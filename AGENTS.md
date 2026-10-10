@@ -8,7 +8,7 @@ Instrukser for alle KI-agenter som jobber i dette repoet (Claude, Codex, ChatGPT
 2. Les `todo.md`, særlig `## Neste`.
 3. Les de siste oppføringene i `log.md`.
 4. Les `STATUS.md` hvis du skal endre noe som er testet eller rapportert der.
-5. Referansen er The Dig HD Remake (github.com/Tombonator3000/Dig-HD-Remake). Les `AGENTS.md`, `docs/HD-MOTOR.md` og `docs/HD-REMASTER-METODE.md` der før du lager motor, pipeline eller grafikkjobber her.
+5. Les `docs/HD-REMASTER-METODE.md` og `docs/HD-MOTOR.md` ved arbeid med motor, pipeline eller grafikk. Referansen er The Dig HD Remake (github.com/Tombonator3000/Dig-HD-Remake), som dette repoet er kopiert fra og tilpasset.
 
 ## Mens du jobber
 
@@ -33,16 +33,38 @@ Instrukser for alle KI-agenter som jobber i dette repoet (Claude, Codex, ChatGPT
 ## Roller
 
 - Claude: all kode (pipeline, motor, test, verktøy for grafikkjobbene) og kontrollen av grafikken.
-- ChatGPT/Codex: HD-grafikken. Jobber bare i grenen `gpt-arbeid` når den finnes.
+- ChatGPT/Codex: HD-grafikken, etter `docs/BESTILLING-CHATGPT.md` når den er aktiv. Jobber bare i grenen `gpt-arbeid`.
 - Tom: godkjenner stil og resultater.
 
 ## Oppsett
 
 ```sh
 tools/hent_spilldata.sh          # spillfilene til game/, setter sammen MONSTER.SOU og sjekker sjekksummene
+python3 -m venv .venv && . .venv/bin/activate
+pip install -e "pipeline[dev]"   # smhd
+smhd info                        # sjekker spillfilene og viser nøkkeltall
+engine/build.sh                  # ScummVM med patchen til engine/scummvm
+./spill.sh                       # henter det som mangler, bygger og starter spillet
 ```
 
-Motor, pipeline og spill.sh kommer etter hvert, etter mønster fra The Dig.
+`smhd extract` er ikke portet til SCUMM v6 ennå (The Dig brukte dekoderne i thedig-textures). DigHD i patchen er bare slått på for The Dig. Til begge er portet, kjører Sam & Max som originalen, og `engine/test.sh`, `tools/romtest.sh`, `tools/gpt_runde.sh` og `./spill.sh --auto` kan ikke brukes.
+
+## Kommandoer
+
+```sh
+cd pipeline && pytest            # etter endringer i pipelinen (game-testene hoppes over uten game/)
+pytest -m "not game"             # det CI kjører
+node --test engine/pages/tests/*.test.mjs   # nettsidekoden
+engine/run.sh ingen              # spillet uten mod
+python3 tools/indeks_info.py game/SAMNMAX.000
+```
+
+## Arbeid med motoren
+
+- Patchen ligger i `engine/patches/` og er foreløpig den samme som i The Dig. Gjør endringer i `engine/scummvm`, og lag patchen på nytt med
+  `git -C engine/scummvm add -N engines/scumm/dighd.cpp engines/scumm/dighd.h && git -C engine/scummvm diff > engine/patches/0001-dighd-hd-grafikk.patch`.
+- ScummVM-versjonen er låst i `engine/SCUMMVM_COMMIT`. Bytt den bare sammen med en test av patchen.
+- Hva som må portes for v6: `docs/HD-MOTOR.md`.
 
 ## Grener
 
@@ -50,5 +72,5 @@ Motor, pipeline og spill.sh kommer etter hvert, etter mønster fra The Dig.
 | --- | --- |
 | `main` | Kode og dokumentasjon |
 | `spilldata` | Spillfilene med sjekksummer, uten felles historikk med `main` |
-| `gpt-arbeid` | Arbeidsbordet med ChatGPT/Codex (lages når grafikkarbeidet starter) |
-| `hd-mod` | Siste ferdige HD-mod, én commit som erstattes (lages når modden finnes) |
+| `gpt-arbeid` | Arbeidsbordet med ChatGPT/Codex. Ingen jobber før stilpiloten er godkjent |
+| `hd-mod` | Siste ferdige HD-mod, én commit som erstattes. Tom til den første modden finnes |

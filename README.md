@@ -10,22 +10,25 @@ Repoet er offentlig etter Toms valg. Spillfilene og alt som lages fra dem ligger
 
 | Del | Status |
 | --- | --- |
-| Repo | Satt opp som The Dig: AGENTS, logg, minne, todo, status, grener |
-| Spillfiler | CD-utgaven (SAMNMAX.000, SAMNMAX.001, MONSTER.SOU med tale). Se `memory.md` for utgave og sjekksummer |
-| Uttrekk | Ikke startet |
-| HD-motor | Ikke startet. The Dig-patchen er for SCUMM v7 og må tilpasses v6 |
-| HD-grafikk | Ikke startet |
+| Repo | Samme oppsett som The Dig HD Remake: `engine/`, `pipeline/` (`smhd`), `tools/`, `docs/`, `spill.sh`, arbeidsflyter og grenene `spilldata`, `hd-mod` og `gpt-arbeid`. Kopiert og tilpasset Sam & Max |
+| Spillfiler | Engelsk CD-utgave (SAMNMAX.000, SAMNMAX.001, MONSTER.SOU med tale) i `spilldata` |
+| Analyse | 85 rom (36 brede), 63 med z-plan, 43 med fargesykling, 959 objektbilder, 348 kostymer. Se [docs/ANALYSE.md](docs/ANALYSE.md) og [docs/rom-oversikt.csv](docs/rom-oversikt.csv) |
+| HD-motor | ScummVM med The Dig-patchen bygger og kjører Sam & Max, men uten HD: DigHD er ikke portet til SCUMM v6 ennå ([docs/HD-MOTOR.md](docs/HD-MOTOR.md)) |
+| Uttrekk | Ikke portet (`smhd extract` stopper med en melding) |
+| HD-grafikk | Ikke startet. Stilpilot med Tom først |
+| Spille | `./spill.sh` starter originalspillet. Linux-pakken er tilpasset, ikke bygget i Actions ennå. Nettsiden trenger eget repo |
 
 Detaljer: [STATUS.md](STATUS.md). Hva som gjenstår: [todo.md](todo.md).
 
-## Hente spillfilene
+## Spille
 
 ```sh
+sudo apt install build-essential git pkg-config libsdl2-dev libpng-dev zlib1g-dev   # én gang (Ubuntu/Debian)
 git clone https://github.com/Tombonator3000/Sam-Max-HD.git && cd Sam-Max-HD
-tools/hent_spilldata.sh
+./spill.sh
 ```
 
-Skriptet henter grenen `spilldata` til `game/`, setter sammen talen (`MONSTER.SOU` ligger i deler på 90 MB fordi GitHub ikke tar filer over 100 MB) og sjekker sjekksummene.
+`spill.sh` henter spillfilene og siste HD-mod, bygger motoren første gang og starter spillet. Talen (`MONSTER.SOU`) ligger i deler på 90 MB i `spilldata` fordi GitHub ikke tar filer over 100 MB, og settes sammen av `tools/hent_spilldata.sh`. Til HD-delen er portet, starter spillet som originalen. Alle valg og hva du skal se etter: [docs/SPILLTEST.md](docs/SPILLTEST.md).
 
 ## Grener
 
@@ -33,5 +36,5 @@ Skriptet henter grenen `spilldata` til `game/`, setter sammen talen (`MONSTER.SO
 | --- | --- |
 | `main` | Kode og dokumentasjon |
 | `spilldata` | Spillfilene med sjekksummer |
-| `gpt-arbeid` | Arbeidsbordet med grafikerne (kommer) |
-| `hd-mod` | Siste HD-pakke (kommer) |
+| `gpt-arbeid` | Arbeidsbordet med grafikerne. Ingen jobber før stilpiloten |
+| `hd-mod` | Siste HD-pakke, én commit som erstattes. Tom til den første modden finnes |
