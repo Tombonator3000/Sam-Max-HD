@@ -1,0 +1,31 @@
+# memory.md
+
+Faste fakta og beslutninger. Oppdateres når noe endrer seg.
+
+## Mål
+- HD-versjon av *Sam & Max Hit the Road* (LucasArts 1993, SCUMM v6): HD-bakgrunner, HD-objekter, HD-figurer og HD-tekst, lagt oppå originalen slik som i The Dig HD.
+- Tom vil ha det samme som for The Dig: spillet starter rett inn som originalen, HD eller originalgrafikk velges i spillets egen meny, det virker på mobil, og det finnes en komplett fil til nedlasting (Linux først).
+
+## Spillfilene
+- Original på Google Drive, mappen `samnmax` (id `1ZWXP2NLg9FzADXZ5G37HlkYGtoSKvHih`) i mappen `Scummvm` (id `1YpufOwLtohaVAPOdRxnIs4DHzO_0GcQ5`). Tom delte `Scummvm` med lenke 10. oktober 13:17 så filene kunne hentes.
+- Utgave: engelsk CD-utgave. SAMNMAX.000 MD5 `d917f311a448e3cc7239c31bddb00dd2`, som i ScummVMs `scumm-md5.h` (master, generert 27. september 2026) står som samnmax, CD, 9080 byte, EN_ANY.
+- Filer og størrelser: SAMNMAX.000 (9 080), SAMNMAX.001 (13 790 685), MONSTER.SOU (183 195 967, talen), MT32_CONTROL.ROM (65 536) og MT32_PCM.ROM (524 288). ROM-filene er Roland MT-32-ROM for musikkemulering i ScummVM, ikke en del av spillet, og er valgfrie.
+- SHA-256 for alle filene står i `game/SHA256SUMS` i grenen `spilldata`.
+- Kopi i grenen `spilldata` (uten felles historikk med `main`). MONSTER.SOU ligger i to deler på høyst 90 MiB (`MONSTER.SOU.001` og `.002`). `tools/hent_spilldata.sh` setter den sammen og sjekker summene.
+- Repoet er offentlig etter Toms valg 10. oktober 2026 ("Offentlig, som The Dig").
+- Spillfiler og alt laget fra dem (work/, mods/) skal aldri inn i main.
+
+## Format (sjekket 10. oktober)
+- SAMNMAX.000 og .001 er kryptert med XOR 0x69. Etter XOR: SAMNMAX.000 har blokkene RNAM (tom), MAXS, DROO, DSCR, DSOU, DCOS, DCHR, DOBJ og AARY. SAMNMAX.001 er én LECF-blokk over hele filen.
+- Indeksen (plasser, i bruk): rom 95 (85), skript 122 (121), lyder 95 (94), kostymer 349 (348), tegnsett 6 (4), objekter 1100. Ikke kontrollert mot innholdet i LECF.
+- MONSTER.SOU starter med `SOU `.
+
+## Teknisk plan (fra The Dig, ikke testet for Sam & Max)
+- Referanse: github.com/Tombonator3000/Dig-HD-Remake og skillen `scumm-hd-remake`. The Dig-patchen er for SCUMM v7 og kan ikke kopieres rett.
+- Sam & Max er v6: kostymene tegnes av `ClassicCostumeRenderer` (`costume.cpp`), ikke AKOS. Teksten av `CharsetRendererClassic`. Ingen SMUSH-filmer, mellomsekvensene tegnes av motoren. Blast-objekter og blast-tekst finnes.
+- ScummVM-ID `samnmax`. Commit er ikke låst ennå.
+- For uttrekket: enten en dump-modus i motorpatchen eller egne dekodere etter ScummVM-kildene. Ikke bestemt.
+
+## Arbeidsform
+- Roller: Claude koden, ChatGPT/Codex grafikken, Tom godkjenner.
+- Stilpilot med ett rom og ett figurark før noe bestilles i mengde. Ta glatt figurstil med ekte alfa fra starten (lærdom fra The Dig).

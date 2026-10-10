@@ -1,0 +1,19 @@
+name: test
+
+on:
+  push:
+    branches-ignore: [spilldata, hd-mod, gpt-arbeid]
+  pull_request:
+
+jobs:
+  repo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ingen spillfiler i grenen
+        run: |
+          if git ls-files | grep -iE '(^|/)(samnmax|monster)\.|\.(sm0|sm1|sou|rom)$|^game/|^work/|^mods/'; then
+            echo "Spillfiler eller avledede filer er sjekket inn"; exit 1
+          fi
+      - name: Skallskriptene
+        run: bash -n tools/*.sh
