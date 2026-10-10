@@ -16,3 +16,8 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 - Grenen `spilldata` (uten felles historikk med main): README, `game/` med SAMNMAX.000, SAMNMAX.001, de to MT-32-ROM-filene og `SHA256SUMS` for alle fem hele filer (a65333e), så MONSTER.SOU delt med `split -b 90M` i `MONSTER.SOU.001` (94 371 840) og `.002` (88 824 127), én del per push (04c068b, 55a26b7). Sjekket før push at delene satt sammen gir samme SHA-256 som originalen.
 - Main: AGENTS.md, README, memory.md, todo.md, log.md, STATUS.md, .gitignore mot spillfilene, `tools/hent_spilldata.sh` (setter sammen MONSTER.SOU og sjekker summene) og en CI-sjekk som stopper spillfiler i main og kodegrener.
 - Ikke gjort: ScummVM er ikke bygget, og spillet er ikke startet. Ingen motor, pipeline eller grafikk ennå.
+
+## 2026-10-10 13:25 (Claude)
+- Kontroll: fersk `git clone` av main (86952bf), så `tools/hent_spilldata.sh`. Grenen hentet, MONSTER.SOU satt sammen (183 195 967 byte), SHA-256 for alle fem filer stemmer. `git status` er tom etterpå, så `game/` holdes utenfor.
+- CI (test) på main 86952bf: bestått.
+- Tom kan skru av lenkedelingen på Drive-mappen `Scummvm` nå.
