@@ -36,7 +36,9 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
 ## Teknisk plan (fra The Dig, ikke testet for Sam & Max)
 - Referanse: github.com/Tombonator3000/Dig-HD-Remake og skillen `scumm-hd-remake`. The Dig-patchen er for SCUMM v7 og kan ikke kopieres rett.
-- Patchen bygger mot ScummVM `c9091321` og Sam & Max kjører med den (testet uten skjerm 10. oktober), men DigHD er av fordi `DigHD::create` krever `GID_DIG`.
+- DigHD er på for Sam & Max fra 10. oktober (`DigHD::create` godtar `GID_SAMNMAX`). Endringer i patchen for v6: kroker i `ClassicCostumeRenderer` (`drawLimb` setter rutenummer lag * 128 + kode, `markAsDirty` husker rektangelet, `paintCelByleRLE` kaller `noteCel`), `beginActor` også for klassiske kostymer, pekerkroken i `ScummEngine::updateCursor`, testhoppet leser RMHD i v6-format, `DIGHD_TEST_COSTUME` leser COST-hodet, blast-objekter får bildet som faktisk tegnes (Sam & Max ber om 0, motoren bruker 1).
+- Viktig v6-forskjell: `drawStripToScreen` legger tekstlaget over bufferen i `_compositeBuf` før blit. `blitVirtScreen` får derfor også `vsSrc` (området i bufferen) for merkene per piksel; uten det fikk ingen figurer HD.
+- Ikke portet: tekst (`CharsetRendererClassic`) og menyraden HD Graphics for v6. Ctrl+H virker.
 - Sam & Max er v6: kostymene tegnes av `ClassicCostumeRenderer` (`costume.cpp`), ikke AKOS. Teksten av `CharsetRendererClassic`. Ingen SMUSH-filmer, mellomsekvensene tegnes av motoren. Blast-objekter finnes i v6. Blast-tekst er tom i `ScummEngine_v6` ved c9091321 (skillen sier den finnes; må sjekkes i spillet).
 - Funnet i ScummVM-kilden 10. oktober: pekerkroken i patchen ligger bare i `ScummEngine_v7::updateCursor`, og menyraden HD Graphics står med v7-koordinater i `setUpMainMenuControls`. Begge må lages for v6.
 - `engine/build.sh` bygger med `--disable-mt32emu`, så MT-32-ROM-filene brukes ikke. Uten MIDI-utgang spiller iMUSE musikken med AdLib.

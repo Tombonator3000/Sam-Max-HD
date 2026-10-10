@@ -151,7 +151,7 @@ Spillets exe-fil trenger ikke dekompileres. ScummVM har SCUMM v6-motoren (`Scumm
 
 ## 8. Motoren
 
-Patchen er den samme som i The Dig, og den er ikke aktiv for Sam & Max ennå: `DigHD::create` slår seg bare på for `GID_DIG`. Hva som må portes, står i [HD-MOTOR.md](HD-MOTOR.md).
+Patchen er The Dig sin, utvidet for Sam & Max 10. oktober: rom, objekter, blast-objekter og kostymer får HD; teksten og menyraden er ikke portet. Detaljer og tester i [HD-MOTOR.md](HD-MOTOR.md).
 
 **Bygget og startet 10. oktober:** `engine/build.sh` bygde ScummVM ved `c9091321` med patchen her (Ubuntu 24.04, SDL 2.30). Spillet ble startet fra `game/` uten skjerm (`SDL_VIDEODRIVER=dummy`) og kjørte i 25 sekunder til det ble stoppet: ScummVM kjente igjen `samnmax`, CD, SCUMM 6 og MD5-en, leste alle katalogene i indeksen, skriptene la objekt 35 fra rom 1 i inventaret, og iMUSE startet musikken (AdLib, fordi MIDI-utgangen ikke finnes her). Ingen feil. Bildet er ikke sett, fordi det ikke er skjerm og DigHD (som har bildedump) ikke er på for Sam & Max.
 
@@ -162,9 +162,9 @@ Patchen er den samme som i The Dig, og den er ikke aktiv for Sam & Max ennå: `D
 | `engines/scumm/gfx.cpp` | `drawStripToScreen`, `markRectAsDirty`, overgangseffekter | Finnes. Felles for alle SCUMM-versjoner |
 | `engines/scumm/object.cpp` | `drawObject`, `ScummEngine_v6::drawBlastObject`, `removeBlastObjects` | Finnes. Blast-objektene er v6-kode |
 | `engines/scumm/palette.cpp` | `updatePalette`, `initCycl`, `cyclePalette`, `setCurrentPalette` | Paletten går til DigHD fra `updatePalette` |
-| `engines/scumm/costume.cpp` | `ClassicCostumeRenderer::drawLimb`, `paintCelByleRLE` | Mangler. Krokene finnes bare i `akos.cpp` |
+| `engines/scumm/costume.cpp` | `ClassicCostumeRenderer::drawLimb`, `paintCelByleRLE` | Lagt til 10. oktober |
 | `engines/scumm/charset.cpp` | `CharsetRendererClassic` | Mangler. Kroken finnes bare i `CharsetRendererV7::drawCharV7` |
-| `engines/scumm/cursor.cpp` | `ScummEngine::updateCursor` | Mangler. Kroken finnes bare i `ScummEngine_v7::updateCursor` |
+| `engines/scumm/cursor.cpp` | `ScummEngine::updateCursor` | Lagt til 10. oktober |
 | `engines/scumm/gfx_gui.cpp` | `ScummEngine_v6::setUpMainMenuControls`, `updateMainMenuControls` | Raden HD Graphics finnes, men bare for `GID_DIG` |
 
 **Filnavn i mod-mappen:** som i The Dig (`rooms/roomNNN.png`, `objects/objNNN_SS.png`, `costumes/costumeCCC_NNN.png`, med `_idx.png` ved siden av). Uttrekk, oppskalering og motor bruker de samme navnene.

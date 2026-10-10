@@ -10,8 +10,7 @@
 #
 # Bruk: engine/test.sh [antall bilder, standard 3000]
 #
-# Ikke i bruk for Sam & Max ennå: DigHD er bare slått på for The Dig, så motoren skriver ingen
-# DigHD-linjer. Uttrekket (smhd extract) virker.
+# Med Sam & Max: kjører fra starten av spillet (rom 1, 3 og 2) med rom, objekter og kostyme 1 til 20.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

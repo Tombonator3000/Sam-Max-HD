@@ -13,7 +13,7 @@ Repoet er offentlig etter Toms valg. Spillfilene og alt som lages fra dem ligger
 | Repo | Samme oppsett som The Dig HD Remake: `engine/`, `pipeline/` (`smhd`), `tools/`, `docs/`, `spill.sh`, arbeidsflyter og grenene `spilldata`, `hd-mod` og `gpt-arbeid`. Kopiert og tilpasset Sam & Max |
 | Spillfiler | Engelsk CD-utgave (SAMNMAX.000, SAMNMAX.001, MONSTER.SOU med tale) i `spilldata` |
 | Analyse | 85 rom (36 brede), 63 med z-plan, 43 med fargesykling, 959 objektbilder, 348 kostymer. Se [docs/ANALYSE.md](docs/ANALYSE.md) og [docs/rom-oversikt.csv](docs/rom-oversikt.csv) |
-| HD-motor | ScummVM med The Dig-patchen bygger og kjører Sam & Max, men uten HD: DigHD er ikke portet til SCUMM v6 ennå ([docs/HD-MOTOR.md](docs/HD-MOTOR.md)) |
+| HD-motor | På for Sam & Max: rom, objekter, blast-objekter og figurer får HD fra modden. Testet med nearest-mod (0 avvik) og romtest i alle rom. Teksten og menyraden HD Graphics er ikke portet; Ctrl+H bytter ([docs/HD-MOTOR.md](docs/HD-MOTOR.md)) |
 | Uttrekk | `smhd extract` tar ut alt: 83 rombakgrunner, 959 objektbilder og 16 052 kostymeruter fra 348 kostymer, som PNG med metadata. Egne dekodere oversatt fra ScummVM |
 | Skript | Alle 1181 skript dekompilert med descumm (`tools/dekompiler_skript.py`), 1179 uten feil |
 | HD-grafikk | Ikke startet. Stilpilot med Tom først |
@@ -29,7 +29,7 @@ git clone https://github.com/Tombonator3000/Sam-Max-HD.git && cd Sam-Max-HD
 ./spill.sh
 ```
 
-`spill.sh` henter spillfilene og siste HD-mod, bygger motoren første gang og starter spillet. Talen (`MONSTER.SOU`) ligger i deler på 90 MB i `spilldata` fordi GitHub ikke tar filer over 100 MB, og settes sammen av `tools/hent_spilldata.sh`. Til HD-delen er portet, starter spillet som originalen. Alle valg og hva du skal se etter: [docs/SPILLTEST.md](docs/SPILLTEST.md).
+`spill.sh` henter spillfilene og siste HD-mod, bygger motoren første gang og starter spillet. Talen (`MONSTER.SOU`) ligger i deler på 90 MB i `spilldata` fordi GitHub ikke tar filer over 100 MB, og settes sammen av `tools/hent_spilldata.sh`. Til det finnes en HD-mod, starter spillet med originalgrafikken; `./spill.sh --auto` gir automatisk oppskalering. Ctrl+H bytter mellom HD og original. Alle valg og hva du skal se etter: [docs/SPILLTEST.md](docs/SPILLTEST.md).
 
 ## Grener
 

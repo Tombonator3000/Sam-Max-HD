@@ -9,7 +9,7 @@ Planen er den samme som for The Dig: en nettside som går rett inn i spillet, p�
 | Nettsiderepoet `Tombonator3000/Sam-Max-HD-Web` | Finnes ikke ennå |
 | Nettsidekoden i `engine/pages` | Tilpasset Sam & Max. Ikke bygget og ikke testet i nettleser |
 | Motoren for nettleseren (`engine/build-web.sh`, `engine/build-pages.py`) | Ikke bygget for Sam & Max |
-| HD-grafikk | Ingen. HD-patchen er ikke portet til SCUMM v6, så motoren viser bare originalgrafikken, og det finnes ingen HD-mod i `hd-mod` |
+| HD-grafikk | Motoren har HD for rom, objekter og figurer i Sam & Max, men det finnes ingen HD-mod i `hd-mod` ennå |
 
 Alt under beskriver hvordan siden skal virke, etter The Dig sin nettside. Ingenting av det er prøvd med Sam & Max.
 

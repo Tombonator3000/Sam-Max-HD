@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Romtest: kjører spillet uten skjerm i hvert rom og ser hva HD-motoren gjør der.
 
-Ikke portet til Sam & Max ennå: testkrokene (DIGHD_TEST_ROOM osv.) virker bare når DigHD er
-slått på, og det er den bare for The Dig til patchen er portet til v6. Romtesten trenger også
-uttrekket (work/extract/rooms.json), som ikke er portet.
+Med Sam & Max (10. oktober): kjørt i alle 85 rom med en nearest-mod. Rom som henger etter
+hoppet (skriptfeil uten riktig spilltilstand), stoppes av --tidsgrense.
 
 For hvert rom (og for brede og høye rom flere kameraplasser) hopper spillet til
 rommet med DIGHD_TEST_ROOM, går et antall bilder og lagrer skjermbildet i HD og
