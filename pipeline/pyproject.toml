@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smhd"
+version = "0.1.0"
+description = "HD-pipeline for Sam & Max Hit the Road: oppskalering, mod-pakker og grafikkjobber for HD-motoren"
+requires-python = ">=3.12"
+dependencies = [
+  "pillow>=10",
+  "numpy>=1.26",
+  "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+# Dekoderne for LA1/AKOS/SAN (digart), verifisert mot ScummVM, låst til en kjent versjon.
+# Bare `smhd extract` trenger dem. CI fikk ikke klonet repoet 9. oktober 2026
+# ("could not read Username"); derfor er de valgfrie, så resten installeres og testes uten.
+uttrekk = [
+  "thedig-textures @ git+https://github.com/felipe-dos-santos81/thedig-textures@1cf355ed1aa32326fc1b3097ba1d1df692b51501",
+]
+
+[project.scripts]
+smhd = "smhd.cli:main"
+
+[tool.setuptools]
+packages = ["smhd"]
+
+[tool.setuptools.package-data]
+smhd = ["skrifter/*/*"]
+
+[tool.pytest.ini_options]
+markers = ["game: trenger spillfilene i game/ (hentes med tools/hent_spilldata.sh)"]

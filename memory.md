@@ -17,15 +17,30 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
 ## Format (sjekket 10. oktober)
 - SAMNMAX.000 og .001 er kryptert med XOR 0x69. Etter XOR: SAMNMAX.000 har blokkene RNAM (tom), MAXS, DROO, DSCR, DSOU, DCOS, DCHR, DOBJ og AARY. SAMNMAX.001 er én LECF-blokk over hele filen.
-- Indeksen (plasser, i bruk): rom 95 (85), skript 122 (121), lyder 95 (94), kostymer 349 (348), tegnsett 6 (4), objekter 1100. Ikke kontrollert mot innholdet i LECF.
+- Indeksen (plasser, i bruk): rom 95 (85), skript 122 (121), lyder 95 (94), kostymer 349 (348), tegnsett 6 (4), objekter 1100.
+- I SAMNMAX.001 (målt med `gamedata.read_rooms`): 85 rom (42 på 320 x 200, 36 brede opptil 1104, 4 nesten tomme: 69, 80, 81, 82), 63 med z-plan, 2 med flere paletter (7 og 51), 43 med fargesykling, 959 objektbilder på 715 objekter, 348 COST med ID 1 til 348 i DCOS, 120 SCRP, 94 SOUN, 4 CHAR, 564 LSCR. Paletter i PALS/WRAP/APAL som i v7.
 - MONSTER.SOU starter med `SOU `.
+
+## Oppsettet (10. oktober)
+- Tom ville ha repoet satt opp på samme måte som Dig-HD-Remake, med skillen `scumm-hd-remake`, og valgte "hele oppsettet, tilpasset": samme mapper og filer, tilpasset der det går, og det som ikke er portet til v6, merket.
+- Kopiert fra Dig-HD-Remake (main 36cd09f): `engine/` (patch, byggeskript, nettsidekode), `pipeline/` (omdøpt fra `dighd` til `smhd`), `tools/`, `docs/`, `spill.sh`, `.github/workflows/test.yml` og `linux.yml`. The Dig-spesifikke data (konseptbilder, romnotater, figurliste, avvisninger, kostymefarger, grafikkpiloten) er ikke tatt med; CSV-filene har bare overskrifter, unntatt `docs/rom-oversikt.csv`, som er fylt fra Sam & Max-filene.
+- Miljøvariablene `DIGHD_*`, klassen DigHD, `dighd.cpp/.h`, patchnavnet og mod-formatet beholdes, fordi patchen er den samme.
+- `gamedata.py` leser både v6 (Sam & Max, XOR 0x69) og v7 (The Dig). `smhd info` virker. `smhd extract` stopper med en melding for v6.
+- Grenene `hd-mod` (README og SHA256SUMS, ingen mod) og `gpt-arbeid` (AGENTS, BESTILLING, ORDRE uten jobber) er startgrener.
+- Linux-arbeidsflyten kjører bare for hånd eller om natten når `hd-mod` endres; push-utløseren er av til HD virker.
+- Nettsiderepoet (planlagt `Tombonator3000/Sam-Max-HD-Web`) finnes ikke.
 
 ## Teknisk plan (fra The Dig, ikke testet for Sam & Max)
 - Referanse: github.com/Tombonator3000/Dig-HD-Remake og skillen `scumm-hd-remake`. The Dig-patchen er for SCUMM v7 og kan ikke kopieres rett.
-- Sam & Max er v6: kostymene tegnes av `ClassicCostumeRenderer` (`costume.cpp`), ikke AKOS. Teksten av `CharsetRendererClassic`. Ingen SMUSH-filmer, mellomsekvensene tegnes av motoren. Blast-objekter og blast-tekst finnes.
-- ScummVM-ID `samnmax`. Commit er ikke låst ennå.
+- Patchen bygger mot ScummVM `c9091321` og Sam & Max kjører med den (testet uten skjerm 10. oktober), men DigHD er av fordi `DigHD::create` krever `GID_DIG`.
+- Sam & Max er v6: kostymene tegnes av `ClassicCostumeRenderer` (`costume.cpp`), ikke AKOS. Teksten av `CharsetRendererClassic`. Ingen SMUSH-filmer, mellomsekvensene tegnes av motoren. Blast-objekter finnes i v6. Blast-tekst er tom i `ScummEngine_v6` ved c9091321 (skillen sier den finnes; må sjekkes i spillet).
+- Funnet i ScummVM-kilden 10. oktober: pekerkroken i patchen ligger bare i `ScummEngine_v7::updateCursor`, og menyraden HD Graphics står med v7-koordinater i `setUpMainMenuControls`. Begge må lages for v6.
+- `engine/build.sh` bygger med `--disable-mt32emu`, så MT-32-ROM-filene brukes ikke. Uten MIDI-utgang spiller iMUSE musikken med AdLib.
+- Nettsiden: `engine/pages` er tilpasset (filfilter, MONSTER.SOU-deler, samnmax), 16 nodetester består, men den er ikke bygget eller prøvd i nettleser. Lerretet venter på loggen `DigHD: screen`, som ikke kommer før DigHD er på.
+- ScummVM-ID `samnmax`. Låst til commit c9091321 (`engine/SCUMMVM_COMMIT`), samme som The Dig.
 - For uttrekket: enten en dump-modus i motorpatchen eller egne dekodere etter ScummVM-kildene. Ikke bestemt.
 
 ## Arbeidsform
 - Roller: Claude koden, ChatGPT/Codex grafikken, Tom godkjenner.
+- Claude får ikke flette sine egne PR-er herfra (sikkerhetskontrollen, 10. oktober). Tom fletter når CI er grønn.
 - Stilpilot med ett rom og ett figurark før noe bestilles i mengde. Ta glatt figurstil med ekte alfa fra starten (lærdom fra The Dig).
