@@ -36,3 +36,4 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 - Grenene `hd-mod` (README og SHA256SUMS, ingen mod, 396177a) og `gpt-arbeid` (AGENTS, BESTILLING, ORDRE uten jobber, stil/, 0e359b2) laget og pushet.
 - Funnet i ScummVM-kilden: pekerkroken i patchen er bare i `ScummEngine_v7::updateCursor`, menyraden HD Graphics står med v7-koordinater, blast-tekst er tom i `ScummEngine_v6`, og `--disable-mt32emu` gjør at ROM-filene ikke brukes. Skrevet i HD-MOTOR, memory og todo.
 - AGENTS, README, memory, todo og STATUS oppdatert.
+- PR 1 (`oppsett-som-dig`), CI (test) grønn på push og PR. Jeg får ikke flette min egen PR herfra (stoppet av sikkerhetskontrollen, som i Dig-repoet). Tom fletter.

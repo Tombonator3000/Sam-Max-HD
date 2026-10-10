@@ -42,4 +42,5 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
 ## Arbeidsform
 - Roller: Claude koden, ChatGPT/Codex grafikken, Tom godkjenner.
+- Claude får ikke flette sine egne PR-er herfra (sikkerhetskontrollen, 10. oktober). Tom fletter når CI er grønn.
 - Stilpilot med ett rom og ett figurark før noe bestilles i mengde. Ta glatt figurstil med ekte alfa fra starten (lærdom fra The Dig).
