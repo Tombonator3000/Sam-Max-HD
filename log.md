@@ -5,7 +5,7 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 ## 2026-10-09 21:37
 - Repo opprettet av Tom (bare README).
 
-## 2026-10-10 12:57 til 13:25 (Claude)
+## 2026-10-10 12:57 til 13:22 (Claude)
 - Tom: sett opp repoet på samme måte som The Dig HD Remake, klargjør filene fra Google Drive og legg dem inn.
 - Sjekket etter AGENTS.md. Fantes ikke. Leste AGENTS, memory, todo, STATUS, siste del av log og `tools/hent_spilldata.sh` i Dig-HD-Remake, og skillen `scumm-hd-remake`.
 - Spurte Tom om synlighet: offentlig, som The Dig.
@@ -17,7 +17,7 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 - Main: AGENTS.md, README, memory.md, todo.md, log.md, STATUS.md, .gitignore mot spillfilene, `tools/hent_spilldata.sh` (setter sammen MONSTER.SOU og sjekker summene) og en CI-sjekk som stopper spillfiler i main og kodegrener.
 - Ikke gjort: ScummVM er ikke bygget, og spillet er ikke startet. Ingen motor, pipeline eller grafikk ennå.
 
-## 2026-10-10 13:25 (Claude)
+## 2026-10-10 13:23 (Claude)
 - Kontroll: fersk `git clone` av main (86952bf), så `tools/hent_spilldata.sh`. Grenen hentet, MONSTER.SOU satt sammen (183 195 967 byte), SHA-256 for alle fem filer stemmer. `git status` er tom etterpå, så `game/` holdes utenfor.
 - CI (test) på main 86952bf: bestått.
 - Tom kan skru av lenkedelingen på Drive-mappen `Scummvm` nå.
