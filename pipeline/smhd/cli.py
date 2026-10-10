@@ -1,8 +1,7 @@
 """Kommandolinje for HD-pipelinen.
 
   smhd info                         Sjekker spillfilene og viser nøkkeltall
-  smhd extract                      Eksporterer rom, objekter og kostymer til work/extract (ikke portet til
-                                     Sam & Max ennå, se export.py)
+  smhd extract                      Eksporterer rom, objekter og kostymer til work/extract (eksport_v6.py)
   smhd build-mod --name test        Lager en mod-mappe for HD-motoren
   smhd compare --room 22            Lager et sammenligningsbilde av oppskaleringsmetoder
   smhd gpt-pakke                    Lager jobber for ChatGPT i work/gpt (rom, store objektbilder, lag, ikonark
@@ -72,21 +71,35 @@ def cmd_info(a) -> int:
 
 
 def cmd_extract(a) -> int:
-    idx = gamedata.read_index(Path(a.game) / INDEX_FILE)
-    if idx.version != 7:
-        print("smhd extract er ikke portet til SCUMM v6 ennå. Uttrekket for The Dig brukte dekoderne i\n"
-              "thedig-textures, som bare kan The Dig. For Sam & Max trengs en dump-modus i motorpatchen\n"
-              "eller egne dekodere for SMAP og COST (se todo.md og docs/ANALYSE.md).", file=sys.stderr)
-        return 2
     game, out = Path(a.game), Path(a.out)
+    idx = gamedata.read_index(game / INDEX_FILE)
+    parts = a.only.split(",") if a.only else ["rom", "kostymer"]
+    if idx.version == 6:
+        from . import eksport_v6
+        ok = True
+        if {"rom", "la1"} & set(parts):
+            meta = eksport_v6.export_rooms(game, out, _rooms(a.rooms))
+            n_rooms = sum(1 for r in meta["rooms"].values() if "codecs" in r)
+            n_obj = sum(len(o["states"]) for r in meta["rooms"].values() for o in r["objects"])
+            print(f"Rom og objekter: {meta['written']} bilder ({n_rooms} rom, {n_obj} objektbilder) -> {out}")
+            if meta["errors"]:
+                ok = False
+                print(f"  {len(meta['errors'])} feil, se rooms.json")
+        if {"kostymer", "akos"} & set(parts):
+            res = eksport_v6.export_costumes(game, out, _rooms(a.costumes))
+            print(f"Kostymeruter: {res['written']} bilder fra {res['costumes']} kostymer -> {out / 'costumes'}")
+            if res["errors"]:
+                ok = False
+                print(f"  {len(res['errors'])} feil: " + "; ".join(res["errors"][:5]))
+        return 0 if ok else 1
+    # The Dig (v7): dekoderne i thedig-textures
     rooms = _rooms(a.rooms)
-    parts = a.only.split(",") if a.only else ["la1", "akos"]
-    if "la1" in parts:
+    if {"rom", "la1"} & set(parts):
         meta = export.export_la1(game, out, rooms)
         print(f"Rom og objekter: {meta['written']} bilder -> {out}")
         if meta["errors"]:
             print(f"  {len(meta['errors'])} feil, se rooms.json")
-    if "akos" in parts:
+    if {"kostymer", "akos"} & set(parts):
         colours = export.read_costume_colours(Path(a.kostymefarger) if a.kostymefarger else None)
         n = export.export_costumes(game, out, _rooms(a.costumes), colours)
         print(f"Kostymeruter: {n} bilder -> {out / 'costumes'}")
@@ -191,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("extract", help="eksporter originalgrafikk")
     p.add_argument("--out", default=str(root / "work" / "extract"))
-    p.add_argument("--only", help="la1, akos (kommaseparert). Standard: begge")
+    p.add_argument("--only", help="rom, kostymer (kommaseparert; la1 og akos virker også). Standard: begge")
     p.add_argument("--rooms", help="for eksempel 22,24 eller 20-30")
     p.add_argument("--costumes", help="kostyme-ID-er, for eksempel 1-10")
     p.add_argument("--kostymefarger", default=str(root / "docs" / "kostymefarger.csv"),

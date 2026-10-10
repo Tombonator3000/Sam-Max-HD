@@ -93,6 +93,137 @@ def test_v6_index_and_rooms_with_xor(tmp_path):
     assert gamedata.costume_ids(idx, rooms) == [1]
 
 
+def _bits(bitlist: list[int]) -> bytes:
+    """Bitstrøm med minst signifikante bit først, som bitleserne i gfx.cpp."""
+    out = bytearray((len(bitlist) + 7) // 8 + 2)
+    for i, b in enumerate(bitlist):
+        out[i // 8] |= b << (i % 8)
+    return bytes(out)
+
+
+def _num(v: int, n: int) -> list[int]:
+    return [(v >> i) & 1 for i in range(n)]
+
+
+def test_v6_strip_codecs():
+    from smhd import v6grafikk as v
+    # Rå piksler (kodek 1), 8 x 2
+    raw = bytes([1]) + bytes(range(16))
+    pix, mask, code = v.decode_strip(raw, 0, 2, 5)
+    assert code == 1 and pix == bytearray(range(16)) and all(mask)
+    # BasicH (kodek 28, 8 bit per ny farge): farge 10, ny farge 20 etter fire piksler
+    bits = [0, 0, 0] + [1, 0] + _num(20, 8) + [0, 0, 0, 0]
+    pix, mask, _ = v.decode_strip(bytes([28, 10]) + _bits(bits), 0, 1, 5)
+    assert list(pix) == [10, 10, 10, 10, 20, 20, 20, 20] and all(mask)
+    # BasicH: +1 og så snu retningen (-1 to ganger)
+    bits = [1, 1, 0] + [1, 1, 1] + [1, 1, 0] + [0, 0, 0, 0, 0]
+    pix, _, _ = v.decode_strip(bytes([28, 10]) + _bits(bits), 0, 1, 5)
+    assert list(pix) == [10, 9, 10, 11, 11, 11, 11, 11]
+    # BasicV (kodek 18), 8 x 2: pikslene går nedover kolonnene
+    bits = [1, 0] + _num(30, 8) + [0] * 14
+    pix, _, _ = v.decode_strip(bytes([18, 10]) + _bits(bits), 0, 2, 5)
+    assert list(pix[:8]) == [10] + [30] * 7 and list(pix[8:]) == [30] * 8
+    # MajMin (kodek 108): farge 7, +2 (3 bit: 6 - 4), så ny farge 40 med 8 bit
+    bits = [0] + [1, 1] + _num(6, 3) + [0, 0] + [1, 0] + _num(40, 8) + [0, 0, 0]
+    pix, mask, _ = v.decode_strip(bytes([108, 7]) + _bits(bits), 0, 1, 5)
+    assert list(pix) == [7, 7, 9, 9, 9, 40, 40, 40] and all(mask)
+    # MajMin med gjentakelse: diff 0 og antall 3 (8 bit), så samme farge videre
+    bits = [1, 1] + _num(4, 3) + _num(3, 8) + [0] * 10
+    pix, _, _ = v.decode_strip(bytes([108, 7]) + _bits(bits), 0, 1, 5)
+    assert list(pix) == [7] * 8
+    # Med gjennomsiktighet (kodek 128): fargen 9 tegnes ikke
+    bits = [0] + [1, 1] + _num(6, 3) + [0] * 10
+    pix, mask, _ = v.decode_strip(bytes([128, 7]) + _bits(bits), 0, 1, 9)
+    assert list(mask) == [1, 1, 0, 0, 0, 0, 0, 0]
+    with pytest.raises(ValueError):
+        v.decode_strip(bytes([99, 0, 0, 0]), 0, 1, 5)
+
+
+def test_v6_smap_and_bomp():
+    from smhd import v6grafikk as v
+    # SMAP med to striper, 16 x 1: stripe 0 rå, stripe 1 rå med andre verdier
+    s0 = bytes([1]) + bytes([1] * 8)
+    s1 = bytes([1]) + bytes([2] * 8)
+    body = struct.pack("<2I", 16, 16 + len(s0)) + s0 + s1
+    smap = _block(b"SMAP", body)
+    bm = v.decode_smap(smap, 0, 16, 1, 5)
+    assert list(bm.pixels) == [1] * 8 + [2] * 8 and bm.codecs == {1: 2}
+    # BOMP 4 x 2: linje 1 er ett løp med farge 3, linje 2 er 4 bokstavelige byte (255 er gjennomsiktig)
+    line1 = bytes([(3 << 1) | 1, 3])
+    line2 = bytes([(3 << 1), 4, 255, 5, 6])
+    data = struct.pack("<3H", 0, 4, 2) + bytes(4) + struct.pack("<H", len(line1)) + line1 + struct.pack("<H", len(line2)) + line2
+    bm = v.decode_bomp(data, 0)
+    assert (bm.width, bm.height) == (4, 2)
+    assert list(bm.pixels) == [3, 3, 3, 3, 4, 255, 5, 6] and list(bm.mask) == [1, 1, 1, 1, 1, 0, 1, 1]
+
+
+def _cost(fmt: int) -> bytes:
+    """En liten COST-blokk: én animasjon med to ruter i lag 0."""
+    ex = fmt in (0x60, 0x61)
+    pal = bytes([0] + list(range(50, 65)))           # 16 farger
+    head = bytes(6) + bytes([0, fmt]) + pal          # antall animasjoner 0 (bare animasjon 0)
+    p = len(head)
+    frame_offsets = p + 2
+    data_offsets = p + 34
+    anim = data_offsets + 2
+    cmds = anim + 5
+    table = cmds + 2
+    cel0 = table + 4
+    hdr0 = struct.pack("<6h", 2, 3, -1, -40, 0, 0) + (bytes([0xFF, 0xFF]) if ex else b"")
+    rle0 = bytes([0x13, 0x01, 0x22])
+    cel1 = cel0 + len(hdr0) + len(rle0)
+    if ex:
+        # Ruten bruker bildet til lag 0, kode 0 (ex1 = 0, ex2 = 0), med eget hode
+        hdr1, rle1 = struct.pack("<6h", 2, 3, 0, 0, 0, 0) + bytes([0, 0]), b""
+    else:
+        hdr1, rle1 = struct.pack("<6h", 1, 3, 0, 0, 0, 0), bytes([0x30, 0x03])
+    body = bytearray(head)
+    body += struct.pack("<H", cmds)
+    body += struct.pack("<16H", table, *([0] * 15))
+    body += struct.pack("<H", anim)
+    body += struct.pack("<HH", 0x8000, 0) + bytes([1])   # lag 0, kommando 0 og 1
+    body += bytes([0, 1])                                 # kodene 0 og 1
+    body += struct.pack("<2H", cel0, cel1)
+    body += hdr0 + rle0 + hdr1 + rle1
+    return _block(b"COST", bytes(body))
+
+
+def test_v6_costume():
+    from smhd import v6grafikk as v
+    c = v.decode_costume(_cost(0x58), 0)
+    assert c.format == 0x58 and len(c.palette) == 16 and not c.errors
+    assert c.animations == [{"valg": 0, "animasjon": 0, "retning": 0, "lag": 0, "ruter": [0, 1]}]
+    a, b = c.cels
+    assert (a.cel, a.width, a.height, a.rel_x, a.rel_y) == (0, 2, 3, -1, -40)
+    # Løpene går nedover kolonnene: kolonne 0 er farge 1, kolonne 1 er 0, 2, 2
+    assert list(a.colours) == [1, 0, 1, 2, 1, 2]
+    assert list(a.pixels) == [50, 0, 50, 51, 50, 51] and list(a.mask) == [1, 0, 1, 1, 1, 1]
+    # Antall 0 i den første byten: antallet står i neste byte
+    assert (b.width, b.height) == (1, 3) and list(b.colours) == [3, 3, 3]
+    # Format 0x60: ruten kan bruke bildet til en annen rute
+    c = v.decode_costume(_cost(0x60), 0)
+    assert list(c.cels[1].colours) == list(c.cels[0].colours) and c.cels[1].data == c.cels[0].data
+
+
+@pytest.mark.game
+def test_v6_extract_real_game(tmp_path):
+    """Uttrekket av Sam & Max: alle rom, objektbilder og kostymeruter, uten feil."""
+    if not (GAME / "SAMNMAX.001").exists():
+        pytest.skip("game/ mangler, kjør tools/hent_spilldata.sh")
+    import json
+    from smhd import eksport_v6
+    meta = eksport_v6.export_rooms(GAME, tmp_path)
+    assert not meta["errors"]
+    assert sum(1 for r in meta["rooms"].values() if "codecs" in r) == 83
+    assert sum(len(o["states"]) for r in meta["rooms"].values() for o in r["objects"]) == 959
+    res = eksport_v6.export_costumes(GAME, tmp_path, {2, 3})
+    assert not res["errors"] and res["costumes"] == 2 and res["written"] == 81 + 94
+    cm = json.loads((tmp_path / "costumes.json").read_text())
+    assert cm["2"]["format"] == "0x58" and len(cm["2"]["cels"]) == 81
+    im = Image.open(tmp_path / "costumes" / f"costume002_{cm['2']['cels'][0]['cel']:03d}.png")
+    assert im.mode == "RGBA" and im.size == (cm["2"]["cels"][0]["w"], cm["2"]["cels"][0]["h"])
+
+
 def test_upscale_and_alpha():
     im = Image.new("RGB", (10, 6), (200, 40, 10))
     for method in ("nearest", "lanczos", "lanczos-sharp"):
@@ -199,15 +330,6 @@ def test_costume_colours(tmp_path):
     table = export.read_costume_colours(path)
     ids = [line.split(",")[0] for line in path.read_text(encoding="utf-8").splitlines()[1:] if line.strip()]
     assert len(table) == len(ids) == len(set(ids)) and all(t["kind"] in ("rom", "rgbs") for t in table.values())
-
-
-@pytest.mark.game
-def test_extract_stops_for_v6(capsys):
-    """Uttrekket fra The Dig (AKOS, thedig-textures) er ikke portet; for Sam & Max skal det stoppe tydelig."""
-    if not (GAME / "SAMNMAX.001").exists():
-        pytest.skip("game/ mangler, kjør tools/hent_spilldata.sh")
-    assert cli.main(["--game", str(GAME), "extract"]) == 2
-    assert "ikke portet" in capsys.readouterr().err
 
 
 def test_gpt_tiles_shift_and_judge():

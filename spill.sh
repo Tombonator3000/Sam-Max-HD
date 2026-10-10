@@ -2,13 +2,14 @@
 # Spill Sam & Max med HD-grafikken rett fra repoet.
 #
 # Merk: HD-delen av motoren er bare slått på for The Dig til patchen er portet til SCUMM v6.
-# Til da starter spillet som originalen (uten HD), og --rom, --klassisk, --gult og --auto virker ikke.
+# Til da starter spillet som originalen (uten HD): --rom, --klassisk og --gult virker ikke, og modden
+# fra --auto lages, men vises ikke.
 #
 #   ./spill.sh                 henter det som mangler, oppdaterer HD-modden og motoren, starter spillet
 #   ./spill.sh --rom 22        starter i rom 22 (for å se på et bestemt rom)
 #   ./spill.sh --klassisk      starter med originalgrafikken (Ctrl+H bytter underveis)
 #   ./spill.sh --gult          farger gult der HD mangler (Ctrl+Shift+H slår av og på)
-#   ./spill.sh --auto          fyller rom og objekter uten ChatGPT-bilde med automatisk oppskalering (trenger uttrekket, ikke portet)
+#   ./spill.sh --auto          fyller rom og objekter uten ChatGPT-bilde med automatisk oppskalering
 #   ./spill.sh --fort          ingen henting eller bygging, bare start
 #   ./spill.sh --fullskjerm    fullskjerm
 #   ./spill.sh --programvare   uten OpenGL (hvis spillet ikke starter og sier "Could not load any graphics mode")
@@ -37,7 +38,7 @@ while [ $# -gt 0 ]; do
 	--programvare) PROGRAMVARE=1; shift ;;
 	--nettleser) NETTLESER=1; shift ;;
 	--port) PORT="$2"; shift 2 ;;
-	-h|--help) sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+	-h|--help) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
 	*) EKSTRA+=("$1"); shift ;;
 	esac
 done
@@ -102,10 +103,6 @@ fi
 # 4. Automatisk oppskalering der ChatGPT ikke har levert ennå (valgfritt)
 MOD=gpt
 [ -f mods/gpt/mod.json ] || { MOD=ingen; echo "Ingen HD-mod ennå, starter uten."; }
-if [ "$AUTO" = 1 ] && [ ! -f work/extract/rooms.json ]; then
-	echo "--auto trenger uttrekket (smhd extract), som ikke er portet til Sam & Max ennå."
-	exit 1
-fi
 if [ "$AUTO" = 1 ]; then
 	MOD=auto
 	GPT_STEMPEL="$(sha256sum mods/gpt/SHA256SUMS | cut -c1-16)"

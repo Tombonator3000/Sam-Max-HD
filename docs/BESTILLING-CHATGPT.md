@@ -6,7 +6,7 @@ Dato: 10. oktober 2026
 
 **Ikke aktiv.** Bestillingen gjelder ikke før stilpiloten (ett rom og ett figurark sett i motoren) er godkjent av Tom. Ikke lag grafikk etter den før det. Status nå:
 
-- Det finnes ingen jobber. Uttrekket (`smhd extract`) er ikke portet til Sam & Max, og HD-motoren er ikke portet til SCUMM v6.
+- Det finnes ingen jobber. Uttrekket (`smhd extract`) virker for Sam & Max, men HD-motoren er ikke portet til SCUMM v6, og stilpiloten er ikke laget.
 - Jobbformatet, kontrollene og mottaket er kopiert fra The Dig HD Remake og er ikke prøvd med Sam & Max.
 - Promptene som `smhd gpt-pakke` skriver, er fortsatt The Dig sine og må skrives om før de første jobbene lages.
 

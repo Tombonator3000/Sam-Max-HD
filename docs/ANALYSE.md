@@ -7,7 +7,7 @@ Skrevet 10. oktober 2026. Grunnlaget er spillfilene i grenen `spilldata`, indeks
 - Spillfilene er den engelske CD-utgaven av *Sam & Max Hit the Road* (LucasArts 1993). MD5 for `SAMNMAX.000` stemmer med ScummVM sin oppføring for `samnmax`, CD, engelsk.
 - Spillet er SCUMM v6. `SAMNMAX.000` og `SAMNMAX.001` er kryptert med XOR 0x69. Indeksen og blokkstrukturen i `SAMNMAX.001` er lest med `smhd info` (`pipeline/smhd/gamedata.py`).
 - Dekompilering trengs ikke. ScummVM kjører spillet (`samnmax`), og skriptene kan leses med descumm. Arbeidet er HD-grafikken og å porte HD-patchen fra SCUMM v7 til v6.
-- 85 rom (36 brede som ruller, ingen høye), 63 med z-plan, 2 med flere paletter, 43 med fargesykling. 959 objektbilder fordelt på 715 objekter. 348 kostymer. Hvor mange kostymeruter det er, er ikke målt (krever en COST-dekoder).
+- 85 rom (36 brede som ruller, ingen høye), 63 med z-plan, 2 med flere paletter, 43 med fargesykling. 959 objektbilder fordelt på 715 objekter (103 av dem er blast-objekter med BOMP). 348 kostymer med 16 052 ruter som animasjonene bruker. Alt er trukket ut med `smhd extract`, og alle 1181 skript er dekompilert med descumm.
 - Det er ingen SMUSH-filmer. Mellomsekvensene og minispillene tegnes av motoren, så de skal få HD gjennom de samme krokene som rom, objekter, figurer og tekst.
 - Stilen er trofast HD: samme motiv og farger med mer detalj, og tegneserieuttrykket beholdes. En stilpilot (ett rom og ett figurark sett i motoren) skal godkjennes av Tom før noe bestilles.
 
@@ -74,29 +74,51 @@ Romlisten med mål, z-plan, paletter og objektbilder per rom ligger i `docs/rom-
 | --- | --- |
 | Z-plan | Hvor mange forgrunnsmasker hvert rom har (ZP02 og videre) |
 | Fargesykling | Hvilke palettindekser som sykles, og hvor fort |
-| Objektbilder | Hvilke som bare har BOMP-bilde (blast-objekter) |
-| Kostymer og ruter | Antall ruter per kostyme, animasjoner og retninger, og største rute (krever en COST-dekoder) |
+| Kostymer og ruter | Største rute, og hvilke animasjoner skriptene faktisk bruker |
 | Tegnsett | Hvilke tegnsett som brukes hvor (dialog, meny, bannere), med størrelse og antall farger |
 | Lokale skript | Lokale skript og inn- og utgangsskript per rom (LSCR, ENCD, EXCD) |
 | Mellomsekvenser og minispill | Hvilke rom og skript som står for dem |
 | Figurer | Hvilke kostymer som er Sam, Max og de andre figurene |
 
-## 4. Dekompilering: hva som faktisk trengs
+## 4. Dekompilering
 
-Spillets exe-fil trenger ikke dekompileres. ScummVM har SCUMM v6-motoren (`ScummEngine_v6`), og spillet kjører der som `samnmax`.
+Spillets exe-fil trenger ikke dekompileres. ScummVM har SCUMM v6-motoren (`ScummEngine_v6`), og spillet kjører der som `samnmax`. Det som trengs, er skriptene og grafikken. Begge er tatt ut 10. oktober.
 
-Det som trengs, er to ting:
+### Skriptene
 
-1. **Skriptene**, for å forstå når objekter skifter tilstand, når paletten byttes, og hvordan mellomsekvensene og minispillene er bygget. `descumm -6` fra scummvm-tools gir lesbar kode. Dette er oppslagsverk, ikke noe som skal endres. Ikke prøvd ennå.
-2. **Grafikken**, som utgangspunkt for HD-versjonene: rom, objekter i hver tilstand og kostymeruter som indekserte PNG med palett, pluss JSON med metadata.
+`tools/bygg_descumm.sh` bygger descumm fra scummvm-tools (låst til commit `8665aa1d`, bare fem kildefiler, ingen biblioteker). `tools/dekompiler_skript.py` leser skriptblokkene og dekompilerer dem til `work/skript/` (åpne `OVERSIKT.md` først). Det tar et par sekunder.
 
-Om uttrekket:
+| Sort | Skript | Uten feil | Feilet |
+| --- | ---: | ---: | ---: |
+| Globale skript (SCRP) | 120 | 120 | 0 |
+| Lokale skript (LSCR) | 564 | 562 | 2 |
+| Inngangsskript (ENCD) | 85 | 85 | 0 |
+| Utgangsskript (EXCD) | 85 | 85 | 0 |
+| Objektskript (VERB med kode) | 327 | 327 | 0 |
+| Sum | 1181 | 1179 | 2 |
 
-- The Dig brukte dekoderne i thedig-textures. De kan bare lese The Dig, så `smhd extract` er ikke portet.
-- To veier, ikke bestemt: en dump-modus i motorpatchen (motoren dekoder alt allerede, også alle ruter via kostymetegneren), eller egne dekodere i pipelinen etter ScummVM-kildene (`gfx.cpp`, `costume.cpp`). Ingen av dem er laget.
-- `pipeline/smhd/gamedata.py` leser nå både The Dig (v7) og Sam & Max (v6, etter XOR 0x69): romstørrelser, paletter, sykling, z-plan, objektenes plass og tilstander, og kostyme-ID for hver COST-blokk. Selve bildene (SMAP og COST) dekodes ikke ennå.
-- Kostyme-ID er katalogens ID, ikke rekkefølgen i filen (lærdom fra The Dig).
-- Tellingene fra uttrekket skal sjekkes mot spillfilene.
+- De to som feilet (lokalt skript 210 i rom 66 og 206 i rom 78) stopper på opkoden 0xBD nesten til slutt. ScummVM kjører 0xBD som `o6_dummy` i v6; descumm kjenner den bare i HE-spill. Alt før står i filene.
+- 623 av 950 objekter har tom verbtabell og ingen kode. Globalt skript 8 og 9 peker på samme blokk.
+- Kontrollert: alle 3368 talereplikker (`sound(offset, 0xA)`) peker på en VCTL-blokk i MONSTER.SOU, alle kall til globale skript og 921 kall til lokale skript peker på skript som finnes, og i alle 78 `loadRoomWithEgo` ligger objektet i rommet.
+- Første skript har versjonsteksten "Sam & Max Hit the Road, CD1.11, 3-24-94".
+
+### Grafikken
+
+`smhd extract` tar ut all originalgrafikken til `work/extract` på omtrent halvannet minutt, i samme format som uttrekket for The Dig (`rooms.json`, `costumes.json`, `roomNNN.png`, `objNNN_SS.png`, `costumeCCC_NNN.png`, alle med `_idx.png`). Dekoderne står i `pipeline/smhd/v6grafikk.py` og er oversatt fra ScummVM ved `c9091321`:
+
+- **Rom og objekter (SMAP):** `Gdi::decompressBitmap` med kodekene Sam & Max bruker: rå (1), BasicV (15 til 18, 34 til 38), BasicH (25 til 28, 48) og MajMin (104 til 108, 124 til 128). Gjennomsiktig farge fra TRNS (5 i 83 rom).
+- **Blast-objekter (BOMP):** 103 objektbilder, `bompDecodeLine`, fargen 255 er gjennomsiktig.
+- **Kostymer (COST):** `ClassicCostumeLoader` og `byleRLEDecode`. Format 0x58 (53 kostymer, 16 farger), 0x59 (39, 32 farger), 0x60 (79) og 0x61 (177). Formatene 0x60 og 0x61 kan peke på bildet til en annen rute. Ruter som animasjonene bruker, tas ut. Rutenummeret er lag * 128 + kode, så motoren kan regne det ut i `drawLimb`.
+
+| Hva | Tatt ut |
+| --- | --- |
+| Rombakgrunner | 83 (rom 81 og 82 har bredde 0 og ingen bakgrunn) |
+| Objektbilder | 959 (856 SMAP og 103 BOMP), 0 feil |
+| Kostymeruter | 16 052 fra 348 kostymer. 17 ruter har bredde eller høyde 0 og får ikke noe bilde. 4789 ruter bruker samme bilde som en annen rute (`samme_bilde_som` i costumes.json) |
+
+**Farger i kostymene:** kostymepaletten peker på indekser i rompaletten. Bare indeksene 0 til 15 er like i alle rom, og Sam og Max bruker 234 til 255, som varierer. RGBA-bildene har derfor fargene fra rommet kostymet ligger i (palett 0). Noen kostymer (for eksempel 127, 132, 153, 194, 211, 227 og 280) blir helt magenta med den paletten; de ser ut til å være skygger eller masker, og fargene settes trolig av skript. Indeksbildene har de riktige indeksene uansett.
+
+**Kontrollert:** alle rom og ett bilde fra hvert kostyme er sett på i kontaktark, og rom 2 med alle objektene lagt på plass etter CDHD stemmer med spillet. Sam (kostyme 2) og Max (kostyme 3) har riktige farger. Ikke sammenlignet piksel for piksel med motoren, fordi DigHD (som kan lagre skjermbilder) ikke er på for Sam & Max ennå. `smhd build-mod` lager en mod av uttrekket (testet med automatisk oppskalering: 83 rom, 950 objektbilder; de 9 objektbildene i rom 81 og 82 tas ikke med, fordi rommene ikke har bakgrunn).
 
 ## 5. HD-bakgrunner
 
@@ -114,7 +136,7 @@ Om uttrekket:
 
 ## 6. HD-figurer
 
-- Kostymene er klassiske (COST) og tegnes av `ClassicCostumeRenderer` i `costume.cpp`, ikke av AKOS som i The Dig. Antall ruter er ikke målt.
+- Kostymene er klassiske (COST) og tegnes av `ClassicCostumeRenderer` i `costume.cpp`, ikke av AKOS som i The Dig. 348 kostymer, 16 052 ruter (se 4). Animasjonene per kostyme, lag og retning står i `costumes.json` i samme form som for The Dig.
 - Figurene som er kjent: Sam (hunden i dress og hatt) og Max (den hvite, kaninaktige figuren). Andre figurer er ikke kartlagt.
 - **Stil:** glatt stil med ekte alfa fra starten. I The Dig avviste Tom figurer klippet med originalens omriss, fordi de fikk trappetrinn i 4x.
 - **Animasjon:** rutene i én animasjon males på samme ark, så figuren ikke flimrer. Ankerpunkter og timing beholdes fra kostymet. HD-ruten erstatter bare pikslene.
@@ -158,7 +180,7 @@ Motoren er den samme uansett stil. Før noe bestilles i mengde, lages en stilpil
 1. Spillfilene til `game/` med `tools/hent_spilldata.sh`. Gjort og testet 10. oktober.
 2. Bygg ScummVM ved `c9091321` med patchen (`engine/build.sh`), og start spillet uendret fra `game/` uten skjerm. Gjort 10. oktober (se 8).
 3. Mål rom, objekter og kostymer, og lag romlisten. Gjort 10. oktober for det indeksen og blokkene sier; det under Ikke målt ennå gjenstår.
-4. Velg vei for uttrekket: dump-modus i motoren eller egne dekodere.
+4. Uttrekket med egne dekodere (`smhd extract`). Gjort 10. oktober (se 4).
 5. Port DigHD til v6 etter [HD-MOTOR.md](HD-MOTOR.md): slå den på for `GID_SAMNMAX`, ta rom og objekter først, og test med en `nearest`-mod (0 avvik mot originalen). Deretter figurer, tekst, farger og sykling, blast-objekter, menyen og pekeren.
 6. `smhd build-mod` med automatisk oppskalering.
 7. Stilpilot med Tom.

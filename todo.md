@@ -19,8 +19,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Tell rom, størrelser, z-plan, paletter, fargesykling, objektbilder og kostymer (`smhd info`)
 - [x] Romliste som CSV (`docs/rom-oversikt.csv`, uten navn)
 - [ ] Navn på rommene i romlisten ved gjennomsyn (RNAM er tom)
-- [ ] Ruter per kostyme, animasjoner og retninger (krever COST-dekoder)
-- [ ] Hvilke objekter som bare har BOMP-bilde (blast-objekter)
+- [x] Ruter per kostyme, animasjoner og retninger (`costumes.json`, 16 052 ruter)
+- [x] Hvilke objekter som har BOMP-bilde (103 blast-objektbilder, `kind` i rooms.json)
+- [x] Dekompiler alle skriptene med descumm (`tools/dekompiler_skript.py`, 1179 av 1181)
+- [ ] Finn hvilke rom og palett hvert kostyme faktisk vises i (fra skriptene), og bruk den paletten i RGBA-bildene
 - [ ] Finn mellomsekvensene og minispillene som tegnes av motoren
 - [ ] Hvilke kostymer som er Sam, Max og de andre (fyll `docs/figurer.csv`)
 
@@ -36,9 +38,11 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ### Pipeline
 
-- [ ] Velg vei for uttrekket: dump-modus i motorpatchen eller egne dekodere for SMAP og COST
-- [ ] Uttrekk av rom, objekter og kostymeruter som indekserte PNG med JSON, i samme format som The Dig
-- [ ] `smhd build-mod` med automatisk oppskalering
+- [x] Uttrekket med egne dekodere for SMAP, BOMP og COST (`pipeline/smhd/v6grafikk.py`, `eksport_v6.py`)
+- [x] Uttrekk av rom, objekter og kostymeruter som indekserte PNG med JSON, i samme format som The Dig
+- [x] `smhd build-mod` med automatisk oppskalering (testet)
+- [ ] Sammenlign uttrekket piksel for piksel med motoren når DigHD er på for Sam & Max
+- [ ] `build-mod` hopper over objektbildene i rom uten bakgrunn (rom 81 og 82, 9 bilder); ta dem med
 - [ ] `engine/test.sh` og `tools/romtest.sh` med Sam & Max
 - [ ] Prompter og figurnavn i `gpt.py` og `figur.py` gjennomgått for Sam & Max (grovt tilpasset 10. oktober)
 

@@ -12,8 +12,8 @@ Det finnes ingen HD-versjon av Sam & Max å teste ennå.
 | HD-grafikk | Ingen. HD-patchen er ikke portet til SCUMM v6, så motoren viser bare originalgrafikken. Grenen `hd-mod` har ingen mod |
 | `./spill.sh` | Tilpasset. Testet her 10. oktober uten skjerm: hentet `hd-mod` (tom), bygget motoren og startet Sam & Max uten mod. Uten skjerm trengs `--programvare`, ellers finner OpenGL ingen grafikkmodus. Ikke testet med skjerm |
 | `engine/run.sh` | Tilpasset (`engine/run.sh ingen` starter uten mod). Brukt av `spill.sh` i testen over |
-| `engine/test.sh`, `tools/romtest.sh` | Tilpasset filnavn og spill-ID, men stopper til uttrekket og DigHD er portet |
-| `./spill.sh --auto` | Krever `smhd extract`, som ikke er portet |
+| `engine/test.sh`, `tools/romtest.sh` | Tilpasset filnavn og spill-ID, men kan ikke brukes før DigHD er portet |
+| `./spill.sh --auto` | Lager modden med automatisk oppskalering (uttrekket virker), men modden vises ikke før DigHD er portet |
 | Nettsiden | Repoet `Tombonator3000/Sam-Max-HD-Web` finnes ikke. Se [PAGES.md](PAGES.md) |
 | Linux-pakken | `tools/pakke_linux.sh` tilpasset. AppDir laget og startet uten skjerm her 10. oktober (uten HD-mod). AppImage og arbeidsflyten er ikke kjørt |
 | ScummVM med patchen og Sam & Max | Bygget og startet uten skjerm 10. oktober: spillet kjører (indeks lest, skript og musikk i gang), uten HD. Bildet er ikke sett |

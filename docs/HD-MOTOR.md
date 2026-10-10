@@ -37,7 +37,7 @@ Fra skillen `scumm-hd-remake` og The Dig sin erfaring, sjekket mot ScummVM-kilde
 
 1. **Slå på DigHD for Sam & Max.** `DigHD::create` må godta `GID_SAMNMAX`.
 2. **Kostymer.** Sam & Max har klassiske kostymer (COST), som tegnes av `ClassicCostumeRenderer` i `costume.cpp`. Krokene for rutene (`beginActor`, `noteCel`) finnes bare i `akos.cpp`, og `beginActor` kalles i `base-costume.cpp` bare når `_akosRendering` er satt. Krokene må inn i `ClassicCostumeRenderer` (`drawLimb`, `paintCelByleRLE`).
-3. **Figurfargene.** The Dig sitt uttrekk og motor kjenner AKOS-kodekene (1, 5 og 16), RGBS og AKPL. Klassiske kostymer har egen palett (`ClassicCostumeRenderer::setPalette`). Hvordan fargene skal leses i uttrekket og i motoren, må sjekkes.
+3. **Figurfargene.** The Dig sitt uttrekk og motor kjenner AKOS-kodekene (1, 5 og 16), RGBS og AKPL. Klassiske kostymer har egen palett (`ClassicCostumeRenderer::setPalette`) som peker på indekser i rompaletten. Uttrekket (`smhd extract`) lagrer de indeksene i `_idx.png`, og rutenummeret er lag * 128 + kode, så kroken i `drawLimb` kan finne filen `costumeCCC_NNN.png` direkte.
 4. **Tekst.** Teksten tegnes av `CharsetRendererClassic`. Kroken (`noteGlyph`) finnes bare i `CharsetRendererV7::drawCharV7`.
 5. **Blast-objekter og blast-tekst.** Blast-objektene er v6-kode (`ScummEngine_v6::drawBlastObject`), og krokene der finnes allerede. En kommentar i `script_v6.cpp` tyder på at minispillet på motorveien bruker dem. Skillen nevner også blast-tekst. I ScummVM ved `c9091321` er `drawBlastTexts` og `removeBlastTexts` tomme i `ScummEngine_v6`, og køen for blast-tekst finnes bare i `ScummEngine_v7`. Hvordan Sam & Max tegner og fjerner tekst, må derfor sjekkes i spillet. `restoreCharsetBg` kaller `markRectAsDirty`, der patchen allerede nullstiller glyfene. Ikke testet.
 6. **Ingen SMUSH.** Delene for filmer (`smush_player.cpp`, `nut_renderer.cpp`, filmrammer, undertekster over filmer) brukes ikke. `DIGHD_SKIP_VIDEO` gjør ingenting i v6. Mellomsekvensene og minispillene tegnes av motoren og går gjennom de samme krokene som resten.
@@ -70,7 +70,7 @@ Verktøyene rundt:
 
 - `engine/test.sh`: lager en mod med `nearest` og sjekker at HD-bildet er likt originalen skalert opp (0 avvik, unntatt skalerte figurer).
 - `tools/romtest.sh`: kjører hvert rom uten skjerm og lager rapport og kontaktark.
-- Begge har fått Sam & Max sine filnavn og spill-ID, men kan ikke kjøres før DigHD er portet og uttrekket finnes. `engine/test.sh` stopper med en melding til da.
+- Begge har fått Sam & Max sine filnavn og spill-ID. Uttrekket finnes nå (`smhd extract`), men testene kan ikke kjøres før DigHD er portet.
 
 ## Lærdom fra The Dig som gjelder her
 

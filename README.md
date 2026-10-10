@@ -14,7 +14,8 @@ Repoet er offentlig etter Toms valg. Spillfilene og alt som lages fra dem ligger
 | Spillfiler | Engelsk CD-utgave (SAMNMAX.000, SAMNMAX.001, MONSTER.SOU med tale) i `spilldata` |
 | Analyse | 85 rom (36 brede), 63 med z-plan, 43 med fargesykling, 959 objektbilder, 348 kostymer. Se [docs/ANALYSE.md](docs/ANALYSE.md) og [docs/rom-oversikt.csv](docs/rom-oversikt.csv) |
 | HD-motor | ScummVM med The Dig-patchen bygger og kjører Sam & Max, men uten HD: DigHD er ikke portet til SCUMM v6 ennå ([docs/HD-MOTOR.md](docs/HD-MOTOR.md)) |
-| Uttrekk | Ikke portet (`smhd extract` stopper med en melding) |
+| Uttrekk | `smhd extract` tar ut alt: 83 rombakgrunner, 959 objektbilder og 16 052 kostymeruter fra 348 kostymer, som PNG med metadata. Egne dekodere oversatt fra ScummVM |
+| Skript | Alle 1181 skript dekompilert med descumm (`tools/dekompiler_skript.py`), 1179 uten feil |
 | HD-grafikk | Ikke startet. Stilpilot med Tom først |
 | Spille | `./spill.sh` starter originalspillet. Linux-pakken er tilpasset, ikke bygget i Actions ennå. Nettsiden trenger eget repo |
 

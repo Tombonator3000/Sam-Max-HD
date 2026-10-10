@@ -10,9 +10,8 @@
 #
 # Bruk: engine/test.sh [antall bilder, standard 3000]
 #
-# Ikke portet til Sam & Max ennå: nearest-modden lages fra uttrekket (smhd extract), som ikke
-# er portet til v6, og DigHD er bare slått på for The Dig. Skriptet stopper derfor med en
-# melding til begge deler er på plass.
+# Ikke i bruk for Sam & Max ennå: DigHD er bare slått på for The Dig, så motoren skriver ingen
+# DigHD-linjer. Uttrekket (smhd extract) virker.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,7 +20,7 @@ SRC="${SCUMMVM_SRC:-$HERE/scummvm}"
 FRAMES="${1:-3000}"
 OUT="$ROOT/work/test-dumps"
 
-[ -f "$ROOT/work/extract/rooms.json" ] || { echo "Uttrekket mangler (smhd extract er ikke portet til Sam & Max ennå)."; exit 2; }
+[ -f "$ROOT/work/extract/rooms.json" ] || { echo "Uttrekket mangler. Kjør smhd extract først."; exit 2; }
 [ -d "$ROOT/mods/test-nearest" ] || smhd build-mod --name test-nearest --method nearest --kostymer 1-20
 
 rm -rf "$OUT"
