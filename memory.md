@@ -25,14 +25,20 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Tom ville ha repoet satt opp på samme måte som Dig-HD-Remake, med skillen `scumm-hd-remake`, og valgte "hele oppsettet, tilpasset": samme mapper og filer, tilpasset der det går, og det som ikke er portet til v6, merket.
 - Kopiert fra Dig-HD-Remake (main 36cd09f): `engine/` (patch, byggeskript, nettsidekode), `pipeline/` (omdøpt fra `dighd` til `smhd`), `tools/`, `docs/`, `spill.sh`, `.github/workflows/test.yml` og `linux.yml`. The Dig-spesifikke data (konseptbilder, romnotater, figurliste, avvisninger, kostymefarger, grafikkpiloten) er ikke tatt med; CSV-filene har bare overskrifter, unntatt `docs/rom-oversikt.csv`, som er fylt fra Sam & Max-filene.
 - Miljøvariablene `DIGHD_*`, klassen DigHD, `dighd.cpp/.h`, patchnavnet og mod-formatet beholdes, fordi patchen er den samme.
-- `gamedata.py` leser både v6 (Sam & Max, XOR 0x69) og v7 (The Dig). `smhd info` virker. `smhd extract` stopper med en melding for v6.
+- `gamedata.py` leser både v6 (Sam & Max, XOR 0x69) og v7 (The Dig). `smhd info` virker.
+- Uttrekket (10. oktober): egne dekodere oversatt fra ScummVM i `pipeline/smhd/v6grafikk.py` (SMAP-kodekene 1, 15 til 18, 25 til 28, 34 til 38, 48, 104 til 108, 124 til 128; BOMP; klassiske COST i format 0x58, 0x59, 0x60, 0x61) og `eksport_v6.py`. `smhd extract` gir 83 rom, 959 objektbilder og 16 052 kostymeruter fra 348 kostymer på omtrent halvannet minutt.
+- Rutenummer i Sam & Max-kostymer = lag * 128 + kode (filnavn costumeCCC_NNN). Bare ruter som animasjonene bruker, tas ut. Kostyme 2 er Sam og 3 er Max (begge i rom 1).
+- Kostymefarger: COST-paletten peker på indekser i rompaletten; bare 0 til 15 er like i alle rom (Sam og Max bruker 234 til 255). RGBA-bildene bruker paletten i rommet kostymet ligger i.
+- Skriptene: `tools/bygg_descumm.sh` (scummvm-tools 8665aa1d) og `tools/dekompiler_skript.py` dekompilerer 1181 skript til work/skript (1179 uten feil; to stopper på 0xBD, som er o6_dummy i ScummVM).
 - Grenene `hd-mod` (README og SHA256SUMS, ingen mod) og `gpt-arbeid` (AGENTS, BESTILLING, ORDRE uten jobber) er startgrener.
 - Linux-arbeidsflyten kjører bare for hånd eller om natten når `hd-mod` endres; push-utløseren er av til HD virker.
 - Nettsiderepoet (planlagt `Tombonator3000/Sam-Max-HD-Web`) finnes ikke.
 
 ## Teknisk plan (fra The Dig, ikke testet for Sam & Max)
 - Referanse: github.com/Tombonator3000/Dig-HD-Remake og skillen `scumm-hd-remake`. The Dig-patchen er for SCUMM v7 og kan ikke kopieres rett.
-- Patchen bygger mot ScummVM `c9091321` og Sam & Max kjører med den (testet uten skjerm 10. oktober), men DigHD er av fordi `DigHD::create` krever `GID_DIG`.
+- DigHD er på for Sam & Max fra 10. oktober (`DigHD::create` godtar `GID_SAMNMAX`). Endringer i patchen for v6: kroker i `ClassicCostumeRenderer` (`drawLimb` setter rutenummer lag * 128 + kode, `markAsDirty` husker rektangelet, `paintCelByleRLE` kaller `noteCel`), `beginActor` også for klassiske kostymer, pekerkroken i `ScummEngine::updateCursor`, testhoppet leser RMHD i v6-format, `DIGHD_TEST_COSTUME` leser COST-hodet, blast-objekter får bildet som faktisk tegnes (Sam & Max ber om 0, motoren bruker 1).
+- Viktig v6-forskjell: `drawStripToScreen` legger tekstlaget over bufferen i `_compositeBuf` før blit. `blitVirtScreen` får derfor også `vsSrc` (området i bufferen) for merkene per piksel; uten det fikk ingen figurer HD.
+- Ikke portet: tekst (`CharsetRendererClassic`) og menyraden HD Graphics for v6. Ctrl+H virker.
 - Sam & Max er v6: kostymene tegnes av `ClassicCostumeRenderer` (`costume.cpp`), ikke AKOS. Teksten av `CharsetRendererClassic`. Ingen SMUSH-filmer, mellomsekvensene tegnes av motoren. Blast-objekter finnes i v6. Blast-tekst er tom i `ScummEngine_v6` ved c9091321 (skillen sier den finnes; må sjekkes i spillet).
 - Funnet i ScummVM-kilden 10. oktober: pekerkroken i patchen ligger bare i `ScummEngine_v7::updateCursor`, og menyraden HD Graphics står med v7-koordinater i `setUpMainMenuControls`. Begge må lages for v6.
 - `engine/build.sh` bygger med `--disable-mt32emu`, så MT-32-ROM-filene brukes ikke. Uten MIDI-utgang spiller iMUSE musikken med AdLib.

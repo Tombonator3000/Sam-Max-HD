@@ -43,11 +43,13 @@ tools/hent_spilldata.sh          # spillfilene til game/, setter sammen MONSTER.
 python3 -m venv .venv && . .venv/bin/activate
 pip install -e "pipeline[dev]"   # smhd
 smhd info                        # sjekker spillfilene og viser nøkkeltall
+smhd extract                     # all originalgrafikk til work/extract (rom, objekter, kostymeruter)
 engine/build.sh                  # ScummVM med patchen til engine/scummvm
 ./spill.sh                       # henter det som mangler, bygger og starter spillet
+tools/bygg_descumm.sh && .venv/bin/python tools/dekompiler_skript.py   # alle skript som tekst i work/skript
 ```
 
-`smhd extract` er ikke portet til SCUMM v6 ennå (The Dig brukte dekoderne i thedig-textures). DigHD i patchen er bare slått på for The Dig. Til begge er portet, kjører Sam & Max som originalen, og `engine/test.sh`, `tools/romtest.sh`, `tools/gpt_runde.sh` og `./spill.sh --auto` kan ikke brukes.
+`smhd extract` bruker egne dekodere for SCUMM v6 (`pipeline/smhd/v6grafikk.py`, oversatt fra ScummVM). Rutenummeret i kostymene er lag * 128 + kode. DigHD i patchen er på for The Dig og Sam & Max; i Sam & Max får rom, objekter, blast-objekter og figurer HD, mens teksten og menyraden ikke er portet (`docs/HD-MOTOR.md`). Kjør `engine/test.sh` (0 avvik med nearest-mod) og gjerne `tools/romtest.sh --mod test-nearest --kamera ett` etter endringer i patchen.
 
 ## Kommandoer
 

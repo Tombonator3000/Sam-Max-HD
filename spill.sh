@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 # Spill Sam & Max med HD-grafikken rett fra repoet.
 #
-# Merk: HD-delen av motoren er bare slått på for The Dig til patchen er portet til SCUMM v6.
-# Til da starter spillet som originalen (uten HD), og --rom, --klassisk, --gult og --auto virker ikke.
+# HD-motoren gir HD for rom, objekter og figurer. Teksten er originalpiksler, og raden HD Graphics
+# i spillets meny finnes ikke ennå for Sam & Max (Ctrl+H bytter).
 #
 #   ./spill.sh                 henter det som mangler, oppdaterer HD-modden og motoren, starter spillet
 #   ./spill.sh --rom 22        starter i rom 22 (for å se på et bestemt rom)
 #   ./spill.sh --klassisk      starter med originalgrafikken (Ctrl+H bytter underveis)
 #   ./spill.sh --gult          farger gult der HD mangler (Ctrl+Shift+H slår av og på)
-#   ./spill.sh --auto          fyller rom og objekter uten ChatGPT-bilde med automatisk oppskalering (trenger uttrekket, ikke portet)
+#   ./spill.sh --auto          fyller rom og objekter uten ChatGPT-bilde med automatisk oppskalering
 #   ./spill.sh --fort          ingen henting eller bygging, bare start
 #   ./spill.sh --fullskjerm    fullskjerm
 #   ./spill.sh --programvare   uten OpenGL (hvis spillet ikke starter og sier "Could not load any graphics mode")
 #   ./spill.sh --nettleser     i nettleseren på http://localhost:8000, bare på denne maskinen (--port N for en annen port)
 #
 # Valg som ikke står over, sendes videre til ScummVM.
-# I spillet: F5 åpner menyen, der HD Graphics velger HD eller originalgrafikk (valget huskes; Ctrl+H bytter også).
+# I spillet: Ctrl+H bytter mellom HD og originalgrafikk (valget huskes).
 # Ctrl+Shift+H (gult felt der HD mangler), Alt+S (skjermbilde).
 # Hva du bør se etter: docs/SPILLTEST.md.
 # Nettleseren: spillet og HD-grafikken tilhører Disney/Lucasfilm og skal aldri legges på en åpen adresse.
@@ -102,10 +102,6 @@ fi
 # 4. Automatisk oppskalering der ChatGPT ikke har levert ennå (valgfritt)
 MOD=gpt
 [ -f mods/gpt/mod.json ] || { MOD=ingen; echo "Ingen HD-mod ennå, starter uten."; }
-if [ "$AUTO" = 1 ] && [ ! -f work/extract/rooms.json ]; then
-	echo "--auto trenger uttrekket (smhd extract), som ikke er portet til Sam & Max ennå."
-	exit 1
-fi
 if [ "$AUTO" = 1 ]; then
 	MOD=auto
 	GPT_STEMPEL="$(sha256sum mods/gpt/SHA256SUMS | cut -c1-16)"
@@ -142,5 +138,5 @@ steg "Starter Sam & Max (mod: $MOD)"
 [ -n "$ROM" ] && export DIGHD_TEST_ROOM="$ROM" DIGHD_TEST_AT="${DIGHD_TEST_AT:-240}" DIGHD_SKIP_VIDEO=1 && echo "Hopper til rom $ROM (virker først når HD-patchen er portet til v6)."
 [ "$KLASSISK" = 1 ] && export DIGHD_CLASSIC=1
 [ "$GULT" = 1 ] && export DIGHD_SHOW_MISSING=1
-echo "Grafikk: F5 i spillet, HD Graphics i menyen (Ctrl+H bytter også). Ctrl+Shift+H: gult felt der HD mangler. Alt+S: skjermbilde."
+echo "Grafikk: Ctrl+H bytter mellom HD og original. Ctrl+Shift+H: gult felt der HD mangler. Alt+S: skjermbilde."
 exec engine/run.sh "$MOD" --subtitles "${EKSTRA[@]}"

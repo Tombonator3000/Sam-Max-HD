@@ -8,8 +8,7 @@
 # Modmappen er mods/<modnavn>. Spillfilene ligger i game/ (tools/hent_spilldata.sh).
 # Talen: tools/hent_spilldata.sh setter sammen MONSTER.SOU i game/.
 #
-# Merk: HD-delen av patchen (DigHD) er bare slått på for The Dig til den er portet til
-# SCUMM v6. Til da kjører Sam & Max som originalen, også med en mod.
+# HD-motoren (DigHD) gir HD for rom, objekter og figurer i Sam & Max. Teksten er originalpiksler.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

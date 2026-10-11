@@ -10,8 +10,8 @@
 #
 # Bruk: tools/gpt_runde.sh [--beskjed "tekst til ChatGPT"] ...
 #
-# Ikke i bruk for Sam & Max ennå: den trenger uttrekket (smhd extract), som ikke er portet til v6,
-# og bestillingen er ikke aktiv før stilpiloten er godkjent (docs/BESTILLING-CHATGPT.md).
+# Ikke i bruk for Sam & Max ennå: bestillingen er ikke aktiv før stilpiloten er godkjent
+# (docs/BESTILLING-CHATGPT.md). Uttrekket (smhd extract) virker.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
@@ -30,7 +30,7 @@ if ! command -v smhd >/dev/null 2>&1; then
 	[ -x .venv/bin/smhd ] || { python3 -m venv .venv && .venv/bin/pip install -q -e "pipeline[dev,uttrekk]"; }
 	export PATH="$ROOT/.venv/bin:$PATH"
 fi
-[ -f work/extract/rooms.json ] || smhd extract --only la1
+[ -f work/extract/rooms.json ] || smhd extract
 
 # 2. Hent
 before="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json 2>/dev/null | sha256sum || true)"

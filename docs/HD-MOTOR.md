@@ -4,10 +4,18 @@ Kort versjon for Sam & Max. Alle detaljer om hvordan motoren virker, innstilling
 
 ## Status
 
-- Patchen `engine/patches/0001-dighd-hd-grafikk.patch` er byte for byte den samme som i The Dig HD Remake, mot ScummVM-commit `c9091321` (`engine/SCUMMVM_COMMIT`).
-- Den er ikke aktiv for Sam & Max. `DigHD::create` i `engines/scumm/dighd.cpp` returnerer uten å lage noe når spillet ikke er `GID_DIG`. Sam & Max kjører derfor uten HD, også med `DIGHD_MOD` satt. Rettingen for Esc i patchen virker også uten DigHD (se under).
+- Patchen `engine/patches/0001-dighd-hd-grafikk.patch` er The Dig sin patch mot ScummVM-commit `c9091321` (`engine/SCUMMVM_COMMIT`), utvidet for Sam & Max 10. oktober. The Dig skal virke som før; det er ikke testet her, fordi The Dig-filene ikke er i dette repoet.
+- DigHD er på for The Dig og Sam & Max (`GID_SAMNMAX`) når `DIGHD_MOD` eller `dighd_mod` er satt.
+- I Sam & Max får rom, objekter, blast-objekter og kostymerutene HD. Teksten og menyraden er ikke portet (se listen under); teksten vises som originalpiksler.
 - Miljøvariablene `DIGHD_*`, nøklene `dighd_*` i scummvm.ini og mod-formatet beholdes.
-- Bygget her 10. oktober med `engine/build.sh` og startet med Sam & Max uten skjerm: spillet kjører som originalen. Ingen HD, fordi DigHD ikke er på.
+
+### Testet 10. oktober
+
+- `engine/test.sh` (nearest-mod med rom, objekter og kostyme 1 til 20, 3000 bilder fra start): 0 av omtrent 1 million HD-piksler skiller seg sterkt fra originalen i alle dumper, og skjermen er lik hele skjermen bygget på nytt. Hver bakgrunnspiksel fant HD-bildet sitt ("background without HD 0"), så uttrekket stemmer piksel for piksel med det motoren tegner.
+- `tools/romtest.sh --mod test-nearest --kamera ett` (alle 85 rom): 62 rom med HD-bakgrunn, 0 krasj, 0 forskjøvne bilder, 0 kjøringer der skjermen er ulik hele skjermen bygget på nytt. 12 rom hang etter testhoppet (skriptfeil fordi spillet ikke er i riktig tilstand, for eksempel "state -1 is out of bounds" i rom 11), 3 rom byttet til rom 0, 7 rom er mindre enn skjermen og testes ikke, og rom 67 er svart.
+- Kostymer: med en nearest-mod med alle 16 052 ruter i kontoret (rom 7) får Sam og Max HD-ruter. Avviket er 0,26 til 0,29 prosent av skjermen, i kantene av figurene, fordi de er skalert (motorens skalatabell mot en jevn skalering i DigHD, som i The Dig). `DIGHD_TEST_COSTUME=2` spilte alle animasjonene til Sam med HD-ruter og 0 avvik.
+- Blast-objekter: i motorveispillet (rom 68) får alle veibitene HD (for eksempel 6907 av 6907 piksler for objekt 604).
+- Ctrl+H bytter mellom HD og klassisk grafikk.
 
 ## Hva patchen gjør
 
@@ -33,17 +41,18 @@ Resten, kort:
 
 ## Det som må portes for v6
 
-Fra skillen `scumm-hd-remake` og The Dig sin erfaring, sjekket mot ScummVM-kilden ved `c9091321`. Ingen av punktene er gjort.
+Fra skillen `scumm-hd-remake` og The Dig sin erfaring, sjekket mot ScummVM-kilden ved `c9091321`. Punkt 1, 2, 3, 4, 6 og 9 er gjort 10. oktober. Teksten (5) og menyraden (8) gjenstår.
 
-1. **Slå på DigHD for Sam & Max.** `DigHD::create` må godta `GID_SAMNMAX`.
-2. **Kostymer.** Sam & Max har klassiske kostymer (COST), som tegnes av `ClassicCostumeRenderer` i `costume.cpp`. Krokene for rutene (`beginActor`, `noteCel`) finnes bare i `akos.cpp`, og `beginActor` kalles i `base-costume.cpp` bare når `_akosRendering` er satt. Krokene må inn i `ClassicCostumeRenderer` (`drawLimb`, `paintCelByleRLE`).
-3. **Figurfargene.** The Dig sitt uttrekk og motor kjenner AKOS-kodekene (1, 5 og 16), RGBS og AKPL. Klassiske kostymer har egen palett (`ClassicCostumeRenderer::setPalette`). Hvordan fargene skal leses i uttrekket og i motoren, må sjekkes.
-4. **Tekst.** Teksten tegnes av `CharsetRendererClassic`. Kroken (`noteGlyph`) finnes bare i `CharsetRendererV7::drawCharV7`.
-5. **Blast-objekter og blast-tekst.** Blast-objektene er v6-kode (`ScummEngine_v6::drawBlastObject`), og krokene der finnes allerede. En kommentar i `script_v6.cpp` tyder på at minispillet på motorveien bruker dem. Skillen nevner også blast-tekst. I ScummVM ved `c9091321` er `drawBlastTexts` og `removeBlastTexts` tomme i `ScummEngine_v6`, og køen for blast-tekst finnes bare i `ScummEngine_v7`. Hvordan Sam & Max tegner og fjerner tekst, må derfor sjekkes i spillet. `restoreCharsetBg` kaller `markRectAsDirty`, der patchen allerede nullstiller glyfene. Ikke testet.
-6. **Ingen SMUSH.** Delene for filmer (`smush_player.cpp`, `nut_renderer.cpp`, filmrammer, undertekster over filmer) brukes ikke. `DIGHD_SKIP_VIDEO` gjør ingenting i v6. Mellomsekvensene og minispillene tegnes av motoren og går gjennom de samme krokene som resten.
-7. **Menyraden.** `digHDMenuRow` i `gfx_gui.cpp` gir raden HD Graphics bare for `GID_DIG`. Sam & Max bruker samme funksjon (`ScummEngine_v6::setUpMainMenuControls`), men raden er plassert med v7-koordinatene, og v6-menyen bruker andre (`yConstantV6`). Plasseringen må lages for v6 og sjekkes i originalmenyen.
-8. **Musepekeren.** Kroken for pekeren i HD finnes bare i `ScummEngine_v7::updateCursor`. Sam & Max bruker `ScummEngine::updateCursor`. Museposisjonen deles allerede på skalaen i `input.cpp`.
-9. **XOR 0x69.** ScummVM dekrypterer filene selv (`GF_USE_KEY`). Det gjelder uttrekket i pipelinen, ikke motoren.
+1. **Slå på DigHD for Sam & Max.** Gjort: `DigHD::create` godtar `GID_SAMNMAX`. Testhoppet leser romstørrelsen fra RMHD i v6-formatet.
+2. **Kostymer.** Gjort: `ClassicCostumeRenderer::drawLimb` setter rutenummeret (lag * 128 + kode), `markAsDirty` husker rektangelet, og `paintCelByleRLE` kaller `noteCel` etter `byleRLEDecode`. `beginActor` i `base-costume.cpp` kalles nå også for klassiske kostymer. `DIGHD_TEST_COSTUME` leser animasjonene fra COST-hodet.
+3. **Figurfargene.** Klassiske kostymer har egen palett (`ClassicCostumeRenderer::setPalette`) som peker på indekser i rompaletten. Uttrekket lagrer de indeksene i `_idx.png`. Når spillet viser andre farger (andre rom, skuespillerpalett), tones HD-pikselen etter forholdet mellom fargene, som i The Dig.
+4. **v6 tegner teksten i et eget lag.** Gjort: `drawStripToScreen` legger tekstlaget over bufferen i `_compositeBuf` før det sendes videre i v6. DigHD får nå både den sammensatte kopien (verdiene) og området i bufferen (for merkene per piksel). Uten dette fikk ingen figurpiksler HD.
+5. **Tekst.** Ikke gjort. Teksten tegnes av `CharsetRendererClassic` i tekstlaget. Kroken (`noteGlyph`) finnes bare i `CharsetRendererV7::drawCharV7`. Teksten vises som originalpiksler.
+6. **Blast-objekter og blast-tekst.** Blast-objektene er v6-kode (`ScummEngine_v6::drawBlastObject`). Gjort: Sam & Max ber om bilde 0, og motoren bruker da bilde 1; kroken får nå bildet som faktisk tegnes, så `objNNN_01.png` brukes. En kommentar i `script_v6.cpp` tyder på at minispillet på motorveien bruker dem. Skillen nevner også blast-tekst. I ScummVM ved `c9091321` er `drawBlastTexts` og `removeBlastTexts` tomme i `ScummEngine_v6`, og køen for blast-tekst finnes bare i `ScummEngine_v7`. Hvordan Sam & Max tegner og fjerner tekst, må derfor sjekkes i spillet. `restoreCharsetBg` kaller `markRectAsDirty`, der patchen allerede nullstiller glyfene. Ikke testet.
+7. **Ingen SMUSH.** Delene for filmer (`smush_player.cpp`, `nut_renderer.cpp`, filmrammer, undertekster over filmer) brukes ikke. `DIGHD_SKIP_VIDEO` gjør ingenting i v6. Mellomsekvensene og minispillene tegnes av motoren og går gjennom de samme krokene som resten.
+8. **Menyraden.** Ikke gjort. `digHDMenuRow` i `gfx_gui.cpp` gir raden HD Graphics bare for `GID_DIG`. Sam & Max bruker samme funksjon (`ScummEngine_v6::setUpMainMenuControls`), men raden er plassert med v7-koordinatene, og v6-menyen bruker andre (`yConstantV6`). Plasseringen må lages for v6 og sjekkes i originalmenyen.
+9. **Musepekeren.** Gjort: kroken ligger nå også i `ScummEngine::updateCursor`, som Sam & Max bruker. Ikke sett på en ekte skjerm.
+10. **XOR 0x69.** ScummVM dekrypterer filene selv (`GF_USE_KEY`). Det gjelder uttrekket i pipelinen, ikke motoren.
 
 Rettingen for Esc i `script.cpp` (en mellomsekvens hoppes ikke over når skriptet som startet den er stoppet) er ikke knyttet til DigHD og gjelder alle spill i denne motoren, også Sam & Max nå. Ikke testet med Sam & Max.
 
@@ -51,7 +60,7 @@ Rekkefølgen fra The Dig: rom og objekter først, testet med en `nearest`-mod. D
 
 ## Testkrokene
 
-Krokene ligger i DigHD og virker derfor ikke for Sam & Max før DigHD er slått på. Alle er miljøvariabler. Kjør med `SDL_VIDEODRIVER=dummy` og `SDL_AUDIODRIVER=dummy`.
+Krokene ligger i DigHD og virker for Sam & Max. Alle er miljøvariabler. Kjør med `SDL_VIDEODRIVER=dummy` og `SDL_AUDIODRIVER=dummy`.
 
 | Variabel | Hva | Merknad for Sam & Max |
 | --- | --- | --- |
@@ -62,7 +71,7 @@ Krokene ligger i DigHD og virker derfor ikke for Sam & Max før DigHD er slått 
 | `DIGHD_TEST_ROOM`, `DIGHD_TEST_AT`, `DIGHD_TEST_CAMX`, `DIGHD_TEST_CAMY` | Hopper til et rom og setter kameraet | |
 | `DIGHD_TEST_KEYS`, `DIGHD_TEST_CLICKS` | Taster og klikk ved gitte bilder | |
 | `DIGHD_TEST_OBJSTATE`, `DIGHD_TEST_OBJSTATE_AT`, `DIGHD_TEST_OBJSTATE_EVERY` | Setter objekter i hver tilstand | |
-| `DIGHD_TEST_COSTUME`, `DIGHD_TEST_ACTOR`, `DIGHD_TEST_POS`, `DIGHD_TEST_PALETTE`, `DIGHD_TEST_CHORE_EVERY`, `DIGHD_TEST_WALK`, `DIGHD_TEST_CLIP` | Setter inn en skuespiller med et kostyme og spiller animasjonene, går eller klipper mot z-masken | `DIGHD_TEST_COSTUME` leser animasjonene fra AKOS (AKHD, AKCH) og må skrives om for klassiske kostymer |
+| `DIGHD_TEST_COSTUME`, `DIGHD_TEST_ACTOR`, `DIGHD_TEST_POS`, `DIGHD_TEST_PALETTE`, `DIGHD_TEST_CHORE_EVERY`, `DIGHD_TEST_WALK`, `DIGHD_TEST_CLIP` | Setter inn en skuespiller med et kostyme og spiller animasjonene, går eller klipper mot z-masken | For klassiske kostymer leses animasjonene fra COST-hodet (alle med en offset). Noen kostymer har animasjoner som peker utenfor kostymet (se `advarsler` i costumes.json) |
 | `DIGHD_SKIP_VIDEO` | Hopper over filmer | Ingen virkning, det er ingen SMUSH-filmer |
 | `DIGHD_DEBUG_SOFT`, `DIGHD_DEBUG_BLAST`, `DIGHD_DEBUG_FACE` | Logger myke ruter, blast-objekter og valg i HD-skriften | |
 
@@ -70,7 +79,7 @@ Verktøyene rundt:
 
 - `engine/test.sh`: lager en mod med `nearest` og sjekker at HD-bildet er likt originalen skalert opp (0 avvik, unntatt skalerte figurer).
 - `tools/romtest.sh`: kjører hvert rom uten skjerm og lager rapport og kontaktark.
-- Begge har fått Sam & Max sine filnavn og spill-ID, men kan ikke kjøres før DigHD er portet og uttrekket finnes. `engine/test.sh` stopper med en melding til da.
+- Begge virker med Sam & Max (se Testet over).
 
 ## Lærdom fra The Dig som gjelder her
 
