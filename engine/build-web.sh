@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Bygger ScummVM med HD-patchen fra The Dig HD (DigHD) for nettleseren (WebAssembly med Emscripten).
-# Patchen er foreløpig bare slått på for The Dig, så Sam & Max kjører uten HD i denne motoren.
+# Patchen er på for Sam & Max (rom, objekter og figurer). Nettleserversjonen er ikke bygget for Sam & Max ennå.
 #
 # Resultatet kjøres lokalt med engine/run-web.sh på http://localhost:8000.
 # engine/build-pages.py lager en egen offentlig motorpakke som leser private filer

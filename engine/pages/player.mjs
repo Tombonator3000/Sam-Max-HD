@@ -4,8 +4,8 @@ import {attachTouch} from './touch.mjs';
 // The page goes straight into the game. Only the first time (no key and no
 // chosen folders) it asks for the read-only key to the game repository.
 // HD or original graphics is chosen in the game's own menu (F5) in The Dig.
-// For Sam & Max the HD patch is not switched on yet (it only runs for GID_DIG),
-// so the engine plays the original graphics and the HD pack is not used.
+// In Sam & Max the HD patch gives HD rooms, objects and figures; text stays original
+// pixels, and the HD row in the game's menu is not there yet (Ctrl+H switches).
 
 const baseURL = new URL('./', location.href);
 const library = new LocalLibrary(baseURL.pathname);
@@ -180,8 +180,7 @@ async function launch(source, rows) {
     }, error => { status(error.message, true); throw error; })};
     window.fetch = privateFetch(reader, indexes, baseURL, networkFetch);
 
-    // The DIGHD_ variables keep their names from The Dig; the patch reads them
-    // only when it runs (today only for GID_DIG), so for Sam & Max they do nothing yet.
+    // The DIGHD_ variables keep their names from The Dig.
     const env = {DIGHD_MOD: '/data/mods/gpt', HOME: '/home/sam-max-hd' + baseURL.pathname.replace(/[^a-zA-Z0-9_-]/g, '_')};
     if (query.has('rom')) {
       // The index of Sam & Max has 95 room slots (memory.md); not every number is a room

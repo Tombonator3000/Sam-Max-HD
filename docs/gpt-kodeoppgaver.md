@@ -1,4 +1,4 @@
-Ingen kodeoppgaver nå. Det finnes ingenting å teste for Sam & Max ennå: HD-patchen er ikke portet til SCUMM v6, og det finnes ingen HD-mod. `./spill.sh` starter originalspillet. Oppgavene under er for senere, når Claude har skrevet i `ORDRE.md` at de gjelder. De er for Codex eller ChatGPT med tilgang til laptopen og repoet. Ta én om gangen, og skriv i `rapporter/` i denne grenen hva du gjorde og fant.
+Ingen kodeoppgaver nå. HD-motoren virker for Sam & Max, men det finnes ingen HD-mod ennå. `./spill.sh --auto` starter med automatisk oppskalering. Oppgavene under er for senere, når Claude har skrevet i `ORDRE.md` at de gjelder. De er for Codex eller ChatGPT med tilgang til laptopen og repoet. Ta én om gangen, og skriv i `rapporter/` i denne grenen hva du gjorde og fant.
 
 1. **Test HD-modden på laptopen med skjerm og tastatur.** `git checkout main && git pull && ./spill.sh` henter, bygger og starter alt. Rommene som skal sjekkes, står i `ORDRE.md`. Følg `docs/SPILLTEST.md`. Sjekk:
    - at Sam og Max går bak ting i forgrunnen der de skal,

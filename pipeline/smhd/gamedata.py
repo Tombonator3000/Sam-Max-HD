@@ -5,8 +5,8 @@ The Dig (v7, der koden kommer fra): DIG.LA0 og DIG.LA1, ukryptert. Begge leses h
 
 Dette er bare det HD-arbeidet trenger: romnavn, romstørrelser, paletter,
 fargesykling, hvor objektene står, og hvilken kostyme-ID hver kostymeblokk
-har (AKOS i v7, COST i v6). Selve bildedekodingen er ikke portet til v6 ennå
-(se export.py).
+har (AKOS i v7, COST i v6). Bildene dekodes i v6grafikk.py (v6) og av
+thedig-textures (v7, export.py).
 
 Blokkformat: 4 byte tagg + 4 byte størrelse (big endian, inkludert hodet).
 Ingen utfylling til partall (neste = start + størrelse).

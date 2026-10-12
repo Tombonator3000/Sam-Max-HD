@@ -48,3 +48,24 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 - Tester: nye enhetstester for stripekodekene, SMAP og BOMP, og for kostymer i format 0x58 og 0x60 (syntetiske data), og en game-test for uttrekket. Den gamle testen som ventet at extract skulle stoppe, er fjernet. `pytest`: 33 bestått (31 uten spillfiler).
 - `spill.sh --auto` og `tools/gpt_runde.sh` stopper ikke lenger på uttrekket. AGENTS, README, STATUS, todo, memory og docs (ANALYSE, HD-MOTOR, SPILLTEST, BESTILLING) oppdatert.
 - Til Tom: `sam-max-sprites.zip` (rom, objekter og kostymeruter som PNG uten indeksbildene, med rooms.json og costumes.json), `sam-max-skript.zip` og to kontaktark. Laget fra `work/`, ikke lagt i repoet.
+
+## 2026-10-10 18:48 til 19:31 (Claude)
+- Tom: slå på HD-motoren. Ny gren `motor-v6` fra `uttrekk-v6` (PR 2 var ikke flettet).
+- `DigHD::create` godtar `GID_SAMNMAX`. Testhoppet leser romstørrelsen fra RMHD i v6-formatet. Pekerkroken lagt i `ScummEngine::updateCursor` (v6), siden skjermen er RGB.
+- Første kjøring (nearest-mod med rom og objekter, 3000 bilder fra start): 0 av omtrent 1 million HD-piksler skiller seg sterkt fra originalen, skjermen lik hele skjermen bygget på nytt, og "background without HD 0" i alle dumper. Uttrekket stemmer altså piksel for piksel med motoren.
+- Kostymer: kroker i `ClassicCostumeRenderer` (`drawLimb` setter rutenummer lag * 128 + kode, `markAsDirty` husker rektangelet, `paintCelByleRLE` kaller `noteCel`), og `beginActor` i `base-costume.cpp` også for klassiske kostymer. Først fikk ingen figurpiksler HD: i v6 legger `drawStripToScreen` tekstlaget over bufferen i `_compositeBuf`, så `src` pekte ikke inn i bufferen der merkene står. `blitVirtScreen` får nå også `vsSrc` (området i bufferen) for merkene, og `src` for verdiene. Etterpå: Sam og Max i kontoret (rom 7) med HD-ruter, 0,26 til 0,29 prosent avvik i kantene av de skalerte figurene (skalatabellen mot jevn skalering, som i The Dig). Midlertidig logging brukt til feilsøkingen er fjernet.
+- `DIGHD_TEST_COSTUME` leser animasjonene fra COST-hodet for klassiske kostymer. Med kostyme 2 (Sam) i rom 4: 57 animasjonsbytter, HD-ruter, 0 avvik.
+- Blast-objekter: Sam & Max ber om bilde 0, og motoren bruker da bilde 1. Kroken fikk 0 og fant ingen HD. Nå får den bildet som faktisk tegnes. I motorveispillet (rom 68): 6907 av 6907 piksler med HD for objekt 604, og tilsvarende for de andre.
+- `engine/test.sh` (nearest-mod med rom, objekter og kostyme 1 til 20): 0 avvik i alle dumper.
+- `tools/romtest.sh --mod test-nearest --kamera ett --tidsgrense 45`: 85 rom, 62 ok med HD-bakgrunn, 0 krasj, 0 forskjøvne bilder, 0 kjøringer med skjermavvik. 12 rom hang etter testhoppet (skriptfeil fordi spillet ikke er i tilstanden rommet venter, for eksempel "state -1 is out of bounds" i rom 11, og ScummVM åpner feilsøkeren), 3 byttet til rom 0, 7 er mindre enn skjermen, rom 67 er svart. Kjørt i bakgrunnen; første forsøk ble avbrutt av tidsgrensen på 10 minutter i verktøyet.
+- Ctrl+H bytter mellom HD og klassisk grafikk (testet med `DIGHD_TEST_KEYS=400:ctrl+h,500:ctrl+h`).
+- Automatisk oppskalering (lanczos-sharp, kostyme 1 til 5) i kontoret: rom, objekter og Sam og Max fra modden. Figurene får harde kanter og ringer i oppskaleringen, som ventet; den ferdige grafikken skal males.
+- Patchen laget på nytt (`git add -N` og `git diff`), og `git apply --check` mot c9091321 i en egen arbeidskopi bestått. The Dig er ikke testet med den utvidede patchen her.
+- Ikke portet: teksten (`CharsetRendererClassic`) og menyraden HD Graphics for v6.
+- Dokumentasjon oppdatert: HD-MOTOR (status, tester, listen over det som er portet), ANALYSE, SPILLTEST, PAGES, BESTILLING, gpt-kodeoppgaver, README, AGENTS, STATUS, memory, todo, og kommentarene i spill.sh, engine/run.sh, engine/test.sh, nettsidefilene, pakke_linux.sh og linux.yml.
+
+## 2026-10-12 07:29 (Codex)
+- Tom ba om å løse konfliktene i PR 2 (`uttrekk-v6`). Flettet `main` ved 5ef6f1f inn i arbeidsgrenen, uten å flette PR-en til main.
+- PR 3 hadde allerede tatt med både uttrekkscommitten 3d74741 og motorarbeidet f2c0d55. Beholdt main-versjonene i alle ti konfliktfilene, slik at nyere HD-støtte og dokumentasjon ikke går tilbake. Før denne loggoppføringen og todo-punktet var hele resultatet identisk med main.
+- Tester: 31 pipelinetester uten spillfiler bestått (Python 3.12, 2 game-tester valgt bort), 16 nodetester bestått, Pages-pakkeren kompilert med `py_compile`, og `bash -n` bestått for alle skallskriptene. Ingen spillfiler eller avledede filer spores i grenen. Ingen uløste konflikter.
+- Motoren er ikke bygget eller startet på nytt; motorkoden er uendret fra main. Tidligere spilltester ovenfor er ikke kjørt på nytt.

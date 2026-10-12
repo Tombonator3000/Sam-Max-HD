@@ -2,8 +2,8 @@
 # Lager den komplette Linux-pakken: én AppImage med ScummVM med HD-patchen, spillfilene,
 # talen og HD-modden. Pakken starter rett i spillet.
 #
-# Merk: HD-delen av patchen er bare slått på for The Dig til den er portet til SCUMM v6, og det
-# finnes ingen HD-mod for Sam & Max ennå. Til da gir pakken originalspillet i den samme motoren.
+# Merk: HD-motoren er på for Sam & Max (rom, objekter og figurer), men det finnes ingen HD-mod ennå.
+# Uten mods/gpt gir pakken originalgrafikken.
 #
 #   tools/pakke_linux.sh [utmappe]          standard out/linux
 #

@@ -10,8 +10,8 @@
 # Spillet og HD-grafikken tilhører Disney/Lucasfilm. Mappen work/nettleser og adressen skal aldri
 # legges ut på en åpen adresse: ingen GitHub Pages, ingen publisering, ingen opplasting.
 #
-# HD-patchen (DigHD) er foreløpig bare slått på for The Dig. Sam & Max kjører uten HD til patchen
-# er tilpasset SCUMM v6, og modden, --rom, --klassisk og --gult gjør ingenting før det.
+# HD-patchen (DigHD) er på for Sam & Max: rom, objekter og figurer får HD fra modden, teksten er
+# originalpiksler. Ikke prøvd i nettleser.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

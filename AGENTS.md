@@ -49,7 +49,7 @@ engine/build.sh                  # ScummVM med patchen til engine/scummvm
 tools/bygg_descumm.sh && .venv/bin/python tools/dekompiler_skript.py   # alle skript som tekst i work/skript
 ```
 
-`smhd extract` bruker egne dekodere for SCUMM v6 (`pipeline/smhd/v6grafikk.py`, oversatt fra ScummVM). Rutenummeret i kostymene er lag * 128 + kode. DigHD i patchen er bare slått på for The Dig. Til den er portet, kjører Sam & Max som originalen, og en HD-mod vises ikke; `engine/test.sh` og `tools/romtest.sh` kan ikke brukes ennå.
+`smhd extract` bruker egne dekodere for SCUMM v6 (`pipeline/smhd/v6grafikk.py`, oversatt fra ScummVM). Rutenummeret i kostymene er lag * 128 + kode. DigHD i patchen er på for The Dig og Sam & Max; i Sam & Max får rom, objekter, blast-objekter og figurer HD, mens teksten og menyraden ikke er portet (`docs/HD-MOTOR.md`). Kjør `engine/test.sh` (0 avvik med nearest-mod) og gjerne `tools/romtest.sh --mod test-nearest --kamera ett` etter endringer i patchen.
 
 ## Kommandoer
 
