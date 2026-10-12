@@ -69,3 +69,9 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 - PR 3 hadde allerede tatt med både uttrekkscommitten 3d74741 og motorarbeidet f2c0d55. Beholdt main-versjonene i alle ti konfliktfilene, slik at nyere HD-støtte og dokumentasjon ikke går tilbake. Før denne loggoppføringen og todo-punktet var hele resultatet identisk med main.
 - Tester: 31 pipelinetester uten spillfiler bestått (Python 3.12, 2 game-tester valgt bort), 16 nodetester bestått, Pages-pakkeren kompilert med `py_compile`, og `bash -n` bestått for alle skallskriptene. Ingen spillfiler eller avledede filer spores i grenen. Ingen uløste konflikter.
 - Motoren er ikke bygget eller startet på nytt; motorkoden er uendret fra main. Tidligere spilltester ovenfor er ikke kjørt på nytt.
+
+## 2026-10-12 15:33 (Codex)
+- Tom ba om regelen for kildetro motiv- og designanalyse i remake-skillen i Dig, Sam & Max og Zak. Oppdatert `docs/skills/scumm-hd-remake/SKILL.md` i Dig og lagt samme skill inn her i alle tre repoer.
+- Regelen krever avklart originalkontekst, motiv, funksjon, palett, person/drakt og design før stilpilot eller nytegning. Hele animasjoner og sammensatte figurdeler kontrolleres visuelt i spillet i tillegg til teknisk mottak. Spillets egne stilvalg gjelder.
+- Koblet regelen fra AGENTS, remastermetoden, bestillingen og malen for grafikkgrenen. Presisert at påviste feil i en prompt rettes i separat notat før generering når jobbfilene er beskyttet. Eksisterende godkjenninger gjelder fortsatt.
+- Kontroll: skill-validatoren bestått for alle tre kopier, identiske skill-filer bekreftet med SHA-256, og lokale lenker og henvisninger til riktig repo kontrollert. `git diff --check` bestått. Ingen motor- eller pipelineendring; spillet er ikke startet på nytt og ingen ny grafikk er laget i denne oppgaven.

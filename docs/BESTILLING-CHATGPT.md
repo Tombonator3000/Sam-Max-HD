@@ -10,6 +10,12 @@ Dato: 10. oktober 2026
 - Jobbformatet, kontrollene og mottaket er kopiert fra The Dig HD Remake og er ikke prøvd med Sam & Max.
 - Promptene som `smhd gpt-pakke` skriver, er fortsatt The Dig sine og må skrives om før de første jobbene lages.
 
+## Kildetro grafikk før produksjon
+
+Les [remake-skillen i main](https://github.com/Tombonator3000/Sam-Max-HD/blob/main/docs/skills/scumm-hd-remake/SKILL.md), særlig «Før HD-produksjon: avklar motiv og design», før stilpilot og nytegning. Avklar motiv, funksjon, riktig palett, person/drakt og design fra originalen i spillkontekst. Bruk spillets egne godkjente stilankere og dokumenter grunnlaget i eksisterende analyse og jobbnotat. Kontroller samme identitet gjennom hele animasjonen og hode/kropp samlet i spillet; alfa og ruteantall beviser ikke riktig motiv.
+
+Regelen gjelder også når jobbformatet ber om ordrett prompt. Ved påvist feil premiss: behold beskyttede jobbfiler, legg korrigert prompt og kildebegrunnelse i et separat notat, og bruk rettelsen. Avklar bare nødvendig manglende betydning eller design; eksisterende godkjenninger gjelder fortsatt. Fortsett uavhengig arbeid som allerede er autorisert.
+
 ## 1. Hva vi bestiller
 
 Vi lager en HD-versjon av LucasArts' *Sam & Max Hit the Road* (1993). Spillet kjører i ScummVM med en patch som legger HD-bilder nøyaktig oppå originalgrafikken, piksel for piksel. Vi trenger at du maler grafikken på nytt i 4x oppløsning (1280 x 800 for et rom på 320 x 200), **trofast mot originalen**: samme motiv, samme former på samme sted, samme farger og samme tegneserieuttrykk. Bare skarpere og med mer detalj.
