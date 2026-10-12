@@ -63,3 +63,9 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 - Patchen laget på nytt (`git add -N` og `git diff`), og `git apply --check` mot c9091321 i en egen arbeidskopi bestått. The Dig er ikke testet med den utvidede patchen her.
 - Ikke portet: teksten (`CharsetRendererClassic`) og menyraden HD Graphics for v6.
 - Dokumentasjon oppdatert: HD-MOTOR (status, tester, listen over det som er portet), ANALYSE, SPILLTEST, PAGES, BESTILLING, gpt-kodeoppgaver, README, AGENTS, STATUS, memory, todo, og kommentarene i spill.sh, engine/run.sh, engine/test.sh, nettsidefilene, pakke_linux.sh og linux.yml.
+
+## 2026-10-12 07:29 (Codex)
+- Tom ba om å løse konfliktene i PR 2 (`uttrekk-v6`). Flettet `main` ved 5ef6f1f inn i arbeidsgrenen, uten å flette PR-en til main.
+- PR 3 hadde allerede tatt med både uttrekkscommitten 3d74741 og motorarbeidet f2c0d55. Beholdt main-versjonene i alle ti konfliktfilene, slik at nyere HD-støtte og dokumentasjon ikke går tilbake. Før denne loggoppføringen og todo-punktet var hele resultatet identisk med main.
+- Tester: 31 pipelinetester uten spillfiler bestått (Python 3.12, 2 game-tester valgt bort), 16 nodetester bestått, Pages-pakkeren kompilert med `py_compile`, og `bash -n` bestått for alle skallskriptene. Ingen spillfiler eller avledede filer spores i grenen. Ingen uløste konflikter.
+- Motoren er ikke bygget eller startet på nytt; motorkoden er uendret fra main. Tidligere spilltester ovenfor er ikke kjørt på nytt.
