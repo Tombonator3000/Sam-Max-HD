@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib
+p=Path('rapporter/bestilling049-20261013');J=lambda f:json.loads(Path(f).read_text());jobs=[r['jobb'] for r in J(p/'root-lagbevis.json')][2:];(p/'c-jobber.json').write_text(json.dumps(jobs,indent=2)+'\n');under={r['jobb']:r for r in J(p/'root-underlagsbevis.json')};objects={}
+for f in ['kildehash.json','root-ekstra-kildehash.json']:
+ for r in J(p/f):assert hashlib.sha256(Path(r['fil']).read_bytes()).hexdigest()==r['sha256']
+for j in jobs:
+ m=J(Path('jobber',j,'jobb.json'));base=Image.open(m['bilde_to']).convert('RGB')
+ if j in under:
+  u=under[j];base=Image.open(Path('jobber',u['rom'],'resultat.png')).convert('RGB');x,y,w,h=u['hd_kutt'];dx,dy,dw,dh=u['hd_plassering'];base.paste(Image.open(Path('jobber',u['underlag'],'resultat.png')).crop((x,y,x+w,y+h)),(dx,dy))
+ base.save(p/f'c-{j}-underlag.png')
+ for o in m['objekter']:objects[o['bilde']]={'jobb':j,'name':o['bilde'],'romrekt':o['rekt'],'m':m}
+groups={'korkvirvel':['obj814_01','obj820_01'],'hender':['obj815_01','obj816_01','obj817_01','obj818_01']};plan={}
+for g,names in groups.items():
+ src=Image.new('RGB',(1536,1024),(128,128,128));stil=src.copy();units=[]
+ for i,n in enumerate(names):
+  u=objects[n];m=u['m'];x,y,w,h=u['romrekt'];scale=min(704/w,448/h);sw,sh=round(w*scale),round(h*scale);px=i%2*768+(768-sw)//2;py=i//2*512+(512-sh)//2;a=Image.open(Path('jobber',u['jobb'],'original_1x.png')).crop((x,y,x+w,y+h));bx,by=m['bilde_i_lerret'][:2];b=Image.open(p/f'c-{u["jobb"]}-underlag.png').crop((bx+x*4,by+y*4,bx+(x+w)*4,by+(y+h)*4));src.paste(a.resize((sw,sh),Image.Resampling.NEAREST),(px,py));stil.paste(b.resize((sw,sh),Image.Resampling.LANCZOS),(px,py));units.append({k:v for k,v in u.items() if k!='m'}|{'atlasrekt':[px,py,sw,sh]})
+ src.save(p/f'c-{g}-source.png');stil.save(p/f'c-{g}-stil.png');plan[g]={'size':[1536,1024],'units':units}
+ extra='Left cork stop in blue-black rim of upside-down snowglobe. Right the exact vivid blue swirling vortex inside globe, preserve folds/spiral and surrounding orange-red forms. Do not add creatures, faces or new objects. Preserve partially clipped label glyphs at edges exactly.' if g=='korkvirvel' else 'Four DIFFERENT close-up poses of Sam brown hand/gray cuff gripping cork over blue snowglobe rim. Top left pose815 cork, top right816 cork, bottom left817 cork (different finger positions from816, do not duplicate), bottom right818 OPEN BLUE HOLE WITHOUT CORK. Preserve each finger geometry/cropping, no added fingers. Bottom rim/label fragments must stay clipped, never complete text or extend hand. Style reference may have no upper hand; original controls state.'
+ prompt=Path('jobber',units[0]['jobb'],'prompt.txt').read_text()+'\nLOCAL FIELDS ONLY: output1536x1024, gray128 gaps, exact rectangles '+str([u['atlasrekt'] for u in units])+'. First reference controls all content/geometry/palette; second only painting level/background continuity. '+extra+' Smooth HD contours; do not zoom or reframe.\n';(p/f'c-{g}-prompt1.txt').write_text(prompt)
+(p/'c-atlasplan.json').write_text(json.dumps(plan,indent=2)+'\n')

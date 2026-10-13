@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 00:39 (norsk tid)
+Oppdatert 2026-10-14 00:40 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 570 bilder levert (255 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 579 bilder levert (263 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -740,14 +740,14 @@ Rom 71.
 Rom 71, 77, 79, 83.
 
 - [ ] `lag071_15` (rom 71 Påkledning, Sam og Max, lag 15 med 2 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_16` (rom 71 Påkledning, Sam og Max, lag 16 med 1 objektbilde, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag077_01_del1av2` (rom 77 Rulletekst (paneler), lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom077_del1av2/resultat.png`)
-- [ ] `lag077_02_del1av2` (rom 77 Rulletekst (paneler), lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom077_del1av2/resultat.png`)
-- [ ] `lag079_01_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 01 med 2 objektbilder, del 1/2, bilde to `jobber/rom079_del1av2/resultat.png`)
-- [ ] `lag079_02_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`)
-- [ ] `lag079_03_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`)
-- [ ] `lag079_04_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`)
-- [ ] `lag079_05_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`)
+- [x] `lag071_16` (rom 71 Påkledning, Sam og Max, lag 16 med 1 objektbilde, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag077_01_del1av2` (rom 77 Rulletekst (paneler), lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom077_del1av2/resultat.png`)
+- [x] `lag077_02_del1av2` (rom 77 Rulletekst (paneler), lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom077_del1av2/resultat.png`)
+- [x] `lag079_01_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 01 med 2 objektbilder, del 1/2, bilde to `jobber/rom079_del1av2/resultat.png`)
+- [x] `lag079_02_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`)
+- [x] `lag079_03_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`)
+- [x] `lag079_04_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`)
+- [x] `lag079_05_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`)
 - [ ] `lag083_01` (rom 83 Slutten (bigfootene i skyene), lag 01 med 4 objektbilder, bilde to `jobber/rom083/resultat.png`)
 
 ## Bestilling 50
@@ -3527,3 +3527,5 @@ Bestilling50: sju lag levert OK med sju egne felt: voksboks, tannfravær og fire
 Bestilling 47: ni lag levert OK med 47 egne felt, to byte-identiske panoramaoverlapper og fire antrekkskombinasjoner. Lag068_12 holdes utenfor med FEIL. Se `rapporter/bestilling047-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
 
 Bestilling 48: ni antrekkslag levert OK med 35 egne felt, korrekt LeChuck Pizza og rettet revnet bukseben. Lag071_05 avventer motivavklaring. Se `rapporter/bestilling048-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+
+Bestilling 49: åtte lag levert med ni OK-felt; fire OK og fire SJEKK på arvet underlagsavvik. 077-tilstander, snøkulegrep og 1¢-maske er kontrollert. Lag071_15 og lag083_01 avventer motivavklaring. Se `rapporter/bestilling049-20261013/RAPPORT.md`. HD-arbeidet fortsetter.

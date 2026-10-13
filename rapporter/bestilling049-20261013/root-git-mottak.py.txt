@@ -1,0 +1,36 @@
+"""Commit and push the scoped delivery while retaining exact generation prompts."""
+from pathlib import Path
+import subprocess,hashlib,json,re
+
+def seal_and_push(folder,entries,message,allow_existing_index=False):
+    root=folder.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    assert subprocess.check_output(['git','branch','--show-current'],cwd=root,text=True).strip()=='gpt-arbeid'
+    paths=[str(folder.relative_to(root)),'GRAFIKKLISTE.md','todo.md','log.md']+[f'jobber/{e["jobb"]}/{name}' for e in entries for name in ['resultat.png','notat.md']]
+    staged=subprocess.check_output(['git','diff','--cached','--name-only'],cwd=root,text=True).splitlines()
+    if not allow_existing_index:assert not staged
+    assert all(p in paths or p.startswith(paths[0]+'/') for p in staged),staged
+    for p in list(folder.rglob('*'))+[root/'jobber'/e['jobb']/'notat.md' for e in entries]:
+        if p.is_file() and p.suffix=='.md':p.write_text('\n'.join(line.rstrip() for line in p.read_text().splitlines()).rstrip()+'\n')
+    def seal():
+        files=sorted(p for p in folder.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')+[root/'jobber'/e['jobb']/name for e in entries for name in ['resultat.png','notat.md']]
+        (folder/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+str(p.relative_to(root))+'\n' for p in files))
+        subprocess.run(['git','add','--',*paths],cwd=root,check=True)
+    seal()
+    check=subprocess.run(['git','diff','--cached','--check'],cwd=root,text=True,capture_output=True)
+    exceptions=[]
+    if check.returncode:
+        lines=check.stdout.splitlines();assert len(lines)%2==0 and not check.stderr,check
+        for warning,content in zip(lines[::2],lines[1::2]):
+            match=re.fullmatch(r'(.+):(\d+): trailing whitespace\.',warning);assert match,warning
+            name,line=match.groups();p=root/name
+            assert p.parent==folder and (re.fullmatch(r'.+-prompt\d+\.txt',p.name) or p.name=='c-qa.py.txt'),name
+            assert content.startswith('+') and p.read_text().splitlines()[int(line)-1]==content[1:]
+            exceptions.append({'fil':name,'linje':int(line),'sha256':sha(p),'grunn':'Ordrett generatorprompt eller arkivert produksjonsoppskrift beholdes, inkludert terminalt mellomrom.'})
+        excluded=sorted({e['fil'] for e in exceptions})
+        subprocess.run(['git','diff','--cached','--check','--','.',*[f':(exclude){p}' for p in excluded]],cwd=root,check=True)
+    (folder/'root-git-diffkontroll.json').write_text(json.dumps({'standard_diffcheck':check.returncode==0,'unntak_kun_ordrette_prompter_og_arkivert_oppskrift':exceptions,'ovrige_filer_diffcheck_OK':True},ensure_ascii=False,indent=2)+'\n')
+    seal()
+    subprocess.run(['git','diff','--cached','--check','--','.',*[f':(exclude){p}' for p in sorted({e['fil'] for e in exceptions})]],cwd=root,check=True)
+    subprocess.run(['git','commit','-m',message],cwd=root,check=True,capture_output=True,text=True)
+    subprocess.run(['git','push','origin','gpt-arbeid'],cwd=root,check=True,capture_output=True,text=True)
+    return subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()

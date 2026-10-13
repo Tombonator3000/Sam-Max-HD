@@ -1,0 +1,200 @@
+from pathlib import Path
+import hashlib, json, re
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image, ImageDraw
+import numpy as np
+
+r = Path(__file__).resolve().parent
+root = r.parents[1]
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+sources = json.loads((r/'kildehash.json').read_text())
+assert len(sources) == 40
+extra=json.loads((r/'root-ekstra-kildehash.json').read_text())
+assert len(extra)==32
+for e in extra:assert sha(root/e['fil'])==e['sha256'],e['fil']
+for s in sources:
+    assert sha(root/s['fil']) == s['sha256'], s['fil']
+for path,digest in json.loads((r/'root-ankerhash.json').read_text()).items():assert sha(root/path)==digest,path
+records = {}
+for g in ['b','c']:
+    data=json.loads((r/f'{g}-leveranser.json').read_text())
+    for e in (data['leveranser'] if isinstance(data,dict) else data):
+        e.setdefault('jobb',e.get('id'))
+        assert e['jobb'] not in records
+        records[e['jobb']] = e
+jobs = [j for j in re.findall(r'^- \[[ x]\] `([^`]+)`', (root/'GRAFIKKLISTE.md').read_text(), re.M) if j in records]
+n=len(records)
+assert len(jobs)==n and n in {8}
+q=(root/'GRAFIKKLISTE.md').read_text().split('## Bestilling 49\n',1)[1].split('## Bestilling 50\n',1)[0]
+expected=set(re.findall(r'^- \[[ x]\] `([^`]+)`',q,re.M))
+assert set(jobs)<=expected
+assert expected-set(jobs)=={'lag071_15','lag083_01'}
+out, checks, groups = [], [], {}
+for j in jobs:
+    e = records[j]
+    p = root/e['resultat']
+    assert sha(p) == e['sha256'], j
+    im = Image.open(p)
+    assert im.mode=='RGB',j
+    assert im.size == (1536,1024), j
+    meta = json.loads((root/'jobber'/j/'jobb.json').read_text())
+    x,y,w,h = meta['bilde_i_lerret']
+    arr = np.asarray(im.convert('RGB'))
+    outside = np.ones((1024,1536),dtype=bool)
+    outside[y:y+h,x:x+w] = False
+    assert np.all(arr[outside] == 128), j
+    logs = [root/e[k] for k in ['kontrollfil','egenkontroll_logg','logg'] if k in e]+[r/f'{j}-kontroll.txt',r/f'{j}-egenkontroll.txt']
+    logs = [p for p in logs if p.is_file() and 'Utfall:' in p.read_text()]
+    assert logs, j
+    status=re.search(r'Utfall: (OK|SJEKK|FEIL)',logs[0].read_text()).group(1)
+    assert status in {'OK','SJEKK','FEIL'},(j,status)
+    expected=e.get('egenkontroll',e.get('teknisk_kontroll'))
+    if expected in {'OK','SJEKK','FEIL'}:assert status==expected,(j,status,expected)
+    assert (root/'jobber'/j/'notat.md').is_file()
+    item = dict(e)
+    item.update(egenkontroll=status,klar_for_mottak=status!='FEIL' and e.get('klar_for_mottak',True) and e.get('leveranseklar',True),kontrollfil=str(logs[0].relative_to(root)),
+                visuelt_godkjent=False,stil_godkjent_av_Tom=True,importert=False,
+                runtime_verifisert=False,storrelse=list(im.size),format=im.mode)
+    out.append(item)
+    checks.append({'jobb':j,'sha256':sha(p),'format':im.mode,'storrelse':list(im.size),
+                   'padding_rgb128':True,'egenkontroll':status})
+    if meta['type']=='rom' and meta.get('deler',1)>1:
+        groups.setdefault(meta['rom'],[]).append((j,meta,arr[y:y+h,x:x+w]))
+overlaps=[]
+for room,items in groups.items():
+    items.sort(key=lambda e:e[1]['region'][0])
+    assert len(items)==items[0][1]['deler'], room
+    for (ja,ma,a),(jb,mb,b) in zip(items,items[1:]):
+        dx=(mb['region'][0]-ma['region'][0])*ma['skala']
+        width=min(a.shape[1]-dx,b.shape[1])
+        assert width>0 and np.array_equal(a[:,dx:dx+width],b[:,:width]),(ja,jb)
+        overlaps.append({'rom':room,'jobber':[ja,jb],'bredde':width,'hoyde':a.shape[0],'byte_identisk':True})
+# Layer panoramas are grouped by layer and verified against their full masters.
+assert not groups
+panorama_fields={}
+if r.name.startswith('bestilling047'):
+ for layer in [1,2]:
+  ja,jb=f'lag070_{layer:02}_del1av2',f'lag070_{layer:02}_del2av2'
+  masterpath=root/records[ja]['fullmaster'];assert sha(masterpath)==records[ja]['fullmaster_sha256']==records[jb]['fullmaster_sha256']
+  master=Image.open(masterpath).convert('RGB');assert master.size==(1920,800)
+  for j,dx in [(ja,0),(jb,384)]:
+   assert Image.open(root/records[j]['resultat']).crop((0,112,1536,912)).tobytes()==master.crop((dx,0,dx+1536,800)).tobytes()
+  assert Image.open(root/records[ja]['resultat']).crop((384,112,1536,912)).tobytes()==Image.open(root/records[jb]['resultat']).crop((0,112,1152,912)).tobytes()
+  overlaps.append({'jobber':[ja,jb],'bredde':1152,'hoyde':800,'byte_identisk':True,'master_sha256':sha(masterpath)})
+  fields=[o for j in [ja,jb] for o in json.loads((root/'jobber'/j/'jobb.json').read_text())['objekter']]
+  for j in [ja,jb]:panorama_fields[j]=fields
+underlay_proofs=[]
+background=[]
+for j,e in records.items():
+    meta=json.loads((root/'jobber'/j/'jobb.json').read_text());rx,ry,rw,rh=meta['region'];px,py,pw,ph=meta['bilde_i_lerret']
+    bp=meta['bilde_to'];composed=Image.open(root/bp).convert('RGB')
+    recipe=None
+    if j.startswith('lag077_'):
+        up='jobber/obj780_01/resultat.png';crop=(128,368,1408,656);at=(0,112)
+        composed.paste(Image.open(root/up).convert('RGB').crop(crop),at);recipe={'fil':up,'sha256':sha(root/up),'crop_xyxy':crop,'plassering':at}
+    elif j.startswith('lag079_') and j!='lag079_01_del1av2':
+        bp='jobber/rom079_del1av2/resultat.png';composed=Image.open(root/bp).convert('RGB')
+        up='jobber/obj819_01/resultat.png';crop=(128,112,1408,912);at=(0,112)
+        composed.paste(Image.open(root/up).convert('RGB').crop(crop),at);recipe={'fil':up,'sha256':sha(root/up),'crop_xyxy':crop,'plassering':at}
+    if 'grunnrom' in e:
+        assert composed.tobytes()==Image.open(root/e['grunnrom']).convert('RGB').tobytes(),j
+        underlay_proofs.append({'jobb':j,'uavhengig_komposisjon_byteidentisk':True,'oppskrift':recipe,'grunnrom':bp})
+    base=np.asarray(composed);arr=np.asarray(Image.open(root/e['resultat']).convert('RGB'))
+    outside=np.ones((1024,1536),dtype=bool)
+    def rect(mask,box):
+        xx,yy,ww,hh=box;x0=max(0,xx);y0=max(0,yy);x1=min(1536,xx+ww);y1=min(1024,yy+hh)
+        if x1>x0 and y1>y0:mask[y0:y1,x0:x1]=False
+    for ob in panorama_fields.get(j,meta['objekter']):
+        x,y,w,h=ob['rekt'];rect(outside,[px+(x-rx)*4,py+(y-ry)*4,w*4,h*4])
+    diff=np.any(base!=arr,axis=2);count=int((diff&outside).sum())
+    assert count==0,(j,count)
+    background.append({'jobb':j,'sammenliknet_HD_grunnrom':bp,'utenfor_egen_union':count})
+(r/'root-bakgrunnskontroll.json').write_text(json.dumps(background,ensure_ascii=False,indent=2)+'\n')
+(r/'root-underlagskontroll.json').write_text(json.dumps(underlay_proofs,ensure_ascii=False,indent=2)+'\n')
+provenance=[]
+if (r/'c-proveniens.json').exists():
+ provenance=json.loads((r/'c-proveniens.json').read_text());assert len(provenance)==2
+ for call in provenance:
+  for key in ['raw','prompt']:assert sha(root/call[key])==call[key+'_sha256'],call[key]
+  for ref in call['referanser']:assert sha(root/ref['fil'])==ref['sha256'],ref['fil']
+new_hashes=[]
+for e in records.values():
+ if 'grunnrom' in e:assert sha(root/e['grunnrom'])==e['grunn_sha256']
+ for block in e.get('raw',[]):assert sha(root/block['fil'])==block['sha256']
+ for path,digest in e.get('kildehash',{}).items():assert sha(root/path)==digest,path
+ for key in ['raabilde','prompt','fullmaster']:
+  if e.get(key):assert sha(root/e[key])==e[key+'_sha256']
+ if e.get('lokalretting'):
+  for key,path in e['lokalretting'].items():
+   assert (root/path).is_file();new_hashes.append({'fil':path,'sha256':sha(root/path)})
+(r/'root-proveniens-tillegg.json').write_text(json.dumps(new_hashes,indent=2)+'\n')
+native=[]
+for j,e in records.items():
+ if 'native_svg' not in e:continue
+ for name in ['native_svg','geometri']:assert sha(root/e[name])==e[name+'_sha256']
+ svg=(root/e['native_svg']).read_text();assert '<image' not in svg and 'gradient' not in svg
+ g=json.loads((root/e['geometri']).read_text());assert sha(root/g['source'])==g['source_sha256']
+ assert g['source_region_loops']==g['vector_region_loops'] and g['junction_positions_unchanged']
+ assert g['maximum_chain_simplification_distance_source_px']<=.8 and g['coverage_gaps']==0
+ assert g['shared_boundary_reused_on_both_sides'] and g['flat_original_colors'] and g['new_facets']==0
+ native.append({'jobb':j,'svg_sha256':sha(root/e['native_svg']),'palett':g['source_palette_count'],'lokker':g['vector_region_loops'],'maks_kjedeavstand':g['maximum_chain_simplification_distance_source_px'],'hull':0})
+assert len(native)==(2 if r.name.startswith('bestilling049') else 0)
+(r/'root-vektorkontroll.json').write_text(json.dumps(native,indent=2)+'\n')
+# Fresh independent invocation of the unmodified checker on final files.
+import subprocess,sys
+for j in jobs:
+ result=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(root/records[j]['resultat'])],text=True,capture_output=True,check=False)
+ (r/f'{j}-root-kontroll.txt').write_text(result.stdout)
+ expected=records[j]['egenkontroll'];assert re.search('Utfall: '+expected,result.stdout),j
+ assert result.returncode==(0 if expected=='OK' else 1)
+# Independently expose every object result, including the checker's silent OK rows.
+import importlib.util
+spec=importlib.util.spec_from_file_location('delivery_check',root/'verktoy/sjekk_leveranse.py');checker=importlib.util.module_from_spec(spec);spec.loader.exec_module(checker)
+objectchecks=[]
+for j in jobs:
+    meta=json.loads((root/'jobber'/j/'jobb.json').read_text());rx,ry,rw,rh=meta['region'];x,y,w,h=meta['bilde_i_lerret']
+    result=Image.open(root/records[j]['resultat']).convert('RGB').crop((x,y,x+w,y+h))
+    measure=checker.compare(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'),result)
+    for ob in meta.get('objekter',[]):
+        ox,oy,ow,oh=ob['rekt'];x0,y0=max(0,ox-rx),max(0,oy-ry);x1,y1=min(rw,ox-rx+ow),min(rh,oy-ry+oh)
+        aa,bb=measure['eo'][y0:y1,x0:x1],measure['es'][y0:y1,x0:x1]
+        skip=x1-x0<4 or y1-y0<4 or aa.std()<1
+        value=None if skip else checker.corr(aa,bb)
+        objectchecks.append({'jobb':j,'objekt':ob['bilde'],'rekt':ob['rekt'],'hoppet_over':bool(skip),'source_edge_std':float(aa.std()),'kantkorrelasjon':value,'status':'SKIPPED' if skip else 'OK' if value>=.6 else 'SJEKK' if value>=.5 else 'FEIL'})
+assert len(objectchecks)==9
+assert all(e["status"]=="OK" and not e["hoppet_over"] for e in objectchecks)
+(r/'root-objektkontroll.json').write_text(json.dumps(objectchecks,ensure_ascii=False,indent=2)+'\n')
+# Confirm the four SJEKK blocks are wholly inherited from the independently composed 819 base.
+inherited=[]
+if r.name.startswith('bestilling049'):
+ import math
+ for j in [f'lag079_0{i}_del1av2' for i in range(2,6)]:
+  e=records[j];after=Image.open(root/e['resultat']).convert('RGB');before=Image.open(root/e['grunnrom']).convert('RGB')
+  mm=checker.compare(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'),after.crop((0,112,1536,912)))
+  blocks=[]
+  for yy in [0,100]:
+   for xx in [0,128,256]:
+    dx,dy=checker.phase_shift(mm['eo'][yy:yy+100,xx:xx+128],mm['es'][yy:yy+100,xx:xx+128]);blocks.append((math.hypot(dx,dy),xx,yy,dx,dy))
+  length,xx,yy,dx,dy=max(blocks);assert (xx,yy)==(0,100) and 1<length<1.2
+  box=(xx*4,112+yy*4,(xx+128)*4,112+(yy+100)*4)
+  assert before.crop(box).tobytes()==after.crop(box).tobytes()
+  inherited.append({'jobb':j,'storst_blokk':[xx,yy,128,100],'avstand':length,'dx':dx,'dy':dy,'endrede_HD_piksler_fra_underlag':0,'status':'SJEKK beholdt'})
+(r/'root-arvet-blokkavvik.json').write_text(json.dumps(inherited,indent=2)+'\n')
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+manifest={'dato':stamp,'gren':'gpt-arbeid','produksjonsagent':'gpt-6-astra',
+          'verktøy':'Innebygd ChatGPT-bildegenerator og autorisert presis bildebehandling',
+          'modell':'Eksakt bildemodellnavn ikke eksponert','leveranser':out}
+(r/'fremdrift.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+summary={'dato':stamp,'antall_leveranser':len(out),'beskyttede_kilder_uendret':len(sources),'ekstra_kilder_uendret':len(extra),
+         'overlapp':overlaps,'leveranser':checks,'motorimport':False,'runtime':False,
+         'ny_visuell_brukergodkjenning':False,'ikke_klar_for_mottak':[e['jobb'] for e in out if not e['klar_for_mottak']],'utfall_antall':{v:sum(e['egenkontroll']==v for e in out) for v in ['OK','SJEKK','FEIL']}}
+(r/'sluttkontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+contact=Image.new('RGB',(1536,5*286),(210,213,218));d=ImageDraw.Draw(contact)
+for i,j in enumerate(jobs):
+    for k,f in enumerate(['referanse.png','resultat.png']):
+        im=Image.open(root/'jobber'/j/f).convert('RGB');im.thumbnail((384,256))
+        x=i%2*768+k*384;y=i//2*286
+        contact.paste(im,(x,y+20));d.text((x+7,y+4),j+(' ORIGINAL' if k==0 else ' HD'),fill=(25,25,25))
+contact.save(r/'samlet-kontaktark.png')
+print(json.dumps({'leveranser':len(out),'kilder_uendret':len(sources),'overlapp':overlaps}))

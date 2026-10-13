@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,importlib.util,math
+p=Path('rapporter/bestilling049-20261013');sp=importlib.util.spec_from_file_location('ck','verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(sp);sp.loader.exec_module(ck);res=[]
+for j in [f'lag079_0{i}_del1av2' for i in range(2,6)]:
+ src=Image.open(Path('jobber',j,'original_1x.png'));out=Image.open(Path('jobber',j,'resultat.png'));r=ck.compare(src,out.crop((0,112,1536,912)));eo,es=r['eo'],r['es'];rows=[]
+ for y in [0,100]:
+  for x in [0,128,256]:
+   a,b=eo[y:y+100,x:x+128],es[y:y+100,x:x+128];dx,dy=ck.phase_shift(a,b);rows.append({'originalrekt':[x,y,128,100],'dx':dx,'dy':dy,'avstand':math.hypot(dx,dy)})
+ row=max(rows,key=lambda z:z['avstand']);x,y,w,h=row['originalrekt'];before=np.array(Image.open(p/f'c-{j}-underlag.png'));after=np.array(out);row['avvik_fra_nytt_underlag_i_blokk']=int(np.any(before[112+y*4:112+(y+h)*4,x*4:(x+w)*4]!=after[112+y*4:112+(y+h)*4,x*4:(x+w)*4],axis=2).sum());res.append({'jobb':j,'blokker':rows,'storst':row})
+(p/'c-blokkdiagnose.json').write_text(json.dumps(res,indent=2)+'\n');print(json.dumps([{'jobb':r['jobb'],'storst':r['storst']} for r in res],indent=2))
