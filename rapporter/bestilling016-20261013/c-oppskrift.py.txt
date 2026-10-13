@@ -1,0 +1,7 @@
+from pathlib import Path
+from PIL import Image
+r=Path("rapporter/bestilling016-20261013")
+for j,n,box in [("obj682_01",2,(128,462,1408,560)),("obj683_01",1,(128,464,1408,560))]:
+    out=Image.new("RGB",(1536,1024),(128,128,128))
+    out.paste(Image.open(r/f"{j}-raa-{n}.png").convert("RGB").crop(box).resize((1280,96),Image.Resampling.LANCZOS),(128,464))
+    out.save(Path("jobber")/j/"resultat.png")

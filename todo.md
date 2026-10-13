@@ -39,4 +39,5 @@
 - [x] Levert bestilling 13 med åtte OK, to SJEKK og kildeavklart mammut/hyssing.
 - [x] Levert bestilling 14 med sju OK og tre SJEKK, punktgrupper og kildefarger kontrollert.
 - [x] Levert bestilling 15 med ni OK og obj605_01 SJEKK, målte kantavvik og presise genererte komponenter dokumentert.
-- [ ] Fortsett bestilling 16 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 16 med sju OK og tre SJEKK, tavler, knuste lag og banemarkeringer dokumentert.
+- [ ] Fortsett bestilling 17 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

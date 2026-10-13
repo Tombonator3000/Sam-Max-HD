@@ -1,0 +1,26 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import json,hashlib,re
+B=Path.cwd();R=B/'rapporter/bestilling016-20261013'
+cfg={'obj649_01':([224,280,1312,744],[368,336,800,352]),'obj650_01':([368,335,1168,689],[368,336,800,352]),'obj668_01':([181,479,1355,543],[176,480,1184,64]),'obj669_01':([177,479,1360,542],[176,480,1184,64])}
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+contact=Image.new('RGB',(1640,1050),(150,150,150));d=ImageDraw.Draw(contact);manifest=[]
+for n,(j,(box,target)) in enumerate(cfg.items()):
+ x,y,w,h=target;raw=R/f'a-{j}-raa.png';im=Image.open(raw).convert('RGB').crop(box).resize((w,h),Image.Resampling.LANCZOS)
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im,(x,y));assert out.tobytes()==Image.open(B/f'jobber/{j}/resultat.png').convert('RGB').tobytes()
+ status=re.search(r'Utfall: (\w+)',(R/f'a-{j}-kontroll.txt').read_text())[1]
+ entry={'jobb':j,'resultat':f'jobber/{j}/resultat.png','sha256':sha(B/f'jobber/{j}/resultat.png'),'egenkontroll':status,'kontrollfil':f'rapporter/bestilling016-20261013/a-{j}-kontroll.txt','forsok':1,'runtime':False,'ny_brukergodkjenning':False,'raa':str(raw.relative_to(B)),'raa_sha256':sha(raw),'generert_utsnitt':box,'motivfelt':target,'presis_padding':True}
+ manifest.append(entry)
+ if n<2:
+  yy=24+n*385
+  for col,f in enumerate(['referanse.png','resultat.png']):
+   d.text((20+col*820,yy-18),j+' '+('original' if col==0 else status),fill='black');contact.paste(Image.open(B/f'jobber/{j}/{f}').crop((x,y,x+w,y+h)),(20+col*820,yy))
+ else:
+  yy=800+(n-2)*120
+  for col,f in enumerate(['referanse.png','resultat.png']):
+   d.text((20+col*820,yy-18),j+' '+('original' if col==0 else status),fill='black');contact.paste(Image.open(B/f'jobber/{j}/{f}').crop((x,y,x+w,y+h)).resize((800,43),Image.Resampling.LANCZOS),(20+col*820,yy))
+contact.save(R/'a-samlet-qa.png')
+(R/'a-leveranser.json').write_text(json.dumps({'leveranser':manifest},indent=2))
+locks=json.loads((R/'kildehash.json').read_text());proof=[dict(v,uendret=sha(B/v['fil'])==v['sha256']) for v in locks];assert all(v['uendret'] for v in proof)
+(R/'a-kildebevis.json').write_text(json.dumps(proof,indent=2))
+print(json.dumps(manifest,indent=2))

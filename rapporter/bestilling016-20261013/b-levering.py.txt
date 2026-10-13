@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling016-20261013'
+raws={"obj664_01":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-e6307fe1-36be-4970-9e4b-e100a9a988b4.png","obj665_01":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-78e6d620-a0d9-49cb-b453-d355d6fdec00.png","obj666_01":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-48680dfd-2f31-466f-884c-74330f38dcee.png","obj667_01":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-28de3243-b9f8-4324-b2b4-307e8f658b78.png"}
+boxes={'obj664_01':(128,210,1408,774),'obj665_01':(192,128,1344,896),'obj666_01':(180,248,1356,808),'obj667_01':(205,125,1331,897)}
+for j,raw in raws.items():
+ shutil.copy2(raw,r/(j+'-raa01.png'));im=Image.open(raw).convert('RGB')
+ m=json.loads((b/'jobber'/j/'jobb.json').read_text());x,y,w,h=m['bilde_i_lerret']
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im.crop(boxes[j]).resize((w,h),Image.Resampling.LANCZOS),(x,y));out.save(b/'jobber'/j/'resultat.png')
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(b/'jobber'/j/'resultat.png')],capture_output=True,text=True)
+ (r/(j+'-kontroll.txt')).write_text(p.stdout+p.stderr);print(j,p.stdout)

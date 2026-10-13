@@ -244,16 +244,16 @@ Rom 68.
 
 Rom 68, 69.
 
-- [ ] `obj649_01` (rom 68 Highway Surfing (minispill), objekt 649 tilstand 01)
-- [ ] `obj650_01` (rom 68 Highway Surfing (minispill), objekt 650 tilstand 01)
-- [ ] `obj664_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 664 tilstand 01)
-- [ ] `obj665_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 665 tilstand 01)
-- [ ] `obj666_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 666 tilstand 01)
-- [ ] `obj667_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 667 tilstand 01)
-- [ ] `obj668_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 668 tilstand 01)
-- [ ] `obj669_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 669 tilstand 01)
-- [ ] `obj682_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 682 tilstand 01)
-- [ ] `obj683_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 683 tilstand 01)
+- [x] `obj649_01` (rom 68 Highway Surfing (minispill), objekt 649 tilstand 01)
+- [x] `obj650_01` (rom 68 Highway Surfing (minispill), objekt 650 tilstand 01)
+- [x] `obj664_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 664 tilstand 01)
+- [x] `obj665_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 665 tilstand 01)
+- [x] `obj666_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 666 tilstand 01)
+- [x] `obj667_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 667 tilstand 01)
+- [x] `obj668_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 668 tilstand 01)
+- [x] `obj669_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 669 tilstand 01)
+- [x] `obj682_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 682 tilstand 01)
+- [x] `obj683_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 683 tilstand 01)
 
 ## Bestilling 17
 
@@ -3453,3 +3453,5 @@ Rom049 er senere rettet etter Toms uttrykkelige vektorvalg og levert OK; tidlige
 Bestilling 14: 7 OK og 3 SJEKK, ti bilder levert. Komponentkontroll av stjerner og lokale figur-/palettrettinger bevart. Historisk promptmetadataavvik dokumentert, beskyttede kilder urørt. Se `rapporter/bestilling014-20261013/RAPPORT.md`. Bestilling 15 fortsetter.
 
 Bestilling 15: 9 OK og obj605_01 SJEKK, ti veisegmenter levert. Genererte stripe-/veikomponenter presist skalert, lokale restavvik dokumentert. Se `rapporter/bestilling015-20261013/RAPPORT.md`. Bestilling 16 fortsetter.
+
+Bestilling 16: 7 OK og 3 SJEKK (obj649_01, obj650_01 og obj668_01), ti bilder levert. Tavlenes bakside/knuste tilstander, lave banemarkeringer og sparse horisontkonturer kildekontrollert. Se `rapporter/bestilling016-20261013/RAPPORT.md`. Bestilling 17 fortsetter.

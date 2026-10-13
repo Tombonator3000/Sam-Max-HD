@@ -152,3 +152,9 @@
 - Bestilling 15 levert med 9 OK og obj605_01 SJEKK. Root har vurdert samlet original/HD. 40 beskyttede kilder uendret, SHA/lerret/padding kontrollert.
 - 609/612/613 gulstriper skalert som nye genererte komponenter, underlag fra innebygd imagegen, ingen originalmasker eller lokal warp. 609 ny veikomponent helskalert; 40 kantmålinger middel absolutt HD-avvik 5.2 til 1.775 og maksimum 12 til 5, små avvik består. Egenkontroll 609 nå OK, 605 SJEKK uendret.
 - Alle ti bestilling 14-PNG SHA-verifisert fra eksakt GitHub-commit. Proveniens og historikk i rapporter/bestilling015-20261013/. Ingen motorimport, faktisk spillvisning eller ny individuell godkjenning. Bestilling 16/17/18 fortsetter.
+
+## 2026-10-13 20:05 (Codex, Astra)
+
+- Bestilling 16 levert med 7 OK og 3 SJEKK, obj649/650/668. Root har sett original/HD samlet og beholdt dokumenterte konturavvik. 40 beskyttede kilder uendret, SHA/lerret/padding kontrollert.
+- Tom grønn tavle, egen metallbakside, fire knuste tilstander med meningsfulle svarte tomrom, STARTING LINE/FINISH LINE og to ulike gul/oransje horisonter. Første 664/666/682-FEIL og motivfeil i 665 er rettet før levering.
+- Alle ti bestilling 15-PNG SHA-verifisert fra GitHub. Proveniens/QA i rapporter/bestilling016-20261013/. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Bestilling 17/18 pågår.
