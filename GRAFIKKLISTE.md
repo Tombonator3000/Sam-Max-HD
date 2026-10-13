@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 19:17 (norsk tid)
+Oppdatert 2026-10-13 19:23 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 52 hele rom og 1 delvis levert (81 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 28 levert, inkludert fem SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 55 hele rom og 1 delvis levert (87 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 32 levert, inkludert 6 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -199,16 +199,16 @@ Rom 53, 54, 55, 56, 57, 58.
 
 Rom 58, 59, 60, 61.
 
-- [ ] `rom058_del2av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), del 2/2)
-- [ ] `rom059_del1av2` (rom 59 Dinosaurene (T. rex og mammut), del 1/2)
-- [ ] `rom059_del2av2` (rom 59 Dinosaurene (T. rex og mammut), del 2/2)
-- [ ] `obj566_01` (rom 59 Dinosaurene (T. rex og mammut), objekt 566 tilstand 01)
-- [ ] `obj570_01` (rom 59 Dinosaurene (T. rex og mammut), objekt 570 tilstand 01)
-- [ ] `obj570_02` (rom 59 Dinosaurene (T. rex og mammut), objekt 570 tilstand 02)
-- [ ] `obj570_03` (rom 59 Dinosaurene (T. rex og mammut), objekt 570 tilstand 03)
-- [ ] `rom060_del1av2` (rom 60 Tarpit Slide, del 1/2)
-- [ ] `rom060_del2av2` (rom 60 Tarpit Slide, del 2/2)
-- [ ] `rom061_del1av2` (rom 61 Strikkhoppgrotten i fjellet, del 1/2)
+- [x] `rom058_del2av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), del 2/2)
+- [x] `rom059_del1av2` (rom 59 Dinosaurene (T. rex og mammut), del 1/2)
+- [x] `rom059_del2av2` (rom 59 Dinosaurene (T. rex og mammut), del 2/2)
+- [x] `obj566_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 59 Dinosaurene (T. rex og mammut), objekt 566 tilstand 01)
+- [x] `obj570_01` (rom 59 Dinosaurene (T. rex og mammut), objekt 570 tilstand 01)
+- [x] `obj570_02` (rom 59 Dinosaurene (T. rex og mammut), objekt 570 tilstand 02)
+- [x] `obj570_03` (rom 59 Dinosaurene (T. rex og mammut), objekt 570 tilstand 03)
+- [x] `rom060_del1av2` (rom 60 Tarpit Slide, del 1/2)
+- [x] `rom060_del2av2` (levert med egenkontroll SJEKK, se jobbnotat) (rom 60 Tarpit Slide, del 2/2)
+- [x] `rom061_del1av2` (rom 61 Strikkhoppgrotten i fjellet, del 1/2)
 
 ## Bestilling 14
 
@@ -3445,3 +3445,5 @@ Bestilling 10: ti rombilder med egenkontroll OK, fire identiske overlapp og kild
 Bestilling 11: ni bilder klare, alle teknisk OK. Rom049 er teknisk OK men visuelt avvist etter fem forsøk og forblir ukrysset. Se `rapporter/bestilling011-20261013/RAPPORT.md`. Bestilling 12 og 13 fortsetter uavhengig.
 
 Bestilling 12: ti OK levert, med kildekontrollert fest, bassengtilstander og grønnsaksmuseum. Rom058-master og neste del er låst; se `rapporter/bestilling012-20261013/RAPPORT.md`. Bestilling 13 fortsetter.
+
+Bestilling 13: 8 OK og 2 SJEKK (obj566_01 og rom060 del 2). Ti bilder levert, kontrollavvik beholdt. Rom061-master og neste del er låst; se `rapporter/bestilling013-20261013/RAPPORT.md`. Bestilling 14 fortsetter.

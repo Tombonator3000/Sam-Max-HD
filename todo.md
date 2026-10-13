@@ -36,4 +36,5 @@
 - [x] Levert ni klare bilder i bestilling 11, med kildetro skilt og identiske panoramaer.
 - [ ] Avklar rom049 visuelt. Fem bildeforsøk gir ekstra polygoner/gradienter tross teknisk OK. Presis vektorrekonstruksjon er foreslått som uttrykkelig metodevalg. Ikke klar for mottak.
 - [x] Levert bestilling 12 med ti OK, to identiske romoverlapp og låst rom058-master.
-- [ ] Fortsett bestilling 13 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 13 med åtte OK, to SJEKK og kildeavklart mammut/hyssing.
+- [ ] Fortsett bestilling 14 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

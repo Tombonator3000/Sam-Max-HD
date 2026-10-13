@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+import shutil,json,hashlib,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling013-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+e=json.loads((b/'rapporter/bestilling012-20261013/b-leveranser.json').read_text())['fremtidig_leveranse']
+assert sha(b/e['fullmaster'])==e['fullmaster_sha256']
+a=Image.new('RGB',(1536,1024),(128,128,128));a.paste(Image.open(b/e['fullmaster']).crop((384,0,1920,800)),(0,112));a.save(b/'jobber/rom058_del2av2/resultat.png')
+assert sha(b/'jobber/rom058_del2av2/resultat.png')==e['sha256']
+raw="/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-7645316f-e79e-45b9-9053-6dfba1597b24.png"
+shutil.copy2(raw,r/'rom059-raa01.png')
+im=Image.open(raw).convert('RGB').resize((1920,1024),Image.Resampling.LANCZOS).crop((0,112,1920,912));im.save(r/'rom059-fullmaster.png')
+for part,x in [(1,0),(2,384)]:
+ a=Image.new('RGB',(1536,1024),(128,128,128));a.paste(im.crop((x,0,x+1536,800)),(0,112));a.save(b/'jobber'/f'rom059_del{part}av2'/'resultat.png')
+for j in ['rom058_del2av2','rom059_del1av2','rom059_del2av2']:
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True)
+ (r/(j+'-kontroll.txt')).write_text(p.stdout+p.stderr);print(j,p.stdout)

@@ -125,3 +125,10 @@
 - Festsalen har kildeband/publikum og 1216 x 800 identisk overlapp. Grønnsaksmuseet har 1152 x 800 identisk overlapp, småskilt uten gjettet pris/utvidelse. Rom058 har låst fellesmaster, neste del kontrollert OK.
 - Rom055 har fire påler; obj523/524 avdekkede tilstander holdt separate, 65 ulike originaloverlapp-piksler dokumentert. Rom054 tomt bad, rom056 lukket fryser. Første obj523-FEIL avvist.
 - Alle ti lagrede bestilling 11-PNG SHA-verifisert fra GitHub, inkludert visuelt avvist VR-kandidat. Notater/proveniens i rapporter/bestilling012-20261013/. Ingen runtime/import/ny individuell godkjenning. Bestilling 13 fortsetter.
+
+## 2026-10-13 19:23 (Codex, Astra)
+
+- Bestilling 13 levert med 8 OK og 2 SJEKK, obj566_01 og rom060 del 2. Begge blokk 1,06, ikke kalt OK. Root har vurdert alle original/HD og dokumentert de lokale avvikene separat. 40+4 beskyttede kilder uendret.
+- Mammutens pelsfrie mekaniske tilstand og tre hyssingfester kildeavklart med originaler/register/offisiell hintbok. Nye hyssingtilstander deler byte-identisk nytegnet bakgrunn utenfor dokumenterte forskjellsrektangler, ingen originalmasker.
+- Rom058/059 har 1152 x 800 identiske overlapp, Tarpit 1312 x 800. Tre købarn og avklipt sklietoppfigur bevart; brune tjæredyr ikke gjort til badegjester. Rom061-master1952 x 800 låst med neste del OK og 1120 x 800 identisk overlapp.
+- Alle ti bestilling 12-PNG SHA-verifisert fra GitHub. Proveniens/QA i rapporter/bestilling013-20261013/. Ingen import, timing, faktisk spillvisning eller ny individuell godkjenning. Bestilling 14 pågår.

@@ -1,0 +1,12 @@
+from PIL import Image
+from pathlib import Path
+# Kjør fra repoets rot. Råforsøk er allerede bevart i rapportmappen.
+r=Path('rapporter/bestilling013-20261013')
+for room,w,off,attempt in [('060',1760,224,2),('061',1952,416,1)]:
+    m=Image.open(r/f'rom{room}-raa-{attempt}.png').convert('RGB').resize((w,800),Image.Resampling.LANCZOS)
+    m.save(r/f'rom{room}-fullmaster.png')
+    for n,x in [(1,0),(2,off)]:
+        out=Image.new('RGB',(1536,1024),(128,128,128))
+        out.paste(m.crop((x,0,x+1536,800)),(0,112))
+        p=r/'rom061_del2av2-kontroll/resultat.png' if room=='061' and n==2 else Path('jobber')/f'rom{room}_del{n}av2'/'resultat.png'
+        out.save(p)
