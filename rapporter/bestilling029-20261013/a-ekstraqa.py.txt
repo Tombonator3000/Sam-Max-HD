@@ -1,0 +1,8 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+r=Path(__file__).resolve().parent;root=r.parents[1];out=Image.new('RGB',(1200,1250),(180,180,180));d=ImageDraw.Draw(out)
+for i,(j,box) in enumerate([('lag019_03',(480,300,1040,620)),('lag020_02',(960,540,1330,880)),('lag020_03',(1060,440,1170,530))]):
+ for k,n in enumerate(['referanse.png','resultat.png']):
+  im=Image.open(root/'jobber'/j/n).crop(box);im.thumbnail((570,380));out.paste(im,(k*600,i*410+25))
+ d.text((5,i*410+5),j+' original / HD',fill='black')
+out.save(r/'a-underlag-kantqa.png')

@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np,importlib.util
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling029-20261013';sp=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(sp);sp.loader.exec_module(c)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+boxes=json.loads((r/'a-rektangler.json').read_text());entries=[];rows=[];metrics=[]
+for j,box in boxes.items():
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());im=Image.open(d/'resultat.png').convert('RGB');aa=np.array(im);base=np.array(Image.open(root/m['bilde_to']).convert('RGB'));src=Image.open(d/'original_1x.png').convert('RGB');part,_=c.part_of(im,m);met=c.compare(src,part);fields=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];co=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));assert co>=.6;fields.append({'objekt':o['bilde'],'rekt':o['rekt'],'kantkorrelasjon':co,'utfall':'OK','hoppet_over':False});b=(128+x*4,112+y*4,128+(x+w)*4,112+(y+h)*4);rows.append((j,o['bilde'],Image.open(d/'referanse.png').crop(b),im.crop(b)))
+ actualbox=(1024,368,1216,720) if j=='lag020_03' else box
+ mask=np.ones((1024,1536),bool);x,y,z,t=actualbox;mask[y:t,x:z]=False;outside=int(np.any(aa[mask]!=base[mask],axis=1).sum());assert outside==0
+ assert im.size==(1536,1024) and np.all(aa[:112]==128) and np.all(aa[912:]==128) and np.all(aa[:,:128]==128) and np.all(aa[:,1408:]==128)
+ raw=r/f'a-{j}-raa01.png';prompt=r/f'a-{j}-prompt01.txt';assert (d/'prompt.txt').read_text().rstrip() in prompt.read_text();e={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':'OK','kontrollfil':str((r/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':1,'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'prompt':str(prompt.relative_to(root)),'prompt_sha256':sha(prompt),'referanser':[{'fil':f,'sha256':sha(root/f)} for f in [f'jobber/{j}/referanse.png',m['bilde_to']]],'objektkontroll':fields,'sammensettingsrekt':actualbox,'utenfor_sammensettingsrekt_ulike_piksler':outside,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'verktoy':'image_gen.imagegen','eksakt_modell':'ikke eksponert'};
+ if j in ['lag020_01','lag020_03']:
+  e['forsok']=2;e['mikroretting']={'raa':str((r/f'a-{j}-raa02.png').relative_to(root)),'raa_sha256':sha(r/f'a-{j}-raa02.png'),'prompt':str((r/f'a-{j}-prompt02.txt').relative_to(root)),'prompt_sha256':sha(r/f'a-{j}-prompt02.txt'),'referanse':str((r/f'a-{j}-kortkilde.png').relative_to(root)),'referanse_sha256':sha(r/f'a-{j}-kortkilde.png')}
+ entries.append(e);metrics.append({'jobb':j,'felt':fields})
+ (d/'notat.md').write_text(f'# {j}\n\nNytegnet konkret tilstand etter root-kildeplan.md, sammenholdt med alle fem originaler og riktig levert rom-HD. Innebygd imagegen, {e["forsok"]} kall, eksakt modell ikke eksponert. Ordrett prompt pluss separat kildepresisering, råbilde og alle SHA i a-leveranser.json. Oppskriften a-sammensetting.py.txt er faktisk kjørt.\n\nOpak RGB 1536 x 1024, motiv [128,112,1280,800], padding RGB 128. Rektangulær innsetting av NYGENERERT grafikk med fire HD-pikslers kantovergang mot NYTEGNET rombakgrunn. Ingen originalmasker, kildepikselkopiering, vektor eller lokal warp. Utenfor dokumentert rektangel er grunnrommet byte-identisk. 019_03 bruker eget større underlagsfelt for Sams utstrakte arm. 020_03 gjenbruker nytegnet åpent skap fra 020_01 med sitt eget nye rutefelt.\n\nUendret checker OK og metadatafelt eksplisitt kontrollert. Se a-kilde-qa.md og a-objektqa.png for motivkontroll og begrensninger. SHA-256: {e["sha256"]}.\n\nIngen import/runtime eller ny individuell brukergodkjenning. Root tar samlet mottak.\n')
+# Door family equality outside card.
+a=np.array(Image.open(root/'jobber/lag020_01/resultat.png'));b=np.array(Image.open(root/'jobber/lag020_03/resultat.png'));x,y,z,t=boxes['lag020_03'];mask=np.ones(a.shape[:2],bool);mask[y:t,x:z]=False;assert np.array_equal(a[mask],b[mask]);(r/'a-familiebevis.json').write_text(json.dumps({'skap_ulike_piksler':int(np.any(a!=b,axis=2).sum()),'forskjellsrekt':boxes['lag020_03'],'utenfor_rutefelt_byteidentisk':True},indent=2))
+locks=json.loads((r/'kildehash.json').read_text())+json.loads((r/'root-ekstra-kildehash.json').read_text())
+for e in locks:assert sha(root/e['fil'])==e['sha256']
+(r/'a-kildehashkontroll.json').write_text(json.dumps([{**e,'uendret':True} for e in locks],indent=2)+'\n');(r/'a-perobjektkontroll.json').write_text(json.dumps(metrics,indent=2)+'\n');(r/'a-leveranser.json').write_text(json.dumps({'leveranser':entries,'genereringskall':7,'checker_sha256':sha(root/'verktoy/sjekk_leveranse.py'),'oppskrift':'rapporter/bestilling029-20261013/a-sammensetting.py.txt','oppskrift_sha256':sha(r/'a-sammensetting.py.txt')},ensure_ascii=False,indent=2)+'\n')
+out=Image.new('RGB',(1200,len(rows)*480),(180,180,180));dr=ImageDraw.Draw(out)
+for i,(j,o,s,h) in enumerate(rows):
+ for k,im in enumerate([s,h]):
+  scale=min(570/im.width,430/im.height);im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);out.paste(im,(k*600,i*480+25))
+ dr.text((5,i*480+5),j+' '+o,fill='black')
+out.save(r/'a-objektqa.png');print(metrics)

@@ -53,7 +53,8 @@
 - [x] Levert bestilling 26 med ti OK,22 faktiske objektkontroller, kartfamilier og Snuckey’s-master/egne landskap.
 - [x] Levert bestilling27 med ti OK,24 faktiske objektkontroller, mikrotilstandsretting og Midway-master.
 - [x] Levert bestilling 28 med ti OK, 25 faktiske objektkontroller, tre karnevalsmastere og minispilluttrykk.
-- [ ] Fortsett bestilling 29 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 29 med ti OK, 17 faktiske objektkontroller, kildeegne underlag og ansiktsretting.
+- [ ] Fortsett bestilling 30 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
 
 - [x] Rom090 og obj901_01 rettet og levert OK med uttrykkelig valgt vektorrekonstruksjon; tidligere bestilling 21-avvik erstattet.
 

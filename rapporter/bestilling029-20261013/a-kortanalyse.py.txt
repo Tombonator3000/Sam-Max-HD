@@ -1,0 +1,5 @@
+from pathlib import Path
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1]
+for j in ['lag020_01','lag020_03']:
+ im=Image.open(root/'jobber'/j/'original_1x.png');im.crop((236,84,258,103)).resize((660,570),Image.Resampling.NEAREST).save(r/f'a-{j}-kortkilde.png')

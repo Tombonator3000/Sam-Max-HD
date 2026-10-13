@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling029-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';gen=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a')
+raws={'lag019_02':'exec-f536fcc3-bf1c-4cf3-871e-c01452e7ab3b.png','lag019_03':'exec-11fd5c57-9e06-4e87-a55d-6065e4d79d78.png','lag020_01':'exec-8355896d-7f4d-4c89-aa77-71cd5166bd92.png','lag020_02':'exec-768b3f30-9663-4977-98b6-bd7ad45e9f1e.png','lag020_03':'exec-b563765d-e45c-4135-a865-2c020f18ec76.png'}
+boxes={'lag019_02':(128,240,512,752),'lag019_03':(128,240,1024,784),'lag020_01':(1024,368,1216,720),'lag020_02':(992,560,1280,816),'lag020_03':(1080,456,1148,508)}
+for j,f in raws.items():
+ shutil.copy2(gen/f,r/f'a-{j}-raa01.png');base=Image.open(root/'jobber'/('rom019' if '019' in j else 'rom020')/'resultat.png').convert('RGB')
+ if j=='lag020_03':base=Image.open(root/'jobber/lag020_01/resultat.png').convert('RGB')
+ box=boxes[j];aa=np.array(Image.open(r/f'a-{j}-raa01.png').convert('RGB').crop(box),float);bb=np.array(base.crop(box),float);h,w=aa.shape[:2];yy,xx=np.mgrid[:h,:w];edges=[yy,h-1-yy,w-1-xx];
+ if box[0]!=128:edges.append(xx)
+ alpha=np.clip(np.minimum.reduce(edges)/4,0,1)[...,None];base.paste(Image.fromarray(np.rint(aa*alpha+bb*(1-alpha)).astype('uint8')),box[:2]);base.save(root/'jobber'/j/'resultat.png')
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(root/'jobber'/j/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+(r/'a-rektangler.json').write_text(json.dumps(boxes,indent=2)+'\n')
+contact=Image.new('RGB',(1200,2150),(180,180,180));d=ImageDraw.Draw(contact)
+for i,j in enumerate(raws):
+ for k,f in enumerate(['referanse.png','resultat.png']):
+  im=Image.open(root/'jobber'/j/f);im.thumbnail((590,395));contact.paste(im,(k*600,i*430+25))
+ d.text((5,i*430+5),j+' original / HD',fill='black')
+contact.save(r/'a-samlet-kontaktark.png')

@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';sp=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(sp);sp.loader.exec_module(ck)
+jobs=['lag021_01_del1av2','lag021_02_del1av2','lag021_03_del1av2','lag022_01_del3av3','lag022_02_del3av3'];proof=[];family={};full=Image.new('RGB',(1536,5*450),(128,128,128));df=ImageDraw.Draw(full)
+for k,j in enumerate(jobs):
+ p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());base=Image.open(root/m['bilde_to']).convert('RGB');raw=Image.open(r/('b-'+j.split('_del')[0]+'-raa01.png')).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS);out=base.copy();allow=np.zeros((1024,1536),bool);boxes=[];x,y,w,h=m['bilde_i_lerret'];rx,ry,_,_=m['region']
+ if j=='lag021_03_del1av2':raw.paste(Image.open(r/'b-lag021_03-raa03.png').convert('RGB').resize((128,128),Image.Resampling.LANCZOS),(480,432))
+ for o in m['objekter']:
+  ox,oy,ow,oh=o['rekt'];xx=x+(ox-rx)*4;yy=y+(oy-ry)*4;box=(xx,yy,xx+ow*4,yy+oh*4);out.paste(raw.crop(box),(xx,yy));allow[yy:yy+oh*4,xx:xx+ow*4]=True;boxes.append([xx,yy,ow*4,oh*4])
+ # Ordinary feather along metadata-union border; both sides are NEW artwork.
+ # Never derived from an original silhouette, and no geometry warp.
+ width=12 if j=='lag021_03_del1av2' else 8
+ core=allow.copy();distance=np.zeros(allow.shape,dtype=float)
+ for step in range(width):
+  distance+=core
+  pad=np.pad(core,1,constant_values=False);core=core&pad[:-2,1:-1]&pad[2:,1:-1]&pad[1:-1,:-2]&pad[1:-1,2:]
+ alpha=np.clip(distance/width,0,1)[:,:,None]
+ out=Image.fromarray(np.rint(np.array(out)*alpha+np.array(base)*(1-alpha)).astype('uint8'))
+ if j.startswith('lag022_'):
+  # Source-identical 01/02 face: one NEW redraw, same placement, no old clown features.
+  face=Image.open(r/'b-ansikt-raa01.png').convert('RGB').resize((88,68),Image.Resampling.LANCZOS)
+  patch=face.crop((8,4,68,52));yy,xx=np.mgrid[:48,:60];af=np.minimum.reduce([xx+1,60-xx,yy+1,48-yy]);af=Image.fromarray((np.clip(af/2,0,1)*255).astype('uint8'))
+  out.paste(patch,(884,512),af)
+ out.save(p/'resultat.png');different=np.any(np.array(out)!=np.array(base),axis=2);assert not (different&~allow).any()
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+ orig=Image.open(p/'original_1x.png').convert('RGB');c=ck.compare(orig,out.crop((x,y,x+w,y+h)));obs=[];qa=Image.new('RGB',(1200,480*len(m['objekter'])),(185,185,185));d=ImageDraw.Draw(qa)
+ for n,o in enumerate(m['objekter']):
+  ox,oy,ow,oh=o['rekt'];ox-=rx;oy-=ry;cor=float(ck.corr(c['eo'][oy:oy+oh,ox:ox+ow],c['es'][oy:oy+oh,ox:ox+ow]));status='OK' if cor>=.6 else 'SJEKK' if cor>=.5 else 'FEIL';obs.append({'objekt':o['bilde'],'kantkorrelasjon':cor,'status':status});a=orig.crop((ox,oy,ox+ow,oy+oh)).resize((ow*4,oh*4),Image.Resampling.NEAREST);b=out.crop((x+ox*4,y+oy*4,x+(ox+ow)*4,y+(oy+oh)*4));qa.paste(a,(0,n*480+20));qa.paste(b,(600,n*480+20));d.text((0,n*480),o['bilde']+' source / HD',fill='black');family.setdefault(o['objekt'],[]).append((o['bilde'],a,b))
+ qa.save(r/f'b-{j}-objektqa01.png');df.text((0,k*450),j,fill='white');full.paste(orig.resize((768,400),Image.Resampling.NEAREST),(0,k*450+20));full.paste(out.crop((x,y,x+w,y+h)).resize((768,400)),(768,k*450+20));proof.append({'jobb':j,'sha256':hashlib.sha256((p/'resultat.png').read_bytes()).hexdigest(),'komposisjonsbokser':boxes,'utenfor_metadataunion_endret':int((different&~allow).sum()),'objekter':obs});print(obs)
+full.save(r/'b-samlet-kilde-HD.png')
+for oid,ims in family.items():
+ maxw=max(a.width for _,a,b in ims);maxh=max(a.height for _,a,b in ims);q=Image.new('RGB',(maxw*2+30,(maxh+30)*len(ims)),(185,185,185));d=ImageDraw.Draw(q)
+ for n,(name,a,b) in enumerate(ims):d.text((0,n*(maxh+30)),name,fill='black');q.paste(a,(0,n*(maxh+30)+20));q.paste(b,(maxw+20,n*(maxh+30)+20))
+ q.save(r/f'b-familie-{oid}.png')
+(r/'b-komposisjonsbevis.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')

@@ -1,0 +1,6 @@
+from pathlib import Path
+r=Path(__file__).resolve().parent;root=r.parents[1]
+for j in ['lag020_01','lag020_03']:
+ text=(root/'jobber'/j/'prompt.txt').read_text()+'\n\nSEPARATE LOCAL SOURCE CORRECTION:\nThis call outputs only the attached local crop, maintaining its exact framing and aspect ratio. Newly paint clean smooth HD shapes in place of pixel staircase. Do not return a full room. The crop is pink wardrobe door background with '
+ text+=('ONE tiny dark gray square mark at exactly the source location and size. It is not a handle, do not enlarge it. Preserve the pink background and dark red door edge at right.' if j.endswith('01') else 'the small white grid card: six visible columns of white blank cells in two rows, left tan vertical stripe, blue horizontal divider, abstract GREEN/DARK green zigzag top marks and pink/red marks at upper left. Do not turn marks into flowers, letters, dates, numbers, or a logo. Keep precise source layout and proportions, gray bottom shadow, surrounding dusty pink door and red edge at right. Smooth painted outlines, no pixel staircase.')
+ (r/f'a-{j}-prompt02.txt').write_text(text)

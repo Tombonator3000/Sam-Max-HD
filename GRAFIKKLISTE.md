@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 22:45 (norsk tid)
+Oppdatert 2026-10-13 22:48 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 165 bilder levert (71 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 182 bilder levert (81 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -439,16 +439,16 @@ Rom 17, 18, 19.
 
 Rom 19, 20, 21, 22.
 
-- [ ] `lag019_02` (rom 19 Wak-A-Rat med Max (minispill), lag 02 med 1 objektbilde, bilde to `jobber/rom019/resultat.png`)
-- [ ] `lag019_03` (rom 19 Wak-A-Rat med Max (minispill), lag 03 med 1 objektbilde, bilde to `jobber/rom019/resultat.png`)
-- [ ] `lag020_01` (rom 20 Trixies vogn, inne, lag 01 med 1 objektbilde, bilde to `jobber/rom020/resultat.png`)
-- [ ] `lag020_02` (rom 20 Trixies vogn, inne, lag 02 med 1 objektbilde, bilde to `jobber/rom020/resultat.png`)
-- [ ] `lag020_03` (rom 20 Trixies vogn, inne, lag 03 med 1 objektbilde, bilde to `jobber/rom020/resultat.png`)
-- [ ] `lag021_01_del1av2` (rom 21 Tunnel of Love, inngangen, lag 01 med 3 objektbilder, del 1/2, bilde to `jobber/rom021_del1av2/resultat.png`)
-- [ ] `lag021_02_del1av2` (rom 21 Tunnel of Love, inngangen, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom021_del1av2/resultat.png`)
-- [ ] `lag021_03_del1av2` (rom 21 Tunnel of Love, inngangen, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom021_del1av2/resultat.png`)
-- [ ] `lag022_01_del3av3` (rom 22 Tunnel of Love, inne, lag 01 med 3 objektbilder, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
-- [ ] `lag022_02_del3av3` (rom 22 Tunnel of Love, inne, lag 02 med 3 objektbilder, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
+- [x] `lag019_02` (rom 19 Wak-A-Rat med Max (minispill), lag 02 med 1 objektbilde, bilde to `jobber/rom019/resultat.png`)
+- [x] `lag019_03` (rom 19 Wak-A-Rat med Max (minispill), lag 03 med 1 objektbilde, bilde to `jobber/rom019/resultat.png`)
+- [x] `lag020_01` (rom 20 Trixies vogn, inne, lag 01 med 1 objektbilde, bilde to `jobber/rom020/resultat.png`)
+- [x] `lag020_02` (rom 20 Trixies vogn, inne, lag 02 med 1 objektbilde, bilde to `jobber/rom020/resultat.png`)
+- [x] `lag020_03` (rom 20 Trixies vogn, inne, lag 03 med 1 objektbilde, bilde to `jobber/rom020/resultat.png`)
+- [x] `lag021_01_del1av2` (rom 21 Tunnel of Love, inngangen, lag 01 med 3 objektbilder, del 1/2, bilde to `jobber/rom021_del1av2/resultat.png`)
+- [x] `lag021_02_del1av2` (rom 21 Tunnel of Love, inngangen, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom021_del1av2/resultat.png`)
+- [x] `lag021_03_del1av2` (rom 21 Tunnel of Love, inngangen, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom021_del1av2/resultat.png`)
+- [x] `lag022_01_del3av3` (rom 22 Tunnel of Love, inne, lag 01 med 3 objektbilder, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
+- [x] `lag022_02_del3av3` (rom 22 Tunnel of Love, inne, lag 02 med 3 objektbilder, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
 
 ## Bestilling 30
 
@@ -3485,3 +3485,5 @@ Bestilling27: ti lag levert OK,24 faktiske objektkontroller. Kaktus på samordne
 LeChuck Pizza rettet i begge rom070-deler etter Toms direkte tekstavklaring. Ett nytt imagegen-kall, bare 200 × 84-masterfelt endret, 1152 × 800-overlapp byteidentisk og begge checkere OK. Senere lag er kartlagt; silhuettilstand070_01 skal fortsatt være tom. Se `rapporter/lechuck-pizza-retting-20261013/RAPPORT.md`.
 
 Bestilling 28: ti lag levert OK med 25 faktiske objektkontroller. Tre egne karnevalsmastere har identisk 544 × 800-overlapp; kjeglerest, propell og fire trappete vimpelfelt er rettet. Fire minispilllag har egne Sam/Max-uttrykk, fem tomme hull og uavhengig motivkontroll. Se `rapporter/bestilling028-20261013/RAPPORT.md`. Bestilling 29 og videre fortsetter.
+
+Bestilling 29: ti lag levert OK med 17 faktiske objektkontroller. Egne Max-poser og Sam-armunderlag, rosa skap med/uten rutefelt, åpent kistelokk og fem Tunnel of Love-tilstander. Pilavklipping og oppdiktet klovnenese/smil er rettet og kontrollert. Se `rapporter/bestilling029-20261013/RAPPORT.md`. Bestilling 30 og videre fortsetter.

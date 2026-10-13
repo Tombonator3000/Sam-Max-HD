@@ -237,3 +237,8 @@
 
 - Bestilling 28: ti lag levert OK med 25 faktiske objektkontroller. Tre egne karnevalsmastere har identisk 544 × 800-overlapp; kjeglerest, propell og fire trappete vimpelfelt er rettet. Fire minispilllag har egne Sam/Max-uttrykk, fem tomme hull og uavhengig motivkontroll. Se `rapporter/bestilling028-20261013/RAPPORT.md`. Bestilling 29 og videre fortsetter.
 - 40 beskyttede kilder og åtte ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T22:48:47+02:00 (Codex, Astra)
+
+- Bestilling 29: ti lag levert OK med 17 faktiske objektkontroller. Egne Max-poser og Sam-armunderlag, rosa skap med/uten rutefelt, åpent kistelokk og fem Tunnel of Love-tilstander. Pilavklipping og oppdiktet klovnenese/smil er rettet og kontrollert. Se `rapporter/bestilling029-20261013/RAPPORT.md`. Bestilling 30 og videre fortsetter.
+- 40 beskyttede kilder og 16 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
