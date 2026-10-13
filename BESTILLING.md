@@ -2,13 +2,9 @@
 
 Til: ChatGPT (bildegenerering, helst som Codex i dette repoet)
 Fra: Tom, med Claude som står for koden
-Dato: 10. oktober 2026
+Dato: 10. oktober 2026, oppdatert 13. oktober 2026
 
-**Ikke aktiv.** Bestillingen gjelder ikke før stilpiloten (ett rom og ett figurark sett i motoren) er godkjent av Tom. Ikke lag grafikk etter den før det. Status nå:
-
-- Det finnes ingen jobber. Uttrekket (`smhd extract`) er ikke portet til Sam & Max, og HD-motoren er ikke portet til SCUMM v6.
-- Jobbformatet, kontrollene og mottaket er kopiert fra The Dig HD Remake og er ikke prøvd med Sam & Max.
-- Promptene som `smhd gpt-pakke` skriver, er fortsatt The Dig sine og må skrives om før de første jobbene lages.
+**Aktiv fra 13. oktober 2026, i stilpiloten.** Alle jobbene er laget og ligger i grenen `gpt-arbeid`. Arbeidet starter med stilpiloten: hovedark for Sam og Max, kontoret (rom 7) og det første figurarket for hver av dem. Resten venter til Tom har godkjent piloten og stilankerne ligger i `stil/`. `ORDRE.md` i grenen sier hva som gjelder nå.
 
 ## Kildetro grafikk før produksjon
 
@@ -16,19 +12,32 @@ Les [remake-skillen i main](https://github.com/Tombonator3000/Sam-Max-HD/blob/ma
 
 Regelen gjelder også når jobbformatet ber om ordrett prompt. Ved påvist feil premiss: behold beskyttede jobbfiler, legg korrigert prompt og kildebegrunnelse i et separat notat, og bruk rettelsen. Avklar bare nødvendig manglende betydning eller design; eksisterende godkjenninger gjelder fortsatt. Fortsett uavhengig arbeid som allerede er autorisert.
 
+Det som er avklart for Sam & Max før jobbene ble laget, står i `docs/ANALYSE.md` (avsnittet om klargjøringen), `docs/figurer.csv` (hvem og hva hvert kostyme er), `docs/gpt-romnotater.csv` (skilt, tekst og rariteter per rom) og `docs/kostymefarger.csv` (paletten kostymene vises med).
+
 ## 1. Hva vi bestiller
 
 Vi lager en HD-versjon av LucasArts' *Sam & Max Hit the Road* (1993). Spillet kjører i ScummVM med en patch som legger HD-bilder nøyaktig oppå originalgrafikken, piksel for piksel. Vi trenger at du maler grafikken på nytt i 4x oppløsning (1280 x 800 for et rom på 320 x 200), **trofast mot originalen**: samme motiv, samme former på samme sted, samme farger og samme tegneserieuttrykk. Bare skarpere og med mer detalj.
 
-Det som skal males: rombakgrunner, store objektbilder, små objekter (dører, ting) i lagjobber, ikoner og figurark. Hvor mange av hver, er ikke talt ennå. Hver jobb er ett bilde på 1536 x 1024 piksler.
+Jobbene (laget med `smhd gpt-pakke --figurer alle` 13. oktober 2026):
+
+| Hva | Jobber | Bilder i dem |
+| --- | --- | --- |
+| Hovedark (Sam og Max) | 2 | Referanse til alle figurarkene for dem |
+| Rombakgrunner (`romNNN`) | 115 | 76 rom; de brede er delt i deler med overlapp |
+| Store objektbilder (`objNNN_SS`) | 86 | Nærbilder, kart, store deler og bilder i rom uten bakgrunn |
+| Lagjobber (`lagNNN_KK`) | 296 | 701 små objektbilder tegnet på plass i rommet |
+| Ikonark (`ikonNN`) | 9 | 163 pekere, inventar- og samtaleikoner og små deler |
+| Figurark (`figCCC_KK`) | 1758 | 15 661 kostymeruter fra 343 kostymer |
+
+Hver jobb er ett bilde på 1536 x 1024 piksler. Ni objektbilder er helt gjennomsiktige og får ingen jobb. Fem kostymer er rene skyggeformer og får ingen figurark (se 4).
 
 ## 2. Hvem gjør hva
 
 | Hvem | Ansvar |
 | --- | --- |
-| **ChatGPT** | Lager HD-bildene etter jobbene. Gir råd om stil og sier fra når en jobb er uklar eller umulig. Skriver et kort notat per jobb. |
-| **Claude** | All kode: lager jobbene, tar imot bildene, sjekker plassering og farger, syr sammen deler, lager mod-mappen, tester i motoren og skriver rapport. |
-| **Tom** | Godkjenner stilen, flytter filer mellom dere hvis ChatGPT ikke jobber i repoet, og har siste ord. |
+| **ChatGPT** | Lager HD-bildene etter jobbene. Kjører egenkontrollen før levering. Gir råd om stil og sier fra når en jobb er uklar eller umulig. Skriver et kort notat per jobb. |
+| **Claude** | All kode: lager jobbene, tar imot bildene, sjekker plassering, størrelse og farger, syr sammen deler, lager mod-mappen, tester i motoren og skriver rapport. |
+| **Tom** | Godkjenner stilen og hovedarkene, flytter filer mellom dere hvis ChatGPT ikke jobber i repoet, og har siste ord. |
 
 ChatGPT skal ikke endre kode, jobbfiler eller noe i grenen `main`.
 
@@ -37,13 +46,14 @@ ChatGPT skal ikke endre kode, jobbfiler eller noe i grenen `main`.
 Motoren bruker HD-bildet bare der den vet at originalen viser uendret bakgrunn. Den sammenligner piksel for piksel. Figurer går foran og bak ting etter masker i originalens oppløsning, og klikkområder og gangflater ligger der de lå. Derfor:
 
 1. **Ingenting flyttes.** Kanter, horisont, dører, møbler, skilt og lys skal ligge på nøyaktig samme sted. Ikke zoom, beskjær, roter, speil eller komponer om.
-2. **Ingenting legges til eller fjernes.** Ingen nye gjenstander, figurer, tekst, symboler eller detaljer som endrer hva man ser.
-3. **Skilt, tekst og symboler kopieres nøyaktig.** Noen av dem er gåteledetråder eller vitser.
-4. **Samme farger, lys og stemning.** Samme lysretning, skygger og kontrast. Ikke varmere, kaldere, mørkere eller lysere.
-5. **Samme stil.** Sam & Max sitt tegneserieuttrykk fra LucasArts i 1993, med samme streker, former og farger som originalen. Ikke fotorealisme, ikke moderne 3D, ikke filmkorn, ikke vignett.
-6. **Det som blir bedre:** jevne overganger i stedet for dithering og fargebånd, rene kanter og streker, og mer detalj der originalen antyder den.
+2. **Ingenting legges til, fjernes eller byttes ut.** Ingen nye gjenstander, figurer, tekst, skilt, symboler, mønstre, planter, rot eller detaljer. Like mange av alt: vinduer, stolper, bøker, flasker, stjerner, tenner og fingre.
+3. **Ingenting rettes eller ryddes.** Det skjeve, rotete og rare er en del av spillet: kontoret skal være rotete, gavebutikken er opp ned, Escher-rommet har umulig perspektiv, VR-verdenen er flate polygoner. Skrå og buede linjer forblir skrå og buede. Flater som er tomme, er ofte tomme fordi spillet tegner objekter eller figurer der.
+4. **Skilt, tekst og symboler kopieres bokstav for bokstav.** Samme ord, stavemåte, bokstavform, størrelse og plass. Mange er vitser eller gåteledetråder. Romnotatene siterer teksten der den kan leses sikkert; der en bokstav ikke kan leses, beholdes formen i stedet for å gjette et ord.
+5. **Samme farger, lys og stemning.** Samme lysretning, skygger og kontrast. Ikke varmere, kaldere, mørkere eller lysere. Noen scener har egne farger med vilje (alkoven i rom 92 viser Sam i brun dress i varmt lys, rulletekstpanelene er psykedeliske eller grå); de beholdes.
+6. **Samme stil.** Sam & Max sitt tegneserieuttrykk fra LucasArts i 1993: kraftige mørke omriss, mettede farger, malte skygger og overdrevet perspektiv. Ikke fotorealisme, ikke moderne 3D, ikke filmkorn, ikke vignett.
+7. **Det som blir bedre:** jevne overganger i stedet for dithering og fargebånd, rene kanter og streker, og mer detalj der originalen antyder den.
 
-Farger som animeres med fargesykling, viser motoren i HD gjennom et glatt fargekart (se [HD-MOTOR.md](HD-MOTOR.md)). Mal dem like nøye som resten. Hvilke rom i Sam & Max som sykler farger, er ikke målt.
+Farger som animeres med fargesykling, viser motoren i HD gjennom et glatt fargekart (se [HD-MOTOR.md](HD-MOTOR.md)). Mal dem like nøye som resten. 43 av rommene har fargesykling.
 
 ## 4. Jobbene
 
@@ -54,98 +64,108 @@ Hver jobb ligger i `jobber/<jobb>/`:
 | `referanse.png` | Originalen forstørret 4x med harde pikselkanter, på en grå kant (#808080). 1536 x 1024. Dette er bildet du redigerer. |
 | `original_1x.png` | Det samme utsnittet i originalstørrelse, til sammenligning. |
 | `prompt.txt` | Teksten til bildeverktøyet, på engelsk. Brukes ordrett. Den kan ha et notat for rom med spesielle hensyn. |
-| `jobb.json` | Metadata (rom, utsnitt, sjekksummer). Skal ikke endres. |
-| `resultat.png` | **Det du leverer.** PNG, enten hele lerretet (1536 x 1024 med grå kant) eller bare bildet i samme sideforhold som utsnittet (16:10 for vanlige rom, minst 1280 x 800). |
+| `jobb.json` | Metadata (rom, utsnitt, rektangler, bilde to, sjekksummer). Skal ikke endres. |
+| `resultat.png` | **Det du leverer.** PNG, enten hele lerretet (1536 x 1024 med grå kant) eller bare bildet i samme sideforhold som utsnittet (16:10 for vanlige rom, minst 1280 x 800). Figurark leveres alltid som hele lerretet med ekte alfa. |
 | `notat.md` | **Det du skriver:** verktøy og modell hvis det vises, dato, antall forsøk, og hva som var usikkert. |
 | `retur.md` | Kommer fra Claude hvis jobben ble avvist eller må sjekkes, med grunn og forslag til ny prompt. |
 
-Den grå kanten er bare fyll, slik at bildet får sideforholdet 3:2. Hold den grå. Rom som er bredere eller høyere enn ett lerret, er delt i deler med overlapp (for eksempel `romNNN_del1av3`). Delene sys sammen av Claude, så kantene skal være naturlige, uten ramme eller toning.
+Den grå kanten er bare fyll, slik at bildet får sideforholdet 3:2. Hold den grå. Rom som er bredere enn ett lerret, er delt i deler med overlapp (for eksempel `rom007_del1av2`). Delene sys sammen av Claude, så kantene skal være naturlige, uten ramme eller toning.
 
-Oversikt over alle jobber: `JOBBER.md`. Status: `status.csv` (ny, godkjent, sjekk, avvist). Kolonnen `type` sier om jobben er et rom (`rom`), et stort objektbilde (`objekt`), et lag (`lag`), et ikonark (`ikon`) eller et figurark (`figur`).
+Oversikt over alle jobber: `JOBBER.md`. Status: `status.csv` (ny, godkjent, sjekk, avvist). Rekkefølgen: `GRAFIKKLISTE.md`. Kolonnen `type` sier om jobben er et rom (`rom`), et stort objektbilde (`objekt`), et lag (`lag`), et ikonark (`ikon`) eller et figurark (`figur`).
 
 ### Objektjobber
 
-Noen ganger tegner spillet et stort bilde over bakgrunnen, for eksempel et nærbilde eller et kart. Slike store objektbilder er egne jobber. Grensen i pipelinen er minst 16 000 piksler i alt, eller minst 200 piksler bredt, eller minst 150 piksler høyt.
+Noen ganger tegner spillet et stort bilde over bakgrunnen, for eksempel et nærbilde, et kart eller en del av et minispill. Slike store objektbilder er egne jobber. Grensen er minst 16 000 piksler i alt, eller minst 200 piksler bredt, eller minst 150 piksler høyt.
 
 - Jobbene heter `objNNN_SS`: objekt-ID og tilstand som i filnavnet.
-- `referanse.png` viser objektbildet lagt over rommet der spillet tegner det, på samme lerret og med samme grå kant som rommene. Der objektet er gjennomsiktig, synes rommet bak. Utenfor rommet er det svart.
+- `referanse.png` viser objektbildet lagt over rommet der spillet tegner det, på samme lerret og med samme grå kant som rommene. Der objektet er gjennomsiktig, synes rommet bak. Utenfor rommet er det svart. Noen rom er nesten tomme lagerrom for bilder spillet viser andre steder (rom 1, 67, 69, 78, 80, 81, 82, 93 og 94); der er bakgrunnen svart.
 - Mal hele bildet som en bakgrunn. Bare objektets egne piksler brukes i spillet, de gjennomsiktige delene klippes ut igjen etterpå.
-- `prompt.txt` har en ekstra linje om at bildet er et stort bilde spillet viser over rommet.
 - Leveres som rommene. Leverer du bare bildet, skal det ha objektets sideforhold (`bilde_i_lerret` i `jobb.json`).
 
 ### Lagjobber (små objekter)
 
 De andre objektbildene er små: dører, brytere, lys og ting. De males på plass i rommet, så de får samme stil og lys som HD-rommet, og klippes ut etterpå.
 
-- Jobbene heter `lagNNN_KK`: rom NNN, lag KK. Brede og høye rom har samme deler som romjobbene, for eksempel hører `lagNNN_01_del2av3` til `romNNN_del2av3`. Deler uten objekter er ikke med.
+- Jobbene heter `lagNNN_KK`: rom NNN, lag KK. Brede rom har samme deler som romjobbene, for eksempel hører `lag007_01_del2av2` til `rom007_del2av2`. Deler uten objekter er ikke med.
 - `referanse.png` er rommet med lagets objekter tegnet der spillet tegner dem. Lag 01 har første tilstand av hvert objekt, lag 02 neste og så videre. Objekter som ville ligget oppå hverandre, står i hvert sitt lag.
-- Ligger objektene på et stort objektbilde, er det store bildet med i referansen.
-- Bilde to er det godkjente HD-bildet for samme del: `jobber/romNNN/resultat.png` eller `jobber/romNNN_delXavY/resultat.png`, eller objektjobben for det store bildet objektene ligger på. Det står i `bilde_to` i `jobb.json` og i ordren. Bruk det i stedet for stilankeret.
-- Mal hele bildet trofast, også rommet rundt. Objektene klippes ut etter posisjon, så de må ligge nøyaktig der de er, med samme størrelse, omriss og farger. Ingen objekter skal mangle eller flyte inn i rommet.
-- `jobb.json` lister objektene som klippes ut av akkurat denne jobben (`objekter`, med rektangel i originalpiksler).
-- Leveres som rommene.
+- Bilde to er det godkjente HD-bildet for samme del (`bilde_to` i `jobb.json`).
+- Mal hele bildet trofast, også rommet rundt. Objektene klippes ut etter posisjon, så de må ligge nøyaktig der de er, med samme størrelse, omriss og farger. Ingen objekter skal mangle, flyte inn i rommet eller tegnes om.
 
 ### Ikonark
 
-Ikoner som ikke tegnes på plass i et rom (for eksempel tingene i inventaret), ligger i et rutenett på ikonark, på en flat bakgrunnsfarge. Hvilke bilder dette gjelder i Sam & Max, er ikke kartlagt.
+Pekerne (rom 93), inventaret og samtaleikonene (rom 94) og små deler som spillet tegner over skjermen (skilt og biler i Highway Surfing, landskapsbitene i kikkerten, ringen under forstørrelsesglasset og lignende) ligger tett i rader på ikonark, på en flat bakgrunnsfarge som ikke finnes i ikonene.
 
-- Jobbene heter `ikonNN`. Tilstandene til et ikon (for eksempel vanlig og uthevet) står ved siden av hverandre.
-- Mal hvert ikon trofast i ruten sin. Hold bakgrunnen flat, uten rammer eller rutenett.
+- Jobbene heter `ikonNN`. Tilstandene til et ikon (for eksempel vanlig og uthevet) står ved siden av hverandre. Et nytt rom begynner på ny rad.
+- Mal hvert bilde trofast i ruten sin, med samme størrelse, omriss og bokstaver. Hold bakgrunnen flat, uten rammer, rutenett, skygger eller glød.
 - Leveres som rommene, med stilankeret som bilde to.
 
 ### Figurark
 
-Figurene er kostymer: animasjonsruter som spillet tegner etter hverandre. Males hver rute for seg, blir det for mange jobber, og figuren flimrer fordi hver rute blir litt ulik. Derfor står rutene som hører sammen, på figurark.
+Figurene er kostymer: animasjonsruter som spillet tegner etter hverandre. Rutene som hører sammen, står på figurark, så figuren blir lik i alle rutene.
 
 - Jobbene heter `figCCC_KK`: kostyme CCC, ark KK.
-- `referanse.png` er rutene i 4x på en flat bakgrunnsfarge som ikke finnes i kostymet, med 32 HD-piksler mellom rutene og samme grå kant som de andre jobbene. Ruter i samme animasjon og retning står etter hverandre på samme rad, i den rekkefølgen spillet viser dem. Prompten sier hva som står på arket.
-- Er figuren delt i deler i kostymet (for eksempel hode og kropp hver for seg), males delene som de er, uten å gjøre dem hele.
-- Mal alle rutene som den samme figuren: samme ansikt, klær, farger og lys. Sam er hunden i dress og hatt, Max den hvite, kaninaktige figuren. Bare posen skal være forskjellig, nøyaktig som i originalen.
-- Bilde to er stilankeret for ark 01. For de andre arkene er bilde to det godkjente ark 01 for samme kostyme (`bilde_to` i `jobb.json`). Lag dem etter at ark 01 er godkjent.
-- Ruter som ikke får plass på et ark i 4x, skaleres ikke ned. De blir egne jobber, og er de bredere eller høyere enn lerretet, deles de som rommene.
-- Leveres som rommene.
+- `referanse.png` er rutene i 4x på en flat bakgrunnsfarge som ikke finnes i kostymet, med 32 HD-piksler mellom rutene og samme grå kant som de andre jobbene. Ruter i samme animasjon og retning står etter hverandre på samme rad, i den rekkefølgen spillet viser dem. Prompten sier hva som står på arket og hvem det er (fra `docs/figurer.csv`).
+- Kroppen og hodet er ofte egne deler i kostymet (i Sam & Max er kroppen lag 1, munn og hode lag 2 til 4). Delene males som de er, uten å gjøre dem hele.
+- Ruter mot venstre finnes ikke på arkene når kostymet ikke har egne: spillet speilvender rutene mot høyre. Ikke tegn noen.
+- Skyggepiksler (palettindeks 13, som spillet tegner gjennom skyggetabellen) er tatt bort fra arkene; motoren tegner skyggen selv. Fem kostymer (127, 132, 153, 211 og 280) er bare skygge og har ingen ark.
+- Seks ruter i fire kostymer er feil i dataene (animasjoner som peker utenfor kostymet, og som dekoderen leser som ruter på opptil 6189 piksler). De er ikke med.
+- Mal alle rutene som den samme figuren: samme ansikt, klær, farger og lys. Bare posen skal være forskjellig, nøyaktig som i originalen.
+- Glatt stil med ekte alfa: arkene leveres på gjennomsiktig bakgrunn, med myke kanter, ikke klippet med originalens omriss (Tom avviste trappetrinnene i The Dig).
+- Bilde to: hovedarket for kostymer med Sam eller Max (kolonnen `hovedark` i `docs/figurer.csv`; for kostymer med begge er hovedarket til Max bilde tre). For de andre kostymene er bilde to stilankeret for ark 01 og det godkjente ark 01 for de andre arkene. Det står i `bilde_to` og `referanser` i `jobb.json`.
+- Unntak: nærbildene i alkoven (kostyme 341 til 347) har varme farger med vilje og får ikke hovedarket som bilde to. Fargene tas fra referansen.
+- Leverte ark føres under `leveranser` i `rapporter/*/fremdrift.json` med `jobb`, `resultat` (stien til PNG-en) og `sha256`. Hvert ark skal ha et rutekart (`rapporter/*/rutekart*.json`) som kobler hver rute (`bilde`) til boksen rundt delen av tegningen med alfa over 128, `[x, y, bredde, høyde]`.
 
-#### Glatt stil med ekte alfa
+### Hovedark
 
-Figurene lages i glatt, detaljert stil med myke kanter fra starten. I The Dig avviste Tom figurer klippet med originalens omriss, fordi de fikk trappetrinn i 4x.
+Før figurarkene for Sam og Max lages ett hovedark per person, slik Full Throttle hadde ett hovedark per figur som alle tegnerne fulgte. Referansen ligger i `hovedark/sam/` og `hovedark/max/`: originalfiguren forfra, fra høyre, bakfra og fra venstre, satt sammen av lagene slik spillet tegner dem, og et nærbilde av ansiktet. Leveransen er `hovedark/sam.png` og `hovedark/max.png` på gjennomsiktig bakgrunn, uten tekst, med notat i `hovedark/<navn>-notat.md`. Tom godkjenner hovedarkene før de brukes.
 
-- Arkene tegnes på gjennomsiktig bakgrunn med ekte alfa, ikke på flat farge. Figurene kan være tegnet i litt annen størrelse og litt andre steder enn i referansen. De klippes ikke med originalens omriss.
-- Leverte ark føres under `leveranser` i `rapporter/*/fremdrift.json` med `jobb`, `resultat` (stien til PNG-en) og `sha256`. Stemmer ikke sha256 med filen, tas arket ikke inn.
-- Hvert ark skal ha et rutekart (`rapporter/*/rutekart*.json`). Det kobler hver rute (`bilde`) til boksen rundt delen av tegningen med alfa over 128, `[x, y, bredde, høyde]`, under `ny_diagnostisk_rekt_alfa128`, `drawn_bbox_alpha128`, `native_analyseboks_alfa128` eller `rect`. Uten rutekart kobles rutene etter rad og rekkefølge, og da må antall rader og deler per rad stemme med referansen.
-- Claude tar arkene inn med `smhd myke-figurer`. Hver gruppe av ruter (samme animasjon og lag, samme rad på arket) skaleres til originalens høyde, og hver rute tilpasses originalens omriss i bredde og høyde for seg, høyst 12 prosent fra gruppens faktor. I The Dig ble hodene tegnet omtrent 35 prosent større enn kroppene, så hoder og kropper skaleres hver for seg.
-- Ruter der omrisset er svært ulikt originalen (dekker under 80 prosent av originalens piksler, eller snitt delt på union under 0,6), får status sjekk i `myke.json` og kontaktark `forhandsvisning/myk_<jobb>.png`.
+## 5. Fast størrelse i alle figurark
 
-Kostymene skal stå i `docs/figurer.csv` i grenen `main`, med navn, antall ruter og antall ark, sortert etter hvor mye de vises. Filen har bare overskriftene nå. Hvilke kostymer som er Sam og Max, er ikke kartlagt.
+Dette er den viktigste regelen for figurene. En figur som er tegnet litt større i én rute enn i den neste, vokser og krymper i spillet. I The Dig så Tom astronautene skifte størrelse når de snakket, og hodene ble tegnet omtrent 35 prosent større enn kroppene.
 
-## 5. Rekkefølge
+- Hver rute tegnes nøyaktig så stor som den er i referansen: samme høyde, samme bredde og samme forhold mellom hode, kropp, armer, ben og gjenstander. En piksel i referansens originalstørrelse er fire piksler i resultatet, på alle arkene til samme figur.
+- Prompten sier hvor store rutene på arket er, og `jobb.json` har boksen rundt hver rute (`synlig` under `ruter`, i originalpiksler).
+- Hoder, hender og øyne gjøres ikke større. Ingen rute fylles ut eller strekkes for å se bedre ut.
 
-1. **Stilpilot:** ett rom og ett figurark, sett i motoren. Tom godkjenner. Rommet og figuren er ikke valgt.
-2. **Stilankere:** de godkjente pilotbildene legges i `stil/` i grenen `gpt-arbeid`. Legg ved det ankeret som passer best, som bilde nummer to i hver jobb (prompten forklarer hvordan). Det holder stilen lik fra rom til rom.
-3. **Løpende ordre:** Claude skriver `ORDRE.md` i grenen etter hver kontroll, med de neste jobbene. Ta dem i den rekkefølgen. Avviste rom- og objektjobber står først. Nye jobber står etter romnummer, med romjobbene før objektjobbene i samme rom. Lagjobbene kommer etter rom- og objektjobbene, og først de der bilde to er godkjent. Så ikonarkene, og til slutt figurarkene utenfor piloten når de er bestilt.
+Egenkontroll før levering, i grenen `gpt-arbeid`:
+
+```sh
+python3 verktoy/sjekk_leveranse.py jobber/fig002_01/resultat.png
+```
+
+Skriptet måler hver rute: bredde og høyde på det som er tegnet mot originalen ganger 4, hvor langt midten er flyttet, og hvor godt omrisset dekker originalen. Grensene: OK innen 6 prosent i størrelse og 1,5 originalpiksler i plassering, SJEKK opptil 12 prosent og 3 piksler, FEIL over det. Det sier også fra når rutene i samme animasjon er tegnet ulikt store (mer enn 5 prosent forskjell). Gjør om rutene som får FEIL. Skriptet sjekker også rom, objekter, lag, ikonark og hovedark med de samme grensene som mottaket.
+
+Mottaket hos Claude (`smhd myke-figurer`) skalerer hver gruppe av ruter til originalens høyde og tilpasser hver rute høyst 12 prosent, men det kan ikke rette proporsjoner inne i en rute. Det merker ruter som er tegnet mer enn 12 prosent større eller mindre enn resten av gruppen, med status sjekk.
+
+## 6. Rekkefølge
+
+1. **Stilpilot (nå):** hovedark for Sam og Max, kontoret (`rom007_del1av2` og `rom007_del2av2`), og `fig002_01` (Sam) og `fig003_01` (Max) med hovedarkene som bilde to. Stopp etter piloten.
+2. **Godkjenning:** Tom ser på piloten i motoren. De godkjente bildene legges i `stil/` som stilankere, og Claude skriver ny ordre.
+3. **Løpende ordre:** Claude skriver `ORDRE.md` etter hver kontroll. Avviste rom- og objektjobber står først. Nye jobber står etter romnummer, med romjobbene før objektjobbene i samme rom. Så lagjobbene (først de der bilde to er godkjent), så ikonarkene, og til slutt figurarkene: Sam og Max først, så de andre kostymene med dem, så de navngitte figurene (Conroy Bumpus, Trixie, Bruno, Doug, Shuv-Oohl, Kushman-brødrene), så resten.
 4. **Retur:** jobber med `retur.md` står først i ordren og gjøres på nytt med teksten der.
 
-Det er ingen filmer i Sam & Max. Mellomsekvensene og minispillene tegnes av motoren, så de bruker rom, objekter og figurer fra spillfilene og dekkes av de samme jobbtypene. Hvilke rom det gjelder, er ikke kartlagt.
+Det er ingen filmer i Sam & Max. Mellomsekvensene og minispillene tegnes av motoren og bruker rom, objekter og figurer fra spillfilene, så de dekkes av de samme jobbtypene.
 
-## 6. Arbeidsflyt
+## 7. Arbeidsflyt
 
 ### A. ChatGPT som Codex i repoet (anbefalt)
 
 1. Åpne repoet `Tombonator3000/Sam-Max-HD` og bytt til grenen `gpt-arbeid`. Den har sin egen `AGENTS.md` og en kopi av denne bestillingen.
 2. Les `ORDRE.md` og ta jobbene der. Lag ikke egne grener eller PR-er for grafikken.
-3. For hver jobb: bruk bildeverktøyet med `referanse.png` som bildet som skal redigeres, et stilanker som bilde to (for lagjobber det godkjente HD-bildet i `bilde_to`), og `prompt.txt` ordrett som prompt. Be om 1536 x 1024. Lagre som `resultat.png` og skriv `notat.md`.
-4. Se på resultatet ved siden av referansen før du leverer. Ligger noe feil, prøv igjen.
-5. Commit i grenen `gpt-arbeid` med jobbene i meldingen, for eksempel `GPT: romNNN, objNNN_SS`, og push. Aldri til `main`.
+3. For hver jobb: bruk bildeverktøyet med `referanse.png` som bildet som skal redigeres, bildene i `referanser` (eller stilankeret) som bilde to og tre, og `prompt.txt` ordrett som prompt. Be om 1536 x 1024. Lagre som `resultat.png` og skriv `notat.md`.
+4. Kjør `python3 verktoy/sjekk_leveranse.py jobber/<jobb>/resultat.png` og se på resultatet ved siden av referansen. Ligger noe feil, prøv igjen.
+5. Commit i grenen `gpt-arbeid` med jobbene i meldingen, for eksempel `GPT: rom007_del1av2, fig002_01`, og push. Aldri til `main`.
 
 Claude henter grenen, kjører kontrollen og skriver `RAPPORT.md` og `retur.md` tilbake.
 
 ### B. Vanlig ChatGPT-chat (manuelt)
 
-1. Lag et ChatGPT-prosjekt «Sam & Max HD» og lim inn teksten i punkt 10 som instruksjoner.
-2. For hver jobb: last opp `referanse.png` (og stilankeret), lim inn `prompt.txt`.
-3. Last ned bildet og lagre det som `work/gpt/innboks/<jobb>.png`, for eksempel `romNNN.png`.
+1. Lag et ChatGPT-prosjekt «Sam & Max HD» og lim inn teksten i punkt 11 som instruksjoner.
+2. For hver jobb: last opp `referanse.png` (og bilde to), lim inn `prompt.txt`.
+3. Last ned bildet og lagre det som `work/gpt/innboks/<jobb>.png`, for eksempel `rom007_del1av2.png`.
 4. Kjør `smhd gpt-inn`. Bildene flyttes inn i riktig jobb og sjekkes.
 
-## 7. Slik sjekkes leveransene
+## 8. Slik sjekkes leveransene
 
 `smhd gpt-inn` gjør dette med hvert bilde:
 
@@ -156,67 +176,36 @@ Claude henter grenen, kjører kontrollen og skriver `RAPPORT.md` og `retur.md` t
 | Blokker | Forskyvning i deler av bildet (avslører zoom og flyttede ting) | 1,0 eller mindre | 2,0 eller mindre | mer |
 | Kantlikhet | Om formene er de samme (0 til 1) | 0,55 eller mer | 0,40 eller mer | mindre |
 
-Prøvd i The Dig med kunstige svar: et bilde forskjøvet 3 piksler ble avvist, 3 prosent zoom ble avvist, 1 prosent zoom havnet på sjekk, feil sideforhold ble avvist, og et omtegnet bilde som lå riktig, ble godkjent. Ikke prøvd med Sam & Max.
+Prøvd i The Dig med kunstige svar: et bilde forskjøvet 3 piksler ble avvist, 3 prosent zoom ble avvist, 1 prosent zoom havnet på sjekk, feil sideforhold ble avvist, og et omtegnet bilde som lå riktig, ble godkjent. Egenkontrollen her er prøvd med kunstige leveranser for Sam & Max (13. oktober): et rom forskjøvet 3 piksler gir FEIL, en riktig leveranse gir OK, og en figurrute tegnet 15 prosent for stor gir FEIL. Ikke prøvd med ekte ChatGPT-bilder for Sam & Max.
 
-Etter sjekken **låses fargene til originalen**: de grove fargeflatene hentes fra originalen og detaljene fra ditt bilde. Et lite fargestikk gjør derfor ikke noe, men feil plassering gjør det. Grensene justeres når vi har sett ekte resultater.
+Etter sjekken **låses fargene til originalen**: de grove fargeflatene hentes fra originalen og detaljene fra ditt bilde. Et lite fargestikk gjør derfor ikke noe, men feil plassering gjør det.
 
-Objektjobber kontrolleres på samme måte mot sitt eget `original_1x.png` (objektbildet over rommet i 1x).
-
-Lagjobber og ikonark kontrolleres som helhet på samme måte, og i tillegg hvert objekt for seg, bare på objektets synlige piksler:
+Lagjobber og ikonark kontrolleres i tillegg objekt for objekt, bare på objektets synlige piksler:
 
 | Sjekk per objekt | Avvist når |
 | --- | --- |
-| Mangler | Resultatet ligner mer på rommet uten objektet enn på objektet (kantlikhet mot bakgrunnen er over kantlikheten mot objektet pluss 0,05). Måles når objektet skiller seg fra bakgrunnen (kantlikhet under 0,90 mellom dem). |
+| Mangler | Resultatet ligner mer på rommet uten objektet enn på objektet (kantlikhet mot bakgrunnen er over kantlikheten mot objektet pluss 0,05). Måles når objektet skiller seg fra bakgrunnen. |
 | Tegnet om | Kantlikheten i objektet er under 0,50, for objekter med tydelige kanter. |
 
-Ett feil objekt avviser hele jobben.
+Ett feil objekt avviser hele jobben. Senere tilstander av et objekt gjøres like den første der originalene er like.
 
-Figurark kontrolleres som helhet på samme måte (plassering), og i tillegg hver rute for seg og flimmer mellom rutene:
+Figurark i glatt stil tas inn med `smhd myke-figurer` (`pipeline/smhd/myk.py`, versjon 4): rutekartet kobler delene av tegningen til rutene, hver gruppe skaleres til originalens høyde, hver rute tilpasses høyst 12 prosent, og ruter som er tegnet ulikt store, får status sjekk (se 5). Ruter der omrisset er svært ulikt originalen (dekker under 80 prosent, eller snitt delt på union under 0,6), får også status sjekk, med kontaktark i `forhandsvisning/myk_<jobb>.png`.
 
-| Sjekk per figurark | Avvist når |
-| --- | --- |
-| Mangler | Under halvparten av rutens piksler er malt som figur |
-| Omriss | Overlappen mellom det som er malt som figur og originalens omriss (snitt delt på union, i 4x) er under 0,80 |
-| Tegnet om | Kantlikheten inne i omrisset er under 0,50, for ruter med tydelige kanter |
-| Flimmer | To nabo-ruter i samme animasjon og retning skiller seg mye mer fra hverandre i HD enn i originalen. Rutene legges over hverandre der originalene passer best, og forskjellen måles i 1x etter fargelåsen, der begge har figur, jevnet ut over 3 x 3 piksler. Avvist når HD skiller seg mer enn 30 (0 til 255) mer enn originalen noe sted |
+Ferdige rom havner i `work/gpt-ferdig/rooms/`, objektbilder i `work/gpt-ferdig/objects/` og figurruter i `work/gpt-ferdig/costumes/`. `smhd build-mod --egne work/gpt-ferdig` lager mod-modden. Teknisk status godkjent er ikke Toms visuelle godkjenning (se [HD-REMASTER-METODE.md](HD-REMASTER-METODE.md)).
 
-Ark i glatt stil med ekte alfa går gjennom `smhd myke-figurer` i tillegg (punkt 4).
+## 9. Sporing
 
-Etter fargelåsen klippes hvert objekt ut av delen det står i (sydd sammen hvis det står i flere) på rektangelet sitt, i 4x med gjennomsiktigheten fra originalen. Figurruter klippes ut på samme måte til `costumes/costumeCCC_NNN.png`. Myke kanter i arket blander inn bakgrunnsfargen langs omrisset. Der en HD-piksel innenfor omrisset (høyst 2 originalpiksler fra kanten) er dratt mer enn 12 prosent av veien fra originalfargen mot bakgrunnsfargen, fylles den innenfra, ellers får figuren en glorie i bakgrunnsfargen. Et objekt er ferdig når alle delene det står i, er godtatt (godkjent, eller sjekk som for rommene; med `--bare-godkjente` bare godkjent). Senere tilstander av et objekt gjøres like den første der originalene er like.
+Hver leveranse skal kunne spores. Claude skriver `work/gpt-ferdig/provenance.json` med sjekksum for referanse, prompt og resultat, målingene og innstillingene for fargelåsen, og `myke.json` for figurarkene. Ditt `notat.md` utfyller med verktøy, modell, dato, antall forsøk og eventuelle endringer i prompten.
 
-Ferdige rom havner i `work/gpt-ferdig/rooms/`, ferdige objektbilder i `work/gpt-ferdig/objects/` og ferdige figurruter i `work/gpt-ferdig/costumes/`. `smhd build-mod --egne work/gpt-ferdig` lager mod-mappen motoren bruker, og bruker de godkjente bildene i stedet for automatisk oppskalering. Ruter uten HD-bilde vises som originalen, med mindre kostymet er valgt med `--kostymer`; da skaleres resten automatisk. Et rom regnes som ferdig når romjobbene er godkjent, uavhengig av objektene.
+## 10. Erfaringer fra Jones, Moonstone og The Dig
 
-## 8. Sporing
+**Jones in the Fast Lane** fikk HD-grafikk fra ChatGPT sitt innebygde bildeverktøy (via Codex): én presis prompt per bilde med lister over hva som skal bevares og hva som ikke skal gjøres virket. Verktøyet skrev feil tekst på et skilt og kuttet hår fordi figurene var plassert litt annerledes; begge ble rettet med en smal korrigeringsprompt. Stilen ble skiftet to ganger, derfor stilpilot og stilankere først. Bildeverktøyet tok høyst fem referansebilder om gangen og ga ikke alltid nøyaktig størrelse.
 
-Hver leveranse skal kunne spores. Claude skriver `work/gpt-ferdig/provenance.json` med sjekksum for referanse, prompt og resultat, målingene og innstillingene for fargelåsen. Objektbilder fra lag og ikonark får hver sin oppføring med laget eller arket de kom fra og rektangelet i det. Figurruter får én oppføring per rute med arket, rektangelet, animasjonen og målingene for ruten og nabo-rutene. Ditt `notat.md` utfyller med verktøy, modell, dato, antall forsøk og eventuelle endringer i prompten.
+**Moonstone** fikk motoren for HD-grafikk, men ikke ferdig grafikk: HD-bildene navngis likt som utpakkede filer i 4x, liste over all grafikk med mål, bryter mellom HD og original, og automatisk kontroll av plasseringen.
 
-## 9. Erfaringer fra Jones, Moonstone og The Dig
+**The Dig HD Remake** (skillen `scumm-hd-remake`): ChatGPT bommet på tekst og plassering, og stilen gled over tid. En dårligere ny leveranse skal ikke erstatte en godtatt. Den grå lerretskanten blødde inn i ytterradene. Codex laget egne jobber utenfor jobblisten. Figurene skiftet størrelse mellom rutene, og tre kvinner i romdrakt ble tegnet like fordi kostymene manglet navn. Derfor har Sam & Max navn og beskrivelse per kostyme, hovedark og egenkontroll av størrelsen fra starten.
 
-**Jones in the Fast Lane** fikk HD-grafikk fra ChatGPT sitt innebygde bildeverktøy (via Codex):
-
-- Det som virket: én presis prompt per bilde med lister over hva som skal bevares og hva som ikke skal gjøres, referansebildet som bildet som redigeres, og atlas for flere animasjonsrammer i ett bilde.
-- Det som gikk galt og måtte rettes: verktøyet skrev feil tekst på et skilt, og hår ble kuttet fordi figurene var plassert litt annerledes. Begge ble rettet med en ny, smal korrigeringsprompt.
-- Stilen ble skiftet to ganger. Derfor starter vi med pilot og stilankere før resten.
-- Sporingen (prompt, referanse og sjekksum for hvert bilde) og automatisk kontroll av størrelser og plassering gjorde det mulig å holde orden.
-- Bildeverktøyet tok høyst fem referansebilder om gangen og ga ikke alltid nøyaktig størrelse. Derfor tåler `gpt-inn` andre størrelser med samme sideforhold.
-
-**Moonstone** fikk motoren for HD-grafikk, men ikke ferdig grafikk:
-
-- HD-bildene navngis likt som utpakkede filer, i 4x størrelse.
-- Liste over all grafikk med mål og HD-navn (her `docs/rom-oversikt.csv` og `JOBBER.md`).
-- Bryter mellom HD og original, og gult felt der HD mangler.
-- Plasseringen sjekkes automatisk. Her gjør `gpt-inn` det før bildet slipper inn, og `engine/test.sh` i motoren etterpå.
-- HD-bildene må tones med paletten når spillet fader. Motoren fra The Dig gjør det.
-
-**The Dig HD Remake** (fra skillen `scumm-hd-remake`):
-
-- ChatGPT bommet på tekst og plassering, og stilen gled over tid. Den automatiske kontrollen og stilankerne fanget det meste.
-- En dårligere ny leveranse skal ikke erstatte en godtatt. Mottaket tar vare på den beste per jobb.
-- Den grå lerretskanten blødde inn i ytterradene på noen bilder. Hold kanten grå og bildet innenfor.
-- Små objekter ble malt på plass i rommet (lagjobber) og klippet ut. Ikoner ble malt i ikonark.
-- Codex laget egne jobber utenfor jobblisten. Mottaket leser derfor leveransene i `rapporter/*/fremdrift.json` og rutekartene, ikke bare `status.csv`.
-
-## 10. Tekst til ChatGPT-prosjektet
+## 11. Tekst til ChatGPT-prosjektet
 
 Lim inn dette som instruksjoner i et ChatGPT-prosjekt (arbeidsflyt B), eller la Codex lese denne filen (arbeidsflyt A):
 
@@ -229,28 +218,31 @@ og prompt.txt. Bruk prompt.txt ordrett og referanse.png som bildet som redigeres
 1536 x 1024 med samme oppsett. Jobber som heter objNNN_SS, er store bilder spillet viser over rommet.
 Behandle dem som bakgrunner. Jobber som heter lagNNN_KK, er rommet med små objekter tegnet på plass.
 Mal alt trofast; objektene klippes ut etter posisjon, så de må ligge nøyaktig der de er. Bruk det
-godkjente HD-bildet i bilde_to som bilde to. Jobber som heter ikonNN, er ikoner på flat bakgrunn.
+godkjente HD-bildet i bilde_to som bilde to. Jobber som heter ikonNN, er små bilder på flat bakgrunn.
 Jobber som heter figCCC_KK, er figurark: animasjonsruter av samme figur. Mal alle rutene som samme figur
-(samme ansikt, klær, farger og lys), med samme pose og plass som originalen, i glatt stil med myke kanter
-på gjennomsiktig bakgrunn med ekte alfa. Deler av en figur (for eksempel hode og kropp hver for seg)
-males som de er.
+(samme ansikt, klær, farger og lys), i glatt stil med myke kanter på gjennomsiktig bakgrunn med ekte alfa.
 
-Regler: ingenting flyttes, zoomes eller beskjæres. Ingenting legges til eller fjernes. Skilt, tekst og
-symboler kopieres nøyaktig. Samme farger, lys og stemning. Samme tegneserieuttrykk som originalen, med
-samme streker, former og farger. Ikke fotorealisme, ikke moderne 3D. Den grå kanten skal være grå.
-Bedre detalj, jevne overganger og rene kanter er målet.
+Regler: ingenting flyttes, zoomes eller beskjæres. Ingenting legges til, fjernes eller byttes ut, og det
+skal være like mange av alt. Ingenting rettes eller ryddes, heller ikke det som ser rart ut. Skilt, tekst
+og symboler kopieres bokstav for bokstav. Samme farger, lys og stemning. Samme tegneserieuttrykk som
+originalen, med kraftige omriss og mettede farger. Ikke fotorealisme, ikke moderne 3D. Den grå kanten
+skal være grå. Bedre detalj, jevne overganger og rene kanter er målet.
 
-Hvis et stilanker er vedlagt som bilde to, følg detaljnivået og strekene i det, men ta alt
-innhold fra referansen.
+Figurer: hver rute tegnes nøyaktig så stor som i referansen (en inndatapiksel er fire utdatapiksler),
+med samme forhold mellom hode, kropp og armer. Hoder og hender gjøres ikke større. Deler av en figur
+(hode og kropp hver for seg) males som de er. Rutene mot venstre lager spillet ved å speilvende.
 
-Se på resultatet ved siden av referansen før du leverer. Si fra hvis noe ikke lar seg gjøre trofast.
-Skriv et kort notat: verktøy, dato, antall forsøk, hva som var usikkert.
+Hvis et stilanker eller hovedark er vedlagt som bilde to, følg detaljnivået og designet i det, men ta
+alle former, størrelser, posisjoner og farger fra referansen.
+
+Kjør python3 verktoy/sjekk_leveranse.py på resultatet før du leverer, og gjør om det som får FEIL.
+Si fra hvis noe ikke lar seg gjøre trofast. Skriv et kort notat: verktøy, dato, antall forsøk, hva som var usikkert.
 ```
 
-## 11. Opphav
+## 12. Opphav
 
 *Sam & Max Hit the Road* eies av Disney/Lucasfilm. Repoet er offentlig etter Toms valg, men jobbene, referansene og resultatene ligger bare i grenen `gpt-arbeid` og i `work/`. De skal ikke deles utenfor repoet eller legges i `main`.
 
-## 12. Videre arbeidsmetode
+## 13. Videre arbeidsmetode
 
-Se [HD-REMASTER-METODE.md](HD-REMASTER-METODE.md) for kontroll av figuridentitet, rutekart, hele animasjoner, objekttilstander og visuell godkjenning. Teknisk mottaksstatus er ikke i seg selv Toms visuelle godkjenning. Kontrollnivåene i metoden er forslag inntil verktøy og rapporter støtter dem.
+Se [HD-REMASTER-METODE.md](HD-REMASTER-METODE.md) for kontroll av figuridentitet, rutekart, hele animasjoner, objekttilstander og visuell godkjenning. Teknisk mottaksstatus er ikke i seg selv Toms visuelle godkjenning.
