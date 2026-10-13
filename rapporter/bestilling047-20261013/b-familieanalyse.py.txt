@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,itertools
+r=Path('rapporter/bestilling047-20261013');h=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();locks=[];rows=[]
+for n in [47,48]:
+ q=Path(f'rapporter/bestilling{n:03d}-20261013')
+ for name in ['kildehash.json','root-ekstra-kildehash.json']:
+  for z in json.loads((q/name).read_text()):assert h(z['fil'])==z['sha256'];locks.append(z['fil'])
+ rows += [z for z in json.loads((q/'root-feltbevis.json').read_text()) if z['jobb']!='lag068_12']
+extra=[]
+for j in ['lag071_15','lag071_16']:
+ p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text())
+ for name in ['original_1x.png','referanse.png','prompt.txt','jobb.json']:extra.append({'fil':str(p/name),'sha256':h(p/name)})
+ for o in m['objekter']:
+  x,y,w,hh=o['rekt'];rows.append({'jobb':j,'objekt':o['bilde'],'rekt':o['rekt'],'hd_rekt':[128+x*4,112+y*4,w*4,hh*4],'register':{'internt_originalnavn':{735:'sam-sword-image',764:'max-punk-hair',770:'max-bubblegumhead'}[o['objekt']]}})
+(r/'b-049-konteksthash.json').write_text(json.dumps(extra,indent=2)+'\n')
+proof=[]
+for j in sorted(set(z['jobb'] for z in rows)):
+ p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());a=np.array(Image.open(p/'original_1x.png').convert('RGB'));basepath=Path(m['bilde_to']).parent/'original_1x.png';b=np.array(Image.open(basepath).convert('RGB'));mask=np.zeros(a.shape[:2],bool);objs=list(m['objekter']);rx=m['region'][0]
+ # Full actual source union from both panorama parts.
+ if j.startswith(('lag070_01','lag070_02')):
+  sibling=j.replace('del1av2','del2av2') if 'del1av2' in j else j.replace('del2av2','del1av2');objs+=json.loads(Path('jobber',sibling,'jobb.json').read_text())['objekter']
+ for o in objs:
+  x,y,w,hh=o['rekt'];lo=max(0,x-rx);hi=min(a.shape[1],x-rx+w)
+  if hi>lo:mask[y:y+hh,lo:hi]=True
+ diff=np.any(a!=b,axis=2);over=[]
+ for aa,bb in itertools.combinations(m['objekter'],2):
+  x,y,w,hh=aa['rekt'];u,v,s,t=bb['rekt'];area=max(0,min(x+w,u+s)-max(x,u))*max(0,min(y+hh,v+t)-max(y,v))
+  if area:over.append([aa['bilde'],bb['bilde'],area])
+ proof.append({'jobb':j,'endret':int(diff.sum()),'utenfor_felles_union':int(diff[~mask].sum()),'overlappende_felt':over})
+panos=[]
+for layer in [1,2]:
+ a,b=[np.array(Image.open(f'jobber/lag070_{layer:02d}_del{i}av2/original_1x.png')) for i in [1,2]];assert np.array_equal(a[:,96:],b[:,:288]);panos.append({'lag':layer,'master':[1920,800],'klipp':[0,384],'overlapp':[1152,800],'source_overlap_identisk':True})
+(r/'b-familiebevis.json').write_text(json.dumps({'kontrollerte_laasoppforinger':len(locks),'unike_laasfiler':len(set(locks)),'ekstra49':8,'panorama':panos,'jobber':proof},ensure_ascii=False,indent=2)+'\n')
+(r/'b-felttabell.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+print('LOCKS',len(locks),len(set(locks)),'FIELDS',len(rows),'JOBS',len(proof));print([(z['jobb'],z['utenfor_felles_union'],z['overlappende_felt']) for z in proof])

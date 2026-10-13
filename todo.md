@@ -91,3 +91,5 @@
 - [x] Levert fem jobber i bestilling46 med19 faktiske feltkontroller,04 med SJEKK.
 
 - [x] Levert sju jobber i bestilling50 med sju faktiske feltkontroller.
+
+- [x] Levert 9 jobber i bestilling 47 med 47 faktiske feltkontroller.

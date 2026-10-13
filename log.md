@@ -332,3 +332,8 @@
 
 - Bestilling50: sju lag levert OK med sju egne felt: voksboks, tannfravær og fire kildepresise skytestillinger. Tre083-tilstander avventer motivavklaring. Se `rapporter/bestilling050-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T00:39:04+02:00 (Codex, Astra)
+
+- Bestilling 47: ni lag levert OK med 47 egne felt, to byte-identiske panoramaoverlapper og fire antrekkskombinasjoner. Lag068_12 holdes utenfor med FEIL. Se `rapporter/bestilling047-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

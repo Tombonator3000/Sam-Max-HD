@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil,subprocess
+r=Path('rapporter/bestilling047-20261013');shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-c62499b2-7323-47c0-b346-92e605dd5b1c.png',r/'b-lag071_04-raa01.png')
+for j in ['lag070_03_del1av2']+[f'lag071_{n:02d}' for n in range(1,5)]:
+ p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());out=Image.open(m['bilde_to']).convert('RGB');raw=Image.open(r/('b-07003-raa01.png' if j.startswith('lag070') else f'b-{j}-raa01.png')).convert('RGB').resize((160,96) if j.startswith('lag070') else (1536,1024),Image.Resampling.LANCZOS)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=(x-m['region'][0]+m['plassering'][0])*4;y=(y+m['plassering'][1])*4;w*=4;h*=4;yy,xx=np.mgrid[:h,:w];a=Image.fromarray((np.clip(np.minimum.reduce([xx+1,w-xx,yy+1,h-yy])/6,0,1)*255).astype('uint8'));tile=raw if j.startswith('lag070') else raw.crop((x,y,x+w,y+h));out.paste(tile,(x,y),a)
+ out.save(p/'resultat.png');run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr);print(run.stdout)

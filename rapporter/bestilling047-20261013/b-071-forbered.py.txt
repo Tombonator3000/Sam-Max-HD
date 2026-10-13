@@ -1,0 +1,10 @@
+from pathlib import Path
+import json
+rows=json.loads(Path('rapporter/bestilling047-20261013/b-felttabell.json').read_text());plan=Path('rapporter/bestilling047-20261013/b-kildeplan.md').read_text()
+for n in list(range(1,5))+list(range(6,15))+[16]:
+ j=f'lag071_{n:02d}';r=Path(f'rapporter/bestilling{47 if n<=4 else 48 if n<=14 else 49:03d}-20261013');p=Path('jobber')/j;details='\n'.join(line for line in plan.splitlines() if line.startswith('| '+j+' |'))
+ prompt=(p/'prompt.txt').read_text()+'\n\nSEPARATE SOURCE CLARIFICATION: This is a specific paper-doll dress-up combination, not standard Sam suit/hat or a cumulative costume. First reference is exact source geometry/state/palette. Second reference is delivered HD base for the SAME Sam and Max body/face identity and background style. Change ONLY the visible costume and props found in source; preserve their exact positions and clipping, hands with each object, head/body sizes, and all source oddities. Keep canvas1536x1024 with gray128 border and content[128,112,1280,800]. Do not add absent costumes, labels or embellishments. Smooth clean cartoon strokes, not realism. Source inventory below (Norwegian descriptions, original room and HD rectangles):\n'+details+'\nThis state starts independently from bare base, never inherit other states. Preserve small motifs/counts such as garment patterns and marks, without invented letters. '
+ if n==6:prompt+='Pizza box label MUST read LeChuck Pizza. Use this source box angle/body/hand, NOT another room whole box. '
+ if n in [1,2]:prompt+='Round button says PUSH ME and retains this source own shape and lighting. '
+ if n==16:prompt+='The bubblegum-machine head shows red 1¢ and the small colored circular contents. Keep the ears exposed and own mouth below; no normal helmet. '
+ (r/f'b-{j}-prompt01.txt').write_text(prompt+'\n')

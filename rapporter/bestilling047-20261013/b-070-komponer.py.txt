@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil,subprocess
+r=Path('rapporter/bestilling047-20261013');shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-a41aaec1-e383-4e99-a362-1f542a8f67f8.png',r/'b-070-02-raa01.png')
+for n in [1,2]:
+ out=Image.open(r/'b-070-hd-kilde.png').convert('RGB');raw=Image.open(r/f'b-070-{n:02d}-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS)
+ for d in [1,2]:
+  m=json.loads(Path(f'jobber/lag070_{n:02d}_del{d}av2/jobb.json').read_text())
+  for o in m['objekter']:
+   x,y,w,h=[v*4 for v in o['rekt']];yy,xx=np.mgrid[:h,:w];a=Image.fromarray((np.clip(np.minimum.reduce([xx+1,w-xx,yy+1,h-yy])/6,0,1)*255).astype('uint8'));out.paste(raw.crop((x,y,x+w,y+h)),(x,y),a)
+ out.save(r/f'b-070-{n:02d}-fullmaster.png')
+ for d,x in [(1,0),(2,384)]:
+  j=f'lag070_{n:02d}_del{d}av2';im=Image.new('RGB',(1536,1024),(128,128,128));im.paste(out.crop((x,0,x+1536,800)),(0,112));im.save(f'jobber/{j}/resultat.png');run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr);print(run.stdout)
+# source-only arrow crop for independent layer03
+p=Path('jobber/lag070_03_del1av2');Image.open(p/'referanse.png').crop((0,112,160,208)).save(r/'b-07003-source.png');Image.open('jobber/rom070_del1av2/resultat.png').crop((0,112,160,208)).save(r/'b-07003-hd.png');(r/'b-07003-prompt01.txt').write_text((p/'prompt.txt').read_text()+'\n\nSEPARATE LOCAL CROP: output only160x96 proportional top-left field. Source has a red RIGHT arrow covering the upper part of the existing bat. Preserve exact arrow shape and position and dark/gray fragments below. Second image is HD style/bat context; do not omit arrow or invent a whole new bat. No padding.\n')

@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess,shutil
+r=Path('rapporter/bestilling047-20261013');target=(167,159,191)
+# Les kun palettverdien, aldri kildeform eller kildealfa.
+s=Image.open('jobber/lag070_01_del1av2/original_1x.png').convert('RGB');print(s.getpixel((90,60)))
+for n in [1,2]:
+ p=r/f'b-070-{n:02d}-fullmaster.png';shutil.copy2(p,r/f'b-070-{n:02d}-for-flatfarge.png');out=Image.open(r/'b-070-hd-kilde.png').convert('RGB');raw=Image.open(r/f'b-070-{n:02d}-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS);a=np.asarray(raw).astype(float)
+ # Nytegnet grålilla skiller seg fra gul bakgrunn ved B-R og B-G. Fargevalg kommer utelukkende fra ny råtegning.
+ mask=(a[:,:,0]>105)&(a[:,:,0]<195)&(a[:,:,1]>105)&(a[:,:,1]<195)&(a[:,:,2]-a[:,:,0]>12)&(a[:,:,2]-a[:,:,1]>17)&(abs(a[:,:,0]-a[:,:,1])<17)
+ a[mask]=target;raw=Image.fromarray(a.astype('uint8'));raw.save(r/f'b-070-{n:02d}-ny-flatfarge.png')
+ for d in [1,2]:
+  m=json.loads(Path(f'jobber/lag070_{n:02d}_del{d}av2/jobb.json').read_text())
+  for o in m['objekter']:
+   x,y,w,h=[v*4 for v in o['rekt']];yy,xx=np.mgrid[:h,:w];edges=[xx+1,w-xx,yy+1,h-yy]
+   if n==1 and o['objekt'] in [708,710]:edges=[w-xx,yy+1,h-yy]
+   if n==1 and o['objekt'] in [693,709]:edges=[xx+1,w-xx,h-yy]
+   alpha=Image.fromarray((np.clip(np.minimum.reduce(edges)/6,0,1)*255).astype('uint8'));out.paste(raw.crop((x,y,x+w,y+h)),(x,y),alpha)
+ out.save(p)
+ for d,x in [(1,0),(2,384)]:
+  j=f'lag070_{n:02d}_del{d}av2';im=Image.new('RGB',(1536,1024),(128,128,128));im.paste(out.crop((x,0,x+1536,800)),(0,112));im.save(f'jobber/{j}/resultat.png');run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr)

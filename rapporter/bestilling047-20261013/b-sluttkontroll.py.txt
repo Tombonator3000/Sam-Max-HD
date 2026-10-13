@@ -1,0 +1,33 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,importlib.util
+sp=importlib.util.spec_from_file_location('checker','verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(sp);sp.loader.exec_module(c);h=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+groups={47:[f'lag070_{n:02d}_del{d}av2' for n in [1,2] for d in [1,2]]+['lag070_03_del1av2']+[f'lag071_{n:02d}' for n in range(1,5)],48:[f'lag071_{n:02d}' for n in range(6,15)],49:['lag071_16']}
+for batch,jobs in groups.items():
+ r=Path(f'rapporter/bestilling{batch:03d}-20261013');proof=[];fields=[];family=Image.new('RGB',(1152,len(jobs)*320),(35,35,35));draw=ImageDraw.Draw(family)
+ for i,j in enumerate(jobs):
+  p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());src=Image.open(p/'referanse.png').convert('RGB');im=Image.open(p/'resultat.png').convert('RGB');base=Image.open(m['bilde_to']).convert('RGB');mask=np.zeros((1024,1536),bool);objs=m['objekter'];ox,oy=m['plassering'];rx=m['region'][0]
+  union=list(objs)
+  if j.startswith(('lag070_01','lag070_02')):
+   other=j.replace('del1av2','del2av2') if 'del1av2' in j else j.replace('del2av2','del1av2');union+=json.loads(Path('jobber',other,'jobb.json').read_text())['objekter']
+  for o in union:
+   x,y,w,hh=o['rekt'];xx=(x-rx+ox)*4;yy=(y+oy)*4;lo=max(ox*4,xx);hi=min((ox+m['region'][2])*4,xx+w*4)
+   if hi>lo:mask[yy:yy+hh*4,lo:hi]=True
+  outside=int(np.any(np.array(im)!=np.array(base),axis=2)[~mask].sum());assert outside==0,(j,outside)
+  part,_=c.part_of(im,m);me=c.compare(Image.open(p/'original_1x.png'),part);status=c.judge(me)[0];ff=[]
+  for o in objs:
+   x,y,w,hh=o['rekt'];x0=max(0,x-rx);x1=min(m['region'][2],x-rx+w);co=c.corr(me['eo'][y:y+hh,x0:x1],me['es'][y:y+hh,x0:x1]);st='OK' if co>=.6 else 'SJEKK' if co>=.5 else 'FEIL';ff.append({'objekt':o['bilde'],'kantlikhet':co,'status':st});status=c.worst(status,st);cx=(x-rx+ox)*4;cy=(y+oy)*4;box=(cx,cy,cx+w*4,cy+hh*4);fields.append((j,o['bilde'],src.crop(box),im.crop(box)))
+  z={'jobb':j,'resultat':str(p/'resultat.png'),'sha256':h(p/'resultat.png'),'egenkontroll':status,'kontrollfil':str(r/f'b-{j}-kontroll01.txt'),'utenfor_union':outside,'felt':ff,'forsok':1,'runtime':False,'ny_brukergodkjenning':False,'fullmaster':None,'fullmaster_sha256':None}
+  if j.startswith(('lag070_01','lag070_02')):
+   master=r/f'b-070-{m["lag"]:02d}-fullmaster.png';z.update(fullmaster=str(master),fullmaster_sha256=h(master));arr=np.array(Image.open(master));assert np.array_equal(np.array(im)[112:912],arr[:,rx*4:rx*4+1536])
+  proof.append(z);draw.text((5,i*320+5),j+' original / HD '+status,fill='white');family.paste(src.resize((576,288)),(0,i*320+25));family.paste(im.resize((576,288)),(576,i*320+25))
+ family.save(r/'b-sluttfamilie.png')
+ for start in range(0,len(fields),8):
+  page=Image.new('RGB',(1280,4*270),(45,45,45));d=ImageDraw.Draw(page)
+  for k,(j,o,s,t) in enumerate(fields[start:start+8]):
+   xx=(k%2)*640;yy=(k//2)*270;d.text((xx+3,yy+3),j+' '+o,fill='white');s.thumbnail((310,235));t.thumbnail((310,235));page.paste(s,(xx,yy+30));page.paste(t,(xx+320,yy+30))
+  page.save(r/f'b-sluttfelt-{start//8+1}.png')
+ locks=[]
+ for f in (['kildehash.json','root-ekstra-kildehash.json'] if batch!=49 else ['b-kildehash.json']):
+  for z in json.loads((r/f).read_text()):assert h(z['fil'])==z['sha256'];locks.append(z['fil'])
+ (r/'b-sluttbevis.json').write_text(json.dumps({'kilder_uendret':len(locks),'leveranser':proof},ensure_ascii=False,indent=2)+'\n');print(batch,len(proof),len(fields),[(z['jobb'],z['egenkontroll']) for z in proof])

@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess,shutil
+r=Path('rapporter/bestilling047-20261013');p=r/'b-070-01-fullmaster.png';shutil.copy2(p,r/'b-070-01-fullmaster-for-kantretting.png');out=Image.open(p).convert('RGB');raw=Image.open(r/'b-070-01-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS)
+# Hele nye komponentrektangler. Fjæring kun mot topp/bunn/høyre, ikke venstre hvor motivet treffer feltgrensen.
+for x,y,w,h in [(512,352,160,128),(960,0,192,160)]:
+ yy,xx=np.mgrid[:h,:w];a=Image.fromarray((np.clip(np.minimum.reduce([w-xx,yy+1,h-yy])/6,0,1)*255).astype('uint8'));out.paste(raw.crop((x,y,x+w,y+h)),(x,y),a)
+out.save(p)
+for d,x in [(1,0),(2,384)]:
+ j=f'lag070_01_del{d}av2';im=Image.new('RGB',(1536,1024),(128,128,128));im.paste(out.crop((x,0,x+1536,800)),(0,112));im.save(f'jobber/{j}/resultat.png');run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr)
