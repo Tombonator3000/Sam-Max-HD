@@ -113,7 +113,7 @@ send)
 	if git -C "$TREE" diff --cached --quiet; then
 		echo "Ingen endringer å sende."
 	else
-		git -C "$TREE" commit -q -m "Claude: jobber og status $(date '+%Y-%m-%d %H:%M')"
+		git -C "$TREE" commit -q -m "Claude: jobber og status $(TZ=Europe/Oslo date '+%Y-%m-%d %H:%M')"
 		if [ "${SEND_UTEN_PUSH:-0}" = "1" ]; then
 			echo "Committet lokalt i $TREE (ikke pushet)."
 		else

@@ -318,6 +318,16 @@ def _write_job(jobs_dir: Path, job: Job, image: Image.Image, prompt: str, style_
     (d / "jobb.json").write_text(json.dumps(data, indent=1, ensure_ascii=False))
 
 
+def norsk_tid(fmt: str) -> str:
+    """Klokka i Norge, også når maskinen går på UTC (skyen). Uten tidssonedata: maskinens tid."""
+    try:
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        return datetime.now(ZoneInfo("Europe/Oslo")).strftime(fmt)
+    except Exception:
+        return time.strftime(fmt)
+
+
 def read_room_names(path: Path | None) -> dict[int, str]:
     """Romnavnene i docs/rom-oversikt.csv (kolonnen navn). RNAM i Sam & Max er tom."""
     if not path or not Path(path).exists():
@@ -1847,7 +1857,7 @@ def write_list(work: Path, batch: int = 10, pilot_phase: bool = False) -> Path:
     fig_done, fig_total = _piece_progress(work, rows, "figur")
     sheets = {_image_of(r) for r in by["figur"]}
     later = "Etter godkjent stilpilot" if pilot_phase else "Nå"
-    lines = ["# Grafikkliste", "", time.strftime("Oppdatert %Y-%m-%d %H:%M (norsk tid)"), "",
+    lines = ["# Grafikkliste", "", norsk_tid("Oppdatert %Y-%m-%d %H:%M (norsk tid)"), "",
              "Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. "
              "Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.", "",
              "## Oversikt", "",
@@ -1962,7 +1972,7 @@ def write_orders(work: Path, batch: int = 10, anchors: list[str] | None = None,
     status = {r["jobb"]: r["status"] for r in rows}
     masters = master_sheets(work)
 
-    lines = ["# Ordre fra Claude", "", time.strftime("Oppdatert %Y-%m-%d %H:%M (norsk tid)"), "",
+    lines = ["# Ordre fra Claude", "", norsk_tid("Oppdatert %Y-%m-%d %H:%M (norsk tid)"), "",
              "Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og "
              "`BESTILLING.md` i denne grenen.", "",
              "## Status", "",
