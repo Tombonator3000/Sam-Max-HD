@@ -189,3 +189,7 @@
 
 - Bestilling 21: åtte klare (7 OK og rom092 SJEKK), rom090/obj901 uavklarte FEIL og ukrysset. Fargede klær/egen surfersilhuett, svakt UIunderlag og første seksobjekt-lag kontrollert. Metodevalg for to flate kandidater spurt separat. Se `rapporter/bestilling021-20261013/RAPPORT.md`. Bestilling 22 fortsetter.
 - Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i rapporter/bestilling021-20261013/.
+
+## 2026-10-13T21:06:06+02:00 (Codex, Astra)
+
+- Rom090 og obj901_01 levert OK etter Toms uttrykkelige vektorvalg, med native SVG, originalens flate palett og uavhengig motiv-/geometrikontroll. Dette erstatter de to FEIL-kandidatene i bestilling 21. Alle 76 rombakgrunner er nå levert som grafikk; obj187_05 og obj307_01 står fortsatt uavklart. Ingen import eller runtime. Se `rapporter/rom090-obj901-vektor-20261013/`.

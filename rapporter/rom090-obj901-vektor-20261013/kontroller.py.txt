@@ -1,0 +1,40 @@
+from pathlib import Path
+import json,hashlib,math,shutil,subprocess,xml.etree.ElementTree as ET
+from PIL import Image,ImageDraw
+import numpy as np
+out=Path(__file__).resolve().parent;root=out.parents[1]
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def distance(p,a,b):
+ dx,dy=b[0]-a[0],b[1]-a[1]
+ t=0 if dx==dy==0 else max(0,min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/(dx*dx+dy*dy)))
+ return math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dy)
+summary=[]
+sheet=Image.new('RGB',(1536,2*3*420),(200,200,200));draw=ImageDraw.Draw(sheet)
+for n,j in enumerate(['rom090','obj901_01']):
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());x,y,w,h=m['bilde_i_lerret'];g=json.loads((out/f'{j}-geometri.json').read_text())
+ raw=(out/f'{j}-motiv.svg').read_text().splitlines();svg='\n'.join(['<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024">','<rect width="1536" height="1024" fill="rgb(128,128,128)"/>',f'<g transform="translate({x},{y}) scale(4)">']+raw[1:-1]+['</g>','</svg>'])+'\n';(out/f'{j}-kandidat.svg').write_text(svg)
+ assert '<image' not in svg and 'gradient' not in svg.lower()
+ im=Image.open(out/f'{j}-kandidat.png').convert('RGB');a=np.array(im);pad=np.ones((1024,1536),bool);pad[y:y+h,x:x+w]=False;assert np.all(a[pad]==128)
+ assert np.array_equal(a[y:y+h,x:x+w],np.array(Image.open(out/f'{j}-motiv.png')))
+ metrics=[]
+ for k,chain in enumerate(g['geometry']):
+  src=chain['source'];vec=chain['vector'];assert src[0]==vec[0] and src[-1]==vec[-1]
+  error=max(min(distance(p,u,v) for u,v in zip(vec,vec[1:])) for p in src)
+  assert error<=.80000001
+  metrics.append({'chain':k,'max_distance':error,'source_vertices':len(src),'vector_vertices':len(vec)})
+ sourcepts=[p for c in g['geometry'] for p in c['source']];vecpts=[p for c in g['geometry'] for p in c['vector']]
+ bbox=lambda pts:[min(p[0] for p in pts),min(p[1] for p in pts),max(p[0] for p in pts),max(p[1] for p in pts)]
+ assert bbox(sourcepts)==bbox(vecpts)==[0,0,w//4,h//4]
+ clone=out/f'kontroll-{j}';clone.mkdir(exist_ok=True)
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:shutil.copy2(d/f,clone/f);assert sha(d/f)==sha(clone/f)
+ shutil.copy2(out/f'{j}-kandidat.png',clone/'resultat.png')
+ run=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(clone/'resultat.png')],capture_output=True,text=True);(out/f'{j}-kontroll.txt').write_text(run.stdout+run.stderr)
+ for col,(label,path) in enumerate([('Original',d/'referanse.png'),('Tidligere imagegen FEIL',d/'resultat.png'),('Native vektor',out/f'{j}-kandidat.png')]):
+  # one large row per version, fit canvas without changing aspect ratio
+  pic=Image.open(path).convert('RGB');pic.thumbnail((1536,390));xx=(1536-pic.width)//2;yy=(n*3+col)*420+25;sheet.paste(pic,(xx,yy));draw.text((10,yy-20),j+' '+label,fill='black')
+ info={'jobb':j,'egenkontroll':{0:'OK',1:'SJEKK',2:'FEIL'}.get(run.returncode,'FEIL'),'kontrollfil':f'{j}-kontroll.txt','png':f'{j}-kandidat.png','png_sha256':sha(out/f'{j}-kandidat.png'),'svg':f'{j}-kandidat.svg','svg_sha256':sha(out/f'{j}-kandidat.svg'),'motiv_svg_sha256':sha(out/f'{j}-motiv.svg'),'kildegeometri_bbox':bbox(sourcepts),'vektorgeometri_bbox':bbox(vecpts),'uendrede_kjedeendepunkter':True,'maks_maalt_grenseavvik_originalpiksler':max(e['max_distance'] for e in metrics),'source_vertices':sum(e['source_vertices'] for e in metrics),'vector_vertices':sum(e['vector_vertices'] for e in metrics),'source_palette_count':g['source_palette_count'],'source_region_loops':g['source_region_loops'],'vector_region_loops':g['vector_region_loops'],'canvas':[1536,1024],'motiv':[x,y,w,h],'padding':[128,128,128],'dekning_uten_hull':True,'native_bitmapfri_svg':True,'antialias':'16 samples per originalpixel, BOX til4x; flate fyllfarger bevares, kantdekning lager mellomtoner','runtime':False,'individuell_bildegodkjenning':False,'jobbmappen_overskrevet':False,'kjeder':metrics}
+ (out/f'{j}-geometriqa.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n');summary.append({k:v for k,v in info.items() if k!='kjeder'});print(run.stdout)
+sheet.save(out/'samlet-foer-etter.png')
+locks=json.loads((out/'kildehash.json').read_text());assert all(sha(root/e['fil'])==e['sha256'] for e in locks)
+(out/'leveranser.json').write_text(json.dumps({'leveranser':summary,'beskyttede_kilder_uendret':len(locks),'oppskrift_sha256':sha(out/'rekonstruer.py.txt'),'kontrolloppskrift_sha256':sha(Path(__file__)),'checker_sha256':sha(root/'verktoy/sjekk_leveranse.py')},ensure_ascii=False,indent=2)+'\n')

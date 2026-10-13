@@ -1,0 +1,30 @@
+from pathlib import Path
+import json,hashlib
+out=Path(__file__).resolve().parent;root=out.parents[1]
+jobs=['rom090','obj901_01']
+locked=[{'fil':f'jobber/{j}/{f}','sha256':hashlib.sha256((root/f'jobber/{j}/{f}').read_bytes()).hexdigest()} for j in jobs for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']]
+(out/'kildehash.json').write_text(json.dumps(locked,indent=2)+'\n')
+(out/'TOMS-METODEVALG.json').write_text(json.dumps({'brukerutsagn':'Bruk presis vektorrekonstruksjon for begge','kontekst':'Direkte brukerutsagn om rom090 og obj901_01, videresendt av root 2026-10-13.','gjelder_kun':jobs,'metode':'Kildenative delte grensekjeder, RDP 0.8, native SVG med flate kildefarger, sample-senter og halvåpen even-odd scanline-rendering.','ingen_generell_vektortillatelse':True,'produksjonsjobbmapper_endres':False,'mottak_og_levering':'root'},ensure_ascii=False,indent=2)+'\n')
+old=root/'rapporter/rom077-vektor-20261013/rekonstruer.py.txt'
+s=old.read_text()
+s=s.replace("source = out / 'original-full.png'","import sys\njob_id=sys.argv[1]\nassert job_id in ['rom090','obj901_01']\nsource=root/'jobber'/job_id/'original_1x.png'\njob=json.loads((source.parent/'jobb.json').read_text())")
+s=s.replace('assert (width, height) == (640, 200)','assert (width,height)==tuple(job["region"][2:])')
+s=s.replace('assert len(palette) == 6','assert len(palette)==(41 if job_id=="rom090" else 8)')
+s=s.replace("    road_ends = {frozenset(((371,132),(478,78))),frozenset(((482,78),(589,132)))}\n    if frozenset((path[0],path[-1])) in road_ends:\n        cleaned = rdp(path,1.6)\n",'')
+s=s.replace('width="2560" height="800"','width="{width*4}" height="{height*4}"')
+s=s.replace("out/'rom077-master.svg'","out/f'{job_id}-motiv.svg'")
+s=s.replace('master = render.resize((2560,800),Image.Resampling.BOX)','master = render.resize((width*4,height*4),Image.Resampling.BOX)')
+start=s.index("master.save(out/'rom077-master.png')");end=s.index('detail = {',start)
+s=s[:start]+'''master.save(out/f'{job_id}-motiv.png')
+canvas=Image.new('RGB',(1536,1024),(128,128,128))
+px,py,pw,ph=job['bilde_i_lerret']
+assert master.size==(pw,ph)
+canvas.paste(master,(px,py))
+canvas.save(out/f'{job_id}-kandidat.png')
+'''+s[end:]
+s=s.replace("'maximum_chain_simplification_distance_source_px':1.6","'maximum_chain_simplification_distance_source_px':0.8")
+s=s.replace("    'road_side_boundary_tolerance_source_px':1.6,\n    'road_side_endpoints_unchanged':True,\n",'')
+s=s.replace("'Bruk presis vektorrekonstruksjon for rom077'","'Bruk presis vektorrekonstruksjon for begge (kun rom090 og obj901_01)' ")
+s=s.replace("out/'geometri.json'","out/f'{job_id}-geometri.json'")
+(out/'rekonstruer.py.txt').write_text(s)
+(out/'metodeproveniens.json').write_text(json.dumps({'oppskrift_kilde':str(old.relative_to(root)),'oppskrift_kilde_sha256':hashlib.sha256(old.read_bytes()).hexdigest(),'endringer':['generiske dimensjoner og metadata-plassering','RDP 0.8 for alle kjeder, ingen vei-unntak','to separat navngitte SVG/PNG/kontrollsett'],'forbered_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},ensure_ascii=False,indent=2)+'\n')

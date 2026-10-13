@@ -1,0 +1,90 @@
+from pathlib import Path
+import hashlib, json, re, shutil, subprocess
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+root = Path(__file__).resolve().parents[2]
+report = Path(__file__).resolve().parent
+python = '/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+
+def update_queue(entries, note):
+    p = root/'GRAFIKKLISTE.md'
+    text = p.read_text()
+    for e in entries:
+        assert e['klar_for_mottak'] and e['egenkontroll'] != 'FEIL'
+        old = '- [ ] `'+e['jobb']+'`'
+        assert text.count(old) == 1
+        text = text.replace(old, '- [x] `'+e['jobb']+'`')
+    text += '\n'+note+'\n'
+    ids = [j for j in re.findall(r'^- \[x\] `([^`]+)`', text, re.M) if (root/'jobber'/j/'jobb.json').is_file()]
+    metas = {j:json.loads((root/'jobber'/j/'jobb.json').read_text()) for j in ids}
+    latest = {}
+    for f in sorted((root/'rapporter').glob('bestilling*-20261013/fremdrift.json')):
+        for e in json.loads(f.read_text())['leveranser']:
+            latest[e['jobb']] = e
+    for f in sorted((root/'rapporter').glob('*vektor*-20261013/fremdrift.json')):
+        for e in json.loads(f.read_text())['leveranser']:
+            latest[e['jobb']] = e
+    bgs = [j for j,m in metas.items() if m['type']=='rom']
+    objs = [j for j,m in metas.items() if m['type']=='objekt']
+    layers = [m for m in metas.values() if m['type']=='lag']
+    rooms = {metas[j]['rom'] for j in bgs}
+    complete = [v for v in rooms if len([j for j in bgs if metas[j]['rom']==v]) == max(metas[j].get('deler',1) for j in bgs if metas[j]['rom']==v)]
+    count = lambda js:sum(latest.get(j,{}).get('egenkontroll')=='SJEKK' for j in js)
+    stamp = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+    text = re.sub(r'Oppdatert [^\n]+', 'Oppdatert '+stamp+' (norsk tid)', text, count=1)
+    text = re.sub(r'\| Rombakgrunner \| [^|]+ \|', f'| Rombakgrunner | {len(complete)} hele rom levert ({len(bgs)} deler), inkludert {count(bgs)} SJEKK, pilotrom visuelt godkjent |', text, count=1)
+    text = re.sub(r'\| Store objektbilder \(nærbilder, kart og store deler\) \| [^|]+ \|', f'| Store objektbilder (nærbilder, kart og store deler) | {len(objs)} levert, inkludert {count(objs)} SJEKK |', text, count=1)
+    text = re.sub(r'(\| Små objektbilder i lag [^|]+\|) [^|]+ \|', r'\1 '+str(sum(len(v.get('objekter',[])) for v in layers))+' bilder levert ('+str(len(layers))+' lagjobber) |', text, count=1)
+    p.write_text(text)
+    return {'grafikkjobber':len(ids),'romdeler':len(bgs),'hele_rom':len(complete),'store_objekter':len(objs),'lagjobber':len(layers),'sma_objekter':sum(len(v.get('objekter',[])) for v in layers)}
+
+def seal_and_push(folder, entries, message):
+    for p in list(folder.rglob('*'))+[root/'jobber'/e['jobb']/'notat.md' for e in entries]:
+        if p.is_file() and p.suffix in {'.md','.txt'} and p.name not in {'prompt.txt','SHA256SUMS.txt'}:
+            p.write_text('\n'.join(line.rstrip() for line in p.read_text().splitlines()).rstrip()+'\n')
+    files = sorted(p for p in folder.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')+[root/'jobber'/e['jobb']/name for e in entries for name in ['resultat.png','notat.md']]
+    (folder/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+str(p.relative_to(root))+'\n' for p in files))
+    assert subprocess.check_output(['git','branch','--show-current'],cwd=root,text=True).strip()=='gpt-arbeid'
+    assert not subprocess.check_output(['git','diff','--cached','--name-only'],cwd=root,text=True).strip()
+    paths = [str(folder.relative_to(root)), 'GRAFIKKLISTE.md','todo.md','log.md']+[str((root/'jobber'/e['jobb']/name).relative_to(root)) for e in entries for name in ['resultat.png','notat.md']]
+    subprocess.run(['git','add','--',*paths],cwd=root,check=True)
+    subprocess.run(['git','diff','--cached','--check'],cwd=root,check=True)
+    subprocess.run(['git','commit','-m',message],cwd=root,check=True,capture_output=True,text=True)
+    subprocess.run(['git','push','origin','gpt-arbeid'],cwd=root,check=True,capture_output=True,text=True)
+    return subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+
+def main():
+    from PIL import Image
+    import numpy as np
+    sources=json.loads((report/'kildehash.json').read_text())
+    for e in sources:assert sha(root/e['fil'])==e['sha256']
+    data=json.loads((report/'leveranser.json').read_text())
+    entries=[]
+    for e in data['leveranser']:
+        j=e['jobb'];candidate=report/e['png']
+        assert sha(candidate)==e['png_sha256'] and sha(report/e['svg'])==e['svg_sha256']
+        im=Image.open(candidate);assert im.size==(1536,1024) and im.mode=='RGB'
+        a=np.asarray(im);x,y,w,h=e['motiv'];outside=np.ones(a.shape[:2],bool);outside[y:y+h,x:x+w]=False
+        assert np.all(a[outside]==128)
+        shutil.copyfile(candidate,root/'jobber'/j/'resultat.png')
+        result=subprocess.run([python,str(root/'verktoy/sjekk_leveranse.py'),str(root/'jobber'/j/'resultat.png')],text=True,capture_output=True,check=True)
+        (report/f'{j}-egenkontroll-levert.txt').write_text(result.stdout)
+        (root/'jobber'/j/'notat.md').write_text(f'# {j}\n\nTom valgte uttrykkelig presis vektorrekonstruksjon for denne jobben. Tidligere imagegen-kandidat med FEIL er arkivert i rapportmappen og erstattet av native SVG og rasterisert PNG.\n\n'+('Sam-hode med hatt, to avskårne Max-ører, blå hyller med tett dekor og draperi er bevart. Ingen nye kropper eller våpen. De 41 kildefargene og 2274 regionløkkene består; tett smågrafikk er fortsatt delvis trappet.' if j=='rom090' else 'Tomt rødt felt, skjev mørk søm og lav avklipt sokkeltopp er bevart. Ingen hårtust, støtte eller ny oval kant. Åtte kildefarger og elleve regionløkker.')+f'\n\nDelte grensekjeder forenklet høyst 0,8 originalpiksel, endepunkter uendret. Flate native SVG-paths uten bitmap eller gradient. Samplesenterbasert even-odd-raster med halvåpne intervaller og antialiasing. Lerret RGB 1536 × 1024, motiv {e["motiv"]}, eksakt grå padding 128.\n\nUendret sjekk_leveranse.py: OK. Root har sett før/etter, C har kontrollert uavhengig. Åtte beskyttede kilder er uendret. Ingen motorimport, runtime eller ny individuell bildegodkjenning. Metode, geometrimålinger, oppskrift og SVG er bevart i rapporter/rom090-obj901-vektor-20261013/.\n\nSHA-256 resultat: {e["png_sha256"]}\n')
+        item=dict(e)
+        item.update(resultat=f'jobber/{j}/resultat.png',sha256=e['png_sha256'],svg=str((report/e['svg']).relative_to(root)),svg_sha256=e['svg_sha256'],kontrollfil=str((report/f'{j}-egenkontroll-levert.txt').relative_to(root)),klar_for_mottak=True,visuelt_godkjent=False,importert=False,runtime=False,runtime_verifisert=False,produksjonsagent='gpt-6-astra',metode='Presis vektorrekonstruksjon, uttrykkelig valgt av Tom',jobbmappen_overskrevet=True)
+        entries.append(item)
+    stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+    (report/'fremdrift.json').write_text(json.dumps({'dato':stamp,'gren':'gpt-arbeid','leveranser':entries,'beskyttede_kilder_uendret':8},ensure_ascii=False,indent=2)+'\n')
+    note='Rom090 og obj901_01 levert OK etter Toms uttrykkelige vektorvalg, med native SVG, originalens flate palett og uavhengig motiv-/geometrikontroll. Dette erstatter de to FEIL-kandidatene i bestilling 21. Alle 76 rombakgrunner er nå levert som grafikk; obj187_05 og obj307_01 står fortsatt uavklart. Ingen import eller runtime. Se `rapporter/rom090-obj901-vektor-20261013/`.'
+    counts=update_queue(entries,note)
+    (report/'root-mottak.json').write_text(json.dumps({'dato':stamp,'mottatt':True,'root_visuell_motivkontroll':True,'c_uavhengig_qa':'c-uavhengig-qa.md','telling':counts,'ny_brukergodkjenning':False,'importert':False,'runtime':False},ensure_ascii=False,indent=2)+'\n')
+    with (report/'RAPPORT.md').open('a') as f:f.write('\n## Endelig mottak\n\nRoot har sett original, tidligere kandidat og vektor sammen, lest C sin kontroll og kjørt uendret checker på de faktiske jobbleveransene: begge OK. PNG og notat er lagt i jobbmappene. Kandidatbeskrivelsen over gjelder tidligere status før dette mottaket; aktuell leveransestatus står i fremdrift.json og root-mottak.json. Ingen ny individuell bildeaksept, motorimport eller runtime.\n')
+    with (root/'todo.md').open('a') as f:f.write('\n- [x] Rom090 og obj901_01 rettet og levert OK med uttrykkelig valgt vektorrekonstruksjon; tidligere bestilling 21-avvik erstattet.\n')
+    with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex, Astra)\n\n- '+note+'\n')
+    for e in sources:assert sha(root/e['fil'])==e['sha256']
+    commit=seal_and_push(report,entries,'GPT: presis vektorrekonstruksjon av rom090 og tomt sokkelfelt')
+    print(json.dumps({'commit':commit,'telling':counts},ensure_ascii=False))
+
+if __name__=='__main__':main()

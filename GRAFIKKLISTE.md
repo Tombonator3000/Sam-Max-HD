@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 20:53 (norsk tid)
+Oppdatert 2026-10-13 21:06 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 75 hele rom levert (114 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 83 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 6 bilder levert (1 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -320,12 +320,12 @@ Rom 83, 84, 85, 86, 87, 88.
 Rom 2, 89, 90, 91, 92, 94.
 
 - [x] `rom089` (rom 89 Hyssingnøstet fra en annen vinkel)
-- [ ] `rom090` (rom 90 Sam og Max med pistoler)
+- [x] `rom090` (rom 90 Sam og Max med pistoler)
 - [x] `rom091_del1av2` (rom 91 Påkledning, Sam (silhuetter), del 1/2)
 - [x] `rom091_del2av2` (rom 91 Påkledning, Sam (silhuetter), del 2/2)
 - [x] `obj850_01` (rom 91 Påkledning, Sam (silhuetter), objekt 850 tilstand 01)
 - [x] `rom092` (rom 92 Alkoven (nærbilde))
-- [ ] `obj901_01` (rom 92 Alkoven (nærbilde), objekt 901 tilstand 01)
+- [x] `obj901_01` (rom 92 Alkoven (nærbilde), objekt 901 tilstand 01)
 - [x] `obj995_01` (rom 94 Inventaret og samtaleikonene, objekt 995 tilstand 01)
 - [x] `obj996_01` (rom 94 Inventaret og samtaleikonene, objekt 996 tilstand 01)
 - [x] `lag002_01` (rom 2 Laboratoriet (intro), lag 01 med 6 objektbilder, bilde to `jobber/rom002/resultat.png`)
@@ -3467,3 +3467,5 @@ Bestilling 19: 7 OK og 3 SJEKK (obj819/822/831), ti bilder levert. Snøkulenes o
 Bestilling 20: 9 OK og rom083 SJEKK, ti bilder levert. Separate sky-/figurtilstander, tre Wax Me-kort med identiske overlapper, egen tett skog og kildekontrollerte bybilder. Se `rapporter/bestilling020-20261013/RAPPORT.md`. Bestilling 21 fortsetter.
 
 Bestilling 21: åtte klare (7 OK og rom092 SJEKK), rom090/obj901 uavklarte FEIL og ukrysset. Fargede klær/egen surfersilhuett, svakt UIunderlag og første seksobjekt-lag kontrollert. Metodevalg for to flate kandidater spurt separat. Se `rapporter/bestilling021-20261013/RAPPORT.md`. Bestilling 22 fortsetter.
+
+Rom090 og obj901_01 levert OK etter Toms uttrykkelige vektorvalg, med native SVG, originalens flate palett og uavhengig motiv-/geometrikontroll. Dette erstatter de to FEIL-kandidatene i bestilling 21. Alle 76 rombakgrunner er nå levert som grafikk; obj187_05 og obj307_01 står fortsatt uavklart. Ingen import eller runtime. Se `rapporter/rom090-obj901-vektor-20261013/`.

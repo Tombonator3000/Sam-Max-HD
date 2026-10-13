@@ -1,11 +1,11 @@
 # obj901_01
 
-Tom sokkeltilstand uten hår og støtte. Fortsatt teknisk FEIL. Den nytegnede sokkelranden og den rette mørke sømmen er ikke tilstrekkelig kildetro: kilden har mer trinnvis kant. Valgt forsøk 2 før palettmapping; ikke klar for mottak.
+Tom valgte uttrykkelig presis vektorrekonstruksjon for denne jobben. Tidligere imagegen-kandidat med FEIL er arkivert i rapportmappen og erstattet av native SVG og rasterisert PNG.
 
-Innebygd ChatGPT-bildegenerator, 2 fullforsøk. Eksakt modellnavn er ikke eksponert. Ordrett jobbprompt og separat kildepresisering er bevart sammen med alle råforsøk i rapporter/bestilling021-20261013/a-obj901_01-*. Første forsøk brukte originalreferansen og godkjent stil/rom007_del1av2.png. Andre forsøk, der relevant, brukte originalreferansen alene. Ingen avvist kandidat var stilanker.
+Tomt rødt felt, skjev mørk søm og lav avklipt sokkeltopp er bevart. Ingen hårtust, støtte eller ny oval kant. Åtte kildefarger og elleve regionløkker.
 
-Valgt bilde er RGB 1536 x 1024, motivrektangel 512, 256, 512, 512, padding nøyaktig RGB 128. Kun hel klipping/plassering av generert bilde; ingen originalpikselmaske eller lokal warp. Uendret sjekk_leveranse.py: FEIL. Se rapporter/bestilling021-20261013/a-obj901_01-kontroll.txt.
+Delte grensekjeder forenklet høyst 0,8 originalpiksel, endepunkter uendret. Flate native SVG-paths uten bitmap eller gradient. Samplesenterbasert even-odd-raster med halvåpne intervaller og antialiasing. Lerret RGB 1536 × 1024, motiv [512, 256, 512, 512], eksakt grå padding 128.
 
-SHA-256: 3fc9647e16ed845a788c4a0658c668e5964a263393277989e70d66684632004c
+Uendret sjekk_leveranse.py: OK. Root har sett før/etter, C har kontrollert uavhengig. Åtte beskyttede kilder er uendret. Ingen motorimport, runtime eller ny individuell bildegodkjenning. Metode, geometrimålinger, oppskrift og SVG er bevart i rapporter/rom090-obj901-vektor-20261013/.
 
-Kilder: jobbens original_1x.png, referanse.png, jobb.json og prompt.txt; c-kildeplan.md og GRUNNLAG.md. Samlet kilde-QA, oppskrift, palettdiagnose og manifest finnes i samme rapportmappe. Teknisk kontroll er ikke visuell brukergodkjenning. Ikke importert eller runtime-testet.
+SHA-256 resultat: e46386ff15656606dba8bbf30c09c75b55230b5172f1f042d1fa103f8a252cac

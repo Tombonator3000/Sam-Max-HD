@@ -1,11 +1,11 @@
 # rom090
 
-Avskåret Sam-hode med hatt og to Max-ører, hyller og mørke målformer, blått felt og nederste draperi. Ingen hele kropper, Max-ansikt eller pistoler. Fortsatt teknisk FEIL. Nye draperifolder avviker fra kildens nederste midtfelt; palettmapping løste ikke dette. Valgt forsøk 2 før palettmapping.
+Tom valgte uttrykkelig presis vektorrekonstruksjon for denne jobben. Tidligere imagegen-kandidat med FEIL er arkivert i rapportmappen og erstattet av native SVG og rasterisert PNG.
 
-Innebygd ChatGPT-bildegenerator, 2 fullforsøk. Eksakt modellnavn er ikke eksponert. Ordrett jobbprompt og separat kildepresisering er bevart sammen med alle råforsøk i rapporter/bestilling021-20261013/a-rom090-*. Første forsøk brukte originalreferansen og godkjent stil/rom007_del1av2.png. Andre forsøk, der relevant, brukte originalreferansen alene. Ingen avvist kandidat var stilanker.
+Sam-hode med hatt, to avskårne Max-ører, blå hyller med tett dekor og draperi er bevart. Ingen nye kropper eller våpen. De 41 kildefargene og 2274 regionløkkene består; tett smågrafikk er fortsatt delvis trappet.
 
-Valgt bilde er RGB 1536 x 1024, motivrektangel 128, 272, 1280, 480, padding nøyaktig RGB 128. Kun hel klipping/plassering av generert bilde; ingen originalpikselmaske eller lokal warp. Uendret sjekk_leveranse.py: FEIL. Se rapporter/bestilling021-20261013/a-rom090-kontroll.txt.
+Delte grensekjeder forenklet høyst 0,8 originalpiksel, endepunkter uendret. Flate native SVG-paths uten bitmap eller gradient. Samplesenterbasert even-odd-raster med halvåpne intervaller og antialiasing. Lerret RGB 1536 × 1024, motiv [128, 272, 1280, 480], eksakt grå padding 128.
 
-SHA-256: 31e86532809fcee06468455ee47e16c8b649b7889fe9d6c395375710b93dbb00
+Uendret sjekk_leveranse.py: OK. Root har sett før/etter, C har kontrollert uavhengig. Åtte beskyttede kilder er uendret. Ingen motorimport, runtime eller ny individuell bildegodkjenning. Metode, geometrimålinger, oppskrift og SVG er bevart i rapporter/rom090-obj901-vektor-20261013/.
 
-Kilder: jobbens original_1x.png, referanse.png, jobb.json og prompt.txt; c-kildeplan.md og GRUNNLAG.md. Samlet kilde-QA, oppskrift, palettdiagnose og manifest finnes i samme rapportmappe. Teknisk kontroll er ikke visuell brukergodkjenning. Ikke importert eller runtime-testet.
+SHA-256 resultat: 06ae2400e4bd3a42b6f11b48add3d5f94b4d4078eedc1d5284fa419b25ad1570
