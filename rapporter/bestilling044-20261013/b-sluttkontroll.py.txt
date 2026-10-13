@@ -1,0 +1,39 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,importlib.util,subprocess
+r=Path('rapporter/bestilling044-20261013');py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';spec=importlib.util.spec_from_file_location('chk','verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+jobs=['lag058_01_del1av2','lag058_01_del2av2','lag058_02_del2av2','lag059_01_del2av2','lag059_02_del1av2','lag059_03_del1av2','lag059_04_del1av2','lag060_01_del2av2','lag060_02_del2av2'];proof=[];fields=[];h=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+master=Image.open(r/'b-058-fullmaster.png').convert('RGB')
+family=Image.new('RGB',(1152,len(jobs)*320),(35,35,35));fd=ImageDraw.Draw(family)
+for i,j in enumerate(jobs):
+ p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());im=Image.open(p/'resultat.png').convert('RGB');src=Image.open(p/'referanse.png').convert('RGB');base=Image.open(m['bilde_to']).convert('RGB');mask=np.zeros((1024,1536),bool);rx=m['region'][0]
+ boxes=[]
+ for o in m['objekter']:
+  x,y,w,hh=o['rekt'];cx=(x-rx)*4;cy=112+y*4;box=(cx,cy,cx+w*4,cy+hh*4);boxes.append(box)
+  if box[0]<1536 and box[2]>0:mask[max(0,cy):min(1024,cy+hh*4),max(0,cx):min(1536,cx+w*4)]=True
+  fields.append((j,o['bilde'],src.crop(box),im.crop(box)))
+ if j.startswith('lag058_01'):
+  for x,y,w,hh in [(0,112,184,80),(192,80,24,24),(360,80,48,56)]:
+   cx=(x-rx)*4;cy=112+y*4;mask[cy:cy+hh*4,max(0,cx):min(1536,cx+w*4)]=True
+  assert np.array_equal(np.array(im)[112:912],np.array(master)[:,rx*4:rx*4+1536])
+ if j in jobs[4:7]:
+  mask[208:848,608:800]=True
+  under=Image.open(r/'b-059-underlag570.png').convert('RGB');a=np.array(im);b=np.array(under);region=np.zeros((1024,1536),bool);region[208:848,608:800]=True;region[208:400,512:800]=False;assert np.array_equal(a[region],b[region])
+ outside=int(np.any(np.array(im)!=np.array(base),axis=2)[~mask].sum());assert outside==0,(j,outside)
+ run=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);cf=r/f'b-{j}-sluttkontroll.txt';cf.write_text(run.stdout+run.stderr);status=['OK','SJEKK','FEIL'][run.returncode];measurement=c.compare(Image.open(p/'original_1x.png'),im.crop((0,112,1536,912)));fm=[]
+ for o in m['objekter']:
+  x,y,w,hh=o['rekt'];x0=max(0,x-rx);x1=min(384,x-rx+w);a=measurement['eo'][y:y+hh,x0:x1];b=measurement['es'][y:y+hh,x0:x1];co=c.corr(a,b);fm.append({'objekt':o['bilde'],'kantlikhet':co,'status':'OK' if co>=.6 else 'SJEKK' if co>=.5 else 'FEIL'})
+ proof.append({'jobb':j,'sha256':h(p/'resultat.png'),'egenkontroll':status,'kontrollfil':str(cf),'utenfor_union':outside,'felt':fm})
+ family.paste(src.resize((576,288)),(0,i*320+25));family.paste(im.resize((576,288)),(576,i*320+25));fd.text((5,i*320+5),j+' original / HD '+status,fill='white')
+family.save(r/'b-sluttfamilie.png')
+for start in range(0,len(fields),4):
+ page=Image.new('RGB',(1024,4*300),(40,40,40));d=ImageDraw.Draw(page)
+ for k,(j,o,s,t) in enumerate(fields[start:start+4]):
+  d.text((5,k*300+5),j+' '+o,fill='white');s.thumbnail((500,265));t.thumbnail((500,265));page.paste(s,(0,k*300+30));page.paste(t,(512,k*300+30))
+ page.save(r/f'b-sluttfelt-{start//4+1}.png')
+locks=[]
+for name in ['kildehash.json','root-ekstra-kildehash.json']:
+ for z in json.loads((r/name).read_text()):assert h(z['fil'])==z['sha256'];locks.append(z['fil'])
+assert np.array_equal(np.array(Image.open('jobber/lag058_01_del1av2/resultat.png'))[112:912,384:1536],np.array(Image.open('jobber/lag058_01_del2av2/resultat.png'))[112:912,:1152])
+(r/'b-sluttbevis.json').write_text(json.dumps({'kilder_uendret':len(locks),'fullmaster':str(r/'b-058-fullmaster.png'),'fullmaster_sha256':h(r/'b-058-fullmaster.png'),'overlapp':[1152,800],'klipp':[0,384],'leveranser':proof},ensure_ascii=False,indent=2)+'\n')
+print([(z['jobb'],z['egenkontroll'],z['felt']) for z in proof])

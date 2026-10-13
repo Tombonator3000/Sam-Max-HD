@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 00:11 (norsk tid)
+Oppdatert 2026-10-14 00:13 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 426 bilder levert (206 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 440 bilder levert (216 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -664,16 +664,16 @@ Rom 53, 54, 55, 56.
 
 Rom 56, 58, 59, 60.
 
-- [ ] `lag056_06` (rom 56 Kjøkkenet, lag 06 med 2 objektbilder, bilde to `jobber/rom056/resultat.png`)
-- [ ] `lag058_01_del1av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), lag 01 med 2 objektbilder, del 1/2, bilde to `jobber/rom058_del1av2/resultat.png`)
-- [ ] `lag058_01_del2av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom058_del2av2/resultat.png`)
-- [ ] `lag058_02_del2av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), lag 02 med 3 objektbilder, del 2/2, bilde to `jobber/rom058_del2av2/resultat.png`)
-- [ ] `lag059_01_del2av2` (rom 59 Dinosaurene (T. rex og mammut), lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom059_del2av2/resultat.png`)
-- [ ] `lag059_02_del1av2` (rom 59 Dinosaurene (T. rex og mammut), lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom059_del1av2/resultat.png`)
-- [ ] `lag059_03_del1av2` (rom 59 Dinosaurene (T. rex og mammut), lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom059_del1av2/resultat.png`)
-- [ ] `lag059_04_del1av2` (rom 59 Dinosaurene (T. rex og mammut), lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom059_del1av2/resultat.png`)
-- [ ] `lag060_01_del2av2` (rom 60 Tarpit Slide, lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom060_del2av2/resultat.png`)
-- [ ] `lag060_02_del2av2` (rom 60 Tarpit Slide, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom060_del2av2/resultat.png`)
+- [x] `lag056_06` (rom 56 Kjøkkenet, lag 06 med 2 objektbilder, bilde to `jobber/rom056/resultat.png`)
+- [x] `lag058_01_del1av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), lag 01 med 2 objektbilder, del 1/2, bilde to `jobber/rom058_del1av2/resultat.png`)
+- [x] `lag058_01_del2av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom058_del2av2/resultat.png`)
+- [x] `lag058_02_del2av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), lag 02 med 3 objektbilder, del 2/2, bilde to `jobber/rom058_del2av2/resultat.png`)
+- [x] `lag059_01_del2av2` (rom 59 Dinosaurene (T. rex og mammut), lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom059_del2av2/resultat.png`)
+- [x] `lag059_02_del1av2` (rom 59 Dinosaurene (T. rex og mammut), lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom059_del1av2/resultat.png`)
+- [x] `lag059_03_del1av2` (rom 59 Dinosaurene (T. rex og mammut), lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom059_del1av2/resultat.png`)
+- [x] `lag059_04_del1av2` (rom 59 Dinosaurene (T. rex og mammut), lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom059_del1av2/resultat.png`)
+- [x] `lag060_01_del2av2` (rom 60 Tarpit Slide, lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom060_del2av2/resultat.png`)
+- [x] `lag060_02_del2av2` (rom 60 Tarpit Slide, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom060_del2av2/resultat.png`)
 
 ## Bestilling 45
 
@@ -3515,3 +3515,5 @@ Bestilling 43: åtte lag levert OK med 21 faktiske feltkontroller. Tomt pelsdrak
 Bestilling 41: ti lag levert OK med 27 faktiske feltkontroller og to byte-identiske panoramaoverlapper. VR-varianten uten sverd bruker allerede valgt vektormetode for samme rom. Se `rapporter/bestilling041-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 
 Bestilling 42: ni lobbylag levert OK med ti faktiske feltkontroller. Festsallaget venter på motivavklaring. Se `rapporter/bestilling042-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+
+Bestilling 44: ti lag levert, åtte OK og to SJEKK (portene, blokk 1,02). Alle 14 egne felt er OK; 570-underlag og panoramaoverlapp er bytekontrollert. Se `rapporter/bestilling044-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.

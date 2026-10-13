@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np
+r=Path('rapporter/bestilling044-20261013');locks=[]
+for f in ['kildehash.json','root-ekstra-kildehash.json']:
+ for z in json.loads((r/f).read_text()):assert hashlib.sha256(Path(z['fil']).read_bytes()).hexdigest()==z['sha256'];locks.append(z['fil'])
+(r/'b-kildehash-start.json').write_text(json.dumps({'uendret':len(locks)},indent=2)+'\n')
+for typ in ['source','hd']:
+ paths=[f'jobber/lag058_01_del{i}av2/referanse.png' if typ=='source' else f'jobber/rom058_del{i}av2/resultat.png' for i in [1,2]];a,b=[Image.open(p).convert('RGB').crop((0,112,1536,912)) for p in paths];assert np.array_equal(np.array(a)[:,384:],np.array(b)[:,:1152]);master=Image.new('RGB',(1920,800));master.paste(a,(0,0));master.paste(b.crop((1152,0,1536,800)),(1536,0));master.save(r/f'b-058-master-{typ}.png')
+# Exact delivered570 underlay composed before jaw edits.
+base=Image.open('jobber/rom059_del1av2/resultat.png').convert('RGB');under=Image.open('jobber/obj570_01/resultat.png').convert('RGB');base.paste(under.crop((672,192,864,832)),(608,208));base.save(r/'b-059-underlag570.png')
+groups={'05802':(['lag058_02_del2av2']*3,[554,559,991],(768,288),[(0,0),(256,0),(512,0)]),'059kjever':([f'lag059_{i:02d}_del1av2' for i in [2,3,4]],[569]*3,(864,192),[(0,0),(288,0),(576,0)]),'059munn':(['lag059_01_del2av2'],[573],(160,128),[(0,0)]),'060porter':(['lag060_01_del2av2','lag060_02_del2av2'],[574,574],(384,288),[(0,0),(192,0)])}
+for key,(jobs,ids,size,pos) in groups.items():
+ ss=Image.new('RGB',size,(128,128,128));hh=ss.copy();rows=[]
+ for j,oid,(sx,sy) in zip(jobs,ids,pos):
+  p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());o=next(o for o in m['objekter'] if o['objekt']==oid);x,y,w,h=o['rekt'];rx=m['region'][0];cx=(x-rx)*4;cy=112+y*4;box=(cx,cy,cx+w*4,cy+h*4);ss.paste(Image.open(p/'referanse.png').crop(box),(sx,sy));anchor=base if oid==569 else Image.open(m['bilde_to']);hh.paste(anchor.crop(box),(sx,sy));rows.append({'jobb':j,'objekt':o['bilde'],'canvas_rekt':[cx,cy,w*4,h*4],'ark_rekt':[sx,sy,w*4,h*4]})
+ ss.save(r/f'b-{key}-source.png');hh.save(r/f'b-{key}-hd.png');(r/f'b-{key}-oppsett.json').write_text(json.dumps({'storrelse':size,'felt':rows},indent=2)+'\n')

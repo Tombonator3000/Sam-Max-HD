@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+extra=json.loads((r/'root-ekstra-kildehash.json').read_text())
+for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+ p=root/'jobber/obj570_01'/f;extra.append({'fil':str(p.relative_to(root)),'sha256':sha(p)})
+(r/'root-ekstra-kildehash.json').write_text(json.dumps(extra,indent=2)+'\n')
+parts=[json.loads((root/'jobber'/j/'jobb.json').read_text()) for j in ['lag058_01_del1av2','lag058_01_del2av2']]
+union=[ob for m in parts for ob in m['objekter']];proof=[]
+for m in parts:
+ im=np.asarray(Image.open(root/'jobber'/m['id']/'original_1x.png').convert('RGB'));base=np.asarray(Image.open((root/m['bilde_to']).parent/'original_1x.png').convert('RGB'));rx,ry,rw,rh=m['region'];mask=np.zeros((rh,rw),bool)
+ for ob in union:
+  x,y,w,h=ob['rekt'];x0=max(0,x-rx);y0=max(0,y-ry);x1=min(rw,x-rx+w);y1=min(rh,y-ry+h)
+  if x1>x0 and y1>y0:mask[y0:y1,x0:x1]=True
+ outside=int((np.any(im!=base,axis=2)&~mask).sum());assert outside==0
+ proof.append({'jobb':m['id'],'union':[o['bilde'] for o in union],'utenfor_union':outside})
+for group in [['lag058_01_del1av2','lag058_01_del2av2'],['rom058_del1av2','rom058_del2av2']]:
+ aa=Image.open(root/'jobber'/group[0]/'original_1x.png');bb=Image.open(root/'jobber'/group[1]/'original_1x.png');assert aa.crop((96,0,384,200)).tobytes()==bb.crop((0,0,288,200)).tobytes()
+a=Image.open(root/'jobber/rom058_del1av2/resultat.png').crop((0,112,1536,912));b=Image.open(root/'jobber/rom058_del2av2/resultat.png').crop((0,112,1536,912));assert a.crop((384,0,1536,800)).tobytes()==b.crop((0,0,1152,800)).tobytes()
+for j in ['lag059_02_del1av2','lag059_03_del1av2','lag059_04_del1av2']:
+ m=json.loads((root/'jobber'/j/'jobb.json').read_text());base=Image.open((root/m['bilde_to']).parent/'original_1x.png').convert('RGB');source=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB');under=Image.open(root/'jobber/obj570_01/original_1x.png').convert('RGB');base.paste(under,(152,24))
+ changes=int(np.any(np.asarray(base.crop((128,24,200,72)))!=np.asarray(source.crop((128,24,200,72))),axis=2).sum())
+ base.paste(source.crop((128,24,200,72)),(128,24));assert base.tobytes()==source.tobytes()
+ proof.append({'jobb':j,'original_570_underlag_pluss_569_eksakt':True,'569_endringer_fra_komponert_underlag':changes,'underlag_hd_kilde_xywh':[672,192,192,640],'underlag_hd_maal_xywh':[608,208,192,640],'underlag_hd_sha256':sha(root/'jobber/obj570_01/resultat.png')})
+(r/'root-geometribevis.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))

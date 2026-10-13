@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np,subprocess
+r=Path('rapporter/bestilling044-20261013');jobs=[]
+def feather(w,h,n=6):
+ y,x=np.mgrid[:h,:w];return Image.fromarray((np.clip(np.minimum.reduce([x+1,w-x,y+1,h-y])/n,0,1)*255).astype('uint8'))
+master=Image.open(r/'b-058-master-hd.png').convert('RGB');raw=Image.open(r/'b-058-master-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS)
+for box in [(0,448,736,320),(768,320,96,96),(1440,320,192,224)]:
+ x,y,w,h=box;master.paste(raw.crop((x,y,x+w,y+h)),(x,y),feather(w,h))
+master.save(r/'b-058-fullmaster.png')
+for i,x in [(1,0),(2,384)]:
+ j=f'lag058_01_del{i}av2';out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(master.crop((x,0,x+1536,800)),(0,112));out.save(f'jobber/{j}/resultat.png');jobs.append(j)
+for key in ['05802','059kjever','059munn','060porter']:
+ conf=json.loads((r/f'b-{key}-oppsett.json').read_text());raw=Image.open(r/f'b-{key}-raa01.png').convert('RGB')
+ if key=='059kjever':raw=raw.crop((0,114,2048,570))
+ if key=='059munn':raw=raw.crop((102,24,1435,1001))
+ raw=raw.resize(tuple(conf['storrelse']),Image.Resampling.LANCZOS);outs={}
+ for z in conf['felt']:
+  j=z['jobb'];m=json.loads(Path(f'jobber/{j}/jobb.json').read_text())
+  if j not in outs:outs[j]=Image.open(r/'b-059-underlag570.png' if key=='059kjever' else m['bilde_to']).convert('RGB')
+  x,y,w,h=z['canvas_rekt'];sx,sy,sw,sh=z['ark_rekt'];tile=raw.crop((sx,sy,sx+sw,sy+sh));outs[j].paste(tile,(x,y),feather(w,h))
+ for j,out in outs.items():out.save(f'jobber/{j}/resultat.png');jobs.append(j)
+for j in jobs:
+ run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr);print(run.stdout)

@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess,shutil
+r=Path('rapporter/bestilling044-20261013');shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-f29b000f-291f-497e-ad8b-7b551b2f855b.png',r/'b-059kjever-raa02.png')
+# Actual raw dimensions, not UI preview coordinates. Flat padding excluded by observed boundary.
+raw=Image.open(r/'b-059kjever-raa02.png').convert('RGB').crop((0,124,2172,600)).resize((864,192),Image.Resampling.LANCZOS)
+raw.save(r/'b-059kjever-normalisert02.png')
+for k,j in enumerate(['lag059_02_del1av2','lag059_03_del1av2','lag059_04_del1av2']):
+ p=Path('jobber')/j/'resultat.png';shutil.copy2(p,r/f'b-{j}-for-korrektuttak.png');out=Image.open(r/'b-059-underlag570.png').convert('RGB');y,x=np.mgrid[:192,:288];alpha=Image.fromarray((np.clip(np.minimum.reduce([x+1,288-x,y+1,192-y])/6,0,1)*255).astype('uint8'));out.paste(raw.crop((k*288,0,(k+1)*288,192)),(512,208),alpha);out.save(p)
+for j in ['lag058_02_del2av2','lag059_02_del1av2','lag059_03_del1av2','lag059_04_del1av2']:
+ run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll02.txt').write_text(run.stdout+run.stderr);print(run.stdout)
