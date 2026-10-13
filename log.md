@@ -327,3 +327,8 @@
 
 - Bestilling46: fem Highway Surfing-lag levert, fire OK og én SJEKK (04, blokk1,75). Alle19 felt erOK. Sju andre068-kandidater holdes tilbake med FEIL og behandles videre. Se `rapporter/bestilling046-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T00:29:55+02:00 (Codex, Astra)
+
+- Bestilling50: sju lag levert OK med sju egne felt: voksboks, tannfravær og fire kildepresise skytestillinger. Tre083-tilstander avventer motivavklaring. Se `rapporter/bestilling050-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

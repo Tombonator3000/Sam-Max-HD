@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil
+p=Path('rapporter/bestilling050-20261013')
+for g,info in json.loads((p/'c-atlasplan.json').read_text()).items():
+ raw=Image.open(p/f'c-{g}-raa1.png').convert('RGB').resize(info['size'],Image.Resampling.LANCZOS)
+ for u in info['units']:
+  j=u['jobb'];m=json.loads(Path('jobber',j,'jobb.json').read_text());x,y,w,h=u['atlasrekt'];rx,ry,rw,rh=u['romrekt'];field=raw.crop((x,y,x+w,y+h)).resize((rw*4,rh*4),Image.Resampling.LANCZOS);out=Image.open(m['bilde_to']).convert('RGB');bx,by=m['bilde_i_lerret'][:2];out.paste(field,(bx+(rx-m['region'][0])*4,by+(ry-m['region'][1])*4));out.save(Path('jobber',j,'resultat.png'));field.save(p/f'c-{u["name"]}-felt.png')
+for i in range(1,5):shutil.copy(p/f'c-lag090_0{i}-kandidat.png',Path('jobber',f'lag090_0{i}','resultat.png'))

@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np,csv
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+extra=[];contexts=['rom083', 'rom084_del1av3', 'rom084_del2av3', 'rom084_del3av3', 'rom085', 'rom090']
+for j in contexts:
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+  p=root/'jobber'/j/f;extra.append({'fil':str(p.relative_to(root)),'sha256':sha(p)})
+(r/'root-ekstra-kildehash.json').write_text(json.dumps(extra,indent=2)+'\n')
+fields=json.loads((r/'root-feltbevis.json').read_text());register={(int(e['rom']),int(e['objekt_id']),e['tilstand_hex']):e for e in csv.DictReader((root/'konsept/2026-10-12/objektbilder-959.csv').open())}
+contextproof=[]
+micros=[]
+for page in range((len(fields)+5)//6):
+ out=Image.new('RGB',(1250,3*350),(180,180,180));d=ImageDraw.Draw(out)
+ for i,e in enumerate(fields[page*6:page*6+6]):
+  m=json.loads((root/'jobber'/e['jobb']/'jobb.json').read_text());base=(root/m['bilde_to']).parent/'original_1x.png';source=root/'jobber'/e['jobb']/'original_1x.png';baseim=Image.open(base).convert('RGB')
+  if m.get('underlag')==['obj819_01']:
+   under=baseim;baseim=Image.open(root/'jobber/rom079_del1av2/original_1x.png').convert('RGB');baseim.paste(under,(0,0))
+  aa=baseim.crop(e['lokalt_klipp']);bb=Image.open(source).convert('RGB').crop(e['lokalt_klipp']);dd=np.any(np.asarray(aa)!=np.asarray(bb),axis=2);yy,xx=np.nonzero(dd);micros.append({'jobb':e['jobb'],'objekt':e['objekt'],'endringer':int(dd.sum()),'lokal_bbox':None if not len(xx) else [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]})
+  for k,im in enumerate([aa,bb]):
+   im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);im.thumbnail((300,315),Image.Resampling.NEAREST);x=i%2*625+k*310;y=i//2*350;out.paste(im,(x,y+30));d.text((x+3,y+4),e['objekt']+(' base' if k==0 else ' '+e['jobb']),fill='black')
+ out.save(r/f'root-grunnrom-lag-{page+1}.png')
+(r/'root-kontekstfelt.json').write_text(json.dumps([],indent=2)+'\n');(r/'root-mikrobevis.json').write_text(json.dumps(micros,indent=2)+'\n');(r/'root-kontekstbevis.json').write_text(json.dumps(contextproof,indent=2)+'\n');print(json.dumps({'ekstra':len(extra),'felt':len(fields),'kontekst':contextproof,'mikro':[(e['jobb'],e['objekt'],e['endringer']) for e in micros]},ensure_ascii=False))

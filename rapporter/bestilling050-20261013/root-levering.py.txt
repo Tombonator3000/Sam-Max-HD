@@ -1,0 +1,19 @@
+from pathlib import Path
+import hashlib,json,runpy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+c=runpy.run_path(str(root/'rapporter/rom090-obj901-vektor-20261013/root-levering.py.txt'),run_name='delivery_helpers')
+m=json.loads((r/'fremdrift.json').read_text());s=json.loads((r/'sluttkontroll.json').read_text());assert s['utfall_antall']=={'OK':7,'SJEKK':0,'FEIL':0} and not s['ikke_klar_for_mottak']
+for name in ['kildehash.json','root-ekstra-kildehash.json']:
+ for e in json.loads((r/name).read_text()):assert sha(root/e['fil'])==e['sha256']
+for e in m['leveranser']:assert sha(root/e['resultat'])==e['sha256'] and e['klar_for_mottak'] and not e['runtime_verifisert']
+o=json.loads((r/'root-objektkontroll.json').read_text());assert len(o)==7 and all(e['status']=='OK' for e in o)
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+note='Bestilling50: sju lag levert OK med sju egne felt: voksboks, tannfravær og fire kildepresise skytestillinger. Tre083-tilstander avventer motivavklaring. Se `rapporter/bestilling050-20261013/RAPPORT.md`. HD-arbeidet fortsetter.'
+counts=c['update_queue'](m['leveranser'],note)
+(r/'root-mottak.json').write_text(json.dumps({'dato':stamp,'telling':counts,'root_visuell_motivkontroll':True,'alle_7_objektfelt_kontrollert':True,'motorimport':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+with (root/'todo.md').open('a') as f:f.write('\n- [x] Levert sju jobber i bestilling50 med sju faktiske feltkontroller.\n')
+with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex, Astra)\n\n- '+note+'\n- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.\n')
+commit=c['seal_and_push'](r,m['leveranser'],'GPT: voksboks, tannfravær og fire skytestillinger, bestilling 50')
+print(json.dumps({'commit':commit,'telling':counts},ensure_ascii=False))

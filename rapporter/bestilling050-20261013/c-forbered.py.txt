@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib
+p=Path('rapporter/bestilling050-20261013');jobs=['lag084_01_del1av3','lag084_02_del1av3','lag085_01']+[f'lag090_0{i}' for i in range(1,5)];plan={}
+for f in ['kildehash.json','root-ekstra-kildehash.json']:
+ for r in json.loads((p/f).read_text()):assert hashlib.sha256(Path(r['fil']).read_bytes()).hexdigest()==r['sha256']
+for g,js in {'voks':jobs[:2],'tann':jobs[2:3]}.items():
+ src=Image.new('RGB',(1536,1024),(128,128,128));stil=src.copy();units=[]
+ for i,j in enumerate(js):
+  m=json.loads(Path('jobber',j,'jobb.json').read_text());o=m['objekter'][0];x,y,w,h=o['rekt'];sw,sh=(624,864) if g=='voks' else(640,800);px,py=(72+i*768,80) if g=='voks' else(448,112);a=Image.open(Path('jobber',j,'original_1x.png')).crop((x,y,x+w,y+h));bx,by=m['bilde_i_lerret'][:2];b=Image.open(m['bilde_to']).crop((bx+x*4,by+y*4,bx+(x+w)*4,by+(y+h)*4));src.paste(a.resize((sw,sh),Image.Resampling.NEAREST),(px,py));stil.paste(b.resize((sw,sh),Image.Resampling.LANCZOS),(px,py));units.append({'jobb':j,'name':o['bilde'],'romrekt':o['rekt'],'atlasrekt':[px,py,sw,sh]})
+ src.save(p/f'c-{g}-source.png');stil.save(p/f'c-{g}-stil.png');plan[g]={'size':[1536,1024],'units':units}
+ extra='Two states of MAX’S WAX crayon/wax box. Left OPEN lid, exact rows of colored wax/crayon tips and gray lid inside. Right CLOSED yellow lid with green marks. Keep MAX’S WAX lettering in two lines, exact box angles/crop and background postcard fragments incl Wax Me lettering visible only in right state. Do not invent new crayons or straighten lid. Style image is wrong state, only brushwork reference.' if g=='voks' else 'This is ONE SPECIFIC LOWER TOOTH ABSENT from a dinosaur jaw. First source shows black interior where tooth was, partial upper tooth at top and light blue/gray lower jaw edge at bottom. Copy exactly the ABSENCE and those boundary fragments. Do not draw any new lower tooth, gums, tongue or extra anatomy. Second image has wrong present tooth; use its brushwork only.'
+ prompt=Path('jobber',js[0],'prompt.txt').read_text()+'\nLOCAL CROP PRODUCTION. Output1536x1024, preserve exact rectangles '+str([u['atlasrekt'] for u in units])+', gray128 gaps. First image controls geometry/content, second brushwork only. Smooth contours, exact palette and framing. '+extra+'\n';(p/f'c-{g}-prompt1.txt').write_text(prompt)
+(p/'c-atlasplan.json').write_text(json.dumps(plan,indent=2)+'\n');(p/'c-jobber.json').write_text(json.dumps(jobs,indent=2)+'\n')
