@@ -1,0 +1,76 @@
+{
+  "leveranser": [
+    {
+      "jobb": "obj995_01",
+      "resultat": "jobber/obj995_01/resultat.png",
+      "sha256": "2bb123025abd7d93d98e3e08d4418031572b4a3d0da9a5daf82462e1313a0a38",
+      "egenkontroll": "OK",
+      "kontrollfil": "rapporter/bestilling021-20261013/obj995_01-egenkontroll2.txt",
+      "forsok": 2,
+      "raw": [
+        {
+          "fil": "rapporter/bestilling021-20261013/obj995_01-raw1.png",
+          "sha256": "92080db14a45a32ccb68c72482bd5102159a532692bd2f26ebee670462507b4a",
+          "prompt": "rapporter/bestilling021-20261013/obj995_01-prompt1.txt",
+          "prompt_sha256": "99bbf17ac81cc91151a70b38eb76675d94b1c12060f96cdc1b77582eac178d6f"
+        },
+        {
+          "fil": "rapporter/bestilling021-20261013/obj995_01-raw2.png",
+          "sha256": "4ce2e1f0e97e416d3dae2a1f8eafe3b460589c3e362c73ade1260982cf936d35",
+          "prompt": "rapporter/bestilling021-20261013/obj995_01-prompt2.txt",
+          "prompt_sha256": "8ae4105a825d808fa1164dcb9f2f32afc82a5e669753e4aaf062b9d7c8ddb369"
+        }
+      ],
+      "runtime": false,
+      "ny_brukergodkjenning": false,
+      "klar_for_mottak": false,
+      "visuelt_forbehold": "To source-only forsøk. Forsøk 1 hadde for blanke kanter og er bevart som avvist; forsøk 2 er mattere og valgt. Svak sentral emblem-/glyfstruktur er beholdt som uleselige fragmenter uten antatt ord/logo. Brune tomfelt og svart ytterområde beholdt. Fortsatt synlig restavvik: kantene og indre delingslinjer er mer modellerte/mørkt omrammede enn originalens femfargeflate. Kandidaten må vurderes visuelt av root; teknisk OK alene friskmelder ikke materialfølelsen."
+    },
+    {
+      "jobb": "obj996_01",
+      "resultat": "jobber/obj996_01/resultat.png",
+      "sha256": "ba5010251bf301a8d705983e62b0b1faf9ac5f34ceb2522b39a383a514dcf063",
+      "egenkontroll": "OK",
+      "kontrollfil": "rapporter/bestilling021-20261013/obj996_01-egenkontroll2.txt",
+      "forsok": 2,
+      "raw": [
+        {
+          "fil": "rapporter/bestilling021-20261013/obj996_01-raw1.png",
+          "sha256": "c19f9257c23d3a30bf0c2b3a9161b949f365a7a1656b9061482d99df35f4a475",
+          "prompt": "rapporter/bestilling021-20261013/obj996_01-prompt1.txt",
+          "prompt_sha256": "ec17363c2c39b3033c3decd67764251cb1f293b4eaa842b6274919c741848c10"
+        },
+        {
+          "fil": "rapporter/bestilling021-20261013/obj996_01-raw2.png",
+          "sha256": "019b221af9051409b969c433cc5dfc81a530fd289b362b5591ab27a19363f3aa",
+          "prompt": "rapporter/bestilling021-20261013/obj996_01-prompt2.txt",
+          "prompt_sha256": "b9e92440c53e710ee440f93bb0b731a454024b69080faa5aabc8fb65261c29d3"
+        }
+      ],
+      "runtime": false,
+      "ny_brukergodkjenning": false,
+      "klar_for_mottak": true,
+      "visuelt_forbehold": "Avklippet UI-stripe med beige felter, svart mellomrom og delvis synlige symboler. Ingen komplette ikoner er lagt til utenfor utsnittet. Første forsøk manglet to svært svake brune fragmenter i et svart mellomrom. Forsøk 2 er lokal source-only imagegen med kilde-/HD-utsnitt; det nygenererte feltet ble helskalert og bare [544,528,104,32] innfelt. Alt utenfor rektangelet er byteidentisk med første kandidat. Fragmentene er ikke tolket som et nytt lesbart ord. De synlige blå/oransje ikonstrekene er renere enn originalpiksler, men uten nye felt."
+    },
+    {
+      "jobb": "lag002_01",
+      "resultat": "jobber/lag002_01/resultat.png",
+      "sha256": "d7340796f47daf819dfc2ae9a49095e553856cc425f4fb911630ad91943e1a54",
+      "egenkontroll": "OK",
+      "kontrollfil": "rapporter/bestilling021-20261013/lag002_01-egenkontroll1.txt",
+      "forsok": 1,
+      "raw": [
+        {
+          "fil": "rapporter/bestilling021-20261013/lag002_01-raw1.png",
+          "sha256": "b7b4a1e18169dc0540a56eef509e576d5f124a59357fc18978364b6e2d34be05",
+          "prompt": "rapporter/bestilling021-20261013/lag002_01-prompt1.txt",
+          "prompt_sha256": "085eecce780a019c5676564cc098f8778674849dd267922e25f1f037e6128b65"
+        }
+      ],
+      "runtime": false,
+      "ny_brukergodkjenning": false,
+      "klar_for_mottak": true,
+      "visuelt_forbehold": "Ett imagegen-forsøk med lagoriginal og levert rom002-HD som bilde to. Hele rommet er nytegnet; grunnrommet er derfor IKKE byteidentisk utenfor objektene. Seks komponenter er kontrollert: lav mørk bilrutedel med oransje lys uten hel bil; lys nedrast stein; mørk stein ved pæren; lite oransje/gult panellys; limekrans ved blå kule; lilla krans ved grønn kule. Full opak RGB-romkompositt, ingen atlas/alfa/nøkkelfarge. Ingen objekter fra lag002_02..05. Nærbilder og tall er i c-seksobjekt-qa.png og c-seksobjekt-kontroll.json. Kransenes små tagger og steinenes bruddstreker er HD-tolkninger, ikke eksakt pikselidentisk detalj. Ekte lagkomposisjon/import/runtime er ikke testet."
+    }
+  ]
+}

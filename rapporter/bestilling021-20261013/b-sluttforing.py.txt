@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+b=Path.cwd();r=b/'rapporter/bestilling021-20261013'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def rel(p):return str(p.relative_to(b))
+locks=json.loads((r/'kildehash.json').read_text());assert all(sha(b/v['fil'])==v['sha256'] for v in locks)
+m=np.array(Image.open(r/'b-rom091-fullmaster.png'));assert m.shape==(800,2656,3)
+rows=[];arrays=[]
+for job,rect,n in [('rom091_del1av2',(0,112,1536,800),1),('rom091_del2av2',(0,112,1536,800),1),('obj850_01',(528,240,480,544),2)]:
+ p=b/'jobber'/job/'resultat.png';a=np.array(Image.open(p));x,y,w,h=rect;assert a.shape==(1024,1536,3);outside=a.copy();outside[y:y+h,x:x+w]=128;assert np.all(outside==128)
+ c=r/(job+'-kontroll.txt');assert 'Utfall: OK' in c.read_text()
+ row=dict(jobb=job,resultat=rel(p),sha256=sha(p),egenkontroll='OK',kontrollfil=rel(c),forsok=n,runtime=False,ny_brukergodkjenning=False,klar_for_mottak=True,bilde_i_lerret=rect)
+ if job.startswith('rom'):
+  dx=0 if 'del1' in job else 1120;assert np.array_equal(a[112:912],m[:,dx:dx+1536]);arrays.append(a)
+  row.update(fullmaster=rel(r/'b-rom091-fullmaster.png'),fullmaster_sha256=sha(r/'b-rom091-fullmaster.png'),klipp=[dx,0,1536,800])
+ rows.append(row)
+ (p.parent/'notat.md').write_text(f'''# {job}\n\nInnebygd ChatGPT imagegen, eksakt modellnavn ikke eksponert. Antall forsøk: {n}. Romparet deler ett genereringsforsøk og én 2656 x 800 master. Obj850 er en selvstendig tilstand; første forsøk ga FEIL og ble tegnet om fra originalen.\n\nResultat SHA-256: {sha(p)}. Kildehashene står i rapporter/bestilling021-20261013/kildehash.json; alle 40 låste filer er uendret. Uendret sjekk_leveranse.py: OK. Motivfelt: {rect}. Øvrig canvas er RGB(128,128,128).\n\nKildepresiseringen bevarer fargede tomme klær i rommet og lilla/grå surfersilhuett i obj850, med fargede nabofragmenter. Ingen nye personer inni klærne, ingen gjeninnført surfebrett i silhuettilstanden. Småglyfer er nytegnet og ikke bokstavsertifisert; nytegningen har mykere volumskygger og svak tonestruktur i ellers flate felt. Se b-kilde-qa.md og b-glyffer.png.\n\nPromptene er brukt ordrett med separat presisering. Råbilder og plasseringsoppskrifter ligger i rapportmappen. Ingen originalmasker eller lokal warp. Runtime og ny individuell brukergodkjenning er false.\n''')
+assert np.array_equal(arrays[0][112:912,1120:1536],arrays[1][112:912,:416])
+for job in ['rom091_del1av2','rom091_del2av2']:assert (b/'jobber'/job/'prompt.txt').read_text() in (r/'b-rom091-prompt01.txt').read_text()
+for n in [1,2]:assert (b/'jobber/obj850_01/prompt.txt').read_text() in (r/f'obj850_01-prompt0{n}.txt').read_text()
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':rows},ensure_ascii=False,indent=2)+'\n')
+files=['b-rom091-raa01.png','obj850_01-raa01.png','obj850_01-raa02.png','b-rom091-prompt01.txt','obj850_01-prompt01.txt','obj850_01-prompt02.txt']
+(r/'b-proveniens.json').write_text(json.dumps({'verktoy':'innebygd ChatGPT imagegen','modell':'ikke eksponert','beskyttede_kilder_uendret':len(locks),'overlapp':[416,800],'overlapp_byteidentisk':True,'rom091_raw_crop':[0,116,1931,696],'rom091_helskalering':[2656,800],'obj850_valgt_forsok':2,'obj850_raw_crop':[528,240,1008,784],'originalmasker':False,'lokal_warp':False,'filer':[{'fil':rel(r/f),'sha256':sha(r/f)} for f in files]},ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(rows,ensure_ascii=False,indent=2))

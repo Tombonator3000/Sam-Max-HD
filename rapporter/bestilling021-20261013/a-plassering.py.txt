@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+import json
+root=Path(__file__).resolve().parents[2]
+r=root/'rapporter/bestilling021-20261013'
+# Reconstruct selected pre-palette candidates from new generated raw images only.
+for job,attempt in [('rom089',1),('rom090',2),('rom092',1),('obj901_01',2)]:
+    d=root/'jobber'/job
+    x,y,w,h=json.loads((d/'jobb.json').read_text())['bilde_i_lerret']
+    raw=Image.open(r/f'a-{job}-raa{attempt:02d}.png').convert('RGB')
+    assert raw.size==(1536,1024)
+    canvas=Image.new('RGB',(1536,1024),(128,128,128))
+    canvas.paste(raw.crop((x,y,x+w,y+h)),(x,y))
+    canvas.save(d/'resultat.png')

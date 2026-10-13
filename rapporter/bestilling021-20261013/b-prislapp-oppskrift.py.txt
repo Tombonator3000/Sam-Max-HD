@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,hashlib,json,subprocess,shutil
+b=Path.cwd();r=b/'rapporter/bestilling021-20261013'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-38d37bca-5e9e-42e8-adbe-82b78efbb5a4.png',r/'b-prislapp-raa.png')
+p=r/'b-rom091-fullmaster.png';shutil.copy2(p,r/'b-rom091-fullmaster-for-prislapp.png')
+before=Image.open(p).convert('RGB');after=before.copy()
+patch=Image.open(r/'b-prislapp-raa.png').convert('RGB').resize((176,84),Image.Resampling.LANCZOS)
+box=(2238,542,2292,574);after.paste(patch.crop((78,30,132,62)),box[:2]);after.save(p)
+a=np.array(before);z=np.array(after);mask=np.any(a!=z,axis=2);outside=mask.copy();outside[542:574,2238:2292]=False;assert not outside.any()
+j=b/'jobber/rom091_del2av2/resultat.png';shutil.copy2(j,r/'b-rom091-del2-for-prislapp.png');out=Image.open(j).convert('RGB');out.paste(after.crop((1120,0,2656,800)),(0,112));out.save(j)
+control=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(j)],capture_output=True,text=True);(r/'b-prislapp-kontroll.txt').write_text(control.stdout+control.stderr);print(control.stdout)
+after.crop((2160,512,2336,596)).resize((1056,504)).save(r/'b-prislapp-etter.png')
+(r/'b-prislapp-overstyring.json').write_text(json.dumps({'jobb':'rom091_del2av2','resultat':str(j.relative_to(b)),'sha256':sha(j),'fullmaster':str(p.relative_to(b)),'fullmaster_sha256':sha(p),'forrige_master_sha256':sha(r/'b-rom091-fullmaster-for-prislapp.png'),'master_rettingsboks':[2238,542,54,32],'resten_byteidentisk':True,'prisdel_og_tube_uendret':True,'endrede_masterpiksler':int(mask.sum()),'egenkontroll':'OK' if 'Utfall: OK' in control.stdout else 'SJEKK','kontrollfil':str((r/'b-prislapp-kontroll.txt').relative_to(b)),'forsok':1,'runtime':False,'ny_brukergodkjenning':False,'merknad':'Formbasert lokal retting; lesningen EACH er plausibel, men ikke bokstavsertifisert.'},ensure_ascii=False,indent=2)+'\n')

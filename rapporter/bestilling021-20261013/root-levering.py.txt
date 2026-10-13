@@ -1,0 +1,59 @@
+from pathlib import Path
+import json,hashlib,subprocess,re,urllib.request,concurrent.futures
+from datetime import datetime
+from zoneinfo import ZoneInfo
+root=Path(__file__).resolve().parents[2]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def deliver(n,note,message):
+    r=root/f'rapporter/bestilling{n:03d}-20261013'
+    subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3',str(r/'root-sluttkontroll.py.txt')],check=True,capture_output=True,text=True)
+    m=json.loads((r/'fremdrift.json').read_text());s=json.loads((r/'sluttkontroll.json').read_text())
+    assert s['utfall_antall']=={'OK':7,'SJEKK':1,'FEIL':2}
+    assert set(s['ikke_klar_for_mottak'])=={'rom090','obj901_01'}
+    assert len(m['leveranser'])==10
+    stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+    q=root/'GRAFIKKLISTE.md';t=q.read_text()
+    for e in m['leveranser']:
+        if not e['klar_for_mottak']:continue
+        old='- [ ] `'+e['jobb']+'`';new='- [x] `'+e['jobb']+'`'
+        if old in t:assert t.count(old)==1;t=t.replace(old,new)
+        else:assert n==18 and e['jobb']=='rom077_del2av2' and new in t
+    t+='\n'+note+'\n'
+    ids=[j for j in re.findall(r'^- \[x\] `([^`]+)`',t,re.M) if (root/'jobber'/j/'jobb.json').is_file()]
+    metas={j:json.loads((root/'jobber'/j/'jobb.json').read_text()) for j in ids}
+    latest={}
+    for i in range(2,n+1):
+        p=root/f'rapporter/bestilling{i:03d}-20261013/fremdrift.json'
+        if p.is_file():
+            for e in json.loads(p.read_text())['leveranser']:latest[e['jobb']]=e
+    bgs=[j for j,m in metas.items() if m['type']=='rom'];objs=[j for j,m in metas.items() if m['type']=='objekt']
+    rooms={metas[j]['rom'] for j in bgs}
+    complete=[v for v in rooms if len([j for j in bgs if metas[j]['rom']==v])==max(metas[j].get('deler',1) for j in bgs if metas[j]['rom']==v)]
+    count=lambda js:sum(latest.get(j,{}).get('egenkontroll')=='SJEKK' for j in js)
+    t=re.sub(r'Oppdatert [^\n]+','Oppdatert '+stamp+' (norsk tid)',t,count=1)
+    t=re.sub(r'\| Rombakgrunner \| [^|]+ \|',f'| Rombakgrunner | {len(complete)} hele rom levert ({len(bgs)} deler), inkludert {count(bgs)} SJEKK, pilotrom visuelt godkjent |',t,count=1)
+    t=re.sub(r'\| Store objektbilder \(nærbilder, kart og store deler\) \| [^|]+ \|',f'| Store objektbilder (nærbilder, kart og store deler) | {len(objs)} levert, inkludert {count(objs)} SJEKK |',t,count=1);layers=[metas[j] for j in ids if metas[j]['type']=='lag']
+    t=re.sub(r'(\| Små objektbilder i lag [^|]+\|) [^|]+ \|',r'\1 '+str(sum(len(v.get('objekter',[])) for v in layers))+' bilder levert ('+str(len(layers))+' lagjobber) |',t,count=1)
+    q.write_text(t)
+    p=root/'todo.md';t=p.read_text();old=f'- [ ] Fortsett bestilling {n}'
+    if old in t:t=t.replace(old,f'- [x] Levert bestilling {n} med sju OK og ett SJEKK, to uavklarte FEIL, kilde-/motivkontroll og dokumenterte rettinger.\n- [ ] Fortsett bestilling {n+1}')
+    else:assert n==19
+    p.write_text(t)
+    with (root/'log.md').open('a') as f:f.write(f'\n## {stamp} (Codex, Astra)\n\n- '+note+'\n- Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i '+str(r.relative_to(root))+'/.\n')
+    for p in list(r.rglob('*'))+[root/'jobber'/e['jobb']/'notat.md' for e in m['leveranser']]:
+        if p.is_file() and p.suffix in {'.md','.txt'} and p.name!='prompt.txt':p.write_text('\n'.join(l.rstrip() for l in p.read_text().splitlines()).rstrip()+'\n')
+    files=sorted(p for p in r.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')+[root/'jobber'/e['jobb']/name for e in m['leveranser'] for name in ['resultat.png','notat.md']]
+    (r/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+str(p.relative_to(root))+'\n' for p in files))
+    extra=root/'rapporter/gjenkontroll-187-307-20261013'
+    for p in extra.rglob('*'):
+        if p.is_file() and p.suffix in {'.md','.txt'} and p.name!='prompt.txt':p.write_text('\n'.join(l.rstrip() for l in p.read_text().splitlines()).rstrip()+'\n')
+    extra_files=sorted(p for p in extra.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')
+    (extra/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+str(p.relative_to(root))+'\n' for p in extra_files))
+    stage=[str(extra.relative_to(root)),'GRAFIKKLISTE.md','todo.md','log.md',str(r.relative_to(root))]+[str((root/'jobber'/e['jobb']/name).relative_to(root)) for e in m['leveranser'] for name in ['resultat.png','notat.md']]
+    assert subprocess.check_output(['git','branch','--show-current'],cwd=root,text=True).strip()=='gpt-arbeid'
+    subprocess.run(['git','add','--',*stage],cwd=root,check=True);subprocess.run(['git','diff','--cached','--check'],cwd=root,check=True)
+    subprocess.run(['git','commit','-m',message],cwd=root,check=True,capture_output=True,text=True);subprocess.run(['git','push','origin','gpt-arbeid'],cwd=root,check=True,capture_output=True,text=True)
+    commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+    print('Pushed',n,commit,'delivered jobs',len(ids),'BG',len(bgs),'objects',len(objs),flush=True)
+    return commit,m['leveranser']
+deliver(21,'Bestilling 21: åtte klare (7 OK og rom092 SJEKK), rom090/obj901 uavklarte FEIL og ukrysset. Fargede klær/egen surfersilhuett, svakt UIunderlag og første seksobjekt-lag kontrollert. Metodevalg for to flate kandidater spurt separat. Se `rapporter/bestilling021-20261013/RAPPORT.md`. Bestilling 22 fortsetter.','GPT: bestilling 21, egne tilstander og laboratoriets forste lag')

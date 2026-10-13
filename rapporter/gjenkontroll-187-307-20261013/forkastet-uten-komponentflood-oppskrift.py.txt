@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageFilter,ImageDraw
+import numpy as np,hashlib,json,shutil,subprocess
+r=Path(__file__).resolve().parent;root=r.parents[1];j=root/'jobber/obj187_05';before=Image.open(j/'resultat.png').convert('RGB');shutil.copyfile(j/'resultat.png',r/'187-gammel-feil.png')
+# Segment ONLY the currently generated blue backdrop. Original contours are
+# never used as a mask. Low saturation purple jacket and black/blue tie excluded.
+box=(352,192,1184,832);part=before.crop(box);a=np.array(part).astype(float);hsv=np.array(part.convert('HSV'))
+core=((hsv[:,:,0]>=140)&(hsv[:,:,0]<=165)&(a[:,:,1]>=a[:,:,0]+20)&(a[:,:,2]>=a[:,:,1]+30)&(a[:,:,2]>=120)).astype('uint8')*255
+alpha=Image.fromarray(core).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.5));alpha.save(r/'187-alpha-fra-generert.png')
+under=Image.open(r/'187-underlag-raa.png').convert('RGB').resize(part.size,Image.Resampling.LANCZOS);under.save(r/'187-generert-underlag-832x640.png')
+out=before.copy();out.paste(under,box[:2],alpha);out.save(r/'187-kandidat-underlag.png')
+b=np.array(before);z=np.array(out);changed=np.any(b!=z,axis=2);allowed=np.zeros(changed.shape,bool);allowed[box[1]:box[3],box[0]:box[2]]=np.array(alpha)>0;assert not changed[~allowed].any()
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();(r/'187-underlag-bevis.json').write_text(json.dumps({'before_sha256':sha(r/'187-gammel-feil.png'),'candidate_sha256':sha(r/'187-kandidat-underlag.png'),'alpha':'Only new-generated blue hue/color component, eroded and antialiased at its own boundary','pixels_changed':int(changed.sum()),'unchanged_outside_generated_alpha':True,'source_contour_mask_used':False,'source_pixels_pasted':False,'local_geometry_warp':False,'underlay_raw_sha256':sha(r/'187-underlag-raa.png'),'runtime':False},ensure_ascii=False,indent=2)+'\n')
+d=r/'187-kontroll';d.mkdir(exist_ok=True)
+for n in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:shutil.copyfile(j/n,d/n)
+shutil.copyfile(r/'187-kandidat-underlag.png',d/'resultat.png');cp=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3',str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/'187-underlag-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+qa=Image.new('RGB',(3*832,680),(128,128,128));draw=ImageDraw.Draw(qa)
+for i,(label,im) in enumerate([('ORIGINAL',Image.open(j/'referanse.png')),('FOER',before),('ETTER',out)]):draw.text((i*832+5,6),label,fill=(0,0,0));qa.paste(im.crop(box),(i*832,30))
+qa.save(r/'187-underlag-qa.png')

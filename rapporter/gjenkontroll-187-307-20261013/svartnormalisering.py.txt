@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,shutil,subprocess
+r=Path(__file__).resolve().parent;root=r.parents[1];records=[]
+for job in ['obj187_05','obj307_01']:
+    j=root/'jobber'/job;source=np.asarray(Image.open(j/'original_1x.png').convert('RGB'));values=np.max(source,axis=2);minimum=int(values[values>0].min());assert minimum>=12
+    im=Image.open(j/'resultat.png').convert('RGB');a=np.asarray(im).copy();mask=np.max(a,axis=2)<12;changed=mask&np.any(a!=0,axis=2);a[mask]=0
+    candidate=r/(job+'-svart-kandidat.png');Image.fromarray(a).save(candidate)
+    d=r/(job+'-svartkontroll');d.mkdir(exist_ok=True)
+    for name in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:shutil.copyfile(j/name,d/name)
+    shutil.copyfile(candidate,d/'resultat.png');cp=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3',str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/(job+'-svart-kontroll.txt')).write_text(cp.stdout+cp.stderr)
+    records.append({'jobb':job,'original_minste_ikke_svarte_maxRGB':minimum,'kriterium':'maxRGB<12 on only new-generated result','endret_antall':int(changed.sum()),'resten_byteidentisk':np.array_equal(np.asarray(im)[~changed],a[~changed]),'candidate_sha256':hashlib.sha256(candidate.read_bytes()).hexdigest(),'source_contour_mask_used':False,'source_pixels_pasted':False,'local_warp':False,'returncode':cp.returncode});print(job,minimum,int(changed.sum()));print(cp.stdout)
+(r/'svartnormalisering-bevis.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')

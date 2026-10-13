@@ -1,0 +1,26 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+This picture is a large image that the game draws on top of the room, such as a close-up, a map or a panel. Treat it as a background picture and follow all the rules above.
+
+Note for this room: Silhouettes on purpose: the flat gray shapes mark where the game draws clothes and items. Keep every gray silhouette exactly in shape and position, flat gray with no detail, on the plain background.
+
+If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image.
+
+SEPARATE SOURCE STATE CORRECTION: Repaint only the first reference exactly. This specific object850 is the REMOVED SURFER EQUIPMENT STATE: a single flat lavender-gray silhouette of long board/shorts/fins, with beige holes and the exact ragged edges. No interior board details, flames, shorts pattern or colored fins. The white pentagonal badge with black irregular glyph stays fully colored, as do the clipped saw top-left, purple/dark suit upper-right, red bandana fragment at lower-left and white shoe fragment on right edge. These are intentionally cropped neighbors. Do not complete them. Same source beige and lavender palette, all flat open areas untouched in meaning; smooth edges and faithful cartoon linework. Keep 1536x1024 canvas and motif rectangle [528,240,480,544], neutral #808080 outside. The second reference supports brushwork only; no borrowed objects or extra characters.
+SECOND SOURCE-ONLY REDRAW: Match FIRST SOURCE's boundary positions extremely closely. Previous attempt not provided. Flat lavender silhouette must be ONE SOLID COLOR, no gradient or texture. Flat beige also no paper texture. Preserve the original's angular scallops and step-like irregular lower shoes/shorts boundary; do not round and inflate them. EXACT source badge black glyph structure, not a decorative flourish or new logo. This is an exact image overlay, retain all shapes. Use original canvas and box size, not enlarged field.

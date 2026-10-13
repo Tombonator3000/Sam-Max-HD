@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess
+P=Path('rapporter/bestilling021-20261013');rows=[]
+for j in ['rom090','obj901_01']:
+ d=Path('jobber')/j;m=json.loads((d/'jobb.json').read_text());x,y,w,h=m['bilde_i_lerret'];src=np.array(Image.open(d/'original_1x.png').convert('RGB'));pal=np.unique(src.reshape(-1,3),axis=0).astype(np.int32)
+ im=Image.open(d/'resultat.png').convert('RGB');im.save(P/('a-'+j+'-foerpalett.png'));a=np.array(im.crop((x,y,x+w,y+h)));f=a.reshape(-1,3).astype(np.int32);result=np.empty_like(f)
+ for start in range(0,len(f),32768):
+  sub=f[start:start+32768];dist=((sub[:,None,:]-pal[None,:,:])**2).sum(axis=2);result[start:start+len(sub)]=pal[np.argmin(dist,axis=1)]
+ out=result.astype(np.uint8).reshape(a.shape);im.paste(Image.fromarray(out),(x,y));im.save(d/'resultat.png')
+ row=dict(jobb=j,metode='Global nearest RGB Euclidean palette mapping, no coordinates or masks',palett=pal.tolist(),farger_foer=len(np.unique(a.reshape(-1,3),axis=0)),farger_etter=len(np.unique(out.reshape(-1,3),axis=0)),endrede_piksler=int(np.any(a!=out,axis=2).sum()),snitt_absolutt_rgbendring=float(np.abs(a.astype(float)-out).mean()))
+ run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(d/'resultat.png')],capture_output=True,text=True);row['kontroll']=run.stdout;rows.append(row);print(run.stdout)
+(P/'a-palettbehandling.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2))

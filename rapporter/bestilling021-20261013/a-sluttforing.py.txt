@@ -1,0 +1,49 @@
+from pathlib import Path
+import json, hashlib, shutil, subprocess
+from PIL import Image, ImageDraw
+import numpy as np
+root=Path(__file__).resolve().parents[2]
+r=root/'rapporter/bestilling021-20261013'
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+jobs=['rom089','rom090','rom092','obj901_01']
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+# Preserve the diagnostic palette result once, then restore the selected unquantized candidate.
+for j in ['rom090','obj901_01']:
+    dst=r/f'a-{j}-palettkandidat.png'
+    if not dst.exists(): shutil.copy2(root/f'jobber/{j}/resultat.png',dst)
+    shutil.copy2(r/f'a-{j}-foerpalett.png',root/f'jobber/{j}/resultat.png')
+out=[]
+sheet=Image.new('RGB',(1000,4*360),(210,210,210)); draw=ImageDraw.Draw(sheet)
+for n,j in enumerate(jobs):
+    d=root/'jobber'/j; meta=json.loads((d/'jobb.json').read_text()); x,y,w,h=meta['bilde_i_lerret']
+    im=Image.open(d/'resultat.png').convert('RGB'); a=np.array(im)
+    pad=np.ones(a.shape[:2],bool);pad[y:y+h,x:x+w]=False
+    assert im.size==(1536,1024) and np.all(a[pad]==128)
+    cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True)
+    log=r/f'a-{j}-kontroll.txt';log.write_text(cp.stdout+cp.stderr)
+    status={0:'OK',1:'SJEKK',2:'FEIL'}.get(cp.returncode,'FEIL')
+    attempts=2 if j in ['rom090','obj901_01'] else 1
+    prov=[]
+    for k in range(1,attempts+1):
+        raw=r/f'a-{j}-raa{k:02d}.png';prompt=r/f'a-{j}-prompt{k:02d}.txt'
+        assert prompt.read_text().startswith((d/'prompt.txt').read_text())
+        prov.append({'forsok':k,'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'prompt':str(prompt.relative_to(root)),'prompt_sha256':sha(prompt),'verktoy':'image_gen.imagegen','eksakt_modell':'ikke eksponert'})
+    entry={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':status,'kontrollfil':str(log.relative_to(root)),'forsok':attempts,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':status!='FEIL','proveniens':prov,'padding_rgb':[128,128,128],'bilde_i_lerret':[x,y,w,h]}
+    out.append(entry)
+    for col,f in enumerate(['referanse.png','resultat.png']):
+        thumb=Image.open(d/f).convert('RGB');thumb.thumbnail((495,330));sheet.paste(thumb,(col*500,n*360+25))
+    draw.text((8,n*360+5),f'{j} original / HD, {status}',fill='black')
+    details={
+      'rom089':'Ny vinkel på hyssingnøstet med TRAM og to MUSEUM-skilt og røde venstrepiler. Små utydelige kildeglyfer beholdes som merker, ikke påstått lesbar ny tekst. Trapper, plattform, hyssing og vegetasjon kontrollert visuelt.',
+      'rom090':'Avskåret Sam-hode med hatt og to Max-ører, hyller og mørke målformer, blått felt og nederste draperi. Ingen hele kropper, Max-ansikt eller pistoler. Fortsatt teknisk FEIL. Nye draperifolder avviker fra kildens nederste midtfelt; palettmapping løste ikke dette. Valgt forsøk 2 før palettmapping.',
+      'rom092':'Oransjebrun hårform på skrå støtte og firkantet brun sokkel i rødt lys. Ikke en levende figur. SJEKK gjelder blokkskift 1.26 originalpiksler. Visuell motividentitet kontrollert, men ikke runtime eller individuell brukergodkjenning.',
+      'obj901_01':'Tom sokkeltilstand uten hår og støtte. Fortsatt teknisk FEIL. Den nytegnede sokkelranden og den rette mørke sømmen er ikke tilstrekkelig kildetro: kilden har mer trinnvis kant. Valgt forsøk 2 før palettmapping; ikke klar for mottak.'}[j]
+    (d/'notat.md').write_text(f'# {j}\n\n{details}\n\nInnebygd ChatGPT-bildegenerator, {attempts} fullforsøk. Eksakt modellnavn er ikke eksponert. Ordrett jobbprompt og separat kildepresisering er bevart sammen med alle råforsøk i rapporter/bestilling021-20261013/a-{j}-*. Første forsøk brukte originalreferansen og godkjent stil/rom007_del1av2.png. Andre forsøk, der relevant, brukte originalreferansen alene. Ingen avvist kandidat var stilanker.\n\nValgt bilde er RGB 1536 x 1024, motivrektangel {x}, {y}, {w}, {h}, padding nøyaktig RGB 128. Kun hel klipping/plassering av generert bilde; ingen originalpikselmaske eller lokal warp. Uendret sjekk_leveranse.py: {status}. Se {log.relative_to(root)}.\n\nSHA-256: {entry["sha256"]}\n\nKilder: jobbens original_1x.png, referanse.png, jobb.json og prompt.txt; c-kildeplan.md og GRUNNLAG.md. Samlet kilde-QA, oppskrift, palettdiagnose og manifest finnes i samme rapportmappe. Teknisk kontroll er ikke visuell brukergodkjenning. Ikke importert eller runtime-testet.\n')
+sheet.save(r/'a-samlet-kontaktark.png')
+(r/'a-leveranser.json').write_text(json.dumps({'leveranser':out},ensure_ascii=False,indent=2)+'\n')
+locked=json.loads((r/'kildehash.json').read_text())
+assert isinstance(locked,list)
+checks=[{'fil':e['fil'],'sha256':sha(root/e['fil']),'uendret':sha(root/e['fil'])==e['sha256']} for e in locked]
+assert all(e['uendret'] for e in checks)
+(r/'a-kildehashkontroll.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps([{'jobb':e['jobb'],'status':e['egenkontroll'],'sha256':e['sha256']} for e in out],indent=2))

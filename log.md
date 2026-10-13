@@ -184,3 +184,8 @@
 
 - Bestilling 20: 9 OK og rom083 SJEKK, ti bilder levert. Separate sky-/figurtilstander, tre Wax Me-kort med identiske overlapper, egen tett skog og kildekontrollerte bybilder. Se `rapporter/bestilling020-20261013/RAPPORT.md`. Bestilling 21 fortsetter.
 - Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i rapporter/bestilling020-20261013/.
+
+## 2026-10-13 20:53 (Codex, Astra)
+
+- Bestilling 21: åtte klare (7 OK og rom092 SJEKK), rom090/obj901 uavklarte FEIL og ukrysset. Fargede klær/egen surfersilhuett, svakt UIunderlag og første seksobjekt-lag kontrollert. Metodevalg for to flate kandidater spurt separat. Se `rapporter/bestilling021-20261013/RAPPORT.md`. Bestilling 22 fortsetter.
+- Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i rapporter/bestilling021-20261013/.
