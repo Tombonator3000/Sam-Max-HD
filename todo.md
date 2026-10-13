@@ -63,6 +63,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] PR 4 (grafikkjobbene) flettet til main (13. oktober, e0baba9)
 - [ ] Stilpilot: hovedark Sam og Max, rom 7 og fig002_01 og fig003_01 levert, kontrollert, sett i motoren og godkjent av Tom; stilankere i `stil/`
 - [ ] Aktiver bestillingen (`docs/BESTILLING-CHATGPT.md`) og grafikkrunder med `tools/gpt_runde.sh`
+- [x] Testrom for dynamisk lys på GitHub Pages (`lystest/`, 13. oktober). Tom slår på Pages med GitHub Actions som kilde
 - [ ] Dynamisk lys med normalkart og luminansmaske, etter godkjent stilpilot (Tom 13. oktober): valgfritt for spilleren (av som standard, eget valg i menyen), ingen kastede skygger. Prøv først i ett rom (kontoret med lampen) med normalkart regnet ut fra HD-bildene og lyset av og på med en tast. Lyset legges inn før fargeforholdet fra paletten, så nedtoning og blink fortsatt virker. Rommene har lyset malt inn, så det må vurderes i spillet om det løfter eller bare endrer
 
 ### Spillbart for Tom
