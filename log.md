@@ -97,3 +97,10 @@
 - Rom032/035 har1152pxidentiskoverlapp. Rom036del1 matcher fullmaster; fremtidig del2 kontrollert medOK. Originalens dørtilstander, svarte sol, skjevheter, fisk og tomme felter bevart. Root sammenlignet samlet og tankdetalj.
 - Numerisk kontrollbegrensning reprodusert uten artendring: symmetrisk utglatting av originaler kan gi store FFT-blokkskift uten posisjonstransformasjon. Full oppskrift/JSON i rapporter/kontroll-fft-20261013/. Dette fritar ikke grafikken fra eksisterende kontroll eller visuell QA.
 - Forrige bestillings ti PNG-SHA verifisert fra GitHub. Rapport/proveniens i rapporter/bestilling008-20261013/. Ingen kode/kildeendring, import, spilltest eller ny individuell godkjenning. Bestilling9 kildeplan klar.
+
+## 2026-10-13 19:00 (Codex, Astra)
+
+- Bestilling 9 levert med 7 OK og 3 SJEKK: obj335_01, obj337_01 og obj339_01. Ingen utfall oppgradert. Alle 40 beskyttede kilder og fire ekstra originaler uendret, lerret/padding/SHA verifisert. Root har sammenlignet samlet original/HD.
+- Seks vortex-spinnere tegnet etter flere originaltilstander. Stol er tydelig, øvrige formers eksakte navn/funksjon er uavklart. Ingen nye bok-, kost- eller hattedetaljer lagt til. Små konturavvik og mer uttalt solglød dokumentert.
+- Rom036 del 2 fra låst master, overlapp 1152 x 800 identisk over bestillingsgrensen. Escher-rommets overlapp identisk. Magnetrommet har tre røde magneter; master og neste del er låst og kontrollert.
+- Bestilling 8 sine ti lagrede PNG, inkludert eksplisitt FEIL-kandidat, SHA-verifisert fra GitHub. Proveniens i rapporter/bestilling009-20261013/. Bestilling 10 fortsetter. Ingen motorimport, spilltest eller ny individuell brukergodkjenning.

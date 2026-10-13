@@ -1,0 +1,8 @@
+from PIL import Image
+from pathlib import Path
+import hashlib
+p=Path('rapporter/bestilling008-20261013/rom036-fullmaster.png')
+assert hashlib.sha256(p.read_bytes()).hexdigest()=='8a7073a6ff58eea356f4e988c77504a3d224152c0fc93c7c7a12723ba3962bed'
+c=Image.new('RGB',(1536,1024),(128,128,128))
+c.paste(Image.open(p).convert('RGB').crop((384,0,1920,800)),(0,112))
+c.save('jobber/rom036_del2av2/resultat.png')

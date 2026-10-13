@@ -1,0 +1,22 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import json,hashlib,subprocess,numpy as np
+p=Path('rapporter/bestilling009-20261013')
+spec=json.loads((p/'a-prosessering.json').read_text())
+def sha(f):return hashlib.sha256(Path(f).read_bytes()).hexdigest()
+rows=[];qa=Image.new('RGB',(1440,6*230),(40,40,40));draw=ImageDraw.Draw(qa)
+for idx,n in enumerate(sorted(spec)):
+ rawname,box=spec[n];attempts=2 if n in ['obj335_01','obj338_01','obj340_01'] else 1
+ raw=p/('a-'+n+('-raa02.png' if attempts==2 else '-raa.png'))
+ j=json.loads(Path('jobber',n,'jobb.json').read_text());x,y,w,h=j['bilde_i_lerret']
+ part=Image.open(raw).convert('RGB').crop(box).resize((w,h),Image.Resampling.LANCZOS)
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(part,(x,y));f=Path('jobber',n,'resultat.png');out.save(f)
+ a=np.array(out);mask=np.ones(a.shape[:2],bool);mask[y:y+h,x:x+w]=False;assert np.all(a[mask]==128)
+ result=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(f)],capture_output=True,text=True)
+ log=p/('a-'+n+'-sluttkontroll.txt');log.write_text(result.stdout+result.stderr);status=result.stdout.split('Utfall: ')[-1].strip();print(n,status)
+ rows.append({'jobb':n,'resultat':str(f),'sha256':sha(f),'egenkontroll':status,'kontrollfil':str(log),'forsok':attempts,'raw':str(raw),'raw_sha256':sha(raw),'raw_rect':box,'bilde_i_lerret':[x,y,w,h],'padding_rgb128':True,'runtime':False,'ny_brukergodkjenning':False})
+ ref=Image.open(Path('jobber',n,'original_1x.png')).convert('RGB').resize((700,200),Image.Resampling.NEAREST)
+ hd=part.resize((700,200),Image.Resampling.LANCZOS);qa.paste(ref,(0,idx*230+25));qa.paste(hd,(730,idx*230+25));draw.text((8,idx*230+5),n+' original / HD '+status,fill='white')
+qa.save(p/'a-tilstander-qa.png')
+locked=json.loads((p/'kildehash.json').read_text());check=[{'fil':v['fil'],'sha256':sha(v['fil']),'uendret':sha(v['fil'])==v['sha256']} for v in locked];assert all(v['uendret'] for v in check);(p/'a-kildebevis.json').write_text(json.dumps(check,indent=2)+'\n')
+(p/'a-leveranser.json').write_text(json.dumps({'leveranser':rows,'model':'ikke eksponert','runtime':False,'ny_brukergodkjenning':False},indent=2,ensure_ascii=False)+'\n')

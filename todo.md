@@ -31,4 +31,5 @@
 - [x] Levert bestilling7 med9OK og obj293_01 SJEKK; kildeavklart hånd/griper/magnet og identiske romoverlapper.
 - [x] Levert ni OK-bilder i bestilling8, med konsistent kikkertpanel, rommastere og låst rom036-del2 for neste bestilling.
 - [ ] Avklar obj307_01 med egenkontroll FEIL. Ikke klar for mottak. Se rapporter/kontroll-fft-20261013/RAPPORT.md og rapporter/bestilling008-20261013/RAPPORT.md.
-- [ ] Fortsett bestilling9 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 9 med sju OK og tre SJEKK, kildeanalyse av seks vortex-spinnere og identiske romoverlapp.
+- [ ] Fortsett bestilling 10 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

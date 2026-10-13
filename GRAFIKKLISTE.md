@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 18:41 (norsk tid)
+Oppdatert 2026-10-13 19:00 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 32 hele rom og 1 delvis levert (51 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 19 levert, inkludert to SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 34 hele rom og 1 delvis levert (55 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 25 levert, inkludert fem SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -139,16 +139,16 @@ Rom 31, 32, 33, 34, 35, 36.
 
 Rom 36, 37, 38.
 
-- [ ] `rom036_del2av2` (rom 36 Mystery Vortex, ute, del 2/2)
-- [ ] `obj335_01` (rom 36 Mystery Vortex, ute, objekt 335 tilstand 01)
-- [ ] `obj336_01` (rom 36 Mystery Vortex, ute, objekt 336 tilstand 01)
-- [ ] `obj337_01` (rom 36 Mystery Vortex, ute, objekt 337 tilstand 01)
-- [ ] `obj338_01` (rom 36 Mystery Vortex, ute, objekt 338 tilstand 01)
-- [ ] `obj339_01` (rom 36 Mystery Vortex, ute, objekt 339 tilstand 01)
-- [ ] `obj340_01` (rom 36 Mystery Vortex, ute, objekt 340 tilstand 01)
-- [ ] `rom037_del1av2` (rom 37 Mystery Vortex, inne (Escher-rommet), del 1/2)
-- [ ] `rom037_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), del 2/2)
-- [ ] `rom038_del1av2` (rom 38 Magnetrommet, del 1/2)
+- [x] `rom036_del2av2` (rom 36 Mystery Vortex, ute, del 2/2)
+- [x] `obj335_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 36 Mystery Vortex, ute, objekt 335 tilstand 01)
+- [x] `obj336_01` (rom 36 Mystery Vortex, ute, objekt 336 tilstand 01)
+- [x] `obj337_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 36 Mystery Vortex, ute, objekt 337 tilstand 01)
+- [x] `obj338_01` (rom 36 Mystery Vortex, ute, objekt 338 tilstand 01)
+- [x] `obj339_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 36 Mystery Vortex, ute, objekt 339 tilstand 01)
+- [x] `obj340_01` (rom 36 Mystery Vortex, ute, objekt 340 tilstand 01)
+- [x] `rom037_del1av2` (rom 37 Mystery Vortex, inne (Escher-rommet), del 1/2)
+- [x] `rom037_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), del 2/2)
+- [x] `rom038_del1av2` (rom 38 Magnetrommet, del 1/2)
 
 ## Bestilling 10
 
@@ -3437,3 +3437,5 @@ Bestilling6: ti rombilder levert, alle egenkontroller OK. Rom022 er komplett med
 Bestilling7:9OK og obj293_01 SJEKK, ti bilder levert. Se `rapporter/bestilling007-20261013/RAPPORT.md`. Bestilling8 er startet. Obj187_05 fra5 forblir ukrysset/uavklart.
 
 Bestilling8:9OK levert og obj307_01 uavklart FEIL. Paneltoppkandidaten forblir ukrysset; se `rapporter/bestilling008-20261013/RAPPORT.md`. Reproduserbar numerisk kontrollbegrensning står i `rapporter/kontroll-fft-20261013/RAPPORT.md`, uten omklassifisering av grafikken.
+
+Bestilling 9: 7 OK og 3 SJEKK (obj335_01, obj337_01 og obj339_01), ti bilder levert. Se `rapporter/bestilling009-20261013/RAPPORT.md`. Mystery Vortex-formenes identitet og små konturavvik er oppgitt; rom036/037 har identisk overlapp. Bestilling 10 fortsetter. De to eldre FEIL-kandidatene forblir ukrysset.

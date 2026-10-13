@@ -1,0 +1,1 @@
+Rom036del2 er presist klippet fra låst008master. Manifesthash verifisert, levering identisk med008kontrollbilde, overlapp med del1 byte-identisk1152x800. Alle44låste kilder uendret. Uendret egenkontroll OK. Ingen ny generering eller008endring. Runtime og ny brukergodkjenning false. Se c-leveranser.json og jobbnotat for proveniens/hash.

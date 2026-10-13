@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+import shutil,subprocess,json,importlib.util,io,contextlib
+b=Path.cwd();r=b/'rapporter/bestilling009-20261013'
+raw={"rom037":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-4e1fbda7-bbbf-45bd-bab0-b7b2e4863b2b.png","rom038":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-dec9a0d0-18a5-4397-8765-7f200aaa585e.png"}
+for n,p in raw.items():
+ shutil.copy2(p,r/(n+'-raa01.png'))
+ im=Image.open(p).convert('RGB').resize((1920,1024),Image.Resampling.LANCZOS).crop((0,112,1920,912))
+ im.save(r/(n+'-fullmaster.png'))
+ for part,x in [(1,0),(2,384)]:
+  canvas=Image.new('RGB',(1536,1024),(128,128,128));canvas.paste(im.crop((x,0,x+1536,800)),(0,112))
+  j=f'{n}_del{part}av2'
+  dest=r/(j+'-fremtidig.png') if n=='rom038' and part==2 else b/'jobber'/j/'resultat.png'
+  canvas.save(dest)
+spec=importlib.util.spec_from_file_location('check',b/'verktoy/sjekk_leveranse.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+for j in ['rom037_del1av2','rom037_del2av2','rom038_del1av2','rom038_del2av2']:
+ d=b/'jobber'/j
+ p=r/(j+'-fremtidig.png') if j=='rom038_del2av2' else d/'resultat.png'
+ buf=io.StringIO()
+ with contextlib.redirect_stdout(buf):status=m.check_picture(p,json.loads((d/'jobb.json').read_text()),d)
+ (r/(j+'-kontroll.txt')).write_text(buf.getvalue()+'\nUtfall: '+status+'\n')
+ print(j,status,buf.getvalue())
