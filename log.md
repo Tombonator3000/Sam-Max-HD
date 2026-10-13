@@ -98,3 +98,7 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 
 ## 2026-10-13 09:35 (Claude)
 - PR 4 (grafikkjobbene) squash-flettet til main som e0baba9 mens CI på siste commit fortsatt kjørte; nettleser og pipeline var grønne på commiten før (ef9c441), og siste commit endret bare logg, todo, STATUS og README. Arbeidsgrenen startet på nytt fra main.
+
+## 2026-10-13 09:50 (Claude)
+- Tom spurte om dynamisk lys med normalkart og luminansmaske (bilde av Pixel Art Lighter). Svar: det passer i HD-motoren som et siste steg per piksel, men strider mot trofast remake om det står på, og normalkartene er en ekstra produksjon. Tom: valgfritt for spilleren, ingen kastede skygger, vent til stilpiloten er godkjent. Lagt i todo og memory.
+- Sjekket Zak-repoet (FM-Towns, v3): skyggeregelen herfra gjelder ikke der, fordi ScummVM bare setter skyggetabellen for v5 og nyere. Notert i memory her og i Zak.

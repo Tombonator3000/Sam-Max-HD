@@ -63,8 +63,9 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - `smhd gpt-pakke --figurer alle` gir 2 hovedark, 115 romjobber (76 rom), 86 objektjobber, 296 lagjobber (701 bilder), 9 ikonark (163 bilder) og 1758 figurark (15 661 ruter, 343 kostymer). Ligger i `work/gpt`, ikke i noen gren ennå.
 - Fast størrelse: prompten gir målet på hver rute i 4x, og `tools/sjekk_leveranse.py` (bare numpy og Pillow) kopieres til `verktoy/` i `gpt-arbeid` så grafikeren kan sjekke før commit. `myk.py` versjon 4 merker grupper der tegnet størrelse spriker mer enn 12 prosent.
 - Hovedark: `figur.MASTERS` (Sam kostyme 2 og nærbilde 27, Max kostyme 3 og nærbilde 28). Figurjobber for kostymer med `hovedark` i `docs/figurer.csv` får hovedarket som bilde to; senere ark av samme kostyme får første ark som bilde tre.
-- Klassiske kostymer: palettindeks 13 er skygge (tegnes gjennom skyggetabellen) og tas bort fra arkene. Kostyme 127, 132, 153, 211 og 280 er bare skygge og får ingen ark. Kroppen er oftest lag 1. Mot venstre speilvender motoren rutene mot høyre (ingen egne ruter).
+- Klassiske kostymer: palettindeks 13 er skygge (tegnes gjennom skyggetabellen) og tas bort fra arkene. Gjelder v5 og nyere: ScummVM setter `_shadowTable` bare da, så i Zak (v3) er 13 en vanlig farge. Kostyme 127, 132, 153, 211 og 280 er bare skygge og får ingen ark. Kroppen er oftest lag 1. Mot venstre speilvender motoren rutene mot høyre (ingen egne ruter).
 - Seks ruter i kostyme 62, 133, 331 og 346 er søppel fra animasjonskoder utenfor kostymet (opptil 6189 px). `figur.MAX_CEL` = 640 x 400 holder dem ute.
 - Paletter: `docs/kostymefarger.csv` (2, 4, 7 til rom 7; 104, 106, 107, 108 til rom 76; 334 til rom 88). Fra `tools/kostymer.py`, som leser skriptene.
 - Romnavn i `docs/rom-oversikt.csv` (alle 85), engelske romnotater med skilttekst i `docs/gpt-romnotater.csv`, figurliste med navn og engelsk beskrivelse i `docs/figurer.csv`.
 - CSV-filene i `docs/` skrives med LF (`lineterminator="\n"`), ellers klager `git diff --check`.
+- Dynamisk lys (normalkart og luminansmaske) er planlagt etter stilpiloten: valgfritt for spilleren, ingen kastede skygger (Tom 13. oktober). Samme plan i Zak.
