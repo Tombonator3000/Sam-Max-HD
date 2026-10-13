@@ -1,0 +1,4 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,shutil
+r=Path('rapporter/bestilling035-20261013');shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-ffcfc418-f737-4dfd-8fd1-fed76676c31f.png',r/'b-ball03-raa03.png');p=Path('jobber/lag037_03_del1av2/resultat.png');out=Image.open(p).convert('RGB');base=Image.open('jobber/rom037_del1av2/resultat.png').convert('RGB');tile=Image.open(r/'b-ball03-raa03.png').convert('RGB').resize((192,224),Image.Resampling.LANCZOS);out.paste(base.crop((576,112,768,336)),(576,112));y,x=np.mgrid[:224,:192];alpha=Image.fromarray((np.clip(np.minimum.reduce([x+1,192-x,y+1,224-y])/8,0,1)*255).astype('uint8'));out.paste(tile,(576,112),alpha);out.save(p)

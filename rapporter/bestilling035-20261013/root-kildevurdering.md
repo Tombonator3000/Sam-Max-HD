@@ -1,0 +1,5 @@
+# Root kildevurdering35
+
+Root har lest hele kildeplanen/felttabellen og sett alle ti helscener,23felt og felles037master. A produserer seks036uthusvarianter, hvor02=06 og03=05 er dokumentert identiske hele originalkompositter. Fire forskjellige nye valgte tegninger kan derfor gi seks resultater. Åpen/skrå front i01, lukkede brunflater i øvrige og kildeegne posisjoner beholdes.
+
+B eier alle fire037jobber:01del1/2 fra én1920×800master, samt02/03del1 med egne tilstander. Den opprinnelige korte arbeidsfordelingen som kalte alle tre del2 var feil; faktiske jobb-IDer og metadata styrer. 01 krever alle ni felt i begge synlige deler, med fire svarte døråpninger, egne små fisk-/nebb-/8ball-/tangent-/periskoptilstander.354_01 er bare ett tonemerke i dammen. 02/03 beholder grunnrommets lukkede dører og nebb, og03s doble lyse kulebuer skal ikke ryddes bort. Root har også sett senere350/354kilder i36 og støtter den dokumenterte familieidentiteten. Runtime og animasjonstiming er fortsatt ikke verifisert.

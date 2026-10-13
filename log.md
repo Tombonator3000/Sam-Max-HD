@@ -282,3 +282,8 @@
 
 - Bestilling38: seks lag levert OK med sju faktiske feltkontroller, dråpe/plask, åpen dør, CB-buss og lav arm. Fire jobber venter motivavklaring. Se `rapporter/bestilling038-20261013/RAPPORT.md`. Bestilling35s retting og resten av HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-13T23:43:16+02:00 (Codex, Astra)
+
+- Bestilling35: ti lag levert, ni OK og lag037_01_del2av2 SJEKK (blokk2,00). Alle23metadatafelt OK, egen uthusfamilie og identisk Escher-overlapp. Se `rapporter/bestilling035-20261013/RAPPORT.md`. Bestilling39 og videre fortsetter.
+- 80 beskyttede/kontekstfiler uendret. Ingen avvik utenfor faktisk feltunion. Rot har sett alle scener, mikrotilstander og ballretting. Ingen import, runtime eller ny individuell bildeaksept.

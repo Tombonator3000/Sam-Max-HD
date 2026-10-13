@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess
+root=Path.cwd();r=root/'rapporter/bestilling035-20261013';base=Image.open(root/'jobber/rom037_del1av2/resultat.png').convert('RGB');ob=np.array(Image.open(root/'jobber/rom037_del1av2/original_1x.png').convert('RGB'));rows=[]
+for i,rawbox in [(2,(973,547,1328,989)),(3,(933,576,1351,1024))]:
+ j=f'lag037_{i:02d}_del1av2';p=root/'jobber'/j;out=Image.open(p/'resultat.png').convert('RGB');raw=Image.open(r/f'b-037-{i:02d}-raa01.png').crop(rawbox).convert('RGBA');a=np.array(raw).astype(float);rgb=a[:,:,:3];mx=rgb.max(2);mn=rgb.min(2);mask=(((mx-mn)<np.maximum(mx,1)*.46)|(mx<65))&(mx<235);h,w=mask.shape;allowed=np.zeros(mask.shape,bool);allowed[int(h*.32):int(h*.72),:int(w*.78)]=True;
+ if i==2:
+  allowed[:]=False;allowed[195:248,35:160]=True
+ mask&=allowed;yy,xx=np.where(mask);bb=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];raw.putalpha(Image.fromarray((mask*255).astype('uint8')));raw.save(r/f'b-354-{i:02d}-nyalfa.png');orig=np.array(Image.open(p/'original_1x.png').convert('RGB'));dif=np.any(orig[128:168,328:360]!=ob[128:168,328:360],axis=2);dif[30:]=False;sy,sx=np.where(dif);dst=[1312+int(sx.min())*4,624+int(sy.min())*4,int(sx.max()-sx.min()+1)*4,int(sy.max()-sy.min()+1)*4];tile=raw.crop(bb).resize((dst[2],dst[3]),Image.Resampling.LANCZOS);out.paste(base.crop((1312,624,1440,784)),(1312,624));out.paste(tile,tuple(dst[:2]),tile)
+ # Shared new-art tone point: same source micro position, no source RGB copied.
+ tone=Image.open(r/'b-037-master-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS).crop((1388,656,1392,660));out.paste(tone,(1388,768));out.save(p/'resultat.png');rows.append({'jobb':j,'ny_alfa_boks':bb,'kildebruk_kun_helboks':dst,'tonepunkt_canvas':[1388,768,4,4]})
+ res=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll02.txt').write_text(res.stdout+res.stderr);print(res.stdout)
+(r/'b-periskop-mikrobevis.json').write_text(json.dumps(rows,indent=2)+'\n')

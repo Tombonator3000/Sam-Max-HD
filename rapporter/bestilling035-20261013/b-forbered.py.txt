@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib
+root=Path.cwd();r=root/'rapporter/bestilling035-20261013';a=Image.open(root/'jobber/rom037_del1av2/resultat.png').convert('RGB').crop((0,112,1536,912));b=Image.open(root/'jobber/rom037_del2av2/resultat.png').convert('RGB').crop((0,112,1536,912));assert a.crop((384,0,1536,800)).tobytes()==b.crop((0,0,1152,800)).tobytes();master=Image.new('RGB',(1920,800));master.paste(a,(0,0));master.paste(b,(384,0));master.save(r/'b-037-hdgrunn.png')
+for i in [2,3]:
+ j=f'lag037_{i:02d}_del1av2';p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text())
+ for name,f in [('source',p/'referanse.png'),('hd',root/m['bilde_to'])]:
+  im=Image.open(f).convert('RGB');sheet=Image.new('RGB',(384,384),(128,128,128))
+  for o in m['objekter']:
+   x,y,w,h=o['rekt'];tile=im.crop((x*4,112+y*4,(x+w)*4,112+(y+h)*4));pos={350:(0,0),352:(192,0),353:(0,240),354:(240,224)}[o['objekt']];sheet.paste(tile,pos)
+  sheet.save(r/f'b-037-{i:02d}-{name}.png')

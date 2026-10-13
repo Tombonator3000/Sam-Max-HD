@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];fields=json.loads((r/'a-feltbevis.json').read_text());lines=['| Jobb | Objekt | Kildeboks | HD-boks | Farger | Endrede kildepiksler mot rom |','| --- | --- | --- | --- | --- | --- |']
+for e in fields:
+ j=e['jobb'];m=json.loads((root/'jobber'/j/'jobb.json').read_text());b=e['lokalt_klipp'];a=np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop(b));bb=np.array(Image.open((root/m['bilde_to']).parent/'original_1x.png').convert('RGB').crop(b));lines.append(f'| {j} | {e["objekt"]} | {e["rekt"]} | {e["hd_rekt"]} | {e["palett_antall"]} | {int(np.any(a!=bb,axis=2).sum())} |')
+(r/'a-felttabell.md').write_text('\n'.join(lines)+'\n');locks=[]
+for f in ['kildehash.json','a-ekstra-kildehash.json','a-nabo-kildehash.json']:locks+=json.loads((r/f).read_text())
+assert all(hashlib.sha256((root/e['fil']).read_bytes()).hexdigest()==e['sha256'] for e in locks);(r/'a-kildehashkontroll.json').write_text(json.dumps({'antall':len(locks),'alle_uendret':True,'filer':locks},indent=2))

@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,importlib.util
+r=Path('rapporter/bestilling035-20261013');proof=json.loads((r/'b-sluttbevis.json').read_text());spec=importlib.util.spec_from_file_location('ck','verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(spec);spec.loader.exec_module(ck)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+fields=[];deliver=[]
+for z in proof['leveranser']:
+ j=z['jobb'];p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());metrics=ck.compare(Image.open(p/'original_1x.png'),Image.open(p/'resultat.png').crop((0,112,1536,912)))
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];a=metrics['eo'][y:y+h,max(0,x):min(384,x+w)];b=metrics['es'][y:y+h,max(0,x):min(384,x+w)];c=ck.corr(a,b);fields.append({'jobb':j,'objekt':o['bilde'],'kantlikhet':float(c),'egenkontroll':'OK' if c>=.6 else 'SJEKK' if c>=.5 else 'FEIL'})
+ attempts=3 if '_03_' in j else 2 if '_02_' in j else 1
+ entry={**z,'resultat':str(p/'resultat.png'),'forsok':attempts,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True}
+ if '_01_' in j:entry.update(fullmaster=proof['fullmaster'],fullmaster_sha256=proof['fullmaster_sha256'],klipp_x=0 if 'del1' in j else 384)
+ deliver.append(entry)
+ (p/'notat.md').write_text(f'''# {j}\n\nKildetro nytegning med innebygd ChatGPT-bildegenerator. Eksakt bildemodell er ikke eksponert. {attempts} relevante forsøk; 01-paret deler én generert master. Ordrett prompt med separat kildepresisering, råbilder, proveniens og oppskrifter er bevart i {r}.\n\nFire svarte døråpninger, åpent andehåndtak og kildeegen 8-ball gjelder bare 01. 02 og 03 har grunnrommets lukkede dører og egne fiskefragmenter, tangenttoner og lave periskoptupper. 354_01 er bare ett tonemerke, ingen oppreist gjenstand. 03s doble konturbuer er beholdt. Bare nygenerert kunst og levert HD-underlag inngår; originalen brukes til analyse og hele komponentbokser, aldri som resultatpiksler eller alfa. Ingen warp eller vektortrace.\n\nUendret egenkontroll: {z['egenkontroll']}. Se {z['kontrollfil']}. 01 del2 beholder SJEKK for blokkforskyvning 2,00; øvrige tre er OK. Null endringer utenfor samlet kildeunion. Begge 01-deler matcher samme master med 1152 × 800 byte-identisk overlapp.\n\nNye former, fiskefragmenter og metall er renere og mer modellerte enn pikselkilden. Disse tegningsforbeholdene og grunnrommets egne HD-tolkninger er ikke en runtime- eller brukerbekreftelse.\n\nOriginal SHA-256: {sha(p/'original_1x.png')}\nResultat SHA-256: {z['sha256']}\n\nRuntime: false. Ny individuell brukergodkjenning: false.\n''')
+(r/'b-objektkontroll.json').write_text(json.dumps(fields,indent=2)+'\n');(r/'b-leveranser.json').write_text(json.dumps({'leveranser':deliver,'kilder_uendret':proof['kilder_uendret'],'runtime':False,'ny_brukergodkjenning':False},indent=2)+'\n')
+files=[]
+for p in sorted(r.iterdir()):
+ if p.suffix=='.png' and ('raa' in p.name or 'fullmaster' in p.name) or p.suffix=='.txt' and ('prompt' in p.name or p.name.endswith('.py.txt')):files.append({'fil':str(p),'sha256':sha(p)})
+(r/'b-proveniens.json').write_text(json.dumps({'verktøy':'innebygd ChatGPT imagegen','eksakt_bildemodell':'ikke eksponert','antall_genereringskall':5,'filer':files,'valgt_ballretting':'b-ball03-raa03.png','komposisjonsrekkefolge':['b-komponer.py.txt','b-periskop-mikro-rett.py.txt','b-ball-sluttretting.py.txt'],'ikke_sluttvalgt':['b-ball-bakgrunn-rett.py.txt'],'alfa':'bare nygenererte farger og egne nybildeutvalg; ingen originalmasker'},indent=2,ensure_ascii=False)+'\n')

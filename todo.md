@@ -59,7 +59,8 @@
 - [ ] Fullfør bestilling 31: åtte OK levert, lag026_02 og lag026_03 venter avklaring av figur og lyst fragment.
 - [x] Levert bestilling 33 med ti OK, elleve feltkontroller og576×800identisk kikkertoverlapp.
 - [ ] Fullfør bestilling 34: seks OK levert; lag032_01/03 og lag035_01/02 venter avklaring av grønne former.
-- [ ] Fortsett bestilling 35 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Bestilling35 levert med ni OK og én SJEKK;23feltOK og identisk Escher-overlapp.
+- [ ] Fortsett bestilling39 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
 
 - [x] Rom090 og obj901_01 rettet og levert OK med uttrykkelig valgt vektorrekonstruksjon; tidligere bestilling 21-avvik erstattet.
 

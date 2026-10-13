@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json
+r=Path('rapporter/bestilling035-20261013');p=Path('jobber/lag037_03_del1av2/resultat.png');out=Image.open(p).convert('RGB');out.save(r/'b-03-for-bakgrunnsretting.png');tile=out.crop((576,112,768,336)).convert('RGBA');a=np.array(tile);rgb=a[:,:,:3].astype(float);R,G,B=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2];mx=rgb.max(2);mn=rgb.min(2);y,x=np.mgrid[:224,:192]
+mask=((mx<65)|((mx-mn)<45)|((R<B*.7)&(G>B*.43)))&(x>=16)&(y<113)
+# The alpha uses only generated colors and a generated-image selection region.
+# No source mask, silhouette tracing or geometry transformation.
+tile.putalpha(Image.fromarray((mask*255).astype('uint8')));tile.save(r/'b-35203-nyalfa.png');base=Image.open('jobber/rom037_del1av2/resultat.png').convert('RGB');out.paste(base.crop((576,112,768,336)),(576,112));out.paste(tile,(576,112),tile);out.save(p)
+(r/'b-ball-bakgrunn-rett.json').write_text(json.dumps({'alfa_fra':'bare nygenererte farger og rektangulært komponentvalg','boks':[576,112,192,224],'originalmasker':False,'bakgrunn':'levert HD-grunnrom'},indent=2)+'\n')

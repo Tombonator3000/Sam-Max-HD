@@ -1,0 +1,5 @@
+# Root mottak av seks uthustilstander etter retting
+
+Root har sett alle seks helscener og metadatafelt, deretter 04s original/før/etter og den nedre originalflaten i02/03/04. Det tidligere ovale hullet i04 er rettet med eget nytt bildeutdrag til den kantete skrå åpningen. Siste04SHA er719d14da13eb87431b10dd537051c23e066c88c0ef3044f6db39e1a579b7c636. Bare [760,307,60,38] er endret etter den første mottakskontrollen; resten av bildet er bevart.
+
+Åpen front i01, lukkede fronter i de øvrige, lillagul palett og egne posisjoner følger kilden. Den nedre åpningen beholder nå samme type gjennom familien.02=06 og03=05 er kildeidentiske par som deler valgt ny grafikk. Trelinjer, mørke felt og døråpninger er glattere modellerte, men det er ikke funnet vesentlig gjenværende motivfeil. Denne vurderingen erstatter den foreløpige returstatusen i root-a-visuell-qa-forelopig.md, som beholdes som sporbar historikk. Samlet teknisk mottak utføres separat når B sine fire037jobber er klare. Ingen motorimport, runtime eller ny individuell bildegodkjenning er utført.

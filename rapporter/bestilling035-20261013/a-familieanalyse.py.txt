@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,itertools,numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();locks=[]
+def src(j):return Image.open(root/'jobber'/j/'original_1x.png').convert('RGB')
+for j in ['rom036_del2av2','rom037_del1av2','rom037_del2av2']:
+ for n in ['original_1x.png','referanse.png','prompt.txt','jobb.json']:locks.append({'fil':f'jobber/{j}/{n}','sha256':sha(root/'jobber'/j/n)})
+(r/'a-ekstra-kildehash.json').write_text(json.dumps(locks,indent=2));fields=json.loads((r/'a-feltbevis.json').read_text());rows=[]
+for e in fields:
+ j=e['jobb'];m=json.loads((root/'jobber'/j/'jobb.json').read_text());base=src(Path(m['bilde_to']).parent.name);rows.append((j+' '+e['objekt'],base.crop(e['lokalt_klipp']),src(j).crop(e['lokalt_klipp'])))
+for start in range(0,len(rows),6):
+ can=Image.new('RGB',(1200,min(6,len(rows)-start)*230),(185,185,185));dr=ImageDraw.Draw(can)
+ for i,(label,a,b) in enumerate(rows[start:start+6]):
+  dr.text((5,i*230+5),label+' grunnrom / kilde',fill='black')
+  for k,im in enumerate([a,b]):
+   s=min(560/im.width,195/im.height);im=im.resize((round(im.width*s),round(im.height*s)),Image.Resampling.NEAREST);can.paste(im,(k*600,i*230+30))
+ can.save(r/f'a-grunnromsfelt-{start//6+1}.png')
+a=src('lag037_01_del1av2');b=src('lag037_01_del2av2');master=Image.new('RGB',(480,200));master.paste(a,(0,0));master.paste(b,(96,0));master.resize((1920,800),Image.Resampling.NEAREST).save(r/'a-037-master-kilde.png');same=a.crop((96,0,384,200)).tobytes()==b.crop((0,0,288,200)).tobytes();out={'03701_master':[1920,800],'klipp_x':[0,384],'overlapp':[1152,800],'overlapp_rgb_identisk':same}
+base=Image.new('RGB',(480,200));base.paste(src('rom037_del1av2'),(0,0));base.paste(src('rom037_del2av2'),(96,0));mask=np.zeros((200,480),bool)
+for e in fields:
+ if e['jobb'].startswith('lag037_01'):
+  x,y,w,h=e['rekt'];mask[y:y+h,x:x+w]=True
+diff=np.any(np.array(master)!=np.array(base),axis=2);out['03701_total_diff']=int(diff.sum());out['03701_utenfor_union']=int((diff&~mask).sum())
+seq=[f'lag036_{i:02d}_del2av2' for i in range(1,7)];out['334_par']=[{'a':a,'b':b,'ulike':int(np.any(np.array(src(a))!=np.array(src(b)),axis=2).sum())} for a,b in itertools.combinations(seq,2)]
+for ob in [350,352,353,354]:
+ ss=[(1,'lag037_01_del2av2'),(2,'lag037_02_del1av2'),(3,'lag037_03_del1av2')];arr=[]
+ for i,j in ss:
+  e=next(e for e in fields if e['jobb']==j and e['objekt']==f'obj{ob}_{i:02d}');arr.append((j,np.array(src(j).crop(e['lokalt_klipp']))))
+ out[f'{ob}_par']=[{'a':a,'b':b,'ulike':int(np.any(aa!=bb,axis=2).sum())} for (a,aa),(b,bb) in itertools.combinations(arr,2)]
+(r/'a-familiebevis.json').write_text(json.dumps(out,indent=2));print(json.dumps(out,indent=2))

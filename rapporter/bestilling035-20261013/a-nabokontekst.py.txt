@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1];locks=[];rows=[]
+for n in range(4,11):
+ j=f'lag037_{n:02d}_del2av2';d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text())
+ for name in ['original_1x.png','referanse.png','prompt.txt','jobb.json']:locks.append({'fil':str((d/name).relative_to(root)),'sha256':hashlib.sha256((d/name).read_bytes()).hexdigest()})
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];im=Image.open(d/'original_1x.png').crop((x,y,x+w,y+h));rows.append((j+' '+o['bilde'],im))
+can=Image.new('RGB',(1200,((len(rows)+3)//4)*250),(185,185,185));dr=ImageDraw.Draw(can)
+for i,(label,im) in enumerate(rows):
+ x=i%4*300;y=i//4*250;dr.text((x+2,y+5),label,fill='black');im=im.resize((im.width*5,im.height*5),Image.Resampling.NEAREST);im.thumbnail((295,215),Image.Resampling.NEAREST);can.paste(im,(x,y+30))
+can.save(r/'a-037-nabokontekst.png');(r/'a-nabo-kildehash.json').write_text(json.dumps(locks,indent=2))

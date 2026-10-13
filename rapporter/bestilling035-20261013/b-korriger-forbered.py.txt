@@ -1,0 +1,3 @@
+from PIL import Image
+from pathlib import Path
+r=Path('rapporter/bestilling035-20261013');src=Image.new('RGB',(384,128),(128,128,128));new=src.copy();src.paste(Image.open(r/'b-037-02-source.png').crop((0,0,160,96)),(0,0));src.paste(Image.open(r/'b-037-03-source.png').crop((192,0,384,112)),(192,0));new.paste(Image.open(r/'b-037-02-raa01.png').crop((171,0,651,259)).resize((160,96)),(0,0));new.paste(Image.open(r/'b-037-03-raa01.png').crop((768,0,1398,576)).resize((192,224)).crop((0,0,192,112)),(192,0));src.save(r/'b-mikroretting-source.png');new.save(r/'b-mikroretting-rediger.png')

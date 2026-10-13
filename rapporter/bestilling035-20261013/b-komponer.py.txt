@@ -1,0 +1,47 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess
+root=Path.cwd();r=root/'rapporter/bestilling035-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+exec((root/'rapporter/bestilling032-20261013/b-komponentanalyse.py.txt').read_text().split('base=np.array')[0])
+# Restore intended report root after loading the generic component helper.
+r=root/'rapporter/bestilling035-20261013'
+def feather(w,h,n):
+ y,x=np.mgrid[:h,:w];return Image.fromarray((np.clip(np.minimum.reduce([x+1,w-x,y+1,h-y])/n,0,1)*255).astype('uint8'))
+def fish(tile,src,basesrc,destination,records):
+ a=np.array(tile.convert('RGB')).astype(float);h,w=a.shape[:2];mask=(a[:,:,0]>25)&(a[:,:,1]>20)&(a[:,:,2]<a[:,:,1]*.65)&(a[:,:,0]<a[:,:,1]*1.9);valid=np.zeros((h,w),bool);valid[int(h*.18):int(h*.85),int(w*.1):int(w*.65)]=True;mask&=valid;yy,xx=np.where(mask);bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];tile=tile.convert('RGBA');tile.putalpha(Image.fromarray((mask*255).astype('uint8')));diff=np.any(np.array(src)!=np.array(basesrc),axis=2);sy,sx=np.where(diff);box=[int(sx.min())*4,int(sy.min())*4,int(sx.max()-sx.min()+1)*4,int(sy.max()-sy.min()+1)*4];part=tile.crop(bbox).resize((box[2],box[3]),Image.Resampling.LANCZOS);destination.paste(part,tuple(box[:2]),part);records.append({'type':'fish_newalpha','ny_boks':bbox,'kilde_helboks_hd':box});return destination
+base=Image.open(r/'b-037-hdgrunn.png').convert('RGB');master=base.copy();raw=Image.open(r/'b-037-master-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS);records=[];boxes=[]
+for part in [1,2]:
+ j=f'lag037_01_del{part}av2';m=json.loads((root/'jobber'/j/'jobb.json').read_text());orig=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB');bas=Image.open(root/f'jobber/rom037_del{part}av2/original_1x.png').convert('RGB');rx=m['region'][0]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];xx=x*4;yy=y*4;ww=w*4;hh=h*4;tile=raw.crop((xx,yy,xx+ww,yy+hh));boxes.append([xx,yy,ww,hh]);src=orig.crop((x-rx,y,x-rx+w,y+h));bs=bas.crop((x-rx,y,x-rx+w,y+h))
+  if o['objekt']==354:
+   master.paste(raw.crop((1388,656,1392,660)),(1388,656));records.append({'objekt':o['bilde'],'mikroboks_master':[1388,656,4,4],'nytt_materiale':'b-037-master-raa01.png'});continue
+  if o['objekt']==350:dest=base.crop((xx,yy,xx+ww,yy+hh));dest=fish(tile,src,bs,dest,records);master.paste(dest,(xx,yy));continue
+  if o['objekt']==353:
+   ds=components(np.any(np.array(src)!=np.array(bs),axis=2));
+   for c in ds:
+    u,v,cw,ch=map(int,c['boks']);box=(u*4,v*4,(u+cw)*4,(v+ch)*4);master.paste(tile.crop(box),(xx+u*4,yy+v*4));records.append({'objekt':o['bilde'],'kilde_komponentboks':list(map(int,c['boks'])),'nytt_materiale':'egen generert tangentflate'})
+   continue
+  master.paste(tile,(xx,yy),feather(ww,hh,6))
+master.save(r/'b-037-fullmaster.png')
+for part,offset in [(1,0),(2,384)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(master.crop((offset,0,offset+1536,800)),(0,112));out.save(root/f'jobber/lag037_01_del{part}av2/resultat.png')
+rawboxes={2:{350:(171,0,651,259),352:(874,0,1363,546),353:(171,577,765,958),354:(973,547,1328,989)},3:{350:(140,0,640,299),352:(768,0,1398,576),353:(140,593,768,987),354:(933,576,1351,1024)}}
+fix=Image.open(r/'b-mikroretting-raa02.png').convert('RGB')
+for i in [2,3]:
+ j=f'lag037_{i:02d}_del1av2';p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());baseim=Image.open(root/m['bilde_to']).convert('RGB');out=baseim.copy();orig=Image.open(p/'original_1x.png').convert('RGB');bas=Image.open(root/'jobber/rom037_del1av2/original_1x.png').convert('RGB');rawim=Image.open(r/f'b-037-{i:02d}-raa01.png').convert('RGB')
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];xx=x*4;yy=112+y*4;ww=w*4;hh=h*4;tile=rawim.crop(rawboxes[i][o['objekt']]).resize((ww,hh),Image.Resampling.LANCZOS);src=orig.crop((x,y,x+w,y+h));bs=bas.crop((x,y,x+w,y+h))
+  if i==2 and o['objekt']==350:tile=fix.crop((0,0,852,512)).resize((ww,hh),Image.Resampling.LANCZOS)
+  if i==3 and o['objekt']==352:
+   repaired=fix.crop((1024,0,2048,597)).resize((192,112),Image.Resampling.LANCZOS);tile.paste(repaired,(0,0))
+  if o['objekt']==350:dest=baseim.crop((xx,yy,xx+ww,yy+hh));dest=fish(tile,src,bs,dest,records);out.paste(dest,(xx,yy));continue
+  if o['objekt']==353:
+   for c in components(np.any(np.array(src)!=np.array(bs),axis=2)):
+    u,v,cw,ch=map(int,c['boks']);out.paste(tile.crop((u*4,v*4,(u+cw)*4,(v+ch)*4)),(xx+u*4,yy+v*4));records.append({'objekt':o['bilde'],'kilde_komponentboks':list(map(int,c['boks'])),'nytt_materiale':'egen generert tangentflate'})
+   continue
+  out.paste(tile,(xx,yy),feather(ww,hh,6))
+ out.save(p/'resultat.png')
+for j in ['lag037_01_del1av2','lag037_01_del2av2','lag037_02_del1av2','lag037_03_del1av2']:
+ p=root/'jobber'/j;res=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(res.stdout+res.stderr);print(res.stdout)
+(r/'b-komponentoppskrift.json').write_text(json.dumps(records,indent=2,default=int)+'\n')
