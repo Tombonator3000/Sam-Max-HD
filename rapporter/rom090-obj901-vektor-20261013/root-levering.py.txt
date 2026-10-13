@@ -42,7 +42,8 @@ def update_queue(entries, note):
 
 def seal_and_push(folder, entries, message):
     for p in list(folder.rglob('*'))+[root/'jobber'/e['jobb']/'notat.md' for e in entries]:
-        if p.is_file() and p.suffix in {'.md','.txt'} and p.name not in {'prompt.txt','SHA256SUMS.txt'}:
+        # Prompt and recipe bytes are provenance, including their exact final newline.
+        if p.is_file() and p.suffix == '.md':
             p.write_text('\n'.join(line.rstrip() for line in p.read_text().splitlines()).rstrip()+'\n')
     files = sorted(p for p in folder.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')+[root/'jobber'/e['jobb']/name for e in entries for name in ['resultat.png','notat.md']]
     (folder/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+str(p.relative_to(root))+'\n' for p in files))

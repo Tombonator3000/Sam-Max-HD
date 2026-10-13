@@ -1,0 +1,40 @@
+from pathlib import Path
+import json,hashlib,subprocess
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+r=Path(__file__).resolve().parent;root=r.parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+audit=json.loads((r/'c-promptintegritet.json').read_text());records={}
+for e in audit['kontroller']:
+    if e['status']=='EOF_AVVIK_BEVIST':
+        if e['fil'] in records:assert records[e['fil']]['forventet_sha256']==e['forventet_sha256']
+        records[e['fil']]=e
+assert len(records)==17
+tracked=subprocess.check_output(['git','ls-files','jobber/*/resultat.png'],cwd=root,text=True).splitlines()
+before={f:sha(root/f) for f in tracked}
+changes=[]
+for name,e in records.items():
+    p=root/name;assert name.startswith('rapporter/') and 'prompt' in p.name
+    assert sha(p)==e['aktuell_sha256'],name
+    b=p.read_bytes();assert b.endswith(b'\n') and hashlib.sha256(b[:-1]).hexdigest()==e['forventet_sha256']
+    p.write_bytes(b[:-1])
+    changes.append({'fil':name,'foer_sha256':e['aktuell_sha256'],'etter_sha256':sha(p),'fjernet_suffix_hex':'0a','eksakt_historisk_hash_gjenopprettet':sha(p)==e['forventet_sha256']})
+assert before=={f:sha(root/f) for f in tracked}
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+(r/'root-reparasjon.json').write_text(json.dumps({'dato':stamp,'reparasjoner':changes,'leverte_png_ubevaerte':len(tracked),'alle_leverte_png_uendret':True,'beskyttede_jobbprompter_endret':False,'historiske_manifest_sha_endret':False},ensure_ascii=False,indent=2)+'\n')
+(r/'RAPPORT.md').write_text('# Gjenopprettet promptintegritet\n\nRoots tekstnormalisering la til ett avsluttende LF i17 rapportprompter fra bestilling20–22. C kontrollerte eksplisitte prompt/hash-par og beviste den eksakte byteforskjellen. Root har fjernet bare dette ene LF, kontrollert førhash og gjenopprettet hver tidligere lagret SHA-256. Ingen tekst inne i promptene er endret.\n\nAlle '+str(len(tracked))+' tidligere leverte PNG-er er kontrollert uendret. Beskyttede jobbprompter, originaler og metadata er ikke berørt. Historiske manifestverdier er bevart, og de tilhørende samlede SHA-filene er oppdatert til korrekte rapportbytes. Leveringshjelperen normaliserer heretter bare Markdown; prompt- og oppskriftsbytes bevares eksakt.\n\nC sin revisjon omfatter64 unike eksplisitte hashpar:47 var riktige og17 hadde det beviste ekstraLF. Inventaret fant også242 rapportprompter uten eksplisitt historisk prompt-SHA; disse er ikke erklært historisk byteverifisert. Den foreløpige vide koblingen til generelle bildehash ble forkastet før slutt og er dokumentert som analysefeil.\n\nBevis, filinventar og etterhash står i c-promptintegritet.json og root-reparasjon.json. Dette er en proveniensretting, ikke endret grafikk eller runtime-verifikasjon.\n')
+for folder in ['bestilling020-20261013','bestilling021-20261013','bestilling022-20261013','rom090-obj901-vektor-20261013']:
+    sums=root/'rapporter'/folder/'SHA256SUMS.txt'
+    paths=[line.split('  ',1)[1] for line in sums.read_text().splitlines()]
+    sums.write_text(''.join(sha(root/f)+'  '+f+'\n' for f in paths))
+with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex, Astra)\n\n-17 rapportprompters opprinnelige bytes gjenopprettet ved å fjerne ett bevist ekstraLF. Alle222 tidligere leverte PNG-er er uendret. Leveringshjelperen bevarer heretter prompt-/oppskriftsbytes. Se rapporter/promptintegritet-20261013/.\n')
+files=sorted(p for p in r.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')
+(r/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+str(p.relative_to(root))+'\n' for p in files))
+stage=[str(r.relative_to(root)),'log.md','rapporter/rom090-obj901-vektor-20261013/root-levering.py.txt']+list(records)+[f'rapporter/{f}/SHA256SUMS.txt' for f in ['bestilling020-20261013','bestilling021-20261013','bestilling022-20261013','rom090-obj901-vektor-20261013']]
+assert not subprocess.check_output(['git','diff','--cached','--name-only'],cwd=root,text=True).strip()
+assert subprocess.check_output(['git','branch','--show-current'],cwd=root,text=True).strip()=='gpt-arbeid'
+subprocess.run(['git','add','--',*stage],cwd=root,check=True);subprocess.run(['git','diff','--cached','--check'],cwd=root,check=True)
+subprocess.run(['git','commit','-m','GPT: bevar eksakte promptbytes og rett dokumenterte LF-avvik'],cwd=root,check=True,capture_output=True,text=True)
+subprocess.run(['git','push','origin','gpt-arbeid'],cwd=root,check=True,capture_output=True,text=True)
+print(subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip())

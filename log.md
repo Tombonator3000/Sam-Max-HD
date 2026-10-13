@@ -203,3 +203,7 @@
 
 - Bestilling 23: ti kontorlag levert OK. Ni egne TV-tilstander, lokal munn-/øyeretting og grønn indikator bare i lag03. Riktig HD-rom er bytebevart utenfor nye felt; lag02 del2 har identisk overlapp med bestilling22. Alle elleve objektfelt kontrollert. Se `rapporter/bestilling023-20261013/RAPPORT.md`. Bestilling 24 og videre lag fortsetter.
 - 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T21:31:33+02:00 (Codex, Astra)
+
+-17 rapportprompters opprinnelige bytes gjenopprettet ved å fjerne ett bevist ekstraLF. Alle222 tidligere leverte PNG-er er uendret. Leveringshjelperen bevarer heretter prompt-/oppskriftsbytes. Se rapporter/promptintegritet-20261013/.
