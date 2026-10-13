@@ -27,7 +27,7 @@ Instrukser for alle KI-agenter som jobber i dette repoet (Claude, Codex, ChatGPT
 ## Regler
 
 - Spillfiler (`SAMNMAX.*`, `*.SM0`, `*.SM1`, `MONSTER.SOU`, `*.ROM`) og alt som lages fra dem (`work/`, `mods/`, HD-bilder) skal aldri inn i `main` eller kodegrener. De ligger i egne grener (se under).
-- Repoet er offentlig etter Toms valg (10. oktober 2026). *Sam & Max Hit the Road* tilhører Disney/Lucasfilm. Tom har bestemt (13. oktober 2026) at grafikk og annet fra spillet kan deles utenfor repoet til hans eget, private bruk, for eksempel på testsider på GitHub Pages eller som filer til egne maskiner og telefoner. Spillfilene og alt som lages fra dem holdes fortsatt utenfor `main` og kodegrenene.
+- Repoet er offentlig etter Toms valg (10. oktober 2026). *Sam & Max Hit the Road* tilhører Disney/Lucasfilm. Tom har bestemt (13. oktober 2026) at grafikk og annet fra spillet kan deles utenfor repoet til hans eget, private bruk: som filer til egne maskiner og telefoner, eller på private steder bare han har tilgang til. Offentlige sider og pakker (GitHub Pages, releaser) har fortsatt ingen spillgrafikk. Spillfilene og alt som lages fra dem holdes fortsatt utenfor `main` og kodegrenene.
 - Kjør testene før du committer endringer i pipelinen eller motoren.
 - Kodeendringer går via PR mot `main` og flettes når CI er grønn. Logg, status, todo og minne kan committes rett i `main`.
 
