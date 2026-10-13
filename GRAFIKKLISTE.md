@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 20:30 (norsk tid)
+Oppdatert 2026-10-13 20:35 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 66 hele rom levert (102 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 78 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 72 hele rom levert (110 deler), inkludert 2 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 80 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -304,16 +304,16 @@ Rom 79, 80, 82.
 
 Rom 83, 84, 85, 86, 87, 88.
 
-- [ ] `rom083` (rom 83 Slutten (bigfootene i skyene))
-- [ ] `obj832_01` (rom 83 Slutten (bigfootene i skyene), objekt 832 tilstand 01)
-- [ ] `rom084_del1av3` (rom 84 Max's Wax (bildekort), del 1/3)
-- [ ] `rom084_del2av3` (rom 84 Max's Wax (bildekort), del 2/3)
-- [ ] `rom084_del3av3` (rom 84 Max's Wax (bildekort), del 3/3)
-- [ ] `rom085` (rom 85 Dinosaurhodet i nærbilde)
-- [ ] `rom086` (rom 86 Savage Jungle Inn-skiltet (slutten))
-- [ ] `obj839_01` (rom 86 Savage Jungle Inn-skiltet (slutten), objekt 839 tilstand 01)
-- [ ] `rom087` (rom 87 San Francisco)
-- [ ] `rom088` (rom 88 Seattle)
+- [x] `rom083` (rom 83 Slutten (bigfootene i skyene))
+- [x] `obj832_01` (rom 83 Slutten (bigfootene i skyene), objekt 832 tilstand 01)
+- [x] `rom084_del1av3` (rom 84 Max's Wax (bildekort), del 1/3)
+- [x] `rom084_del2av3` (rom 84 Max's Wax (bildekort), del 2/3)
+- [x] `rom084_del3av3` (rom 84 Max's Wax (bildekort), del 3/3)
+- [x] `rom085` (rom 85 Dinosaurhodet i nærbilde)
+- [x] `rom086` (rom 86 Savage Jungle Inn-skiltet (slutten))
+- [x] `obj839_01` (rom 86 Savage Jungle Inn-skiltet (slutten), objekt 839 tilstand 01)
+- [x] `rom087` (rom 87 San Francisco)
+- [x] `rom088` (rom 88 Seattle)
 
 ## Bestilling 21
 
@@ -3463,3 +3463,5 @@ Rom077 er senere rettet etter Toms uttrykkelige vektorvalg, begge deler levert O
 Bestilling 18: 7 OK og 3 SJEKK (obj774/775/781), ti bilder levert. Rene mørke gråpaneler, to manglende punktstjerner rettet, uregelmessig dørmerke og ny kikkertmaster kontrollert. Rom077 del2 fra autorisert vektorleveranse. Se `rapporter/bestilling018-20261013/RAPPORT.md`. Bestilling 19 fortsetter.
 
 Bestilling 19: 7 OK og 3 SJEKK (obj819/822/831), ti bilder levert. Snøkulenes orientering/egne blå variant og Jesse James-hånd/golfballhenter/magnet/ring-tilstander kildekontrollert. Se `rapporter/bestilling019-20261013/RAPPORT.md`. Bestilling 20 fortsetter.
+
+Bestilling 20: 9 OK og rom083 SJEKK, ti bilder levert. Separate sky-/figurtilstander, tre Wax Me-kort med identiske overlapper, egen tett skog og kildekontrollerte bybilder. Se `rapporter/bestilling020-20261013/RAPPORT.md`. Bestilling 21 fortsetter.

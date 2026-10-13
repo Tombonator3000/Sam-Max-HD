@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling020-20261013'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def rel(p):return str(p.relative_to(b))
+master=r/'b-rom084-fullmaster.png';m=np.array(Image.open(master));assert m.shape==(800,3840,3)
+locks=json.loads((r/'kildehash.json').read_text());changed=[v['fil'] for v in locks if sha(b/v['fil'])!=v['sha256']];assert not changed
+originals=[Image.open(b/'jobber'/f'rom084_del{n}av3/original_1x.png').convert('RGB') for n in [1,2,3]]
+for i in [0,1]:assert np.array_equal(np.array(originals[i])[:,288:384],np.array(originals[i+1])[:,:96])
+source=Image.new('RGB',(960,200))
+for im,x in zip(originals,[0,288,576]):source.paste(im,(x,0))
+assert np.array_equal(np.array(source),np.array(Image.open(r/'b-rom084-kilde1x.png')))
+for n in [1,2,3]:
+ p=(b/'jobber'/f'rom084_del{n}av3/prompt.txt').read_text()
+ for attempt in [1,2]:assert p in (r/f'b-rom084-prompt0{attempt}.txt').read_text()
+rows=[];arrays=[]
+for n,x in [(1,0),(2,1152),(3,2304)]:
+ job=f'rom084_del{n}av3';p=b/'jobber'/job/'resultat.png';a=np.array(Image.open(p));arrays.append(a)
+ assert a.shape==(1024,1536,3) and np.all(a[:112]==128) and np.all(a[912:]==128)
+ assert np.array_equal(a[112:912],m[:,x:x+1536])
+ control=r/(job+'-kontroll.txt');assert 'Utfall: OK' in control.read_text()
+ row=dict(jobb=job,resultat=rel(p),sha256=sha(p),egenkontroll='OK',kontrollfil=rel(control),forsok=2,fullmaster=rel(master),fullmaster_sha256=sha(master),klipp=[x,0,1536,800],plassering=[0,112],runtime=False,ny_brukergodkjenning=False,klar_for_mottak=True)
+ rows.append(row)
+ (p.parent/'notat.md').write_text(f'''# {job}\n\nNytegnet fra originalen med innebygd ChatGPT imagegen. To felles genereringsforsøk for alle tre deler, ikke to per del. Eksakt bildemodell er ikke eksponert. Forsøk 2 er valgt etter at forsøk 1 ga SJEKK / FEIL. Ordrette jobbprompter og separat kildepresisering er lagret i rapportmappen.\n\nFelles master er 3840 x 800. Denne delen er klippet ved x = {x}, bredde 1536 og høyde 800, og plassert ved (0,112) på 1536 x 1024 med RGB(128,128,128) padding. Bare helskalering av nygenerert motiv, ingen originalmaskering eller warp. Begge deloverlapper er byte-identiske.\n\nUendret egenkontroll: OK. Alle 40 beskyttede kildefiler er uendret. Kildehashene står i rapportmappens kildehash.json. Resultat SHA-256: {sha(p)}. Master SHA-256: {sha(master)}.\n\nTre skjeve Wax Me-kort med krokodille, undersjøisk bilscene og slangescene. Ingen fargestiftboks eller MAX'S WAX. Sam og Max, kostymer og avkuttinger er beholdt. Små tenner, øyespalter, bobler og skyggeformer er nytolket i glattere strek; hver liten kontur er ikke sertifisert pikselidentisk. Se b-kilde-qa.md. Runtime er ikke prøvd, og bildene har ingen ny individuell brukergodkjenning.\n''')
+for i in [0,1]:assert np.array_equal(arrays[i][112:912,1152:],arrays[i+1][112:912,:384])
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':rows},ensure_ascii=False,indent=2)+'\n')
+(r/'b-proveniens.json').write_text(json.dumps({'verktoy':'innebygd ChatGPT imagegen','eksakt_bildemodell':'ikke eksponert','antall_felles_genereringer':2,'valgt_forsok':2,'raa_beskjaering':[0,136,2164,589],'helskalering_til':[3840,800],'metode':'PIL LANCZOS','beskyttede_kilder':len(locks),'endrede_kilder':changed,'overlapper':[{'deler':[1,2],'storrelse':[384,800],'byteidentisk':True},{'deler':[2,3],'storrelse':[384,800],'byteidentisk':True}],'master_sha256':sha(master),'raa':[{'fil':rel(r/f'b-rom084-raa0{k}.png'),'sha256':sha(r/f'b-rom084-raa0{k}.png'),'prompt_sha256':sha(r/f'b-rom084-prompt0{k}.txt')} for k in [1,2]],'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(rows,ensure_ascii=False,indent=2))

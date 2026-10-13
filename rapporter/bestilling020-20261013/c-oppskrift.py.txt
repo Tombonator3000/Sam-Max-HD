@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import shutil,json,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling020-20261013';g=Path('/home/tombonator3000t/.codex/generated_images/01a135e9-14ca-7082-b901-a0ecf3e0b936')
+items={'rom086':('exec-c52fc237-842a-4f5e-ab8c-30c7b6fcccd7.png',(128,110,1408,912)),'obj839_01':('exec-14163d43-a951-47f6-96e4-74eee441e201.png',(224,86,1926,646)),'rom087':('exec-4b14ab61-dc92-4136-a4ad-54aacbde4c03.png',(128,111,1408,912)),'rom088':('exec-26c19848-8baf-44ed-b526-1dd07b8ec505.png',(128,112,1408,912))}
+for n,(raw,box) in items.items():
+ shutil.copyfile(g/raw,r/(n+'-raw1.png'));j=json.loads((b/'jobber'/n/'jobb.json').read_text());x,y,w,h=j['bilde_i_lerret'];im=Image.open(g/raw).convert('RGB').crop(box).resize((w,h),Image.Resampling.LANCZOS);out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im,(x,y));out.save(b/'jobber'/n/'resultat.png')
+ cmd=['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(Path('jobber')/n/'resultat.png')];p=subprocess.run(cmd,capture_output=True,text=True);(r/(n+'-egenkontroll1.txt')).write_text(p.stdout+p.stderr);print(p.stdout)
+n='obj839_01';raw='exec-1b2fbc27-4981-4e97-acc3-5883ad930987.png';shutil.copyfile(g/raw,r/(n+'-raw2.png'));im=Image.open(g/raw).convert('RGB').crop((160,304,1376,720));out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im,(160,304));out.save(b/'jobber'/n/'resultat.png');p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py','jobber/'+n+'/resultat.png'],capture_output=True,text=True);(r/(n+'-egenkontroll2.txt')).write_text(p.stdout+p.stderr);print(p.stdout)

@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,subprocess
+P=Path('rapporter/bestilling020-20261013')
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+rows=[]
+for j,n,box in [('rom083',2,(128,112,1408,912)),('obj832_01',3,(128,288,1408,736)),('rom085',1,(128,112,1408,912))]:
+ a=Image.open(P/('a-'+j+'-raa%02d.png'%n)).convert('RGB');c=Image.new('RGB',(1536,1024),(128,128,128));c.paste(a.crop(box),box[:2]);out=Path('jobber')/j/'resultat.png';c.save(out)
+ run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(out)],capture_output=True,text=True);log=P/('a-'+j+'-kontroll.txt');log.write_text(run.stdout+run.stderr);status={0:'OK',1:'SJEKK',2:'FEIL'}.get(run.returncode,'FEIL')
+ rows.append(dict(jobb=j,resultat=str(out),sha256=sha(out),egenkontroll=status,kontrollfil=str(log),forsok=n,runtime=False,ny_brukergodkjenning=False,klar_for_mottak=status!='FEIL'))
+ (Path('jobber')/j/'notat.md').write_text('# HD-leveranse '+j+'\n\nInnebygd imagegen brukt, eksakt modellnavn ikke eksponert. '+str(n)+' genereringsforsøk fra beskyttet originalreferanse, med originalprompt ordrett og separat kildepresisering. Godkjent stil/rom007_del1av2.png var penselreferanse i første forsøk; senere presisjonsforsøk brukte kun originalen for å begrense motivdrift. Valgt råbilde: '+str(P/('a-'+j+'-raa%02d.png'%n))+'.\n\nMotivfelt klippet direkte fra valgt 1536 × 1024 råbilde og lagt på eksakt RGB128-padding, uten lokal warp, originalmaske eller originalpikselkunst i leveransen. Motiv, avklipp og antall kontrollert mot kilde. Se a-kilde-qa.md for figur-/tannkontroll og begrensninger.\n\nUendret egenkontroll: '+status+'. SHA256 '+sha(out)+'. Kontrollfil '+str(log)+'. Ingen runtime, motorkomposisjon eller ny individuell brukergodkjenning påstås.\n')
+(P/'a-leveranser.json').write_text(json.dumps({'leveranser':rows},ensure_ascii=False,indent=2))
+locks=json.loads((P/'kildehash.json').read_text());proof=[dict(fil=x['fil'],sha256=sha(x['fil']),uendret=sha(x['fil'])==x['sha256']) for x in locks];(P/'a-kildebevis.json').write_text(json.dumps(proof,indent=2))
+sheet=Image.new('RGB',(3072,3072),(128,128,128))
+for i,(j,n,box) in enumerate([('rom083',2,None),('obj832_01',3,None),('rom085',1,None)]):
+ sheet.paste(Image.open(Path('jobber')/j/'referanse.png'),(0,i*1024));sheet.paste(Image.open(Path('jobber')/j/'resultat.png'),(1536,i*1024))
+sheet.save(P/'a-samlet-qa.png')
+print(json.dumps(rows,ensure_ascii=False,indent=2));print('Kilder',len(proof),all(x['uendret'] for x in proof))

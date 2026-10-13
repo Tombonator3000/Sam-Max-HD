@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+import shutil,subprocess,numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling020-20261013';shutil.copy2(r/'b-rom084-fullmaster.png',r/'b-rom084-fullmaster01.png');shutil.copy2("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-ee6f5c7d-4bf6-4962-95a2-5bd15fa2945d.png",r/'b-rom084-raa02.png')
+im=Image.open(r/'b-rom084-raa02.png').convert('RGB').crop((0,136,2164,589)).resize((3840,800),Image.Resampling.LANCZOS);im.save(r/'b-rom084-fullmaster.png')
+for n,x in [(1,0),(2,1152),(3,2304)]:
+ j=b/'jobber'/f'rom084_del{n}av3'/'resultat.png';shutil.copy2(r/(j.parent.name+'-kontroll.txt'),r/(j.parent.name+'-kontroll01.txt'));a=Image.new('RGB',(1536,1024),(128,128,128));a.paste(im.crop((x,0,x+1536,800)),(0,112));a.save(j)
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(j)],capture_output=True,text=True);(r/(j.parent.name+'-kontroll.txt')).write_text(p.stdout+p.stderr);print(p.stdout)

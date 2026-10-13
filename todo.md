@@ -44,4 +44,5 @@
 - [x] Rom077 begge deler levert OK etter uttrykkelig vektorvalg, egen SVGmaster og kilde-/rasterkontroll. Se rapporter/rom077-vektor-20261013/.
 - [x] Levert bestilling 18 med sju OK og tre SJEKK, kilde-/motivkontroll og dokumenterte rettinger.
 - [x] Levert bestilling 19 med sju OK og tre SJEKK, kilde-/motivkontroll og dokumenterte rettinger.
-- [ ] Fortsett bestilling 20 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 20 med ni OK og ett SJEKK, kilde-/motivkontroll og dokumenterte rettinger.
+- [ ] Fortsett bestilling 21 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

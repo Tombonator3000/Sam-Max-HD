@@ -179,3 +179,8 @@
 
 - Bestilling 19: 7 OK og 3 SJEKK (obj819/822/831), ti bilder levert. Snøkulenes orientering/egne blå variant og Jesse James-hånd/golfballhenter/magnet/ring-tilstander kildekontrollert. Se `rapporter/bestilling019-20261013/RAPPORT.md`. Bestilling 20 fortsetter.
 - Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i rapporter/bestilling019-20261013/.
+
+## 2026-10-13 20:35 (Codex, Astra)
+
+- Bestilling 20: 9 OK og rom083 SJEKK, ti bilder levert. Separate sky-/figurtilstander, tre Wax Me-kort med identiske overlapper, egen tett skog og kildekontrollerte bybilder. Se `rapporter/bestilling020-20261013/RAPPORT.md`. Bestilling 21 fortsetter.
+- Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i rapporter/bestilling020-20261013/.
