@@ -12,11 +12,11 @@ Repoet er offentlig etter Toms valg. Spillfilene og alt som lages fra dem ligger
 | --- | --- |
 | Repo | Samme oppsett som The Dig HD Remake: `engine/`, `pipeline/` (`smhd`), `tools/`, `docs/`, `spill.sh`, arbeidsflyter og grenene `spilldata`, `hd-mod` og `gpt-arbeid`. Kopiert og tilpasset Sam & Max |
 | Spillfiler | Engelsk CD-utgave (SAMNMAX.000, SAMNMAX.001, MONSTER.SOU med tale) i `spilldata` |
-| Analyse | 85 rom (36 brede), 63 med z-plan, 43 med fargesykling, 959 objektbilder, 348 kostymer. Se [docs/ANALYSE.md](docs/ANALYSE.md) og [docs/rom-oversikt.csv](docs/rom-oversikt.csv) |
+| Analyse | 85 rom med navn (36 brede), 63 med z-plan, 43 med fargesykling, 959 objektbilder, 348 kostymer. Se [docs/ANALYSE.md](docs/ANALYSE.md) og [docs/rom-oversikt.csv](docs/rom-oversikt.csv) |
 | HD-motor | På for Sam & Max: rom, objekter, blast-objekter og figurer får HD fra modden. Testet med nearest-mod (0 avvik) og romtest i alle rom. Teksten og menyraden HD Graphics er ikke portet; Ctrl+H bytter ([docs/HD-MOTOR.md](docs/HD-MOTOR.md)) |
 | Uttrekk | `smhd extract` tar ut alt: 83 rombakgrunner, 959 objektbilder og 16 052 kostymeruter fra 348 kostymer, som PNG med metadata. Egne dekodere oversatt fra ScummVM |
 | Skript | Alle 1181 skript dekompilert med descumm (`tools/dekompiler_skript.py`), 1179 uten feil |
-| HD-grafikk | Ikke startet. Stilpilot med Tom først |
+| HD-grafikk | Alle jobbene til ChatGPT er klargjort: hovedark for Sam og Max, rom, objekter, ikoner og 1758 figurark med fast størrelse og egenkontroll ([docs/BESTILLING-CHATGPT.md](docs/BESTILLING-CHATGPT.md)). Stilpiloten først, ingen bilder laget ennå |
 | Spille | `./spill.sh` starter originalspillet. Linux-pakken er tilpasset, ikke bygget i Actions ennå. Nettsiden trenger eget repo |
 
 Detaljer: [STATUS.md](STATUS.md). Hva som gjenstår: [todo.md](todo.md).
@@ -37,5 +37,5 @@ git clone https://github.com/Tombonator3000/Sam-Max-HD.git && cd Sam-Max-HD
 | --- | --- |
 | `main` | Kode og dokumentasjon |
 | `spilldata` | Spillfilene med sjekksummer |
-| `gpt-arbeid` | Arbeidsbordet med grafikerne. Ingen jobber før stilpiloten |
+| `gpt-arbeid` | Arbeidsbordet med grafikerne. Jobbene legges inn når Tom sier ja; bare stilpiloten er bestilt |
 | `hd-mod` | Siste HD-pakke, én commit som erstattes. Tom til den første modden finnes |

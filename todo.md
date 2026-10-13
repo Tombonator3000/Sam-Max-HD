@@ -22,13 +22,14 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 - [x] Tell rom, størrelser, z-plan, paletter, fargesykling, objektbilder og kostymer (`smhd info`)
 - [x] Romliste som CSV (`docs/rom-oversikt.csv`, uten navn)
-- [ ] Navn på rommene i romlisten ved gjennomsyn (RNAM er tom)
+- [x] Navn på rommene i romlisten (13. oktober, alle 85)
 - [x] Ruter per kostyme, animasjoner og retninger (`costumes.json`, 16 052 ruter)
 - [x] Hvilke objekter som har BOMP-bilde (103 blast-objektbilder, `kind` i rooms.json)
 - [x] Dekompiler alle skriptene med descumm (`tools/dekompiler_skript.py`, 1179 av 1181)
-- [ ] Finn hvilke rom og palett hvert kostyme faktisk vises i (fra skriptene), og bruk den paletten i RGBA-bildene
+- [x] Finn hvilke rom og palett hvert kostyme vises i fra skriptene (`tools/kostymer.py`, `docs/kostymefarger.csv`, 13. oktober)
+- [ ] Se de kostymene som står med «trolig» i `docs/figurer.csv` i spillet, og rulletekstpanelene i rom 67 og 77
 - [ ] Finn mellomsekvensene og minispillene som tegnes av motoren
-- [ ] Hvilke kostymer som er Sam, Max og de andre (fyll `docs/figurer.csv`)
+- [x] Hvilke kostymer som er Sam, Max og de andre (`docs/figurer.csv`, 13. oktober)
 
 ### Motor (`docs/HD-MOTOR.md`)
 
@@ -53,11 +54,13 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Sammenlign uttrekket med motoren: alle bakgrunnspiksler finner HD-bildet sitt med nearest-mod ("background without HD 0")
 - [ ] `build-mod` hopper over objektbildene i rom uten bakgrunn (rom 81 og 82, 9 bilder); ta dem med
 - [x] `engine/test.sh` og `tools/romtest.sh` med Sam & Max
-- [ ] Prompter og figurnavn i `gpt.py` og `figur.py` gjennomgått for Sam & Max (grovt tilpasset 10. oktober)
+- [x] Prompter og figurnavn i `gpt.py` og `figur.py` skrevet for Sam & Max (13. oktober)
 
 ### Grafikk
 
-- [ ] Stilpilot med Tom: ett rom og ett figurark sett i motoren, stilankere, godkjenning
+- [x] Alle grafikkjobbene laget med hovedark, fast størrelse i figurarkene og egenkontroll (`tools/sjekk_leveranse.py`), 13. oktober
+- [ ] Tom sier ja til å legge jobbene i `gpt-arbeid` (`tools/gpt_gren.sh send`)
+- [ ] Stilpilot: hovedark Sam og Max, rom 7 og fig002_01 og fig003_01 levert, kontrollert, sett i motoren og godkjent av Tom; stilankere i `stil/`
 - [ ] Aktiver bestillingen (`docs/BESTILLING-CHATGPT.md`) og grafikkrunder med `tools/gpt_runde.sh`
 
 ### Spillbart for Tom

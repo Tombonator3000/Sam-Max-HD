@@ -10,8 +10,9 @@
 #
 # Bruk: tools/gpt_runde.sh [--beskjed "tekst til ChatGPT"] ...
 #
-# Ikke i bruk for Sam & Max ennå: bestillingen er ikke aktiv før stilpiloten er godkjent
-# (docs/BESTILLING-CHATGPT.md). Uttrekket (smhd extract) virker.
+# Sam & Max: jobbene er laget (13. oktober 2026). Uten stilankere i stil/ skriver smhd gpt-ordre en ordre
+# med bare stilpiloten (hovedarkene, kontoret og de første figurarkene for Sam og Max); når Tom har godkjent
+# piloten og ankerne ligger i stil/, kommer resten i vanlig rekkefølge.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"

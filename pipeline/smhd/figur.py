@@ -6,8 +6,8 @@ CCC, ark KK). Arket er 4x på det vanlige lerretet (1536 x 1024 med grå kant), 
 en flat bakgrunnsfarge som ikke finnes i kostymet, med god avstand mellom dem. ChatGPT maler hele
 arket på en gang, og rutene klippes ut igjen etter posisjon med gjennomsiktigheten fra originalen.
 
-Rekkefølgen kommer fra animasjonene i AKOS (gamedata.akos_animations; for COST i v6 er dette ikke portet): først stående i alle
-retninger (som et modellark), så gange mot høyre og venstre, snakking, gange i de andre
+Rekkefølgen kommer fra animasjonene i kostymet (costumes.json; for COST i v6 leser eksport_v6.py dem): først
+stående i alle retninger (som et modellark), så gange mot høyre og venstre, snakking, gange i de andre
 retningene, og til slutt resten. Ruter i samme animasjon og retning står etter hverandre på
 samme rad, og en animasjon deles ikke mellom ark når den får plass på et tomt ark. Ruter som
 ikke får plass på et ark i 4x, blir egne jobber i stedet for å skaleres ned, og er de bredere
@@ -15,7 +15,16 @@ eller høyere enn lerretet, deles de som rommene.
 
 Kontrollen i gpt-inn: arket som helhet (plassering, som rommene), hver rute for seg (mangler,
 omriss og kantlikhet inne i omrisset), og flimmer: nabo-ruter i samme animasjon skal ikke skille
-seg mer fra hverandre i HD enn originalrutene gjør.
+seg mer fra hverandre i HD enn originalrutene gjør. Ark i glatt stil med ekte alfa tas inn av myk.py.
+
+Sam & Max (13. oktober 2026):
+- Skyggepiksler (palettindeks 13, som ScummVM tegner gjennom skyggetabellen) står ikke på arkene. Rene
+  skyggekostymer får ingen ark; motoren tegner skyggen selv.
+- Ruter større enn MAX_CEL (to skjermer) er feil i dataene: animasjoner som peker utenfor kostymet, og
+  som dekoderen leser som tilfeldige ruter. De males ikke.
+- Kostymer med en hovedperson (kolonnen hovedark i docs/figurer.csv) får det godkjente hovedarket
+  (hovedark/<navn>.png) som bilde to på alle arkene, så figuren blir lik på tvers av kostymene.
+- Prompten sier hvor store rutene er i referansen, og at hver rute skal holde den størrelsen.
 """
 from __future__ import annotations
 
@@ -32,10 +41,13 @@ from . import gpt
 FIG_SHEET = (352, 240)       # arket i originalpiksler, midt på lerretet (384 x 256) med grå kant rundt
 FIG_MARGIN = 4               # originalpiksler fra arkets kant til rutene
 FIG_PAD = 8                  # originalpiksler mellom rutene (32 HD-piksler)
-FIG_PILOT: dict[int, int] = {}  # kostyme: antall ark i piloten. Tom til Tom har valgt figur til stilpiloten
+FIG_PILOT: dict[int, int] = {2: 1, 3: 1}  # kostyme: antall ark i stilpiloten (Sam og Max, første ark)
+MAX_CEL = (640, 400)         # ruter større enn dette er feil i dataene og males ikke (i Sam & Max 4163 til 6189
+                             # piksler brede eller 4924 til 5257 høye; ekte ruter er høyst 320 x 200)
+SHADOW_INDEX = 13            # palettindeks som tegnes gjennom skyggetabellen (base-costume.cpp, pcolor == 13)
+MAIN_FIGURES = {"sam": "Sam", "max": "Max"}  # hovedark: navn i filnavnet og i prompten
 # Bakgrunnsfarger å velge mellom. Den som ligger lengst fra alle fargene i kostymet, brukes.
-FIG_BACKGROUNDS = [((0, 177, 64), "green"), ((0, 71, 187), "blue"), ((255, 0, 255), "magenta"),
-                   ((0, 200, 200), "cyan"), ((240, 200, 0), "yellow")]
+FIG_BACKGROUNDS = gpt.SHEET_BACKGROUNDS
 
 # Kontroll per rute og flimmer. Grensene er satt med kunstige ark og justeres etter ekte leveranser.
 FIG_MIN_PIXELS = 40          # ruter med færre synlige piksler kontrolleres ikke enkeltvis
@@ -61,31 +73,32 @@ DIR_EN = {8: {0: "away from the viewer", 1: "away to the right", 2: "right", 3: 
 ANIM_NO = {1: "start", 2: "gange", 3: "stående", 4: "snakking", 5: "slutt på snakking"}
 ANIM_EN = {1: "start pose", 2: "walking", 3: "standing", 4: "talking", 5: "end of talking"}
 
-PROMPT_FIGURE = """Task: HD remaster of a sheet of animation frames from the 1993 adventure game Sam & Max Hit the Road (LucasArts), in the smooth, detailed style approved for the main characters. This is a production asset. Every frame is fitted to the original frame's size and position afterwards, and the game lays it over the HD background with its own soft edges.
+PROMPT_FIGURE = """Task: faithful HD remaster of a sheet of animation frames from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. Every frame replaces one original frame in the game, at the same size and position, and the frames are played one after another.
 
-Input: the attached image is the original low-resolution sheet enlarged 4x with hard pixel edges. The frames stand apart on a plain flat {color} background ({hex}). Around the sheet is a plain gray (#808080) border. The border is only padding.
+Input: the attached image is the original low-resolution sheet enlarged exactly 4x with hard pixel edges. The frames stand apart on a plain flat {color} background ({hex}). Around the sheet is a plain gray (#808080) border. The background and the border are only padding.
 
-All frames on this sheet are animation frames of {who}, in different poses. On this sheet, row by row from left to right: {content}.
+What the sheet shows: {who}. The description is only a help; the input image decides. On this sheet, row by row from left to right: {content}.
+
+Size rule (most important): draw every frame at exactly the size it has in the input, with the same height, the same width and the same proportions of head, body, arms, legs and props. One input pixel is 4 output pixels for every frame on this sheet and on every other sheet of this character, so the character never grows, shrinks or changes shape between frames. {sizes}
 
 Do:
-- Repaint every frame in high resolution with clean, natural detail: smooth shading instead of dithering, smooth anti-aliased outlines (no pixel steps), believable cloth, skin, hair and material.
-- Keep the original look: the same character, the same colors, light direction, shadows and contrast, in the painted style of the approved HD sheets.
-- Make all frames look identical apart from the pose: the same face, hair, clothes, colors and light in every frame. The frames are played one after another in the game, so any difference between them flickers.
-- Keep the pose, proportions and silhouette of every frame as in the input, and keep each frame in its place on the sheet, in the same rows and the same order.
-- Glowing effects (light, energy, lightning, sparks) are painted as soft glow that fades into transparency.
+- Repaint every frame in high resolution with clean, natural detail: smooth shading instead of dithering, smooth anti-aliased outlines (no pixel steps), in the bold-outlined cartoon style of the original.
+- Keep the original design: the same character, the same colors, light direction, shadows and contrast as in the input.
+- Make all frames look identical apart from the pose: the same face, eyes, hat, clothes, colors and light in every frame. Any difference between frames flickers in the game.
+- Keep the pose and silhouette of every frame, and keep each frame in its place on the sheet, in the same rows and the same order.
+- Glowing effects (light, lightning, sparks, fire) are painted as soft glow that fades into transparency.
 
 Do not:
-- Do not add, remove, merge or redesign frames. Do not add anything between the frames: no shadows, floor, text, numbers, labels, frames or grid lines.
+- Do not add, remove, merge, split or redesign frames.
+- Do not add anything that is not in the input: no new props, accessories, patterns, logos, text, shadows, floor, numbers, labels, frames or grid lines.
+- Do not change colors, clothes or proportions, and do not make heads, hands or eyes bigger than in the input.
+- Some frames show only part of the character (a body without a head, a head alone, an arm), because the game draws the parts separately. Paint them as they are and do not complete them.
 - Do not let frames touch or overlap each other.
-- Some frames show only part of the character, for example a body without a head or a head alone, because the game draws the parts separately. Paint them as they are and do not complete them.
-{markers}- No photorealism, no modern 3D look, no film grain, no vignette, no watermark, no signature.
+- No photorealism, no modern 3D look, no film grain, no vignette, no watermark, no signature.
 
-Output: one PNG image, exactly 1536 x 1024 pixels, with a fully transparent background (real alpha, no background color and no gray border) and the frames in the same layout as the input. List the delivery with its sha256 in the fremdrift.json of your report and add a rutekart (the box around each frame's drawing) as for the main characters."""
+Output: one PNG image, exactly 1536 x 1024 pixels, with a fully transparent background (real alpha: no background color and no gray border) and every frame in the same place as in the input. Before delivering, run python3 verktoy/sjekk_leveranse.py jobber/{job}/resultat.png and redo the frames it reports as too big, too small, moved or missing. List the delivery with its sha256 in the fremdrift.json of your report and add a rutekart (the box around each frame's drawing, alpha above 128)."""
 
-PROMPT_FIGURE_MARKERS = """- Small bright magenta marks under the feet or at the edges are shadow markers used by the game. Leave them out; the game draws the shadow itself.
-"""
-
-PROMPT_FIGURE_STYLE = """If a second image is attached, it is an already approved HD sheet of the same character, or an approved HD picture from the same game. Paint the character exactly as in that image: the same face, hair, clothes, colors and level of detail. Take all poses and the layout from the first image."""
+PROMPT_FIGURE_STYLE = """If a second image is attached, it is the approved master sheet (hovedark) of this character, or an already approved HD sheet of the same character, or an approved HD picture from the same game. Paint the character exactly as in that image: the same face, hair, clothes, colors and level of detail. Take every pose, size and position from the first image. If a third image is attached, it is the master sheet of the second character on the sheet."""
 
 PROMPT_FIGURE_PART = """This is part {part} of {parts} of one large frame. The other parts are made separately and joined afterwards, so keep the edges of the picture natural, with no vignette, frame or fading."""
 
@@ -105,7 +118,9 @@ FIG_FLICKER_RETRY = ("Precise correction of the attached sheet. The frames are i
 # ---------------------------------------------------------------- liste over kostymene
 
 def read_figure_list(path: Path | None) -> dict[int, dict]:
-    """docs/figurer.csv: kostyme -> {"figur", "rekkefolge"}. Rekkefølgen er hvor mye kostymet vises."""
+    """docs/figurer.csv: kostyme -> {"figur", "rekkefolge", "prompt_en", "hovedark"}. Rekkefølgen er hvor mye
+    kostymet vises. prompt_en er en kort engelsk beskrivelse til prompten, hovedark navnene på hovedarkene
+    (sam, max eller sam+max) som legges ved som bilde to og tre."""
     if not path or not Path(path).exists():
         return {}
     out = {}
@@ -114,8 +129,11 @@ def read_figure_list(path: Path | None) -> dict[int, dict]:
             cid = (row.get("kostyme") or "").strip()
             if cid.isdigit():
                 rank = (row.get("rekkefolge") or "").strip()
+                masters = [m.strip().lower() for m in (row.get("hovedark") or "").split("+") if m.strip()]
                 out[int(cid)] = {"figur": (row.get("figur") or "").strip(),
-                                 "rekkefolge": int(rank) if rank.isdigit() else n + 1}
+                                 "rekkefolge": int(rank) if rank.isdigit() else n + 1,
+                                 "prompt_en": (row.get("prompt_en") or "").strip(),
+                                 "hovedark": [m for m in masters if m in MAIN_FIGURES]}
     return out
 
 
@@ -285,14 +303,43 @@ def plan_sheets(groups: list[list[Cel]]) -> list[Sheet]:
     return [s.sheet() if isinstance(s, _Shelf) else s for s in sheets]
 
 
+def shadow_mask(extract: Path, name: str, rgba: np.ndarray) -> np.ndarray:
+    """Skyggepikslene i en rute: palettindeks SHADOW_INDEX i indeksbildet (name_idx.png). Uten indeksbilde:
+    fargen ScummVM-paletten har for indeks 13 (255, 87, 255) og nære farger, som myk.technical."""
+    idx_path = extract / "costumes" / f"{name}_idx.png"
+    visible = rgba[..., 3] > 0
+    if idx_path.exists():
+        with Image.open(idx_path) as im:
+            idx = np.asarray(im)
+        if idx.shape == visible.shape:
+            return visible & (idx == SHADOW_INDEX)
+    r, g, b = (rgba[..., k].astype(np.int16) for k in range(3))
+    return visible & (r >= 230) & (b >= 230) & (g <= 120)
+
+
+def cel_rgba(extract: Path, name: str) -> Image.Image | None:
+    """Ruten (costumeCCC_NNN) som RGBA uten skyggepiksler, slik den står på figurarket. None når filen mangler."""
+    p = extract / "costumes" / f"{name}.png"
+    if not p.exists():
+        return None
+    with Image.open(p) as im:
+        a = np.asarray(im.convert("RGBA")).copy()
+    a[shadow_mask(extract, name, a)] = 0
+    return Image.fromarray(a, "RGBA")
+
+
+def valid_cel(c: dict) -> bool:
+    """Ruter større enn MAX_CEL er feil i dataene."""
+    return 0 < c["w"] <= MAX_CEL[0] and 0 < c["h"] <= MAX_CEL[1]
+
+
 def cel_boxes(extract: Path, cid: int, info: dict) -> dict[int, tuple[int, int, int, int] | None]:
-    """De synlige pikslene i hver rute (None for helt gjennomsiktige)."""
+    """De synlige pikslene i hver rute, uten skyggepiksler (None for helt gjennomsiktige ruter, rene
+    skyggeruter og ugyldige ruter)."""
     out = {}
     for c in info["cels"]:
-        p = extract / "costumes" / f"costume{cid:03d}_{c['cel']:03d}.png"
-        if p.exists():
-            with Image.open(p) as im:
-                out[c["cel"]] = im.convert("RGBA").getchannel("A").getbbox()
+        im = cel_rgba(extract, f"costume{cid:03d}_{c['cel']:03d}") if valid_cel(c) else None
+        out[c["cel"]] = im.getchannel("A").getbbox() if im is not None else None
     return out
 
 
@@ -300,10 +347,9 @@ def costume_colours(extract: Path, cid: int, info: dict) -> np.ndarray:
     """Alle fargene (N x 3) i de synlige pikslene i rutene til et kostyme."""
     colours: set[tuple[int, int, int]] = set()
     for c in info["cels"]:
-        p = extract / "costumes" / f"costume{cid:03d}_{c['cel']:03d}.png"
-        if p.exists():
-            with Image.open(p) as im:
-                a = np.asarray(im.convert("RGBA"))
+        im = cel_rgba(extract, f"costume{cid:03d}_{c['cel']:03d}") if valid_cel(c) else None
+        if im is not None:
+            a = np.asarray(im)
             colours |= set(map(tuple, np.unique(a[a[..., 3] > 0][:, :3], axis=0).tolist()))
     return np.array(sorted(colours), dtype=np.float64).reshape(-1, 3)
 
@@ -329,16 +375,29 @@ def has_markers(colours: np.ndarray) -> bool:
 
 
 def sheet_image(extract: Path, cid: int, sheet: Sheet, bg: tuple[int, int, int]) -> Image.Image:
-    """Arket i originalpiksler: rutene på den flate bakgrunnsfargen."""
+    """Arket i originalpiksler: rutene uten skyggepiksler på den flate bakgrunnsfargen."""
     image = Image.new("RGBA", sheet.size, (*bg, 255))
     for c, x, y in sheet.cels:
-        with Image.open(extract / "costumes" / f"costume{cid:03d}_{c.rute:03d}.png") as im:
-            gpt._paste_over(image, im.convert("RGBA"), x, y)
+        im = cel_rgba(extract, f"costume{cid:03d}_{c.rute:03d}")
+        if im is not None:
+            gpt._paste_over(image, im, x, y)
     return image.convert("RGB")
 
 
-def _describe(cels: list[dict], dirs: int, english: bool) -> str:
-    """Hva som står på arket: animasjonene i rekkefølge, med retninger og antall ruter."""
+def main_limb(info: dict, boxes: dict[int, tuple[int, int, int, int] | None]) -> int | None:
+    """Laget med mest synlig tegning i kostymet (kroppen). I The Dig (AKOS) var det lag 0; i Sam & Max
+    (klassiske kostymer) er det oftest lag 1. De andre lagene beskrives som egne deler."""
+    area: dict[int, int] = {}
+    for c in info["cels"]:
+        b = boxes.get(c["cel"])
+        if b:
+            area[c.get("lag", 0)] = area.get(c.get("lag", 0), 0) + (b[2] - b[0]) * (b[3] - b[1])
+    return max(area, key=lambda k: (area[k], -k)) if area else None
+
+
+def _describe(cels: list[dict], dirs: int, english: bool, main: int | None = 0) -> str:
+    """Hva som står på arket: animasjonene i rekkefølge, med retninger og antall ruter. main er laget med
+    kroppen; ruter i andre lag beskrives som egne deler."""
     anim_names, dir_names = (ANIM_EN, DIR_EN) if english else (ANIM_NO, DIR_NO)
     dn = dir_names.get(dirs, dir_names[4])
     parts: list[list] = []                       # [animasjon, lag, [retninger], antall]
@@ -356,7 +415,7 @@ def _describe(cels: list[dict], dirs: int, english: bool) -> str:
             out.append(f"other frames ({n})" if english else f"andre ruter ({n})")
             continue
         name = anim_names.get(anim, f"animation {anim}" if english else f"animasjon {anim}")
-        if lag:
+        if lag is not None and lag != main:
             name += " (a separate part the game draws on top of the body, such as the head)" if english else \
                 f" (lag {lag}, tegnes over kroppen)"
         where = ", ".join(dn.get(d, str(d)) for d in ds if d is not None)
@@ -375,20 +434,37 @@ def _describe(cels: list[dict], dirs: int, english: bool) -> str:
 MAIN_CHARACTERS = ("Sam", "Max")  # navnene må stå i figurlisten (docs/figurer.csv) for å bli brukt
 
 
-def _who(label: str) -> str:
-    """Hvem arket viser, til den engelske prompten. Bare hovedpersonenes navn brukes derfra."""
+def _who(label: str, description: str = "") -> str:
+    """Hva arket viser, til den engelske prompten: beskrivelsen i figurlisten (prompt_en) når den finnes,
+    ellers hovedpersonenes navn fra figurlisten, ellers en nøytral setning."""
+    if description:
+        return description
     people = [n for n in MAIN_CHARACTERS if n in label]
     if len(people) == 1:
-        return f"the same character ({people[0]})"
+        return f"animation frames of the same character ({people[0]})"
     if people:
-        return f"the same characters ({', '.join(people[:-1])} and {people[-1]}), as one scene"
-    return "the same character or thing (one costume in the game)"
+        return f"animation frames of the same characters ({', '.join(people[:-1])} and {people[-1]}), as one scene"
+    return "animation frames of one costume in the game (a character, an object or an effect)"
+
+
+def size_text(cels: list[dict]) -> str:
+    """Hvor store rutene på arket er i referansen (synlige piksler, 4x), til prompten."""
+    ws = [(c["synlig"][2] - c["synlig"][0]) * gpt.SCALE for c in cels]
+    hs = [(c["synlig"][3] - c["synlig"][1]) * gpt.SCALE for c in cels]
+    if not ws:
+        return ""
+    if len(cels) == 1:
+        return f"The frame on this sheet is {ws[0]} x {hs[0]} pixels in the input (the box around its visible pixels)."
+    return (f"On this sheet the frames are from {min(hs)} to {max(hs)} pixels tall and from {min(ws)} to {max(ws)} "
+            "pixels wide in the input (the box around each frame's visible pixels); jobb.json lists every frame's box "
+            "under ruter (synlig, in original pixels: multiply by 4).")
 
 
 def figure_prompt(who: str, bg: tuple[int, int, int], colour: str, content: str, part: int, parts: int,
-                  note: str | None, markers: bool = False) -> str:
+                  note: str | None, markers: bool = False, sizes: str = "", job: str = "<jobb>") -> str:
+    """Prompten til et figurark. markers er med for eldre kall; skyggepikslene står ikke på arkene lenger."""
     prompt = PROMPT_FIGURE.format(color=colour, hex="#%02X%02X%02X" % bg, who=who, content=content,
-                                  markers=PROMPT_FIGURE_MARKERS if markers else "")
+                                  sizes=sizes, job=job)
     if note:
         prompt += "\n\nNote for this character: " + note
     if parts > 1:
@@ -396,23 +472,37 @@ def figure_prompt(who: str, bg: tuple[int, int, int], colour: str, content: str,
     return prompt + "\n\n" + PROMPT_FIGURE_STYLE
 
 
+def master_refs(entry: dict) -> list[str]:
+    """Hovedarkene for et kostyme (hovedark/sam.png og så videre), i rekkefølgen i figurlisten."""
+    return [f"hovedark/{m}.png" for m in entry.get("hovedark", [])]
+
+
 def figure_jobs(extract: Path, jobs_dir: Path, costumes: list[int], meta: dict[int, dict], names: dict[int, dict],
                 rooms_meta: dict, notes: dict, style_ref: Path | None, pilot_only: bool) -> list[gpt.Job]:
-    """Figurjobbene (figCCC_KK) for kostymene, i rekkefølge. Med pilot_only bare arkene i FIG_PILOT."""
+    """Figurjobbene (figCCC_KK) for kostymene, i rekkefølge. Med pilot_only bare arkene i FIG_PILOT.
+
+    Bilde to: hovedarket for kostymer med en hovedperson (alle arkene), ellers stilankeret for ark 01 og
+    det godkjente ark 01 for de andre arkene. Står i bilde_to og referanser i jobb.json.
+    """
     jobs: list[gpt.Job] = []
     for cid in costumes:
         info = meta[cid]
-        groups = groups_of(info, cel_boxes(extract, cid, info))
+        boxes = cel_boxes(extract, cid, info)
+        groups = groups_of(info, boxes)
         sheets = plan_sheets(groups)
         if pilot_only:
             sheets = sheets[:FIG_PILOT.get(cid, 0)]
         if not sheets:
             continue
+        main = main_limb(info, boxes)
+        # Uten egne venstreruter speilvender motoren ruten mot høyre (costume.cpp, _drawActorToRight)
+        mirrored = info.get("speil") is False and info.get("retninger", 4) == 4
         colours = costume_colours(extract, cid, info)
         bg, colour, _ = background_for(extract, cid, info, colours)
-        markers = has_markers(colours)
-        name = names.get(cid, {}).get("figur") or f"kostyme {cid}"
-        who = _who(name)
+        entry = names.get(cid, {})
+        name = entry.get("figur") or f"kostyme {cid}"
+        who = _who(name, entry.get("prompt_en", ""))
+        masters = master_refs(entry)
         dirs = info.get("retninger", 4)
         home = info.get("room", 0)
         first_job = None
@@ -426,20 +516,24 @@ def figure_jobs(extract: Path, jobs_dir: Path, costumes: list[int], meta: dict[i
             tiles = gpt.plan_tiles(sw, sh)
             pieces = [gpt.Piece(p["bilde"], cid, str(p["rute"]), home, tuple(p["rekt"]), tuple(p["synlig"])) for p in cels]
             where = gpt.assign_parts(pieces, tiles) if len(tiles) > 1 else {0: pieces}
-            content_no = _describe(cels, dirs, english=False)
-            content_en = _describe(cels, dirs, english=True)
+            content_no = _describe(cels, dirs, english=False, main=main)
+            content_en = _describe(cels, dirs, english=True, main=main)
+            if mirrored:
+                content_en += (". The game mirrors the frames facing right when the character faces left, so there "
+                               "are no frames facing left; do not add any")
             pilot = pilot_only or (cid in FIG_PILOT and k <= FIG_PILOT[cid])
+            refs = masters or ([f"jobber/{first_job}/resultat.png"] if first_job else [])
             for i, inside in where.items():
                 x, y, w, h, ox, oy = tiles[i]
                 jid = f"fig{cid:03d}_{k:02d}" + ("" if len(tiles) == 1 else f"_del{i + 1}av{len(tiles)}")
                 names_in = {p.bilde for p in inside}
+                mine = [p for p in cels if p["bilde"] in names_in]
                 job = gpt.Job(jid, home, name, i + 1, len(tiles), (sw, sh), (x, y, w, h), (ox, oy), type="figur",
-                              lag=k, kostyme=cid, ruter=[p for p in cels if p["bilde"] in names_in],
-                              bakgrunn=list(bg), pilot=True if pilot else None,
-                              rekkefolge=names.get(cid, {}).get("rekkefolge"), innhold=content_no,
-                              bilde_to=f"jobber/{first_job}/resultat.png" if first_job else None)
+                              lag=k, kostyme=cid, ruter=mine, bakgrunn=list(bg), pilot=True if pilot else None,
+                              rekkefolge=entry.get("rekkefolge"), innhold=content_no,
+                              bilde_to=refs[0] if refs else None, referanser=refs or None)
                 prompt = figure_prompt(who, bg, colour, content_en, i + 1, len(tiles), notes.get(f"fig{cid:03d}"),
-                                       markers)
+                                       sizes=size_text(mine), job=jid)
                 gpt._write_job(jobs_dir, job, image, prompt, style_ref)
                 jobs.append(job)
                 first_job = first_job or jid
@@ -736,3 +830,138 @@ def finish_cels(name: str, parts: list[tuple[gpt.Job, np.ndarray | None]], resul
             "fargelås": settings, "jobber": made_by,
         }
     return done, not_done, prov
+
+
+# ---------------------------------------------------------------- hovedark (master-figurark)
+
+# Hovedarkene for hovedpersonene: kostymet de står og går i, og et nærbilde av ansiktet. Grafikeren lager
+# hovedark/<navn>.png etter referansen, Tom godkjenner, og så legges det ved som bilde to i alle figurarkene
+# for personen (kolonnen hovedark i docs/figurer.csv). Slik som Full Throttle sitt hovedark per figur.
+MASTERS = {"sam": {"kostyme": 2, "naerbilde": 27}, "max": {"kostyme": 3, "naerbilde": 28}}
+DIR_FRONT_SIDE_BACK = [(2, "front"), (1, "right side"), (3, "back"), (0, "left side")]
+
+PROMPT_MASTER = """Task: master character sheet (model sheet) for {name} from the 1993 adventure game Sam & Max Hit the Road (LucasArts), for a faithful HD remaster. Every later animation sheet of {name} gets this sheet as the reference for the design, so it must match the original exactly and be consistent with itself.
+
+Input: the attached image shows the original low-resolution frames of {name}, enlarged exactly 4x with hard pixel edges, on a plain flat {color} background ({hex}) inside a gray (#808080) border: {content}.
+
+Who it is: {who}.
+
+Draw on one sheet, in the clean high-resolution cartoon style of the game (bold dark outlines, smooth shading, no dithering, no pixel steps):
+- the full figure from the front, from the right side, from behind and from the left side, in the same standing poses as the input,
+- a close-up of the face, as in the close-up frame,
+- the same proportions as the input frames: the same height of head, body and legs, the same width, and the same size of eyes, nose, mouth, hands and feet. Use the input frames as the exact measure, so the figures on this sheet are 4 times the size of the input frames.
+
+Keep the design exactly: the same face, colors, clothes, hat, tie and every mark as in the input. Do not add accessories, logos, text, patterns or details that are not in the input, do not make the head bigger or the body slimmer, and do not modernize the design. Take the colors from the standing frames; the close-up comes from a scene with its own light and background, so use it for the shape of the face only.
+
+Output: one PNG image, exactly 1536 x 1024 pixels, with a fully transparent background (real alpha), the figures standing on one line and not touching each other. No labels, numbers or text on the sheet. Save it as hovedark/{file}.png and write hovedark/{file}-notat.md with tool, date, number of attempts and what was uncertain. Tom approves the sheet before it is used."""
+
+
+def pose_image(extract: Path, cid: int, info: dict, anim: int, direction: int) -> Image.Image | None:
+    """Figuren slik spillet viser den i animasjonen (anim, retning): første rute i hvert lag, satt sammen etter
+    rel_x og rel_y, lag 0 nederst, slik ClassicCostumeRenderer tegner dem. En animasjon endrer bare lagene den
+    har; de andre beholder ruten fra startanimasjonen (1), som setter hodet. Derfor legges start og så anim
+    oppå hverandre. Mot venstre (retning 0) speilvendes bildet når kostymet ikke har egne venstreruter (speil
+    er usann), som _drawActorToRight i costume.cpp. None når det ikke finnes noe."""
+    cels = {c["cel"]: c for c in info["cels"]}
+    limbs: dict[int, int] = {}
+    for step in ((1, anim) if anim != 1 else (1,)):
+        for a in info.get("animasjoner", []):
+            if a["animasjon"] == step and a["retning"] == direction and a["ruter"]:
+                limbs[a["lag"]] = a["ruter"][0]
+    parts = []
+    for lag, cel in limbs.items():
+        c = cels.get(cel)
+        if not c or not valid_cel(c):
+            continue
+        im = cel_rgba(extract, f"costume{cid:03d}_{c['cel']:03d}")
+        if im is not None and im.getchannel("A").getbbox():
+            parts.append((lag, c.get("rel_x", 0), c.get("rel_y", 0), im))
+    if not parts:
+        return None
+    x0 = min(rx for _, rx, _, _ in parts)
+    y0 = min(ry for _, _, ry, _ in parts)
+    x1 = max(rx + im.width for _, rx, _, im in parts)
+    y1 = max(ry + im.height for _, _, ry, im in parts)
+    canvas = Image.new("RGBA", (x1 - x0, y1 - y0), (0, 0, 0, 0))
+    for _, rx, ry, im in sorted(parts, key=lambda p: p[0]):
+        canvas.alpha_composite(im, (rx - x0, ry - y0))
+    if direction == 0 and not info.get("speil"):
+        canvas = canvas.transpose(Image.FLIP_LEFT_RIGHT)
+    box = canvas.getchannel("A").getbbox()
+    return canvas.crop(box) if box else None
+
+
+def closeup_image(extract: Path, cid: int, info: dict) -> Image.Image | None:
+    """Første rute i kostymets første animasjon (nærbildene av ansiktet har bare noen få animasjoner)."""
+    cels = {c["cel"]: c for c in info["cels"]}
+    for a in sorted(info.get("animasjoner", []), key=lambda a: (a["animasjon"], a["retning"])):
+        for r in a["ruter"]:
+            c = cels.get(r)
+            if c and valid_cel(c):
+                im = cel_rgba(extract, f"costume{cid:03d}_{r:03d}")
+                if im is not None and im.getchannel("A").getbbox():
+                    return im
+    return None
+
+
+def master_jobs(extract: Path, out: Path, meta: dict[int, dict], names: dict[int, dict]) -> list[str]:
+    """Skriver hovedark/<navn>/ (referanse.png, original_1x.png, prompt.txt, jobb.json) for hovedpersonene i
+    MASTERS. Gir navnene som ble laget. Leveransen er hovedark/<navn>.png på arbeidsgrenen."""
+    made = []
+    for key, spec in MASTERS.items():
+        cid, close = spec["kostyme"], spec["naerbilde"]
+        if cid not in meta:
+            continue
+        info = meta[cid]
+        poses = []
+        for d, label in DIR_FRONT_SIDE_BACK:
+            im = pose_image(extract, cid, info, 3, d)
+            if im is not None:
+                poses.append((label, im))
+        face = closeup_image(extract, close, meta[close]) if close in meta else None
+        if not poses:
+            continue
+        # Figurene på én linje (føttene nederst), nærbildet til høyre for dem
+        items = [im for _, im in poses] + ([face] if face is not None else [])
+        W = FIG_MARGIN * 2 + sum(im.width for im in items) + FIG_PAD * (len(items) - 1)
+        H = FIG_MARGIN * 2 + max(im.height for im in items)
+        if W > gpt.TILE[0] or H > gpt.TILE[1]:
+            continue
+        colours = np.array(sorted({tuple(p[:3]) for im in items for p in np.asarray(im).reshape(-1, 4) if p[3]}),
+                           dtype=np.float64).reshape(-1, 3)
+        bg, colour = gpt.sheet_background(colours)
+        sheet = Image.new("RGBA", (W, H), (*bg, 255))
+        x = FIG_MARGIN
+        boxes = []
+        for im in items:
+            y = H - FIG_MARGIN - im.height
+            sheet.alpha_composite(im, (x, y))
+            boxes.append([x, y, im.width, im.height])
+            x += im.width + FIG_PAD
+        content = ", ".join(f"standing, {label}" for label, _ in poses)
+        if face is not None:
+            content += ", and on the right a close-up frame of the face"
+        entry = names.get(cid, {})
+        who = entry.get("prompt_en") or MAIN_FIGURES[key]
+        d = out / "hovedark" / key
+        d.mkdir(parents=True, exist_ok=True)
+        ox, oy = (gpt.TILE[0] - W) // 2, (gpt.TILE[1] - H) // 2
+        canvas = Image.new("RGB", gpt.CANVAS, gpt.BORDER)
+        canvas.paste(sheet.convert("RGB").resize((W * gpt.SCALE, H * gpt.SCALE), Image.NEAREST),
+                     (ox * gpt.SCALE, oy * gpt.SCALE))
+        canvas.save(d / "referanse.png")
+        sheet.convert("RGB").save(d / "original_1x.png")
+        prompt = PROMPT_MASTER.format(name=MAIN_FIGURES[key], color=colour, hex="#%02X%02X%02X" % bg,
+                                      content=content, who=who, file=key)
+        (d / "prompt.txt").write_text(prompt + "\n", encoding="utf-8")
+        (d / "jobb.json").write_text(json.dumps({
+            "id": f"hovedark_{key}", "type": "hovedark", "figur": MAIN_FIGURES[key], "kostyme": cid,
+            "rekkefolge": list(MASTERS).index(key) + 1,
+            "naerbilde": close if face is not None else None, "leveranse": f"hovedark/{key}.png",
+            "notat": f"hovedark/{key}-notat.md", "plassering": [ox, oy], "storrelse": [W, H],
+            "bokser": boxes, "bakgrunn": list(bg),
+            "sha256_referanse": gpt._sha(d / "referanse.png"),
+            "sha256_prompt": __import__("hashlib").sha256(prompt.encode()).hexdigest(),
+        }, indent=1, ensure_ascii=False))
+        made.append(key)
+    return made

@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Synker ChatGPT-jobbene (work/gpt) med grenen gpt-arbeid.
 #
-#   tools/gpt_gren.sh send   Legger jobbene, status, rapport og bestillingen inn i grenen og pusher
-#   tools/gpt_gren.sh hent   Henter grenen og kopierer ChatGPT sine resultater og notater til work/gpt
+#   tools/gpt_gren.sh send   Legger jobbene, hovedarkene, status, rapport, bestillingen og egenkontrollen
+#                            (verktoy/sjekk_leveranse.py) inn i grenen og pusher
+#   tools/gpt_gren.sh hent   Henter grenen og kopierer ChatGPT sine resultater, notater og hovedark til work/gpt
 #
-# Vanlig runde: smhd gpt-pakke, send, (ChatGPT jobber), hent, smhd gpt-inn, send.
+# Vanlig runde: smhd gpt-pakke, smhd gpt-ordre, send, (ChatGPT jobber), hent, smhd gpt-inn, send.
+# Med SEND_UTEN_PUSH=1 committes grenen lokalt (work/.gpt-gren) uten push.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
@@ -50,6 +52,17 @@ copy_jobs_out() {
 			cp "$WORK/forhandsvisning/$id.png" "$TREE/forhandsvisning/"
 		fi
 	done
+	# Hovedarkene: referanse, prompt og jobb.json. Leveransene (hovedark/<navn>.png) røres ikke.
+	for d in "$WORK"/hovedark/*/; do
+		[ -d "$d" ] || continue
+		id="$(basename "$d")"
+		mkdir -p "$TREE/hovedark/$id"
+		for f in referanse.png original_1x.png prompt.txt jobb.json; do
+			[ -f "$d/$f" ] && cp "$d/$f" "$TREE/hovedark/$id/$f"
+		done
+	done
+	mkdir -p "$TREE/verktoy"
+	cp "$ROOT/tools/sjekk_leveranse.py" "$TREE/verktoy/sjekk_leveranse.py"
 	cp "$ROOT/docs/BESTILLING-CHATGPT.md" "$TREE/BESTILLING.md"
 	cp "$ROOT/docs/gpt-arbeid-AGENTS.md" "$TREE/AGENTS.md"
 	[ -f "$TREE/README.md" ] || printf '# gpt-arbeid\n\nArbeidsbordet for HD-grafikken. Les AGENTS.md og BESTILLING.md.\n' > "$TREE/README.md"
@@ -59,6 +72,7 @@ restore_jobs() {
 	# Ny arbeidsmappe (for eksempel etter at maskinen er byttet): hent alle jobbene fra grenen
 	mkdir -p "$WORK"
 	cp -r "$TREE/jobber" "$WORK/"
+	[ -d "$TREE/hovedark" ] && cp -r "$TREE/hovedark" "$WORK/"
 	for f in JOBBER.md status.csv ORDRE.md RAPPORT.md; do
 		[ -f "$TREE/$f" ] && cp "$TREE/$f" "$WORK/$f"
 	done
@@ -78,6 +92,15 @@ copy_results_in() {
 			fi
 		done
 	done
+	# Leverte hovedark (hovedark/<navn>.png og notatet)
+	for f in "$TREE"/hovedark/*.png "$TREE"/hovedark/*-notat.md; do
+		[ -f "$f" ] || continue
+		mkdir -p "$WORK/hovedark"
+		if ! cmp -s "$f" "$WORK/hovedark/$(basename "$f")"; then
+			cp "$f" "$WORK/hovedark/"
+			n=$((n + 1))
+		fi
+	done
 	echo "Hentet $n nye eller endrede filer fra ChatGPT."
 }
 
@@ -91,9 +114,13 @@ send)
 		echo "Ingen endringer å sende."
 	else
 		git -C "$TREE" commit -q -m "Claude: jobber og status $(date '+%Y-%m-%d %H:%M')"
-		# HEAD og ikke grennavnet: arbeidskopien kan stå på en løs commit etter en manuell utsjekk
-		git -C "$TREE" push -q origin "HEAD:refs/heads/$BRANCH"
-		echo "Sendt til grenen $BRANCH."
+		if [ "${SEND_UTEN_PUSH:-0}" = "1" ]; then
+			echo "Committet lokalt i $TREE (ikke pushet)."
+		else
+			# HEAD og ikke grennavnet: arbeidskopien kan stå på en løs commit etter en manuell utsjekk
+			git -C "$TREE" push -q origin "HEAD:refs/heads/$BRANCH"
+			echo "Sendt til grenen $BRANCH."
+		fi
 	fi
 	;;
 hent)

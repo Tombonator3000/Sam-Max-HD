@@ -77,8 +77,7 @@ Romlisten med mål, z-plan, paletter og objektbilder per rom ligger i `docs/rom-
 | Kostymer og ruter | Største rute, og hvilke animasjoner skriptene faktisk bruker |
 | Tegnsett | Hvilke tegnsett som brukes hvor (dialog, meny, bannere), med størrelse og antall farger |
 | Lokale skript | Lokale skript og inn- og utgangsskript per rom (LSCR, ENCD, EXCD) |
-| Mellomsekvenser og minispill | Hvilke rom og skript som står for dem |
-| Figurer | Hvilke kostymer som er Sam, Max og de andre figurene |
+| Mellomsekvenser og minispill | Hvilke skript som står for dem (rommene er kjent, se 11) |
 
 ## 4. Dekompilering
 
@@ -116,7 +115,7 @@ Spillets exe-fil trenger ikke dekompileres. ScummVM har SCUMM v6-motoren (`Scumm
 | Objektbilder | 959 (856 SMAP og 103 BOMP), 0 feil |
 | Kostymeruter | 16 052 fra 348 kostymer. 17 ruter har bredde eller høyde 0 og får ikke noe bilde. 4789 ruter bruker samme bilde som en annen rute (`samme_bilde_som` i costumes.json) |
 
-**Farger i kostymene:** kostymepaletten peker på indekser i rompaletten. Bare indeksene 0 til 15 er like i alle rom, og Sam og Max bruker 234 til 255, som varierer. RGBA-bildene har derfor fargene fra rommet kostymet ligger i (palett 0). Noen kostymer (for eksempel 127, 132, 153, 194, 211, 227 og 280) blir helt magenta med den paletten; de ser ut til å være skygger eller masker, og fargene settes trolig av skript. Indeksbildene har de riktige indeksene uansett.
+**Farger i kostymene:** kostymepaletten peker på indekser i rompaletten. Bare indeksene 0 til 15 er like i alle rom; Sam og Max bruker 234 til 255, som er like i 75 til 79 av 85 rom. RGBA-bildene har fargene fra rommet kostymet ligger i (palett 0), eller fra rommet i `docs/kostymefarger.csv` når kostymet vises et annet sted (se 11). Magentaen i noen kostymer er palettindeks 13, som `ClassicCostumeRenderer` tegner gjennom skyggetabellen (`base-costume.cpp`, `pcolor == 13`): det er skygger, ikke farger. Indeksbildene har de riktige indeksene uansett.
 
 **Kontrollert:** alle rom og ett bilde fra hvert kostyme er sett på i kontaktark, og rom 2 med alle objektene lagt på plass etter CDHD stemmer med spillet. Sam (kostyme 2) og Max (kostyme 3) har riktige farger. Ikke sammenlignet piksel for piksel med motoren, fordi DigHD (som kan lagre skjermbilder) ikke er på for Sam & Max ennå. `smhd build-mod` lager en mod av uttrekket (testet med automatisk oppskalering: 83 rom, 950 objektbilder; de 9 objektbildene i rom 81 og 82 tas ikke med, fordi rommene ikke har bakgrunn).
 
@@ -137,7 +136,7 @@ Spillets exe-fil trenger ikke dekompileres. ScummVM har SCUMM v6-motoren (`Scumm
 ## 6. HD-figurer
 
 - Kostymene er klassiske (COST) og tegnes av `ClassicCostumeRenderer` i `costume.cpp`, ikke av AKOS som i The Dig. 348 kostymer, 16 052 ruter (se 4). Animasjonene per kostyme, lag og retning står i `costumes.json` i samme form som for The Dig.
-- Figurene som er kjent: Sam (hunden i dress og hatt) og Max (den hvite, kaninaktige figuren). Andre figurer er ikke kartlagt.
+- Alle 348 kostymene har navn eller beskrivelse i `docs/figurer.csv` (13. oktober, se 11). Sam er kostyme 2, 4, 7 og flere; Max er 3, 5, 6 og flere.
 - **Stil:** glatt stil med ekte alfa fra starten. I The Dig avviste Tom figurer klippet med originalens omriss, fordi de fikk trappetrinn i 4x.
 - **Animasjon:** rutene i én animasjon males på samme ark, så figuren ikke flimrer. Ankerpunkter og timing beholdes fra kostymet. HD-ruten erstatter bare pikslene.
 - **Størrelse:** i The Dig tegnet grafikerne hodene omtrent 35 prosent større enn kroppene. Mottaket skalerer derfor hver gruppe ruter til originalens høyde og plasserer etter best overlapp (`myk.py`).
@@ -173,7 +172,7 @@ Patchen er The Dig sin, utvidet for Sam & Max 10. oktober: rom, objekter, blast-
 
 Planen er trofast HD: samme motiv, samme former på samme sted og samme farger, bare skarpere og med mer detalj. Sam & Max sitt tegneserieuttrykk beholdes.
 
-Motoren er den samme uansett stil. Før noe bestilles i mengde, lages en stilpilot: ett rom og ett figurark, sett i motoren, med stilankere. Tom godkjenner. Rommet og figuren til piloten er ikke valgt.
+Motoren er den samme uansett stil. Før noe bestilles i mengde, lages en stilpilot, sett i motoren, med stilankere. Tom godkjenner. Piloten er valgt 13. oktober: hovedark for Sam og Max, kontoret (rom 7, to deler) og det første figurarket for Sam (kostyme 2) og Max (kostyme 3).
 
 ## 10. Første steg
 
@@ -185,6 +184,40 @@ Motoren er den samme uansett stil. Før noe bestilles i mengde, lages en stilpil
 6. `smhd build-mod` med automatisk oppskalering.
 7. Stilpilot med Tom.
 8. Spillbart for Tom: `./spill.sh`, nettsiden (eget repo) og Linux-pakken.
+
+## 11. Klargjøring av grafikken (13. oktober 2026)
+
+Tom ba om at all grafikken klargjøres så ChatGPT kan male den i HD: samme størrelse i alle figurarkene, ingen oppdiktede eller endrede objekter, og trofast mot originalen. Det som ble funnet og avgjort før jobbene ble laget:
+
+**Romnavn.** RNAM er tom. Alle 85 rom har fått navn i `docs/rom-oversikt.csv`, fra gjennomsyn av rommene og de interne objektnavnene i skriptene (for eksempel `office-dart-board`, `carny-kushman-sign`, `escher-mirror`).
+
+**Rom uten egen bakgrunn.** Ni rom er lagerrom for bilder spillet tegner andre steder: rom 1 (LucasArts-logoen), 67 og 77 (rulletekst), 69 (Highway Surfing: politibilene, veiskiltene med vitser, start- og mållinje, horisont), 78 (landskapsbitene i kikkerten), 80 og 82 (slangene i hyssingnøstet), 81 (ringen under forstørrelsesglasset), 93 (pekerne for handlingene) og 94 (inventaresken, samtaleikonene og inventaret). De store bildene der blir objektjobber, de små havner på ikonark.
+
+**Ikonarkene.** Rutenettet fra The Dig (én rute på størrelse med det største ikonet) ga 82 nesten tomme ark for Sam & Max. Nå pakkes ikonene tett i rader, rom for rom, med tilstandene til et ikon etter hverandre og en flat bakgrunnsfarge som ikke finnes i ikonene: 9 ark med 163 bilder.
+
+**Paletter.** `tools/kostymer.py` leser skriptene og finner rommene der hvert kostyme settes på en skuespiller eller lastes (345 av 348 har fast nummer i skriptene), og velger paletten flertallet av de rommene har. Åtte kostymer får en annen palett enn hjemrommet sitt (`docs/kostymefarger.csv`, tatt i bruk av `smhd extract`):
+
+| Kostyme | Ligger i | Vises med | Hvorfor |
+| --- | --- | --- | --- |
+| 2, 4, 7 (Sam) | rom 1 | rom 7 | Indeks 250 er oransje i rom 1, men krem (255, 247, 199) i 75 av 85 rom |
+| 104, 106, 107, 108 | rom 23 | rom 76 | Settes bare i rom 76; 5 til 22 farger er ulike |
+| 334 (tre) | rom 86 | rom 88 | Settes 7 ganger i rom 88; 10 farger er ulike |
+
+Motoren toner HD-pikselen etter paletten i indeksbildet (`basePal` i patchen), så riktig palett i uttrekket gir riktige farger også når spillet viser andre.
+
+**Skygger.** Palettindeks 13 (255, 87, 255) tegnes gjennom skyggetabellen. Skyggepikslene er tatt bort fra figurarkene, og fem kostymer som bare er skygge (127, 132, 153, 211 og 280), får ingen ark. Kostyme 95 og 194 har en hvit og en svart form i tillegg og får ark for den.
+
+**Feil i dataene.** Seks ruter i kostyme 62, 133, 331 og 346 er 4163 til 6189 piksler brede eller 4924 til 5257 høye. De kommer fra animasjoner som peker utenfor kostymet (advarslene i `costumes.json`), og dekoderen leser tilfeldige data som ruter. Ruter større enn 640 x 400 tas ikke med på arkene (`figur.MAX_CEL`); ekte ruter er høyst 320 x 200.
+
+**Lag og speilvending.** I klassiske kostymer er kroppen oftest lag 1 (i The Dig lag 0), og munn og hode er egne lag. En animasjon endrer bare lagene den har; de andre beholder ruten fra startanimasjonen. Mot venstre tegner `ClassicCostumeRenderer` rutene mot høyre speilvendt når kostymet ikke har eget speilflagg (`_drawActorToRight` i `costume.cpp`). Promptene sier derfor at arkene ikke har ruter mot venstre, og hovedarkene settes sammen av start- og ståanimasjonen.
+
+**Hvem er hvem.** Navnene er hentet fra replikkene i skriptene og koblet til kostymet skuespilleren har i samme skript: Shep og Burl Kushman (78, «Hi. I'm Shep Kushman, and this is my brother Burl.»), Shuv-Oohl (201 og 202), Doug the Mole Man (102), Trixie (80, 229, 240, 241; «Goodbye, everyone!»), Bruno (228, 237 til 239, 242), Conroy Bumpus (68, 125, 130, 231 til 234, 244) og Conroys håndlanger (69, 129, 245, 293). Det som er tolket og ikke bekreftet, står med «trolig» i `docs/figurer.csv` (for eksempel kvinnen med lang ringhals i rom 23). Hver rad har en engelsk beskrivelse (`prompt_en`) som går inn i prompten, og kolonnen `hovedark` sier hvilke kostymer som får hovedarket til Sam eller Max som bilde to.
+
+**Sett i motoren.** Rom 67, 77, 83 og 92 ble kjørt uten skjerm med testhoppet og bildedump (13. oktober). Alkoven (rom 92) viser Sam i brun dress og Max i ferskenfarge i varmt rødt lys, slik uttrekket har dem; derfor får kostyme 341 til 347 ikke hovedarket som bilde to. Rom 77 viser rulleteksten i rødt på en mørk vei og tittelen (kostyme 328). Rulletekstpanelene i rom 67 og 77 kom ikke på skjermen i løpet av de 900 bildene; fargene deres er ikke sett i spillet.
+
+**Jobbene** (`smhd gpt-pakke --figurer alle`): 2 hovedark, 115 romjobber for 76 rom, 86 objektjobber, 296 lagjobber med 701 objektbilder, 9 ikonark med 163 bilder og 1758 figurark med 15 661 ruter fra 343 kostymer. Ni objektbilder er helt gjennomsiktige og får ingen jobb. Promptene, ordren og egenkontrollen står i [BESTILLING-CHATGPT.md](BESTILLING-CHATGPT.md).
+
+**Minispill og mellomsekvenser** (rommene, fra gjennomsynet): Wak-A-Rat (18, 19), Gator Golf (25), Car Bomb (66), Highway Surfing (68, 69), påkledning (70, 71, 91), den virtuelle verdenen (49, 50), kikkerten (31, 78) og introen (1 til 6). Hvilke skript som styrer dem, er ikke gått gjennom.
 
 ## Kilder
 
