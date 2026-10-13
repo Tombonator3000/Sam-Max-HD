@@ -4,8 +4,8 @@
   smhd extract                      Eksporterer rom, objekter og kostymer til work/extract (eksport_v6.py)
   smhd build-mod --name test        Lager en mod-mappe for HD-motoren
   smhd compare --room 22            Lager et sammenligningsbilde av oppskaleringsmetoder
-  smhd gpt-pakke                    Lager jobber for ChatGPT i work/gpt (rom, store objektbilder, lag, ikonark
-                                     og figurark; --figurer alle for alle kostymene)
+  smhd gpt-pakke                    Lager jobber for ChatGPT i work/gpt (rom, store objektbilder, lag, ikonark,
+                                     figurark og hovedark; --figurer alle for alle kostymene)
   smhd gpt-inn                      Tar imot bilder fra ChatGPT, sjekker dem og lager HD-rom og HD-objekter
   smhd gpt-ordre                    Skriver ORDRE.md med neste jobber til ChatGPT
   smhd myke-figurer                 Tar inn figurarkene i glatt stil (ekte alfa) som myke kostymeruter
@@ -86,7 +86,8 @@ def cmd_extract(a) -> int:
                 ok = False
                 print(f"  {len(meta['errors'])} feil, se rooms.json")
         if {"kostymer", "akos"} & set(parts):
-            res = eksport_v6.export_costumes(game, out, _rooms(a.costumes))
+            colours = export.read_costume_colours(Path(a.kostymefarger) if a.kostymefarger else None)
+            res = eksport_v6.export_costumes(game, out, _rooms(a.costumes), colours)
             print(f"Kostymeruter: {res['written']} bilder fra {res['costumes']} kostymer -> {out / 'costumes'}")
             if res["errors"]:
                 ok = False
@@ -137,7 +138,8 @@ def _figures(arg: str | None):
 def cmd_gpt_pakke(a) -> int:
     notes = gpt.read_notes(Path(a.notater)) if a.notater else {}
     jobs = gpt.make_jobs(Path(a.extract), Path(a.ut), _rooms(a.rooms), notes, figures=_figures(a.figurer),
-                         game=Path(a.game), figure_list=Path(a.figurliste) if a.figurliste else None)
+                         game=Path(a.game), figure_list=Path(a.figurliste) if a.figurliste else None,
+                         room_names=gpt.read_room_names(Path(a.romliste) if a.romliste else None))
     n = {t: sum(j.type == t for j in jobs) for t in ("rom", "objekt", "lag", "ikon", "figur")}
     pieces = {t: len(gpt._pieces_of(jobs, t)) for t in ("lag", "ikon", "figur")}
     sheets = len({j.bilde for j in jobs if j.type == "figur"})
@@ -173,7 +175,7 @@ def cmd_gpt_ordre(a) -> int:
     anchors = sorted(p.name for p in Path(a.stil).glob("*.png")) if a.stil and Path(a.stil).is_dir() else []
     path = gpt.write_orders(Path(a.fra), batch=a.antall, anchors=anchors, messages=a.beskjed or None,
                            tasks=Path(a.oppgaver) if a.oppgaver else None)
-    gpt.write_list(Path(a.fra), batch=a.antall)
+    gpt.write_list(Path(a.fra), batch=a.antall, pilot_phase=not anchors)
     print(f"Ordre skrevet: {path}")
     return 0
 
@@ -208,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--rooms", help="for eksempel 22,24 eller 20-30")
     p.add_argument("--costumes", help="kostyme-ID-er, for eksempel 1-10")
     p.add_argument("--kostymefarger", default=str(root / "docs" / "kostymefarger.csv"),
-                   help="rom og palett for kostymer med kodek 5 og 16 (tom streng for ingen tabell)")
+                   help="rom og palett for kostymer som vises i et annet rom enn de ligger i (tom streng for ingen tabell)")
 
     def up(p):
         p.add_argument("--method", default="lanczos", choices=METHODS)
@@ -246,10 +248,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--rooms", help="for eksempel 22,24 eller 20-30 (standard: alle)")
     p.add_argument("--notater", default=str(root / "docs" / "gpt-romnotater.csv"), help="CSV med rom,notat")
     p.add_argument("--figurer", default="pilot",
-                   help="figurark: pilot (standard, arkene i FIG_PILOT i figur.py, tom til stilpiloten er valgt), alle, ingen, eller "
+                   help="figurark: pilot (standard, arkene i FIG_PILOT i figur.py: første ark for Sam og Max), alle, ingen, eller "
                         "kostyme-ID-er som 14,18 eller 14-20 (alle arkene for dem)")
     p.add_argument("--figurliste", default=str(root / "docs" / "figurer.csv"),
                    help="CSV med kostymene (navn og rekkefølge for figurarkene)")
+    p.add_argument("--romliste", default=str(root / "docs" / "rom-oversikt.csv"),
+                   help="CSV med romnavnene (kolonnen navn), siden RNAM er tom")
 
     p = sub.add_parser("gpt-inn", help="ta imot bilder fra ChatGPT, sjekk dem og lag HD-rom")
     p.add_argument("--extract", default=str(root / "work" / "extract"))

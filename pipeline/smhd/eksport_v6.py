@@ -12,8 +12,10 @@ oppskaleringen og grafikkjobbene kan bruke dem:
   rooms.json, costumes.json  metadata
 
 Dekodingen står i v6grafikk.py og følger ScummVM ved c9091321. Kostymefargene er indekser i
-rompaletten. Fargene i RGBA-bildene er fra paletten i rommet kostymet ligger i (palett 0);
-spillet kan vise dem med andre farger i andre rom og når et skript setter skuespillerpaletten.
+rompaletten. Fargene i RGBA-bildene er fra paletten i rommet kostymet ligger i (palett 0), eller fra
+rommet som står i docs/kostymefarger.csv når kostymet vises et annet sted (tools/kostymer.py finner
+dem). Spillet kan vise dem med andre farger i andre rom og når et skript setter skuespillerpaletten;
+motoren toner da etter paletten i indeksbildet.
 """
 from __future__ import annotations
 
@@ -157,12 +159,20 @@ def export_rooms(game: Path, out: Path, rooms_filter: set[int] | None = None) ->
     return meta
 
 
-def export_costumes(game: Path, out: Path, costume_filter: set[int] | None = None) -> dict:
-    """Alle kostymerutene animasjonene bruker. Returnerer {"written", "errors"} og skriver costumes.json."""
+def export_costumes(game: Path, out: Path, costume_filter: set[int] | None = None,
+                    colours: dict[int, dict] | None = None) -> dict:
+    """Alle kostymerutene animasjonene bruker. Returnerer {"written", "errors"} og skriver costumes.json.
+
+    colours: kostyme -> {"kind": "rom", "room", "palette", "source"} fra docs/kostymefarger.csv
+    (export.read_costume_colours). Da brukes paletten i det rommet i stedet for hjemrommets, både i
+    RGBA-bildet og i paletten til indeksbildet, så motoren toner riktig. Det gjelder kostymer som ligger
+    i ett rom og vises i et annet (tools/kostymer.py foreslår dem).
+    """
     d, _ = gamedata.load(game / DATA_FILE)
     index = gamedata.read_index(game / INDEX_FILE)
     rooms = gamedata.read_rooms(game / DATA_FILE)
     ids = gamedata.costume_ids(index, rooms)
+    colours = colours or {}
     dest = out / "costumes"
     dest.mkdir(parents=True, exist_ok=True)
     meta: dict = {}
@@ -171,12 +181,20 @@ def export_costumes(game: Path, out: Path, costume_filter: set[int] | None = Non
     n = 0
     for num in sorted(rooms, key=lambda k: rooms[k].offset):
         r = rooms[num]
-        palette = r.palettes[0] if r.palettes else bytes(768)
         for o in r.cost_offsets:
             cid = ids[n]
             n += 1
             if costume_filter and cid not in costume_filter:
                 continue
+            spec = colours.get(cid)
+            source = {"kind": "rom", "room": num, "palette": 0, "source": "rommet kostymet ligger i"}
+            if spec and spec.get("kind") == "rom" and spec.get("room") in rooms:
+                source = {"kind": "rom", "room": spec["room"], "palette": spec.get("palette", 0),
+                          "source": spec.get("source") or "tabell"}
+            elif spec:
+                errors.append(f"kostyme {cid}: fargetabellen peker på {spec}, som ikke kan brukes for v6")
+            pals = rooms[source["room"]].palettes
+            palette = pals[source["palette"]] if source["palette"] < len(pals) else (pals[0] if pals else bytes(768))
             try:
                 c = v6grafikk.decode_costume(d, r.offset + o)
             except (ValueError, IndexError) as e:
@@ -206,7 +224,7 @@ def export_costumes(game: Path, out: Path, costume_filter: set[int] | None = Non
             meta[str(cid)] = {
                 "room": num, "format": f"0x{c.format:02X}", "farger": len(c.palette), "speil": c.mirror,
                 "kostymepalett": list(c.palette),
-                "colours": {"kind": "rom", "room": num, "palette": 0, "source": "rommet kostymet ligger i"},
+                "colours": source,
                 "cels": cels, "tomme_ruter": empty, "retninger": 4, "animasjoner": c.animations,
                 "advarsler": c.errors,
             }

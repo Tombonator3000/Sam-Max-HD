@@ -50,9 +50,21 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Roller: Claude koden, ChatGPT/Codex grafikken, Tom godkjenner.
 - Claude får ikke flette sine egne PR-er herfra (sikkerhetskontrollen, 10. oktober). Tom fletter når CI er grønn.
 - Stilpilot med ett rom og ett figurark før noe bestilles i mengde. Ta glatt figurstil med ekte alfa fra starten (lærdom fra The Dig).
+- Stilpiloten (valgt 13. oktober): hovedark for Sam og Max, kontoret (rom 7, to deler) og første figurark for kostyme 2 og 3. Så lenge `stil/` er tom, skriver `smhd gpt-ordre` bare piloten i ORDRE.md.
 
 ## Kildetro grafikk og design (12. oktober 2026)
 - Tom ba om samme regel i remake-skillen i Dig, Sam & Max og Zak: avklar motiv, funksjon, palett, figuridentitet og design fra riktig originalkontekst før grafisk HD-arbeid, også stilpilot.
 - Skillen ligger i `docs/skills/scumm-hd-remake/SKILL.md`. Den er koblet fra AGENTS, remastermetoden, bestillingen og malen for grafikkgrenen. Spillets egne stilvalg gjelder; Dig sine figurer og materialer er ikke designfasit for de andre spillene.
 - Rett påviste feil i produksjonsgrunnlaget før generering. Beskyttede jobbfiler beholdes; korrigert prompt og kildebegrunnelse leveres i et separat notat.
 - Visuell kontroll av mening, identitet og hele animasjoner i spillet kommer i tillegg til teknisk mottak. Innført regel er ikke bevis for at alle ressursene er analysert eller spilltestet.
+
+## Grafikkjobbene (13. oktober 2026)
+- Tom: klargjør all grafikken til ChatGPT, samme størrelse i alle figurark, ingen oppdiktede eller endrede objekter, trofast HD. Fremgangsmåten er hentet fra Dig (`gpt-arbeid` der, hovedark som Full Throttle, `myk.py` versjon 3).
+- `smhd gpt-pakke --figurer alle` gir 2 hovedark, 115 romjobber (76 rom), 86 objektjobber, 296 lagjobber (701 bilder), 9 ikonark (163 bilder) og 1758 figurark (15 661 ruter, 343 kostymer). Ligger i `work/gpt`, ikke i noen gren ennå.
+- Fast størrelse: prompten gir målet på hver rute i 4x, og `tools/sjekk_leveranse.py` (bare numpy og Pillow) kopieres til `verktoy/` i `gpt-arbeid` så grafikeren kan sjekke før commit. `myk.py` versjon 4 merker grupper der tegnet størrelse spriker mer enn 12 prosent.
+- Hovedark: `figur.MASTERS` (Sam kostyme 2 og nærbilde 27, Max kostyme 3 og nærbilde 28). Figurjobber for kostymer med `hovedark` i `docs/figurer.csv` får hovedarket som bilde to; senere ark av samme kostyme får første ark som bilde tre.
+- Klassiske kostymer: palettindeks 13 er skygge (tegnes gjennom skyggetabellen) og tas bort fra arkene. Kostyme 127, 132, 153, 211 og 280 er bare skygge og får ingen ark. Kroppen er oftest lag 1. Mot venstre speilvender motoren rutene mot høyre (ingen egne ruter).
+- Seks ruter i kostyme 62, 133, 331 og 346 er søppel fra animasjonskoder utenfor kostymet (opptil 6189 px). `figur.MAX_CEL` = 640 x 400 holder dem ute.
+- Paletter: `docs/kostymefarger.csv` (2, 4, 7 til rom 7; 104, 106, 107, 108 til rom 76; 334 til rom 88). Fra `tools/kostymer.py`, som leser skriptene.
+- Romnavn i `docs/rom-oversikt.csv` (alle 85), engelske romnotater med skilttekst i `docs/gpt-romnotater.csv`, figurliste med navn og engelsk beskrivelse i `docs/figurer.csv`.
+- CSV-filene i `docs/` skrives med LF (`lineterminator="\n"`), ellers klager `git diff --check`.

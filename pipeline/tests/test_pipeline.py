@@ -510,7 +510,7 @@ def test_gpt_object_jobs_and_import(tmp_path):
     assert prov["type"] == "objekt" and prov["jobber"][0]["status"] == "godkjent"
     report = (work / "RAPPORT.md").read_text()
     assert "Ferdige rom: 0 av 1" in report and "Ferdige objekter: 1 av 1 (obj241_01)" in report
-    orders = gpt.write_orders(work).read_text()
+    orders = gpt.write_orders(work, anchors=["stil.png"]).read_text()
     assert "Ferdige rom: 0 av 1" in orders and "Ferdige objekter: 1 av 1 (obj241_01)" in orders
     assert "1. `rom005`" in orders
 
@@ -553,7 +553,7 @@ def test_gpt_orders_with_objects(tmp_path):
             row.update(jobb=jobb, type=typ, rom=rom, navn="x", status=status, kommentar=kommentar)
             row["del"] = "1/1"
             f.write(",".join(str(row[k]) for k in gpt.STATUS_FIELDS) + "\n")
-    text = gpt.write_orders(tmp_path, batch=10).read_text()
+    text = gpt.write_orders(tmp_path, batch=10, anchors=["stil.png"]).read_text()
     # Avviste, så nye objektjobber i ferdige rom, så nye etter romnummer (rom før objekt), så sjekk
     order = ["rom010", "obj050_01", "rom002_del1av3", "rom003", "obj060_01", "rom011"]
     pos = [text.index(f"`{j}`") for j in order]
@@ -708,9 +708,13 @@ def test_gpt_layer_jobs(tmp_path):
     assert prompt.rstrip().endswith(gpt.PROMPT_LAYER_STYLE)
     assert "Small things on the panel." in prompt and "Keep the panel empty." not in prompt
     icon_prompt = (work / "jobber" / "ikon01" / "prompt.txt").read_text()
-    assert gpt.PROMPT_ICONS in icon_prompt and icon_prompt.rstrip().endswith(gpt.PROMPT_STYLE)
+    icon_job = json.loads((work / "jobber" / "ikon01" / "jobb.json").read_text())
+    bg = tuple(icon_job["bakgrunn"])
+    assert bg in [b for b, _ in gpt.SHEET_BACKGROUNDS]
+    assert gpt.PROMPT_ICONS.split("{color}")[0] in icon_prompt and ("#%02X%02X%02X" % bg) in icon_prompt
+    assert icon_prompt.rstrip().endswith(gpt.PROMPT_STYLE)
     sheet = Image.open(work / "jobber" / "ikon01" / "original_1x.png")
-    assert sheet.size == gpt.ICON_SHEET and sheet.getpixel((1, 1)) == gpt.ICON_BG
+    assert sheet.size == gpt.ICON_SHEET and sheet.getpixel((1, 1)) == bg
 
     # Rom- og objektjobbene er de samme som uten de små objektene
     plain = tmp_path / "uten"
@@ -768,7 +772,7 @@ def test_gpt_layer_import_and_mod(tmp_path):
     assert "Ferdige objektbilder fra lag: 2 av 5" in report and "Ferdige ikoner fra ikonark: 1 av 1" in report
 
     # Ordre og grafikkliste: lagjobbene etter rom- og objektjobbene, med bilde to
-    orders = gpt.write_orders(work, batch=10).read_text()
+    orders = gpt.write_orders(work, batch=10, anchors=["stil.png"]).read_text()
     assert "Lagjobber: 1 av 3 godkjent. Ferdige objektbilder fra lag: 2 av 5" in orders
     assert orders.index("`lag006_02`") < orders.index("`rom006`") < orders.index("`lag006_03`")
     assert ("`lag006_03` (rom 6, lagrom, lag 03 med 1 objektbilde, del 1/1). Legg ved "
@@ -1015,6 +1019,7 @@ def test_figure_sheets_plan_and_jobs(tmp_path, monkeypatch):
     assert "gange mot høyre (6 ruter)" in data["innhold"]
     second = json.loads((work / "jobber" / "fig014_02_del2av2" / "jobb.json").read_text())
     assert second["bilde_to"] == "jobber/fig014_01/resultat.png" and second["deler"] == 2
+    assert second["referanser"] == ["jobber/fig014_01/resultat.png"] and "referanser" not in data
     # Referansen: 4x på lerretet med grå kant, rutene på den flate bakgrunnen
     ref = Image.open(d / "referanse.png")
     ox, oy = data["plassering"]
@@ -1025,7 +1030,11 @@ def test_figure_sheets_plan_and_jobs(tmp_path, monkeypatch):
     assert ref.getpixel(((ox + c["rekt"][0] + 12) * 4 + 1, (oy + c["rekt"][1] + 18) * 4 + 1)) == \
         cel0.getpixel((12, 18))[:3]
     prompt = (d / "prompt.txt").read_text()
-    assert "the same face, hair, clothes, colors and light in every frame" in prompt
+    assert "the same face, eyes, hat, clothes, colors and light in every frame" in prompt
+    # Størrelsesregelen med målene på arket, og egenkontrollen grafikeren kjører før levering
+    assert "Size rule (most important)" in prompt and "pixels tall" in prompt
+    assert "verktoy/sjekk_leveranse.py jobber/fig014_01/resultat.png" in prompt
+    assert "do not make heads, hands or eyes bigger" in prompt
     # Glatt stil: gjennomsiktig bakgrunn med ekte alfa, ikke originalens omriss piksel for piksel
     assert "#%02X%02X%02X" % bg in prompt and "fully transparent background" in prompt
     assert "outline of every frame exactly" not in prompt
@@ -1232,16 +1241,16 @@ def test_figure_rejections_and_orders(tmp_path):
     ref = Image.open(rd / "referanse.png")
     ref.transform(ref.size, Image.AFFINE, (1, 0, -24, 0, 1, -16)).save(rd / "resultat.png")
     gpt.import_results(work, ex, done)
-    orders = gpt.write_orders(work, batch=10).read_text()
+    orders = gpt.write_orders(work, batch=10, anchors=["stil.png"]).read_text()
     pos = [orders.index(f"`{j}`") for j in ("rom005", "fig014_01", "fig014_02_del1av2", "obj241_01", "lag005_01")]
     assert pos == sorted(pos)
-    assert "Pilot for figurarkene" in orders and "Figurark: 0 av 3 godkjent. Ferdige figurruter: 0 av 9" in orders
+    assert "(pilot)" in orders and "Figurark: 0 av 3 godkjent. Ferdige figurruter: 0 av 9" in orders
     assert "Legg ved `jobber/fig014_01/resultat.png` som bilde to" in orders
     assert "Lag denne etter at fig014_01 er godkjent." in orders
     lst = gpt.write_list(work, batch=10).read_text()
     assert "`fig014_01` (figurark 1 for kostyme 14, 8 ruter: stående" in lst
-    assert "(avvist, les retur.md) (pilot)" in lst and "De er en pilot" in lst
-    assert "| Figurer: pilot med figurark for kostyme 14 (`figCCC_KK`, kostymeruter) | 0 | 9 |" in lst
+    assert "(avvist, les retur.md) (pilot)" in lst
+    assert "| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 0 | 9 |" in lst
     # Bestilling 1: de avviste romjobbene og piloten
     assert "Rom 5. Figurark for kostyme 14." in lst
 
@@ -1454,3 +1463,365 @@ def test_rejected_soft_sheet():
     assert myk.rejected_sheet(rej, "fig002_01", "hva som helst")     # "*" gjelder alle
     assert myk.rejected_sheet(rej, "fig003_01", "abc") is None      # sjekk er ikke avvist
     assert myk.rejected_sheet(None, "fig004_01", "abc") is None
+
+
+# Tatt fra Dig-HD-Remake main eb7c0b0 (myk.py versjon 3), 13. oktober 2026
+
+def _soft_sheet_case(tmp_path, originals, drawings):
+    """Lager et uttrekk med originalrutene og et ark med tegningene på rad, med rutekart.
+    originals/drawings: navn -> RGBA (numpy). Gir (ark, rutene, boksene, uttrekk)."""
+    import numpy as np
+    ex = tmp_path / "ex"
+    (ex / "costumes").mkdir(parents=True)
+    for b, o in originals.items():
+        Image.fromarray(o, "RGBA").save(ex / "costumes" / f"{b}.png")
+    width = sum(d.shape[1] + 20 for d in drawings.values()) + 20
+    height = max(d.shape[0] for d in drawings.values()) + 40
+    sheet = np.zeros((height, width, 4), np.uint8)
+    boxes, x = {}, 20
+    for b, d in drawings.items():
+        sheet[20:20 + d.shape[0], x:x + d.shape[1]] = d
+        ys, xs = np.nonzero(d[..., 3] >= 128)
+        boxes[b] = [x + int(xs.min()), 20 + int(ys.min()), int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1)]
+        x += d.shape[1] + 20
+    cels = [{"bilde": b, "animasjon": 1, "lag": 0} for b in originals]
+    return sheet, cels, boxes, ex
+
+
+def test_soft_cel_technical_and_outliers(tmp_path):
+    # Versjon 3: tekniske magentapiksler og en fjern utligger styrer ikke skala og fotfeste (Pig 064),
+    # utliggeren legges inn fra originalen, og en rute med bare magenta får ikke HD-bilde
+    import numpy as np
+    from smhd import myk
+
+    o = np.zeros((60, 80, 4), np.uint8)
+    o[4:30, 6:30] = (90, 80, 140, 255)                 # kroppen
+    o[30:33, 4:34] = (255, 87, 255, 255)               # skyggemerke under
+    o[58, 78] = (0, 0, 0, 255)                         # ekte svart utligger langt unna
+    mask, outlier = myk.measure_mask(o)
+    assert mask.sum() == 26 * 24 and outlier.sum() == 1 and outlier[58, 78]
+    assert myk.technical(o).sum() == 3 * 30
+
+    shadow_only = np.zeros((2, 4, 4), np.uint8)
+    shadow_only[...] = (255, 63, 255, 255)
+    d = np.zeros((120, 110, 4), np.uint8)
+    d[5:109, 5:101] = (90, 80, 140, 255)               # tegnet kropp, 96 x 104 = 24 x 26 i 4x
+    sheet, cels, boxes, ex = _soft_sheet_case(tmp_path, {"costume007_064": o, "costume007_001": shadow_only},
+                                              {"costume007_064": d})
+    out = tmp_path / "ut"
+    rep = myk.import_sheet(sheet, cels, boxes, ex, out)["ruter"]
+    r = rep["costume007_064"]
+    assert r["status"] == "ok" and r["snitt_union"] > 0.9, r
+    assert abs(r["skala"] - 1.0) < 0.02, r                 # skala fra kroppen, ikke 60 piksler høy rute
+    assert "utliggerpiksler" in r["kilde"]
+    with Image.open(out / "costumes" / "costume007_064_hd.png") as im:
+        n = np.asarray(im.convert("RGBA"))
+    mx, my = r["marg"]
+    assert n[(my + 58) * 4 + 2, (mx + 78) * 4 + 2, 3] > 128   # utliggeren er med
+    assert rep["costume007_001"]["status"] == "teknisk"
+    assert not (out / "costumes" / "costume007_001_hd.png").exists()
+
+
+def test_soft_cel_no_head_pulse(tmp_path):
+    # Codex 11. oktober: munnstillinger der originalen er 12 og 13 piksler høy og tegningene like høye,
+    # fikk hodet strukket 8 prosent. Når tegningene ikke sprer mer enn originalene, brukes gruppens skala.
+    import numpy as np
+    from smhd import myk
+
+    originals, drawings = {}, {}
+    for i, h in enumerate((12, 13, 13)):
+        o = np.zeros((16, 10, 4), np.uint8)
+        o[1:1 + h, 1:9] = (200, 160, 140, 255)
+        originals[f"costume016_05{i}"] = o
+        d = np.zeros((80, 50, 4), np.uint8)
+        d[4:72, 5:45] = (200, 160, 140, 255)           # alle tre 40 x 68
+        drawings[f"costume016_05{i}"] = d
+    sheet, cels, boxes, ex = _soft_sheet_case(tmp_path, originals, drawings)
+    rep = myk.import_sheet(sheet, cels, boxes, ex, tmp_path / "ut")["ruter"]
+    heights, factors = set(), set()
+    for b in originals:
+        with Image.open(tmp_path / "ut" / "costumes" / f"{b}_hd.png") as im:
+            a = np.asarray(im.convert("RGBA"))[..., 3] >= 128
+        ys = np.nonzero(a.any(axis=1))[0]
+        heights.add(int(ys[-1] - ys[0] + 1))
+        factors.add(tuple(rep[b]["skala_xy"] or (rep[b]["skala"], rep[b]["skala"])))
+    assert len(heights) == 1 and len(factors) == 1, (heights, factors)
+
+
+def test_soft_cel_override_sheet(tmp_path):
+    # En rute kan tas fra et eget rettingsark (fra-claude/mottak-per-rute.json), med egen skala
+    import numpy as np
+    from smhd import myk
+
+    o = np.zeros((20, 12, 4), np.uint8)
+    o[2:18, 2:10] = (120, 120, 200, 255)
+    bad = np.zeros((40, 40, 4), np.uint8)
+    bad[2:12, 2:38] = (120, 120, 200, 255)            # feil form på hovedarket
+    sheet, cels, boxes, ex = _soft_sheet_case(tmp_path, {"costume007_113": o}, {"costume007_113": bad})
+    fix = np.zeros((200, 200, 4), np.uint8)
+    fix[50:178, 60:124] = (120, 120, 200, 255)        # 64 x 128: riktig form, annen skala
+    rep = myk.import_sheet(sheet, cels, boxes, ex, tmp_path / "ut",
+                           {"costume007_113": (fix, [60, 50, 64, 128])})["ruter"]["costume007_113"]
+    assert rep["kilde"] == "rettingsark" and rep["status"] == "ok" and rep["snitt_union"] > 0.9, rep
+
+
+# ---------------------------------------------------------------- Sam & Max: klargjøring av grafikken (13. oktober 2026)
+
+def test_soft_cel_size_spread(tmp_path):
+    # En rute tegnet 20 prosent høyere enn resten av gruppen får status sjekk og storrelsesavvik
+    import numpy as np
+    from smhd import myk
+
+    originals, drawings = {}, {}
+    for i, extra in enumerate((1.0, 1.0, 1.2)):
+        o = np.zeros((20, 12, 4), np.uint8)
+        o[2:18, 2:10] = (200, 160, 140, 255)
+        originals[f"costume002_13{i}"] = o
+        h = round(64 * extra)
+        d = np.zeros((h + 8, 40, 4), np.uint8)
+        d[4:4 + h, 4:36] = (200, 160, 140, 255)
+        drawings[f"costume002_13{i}"] = d
+    sheet, cels, boxes, ex = _soft_sheet_case(tmp_path, originals, drawings)
+    rep = myk.import_sheet(sheet, cels, boxes, ex, tmp_path / "ut")
+    r = rep["ruter"]
+    assert r["costume002_130"]["status"] == "ok" and "storrelsesavvik" not in r["costume002_130"]
+    assert r["costume002_132"]["status"] == "sjekk" and r["costume002_132"]["storrelsesavvik"][1] > 0.15
+    assert r["costume002_130"]["tegnet_mot_4x"] == [1.0, 1.0]
+    assert rep["tegnet_storrelse"] is not None
+
+
+def test_figure_shadow_pixels_and_invalid_cels(tmp_path):
+    # Skyggepiksler (palettindeks 13) står ikke på arket, rene skyggeruter og ruter større enn MAX_CEL
+    # får ingen boks, og et kostyme med bare skygger får ingen ark
+    import json
+    import numpy as np
+    from smhd import export, figur
+
+    ex = tmp_path / "extract"
+    (ex / "costumes").mkdir(parents=True)
+    (ex / "rooms").mkdir()
+    (ex / "rooms.json").write_text(json.dumps({"game_md5_la0": "x", "rooms": {}}))
+
+    def cel(cid, n, w, h, shadow_rows=0, all_shadow=False):
+        rgba = np.zeros((h, w, 4), np.uint8)
+        idx = np.zeros((h, w), np.uint8)
+        rgba[:, :] = (120, 80, 40, 255)
+        idx[:, :] = 40
+        if shadow_rows:
+            rgba[-shadow_rows:] = (255, 87, 255, 255)
+            idx[-shadow_rows:] = figur.SHADOW_INDEX
+        if all_shadow:
+            rgba[:, :] = (255, 87, 255, 255)
+            idx[:, :] = figur.SHADOW_INDEX
+        Image.fromarray(rgba, "RGBA").save(ex / "costumes" / f"costume{cid:03d}_{n:03d}.png")
+        Image.fromarray(idx, "L").convert("P").save(ex / "costumes" / f"costume{cid:03d}_{n:03d}_idx.png")
+
+    cel(40, 128, 20, 30, shadow_rows=4)          # figur med skygge under føttene
+    cel(40, 129, 20, 30)
+    cel(40, 130, 700, 10)                         # feil i dataene: bredere enn MAX_CEL
+    cel(41, 128, 30, 10, all_shadow=True)         # rent skyggekostyme
+    anims = [{"valg": 4, "animasjon": 3, "retning": 1, "lag": 1, "ruter": [128, 129, 130]}]
+    meta = {"40": {"room": 5, "retninger": 4, "speil": False, "animasjoner": anims,
+                   "cels": [{"cel": 128, "w": 20, "h": 30, "lag": 1}, {"cel": 129, "w": 20, "h": 30, "lag": 1},
+                            {"cel": 130, "w": 700, "h": 10, "lag": 1}]},
+            "41": {"room": 5, "retninger": 4, "speil": False,
+                   "animasjoner": [{"valg": 4, "animasjon": 3, "retning": 1, "lag": 1, "ruter": [128]}],
+                   "cels": [{"cel": 128, "w": 30, "h": 10, "lag": 1}]}}
+    (ex / "costumes.json").write_text(json.dumps(meta))
+    costumes = export.load_costumes(ex)
+    boxes = figur.cel_boxes(ex, 40, costumes[40])
+    assert boxes[128] == (0, 0, 20, 26) and boxes[129] == (0, 0, 20, 30) and boxes[130] is None
+    assert figur.cel_boxes(ex, 41, costumes[41]) == {128: None}
+    sheets = figur.plan_sheets(figur.groups_of(costumes[40], boxes))
+    img = figur.sheet_image(ex, 40, sheets[0], (0, 177, 64))
+    a = np.asarray(img)
+    assert not ((a[..., 0] >= 230) & (a[..., 2] >= 230) & (a[..., 1] <= 120)).any()   # ingen magenta på arket
+    jobs = figur.figure_jobs(ex, tmp_path / "jobber", [40, 41], costumes, {}, {}, {}, None, False)
+    assert {j.kostyme for j in jobs} == {40}
+    prompt = (tmp_path / "jobber" / jobs[0].id / "prompt.txt").read_text()
+    assert "no frames facing left" in prompt and "shadow markers" not in prompt
+
+
+def test_figure_master_refs_and_master_sheet(tmp_path):
+    # Kostymer med hovedark i figurlisten får hovedarket som bilde to på alle arkene, og hovedarket settes
+    # sammen av startanimasjonen (hodet) og stående (kroppen), med venstre speilvendt
+    import csv
+    import json
+    import numpy as np
+    from smhd import export, figur
+
+    ex = tmp_path / "extract"
+    (ex / "costumes").mkdir(parents=True)
+
+    def cel(cid, n, w, h, colour):
+        rgba = np.zeros((h, w, 4), np.uint8)
+        rgba[:, :] = (*colour, 255)
+        rgba[:, : w // 3, :3] = (20, 20, 20)       # mørk venstre kant, så speilvendingen synes
+        Image.fromarray(rgba, "RGBA").save(ex / "costumes" / f"costume{cid:03d}_{n:03d}.png")
+
+    cel(2, 128, 16, 30, (120, 140, 190))          # kropp forfra
+    cel(2, 129, 14, 30, (120, 140, 190))          # kropp fra siden
+    cel(2, 130, 16, 30, (120, 140, 190))          # kropp bakfra
+    cel(2, 385, 12, 10, (170, 100, 50))           # hodet (lag 3, fra startanimasjonen)
+    cel(27, 1920, 30, 24, (170, 100, 50))         # nærbilde av ansiktet
+    cels = [{"cel": 128, "w": 16, "h": 30, "lag": 1, "rel_x": -8, "rel_y": -30},
+            {"cel": 129, "w": 14, "h": 30, "lag": 1, "rel_x": -7, "rel_y": -30},
+            {"cel": 130, "w": 16, "h": 30, "lag": 1, "rel_x": -8, "rel_y": -30},
+            {"cel": 385, "w": 12, "h": 10, "lag": 3, "rel_x": -6, "rel_y": -38}]
+    anims = []
+    for d, body in ((0, 129), (1, 129), (2, 128), (3, 130)):
+        anims.append({"valg": 4 + d, "animasjon": 1, "retning": d, "lag": 3, "ruter": [385]})
+        anims.append({"valg": 12 + d, "animasjon": 3, "retning": d, "lag": 1, "ruter": [body]})
+    meta = {"2": {"room": 1, "retninger": 4, "speil": False, "animasjoner": anims, "cels": cels},
+            "27": {"room": 4, "retninger": 4, "speil": False, "cels": [{"cel": 1920, "w": 30, "h": 24, "lag": 15}],
+                   "animasjoner": [{"valg": 4, "animasjon": 1, "retning": 0, "lag": 15, "ruter": [1920]}]}}
+    (ex / "costumes.json").write_text(json.dumps(meta))
+    costumes = export.load_costumes(ex)
+    front = figur.pose_image(ex, 2, costumes[2], 3, 2)
+    assert front.size == (16, 38)                 # hodet over kroppen
+    right, left = figur.pose_image(ex, 2, costumes[2], 3, 1), figur.pose_image(ex, 2, costumes[2], 3, 0)
+    assert np.array_equal(np.asarray(left), np.asarray(right.transpose(Image.FLIP_LEFT_RIGHT)))
+
+    fl = tmp_path / "figurer.csv"
+    with fl.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["rekkefolge", "kostyme", "figur", "prompt_en", "hovedark"])
+        w.writeheader()
+        w.writerow({"rekkefolge": 1, "kostyme": 2, "figur": "Sam", "prompt_en": "Sam, the dog detective", "hovedark": "sam"})
+    names = figur.read_figure_list(fl)
+    assert names[2]["hovedark"] == ["sam"]
+    jobs = figur.figure_jobs(ex, tmp_path / "jobber", [2], costumes, names, {}, {}, None, False)
+    assert jobs and all(j.bilde_to == "hovedark/sam.png" and j.referanser == ["hovedark/sam.png"] for j in jobs)
+    assert "Sam, the dog detective" in (tmp_path / "jobber" / jobs[0].id / "prompt.txt").read_text()
+
+    made = figur.master_jobs(ex, tmp_path / "gpt", costumes, names)
+    assert made == ["sam"]
+    d = tmp_path / "gpt" / "hovedark" / "sam"
+    data = json.loads((d / "jobb.json").read_text())
+    assert data["type"] == "hovedark" and data["leveranse"] == "hovedark/sam.png" and len(data["bokser"]) == 5
+    assert Image.open(d / "referanse.png").size == (1536, 1024)
+    assert "master character sheet" in (d / "prompt.txt").read_text()
+
+
+def test_icon_sheet_rows_and_background(tmp_path):
+    # Ikonene pakkes tett i rader, rom for rom, med tilstandene til et ikon etter hverandre, og arket får en
+    # flat bakgrunnsfarge som ikke er i ikonene
+    from smhd import gpt
+
+    def icon(w, h, colour):
+        return Image.new("RGBA", (w, h), (*colour, 255))
+
+    icons = [(93, {"id": 874}, [("01", icon(32, 24, (255, 255, 255)))]),
+             (93, {"id": 880}, [("01", icon(40, 24, (110, 140, 220))), ("02", icon(40, 24, (110, 140, 220)))]),
+             (94, {"id": 997}, [("01", icon(40, 24, (250, 190, 120)))]),
+             (69, {"id": 661}, [("01", icon(168, 64, (30, 30, 40)))])]
+    sheets = gpt.plan_icon_sheets(icons)
+    assert len(sheets) == 1
+    pos = {p.bilde: p.rekt for p in sheets[0]}
+    assert pos["obj880_01"][1] == pos["obj880_02"][1] and pos["obj880_02"][0] > pos["obj880_01"][0]
+    assert pos["obj997_01"][1] > pos["obj874_01"][1]          # nytt rom, ny rad
+    assert pos["obj661_01"][1] > pos["obj997_01"][1]
+    for p in sheets[0]:
+        x, y, w, h = p.rekt
+        assert x >= gpt.ICON_MARGIN and y >= gpt.ICON_MARGIN
+        assert x + w <= gpt.ICON_SHEET[0] - gpt.ICON_MARGIN and y + h <= gpt.ICON_SHEET[1] - gpt.ICON_MARGIN
+    import numpy as np
+    bg, name = gpt.sheet_background(np.array([[255, 255, 255], [110, 140, 220], [250, 190, 120], [30, 30, 40]], float))
+    assert bg in [b for b, _ in gpt.SHEET_BACKGROUNDS]
+
+
+def test_sjekk_leveranse_tool(tmp_path):
+    # Egenkontrollen til grafikeren: et riktig figurark er OK, en rute tegnet 15 prosent for stor er FEIL,
+    # og et rom som er forskjøvet 3 originalpiksler, er FEIL
+    import importlib.util
+    import json
+    import numpy as np
+    from PIL import ImageFilter
+    from smhd import gpt
+
+    spec = importlib.util.spec_from_file_location("sjekk", ROOT / "tools" / "sjekk_leveranse.py")
+    sjekk = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sjekk)
+
+    ex = _figure_extract(tmp_path)
+    work = tmp_path / "gpt"
+    jobs = gpt.make_jobs(ex, work, figures={14})
+    d = work / "jobber" / "fig014_01"
+    job = json.loads((d / "jobb.json").read_text())
+    ref = np.asarray(Image.open(d / "referanse.png").convert("RGB")).astype(np.int16)
+    mask = (np.abs(ref - np.array(job["bakgrunn"], np.int16)).sum(axis=2) > 24) & (np.abs(ref - 128).sum(axis=2) > 6)
+    rgba = np.zeros(ref.shape[:2] + (4,), np.uint8)
+    rgba[..., :3] = ref
+    rgba[..., 3] = mask * 255
+    good = Image.fromarray(rgba, "RGBA")
+    good.save(d / "resultat.png")
+    assert sjekk.main([str(d / "resultat.png")]) == 0
+
+    c = job["ruter"][2]
+    ox, oy = job["plassering"]
+    rx, ry = job["region"][:2]
+    x0, y0, x1, y1 = [(v - o + p) * 4 for v, o, p in zip(c["synlig"], (rx, ry, rx, ry), (ox, oy, ox, oy))]
+    bad = good.copy()
+    cut = good.crop((x0, y0, x1, y1))
+    bad.paste((0, 0, 0, 0), (x0, y0, x1, y1))
+    nw, nh = round(cut.width * 1.15), round(cut.height * 1.15)
+    bad.alpha_composite(cut.resize((nw, nh), Image.LANCZOS), (x0 - (nw - cut.width) // 2, y0 - (nh - cut.height)))
+    bad.save(d / "resultat.png")
+    assert sjekk.main([str(d / "resultat.png")]) == 2
+
+    r = work / "jobber" / "rom005"
+    im = Image.open(r / "referanse.png").convert("RGB").filter(ImageFilter.GaussianBlur(1.2))
+    im.save(r / "resultat.png")
+    assert sjekk.main([str(r / "resultat.png")]) == 0
+    im.transform(im.size, Image.AFFINE, (1, 0, -12, 0, 1, 0)).save(r / "resultat.png")
+    assert sjekk.main([str(r / "resultat.png")]) == 2
+
+
+@pytest.mark.game
+def test_costume_palette_table_real_game(tmp_path):
+    """Sam (kostyme 2) ligger i rom 1, der palettindeks 250 er oransje. Tabellen gir paletten i rom 7, der
+    indeks 250 er krem som i 75 av 85 rom."""
+    if not (GAME / "SAMNMAX.001").exists():
+        pytest.skip("game/ mangler, kjør tools/hent_spilldata.sh")
+    import json
+    import numpy as np
+    from smhd import eksport_v6, export
+    colours = export.read_costume_colours(ROOT / "docs" / "kostymefarger.csv")
+    assert colours[2]["room"] == 7
+    res = eksport_v6.export_costumes(GAME, tmp_path, {2}, colours)
+    assert not res["errors"]
+    cm = json.loads((tmp_path / "costumes.json").read_text())
+    assert cm["2"]["colours"]["room"] == 7
+    found = False
+    for c in cm["2"]["cels"]:
+        name = f"costume002_{c['cel']:03d}"
+        idx = np.asarray(Image.open(tmp_path / "costumes" / f"{name}_idx.png"))
+        rgb = np.asarray(Image.open(tmp_path / "costumes" / f"{name}.png").convert("RGBA"))
+        hit = idx == 250
+        if hit.any():
+            assert tuple(rgb[hit][0][:3]) == (255, 247, 199)
+            found = True
+            break
+    assert found
+
+
+def test_orders_in_style_pilot(tmp_path, monkeypatch):
+    # Uten stilankere: ordren har bare stilpiloten (pilotrommet og pilotarkene) og sier at resten venter;
+    # grafikklisten har piloten som bestilling 1 og resten under «Etter godkjent stilpilot»
+    from smhd import figur, gpt
+
+    monkeypatch.setattr(gpt, "PILOT_ROOMS", {5})
+    monkeypatch.setattr(figur, "FIG_PILOT", {14: 1})
+    ex = _figure_extract(tmp_path)
+    work = tmp_path / "gpt"
+    gpt.make_jobs(ex, work, figures={14})
+    orders = gpt.write_orders(work, batch=10).read_text()
+    assert "## Stilpiloten (gjør dette nå)" in orders and "Stopp etter piloten" in orders
+    assert "`rom005`" in orders and "`fig014_01`" in orders
+    assert "`lag005_01`" not in orders and "`fig014_02_del1av2`" not in orders
+    assert orders.index("`rom005`") < orders.index("`fig014_01`")
+    lst = gpt.write_list(work, batch=10, pilot_phase=True).read_text()
+    assert lst.index("## Bestilling 1: stilpiloten") < lst.index("`rom005`") < lst.index("## Etter godkjent stilpilot")
+    assert lst.index("## Etter godkjent stilpilot") < lst.index("`lag005_01`")
+    # Med stilankere er det vanlig drift
+    normal = gpt.write_orders(work, batch=10, anchors=["room005.png"]).read_text()
+    assert "## Gjør disse nå" in normal and "`lag005_01`" in normal

@@ -61,6 +61,10 @@ BORDER = (128, 128, 128)     # grå kant rundt bildet på lerretet
 OK_SHIFT, OK_BLOCK, OK_EDGES = 0.75, 1.0, 0.55
 CHECK_SHIFT, CHECK_BLOCK, CHECK_EDGES = 1.5, 2.0, 0.40
 
+# Stilpiloten: rommet som males først, sammen med hovedarkene og de første figurarkene for Sam og Max
+# (figur.FIG_PILOT). Resten venter til Tom har godkjent piloten og stilankerne ligger i stil/.
+PILOT_ROOMS = {7}            # kontoret
+
 # Objektbilder som er så store at de dekker mye av skjermen, blir egne jobber
 BIG_AREA, BIG_W, BIG_H = 16000, 200, 150
 # Store objekter som ikke blir jobber (i The Dig de ensfargede rutenettene i inventaret, obj618
@@ -76,26 +80,31 @@ OBJ_MIN_PIXELS = 40          # objekter med færre synlige piksler i utsnittet k
 OBJ_MIN_EDGE = 1.0           # heller ikke objekter nesten uten kanter i originalen (jevn flate)
 OBJ_REDRAWN_EDGE = 2.0       # grensen OBJ_EDGES gjelder bare objekter med så tydelige kanter (ellers tilfeldig)
 ICON_MAX = (32, 24)          # små bilder på (0, 0) i et vanlig rom er ikoner (The Dig: rom 107)
-ICON_BG = (0, 0, 171)        # bakgrunnen på ikonarket (The Dig: inventaret; ikke valgt for Sam & Max)
-ICON_SHEET = (320, 224)      # ikonarket i originalpiksler, midt på lerretet med grå kant
+ICON_BG = (0, 0, 171)        # reservefarge for et ikonark uten ikoner (The Dig: inventaret)
+ICON_SHEET = (352, 240)      # ikonarket i originalpiksler, midt på lerretet med grå kant (som figurarkene)
+ICON_MARGIN = 4              # originalpiksler fra arkets kant til ikonene
 ICON_PAD = 8                 # originalpiksler mellom ikonene på arket
+# Flate bakgrunnsfarger for ikonark og figurark. Den som ligger lengst fra alle fargene på arket, brukes.
+SHEET_BACKGROUNDS = [((0, 177, 64), "green"), ((0, 71, 187), "blue"), ((255, 0, 255), "magenta"),
+                     ((0, 200, 200), "cyan"), ((240, 200, 0), "yellow")]
 
 PROMPT_BASE = """Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
 
 Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
 
 Do:
-- Repaint the picture inside the gray border in high resolution with clean, natural detail: smooth gradients instead of dithering and color banding, crisp edges, believable texture in wood, metal, fabric, sky, water and light.
-- Keep the original look: the same hand-drawn cartoon style of the 1993 LucasArts game, the same colors, light direction, shadows, mood and contrast.
-- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels.
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
 
 Do not:
 - Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
-- Do not add, remove or replace anything: no new objects, people, creatures, text, symbols or details. Do not fix or reinterpret anything.
-- Copy symbols, glyphs, markings and engravings exactly in shape and position.
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
 - No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
 
-Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input."""
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL."""
 
 PROMPT_STYLE = """If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image."""
 
@@ -109,7 +118,7 @@ PROMPT_LAYER = """This picture is the room with some of the game's small objects
 
 PROMPT_LAYER_STYLE = """If a second image is attached, it is the approved HD version of the same room, or of the large picture the objects lie on, without these objects. Paint the room the same way as in that image, and give the objects the same level of detail, brushwork and light, so they fit into it. Take all shapes, positions and colors from the first image."""
 
-PROMPT_ICONS = """This picture is a sheet of small inventory icons from the game, laid out in a grid on the plain dark blue color that the game shows behind them. Paint every icon faithfully by the rules above. The icons are cut out of your picture afterwards by their exact position, so every icon must stay exactly where it is, with the same size, outline and colors. Icons next to each other are often states of the same item (for example normal and highlighted): keep everything they have in common identical. Keep the dark blue background plain and flat, with no frames or grid."""
+PROMPT_ICONS = """This picture is a sheet of small pictures from the game: cursor pictures, inventory and conversation icons, and small parts that the game draws on top of the screen (signs, scenery pieces, panels). They are laid out on a plain flat {color} background ({hex}) that is not part of them, inside the gray border. Paint every picture faithfully by the rules above, each one on its own. The pictures are cut out of your image afterwards by their exact position, so every picture must stay exactly where it is, with the same size, outline, colors and lettering. Pictures next to each other are often states of the same item (for example normal and highlighted): keep everything they have in common identical. Keep the background plain, flat and the same color everywhere, with no frames, grid, shadows or glow around the pictures."""
 
 
 @dataclass
@@ -140,6 +149,7 @@ class Job:
     pilot: bool | None = None              # med i piloten (står tidlig i ordren)
     rekkefolge: int | None = None          # plassen til kostymet i docs/figurer.csv
     innhold: str | None = None             # hva som står på arket, på norsk
+    referanser: list[str] | None = None    # bildene som legges ved etter referanse.png (bilde to, tre ...)
 
     @property
     def bilde(self) -> str:
@@ -164,7 +174,7 @@ class Job:
 
 # Felt som bare lag, ikonark og figurark har. Romjobber og objektjobber skriver dem ikke i jobb.json.
 _PIECE_FIELDS = ("lag", "objekter", "underlag", "bilde_to", "kostyme", "ruter", "bakgrunn", "pilot", "rekkefolge",
-                 "innhold")
+                 "innhold", "referanser")
 
 
 def _load_job(data: dict) -> Job:
@@ -176,7 +186,8 @@ def _load_job(data: dict) -> Job:
                objekt_i_rom=tuple(in_room) if in_room else None, lag=data.get("lag"),
                objekter=data.get("objekter"), underlag=data.get("underlag"), bilde_to=data.get("bilde_to"),
                kostyme=data.get("kostyme"), ruter=data.get("ruter"), bakgrunn=data.get("bakgrunn"),
-               pilot=data.get("pilot"), rekkefolge=data.get("rekkefolge"), innhold=data.get("innhold"))
+               pilot=data.get("pilot"), rekkefolge=data.get("rekkefolge"), innhold=data.get("innhold"),
+               referanser=data.get("referanser"))
 
 
 def _order(job: Job) -> tuple:
@@ -307,9 +318,27 @@ def _write_job(jobs_dir: Path, job: Job, image: Image.Image, prompt: str, style_
     (d / "jobb.json").write_text(json.dumps(data, indent=1, ensure_ascii=False))
 
 
+def norsk_tid(fmt: str) -> str:
+    """Klokka i Norge, også når maskinen går på UTC (skyen). Uten tidssonedata: maskinens tid."""
+    try:
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        return datetime.now(ZoneInfo("Europe/Oslo")).strftime(fmt)
+    except Exception:
+        return time.strftime(fmt)
+
+
+def read_room_names(path: Path | None) -> dict[int, str]:
+    """Romnavnene i docs/rom-oversikt.csv (kolonnen navn). RNAM i Sam & Max er tom."""
+    if not path or not Path(path).exists():
+        return {}
+    with Path(path).open(newline="", encoding="utf-8") as f:
+        return {int(r["rom"]): (r.get("navn") or "").strip() for r in csv.DictReader(f) if (r.get("rom") or "").isdigit()}
+
+
 def make_jobs(extract: Path, out: Path, rooms: set[int] | None = None, notes: dict[int, str] | None = None,
               style_ref: Path | None = None, figures: str | set[int] | None = None, game: Path | None = None,
-              figure_list: Path | None = None) -> list[Job]:
+              figure_list: Path | None = None, room_names: dict[int, str] | None = None) -> list[Job]:
     """Lager alle jobbene i out/jobber, status.csv og JOBBER.md.
 
     figures: figurark (figCCC_KK) for kostymene. None eller "ingen": ingen. "pilot": bare piloten
@@ -318,6 +347,9 @@ def make_jobs(extract: Path, out: Path, rooms: set[int] | None = None, notes: di
     docs/figurer.csv (navn og rekkefølge).
     """
     meta = json.loads((extract / "rooms.json").read_text())
+    for key, info in meta["rooms"].items():
+        if (room_names or {}).get(int(key)):
+            info["name"] = room_names[int(key)]
     jobs_dir = out / "jobber"
     jobs_dir.mkdir(parents=True, exist_ok=True)
     notes = notes or {}
@@ -338,7 +370,7 @@ def make_jobs(extract: Path, out: Path, rooms: set[int] | None = None, notes: di
             for i, (x, y, w, h, ox, oy) in enumerate(tiles):
                 jid = f"rom{num:03d}" if len(tiles) == 1 else f"rom{num:03d}_del{i + 1}av{len(tiles)}"
                 job = Job(jid, num, info["name"], i + 1, len(tiles), (room.width, room.height),
-                          (x, y, w, h), (ox, oy))
+                          (x, y, w, h), (ox, oy), pilot=True if num in PILOT_ROOMS else None)
                 _write_job(jobs_dir, job, room, _prompt(num, notes, i + 1, len(tiles)), style_ref)
                 jobs.append(job)
         # Store objektbilder i rommet, også når selve rommet er hoppet over
@@ -365,6 +397,7 @@ def make_jobs(extract: Path, out: Path, rooms: set[int] | None = None, notes: di
         chosen, pilot_only = figur.select_costumes(figures, costumes, names)
         jobs += figur.figure_jobs(extract, jobs_dir, chosen, costumes, names, meta["rooms"], notes, style_ref,
                                   pilot_only)
+        figur.master_jobs(extract, out, costumes, names)
 
     _write_status(out, jobs, {})
     _write_overview(out, jobs, skipped, left)
@@ -662,34 +695,111 @@ def _layer_jobs(extract: Path, jobs_dir: Path, num: int, info: dict, room: Image
     return jobs
 
 
+def sheet_background(colours: np.ndarray) -> tuple[tuple[int, int, int], str]:
+    """Den flate bakgrunnsfargen i SHEET_BACKGROUNDS som ligger lengst fra alle fargene (N x 3) på arket."""
+    if not len(colours):
+        return SHEET_BACKGROUNDS[0]
+    return max(SHEET_BACKGROUNDS, key=lambda b: float(np.linalg.norm(colours - b[0], axis=1).min()))
+
+
+class _Rows:
+    """Bokser på rader: venstre mot høyre, ny rad når raden er full, nederst på raden."""
+
+    def __init__(self, size: tuple[int, int]):
+        self.W, self.H = size
+        self.rows: list[dict] = []
+
+    def copy(self) -> "_Rows":
+        r = _Rows((self.W, self.H))
+        r.rows = [{**row, "items": list(row["items"])} for row in self.rows]
+        return r
+
+    def place(self, key, w: int, h: int, new_row: bool) -> bool:
+        row = self.rows[-1] if self.rows else None
+        if row and not new_row and row["x"] + w + ICON_MARGIN <= self.W and row["y"] + max(row["h"], h) + ICON_MARGIN <= self.H:
+            row["items"].append((key, row["x"], w, h))
+            row["x"] += w + ICON_PAD
+            row["h"] = max(row["h"], h)
+            return True
+        y = row["y"] + row["h"] + ICON_PAD if row else ICON_MARGIN
+        if ICON_MARGIN + w + ICON_MARGIN > self.W or y + h + ICON_MARGIN > self.H:
+            return False
+        self.rows.append({"y": y, "h": h, "x": ICON_MARGIN + w + ICON_PAD, "items": [(key, ICON_MARGIN, w, h)]})
+        return True
+
+    def place_all(self, items: list[tuple], new_row: bool) -> bool:
+        return all(self.place(k, w, h, new_row and i == 0) for i, (k, w, h) in enumerate(items))
+
+    def positions(self) -> list[tuple]:
+        """(nøkkel, x, y) med boksen nederst på raden."""
+        return [(k, x, row["y"] + row["h"] - h) for row in self.rows for k, x, w, h in row["items"]]
+
+
 def plan_icon_sheets(icons: list[tuple[int, dict, list]]) -> list[list[Piece]]:
-    """Legger ikonene i rutenett på ark (ICON_SHEET), med alle tilstandene til et ikon etter hverandre.
+    """Legger ikonene på ark (ICON_SHEET) i rader, tett, med alle tilstandene til et ikon etter hverandre.
 
-    Hver rute er det største ikonet pluss ICON_PAD. Et ikon deles ikke mellom to ark.
+    Ikonene står i rekkefølgen de kommer (rom for rom); et nytt rom begynner på ny rad. Får ikke alle
+    tilstandene til et ikon plass på resten av arket, men på et tomt ark, begynner de et nytt ark. Et ikon
+    som er større enn arket, får et ark for seg (det skjer ikke med grensene for store objektbilder).
     """
-    if not icons:
-        return []
-    cw = max(im.width for _, _, states in icons for _, im in states) + ICON_PAD
-    ch = max(im.height for _, _, states in icons for _, im in states) + ICON_PAD
-    cols, rows = max(1, ICON_SHEET[0] // cw), max(1, ICON_SHEET[1] // ch)
-    x0, y0 = (ICON_SHEET[0] - cols * cw) // 2, (ICON_SHEET[1] - rows * ch) // 2
-    sheets: list[list[Piece]] = [[]]
+    sheets: list[_Rows] = []
+    cur: _Rows | None = None
+    prev_room = None
+    order: list[tuple[str, tuple]] = []           # nøkkel -> (rom, objekt, tilstand, bilde)
+    info: dict[str, tuple] = {}
     for num, obj, states in icons:
-        if len(sheets[-1]) + len(states) > cols * rows and sheets[-1]:
-            sheets.append([])
+        items = []
         for state, im in states:
-            n = len(sheets[-1])
-            cx = x0 + (n % cols) * cw + (cw - im.width) // 2
-            cy = y0 + (n // cols) * ch + (ch - im.height) // 2
+            key = f"obj{obj['id']:03d}_{state}"
+            info[key] = (num, obj, state, im)
+            items.append((key, im.width, im.height))
+        new_row = num != prev_room
+        prev_room = num
+        if cur is None or not cur.copy().place_all(items, new_row):
+            if cur is not None and _Rows(ICON_SHEET).place_all(items, True):
+                cur = None
+        if cur is None:
+            cur = _Rows(ICON_SHEET)
+            sheets.append(cur)
+            new_row = True
+        for i, (key, w, h) in enumerate(items):
+            if not cur.place(key, w, h, new_row and i == 0):
+                cur = _Rows((max(ICON_SHEET[0], w + 2 * ICON_MARGIN), max(ICON_SHEET[1], h + 2 * ICON_MARGIN)))
+                sheets.append(cur)
+                cur.place(key, w, h, True)
+    out: list[list[Piece]] = []
+    for sheet in sheets:
+        pieces = []
+        for key, x, y in sheet.positions():
+            num, obj, state, im = info[key]
             b = im.getchannel("A").getbbox() or (0, 0, 0, 0)
-            sheets[-1].append(Piece(f"obj{obj['id']:03d}_{state}", obj["id"], state, num,
-                                    (cx, cy, im.width, im.height), (cx + b[0], cy + b[1], cx + b[2], cy + b[3])))
-    return sheets
+            pieces.append(Piece(key, obj["id"], state, num, (x, y, im.width, im.height),
+                                (x + b[0], y + b[1], x + b[2], y + b[3])))
+        if pieces:
+            out.append(pieces)
+    return out
 
 
-def icon_sheet_image(extract: Path, pieces: list[Piece]) -> Image.Image:
-    """Ikonarket: ikonene på inventarets mørkeblå farge."""
-    image = Image.new("RGBA", ICON_SHEET, (*ICON_BG, 255))
+def icon_sheet_size(pieces: list[Piece]) -> tuple[int, int]:
+    """Arkets størrelse: ICON_SHEET, eller større når et ikon ikke får plass."""
+    w = max([ICON_SHEET[0]] + [p.rekt[0] + p.rekt[2] + ICON_MARGIN for p in pieces])
+    h = max([ICON_SHEET[1]] + [p.rekt[1] + p.rekt[3] + ICON_MARGIN for p in pieces])
+    return (w, h)
+
+
+def icon_colours(extract: Path, pieces: list[Piece]) -> np.ndarray:
+    """Alle fargene (N x 3) i de synlige pikslene på et ikonark."""
+    colours: set[tuple[int, int, int]] = set()
+    for p in pieces:
+        with Image.open(extract / "objects" / f"{p.bilde}.png") as im:
+            a = np.asarray(im.convert("RGBA"))
+        colours |= set(map(tuple, np.unique(a[a[..., 3] > 0][:, :3], axis=0).tolist()))
+    return np.array(sorted(colours), dtype=np.float64).reshape(-1, 3)
+
+
+def icon_sheet_image(extract: Path, pieces: list[Piece], bg: tuple[int, int, int] = ICON_BG) -> Image.Image:
+    """Ikonarket: ikonene på den flate bakgrunnsfargen."""
+    image = Image.new("RGBA", icon_sheet_size(pieces), (*bg, 255))
     for p in pieces:
         _paste_over(image, Image.open(extract / "objects" / f"{p.bilde}.png").convert("RGBA"), p.rekt[0], p.rekt[1])
     return image.convert("RGB")
@@ -697,15 +807,23 @@ def icon_sheet_image(extract: Path, pieces: list[Piece]) -> Image.Image:
 
 def _icon_jobs(extract: Path, jobs_dir: Path, sheets: list[list[Piece]], style_ref: Path | None) -> list[Job]:
     jobs = []
-    sw, sh = ICON_SHEET
     for n, pieces in enumerate(sheets, 1):
         rooms = sorted({p.rom for p in pieces})
-        job = Job(f"ikon{n:02d}", rooms[0], "ikonark", 1, 1, ICON_SHEET, (0, 0, sw, sh),
-                  ((TILE[0] - sw) // 2, (TILE[1] - sh) // 2), type="ikon", lag=n,
-                  objekter=[p.to_json() for p in pieces])
-        prompt = PROMPT_BASE + "\n\n" + PROMPT_ICONS + "\n\n" + PROMPT_STYLE
-        _write_job(jobs_dir, job, icon_sheet_image(extract, pieces), prompt, style_ref)
-        jobs.append(job)
+        sw, sh = icon_sheet_size(pieces)
+        bg, colour = sheet_background(icon_colours(extract, pieces))
+        image = icon_sheet_image(extract, pieces, bg)
+        tiles = plan_tiles(sw, sh)
+        where = assign_parts(pieces, tiles) if len(tiles) > 1 else {0: pieces}
+        for i, inside in where.items():
+            x, y, w, h, ox, oy = tiles[i]
+            jid = f"ikon{n:02d}" + ("" if len(tiles) == 1 else f"_del{i + 1}av{len(tiles)}")
+            job = Job(jid, rooms[0], "ikonark", i + 1, len(tiles), (sw, sh), (x, y, w, h), (ox, oy), type="ikon",
+                      lag=n, objekter=[p.to_json() for p in inside], bakgrunn=list(bg))
+            prompt = (PROMPT_BASE + "\n\n" + PROMPT_ICONS.format(color=colour, hex="#%02X%02X%02X" % bg)
+                      + ("\n\n" + PROMPT_TILE.format(part=i + 1, parts=len(tiles)) if len(tiles) > 1 else "")
+                      + "\n\n" + PROMPT_STYLE)
+            _write_job(jobs_dir, job, image, prompt, style_ref)
+            jobs.append(job)
     return jobs
 
 
@@ -872,7 +990,7 @@ def _piece_background(extract: Path, job: Job) -> Image.Image:
     """Utsnittet av et lag eller ikonark uten objektbildene: rommet med underlaget, eller arkets farge."""
     x, y, w, h = job.region
     if job.type == "ikon":
-        return Image.new("RGB", (w, h), ICON_BG)
+        return Image.new("RGB", (w, h), tuple(job.bakgrunn or ICON_BG))
     room = Image.open(extract / "rooms" / f"room{job.rom:03d}.png").convert("RGBA")
     if job.underlag:
         objs = json.loads((extract / "rooms.json").read_text())["rooms"][str(job.rom)]["objects"]
@@ -1615,10 +1733,21 @@ def _piece_progress(work: Path | None, rows: list[dict], kind: str) -> tuple[int
 
 
 def _is_pilot(work: Path | None, r: dict) -> bool:
-    return r["type"] == "figur" and bool(_job_info(work, r).get("pilot"))
+    """Jobben er med i stilpiloten (rommene i PILOT_ROOMS og arkene i figur.FIG_PILOT)."""
+    return bool(_job_info(work, r).get("pilot"))
 
 
-def work_queue(rows: list[dict], work: Path | None = None) -> list[dict]:
+def master_sheets(work: Path) -> list[dict]:
+    """Hovedarkene som skal lages (work/hovedark/<navn>/jobb.json), med om leveransen finnes."""
+    out = []
+    for f in sorted((work / "hovedark").glob("*/jobb.json")):
+        data = json.loads(f.read_text())
+        data["levert"] = (work / data["leveranse"]).exists()
+        out.append(data)
+    return sorted(out, key=lambda d: (d.get("rekkefolge", 99), d.get("id", "")))
+
+
+def work_queue(rows: list[dict], work: Path | None = None, pilot_only: bool = False) -> list[dict]:
     """Alle jobber som ikke er godkjent, i den rekkefølgen ChatGPT skal ta dem.
 
     Avviste rom- og objektjobber først. Så figurarkene i piloten (avviste, så nye), så de andre
@@ -1648,6 +1777,9 @@ def work_queue(rows: list[dict], work: Path | None = None) -> list[dict]:
     retry_main = [r for r in rows if r["status"] == "avvist" and r["type"] in ("rom", "objekt")]
     retry_rest = [r for r in rows if r["status"] == "avvist" and r["type"] not in ("rom", "objekt")
                   and r["jobb"] not in in_pilot]
+    if pilot_only:
+        # Stilpiloten: rommene først, så figurarkene; resten venter til piloten er godkjent
+        return sorted(pilot, key=lambda r: (r["type"] == "figur", r["status"] != "avvist"))
     fresh = sorted((r for r in rows if r["status"] == "ny" and r["jobb"] not in in_pilot), key=key)
     better = [r for r in rows if r["status"] == "sjekk"]
     return retry_main + pilot + retry_rest + fresh + better
@@ -1676,85 +1808,85 @@ def _piece_label(work: Path | None, r: dict) -> tuple[str, str | None]:
     return what + (f" med {n} {'objektbilde' if n == 1 else 'objektbilder'}" if n else ""), info.get("bilde_to")
 
 
-def write_list(work: Path, batch: int = 10) -> Path:
+def _job_label(work: Path | None, r: dict, obj_rows: list[dict] | None = None) -> str:
+    """Kort beskrivelse av en jobb i ordren og grafikklisten: hva den er og hvilket bilde to som brukes."""
+    what = f"rom {r['rom']} {r['navn']}"
+    second = None
+    m = _OBJ_ID.match(r["jobb"]) if r["type"] == "objekt" else None
+    if m:
+        what += f", objekt {int(m.group(1))} tilstand {m.group(2)}"
+    if r["type"] == "lag":
+        piece, second = _piece_label(work, r)
+        what += f", {piece}"
+    elif r["type"] in ("ikon", "figur"):
+        what, second = _piece_label(work, r)
+    if r["del"] not in ("1/1", ""):
+        what += f", del {r['del']}"
+    if second:
+        what += f", bilde to `{second}`"
+    return what
+
+
+def write_list(work: Path, batch: int = 10, pilot_phase: bool = False) -> Path:
     """Skriver GRAFIKKLISTE.md: alt ChatGPT skal lage, i rekkefølge og delt i bestillinger.
 
-    Bestilling 1 er det samme som står i ORDRE.md. Når den er levert, tar ChatGPT neste
-    bestilling uten å vente på ny ordre.
+    Bestilling 1 er det samme som står i ORDRE.md. Når den er levert, tar ChatGPT neste bestilling uten å
+    vente på ny ordre. I stilpiloten (pilot_phase, ingen stilankere ennå) er bestilling 1 piloten, og resten
+    står under en overskrift som sier at de venter på at Tom godkjenner piloten.
     """
     rows = read_status(work)
-    queue = work_queue(rows, work)
+    pilot = work_queue(rows, work, pilot_only=True) if pilot_phase else []
+    in_pilot = {r["jobb"] for r in pilot}
+    queue = [r for r in work_queue(rows, work) if r["jobb"] not in in_pilot]
     done = [r for r in rows if r["status"] == "godkjent"]
-    room_rows = [r for r in rows if r["type"] == "rom"]
-    obj_rows = [r for r in rows if r["type"] == "objekt"]
-    lag_rows = [r for r in rows if r["type"] == "lag"]
-    icon_rows = [r for r in rows if r["type"] == "ikon"]
-    fig_rows = [r for r in rows if r["type"] == "figur"]
-    rooms_all = {int(r["rom"]) for r in room_rows}
-    rooms_done = rooms_all - {int(r["rom"]) for r in room_rows if r["status"] != "godkjent"}
-    objects_all = {_image_of(r) for r in obj_rows}
-    objects_done = objects_all - {_image_of(r) for r in obj_rows if r["status"] != "godkjent"}
+    by = {t: [r for r in rows if r["type"] == t] for t in ("rom", "objekt", "lag", "ikon", "figur")}
+    rooms_all = {int(r["rom"]) for r in by["rom"]}
+    rooms_done = rooms_all - {int(r["rom"]) for r in by["rom"] if r["status"] != "godkjent"}
+    objects_all = {_image_of(r) for r in by["objekt"]}
+    objects_done = objects_all - {_image_of(r) for r in by["objekt"] if r["status"] != "godkjent"}
+    masters = master_sheets(work)
 
     def label(r: dict) -> str:
-        what = f"rom {r['rom']} {r['navn']}"
-        second = None
-        m = _OBJ_ID.match(r["jobb"]) if r["type"] == "objekt" else None
-        if m:
-            what += f", objekt {int(m.group(1))} tilstand {m.group(2)}"
-        if r["type"] == "lag":
-            piece, second = _piece_label(work, r)
-            what += f", {piece}"
-        elif r["type"] in ("ikon", "figur"):
-            what, second = _piece_label(work, r)
-        if r["del"] not in ("1/1", ""):
-            what += f", del {r['del']}"
-        if second:
-            what += f", bilde to `{second}`"
         note = {"avvist": " (avvist, les retur.md)", "sjekk": " (kan bli bedre)"}.get(r["status"], "")
         if _is_pilot(work, r):
             note += " (pilot)"
-        return f"`{r['jobb']}` ({what}){note}"
+        return f"`{r['jobb']}` ({_job_label(work, r)}){note}"
 
-    if lag_rows or icon_rows:
-        lag_done, lag_total = _piece_progress(work, rows, "lag")
-        icon_done, icon_total = _piece_progress(work, rows, "ikon")
-        small = [f"| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | {lag_done} | {lag_total} | "
-                 f"Etter rommene og de store objektbildene ({len(lag_rows)} lagjobber) |",
-                 f"| Ikoner i inventaret (`ikonNN`) | {icon_done} | {icon_total} | Til slutt ({len(icon_rows)} ikonark) |"]
-    else:
-        small = ["| Andre objektbilder (610) | 0 | 610 | Senere, egen bestilling når rommene er ferdige |"]
-    if fig_rows:
-        fig_done, fig_total = _piece_progress(work, rows, "figur")
-        pilot_rows = [r for r in fig_rows if _is_pilot(work, r)]
-        sheets = {_image_of(r) for r in fig_rows}
-        if len(pilot_rows) == len(fig_rows):
-            figures = [f"| Figurer: pilot med figurark for {pilot_rows[0]['navn']} (`figCCC_KK`, kostymeruter) | "
-                       f"{fig_done} | {fig_total} | Nå, etter de avviste rom- og objektjobbene ({len(sheets)} ark) |",
-                       f"| Alle figurene (348 kostymer) | {fig_done} | ikke telt | Senere, når piloten er godkjent |"]
-        else:
-            figures = [f"| Figurer (`figCCC_KK`, kostymeruter; piloten først) | {fig_done} | {fig_total} | "
-                       f"Piloten etter de avviste rom- og objektjobbene, resten til slutt ({len(sheets)} ark) |"]
-    else:
-        figures = ["| Figurer (modellark for Sam og Max) | 0 | 2 | Senere, egen bestilling |"]
-
-    lines = ["# Grafikkliste", "", time.strftime("Oppdatert %Y-%m-%d %H:%M (norsk tid)"), "",
+    lag_done, lag_total = _piece_progress(work, rows, "lag")
+    icon_done, icon_total = _piece_progress(work, rows, "ikon")
+    fig_done, fig_total = _piece_progress(work, rows, "figur")
+    sheets = {_image_of(r) for r in by["figur"]}
+    later = "Etter godkjent stilpilot" if pilot_phase else "Nå"
+    lines = ["# Grafikkliste", "", norsk_tid("Oppdatert %Y-%m-%d %H:%M (norsk tid)"), "",
              "Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. "
-             "Bestilling 1 er det samme som står i `ORDRE.md`. Når en bestilling er levert, tar du neste "
-             "uten å vente på ny ordre. Hopp over jobber som er krysset av.", "",
+             "Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.", "",
              "## Oversikt", "",
              "| Del | Ferdig | Totalt | Når |", "| --- | --- | --- | --- |",
-             f"| Rombakgrunner | {len(rooms_done)} | {len(rooms_all)} | Nå, bestillingene under ({len(room_rows)} jobber, brede og høye rom er delt) |",
-             f"| Store objektbilder (nærbilder og store objekter) | {len(objects_done)} | {len(objects_all)} | Nå, sammen med rommene |",
-             *small,
-             *figures,
-             "| Filmrammer (12 638) | 0 | 12 638 | Senere, egen bestilling |", ""]
-    if fig_rows:
-        lines += ["Figurarkene i piloten står rett etter de avviste rom- og objektjobbene. De er en pilot: vi skal se "
-                  "om ChatGPT kan male animasjonsruter som er like nok til at figuren ikke flimrer, før resten av "
-                  "figurene bestilles.", ""]
+             f"| Hovedark (Sam og Max) | {sum(m['levert'] for m in masters)} levert | {len(masters)} | "
+             f"{'Nå, i stilpiloten' if pilot_phase else 'Ferdig eller under arbeid'} |",
+             f"| Rombakgrunner | {len(rooms_done)} | {len(rooms_all)} | {later} ({len(by['rom'])} jobber, brede rom er delt) |",
+             f"| Store objektbilder (nærbilder, kart og store deler) | {len(objects_done)} | {len(objects_all)} | "
+             f"{later}, sammen med rommene |",
+             f"| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | {lag_done} | {lag_total} | "
+             f"Etter rommene og de store objektbildene ({len(by['lag'])} lagjobber) |",
+             f"| Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | {icon_done} | {icon_total} | "
+             f"Etter lagene ({len(by['ikon'])} jobber) |",
+             f"| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | {fig_done} | {fig_total} | "
+             f"Til slutt, Sam og Max først ({len(sheets)} ark, {len(by['figur'])} jobber) |", ""]
+    n = 0
+    if pilot_phase:
+        n = 1
+        lines += ["## Bestilling 1: stilpiloten (nå, samme som ORDRE.md)", "",
+                  "Hovedarkene for Sam og Max, kontoret og de første figurarkene. Tom godkjenner stilen før resten "
+                  "bestilles.", ""]
+        lines += [f"- [{'x' if m['levert'] else ' '}] `{m['leveranse']}` (hovedark for {m['figur']}, referanse i "
+                  f"`hovedark/{Path(m['leveranse']).stem}/`)" for m in masters]
+        lines += [f"- [ ] {label(r)}" for r in pilot]
+        lines += ["", "## Etter godkjent stilpilot", "",
+                  "Ikke start disse før `ORDRE.md` sier at piloten er godkjent og stilankerne ligger i `stil/`.", ""]
     for i in range(0, len(queue), batch):
         part = queue[i:i + batch]
-        n = i // batch + 1
+        n += 1
         rooms = sorted({int(r["rom"]) for r in part if r["type"] != "figur"})
         who = list(dict.fromkeys(r["navn"] for r in part if r["type"] == "figur"))
         where = ([f"Rom {', '.join(map(str, rooms))}."] if rooms else []) + \
@@ -1762,7 +1894,7 @@ def write_list(work: Path, batch: int = 10) -> Path:
         lines += [f"## Bestilling {n}" + (" (nå, samme som ORDRE.md)" if n == 1 else ""), "", " ".join(where), ""]
         lines += [f"- [ ] {label(r)}" for r in part]
         lines.append("")
-    if not queue:
+    if not queue and not pilot:
         lines += ["## Bestillinger", "", "Alle jobber er levert og godkjent.", ""]
     lines += ["## Ferdig", ""]
     lines += [f"- [x] `{r['jobb']}` (rom {r['rom']} {r['navn']})" for r in done] or ["Ingen ennå."]
@@ -1771,16 +1903,65 @@ def write_list(work: Path, batch: int = 10) -> Path:
     return path
 
 
+def _order_line(work: Path, r: dict, status: dict[str, str], obj_rows: list[dict]) -> str:
+    """Én linje i ordren: jobben, hva den er, og hvilket bilde to som skal legges ved."""
+    why = " (pilot)" if _is_pilot(work, r) else ""
+    if r["status"] == "avvist":
+        why = f" Avvist: {r['kommentar']}. Les retur.md."
+    elif r["status"] == "sjekk":
+        why = f" Godtatt foreløpig, men kan bli bedre: {r['kommentar']}."
+    if r["type"] == "figur":
+        what, second = _piece_label(work, r)
+        info = _job_info(work, r)
+        refs = info.get("referanser") or ([second] if second else [])
+        if refs:
+            names = " og ".join(f"`{x}`" for x in refs)
+            why += f" Legg ved {names} som bilde {'to og tre' if len(refs) > 1 else 'to'} (ikke stilankeret)."
+            for x in refs:
+                dep = _second_job({"bilde_to": x})
+                if dep and status.get(dep) != "godkjent":
+                    why += f" Lag denne etter at {dep} er godkjent."
+                elif x.startswith("hovedark/") and not (work / x).exists():
+                    why += f" Lag denne etter at `{x}` er levert."
+        else:
+            why += " Legg ved stilankeret som bilde to."
+        return f"`{r['jobb']}` ({what}, del {r['del']}).{why}"
+    what = f"rom {r['rom']}, {r['navn']}"
+    m = _OBJ_ID.match(r["jobb"]) if r["type"] == "objekt" else None
+    if m:
+        what += f", objekt {int(m.group(1))} tilstand {m.group(2)}"
+        states = sorted({_OBJ_ID.match(o["jobb"]).group(2) for o in obj_rows
+                         if _OBJ_ID.match(o["jobb"]) and _OBJ_ID.match(o["jobb"]).group(1) == m.group(1)})
+        if states and m.group(2) != states[0]:
+            first = f"obj{m.group(1)}_{states[0]}"
+            why += (f" Legg ved `jobber/{first}/resultat.png` som bilde to (ikke stilankeret), så tilstandene "
+                    f"blir like. Lag denne etter {first}.")
+    if r["type"] in ("lag", "ikon"):
+        piece, second = _piece_label(work, r)
+        what = f"{what}, {piece}" if r["type"] == "lag" else piece
+        if second:
+            why += (f" Legg ved `{second}` som bilde to (ikke stilankeret), så objektene får samme stil og lys "
+                    "som HD-bildet.")
+            dep = _second_job({"bilde_to": second})
+            if dep and status.get(dep) != "godkjent":
+                why += f" Lag denne etter at {dep} er godkjent."
+    return f"`{r['jobb']}` ({what}, del {r['del']}).{why}"
+
+
 def write_orders(work: Path, batch: int = 10, anchors: list[str] | None = None,
                  messages: list[str] | None = None, tasks: Path | None = None) -> Path:
-    """Skriver ORDRE.md: status, neste jobber og beskjeder. ChatGPT leser denne først."""
+    """Skriver ORDRE.md: status, neste jobber og beskjeder. ChatGPT leser denne først.
+
+    Uten stilankere er arbeidet i stilpiloten: ordren har bare hovedarkene og pilotjobbene, og sier at
+    resten venter til Tom har godkjent. Med stilankere i stil/ kommer de neste jobbene i vanlig rekkefølge.
+    """
     rows = read_status(work)
+    pilot_phase = not anchors
     counts: dict[str, int] = {}
     for r in rows:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
     room_rows = [r for r in rows if r["type"] == "rom"]
     obj_rows = [r for r in rows if r["type"] == "objekt"]
-    # Et rom er ferdig når romjobbene er godkjent, uavhengig av objektene
     rooms_all = {int(r["rom"]) for r in room_rows}
     rooms_done = sorted(rooms_all - {int(r["rom"]) for r in room_rows if r["status"] != "godkjent"})
     objects_all = {_image_of(r) for r in obj_rows}
@@ -1789,97 +1970,83 @@ def write_orders(work: Path, batch: int = 10, anchors: list[str] | None = None,
     icon_rows = [r for r in rows if r["type"] == "ikon"]
     fig_rows = [r for r in rows if r["type"] == "figur"]
     status = {r["jobb"]: r["status"] for r in rows}
+    masters = master_sheets(work)
 
-    queue = work_queue(rows, work)[:batch]
-
-    lines = ["# Ordre fra Claude", "", time.strftime("Oppdatert %Y-%m-%d %H:%M (norsk tid)"), "",
-             "Les denne filen før du starter. Den erstatter tidligere ordre.", "",
+    lines = ["# Ordre fra Claude", "", norsk_tid("Oppdatert %Y-%m-%d %H:%M (norsk tid)"), "",
+             "Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og "
+             "`BESTILLING.md` i denne grenen.", "",
              "## Status", "",
              f"- Jobber: {len(rows)}. " + ", ".join(f"{k} {v}" for k, v in sorted(counts.items())),
              f"- {_done_line('rom', rooms_done, len(rooms_all))}"]
     if obj_rows:
         lines.append(f"- {_done_line('objekter', objects_done, len(objects_all))}")
     for kind, kind_rows, jobs_label, label in (("lag", lag_rows, "Lagjobber", "objektbilder fra lag"),
-                                                ("ikon", icon_rows, "Ikonark", "ikoner fra ikonark"),
+                                                ("ikon", icon_rows, "Ikonark", "bilder fra ikonark"),
                                                 ("figur", fig_rows, "Figurark", "figurruter")):
         if kind_rows:
             done, total = _piece_progress(work, rows, kind)
             ok = sum(r["status"] == "godkjent" for r in kind_rows)
             lines.append(f"- {jobs_label}: {ok} av {len(kind_rows)} godkjent. Ferdige {label}: {done} av {total}")
-    lines += ["", "## Gjør disse nå", ""]
-    if not queue:
-        lines.append("Alle jobber er levert. Vent på ny bestilling.")
-    for i, r in enumerate(queue, 1):
-        why = ""
-        if r["status"] == "avvist":
-            why = f" Avvist: {r['kommentar']}. Les retur.md."
-        elif r["status"] == "sjekk":
-            why = f" Godtatt foreløpig, men kan bli bedre: {r['kommentar']}."
-        if r["type"] == "figur":
-            what, second = _piece_label(work, r)
-            pilot = " Pilot for figurarkene, så vi ser om figurene kan lages slik." if _is_pilot(work, r) else ""
-            if second:
-                dep = _second_job({"bilde_to": second})
-                why += (f" Legg ved `{second}` som bilde to (ikke stilankeret), så figuren blir lik på alle arkene.")
-                if dep and status.get(dep) != "godkjent":
-                    why += f" Lag denne etter at {dep} er godkjent."
-            else:
-                why += " Legg ved stilankeret som bilde to."
-            lines.append(f"{i}. `{r['jobb']}` ({what}, del {r['del']}).{pilot}{why}")
-            continue
-        what = f"rom {r['rom']}, {r['navn']}"
-        m = _OBJ_ID.match(r["jobb"]) if r["type"] == "objekt" else None
-        if m:
-            what += f", objekt {int(m.group(1))} tilstand {m.group(2)}"
-            states = sorted({_OBJ_ID.match(o["jobb"]).group(2) for o in obj_rows
-                             if _OBJ_ID.match(o["jobb"]) and _OBJ_ID.match(o["jobb"]).group(1) == m.group(1)})
-            if m.group(2) != states[0]:
-                first = f"obj{m.group(1)}_{states[0]}"
-                why += (f" Legg ved `jobber/{first}/resultat.png` som bilde to (ikke stilankeret), så tilstandene "
-                        f"blir like. Lag denne etter {first}.")
-        if r["type"] in ("lag", "ikon"):
-            piece, second = _piece_label(work, r)
-            what = f"{what}, {piece}" if r["type"] == "lag" else piece
-            if second:
-                why += (f" Legg ved `{second}` som bilde to (ikke stilankeret), så objektene får samme stil og lys "
-                        "som HD-bildet.")
-                dep = _second_job({"bilde_to": second})
-                if dep and status.get(dep) != "godkjent":
-                    why += f" Lag denne etter at {dep} er godkjent."
-        lines.append(f"{i}. `{r['jobb']}` ({what}, del {r['del']}).{why}")
-    if queue:
-        lines += ["", "Når disse er levert, fortsett med bestilling 2 i `GRAFIKKLISTE.md` uten å vente på ny ordre."]
+    if masters:
+        lines.append(f"- Hovedark: {sum(m['levert'] for m in masters)} av {len(masters)} levert")
+
+    if pilot_phase:
+        pilot = work_queue(rows, work, pilot_only=True)
+        lines += ["", "## Stilpiloten (gjør dette nå)", "",
+                  "Før noe annet males, lager vi en stilpilot som Tom godkjenner: hovedark for Sam og Max, kontoret "
+                  "(rom 7) og det første figurarket for hver av dem. Ta dem i denne rekkefølgen:", ""]
+        k = 0
+        for m in masters:
+            k += 1
+            key = Path(m["leveranse"]).stem
+            done = " (levert)" if m["levert"] else ""
+            lines.append(f"{k}. Hovedark for {m['figur']}: lag `{m['leveranse']}` etter `hovedark/{key}/referanse.png` "
+                         f"og `hovedark/{key}/prompt.txt`, og skriv `{m['notat']}`.{done}")
+        for r in pilot:
+            k += 1
+            lines.append(f"{k}. {_order_line(work, r, status, obj_rows)}")
+        lines += ["", "**Stopp etter piloten.** Ikke start på jobbene i `GRAFIKKLISTE.md` under «Etter godkjent "
+                  "stilpilot» før Tom har godkjent piloten og Claude har lagt stilankerne i `stil/` og skrevet en ny "
+                  "ordre. Kjør `verktoy/sjekk_leveranse.py` på hver leveranse før du committer."]
+    else:
+        queue = work_queue(rows, work)[:batch]
+        lines += ["", "## Gjør disse nå", ""]
+        if not queue:
+            lines.append("Alle jobber er levert. Vent på ny bestilling.")
+        for i, r in enumerate(queue, 1):
+            lines.append(f"{i}. {_order_line(work, r, status, obj_rows)}")
+        if queue:
+            lines += ["", "Når disse er levert, fortsett med neste bestilling i `GRAFIKKLISTE.md` uten å vente på ny ordre."]
     lines += ["", "## Stilankere", ""]
     if anchors:
         lines += [f"- `stil/{a}`" for a in anchors]
         lines += ["", "Legg ved det ankeret som ligner mest på rommet som bilde to."]
     else:
-        lines.append("Ingen ennå.")
+        lines.append("Ingen ennå. De godkjente pilotbildene blir stilankerne.")
     lines += ["", "## Leveringsformat", "",
-              "Begge formatene godtas av kontrollen:", "",
-              "- `resultat.png` på 1536 x 1024 med samme grå kant som `referanse.png`.",
-              "- `resultat.png` med bare bildet, i samme sideforhold som utsnittet (16:10 for vanlige rom, "
-              "minst 1280 x 800). Slik pilotbildene ble levert.", "",
-              "Objektjobbene (`objNNN_SS`) er store bilder som spillet tegner over rommet (nærbilder, kart, "
-              "paneler). De lages og leveres på samme måte. Utsnittet er da objektbildet, så leverer du bare "
-              "bildet, skal det ha objektets sideforhold (se `bilde_i_lerret` i `jobb.json`).", ""]
-    if lag_rows or icon_rows:
-        lines += ["Lagjobbene (`lagNNN_KK`) er rommet med spillets små objekter tegnet på plass. Mal alt trofast. "
-                  "Objektene klippes ut etter posisjonen, så de må ligge nøyaktig der de er. Bilde to er det "
-                  "godkjente HD-bildet som står i ordren (`bilde_to` i `jobb.json`). Ikonarkene (`ikonNN`) er "
-                  "ikonene i inventaret på mørkeblå bakgrunn. Begge leveres som rommene.", ""]
-    if fig_rows:
-        lines += ["Figurarkene (`figCCC_KK`) er animasjonsruter av samme figur på en flat bakgrunnsfarge. Mal alle "
-                  "rutene som den samme personen (samme ansikt, klær, farger og lys), med nøyaktig samme omriss som "
-                  "originalen, og hold bakgrunnen flat. Rutene klippes ut etter posisjonen. Arkene i piloten er en "
-                  "prøve: lag dem i rekkefølge, ark 01 først. Leveres som rommene.", ""]
-    lines += ["Skriv `notat.md` i jobbmappen. Commit 5 til 10 jobber om gangen i grenen `gpt-arbeid` og push.", ""]
+              "- Rom, objekter, lag og ikonark: `resultat.png` på 1536 x 1024 med samme grå kant som `referanse.png`, "
+              "eller bare bildet i samme sideforhold som utsnittet (16:10 for vanlige rom, minst 1280 x 800). Objekt-"
+              "jobbene (`objNNN_SS`) er store bilder spillet tegner over rommet; leverer du bare bildet, skal det ha "
+              "objektets sideforhold (`bilde_i_lerret` i `jobb.json`).",
+              "- Lagjobbene (`lagNNN_KK`) er rommet med spillets små objekter tegnet på plass. Objektene klippes ut "
+              "etter posisjonen, så de må ligge nøyaktig der de er, med samme størrelse og omriss. Bilde to er det "
+              "godkjente HD-bildet i `bilde_to`.",
+              "- Ikonarkene (`ikonNN`) er pekere, inventar, samtaleikoner og små deler på en flat bakgrunnsfarge. "
+              "Hvert bilde klippes ut etter posisjonen. Hold bakgrunnen flat.",
+              "- Figurarkene (`figCCC_KK`) leveres som hele lerretet, 1536 x 1024, på gjennomsiktig bakgrunn med ekte "
+              "alfa. Hver rute skal ha nøyaktig samme størrelse og plass som i referansen (en inndatapiksel er fire "
+              "utdatapiksler). Før leveransen inn under `leveranser` i `rapporter/<din rapport>/fremdrift.json` med "
+              "sha256, og lever et rutekart (`rapporter/<din rapport>/rutekart*.json`).",
+              "- Hovedarkene (`hovedark/<navn>.png`) leveres på gjennomsiktig bakgrunn, uten tekst.",
+              "",
+              "Kjør `python3 verktoy/sjekk_leveranse.py <resultat>` før du committer, og gjør om det som får FEIL. "
+              "Skriv `notat.md` i jobbmappen. Commit 5 til 10 jobber om gangen i grenen `gpt-arbeid` og push.", ""]
     if messages:
         lines += ["## Beskjeder", ""] + [f"- {m}" for m in messages] + [""]
     if tasks and tasks.exists() and tasks.read_text(encoding="utf-8").strip():
         lines += ["## Kodeoppgaver", "", tasks.read_text(encoding="utf-8").strip(), ""]
-    lines += ["## Neste sjekk", "", "Claude henter grenen omtrent hver halvtime, kontrollerer leveransene, "
-              "oppdaterer `status.csv`, `RAPPORT.md` og `retur.md`, og skriver ny ordre her."]
+    lines += ["## Neste sjekk", "", "Claude henter grenen, kontrollerer leveransene, oppdaterer `status.csv`, "
+              "`RAPPORT.md` og `retur.md`, og skriver ny ordre her."]
     path = work / "ORDRE.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path
