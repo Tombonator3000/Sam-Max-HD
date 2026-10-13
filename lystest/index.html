@@ -663,7 +663,7 @@ function ramme(t) {
   for (const l of aktive) {
     pos.push(l.x, l.y, l.hoyde);
     const c = hexTilRgb(l.farge); farger.push(c[0] * l.styrke, c[1] * l.styrke, c[2] * l.styrke);
-    rad.push(l.radius * Math.max(scene.w / W0, scene.h / H0));
+    rad.push(l.radius * scene.h / H0);   // etter høyden: brede rom har samme pikselskala, ikke større
   }
   while (pos.length < 12) { pos.push(0, 0, 0); farger.push(0, 0, 0); rad.push(1); }
 
