@@ -1,0 +1,52 @@
+# Kildeplan for bestilling 36
+
+Kun kildeanalyse, ingen bildeproduksjon. De neste ti jobbene er hentet fra GRAFIKKLISTE.md sin bestilling 36. Alle ti originalkompositter, seksten felt og relevante tidligere familietilstander er sett visuelt. 40 beskyttede jobbfiler og 24 ekstra kilde-/HD-kontekstfiler er låst og kontrollert uendret i b-kildehashkontroll.json. Originalkontaktark, b-objektfelt-1..3.png, b-350-354-grensefamilie.png og b-038-master-kilde.png dokumenterer motivene.
+
+Alle leveranser skal være opake RGB 1536 × 1024 med motiv [0,112,1536,800] og RGB128-padding. Del 2 er kildeintervallet x96..480; HD-x er (romx − 96) × 4. Del 1 begynner ved romx0.
+
+## Escher-rommet: liten fisk og periskop
+
+Registeret konsept/2026-10-12/objektnavn-original.tsv identifiserer 350 som escher-fish og 354 som escher-parascope. Visuell familie støtter en liten olivenbrun fisk som passerer mot høyre gjennom det avskårne øvre bildefeltet, og et grått periskop som stiger opp gjennom den lilla gulvflaten. Dette er ikke nye figurer, mikrofoner eller slanger. Bevar den svarte åpningen, grålilla røret og mørke skygge-/speilformen på lilla underlag.
+
+350_04 viser fisken nær midten/høyre, 05 bare bakre del ved høyre rammekant og 06 en svært liten rest ved kanten. Ikke fullfør den til en hel fisk når kilden bare viser fragment. 354_04 er en lav åpning med liten grå side; 05 er mer oppbøyd; 06 stiger videre; 07 har høyere bøy mot venstre; 08 viser den svarte åpningen mer forfra; 09 peker mot høyre; 0A vender tilbake mot venstre med egen høyde/form. Lagnummer 10 betyr her hexadecimal tilstand 0A, ikke en duplikat av 07.
+
+Tidligere 350_01..03 og 354_01..03 fra bestilling 35 er låst som kontekst. b-350-354-grensefamilie.png viser overgangen. Senere lag 07..10 har bare 354 og skal beholde grunnrommets uendrede øvre felt, ikke arve 350_06-fragmentet blindt. Alle sju kompositter er byte-identiske med eget originalgrunnrom utenfor sin metadataunion. Nabokomposittene skiller med 272, 205, 174, 205, 250 og 317 kildepiksler; ingen er duplikater.
+
+Bruk levert rom037 del2 som basis og bevar tilsiktet umulig perspektiv, klokke, 8-tall, speilskygge, pianotangenter, skrå dører, trapp og tomme områder. Ingen ny tekst er nødvendig. Fisken skal ikke gis navngitt identitet eller nye ansiktstrekk; de små kildeformene styrer.
+
+## Magnetrommet: fargede ender og egne spaker
+
+Alle tre hesteskomagnetenes kropper forblir røde. I lag038_01 har venstre magnets ender sterke oransjerøde flater (362), den høyre lille magneten gule ender (363), mens den store midtmagneten beholder grålilla ender. Samme lag har tre egne spakstillinger: 359 rød spak skrått opp mot høyre, 360 gul/oransje spak skrått opp mot venstre, 361 blå spak skrått opp mot venstre. Følg kildevinkelen og avkuttingen ved nedre kant.
+
+Lag038_02 viser bare 364: midtmagnetens to ender er sterke blå/cyan flater med mørkere sider. Venstre og høyre magnet samt spakene følger her grunnrommet. Ikke overfør oransje/gule ender eller spakstillingene fra lag01. Registernavnene red/green/blue-magnet beskriver objektroller, ikke kroppsfargene. Alle kroppene er fremdeles røde i disse originale komposittene. Zap-navnene gir ikke grunnlag for å tegne lyn, feltlinjer, N/S eller ekstra glød: kildebildet viser flate fargeskift på de eksisterende endene.
+
+**Lag038_01 må produseres fra én felles master på 1920 × 800**, klipp x0 og x384 til 1536-bredde og sett ved canvas-y112. Originaloverlapp er byte-identisk, HD-overlapp skal være 1152 × 800. Del1 har 1084 endrede originalpiksler utenfor sin ene metadataboks, og del2 har 941 utenfor sine fire bokser. Disse er de andre delenes kildeegne felt. Hele masteren har 3721 endrede piksler og null utenfor unionen av alle fem objekter, dokumentert i b-038-unionbevis.json. Ikke lever hver del med bare lokalt listede objekter.
+
+## Eksakte felt
+
+| Jobb | Objekt | Kildeboks | HD-boks |
+| --- | --- | --- | --- |
+| lag037_04_del2av2 | obj350_04 | [208, 0, 40, 24] | [448, 112, 160, 96] |
+| lag037_04_del2av2 | obj354_04 | [328, 128, 32, 40] | [928, 624, 128, 160] |
+| lag037_05_del2av2 | obj350_05 | [208, 0, 40, 24] | [448, 112, 160, 96] |
+| lag037_05_del2av2 | obj354_05 | [328, 128, 32, 40] | [928, 624, 128, 160] |
+| lag037_06_del2av2 | obj350_06 | [208, 0, 40, 24] | [448, 112, 160, 96] |
+| lag037_06_del2av2 | obj354_06 | [328, 128, 32, 40] | [928, 624, 128, 160] |
+| lag037_07_del2av2 | obj354_07 | [328, 128, 32, 40] | [928, 624, 128, 160] |
+| lag037_08_del2av2 | obj354_08 | [328, 128, 32, 40] | [928, 624, 128, 160] |
+| lag037_09_del2av2 | obj354_09 | [328, 128, 32, 40] | [928, 624, 128, 160] |
+| lag037_10_del2av2 | obj354_0A | [328, 128, 32, 40] | [928, 624, 128, 160] |
+| lag038_01_del1av2 | obj362_01 | [56, 80, 80, 72] | [224, 432, 320, 288] |
+| lag038_01_del2av2 | obj359_01 | [120, 160, 48, 40] | [96, 752, 192, 160] |
+| lag038_01_del2av2 | obj360_01 | [384, 144, 64, 32] | [1152, 688, 256, 128] |
+| lag038_01_del2av2 | obj361_01 | [224, 152, 32, 40] | [512, 720, 128, 160] |
+| lag038_01_del2av2 | obj363_01 | [352, 64, 96, 48] | [1024, 368, 384, 192] |
+| lag038_02_del2av2 | obj364_01 | [224, 32, 128, 80] | [512, 240, 512, 320] |
+
+## Produksjonsrisiko og videre kontroll
+
+Ordrette beskyttede prompter må suppleres med disse tilstandspresiseringene. Den generiske teksten om deler som lages separat må ikke føre til uavhengige magnetpanoramaer uten felles master. De registrerte fargenavnene må ikke overskrive faktisk palett. Ingen kilde krever nye lesbare skilt; svært små former skal beholdes uten tekstgjetting.
+
+Anbefalt arbeidsdeling er én eier for hele 350/354-familien i bestilling35/36, og én eier for magnetparet samt separat 364-tilstand. Små kildevarianter kan dele dokumentert likt nytt underlag, men ulike rørvinkler, fiskeavskjæringer og spakstillinger skal ikke dedupliseres. Ordinær helskalering og plassering av ny kunst er egnet; ingen originalsilhuett, originalpikselkopiering eller lokal warp.
+
+Kildebetydningen er tilstrekkelig støttet for produksjonsplanen. Nøyaktig animasjonstiming, magnetenes motorlogikk og samtidig runtime-visning er ikke verifisert. Ingen nye bilder, leveranser eller tekniske beståttstempler er produsert i denne analysen. Root må lese planen før produksjon starter.

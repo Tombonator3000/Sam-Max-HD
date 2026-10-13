@@ -267,3 +267,8 @@
 
 - Bestilling 34: seks lag levert OK med sju faktiske objektkontroller, siste tre viserposisjoner, to mikrotilstander og trådfravær/lukket dør på nøstet. Fire jobber venter grønt motivinnhold og er ikke levert. Se `rapporter/bestilling034-20261013/RAPPORT.md`. Bestilling 35 og videre fortsetter.
 - 40 beskyttede kilder og 12 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T23:39:23+02:00 (Codex, Astra)
+
+- Bestilling 36: ti lag levert OK, 16 faktiske feltkontroller, egne periskop-/fisketilstander og magnetmaster med identisk1152×800overlapp. Se `rapporter/bestilling036-20261013/RAPPORT.md`. Bestilling35 har fortsatt egen retting; øvrig HD-arbeid fortsetter.
+- 64 beskyttede/kontekstfiler er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

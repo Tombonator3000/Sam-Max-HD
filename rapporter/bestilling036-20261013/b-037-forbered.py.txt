@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import json
+root=Path.cwd();r=root/'rapporter/bestilling036-20261013'
+for i in range(4,11):
+ j=f'lag037_{i:02d}_del2av2';p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());src=Image.open(p/'referanse.png').convert('RGB');hd=Image.open(root/m['bilde_to']).convert('RGB')
+ for name,im in [('source',src),('hd',hd)]:
+  sheet=Image.new('RGB',(320,176),(128,128,128)) if i<=6 else Image.new('RGB',(128,160),(128,128,128))
+  for k,o in enumerate(m['objekter']):
+   x,y,w,h=o['rekt'];xx=(x-96)*4;yy=112+y*4;tile=im.crop((xx,yy,xx+w*4,yy+h*4));sheet.paste(tile,((192 if o['objekt']==354 else 0),0) if i<=6 else(0,0))
+  sheet.save(r/f'b-037-{i:02d}-{name}.png')

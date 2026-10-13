@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,re,numpy as np
+root=Path.cwd();r=root/'rapporter/bestilling036-20261013';text=(root/'GRAFIKKLISTE.md').read_text().split('## Bestilling 36\n')[1].split('## Bestilling 37')[0];jobs=re.findall(r'^- \[.\] `([^`]+)`',text,re.M)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,x):p.write_text(json.dumps(x,indent=2,ensure_ascii=False)+'\n')
+locks=[{'fil':str((root/'jobber'/j/f).relative_to(root)),'sha256':sha(root/'jobber'/j/f)} for j in jobs for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']]
+if (r/'kildehash.json').exists():assert json.loads((r/'kildehash.json').read_text())==locks
+else:save(r/'kildehash.json',locks)
+sheet=Image.new('RGB',(1536,5*432),(128,128,128));d=ImageDraw.Draw(sheet);rows=[];fields=[];ctx=set();arrays={}
+for k,j in enumerate(jobs):
+ p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());src=Image.open(p/'original_1x.png').convert('RGB');arrays[j]=np.array(src);basej=f'rom{m["rom"]:03d}_del{m["del_nr"]}av2';base=np.array(Image.open(root/'jobber'/basej/'original_1x.png').convert('RGB'));delta=np.any(np.array(src)!=base,axis=2);mask=np.zeros(delta.shape,bool);rx,ry,rw,rh=m['region'];row={'jobb':j,'region':m['region'],'canvas':m['lerret'],'motiv':m['bilde_i_lerret'],'underlag':m['underlag'],'bilde_to':m['bilde_to'],'objekter':m['objekter'],'endret_mot_grunnrom':int(delta.sum())}
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];lx=x-rx;ly=y-ry;mask[max(0,ly):min(rh,ly+h),max(0,lx):min(rw,lx+w)]=True;crop=src.crop((lx,ly,lx+w,ly+h));fields.append({'jobb':j,'objekt':o['bilde'],'rekt':o['rekt'],'hd_rekt':[lx*4,112+ly*4,w*4,h*4],'palettfarger':len(crop.getcolors(w*h) or [])});crop.resize((w*4,h*4),Image.Resampling.NEAREST).save(r/f'b-{j}-{o["bilde"]}-kilde.png')
+ row['utenfor_egen_metadataunion']=int((delta&~mask).sum());rows.append(row);d.text(((k%2)*768,(k//2)*432+2),j,fill='white');sheet.paste(src.resize((768,400),Image.Resampling.NEAREST),((k%2)*768,(k//2)*432+24));ctx.update([f'jobber/{basej}/{f}' for f in ['original_1x.png','referanse.png','jobb.json']]);ctx.add(m['bilde_to'])
+sheet.save(r/'original-kontaktark.png');save(r/'b-lagbevis.json',rows);save(r/'b-feltbevis.json',fields);save(r/'b-ekstra-kildehash.json',[{'fil':p,'sha256':sha(root/p)} for p in sorted(ctx)])
+for n in range(0,len(fields),6):
+ page=Image.new('RGB',(1152,3*310),(128,128,128));pd=ImageDraw.Draw(page)
+ for q,f in enumerate(fields[n:n+6]):
+  im=Image.open(r/f'b-{f["jobb"]}-{f["objekt"]}-kilde.png');im.thumbnail((560,276));x=(q%2)*576;y=(q//2)*310;pd.text((x,y),f['jobb']+' '+f['objekt'],fill='white');page.paste(im,(x,y+24))
+ page.save(r/f'b-objektfelt-{n//6+1}.png')
+fam=[]
+for a,b in zip(jobs[:6],jobs[1:7]):
+ dif=np.any(arrays[a]!=arrays[b],axis=2);yy,xx=np.where(dif);fam.append({'fra':a,'til':b,'ulike_piksler':int(dif.sum()),'lokal_bbox':None if not len(xx) else list(map(int,[xx.min(),yy.min(),xx.max()+1,yy.max()+1]))})
+a=arrays['lag038_01_del1av2'];b=arrays['lag038_01_del2av2'];fam.append({'par':'lag038_01','overlapp_original_byteidentisk':bool(np.array_equal(a[:,96:],b[:,:288])),'master':[1920,800],'klipp':[0,384],'overlapp_hd':[1152,800]});save(r/'b-familiebevis.json',fam)
+print(json.dumps(rows,ensure_ascii=False,indent=2))

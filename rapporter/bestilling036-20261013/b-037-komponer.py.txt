@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,subprocess
+root=Path.cwd();r=root/'rapporter/bestilling036-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+def feather(w,h,n):
+ y,x=np.mgrid[:h,:w];return Image.fromarray((np.clip(np.minimum.reduce([x+1,w-x,y+1,h-y])/n,0,1)*255).astype('uint8'))
+page=Image.new('RGB',(640,7*190),(128,128,128));d=ImageDraw.Draw(page)
+for i in range(4,11):
+ j=f'lag037_{i:02d}_del2av2';p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());out=Image.open(root/m['bilde_to']).convert('RGB');raw=Image.open(r/f'b-037-{i:02d}-raa01.png').convert('RGB')
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=(x-96)*4;y=112+y*4;w*=4;h*=4
+  if i<=6:
+   rw,rh=raw.size
+   if i==5:box=(0,0,768,492) if o['objekt']==350 else(920,0,1536,818)
+   else:box=(0,0,845,507) if o['objekt']==350 else(1014,0,1690,840)
+   tile=raw.crop(box).resize((w,h),Image.Resampling.LANCZOS)
+  else:tile=raw.resize((w,h),Image.Resampling.LANCZOS)
+  out.paste(tile,(x,y),feather(w,h,8));src=Image.open(p/'referanse.png').crop((x,y,x+w,y+h));col=0 if o['objekt']==350 else 320;page.paste(src,(col,(i-4)*190+20));page.paste(tile,(col+160,(i-4)*190+20));d.text((col,(i-4)*190),o['bilde'],fill='white')
+ out.save(p/'resultat.png');res=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(res.stdout+res.stderr);print(res.stdout)
+page.save(r/'b-037-kandidatfamilie.png')

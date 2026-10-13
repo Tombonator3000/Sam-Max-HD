@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json
+root=Path.cwd();r=root/'rapporter/bestilling036-20261013';base=Image.open(root/'jobber/rom037_del2av2/resultat.png').convert('RGB');origbase=np.array(Image.open(root/'jobber/rom037_del2av2/original_1x.png').convert('RGB'));rows=[]
+for i in [4,5,6]:
+ j=f'lag037_{i:02d}_del2av2';p=root/'jobber'/j;out=Image.open(p/'resultat.png').convert('RGB');orig=np.array(Image.open(p/'original_1x.png').convert('RGB'));diff=np.any(orig[:24,112:152]!=origbase[:24,112:152],axis=2);yy,xx=np.where(diff);dst=[448+int(xx.min())*4,112+int(yy.min())*4,int(xx.max()-xx.min()+1)*4,int(yy.max()-yy.min()+1)*4]
+ if i==4:im=Image.open(r/'b-fisk04-raa03.png').convert('RGBA');roi=(60,30,112,74)
+ else:
+  raw=Image.open(r/f'b-037-{i:02d}-raa01.png');im=raw.crop((0,0,768,492) if i==5 else(0,0,845,507)).convert('RGBA');roi=(96,22,140,72)
+ a=np.array(im);h,w=a.shape[:2];col=a[:,:,:3].astype(float);alpha=(col[:,:,0]>25)&(col[:,:,1]>20)&(col[:,:,2]<col[:,:,1]*.65)&(col[:,:,0]<col[:,:,1]*1.9);allow=np.zeros((h,w),bool);x0,y0,x1,y1=roi;allow[round(y0*h/96):round(y1*h/96),round(x0*w/160):round(x1*w/160)]=True;alpha &=allow;ys,xs=np.where(alpha);box=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)];im.putalpha(Image.fromarray((alpha*255).astype('uint8')));im.save(r/f'b-fisk{i:02d}-nyalfa.png');tile=im.crop(box).resize((dst[2],dst[3]),Image.Resampling.LANCZOS);out.paste(base.crop((448,112,608,208)),(448,112));out.paste(tile,tuple(dst[:2]),tile);out.save(p/'resultat.png');rows.append({'jobb':j,'ny_alfa_boks':box,'hd_helboks':dst,'alfa_fra':'utelukkende nygenerert farge, ikke original','kilde_fra':'kun antall/plassering/helboks'})
+# 09: ordinary rescaling of one complete newly painted pipe+shadow rectangle.
+p=root/'jobber/lag037_09_del2av2';orig=np.array(Image.open(p/'original_1x.png').convert('RGB'));diff=np.any(orig[128:168,232:264]!=origbase[128:168,232:264],axis=2);yy,xx=np.where(diff);dst=[int(xx.min())*4,int(yy.min())*4,int(xx.max()-xx.min()+1)*4,int(yy.max()-yy.min()+1)*4];print('09 source local HD bbox',dst);rows.append({'jobb':'lag037_09_del2av2','periskop_kilde_helboks':dst})
+(r/'b-motivretting-bevis.json').write_text(json.dumps(rows,indent=2)+'\n')
+# Main source component is [12,6,15,25] source pixels; separate tone point is not included in scaling.
+p=root/'jobber/lag037_09_del2av2';out=Image.open(p/'resultat.png').convert('RGB');out.paste(base.crop((928,624,1056,784)),(928,624));raw=Image.open(r/'b-037-09-raa01.png').convert('RGB').resize((128,160),Image.Resampling.LANCZOS);tile=raw.crop((50,19,98,128)).resize((68,108),Image.Resampling.LANCZOS);yy,xx=np.mgrid[:108,:68];alpha=Image.fromarray((np.clip(np.minimum.reduce([xx+1,68-xx,yy+1,108-yy])/5,0,1)*255).astype('uint8'));out.paste(tile,(972,644),alpha);out.save(p/'resultat.png')
+rows[-1]['valgt_kilde_hovedkomponent']=[48,24,60,100];rows[-1]['nytt_rekt_med_margin']=[50,19,48,109];rows[-1]['plassert_rekt_med_margin']=[972,644,68,108];(r/'b-motivretting-bevis.json').write_text(json.dumps(rows,indent=2)+'\n')

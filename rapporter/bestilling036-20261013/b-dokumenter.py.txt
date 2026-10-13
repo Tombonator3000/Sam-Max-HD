@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,importlib.util
+r=Path('rapporter/bestilling036-20261013');proof=json.loads((r/'b-sluttbevis.json').read_text());spec=importlib.util.spec_from_file_location('ck','verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(spec);spec.loader.exec_module(ck)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+fields=[];deliver=[]
+for z in proof['leveranser']:
+ j=z['jobb'];p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());metrics=ck.compare(Image.open(p/'original_1x.png'),Image.open(p/'resultat.png').crop((0,112,1536,912)))
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];a=metrics['eo'][y:y+h,max(0,x):min(384,x+w)];b=metrics['es'][y:y+h,max(0,x):min(384,x+w)];c=ck.corr(a,b);fields.append({'jobb':j,'objekt':o['bilde'],'kantlikhet':float(c),'egenkontroll':'OK' if c>=.6 else'SJEKK' if c>=.5 else'FEIL'})
+ attempts=3 if j=='lag037_04_del2av2' else 2 if j=='lag037_08_del2av2' else 1
+ entry={**z,'resultat':str(p/'resultat.png'),'forsok':attempts,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True}
+ if j.startswith('lag038_01'):
+  entry.update(fullmaster=proof['fullmaster'],fullmaster_sha256=proof['fullmaster_sha256'],klipp_x=0 if 'del1' in j else 384)
+ deliver.append(entry)
+ note=f'''# {j}\n\nKildetro nytegning med innebygd ChatGPT-bildegenerator. Eksakt bildemodell er ikke eksponert. {attempts} genereringsforsøk er knyttet til motivet; panoramaparet deler ett råforsøk. Råbilder, ordrette originalprompter med separat kildepresisering og oppskrifter ligger i {r}.\n\nOriginalens egen tilstand, avkutting og palett styrer motivet. Resultatet er opakt RGB, 1536 × 1024, motiv ved 0,112 med 1536 × 800 og nøytral padding. Nytt motiv er helskalert og plassert; alfa ved fiskeavkuttingene kommer bare fra nygenerert kunst. Ingen originalmasker, originalpiksler, lokal warp eller vektortrace.\n\nUendret egenkontroll: {z['egenkontroll']}. Kontroll: {z['kontrollfil']}. Null endrede piksler utenfor kildeunionen. Visuell kontroll omfatter hele rommet og egne tilstandsutsnitt. Metall og små konturer er glattere og mer modellerte enn originalen; teknisk OK er ikke individuell bruker- eller runtime-godkjenning.\n\nOriginal SHA-256: {sha(p/'original_1x.png')}\nResultat SHA-256: {z['sha256']}\n\nRuntime: false. Ny individuell brukergodkjenning: false.\n'''
+ (p/'notat.md').write_text(note)
+(r/'b-objektkontroll.json').write_text(json.dumps(fields,indent=2)+'\n')
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':deliver,'kilder_uendret':proof['kilder_uendret'],'runtime':False,'ny_brukergodkjenning':False},indent=2)+'\n')
+files=[]
+for p in sorted(r.iterdir()):
+ if p.suffix=='.png' and ('raa' in p.name or 'fullmaster' in p.name) or p.suffix=='.txt' and ('prompt' in p.name or p.name.endswith('.py.txt')):files.append({'fil':str(p),'sha256':sha(p)})
+(r/'b-proveniens.json').write_text(json.dumps({'verktøy':'innebygd ChatGPT imagegen','eksakt_bildemodell':'ikke eksponert','filer':files,'forkastet':['b-fisk04-raa02.png'],'valgte_rettinger':['b-fisk04-raa03.png','b-037-08-raa02.png'],'komposisjonsrekkefolge':['b-magnet-komponer.py.txt','b-037-komponer.py.txt','b-motivretting.py.txt','b-08-sluttretting.py.txt'],'tonekomponent_fra':'rapporter/bestilling035-20261013/b-037-master-raa01.png','tonekomponent_kilde_sha256':sha(Path('rapporter/bestilling035-20261013/b-037-master-raa01.png'))},indent=2,ensure_ascii=False)+'\n')

@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,shutil,json
+r=Path('rapporter/bestilling036-20261013');shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-0c86acbb-89e9-40d8-88dc-9db4ca1837d6.png',r/'b-037-08-raa02.png')
+p=Path('jobber/lag037_08_del2av2/resultat.png');out=Image.open(p).convert('RGB');tile=Image.open(r/'b-037-08-raa02.png').convert('RGB').resize((128,160),Image.Resampling.LANCZOS);y,x=np.mgrid[:160,:128];alpha=Image.fromarray((np.clip(np.minimum.reduce([x+1,128-x,y+1,160-y])/8,0,1)*255).astype('uint8'));base=Image.open('jobber/rom037_del2av2/resultat.png');out.paste(base.crop((928,624,1056,784)),(928,624));out.paste(tile,(928,624),alpha);out.save(p)
+# Shared source point is verified numerically; replacement color is solely from newly generated master.
+points={}
+for i in range(4,11):
+ j=f'lag037_{i:02d}_del2av2';src=Image.open(f'jobber/{j}/original_1x.png');points[j]=src.getpixel((251,164))
+assert len(set(points.values()))==1
+new=Image.open('rapporter/bestilling035-20261013/b-037-master-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS).crop((1388,656,1392,660))
+for j in points:
+ p=Path('jobber')/j/'resultat.png';out=Image.open(p);out.paste(new,(1004,768));out.save(p)
+(r/'b-fellestone-bevis.json').write_text(json.dumps({'originalpunkter':points,'ny_farge_fra':'bestilling035 b-037-master-raa01.png normalisert 1920x800, rekt1388,656,4,4','plassering':[1004,768,4,4],'originalpiksler_brukt_i_resultat':False},indent=2)+'\n')

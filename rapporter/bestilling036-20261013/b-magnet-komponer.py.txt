@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess
+root=Path.cwd();r=root/'rapporter/bestilling036-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+def feather(w,h,n):
+ y,x=np.mgrid[:h,:w];return Image.fromarray((np.clip(np.minimum.reduce([x+1,w-x,y+1,h-y])/n,0,1)*255).astype('uint8'))
+base=Image.open(r/'b-038-hdgrunn.png').convert('RGB');master=base.copy();raw=Image.open(r/'b-038-master-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS);boxes=[]
+for j in ['lag038_01_del1av2','lag038_01_del2av2']:
+ for o in json.loads((root/'jobber'/j/'jobb.json').read_text())['objekter']:
+  x,y,w,h=[v*4 for v in o['rekt']];master.paste(raw.crop((x,y,x+w,y+h)),(x,y),feather(w,h,6));boxes.append([x,y,w,h])
+master.save(r/'b-038-fullmaster.png');rows=[]
+for j,offset in [('lag038_01_del1av2',0),('lag038_01_del2av2',384),('lag038_02_del2av2',384)]:
+ p=root/'jobber'/j
+ if '_01_' in j:out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(master.crop((offset,0,offset+1536,800)),(0,112))
+ else:
+  out=Image.open(root/'jobber/rom038_del2av2/resultat.png').convert('RGB');tile=Image.open(r/'b-364-raa01.png').convert('RGB').resize((512,320),Image.Resampling.LANCZOS);out.paste(tile,(512,240),feather(512,320,6))
+ out.save(p/'resultat.png');res=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(res.stdout+res.stderr);print(res.stdout)
+ rows.append({'jobb':j,'sha256':hashlib.sha256((p/'resultat.png').read_bytes()).hexdigest()})
+(r/'b-magnet-kandidater.json').write_text(json.dumps(rows,indent=2)+'\n')

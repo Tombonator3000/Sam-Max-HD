@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib
+root=Path.cwd();r=root/'rapporter/bestilling036-20261013';rows=[]
+for lock in ['kildehash.json','b-ekstra-kildehash.json']:
+ for x in json.loads((r/lock).read_text()):
+  actual=hashlib.sha256((root/x['fil']).read_bytes()).hexdigest();assert actual==x['sha256'];rows.append(x)
+master=Image.new('RGB',(1920,800));a=Image.open(root/'jobber/rom038_del1av2/resultat.png').convert('RGB').crop((0,112,1536,912));b=Image.open(root/'jobber/rom038_del2av2/resultat.png').convert('RGB').crop((0,112,1536,912));assert a.crop((384,0,1536,800)).tobytes()==b.crop((0,0,1152,800)).tobytes();master.paste(a,(0,0));master.paste(b,(384,0));master.save(r/'b-038-hdgrunn.png')
+Image.open(root/'jobber/lag038_02_del2av2/referanse.png').crop((512,240,1024,560)).save(r/'b-364-source.png');Image.open(root/'jobber/rom038_del2av2/resultat.png').crop((512,240,1024,560)).save(r/'b-364-hd.png')
+(r/'b-kildelas-produksjonsstart.json').write_text(json.dumps({'antall':len(rows),'alle_uendret':True},indent=2)+'\n')

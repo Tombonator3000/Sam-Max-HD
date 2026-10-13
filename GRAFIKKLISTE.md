@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:26 (norsk tid)
+Oppdatert 2026-10-13 23:39 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 243 bilder levert (125 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 259 bilder levert (135 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -544,16 +544,16 @@ Rom 36, 37.
 
 Rom 37, 38.
 
-- [ ] `lag037_04_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 04 med 2 objektbilder, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
-- [ ] `lag037_05_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 05 med 2 objektbilder, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
-- [ ] `lag037_06_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 06 med 2 objektbilder, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
-- [ ] `lag037_07_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 07 med 1 objektbilde, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
-- [ ] `lag037_08_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 08 med 1 objektbilde, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
-- [ ] `lag037_09_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 09 med 1 objektbilde, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
-- [ ] `lag037_10_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 10 med 1 objektbilde, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
-- [ ] `lag038_01_del1av2` (rom 38 Magnetrommet, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom038_del1av2/resultat.png`)
-- [ ] `lag038_01_del2av2` (rom 38 Magnetrommet, lag 01 med 4 objektbilder, del 2/2, bilde to `jobber/rom038_del2av2/resultat.png`)
-- [ ] `lag038_02_del2av2` (rom 38 Magnetrommet, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom038_del2av2/resultat.png`)
+- [x] `lag037_04_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 04 med 2 objektbilder, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
+- [x] `lag037_05_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 05 med 2 objektbilder, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
+- [x] `lag037_06_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 06 med 2 objektbilder, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
+- [x] `lag037_07_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 07 med 1 objektbilde, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
+- [x] `lag037_08_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 08 med 1 objektbilde, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
+- [x] `lag037_09_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 09 med 1 objektbilde, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
+- [x] `lag037_10_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 10 med 1 objektbilde, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`)
+- [x] `lag038_01_del1av2` (rom 38 Magnetrommet, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom038_del1av2/resultat.png`)
+- [x] `lag038_01_del2av2` (rom 38 Magnetrommet, lag 01 med 4 objektbilder, del 2/2, bilde to `jobber/rom038_del2av2/resultat.png`)
+- [x] `lag038_02_del2av2` (rom 38 Magnetrommet, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom038_del2av2/resultat.png`)
 
 ## Bestilling 37
 
@@ -3497,3 +3497,5 @@ Bestilling 31: åtte lag levert OK med 11 faktiske objektkontroller. To figurfra
 Bestilling 33: ti lag levert OK med elleve faktiske objektkontroller, kikkertfragmenter fra felles master, to viserposisjoner med308underlag og egne gnister/ledningsender. Se `rapporter/bestilling033-20261013/RAPPORT.md`. Bestilling 34 og videre fortsetter.
 
 Bestilling 34: seks lag levert OK med sju faktiske objektkontroller, siste tre viserposisjoner, to mikrotilstander og trådfravær/lukket dør på nøstet. Fire jobber venter grønt motivinnhold og er ikke levert. Se `rapporter/bestilling034-20261013/RAPPORT.md`. Bestilling 35 og videre fortsetter.
+
+Bestilling 36: ti lag levert OK, 16 faktiske feltkontroller, egne periskop-/fisketilstander og magnetmaster med identisk1152×800overlapp. Se `rapporter/bestilling036-20261013/RAPPORT.md`. Bestilling35 har fortsatt egen retting; øvrig HD-arbeid fortsetter.

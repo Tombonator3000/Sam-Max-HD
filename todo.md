@@ -65,3 +65,5 @@
 
 - [x] Rettet LeChuck Pizza i rom070 etter brukeravklaring; senere aktive eskevarianter skal følge samme tekst.
 - Ved uklart motiv: spør Tom før nytegning. Avklart 260 = stangfot på brygga; 269 = søl/vannplask fra Dunk the Beast-tanken.
+
+- [x] Levert bestilling36 med ti OK,16 feltkontroller og identisk magnetoverlapp.

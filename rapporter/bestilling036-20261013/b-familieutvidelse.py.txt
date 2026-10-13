@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib
+root=Path.cwd();r=root/'rapporter/bestilling036-20261013';extra=json.loads((r/'b-ekstra-kildehash.json').read_text());seen={x['fil'] for x in extra};page=Image.new('RGB',(800,6*180),(128,128,128));d=ImageDraw.Draw(page);stats=[]
+for i in range(1,7):
+ j=f'lag037_{i:02d}_del2av2' if i==1 or i>=4 else f'lag037_{i:02d}_del1av2';p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());im=Image.open(p/'original_1x.png').convert('RGB');rx=m['region'][0]
+ for f in ['original_1x.png','referanse.png','prompt.txt','jobb.json']:
+  rel=f'jobber/{j}/{f}'
+  if rel not in seen:extra.append({'fil':rel,'sha256':hashlib.sha256((root/rel).read_bytes()).hexdigest()});seen.add(rel)
+ for n,oid in enumerate([350,354]):
+  o=next((o for o in m['objekter'] if o['objekt']==oid),None)
+  if not o:continue
+  x,y,w,h=o['rekt'];crop=im.crop((x-rx,y,x-rx+w,y+h));page.paste(crop.resize((w*4,h*4),Image.Resampling.NEAREST),(n*400,(i-1)*180+20));d.text((n*400,(i-1)*180),j+' '+o['bilde'],fill='white')
+page.save(r/'b-350-354-grensefamilie.png')
+a=Image.open(root/'jobber/lag038_01_del1av2/original_1x.png').convert('RGB');b=Image.open(root/'jobber/lag038_01_del2av2/original_1x.png').convert('RGB');master=Image.new('RGB',(480,200));master.paste(a,(0,0));master.paste(b,(96,0));master.resize((1920,800),Image.Resampling.NEAREST).save(r/'b-038-master-kilde.png');ba=Image.open(root/'jobber/rom038_del1av2/original_1x.png').convert('RGB');bb=Image.open(root/'jobber/rom038_del2av2/original_1x.png').convert('RGB');base=Image.new('RGB',(480,200));base.paste(ba,(0,0));base.paste(bb,(96,0));mask=np.zeros((200,480),bool)
+for j in ['lag038_01_del1av2','lag038_01_del2av2']:
+ for o in json.loads((root/'jobber'/j/'jobb.json').read_text())['objekter']:
+  x,y,w,h=o['rekt'];mask[y:y+h,x:x+w]=True
+change=np.any(np.array(master)!=np.array(base),axis=2);stats={'hele_master_endret':int(change.sum()),'utenfor_femfelts_union':int((change&~mask).sum()),'master':[1920,800],'klipp':[0,384],'overlapp':[1152,800]};(r/'b-038-unionbevis.json').write_text(json.dumps(stats,indent=2)+'\n');(r/'b-ekstra-kildehash.json').write_text(json.dumps(extra,indent=2)+'\n');print(stats);print('Ekstra',len(extra))
