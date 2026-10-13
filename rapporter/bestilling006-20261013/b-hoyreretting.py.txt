@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+b=Path(__file__).resolve().parents[2]
+r=b/'rapporter/bestilling006-20261013'
+r5=b/'rapporter/bestilling005-20261013'
+master=Image.open(r5/'rom022-fullscene-for-hoyreretting.png').convert('RGB')
+patch=Image.open(r/'rom022-hoyre-raaforsok1.png').convert('RGB').resize((608,800),Image.Resampling.LANCZOS)
+old=np.asarray(master.crop((2560,112,3168,912)),dtype=float)
+new=np.asarray(patch,dtype=float)
+weight=np.minimum(np.arange(608)/48,1)[None,:,None]
+# Narrow HD-to-HD seam blend only, no original-image or silhouette masks.
+patch=Image.fromarray(np.uint8(np.round(old*(1-weight)+new*weight)))
+master.paste(patch,(2560,112))
+master.save(r/'rom022-master-kandidat.png')

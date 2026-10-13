@@ -27,4 +27,5 @@
 - [x] Fullfør bestilling 4 med ti bilder, kildeavklarte utstillinger, minispilltilstander og identisk romoverlapp.
 - [x] Levert ni bilder i bestilling5: åtte OK og obj202_01 med SJEKK.
 - [ ] Avklar obj187_05 med egenkontroll FEIL etter dokumenterte rettforsøk og uavhengig diagnose. Se rapporter/bestilling005-20261013/KONTROLL-AVVIK.md. Ikke klar for mottak.
-- [ ] Fortsett bestilling6/7 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Fullført bestilling6 med ti rombilder, egenkontroll OK og identiske overlapp, også rom022 over bestillingsgrensen.
+- [ ] Fortsett bestilling7 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

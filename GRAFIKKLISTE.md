@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 18:22 (norsk tid)
+Oppdatert 2026-10-13 18:24 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,7 +9,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 18 hele rom og 1 delvis levert (27 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Rombakgrunner | 25 rom levert (37 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 14 levert, inkludert én SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
@@ -94,16 +94,16 @@ Rom 18, 19, 20, 21, 22.
 
 Rom 22, 23, 24, 25, 26, 27, 28.
 
-- [ ] `rom022_del2av3` (rom 22 Tunnel of Love, inne, del 2/3)
-- [ ] `rom022_del3av3` (rom 22 Tunnel of Love, inne, del 3/3)
-- [ ] `rom023` (rom 23 Dougs gjemmested (under Tunnel of Love))
-- [ ] `rom024_del1av2` (rom 24 Gator Golf, del 1/2)
-- [ ] `rom024_del2av2` (rom 24 Gator Golf, del 2/2)
-- [ ] `rom025` (rom 25 Gator Golf, utslagsplassen (minispill))
-- [ ] `rom026` (rom 26 Dunk the Beast)
-- [ ] `rom027_del1av2` (rom 27 World's Largest Ball of Twine, ute, del 1/2)
-- [ ] `rom027_del2av2` (rom 27 World's Largest Ball of Twine, ute, del 2/2)
-- [ ] `rom028` (rom 28 Hyssingmuseet)
+- [x] `rom022_del2av3` (rom 22 Tunnel of Love, inne, del 2/3)
+- [x] `rom022_del3av3` (rom 22 Tunnel of Love, inne, del 3/3)
+- [x] `rom023` (rom 23 Dougs gjemmested (under Tunnel of Love))
+- [x] `rom024_del1av2` (rom 24 Gator Golf, del 1/2)
+- [x] `rom024_del2av2` (rom 24 Gator Golf, del 2/2)
+- [x] `rom025` (rom 25 Gator Golf, utslagsplassen (minispill))
+- [x] `rom026` (rom 26 Dunk the Beast)
+- [x] `rom027_del1av2` (rom 27 World's Largest Ball of Twine, ute, del 1/2)
+- [x] `rom027_del2av2` (rom 27 World's Largest Ball of Twine, ute, del 2/2)
+- [x] `rom028` (rom 28 Hyssingmuseet)
 
 ## Bestilling 7
 
@@ -3431,3 +3431,5 @@ Bestilling 3 er levert med ti bilder og egenkontroll OK, se `rapporter/bestillin
 Bestilling 4 er levert med ti bilder og egenkontroll OK, se `rapporter/bestilling004-20261013/RAPPORT.md`. Bestilling 5 er startet.
 
 Bestilling5:8OK,1SJEKK og1uavklartFEIL. Obj187_05 er ikke klar for mottak og forblir ukrysset. Se `rapporter/bestilling005-20261013/RAPPORT.md`. Uavhengig produksjon i bestilling6/7 fortsetter.
+
+Bestilling6: ti rombilder levert, alle egenkontroller OK. Rom022 er komplett med identisk overlapp over bestillingsgrensen. Se `rapporter/bestilling006-20261013/RAPPORT.md`. Obj187_05 fra bestilling5 er fortsatt uavklart.

@@ -1,0 +1,29 @@
+"""Kjør fra repoets rot med Pillow og NumPy. Kun autorisert lerret/utsnitt/overgang."""
+from pathlib import Path
+from PIL import Image
+import numpy as np
+
+r = Path('rapporter/bestilling006-20261013')
+for jobb, forsok in [('rom025', 2), ('rom026', 1)]:
+    raw = Image.open(r / f'{jobb}-raa-{forsok}.png').convert('RGB')
+    canvas = Image.new('RGB', (1536, 1024), (128, 128, 128))
+    canvas.paste(raw.crop((128, 112, 1408, 912)), (128, 112))
+    canvas.save(Path('jobber') / jobb / 'resultat.png')
+
+a, b = [np.array(Image.open(r / f'rom027_del{i}av2-raa-1.png').convert('RGB').crop((0, 112, 1536, 912))) for i in [1, 2]]
+full = np.zeros((800, 1888, 3), dtype=np.uint8)
+full[:, :1536] = a
+full[:, 1536:] = b[:, 1184:]
+x0, x1 = 1200, 1280
+full[:, x1:] = b[:, x1-352:]
+for x in range(x0, x1):
+    t = (x-x0)/(x1-x0)
+    t = t*t*(3-2*t)
+    full[:, x] = np.round((1-t)*a[:, x] + t*b[:, x-352]).astype(np.uint8)
+Image.fromarray(full).save(r / 'rom027-fullscene.png')
+for i, x in [(1, 0), (2, 352)]:
+    canvas = Image.new('RGB', (1536, 1024), (128, 128, 128))
+    canvas.paste(Image.fromarray(full[:, x:x+1536]), (0, 112))
+    canvas.save(Path('jobber') / f'rom027_del{i}av2' / 'resultat.png')
+# Kildens bredde er 472 originalpiksler: 1888 HD, offset 352, overlapp 1184.
+# Ingen originalpiksler brukes i leveransen og ingen motivgeometri flyttes/warpes.

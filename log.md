@@ -76,3 +76,10 @@
 - Blåbakgrunns-FFT undersøkt av root og uavhengig Astra-agent; hypotesen om ustabil korrelasjon er ikke bevist. Flere kildebaserte rettinger/raw er bevart, ingen figurwarp eller terskelendring.
 - Tunnel021 har identiskoverlapp; rom022 fellesmaster er låst for del1–3 og høyre kildegeometri rettet uten endring av del1/overlapp. Alle40beskyttede kilder uendret.
 - Rapport/diagnose/proveniens i rapporter/bestilling005-20261013/. Bestilling4s ti PNG-SHA verifisert fra GitHub. Ingen motorimport, spilltest, ny individuell godkjenning eller kode-/kildeendring.
+
+## 2026-10-13 18:24 (Codex, Astra)
+
+- Bestilling6 fullført med ti rombilder, alle uendrede egenkontroller OK, 40beskyttede kilder uendret og eksakt lerret/padding. Root sammenlignet samlet original/HD.
+- Rom022 del1–3 fra felles korrigert master, begge720pxoverlapper identiske over bestillingsgrensen. Rom024/027 har512/1184pxidentiskoverlapp.
+- Kildens tomme golf-/dunk-felt bevart uten ekstra knapper/Bruno. Alligatorstatue og hyssingmuseets store tråder identitetsavklart. Mikrodetaljer ikke erklært identiske.
+- Rapport og proveniens i rapporter/bestilling006-20261013/. Ingen motorimport, spilltest eller ny individuell godkjenning. Obj187_05 fortsatt FEIL/uavklart; obj202_01 SJEKK. Bestilling7 fortsetter.
