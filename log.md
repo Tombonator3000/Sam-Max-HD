@@ -102,3 +102,9 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 ## 2026-10-13 09:50 (Claude)
 - Tom spurte om dynamisk lys med normalkart og luminansmaske (bilde av Pixel Art Lighter). Svar: det passer i HD-motoren som et siste steg per piksel, men strider mot trofast remake om det står på, og normalkartene er en ekstra produksjon. Tom: valgfritt for spilleren, ingen kastede skygger, vent til stilpiloten er godkjent. Lagt i todo og memory.
 - Sjekket Zak-repoet (FM-Towns, v3): skyggeregelen herfra gjelder ikke der, fordi ScummVM bare setter skyggetabellen for v5 og nyere. Notert i memory her og i Zak.
+
+## 2026-10-13 10:32 (Claude)
+- Tom viste Bernard, Laverne og Hoagie fra Day of the Tentacle, original og remaster side om side, og ba om at metoden legges i guiden for hvordan originalgrafikk gjøres om til HD.
+- Nytt punkt «Fra piksel til HD-strek, slik DOTT Remastered gjorde det» under Figurstilen i `docs/skills/scumm-hd-remake/SKILL.md`, og en henvisning under forbildene: samme positur, silhuett og proporsjoner, hver pikselklynge tegnet som det den forestiller, samme farge per flate, ren mørk kontur, flate farger med ett skyggetrinn, ingen nye detaljer, hodet ikke større. Med forslag til engelsk prompttekst. Skillen er lik i Dig, Sam & Max og Zak (SHA-256 kontrollert).
+- Kort avsnitt i `docs/HD-REMASTER-METODE.md`. Bildet er ikke lagt i repoet (grafikken tilhører Disney/Lucasfilm).
+- Sam & Max: samme regel i figurdelen av `docs/BESTILLING-CHATGPT.md`. Kopien i `gpt-arbeid` og figurpromptene i `figur.py` er ikke endret.
