@@ -1,0 +1,25 @@
+from pathlib import Path
+import hashlib,json,runpy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+c=runpy.run_path(str(root/'rapporter/rom090-obj901-vektor-20261013/root-levering.py.txt'),run_name='delivery_helpers')
+c['seal_and_push']=runpy.run_path(str(root/'rapporter/bestilling051-20261013/root-git-mottak.py.txt'))['seal_and_push']
+m=json.loads((r/'fremdrift.json').read_text());s=json.loads((r/'sluttkontroll.json').read_text());assert s['utfall_antall']=={'OK':8,'SJEKK':2,'FEIL':0} and not s['ikke_klar_for_mottak']
+for name in ['kildehash.json','root-ekstra-kildehash.json']:
+ for e in json.loads((r/name).read_text()):assert sha(root/e['fil'])==e['sha256']
+for e in m['leveranser']:assert sha(root/e['resultat'])==e['sha256'] and e['klar_for_mottak'] and not e['runtime_verifisert']
+o=json.loads((r/'root-objektkontroll.json').read_text());assert len(o)==70 and sum(e['status']=='OK' for e in o)==67 and sum(e['status']=='SKIPPED' for e in o)==3
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+note='Bestilling 51: fem 091-lag og fem ikonark levert, åtte OK og to SJEKK. 67 ikke-tomme felt OK og tre tomme felt bevist. To 416-pikslers overlapper er identiske; 850-komposisjonen og alle ikonmotiver er kontrollert. Se `rapporter/bestilling051-20261013/RAPPORT.md`. HD-arbeidet fortsetter.'
+counts=c['update_queue'](m['leveranser'],note)
+import re
+q=root/'GRAFIKKLISTE.md';qt=q.read_text();ids=[j for j in re.findall(r'^- \[x\] `([^`]+)`',qt,re.M) if (root/'jobber'/j/'jobb.json').is_file()]
+metas=[json.loads((root/'jobber'/j/'jobb.json').read_text()) for j in ids];icons=[e for e in metas if e['type']=='ikon']
+counts['ikonark']=len(icons);counts['ikonfelt']=sum(len(e['objekter']) for e in icons)
+qt=re.sub(r'(\| Ikonark [^|]+\|) [^|]+ \|',lambda mm:mm.group(1)+' '+str(counts['ikonfelt'])+' felt levert ('+str(counts['ikonark'])+' ark), inkludert 2 SJEKK |',qt,count=1);q.write_text(qt)
+(r/'root-mottak.json').write_text(json.dumps({'dato':stamp,'telling':counts,'root_visuell_motivkontroll':True,'alle_70_felt_kontrollert_inkl_3_tomme':True,'motorimport':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+with (root/'todo.md').open('a') as f:f.write('\n- [x] Levert 10 jobber i bestilling 51: fem lag og fem ikonark, 67 OK-felt og tre tomme felt.\n')
+with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex, Astra)\n\n- '+note+'\n- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.\n')
+commit=c['seal_and_push'](r,m['leveranser'],'GPT: fem 091-lag og fem ikonark med kildebevis, bestilling 51')
+print(json.dumps({'commit':commit,'telling':counts},ensure_ascii=False))

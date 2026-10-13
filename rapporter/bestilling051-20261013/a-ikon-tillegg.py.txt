@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,collections,hashlib,subprocess
+r=Path(__file__).resolve().parent;root=r.parents[1];data=json.loads((r/'a-ikon-feltbevis.json').read_text());f=data['felt'];groups=collections.defaultdict(list)
+for e in f:groups[(tuple(e['rekt'][2:]),e['piksel_sha256'])].append(e['bilde'])
+dups=[v for v in groups.values() if len(v)>1]
+# Exact scene search of the 24x24 source fragment, analysis only.
+e=next(x for x in f if x['bilde']=='obj560_01');x,y,w,h=e['rekt'];needle=np.array(Image.open(root/'jobber/ikon01/original_1x.png').convert('RGB'))[y:y+h,x:x+w];matches=[]
+for d in sorted((root/'jobber').glob('rom058*')):
+ a=np.array(Image.open(d/'original_1x.png').convert('RGB'))
+ for yy in range(a.shape[0]-h+1):
+  for xx in np.where((a[yy,:a.shape[1]-w+1]==needle[0,0]).all(1))[0]:
+   if np.array_equal(a[yy:yy+h,xx:xx+w],needle):matches.append({'jobb':d.name,'x':int(xx),'y':yy,'w':w,'h':h})
+(r/'a-ikon-duplikater-og-kontekst.json').write_text(json.dumps({'byteidentiske_felt':dups,'560_eksakt_rom058':matches},ensure_ascii=False,indent=2)+'\n')
+# Contact sheets for questions with actual IDs, never a proposed redraw.
+questions=[('A',['obj891_01','obj892_01']),('B',['obj1000_01','obj1002_01','obj1003_01']),('C',['obj1026_01','obj1027_01','obj1028_01']),('D',['obj1024_01','obj1029_01','obj1030_01']),('E',['obj1041_01','obj1043_01','obj1044_01']),('F',['obj1053_01','obj1054_01','obj1055_01']),('G',['obj1057_01','obj1058_01','obj1060_01']),('H',['obj1075_01','obj1076_01','obj1077_01','obj1078_01','obj1079_01'])]
+for page in range(2):
+ can=Image.new('RGB',(1280,880),(190,190,190));dr=ImageDraw.Draw(can)
+ for row,(letter,ids) in enumerate(questions[page*4:page*4+4]):
+  dr.text((4,row*220+4),letter,fill='black')
+  for col,j in enumerate(ids):
+   e=next(z for z in f if z['bilde']==j);x,y,w,h=e['rekt'];im=Image.open(root/'jobber'/e['jobb']/'original_1x.png').crop((x,y,x+w,y+h));dr.text((30+col*245,row*220+5),j,fill='black');scale=min(230/w,175/h);can.paste(im.resize((round(w*scale),round(h*scale)),Image.Resampling.NEAREST),(30+col*245,row*220+28))
+ can.save(r/f'a-ikon-sporsmal-{page+1}.png')
+# Lock inspected context and exact read-only repository code revision.
+ctx={}
+for d in sorted((root/'jobber').glob('rom058*')):
+ for name in ['original_1x.png','referanse.png','jobb.json']:ctx[str((d/name).relative_to(root))]=hashlib.sha256((d/name).read_bytes()).hexdigest()
+code=subprocess.check_output(['git','show','origin/main:pipeline/smhd/gpt.py'],cwd=root);(r/'a-ikon-importkontrakt-kilde.py.txt').write_bytes(code)
+ctx['origin/main:pipeline/smhd/gpt.py']={'git_ref':subprocess.check_output(['git','rev-parse','origin/main'],cwd=root,text=True).strip(),'sha256':hashlib.sha256(code).hexdigest()}
+(r/'a-ikon-konteksthash.json').write_text(json.dumps(ctx,indent=2)+'\n')
+print('DUPLIKATER',dups,'560',matches)

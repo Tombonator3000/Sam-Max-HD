@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 00:40 (norsk tid)
+Oppdatert 2026-10-14 00:45 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,8 +11,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 579 bilder levert (263 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
-| Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 610 bilder levert (268 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 39 felt levert (5 ark), inkludert 2 SJEKK | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
 ## Bestilling 1: stilpiloten (nå, samme som ORDRE.md)
@@ -769,16 +769,16 @@ Rom 83, 84, 85, 90.
 
 Rom 1, 69, 78, 91.
 
-- [ ] `lag091_01_del1av2` (rom 91 Påkledning, Sam (silhuetter), lag 01 med 13 objektbilder, del 1/2, bilde to `jobber/rom091_del1av2/resultat.png`)
-- [ ] `lag091_01_del2av2` (rom 91 Påkledning, Sam (silhuetter), lag 01 med 12 objektbilder, del 2/2, bilde to `jobber/rom091_del2av2/resultat.png`)
-- [ ] `lag091_02_del1av2` (rom 91 Påkledning, Sam (silhuetter), lag 02 med 3 objektbilder, del 1/2, bilde to `jobber/rom091_del1av2/resultat.png`)
-- [ ] `lag091_02_del2av2` (rom 91 Påkledning, Sam (silhuetter), lag 02 med 2 objektbilder, del 2/2, bilde to `jobber/rom091_del2av2/resultat.png`)
-- [ ] `lag091_03_del1av2` (rom 91 Påkledning, Sam (silhuetter), lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom091_del1av2/resultat.png`)
-- [ ] `ikon01` (ikonark 1 med 6 ikoner)
-- [ ] `ikon02` (ikonark 2 med 8 ikoner)
-- [ ] `ikon03` (ikonark 3 med 10 ikoner)
-- [ ] `ikon04` (ikonark 4 med 7 ikoner)
-- [ ] `ikon05` (ikonark 5 med 8 ikoner)
+- [x] `lag091_01_del1av2` (rom 91 Påkledning, Sam (silhuetter), lag 01 med 13 objektbilder, del 1/2, bilde to `jobber/rom091_del1av2/resultat.png`)
+- [x] `lag091_01_del2av2` (rom 91 Påkledning, Sam (silhuetter), lag 01 med 12 objektbilder, del 2/2, bilde to `jobber/rom091_del2av2/resultat.png`)
+- [x] `lag091_02_del1av2` (rom 91 Påkledning, Sam (silhuetter), lag 02 med 3 objektbilder, del 1/2, bilde to `jobber/rom091_del1av2/resultat.png`)
+- [x] `lag091_02_del2av2` (rom 91 Påkledning, Sam (silhuetter), lag 02 med 2 objektbilder, del 2/2, bilde to `jobber/rom091_del2av2/resultat.png`)
+- [x] `lag091_03_del1av2` (rom 91 Påkledning, Sam (silhuetter), lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom091_del1av2/resultat.png`)
+- [x] `ikon01` (ikonark 1 med 6 ikoner)
+- [x] `ikon02` (ikonark 2 med 8 ikoner)
+- [x] `ikon03` (ikonark 3 med 10 ikoner)
+- [x] `ikon04` (ikonark 4 med 7 ikoner)
+- [x] `ikon05` (ikonark 5 med 8 ikoner)
 
 ## Bestilling 52
 
@@ -3529,3 +3529,5 @@ Bestilling 47: ni lag levert OK med 47 egne felt, to byte-identiske panoramaover
 Bestilling 48: ni antrekkslag levert OK med 35 egne felt, korrekt LeChuck Pizza og rettet revnet bukseben. Lag071_05 avventer motivavklaring. Se `rapporter/bestilling048-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
 
 Bestilling 49: åtte lag levert med ni OK-felt; fire OK og fire SJEKK på arvet underlagsavvik. 077-tilstander, snøkulegrep og 1¢-maske er kontrollert. Lag071_15 og lag083_01 avventer motivavklaring. Se `rapporter/bestilling049-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+
+Bestilling 51: fem 091-lag og fem ikonark levert, åtte OK og to SJEKK. 67 ikke-tomme felt OK og tre tomme felt bevist. To 416-pikslers overlapper er identiske; 850-komposisjonen og alle ikonmotiver er kontrollert. Se `rapporter/bestilling051-20261013/RAPPORT.md`. HD-arbeidet fortsetter.

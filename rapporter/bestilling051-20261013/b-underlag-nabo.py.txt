@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess
+r=Path('rapporter/bestilling051-20261013');base=Image.open('jobber/rom091_del1av2/resultat.png').convert('RGB');source=np.array(Image.open('jobber/lag091_03_del1av2/referanse.png').convert('RGB'));sourcebase=np.array(Image.open('jobber/rom091_del1av2/referanse.png').convert('RGB'));rects=[(480,368,160,96),(608,368,224,224),(576,496,160,160)]
+# Hele NYE naborektangler, source kun read-only likhetsbevis. Ingen kildemasker.
+for x,y,w,h in rects:assert np.array_equal(source[y:y+h,x:x+w],sourcebase[y:y+h,x:x+w])
+for p in [Path('jobber/lag091_03_del1av2/resultat.png'),r/'b-091-03-hd-underlag-tonet.png']:
+ im=Image.open(p).convert('RGB');before=np.array(im);im.save(r/('b-091-03-for-naboretting.png' if p.parent.name=='lag091_03_del1av2' else 'b-underlag-for-naboretting.png'))
+ for x,y,w,h in rects:im.paste(base.crop((x,y,x+w,y+h)),(x,y))
+ im.save(p)
+p=Path('jobber/lag091_03_del1av2/resultat.png');(r/'b-underlag-nabobevis.json').write_text(json.dumps({'nye_hd_rektangler':rects,'original_pikseldifferanse_i_rektanglene':0,'resultat_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'originalmasker':False},indent=2));run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p)],capture_output=True,text=True);(r/'b-lag091_03_del1av2-kontroll01.txt').write_text(run.stdout+run.stderr)

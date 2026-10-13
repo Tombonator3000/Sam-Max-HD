@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,subprocess,hashlib,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+data=json.loads((r/'a-ikon-feltbevis.json').read_text());out=[]
+for n in range(1,7):
+ j=f'ikon{n:02d}';rr=root/f'rapporter/bestilling{51 if n<=5 else 52:03d}-20261013';raw=rr/f'a-{j}-raa{3 if n==2 else 1:02d}.png';d=root/'jobber'/j
+ if not raw.exists():continue
+ g=np.array(Image.open(raw).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS))
+ if n==1 and (rr/'a-ikon01-raa02.png').exists():
+  newer=np.array(Image.open(rr/'a-ikon01-raa02.png').convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS));g[720:944,784:1328]=newer[720:944,784:1328]
+  if (rr/'a-ikon01-dinosaur-raa03.png').exists():g[272:368,80:176]=np.array(Image.open(rr/'a-ikon01-dinosaur-raa03.png').convert('RGB').resize((96,96),Image.Resampling.LANCZOS))
+ a=np.full((1024,1536,3),128,dtype=np.uint8);a[32:992,64:1472]=[255,0,255];records=[]
+ for e in data['felt']:
+  if e['jobb']!=j:continue
+  x,y,w,h=e['rekt'];X=64+x*4;Y=32+y*4;W=w*4;H=h*4
+  if not e['synlige_piksler']:records.append({'objekt':e['bilde'],'tom':True});continue
+  x0=max(64,X-12);y0=max(32,Y-12);x1=min(1472,X+W+12);y1=min(992,Y+H+12);search=g[y0:y1,x0:x1];mag=(search[:,:,0]>200)&(search[:,:,2]>200)&(search[:,:,1]<80);yy,xx=np.where(~mag)
+  if not len(xx):raise ValueError(e['bilde']+' mangler')
+  nb=[int(xx.min()+x0),int(yy.min()+y0),int(xx.max()+1+x0),int(yy.max()+1+y0)];bx,by,bw,bh=e['synlig_bbox'];dest=[X+bx*4,Y+by*4,bw*4,bh*4]
+  p=np.array(Image.fromarray(g).crop(tuple(nb)).resize((dest[2],dest[3]),Image.Resampling.LANCZOS));mag=(p[:,:,0]>200)&(p[:,:,2]>200)&(p[:,:,1]<80);p[mag]=[255,0,255];a[dest[1]:dest[1]+dest[3],dest[0]:dest[0]+dest[2]]=p;records.append({'objekt':e['bilde'],'ny_bbox':nb,'maal_bbox':dest,'normalisert_ny_magenta':int(mag.sum())})
+ if n==3:
+  # Source-confirmed hue correction of NEW bottom stripe only, no geometry change.
+  patch=a[275:280,304:380];v=patch.max(axis=2).astype(float);patch[:]=np.stack([v*(219/255),v,v*(219/255)],axis=2).round().astype('uint8')
+ im=Image.fromarray(a);im.save(d/'resultat.png');m=json.loads((d/'jobb.json').read_text());part,_=c.part_of(im,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);obs=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];ec=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));obs.append({'bilde':o['bilde'],'korrelasjon':ec,'source_std':float(met['eo'][y:y+h,x:x+w].std())})
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(rr/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr)
+ entry={'jobb':j,'sha256':sha(d/'resultat.png'),'status':{0:'OK',1:'SJEKK',2:'FEIL'}.get(cp.returncode,'FEIL'),'maal':{k:v for k,v in met.items() if k not in ['eo','es'] and isinstance(v,(float,int,str))},'objekter':obs,'behandling':records};out.append(entry);print(j,entry['status'],entry['maal'],[(o['bilde'],round(o['korrelasjon'],3)) for o in obs])
+(r/'a-ikon-forelopig-kontroll.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')

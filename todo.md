@@ -97,3 +97,5 @@
 - [x] Levert 9 jobber i bestilling 48 med 35 faktiske feltkontroller.
 
 - [x] Levert 8 jobber i bestilling 49 med 9 faktiske feltkontroller.
+
+- [x] Levert 10 jobber i bestilling 51: fem lag og fem ikonark, 67 OK-felt og tre tomme felt.

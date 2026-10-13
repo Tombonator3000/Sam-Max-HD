@@ -347,3 +347,8 @@
 
 - Bestilling 49: åtte lag levert med ni OK-felt; fire OK og fire SJEKK på arvet underlagsavvik. 077-tilstander, snøkulegrep og 1¢-maske er kontrollert. Lag071_15 og lag083_01 avventer motivavklaring. Se `rapporter/bestilling049-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T00:45:31+02:00 (Codex, Astra)
+
+- Bestilling 51: fem 091-lag og fem ikonark levert, åtte OK og to SJEKK. 67 ikke-tomme felt OK og tre tomme felt bevist. To 416-pikslers overlapper er identiske; 850-komposisjonen og alle ikonmotiver er kontrollert. Se `rapporter/bestilling051-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

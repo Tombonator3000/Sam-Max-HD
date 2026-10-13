@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess,shutil
+from collections import deque
+r=Path('rapporter/bestilling051-20261013');p=Path('jobber/lag091_03_del1av2/resultat.png');shutil.copy2(p,r/'b-091-03-for-underlagstone.png');im=Image.open(p).convert('RGB');a=np.array(im);before=a.copy();crop=a[368:912,352:832].astype(float)
+# Fargevalg kun på kopiert NYTT850. Ingen originalkontur eller originalmaske.
+m=(crop[:,:,0]>100)&(crop[:,:,0]<195)&(crop[:,:,1]>100)&(crop[:,:,1]<195)&(crop[:,:,2]-crop[:,:,0]>12)&(crop[:,:,2]-crop[:,:,1]>17)&(abs(crop[:,:,0]-crop[:,:,1])<17)
+# Behold bare sammenhengende ny grålilla surfefraværsform. Startpunkt er inne i det genererte brettet.
+seen=np.zeros(m.shape,bool);q=deque([(130,120)])
+while q:
+ y,x=q.popleft()
+ if y<0 or x<0 or y>=544 or x>=480 or seen[y,x] or not m[y,x]:continue
+ seen[y,x]=True;q.extend([(y-1,x),(y+1,x),(y,x-1),(y,x+1)])
+assert seen.sum()>20000
+crop[seen]=(167,159,191);a[368:912,352:832]=crop.astype('uint8');Image.fromarray(a).save(p)
+diff=np.any(a!=before,axis=2);yy,xx=np.where(diff);outside=diff.copy();outside[368:912,352:832]=False;assert not outside.any()
+(r/'b-underlag-tone-bevis.json').write_text(json.dumps({'underlag_fil':'jobber/obj850_01/resultat.png','underlag_sha256':hashlib.sha256(Path('jobber/obj850_01/resultat.png').read_bytes()).hexdigest(),'kopiert_underlag':[352,368,480,544],'endret_antall':int(diff.sum()),'diff_bbox':[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],'utenfor_underlag':0,'farge':[167,159,191],'maskegrunnlag':'bare farge og sammenheng i NYTT kopiert underlag','resultat_sha256':hashlib.sha256(p.read_bytes()).hexdigest()},indent=2))
+# Reproduserbar faktisk basis til utenfor-egetfelt-kontroll: samme nytt-til-nytt behandling på underlaget, separat fra847.
+base=np.array(Image.open(r/'b-091-03-hd-underlag.png').convert('RGB'));view=base[368:912,352:832];view[seen]=(167,159,191);Image.fromarray(base).save(r/'b-091-03-hd-underlag-tonet.png')
+run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p)],capture_output=True,text=True);(r/'b-lag091_03_del1av2-kontroll01.txt').write_text(run.stdout+run.stderr);print(run.stdout)

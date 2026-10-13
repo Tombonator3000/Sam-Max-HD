@@ -1,0 +1,23 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+This picture is a sheet of small pictures from the game: cursor pictures, inventory and conversation icons, and small parts that the game draws on top of the screen (signs, scenery pieces, panels). They are laid out on a plain flat magenta background (#FF00FF) that is not part of them, inside the gray border. Paint every picture faithfully by the rules above, each one on its own. The pictures are cut out of your image afterwards by their exact position, so every picture must stay exactly where it is, with the same size, outline, colors and lettering. Pictures next to each other are often states of the same item (for example normal and highlighted): keep everything they have in common identical. Keep the background plain, flat and the same color everywhere, with no frames, grid, shadows or glow around the pictures.
+
+If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image.
+
+SEPARATE COMPONENT OVERRIDE: image1 is ONLY the original24x24 dinosaur-head crop extracted from the atlas and enlarged for reading. For this component attempt output a square1024x1024 rendering of this exact crop, filling all bounds. It will be precisely resized to96x96 in the atlas. Image2 supplies painted style only. This is a teal dinosaur statue's CROPPED SNOUT AND OPEN JAW with dark green-black background. The upper head is cropped off the right edge. There is NO VISIBLE EYE, NO NOSTRIL, NO TOOTH ROW in this crop. Absolutely no new eyes, eye socket, rounded eye bump, nostril, teeth, horns or scales. The TOP EDGE OF THE BLUE-GREEN SHAPE IS A BROAD LOW FLAT HORIZONTAL PLANE interrupted by the source's rectangular rise near the right, NOT a round eye hump. Smooth angular contour and large simple planes, exactly the source geometry. Gray lavender thick curved lower jaw, black hollow mouth and slate teal upper broad snout. Preserve all original palette blocks, edge intersections and background corners, do not add a smile or living-animal expression. No labels or borders. High-definition painting, not a nearest-neighbor pixel enlargement.

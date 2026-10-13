@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,csv,collections
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+reg={(int(e['objekt_id']),e['tilstand_hex']):e for e in csv.DictReader((root/'konsept/2026-10-12/objektbilder-959.csv').open())}
+locks={};fields=[];sheets=[];families=collections.defaultdict(list)
+for n in range(1,10):
+ j=f'ikon{n:02d}';d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB');a=np.array(im);bg=np.array(m['bakgrunn']);rec={'jobb':j,'canvas':m['lerret'],'motiv':m['bilde_i_lerret'],'original':list(im.size),'bakgrunn':m['bakgrunn'],'felter':len(m['objekter']),'rgba':Image.open(d/'referanse.png').mode,'magenta_piksler':int((a==bg).all(2).sum())};sheets.append(rec)
+ for f in ['original_1x.png','referanse.png','jobb.json','prompt.txt']:locks[str((d/f).relative_to(root))]=sha(d/f)
+ can=Image.new('RGB',(1200,((len(m['objekter'])+3)//4)*230),(195,195,195));dr=ImageDraw.Draw(can)
+ for i,o in enumerate(m['objekter']):
+  x,y,w,h=o['rekt'];crop=im.crop((x,y,x+w,y+h));aa=np.array(crop);mask=(aa!=bg).any(2);yy,xx=np.where(mask);colors,cnts=np.unique(aa[mask],axis=0,return_counts=True);idx=np.argsort(cnts)[::-1];rr=reg.get((o['objekt'],o['tilstand']),{})
+  e={'jobb':j,**o,'navn_register':rr.get('internt_originalnavn'),'original_register':rr,'synlig_bbox':None if not len(xx) else [int(xx.min()),int(yy.min()),int(xx.max()+1-xx.min()),int(yy.max()+1-yy.min())],'synlige_piksler':int(mask.sum()),'palett':len(colors),'toppfarger':[{'rgb':colors[k].tolist(),'antall':int(cnts[k])} for k in idx[:6]],'piksel_sha256':hashlib.sha256(aa.tobytes()).hexdigest()};fields.append(e);families[str(o['objekt'])].append(e)
+  X=(i%4)*300;Y=(i//4)*230;dr.text((X+4,Y+4),f'{i+1}: {o["bilde"]} r{o["rom"]}',fill='black');dr.text((X+4,Y+20),str(rr.get('internt_originalnavn','?'))[:40],fill='black');dr.text((X+4,Y+36),str(o['rekt']),fill='black');s=min(280/w,170/h);can.paste(crop.resize((round(w*s),round(h*s)),Image.Resampling.NEAREST),(X+5,Y+55))
+ can.save(r/f'a-{j}-felt.png')
+ dup=[e['bilde'] for e in fields if e['jobb']==j and e['synlige_piksler']==0];rec['tomme_felt']=dup
+fam=[]
+for obj,es in families.items():
+ if len(es)<2:continue
+ pairs=[]
+ for a,b in zip(es,es[1:]):
+  def ar(e):
+   x,y,w,h=e['rekt'];return np.array(Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop((x,y,x+w,y+h)))
+  aa,bb=ar(a),ar(b);pairs.append({'fra':a['bilde'],'til':b['bilde'],'samme_storrelse':aa.shape==bb.shape,'endrede_piksler':int(np.any(aa!=bb,axis=2).sum()) if aa.shape==bb.shape else None})
+ fam.append({'objekt':obj,'tilstander':len(es),'par':pairs})
+(r/'a-ikon-kildehash.json').write_text(json.dumps(locks,indent=2)+'\n')
+(r/'a-ikon-feltbevis.json').write_text(json.dumps({'ark':sheets,'felt':fields,'familier':fam},ensure_ascii=False,indent=2)+'\n')
+for n in range(1,10):
+ print('\nikon',n)
+ for e in fields:
+  if e['jobb']==f'ikon{n:02d}':print(e['bilde'],e['rom'],e['navn_register'],e['rekt'],e['synlige_piksler'])

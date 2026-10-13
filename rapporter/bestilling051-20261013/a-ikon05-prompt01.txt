@@ -1,0 +1,35 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+This picture is a sheet of small pictures from the game: cursor pictures, inventory and conversation icons, and small parts that the game draws on top of the screen (signs, scenery pieces, panels). They are laid out on a plain flat magenta background (#FF00FF) that is not part of them, inside the gray border. Paint every picture faithfully by the rules above, each one on its own. The pictures are cut out of your image afterwards by their exact position, so every picture must stay exactly where it is, with the same size, outline, colors and lettering. Pictures next to each other are often states of the same item (for example normal and highlighted): keep everything they have in common identical. Keep the background plain, flat and the same color everywhere, with no frames, grid, shadows or glow around the pictures.
+
+If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image.
+
+
+SEPARATE SOURCE CLARIFICATION, authoritative atlas-specific constraints:
+Image 1 is the exact original atlas to redraw, not a continuous room. Image 2 is approved ink/paint style only, never import its office, props or warm colors. Output exactly 1536x1024 RGB. Source picture bounds are [64,32,1408,960] pixels. Inside is perfectly flat #FF00FF magenta except the actual separate pictures. Outside is perfectly flat #808080. Each source pixel is exactly 4 output pixels. Preserve ALL individual bounding boxes and silhouettes including intentional partial/clipped pictures. Black inside pictures is actual content, not transparency. Do not connect separate tiles into a landscape. No new labels, tile borders or highlights outside artwork. Modern smooth hand-painted linework, no pixel-art upscale or added grain. Rectangles listed below are [x,y,width,height] in OUTPUT pixels and are hard placement constraints. Use the original for every precise detail.
+obj796_01 [80,48,256,352]: Kildeeget blått himmel-/grønt sletteutsnitt, bevar sky/tre/flekk og avkutting.
+obj797_01 [368,48,128,352]: Kildeeget blått himmel-/grønt skogutsnitt med graner og avkutting.
+obj798_01 [528,48,128,352]: Kildeeget blått himmel-/grønt skogutsnitt med graner og avkutting.
+obj799_01 [688,48,160,352]: Kildeeget blått himmel-/grønt skogutsnitt med graner og avkutting.
+obj800_01 [880,48,288,352]: Kildeeget blått himmel-/grønt skogutsnitt med graner og avkutting.
+obj801_01 [1200,48,160,352]: Kildeeget blått himmel-/grønt skogutsnitt med graner og avkutting.
+obj802_01 [80,432,608,352]: Haug av grå svarte dekk med flamme og stor mørk røyk over skogen.
+obj803_01 [720,432,448,352]: Hvite lys-/sirkelgrupper på himmel over elvedal; ikke stjerner tilfeldig plassert.
+Each rectangular landscape crop is fully opaque and has its own exact composition, blue sky and green forest. No new panorama and no merging rectangular pictures. Preserve source cropping at every border. White highlights/clouds and black tree shadows are content.
+The wide bottom-left picture is a pile of recognizable dark gray tires burning with tiny yellow/orange flame and black smoke, not a volcano. Bottom-right white lights retain exactly the source clusters and circular strokes over the winding river valley; do not invent a starry sky.

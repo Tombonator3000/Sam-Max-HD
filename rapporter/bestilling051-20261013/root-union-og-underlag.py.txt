@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+root=Path.cwd();r=root/'rapporter/bestilling051-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def im(j,f='original_1x.png'):return Image.open(root/'jobber'/j/f).convert('RGB')
+def m(j):return json.loads((root/'jobber'/j/'jobb.json').read_text())
+proof=[]
+for state in ['01','02']:
+ js=[f'lag091_{state}_del{i}av2' for i in [1,2]];a,b=map(im,js);assert a.crop((280,0,384,200)).tobytes()==b.crop((0,0,104,200)).tobytes()
+ union=[o for j in js for o in m(j)['objekter']]
+ for j in js:
+  rx,ry,w,h=m(j)['region'];mask=np.zeros((h,w),bool)
+  for o in union:
+   x,y,ow,oh=o['rekt'];x0,y0=max(0,x-rx),max(0,y-ry);x1,y1=min(w,x-rx+ow),min(h,y-ry+oh)
+   if x1>x0 and y1>y0:mask[y0:y1,x0:x1]=True
+  diff=np.any(np.asarray(im(j))!=np.asarray(im('rom091_del'+str(m(j)['del_nr'])+'av2')),axis=2);assert not np.any(diff&~mask)
+  proof.append({'jobb':j,'egne_felt':len(m(j)['objekter']),'felles_tilstandsunion':len(union),'kilde_utenfor_fellesunion':0,'kildeoverlapp_bredde':104,'hd_overlapp_bredde':416,'master_storrelse':[2656,800]})
+a=im('rom091_del1av2');a.paste(im('obj850_01'),(88,64));b=im('lag091_03_del1av2');diff=np.any(np.asarray(a)!=np.asarray(b),axis=2);mask=np.zeros((200,384),bool);mask[:104,:104]=True;assert not np.any(diff&~mask)
+proof.append({'jobb':'lag091_03_del1av2','underlag':'obj850_01','underlag_sha256':sha(root/'jobber/obj850_01/resultat.png'),'original_plassering':[88,64],'hd_kutt':[528,240,480,544],'hd_plassering':[352,368,480,544],'utenfor_egne_felt_etter_underlag':0})
+(r/'root-union-og-underlag.json').write_text(json.dumps(proof,indent=2)+'\n')
+extra=[{'fil':f'jobber/{j}/{f}','sha256':sha(root/'jobber'/j/f)} for j in ['rom091_del1av2','rom091_del2av2','obj850_01'] for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']];(r/'root-ekstra-kildehash.json').write_text(json.dumps(extra,indent=2)+'\n')
+a=json.loads((r/'root-ankerhash.json').read_text());a['jobber/obj850_01/resultat.png']=sha(root/'jobber/obj850_01/resultat.png');(r/'root-ankerhash.json').write_text(json.dumps(a,indent=2)+'\n')
+print(json.dumps(proof))
