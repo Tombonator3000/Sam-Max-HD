@@ -56,7 +56,7 @@
 <body>
 <main>
   <h1>Lystest: dynamisk lys med normalkart og lysmaske</h1>
-  <p>Et testrom for det valgfrie lyset i HD-utgavene. Rommet og figuren er egen testgrafikk i samme stil som spillene (flate farger, mørk kontur), ikke grafikk fra spillene. Lyset regnes per piksel fra normalkartet. Det som lyser selv (lampepære, vindu), står i lysmasken og blir ikke skyggelagt. Ingen kastede skygger.</p>
+  <p>Et testrom for det valgfrie lyset i HD-utgavene. Trykk «Hent kontoret» for å prøve lyset i kontoret til Sam &amp; Max. Testrommet og testfiguren er egen testgrafikk i samme stil som spillene (flate farger, mørk kontur), ikke grafikk fra spillene. Lyset regnes per piksel fra normalkartet. Det som lyser selv (lampepære, vindu), står i lysmasken og blir ikke skyggelagt. Ingen kastede skygger.</p>
   <p class="small">Klikk eller trykk på gulvet for å flytte figuren. Lyset følger musen når «Musepeker» er på. <kbd>L</kbd> slår det dynamiske lyset av og på, <kbd>C</kbd> slår sammenligningen av og på, <kbd>Shift</kbd> + klikk flytter bordlampen.</p>
 
   <div id="scene">
@@ -88,6 +88,14 @@
     </fieldset>
 
     <fieldset>
+      <legend>Sam &amp; Max: kontoret</legend>
+      <p class="small">Henter kontoret (rom 7) og Sam og Max fra grenen <code>gpt-arbeid</code> i repoet. Grafikken ligger ikke på denne siden; den hentes når du trykker. HD-bildene fra stilpiloten brukes når de er levert, ellers originalen forstørret 4x. Sam &amp; Max tilhører Disney/Lucasfilm.</p>
+      <button class="primary" id="hentKontor">Hent kontoret</button>
+      <p class="small" id="kontorInfo" style="margin-top:6px"></p>
+      <p class="small">Max følger etter Sam. Flytt bordlampen med <kbd>Shift</kbd> + klikk eller dobbeltklikk.</p>
+    </fieldset>
+
+    <fieldset>
       <legend>Egne bilder (blir i nettleseren)</legend>
       <p class="small">Last inn et HD-rom for å prøve lyset på ekte grafikk. Bildene leses lokalt og sendes ingen steder. Uten normalkart lages et fra lysstyrken i bildet.</p>
       <label class="fil">Rom <input type="file" id="filRom" accept="image/*"></label>
@@ -95,7 +103,7 @@
       <label><input type="checkbox" id="gronnOpp" checked> Normalkartet har grønt opp (OpenGL)</label>
       <label class="fil">Lysmaske <input type="file" id="filMaske" accept="image/*"></label>
       <label class="slider">Mykhet <input type="range" id="mykhet" min="0" max="12" step="1" value="3"><output></output></label>
-      <label><input type="checkbox" id="visFigur" checked> Vis testfiguren</label>
+      <label><input type="checkbox" id="visFigur" checked> Vis figurene</label>
       <button id="tilbake">Tilbake til testrommet</button>
     </fieldset>
   </div>
@@ -407,23 +415,46 @@ function lagLag(sett, mykhet) {
   };
 }
 
+function lagLagFra(fargeCanvas, hoyde, maske, w, h) {
+  return { w, h, farge: texBilde(fargeCanvas), hoyde: texFlyt(hoyde, w, h), maske: texMaske(maske, w, h), normal: null };
+}
+
 // ---------- Tilstand ----------
 let rom, scene = { w: W0, h: H0, gulv: FLOOR_Y };
-const figurData = tegnFigur();
-const figur = { lag: lagLag(figurData.sett, 2), x: 420, y: 700, mx: 420, my: 700, skala: 1, retning: 1 };
+const testFigur = (() => { const d = tegnFigur(); return { lag: lagLag(d.sett, 2), ankerX: d.ankerX, ankerY: d.ankerY }; })();
+function nyFigur(grafikk, x, y, skala) {
+  return { ...grafikk, x, y, mx: x, my: y, skala, retning: 1, spor: [] };
+}
+let figurer = [nyFigur(testFigur, 420, 700, 1)];
+let figur = figurer[0];
 let mus = { x: 640, y: 300, inne: false };
+let kilde = "test";
 
 const lys = [
   { navn: "Bordlampe", paa: true, farge: "#ffd28a", styrke: 0.75, radius: 620, hoyde: 70, x: 945, y: 396, folger: null },
   { navn: "Musepeker", paa: true, farge: "#ffffff", styrke: 0.55, radius: 420, hoyde: 90, x: 640, y: 300, folger: "mus" },
   { navn: "Figuren (lommelykt)", paa: false, farge: "#bfe0ff", styrke: 0.9, radius: 360, hoyde: 60, x: 0, y: 0, folger: "figur" },
+  { navn: "Taklampe 2 (kontoret)", paa: false, farge: "#ffe2a8", styrke: 0.6, radius: 900, hoyde: 180, x: 0, y: 0, folger: null },
 ];
+const standardLys = lys.map((l) => ({ ...l }));
+function settLys(i, verdier) {
+  Object.assign(lys[i], verdier);
+  const boks = document.querySelectorAll("#lysliste .lys")[i];
+  if (!boks) return;
+  boks.querySelector(".navn").textContent = lys[i].navn;
+  for (const inp of boks.querySelectorAll("input")) {
+    const k = inp.dataset.k;
+    if (inp.type === "checkbox") inp.checked = lys[i][k]; else inp.value = lys[i][k];
+    inp.dispatchEvent(new Event("input"));
+  }
+}
 
 function byggTestrom() {
   rom = lagLag(tegnRom(), 4);
   scene = { w: W0, h: H0, gulv: FLOOR_Y };
-  lys[0].x = 945; lys[0].y = 396;
-  figur.skala = 1; figur.x = figur.mx = 420; figur.y = figur.my = 700;
+  for (let i = 0; i < lys.length; i++) settLys(i, { ...standardLys[i] });
+  figurer = [nyFigur(testFigur, 420, 700, 1)]; figur = figurer[0];
+  kilde = "test";
   settStorrelse();
 }
 function settStorrelse() { canvas.width = scene.w; canvas.height = scene.h; }
@@ -440,7 +471,7 @@ function hexTilRgb(hex) { const n = parseInt(hex.slice(1), 16); return [(n >> 16
 const liste = $("lysliste");
 lys.forEach((l, i) => {
   const d = document.createElement("div"); d.className = "lys";
-  d.innerHTML = `<div class="lysnavn"><input type="checkbox" ${l.paa ? "checked" : ""} data-k="paa"> ${l.navn}<input type="color" value="${l.farge}" data-k="farge"></div>
+  d.innerHTML = `<div class="lysnavn"><input type="checkbox" ${l.paa ? "checked" : ""} data-k="paa"> <span class="navn">${l.navn}</span><input type="color" value="${l.farge}" data-k="farge"></div>
     <label class="slider">Styrke <input type="range" min="0" max="2.5" step="0.01" value="${l.styrke}" data-k="styrke"><output></output></label>
     <label class="slider">Rekkevidde <input type="range" min="50" max="1400" step="10" value="${l.radius}" data-k="radius"><output></output></label>
     <label class="slider">Høyde <input type="range" min="5" max="300" step="1" value="${l.hoyde}" data-k="hoyde"><output></output></label>`;
@@ -504,20 +535,94 @@ async function byggEgetRom() {
   if (egne.normal) l.normal = texBilde(tilCtx(egne.normal, w, h).canvas);
   rom = l;
   scene = { w, h, gulv: h * 0.7 };
-  figur.skala = h / H0;
-  figur.x = figur.mx = w * 0.33; figur.y = figur.my = h * 0.88;
+  figurer = [nyFigur(testFigur, w * 0.33, h * 0.88, h / H0)]; figur = figurer[0];
+  kilde = "egen";
   lys[0].x = w * 0.5; lys[0].y = h * 0.3;
   settStorrelse();
 }
 $("filRom").addEventListener("change", async (e) => { if (e.target.files[0]) { egne.rom = await lesBilde(e.target.files[0]); await byggEgetRom(); } });
 $("filNormal").addEventListener("change", async (e) => { if (e.target.files[0]) { egne.normal = await lesBilde(e.target.files[0]); await byggEgetRom(); } });
 $("filMaske").addEventListener("change", async (e) => { if (e.target.files[0]) { egne.maske = await lesBilde(e.target.files[0]); await byggEgetRom(); } });
-$("mykhet").addEventListener("change", () => { if (egne.rom) byggEgetRom(); else { rom = lagLag(tegnRom(), verdi("mykhet")); } });
+$("mykhet").addEventListener("change", () => {
+  if (kilde === "egen") byggEgetRom(); else if (kilde === "kontoret") hentKontoret(); else rom = lagLag(tegnRom(), verdi("mykhet"));
+});
 $("tilbake").addEventListener("click", () => {
   egne = { rom: null, normal: null, maske: null };
   for (const id of ["filRom", "filNormal", "filMaske"]) $(id).value = "";
   byggTestrom();
 });
+
+// ---------- Sam & Max: kontoret hentes fra repoet ----------
+// Grafikken ligger i grenen gpt-arbeid i repoet og hentes først når man trykker på knappen.
+// Den ligger ikke på denne siden. Sam & Max tilhører Disney/Lucasfilm.
+const RAW = "https://raw.githubusercontent.com/Tombonator3000/Sam-Max-HD/gpt-arbeid/";
+async function hentBilde(sti, valgfri) {
+  const r = await fetch(RAW + sti, { cache: "no-cache" });
+  if (!r.ok) { if (valgfri) return null; throw new Error(`${sti}: ${r.status}`); }
+  return await createImageBitmap(await r.blob());
+}
+async function hentJson(sti) {
+  const r = await fetch(RAW + sti, { cache: "no-cache" });
+  if (!r.ok) throw new Error(`${sti}: ${r.status}`);
+  return await r.json();
+}
+// Figur fra hovedarket: én rute, fargenøkkelen blir gjennomsiktig, avrundet høyde fra omrisset
+function figurFraArk(bilde, boks, bg, skala) {
+  const [bx, by, bw, bh] = boks, w = bw * skala, h = bh * skala;
+  const { c, x } = lag(w, h);
+  x.imageSmoothingEnabled = false;
+  x.drawImage(bilde, bx, by, bw, bh, 0, 0, w, h);
+  const id = x.getImageData(0, 0, w, h), d = id.data, alfa = new Float32Array(w * h);
+  let bunn = 0;
+  for (let i = 0; i < w * h; i++) {
+    const nokkel = d[i * 4] === bg[0] && d[i * 4 + 1] === bg[1] && d[i * 4 + 2] === bg[2];
+    if (nokkel) d[i * 4 + 3] = 0; else { alfa[i] = 1; bunn = Math.max(bunn, Math.floor(i / w)); }
+  }
+  x.putImageData(id, 0, 0);
+  const rund = blur(alfa, w, h, 3 * skala), lum = blur(lysstyrke(x, w, h), w, h, 2);
+  const hoyde = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) hoyde[i] = alfa[i] ? Math.min(1, rund[i] * 0.85 + lum[i] * 0.15) : 0;
+  return { lag: lagLagFra(c, hoyde, new Float32Array(w * h), w, h), ankerX: w / 2, ankerY: bunn + 1 };
+}
+async function hentKontoret() {
+  const knapp = $("hentKontor"), info = $("kontorInfo");
+  knapp.disabled = true; info.textContent = "Henter fra repoet ...";
+  try {
+    const S = 4, deler = ["rom007_del1av2", "rom007_del2av2"];
+    const jobber = await Promise.all(deler.map((j) => hentJson(`jobber/${j}/jobb.json`)));
+    const [rw, rh] = jobber[0].rom_storrelse, w = rw * S, h = rh * S;
+    const { c, x } = lag(w, h);
+    x.imageSmoothingEnabled = false;
+    let hd = 0;
+    for (let i = 0; i < deler.length; i++) {
+      const j = jobber[i], [gx, gy, gw, gh] = j.region;
+      const ferdig = await hentBilde(`jobber/${deler[i]}/resultat.png`, true);
+      if (ferdig) { const [lx, ly, lw, lh] = j.bilde_i_lerret; x.imageSmoothingEnabled = true; x.drawImage(ferdig, lx, ly, lw, lh, gx * S, gy * S, gw * S, gh * S); x.imageSmoothingEnabled = false; hd++; }
+      else x.drawImage(await hentBilde(`jobber/${deler[i]}/original_1x.png`), 0, 0, gw, gh, gx * S, gy * S, gw * S, gh * S);
+    }
+    const myk = Math.max(4, verdi("mykhet") * 2);
+    rom = lagLagFra(c, blur(lysstyrke(x, w, h), w, h, myk), new Float32Array(w * h), w, h);
+    scene = { w, h, gulv: h * 0.68 };
+    const figs = [];
+    for (const navn of ["sam", "max"]) {
+      const j = await hentJson(`hovedark/${navn}/jobb.json`);
+      const ark = await hentBilde(`hovedark/${navn}/original_1x.png`);
+      figs.push(figurFraArk(ark, j.bokser[1], j.bakgrunn, S));   // rute 1: mot høyre; mot venstre speilvendes, som i spillet
+    }
+    figurer = [nyFigur(figs[0], w * 0.45, h * 0.9, 1), nyFigur(figs[1], w * 0.36, h * 0.92, 1)];
+    figur = figurer[0];
+    // de to taklampene i kontoret
+    settLys(0, { navn: "Taklampe 1", x: w * 0.291, y: h * 0.225, hoyde: 180, radius: 900, styrke: 0.6, farge: "#ffe2a8" });
+    settLys(3, { paa: true, x: w * 0.571, y: h * 0.18 });
+    kilde = "kontoret";
+    settStorrelse();
+    info.textContent = hd ? `Kontoret med HD-bilder fra piloten (${hd} av 2 deler). Sam og Max fra hovedarkene i originalen.`
+                          : "Kontoret og Sam og Max i originalgrafikken, forstørret 4x. HD-bildene kommer med når piloten er levert.";
+  } catch (e) {
+    info.textContent = "Klarte ikke å hente grafikken: " + e.message;
+  } finally { knapp.disabled = false; }
+}
+$("hentKontor").addEventListener("click", hentKontoret);
 
 // ---------- Tegning ----------
 function tegnLag(l, x, y, w, h, zBase, zSkala) {
@@ -535,15 +640,20 @@ function tegnLag(l, x, y, w, h, zBase, zSkala) {
 let sist = performance.now();
 function ramme(t) {
   const dt = Math.min(0.05, (t - sist) / 1000); sist = t;
-  // figuren går mot målet
-  const dx = figur.mx - figur.x, dy = figur.my - figur.y, d = Math.hypot(dx, dy);
-  const fart = 280 * figur.skala * dt;
-  if (d > 1) { figur.x += dx / d * Math.min(fart, d); figur.y += dy / d * Math.min(fart, d); if (Math.abs(dx) > 2) figur.retning = dx > 0 ? 1 : -1; }
-  // figurens størrelse etter dybden, som skalering i SCUMM
-  const dyp = 0.82 + 0.18 * (figur.y - scene.gulv) / (scene.h - scene.gulv);
-  const sk = figur.skala * dyp;
-  const fw = figur.lag.w * sk, fh = figur.lag.h * sk;
-  const fx = figur.x - figurData.ankerX * sk, fy = figur.y - figurData.ankerY * sk;
+  // figurene går mot målet; nummer to følger etter den første
+  figurer.forEach((f, i) => {
+    if (i > 0) {
+      const leder = figurer[i - 1];
+      const avstand = Math.hypot(leder.x - f.x, leder.y - f.y);
+      if (avstand > 150 * f.skala) { f.mx = leder.x - 110 * f.skala * leder.retning; f.my = leder.y + 6; }
+    }
+    const dx = f.mx - f.x, dy = f.my - f.y, d = Math.hypot(dx, dy);
+    const fart = 280 * f.skala * dt;
+    if (d > 1) { f.x += dx / d * Math.min(fart, d); f.y += dy / d * Math.min(fart, d); if (Math.abs(dx) > 2) f.retning = dx > 0 ? 1 : -1; }
+  });
+  // størrelse etter dybden, som skaleringen i SCUMM
+  const dypAv = (f) => f.skala * (0.82 + 0.18 * (f.y - scene.gulv) / Math.max(1, scene.h - scene.gulv));
+  const sk = dypAv(figur);
 
   if (mus.inne || !lys[1].x) { lys[1].x = mus.x; lys[1].y = mus.y; }
   lys[2].x = figur.x + 50 * sk * figur.retning; lys[2].y = figur.y - 250 * sk;
@@ -570,8 +680,12 @@ function ramme(t) {
 
   tegnLag(rom, 0, 0, scene.w, scene.h, 0, 60);
   if ($("visFigur").checked) {
-    if (figur.retning < 0) tegnLag(figur.lag, fx + fw, fy, -fw, fh, 40 * sk, 50 * sk);
-    else tegnLag(figur.lag, fx, fy, fw, fh, 40 * sk, 50 * sk);
+    for (const f of [...figurer].sort((a, b) => a.y - b.y)) {
+      const k = dypAv(f), fw = f.lag.w * k, fh = f.lag.h * k;
+      const fx = f.x - f.ankerX * k, fy = f.y - f.ankerY * k;
+      if (f.retning < 0) tegnLag(f.lag, fx + fw, fy, -fw, fh, 40 * k, 50 * k);
+      else tegnLag(f.lag, fx, fy, fw, fh, 40 * k, 50 * k);
+    }
   }
   $("status").textContent = $("paa").checked ? `Dynamisk lys på, ${aktive.length} lyskilder` : "Dynamisk lys av (originalen)";
   requestAnimationFrame(ramme);
