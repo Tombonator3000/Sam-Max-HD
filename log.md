@@ -23,3 +23,10 @@
 - Lagt inn Sam & Max-spesifikk Purcell-analyse og kildehenvisning. DOTT/Purcell skal ikke erstatte The Dig sine godkjente stilankere eller Zak sine personer/paletter.
 - Full analyse fra Sam & Max 12. oktober er bevart som datert case med fungerende lenker til riktig spill. Tekniske tall overføres ikke mellom spill.
 - Ingen ny bildegenerering eller spilltest i dokumentasjonsoppgaven. SHA-256, lokale dokumentlenker og git-diff kontrolleres før levering.
+
+## 2026-10-13 15:45 (Codex)
+
+- Tom ba om hovedark for Sam og Max. Laget fem Sam-forsøk og tre Max-forsøk med innebygd ChatGPT-bildegenerator; modellnavn ikke eksponert.
+- Levert de beste kandidatene som hovedark/sam.png og hovedark/max.png, med notater, benyttede prompter, kildehash, resultat-hash og kontroll i rapporter/hovedark-20261013/.
+- Begge har 1536 x 1024, RGBA, ekte alfa og fem visninger. Egenkontroll SJEKK, ingen FEIL i de valgte filene. Størrelse, bredde og plassering er fortsatt ikke helt kildetro; mål og begrensninger er dokumentert. Ikke godkjente stilankere.
+- Kryssene i GRAFIKKLISTE.md betyr at kandidatene er levert, ikke godkjent. status.csv og ORDRE.md er beholdt. Ingen andre pilotjobber, kodeendring, import eller spilltest. Eldre lokal stilpilot-mappe er urørt.

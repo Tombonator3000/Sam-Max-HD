@@ -15,3 +15,6 @@
 
 - [x] Lagret analysen og DOTT-/Purcell-grunnlaget i de tre repoene etter Toms bestilling 13. oktober.
 - [ ] Rett Bigfoot-streken og kontroller nye Sam/Max-prøver mot valgt Purcell-referanse før produksjonsbruk.
+
+- [x] Levert hovedarkskandidater for Sam og Max 13. oktober, med ekte alfa, notater og egenkontroll SJEKK.
+- [ ] Rett eller avklar gjenstående mål- og plasseringsavvik i hovedarkene før bruk som geometrisk fasit. Tom vurderer stilen.

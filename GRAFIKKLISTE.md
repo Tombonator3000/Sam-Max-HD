@@ -8,7 +8,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
-| Hovedark (Sam og Max) | 0 levert | 2 | Nå, i stilpiloten |
+| Hovedark (Sam og Max) | 2 kandidater levert, SJEKK | 2 | Nå, i stilpiloten |
 | Rombakgrunner | 0 | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 0 | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
@@ -19,8 +19,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 
 Hovedarkene for Sam og Max, kontoret og de første figurarkene. Tom godkjenner stilen før resten bestilles.
 
-- [ ] `hovedark/sam.png` (hovedark for Sam, referanse i `hovedark/sam/`)
-- [ ] `hovedark/max.png` (hovedark for Max, referanse i `hovedark/max/`)
+- [x] `hovedark/sam.png` (hovedark for Sam, referanse i `hovedark/sam/`; pilotkandidat levert 13. oktober, SJEKK på størrelse, ikke godkjent)
+- [x] `hovedark/max.png` (hovedark for Max, referanse i `hovedark/max/`; pilotkandidat levert 13. oktober, SJEKK på størrelse, ikke godkjent)
 - [ ] `rom007_del1av2` (rom 7 Kontoret, del 1/2) (pilot)
 - [ ] `rom007_del2av2` (rom 7 Kontoret, del 2/2) (pilot)
 - [ ] `fig002_01` (figurark 1 for Sam (kostyme 2), 9 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`) (pilot)
@@ -3422,4 +3422,4 @@ Figurark for Ildslukeren, Hette, Mann i rød skjorte.
 
 ## Ferdig
 
-Ingen ennå.
+Ingen godkjente produksjonsleveranser ennå. Hovedarkene er levert som pilotkandidater med SJEKK; se `rapporter/hovedark-20261013/RAPPORT.md`.

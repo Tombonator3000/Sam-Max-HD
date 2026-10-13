@@ -1,0 +1,20 @@
+Task: master character sheet (model sheet) for Sam from the 1993 adventure game Sam & Max Hit the Road (LucasArts), for a faithful HD remaster. Every later animation sheet of Sam gets this sheet as the reference for the design, so it must match the original exactly and be consistent with itself.
+
+Input: the attached image shows the original low-resolution frames of Sam, enlarged exactly 4x with hard pixel edges, on a plain flat magenta background (#FF00FF) inside a gray (#808080) border: standing, front, standing, right side, standing, back, standing, left side, and on the right a close-up frame of the face.
+
+Who it is: Sam, the dog detective (a big brown dog in a light blue-gray suit, white shirt, striped dark blue tie and a blue-gray fedora), standing, walking and talking.
+
+Draw on one sheet, in the clean high-resolution cartoon style of the game, like the characters of Day of the Tentacle Remastered next to their originals: trace the input frames and turn every cluster of pixels into the shape it shows, with bold dark outlines, flat colors with one shade and a few highlights, and no gradients, texture, dithering or pixel steps:
+- the full figure from the front, from the right side, from behind and from the left side, in the same standing poses as the input,
+- a close-up of the face, as in the close-up frame,
+- the same proportions as the input frames: the same height of head, body and legs, the same width, and the same size of eyes, nose, mouth, hands and feet. Use the input frames as the exact measure, so the figures on this sheet are 4 times the size of the input frames.
+
+Keep the design exactly: the same face, colors, clothes, hat, tie and every mark as in the input. Do not add accessories, logos, text, patterns or details that are not in the input, do not make the head bigger or the body slimmer, and do not modernize the design. Take the colors from the standing frames; the close-up comes from a scene with its own light and background, so use it for the shape of the face only.
+
+Output: one PNG image, exactly 1536 x 1024 pixels, with a fully transparent background (real alpha), the figures standing on one line and not touching each other. No labels, numbers or text on the sheet. Save it as hovedark/sam.png and write hovedark/sam-notat.md with tool, date, number of attempts and what was uncertain. Tom approves the sheet before it is used.
+
+
+Production clarification, overriding only the ambiguous wording above: Image 1 is the edit target. It is ALREADY enlarged to 4x. Keep the exact five drawings at the SAME positions and pixel sizes as in image 1. DO NOT enlarge them again or fill the canvas. Keep the very large empty margins as transparent alpha. Final canvas exactly 1536 x 1024. Remove both the gray and magenta background completely; no ground, no cast shadow, no grid. Four standing views and one face close-up, five distinct isolated drawings in total.
+Image 2 (Purcell color illustration) and image 3 (Purcell ink illustration) are supporting references for lively tapered linework and character identity ONLY. Do not copy their poses, accessories, markings, weapons or rat. The game edit target defines all clothing, details, colors, body proportions and poses. Follow the current ANALYSE.md correction: varied, moderately thin dark silhouette lines with lighter inner lines; do not use a uniformly heavy black sticker outline. Clean flat local color and one controlled shadow tone, no texture, no hatching, no gradient.
+The face close-up has special scene lighting and bits of scene background. Isolate only the visible head, face and visible ear parts, remove the scene background, and use the standing figure's normal local palette. Do not add a neck, shoulders, hat or other anatomy absent from that close-up.
+Exact allowed outer drawing boxes in the output canvas [left, top, width, height], in reading order, are [[224, 372, 192, 280], [448, 372, 160, 280], [640, 372, 180, 280], [852, 372, 160, 280], [1044, 444, 268, 208]]. Match these silhouettes and bounds, without labels or visible boxes. The standing figures have a shared foot line at y=652.

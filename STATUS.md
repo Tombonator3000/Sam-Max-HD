@@ -11,3 +11,7 @@ Ingen HD-konvertering, motorendring eller pipelineendring er gjort. Ingen commit
 ## Stilrettelse 13. oktober
 
 Se [ANALYSE.md](ANALYSE.md): tynnere Bigfoot-strek og Steve Purcell-referansene fra Tom. Dette dokumentasjonssteget lager ingen nye HD-ruter. Kandidatene er fortsatt ikke produksjonsgodkjent.
+
+## Hovedark 2026-10-13 15:47
+
+To hovedark er levert som pilotkandidater: hovedark/sam.png og hovedark/max.png, med notater, prompter, SHA-256 og kontroll i rapporter/hovedark-20261013/. Begge er PNG 1536 x 1024 med ekte alfa og fem visninger. Egenkontroll SJEKK, ingen FEIL i valgte kandidater. Sam er 5 til 7 prosent for høy i ståvisningene; Max 10 til 12 prosent for lav. Bredde og plassering er også dokumentert som avvik. Ikke godkjente stilankere eller ferdige produksjonsark. Ingen motorimport eller spilltest.
