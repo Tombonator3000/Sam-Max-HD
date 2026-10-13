@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling005-20261013';r.mkdir(exist_ok=True)
+extra=[]
+for room,n,w,starts in [('rom021',2,1920,[0,384]),('rom022',3,3168,[0,816,1632])]:
+    full=Image.new('RGB',(w,1024),(128,128,128))
+    prompts=[]
+    for part,x in enumerate(starts,1):
+        j=f'{room}_del{part}av{n}'
+        full.paste(Image.open(b/'jobber'/j/'referanse.png').convert('RGB').crop((0,112,1536,912)),(x,112))
+        prompts.append('Original prompt '+j+':\n'+(b/'jobber'/j/'prompt.txt').read_text())
+        if room=='rom022' and part>1:
+            for name in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+                path=b/'jobber'/j/name
+                extra.append({'fil':str(path.relative_to(b)),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+    full.save(r/(room+'-fullkilde.png'))
+    p='\n\n'.join(prompts)
+    p+=f'\n\nFullscene production clarification: these original part prompts are retained verbatim, but the editing target is ONE complete joined original panorama. Override only the per-part canvas instructions: output one {w}x1024 image, painted scene (0,112,{w},800), pure gray padding. Preserve entire panorama geometry. All delivery crops must come from this same master. Image2 is approved paint and line style only. Do not copy objects from image2.'
+    if room=='rom021':
+        p+=' Source: Tunnel of Love entrance facade. Preserve exactly TWO pink winged cupid sculptures on the left, their respective wings, bows, arrows and hearts, and ONE red horned winged devil above the rocky facade. Same facial expressions, anatomy, angles and scale as source. The facade lettering reads TUNNEL OF LOVE, with a HEART SHAPE standing for the O in LOVE. Do not replace the heart by a round letter O. Keep its uneven individual letter positions, rock openings, red platform, two stairs, backdrop tent and right foreground bin. No added statues, people, lamps or signs.'
+    else:
+        p+=' Source: Tunnel of Love dark-ride background. Keep the exact flat theatrical tableau identities and separate silhouettes; these are staged wall scenes, NOT new foreground people. From left: pale-blue skeleton/bone shapes in TWO boxes both labeled CORN DOGS; central cave tableau with green serpentine creature and TWO human figures (woman left and man right) as originally posed; one blue skeleton sweeping with orange broom; one large green monster carrying a red-haired woman, in front of orange palm shape and red HOT lettering; blue pipes and rectangular panel with its exact visible buttons; far-right castle tableau contains THREE figures: masked guitarist at left, small figure in basket at center and moustached heavy man at right. Preserve all original shapes, attire, objects, poses and number of figures. Do NOT replace humans with skeletons or add ghosts. Preserve black empty space, purple cave contours, water strips and cold blue/green/orange local lighting. No brightness boost. Copy CORN DOGS on both boxes and HOT exactly, no extra words. All three crops will eventually be taken from this SAME fullscene, so every part must be painted.'
+    (r/(room+'-prompt.txt')).write_text(p)
+(r/'b-ekstrakildehash-rom022.json').write_text(json.dumps(extra,indent=2)+'\n')

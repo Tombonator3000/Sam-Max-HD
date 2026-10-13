@@ -69,3 +69,10 @@
 - Bevart Human Enigmas kranhode og tom Bruno-isform. Wak-A-Rat har fem kildebaserte hull med riktig klubbokklusjon og tomme motorfelt. Reelle plasseringsfeil erstattet; ustabil FFT i felles blå bakgrunn rettet ved gjenbruk av nytegnet bakgrunn der originalene er byte-identiske, uten figurwarp eller terskelendring.
 - Rapport, råforsøk, prompter, oppskrifter og QA i rapporter/bestilling004-20261013/. Bestilling 3 sine ti PNG-SHA er verifisert fra GitHub. Bestilling 5 startet.
 - Ingen kode-/kildeendring, motorimport, spilltest eller individuell ny Tom-godkjenning.
+
+## 2026-10-13 18:22 (Codex, Astra)
+
+- Bestilling5 har8OK,1SJEKK(obj202_01) og1uavklartFEIL(obj187_05). Kandidaten05bevares med klar_for_mottak=false og ukrysset køpunkt; ingen kontrollutfall oppgraderes. Uavhengig produksjon fortsetter.
+- Blåbakgrunns-FFT undersøkt av root og uavhengig Astra-agent; hypotesen om ustabil korrelasjon er ikke bevist. Flere kildebaserte rettinger/raw er bevart, ingen figurwarp eller terskelendring.
+- Tunnel021 har identiskoverlapp; rom022 fellesmaster er låst for del1–3 og høyre kildegeometri rettet uten endring av del1/overlapp. Alle40beskyttede kilder uendret.
+- Rapport/diagnose/proveniens i rapporter/bestilling005-20261013/. Bestilling4s ti PNG-SHA verifisert fra GitHub. Ingen motorimport, spilltest, ny individuell godkjenning eller kode-/kildeendring.

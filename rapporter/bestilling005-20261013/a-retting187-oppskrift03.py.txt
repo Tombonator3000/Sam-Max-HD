@@ -1,0 +1,16 @@
+from PIL import Image
+from pathlib import Path
+import shutil,subprocess
+p=Path('rapporter/bestilling005-20261013')
+raw=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a/exec-fe458aa2-564b-42cf-ba35-8493d98a661f.png')
+shutil.copy2(raw,p/'a-retting187-raa03.png')
+im=Image.open(raw).convert('RGB')
+# Visible hard rectangular motif boundary, no local shape movements.
+part=im.crop((287,143,1249,870)).resize((832,640),Image.Resampling.LANCZOS)
+out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(part,(352,192))
+out.save(p/'a-retting187-kandidat03.png')
+shutil.copy2('jobber/obj187_05/resultat.png',p/'a-retting187-for-fullforsok.png')
+out.save('jobber/obj187_05/resultat.png')
+r=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py','jobber/obj187_05/resultat.png'],capture_output=True,text=True)
+(p/'a-retting187-kontroll03.txt').write_text(r.stdout+r.stderr)
+print(r.stdout)

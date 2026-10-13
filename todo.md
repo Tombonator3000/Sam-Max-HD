@@ -25,4 +25,6 @@
 - [x] Fullfør bestilling 2 med ti kildekontrollerte HD-bilder, egne notater, egenkontroll OK og byte-identisk gateoverlapp. Se rapporter/bestilling002-20261013/RAPPORT.md.
 - [x] Fullfør bestilling 3 med ti bilder, kildehash, rettet skilttekst og identisk overlapp i tre rompar.
 - [x] Fullfør bestilling 4 med ti bilder, kildeavklarte utstillinger, minispilltilstander og identisk romoverlapp.
-- [ ] Fortsett bestilling 5 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert ni bilder i bestilling5: åtte OK og obj202_01 med SJEKK.
+- [ ] Avklar obj187_05 med egenkontroll FEIL etter dokumenterte rettforsøk og uavhengig diagnose. Se rapporter/bestilling005-20261013/KONTROLL-AVVIK.md. Ikke klar for mottak.
+- [ ] Fortsett bestilling6/7 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

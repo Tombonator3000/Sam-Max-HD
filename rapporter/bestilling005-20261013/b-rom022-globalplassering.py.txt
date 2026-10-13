@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image
+import importlib.util,numpy as np
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling005-20261013'
+src=Image.open(r/'rom022-fullscene-forsok2.png').convert('RGB').crop((0,112,3168,912))
+# Global correction of the measured 1.04 percent horizontal compression.
+# Coherent scene registration only; no local warp or original pixel masking.
+scaled=src.resize((3201,795),Image.Resampling.LANCZOS)
+scene=Image.new('RGB',(3168,800),(0,0,0));scene.paste(scaled,(-4,0))
+full=Image.new('RGB',(3168,1024),(128,128,128));full.paste(scene,(0,112))
+full.save(r/'rom022-fullscene-rettet.png')
+s=importlib.util.spec_from_file_location('qa',b/'verktoy/sjekk_leveranse.py');q=importlib.util.module_from_spec(s);s.loader.exec_module(q)
+for i,x in enumerate([0,816,1632],1):
+ job=f'rom022_del{i}av3'
+ original=Image.open(b/'jobber'/job/'original_1x.png')
+ crop=scene.crop((x,0,x+1536,800))
+ m=q.compare(original,crop);lv,why=q.judge(m)
+ print(job,lv,{k:v for k,v in m.items() if k not in ['eo','es']})

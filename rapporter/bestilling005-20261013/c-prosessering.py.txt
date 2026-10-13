@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import json
+r=Path('rapporter/bestilling005-20261013')
+for j,n in [('obj187_05',2),('obj187_06',1),('rom019',1),('obj199_01',1),('obj202_01',2)]:
+    x,y,w,h=json.loads(Path('jobber',j,'jobb.json').read_text())['bilde_i_lerret']
+    a=Image.open(r/f'{j}-raa-{n}.png').convert('RGB')
+    c=Image.new('RGB',(1536,1024),(128,128,128))
+    c.paste(a.crop((x,y,x+w,y+h)),(x,y))
+    c.save(f'jobber/{j}/resultat.png')

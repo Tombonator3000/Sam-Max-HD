@@ -1,0 +1,81 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil,subprocess,numpy as np
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling005-20261013'
+mapping=json.loads("{\"rom021\":\"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-7553ec80-8acf-474b-ba4e-f7299afd5586.png\",\"rom022\":\"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-25800509-d239-4813-9db0-495d272d04a6.png\"}")
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+masters=[]
+for room,src in mapping.items():
+ w=1920 if room=='rom021' else 3168
+ raw=Image.open(src).convert('RGB')
+ shutil.copy2(src,r/(room+'-raaforsok1.png'))
+ im=raw.resize((w,1024),Image.Resampling.LANCZOS)
+ full=Image.new('RGB',(w,1024),(128,128,128));full.paste(im.crop((0,112,w,912)),(0,112))
+ master=r/(room+'-fullscene.png');full.save(master)
+ starts=[0,384] if room=='rom021' else [0,816,1632]
+ masters.append({'rom':room,'master':str(master.relative_to(b)),'sha256':sha(master),'raw_size':raw.size,'master_size':full.size,'region_y':112,'region_height':800,'crops':[{'jobb':f'{room}_del{i+1}av{len(starts)}','box':[x,0,x+1536,1024],'levert_na':room=='rom021' or i==0} for i,x in enumerate(starts)]})
+ for i,x in enumerate(starts):
+  if room=='rom022' and i>0:continue
+  full.crop((x,0,x+1536,1024)).save(b/'jobber'/f'{room}_del{i+1}av{len(starts)}'/'resultat.png')
+(r/'b-fullmaster-register.json').write_text(json.dumps(masters,ensure_ascii=False,indent=2)+'\n')
+a=np.asarray(Image.open(b/'jobber/rom021_del1av2/resultat.png'))
+c=np.asarray(Image.open(b/'jobber/rom021_del2av2/resultat.png'))
+assert np.array_equal(a[:,384:],c[:,:1152])
+jobs=['rom021_del1av2','rom021_del2av2','rom022_del1av3']
+rows=json.loads((r/'kildehash.json').read_text())
+selected=[a for a in rows if any('/'+j+'/' in a['fil'] for j in jobs)]
+assert len(selected)==12,len(selected)
+extras=json.loads((r/'b-ekstrakildehash-rom022.json').read_text())
+assert len(extras)==8
+assert all(sha(b/a['fil'])==a['sha256'] for a in selected+extras)
+out=[]
+for job in jobs:
+ dest=b/'jobber'/job/'resultat.png';room=job[:6]
+ p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(dest)],cwd=b,text=True,capture_output=True)
+ (r/(job+'-kontroll.txt')).write_text(p.stdout+p.stderr)
+ print(p.stdout)
+ e={'jobb':job,'resultat':str(dest.relative_to(b)),'sha256':sha(dest),'referanse_sha256':sha(b/'jobber'/job/'referanse.png'),'teknisk_kontroll':'OK' if p.returncode==0 else 'FEIL','visuell_egenkontroll':'Original og fullscene sammenlignet, store skilt og figurtelling kontrollert','runtime':False,'nybildegodkjenning':False,'forsok':1,'verktoy':'innebygd image_gen','eksakt_bildemodell':'ikke eksponert','fullmaster':str((r/(room+'-fullscene.png')).relative_to(b)),'fullmaster_sha256':sha(r/(room+'-fullscene.png'))}
+ out.append(e)
+ motif=('To rosa, vingede cupidfigurer og én rød hornet djevel over den skjeve steinfasaden. TUNNEL OF LOVE er bevart med hjerte som O i LOVE. Begge trapper, rød plattform, huleåpninger, telt og forgrunn er kontrollert.' if room=='rom021' else 'Mørk Tunnel of Love-kulisse. Første del viser tre stablede CORN DOGS-kasser, grønn slangeaktig skapning og to mennesker i hulekulissen, samt blått skjelett med kost. Hele masteren bevarer også grønt monster med kvinne, HOT-skilt, rør/panel og slottsscenen med tre figurer. Ingen identitetsnavn er gjettet; figurene er dokumentert som visuelle roller i attraksjonskulissen.')
+ note=f"""# {job}
+
+Dato: 13. oktober 2026. Ett fullsceneforsøk med innebygd image_gen. Eksakt modellnavn er ikke eksponert.
+
+## Kilde og motiv
+
+{motif}
+
+Kilden er beskyttet jobbmetadata og originalreferanse, lest med origin/main:docs/gpt-romnotater.csv. Alle originaldeler er sett før produksjon. Godkjent kontorbilde er kun stilstøtte. Originalprompter er bevart ordrett med avgrenset tillegg om fullscene, skilt, figurantall og identitet.
+
+## Leveranse
+
+Resultatet er1536x1024, scene [0,112,1536,800] og eksakt #808080 padding. Hele genererte panoramaet er normalisert med Lanczos til kildens fullsceneformat, uten lokal warp. Delene klippes fra én master. Rom021-overlapp1152 er byte-identisk.
+
+Rom022-fullmasteren er3168x1024. Bare del1 er levert i denne bestillingen. Del2 og del3 SKAL senere klippes fra samme SHA-låste master med x816 og x1632, ingen ny uavhengig generering. Register og klippeoppskrift finnes i rapporten.
+
+Referanse SHA-256: {e['referanse_sha256']}
+Resultat SHA-256: {e['sha256']}
+Fullmaster SHA-256: {e['fullmaster_sha256']}
+
+Uendret sjekk_leveranse.py: {e['teknisk_kontroll']}. Kontrollutdata er bevart i {job}-kontroll.txt. Tolv bestillingskilder og åtte ekstra kilder for rom022 del2/del3 er kontrollert uten avvik.
+
+Visuell egenkontroll omfatter original/fullscene, tydelige skilt og hovedfigurenes roller, antall og posisjoner. Små finger-, fjær-, tann- og plakat-/kulissedetaljer er tolket fra lave pikselmengder og er ikke bevist detaljidentiske. Jevnere skygger og overflateform enn originalen er synlig. Kontroll av spillets animerte objekter oppå disse bakgrunnene gjenstår.
+
+Runtime=false. Nybildegodkjenning=false. Ingen påstand om godkjent motorintegrasjon eller ny visuell godkjenning fra Tom.
+"""
+ (b/'jobber'/job/'notat.md').write_text(note)
+(r/'b-leveranser.json').write_text(json.dumps({'dato':'2026-10-13','leveranser':out,'fullmaster_register':'b-fullmaster-register.json'},ensure_ascii=False,indent=2)+'\n')
+(r/'b-kilde-qa.md').write_text("""# Kilde-QA for rom021 og rom022
+
+Rom021 viser inngangen til Tunnel of Love med to rosa vingede cupider, én rød hornet djevel, skjev steinfasade og TUNNEL OF LOVE med hjerte som O. Rom022 er en mørk kulisse med ulike horror-/eventyrtablåer. Sammenhengen er underholdningsattraksjonen, ikke nye personer i forgrunnen.
+
+Alle fem originaldeler er visuelt lest og knyttet til jobbmetadata. docs/gpt-romnotater.csv i origin/main bekrefter inngangsskiltet og CORN DOGS/HOT inne. Cupider, djevel, skjelett med kost, monster som bærer kvinne og slottstabåets tre figurer er beholdt som forskjellige motiv. Egennavn eller udokumentert fortelling er ikke lagt til.
+
+Originalpromptene er bevart med en nødvendig teknisk presisering for én felles fullscene. Rom021-master1920x1024 gir del1 ved x0 og del2 ved x384. Overlapp1152 er array_equal. Rom022-master3168x1024 kommer fra alle tre originaldeler og gir utsnitt ved x0,816,1632, bredde1536. Bare del1 er levert nå; de øvrige to skal klippes senere fra samme master. b-fullmaster-register.json låser masterens SHA og alle klippebokser.
+
+Tolv beskyttede kilder fra gjeldende bestilling og åtte ekstra fra rom022 del2/del3 matcher hashlåsene. Ingen beskyttede filer er endret. Ett innebygd bildeverktøyforsøk per fullscene; verktøyet oppgir ikke eksakt modellversjon.
+
+Visuell egenkontroll er ikke motor- eller brukergodkjenning. Små tegn/anatomidetaljer er tolkninger, mens skiltord, antall hovedfigurer og hovedgeometri er sammenlignet. Runtime=false og nybildegodkjenning=false. Ingen Git-, kode- eller globale dokumentmutasjoner er utført.
+""")

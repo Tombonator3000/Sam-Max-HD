@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 17:58 (norsk tid)
+Oppdatert 2026-10-13 18:22 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 15 rom levert (22 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 10 levert, egenkontroll OK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 18 hele rom og 1 delvis levert (27 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 14 levert, inkludert én SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -79,16 +79,16 @@ Rom 15, 16, 17, 18.
 
 Rom 18, 19, 20, 21, 22.
 
-- [ ] `obj187_05` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 05)
-- [ ] `obj187_06` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 06)
-- [ ] `rom019` (rom 19 Wak-A-Rat med Max (minispill))
-- [ ] `obj199_01` (rom 19 Wak-A-Rat med Max (minispill), objekt 199 tilstand 01)
-- [ ] `obj202_01` (rom 19 Wak-A-Rat med Max (minispill), objekt 202 tilstand 01)
-- [ ] `rom020` (rom 20 Trixies vogn, inne)
-- [ ] `obj204_01` (rom 20 Trixies vogn, inne, objekt 204 tilstand 01)
-- [ ] `rom021_del1av2` (rom 21 Tunnel of Love, inngangen, del 1/2)
-- [ ] `rom021_del2av2` (rom 21 Tunnel of Love, inngangen, del 2/2)
-- [ ] `rom022_del1av3` (rom 22 Tunnel of Love, inne, del 1/3)
+- [ ] `obj187_05` (arbeidskandidat med egenkontroll FEIL, ikke klar for mottak) (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 05)
+- [x] `obj187_06` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 06)
+- [x] `rom019` (rom 19 Wak-A-Rat med Max (minispill))
+- [x] `obj199_01` (rom 19 Wak-A-Rat med Max (minispill), objekt 199 tilstand 01)
+- [x] `obj202_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 19 Wak-A-Rat med Max (minispill), objekt 202 tilstand 01)
+- [x] `rom020` (rom 20 Trixies vogn, inne)
+- [x] `obj204_01` (rom 20 Trixies vogn, inne, objekt 204 tilstand 01)
+- [x] `rom021_del1av2` (rom 21 Tunnel of Love, inngangen, del 1/2)
+- [x] `rom021_del2av2` (rom 21 Tunnel of Love, inngangen, del 2/2)
+- [x] `rom022_del1av3` (rom 22 Tunnel of Love, inne, del 1/3)
 
 ## Bestilling 6
 
@@ -3429,3 +3429,5 @@ Bestilling 2 er levert med ti bilder og egenkontroll OK. Se `rapporter/bestillin
 Bestilling 3 er levert med ti bilder og egenkontroll OK, se `rapporter/bestilling003-20261013/RAPPORT.md`. Bestilling 4 er startet.
 
 Bestilling 4 er levert med ti bilder og egenkontroll OK, se `rapporter/bestilling004-20261013/RAPPORT.md`. Bestilling 5 er startet.
+
+Bestilling5:8OK,1SJEKK og1uavklartFEIL. Obj187_05 er ikke klar for mottak og forblir ukrysset. Se `rapporter/bestilling005-20261013/RAPPORT.md`. Uavhengig produksjon i bestilling6/7 fortsetter.

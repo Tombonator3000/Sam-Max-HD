@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,shutil,subprocess
+b=Path(__file__).resolve().parents[2];r=b/'rapporter/bestilling005-20261013'
+s=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a/exec-85cfdda8-c462-4185-9507-5e5fff0ac479.png')
+shutil.copy2(s,r/'rom020-forsok02.png')
+im=Image.open(s).convert('RGB').crop((128,112,1408,912));out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im,(128,112));out.save(b/'jobber/rom020/resultat.png')
+p=b/'jobber/obj204_01/resultat.png';out=Image.open(p).convert('RGB');part=np.array(out.crop((352,320,1184,704)))
+part=np.pad(part,((0,4),(0,0),(0,0)),mode='edge')[4:388];out.paste(Image.fromarray(part),(352,320));out.save(p)
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for id in ['rom020','obj204_01']:
+ run=subprocess.run([py,str(b/'verktoy/sjekk_leveranse.py'),str(b/f'jobber/{id}/resultat.png')],capture_output=True,text=True)
+ (r/f'{id}-kontroll.txt').write_text(run.stdout+run.stderr);print(run.stdout)

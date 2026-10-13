@@ -1,0 +1,65 @@
+{
+  "dato": "2026-10-13",
+  "leveranser": [
+    {
+      "jobb": "rom020",
+      "resultat": "jobber/rom020/resultat.png",
+      "sha256": "9059c5f05db03cd763c12e1aa387d2c3bf7c793284859e675f28d89ffc93e7d0",
+      "egenkontroll": "OK",
+      "kontrollfil": "rapporter/bestilling005-20261013/rom020-kontroll.txt",
+      "forsok": 2,
+      "modell": "Eksakt bildemodellversjon ikke eksponert",
+      "bilde_i_lerret": [
+        128,
+        112,
+        1280,
+        800
+      ],
+      "padding_rgb": [
+        128,
+        128,
+        128
+      ],
+      "kildehash": {
+        "referanse.png": "43e2579b88bfb29666ba2115f7fd0cdcaef2f0d202d5899b55a3151ff447ea31",
+        "original_1x.png": "3b855d47c68075f463031d3b7eba1b0900e3b888b650f254c5f87a709c004f07",
+        "prompt.txt": "f46f564d0de59e16c419994b72671ccf21ec86076fb32866da1d84c5710b16f9",
+        "jobb.json": "9f7008384de86f3bda0adfd5d6e3933d8d46193e7311bfb8b72e6a01569cce47"
+      },
+      "kildeanalyse": "Rom 20 har ingen levende figurer i bakgrunnen. Rosa seng, pute og garderobeskap, lilla gardiner, oransje benker, bord med lilla vase og hvite/gule blomster, hyllerekvisitter, veggplakater og blå boks med gul stjerne er kildemotivet. RICE er synlig på hylleboksen. Plakatene er beholdt som veggbilder. De små motivene er visuelt tolket fra originalen; navn/arter er ikke kildebekreftet.",
+      "etterbehandling": "To generatorforsøk. Første forsøk avvist for komposisjonsavvik: FEIL, skift 1.00, blokk 15.04, kantlikhet 0.33. Forsøk 2 brukte originalen igjen, med konkrete geometriankere. Andre råforsøk ble beskåret ved 128,112,1408,912 og satt tilbake på korrekt lerret med RGB128-padding. Endelig OK: skift 0.08, blokk 0.18, kantlikhet 0.97.",
+      "runtime_verifisert": false,
+      "tom_godkjent": false
+    },
+    {
+      "jobb": "obj204_01",
+      "resultat": "jobber/obj204_01/resultat.png",
+      "sha256": "f67d9661abc8c459c4a4a39a83aa5dfb29b4f96591379093b7df4fa84b48d9f0",
+      "egenkontroll": "OK",
+      "kontrollfil": "rapporter/bestilling005-20261013/obj204_01-kontroll.txt",
+      "forsok": 1,
+      "modell": "Eksakt bildemodellversjon ikke eksponert",
+      "bilde_i_lerret": [
+        352,
+        320,
+        832,
+        384
+      ],
+      "padding_rgb": [
+        128,
+        128,
+        128
+      ],
+      "kildehash": {
+        "referanse.png": "fc7b7a25e7dfbb28760b31e665675e26ed129c67a77f32b1575d2b4fc69639a7",
+        "original_1x.png": "5cce72810db5991a571eace28043a026bbcd62afc535763366ece93ce7b133ef",
+        "prompt.txt": "7da1e626de098c36d26e50c8d0da1b538773925d0514b216a63cb26c6b337198",
+        "jobb.json": "9b852c9529d774b8a586d9a2e7b9a18bae9b424af573c79a5c965662575a6b22"
+      },
+      "kildeanalyse": "Metadata plasserer objektet ved 8,104 med mål 208x96 i rom 20. Referansen viser den tomme sengen med rosa quiltet dyne, pute med frynser, hvitt laken, svarte og hvite gavler og del av benker/bord bak. Ingen person under dynen eller figur som skal fullføres. Sammenligning med tilsvarende utsnitt av romoriginalen viste 5568 avvikende originalpiksler, derfor ble objektkilden behandlet separat. Skriptutløseren til tilstand 01 er ikke undersøkt.",
+      "etterbehandling": "Ett generatorforsøk. Rektangel 278,280,1258,734 beskåret og skalert til 832x384 ved 352,320. Første kontroll SJEKK: skift 1.16, blokk 1.78, kantlikhet 0.74. Hele motivet ble flyttet 4 HD-piksler opp med kantforlengelse nederst. Endelig OK: skift 0.18, blokk 0.79, kantlikhet 0.89. Ingen originalpikselmaske brukt.",
+      "runtime_verifisert": false,
+      "tom_godkjent": false
+    }
+  ]
+}

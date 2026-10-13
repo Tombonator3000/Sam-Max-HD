@@ -1,0 +1,25 @@
+from PIL import Image
+import numpy as np,shutil,subprocess,hashlib,json
+from pathlib import Path
+p=Path('rapporter/bestilling005-20261013')
+raw=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a/exec-ce1dbbab-ffe0-4e4e-8f5c-cde498c3f58f.png')
+shutil.copy2(raw,p/'a-retting187-raa02.png')
+original=Image.open(p/'a-retting187-for.png').convert('RGB')
+new=Image.open(raw).convert('RGB')
+assert new.size==original.size==(1536,1024)
+box=(352,192,628,472)
+a=np.array(original.crop(box),dtype=float);b=np.array(new.crop(box),dtype=float)
+# Rectangular color transition confined inside allowed rectangle. No source pixel mask.
+h,w=a.shape[:2];yy,xx=np.mgrid[:h,:w]
+weight=np.minimum(np.clip((w-1-xx)/32,0,1),np.clip((h-1-yy)/32,0,1))[...,None]
+patch=np.rint(a*(1-weight)+b*weight).astype('uint8')
+out=original.copy();out.paste(Image.fromarray(patch),(352,192))
+out.save(p/'a-retting187-kandidat02.png')
+out.save('jobber/obj187_05/resultat.png')
+orig=np.array(original);arr=np.array(out);mask=np.ones(arr.shape[:2],bool);mask[192:472,352:628]=False
+assert np.array_equal(orig[mask],arr[mask])
+cmd=['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py','jobber/obj187_05/resultat.png']
+r=subprocess.run(cmd,capture_output=True,text=True)
+(p/'a-retting187-kontroll02.txt').write_text(r.stdout+r.stderr)
+print(r.stdout)
+print('sha256',hashlib.sha256(Path('jobber/obj187_05/resultat.png').read_bytes()).hexdigest())
