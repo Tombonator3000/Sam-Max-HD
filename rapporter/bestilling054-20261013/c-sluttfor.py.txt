@@ -1,0 +1,33 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+R=Path.cwd();O=R/'rapporter/bestilling054-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rel=lambda p:str(p.relative_to(R));P='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';cs=json.loads((O/'c-rutekart-kilde.json').read_text())['ruter'];proof=json.loads((O/'c-plasseringsbevis.json').read_text())
+clone=O/'c-partiell-kontroll/fig007_02';clone.mkdir(parents=True,exist_ok=True)
+j=json.loads((R/'jobber/fig007_02/jobb.json').read_text());j['ruter']=[c for c in j['ruter'] if c['animasjon']!=7];(clone/'jobb.json').write_text(json.dumps(j,indent=2)+'\n');shutil.copy2(O/'c-fig007_02-partiell.png',clone/'resultat.png')
+for f in ['original_1x.png','referanse.png']:shutil.copy2(R/'jobber/fig007_02'/f,clone/f)
+r=subprocess.run([P,'verktoy/sjekk_leveranse.py',str(clone/'resultat.png')],capture_output=True,text=True);(O/'c-fig007_02-partiell-kontroll.txt').write_text(r.stdout+r.stderr)
+locks=json.loads((O/'c-kildehash.json').read_text())['filer'];assert all(sha(R/p)==h for p,h in locks.items())
+proveniens=[]
+for n in ['03','04','05','06']:
+ raw=O/f'c-fig007_{n}-raa01.png';p=O/f'c-fig007_{n}-prompt01.txt';proveniens.append({'jobb':'fig007_'+n,'forsok':1,'verktøy':'innebygd ChatGPT imagegen','eksakt_modell':'ikke eksponert','raw':rel(raw),'raw_sha256':sha(raw),'prompt':rel(p),'prompt_sha256':sha(p)})
+(O/'c-proveniens.json').write_text(json.dumps({'kall':proveniens,'donor_commit':'03e56d0cbbb7815cfeb743fe006d3d0b8c730aec','donorbevis':'c-plasseringsbevis.json'},indent=2)+'\n')
+lever=[]
+for n in ['01','03','04','05','06']:
+ name='fig007_'+n;result=R/'jobber'/name/'resultat.png';control=O/f'c-{name}-kontroll.txt';status='SJEKK' if 'Utfall: SJEKK' in control.read_text() else 'OK';rec={'jobb':name,'resultat':rel(result),'sha256':sha(result),'egenkontroll':status,'kontrollfil':rel(control),'forsok':0 if n=='01' else 1,'runtime':False,'ny_brukergodkjenning':False,'klar_for_rotkontroll':True,'ruter':sum(c['jobb']==name for c in cs),'proveniens':rel(O/'c-proveniens.json')}
+ if n!='01':rec.update(next(x for x in proveniens if x['jobb']==name))
+ lever.append(rec);(R/'jobber'/name/'notat.md').write_text(f"# {name}\n\nBestilling 54. Sam, kostyme 7, kildebestemte fraskilte lag og egne poser. Resultat SHA-256: `{sha(result)}`. Uendret egenkontroll: **{status}**; se `{rel(control)}`.\n\n"+('Kildebevist gjenbruk av mottatte nye Sam 002-komponenter, med synlig boks og rel-plassering; ingen ny generering. ' if n=='01' else 'Ett innebygd ChatGPT imagegen-forsøk. Eksakt modellnavn er ikke eksponert. Ordrett jobbprompt med separat kildepresisering og godkjent Sam/pilot som identitetsanker. Nytegnede alfa-komponenter er helskalert til metadatafeltene; ingen originalkonturmasker. ')+"Råbilder, prompter, SHA og oppskrift finnes i `rapporter/bestilling054-20261013/c-proveniens.json` og `c-plasser.py.txt`.\n\nAlle relevante ruter og ti statiske rel-komposisjoner er sett. Dette er ikke runtime-/avspillingstest eller ny brukergodkjenning. Tre tynne armlag har dokumentert SJEKK: 1024 (0,63), 1410 (0,64), 1411 (0,74); glattere/bredere erme- og potekontur enn rasterkilden. Ingen størrelse-/plasseringsfeil. Se samlet kilde-QA for avgrensning og små ruter kontrollert visuelt.\n")
+partial=O/'c-fig007_02-partiell.png';held=[c['rute'] for c in cs if c['jobb']=='fig007_02' and c['animasjon']==7]
+(O/'c-leveranser.json').write_text(json.dumps({'leveranser':lever,'partiell':{'jobb':'fig007_02','resultat':rel(partial),'sha256':sha(partial),'klare_ruter':20,'avventer_ruter':held,'kontrollfil':rel(O/'c-fig007_02-partiell-kontroll.txt'),'ikke_hel_leveranse':True},'beskyttede_kilder':24,'kilder_uendret':True,'runtime':False,'ny_brukergodkjenning':False},indent=2)+'\n')
+(R/'jobber/fig007_02/notat.md').write_text('# fig007_02 — delvis klar\n\n20 kildebeviste nye donor-ruter er pakket i rapportens `c-fig007_02-partiell.png`. Fem a07-ruter '+str(held)+' avventer brukerens gestavklaring. Intet fullstendig resultat er levert i jobbmappen. Rapportklonens kontroll gjelder bare de 20 klare rutene, ikke hele arket. Runtime og ny brukergodkjenning er uverifisert.\n')
+(O/'c-kilde-qa.md').write_text('''# Sam 007 — samlet kilde- og motivkontroll
+
+109 ruter totalt: 45 dokumenterte nye donor-komponenter fra mottatt 002, 59 nytegnede ruter og fem a07 holdt. Alle 104 tilgjengelige ruter er visuelt gjennomgått i hele ark og de 59 nye i åtte original/HD-detaljark. Ti statiske rel-komposisjoner er kontrollert i c-rel-HD-sammensetting.png mot c-rel-sammensetting.png. Dette beviser ikke runtime, riktig animasjonstiming eller endelig brukergodkjenning.
+
+Sam beholder blågrå dress, mørkt stripet slips, hatt og brune bare poter. Ingen ny rekvisitt eller funksjonsnavn. 005 sine første tre hatter har luftgap; ørene varierer. Hode-/armløse felt og smale ermedeler er ikke fullført til nye hele figurer. 006 sine 1536/1664 er kildebeviste donorhode/-øyelokk, selv om lagnummeret skifter. 001 cel128 er pakket etter synlig boks og verdensrel, ikke den store kryssende rektangelen.
+
+Teknisk SJEKK beholdes for 003 cel1024 (IoU 0,63), 006 cel1410 (0,64) og1411 (0,74). Ny ermekant/pote er glattere og noe fyldigere enn de svært smale rasterlagene. Størrelse, høyde og sentrum stemmer; de statiske sammensettingene viser riktig armfeste og ingen ny rekvisitt. Dette er et konkret konturforbehold, ikke påstått pikselidentitet. Øvrige sjekkbare ruter er OK. Checkeren utelater enkelte svært små ruter: 001 har 23 faktiske mot 21 rapporterte, 006 har 16 mot15; disse små øyelokksfeltene er visuelt og med donorhash kontrollert separat.
+
+Nye finger-/tåbuer, lommekant og stoffrynker er tydeligere enn originalens få piksler. De er tegningsfortolkning, ikke ny kildebevist anatomi. De tre kroppslagenes sammensetting med donorhode og armene er kontrollert uten runtime. Alle 24 beskyttede kildefiler har uendrede SHA. Donorfiler er ikke endret. Donors svært svake magenta-RGB/alfa1-kantpiksler er arvet som dokumentert ved mottak av52.
+
+Proveniens: fire innebygde imagegen-kall, eksakt modell ikke eksponert. Promptfiler har originalprompt ordrett etterfulgt av kildepresisering. Råbilder er bevart. Presis plassering/alfaopprydding er utelukkende fra nygenererte komponenter; ingen originalkonturmaske eller geometriwarp. Oppskrifter c-plasser.py.txt og c-qa.py.txt.
+''')
+print([(r['jobb'],r['egenkontroll']) for r in lever]);print('partial',r.stdout if hasattr(r,'stdout') else 'see control')

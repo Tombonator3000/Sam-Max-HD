@@ -1,0 +1,33 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,sys
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();records=json.loads((r/'a-kildebevis.json').read_text())['ruter'];locks=json.loads((r/'a-kildehash.json').read_text())['filer'];assert all(sha(root/p)==h for p,h in locks.items())
+bm=json.loads((root/'rapporter/bestilling053-20261013/b-leveranser.json').read_text())['leveranser'];assert all(sha(root/e['resultat'])==e['sha256'] for e in bm)
+proof=[];manifest=[];qa=[]
+for name in ['fig005_01','fig005_02','fig005_03','fig235_01']:
+ out=Image.new('RGBA',(1536,1024));es=[e for e in records if e['jobb']==name];cells=[]
+ for e in es:
+  x,y,ex,ey=e['synlig'];w,h=ex-x,ey-y;tx,ty=64+x*4,32+y*4
+  if e['rute']==0:
+   donor=r/'a-cel000-plassert.png';sx,sy=tx,ty;donorcel=0;method='Ny cel000 med lokal imagegen-kinnretting'
+  else:
+   matches=e['samme_synlige_RGB_og_bakgrunnsmaske'];same=[v for v in matches if v['cel']==e['rute']];v=(same or matches)[0];donor=root/'jobber'/v['jobb']/'resultat.png';dc=next(c for c in json.loads((root/'jobber'/v['jobb']/'jobb.json').read_text())['ruter'] if c['rute']==v['cel']);sx,sy=64+dc['synlig'][0]*4,32+dc['synlig'][1]*4;donorcel=v['cel'];method='Bytegjenbruk av ny mottatt donor'
+  im=Image.open(donor);assert im.mode=='RGBA';p=im.crop((sx-12,sy-12,sx+w*4+12,sy+h*4+12));a=np.array(p);assert not np.concatenate([a[0,:,3],a[-1,:,3],a[:,0,3],a[:,-1,3]]).any(),(name,e['rute'],'margin')
+  out.paste(p,(tx-12,ty-12));new=out.crop((tx-12,ty-12,tx+w*4+12,ty+h*4+12));assert new.tobytes()==p.tobytes();ys,xs=np.nonzero(a[:,:,3]>=128);bbox=[int(xs.min()+tx-12),int(ys.min()+ty-12),int(xs.max()+tx-11),int(ys.max()+ty-11)]
+  cells.append({'cel':e['rute'],'donor':str(donor.relative_to(root)),'donorcel':donorcel,'donor_sha256':sha(donor),'RGBA_byteidentisk':True,'bbox_alfa_ge128':bbox,'metode':method,'originalmetadata':e['originalmetadata'],'utklipp_sha256':hashlib.sha256(p.tobytes()).hexdigest()});o=Image.open(root/'jobber'/name/'original_1x.png').crop((x,y,x+w,y+h));qa.append((name,e['rute'],o,p))
+ 
+ if name=='fig005_01':out=Image.open(root/'jobber/fig003_01/resultat.png').copy()
+ dest=root/'jobber'/name/'resultat.png';out.save(dest);cp=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(dest)],capture_output=True,text=True);log=cp.stdout+cp.stderr;(r/f'a-{name}-kontroll.txt').write_text(log);level='FEIL' if 'Utfall: FEIL' in log else 'SJEKK' if 'Utfall: SJEKK' in log else 'OK';assert level!='FEIL',log
+ manifest.append({'jobb':name,'resultat':str(dest.relative_to(root)),'sha256':sha(dest),'egenkontroll':level,'kontrollfil':str((r/f'a-{name}-kontroll.txt').relative_to(root)),'forsok':2 if name=='fig005_03' else 0,'mottak_commit':'1f1eb68ec6813f90ebda64917a38315f370f1df1','runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True});proof.append({'jobb':name,'ruter':cells})
+ (root/'jobber'/name/'notat.md').write_text(f"# {name}\n\n{len(cells)} ruter levert som ekte RGBA med transparent bakgrunn/padding. Kildeidentiske ruter gjenbrukt fra mottatt Max003, med egne målmetadata og byteidentiske nye celutklipp inkludert alfamargin. Cel000 i00503 er egen nytegning med innebygd imagegen og lokal kinnretting. Ingen originalmaske eller lokal warp. Eksakt bildemodell er ikke eksponert.\n\nSHA256: {sha(dest)}\n\nUendret checker: {level}. Se rapporter/bestilling054-20261013/a-celkart.json og a-kilde-qa.md for proveniens, individuelle bokser, øyelokk, rel og begrensninger. Runtime og ny individuell brukergodkjenning er ikke utført.\n")
+(r/'a-leveranser.json').write_text(json.dumps({'leveranser':manifest},ensure_ascii=False,indent=2)+'\n');(r/'a-celkart.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+can=Image.new('RGB',(1536,1024),(205,205,205))
+for i,e in enumerate(manifest):
+ im=Image.open(root/e['resultat']);bg=Image.new('RGBA',im.size,(205,205,205,255));bg.alpha_composite(im);can.paste(bg.convert('RGB').resize((768,512)),(i%2*768,i//2*512))
+can.save(r/'a-helscene-qa.png')
+for page in range((len(qa)+11)//12):
+ can=Image.new('RGB',(1600,1200),(205,205,205));dr=ImageDraw.Draw(can)
+ for i,(name,cel,o,p) in enumerate(qa[page*12:page*12+12]):
+  x=i%4*400;y=i//4*400;dr.text((x+3,y+4),f'{name} cel{cel}: original / ny',fill='black');o=o.resize((o.width*4,o.height*4),Image.Resampling.NEAREST);o.thumbnail((190,355));p.thumbnail((190,355));can.paste(o,(x+3,y+35));can.paste(p,(x+202,y+35),p)
+ can.save(r/f'a-levert-feltqa-{page+1}.png')
+print([(e['jobb'],e['egenkontroll'],e['sha256']) for e in manifest])

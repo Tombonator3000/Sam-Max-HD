@@ -1,0 +1,10 @@
+exec(open(str(__file__).replace('a-cel000-komposisjonsprove.py.txt','a-sammensetting.py.txt')).read().split('can=Image.new')[0])
+def plane(es):
+ p=Image.new('RGBA',(80,90))
+ for e in es:
+  m=e['originalmetadata'];p.alpha_composite(cut(e),(40+m['rel_x'],75+m['rel_y']))
+ a=np.array(p);a[a[:,:,3]==0,:3]=0;return a
+zero=next(v for v in rec if v['rute']==0);target=plane([zero]);body=next(v for v in rec if v['jobb']=='fig005_01' and v['rute']==129);results=[]
+for head in [v for v in rec if v['jobb']=='fig005_01' and v['lag']==3]:
+ p=plane([body,head]);diff=np.any(p!=target,2);ys,xs=np.nonzero(diff);results.append({'hode':head['rute'],'kropp':129,'endrede_RGBA_piksler':int(diff.sum()),'diff_bbox_rel_xyxy':[int(xs.min()-40),int(ys.min()-75),int(xs.max()+1-40),int(ys.max()+1-75)] if len(xs) else None})
+(r/'a-cel000-komposisjonsprove.json').write_text(json.dumps(results,indent=2)+'\n');print(sorted(results,key=lambda v:v['endrede_RGBA_piksler'])[:3])

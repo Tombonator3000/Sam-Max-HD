@@ -1,0 +1,11 @@
+"""Resume only Git receipt after own diagnostic logs had an extra blank EOF line.
+The queue, counts and logs were already updated once. Do not update them twice.
+Exact generator prompts and raw artifacts remain untouched.
+"""
+from pathlib import Path
+import json,runpy
+r=Path(__file__).resolve().parent;root=r.parents[1]
+for p in r.glob('fig*-root-kontroll.txt'):p.write_text(p.read_text().rstrip()+'\n')
+seal=runpy.run_path(str(root/'rapporter/bestilling051-20261013/root-git-mottak.py.txt'))['seal_and_push']
+entries=json.loads((r/'fremdrift.json').read_text())['leveranser']
+print(seal(r,entries,'GPT: 152 Sam og Max-ruter med kildetro kontroll, bestilling 54',allow_existing_index=True))

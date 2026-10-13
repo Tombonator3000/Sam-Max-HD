@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,shutil
+r=Path(__file__).resolve().parent
+old=Image.open(r/'a-cel000-raa01.png').convert('RGBA');new=Image.open(r/'a-cel000-raa02.png').convert('RGBA');assert old.size==new.size
+rect=(245,898,320,960);out=old.copy();out.paste(new.crop(rect),rect[:2]);out.save(r/'a-cel000-valgt-raa.png');a=np.array(old);b=np.array(out);mask=np.zeros(a.shape[:2],bool);mask[rect[1]:rect[3],rect[0]:rect[2]]=True;diff=np.any(a!=b,2);assert not diff[~mask].any()
+for f in ['a-cel000-komponent.png','a-cel000-plassert.png','a-cel000-kandidatqa.png','a-cel000-proveniens.json','a-cel000-delkontroll.txt']:shutil.copyfile(r/f,r/f.replace('a-cel000-','a-cel000-for-kinn-'))
+s=(r/'a-cel000-plasser.py.txt').read_text().replace("a-cel000-raa01.png","a-cel000-valgt-raa.png");exec(compile(s,str(r/'a-cel000-plasser.py.txt'),'exec'))
+(r/'a-cel000-kinnbevis.json').write_text(json.dumps({'raw_rekt_xyxy':rect,'endrede_RGBA_piksler':int(diff.sum()),'endrede_utenfor':int(diff[~mask].sum()),'metode':'Rektangulær bytekopi fra ny innebygd imagegen-edit inn i godkjent ny raw01. Resten uendret, deretter samme helskalering.','raw01_sha256':hashlib.sha256((r/'a-cel000-raa01.png').read_bytes()).hexdigest(),'raw02_sha256':hashlib.sha256((r/'a-cel000-raa02.png').read_bytes()).hexdigest(),'valgt_raw_sha256':hashlib.sha256((r/'a-cel000-valgt-raa.png').read_bytes()).hexdigest()},indent=2)+'\n')

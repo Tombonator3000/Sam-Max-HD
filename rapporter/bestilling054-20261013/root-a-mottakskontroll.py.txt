@@ -1,0 +1,41 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys,importlib.util
+from PIL import Image
+import numpy as np
+sys.dont_write_bytecode=True
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda n:json.loads((r/n).read_text())
+locks=read('a-kildehash.json')['filer'];assert len(locks)==16
+for p,h in {**locks,**read('a-konteksthash.json')}.items():assert sha(root/p)==h
+om=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text());manifest=read('a-leveranser.json')['leveranser'];proof=[];reused=0;new=0
+for e in manifest:
+ j=e['jobb'];p=root/e['resultat'];assert sha(p)==e['sha256'];im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024)
+ meta=json.loads((root/'jobber'/j/'jobb.json').read_text());cs=next(q for q in read('a-celkart.json') if q['jobb']==j)['ruter'];alpha=np.array(im)[:,:,3];used=np.zeros(alpha.shape,bool);cells=[]
+ for c in meta['ruter']:
+  cp=next(q for q in cs if q['cel']==c['rute']);x,y,X,Y=c['synlig'];tx,ty,tw,th=64+4*x,32+4*y,(X-x)*4,(Y-y)*4
+  used[max(0,ty-12):ty+th+12,max(0,tx-12):tx+tw+12]=True
+  donor=root/cp['donor'];assert sha(donor)==cp['donor_sha256']
+  if c['rute']==0:
+   assert j=='fig005_03';sx,sy=tx,ty;new+=1
+  else:
+   dm=json.loads((donor.parent/'jobb.json').read_text());dc=next(q for q in dm['ruter'] if q['rute']==cp['donorcel']);sx,sy=64+4*dc['synlig'][0],32+4*dc['synlig'][1]
+   original=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop(c['synlig']);old=Image.open(donor.parent/'original_1x.png').convert('RGB').crop(dc['synlig'])
+   assert original.size==old.size and original.tobytes()==old.tobytes()
+   cm=next(q for q in om[str(meta['kostyme'])]['cels'] if q['cel']==c['rute']);dcm=next(q for q in om[str(dm['kostyme'])]['cels'] if q['cel']==dc['rute'])
+   assert [cm['rel_x']+x-c['rekt'][0],cm['rel_y']+y-c['rekt'][1]]==[dcm['rel_x']+dc['synlig'][0]-dc['rekt'][0],dcm['rel_y']+dc['synlig'][1]-dc['rekt'][1]]
+   assert (X-x,Y-y)==(dc['synlig'][2]-dc['synlig'][0],dc['synlig'][3]-dc['synlig'][1]);reused+=1
+  a=Image.open(donor).convert('RGBA').crop((sx-12,sy-12,sx+tw+12,sy+th+12));b=im.crop((tx-12,ty-12,tx+tw+12,ty+th+12))
+  assert a.tobytes()==b.tobytes() and hashlib.sha256(a.tobytes()).hexdigest()==cp['utklipp_sha256']
+  cells.append({'cel':c['rute'],'RGBA_donor_byteidentisk':True,'source_RGB_og_synlig_origin_identisk':c['rute']!=0,'donor':cp['donor'],'donor_sha256':cp['donor_sha256'],'kjernepiksler':int((np.array(b)[:,:,3]>=128).sum())})
+ assert not np.any(alpha[~used])
+ px,py,pw,ph=meta['bilde_i_lerret'];padding=np.ones(alpha.shape,bool);padding[py:py+ph,px:px+pw]=False;assert not np.any(alpha[padding])
+ run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);assert 'Utfall: OK' in run.stdout
+ (r/f'{j}-root-kontroll.txt').write_text(run.stdout+run.stderr)
+ proof.append({'jobb':j,'sha256':sha(p),'status':'OK','ruter':cells,'padding_og_utenfor_rutevinduer_alfa_null':True})
+assert reused==67 and new==1
+# Local cheek edit: the retained generated raster differs only in the recorded rectangle.
+k=read('a-cel000-kinnbevis.json');raws={sha(p):p for p in r.glob('a-*.png')}
+for key in ['raw01_sha256','raw02_sha256','valgt_raw_sha256']:assert k[key] in raws
+a=np.array(Image.open(raws[k['raw01_sha256']]));b=np.array(Image.open(raws[k['valgt_raw_sha256']]));outside=np.ones(a.shape[:2],bool);x,y,X,Y=k['raw_rekt_xyxy'];outside[y:Y,x:X]=False
+assert not np.any(np.any(a!=b,axis=2)&outside)
+(r/'root-a-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':16,'gjenbrukte_ruter':67,'nye_ruter':1,'kinnretting_utenfor_rekt':0,'leveranser':proof,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('A: 68 cells OK; 67 source/world-origin/new-RGBA donor identities; cheek edit bounded')

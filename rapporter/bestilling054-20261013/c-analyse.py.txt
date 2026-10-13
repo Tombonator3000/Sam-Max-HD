@@ -1,0 +1,42 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFont
+import json,hashlib,collections
+R=Path.cwd();O=R/'rapporter/bestilling054-20261013';font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',13);M=json.loads((R/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();locks={};sam2=[];records=[];groups=collections.defaultdict(list)
+def get(k,n):
+ name=f'fig{k:03}_{n:02}';d=R/'jobber'/name;j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB');cs={c['cel']:c for c in M[str(k)]['cels']};out=[]
+ for c in j['ruter']:
+  s=c['synlig'];p=im.crop(s);v=cs[c['rute']];x,y,w,h=c['rekt'];origin=[v['rel_x']+s[0]-x,v['rel_y']+s[1]-y];sig=hashlib.sha256(p.tobytes()).hexdigest();out.append(({'jobb':name,**c,'celmetadata':v,'synlig_origin_i_verden':origin,'synlig_storrelse':list(p.size),'synlig_RGB_sha256':sig},p))
+ return j,out
+for n in range(1,8):sam2.extend(get(2,n)[1])
+for n in range(1,7):
+ j,arr=get(7,n)
+ for f in ['jobb.json','prompt.txt','referanse.png','original_1x.png']:
+  p=R/f'jobber/fig007_{n:02}'/f;locks[str(p.relative_to(R))]=sha(p)
+ for c,p in arr:
+  matches=[]
+  for d,q in sam2:
+   if p.size==q.size and c['synlig_RGB_sha256']==d['synlig_RGB_sha256']:
+    matches.append({'jobb':d['jobb'],'cel':d['rute'],'samme_lag':c['lag']==d['lag'],'samme_retning':c['retning']==d['retning'],'samme_synlig_origin':c['synlig_origin_i_verden']==d['synlig_origin_i_verden'],'origin_002':d['synlig_origin_i_verden'],'samme_celrekt':c['celmetadata']['w']==d['celmetadata']['w'] and c['celmetadata']['h']==d['celmetadata']['h'],'avventer_a07':d['animasjon']==7})
+  c['eksakte_synlige_002_treff']=matches;records.append(c);groups[(c['animasjon'],c['retning'],c['lag'])].append((c,p))
+for key,arr in groups.items():
+ cw,ch=300,350;out=Image.new('RGB',(min(5,len(arr))*cw,((len(arr)+4)//5)*ch),(225,225,225));dr=ImageDraw.Draw(out)
+ for ix,(c,p) in enumerate(arr):
+  x=(ix%5)*cw;y=(ix//5)*ch;dr.text((x+4,y+4),f"{c['jobb']} cel {c['rute']}",font=font,fill='black');dr.text((x+4,y+22),f"rel {c['celmetadata']['rel_x']},{c['celmetadata']['rel_y']} bbox {p.width}x{p.height}",font=font,fill='black');q=p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST);q.thumbnail((290,300));out.paste(q,(x+4,y+45))
+ out.save(O/f'c-sekvens-a{key[0]:02}-r{key[1]}-l{key[2]}.png')
+contact=Image.new('RGB',(1536,1536))
+for n in range(1,7):contact.paste(Image.open(R/f'jobber/fig007_{n:02}/referanse.png').resize((768,512)),(((n-1)%2)*768,((n-1)//2)*512))
+contact.save(O/'c-original-kontaktark.png');(O/'c-kildehash.json').write_text(json.dumps({'antall':len(locks),'filer':locks},indent=2)+'\n');(O/'c-rutekart-kilde.json').write_text(json.dumps({'ruter':records,'kostyme7':M['7'],'kostyme2_palett':M['2']['kostymepalett']},indent=2)+'\n')
+counts=[]
+for n in range(1,7):
+ rr=[c for c in records if c['jobb']==f'fig007_{n:02}'];counts.append({'jobb':f'fig007_{n:02}','ruter':len(rr),'eksakt_synlig_RGB':sum(bool(c['eksakte_synlige_002_treff']) for c in rr),'grupper':dict(collections.Counter(str((c['animasjon'],c['retning'],c['lag'])) for c in rr))})
+(O/'c-sammendrag.json').write_text(json.dumps(counts,indent=2)+'\n');print(json.dumps(counts,indent=2));print('matches',sum(bool(c['eksakte_synlige_002_treff']) for c in records),'/',len(records));print('rel differences',[(c['rute'],c['eksakte_synlige_002_treff']) for c in records if c['eksakte_synlige_002_treff'] and not any(x['samme_synlig_origin'] for x in c['eksakte_synlige_002_treff'])])
+# Kildekomposisjoner er statiske rel-kontroller, ikke antatt tidskobling.
+lookup={c['rute']:(c,p) for arr in groups.values() for c,p in arr};cases=[[179,1024,1152,385],[179,1027,1155,385],[179,1030,1158,385],[0,385],[9,385],[14,385],[178,1281,1408,385],[178,1285,1414,1536],[178,1287,1416,1536],[179,768,1412,1536]]
+out=Image.new('RGB',(1800,800),(230,230,230));dr=ImageDraw.Draw(out)
+for ix,ids in enumerate(cases):
+ canvas=Image.new('RGBA',(90,90))
+ for id in ids:
+  c,p=lookup[id];a=p.convert('RGBA');a.putdata([(r,g,b,0 if (r,g,b)==(255,0,255) else 255) for r,g,b,_ in a.getdata()]);ox,oy=c['synlig_origin_i_verden'];canvas.alpha_composite(a,(40+ox,82+oy))
+ x=(ix%5)*360;y=(ix//5)*400;dr.text((x+3,y+5),str(ids),font=font,fill='black');p=canvas.resize((360,360),Image.Resampling.NEAREST);out.paste(p,(x,y+30),p)
+out.save(O/'c-rel-sammensetting.png')
+(O/'c-ekstra-kildehash.json').write_text(json.dumps({'filer':{str(p.relative_to(R)):sha(p) for p in [R/'konsept/2026-10-12/kostymer-originalmetadata.json',R/'rapporter/bestilling053-20261013/root-duplikatkandidater.json',R/'hovedark/sam.png']}},indent=2)+'\n')

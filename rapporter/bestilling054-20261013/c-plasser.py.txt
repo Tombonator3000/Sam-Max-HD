@@ -1,0 +1,29 @@
+from pathlib import Path
+import json,hashlib
+import numpy as np
+from PIL import Image,ImageFilter
+R=Path.cwd();O=R/'rapporter/bestilling054-20261013'
+old=(R/'rapporter/bestilling052-20261013/c-plasser.py.txt').read_text();exec(old[old.index('def box'):old.index('rois={')])
+rois={
+'03':[(0,0,270,365)]+rows([0,115,215,320,460,635,805],365,510)+rows([0,165,310,490,660,810,970],510,700)+rows([0,190,355,525,695],700,830)+rows([0,250,490,710,945],830,1024),
+'04':rows([0,265,505,750,990,1250,1536],0,350)+rows([0,265,500,735,990],350,650)+rows([0,285,545,810,1080,1350],650,1024),
+'05':rows([0,335,615,905,1200],0,410)+rows([0,300,530,775,1040],410,775)+[(0,775,280,1024)],
+'06':[(0,0,220,190),(0,190,130,340),(130,190,210,340),(0,340,265,520),(265,340,470,520)]+rows([0,150,270,415,575,715,855,1020],520,660)+[(0,835,170,1024),(170,835,280,1024)]}
+source=json.loads((O/'c-rutekart-kilde.json').read_text())['ruter'];proof=[]
+for n in ['01','02','03','04','05','06']:
+ name='fig007_'+n;out=Image.new('RGBA',(1536,1024));idx=0;raw=Image.open(O/f'c-{name}-raa01.png').convert('RGBA') if n in rois else None
+ for c in [q for q in source if q['jobb']==name]:
+  sx,sy,ex,ey=c['synlig'];target=[64+sx*4,32+sy*4,64+ex*4,32+ey*4];matches=c['eksakte_synlige_002_treff'];rec={'jobb':name,'cel':c['rute'],'target_core_bbox':target}
+  if matches:
+   m=matches[0]
+   if m['avventer_a07']:rec['status']='avventer a07';proof.append(rec);continue
+   dj=json.loads((R/'jobber'/m['jobb']/'jobb.json').read_text());dc=next(x for x in dj['ruter'] if x['rute']==m['cel']);a,b,z,t=dc['synlig'];donor=R/'jobber'/m['jobb']/'resultat.png'
+   if not donor.exists():donor=R/'rapporter/bestilling052-20261013'/f"c-{m['jobb']}-partiell.png"
+   dbox=[64+4*a-3,32+4*b-3,64+4*z+3,32+4*t+3];p=Image.open(donor).convert('RGBA').crop(dbox);out.alpha_composite(p,(target[0]-3,target[1]-3));rec.update({'status':'gjenbruk','donor':str(donor.relative_to(R)),'donor_sha256':hashlib.sha256(donor.read_bytes()).hexdigest(),'donor_cel':m['cel'],'donor_crop':dbox,'komponent_sha256':hashlib.sha256(p.tobytes()).hexdigest()})
+  else:
+   roi=rois[n][idx];idx+=1;p,b=fit(raw.crop(roi),(ex-sx)*4,(ey-sy)*4);out.alpha_composite(p,(target[0]-b[0],target[1]-b[1]));rec.update({'status':'nytegnet','raw_roi':roi})
+  proof.append(rec)
+ if raw is not None:assert idx==len(rois[n]),(n,idx)
+ dest=O/f'c-{name}-partiell.png' if n=='02' else R/'jobber'/name/'resultat.png';out.save(dest)
+ qa=Image.new('RGBA',out.size,(238,238,238,255));qa.alpha_composite(out);qa.convert('RGB').save(O/f'c-{name}-kandidat.png')
+(O/'c-plasseringsbevis.json').write_text(json.dumps(proof,indent=2)+'\n')

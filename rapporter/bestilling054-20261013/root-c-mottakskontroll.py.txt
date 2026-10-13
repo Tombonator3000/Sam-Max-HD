@@ -1,0 +1,66 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys,importlib.util,copy,contextlib,io
+from PIL import Image
+import numpy as np
+sys.dont_write_bytecode=True
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+read=lambda n:json.loads((r/n).read_text())
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');checker=importlib.util.module_from_spec(spec);spec.loader.exec_module(checker)
+locks=read('c-kildehash.json')['filer'];assert len(locks)==24
+for p,h in locks.items():assert sha(root/p)==h
+manifest=read('c-leveranser.json');entries=manifest['leveranser'];partial=manifest['partiell'];proof=read('c-plasseringsbevis.json');source=read('c-rutekart-kilde.json')['ruter']
+paths={e['jobb']:root/e['resultat'] for e in entries+[partial]}
+for e in entries+[partial]:assert sha(paths[e['jobb']])==e['sha256']
+donors=[];held=[];new=[]
+for c in proof:
+ j=c['jobb'];id=c['cel'];s=next(v for v in source if v['jobb']==j and v['rute']==id)
+ if c['status']=='avventer a07':held.append((j,id));continue
+ if c['status']=='nytegnet':new.append((j,id));continue
+ assert c['status']=='gjenbruk'
+ donor=root/c['donor'];assert sha(donor)==c['donor_sha256']
+ match=next(m for m in s['eksakte_synlige_002_treff'] if m['cel']==c['donor_cel'] and m['jobb'] in str(donor))
+ dj=match['jobb'];dm=json.loads((root/'jobber'/dj/'jobb.json').read_text());dc=next(v for v in dm['ruter'] if v['rute']==match['cel'])
+ original=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop(s['synlig'])
+ old=Image.open(root/'jobber'/dj/'original_1x.png').convert('RGB').crop(dc['synlig'])
+ assert original.size==old.size and original.tobytes()==old.tobytes()
+ assert match['samme_synlig_origin']
+ clip=Image.open(donor).convert('RGBA').crop(c['donor_crop']);assert hashlib.sha256(clip.tobytes()).hexdigest()==c['komponent_sha256']
+ x,y,X,Y=c['target_core_bbox'];target=Image.open(paths[j]).convert('RGBA').crop((x-3,y-3,X+3,Y+3))
+ a,b=np.array(clip),np.array(target);assert a.shape==b.shape and np.array_equal(a[:,:,3],b[:,:,3])
+ assert np.array_equal(a[a[:,:,3]>0],b[a[:,:,3]>0])
+ donors.append({'jobb':j,'cel':id,'source_RGB_identisk':True,'donor':c['donor'],'donor_sha256':c['donor_sha256'],'alfa_og_synlige_RGBA_byteidentiske':True,'synlig_origin_identisk':True})
+assert len(donors)==45 and len(new)==59 and len(held)==5
+checks=[]
+for e in entries+[partial]:
+ j=e['jobb'];p=paths[j];meta=json.loads((root/'jobber'/j/'jobb.json').read_text());im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024)
+ if j==partial['jobb']:
+  meta=copy.deepcopy(meta);meta['ruter']=[c for c in meta['ruter'] if c['rute'] not in partial['avventer_ruter']]
+  with contextlib.redirect_stdout(out:=io.StringIO()):status=checker.check_figure(p,meta,root/'jobber'/j)
+  output=out.getvalue();assert status=='OK' and len(meta['ruter'])==20
+ else:
+  run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True)
+  output=run.stdout+run.stderr;status=run.stdout.split('Utfall: ')[-1].strip();assert status==e['egenkontroll']
+  expected={'fig007_01':[], 'fig007_03':[1024], 'fig007_04':[], 'fig007_05':[], 'fig007_06':[1410,1411]}[j]
+  assert 'FEIL' not in output
+  for cel in expected:assert f'SJEKK costume007_{cel}:' in output
+  assert output.count('SJEKK costume007_')==len(expected)
+ (r/f'{j}-root-kontroll.txt').write_text(output.rstrip()+'\n')
+ arr=np.array(im);alpha=arr[:,:,3];used=np.zeros(alpha.shape,bool);cells=[]
+ for c in meta['ruter']:
+  sx,sy,ex,ey=c['synlig'];x,y,X,Y=64+sx*4,32+sy*4,64+ex*4,32+ey*4;used[max(0,y-16):Y+16,max(0,x-16):X+16]=True
+  assert np.any(alpha[y:Y,x:X]>=128)
+  cells.append(c['rute'])
+ assert not np.any(alpha[~used])
+ px,py,pw,ph=meta['bilde_i_lerret'];padding=np.ones(alpha.shape,bool);padding[py:py+ph,px:px+pw]=False;assert not np.any(alpha[padding])
+ magenta=(alpha>0)&(arr[:,:,0]>240)&(arr[:,:,1]<20)&(arr[:,:,2]>240);assert int(alpha[magenta].max(initial=0))<=1
+ if j==partial['jobb']:
+  originalmeta=json.loads((root/'jobber'/j/'jobb.json').read_text())
+  for c in originalmeta['ruter']:
+   if c['rute'] in partial['avventer_ruter']:
+    x,y,X,Y=c['synlig'];assert not np.any(alpha[32+y*4:32+Y*4,64+x*4:64+X*4])
+ checks.append({'jobb':j,'sha256':sha(p),'status':status,'ruter':len(cells),'hel_leveranse':j!=partial['jobb'],'padding_alfa_null':True,'alfa_utenfor_rutevinduer_null':True,'magenta_RGB_alfa1':int(magenta.sum())})
+for call in read('c-proveniens.json')['kall']:
+ for k in ('raw','prompt'):assert sha(root/call[k])==call[k+'_sha256']
+out={'kilder_uendret':24,'hele_ark':5,'hele_ruter':84,'partielle_ruter':20,'holdte_ruter':held,'gjenbruk':donors,'nytegnede_ruter':59,'kontroller':checks,'runtime':False,'ny_brukergodkjenning':False}
+(r/'root-c-mottakskontroll.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+print('C: 84 whole + 20 partial cells; 45 donor matches verified; 59 newly drawn; 5 held')

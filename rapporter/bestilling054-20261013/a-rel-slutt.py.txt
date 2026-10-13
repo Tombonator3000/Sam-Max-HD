@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];rec=json.loads((r/'a-kildebevis.json').read_text())['ruter'];can=Image.new('RGB',(1800,600),(205,205,205));dr=ImageDraw.Draw(can);small=[]
+for col,(job,di) in enumerate([('fig005_01',1),('fig005_01',2),('fig005_01',3),('fig235_01',1),('fig005_03',0)]):
+ im=Image.open(root/'jobber'/job/'resultat.png');es=[e for e in rec if e['jobb']==job and (e['rute']==0 if di==0 else e['rute'] in {1:[129,385,513],2:[128,384,512],3:[130,386]}[di])];plane=Image.new('RGBA',(360,520))
+ for e in sorted(es,key=lambda e:e['lag']):
+  x,y,ex,ey=e['synlig'];m=e['originalmetadata'];q=im.crop((64+x*4-12,32+y*4-12,64+ex*4+12,32+ey*4+12));dx=180+4*(m['rel_x']+x-e['rekt'][0])-12;dy=420+4*(m['rel_y']+y-e['rekt'][1])-12;plane.alpha_composite(q,(dx,dy))
+  if e['rute'] in [512,513]:
+   a=np.array(q);small.append({'jobb':job,'cel':e['rute'],'alfa_ge128':int((a[:,:,3]>=128).sum()),'donor_byteidentitet':'Se a-celkart.json'})
+ can.paste(plane,(col*360,50),plane);dr.text((col*360+3,5),job+' retning'+str(di),fill='black')
+can.save(r/'a-rel-levert-komposisjon.png');(r/'a-oyelokk-slutt.json').write_text(json.dumps(small,indent=2)+'\n')

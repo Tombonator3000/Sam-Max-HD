@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+import numpy as np,json,hashlib,importlib.util,contextlib,io
+r=Path(__file__).resolve().parent;root=r.parents[1];p=Image.open(r/'a-cel000-raa01.png').convert('RGBA')
+def bbox(im):
+ ys,xs=np.nonzero(np.array(im)[:,:,3]>=128);return [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
+b=bbox(p);p=p.crop((max(0,b[0]-4),max(0,b[1]-4),min(p.width,b[2]+4),min(p.height,b[3]+4)));b=bbox(p);w,h=124,212;W=round(p.width*w/(b[2]-b[0]));H=round(p.height*h/(b[3]-b[1]));best=None
+for dx in range(-2,3):
+ for dy in range(-2,3):
+  q=p.convert('RGBa').resize((W+dx,H+dy),Image.Resampling.LANCZOS).convert('RGBA');bb=bbox(q);score=abs(bb[2]-bb[0]-w)+abs(bb[3]-bb[1]-h)
+  if best is None or score<best[0]:best=(score,q,bb)
+assert best[0]==0
+q,bb=best[1:];out=Image.new('RGBA',(1536,1024));out.paste(q,(80-bb[0],296-bb[1]));out.save(r/'a-cel000-plassert.png');q.save(r/'a-cel000-komponent.png')
+j=json.loads((root/'jobber/fig005_03/jobb.json').read_text());j['ruter']=[v for v in j['ruter'] if v['rute']==0]
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod);buf=io.StringIO()
+with contextlib.redirect_stdout(buf):status=mod.check_figure(r/'a-cel000-plassert.png',j,root/'jobber/fig005_03')
+(r/'a-cel000-delkontroll.txt').write_text('Kun cel000, øvrige åtte ruter utelatt fra jobbargumentet. Uendret check_figure; ikke fullarkskontroll.\n'+buf.getvalue()+'Utfall: '+status+'\n')
+(r/'a-cel000-proveniens.json').write_text(json.dumps({'verktoy':'innebygd imagegen','eksakt_modell':'ikke eksponert','raw_sha256':hashlib.sha256((r/'a-cel000-raa01.png').read_bytes()).hexdigest(),'output_bbox_alpha128':bbox(out),'egenkontroll_enkeltcel':status,'runtime':False,'fullark':False,'source_mask':False,'resize':'hel ny komponent, premultiplisert RGBA Lanczos'},indent=2)+'\n')
+print(status,buf.getvalue())

@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json
+r=Path(__file__).resolve().parent;root=r.parents[1];data=json.loads((r/'a-kildebevis.json').read_text());rec=data['ruter']
+def cut(e):
+ x,y,w,h=e['rekt'];im=Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop((x,y,x+w,y+h));a=np.array(im);alpha=np.uint8(np.any(a!=e['bakgrunn'],2))*255;return Image.fromarray(np.dstack((a,alpha)))
+can=Image.new('RGB',(1800,700),(205,205,205));dr=ImageDraw.Draw(can)
+for col,(job,direction) in enumerate([('fig005_01',1),('fig005_01',2),('fig005_01',3),('fig235_01',1),('fig005_03',0)]):
+ arr=[e for e in rec if e['jobb']==job and ((e['rute']==0) if direction==0 else e['rute'] in ({1:[129,385,513],2:[128,384,512],3:[130,386]}[direction]))]
+ plane=Image.new('RGBA',(70,90));
+ for e in sorted(arr,key=lambda v:v['lag']):
+  m=e['originalmetadata'];plane.alpha_composite(cut(e),(35+m['rel_x'],75+m['rel_y']))
+ dr.text((col*360+5,5),f'{job} retning {direction}',fill='black');dr.text((col*360+5,23),str([(e['rute'],e['lag']) for e in arr]),fill='black');plane=plane.resize((350,450),Image.Resampling.NEAREST);can.paste(plane,(col*360+5,50),plane)
+can.save(r/'a-rel-sammensetting.png')
+# Exact source cell0, enlarged for semantic review. No delivery asset.
+e=next(v for v in rec if v['rute']==0);im=cut(e);bg=Image.new('RGBA',im.size,(205,205,205,255));bg.alpha_composite(im);bg.convert('RGB').resize((496,848),Image.Resampling.NEAREST).save(r/'a-cel000-narbilde.png')
+print('paletteequal',data['kostymemetadata']['3']['kostymepalett']==data['kostymemetadata']['5']['kostymepalett']==data['kostymemetadata']['235']['kostymepalett'])
+print('allRGB',all(v['RGB_identisk'] for e in rec for v in e['samme_synlige_RGB_og_bakgrunnsmaske']))

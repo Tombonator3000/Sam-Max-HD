@@ -362,3 +362,8 @@
 
 - Bestilling 53: ti figurark med 137 Sam/Max-ruter levert, ni OK og én dokumentert SJEKK for to tilsiktede halsskjøter. Se `rapporter/bestilling053-20261013/RAPPORT.md`. Arbeidet fortsetter.
 - Figurark har ekte RGBA; 71 Sam-ruter er bevist kildeidentiske og gjenbruker nye komponenter. Max-ansikter er korrigert og kontrollert lokalt. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T01:08:56+02:00 (Codex, Astra)
+
+- Bestilling 54: ni figurark med 152 Sam/Max-ruter levert, sju OK og to SJEKK for tre tynne armkonturer. Tjue klare ruter i fig007_02 er separat delarbeid, fem a07-ruter venter. Se `rapporter/bestilling054-20261013/RAPPORT.md`. Arbeidet fortsetter.
+- Figurark har ekte RGBA; 112 kildebeviste donorruter gjenbrukes blant hele og partielle ark. 60 nye ruter, lokale kinnretting og alle rel-sammensettinger er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.

@@ -1,0 +1,22 @@
+from pathlib import Path
+import json
+from PIL import Image,ImageDraw,ImageFont
+R=Path.cwd();O=R/'rapporter/bestilling054-20261013';cs=json.loads((O/'c-rutekart-kilde.json').read_text())['ruter'];font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',15)
+def hd(c):
+ n=c['jobb'];p=R/'jobber'/n/'resultat.png'
+ if n=='fig007_02':p=O/f'c-{n}-partiell.png'
+ x,y,z,t=c['synlig'];return Image.open(p).convert('RGBA').crop((64+x*4-3,32+y*4-3,64+z*4+3,32+t*4+3))
+new=[c for c in cs if not c['eksakte_synlige_002_treff']]
+for start in range(0,len(new),8):
+ out=Image.new('RGB',(1600,((min(8,len(new)-start)+3)//4)*430),(230,230,230));d=ImageDraw.Draw(out)
+ for i,c in enumerate(new[start:start+8]):
+  x=i%4*400;y=i//4*430;d.text((x+5,y+5),c['jobb']+' cel '+str(c['rute']),font=font,fill='black');s=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']);s=s.resize((s.width*4,s.height*4),Image.Resampling.NEAREST);s.thumbnail((190,380));out.paste(s,(x+4,y+30));p=hd(c);p.thumbnail((190,380));out.paste(p,(x+205,y+30),p)
+ out.save(O/f'c-ruteqa-{start//8+1}.png')
+lookup={c['rute']:c for c in cs};cases=[[179,1024,1152,385],[179,1027,1155,385],[179,1030,1158,385],[0,385],[9,385],[14,385],[178,1281,1408,385],[178,1285,1414,1536],[178,1287,1416,1536],[179,768,1412,1536]]
+out=Image.new('RGB',(1800,800),(230,230,230));d=ImageDraw.Draw(out)
+for i,ids in enumerate(cases):
+ canvas=Image.new('RGBA',(360,360))
+ for id in ids:
+  c=lookup[id];p=hd(c);ox,oy=c['synlig_origin_i_verden'];canvas.alpha_composite(p,(160+ox*4-3,328+oy*4-3))
+ x=i%5*360;y=i//5*400;d.text((x+3,y+5),str(ids),font=font,fill='black');out.paste(canvas,(x,y+30),canvas)
+out.save(O/'c-rel-HD-sammensetting.png')
