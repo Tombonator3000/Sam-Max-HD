@@ -1,0 +1,45 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,subprocess,numpy as np
+p=Path('rapporter/bestilling027-20261013');sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();dump=lambda f,v:Path(f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+jobs=['lag012_05_del1av2','lag015_01_del2av2','lag015_02_del2av2','lag017_01_del1av2','lag017_01_del2av2']
+proof=[]
+for row in json.loads((p/'kildehash.json').read_text()):proof.append(dict(row,faktisk_sha256=sha(row['fil']),uendret=sha(row['fil'])==row['sha256']))
+assert all(r['uendret'] for r in proof);dump(p/'c-kildehashkontroll.json',proof)
+full=Image.open(p/'c-017-fullmaster.png');base=np.asarray(Image.open(p/'c-017-grunnmaster.png'));a=np.asarray(full);mask=np.zeros(a.shape[:2],bool)
+for j in jobs[-2:]:
+ m=json.loads(Path('jobber/'+j+'/jobb.json').read_text())
+ for o in m['objekter']:
+  x,y,w,h=[v*4 for v in o['rekt']]
+  if o['bilde']=='obj178_01':y-=12;h+=12
+  mask[y:y+h,x:x+w]=True
+ov=np.array_equal(np.asarray(Image.open('jobber/'+jobs[-2]+'/resultat.png'))[112:912,992:1536],np.asarray(Image.open('jobber/'+jobs[-1]+'/resultat.png'))[112:912,:544])
+assert ov and not np.any(a[~mask]!=base[~mask])
+bevis={'master':str(p/'c-017-fullmaster.png'),'master_sha256':sha(p/'c-017-fullmaster.png'),'master_storrelse':[2528,800],'klipp_x':[0,992],'overlapp':[544,800],'overlapp_byteidentisk':ov,'utenfor_8_objektfelt_med_linseutvidelse_avvik':int(np.count_nonzero(np.any(a!=base,axis=2)&~mask)),'linse_innklipp_fullmaster_xywh':[1024,340,96,76],'linse_begrunnelse':'12 HD px ekstra over metadatafeltet fjerner gammel rød ring som HD-grunnrommet tegnet utenfor originalens objektboks. Bare nytt generert mørkt underlag, ingen originalmaske.'}
+checks=[];records=[]
+for j in jobs:
+ d=Path('jobber')/j;result=d/'resultat.png';m=json.loads((d/'jobb.json').read_text());n=1 if j.startswith('lag017') else 2
+ log=p/(j+'-kontroll.txt');r=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(result)],capture_output=True,text=True);log.write_text(r.stdout+r.stderr);assert r.returncode==0
+ raws=[]
+ for k in range(1,n+1):
+  raw=p/(j+f'-raw{k}.png');prompt=p/(j+f'-prompt{k}.txt');raws.append({'fil':str(raw),'sha256':sha(raw),'prompt':str(prompt),'prompt_sha256':sha(prompt),'valgt':k==n})
+ bb=np.asarray(Image.open('rapporter/bestilling026-20261013/a-statue-felles-underlag.png' if j.startswith('lag012') else m['bilde_to']).convert('RGB'));rr=np.asarray(Image.open(result).convert('RGB'));masks=np.zeros(rr.shape[:2],bool)
+ if not j.startswith('lag017'):
+  for o in m['objekter']:
+   x,y,w,h=o['rekt'];x=(x-m['region'][0])*4;y=(y-m['region'][1])*4+112;w*=4;h*=4;masks[y:y+h,x:x+w]=True
+  outside=int(np.count_nonzero(np.any(rr!=bb,axis=2)&~masks));assert outside==0
+ else:outside=0
+ padding=bool(np.all(rr[:112]==128) and np.all(rr[912:]==128));assert padding
+ checks.append({'jobb':j,'utenfor_egne_felt_avvik':outside,'fullmasterkontroll_for_017':j.startswith('lag017'),'canvas':[1536,1024],'RGB128_padding':padding})
+ forbehold={'lag012':'Kaktus med to armer, brun sombrero, rødt tørkle og lav grå sokkel. Hattens sikksakk, munnendemerker og materialstrøk er tydeligere enn kilden; kroppen er glattere. Røde klipper følger samordnet 26-underlag.','lag015_01':'Flat grønn pute på lav treplattform. Grønn topp er mer rettkantet og trerammen mer markert enn pikselkilden. Ingen ny figur/vekt.','lag015_02':'Liten grålilla vekt på målerens nedre svarte linje. Platen er glattere og mer regelmessig trapesformet enn kildens små knekker. Objektkorrelasjon 0,657, altså OK, men lavest i familien.','lag017':'Alle åtte kildeobjekter er samlet i én master. Tre ulike vimpelforløp, tom linseholder, hevede to røde grep, åpen WIN-front, åpen Trixiedør uten figur og egen propellvinkel. Vimpler/håndtak er rundere og mer blanke enn kilden; røde WIN-småformer er tydeligere, uten påstått identitet. Grunnrommets øvrige tidligere tegningsforbehold følger med.'}
+ key=next(k for k in forbehold if j.startswith(k));v=forbehold[key]
+ rec={'jobb':j,'resultat':str(result),'sha256':sha(result),'egenkontroll':'OK','kontrollfil':str(log),'forsok':n,'raw':raws,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'visuelt_forbehold':v}
+ if j.startswith('lag017'):rec.update(fullmaster=str(p/'c-017-fullmaster.png'),fullmaster_sha256=bevis['master_sha256'])
+ if j.startswith('lag012'):rec.update(underlag='rapporter/bestilling026-20261013/a-statue-felles-underlag.png',underlag_sha256=sha('rapporter/bestilling026-20261013/a-statue-felles-underlag.png'))
+ records.append(rec)
+ note=f'''# {j}\n\nLevert med innebygd ChatGPT imagegen, {n} forsøk. Verktøyet eksponerer ikke et bekreftet eksakt modellnavn. Originalprompt er bevart ordrett foran separat kildepresisering; beskyttede kilder er uendret.\n\n{v}\n\nNytegningen er helskalert og relevante rektangulære felt komponert på nytegnet HD-grunnrom med 3 px diskret kantblending. Ingen originalsilhuettmasker, originalpiksler i resultatet, lokal geometriwarp eller vektorrekonstruksjon. '''
+ if j.startswith('lag017'):note+='Felles 2528 × 800-master, klipp 0/992 og byteidentisk 544 × 800-overlapp. Linsefeltet er utvidet 12 HD px oppover for å fjerne gammel rød ring utenfor kildeboksen. Tre vimpelfelt har jevnt bilineært additivt RGB-felt beregnet fra forskjellen mellom nytegnet feltkant og nytt HD-grunnrom; geometri og tegnet innhold er ikke flyttet. '
+ note+=f'\n\nUendret egenkontroll: OK. Resultat SHA-256: `{sha(result)}`. Råfiler/prompter/SHA, kontroll og oppskrift: `{p}/c-leveranser.json`, c-kilde-qa.md og c-*-komposisjon.py.txt. Alle 11 objektrektangler er kontrollert visuelt og målt separat. Runtime/import i motor og ny individuell brukergodkjenning er ikke verifisert.\n'
+ (d/'notat.md').write_text(note)
+bevis['leveranser']=checks;dump(p/'c-komposisjonsbevis.json',bevis);dump(p/'c-leveranser.json',{'leveranser':records,'kildehashkontroll':str(p/'c-kildehashkontroll.json'),'objektkontroll':str(p/'c-objektkontroll.json'),'komposisjonsbevis':str(p/'c-komposisjonsbevis.json'),'runtime':False,'ny_brukergodkjenning':False})

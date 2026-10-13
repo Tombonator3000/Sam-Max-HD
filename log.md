@@ -222,3 +222,8 @@
 
 - Bestilling 26: ti lag levert OK,22 faktiske objektfelt. Kartets siste elleve tilstander og rettet seksmerkers skilt, Snuckey’s dør-/is-/vare-/koppvarianter og felles bilmaster med1152-overlapp kontrollert. To egne skulpturer har felles rødklippelandskap. Utvidet ny eske-kontekst og bilens avklippingsforbehold dokumentert. Se `rapporter/bestilling026-20261013/RAPPORT.md`. Bestilling 27 og videre fortsetter.
 - 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T21:55:15+02:00 (Codex, Astra)
+
+- Bestilling27: ti lag levert OK,24 faktiske objektkontroller. Kaktus på samordnet rødklippelandskap, to styrkemålertilstander og fem utstillingslag med dråper/bobler4/3/1/2. Kran-/hånd-/gulvfeil rettet og uavhengig kontrollert. Midway-master2528×800 har identisk544-overlapp, tom linse og egne vimpler/spak/dør. Se `rapporter/bestilling027-20261013/RAPPORT.md`. Bestilling28 og videre fortsetter.
+- 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,importlib.util,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1];sp=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');checker=importlib.util.module_from_spec(sp);sp.loader.exec_module(checker)
+rows=[];families={154:[],155:[]};full=Image.new('RGB',(1536,5*540),(128,128,128));d=ImageDraw.Draw(full)
+for i in range(1,6):
+ j=f'lag016_{i:02d}_del'+('1av2' if i==5 else '2av2');p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());x,y,w,h=m['bilde_i_lerret'];out=Image.open(p/'resultat.png').convert('RGB');orig=Image.open(p/'original_1x.png').convert('RGB');c=checker.compare(orig,out.crop((x,y,x+w,y+h)));obs=[]
+ contact=Image.new('RGB',(1280,560*len(m['objekter'])),(185,185,185));dc=ImageDraw.Draw(contact)
+ for k,o in enumerate(m['objekter']):
+  ox,oy,ow,oh=o['rekt'];ox-=m['region'][0];oy-=m['region'][1];eo=c['eo'][oy:oy+oh,ox:ox+ow];es=c['es'][oy:oy+oh,ox:ox+ow];cor=float(checker.corr(eo,es));obs.append({'objekt':o['bilde'],'kantkorrelasjon':cor,'status':'OK' if cor>=.6 else 'SJEKK' if cor>=.5 else 'FEIL'});a=orig.crop((ox,oy,ox+ow,oy+oh)).resize((ow*4,oh*4),Image.Resampling.NEAREST);b=out.crop((ox*4,112+oy*4,(ox+ow)*4,112+(oy+oh)*4));dc.text((5,k*560+5),o['bilde']+' original / HD',fill='black');contact.paste(a,(5,k*560+25));contact.paste(b,(645,k*560+25))
+  if o['objekt'] in families:families[o['objekt']].append((o['bilde'],a,b))
+ contact.save(r/f'b-{j}-objektqa.png');d.text((5,(i-1)*540+5),j+' source / HD',fill='black');orig.info.clear();full.paste(orig.resize((768,400),Image.Resampling.NEAREST),(0,(i-1)*540+25));full.paste(out.crop((0,112,1536,912)).resize((768,400)),(768,(i-1)*540+25));rows.append({'jobb':j,'sha256':hashlib.sha256((p/'resultat.png').read_bytes()).hexdigest(),'objekter':obs});print(j,obs)
+full.save(r/'b-samlet-kilde-HD.png')
+for oid,ims in families.items():
+ ht=560 if oid==154 else 970;out=Image.new('RGB',(400*len(ims),ht),(185,185,185));d=ImageDraw.Draw(out)
+ for k,(name,a,b) in enumerate(ims):d.text((k*400+5,5),name+' source / HD',fill='black');out.paste(a.resize((a.width*2,a.height*2),Image.Resampling.NEAREST),(k*400+5,25));out.paste(b.resize((b.width*2,b.height*2),Image.Resampling.NEAREST),(k*400+5,35+a.height*2))
+ out.save(r/f'b-obj{oid}-resultatfamilie.png')
+(r/'b-objektqa.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')

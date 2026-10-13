@@ -1,0 +1,16 @@
+from PIL import Image
+from pathlib import Path
+import numpy as np,json
+p=Path('rapporter/bestilling027-20261013')
+base=Image.new('RGB',(2528,800));base.paste(Image.open('jobber/rom017_del1av2/resultat.png').crop((0,112,1536,912)),(0,0));base.paste(Image.open('jobber/rom017_del2av2/resultat.png').crop((0,112,1536,912)),(992,0))
+base.save(p/'c-017-grunnmaster.png')
+for n in [1,2]:
+ j=f'lag017_01_del{n}av2';meta=json.loads(Path('jobber/'+j+'/jobb.json').read_text());rx=meta['region'][0]
+ raw=Image.open(p/(j+'-raw1.png')).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+ for o in meta['objekter']:
+  x,y,w,h=[v*4 for v in o['rekt']];new=raw.crop((x-rx*4,y+112,x-rx*4+w,y+112+h));old=np.array(base.crop((x,y,x+w,y+h)))
+  yy,xx=np.indices((h,w));a=np.minimum.reduce([xx,yy,w-1-xx,h-1-yy]).clip(0,3)/3
+  out=np.rint(np.array(new)*a[:,:,None]+old*(1-a[:,:,None])).astype('uint8');base.paste(Image.fromarray(out),(x,y))
+base.save(p/'c-017-fullmaster.png')
+for n,x in [(1,0),(2,992)]:
+ im=Image.new('RGB',(1536,1024),(128,128,128));im.paste(base.crop((x,0,x+1536,800)),(0,112));im.save(f'jobber/lag017_01_del{n}av2/resultat.png')

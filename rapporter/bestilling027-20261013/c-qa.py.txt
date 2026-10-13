@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np,importlib.util
+p=Path('rapporter/bestilling027-20261013')
+spec=importlib.util.spec_from_file_location('check','verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(spec);spec.loader.exec_module(ck)
+jobs=['lag012_05_del1av2','lag015_01_del2av2','lag015_02_del2av2','lag017_01_del1av2','lag017_01_del2av2']
+rows=[];stats=[]
+for j in jobs:
+ d=Path('jobber')/j;m=json.loads((d/'jobb.json').read_text());r=Image.open(d/'resultat.png').convert('RGB');src=Image.open(d/'referanse.png').convert('RGB');base=Image.open(m['bilde_to']).convert('RGB')
+ metric=ck.compare(Image.open(d/'original_1x.png').convert('RGB'),r.crop((0,112,1536,912)))
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];lx=x-m['region'][0];ly=y-m['region'][1];bb=(lx*4,112+ly*4,(lx+w)*4,112+(ly+h)*4)
+  a,b=metric['eo'][ly:ly+h,lx:lx+w],metric['es'][ly:ly+h,lx:lx+w];co=float(ck.corr(a,b));stats.append({'jobb':j,'objekt':o['bilde'],'rekt':o['rekt'],'hd_rekt':list(bb),'korrelasjon':co,'original_std':float(a.std())})
+  scale=min(2,430/max(w*4,h*4));sz=(round(w*4*scale),round(h*4*scale));row=Image.new('RGB',(1320,max(160,sz[1]+35)),(160,160,160));draw=ImageDraw.Draw(row);draw.text((5,3),j+' '+o['bilde']+' original / HD / grunnrom  corr '+str(round(co,3)),fill='black')
+  for k,im in enumerate([src,r,base]):row.paste(im.crop(bb).resize(sz,Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS),(k*440,30))
+  rows.append(row)
+for n,start in enumerate(range(0,len(rows),5),1):
+ part=rows[start:start+5];out=Image.new('RGB',(1320,sum(i.height for i in part)),(160,160,160));y=0
+ for row in part:out.paste(row,(0,y));y+=row.height
+ out.save(p/f'c-objektqa-{n}.png')
+(p/'c-objektkontroll.json').write_text(json.dumps(stats,indent=2)+'\n')
+out=Image.new('RGB',(1536,2560),(128,128,128));draw=ImageDraw.Draw(out)
+for n,j in enumerate(jobs):out.paste(Image.open('jobber/'+j+'/resultat.png').resize((768,512)),(768*(n%2),512*(n//2)));draw.text((768*(n%2)+4,512*(n//2)+4),j,fill='white')
+out.crop((0,0,1536,1536)).save(p/'c-familie.png')

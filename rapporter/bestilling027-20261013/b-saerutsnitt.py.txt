@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json
+r=Path(__file__).resolve().parent;root=r.parents[1];rows=json.loads((r/'b-kildebevis.json').read_text());wanted=['obj144_01','obj145_01','obj150_01','obj152_01','obj153_01','obj167_01','obj169_01','obj178_01','obj184_01'];pairs=[]
+for v in rows:
+ for o in v['objekter']:
+  if o['objekt'] in wanted:
+   x,y,w,h=o['lokalrekt'];a=Image.open(root/v['base_original']).convert('RGB').crop((x,y,x+w,y+h));b=Image.open(root/'jobber'/v['jobb']/'original_1x.png').convert('RGB').crop((x,y,x+w,y+h));pairs.append((o['objekt'],a,b))
+for start in range(0,len(pairs),3):
+ chunk=pairs[start:start+3];ht=sum(max(a.height*6,100)+30 for _,a,b in chunk);out=Image.new('RGB',(1400,ht),(180,180,180));d=ImageDraw.Draw(out);yy=0
+ for name,a,b in chunk:
+  d.text((5,yy+3),name+' grunnrom / faktisk lag',fill='black');out.paste(a.resize((a.width*6,a.height*6),Image.Resampling.NEAREST),(5,yy+25));out.paste(b.resize((b.width*6,b.height*6),Image.Resampling.NEAREST),(710,yy+25));yy+=max(a.height*6,100)+30
+ out.save(r/f'b-saerutsnitt-{start//3+1}.png')
+# HD base context; existing individual references are not new approvals.
+ps=sorted(set(v['baseHD'] for v in rows));out=Image.new('RGB',(1536,512*len(ps)),(128,128,128));d=ImageDraw.Draw(out)
+for i,p in enumerate(ps):
+ im=Image.open(root/p).convert('RGB');out.paste(im.resize((768,512)),(0,i*512));d.text((780,i*512+20),p,fill='black')
+out.save(r/'b-HD-grunnrom.png')

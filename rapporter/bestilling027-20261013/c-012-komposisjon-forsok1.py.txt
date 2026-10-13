@@ -1,0 +1,10 @@
+from PIL import Image
+import numpy as np
+from pathlib import Path
+p=Path('rapporter/bestilling027-20261013')
+im=Image.open(p/'lag012_05_del1av2-raw1.png').convert('RGB').resize((416,448),Image.Resampling.LANCZOS)
+base=Image.open('rapporter/bestilling026-20261013/a-statue-felles-underlag.png').convert('RGB')
+x,y,w,h=736,368,352,384
+new=im.crop((32,32,384,416));old=np.array(base.crop((x,y,x+w,y+h)))
+yy,xx=np.indices((h,w));a=np.minimum.reduce([xx,yy,w-1-xx,h-1-yy]).clip(0,3)/3
+out=np.rint(np.array(new)*a[:,:,None]+old*(1-a[:,:,None])).astype('uint8');base.paste(Image.fromarray(out),(x,y));base.save('jobber/lag012_05_del1av2/resultat.png')

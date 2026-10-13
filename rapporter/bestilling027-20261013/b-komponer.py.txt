@@ -1,0 +1,68 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess
+r=Path(__file__).resolve().parent;root=r.parents[1];py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+def rgb(p):return Image.open(p).convert('RGB')
+def cc(mask):
+ seen=set();bs=[]
+ for y,x in zip(*np.where(mask)):
+  if (y,x) in seen:continue
+  q=[(y,x)];seen.add((y,x));pts=[]
+  while q:
+   yy,xx=q.pop();pts.append((yy,xx))
+   for dy,dx in [(0,1),(1,0),(-1,0),(0,-1)]:
+    ny,nx=yy+dy,xx+dx
+    if 0<=ny<mask.shape[0] and 0<=nx<mask.shape[1] and mask[ny,nx] and (ny,nx) not in seen:seen.add((ny,nx));q.append((ny,nx))
+  ys,xs=zip(*pts);bs.append([int(min(xs)),int(min(ys)),int(max(xs)+1),int(max(ys)+1)])
+ return bs
+base=rgb(root/'jobber/rom016_del2av2/resultat.png');raw={i:rgb(r/f'b-lag016_{i:02d}-raa01.png') for i in [1,2,4]};clean=rgb(r/'b-glass-rent-raa01.png').resize((44,68),Image.Resampling.LANCZOS)
+raw[4]=base.copy();raw[4].paste(rgb(r/'b-lag016_04-raa02.png').resize((384,224),Image.Resampling.LANCZOS),(480,304))
+# All alpha comes ONLY from new generated graphics, never original pixels.
+a=np.array(raw[1].crop((493,462,508,484))).astype(float);alpha=np.clip((a[:,:,2]-a[:,:,0]-10)/60,0,1);aa=(alpha*255).astype('uint8');drop=Image.fromarray(np.dstack([a.astype('uint8'),aa]),'RGBA');drop=drop.crop(drop.getbbox());drop.save(r/'b-generert-draape-alpha.png')
+a=np.array(raw[1].crop((805,332,815,342))).astype(float);alpha=np.clip((np.minimum(a[:,:,0],a[:,:,2])-155)/65,0,1);bubble=Image.fromarray(np.dstack([a.astype('uint8'),(alpha*255).astype('uint8')]),'RGBA');bubble=bubble.crop(bubble.getbbox());bubble.save(r/'b-generert-boble-alpha.png');bubble=bubble.resize((4,4),Image.Resampling.LANCZOS)
+proof=[];bodies={1:base,2:raw[2],3:raw[2],4:raw[4]}
+for i in range(1,6):
+ j=f'lag016_{i:02d}_del'+('1av2' if i==5 else '2av2');p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());out=rgb(root/m['bilde_to']);basearr=np.array(out);changed=[]
+ def paste_box(im,box):
+  x,y,w,h=box;out.paste(im.crop((x,y,x+w,y+h)),(x,y));changed.append(box)
+ if i==1:
+  for box in [(1056,752,128,64),(160,432,128,128)]:paste_box(raw[1],box)
+ if i==2:
+  paste_box(raw[2],(288,304,192,256))
+  # Blend only the bottom 24 HD rows of NEW room floor into the delivered NEW HD base.
+  # No source pixels, silhouettes or geometry transformations are involved.
+  tile=raw[2].crop((1088,368,1536,880));alpha=np.full((512,448),255,dtype=np.uint8)
+  alpha[-24:]=np.linspace(255,0,24).astype('uint8')[:,None]
+  out.paste(tile,(1088,368),Image.fromarray(alpha));changed.append([1088,368,448,512])
+ if i<=3:
+  # Same HD tap head; whole generated droplet fitted to source-state bounding box.
+  heights={1:8,2:12,3:24};out.paste(drop.resize((12,heights[i]),Image.Resampling.LANCZOS),(496,460),drop.resize((12,heights[i]),Image.Resampling.LANCZOS));changed.append([496,460,12,heights[i]])
+ elif i==4:paste_box(raw[4],(480,368,160,128))
+ else:
+  out.paste(rgb(r/'b-lag016_05-raa02.png').resize((160,128),Image.Resampling.LANCZOS),(864,368));changed.append([864,368,160,128])
+ bubbles=[];cleared=[]
+ if i<=4:
+  paste_box(bodies[i],(672,304,192,224))
+  # Remove generator-added glints/bubbles by rectangular crops of NEW clean underlay.
+  a=np.array(out.crop((796,300,840,368)));mask=(a[:,:,0]>195)&(a[:,:,2]>175)
+  for x0,y0,x1,y1 in cc(mask):
+   # Rectangular 3px feather surrounds the detected NEW glint, whose core is fully replaced.
+   gx0,gy0,gx1,gy1=x0-2,y0-2,x1+2,y1+2
+   x0=max(0,x0-6);y0=max(0,y0-6);x1=min(44,x1+6);y1=min(68,y1+6)
+   yy,xx=np.mgrid[y0:y1,x0:x1]
+   dist=np.maximum(np.maximum(gx0-xx,xx-(gx1-1)),np.maximum(gy0-yy,yy-(gy1-1)))
+   feather=Image.fromarray((np.clip(1-dist/4,0,1)*255).astype('uint8'))
+   out.paste(clean.crop((x0,y0,x1,y1)),(796+x0,300+y0),feather);cleared.append([796+x0,300+y0,x1-x0,y1-y0]);changed.append(cleared[-1])
+  # Original is used ONLY to locate separate one-pixel white bubble boxes.
+  src=np.array(rgb(p/'original_1x.png').crop((168,48,216,104)));wh=(src[:,:,0]>200)&(src[:,:,2]>180)
+  for x0,y0,x1,y1 in cc(wh):
+   assert (x1-x0,y1-y0)==(1,1)
+   pos=(672+x0*4,304+y0*4);out.paste(bubble,pos,bubble);bubbles.append([*pos,4,4]);changed.append(bubbles[-1])
+  assert len(bubbles)=={1:4,2:3,3:1,4:2}[i]
+ out.save(p/'resultat.png')
+ allow=np.zeros((1024,1536),bool)
+ for x,y,w,h in changed:allow[y:y+h,x:x+w]=True
+ dif=np.any(np.array(out)!=basearr,axis=2);assert not (dif&~allow).any()
+ proof.append({'jobb':j,'komposisjonsbokser':changed,'boblebokser':bubbles,'fjernede_genererte_glimt':cleared,'utenfor_bokser_endret':int((dif&~allow).sum()),'sha256':hashlib.sha256((p/'resultat.png').read_bytes()).hexdigest()})
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(cp.stdout+cp.stderr);print(j,cp.stdout[-1400:])
+(r/'b-komposisjonsbevis.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')

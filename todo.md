@@ -51,6 +51,7 @@
 - [x] Levert bestilling 24 med ti OK, ti faktiske objektkontroller og etterkontrollerte antenneskjøter.
 - [x] Levert bestilling 25 med ti OK,45 faktiske objektkontroller, fem vifteposer og uavhengig kart-QA.
 - [x] Levert bestilling 26 med ti OK,22 faktiske objektkontroller, kartfamilier og Snuckey’s-master/egne landskap.
-- [ ] Fortsett bestilling 27 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling27 med ti OK,24 faktiske objektkontroller, mikrotilstandsretting og Midway-master.
+- [ ] Fortsett bestilling 28 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
 
 - [x] Rom090 og obj901_01 rettet og levert OK med uttrykkelig valgt vektorrekonstruksjon; tidligere bestilling 21-avvik erstattet.

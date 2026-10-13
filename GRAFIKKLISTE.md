@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 21:46 (norsk tid)
+Oppdatert 2026-10-13 21:55 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 116 bilder levert (51 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 140 bilder levert (61 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -409,16 +409,16 @@ Rom 10, 11, 12.
 
 Rom 12, 15, 16, 17.
 
-- [ ] `lag012_05_del1av2` (rom 12 Snuckey's, ute, lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/rom012_del1av2/resultat.png`)
-- [ ] `lag015_01_del2av2` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom015_del2av2/resultat.png`)
-- [ ] `lag015_02_del2av2` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom015_del2av2/resultat.png`)
-- [ ] `lag016_01_del2av2` (rom 16 Hall of Oddities (freakshowet), lag 01 med 4 objektbilder, del 2/2, bilde to `jobber/rom016_del2av2/resultat.png`)
-- [ ] `lag016_02_del2av2` (rom 16 Hall of Oddities (freakshowet), lag 02 med 4 objektbilder, del 2/2, bilde to `jobber/rom016_del2av2/resultat.png`)
-- [ ] `lag016_03_del2av2` (rom 16 Hall of Oddities (freakshowet), lag 03 med 2 objektbilder, del 2/2, bilde to `jobber/rom016_del2av2/resultat.png`)
-- [ ] `lag016_04_del2av2` (rom 16 Hall of Oddities (freakshowet), lag 04 med 2 objektbilder, del 2/2, bilde to `jobber/rom016_del2av2/resultat.png`)
-- [ ] `lag016_05_del1av2` (rom 16 Hall of Oddities (freakshowet), lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/rom016_del1av2/resultat.png`)
-- [ ] `lag017_01_del1av2` (rom 17 Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), lag 01 med 5 objektbilder, del 1/2, bilde to `jobber/rom017_del1av2/resultat.png`)
-- [ ] `lag017_01_del2av2` (rom 17 Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom017_del2av2/resultat.png`)
+- [x] `lag012_05_del1av2` (rom 12 Snuckey's, ute, lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/rom012_del1av2/resultat.png`)
+- [x] `lag015_01_del2av2` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom015_del2av2/resultat.png`)
+- [x] `lag015_02_del2av2` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom015_del2av2/resultat.png`)
+- [x] `lag016_01_del2av2` (rom 16 Hall of Oddities (freakshowet), lag 01 med 4 objektbilder, del 2/2, bilde to `jobber/rom016_del2av2/resultat.png`)
+- [x] `lag016_02_del2av2` (rom 16 Hall of Oddities (freakshowet), lag 02 med 4 objektbilder, del 2/2, bilde to `jobber/rom016_del2av2/resultat.png`)
+- [x] `lag016_03_del2av2` (rom 16 Hall of Oddities (freakshowet), lag 03 med 2 objektbilder, del 2/2, bilde to `jobber/rom016_del2av2/resultat.png`)
+- [x] `lag016_04_del2av2` (rom 16 Hall of Oddities (freakshowet), lag 04 med 2 objektbilder, del 2/2, bilde to `jobber/rom016_del2av2/resultat.png`)
+- [x] `lag016_05_del1av2` (rom 16 Hall of Oddities (freakshowet), lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/rom016_del1av2/resultat.png`)
+- [x] `lag017_01_del1av2` (rom 17 Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), lag 01 med 5 objektbilder, del 1/2, bilde to `jobber/rom017_del1av2/resultat.png`)
+- [x] `lag017_01_del2av2` (rom 17 Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom017_del2av2/resultat.png`)
 
 ## Bestilling 28
 
@@ -3479,3 +3479,5 @@ Bestilling 24: ti TV-/signal-/antennelag levert OK. Identiske 0D/0E/0F kildebevi
 Bestilling 25: ti lag levert OK, med45 faktiske objektkontroller. Fem egne vifteposer, to dørtilstander, skade-/hodefelt og kildebevist TV-gjenbruk. Fire kartlag med egne munn-/gape-/vimpeltilstander; tre konkrete kart03-avvik rettet og uavhengig etterkontrollert. Se `rapporter/bestilling025-20261013/RAPPORT.md`. Bestilling 26 og videre fortsetter.
 
 Bestilling 26: ti lag levert OK,22 faktiske objektfelt. Kartets siste elleve tilstander og rettet seksmerkers skilt, Snuckey’s dør-/is-/vare-/koppvarianter og felles bilmaster med1152-overlapp kontrollert. To egne skulpturer har felles rødklippelandskap. Utvidet ny eske-kontekst og bilens avklippingsforbehold dokumentert. Se `rapporter/bestilling026-20261013/RAPPORT.md`. Bestilling 27 og videre fortsetter.
+
+Bestilling27: ti lag levert OK,24 faktiske objektkontroller. Kaktus på samordnet rødklippelandskap, to styrkemålertilstander og fem utstillingslag med dråper/bobler4/3/1/2. Kran-/hånd-/gulvfeil rettet og uavhengig kontrollert. Midway-master2528×800 har identisk544-overlapp, tom linse og egne vimpler/spak/dør. Se `rapporter/bestilling027-20261013/RAPPORT.md`. Bestilling28 og videre fortsetter.

@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1]
+rows=json.loads((r/'b-kildebevis.json').read_text());proof=[]
+def bbox(d):
+ yy,xx=np.where(d);return None if not len(xx) else [int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)]
+for v in rows:
+ p=root/'jobber'/v['jobb'];im=np.array(Image.open(p/'original_1x.png').convert('RGB'));ba=np.array(Image.open(root/v['base_original']).convert('RGB'));m=json.loads((p/'jobb.json').read_text());rx,ry,_,_=v['region']
+ for o in v['objekter']:
+  x,y,w,h=o['lokalrekt'];a=im[y:y+h,x:x+w];b=ba[y:y+h,x:x+w];dif=np.any(a!=b,axis=2);proof.append({'jobb':v['jobb'],'objekt':o['objekt'],'endrede_mot_base':int(dif.sum()),'lokal_differanseboks':bbox(dif)})
+for oid,states in [(154,5),(155,4)]:
+ picks=[]
+ for v in rows:
+  for o in v['objekter']:
+   if o['objekt'].startswith(f'obj{oid}_'):
+    x,y,w,h=o['lokalrekt'];im=Image.open(root/'jobber'/v['jobb']/'original_1x.png').convert('RGB');im.info.clear();picks.append((o['objekt'],im.crop((x,y,x+w,y+h))))
+ out=Image.new('RGB',(len(picks)*400,500),(185,185,185));d=ImageDraw.Draw(out)
+ for i,(name,im) in enumerate(picks):d.text((i*400+5,5),name,fill='black');out.paste(im.resize((im.width*8,im.height*8),Image.Resampling.NEAREST),(i*400+5,25))
+ out.save(r/f'b-obj{oid}-familie.png')
+ diffs=[]
+ for (an,a),(bn,b) in zip(picks,picks[1:]):
+  dif=np.any(np.array(a)!=np.array(b),axis=2);diffs.append({'fra':an,'til':bn,'endrede':int(dif.sum()),'boks':bbox(dif)})
+ (r/f'b-obj{oid}-differanser.json').write_text(json.dumps(diffs,indent=2))
+a=np.array(Image.open(root/'jobber/lag017_01_del1av2/original_1x.png').convert('RGB'));b=np.array(Image.open(root/'jobber/lag017_01_del2av2/original_1x.png').convert('RGB'));ov=np.any(a[:,248:384]!=b[:,:136],axis=2)
+extra={'rom017_overlapp_original':[136,200],'overlapp_endrede':int(ov.sum())}
+# All metadata from both parts cover partial motifs omitted in part2's own list.
+mask=np.zeros(b.shape[:2],bool)
+for part in [1,2]:
+ m=json.loads((root/f'jobber/lag017_01_del{part}av2/jobb.json').read_text())
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=248;x0=max(x,0);x1=min(x+w,384)
+  if x1>x0:mask[y:y+h,x0:x1]=True
+bb=np.array(Image.open(root/'jobber/rom017_del2av2/original_1x.png').convert('RGB'));extra['rom017_del2_utenfor_union_begge_deler']=int((np.any(b!=bb,axis=2)&~mask).sum())
+a=np.array(Image.open(root/'jobber/lag012_05_del1av2/original_1x.png').convert('RGB'));exclude=np.ones(a.shape[:2],bool);exclude[64:160,184:272]=False
+extra['rom012_bakgrunnsammenligning']={j:int((np.any(a!=np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB')),axis=2)&exclude).sum()) for j in ['lag012_03_del1av2','lag012_04_del1av2']}
+(r/'b-objektdifferanser.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2));(r/'b-bakgrunnsbevis.json').write_text(json.dumps(extra,ensure_ascii=False,indent=2));print(json.dumps({'objekter':proof,'ekstra':extra},ensure_ascii=False,indent=2))

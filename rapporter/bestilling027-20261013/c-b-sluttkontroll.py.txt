@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+p=Path('rapporter/bestilling027-20261013');records=json.loads((p/'b-leveranser.json').read_text())['leveranser'];out=[]
+for r in records:
+ f=Path(r['resultat']);a=np.asarray(Image.open(f).convert('RGB'));sha=hashlib.sha256(f.read_bytes()).hexdigest();assert sha==r['sha256']
+ j=json.loads((f.parent/'jobb.json').read_text());base=np.asarray(Image.open(j['bilde_to']).convert('RGB'));mask=np.zeros(a.shape[:2],bool)
+ for o in j['objekter']:
+  x,y,w,h=o['rekt'];x=(x-j['region'][0])*4;y=y*4+112;mask[y:y+h*4,x:x+w*4]=True
+ outside=int(np.count_nonzero(np.any(a!=base,axis=2)&~mask))
+ document=next(v for v in json.loads((p/'b-komposisjonsbevis.json').read_text()) if v['jobb']==r['jobb'])
+ for x,y,w,h in document['komposisjonsbokser']:mask[y:y+h,x:x+w]=True
+ documented_outside=int(np.count_nonzero(np.any(a!=base,axis=2)&~mask));assert documented_outside==0
+ row={'utenfor_dokumenterte_bokser_avvik':documented_outside,'jobb':r['jobb'],'sha256':sha,'manifest_stemmer':True,'utenfor_metadataunion_avvik':outside,'egenkontroll':r['egenkontroll']}
+ if any(o['objekt']==155 for o in j['objekter']):
+  cut=a[306:362,784:840];white=np.all(cut>220,axis=2);seen=set();comps=[]
+  for y,x in zip(*np.nonzero(white)):
+   if (int(y),int(x)) in seen:continue
+   todo=[(int(y),int(x))];pts=[];seen.add(todo[0])
+   while todo:
+    yy,xx=todo.pop();pts.append((yy,xx))
+    for dy,dx in [(0,1),(0,-1),(1,0),(-1,0)]:
+     q=(yy+dy,xx+dx)
+     if 0<=q[0]<white.shape[0] and 0<=q[1]<white.shape[1] and white[q] and q not in seen:seen.add(q);todo.append(q)
+   comps.append({'boks':[min(x for y,x in pts)+784,min(y for y,x in pts)+306,max(x for y,x in pts)+785,max(y for y,x in pts)+307],'piksler':len(pts)})
+  row['hvite_boblekomponenter_i_undersokt_felt']=comps
+ out.append(row)
+(p/'c-b-sluttkontroll.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')

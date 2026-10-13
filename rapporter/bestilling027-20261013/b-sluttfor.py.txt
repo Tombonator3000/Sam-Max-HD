@@ -1,0 +1,30 @@
+from pathlib import Path
+import json,hashlib
+import numpy as np
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def dump(n,x):(r/n).write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+locks=json.loads((r/'kildehash.json').read_text());bad=[x['fil'] for x in locks if sha(root/x['fil'])!=x['sha256']];assert not bad;dump('b-slutt-kildehash.json',{'antall':len(locks),'avvik':bad})
+prov=[]
+for p in sorted(r.glob('b-*prompt*.txt')):
+ stem=p.name.replace('prompt','raa');raw=r/stem.replace('.txt','.png');part='1av2' if '05-' in p.name else '2av2';orig=(root/f'jobber/lag016_0{5 if part=="1av2" else 1}_del{part}/prompt.txt').read_text();assert p.read_text().startswith(orig)
+ prov.append({'prompt':str(p.relative_to(root)),'sha256_promptfil':sha(p),'sha256_request':hashlib.sha256(p.read_bytes()[:-1]).hexdigest(),'siste_lf_kun_i_fil':True,'ordrett_originalprompt_prefix':True,'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw)})
+dump('b-proveniens.json',{'verktoy':'Innebygd ChatGPT image_gen','eksakt_bildemodell':'Ikke eksponert av verktøyet','antall_kall':7,'kall':prov,'oppskrift':'b-komponer.py.txt','requestkontroll':'b-requestkontroll.json'})
+proof=json.loads((r/'b-komposisjonsbevis.json').read_text());qa={x['jobb']:x for x in json.loads((r/'b-objektqa.json').read_text())};entries=[]
+for i,e in enumerate(proof,1):
+ j=e['jobb'];p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());a=np.array(Image.open(p/'resultat.png').convert('RGB'));x,y,w,h=m['bilde_i_lerret'];mask=np.ones(a.shape[:2],bool);mask[y:y+h,x:x+w]=False;assert np.all(a[mask]==128)
+ assert 'Utfall: OK' in (r/f'b-{j}-kontroll01.txt').read_text()
+ attempts={1:1,2:1,3:0,4:2,5:2}[i]
+ ent={'jobb':j,'resultat':str((p/'resultat.png').relative_to(root)),'sha256':sha(p/'resultat.png'),'egenkontroll':'OK','kontrollfil':str((r/f'b-{j}-kontroll01.txt').relative_to(root)),'forsok':attempts,'fullmaster':None,'fullmaster_sha256':None,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'objektkontroll':qa[j]['objekter'],'proveniens':str((r/'b-proveniens.json').relative_to(root)),'grunnrom':m['bilde_to'],'grunnrom_sha256':sha(root/m['bilde_to']),'kilder':[v for v in locks if v['fil'].startswith('jobber/'+j+'/')],'utenfor_dokumenterte_komposisjonsbokser_endret':e['utenfor_bokser_endret']}
+ entries.append(ent)
+ notes={1:'Hånd/glass og gulvrester er fjernet bare i dette lagets kildeegne felt. Fire hvite bobler. Første korte dråpe.',2:'Bruno med is/sokkel er fraværende; krystallkule/pidestall består. Insect Lad har egen kroppstilstand. Tre bobler og andre dråpe.',3:'Deler den nye kroppen fra tilstand 02 fordi originalkroppene er byteidentiske. Ett boblepunkt og tredje, lengre dråpe. Ingen egen direkte generering, forsøk 0 betyr avledet komposisjon fra dokumenterte nye komponenter.',4:'Første forsøk hadde for høyt skrått kranutløp og vinkehånd. Lokalt imagegen-forsøk 2 rettet begge mot kilde. To bobler, ikke ett som den første kildeplanen feilaktig telte.',5:'Første forsøk gjentok feil normal kranstilling og er forkastet. Source-only forsøk 2 gir egen hevet kran og skrått håndtak. Ingen blå dråpe.'}
+ (p/'notat.md').write_text(f'''# {j}\n\n{notes[i]}\n\nInnebygd ChatGPT image_gen er brukt; verktøyet eksponerte ikke eksakt bildemodell. Direkte forsøk for jobben: {attempts}. Hele familien har sju dokumenterte kall, inklusive ett rent nytegnet underlag for bobler. Se rapporter/bestilling027-20261013/b-proveniens.json og b-komponer.py.txt. Ordrett faktisk prompt er bevart før separat kildepresisering; eksisterende sha256_prompt-metadataavvik er ikke korrigert.\n\nEgenkontroll: OK med uendret sjekk_leveranse.py. Hvert relevant objektfelt er også kontrollert, men teknikk er ikke bruker- eller runtimegodkjenning. Resultat SHA-256: {ent['sha256']}. Fire beskyttede kildehash for jobben er bevart i b-leveranser.json; alle 40 batchkilder er uendret.\n\nOpakt RGB-lerret 1536 × 1024 med eksakt grå padding. Utenfor dokumenterte komposisjonsbokser er levert grunnrom byteidentisk. Alpha for dråpe og punktbobler kommer kun fra nygenerert grafikk; originalen gir posisjon og boks, aldri farge eller maske. Bobleunderlag er nytegnet, med ordinær rektangulær fjæring. Ingen originalsilhuett, lokal warp eller vektortrace.\n\nForbehold: glattere materialer og rundere, tydeligere ansikt/fingre enn lavoppløst kilde. Tilstand 04 har kraftigere strek og tilstand 05 mer kantet skyggelegging enn fellesgrunnlaget. Små lokale toneforskjeller i grønt glass består. Runtime=false, ny individuell brukergodkjenning=false. Se samlet b-kilde-qa.md og uavhengig C-kontroll.\n''')
+dump('b-leveranser.json',{'leveranser':entries})
+# Body equality 02/03 outside the explicitly placed new bubbles.
+a=np.array(Image.open(root/'jobber/lag016_02_del2av2/resultat.png'));b=np.array(Image.open(root/'jobber/lag016_03_del2av2/resultat.png'));allow=np.zeros((1024,1536),bool)
+for e in proof[1:3]:
+ for x,y,w,h in e['boblebokser']:allow[y:y+h,x:x+w]=True
+local=np.zeros_like(allow);local[304:528,672:864]=True;count=int((np.any(a!=b,axis=2)&local&~allow).sum());assert count==0
+dump('b-mikrobevis.json',{'bobler':[e['boblebokser'] for e in proof[:4]],'antall':[4,3,1,2],'kropp02_03_ulike_piksler_utenfor_bobler':count,'draapebokser':[[496,460,12,8],[496,460,12,12],[496,460,12,24]],'originalfarger_eller_masker_brukt_i_resultat':False})
+print('5 manifest entries; 40 sources unchanged; 02/03 bodies identical outside bubbles')

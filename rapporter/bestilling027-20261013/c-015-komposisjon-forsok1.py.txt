@@ -1,0 +1,13 @@
+from PIL import Image
+from pathlib import Path
+import numpy as np
+p=Path('rapporter/bestilling027-20261013')
+for n,context,rect in [('01',(704,560,992,720),(736,592,224,96)),('02',(704,560,864,720),(736,592,64,64))]:
+ j='lag015_'+n+'_del2av2'
+ im=Image.open(p/(j+'-raw1.png')).convert('RGB').resize((context[2]-context[0],context[3]-context[1]),Image.Resampling.LANCZOS)
+ base=Image.open('jobber/rom015_del2av2/resultat.png').convert('RGB')
+ x,y,w,h=rect
+ new=im.crop((x-context[0],y-context[1],x-context[0]+w,y-context[1]+h))
+ yy,xx=np.indices((h,w));a=np.minimum.reduce([xx,yy,w-1-xx,h-1-yy]).clip(0,3)/3
+ old=np.array(base.crop((x,y,x+w,y+h)));out=np.rint(np.array(new)*a[:,:,None]+old*(1-a[:,:,None])).astype('uint8')
+ base.paste(Image.fromarray(out),(x,y));base.save('jobber/'+j+'/resultat.png')

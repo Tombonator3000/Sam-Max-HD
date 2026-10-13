@@ -1,0 +1,15 @@
+# Bestilling27: ti objektlag
+
+Alle ti er mottatt med OK fra uendret checker,24 faktisk målte objektfelt og40 uendrede beskyttede kilder. Root har sett fullscener, nærbilder og familietilstander. C har uavhengig kontrollert B sine fem utstillingslag og rettingene. Ingen motorimport, runtime, avspillingstiming eller ny individuell bildegodkjenning er utført.
+
+Kaktusskulpturen har egne grønne armer, brun sombrero og rødt tørkle, på samme kildeegne rødklippelandskap som de to skulpturene i26. Root har kontrollert felles bakgrunns-SHA og byteidentitet utenfor statuefeltet. To styrkemålerlag har egen lav plattform med flat grønn topp og en separat liten grålilla vekt. Vekten har batchens laveste kantkorrelasjon,0,657, og er glattere/trapesformet enn de sparsomme kildeknekkene.
+
+Utstillingslagene bevarer de forskjellige fraværsfeltene: hånd/glass og bestemt gulvrest borte i01, Bruno/is/sokkel borte i02, men kulepidestall og kildebegrunnet avklippet rest ved feltkanten beholdt. Grunnrommets øvrige utstillinger er tilbake i03/04. Insect Lad beholder egen identitet og kildepose.
+
+Kranhodet har tre ulike blå dråpestørrelser med felles krangeometri, deretter egne04/05-vinkler uten dråpe. Glassfigurens faktiske bobleantall er **4/3/1/2**. Et lite andre punkt nær hodet i04 ble oversett i første kildeanalyse, deretter funnet ved RGB-kontroll og bevart. Kroppen i02/03 er byteidentisk utenfor de egne boblefeltene. C fant for bratt utløp og for høy vinkehånd i04; lokal nygenerering rettet begge. Boblefelt- og gulvskjøter ble rettet og etterkontrollert.31/52/52 HD-piksler utenfor bare metadataunionen i01/02/03 følger dokumentert boblerensing; null avvik utenfor de faktisk oppgitte komposisjonsboksene er kontrollert separat.
+
+Midway har én2528 ×800-master, klipp0/992 og identisk544 ×800-overlapp. Åtte objekter følger hele kildelaget: eget WIN-frontinnhold, tom linseholder, to hevede spakgrep, åpen Trixiedør uten figur, tre forskjellige vimpler og egen propellstilling. En gammel HD-linserest lå12 piksler over metadatafeltet og ble fjernet med et eksplisitt større rektangel fra nytegnet tomfelt. Svake himmelgrenser rundt vimplene ble sammenpasset mellom nye bilder med jevnt additivt RGB-felt, uten geometriendring.
+
+Alle lerret er opake RGB1536 ×1024 med eksakt grå padding128. Root har kontrollert master/klipp/overlapp og alle24 felt. Råforsøk, ordrette prompter med egne kildepresiseringer, faktisk prompt-SHA, forkastede kandidater og oppskrifter er bevart. Innebygd imagegen er brukt; eksakt bildemodellnavn er ikke eksponert. Ingen originalsilhuettmasker, kildepikselkopiering, vektorunntak eller warp er brukt.
+
+Rundere/blankere vimpler, vekt og metallkanter, kraftigere04-streker og grunnrommets tydeligere gulvrest er konkrete tegningsforbehold. [Fremdrift/SHA](fremdrift.json), [sluttkontroll](sluttkontroll.json), [objektmålinger](root-objektkontroll.json), [B sin QA](b-kilde-qa.md), [C sin QA](c-kilde-qa.md) og [uavhengig B-etterkontroll](c-uavhengig-b-qa.md) dokumenterer dette. Offentlige PNG-hasher fra26 er bekreftet i bestilling026-pushkontroll.json. Ingen teknisk kontroll erstatter individuell bildeaksept eller spillvisning.
