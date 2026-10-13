@@ -1,0 +1,52 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,shutil,numpy as np
+p=Path('rapporter/bestilling039-20261013');q=Path('rapporter/bestilling040-20261013');q.mkdir(exist_ok=True);sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();dump=lambda f,v:Path(f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+plan=json.loads((p/'c-atlasplan.json').read_text());stats=json.loads((p/'c-objektkontroll.json').read_text());prov=[]
+for g,count in [('dyr1',2),('dyr2',2),('racoon',1),('orer',1),('blink',1)]:
+ for k in range(1,count+1):
+  r={'gruppe':g,'forsok':k,'verktoy':'innebygd ChatGPT imagegen','modell':'eksakt modellnavn ikke eksponert'}
+  for key,f in [('raw',p/f'c-{g}-raw{k}.png'),('prompt',p/f'c-{g}-prompt{k}.txt'),('source',p/f'c-{g}-source.png')]:r[key]=str(f);r[key+'_sha256']=sha(f)
+  if k==1:
+   f=p/f'c-{g}-{"hd" if g=="blink" else "stil"}.png';r['stilanker']=str(f);r['stilanker_sha256']=sha(f)
+  prov.append(r)
+dump(p/'c-proveniens.json',{'faktiske_bildekall':7,'forsok':prov})
+checks=[]
+for lock in ['kildehash.json','c-ekstra-kildehash.json']:
+ for z in json.loads((p/lock).read_text()):checks.append({'fil':z['fil'],'sha256':sha(z['fil']),'uendret':sha(z['fil'])==z['sha256']})
+assert all(z['uendret'] for z in checks);dump(p/'c-kildehashkontroll.json',checks)
+second=['obj410_02','obj411_01','obj413_01','obj415_01','obj416_01','obj418_01','obj419_01','obj408_01'];out=[[],[]]
+for n in range(1,13):
+ j=f'lag044_{n:02d}';d=Path('jobber')/j;m=json.loads((d/'jobb.json').read_text());f=d/'resultat.png';a=np.array(Image.open(f));assert a.shape==(1024,1536,3);mask=np.ones((1024,1536),bool);mask[112:912,128:1408]=False;assert (a[mask]==128).all();groups=set();sel=[]
+ for o in m['objekter']:
+  group=next(g for g,rs in plan.items() if any(r['objekt']==o['bilde'] for r in rs));groups.add(group);sel.append({'objekt':o['bilde'],'gruppe':group,'valgt_forsok':2 if o['bilde'] in second else 1,'felt':str(p/f'c-{o["bilde"]}-felt.png'),'felt_sha256':sha(p/f'c-{o["bilde"]}-felt.png')})
+ if n in [8,10]:groups.add('blink')
+ relevant=[r for r in prov if r['gruppe'] in groups]
+ log=(p/f'{j}-kontroll.txt').read_text();assert 'Utfall: OK' in log
+ destination=p if n<=10 else q
+ if n>10:shutil.copyfile(p/f'{j}-kontroll.txt',q/f'{j}-kontroll.txt')
+ row={'jobb':j,'resultat':str(f),'sha256':sha(f),'egenkontroll':'OK','kontrollfil':str(destination/f'{j}-kontroll.txt'),'forsok':len(relevant),'raw':relevant,'valgte_felt':sel,'objektkontroll':[z for z in stats if z['jobb']==j],'grunn':'jobber/rom044/resultat.png','grunn_sha256':sha('jobber/rom044/resultat.png'),'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True}
+ if n==12:row.update({'underlag':'jobber/obj409_01/resultat.png','underlag_sha256':sha('jobber/obj409_01/resultat.png'),'underlag_klipp':[400,320,736,384],'underlag_lerretrekt':[672,112,736,384]})
+ out[n>10].append(row)
+ desc='Kildeidentitet er dokumentert av originalnavnene ox/flamingo/jackalope/racoon i objektbilder-959.csv. Hver kildevariant og avkutting er kontrollert; ingen artsgjetting.'
+ if n in [8,10]:desc+=' To øyehøylys er fjernet med små rektangler fra nygenerert svart maskeunderlag. Lag08 beholder resten byte-identisk med HD-grunnrommet; lag10 har også egen ørepose.'
+ if n==11:desc+=' Lukket munn er satt inn som lokalt nytt felt [0,8,48,36] innen metadatafeltet, med 3 px rektangulær fjæring på tre kanter. Resten av kroppen beholdes fra HD-grunnrommet.'
+ if n==12:desc+=' Eksakt tidligere levert HD409-klipp [400,320,736,384] er plassert [672,112] før portrettfraværfeltet. Lys lilla veggfirkant og lite merke beholdes; ingen ny person eller fullførte skjulte bokstaver.'
+ (d/'notat.md').write_text(f'# {j}\n\n{desc}\n\nInnebygd ChatGPT imagegen, eksakt modellnavn ikke eksponert. Originalprompt ordrett pluss separat kildepresisering. Råforsøk, prompter, SHA og valgte felt er bevart i {p}/c-proveniens.json og leveransemanifest. Atlasene er arbeidsbilder; resultat er full RGB-romkomposisjon med ordinær presis skalering/plassering, ingen kildepikselmasker eller warp.\n\nUendret checker: OK. Resultat SHA-256: `{row["sha256"]}`. Canvas 1536 × 1024, motiv [128,112,1280,800], padding 128. Kilder uendret. Objektnærbilder og samlet familie/helscene er kontrollert. Mer modellering, tydeligere hånd-/tåformer på vaskebjørnen fra levert HD-identitet og små kontur-/toneforskjeller består som tegningsforbehold. Runtime og ny brukergodkjenning er false.\n')
+dump(p/'c-leveranser.json',{'leveranser':out[0]});dump(q/'c-leveranser.json',{'leveranser':out[1]})
+qa='''# Bestilling 39 og 044-fortsettelsen i 40 – samlet kilde-QA
+
+Ti + to leveranser er kontrollert mot de riktige originalene. Alle 23 metadatafelt har separat kantmåling i c-objektkontroll.json og alle tolv uendrede sjekker gir OK. Første 418-felt ga FEIL 0,36; source-only forsøk 2 retter lavere ørevinkel og gir 0,936. Alle 40 + 8 låste kilder er uendret. Canvas, motiv og padding er kontrollert. Null avvik utenfor faktiske metadataunioner; lag12 inkluderer bevisst 409-underlaget i unionen.
+
+Identitet er verifisert i konsept/2026-10-12/objektbilder-959.csv linje 373–394: ox-mouth/eye/ear, flamingo-eye/mouth, jackalope-eye/nose/mouth/ear og racoon-body/ears/mouth. 416 er nese, 417 munn. Rutet navn avgjør ikke alene faktisk tilstandsinnhold: 421_02 fjerner bare de to lyse øyepunktene ved original (107,86) og (113,87); 421_03 kombinerer dette med oppstående ører. Dette er dokumentert i c-mikrobevis.json og c-blinkbevis.json. Lag08 bruker kun to små nygenererte underlagsrektangler på levert HD, resten er byte-identisk. Ingen kildebasert piksel-/silhuettmaske.
+
+Sju kroppshøyder/posisjoner er satt fra egne 420-kilder. Samlet c-racoon-familie.png viser kildene og de faktiske nye komposisjonene. Ørestillinger og fravær av høylys er sett separat; lukket munn i lag11 er beholdt uten å endre resten av kroppen. Tydelige svarte poter/fingertupper, lysere maskesnute og fyldigere modellering viderefører tidligere levert HD-romidentitet og er mer detaljerte enn kildens mørke flater. De er et konkret visuelt forbehold, ikke påstand om piksel-/formidentitet. Kropps-/hodebredden varierer svakt mellom nytegnede stillinger. Ingen ekstra hel figur, hale eller nye klær er lagt inn.
+
+Oksemunnene er ulike, okseøyet lukket uten pupilglimt. Første flamingoøye arvet feil søvnig grunnromstilstand; source-only forsøk 2 viser åpent rundt øye. Jackalopens egne øye-/nese-/munn-/ørefelt er beholdt. Source-only forsøk 2 har mer markert pels/lys langs enkelte ørekanter enn HD-grunnrommet. Nærbilder og helscener er kontrollert; små tone-/konturforskjeller langs klipprektangler kan bestå. Ingen geometrisk warp er brukt for å jage kontrollmål.
+
+Lag12: kildekomposisjonen rom044 + 409 ved [136,0,184,96] + 408 ved [200,48,40,40] er bytebevist. Det nye 409-underlaget gjenbrukes presist. 408 viser portrettfravær: lys lilla veggfirkant og lite mørkt merke, ikke et nytt portrett. Synlige EDU...MENT-bokstaver avbrytes av feltet. Den generiske romprompten nevner skiltet, men lag01–11 får det ikke fordi kilden ikke viser det.
+
+Sju faktiske innebygde bildekall, alle råbilder og fullprompter bevart. Første atlasforsøk og feilfelt beholdes via råbilder og avvist kontroll. Eksakt modell er ikke eksponert. Oppskrifter i c-forbered-produksjon.py.txt, c-komposisjon.py.txt, c-qa.py.txt og c-familieqa.py.txt. Ingen Git, globale logger, produktkode eller beskyttede kilder endret. Runtime/import/animasjon og ny individuell brukergodkjenning er ikke verifisert.
+'''
+(p/'c-kilde-qa.md').write_text(qa);(q/'c-kilde-qa.md').write_text('# 044-fortsettelse fra bestilling 39\n\nlag044_11/12 inngår i den samlede familien. Se ../bestilling039-20261013/c-kilde-qa.md, c-proveniens.json, c-racoon-familie.png og c-objektqa-8.png. Begge kontroller OK; 11 er lukket munn, 12 er HD409-underlag med portrettfravær/merke. Manifest her inneholder bare disse to jobbene. Runtime og ny brukergodkjenning false.\n')
+print('leveranser',len(out[0]),len(out[1]),'felt',len(stats),'kilder',len(checks))

@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np
+p=Path('rapporter/bestilling039-20261013');p.mkdir(exist_ok=True);locks=[[],[]];rows=[];fields={};evidence=[];base=np.array(Image.open('jobber/rom044/original_1x.png').convert('RGB'))
+for n in range(1,13):
+ j=f'lag044_{n:02d}';d=Path('jobber')/j;m=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB');a=np.array(im);mask=np.zeros(a.shape[:2],bool)
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:locks[n>10].append({'fil':str(d/f),'sha256':hashlib.sha256((d/f).read_bytes()).hexdigest()})
+ row=Image.new('RGB',(660,424),(128,128,128));ImageDraw.Draw(row).text((4,2),j,fill='white');row.paste(im.resize((640,400),Image.Resampling.NEAREST),(10,22));rows.append(row)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];mask[y:y+h,x:x+w]=1;crop=im.crop((x,y,x+w,y+h));fields.setdefault(o['bilde'],(crop,o['rekt'],[]))[2].append(j)
+ evidence.append({'jobb':j,'objekter':m['objekter'],'utenfor_metadata_avvik':int(np.any(a!=base,axis=2)[~mask].sum()),'totale_avvik':int(np.any(a!=base,axis=2).sum()),'palettfarger':len(im.getcolors(100000))})
+for k in range(0,12,4):
+ out=Image.new('RGB',(1320,848));
+ for i,r in enumerate(rows[k:k+4]):out.paste(r,((i%2)*660,(i//2)*424))
+ out.save(p/f'c-original-kontaktark-{k//4+1}.png')
+fr=[]
+for name,(im,rect,jobs) in sorted(fields.items()):
+ out=Image.new('RGB',(520,360),(128,128,128));ImageDraw.Draw(out).text((5,5),name+' '+str(rect)+' '+','.join(x[-2:] for x in jobs),fill='white');z=min(8,500/im.width,320/im.height);out.paste(im.resize((round(im.width*z),round(im.height*z)),Image.Resampling.NEAREST),(5,30));fr.append(out)
+for k in range(0,len(fr),6):
+ out=Image.new('RGB',(1560,720));
+ for i,r in enumerate(fr[k:k+6]):out.paste(r,((i%3)*520,(i//3)*360))
+ out.save(p/f'c-objektfelt-{k//6+1}.png')
+for name,data in [('kildehash.json',locks[0]),('c-ekstra-kildehash.json',locks[1]),('c-kildebevis.json',evidence)]: (p/name).write_text(json.dumps(data,indent=2)+'\n')
+print(json.dumps(evidence,indent=2))

@@ -1,0 +1,45 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib
+p=Path('rapporter/bestilling039-20261013');base=np.array(Image.open('jobber/rom044/original_1x.png').convert('RGB'));records=[]
+for n in range(1,13):
+ d=Path(f'jobber/lag044_{n:02d}');m=json.loads((d/'jobb.json').read_text());prompt=(d/'prompt.txt').read_text();a=np.array(Image.open(d/'original_1x.png').convert('RGB'))
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];diff=np.any(a[y:y+h,x:x+w]!=base[y:y+h,x:x+w],axis=2);yy,xx=np.where(diff);r={'jobb':d.name,'objekt':o['bilde'],'rekt':o['rekt'],'lerretrekt':[128+4*x,112+4*y,4*w,4*h],'endrede_piksler':int(diff.sum()),'endringsboks_lokal':([int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)] if len(xx) else None)}
+  if len(xx)<60:r['endringer']=[{'xy':[int(u+x),int(v+y)],'fra':base[v+y,u+x].tolist(),'til':a[v+y,u+x].tolist()} for v,u in zip(yy,xx)]
+  records.append(r)
+# Exact underlay route for12
+s=np.array(Image.open('jobber/obj409_01/original_1x.png').convert('RGB'));a=base.copy();a[0:96,136:320]=s;target=np.array(Image.open('jobber/lag044_12/original_1x.png').convert('RGB'));a[48:88,200:240]=target[48:88,200:240];assert np.array_equal(a,target)
+(p/'c-mikrobevis.json').write_text(json.dumps({'felt':records,'lag12_underlag409_pluss408_eksakt':True},indent=2)+'\n')
+text='''# Bestilling 39 – kildeplan, ingen generering
+
+40 kildefiler for lag044_01–10 er låst i kildehash.json. Åtte kontekstfiler for 11–12 er låst i c-ekstra-kildehash.json. Alle tolv originaler, metadata og prompter er lest. Tre originalkontaktark og fire feltark er visuelt kontrollert. Rom044-notat og det opprinnelige gpt-romnotater-registeret er undersøkt; sistnevnte inneholder bare overskriften og gir ingen ekstra artsavklaring.
+
+Dette er full RGB-romkomposisjon, ikke atlas/alfaark. Canvas 1536 × 1024, motiv [128,112,1280,800], grå padding 128. Originalrom 320 × 200. Canvasfelt beregnes som [128+4x,112+4y,4w,4h]. Eksakte felt og endringsbokser står i c-mikrobevis.json. Alle første elleve tilstander har null kildeavvik utenfor sine metadatafelt. Bakgrunnen kan derfor gjenbrukes fra rom044-HD utenfor faktisk endrede felter.
+
+## Motiver og tilstander
+
+410_01/02 er nedre munn-/snutefelt på stort grått hornhode. 01 åpen munn med rød innside; 02 mindre/lukket åpning. 411_01 er øyefelt med lukket/skrå øyestrek. 412_01 er venstre øre under horn, langt smalt utsnitt. Visuell artslesning er bøffel-/storfeaktig; eksakt zoologisk art er ikke dokumentert her og skal ikke brukes til å legge til detaljer.
+
+413_01 er rosa fugls øye; 414_01 er det lange gule nebbet i åpen tilstand med mørk åpning. Ikke tegn tenner eller nytt nebb. 415_01 er lite øyefelt på hjorteaktig trofé ved venstre dør. 416_01 og 417_01 er to ulike munn-/snutefelt på samme hode, med ulike rektangler; bevar hvitt/rosa og mørk åpning. 418_01 og 419_01 er venstre og høyre øre-/gevirnære felt, egne utsnitt, ikke to komplette hoder.
+
+420_01–07 viser den samme grå, svartmaskerte dyrefiguren i tønnen: ulike høyder og munn-/kroppsposisjoner. Visuelt vaskebjørnaktig, men navn/funksjon må bekreftes fra dokumentert kilde eller bruker før identitetsavhengig nytegning. Ikke gjør den til Max, katt eller vanlig ny figur. Bevar to spisse ører, svart ansiktsmaske, grå kropp, lys snute og rød munn. Figuren og tønnekanten overlapper; tegn ikke nye hender eller synlig full underkropp.
+
+421_01–03 er bare 40 × 8 originalpiksler øverst ved figurens ører/hode. De skal ikke erstattes med en full ny figur. 421_02 (lag08) endrer bare TO kildepiksler mot grunnrommet; konkret liste og RGB står i c-mikrobevis.json. 421_01/03 endrer 46/48 piksler. 422_01 (lag11) er et 16 × 16 snute-/munnfelt med 29 endringer, lukket/flat munn sammenlignet med åpent grunnrom. Hele familien må kontrolleres samlet med utsnitt fra samme HD-identitet, og de små øreendringene må påvises visuelt, ikke bare ved høy feltkorrelasjon.
+
+## Siste kontekstjobb: 408 og 409
+
+Lag044_12 har obj409_01 i underlag. Det forklarer 5 350 kildepiksler utenfor 408-rektangelet. Eksakt kildekomposisjon er bevist: rom044 + obj409 original ved [136,0,184,96] + 408 ved [200,48,40,40] gir hele lag12 byte-identisk. 408 er det tomme lyse vegg-/panelfeltet som dekker midten av skiltet og har liten mørk merkeform øverst, ikke et nytt portrett. Skiltets synlige EDU...MENT skal bli avklippet bak feltet; ingen fullføring av skjulte bokstaver. Eksisterende nytegnet obj409 kan undersøkes for gjenbruk ved produksjon, med SHA og riktig plassering. Ikke påstå null avvik utenfor 408 alene.
+
+## Palett, tomrom og risiko
+
+Originalene har 112 farger, unntatt lag03 med 113 og lag12 med 115. De er rompaletter, ikke krav om å kopiere piksler eller automatisk begrense HD til samme antall. Bevar brun vegg/tønne, grålilla hornhode, rosa/gult nebb, brun/rosa hjortedetalj, grå/svart maskert figur og røde munnflater. Svarte forgrunnsformer og tak er bakgrunn som ikke skal gis nye identiteter. Generisk prompt nevner EDU-skiltet også når det faktisk mangler i lag01–11; kildene bestemmer synligheten.
+
+Anbefaling: samme eier for hele 044-familien over 39/40. Lag én konsistent ny figuridentitet og behold egne 420-, 421- og 422-tilstander. Dyras øye/munn/ørekomponenter kan produseres lokalt fra egne originalfelt og HD-romkontekst. Hold 408/409-underlagskomposisjonen separat. Ingen generering før root har lest planen og eventuell identitetsavklaring er løst. Runtime, animasjonsrekkefølge, lydkobling og spillfunksjon er uverifisert; nummerrekkefølge alene beviser dem ikke.
+
+## Jobbfordeling og eksakte originalrektangler
+
+'''
+for n in range(1,13):
+ m=json.loads(Path(f'jobber/lag044_{n:02d}/jobb.json').read_text());text+=f"- lag044_{n:02d}: "+'; '.join(o['bilde']+' '+str(o['rekt']) for o in m['objekter'])+('. Kontekst fra bestilling 40.' if n>10 else '')+'\n'
+(p/'c-kildeplan.md').write_text(text)

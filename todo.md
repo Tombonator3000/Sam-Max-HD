@@ -73,3 +73,5 @@
 
 - [x] Levert bestilling38 med 6 OK og7 faktiske feltkontroller.
 - [ ] Fullfør bestilling38: tre Frog Rock-lag og rist på Conroy-figuren venter motivavklaring.
+
+- [x] Levert bestilling 39 med 10 OK og 21 faktiske feltkontroller.

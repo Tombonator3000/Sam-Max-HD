@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json
+p=Path('rapporter/bestilling039-20261013');plan=json.loads((p/'c-atlasplan.json').read_text());fields={}
+for group,rs in plan.items():
+ raw=Image.open(p/f'c-{group}-raw1.png').convert('RGB').resize((1536,1536 if group=='racoon' else 1024),Image.Resampling.LANCZOS)
+ for r in rs:
+  choice=2 if r['objekt'] in ['obj410_02','obj411_01','obj413_01','obj415_01','obj416_01','obj418_01','obj419_01','obj408_01'] else 1
+  raw=Image.open(p/f'c-{group}-raw{choice}.png').convert('RGB').resize((1536,1536 if group=='racoon' else 1024),Image.Resampling.LANCZOS)
+  x,y,w,h=r['atlasrekt'];rx,ry,rw,rh=r['romrekt'];mx,my,mw,mh=r['metadatarekt'];im=raw.crop((x,y,x+w,y+h)).resize((rw*4,rh*4),Image.Resampling.LANCZOS);im=im.crop(((mx-rx)*4,(my-ry)*4,(mx-rx+mw)*4,(my-ry+mh)*4));im.save(p/f'c-{r["objekt"]}-felt.png');fields[r['objekt']]=im
+base=Image.open('jobber/rom044/resultat.png').convert('RGB');records=[]
+# Mouth state uses only local mouth rectangle from newly generated art; unchanged body is HD base.
+f=base.crop((544,464,608,528));new=fields['obj422_01'];piece=new.crop((0,8,48,44));yy,xx=np.mgrid[:36,:48];alpha=np.clip(np.minimum.reduce([yy,47-xx,35-yy])/3,0,1)[...,None];old=np.array(f.crop((0,8,48,44)),float);f.paste(Image.fromarray(np.rint(np.array(piece)*alpha+old*(1-alpha)).astype('uint8')),(0,8));fields['obj422_01']=f;f.save(p/'c-obj422_01-felt.png')
+# Two original state changes identify semantic eye highlights, not a source mask.
+# Replace only small rectangles using newly generated black mask underlay.
+blink=Image.open(p/'c-blink-raw1.png').convert('RGB').resize((160,128),Image.Resampling.LANCZOS)
+fields['obj421_02']=base.crop((480,432,640,464))
+for name in ['obj421_02','obj421_03']:
+ for bb in [(73,21,84,32),(97,25,108,32)]:fields[name].paste(blink.crop(bb),bb[:2])
+ fields[name].save(p/f'c-{name}-felt.png')
+
+for n in range(1,13):
+ j=f'lag044_{n:02d}';d=Path('jobber')/j;m=json.loads((d/'jobb.json').read_text());im=base.copy();mask=np.zeros((1024,1536),bool)
+ if n==12:
+  under=Image.open('jobber/obj409_01/resultat.png').crop((400,320,1136,704));im.paste(under,(672,112));mask[112:496,672:1408]=True
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=128+x*4;y=112+y*4;im.paste(fields[o['bilde']],(x,y));mask[y:y+h*4,x:x+w*4]=True
+ im.save(d/'resultat.png');records.append({'jobb':j,'utenfor_faktisk_union_avvik':int(np.any(np.array(im)!=np.array(base),axis=2)[~mask].sum())})
+(p/'c-komposisjonsbevis.json').write_text(json.dumps(records,indent=2)+'\n')

@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:43 (norsk tid)
+Oppdatert 2026-10-13 23:51 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 317 bilder levert (161 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 338 bilder levert (171 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -589,16 +589,16 @@ Rom 40, 41, 42, 43.
 
 Rom 44.
 
-- [ ] `lag044_01` (rom 44 Bumpusville, troférommet (Edutainment), lag 01 med 5 objektbilder, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_02` (rom 44 Bumpusville, troférommet (Edutainment), lag 02 med 3 objektbilder, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_03` (rom 44 Bumpusville, troférommet (Edutainment), lag 03 med 4 objektbilder, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_04` (rom 44 Bumpusville, troférommet (Edutainment), lag 04 med 2 objektbilder, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_05` (rom 44 Bumpusville, troférommet (Edutainment), lag 05 med 2 objektbilder, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_06` (rom 44 Bumpusville, troférommet (Edutainment), lag 06 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_07` (rom 44 Bumpusville, troférommet (Edutainment), lag 07 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_08` (rom 44 Bumpusville, troférommet (Edutainment), lag 08 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_09` (rom 44 Bumpusville, troférommet (Edutainment), lag 09 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_10` (rom 44 Bumpusville, troférommet (Edutainment), lag 10 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_01` (rom 44 Bumpusville, troférommet (Edutainment), lag 01 med 5 objektbilder, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_02` (rom 44 Bumpusville, troférommet (Edutainment), lag 02 med 3 objektbilder, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_03` (rom 44 Bumpusville, troférommet (Edutainment), lag 03 med 4 objektbilder, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_04` (rom 44 Bumpusville, troférommet (Edutainment), lag 04 med 2 objektbilder, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_05` (rom 44 Bumpusville, troférommet (Edutainment), lag 05 med 2 objektbilder, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_06` (rom 44 Bumpusville, troférommet (Edutainment), lag 06 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_07` (rom 44 Bumpusville, troférommet (Edutainment), lag 07 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_08` (rom 44 Bumpusville, troférommet (Edutainment), lag 08 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_09` (rom 44 Bumpusville, troférommet (Edutainment), lag 09 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_10` (rom 44 Bumpusville, troférommet (Edutainment), lag 10 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
 
 ## Bestilling 40
 
@@ -3505,3 +3505,5 @@ Bestilling37: ti lag levert OK med 28 faktiske feltkontroller, hjul/kiste/reflek
 Bestilling38: seks lag levert OK med sju faktiske feltkontroller, dråpe/plask, åpen dør, CB-buss og lav arm. Fire jobber venter motivavklaring. Se `rapporter/bestilling038-20261013/RAPPORT.md`. Bestilling35s retting og resten av HD-arbeidet fortsetter.
 
 Bestilling35: ti lag levert, ni OK og lag037_01_del2av2 SJEKK (blokk2,00). Alle23metadatafelt OK, egen uthusfamilie og identisk Escher-overlapp. Se `rapporter/bestilling035-20261013/RAPPORT.md`. Bestilling39 og videre fortsetter.
+
+Bestilling 39: ti lag fra dyreutstillingen levert OK med 21 faktiske feltkontroller, kildeegne munn-/ørestillinger, kroppshøyder og fjerning av to øyeglimt. Se `rapporter/bestilling039-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.

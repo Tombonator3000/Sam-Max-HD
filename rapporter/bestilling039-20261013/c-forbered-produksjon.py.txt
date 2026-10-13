@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image
+import json
+p=Path('rapporter/bestilling039-20261013');hd=Image.open('jobber/rom044/resultat.png').convert('RGB');items={}
+for n in range(1,13):
+ j=f'lag044_{n:02d}';m=json.loads(Path('jobber/'+j+'/jobb.json').read_text())
+ for o in m['objekter']:items[o['bilde']]=(j,o['rekt'])
+sets={'dyr1':['obj410_01','obj410_02','obj411_01','obj412_01','obj413_01','obj414_01'],'dyr2':['obj415_01','obj416_01','obj417_01','obj418_01','obj419_01','obj408_01'],'racoon':[f'obj420_{k:02d}' for k in range(1,8)]+['obj422_01'],'orer':['obj421_01','obj421_02','obj421_03']}
+allrows={}
+for group,names in sets.items():
+ size=(1536,1536 if group=='racoon' else 1024);src=Image.new('RGB',size,(128,128,128));sty=src.copy();rows=[]
+ for i,name in enumerate(names):
+  j,rect=items[name];x,y,w,h=rect
+  if group in ['racoon','orer']:x,y,w,h=88,80,40,32
+  scale=10 if group in ['racoon','orer'] else 8
+  if name=='obj408_01':scale=8
+  px=(i%3)*512+(512-w*scale)//2;py=(i//3)*512+(512-h*scale)//2
+  im=Image.open('jobber/'+j+'/original_1x.png').crop((x,y,x+w,y+h));src.paste(im.resize((w*scale,h*scale),Image.Resampling.NEAREST),(px,py));sty.paste(hd.crop((128+x*4,112+y*4,128+(x+w)*4,112+(y+h)*4)).resize((w*scale,h*scale),Image.Resampling.LANCZOS),(px,py))
+  rows.append({'objekt':name,'jobb':j,'romrekt':[x,y,w,h],'atlasrekt':[px,py,w*scale,h*scale],'metadatarekt':rect})
+ src.save(p/f'c-{group}-source.png');sty.save(p/f'c-{group}-stil.png');allrows[group]=rows
+ original=Path('jobber/'+rows[0]['jobb']+'/prompt.txt').read_text()
+ brief={'dyr1':'Six separate original object crops in fixed grid: top row ox mouth OPEN, ox mouth less open, ox eye CLOSED; bottom row long ox ear, flamingo eye, flamingo beak OPEN. Preserve each exact cutoff and own mouth/eye/ear state. No teeth added. Keep backgrounds and precise anatomy; no entire new heads. Source is authoritative for all geometry.','dyr2':'Six separate source crops: top row jackalope eye, jackalope NOSE (not mouth), jackalope open MOUTH; bottom row jackalope left ear, right ear with antler fragment, EMPTY pale wall where portrait has been removed. Last panel must have NO portrait, face, frame or text; preserve small dark hook/mark near top and partial neighboring picture at left exactly. Jackalope is horned rabbit trophy, not ordinary deer.','racoon':'Eight crops of the SAME racoon-body (original resource spelling racoon). Seven different body heights/poses with open red mouth in reading order; eighth is original base body with CLOSED mouth. Maintain black mask, white muzzle, gray body, two pointed ears and each exact height and mouth size. Do not add paws absent from original or redesign as cat/Max. Use same coherent HD identity throughout, but source geometry overrides style reference. Ninth bottom-right cell stays gray.','orer':'Three same racoon head/body context crops in top row. Only ear/head TOP STRIP changes relative to base: three distinct source poses. Source second crop differs from original base in just two pixels, so do NOT invent a new pose. Keep overall figure and all original ear tips. Only upper 8 of32 source rows will be used in production. Bottom row all gray.'}[group]
+ prompt=original+'\n\nSEPARATE PRODUCTION ATLAS, not final game canvas. Output exact '+str(size[0])+' x '+str(size[1])+' with attached first image layout unchanged. Each cell 512 x512, gray128 gaps. Every crop must remain at its exact attached rectangle; do not enlarge or recenter objects. '+brief+' Second image is existing HD brushwork/identity only, never copy wrong source state. Smooth newly drawn outlines, no pixel stairs. No labels or new objects. Rectangles in reading order: '+json.dumps([r['atlasrekt'] for r in rows])+'.\n'
+ (p/f'c-{group}-prompt1.txt').write_text(prompt)
+(p/'c-atlasplan.json').write_text(json.dumps(allrows,indent=2)+'\n')

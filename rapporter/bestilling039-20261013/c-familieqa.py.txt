@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json
+p=Path('rapporter/bestilling039-20261013');out=Image.new('RGB',(1320,1320),(128,128,128))
+for i,n in enumerate(range(1,12)):
+ im=Image.open(f'jobber/lag044_{n:02d}/resultat.png');src=Image.open(f'jobber/lag044_{n:02d}/referanse.png');x=(i%3)*440;y=(i//3)*330;ImageDraw.Draw(out).text((x+5,y+5),f'lag044_{n:02d} source / HD',fill='white')
+ for k,a in enumerate([src,im]):out.paste(a.crop((480,432,640,560)).resize((216,173),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS),(x+2+k*220,y+25))
+ im.crop((480,432,640,560)).resize((320,256),Image.Resampling.NEAREST).save(p/f'c-racoon-{n:02d}-zoom.png')
+out.save(p/'c-racoon-familie.png')
+base=np.array(Image.open('jobber/rom044/resultat.png'));a=np.array(Image.open('jobber/lag044_08/resultat.png'));dif=np.any(a!=base,axis=2);yy,xx=np.where(dif);(p/'c-blinkbevis.json').write_text(json.dumps({'jobb':'lag044_08','kildeendringer':[[107,86],[113,87]],'nye_hd_rektangler_lokal':[ [73,21,11,11],[97,25,11,7]],'nytt_underlag':'c-blink-raw1.png','antall_endrede_hd_piksler':int(dif.sum()),'endringsboks_canvas':[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],'resten_byteidentisk':True},indent=2)+'\n')

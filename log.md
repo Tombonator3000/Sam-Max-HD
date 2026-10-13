@@ -287,3 +287,8 @@
 
 - Bestilling35: ti lag levert, ni OK og lag037_01_del2av2 SJEKK (blokk2,00). Alle23metadatafelt OK, egen uthusfamilie og identisk Escher-overlapp. Se `rapporter/bestilling035-20261013/RAPPORT.md`. Bestilling39 og videre fortsetter.
 - 80 beskyttede/kontekstfiler uendret. Ingen avvik utenfor faktisk feltunion. Rot har sett alle scener, mikrotilstander og ballretting. Ingen import, runtime eller ny individuell bildeaksept.
+
+## 2026-10-13T23:51:15+02:00 (Codex, Astra)
+
+- Bestilling 39: ti lag fra dyreutstillingen levert OK med 21 faktiske feltkontroller, kildeegne munn-/ørestillinger, kroppshøyder og fjerning av to øyeglimt. Se `rapporter/bestilling039-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

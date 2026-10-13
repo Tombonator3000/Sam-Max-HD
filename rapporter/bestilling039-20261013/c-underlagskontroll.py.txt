@@ -1,0 +1,5 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+p=Path('rapporter/bestilling039-20261013');a=np.array(Image.open('jobber/lag044_12/resultat.png'));u=np.array(Image.open('jobber/obj409_01/resultat.png'))[320:704,400:1136];r=a[112:496,672:1408];mask=np.ones((384,736),bool);mask[192:352,256:416]=False
+v={'jobb':'lag044_12','underlag':'jobber/obj409_01/resultat.png','underlag_sha256':hashlib.sha256(Path('jobber/obj409_01/resultat.png').read_bytes()).hexdigest(),'underlag_kildeklipp_xywh':[400,320,736,384],'underlag_lerretrekt_xywh':[672,112,736,384],'obj408_lerretrekt_xywh':[928,304,160,160],'underlag_byteavvik_utenfor408':int(np.any(r!=u,axis=2)[mask].sum()),'kildekomposisjon_eksakt':json.loads((p/'c-mikrobevis.json').read_text())['lag12_underlag409_pluss408_eksakt']};assert v['underlag_byteavvik_utenfor408']==0;(p/'c-underlagsbevis.json').write_text(json.dumps(v,indent=2)+'\n')
