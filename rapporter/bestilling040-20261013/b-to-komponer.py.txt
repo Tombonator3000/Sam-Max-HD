@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil,subprocess
+r=Path('rapporter/bestilling040-20261013');g=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207');raws={'lag045_03':'exec-26f6de0b-7b54-47d8-9f82-f475675c0769.png','lag048_01':'exec-1e00ab8a-edbe-4f71-b691-33f2a6bec59e.png'}
+for j,f in raws.items():
+ shutil.copy2(g/f,r/f'b-{j}-raa01.png');p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());out=Image.open(m['bilde_to']).convert('RGB');raw=Image.open(r/f'b-{j}-raa01.png').convert('RGB')
+ for idx,o in enumerate(m['objekter']):
+  x,y,w,h=o['rekt'];x=128+x*4;y=112+y*4;w*=4;h*=4
+  if j=='lag045_03':tile=raw.crop((0,0,576,576) if idx==0 else(768,0,1536,768)).resize((w,h),Image.Resampling.LANCZOS)
+  else:tile=raw.resize((w,h),Image.Resampling.LANCZOS)
+  yy,xx=np.mgrid[:h,:w];alpha=Image.fromarray((np.clip(np.minimum.reduce([xx+1,w-xx,yy+1,h-yy])/5,0,1)*255).astype('uint8'));out.paste(tile,(x,y),alpha)
+ out.save(p/'resultat.png');run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr);print(run.stdout)

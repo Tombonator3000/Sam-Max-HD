@@ -292,3 +292,8 @@
 
 - Bestilling 39: ti lag fra dyreutstillingen levert OK med 21 faktiske feltkontroller, kildeegne munn-/ørestillinger, kroppshøyder og fjerning av to øyeglimt. Se `rapporter/bestilling039-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-13T23:57:29+02:00 (Codex, Astra)
+
+- Bestilling 40: åtte lag levert OK med 30 faktiske feltkontroller, egne sangromstilstander, hjelmfravær og presist409-underlag. To sokkelhodetilstander venter på brukerens motivavklaring. Se `rapporter/bestilling040-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib
+r=Path('rapporter/bestilling040-20261013');checks=[]
+for fn in ['kildehash.json','root-ekstra-kildehash.json']:
+ for row in json.loads((r/fn).read_text()):
+  assert hashlib.sha256(Path(row['fil']).read_bytes()).hexdigest()==row['sha256'];checks.append(row['fil'])
+for f,h in json.loads((r/'root-ankerhash.json').read_text()).items():assert hashlib.sha256(Path(f).read_bytes()).hexdigest()==h
+(r/'b-kildehash-start.json').write_text(json.dumps({'uendret':len(checks),'ankre_uendret':4},indent=2)+'\n')
+for j in ['lag045_03','lag048_01']:
+ p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());src=Image.open(p/'referanse.png');hd=Image.open(m['bilde_to']);ss=Image.new('RGB',(256,160),(128,128,128)) if j=='lag045_03' else None;hh=ss.copy() if ss else None
+ for i,o in enumerate(m['objekter']):
+  x,y,w,h=o['rekt'];box=(128+4*x,112+4*y,128+4*(x+w),112+4*(y+h))
+  if ss:ss.paste(src.crop(box),(i*128,0));hh.paste(hd.crop(box),(i*128,0))
+  else:ss=src.crop(box);hh=hd.crop(box)
+ ss.save(r/f'b-{j}-source.png');hh.save(r/f'b-{j}-hd.png')
+ extra={'lag045_03':'Output only a two-panel component sheet with aspect256:160. Left upper panel occupies x0..96,y0..96 and shows the actual brown shelf after the blue booklike object is REMOVED. Keep adjacent books, dark wood and shelf edges. No new object. Right panel x128..256,y0..128 shows the gray-purple escalator steps in precisely source03 phase; retain original count and positions of the horizontal step edges, skew gray diagonal border, surrounding red-brown wood and carpet. All unused sheet area stays neutral gray128. First image is source geometry, second existing HD material context. Preserve exact two panel layout and no text.', 'lag048_01':'Output only this192:224 proportional local component crop. First image is the source state, second is existing HD context. The HELMET IS ABSENT in this source state, as is its hanging black spring/spiral and black support side-lines. Repaint the bare pale green inner wall, retaining only the original upper green mechanism/mount, horizontal green crossbar and the right hanging green/white cables. No helmet, no black spring, no person, no new object. Preserve every remaining edge and its position from source, matching HD cartoon shading. This is opaque RGB, not a transparent object.'}[j]
+ (r/f'b-{j}-prompt01.txt').write_text((p/'prompt.txt').read_text()+'\nSEPARATE SOURCE CLARIFICATION FOR COMPONENT PRODUCTION: '+extra+'\n')

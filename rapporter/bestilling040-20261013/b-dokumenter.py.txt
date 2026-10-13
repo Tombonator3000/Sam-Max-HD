@@ -1,0 +1,12 @@
+from pathlib import Path
+import json,hashlib
+r=Path('rapporter/bestilling040-20261013');proof=json.loads((r/'b-sluttbevis.json').read_text());attempt={'lag045_03':1,'lag047_01':2,'lag047_02':2,'lag047_03':3,'lag047_04':3,'lag048_01':1};rows=[]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+for z in proof['leveranser']:
+ j=z['jobb'];p=Path('jobber')/j;rows.append({**z,'forsok':attempt[j],'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True})
+ (p/'notat.md').write_text(f'''# {j}\n\nKildetro lagkompositt med innebygd ChatGPT-bildegenerator. Eksakt bildemodell er ikke eksponert. {attempt[j]} relevante genereringsforsøk; enkelte katte- og mikrofelt deler nygenererte komponenter fra familiearbeidet. Ordrett originalprompt med separat kildepresisering, alle råbilder og oppskrifter er bevart i {r}.\n\nEgenkontroll: {z['egenkontroll']}, uendret sjekk_leveranse.py. Se {z['kontrollfil']}. Opakt RGB 1536 × 1024, motiv [128,112,1280,800], padding128. Null endringer utenfor metadataunionen. Originaler brukes som motivreferanser og til hele felt-/komponentbokser, ikke resultatpiksler, originalalfa eller warp.\n\nVisuell kontroll: faktisk kildeegen tilstand, avkutting og fravær er gjennomgått i b-sluttfelt-1.png til b-sluttfelt-4.png samt b-sluttfamilie.png. HD har fyldigere øyelokk, munnkonturer og dekor enn kildepikslene. Dette er et tegningsforbehold, ikke påstand om identisk anatomi eller runtime.\n\nOriginal SHA-256: {sha(p/'original_1x.png')}\nResultat SHA-256: {z['sha256']}\n\nRuntime: false. Ny individuell brukergodkjenning: false.\n''')
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':rows,'kilder_uendret':52,'runtime':False,'ny_brukergodkjenning':False,'ikke_produsert':['lag045_01','lag045_02']},indent=2)+'\n')
+files=[]
+for p in sorted(r.iterdir()):
+ if p.name.startswith('b-') and (('raa' in p.name and p.suffix=='.png') or ('prompt' in p.name and p.suffix=='.txt') or p.name.endswith('.py.txt')):files.append({'fil':str(p),'sha256':sha(p)})
+(r/'b-proveniens.json').write_text(json.dumps({'verktøy':'innebygd ChatGPT imagegen','eksakt_bildemodell':'ikke eksponert','genereringskall':11,'filer':files,'komposisjonsrekkefolge':['b-to-komponer.py.txt','b-047-komponer.py.txt','b-04701-lokal-komponer.py.txt','b-lokal-komponer.py.txt','b-katt-mikro-komponer.py.txt'],'micro_kilder':'b-mikrokomposisjon.json','originalmasker':False,'runtime':False,'ny_brukergodkjenning':False},indent=2,ensure_ascii=False)+'\n')

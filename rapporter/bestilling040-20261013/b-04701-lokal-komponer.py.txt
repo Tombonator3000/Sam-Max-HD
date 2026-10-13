@@ -1,0 +1,7 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np
+r=Path('rapporter/bestilling040-20261013');p=Path('jobber/lag047_01/resultat.png');out=Image.open(p).convert('RGB');raw=Image.open(r/'b-04701-lokal-raa02.png').convert('RGB').resize((384,384),Image.Resampling.LANCZOS)
+for z in json.loads((r/'b-04701-lokal-oppsett.json').read_text()):
+ x,y,w,h=z['kilde_rekt'];x=128+x*4;y=112+y*4;w*=4;h*=4;sx,sy,sw,sh=z['ark_rekt'];tile=raw.crop((sx,sy,sx+sw,sy+sh));yy,xx=np.mgrid[:h,:w];a=Image.fromarray((np.clip(np.minimum.reduce([xx+1,w-xx,yy+1,h-yy])/4,0,1)*255).astype('uint8'));out.paste(tile,(x,y),a)
+out.save(p)

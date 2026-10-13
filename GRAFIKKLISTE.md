@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:51 (norsk tid)
+Oppdatert 2026-10-13 23:57 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 338 bilder levert (171 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 368 bilder levert (179 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -604,16 +604,16 @@ Rom 44.
 
 Rom 44, 45, 47, 48.
 
-- [ ] `lag044_11` (rom 44 Bumpusville, troférommet (Edutainment), lag 11 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
-- [ ] `lag044_12` (rom 44 Bumpusville, troférommet (Edutainment), lag 12 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_11` (rom 44 Bumpusville, troférommet (Edutainment), lag 11 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
+- [x] `lag044_12` (rom 44 Bumpusville, troférommet (Edutainment), lag 12 med 1 objektbilde, bilde to `jobber/rom044/resultat.png`)
 - [ ] `lag045_01` (rom 45 Bumpusville, soverommet, lag 01 med 4 objektbilder, bilde to `jobber/rom045/resultat.png`)
 - [ ] `lag045_02` (rom 45 Bumpusville, soverommet, lag 02 med 3 objektbilder, bilde to `jobber/rom045/resultat.png`)
-- [ ] `lag045_03` (rom 45 Bumpusville, soverommet, lag 03 med 2 objektbilder, bilde to `jobber/rom045/resultat.png`)
-- [ ] `lag047_01` (rom 47 Bumpusville Sings (menasjeriet), lag 01 med 11 objektbilder, bilde to `jobber/rom047/resultat.png`)
-- [ ] `lag047_02` (rom 47 Bumpusville Sings (menasjeriet), lag 02 med 8 objektbilder, bilde to `jobber/rom047/resultat.png`)
-- [ ] `lag047_03` (rom 47 Bumpusville Sings (menasjeriet), lag 03 med 4 objektbilder, bilde to `jobber/rom047/resultat.png`)
-- [ ] `lag047_04` (rom 47 Bumpusville Sings (menasjeriet), lag 04 med 2 objektbilder, bilde to `jobber/rom047/resultat.png`)
-- [ ] `lag048_01` (rom 48 Bumpusville, VR-rommet, lag 01 med 1 objektbilde, bilde to `jobber/rom048/resultat.png`)
+- [x] `lag045_03` (rom 45 Bumpusville, soverommet, lag 03 med 2 objektbilder, bilde to `jobber/rom045/resultat.png`)
+- [x] `lag047_01` (rom 47 Bumpusville Sings (menasjeriet), lag 01 med 11 objektbilder, bilde to `jobber/rom047/resultat.png`)
+- [x] `lag047_02` (rom 47 Bumpusville Sings (menasjeriet), lag 02 med 8 objektbilder, bilde to `jobber/rom047/resultat.png`)
+- [x] `lag047_03` (rom 47 Bumpusville Sings (menasjeriet), lag 03 med 4 objektbilder, bilde to `jobber/rom047/resultat.png`)
+- [x] `lag047_04` (rom 47 Bumpusville Sings (menasjeriet), lag 04 med 2 objektbilder, bilde to `jobber/rom047/resultat.png`)
+- [x] `lag048_01` (rom 48 Bumpusville, VR-rommet, lag 01 med 1 objektbilde, bilde to `jobber/rom048/resultat.png`)
 
 ## Bestilling 41
 
@@ -3507,3 +3507,5 @@ Bestilling38: seks lag levert OK med sju faktiske feltkontroller, dråpe/plask, 
 Bestilling35: ti lag levert, ni OK og lag037_01_del2av2 SJEKK (blokk2,00). Alle23metadatafelt OK, egen uthusfamilie og identisk Escher-overlapp. Se `rapporter/bestilling035-20261013/RAPPORT.md`. Bestilling39 og videre fortsetter.
 
 Bestilling 39: ti lag fra dyreutstillingen levert OK med 21 faktiske feltkontroller, kildeegne munn-/ørestillinger, kroppshøyder og fjerning av to øyeglimt. Se `rapporter/bestilling039-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+
+Bestilling 40: åtte lag levert OK med 30 faktiske feltkontroller, egne sangromstilstander, hjelmfravær og presist409-underlag. To sokkelhodetilstander venter på brukerens motivavklaring. Se `rapporter/bestilling040-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.

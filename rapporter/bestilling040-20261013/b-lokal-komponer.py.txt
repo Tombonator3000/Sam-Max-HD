@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess
+r=Path('rapporter/bestilling040-20261013')
+for i in [2,3,4]:
+ j=f'lag047_{i:02d}';p=Path('jobber')/j;out=Image.open(p/'resultat.png').convert('RGB');conf=json.loads((r/f'b-{j}-lokal-oppsett.json').read_text());raw=Image.open(r/f'b-{j}-lokal-raa02.png').convert('RGB').resize(tuple(conf['storrelse']),Image.Resampling.LANCZOS)
+ for z in conf['felt']:
+  if z['objekt']=='obj443_01':continue
+  x,y,w,h=z['kilde_rekt'];x=128+x*4;y=112+y*4;w*=4;h*=4;sx,sy,sw,sh=z['ark_rekt'];tile=raw.crop((sx,sy,sx+sw,sy+sh));yy,xx=np.mgrid[:h,:w];a=Image.fromarray((np.clip(np.minimum.reduce([xx+1,w-xx,yy+1,h-yy])/4,0,1)*255).astype('uint8'));out.paste(tile,(x,y),a)
+ out.save(p/'resultat.png');run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll02.txt').write_text(run.stdout+run.stderr);print(run.stdout)
+# Whole cat-head context for faithful mouth/eye corrections, only target rectangles will be composed.
+box=(880,464,992,576);ss=Image.new('RGB',(256,128),(128,128,128));hh=ss.copy()
+for n,i in enumerate([3,4]):
+ ss.paste(Image.open(f'jobber/lag047_{i:02d}/referanse.png').crop(box),(n*128,0));hh.paste(Image.open('jobber/rom047/resultat.png').crop(box),(n*128,0))
+ss.save(r/'b-katt-source.png');hh.save(r/'b-katt-hd.png');(r/'b-katt-prompt03.txt').write_text(Path('jobber/lag047_03/prompt.txt').read_text()+'''\nSEPARATE LOCAL SOURCE CLARIFICATION: Output ONLY two square cat-head panels in a256x128 proportional sheet, unused gray border kept. Exact source is FIRST; HD second is identity/style context but wrong states. LEFT source cat head has mouth OPEN as a tiny black horizontal gap below pink nose, with pale yellow lower rim. Do not retain the two large closed white buckteeth from HD. RIGHT source cat has its own lowered/closed eye shape as visible in the source, different from left; no new eye anatomy. Preserve the same gray head, yellow muzzle, pink nose, triangular ears, red mounting plaque and exact geometry. Follow SOURCE tiny eyelid and mouth shapes, not generic cartoon expressions. No extra teeth, text, labels or larger mouth.\n''')

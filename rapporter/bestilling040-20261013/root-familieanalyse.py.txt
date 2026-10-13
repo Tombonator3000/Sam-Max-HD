@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1]
+out=[]
+for e in json.loads((r/'root-feltbevis.json').read_text()):
+ j=e['jobb'];m=json.loads((root/'jobber'/j/'jobb.json').read_text());a=np.asarray(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'));b=np.asarray(Image.open((root/m['bilde_to']).parent/'original_1x.png').convert('RGB'));x0,y0,x1,y1=e['lokalt_klipp'];dd=np.any(a[y0:y1,x0:x1]!=b[y0:y1,x0:x1],axis=2);yy,xx=np.nonzero(dd);v={'jobb':j,'objekt':e['objekt'],'endringer':int(dd.sum()),'lokal_bbox':None if not len(xx) else [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]}
+ if len(xx)<=8:v['piksler']=[{'rom_xy':[int(x+x0),int(y+y0)],'fra':b[y+y0,x+x0].tolist(),'til':a[y+y0,x+x0].tolist()} for y,x in zip(yy,xx)]
+ out.append(v)
+(r/'root-mikrobevis.json').write_text(json.dumps(out,indent=2)+'\n')
+print(json.dumps([(e['objekt'],e['endringer']) for e in out]))

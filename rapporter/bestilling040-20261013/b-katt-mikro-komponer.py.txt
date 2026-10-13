@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil
+r=Path('rapporter/bestilling040-20261013');shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-674f57b1-f33f-4166-a3d3-4b83d2c39536.png',r/'b-katt-raa03.png');raw=Image.open(r/'b-katt-raa03.png').convert('RGB').resize((256,128),Image.Resampling.LANCZOS)
+def put(j,tile,xy,feather=0):
+ p=Path('jobber')/j/'resultat.png';out=Image.open(p).convert('RGB')
+ if feather:
+  w,h=tile.size;y,x=np.mgrid[:h,:w];a=Image.fromarray((np.clip(np.minimum.reduce([x+1,w-x,y+1,h-y])/feather,0,1)*255).astype('uint8'));out.paste(tile,xy,a)
+ else:out.paste(tile,xy)
+ out.save(p)
+# Target mouth/eyes only; exact source metadata rectangles, whole newly painted patches.
+put('lag047_03',raw.crop((16,60,80,92)),(896,528),2)
+put('lag047_04',raw.crop((144,32,208,64)),(896,496),2)
+# One gray eye-state mark, source supplies position/size only. Gray is sampled from new cat art.
+catgray=raw.crop((165,35,169,39));put('lag047_02',catgray,(912,512))
+# Six-pixel source microstate is one contiguous3x2 block of yellow eyelid replacing a dark eye.
+# Sample only newly generated toucan yellow cheek, then scale the complete patch to12x8.
+toucan=Image.open(r/'b-lag047_01-raa01.png').convert('RGB');cream=toucan.crop((1062,290,1074,298));put('lag047_02',cream,(1056,256))
+(r/'b-mikrokomposisjon.json').write_text(json.dumps({'cat44402':{'kilde_endrede_piksler':1,'canvas_rekt':[912,512,4,4],'farge_fra':'b-katt-raa03.png ny grå ansiktsflate'},'toucan45301':{'kilde_endrede_piksler':6,'canvas_rekt':[1056,256,12,8],'farge_fra':'b-lag047_01-raa01.png ny gul kinnflate'},'originalmasker':False,'originalfarger_brukt':False},indent=2)+'\n')

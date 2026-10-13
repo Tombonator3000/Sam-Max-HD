@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np,subprocess
+r=Path('rapporter/bestilling040-20261013');micro={(v['jobb'],v['objekt']):v for v in json.loads((r/'root-mikrobevis.json').read_text())};tiles=[]
+for i in range(1,5):
+ j=f'lag047_{i:02d}';p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());out=Image.open(m['bilde_to']).convert('RGB');raw=Image.open(r/f'b-{j}-raa01.png').convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=128+x*4;y=112+y*4;w*=4;h*=4;box=(x,y,x+w,y+h)
+  if micro[(j,o['bilde'])]['endringer']>6:
+   yy,xx=np.mgrid[:h,:w];a=Image.fromarray((np.clip(np.minimum.reduce([xx+1,w-xx,yy+1,h-yy])/4,0,1)*255).astype('uint8'));out.paste(raw.crop(box),(x,y),a)
+  # 0/1/6-pixel states remain base pending exact generated microcomponent work.
+  tile=Image.new('RGB',(660,max(100,h)+25),(90,90,90));d=ImageDraw.Draw(tile);d.text((2,2),j+' '+o['bilde'],fill='white');tile.paste(Image.open(p/'referanse.png').crop(box),(0,25));tile.paste(out.crop(box),(330,25));tiles.append(tile)
+ out.save(p/'resultat.png');res=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(res.stdout+res.stderr);print(res.stdout)
+for n in range(0,len(tiles),7):
+ ts=tiles[n:n+7];pg=Image.new('RGB',(660,sum(t.height for t in ts)),(90,90,90));y=0
+ for t in ts:pg.paste(t,(0,y));y+=t.height
+ pg.save(r/f'b-047-felt-forste-{n//7+1}.png')

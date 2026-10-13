@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,importlib.util
+r=Path('rapporter/bestilling040-20261013');jobs=['lag045_03']+[f'lag047_{i:02d}' for i in range(1,5)]+['lag048_01'];sp=importlib.util.spec_from_file_location('ck','verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(sp);sp.loader.exec_module(ck);rows=[];fields=[];tiles=[];page=Image.new('RGB',(1000,6*285),(90,90,90));d=ImageDraw.Draw(page)
+for idx,j in enumerate(jobs):
+ p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());out=Image.open(p/'resultat.png').convert('RGB');a=np.array(out);base=np.array(Image.open(m['bilde_to']));union=np.zeros(a.shape[:2],bool);metrics=ck.compare(Image.open(p/'original_1x.png'),out.crop((128,112,1408,912)))
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];corr=float(ck.corr(metrics['eo'][y:y+h,x:x+w],metrics['es'][y:y+h,x:x+w]));fields.append({'jobb':j,'objekt':o['bilde'],'kantlikhet':corr,'utfall':'OK' if corr>=.6 else 'SJEKK' if corr>=.5 else 'FEIL'});x=128+x*4;y=112+y*4;w*=4;h*=4;union[y:y+h,x:x+w]=True;box=(x,y,x+w,y+h);t=Image.new('RGB',(650,max(75,h)+25),(90,90,90));ImageDraw.Draw(t).text((2,2),j+' '+o['bilde'],fill='white');t.paste(Image.open(p/'referanse.png').crop(box),(0,25));t.paste(out.crop(box),(330,25));tiles.append(t)
+ assert int(np.any(a!=base,axis=2)[~union].sum())==0,j
+ assert a.shape==(1024,1536,3) and np.all(a[:112]==128) and np.all(a[912:]==128) and np.all(a[:,:128]==128) and np.all(a[:,1408:]==128)
+ run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);cf=r/f'b-{j}-sluttkontroll.txt';cf.write_text(run.stdout+run.stderr);print(run.stdout);rows.append({'jobb':j,'resultat':str(p/'resultat.png'),'sha256':hashlib.sha256((p/'resultat.png').read_bytes()).hexdigest(),'egenkontroll':{0:'OK',1:'SJEKK',2:'FEIL'}.get(run.returncode,'FEIL'),'kontrollfil':str(cf),'utenfor_union':0})
+ d.text((2,idx*285),j,fill='white')
+ for col,name in enumerate(['referanse.png','resultat.png']):
+  im=Image.open(p/name);im.thumbnail((490,260));page.paste(im,(col*500,idx*285+23))
+page.save(r/'b-sluttfamilie.png')
+for n in range(0,len(tiles),7):
+ ts=tiles[n:n+7];pg=Image.new('RGB',(650,sum(t.height for t in ts)),(90,90,90));y=0
+ for t in ts:pg.paste(t,(0,y));y+=t.height
+ pg.save(r/f'b-sluttfelt-{n//7+1}.png')
+locks=[]
+for fn in ['kildehash.json','root-ekstra-kildehash.json']:
+ for z in json.loads((r/fn).read_text()):assert hashlib.sha256(Path(z['fil']).read_bytes()).hexdigest()==z['sha256'];locks.append(z['fil'])
+(r/'b-sluttbevis.json').write_text(json.dumps({'leveranser':rows,'felt':fields,'kilder_uendret':len(locks),'runtime':False,'ny_brukergodkjenning':False},indent=2)+'\n')
