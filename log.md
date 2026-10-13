@@ -132,3 +132,10 @@
 - Mammutens pelsfrie mekaniske tilstand og tre hyssingfester kildeavklart med originaler/register/offisiell hintbok. Nye hyssingtilstander deler byte-identisk nytegnet bakgrunn utenfor dokumenterte forskjellsrektangler, ingen originalmasker.
 - Rom058/059 har 1152 x 800 identiske overlapp, Tarpit 1312 x 800. Tre købarn og avklipt sklietoppfigur bevart; brune tjæredyr ikke gjort til badegjester. Rom061-master1952 x 800 låst med neste del OK og 1120 x 800 identisk overlapp.
 - Alle ti bestilling 12-PNG SHA-verifisert fra GitHub. Proveniens/QA i rapporter/bestilling013-20261013/. Ingen import, timing, faktisk spillvisning eller ny individuell godkjenning. Bestilling 14 pågår.
+
+## 2026-10-13 19:33 (Codex, Astra)
+
+- Tom valgte uttrykkelig presis vektorrekonstruksjon for rom049. Fem genererte kandidater avvist, ny kildebasert SVG/PNG-leveranse har uendret egenkontroll OK 0,01/0,07/1,00.
+- 41 flate originalfarger, felles kildegrenser og knutepunkter bevart. Ingen innbakt bitmap, gradient eller ny tekstur. 532 rasterregionløkker beholdt. Root og uavhengig Astra-QA undersøkte motiv/topologi; ingen avgjørende feil funnet.
+- Noen trappekanter består ved små tette knutepunkter, dokumentert som kvalitetsforbehold. Fire beskyttede kilder uendret. Proveniens, geometri, metodevalg og tidligere avvist kandidat i rapporter/rom049-vektor-20261013/.
+- Grafikk levert, ingen ny individuell bildegodkjenning, import, masker eller faktisk spillvisning. Øvrig HD-produksjon fortsetter.

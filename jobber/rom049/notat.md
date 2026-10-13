@@ -1,13 +1,11 @@
-# rom049 – Bestilling 11 C
+# Rom049, presis vektorrekonstruksjon
 
-VISUELT UAVKLART. Fire imagegen-forsøk er avvist: ekstra polygonunderinndeling og gradienter bryter kildens flate, brede fasetter. Teknisk OK er utilstrekkelig. Resultatfilen er kandidat 2, ikke godkjent HD-leveranse. Forsøk 3 og 4 er bare bevart som råforsøk.
+Tom valgte uttrykkelig «Bruk presis vektorrekonstruksjon for VR-rommet» 13. oktober 2026. Fem bildeforsøk hadde ekstra fasetter og gradienter og ble visuelt avvist. Ny leveranse bruker kildebaserte SVG-flater, ikke et nytt bildeforsøk eller oppskalert originalbitmap.
 
-Verktøy: innebygd ChatGPT imagegen; eksakt modellversjon er ikke eksponert. 4 forsøk. Ordrett originalprompt og nødvendige kildepresiseringer er bevart separat i rapportmappen. Godkjent kontoranker brukes bare som malerisk stil for 047, 048 og 050; 049 er et uttrykkelig unntak med flate polygoner.
+Python 3, numpy og Pillow henter originalens 41 farger og sammenhengende fargegrenser. Felles grenser forenkles én gang og gjenbrukes på begge naboflater. Knutepunktene står på kildekoordinater, største tillatte kjedeforenkling er 0,8 originalpiksel. Alle 532 rasterregionløkker består; dette er et topologimål, ikke et anslag over antall designfasetter. SVG har ingen innbakt raster, gradient eller tekstur. PNG rendres fra de samme vektorbanene med antialiasdekning langs kanter. Ingen generert tegning er maskert med originalsilhuetten.
 
-Resultat SHA-256: `cc1028e51d0a62061a66b99fcc330711fd4d9280394403e8fb2f5f390c157afc`. Alle råforsøk og deres SHA-256 finnes i c-leveranser.json. Valgt råforsøk: 2.
+Uendret egenkontroll: OK, skift 0,01, blokk 0,07 og kantlikhet 1,00. Root og uavhengig Astra-QA har sett original/HD. Hule, sverd, slottvinduer og kildepalett er bevart. Separat diagnose fant ingen egentlige segmentkryss, uten å være et fullstendig topologisk bevis.
 
-Presis plassering: råbildets rektangel (128,112,1280,800) klippes uten skalering og plasseres på samme koordinater i 1536 × 1024 RGB-lerret med padding (128,128,128). Ingen geometriwarp eller originalsilhuettmaskering.
+Enkelte trappetrinn består ved små, tette knutepunkter, særlig sverdet og noen fjell-/hulekanter. Resultatet er ikke jevnt utglattet eller pikselidentisk overalt. Dette forbeholdet er bevart. Fire beskyttede jobbfiler er SHA-uendret. Råforsøk og tidligere avviste kandidat finnes i historikken og rapportene.
 
-Uendret checker: OK, se `rom049-kontroll.txt`. Dette er kun teknisk egenkontroll. Runtime og ny brukergodkjenning er ikke utført.
-
-Root gjorde et femte originalstyrt bildeforsøk uten stilanker. Også dette tilfører gradienter og nye fasetter og er visuelt avvist. Råbilde og full prompt er bevart. Ingen ny kandidat er promotert. Presis vektorrekonstruksjon er foreslått i et uttrykkelig metodevalg etter bildeverktøyets instruks; øvrig produksjon fortsetter.
+Detaljer, master, oppskrift, brukerens metodevalg og uavhengig QA: rapporter/rom049-vektor-20261013/. Totalt fem bildeforsøk og én vektorrekonstruksjon. Eksakt bildemodell for avviste forsøk var ikke eksponert; denne leveransen er vektorrendret. Individuell bildegodkjenning, originalmasker, dynamisk palett, motorimport og faktisk spillvisning er ikke verifisert.

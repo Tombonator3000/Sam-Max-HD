@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 19:23 (norsk tid)
+Oppdatert 2026-10-13 19:33 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,7 +9,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 55 hele rom og 1 delvis levert (87 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Rombakgrunner | 56 hele rom og 1 delvis levert (88 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 32 levert, inkludert 6 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
@@ -173,7 +173,7 @@ Rom 44, 45, 47, 48, 49, 50, 51, 52.
 - [x] `rom045` (rom 45 Bumpusville, soverommet)
 - [x] `rom047` (rom 47 Bumpusville Sings (menasjeriet))
 - [x] `rom048` (rom 48 Bumpusville, VR-rommet)
-- [ ] `rom049` (teknisk OK, visuelt avvist: ekstra fasetter/gradienter, ikke klar for mottak) (rom 49 Den virtuelle verdenen)
+- [x] `rom049` (rettet med uttrykkelig valgt presis vektorrekonstruksjon, egenkontroll OK, se rapporter/rom049-vektor-20261013/RAPPORT.md) (rom 49 Den virtuelle verdenen)
 - [x] `rom050` (rom 50 Hjernen i VR-maskinen)
 - [x] `rom051_del1av2` (rom 51 Savage Jungle Inn, ute, del 1/2)
 - [x] `rom051_del2av2` (rom 51 Savage Jungle Inn, ute, del 2/2)
@@ -3447,3 +3447,5 @@ Bestilling 11: ni bilder klare, alle teknisk OK. Rom049 er teknisk OK men visuel
 Bestilling 12: ti OK levert, med kildekontrollert fest, bassengtilstander og grønnsaksmuseum. Rom058-master og neste del er låst; se `rapporter/bestilling012-20261013/RAPPORT.md`. Bestilling 13 fortsetter.
 
 Bestilling 13: 8 OK og 2 SJEKK (obj566_01 og rom060 del 2). Ti bilder levert, kontrollavvik beholdt. Rom061-master og neste del er låst; se `rapporter/bestilling013-20261013/RAPPORT.md`. Bestilling 14 fortsetter.
+
+Rom049 er senere rettet etter Toms uttrykkelige vektorvalg og levert OK; tidligere avvist bestilling 11-kandidat er historikk. Se `rapporter/rom049-vektor-20261013/RAPPORT.md`. Noen trappekanter er bevart ved tette knutepunkter.
