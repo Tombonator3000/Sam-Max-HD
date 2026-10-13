@@ -1,0 +1,11 @@
+# Bestilling 10 gruppe B kilde-QA
+
+Fire resultater fra to fullscene-genereringer, ett forsøk per rom. Originale deler, helscener og metadata undersøkt før generering. Godkjent kontorpilot brukt kun som stilanker. Ordrette prompter med egne kildepresiseringer bevart; innebygd imagegen, eksakt modellnavn ikke eksponert.
+
+Rom042: BUMPUSVILLE-skilt, ansiktsornament og CB-formet blomsterbed bevart. Grå gitarstatue er skulptur, ikke levende person. Sju notegrupper består av fem enkeltmarkører og to doble, ni notehoder totalt. Fire verandasøyler, originalens vindusgrupper med lilla skodder og avklipt venstre rundvindu, brønn, gangstier, basseng, hodeformet grønn busk og delvis skjult bil kontrollert. Ingen nye gjester. Små vindusruter, lyspunkter, vannsprut og blomster er HD-tolkninger; ikke dokumentert identiske enkeltpiksler.
+
+Rom043: Conroy har høy blond krølltopp, svarte solbriller, rosa ansikt, oransje jakke, blått bryst/halsfelt og gule bukser. Venstre utstilling holder gitar og kildeegen håndstilling med runde mørke brystdetaljen; portrettet har kryssede armer. Fire synlige rammer til venstre for portrettet, to delvis skjulte bak høyre søyle, to gullplater på høyre vegg, tre små rammer nær døren og avklipt bilde ytterst til høyre bevart. Mørke rammer bak venstre figur beholdt uten nye motiver. To vridde søyler, sju spotlamper, sofa, sperretau, teppe, gardin, horn, plante og to svarte instrumentsilhuetter følger kilden. Ingen ny lesbar plaketttekst; portrettets små signaturformer er tolket fra kilden, ikke autentisert som navn.
+
+Fullmastere rom042 2048×800 og rom043 2496×800. Klipp med delskift512/960 gir byte-identisk overlapp1024×800/576×800. Oppskriften bruker global normalisering fra generatorcanvas og eksakt klipp, ingen lokal warp eller originalkonturmaskering. Alle 16 beskyttede kilder kontrollert uendret mot kildehash.json.
+
+Uendret sjekk_leveranse.py gir fire OK: rom042del1 skift0.04/blokk0.27/kant0.96, del2 0.08/0.12/0.96; rom043del1 0.07/0.49/0.95, del2 0.07/0.38/0.96. Visuelt sett samlet mot originalhelscenene. Mer modellert shading og mikrokonturer er tolkninger. Runtime, faktisk produktvisning, maskesamspill og ny individuell brukergodkjenning er uverifisert/false.

@@ -104,3 +104,10 @@
 - Seks vortex-spinnere tegnet etter flere originaltilstander. Stol er tydelig, øvrige formers eksakte navn/funksjon er uavklart. Ingen nye bok-, kost- eller hattedetaljer lagt til. Små konturavvik og mer uttalt solglød dokumentert.
 - Rom036 del 2 fra låst master, overlapp 1152 x 800 identisk over bestillingsgrensen. Escher-rommets overlapp identisk. Magnetrommet har tre røde magneter; master og neste del er låst og kontrollert.
 - Bestilling 8 sine ti lagrede PNG, inkludert eksplisitt FEIL-kandidat, SHA-verifisert fra GitHub. Proveniens i rapporter/bestilling009-20261013/. Bestilling 10 fortsetter. Ingen motorimport, spilltest eller ny individuell brukergodkjenning.
+
+## 2026-10-13 19:03 (Codex, Astra)
+
+- Bestilling 10 levert med ti OK, 40 uendrede beskyttede kilder, eksakt lerret/padding og SHA. Root sammenlignet alle original/HD samt større gruppe A.
+- Rom038 overlapper tidligere del med 1152 x 800 identiske bytes. Frog Rock 1152, Bumpusville ute 1024 og gangen 576 piksler bred identisk overlapp. Bevis/oppskrift i rapporter/bestilling010-20261013/.
+- Rom040 forblir opp ned; BEEF rettet etter nærlesing uten endring av resten. Rom044 uten separat EDU-skilt eller blank dekkplate. Conroy, statuer, utstillinger og kildens tomme felt bevart. Små glypher og materialdetaljer er ikke erklært identiske.
+- Alle ti bestilling 9-PNG SHA-verifisert fra GitHub. Ingen motorimport, faktisk spillvisning eller ny individuell brukergodkjenning. Bestilling 11 pågår; tidligere avvik beholder status.

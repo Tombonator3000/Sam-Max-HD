@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 19:00 (norsk tid)
+Oppdatert 2026-10-13 19:03 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,7 +9,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 34 hele rom og 1 delvis levert (55 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Rombakgrunner | 41 hele rom levert (65 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 25 levert, inkludert fem SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
@@ -154,16 +154,16 @@ Rom 36, 37, 38.
 
 Rom 38, 39, 40, 41, 42, 43, 44.
 
-- [ ] `rom038_del2av2` (rom 38 Magnetrommet, del 2/2)
-- [ ] `rom039` (rom 39 Shuv-Oohls hule)
-- [ ] `rom040` (rom 40 Gavebutikken (opp ned))
-- [ ] `rom041_del1av2` (rom 41 Frog Rock, del 1/2)
-- [ ] `rom041_del2av2` (rom 41 Frog Rock, del 2/2)
-- [ ] `rom042_del1av2` (rom 42 Bumpusville, ute, del 1/2)
-- [ ] `rom042_del2av2` (rom 42 Bumpusville, ute, del 2/2)
-- [ ] `rom043_del1av2` (rom 43 Bumpusville, gangen, del 1/2)
-- [ ] `rom043_del2av2` (rom 43 Bumpusville, gangen, del 2/2)
-- [ ] `rom044` (rom 44 Bumpusville, troférommet (Edutainment))
+- [x] `rom038_del2av2` (rom 38 Magnetrommet, del 2/2)
+- [x] `rom039` (rom 39 Shuv-Oohls hule)
+- [x] `rom040` (rom 40 Gavebutikken (opp ned))
+- [x] `rom041_del1av2` (rom 41 Frog Rock, del 1/2)
+- [x] `rom041_del2av2` (rom 41 Frog Rock, del 2/2)
+- [x] `rom042_del1av2` (rom 42 Bumpusville, ute, del 1/2)
+- [x] `rom042_del2av2` (rom 42 Bumpusville, ute, del 2/2)
+- [x] `rom043_del1av2` (rom 43 Bumpusville, gangen, del 1/2)
+- [x] `rom043_del2av2` (rom 43 Bumpusville, gangen, del 2/2)
+- [x] `rom044` (rom 44 Bumpusville, troférommet (Edutainment))
 
 ## Bestilling 11
 
@@ -3439,3 +3439,5 @@ Bestilling7:9OK og obj293_01 SJEKK, ti bilder levert. Se `rapporter/bestilling00
 Bestilling8:9OK levert og obj307_01 uavklart FEIL. Paneltoppkandidaten forblir ukrysset; se `rapporter/bestilling008-20261013/RAPPORT.md`. Reproduserbar numerisk kontrollbegrensning står i `rapporter/kontroll-fft-20261013/RAPPORT.md`, uten omklassifisering av grafikken.
 
 Bestilling 9: 7 OK og 3 SJEKK (obj335_01, obj337_01 og obj339_01), ti bilder levert. Se `rapporter/bestilling009-20261013/RAPPORT.md`. Mystery Vortex-formenes identitet og små konturavvik er oppgitt; rom036/037 har identisk overlapp. Bestilling 10 fortsetter. De to eldre FEIL-kandidatene forblir ukrysset.
+
+Bestilling 10: ti rombilder med egenkontroll OK, fire identiske overlapp og kildekontrollert opp-ned-butikk og troférom. Se `rapporter/bestilling010-20261013/RAPPORT.md`. Bestilling 11 er startet.

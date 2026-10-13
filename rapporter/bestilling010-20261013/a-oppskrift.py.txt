@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+import json
+b=Path(__file__).resolve().parents[2]
+r=b/'rapporter/bestilling010-20261013'
+for job,p in json.loads((r/'a-prosessering.json').read_text()).items():
+    im=Image.open(r/p['raw']).convert('RGB')
+    out=Image.new('RGB',(1536,1024),(128,128,128))
+    out.paste(im.crop(tuple(p['box'])).resize((1280,800),Image.Resampling.LANCZOS),(128,112))
+    for patch in p.get('patches',[]):
+        im=Image.open(r/patch['raw']).convert('RGB')
+        if 'box' in patch: im=im.crop(tuple(patch['box']))
+        if 'resize' in patch: im=im.resize(tuple(patch['resize']),Image.Resampling.LANCZOS)
+        if 'rotate' in patch: im=im.rotate(patch['rotate'])
+        out.paste(im,tuple(patch['paste']))
+    out.save(b/'jobber'/job/'resultat.png')

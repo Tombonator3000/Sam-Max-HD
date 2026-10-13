@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+import hashlib
+r=Path('rapporter/bestilling010-20261013')
+m=Path('rapporter/bestilling009-20261013/rom038-fullmaster.png')
+assert hashlib.sha256(m.read_bytes()).hexdigest()=='b917371e262b93be2019cf0b8f8c039f589ce44716650afcfb7aae9a27434789'
+c=Image.new('RGB',(1536,1024),(128,128,128))
+c.paste(Image.open(m).convert('RGB').crop((384,0,1920,800)),(0,112))
+c.save('jobber/rom038_del2av2/resultat.png')
+a,b=[np.array(Image.open(r/name).convert('RGB').crop((0,112,1536,912))) for name in ['rom041_del1av2-raa-2.png','rom041_del2av2-raa-1.png']]
+f=np.zeros((800,1920,3),dtype=np.uint8)
+f[:,:1536]=a
+f[:,1088:]=b[:,704:]
+t=np.linspace(0,1,64)[None,:,None]
+t=t*t*(3-2*t)
+f[:,1024:1088]=np.round(a[:,1024:1088]*(1-t)+b[:,640:704]*t).astype('uint8')
+Image.fromarray(f).save(r/'rom041-fullmaster.png')
+for i,x in [(1,0),(2,384)]:
+    c=Image.new('RGB',(1536,1024),(128,128,128))
+    c.paste(Image.fromarray(f[:,x:x+1536]),(0,112))
+    c.save(f'jobber/rom041_del{i}av2/resultat.png')

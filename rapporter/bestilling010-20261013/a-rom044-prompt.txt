@@ -1,0 +1,24 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+Note for this room: Copy the sign 'EDU...MENT' exactly as it shows: the middle of the sign is covered by a plain panel where the game draws an object; keep that panel plain. Keep the stuffed heads and the trophies as they are.
+
+If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image.
+
+
+SOURCE CLARIFICATION: CRITICAL SOURCE CORRECTION: The generic room note about EDU...MENT and a blank covering panel does NOT apply to this background. That sign is separate object409. Do NOT draw EDU text, hanging sign, sign posts or a blank sign plate anywhere. Image1 is sole source for this trophy room background; image2 is approved ink/paint style only. Preserve every source trophy/display shape exactly: large gray buffalo/ox-like head with curved horns upper-left, pink long-beaked bird head below it, pale long-eared head cropped at far left, small gray open-mouth display on golden barrel below bird, blue guitar-like object behind glass, wooden cabinet with individual angular green/yellow/gray exhibit forms, back-wall framed monochrome face with dark brimmed shape, surrounding small frames, two glass-fronted boxes beneath it, right-wall pictures and blue-gray chest/bench. Do NOT invent animal species, living figures, faces or new exhibit details. All large foreground silhouettes remain entirely BLACK and cut off as source, no completing them. Preserve black ceiling, three hanging spotlights, door opening at left with red drape/green bar, red carpet, skewed floorboards and tan/wood surfaces. Small plaque marks are source shapes, not new readable words. Do not add/remove frames, heads or display parts. Exact1280x800 picture at[128,112] on1536x1024RGB128 padding. Trace the exact boundaries and original exaggerated skew, no local scale changes, no added spotlight, retain source palette and bold restrained cartoon ink/paint.
