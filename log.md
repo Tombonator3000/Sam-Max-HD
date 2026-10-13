@@ -242,3 +242,8 @@
 
 - Bestilling 29: ti lag levert OK med 17 faktiske objektkontroller. Egne Max-poser og Sam-armunderlag, rosa skap med/uten rutefelt, åpent kistelokk og fem Tunnel of Love-tilstander. Pilavklipping og oppdiktet klovnenese/smil er rettet og kontrollert. Se `rapporter/bestilling029-20261013/RAPPORT.md`. Bestilling 30 og videre fortsetter.
 - 40 beskyttede kilder og 16 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T23:00:38+02:00 (Codex, Astra)
+
+- Bestilling 30: ti lag levert OK med 20 faktiske objektkontroller. Brukeravklart stangfot, Gator Golf-knapper og liggende Sam, fravær av brekkjern/griper og seks egne Tunnel of Love-tilstander. Se `rapporter/bestilling030-20261013/RAPPORT.md`. Bestilling 31 og videre fortsetter.
+- 40 beskyttede kilder og 12 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

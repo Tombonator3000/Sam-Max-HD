@@ -1,0 +1,6 @@
+from pathlib import Path
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1]
+for n,p in [('kilde','jobber/lag023_01/referanse.png'),('hd','jobber/rom023/resultat.png')]:
+ Image.open(root/p).crop((128,688,320,784)).resize((1152,576),Image.Resampling.NEAREST if n=='kilde' else Image.Resampling.LANCZOS).save(r/f'a-023-{n}.png')
+p=(root/'jobber/lag023_01/prompt.txt').read_text();(r/'a-lag023_01-prompt02.txt').write_text(p+'\n\nLOCAL SOURCE CORRECTION: output ONLY attached crop, same framing and 2:1 ratio. First image actual absence state; second existing HD context. Thin silver crowbar above scraps must be GONE, but preserve large beige polygon scrap rising behind white scrap at bottom left. Preserve ALL other beige/white/gray/yellow fragments and clipping. Black upper background remains black. Newly paint smooth HD forms in EXACT source positions. Do not remove beige polygon with the crowbar. No new tool or texture.\n')

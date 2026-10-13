@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np,importlib.util
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling030-20261013';sp=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(sp);sp.loader.exec_module(c)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+boxes=json.loads((r/'a-rektangler.json').read_text());entries=[];rows=[]
+for j,rects in boxes.items():
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());im=Image.open(d/'resultat.png').convert('RGB');a=np.array(im);base=np.array(Image.open(root/m['bilde_to']).convert('RGB'));part,_=c.part_of(im,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);fields=[];mask=np.ones(a.shape[:2],bool)
+ for o,b in zip(m['objekter'],rects):
+  x,y,w,h=o['rekt'];x-=m['region'][0];co=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));fields.append({'objekt':o['bilde'],'rekt':o['rekt'],'kantkorrelasjon':co,'utfall':'OK' if co>=.6 else 'SJEKK' if co>=.5 else 'FEIL'});rows.append((j,o['bilde'],Image.open(d/'referanse.png').crop(b),im.crop(b)));x,y,z,t=b;mask[y:t,x:z]=False
+ assert all(f['utfall']=='OK' for f in fields);assert np.array_equal(a[mask],base[mask]);pad=np.ones(a.shape[:2],bool);x,y,w,h=m['bilde_i_lerret'];pad[y:y+h,x:x+w]=False;assert np.all(a[pad]==128)
+ attempts=2 if j in ['lag023_01','lag025_02'] else 1;prov=[]
+ for k in range(1,attempts+1):
+  raw=r/f'a-{j}-raa{k:02d}.png';p=r/f'a-{j}-prompt{k:02d}.txt';assert (d/'prompt.txt').read_text().rstrip() in p.read_text();refs=[f'jobber/{j}/referanse.png',m['bilde_to']] if k==1 else [f'rapporter/bestilling030-20261013/a-{"023" if j=="lag023_01" else "sam"}-{n}.png' for n in ['kilde','hd']];prov.append({'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'prompt':str(p.relative_to(root)),'prompt_sha256':sha(p),'referanser':[{'fil':f,'sha256':sha(root/f)} for f in refs]})
+ e={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':'OK','kontrollfil':str((r/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':attempts,'proveniens':prov,'objektkontroll':fields,'utenfor_metadataunion_ulike_piksler':0,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True};entries.append(e)
+ (d/'notat.md').write_text(f'# {j}\n\nKildetro tilstand etter root-kildeplan.md og visuell feltkontroll. Brukeren har avklart obj260 som stangfot på brygga; ingen kamera eller golfkøller er lagt til. 023/024 er fraværstilstander. 025-variantene har egne mølle-, knapp- og figurtilstander.\n\nInnebygd imagegen, {attempts} kall; eksakt modell ikke eksponert. Alle råbilder/prompter/referansehash i a-leveranser.json. Ordrett prompt pluss separat kildepresisering. Rektangulær nygrafikk med fire HD-pikslers kantovergang mot nytegnet rombakgrunn. Ingen originalmasker, kildepikselkunst, vektor eller lokal warp.\n\nUendret checker OK, alle metadatafelt eksplisitt OK. Opak RGB1536 x1024, kildebestemt motivfelt, padding128. Byte-identisk grunnrom utenfor metadataunion. SHA-256 {e["sha256"]}. Se a-kilde-qa.md og nærbilder for motiv og begrensninger. Ingen runtime/import eller ny individuell godkjenning.\n')
+locks=json.loads((r/'kildehash.json').read_text())+json.loads((r/'root-ekstra-kildehash.json').read_text())
+for e in locks:assert sha(root/e['fil'])==e['sha256']
+(r/'a-kildehashkontroll.json').write_text(json.dumps([{**e,'uendret':True} for e in locks],indent=2));(r/'a-leveranser.json').write_text(json.dumps({'leveranser':entries,'genereringskall':6,'checker_sha256':sha(root/'verktoy/sjekk_leveranse.py'),'oppskrift_sha256':sha(r/'a-sammensetting.py.txt')},indent=2));print([(e['jobb'],e['objektkontroll']) for e in entries])
+for start in range(0,len(rows),5):
+ sub=rows[start:start+5];out=Image.new('RGB',(1200,len(sub)*300),(180,180,180));dr=ImageDraw.Draw(out)
+ for i,(j,o,s,h) in enumerate(sub):
+  for k,im in enumerate([s,h]):
+   sc=min(560/im.width,260/im.height);im=im.resize((round(im.width*sc),round(im.height*sc)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);out.paste(im,(k*600,i*300+25))
+  dr.text((5,i*300+5),j+' '+o,fill='black')
+ out.save(r/f'a-objektqa-{start//5+1}.png')

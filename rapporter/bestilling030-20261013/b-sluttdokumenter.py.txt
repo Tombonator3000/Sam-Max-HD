@@ -1,0 +1,34 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent; root=r.parents[1]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,x):p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+checks=[]
+for f in ['kildehash.json','root-ekstra-kildehash.json']:
+ for x in json.loads((r/f).read_text()):
+  actual=sha(root/x['fil']);checks.append(dict(x,faktisk_sha256=actual,uendret=actual==x['sha256']))
+assert all(x['uendret'] for x in checks)
+save(r/'b-kildelas-slutt.json',{'antall':len(checks),'alle_uendret':True,'filer':checks})
+proof=json.loads((r/'b-komposisjonsbevis.json').read_text());calls=[]
+original=(root/'jobber/lag022_03_del3av3/prompt.txt').read_bytes()
+for p in sorted(r.glob('b-*prompt*.txt')):
+ raw=r/p.name.replace('prompt','raa').replace('.txt','.png')
+ assert raw.exists()
+ data=p.read_bytes(); assert data.startswith(original)
+ calls.append({'prompt':str(p.relative_to(root)),'promptfil_sha256':sha(p),'ordrett_originalprefix':True,'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'verktoy':'innebygd ChatGPT imagegen','eksakt_bildemodell':'ikke eksponert'})
+save(r/'b-proveniens.json',{'genereringskall':len(calls),'kall':calls,'oppskrift':str((r/'b-komponer.py.txt').relative_to(root)),'merknad':'07 og 08 deler nytegnet kropp. 08 har ett eget lokalt kall og arver to 07-kall. Ingen originalpiksler eller originalkonturmasker i sluttkomposisjonen.'})
+rows=[]
+for x in proof:
+ j=x['jobb'];i=int(j.split('_')[1]);p=root/'jobber'/j;result=p/'resultat.png';actual=sha(result);assert actual==x['sha256']
+ a=np.array(Image.open(result).convert('RGB'));assert a.shape==(1024,1536,3);assert (a[:112]==128).all() and (a[912:]==128).all()
+ ctl=r/f'b-{j}-kontroll01.txt';assert 'Utfall: OK' in ctl.read_text()
+ row={'jobb':j,'resultat':str(result.relative_to(root)),'sha256':actual,'egenkontroll':'OK','kontrollfil':str(ctl.relative_to(root)),'forsok':2 if i in (3,4,7) else 1,'fullmaster':None,'fullmaster_sha256':None,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'objektkontroll':x['objekter'],'utenfor_metadataunion_endret':0,'bilde_to_sha256':sha(root/'jobber/rom022_del3av3/resultat.png')}
+ rows.append(row)
+ extra='Tilstand 03 har også den egne hevede Henry-armen 228_03; de overlappende feltene er komponert samlet.' if i==3 else 'Grunnrommets hengende arm og lukkede port er bevart.'
+ detail='Ansiktet er lokalt nytegnet med flate oransjebrune trekk, uten rund rød nese, hevede øyenbryn eller nytt smil.' if i in (3,4) else 'Frontfigurens ansikt følger flate oransjebrune trekk uten navngitt figuridentitet.'
+ if i>=7:detail+=' Den tippede lille ansikts-/hetteformen nederst er rettet fra originalutsnitt; den er ikke gjort oppreist. 07/08 skiller bare innen (888,568,144,44), med 6324 ulike HD-piksler og null utenfor.'
+ (p/'notat.md').write_text(f'''# {j}\n\nNytegnet med innebygd ChatGPT imagegen. Eksakt bildemodell er ikke eksponert. Eget antall forsøk: {row['forsok']}. Hele familien bruker ni kall; 08 arver dessuten det nytegnede grunnlaget fra 07. Ordrett originalprompt og separat kildepresisering, råbilder og SHA er bevart i b-proveniens.json.\n\n{extra} {detail}\n\nPresis helskalering av nye komponenter og ordinær kantovergang mellom nye bilder er dokumentert i b-komponer.py.txt. Ingen originalsilhuettmasker, originalpikselkopiering eller lokal deformasjon. Canvas 1536 × 1024 med nøytral padding og motivfelt 1536 × 800 ved y112. Resten utenfor metadataunionen er byte-identisk med levert rom022 del3.\n\nUendret egenkontroll: OK. Objektfeltene er OK. Resultat SHA256: `{actual}`. Alle 40 låste kilder og 12 kontekstfiler er uendret, se b-kildelas-slutt.json for hver kildehash.\n\nEgen visuell kontroll: riktig øksepose, hette, hender, kurv og egne små ansikts-/grønnspissformer er vurdert samlet. HD-formene er glattere, rundere og mer modellerte enn kildepikslene; små ansiktstrekk og lokale lysnyanser er tegningsfortolkninger. Teknisk OK er ikke runtime eller ny individuell brukergodkjenning. Begge er false.\n''')
+save(r/'b-leveranser.json',{'leveranser':rows,'genereringskall_totalt':len(calls),'kildelas':str((r/'b-kildelas-slutt.json').relative_to(root)),'proveniens':str((r/'b-proveniens.json').relative_to(root)),'runtime':False,'ny_brukergodkjenning':False})
+print('Ferdig:',len(rows),'leveranser,',len(calls),'kall,',len(checks),'uendrede kilder')

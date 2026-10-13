@@ -1,0 +1,34 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';sp=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(sp);sp.loader.exec_module(ck)
+def rgb(p):return Image.open(p).convert('RGB')
+def feather(w,h,n):
+ yy,xx=np.mgrid[:h,:w];return Image.fromarray((np.clip(np.minimum.reduce([xx+1,w-xx,yy+1,h-yy])/n,0,1)*255).astype('uint8'))
+proof=[];family=Image.new('RGB',(852,6*412),(128,128,128));fd=ImageDraw.Draw(family);full=Image.new('RGB',(1536,6*430),(128,128,128));df=ImageDraw.Draw(full);previous=None
+for i in range(3,9):
+ j=f'lag022_{i:02d}_del3av3';p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());base=rgb(root/m['bilde_to']);out=base.copy();raw=base.copy();idx=7 if i==8 else i;tile=rgb(r/f'b-lag022_{idx:02d}-raa01.png').resize((512 if i==3 else 416,384),Image.Resampling.LANCZOS);raw.paste(tile,(640,240))
+ if i in [3,4]:
+  face=rgb(r/f'b-ansikt{i:02d}-raa01.png').resize((120,112),Image.Resampling.LANCZOS);raw.paste(face,(856,496),feather(120,112,5))
+ if i>=7:
+  lower=rgb(r/'b-lag022_07-raa02.png').resize((184,76),Image.Resampling.LANCZOS);raw.paste(lower,(856,548),feather(184,76,5))
+ if i==8:
+  # The source 07/08 difference is confined to this rectangle. Shared NEW body outside.
+  lower=rgb(r/'b-lag022_08-raa01.png').resize((184,76),Image.Resampling.LANCZOS);raw.paste(lower.crop((32,20,176,64)),(888,568),feather(144,44,3))
+ allow=np.zeros((1024,1536),bool);boxes=[]
+ for o in m['objekter']:
+  ox,oy,ow,oh=o['rekt'];xx=(ox-408)*4;yy=112+oy*4;out.paste(raw.crop((xx,yy,xx+ow*4,yy+oh*4)),(xx,yy));allow[yy:yy+oh*4,xx:xx+ow*4]=True;boxes.append([xx,yy,ow*4,oh*4])
+ core=allow.copy();distance=np.zeros(allow.shape,float)
+ for _ in range(8):
+  distance+=core;pa=np.pad(core,1);core=core&pa[:-2,1:-1]&pa[2:,1:-1]&pa[1:-1,:-2]&pa[1:-1,2:]
+ alpha=np.clip(distance/8,0,1)[:,:,None];out=Image.fromarray(np.rint(np.array(out)*alpha+np.array(base)*(1-alpha)).astype('uint8'));out.save(p/'resultat.png');dif=np.any(np.array(out)!=np.array(base),axis=2);assert not (dif&~allow).any()
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+ orig=rgb(p/'original_1x.png');c=ck.compare(orig,out.crop((0,112,1536,912)));obs=[];qa=Image.new('RGB',(1100,len(m['objekter'])*420),(185,185,185));d=ImageDraw.Draw(qa)
+ for n,o in enumerate(m['objekter']):
+  ox,oy,ow,oh=o['rekt'];ox-=408;cor=float(ck.corr(c['eo'][oy:oy+oh,ox:ox+ow],c['es'][oy:oy+oh,ox:ox+ow]));status='OK' if cor>=.6 else 'SJEKK' if cor>=.5 else 'FEIL';obs.append({'objekt':o['bilde'],'kantkorrelasjon':cor,'status':status});a=orig.crop((ox,oy,ox+ow,oy+oh)).resize((ow*4,oh*4),Image.Resampling.NEAREST);b=out.crop((ox*4,112+oy*4,(ox+ow)*4,112+(oy+oh)*4));qa.paste(a,(0,n*420+20));qa.paste(b,(550,n*420+20));d.text((0,n*420),o['bilde'],fill='black')
+  if o['objekt']==222:fd.text((0,(i-3)*412),j,fill='white');family.paste(a,(0,(i-3)*412+20));family.paste(b,(436,(i-3)*412+20))
+ qa.save(r/f'b-{j}-objektqa.png');df.text((0,(i-3)*430),j,fill='white');full.paste(orig.resize((768,400),Image.Resampling.NEAREST),(0,(i-3)*430+20));full.paste(out.crop((0,112,1536,912)).resize((768,400)),(768,(i-3)*430+20));proof.append({'jobb':j,'sha256':hashlib.sha256((p/'resultat.png').read_bytes()).hexdigest(),'komposisjonsbokser':boxes,'utenfor_metadataunion_endret':int((dif&~allow).sum()),'objekter':obs});print(obs)
+ if i==7:previous=np.array(out)
+ if i==8:
+  delta=np.any(np.array(out)!=previous,axis=2);allowed=np.zeros(delta.shape,bool);allowed[568:612,888:1032]=True;assert not (delta&~allowed).any();(r/'b-07-08-bytebevis.json').write_text(json.dumps({'ulike_hd_piksler':int(delta.sum()),'kun_boks':[888,568,144,44],'utenfor_boks_endret':int((delta&~allowed).sum())},indent=2)+'\n')
+family.save(r/'b-222-sluttfamilie.png');full.save(r/'b-samlet-kilde-HD.png');(r/'b-komposisjonsbevis.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')

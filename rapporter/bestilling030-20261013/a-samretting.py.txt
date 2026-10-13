@@ -1,0 +1,6 @@
+from pathlib import Path
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1]
+for n,f in [('kilde','referanse.png'),('hd','resultat.png')]:
+ Image.open(root/'jobber/lag025_02'/f).crop((256,752,672,912)).resize((1248,480),Image.Resampling.NEAREST if n=='kilde' else Image.Resampling.LANCZOS).save(r/f'a-sam-{n}.png')
+(r/'a-lag025_02-prompt02.txt').write_text((root/'jobber/lag025_02/prompt.txt').read_text()+'\n\nLOCAL SOURCE CORRECTION: Output only exact attached 416x160 crop framing, enlarged HD. Image1 source pose authoritative, image2 painted quality but incorrect extra rear brown paws must be REMOVED. Only TWO brown hands at front left/right of face are visible. Back of suit is entirely gray-blue source shape, NO brown feet or paws behind shoulders or hips. Face is flat against planks, eyes closed thin dark strokes, orange brown fur, dark navy tie clipped bottom, gray blue suit, separate gray hat at right. Keep every silhouette placement and clipping. Do not invent hindfeet, fingers, injury.\n')

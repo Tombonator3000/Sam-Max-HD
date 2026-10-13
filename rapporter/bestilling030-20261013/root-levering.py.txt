@@ -1,0 +1,30 @@
+from pathlib import Path
+import hashlib, json, runpy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+root=Path(__file__).resolve().parents[2]
+r=Path(__file__).resolve().parent
+common=runpy.run_path(str(root/'rapporter/rom090-obj901-vektor-20261013/root-levering.py.txt'),run_name='delivery_helpers')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+m=json.loads((r/'fremdrift.json').read_text())
+s=json.loads((r/'sluttkontroll.json').read_text())
+assert s['utfall_antall']=={'OK':10,'SJEKK':0,'FEIL':0} and not s['ikke_klar_for_mottak']
+for e in json.loads((r/'kildehash.json').read_text()):
+    assert sha(root/e['fil'])==e['sha256']
+for e in m['leveranser']:
+    assert sha(root/e['resultat'])==e['sha256']
+    assert e['klar_for_mottak'] and not e['importert'] and not e['runtime_verifisert']
+objects=json.loads((r/'root-objektkontroll.json').read_text())
+assert len(objects)==20 and all(e['status']=='OK' and not e['hoppet_over'] for e in objects)
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+note='Bestilling 30: ti lag levert OK med 20 faktiske objektkontroller. Brukeravklart stangfot, Gator Golf-knapper og liggende Sam, fravær av brekkjern/griper og seks egne Tunnel of Love-tilstander. Se `rapporter/bestilling030-20261013/RAPPORT.md`. Bestilling 31 og videre fortsetter.'
+counts=common['update_queue'](m['leveranser'],note)
+(r/'root-mottak.json').write_text(json.dumps({'dato':stamp,'telling':counts,'root_visuell_motivkontroll':True,'alle_20_objektfelt_kontrollert':True,'motorimport':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+p=root/'todo.md';text=p.read_text();old='- [ ] Fortsett bestilling 30'
+assert text.count(old)==1
+text=text.replace(old,'- [x] Levert bestilling 30 med ti OK, 20 faktiske objektkontroller, brukeravklart stangfot og egne animasjonstilstander.\n- [ ] Fortsett bestilling 31')
+p.write_text(text)
+with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex, Astra)\n\n- '+note+'\n- 40 beskyttede kilder og 12 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.\n')
+commit=common['seal_and_push'](r,m['leveranser'],'GPT: bestilling 30, Gator Golf og seks øksetilstander')
+print(json.dumps({'commit':commit,'telling':counts},ensure_ascii=False))

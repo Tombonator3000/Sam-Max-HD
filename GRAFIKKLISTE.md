@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 22:48 (norsk tid)
+Oppdatert 2026-10-13 23:00 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 182 bilder levert (81 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 202 bilder levert (91 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -454,16 +454,16 @@ Rom 19, 20, 21, 22.
 
 Rom 22, 23, 24, 25.
 
-- [ ] `lag022_03_del3av3` (rom 22 Tunnel of Love, inne, lag 03 med 2 objektbilder, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
-- [ ] `lag022_04_del3av3` (rom 22 Tunnel of Love, inne, lag 04 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
-- [ ] `lag022_05_del3av3` (rom 22 Tunnel of Love, inne, lag 05 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
-- [ ] `lag022_06_del3av3` (rom 22 Tunnel of Love, inne, lag 06 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
-- [ ] `lag022_07_del3av3` (rom 22 Tunnel of Love, inne, lag 07 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
-- [ ] `lag022_08_del3av3` (rom 22 Tunnel of Love, inne, lag 08 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
-- [ ] `lag023_01` (rom 23 Dougs gjemmested (under Tunnel of Love), lag 01 med 1 objektbilde, bilde to `jobber/rom023/resultat.png`)
-- [ ] `lag024_01_del1av2` (rom 24 Gator Golf, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom024_del1av2/resultat.png`)
-- [ ] `lag025_01` (rom 25 Gator Golf, utslagsplassen (minispill), lag 01 med 9 objektbilder, bilde to `jobber/rom025/resultat.png`)
-- [ ] `lag025_02` (rom 25 Gator Golf, utslagsplassen (minispill), lag 02 med 2 objektbilder, bilde to `jobber/rom025/resultat.png`)
+- [x] `lag022_03_del3av3` (rom 22 Tunnel of Love, inne, lag 03 med 2 objektbilder, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
+- [x] `lag022_04_del3av3` (rom 22 Tunnel of Love, inne, lag 04 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
+- [x] `lag022_05_del3av3` (rom 22 Tunnel of Love, inne, lag 05 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
+- [x] `lag022_06_del3av3` (rom 22 Tunnel of Love, inne, lag 06 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
+- [x] `lag022_07_del3av3` (rom 22 Tunnel of Love, inne, lag 07 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
+- [x] `lag022_08_del3av3` (rom 22 Tunnel of Love, inne, lag 08 med 1 objektbilde, del 3/3, bilde to `jobber/rom022_del3av3/resultat.png`)
+- [x] `lag023_01` (rom 23 Dougs gjemmested (under Tunnel of Love), lag 01 med 1 objektbilde, bilde to `jobber/rom023/resultat.png`)
+- [x] `lag024_01_del1av2` (rom 24 Gator Golf, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom024_del1av2/resultat.png`)
+- [x] `lag025_01` (rom 25 Gator Golf, utslagsplassen (minispill), lag 01 med 9 objektbilder, bilde to `jobber/rom025/resultat.png`)
+- [x] `lag025_02` (rom 25 Gator Golf, utslagsplassen (minispill), lag 02 med 2 objektbilder, bilde to `jobber/rom025/resultat.png`)
 
 ## Bestilling 31
 
@@ -3487,3 +3487,5 @@ LeChuck Pizza rettet i begge rom070-deler etter Toms direkte tekstavklaring. Ett
 Bestilling 28: ti lag levert OK med 25 faktiske objektkontroller. Tre egne karnevalsmastere har identisk 544 × 800-overlapp; kjeglerest, propell og fire trappete vimpelfelt er rettet. Fire minispilllag har egne Sam/Max-uttrykk, fem tomme hull og uavhengig motivkontroll. Se `rapporter/bestilling028-20261013/RAPPORT.md`. Bestilling 29 og videre fortsetter.
 
 Bestilling 29: ti lag levert OK med 17 faktiske objektkontroller. Egne Max-poser og Sam-armunderlag, rosa skap med/uten rutefelt, åpent kistelokk og fem Tunnel of Love-tilstander. Pilavklipping og oppdiktet klovnenese/smil er rettet og kontrollert. Se `rapporter/bestilling029-20261013/RAPPORT.md`. Bestilling 30 og videre fortsetter.
+
+Bestilling 30: ti lag levert OK med 20 faktiske objektkontroller. Brukeravklart stangfot, Gator Golf-knapper og liggende Sam, fravær av brekkjern/griper og seks egne Tunnel of Love-tilstander. Se `rapporter/bestilling030-20261013/RAPPORT.md`. Bestilling 31 og videre fortsetter.

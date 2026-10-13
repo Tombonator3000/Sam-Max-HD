@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling030-20261013';gen=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a');py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+files={'lag023_01':['exec-c9bb7d84-36b7-4013-98d5-b9d725e8bea5.png','exec-96c94c36-e4f7-4834-ad57-6d55942da7c6.png'],'lag024_01_del1av2':['exec-fdf0c390-d7f2-4109-b898-c1516dc2513e.png'],'lag025_01':['exec-0656762e-24af-4792-b7a5-17c508152190.png'],'lag025_02':['exec-8173c62d-990f-4543-84bf-3102b77d8b7b.png','exec-cc7d70de-e0ae-4fb3-aae9-f5ec74a8a4ba.png']};proof={}
+for j,fs in files.items():
+ for k,f in enumerate(fs,1):shutil.copy2(gen/f,r/f'a-{j}-raa{k:02d}.png')
+ m=json.loads((root/'jobber'/j/'jobb.json').read_text());base=Image.open(root/m['bilde_to']).convert('RGB');raw=Image.open(r/f'a-{j}-raa01.png').convert('RGB');rects=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=m['bilde_i_lerret'][0]+(x-m['region'][0])*4;y=112+y*4;w*=4;h*=4;box=(x,y,x+w,y+h);rects.append(box)
+  aa=np.array(Image.open(r/f'a-{j}-raa02.png').convert('RGB').resize((w,h),Image.Resampling.LANCZOS) if j=='lag023_01' or o['bilde']=='obj258_01' else raw.crop(box),float);bb=np.array(base.crop(box),float);yy,xx=np.mgrid[:h,:w];edges=[]
+  if x>m['bilde_i_lerret'][0]:edges.append(xx)
+  if y>112:edges.append(yy)
+  if x+w<m['bilde_i_lerret'][0]+m['bilde_i_lerret'][2]:edges.append(w-1-xx)
+  if y+h<912:edges.append(h-1-yy)
+  alpha=np.clip(np.minimum.reduce(edges)/4,0,1)[...,None];base.paste(Image.fromarray(np.rint(aa*alpha+bb*(1-alpha)).astype('uint8')),(x,y))
+ base.save(root/'jobber'/j/'resultat.png');proof[j]=rects;cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(root/'jobber'/j/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+(r/'a-rektangler.json').write_text(json.dumps(proof,indent=2))
+contact=Image.new('RGB',(1200,1720),(180,180,180));d=ImageDraw.Draw(contact)
+for i,j in enumerate(files):
+ for k,f in enumerate(['referanse.png','resultat.png']):
+  im=Image.open(root/'jobber'/j/f);im.thumbnail((590,395));contact.paste(im,(k*600,i*430+25))
+ d.text((5,i*430+5),j+' original / HD',fill='black')
+contact.save(r/'a-samlet-kontaktark.png')
