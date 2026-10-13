@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+b = Path(__file__).resolve().parents[2]
+raw = Image.open(b / 'rapporter/bestilling004-20261013/rom018-raaforsok1.png').convert('RGB')
+assert raw.size == (1536, 1024)
+out = Image.new('RGB', (1536, 1024), (128, 128, 128))
+out.paste(raw.crop((128, 112, 1408, 912)), (128, 112))
+out.save(b / 'jobber/rom018/resultat.png')

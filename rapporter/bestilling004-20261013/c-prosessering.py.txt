@@ -1,0 +1,22 @@
+from PIL import Image
+from pathlib import Path
+import numpy as np
+r=Path('rapporter/bestilling004-20261013')
+for j,n in [('obj187_01',2),('obj187_02',1),('obj187_03',1),('obj187_04',1)]:
+    a=Image.open(r/f'{j}-raa-{n}.png').convert('RGB')
+    c=Image.new('RGB',(1536,1024),(128,128,128))
+    c.paste(a.crop((352,192,1184,832)),(352,192))
+    c.save(f'jobber/{j}/resultat.png')
+s=np.array(Image.open('jobber/obj187_03/resultat.png').convert('RGB'))
+for j in ['obj187_01','obj187_04']:
+    p=Path('jobber')/j/'resultat.png'
+    a=np.array(Image.open(p).convert('RGB'))
+    x0,y0,x1,y1=352,192,644,528
+    for y in range(y0,y1):
+        for x in range(x0,x1):
+            tx=min(1,max(0,(x1-x)/16))
+            ty=min(1,max(0,(y1-y)/16))
+            t=min(tx,ty)
+            t=t*t*(3-2*t)
+            a[y,x]=np.rint(t*s[y,x]+(1-t)*a[y,x]).astype('uint8')
+    Image.fromarray(a).save(p)

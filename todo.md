@@ -24,4 +24,5 @@
 - [x] Tom godkjente stilpiloten og autoriserte videre HD-konvertering: «veldig bra! godkjenner dette! sett inn i repo , fortsett med resten av HD konvertering».
 - [x] Fullfør bestilling 2 med ti kildekontrollerte HD-bilder, egne notater, egenkontroll OK og byte-identisk gateoverlapp. Se rapporter/bestilling002-20261013/RAPPORT.md.
 - [x] Fullfør bestilling 3 med ti bilder, kildehash, rettet skilttekst og identisk overlapp i tre rompar.
-- [ ] Fortsett bestilling 4 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Fullfør bestilling 4 med ti bilder, kildeavklarte utstillinger, minispilltilstander og identisk romoverlapp.
+- [ ] Fortsett bestilling 5 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

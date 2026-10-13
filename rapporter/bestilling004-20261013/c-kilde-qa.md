@@ -1,0 +1,9 @@
+# Objekt187, kilde- og tilstandskontroll
+
+Fire originale objektbilder i rom18. Metadata angir objekt_i_rom [24,32,208,160]. Motiv: Sams røde treklubbe og hånd i fire stillinger. 01 løftet vannrett,02 slag bakre venstre,03 slag høyre,04 slag midten. Fem hull totalt, men klubben skjuler et hull i hver av02 til04. Hull som er skjult i kilden ble ikke gjeninnført. Ingen rotter eller ekstra fingre. Frakk, hånd, grep, skaft og treklubbens røde materiale er sammenlignet samlet.
+
+Kildene1x/4x for alle tilstander, rom018-HD og Sams godkjente hovedark ble visuelt gjennomgått. Originalpaletten bestemmer lokal grålilla frakk, blåsvart slips, orangebrun pels. Delvis avskåret bokstavfelt blir ikke komplettert med tekst fra romoversikten. Ingen gjetting av ny identitet.
+
+Første01-forsøk hadde endret motivrektangel og reelle plasseringsavvik, og ble erstattet. Andre01-forsøk var visuelt nær kilden (kant0.96, globalt skift0.41), men FFT-blokktesten ga31.61 i tom øvre venstre bakgrunn. Samme problem i04 (blokk9.99, globalt0.08). Diagnosen lokaliserte maksimal forskyvning til originalblokk x0,y0,69x80; den inneholder bare venstre mørke gardinkant og blå gradient/dithering. Alle øvrige01-blokker hadde forskyvning under0.9. Kildens73x84-område er byte-identisk i01,03,04. HD-bakgrunnen fra03 er gjenbrukt i akkurat dette området med16px fjæring. Ingen figurflytting, warping, terskelendring eller originalmaskering. Førversjoner bevart.
+
+Etter harmonisering får alle fire OK i uendret kontroll. Endelig01: skift0.41/blokk0.87/kant0.96;02:0.09/0.14/0.96;03:0.10/0.35/0.94;04:0.08/0.35/0.96. Eksakt1536x1024lerret og gråpaddingRGB128 kontrollert. Alle fire vist samlet for visuell tilstandskontroll. Runtime, reell spillanimasjon, maskesamspill og ny brukergodkjenning er uverifisert/false. Ingen Git/kode/beskyttede kilder endret.

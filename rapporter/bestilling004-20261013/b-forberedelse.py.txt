@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling004-20261013'
+r.mkdir(exist_ok=True)
+im=Image.new('RGB',(2528,1024),(128,128,128))
+for part,x in [(1,0),(2,992)]:
+ im.paste(Image.open(b/'jobber'/f'rom017_del{part}av2'/'referanse.png').convert('RGB').crop((0,112,1536,912)),(x,112))
+im.save(r/'rom017-fullkilde.png')
+p='\n\n'.join('Original prompt '+j+':\n'+(b/'jobber'/j/'prompt.txt').read_text() for j in ['rom017_del1av2','rom017_del2av2'])
+p+='\n\nFullscene clarification: the attached first image is the entire joined original room17,2528x1024 with scene (0,112,2528,800). Override only the two original prompts canvas instruction: output ONE complete 2528x1024 panorama with this exact original geometry. Both job images will be cut from this same master. Keep all source geometry unchanged. Image2 is only approved paint/line style. Copy CONE OF TRAGEDY, WAK A RAT, WIN, TRIXIE and GUN exactly with source letter placement. The silver caravan, purple window curtains, door with red star, stairs, towing bar, two tanks and flower pot must retain their precise geometry. Preserve ground cable and plug, fence slats, tent flags, plane atop GUN sign and midway structures. No people added. The tabletop game visible at left center must keep its dark holes; never add rats. Keep source colors and shadows. No extra words or objects. Pure gray padding.'
+(r/'rom017-prompt.txt').write_text(p)
+p=(b/'jobber/rom018/prompt.txt').read_text()
+p+='\n\nSource clarification: first image is room18, Sam standing behind Wak-A-Rat game. Image2 is approved Sam identity and line style ONLY. Keep the exact original pose and anatomy, hat tilt, long snout pointing left and tongue curled on his right cheek, with no extra teeth and no mallet added. Sam has a purple-blue gray suit under this scene light and a blue/black striped tie. Do not switch to another pose or brighten to model-sheet colors. Five empty BLACK holes on the yellow-orange board must keep exact shapes and locations. The top left panel says HIT 20 WIN; its large black rectangle below MUST REMAIN EMPTY, no numbers, score, lettering or icons. Preserve both red stars. Preserve the original cropped WAK-A-RAT lettering on the front of the box, do not enlarge or complete letters beyond the scene edge. Exact canvas1536x1024, scene [128,112,1280,800], pure #808080 padding. Clean Purcell linework, source controls all geometry.'
+(r/'rom018-prompt.txt').write_text(p)

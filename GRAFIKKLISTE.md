@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 17:54 (norsk tid)
+Oppdatert 2026-10-13 17:58 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 12 rom levert (17 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 5 levert, egenkontroll OK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 15 rom levert (22 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 10 levert, egenkontroll OK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -64,16 +64,16 @@ Rom 9, 10, 11, 12, 15.
 
 Rom 15, 16, 17, 18.
 
-- [ ] `obj142_01` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), objekt 142 tilstand 01)
-- [ ] `rom016_del1av2` (rom 16 Hall of Oddities (freakshowet), del 1/2)
-- [ ] `rom016_del2av2` (rom 16 Hall of Oddities (freakshowet), del 2/2)
-- [ ] `rom017_del1av2` (rom 17 Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), del 1/2)
-- [ ] `rom017_del2av2` (rom 17 Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), del 2/2)
-- [ ] `rom018` (rom 18 Wak-A-Rat (minispill))
-- [ ] `obj187_01` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 01)
-- [ ] `obj187_02` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 02)
-- [ ] `obj187_03` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 03)
-- [ ] `obj187_04` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 04)
+- [x] `obj142_01` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), objekt 142 tilstand 01)
+- [x] `rom016_del1av2` (rom 16 Hall of Oddities (freakshowet), del 1/2)
+- [x] `rom016_del2av2` (rom 16 Hall of Oddities (freakshowet), del 2/2)
+- [x] `rom017_del1av2` (rom 17 Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), del 1/2)
+- [x] `rom017_del2av2` (rom 17 Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), del 2/2)
+- [x] `rom018` (rom 18 Wak-A-Rat (minispill))
+- [x] `obj187_01` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 01)
+- [x] `obj187_02` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 02)
+- [x] `obj187_03` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 03)
+- [x] `obj187_04` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 04)
 
 ## Bestilling 5
 
@@ -3427,3 +3427,5 @@ Tom har godkjent hovedarkene og stilpiloten 13. oktober og autorisert resten av 
 Bestilling 2 er levert med ti bilder og egenkontroll OK. Se `rapporter/bestilling002-20261013/RAPPORT.md`. Kryss betyr levert grafikk; individuell visuell godkjenning, motorimport og spilltest er egne tilstander. Bestilling 3 er startet.
 
 Bestilling 3 er levert med ti bilder og egenkontroll OK, se `rapporter/bestilling003-20261013/RAPPORT.md`. Bestilling 4 er startet.
+
+Bestilling 4 er levert med ti bilder og egenkontroll OK, se `rapporter/bestilling004-20261013/RAPPORT.md`. Bestilling 5 er startet.

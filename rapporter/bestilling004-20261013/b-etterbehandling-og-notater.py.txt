@@ -1,0 +1,73 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil,subprocess,numpy as np
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling004-20261013'
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+s=Path("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-78e34ab5-402c-428c-bafa-b844902e6304.png")
+shutil.copy2(s,r/'rom017-raaforsok1.png')
+raw=Image.open(s).convert('RGB')
+size=raw.size
+im=raw.resize((2528,1024),Image.Resampling.LANCZOS)
+full=Image.new('RGB',(2528,1024),(128,128,128));full.paste(im.crop((0,112,2528,912)),(0,112))
+full.save(r/'rom017-fullscene.png')
+for part,x in [(1,0),(2,992)]:
+ full.crop((x,0,x+1536,1024)).save(b/'jobber'/f'rom017_del{part}av2'/'resultat.png')
+a=np.asarray(Image.open(b/'jobber/rom017_del1av2/resultat.png'))
+c=np.asarray(Image.open(b/'jobber/rom017_del2av2/resultat.png'))
+assert np.array_equal(a[:,992:],c[:,:544])
+jobs=['rom017_del1av2','rom017_del2av2','rom018']
+rows=json.loads((r/'kildehash.json').read_text())
+selected=[a for a in rows if any('/'+j+'/' in a['fil'] for j in jobs)]
+assert len(selected)==12,len(selected)
+assert all(sha(b/a['fil'])==a['sha256'] for a in selected)
+out=[]
+for job in jobs:
+ dest=b/'jobber'/job/'resultat.png'
+ p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(dest)],cwd=b,text=True,capture_output=True)
+ (r/(job+'-kontroll.txt')).write_text(p.stdout+p.stderr)
+ assert p.returncode==0
+ print(p.stdout)
+ room='rom018' if job=='rom018' else 'rom017'
+ motif=('Sam ved Wak-A-Rat. Hatt, snute, tunge på høyre kinn, dress og blåsvart slips følger originalen. Fem tomme svarte hull i brettet og tomt svart tellefelt er bevart. HIT 20 WIN og begge stjernene er kontrollert. Bokstekst på kassens front beholder avskjæringen i originalen.' if room=='rom018' else 'Midway med Cone of Tragedy, Wak-A-Rat, GUN-skiltet og Trixies sølvfargede vogn. CONE OF TRAGEDY, WAK A RAT, WIN, TRIXIE og GUN er kontrollert. Vognens tre vindusfelt med lilla gardiner, rød stjerne, dør, trapp, to tanker, trekkstang og blomsterpotte er bevart. Kabel med kobling på bakken, gjerder og teltoppbygging er kontrollert som sceneinnhold.')
+ e={'jobb':job,'resultat':str(dest.relative_to(b)),'sha256':sha(dest),'referanse_sha256':sha(b/'jobber'/job/'referanse.png'),'egenkontroll':'OK','teknisk_kontroll':'OK','visuell_egenkontroll':motif,'runtime':False,'nybildegodkjenning':False,'forsok':1,'verktoy':'innebygd image_gen','eksakt_bildemodell':'ikke eksponert','overlapp_byteidentisk':True if room=='rom017' else None,'overlapp_bredde':544 if room=='rom017' else None}
+ out.append(e)
+ note=f"""# {job}
+
+Dato: 13. oktober 2026. Ett innebygd image_gen-forsøk for dette rommet. Eksakt modellnavn er ikke eksponert.
+
+## Kilde og innhold
+
+{motif}
+
+Kilde: beskyttet jobbmetadata og originalreferanse, lest sammen med origin/main:docs/gpt-romnotater.csv. Godkjent Sam-hovedark styrer identitet/strek for rom018, ikke positur, fargebytte eller nye detaljer. For rom017 er godkjent kontor kun stilstøtte. Originalpromptene er bevart ordrett med separat kildepresisering i rapportmappens {room}-prompt.txt.
+
+## Leveranse og egenkontroll
+
+Resultatet er 1536x1024 med eksakt grå padding. Rom017-delene er skåret fra én 2528x1024-master etter global Lanczos-normalisering fra {size[0]}x{size[1]}; ingen lokal warp er brukt. Overlapp på544 piksler er byte-identisk. Rom018 har originalformat1536x1024 og kun padding normalisert.
+
+Uendret sjekk_leveranse.py: OK. Kontrollutdata i {job}-kontroll.txt. Tolv beskyttede kildefiler er kontrollert mot kildehash.json uten avvik.
+
+Referanse SHA-256: {e['referanse_sha256']}
+Resultat SHA-256: {e['sha256']}
+
+Visuell egenkontroll omfatter motiv, hovedgeometri og skilt. Små gjerdespisser, blomster og teltflatedetaljer er nytegnet fra pikselklynger; eksakt detaljidentitet utover kontrollert hovedinnhold er ikke bevist. Bildene har jevnere skygger og noe mer overflateform enn originalen.
+
+Runtime=false. Nybildegodkjenning=false. Motorintegrasjon, klikkflater, kostyme-/objektlag og Toms kontroll av disse nye bildene er ikke utført. Rom018 er egnet som samme roms relevante bakgrunnsreferanse for obj187-arbeidet, men dette dokumenterer ikke ferdig import.
+"""
+ (b/'jobber'/job/'notat.md').write_text(note)
+(r/'b-leveranser.json').write_text(json.dumps({'dato':'2026-10-13','leveranser':out},ensure_ascii=False,indent=2)+'\n')
+(r/'b-kilde-qa.md').write_text("""# Kilde-QA for rom017 og rom018
+
+Tre jobber er produsert fra to rom. Metadata og docs/gpt-romnotater.csv fra origin/main er lest. Begge originaldeler av rom017 og rom018 er sett før generering, sammen med relevante godkjente stil-/hovedark. Ingen nye figurer eller rotter er lagt til.
+
+Rom017 er én fullscene med begge originalpromptene bevart ordrett og tillegg om felles fullscene. Resultatet er globalt skalert til2528x1024, deretter normalisert til grå padding og skåret etter regionene x0 og x992. Byte-identisk overlapp544 er kontrollert. Ingen lokal warp eller originalpikselmaskering.
+
+Rom018 bevarer Sams egen pose og tungeuttrykk, fem tomme hull og tomt svart tellefelt. Dette er bakgrunnen for minispillet, ikke en tegning av aktive rotter eller score. Hovedarket er kun identitets-/stilstøtte.
+
+Begge rom har ett innebygd image_gen-forsøk. Eksakt modellversjon er ikke eksponert. Alle tre tekniske leveransekontroller gir OK. Tolv beskyttede kildesjekksummer stemmer med låsen. Råforsøk, brukte prompter og oppskrifter er bevart.
+
+Visuell egenkontroll inkluderer de dokumenterte store skiltene. Små ornamenter og mikrodetaljer er tolket, og teknisk kontroll beviser ikke semantisk detaljidentitet. Runtime og nybildegodkjenning er false. Ingen Git-, kode- eller globale dokumentmutasjoner er utført.
+""")
+print('Manifest klart; 12 kilder uendret; overlapp544 identisk.')

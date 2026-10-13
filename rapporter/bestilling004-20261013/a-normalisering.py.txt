@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image
+import shutil,subprocess
+b=Path(__file__).resolve().parents[2];r=b/'rapporter/bestilling004-20261013'
+s=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a')
+shutil.copy2(s/'exec-7d866b6d-6822-49d7-8863-60c273796699.png',r/'obj142_01-forsok01.png')
+im=Image.open(r/'obj142_01-forsok01.png').convert('RGB').crop((476,122,1060,898)).resize((448,576),Image.Resampling.LANCZOS)
+out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im,(544,224));out.save(b/'jobber/obj142_01/resultat.png')
+shutil.copy2(s/'exec-4033c0cc-8c3e-4a20-a07e-4e520107fa9a.png',r/'a-rom016-fullscene-forsok01.png')
+full=Image.open(r/'a-rom016-fullscene-forsok01.png').convert('RGB').crop((0,192,1536,832)).resize((1920,800),Image.Resampling.LANCZOS)
+full.save(r/'a-rom016-fullscene.png')
+for id,x in [('rom016_del1av2',0),('rom016_del2av2',384)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(full.crop((x,0,x+1536,800)),(0,112));out.save(b/f'jobber/{id}/resultat.png')
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for id in ['obj142_01','rom016_del1av2','rom016_del2av2']:
+ run=subprocess.run([py,str(b/'verktoy/sjekk_leveranse.py'),str(b/f'jobber/{id}/resultat.png')],capture_output=True,text=True)
+ (r/f'{id}-kontroll.txt').write_text(run.stdout+run.stderr);print(run.stdout)

@@ -62,3 +62,10 @@
 - Bilen, USA-kartets tomme reisemålsfelt og Snuckey-bakgrunnsvariantene kildeavklart. ODDITIES-tekstfeil fanget visuelt og rettet med innebygd bilde-edit. Små etikettglyfer ikke erklært detaljidentiske.
 - Bestilling 2 pushet i 829caa876e8b0459cce16cd2cbff44972b05f4cc; alle ti offentlige PNG-bytes verifisert med SHA mot lokalt. Bestilling 4 startet.
 - Notater, råforsøk, prompter, oppskrifter og samlet QA i rapporter/bestilling003-20261013/. Ingen kode/kildeendring, motorimport eller spilltest.
+
+## 2026-10-13 17:58 (Codex, Astra)
+
+- Fullført bestilling 4: ti HD-bilder, alle egenkontroller OK og 40 beskyttede kildehash uendret. Rom016/017 har byte-identisk overlapp fra felles fullscener.
+- Bevart Human Enigmas kranhode og tom Bruno-isform. Wak-A-Rat har fem kildebaserte hull med riktig klubbokklusjon og tomme motorfelt. Reelle plasseringsfeil erstattet; ustabil FFT i felles blå bakgrunn rettet ved gjenbruk av nytegnet bakgrunn der originalene er byte-identiske, uten figurwarp eller terskelendring.
+- Rapport, råforsøk, prompter, oppskrifter og QA i rapporter/bestilling004-20261013/. Bestilling 3 sine ti PNG-SHA er verifisert fra GitHub. Bestilling 5 startet.
+- Ingen kode-/kildeendring, motorimport, spilltest eller individuell ny Tom-godkjenning.
