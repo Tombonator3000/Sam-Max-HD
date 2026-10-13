@@ -60,7 +60,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 - [x] Alle grafikkjobbene laget med hovedark, fast størrelse i figurarkene og egenkontroll (`tools/sjekk_leveranse.py`), 13. oktober
 - [x] Jobbene lagt i `gpt-arbeid` (13. oktober, c96f80b)
-- [ ] Tom fletter PR 4 (grafikkjobbene) når CI er grønn
+- [x] PR 4 (grafikkjobbene) flettet til main (13. oktober, e0baba9)
 - [ ] Stilpilot: hovedark Sam og Max, rom 7 og fig002_01 og fig003_01 levert, kontrollert, sett i motoren og godkjent av Tom; stilankere i `stil/`
 - [ ] Aktiver bestillingen (`docs/BESTILLING-CHATGPT.md`) og grafikkrunder med `tools/gpt_runde.sh`
 
