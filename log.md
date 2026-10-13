@@ -91,3 +91,7 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 - Tester: `pytest` 43 bestått (40 uten spillfiler og 3 med), nye tester for skyggepiksler, hovedark, ikonark, myke figurer, størrelsesspredning, egenkontrollen og pilotordren. `bash -n` på skallskriptene og `git diff --check` bestått. Egenkontrollen prøvd på syntetiske leveranser (riktig OK, rute 15 prosent for stor FEIL, rom 3 px forskjøvet FEIL).
 - Ordren og grafikklisten fikk UTC-tid merket som norsk tid; `gpt.norsk_tid` bruker nå Europe/Oslo, også i committen fra `tools/gpt_gren.sh`. Jobbene er committet lokalt i `work/.gpt-gren` (gpt-arbeid), ikke pushet.
 - Ikke gjort: ingen bilder laget, ingenting pushet til `gpt-arbeid` (venter på Toms ja), promptene ikke prøvd i ChatGPT, `myk.py` og egenkontrollen ikke prøvd på ekte leveranser. Figurene med «trolig» i figurlisten er ikke sett i spillet.
+
+## 2026-10-13 09:34 (Claude)
+- Tom sa ja til å pushe jobbene og til PR mot main. `gpt-arbeid` pushet (c96f80b): alle jobbene, hovedarkene, `verktoy/sjekk_leveranse.py` og ordren med bare stilpiloten.
+- PR 4 mot main fra `ccr-f99918a6-v2s5v1` for koden og dokumentasjonen. Tom fletter når CI er grønn.

@@ -37,5 +37,5 @@ git clone https://github.com/Tombonator3000/Sam-Max-HD.git && cd Sam-Max-HD
 | --- | --- |
 | `main` | Kode og dokumentasjon |
 | `spilldata` | Spillfilene med sjekksummer |
-| `gpt-arbeid` | Arbeidsbordet med grafikerne. Jobbene legges inn når Tom sier ja; bare stilpiloten er bestilt |
+| `gpt-arbeid` | Arbeidsbordet med grafikerne: alle jobbene, bare stilpiloten er bestilt |
 | `hd-mod` | Siste HD-pakke, én commit som erstattes. Tom til den første modden finnes |

@@ -31,7 +31,7 @@ Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. 
 
 - Teksten (`CharsetRendererClassic`) og menyraden HD Graphics er ikke portet: teksten vises som originalpiksler, og HD velges med Ctrl+H. Se `docs/HD-MOTOR.md`.
 - The Dig er ikke testet med den utvidede patchen her (filene er ikke i dette repoet).
-- `tools/gpt_runde.sh` er ikke kjørt på ekte leveranser. Jobbene ligger klare lokalt; de er ikke lagt i `gpt-arbeid` før Tom sier ja.
+- `tools/gpt_runde.sh` er ikke kjørt på ekte leveranser. Jobbene ligger i `gpt-arbeid` (13. oktober); bare stilpiloten er bestilt.
 - Kostymefargene: åtte kostymer har fått paletten fra rommene de brukes i. Resten bruker hjemrommet, som stemmer for de fleste, men er ikke sjekket kostyme for kostyme i spillet. Rulletekstpanelene i rom 67 og 77 er ikke sett i motoren.
 - Promptene i `gpt.py` og `figur.py` er skrevet om for Sam & Max, men ikke prøvd i ChatGPT. Bestillingen er aktiv bare for stilpiloten.
 - Figuridentiteten: navnene i `docs/figurer.csv` kommer fra replikkene i skriptene. De som står med «trolig», er tolket og ikke sett i spillet.
