@@ -1,0 +1,8 @@
+# Kjør fra kanonisk checkout. Lag002_02-for-krans.png er bevart førkandidat.
+from pathlib import Path
+from PIL import Image
+import numpy as np
+r=Path('rapporter/bestilling022-20261013');im=Image.open(r/'lag002_02-for-krans.png').convert('RGB');before=np.array(im)
+im.paste(Image.open(r/'lag002_02-raa03-krans.png').convert('RGB').resize((172,156),Image.Resampling.LANCZOS),(568,288))
+a=np.any(before!=np.array(im),axis=2);a[288:444,568:740]=False;assert not a.any()
+im.save('jobber/lag002_02/resultat.png')

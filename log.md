@@ -193,3 +193,8 @@
 ## 2026-10-13T21:06:06+02:00 (Codex, Astra)
 
 - Rom090 og obj901_01 levert OK etter Toms uttrykkelige vektorvalg, med native SVG, originalens flate palett og uavhengig motiv-/geometrikontroll. Dette erstatter de to FEIL-kandidatene i bestilling 21. Alle 76 rombakgrunner er nå levert som grafikk; obj187_05 og obj307_01 står fortsatt uavklart. Ingen import eller runtime. Se `rapporter/rom090-obj901-vektor-20261013/`.
+
+## 2026-10-13T21:06:55+02:00 (Codex, Astra)
+
+- Bestilling 22: ti objektlag levert OK. Egne bil-/lystilstander, fire ørefliker og bevisst avskårne figurdeler beholdt. To kontormastere med identiske overlapp, små øye-/TV-/skallevarianter og alle 22 objektfelt kontrollert. Se `rapporter/bestilling022-20261013/RAPPORT.md`. Bestilling 23 og videre lag fortsetter.
+- 40 beskyttede og fire ekstra kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

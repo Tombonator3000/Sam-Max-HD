@@ -1,0 +1,20 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import numpy as np,json
+b=Path.cwd();r=b/'rapporter/bestilling022-20261013'
+s1=Image.open(r/'lag007_01-source-full.png');s2=Image.open(r/'lag007_02-source-full.png');h1=Image.open(r/'lag007_01-fullmaster.png');h2=Image.open(r/'lag007_02-fullmaster.png');ha=Image.open(r/'c-rom007-hd-anker.png')
+# Original fullscene is 4x nearest; existing original room is assembled only for evidence.
+a=Image.open(b/'jobber/rom007_del1av2/original_1x.png').convert('RGB');c=Image.open(b/'jobber/rom007_del2av2/original_1x.png').convert('RGB');sa=Image.new('RGB',(488,200));sa.paste(a,(0,0));sa.paste(c,(104,0));sa=sa.resize((1952,800),Image.Resampling.NEAREST)
+fields=[('TV 071_01 / 071_02',(576,352,672,448)),('Puppet 074_01 gaze',(1632,128,1696,192)),('Skull 075_01 glints',(1664,192,1728,224))]
+out=Image.new('RGB',(1800,1120),(90,90,90));d=ImageDraw.Draw(out)
+for row,(name,box) in enumerate(fields):
+ y=row*370;d.text((10,y+5),name,fill='white')
+ for col,(im,label) in enumerate([(sa,'Original room'),(s1,'Original layer01'),(s2,'Original layer02'),(ha,'Approved HD room'),(h1,'HD layer01'),(h2,'HD layer02')]):
+  crop=im.crop(box);crop.thumbnail((280,300));crop=im.crop(box).resize((280,280 if row<2 else 140),Image.Resampling.NEAREST if col<3 else Image.Resampling.LANCZOS);out.paste(crop,(col*300+10,y+50));d.text((col*300+10,y+28),label,fill='white')
+out.save(r/'c-smatilstander-kilde-hd-anker.png')
+records=[]
+for name,box in fields:
+ x,y,x2,y2=box
+ for label,aa,bb in [('rom-01',sa,s1),('rom-02',sa,s2),('01-02',s1,s2)]:
+  aa=np.array(aa.resize((488,200),Image.Resampling.NEAREST));bb=np.array(bb.resize((488,200),Image.Resampling.NEAREST));diff=np.any(aa[y//4:y2//4,x//4:x2//4]!=bb[y//4:y2//4,x//4:x2//4],axis=2);yy,xx=np.where(diff);records.append(dict(felt=name,sammenligning=label,antall_kildepiksler=int(diff.sum()),endrede_originalkoordinater=[[int(x//4+i),int(y//4+j)] for j,i in zip(yy,xx)]))
+(r/'c-smatilstander-kildedelta.json').write_text(json.dumps(records,indent=2)+'\n')

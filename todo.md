@@ -46,6 +46,7 @@
 - [x] Levert bestilling 19 med sju OK og tre SJEKK, kilde-/motivkontroll og dokumenterte rettinger.
 - [x] Levert bestilling 20 med ni OK og ett SJEKK, kilde-/motivkontroll og dokumenterte rettinger.
 - [x] Levert bestilling 21 med sju OK og ett SJEKK, to uavklarte FEIL, kilde-/motivkontroll og dokumenterte rettinger.
-- [ ] Fortsett bestilling 22 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 22 med ti OK, 22 faktiske objektkontroller og to identiske kontoroverlapp.
+- [ ] Fortsett bestilling 23 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
 
 - [x] Rom090 og obj901_01 rettet og levert OK med uttrykkelig valgt vektorrekonstruksjon; tidligere bestilling 21-avvik erstattet.

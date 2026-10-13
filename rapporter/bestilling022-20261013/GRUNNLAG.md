@@ -1,0 +1,13 @@
+# Produksjonsgrunnlag for bestilling 22
+
+Toms videre HD-konvertering med Astra og presis skalering/plassering gjelder. Les a-kildeplan.md og den eksakte objektbokstabellen.40beskyttede kilder og fire ekstra for neste del av lag007_02 er låst. Innebygd ChatGPT-bildegenerator brukes, eksakt bildemodell ikke eksponert. Promptene bevares ordrett med separat kildepresisering. Ingen originalkonturmasker, originaloppskalering som erstatningskunst eller lokal warp. Kun figurark har ektealfakrav; disse lagene er opake RGB-romkomposisjoner med nøytral padding.
+
+A eier lag003_01, lag004_01 og lag004_02. Forskerhode, Sam-hode og Max-ører/ørefravær er konkrete komponenter. Lag004_02 skal vise hodeløs Sam og Max uten ørene, ikke anatomisk fullføring. Hovedark støtter identitet, kildeposen og paletten bestemmer.
+
+B eier lag002_02, lag002_03, lag002_04, lag002_05. Fire faktiske laboratorietilstander: bil051 og bil057 er ulike,052_02 lavt rutedel uten hel bil,056åpen bildør med kildeegent merke uten fullbil, små steiner/lys/hodeskalle beholdes. Sammenlign mot levertrom002 og lag002_01 fra21, men kopier ikke bort variantendringene.
+
+C eier lag007_01 begge deler og lag007_02 del1, med ekstra del2 fra23 som kontekst/kontrollbilde kun i rapporten. Én1952×800master per lag, klipp0/416, overlapp1120×800. Ikke slå to ulike lag sammen. Fullkomposisjonens innhold styrer selv om metadata fordeler hvert objektuttrekk til én del. Åpen/lukket dør, telefon uten rødt rør, TVfigurer, øyne, dartskive uten/med piler, lys/matrester/papirer/vinduer følger akkurat hver kilde. Tre-/firepikselvarianter skal ikke forsvinne ved blind bakgrunnsgjenbruk. Ekstradel2 skal kontrolleres/låses for23, ikke leveres som ellevte jobb her.
+
+Bruk riktig bilde_to som levert HD-romanker og konkret original som innhold. Hvert objektfelt må få nærbilde og posisjons-/identitets-QA. Uendret checker har helbilde- og perobjektkantkontroll, men OK-objekter er stille og svake/små bokser kan hoppes over. Dokumenter hvilke som faktisk kontrolleres. Nye lokalimagegen-komponenter kan legges presist i dokumenterte rektangler på nytt HD-rom; originalmasker/piksler er ikke tillatt. Bakgrunns-/tilstandskonsistens må vises, teknisk OK er ikke spilltest eller ny bildegodkjenning.
+
+Root eier global kø/logger, samlet QA, Git og levering. Råforsøk, sendte prompter, oppskrifter, notater, kildehash, resultatSHA, manifest og faktisk kontroll bevares. Ingen motor-/pipelinekode, beskyttede jobbfiler eller Claude-eide ordre-/statusfiler endres. Ingen runtime, originaltiming, faktisk nøkkelfarge/maskeklippeimport eller individuell godkjenning hevdes.

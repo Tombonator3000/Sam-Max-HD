@@ -1,0 +1,43 @@
+from pathlib import Path
+import json,hashlib
+import numpy as np
+from PIL import Image
+b=Path.cwd(); r=b/'rapporter/bestilling022-20261013'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def rel(p):return str(p.relative_to(b))
+def write(p,x):p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+locks=[]
+for f in ['kildehash.json','ekstra-kildehash.json']:
+ for rec in json.loads((r/f).read_text()):
+  actual=sha(b/rec['fil']); locks.append(dict(rec,aktuell_sha256=actual,uendret=actual==rec['sha256']))
+assert len(locks)==44 and all(z['uendret'] for z in locks)
+write(r/'c-kildehashkontroll.json',locks)
+raws={
+'01':[('raw1','prompt1','fullscene valgt'),('raw2','prompt2','lokal øyestilling valgt'),('raw-tv1','prompt-tv','forkastet: separate øyne'),('raw-tv2','prompt-tv2','forkastet: feil sideforhold/innramming'),('raw-tv3','prompt-tv3','lokal TV valgt')],
+'02':[('raw1','prompt1','fullscene valgt'),('raw-tv','prompt-tv','lokal TV valgt')]}
+masters=[]; records=[]
+for l in ['01','02']:
+ master=r/f'lag007_{l}-fullmaster.png'; im=np.array(Image.open(master)); assert im.shape==(800,1952,3)
+ raw=[]
+ for name,pr,status in raws[l]:
+  p=r/f'lag007_{l}-{name}.png';q=r/f'lag007_{l}-{pr}.txt';raw.append(dict(fil=rel(p),sha256=sha(p),prompt=rel(q),prompt_sha256=sha(q),bruk=status))
+ base=np.array(Image.open(r/f'lag007_{l}-raw1.png').convert('RGB').resize((1952,800),Image.Resampling.LANCZOS))
+ allowed=np.zeros((800,1952),bool);allowed[352:448,576:672]=True
+ if l=='01':allowed[155:175,1642:1682]=True
+ assert np.array_equal(base[~allowed],im[~allowed])
+ clips=[]
+ for part,x in [(1,0),(2,416)]:
+  n=f'lag007_{l}_del{part}av2'; future=l=='02' and part==2
+  p=(r/'c-kontroll-lag007_02_del2av2' if future else b/'jobber'/n)/'resultat.png'
+  a=np.array(Image.open(p));assert a.shape==(1024,1536,3) and np.all(a[:112]==128) and np.all(a[912:]==128)
+  assert np.array_equal(a[112:912],im[:,x:x+1536]);clips.append(a[112:912])
+  rec=dict(jobb=n,resultat=rel(p),sha256=sha(p),egenkontroll='OK',kontrollfil=rel(r/(n+'-egenkontroll-slutt.txt')),forsok=len(raw),forsok_forklaring='Antall imagegen-kall for felles master, inklusive bevarte forkastede lokale forsøk.',raw=raw,fullmaster=rel(master),fullmaster_sha256=sha(master),runtime=False,ny_brukergodkjenning=False,klar_for_mottak=True,kontrollbilde_fremtidig_del=future,visuelt_forbehold='Nytegnet full bakgrunn følger HD-romankeret, men er ikke byteidentisk med dette. TV-formene er renere/større enn kildepikslene; de små munn-/kragevariantene er bevart uten påstått figuridentitet. Papir, gulvrester, øyne og grønne skallepunkter har noe tydeligere HD-kanter. Se separat objekt-QA.')
+  if future:write(r/'c-fremtidig-lag007_02_del2av2.json',rec)
+  else:
+   records.append(rec)
+   (b/'jobber'/n/'notat.md').write_text(f'''# {n}\n\nFull RGB-romkomposisjon, ikke atlas eller alfaark. Originalens fullkomposisjon bestemmer alle synlige tilstander, også objekter som er tilordnet den andre delen i metadata.\n\nLaget med innebygd ChatGPT imagegen; eksakt modellversjon er ikke eksponert. Originalpromptene er beholdt ordrett i fullscene-prompten, fulgt av separat kildepresisering. Kildereferanser og godkjent rom007-HD brukes for innhold og strek. {len(raw)} kall til felles master, med forkastede forsøk bevart og spesifisert i c-leveranser.json.\n\nMaster {rel(master)}, SHA-256 {sha(master)}. Klipp x {x}..{x+1536}, y 0..800; plassert på x 0, y 112 i 1536 × 1024 RGB-lerret med eksakt grå 128. Leveranse SHA-256 {sha(p)}. Begge deler har byteidentisk 1120 × 800 overlapp.\n\nVanlig helskalering av nygenerert fullscene; lokale nygenererte TV-/øyefelt innfelt med rektangulær kantblanding. Ingen originalkonturmaske eller lokal geometriwarp. Alt utenfor de dokumenterte lokale feltene er byteidentisk med den helskalerte første genereringen.\n\nUendret egenkontroll: OK, se {rel(r/(n+'-egenkontroll-slutt.txt'))}. Alle metadataobjekter er kontrollert separat; ingen hoppes over av lav variasjon. Teknisk OK er ikke runtime-bevis. Runtime og ny brukergodkjenning: false.\n\nKvalitetsforbehold: {rec['visuelt_forbehold']} Kildeusikre TV-figurer identifiseres ikke ved gjetning. Se c-kilde-qa.md, c-objekt-kontroll.json og kontaktarkene i rapportmappen. Alle 44 låste kilder er uendret.\n''')
+ assert np.array_equal(clips[0][:,416:],clips[1][:,:1120])
+ masters.append(dict(lag='lag007_'+l,fullmaster=rel(master),sha256=sha(master),size=[1952,800],klipp_x=[0,416],overlapp=[1120,800],overlapp_byteidentisk=True,lokal_retting_utenfor_felt_byteidentisk=True))
+write(r/'c-masterlas.json',masters)
+write(r/'c-leveranser.json',dict(leveranser=records,masterlas=rel(r/'c-masterlas.json'),kildekontroll=rel(r/'c-kildehashkontroll.json'),runtime=False,ny_brukergodkjenning=False))
+print('44 kilder uendret; 2 mastere, 3 leveranser og 1 fremtidig kontrollklipp dokumentert')

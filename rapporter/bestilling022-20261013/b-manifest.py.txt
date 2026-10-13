@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling022-20261013'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def rel(p):return str(p.relative_to(b))
+locks=json.loads((r/'kildehash.json').read_text());assert all(sha(b/v['fil'])==v['sha256'] for v in locks)
+objects=json.loads((r/'b-objektkontroll.json').read_text());rows=[];sheet=Image.new('RGB',(1536,2048),(128,128,128))
+for i,n in enumerate([2,3,4,5]):
+ j=f'lag002_0{n}';p=b/'jobber'/j/'resultat.png';a=np.array(Image.open(p));assert a.shape==(1024,1536,3);a[112:912,128:1408]=128;assert np.all(a==128)
+ prompt=(b/'jobber'/j/'prompt.txt').read_text();assert prompt in (r/(j+'-prompt01.txt')).read_text()
+ checks=[o for o in objects if o['jobb']==j];assert all(o['korrelasjon']>=.6 and o['faktisk_kontrollert'] for o in checks)
+ row=dict(jobb=j,resultat=rel(p),sha256=sha(p),egenkontroll='OK',kontrollfil=rel(r/(j+'-kontroll.txt')),forsok=3 if n==2 else 1,objektkontroll=checks,runtime=False,ny_brukergodkjenning=False,klar_for_mottak=True,bilde_to_sha256=sha(b/'jobber/rom002/resultat.png'))
+ if n==2:row['lokalretting']={'boks':[568,288,172,156],'valgt_forsok':3,'resten_byteidentisk':True}
+ rows.append(row)
+ for k,name in enumerate(['referanse.png','resultat.png']):sheet.paste(Image.open(b/'jobber'/j/name).resize((768,512)),(k*768,i*512))
+ (p.parent/'notat.md').write_text(f'''# {j}\n\nFull opak RGB-romkomposisjon på 1536 x 1024 med motivfelt [128,112,1280,800] og nøytral RGB128-padding. Riktig rom002-HD ble brukt som bilde to; lagets egen original styrer alle objekter og tilstander. Ordrett prompt med separat kildepresisering, innebygd ChatGPT imagegen. Eksakt modellnavn er ikke eksponert.\n\nForsøk: {row['forsok']}. Lag002_02 har ett helforsøk og to lokale lyskransforsøk, hvor det tredje er valgt. De øvrige har ett helforsøk. Ingen originalmasker eller lokal warp. Se rapportmappens råbilder, prompter og oppskrifter.\n\nUendret kontroll: OK. {len(checks)} objektbokser er faktisk kantkontrollert, med nærbilder og korrelasjoner i b-objektkontroll.json og b-objektkontaktark.png. Alle 40 låste kilder er uendret. Resultat SHA-256: {sha(p)}.\n\nSemantikk og gjenværende forbehold står i b-kilde-qa.md: biler051/057 er separate varianter,052_02 er bare en lav rutedel,056 er en løs åpen dørkomponent. Opplyst skalle/pære og brutt krans gjelder bare02. Glattere lys, mer regelmessige former og små konturforskjeller er ikke runtimegodkjenning. Import og runtime er ikke prøvd, ingen ny individuell brukergodkjenning.\n''')
+sheet.save(r/'b-familie.png');(r/'b-leveranser.json').write_text(json.dumps({'leveranser':rows},ensure_ascii=False,indent=2)+'\n')
+files=sorted(p for p in r.iterdir() if ('-raa' in p.name or '-prompt' in p.name) and p.name.startswith('lag002'))
+(r/'b-proveniens.json').write_text(json.dumps({'verktoy':'innebygd ChatGPT imagegen','modell':'ikke eksponert','beskyttede_kilder_uendret':len(locks),'objekter_kontrollert':len(objects),'rom002_sha256':sha(b/'jobber/rom002/resultat.png'),'filer':[{'fil':rel(p),'sha256':sha(p)} for p in files],'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print([(v['jobb'],v['sha256']) for v in rows])

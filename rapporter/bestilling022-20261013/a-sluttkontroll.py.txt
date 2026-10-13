@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np
+import json,hashlib,importlib.util
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling022-20261013'
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+jobs=['lag003_01','lag004_01','lag004_02'];records=[];objects=[]
+overview=Image.new('RGB',(1000,1080),(210,210,210));od=ImageDraw.Draw(overview)
+close=Image.new('RGB',(1024,4*520),(210,210,210));cd=ImageDraw.Draw(close);row=0
+for i,j in enumerate(jobs):
+    d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());orig=Image.open(d/'original_1x.png').convert('RGB');res=Image.open(d/'resultat.png').convert('RGB')
+    part,_=c.part_of(res,m);comp=c.compare(orig,part)
+    x,y,w,h=m['bilde_i_lerret'];pad=np.ones((1024,1536),bool);pad[y:y+h,x:x+w]=False;assert np.all(np.array(res)[pad]==128)
+    for p in m['objekter']:
+        ox,oy,ow,oh=p['rekt'];a=comp['eo'][oy:oy+oh,ox:ox+ow];b=comp['es'][oy:oy+oh,ox:ox+ow]
+        skipped=min(ow,oh)<4 or float(a.std())<1.0;corr=None if skipped else float(c.corr(a,b))
+        obj={'jobb':j,'objekt':p['bilde'],'originalrekt':[ox,oy,ow,oh],'hdrekt':[x+ox*4,y+oy*4,ow*4,oh*4],'kant_std_original':float(a.std()),'kontroll_hoppet_over':skipped,'kantkorrelasjon':corr,'utfall':'HOPPET OVER' if skipped else ('OK' if corr>=.6 else 'SJEKK' if corr>=.5 else 'FEIL')};objects.append(obj)
+        for col,im,box in [(0,Image.open(d/'referanse.png'),(x+ox*4,y+oy*4,x+(ox+ow)*4,y+(oy+oh)*4)),(1,res,(x+ox*4,y+oy*4,x+(ox+ow)*4,y+(oy+oh)*4))]:
+            crop=im.crop(box).convert('RGB');crop.thumbnail((500,480));close.paste(crop,(col*512,row*520+30))
+        cd.text((10,row*520+7),f'{j} {p["bilde"]}: original / HD, kant {corr:.6f}',fill='black');row+=1
+    for col,name in enumerate(['referanse.png','resultat.png']):
+        thumb=Image.open(d/name).convert('RGB');thumb.thumbnail((495,330));overview.paste(thumb,(col*500,i*360+25))
+    od.text((8,i*360+5),f'{j}: original / HD',fill='black')
+    prompt=r/f'a-{j}-prompt01.txt';raw=r/f'a-{j}-raa01.png';assert prompt.read_text().startswith((d/'prompt.txt').read_text().rstrip())
+    records.append({'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':'OK','kontrollfil':str((r/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':1,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'prompt':str(prompt.relative_to(root)),'prompt_sha256':sha(prompt),'verktoy':'image_gen.imagegen','eksakt_modell':'ikke eksponert','bilde_to':m['bilde_to'],'bilde_to_sha256':sha(root/m['bilde_to']),'padding_rgb':[128,128,128]})
+    identity={'lag003_01':'Gul/oransje forskerhode med oransje hårkrøll, asymmetriske lyse briller, ører, nese og tung hake på eksisterende frakk.','lag004_01':'Fire synlige lange ørefliker i to overlappende par som faktisk kildekomposisjon. Brunt Sam-hode under hatten. Ikke anatomisk normalisering til to ører.','lag004_02':'Ingen lange Max-ører. Sam-hodet mangler fortsatt, med kildens mørkeblå felt under hatten og brune sidebiter. Ingen anatomisk fullføring.'}[j]
+    (d/'notat.md').write_text(f'# {j}\n\n{identity}\n\nEtt forsøk med innebygd ChatGPT-bildegenerator, image_gen.imagegen. Eksakt modellnavn er ikke eksponert. Ordrett prompt pluss separat kildepresisering og råbilde er bevart i rapporter/bestilling022-20261013/a-{j}-*. Referanse.png styrer motiv/pose/palett; {m["bilde_to"]} er bilde to og støtter levert romstil.\n\nFull opak RGB-komposisjon 1536 x 1024. Motiv [128,112,1280,800], padding eksakt RGB 128. Råbildets motivrektangel er plassert uten skalering, warp, originalkonturmasker eller originalpiksler i ny kunst. Ingen alfamaske eller nøkkelfarge er brukt.\n\nUendret sjekk_leveranse.py gir OK. Hvert metadatafelt er i tillegg målt med checkerens egne kantfunksjoner og vist i a-objekt-naerbilder.png; se a-objektkontroll.json. Dette er ikke import eller runtime og ikke ny individuell brukergodkjenning.\n\nSHA-256: {records[-1]["sha256"]}\n\nSe a-leveranser.json, a-kilde-qa.md, a-plassering.py.txt og a-sluttkontroll.py.txt for proveniens og begrensninger.\n')
+overview.save(r/'a-samlet-kontaktark.png');close.save(r/'a-objekt-naerbilder.png')
+(r/'a-objektkontroll.json').write_text(json.dumps(objects,ensure_ascii=False,indent=2)+'\n');(r/'a-leveranser.json').write_text(json.dumps({'leveranser':records},ensure_ascii=False,indent=2)+'\n')
+checks=[]
+for name in ['kildehash.json','ekstra-kildehash.json']:
+    for e in json.loads((r/name).read_text()):
+        checks.append({'fil':e['fil'],'sha256':sha(root/e['fil']),'uendret':sha(root/e['fil'])==e['sha256']})
+assert len(checks)==44 and all(x['uendret'] for x in checks)
+(r/'a-kildehashkontroll.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(objects,ensure_ascii=False,indent=2))

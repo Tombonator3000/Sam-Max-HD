@@ -1,0 +1,23 @@
+from PIL import Image
+from pathlib import Path
+import shutil,json,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling022-20261013';g=Path('/home/tombonator3000t/.codex/generated_images/01a135e9-14ca-7082-b901-a0ecf3e0b936');py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for layer,raw in [('01','exec-1a86c5a9-da3d-4a7b-ae74-5a4c1cbb6fb8.png'),('02','exec-6e010f5d-12a5-4652-b570-126db11dbe35.png')]:
+ shutil.copyfile(g/raw,r/('lag007_'+layer+'-raw1.png'));im=Image.open(g/raw).convert('RGB');print(layer,im.size);im.resize((1952,800),Image.Resampling.LANCZOS).save(r/('lag007_'+layer+'-fullmaster.png'))
+ for part,x in [(1,0),(2,416)]:
+  n=f'lag007_{layer}_del{part}av2';out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(Image.open(r/('lag007_'+layer+'-fullmaster.png')).crop((x,0,x+1536,800)),(0,112));dest=b/'jobber'/n
+  if layer=='02' and part==2:
+   dest=r/'c-kontroll-lag007_02_del2av2';dest.mkdir(exist_ok=True)
+   for f in ['jobb.json','original_1x.png','referanse.png']:shutil.copyfile(b/'jobber'/n/f,dest/f)
+  out.save(dest/'resultat.png');p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(dest/'resultat.png')],capture_output=True,text=True);(r/(n+'-egenkontroll1.txt')).write_text(p.stdout+p.stderr);print(p.stdout)
+import numpy as np
+# Bevar alle lokale forsøk, også forkastede TV-versjoner.
+local={'lag007_01-raw2.png':'exec-dc64767d-347c-4b7b-b835-725b892d71d9.png','lag007_01-raw-tv1.png':'exec-d7ac218c-9c6e-4371-857e-e830f7ea348e.png','lag007_01-raw-tv2.png':'exec-bdf748c7-f3e2-4f22-8522-34f70322ca35.png','lag007_01-raw-tv3.png':'exec-dc4045e7-3e4d-413a-85b8-47782212819b.png','lag007_02-raw-tv.png':'exec-7421a81a-e425-4882-b510-536a3fd2b707.png'}
+for dst,src in local.items():shutil.copyfile(g/src,r/dst)
+def rectpatch(im,patch,xy,blend):
+ x,y=xy;w,h=patch.size;old=np.asarray(im.crop((x,y,x+w,y+h))).astype(float);new=np.asarray(patch).astype(float);yy,xx=np.mgrid[:h,:w];alpha=np.minimum.reduce([xx,yy,w-1-xx,h-1-yy]).astype(float);alpha=np.clip(alpha/max(1,blend),0,1)[...,None];im.paste(Image.fromarray(np.uint8(np.rint(old*(1-alpha)+new*alpha))),(x,y))
+im=Image.open(r/'lag007_01-fullmaster.png').convert('RGB');eye=Image.open(r/'lag007_01-raw2.png').convert('RGB').resize((160,144),Image.Resampling.LANCZOS);rectpatch(im,eye.crop((42,43,82,63)),(1642,155),2);im.save(r/'lag007_01-fullmaster.png')
+for l in ['01','02']:
+ im=Image.open(r/f'lag007_{l}-fullmaster.png').convert('RGB');raw='lag007_01-raw-tv3.png' if l=='01' else 'lag007_02-raw-tv.png';tv=Image.open(r/raw).convert('RGB').resize((96,96),Image.Resampling.LANCZOS);rectpatch(im,tv,(576,352),3);im.save(r/f'lag007_{l}-fullmaster.png')
+ for part,x in [(1,0),(2,416)]:
+  n=f'lag007_{l}_del{part}av2';out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im.crop((x,0,x+1536,800)),(0,112));dest=b/'jobber'/n if not(l=='02' and part==2) else r/'c-kontroll-lag007_02_del2av2';out.save(dest/'resultat.png');p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(dest/'resultat.png')],capture_output=True,text=True);(r/(n+'-egenkontroll-slutt.txt')).write_text(p.stdout+p.stderr);print(p.stdout)

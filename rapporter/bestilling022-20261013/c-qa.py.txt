@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,importlib.util
+b=Path.cwd();r=b/'rapporter/bestilling022-20261013';spec=importlib.util.spec_from_file_location('checker',b/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c);recs=[];thumbs=[]
+for l in ['01','02']:
+ for part in [1,2]:
+  n=f'lag007_{l}_del{part}av2';d=b/'jobber'/n;res=d/'resultat.png' if not(l=='02' and part==2) else r/'c-kontroll-lag007_02_del2av2/resultat.png';j=json.loads((d/'jobb.json').read_text());im=Image.open(res).convert('RGB');p,kind=c.part_of(im,j);m=c.compare(Image.open(d/'original_1x.png').convert('RGB'),p)
+  for o in j['objekter']:
+   x,y,w,h=o['rekt'];rx=j['region'][0];xx=x-rx;aa,bb=m['eo'][y:y+h,xx:xx+w],m['es'][y:y+h,xx:xx+w];rec={'jobb':n,**o,'hd_lerret_rekt':[4*xx,112+4*y,4*w,4*h],'std':float(aa.std()),'corr':float(c.corr(aa,bb)),'skipped':bool(aa.std()<1 or min(w,h)<4)};recs.append(rec)
+   box=(4*xx,112+4*y,4*(xx+w),112+4*(y+h));s=Image.open(d/'referanse.png').crop(box);q=im.crop(box);scale=min(3,400/s.width,300/s.height);size=(round(s.width*scale),round(s.height*scale));thumbs.append((n+' '+o['bilde'],s.resize(size,Image.Resampling.NEAREST),q.resize(size)))
+(r/'c-objekt-kontroll.json').write_text(json.dumps(recs,indent=2)+'\n')
+for group in range((len(thumbs)+3)//4):
+ out=Image.new('RGB',(900,1320),(128,128,128));dr=ImageDraw.Draw(out)
+ for i,(name,s,q) in enumerate(thumbs[group*4:group*4+4]):dr.text((5,i*330+5),name+' original / HD',fill='white');out.paste(s,(5,i*330+25));out.paste(q,(455,i*330+25))
+ out.save(r/f'c-objekt-qa-{group+1}.png')
+out=Image.new('RGB',(1952,4*825),(128,128,128));dr=ImageDraw.Draw(out)
+for i,(l,kind) in enumerate([('01','source-full'),('01','fullmaster'),('02','source-full'),('02','fullmaster')]):dr.text((5,i*825+5),l+' '+kind,fill='white');out.paste(Image.open(r/f'lag007_{l}-{kind}.png'),(0,i*825+25))
+out.save(r/'c-samlet-qa.png');print([(x['bilde'],round(x['corr'],3),x['skipped']) for x in recs])

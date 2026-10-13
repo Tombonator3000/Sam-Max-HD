@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 6 bilder levert (1 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 28 bilder levert (11 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -334,16 +334,16 @@ Rom 2, 89, 90, 91, 92, 94.
 
 Rom 2, 3, 4, 7.
 
-- [ ] `lag002_02` (rom 2 Laboratoriet (intro), lag 02 med 4 objektbilder, bilde to `jobber/rom002/resultat.png`)
-- [ ] `lag002_03` (rom 2 Laboratoriet (intro), lag 03 med 1 objektbilde, bilde to `jobber/rom002/resultat.png`)
-- [ ] `lag002_04` (rom 2 Laboratoriet (intro), lag 04 med 1 objektbilde, bilde to `jobber/rom002/resultat.png`)
-- [ ] `lag002_05` (rom 2 Laboratoriet (intro), lag 05 med 1 objektbilde, bilde to `jobber/rom002/resultat.png`)
-- [ ] `lag003_01` (rom 3 Forskeren i nærbilde (intro), lag 01 med 1 objektbilde, bilde to `jobber/rom003/resultat.png`)
-- [ ] `lag004_01` (rom 4 Sam og Max i nærbilde (intro), lag 01 med 2 objektbilder, bilde to `jobber/rom004/resultat.png`)
-- [ ] `lag004_02` (rom 4 Sam og Max i nærbilde (intro), lag 02 med 1 objektbilde, bilde to `jobber/rom004/resultat.png`)
-- [ ] `lag007_01_del1av2` (rom 7 Kontoret, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_01_del2av2` (rom 7 Kontoret, lag 01 med 7 objektbilder, del 2/2, bilde to `jobber/rom007_del2av2/resultat.png`)
-- [ ] `lag007_02_del1av2` (rom 7 Kontoret, lag 02 med 3 objektbilder, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag002_02` (rom 2 Laboratoriet (intro), lag 02 med 4 objektbilder, bilde to `jobber/rom002/resultat.png`)
+- [x] `lag002_03` (rom 2 Laboratoriet (intro), lag 03 med 1 objektbilde, bilde to `jobber/rom002/resultat.png`)
+- [x] `lag002_04` (rom 2 Laboratoriet (intro), lag 04 med 1 objektbilde, bilde to `jobber/rom002/resultat.png`)
+- [x] `lag002_05` (rom 2 Laboratoriet (intro), lag 05 med 1 objektbilde, bilde to `jobber/rom002/resultat.png`)
+- [x] `lag003_01` (rom 3 Forskeren i nærbilde (intro), lag 01 med 1 objektbilde, bilde to `jobber/rom003/resultat.png`)
+- [x] `lag004_01` (rom 4 Sam og Max i nærbilde (intro), lag 01 med 2 objektbilder, bilde to `jobber/rom004/resultat.png`)
+- [x] `lag004_02` (rom 4 Sam og Max i nærbilde (intro), lag 02 med 1 objektbilde, bilde to `jobber/rom004/resultat.png`)
+- [x] `lag007_01_del1av2` (rom 7 Kontoret, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_01_del2av2` (rom 7 Kontoret, lag 01 med 7 objektbilder, del 2/2, bilde to `jobber/rom007_del2av2/resultat.png`)
+- [x] `lag007_02_del1av2` (rom 7 Kontoret, lag 02 med 3 objektbilder, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
 
 ## Bestilling 23
 
@@ -3469,3 +3469,5 @@ Bestilling 20: 9 OK og rom083 SJEKK, ti bilder levert. Separate sky-/figurtilsta
 Bestilling 21: åtte klare (7 OK og rom092 SJEKK), rom090/obj901 uavklarte FEIL og ukrysset. Fargede klær/egen surfersilhuett, svakt UIunderlag og første seksobjekt-lag kontrollert. Metodevalg for to flate kandidater spurt separat. Se `rapporter/bestilling021-20261013/RAPPORT.md`. Bestilling 22 fortsetter.
 
 Rom090 og obj901_01 levert OK etter Toms uttrykkelige vektorvalg, med native SVG, originalens flate palett og uavhengig motiv-/geometrikontroll. Dette erstatter de to FEIL-kandidatene i bestilling 21. Alle 76 rombakgrunner er nå levert som grafikk; obj187_05 og obj307_01 står fortsatt uavklart. Ingen import eller runtime. Se `rapporter/rom090-obj901-vektor-20261013/`.
+
+Bestilling 22: ti objektlag levert OK. Egne bil-/lystilstander, fire ørefliker og bevisst avskårne figurdeler beholdt. To kontormastere med identiske overlapp, små øye-/TV-/skallevarianter og alle 22 objektfelt kontrollert. Se `rapporter/bestilling022-20261013/RAPPORT.md`. Bestilling 23 og videre lag fortsetter.

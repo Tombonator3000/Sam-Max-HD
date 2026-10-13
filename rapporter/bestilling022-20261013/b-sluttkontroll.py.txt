@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import subprocess,json,numpy as np,importlib.util
+b=Path.cwd();r=b/'rapporter/bestilling022-20261013'
+spec=importlib.util.spec_from_file_location('checker',b/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+rows=[];thumbs=[]
+for n in [2,3,4,5]:
+ j=f'lag002_0{n}';out=Image.open(b/'jobber'/j/'resultat.png').convert('RGB')
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(b/'jobber'/j/'resultat.png')],capture_output=True,text=True);(r/(j+'-kontroll.txt')).write_text(p.stdout+p.stderr);print(p.stdout)
+ job=json.loads((b/'jobber'/j/'jobb.json').read_text());original=Image.open(b/'jobber'/j/'original_1x.png').convert('RGB');m=c.compare(original,out.crop((128,112,1408,912)))
+ for o in job['objekter']:
+  x,y,w,h=o['rekt'];a=m['eo'][y:y+h,x:x+w];z=m['es'][y:y+h,x:x+w];v=float(c.corr(a,z));rows.append(dict(jobb=j,objekt=o['bilde'],rekt=o['rekt'],hd_rekt=[128+4*x,112+4*y,4*w,4*h],kantstd=float(a.std()),korrelasjon=v,faktisk_kontrollert=bool(a.std()>=1)))
+  panel=Image.new('RGB',(1120,300),(128,128,128));d=ImageDraw.Draw(panel);d.text((5,5),f'{j} {o["bilde"]} corr {v:.3f}',fill='white')
+  for k,im in enumerate([original.crop((x,y,x+w,y+h)).resize((w*4,h*4),Image.Resampling.NEAREST),out.crop((128+4*x,112+4*y,128+4*(x+w),112+4*(y+h)))]):panel.paste(im,(k*560,30))
+  thumbs.append(panel)
+sheet=Image.new('RGB',(1120,300*len(thumbs)),(128,128,128))
+for i,t in enumerate(thumbs):sheet.paste(t,(0,300*i))
+sheet.save(r/'b-objektkontaktark.png');(r/'b-objektkontroll.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
