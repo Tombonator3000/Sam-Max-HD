@@ -1,0 +1,7 @@
+from pathlib import Path
+from PIL import Image
+b=Path.cwd();r=b/'rapporter/bestilling012-20261013'
+for n in ['rom057','rom058']:
+ a=Image.new('RGB',(1920,1024),(128,128,128))
+ for part,x in [(1,0),(2,384)]:a.paste(Image.open(b/'jobber'/f'{n}_del{part}av2'/'referanse.png').convert('RGB').crop((0,112,1536,912)),(x,112))
+ a.save(r/(n+'-fullkilde.png'))

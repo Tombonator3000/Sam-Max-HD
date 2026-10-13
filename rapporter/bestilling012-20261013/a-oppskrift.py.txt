@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import json
+b=Path(__file__).resolve().parents[2]
+r=b/'rapporter/bestilling012-20261013'
+for job,p in json.loads((r/'a-prosessering.json').read_text()).items():
+ im=Image.open(r/p['raw']).convert('RGB')
+ x,y,w,h=json.loads((b/'jobber'/job/'jobb.json').read_text())['bilde_i_lerret']
+ out=Image.new('RGB',(1536,1024),(128,128,128))
+ out.paste(im.crop(tuple(p['box'])).resize((w,h),Image.Resampling.LANCZOS),(x,y))
+ out.save(b/'jobber'/job/'resultat.png')

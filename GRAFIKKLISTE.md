@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 19:16 (norsk tid)
+Oppdatert 2026-10-13 19:17 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 47 hele rom levert (73 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 26 levert, inkludert fem SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 52 hele rom og 1 delvis levert (81 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 28 levert, inkludert fem SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -184,16 +184,16 @@ Rom 44, 45, 47, 48, 49, 50, 51, 52.
 
 Rom 53, 54, 55, 56, 57, 58.
 
-- [ ] `rom053_del1av2` (rom 53 Savage Jungle Inn, festsalen, del 1/2)
-- [ ] `rom053_del2av2` (rom 53 Savage Jungle Inn, festsalen, del 2/2)
-- [ ] `rom054` (rom 54 Boblebadet)
-- [ ] `rom055` (rom 55 Bassengområdet)
-- [ ] `obj523_01` (rom 55 Bassengområdet, objekt 523 tilstand 01)
-- [ ] `obj524_01` (rom 55 Bassengområdet, objekt 524 tilstand 01)
-- [ ] `rom056` (rom 56 Kjøkkenet)
-- [ ] `rom057_del1av2` (rom 57 Celebrity Vegetable Museum, del 1/2)
-- [ ] `rom057_del2av2` (rom 57 Celebrity Vegetable Museum, del 2/2)
-- [ ] `rom058_del1av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), del 1/2)
+- [x] `rom053_del1av2` (rom 53 Savage Jungle Inn, festsalen, del 1/2)
+- [x] `rom053_del2av2` (rom 53 Savage Jungle Inn, festsalen, del 2/2)
+- [x] `rom054` (rom 54 Boblebadet)
+- [x] `rom055` (rom 55 Bassengområdet)
+- [x] `obj523_01` (rom 55 Bassengområdet, objekt 523 tilstand 01)
+- [x] `obj524_01` (rom 55 Bassengområdet, objekt 524 tilstand 01)
+- [x] `rom056` (rom 56 Kjøkkenet)
+- [x] `rom057_del1av2` (rom 57 Celebrity Vegetable Museum, del 1/2)
+- [x] `rom057_del2av2` (rom 57 Celebrity Vegetable Museum, del 2/2)
+- [x] `rom058_del1av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore), del 1/2)
 
 ## Bestilling 13
 
@@ -3443,3 +3443,5 @@ Bestilling 9: 7 OK og 3 SJEKK (obj335_01, obj337_01 og obj339_01), ti bilder lev
 Bestilling 10: ti rombilder med egenkontroll OK, fire identiske overlapp og kildekontrollert opp-ned-butikk og troférom. Se `rapporter/bestilling010-20261013/RAPPORT.md`. Bestilling 11 er startet.
 
 Bestilling 11: ni bilder klare, alle teknisk OK. Rom049 er teknisk OK men visuelt avvist etter fem forsøk og forblir ukrysset. Se `rapporter/bestilling011-20261013/RAPPORT.md`. Bestilling 12 og 13 fortsetter uavhengig.
+
+Bestilling 12: ti OK levert, med kildekontrollert fest, bassengtilstander og grønnsaksmuseum. Rom058-master og neste del er låst; se `rapporter/bestilling012-20261013/RAPPORT.md`. Bestilling 13 fortsetter.

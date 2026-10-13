@@ -1,0 +1,12 @@
+from PIL import Image
+from pathlib import Path
+import shutil,numpy as np
+b=Path('/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren');r=b/'rapporter/bestilling012-20261013';g=Path('/home/tombonator3000t/.codex/generated_images/01a135e9-14ca-7082-b901-a0ecf3e0b936')
+for j,f in [('rom053_del1av2','exec-dc103020-566a-4e80-ba21-ca10efb5c862.png'),('rom053_del2av2','exec-4cb373d2-bf63-4398-b115-5983cb07a5ca.png'),('rom056','exec-09266481-30c4-4152-b12e-4894591d9c7d.png')]:shutil.copy(g/f,r/f'{j}-raa-1.png')
+a=Image.open(r/'rom053_del1av2-raa-1.png').convert('RGB').crop((0,112,1536,912));z=Image.open(r/'rom053_del2av2-raa-1.png').convert('RGB').crop((0,112,1536,912))
+m=Image.new('RGB',(1856,800));m.paste(a,(0,0));m.paste(z.crop((416,0,1536,800)),(736,0))
+for x in range(704,736):m.paste(Image.blend(a.crop((x,0,x+1,800)),z.crop((x-320,0,x-319,800)),(x-703)/33),(x,0))
+m.save(r/'rom053-fullmaster.png')
+for j,x in [('rom053_del1av2',0),('rom053_del2av2',320)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(m.crop((x,0,x+1536,800)),(0,112));out.save(b/'jobber'/j/'resultat.png')
+out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(Image.open(r/'rom056-raa-1.png').convert('RGB').crop((128,112,1408,912)),(128,112));out.save(b/'jobber/rom056/resultat.png')

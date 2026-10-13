@@ -118,3 +118,10 @@
 - 40 beskyttede kilder uendret, SHA/lerret/padding kontrollert. Root så alle original/HD samlet. Rom051/052 har 1216/1152 x 800 byte-identiske overlapp. EDUTAINMENT og MA TRUK kildekontrollert.
 - Rom050 korrigert semantisk til rengjøringsrobotens hjerne og husplan, støttet av offisiell hintbok søkeutdrag side 23. Beskyttede filer urørt. Ingen aktivering, masker, import, spilltest eller ny individuell godkjenning.
 - Forrige bestillings ti PNG SHA-verifisert fra GitHub. Proveniens/QA i rapporter/bestilling011-20261013/. Bestilling 12/13 pågår.
+
+## 2026-10-13 19:17 (Codex, Astra)
+
+- Bestilling 12 levert med ti OK, 40+4 uendrede beskyttede kilder og eksakt lerret/padding/SHA. Root har sammenlignet alle original/HD.
+- Festsalen har kildeband/publikum og 1216 x 800 identisk overlapp. Grønnsaksmuseet har 1152 x 800 identisk overlapp, småskilt uten gjettet pris/utvidelse. Rom058 har låst fellesmaster, neste del kontrollert OK.
+- Rom055 har fire påler; obj523/524 avdekkede tilstander holdt separate, 65 ulike originaloverlapp-piksler dokumentert. Rom054 tomt bad, rom056 lukket fryser. Første obj523-FEIL avvist.
+- Alle ti lagrede bestilling 11-PNG SHA-verifisert fra GitHub, inkludert visuelt avvist VR-kandidat. Notater/proveniens i rapporter/bestilling012-20261013/. Ingen runtime/import/ny individuell godkjenning. Bestilling 13 fortsetter.
