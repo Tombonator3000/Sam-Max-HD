@@ -382,3 +382,8 @@
 
 - Bestilling 58: fem nye Max-ark med 90 ruter og fire tidligere leverte ark med lokale munnrettinger, alle OK. 325 beholder egne hodeankre; 205 har kildebevist vertikal vending. Se `rapporter/bestilling058-20261013/RAPPORT.md`. Arbeidet fortsetter.
 - 33 Max325-ruter og57 Max205-ruter er kilde- og plasseringskontrollert. Tidligere røde munnavvik er rettet i003/005 med uendret alfa og omgivende piksler. Historiske donorbytes er arkivert. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T01:39:30+02:00 (Codex, Astra)
+
+- Bestilling57: seks Sam-ark med79 ruter levert, alle OK. Pute, dinosaurtann, John Muir-squash og håndholdt vortex er kildeavklart og kontrollert; små separate punkter er beholdt. Se `rapporter/bestilling057-20261013/RAPPORT.md`. Arbeidet fortsetter.
+-14 bildekall er dokumentert med faktisk sendt prompt, også forkastede forsøk. Sam1941s kropp er ikke strukket til det separate punktet;1993/94 har egne smålag. Alle seks faktiske RGBA-leveranser og24 beskyttede jobbkilder er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.

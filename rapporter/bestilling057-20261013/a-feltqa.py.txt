@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1];es=json.loads((r/'a-kildebevis.json').read_text())['ruter'];es=[e for e in es if (r/f"a-{e['jobb']}-partiell.png").exists()]
+for page in range((len(es)+7)//8):
+ out=Image.new('RGB',(1200,960),(70,80,90));d=ImageDraw.Draw(out)
+ for k,e in enumerate(es[page*8:page*8+8]):
+  x=k%2*600;y=k//2*240;sx,sy,ex,ey=e['synlig'];d.text((x+8,y+6),f"{e['jobb']} cel {e['rute']} rel {e['originalmetadata']['rel_x']},{e['originalmetadata']['rel_y']}",fill='white')
+  src=Image.open(root/'jobber'/e['jobb']/'original_1x.png').crop((sx,sy,ex,ey)).convert('RGBA');hd=Image.open(r/f"a-{e['jobb']}-partiell.png").crop((64+sx*4-4,32+sy*4-4,64+ex*4+4,32+ey*4+4))
+  src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST)
+  for j,im in enumerate([src,hd]):
+   im.thumbnail((275,200),Image.Resampling.NEAREST if j==0 else Image.Resampling.LANCZOS);out.paste(im,(x+j*300+(290-im.width)//2,y+30+(200-im.height)//2),im)
+ out.save(r/f'a-slutt-feltqa-{page+1}.png')

@@ -1,0 +1,7 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,collections
+r=Path(__file__).resolve().parent;root=r.parents[1];es=json.loads((r/'a-kildebevis.json').read_text())['ruter'];groups=collections.defaultdict(list);tight=[]
+for e in es:
+ x,y,xx,yy=e['synlig'];a=np.array(Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop((x,y,xx,yy)));m=np.any(a!=e['bakgrunn'],2);ys,xs=np.where(m);b=[x+int(xs.min()),y+int(ys.min()),x+int(xs.max()+1),y+int(ys.max()+1)];e['faktisk_RGB_bbox']=b;tight.append({'cel':e['rute'],'synlig':e['synlig'],'faktisk':b});groups[(a.shape,hashlib.sha256(a.tobytes()).hexdigest())].append({'jobb':e['jobb'],'cel':e['rute'],'rel':[e['originalmetadata']['rel_x'],e['originalmetadata']['rel_y']]})
+(r/'a-familiebevis.json').write_text(json.dumps({'unike_RGB':len(groups),'identiske_grupper':[v for v in groups.values() if len(v)>1],'synlig_bbox_avvik':[e for e in tight if e['synlig']!=e['faktisk']]},indent=2)+'\n');print((r/'a-familiebevis.json').read_text())

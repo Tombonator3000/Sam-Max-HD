@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil,subprocess,sys
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();es=json.loads((r/'a-kildebevis.json').read_text())['ruter'];locks=json.loads((r/'a-kildehash.json').read_text())['filer'];assert all(sha(root/p)==h for p,h in locks.items());manifest=[];rutemap=[]
+for n in range(1,7):
+ name=f'fig272_{n:02d}';dest=root/'jobber'/name/'resultat.png';shutil.copyfile(r/f'a-{name}-partiell.png',dest);p=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(dest)],capture_output=True,text=True);(r/f'a-{name}-kontroll.txt').write_text(p.stdout+p.stderr);assert 'Utfall: OK' in p.stdout;im=Image.open(dest);a=np.array(im);assert im.mode=='RGBA';count=len([e for e in es if e['jobb']==name]);manifest.append({'jobb':name,'resultat':str(dest.relative_to(root)),'sha256':sha(dest),'egenkontroll':'OK','kontrollfil':str((r/f'a-{name}-kontroll.txt').relative_to(root)),'forsok':14,'ruter':count,'proveniens':'rapporter/bestilling057-20261013/a-bildekall.json','runtime':False,'ny_brukergodkjenning':False})
+ (dest.parent/'notat.md').write_text(f'''# {name}\n\nRGBA 1536 × 1024, {count} kildeplasserte ruter. SHA-256: `{sha(dest)}`. Uendret sjekk_leveranse.py gir OK.\n\nFamilien har79 ruter,45 unike kildeutklipp og ni valgte nye gruppebilder fra14 innebygde bildekall. Eksakt modellnavn er ikke eksponert. Faktisk prompt per kall, også den rettede familievariabelfeilen, er bevart i a-bildekall.json og a-kallNN-faktisk-prompt.txt. Avviste forsøk er ikke ankere.\n\nMotiver: hårtonikkpute, dinosaurtann, John Muir-formet squash og håndholdt vortex. Hver rutes egen rel/lag/retning og tilstand er bevart. Kildebeviste repetisjoner deler ny art. 1941s kropp og separate beige punkt behandles hver for seg;1993/94 har egne fargede småkomponenter. Ingen originalmasker eller lokal warp.\n\nSe a-kilde-qa.md, a-plasseringsbevis.json, a-rutekart-hd.json og ti felt-/rel-ark i rapporter/bestilling057-20261013. Ingen runtime-avspilling eller ny individuell brukergodkjenning. Kildens24 beskyttede filer er uendret.\n''')
+for e in es:
+ x,y,xx,yy=e['synlig'];a=np.array(Image.open(root/'jobber'/e['jobb']/'resultat.png'));q=a[32+y*4:32+yy*4,64+x*4:64+xx*4];ys,xs=np.where(q[:,:,3]>=128);rutemap.append({'jobb':e['jobb'],'cel':e['rute'],'synlig':e['synlig'],'rekt':e['rekt'],'rel':e['originalmetadata'],'hd_kjerne_bbox':[64+x*4+int(xs.min()),32+y*4+int(ys.min()),64+x*4+int(xs.max()+1),32+y*4+int(ys.max()+1)],'komponent_RGBA_sha256':hashlib.sha256(q.tobytes()).hexdigest()})
+(r/'a-rutekart-hd.json').write_text(json.dumps(rutemap,ensure_ascii=False,indent=2)+'\n');(r/'a-leveranser.json').write_text(json.dumps({'leveranser':manifest},ensure_ascii=False,indent=2)+'\n')
+for page in range((len(es)+7)//8):
+ out=Image.new('RGB',(2400,430),(75,85,95));d=ImageDraw.Draw(out)
+ for i,e in enumerate(es[page*8:page*8+8]):
+  x,y,xx,yy=e['synlig'];rx,ry=e['rekt'][:2];m=e['originalmetadata'];d.text((i*300+5,5),f"{e['rute']} rel{m['rel_x']},{m['rel_y']}",fill='white');src=Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGBA').crop((x,y,xx,yy));a=np.array(src);a[:,:,3]=np.uint8(np.any(a[:,:,:3]!=e['bakgrunn'],2))*255;src=Image.fromarray(a).resize((src.width*2,src.height*2),Image.Resampling.NEAREST);hd=Image.open(root/'jobber'/e['jobb']/'resultat.png').crop((64+x*4,32+y*4,64+xx*4,32+yy*4));hd=hd.resize((hd.width//2,hd.height//2),Image.Resampling.LANCZOS);ox=i*300+80;oy=175;dx=(m['rel_x']+x-rx)*2;dy=(m['rel_y']+y-ry)*2
+  for j,im in enumerate([src,hd]):
+   out.paste(im,(ox+dx,oy+j*210+dy),im);d.line((ox,25+j*210,ox,195+j*210),fill=(125,135,145));d.line((i*300+10,oy+j*210,i*300+295,oy+j*210),fill=(125,135,145))
+ out.save(r/f'a-rel-slutt-{page+1}.png')
+full=Image.new('RGB',(1536,1536),(75,85,95))
+for n in range(1,7):
+ im=Image.open(root/'jobber'/f'fig272_{n:02d}'/'resultat.png');im.thumbnail((768,512));full.paste(im,((n-1)%2*768,(n-1)//2*512),im)
+full.save(r/'a-slutt-helark.png');print(json.dumps(manifest,indent=2))

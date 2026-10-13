@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,hashlib
+r=Path(__file__).resolve().parent;ss=json.loads((r/'a-sendte-promptstrenger.json').read_text());calls=[
+('pute1','57p1','649e299e-eec9-4fa0-8b9c-7aea79bbe165','a-pute1-raa01.png',True),
+('pute2','57p2','ec484386-e639-4e94-86c3-d0031090da05','a-pute2-raa01.png',True),
+('pute3','57p3','7947d0c0-1fcf-42e8-8aa3-148b59fce13d','a-pute3-raa01.png',True),
+('tann1','57t1','fbcf4772-a805-4159-8cd9-9af1f55ae9bd','a-tann1-ikkevalgt-raa01.png',False),
+('tann2','57t2','82e11e1a-e962-4ed7-897e-3bb520332091','a-tann2-avvist-raa01.png',False),
+('vortex1','57v1','4f320b4a-880a-4b78-80f7-874e1bd97f82','a-vortex1-avvist-raa01.png',False),
+('tann2','57t2correct','5060c9a8-d9aa-45a1-8945-4918d2184c46','a-tann2-avvist-raa02.png',False),
+('vortex1','57v1correct','20121b8d-6d93-49aa-acd6-5cd71053f4e5','a-vortex1-raa01.png',True),
+('vortex2','57v2correct','67dd5463-ce66-4901-b280-62b438a65b92','a-vortex2-avvist-raa01.png',False),
+('muir1','57m1','6865bbe3-629f-458a-824b-a946e3e679a1','a-muir1-raa01.png',True),
+('muir2','57m2','c277fc3e-a1bf-463f-9249-c21dfb016ad9','a-muir2-raa01.png',True),
+('vortex2','57v2retry','c53bb62d-b2a9-4d87-823a-58d873e8ab30','a-vortex2-raa01.png',True),
+('tann2','57t2finalprompt','8ac37ab0-64b9-4477-96b2-eeeadf4cd777','a-tann2-raa01.png',True),
+('tann1','57t1final','934022e2-a5f1-4ed2-be94-871d88ecb836','a-tann1-raa01.png',True)]
+a=[]
+for i,(g,key,uid,raw,selected) in enumerate(calls,1):
+ actual=ss[key];f=r/f'a-kall{i:02d}-faktisk-prompt.txt';f.write_text(actual);a.append({'kall':i,'gruppe':g,'valgt':selected,'verktøy':'tools.image_gen__imagegen','modell':'eksakt navn ikke eksponert','råfil':raw,'rå_sha256':hashlib.sha256((r/raw).read_bytes()).hexdigest(),'generert_original':f'/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a/exec-{uid}.png','faktisk_prompt':f.name,'faktisk_prompt_sha256':hashlib.sha256(actual.encode()).hexdigest(),'referanser':[f'a-{g}-kilde.png','hovedark/sam.png'],'feil_familiepresisering':i<=6})
+(r/'a-bildekall.json').write_text(json.dumps(a,ensure_ascii=False,indent=2)+'\n')

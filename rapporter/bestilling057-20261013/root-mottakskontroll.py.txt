@@ -1,0 +1,44 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1]
+read=lambda n:json.loads((r/n).read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks={**read('a-kildehash.json')['filer'],**read('a-konteksthash.json')}
+for p,h in locks.items():assert sha(root/p)==h,p
+calls=read('a-bildekall.json');assert len(calls)==14
+for c in calls:
+    assert sha(r/c['råfil'])==c['rå_sha256']
+    assert sha(r/c['faktisk_prompt'])==c['faktisk_prompt_sha256']
+src=read('a-kildebevis.json')['ruter'];mp=read('a-unik-kobling.json');placement=read('a-plasseringsbevis.json');native=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['272']['cels']
+out={};original={};records=[]
+for m in mp:
+    e=next(x for x in src if x['rute']==m['cel']);j=e['jobb'];c=m['cel'];rep=m['representant'];job=json.loads((root/'jobber'/j/'jobb.json').read_text());actual=next(x for x in job['ruter'] if x['rute']==c)
+    assert actual['synlig']==e['synlig'] and actual['rekt']==e['rekt'];assert e['originalmetadata']==next(x for x in native if x['cel']==c)
+    original[c]=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop(e['synlig'])
+    q=Image.open(r/f'a-cel{rep}-komponent.png').convert('RGBA');a=np.array(q);yy,xx=np.nonzero(a[:,:,3]>=128);b=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+    x,y,X,Y=e['synlig'];width=38 if c==1941 else 43 if c in [1993,1994] else X-x
+    assert b[2]-b[0]==4*width and b[3]-b[1]==4*(Y-y)
+    out.setdefault(j,Image.new('RGBA',(1536,1024))).alpha_composite(q,(64+4*x-b[0],32+4*y-b[1]))
+    records.append({'jobb':j,'cel':c,'representant':rep,'rel_bevart':e['originalmetadata'],'hovedkomponent_kjerne':[4*width,4*(Y-y)],'komponent_sha256':sha(r/f'a-cel{rep}-komponent.png')})
+for m in mp:
+    assert original[m['cel']].size==original[m['representant']].size and original[m['cel']].tobytes()==original[m['representant']].tobytes()
+assert len(mp)==79 and len({m['representant'] for m in mp})==45
+points=[e for e in placement if 'ny_komponent' in e];assert len(points)==6
+for e in points:
+    q=Image.open(r/e['ny_komponent']).convert('RGBA');assert q.size==(4,4);x,y,w,h=e['mål'];srcrow=next(x for x in src if x['rute']==e['cel'])
+    out[srcrow['jobb']].alpha_composite(q,(x,y))
+smallsource=read('a-kildekomponenter.json')
+for e in smallsource:
+    actual=[p['mål'] for p in points if p['cel']==e['cel']]
+    expected=[[64+4*c['atlas_bbox'][0],32+4*c['atlas_bbox'][1],4,4] for c in e['komponenter'][1:]]
+    assert actual==expected
+deliveries=[]
+for e in read('a-leveranser.json')['leveranser']:
+    j=e['jobb'];p=root/e['resultat'];assert sha(p)==e['sha256'];im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024)
+    assert im.tobytes()==out[j].tobytes(),j
+    run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);assert 'Utfall: OK' in run.stdout
+    (r/f'root-{j}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n')
+    deliveries.append({'jobb':j,'sha256':sha(p),'ruter':e['ruter'],'komponentrekonstruksjon':'byteidentisk','egenkontroll':'OK'})
+(r/'root-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':24,'kontekst_uendret':len(locks)-24,'bildekall_og_faktiske_prompthasher':14,'ruter':records,'45_unike_79_kilder_kontrollert':True,'separate_nye_flekker':points,'leveranser':deliveries,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('A57: 79 ruter/45 kilder,6 nye flekker,14 faktisk sendte prompter og6 leverte RGBA-ark verifisert, alle OK.')

@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1];es=json.loads((r/'a-kildebevis.json').read_text())['ruter'];seen={};reps=[];mapping=[]
+for e in es:
+ x,y,xx,yy=e['synlig'];im=Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop((x,y,xx,yy));key=(im.size,hashlib.sha256(im.tobytes()).hexdigest());rep=seen.setdefault(key,e['rute']);mapping.append({'cel':e['rute'],'representant':rep,'jobb':e['jobb']});
+ if rep==e['rute']:reps.append(e)
+(r/'a-unik-kobling.json').write_text(json.dumps(mapping,indent=2)+'\n')
+groups=[]
+for anim,label in [(1,'pute'),(7,'tann'),(9,'vortex'),(8,'muir')]:
+ ee=[e for e in reps if e['animasjon']==anim]
+ for n in range(0,len(ee),6):groups.append((f'{label}{n//6+1}',ee[n:n+6]))
+for name,arr in groups:
+ label=name.rstrip("0123456789")
+ can=Image.new('RGB',(960,640),(255,0,255));boxes=[]
+ for i,e in enumerate(arr):
+  x,y,xx,yy=e['synlig'];p=Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop((x,y,xx,yy));special=None
+  if e['rute']==1941:p=p.crop((0,0,50,p.height));special='Fjern enkeltpunktet fra denne komposittreferansen; plasser ny separat komponent senere.'
+  p=p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST);px=i%3*320+20;py=i//3*320+300-p.height;can.paste(p,(px,py));boxes.append({'cel':e['rute'],'jobb':e['jobb'],'kilderute':e['synlig'],'source_image_box':[px,py,p.width,p.height],'grid':[i%3*320,i//3*320,(i%3+1)*320,(i//3+1)*320],'spesielt':special})
+ can.save(r/f'a-{name}-kilde.png');(r/f'a-{name}-bokser.json').write_text(json.dumps(boxes,indent=2)+'\n')
+ original=(root/'jobber'/arr[0]['jobb']/'prompt.txt').read_text();extra=f'''SCOPED SOURCE CLARIFICATION: Produce ONLY the {len(arr)} distinct Sam poses in attached source contact sheet, in its exact 3 column by 2 row order, remaining cells empty. This is a re-layout of original source cels, not the final atlas. Preserve each source pose exactly: SAME brown dog Sam, blue gray suit and fedora, white shirt, dark blue diagonally striped tie. Source-specific head angle, eyes, closed mouth, short legs and long horizontal snout take precedence over style sheet. All feet are bare brown dog paws, NOT shoes. Match the Sam style reference only for clean hand ink and restrained flat cel shading, not its neutral pose. Do NOT make the head larger or the legs longer. Preserve hand-object contact and source-specific mouth differences. Generate a clean RGBA transparent sprite sheet, no magenta, gray or floor shadows, no text, no numbered labels. We will scale whole NEW components to their original source boxes, never warp them. {label.upper()} context: '''
+ extra+= {'pute':'The cream object with pale green swirls is a soft BEDROOM PILLOW, with source-shaped pointed corners and folds, not a map or paper. No continents or text. Some poses have hands empty because the pillow is gone; do not restore it.','tann':'The small curved ivory object is a DINOSAUR TOOTH held in the hand, tip down then tilted horizontally; it is not a knife, cone or food. Keep its original bend and extent. Empty-hand poses stay empty.','muir':'This is the JOHN MUIR-SHAPED GOURD used for the third totem, not the different Conroy Bumpus eggplant. Preserve its purple slender human-profile vegetable shape, green stem, source-shown pale profile details, and its extensive occlusion by the hand. Do not reveal a full face behind the hand, add a face or invent dark hair. Empty-hand variants remain empty.', 'vortex':'The orange/yellow shallow disk with blue underside is a HAND-HELD VORTEX, not food. Retain its tiny colored components and the disappearance fragments where visible, without adding a glow or particles.'}[label]
+ (r/f'a-{name}-prompt-original.txt').write_text(original);(r/f'a-{name}-kildepresisering.txt').write_text(extra);(r/f'a-{name}-prompt01.txt').write_text(original+'\n\n'+extra)
+print([(n,[e['rute'] for e in ee]) for n,ee in groups])

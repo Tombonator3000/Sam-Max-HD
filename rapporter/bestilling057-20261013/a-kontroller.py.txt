@@ -1,0 +1,8 @@
+from pathlib import Path
+import shutil,subprocess,sys,json
+r=Path(__file__).resolve().parent;root=r.parents[1];results=[]
+for n in range(1,7):
+ name=f'fig272_{n:02d}';d=r/'a-kontrollkloner'/name;d.mkdir(parents=True,exist_ok=True)
+ for f in ['jobb.json','prompt.txt','original_1x.png','referanse.png']:shutil.copyfile(root/'jobber'/name/f,d/f)
+ shutil.copyfile(r/f'a-{name}-partiell.png',d/'resultat.png');p=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);text=p.stdout+p.stderr;(r/f'a-{name}-kontroll.txt').write_text(text);print(text);results.append({'jobb':name,'kontroll':text})
+(r/'a-kontrolloversikt.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\n')

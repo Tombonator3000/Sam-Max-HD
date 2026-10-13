@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 01:32 (norsk tid)
+Oppdatert 2026-10-14 01:39 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -12,8 +12,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 610 bilder levert (268 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
-| Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 46 felt levert (6 ark), inkludert 2 SJEKK | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 649 ruter levert (48 ark), pilotstil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
+| Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 46 felt levert (6 ark), inkludert2 SJEKK | 163 | Etter lagene (9 jobber) |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 728 ruter levert (54 ark), pilotstil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
 ## Bestilling 1: stilpiloten (nå, samme som ORDRE.md)
 
@@ -859,12 +859,12 @@ Figurark for Sam og Max, Sam, Max.
 
 Figurark for Sam.
 
-- [ ] `fig272_01` (figurark 1 for Sam (kostyme 272), 17 ruter: start mot høyre (17 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig272_02` (figurark 2 for Sam (kostyme 272), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig272_03` (figurark 3 for Sam (kostyme 272), 13 ruter: animasjon 7 mot høyre (13 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig272_04` (figurark 4 for Sam (kostyme 272), 20 ruter: animasjon 8 mot høyre (20 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig272_05` (figurark 5 for Sam (kostyme 272), 19 ruter: animasjon 9 mot høyre (19 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig272_06` (figurark 6 for Sam (kostyme 272), 3 ruter: animasjon 9 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig272_01` (figurark 1 for Sam (kostyme 272), 17 ruter: start mot høyre (17 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig272_02` (figurark 2 for Sam (kostyme 272), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig272_03` (figurark 3 for Sam (kostyme 272), 13 ruter: animasjon 7 mot høyre (13 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig272_04` (figurark 4 for Sam (kostyme 272), 20 ruter: animasjon 8 mot høyre (20 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig272_05` (figurark 5 for Sam (kostyme 272), 19 ruter: animasjon 9 mot høyre (19 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig272_06` (figurark 6 for Sam (kostyme 272), 3 ruter: animasjon 9 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig091_01` (figurark 1 for Sam (kostyme 91), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig091_02` (figurark 2 for Sam (kostyme 91), 14 ruter: animasjon 7 mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig091_03` (figurark 3 for Sam (kostyme 91), 13 ruter: animasjon 8 mot høyre (8 ruter); animasjon 9 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
@@ -3543,3 +3543,5 @@ Bestilling 55: ti figurark med 82 ruter levert, alle OK. Max006, Sam236 og sju M
 Bestilling 56: sju figurark med 90 ruter levert, alle OK. Sam114 med bøttelag, Sam326 med egne hodeankre og siste Mini Vortex-ark er kontrollert. Max066s rasp og nøkkel er kildeavklart for produksjon i bestilling59. Se `rapporter/bestilling056-20261013/RAPPORT.md`. Arbeidet fortsetter.
 
 Bestilling 58: fem nye Max-ark med 90 ruter og fire tidligere leverte ark med lokale munnrettinger, alle OK. 325 beholder egne hodeankre; 205 har kildebevist vertikal vending. Se `rapporter/bestilling058-20261013/RAPPORT.md`. Arbeidet fortsetter.
+
+Bestilling57: seks Sam-ark med79 ruter levert, alle OK. Pute, dinosaurtann, John Muir-squash og håndholdt vortex er kildeavklart og kontrollert; små separate punkter er beholdt. Se `rapporter/bestilling057-20261013/RAPPORT.md`. Arbeidet fortsetter.

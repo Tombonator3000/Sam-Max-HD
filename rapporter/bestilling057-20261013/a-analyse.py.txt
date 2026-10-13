@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,collections
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();M=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text());locks={};context={};records=[];bases=[]
+for d in sorted((root/'jobber').glob('fig002_*')):
+ j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB')
+ for f in ['jobb.json','original_1x.png']:context[str((d/f).relative_to(root))]=sha(d/f)
+ for c in j['ruter']:
+  x,y,ex,ey=c['synlig'];bases.append((d.name,c,np.array(im.crop((x,y,ex,ey)))))
+for name in [f'fig272_{n:02d}' for n in range(1,7)]:
+ d=root/'jobber'/name;j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB');om={v['cel']:v for v in M['272']['cels']}
+ for f in ['jobb.json','prompt.txt','original_1x.png','referanse.png']:locks[str((d/f).relative_to(root))]=sha(d/f)
+ for c in j['ruter']:
+  x,y,ex,ey=c['synlig'];a=np.array(im.crop((x,y,ex,ey)));matches=[]
+  for bn,bc,ba in bases:
+   if a.shape==ba.shape and np.array_equal(a,ba):
+    old=next(v for v in M['2']['cels'] if v['cel']==bc['rute']);matches.append({'jobb':bn,'cel':bc['rute'],'RGB_identisk':True,'meta_forskjeller':{k:[old.get(k),v] for k,v in om[c['rute']].items() if old.get(k)!=v},'rekt':bc['rekt']})
+  records.append({'jobb':name,**c,'originalmetadata':om[c['rute']],'bakgrunn':j['bakgrunn'],'synlige_piksler':int(np.any(a!=j['bakgrunn'],2).sum()),'palett_RGB':np.unique(a[np.any(a!=j['bakgrunn'],2)],axis=0).tolist(),'002_treff':matches})
+context['konsept/2026-10-12/kostymer-originalmetadata.json']=sha(root/'konsept/2026-10-12/kostymer-originalmetadata.json');context['hovedark/sam.png']=sha(root/'hovedark/sam.png')
+(r/'a-kildehash.json').write_text(json.dumps({'antall':len(locks),'filer':locks},indent=2)+'\n');(r/'a-konteksthash.json').write_text(json.dumps(context,indent=2)+'\n');(r/'a-kildebevis.json').write_text(json.dumps({'ruter':records,'kostymemetadata':{k:{f:M[k][f] for f in ['room','format','farger','speil','kostymepalett','colours','animasjoner','retninger']} for k in ['2','272']}},ensure_ascii=False,indent=2)+'\n')
+can=Image.new('RGB',(1536,1536),(128,128,128))
+for i,name in enumerate([f'fig272_{n:02d}' for n in range(1,7)]):can.paste(Image.open(root/'jobber'/name/'referanse.png').resize((768,512)),(i%2*768,i//2*512))
+can.save(r/'a-original-kontaktark.png')
+for page in range((len(records)+7)//8):
+ can=Image.new('RGB',(1600,800),(205,205,205));dr=ImageDraw.Draw(can)
+ for i,e in enumerate(records[page*8:page*8+8]):
+  xx=i%4*400;yy=i//4*400;m=e['originalmetadata'];dr.text((xx+3,yy+3),f"{e['jobb']} cel{e['rute']} a{e['animasjon']} r{e['retning']} l{e['lag']} nr{e['nr']}",fill='black');dr.text((xx+3,yy+20),f"rel{m['rel_x']},{m['rel_y']} 002: {[v['cel'] for v in e['002_treff']]}",fill='black');x,y,ex,ey=e['synlig'];w,h=ex-x,ey-y;im=Image.open(root/'jobber'/e['jobb']/'original_1x.png').crop((x,y,ex,ey)).resize((w*5,h*5),Image.Resampling.NEAREST);im.thumbnail((390,345));can.paste(im,(xx+3,yy+45))
+ can.save(r/f'a-feltark-{page+1}.png')
