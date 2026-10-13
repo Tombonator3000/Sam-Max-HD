@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 19:03 (norsk tid)
+Oppdatert 2026-10-13 19:16 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 41 hele rom levert (65 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 25 levert, inkludert fem SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 47 hele rom levert (73 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 26 levert, inkludert fem SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -169,16 +169,16 @@ Rom 38, 39, 40, 41, 42, 43, 44.
 
 Rom 44, 45, 47, 48, 49, 50, 51, 52.
 
-- [ ] `obj409_01` (rom 44 Bumpusville, troférommet (Edutainment), objekt 409 tilstand 01)
-- [ ] `rom045` (rom 45 Bumpusville, soverommet)
-- [ ] `rom047` (rom 47 Bumpusville Sings (menasjeriet))
-- [ ] `rom048` (rom 48 Bumpusville, VR-rommet)
-- [ ] `rom049` (rom 49 Den virtuelle verdenen)
-- [ ] `rom050` (rom 50 Hjernen i VR-maskinen)
-- [ ] `rom051_del1av2` (rom 51 Savage Jungle Inn, ute, del 1/2)
-- [ ] `rom051_del2av2` (rom 51 Savage Jungle Inn, ute, del 2/2)
-- [ ] `rom052_del1av2` (rom 52 Savage Jungle Inn, lobbyen, del 1/2)
-- [ ] `rom052_del2av2` (rom 52 Savage Jungle Inn, lobbyen, del 2/2)
+- [x] `obj409_01` (rom 44 Bumpusville, troférommet (Edutainment), objekt 409 tilstand 01)
+- [x] `rom045` (rom 45 Bumpusville, soverommet)
+- [x] `rom047` (rom 47 Bumpusville Sings (menasjeriet))
+- [x] `rom048` (rom 48 Bumpusville, VR-rommet)
+- [ ] `rom049` (teknisk OK, visuelt avvist: ekstra fasetter/gradienter, ikke klar for mottak) (rom 49 Den virtuelle verdenen)
+- [x] `rom050` (rom 50 Hjernen i VR-maskinen)
+- [x] `rom051_del1av2` (rom 51 Savage Jungle Inn, ute, del 1/2)
+- [x] `rom051_del2av2` (rom 51 Savage Jungle Inn, ute, del 2/2)
+- [x] `rom052_del1av2` (rom 52 Savage Jungle Inn, lobbyen, del 1/2)
+- [x] `rom052_del2av2` (rom 52 Savage Jungle Inn, lobbyen, del 2/2)
 
 ## Bestilling 12
 
@@ -3441,3 +3441,5 @@ Bestilling8:9OK levert og obj307_01 uavklart FEIL. Paneltoppkandidaten forblir u
 Bestilling 9: 7 OK og 3 SJEKK (obj335_01, obj337_01 og obj339_01), ti bilder levert. Se `rapporter/bestilling009-20261013/RAPPORT.md`. Mystery Vortex-formenes identitet og små konturavvik er oppgitt; rom036/037 har identisk overlapp. Bestilling 10 fortsetter. De to eldre FEIL-kandidatene forblir ukrysset.
 
 Bestilling 10: ti rombilder med egenkontroll OK, fire identiske overlapp og kildekontrollert opp-ned-butikk og troférom. Se `rapporter/bestilling010-20261013/RAPPORT.md`. Bestilling 11 er startet.
+
+Bestilling 11: ni bilder klare, alle teknisk OK. Rom049 er teknisk OK men visuelt avvist etter fem forsøk og forblir ukrysset. Se `rapporter/bestilling011-20261013/RAPPORT.md`. Bestilling 12 og 13 fortsetter uavhengig.

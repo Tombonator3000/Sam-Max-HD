@@ -1,0 +1,13 @@
+# Samlet rapport for bestilling 11
+
+Ni bilder er klare for mottak. Alle ti lagrede kandidater har teknisk egenkontroll **OK**, men **rom049 er visuelt avvist og ikke leveranseklar**. Fem originalstyrte bildeforsøk tilfører ekstra polygonflater og gradienter. Ingen kontrollutfall brukes som erstatning for visuell samsvarskontroll. Rom049 forblir ukrysset. Et uttrykkelig metodevalg for eventuell presis vektorrekonstruksjon er sendt til Tom; øvrig produksjon fortsetter.
+
+Root har sett alle originaler og HD samlet. [Sluttkontroll](sluttkontroll.json) dokumenterer 40 uendrede beskyttede kilder, 1536 x 1024 lerret, RGB128-padding, SHA og faktiske leveransetilstander. [Fremdrift](fremdrift.json) markerer rom049 med klar_for_mottak=false. Kandidaten og alle fem råforsøk/prompter er bevart som avviste eksempler.
+
+Obj409 er det separate EDUTAINMENT-skiltet, med hele ordet og uten blank dekkplate. Første forsøk ble forkastet etter FEIL; andre er valgt. Rom045 har tom monstertruck-seng med MA TRUK, grå trapp, putefelt og avklipte hatter. Ingen sovende person er lagt til.
+
+Rom047 beholder BUMPUSVILLE SINGS, tom grønn scene, rosa gardiner og dyrehodenes konkrete originaltilstand. Rom048 beholder tom grønn VR-kabin og hengende utstyr uten bruker/avatar. Rom050s navn i metadata er misvisende: [LucasArts' offisielle hintbok](https://www.mocagh.org/lucasfilm/sammax-hintbook.pdf), søkeutdrag fra trykt side 23, identifiserer rengjøringsrobotens hjerne og husets plantegning. Skjermens grønne områder, fem fargekontakter og kablenes konkrete tilstand er bevart, uten å løse gåten i bildet. Den faktiske koblingen for ressurs-ID-en er ikke runtime-testet. Kildeplan, jobbnotat og QA har separat korrigering; beskyttet navn/prompt er urørt.
+
+Savage Jungle Inn ute har én master 1856 x 800, med delskift 320 og byte-identisk overlapp 1216 x 800. SAVAGE JUNGLE INN og WELCOME PODIATRALLY GIFTED, skiltøglen, dekorvulkan, bro og tre biler er bevart. Lobbyen har én master 1920 x 800 og identisk overlapp 1152 x 800. THE REPTILE QUEEN, tukan, hvilende øgle, steinhode og tomme hyller er kontrollert. Små plakatkrediteringer er kildeformer uten nye navn.
+
+Råbilder, ordrette prompter med kildepresiseringer, klippeoppskrifter og kilde-QA er bevart. Alle ti PNG fra bestilling 10 er SHA-verifisert fra GitHub ved eksakt commit. Eksakt bildemodellnavn er ikke eksponert. Mikrokonturer og materialskygger er HD-tolkninger. Motorimport, originalmasker, dynamisk palett, timing og faktisk spillvisning er ikke prøvd, og ingen ny individuell brukergodkjenning påstås. To eldre FEIL-kandidater og fem SJEKK beholder status.

@@ -111,3 +111,10 @@
 - Rom038 overlapper tidligere del med 1152 x 800 identiske bytes. Frog Rock 1152, Bumpusville ute 1024 og gangen 576 piksler bred identisk overlapp. Bevis/oppskrift i rapporter/bestilling010-20261013/.
 - Rom040 forblir opp ned; BEEF rettet etter nærlesing uten endring av resten. Rom044 uten separat EDU-skilt eller blank dekkplate. Conroy, statuer, utstillinger og kildens tomme felt bevart. Små glypher og materialdetaljer er ikke erklært identiske.
 - Alle ti bestilling 9-PNG SHA-verifisert fra GitHub. Ingen motorimport, faktisk spillvisning eller ny individuell brukergodkjenning. Bestilling 11 pågår; tidligere avvik beholder status.
+
+## 2026-10-13 19:16 (Codex, Astra)
+
+- Bestilling 11 har ni leveranseklare bilder. Alle ti kandidater teknisk OK, men rom049 visuelt avvist: fem bildeforsøk tilfører polygoner/gradienter. Beholdt ukrysset og klar_for_mottak=false. Metodevalg for eventuell presis vektorrekonstruksjon spurt; øvrig produksjon fortsetter.
+- 40 beskyttede kilder uendret, SHA/lerret/padding kontrollert. Root så alle original/HD samlet. Rom051/052 har 1216/1152 x 800 byte-identiske overlapp. EDUTAINMENT og MA TRUK kildekontrollert.
+- Rom050 korrigert semantisk til rengjøringsrobotens hjerne og husplan, støttet av offisiell hintbok søkeutdrag side 23. Beskyttede filer urørt. Ingen aktivering, masker, import, spilltest eller ny individuell godkjenning.
+- Forrige bestillings ti PNG SHA-verifisert fra GitHub. Proveniens/QA i rapporter/bestilling011-20261013/. Bestilling 12/13 pågår.

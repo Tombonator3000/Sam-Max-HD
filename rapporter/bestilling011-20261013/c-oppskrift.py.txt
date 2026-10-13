@@ -1,0 +1,8 @@
+from PIL import Image
+from pathlib import Path
+# Kjør fra repoets rot. 049 er en avvist kandidat, ikke ferdig levering.
+r=Path("rapporter/bestilling011-20261013")
+for j,n in [("rom047",1),("rom048",1),("rom049",2),("rom050",1)]:
+    art=Image.open(r/f"{j}-raa-{n}.png").convert("RGB").crop((128,112,1408,912))
+    out=Image.new("RGB",(1536,1024),(128,128,128));out.paste(art,(128,112))
+    out.save(Path("jobber")/j/"resultat.png")

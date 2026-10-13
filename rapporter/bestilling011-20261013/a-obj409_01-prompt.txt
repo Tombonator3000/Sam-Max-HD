@@ -1,0 +1,26 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+This picture is a large image that the game draws on top of the room, such as a close-up, a map or a panel. Treat it as a background picture and follow all the rules above.
+
+Note for this room: Copy the sign 'EDU...MENT' exactly as it shows: the middle of the sign is covered by a plain panel where the game draws an object; keep that panel plain. Keep the stuffed heads and the trophies as they are.
+
+If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image.
+
+
+SOURCE CORRECTION: The generic EDU...MENT and blank-panel note is FALSE for this exact object state. The first image visibly spells EDUTAINMENT in FULL. Preserve every letter at its exact source position and colors: E red, D yellow, U yellow, T red, A red, I red, N red, M yellow, E yellow, N red, T red. No dots, no covering panel, no missing middle. Preserve two long brown hanging rods, arched top with five red/yellow fan segments, brown double frame, the same alternating tiny red/yellow rim lights at identical spacing/count as source. Black interior. Preserve source backdrop fragments around and below the sign exactly: black ceiling, three cropped lamps left of arch, cabinet/portrait fragments below, orange/brown wall top-right. Do not replace this background with a flat color or invent new items. This is a composite object reference, not a newly designed room. Exact picture rect736x384 at[400,320], canvas1536x1024RGB128. Match source geometry, count, hard tilted outlines precisely; smooth painted ink not pixel upscale. Second image only approved paint/stroke reference.

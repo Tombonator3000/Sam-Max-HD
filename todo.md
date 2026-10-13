@@ -33,4 +33,6 @@
 - [ ] Avklar obj307_01 med egenkontroll FEIL. Ikke klar for mottak. Se rapporter/kontroll-fft-20261013/RAPPORT.md og rapporter/bestilling008-20261013/RAPPORT.md.
 - [x] Levert bestilling 9 med sju OK og tre SJEKK, kildeanalyse av seks vortex-spinnere og identiske romoverlapp.
 - [x] Fullført bestilling 10 med ti OK, korrekt opp-ned-butikk og fire identiske romoverlapp.
-- [ ] Fortsett bestilling 11 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert ni klare bilder i bestilling 11, med kildetro skilt og identiske panoramaer.
+- [ ] Avklar rom049 visuelt. Fem bildeforsøk gir ekstra polygoner/gradienter tross teknisk OK. Presis vektorrekonstruksjon er foreslått som uttrykkelig metodevalg. Ikke klar for mottak.
+- [ ] Fortsett bestilling 12 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
