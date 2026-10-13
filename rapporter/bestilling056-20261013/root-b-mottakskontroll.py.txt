@@ -1,0 +1,35 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1]
+read=lambda n:json.loads((r/n).read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks=read('b-kildehash.json')['filer'];context=read('b-konteksthash.json')
+for p,h in {**locks,**context}.items():assert sha(root/p)==h,p
+for p,h in read('b-proveniens.json')['raw_og_prompt'].items():assert sha(root/p)==h,p
+map=read('b-rutekart-slutt.json');records=[];source={};rgba={}
+for e in read('b-leveranser.json')['leveranser']:
+ j=e['jobb'];p=root/e['resultat'];assert sha(p)==e['sha256'];im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024)
+ m=json.loads((root/'jobber'/j/'jobb.json').read_text());alpha=np.array(im)[:,:,3];used=np.zeros(alpha.shape,bool);cells=[]
+ for c in m['ruter']:
+  cel=c['rute'];cp=next(v for v in map if v['jobb']==j and v['cel']==cel);x,y,X,Y=c['synlig'];t=[64+4*x,32+4*y,64+4*X,32+4*Y];assert cp['target']==t and cp['source_synlig']==c['synlig']
+  tx,ty,tX,tY=t;used[ty:tY,tx:tX]=True;q=im.crop(t);a=np.array(q)[:,:,3];ys,xs=np.nonzero(a>=128);assert [tx+int(xs.min()),ty+int(ys.min()),tx+int(xs.max()+1),ty+int(ys.max()+1)]==cp['alpha128_bbox']==t
+  assert hashlib.sha256(q.tobytes()).hexdigest()==cp['cel_rgba_sha256'];rgba[cel]=q.tobytes();source[cel]=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop(c['synlig']).tobytes();cells.append({'cel':cel,'maal':t,'kjerne_og_SHA':'OK'})
+ assert not np.any(alpha[~used]);px,py,pw,ph=m['bilde_i_lerret'];pad=np.ones(alpha.shape,bool);pad[py:py+ph,px:px+pw]=False;assert not np.any(alpha[pad])
+ run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);assert 'Utfall: OK' in run.stdout
+ (r/f'root-{j}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n');records.append({'jobb':j,'sha256':sha(p),'ruter':cells,'utenfor_felt_og_padding_transparent':True})
+assert len(source)==52 and source[15]==source[25] and rgba[15]==rgba[25]
+changes=read('b-rettinger-bevis.json')
+for j,cels in [('fig114_02',[14]),('fig114_03',[144,145,146])]:
+ a=np.array(Image.open(r/f'b-{j}-for-retting.png'));b=np.array(Image.open(root/'jobber'/j/'resultat.png'));outside=np.ones(a.shape[:2],bool)
+ for cp in changes:
+  if cp['cel'] in cels:
+   x,y,X,Y=cp['target'];outside[y:Y,x:X]=False
+ assert not np.any(np.any(a!=b,axis=2)&outside)
+patch=read('b-140-bevis.json');a=np.array(Image.open(r/'b-fig114_04-for140.png'));b=np.array(Image.open(root/'jobber/fig114_04/resultat.png'));outside=np.ones(a.shape[:2],bool);x,y,X,Y=patch['komposisjonsrektangel'];outside[y:Y,x:X]=False;assert not np.any(np.any(a!=b,axis=2)&outside);assert int(np.any(a!=b,axis=2).sum())==patch['endrede_piksler']==133
+patch=read('b-150151-rettingbevis.json');a=np.array(Image.open(r/'b-fig114_05-for150151.png'));b=np.array(Image.open(root/'jobber/fig114_05/resultat.png'));outside=np.ones(a.shape[:2],bool)
+for e in patch['ruter']:
+ x,y,X,Y=e['global_rett'];outside[y:Y,x:X]=False
+assert not np.any(np.any(a!=b,axis=2)&outside);assert int(np.any(a!=b,axis=2).sum())==patch['endrede_piksler']==4213;assert sha(root/'jobber/fig114_05/resultat.png')==patch['sha256']
+(r/'root-b-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':20,'kontekst_uendret':len(context),'source15_25_identisk_og_ny_RGBA_identisk':True,'handtak_og_lokal140retting_bare_avgrensede_felt':True,'leveranser':records,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('B56: 52 ruter, kilde/proveniens/felt/alpha/ekte kontroll og lokale rettinger verifisert')

@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil
+r=Path('rapporter/bestilling056-20261013');m=json.loads(Path('jobber/fig114_05/jobb.json').read_text());src=Image.open('jobber/fig114_05/original_1x.png');hd=Image.open('jobber/fig114_05/resultat.png');shutil.copyfile('jobber/fig114_05/resultat.png',r/'b-fig114_05-for150151.png')
+for q in [0,1]:
+ out=Image.new('RGB' if q==0 else 'RGBA',(1200,600),(160,160,160) if q==0 else (0,0,0,0))
+ for k,o in enumerate(m['ruter'][:2]):
+  x,y,e,f=o['synlig'];im=(src.crop((x,y,e,f)) if q==0 else hd.crop((64+x*4,32+y*4,64+e*4,32+f*4))).resize((480,400),Image.Resampling.NEAREST if q==0 else Image.Resampling.LANCZOS);out.paste(im,(k*600+50,80))
+ out.save(r/('b-150151-edit-kilde.png' if q==0 else 'b-150151-edit-hd.png'))
+p='''Edit these TWO independent bucket sprites following source image1 EXACT negative-space geometry; image2 only drawing style. Blue bucket, orange small rim fragments, curved silver/blue right handle. Crucial: inside the large transparent opening remove ALL newly invented white golf-ball humps along central and lower edge. First/left source150 has a FLAT thin gray horizontal line at bottom of opening, NOT balls. Second/right source151 has NO WHITE/GRAY central lower fill at all: transparent space meets BLUE bucket edge with its two tiny steps. Neither has a continuous orange lower rim across the open center. Preserve ONLY tiny WHITE REMNANT at far LEFT of each source opening, at the exact small source extent; do not enlarge into hemisphere. Do not fill hole or add back wall, balls or hand. Preserve blue lower body, curved right handle and remaining palette/layout. Two separate RGBA cutouts on transparent background, one row, same positions and proportions. Black is NOT a background to paint: use real alpha. No additional objects/text.''' 
+(r/'b-150151-prompt02.txt').write_text(p)

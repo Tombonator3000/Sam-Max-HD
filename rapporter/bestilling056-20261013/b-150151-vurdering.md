@@ -1,0 +1,5 @@
+# Avgrenset kildebevis og retting
+
+Original150 har flat grå linje og liten lys venstrerest. Original151 har kun liten lys venstrerest; sentralt nedre felt er transparent over blå kant. De flere hvite halvkuleformene i førbildet var oppfunnet utfylling. Native original-RGB er dokumentert i b-150151-pikselbevis.json og kilde/HD-kontaktarket.
+
+150/151 er lokalt rettet etter original RGB/palettkontroll. Sentral hvit kuleutfylling var ikke kildebevist og er fjernet;150 beholder flat grå linje,151 transparent åpning helt ned til blå kant. Lille hvite venstrerest er redusert til kildens omfang. Ett innebygd imagegen-kall, egne nye komponentutklipp og alfa. Nederste seks opake RGB-rader i innklippet tonesammenpasses med tidligere NY kunst; ingen kildepiksler eller silhuettmaske. Endrede piksler:4213, utenfor to dokumenterte rektangler:0. Cel152 og fire øvrige ark er byte-identiske. Kontroll03:3/3OK. Ny SHA:969a97d72d86f36e82acd06485b1a96a6dab4ab798de2c3ed16d173d946e345b. b-celqa-05-1 og b-relqa-4 er oppdatert.

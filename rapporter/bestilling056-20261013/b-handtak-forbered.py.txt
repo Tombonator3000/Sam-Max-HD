@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil
+r=Path('rapporter/bestilling056-20261013');rs=json.loads((r/'b-ruteregister.json').read_text())['ruter'];ids=[131,132,133,140,144,145,146];frames=[]
+for q in [0,1]:
+ out=Image.new('RGB',(1536,1024),(180,180,180)) if q==0 else Image.new('RGBA',(1536,1024))
+ for k,id in enumerate(ids):
+  o=next(z for z in rs if z['rute']==id);im=Image.open(Path('jobber',o['jobb'],'original_1x.png' if q==0 else 'resultat.png'));im=im.crop(tuple(o['synlig'] if q==0 else o['hd_synlig']));im=im.resize((280,260),Image.Resampling.NEAREST if q==0 else Image.Resampling.LANCZOS);out.paste(im,(k%4*384+48,k//4*512+90))
+ out.save(r/('b-handtak-kilde.png' if q==0 else 'b-handtak-hd-for.png'))
+p='''Correct ONLY the seven separate bucket sprites on image2, following image1 exact shapes and handle phases. Image1 source has magenta transparency, do not paint magenta. Output seven independent RGBA sprites on transparent 1536x1024, four top row, three bottom row in SAME order. Top row source cels131132133140 are gray metal buckets containing green fish. Bottom row144145146 are BLUE buckets with ORANGE rim and gray-white golf balls. Preserve each individual source silhouette, bucket material, fish and ball clusters. Crucial correction: each source shows TWO separated visible ends of a thin silver/blue wire handle, the long end on left and a SHORT UPRIGHT REAR END to right. The right end is a straight small metal segment, NOT green fish fin or floating object. Keep its exact source height/location. The long left handle of all7 slopes slightly right near its upper tip as in source, NOT straight vertical or long diagonal across center. The gap between wire ends stays open/transparent where source shows open. Do not join wire ends or invent a complete arch. For fourth top cell140, remove floating green blob and replace with source short white/gray right handle end attached at rim; left wire end is mostly upright. Keep drawing style image2, flat controlled shading and thin dark outlines. No text, hands, Sam, additional fish, new labels, additional cels or decoration. This edit fixes omitted thin wire segments and preserves everything else as much as possible.'''
+(r/'b-handtak-prompt02.txt').write_text(p)
+for n in range(1,6):shutil.copyfile(Path('jobber',f'fig114_{n:02d}','resultat.png'),r/f'b-fig114_{n:02d}-for-retting.png')

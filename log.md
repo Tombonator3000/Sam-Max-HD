@@ -372,3 +372,8 @@
 
 - Bestilling 55: ti figurark med 82 ruter levert, alle OK. Max006, Sam236 og sju Mini Vortex-ark er kilde- og plasseringskontrollert. Se `rapporter/bestilling055-20261013/RAPPORT.md`. Arbeidet fortsetter.
 - Figurark har ekte RGBA; 38 ruter gjenbruker kildebeviste nye komponenter, 44 er nye motiver. Max-øyne, Vortex-lysvarianter, nedre småformer og verdensankre er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T01:25:45+02:00 (Codex, Astra)
+
+- Bestilling 56: sju figurark med 90 ruter levert, alle OK. Sam114 med bøttelag, Sam326 med egne hodeankre og siste Mini Vortex-ark er kontrollert. Max066s rasp og nøkkel er kildeavklart for produksjon i bestilling59. Se `rapporter/bestilling056-20261013/RAPPORT.md`. Arbeidet fortsetter.
+- Figurark har ekte RGBA;35 ruter gjenbruker kildebeviste nye komponenter. Bøttehåndtak, åpne håndfelt og Sam326s egne hodeankre er kontrollert. Vortex08 er kontrollert sammen med hele207familien. Ingen motorimport, spilltest eller ny individuell bildeaksept.

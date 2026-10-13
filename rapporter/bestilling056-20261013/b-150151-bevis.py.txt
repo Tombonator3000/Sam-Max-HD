@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json
+r=Path('rapporter/bestilling056-20261013');m=json.loads(Path('jobber/fig114_05/jobb.json').read_text());src=Image.open('jobber/fig114_05/original_1x.png').convert('RGB');hd=Image.open('jobber/fig114_05/resultat.png').convert('RGBA');out=Image.new('RGB',(1400,900),(160,160,160));d=ImageDraw.Draw(out);records=[]
+for k,o in enumerate(m['ruter'][:2]):
+ sx,sy,ex,ey=o['synlig'];a=np.array(src.crop((sx,sy,ex,ey)));print('cel',o['rute'],'size',a.shape,'colors',np.unique(a.reshape(-1,3),axis=0).tolist());colors={tuple(v):i for i,v in enumerate(np.unique(a.reshape(-1,3),axis=0))};chars='0123456789ABCDEFGHIJK';print('\n'.join(''.join(chars[colors[tuple(v)]] for v in row) for row in a));print({chars[i]:v for v,i in colors.items()})
+ b=np.zeros((a.shape[0],a.shape[1],4),dtype='uint8');b[:,:,:3]=a;b[:,:,3]=np.where(np.all(a==m['bakgrunn'],axis=2),0,255);source=Image.fromarray(b);new=hd.crop((64+sx*4,32+sy*4,64+ex*4,32+ey*4))
+ for q,im in enumerate([source,new]):
+  im=im.resize((500,400),Image.Resampling.NEAREST if q==0 else Image.Resampling.LANCZOS);out.paste(im,(q*700,k*450+35),im);d.text((q*700+5,k*450+5),f"cel{o['rute']} "+['original','HD'][q],fill='black')
+ # list every light neutral source pixel, including wire and known left rim fragments
+ mask=(a[:,:,0]>=150)&(np.max(a,axis=2)-np.min(a,axis=2)<=20);yx=np.argwhere(mask);records.append({'cel':o['rute'],'source_synlig':o['synlig'],'light_neutral_coordinates_local_xy':[[int(x),int(y)] for y,x in yx],'palette':{str(v):i for v,i in colors.items()}})
+out.save(r/'b-150151-kilde-hd.png');(r/'b-150151-pikselbevis.json').write_text(json.dumps(records,indent=2))

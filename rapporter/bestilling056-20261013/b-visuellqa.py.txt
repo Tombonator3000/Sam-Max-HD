@@ -1,0 +1,22 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import numpy as np,json
+r=Path('rapporter/bestilling056-20261013');reg=json.loads((r/'b-ruteregister.json').read_text());lookup={};records=reg['ruter']
+for n in range(1,6):
+ j=f'fig114_{n:02d}';m=json.loads(Path('jobber',j,'jobb.json').read_text());src=Image.open(Path('jobber',j,'original_1x.png')).convert('RGBA');hd=Image.open(Path('jobber',j,'resultat.png'));rs=[a for a in records if a['jobb']==j]
+ for start in range(0,len(rs),6):
+  out=Image.new('RGB',(1500,900),(165,165,165));d=ImageDraw.Draw(out)
+  for k,o in enumerate(rs[start:start+6]):
+   sx,sy,ex,ey=o['synlig'];a=np.array(src.crop((sx,sy,ex,ey)));a[:,:,3]=np.where(np.all(a[:,:,:3]==m['bakgrunn'],axis=2),0,255);orig=Image.fromarray(a).resize(((ex-sx)*4,(ey-sy)*4),Image.Resampling.NEAREST);new=hd.crop(tuple(o['hd_synlig']));lookup[o['rute']]=(orig,new,o);xx=k%3*500;yy=k//3*450;d.text((xx+5,yy+5),f"{j} cel{o['rute']}: kilde / HD",fill='black');scale=min(235/new.width,405/new.height)
+   for q,im in enumerate([orig,new]):
+    im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.NEAREST if q==0 else Image.Resampling.LANCZOS);out.paste(im,(xx+q*250+3,yy+35),im)
+  out.save(r/f'b-celqa-{n:02d}-{start//6+1}.png')
+for start in range(0,len(reg['diagnostiske_par']),4):
+ out=Image.new('RGB',(1600,900),(165,165,165));d=ImageDraw.Draw(out)
+ for k,pair in enumerate(reg['diagnostiske_par'][start:start+4]):
+  for q in range(2):
+   canvas=Image.new('RGBA',(480,400))
+   for id in pair:
+    im,nn,o=lookup[id];im=[im,nn][q];c=o['metadata'];sx,sy,ex,ey=o['synlig'];x,y,w,h=o['rekt'];canvas.alpha_composite(im,((30+c['rel_x']+sx-x)*4,(82+c['rel_y']+sy-y)*4))
+   canvas=canvas.resize((400,333),Image.Resampling.NEAREST if q==0 else Image.Resampling.LANCZOS);xx=k%2*800+q*400;yy=k//2*450;out.paste(canvas,(xx,yy+45),canvas);d.text((xx+5,yy+5),f'{pair} '+['kilde','HD'][q]+' diagnostisk rel, ikke runtime',fill='black')
+ out.save(r/f'b-relqa-{start//4+1}.png')

@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 01:19 (norsk tid)
+Oppdatert 2026-10-14 01:25 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -13,7 +13,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 610 bilder levert (268 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 46 felt levert (6 ark), inkludert 2 SJEKK | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 469 ruter levert (36 ark), pilotstil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 559 ruter levert (43 ark), pilotstil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
 ## Bestilling 1: stilpiloten (nå, samme som ORDRE.md)
 
@@ -844,16 +844,16 @@ Figurark for Sam, Max, Sam og Max.
 
 Figurark for Sam og Max, Sam, Max.
 
-- [ ] `fig207_08` (figurark 8 for Sam og Max (kostyme 207), 4 ruter: animasjon 10 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig114_01` (figurark 1 for Sam (kostyme 114), 12 ruter: stående mot høyre (1 rute); animasjon 7 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig114_02` (figurark 2 for Sam (kostyme 114), 17 ruter: animasjon 7 mot høyre (7 ruter); animasjon 7 (lag 1, tegnes over kroppen) mot høyre (9 ruter); animasjon 8 mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig114_03` (figurark 3 for Sam (kostyme 114), 8 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig114_04` (figurark 4 for Sam (kostyme 114), 12 ruter: animasjon 9 mot høyre (9 ruter); animasjon 9 (lag 1, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig114_05` (figurark 5 for Sam (kostyme 114), 3 ruter: animasjon 10 (lag 1, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig207_08` (figurark 8 for Sam og Max (kostyme 207), 4 ruter: animasjon 10 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig114_01` (figurark 1 for Sam (kostyme 114), 12 ruter: stående mot høyre (1 rute); animasjon 7 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig114_02` (figurark 2 for Sam (kostyme 114), 17 ruter: animasjon 7 mot høyre (7 ruter); animasjon 7 (lag 1, tegnes over kroppen) mot høyre (9 ruter); animasjon 8 mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig114_03` (figurark 3 for Sam (kostyme 114), 8 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig114_04` (figurark 4 for Sam (kostyme 114), 12 ruter: animasjon 9 mot høyre (9 ruter); animasjon 9 (lag 1, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig114_05` (figurark 5 for Sam (kostyme 114), 3 ruter: animasjon 10 (lag 1, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig066_01` (figurark 1 for Max (kostyme 66), 14 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot oss (1 rute); gange mot høyre (8 ruter); snakking mot høyre (1 rute), bilde to `hovedark/max.png`)
 - [ ] `fig066_02` (figurark 2 for Max (kostyme 66), 21 ruter: snakking (lag 2, tegnes over kroppen) mot høyre (13 ruter); gange mot oss (8 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig066_03` (figurark 3 for Max (kostyme 66), 11 ruter: gange bort (8 ruter); animasjon 6 mot høyre (3 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig326_01` (figurark 1 for Sam (kostyme 326), 34 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); snakking mot høyre, mot oss, bort (29 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig326_01` (figurark 1 for Sam (kostyme 326), 34 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); snakking mot høyre, mot oss, bort (29 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 57
 
@@ -3539,3 +3539,5 @@ Bestilling 53: ti figurark med 137 Sam/Max-ruter levert, ni OK og én dokumenter
 Bestilling 54: ni figurark med 152 Sam/Max-ruter levert, sju OK og to SJEKK for tre tynne armkonturer. Tjue klare ruter i fig007_02 er separat delarbeid, fem a07-ruter venter. Se `rapporter/bestilling054-20261013/RAPPORT.md`. Arbeidet fortsetter.
 
 Bestilling 55: ti figurark med 82 ruter levert, alle OK. Max006, Sam236 og sju Mini Vortex-ark er kilde- og plasseringskontrollert. Se `rapporter/bestilling055-20261013/RAPPORT.md`. Arbeidet fortsetter.
+
+Bestilling 56: sju figurark med 90 ruter levert, alle OK. Sam114 med bøttelag, Sam326 med egne hodeankre og siste Mini Vortex-ark er kontrollert. Max066s rasp og nøkkel er kildeavklart for produksjon i bestilling59. Se `rapporter/bestilling056-20261013/RAPPORT.md`. Arbeidet fortsetter.

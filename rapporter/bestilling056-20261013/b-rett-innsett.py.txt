@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess,hashlib
+r=Path('rapporter/bestilling056-20261013');rs=json.loads((r/'b-ruteregister.json').read_text())['ruter'];proof=[]
+changes=[(14,'b-fig114_02-raa01.png',(414,0,763,298)),(144,'b-blaahandtak-raa02.png',(0,0,630,864)),(145,'b-blaahandtak-raa02.png',(630,0,1260,864)),(146,'b-blaahandtak-raa02.png',(1260,0,1888,864))]
+for id,raw,slot in changes:
+ o=next(z for z in rs if z['rute']==id);p=Path('jobber',o['jobb'],'resultat.png');im=Image.open(p).convert('RGBA');before=np.array(im);a=np.array(Image.open(r/raw).convert('RGBA').crop(slot));a[:,:,3]=np.where(a[:,:,3]<16,0,np.minimum(255,a[:,:,3].astype(float)*255/254)).astype('uint8');ys,xs=np.where(a[:,:,3]>128);bbox=(int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1));new=Image.fromarray(a).crop(bbox);t=o['hd_synlig'];new=new.resize((t[2]-t[0],t[3]-t[1]),Image.Resampling.LANCZOS);im.paste(new,t[:2]);im.save(p);diff=np.any(before!=np.array(im),axis=2);outside=diff.copy();outside[t[1]:t[3],t[0]:t[2]]=False;proof.append({'cel':id,'raw':raw,'slot':slot,'nyalfa_bbox':bbox,'target':t,'diff':int(diff.sum()),'diff_utenfor':int(outside.sum())})
+(r/'b-rettinger-bevis.json').write_text(json.dumps(proof,indent=2))
+for n in range(1,6):
+ j=f'fig114_{n:02d}';run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll02.txt').write_text(run.stdout+run.stderr);print(run.stdout)

@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess
+r=Path('rapporter/bestilling056-20261013');raw=Image.open(r/'b-150151-raa02.png').convert('RGBA');p=Path('jobber/fig114_05/resultat.png');im=Image.open(r/'b-fig114_05-for150151.png').convert('RGBA');before=np.array(im);m=json.loads(Path('jobber/fig114_05/jobb.json').read_text());proof=[];union=np.zeros(before.shape[:2],bool)
+for k,o in enumerate(m['ruter'][:2]):
+ slot=(k*896,0,(k+1)*896,896);a=np.array(raw.crop(slot));a[:,:,3]=np.where(a[:,:,3]<16,0,np.minimum(255,a[:,:,3].astype(float)*255/254)).astype('uint8');yy,xx=np.where(a[:,:,3]>128);bb=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1));new=Image.fromarray(a).crop(bb).resize((96,80),Image.Resampling.LANCZOS);sx,sy,ex,ey=o['synlig'];tx,ty=64+sx*4,32+sy*4;local=(0,16,82,56);rect=(tx,ty+16,tx+82,ty+56);patch=np.array(new.crop(local));old=np.array(im.crop(rect));
+ for row in range(patch.shape[0]-6,patch.shape[0]):
+  f=(patch.shape[0]-1-row)/6;sel=(patch[row,:,3]>128)&(old[row,:,3]>128);patch[row,sel,:3]=(patch[row,sel,:3]*f+old[row,sel,:3]*(1-f)).astype('uint8')
+ im.paste(Image.fromarray(patch),rect[:2]);union[rect[1]:rect[3],rect[0]:rect[2]]=True;proof.append({'cel':o['rute'],'raw_slot':slot,'nyalfa_bbox':bb,'target_local_rett':local,'global_rett':rect})
+im.save(p);diff=np.any(np.array(im)!=before,axis=2);(r/'b-150151-rettingbevis.json').write_text(json.dumps({'ruter':proof,'endrede_piksler':int(diff.sum()),'utenfor':int((diff&~union).sum()),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'originalmaske':False},indent=2));run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p)],capture_output=True,text=True);(r/'b-fig114_05-kontroll03.txt').write_text(run.stdout+run.stderr);print(run.stdout)

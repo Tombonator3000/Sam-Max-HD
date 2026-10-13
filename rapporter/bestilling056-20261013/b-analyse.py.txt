@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,collections
+r=Path('rapporter/bestilling056-20261013');meta=json.loads(Path('konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['114'];cm={x['cel']:x for x in meta['cels']};sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();locks={};records=[];lookup={};groups=collections.defaultdict(list);hashgroups=collections.defaultdict(list)
+for n in range(1,6):
+ j=f'fig114_{n:02d}';p=Path('jobber',j);m=json.loads((p/'jobb.json').read_text());im=Image.open(p/'original_1x.png').convert('RGB');bg=m['bakgrunn']
+ for f in ['jobb.json','prompt.txt','referanse.png','original_1x.png']:locks[str(p/f)]=sha(p/f)
+ for o in m['ruter']:
+  sx,sy,ex,ey=o['synlig'];x,y,w,h=o['rekt'];crop=im.crop((sx,sy,ex,ey));a=np.array(crop.convert('RGBA'));a[:,:,3]=np.where(np.all(a[:,:,:3]==bg,axis=2),0,255);a[a[:,:,3]==0,:3]=0;cel=Image.new('RGBA',(w,h));cel.alpha_composite(Image.fromarray(a),(sx-x,sy-y));lookup[o['rute']]=cel;colors,cnt=np.unique(a[a[:,:,3]>0,:3],axis=0,return_counts=True);pal=[{'rgb':v.tolist(),'antall':int(c)} for v,c in sorted(zip(colors,cnt),key=lambda q:-q[1])];sig=hashlib.sha256(cel.tobytes()+str(cel.size).encode()).hexdigest();hashgroups[sig].append(o['rute']);rec={'jobb':j,**o,'metadata':cm[o['rute']],'hd_synlig':[64+sx*4,32+sy*4,64+ex*4,32+ey*4],'antall_synlige':int((a[:,:,3]>0).sum()),'palett':pal,'cel_rgba_sha256':sig};records.append(rec);groups[(o['animasjon'],o['retning'],o['lag'])].append(rec)
+ for start in range(0,len(m['ruter']),8):
+  out=Image.new('RGB',(1400,900),(200,200,200));d=ImageDraw.Draw(out)
+  for k,o in enumerate(m['ruter'][start:start+8]):
+   sx,sy,ex,ey=o['synlig'];a=im.crop((sx,sy,ex,ey));s=min(310/a.width,350/a.height);a=a.resize((round(a.width*s),round(a.height*s)),Image.Resampling.NEAREST);xx=k%4*350;yy=k//4*450;c=cm[o['rute']];d.text((xx+5,yy+5),f"{j} cel{o['rute']} a{o['animasjon']} l{o['lag']}",fill='black');d.text((xx+5,yy+22),f"rel({c['rel_x']},{c['rel_y']}) move({c['move_x']},{c['move_y']})",fill='black');out.paste(a,(xx+5,yy+48))
+  out.save(r/f'b-ruter-{n:02d}-{start//8+1}.png')
+contact=Image.new('RGB',(1536,1536),(128,128,128))
+for n in range(1,6):contact.paste(Image.open(f'jobber/fig114_{n:02d}/referanse.png').resize((768,512)),(((n-1)%2)*768,((n-1)//2)*512))
+contact.save(r/'b-original-kontaktark.png')
+# Diagnostisk lagplassering, ikke påstand om eksakt samtidighet/timing.
+combos=[(4,128),(10,130),(12,132),(14,134),(19,136),(4,141),(10,143),(12,145),(14,147),(19,148),(22,138),(23,139),(24,140),(22,150),(23,151),(24,152)]
+for start in range(0,len(combos),8):
+ out=Image.new('RGB',(1600,1000),(200,200,200));d=ImageDraw.Draw(out)
+ for k,pair in enumerate(combos[start:start+8]):
+  canvas=Image.new('RGBA',(120,100))
+  for id in pair:
+   c=cm[id];canvas.alpha_composite(lookup[id],(30+c['rel_x'],82+c['rel_y']))
+  canvas=canvas.resize((400,333),Image.Resampling.NEAREST);xx=k%4*400;yy=k//4*500;out.paste(canvas,(xx,yy+45),canvas);d.text((xx+5,yy+5),f"cels{pair} rel. DIAGNOSTISK, timing ikke bevist",fill='black')
+ out.save(r/f'b-sammensetting-{start//8+1}.png')
+(r/'b-kildehash.json').write_text(json.dumps({'antall':len(locks),'filer':locks},indent=2)+'\n');anchors=['hovedark/sam.png','jobber/fig002_01/resultat.png','stil/fig002_01.png','konsept/2026-10-12/kostymer-originalmetadata.json','konsept/2026-10-12/kostymer-348.csv','konsept/2026-10-12/skript-kostymekoblinger.tsv','jobber/rom025/original_1x.png','jobber/rom025/jobb.json'];(r/'b-konteksthash.json').write_text(json.dumps({p:sha(p) for p in anchors},indent=2));(r/'b-ruteregister.json').write_text(json.dumps({'ruter':records,'grupper':[{'animasjon':k[0],'retning':k[1],'lag':k[2],'cels':[z['rute'] for z in v]} for k,v in groups.items()],'originalmetadata':meta,'identiske_cels':[v for v in hashgroups.values() if len(v)>1],'diagnostiske_par':combos,'runtime':False},indent=2));print('ruter',len(records),'jobber',collections.Counter(z['jobb'] for z in records),'identiske',[v for v in hashgroups.values() if len(v)>1]);print('grupper',[(k,[z['rute'] for z in v]) for k,v in groups.items()])

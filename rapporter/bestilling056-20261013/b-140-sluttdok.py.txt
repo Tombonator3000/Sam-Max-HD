@@ -1,0 +1,22 @@
+from pathlib import Path
+import json,hashlib
+r=Path('rapporter/bestilling056-20261013');sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+p=r/'b-leveranser.json';m=json.loads(p.read_text());m['status']='Ferdig for rotmottak etter lokal140-retting'
+for z in m['leveranser']:
+ z['klar_for_mottak']=True
+ if z['jobb']=='fig114_04':z.update(sha256=sha(z['resultat']),forsok=2,kontrollfil=str(r/'b-fig114_04-kontroll03.txt'),lokalretting=str(r/'b-140-bevis.json'))
+ n=Path('jobber',z['jobb'],'notat.md');t=n.read_text().replace('Endelig motivmottak avventes hos rot.','Klar for rotmottak etter dokumentert lokalretting. Runtime og ny individuell brukergodkjenning er fortsatt false.')
+ if z['jobb']=='fig114_04':
+  t=t.replace('1 genereringsforsøk relevant for arket.','2 genereringsforsøk relevant for arket.').replace('523fab9988c68f7059f3242b6d9e9bfc83b47a428ee51cb8933f581cd04bcde7',z['sha256']).replace('b-fig114_04-kontroll02.txt','b-fig114_04-kontroll03.txt');t+='\nCel140: Bare den separate øvre hvit/grønne kildeformen er lokalt rettet med innebygd imagegen. Ny alfa, ingen originalpiksler. 133 piksler endret innen [458,888,472,904], null utenfor. Funksjonen er uavklart; ingen material- eller forbindelsestolkning er lagt til. 131–133 er beholdt som grønne/hvite kildeformer.\n'
+ n.write_text(t)
+p.write_text(json.dumps(m,indent=2)+'\n')
+qa=r/'b-kilde-qa.md';t=qa.read_text().replace('Endelig motivmottak avventes hos rot.','Klar for rotmottak etter siste kildebaserte lokalretting.');start=t.index('Åpen kildevurdering:');end=t.index('\n\nTegningsforbehold:',start);t=t[:start]+'''Avklart kildebehandling:131–133 beholdes som grønne/hvite kildeformer, uten å påstå metall eller annen funksjon. Etter rot sin vurdering er bare140s separate korte hvit/grønne spiss rettet. Ett innebygd imagegen-kall ga en ny rett hvit stripe med grønn underside; bare denne nye komponenten ble klippet, helskalert til8x12 og plassert ved(460,888). b-140-bevis.json viser133 endrede piksler innen[458,888,472,904] og null utenfor. Den tidligere buede formen er borte. Funksjonen er fortsatt uavklart. b-celqa-04-2.png viser ny sluttform og b-relqa-4.png den diagnostiske sammensettingen. Egenkontroll03 er OK,12/12. Det brede b-handtak-prompt02.txt er et UBRUKT utkast; bare b-blaahandtak-prompt02.txt og b-140-prompt03.txt ble sendt som rettingskall.'''+t[end:];qa.write_text(t)
+prov=json.loads((r/'b-proveniens.json').read_text());prov['raw_og_prompt'].update({str(p):sha(p) for p in r.glob('b-140-*') if ('raa' in p.name or 'prompt' in p.name)});prov['oppskrifter']+=['b-140-innsett.py.txt','b-140-sluttdok.py.txt'];prov['ubrukte_promptutkast']=['b-handtak-prompt02.txt'];(r/'b-proveniens.json').write_text(json.dumps(prov,indent=2))
+# Oppdater cel140s slutt-hash uten å skrive kilderegister.
+from PIL import Image
+import numpy as np
+p=r/'b-rutekart-slutt.json';a=json.loads(p.read_text())
+for z in a:
+ if z['cel']==140:
+  ar=np.array(Image.open('jobber/fig114_04/resultat.png').crop(tuple(z['target'])));z['cel_rgba_sha256']=hashlib.sha256(ar.tobytes()).hexdigest()
+p.write_text(json.dumps(a,indent=2));locks=json.loads((r/'b-kildehash.json').read_text())['filer'];ctx=json.loads((r/'b-konteksthash.json').read_text());assert all(sha(p)==h for p,h in {**locks,**ctx}.items());print('20+8 kilder uendret; sluttmanifest oppdatert')

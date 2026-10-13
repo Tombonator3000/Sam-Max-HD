@@ -1,0 +1,6 @@
+from PIL import Image
+from pathlib import Path
+import json,shutil
+r=Path('rapporter/bestilling056-20261013');o=next(x for x in json.loads((r/'b-ruteregister.json').read_text())['ruter'] if x['rute']==140);print(o['synlig'],o['hd_synlig']);im=Image.open('jobber/fig114_04/original_1x.png');im.crop(tuple(o['synlig'])).resize((672,528),Image.Resampling.NEAREST).save(r/'b-140-kilde.png');Image.open('jobber/fig114_04/resultat.png').crop(tuple(o['hd_synlig'])).resize((672,528)).save(r/'b-140-hd-for.png');shutil.copyfile('jobber/fig114_04/resultat.png',r/'b-fig114_04-for140.png')
+p='Edit image2 ONLY at the tiny isolated shape at upper right. Image1 is the source reference: preserve its SHORT STRAIGHT VERTICAL WHITE STRIPE with GREEN UNDERSIDE, exact small extent and detached position. It is a simple white/green source shape of unknown function. No rounded bulb, no connection, no invented function or material. Everything else in the bucket is unchanged. Output transparent RGBA same composition. Do not change fish, bucket, handle, palette or other shapes. Only replace that isolated upper-right tiny rounded green form by the short upright white/green source shape.'
+(r/'b-140-prompt03.txt').write_text(p)
