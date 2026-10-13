@@ -206,4 +206,4 @@
 
 ## 2026-10-13T21:31:33+02:00 (Codex, Astra)
 
--17 rapportprompters opprinnelige bytes gjenopprettet ved å fjerne ett bevist ekstraLF. Alle222 tidligere leverte PNG-er er uendret. Leveringshjelperen bevarer heretter prompt-/oppskriftsbytes. Se rapporter/promptintegritet-20261013/.
+- 17 rapportprompters opprinnelige bytes gjenopprettet ved å fjerne ett bevist ekstraLF. Alle224 tidligere versjonerte PNG-er (222 leverte og to uavklarte) er uendret. Leveringshjelperen bevarer heretter prompt-/oppskriftsbytes. Se rapporter/promptintegritet-20261013/.
