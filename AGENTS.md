@@ -29,7 +29,7 @@ Regelen gjelder også når jobbformatet ber om ordrett prompt. Ved påvist feil 
 - Deler av en figur (hode og kropp hver for seg) males som de er. Rutene mot venstre lager spillet ved å speilvende; tegn ingen.
 - Kodeoppgaver i `ORDRE.md` er for den som har laptopen med spillet. Rapporter skrives i `rapporter/` i denne grenen. Kodeendringer går som PR mot `main`.
 - Skriv på norsk i notater, uten emoji og uten tankestreker.
-- Repoet er offentlig, men spillet tilhører Disney/Lucasfilm. Ingenting herfra skal deles utenfor repoet.
+- Repoet er offentlig, men spillet tilhører Disney/Lucasfilm. Tom kan dele det utenfor repoet til eget, privat bruk; ellers deles det ikke videre.
 
 ## Slik jobber du
 
