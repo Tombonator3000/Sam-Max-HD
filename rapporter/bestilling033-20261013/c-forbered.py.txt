@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib
+p=Path('rapporter/bestilling033-20261013');jobs=['lag031_01_del1av4','lag031_01_del2av4','lag031_02_del1av4','lag031_03_del1av4','lag031_04_del1av4','lag031_05_del2av4','lag031_06_del2av4'];sha=lambda x:hashlib.sha256(Path(x).read_bytes()).hexdigest()
+for z in json.loads((p/'kildehash.json').read_text())+json.loads((p/'root-ekstra-kildehash.json').read_text()):assert sha(z['fil'])==z['sha256']
+assert sha('jobber/obj308_01/resultat.png')=='0b18ae890130f959252d444c82c965a6b7651fa644e5fd77b417b965ca4d67ca'
+# Read-only rektangulaere kildeutsnitt for referanse, ikke ny kunst.
+def crop(j,o):
+ m=json.loads(Path('jobber/'+j+'/jobb.json').read_text());q=next(v for v in m['objekter'] if v['bilde']==o);x,y,w,h=q['rekt'];x-=m['region'][0];return Image.open('jobber/'+j+'/original_1x.png').crop((x,y,x+w,y+h))
+strips=Image.new('RGB',(1536,1024),(128,128,128))
+for i,(j,o) in enumerate([(jobs[0],'obj310_01'),(jobs[2],'obj310_02')]):strips.paste(crop(j,o).resize((1408,192),Image.Resampling.NEAREST),(64,128+i*512))
+strips.save(p/'c-310-source.png')
+frags=Image.new('RGB',(1024,1024),(128,128,128));spec=[(jobs[1],'obj306_01'),(jobs[1],'obj309_01'),(jobs[3],'obj311_01'),(jobs[4],'obj312_01')]
+for i,(j,o) in enumerate(spec):frags.paste(crop(j,o).resize((384,384),Image.Resampling.NEAREST),(64+(i%2)*512,64+(i//2)*512))
+frags.save(p/'c-ledning-source.png')
+# De to forste viserposisjonene produseres na; resten folger samme familie i34.
+vis=Image.new('RGB',(1024,1024),(128,128,128))
+for i,j in enumerate(jobs[5:]):vis.paste(crop(j,f'obj305_0{i+1}').resize((800,400),Image.Resampling.NEAREST),(112,32+560*i))
+vis.save(p/'c-305-source.png')
+a=Image.open('jobber/rom031_del1av4/resultat.png').crop((0,112,1536,912));b=Image.open('jobber/rom031_del2av4/resultat.png').crop((0,112,1536,912));assert a.crop((960,0,1536,800)).tobytes()==b.crop((0,0,576,800)).tobytes();master=Image.new('RGB',(2496,800));master.paste(a,(0,0));master.paste(b,(960,0));master.save(p/'c-grunnmaster.png')
+pr1=Path('jobber/'+jobs[0]+'/prompt.txt').read_text();pr2=Path('jobber/'+jobs[1]+'/prompt.txt').read_text()
+(p/'c-310-prompt1.txt').write_text(pr1+'\n\nLOCAL TWO-STATE SHEET, not whole room redraw. First source is1536x1024 with two1408x192 strips at[64,128] and[64,640]. Return this exact layout. Top: clipped lower red/orange circular lens rim and gray inset; do not complete circle. Bottom: DIFFERENT cropped red/gray lens portion above, a BLACK GAP, and separate gray metal curved markings strip along bottom. Do not fill black gap. Preserve exact cutoffs, thicknesses, odd cropped shapes. Second HD reference is brush/outline style ONLY; source determines content and muted gray/black palette. No full binocular, numbers, screws or extra details. Smooth drawn edges, not pixel stairs.\n')
+(p/'c-ledning-prompt1.txt').write_text(pr2+'\n\nSECOND APPLICABLE JOB PROMPT (VERBATIM):\n'+pr1+'\n\nLOCAL FOUR-FIELD SHEET. Source1024square:384square fields at(64,64),(576,64),(64,576),(576,576). Return exact layout, gray padding. Top-left306: blue cable, copper strands around top screw, gray clipped metal plate, lower screw. Top-right309: white/blue cable, copper curled strands at screw, coin slot and LEFT-CLIPPED 25-cent glyphs, lower screw. Bottom-left311: same blue type MOVED into landscape with source-specific GREEN fine outlines, sky notch at left. Bottom-right312: white cable variant with GREEN fine outlines and sky blue wedge at right. Preserve each source color difference, do not normalize to identical plates or add complete25text. Exact black notches, cutoffs and cable positions. These are disconnected panel fragments, not complete binoculars or any creature. Second reference only muted metal material/linework, no copying its full panel contents. Preserve copper strand counts and shapes and all four source variants.\n')
+(p/'c-305-prompt1.txt').write_text(pr2+'\n\nLOCAL TWO-STATE SHEET. Source1024square: two800x400fields at(112,32) and(112,592). Return exactlayout. Both depict same dark gray semicircular dial inset with fine concentric arcs, no numbers, no ticks or buttons. Same clipped bottom pivot and plain gray metal handle. Upper handle points SHALLOW LEFT; lower handle points DIAGONAL UPPER LEFT. Preserve thickness, length, center and source clipping. Second HD reference is existing metal style/material. Do not use its straight-up handle position. No copperwire or new symbols. Smooth clean painted arcs and edge highlights while source fixes geometry.\n')

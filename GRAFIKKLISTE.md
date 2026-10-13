@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:15 (norsk tid)
+Oppdatert 2026-10-13 23:24 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 225 bilder levert (109 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 236 bilder levert (119 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -499,16 +499,16 @@ Rom 27, 28, 29, 30.
 
 Rom 30, 31.
 
-- [ ] `lag030_05_del1av2` (rom 30 Den roterende restauranten, lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
-- [ ] `lag030_06_del1av2` (rom 30 Den roterende restauranten, lag 06 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
-- [ ] `lag030_07_del1av2` (rom 30 Den roterende restauranten, lag 07 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
-- [ ] `lag031_01_del1av4` (rom 31 Kikkerten med utsikten, lag 01 med 1 objektbilde, del 1/4, bilde to `jobber/rom031_del1av4/resultat.png`)
-- [ ] `lag031_01_del2av4` (rom 31 Kikkerten med utsikten, lag 01 med 2 objektbilder, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
-- [ ] `lag031_02_del1av4` (rom 31 Kikkerten med utsikten, lag 02 med 1 objektbilde, del 1/4, bilde to `jobber/rom031_del1av4/resultat.png`)
-- [ ] `lag031_03_del1av4` (rom 31 Kikkerten med utsikten, lag 03 med 1 objektbilde, del 1/4, bilde to `jobber/rom031_del1av4/resultat.png`)
-- [ ] `lag031_04_del1av4` (rom 31 Kikkerten med utsikten, lag 04 med 1 objektbilde, del 1/4, bilde to `jobber/rom031_del1av4/resultat.png`)
-- [ ] `lag031_05_del2av4` (rom 31 Kikkerten med utsikten, lag 05 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
-- [ ] `lag031_06_del2av4` (rom 31 Kikkerten med utsikten, lag 06 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
+- [x] `lag030_05_del1av2` (rom 30 Den roterende restauranten, lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
+- [x] `lag030_06_del1av2` (rom 30 Den roterende restauranten, lag 06 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
+- [x] `lag030_07_del1av2` (rom 30 Den roterende restauranten, lag 07 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
+- [x] `lag031_01_del1av4` (rom 31 Kikkerten med utsikten, lag 01 med 1 objektbilde, del 1/4, bilde to `jobber/rom031_del1av4/resultat.png`)
+- [x] `lag031_01_del2av4` (rom 31 Kikkerten med utsikten, lag 01 med 2 objektbilder, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
+- [x] `lag031_02_del1av4` (rom 31 Kikkerten med utsikten, lag 02 med 1 objektbilde, del 1/4, bilde to `jobber/rom031_del1av4/resultat.png`)
+- [x] `lag031_03_del1av4` (rom 31 Kikkerten med utsikten, lag 03 med 1 objektbilde, del 1/4, bilde to `jobber/rom031_del1av4/resultat.png`)
+- [x] `lag031_04_del1av4` (rom 31 Kikkerten med utsikten, lag 04 med 1 objektbilde, del 1/4, bilde to `jobber/rom031_del1av4/resultat.png`)
+- [x] `lag031_05_del2av4` (rom 31 Kikkerten med utsikten, lag 05 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
+- [x] `lag031_06_del2av4` (rom 31 Kikkerten med utsikten, lag 06 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
 
 ## Bestilling 34
 
@@ -3493,3 +3493,5 @@ Bestilling 30: ti lag levert OK med 20 faktiske objektkontroller. Brukeravklart 
 Bestilling 32: ti lag levert OK med tolv faktiske objektkontroller, identisk taubaneoverlapp, museumsdør, redskapslag og fire kikkert/gnisttilstander. Se `rapporter/bestilling032-20261013/RAPPORT.md`. Bestilling 31 venter egne rettinger/avklaringer; videre arbeid fortsetter.
 
 Bestilling 31: åtte lag levert OK med 11 faktiske objektkontroller. To figurfragmenter i lag026_02 og lag026_03 venter nødvendig brukeravklaring; disse er ikke levert. SWING-variant og Dunk the Beast-tilstander. Se `rapporter/bestilling031-20261013/RAPPORT.md`. Bestilling 32 er levert; bestilling 33 og videre fortsetter.
+
+Bestilling 33: ti lag levert OK med elleve faktiske objektkontroller, kikkertfragmenter fra felles master, to viserposisjoner med308underlag og egne gnister/ledningsender. Se `rapporter/bestilling033-20261013/RAPPORT.md`. Bestilling 34 og videre fortsetter.

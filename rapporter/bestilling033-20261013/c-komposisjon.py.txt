@@ -1,0 +1,34 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np
+p=Path('rapporter/bestilling033-20261013');master=Image.open(p/'c-grunnmaster.png').convert('RGB');base=master.copy();fields={}
+a=Image.open(p/'c-310-raw1.png').convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+for i in range(2):fields[f'obj310_0{i+1}']=a.crop((64,128+i*512,1472,320+i*512)).resize((704,96),Image.Resampling.LANCZOS)
+a=Image.open(p/'c-ledning-raw1.png').convert('RGB').resize((1024,1024),Image.Resampling.LANCZOS)
+for i,o in enumerate(['obj306_01','obj309_01','obj311_01','obj312_01']):x=64+(i%2)*512;y=64+(i//2)*512;fields[o]=a.crop((x,y,x+384,y+384)).resize((288,288),Image.Resampling.LANCZOS)
+a=Image.open(p/'c-305-raw1.png').convert('RGB').resize((1024,1024),Image.Resampling.LANCZOS)
+for i in range(2):fields[f'obj305_0{i+1}']=a.crop((112,32+i*560,912,432+i*560)).resize((320,160),Image.Resampling.LANCZOS)
+# Vanlig rektangulaert gjenbruk av nytt bildeinnhold, ingen kildepiksler.
+# 309/312 har byte-identisk originalt tekstfelt [0,16,11,18]. Gjenbruk korrekt avklippet NY tekst.
+fields['obj309_01'].paste(fields['obj312_01'].crop((0,64,44,136)),(0,64))
+# Nye, feilaktige hjorneskruer erstattes med skruelost nygenerert metall fra samme felt.
+for key in ['obj305_01','obj305_02']:
+ f=fields[key];yy,xx=np.indices((20,20));al=np.minimum(19-xx,19-yy).clip(0,4)/4;ar=np.minimum(xx,19-yy).clip(0,4)/4;f.paste(f.crop((24,0,44,20)),(0,0),Image.fromarray(np.rint(al*255).astype('uint8')));f.paste(f.crop((276,0,296,20)),(300,0),Image.fromarray(np.rint(ar*255).astype('uint8')))
+# 310_02 fikk en liten ny visertupp nederst; nytt gratt metall gjenbrukes lokalt.
+f=fields['obj310_02'];f.paste(f.crop((583,91,616,96)),(623,91))
+for o,xy in [('obj310_01',(160,0)),('obj309_01',(1344,512)),('obj306_01',(1760,512))]:master.paste(fields[o],xy)
+master.save(p/'c-03101-fullmaster.png');proof=[]
+for n,part in [(1,1),(1,2),(2,1),(3,1),(4,1),(5,2),(6,2)]:
+ j=f'lag031_{n:02d}_del{part}av4';m=json.loads(Path('jobber/'+j+'/jobb.json').read_text());im=Image.open(m['bilde_to']).convert('RGB');originalhd=im.copy();mask=np.zeros((1024,1536),bool)
+ if n==1:
+  offset=0 if part==1 else 960;im.paste(master.crop((offset,0,offset+1536,800)),(0,112))
+  for x,y,w,h in [(160,0,704,96),(1344,512,288,288),(1760,512,288,288)]:
+   x-=offset;l=max(0,x);r=min(1536,x+w)
+   if l<r:mask[y+112:y+112+h,l:r]=True
+ else:
+  if n in [5,6]:im.paste(Image.open('jobber/obj308_01/resultat.png').crop((1088,368,1408,656)),(0,624));mask[624:912,:320]=True
+  for o in m['objekter']:
+   x,y,w,h=o['rekt'];x=(x-m['region'][0])*4;y=y*4+112;w*=4;h*=4;im.paste(fields[o['bilde']],(x,y));mask[y:y+h,x:x+w]=True
+ im.save('jobber/'+j+'/resultat.png');proof.append({'jobb':j,'utenfor_faktisk_union_avvik':int(np.count_nonzero(np.any(np.array(im)!=np.array(originalhd),axis=2)&~mask))})
+for o,im in fields.items():im.save(p/f'c-{o}-felt.png')
+(p/'c-komposisjonsbevis.json').write_text(json.dumps(proof,indent=2)+'\n')

@@ -1,0 +1,29 @@
+from pathlib import Path
+import json,hashlib,itertools
+import numpy as np
+from PIL import Image,ImageDraw
+r=Path(__file__).resolve().parent;root=r.parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+extra=[]
+context=['lag030_01_del1av2','lag030_02_del1av2','lag030_03_del1av2','lag030_04_del1av2','lag031_07_del2av4','lag031_08_del2av4','lag031_09_del2av4','obj308_01']
+for j in context:
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+  p=root/'jobber'/j/f;extra.append({'fil':str(p.relative_to(root)),'sha256':sha(p)})
+(r/'root-ekstra-kildehash.json').write_text(json.dumps(extra,ensure_ascii=False,indent=2)+'\n')
+master=Image.new('RGB',(624,200));ma=Image.open(root/'jobber/lag031_01_del1av4/original_1x.png').convert('RGB');mb=Image.open(root/'jobber/lag031_01_del2av4/original_1x.png').convert('RGB')
+assert ma.crop((240,0,384,200)).tobytes()==mb.crop((0,0,144,200)).tobytes()
+master.paste(ma,(0,0));master.paste(mb,(240,0));master.resize((1872,600),Image.Resampling.NEAREST).save(r/'root-03101-felleskilde.png')
+underlag=[];own=Image.open(root/'jobber/obj308_01/original_1x.png').convert('RGB');base=Image.open(root/'jobber/rom031_del2av4/original_1x.png').convert('RGB');recon=base.copy();recon.paste(own.crop((240,0,320,72)),(0,128))
+for j in ['lag031_05_del2av4','lag031_06_del2av4','lag031_07_del2av4','lag031_08_del2av4','lag031_09_del2av4']:
+ target=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB');diff=np.any(np.asarray(target)!=np.asarray(recon),axis=2);diff[136:176,40:120]=False
+ assert not np.any(diff),j
+ underlag.append({'jobb':j,'utenfor_eget305felt_etter_rektangulaert308underlag':0})
+contact=Image.new('RGB',(1000,360),(180,180,180));d=ImageDraw.Draw(contact);family=[]
+for k,j in enumerate(['lag031_05_del2av4','lag031_06_del2av4','lag031_07_del2av4','lag031_08_del2av4','lag031_09_del2av4']):
+ a=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop((40,136,120,176));family.append((j,np.asarray(a)))
+ contact.paste(a.resize((320,160),Image.Resampling.NEAREST),((k%3)*330,(k//3)*180+20));d.text(((k%3)*330+3,(k//3)*180+3),j,fill=(0,0,0))
+contact.save(r/'root-305-familie.png')
+familydiff=[{'a':a,'b':b,'ulike_piksler':int(np.any(aa!=bb,axis=2).sum())} for (a,aa),(b,bb) in itertools.combinations(family,2)]
+result={'03101_master':[2496,800],'03101_klipp_x':[0,960],'03101_overlapp':[576,800],'03101_kildeoverlapp_identisk':True,'305_underlag':underlag,'305_familie':familydiff,'308_hd_sha256':sha(root/'jobber/obj308_01/resultat.png')}
+(r/'root-familiebevis.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(result))
