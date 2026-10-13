@@ -1,14 +1,17 @@
 name: lystest-pages
 
-# Publiserer testrommet for dynamisk lys (lystest/) på GitHub Pages.
+# Publiserer lystesten (lystest/) på GitHub Pages med kontoret (rom 7) og hovedarkene til Sam og Max,
+# hentet fra gpt-arbeid inn i pakken. Offentlig side etter Toms beslutning 13. oktober 2026 (se AGENTS).
+# Grafikken sjekkes aldri inn i main; lystest/ i repoet skal bare ha HTML.
 # Krever at Pages bruker GitHub Actions som kilde (Settings > Pages > Source).
-# Siden har bare egen testgrafikk; spillfiler og HD-bilder skal aldri hit.
 
 on:
   push:
     branches: [main]
     paths: ["lystest/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"   # henter nye HD-bilder fra gpt-arbeid, for eksempel fra stilpiloten
 
 permissions:
   contents: read
@@ -32,6 +35,20 @@ jobs:
           if find lystest -type f ! -name '*.html' | grep -q .; then
             echo "lystest/ skal bare ha HTML-filer med egen testgrafikk"; find lystest -type f; exit 1
           fi
+      - name: Kontoret og hovedarkene fra gpt-arbeid inn i pakken
+        run: |
+          git fetch --depth 1 origin gpt-arbeid
+          for f in jobber/rom007_del1av2/jobb.json jobber/rom007_del1av2/original_1x.png \
+                   jobber/rom007_del2av2/jobb.json jobber/rom007_del2av2/original_1x.png \
+                   hovedark/sam/jobb.json hovedark/sam/original_1x.png \
+                   hovedark/max/jobb.json hovedark/max/original_1x.png; do
+            mkdir -p "lystest/spill/$(dirname "$f")"
+            git show "FETCH_HEAD:$f" > "lystest/spill/$f"
+          done
+          for f in jobber/rom007_del1av2/resultat.png jobber/rom007_del2av2/resultat.png; do
+            if git cat-file -e "FETCH_HEAD:$f" 2>/dev/null; then git show "FETCH_HEAD:$f" > "lystest/spill/$f"; echo "HD: $f"; fi
+          done
+          find lystest -type f | sort
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
