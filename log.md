@@ -232,3 +232,8 @@
 
 - LeChuck Pizza rettet i begge rom070-deler etter Toms direkte tekstavklaring. Ett nytt imagegen-kall, bare 200 × 84-masterfelt endret, 1152 × 800-overlapp byteidentisk og begge checkere OK. Senere lag er kartlagt; silhuettilstand070_01 skal fortsatt være tom. Se `rapporter/lechuck-pizza-retting-20261013/RAPPORT.md`.
 - Tom avklarte også stangfot260 og vannplask269 etter originalutdrag. Videre kildeplaner er korrigert.
+
+## 2026-10-13T22:45:47+02:00 (Codex, Astra)
+
+- Bestilling 28: ti lag levert OK med 25 faktiske objektkontroller. Tre egne karnevalsmastere har identisk 544 × 800-overlapp; kjeglerest, propell og fire trappete vimpelfelt er rettet. Fire minispilllag har egne Sam/Max-uttrykk, fem tomme hull og uavhengig motivkontroll. Se `rapporter/bestilling028-20261013/RAPPORT.md`. Bestilling 29 og videre fortsetter.
+- 40 beskyttede kilder og åtte ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

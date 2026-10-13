@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling028-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for j in ['lag018_01','lag018_02','lag018_03','lag019_01']:
+ base=Image.open(root/('jobber/rom019/resultat.png' if j=='lag019_01' else 'jobber/rom018/resultat.png')).convert('RGB')
+ if j=='lag018_01':base.paste(Image.open(r/'a-eyes-raa02.png').convert('RGB').resize((224,64),Image.Resampling.LANCZOS),(224,560))
+ if j in ['lag018_02','lag018_03']:
+  name='face02' if j.endswith('02') else 'face03';a=np.array(Image.open(r/f'a-{name}-raa01.png').convert('RGB').resize((160,160),Image.Resampling.LANCZOS),float);b=np.array(base.crop((992,240,1152,400)),float);yy,xx=np.mgrid[:160,:160];alpha=np.clip(np.minimum.reduce([xx,yy,159-xx,159-yy])/4,0,1)[...,None];
+  # A smaller rectangular new-art window preserves unchanged jaw/ear geometry.
+  out=base.copy();patch=Image.fromarray(np.rint(a).astype('uint8'))
+  for x,y,z,t in [(12,10,128,76),(40,80,140,136)]:
+   aa=np.array(patch.crop((x,y,z,t)),float);bb=np.array(base.crop((992+x,240+y,992+z,240+t)),float);hh,ww=aa.shape[:2];yy,xx=np.mgrid[:hh,:ww];al=np.clip(np.minimum.reduce([xx,yy,ww-1-xx,hh-1-yy])/4,0,1)[...,None];out.paste(Image.fromarray(np.rint(aa*al+bb*(1-al)).astype('uint8')),(992+x,240+y))
+  base=out
+ if j=='lag018_02':base.paste(Image.open(r/'a-nose-raa01.png').convert('RGB').resize((64,64),Image.Resampling.LANCZOS),(320,592))
+ if j=='lag019_01':
+  raw=Image.open(r/'a-lag019_01-raa01.png').convert('RGB');box=(128,240,512,752);a=np.array(raw.crop(box),float);b=np.array(base.crop(box),float);yy,xx=np.mgrid[:512,:384];alpha=np.clip(np.minimum.reduce([yy,511-yy,383-xx])/4,0,1)[...,None];base.paste(Image.fromarray(np.rint(a*alpha+b*(1-alpha)).astype('uint8')),box[:2])
+ base.save(root/'jobber'/j/'resultat.png');cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(root/'jobber'/j/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)

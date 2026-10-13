@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image,ImageDraw
+import numpy as np
+root=Path('/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren');r=root/'rapporter/bestilling028-20261013';r.mkdir(exist_ok=True)
+jobs=[f'lag017_{n:02d}_del{p}av2' for n in [2,3,4] for p in [1,2]]+['lag018_01','lag018_02','lag018_03','lag019_01'];extra=['lag019_02','lag019_03'];locks=[];extras=[];records=[];fields=[]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+for j in jobs+extra:
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());a=np.array(Image.open(d/'original_1x.png').convert('RGB'));bid=f'rom{m["rom"]:03d}'+(f'_del{m["del_nr"]}av2' if m['deler']==2 else '');base=np.array(Image.open(root/'jobber'/bid/'original_1x.png').convert('RGB'));diff=np.any(a!=base,axis=2);union=np.zeros(diff.shape,bool)
+ for f in ['original_1x.png','referanse.png','jobb.json','prompt.txt']:(extras if j in extra else locks).append({'fil':str((d/f).relative_to(root)),'sha256':sha(d/f)})
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];y-=m['region'][1];union[y:y+h,x:x+w]=True;crop=a[y:y+h,x:x+w];colors,counts=np.unique(crop.reshape(-1,3),axis=0,return_counts=True);fields.append({'jobb':j,'objekt':o['bilde'],'rekt':o['rekt'],'lokalrekt':[x,y,w,h],'hdrekt':[m['bilde_i_lerret'][0]+x*4,m['bilde_i_lerret'][1]+y*4,w*4,h*4],'palettantall':len(colors),'palett':[{'rgb':v.tolist(),'antall':int(c)} for v,c in zip(colors,counts)],'endret_mot_rom':int(diff[y:y+h,x:x+w].sum())})
+ records.append({'jobb':j,'metadata':m,'diff_total':int(diff.sum()),'diff_utenfor_objektunion':int((diff&~union).sum())})
+(r/'kildehash.json').write_text(json.dumps(locks,indent=2)+'\n');(r/'a-ekstra-konteksthash.json').write_text(json.dumps(extras,indent=2)+'\n');(r/'a-lagbevis.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n');(r/'a-feltbevis.json').write_text(json.dumps(fields,ensure_ascii=False,indent=2)+'\n')
+contact=Image.new('RGB',(1200,5*430),(180,180,180));dr=ImageDraw.Draw(contact)
+for i,j in enumerate(jobs):
+ im=Image.open(root/'jobber'/j/'referanse.png');im.thumbnail((590,395));contact.paste(im,((i%2)*600,(i//2)*430+25));dr.text(((i%2)*600+5,(i//2)*430+5),j,fill='black')
+contact.save(r/'original-kontaktark.png')
+for pg in range((len(fields)+7)//8):
+ fs=fields[pg*8:(pg+1)*8];im=Image.new('RGB',(1200,4*300),(180,180,180));dr=ImageDraw.Draw(im)
+ for n,f in enumerate(fs):
+  x,y,w,h=f['lokalrekt'];crop=Image.open(root/'jobber'/f['jobb']/'original_1x.png').crop((x,y,x+w,y+h));scale=min(560/w,260/h,6);crop=crop.resize((round(w*scale),round(h*scale)),Image.Resampling.NEAREST);im.paste(crop,((n%2)*600,(n//2)*300+25));dr.text(((n%2)*600+5,(n//2)*300+5),f['jobb']+' '+f['objekt']+' '+str(f['rekt']),fill='black')
+ im.save(r/f'a-objektfelt-{pg+1}.png')
+print([(x['jobb'],[(o['bilde'],o['rekt']) for o in x['metadata']['objekter']],x['diff_total'],x['diff_utenfor_objektunion']) for x in records]);print('fields',len(fields))

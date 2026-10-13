@@ -1,0 +1,32 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,importlib.util
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling028-20261013';spec=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+jobs=['lag018_01','lag018_02','lag018_03','lag019_01'];entries=[];rows=[];metrics=[];contact=Image.new('RGB',(1200,1720),(180,180,180));dr=ImageDraw.Draw(contact)
+for idx,j in enumerate(jobs):
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());im=Image.open(d/'resultat.png').convert('RGB');a=np.array(im);base=np.array(Image.open(root/m['bilde_to']).convert('RGB'));source=Image.open(d/'original_1x.png').convert('RGB');part,_=c.part_of(im,m);met=c.compare(source,part);mask=np.ones((1024,1536),bool)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];box=(128+x*4,112+y*4,128+(x+w)*4,112+(y+h)*4);mask[box[1]:box[3],box[0]:box[2]]=False;eo=met['eo'][y:y+h,x:x+w];es=met['es'][y:y+h,x:x+w];corr=float(c.corr(eo,es));assert corr>=.6;metrics.append({'jobb':j,'objekt':o['bilde'],'rekt':o['rekt'],'kantkorrelasjon':corr,'utfall':'OK','hoppet_over':False});rows.append((j,o['bilde'],Image.open(d/'referanse.png').crop(box),im.crop(box),corr))
+ # Face union includes the small corner outside individual rectangles; report it honestly.
+ outside=int(np.any(a[mask]!=base[mask],axis=1).sum());assert outside==0
+ assert im.size==(1536,1024) and np.all(a[:112]==128) and np.all(a[912:]==128) and np.all(a[:,:128]==128) and np.all(a[:,1408:]==128)
+ for col,p in enumerate(['referanse.png','resultat.png']):
+  thumb=Image.open(d/p);thumb.thumbnail((590,395));contact.paste(thumb,(col*600,idx*430+25))
+ dr.text((5,idx*430+5),j+' original / HD',fill='black')
+ components={'lag018_01':[('eyes',1),('eyes',2)],'lag018_02':[('face02',1),('nose',1)],'lag018_03':[('face03',1)],'lag019_01':[('lag019_01',1)]}[j];prov=[]
+ for name,k in components:
+  raw=r/f'a-{name}-raa{k:02d}.png';prompt=r/f'a-{name}-prompt{k:02d}.txt';assert (d/'prompt.txt').read_text().rstrip() in prompt.read_text();refs=[f'rapporter/bestilling028-20261013/a-{name}-source.png',f'rapporter/bestilling028-20261013/a-{name}-hd.png'] if name!='lag019_01' else ['jobber/lag019_01/referanse.png','jobber/rom019/resultat.png','hovedark/max.png']
+  if name.startswith('face'):refs+=['hovedark/sam.png']
+  prov.append({'komponent':name,'forsok':k,'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'prompt':str(prompt.relative_to(root)),'prompt_sha256':sha(prompt),'referanser':[{'fil':f,'sha256':sha(root/f)} for f in refs]})
+ entry={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':'OK','kontrollfil':str((r/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':len(components),'proveniens':prov,'objektkontroll':[o for o in metrics if o['jobb']==j],'utenfor_metadataunion_ulike_piksler':outside,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'verktoy':'image_gen.imagegen','eksakt_modell':'ikke eksponert'};entries.append(entry)
+ (d/'notat.md').write_text(f'# {j}\n\nKildetro minispillvariant etter a-kildeplan.md. Fem svarte hull beholdt tomme. Rom 018 har tomt HIT 20 WIN-tellefelt; rom 019 har ikke poengpanel. Sam-feltene i 018_01 gjenbruker byte-identisk levert rom-HD. Små Max-lag beholdes avskåret uten fullføring. 019_01 har egne bøyde ører, poter og Sam-arm nede.\n\nInnebygd imagegen; eksakt modell ikke eksponert. {len(components)} genereringskall knyttet til jobben, alle råforsøk/prompter og referansehash i a-leveranser.json. Hele nye komponenter er skalert og klippet rektangulært. Sam-uttrykkene er generert samlet, deretter satt inn som to rektangulære indre felt fra samme nye bilde for å bevare uendret kjeve-/øregrense. Fire HD-pikslers rektangulær kantovergang mot NYTEGNET grunnrom. Ingen originalmasker, vektor eller lokal warp.\n\nUendret checker OK; alle metadatafelt eksplisitt kontrollert. Opak RGB 1536 x 1024, motiv [128,112,1280,800], padding RGB 128. Utenfor metadataunionen er bildet byte-identisk med levert grunnrom. Se a-kilde-qa.md og nærbilder for visuell kontroll/begrensninger.\n\nSHA-256: {entry["sha256"]}\n\nIngen runtime/import eller ny individuell brukergodkjenning. Root tar mottak.\n')
+contact.save(r/'a-samlet-kontaktark.png');out=Image.new('RGB',(1200,len(rows)*290),(180,180,180));dr=ImageDraw.Draw(out)
+for row,(j,o,s,h,co) in enumerate(rows):
+ for col,im in enumerate([s,h]):
+  scale=min(550/im.width,250/im.height,4);im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.NEAREST if col==0 else Image.Resampling.LANCZOS);out.paste(im,(col*600,row*290+25))
+ dr.text((5,row*290+5),f'{j} {o} {co:.6f}',fill='black')
+out.save(r/'a-objektqa.png');(r/'a-perobjektkontroll.json').write_text(json.dumps(metrics,indent=2)+'\n');(r/'a-leveranser.json').write_text(json.dumps({'leveranser':entries,'genereringskall':6,'checker_sha256':sha(root/'verktoy/sjekk_leveranse.py')},ensure_ascii=False,indent=2)+'\n')
+locks=json.loads((r/'kildehash.json').read_text())+json.loads((r/'a-ekstra-konteksthash.json').read_text())
+for e in locks:assert sha(root/e['fil'])==e['sha256']
+(r/'a-kildehashkontroll.json').write_text(json.dumps([{**e,'uendret':True} for e in locks],indent=2)+'\n');print(metrics)

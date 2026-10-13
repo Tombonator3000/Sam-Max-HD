@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,subprocess,numpy as np
+p=Path('rapporter/bestilling028-20261013');sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();dump=lambda f,v:Path(f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+proof=[]
+for r in json.loads((p/'kildehash.json').read_text()):proof.append(dict(r,faktisk_sha256=sha(r['fil']),uendret=sha(r['fil'])==r['sha256']))
+assert all(r['uendret'] for r in proof);dump(p/'c-kildehashkontroll.json',proof)
+records=[];comps=[]
+for state in ['02','03','04']:
+ master=p/f'c-017-{state}-fullmaster.png';a=np.array(Image.open(master));base=np.array(Image.open(p/'c-017-grunnmaster.png'));mask=np.zeros(a.shape[:2],bool)
+ for n in [1,2]:
+  m=json.loads(Path(f'jobber/lag017_{state}_del{n}av2/jobb.json').read_text())
+  for o in m['objekter']:
+   x,y,w,h=[v*4 for v in o['rekt']]
+   if o['bilde']=='obj173_01':y-=16;h+=16
+   mask[y:y+h,x:x+w]=True
+ outside=int(np.count_nonzero(np.any(a!=base,axis=2)&~mask));assert outside==0
+ aa=np.array(Image.open(f'jobber/lag017_{state}_del1av2/resultat.png'));bb=np.array(Image.open(f'jobber/lag017_{state}_del2av2/resultat.png'));ov=np.array_equal(aa[112:912,992:1536],bb[112:912,:544]);assert ov
+ comps.append({'tilstand':state,'fullmaster':str(master),'sha256':sha(master),'storrelse':[2528,800],'klipp_x':[0,992],'overlapp':[544,800],'overlapp_byteidentisk':ov,'utenfor_samlet_komposisjonsunion_avvik':outside,'kjeglefelt_utvidet_16_HD_px_opp':state=='02'})
+ for n in [1,2]:
+  j=f'lag017_{state}_del{n}av2';d=Path('jobber')/j;result=d/'resultat.png';rr=np.array(Image.open(result));assert rr.shape==(1024,1536,3) and np.all(rr[:112]==128) and np.all(rr[912:]==128)
+  log=p/f'{j}-kontroll.txt';r=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(result)],capture_output=True,text=True);log.write_text(r.stdout+r.stderr);status=r.stdout.strip().split('Utfall: ')[-1];assert status in ['OK','SJEKK']
+  raw=p/f'{j}-raw1.png';prompt=p/f'{j}-prompt1.txt';raws=[{'fil':str(raw),'sha256':sha(raw),'prompt':str(prompt),'prompt_sha256':sha(prompt),'valgt':'relevante objektfelt'}];attempts=1
+  if state=='04' and n==2:
+   attempts=4
+   for k in [2,3]:
+    f=p/f'c-propell04-raw{k}.png';pr=p/f'c-propell04-prompt{k}.txt';raws.append({'fil':str(f),'sha256':sha(f),'prompt':str(pr),'prompt_sha256':sha(pr),'valgt':False})
+   f=p/f'{j}-raw4.png';pr=p/f'{j}-prompt4.txt';raws.append({'fil':str(f),'sha256':sha(f),'prompt':str(pr),'prompt_sha256':sha(pr),'valgt':'kun obj183_04'})
+  if state in ['03','04']:
+   f=p/'c-vimpler-raw2.png';pr=p/'c-vimpler-prompt2.txt';raws.append({'fil':str(f),'sha256':sha(f),'prompt':str(pr),'prompt_sha256':sha(pr),'valgt':'fire vimpelfelt via felles master; også overlappende del'})
+   attempts+=1
+  note={'02':'Tom kjegleplass med gul stjernekrans, åpen tom WIN-luke, liten lås på lukket Trixiedør, tre brede vimpler og nesten loddrett propell. Nye vimpler er glattere/bredere i kurvene, låsen mer modellert, den tomme luken har tydeligere innvendig volum. Kjeglefeltet er utvidet 16 HD px opp med samme nye genererte underlag for å fjerne gammel HD-spiss utenfor originalens metadatarektangel.','03':'Egne fragmenterte røde/gule/grønne vimpler med hull og separate prikker, to røde spaktopper og tre synlige propellarmretninger. Rød/gul vimpel er rettet med felles lokalt imagegen-forsøk til jevne konturer. Separate prikker, T-form og tynne fragmenter er bevart. De nye formene er rundere og mer blanke enn kilden. Ingen fylt flaggduk. Kjegle, lukket dør, rød linse og lukket WIN-front følger denne tilstandens originalgrunnlag.','04':'Egne smale røde/gule/grønne fragmenter og fire propellarmer, inklusive den nesten vannrette høyrearmen. Første propell manglet lang høyrearm; lokalt forsøk 2 hadde riktig antall men forstørret geometri og er avvist. Forsøk 3 endret hodeformen og er også avvist. Fullkomposisjonsforsøk 4 er valgt bare for propellfeltet. Høyrebladet er noe lengre og tynnere enn kilden. Rødt/grønt er rettet med felles lokalt imagegen-forsøk til jevne konturer og bevarte separate prikker/fliker; gult høyrefelt beholder liten åpen løkke. Kjegle, lukket dør, rød linse og grunnspaker er bevart.'}[state]
+  records.append({'jobb':j,'resultat':str(result),'sha256':sha(result),'egenkontroll':status,'kontrollfil':str(log),'forsok':attempts,'raw':raws,'fullmaster':str(master),'fullmaster_sha256':sha(master),'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'visuelt_forbehold':note})
+  (d/'notat.md').write_text(f'# {j}\n\nInnebygd ChatGPT imagegen, {attempts} forsøk knyttet til denne delen. Eksakt modellnavn er ikke eksponert. Originalprompt er brukt ordrett med separat kildepresisering.\n\n{note}\n\nAlle synlige objektfelt fra begge deler inngår i en felles 2528 × 800-master. Klipp x = 0 og 992, 544 × 800 byteidentisk overlapp. Nytegnet HD-grunnrom gjenbrukes utenfor sammensettingsfeltene. Hel skalering, rektangulær innplassering, 3 px kantfjæring og jevnt bilineært RGB-tonefelt på nytegnete vimpler; ingen originalpiksler, originalsilhuettmasker, lokal geometriwarp eller vektortrace.\n\nUendret egenkontroll: {status}. Resultat SHA-256: `{sha(result)}`. Proveniens, råforsøk, prompter og SHA i `{p}/c-leveranser.json`; oppskrift c-komposisjon.py.txt og samlet kilde-/motivkontroll c-kilde-qa.md. Beskyttede kilder uendret. Runtime/import og ny individuell brukergodkjenning er ikke verifisert.\n')
+dump(p/'c-komposisjonsbevis.json',comps);dump(p/'c-leveranser.json',{'leveranser':records,'kildehashkontroll':str(p/'c-kildehashkontroll.json'),'objektkontroll':str(p/'c-objektkontroll.json'),'komposisjonsbevis':str(p/'c-komposisjonsbevis.json'),'runtime':False,'ny_brukergodkjenning':False})

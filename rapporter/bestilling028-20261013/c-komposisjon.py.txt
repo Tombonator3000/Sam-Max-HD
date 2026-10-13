@@ -1,0 +1,40 @@
+from PIL import Image
+from pathlib import Path
+import numpy as np,json
+p=Path('rapporter/bestilling028-20261013')
+tonebevis=[]
+def match_tone(new,old,name):
+ new=np.asarray(new).astype(float);old=old.astype(float);h,w=old.shape[:2]
+ yy,xx=np.indices((h,w));xn=xx/max(1,w-1)*2-1;yn=yy/max(1,h-1)*2-1
+ mat=np.stack([np.ones_like(xn),xn,yn,xn*yn],axis=-1)
+ boundary=(xx<3)|(yy<3)|(xx>=w-3)|(yy>=h-3)
+ A=mat[boundary];D=(old-new)[boundary]
+ coef=[]
+ for c in range(3):
+  keep=np.ones(len(A),bool)
+  for it in range(4):
+   fit=np.linalg.lstsq(A[keep],D[keep,c],rcond=None)[0];res=np.abs(D[:,c]-A@fit);keep=res<=max(2,np.quantile(res,0.85))
+  coef.append(fit)
+ coef=np.array(coef).T;delta=mat@coef
+ tonebevis.append({'objekt':name,'koeffisienter':coef.tolist(),'additiv_min':float(delta.min()),'additiv_maks':float(delta.max())})
+ return np.clip(new+delta,0,255)
+
+base=Image.new('RGB',(2528,800));base.paste(Image.open('jobber/rom017_del1av2/resultat.png').crop((0,112,1536,912)),(0,0));base.paste(Image.open('jobber/rom017_del2av2/resultat.png').crop((0,112,1536,912)),(992,0))
+base.save(p/'c-017-grunnmaster.png')
+for state in ['02','03','04']:
+ master=base.copy()
+ for n in [1,2]:
+  j=f'lag017_{state}_del{n}av2';meta=json.loads(Path('jobber/'+j+'/jobb.json').read_text());rx=meta['region'][0]
+  raw=Image.open(p/(j+'-raw1.png')).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+  for o in meta['objekter']:
+   x,y,w,h=[v*4 for v in o['rekt']]
+   if o['bilde']=='obj173_01':y-=16;h+=16
+   selected=Image.open(p/'lag017_04_del2av2-raw4.png').convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS) if o['bilde']=='obj183_04' else raw
+   new=selected.crop((x-rx*4,y+112,x-rx*4+w,y+112+h));old=np.array(master.crop((x,y,x+w,y+h)))
+   newarr=match_tone(new,old,o['bilde']) if o['bilde'][:6] in ['obj180','obj181','obj182'] else np.asarray(new)
+   yy,xx=np.indices((h,w));a=np.minimum.reduce([xx,yy,w-1-xx,h-1-yy]).clip(0,3)/3
+   out=np.rint(newarr*a[:,:,None]+old*(1-a[:,:,None])).astype('uint8');master.paste(Image.fromarray(out),(x,y))
+ master.save(p/f'c-017-{state}-fullmaster.png')
+ for n,x in [(1,0),(2,992)]:
+  im=Image.new('RGB',(1536,1024),(128,128,128));im.paste(master.crop((x,0,x+1536,800)),(0,112));im.save(f'jobber/lag017_{state}_del{n}av2/resultat.png')
+(p/'c-017-grensetone.json').write_text(json.dumps(tonebevis,indent=2)+'\n')

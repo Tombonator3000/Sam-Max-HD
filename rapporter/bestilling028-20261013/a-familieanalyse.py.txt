@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,csv,hashlib
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling028-20261013';proof={};fields=json.loads((r/'a-feltbevis.json').read_text())
+def arr(j):return np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'))
+def bbox(d):
+ y,x=np.where(d);return [int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)] if len(x) else None
+for state in [2,3,4]:
+ j1=f'lag017_{state:02d}_del1av2';j2=f'lag017_{state:02d}_del2av2';a=arr(j1);b=arr(j2);assert np.array_equal(a[:,248:],b[:,:136]);full=np.concatenate([a,b[:,136:]],axis=1);Image.fromarray(full).save(r/f'a-lag017_{state:02d}-originalmaster.png');base=np.concatenate([arr('rom017_del1av2'),arr('rom017_del2av2')[:,136:]],axis=1);d=np.any(full!=base,axis=2);mask=np.zeros(d.shape,bool)
+ for j in [j1,j2]:
+  for o in json.loads((root/'jobber'/j/'jobb.json').read_text())['objekter']:
+   x,y,w,h=o['rekt'];mask[y:y+h,x:x+w]=True
+ proof[f'017_{state:02d}']={'fullsize':list(full.shape[1::-1]),'overlap_source':[136,200],'overlap_hd':[544,800],'master_hd':[2528,800],'clip_hd_x':[0,992],'outside_fullunion':int((d&~mask).sum()),'full_diff':int(d.sum())}
+for one,two in [('lag018_01','lag018_02'),('lag018_02','lag018_03'),('lag019_01','lag019_02'),('lag019_01','lag019_03')]:
+ d=np.any(arr(one)!=arr(two),axis=2);proof[one+'__'+two]={'different_pixels':int(d.sum()),'bbox':bbox(d)}
+a=arr('lag019_03');b=arr('rom019');d=np.any(a!=b,axis=2);d[32:160,:96]=False;proof['01903_outside_max']={'different_pixels':int(d.sum()),'bbox':bbox(d)}
+for j in ['lag018_01','lag018_02','lag018_03']:
+ m=json.loads((root/'jobber'/j/'jobb.json').read_text());a=arr(j);rect=[216,32,40,40];proof[j+'_face_union']={'source_rect':rect,'hd_rect':[992,240,160,160],'194_195_overlap':[216,48,32,8],'recommendation':'one face patch, not separately drawn overlapping eye/tongue rectangles'}
+register=list(csv.DictReader((root/'konsept/2026-10-12/objektbilder-959.csv').open()))
+for f in fields:f['register']=[x for x in register if x['kilde']==f['objekt']+'.png']
+(r/'a-feltbevis.json').write_text(json.dumps(fields,ensure_ascii=False,indent=2)+'\n');(r/'a-familiebevis.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+anchors=[]
+for j in ['rom017_del1av2','rom017_del2av2','rom018','rom019']:
+ p=root/'jobber'/j/'resultat.png';anchors.append({'fil':str(p.relative_to(root)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+(r/'a-ankerhash.json').write_text(json.dumps(anchors,indent=2)+'\n');print(json.dumps(proof,indent=2));print([(f['objekt'],f['palettantall'],f['hdrekt']) for f in fields if f['jobb'].startswith(('lag018','lag019'))])
