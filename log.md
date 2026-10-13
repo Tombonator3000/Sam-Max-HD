@@ -352,3 +352,8 @@
 
 - Bestilling 51: fem 091-lag og fem ikonark levert, åtte OK og to SJEKK. 67 ikke-tomme felt OK og tre tomme felt bevist. To 416-pikslers overlapper er identiske; 850-komposisjonen og alle ikonmotiver er kontrollert. Se `rapporter/bestilling051-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T00:51:03+02:00 (Codex, Astra)
+
+- Bestilling 52: fem Sam-ark med 61 ruter og ikon06 med sju felt levert OK. Seks avklarte ruter i ufullstendig fig002_06 er kontrollert separat; fem a07-ruter venter fortsatt. Se `rapporter/bestilling052-20261013/RAPPORT.md`. Arbeidet fortsetter.
+- Figurark har ekte RGBA; ikon06 har foreskrevet RGB/magenta. Potekorreksjon er kontrollert innenfor fire rektangler. Ingen motorimport, spilltest eller ny individuell bildeaksept.

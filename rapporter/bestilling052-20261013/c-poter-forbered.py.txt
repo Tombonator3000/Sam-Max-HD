@@ -1,0 +1,12 @@
+from PIL import Image
+from pathlib import Path
+import json
+O=Path('rapporter/bestilling052-20261013');boxes=[(617,267,718,329),(865,261,997,332),(454,574,551,636),(668,575,779,637)]
+for kind,path in [('kilde','jobber/fig002_04/referanse.png'),('hd','jobber/fig002_04/resultat.png')]:
+ im=Image.open(path).convert('RGBA');out=Image.new('RGBA',(1024,256))
+ for ix,b in enumerate(boxes):
+  p=im.crop(b);p.thumbnail((240,240));p=p.resize((p.width*2,p.height*2),Image.Resampling.NEAREST);out.alpha_composite(p,(ix*256+(256-p.width)//2,(256-p.height)//2))
+ out.save(O/f'c-poter-{kind}.png')
+(O/'c-potebokser.json').write_text(json.dumps(boxes))
+p=Path('jobber/fig002_04/prompt.txt').read_text()+'\n\nLOCAL CORRECTION ONLY: Four cropped raised bare dog paws from the walking sheet. Image1 shows exact original brown sole/foot shadow clusters; image2 shows selected HD crops to correct. Produce four matching corrected HD patches in the same horizontal arrangement as image2 on transparent background. Remove the invented hard rectangular shoe-like panel outlines inside each sole. Retain the original darker brown areas as gently organic paw-pad/shadow shapes, no manufactured shoe sole or rim, no new toe count. Preserve exact outer paw contours, toe silhouettes, orientations, colours and any blue trouser fragment. The four poses remain distinct. No other part of the character is requested.\n'
+(O/'c-poter-prompt01.txt').write_text(p)

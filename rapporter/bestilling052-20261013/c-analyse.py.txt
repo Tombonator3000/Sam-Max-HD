@@ -1,0 +1,43 @@
+from pathlib import Path
+import json,hashlib,collections
+from PIL import Image,ImageDraw,ImageFont
+R=Path('/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren'); O=R/'rapporter/bestilling052-20261013';O.mkdir(exist_ok=True)
+f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',14)
+meta=json.loads((R/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['2']; cels={c['cel']:c for c in meta['cels']}
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks={};records=[];groups=collections.defaultdict(list)
+for i in range(2,8):
+ name=f'fig002_{i:02}';d=R/'jobber'/name;j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB')
+ for fn in ['jobb.json','prompt.txt','referanse.png','original_1x.png']: locks[str((d/fn).relative_to(R))]=sha(d/fn)
+ for r in j['ruter']:
+  rec={'jobb':name,**r,'originalmetadata':cels[r['rute']]};x,y,w,h=r['rekt'];sx,sy,ex,ey=r['synlig'];rec['hd_synlig']=[64+sx*4,32+sy*4,64+ex*4,32+ey*4];rec['original_ikke_bakgrunn']=sum(p!=(255,0,255) for p in im.crop((x,y,x+w,y+h)).getdata());records.append(rec)
+  groups[(r['animasjon'],r['retning'],r['lag'])].append((rec,im.crop((x,y,x+w,y+h))))
+for key,arr in groups.items():
+ n=len(arr);cw,ch=300,360;out=Image.new('RGB',(cw*min(n,5),ch*((n+4)//5)),(225,225,225));dr=ImageDraw.Draw(out)
+ for ix,(r,im) in enumerate(arr):
+  x=(ix%5)*cw;y=(ix//5)*ch;dr.text((x+8,y+5),f"{r['jobb']} cel {r['rute']} nr {r['nr']}",font=f,fill='black');dr.text((x+8,y+24),f"rel {r['originalmetadata']['rel_x']},{r['originalmetadata']['rel_y']} / {im.width}x{im.height}",font=f,fill='black');im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);out.paste(im,(x+8,y+52))
+ out.save(O/f'c-sekvens-a{key[0]:02}-r{key[1]}-l{key[2]}.png')
+(O/'c-kildehash.json').write_text(json.dumps({'filer':locks,'antall':len(locks)},indent=2)+'\n')
+anchors=['hovedark/sam.png','jobber/fig002_01/resultat.png','jobber/fig002_01/jobb.json','jobber/fig002_01/original_1x.png','jobber/fig002_01/notat.md','konsept/2026-10-12/kostymer-originalmetadata.json','rapporter/stilpilot-fortsettelse-20261013/TOMS-GODKJENNING.json']
+(O/'c-ankerhash.json').write_text(json.dumps({p:sha(R/p) for p in anchors},indent=2)+'\n')
+(O/'c-rutekart-kilde.json').write_text(json.dumps({'ruter':records,'grupper':[{'animasjon':k[0],'retning':k[1],'lag':k[2],'cels':[r['rute'] for r,_ in v]} for k,v in groups.items()],'metadata_animasjoner':meta['animasjoner'],'runtime':False},indent=2)+'\n')
+contact=Image.new('RGB',(1536,1536),(128,128,128))
+for i in range(2,8):
+ im=Image.open(R/f'jobber/fig002_{i:02}/referanse.png').resize((768,512));contact.paste(im,(((i-2)%2)*768,((i-2)//2)*512))
+contact.save(O/'c-original-kontaktark.png')
+print(json.dumps([{'a':k,'count':len(v),'cels':[r['rute'] for r,_ in v]} for k,v in groups.items()]))
+# Diagnostisk originalkomposisjon etter originale rel-koordinater, ikke produksjonsmasker.
+lookup={}
+for i in range(1,8):
+ j=json.loads((R/f'jobber/fig002_{i:02}/jobb.json').read_text());im=Image.open(R/f'jobber/fig002_{i:02}/original_1x.png').convert('RGBA')
+ for r in j['ruter']:
+  x,y,w,h=r['rekt'];p=im.crop((x,y,x+w,y+h));p.putdata([(a,b,c,0 if (a,b,c)==(255,0,255) else 255) for a,b,c,_ in p.getdata()]);lookup[r['rute']]=p
+out=Image.new('RGB',(1500,800),(220,220,220));dr=ImageDraw.Draw(out)
+combos=[[129,256,394],[128,412],[130,390],[129,257,385],[129,261,385]]
+for ix,ids in enumerate(combos):
+ box=Image.new('RGBA',(90,90));
+ for id in ids:
+  c=cels[id];box.alpha_composite(lookup[id],(40+c['rel_x'],80+c['rel_y']))
+ out.paste(box.resize((360,360),Image.Resampling.NEAREST),((ix%3)*500,30+(ix//3)*400),box.resize((360,360),Image.Resampling.NEAREST));dr.text(((ix%3)*500+5,(ix//3)*400+5),str(ids)+' source rel',font=f,fill='black')
+out.save(O/'c-original-lagsammensetting.png')
+(O/'c-analyse.py.txt').write_text(Path('/tmp/c52_analysis.py').read_text())

@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 00:45 (norsk tid)
+Oppdatert 2026-10-14 00:51 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -12,8 +12,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 610 bilder levert (268 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
-| Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 39 felt levert (5 ark), inkludert 2 SJEKK | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
+| Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 46 felt levert (6 ark), inkludert 2 SJEKK | 163 | Etter lagene (9 jobber) |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 98 ruter levert (7 ark), pilotstil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
 ## Bestilling 1: stilpiloten (nå, samme som ORDRE.md)
 
@@ -784,16 +784,16 @@ Rom 1, 69, 78, 91.
 
 Rom 78, 80, 93, 94. Figurark for Sam.
 
-- [ ] `ikon06` (ikonark 6 med 7 ikoner)
+- [x] `ikon06` (ikonark 6 med 7 ikoner)
 - [ ] `ikon07` (ikonark 7 med 22 ikoner)
 - [ ] `ikon08` (ikonark 8 med 47 ikoner)
 - [ ] `ikon09` (ikonark 9 med 48 ikoner)
-- [ ] `fig002_02` (figurark 2 for Sam (kostyme 2), 22 ruter: gange mot høyre (8 ruter); snakking (lag 3, tegnes over kroppen) mot høyre (14 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig002_03` (figurark 3 for Sam (kostyme 2), 15 ruter: snakking (lag 3, tegnes over kroppen) mot oss, bort (15 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig002_04` (figurark 4 for Sam (kostyme 2), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig002_05` (figurark 5 for Sam (kostyme 2), 13 ruter: gange bort (8 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig002_02` (figurark 2 for Sam (kostyme 2), 22 ruter: gange mot høyre (8 ruter); snakking (lag 3, tegnes over kroppen) mot høyre (14 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig002_03` (figurark 3 for Sam (kostyme 2), 15 ruter: snakking (lag 3, tegnes over kroppen) mot oss, bort (15 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig002_04` (figurark 4 for Sam (kostyme 2), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig002_05` (figurark 5 for Sam (kostyme 2), 13 ruter: gange bort (8 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig002_06` (figurark 6 for Sam (kostyme 2), 11 ruter: animasjon 7 mot høyre (5 ruter); animasjon 10 mot høyre, mot oss, bort (3 ruter); animasjon 11 mot høyre, mot oss, bort (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig002_07` (figurark 7 for Sam (kostyme 2), 3 ruter: animasjon 12 mot høyre, mot oss, bort (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig002_07` (figurark 7 for Sam (kostyme 2), 3 ruter: animasjon 12 mot høyre, mot oss, bort (3 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 53
 
@@ -3531,3 +3531,5 @@ Bestilling 48: ni antrekkslag levert OK med 35 egne felt, korrekt LeChuck Pizza 
 Bestilling 49: åtte lag levert med ni OK-felt; fire OK og fire SJEKK på arvet underlagsavvik. 077-tilstander, snøkulegrep og 1¢-maske er kontrollert. Lag071_15 og lag083_01 avventer motivavklaring. Se `rapporter/bestilling049-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
 
 Bestilling 51: fem 091-lag og fem ikonark levert, åtte OK og to SJEKK. 67 ikke-tomme felt OK og tre tomme felt bevist. To 416-pikslers overlapper er identiske; 850-komposisjonen og alle ikonmotiver er kontrollert. Se `rapporter/bestilling051-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+
+Bestilling 52: fem Sam-ark med 61 ruter og ikon06 med sju felt levert OK. Seks avklarte ruter i ufullstendig fig002_06 er kontrollert separat; fem a07-ruter venter fortsatt. Se `rapporter/bestilling052-20261013/RAPPORT.md`. Arbeidet fortsetter.

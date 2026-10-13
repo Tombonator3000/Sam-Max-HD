@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+import json,numpy as np,hashlib
+R=Path.cwd();O=R/'rapporter/bestilling052-20261013';ns={};exec((O/'c-plasser.py.txt').read_text().split('rois={')[0],ns);fit=ns['fit'];box=ns['box'];raw=Image.open(O/'c-poter-raa01.png').convert('RGBA');im=Image.open(O/'c-fig002_04-for-poter.png').convert('RGBA');before=np.array(im);boxes=json.loads((O/'c-potebokser.json').read_text());proof=[]
+for k,b in enumerate(boxes):
+ old=im.crop(b);ob=box(old);p=raw.crop((1146,0,1570,raw.height) if k==2 else (k*raw.width//4,0,(k+1)*raw.width//4,raw.height));q,qb=fit(p,ob[2]-ob[0],ob[3]-ob[1]);patch=Image.new('RGBA',old.size);patch.alpha_composite(q,(ob[0]-qb[0],ob[1]-qb[1]));oa=np.array(old).astype(float);na=np.array(patch).astype(float);yy,xx=np.indices(oa.shape[:2]);weight=np.clip(np.minimum.reduce([xx,yy,oa.shape[1]-1-xx,oa.shape[0]-1-yy])/10,0,1)[:,:,None];mix=oa*(1-weight)+na*weight;im.paste(Image.fromarray(np.rint(mix).astype('uint8')),b[:2]);proof.append({'rekt':b,'generated_quadrant':k,'new_core_bbox':ob})
+im.save('jobber/fig002_04/resultat.png');after=np.array(im);union=np.zeros(before.shape[:2],bool)
+for x0,y0,x1,y1 in boxes:union[y0:y1,x0:x1]=True
+assert np.array_equal(before[~union],after[~union]);(O/'c-potebevis.json').write_text(json.dumps({'felt':proof,'utenfor_endret':0,'sha256':hashlib.sha256(Path('jobber/fig002_04/resultat.png').read_bytes()).hexdigest()},indent=2)+'\n');qa=Image.new('RGB',im.size,(238,238,238));qa.paste(im,(0,0),im);qa.save(O/'c-fig002_04-kandidat.png')

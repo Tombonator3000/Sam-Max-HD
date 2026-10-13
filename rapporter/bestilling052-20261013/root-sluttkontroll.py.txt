@@ -1,0 +1,98 @@
+from pathlib import Path
+import hashlib,json,re,subprocess,sys,copy,io,contextlib,importlib.util
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image
+import numpy as np
+sys.dont_write_bytecode=True
+r=Path(__file__).resolve().parent;root=r.parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');checker=importlib.util.module_from_spec(spec);spec.loader.exec_module(checker)
+locks=json.loads((r/'c-kildehash.json').read_text())['filer']
+icons=json.loads((root/'rapporter/bestilling051-20261013/a-ikon-kildehash.json').read_text())
+locks.update({p:h for p,h in icons.items() if '/ikon06/' in p})
+assert len(locks)==28
+anchors=json.loads((r/'c-ankerhash.json').read_text())
+for p,h in {**locks,**anchors}.items():assert sha(root/p)==h,p
+(r/'kildehash.json').write_text(json.dumps([{'fil':p,'sha256':h} for p,h in locks.items()],indent=2)+'\n')
+records=json.loads((r/'a-leveranser.json').read_text())['leveranser']+json.loads((r/'c-leveranser.json').read_text())['leveranser']
+assert len(records)==6
+q=(root/'GRAFIKKLISTE.md').read_text().split('## Bestilling 52\n')[1].split('## Bestilling 53\n')[0]
+assert {e['jobb'] for e in records}<=set(re.findall(r'^- \[[ x]\] `([^`]+)`',q,re.M))
+checks=[];figchecks=[];obchecks=[]
+def figureproof(j,p,meta):
+ im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024)
+ arr=np.asarray(im);a=arr[:,:,3];used=np.zeros(a.shape,bool)
+ px,py,pw,ph=meta['bilde_i_lerret'];outside=np.ones(a.shape,bool);outside[py:py+ph,px:px+pw]=False
+ assert not np.any(a[outside])
+ original=np.asarray(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'))
+ rx,ry,_,_=meta['region'];ox,oy=meta['plassering']
+ cells=[]
+ for c in meta['ruter']:
+  sx,sy,ex,ey=c['synlig'];box=((ox+sx-rx)*4,(oy+sy-ry)*4,(ox+ex-rx)*4,(oy+ey-ry)*4)
+  a0,b0,a1,b1=box
+  # Rectangular tolerance is measurement only. Never used to make artwork.
+  x0,y0=max(0,a0-16),max(0,b0-16);x1,y1=min(1536,a1+16),min(1024,b1+16)
+  used[y0:y1,x0:x1]=True
+  sourcepixels=int(checker.original_mask(original,meta['bakgrunn'],(sx-rx,sy-ry,ex-rx,ey-ry)).sum())
+  assert sourcepixels>=20,(j,c['rute'],sourcepixels)
+  ys,xs=np.nonzero(a[y0:y1,x0:x1]>=128);assert len(xs)>0
+  cells.append({'cel':c['rute'],'animasjon':c['animasjon'],'retning':c['retning'],'lag':c['lag'],'kilde_synlige_piksler':sourcepixels,'HD_rekt_xyxy':box,'ny_alfa_kjerne_piksler':len(xs),'ny_alfa_bbox_xyxy':[int(x0+xs.min()),int(y0+ys.min()),int(x0+xs.max()+1),int(y0+ys.max()+1)]})
+ assert not np.any(a[~used]),(j,'alpha outside cells')
+ magenta=(a>0)&(arr[:,:,0]>240)&(arr[:,:,1]<20)&(arr[:,:,2]>240)
+ assert int(a[magenta].max(initial=0))<=1,j
+ return {'jobb':j,'sha256':sha(p),'ruter':cells,'padding_alfa_null':True,'utenfor_rutevinduer_alfa_null':True,'synlig_magenta':False,'magenta_RGB_rest_med_alfa_1':int(magenta.sum()),'maks_rest_alfa':int(a[magenta].max(initial=0))}
+for e in records:
+ j=e['jobb'];p=root/e['resultat'];assert sha(p)==e['sha256'] and e['egenkontroll']=='OK'
+ meta=json.loads((root/'jobber'/j/'jobb.json').read_text())
+ run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True)
+ assert run.returncode==0 and 'Utfall: OK' in run.stdout,(j,run.stdout,run.stderr)
+ log=r/f'{j}-root-kontroll.txt';log.write_text(run.stdout)
+ if meta['type']=='figur':
+  proof=figureproof(j,p,meta);figchecks.append(proof);n=len(meta['ruter'])
+  assert f'{n} av {n} ruter OK' in run.stdout
+ else:
+  im=Image.open(p);assert im.mode=='RGB' and im.size==(1536,1024)
+  arr=np.asarray(im);px,py,pw,ph=meta['bilde_i_lerret'];outside=np.ones(arr.shape[:2],bool);outside[py:py+ph,px:px+pw]=False
+  assert np.all(arr[outside]==128)
+  unused=np.zeros(arr.shape[:2],bool);unused[py:py+ph,px:px+pw]=True
+  measure=checker.compare(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'),im.crop((px,py,px+pw,py+ph)))
+  for ob in meta['objekter']:
+   x,y,w,h=ob['rekt'];unused[py+y*4:py+(y+h)*4,px+x*4:px+(x+w)*4]=False
+   a,b=measure['eo'][y:y+h,x:x+w],measure['es'][y:y+h,x:x+w];value=checker.corr(a,b);assert a.std()>=1 and value>=.6
+   obchecks.append({'jobb':j,'objekt':ob['bilde'],'rekt':ob['rekt'],'kantkorrelasjon':value,'status':'OK'})
+  assert np.all(arr[unused]==[255,0,255])
+ e.update(kontrollfil=str(log.relative_to(root)),visuelt_godkjent=False,stil_godkjent_av_Tom=True,importert=False,runtime_verifisert=False,klar_for_mottak=True)
+ checks.append({'jobb':j,'sha256':sha(p),'egenkontroll':'OK','format':Image.open(p).mode,'storrelse':[1536,1024]})
+assert sum(len(e['ruter']) for e in figchecks)==61 and len(obchecks)==7
+# Six clear cells from incomplete 06 are evidence only, never counted as a delivered sheet.
+pentry=json.loads((r/'c-leveranser.json').read_text())['ufullstendige'][0];p=root/pentry['resultat_i_rapport'];assert sha(p)==pentry['sha256']
+meta=json.loads((root/'jobber/fig002_06/jobb.json').read_text());held=[c for c in meta['ruter'] if c['rute'] in pentry['avventer_cels']]
+partial=copy.deepcopy(meta);partial['ruter']=[c for c in meta['ruter'] if c not in held];assert len(held)==5 and len(partial['ruter'])==6
+with contextlib.redirect_stdout(out:=io.StringIO()):status=checker.check_figure(p,partial,root/'jobber/fig002_06')
+assert status=='OK' and '6 av 6 ruter OK' in out.getvalue()
+(r/'fig002_06-partiell-root-kontroll.txt').write_text(out.getvalue()+'Utfall: OK, bare seks avklarte ruter; arket er ikke levert.\n')
+partialproof=figureproof('fig002_06',p,partial);partialproof['hele_arket_levert']=False;partialproof['holdte_cels']=[c['rute'] for c in held]
+a=np.asarray(Image.open(p))[:,:,3]
+for c in held:
+ x,y,ex,ey=c['synlig'];assert not np.any(a[32+y*4:32+ey*4,64+x*4:64+ex*4])
+partialproof['holdte_felt_helt_transparente']=True
+# Independently confirm local correction is contained in the four recorded rectangles.
+pote=json.loads((r/'c-potebevis.json').read_text());before=np.array(Image.open(r/'c-fig002_04-for-poter.png'));after=np.array(Image.open(root/'jobber/fig002_04/resultat.png'));assert sha(root/'jobber/fig002_04/resultat.png')==pote['sha256']
+outside=np.ones(after.shape[:2],bool)
+for item in pote['felt']:
+ x,y,ex,ey=item['rekt'];outside[y:ey,x:ex]=False
+assert not np.any(np.any(before!=after,axis=2)&outside)
+# All exact generator outputs, prompts, references, and shared composition recipe.
+provenance=json.loads((r/'c-proveniens.json').read_text())['genereringer'];assert len(provenance)==7
+for call in provenance:
+ for key in ['raw','prompt']:assert sha(root/call[key])==call[key+'_sha256']
+for e in records:
+ for call in e.get('proveniens',[]):
+  for key in ['raa','prompt']:assert sha(root/call[key])==call[key+'_sha256']
+  for ref in call['referanser']:assert sha(root/ref['fil'])==ref['sha256']
+ if e.get('oppskrift'):assert sha(root/e['oppskrift'])==e['oppskrift_sha256']
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+outputs={'root-figurkontroll.json':figchecks,'root-objektkontroll.json':obchecks,'root-partiell-kontroll.json':partialproof,'root-poterekt-kontroll.json':{'sha256':pote['sha256'],'utenfor_fire_rektangler_endret':0},'fremdrift.json':{'dato':stamp,'gren':'gpt-arbeid','produksjonsagent':'gpt-6-astra','modell':'Eksakt bildemodellnavn ikke eksponert','leveranser':records},'sluttkontroll.json':{'dato':stamp,'antall_leveranser':6,'figurruter':61,'ikonfelt':7,'partielle_ruter_ikke_levert_ark':6,'kilder_uendret':len(locks),'ankerkilder_uendret':len(anchors),'utfall_antall':{'OK':6,'SJEKK':0,'FEIL':0},'ikke_klar_for_mottak':[],'runtime':False,'importert':False,'ny_brukergodkjenning':False,'leveranser':checks}}
+for name,data in outputs.items():(r/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+print('6 sheets OK: 61 figure cells, 7 icon fields; 6 separate partial cells verified; 28 protected sources unchanged')

@@ -1,0 +1,30 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image,ImageDraw,ImageFont
+R=Path.cwd();O=R/'rapporter/bestilling052-20261013';font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',15);meta=json.loads((R/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['2'];cs={c['cel']:c for c in meta['cels']};lookup={};allrec=[]
+for n in range(1,8):
+ j=json.loads((R/f'jobber/fig002_{n:02}/jobb.json').read_text());im=Image.open(O/'c-fig002_06-partiell.png' if n==6 else R/f'jobber/fig002_{n:02}/resultat.png').convert('RGBA');src=Image.open(R/f'jobber/fig002_{n:02}/original_1x.png').convert('RGBA')
+ for c in j['ruter']:
+  if n==6 and c['animasjon']==7:continue
+  x,y,w,h=c['rekt'];hd=im.crop((64+x*4,32+y*4,64+(x+w)*4,32+(y+h)*4));ori=src.crop((x,y,x+w,y+h));ori.putdata([(a,b,c,0 if (a,b,c)==(255,0,255) else 255) for a,b,c,_ in ori.getdata()]);lookup[c['rute']]=(hd,ori);allrec.append((n,c,hd,ori))
+for start in range(0,len(allrec),12):
+ arr=allrec[start:start+12];out=Image.new('RGB',(1440,1200),(235,235,235));dr=ImageDraw.Draw(out)
+ for ix,(n,c,hd,ori) in enumerate(arr):
+  xx=(ix%3)*480;yy=(ix//3)*300;dr.text((xx+5,yy+5),f"fig002_{n:02} cel {c['rute']} a{c['animasjon']} r{c['retning']} l{c['lag']}",font=font,fill='black')
+  for k,p in enumerate([ori.resize((ori.width*4,ori.height*4),Image.Resampling.NEAREST),hd]):
+   p.thumbnail((230,265));out.paste(p,(xx+k*240,yy+30),p)
+ out.save(O/f'c-ruteqa-{start//12+1}.png')
+combos=[]
+for c in allrec:
+ n,r,hd,ori=c
+ if r['lag']==3 and n>1:combos.append([({1:129,2:128,3:130}[r['retning']])]+([256] if r['retning']==1 else [])+[r['rute']])
+ if r['lag']==2 and n==5:combos.append([129,r['rute'],385])
+for start in range(0,len(combos),8):
+ out=Image.new('RGB',(1440,800),(235,235,235));dr=ImageDraw.Draw(out)
+ for ix,ids in enumerate(combos[start:start+8]):
+  base=Image.new('RGBA',(360,360))
+  for id in ids:
+   c=cs[id];base.alpha_composite(lookup[id][0],((40+c['rel_x'])*4,(80+c['rel_y'])*4))
+  xx=(ix%4)*360;yy=(ix//4)*400;dr.text((xx+5,yy+5),str(ids),font=font,fill='black');out.paste(base,(xx,yy+35),base)
+ out.save(O/f'c-sammensetting-{start//8+1}.png')
+print('ruter med pilot',len(allrec),'nye',len(allrec)-9,'komposisjoner',len(combos))
