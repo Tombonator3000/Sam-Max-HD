@@ -55,3 +55,6 @@
 - [ ] Fortsett bestilling 28 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
 
 - [x] Rom090 og obj901_01 rettet og levert OK med uttrykkelig valgt vektorrekonstruksjon; tidligere bestilling 21-avvik erstattet.
+
+- [x] Rettet LeChuck Pizza i rom070 etter brukeravklaring; senere aktive eskevarianter skal følge samme tekst.
+- Ved uklart motiv: spør Tom før nytegning. Avklart 260 = stangfot på brygga; 269 = søl/vannplask fra Dunk the Beast-tanken.

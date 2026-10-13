@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1]
+master=Image.open(root/'rapporter/bestilling017-20261013/a-rom070-fullmaster.png').convert('RGB')
+new=Image.open(r/'raa-01.png').convert('RGB').resize((240,112),Image.Resampling.LANCZOS)
+box=(1290,48,1490,132)
+a=np.asarray(new.crop((18,8,218,92))).astype(float);b=np.asarray(master.crop(box)).astype(float)
+yy,xx=np.indices(a.shape[:2]);alpha=np.minimum.reduce([xx,yy,199-xx,83-yy]).clip(0,2)/2
+master.paste(Image.fromarray(np.rint(a*alpha[:,:,None]+b*(1-alpha[:,:,None])).astype('uint8')),box[:2])
+assert master.tobytes()==Image.open(r/'rom070-fullmaster-kandidat.png').convert('RGB').tobytes()
+print('Nytegnet etikett reprodusert byteidentisk')

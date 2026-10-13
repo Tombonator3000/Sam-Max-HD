@@ -1,11 +1,9 @@
-# rom070_del2av2: HD-leveranse
+# rom070_del2av2: LeChuck Pizza rettet
 
-Innebygd ChatGPT-bildegenerator, 2 kall inklusive eventuell smal etikettkorreksjon. Eksakt modellnavn er ikke eksponert. Kilder og feilaktige romnoter er dokumentert i a-kildeplan.md og a-kilde-qa.md under rapporter/bestilling017-20261013. Ordrette prompter med kildekorreksjon er bevart.
+Tom avklarte 13. oktober 2026 at pizzaesken skal ha teksten «LeChuck Pizza», som Monkey Island-referanse. Den tidligere uavklarte/feiltolkede etiketten i bestilling 17 er erstattet med tydelig LeChuck på øvre linje og Pizza på nedre linje. Ingen apostrof eller ekstra s er lagt til.
 
-Resultat SHA256: e5ef3e368e6e3ca5bafe0e18dbe262ee0268e3b6b3ababaf73b85815071e8b0a. Egenkontroll med uendret verktoy/sjekk_leveranse.py: OK. Kontrollfil: rapporter/bestilling017-20261013/a-rom070_del2av2-kontroll.txt.
+Ett nytt kall til innebygd ChatGPT-bildegenerator. Eksakt modellnavn er ikke eksponert. Ordrett jobbprompt er bevart og fulgt av separat autoritativ brukerrettelse. Råbilde, prompt og kilde-/førhasher ligger i rapporter/lechuck-pizza-retting-20261013/.
 
-1536 x 1024 med eksakt RGB128-padding. Rom070 kommer fra én 1920 x 800-master med skift 384 og byte-identisk overlapp 1152; fullmaster-SHA står i a-leveranser.json. Ingen warp, originalmasker eller vektortrace. Vanlig helskalering/plassering og smalt rektangulært uttak fra NYGENERERT etikettkorreksjon er dokumentert i a-oppskrift.py.txt.
+Bare masterrektangel [1290,48,200,84] er endret. Hel nedskalering av den nye lokale tegningen og 2 HD-pikslers rektangulær fjæring mellom to nye bilder; ingen originalmasker, originalpiksler som ny kunst eller geometriwarp. Resten av 1920 × 800-masteren er byteidentisk med levert master. De to 1536 × 1024-romdelene har RGB 128-padding og 1152 × 800 identisk overlapp.
 
-Alle 26 rom070-grupper og rom071-grunnfigurene er visuelt kontrollert. Pizzaeskens små glyffer er fortsatt ikke fullt kildeavklart, selv etter smal retting. Indre ornamenter er ikke sertifisert pikselidentiske. Teknisk OK er ikke visuell godkjenning. Ingen runtime, import eller påkledningsinteraksjon er testet.
-
-Råforsøk, kildeutdrag, master, komplett prompt, oppskrift, QA og 44 uendrede kildehash er bevart i rapportmappen.
+Aktuelt resultat SHA-256: `b275cd84377034f9b1779766cd67eda32f192b97cc9d5c61dc00602a9a260646`. Uendret egenkontroll: OK. Root har lest teksten og sett den i kostymegruppen. Brukeren har avklart teksten; ny individuell godkjenning av selve rettingsbildet, import og runtime er ikke utført. Øvrige historiske smådetaljforbehold fra bestilling 17 består.

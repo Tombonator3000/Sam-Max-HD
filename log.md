@@ -227,3 +227,8 @@
 
 - Bestilling27: ti lag levert OK,24 faktiske objektkontroller. Kaktus på samordnet rødklippelandskap, to styrkemålertilstander og fem utstillingslag med dråper/bobler4/3/1/2. Kran-/hånd-/gulvfeil rettet og uavhengig kontrollert. Midway-master2528×800 har identisk544-overlapp, tom linse og egne vimpler/spak/dør. Se `rapporter/bestilling027-20261013/RAPPORT.md`. Bestilling28 og videre fortsetter.
 - 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T22:44:29+02:00 (Codex)
+
+- LeChuck Pizza rettet i begge rom070-deler etter Toms direkte tekstavklaring. Ett nytt imagegen-kall, bare 200 × 84-masterfelt endret, 1152 × 800-overlapp byteidentisk og begge checkere OK. Senere lag er kartlagt; silhuettilstand070_01 skal fortsatt være tom. Se `rapporter/lechuck-pizza-retting-20261013/RAPPORT.md`.
+- Tom avklarte også stangfot260 og vannplask269 etter originalutdrag. Videre kildeplaner er korrigert.

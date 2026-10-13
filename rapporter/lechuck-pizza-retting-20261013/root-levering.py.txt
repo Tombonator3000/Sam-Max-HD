@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib,runpy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+root=Path(__file__).resolve().parents[2];r=Path(__file__).resolve().parent
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+common=runpy.run_path(str(root/'rapporter/rom090-obj901-vektor-20261013/root-levering.py.txt'),run_name='delivery_helpers')
+m=json.loads((r/'fremdrift.json').read_text());s=json.loads((r/'sluttkontroll.json').read_text())
+assert s['teknisk_utfall']==['OK','OK'] and s['utenfor_etikettrektangel_avvik']==0 and s['overlapp_byteidentisk']
+for e in m['leveranser']:assert sha(root/e['resultat'])==e['sha256'] and e['klar_for_mottak']
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+note='LeChuck Pizza rettet i begge rom070-deler etter Toms direkte tekstavklaring. Ett nytt imagegen-kall, bare 200 × 84-masterfelt endret, 1152 × 800-overlapp byteidentisk og begge checkere OK. Senere lag er kartlagt; silhuettilstand070_01 skal fortsatt være tom. Se `rapporter/lechuck-pizza-retting-20261013/RAPPORT.md`.'
+with (root/'GRAFIKKLISTE.md').open('a') as f:f.write('\n'+note+'\n')
+with (root/'todo.md').open('a') as f:f.write('\n- [x] Rettet LeChuck Pizza i rom070 etter brukeravklaring; senere aktive eskevarianter skal følge samme tekst.\n- Ved uklart motiv: spør Tom før nytegning. Avklart 260 = stangfot på brygga; 269 = søl/vannplask fra Dunk the Beast-tanken.\n')
+with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex)\n\n- '+note+'\n- Tom avklarte også stangfot260 og vannplask269 etter originalutdrag. Videre kildeplaner er korrigert.\n')
+print(common['seal_and_push'](r,m['leveranser'],'GPT: rett LeChuck Pizza etter brukeravklaring'))

@@ -1,0 +1,41 @@
+from pathlib import Path
+import hashlib,json,re,subprocess,runpy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image
+import numpy as np
+root=Path(__file__).resolve().parents[2];r=Path(__file__).resolve().parent
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+locks=json.loads((r/'foerhash.json').read_text())
+for e in locks:assert sha(root/e['fil'])==e['sha256'],e['fil']
+old=Image.open(root/'rapporter/bestilling017-20261013/a-rom070-fullmaster.png').convert('RGB')
+master=Image.open(r/'rom070-fullmaster-kandidat.png').convert('RGB');assert master.size==(1920,800)
+a=np.asarray(old);b=np.asarray(master);mask=np.ones((800,1920),bool);mask[48:132,1290:1490]=False
+assert np.array_equal(a[mask],b[mask]);changed=int(np.any(a!=b,axis=2).sum())
+entries=[]
+for j,x in [('rom070_del1av2',0),('rom070_del2av2',384)]:
+ folder=root/'jobber'/j;before=Image.open(folder/'resultat.png').convert('RGB');assert before.crop((0,112,1536,912)).tobytes()==old.crop((x,0,x+1536,800)).tobytes()
+ im=Image.new('RGB',(1536,1024),(128,128,128));im.paste(master.crop((x,0,x+1536,800)),(0,112));im.save(folder/'resultat.png')
+ diff=np.any(np.asarray(before)!=np.asarray(im),axis=2);allowed=np.zeros((1024,1536),bool);allowed[160:244,1290-x:1490-x]=True;assert not np.any(diff&~allowed)
+ check=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(folder/'resultat.png')],cwd=root,text=True,capture_output=True,check=True)
+ log=r/f'{j}-kontroll.txt';log.write_text(check.stdout+check.stderr);status=re.search(r'Utfall: (OK|SJEKK|FEIL)',check.stdout).group(1);assert status=='OK'
+ note=f'''# {j}: LeChuck Pizza rettet
+
+Tom avklarte 13. oktober 2026 at pizzaesken skal ha teksten «LeChuck Pizza», som Monkey Island-referanse. Den tidligere uavklarte/feiltolkede etiketten i bestilling 17 er erstattet med tydelig LeChuck på øvre linje og Pizza på nedre linje. Ingen apostrof eller ekstra s er lagt til.
+
+Ett nytt kall til innebygd ChatGPT-bildegenerator. Eksakt modellnavn er ikke eksponert. Ordrett jobbprompt er bevart og fulgt av separat autoritativ brukerrettelse. Råbilde, prompt og kilde-/førhasher ligger i rapporter/lechuck-pizza-retting-20261013/.
+
+Bare masterrektangel [1290,48,200,84] er endret. Hel nedskalering av den nye lokale tegningen og 2 HD-pikslers rektangulær fjæring mellom to nye bilder; ingen originalmasker, originalpiksler som ny kunst eller geometriwarp. Resten av 1920 × 800-masteren er byteidentisk med levert master. De to 1536 × 1024-romdelene har RGB 128-padding og 1152 × 800 identisk overlapp.
+
+Aktuelt resultat SHA-256: `{sha(folder/'resultat.png')}`. Uendret egenkontroll: {status}. Root har lest teksten og sett den i kostymegruppen. Brukeren har avklart teksten; ny individuell godkjenning av selve rettingsbildet, import og runtime er ikke utført. Øvrige historiske smådetaljforbehold fra bestilling 17 består.
+'''
+ (folder/'notat.md').write_text(note)
+ entries.append({'jobb':j,'resultat':str((folder/'resultat.png').relative_to(root)),'sha256':sha(folder/'resultat.png'),'egenkontroll':status,'kontrollfil':str(log.relative_to(root)),'fullmaster':str((r/'rom070-fullmaster-kandidat.png').relative_to(root)),'fullmaster_sha256':sha(r/'rom070-fullmaster-kandidat.png'),'masterklipp':[x,0,1536,800],'klar_for_mottak':True,'retting_av_levert_jobb':True,'visuelt_godkjent':False,'importert':False,'runtime':False,'runtime_verifisert':False,'tekst_avklart_av_bruker':True})
+l=Image.open(root/'jobber/rom070_del1av2/resultat.png').crop((384,112,1536,912));rr=Image.open(root/'jobber/rom070_del2av2/resultat.png').crop((0,112,1152,912));assert l.tobytes()==rr.tobytes()
+for e in locks:
+ if Path(e['fil']).name not in ['resultat.png','notat.md']:assert sha(root/e['fil'])==e['sha256']
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+(r/'fremdrift.json').write_text(json.dumps({'dato':stamp,'gren':'gpt-arbeid','leveranser':entries,'genereringskall':1,'verktøy':'Innebygd ChatGPT-bildegenerator','eksakt_bildemodell':'ikke eksponert'},ensure_ascii=False,indent=2)+'\n')
+(r/'sluttkontroll.json').write_text(json.dumps({'dato':stamp,'beskyttede_kilder_uendret':8,'endrede_masterpiksler':changed,'utenfor_etikettrektangel_avvik':0,'overlapp':[1152,800],'overlapp_byteidentisk':True,'teknisk_utfall':['OK','OK'],'tekst_lest_av_root':'LeChuck / Pizza','runtime':False},ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'leveranser':entries,'endrede_masterpiksler':changed},ensure_ascii=False))
