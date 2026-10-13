@@ -1,0 +1,7 @@
+from PIL import Image
+from pathlib import Path
+r=Path("rapporter/bestilling015-20261013")
+for j,n in [("obj611_01",1),("obj612_01",2),("obj613_01",2)]:
+    out=Image.new("RGB",(1536,1024),(128,128,128))
+    out.paste(Image.open(r/f"{j}-raa-{n}.png").convert("RGB").crop((240,464,1296,560)),(240,464))
+    out.save(Path("jobber")/j/"resultat.png")

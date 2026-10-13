@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib
+b=Path.cwd();r=b/'rapporter/bestilling015-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+jobs=['obj607_01','obj608_01','obj609_01','obj610_01'];entries=[];sheet=Image.new('RGB',(1536,960),(128,128,128));d=ImageDraw.Draw(sheet)
+for i,j in enumerate(jobs):
+ p=b/'jobber'/j/'resultat.png';m=json.loads((p.parent/'jobb.json').read_text());x,y,w,h=m['bilde_i_lerret'];n=2 if j in ['obj609_01','obj610_01'] else 1
+ status='SJEKK' if j=='obj609_01' else 'OK'
+ assert 'Utfall: '+status in (r/(j+'-kontroll.txt')).read_text()
+ d.text((8,i*240+3),j+' original / HD',fill='white')
+ for row,name in enumerate(['referanse.png','resultat.png']):sheet.paste(Image.open(p.parent/name).crop((0,464,1536,560)),(0,i*240+25+row*100))
+ entries.append({'jobb':j,'resultat':str(p.relative_to(b)),'sha256':sha(p),'egenkontroll':status,'kontrollfil':str((r/(j+'-kontroll.txt')).relative_to(b)),'forsok':n,'raw':[{'fil':str((r/(j+f'-raa{k:02}.png')).relative_to(b)),'sha256':sha(r/(j+f'-raa{k:02}.png')),'prompt':str((r/(j+f'-prompt{k:02}.txt')).relative_to(b))} for k in range(1,n+1)],'runtime':False,'ny_brukergodkjenning':False})
+ sources=[v for v in json.loads((r/'kildehash.json').read_text()) if v['fil'].startswith('jobber/'+j+'/')]
+ note='To omtegningsforsøk. Første resultat FEIL, råforsøk bevart. ' if n==2 else 'Ett genereringsforsøk. '
+ if status=='SJEKK':note+='Gjeldende SJEKK: skift0.97, blokk1.98, kantlikhet0.94. Stripeenden og veikant har små lokale avvik. Ikke kalt teknisk OK. '
+ (p.parent/'notat.md').write_text('# Leveransenotat\n\n'+note+'Innebygd ChatGPT imagegen; eksakt bildemodell er ikke eksponert. Ordrett jobbprompt med separat lagpresisering.\n\nKilde er et lavt Highway Surfing-veisegment, ikke HUD eller skilt. Ulike sidevinkler og den ene gulstripen er bevart uten biler, tekst eller nye markører. Genererte mørke felt har svake tonevariasjoner; de er motiv og ikke transparens.\n\nCanvas1536 × 1024, motivfelt '+str(m['bilde_i_lerret'])+', eksakt RGB128-padding. Kun helskalering og rektangulær plassering. Ingen vektortrace, originalsilhouette eller lokal warp.\n\nEgenkontroll: '+status+'. Resultat SHA256: '+sha(p)+'\n\nLåste kildehash: '+json.dumps(sources,ensure_ascii=False)+'\n\nRuntime:false. Ny individuell brukergodkjenning:false. Se b-kilde-qa.md og b-familie.png.\n')
+sources=json.loads((r/'kildehash.json').read_text());assert all(sha(b/v['fil'])==v['sha256'] for v in sources)
+sheet.save(r/'b-familie.png')
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':entries,'kilder_kontrollert':len(sources),'kilder_uendret':True},ensure_ascii=False,indent=2)+'\n')
+(r/'b-kilde-qa.md').write_text('# Bestilling15 B, kilde-QA\n\nObj607,608 og610 har OK. Obj609 har SJEKK etter andre forsøk: skift0.97, blokk1.98, kantlikhet0.94. Første609/610 var FEIL og ble omtegnet. SJEKK er ikke godkjent automatisk og må inngå i roots mottaksvurdering.\n\nAlle40 låste kilder er kontrollert uendret. Kildeplanen og Highway Surfing-registeret er brukt. Råbilder og ordrette prompter med separat lagpresisering er bevart. Ingen vektortrace eller masker fra originalen.\n\nFamilie-QA:607 har gulstripe som heller venstre nedover,608 høyre nedover; begge er bredere og lysere enn609/610.609 har nesten rett stripe fra toppen,610 skrå stripe mot venstre nedover. Veikantene har de ulike hellingene. Ingen nye HUD-felt, tekst, biler, veistriper eller objekter. Både nesten svarte sidefelt og tomme veirader er bevart.\n\nForbehold:609 har fortsatt litt lengre stripe og lokale kantavvik, i samsvar med SJEKK. Generatede flater har svak malerisk tonevariasjon, også i mørke sidefelt; ingen ny asfaltkorntekstur eller fysisk detalj er tilsiktet. Den presise RGB7,7,0-flatheten er ikke garantert av genereringen. Lave felt er særlig følsomme for få pikslers avvik.\n\nB-familiearket viser original over HD for hver jobb. Motortegning, segmentrekkefølge, dynamisk palett og sømløshet mot øvrige veisegmenter er ikke runtime-testet. Runtime og individuell ny brukergodkjenning er false.\n')
+print('3 OK, 1 SJEKK; 40 kilder uendret')

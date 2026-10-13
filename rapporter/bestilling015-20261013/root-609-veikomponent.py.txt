@@ -1,0 +1,70 @@
+from pathlib import Path
+import json, shutil, hashlib, subprocess
+import numpy as np
+from PIL import Image, ImageFilter
+
+root = Path(__file__).resolve().parents[2]
+report = root/'rapporter/bestilling015-20261013'
+job = root/'jobber/obj609_01'
+meta = json.loads((job/'jobb.json').read_text())
+x,y,w,h = meta['bilde_i_lerret']
+before = Image.open(job/'resultat.png').convert('RGB')
+before.save(report/'root-609-for-veikomponent.png')
+# Clean road is reconstructed from the previous NEW generated road and the
+# locally image-generated, color-matched underlay. No source pixels are pasted.
+road = Image.open(report/'c-609-for-komponent.png').convert('RGB').crop((x,y,x+w,y+h))
+underlay = Image.open(report/'c-609-underlag-fargematchet.png').convert('RGB')
+old_alpha = Image.open(report/'c-609-stripe-generert-alfa.png').getchannel('A')
+mask = Image.new('L',(128,80),0)
+mask.paste(old_alpha.point(lambda a:255 if a>0 else 0),(32,0))
+mask = mask.filter(ImageFilter.MaxFilter(3)).filter(ImageFilter.GaussianBlur(.45))
+patch = road.crop((468,0,596,80))
+road.paste(Image.composite(underlay,patch,mask),(468,0))
+road.save(report/'root-609-generert-vei-uten-stripe.png')
+
+def bounds(arr):
+    # Source contributes only a rectangular measurement, never its contour.
+    yy,xx = np.nonzero(arr[...,2]>20)
+    return [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+
+source = np.asarray(Image.open(job/'original_1x.png').convert('RGB'))
+target = [v*4 for v in bounds(source)]
+generated = bounds(np.asarray(road))
+out = Image.new('RGB',(w,h),(7,7,0))
+out.paste(road.crop(generated).resize((target[2]-target[0],target[3]-target[1]),Image.Resampling.LANCZOS),target[:2])
+stripe = Image.open(report/'c-609-stripe-plassert-alfa.png').convert('RGBA')
+out.paste(stripe,(500,0),stripe)
+candidate = before.copy()
+candidate.paste(out,(x,y))
+candidate.save(report/'root-609-presis-kandidat.png')
+
+def landmark_error(image):
+    a = np.asarray(image)
+    delta=[]
+    for row in range(2,22):
+        original=np.flatnonzero(source[row,:,2]>20)
+        new=np.flatnonzero(a[row*4+2,:,2]>20)
+        delta.extend([int(new[0]-original[0]*4),int(new[-1]-((original[-1]+1)*4-1))])
+    return {'mean_abs_hd':float(np.mean(np.abs(delta))), 'maximum_abs_hd':int(max(map(abs,delta))), 'deltas_hd':delta}
+
+evidence = {'generated_component_bounds':generated,'source_rectangle_target_hd':target,
+    'transform':'One global rectangle resize of the NEW generated road component; separate corrected generated stripe stays fixed',
+    'original_contour_mask_used':False,'source_pixels_pasted':False,'local_warp':False,
+    'before_landmark_errors':landmark_error(before.crop((x,y,x+w,y+h))),
+    'after_landmark_errors':landmark_error(out),
+    'stripe_bbox_hd':[500,0,524,40],'runtime':False,
+    'before_sha256':hashlib.sha256((job/'resultat.png').read_bytes()).hexdigest(),
+    'candidate_sha256':hashlib.sha256((report/'root-609-presis-kandidat.png').read_bytes()).hexdigest()}
+assert evidence['after_landmark_errors']['mean_abs_hd'] < evidence['before_landmark_errors']['mean_abs_hd']
+control=report/'root-609-kontroll'
+control.mkdir(exist_ok=True)
+for name in ['jobb.json','referanse.png','original_1x.png']:
+    shutil.copyfile(job/name,control/name)
+shutil.copyfile(report/'root-609-presis-kandidat.png',control/'resultat.png')
+python='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+p=subprocess.run([python,str(root/'verktoy/sjekk_leveranse.py'),str(control/'resultat.png')],capture_output=True,text=True)
+(report/'root-609-presis-kontroll.txt').write_text(p.stdout+p.stderr)
+evidence['checker_returncode']=p.returncode
+(report/'root-609-veikomponent-bevis.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(evidence,ensure_ascii=False,indent=2))
+print(p.stdout)

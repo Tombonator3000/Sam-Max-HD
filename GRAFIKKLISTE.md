@@ -229,16 +229,16 @@ Rom 61, 62, 66, 67, 68.
 
 Rom 68.
 
-- [ ] `obj604_01` (rom 68 Highway Surfing (minispill), objekt 604 tilstand 01)
-- [ ] `obj605_01` (rom 68 Highway Surfing (minispill), objekt 605 tilstand 01)
-- [ ] `obj606_01` (rom 68 Highway Surfing (minispill), objekt 606 tilstand 01)
-- [ ] `obj607_01` (rom 68 Highway Surfing (minispill), objekt 607 tilstand 01)
-- [ ] `obj608_01` (rom 68 Highway Surfing (minispill), objekt 608 tilstand 01)
-- [ ] `obj609_01` (rom 68 Highway Surfing (minispill), objekt 609 tilstand 01)
-- [ ] `obj610_01` (rom 68 Highway Surfing (minispill), objekt 610 tilstand 01)
-- [ ] `obj611_01` (rom 68 Highway Surfing (minispill), objekt 611 tilstand 01)
-- [ ] `obj612_01` (rom 68 Highway Surfing (minispill), objekt 612 tilstand 01)
-- [ ] `obj613_01` (rom 68 Highway Surfing (minispill), objekt 613 tilstand 01)
+- [x] `obj604_01` (rom 68 Highway Surfing (minispill), objekt 604 tilstand 01)
+- [x] `obj605_01` (rom 68 Highway Surfing (minispill), objekt 605 tilstand 01)
+- [x] `obj606_01` (rom 68 Highway Surfing (minispill), objekt 606 tilstand 01)
+- [x] `obj607_01` (rom 68 Highway Surfing (minispill), objekt 607 tilstand 01)
+- [x] `obj608_01` (rom 68 Highway Surfing (minispill), objekt 608 tilstand 01)
+- [x] `obj609_01` (rom 68 Highway Surfing (minispill), objekt 609 tilstand 01)
+- [x] `obj610_01` (rom 68 Highway Surfing (minispill), objekt 610 tilstand 01)
+- [x] `obj611_01` (rom 68 Highway Surfing (minispill), objekt 611 tilstand 01)
+- [x] `obj612_01` (rom 68 Highway Surfing (minispill), objekt 612 tilstand 01)
+- [x] `obj613_01` (rom 68 Highway Surfing (minispill), objekt 613 tilstand 01)
 
 ## Bestilling 16
 
@@ -3451,3 +3451,5 @@ Bestilling 13: 8 OK og 2 SJEKK (obj566_01 og rom060 del 2). Ti bilder levert, ko
 Rom049 er senere rettet etter Toms uttrykkelige vektorvalg og levert OK; tidligere avvist bestilling 11-kandidat er historikk. Se `rapporter/rom049-vektor-20261013/RAPPORT.md`. Noen trappekanter er bevart ved tette knutepunkter.
 
 Bestilling 14: 7 OK og 3 SJEKK, ti bilder levert. Komponentkontroll av stjerner og lokale figur-/palettrettinger bevart. Historisk promptmetadataavvik dokumentert, beskyttede kilder urørt. Se `rapporter/bestilling014-20261013/RAPPORT.md`. Bestilling 15 fortsetter.
+
+Bestilling 15: 9 OK og obj605_01 SJEKK, ti veisegmenter levert. Genererte stripe-/veikomponenter presist skalert, lokale restavvik dokumentert. Se `rapporter/bestilling015-20261013/RAPPORT.md`. Bestilling 16 fortsetter.

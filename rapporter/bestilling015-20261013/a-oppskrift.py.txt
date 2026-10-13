@@ -1,0 +1,31 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import hashlib,json,re
+import numpy as np
+B=Path.cwd(); R=B/'rapporter/bestilling015-20261013'
+settings={'obj604_01':('a-obj604_01-raa.png',[128,464,1408,559],1),'obj605_01':('a-obj605_01-raa02.png',[128,464,1408,559],2),'obj606_01':('a-obj606_01-raa.png',[128,463,1408,560],1)}
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+measure={}; deliveries=[]; contact=Image.new('RGB',(1320,780),'#aaaaaa');d=ImageDraw.Draw(contact)
+for index,(j,(raw,box,n)) in enumerate(settings.items()):
+ im=Image.open(R/raw).convert('RGB').crop(box).resize((1280,96),Image.Resampling.LANCZOS)
+ a=np.array(im); a[a.max(axis=2)<40]=(7,7,0);im=Image.fromarray(a)
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im,(128,464))
+ assert np.array_equal(np.array(out),np.array(Image.open(B/f'jobber/{j}/resultat.png')))
+ measure[j]={}
+ for k,f in [('original','referanse.png'),('HD','resultat.png')]:
+  aa=np.asarray(Image.open(B/f'jobber/{j}/{f}').convert('RGB'))[464:560,128:1408]
+  road=aa[:,:,2]>40; yellow=(aa[:,:,0].astype(int)-aa[:,:,2]>35)&(aa[:,:,1]>130)
+  ys,xs=np.where(yellow)
+  measure[j][k]={'vei_topp':np.where(road[0])[0][[0,-1]].tolist(),'vei_bunn':np.where(road[95])[0][[0,-1]].tolist(),'gul_forste_y':int(ys.min()),'gul_forste_x':np.where(yellow[ys.min()])[0][[0,-1]].tolist(),'gul_siste_x':np.where(yellow[95])[0][[0,-1]].tolist()}
+  y=index*260+(24 if k=='original' else 150)
+  d.text((20,y-18),j+' '+k,fill='black');contact.paste(Image.fromarray(aa),(20,y))
+ status=re.search(r'Utfall: (\w+)',(R/f'a-{j}-kontroll.txt').read_text())[1]
+ deliveries.append({'jobb':j,'resultat':f'jobber/{j}/resultat.png','sha256':sha(B/f'jobber/{j}/resultat.png'),'egenkontroll':status,'kontrollfil':f'rapporter/bestilling015-20261013/a-{j}-kontroll.txt','forsok':n,'runtime':False,'ny_brukergodkjenning':False,'raa':str((R/raw).relative_to(B)),'raa_sha256':sha(R/raw),'generert_utsnitt':box,'motivfelt':[128,464,1280,96],'presis_padding':True})
+contact.save(R/'a-samlet-qa.png')
+(R/'a-familiemaal.json').write_text(json.dumps(measure,indent=2))
+(R/'a-leveranser.json').write_text(json.dumps({'leveranser':deliveries},indent=2))
+locks=json.loads((R/'kildehash.json').read_text()); proof=[dict(x,uendret=sha(B/x['fil'])==x['sha256']) for x in locks]
+assert all(x['uendret'] for x in proof)
+(R/'a-kildebevis.json').write_text(json.dumps(proof,indent=2))
+print(json.dumps(measure,indent=2))
+print(json.dumps(deliveries,indent=2))

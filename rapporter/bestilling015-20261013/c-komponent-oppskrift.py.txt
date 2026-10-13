@@ -1,0 +1,61 @@
+from PIL import Image, ImageFilter, ImageDraw
+import numpy as np, json, hashlib, shutil, subprocess
+from pathlib import Path
+B=Path.cwd(); R=B/'rapporter/bestilling015-20261013'
+G=Path('/home/tombonator3000t/.codex/generated_images/01a135e9-14ca-7082-b901-a0ecf3e0b936')
+data=[('609',468,[500,0,525,45],[500,0,524,40],'cd30ef97-6c8c-497f-9a6d-6b83229f36c1'),('612',536,[553,0,621,45],[560,0,620,40],'2406be6a-14a9-4077-878e-ccf513253107'),('613',392,[407,0,473,42],[408,0,468,40],'88a0bf91-8da7-40e5-855f-01c18d350e1f')]
+evidence=[]
+qa=Image.new('RGB',(1280,400),(128,128,128))
+for row,(n,cx,old,new,uuid) in enumerate(data):
+ j='obj'+n+'_01'; out=B/'jobber'/j/'resultat.png'
+ snap=R/('c-'+n+'-for-komponent.png')
+ if not snap.exists(): shutil.copy2(out,snap)
+ im=Image.open(snap).convert('RGB'); A=np.array(im)
+ raw=R/('c-'+n+'-underlag-raa.png'); shutil.copy2(G/('exec-'+uuid+'.png'),raw)
+ u=Image.open(raw).convert('RGB').resize((128,80),Image.Resampling.LANCZOS)
+ u.save(R/('c-'+n+'-underlag-128x80.png'))
+ region=np.array(im.crop((240+cx,464,240+cx+128,544))).astype(float)
+ U=np.array(u).astype(float)
+ # Alpha is inferred solely from generated yellow chroma, relative to generated road underlay.
+ chrom=np.minimum(region[:,:,0],region[:,:,1])-region[:,:,2]
+ # Match generated underlay color to surrounding generated road using an affine color-offset plane.
+ yy,xx=np.mgrid[:80,:128]; features=np.stack([np.ones_like(xx),xx/128,yy/80],axis=-1)
+ safe=chrom < -5
+ for channel in range(3):
+  fit=np.linalg.lstsq(features[safe],(region-U)[:,:,channel][safe],rcond=None)[0]
+  U[:,:,channel]+=features@fit
+ U=np.clip(U,0,255);u=Image.fromarray(U.round().astype('uint8'))
+ u.save(R/('c-'+n+'-underlag-fargematchet.png'))
+ bgchrom=np.minimum(U[:,:,0],U[:,:,1])-U[:,:,2]
+ peak=np.percentile(chrom[chrom>50],90)
+ alpha=np.clip((chrom-bgchrom)/(peak-bgchrom),0,1)
+ alpha[chrom<0]=0
+ color=np.clip((region-(1-alpha[:,:,None])*U)/np.maximum(alpha[:,:,None],.001),0,255)
+ rgba=np.dstack([color,alpha*255]).round().astype('uint8')
+ x0,y0,x1,y1=old; box=(x0-cx,y0,x1-cx,y1)
+ comp=Image.fromarray(rgba).crop(box)
+ comp.save(R/('c-'+n+'-stripe-generert-alfa.png'))
+ # PIL premultiplied RGBa resize avoids dark edge contamination.
+ scaled=comp.convert('RGBa').resize((new[2]-new[0],new[3]-new[1]),Image.Resampling.LANCZOS).convert('RGBA')
+ scaled.save(R/('c-'+n+'-stripe-plassert-alfa.png'))
+ # Replace old generated stripe footprint only, with generated road; small feather from generated mask.
+ mask=Image.fromarray((alpha>0).astype('uint8')*255).filter(ImageFilter.MaxFilter(3)).filter(ImageFilter.GaussianBlur(.45))
+ clean=Image.composite(u,Image.fromarray(region.astype('uint8')),mask)
+ result=im.copy(); result.paste(clean,(240+cx,464))
+ result.paste(scaled,(240+new[0],464+new[1]),scaled)
+ result.save(out)
+ diff=np.any(np.array(result)!=A,axis=2)
+ ys,xs=np.where(diff)
+ # Full road edges and all pixels outside the generated component neighborhood remain unchanged.
+ allowed=np.zeros(diff.shape,bool);allowed[464:544,240+cx:240+cx+128]=True
+ assert not diff[~allowed].any()
+ bbox=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
+ evidence.append(dict(jobb=j,gammel_bbox_lokalHD=old,ny_bbox_lokalHD=new,endret_bbox_lerret=bbox,endret_antall=int(diff.sum()),byteidentisk_utenfor_bbox=True,for_sha256=hashlib.sha256(snap.read_bytes()).hexdigest(),etter_sha256=hashlib.sha256(out.read_bytes()).hexdigest(),underlag_sha256=hashlib.sha256(raw.read_bytes()).hexdigest()))
+ for col,p in enumerate([B/'jobber'/j/'referanse.png',snap,out]):
+  thumb=Image.open(p).crop((240+cx,464,240+cx+128,544)).resize((384,240),Image.Resampling.NEAREST if col==0 else Image.Resampling.LANCZOS)
+  # QA displays lower half height at 1.5 scale, preserving all crop.
+  thumb=thumb.resize((384,120))
+  qa.paste(thumb,(col*420,row*130))
+qa.save(R/'c-komponent-qa.png')
+(R/'c-komponent-bevis.json').write_text(json.dumps(evidence,indent=2)+'\n')
+print(json.dumps(evidence,indent=2))

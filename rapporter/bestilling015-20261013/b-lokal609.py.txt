@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,sys,io,contextlib,json
+b=Path.cwd();r=b/'rapporter/bestilling015-20261013';j=b/'jobber/obj609_01'
+sys.path.insert(0,str(b/'verktoy'));import sjekk_leveranse as ck
+before=Image.open(j/'resultat.png').convert('RGB')
+raw=Image.open(r/'obj609_01-raa03.png').convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+box=(730,464,775,516);after=before.copy();after.paste(raw.crop(box),box[:2]);p=r/'obj609_01-lokal03.png';after.save(p)
+a=np.array(before);z=np.array(after);outside=np.ones(a.shape[:2],bool);outside[464:516,730:775]=False
+assert np.array_equal(a[outside],z[outside])
+buf=io.StringIO()
+with contextlib.redirect_stdout(buf):status=ck.check_picture(p,json.loads((j/'jobb.json').read_text()),j)
+(r/'obj609_01-kontroll03.txt').write_text(buf.getvalue());print(buf.getvalue())
+for tag,im in [('original',Image.open(j/'referanse.png')),('before',before),('after',after)]:
+ a=np.array(im)[464:516,730:775];sel=(a[:,:,0]>120)&(a[:,:,1]>120)&(a[:,:,2]<110);ys,xs=np.where(sel);print(tag,int(ys.min()+464),int(ys.max()+464),int(xs.min()+730),int(xs.max()+730))
