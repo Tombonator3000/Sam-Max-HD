@@ -1,0 +1,36 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image
+import numpy as np
+p=Path('rapporter/bestilling045-20261013');H=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();J=lambda f:json.loads(Path(f).read_text());write=lambda f,v:Path(f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+prov=[]
+for group,n,refs in [(g,1,[f'c-{g}-source.png',f'c-{g}-stil.png']) for g in J(p/'c-atlasplan.json')]+[('oyne',2,['c-oyne-source.png']),('lampe',2,['c-lampe-source2.png']),('lampe',3,['c-lampe-source2.png'])]:
+ raw=p/f'c-{group}-raa{n}.png';prompt=p/f'c-{group}-prompt{n}.txt';prov.append({'gruppe':group,'forsok':n,'verktøy':'innebygd ChatGPT imagegen','eksakt_modell':'ikke eksponert','raw':str(raw),'raw_sha256':H(raw),'prompt':str(prompt),'prompt_sha256':H(prompt),'referanser':[{'fil':str(p/r),'sha256':H(p/r)} for r in refs]})
+write(p/'c-proveniens.json',prov)
+source=[]
+for f in ['kildehash.json','root-ekstra-kildehash.json']:
+ for x in J(p/f):source.append({'fil':x['fil'],'forventet':x['sha256'],'faktisk':H(x['fil']),'uendret':H(x['fil'])==x['sha256']})
+assert all(x['uendret'] for x in source);write(p/'c-kildehashkontroll.json',{'antall':len(source),'alle_uendret':True,'filer':source})
+notes={
+'lag061_01_del1av2':'Smal port 581_01 er kildeidentisk med grunnrommet og gjenbruker levert HD. Første plankevinkel og grønn/gul slakk strikk med løkker, grå fester og lavt endestykke. Strikkens nye løkker er rundere og fester mer modellerte enn få kildepiksler.',
+'lag061_02_del1av2':'Lav foldport i mellomvidde, svart rom over. Egen doble plankekant: separasjonen er tydeligere og mer materiell i HD; ikke påstått kildebevist brudd eller ny mekanikk.',
+'lag061_03_del1av2':'Bred lav foldport og lavere plankestilling. Foldportens diagonaler og mørke felt er beholdt. Doble plankekanter er mer klart adskilt enn den lave originaloppløsningen.',
+'lag061_04_del1av2':'Fjerde plankevinkel og tent grønn lampe. Første lampe manglet grønne side-/bunnmarkeringer. Lokalt forsøk 2 bevarer lampe og venstre grønne streker uten nye skruer; kun nederste 4 HD-rader fra forsøk 3 gir den kildeegne grønne bunnlinjen. Ingen kildemasker eller originale leveransepiksler.',
+'lag061_05_del2av2':'Lang rett grønn/gul strikk og grått feste. Rekkverk/plankekant ligger foran strikken slik kilden viser. Dette er egen tilstand i del 2, ikke høyredel av de andre fire tilstandene.',
+'lag066_01':'Nøyaktig én gjenværende bombe og én trampoline. Svart/hvit DeSoto med gul dørmarkering, grønn kompaktbil med egen skrå frontstilling. Åpent øye 597_01 er kildeidentisk med grunnrom og gjenbrukes. Bilene har tydeligere krom/hjul enn kilden.',
+'lag066_02':'Ingen bombe, to trampoliner, gul taxi avskåret ved venstre kant og helt lukket øye. Øyeforsøk 1 ga ny mørk kontur/høylys og er forkastet; source-only forsøk 2 valgt. Taxiens rutebånd, takskilt og bakre retning bevares, uten ny lesbar tekst.',
+'lag066_03':'Rød trekkbil med blå campingvogn klipt av ved venstre kant. Delvis lukket øye har lyst øvre felt og mørkt nedre felt; samme kildebaserte forsøk 2 som 597_02. Campingvognens røde vindusdetaljer er tydeligere gardinaktige i HD, ikke kildebevist materiale.',
+'lag066_04':'Lang svart likbil sett fra siden med front mot høyre. Tomme grønne felt, egne hjulplasseringer og avstand til rød kant bevart. Panser, krom og karosseri er mer avrundet/modellert enn originalens blokkformer.'}
+records=[];proof=[]
+for j in J(p/'c-jobber.json'):
+ d=Path('jobber')/j;m=J(d/'jobb.json');out=d/'resultat.png';ctrl=p/f'{j}-kontroll.txt';assert 'Utfall: OK' in ctrl.read_text();img=Image.open(out);assert img.mode=='RGB' and img.size==(1536,1024);a=np.array(img);base=np.array(Image.open(m['bilde_to']));mask=np.zeros((1024,1536),bool)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=m['bilde_i_lerret'][0]+(x-m['region'][0])*4;y=112+(y-m['region'][1])*4;mask[y:y+h*4,x:x+w*4]=True
+ assert np.array_equal(a[~mask],base[~mask]);bx,by,bw,bh=m['bilde_i_lerret'];pad=np.ones((1024,1536),bool);pad[by:by+bh,bx:bx+bw]=False;assert (a[pad]==128).all();proof.append({'jobb':j,'grunnrom':m['bilde_to'],'grunn_sha256':H(m['bilde_to']),'utenfor_objektunion_avvik':0,'padding_RGB128':True,'resultat_sha256':H(out)})
+ groups={g for g,info in J(p/'c-atlasplan.json').items() if any(u['jobb']==j for u in info['units'])}
+ if j=='lag061_04_del1av2':groups.add('lampe')
+ rows=[x for x in prov if x['gruppe'] in groups];records.append({'jobb':j,'resultat':str(out),'sha256':H(out),'egenkontroll':'OK','kontrollfil':str(ctrl),'forsok':max(x['forsok'] for x in rows),'genereringskall':len(rows),'raw':[{'fil':x['raw'],'sha256':x['raw_sha256']} for x in rows],'proveniens':str(p/'c-proveniens.json'),'grunnrom':m['bilde_to'],'grunn_sha256':H(m['bilde_to']),'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'visuell_qa':notes[j]})
+ (d/'notat.md').write_text(f'# {j}\n\n{notes[j]}\n\nInnebygd ChatGPT imagegen, eksakt modell ikke eksponert. Ordrett originalprompt med separat kilde-/utsnittspresisering, råbilder og SHA er bevart i {p}/c-proveniens.json. Vanlig helskalering av nye felt og eksakt metadatarektangelplassering på levert HD-grunnrom; ingen originalmasker, tracing eller lokal warp. Se c-komposisjon.py.txt.\n\nResultat SHA-256: `{H(out)}`. Uendret kontroll: OK ({ctrl}). Felt og helscene er visuelt sammenlignet, se forbehold ovenfor. Utenfor objektunionen er grunnrommet byte-identisk, 1536 x 1024 RGB og padding 128 verifisert. Beskyttede kilder uendret. Runtime og ny individuell brukergodkjenning er ikke bekreftet.\n')
+write(p/'c-leveranser.json',{'leveranser':records});write(p/'c-underlagsbevis.json',proof)
+(p/'c-kilde-qa.md').write_text('# Bestilling 45 C: kilde- og motivkontroll\n\nNi leveranser, 22 metadatafelt. Lag068_01 tilhører annen agent og er ikke produsert her. Rotplanen og originale felt/helscener ble undersøkt før tegning. Alle 56 låste beskyttede kilder er uendret. Åtte innebygde imagegen-kall er bevart med prompt-/rå-/referansehash i c-proveniens.json. Eksakt modellnavn er ikke eksponert.\n\nAlle ni uendrede checker-kjøringer gir OK. Feltmålinger finnes i c-objektkontroll.json; åtte c-objektqa-ark og c-helsceneqa.png er visuelt kontrollert. Korrelasjon alene brukes ikke som identitets- eller tilstandsbevis.\n\n'+'\n\n'.join('## '+j+'\n\n'+v for j,v in notes.items())+'\n\n## Metode og begrensninger\n\nHele nygenererte lokale felt er skalert og plassert i metadatarektangler. Grunnrommets øvrige piksler er byte-identiske. 581_01 og 597_01 er selvstendig bevist kildeidentiske med grunnrommet og gjenbruker korrekt levert HD-felt. Lampen kombinerer kun to nytegnede rektangler; ingen originale piksler eller konturmasker. Plankers doublekskanter, bilers krom og gardinaktige vindusdetaljer er tydeligere modellert enn originalen og er eksplisitte kvalitetsforbehold. Runtime og ny individuell brukergodkjenning er uverifisert.\n')
+print(len(records),'leveranser',len(prov),'kall',len(source),'kilder')

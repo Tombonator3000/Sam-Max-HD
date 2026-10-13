@@ -317,3 +317,8 @@
 
 - Bestilling 44: ti lag levert, åtte OK og to SJEKK (portene, blokk 1,02). Alle 14 egne felt er OK; 570-underlag og panoramaoverlapp er bytekontrollert. Se `rapporter/bestilling044-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T00:22:40+02:00 (Codex, Astra)
+
+- Bestilling 45: ni lag levert OK med22 egne felt; springbrett02/03 rettet etter motivkontroll. Lag06801 holdes tilbake med FEIL og behandles videre med068-familien. Se `rapporter/bestilling045-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

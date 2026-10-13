@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json
+p=Path('rapporter/bestilling045-20261013');plan=json.loads((p/'c-atlasplan.json').read_text());units=[]
+for group,info in plan.items():
+ choice=2 if group=="oyne" else 1
+ raw=Image.open(p/f'c-{group}-raa{choice}.png').convert('RGB').resize(info['size'],Image.Resampling.LANCZOS)
+ for u in info['units']:
+  x,y,w,h=u['atlasrekt'];rx,ry,rw,rh=u['romrekt'];im=raw.crop((x,y,x+w,y+h)).resize((rw*4,rh*4),Image.Resampling.LANCZOS);im.save(p/f'c-{u["name"]}-felt.png');units.append((u,im))
+# Local lamp redraw: attempt2 mounting and left state marks; attempt3 bottom state line only.
+lamp=Image.open(p/'c-lampe-raa2.png').convert('RGB').crop((128,128,1408,896)).resize((160,96),Image.Resampling.LANCZOS)
+line=Image.open(p/'c-lampe-raa3.png').convert('RGB').crop((128,864,1408,896)).resize((160,4),Image.Resampling.LANCZOS)
+lamp.paste(line,(0,92))
+units=[(u,lamp if u['name']=='obj584_01' else im) for u,im in units]
+lamp.save(p/'c-obj584_01-felt.png')
+planke2=Image.open(p/'c-planke2-raa2.png').convert('RGB').crop((120,152,1416,872)).resize((288,160),Image.Resampling.LANCZOS)
+units=[(u,planke2 if u['name']=='obj582_02' else im) for u,im in units]
+planke2.save(p/'c-obj582_02-felt.png')
+planke3=Image.open(p/'c-planke3-raa6.png').convert('RGB').crop((120,152,1416,872)).resize((288,160),Image.Resampling.LANCZOS)
+units=[(u,planke3 if u['name']=='obj582_03' else im) for u,im in units]
+planke3.save(p/'c-obj582_03-felt.png')
+records=[]
+for j in json.loads((p/'c-jobber.json').read_text()):
+ d=Path('jobber')/j;m=json.loads((d/'jobb.json').read_text());base=Image.open(m['bilde_to']).convert('RGB');out=base.copy();mask=np.zeros((1024,1536),bool)
+ for o in m['objekter']:
+  name=o['bilde'];x,y,w,h=o['rekt'];px=m['bilde_i_lerret'][0]+(x-m['region'][0])*4;py=m['bilde_i_lerret'][1]+(y-m['region'][1])*4
+  if name in ['obj581_01','obj597_01']:continue
+  found=[]
+  for u,im in units:
+   ux,uy,uw,uh=u['romrekt']
+   if (u['jobb']==j and x>=ux and y>=uy and x+w<=ux+uw and y+h<=uy+uh) or (name=='obj530_02' and u['name']=='obj530_01'):found.append((u,im))
+  assert len(found)==1,(j,name,len(found))
+  u,im=found[0];ux,uy,uw,uh=u['romrekt'];field=im.crop(((x-ux)*4,(y-uy)*4,(x-ux+w)*4,(y-uy+h)*4));out.paste(field,(px,py));mask[py:py+h*4,px:px+w*4]=True
+ out.save(d/'resultat.png');records.append({'jobb':j,'utenfor_objektunion_avvik':int(np.any(np.array(out)!=np.array(base),axis=2)[~mask].sum())})
+(p/'c-komposisjonsbevis.json').write_text(json.dumps(records,indent=2)+'\n')

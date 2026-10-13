@@ -1,0 +1,26 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image
+import numpy as np
+p=Path('rapporter/bestilling045-20261013');J=lambda f:json.loads(Path(f).read_text());H=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();W=lambda f,v:Path(f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+prov=J(p/'c-proveniens.json');prov=[r for r in prov if r['gruppe'] not in ['planke2','planke3']]
+for g,n in [('planke2',2)]+[('planke3',n) for n in range(2,7)]:
+ raw=p/f'c-{g}-raa{n}.png';prompt=p/f'c-{g}-prompt{n}.txt';ref=p/f'c-{g}-source2.png';prov.append({'gruppe':g,'forsok':n,'verktøy':'innebygd ChatGPT imagegen','eksakt_modell':'ikke eksponert','raw':str(raw),'raw_sha256':H(raw),'prompt':str(prompt),'prompt_sha256':H(prompt),'referanser':[{'fil':str(ref),'sha256':H(ref)}],'valgt':n==(2 if g=='planke2' else 6)})
+W(p/'c-proveniens.json',prov);man=J(p/'c-leveranser.json');old=J(p/'c-for-plankeretting-hasher.json');bevis=[]
+for r in man['leveranser']:
+ j=r['jobb'];out=Path(r['resultat']);prior=next(x for x in old if x['jobb']==j)
+ if j not in ['lag061_02_del1av2','lag061_03_del1av2']:
+  assert H(out)==prior['sha256'];bevis.append({'jobb':j,'sha256':H(out),'uendret':True});continue
+ n=2 if '02_' in j else 3;chosen=2 if n==2 else 6;a=np.array(Image.open(out));b=np.array(Image.open(p/f'c-{j}-for-plankeretting.png'));mask=np.zeros(a.shape[:2],bool);mask[464:624,1088:1376]=True;assert np.array_equal(a[~mask],b[~mask]);bevis.append({'jobb':j,'for_sha256':prior['sha256'],'etter_sha256':H(out),'endringsboks':[1088,464,288,160],'utenfor_boks_avvik':0})
+ text='Lav foldport og egen springbrettstilling beholdt. Første atlas feiltolket bevegelse som løse/brekkede plankebiter og er avvist. '+('Nytt source-only forsøk 2 har sammenhengende brettflate og uttonet bevegelsesekko, uten løs flis.' if n==2 else 'Source-only forsøk 2–5 ga fortsatt fysisk splitt/stabel og er avvist. Forsøk 6 har én sammenhengende avrundet ytterkant og smal bevegelsesskygge under; den lyse sidestripen er modellert skygge/trestrek, ikke åpen bruddflate. Rot vurderer bevegelseslesningen.')
+ r.update({'sha256':H(out),'forsok':chosen,'genereringskall':r['genereringskall']+(1 if n==2 else 5),'visuell_qa':text,'klar_for_mottak':True})
+ r['raw']=[x for x in r['raw'] if 'c-planke' not in x['fil'] or 'c-planker-' in x['fil']]+[{'fil':x['raw'],'sha256':x['raw_sha256']} for x in prov if x['gruppe']==f'planke{n}']
+ (Path('jobber')/j/'notat.md').write_text(f'# {j}\n\n{text}\n\nInnebygd ChatGPT imagegen, eksakt modell ikke eksponert. Ordrette originalprompter med separate kildepresiseringer; alle forsøk, referanser og SHA er i {p}/c-proveniens.json. Kun originalutsnitt brukt til rettingen, ingen forkastet HD som formanker. Nytt felt er helskalert og plassert i [1088,464,288,160]; alle øvrige piksler byte-identiske med førkandidaten. Ingen originalmasker/warp.\n\nResultat SHA-256 `{H(out)}`. Uendret checker OK; separat motivkontroll og feltmåling i c-objektqa og c-objektkontroll. Kilder/padding verifisert. Runtime og ny individuell brukergodkjenning: false.\n')
+W(p/'c-leveranser.json',man);W(p/'c-planker-rettingsbevis.json',bevis)
+u=J(p/'c-underlagsbevis.json')
+for r in u:r['resultat_sha256']=H(Path('jobber')/r['jobb']/'resultat.png')
+W(p/'c-underlagsbevis.json',u)
+q=p/'c-kilde-qa.md';s=q.read_text();s=s.split('\n## Etterkontroll: springbrett')[0];s+='\n## Etterkontroll: springbrett\n\nRot avviste 582_02/03 som materielt splittede plankebiter. Førkandidater er bevart. Seks nye source-only kall: 02 forsøk 2 valgt, 03 forsøk 2–5 avvist og 6 valgt. De nye brettene har sammenhengende overflate uten splinter. 02 har uttonet bevegelsesekko; 03 har sammenhengende ytterkant og smal skygge under. Rot skal bekrefte bevegelseslesningen. Det tidligere forbeholdet om materielle dobbelkanter er erstattet av denne rettingen. Totalt 14 genereringskall. Sju andre resultater er SHA-identiske; utenfor hvert av de to plankefeltene er førkandidaten byte-identisk. Alle ni checker fortsatt OK.\n';q.write_text(s)
+for f in ['kildehash.json','root-ekstra-kildehash.json']:
+ for r in J(p/f):assert H(r['fil'])==r['sha256']
+print('To rettinger dokumentert, sju uendret, 56 kilder uendret')

@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 00:13 (norsk tid)
+Oppdatert 2026-10-14 00:22 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 440 bilder levert (216 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 462 bilder levert (225 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -679,15 +679,15 @@ Rom 56, 58, 59, 60.
 
 Rom 61, 66, 68.
 
-- [ ] `lag061_01_del1av2` (rom 61 Strikkhoppgrotten i fjellet, lag 01 med 3 objektbilder, del 1/2, bilde to `jobber/rom061_del1av2/resultat.png`)
-- [ ] `lag061_02_del1av2` (rom 61 Strikkhoppgrotten i fjellet, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom061_del1av2/resultat.png`)
-- [ ] `lag061_03_del1av2` (rom 61 Strikkhoppgrotten i fjellet, lag 03 med 2 objektbilder, del 1/2, bilde to `jobber/rom061_del1av2/resultat.png`)
-- [ ] `lag061_04_del1av2` (rom 61 Strikkhoppgrotten i fjellet, lag 04 med 2 objektbilder, del 1/2, bilde to `jobber/rom061_del1av2/resultat.png`)
-- [ ] `lag061_05_del2av2` (rom 61 Strikkhoppgrotten i fjellet, lag 05 med 1 objektbilde, del 2/2, bilde to `jobber/rom061_del2av2/resultat.png`)
-- [ ] `lag066_01` (rom 66 Car Bomb (minispill), lag 01 med 5 objektbilder, bilde to `jobber/rom066/resultat.png`)
-- [ ] `lag066_02` (rom 66 Car Bomb (minispill), lag 02 med 4 objektbilder, bilde to `jobber/rom066/resultat.png`)
-- [ ] `lag066_03` (rom 66 Car Bomb (minispill), lag 03 med 2 objektbilder, bilde to `jobber/rom066/resultat.png`)
-- [ ] `lag066_04` (rom 66 Car Bomb (minispill), lag 04 med 1 objektbilde, bilde to `jobber/rom066/resultat.png`)
+- [x] `lag061_01_del1av2` (rom 61 Strikkhoppgrotten i fjellet, lag 01 med 3 objektbilder, del 1/2, bilde to `jobber/rom061_del1av2/resultat.png`)
+- [x] `lag061_02_del1av2` (rom 61 Strikkhoppgrotten i fjellet, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom061_del1av2/resultat.png`)
+- [x] `lag061_03_del1av2` (rom 61 Strikkhoppgrotten i fjellet, lag 03 med 2 objektbilder, del 1/2, bilde to `jobber/rom061_del1av2/resultat.png`)
+- [x] `lag061_04_del1av2` (rom 61 Strikkhoppgrotten i fjellet, lag 04 med 2 objektbilder, del 1/2, bilde to `jobber/rom061_del1av2/resultat.png`)
+- [x] `lag061_05_del2av2` (rom 61 Strikkhoppgrotten i fjellet, lag 05 med 1 objektbilde, del 2/2, bilde to `jobber/rom061_del2av2/resultat.png`)
+- [x] `lag066_01` (rom 66 Car Bomb (minispill), lag 01 med 5 objektbilder, bilde to `jobber/rom066/resultat.png`)
+- [x] `lag066_02` (rom 66 Car Bomb (minispill), lag 02 med 4 objektbilder, bilde to `jobber/rom066/resultat.png`)
+- [x] `lag066_03` (rom 66 Car Bomb (minispill), lag 03 med 2 objektbilder, bilde to `jobber/rom066/resultat.png`)
+- [x] `lag066_04` (rom 66 Car Bomb (minispill), lag 04 med 1 objektbilde, bilde to `jobber/rom066/resultat.png`)
 - [ ] `lag068_01` (rom 68 Highway Surfing (minispill), lag 01 med 9 objektbilder, bilde to `jobber/rom068/resultat.png`)
 
 ## Bestilling 46
@@ -3517,3 +3517,5 @@ Bestilling 41: ti lag levert OK med 27 faktiske feltkontroller og to byte-identi
 Bestilling 42: ni lobbylag levert OK med ti faktiske feltkontroller. Festsallaget venter på motivavklaring. Se `rapporter/bestilling042-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 
 Bestilling 44: ti lag levert, åtte OK og to SJEKK (portene, blokk 1,02). Alle 14 egne felt er OK; 570-underlag og panoramaoverlapp er bytekontrollert. Se `rapporter/bestilling044-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+
+Bestilling 45: ni lag levert OK med22 egne felt; springbrett02/03 rettet etter motivkontroll. Lag06801 holdes tilbake med FEIL og behandles videre med068-familien. Se `rapporter/bestilling045-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
