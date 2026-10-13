@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFilter
+import numpy as np,json,hashlib
+R=Path.cwd();O=R/'rapporter/bestilling059-20261013';C=json.load(open(O/'c-rutekart066.json'))['ruter'];D={c['rute']:c for c in C};sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def fit(p,w,h):
+ a=np.array(p);bb=Image.fromarray((a[:,:,3]>128).astype('uint8')*255).getbbox();p=p.crop(bb);a=np.array(p);reach=np.array(Image.fromarray((a[:,:,3]>128).astype('uint8')*255).filter(ImageFilter.MaxFilter(5)))>0;a[:,:,3][(a[:,:,3]<32)&~reach]=0;return Image.fromarray(a).convert('RGBa').resize((w,h),Image.Resampling.LANCZOS).convert('RGBA')
+rec=[];raw=Image.open(O/'c-anker-raa01.png').convert('RGBA')
+for cid,box in zip([132,130,128,164],[(0,0,684,600),(684,0,1368,600),(0,600,684,1149),(684,600,1368,1149)]):
+ c=D[cid];x,y,x2,y2=c['synlig'];p=fit(raw.crop(box),(x2-x)*4,(y2-y)*4);f=O/f'c-cel{cid}.png';p.save(f);rec.append({'cel':cid,'raw':'c-anker-raa01.png','ROI':box,'komponent':str(f.relative_to(R)),'sha256':sha(f)})
+(O/'c-nye-komponenter.json').write_text(json.dumps(rec,indent=2)+'\n')
+qa=Image.new('RGB',(1200,740),(145,155,155));dr=ImageDraw.Draw(qa)
+for i,cid in enumerate([132,130,128,164]):
+ c=D[cid];p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']);p=p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST);x=i%2*600;y=i//2*370;dr.text((x+4,y+4),f'cel{cid} source / HD',fill='black');qa.paste(p,(x+5,y+40));p=Image.open(O/f'c-cel{cid}.png');qa.paste(p,(x+310,y+40),p)
+qa.save(O/'c-anker-qa.png')

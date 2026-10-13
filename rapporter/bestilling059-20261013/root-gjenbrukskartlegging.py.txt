@@ -1,0 +1,26 @@
+"""Kun kildeanalyse av uløste figurark; ingen leveransefiler endres."""
+from pathlib import Path
+import collections,hashlib,json,re
+import numpy as np
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1]
+done=set(re.findall(r'^- \[x\] `(fig[^`]+)`',(root/'GRAFIKKLISTE.md').read_text(),re.M))
+donors=collections.defaultdict(list);pending={};sources={}
+def records(p):
+    m=json.loads((p/'jobb.json').read_text());im=Image.open(p/'original_1x.png').convert('RGBA')
+    for c in m['ruter']:
+        a=np.array(im.crop(c['synlig']));a[:,:,3]=np.where(np.all(a[:,:,:3]==m['bakgrunn'],axis=2),0,255);a[a[:,:,3]==0,:3]=0
+        sig=hashlib.sha256(a.tobytes()+str(a.shape).encode()).hexdigest()
+        yield sig,{'jobb':p.name,'cel':c['rute'],'synlig':c['synlig'],'lag':c['lag'],'kostyme':m['kostyme']}
+for p in sorted((root/'jobber').glob('fig*')):
+    if p.name in done:
+        for sig,c in records(p):donors[sig].append(c)
+    else: pending[p.name]=list(records(p))
+report=[]
+for j,rows in pending.items():
+    matches=[{**c,'eksakte_RGB_donorer':donors.get(sig,[])} for sig,c in rows]
+    n=sum(bool(c['eksakte_RGB_donorer']) for c in matches)
+    report.append({'jobb':j,'ruter':len(rows),'eksakte_kilder':n,'alle_eksakte':n==len(rows),'detaljer':matches})
+(r/'root-gjenbrukskartlegging.json').write_text(json.dumps({'kun_kildeanalyse':True,'ikke_semantisk_eller_runtime_godkjenning':True,'donorark':len(done),'resterende_ark':len(pending),'jobber':report},ensure_ascii=False,indent=2)+'\n')
+print('Helt kildeidentiske kandidater:',[(x['jobb'],x['ruter']) for x in report if x['alle_eksakte']])
+print('Delvis kildeidentiske kandidater:',[(x['jobb'],x['eksakte_kilder'],x['ruter']) for x in report if x['eksakte_kilder'] and not x['alle_eksakte']][:60])

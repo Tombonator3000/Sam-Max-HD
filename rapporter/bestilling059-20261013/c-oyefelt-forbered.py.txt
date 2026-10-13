@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import json
+R=Path.cwd();O=R/'rapporter/bestilling059-20261013';im=Image.new('RGBA',(900,400));boxes={132:[28,64,116,108],130:[24,64,112,108]}
+for i,(cid,b) in enumerate(boxes.items()):
+ p=Image.open(O/f'c-cel{cid}.png').crop(b);p=p.resize((352,176));im.paste(p,(i*450+30,90))
+im.save(O/'c-oyefelt-HD.png');(O/'c-oyefelt-bokser.json').write_text(json.dumps(boxes))
+p=(R/'jobber/fig066_01/prompt.txt').read_text()+'\n\nLOKAL NY-TIL-NY KORREKSJON / UNDERLAG: Rediger kun de to eksisterende ansiktsutsnittene i vedlegget. Fjern de fire svarte ovale øynene helt, og fyll akkurat disse stedene med samme jevne kremhvite ansiktsflate som rundt øynene. La neser, munnkant, ytre kontur, størrelse, stil, farger og lys være uendret. Resultatet er to identiske utsnitt uten øyne, som skal brukes som nytt underlag for å plassere de opprinnelig nytegnede øynene korrekt mot animasjonens egne små øyelokk. Ikke tegn nye øyne, streker, øyenbryn eller skygger der de var. Gjennomsiktig bakgrunn, to felt ved siden av hverandre, samme rektangler.\n'
+(O/'c-oyefelt-prompt01.txt').write_text(p)

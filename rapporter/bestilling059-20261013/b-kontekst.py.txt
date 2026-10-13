@@ -1,0 +1,26 @@
+from pathlib import Path
+import json,hashlib,collections
+from PIL import Image,ImageDraw
+import numpy as np
+r=Path('rapporter/bestilling059-20261013');data=json.loads((r/'b-ruteregister.json').read_text());rows=data['ruter'];sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+locks=json.loads((r/'b-kildehash.json').read_text())['filer'];assert all(sha(p)==s for p,s in locks.items())
+ctx=['konsept/2026-10-12/kostymer-originalmetadata.json','konsept/2026-10-12/objektnavn-original.tsv','konsept/2026-10-12/skript-kostymekoblinger.tsv','jobber/rom020/referanse.png','jobber/lag020_02/referanse.png','jobber/lag020_02/jobb.json','hovedark/sam.png']
+(r/'b-konteksthash.json').write_text(json.dumps({'filer':{p:sha(p) for p in ctx}},indent=2))
+g=collections.defaultdict(list)
+for z in rows:g[z['rgba_sha256']].append(z['rute'])
+(r/'b-familiebevis.json').write_text(json.dumps({'ruter':len(rows),'unike_originalrgba':len(g),'identiske_grupper':[v for v in g.values() if len(v)>1],'eksakte_leverte_donorer':sum(bool(z['eksakte_rgb_donorer']) for z in rows),'kildehash_20_uendret':True},indent=2))
+out=Image.new('RGB',(1536,1080),(145,145,145));d=ImageDraw.Draw(out)
+for i,p in enumerate(ctx[3:5]):
+ im=Image.open(p);im.thumbnail((768,512));out.paste(im,(i*768,24));d.text((i*768+8,5),p,fill='black')
+for i,cel in enumerate([1954,1955,1956,1957]):
+ z=next(z for z in rows if z['rute']==cel);im=Image.open(Path('jobber')/z['jobb']/'original_1x.png').crop(tuple(z['synlig']));im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);out.paste(im,(i*384+10,590));d.text((i*384+10,562),f'Original cel {cel}',fill='black')
+out.save(r/'b-kontekst-kiste.png')
+for anim in [1,7,8,9,10]:
+ rr=[z for z in rows if z['animasjon']==anim];w=500;h=310;out=Image.new('RGB',(w*4,h*((len(rr)+3)//4)),(160,160,160));d=ImageDraw.Draw(out)
+ for i,z in enumerate(rr):
+  a=np.array(Image.open(Path('jobber')/z['jobb']/'original_1x.png').convert('RGBA').crop(tuple(z['synlig'])));a[:,:,3]=np.where(np.all(a[:,:,:3]==[255,0,255],axis=2),0,255);im=Image.fromarray(a).resize((a.shape[1]*2,a.shape[0]*2),Image.Resampling.NEAREST);x=i%4*w;y=i//4*h;mx=z['metadata']['rel_x'];my=z['metadata']['rel_y'];d.text((x+6,y+6),f"cel {z['rute']} rel({mx},{my}) lag15",fill='black');d.line((x+60,y+35,x+60,y+280),fill=(110,110,110));d.line((x,y+230,x+w,y+230),fill=(110,110,110));out.paste(im,(x+60+mx*2,y+230+my*2),im)
+ out.save(r/f'b-sekvens-a{anim:02d}.png')
+lines=['| Ark | Cel | Animasjon | Kildestørrelse | Rel | Synlig boks, kilde |','|---|---:|---:|---|---|---|']
+for z in rows:
+ c=z['metadata'];lines.append(f"| {z['jobb']} | {z['rute']} | {z['animasjon']} | {c['w']} × {c['h']} | {c['rel_x']}, {c['rel_y']} | {z['synlig']} |")
+(r/'b-felttabell.md').write_text('\n'.join(lines)+'\n');print(len(rows),len(g))

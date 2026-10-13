@@ -1,0 +1,52 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1]
+read=lambda n:json.loads((r/n).read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for p,h in read('c-kildehash.json')['filer'].items():assert sha(root/p)==h,p
+prov=read('c-proveniens.json');assert len(prov['raw'])==prov['kall']
+for c in prov['raw']:
+    assert sha(root/c['raw'])==c['raw_sha256']
+    assert sha(root/c['prompt'])==c['prompt_sha256']
+src={z['rute']:z for z in read('c-rutekart066.json')['ruter']};native=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())
+proof={z['cel']:z for z in read('c-komponentbevis.json')['ruter']};records=[];deliveries=[]
+def source_crop(job,cell):
+    p=root/'jobber'/job;m=json.loads((p/'jobb.json').read_text());z=next(x for x in m['ruter'] if x['rute']==cell)
+    a=np.array(Image.open(p/'original_1x.png').convert('RGBA').crop(z['synlig']));mask=np.all(a[:,:,:3]==m['bakgrunn'],axis=2);a[:,:,3]=np.where(mask,0,255);a[mask,:3]=0
+    return a
+donors=read('c-donorlas.json');assert len(donors)==13
+for d in donors:
+    c=d['cel'];p=root/d['donor'];assert sha(p)==d['donor_sha256']
+    assert np.array_equal(source_crop(src[c]['jobb'],c),source_crop(p.parent.name,d['donor_cel']))
+    donor=Image.open(p).convert('RGBA').crop(d['donor_box']);component=Image.open(root/d['komponent']).convert('RGBA')
+    assert donor.size==component.size and donor.tobytes()==component.tobytes()
+    assert sha(root/d['komponent'])==d['komponent_sha256']
+for e in read('c-leveranser.json')['leveranser']:
+    j=e['jobb'];p=root/e['resultat'];im=Image.open(p);assert sha(p)==e['sha256'] and im.mode=='RGBA' and im.size==(1536,1024)
+    out=Image.new('RGBA',im.size);mapping=read(f'c-{j}-rutekart.json');jm=json.loads((root/'jobber'/j/'jobb.json').read_text())
+    for m in mapping:
+        c=m['cel'];z=src[c];n=next(n for n in native['66']['cels'] if n['cel']==c);assert z['metadata']==n
+        actual=next(x for x in jm['ruter'] if x['rute']==c);assert actual['synlig']==z['synlig'] and actual['rekt']==z['rekt']
+        x,y,X,Y=z['synlig'];rx,ry,_,_=z['rekt'];rel=[n['rel_x']+x-rx,n['rel_y']+y-ry,n['rel_x']+X-rx,n['rel_y']+Y-ry]
+        assert m['rel']==rel==z['synlig_rel'];box=[64+4*x,32+4*y,64+4*X,32+4*Y];assert m['malboks']==box
+        q=Image.open(root/m['komponent']).convert('RGBA');assert q.size==(4*(X-x),4*(Y-y))
+        assert sha(root/m['komponent'])==m['sha256']==proof[c]['sha256'];assert hashlib.sha256(q.tobytes()).hexdigest()==proof[c]['RGBA_sha256']
+        assert q.tobytes()==im.crop(box).tobytes();out.paste(q,box[:2]);records.append({'jobb':j,'cel':c,'rel':rel,'mål':box,'sha256':m['sha256']})
+    assert out.tobytes()==im.tobytes()
+    run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);status={0:'OK',1:'SJEKK',2:'FEIL'}[run.returncode]
+    assert status==e['egenkontroll'] and status!='FEIL'
+    (r/f'root-{j}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n');deliveries.append({'jobb':j,'ruter':len(mapping),'sha256':sha(p),'egenkontroll':status})
+eyes=[]
+for e in read('c-oyefelt-bevis.json'):
+    c=e['cel'];lid=384 if c==132 else 512;old=np.array(Image.open(r/f'c-cel{c}-for-oyefelt.png'));now=np.array(Image.open(r/f'c-cel{c}.png'));allowed=np.zeros(old.shape[:2],bool)
+    for pair in e['oye_fra_til']:
+        for x,y,X,Y in pair:allowed[y:Y,x:X]=True
+    diff=np.any(old!=now,axis=2);assert not diff[~allowed].any()
+    im=Image.fromarray(now);dx=(src[lid]['synlig_rel'][0]-src[c]['synlig_rel'][0])*4;dy=(src[lid]['synlig_rel'][1]-src[c]['synlig_rel'][1])*4
+    im.alpha_composite(Image.open(r/f'c-cel{lid}.png'),(dx,dy));a=np.array(im);counts=[]
+    for _,(x,y,X,Y) in e['oye_fra_til']:counts.append(int((a[y:Y,x:X,:3].max(axis=2)<100).sum()))
+    assert counts==[0,0];eyes.append({'cel':c,'lokk':lid,'relplassering':[dx,dy],'endret_RGBA':int(diff.sum()),'endret_alfa':int((old[:,:,3]!=now[:,:,3]).sum()),'mørke_pupillpiksler_med_lokk':counts})
+assert len(records)==46
+(r/'root-c-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':12,'native_bildekall_og_promptpar':prov['kall'],'eksakte_urørte_donorhoder':13,'ruter':records,'øyelokk':eyes,'leveranser':deliveries,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('C59:',len(records),'ruter,13 donorpar, metadata og byteidentisk fullpakking;',[(e['jobb'],e['egenkontroll']) for e in deliveries])

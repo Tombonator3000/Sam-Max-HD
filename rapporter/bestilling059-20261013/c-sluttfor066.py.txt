@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess
+R=Path.cwd();O=R/'rapporter/bestilling059-20261013';C=json.load(open(O/'c-rutekart066.json'))['ruter'];H=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rel=lambda p:str(p.relative_to(R));py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+locks=json.load(open(O/'c-kildehash.json'))['filer'];assert all(H(R/p)==h for p,h in locks.items())
+recs=[]
+for c in C:
+ p=O/f"c-cel{c['rute']}.png";x,y,x2,y2=c['synlig'];im=Image.open(R/'jobber'/c['jobb']/'resultat.png');a=np.array(Image.open(p));b=np.array(im.crop((64+x*4,32+y*4,64+x2*4,32+y2*4)));assert np.array_equal(a,b);recs.append({'cel':c['rute'],'jobb':c['jobb'],'komponent':rel(p),'sha256':H(p),'RGBA_sha256':hashlib.sha256(a.tobytes()).hexdigest(),'pakke_eksakt':True,'rel':c['synlig_rel']})
+cor=[]
+for cid,lid,dx in [(132,384,52),(130,512,36)]:
+ pre=np.array(Image.open(O/f'c-cel{cid}-for-oyefelt.png'));now=np.array(Image.open(O/f'c-cel{cid}.png'));rec=next(r for r in json.load(open(O/'c-oyefelt-bevis.json')) if r['cel']==cid);mask=np.zeros(pre.shape[:2],bool)
+ for pair in rec['oye_fra_til']:
+  for x,y,x2,y2 in pair:mask[y:y2,x:x2]=True
+ diff=np.any(pre!=now,axis=2);assert not diff[~mask].any();im=Image.fromarray(now);im.alpha_composite(Image.open(O/f'c-cel{lid}.png'),(dx,84));a=np.array(im);counts=[]
+ for _,(x,y,x2,y2) in rec['oye_fra_til']:counts.append(int((a[y:y2,x:x2,:3].max(axis=2)<100).sum()))
+ cor.append({'cel':cid,'lokk':lid,'endret_RGBA':int(diff.sum()),'endret_alfa':int((pre[:,:,3]!=now[:,:,3]).sum()),'utenfor_felt_endret':int(diff[~mask].sum()),'morke_pupillpiksler_med_lokk':counts})
+(O/'c-komponentbevis.json').write_text(json.dumps({'kilder_12_uendret':True,'ruter':recs,'oyelokk':cor},indent=2)+'\n')
+raws=[]
+for stem in ['anker','gang-hoyre','gang-forfra','gang-bakfra','a6','smalag','oreknekk','orefelt','oyefelt']:
+ n='02' if stem=='oreknekk' else ('03' if stem=='orefelt' else '01');raw=O/f'c-{stem}-raa{n}.png';prompt=O/f'c-{stem}-prompt{n}.txt';raws.append({'raw':rel(raw),'raw_sha256':H(raw),'prompt':rel(prompt),'prompt_sha256':H(prompt),'status':'avvist: for hengende orer og endrede kropper' if stem=='oreknekk' else 'valgt helt eller avgrenset felt'})
+prov={'verktoy':'Innebygd ChatGPT imagegen','eksakt_modell':'ikke eksponert av verktøyet','kall':9,'raw':raws,'donorer':'rapporter/bestilling059-20261013/c-donorlas.json','plassering':'Premultiplisert helskalering av nye motiver til metadataens synlige bokser; alfa fra nytegning. Lokale nye ørefelt og øyekomponenter, aldri originalmasker.','oppskrifter':[rel(p) for p in sorted(O.glob('c-*.py.txt'))],'runtime':False,'ny_brukergodkjenning':False}
+(O/'c-proveniens.json').write_text(json.dumps(prov,indent=2,ensure_ascii=False)+'\n')
+manifest=[]
+for j,n,attempts in [('fig066_01',14,4),('fig066_02',21,3),('fig066_03',11,4)]:
+ f=R/'jobber'/j/'resultat.png';run=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(f)],capture_output=True,text=True);cf=O/f'c-{j}-kontroll.txt';cf.write_text(run.stdout+run.stderr);status={0:'OK',1:'SJEKK',2:'FEIL'}[run.returncode];assert status!='FEIL';manifest.append({'jobb':j,'resultat':rel(f),'sha256':H(f),'egenkontroll':status,'kontrollfil':rel(cf),'ruter':n,'forsok':attempts,'proveniens':rel(O/'c-proveniens.json'),'rutekart':rel(O/f'c-{j}-rutekart.json'),'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'visuelt_forbehold':'133: kontur IoU 0,73; ny arm/hånd lysere og fot/ben rundere. Ingen påstand om kildepikselidentisk silhuett.' if j=='fig066_03' else 'Rundere konturer og tydeligere metall-/nøkkeldetaljer enn originalen.'})
+ note=f'''# {j}\n\nLevert {n} ruter med ekte RGBA på 1536 × 1024. SHA-256: `{H(f)}`. Uendret egenkontroll: **{status}**; se `{rel(cf)}`.\n\nMax med rasp og toalettnøkkel er kildeavklart i LucasArts-hintboken via roots dokumenterte utdrag. Egne håndkontakter, grå rasp, mørk ende, blå forbindelse og rød nøkkel er bevart. A6 har ingen oppfunnet mottaker eller gjenstand i de tomme hendene. Alle 46 ruter er gjennomgått i felles QA, inkludert 13 korrigerte 003-donorhoder og to egne smålag. Donorer, egne rel og nøyaktig pakking står i c-donorlas/c-komponentbevis/rutekart.\n\nInnebygd ChatGPT imagegen, eksakt modell ikke eksponert. Denne jobbens relevante forsøk: {attempts}; hele familien har ni kall, hvorav det for hengende øreforsøket er avvist og bevart. Råbilder, ordrette jobbprompter med separate presiseringer, SHA og oppskrifter står i `{rel(O/'c-proveniens.json')}`. Ingen originale produksjonsmasker.\n\n{manifest[-1]['visuelt_forbehold']} Smålagene er kontrollert oppå ståfigurene etter presis plassering av bare de nye pupillkomponentene på nytt imagegen-underlag. Fire øresideprofiler er lokalt korrigert; resten av disse kroppene er byte-identisk.\n\n12 beskyttede kilder er uendret. Import, animasjonstiming og faktisk runtime er ikke testet; ingen ny individuell brukergodkjenning påstås.\n''';(R/'jobber'/j/'notat.md').write_text(note)
+(O/'c-leveranser.json').write_text(json.dumps({'leveranser':manifest,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(manifest,indent=2,ensure_ascii=False));print('eyelid',cor)

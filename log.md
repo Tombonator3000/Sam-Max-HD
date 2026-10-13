@@ -387,3 +387,8 @@
 
 - Bestilling57: seks Sam-ark med79 ruter levert, alle OK. Pute, dinosaurtann, John Muir-squash og håndholdt vortex er kildeavklart og kontrollert; små separate punkter er beholdt. Se `rapporter/bestilling057-20261013/RAPPORT.md`. Arbeidet fortsetter.
 -14 bildekall er dokumentert med faktisk sendt prompt, også forkastede forsøk. Sam1941s kropp er ikke strukket til det separate punktet;1993/94 har egne smålag. Alle seks faktiske RGBA-leveranser og24 beskyttede jobbkilder er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T01:48:45+02:00 (Codex, Astra)
+
+- Bestilling59: ti figurark med115 ruter levert; Sam ved kista, Max med rasp/toalettnøkkel og20 kildeidentiske Max-felt. Ni OK, fig066_03 SJEKK for133s omriss. Se `rapporter/bestilling059-20261013/RAPPORT.md`. Arbeidet fortsetter.
+-16 native bildekall og33 nye donorutsnitt er dokumentert. Alle faktiske leveranser kan gjenoppbygges byteidentisk fra nye komponenter;63 unike kilde-/kontekstlåser er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.

@@ -113,3 +113,5 @@
 - [x] Levert bestilling58: fem nye Max-ark,90 ruter; seks munnfelt rettet i fire tidligere ark. Alle ni ark OK.
 
 - [x] Levert bestilling57: seks Sam-ark med79 ruter og fire rekvisitter;45 kildeunike motiver og seks separate fargepunkter kontrollert. Alle OK.
+
+- [x] Levert bestilling59: ti figurark med115 ruter. Ni OK; Max066_03 beholder SJEKK for133s omriss. Øyelokk, donorhoder, kistelokk og kildebeviste rosa sålemerker kontrollert.

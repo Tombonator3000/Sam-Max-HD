@@ -1,0 +1,33 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1]
+read=lambda name:json.loads((r/name).read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks=read('root-max259-kildehash.json')
+for p,h in locks.items():assert sha(root/p)==h,p
+native=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())
+proof=read('root-max259-gjenbruksbevis.json')['ruter'];assert len(proof)==20
+out={};records=[]
+for e in proof:
+    j=e['jobb'];d=e['donorjobb'];jm=json.loads((root/'jobber'/j/'jobb.json').read_text());dm=json.loads((root/'jobber'/d/'jobb.json').read_text())
+    s=np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGBA').crop(e['synlig']))
+    ds=np.array(Image.open(root/'jobber'/d/'original_1x.png').convert('RGBA').crop(e['donorsynlig']))
+    for a,bg in [(s,jm['bakgrunn']),(ds,dm['bakgrunn'])]:
+        a[:,:,3]=np.where(np.all(a[:,:,:3]==bg,axis=2),0,255);a[a[:,:,3]==0,:3]=0
+    assert np.array_equal(s,ds)
+    assert e['meta']==next(z for z in native['259']['cels'] if z['cel']==e['cel'])
+    assert e['donormeta']==next(z for z in native[str(dm['kostyme'])]['cels'] if z['cel']==e['donorcel'])
+    assert e['synlig_origin']==e['donor_origin']
+    p=root/e['donor'];assert sha(p)==e['donor_sha256'];q=Image.open(p).convert('RGBA').crop(e['donor_box'])
+    assert hashlib.sha256(q.tobytes()).hexdigest()==e['ny_RGBA_sha256']
+    target=e['target_box'];assert q.size==(target[2]-target[0],target[3]-target[1])
+    out.setdefault(j,Image.new('RGBA',(1536,1024))).paste(q,target[:2]);records.append({'jobb':j,'cel':e['cel'],'donor':d,'source_match':True,'rel_match':True,'donor_sha256':e['donor_sha256'],'margin_max_alpha':e['sikkerhetskant_max_alfa']})
+entries=read('root-leveranser.json')['leveranser']
+for e in entries:
+    p=root/e['resultat'];im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024) and sha(p)==e['sha256']
+    assert out[e['jobb']].tobytes()==im.tobytes()
+    run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);assert 'Utfall: OK' in run.stdout
+    (r/f'root-{e["jobb"]}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n')
+(r/'root-259-mottakskontroll.json').write_text(json.dumps({'låste_filer':len(locks),'ruter':records,'leveranser':entries,'rekonstruksjon':'begge ark byteidentiske fra dokumenterte nye donorutsnitt','runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('259: 20 kildepar, native metadata, uendret donor, hele nye ark og begge checkere OK.')

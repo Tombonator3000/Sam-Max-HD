@@ -1,0 +1,43 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent; root=r.parents[1]
+read=lambda name:json.loads((r/name).read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks={**read('b-kildehash.json')['filer'],**read('b-konteksthash.json')['filer']}
+for p,h in locks.items():assert sha(root/p)==h,p
+calls=read('b-proveniens.json');assert len(calls)==7
+for c in calls:
+    assert sha(root/c['raw'])==c['sha256']
+    assert sha(root/c['prompt'])==c['prompt_sha256']
+src={z['rute']:z for z in read('b-ruteregister.json')['ruter']}
+native={z['cel']:z for z in json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['91']['cels']}
+original={}; records=[]; deliveries=[]
+for c,z in src.items():
+    j=z['jobb']; job=json.loads((root/'jobber'/j/'jobb.json').read_text());actual=next(x for x in job['ruter'] if x['rute']==c)
+    assert actual['synlig']==z['synlig'] and actual['rekt']==z['rekt']
+    assert z['metadata']==native[c]
+    original[c]=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop(z['synlig'])
+for entry in read('b-leveranser.json')['leveranser']:
+    j=entry['jobb'];p=root/entry['resultat'];im=Image.open(p)
+    assert sha(p)==entry['sha256'] and im.mode=='RGBA' and im.size==(1536,1024)
+    out=Image.new('RGBA',im.size);mapping=read(f'b-{j}-mapping.json')
+    for m in mapping:
+        c=m['cel'];d=m['ny_donorcel'];z=src[c];s=original[c];ds=original[d]
+        assert s.size==ds.size and s.tobytes()==ds.tobytes()
+        assert z['jobb']==j and m['rel']==[native[c]['rel_x'],native[c]['rel_y']]
+        x,y,X,Y=z['synlig'];target=[64+4*x,32+4*y,4*(X-x),4*(Y-y)];assert m['target']==target
+        q=Image.open(root/m['komponent']).convert('RGBA');assert sha(root/m['komponent'])==m['komponent_sha256']
+        assert q.size==tuple(target[2:]);out.alpha_composite(q,tuple(target[:2]))
+        a=np.array(q);b=np.array(im.crop((target[0],target[1],target[0]+target[2],target[1]+target[3])))
+        a[a[:,:,3]==0]=0;b[b[:,:,3]==0]=0;assert np.array_equal(a,b)
+        records.append({'jobb':j,'cel':c,'ny_donorcel':d,'egen_native_metadata':native[c],'target':target,'komponent_sha256':m['komponent_sha256'],'kildepar_byteidentisk':True})
+    assert im.tobytes()==out.tobytes(),j
+    run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True)
+    assert 'Utfall: OK' in run.stdout,(j,run.stdout)
+    (r/f'root-{j}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n')
+    deliveries.append({'jobb':j,'sha256':sha(p),'ruter':len(mapping),'rekonstruksjon':'byteidentisk','egenkontroll':'OK'})
+assert len(records)==49 and len({z['ny_donorcel'] for z in records})==35
+(r/'root-b-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':20,'kontekst_uendret':7,'native_bildekall_og_promptpar':7,'ruter':records,'leveranser':deliveries,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('B59: 49 ruter/35 unike kilder, 27 låste filer, 7 bildekall og alle5 faktiske RGBA-ark kontrollert OK.')

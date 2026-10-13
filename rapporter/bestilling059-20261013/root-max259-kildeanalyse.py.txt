@@ -1,0 +1,29 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image,ImageDraw
+r=Path(__file__).resolve().parent;root=r.parents[1]
+read=lambda p:json.loads(Path(p).read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+allmeta=read(root/'konsept/2026-10-12/kostymer-originalmetadata.json');audit=read(r/'root-gjenbrukskartlegging.json');locks={};rows=[]
+for j in ['fig259_01','fig259_02']:
+    m=read(root/'jobber'/j/'jobb.json')
+    for n in ['jobb.json','prompt.txt','original_1x.png','referanse.png']:locks[f'jobber/{j}/{n}']=sha(root/'jobber'/j/n)
+    for match in next(e for e in audit['jobber'] if e['jobb']==j)['detaljer']:
+        c=next(x for x in m['ruter'] if x['rute']==match['cel']);d=match['eksakte_RGB_donorer'][0];dj=d['jobb'];dm=read(root/'jobber'/dj/'jobb.json');dc=next(x for x in dm['ruter'] if x['rute']==d['cel'])
+        native=next(x for x in allmeta['259']['cels'] if x['cel']==c['rute']);dn=next(x for x in allmeta[str(dm['kostyme'])]['cels'] if x['cel']==dc['rute'])
+        for n in ['jobb.json','prompt.txt','original_1x.png','referanse.png','resultat.png']:locks[f'jobber/{dj}/{n}']=sha(root/'jobber'/dj/n)
+        origin=lambda c,n:[n['rel_x']+c['synlig'][0]-c['rekt'][0],n['rel_y']+c['synlig'][1]-c['rekt'][1]]
+        rows.append({'jobb':j,'cel':c['rute'],'synlig':c['synlig'],'donorjobb':dj,'donorcel':dc['rute'],'donorsynlig':dc['synlig'],'meta':native,'donormeta':dn,'synlig_origin':origin(c,native),'donor_origin':origin(dc,dn)})
+for p in ['konsept/2026-10-12/kostymer-originalmetadata.json','konsept/2026-10-12/skript-kostymekoblinger.tsv','hovedark/max.png']:locks[p]=sha(root/p)
+for start in range(0,len(rows),8):
+    qa=Image.new('RGB',(1200,1000),(160,160,160));dr=ImageDraw.Draw(qa)
+    for k,e in enumerate(rows[start:start+8]):
+        x=(k%2)*600;y=(k//2)*250
+        im=Image.open(root/'jobber'/e['jobb']/'original_1x.png').crop(e['synlig']).convert('RGB')
+        sx,sy,sX,sY=e['donorsynlig'];hd=Image.open(root/'jobber'/e['donorjobb']/'resultat.png').convert('RGBA').crop((64+4*sx-8,32+4*sy-8,64+4*sX+8,32+4*sY+8))
+        scale=min(220/im.width,210/im.height);im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.NEAREST)
+        dr.text((x+4,y+4),f"{e['jobb']}:{e['cel']} / {e['donorjobb']}:{e['donorcel']}",fill='black');qa.paste(im,(x+4,y+30));qa.paste(hd,(x+290,y+30),hd)
+    qa.save(r/f'root-max259-kilde-donor-{start//8+1}.png')
+(r/'root-max259-kildehash.json').write_text(json.dumps(locks,indent=2)+'\n')
+(r/'root-max259-kildebevis.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+assert len(rows)==20
+print('20 ruter; synlig origin-delta:',sorted(set(tuple(a-b for a,b in zip(x['synlig_origin'],x['donor_origin'])) for x in rows)))

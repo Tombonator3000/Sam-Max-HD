@@ -1,0 +1,13 @@
+# Sluttkontroll av Sam091
+
+Fem ark, 49 ruter, 35 unike nye komponenter. Alle fem faktiske sjekk_leveranse.py-kjøringer er OK: 9, 14, 13, 6 og 7 ruter. Kontrolltekstene er b-fig091_01..05-kontroll01.txt. Resultatene er ekte RGBA på 1536 × 1024. b-leveranser.json låser SHA og b-sluttbevis.json kontrollerer samtlige komponentinnsettinger. Usynlig RGB nulles av alpha_composite, derfor sammenlignes RGBA etter samme nulling; ingen synlig farge eller alfa er endret ved innsetting.
+
+Alle 11 b-celqa-sider er visuelt gjennomgått, sammen med b-sluttfamilie.png og alle fem b-rel-hd-a*-ark. Benløft, fremoverbøyning, tomme hender, egne håndgrep og alle fire hovedperspektiver på lokket er bevart. Den blå stjerneformen forblir et lokk uten kistebunn eller oppfunnet innhold. De tilsiktede tomrommene i nedre kropp og den separate brune fotresten er synlige også i sammensatt rel-visning. Ingen ekstra hoder eller fylte ben er lagt til. Rel er beholdt fra originalmetadata, uten påstand om runtime-timing eller aktørplassering i selve rommet.
+
+Gjenbruk skjer bare innen de ti kildeidentiske gruppene. Hele ark 05 har samme nye komponenter som de beviste motstykkene i 03/04. Andre nærliggende stillinger er tegnet hver for seg. Sam-hovedarket brukes for samme figur og tegneseriestrek; lokk og positurer kommer fra originalene. Rot har særskilt sett den første lokkgruppen og bekreftet grep, stjerne, perspektiv og fotrest.
+
+Forbehold: nye føtter og fingre er rundere, særlig den lille separate fotresten. Ansiktsstreker, nesehøylys, jakkefolder og skarpe lokkkanter er tydeligere enn de grove kildepikslene. Stjerne og blå flater er renere og sterkere avgrenset. Disse forskjellene er synlige HD-tolkninger; ingen påstand om identisk indre kontur eller pikselpalett. Jeg fant ingen avgjørende ny motivfeil i den samlede gjennomgangen.
+
+Sju native imagegen-kall, ett første råforsøk per midlertidig gruppe. Råbilder og ordrette prompter med separat presisering er bevart med SHA i b-proveniens.json. Verktøyet eksponerer ikke eksakt bildemodellnavn. Ny alfa avgrenser hver komponent; lav alfa under 16 nulles, øvrig normaliseres fra 254 til 255. Hele nye komponenter er skalert til kildeboksene med Lanczos. Ingen originalkonturmaske, morfologisk tracing eller lokal warp er brukt. Gruppe 07 fikk et større uttrekksvindu i høyden fordi den nye fotkanten gikk litt nedenfor 512; ingen figurdel ble kuttet.
+
+Alle 20 beskyttede jobbkilder er uendret. Råproduksjon og oppskrifter er avgrenset til b-filer og fem resultat/notat. Eldre 58-filer står urørt. Runtime=false og ny_brukergodkjenning=false. Klar for roots uavhengige mottak, uten Git-mutasjon fra B.

@@ -1,0 +1,9 @@
+exec(open('rapporter/bestilling059-20261013/c-plasser066.py.txt').read().split('rec=[];')[0])
+raw=Image.open(O/'c-oyefelt-raa01.png');B={132:[28,64,116,108],130:[24,64,112,108]};E={132:[([56,75,68,94],[54,85,58,91]),([101,75,111,94],[98,85,102,91])],130:[([31,78,44,97],[40,85,44,91]),([85,78,98,97],[86,85,90,91])]};records=[]
+for i,cid in enumerate([132,130]):
+ p=Image.open(O/f'c-cel{cid}-for-oyefelt.png');before=np.array(p);b=B[cid];under=fit(raw.crop((i*raw.width//2,0,(i+1)*raw.width//2,raw.height)),88,44)
+ for rect,target in E[cid]:
+  x,y,x2,y2=rect;er={132:[[59,78,65,91],[104,79,109,91]],130:[[35,82,40,94],[88,81,94,94]]}[cid][E[cid].index((rect,target))];q=np.array(p.crop(er));eye=q.copy();v=q[:,:,:3].max(axis=2).astype(float);eye[:,:,3]=np.clip((190-v)/110*255,0,255).astype('uint8');eye=Image.fromarray(eye);bb=eye.getbbox();eye=eye.crop(bb).convert('RGBa').resize((target[2]-target[0],target[3]-target[1]),Image.Resampling.LANCZOS).convert('RGBA')
+  fill=np.array(under.crop((x-b[0],y-b[1],x2-b[0],y2-b[1])));old=np.array(p.crop(rect));yy,xx=np.indices(old.shape[:2]);wt=np.minimum.reduce([xx,yy,old.shape[1]-1-xx,old.shape[0]-1-yy]).clip(0,2)/2;out=old.copy();out[:,:,:3]=(old[:,:,:3]*(1-wt[:,:,None])+fill[:,:,:3]*wt[:,:,None]).round().astype('uint8');p.paste(Image.fromarray(out),(x,y));p.alpha_composite(eye,(target[0],target[1]))
+ p.save(O/f'c-cel{cid}.png');records.append({'cel':cid,'raw':'c-oyefelt-raa01.png','underlagsrekt':B[cid],'oye_fra_til':E[cid],'sha256':sha(O/f'c-cel{cid}.png'),'alfa_uendret':bool(np.array_equal(before[:,:,3],np.array(p)[:,:,3]))})
+(O/'c-oyefelt-bevis.json').write_text(json.dumps(records,indent=2)+'\n')

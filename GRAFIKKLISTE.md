@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 01:39 (norsk tid)
+Oppdatert 2026-10-14 01:48 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -13,7 +13,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 610 bilder levert (268 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 46 felt levert (6 ark), inkludert2 SJEKK | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 728 ruter levert (54 ark), pilotstil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 843 ruter levert (64 ark), pilotstil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
 ## Bestilling 1: stilpiloten (nå, samme som ORDRE.md)
 
@@ -850,9 +850,9 @@ Figurark for Sam og Max, Sam, Max.
 - [x] `fig114_03` (figurark 3 for Sam (kostyme 114), 8 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig114_04` (figurark 4 for Sam (kostyme 114), 12 ruter: animasjon 9 mot høyre (9 ruter); animasjon 9 (lag 1, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig114_05` (figurark 5 for Sam (kostyme 114), 3 ruter: animasjon 10 (lag 1, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig066_01` (figurark 1 for Max (kostyme 66), 14 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot oss (1 rute); gange mot høyre (8 ruter); snakking mot høyre (1 rute), bilde to `hovedark/max.png`)
-- [ ] `fig066_02` (figurark 2 for Max (kostyme 66), 21 ruter: snakking (lag 2, tegnes over kroppen) mot høyre (13 ruter); gange mot oss (8 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig066_03` (figurark 3 for Max (kostyme 66), 11 ruter: gange bort (8 ruter); animasjon 6 mot høyre (3 ruter), bilde to `hovedark/max.png`)
+- [x] `fig066_01` (figurark 1 for Max (kostyme 66), 14 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot oss (1 rute); gange mot høyre (8 ruter); snakking mot høyre (1 rute), bilde to `hovedark/max.png`)
+- [x] `fig066_02` (figurark 2 for Max (kostyme 66), 21 ruter: snakking (lag 2, tegnes over kroppen) mot høyre (13 ruter); gange mot oss (8 ruter), bilde to `hovedark/max.png`)
+- [x] `fig066_03` (figurark 3 for Max (kostyme 66), 11 ruter: gange bort (8 ruter); animasjon 6 mot høyre (3 ruter), bilde to `hovedark/max.png`)
 - [x] `fig326_01` (figurark 1 for Sam (kostyme 326), 34 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); snakking mot høyre, mot oss, bort (29 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 57
@@ -865,16 +865,16 @@ Figurark for Sam.
 - [x] `fig272_04` (figurark 4 for Sam (kostyme 272), 20 ruter: animasjon 8 mot høyre (20 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig272_05` (figurark 5 for Sam (kostyme 272), 19 ruter: animasjon 9 mot høyre (19 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig272_06` (figurark 6 for Sam (kostyme 272), 3 ruter: animasjon 9 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig091_01` (figurark 1 for Sam (kostyme 91), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig091_02` (figurark 2 for Sam (kostyme 91), 14 ruter: animasjon 7 mot høyre (14 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig091_03` (figurark 3 for Sam (kostyme 91), 13 ruter: animasjon 8 mot høyre (8 ruter); animasjon 9 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig091_04` (figurark 4 for Sam (kostyme 91), 6 ruter: animasjon 9 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig091_01` (figurark 1 for Sam (kostyme 91), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig091_02` (figurark 2 for Sam (kostyme 91), 14 ruter: animasjon 7 mot høyre (14 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig091_03` (figurark 3 for Sam (kostyme 91), 13 ruter: animasjon 8 mot høyre (8 ruter); animasjon 9 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig091_04` (figurark 4 for Sam (kostyme 91), 6 ruter: animasjon 9 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 58
 
 Figurark for Sam, Max.
 
-- [ ] `fig091_05` (figurark 5 for Sam (kostyme 91), 7 ruter: animasjon 10 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig091_05` (figurark 5 for Sam (kostyme 91), 7 ruter: animasjon 10 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig209_01` (figurark 1 for Sam (kostyme 209), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig209_02` (figurark 2 for Sam (kostyme 209), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig209_03` (figurark 3 for Sam (kostyme 209), 8 ruter: animasjon 8 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
@@ -1085,8 +1085,8 @@ Figurark for Sam, Max.
 Figurark for Max, Sam.
 
 - [ ] `fig193_02` (figurark 2 for Max (kostyme 193), 13 ruter: animasjon 7 mot høyre (13 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig259_01` (figurark 1 for Max (kostyme 259), 17 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); animasjon 13 mot høyre (2 ruter); animasjon 13 (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 14 (lag 2, tegnes over kroppen) mot høyre (4 ruter); animasjon 15 mot høyre (2 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig259_02` (figurark 2 for Max (kostyme 259), 3 ruter: animasjon 15 (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 16 (lag 2, tegnes over kroppen) mot høyre (2 ruter), bilde to `hovedark/max.png`)
+- [x] `fig259_01` (figurark 1 for Max (kostyme 259), 17 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); animasjon 13 mot høyre (2 ruter); animasjon 13 (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 14 (lag 2, tegnes over kroppen) mot høyre (4 ruter); animasjon 15 mot høyre (2 ruter), bilde to `hovedark/max.png`)
+- [x] `fig259_02` (figurark 2 for Max (kostyme 259), 3 ruter: animasjon 15 (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 16 (lag 2, tegnes over kroppen) mot høyre (2 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig298_01` (figurark 1 for Sam (kostyme 298), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig298_02` (figurark 2 for Sam (kostyme 298), 15 ruter: animasjon 7 mot høyre (15 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig009_01` (figurark 1 for Sam (kostyme 9), 11 ruter: start mot høyre (10 ruter); animasjon 7 mot høyre (1 rute), bilde to `hovedark/sam.png`)
@@ -3545,3 +3545,5 @@ Bestilling 56: sju figurark med 90 ruter levert, alle OK. Sam114 med bøttelag, 
 Bestilling 58: fem nye Max-ark med 90 ruter og fire tidligere leverte ark med lokale munnrettinger, alle OK. 325 beholder egne hodeankre; 205 har kildebevist vertikal vending. Se `rapporter/bestilling058-20261013/RAPPORT.md`. Arbeidet fortsetter.
 
 Bestilling57: seks Sam-ark med79 ruter levert, alle OK. Pute, dinosaurtann, John Muir-squash og håndholdt vortex er kildeavklart og kontrollert; små separate punkter er beholdt. Se `rapporter/bestilling057-20261013/RAPPORT.md`. Arbeidet fortsetter.
+
+Bestilling59: ti figurark med115 ruter levert; Sam ved kista, Max med rasp/toalettnøkkel og20 kildeidentiske Max-felt. Ni OK, fig066_03 SJEKK for133s omriss. Se `rapporter/bestilling059-20261013/RAPPORT.md`. Arbeidet fortsetter.

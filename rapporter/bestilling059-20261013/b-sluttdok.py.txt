@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np
+r=Path('rapporter/bestilling059-20261013');sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();rows=json.loads((r/'b-ruteregister.json').read_text())['ruter'];deliver=[];out=Image.new('RGB',(1536,1536),(155,155,155));d=ImageDraw.Draw(out)
+for n in range(1,6):
+ j=f'fig091_{n:02d}';p=Path('jobber')/j/'resultat.png';im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024);small=im.resize((768,512),Image.Resampling.LANCZOS);out.paste(small,((n-1)%2*768,(n-1)//2*512),small);d.text(((n-1)%2*768+5,(n-1)//2*512+5),j,fill='black');rr=[z for z in rows if z['jobb']==j];mapping=json.loads((r/f'b-{j}-mapping.json').read_text());rutekart=[]
+ for m in mapping:
+  x,y,w,h=m['target'];a=np.array(im)[y:y+h,x:x+w];ys,xs=np.where(a[:,:,3]>128);rutekart.append({'cel':m['cel'],'bbox_alpha_over128':[x+int(xs.min()),y+int(ys.min()),x+int(xs.max())+1,y+int(ys.max())+1]})
+ (r/f'b-{j}-rutekart.json').write_text(json.dumps(rutekart,indent=2));entry={'jobb':j,'resultat':str(p),'sha256':sha(p),'egenkontroll':'OK','kontrollfil':str(r/f'b-{j}-kontroll01.txt'),'forsok':1,'ruter':len(rr),'mapping':str(r/f'b-{j}-mapping.json'),'runtime':False,'ny_brukergodkjenning':False};deliver.append(entry)
+ (Path('jobber')/j/'notat.md').write_text(f'''# Leveranse {j}
+
+{len(rr)} ruter levert som ekte RGBA, 1536 × 1024. Uendret sjekk_leveranse.py: OK for alle rutene. Resultat SHA256: `{sha(p)}`.
+
+Innebygd ChatGPT imagegen, ett råforsøk per midlertidig komponentgruppe. Eksakt modellnavn er ikke eksponert av verktøyet. Ordrette jobbprompter er bevart i gruppenes promptfiler, med separat kildepresisering. Sam-hovedark er identitets-/stilanker; originalene bestemmer positur, klær, farger, avkutting og lokkperspektiv. 35 unike nye motiver dekker familiens 49 ruter gjennom dokumentert kildeidentisk gjenbruk.
+
+Ny alfa brukes til avgrensning. Alfa under16 nulles, øvrig alfa skaleres fra254 til255, så hele nye komponenten skaleres til originalens 4×-boks med Lanczos. Ingen originalmaske eller lokal warp. Mapping, råbilder, rutekart og oppskrifter ligger i rapporter/bestilling059-20261013/b-*. Kildehash for jobbens fire beskyttede filer står i b-kildehash.json og er kontrollert uendret.
+
+Alle cel-sammenligninger og rel-sekvenser er visuelt gjennomgått. Bevarte særtrekk er tom nedre kropp, brun separat fotrest, egne hender og benløft samt blått lokk med gul stjerne. HD har rundere føtter/fingre, renere jakkefolder og tydeligere ansiktsstreker enn kildepikslene. Små interne konturer er en HD-tolkning, ikke pikselidentisk reproduksjon. Ingen runtime-test eller ny individuell brukergodkjenning er påstått.
+''')
+out.save(r/'b-sluttfamilie.png');(r/'b-leveranser.json').write_text(json.dumps({'leveranser':deliver,'unike_motiver':35,'ruter':49,'runtime':False,'ny_brukergodkjenning':False},indent=2))
+ids=['42c9a811-3608-4a75-b86d-8d7eeb41201a','346bfef1-65b5-44fa-8f93-219d86f9adb8','bb8926db-1cf4-45d8-a639-c055e80f6b87','1604db68-d073-4e3b-bbe7-e2cc1d3f4df8','66439376-31f1-4b3d-82f7-62d30d12a464','a071394b-ba00-4451-a092-711a886bf826','9a9dd353-e858-4a4e-acb3-1f477c0ded7f'];prov=[]
+for n,i in enumerate(ids,1):
+ raw=r/f'b-gruppe{n:02d}-raa01.png';prompt=r/f'b-gruppe{n:02d}-prompt.txt';prov.append({'gruppe':n,'verktøy':'innebygd ChatGPT imagegen','eksakt_modellnavn':'ikke eksponert','forsok':1,'raw':str(raw),'sha256':sha(raw),'original_tool_path':f'/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-{i}.png','prompt':str(prompt),'prompt_sha256':sha(prompt),'kilde':str(r/f'b-gruppe{n:02d}-kilde.png'),'stilanker':'hovedark/sam.png'})
+(r/'b-proveniens.json').write_text(json.dumps(prov,indent=2));print([(v['jobb'],v['sha256']) for v in deliver])

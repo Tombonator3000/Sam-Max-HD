@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np,hashlib
+r=Path('rapporter/bestilling059-20261013');rows=json.loads((r/'b-ruteregister.json').read_text())['ruter'];meta={z['rute']:z for z in rows};allmap=sum([json.loads((r/f'b-fig091_{n:02d}-mapping.json').read_text()) for n in range(1,6)],[])
+for n in range(1,6):
+ rr=[z for z in rows if z['jobb']==f'fig091_{n:02d}'];hd=Image.open(Path('jobber')/f'fig091_{n:02d}'/'resultat.png');src=Image.open(Path('jobber')/f'fig091_{n:02d}'/'original_1x.png')
+ for start in range(0,len(rr),6):
+  out=Image.new('RGB',(1536,1024),(155,155,155));d=ImageDraw.Draw(out)
+  for i,z in enumerate(rr[start:start+6]):
+   sx,sy,ex,ey=z['synlig'];s=src.crop(z['synlig']);h=hd.crop((64+sx*4,32+sy*4,64+ex*4,32+ey*4));s=s.resize((s.width*3,s.height*3),Image.Resampling.NEAREST);h=h.resize((h.width*3//4,h.height*3//4),Image.Resampling.LANCZOS);x=i%3*512;y=i//3*512;out.paste(s,(x+5,y+55));out.paste(h,(x+260,y+55),h);d.text((x+5,y+20),f"{z['jobb']} cel{z['rute']}: kilde / HD",fill='black')
+  out.save(r/f'b-celqa-{n:02d}-{start//6+1}.png')
+for anim in [1,7,8,9,10]:
+ rr=[z for z in rows if z['animasjon']==anim];out=Image.new('RGB',(2000,310*((len(rr)+3)//4)),(155,155,155));d=ImageDraw.Draw(out)
+ for i,z in enumerate(rr):
+  m=next(m for m in allmap if m['cel']==z['rute']);im=Image.open(m['komponent']);im=im.resize((im.width//2,im.height//2),Image.Resampling.LANCZOS);x=i%4*500;y=i//4*310;mx,my=m['rel'];out.paste(im,(x+60+mx*2,y+230+my*2),im);d.text((x+6,y+6),f"cel{z['rute']} rel{mx},{my}",fill='black')
+ out.save(r/f'b-rel-hd-a{anim:02d}.png')
+locks=json.loads((r/'b-kildehash.json').read_text())['filer'];assert all(hashlib.sha256(Path(p).read_bytes()).hexdigest()==h for p,h in locks.items());proof=[]
+for m in allmap:
+ z=meta[m['cel']];a=np.array(Image.open(Path('jobber')/z['jobb']/'resultat.png'));x,y,w,h=m['target'];component=np.array(Image.open(m['komponent']));component[component[:,:,3]==0,:3]=0;assert np.array_equal(a[y:y+h,x:x+w],component);proof.append({'cel':m['cel'],'jobb':z['jobb'],'target_rgba_identisk_komponent_etter_nulling_av_usynlig_rgb':True,'ny_donorcel':m['ny_donorcel']})
+(r/'b-sluttbevis.json').write_text(json.dumps({'kilder20_uendret':True,'ruter':proof,'runtime':False,'ny_brukergodkjenning':False},indent=2))

@@ -1,0 +1,33 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,collections
+R=Path.cwd();O=R/'rapporter/bestilling059-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();locked=json.loads((R/'rapporter/bestilling056-20261013/root-max066-kildehash.json').read_text());assert all(sha(R/p)==h for p,h in locked.items());(O/'c-kildehash.json').write_text(json.dumps({'antall':12,'filer':locked,'opprinnelig_laas':'rapporter/bestilling056-20261013/root-max066-kildehash.json'},indent=2)+'\n');M=json.load(open(R/'konsept/2026-10-12/kostymer-originalmetadata.json'))['66'];MD={x['cel']:x for x in M['cels']};C=[];lookup={};seq=collections.defaultdict(list);groups=collections.defaultdict(list)
+def normalized(p,bg):
+ a=np.array(p.convert('RGBA'));a[:,:,3]=np.where(np.all(a[:,:,:3]==bg,axis=2),0,255);a[:,:,:3][a[:,:,3]==0]=0;return Image.fromarray(a)
+for n in range(1,4):
+ name=f'fig066_{n:02}';j=json.load(open(R/'jobber'/name/'jobb.json'));im=Image.open(R/'jobber'/name/'original_1x.png').convert('RGB')
+ for c in j['ruter']:
+  p=normalized(im.crop(c['synlig']),j['bakgrunn']);a=np.array(p);h=hashlib.sha256(str(p.size).encode()+p.tobytes()).hexdigest();m=MD[c['rute']];x,y,x2,y2=c['synlig'];rx,ry,_,_=c['rekt'];colors,counts=np.unique(a[a[:,:,3]>0,:3],axis=0,return_counts=True);z={'jobb':name,**c,'metadata':m,'synlig_rel':[m['rel_x']+x-rx,m['rel_y']+y-ry,m['rel_x']+x2-rx,m['rel_y']+y2-ry],'normalisert_RGB_sha256':h,'palett':[{'rgb':v.tolist(),'antall':int(t)} for v,t in zip(colors,counts)]};C.append(z);lookup[c['rute']]=p;seq[c['animasjon'],c['retning'],c['lag']].append(z);groups[h].append(c['rute'])
+don=collections.defaultdict(list)
+for jf in (R/'jobber').glob('fig003_*/jobb.json'):
+ j=json.load(open(jf));im=Image.open(jf.parent/'original_1x.png').convert('RGB')
+ for c in j['ruter']:
+  p=normalized(im.crop(c['synlig']),j['bakgrunn']);h=hashlib.sha256(str(p.size).encode()+p.tobytes()).hexdigest();don[h].append({'jobb':jf.parent.name,'cel':c['rute'],'synlig':c['synlig']})
+for c in C:c['eksakte_003_donorer']=don.get(c['normalisert_RGB_sha256'],[])
+(O/'c-rutekart066.json').write_text(json.dumps({'ruter':C,'kostyme':M,'unike':len(groups),'dublettgrupper':[v for v in groups.values() if len(v)>1],'kun_analyse':True},indent=2)+'\n')
+contact=Image.new('RGB',(1536,1536),(128,128,128))
+for n in range(1,4):contact.paste(Image.open(R/f'jobber/fig066_{n:02}/referanse.png').resize((768,512)),(0,(n-1)*512))
+contact.save(O/'c-original-kontaktark.png')
+for (a,r,l),arr in seq.items():
+ out=Image.new('RGB',(min(len(arr),6)*280,320*((len(arr)+5)//6)),(145,155,155));dr=ImageDraw.Draw(out)
+ for i,c in enumerate(arr):
+  x=i%6*280;y=i//6*320;dr.text((x+4,y+4),f"cel{c['rute']} a{a} r{r} lag{l} nr{c['nr']}",fill='black');p=lookup[c['rute']];p=p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST);out.paste(p,(x+4,y+30),p)
+ out.save(O/f'c-sekvens-a{a}-r{r}-lag{l}.png')
+# actual relative assembly for all13 heads with body164, all source only
+D={c['rute']:c for c in C};heads=[c['rute'] for c in C if c['lag']==2];out=Image.new('RGB',(1680,960),(145,155,155));dr=ImageDraw.Draw(out)
+for i,cid in enumerate(heads):
+ x=i%6*280;y=i//6*320;dr.text((x+4,y+4),f'164 + {cid}',fill='black')
+ for id in [164,cid]:
+  c=D[id];p=lookup[id];p=p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST);sx,sy,_,_=c['synlig_rel'];out.paste(p,(x+100+sx*4,y+255+sy*4),p)
+out.save(O/'c-rel-tale.png')
+print('ruter',len(C),'unique',len(groups),'donors',sum(bool(c['eksakte_003_donorer']) for c in C));print('new', [c['rute'] for c in C if not c['eksakte_003_donorer']]);print('donors',[(c['rute'],c['eksakte_003_donorer']) for c in C if c['eksakte_003_donorer']]);print('palett', sorted({tuple(v['rgb']) for c in C for v in c['palett']}))

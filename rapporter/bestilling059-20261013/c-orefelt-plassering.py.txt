@@ -1,0 +1,11 @@
+exec(open('rapporter/bestilling059-20261013/c-plasser066.py.txt').read().split('rec=[];')[0])
+raw=Image.open(O/'c-orefelt-raa03.png');rec=[]
+for i,cid in enumerate([139,143,157,161]):
+ p=Image.open(O/f'c-cel{cid}-for-orefelt.png');a=np.array(p);old=p.crop((0,0,p.width,80)).getbbox();q=fit(raw.crop((i%2*768,i//2*512,(i%2+1)*768,(i//2+1)*512)),old[2]-old[0],80)
+ # Only upper 72 px: new ear field ends in old crown; no face/body/prop edits.
+ upper=Image.new('RGBA',(p.width,72));upper.paste(q.crop((0,0,q.width,72)),(old[0],0));p.paste(upper,(0,0));p.save(O/f'c-cel{cid}.png');rec.append({'cel':cid,'felt':[0,0,p.width,72],'nytt_feltboks':[old[0],0,old[2],80],'raw':'c-orefelt-raa03.png','utenfor_endret':int(np.any(a[72:]!=np.array(p)[72:],axis=2).sum()),'sha256':sha(O/f'c-cel{cid}.png')})
+(O/'c-orefelt-bevis.json').write_text(json.dumps(rec,indent=2)+'\n')
+qa=Image.new('RGB',(1000,500),(145,150,150));dr=ImageDraw.Draw(qa)
+for i,cid in enumerate([139,143,157,161]):
+ x=i*250;dr.text((x,0),str(cid),fill='black');p=Image.open(O/f'c-cel{cid}.png');qa.paste(p,(x,30),p)
+qa.save(O/'c-orefelt-qa.png')

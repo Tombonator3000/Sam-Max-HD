@@ -1,0 +1,14 @@
+exec(open('rapporter/bestilling059-20261013/c-plasser066.py.txt').read().split('rec=[];')[0])
+rec=json.load(open(O/'c-nye-komponenter.json'))
+G=json.load(open(O/'c-grupper.json'))
+for group in ['gang-hoyre','gang-forfra','gang-bakfra','a6','smalag']:
+ raw=Image.open(O/f'c-{group}-raa01.png').convert('RGBA');cols=4 if group.startswith('gang') else (3 if group=='a6' else 2);rows=2 if group.startswith('gang') else 1
+ for i,cid in enumerate(G[group]):
+  box=[round(i%cols*raw.width/cols),round(i//cols*raw.height/rows),round((i%cols+1)*raw.width/cols),round((i//cols+1)*raw.height/rows)]
+  c=D[cid];x,y,x2,y2=c['synlig'];p=fit(raw.crop(box),(x2-x)*4,(y2-y)*4);f=O/f'c-cel{cid}.png';p.save(f);rec.append({'cel':cid,'raw':f'c-{group}-raa01.png','ROI':box,'komponent':str(f.relative_to(R)),'sha256':sha(f)})
+(O/'c-nye-komponenter.json').write_text(json.dumps(rec,indent=2)+'\n')
+for k in range(6):
+ cs=C[k*8:(k+1)*8];qa=Image.new('RGB',(1400,740),(135,150,155));dr=ImageDraw.Draw(qa)
+ for i,c in enumerate(cs):
+  cid=c['rute'];x=i%4*350;y=i//4*370;dr.text((x+4,y+4),f"{cid} source / HD",fill='black');p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']);p=p.resize((p.width*3,p.height*3),Image.Resampling.NEAREST);qa.paste(p,(x+4,y+40));p=Image.open(O/f'c-cel{cid}.png');qa.paste(p,(x+175,y+40),p)
+ qa.save(O/f'c-ruteqa-{k+1}.png')

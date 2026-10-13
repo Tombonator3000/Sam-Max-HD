@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import json
+R=Path.cwd();O=R/'rapporter/bestilling059-20261013';D={c['rute']:c for c in json.load(open(O/'c-rutekart066.json'))['ruter']}
+s=Image.new('RGB',(800,600),(255,0,255));h=Image.new('RGBA',(800,600))
+for i,cid in enumerate([139,143,157,161]):
+ c=D[cid];x,y,x2,y2=c['synlig'];p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop((x,y,x2,y+20));p=p.resize((p.width*8,160),Image.Resampling.NEAREST);s.paste(p,(i%2*400+35,i//2*300+50));p=Image.open(O/f'c-cel{cid}.png').crop((0,0,(x2-x)*4,80));p=p.resize((p.width*2,160));h.paste(p,(i%2*400+35,i//2*300+50))
+s.save(O/'c-orefelt-original.png');h.save(O/'c-orefelt-HD.png')
+p=(R/'jobber/fig066_02/prompt.txt').read_text()+'\n\nAV GRENSET KILDEKORREKSJON: Lag en 2x2 samling av bare de fire øvre hode-/ørefeltene i bilde 1, samme rekkefølge. Bilde 2 er eksisterende ny strek/farge og størrelsesfordeling som skal beholdes. Originalen bestemmer de små vinkelendringene i ørenes sider: litt bredere øvre del, et lite sideknekk nedover, så smalere skaft. Det er IKKE hengende krokører; ingen dråpe som henger ned fra toppen. Ørene forblir nesten loddrette med avrundet øvre hjørne. Bevar fire egne par og forskjellene front/front/bak/bak. Bare øvre hodekant nederst, ingen øyne, nese, munn, kropp eller rekvisitt. Gjennomsiktig bakgrunn, ingen lysglød eller skygge rundt feltene. Samme enkle kremhvite konturer og rosa foran, krem bakfra. Ingen tekst. Nytegn jevnt men bevar originalens sideprofiler.\n'
+(O/'c-orefelt-prompt03.txt').write_text(p)

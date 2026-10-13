@@ -1,0 +1,33 @@
+from pathlib import Path
+import json,hashlib,collections
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];read=lambda n:json.loads((r/n).read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+entries=[];rutekart=[]
+for name,receipt in [('b-leveranser.json','root-b-mottakskontroll.json'),('c-leveranser.json','root-c-mottakskontroll.json'),('root-leveranser.json','root-259-mottakskontroll.json')]:
+    proof=read(receipt)
+    for e in read(name)['leveranser']:
+        j=e['jobb'];m=json.loads((root/'jobber'/j/'jobb.json').read_text());p=root/e['resultat'];assert sha(p)==e['sha256']
+        e={**e,'ruter':len(m['ruter']),'kontrollfil':str((r/f'root-{j}-kontroll.txt').relative_to(root)),'uavhengig_mottak':str((r/receipt).relative_to(root)),'runtime_verifisert':False,'importert':False,'visuelt_godkjent':False,'stil_godkjent_av_Tom':True,'klar_for_mottak':True};entries.append(e)
+        im=Image.open(p).convert('RGBA')
+        for z in m['ruter']:
+            x,y,X,Y=z['synlig'];a=np.array(im.crop((64+4*x,32+4*y,64+4*X,32+4*Y)));yy,xx=np.nonzero(a[:,:,3]>128)
+            assert len(xx);box=[64+4*x+int(xx.min()),32+4*y+int(yy.min()),64+4*x+int(xx.max())+1,32+4*y+int(yy.max())+1]
+            rutekart.append({'jobb':j,'cel':z['rute'],'source_synlig':z['synlig'],'source_rekt':z['rekt'],'lag':z['lag'],'animasjon':z['animasjon'],'bbox_alpha_over128':box,'piksler_alpha_over128':len(xx)})
+locks={**read('b-kildehash.json')['filer'],**read('b-konteksthash.json')['filer'],**read('c-kildehash.json')['filer'],**read('root-max259-kildehash.json')}
+for p,h in locks.items():assert sha(root/p)==h,p
+foot=[];csrc={z['rute']:z for z in read('c-rutekart066.json')['ruter']}
+for e in read('c-fotfarge-kildebevis.json')['ruter']:
+    p=root/'jobber'/csrc[e['cel']]['jobb']/'original_1x.png';assert sha(p)==e['original_sha256'];im=np.array(Image.open(p).convert('RGB').crop(e['original_synlig']))
+    x,y,X,Y=e['fotfelt_lokalt'];yy,xx=np.nonzero(np.all(im[y:Y,x:X]==e['rosa_rgb'],axis=2));pts=[[int(a+x),int(b+y)] for a,b in zip(xx,yy)]
+    assert pts==e['rosa_xy_lokalt'] and len(pts)==e['rosa_piksler'];foot.append({'cel':e['cel'],'kilde_rgb':e['rosa_rgb'],'piksler_i_fotfelt':len(pts)})
+assert len(entries)==10 and sum(e['ruter'] for e in entries)==115
+status=dict(collections.Counter(e['egenkontroll'] for e in entries));assert status=={'OK':9,'SJEKK':1}
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+(r/'fremdrift.json').write_text(json.dumps({'dato':stamp,'gren':'gpt-arbeid','produksjonsagenter':'gpt-6-astra','bildemodell':'eksakt navn ikke eksponert','leveranser':entries,'importert':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+(r/'rutekart-hd.json').write_text(json.dumps({'ruter':rutekart},ensure_ascii=False,indent=2)+'\n')
+(r/'kildehash.json').write_text(json.dumps([{'fil':p,'sha256':h} for p,h in sorted(locks.items())],ensure_ascii=False,indent=2)+'\n')
+(r/'sluttkontroll.json').write_text(json.dumps({'utfall_antall':{**status,'FEIL':0},'nye_jobber':10,'nye_figurruter':115,'beskyttede_jobbfiler_for_nye_jobber':40,'totalt_verifiserte_unike_låser':len(locks),'bildekall':16,'sam091_ruter':49,'max066_ruter':46,'max259_ruter':20,'rosa_såler_kildeverifisert':foot,'motorimport':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('Forberedt59:',len(entries),'jobber,115 ruter,',len(locks),'kildelåser,9OK/1SJEKK, rosa kildefarge bekreftet i10 fotfelt.')

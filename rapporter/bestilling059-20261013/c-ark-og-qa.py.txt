@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib
+R=Path.cwd();O=R/'rapporter/bestilling059-20261013';C=json.load(open(O/'c-rutekart066.json'))['ruter'];D={c['rute']:c for c in C}
+for job in ['fig066_01','fig066_02','fig066_03']:
+ im=Image.new('RGBA',(1536,1024));rows=[]
+ for c in C:
+  if c['jobb']!=job:continue
+  x,y,x2,y2=c['synlig'];p=Image.open(O/f"c-cel{c['rute']}.png");im.paste(p,(64+x*4,32+y*4));rows.append({'cel':c['rute'],'komponent':str((O/f"c-cel{c['rute']}.png").relative_to(R)),'sha256':hashlib.sha256((O/f"c-cel{c['rute']}.png").read_bytes()).hexdigest(),'malboks':[64+x*4,32+y*4,64+x2*4,32+y2*4],'rel':c['synlig_rel']})
+ im.save(R/'jobber'/job/'resultat.png');(O/f'c-{job}-rutekart.json').write_text(json.dumps(rows,indent=2)+'\n')
+for k in range(8):
+ cs=C[k*6:(k+1)*6];qa=Image.new('RGB',(1560,730),(135,150,155));dr=ImageDraw.Draw(qa)
+ for i,c in enumerate(cs):
+  x=i%3*520;y=i//3*365;dr.text((x+4,y+4),f"cel{c['rute']} kilde 4x / HD",fill='black');p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']);p=p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST);qa.paste(p,(x+4,y+35));p=Image.open(O/f"c-cel{c['rute']}.png");qa.paste(p,(x+268,y+35),p)
+ qa.save(O/f'c-ruteqa-{k+1}.png')
+# Rel composites, no source masks.
+cs=[(164,c['rute']) for c in C if c['jobb']=='fig066_02' and c['lag']==2]+[(132,384),(130,512)]
+qa=Image.new('RGB',(1500,1120),(145,150,150));dr=ImageDraw.Draw(qa)
+for i,ids in enumerate(cs):
+ x=i%5*300+125;y=i//5*370+300;dr.text((i%5*300+4,i//5*370+4),str(ids),fill='black')
+ for cid in ids:
+  p=Image.open(O/f'c-cel{cid}.png');a,b,_,_=D[cid]['synlig_rel'];qa.paste(p,(x+a*4,y+b*4),p)
+qa.save(O/'c-rel-HD.png')
