@@ -48,3 +48,10 @@
 - Fire uendrede egenkontroller gir OK. Tilleggskontroll dekker de små øyelokkrutene som skriptet hopper over. Alle 18 låste kilde-/hovedarkfiler er bevart. Prosedyrer, prompter, råbilder, kildehash, rutekart, kontaktark og valgt-tempo gangdiagnose finnes i rapporter/stilpilot-fortsettelse-20261013/. Ingen originaltiming eller motoravspilling er påstått.
 - Tom godkjente deretter hele piloten og autoriserte resten av HD-konverteringen. Dette er registrert i TOMS-GODKJENNING.json og går foran det tidligere stoppunktet etter piloten. Han ba om fortsettelse med Astra; chatmodellinnstillingen er bekreftet gpt-6-astra.
 - Motor-/pipelinekode, beskyttede jobbfiler, status.csv og Claude-eide ORDRE.md er ikke endret. Ingen motorimport, spilltest eller publisert HD-mod i denne grafikkleveransen.
+
+## 2026-10-13 17:48 (Codex, Astra)
+
+- Fullført bestilling 2: obj036_01, rom002, obj050_01, rom003, rom004, rom005, rom006, rom008, rom009_del1av2 og rom009_del2av2. Alle ti egenkontroller OK; 40 beskyttede kilder uendret.
+- Gatens overlapp 1152 x 800 er byte-identisk fra én master. Historisk logo og dokumentert skilttekst kontrollert. Tilsiktede ufullstendige introansikter bevart for motorens separate animasjonslag. Bakre gangdørtekst er uleselig; dekorative løkker rettet til enkle tegnklaser uten ordgjetting.
+- Manifest, råforsøk, prompter, oppskrifter, samlet kontaktark og usikkerhet ligger i rapporter/bestilling002-20261013/. Innebygd bildeverktøy, eksakt bildemodell ikke eksponert.
+- Bestilling 3 startet etter samme autorisasjon. Ingen motorimport, spilltest eller individuell Tom-godkjenning av de ti nye bildene er påstått. Ingen endringer i beskyttede jobbfiler, kode, status.csv eller ORDRE.md.

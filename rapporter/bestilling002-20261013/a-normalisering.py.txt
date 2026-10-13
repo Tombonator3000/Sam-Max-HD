@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+import shutil, json, hashlib
+b = Path(__file__).resolve().parents[2]
+r = b / 'rapporter/bestilling002-20261013'
+sources = {
+ 'obj036_01': ('exec-fd22f424-e4bf-4d33-87e5-22856f0b6012.png', (256,240,1280,784)),
+ 'rom002': ('exec-497ed448-2679-4c1b-b481-6a30ab24bd3e.png', (128,112,1408,912)),
+ 'obj050_01': ('exec-6b1d45e3-931f-415a-936c-ad4c65922823.png', (303,194,1233,802)),
+}
+for id,(filename,box) in sources.items():
+ src=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a')/filename
+ shutil.copy2(src,r/f'{id}-forsok01.png')
+ im=Image.open(src).convert('RGB')
+ meta=json.loads((b/f'jobber/{id}/jobb.json').read_text())
+ x,y,w,h=meta['bilde_i_lerret']
+ content=im.crop(box)
+ if content.size != (w,h): content=content.resize((w,h),Image.Resampling.LANCZOS)
+ out=Image.new('RGB',(1536,1024),(128,128,128))
+ out.paste(content,(x,y))
+ out.save(b/f'jobber/{id}/resultat.png')
+ print(id,hashlib.sha256((b/f'jobber/{id}/resultat.png').read_bytes()).hexdigest())

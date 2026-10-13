@@ -1,0 +1,24 @@
+from PIL import Image
+from pathlib import Path
+import numpy as np
+r=Path('rapporter/bestilling002-20261013')
+a=Image.open(r/'rom008-raa-1.png').convert('RGB')
+c=Image.new('RGB',(1536,1024),(128,128,128))
+c.paste(a.crop((128,112,1408,912)),(128,112))
+c.save('jobber/rom008/resultat.png')
+a=np.array(Image.open(r/'rom009_del1av2-raa-1.png').convert('RGB').crop((0,112,1536,912)))
+b=np.array(Image.open(r/'rom009_del2av2-raa-1.png').convert('RGB').crop((0,112,1536,912)))
+f=np.zeros((800,1920,3),dtype=np.uint8)
+f[:,:1536]=a
+f[:,1536:]=b[:,1152:]
+x0,x1=938,1030
+f[:,x1:]=b[:,x1-384:]
+for x in range(x0,x1):
+    t=(x-x0)/(x1-x0)
+    t=t*t*(3-2*t)
+    f[:,x]=np.rint((1-t)*a[:,x]+t*b[:,x-384]).astype('uint8')
+Image.fromarray(f).save(r/'rom009-fullscene.png')
+for i,x in enumerate((0,384),1):
+    c=Image.new('RGB',(1536,1024),(128,128,128))
+    c.paste(Image.fromarray(f[:,x:x+1536]),(0,112))
+    c.save(f'jobber/rom009_del{i}av2/resultat.png')

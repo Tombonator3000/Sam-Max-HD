@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil,hashlib,subprocess
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+mapping=json.loads("{\"rom003\":\"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-ff96f58f-0104-4025-aa26-be79ac499201.png\",\"rom004\":\"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-22cbfd4e-a545-41cb-9384-15427090feda.png\",\"rom005\":\"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-e237e44d-5540-4266-bc72-42941703ab91.png\",\"rom006\":\"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-a035d641-f587-426d-8394-7f9ced2096a5.png\"}")
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for job,src in mapping.items():
+    raw=b/'rapporter/bestilling002-20261013'/f'{job}-raaforsok1.png'
+    shutil.copy2(src,raw)
+    im=Image.open(src).convert('RGB')
+    assert im.size==(1536,1024),im.size
+    result=Image.new('RGB',(1536,1024),(128,128,128))
+    result.paste(im.crop((128,112,1408,912)),(128,112))
+    dest=b/'jobber'/job/'resultat.png'
+    result.save(dest)
+    p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(dest)],cwd=b,text=True,capture_output=True)
+    (b/'rapporter/bestilling002-20261013'/f'{job}-kontroll.txt').write_text(p.stdout+p.stderr)
+    print(job,p.returncode,p.stdout,p.stderr)

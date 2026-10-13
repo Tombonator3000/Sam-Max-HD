@@ -1,0 +1,95 @@
+{
+  "dato": "2026-10-13",
+  "leveranser": [
+    {
+      "jobb": "obj036_01",
+      "resultat": "jobber/obj036_01/resultat.png",
+      "sha256": "bbfa38ece282881d9202e0d64999762cbf5645528cf22143f0f9ccccf0ff01ed",
+      "egenkontroll": "OK",
+      "kontrollfil": "rapporter/bestilling002-20261013/obj036_01-kontroll.txt",
+      "forsok": 1,
+      "modell": "Eksakt bildemodellversjon ikke eksponert",
+      "bilde_i_lerret": [
+        256,
+        240,
+        1024,
+        544
+      ],
+      "padding_rgb": [
+        128,
+        128,
+        128
+      ],
+      "kildehash": {
+        "referanse.png": "376cc94e20a7677b049caddece0ecfcb93692ebcc3c88557c08a15fad808ac34",
+        "original_1x.png": "7592f4df7adad035173e3fe75cd7149675a26bc6c540c9d33c11d334251ccf1d",
+        "prompt.txt": "0374c4c7eceacba6964bb686eb1e5afc6d8647caeabcfb9d8cedafc1d399e02d",
+        "jobb.json": "eb8e4cd03f6ffd5a98687a8fe0fa457d019721f018c53d5331a099bbdb03c9ce"
+      },
+      "visuell_egenkontroll": "Historisk lilla L-form med hvit LUCAS og kursiv Arts, liten gullmann med hevede armer under strålebue, TM og gullteksten LucasArts Entertainment Company. Den mørke vinrøde bakgrunnen er flat i originalen. Logoen er ikke en ny figur. Tekst og symbolidentitet er kontrollert visuelt mot både 1x og 4x.",
+      "etterbehandling": "Generatoren holdt utsnittet. Grå padding satt eksakt til RGB128. Svak uønsket bakgrunnsstruktur ble fjernet med fargenøkkel basert på generatorens egne RGB-verdier til originalens flate RGB31,0,23. Ingen originalpikselmaske. Før rettelsen gav blokkontrollen FEIL 40.88; etter rettelsen OK 0.43.",
+      "runtime_verifisert": false,
+      "tom_godkjent": false
+    },
+    {
+      "jobb": "rom002",
+      "resultat": "jobber/rom002/resultat.png",
+      "sha256": "51a93c112da67447d8f7e0b623e7d31bf5a96eb8a4f6da9919e3b3291d3825a4",
+      "egenkontroll": "OK",
+      "kontrollfil": "rapporter/bestilling002-20261013/rom002-kontroll.txt",
+      "forsok": 1,
+      "modell": "Eksakt bildemodellversjon ikke eksponert",
+      "bilde_i_lerret": [
+        128,
+        112,
+        1280,
+        800
+      ],
+      "padding_rgb": [
+        128,
+        128,
+        128
+      ],
+      "kildehash": {
+        "referanse.png": "168443618fb87925d2acafffb06851bfaed05261068746abb8dbdaa80f8fcf66",
+        "original_1x.png": "361626ac276f716d1e3adc5497d8a436009b5f67c25394f0e337aeadcc0ff282",
+        "prompt.txt": "5d5dd8041964240a22907af1acf273689af5af695f67a3a4a2c5d848cbd824d7",
+        "jobb.json": "c534b9e9cfbe1e7eceffae7d05c455a092ee06b5cbe391802cb54f5f6676246d"
+      },
+      "visuell_egenkontroll": "Tomt laboratorierom med blåfiolett mur, skrå takbjelker, hengende apparater, grønne glødekuler, oransje ledninger, rødbrun kasse og plattform i venstre lyspøl. To skallesymboler ved venstre veggpanel og en større forgrunnsskalle er bevart, sammen med løs pære, hylleflasker og tre spaker til høyre. Ingen tekst eller figurer finnes i denne bakgrunnen.",
+      "etterbehandling": "Generatoren holdt utsnittet. Bare grå padding er normalisert til RGB128; motivpiksler er ikke skalert eller maskert.",
+      "runtime_verifisert": false,
+      "tom_godkjent": false
+    },
+    {
+      "jobb": "obj050_01",
+      "resultat": "jobber/obj050_01/resultat.png",
+      "sha256": "dc83d735fe93ba7bafd70df681783e764839af41246af9e824233030f6c45a48",
+      "egenkontroll": "OK",
+      "kontrollfil": "rapporter/bestilling002-20261013/obj050_01-kontroll.txt",
+      "forsok": 1,
+      "modell": "Eksakt bildemodellversjon ikke eksponert",
+      "bilde_i_lerret": [
+        400,
+        272,
+        736,
+        480
+      ],
+      "padding_rgb": [
+        128,
+        128,
+        128
+      ],
+      "kildehash": {
+        "referanse.png": "d34547cc1acfb00b379b51ec17f357a9d9cf50c2f3e96c4e336e1d6a8e94131b",
+        "original_1x.png": "9e6cdbc09117f881297b9d7fc2699ff98112fb2065623eb780fb1dd092909d06",
+        "prompt.txt": "3ffec6ec5bfd6f107228451a7e6ed887ea9ef05f4e65036463334a6bcb6f3923",
+        "jobb.json": "c6386415831fb6e2d2b854efa26668a5e357bb7ec220ec026ec26c31697719b6"
+      },
+      "visuell_egenkontroll": "Metadata plasserer objektet i rom 2 ved 104,64 med mål184x120. Referansen viser samme apparat, forgrunnsskalle, pære og ledninger som rom002, men med tagget åpning og nedrast blå murstein. Oransjefeltet tolkes visuelt som bakgrunnen gjennom hullet, ikke ild eller en skapning. Denne semantikken ble presisert i prompten. Ingen hendelsesavspilling er utført.",
+      "etterbehandling": "Generatoren forstørret motivrektangelet til omtrent930x608. Det ble beskåret til x303,y194,x1233,y802 og skalert med Lanczos til736x480, deretter plassert ved400,272 på1536x1024. Ingen originalpikselmaske. Murkant og haug er nytegnet; enkeltsteiners mikrokontur er ikke verifisert som identisk.",
+      "runtime_verifisert": false,
+      "tom_godkjent": false
+    }
+  ]
+}

@@ -22,4 +22,5 @@
 
 - [x] Fullført resten av stilpiloten: rom007_del1av2, rom007_del2av2, fig002_01 og fig003_01. Fire egenkontroller OK, 37 eksakte rutebokser og separat blinkkontroll.
 - [x] Tom godkjente stilpiloten og autoriserte videre HD-konvertering: «veldig bra! godkjenner dette! sett inn i repo , fortsett med resten av HD konvertering».
-- [ ] Fortsett bestilling 2 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Fullfør bestilling 2 med ti kildekontrollerte HD-bilder, egne notater, egenkontroll OK og byte-identisk gateoverlapp. Se rapporter/bestilling002-20261013/RAPPORT.md.
+- [ ] Fortsett bestilling 3 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

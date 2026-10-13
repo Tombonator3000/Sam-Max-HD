@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+b=Path(__file__).resolve().parents[2]
+p=b/'jobber/obj036_01/resultat.png'
+im=Image.open(p).convert('RGB')
+a=np.array(im)
+c=a[240:784,256:1280]
+# Fargenokkel av bare generatorens morke vinrode bakgrunn. Ingen originalmaske.
+m=(c[:,:,0]<60)&(c[:,:,0]>20)&(c[:,:,1]<12)&(c[:,:,2]<45)&(c[:,:,0]>c[:,:,2]+5)
+c[m]=(31,0,23)
+Image.fromarray(a).save(p)

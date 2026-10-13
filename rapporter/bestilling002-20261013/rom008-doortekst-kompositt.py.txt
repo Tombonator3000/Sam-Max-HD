@@ -1,0 +1,8 @@
+from PIL import Image
+from pathlib import Path
+r=Path('rapporter/bestilling002-20261013')
+a=Image.open(r/'rom008-for-doortekst.png').convert('RGB')
+b=Image.open(r/'rom008-raa-2-doortekst.png').convert('RGB')
+box=(886,373,911,434)
+a.paste(b.crop(box),box[:2])
+a.save('jobber/rom008/resultat.png')
