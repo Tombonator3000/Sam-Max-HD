@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 00:10 (norsk tid)
+Oppdatert 2026-10-14 00:11 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 416 bilder levert (197 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 426 bilder levert (206 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -634,15 +634,15 @@ Rom 49, 50, 52.
 
 Rom 52, 53.
 
-- [ ] `lag052_04_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 04 med 2 objektbilder, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`)
-- [ ] `lag052_05_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 05 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_06_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 06 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_07_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 07 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_08_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 08 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_09_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 09 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_10_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 10 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_11_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 11 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_12_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 12 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_04_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 04 med 2 objektbilder, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`)
+- [x] `lag052_05_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 05 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_06_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 06 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_07_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 07 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_08_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 08 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_09_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 09 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_10_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 10 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_11_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 11 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_12_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 12 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
 - [ ] `lag053_01_del1av2` (rom 53 Savage Jungle Inn, festsalen, lag 01 med 15 objektbilder, del 1/2, bilde to `jobber/rom053_del1av2/resultat.png`)
 
 ## Bestilling 43
@@ -3513,3 +3513,5 @@ Bestilling 40: åtte lag levert OK med 30 faktiske feltkontroller, egne sangroms
 Bestilling 43: åtte lag levert OK med 21 faktiske feltkontroller. Tomt pelsdrakthode og målerstilling er korrigert. Festsalfigurer og isblokk venter på motivavklaring. Se `rapporter/bestilling043-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 
 Bestilling 41: ti lag levert OK med 27 faktiske feltkontroller og to byte-identiske panoramaoverlapper. VR-varianten uten sverd bruker allerede valgt vektormetode for samme rom. Se `rapporter/bestilling041-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+
+Bestilling 42: ni lobbylag levert OK med ti faktiske feltkontroller. Festsallaget venter på motivavklaring. Se `rapporter/bestilling042-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.

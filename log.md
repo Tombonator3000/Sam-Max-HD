@@ -307,3 +307,8 @@
 
 - Bestilling 41: ti lag levert OK med 27 faktiske feltkontroller og to byte-identiske panoramaoverlapper. VR-varianten uten sverd bruker allerede valgt vektormetode for samme rom. Se `rapporter/bestilling041-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T00:11:14+02:00 (Codex, Astra)
+
+- Bestilling 42: ni lobbylag levert OK med ti faktiske feltkontroller. Festsallaget venter på motivavklaring. Se `rapporter/bestilling042-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
