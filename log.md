@@ -158,3 +158,9 @@
 - Bestilling 16 levert med 7 OK og 3 SJEKK, obj649/650/668. Root har sett original/HD samlet og beholdt dokumenterte konturavvik. 40 beskyttede kilder uendret, SHA/lerret/padding kontrollert.
 - Tom grønn tavle, egen metallbakside, fire knuste tilstander med meningsfulle svarte tomrom, STARTING LINE/FINISH LINE og to ulike gul/oransje horisonter. Første 664/666/682-FEIL og motivfeil i 665 er rettet før levering.
 - Alle ti bestilling 15-PNG SHA-verifisert fra GitHub. Proveniens/QA i rapporter/bestilling016-20261013/. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Bestilling 17/18 pågår.
+
+## 2026-10-13 20:09 (Codex, Astra)
+
+- Bestilling 17 ni klare OK, rom077 del1 teknisk OK men visuelt uavklart etter fem forsøk og ukrysset. Master ikke endelig låst, del2 kun kandidat i rapport. Metodevalg for presis vektorrekonstruksjon077 spurt separat.
+- 40+4 beskyttede kilder uendret, canvas/padding/SHA kontrollert. Root har sett alle original/HD samlet. Rom070/073 har 1152/928 x800 identiske overlapp. Pizzaetikettens glyffer fortsatt restusikkerhet.
+- 26 fargede klesgrupper, Sam/Max uten separate UI-knapper, fisker i elv og eget mørkt munnoverlegg, frossen Bruno med tom venstresylinder og egen tom isrest kildekontrollert. Ingen import, runtime eller ny individuell godkjenning. Alle ti bestilling16-PNG SHA-verifisert fra GitHub. Bestilling18/19 fortsetter.

@@ -1,0 +1,28 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import csv,json,hashlib,re
+B=Path.cwd();R=B/'rapporter/bestilling017-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+m=Image.open(R/'a-rom070-raa01.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS)
+n=Image.open(R/'a-rom070-raa02-etikett.png').convert('RGB').resize((1920,800),Image.Resampling.LANCZOS);box=(1290,48,1490,132);m.paste(n.crop(box),box[:2])
+assert m.tobytes()==Image.open(R/'a-rom070-fullmaster.png').convert('RGB').tobytes()
+items=[]
+for j,x in [('rom070_del1av2',0),('rom070_del2av2',384)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(m.crop((x,0,x+1536,800)),(0,112));assert out.tobytes()==Image.open(B/f'jobber/{j}/resultat.png').convert('RGB').tobytes()
+ items.append({'jobb':j,'resultat':f'jobber/{j}/resultat.png','sha256':sha(B/f'jobber/{j}/resultat.png'),'egenkontroll':'OK','kontrollfil':f'rapporter/bestilling017-20261013/a-{j}-kontroll.txt','forsok':2,'fullmaster':str((R/'a-rom070-fullmaster.png').relative_to(B)),'fullmaster_sha256':sha(R/'a-rom070-fullmaster.png'),'masterklipp':[x,0,1536,800],'runtime':False,'ny_brukergodkjenning':False,'visuell_restusikkerhet':'Pizzaeskeglyffer og små indre ornamenter er ikke eksakt kildeavklart.'})
+j='rom071';raw=Image.open(R/'a-rom071-raa.png').convert('RGB');out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(raw.crop((128,112,1408,912)),(128,112));assert out.tobytes()==Image.open(B/f'jobber/{j}/resultat.png').convert('RGB').tobytes()
+items.append({'jobb':j,'resultat':f'jobber/{j}/resultat.png','sha256':sha(B/f'jobber/{j}/resultat.png'),'egenkontroll':'OK','kontrollfil':f'rapporter/bestilling017-20261013/a-{j}-kontroll.txt','forsok':1,'runtime':False,'ny_brukergodkjenning':False})
+(R/'a-leveranser.json').write_text(json.dumps({'leveranser':items},indent=2))
+locks=sum([json.loads((R/f).read_text()) for f in ['kildehash.json','ekstra-kildehash.json']],[]);proof=[dict(v,uendret=sha(B/v['fil'])==v['sha256']) for v in locks];assert all(v['uendret'] for v in proof)
+a=Image.open(B/'jobber/rom070_del1av2/resultat.png').crop((384,112,1536,912));b=Image.open(B/'jobber/rom070_del2av2/resultat.png').crop((0,112,1152,912));assert a.tobytes()==b.tobytes()
+(R/'a-kildebevis.json').write_text(json.dumps({'kilder':proof,'overlapp_hd':[1152,800],'overlapp_identisk':True,'overlapp_rgb_sha256':hashlib.sha256(a.tobytes()).hexdigest(),'raa_sha256':{p.name:sha(p) for p in R.glob('a-*-raa*.png')}},indent=2))
+rows=[r for r in csv.reader(open(B/'konsept/2026-10-12/objektbilder-959.csv')) if len(r)>8 and r[0]=='70' and r[1].isdigit() and 685<=int(r[1])<=710]
+contact=Image.new('RGB',(1440,1680),(170,170,170));d=ImageDraw.Draw(contact);o=Image.open(R/'a-rom070-original-master.png')
+for k,r in enumerate(rows):
+ x,y,w,h=map(int,r[5:9]);xx=(k%4)*360;yy=(k//4)*240;d.text((xx+4,yy+4),r[1]+' kilde / HD',fill='black')
+ for col,im in enumerate([o,m]):
+  crop=im.crop((x*4,y*4,(x+w)*4,(y+h)*4));crop.thumbnail((174,205),Image.Resampling.LANCZOS);contact.paste(crop,(xx+col*180,yy+24))
+contact.save(R/'a-rom070-26-deler-qa.png')
+q=Image.new('RGB',(1280,840),(150,150,150))
+for c,f in enumerate(['referanse.png','resultat.png']):q.paste(Image.open(B/f'jobber/rom071/{f}').crop((128,112,1408,912)).resize((640,400)),(c*640,20))
+q.save(R/'a-rom071-qa.png')
+print(json.dumps(items,indent=2))

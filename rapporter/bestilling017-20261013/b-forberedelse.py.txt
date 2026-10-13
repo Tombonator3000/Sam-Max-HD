@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling017-20261013'
+a=Image.open(b/'jobber/rom073_del1av2/original_1x.png').convert('RGB');z=Image.open(b/'jobber/rom073_del2av2/original_1x.png').convert('RGB')
+assert np.array_equal(np.array(a)[:,152:],np.array(z)[:,:232])
+full=Image.new('RGB',(536,200));full.paste(a,(0,0));full.paste(z,(152,0));full.save(r/'rom073-fullkilde1x.png')
+ref=Image.new('RGB',(2144,1024),(128,128,128));ref.paste(full.resize((2144,800),Image.Resampling.NEAREST),(0,112));ref.save(r/'rom073-fullkilde.png')

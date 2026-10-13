@@ -1,0 +1,24 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image.
+
+
+SOURCE CLARIFICATION: Flashback freakshow. Frozen Bruno, a gray blue long-armed Bigfoot, stands INSIDE the tall blue-white ice on right pedestal. Preserve his source expression, thin arms, hands, feet and pose. Left green cylinder is EMPTY with dark open oval top, NOT occupied by anyone. Retain blue outdoor glimpse through curtain, lamp, wooden floor, exact shadows and black surroundings. Letter shapes CHICKEN DUMPLING left; upper right partially clipped BRUNO / THE / FROZEN / BIG FOOT; lower BRUNO. Do not complete hidden letters or brighten dark upper sign. Motif exactly x128 y112 width1280 height800, gray128 outside on1536x1024. Same odd tilted signs and perspective. Second reference only clean stroke and painted shading, no imported objects.
+
+LOCAL CORRECTION CROP: Return only attached 1104x660 sign crop, same frame. First is source zoom; second chosen HD. Darken and conceal upper BRUNO and trailing FROZEN... letters exactly as in source. Do not guess full hidden word. Follow source letter shapes and source slant closely, preserve lower BIG FOOT. Keep large black upper-right wedge exactly source position and darkness. No new letters, no frosty drips or decorative typography. Preserve lower edge of ice/Bruno in HD crop. Only sign shading/letterforms need correction.

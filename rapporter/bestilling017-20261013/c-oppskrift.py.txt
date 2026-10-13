@@ -1,0 +1,21 @@
+from PIL import Image
+from pathlib import Path
+import numpy as np
+R=Path('rapporter/bestilling017-20261013')
+for j,n,box in [('obj684_01',2,(128,464,1408,560)),('rom076',1,(128,112,1408,912)),('obj773_01',1,(512,144,1024,880))]:
+ out=Image.new('RGB',(1536,1024),(128,128,128))
+ out.paste(Image.open(R/(j+'-raa-'+str(n)+'.png')).convert('RGB').crop(box),box[:2])
+ if j!='obj684_01':
+  n=2 if j=='rom076' else 3;xy=(856,112) if j=='rom076' else (536,144)
+  patch=Image.open(R/(j+'-raa-'+str(n)+'.png')).convert('RGB').resize((368,220),Image.Resampling.LANCZOS)
+  mask=np.ones((220,368))
+  for d in range(3):
+   mask[d,:]=d/3;mask[-1-d,:]=d/3;mask[:,d]=np.minimum(mask[:,d],d/3);mask[:,-1-d]=np.minimum(mask[:,-1-d],d/3)
+  out.paste(patch,xy,Image.fromarray((mask*255).astype('uint8')))
+ out.save('jobber/'+j+'/resultat.png')
+a=Image.open(R/'rom077-raa-1.png').convert('RGB')
+master=Image.new('RGB',(2560,800));master.paste(a.crop((1086,247,2172,470)).resize((1280,264),Image.Resampling.LANCZOS),(1280,268));master.save(R/'rom077-fullmaster.png')
+for part,x in [(1,0),(2,1024)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(master.crop((x,0,x+1536,800)),(0,112))
+ dest=Path('jobber/rom077_del1av2') if part==1 else R/'rom077_del2av2-kontroll'
+ out.save(dest/'resultat.png')

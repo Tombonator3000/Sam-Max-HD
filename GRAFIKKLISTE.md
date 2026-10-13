@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 19:40 (norsk tid)
+Oppdatert 2026-10-13 20:09 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 60 hele rom levert (92 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 38 levert, inkludert 9 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 64 hele rom levert (98 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 61 levert, inkludert 13 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -259,15 +259,15 @@ Rom 68, 69.
 
 Rom 69, 70, 71, 73, 76, 77.
 
-- [ ] `obj684_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 684 tilstand 01)
-- [ ] `rom070_del1av2` (rom 70 Påkledning, Max (silhuetter), del 1/2)
-- [ ] `rom070_del2av2` (rom 70 Påkledning, Max (silhuetter), del 2/2)
-- [ ] `rom071` (rom 71 Påkledning, Sam og Max)
-- [ ] `rom073_del1av2` (rom 73 Inne i fiskens munn, del 1/2)
-- [ ] `rom073_del2av2` (rom 73 Inne i fiskens munn, del 2/2)
-- [ ] `obj772_01` (rom 73 Inne i fiskens munn, objekt 772 tilstand 01)
-- [ ] `rom076` (rom 76 Tilbakeblikk: Bruno i isen)
-- [ ] `obj773_01` (rom 76 Tilbakeblikk: Bruno i isen, objekt 773 tilstand 01)
+- [x] `obj684_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 684 tilstand 01)
+- [x] `rom070_del1av2` (rom 70 Påkledning, Max (silhuetter), del 1/2)
+- [x] `rom070_del2av2` (rom 70 Påkledning, Max (silhuetter), del 2/2)
+- [x] `rom071` (rom 71 Påkledning, Sam og Max)
+- [x] `rom073_del1av2` (rom 73 Inne i fiskens munn, del 1/2)
+- [x] `rom073_del2av2` (rom 73 Inne i fiskens munn, del 2/2)
+- [x] `obj772_01` (rom 73 Inne i fiskens munn, objekt 772 tilstand 01)
+- [x] `rom076` (rom 76 Tilbakeblikk: Bruno i isen)
+- [x] `obj773_01` (rom 76 Tilbakeblikk: Bruno i isen, objekt 773 tilstand 01)
 - [ ] `rom077_del1av2` (rom 77 Rulletekst (paneler), del 1/2)
 
 ## Bestilling 18
@@ -3455,3 +3455,5 @@ Bestilling 14: 7 OK og 3 SJEKK, ti bilder levert. Komponentkontroll av stjerner 
 Bestilling 15: 9 OK og obj605_01 SJEKK, ti veisegmenter levert. Genererte stripe-/veikomponenter presist skalert, lokale restavvik dokumentert. Se `rapporter/bestilling015-20261013/RAPPORT.md`. Bestilling 16 fortsetter.
 
 Bestilling 16: 7 OK og 3 SJEKK (obj649_01, obj650_01 og obj668_01), ti bilder levert. Tavlenes bakside/knuste tilstander, lave banemarkeringer og sparse horisontkonturer kildekontrollert. Se `rapporter/bestilling016-20261013/RAPPORT.md`. Bestilling 17 fortsetter.
+
+Bestilling 17: ni leveranseklare OK. Rom077 del1 teknisk OK, men konkret motivavvik etter fem bildeforsøk, ikke klar og ukrysset; master ikke endelig låst. Se `rapporter/bestilling017-20261013/RAPPORT.md`. Bestilling 18/19 fortsetter uavhengig.

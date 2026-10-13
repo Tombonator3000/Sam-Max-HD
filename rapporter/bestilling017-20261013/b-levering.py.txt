@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil,subprocess,numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling017-20261013';raws={"73":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-8970f23b-9d5e-4aad-b487-056db4d277cd.png","772":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-2d71a9ca-98e8-4d81-9fd7-b11fe84aa866.png"}
+shutil.copy2(raws['73'],r/'rom073-raa01.png')
+im=Image.open(raws['73']).convert('RGB').resize((2144,1024),Image.Resampling.LANCZOS).crop((0,112,2144,912));im.save(r/'rom073-fullmaster.png')
+for part,x in [(1,0),(2,608)]:
+ a=Image.new('RGB',(1536,1024),(128,128,128));a.paste(im.crop((x,0,x+1536,800)),(0,112));a.save(b/'jobber'/f'rom073_del{part}av2'/'resultat.png')
+shutil.copy2(raws['772'],r/'obj772_01-raa01.png')
+im=Image.open(raws['772']).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+a=Image.new('RGB',(1536,1024),(128,128,128));a.paste(im.crop((128,112,1408,912)),(128,112));a.save(b/'jobber/obj772_01/resultat.png')
+a=np.array(Image.open(b/'jobber/rom073_del1av2/resultat.png'));z=np.array(Image.open(b/'jobber/rom073_del2av2/resultat.png'));assert np.array_equal(a[112:912,608:],z[112:912,:928])
+for j in ['rom073_del1av2','rom073_del2av2','obj772_01']:
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(b/'jobber'/j/'resultat.png')],capture_output=True,text=True)
+ (r/(j+'-kontroll.txt')).write_text(p.stdout+p.stderr);print(j,p.stdout)
