@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import shutil,json,hashlib,numpy as np
+p=Path('rapporter/bestilling038-20261013');r=Path('/home/tombonator3000t/.codex/generated_images/01a135e9-14ca-7082-b901-a0ecf3e0b936')
+for n,f in [('arm','fbe33cc9-963f-4555-b0f7-b2d1f4d00f1b'),('bus','eb6f1015-4475-41fa-98ff-5cbfcf522040')]:shutil.copyfile(r/f'exec-{f}.png',p/f'c-{n}-raw2.png')
+rows=[]
+for j,b,fields in [('lag042_01_del2av2','rom042_del2av2',[('door',1,(32,336,128,192)),('bus',2,(960,368,576,224))]),('lag043_02_del1av2','rom043_del1av2',[('arm',2,(192,432,128,128))])]:
+ im=Image.open(Path('jobber')/b/'resultat.png').convert('RGB');base=np.array(im);mask=np.zeros(base.shape[:2],bool)
+ for n,k,(x,y,w,h) in fields:
+  f=Image.open(p/f'c-{n}-raw{k}.png').convert('RGB').resize((w,h),Image.Resampling.LANCZOS);f.save(p/f'c-{n}-felt.png');im.paste(f,(x,y));mask[y:y+h,x:x+w]=True
+ im.save(Path('jobber')/j/'resultat.png');rows.append({'jobb':j,'grunn':b,'utenfor_felt_avvik':int(np.any(base!=np.array(im),axis=2)[~mask].sum()),'felt':fields})
+(p/'c-komposisjonsbevis.json').write_text(json.dumps(rows,indent=2)+'\n')

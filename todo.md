@@ -69,3 +69,6 @@
 - [x] Levert bestilling36 med ti OK,16 feltkontroller og identisk magnetoverlapp.
 
 - [x] Levert bestilling37 med 10 OK og28 faktiske feltkontroller.
+
+- [x] Levert bestilling38 med 6 OK og7 faktiske feltkontroller.
+- [ ] Fullfør bestilling38: tre Frog Rock-lag og rist på Conroy-figuren venter motivavklaring.

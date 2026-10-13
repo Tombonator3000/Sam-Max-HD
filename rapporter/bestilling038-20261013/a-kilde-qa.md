@@ -1,0 +1,7 @@
+# Bestilling 38, fire gavebutikktilstander
+
+lag040_03..06 er ferdige fra fire egne innebygde imagegen-kall. Eksakt modellnavn ikke eksponert. Alle fire uendrede checkerkjøringer gir OK; eksplisitte 379-feltmålinger står i a-leveranser.json. 68 låste kilder er uendret. Ingen øvrige 38-jobber er endret av A.
+
+Familiekontroll sammen med 01/02 finnes i ../bestilling037-20261013/a-040-fullsceneqa.png og a-040-objektqa-1..2.png. 03 har lav dråpe på orange vegg, 04 dråpe lavere på svart, 05 kantet lavt damplask og 06 flere brudte damringer. Ingen stråle, ny dam eller levende figur. De små øvre fragmentene er egne kildebestemte felt. 03/04s NYGENERERTE dråper er skalert til 4 × 12 HD-pikslers bokser ved [376,668] og [376,768], med råboks-/fargekriterium dokumentert i manifest. Dette er komponentplassering, ingen originalkonturmaske. De nye speilingene er jevnere modellerte; pikselidentisk gjengivelse av de få opprinnelige tonebyttene påstås ikke.
+
+Eksisterende rom040-HD er byte-identisk utenfor de dokumenterte delrektanglene. 377/378-tilstandene fra 01/02 er ikke arvet. Hele butikken og all skiltorientering forblir opp ned. Felles oppskrift/proveniens er ../bestilling037-20261013/a-040-sammensetting.py.txt; lokale råfiler/prompter er bevart her. Canvas1536 × 1024, motiv [128,112,1280,800], eksakt RGB128-padding og opak RGB. Ingen runtime eller ny individuell godkjenning. De fire filene er frosset for roots mottak.

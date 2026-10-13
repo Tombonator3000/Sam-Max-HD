@@ -277,3 +277,8 @@
 
 - Bestilling37: ti lag levert OK med 28 faktiske feltkontroller, hjul/kiste/reflekser og kildeegne glass-/dråpeformer. Se `rapporter/bestilling037-20261013/RAPPORT.md`. Bestilling35s retting og resten av HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-13T23:41:07+02:00 (Codex, Astra)
+
+- Bestilling38: seks lag levert OK med sju faktiske feltkontroller, dråpe/plask, åpen dør, CB-buss og lav arm. Fire jobber venter motivavklaring. Se `rapporter/bestilling038-20261013/RAPPORT.md`. Bestilling35s retting og resten av HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

@@ -1,0 +1,35 @@
+from pathlib import Path
+import hashlib,json,itertools
+from PIL import Image,ImageDraw
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+extra=[]
+context=['lag040_01','lag040_02','rom040','rom041_del1av2','rom041_del2av2','rom042_del2av2','rom043_del1av2']
+for j in context:
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+  p=root/'jobber'/j/f;extra.append({'fil':str(p.relative_to(root)),'sha256':sha(p)})
+(r/'root-ekstra-kildehash.json').write_text(json.dumps(extra,indent=2)+'\n')
+# Analysis images only, never production masks or replacement pixels.
+fields=json.loads((r/'root-feltbevis.json').read_text());comparison=Image.new('RGB',(1250,4*350),(180,180,180));d=ImageDraw.Draw(comparison)
+for i,e in enumerate(fields[4:]):
+ m=json.loads((root/'jobber'/e['jobb']/'jobb.json').read_text());b=(root/m['bilde_to']).parent/'original_1x.png';x=i%2*625;y=i//2*350
+ for k,p in enumerate([b,root/'jobber'/e['jobb']/'original_1x.png']):
+  im=Image.open(p).convert('RGB').crop(e['lokalt_klipp']);im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);im.thumbnail((300,305),Image.Resampling.NEAREST);comparison.paste(im,(x+k*312,y+30));d.text((x+k*312+2,y+5),e['objekt']+(' base' if k==0 else ' lag'),fill='black')
+comparison.save(r/'root-grunnrom-mot-lag.png')
+master=Image.new('RGB',(480,200));a=Image.open(root/'jobber/lag041_01_del1av2/original_1x.png').convert('RGB');b=Image.open(root/'jobber/lag041_01_del2av2/original_1x.png').convert('RGB');assert a.crop((96,0,384,200)).tobytes()==b.crop((0,0,288,200)).tobytes();master.paste(a);master.paste(b,(96,0));master.resize((1920,800),Image.Resampling.NEAREST).save(r/'root-041-master-kilde.png')
+base=Image.new('RGB',(480,200));base.paste(Image.open(root/'jobber/rom041_del1av2/original_1x.png'));base.paste(Image.open(root/'jobber/rom041_del2av2/original_1x.png'),(96,0));diff=np.any(np.asarray(master)!=np.asarray(base),axis=2);mask=np.zeros((200,480),bool)
+for x,y,w,h in [[16,96,144,48],[336,104,56,32]]:mask[y:y+h,x:x+w]=True
+assert not np.any(diff&~mask)
+family=[];sheet=Image.new('RGB',(1350,3*300),(180,180,180));draw=ImageDraw.Draw(sheet);originalbase=Image.open(root/'jobber/rom040/original_1x.png').convert('RGB')
+for k in range(1,7):
+ j=f'lag040_{k:02}';im=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB');dd=np.any(np.asarray(im)!=np.asarray(originalbase),axis=2);inside=np.zeros(dd.shape,bool);inside[64:192,48:80]=True;dd &= inside;yy,xx=np.nonzero(dd);crop=im.crop((48,64,80,192));x=(k-1)%3*450;y=(k-1)//3*300;sheet.paste(crop.resize((64,256),Image.Resampling.NEAREST),(x,y+25));draw.text((x+2,y+4),j,fill='black')
+ # Include small active area with context next to the full tall source field.
+ bx=(max(48,int(xx.min())-3),max(64,int(yy.min())-3),min(80,int(xx.max())+4),min(192,int(yy.max())+4));close=im.crop(bx);close=close.resize((close.width*8,close.height*8),Image.Resampling.NEAREST);close.thumbnail((365,265),Image.Resampling.NEAREST);sheet.paste(close,(x+80,y+25))
+ family.append({'jobb':j,'ulike_kildepiksler':int(dd.sum()),'bbox_rom':[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],'sha256':sha(root/'jobber'/j/'original_1x.png')})
+sheet.save(r/'root-379-familie.png')
+q=Image.new('RGB',(940,290),(190,190,190));draw=ImageDraw.Draw(q)
+for k,j in enumerate(['lag041_01_del2av2','lag041_02_del2av2']):
+ im=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop((240,104,296,136));q.paste(im.resize((448,256),Image.Resampling.NEAREST),(k*470,30));draw.text((k*470+6,8),'Frog Rock: '+('brun tilstand' if k==0 else 'gul tilstand'),fill='black')
+q.save(r/'uavklart-frog-rock-haug.png')
+(r/'root-familiebevis.json').write_text(json.dumps({'041_master':[1920,800],'041_klipp_x':[0,384],'041_overlapp':[1152,800],'041_kildeoverlapp_identisk':True,'041_utenfor_union':0,'379_familie':family},indent=2)+'\n')
+print(json.dumps(family))

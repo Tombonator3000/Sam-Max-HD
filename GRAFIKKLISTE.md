@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:40 (norsk tid)
+Oppdatert 2026-10-13 23:41 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 287 bilder levert (145 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 294 bilder levert (151 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -574,16 +574,16 @@ Rom 39, 40.
 
 Rom 40, 41, 42, 43.
 
-- [ ] `lag040_03` (rom 40 Gavebutikken (opp ned), lag 03 med 1 objektbilde, bilde to `jobber/rom040/resultat.png`)
-- [ ] `lag040_04` (rom 40 Gavebutikken (opp ned), lag 04 med 1 objektbilde, bilde to `jobber/rom040/resultat.png`)
-- [ ] `lag040_05` (rom 40 Gavebutikken (opp ned), lag 05 med 1 objektbilde, bilde to `jobber/rom040/resultat.png`)
-- [ ] `lag040_06` (rom 40 Gavebutikken (opp ned), lag 06 med 1 objektbilde, bilde to `jobber/rom040/resultat.png`)
+- [x] `lag040_03` (rom 40 Gavebutikken (opp ned), lag 03 med 1 objektbilde, bilde to `jobber/rom040/resultat.png`)
+- [x] `lag040_04` (rom 40 Gavebutikken (opp ned), lag 04 med 1 objektbilde, bilde to `jobber/rom040/resultat.png`)
+- [x] `lag040_05` (rom 40 Gavebutikken (opp ned), lag 05 med 1 objektbilde, bilde to `jobber/rom040/resultat.png`)
+- [x] `lag040_06` (rom 40 Gavebutikken (opp ned), lag 06 med 1 objektbilde, bilde to `jobber/rom040/resultat.png`)
 - [ ] `lag041_01_del1av2` (rom 41 Frog Rock, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom041_del1av2/resultat.png`)
 - [ ] `lag041_01_del2av2` (rom 41 Frog Rock, lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom041_del2av2/resultat.png`)
 - [ ] `lag041_02_del2av2` (rom 41 Frog Rock, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom041_del2av2/resultat.png`)
-- [ ] `lag042_01_del2av2` (rom 42 Bumpusville, ute, lag 01 med 2 objektbilder, del 2/2, bilde to `jobber/rom042_del2av2/resultat.png`)
+- [x] `lag042_01_del2av2` (rom 42 Bumpusville, ute, lag 01 med 2 objektbilder, del 2/2, bilde to `jobber/rom042_del2av2/resultat.png`)
 - [ ] `lag043_01_del1av2` (rom 43 Bumpusville, gangen, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom043_del1av2/resultat.png`)
-- [ ] `lag043_02_del1av2` (rom 43 Bumpusville, gangen, lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom043_del1av2/resultat.png`)
+- [x] `lag043_02_del1av2` (rom 43 Bumpusville, gangen, lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom043_del1av2/resultat.png`)
 
 ## Bestilling 39
 
@@ -3501,3 +3501,5 @@ Bestilling 34: seks lag levert OK med sju faktiske objektkontroller, siste tre v
 Bestilling 36: ti lag levert OK, 16 faktiske feltkontroller, egne periskop-/fisketilstander og magnetmaster med identisk1152×800overlapp. Se `rapporter/bestilling036-20261013/RAPPORT.md`. Bestilling35 har fortsatt egen retting; øvrig HD-arbeid fortsetter.
 
 Bestilling37: ti lag levert OK med 28 faktiske feltkontroller, hjul/kiste/reflekser og kildeegne glass-/dråpeformer. Se `rapporter/bestilling037-20261013/RAPPORT.md`. Bestilling35s retting og resten av HD-arbeidet fortsetter.
+
+Bestilling38: seks lag levert OK med sju faktiske feltkontroller, dråpe/plask, åpen dør, CB-buss og lav arm. Fire jobber venter motivavklaring. Se `rapporter/bestilling038-20261013/RAPPORT.md`. Bestilling35s retting og resten av HD-arbeidet fortsetter.

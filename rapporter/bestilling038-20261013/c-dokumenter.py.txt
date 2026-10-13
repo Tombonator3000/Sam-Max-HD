@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,numpy as np
+p=Path('rapporter/bestilling038-20261013');sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();dump=lambda f,v:Path(f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+prov=[]
+for n,count in [('door',1),('bus',2),('arm',2)]:
+ for k in range(1,count+1):
+  a={'felt':n,'forsok':k,'verktoy':'innebygd ChatGPT imagegen','modell':'eksakt modellnavn ikke eksponert','valgt':k==count}
+  for key,f in [('raw',p/f'c-{n}-raw{k}.png'),('prompt',p/f'c-{n}-prompt{k}.txt'),('source',p/f'c-{n}-source.png')]+([('stilanker',p/f'c-{n}-hd.png')] if k==1 else []):a[key]=str(f);a[key+'_sha256']=sha(f)
+  prov.append(a)
+dump(p/'c-proveniens.json',{'faktiske_kall':5,'forsok':prov})
+checks=[]
+for lock in ['kildehash.json','root-ekstra-kildehash.json']:
+ for x in json.loads((p/lock).read_text()):checks.append({'fil':x['fil'],'uendret':sha(x['fil'])==x['sha256']})
+assert all(x['uendret'] for x in checks);dump(p/'c-kildehashkontroll.json',checks)
+rs=[];stats=json.loads((p/'c-objektkontroll.json').read_text())
+for j,base,names,desc in [('lag042_01_del2av2','rom042_del2av2',['door','bus'],'Åpen svart dør og CB-turnébuss. Forsøk 1 på buss hadde nye speil/håndtak og ble forkastet. Forsøk 2 beholder avkutting og delvis skjult bil. CB-bokstavene og stjernen er jevnere/mer regulære; flere små grill-/lysdetaljer og sterkere modellering består som tegningsforbehold.'),('lag043_02_del1av2','rom043_del1av2',['arm'],'Lav orange arm med rosa nedvendt hånd. Første forsøk kopierte høy håndstilling fra stilanker og er forkastet. Source-only forsøk 2 har riktig lav stilling. Hånd/erm er mer avrundet og modellert enn kildens grove fargeflater; dette er konkret tegningsforbehold.')]:
+ f=Path('jobber')/j/'resultat.png';im=np.array(Image.open(f));assert im.shape==(1024,1536,3);assert (im[:112]==128).all() and (im[912:]==128).all()
+ row={'jobb':j,'resultat':str(f),'sha256':sha(f),'egenkontroll':'OK','kontrollfil':str(p/f'{j}-kontroll.txt'),'forsok':sum(1 for z in prov if z['felt'] in names),'raw':[z for z in prov if z['felt'] in names],'objektkontroll':[z for z in stats if z['jobb']==j],'grunn':f'jobber/{base}/resultat.png','grunn_sha256':sha(f'jobber/{base}/resultat.png'),'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'visuelle_forbehold':desc};rs.append(row)
+ (f.parent/'notat.md').write_text(f'# {j}\n\n{desc}\n\nInnebygd ChatGPT imagegen, eksakt modellnavn ikke eksponert. Ordrett jobbprompt med separat lokal kildepresisering; råforsøk, prompt-SHA og referanse-SHA er bevart i `{p}/c-proveniens.json`. Bare nytegningene er helskalert til metadatafeltene og satt på levert HD-grunnrom. Ingen originalmasker eller warp. Resten er byte-identisk med grunnrommet.\n\nResultat-SHA: `{row["sha256"]}`. Uendret checker: OK. Tre egne objektutsnitt og to helscener er visuelt kontrollert. Kildehashene er uendret. Runtime og ny brukergodkjenning er ikke verifisert.\n')
+dump(p/'c-leveranser.json',{'leveranser':rs})
+(p/'c-kilde-qa.md').write_text('# Bestilling 38 C – kilde- og motivkontroll\n\nTo leveranser, tre metadatafelt. Alle 40 + 28 låste kildefiler er uendret. RGB 1536 × 1024, grå padding 128. Uendret checker gir OK for begge. Egne feltkorrelasjoner: dør 0,979, buss 0,839, arm 0,787. Tall erstatter ikke motivkontroll.\n\nÅpen dør er svart/tom med grå ramme, ikke ny person eller lukket gyllen dør. Bussen har kildepalett, CB og gul stjerne, avklippet høyreside og bil/busk foran. Første busstegning ble forkastet fordi den introduserte speil/håndtak. Andre forsøk fjerner disse; skrift, stjerne og detaljer er mer regulære og modellerte enn kilden. Den lave armen er egen stilling; første forsøk kopierte feil høy stilling og brukes ikke. Andre forsøk har senket hånd og kort, nesten vannrett erme. Ny hånd og erme er mer avrundet; knapp og skygger er tydeligere enn i kilden.\n\nSe c-objektqa-1.png og c-helsceneqa.png, kontrollert sammen. Ingen tydelig rektangelskjøt i helscenene; smale tone-/konturforskjeller i innklippsgrensene kan bestå. c-komposisjonsbevis.json viser null endringer utenfor hvert metadatafelt. Det er ordinær helskalering av nye rektangler, ikke originalkonturmaskering. Fem faktiske bildekall, alle råforsøk bevart. Ingen beskyttede kilder, motorfiler eller globale logger endret. Runtime og ny brukergodkjenning er false.\n')
