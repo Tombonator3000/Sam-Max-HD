@@ -429,6 +429,7 @@ let figurer = [nyFigur(testFigur, 420, 700, 1)];
 let figur = figurer[0];
 let mus = { x: 640, y: 300, inne: false };
 let kilde = "test";
+let lasteNr = 0;   // øker for hvert scenevalg; en innlasting som er gått ut på dato, setter ikke scenen
 
 const lys = [
   { navn: "Bordlampe", paa: true, farge: "#ffd28a", styrke: 0.75, radius: 620, hoyde: 70, x: 945, y: 396, folger: null },
@@ -450,6 +451,7 @@ function settLys(i, verdier) {
 }
 
 function byggTestrom() {
+  lasteNr++;   // en kontorinnlasting som pågår, skal ikke overstyre dette valget
   rom = lagLag(tegnRom(), 4);
   scene = { w: W0, h: H0, gulv: FLOOR_Y };
   for (let i = 0; i < lys.length; i++) settLys(i, { ...standardLys[i] });
@@ -527,6 +529,7 @@ function tilCtx(bilde, w, h) { const { c, x } = lag(w, h); x.drawImage(bilde, 0,
 
 async function byggEgetRom() {
   const b = egne.rom; if (!b) return;
+  lasteNr++;
   const w = b.width, h = b.height, myk = verdi("mykhet");
   const fctx = tilCtx(b, w, h);
   const l = { w, h, farge: texBilde(fctx.canvas), normal: null };
@@ -592,6 +595,7 @@ function figurFraArk(bilde, boks, bg, skala) {
   return { lag: lagLagFra(c, hoyde, new Float32Array(w * h), w, h), ankerX: w / 2, ankerY: bunn + 1 };
 }
 async function hentKontoret() {
+  const nr = ++lasteNr;
   const knapp = $("hentKontor"), info = $("kontorInfo");
   knapp.disabled = true; info.textContent = "Laster kontoret ...";
   try {
@@ -607,15 +611,14 @@ async function hentKontoret() {
       if (ferdig) { const [lx, ly, lw, lh] = j.bilde_i_lerret; x.imageSmoothingEnabled = true; x.drawImage(ferdig, lx, ly, lw, lh, gx * S, gy * S, gw * S, gh * S); x.imageSmoothingEnabled = false; hd++; }
       else x.drawImage(await hentBilde(`jobber/${deler[i]}/original_1x.png`), 0, 0, gw, gh, gx * S, gy * S, gw * S, gh * S);
     }
+    const ark = [];
+    for (const navn of ["sam", "max"]) ark.push([await hentJson(`hovedark/${navn}/jobb.json`), await hentBilde(`hovedark/${navn}/original_1x.png`)]);
+    if (nr !== lasteNr) return;   // en annen scene er valgt mens kontoret lastet
     const myk = Math.max(4, verdi("mykhet") * 2);
     rom = lagLagFra(c, blur(lysstyrke(x, w, h), w, h, myk), new Float32Array(w * h), w, h);
     scene = { w, h, gulv: h * 0.68 };
-    const figs = [];
-    for (const navn of ["sam", "max"]) {
-      const j = await hentJson(`hovedark/${navn}/jobb.json`);
-      const ark = await hentBilde(`hovedark/${navn}/original_1x.png`);
-      figs.push(figurFraArk(ark, j.bokser[1], j.bakgrunn, S));   // rute 1: mot høyre; mot venstre speilvendes, som i spillet
-    }
+    // rute 1: mot høyre; mot venstre speilvendes, som i spillet
+    const figs = ark.map(([j, bilde]) => figurFraArk(bilde, j.bokser[1], j.bakgrunn, S));
     figurer = [nyFigur(figs[0], w * 0.45, h * 0.9, 1), nyFigur(figs[1], w * 0.36, h * 0.92, 1)];
     figur = figurer[0];
     // de to taklampene i kontoret
@@ -626,7 +629,7 @@ async function hentKontoret() {
     info.textContent = hd ? `Kontoret med HD-bilder fra piloten (${hd} av 2 deler). Sam og Max fra hovedarkene i originalen.`
                           : "Kontoret og Sam og Max i originalgrafikken, forstørret 4x. HD-bildene kommer med når piloten er levert.";
   } catch (e) {
-    info.textContent = "Fant ikke grafikken til kontoret (" + e.message + "). Testrommet vises.";
+    if (nr === lasteNr) info.textContent = "Fant ikke grafikken til kontoret (" + e.message + "). Testrommet vises.";
   } finally { knapp.disabled = false; }
 }
 $("hentKontor").addEventListener("click", hentKontoret);
