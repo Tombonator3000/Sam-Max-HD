@@ -29,4 +29,6 @@
 - [ ] Avklar obj187_05 med egenkontroll FEIL etter dokumenterte rettforsøk og uavhengig diagnose. Se rapporter/bestilling005-20261013/KONTROLL-AVVIK.md. Ikke klar for mottak.
 - [x] Fullført bestilling6 med ti rombilder, egenkontroll OK og identiske overlapp, også rom022 over bestillingsgrensen.
 - [x] Levert bestilling7 med9OK og obj293_01 SJEKK; kildeavklart hånd/griper/magnet og identiske romoverlapper.
-- [ ] Fortsett bestilling8 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert ni OK-bilder i bestilling8, med konsistent kikkertpanel, rommastere og låst rom036-del2 for neste bestilling.
+- [ ] Avklar obj307_01 med egenkontroll FEIL. Ikke klar for mottak. Se rapporter/kontroll-fft-20261013/RAPPORT.md og rapporter/bestilling008-20261013/RAPPORT.md.
+- [ ] Fortsett bestilling9 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

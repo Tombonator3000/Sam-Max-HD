@@ -90,3 +90,10 @@
 - Hånd/griper/fiskemagnet kildeavklart før tegning fra original hintbok, trykt side43/søkeutdrag. Brun del er inntørket hånd, ikke hyssing. Obj293 små negl-/leddavvik oppgitt. Ingen påstått runtime.
 - Restaurantoverlapp1408px og landskapets tre576pxoverlapper byte-identiske. Svarte kildefelt beholdt; generisk feilnotat om kikkert korrigert i tilleggsprompt.
 - Rapport/proveniens i rapporter/bestilling007-20261013/. Bestilling5/6s20lagrede PNG-SHA verifisert fra GitHub, inkludert eksplisitt FEIL-kandidat. Ingen kode/kildeendring, import, spilltest eller ny individuell godkjenning. Bestilling8 startet.
+
+## 2026-10-13 18:41 (Codex, Astra)
+
+- Bestilling8 har9OK og obj307_01 FEIL/uavklart. Kandidaten forblir ukrysset og klar_for_mottak=false. 40+4beskyttede kilder uendret, panelstripene gjenbygger fellesmaster byte-identisk.
+- Rom032/035 har1152pxidentiskoverlapp. Rom036del1 matcher fullmaster; fremtidig del2 kontrollert medOK. Originalens dørtilstander, svarte sol, skjevheter, fisk og tomme felter bevart. Root sammenlignet samlet og tankdetalj.
+- Numerisk kontrollbegrensning reprodusert uten artendring: symmetrisk utglatting av originaler kan gi store FFT-blokkskift uten posisjonstransformasjon. Full oppskrift/JSON i rapporter/kontroll-fft-20261013/. Dette fritar ikke grafikken fra eksisterende kontroll eller visuell QA.
+- Forrige bestillings ti PNG-SHA verifisert fra GitHub. Rapport/proveniens i rapporter/bestilling008-20261013/. Ingen kode/kildeendring, import, spilltest eller ny individuell godkjenning. Bestilling9 kildeplan klar.

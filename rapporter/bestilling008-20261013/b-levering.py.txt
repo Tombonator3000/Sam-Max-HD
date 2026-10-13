@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image
+import shutil,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling008-20261013'
+raw={"rom032":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-aa400468-8924-47bc-8bcc-d2a5d7883920.png","rom033":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-05a4ad4f-1b87-42f8-a870-21a69eca1515.png","rom034":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-19468599-56fa-4609-bb14-ea6131bd84d4.png"}
+for n,p in raw.items():
+ shutil.copy2(p,r/(n+'-raa01.png'))
+ im=Image.open(p).convert('RGB')
+ size=(1920,1024) if n=='rom032' else (1536,1024)
+ im=im.resize(size,Image.Resampling.LANCZOS)
+ canvas=Image.new('RGB',size,(128,128,128))
+ rect=(0,112,1920,912) if n=='rom032' else (128,112,1408,912)
+ canvas.paste(im.crop(rect),rect[:2])
+ if n=='rom032':
+  canvas.save(r/'rom032-fullmaster.png')
+  for part,x in [(1,0),(2,384)]:
+   canvas.crop((x,0,x+1536,1024)).save(b/'jobber'/f'rom032_del{part}av2'/'resultat.png')
+ else:canvas.save(b/'jobber'/n/'resultat.png')
+for j in ['rom032_del1av2','rom032_del2av2','rom033','rom034']:
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True)
+ (r/(j+'-kontroll.txt')).write_text(p.stdout+p.stderr);print(j,p.returncode,p.stdout)

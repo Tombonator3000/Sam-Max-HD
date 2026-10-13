@@ -1,0 +1,20 @@
+from PIL import Image
+import numpy as np,json,hashlib,subprocess,shutil
+from pathlib import Path
+p=Path('rapporter/bestilling008-20261013')
+raw=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a/exec-ac103fa3-d655-4a6f-a818-15c9f1d8856f.png')
+shutil.copy2(raw,p/'a-panel-raa02.png')
+m=Image.open(raw).convert('RGB').crop((128,109,1408,914)).resize((1280,800),Image.Resampling.LANCZOS)
+assert m.size==(1280,800)
+master=p/'a-panel-fullmaster02.png';m.save(master)
+def sha(f):return hashlib.sha256(Path(f).read_bytes()).hexdigest()
+rows=[];again=Image.new('RGB',(1280,800))
+for name,y0,y1 in [('obj307_01',0,160),('obj304_01',160,512),('obj308_01',512,800)]:
+ j=json.loads(Path('jobber',name,'jobb.json').read_text());x,y,w,h=j['bilde_i_lerret'];part=m.crop((0,y0,1280,y1));assert part.size==(w,h)
+ o=Image.new('RGB',(1536,1024),(128,128,128));o.paste(part,(x,y));f=Path('jobber',name,'resultat.png');o.save(f)
+ again.paste(o.crop((x,y,x+w,y+h)),(0,y0));a=np.array(o);mask=np.ones(a.shape[:2],bool);mask[y:y+h,x:x+w]=False;assert np.all(a[mask]==128)
+ r=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(f)],capture_output=True,text=True)
+ log=p/('a-'+name+'-kontroll02.txt');log.write_text(r.stdout+r.stderr);print(r.stdout)
+ rows.append({'jobb':name,'resultat':str(f),'sha256':sha(f),'egenkontroll':r.stdout.split('Utfall: ')[-1].strip(),'kontrollfil':str(log),'forsok':2,'fullmaster':str(master),'fullmaster_sha256':sha(master),'raw':str(p/'a-panel-raa02.png'),'raw_sha256':sha(p/'a-panel-raa02.png'),'master_rect':[0,y0,1280,y1],'bilde_i_lerret':[x,y,w,h],'padding_rgb128':True,'runtime':False,'ny_brukergodkjenning':False})
+assert np.array_equal(np.array(m),np.array(again))
+(p/'a-leveranser.json').write_text(json.dumps({'leveranser':rows,'reassemblert_byte_identisk':True,'model':'ikke eksponert'},indent=2,ensure_ascii=False)+'\n')

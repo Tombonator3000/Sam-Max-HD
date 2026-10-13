@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 18:38 (norsk tid)
+Oppdatert 2026-10-13 18:41 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 28 rom levert (44 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 17 levert, inkludert to SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 32 hele rom og 1 delvis levert (51 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 19 levert, inkludert to SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -124,16 +124,16 @@ Rom 29, 30, 31.
 
 Rom 31, 32, 33, 34, 35, 36.
 
-- [ ] `obj304_01` (rom 31 Kikkerten med utsikten, objekt 304 tilstand 01)
-- [ ] `obj307_01` (rom 31 Kikkerten med utsikten, objekt 307 tilstand 01)
-- [ ] `obj308_01` (rom 31 Kikkerten med utsikten, objekt 308 tilstand 01)
-- [ ] `rom032_del1av2` (rom 32 Fiskedekket på toppen av nøstet, del 1/2)
-- [ ] `rom032_del2av2` (rom 32 Fiskedekket på toppen av nøstet, del 2/2)
-- [ ] `rom033` (rom 33 Toppen av nøstet)
-- [ ] `rom034` (rom 34 Hyssingtråd i nærbilde)
-- [ ] `rom035_del1av2` (rom 35 World of Fish, del 1/2)
-- [ ] `rom035_del2av2` (rom 35 World of Fish, del 2/2)
-- [ ] `rom036_del1av2` (rom 36 Mystery Vortex, ute, del 1/2)
+- [x] `obj304_01` (rom 31 Kikkerten med utsikten, objekt 304 tilstand 01)
+- [ ] `obj307_01` (arbeidskandidat med egenkontroll FEIL, ikke klar for mottak) (rom 31 Kikkerten med utsikten, objekt 307 tilstand 01)
+- [x] `obj308_01` (rom 31 Kikkerten med utsikten, objekt 308 tilstand 01)
+- [x] `rom032_del1av2` (rom 32 Fiskedekket på toppen av nøstet, del 1/2)
+- [x] `rom032_del2av2` (rom 32 Fiskedekket på toppen av nøstet, del 2/2)
+- [x] `rom033` (rom 33 Toppen av nøstet)
+- [x] `rom034` (rom 34 Hyssingtråd i nærbilde)
+- [x] `rom035_del1av2` (rom 35 World of Fish, del 1/2)
+- [x] `rom035_del2av2` (rom 35 World of Fish, del 2/2)
+- [x] `rom036_del1av2` (rom 36 Mystery Vortex, ute, del 1/2)
 
 ## Bestilling 9
 
@@ -3435,3 +3435,5 @@ Bestilling5:8OK,1SJEKK og1uavklartFEIL. Obj187_05 er ikke klar for mottak og for
 Bestilling6: ti rombilder levert, alle egenkontroller OK. Rom022 er komplett med identisk overlapp over bestillingsgrensen. Se `rapporter/bestilling006-20261013/RAPPORT.md`. Obj187_05 fra bestilling5 er fortsatt uavklart.
 
 Bestilling7:9OK og obj293_01 SJEKK, ti bilder levert. Se `rapporter/bestilling007-20261013/RAPPORT.md`. Bestilling8 er startet. Obj187_05 fra5 forblir ukrysset/uavklart.
+
+Bestilling8:9OK levert og obj307_01 uavklart FEIL. Paneltoppkandidaten forblir ukrysset; se `rapporter/bestilling008-20261013/RAPPORT.md`. Reproduserbar numerisk kontrollbegrensning står i `rapporter/kontroll-fft-20261013/RAPPORT.md`, uten omklassifisering av grafikken.

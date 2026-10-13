@@ -1,0 +1,53 @@
+"""Read-only diagnostic. Run from .gpt-gren with bundled python. Writes only report JSON."""
+from pathlib import Path
+import importlib.util, hashlib, json, math, sys
+import numpy as np
+from PIL import Image, ImageFilter, ImageOps
+b=Path.cwd(); out=b/'rapporter/kontroll-fft-20261013';out.mkdir(exist_ok=True)
+path=b/'verktoy/sjekk_leveranse.py'
+spec=importlib.util.spec_from_file_location('unchanged_check',path);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def confidence(a,b):
+ h,w=a.shape;win=np.outer(np.hanning(h),np.hanning(w))
+ aa=np.fft.fft2((a-a.mean())*win);bb=np.fft.fft2((b-b.mean())*win)
+ cross=bb*np.conj(aa);cross/=np.abs(cross)+1e-9
+ c=np.fft.ifft2(cross).real;py,px=np.unravel_index(np.argmax(c),c.shape)
+ yy,xx=np.indices(c.shape);ddy=np.minimum(abs(yy-py),h-abs(yy-py));ddx=np.minimum(abs(xx-px),w-abs(xx-px))
+ side=c[~((ddy<=3)&(ddx<=3))]
+ peak=float(c[py,px]);second=float(side.max());sd=float(side.std())
+ return {'integer_peak_xy':[int(px),int(py)],'peak':peak,'second_outside_7x7':second,'peak_second_ratio':peak/second if second else None,'psr':(peak-float(side.mean()))/sd if sd else None,'correlation_zero_lag':float(c[0,0])}
+def evaluate(o,hd):
+ metrics=m.compare(o,hd);status,reasons=m.judge(metrics);eo,es=metrics.pop('eo'),metrics.pop('es')
+ h,w=eo.shape;bw,bh=max(48,w//3),max(48,h//2);blocks=[]
+ for by in range(0,max(1,h-bh+1),bh):
+  for bx in range(0,max(1,w-bw+1),bw):
+   a,z=eo[by:by+bh,bx:bx+bw],es[by:by+bh,bx:bx+bw]
+   dx,dy=m.phase_shift(a,z)
+   blocks.append({'xywh':[bx,by,a.shape[1],a.shape[0]],'shift':[dx,dy],'distance':math.hypot(dx,dy),'edge_std_original':float(a.std()),'edge_std_variant':float(z.std()),'edge_variance_original':float(a.var()),'edge_variance_variant':float(z.var()),'edge_corr':m.corr(a,z),'excluded_by_current_std_gate':bool(a.std()<1e-3 or z.std()<1e-3),**confidence(a,z)})
+ return {'status':status,'reasons':reasons,'metrics':metrics,'blocks':blocks}
+records={}
+for job in ['obj187_05','obj307_01']:
+ folder=b/'jobber'/job;o=Image.open(folder/'original_1x.png').convert('RGB');arr=np.asarray(o,dtype=float)
+ # Predetermined finite set. No fitting to an art result, no resampling or positional transform.
+ variants={'identical':o}
+ for radius in [.5,1.,2.]:variants['gaussian_'+str(radius)]=o.filter(ImageFilter.GaussianBlur(radius))
+ for n in [3,5]:variants['median_'+str(n)]=o.filter(ImageFilter.MedianFilter(n))
+ for gamma in [.8,1.2]:variants['gamma_'+str(gamma)]=Image.fromarray(np.rint(255*(arr/255)**gamma).clip(0,255).astype('uint8'))
+ variants['color_quantize_step32']=Image.fromarray((np.rint(arr/32)*32).clip(0,255).astype('uint8'))
+ result={}
+ for name,v in variants.items():
+  # Exact 4x replication is solely the required compare input; BOX in compare restores these pixels exactly.
+  hd=v.resize((o.width*4,o.height*4),Image.Resampling.NEAREST)
+  assert np.array_equal(np.asarray(v),np.asarray(hd.resize(o.size,Image.Resampling.BOX)))
+  result[name]=evaluate(o,hd)
+ metadata=json.loads((folder/'jobb.json').read_text())
+ current=folder/'resultat.png';part,_=m.part_of(Image.open(current),metadata)
+ result['current_production_readonly']=evaluate(o,part)
+ records[job]={'size':list(o.size),'original_sha256':sha(folder/'original_1x.png'),'production_sha256':sha(current),'variants':result}
+report={'control_module':str(path.relative_to(b)),'module_sha256':sha(path),'python':sys.version,'numpy':np.__version__,'records':records,'confidence_note':'PSR and peak ratio are diagnostic only and are NOT used by unchanged compare/judge. They are not calibrated probabilities. All spatial filtering preserves the coordinate grid, but changes local edge profiles; no assertion that all variants are valid HD art.'}
+(out/'diagnose.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+for job,row in records.items():
+ print(job)
+ for name,r in row['variants'].items():
+  block=max(r['blocks'],key=lambda z:z['distance'])
+  print(name,r['status'],r['metrics'],'worst',block['xywh'],'std',round(block['edge_std_original'],4),round(block['edge_std_variant'],4),'PSR',round(block['psr'],2),'ratio',round(block['peak_second_ratio'],3))

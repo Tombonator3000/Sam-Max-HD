@@ -1,0 +1,22 @@
+"""Kjør fra reporot. Bare autorisert kompositt/utsnitt, ingen warp."""
+from pathlib import Path
+from PIL import Image
+import numpy as np
+r = Path('rapporter/bestilling008-20261013')
+for room in ['035', '036']:
+    a, b = [np.array(Image.open(r / f'rom{room}_del{i}av2-raa-1.png').convert('RGB').crop((0,112,1536,912))) for i in [1,2]]
+    full = np.zeros((800,1920,3), dtype=np.uint8)
+    full[:,:1536] = a
+    full[:,1000:] = b[:,616:]
+    x0, x1 = 936, 1000
+    t = np.linspace(0,1,64)[None,:,None]
+    t = t*t*(3-2*t)
+    full[:,x0:x1] = np.round(a[:,x0:x1]*(1-t)+b[:,x0-384:x1-384]*t).astype('uint8')
+    Image.fromarray(full).save(r / f'rom{room}-fullmaster.png')
+    for i,x in [(1,0),(2,384)]:
+        c = Image.new('RGB',(1536,1024),(128,128,128))
+        c.paste(Image.fromarray(full[:,x:x+1536]),(0,112))
+        out = Path(f'jobber/rom{room}_del{i}av2/resultat.png') if room=='035' or i==1 else r/'rom036_del2av2-kontroll.png'
+        c.save(out)
+# Fremtidig rom036del2 er kun bevart som kontrollfil i denne bestillingen.
+# Ved autorisert levering: klipp fullmaster x384..1919, paste0,112 på RGB128lerret.
