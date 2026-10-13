@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 535 bilder levert (246 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 570 bilder levert (255 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -725,15 +725,15 @@ Rom 68, 70, 71.
 Rom 71.
 
 - [ ] `lag071_05` (rom 71 Påkledning, Sam og Max, lag 05 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_06` (rom 71 Påkledning, Sam og Max, lag 06 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_07` (rom 71 Påkledning, Sam og Max, lag 07 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_08` (rom 71 Påkledning, Sam og Max, lag 08 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_09` (rom 71 Påkledning, Sam og Max, lag 09 med 5 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_10` (rom 71 Påkledning, Sam og Max, lag 10 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_11` (rom 71 Påkledning, Sam og Max, lag 11 med 6 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_12` (rom 71 Påkledning, Sam og Max, lag 12 med 6 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_13` (rom 71 Påkledning, Sam og Max, lag 13 med 4 objektbilder, bilde to `jobber/rom071/resultat.png`)
-- [ ] `lag071_14` (rom 71 Påkledning, Sam og Max, lag 14 med 2 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_06` (rom 71 Påkledning, Sam og Max, lag 06 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_07` (rom 71 Påkledning, Sam og Max, lag 07 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_08` (rom 71 Påkledning, Sam og Max, lag 08 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_09` (rom 71 Påkledning, Sam og Max, lag 09 med 5 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_10` (rom 71 Påkledning, Sam og Max, lag 10 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_11` (rom 71 Påkledning, Sam og Max, lag 11 med 6 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_12` (rom 71 Påkledning, Sam og Max, lag 12 med 6 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_13` (rom 71 Påkledning, Sam og Max, lag 13 med 4 objektbilder, bilde to `jobber/rom071/resultat.png`)
+- [x] `lag071_14` (rom 71 Påkledning, Sam og Max, lag 14 med 2 objektbilder, bilde to `jobber/rom071/resultat.png`)
 
 ## Bestilling 49
 
@@ -3525,3 +3525,5 @@ Bestilling46: fem Highway Surfing-lag levert, fire OK og én SJEKK (04, blokk1,7
 Bestilling50: sju lag levert OK med sju egne felt: voksboks, tannfravær og fire kildepresise skytestillinger. Tre083-tilstander avventer motivavklaring. Se `rapporter/bestilling050-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
 
 Bestilling 47: ni lag levert OK med 47 egne felt, to byte-identiske panoramaoverlapper og fire antrekkskombinasjoner. Lag068_12 holdes utenfor med FEIL. Se `rapporter/bestilling047-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+
+Bestilling 48: ni antrekkslag levert OK med 35 egne felt, korrekt LeChuck Pizza og rettet revnet bukseben. Lag071_05 avventer motivavklaring. Se `rapporter/bestilling048-20261013/RAPPORT.md`. HD-arbeidet fortsetter.

@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil,subprocess
+shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-263be23b-1019-4a55-857d-44db71c86ce6.png','rapporter/bestilling049-20261013/b-lag071_16-raa01.png')
+for n in list(range(6,15))+[16]:
+ j=f'lag071_{n:02d}';r=Path(f'rapporter/bestilling{48 if n<15 else 49:03d}-20261013');p=Path('jobber')/j;m=json.loads((p/'jobb.json').read_text());out=Image.open(m['bilde_to']).convert('RGB');raw=Image.open(r/f'b-{j}-raa01.png').convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=128+x*4;y=112+y*4;w*=4;h*=4;yy,xx=np.mgrid[:h,:w];alpha=Image.fromarray((np.clip(np.minimum.reduce([xx+1,w-xx,yy+1,h-yy])/6,0,1)*255).astype('uint8'));out.paste(raw.crop((x,y,x+w,y+h)),(x,y),alpha)
+ out.save(p/'resultat.png');run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr);print(run.stdout)
