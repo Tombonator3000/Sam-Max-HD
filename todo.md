@@ -42,4 +42,5 @@
 - [x] Levert bestilling 16 med sju OK og tre SJEKK, tavler, knuste lag og banemarkeringer dokumentert.
 - [x] Levert ni OK i bestilling 17, kildekorrigert påkledning/fisker/Bruno og panoramaer.
 - [x] Rom077 begge deler levert OK etter uttrykkelig vektorvalg, egen SVGmaster og kilde-/rasterkontroll. Se rapporter/rom077-vektor-20261013/.
-- [ ] Fortsett bestilling 18 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 18 med sju OK og tre SJEKK, kilde-/motivkontroll og dokumenterte rettinger.
+- [ ] Fortsett bestilling 19 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

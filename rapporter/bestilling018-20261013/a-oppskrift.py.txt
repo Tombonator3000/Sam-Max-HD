@@ -1,0 +1,17 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import hashlib,json
+B=Path.cwd();R=B/'rapporter/bestilling018-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+m=Image.open(R/'a-master-raa03.png').convert('RGB').crop((128,112,1408,912));m.putdata([(0,0,0) if max(p)<12 else p for p in m.getdata()]);assert m.tobytes()==Image.open(R/'a-fullmaster03-svart.png').tobytes()
+m.save(R/'a-fullmaster.png');items=[];rebuild=Image.new('RGB',(1280,800))
+for j,ya,yb,cy in [('obj812_01',0,160,432),('obj811_01',160,512,336),('obj813_01',512,800,368)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));crop=m.crop((0,ya,1280,yb));out.paste(crop,(128,cy));assert out.tobytes()==Image.open(B/f'jobber/{j}/resultat.png').tobytes()
+ actual=Image.open(B/f'jobber/{j}/resultat.png').crop((128,cy,1408,cy+yb-ya));rebuild.paste(actual,(0,ya))
+ (R/f'a-{j}-kontroll.txt').write_text((R/f'a-{j}-kontroll03-svart.txt').read_text())
+ items.append({'jobb':j,'resultat':f'jobber/{j}/resultat.png','sha256':sha(B/f'jobber/{j}/resultat.png'),'egenkontroll':'OK','kontrollfil':f'rapporter/bestilling018-20261013/a-{j}-kontroll.txt','forsok':3,'fullmaster':str((R/'a-fullmaster.png').relative_to(B)),'fullmaster_sha256':sha(R/'a-fullmaster.png'),'masterklipp':[0,ya,1280,yb-ya],'runtime':False,'ny_brukergodkjenning':False,'presis_padding':True})
+assert rebuild.tobytes()==m.tobytes()
+locks=json.loads((R/'kildehash.json').read_text());proof=[dict(x,uendret=sha(B/x['fil'])==x['sha256']) for x in locks];assert all(x['uendret'] for x in proof)
+(R/'a-kildebevis.json').write_text(json.dumps({'kilder':proof,'striper_rekonstruerer_master':True,'master_rgb_sha256':hashlib.sha256(m.tobytes()).hexdigest(),'raa_sha256':{p.name:sha(p) for p in R.glob('a-master-raa*.png')},'svartregel':'Kun genererte piksler med max(R,G,B)<12 normaliseres til RGB0, ingen originalmaske.'},indent=2))
+(R/'a-leveranser.json').write_text(json.dumps({'leveranser':items},indent=2))
+q=Image.new('RGB',(2560,840),(128,128,128));q.paste(Image.open(R/'a-original-master.png'),(0,40));q.paste(m,(1280,40));d=ImageDraw.Draw(q);d.text((10,10),'Original',fill='white');d.text((1290,10),'HD valgt forsok 3 med solid svart',fill='white');q.save(R/'a-samlet-qa.png')
+print(json.dumps(items,indent=2))

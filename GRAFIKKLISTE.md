@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 20:09 (norsk tid)
+Oppdatert 2026-10-13 20:30 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -10,7 +10,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 65 hele rom levert (100 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 61 levert, inkludert 13 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Store objektbilder (nærbilder, kart og store deler) | 70 levert, inkludert 16 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -275,15 +275,15 @@ Rom 69, 70, 71, 73, 76, 77.
 Rom 77, 78.
 
 - [x] `rom077_del2av2` (rom 77 Rulletekst (paneler), del 2/2)
-- [ ] `obj774_01` (rom 77 Rulletekst (paneler), objekt 774 tilstand 01)
-- [ ] `obj775_01` (rom 77 Rulletekst (paneler), objekt 775 tilstand 01)
-- [ ] `obj776_01` (rom 77 Rulletekst (paneler), objekt 776 tilstand 01)
-- [ ] `obj777_01` (rom 77 Rulletekst (paneler), objekt 777 tilstand 01)
-- [ ] `obj780_01` (rom 77 Rulletekst (paneler), objekt 780 tilstand 01)
-- [ ] `obj781_01` (rom 77 Rulletekst (paneler), objekt 781 tilstand 01)
-- [ ] `obj811_01` (rom 78 Kikkerten, utsnitt (landskapsbiter), objekt 811 tilstand 01)
-- [ ] `obj812_01` (rom 78 Kikkerten, utsnitt (landskapsbiter), objekt 812 tilstand 01)
-- [ ] `obj813_01` (rom 78 Kikkerten, utsnitt (landskapsbiter), objekt 813 tilstand 01)
+- [x] `obj774_01` (rom 77 Rulletekst (paneler), objekt 774 tilstand 01)
+- [x] `obj775_01` (rom 77 Rulletekst (paneler), objekt 775 tilstand 01)
+- [x] `obj776_01` (rom 77 Rulletekst (paneler), objekt 776 tilstand 01)
+- [x] `obj777_01` (rom 77 Rulletekst (paneler), objekt 777 tilstand 01)
+- [x] `obj780_01` (rom 77 Rulletekst (paneler), objekt 780 tilstand 01)
+- [x] `obj781_01` (rom 77 Rulletekst (paneler), objekt 781 tilstand 01)
+- [x] `obj811_01` (rom 78 Kikkerten, utsnitt (landskapsbiter), objekt 811 tilstand 01)
+- [x] `obj812_01` (rom 78 Kikkerten, utsnitt (landskapsbiter), objekt 812 tilstand 01)
+- [x] `obj813_01` (rom 78 Kikkerten, utsnitt (landskapsbiter), objekt 813 tilstand 01)
 
 ## Bestilling 19
 
@@ -3459,3 +3459,5 @@ Bestilling 16: 7 OK og 3 SJEKK (obj649_01, obj650_01 og obj668_01), ti bilder le
 Bestilling 17: ni leveranseklare OK. Rom077 del1 teknisk OK, men konkret motivavvik etter fem bildeforsøk, ikke klar og ukrysset; master ikke endelig låst. Se `rapporter/bestilling017-20261013/RAPPORT.md`. Bestilling 18/19 fortsetter uavhengig.
 
 Rom077 er senere rettet etter Toms uttrykkelige vektorvalg, begge deler levert OK fra native fellesmaster. Fire sideprikker avklart, rasterrad rettet. Bestilling17s uavklarte kandidat er historikk. Se `rapporter/rom077-vektor-20261013/RAPPORT.md`.
+
+Bestilling 18: 7 OK og 3 SJEKK (obj774/775/781), ti bilder levert. Rene mørke gråpaneler, to manglende punktstjerner rettet, uregelmessig dørmerke og ny kikkertmaster kontrollert. Rom077 del2 fra autorisert vektorleveranse. Se `rapporter/bestilling018-20261013/RAPPORT.md`. Bestilling 19 fortsetter.

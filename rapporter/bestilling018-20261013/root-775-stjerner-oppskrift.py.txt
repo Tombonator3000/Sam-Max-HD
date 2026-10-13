@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,hashlib,json,shutil,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling018-20261013';j=b/'jobber/obj775_01/resultat.png';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+before=Image.open(j).convert('RGB');old=np.array(before);before.save(r/'root-775-for-stjerner.png');donorbox=(874,404,882,412);donor=before.crop(donorbox);donor.save(r/'root-775-generert-donor.png')
+y=np.array(donor.convert('L')).astype(float);background=41.;peak=float(y.max());alpha=np.clip((y-background)/(peak-background),0,1);alpha[y<=background+2]=0
+rgba=np.zeros((8,8,4),dtype='uint8');rgba[:,:,:3]=int(peak);rgba[:,:,3]=np.rint(alpha*255).astype('uint8');star=Image.fromarray(rgba,'RGBA').resize((4,4),Image.Resampling.LANCZOS);star.save(r/'root-775-generert-stjerne-alpha.png')
+boxes=[(984,408,4,4),(892,440,4,4)];out=before.copy()
+for x,z,w,h in boxes:out.paste(star.convert('RGB'),(x,z),star.getchannel('A'))
+out.save(j);new=np.array(out);changed=np.any(old!=new,axis=2);allowed=np.zeros(changed.shape,bool)
+for x,z,w,h in boxes:allowed[z:z+h,x:x+w]=True
+assert not np.any(changed&~allowed);assert all(changed[z:z+h,x:x+w].any() for x,z,w,h in boxes)
+p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(j)],capture_output=True,text=True);(r/'root-775-stjerner-kontroll.txt').write_text(p.stdout+p.stderr);print(p.stdout)
+status='SJEKK';assert 'Utfall: SJEKK' in p.stdout
+locked=json.loads((r/'kildehash.json').read_text());assert all(sha(b/x['fil'])==x['sha256'] for x in locked)
+d={'jobb':'obj775_01','resultat':str(j.relative_to(b)),'sha256':sha(j),'egenkontroll':status,'kontrollfil':str((r/'root-775-stjerner-kontroll.txt').relative_to(b)),'forsok':0,'metode':'To kopier av samme faktisk nygenererte lille punktstjerne med alpha fra generert underlag, helskalert til4x4. Ingen nye imagegen-kall.','for_kandidat':str((r/'root-775-for-stjerner.png').relative_to(b)),'for_sha256':sha(r/'root-775-for-stjerner.png'),'donor_sha256':sha(r/'root-775-generert-donor.png'),'donor_boks':donorbox,'alpha_sha256':sha(r/'root-775-generert-stjerne-alpha.png'),'bakgrunn_fra_generert':background,'topp_fra_generert':peak,'endringsbokser':boxes,'endrede_piksler':int(changed.sum()),'resten_byteidentisk':True,'kilder_uendret':True,'kilder_kontrollert':40,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':False,'merknad':'De to sikre manglene er lagt tilbake. Øvrige31motiver er urørt; opprinneligSJEKK og småplasseringsavvik består. HistoriskB-manifest er urørt.'};(r/'root-775-overstyring.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+note=j.parent/'notat.md';note.write_text(note.read_text()+'\n## Avgrenset stjerneoverstyring\n\nTo manglende småstjerner er komponert fra en faktisk nygenerert stjerne i samme HD-bilde. Bare [984,408,4,4] og [892,440,4,4] er endret, resten er byte-identisk. Ingen originalfarger eller originalpikselmasker er brukt. Uendret checker er fortsatt SJEKK. Historisk B-manifest beholdes; gjeldende SHA finnes i root-775-overstyring.json.\n\nGjeldende resultat SHA256: '+sha(j)+'\n')
+print('changed',changed.sum(),'SHA',sha(j))

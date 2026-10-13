@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+import shutil,subprocess,numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling018-20261013'
+raws={774: "/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-28898acc-26a1-4ec6-9fd1-dd0a3772fd27.png",
+775: "/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-929e95ed-c3b9-4954-b51c-2d50d1fe5aa0.png",
+776: "/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-efbdadb7-6539-4542-b2c5-dde16d7b74dd.png",
+777: "/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-7201b291-6b7d-4f4c-80ac-c25fb03f642e.png"}
+boxes={774:(128,367,1408,651),775:(128,379,1408,656),776:(128,367,1408,656),777:(128,374,1408,653)}
+for i,path in raws.items():
+ j=f'obj{i}_01';shutil.copy2(path,r/(j+'-raa01.png'))
+ im=Image.open(path).convert('RGB').crop(boxes[i]).resize((1280,288),Image.Resampling.LANCZOS)
+ a=Image.new('RGB',(1536,1024),(128,128,128));a.paste(im,(128,368));a.save(b/'jobber'/j/'resultat.png')
+ ar=np.array(im); print(j,'range',int(ar.min()),int(ar.max()),'mean',ar.mean(),'chdiff',int(np.max(ar.max(axis=2)-ar.min(axis=2))))
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(b/'jobber'/j/'resultat.png')],capture_output=True,text=True)
+ (r/(j+'-kontroll01.txt')).write_text(p.stdout+p.stderr);print(p.stdout)

@@ -169,3 +169,8 @@
 
 - Tom valgte presis vektorrekonstruksjon for077, begge deler nå OK fra nativeSVG/PNGmaster. Seks farger,24løkker,34delte kjeder, fem midtkomponenter og fire sideprikker. Alle8kilder uendret,512×800overlapp byte-identisk.
 - To veisider utjevnet med faktisk største avvik1.5269kildepx, endepunkter beholdt. Uavhengig QA fant ingen strenge kryssinger. Ekstra svak PILrasterrad rettet med samplesenter/halvåpen scanline, korrekt bbox. Ny checker del1OK0/0/1,del2OK0.05/0.99/1. Tidligere17kandidat/status er historikk. Ingen import/runtime/ny individuell godkjenning. Bestilling18/19sluttkontroll og20produksjon fortsetter.
+
+## 2026-10-13 20:30 (Codex, Astra)
+
+- Bestilling 18: 7 OK og 3 SJEKK (obj774/775/781), ti bilder levert. Rene mørke gråpaneler, to manglende punktstjerner rettet, uregelmessig dørmerke og ny kikkertmaster kontrollert. Rom077 del2 fra autorisert vektorleveranse. Se `rapporter/bestilling018-20261013/RAPPORT.md`. Bestilling 19 fortsetter.
+- Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i rapporter/bestilling018-20261013/.

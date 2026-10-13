@@ -1,0 +1,16 @@
+from PIL import Image,ImageDraw
+import numpy as np,json
+from pathlib import Path
+R=Path('rapporter/bestilling018-20261013');stats=[];qa=Image.new('RGB',(1536,700),(128,128,128))
+for row,(j,n,lo,hi) in enumerate([('obj780_01',2,0,99),('obj781_01',1,11,147)]):
+ a=Image.open(R/(j+'-raa-'+str(n)+'.png')).convert('RGB').crop((128,368,1408,656))
+ a.save(R/(j+'-motiv-for-tone.png'))
+ g=np.array(a).astype(float).mean(axis=2);mn=float(g.min());mx=float(g.max())
+ v=np.rint(lo+(g-mn)*(hi-lo)/(mx-mn)).clip(lo,hi).astype('uint8');rgb=np.repeat(v[:,:,None],3,axis=2)
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(Image.fromarray(rgb),(128,368));out.save('jobber/'+j+'/resultat.png')
+ src=np.array(Image.open('jobber/'+j+'/original_1x.png').convert('RGB'))[:,:,0]
+ stats.append(dict(jobb=j,raw_min=mn,raw_max=mx,etter_min=int(v.min()),etter_max=int(v.max()),raw_persentiler=np.percentile(g,[0,25,50,75,95,100]).tolist(),etter_persentiler=np.percentile(v,[0,25,50,75,95,100]).tolist(),kilde_persentiler=np.percentile(src,[0,25,50,75,95,100]).tolist(),formel=f'{lo} + (generated-gray - {mn}) * {(hi-lo)/(mx-mn)}'))
+ for col,im in enumerate([Image.open('jobber/'+j+'/referanse.png').crop((128,368,1408,656)),out.crop((128,368,1408,656))]):
+  im=im.resize((768,173),Image.Resampling.LANCZOS);qa.paste(im,(col*768,row*350));ImageDraw.Draw(qa).text((col*768+5,row*350+180),j+(' kilde' if col==0 else ' HD'),fill='white')
+(R/'c-tonebevis.json').write_text(json.dumps(stats,indent=2)+'\n');qa.save(R/'c-samlet-qa.png')
+print(json.dumps(stats,indent=2))

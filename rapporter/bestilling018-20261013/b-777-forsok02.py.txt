@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling018-20261013';path="/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-53226ad8-b58b-4410-8802-2fdd98e665d3.png";shutil.copy2(path,r/'obj777_01-raa02.png')
+im=Image.open(path).convert('RGB').crop((128,370,1408,656)).resize((1280,288),Image.Resampling.LANCZOS)
+a=np.array(im.convert('L')).astype(float);mx=float(a.max());out=np.rint(a/(1+a*(1/99-1/mx))).clip(0,99).astype('uint8');c=Image.new('RGB',(1536,1024),(128,128,128));c.paste(Image.fromarray(out).convert('RGB'),(128,368));c.save(b/'jobber/obj777_01/resultat.png')
+p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py','jobber/obj777_01/resultat.png'],capture_output=True,text=True);(r/'obj777_01-kontroll.txt').write_text(p.stdout+p.stderr);print(p.stdout)
+d=json.loads((r/'b-tonemaaling.json').read_text());d[-1].update(generert_max=mx,generert_mean=float(a.mean()),etter_max=int(out.max()),etter_mean=float(out.mean()),generert_klipp=[128,370,1408,656],kilde_svart_toppstripe_hd='generert i råbildet');(r/'b-tonemaaling.json').write_text(json.dumps(d,indent=2)+'\n')

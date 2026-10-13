@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess,shutil
+b=Path.cwd();r=b/'rapporter/bestilling018-20261013'
+raws={774: "/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-28898acc-26a1-4ec6-9fd1-dd0a3772fd27.png",
+775: "/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-929e95ed-c3b9-4954-b51c-2d50d1fe5aa0.png",
+776: "/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-efbdadb7-6539-4542-b2c5-dde16d7b74dd.png",
+777: "/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-7201b291-6b7d-4f4c-80ac-c25fb03f642e.png"}
+shutil.copy2("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-5db5c768-68af-4f68-9773-1c8423733df2.png",r/'obj775_01-raa02.png')
+boxes={774:(128,367,1408,651),775:(128,379,1408,656),776:(128,367,1408,656),777:(128,374,1408,653)}
+metrics=[]
+for i,path in raws.items():
+ j=f'obj{i}_01';top=20 if i in [775,777] else 0
+ im=Image.open(path).convert('RGB').crop(boxes[i]).resize((1280,288-top),Image.Resampling.LANCZOS)
+ a=np.array(im.convert('L')).astype(float);orig=np.array(Image.open(b/'jobber'/j/'original_1x.png').convert('L'));mn=float(a.min());mx=float(a.max());target=float(orig.max());out=np.rint(a/(1+a*(1/target-1/mx))).clip(0,target).astype('uint8')
+ canvas=Image.new('RGB',(1536,1024),(128,128,128));panel=Image.new('RGB',(1280,288),(0,0,0));panel.paste(Image.fromarray(out).convert('RGB'),(0,top));canvas.paste(panel,(128,368));canvas.save(b/'jobber'/j/'resultat.png')
+ metrics.append({'jobb':j,'generert_min':mn,'generert_max':mx,'generert_mean':float(a.mean()),'original_min':int(orig.min()),'original_max':int(orig.max()),'original_mean':float(orig.mean()),'etter_min':int(out.min()),'etter_max':int(out.max()),'etter_mean':float(out.mean()),'formel':'round(x/(1+x*(1/original_max-1/generert_max)))','kilde_svart_toppstripe_hd':top,'generert_klipp':boxes[i]})
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(b/'jobber'/j/'resultat.png')],capture_output=True,text=True)
+ (r/(j+'-kontroll.txt')).write_text(p.stdout+p.stderr);print(p.stdout)
+(r/'b-tonemaaling.json').write_text(json.dumps(metrics,indent=2)+'\n')
+sheet=Image.new('RGB',(1536,704),(128,128,128))
+for row,i in enumerate(raws):
+ for col,fn in enumerate(['referanse.png','resultat.png']):
+  im=Image.open(b/'jobber'/f'obj{i}_01'/fn).crop((128,368,1408,656)).resize((768,173));sheet.paste(im,(col*768,row*176))
+sheet.save(r/'b-familie.png')

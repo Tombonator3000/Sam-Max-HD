@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,shutil,subprocess,json
+b=Path.cwd();r=b/'rapporter/bestilling018-20261013';j=b/'jobber/obj777_01/resultat.png'
+shutil.copy2(j,r/'obj777_01-for-munnretting.png');shutil.copy2("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-9b5cdfdc-7fdc-4305-8ca3-f668783ed23e.png",r/'obj777_01-raa03.png')
+base=Image.open(j).convert('RGB');old=np.array(base);patch=Image.open(r/'obj777_01-raa03.png').convert('L').resize((151,84),Image.Resampling.LANCZOS).convert('RGB')
+# Fixed rectangular region wholly inside the newly generated mouth crop. No source mask.
+box=(712,512,800,557);base.paste(patch.crop((37,23,125,68)),box[:2]);base.save(j);new=np.array(base);outside=np.ones(old.shape[:2],dtype=bool);outside[512:557,712:800]=False;assert np.array_equal(old[outside],new[outside]);assert new[512:557,712:800].max()<=99
+p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(j)],capture_output=True,text=True);(r/'obj777_01-kontroll.txt').write_text(p.stdout+p.stderr);print(p.stdout)
+(r/'obj777_01-munnretting.json').write_text(json.dumps({'kildeutsnitt':[675,489,826,573],'nygenerert_rektangel':box,'resten_byteidentisk':True,'patch_min':int(new[512:557,712:800].min()),'patch_max':int(new[512:557,712:800].max())},indent=2)+'\n')

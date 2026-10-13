@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,hashlib,json,shutil,subprocess
+r=Path(__file__).resolve().parent;root=r.parents[1]
+before=Image.open(root/'jobber/obj781_01/resultat.png').convert('RGB');shutil.copyfile(root/'jobber/obj781_01/resultat.png',r/'root-781-foer.png')
+new=Image.open(r/'root-781-doer-raa02.png').convert('RGB').resize((108,92),Image.Resampling.LANCZOS)
+# Use only newly generated patch pixels; preserve the rest of the new HD.
+box=(548,502,620,566);old=np.array(before.crop(box),float).mean(2);patch=np.array(new.crop((20,14,92,78)),float).mean(2)
+h,w=patch.shape;yy,xx=np.mgrid[:h,:w];edge=(xx<3)|(xx>=w-3)|(yy<3)|(yy>=h-3)
+X=np.stack([np.ones((h,w)),xx/w,yy/h],axis=-1);fit=np.linalg.lstsq(X[edge],(old-patch)[edge],rcond=None)[0]
+matched=np.clip(np.rint(patch+X@fit),11,147).astype('uint8');mask=np.minimum.reduce([xx/3,(w-1-xx)/3,yy/3,(h-1-yy)/3,np.ones((h,w))]);mask=np.clip(mask,0,1)
+out=before.copy();out.paste(Image.fromarray(np.repeat(matched[:,:,None],3,axis=2)),box[:2],Image.fromarray(np.rint(mask*255).astype('uint8')));out.save(r/'root-781-kandidat.png')
+delta=np.any(np.asarray(out)!=np.asarray(before),axis=2);outside=np.ones(delta.shape,bool);outside[box[1]:box[3],box[0]:box[2]]=False;assert not delta[outside].any()
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+(r/'root-781-doer-bevis.json').write_text(json.dumps({'patch_box_xywh':[548,502,72,64],'endret_antall':int(delta.sum()),'byteidentisk_utenfor':True,'for_sha256':sha(r/'root-781-foer.png'),'etter_sha256':sha(r/'root-781-kandidat.png'),'source_pixels_or_contour_mask_used':False,'raw01_rejected':'Root incorrectly assumed empty door. Original has an irregular dark emblem. Removing it would be wrong.','raw02_method':'Built-in imagegen source-only irregular emblem correction, tone matching solely against generated surrounding HD, rectangular blend','tone_offset_plane':fit.tolist(),'runtime':False},ensure_ascii=False,indent=2)+'\n')
+d=r/'root-781-kontroll';d.mkdir(exist_ok=True)
+for n in ['jobb.json','original_1x.png','referanse.png','prompt.txt']:shutil.copyfile(root/'jobber/obj781_01'/n,d/n)
+shutil.copyfile(r/'root-781-kandidat.png',d/'resultat.png');cp=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3',str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/'root-781-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+qa=Image.new('RGB',(1280,3*308),(128,128,128));draw=ImageDraw.Draw(qa)
+for i,(label,im) in enumerate([('ORIGINAL',Image.open(root/'jobber/obj781_01/referanse.png')),('FOER',before),('ETTER',out)]):draw.text((5,i*308+4),label,fill=(0,0,0));qa.paste(im.crop((128,368,1408,656)),(0,i*308+20))
+qa.save(r/'root-781-etter-qa.png')
