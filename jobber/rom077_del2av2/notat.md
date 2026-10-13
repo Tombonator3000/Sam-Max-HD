@@ -1,0 +1,7 @@
+# Leveransenotat for rom077_del2av2
+
+Tom valgte uttrykkelig «Bruk presis vektorrekonstruksjon for rom077». Fem bildegenereringsforsøk tilføyde feil og er avvist. Gjeldende levering er klippet fra én2560×800 nativeSVG/PNG-master. Originalenes seks flate farger, fem midtkomponenter inklusive apex og fire asymmetriske sideprikker er beholdt. Stor svartflate og røde randlinjer følger source. NativeSVG inneholder ingen bitmap/gradient,24fargeregionløkker og34delte grensekjeder.
+
+RDPtoleranse er0.8kildepx for ordinære grenser og1.6for to veisidekjeder alene, faktisk største avvik1.5269. Endepunkter og originale knutepunkter er beholdt. Veisidenes rastertrapp er glattet, ikke påstått pikselidentisk. SVG er rasterisert ved16samples/kildepx med even-odd scanline ved samplesentre og halvåpne intervaller. Tidligere PILrender ga en svak ekstra rød rad; den er rettet, endelig ikke-svart bbox[1280,268,2560,532] er eksakt. Dette er vektorrasterisering, ingen originaloppskalering eller maskering av generert kunst.
+
+Canvas1536×1024, motiv[0,112,1536,800],RGB128padding. Masterklipp x1024, overlapp512×800 byte-identisk. Uendret egenkontroll OK. SHA256:9f4be089c7e95743b7dbe0d5aa97d87c480705fea3aad1d755e8a23f2ecbc96b. Åtte beskyttede kildefiler uendret. Root og uavhengig Astra-QA har sett motivet og kontrollert topologi/klipp. Det er ikke en ny individuell bildegodkjenning, motorimport eller runtime. Full proveniens/kontroll/oppkrift i rapporter/rom077-vektor-20261013/.

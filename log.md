@@ -164,3 +164,8 @@
 - Bestilling 17 ni klare OK, rom077 del1 teknisk OK men visuelt uavklart etter fem forsøk og ukrysset. Master ikke endelig låst, del2 kun kandidat i rapport. Metodevalg for presis vektorrekonstruksjon077 spurt separat.
 - 40+4 beskyttede kilder uendret, canvas/padding/SHA kontrollert. Root har sett alle original/HD samlet. Rom070/073 har 1152/928 x800 identiske overlapp. Pizzaetikettens glyffer fortsatt restusikkerhet.
 - 26 fargede klesgrupper, Sam/Max uten separate UI-knapper, fisker i elv og eget mørkt munnoverlegg, frossen Bruno med tom venstresylinder og egen tom isrest kildekontrollert. Ingen import, runtime eller ny individuell godkjenning. Alle ti bestilling16-PNG SHA-verifisert fra GitHub. Bestilling18/19 fortsetter.
+
+## 2026-10-13T20:24:40+02:00 (Codex, Astra)
+
+- Tom valgte presis vektorrekonstruksjon for077, begge deler nå OK fra nativeSVG/PNGmaster. Seks farger,24løkker,34delte kjeder, fem midtkomponenter og fire sideprikker. Alle8kilder uendret,512×800overlapp byte-identisk.
+- To veisider utjevnet med faktisk største avvik1.5269kildepx, endepunkter beholdt. Uavhengig QA fant ingen strenge kryssinger. Ekstra svak PILrasterrad rettet med samplesenter/halvåpen scanline, korrekt bbox. Ny checker del1OK0/0/1,del2OK0.05/0.99/1. Tidligere17kandidat/status er historikk. Ingen import/runtime/ny individuell godkjenning. Bestilling18/19sluttkontroll og20produksjon fortsetter.

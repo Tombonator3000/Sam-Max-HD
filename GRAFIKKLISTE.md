@@ -9,7 +9,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 64 hele rom levert (98 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Rombakgrunner | 65 hele rom levert (100 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 61 levert, inkludert 13 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
@@ -268,13 +268,13 @@ Rom 69, 70, 71, 73, 76, 77.
 - [x] `obj772_01` (rom 73 Inne i fiskens munn, objekt 772 tilstand 01)
 - [x] `rom076` (rom 76 Tilbakeblikk: Bruno i isen)
 - [x] `obj773_01` (rom 76 Tilbakeblikk: Bruno i isen, objekt 773 tilstand 01)
-- [ ] `rom077_del1av2` (rom 77 Rulletekst (paneler), del 1/2)
+- [x] `rom077_del1av2` (rom 77 Rulletekst (paneler), del 1/2)
 
 ## Bestilling 18
 
 Rom 77, 78.
 
-- [ ] `rom077_del2av2` (rom 77 Rulletekst (paneler), del 2/2)
+- [x] `rom077_del2av2` (rom 77 Rulletekst (paneler), del 2/2)
 - [ ] `obj774_01` (rom 77 Rulletekst (paneler), objekt 774 tilstand 01)
 - [ ] `obj775_01` (rom 77 Rulletekst (paneler), objekt 775 tilstand 01)
 - [ ] `obj776_01` (rom 77 Rulletekst (paneler), objekt 776 tilstand 01)
@@ -3457,3 +3457,5 @@ Bestilling 15: 9 OK og obj605_01 SJEKK, ti veisegmenter levert. Genererte stripe
 Bestilling 16: 7 OK og 3 SJEKK (obj649_01, obj650_01 og obj668_01), ti bilder levert. Tavlenes bakside/knuste tilstander, lave banemarkeringer og sparse horisontkonturer kildekontrollert. Se `rapporter/bestilling016-20261013/RAPPORT.md`. Bestilling 17 fortsetter.
 
 Bestilling 17: ni leveranseklare OK. Rom077 del1 teknisk OK, men konkret motivavvik etter fem bildeforsøk, ikke klar og ukrysset; master ikke endelig låst. Se `rapporter/bestilling017-20261013/RAPPORT.md`. Bestilling 18/19 fortsetter uavhengig.
+
+Rom077 er senere rettet etter Toms uttrykkelige vektorvalg, begge deler levert OK fra native fellesmaster. Fire sideprikker avklart, rasterrad rettet. Bestilling17s uavklarte kandidat er historikk. Se `rapporter/rom077-vektor-20261013/RAPPORT.md`.

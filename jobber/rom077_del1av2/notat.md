@@ -1,11 +1,7 @@
-# rom077_del1av2 – Bestilling 17 C
+# Leveransenotat for rom077_del1av2
 
-Første fullmaster beholdt som UAVKLART kandidat. Andre forsøk fjernet kildeprikker og er avvist. Kildens seks flate farger er blitt mer gradert, og mulig ekstra liten midtstrek nær forsvinningspunktet er visuelt uavklart. Ingen nye navn eller biler. Masteren er ikke låst som endelig.
+Tom valgte uttrykkelig «Bruk presis vektorrekonstruksjon for rom077». Fem bildegenereringsforsøk tilføyde feil og er avvist. Gjeldende levering er klippet fra én2560×800 nativeSVG/PNG-master. Originalenes seks flate farger, fem midtkomponenter inklusive apex og fire asymmetriske sideprikker er beholdt. Stor svartflate og røde randlinjer følger source. NativeSVG inneholder ingen bitmap/gradient,24fargeregionløkker og34delte grensekjeder.
 
-Innebygd ChatGPT imagegen; eksakt modellnavn er ikke eksponert. Originalprompt er beholdt ordrett foran separate kildepresiseringer. Hele nygenererte utsnitt er skalert/plassert presist; ingen originalsilhuettmaskering eller lokal geometriwarp. Oppskrift: rapporter/bestilling017-20261013/c-oppskrift.py.txt.
+RDPtoleranse er0.8kildepx for ordinære grenser og1.6for to veisidekjeder alene, faktisk største avvik1.5269. Endepunkter og originale knutepunkter er beholdt. Veisidenes rastertrapp er glattet, ikke påstått pikselidentisk. SVG er rasterisert ved16samples/kildepx med even-odd scanline ved samplesentre og halvåpne intervaller. Tidligere PILrender ga en svak ekstra rød rad; den er rettet, endelig ikke-svart bbox[1280,268,2560,532] er eksakt. Dette er vektorrasterisering, ingen originaloppskalering eller maskering av generert kunst.
 
-Kontroll: OK. SHA-256: cea8c0242aaf07a6359681a3184f1ff8a87ddcffcdbf42ddf30fd4fcaeee0c60.
-
-Runtime, import og ny individuell brukergodkjenning er ikke utført.
-
-Tredje panelutsnittforsøk er bevart som avvist: for mange midtstreker og symmetrisert plassering av sidemerker. Nærbildet rom077-panel-original.png viser også et tredje svært svakt sidemerke; presiseringen med tallet to var for snever. Første kandidat står fortsatt uavklart.
+Canvas1536×1024, motiv[0,112,1536,800],RGB128padding. Masterklipp x0, overlapp512×800 byte-identisk. Uendret egenkontroll OK. SHA256:541408d6cefef9af0024ff741f5ba144df6b51acbddb017297ba2c1b6de44fcd. Åtte beskyttede kildefiler uendret. Root og uavhengig Astra-QA har sett motivet og kontrollert topologi/klipp. Det er ikke en ny individuell bildegodkjenning, motorimport eller runtime. Full proveniens/kontroll/oppkrift i rapporter/rom077-vektor-20261013/.

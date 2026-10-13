@@ -41,5 +41,5 @@
 - [x] Levert bestilling 15 med ni OK og obj605_01 SJEKK, målte kantavvik og presise genererte komponenter dokumentert.
 - [x] Levert bestilling 16 med sju OK og tre SJEKK, tavler, knuste lag og banemarkeringer dokumentert.
 - [x] Levert ni OK i bestilling 17, kildekorrigert påkledning/fisker/Bruno og panoramaer.
-- [ ] Avklar rom077 etter fem genereringsforsøk med motivavvik; del1 ikke klar, del2 avventer låst master. Se bestilling017-rapport og spurt metodevalg.
+- [x] Rom077 begge deler levert OK etter uttrykkelig vektorvalg, egen SVGmaster og kilde-/rasterkontroll. Se rapporter/rom077-vektor-20261013/.
 - [ ] Fortsett bestilling 18 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
