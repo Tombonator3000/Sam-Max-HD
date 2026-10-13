@@ -1,0 +1,12 @@
+; Objekt 229 "doug-swanride-door" i rom 23 (OBCD/VERB)
+; Verbtabell (verb: offset fra starten av VERB-blokken): 7: 0x000C
+
+Events:
+   7 - 000C
+[000C] (5D) if (ifClassOfIs(231,[6])) {
+[0019] (7B)   loadRoom(21)
+[001D] (73) } else {
+[0020] (85)   loadRoomWithEgo(219,22,-1,-1)
+[002D] (**) }
+[002D] (65) stopObjectCodeA()
+END

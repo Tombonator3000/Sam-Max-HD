@@ -1,0 +1,241 @@
+; Lokalt skript 205 i rom 28 (LSCR)
+
+Script# 205
+[0000] (7C) stopScript(208)
+[0004] (82) animateActor(4,1)
+[000B] (68) beginCutscene([2])
+[0012] (82) animateActor(2,248)
+[0019] (6C) breakHere()
+[001A] (67) endCutscene()
+[001B] (9D) actorOps.setCurActor(2)
+[0020] (9D) actorOps.setCostume(7)
+[0025] (5E) startScript(0,9,[])
+[002F] (5E) startScript(0,15,[1])
+[003C] (5E) startScript(0,14,[])
+[0046] (43) var171 = 0
+[004C] (43) var169 = getRandomNumber(1)
+[0053] (6C) breakHere()
+[0054] (5D) unless (var171) jump 4c
+[005A] (0C) dup[1] = var171
+[005E] (5D) if (dup[1] == 998) {
+[0065] (5D)   if (!bitvar42) {
+[006D] (BA)     talkActor(sound(0xAF655C, 0xA) + "Shouldn't you be posing for a painting with a pitchfork?",2)
+[00BA] (73)   } else {
+[00BD] (BA)     talkActor(sound(0xB02B87, 0xA) + "Hey, dour docent person!",2)
+[00EA] (**)   }
+[00EA] (82)   animateActor(4,250)
+[00F1] (A9)   wait.waitForMessage()
+[00F3] (BA)   talkActor(sound(0xB0BF32, 0xA) + "Can I help you?" + startAnim(8),4)
+[011B] (A9)   wait.waitForMessage()
+[011D] (5D) } else if (dup[1] == 997) {
+[0128] (5D)   if (!bitvar42) {
+[0130] (BA)     talkActor(sound(0xB1075D, 0xA) + "Do you work here?" + startAnim(17),2)
+[015A] (82)     animateActor(4,250)
+[0161] (A9)     wait.waitForMessage()
+[0163] (BA)     talkActor(sound(0xB15188, 0xA) + "Yup.  Have been for forty years." + startAnim(7),4)
+[019C] (73)   } else {
+[019F] (BA)     talkActor(sound(0xB1DB73, 0xA) + "How much are they paying you, anyway?" + startAnim(17),2)
+[01DD] (82)     animateActor(4,250)
+[01E4] (A9)     wait.waitForMessage()
+[01E6] (BA)     talkActor(sound(0xB2621E, 0xA) + "I'm a volunteer.  But they let me sleep here, and I get all the twine I can eat." + startAnim(6),4)
+[024F] (**)   }
+[024F] (A9)   wait.waitForMessage()
+[0251] (BA)   talkActor(sound(0xB39449, 0xA) + "So, how can I help you?",4)
+[027D] (A9)   wait.waitForMessage()
+[027F] (5D) } else if (dup[1] == 1001) {
+[028A] (5D)   if (!bitvar42) {
+[0292] (BA)     talkActor(sound(0xB40374, 0xA) + "Let me guess: your suit is entirely made of twine." + startAnim(17),2)
+[02DD] (82)     animateActor(4,250)
+[02E4] (A9)     wait.waitForMessage()
+[02E6] (BA)     talkActor(sound(0xB4F69F, 0xA) + "Actually, I'm the docent of this here museum.",4)
+[0328] (73)   } else {
+[032B] (BA)     talkActor(sound(0xB5B3CA, 0xA) + "Don't you ever get tired of sitting there?" + startAnim(17),2)
+[036E] (82)     animateActor(4,250)
+[0375] (A9)     wait.waitForMessage()
+[0377] (BA)     talkActor(sound(0xB656B5, 0xA) + "Nope." + wait() + "The painful splinters keep things interesting." + startAnim(6),4)
+[03C5] (**)   }
+[03C5] (A9)   wait.waitForMessage()
+[03C7] (BA)   talkActor(sound(0xB72E60, 0xA) + "Now, what can I do for you?",4)
+[03F7] (A9)   wait.waitForMessage()
+[03F9] (5D) } else if (dup[1] == 999) {
+[0404] (73)   jump 11b0
+[0408] (73)   /* jump 40c; */
+[040B] (**) }
+[040B] (43) bitvar42 = 1
+[0412] (43) var301 = 4
+[0418] (5D) while (var301 <= var196) {
+[0422] (47)   array195[var301] = 0
+[042B] (4F)   var301++
+[042E] (**) }
+[0431] (5E) startScript(0,11,[])
+[043B] (43) var196 = 3
+[0441] (5D) if (!localvar1) {
+[0448] (5E)   startScript(0,13,[1025])
+[0455] (**) }
+[0455] (5D) if (!localvar3) {
+[045C] (5E)   startScript(0,13,[1036])
+[0469] (**) }
+[0469] (5D) if (bitvar22 && !localvar2) {
+[0474] (5E)   startScript(0,13,[1061])
+[0481] (**) }
+[0481] (5D) if (!localvar0) {
+[0488] (5E)   startScript(0,13,[1030])
+[0495] (**) }
+[0495] (5E) startScript(0,14,[])
+[049F] (43) var171 = 0
+[04A5] (43) var169 = getRandomNumber(1)
+[04AC] (6C) breakHere()
+[04AD] (5D) unless (var171) jump 4a5
+[04B3] (0C) dup[5] = var171
+[04B7] (5D) if (dup[5] == 998) {
+[04BE] (BA)   talkActor(sound(0xB7A08B, 0xA) + "Stop staring at me!" + startAnim(23),2)
+[04EB] (82)   animateActor(4,10)
+[04F2] (CA)   delayFrames(10)
+[04F6] (82)   animateActor(4,5)
+[04FD] (A9)   wait.waitForMessage()
+[04FF] (BA)   talkActor(sound(0xB80AB6, 0xA) + "I can't help it." + startAnim(8),4)
+[0528] (82)   animateActor(2,22)
+[052F] (A9)   wait.waitForMessage()
+[0531] (5D) } else if (dup[5] == 997) {
+[053C] (BA)   talkActor(sound(0xB84DE1, 0xA) + "How'd you get this job, anyway?" + startAnim(21),2)
+[0575] (A9)   wait.waitForMessage()
+[0577] (82)   animateActor(2,22)
+[057E] (BA)   talkActor(sound(0xB8CB8C, 0xA) + "I clawed my way to the top, trampling those foolish enough to get in my way." + startAnim(6),4)
+[05E3] (A9)   wait.waitForMessage()
+[05E5] (5D) } else if (dup[5] == 1001) {
+[05F0] (BA)   talkActor(sound(0xB9FEB7, 0xA) + "It's places like this that make me wish I were Canadian.",2)
+[063E] (A9)   wait.waitForMessage()
+[0640] (BA)   talkActor(sound(0xBAE2E2, 0xA) + "They've got one of these, too, but half of it's French." + startAnim(8),4)
+[0690] (A9)   wait.waitForMessage()
+[0692] (5D) } else if (dup[5] == 999) {
+[069D] (BA)   talkActor(sound(0xBBA58D, 0xA) + "That'll be all for now." + startAnim(26),2)
+[06CE] (73)   jump 11b0
+[06D1] (5D) } else if (dup[5] == 1061) {
+[06DC] (43)   localvar2 = 1
+[06E3] (5D)   if (!bitvar45) {
+[06EA] (43)     bitvar45 = 1
+[06F0] (BA)     talkActor(sound(0xBC1138, 0xA) + "Has Conroy Bumpus passed through here?" + startAnim(21),2)
+[072F] (A9)     wait.waitForMessage()
+[0731] (BA)     talkActor(sound(0xBCB5E3, 0xA) + "Who's that?",4)
+[0751] (A9)     wait.waitForMessage()
+[0753] (BA)     talkActor(sound(0xBCE08E, 0xA) + "He's a country western star gone berserk with power." + startAnim(23),2)
+[07A0] (A9)     wait.waitForMessage()
+[07A2] (82)     animateActor(2,22)
+[07A9] (BA)     talkActor(sound(0xBDCCB9, 0xA) + "I wouldn't know him if I saw him.  I don't get out much.",4)
+[07F6] (A9)     wait.waitForMessage()
+[07F8] (73)   } else {
+[07FB] (BA)     talkActor(sound(0xBEA464, 0xA) + "Sure you haven't seen Conroy Bumpus?",2)
+[0834] (A9)     wait.waitForMessage()
+[0836] (BA)     talkActor(sound(0xBF428F, 0xA) + "I just don't know.",4)
+[085D] (A9)     wait.waitForMessage()
+[085F] (**)   }
+[085F] (5D) } else if (dup[5] == 1025) {
+[086A] (43)   localvar1 = 1
+[0871] (5D)   if (!bitvar41) {
+[0878] (43)     bitvar41 = 1
+[087E] (BA)     talkActor(sound(0xBFA03A, 0xA) + "You haven't seen an eight-foot tall woodland creature answering to the name of Bruno around here, have you?" + startAnim(21),2)
+[0902] (A9)     wait.waitForMessage()
+[0904] (82)     animateActor(2,22)
+[090B] (BA)     talkActor(sound(0xC11EE5, 0xA) + "Are you talking about Bruno the Bigfoot?" + startAnim(8),4)
+[094C] (A9)     wait.waitForMessage()
+[094E] (5D)     if (!bitvar67) {
+[0955] (43)       bitvar2 = 1
+[095B] (6C)       breakHere()
+[095C] (5D)       unless (bitvar3) jump 95b
+[0962] (81)       faceActor(3,4)
+[0969] (**)     }
+[0969] (BA)     talkActor(sound(0xC1B210, 0xA) + "Yeah." + startAnim(26),2)
+[0987] (A9)     wait.waitForMessage()
+[0989] (BA)     talkActor(sound(0xC1DFBB, 0xA) + "He and a bunch of other bigfoots helped build the Ball of Twine back in '56!" + startAnim(6) + wait() + "Why, the stories I could tell--" + startAnim(7),4)
+[0A13] (A9)     wait.waitForMessage()
+[0A15] (5D)     if (!bitvar67) {
+[0A1C] (BA)       talkActor(sound(0xC3DC66, 0xA) + "NOOOOOOOOO!",3)
+[0A3C] (A9)       wait.waitForMessage()
+[0A3E] (**)     }
+[0A3E] (BA)     talkActor(sound(0xC44991, 0xA) + "I've heard enough stories today." + startAnim(14) + wait() + "Have you seen Bruno recently?" + startAnim(25),2)
+[0A9A] (A9)     wait.waitForMessage()
+[0A9C] (82)     animateActor(2,24)
+[0AA3] (BA)     talkActor(sound(0xC5723C, 0xA) + "I haven't seen Bruno in 30 or so years." + wait() + "Is he in trouble?" + startAnim(8),4)
+[0AF6] (A9)     wait.waitForMessage()
+[0AF8] (BA)     talkActor(sound(0xC682E7, 0xA) + "That depends on your definition." + startAnim(17),2)
+[0B31] (A9)     wait.waitForMessage()
+[0B33] (5D)     if (!bitvar67) {
+[0B3A] (BA)       talkActor(sound(0xC70912, 0xA) + "I like to use the one that involves spiny echidnae.",3)
+[0B82] (A9)       wait.waitForMessage()
+[0B84] (43)       bitvar2 = 0
+[0B8A] (**)     }
+[0B8A] (BA)     talkActor(sound(0xC7E87D, 0xA) + "Well, is there anything else I can help you with?",4)
+[0BD0] (A9)     wait.waitForMessage()
+[0BD2] (73)   } else {
+[0BD5] (BA)     talkActor(sound(0xC8A128, 0xA) + "Is there anything else you can tell us about Bruno?",2)
+[0C1D] (A9)     wait.waitForMessage()
+[0C1F] (BA)     talkActor(sound(0xC95B53, 0xA) + "I can't think of a thing that'll take less than 40 minutes to cover.",4)
+[0C78] (A9)     wait.waitForMessage()
+[0C7A] (BA)     talkActor(sound(0xCA5D7E, 0xA) + "Then forget it.  I need my information in bite-sized packets.",2)
+[0CCC] (A9)     wait.waitForMessage()
+[0CCE] (**)   }
+[0CCE] (5D) } else if (dup[5] == 1036) {
+[0CD9] (43)   localvar3 = 1
+[0CE0] (5D)   if (!bitvar43) {
+[0CE7] (43)     bitvar43 = 1
+[0CED] (BA)     talkActor(sound(0xCB6CE9, 0xA) + "What's with all the fish guts flying past the window?" + startAnim(23),2)
+[0D3B] (A9)     wait.waitForMessage()
+[0D3D] (82)     animateActor(2,22)
+[0D44] (BA)     talkActor(sound(0xCC3D94, 0xA) + "Those are leftovers from our last fish delivery." + startAnim(6) + wait() + "Our famous rotating restaurant has fresh fish flown in every day^" + wait() + "^from the World of Fish, in Mosquitoville, Missouri." + startAnim(8),4)
+[0E0A] (A9)     wait.waitForMessage()
+[0E0C] (5D)     if (ifClassOfIs(103,[19])) {
+[0E19] (5F)       startScriptQuick(45,[103,1,1])
+[0E29] (**)     }
+[0E29] (6E)     setClass(103,[147])
+[0E33] (73)   } else {
+[0E36] (BA)     talkActor(sound(0xCF0D3F, 0xA) + "Isn't it a little environmentally unsound, dumping all those excess fish guts on the ground?",2)
+[0EA7] (A9)     wait.waitForMessage()
+[0EA9] (BA)     talkActor(sound(0xD0956A, 0xA) + "Maybe.  Who cares?",4)
+[0ED0] (A9)     wait.waitForMessage()
+[0ED2] (BA)     talkActor(sound(0xD0F995, 0xA) + "Hey, good point.",2)
+[0EF7] (A9)     wait.waitForMessage()
+[0EF9] (**)   }
+[0EF9] (5D) } else if (dup[5] == 1030) {
+[0F04] (43)   localvar0 = 1
+[0F0B] (5D)   if (!bitvar44) {
+[0F12] (43)     bitvar44 = 1
+[0F18] (BA)     talkActor(sound(0xD15640, 0xA) + "This ball isn't really made from a continuous piece of twine, is it?",2)
+[0F71] (A9)     wait.waitForMessage()
+[0F73] (BA)     talkActor(sound(0xD26EEB, 0xA) + "Ai-yup, it's the longest piece of twine in the world, by 92 yards." + startAnim(6),4)
+[0FCE] (A9)     wait.waitForMessage()
+[0FD0] (5D)     if (getOwner(315) == 2) {
+[0FDB] (BA)       talkActor(sound(0xD3D696, 0xA) + "Good thing we only took 91 yards.",2)
+[1011] (A9)       wait.waitForMessage()
+[1013] (BA)       talkActor(sound(0xD482C1, 0xA) + "What's that?" + startAnim(8),4)
+[1038] (A9)       wait.waitForMessage()
+[103A] (5D)       if (!bitvar67) {
+[1041] (43)         bitvar2 = 1
+[1047] (6C)         breakHere()
+[1048] (5D)         unless (bitvar3) jump 1047
+[104E] (81)         faceActor(3,4)
+[1055] (BA)         talkActor(sound(0xD4BD6C, 0xA) + "He said `Wood things come in jars.`",3)
+[108D] (A9)         wait.waitForMessage()
+[108F] (43)         bitvar2 = 0
+[1095] (73)       } else {
+[1098] (BA)         talkActor(sound(0xD5A117, 0xA) + "Nothing.  I just said `Good thing I ate some lard.`",2)
+[10E0] (A9)         wait.waitForMessage()
+[10E2] (**)       }
+[10E2] (BA)       talkActor(sound(0xD68442, 0xA) + "Oh.",4)
+[10FA] (A9)       wait.waitForMessage()
+[10FC] (**)     }
+[10FC] (73)   } else {
+[10FF] (BA)     talkActor(sound(0xD6A5ED, 0xA) + "What would you do if someone cut off, say, 94 yards of the ball?",2)
+[1154] (A9)     wait.waitForMessage()
+[1156] (BA)     talkActor(sound(0xD7C818, 0xA) + "We'd shoot 'em, skin 'em, and sell them as jerky treats." + startAnim(8),4)
+[11A7] (A9)     wait.waitForMessage()
+[11A9] (**)   }
+[11A9] (73)   /* jump 11ad; */
+[11AC] (**) }
+[11AC] (73) jump 412
+[11B0] (A9) wait.waitForMessage()
+[11B2] (9D) actorOps.setCurActor(2)
+[11B7] (9D) actorOps.setCostume(2)
+[11BC] (5E) startScript(0,10,[])
+[11C6] (5E) startScript(1,208,[])
+[11D0] (66) stopObjectCodeB()
+END

@@ -1,0 +1,24 @@
+; Lokalt skript 206 i rom 52 (LSCR)
+
+Script# 206
+[0000] (0C) dup[1] = localvar0
+[0004] (5D) if (dup[1] == 7) {
+[000B] (5D) } else if (dup[1] == 4) {
+[0017] (81)   faceActor(2,4)
+[001F] (6C)   breakHere()
+[0020] (5D)   if (!bitvar85 && !bitvar95) {
+[002C] (BA)     talkActor(sound(0x632D124, 0xA) + "She looks familiar.",2)
+[0054] (5D)   } else if (bitvar95) {
+[005D] (BA)     talkActor(sound(0x633460F, 0xA) + "It's Evelyn Morrison, B-Movie Star." + startAnim(7),2)
+[0099] (CA)     delayFrames(9)
+[009D] (73)   } else {
+[00A0] (81)     faceActor(2,4)
+[00A7] (6C)     breakHere()
+[00A8] (BA)     talkActor(sound(0x634137A, 0xA) + "It's Evelyn Morrison, B-Movie Star.",2)
+[00E0] (**)   }
+[00E0] (73) } else {
+[00E3] (5E)   startScript(0,63,[localvar0,4,localvar1])
+[00F7] (7C)   stopScript(0)
+[00FB] (**) }
+[00FB] (66) stopObjectCodeB()
+END

@@ -1,0 +1,15 @@
+; Objekt 431 "conroy-toupee" i rom 45 (OBCD/VERB)
+; Verbtabell (verb: offset fra starten av VERB-blokken): 3: 0x0044, 4: 0x001C, 91: 0x0012
+; Inngangen til verb 4 (0x001C) er inne i linjen [0019]. Byte foran den: 01 82 00. descumm leser dem som push uten egen linje. Satt som klasser gir de samme bitene som DOBJ har for objektet, så det er trolig ikke kode.
+
+Events:
+   3 - 0044
+   4 - 001C
+  5B - 0012
+[0012] (43) var182 = 1055
+[0018] (65) stopObjectCodeA()
+[0019] (BB) talkEgo(sound(0x6C0B438, 0xA) + "It's Conroy's toupee.")
+[0043] (65) stopObjectCodeA()
+[0044] (83) doSentence(3,localvar0,130,var7)
+[0051] (65) stopObjectCodeA()
+END

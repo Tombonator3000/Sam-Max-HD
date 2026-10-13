@@ -1,0 +1,16 @@
+; Lokalt skript 205 i rom 53 (LSCR)
+
+Script# 205
+[0000] (0C) dup[1] = localvar0
+[0004] (5D) if (dup[1] == 4) {
+[000B] (BB)   talkEgo(sound(0x8594F92, 0xA) + "She looks friendly, in a scary sort of way.")
+[0049] (5D) } else if (dup[1] == 7) {
+[0054] (5D) } else if (dup[1] == 6) {
+[0060] (5E)   startScript(0,104,[])
+[006B] (7C)   stopScript(0)
+[006F] (73) } else {
+[0072] (5E)   startScript(0,63,[localvar0,4,localvar1])
+[0086] (7C)   stopScript(0)
+[008A] (**) }
+[008A] (66) stopObjectCodeB()
+END

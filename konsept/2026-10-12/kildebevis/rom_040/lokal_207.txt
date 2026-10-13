@@ -1,0 +1,188 @@
+; Lokalt skript 207 i rom 40 (LSCR)
+
+Script# 207
+[0000] (7C) stopScript(209)
+[0004] (82) animateActor(4,3)
+[000B] (5E) startScript(0,9,[])
+[0015] (5E) startScript(0,15,[1])
+[0022] (5E) startScript(0,14,[])
+[002C] (43) var171 = 0
+[0032] (43) var169 = getRandomNumber(1)
+[0039] (6C) breakHere()
+[003A] (5D) unless (var171) jump 32
+[0040] (0C) dup[1] = var171
+[0044] (5D) if (dup[1] == 998) {
+[004B] (5D)   if (!bitvar73) {
+[0053] (73)     jump 1a1
+[0056] (**)   }
+[0056] (BA)   talkActor(sound(0x2C694F2, 0xA) + "Make it stop!",2)
+[0078] (A9)   wait.waitForMessage()
+[007A] (BA)   talkActor(sound(0x2C6E65D, 0xA) + "What, and give up show business?",4)
+[00AF] (A9)   wait.waitForMessage()
+[00B1] (5D) } else if (dup[1] == 997) {
+[00BC] (5D)   if (!bitvar73) {
+[00C4] (73)     jump 1a1
+[00C7] (**)   }
+[00C7] (BA)   talkActor(sound(0x2C78FC8, 0xA) + "Do you know why you're upside-down?",2)
+[00FF] (A9)   wait.waitForMessage()
+[0101] (BA)   talkActor(sound(0x2C825B3, 0xA) + "No, but hum a few bars and I'll fake it.",4)
+[013E] (43)   bitvar2 = 1
+[0144] (6C)   breakHere()
+[0145] (5D)   unless (bitvar3) jump 144
+[014B] (A9)   wait.waitForMessage()
+[014D] (82)   animateActor(4,14)
+[0154] (CA)   delayFrames(11)
+[0158] (81)   faceActor(3,4)
+[015F] (BA)   talkActor(sound(0x2C8F35E, 0xA) + "Kill her now, Sam.",3)
+[0186] (A9)   wait.waitForMessage()
+[0188] (43)   bitvar2 = 0
+[018E] (5D) } else if (dup[1] == 1001) {
+[0199] (5D)   if (!bitvar73) {
+[01A1] (43)     bitvar73 = 1
+[01A7] (BA)     talkActor(sound(0x2C94F09, 0xA) + "?Stoofgib tuoba wonk ouy od tahw?",2)
+[01DD] (A9)     wait.waitForMessage()
+[01DF] (82)     animateActor(4,15)
+[01E6] (CA)     delayFrames(7)
+[01EA] (BA)     talkActor(sound(0x2CA2A74, 0xA) + "I'm upside-down, cutie, not dyslexic.",4)
+[0224] (A9)     wait.waitForMessage()
+[0226] (BA)     talkActor(sound(0x2CB3A1F, 0xA) + "Oh.",2)
+[023E] (A9)     wait.waitForMessage()
+[0240] (73)   } else {
+[0243] (BA)     talkActor(sound(0x2CB688A, 0xA) + "I could go for some rightside-up cake right now.",2)
+[0288] (A9)     wait.waitForMessage()
+[028A] (BA)     talkActor(sound(0x2CC4BF5, 0xA) + "It'd just make you downchuck, trust me.",4)
+[02C6] (A9)     wait.waitForMessage()
+[02C8] (**)   }
+[02C8] (5D) } else if (dup[1] == 999) {
+[02D3] (73)   jump cbf
+[02D7] (73)   /* jump 2db; */
+[02DA] (**) }
+[02DA] (43) var301 = 4
+[02E1] (5D) while (var301 <= var196) {
+[02EB] (47)   array195[var301] = 0
+[02F4] (4F)   var301++
+[02F7] (**) }
+[02FA] (5E) startScript(0,11,[])
+[0304] (43) var196 = 3
+[030A] (5D) if (!localvar0) {
+[0311] (5E)   startScript(0,13,[1025])
+[031E] (**) }
+[031E] (5D) if (!localvar1) {
+[0325] (5E)   startScript(0,13,[1061])
+[0332] (**) }
+[0332] (5D) if (!localvar2) {
+[0339] (5E)   startScript(0,13,[1046])
+[0346] (**) }
+[0346] (5E) startScript(0,14,[])
+[0350] (43) var171 = 0
+[0356] (43) var169 = getRandomNumber(1)
+[035D] (6C) breakHere()
+[035E] (5D) unless (var171) jump 356
+[0364] (0C) dup[5] = var171
+[0368] (5D) if (dup[5] == 998) {
+[036F] (BA)   talkActor(sound(0x2CD6E20, 0xA) + "I feel like my sense of reality has just exploded.",2)
+[03B7] (A9)   wait.waitForMessage()
+[03B9] (BA)   talkActor(sound(0x2CE620B, 0xA) + "Try cutting down on cholesterol.",4)
+[03EE] (A9)   wait.waitForMessage()
+[03F0] (5D) } else if (dup[5] == 997) {
+[03FB] (BA)   talkActor(sound(0x2CF0636, 0xA) + "Don't you get tired of always hanging around here?",2)
+[0443] (A9)   wait.waitForMessage()
+[0445] (BA)   talkActor(sound(0x2CFD161, 0xA) + "I'm fine as long as I keep denying the urge to fall^" + wait() + "or jump.",4)
+[0498] (A9)   wait.waitForMessage()
+[049A] (5D) } else if (dup[5] == 1001) {
+[04A5] (81)   faceActor(2,3)
+[04AD] (6C)   breakHere()
+[04AE] (81)   faceActor(3,2)
+[04B5] (6C)   breakHere()
+[04B6] (BA)   talkActor(sound(0x2D11B0C, 0xA) + "Are you feeling as mentally unstable as I am?",2)
+[04F8] (A9)   wait.waitForMessage()
+[04FA] (BA)   talkActor(sound(0x2D1E6B7, 0xA) + "Moreso.",3)
+[0516] (A9)   wait.waitForMessage()
+[0518] (81)   faceActor(2,4)
+[051F] (BA)   talkActor(sound(0x2D22422, 0xA) + "It'll wear off in a few hours.",4)
+[0552] (A9)   wait.waitForMessage()
+[0554] (5D) } else if (dup[5] == 1025) {
+[055F] (43)   localvar0 = 1
+[0566] (5D)   if (!bitvar71) {
+[056D] (BA)     talkActor(sound(0x2D2DACD, 0xA) + "I'm looking for a bigfoot.",2)
+[059C] (82)     animateActor(4,13)
+[05A3] (A9)     wait.waitForMessage()
+[05A5] (82)     animateActor(4,3)
+[05AC] (BA)     talkActor(sound(0x2D357F8, 0xA) + "You too?" + startAnim(7) + wait() + "I used to have a bigfoot in that block of ice over there." + startAnim(6) + wait() + "Yesterday I stepped out to have my spine recompressed," + startAnim(8) + wait() + "and when I got back he was gone." + startAnim(7),4)
+[066E] (43)     bitvar2 = 1
+[0674] (6C)     breakHere()
+[0675] (5D)     unless (bitvar3) jump 674
+[067B] (81)     faceActor(3,4)
+[0682] (A9)     wait.waitForMessage()
+[0684] (BA)     talkActor(sound(0x2D61623, 0xA) + "Spine recompression^cool.",3)
+[06B2] (A9)     wait.waitForMessage()
+[06B4] (43)     bitvar2 = 0
+[06BA] (43)     bitvar71 = 1
+[06C0] (73)   } else {
+[06C3] (BA)     talkActor(sound(0x2D6D08E, 0xA) + "Is there anything you can tell us about the bigfoot that might help us?",2)
+[071F] (A9)     wait.waitForMessage()
+[0721] (BA)     talkActor(sound(0x2D7DEF9, 0xA) + "Not off the bottom of my head, no.",4)
+[0758] (A9)     wait.waitForMessage()
+[075A] (**)   }
+[075A] (5D) } else if (dup[5] == 1061) {
+[0765] (43)   localvar1 = 1
+[076C] (5D)   if (!bitvar72) {
+[0773] (43)     bitvar72 = 1
+[0779] (BA)     talkActor(sound(0x2D8BAA4, 0xA) + "Do you know who Conroy Bumpus is?",2)
+[07AF] (82)     animateActor(4,12)
+[07B6] (A9)     wait.waitForMessage()
+[07B8] (82)     animateActor(4,3)
+[07BF] (BA)     talkActor(sound(0x2D9720F, 0xA) + "Yes, and he was here looking for a bigfoot!" + wait() + "Then he got sick and had to leave^",4)
+[0823] (A9)     wait.waitForMessage()
+[0825] (BA)     talkActor(sound(0x2DB29BA, 0xA) + "This place seems to have that effect on people.",2)
+[0869] (A9)     wait.waitForMessage()
+[086B] (73)   } else {
+[086E] (BA)     talkActor(sound(0x2DBF625, 0xA) + "Is there anything else you can say about Conroy Bumpus?",2)
+[08BA] (A9)     wait.waitForMessage()
+[08BC] (BA)     talkActor(sound(0x2DCEDD0, 0xA) + "Not really, just that he was here for a moment," + wait() + "looking for a bigfoot.",4)
+[0918] (A9)     wait.waitForMessage()
+[091A] (**)   }
+[091A] (5D) } else if (dup[5] == 1046) {
+[0925] (43)   localvar2 = 1
+[092C] (5D)   if (!bitvar212) {
+[0933] (43)     bitvar212 = 1
+[0939] (BA)     talkActor(sound(0x2DE587B, 0xA) + "Do you sell any sno globes like this one?",2)
+[0977] (A9)     wait.waitForMessage()
+[0979] (BA)     talkActor(sound(0x2DF2866, 0xA) + "We used to, but not anymore.",4)
+[09AA] (A9)     wait.waitForMessage()
+[09AC] (BA)     talkActor(sound(0x2DFF391, 0xA) + "Why not?",2)
+[09C9] (A9)     wait.waitForMessage()
+[09CB] (BA)     talkActor(sound(0x2E0257C, 0xA) + "Because they were having an inexplicably bad affect on the Vortex." + startAnim(8) + wait() + "With every new sno globe we built, the Vortex got weaker and weaker.",4)
+[0A6C] (A9)     wait.waitForMessage()
+[0A6E] (BA)     talkActor(sound(0x2E2F627, 0xA) + "The same thing happens when I watch sitcoms.",3)
+[0AAF] (82)     animateActor(4,12)
+[0AB6] (A9)     wait.waitForMessage()
+[0AB8] (82)     animateActor(4,3)
+[0ABF] (BA)     talkActor(sound(0x2E3AC52, 0xA) + "So we decided to discontinue the sno globes for financial reasons.",4)
+[0B16] (A9)     wait.waitForMessage()
+[0B18] (5D)     if (ifClassOfIs(272,[7])) {
+[0B25] (BA)       talkActor(sound(0x2E5487D, 0xA) + "I guess this means you don't have any sno globe stoppers.",2)
+[0B73] (A9)       wait.waitForMessage()
+[0B75] (BA)       talkActor(sound(0x2E64468, 0xA) + "You got it.",4)
+[0B95] (A9)       wait.waitForMessage()
+[0B97] (**)     }
+[0B97] (73)   } else {
+[0B9A] (BA)     talkActor(sound(0x2E68593, 0xA) + "Anything else you can tell us about the sno globes you used to sell?",2)
+[0BF3] (A9)     wait.waitForMessage()
+[0BF5] (BA)     talkActor(sound(0x2E7AF7E, 0xA) + "Only that their continued existence threatens my livelihood.",4)
+[0C46] (A9)     wait.waitForMessage()
+[0C48] (**)   }
+[0C48] (5D) } else if (dup[5] == 999) {
+[0C53] (BA)   talkActor(sound(0x2E8E029, 0xA) + "We'll be back.",2)
+[0C77] (A9)   wait.waitForMessage()
+[0C79] (BA)   talkActor(sound(0x2E93754, 0xA) + "Back, front, it's all the same to me^",4)
+[0CB3] (A9)   wait.waitForMessage()
+[0CB5] (73)   jump cbf
+[0CB8] (73)   /* jump cbc; */
+[0CBB] (**) }
+[0CBB] (73) jump 2db
+[0CBF] (A9) wait.waitForMessage()
+[0CC1] (5E) startScript(0,10,[])
+[0CCB] (5E) startScript(1,209,[])
+[0CD5] (66) stopObjectCodeB()
+END

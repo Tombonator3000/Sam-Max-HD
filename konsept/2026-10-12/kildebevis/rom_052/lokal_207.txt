@@ -1,0 +1,22 @@
+; Lokalt skript 207 i rom 52 (LSCR)
+
+Script# 207
+[0000] (0C) dup[1] = localvar0
+[0004] (5D) if (dup[1] == 7) {
+[000B] (5D) } else if (dup[1] == 4) {
+[0017] (BA)   talkActor(sound(0x634E0E5, 0xA) + "That's a particularly big bigfoot.",2)
+[004F] (5D) } else if (dup[1] == 3) {
+[005A] (0C)   dup[4] = localvar1
+[005F] (5D)   if (dup[4] == 127) {
+[0066] (5E)     startScript(0,205,[])
+[0071] (7C)     stopScript(0)
+[0075] (73)   } else {
+[0078] (5E)     startScript(0,63,[3,5,localvar1])
+[008C] (7C)     stopScript(0)
+[0090] (**)   }
+[0090] (73) } else {
+[0093] (5E)   startScript(0,63,[localvar0,5,localvar1])
+[00A7] (7C)   stopScript(0)
+[00AB] (**) }
+[00AB] (66) stopObjectCodeB()
+END

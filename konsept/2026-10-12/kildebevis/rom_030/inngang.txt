@@ -1,0 +1,114 @@
+; Inngangsskriptet til rom 30 (ENCD)
+
+[0000] (9B) resourceRoutines.lockScript(82)
+[0006] (9B) resourceRoutines.loadScript(82)
+[0008] (9B) resourceRoutines.lockCostume(153)
+[000E] (9B) resourceRoutines.loadCostume(153)
+[0010] (9B) resourceRoutines.lockCostume(154)
+[0016] (9B) resourceRoutines.loadCostume(154)
+[0018] (9B) resourceRoutines.lockCostume(155)
+[001E] (9B) resourceRoutines.loadCostume(155)
+[0020] (9B) resourceRoutines.lockCostume(156)
+[0026] (9B) resourceRoutines.loadCostume(156)
+[0028] (9B) resourceRoutines.lockCostume(157)
+[002E] (9B) resourceRoutines.loadCostume(157)
+[0030] (9B) resourceRoutines.lockCostume(158)
+[0036] (9B) resourceRoutines.loadCostume(158)
+[0038] (9B) resourceRoutines.lockSound(36)
+[003E] (9B) resourceRoutines.loadSound(36)
+[0040] (9B) resourceRoutines.lockSound(37)
+[0046] (9B) resourceRoutines.loadSound(37)
+[0048] (43) VAR_V6_SOUNDMODE = 2
+[004E] (B6) printDebug.begin()
+[0050] (B6) printDebug.msg(sound(0x9EDC2C7, 0xA) + " ")
+[0064] (43) VAR_V6_SOUNDMODE = 0
+[006A] (43) VAR_V6_SOUNDMODE = 2
+[0070] (B6) printDebug.begin()
+[0072] (B6) printDebug.msg(sound(0x9F19D09, 0xA) + " ")
+[0086] (43) VAR_V6_SOUNDMODE = 0
+[008C] (43) VAR_V6_SOUNDMODE = 2
+[0092] (B6) printDebug.begin()
+[0094] (B6) printDebug.msg(sound(0xA0158A2, 0xA) + " ")
+[00A8] (43) VAR_V6_SOUNDMODE = 0
+[00AE] (43) VAR_V6_SOUNDMODE = 2
+[00B4] (B6) printDebug.begin()
+[00B6] (B6) printDebug.msg(sound(0xA021C4F, 0xA) + " ")
+[00CA] (43) VAR_V6_SOUNDMODE = 0
+[00D0] (43) VAR_V6_SOUNDMODE = 2
+[00D6] (B6) printDebug.begin()
+[00D8] (B6) printDebug.msg(sound(0x9F18C8A, 0xA) + " ")
+[00EC] (43) VAR_V6_SOUNDMODE = 0
+[00F2] (43) VAR_V6_SOUNDMODE = 2
+[00F8] (B6) printDebug.begin()
+[00FA] (B6) printDebug.msg(sound(0x9F19D09, 0xA) + " ")
+[010E] (43) VAR_V6_SOUNDMODE = 0
+[0114] (43) VAR_V6_SOUNDMODE = 2
+[011A] (B6) printDebug.begin()
+[011C] (B6) printDebug.msg(sound(0x9EE7F8A, 0xA) + " ")
+[0130] (43) VAR_V6_SOUNDMODE = 0
+[0136] (43) VAR_V6_SOUNDMODE = 2
+[013C] (B6) printDebug.begin()
+[013E] (B6) printDebug.msg(sound(0x9EDDEF4, 0xA) + " ")
+[0152] (43) VAR_V6_SOUNDMODE = 0
+[0158] (43) VAR_V6_SOUNDMODE = 2
+[015E] (B6) printDebug.begin()
+[0160] (B6) printDebug.msg(sound(0x9E921A9, 0xA) + " ")
+[0174] (43) VAR_V6_SOUNDMODE = 0
+[017A] (43) VAR_V6_SOUNDMODE = 2
+[0180] (B6) printDebug.begin()
+[0182] (B6) printDebug.msg(sound(0x9EA31B6, 0xA) + " ")
+[0196] (43) VAR_V6_SOUNDMODE = 0
+[019C] (43) VAR_V6_SOUNDMODE = 2
+[01A2] (B6) printDebug.begin()
+[01A4] (B6) printDebug.msg(sound(0x9DF528E, 0xA) + " ")
+[01B8] (43) VAR_V6_SOUNDMODE = 0
+[01BE] (43) VAR_V6_SOUNDMODE = 2
+[01C4] (B6) printDebug.begin()
+[01C6] (B6) printDebug.msg(sound(0x9F23A2E, 0xA) + " ")
+[01DA] (43) VAR_V6_SOUNDMODE = 0
+[01E0] (9D) actorOps.setCurActor(5)
+[01E5] (9D) actorOps.init()
+[01E7] (9D) actorOps.setCostume(158)
+[01EC] (9D) actorOps.setIgnoreBoxes()
+[01EE] (9D) actorOps.setNeverZClip()
+[01F0] (9D) actorOps.setTalkColor(9)
+[01F5] (9D) actorOps.setScale(255)
+[01FA] (9D) actorOps.setTalkPos(0,-100)
+[0202] (9B) resourceRoutines.lockSound(36)
+[0208] (9B) resourceRoutines.loadSound(36)
+[020A] (9D) actorOps.setCurActor(2)
+[020F] (9D) actorOps.setCostume(4)
+[0214] (74) startSound(36)
+[0218] (47) array184[5] = 209
+[0221] (7F) putActorInXY(5,325,160,30)
+[022E] (82) animateActor(5,250)
+[0235] (5E) startScript(1,215,[])
+[023F] (47) array185[5] = 314
+[0248] (47) array186[5] = 164
+[0251] (43) var194 = 208
+[0257] (5E) startScript(0,203,[])
+[0261] (5E) startScript(1,217,[])
+[026B] (5D) if (ifClassOfIs(297,[17])) {
+[0278] (5E)   startScript(1,214,[])
+[0282] (**) }
+[0282] (5D) if (var166 == 32) {
+[028C] (5E)   startScript(0,201,[])
+[0296] (73) } else {
+[0299] (43)   VAR_SCROLL_SCRIPT = 20
+[029F] (7A)   setCameraAt(160)
+[02A3] (80)   putActorAtObject(2,297,30)
+[02AD] (82)   animateActor(2,248)
+[02B4] (79)   actorFollowCamera(2)
+[02B8] (5D)   if (!bitvar67) {
+[02BF] (9D)     actorOps.setCurActor(3)
+[02C4] (9D)     actorOps.setCostume(5)
+[02C9] (7F)     putActorInXY(3,100,160,30)
+[02D6] (82)     animateActor(3,248)
+[02DD] (5E)     startScript(1,29,[])
+[02E7] (**)   }
+[02E7] (**) }
+[02E7] (5D) if (isAnyOf(var166,[31,78])) {
+[02F7] (5E)   startScript(0,210,[])
+[0301] (**) }
+[0301] (65) stopObjectCodeA()
+END

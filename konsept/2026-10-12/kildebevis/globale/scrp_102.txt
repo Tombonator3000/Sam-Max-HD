@@ -1,0 +1,427 @@
+; Globalt skript 102 (SCRP i rom 52, offset 0x109C6 fra ROOM-blokken)
+
+[0000] (7C) stopScript(201)
+[0004] (5D) if (!bitvar95) {
+[000B] (9D)   actorOps.setCurActor(2)
+[0010] (9D)   actorOps.setCostume(7)
+[0015] (5E)   startScript(0,9,[])
+[001F] (5E)   startScript(0,15,[1])
+[002C] (5E)   startScript(0,14,[])
+[0036] (43)   var171 = 0
+[003C] (43)   var169 = getRandomNumber(1)
+[0043] (6C)   breakHere()
+[0044] (5D)   unless (var171) jump 3c
+[004A] (0C)   dup[1] = var171
+[004E] (5D)   if (dup[1] == 998) {
+[0055] (5D)     if (!bitvar85) {
+[005D] (BB)       talkEgo(sound(0x5E2D8ED, 0xA) + "Hey! You're Evelyn Morrison, famed B movie star!")
+[009F] (A9)       wait.waitForMessage()
+[00A1] (BA)       talkActor(sound(0x5E3FDD8, 0xA) + "Yes, I am she.",4)
+[00C4] (82)       animateActor(2,17)
+[00CB] (CA)       delayFrames(10)
+[00CF] (43)       bitvar85 = 1
+[00D5] (A9)       wait.waitForMessage()
+[00D7] (82)       animateActor(4,249)
+[00DE] (6C)       breakHere()
+[00DF] (BA)       talkActor(sound(0x5E4C1C3, 0xA) + "I've seen all your movies!",2)
+[010E] (43)       bitvar2 = 1
+[0114] (6C)       breakHere()
+[0115] (5D)       unless (bitvar3) jump 114
+[011B] (81)       faceActor(3,4)
+[0122] (A9)       wait.waitForMessage()
+[0124] (BA)       talkActor(sound(0x5E551EE, 0xA) + "My favorite was `Robot Terror From Beyond The Galaxy.`",3)
+[016F] (A9)       wait.waitForMessage()
+[0171] (81)       faceActor(2,3)
+[0178] (6C)       breakHere()
+[0179] (BA)       talkActor(sound(0x5E66B59, 0xA) + "Is that the one where the alien says `Klamdo Barrreta Nimno`?",2)
+[01CB] (A9)       wait.waitForMessage()
+[01CD] (BA)       talkActor(sound(0x5E79EC4, 0xA) + "No, that's `Vampiress in Prison.`",3)
+[0203] (A9)       wait.waitForMessage()
+[0205] (BA)       talkActor(sound(0x5E859AF, 0xA) + "Oh yeah.",2)
+[0222] (A9)       wait.waitForMessage()
+[0224] (81)       faceActor(2,4)
+[022B] (6C)       breakHere()
+[022C] (82)       animateActor(4,249)
+[0233] (6C)       breakHere()
+[0234] (BA)       talkActor(sound(0x5E89D1A, 0xA) + "Would you like Evelyn Morrison's autograph?",4)
+[0274] (82)       animateActor(2,21)
+[027B] (CA)       delayFrames(7)
+[027F] (A9)       wait.waitForMessage()
+[0281] (BA)       talkActor(sound(0x5E98185, 0xA) + "Actually, we just want to ask a few questions.",2)
+[02C4] (82)       animateActor(2,22)
+[02CB] (CA)       delayFrames(10)
+[02CF] (A9)       wait.waitForMessage()
+[02D1] (BA)       talkActor(sound(0x5EA4D30, 0xA) + "Evelyn Morrison is always available for interviews.",4)
+[0319] (82)       animateActor(2,26)
+[0320] (CA)       delayFrames(4)
+[0324] (A9)       wait.waitForMessage()
+[0326] (82)       animateActor(4,249)
+[032D] (6C)       breakHere()
+[032E] (73)       jump 6ba
+[0331] (73)     } else {
+[0334] (BA)       talkActor(sound(0x5EB8E5B, 0xA) + "I still can't believe that YOU'RE Evelyn Morrison!",2)
+[037B] (A9)       wait.waitForMessage()
+[037D] (BA)       talkActor(sound(0x5EC9D06, 0xA) + "Maybe this will make a believer out of you:" + wait() + "<ahem>" + wait() + "`IEEEEEEEEE!!!  IT'S A GIANT SHREW!!!`",4)
+[03ED] (A9)       wait.waitForMessage()
+[03EF] (CA)       delayFrames(4)
+[03F3] (BA)       talkActor(sound(0x5EF7671, 0xA) + "Well?",4)
+[040D] (A9)       wait.waitForMessage()
+[040F] (BA)       talkActor(sound(0x5EFB5DC, 0xA) + "Works for me." + startAnim(17),2)
+[0435] (A9)       wait.waitForMessage()
+[0437] (**)     }
+[0437] (5D)   } else if (dup[1] == 997) {
+[0442] (5D)     if (!bitvar85) {
+[044A] (BB)       talkEgo(sound(0x5F01847, 0xA) + "Hey! Aren't you Evelyn Morrison, famed B movie star?")
+[0490] (73)       jump 9f
+[0493] (73)     } else {
+[0496] (BA)       talkActor(sound(0x5F12832, 0xA) + "Miss Morrison?" + startAnim(17),2)
+[04BD] (A9)       wait.waitForMessage()
+[04BF] (BA)       talkActor(sound(0x5F17B1D, 0xA) + "Yes?",4)
+[04D8] (A9)       wait.waitForMessage()
+[04DA] (82)       animateActor(4,249)
+[04E1] (6C)       breakHere()
+[04E2] (**)     }
+[04E2] (5D)   } else if (dup[1] == 1001) {
+[04ED] (5D)     if (!bitvar85) {
+[04F5] (82)       animateActor(2,17)
+[04FC] (CA)       delayFrames(10)
+[0500] (82)       animateActor(2,29)
+[0507] (CA)       delayFrames(27)
+[050B] (BA)       talkActor(sound(0x5F1B948, 0xA) + "You know, you look like a really scary version of Evelyn Morrison, famed B movie star.",2)
+[0576] (A9)       wait.waitForMessage()
+[0578] (BA)       talkActor(sound(0x5F37673, 0xA) + "I AM Evelyn Morrison, you cur!",4)
+[05AB] (A9)       wait.waitForMessage()
+[05AD] (82)       animateActor(4,249)
+[05B4] (6C)       breakHere()
+[05B5] (BA)       talkActor(sound(0x5F471DE, 0xA) + "Actually I'm more of an Irish wolfhound than a cur^" + startAnim(21),2)
+[0601] (A9)       wait.waitForMessage()
+[0603] (82)       animateActor(2,22)
+[060A] (CA)       delayFrames(10)
+[060E] (73)       jump c4
+[0611] (73)     } else {
+[0614] (BA)       talkActor(sound(0x5F56449, 0xA) + "Something about this place makes me want to toss Max into a volcano.",2)
+[066D] (CA)       delayFrames(2)
+[0671] (43)       bitvar2 = 1
+[0677] (6C)       breakHere()
+[0678] (5D)       unless (bitvar3) jump 677
+[067E] (A9)       wait.waitForMessage()
+[0680] (81)       faceActor(3,2)
+[0687] (BA)       talkActor(sound(0x5F6AA34, 0xA) + "Say what?",3)
+[06A5] (A9)       wait.waitForMessage()
+[06A7] (**)     }
+[06A7] (5D)   } else if (dup[1] == 999) {
+[06B2] (73)     jump 1311
+[06B6] (73)     /* jump 6ba; */
+[06B9] (**)   }
+[06B9] (43)   var301 = 4
+[06C0] (5D)   while (var301 <= var196) {
+[06CA] (47)     array195[var301] = 0
+[06D3] (4F)     var301++
+[06D6] (**)   }
+[06D9] (5E)   startScript(0,11,[])
+[06E3] (43)   var196 = 3
+[06E9] (5D)   if (!localvar0) {
+[06F0] (5E)     startScript(0,13,[1025])
+[06FD] (**)   }
+[06FD] (5D)   if (!localvar1) {
+[0704] (5E)     startScript(0,13,[1061])
+[0711] (**)   }
+[0711] (5E)   startScript(0,14,[])
+[071B] (43)   var171 = 0
+[0721] (43)   var169 = getRandomNumber(1)
+[0728] (6C)   breakHere()
+[0729] (5D)   unless (var171) jump 721
+[072F] (0C)   dup[5] = var171
+[0733] (5D)   if (dup[5] == 998) {
+[073A] (9D)     actorOps.setCurActor(2)
+[0740] (9D)     actorOps.setCostume(2)
+[0745] (81)     faceActor(2,4)
+[074C] (6C)     breakHere()
+[074D] (BA)     talkActor(sound(0x5F6E81F, 0xA) + "Action!",2)
+[0769] (A9)     wait.waitForMessage()
+[076B] (BA)     talkActor(sound(0x5F7298A, 0xA) + "I'm ready for my closeup, Mr. Corman!",4)
+[07A5] (A9)     wait.waitForMessage()
+[07A7] (82)     animateActor(4,250)
+[07AE] (6C)     breakHere()
+[07AF] (82)     animateActor(4,6)
+[07B6] (CA)     delayFrames(18)
+[07BA] (82)     animateActor(4,249)
+[07C1] (82)     animateActor(4,1)
+[07C8] (6C)     breakHere()
+[07C9] (9D)     actorOps.setCurActor(2)
+[07CE] (9D)     actorOps.setCostume(7)
+[07D3] (5D)   } else if (dup[5] == 997) {
+[07DE] (5D)     if (!bitvar88) {
+[07E6] (9D)       actorOps.setCurActor(2)
+[07EB] (9D)       actorOps.setCostume(2)
+[07F0] (82)       animateActor(4,249)
+[07F7] (6C)       breakHere()
+[07F8] (43)       bitvar88 = 1
+[07FE] (BA)       talkActor(sound(0x5F7DF75, 0xA) + "How'd you end up in the hotel business?",2)
+[083A] (A9)       wait.waitForMessage()
+[083C] (BA)       talkActor(sound(0x5F89AA0, 0xA) + "I bet it was a sordid combination of fast cars and fast living." + wait() + "VROOM-VROOM!",3)
+[089E] (A9)       wait.waitForMessage()
+[08A0] (BA)       talkActor(sound(0x5FA5B8B, 0xA) + "It was the stars.",4)
+[08C6] (A9)       wait.waitForMessage()
+[08C8] (BA)       talkActor(sound(0x5FADEF6, 0xA) + "Bigger movie stars than you?  Pshaw.",2)
+[0901] (A9)       wait.waitForMessage()
+[0903] (BA)       talkActor(sound(0x5FBDCA1, 0xA) + "`Pshaw?`",3)
+[0920] (A9)       wait.waitForMessage()
+[0922] (82)       animateActor(4,249)
+[0929] (6C)       breakHere()
+[092A] (BA)       talkActor(sound(0x5FC270C, 0xA) + "No, the stars didn't get bigger^",4)
+[095F] (A9)       wait.waitForMessage()
+[0961] (82)       animateActor(4,250)
+[0968] (BA)       talkActor(sound(0x5FD0537, 0xA) + "The rubber monsters got smaller.",4)
+[099D] (A9)       wait.waitForMessage()
+[099F] (82)       animateActor(4,1)
+[09A6] (6C)       breakHere()
+[09A7] (82)       animateActor(4,6)
+[09AE] (CA)       delayFrames(18)
+[09B2] (BA)       talkActor(sound(0x5FDF4E2, 0xA) + "I still say it was a lurid tale of sin and depravity.",3)
+[09FC] (A9)       wait.waitForMessage()
+[09FE] (82)       animateActor(4,249)
+[0A05] (82)       animateActor(4,1)
+[0A0C] (6C)       breakHere()
+[0A0D] (73)     } else {
+[0A10] (82)       animateActor(2,17)
+[0A17] (CA)       delayFrames(10)
+[0A1B] (82)       animateActor(4,250)
+[0A22] (6C)       breakHere()
+[0A23] (BA)       talkActor(sound(0x5FF00CD, 0xA) + "Do you always speak about yourself in the third person?" + startAnim(26),2)
+[0A73] (CA)       delayFrames(9)
+[0A77] (A9)       wait.waitForMessage()
+[0A79] (BA)       talkActor(sound(0x5FFE378, 0xA) + "Evelyn Morrison doesn't know what you're talking about, you dreadful person.",4)
+[0ADA] (A9)       wait.waitForMessage()
+[0ADC] (82)       animateActor(4,249)
+[0AE3] (6C)       breakHere()
+[0AE4] (**)     }
+[0AE4] (5D)   } else if (dup[5] == 1001) {
+[0AEF] (9D)     actorOps.setCurActor(2)
+[0AF5] (9D)     actorOps.setCostume(7)
+[0AFA] (82)     animateActor(2,248)
+[0B01] (6C)     breakHere()
+[0B02] (82)     animateActor(4,249)
+[0B09] (6C)     breakHere()
+[0B0A] (81)     faceActor(2,4)
+[0B11] (6C)     breakHere()
+[0B12] (82)     animateActor(2,17)
+[0B19] (CA)     delayFrames(10)
+[0B1D] (BA)     talkActor(sound(0x6017BE3, 0xA) + "I have this sudden craving for an umbrella drink.",2)
+[0B63] (A9)     wait.waitForMessage()
+[0B65] (BA)     talkActor(sound(0x60245CE, 0xA) + "Evelyn Morrison's Jungle Inn has the greatest umbrella drinks in the world, with over 237 kinds of rum.",4)
+[0BE1] (A9)     wait.waitForMessage()
+[0BE3] (82)     animateActor(2,26)
+[0BEA] (CA)     delayFrames(9)
+[0BEE] (9D)     actorOps.setCurActor(2)
+[0BF3] (9D)     actorOps.setCostume(2)
+[0BF8] (43)     bitvar2 = 1
+[0BFE] (6C)     breakHere()
+[0BFF] (5D)     unless (bitvar3) jump bfe
+[0C05] (82)     animateActor(4,250)
+[0C0C] (6C)     breakHere()
+[0C0D] (82)     animateActor(4,6)
+[0C14] (81)     faceActor(3,4)
+[0C1B] (BA)     talkActor(sound(0x6048379, 0xA) + "All in just ONE drink?" + wait() + "Which way to the bar?",3)
+[0C5D] (A9)     wait.waitForMessage()
+[0C5F] (82)     animateActor(4,249)
+[0C66] (82)     animateActor(4,1)
+[0C6D] (6C)     breakHere()
+[0C6E] (81)     faceActor(2,3)
+[0C75] (6C)     breakHere()
+[0C76] (BA)     talkActor(sound(0x6059C24, 0xA) + "Take it easy, Max, you don't even drink.",2)
+[0CB3] (A9)     wait.waitForMessage()
+[0CB5] (BA)     talkActor(sound(0x6066D0F, 0xA) + "Oh yeah.  The toucan must've put words into my mouth.",3)
+[0CFF] (A9)     wait.waitForMessage()
+[0D01] (81)     faceActor(2,4)
+[0D08] (6C)     breakHere()
+[0D09] (9D)     actorOps.setCurActor(2)
+[0D0E] (9D)     actorOps.setCostume(7)
+[0D13] (81)     faceActor(2,4)
+[0D1A] (6C)     breakHere()
+[0D1B] (5D)   } else if (dup[5] == 999) {
+[0D26] (BA)     talkActor(sound(0x6079B3A, 0xA) + "I'll get back to you later.",2)
+[0D57] (A9)     wait.waitForMessage()
+[0D59] (5D)     if (getOwner(485) != 2) {
+[0D64] (82)       animateActor(4,250)
+[0D6B] (6C)       breakHere()
+[0D6C] (BA)       talkActor(sound(0x60810A5, 0xA) + "Evelyn Morrison will be here.  In the meantime, why not take some of these brochures?",4)
+[0DD6] (A9)       wait.waitForMessage()
+[0DD8] (82)       animateActor(4,249)
+[0DDF] (6C)       breakHere()
+[0DE0] (BA)       talkActor(sound(0x6097C31, 0xA) + "They have Evelyn Morrison's autograph on them, making them must-have collectibles.",4)
+[0E47] (A9)       wait.waitForMessage()
+[0E49] (84)       pickupObject(485,0)
+[0E50] (BA)       talkActor(sound(0x60B3DDC, 0xA) + "Thanks.",2)
+[0E6C] (73)     } else {
+[0E6F] (82)       animateActor(4,250)
+[0E76] (6C)       breakHere()
+[0E77] (BA)       talkActor(sound(0x60B7507, 0xA) + "Evelyn Morrison will always be there for her admirers.",4)
+[0EC2] (A9)       wait.waitForMessage()
+[0EC4] (82)       animateActor(4,6)
+[0ECB] (CA)       delayFrames(18)
+[0ECF] (82)       animateActor(4,249)
+[0ED6] (82)       animateActor(4,1)
+[0EDD] (6C)       breakHere()
+[0EDE] (**)     }
+[0EDE] (A9)     wait.waitForMessage()
+[0EE0] (73)     jump 1311
+[0EE3] (5D)   } else if (dup[5] == 1025) {
+[0EEE] (43)     localvar0 = 1
+[0EF5] (5D)     if (!bitvar89) {
+[0EFC] (82)       animateActor(4,249)
+[0F03] (6C)       breakHere()
+[0F04] (43)       bitvar89 = 1
+[0F0A] (BA)       talkActor(sound(0x60C9B32, 0xA) + "Have you had any problems with the bigfoots?" + startAnim(13),2)
+[0F4F] (A9)       wait.waitForMessage()
+[0F51] (82)       animateActor(2,24)
+[0F58] (CA)       delayFrames(4)
+[0F5C] (BA)       talkActor(sound(0x60D5C1D, 0xA) + "Evelyn Morrison has always worked well with grotesque creatures of the night.",4)
+[0FBE] (A9)       wait.waitForMessage()
+[0FC0] (BA)       talkActor(sound(0x60EAD48, 0xA) + "I'll take that as a `no` then.",2)
+[0FF3] (A9)       wait.waitForMessage()
+[0FF5] (73)     } else {
+[0FF8] (82)       animateActor(2,17)
+[0FFF] (CA)       delayFrames(10)
+[1003] (BA)       talkActor(sound(0x60F4973, 0xA) + "How many bigfoots are here, anyway?",2)
+[103B] (A9)       wait.waitForMessage()
+[103D] (82)       animateActor(4,250)
+[1044] (6C)       breakHere()
+[1045] (BA)       talkActor(sound(0x60FEFDE, 0xA) + "All of them.",4)
+[1066] (A9)       wait.waitForMessage()
+[1068] (82)       animateActor(4,249)
+[106F] (6C)       breakHere()
+[1070] (82)       animateActor(2,26)
+[1077] (CA)       delayFrames(7)
+[107B] (**)     }
+[107B] (5D)   } else if (dup[5] == 1061) {
+[1086] (43)     localvar1 = 1
+[108D] (5D)     if (!bitvar90) {
+[1094] (43)       bitvar90 = 1
+[109A] (82)       animateActor(4,249)
+[10A1] (6C)       breakHere()
+[10A2] (81)       faceActor(2,4)
+[10A9] (6C)       breakHere()
+[10AA] (82)       animateActor(2,18)
+[10B1] (CA)       delayFrames(9)
+[10B5] (BA)       talkActor(sound(0x6102C89, 0xA) + "You haven't seen a short, self-absorbed, crazy-as-a-bedbug country-western singing star around here, have you?",2)
+[1138] (A9)       wait.waitForMessage()
+[113A] (BA)       talkActor(sound(0x6120AB4, 0xA) + "If you mean Conroy Bumpus, Evelyn Morrison had him ejected from the premises hours ago.",4)
+[11A6] (A9)       wait.waitForMessage()
+[11A8] (BA)       talkActor(sound(0x613DC5F, 0xA) + "Why?",2)
+[11C1] (A9)       wait.waitForMessage()
+[11C3] (82)       animateActor(4,250)
+[11CA] (BA)       talkActor(sound(0x614104A, 0xA) + "He was harassing Evelyn Morrison's guests.",4)
+[1209] (A9)       wait.waitForMessage()
+[120B] (82)       animateActor(2,27)
+[1212] (CA)       delayFrames(7)
+[1216] (82)       animateActor(2,1)
+[121D] (6C)       breakHere()
+[121E] (82)       animateActor(4,249)
+[1225] (73)     } else {
+[1228] (BA)       talkActor(sound(0x614FBF5, 0xA) + "About Conroy Bumpus--",2)
+[1252] (A9)       wait.waitForMessage()
+[1254] (82)       animateActor(4,250)
+[125B] (6C)       breakHere()
+[125C] (BA)       talkActor(sound(0x6158960, 0xA) + "Do not speak that name in Evelyn Morrison's presence!",4)
+[12A6] (A9)       wait.waitForMessage()
+[12A8] (82)       animateActor(4,249)
+[12AF] (6C)       breakHere()
+[12B0] (BA)       talkActor(sound(0x616D24B, 0xA) + "He is but a mere candle when compared to her supernovic brilliance.",4)
+[1308] (A9)       wait.waitForMessage()
+[130A] (**)     }
+[130A] (73)     /* jump 130e; */
+[130D] (**)   }
+[130D] (73)   jump 6ba
+[1311] (A9)   wait.waitForMessage()
+[1313] (9D)   actorOps.setCurActor(2)
+[1318] (9D)   actorOps.setCostume(4)
+[131D] (43)   bitvar2 = 0
+[1323] (82)   animateActor(4,1)
+[132A] (6C)   breakHere()
+[132B] (5E)   startScript(1,201,[])
+[1335] (5E)   startScript(0,10,[])
+[133F] (73) } else {
+[1342] (7C)   stopScript(201)
+[1346] (9D)   actorOps.setCurActor(2)
+[134B] (9D)   actorOps.setTalkPos(0,-112)
+[1353] (9D)   actorOps.setTalkColor(15)
+[1358] (5E)   startScript(0,9,[])
+[1362] (5E)   startScript(0,15,[1])
+[136F] (5E)   startScript(0,14,[])
+[1379] (43)   var171 = 0
+[137F] (43)   var169 = getRandomNumber(1)
+[1386] (6C)   breakHere()
+[1387] (5D)   unless (var171) jump 137f
+[138D] (0C)   dup[11] = var171
+[1391] (5D)   if (dup[11] == 998) {
+[1398] (BA)     talkActor(sound(0x6185536, 0xA) + "Nice outfit." + startAnim(7),2)
+[13BE] (CA)     delayFrames(11)
+[13C2] (A9)     wait.waitForMessage()
+[13C4] (82)     animateActor(4,249)
+[13CB] (6C)     breakHere()
+[13CC] (BA)     talkActor(sound(0x618AB61, 0xA) + "Evelyn Morrison thanks you.",4)
+[13FC] (A9)     wait.waitForMessage()
+[13FE] (82)     animateActor(4,250)
+[1405] (6C)     breakHere()
+[1406] (82)     animateActor(4,249)
+[140D] (6C)     breakHere()
+[140E] (73)     jump 1362
+[1411] (5D)   } else if (dup[11] == 997) {
+[141C] (BA)     talkActor(sound(0x61AFEF7, 0xA) + "So where'd you get that way-out look?" + startAnim(7),2)
+[145B] (A9)     wait.waitForMessage()
+[145D] (CA)     delayFrames(11)
+[1461] (82)     animateActor(4,250)
+[1468] (BA)     talkActor(sound(0x61B95A2, 0xA) + "Lot-5 set-36 wardrobe-14 back in '72.  It really works, don't you think?",4)
+[14C5] (A9)     wait.waitForMessage()
+[14C7] (82)     animateActor(4,249)
+[14CE] (6C)     breakHere()
+[14CF] (BA)     talkActor(sound(0x61D344D, 0xA) + "And it's such a natural look too." + startAnim(7),2)
+[1509] (CA)     delayFrames(11)
+[150D] (A9)     wait.waitForMessage()
+[150F] (73)     jump 1362
+[1512] (5D)   } else if (dup[11] == 1001) {
+[151D] (82)     animateActor(4,250)
+[1525] (6C)     breakHere()
+[1526] (82)     animateActor(4,6)
+[152D] (CA)     delayFrames(18)
+[1531] (82)     animateActor(2,8)
+[1538] (9D)     actorOps.setCurActor(2)
+[153D] (9D)     actorOps.setTalkPos(0,-112)
+[1545] (9D)     actorOps.setTalkColor(15)
+[154A] (BA)     talkActor(sound(0x61DE1B8, 0xA) + "Hey Sam, move us out of here.  I'm getting hot and itchy in here." + startAnim(8),2)
+[15A4] (A9)     wait.waitForMessage()
+[15A6] (CA)     delayFrames(11)
+[15AA] (9D)     actorOps.setCurActor(2)
+[15AF] (9D)     actorOps.setTalkColor(6)
+[15B4] (9D)     actorOps.setTalkFrame(7,5)
+[15BC] (9D)     actorOps.setTalkPos(0,-100)
+[15C4] (9D)     actorOps.setCurActor(2)
+[15C9] (9D)     actorOps.setTalkColor(6)
+[15CE] (BA)     talkActor(sound(0x61ECB63, 0xA) + "Sharing this experience with you, little buddy, makes me realize just how much I need a vacation." + startAnim(7),2)
+[1648] (A9)     wait.waitForMessage()
+[164A] (9D)     actorOps.setCurActor(2)
+[164F] (9D)     actorOps.setTalkColor(15)
+[1654] (CA)     delayFrames(9)
+[1658] (82)     animateActor(4,249)
+[165F] (82)     animateActor(4,1)
+[1666] (6C)     breakHere()
+[1667] (73)     jump 1362
+[166A] (5D)   } else if (dup[11] == 999) {
+[1675] (9D)     actorOps.setCurActor(2)
+[167B] (9D)     actorOps.setTalkColor(6)
+[1680] (9D)     actorOps.setTalkFrame(7,5)
+[1688] (9D)     actorOps.setTalkPos(0,-100)
+[1690] (73)     /* jump 1694; */
+[1693] (**)   }
+[1693] (A9)   wait.waitForMessage()
+[1696] (43)   bitvar2 = 1
+[169C] (6C)   breakHere()
+[169D] (5D)   unless (bitvar3) jump 169c
+[16A3] (82)   animateActor(4,1)
+[16AA] (6C)   breakHere()
+[16AB] (5E)   startScript(1,201,[])
+[16B5] (5E)   startScript(0,10,[])
+[16BF] (**) }
+[16BF] (66) stopObjectCodeB()
+END

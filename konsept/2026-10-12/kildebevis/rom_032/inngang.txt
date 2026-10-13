@@ -1,0 +1,102 @@
+; Inngangsskriptet til rom 32 (ENCD)
+
+[0000] (9C) roomOps.setScreen(0,200)
+[0008] (43) VAR_V6_SOUNDMODE = 2
+[000E] (B6) printDebug.begin()
+[0010] (B6) printDebug.msg(sound(0x9EDC2C7, 0xA) + " ")
+[0024] (43) VAR_V6_SOUNDMODE = 0
+[002A] (43) VAR_V6_SOUNDMODE = 2
+[0030] (B6) printDebug.begin()
+[0032] (B6) printDebug.msg(sound(0x9EAE9BB, 0xA) + " ")
+[0046] (43) VAR_V6_SOUNDMODE = 0
+[004C] (43) VAR_V6_SOUNDMODE = 2
+[0052] (B6) printDebug.begin()
+[0054] (B6) printDebug.msg(sound(0x9EF59CB, 0xA) + " ")
+[0068] (43) VAR_V6_SOUNDMODE = 0
+[006E] (43) VAR_V6_SOUNDMODE = 2
+[0074] (B6) printDebug.begin()
+[0076] (B6) printDebug.msg(sound(0x9FDF5D4, 0xA) + " ")
+[008A] (43) VAR_V6_SOUNDMODE = 0
+[0090] (43) VAR_V6_SOUNDMODE = 2
+[0096] (B6) printDebug.begin()
+[0098] (B6) printDebug.msg(sound(0x9EDA99C, 0xA) + " ")
+[00AC] (43) VAR_V6_SOUNDMODE = 0
+[00B2] (43) VAR_V6_SOUNDMODE = 2
+[00B8] (B6) printDebug.begin()
+[00BA] (B6) printDebug.msg(sound(0x9F2A214, 0xA) + " ")
+[00CE] (43) VAR_V6_SOUNDMODE = 0
+[00D4] (43) VAR_V6_SOUNDMODE = 2
+[00DA] (B6) printDebug.begin()
+[00DC] (B6) printDebug.msg(sound(0x9E1F687, 0xA) + " ")
+[00F0] (43) VAR_V6_SOUNDMODE = 0
+[00F6] (43) VAR_V6_SOUNDMODE = 2
+[00FC] (B6) printDebug.begin()
+[00FE] (B6) printDebug.msg(sound(0x9F9B4A1, 0xA) + " ")
+[0112] (43) VAR_V6_SOUNDMODE = 0
+[0118] (43) VAR_V6_SOUNDMODE = 2
+[011E] (B6) printDebug.begin()
+[0120] (B6) printDebug.msg(sound(0x9E21292, 0xA) + " ")
+[0134] (43) VAR_V6_SOUNDMODE = 0
+[013A] (43) VAR_V6_SOUNDMODE = 2
+[0140] (B6) printDebug.begin()
+[0142] (B6) printDebug.msg(sound(0x9E1D6B0, 0xA) + " ")
+[0156] (43) VAR_V6_SOUNDMODE = 0
+[015C] (43) VAR_V6_SOUNDMODE = 2
+[0162] (B6) printDebug.begin()
+[0164] (B6) printDebug.msg(sound(0x9E4F057, 0xA) + " ")
+[0178] (43) VAR_V6_SOUNDMODE = 0
+[017E] (9B) resourceRoutines.lockScript(83)
+[0184] (9B) resourceRoutines.loadScript(83)
+[0186] (9B) resourceRoutines.lockScript(84)
+[018C] (9B) resourceRoutines.loadScript(84)
+[018E] (5D) if (bitvar54) {
+[0194] (9B)   resourceRoutines.lockCostume(159)
+[019A] (9B)   resourceRoutines.loadCostume(159)
+[019C] (9B)   resourceRoutines.lockCostume(160)
+[01A2] (9B)   resourceRoutines.loadCostume(160)
+[01A4] (9B)   resourceRoutines.lockCostume(161)
+[01AA] (9B)   resourceRoutines.loadCostume(161)
+[01AC] (9B)   resourceRoutines.lockCostume(163)
+[01B2] (9B)   resourceRoutines.loadCostume(163)
+[01B4] (5E)   startScript(0,200,[])
+[01BE] (7C)   stopScript(0)
+[01C2] (**) }
+[01C2] (0C) dup[1] = var166
+[01C6] (5D) if (dup[1] == 30) {
+[01CD] (7A)   setCameraAt(272)
+[01D2] (74)   startSound(35)
+[01D6] (80)   putActorAtObject(2,314,32)
+[01E0] (79)   actorFollowCamera(2)
+[01E4] (7E)   walkActorTo(2,297,108)
+[01EE] (5D)   if (!bitvar67) {
+[01F5] (80)     putActorAtObject(3,314,32)
+[01FF] (**)   }
+[01FF] (5D) } else if (dup[1] == 27) {
+[020A] (7A)   setCameraAt(320)
+[020F] (61)   drawObject(313,1)
+[0216] (80)   putActorAtObject(2,313,32)
+[0220] (7E)   walkActorTo(2,309,109)
+[022A] (5D)   if (!bitvar67) {
+[0231] (80)     putActorAtObject(3,313,32)
+[023B] (7E)     walkActorTo(3,294,108)
+[0245] (**)   }
+[0245] (73) } else {
+[0248] (9B)   resourceRoutines.lockCostume(159)
+[024F] (9B)   resourceRoutines.loadCostume(159)
+[0251] (9B)   resourceRoutines.lockCostume(160)
+[0257] (9B)   resourceRoutines.loadCostume(160)
+[0259] (9B)   resourceRoutines.lockCostume(161)
+[025F] (9B)   resourceRoutines.loadCostume(161)
+[0261] (9B)   resourceRoutines.lockCostume(162)
+[0267] (9B)   resourceRoutines.loadCostume(162)
+[0269] (9B)   resourceRoutines.lockCostume(163)
+[026F] (9B)   resourceRoutines.loadCostume(163)
+[0271] (9B)   resourceRoutines.lockCostume(164)
+[0277] (9B)   resourceRoutines.loadCostume(164)
+[0279] (**) }
+[0279] (5D) if (ifClassOfIs(315,[24])) {
+[0286] (5E)   startScript(0,83,[])
+[0290] (**) }
+[0290] (79) actorFollowCamera(VAR_EGO)
+[0294] (65) stopObjectCodeA()
+END

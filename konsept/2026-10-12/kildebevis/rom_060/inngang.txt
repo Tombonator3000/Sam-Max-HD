@@ -1,0 +1,52 @@
+; Inngangsskriptet til rom 60 (ENCD)
+
+[0000] (9B) resourceRoutines.lockCostume(308)
+[0006] (9B) resourceRoutines.loadCostume(308)
+[0008] (9B) resourceRoutines.lockCostume(305)
+[000E] (9B) resourceRoutines.loadCostume(305)
+[0010] (9B) resourceRoutines.lockCostume(306)
+[0016] (9B) resourceRoutines.loadCostume(306)
+[0018] (9B) resourceRoutines.lockSound(80)
+[001E] (9B) resourceRoutines.loadSound(80)
+[0020] (5D) if (!var327) {
+[0027] (43)   var327 = getRandomNumberRange(11,14)
+[0031] (**) }
+[0031] (0C) dup[1] = var327
+[0035] (9B) resourceRoutines.lockSound(dup[1])
+[0037] (9B) resourceRoutines.loadSound(dup[1])
+[0039] (43) VAR_V6_SOUNDMODE = 2
+[003F] (B6) printDebug.begin()
+[0041] (B6) printDebug.msg(sound(0x9E3226A, 0xA) + " ")
+[0055] (43) VAR_V6_SOUNDMODE = 0
+[005B] (43) VAR_V6_SOUNDMODE = 2
+[0061] (B6) printDebug.begin()
+[0063] (B6) printDebug.msg(sound(0x9E7C351, 0xA) + " ")
+[0077] (43) VAR_V6_SOUNDMODE = 0
+[007D] (5E) startScript(3,203,[])
+[0087] (9D) actorOps.setCurActor(4)
+[008C] (9D) actorOps.init()
+[008E] (9D) actorOps.setCostume(306)
+[0093] (9D) actorOps.setTalkColor(9)
+[0098] (7F) putActorInXY(4,45,167,60)
+[00A5] (82) animateActor(4,250)
+[00AC] (47) array185[4] = 93
+[00B5] (47) array186[4] = 175
+[00BE] (47) array184[4] = 209
+[00C7] (5E) startScript(1,208,[])
+[00D1] (0C) dup[2] = var166
+[00D5] (5D) if (dup[2] == 58) {
+[00DC] (99)   setBoxFlags([5],128)
+[00E7] (5D)   if (!bitvar131) {
+[00EE] (5E)     startScript(0,201,[])
+[00F8] (73)   } else {
+[00FB] (5E)     startScript(0,206,[])
+[0105] (**)   }
+[0105] (5D) } else if (dup[2] == 61) {
+[0110] (5E)   startScript(1,205,[])
+[011B] (5E)   startScript(1,29,[])
+[0125] (73)   /* jump 129; */
+[0128] (**) }
+[0128] (43) var194 = 202
+[012F] (79) actorFollowCamera(VAR_EGO)
+[0133] (65) stopObjectCodeA()
+END

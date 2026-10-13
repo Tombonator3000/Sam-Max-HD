@@ -1,0 +1,138 @@
+; Globalt skript 92 (SCRP i rom 43, offset 0xD3A7 fra ROOM-blokken)
+
+[0000] (68) beginCutscene([2])
+[0007] (43) localvar0 = 1
+[000D] (5D) while (localvar0 <= 15) {
+[0017] (47)   array261[localvar0] = 0
+[0020] (4F)   localvar0++
+[0023] (**) }
+[0026] (43) localvar0 = VAR_ROOM
+[002C] (6C) breakHere()
+[002D] (82) animateActor(7,2)
+[0034] (5D) if (!bitvar206) {
+[003B] (BA)   talkActor(sound(0x90F0A77, 0xA) + "I don't think the cute little robot wants to follow its new programming, Sam.",3)
+[009D] (A9)   wait.waitForMessage()
+[009F] (BA)   talkActor(sound(0x9103D22, 0xA) + "I don't recall giving it a cute little choice.",2)
+[00E2] (A9)   wait.waitForMessage()
+[00E4] (73) } else {
+[00E7] (BA)   talkActor(sound(0x91112CD, 0xA) + "Git along, little robot.",2)
+[0114] (A9)   wait.waitForMessage()
+[0116] (**) }
+[0116] (9B) resourceRoutines.lockSound(57)
+[011C] (9B) resourceRoutines.loadSound(57)
+[011E] (AC) soundKludge([14,57,0,1,0,30])
+[0134] (74) startSound(58)
+[0138] (AC) soundKludge([17,58,0,1,8,57,0])
+[0151] (0C) dup[1] = VAR_ROOM
+[0155] (5D) if (dup[1] == 45) {
+[015C] (7D)   walkActorToObj(7,427,0)
+[0167] (5D) } else if (dup[1] == 43) {
+[0172] (7D)   walkActorToObj(7,393,0)
+[017D] (5D) } else if (dup[1] == 44) {
+[0188] (7D)   walkActorToObj(7,406,0)
+[0193] (73)   /* jump 197; */
+[0196] (**) }
+[0196] (5E) startScript(2,35,[7,2])
+[01A7] (5E) startScript(2,35,[7,3])
+[01B7] (A9) wait.waitForActor(-7,7)
+[01BE] (7C) stopScript(35)
+[01C2] (7F) putActorInXY(7,0,0,0)
+[01CF] (5D) if (!bitvar206) {
+[01D6] (BA)   talkActor(sound(0x91190B8, 0xA) + "There he goes.",2)
+[01F9] (A9)   wait.waitForMessage()
+[01FB] (BA)   talkActor(sound(0x911E8A3, 0xA) + "I'm ripe with anticipation.",3)
+[022B] (A9)   wait.waitForMessage()
+[022D] (BA)   talkActor(sound(0x912964E, 0xA) + "I thought I smelled something.",2)
+[0260] (A9)   wait.waitForMessage()
+[0262] (**) }
+[0262] (43) bitvar78 = 1
+[0268] (7B) loadRoom(47)
+[026C] (80) putActorAtObject(7,435,47)
+[0276] (6C) breakHere()
+[0277] (7E) walkActorTo(7,180,200)
+[0281] (6C) breakHere()
+[0282] (5D) unless ((getObjectX(7) < 240)) jump 281
+[028D] (5E) startScript(1,95,[])
+[0297] (43) localvar1 = 1
+[029D] (5D) while (localvar1 <= 6) {
+[02A7] (9C)   roomOps.darkenPalette(255,100,100,0,255)
+[02B8] (6C)   breakHere()
+[02B9] (9C)   roomOps.darkenPalette(255,255,255,0,255)
+[02CA] (6C)   breakHere()
+[02CB] (4F)   localvar1++
+[02CE] (**) }
+[02D1] (5E) startScript(0,90,[])
+[02DB] (43) localvar1 = 1
+[02E1] (5D) while (localvar1 <= 7) {
+[02EB] (9C)   roomOps.darkenPalette(255,100,100,0,255)
+[02FC] (6C)   breakHere()
+[02FD] (9C)   roomOps.darkenPalette(255,255,255,0,255)
+[030E] (6C)   breakHere()
+[030F] (4F)   localvar1++
+[0312] (**) }
+[0315] (7C) stopScript(95)
+[0319] (7B) loadRoom(48)
+[031D] (AC) soundKludge([15,58,0,1])
+[032D] (9D) actorOps.setCurActor(10)
+[0332] (9D) actorOps.setCostume(245)
+[0337] (7F) putActorInXY(10,96,160,48)
+[0344] (82) animateActor(10,249)
+[034B] (82) animateActor(10,10)
+[0352] (B4) printLine.begin()
+[0354] (B4) printLine.color(10)
+[0359] (B4) printLine.XY(96,20)
+[0361] (B4) printLine.msg(sound(0x91318F9, 0xA) + "What the-?")
+[037E] (CA) delayFrames(6)
+[0382] (9D) actorOps.setCurActor(10)
+[0387] (9D) actorOps.setCostume(69)
+[038C] (7D) walkActorToObj(10,456,0)
+[0396] (CA) delayFrames(8)
+[039A] (9D) actorOps.setCurActor(10)
+[039F] (9D) actorOps.setFollowBoxes()
+[03A1] (A9) wait.waitForActor(-7,10)
+[03A8] (7B) loadRoom(localvar0)
+[03AC] (0C) dup[4] = localvar0
+[03B0] (5D) if (dup[4] == 45) {
+[03B7] (9D)   actorOps.setCurActor(10)
+[03BD] (9D)   actorOps.setIgnoreBoxes()
+[03BF] (9D)   actorOps.setAlwayZClip(1)
+[03C4] (9D)   actorOps.setScale(200)
+[03C9] (7F)   putActorInXY(10,71,140,45)
+[03D6] (7E)   walkActorTo(10,-20,145)
+[03E0] (5D) } else if (dup[4] == 43) {
+[03EB] (7F)   putActorInXY(10,317,141,43)
+[03F9] (7D)   walkActorToObj(10,393,0)
+[0403] (5D) } else if (dup[4] == 44) {
+[040E] (80)   putActorAtObject(10,407,44)
+[0419] (7D)   walkActorToObj(10,406,0)
+[0423] (73)   /* jump 427; */
+[0426] (**) }
+[0426] (6C) breakHere()
+[0428] (43) bitvar2 = 1
+[042E] (6C) breakHere()
+[042F] (5D) unless (bitvar3) jump 42e
+[0435] (43) bitvar77 = 1
+[043B] (5E) startScript(2,35,[10,2])
+[044B] (5E) startScript(2,35,[10,3])
+[045B] (A9) wait.waitForActor(-7,10)
+[0462] (7C) stopScript(35)
+[0466] (7F) putActorInXY(10,0,0,0)
+[0473] (81) faceActor(2,3)
+[047A] (81) faceActor(3,2)
+[0481] (CA) delayFrames(2)
+[0485] (5D) if (!bitvar206) {
+[048C] (43)   bitvar206 = 1
+[0492] (BA)   talkActor(sound(0x9135124, 0xA) + "How Pavlovian.",2)
+[04B5] (A9)   wait.waitForMessage()
+[04B7] (BA)   talkActor(sound(0x913B7CF, 0xA) + "And you should know.",3)
+[04E0] (A9)   wait.waitForMessage()
+[04E2] (73) } else {
+[04E5] (BA)   talkActor(sound(0x9141C3A, 0xA) + "He's not getting any smarter, is he?",2)
+[051E] (A9)   wait.waitForMessage()
+[0520] (**) }
+[0520] (79) actorFollowCamera(2)
+[0524] (43) bitvar2 = 0
+[052A] (43) bitvar78 = 0
+[0530] (67) endCutscene()
+[0531] (66) stopObjectCodeB()
+END

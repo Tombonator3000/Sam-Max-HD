@@ -1,0 +1,42 @@
+; Inngangsskriptet til rom 23 (ENCD)
+
+[0000] (9B) resourceRoutines.lockScript(120)
+[0006] (9B) resourceRoutines.loadScript(120)
+[0008] (9B) resourceRoutines.lockSound(88)
+[000E] (9B) resourceRoutines.loadSound(88)
+[0010] (9B) resourceRoutines.lockCostume(102)
+[0016] (9B) resourceRoutines.loadCostume(102)
+[0018] (9B) resourceRoutines.lockScript(77)
+[001E] (9B) resourceRoutines.loadScript(77)
+[0020] (43) VAR_V6_SOUNDMODE = 2
+[0026] (B6) printDebug.begin()
+[0028] (B6) printDebug.msg(sound(0x9E378C3, 0xA) + " ")
+[003C] (43) VAR_V6_SOUNDMODE = 0
+[0042] (5D) if (!isSoundRunning(29)) {
+[004A] (74)   startSound(29)
+[004E] (73) } else {
+[0051] (75)   stopSound(25)
+[0055] (75)   stopSound(29)
+[0059] (74)   startSound(29)
+[005D] (**) }
+[005D] (9D) actorOps.setCurActor(4)
+[0062] (9D) actorOps.init()
+[0064] (9D) actorOps.setCostume(102)
+[0069] (9D) actorOps.setTalkColor(14)
+[006E] (9D) actorOps.setIgnoreBoxes()
+[0070] (9D) actorOps.setAlwayZClip(1)
+[0075] (47) array185[4] = 130
+[007E] (47) array186[4] = 156
+[0087] (7F) putActorInXY(4,96,139,23)
+[0094] (47) array184[4] = 201
+[009D] (82) animateActor(4,249)
+[00A4] (43) var194 = 77
+[00AA] (5E) startScript(1,200,[])
+[00B4] (5E) startScript(0,202,[])
+[00BE] (5D) if (var166 == 22) {
+[00C8] (6E)   setClass(231,[134])
+[00D2] (**) }
+[00D2] (5E) startScript(1,203,[])
+[00DC] (5E) startScript(1,204,[])
+[00E6] (65) stopObjectCodeA()
+END

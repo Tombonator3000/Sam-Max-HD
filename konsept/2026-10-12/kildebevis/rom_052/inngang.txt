@@ -1,0 +1,114 @@
+; Inngangsskriptet til rom 52 (ENCD)
+
+[0000] (9B) resourceRoutines.lockCostume(252)
+[0006] (9B) resourceRoutines.loadCostume(252)
+[0008] (9B) resourceRoutines.lockCostume(253)
+[000E] (9B) resourceRoutines.loadCostume(253)
+[0010] (9B) resourceRoutines.lockCostume(254)
+[0016] (9B) resourceRoutines.loadCostume(254)
+[0018] (9B) resourceRoutines.lockCostume(255)
+[001E] (9B) resourceRoutines.loadCostume(255)
+[0020] (9B) resourceRoutines.lockCostume(256)
+[0026] (9B) resourceRoutines.loadCostume(256)
+[0028] (9B) resourceRoutines.lockCostume(257)
+[002E] (9B) resourceRoutines.loadCostume(257)
+[0030] (9B) resourceRoutines.lockCostume(258)
+[0036] (9B) resourceRoutines.loadCostume(258)
+[0038] (9B) resourceRoutines.lockCostume(259)
+[003E] (9B) resourceRoutines.loadCostume(259)
+[0040] (9B) resourceRoutines.lockCostume(260)
+[0046] (9B) resourceRoutines.loadCostume(260)
+[0048] (9B) resourceRoutines.lockCostume(261)
+[004E] (9B) resourceRoutines.loadCostume(261)
+[0050] (9B) resourceRoutines.lockCostume(262)
+[0056] (9B) resourceRoutines.loadCostume(262)
+[0058] (9B) resourceRoutines.lockCostume(263)
+[005E] (9B) resourceRoutines.loadCostume(263)
+[0060] (9B) resourceRoutines.lockScript(100)
+[0066] (9B) resourceRoutines.loadScript(100)
+[0068] (9B) resourceRoutines.lockScript(101)
+[006E] (9B) resourceRoutines.loadScript(101)
+[0070] (9B) resourceRoutines.lockScript(103)
+[0076] (9B) resourceRoutines.loadScript(103)
+[0078] (9B) resourceRoutines.lockScript(102)
+[007E] (9B) resourceRoutines.loadScript(102)
+[0080] (43) VAR_V6_SOUNDMODE = 2
+[0086] (B6) printDebug.begin()
+[0088] (B6) printDebug.msg(sound(0x9F282CB, 0xA) + " ")
+[009C] (43) VAR_V6_SOUNDMODE = 0
+[00A2] (43) VAR_V6_SOUNDMODE = 2
+[00A8] (B6) printDebug.begin()
+[00AA] (B6) printDebug.msg(sound(0x9EDA99C, 0xA) + " ")
+[00BE] (43) VAR_V6_SOUNDMODE = 0
+[00C4] (43) VAR_V6_SOUNDMODE = 2
+[00CA] (B6) printDebug.begin()
+[00CC] (B6) printDebug.msg(sound(0x9FDF5D4, 0xA) + " ")
+[00E0] (43) VAR_V6_SOUNDMODE = 0
+[00E6] (43) VAR_V6_SOUNDMODE = 2
+[00EC] (B6) printDebug.begin()
+[00EE] (B6) printDebug.msg(sound(0xA036AA7, 0xA) + " ")
+[0102] (43) VAR_V6_SOUNDMODE = 0
+[0108] (5E) startScript(1,212,[])
+[0112] (70) setState(480,2)
+[0119] (70) setState(481,0)
+[0120] (5D) if (var166 == 53) {
+[012A] (99)   setBoxFlags([5,8],0)
+[0137] (**) }
+[0137] (5D) if (!bitvar95) {
+[013E] (9D)   actorOps.setCurActor(2)
+[0143] (9D)   actorOps.setCostume(4)
+[0148] (9D)   actorOps.setCurActor(3)
+[014D] (9D)   actorOps.setCostume(5)
+[0152] (5E)   startScript(1,202,[])
+[015C] (73) } else {
+[015F] (7F)   putActorInXY(3,0,0,0)
+[016C] (**) }
+[016C] (5D) if (bitvar183) {
+[0172] (9D)   actorOps.setCurActor(5)
+[0177] (9D)   actorOps.init()
+[0179] (9D)   actorOps.setCostume(256)
+[017E] (9D)   actorOps.setIgnoreBoxes()
+[0180] (9D)   actorOps.setElevation(-75)
+[0185] (9D)   actorOps.setTalkFrame(13,5)
+[018D] (9D)   actorOps.setInitFrame(15)
+[0192] (9D)   actorOps.setStandFrame(15)
+[0197] (9D)   actorOps.setTalkColor(5)
+[019C] (9D)   actorOps.setTalkPos(0,-120)
+[01A4] (9D)   actorOps.setScale(255)
+[01A9] (82)   animateActor(5,249)
+[01B0] (7F)   putActorInXY(5,310,46,52)
+[01BD] (73) } else {
+[01C0] (9D)   actorOps.setCurActor(5)
+[01C5] (9D)   actorOps.init()
+[01C7] (9D)   actorOps.setCostume(255)
+[01CC] (9D)   actorOps.setIgnoreBoxes()
+[01CE] (9D)   actorOps.setElevation(-75)
+[01D3] (9D)   actorOps.setTalkColor(5)
+[01D8] (9D)   actorOps.setTalkPos(0,-120)
+[01E0] (9D)   actorOps.setScale(255)
+[01E5] (82)   animateActor(5,249)
+[01EC] (7F)   putActorInXY(5,310,46,52)
+[01F9] (**) }
+[01F9] (9D) actorOps.setCurActor(4)
+[01FE] (9D) actorOps.init()
+[0200] (9D) actorOps.setCostume(253)
+[0205] (9D) actorOps.setIgnoreBoxes()
+[0207] (9D) actorOps.setTalkColor(10)
+[020C] (6E) setClass(4,[146])
+[0216] (7F) putActorInXY(4,160,119,52)
+[0223] (5D) if (ifClassOfIs(481,[134])) {
+[0230] (5E)   startScript(1,200,[])
+[023A] (**) }
+[023A] (5E) startScript(1,213,[])
+[0244] (5E) startScript(3,211,[])
+[024E] (5E) startScript(1,208,[])
+[0258] (5E) startScript(1,210,[])
+[0262] (5E) startScript(1,201,[])
+[026C] (99) setBoxFlags([3],128)
+[0276] (43) var194 = 203
+[027C] (47) array184[4] = 206
+[0285] (47) array184[5] = 207
+[028E] (47) array185[5] = 250
+[0297] (47) array186[5] = 135
+[02A0] (65) stopObjectCodeA()
+END

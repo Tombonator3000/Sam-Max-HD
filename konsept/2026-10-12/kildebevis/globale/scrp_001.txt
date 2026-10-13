@@ -1,0 +1,1488 @@
+; Globalt skript 1 (SCRP i rom 1, offset 0x36A9 fra ROOM-blokken)
+
+[0000] (6B) cursorCommand.initCharset(1)
+[0005] (43) VAR_TIMER_NEXT = 6
+[000B] (43) VAR_CUTSCENEEXIT_KEY = 27
+[0011] (43) VAR_RESTART_KEY = 0
+[0017] (43) VAR_PAUSE_KEY = 32
+[001D] (43) VAR_TALKSTOP_KEY = 46
+[0023] (A4) array150[0] = "Sam & Max Hit the Road, CD1.11, 3-24-94"
+[0052] (A4) VAR_PAUSE_MSG[0] = "Game Paused.  Press SPACE to Continue."
+[0080] (A4) VAR_RESTART_MSG[0] = "Are you sure you want to restart?  (Y/N)Y"
+[00B1] (A4) VAR_QUIT_MSG[0] = "Are you sure you want to quit?  (Y/N)Y"
+[00DF] (A4) VAR_SAVE_BTN[0] = "Save"
+[00EB] (A4) VAR_LOAD_BTN[0] = "Load"
+[00F7] (A4) VAR_PLAY_BTN[0] = "Play"
+[0103] (A4) VAR_CANCEL_BTN[0] = "Cancel"
+[0111] (A4) VAR_QUIT_BTN[0] = "Quit"
+[011D] (A4) VAR_OK_BTN[0] = "OK"
+[0127] (A4) VAR_SAVE_DISK_MSG[0] = "Insert save/load game disk"
+[0149] (A4) VAR_ENTER_NAME_MSG[0] = "You must enter a name"
+[0166] (A4) VAR_NOT_SAVED_MSG[0] = "The game was NOT saved"
+[0184] (A4) VAR_NOT_LOADED_MSG[0] = "The game was NOT loaded"
+[01A3] (A4) VAR_SAVE_MSG[0] = "Saving"
+[01B1] (A4) VAR_LOAD_MSG[0] = "Loading"
+[01C0] (A4) VAR_SAVE_MENU_TITLE[0] = "Name your SAVE game"
+[01DB] (A4) VAR_LOAD_MENU_TITLE[0] = "Select a game to LOAD"
+[01F8] (A4) VAR_MAIN_MENU_TITLE[0] = "Sam & Max Hit the Road"
+[0216] (6E) setClass(995,[150])
+[0220] (6E) setClass(996,[150])
+[022A] (BC) dimArray.int(VAR_GUI_COLORS,44)
+[0231] (47) VAR_GUI_COLORS[0] = 7
+[023A] (47) VAR_GUI_COLORS[1] = 0
+[0243] (47) VAR_GUI_COLORS[2] = 8
+[024C] (47) VAR_GUI_COLORS[3] = 0
+[0255] (47) VAR_GUI_COLORS[4] = 7
+[025E] (47) VAR_GUI_COLORS[5] = 8
+[0267] (47) VAR_GUI_COLORS[6] = 14
+[0270] (47) VAR_GUI_COLORS[7] = 7
+[0279] (47) VAR_GUI_COLORS[8] = 0
+[0282] (47) VAR_GUI_COLORS[9] = 7
+[028B] (47) VAR_GUI_COLORS[10] = 8
+[0294] (47) VAR_GUI_COLORS[11] = 14
+[029D] (47) VAR_GUI_COLORS[12] = 7
+[02A6] (47) VAR_GUI_COLORS[13] = 15
+[02AF] (47) VAR_GUI_COLORS[14] = 8
+[02B8] (47) VAR_GUI_COLORS[15] = 15
+[02C1] (47) VAR_GUI_COLORS[16] = 8
+[02CA] (47) VAR_GUI_COLORS[17] = 15
+[02D3] (47) VAR_GUI_COLORS[18] = 8
+[02DC] (47) VAR_GUI_COLORS[19] = 15
+[02E5] (47) VAR_GUI_COLORS[20] = 8
+[02EE] (47) VAR_GUI_COLORS[21] = 8
+[02F7] (47) VAR_GUI_COLORS[22] = 15
+[0300] (47) VAR_GUI_COLORS[23] = 8
+[0309] (47) VAR_GUI_COLORS[24] = 15
+[0312] (47) VAR_GUI_COLORS[25] = 8
+[031B] (47) VAR_GUI_COLORS[26] = 7
+[0324] (47) VAR_GUI_COLORS[27] = 15
+[032D] (47) VAR_GUI_COLORS[28] = 8
+[0336] (47) VAR_GUI_COLORS[29] = 15
+[033F] (47) VAR_GUI_COLORS[30] = 8
+[0348] (47) VAR_GUI_COLORS[31] = 4
+[0351] (47) VAR_GUI_COLORS[32] = 7
+[035A] (47) VAR_GUI_COLORS[33] = 15
+[0363] (47) VAR_GUI_COLORS[34] = 8
+[036C] (47) VAR_GUI_COLORS[35] = 15
+[0375] (47) VAR_GUI_COLORS[36] = 8
+[037E] (47) VAR_GUI_COLORS[37] = 8
+[0387] (47) VAR_GUI_COLORS[38] = 7
+[0390] (47) VAR_GUI_COLORS[39] = 15
+[0399] (47) VAR_GUI_COLORS[40] = 8
+[03A2] (47) VAR_GUI_COLORS[41] = 15
+[03AB] (47) VAR_GUI_COLORS[42] = 8
+[03B4] (43) VAR_CUTSCENEEXIT_KEY = 27
+[03BA] (43) VAR_PAUSE_KEY = 32
+[03C0] (43) VAR_MAINMENU_KEY = 0
+[03C6] (C9) kernelSetFunctions.setSaveSound([1])
+[03D0] (43) VAR_CHARINC = 3
+[03D6] (43) VAR_CUTSCENE_START_SCRIPT = 2
+[03DC] (43) VAR_CUTSCENE_END_SCRIPT = 3
+[03E2] (43) VAR_ENTRY_SCRIPT2 = 4
+[03E8] (43) VAR_EXIT_SCRIPT = 6
+[03EE] (43) VAR_VERB_SCRIPT = 0
+[03F4] (43) var175 = 19
+[03FA] (43) VAR_SENTENCE_SCRIPT = 50
+[0400] (43) VAR_NUM_ACTOR = 19
+[0406] (43) VAR_INVENTORY_SCRIPT = 52
+[040C] (9C) roomOps.screenEffect(257)
+[0411] (43) VAR_MAINMENU_KEY = 319
+[0417] (6B) cursorCommand.initCharset(2)
+[041C] (43) var177 = 889
+[0422] (6B) cursorCommand.setCursorImg(var177,93)
+[042A] (47) array178[1] = 879
+[0433] (47) array178[2] = 880
+[043C] (47) array178[3] = 881
+[0445] (47) array178[4] = 882
+[044E] (47) array178[5] = 888
+[0457] (43) var132 = 5
+[045D] (43) var130 = VAR_CHARINC
+[0463] (43) var133 = 1
+[0469] (43) var134 = 1
+[046F] (43) var135 = 1
+[0475] (43) var136 = 1
+[047B] (43) var137 = 4
+[0481] (43) var138 = 12
+[0487] (43) var139 = 40
+[048D] (43) var140 = 10
+[0493] (43) var141 = 1
+[0499] (43) var142 = 2
+[049F] (43) VAR_EGO = 2
+[04A5] (43) bitvar76 = 1
+[04AB] (43) var222 = 55
+[04B1] (43) var223 = 30
+[04B7] (6B) cursorCommand.cursorOn()
+[04B9] (6B) cursorCommand.userPutOn()
+[04BB] (9D) actorOps.setCurActor(2)
+[04C0] (9D) actorOps.init()
+[04C2] (9D) actorOps.setCostume(2)
+[04C7] (9D) actorOps.setTalkColor(6)
+[04CC] (9D) actorOps.setTalkPos(0,-110)
+[04D4] (9D) actorOps.setCurActor(3)
+[04D9] (9D) actorOps.init()
+[04DB] (9D) actorOps.setCostume(3)
+[04E0] (84) pickupObject(35,1)
+[04E7] (43) var205 = 6
+[04ED] (47) array195[0] = 997
+[04F6] (47) array195[1] = 998
+[04FF] (47) array195[2] = 1001
+[0508] (47) array195[3] = 999
+[0511] (47) array188[0] = 997
+[051A] (47) array188[1] = 998
+[0523] (47) array188[2] = 1001
+[052C] (47) array188[3] = 999
+[0535] (43) var189 = 3
+[053B] (5F) startScriptQuick(17,[2,1008])
+[0548] (43) bitvar226 = 1
+[054E] (47) array314[1] = 37
+[0557] (47) array314[2] = 80
+[0560] (47) array314[3] = 268
+[0569] (47) array315[1] = 11
+[0572] (47) array315[2] = 190
+[057B] (47) array315[3] = 252
+[0584] (47) array316[1] = 0
+[058D] (47) array316[2] = 174
+[0596] (47) array316[3] = 174
+[059F] (47) array317[1] = 70
+[05A8] (47) array317[2] = 100
+[05B1] (47) array317[3] = 208
+[05BA] (47) array318[1] = 40
+[05C3] (47) array318[2] = 170
+[05CC] (47) array318[3] = 213
+[05D5] (47) array319[1] = 124
+[05DE] (47) array319[2] = 109
+[05E7] (47) array319[3] = 98
+[05F0] (47) array319[4] = 68
+[05F9] (47) array319[5] = 60
+[0602] (47) array320[1] = 108
+[060B] (47) array320[2] = 97
+[0614] (47) array320[3] = 69
+[061D] (47) array320[4] = 58
+[0626] (47) array320[5] = 46
+[062F] (43) var309 = 1
+[0635] (43) var310 = 3
+[063B] (43) var311 = 3
+[0641] (43) var312 = 1
+[0647] (43) var313 = 3
+[064D] (43) var249 = 3
+[0653] (9D) actorOps.setCurActor(1)
+[0658] (9D) actorOps.init()
+[065A] (9D) actorOps.setCostume(1)
+[065F] (9D) actorOps.setIgnoreBoxes()
+[0661] (7F) putActorInXY(1,0,200,7)
+[066E] (82) animateActor(1,250)
+[0675] (43) VAR_SAVELOAD_SCRIPT = 33
+[067B] (43) VAR_SAVELOAD_SCRIPT2 = 34
+[0681] (5E) startScript(0,30,[])
+[068B] (5D) if (localvar0) {
+[0691] (9B)   resourceRoutines.lockRoom(94)
+[0697] (9B)   resourceRoutines.loadRoom(94)
+[0699] (9B)   resourceRoutines.lockRoom(93)
+[069F] (9B)   resourceRoutines.loadRoom(93)
+[06A1] (9B)   resourceRoutines.lockScript(48)
+[06A7] (9B)   resourceRoutines.loadScript(48)
+[06A9] (9B)   resourceRoutines.lockScript(50)
+[06AF] (9B)   resourceRoutines.loadScript(50)
+[06B1] (9B)   resourceRoutines.lockScript(49)
+[06B7] (9B)   resourceRoutines.loadScript(49)
+[06B9] (9B)   resourceRoutines.lockScript(51)
+[06BF] (9B)   resourceRoutines.loadScript(51)
+[06C1] (9B)   resourceRoutines.lockScript(52)
+[06C7] (9B)   resourceRoutines.loadScript(52)
+[06C9] (9B)   resourceRoutines.lockScript(53)
+[06CF] (9B)   resourceRoutines.loadScript(53)
+[06D1] (9B)   resourceRoutines.lockScript(54)
+[06D7] (9B)   resourceRoutines.loadScript(54)
+[06D9] (9B)   resourceRoutines.lockScript(55)
+[06DF] (9B)   resourceRoutines.loadScript(55)
+[06E1] (9B)   resourceRoutines.lockScript(56)
+[06E7] (9B)   resourceRoutines.loadScript(56)
+[06E9] (9B)   resourceRoutines.lockScript(57)
+[06EF] (9B)   resourceRoutines.loadScript(57)
+[06F1] (9B)   resourceRoutines.lockScript(58)
+[06F7] (9B)   resourceRoutines.loadScript(58)
+[06F9] (9B)   resourceRoutines.lockScript(59)
+[06FF] (9B)   resourceRoutines.loadScript(59)
+[0701] (9B)   resourceRoutines.lockScript(60)
+[0707] (9B)   resourceRoutines.loadScript(60)
+[0709] (9B)   resourceRoutines.lockScript(61)
+[070F] (9B)   resourceRoutines.loadScript(61)
+[0711] (9B)   resourceRoutines.lockScript(62)
+[0717] (9B)   resourceRoutines.loadScript(62)
+[0719] (9B)   resourceRoutines.lockScript(63)
+[071F] (9B)   resourceRoutines.loadScript(63)
+[0721] (9B)   resourceRoutines.lockScript(64)
+[0727] (9B)   resourceRoutines.loadScript(64)
+[0729] (9B)   resourceRoutines.lockScript(2)
+[072F] (9B)   resourceRoutines.loadScript(2)
+[0731] (9B)   resourceRoutines.lockScript(3)
+[0737] (9B)   resourceRoutines.loadScript(3)
+[0739] (9B)   resourceRoutines.lockScript(4)
+[073F] (9B)   resourceRoutines.loadScript(4)
+[0741] (9B)   resourceRoutines.lockScript(6)
+[0747] (9B)   resourceRoutines.loadScript(6)
+[0749] (9B)   resourceRoutines.lockScript(7)
+[074F] (9B)   resourceRoutines.loadScript(7)
+[0751] (9B)   resourceRoutines.lockScript(9)
+[0757] (9B)   resourceRoutines.loadScript(9)
+[0759] (9B)   resourceRoutines.lockScript(10)
+[075F] (9B)   resourceRoutines.loadScript(10)
+[0761] (9B)   resourceRoutines.lockScript(11)
+[0767] (9B)   resourceRoutines.loadScript(11)
+[0769] (9B)   resourceRoutines.lockScript(12)
+[076F] (9B)   resourceRoutines.loadScript(12)
+[0771] (9B)   resourceRoutines.lockScript(13)
+[0777] (9B)   resourceRoutines.loadScript(13)
+[0779] (9B)   resourceRoutines.lockScript(14)
+[077F] (9B)   resourceRoutines.loadScript(14)
+[0781] (9B)   resourceRoutines.lockScript(15)
+[0787] (9B)   resourceRoutines.loadScript(15)
+[0789] (9B)   resourceRoutines.lockScript(16)
+[078F] (9B)   resourceRoutines.loadScript(16)
+[0791] (9B)   resourceRoutines.lockScript(17)
+[0797] (9B)   resourceRoutines.loadScript(17)
+[0799] (9B)   resourceRoutines.lockScript(18)
+[079F] (9B)   resourceRoutines.loadScript(18)
+[07A1] (9B)   resourceRoutines.lockScript(19)
+[07A7] (9B)   resourceRoutines.loadScript(19)
+[07A9] (9B)   resourceRoutines.lockScript(20)
+[07AF] (9B)   resourceRoutines.loadScript(20)
+[07B1] (9B)   resourceRoutines.lockScript(21)
+[07B7] (9B)   resourceRoutines.loadScript(21)
+[07B9] (9B)   resourceRoutines.lockScript(22)
+[07BF] (9B)   resourceRoutines.loadScript(22)
+[07C1] (9B)   resourceRoutines.lockScript(23)
+[07C7] (9B)   resourceRoutines.loadScript(23)
+[07C9] (9B)   resourceRoutines.lockScript(24)
+[07CF] (9B)   resourceRoutines.loadScript(24)
+[07D1] (9B)   resourceRoutines.lockScript(25)
+[07D7] (9B)   resourceRoutines.loadScript(25)
+[07D9] (9B)   resourceRoutines.lockScript(26)
+[07DF] (9B)   resourceRoutines.loadScript(26)
+[07E1] (9B)   resourceRoutines.lockScript(27)
+[07E7] (9B)   resourceRoutines.loadScript(27)
+[07E9] (9B)   resourceRoutines.lockScript(28)
+[07EF] (9B)   resourceRoutines.loadScript(28)
+[07F1] (9B)   resourceRoutines.lockScript(29)
+[07F7] (9B)   resourceRoutines.loadScript(29)
+[07F9] (9B)   resourceRoutines.lockScript(30)
+[07FF] (9B)   resourceRoutines.loadScript(30)
+[0801] (9B)   resourceRoutines.lockScript(31)
+[0807] (9B)   resourceRoutines.loadScript(31)
+[0809] (9B)   resourceRoutines.lockScript(32)
+[080F] (9B)   resourceRoutines.loadScript(32)
+[0811] (9B)   resourceRoutines.lockScript(33)
+[0817] (9B)   resourceRoutines.loadScript(33)
+[0819] (9B)   resourceRoutines.lockScript(34)
+[081F] (9B)   resourceRoutines.loadScript(34)
+[0821] (9B)   resourceRoutines.lockScript(35)
+[0827] (9B)   resourceRoutines.loadScript(35)
+[0829] (9B)   resourceRoutines.lockScript(44)
+[082F] (9B)   resourceRoutines.loadScript(44)
+[0831] (9B)   resourceRoutines.lockScript(45)
+[0837] (9B)   resourceRoutines.loadScript(45)
+[0839] (9B)   resourceRoutines.lockScript(46)
+[083F] (9B)   resourceRoutines.loadScript(46)
+[0841] (9B)   resourceRoutines.lockScript(47)
+[0847] (9B)   resourceRoutines.loadScript(47)
+[0849] (9B)   resourceRoutines.lockCostume(1)
+[084F] (9B)   resourceRoutines.loadCostume(1)
+[0851] (9B)   resourceRoutines.lockCostume(2)
+[0857] (9B)   resourceRoutines.loadCostume(2)
+[0859] (9B)   resourceRoutines.lockCostume(3)
+[085F] (9B)   resourceRoutines.loadCostume(3)
+[0861] (9B)   resourceRoutines.lockCostume(4)
+[0867] (9B)   resourceRoutines.loadCostume(4)
+[0869] (9B)   resourceRoutines.lockCostume(5)
+[086F] (9B)   resourceRoutines.loadCostume(5)
+[0871] (9B)   resourceRoutines.lockCostume(7)
+[0877] (9B)   resourceRoutines.loadCostume(7)
+[0879] (9B)   resourceRoutines.lockCostume(235)
+[087F] (9B)   resourceRoutines.loadCostume(235)
+[0881] (9B)   resourceRoutines.lockCostume(236)
+[0887] (9B)   resourceRoutines.loadCostume(236)
+[0889] (9B)   resourceRoutines.lockCostume(326)
+[088F] (9B)   resourceRoutines.loadCostume(326)
+[0891] (9B)   resourceRoutines.lockCostume(325)
+[0897] (9B)   resourceRoutines.loadCostume(325)
+[0899] (5D)   if (localvar0 != -1) {
+[08A3] (43)     VAR_V6_SOUNDMODE = 2
+[08A9] (B6)     printDebug.begin()
+[08AB] (B6)     printDebug.msg(sound(0x9DEC04A, 0xA) + " ")
+[08BF] (43)     VAR_V6_SOUNDMODE = 0
+[08C5] (43)     VAR_V6_SOUNDMODE = 2
+[08CB] (B6)     printDebug.begin()
+[08CD] (B6)     printDebug.msg(sound(0x9DEC177, 0xA) + " ")
+[08E1] (43)     VAR_V6_SOUNDMODE = 0
+[08E7] (43)     VAR_V6_SOUNDMODE = 2
+[08ED] (B6)     printDebug.begin()
+[08EF] (B6)     printDebug.msg(sound(0x9DF528E, 0xA) + " ")
+[0903] (43)     VAR_V6_SOUNDMODE = 0
+[0909] (43)     VAR_V6_SOUNDMODE = 2
+[090F] (B6)     printDebug.begin()
+[0911] (B6)     printDebug.msg(sound(0x9DF8101, 0xA) + " ")
+[0925] (43)     VAR_V6_SOUNDMODE = 0
+[092B] (43)     VAR_V6_SOUNDMODE = 2
+[0931] (B6)     printDebug.begin()
+[0933] (B6)     printDebug.msg(sound(0x9E013AE, 0xA) + " ")
+[0947] (43)     VAR_V6_SOUNDMODE = 0
+[094D] (43)     VAR_V6_SOUNDMODE = 2
+[0953] (B6)     printDebug.begin()
+[0955] (B6)     printDebug.msg(sound(0x9E05E5B, 0xA) + " ")
+[0969] (43)     VAR_V6_SOUNDMODE = 0
+[096F] (43)     VAR_V6_SOUNDMODE = 2
+[0975] (B6)     printDebug.begin()
+[0977] (B6)     printDebug.msg(sound(0x9E0737A, 0xA) + " ")
+[098B] (43)     VAR_V6_SOUNDMODE = 0
+[0991] (43)     VAR_V6_SOUNDMODE = 2
+[0997] (B6)     printDebug.begin()
+[0999] (B6)     printDebug.msg(sound(0x9E11725, 0xA) + " ")
+[09AD] (43)     VAR_V6_SOUNDMODE = 0
+[09B3] (43)     VAR_V6_SOUNDMODE = 2
+[09B9] (B6)     printDebug.begin()
+[09BB] (B6)     printDebug.msg(sound(0x9E129D0, 0xA) + " ")
+[09CF] (43)     VAR_V6_SOUNDMODE = 0
+[09D5] (43)     VAR_V6_SOUNDMODE = 2
+[09DB] (B6)     printDebug.begin()
+[09DD] (B6)     printDebug.msg(sound(0x9E166C7, 0xA) + " ")
+[09F1] (43)     VAR_V6_SOUNDMODE = 0
+[09F7] (43)     VAR_V6_SOUNDMODE = 2
+[09FD] (B6)     printDebug.begin()
+[09FF] (B6)     printDebug.msg(sound(0x9E18EA6, 0xA) + " ")
+[0A13] (43)     VAR_V6_SOUNDMODE = 0
+[0A19] (43)     VAR_V6_SOUNDMODE = 2
+[0A1F] (B6)     printDebug.begin()
+[0A21] (B6)     printDebug.msg(sound(0x9E1B14D, 0xA) + " ")
+[0A35] (43)     VAR_V6_SOUNDMODE = 0
+[0A3B] (43)     VAR_V6_SOUNDMODE = 2
+[0A41] (B6)     printDebug.begin()
+[0A43] (B6)     printDebug.msg(sound(0x9E1D6B0, 0xA) + " ")
+[0A57] (43)     VAR_V6_SOUNDMODE = 0
+[0A5D] (43)     VAR_V6_SOUNDMODE = 2
+[0A63] (B6)     printDebug.begin()
+[0A65] (B6)     printDebug.msg(sound(0x9E1F687, 0xA) + " ")
+[0A79] (43)     VAR_V6_SOUNDMODE = 0
+[0A7F] (43)     VAR_V6_SOUNDMODE = 2
+[0A85] (B6)     printDebug.begin()
+[0A87] (B6)     printDebug.msg(sound(0x9E21292, 0xA) + " ")
+[0A9B] (43)     VAR_V6_SOUNDMODE = 0
+[0AA1] (43)     VAR_V6_SOUNDMODE = 2
+[0AA7] (B6)     printDebug.begin()
+[0AA9] (B6)     printDebug.msg(sound(0x9E232BF, 0xA) + " ")
+[0ABD] (43)     VAR_V6_SOUNDMODE = 0
+[0AC3] (43)     VAR_V6_SOUNDMODE = 2
+[0AC9] (B6)     printDebug.begin()
+[0ACB] (B6)     printDebug.msg(sound(0x9E3226A, 0xA) + " ")
+[0ADF] (43)     VAR_V6_SOUNDMODE = 0
+[0AE5] (43)     VAR_V6_SOUNDMODE = 2
+[0AEB] (B6)     printDebug.begin()
+[0AED] (B6)     printDebug.msg(sound(0x9E340D5, 0xA) + " ")
+[0B01] (43)     VAR_V6_SOUNDMODE = 0
+[0B07] (43)     VAR_V6_SOUNDMODE = 2
+[0B0D] (B6)     printDebug.begin()
+[0B0F] (B6)     printDebug.msg(sound(0x9E35B18, 0xA) + " ")
+[0B23] (43)     VAR_V6_SOUNDMODE = 0
+[0B29] (43)     VAR_V6_SOUNDMODE = 2
+[0B2F] (B6)     printDebug.begin()
+[0B31] (B6)     printDebug.msg(sound(0x9E378C3, 0xA) + " ")
+[0B45] (43)     VAR_V6_SOUNDMODE = 0
+[0B4B] (43)     VAR_V6_SOUNDMODE = 2
+[0B51] (B6)     printDebug.begin()
+[0B53] (B6)     printDebug.msg(sound(0x9E3A76E, 0xA) + " ")
+[0B67] (43)     VAR_V6_SOUNDMODE = 0
+[0B6D] (43)     VAR_V6_SOUNDMODE = 2
+[0B73] (B6)     printDebug.begin()
+[0B75] (B6)     printDebug.msg(sound(0x9E3DEFD, 0xA) + " ")
+[0B89] (43)     VAR_V6_SOUNDMODE = 0
+[0B8F] (43)     VAR_V6_SOUNDMODE = 2
+[0B95] (B6)     printDebug.begin()
+[0B97] (B6)     printDebug.msg(sound(0x9E403AA, 0xA) + " ")
+[0BAB] (43)     VAR_V6_SOUNDMODE = 0
+[0BB1] (43)     VAR_V6_SOUNDMODE = 2
+[0BB7] (B6)     printDebug.begin()
+[0BB9] (B6)     printDebug.msg(sound(0x9E4F057, 0xA) + " ")
+[0BCD] (43)     VAR_V6_SOUNDMODE = 0
+[0BD3] (43)     VAR_V6_SOUNDMODE = 2
+[0BD9] (B6)     printDebug.begin()
+[0BDB] (B6)     printDebug.msg(sound(0x9E51984, 0xA) + " ")
+[0BEF] (43)     VAR_V6_SOUNDMODE = 0
+[0BF5] (43)     VAR_V6_SOUNDMODE = 2
+[0BFB] (B6)     printDebug.begin()
+[0BFD] (B6)     printDebug.msg(sound(0x9E610A7, 0xA) + " ")
+[0C11] (43)     VAR_V6_SOUNDMODE = 0
+[0C17] (43)     VAR_V6_SOUNDMODE = 2
+[0C1D] (B6)     printDebug.begin()
+[0C1F] (B6)     printDebug.msg(sound(0x9E6D1A6, 0xA) + " ")
+[0C33] (43)     VAR_V6_SOUNDMODE = 0
+[0C39] (43)     VAR_V6_SOUNDMODE = 2
+[0C3F] (B6)     printDebug.begin()
+[0C41] (B6)     printDebug.msg(sound(0x9E7C351, 0xA) + " ")
+[0C55] (43)     VAR_V6_SOUNDMODE = 0
+[0C5B] (43)     VAR_V6_SOUNDMODE = 2
+[0C61] (B6)     printDebug.begin()
+[0C63] (B6)     printDebug.msg(sound(0x9E8347C, 0xA) + " ")
+[0C77] (43)     VAR_V6_SOUNDMODE = 0
+[0C7D] (43)     VAR_V6_SOUNDMODE = 2
+[0C83] (B6)     printDebug.begin()
+[0C85] (B6)     printDebug.msg(sound(0x9E921A9, 0xA) + " ")
+[0C99] (43)     VAR_V6_SOUNDMODE = 0
+[0C9F] (43)     VAR_V6_SOUNDMODE = 2
+[0CA5] (B6)     printDebug.begin()
+[0CA7] (B6)     printDebug.msg(sound(0x9EA31B6, 0xA) + " ")
+[0CBB] (43)     VAR_V6_SOUNDMODE = 0
+[0CC1] (43)     VAR_V6_SOUNDMODE = 2
+[0CC7] (B6)     printDebug.begin()
+[0CC9] (B6)     printDebug.msg(sound(0x9EAE9BB, 0xA) + " ")
+[0CDD] (43)     VAR_V6_SOUNDMODE = 0
+[0CE3] (43)     VAR_V6_SOUNDMODE = 2
+[0CE9] (B6)     printDebug.begin()
+[0CEB] (B6)     printDebug.msg(sound(0x9EB744E, 0xA) + " ")
+[0CFF] (43)     VAR_V6_SOUNDMODE = 0
+[0D05] (43)     VAR_V6_SOUNDMODE = 2
+[0D0B] (B6)     printDebug.begin()
+[0D0D] (B6)     printDebug.msg(sound(0x9EB87F1, 0xA) + " ")
+[0D21] (43)     VAR_V6_SOUNDMODE = 0
+[0D27] (43)     VAR_V6_SOUNDMODE = 2
+[0D2D] (B6)     printDebug.begin()
+[0D2F] (B6)     printDebug.msg(sound(0x9EBC19E, 0xA) + " ")
+[0D43] (43)     VAR_V6_SOUNDMODE = 0
+[0D49] (43)     VAR_V6_SOUNDMODE = 2
+[0D4F] (B6)     printDebug.begin()
+[0D51] (B6)     printDebug.msg(sound(0x9EBDCE1, 0xA) + " ")
+[0D65] (43)     VAR_V6_SOUNDMODE = 0
+[0D6B] (43)     VAR_V6_SOUNDMODE = 2
+[0D71] (B6)     printDebug.begin()
+[0D73] (B6)     printDebug.msg(sound(0x9EBF934, 0xA) + " ")
+[0D87] (43)     VAR_V6_SOUNDMODE = 0
+[0D8D] (43)     VAR_V6_SOUNDMODE = 2
+[0D93] (B6)     printDebug.begin()
+[0D95] (B6)     printDebug.msg(sound(0x9EC18FD, 0xA) + " ")
+[0DA9] (43)     VAR_V6_SOUNDMODE = 0
+[0DAF] (43)     VAR_V6_SOUNDMODE = 2
+[0DB5] (B6)     printDebug.begin()
+[0DB7] (B6)     printDebug.msg(sound(0x9EC309E, 0xA) + " ")
+[0DCB] (43)     VAR_V6_SOUNDMODE = 0
+[0DD1] (43)     VAR_V6_SOUNDMODE = 2
+[0DD7] (B6)     printDebug.begin()
+[0DD9] (B6)     printDebug.msg(sound(0x9EC9477, 0xA) + " ")
+[0DED] (43)     VAR_V6_SOUNDMODE = 0
+[0DF3] (43)     VAR_V6_SOUNDMODE = 2
+[0DF9] (B6)     printDebug.begin()
+[0DFB] (B6)     printDebug.msg(sound(0x9ED0D24, 0xA) + " ")
+[0E0F] (43)     VAR_V6_SOUNDMODE = 0
+[0E15] (43)     VAR_V6_SOUNDMODE = 2
+[0E1B] (B6)     printDebug.begin()
+[0E1D] (B6)     printDebug.msg(sound(0x9ED246F, 0xA) + " ")
+[0E31] (43)     VAR_V6_SOUNDMODE = 0
+[0E37] (43)     VAR_V6_SOUNDMODE = 2
+[0E3D] (B6)     printDebug.begin()
+[0E3F] (B6)     printDebug.msg(sound(0x9EDA99C, 0xA) + " ")
+[0E53] (43)     VAR_V6_SOUNDMODE = 0
+[0E59] (43)     VAR_V6_SOUNDMODE = 2
+[0E5F] (B6)     printDebug.begin()
+[0E61] (B6)     printDebug.msg(sound(0x9EDC2C7, 0xA) + " ")
+[0E75] (43)     VAR_V6_SOUNDMODE = 0
+[0E7B] (43)     VAR_V6_SOUNDMODE = 2
+[0E81] (B6)     printDebug.begin()
+[0E83] (B6)     printDebug.msg(sound(0x9EDDEF4, 0xA) + " ")
+[0E97] (43)     VAR_V6_SOUNDMODE = 0
+[0E9D] (43)     VAR_V6_SOUNDMODE = 2
+[0EA3] (B6)     printDebug.begin()
+[0EA5] (B6)     printDebug.msg(sound(0x9EE1DDF, 0xA) + " ")
+[0EB9] (43)     VAR_V6_SOUNDMODE = 0
+[0EBF] (43)     VAR_V6_SOUNDMODE = 2
+[0EC5] (B6)     printDebug.begin()
+[0EC7] (B6)     printDebug.msg(sound(0x9EE7F8A, 0xA) + " ")
+[0EDB] (43)     VAR_V6_SOUNDMODE = 0
+[0EE1] (43)     VAR_V6_SOUNDMODE = 2
+[0EE7] (B6)     printDebug.begin()
+[0EE9] (B6)     printDebug.msg(sound(0x9EEF5B7, 0xA) + " ")
+[0EFD] (43)     VAR_V6_SOUNDMODE = 0
+[0F03] (43)     VAR_V6_SOUNDMODE = 2
+[0F09] (B6)     printDebug.begin()
+[0F0B] (B6)     printDebug.msg(sound(0x9EF1524, 0xA) + " ")
+[0F1F] (43)     VAR_V6_SOUNDMODE = 0
+[0F25] (43)     VAR_V6_SOUNDMODE = 2
+[0F2B] (B6)     printDebug.begin()
+[0F2D] (B6)     printDebug.msg(sound(0x9EF2751, 0xA) + " ")
+[0F41] (43)     VAR_V6_SOUNDMODE = 0
+[0F47] (43)     VAR_V6_SOUNDMODE = 2
+[0F4D] (B6)     printDebug.begin()
+[0F4F] (B6)     printDebug.msg(sound(0x9EF52FE, 0xA) + " ")
+[0F63] (43)     VAR_V6_SOUNDMODE = 0
+[0F69] (43)     VAR_V6_SOUNDMODE = 2
+[0F6F] (B6)     printDebug.begin()
+[0F71] (B6)     printDebug.msg(sound(0x9EF59CB, 0xA) + " ")
+[0F85] (43)     VAR_V6_SOUNDMODE = 0
+[0F8B] (43)     VAR_V6_SOUNDMODE = 2
+[0F91] (B6)     printDebug.begin()
+[0F93] (B6)     printDebug.msg(sound(0x9EF7478, 0xA) + " ")
+[0FA7] (43)     VAR_V6_SOUNDMODE = 0
+[0FAD] (43)     VAR_V6_SOUNDMODE = 2
+[0FB3] (B6)     printDebug.begin()
+[0FB5] (B6)     printDebug.msg(sound(0x9EFB9F3, 0xA) + " ")
+[0FC9] (43)     VAR_V6_SOUNDMODE = 0
+[0FCF] (43)     VAR_V6_SOUNDMODE = 2
+[0FD5] (B6)     printDebug.begin()
+[0FD7] (B6)     printDebug.msg(sound(0x9F0268A, 0xA) + " ")
+[0FEB] (43)     VAR_V6_SOUNDMODE = 0
+[0FF1] (43)     VAR_V6_SOUNDMODE = 2
+[0FF7] (B6)     printDebug.begin()
+[0FF9] (B6)     printDebug.msg(sound(0x9F0F9E7, 0xA) + " ")
+[100D] (43)     VAR_V6_SOUNDMODE = 0
+[1013] (43)     VAR_V6_SOUNDMODE = 2
+[1019] (B6)     printDebug.begin()
+[101B] (B6)     printDebug.msg(sound(0x9F12E94, 0xA) + " ")
+[102F] (43)     VAR_V6_SOUNDMODE = 0
+[1035] (43)     VAR_V6_SOUNDMODE = 2
+[103B] (B6)     printDebug.begin()
+[103D] (B6)     printDebug.msg(sound(0x9F17541, 0xA) + " ")
+[1051] (43)     VAR_V6_SOUNDMODE = 0
+[1057] (43)     VAR_V6_SOUNDMODE = 2
+[105D] (B6)     printDebug.begin()
+[105F] (B6)     printDebug.msg(sound(0x9F18C8A, 0xA) + " ")
+[1073] (43)     VAR_V6_SOUNDMODE = 0
+[1079] (43)     VAR_V6_SOUNDMODE = 2
+[107F] (B6)     printDebug.begin()
+[1081] (B6)     printDebug.msg(sound(0x9F19D09, 0xA) + " ")
+[1095] (43)     VAR_V6_SOUNDMODE = 0
+[109B] (43)     VAR_V6_SOUNDMODE = 2
+[10A1] (B6)     printDebug.begin()
+[10A3] (B6)     printDebug.msg(sound(0x9F23A2E, 0xA) + " ")
+[10B7] (43)     VAR_V6_SOUNDMODE = 0
+[10BD] (43)     VAR_V6_SOUNDMODE = 2
+[10C3] (B6)     printDebug.begin()
+[10C5] (B6)     printDebug.msg(sound(0x9F282CB, 0xA) + " ")
+[10D9] (43)     VAR_V6_SOUNDMODE = 0
+[10DF] (43)     VAR_V6_SOUNDMODE = 2
+[10E5] (B6)     printDebug.begin()
+[10E7] (B6)     printDebug.msg(sound(0x9F2A214, 0xA) + " ")
+[10FB] (43)     VAR_V6_SOUNDMODE = 0
+[1101] (43)     VAR_V6_SOUNDMODE = 2
+[1107] (B6)     printDebug.begin()
+[1109] (B6)     printDebug.msg(sound(0x9F2C0BB, 0xA) + " ")
+[111D] (43)     VAR_V6_SOUNDMODE = 0
+[1123] (43)     VAR_V6_SOUNDMODE = 2
+[1129] (B6)     printDebug.begin()
+[112B] (B6)     printDebug.msg(sound(0x9F2ED88, 0xA) + " ")
+[113F] (43)     VAR_V6_SOUNDMODE = 0
+[1145] (43)     VAR_V6_SOUNDMODE = 2
+[114B] (B6)     printDebug.begin()
+[114D] (B6)     printDebug.msg(sound(0x9F330F5, 0xA) + " ")
+[1161] (43)     VAR_V6_SOUNDMODE = 0
+[1167] (43)     VAR_V6_SOUNDMODE = 2
+[116D] (B6)     printDebug.begin()
+[116F] (B6)     printDebug.msg(sound(0x9F3B722, 0xA) + " ")
+[1183] (43)     VAR_V6_SOUNDMODE = 0
+[1189] (43)     VAR_V6_SOUNDMODE = 2
+[118F] (B6)     printDebug.begin()
+[1191] (B6)     printDebug.msg(sound(0x9F41151, 0xA) + " ")
+[11A5] (43)     VAR_V6_SOUNDMODE = 0
+[11AB] (43)     VAR_V6_SOUNDMODE = 2
+[11B1] (B6)     printDebug.begin()
+[11B3] (B6)     printDebug.msg(sound(0x9F4261E, 0xA) + " ")
+[11C7] (43)     VAR_V6_SOUNDMODE = 0
+[11CD] (43)     VAR_V6_SOUNDMODE = 2
+[11D3] (B6)     printDebug.begin()
+[11D5] (B6)     printDebug.msg(sound(0x9F4404B, 0xA) + " ")
+[11E9] (43)     VAR_V6_SOUNDMODE = 0
+[11EF] (43)     VAR_V6_SOUNDMODE = 2
+[11F5] (B6)     printDebug.begin()
+[11F7] (B6)     printDebug.msg(sound(0x9F4A8F8, 0xA) + " ")
+[120B] (43)     VAR_V6_SOUNDMODE = 0
+[1211] (43)     VAR_V6_SOUNDMODE = 2
+[1217] (B6)     printDebug.begin()
+[1219] (B6)     printDebug.msg(sound(0x9F59FA5, 0xA) + " ")
+[122D] (43)     VAR_V6_SOUNDMODE = 0
+[1233] (43)     VAR_V6_SOUNDMODE = 2
+[1239] (B6)     printDebug.begin()
+[123B] (B6)     printDebug.msg(sound(0x9F5F9D2, 0xA) + " ")
+[124F] (43)     VAR_V6_SOUNDMODE = 0
+[1255] (43)     VAR_V6_SOUNDMODE = 2
+[125B] (B6)     printDebug.begin()
+[125D] (B6)     printDebug.msg(sound(0x9F6A87F, 0xA) + " ")
+[1271] (43)     VAR_V6_SOUNDMODE = 0
+[1277] (43)     VAR_V6_SOUNDMODE = 2
+[127D] (B6)     printDebug.begin()
+[127F] (B6)     printDebug.msg(sound(0x9F76856, 0xA) + " ")
+[1293] (43)     VAR_V6_SOUNDMODE = 0
+[1299] (43)     VAR_V6_SOUNDMODE = 2
+[129F] (B6)     printDebug.begin()
+[12A1] (B6)     printDebug.msg(sound(0x9F79483, 0xA) + " ")
+[12B5] (43)     VAR_V6_SOUNDMODE = 0
+[12BB] (43)     VAR_V6_SOUNDMODE = 2
+[12C1] (B6)     printDebug.begin()
+[12C3] (B6)     printDebug.msg(sound(0x9F7A930, 0xA) + " ")
+[12D7] (43)     VAR_V6_SOUNDMODE = 0
+[12DD] (43)     VAR_V6_SOUNDMODE = 2
+[12E3] (B6)     printDebug.begin()
+[12E5] (B6)     printDebug.msg(sound(0x9F8725D, 0xA) + " ")
+[12F9] (43)     VAR_V6_SOUNDMODE = 0
+[12FF] (43)     VAR_V6_SOUNDMODE = 2
+[1305] (B6)     printDebug.begin()
+[1307] (B6)     printDebug.msg(sound(0x9F9738A, 0xA) + " ")
+[131B] (43)     VAR_V6_SOUNDMODE = 0
+[1321] (43)     VAR_V6_SOUNDMODE = 2
+[1327] (B6)     printDebug.begin()
+[1329] (B6)     printDebug.msg(sound(0x9F9B4A1, 0xA) + " ")
+[133D] (43)     VAR_V6_SOUNDMODE = 0
+[1343] (43)     VAR_V6_SOUNDMODE = 2
+[1349] (B6)     printDebug.begin()
+[134B] (B6)     printDebug.msg(sound(0x9F9C600, 0xA) + " ")
+[135F] (43)     VAR_V6_SOUNDMODE = 0
+[1365] (43)     VAR_V6_SOUNDMODE = 2
+[136B] (B6)     printDebug.begin()
+[136D] (B6)     printDebug.msg(sound(0x9F9E34D, 0xA) + " ")
+[1381] (43)     VAR_V6_SOUNDMODE = 0
+[1387] (43)     VAR_V6_SOUNDMODE = 2
+[138D] (B6)     printDebug.begin()
+[138F] (B6)     printDebug.msg(sound(0x9FA0068, 0xA) + " ")
+[13A3] (43)     VAR_V6_SOUNDMODE = 0
+[13A9] (43)     VAR_V6_SOUNDMODE = 2
+[13AF] (B6)     printDebug.begin()
+[13B1] (B6)     printDebug.msg(sound(0x9FA10CF, 0xA) + " ")
+[13C5] (43)     VAR_V6_SOUNDMODE = 0
+[13CB] (43)     VAR_V6_SOUNDMODE = 2
+[13D1] (B6)     printDebug.begin()
+[13D3] (B6)     printDebug.msg(sound(0x9FA309E, 0xA) + " ")
+[13E7] (43)     VAR_V6_SOUNDMODE = 0
+[13ED] (43)     VAR_V6_SOUNDMODE = 2
+[13F3] (B6)     printDebug.begin()
+[13F5] (B6)     printDebug.msg(sound(0x9FA646B, 0xA) + " ")
+[1409] (43)     VAR_V6_SOUNDMODE = 0
+[140F] (43)     VAR_V6_SOUNDMODE = 2
+[1415] (B6)     printDebug.begin()
+[1417] (B6)     printDebug.msg(sound(0x9FABE98, 0xA) + " ")
+[142B] (43)     VAR_V6_SOUNDMODE = 0
+[1431] (43)     VAR_V6_SOUNDMODE = 2
+[1437] (B6)     printDebug.begin()
+[1439] (B6)     printDebug.msg(sound(0x9FB2345, 0xA) + " ")
+[144D] (43)     VAR_V6_SOUNDMODE = 0
+[1453] (43)     VAR_V6_SOUNDMODE = 2
+[1459] (B6)     printDebug.begin()
+[145B] (B6)     printDebug.msg(sound(0x9FBCCF2, 0xA) + " ")
+[146F] (43)     VAR_V6_SOUNDMODE = 0
+[1475] (43)     VAR_V6_SOUNDMODE = 2
+[147B] (B6)     printDebug.begin()
+[147D] (B6)     printDebug.msg(sound(0x9FC639F, 0xA) + " ")
+[1491] (43)     VAR_V6_SOUNDMODE = 0
+[1497] (43)     VAR_V6_SOUNDMODE = 2
+[149D] (B6)     printDebug.begin()
+[149F] (B6)     printDebug.msg(sound(0x9FC6ECA, 0xA) + " ")
+[14B3] (43)     VAR_V6_SOUNDMODE = 0
+[14B9] (43)     VAR_V6_SOUNDMODE = 2
+[14BF] (B6)     printDebug.begin()
+[14C1] (B6)     printDebug.msg(sound(0x9FCA8B7, 0xA) + " ")
+[14D5] (43)     VAR_V6_SOUNDMODE = 0
+[14DB] (43)     VAR_V6_SOUNDMODE = 2
+[14E1] (B6)     printDebug.begin()
+[14E3] (B6)     printDebug.msg(sound(0x9FD1064, 0xA) + " ")
+[14F7] (43)     VAR_V6_SOUNDMODE = 0
+[14FD] (43)     VAR_V6_SOUNDMODE = 2
+[1503] (B6)     printDebug.begin()
+[1505] (B6)     printDebug.msg(sound(0x9FD484F, 0xA) + " ")
+[1519] (43)     VAR_V6_SOUNDMODE = 0
+[151F] (43)     VAR_V6_SOUNDMODE = 2
+[1525] (B6)     printDebug.begin()
+[1527] (B6)     printDebug.msg(sound(0x9FD893C, 0xA) + " ")
+[153B] (43)     VAR_V6_SOUNDMODE = 0
+[1541] (43)     VAR_V6_SOUNDMODE = 2
+[1547] (B6)     printDebug.begin()
+[1549] (B6)     printDebug.msg(sound(0x9FDD0E9, 0xA) + " ")
+[155D] (43)     VAR_V6_SOUNDMODE = 0
+[1563] (43)     VAR_V6_SOUNDMODE = 2
+[1569] (B6)     printDebug.begin()
+[156B] (B6)     printDebug.msg(sound(0x9FDF5D4, 0xA) + " ")
+[157F] (43)     VAR_V6_SOUNDMODE = 0
+[1585] (43)     VAR_V6_SOUNDMODE = 2
+[158B] (B6)     printDebug.begin()
+[158D] (B6)     printDebug.msg(sound(0x9FE5C81, 0xA) + " ")
+[15A1] (43)     VAR_V6_SOUNDMODE = 0
+[15A7] (43)     VAR_V6_SOUNDMODE = 2
+[15AD] (B6)     printDebug.begin()
+[15AF] (B6)     printDebug.msg(sound(0x9FE8BD2, 0xA) + " ")
+[15C3] (43)     VAR_V6_SOUNDMODE = 0
+[15C9] (43)     VAR_V6_SOUNDMODE = 2
+[15CF] (B6)     printDebug.begin()
+[15D1] (B6)     printDebug.msg(sound(0x9FEEC5F, 0xA) + " ")
+[15E5] (43)     VAR_V6_SOUNDMODE = 0
+[15EB] (43)     VAR_V6_SOUNDMODE = 2
+[15F1] (B6)     printDebug.begin()
+[15F3] (B6)     printDebug.msg(sound(0x9FFE58C, 0xA) + " ")
+[1607] (43)     VAR_V6_SOUNDMODE = 0
+[160D] (43)     VAR_V6_SOUNDMODE = 2
+[1613] (B6)     printDebug.begin()
+[1615] (B6)     printDebug.msg(sound(0xA010BB9, 0xA) + " ")
+[1629] (43)     VAR_V6_SOUNDMODE = 0
+[162F] (43)     VAR_V6_SOUNDMODE = 2
+[1635] (B6)     printDebug.begin()
+[1637] (B6)     printDebug.msg(sound(0xA0158A2, 0xA) + " ")
+[164B] (43)     VAR_V6_SOUNDMODE = 0
+[1651] (43)     VAR_V6_SOUNDMODE = 2
+[1657] (B6)     printDebug.begin()
+[1659] (B6)     printDebug.msg(sound(0xA021C4F, 0xA) + " ")
+[166D] (43)     VAR_V6_SOUNDMODE = 0
+[1673] (43)     VAR_V6_SOUNDMODE = 2
+[1679] (B6)     printDebug.begin()
+[167B] (B6)     printDebug.msg(sound(0xA02657A, 0xA) + " ")
+[168F] (43)     VAR_V6_SOUNDMODE = 0
+[1695] (43)     VAR_V6_SOUNDMODE = 2
+[169B] (B6)     printDebug.begin()
+[169D] (B6)     printDebug.msg(sound(0xA036AA7, 0xA) + " ")
+[16B1] (43)     VAR_V6_SOUNDMODE = 0
+[16B7] (43)     VAR_V6_SOUNDMODE = 2
+[16BD] (B6)     printDebug.begin()
+[16BF] (B6)     printDebug.msg(sound(0xA03E354, 0xA) + " ")
+[16D3] (43)     VAR_V6_SOUNDMODE = 0
+[16D9] (43)     VAR_V6_SOUNDMODE = 2
+[16DF] (B6)     printDebug.begin()
+[16E1] (B6)     printDebug.msg(sound(0xA044381, 0xA) + " ")
+[16F5] (43)     VAR_V6_SOUNDMODE = 0
+[16FB] (43)     VAR_V6_SOUNDMODE = 2
+[1701] (B6)     printDebug.begin()
+[1703] (B6)     printDebug.msg(sound(0xA047BAE, 0xA) + " ")
+[1717] (43)     VAR_V6_SOUNDMODE = 0
+[171D] (43)     VAR_V6_SOUNDMODE = 2
+[1723] (B6)     printDebug.begin()
+[1725] (B6)     printDebug.msg(sound(0xA04FDDB, 0xA) + " ")
+[1739] (43)     VAR_V6_SOUNDMODE = 0
+[173F] (43)     VAR_V6_SOUNDMODE = 2
+[1745] (B6)     printDebug.begin()
+[1747] (B6)     printDebug.msg(sound(0xA05D708, 0xA) + " ")
+[175B] (43)     VAR_V6_SOUNDMODE = 0
+[1761] (43)     VAR_V6_SOUNDMODE = 2
+[1767] (B6)     printDebug.begin()
+[1769] (B6)     printDebug.msg(sound(0xA05F5B5, 0xA) + " ")
+[177D] (43)     VAR_V6_SOUNDMODE = 0
+[1783] (43)     VAR_V6_SOUNDMODE = 2
+[1789] (B6)     printDebug.begin()
+[178B] (B6)     printDebug.msg(sound(0xA064562, 0xA) + " ")
+[179F] (43)     VAR_V6_SOUNDMODE = 0
+[17A5] (43)     VAR_V6_SOUNDMODE = 2
+[17AB] (B6)     printDebug.begin()
+[17AD] (B6)     printDebug.msg(sound(0xA06950F, 0xA) + " ")
+[17C1] (43)     VAR_V6_SOUNDMODE = 0
+[17C7] (43)     VAR_V6_SOUNDMODE = 2
+[17CD] (B6)     printDebug.begin()
+[17CF] (B6)     printDebug.msg(sound(0xA07743C, 0xA) + " ")
+[17E3] (43)     VAR_V6_SOUNDMODE = 0
+[17E9] (43)     VAR_V6_SOUNDMODE = 2
+[17EF] (B6)     printDebug.begin()
+[17F1] (B6)     printDebug.msg(sound(0xA079385, 0xA) + " ")
+[1805] (43)     VAR_V6_SOUNDMODE = 0
+[180B] (73)   } else {
+[180E] (43)     bitvar230 = 1
+[1814] (**)   }
+[1814] (0C)   dup[1] = localvar0
+[1818] (5D)   if (dup[1] == 101) {
+[181F] (43)     VAR_VERB_SCRIPT = 48
+[1826] (7C)     stopScript(var175)
+[182A] (43)     var175 = 51
+[1830] (43)     bitvar6 = 1
+[1836] (5E)     startScript(0,51,[])
+[1840] (7F)     putActorInXY(2,160,160,7)
+[184D] (7F)     putActorInXY(3,0,160,7)
+[185A] (43)     VAR_EGO = 2
+[1860] (79)     actorFollowCamera(VAR_EGO)
+[1864] (84)     pickupObject(221,22)
+[186B] (5D)   } else if (dup[1] == 211) {
+[1876] (43)     VAR_VERB_SCRIPT = 48
+[187D] (7C)     stopScript(var175)
+[1881] (43)     var175 = 51
+[1887] (43)     bitvar6 = 1
+[188D] (5E)     startScript(0,51,[])
+[1897] (7F)     putActorInXY(2,120,190,15)
+[18A4] (7F)     putActorInXY(3,100,190,15)
+[18B1] (43)     VAR_EGO = 2
+[18B7] (84)     pickupObject(63,7)
+[18BE] (84)     pickupObject(70,7)
+[18C5] (84)     pickupObject(95,9)
+[18CC] (43)     bitvar33 = 1
+[18D2] (79)     actorFollowCamera(VAR_EGO)
+[18D6] (5D)   } else if (dup[1] == 212) {
+[18E1] (43)     VAR_VERB_SCRIPT = 48
+[18E8] (7C)     stopScript(var175)
+[18EC] (43)     var175 = 51
+[18F2] (43)     bitvar6 = 1
+[18F8] (5E)     startScript(0,51,[])
+[1902] (7F)     putActorInXY(2,120,190,15)
+[190F] (7F)     putActorInXY(3,100,190,15)
+[191C] (43)     VAR_EGO = 2
+[1922] (84)     pickupObject(63,7)
+[1929] (84)     pickupObject(95,9)
+[1930] (79)     actorFollowCamera(VAR_EGO)
+[1934] (5D)   } else if (dup[1] == 221) {
+[193F] (43)     VAR_VERB_SCRIPT = 48
+[1946] (7C)     stopScript(var175)
+[194A] (43)     var175 = 51
+[1950] (43)     bitvar6 = 1
+[1956] (5E)     startScript(0,51,[])
+[1960] (7F)     putActorInXY(2,120,190,21)
+[196D] (7F)     putActorInXY(3,100,190,21)
+[197A] (43)     VAR_EGO = 2
+[1980] (84)     pickupObject(63,7)
+[1987] (6E)     setClass(63,[6])
+[1991] (84)     pickupObject(95,9)
+[1998] (84)     pickupObject(530,56)
+[199F] (84)     pickupObject(70,7)
+[19A6] (84)     pickupObject(151,16)
+[19AD] (84)     pickupObject(116,11)
+[19B4] (6E)     setClass(116,[134])
+[19BE] (84)     pickupObject(117,11)
+[19C5] (6E)     setClass(117,[134])
+[19CF] (84)     pickupObject(152,16)
+[19D6] (84)     pickupObject(126,11)
+[19DD] (84)     pickupObject(221,22)
+[19E4] (84)     pickupObject(230,23)
+[19EB] (6E)     setClass(221,[131])
+[19F5] (6E)     setClass(140,[6])
+[19FF] (43)     var198 = 3
+[1A05] (5F)     startScriptQuick(17,[2,1025])
+[1A12] (5F)     startScriptQuick(17,[2,1062])
+[1A1F] (43)     bitvar33 = 1
+[1A25] (43)     bitvar32 = 1
+[1A2B] (79)     actorFollowCamera(VAR_EGO)
+[1A2F] (5D)   } else if (dup[1] == 222) {
+[1A3A] (43)     VAR_VERB_SCRIPT = 48
+[1A41] (7C)     stopScript(var175)
+[1A45] (43)     var175 = 51
+[1A4B] (43)     bitvar6 = 1
+[1A51] (5E)     startScript(0,51,[])
+[1A5B] (7F)     putActorInXY(2,120,190,21)
+[1A68] (7F)     putActorInXY(3,100,190,21)
+[1A75] (43)     VAR_EGO = 2
+[1A7B] (84)     pickupObject(530,56)
+[1A82] (84)     pickupObject(210,20)
+[1A89] (84)     pickupObject(63,7)
+[1A90] (84)     pickupObject(95,9)
+[1A97] (84)     pickupObject(151,16)
+[1A9E] (84)     pickupObject(126,11)
+[1AA5] (84)     pickupObject(221,22)
+[1AAC] (84)     pickupObject(70,7)
+[1AB3] (84)     pickupObject(298,30)
+[1ABA] (84)     pickupObject(272,26)
+[1AC1] (84)     pickupObject(176,17)
+[1AC8] (84)     pickupObject(152,16)
+[1ACF] (6E)     setClass(152,[6])
+[1AD9] (84)     pickupObject(322,35)
+[1AE0] (84)     pickupObject(377,40)
+[1AE7] (84)     pickupObject(431,45)
+[1AEE] (84)     pickupObject(269,26)
+[1AF5] (84)     pickupObject(150,16)
+[1AFC] (84)     pickupObject(366,39)
+[1B03] (84)     pickupObject(459,49)
+[1B0A] (84)     pickupObject(242,24)
+[1B11] (84)     pickupObject(127,11)
+[1B18] (84)     pickupObject(572,59)
+[1B1F] (84)     pickupObject(209,20)
+[1B26] (84)     pickupObject(587,62)
+[1B2D] (84)     pickupObject(496,53)
+[1B34] (84)     pickupObject(315,32)
+[1B3B] (6E)     setClass(221,[131])
+[1B45] (43)     bitvar33 = 1
+[1B4B] (43)     bitvar32 = 1
+[1B51] (79)     actorFollowCamera(VAR_EGO)
+[1B55] (5D)   } else if (dup[1] == 223) {
+[1B60] (43)     VAR_VERB_SCRIPT = 48
+[1B67] (7C)     stopScript(var175)
+[1B6B] (43)     var175 = 51
+[1B71] (43)     bitvar6 = 1
+[1B77] (5E)     startScript(0,51,[])
+[1B81] (7F)     putActorInXY(2,120,190,23)
+[1B8E] (7F)     putActorInXY(3,100,190,23)
+[1B9B] (43)     VAR_EGO = 2
+[1BA1] (84)     pickupObject(63,7)
+[1BA8] (84)     pickupObject(95,9)
+[1BAF] (84)     pickupObject(151,16)
+[1BB6] (84)     pickupObject(126,11)
+[1BBD] (84)     pickupObject(221,22)
+[1BC4] (6E)     setClass(221,[131])
+[1BCE] (6E)     setClass(221,[2])
+[1BD8] (43)     bitvar33 = 1
+[1BDE] (43)     bitvar32 = 1
+[1BE4] (79)     actorFollowCamera(VAR_EGO)
+[1BE8] (5D)   } else if (dup[1] == 233) {
+[1BF3] (43)     VAR_VERB_SCRIPT = 48
+[1BFA] (7C)     stopScript(var175)
+[1BFE] (43)     var175 = 51
+[1C04] (43)     bitvar6 = 1
+[1C0A] (5E)     startScript(0,51,[])
+[1C14] (7F)     putActorInXY(2,120,190,16)
+[1C21] (7F)     putActorInXY(3,100,190,16)
+[1C2E] (43)     VAR_EGO = 2
+[1C34] (84)     pickupObject(63,7)
+[1C3B] (84)     pickupObject(95,9)
+[1C42] (43)     bitvar33 = 1
+[1C48] (79)     actorFollowCamera(VAR_EGO)
+[1C4C] (5D)   } else if (dup[1] == 301) {
+[1C57] (43)     VAR_VERB_SCRIPT = 48
+[1C5E] (7C)     stopScript(var175)
+[1C62] (43)     var175 = 51
+[1C68] (43)     bitvar6 = 1
+[1C6E] (5E)     startScript(0,51,[])
+[1C78] (7F)     putActorInXY(2,120,190,35)
+[1C85] (7F)     putActorInXY(3,100,190,35)
+[1C92] (43)     VAR_EGO = 2
+[1C98] (84)     pickupObject(70,7)
+[1C9F] (84)     pickupObject(63,7)
+[1CA6] (84)     pickupObject(95,9)
+[1CAD] (84)     pickupObject(298,30)
+[1CB4] (43)     bitvar33 = 1
+[1CBA] (79)     actorFollowCamera(VAR_EGO)
+[1CBE] (5D)   } else if (dup[1] == 402) {
+[1CC9] (43)     VAR_VERB_SCRIPT = 48
+[1CD0] (7C)     stopScript(var175)
+[1CD4] (43)     var175 = 51
+[1CDA] (43)     bitvar6 = 1
+[1CE0] (5E)     startScript(0,51,[])
+[1CEA] (7F)     putActorInXY(2,120,75,38)
+[1CF7] (7F)     putActorInXY(3,100,75,38)
+[1D04] (43)     VAR_EGO = 2
+[1D0A] (84)     pickupObject(63,7)
+[1D11] (84)     pickupObject(95,9)
+[1D18] (43)     bitvar33 = 1
+[1D1E] (79)     actorFollowCamera(VAR_EGO)
+[1D22] (5D)   } else if (dup[1] == 403) {
+[1D2D] (43)     VAR_VERB_SCRIPT = 48
+[1D34] (7C)     stopScript(var175)
+[1D38] (43)     var175 = 51
+[1D3E] (43)     bitvar6 = 1
+[1D44] (5E)     startScript(0,51,[])
+[1D4E] (7F)     putActorInXY(2,120,75,37)
+[1D5B] (7F)     putActorInXY(3,100,75,37)
+[1D68] (43)     VAR_EGO = 2
+[1D6E] (84)     pickupObject(63,7)
+[1D75] (84)     pickupObject(95,9)
+[1D7C] (43)     bitvar33 = 1
+[1D82] (79)     actorFollowCamera(VAR_EGO)
+[1D86] (5D)   } else if (dup[1] == 404) {
+[1D91] (43)     VAR_VERB_SCRIPT = 48
+[1D98] (7C)     stopScript(var175)
+[1D9C] (43)     var175 = 51
+[1DA2] (43)     bitvar6 = 1
+[1DA8] (5E)     startScript(0,51,[])
+[1DB2] (7F)     putActorInXY(2,120,75,37)
+[1DBF] (7F)     putActorInXY(3,100,75,37)
+[1DCC] (43)     VAR_EGO = 2
+[1DD2] (84)     pickupObject(286,28)
+[1DD9] (84)     pickupObject(63,7)
+[1DE0] (84)     pickupObject(95,9)
+[1DE7] (43)     bitvar33 = 1
+[1DED] (79)     actorFollowCamera(VAR_EGO)
+[1DF1] (5D)   } else if (dup[1] == 405) {
+[1DFC] (43)     VAR_VERB_SCRIPT = 48
+[1E03] (7C)     stopScript(var175)
+[1E07] (43)     var175 = 51
+[1E0D] (43)     bitvar6 = 1
+[1E13] (5E)     startScript(0,51,[])
+[1E1D] (7F)     putActorInXY(2,120,75,39)
+[1E2A] (7F)     putActorInXY(3,100,75,39)
+[1E37] (43)     VAR_EGO = 2
+[1E3D] (84)     pickupObject(95,9)
+[1E44] (84)     pickupObject(286,28)
+[1E4B] (43)     bitvar33 = 1
+[1E51] (79)     actorFollowCamera(VAR_EGO)
+[1E55] (7C)     stopScript(0)
+[1E59] (5D)   } else if (dup[1] == 408) {
+[1E64] (43)     VAR_VERB_SCRIPT = 48
+[1E6B] (7C)     stopScript(var175)
+[1E6F] (43)     var175 = 51
+[1E75] (43)     bitvar6 = 1
+[1E7B] (5E)     startScript(0,51,[])
+[1E85] (7F)     putActorInXY(2,120,75,39)
+[1E92] (7F)     putActorInXY(3,100,75,39)
+[1E9F] (43)     VAR_EGO = 2
+[1EA5] (84)     pickupObject(95,9)
+[1EAC] (84)     pickupObject(178,0)
+[1EB3] (43)     bitvar33 = 1
+[1EB9] (79)     actorFollowCamera(VAR_EGO)
+[1EBD] (5D)   } else if (dup[1] == 409) {
+[1EC8] (43)     VAR_VERB_SCRIPT = 48
+[1ECF] (7C)     stopScript(var175)
+[1ED3] (43)     var175 = 51
+[1ED9] (43)     bitvar6 = 1
+[1EDF] (5E)     startScript(0,51,[])
+[1EE9] (7F)     putActorInXY(2,120,75,37)
+[1EF6] (7F)     putActorInXY(3,100,75,37)
+[1F03] (43)     VAR_EGO = 2
+[1F09] (84)     pickupObject(63,7)
+[1F10] (84)     pickupObject(95,9)
+[1F17] (84)     pickupObject(272,26)
+[1F1E] (84)     pickupObject(496,53)
+[1F25] (84)     pickupObject(530,56)
+[1F2C] (84)     pickupObject(485,52)
+[1F33] (6E)     setClass(530,[6])
+[1F3D] (43)     bitvar33 = 1
+[1F43] (79)     actorFollowCamera(VAR_EGO)
+[1F47] (5D)   } else if (dup[1] == 501) {
+[1F52] (84)     pickupObject(176,17)
+[1F5A] (84)     pickupObject(152,16)
+[1F61] (84)     pickupObject(242,24)
+[1F68] (84)     pickupObject(178,17)
+[1F6F] (6E)     setClass(152,[6])
+[1F79] (43)     VAR_VERB_SCRIPT = 48
+[1F7F] (7C)     stopScript(var175)
+[1F83] (43)     var175 = 51
+[1F89] (43)     bitvar6 = 1
+[1F8F] (5E)     startScript(0,51,[])
+[1F99] (7F)     putActorInXY(2,120,190,27)
+[1FA6] (7F)     putActorInXY(3,100,190,27)
+[1FB3] (43)     VAR_EGO = 2
+[1FB9] (43)     bitvar33 = 1
+[1FBF] (79)     actorFollowCamera(VAR_EGO)
+[1FC3] (5D)   } else if (dup[1] == 503) {
+[1FCE] (43)     VAR_VERB_SCRIPT = 48
+[1FD5] (7C)     stopScript(var175)
+[1FD9] (43)     var175 = 51
+[1FDF] (43)     bitvar6 = 1
+[1FE5] (5E)     startScript(0,51,[])
+[1FEF] (43)     bitvar54 = 1
+[1FF5] (7B)     loadRoom(32)
+[1FF9] (5D)   } else if (dup[1] == 515) {
+[2004] (43)     VAR_VERB_SCRIPT = 48
+[200B] (7C)     stopScript(var175)
+[200F] (43)     var175 = 51
+[2015] (43)     bitvar6 = 1
+[201B] (5E)     startScript(0,51,[])
+[2025] (7B)     loadRoom(31)
+[2029] (7C)     stopScript(0)
+[202D] (5D)   } else if (dup[1] == 516) {
+[2038] (43)     VAR_VERB_SCRIPT = 48
+[203F] (7C)     stopScript(var175)
+[2043] (43)     var175 = 51
+[2049] (43)     bitvar6 = 1
+[204F] (5E)     startScript(0,51,[])
+[2059] (7F)     putActorInXY(2,120,190,30)
+[2066] (7F)     putActorInXY(3,100,190,30)
+[2073] (84)     pickupObject(530,56)
+[207A] (6E)     setClass(297,[18,145])
+[2087] (7B)     loadRoom(31)
+[208B] (7C)     stopScript(0)
+[208F] (5D)   } else if (dup[1] == 517) {
+[209A] (43)     VAR_VERB_SCRIPT = 48
+[20A1] (7C)     stopScript(var175)
+[20A5] (43)     var175 = 51
+[20AB] (43)     bitvar6 = 1
+[20B1] (5E)     startScript(0,51,[])
+[20BB] (6E)     setClass(297,[146,145])
+[20C8] (7B)     loadRoom(78)
+[20CC] (7C)     stopScript(0)
+[20D0] (5D)   } else if (dup[1] == 518) {
+[20DB] (43)     VAR_VERB_SCRIPT = 48
+[20E2] (7C)     stopScript(var175)
+[20E6] (43)     var175 = 51
+[20EC] (43)     bitvar6 = 1
+[20F2] (5E)     startScript(0,51,[])
+[20FC] (7F)     putActorInXY(2,120,190,30)
+[2109] (7F)     putActorInXY(3,100,190,30)
+[2116] (6E)     setClass(297,[146,17])
+[2123] (43)     var244 = 116
+[2129] (7B)     loadRoom(78)
+[212D] (7C)     stopScript(0)
+[2131] (5D)   } else if (dup[1] == 600) {
+[213C] (43)     VAR_VERB_SCRIPT = 48
+[2143] (7C)     stopScript(var175)
+[2147] (43)     var175 = 51
+[214D] (43)     bitvar6 = 1
+[2153] (5E)     startScript(0,51,[])
+[215D] (80)     putActorAtObject(2,244,25)
+[2167] (80)     putActorAtObject(3,244,25)
+[2171] (43)     VAR_EGO = 2
+[2177] (79)     actorFollowCamera(VAR_EGO)
+[217B] (5D)   } else if (dup[1] == 650) {
+[2186] (43)     VAR_VERB_SCRIPT = 48
+[218D] (7C)     stopScript(var175)
+[2191] (43)     var175 = 51
+[2197] (43)     bitvar6 = 1
+[219D] (5E)     startScript(0,51,[])
+[21A7] (84)     pickupObject(322,35)
+[21AE] (43)     bitvar66 = 1
+[21B4] (43)     bitvar67 = 1
+[21BA] (43)     var249 = 3
+[21C0] (43)     var309 = 3
+[21C6] (43)     var310 = 2
+[21CC] (43)     var311 = 1
+[21D2] (43)     var312 = 1
+[21D8] (43)     var313 = 3
+[21DE] (70)     setState(244,1)
+[21E5] (80)     putActorAtObject(2,244,25)
+[21EF] (43)     VAR_EGO = 2
+[21F5] (79)     actorFollowCamera(VAR_EGO)
+[21F9] (5D)   } else if (dup[1] == 651) {
+[2204] (43)     bitvar14 = 1
+[220B] (70)     setState(85,1)
+[2212] (6E)     setClass(85,[32])
+[221C] (84)     pickupObject(322,35)
+[2223] (84)     pickupObject(259,25)
+[222A] (43)     bitvar66 = 1
+[2230] (43)     bitvar67 = 1
+[2236] (43)     var249 = 2
+[223C] (43)     var309 = 2
+[2242] (43)     var310 = 2
+[2248] (43)     var311 = 2
+[224E] (43)     var312 = 2
+[2254] (43)     var313 = 1
+[225A] (80)     putActorAtObject(2,244,25)
+[2264] (43)     VAR_EGO = 2
+[226A] (79)     actorFollowCamera(VAR_EGO)
+[226E] (5D)   } else if (dup[1] == 652) {
+[2279] (84)     pickupObject(322,35)
+[2281] (84)     pickupObject(126,11)
+[2288] (84)     pickupObject(259,25)
+[228F] (84)     pickupObject(152,16)
+[2296] (84)     pickupObject(176,17)
+[229D] (84)     pickupObject(242,24)
+[22A4] (84)     pickupObject(178,17)
+[22AB] (84)     pickupObject(63,7)
+[22B2] (84)     pickupObject(298,30)
+[22B9] (84)     pickupObject(221,22)
+[22C0] (84)     pickupObject(95,9)
+[22C7] (84)     pickupObject(70,7)
+[22CE] (84)     pickupObject(210,20)
+[22D5] (84)     pickupObject(151,16)
+[22DC] (84)     pickupObject(176,17)
+[22E3] (84)     pickupObject(272,26)
+[22EA] (6E)     setClass(272,[160,29,7,12,18])
+[2300] (43)     VAR_VERB_SCRIPT = 48
+[2306] (7C)     stopScript(var175)
+[230A] (43)     var175 = 51
+[2310] (43)     bitvar6 = 1
+[2316] (5E)     startScript(0,51,[])
+[2320] (43)     bitvar33 = 1
+[2326] (43)     bitvar32 = 1
+[232C] (43)     bitvar66 = 1
+[2332] (43)     bitvar67 = 0
+[2338] (43)     bitvar66 = 1
+[233E] (43)     var249 = 2
+[2344] (80)     putActorAtObject(2,240,24)
+[234E] (80)     putActorAtObject(3,240,24)
+[2358] (43)     VAR_EGO = 2
+[235E] (79)     actorFollowCamera(VAR_EGO)
+[2362] (5D)   } else if (dup[1] == 701) {
+[236D] (84)     pickupObject(70,7)
+[2375] (84)     pickupObject(63,7)
+[237C] (84)     pickupObject(95,9)
+[2383] (43)     VAR_VERB_SCRIPT = 48
+[2389] (7C)     stopScript(var175)
+[238D] (43)     var175 = 51
+[2393] (43)     bitvar6 = 1
+[2399] (5E)     startScript(0,51,[])
+[23A3] (7F)     putActorInXY(2,120,200,12)
+[23B0] (7F)     putActorInXY(3,100,200,12)
+[23BD] (43)     VAR_EGO = 2
+[23C3] (79)     actorFollowCamera(VAR_EGO)
+[23C7] (5D)   } else if (dup[1] == 711) {
+[23D2] (84)     pickupObject(70,7)
+[23DA] (84)     pickupObject(152,16)
+[23E1] (43)     VAR_VERB_SCRIPT = 48
+[23E7] (7C)     stopScript(var175)
+[23EB] (43)     var175 = 51
+[23F1] (43)     bitvar6 = 1
+[23F7] (5E)     startScript(0,51,[])
+[2401] (7F)     putActorInXY(2,120,200,12)
+[240E] (7F)     putActorInXY(3,100,200,12)
+[241B] (43)     VAR_EGO = 2
+[2421] (79)     actorFollowCamera(VAR_EGO)
+[2425] (5D)   } else if (dup[1] == 911) {
+[2430] (43)     VAR_VERB_SCRIPT = 48
+[2437] (7C)     stopScript(var175)
+[243B] (43)     var175 = 51
+[2441] (43)     bitvar6 = 1
+[2447] (5E)     startScript(0,51,[])
+[2451] (84)     pickupObject(377,40)
+[2458] (84)     pickupObject(269,26)
+[245F] (84)     pickupObject(150,16)
+[2466] (84)     pickupObject(366,39)
+[246D] (7F)     putActorInXY(2,120,200,41)
+[247A] (7F)     putActorInXY(3,100,200,41)
+[2487] (43)     VAR_EGO = 2
+[248D] (79)     actorFollowCamera(VAR_EGO)
+[2491] (5D)   } else if (dup[1] == 1001) {
+[249C] (43)     VAR_VERB_SCRIPT = 48
+[24A3] (7C)     stopScript(var175)
+[24A7] (43)     var175 = 51
+[24AD] (43)     bitvar6 = 1
+[24B3] (5E)     startScript(0,51,[])
+[24BD] (84)     pickupObject(70,7)
+[24C4] (84)     pickupObject(242,24)
+[24CB] (84)     pickupObject(152,16)
+[24D2] (84)     pickupObject(547,57)
+[24D9] (6E)     setClass(152,[6])
+[24E3] (80)     putActorAtObject(2,388,42)
+[24ED] (80)     putActorAtObject(3,388,42)
+[24F7] (43)     VAR_EGO = 2
+[24FD] (79)     actorFollowCamera(VAR_EGO)
+[2501] (5D)   } else if (dup[1] == 1002) {
+[250C] (43)     VAR_VERB_SCRIPT = 48
+[2513] (7C)     stopScript(var175)
+[2517] (43)     var175 = 51
+[251D] (43)     bitvar6 = 1
+[2523] (5E)     startScript(0,51,[])
+[252D] (84)     pickupObject(242,24)
+[2534] (84)     pickupObject(152,16)
+[253B] (84)     pickupObject(459,49)
+[2542] (6E)     setClass(152,[6])
+[254C] (80)     putActorAtObject(2,388,42)
+[2556] (80)     putActorAtObject(3,388,42)
+[2560] (43)     VAR_EGO = 2
+[2566] (79)     actorFollowCamera(VAR_EGO)
+[256A] (5D)   } else if (dup[1] == 1050) {
+[2575] (43)     VAR_VERB_SCRIPT = 48
+[257C] (7C)     stopScript(var175)
+[2580] (43)     var175 = 51
+[2586] (43)     bitvar6 = 1
+[258C] (5E)     startScript(0,51,[])
+[2596] (84)     pickupObject(242,24)
+[259D] (84)     pickupObject(152,16)
+[25A4] (6E)     setClass(152,[6])
+[25AE] (80)     putActorAtObject(2,427,45)
+[25B8] (80)     putActorAtObject(3,427,45)
+[25C2] (43)     VAR_EGO = 2
+[25C8] (79)     actorFollowCamera(VAR_EGO)
+[25CC] (5D)   } else if (dup[1] == 1107) {
+[25D7] (5F)     startScriptQuick(17,[2,1032])
+[25E5] (43)     VAR_VERB_SCRIPT = 48
+[25EB] (7C)     stopScript(var175)
+[25EF] (43)     var175 = 51
+[25F5] (43)     bitvar6 = 1
+[25FB] (5E)     startScript(0,51,[])
+[2605] (84)     pickupObject(127,11)
+[260C] (84)     pickupObject(135,12)
+[2613] (84)     pickupObject(572,59)
+[261A] (84)     pickupObject(209,20)
+[2621] (84)     pickupObject(587,62)
+[2628] (84)     pickupObject(431,45)
+[262F] (84)     pickupObject(272,26)
+[2636] (84)     pickupObject(242,24)
+[263D] (84)     pickupObject(152,16)
+[2644] (6E)     setClass(152,[6])
+[264E] (7F)     putActorInXY(2,160,160,51)
+[265B] (7F)     putActorInXY(3,180,160,51)
+[2668] (43)     VAR_EGO = 2
+[266E] (79)     actorFollowCamera(VAR_EGO)
+[2672] (5D)   } else if (dup[1] == 1113) {
+[267D] (43)     VAR_VERB_SCRIPT = 48
+[2684] (7C)     stopScript(var175)
+[2688] (43)     var175 = 51
+[268E] (43)     bitvar6 = 1
+[2694] (5E)     startScript(0,51,[])
+[269E] (84)     pickupObject(135,12)
+[26A5] (84)     pickupObject(272,26)
+[26AC] (84)     pickupObject(242,24)
+[26B3] (84)     pickupObject(152,16)
+[26BA] (84)     pickupObject(209,20)
+[26C1] (6E)     setClass(209,[134])
+[26CB] (6E)     setClass(209,[135])
+[26D5] (6E)     setClass(209,[145])
+[26DF] (6E)     setClass(152,[6])
+[26E9] (43)     bitvar95 = 1
+[26EF] (7F)     putActorInXY(2,160,160,56)
+[26FC] (7F)     putActorInXY(3,180,160,56)
+[2709] (43)     VAR_EGO = 2
+[270F] (79)     actorFollowCamera(VAR_EGO)
+[2713] (5D)   } else if (dup[1] == 1150) {
+[271E] (43)     VAR_VERB_SCRIPT = 48
+[2725] (7C)     stopScript(var175)
+[2729] (43)     var175 = 51
+[272F] (43)     bitvar6 = 1
+[2735] (5E)     startScript(0,51,[])
+[273F] (84)     pickupObject(530,56)
+[2746] (6E)     setClass(530,[6])
+[2750] (84)     pickupObject(571,59)
+[2757] (84)     pickupObject(548,57)
+[275E] (84)     pickupObject(272,26)
+[2765] (6E)     setClass(272,[157])
+[276F] (84)     pickupObject(428,45)
+[2776] (43)     bitvar76 = 0
+[277C] (7F)     putActorInXY(2,160,160,54)
+[2789] (7F)     putActorInXY(3,180,160,54)
+[2796] (43)     VAR_EGO = 2
+[279C] (79)     actorFollowCamera(VAR_EGO)
+[27A0] (5D)   } else if (dup[1] == 1199) {
+[27AB] (43)     VAR_VERB_SCRIPT = 48
+[27B2] (7C)     stopScript(var175)
+[27B6] (43)     var175 = 51
+[27BC] (43)     bitvar6 = 1
+[27C2] (5E)     startScript(0,51,[])
+[27CC] (7F)     putActorInXY(2,160,160,51)
+[27D9] (7F)     putActorInXY(3,180,160,51)
+[27E6] (84)     pickupObject(127,11)
+[27ED] (84)     pickupObject(209,20)
+[27F4] (84)     pickupObject(315,32)
+[27FB] (84)     pickupObject(272,26)
+[2802] (84)     pickupObject(496,53)
+[2809] (6E)     setClass(496,[6])
+[2813] (84)     pickupObject(152,16)
+[281A] (6E)     setClass(152,[6])
+[2824] (84)     pickupObject(242,24)
+[282B] (6E)     setClass(102,[147])
+[2835] (6E)     setClass(107,[147])
+[283F] (6E)     setClass(103,[147])
+[2849] (6E)     setClass(104,[147])
+[2853] (6E)     setClass(105,[147])
+[285D] (6E)     setClass(108,[147])
+[2867] (6E)     setClass(106,[147])
+[2871] (43)     VAR_EGO = 2
+[2877] (79)     actorFollowCamera(VAR_EGO)
+[287B] (5D)   } else if (dup[1] == 1210) {
+[2886] (43)     VAR_VERB_SCRIPT = 48
+[288D] (7C)     stopScript(var175)
+[2891] (43)     var175 = 51
+[2897] (43)     bitvar6 = 1
+[289D] (5E)     startScript(0,51,[])
+[28A7] (84)     pickupObject(242,24)
+[28AE] (84)     pickupObject(315,32)
+[28B5] (84)     pickupObject(408,44)
+[28BC] (43)     bitvar76 = 0
+[28C2] (7F)     putActorInXY(2,120,200,58)
+[28CF] (7F)     putActorInXY(3,100,200,58)
+[28DC] (43)     VAR_EGO = 2
+[28E2] (79)     actorFollowCamera(VAR_EGO)
+[28E6] (5D)   } else if (dup[1] == 1290) {
+[28F1] (43)     VAR_VERB_SCRIPT = 48
+[28F8] (7C)     stopScript(var175)
+[28FC] (43)     var175 = 51
+[2902] (43)     bitvar6 = 1
+[2908] (5E)     startScript(0,51,[])
+[2912] (43)     bitvar76 = 0
+[2918] (7F)     putActorInXY(2,120,200,58)
+[2925] (7F)     putActorInXY(3,100,200,58)
+[2932] (43)     VAR_EGO = 2
+[2938] (7B)     loadRoom(89)
+[293C] (5D)   } else if (dup[1] == 1301) {
+[2947] (84)     pickupObject(152,16)
+[294F] (43)     VAR_VERB_SCRIPT = 48
+[2955] (7C)     stopScript(var175)
+[2959] (43)     var175 = 51
+[295F] (43)     bitvar6 = 1
+[2965] (5E)     startScript(0,51,[])
+[296F] (43)     bitvar76 = 0
+[2975] (7F)     putActorInXY(2,120,200,57)
+[2982] (7F)     putActorInXY(3,100,200,57)
+[298F] (43)     VAR_EGO = 2
+[2995] (79)     actorFollowCamera(VAR_EGO)
+[2999] (5D)   } else if (dup[1] == 1400) {
+[29A4] (43)     VAR_VERB_SCRIPT = 48
+[29AB] (7C)     stopScript(var175)
+[29AF] (43)     var175 = 51
+[29B5] (43)     bitvar6 = 1
+[29BB] (5E)     startScript(0,51,[])
+[29C5] (7F)     putActorInXY(2,100,180,55)
+[29D2] (7F)     putActorInXY(3,100,190,55)
+[29DF] (43)     VAR_EGO = 2
+[29E5] (79)     actorFollowCamera(VAR_EGO)
+[29E9] (5D)   } else if (dup[1] == 1410) {
+[29F4] (43)     VAR_VERB_SCRIPT = 48
+[29FB] (7C)     stopScript(var175)
+[29FF] (43)     var175 = 51
+[2A05] (43)     bitvar6 = 1
+[2A0B] (5E)     startScript(0,51,[])
+[2A15] (84)     pickupObject(272,26)
+[2A1C] (6E)     setClass(272,[157])
+[2A26] (6E)     setClass(482,[6])
+[2A30] (6E)     setClass(152,[6])
+[2A3A] (84)     pickupObject(152,16)
+[2A41] (84)     pickupObject(571,59)
+[2A48] (84)     pickupObject(242,24)
+[2A4F] (84)     pickupObject(150,16)
+[2A56] (84)     pickupObject(322,35)
+[2A5D] (84)     pickupObject(548,57)
+[2A64] (84)     pickupObject(428,45)
+[2A6B] (7F)     putActorInXY(2,90,90,54)
+[2A78] (7F)     putActorInXY(3,90,90,54)
+[2A85] (43)     VAR_EGO = 2
+[2A8B] (79)     actorFollowCamera(VAR_EGO)
+[2A8F] (5D)   } else if (dup[1] == 1420) {
+[2A9A] (6E)     setClass(105,[147])
+[2AA5] (6E)     setClass(106,[147])
+[2AAF] (6E)     setClass(107,[147])
+[2AB9] (6E)     setClass(104,[147])
+[2AC3] (6E)     setClass(103,[147])
+[2ACD] (6E)     setClass(102,[147])
+[2AD7] (6E)     setClass(108,[147])
+[2AE1] (6E)     setClass(110,[147])
+[2AEB] (6E)     setClass(109,[147])
+[2AF5] (43)     VAR_VERB_SCRIPT = 48
+[2AFB] (7C)     stopScript(var175)
+[2AFF] (43)     var175 = 51
+[2B05] (43)     bitvar6 = 1
+[2B0B] (5E)     startScript(0,51,[])
+[2B15] (7B)     loadRoom(86)
+[2B19] (5D)   } else if (dup[1] == 1425) {
+[2B24] (6E)     setClass(105,[147])
+[2B2F] (6E)     setClass(106,[147])
+[2B39] (6E)     setClass(107,[147])
+[2B43] (6E)     setClass(104,[147])
+[2B4D] (6E)     setClass(103,[147])
+[2B57] (6E)     setClass(102,[147])
+[2B61] (6E)     setClass(108,[147])
+[2B6B] (6E)     setClass(110,[147])
+[2B75] (6E)     setClass(109,[147])
+[2B7F] (43)     VAR_VERB_SCRIPT = 48
+[2B85] (7C)     stopScript(var175)
+[2B89] (43)     var175 = 51
+[2B8F] (43)     bitvar6 = 1
+[2B95] (5E)     startScript(0,51,[])
+[2B9F] (7B)     loadRoom(54)
+[2BA3] (7B)     loadRoom(51)
+[2BA7] (5D)   } else if (dup[1] == 1430) {
+[2BB2] (43)     VAR_VERB_SCRIPT = 48
+[2BB9] (7C)     stopScript(var175)
+[2BBD] (43)     var175 = 51
+[2BC3] (43)     bitvar6 = 1
+[2BC9] (5E)     startScript(0,51,[])
+[2BD3] (7B)     loadRoom(90)
+[2BD7] (7C)     stopScript(0)
+[2BDB] (5D)   } else if (dup[1] == 1501) {
+[2BE6] (43)     VAR_VERB_SCRIPT = 48
+[2BED] (7C)     stopScript(var175)
+[2BF1] (43)     var175 = 51
+[2BF7] (43)     bitvar6 = 1
+[2BFD] (5E)     startScript(0,51,[])
+[2C07] (7B)     loadRoom(66)
+[2C0B] (5D)   } else if (dup[1] == 1502) {
+[2C16] (43)     VAR_VERB_SCRIPT = 48
+[2C1D] (7C)     stopScript(var175)
+[2C21] (43)     var175 = 51
+[2C27] (43)     bitvar6 = 1
+[2C2D] (5E)     startScript(0,51,[])
+[2C37] (7B)     loadRoom(84)
+[2C3B] (5D)   } else if (dup[1] == 1503) {
+[2C46] (43)     VAR_VERB_SCRIPT = 48
+[2C4D] (7C)     stopScript(var175)
+[2C51] (43)     var175 = 51
+[2C57] (43)     bitvar6 = 1
+[2C5D] (5E)     startScript(0,51,[])
+[2C67] (43)     VAR_SCROLL_SCRIPT = 0
+[2C6D] (7B)     loadRoom(68)
+[2C71] (7C)     stopScript(0)
+[2C75] (5D)   } else if (dup[1] == 1505) {
+[2C80] (5D)   } else if (dup[1] == 1506) {
+[2C8C] (43)     VAR_VERB_SCRIPT = 48
+[2C93] (7C)     stopScript(var175)
+[2C97] (43)     var175 = 51
+[2C9D] (43)     bitvar6 = 1
+[2CA3] (5E)     startScript(0,51,[])
+[2CAD] (43)     VAR_SCROLL_SCRIPT = 0
+[2CB3] (43)     bitvar223 = 1
+[2CB9] (7B)     loadRoom(71)
+[2CBD] (5D)   } else if (dup[1] == 2000) {
+[2CC8] (43)     bitvar223 = 1
+[2CCF] (7B)     loadRoom(1)
+[2CD3] (5D)   } else if (dup[1] == -1) {
+[2CDE] (43)     bitvar223 = 1
+[2CE5] (7B)     loadRoom(1)
+[2CE9] (73)     /* jump 2ced; */
+[2CEC] (**)   }
+[2CEC] (9C)   roomOps.setScreen(0,200)
+[2CF5] (73) } else {
+[2CF8] (5D)   if (localvar0 == -1) {
+[2D02] (43)     bitvar230 = 1
+[2D08] (73)   } else {
+[2D0B] (43)     bitvar230 = 0
+[2D11] (**)   }
+[2D11] (43)   bitvar223 = 1
+[2D17] (7B)   loadRoom(1)
+[2D1B] (**) }
+[2D1B] (66) stopObjectCodeB()
+END

@@ -1,0 +1,97 @@
+; Inngangsskriptet til rom 53 (ENCD)
+
+[0000] (9B) resourceRoutines.lockCostume(265)
+[0006] (9B) resourceRoutines.loadCostume(265)
+[0008] (9B) resourceRoutines.lockCostume(266)
+[000E] (9B) resourceRoutines.loadCostume(266)
+[0010] (9B) resourceRoutines.lockCostume(267)
+[0016] (9B) resourceRoutines.loadCostume(267)
+[0018] (9B) resourceRoutines.lockSound(70)
+[001E] (9B) resourceRoutines.loadSound(70)
+[0020] (9B) resourceRoutines.lockSound(71)
+[0026] (9B) resourceRoutines.loadSound(71)
+[0028] (9B) resourceRoutines.lockSound(72)
+[002E] (9B) resourceRoutines.loadSound(72)
+[0030] (9B) resourceRoutines.lockSound(73)
+[0036] (9B) resourceRoutines.loadSound(73)
+[0038] (9B) resourceRoutines.lockCostume(264)
+[003E] (9B) resourceRoutines.loadCostume(264)
+[0040] (9B) resourceRoutines.lockScript(104)
+[0046] (9B) resourceRoutines.loadScript(104)
+[0048] (9B) resourceRoutines.lockScript(105)
+[004E] (9B) resourceRoutines.loadScript(105)
+[0050] (9B) resourceRoutines.lockScript(106)
+[0056] (9B) resourceRoutines.loadScript(106)
+[0058] (43) var151 = 1
+[005E] (9D) actorOps.setCurActor(4)
+[0063] (9D) actorOps.init()
+[0065] (9D) actorOps.setCostume(267)
+[006A] (9D) actorOps.setIgnoreBoxes()
+[006C] (9D) actorOps.setNeverZClip()
+[006E] (9D) actorOps.setTalkColor(33)
+[0073] (9D) actorOps.setTalkPos(0,-100)
+[007B] (9D) actorOps.setElevation(-10)
+[0080] (9D) actorOps.setScale(255)
+[0085] (47) array184[4] = 205
+[008E] (47) array185[4] = 113
+[0097] (47) array186[4] = 185
+[00A0] (6E) setClass(4,[146])
+[00AA] (9D) actorOps.setCurActor(5)
+[00AF] (9D) actorOps.init()
+[00B1] (9D) actorOps.setCostume(266)
+[00B6] (9D) actorOps.setIgnoreBoxes()
+[00B8] (9D) actorOps.setAlwayZClip(1)
+[00BD] (9D) actorOps.setTalkColor(32)
+[00C2] (9D) actorOps.setTalkPos(0,-120)
+[00CA] (9D) actorOps.setScale(255)
+[00CF] (47) array184[5] = 206
+[00D8] (47) array185[5] = 115
+[00E1] (47) array186[5] = 173
+[00EA] (9D) actorOps.setCurActor(6)
+[00EF] (9D) actorOps.init()
+[00F1] (9D) actorOps.setCostume(265)
+[00F6] (9D) actorOps.setIgnoreBoxes()
+[00F8] (9D) actorOps.setAlwayZClip(1)
+[00FD] (9D) actorOps.setTalkColor(34)
+[0102] (9D) actorOps.setScale(255)
+[0107] (47) array184[6] = 207
+[0110] (7F) putActorInXY(4,65,172,53)
+[011D] (47) array185[6] = 378
+[0126] (47) array186[6] = 195
+[012F] (82) animateActor(4,250)
+[0136] (7F) putActorInXY(5,220,180,53)
+[0143] (82) animateActor(5,250)
+[014A] (7F) putActorInXY(6,425,164,53)
+[0157] (82) animateActor(6,250)
+[015E] (43) var194 = 210
+[0164] (5E) startScript(1,220,[])
+[016E] (5D) if (bitvar94) {
+[0174] (5E)   startScript(0,204,[])
+[017E] (7C)   stopScript(0)
+[0182] (**) }
+[0182] (5D) if (bitvar95) {
+[0188] (43)   bitvar86 = 1
+[018E] (43)   bitvar97 = 1
+[0194] (5E)   startScript(1,201,[])
+[019E] (73) } else {
+[01A1] (5D)   if (var166 == 56) {
+[01AB] (5D)     if (bitvar222) {
+[01B1] (AC)       soundKludge([14,78,0,1,0,30])
+[01C7] (**)     }
+[01C7] (**)   }
+[01C7] (9D)   actorOps.setCurActor(2)
+[01CC] (9D)   actorOps.setCostume(4)
+[01D1] (9D)   actorOps.setCurActor(3)
+[01D6] (9D)   actorOps.setCostume(5)
+[01DB] (5E)   startScript(0,203,[])
+[01E5] (**) }
+[01E5] (5D) if (!bitvar96) {
+[01EC] (5E)   startScript(0,200,[])
+[01F6] (73) } else {
+[01F9] (5E)   startScript(1,219,[])
+[0203] (5E)   startScript(1,212,[])
+[020D] (5E)   startScript(1,209,[])
+[0217] (5E)   startScript(1,208,[])
+[0221] (**) }
+[0221] (65) stopObjectCodeA()
+END

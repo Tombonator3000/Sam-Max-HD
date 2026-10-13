@@ -1,0 +1,17 @@
+; Lokalt skript 202 i rom 53 (LSCR)
+
+Script# 202
+[0000] (68) beginCutscene([2])
+[0007] (B3) stopSentence()
+[0008] (82) animateActor(2,255)
+[000F] (BA) talkActor(sound(0x83F114F, 0xA) + "STOP!" + startAnim(6),4)
+[002D] (99) setBoxFlags([1,2,3,4,5,6,7,8,9],8)
+[004F] (7E) walkActorTo(2,array185[4],array186[4])
+[005F] (A9) wait.waitForActor(-7,2)
+[0066] (A9) wait.waitForMessage()
+[0068] (BA) talkActor(sound(0x83F463A, 0xA) + "Sorry, hon, only yeti elders are allowed in the pool area.",4)
+[00B7] (A9) wait.waitForMessage()
+[00B9] (99) setBoxFlags([1,2,3,4,5,6,7,8,9],0)
+[00DB] (67) endCutscene()
+[00DC] (66) stopObjectCodeB()
+END

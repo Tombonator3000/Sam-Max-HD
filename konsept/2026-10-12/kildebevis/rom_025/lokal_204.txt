@@ -1,0 +1,29 @@
+; Lokalt skript 204 i rom 25 (LSCR)
+
+Script# 204
+[0000] (5D) if (!(VAR_VERB_SCRIPT == 60)) {
+[000B] (43)   localvar0 = getRandomNumber(6)
+[0012] (0C)   dup[1] = localvar0
+[0016] (5D)   if (dup[1] == 1) {
+[001D] (BA)     talkActor(sound(0x8EE64E0, 0xA) + "I'M SCARED, SAM!",3)
+[0043] (5D)   } else if (dup[1] == 2) {
+[004E] (BA)     talkActor(sound(0x8EEDF4B, 0xA) + "Nice alligators^Do you like roaches?",3)
+[0088] (5D)   } else if (dup[1] == 3) {
+[0093] (BA)     talkActor(sound(0x8EFF7F6, 0xA) + "GET ME THE HELL OUT OF HERE!!!!!",3)
+[00C9] (5D)   } else if (dup[1] == 4) {
+[00D4] (BA)     talkActor(sound(0x8F0A521, 0xA) + "FORE!",3)
+[00EF] (5D)   } else if (dup[1] == 5) {
+[00FA] (BA)     talkActor(sound(0x8F0E40C, 0xA) + "NYA NYA, CAN'T DUNK ME!!!",3)
+[0129] (5D)   } else if (dup[1] == 6) {
+[0134] (BA)     talkActor(sound(0x8F197B7, 0xA) + "I HATE COUNTRY MUSIC!!!",3)
+[0161] (73)     /* jump 165; */
+[0164] (**)   }
+[0164] (**) }
+[0165] (A9) wait.waitForMessage()
+[0167] (43) var170 = (20 - 10)
+[0171] (43) var170 = (getRandomNumber(var170) + 10)
+[017C] (43) localvar0 = var170
+[0182] (B1) delaySeconds(localvar0)
+[0186] (73) jump 0
+[0189] (66) stopObjectCodeB()
+END

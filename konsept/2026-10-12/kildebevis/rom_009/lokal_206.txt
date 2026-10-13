@@ -1,0 +1,19 @@
+; Lokalt skript 206 i rom 9 (LSCR)
+
+Script# 206
+[0000] (99) setBoxFlags([16],0)
+[000A] (99) setBoxFlags([17],0)
+[0014] (7F) putActorInXY(8,217,118,9)
+[0021] (9D) actorOps.setCurActor(8)
+[0026] (9D) actorOps.init()
+[0028] (9D) actorOps.setCostume(49)
+[002D] (9D) actorOps.setWalkSpeed(10,4)
+[0035] (9D) actorOps.setScale(155)
+[003A] (7E) walkActorTo(8,330,140)
+[0044] (A9) wait.waitForActor(-7,8)
+[004B] (7F) putActorInXY(8,0,0,0)
+[0058] (43) bitvar16 = 1
+[005E] (99) setBoxFlags([16],128)
+[0068] (99) setBoxFlags([17],128)
+[0072] (66) stopObjectCodeB()
+END

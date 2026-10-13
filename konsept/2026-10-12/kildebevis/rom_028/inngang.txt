@@ -1,0 +1,60 @@
+; Inngangsskriptet til rom 28 (ENCD)
+
+[0000] (9B) resourceRoutines.lockCostume(148)
+[0006] (9B) resourceRoutines.loadCostume(148)
+[0008] (9B) resourceRoutines.lockCostume(149)
+[000E] (9B) resourceRoutines.loadCostume(149)
+[0010] (9B) resourceRoutines.lockCostume(150)
+[0016] (9B) resourceRoutines.loadCostume(150)
+[0018] (9B) resourceRoutines.lockCostume(151)
+[001E] (9B) resourceRoutines.loadCostume(151)
+[0020] (9B) resourceRoutines.lockCostume(152)
+[0026] (9B) resourceRoutines.loadCostume(152)
+[0028] (43) VAR_V6_SOUNDMODE = 2
+[002E] (B6) printDebug.begin()
+[0030] (B6) printDebug.msg(sound(0x9F8725D, 0xA) + " ")
+[0044] (43) VAR_V6_SOUNDMODE = 0
+[004A] (43) VAR_V6_SOUNDMODE = 2
+[0050] (B6) printDebug.begin()
+[0052] (B6) printDebug.msg(sound(0x9F6A87F, 0xA) + " ")
+[0066] (43) VAR_V6_SOUNDMODE = 0
+[006C] (43) VAR_V6_SOUNDMODE = 2
+[0072] (B6) printDebug.begin()
+[0074] (B6) printDebug.msg(sound(0x9EDA99C, 0xA) + " ")
+[0088] (43) VAR_V6_SOUNDMODE = 0
+[008E] (43) VAR_V6_SOUNDMODE = 2
+[0094] (B6) printDebug.begin()
+[0096] (B6) printDebug.msg(sound(0x9EF59CB, 0xA) + " ")
+[00AA] (43) VAR_V6_SOUNDMODE = 0
+[00B0] (43) VAR_V6_SOUNDMODE = 2
+[00B6] (B6) printDebug.begin()
+[00B8] (B6) printDebug.msg(sound(0x9EEF5B7, 0xA) + " ")
+[00CC] (43) VAR_V6_SOUNDMODE = 0
+[00D2] (43) VAR_V6_SOUNDMODE = 2
+[00D8] (B6) printDebug.begin()
+[00DA] (B6) printDebug.msg(sound(0x9E21292, 0xA) + " ")
+[00EE] (43) VAR_V6_SOUNDMODE = 0
+[00F4] (9D) actorOps.setCurActor(4)
+[00F9] (9D) actorOps.init()
+[00FB] (9D) actorOps.setCostume(148)
+[0100] (9D) actorOps.setIgnoreBoxes()
+[0102] (9D) actorOps.setNeverZClip()
+[0104] (9D) actorOps.setTalkColor(222)
+[0109] (9D) actorOps.setTalkPos(0,-100)
+[0111] (7F) putActorInXY(4,66,131,28)
+[011E] (82) animateActor(4,250)
+[0125] (47) array184[4] = 204
+[012E] (47) array185[4] = 120
+[0137] (47) array186[4] = 130
+[0140] (43) var194 = 203
+[0146] (5E) startScript(1,209,[])
+[0150] (5D) if (isAnyOf(var166,[34,33])) {
+[0160] (5E)   startScript(0,201,[])
+[016A] (7C)   stopScript(0)
+[016E] (**) }
+[016E] (5D) if (!bitvar67) {
+[0175] (5E)   startScript(1,200,[])
+[017F] (**) }
+[017F] (5E) startScript(1,208,[])
+[0189] (65) stopObjectCodeA()
+END
