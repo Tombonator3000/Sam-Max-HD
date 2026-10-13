@@ -1,0 +1,7 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,shutil,subprocess,json
+b=Path.cwd();r=b/'rapporter/bestilling019-20261013';j=b/'jobber/obj823_01/resultat.png';shutil.copy2(j,r/'obj823_01-pivot-kandidat04.png');shutil.copy2(r/'obj823_01-pivot-kandidat03.png',j)
+old=np.array(Image.open(r/'obj823_01-resultat02.png'));new=np.array(Image.open(j));outside=np.ones(old.shape[:2],bool);outside[306:366,482:542]=False;assert np.array_equal(old[outside],new[outside])
+p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(j)],capture_output=True,text=True);(r/'obj823_01-kontroll.txt').write_text(p.stdout+p.stderr);print(p.stdout)
+d=json.loads((r/'b-lokalretting.json').read_text());d['obj823_01']={'rektangel':[482,306,60,60],'resten_byteidentisk':True,'forsok':3,'forkastet_forsok':4,'arsak':'Forsøk4 ga tydelig grønn rektangelsøm; forsøk3 valgte delvis skjult smal gul form og bedre kontinuitet.'};(r/'b-lokalretting.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')

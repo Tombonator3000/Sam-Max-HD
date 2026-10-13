@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,shutil,subprocess,json
+b=Path.cwd();r=b/'rapporter/bestilling019-20261013';j=b/'jobber/obj823_01/resultat.png';shutil.copy2(j,r/'obj823_01-resultat02.png')
+shutil.copy2("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-375aaf04-8ea3-433b-a77d-f9103f85d8fd.png",r/'obj823_01-raa03.png');shutil.copy2("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-34a674dd-7b36-4e71-80b7-9999eac67c24.png",r/'obj823_01-raa04.png')
+a=Image.open(j).convert('RGB');old=np.array(a);p=Image.open(r/'obj823_01-raa04.png').convert('RGB').resize((60,60),Image.Resampling.LANCZOS);box=(501,324,531,346);a.paste(p.crop((19,18,49,40)),box[:2]);a.save(j);new=np.array(a);outside=np.ones(old.shape[:2],bool);outside[324:346,501:531]=False;assert np.array_equal(old[outside],new[outside])
+p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(j)],capture_output=True,text=True);(r/'obj823_01-kontroll.txt').write_text(p.stdout+p.stderr);print(p.stdout)
+(r/'b-lokalretting.json').write_text(json.dumps({'obj822_01':{'rektangel':[638,388,61,50],'resten_byteidentisk':True,'forsok':2},'obj823_01':{'rektangel':[501,324,30,22],'resten_byteidentisk':True,'forsok':4}},indent=2)+'\n')

@@ -1,0 +1,18 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import numpy as np
+R=Path('rapporter/bestilling019-20261013')
+qa=Image.new('RGB',(1536,1400),(128,128,128))
+for row,(n,attempt,src,dst) in enumerate([('828',2,(432,272,1104,752),(432,272,1104,752)),('829',1,(256,204,1280,816),(256,208,1280,816)),('830',1,(288,192,1248,832),(288,192,1248,832)),('831',1,(288,192,1248,832),(288,192,1248,832))]):
+ j='obj'+n+'_01';out=Image.new('RGB',(1536,1024),(128,128,128))
+ out.paste(Image.open(R/(j+'-raa-'+str(attempt)+'.png')).convert('RGB').crop(src).resize((dst[2]-dst[0],dst[3]-dst[1]),Image.Resampling.LANCZOS),dst[:2])
+ if n=='830':
+  before=np.array(out);patch=Image.open(R/(j+'-raa-2.png')).convert('RGB').resize((120,96),Image.Resampling.LANCZOS);patch=patch.crop((32,22,76,66));mask=np.ones((44,44))
+  for d in range(4):
+   mask[d,:]=d/4;mask[-1-d,:]=d/4;mask[:,d]=np.minimum(mask[:,d],d/4);mask[:,-1-d]=np.minimum(mask[:,-1-d],d/4)
+  out.paste(patch,(616,378),Image.fromarray((mask*255).astype('uint8')))
+  diff=np.any(before!=np.array(out),axis=2);diff[378:422,616:660]=False;assert not diff.any()
+ out.save('jobber/'+j+'/resultat.png')
+ for col,p in enumerate(['referanse','resultat']):
+  a=Image.open('jobber/'+j+'/'+p+'.png').crop(dst);a.thumbnail((730,320));qa.paste(a,(col*768,row*350));ImageDraw.Draw(qa).text((col*768+5,row*350+325),j+' '+p,fill='white')
+qa.save(R/'c-samlet-qa.png')

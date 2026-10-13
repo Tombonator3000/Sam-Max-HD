@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import hashlib,json,subprocess,numpy as np
+P=Path('rapporter/bestilling019-20261013')
+def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+m=Image.open(P/'a-master-raa01.png').convert('RGB').resize((2560,1024),Image.Resampling.LANCZOS).crop((0,112,2560,912))
+e=Image.open(P/'a-master-etikett-raa02.png').convert('RGB').crop((0,23,2171,701)).resize((2560,800),Image.Resampling.LANCZOS)
+before=np.array(m); rects=[(828,90,981,284),(1586,520,1720,690)]
+for box in rects:m.paste(e.crop(box),box[:2])
+mask=np.zeros((800,2560),bool)
+for x,y,r,d in rects:mask[y:d,x:r]=True
+proof={'master_etikettrektangler_xyxy':rects,'master_utenfor_byteidentisk':bool(np.array_equal(before[~mask],np.array(m)[~mask]))}
+m.save(P/'a-fullmaster.png')
+o=Image.open(P/'a-obj819_01-raa01.png').convert('RGB').crop((128,112,1408,912)).rotate(180)
+before=np.array(o);e=Image.open(P/'a-obj819-etikett-raa02.png').convert('RGB').resize((1280,800),Image.Resampling.LANCZOS);box=(298,524,439,695);o.paste(e.crop(box),box[:2]);mask=np.zeros((800,1280),bool);mask[524:695,298:439]=True
+proof.update(objekt_etikettrektangel_lesevendt_xyxy=box,objekt_utenfor_byteidentisk=bool(np.array_equal(before[~mask],np.array(o)[~mask])))
+jobs=[('rom079_del1av2',0),('rom079_del2av2',1024),('obj819_01',None)]
+rows=[]
+for j,x in jobs:
+ c=Image.new('RGB',(1536,1024),(128,128,128))
+ c.paste(m.crop((x,0,x+1536,800)) if x is not None else o.rotate(180),(0,112) if x is not None else (128,112))
+ out=Path('jobber')/j/'resultat.png';c.save(out)
+ run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(out)],capture_output=True,text=True)
+ log=P/('a-'+j+'-kontroll.txt');log.write_text(run.stdout+run.stderr)
+ status={0:'OK',1:'SJEKK',2:'FEIL'}.get(run.returncode,'FEIL')
+ row=dict(jobb=j,resultat=str(out),sha256=sha(out),egenkontroll=status,kontrollfil=str(log),forsok=2,runtime=False,ny_brukergodkjenning=False,klar_for_mottak=True)
+ if x is not None:row.update(fullmaster=str(P/'a-fullmaster.png'),fullmaster_sha256=sha(P/'a-fullmaster.png'),masterklipp=[x,0,1536,800])
+ rows.append(row)
+ (Path('jobber')/j/'notat.md').write_text('# HD-leveranse '+j+'\n\nInnebygd imagegen: ett kildebasert fullforsøk og ett smalt forsøk for den røde Enjoy-teksten. Eksakt modellnavn er ikke eksponert. Originalprompt er bevart ordrett i rapporten med separat kildekorreksjon. Originalen og godkjent stil/rom007_del1av2.png styrer innhold og penselføring.\n\nVenstre kule er rotert 180 grader, aldri ekstra speilvendt. Tre trær, skjev bygning, fingre, mansjett, sokkel og glassreflekser er visuelt kontrollert. Små kursive kildeglyfer er tolket som Enjoy; HD-bokstavformer er ikke bokstavidentiske med originalpiksler. '+('Egen cyan bølgebakgrunn, ikke klipp fra rommaster. ' if x is None else 'Felles master 2560 × 800, klipp x0/1024, byte-identisk overlapp 512 × 800. ')+'\n\nUendret egenkontroll: '+status+'. SHA256: '+sha(out)+'. Se '+str(log)+'. Teknisk kontroll er ikke runtime eller ny individuell brukergodkjenning. Presis helskalering/rektangelklipp og nøytral RGB128-padding; ingen originalmasker eller lokal warp. Råbilder, reproduserbar oppskrift, kildebevis og visuell QA i '+str(P)+'.\n')
+a=np.array(Image.open('jobber/rom079_del1av2/resultat.png'))[112:912,1024:1536];b=np.array(Image.open('jobber/rom079_del2av2/resultat.png'))[112:912,:512]
+proof.update(overlapp_storrelse=[512,800],overlapp_ulike_piksler=int(np.any(a!=b,axis=2).sum()),fullmaster_sha256=sha(P/'a-fullmaster.png'))
+locks=json.loads((P/'kildehash.json').read_text());proof['kilder']=[dict(fil=z['fil'],sha256=sha(z['fil']),uendret=sha(z['fil'])==z['sha256']) for z in locks]
+(P/'a-kildebevis.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2))
+(P/'a-leveranser.json').write_text(json.dumps({'leveranser':rows},ensure_ascii=False,indent=2))
+sheet=Image.new('RGB',(2560,2400),(128,128,128));sheet.paste(Image.open(P/'rom079-original-full.png'),(0,0));sheet.paste(m,(0,800));sheet.paste(Image.open('jobber/obj819_01/referanse.png').crop((128,112,1408,912)),(0,1600));sheet.paste(o.rotate(180),(1280,1600));sheet.save(P/'a-samlet-qa.png')
+print(json.dumps(rows,ensure_ascii=False,indent=2));print('kilder',len(locks),all(z['uendret'] for z in proof['kilder']))

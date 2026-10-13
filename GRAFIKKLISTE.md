@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 65 hele rom levert (100 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 70 levert, inkludert 16 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 66 hele rom levert (102 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 78 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -289,16 +289,16 @@ Rom 77, 78.
 
 Rom 79, 80, 82.
 
-- [ ] `rom079_del1av2` (rom 79 Snøkulen fra Mystery Vortex, del 1/2)
-- [ ] `rom079_del2av2` (rom 79 Snøkulen fra Mystery Vortex, del 2/2)
-- [ ] `obj819_01` (rom 79 Snøkulen fra Mystery Vortex, objekt 819 tilstand 01)
-- [ ] `obj821_01` (rom 80 Slangene i nøstet (deler), objekt 821 tilstand 01)
-- [ ] `obj822_01` (rom 80 Slangene i nøstet (deler), objekt 822 tilstand 01)
-- [ ] `obj823_01` (rom 80 Slangene i nøstet (deler), objekt 823 tilstand 01)
-- [ ] `obj828_01` (rom 82 Slangene i nøstet (deler), objekt 828 tilstand 01)
-- [ ] `obj829_01` (rom 82 Slangene i nøstet (deler), objekt 829 tilstand 01)
-- [ ] `obj830_01` (rom 82 Slangene i nøstet (deler), objekt 830 tilstand 01)
-- [ ] `obj831_01` (rom 82 Slangene i nøstet (deler), objekt 831 tilstand 01)
+- [x] `rom079_del1av2` (rom 79 Snøkulen fra Mystery Vortex, del 1/2)
+- [x] `rom079_del2av2` (rom 79 Snøkulen fra Mystery Vortex, del 2/2)
+- [x] `obj819_01` (rom 79 Snøkulen fra Mystery Vortex, objekt 819 tilstand 01)
+- [x] `obj821_01` (rom 80 Slangene i nøstet (deler), objekt 821 tilstand 01)
+- [x] `obj822_01` (rom 80 Slangene i nøstet (deler), objekt 822 tilstand 01)
+- [x] `obj823_01` (rom 80 Slangene i nøstet (deler), objekt 823 tilstand 01)
+- [x] `obj828_01` (rom 82 Slangene i nøstet (deler), objekt 828 tilstand 01)
+- [x] `obj829_01` (rom 82 Slangene i nøstet (deler), objekt 829 tilstand 01)
+- [x] `obj830_01` (rom 82 Slangene i nøstet (deler), objekt 830 tilstand 01)
+- [x] `obj831_01` (rom 82 Slangene i nøstet (deler), objekt 831 tilstand 01)
 
 ## Bestilling 20
 
@@ -3461,3 +3461,5 @@ Bestilling 17: ni leveranseklare OK. Rom077 del1 teknisk OK, men konkret motivav
 Rom077 er senere rettet etter Toms uttrykkelige vektorvalg, begge deler levert OK fra native fellesmaster. Fire sideprikker avklart, rasterrad rettet. Bestilling17s uavklarte kandidat er historikk. Se `rapporter/rom077-vektor-20261013/RAPPORT.md`.
 
 Bestilling 18: 7 OK og 3 SJEKK (obj774/775/781), ti bilder levert. Rene mørke gråpaneler, to manglende punktstjerner rettet, uregelmessig dørmerke og ny kikkertmaster kontrollert. Rom077 del2 fra autorisert vektorleveranse. Se `rapporter/bestilling018-20261013/RAPPORT.md`. Bestilling 19 fortsetter.
+
+Bestilling 19: 7 OK og 3 SJEKK (obj819/822/831), ti bilder levert. Snøkulenes orientering/egne blå variant og Jesse James-hånd/golfballhenter/magnet/ring-tilstander kildekontrollert. Se `rapporter/bestilling019-20261013/RAPPORT.md`. Bestilling 20 fortsetter.

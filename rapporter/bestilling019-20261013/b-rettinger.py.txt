@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil,subprocess,numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling019-20261013'
+for j in ['obj822_01','obj823_01']:
+ shutil.copy2(r/(j+'-kontroll.txt'),r/(j+'-kontroll01.txt'));shutil.copy2(b/'jobber'/j/'resultat.png',r/(j+'-resultat01.png'))
+shutil.copy2("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-5d6364f2-c8ca-4858-9469-83b412bddfb7.png",r/'obj823_01-raa02.png')
+im=Image.open(r/'obj823_01-raa02.png').convert('RGB');a=Image.new('RGB',(1536,1024),(128,128,128));a.paste(im.crop((448,272,1088,752)),(448,272));a.save(b/'jobber/obj823_01/resultat.png')
+shutil.copy2("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-6b6fef79-84fa-4ff2-be50-2924ad04a997.png",r/'obj822_01-raa02.png');a=Image.open(b/'jobber/obj822_01/resultat.png').convert('RGB');before=np.array(a);patch=Image.open(r/'obj822_01-raa02.png').convert('RGB').resize((61,50),Image.Resampling.LANCZOS);a.paste(patch,(638,388));a.save(b/'jobber/obj822_01/resultat.png');after=np.array(a);outside=np.ones(before.shape[:2],bool);outside[388:438,638:699]=False;assert np.array_equal(before[outside],after[outside])
+for j in ['obj822_01','obj823_01']:
+ p=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(b/'jobber'/j/'resultat.png')],capture_output=True,text=True);(r/(j+'-kontroll.txt')).write_text(p.stdout+p.stderr);print(p.stdout)
+sheet=Image.new('RGB',(1536,1536),(128,128,128))
+for row,i in enumerate([821,822,823]):
+ for col,name in enumerate(['referanse.png','resultat.png']):sheet.paste(Image.open(b/'jobber'/f'obj{i}_01'/name).resize((768,512)),(col*768,row*512))
+sheet.save(r/'b-familie.png')

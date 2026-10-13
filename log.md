@@ -174,3 +174,8 @@
 
 - Bestilling 18: 7 OK og 3 SJEKK (obj774/775/781), ti bilder levert. Rene mørke gråpaneler, to manglende punktstjerner rettet, uregelmessig dørmerke og ny kikkertmaster kontrollert. Rom077 del2 fra autorisert vektorleveranse. Se `rapporter/bestilling018-20261013/RAPPORT.md`. Bestilling 19 fortsetter.
 - Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i rapporter/bestilling018-20261013/.
+
+## 2026-10-13 20:30 (Codex, Astra)
+
+- Bestilling 19: 7 OK og 3 SJEKK (obj819/822/831), ti bilder levert. Snøkulenes orientering/egne blå variant og Jesse James-hånd/golfballhenter/magnet/ring-tilstander kildekontrollert. Se `rapporter/bestilling019-20261013/RAPPORT.md`. Bestilling 20 fortsetter.
+- Root har sett original/HD samlet. Alle beskyttede kilder, lerret, padding og SHA kontrollert. Dokumenterte SJEKK og motivforbehold beholdes. Ingen import, faktisk spillvisning eller ny individuell godkjenning. Detaljert proveniens i rapporter/bestilling019-20261013/.
