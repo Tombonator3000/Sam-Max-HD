@@ -1,0 +1,50 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np
+p=Path('rapporter/bestilling043-20261013');sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest()
+for lock in ['kildehash.json','root-ekstra-kildehash.json']:
+ for z in json.loads((p/lock).read_text()):assert sha(z['fil'])==z['sha256']
+for f,h in json.loads((p/'root-ankerhash.json').read_text()).items():assert sha(f)==h
+jobs=['lag053_01_del1av2','lag053_02_del1av2','lag054_01','lag054_02','lag054_03','lag055_01','lag056_01','lag056_02','lag056_03','lag056_05','lag056_06'];items={}
+for j in jobs:
+ m=json.loads(Path('jobber/'+j+'/jobb.json').read_text())
+ for o in m['objekter']:items[o['bilde']]={'jobb':j,'rekt':o['rekt'],'base':m['bilde_to'],'offset':m['bilde_i_lerret'][:2]}
+# Original composite bytes allow only these proven reuses.
+a=Image.open('jobber/lag056_01/original_1x.png').crop((16,64,40,104));b=Image.open('jobber/lag056_02/original_1x.png').crop((16,64,40,104));assert a.tobytes()==b.tobytes()
+a=Image.open('jobber/lag056_03/original_1x.png').crop((48,24,72,152));b=Image.open('jobber/rom056/original_1x.png').crop((48,24,72,152));assert a.tobytes()==b.tobytes()
+(p/'c-gjenbruksbevis.json').write_text(json.dumps({'530_01_02_byteidentisk':True,'540_01_grunnrom_byteidentisk':True},indent=2)+'\n')
+groups={
+'053stage':[('stage','lag053_01_del1av2',[64,72,104,64])],
+'053crowd':[('crowd','lag053_01_del1av2',[192,88,176,80])],
+'053state2':[('obj499_01',None,None),('crowd2','lag053_02_del1av2',[216,112,40,24])],
+'054':[('posts01','lag054_01',[104,16,104,80]),('obj517_01',None,None),('obj518_01',None,None),('obj521_01',None,None)],
+'055':[('obj522_01',None,None),('obj525_01',None,None)],
+'056a':[(n,None,None) for n in ['obj530_01','obj530_03','obj535_01','obj531_01','obj531_02','obj534_01']],
+'056b':[(n,None,None) for n in ['obj529_01','obj536_01','obj537_01','obj539_01']],
+'056micro':[(n,None,None) for n in ['obj532_01','obj532_02','obj532_03','obj533_01']]
+}
+brief={
+'053stage':'Source blue band fragments with own head, arm, instrument and foot poses. Keep every visible source fragment. The far left brown/tan fragment is exactly as source; do not invent new figure or fingers. Do not copy unchanged HD pose. No new text.',
+'053crowd':'Dark purple party crowd and table. Bottle is ABSENT in this source. Keep exact dark purple figures, own source mouth/arm/sway positions and black gaps. No new eyes or bright faces, no new people in black spaces. No bottle. Preserve plates, pineapple-edge/table fragments cut by crop.',
+'053state2':'Two isolated crops: guitar arm/instrument fragment and two dark purple audience fragments. Exact own source positions. Only blue for stage, only dark purple for audience, no new anatomy. Do not copy old unchanged HD poses.',
+'054':'Four crops: first contains TWO remaining brown posts; both outer posts are absent. Second and third each show different single missing post, exact remaining source posts and reflections. Last long narrow crop has BLACK rear hot-tub water, retain stones and ladder and cutoff. No steam, people, new posts or extra reflections. Source absence overrides style reference.',
+'055':'Two tall crops where two particular carved yellow totems are ABSENT. Preserve gray square ground sockets, roofs, palms, pool, slide and any tiny cut-off neighboring totem at edge. Do NOT copy removed totem from style. Do not remove other totems outside these crops.',
+'056a':'Six source crops in reading order: dark freezer side window WITHOUT icepick; light lavender window WITH orange icepick; light lavender window WITHOUT icepick; back door bending outward with bulged trapezoid panels; back door bending inward with narrow hourglass panels/light slit; back door OPEN with light white/green wall and brown shelves outside and door leaf at right. Preserve deliberately bent panels, do not normalize to straight closed door. No people.',
+'056b':'Four source crops: narrow OPEN freezer front with black interior/hanging dark forms; EMPTY flat golden brown fur costume on floor (no person, body or new limbs), preserve headpiece at right and long flat fur to left; small pipe/front fragment in own state; freezer LEFT side with rivets, orange icepick in window, and narrow black front opening at right. Preserve exact source cutoff, no larger opening or people.',
+'056micro':'Four tiny source crops: three different BLUE GAUGE NEEDLE positions, then angled freezer HANDLE. Keep each exact dark blue/gray pointer position, no new ticks, letters or scale. Three gauges share identical housing and source differences only within blue dial. Handle diagonal down-right, not old vertical handle.'}
+plan={}
+for g,units in groups.items():
+ single=len(units)==1;size=(1536,1024) if single else (1920,1280);src=Image.new('RGB',size,(128,128,128));sty=src.copy();rows=[]
+ for i,(name,j,rect) in enumerate(units):
+  if j is None:j=items[name]['jobb'];rect=items[name]['rekt']
+  m=json.loads(Path('jobber/'+j+'/jobb.json').read_text());x,y,w,h=rect;ox,oy=m['bilde_i_lerret'][:2]
+  if single:scale=min(1408/w,896/h);ww,hh=round(w*scale),round(h*scale);px,py=(1536-ww)//2,(1024-hh)//2
+  else:scale=min(8,576/w,576/h);ww,hh=round(w*scale),round(h*scale);px=(i%3)*640+(640-ww)//2;py=(i//3)*640+(640-hh)//2
+  crop=Image.open('jobber/'+j+'/original_1x.png').crop((x,y,x+w,y+h));hd=Image.open(m['bilde_to']).crop((ox+x*4,oy+y*4,ox+(x+w)*4,oy+(y+h)*4));src.paste(crop.resize((ww,hh),Image.Resampling.NEAREST),(px,py));sty.paste(hd.resize((ww,hh),Image.Resampling.LANCZOS),(px,py));rows.append({'name':name,'jobb':j,'romrekt':rect,'atlasrekt':[px,py,ww,hh]})
+ src.save(p/f'c-{g}-source.png');sty.save(p/f'c-{g}-stil.png');plan[g]={'size':size,'units':rows}
+ prompts=[]
+ for j in dict.fromkeys(r['jobb'] for r in rows):
+  text=Path('jobber/'+j+'/prompt.txt').read_text()
+  if text not in prompts:prompts.append(text)
+ prompt='\n\n'.join(prompts)+'\n\nPRODUCTION CROPS ONLY. Output exact '+str(size[0])+' x '+str(size[1])+', keep attached first-image gray gaps and every crop at exact rectangle. Do not zoom, recenter or complete crops. '+brief[g]+' First image decides EVERY shape and state. Second image is brushwork only and may contain removed objects/wrong old poses. Smooth new outlines, no pixel stairs, no new details. Rectangles '+json.dumps([r['atlasrekt'] for r in rows])+'.\n';(p/f'c-{g}-prompt1.txt').write_text(prompt)
+(p/'c-atlasplan.json').write_text(json.dumps(plan,indent=2)+'\n');(p/'c-jobber.json').write_text(json.dumps(jobs,indent=2)+'\n')

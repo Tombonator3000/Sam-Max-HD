@@ -297,3 +297,8 @@
 
 - Bestilling 40: åtte lag levert OK med 30 faktiske feltkontroller, egne sangromstilstander, hjelmfravær og presist409-underlag. To sokkelhodetilstander venter på brukerens motivavklaring. Se `rapporter/bestilling040-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 - Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T00:07:10+02:00 (Codex, Astra)
+
+- Bestilling 43: åtte lag levert OK med 21 faktiske feltkontroller. Tomt pelsdrakthode og målerstilling er korrigert. Festsalfigurer og isblokk venter på motivavklaring. Se `rapporter/bestilling043-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

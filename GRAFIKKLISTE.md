@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:57 (norsk tid)
+Oppdatert 2026-10-14 00:07 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 368 bilder levert (179 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 389 bilder levert (187 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -650,15 +650,15 @@ Rom 52, 53.
 Rom 53, 54, 55, 56.
 
 - [ ] `lag053_02_del1av2` (rom 53 Savage Jungle Inn, festsalen, lag 02 med 3 objektbilder, del 1/2, bilde to `jobber/rom053_del1av2/resultat.png`)
-- [ ] `lag054_01` (rom 54 Boblebadet, lag 01 med 3 objektbilder, bilde to `jobber/rom054/resultat.png`)
-- [ ] `lag054_02` (rom 54 Boblebadet, lag 02 med 1 objektbilde, bilde to `jobber/rom054/resultat.png`)
-- [ ] `lag054_03` (rom 54 Boblebadet, lag 03 med 1 objektbilde, bilde to `jobber/rom054/resultat.png`)
-- [ ] `lag055_01` (rom 55 Bassengområdet, lag 01 med 2 objektbilder, bilde to `jobber/rom055/resultat.png`)
-- [ ] `lag056_01` (rom 56 Kjøkkenet, lag 01 med 5 objektbilder, bilde to `jobber/rom056/resultat.png`)
-- [ ] `lag056_02` (rom 56 Kjøkkenet, lag 02 med 3 objektbilder, bilde to `jobber/rom056/resultat.png`)
-- [ ] `lag056_03` (rom 56 Kjøkkenet, lag 03 med 4 objektbilder, bilde to `jobber/rom056/resultat.png`)
+- [x] `lag054_01` (rom 54 Boblebadet, lag 01 med 3 objektbilder, bilde to `jobber/rom054/resultat.png`)
+- [x] `lag054_02` (rom 54 Boblebadet, lag 02 med 1 objektbilde, bilde to `jobber/rom054/resultat.png`)
+- [x] `lag054_03` (rom 54 Boblebadet, lag 03 med 1 objektbilde, bilde to `jobber/rom054/resultat.png`)
+- [x] `lag055_01` (rom 55 Bassengområdet, lag 01 med 2 objektbilder, bilde to `jobber/rom055/resultat.png`)
+- [x] `lag056_01` (rom 56 Kjøkkenet, lag 01 med 5 objektbilder, bilde to `jobber/rom056/resultat.png`)
+- [x] `lag056_02` (rom 56 Kjøkkenet, lag 02 med 3 objektbilder, bilde to `jobber/rom056/resultat.png`)
+- [x] `lag056_03` (rom 56 Kjøkkenet, lag 03 med 4 objektbilder, bilde to `jobber/rom056/resultat.png`)
 - [ ] `lag056_04` (rom 56 Kjøkkenet, lag 04 med 3 objektbilder, bilde to `jobber/rom056/resultat.png`)
-- [ ] `lag056_05` (rom 56 Kjøkkenet, lag 05 med 2 objektbilder, bilde to `jobber/rom056/resultat.png`)
+- [x] `lag056_05` (rom 56 Kjøkkenet, lag 05 med 2 objektbilder, bilde to `jobber/rom056/resultat.png`)
 
 ## Bestilling 44
 
@@ -3509,3 +3509,5 @@ Bestilling35: ti lag levert, ni OK og lag037_01_del2av2 SJEKK (blokk2,00). Alle2
 Bestilling 39: ti lag fra dyreutstillingen levert OK med 21 faktiske feltkontroller, kildeegne munn-/ørestillinger, kroppshøyder og fjerning av to øyeglimt. Se `rapporter/bestilling039-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 
 Bestilling 40: åtte lag levert OK med 30 faktiske feltkontroller, egne sangromstilstander, hjelmfravær og presist409-underlag. To sokkelhodetilstander venter på brukerens motivavklaring. Se `rapporter/bestilling040-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+
+Bestilling 43: åtte lag levert OK med 21 faktiske feltkontroller. Tomt pelsdrakthode og målerstilling er korrigert. Festsalfigurer og isblokk venter på motivavklaring. Se `rapporter/bestilling043-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.

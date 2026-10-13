@@ -1,0 +1,44 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image
+import numpy as np
+p=Path('rapporter/bestilling043-20261013');H=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();J=lambda f:json.loads(Path(f).read_text());write=lambda f,v:Path(f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+prov=[]
+for group,n,refs in [(g,1,[f'c-{g}-source.png',f'c-{g}-stil.png']) for g in J(p/'c-atlasplan.json')]+[(g,2,[f'c-{g}-source.png']) for g in ['053crowd','053state2']]+[(g,2,[f'c-{g}-source2.png']) for g in ['obj532_03','obj536_01']]+[('obj532_03',3,['c-obj532_03-source2.png','c-obj532_03-stil3.png']),('536-head',3,['c-536-head-source3.png'])]:
+ raw=p/f'c-{group}-raa{n}.png';prompt=p/f'c-{group}-prompt{n}.txt';prov.append({'gruppe':group,'forsok':n,'verktøy':'innebygd ChatGPT imagegen','eksakt_modell':'ikke eksponert','raw':str(raw),'raw_sha256':H(raw),'prompt':str(prompt),'prompt_sha256':H(prompt),'referanser':[{'fil':str(p/r),'sha256':H(p/r)} for r in refs]})
+write(p/'c-proveniens.json',prov)
+source=[]
+for f in ['kildehash.json','root-ekstra-kildehash.json']:
+ for x in J(p/f):source.append({'fil':x['fil'],'forventet':x['sha256'],'faktisk':H(x['fil']),'uendret':H(x['fil'])==x['sha256']})
+assert all(x['uendret'] for x in source);write(p/'c-kildehashkontroll.json',{'antall':len(source),'alle_uendret':True,'filer':source})
+notes={
+'lag053_01_del1av2':'Flasken er borte. Blå bandfragmenter og mørklilla publikum følger egne kildeposer. Første publikum normaliserte munner/arm; kildebasert forsøk 2 er valgt. Ansikter og fingre er tydeligere tegnet enn originalen.',
+'lag053_02_del1av2':'Tre egne felt med arm og publikum. Første forsøk hadde feil utsnitt og FEIL; kildebasert forsøk 2 retter arm, åpen munn og håndstilling. Øvrig grunnrom beholdt.',
+'lag054_01':'To bestemte stolper borte; to midtstolper står. Bakre boblebadfelt er svart. Det svarte feltet har svært svake nytegnede mørke vannbånd, ikke lysnet til blått.',
+'lag054_02':'Egen enkeltstolpe borte, resterende stolpekanter og vannspeiling beholdt.',
+'lag054_03':'Annen enkeltstolpe borte. Ikke samme felt som 054_02.',
+'lag055_01':'To bestemte totemer borte med grå plater igjen, to øvrige beholdt. Synlige hut-/basseng-/gressfelt er nytegnet. Platekantene er renere og mer markerte enn originalen.',
+'lag056_01':'Mørkt vindu uten ispigg, bulende dør, viser opp-venstre, skrått håndtak og tom flat gulbrun pelsdrakt. Draktens første forsøk mistet ansiktet; forsøk 2 tegnet et for livaktig ansikt og er avvist som ansiktsanker. Lokalt source-only forsøk 3 bevarer flatt lyst hodefelt og få brune kildemarkeringer uten pupill/øyehvitt/nytt smil. Kun hodeboksen er endret, øvrig kandidat byte-identisk. Ingen person tegnet inn.',
+'lag056_02':'Åpen fryser med mørkt innvendig hengende felt, mørkt vindu uten ispigg og innsnevret bakdør. 530_02 er bevist kildeidentisk med 530_01 og gjenbruker akkurat samme nye felt.',
+'lag056_03':'Lyst vindu med ispigg, loddrett viser, åpen bakdør med kildens lyse/grønne/brune utsyn. 540_01 er kildeidentisk med grunnrom og beholdes byte-identisk fra levert HD-grunnrom.',
+'lag056_05':'Lyst vindu uten ispigg og viser opp-høyre. Første måler hadde feil retning; forsøk 2 tilførte skruer, avvist. Forsøk 3 er valgt som helt nytt målerfelt med riktig retning og enkel ramme.',
+'lag056_06':'Kildens eget rørfelt og venstre fryserfelt med ispigg og smal åpen kant; ingen isblokk eller person kopiert fra holdt 056_04.'}
+man={42:[],43:[],44:[]};proof=[]
+for j in J(p/'c-jobber.json'):
+ d=Path('jobber')/j;m=J(d/'jobb.json');out=d/'resultat.png';ctrl=p/f'{j}-kontroll.txt';assert 'Utfall: OK' in ctrl.read_text();a=np.array(Image.open(out));base=np.array(Image.open(m['bilde_to']));mask=np.zeros((1024,1536),bool)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=m['bilde_i_lerret'][0]+(x-m['region'][0])*4;y=112+(y-m['region'][1])*4;mask[y:y+h*4,x:x+w*4]=True
+ assert np.array_equal(a[~mask],base[~mask]);bx,by,bw,bh=m['bilde_i_lerret'];pad=np.ones((1024,1536),bool);pad[by:by+bh,bx:bx+bw]=False;assert (a[pad]==128).all();proof.append({'jobb':j,'grunnrom':m['bilde_to'],'grunn_sha256':H(m['bilde_to']),'utenfor_objektunion_avvik':0,'padding_RGB128':True,'resultat_sha256':H(out)})
+ batch=42 if j=='lag053_01_del1av2' else 44 if j=='lag056_06' else 43
+ groups=set()
+ for g,info in J(p/'c-atlasplan.json').items():
+  if any(u['jobb']==j for u in info['units']):groups.add(g)
+ if j=='lag056_02':groups.add('056a')
+ if j=='lag056_05':groups.add('obj532_03')
+ if j=='lag056_01':groups.update(['obj536_01','536-head'])
+ rows=[x for x in prov if x['gruppe'] in groups];rec={'jobb':j,'resultat':str(out),'sha256':H(out),'egenkontroll':'OK','kontrollfil':str(ctrl),'forsok':max(x['forsok'] for x in rows),'genereringskall':len(rows),'raw':[{'fil':x['raw'],'sha256':x['raw_sha256']} for x in rows],'proveniens':str(p/'c-proveniens.json'),'grunnrom':m['bilde_to'],'grunn_sha256':H(m['bilde_to']),'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'visuell_qa':notes[j]};man[batch].append(rec)
+ (d/'notat.md').write_text(f'# {j}\n\n{notes[j]}\n\nInnebygd ChatGPT imagegen, eksakt modell ikke eksponert. Ordrett originalprompt og separate kildepresiseringer er bevart i {p}/c-*-prompt*.txt, med råbilder og SHA i c-proveniens.json. Vanlig helskalering av nye felt og presis innsetting innen metadatarektangler; ingen originalmasker, tracing eller lokal geometriwarp. Se c-komposisjon.py.txt.\n\nResultat SHA-256: `{H(out)}`. Uendret kontroll: OK ({ctrl}). Alle felt og helscene er visuelt sammenlignet, konkrete forbehold ovenfor. Utenfor metadataunionen er grunnrommet byte-identisk; RGB 128-padding og 1536 x 1024 verifisert. Beskyttede kilder uendret. Runtime ikke kontrollert, ny individuell brukergodkjenning foreligger ikke.\n')
+for b,records in man.items():write(Path(f'rapporter/bestilling{b:03d}-20261013/c-leveranser.json'),{'leveranser':records})
+write(p/'c-underlagsbevis.json',proof)
+(p/'c-kilde-qa.md').write_text('# C: kilde- og motivkontroll, bestilling 42–44\n\n11 leveranser, 41 objektfelt. Lag056_04 er holdt uten produksjon i påvente av brukerens identitetsavklaring. Bestilling 42/43/44 har henholdsvis 1/9/1 poster i egne C-manifester.\n\nAlle 64 låste beskyttede kilder er uendret. Originaler, metadata, rotplan, grunnrom og alle felt er sett før generering. 14 innebygde imagegen-kall, eksakt modell ikke eksponert. Ordrette jobbprompter med separat begrunnet utsnittsføring og faktisk råproveniens er bevart.\n\nTeknisk: alle 11 kontroller OK, alle 41 metadatafelt målt separat i c-objektkontroll.json. Høy korrelasjon brukes ikke som bevis for riktig tilstand. c-objektqa-1..14.png viser original/HD; c-helsceneqa.png viser alle hele komposisjoner.\n\n'+'\n\n'.join('## '+j+'\n\n'+text for j,text in notes.items())+'\n\n## Sammensetting og begrensninger\n\nKun nygenererte felt settes i eksakte metadatarektangler på tidligere levert HD-rom. Ingen kildepiksler, silhuettmasker, tracing eller lokal geometriwarp i leveransene. Overlappende objekter i scenen produseres samlet før feltklipp. Alle piksler utenfor objektunionen er byte-identiske med grunnrommet. 530_01/02 deler dokumentert samme kilde og nye felt. 540_01 gjenbruker uendret HD-grunnromsfelt.\n\nDe nye feltene har jevnere og tidvis mer modellerte kanter, ansikter, fingre, platekanter og pels enn originalens få piksler. Pelsdraktens nye flate brune hodeformer er kildebaserte; skyggelegging og venstre pels har større tuster enn originalen. Ingen ekstra anatomi påstås. Originalens objektidentitet og tilstand er førende. Runtime og ny individuell brukergodkjenning er uverifisert. Rot mottar og vurderer samlet.\n')
+print('11 manifestposter, 41 felt,',len(prov),'kall,',len(source),'uendrede kilder')
