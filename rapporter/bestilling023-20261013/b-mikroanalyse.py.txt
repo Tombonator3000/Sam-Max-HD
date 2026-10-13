@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,csv
+r=Path('rapporter/bestilling023-20261013')
+def a(j):return np.array(Image.open('jobber/'+j+'/original_1x.png').convert('RGB'))
+def changes(a,b):
+ yy,xx=np.where(np.any(a!=b,axis=2));return [{'xy':[int(x),int(y)],'fra':a[y,x].tolist(),'til':b[y,x].tolist()} for y,x in zip(yy,xx)]
+a4=a('lag007_04_del1av2');a9=a('lag007_09_del1av2');a3=a('lag007_03_del1av2');a2=a('lag007_02_del1av2')
+regs=[(0,112,40,24),(240,48,24,56),(0,128,32,24),(144,88,24,24)];context=[]
+for x,y,w,h in regs:context.append({'rekt':[x,y,w,h],'lag02_til03':changes(a2[y:y+h,x:x+w],a3[y:y+h,x:x+w])})
+eye=changes(a('rom007_del2av2')[48:56,312:328],a('lag007_02_del2av2')[48:56,312:328])
+pals=json.loads((r/'b-palettbevis.json').read_text());sets=[{tuple(c['rgb']) for c in p['farger']} for p in pals]
+v={'04_til09':changes(a4,a9),'076_grunn_til03':changes(a4[128:152,:32],a3[128:152,:32]),'075_grunn_til02':eye,'alle_tv_palettsett_identiske':all(s==sets[0] for s in sets),'kontekst02til03':context,'objektregister':[v for v in csv.DictReader(open('konsept/2026-10-12/objektbilder-959.csv')) if v['rom']=='7' and v['objekt_id'] in ['64','71','75','76','80']]}
+(r/'b-mikroendringer.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')

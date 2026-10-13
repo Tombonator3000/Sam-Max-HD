@@ -1,0 +1,11 @@
+# Read-only production inputs; diagnostic contact sheet only.
+from pathlib import Path
+from PIL import Image,ImageDraw
+b=Path.cwd();r=b/'rapporter/bestilling023-20261013'
+fields=[('04 vs 09',[(4,(148,97,154,104)),(9,(148,97,154,104))]),('0A vs 0B',[(10,(147,91,163,105)),(11,(147,91,163,105))]),('076 only lag03',[(3,(8,131,15,137)),(4,(8,131,15,137))])]
+out=Image.new('RGB',(1000,1000),(95,95,95));d=ImageDraw.Draw(out)
+for row,(label,items) in enumerate(fields):
+ d.text((10,row*330+5),label,fill='white')
+ for col,(idx,box) in enumerate(items):
+  im=Image.open(b/f'jobber/lag007_{idx:02d}_del1av2/original_1x.png').convert('RGB').crop(box);factor=min(450//im.width,270//im.height);im=im.resize((im.width*factor,im.height*factor),Image.Resampling.NEAREST);out.paste(im,(col*500+10,row*330+50));d.text((col*500+10,row*330+28),f'lag{idx:02d}; source box {box}',fill='white')
+out.save(r/'c-mikro-kildegrunnlag.png')

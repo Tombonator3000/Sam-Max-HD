@@ -1,0 +1,21 @@
+from pathlib import Path
+import hashlib,json,subprocess
+from PIL import Image
+import numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling023-20261013';old=b/'rapporter/bestilling022-20261013';n='lag007_02_del2av2';j=b/'jobber'/n
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+master=old/'lag007_02-fullmaster.png';expected='ad2811c269e0894ae0516cf41bf5c4c1ff2fb8d8bf7e4d1351a9c3ceb10c100a'
+prior=next(z for z in json.loads((old/'c-leveranser.json').read_text())['leveranser'] if z['jobb']=='lag007_02_del1av2');assert sha(master)==expected==prior['fullmaster_sha256']
+locks=[]
+for z in json.loads((r/'kildehash.json').read_text()):locks.append(dict(z,aktuell_sha256=sha(b/z['fil']),uendret=sha(b/z['fil'])==z['sha256']))
+assert len(locks)==40 and all(x['uendret'] for x in locks)
+im=Image.open(master).convert('RGB');assert im.size==(1952,800)
+out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im.crop((416,0,1952,800)),(0,112));out.save(j/'resultat.png')
+a=np.array(out);d1=np.array(Image.open(b/prior['resultat']));assert np.array_equal(a[112:912,:1120],d1[112:912,416:]);assert np.all(a[:112]==128) and np.all(a[912:]==128)
+assert sha(j/'resultat.png')==sha(old/'c-kontroll-lag007_02_del2av2/resultat.png')
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(j/'resultat.png')],capture_output=True,text=True);(r/(n+'-egenkontroll.txt')).write_text(p.stdout+p.stderr);assert p.returncode==0 and 'Utfall: OK' in p.stdout
+record=dict(jobb=n,resultat=str((j/'resultat.png').relative_to(b)),sha256=sha(j/'resultat.png'),egenkontroll='OK',kontrollfil=str((r/(n+'-egenkontroll.txt')).relative_to(b)),forsok=0,forsok_forklaring='Eksakt klipp av tidligere generert og låst master; ingen nytegning.',fullmaster=str(master.relative_to(b)),fullmaster_sha256=expected,proveniens='rapporter/bestilling022-20261013/c-leveranser.json',raw=prior['raw'],runtime=False,ny_brukergodkjenning=False,klar_for_mottak=True,visuelt_forbehold=prior['visuelt_forbehold'])
+(r/'c-leveranser.json').write_text(json.dumps(dict(leveranser=[record]),ensure_ascii=False,indent=2)+'\n');(r/'c-kildehashkontroll.json').write_text(json.dumps(locks,ensure_ascii=False,indent=2)+'\n')
+(j/'notat.md').write_text(f'''# {n}\n\nLevert ved presist klipp x 416..1952 fra låst lag02-master i bestilling 22. Ingen ny generering; forsok = 0. Master SHA-256 {expected}. Resultat SHA-256 {record['sha256']}.\n\nRGB 1536 × 1024, motiv [0,112,1536,800], padding nøyaktig RGB 128. 1120 × 800 overlapp med levert del 1 er byteidentisk. Resultatet er også filidentisk med det tidligere kontrollerte fremtidige klippet. Uendret checker OK; se {record['kontrollfil']}. Alle 40 beskyttede kilder er uendret.\n\nGenereringsproveniens: {record['proveniens']}; to tidligere imagegen-kall for lag02, bevart med prompt og SHA. Innebygd ChatGPT imagegen, eksakt modellnavn ikke eksponert. Ingen originalmaske eller geometriwarp. Originalprompten for begge deler var med i fullscene-genereringen.\n\nSkallen har to grønne punkter i øyehulene, ikke nye øyne eller nytt hode. Punktene har mer lysende kant enn originalens flate grønne piksler, som dokumentert i bestilling 22 c-kilde-qa.md og c-smatilstander-kilde-hd-anker.png. Hele komposisjonen beholder lag02 sine egne telefon-/vindu-/TV-tilstander også der metadata tilordner dem del 1. Teknisk OK beviser ikke faktisk import/runtime. Runtime og ny brukergodkjenning er false.\n''')
+print(p.stdout);print(record['sha256'])

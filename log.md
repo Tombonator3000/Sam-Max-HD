@@ -198,3 +198,8 @@
 
 - Bestilling 22: ti objektlag levert OK. Egne bil-/lystilstander, fire ørefliker og bevisst avskårne figurdeler beholdt. To kontormastere med identiske overlapp, små øye-/TV-/skallevarianter og alle 22 objektfelt kontrollert. Se `rapporter/bestilling022-20261013/RAPPORT.md`. Bestilling 23 og videre lag fortsetter.
 - 40 beskyttede og fire ekstra kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T21:16:53+02:00 (Codex, Astra)
+
+- Bestilling 23: ti kontorlag levert OK. Ni egne TV-tilstander, lokal munn-/øyeretting og grønn indikator bare i lag03. Riktig HD-rom er bytebevart utenfor nye felt; lag02 del2 har identisk overlapp med bestilling22. Alle elleve objektfelt kontrollert. Se `rapporter/bestilling023-20261013/RAPPORT.md`. Bestilling 24 og videre lag fortsetter.
+- 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

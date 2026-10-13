@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling023-20261013';p=b/'jobber/lag007_11_del1av2/resultat.png';shutil.copy2(p,r/'lag007_11-for-oyeklipp.png')
+atlas=Image.open(r/'b-mikro-raa04.png').convert('RGB');w,h=atlas.size;patch=atlas.crop((round(w/2),round(h/2),w,h)).resize((96,96),Image.Resampling.LANCZOS)
+tile=Image.open(r/'lag007_11_del1av2-tv.png').convert('RGB');before=np.array(tile);rect=(53,31,69,35);tile.paste(patch.crop(rect),rect[:2]);tile.save(r/'lag007_11_del1av2-tv.png')
+d=np.any(before!=np.array(tile),axis=2);d[31:35,53:69]=False;assert not d.any()
+out=Image.open(p).convert('RGB');out.paste(tile,(576,464));out.save(p)
+c=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p)],capture_output=True,text=True);(r/'lag007_11_del1av2-kontroll.txt').write_text(c.stdout+c.stderr);print(c.stdout)
+proof=json.loads((r/'b-komposisjonsbevis.json').read_text());proof['lokale_nye_rektangler']['11'][0][3]=35
+a=np.array(Image.open(r/'lag007_10_del1av2-tv.png'));z=np.array(tile);d=np.any(a!=z,axis=2);yy,xx=np.where(d);proof['0A_0B']={'endrede_hd_piksler':int(d.sum()),'bbox':[int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)]};proof['0B_utvidet_oyeklipp']={'ny_boks':[53,31,16,4],'ny_generering':False,'resten_byteidentisk':True};(r/'b-komposisjonsbevis.json').write_text(json.dumps(proof,indent=2)+'\n')
+sheet=Image.open(r/'b-tv-familie.png');sheet.paste(tile.resize((192,192)),(960,537));sheet.save(r/'b-tv-familie.png')

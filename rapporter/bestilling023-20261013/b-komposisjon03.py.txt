@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import shutil,json,numpy as np,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling023-20261013';shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-0f395233-cc4e-46b3-91df-d0ddd25af5e5.png',r/'b-mikro-raa04.png')
+atlas=Image.open(r/'b-mikro-raa04.png').convert('RGB');w,h=atlas.size
+patches={}
+for i,n in enumerate([5,8,9,11]):patches[n]=atlas.crop((round(i%2*w/2),round(i//2*h/2),round((i%2+1)*w/2),round((i//2+1)*h/2))).resize((96,96),Image.Resampling.LANCZOS)
+tiles={n:Image.open(r/f'b-tv03-state{n:02X}.png').convert('RGB') for n in range(3,12)}
+# Rectangles are measured on the NEW GENERATED drawing. No original pixels/masks.
+edits={5:[(26,37,47,48)],8:[(27,35,49,46)],9:[(22,43,32,54)],11:[(53,20,69,31),(24,46,35,62)]}
+tiles[9]=tiles[4].copy();tiles[11]=tiles[10].copy()
+for n,rects in edits.items():
+ for rect in rects:tiles[n].paste(patches[n].crop(rect),rect[:2])
+# One shared generated TV casing. Screen aperture follows only the generated04 drawing.
+# This clipping keeps a common NEW casing; it is not a source silhouette mask.
+poly=[(22,7),(54,9),(65,13),(71,24),(66,45),(60,61),(49,71),(27,67),(13,58),(8,49),(9,31),(14,16)]
+mask=Image.new('L',(96,96),0);ImageDraw.Draw(mask).polygon(poly,fill=255);mask.save(r/'b-nytegnet-skjermklipp.png')
+case=tiles[4].copy();base=Image.open(b/'jobber/rom007_del1av2/resultat.png').convert('RGB');newtiles={};trace=[]
+for n in range(3,12):
+ im=case.copy();im.paste(tiles[n],(0,0),mask);newtiles[n]=im;j=f'lag007_{n:02d}_del1av2';im.save(r/(j+'-tv.png'));out=base.copy();out.paste(im,(576,464))
+ if n==3:
+  ind=Image.open(r/'b-076-raa01.png').convert('RGB').resize((44,32),Image.Resampling.LANCZOS);out.paste(ind.crop((12,10,30,20)),(36,642))
+ old=b/'jobber'/j/'resultat.png';shutil.copy2(old,r/(j+'-kandidat02.png'));out.save(old)
+ c=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(old)],capture_output=True,text=True);(r/(j+'-kontroll.txt')).write_text(c.stdout+c.stderr);print(c.stdout)
+ d=np.any(np.array(out)!=np.array(base),axis=2);d[464:560,576:672]=False
+ if n==3:d[642:652,36:54]=False
+ assert not d.any()
+trace={'lokale_nye_rektangler':edits,'case_kilde':'b-tv03-state04.png','nytegnet_skjermpolygon':poly,'originalmasker':False,'rom_utenfor_tv_076_byteidentisk':True}
+for x,y in [(4,9),(10,11)]:
+ a=np.array(newtiles[x]);z=np.array(newtiles[y]);d=np.any(a!=z,axis=2);yy,xx=np.where(d);trace[f'{x:02X}_{y:02X}']={'endrede_hd_piksler':int(d.sum()),'bbox':[int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)]}
+(r/'b-komposisjonsbevis.json').write_text(json.dumps(trace,indent=2)+'\n')
+sheet=Image.new('RGB',(1152,768),(128,128,128))
+for i,n in enumerate(range(3,12)):
+ x=i%3*384;y=i//3*256;source=Image.open(b/'jobber'/f'lag007_{n:02d}_del1av2/original_1x.png').convert('RGB').crop((144,88,168,112));sheet.paste(source.resize((192,192),Image.Resampling.NEAREST),(x,y+25));sheet.paste(newtiles[n].resize((192,192)),(x+192,y+25));ImageDraw.Draw(sheet).text((x,y+5),f'{n:02X} source / HD',fill='white')
+sheet.save(r/'b-tv-familie.png')

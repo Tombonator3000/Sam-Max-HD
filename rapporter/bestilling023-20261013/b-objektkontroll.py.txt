@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import importlib.util,numpy as np,json,hashlib
+b=Path.cwd();r=b/'rapporter/bestilling023-20261013'
+spec=importlib.util.spec_from_file_location('c',b/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+rows=[];base=np.array(Image.open(b/'jobber/rom007_del1av2/resultat.png').convert('RGB'))
+for n in range(3,12):
+ j=f'lag007_{n:02d}_del1av2';d=b/'jobber'/j;job=json.loads((d/'jobb.json').read_text());im=Image.open(d/'resultat.png').convert('RGB');m=c.compare(Image.open(d/'original_1x.png').convert('RGB'),im.crop((0,112,1536,912)))
+ for o in job['objekter']:
+  x,y,w,h=o['rekt'];a=m['eo'][y:y+h,x:x+w];z=m['es'][y:y+h,x:x+w];rows.append({'jobb':j,'objekt':o['bilde'],'rekt':o['rekt'],'std':float(a.std()),'korrelasjon':float(c.corr(a,z)),'kontrollert':bool(a.std()>=1)})
+ outside=np.any(base!=np.array(im),axis=2);outside[464:560,576:672]=False
+ if n==3:outside[642:652,36:54]=False
+ assert not outside.any()
+source=Image.open(b/'jobber/lag007_03_del1av2/referanse.png').convert('RGB');source.info.clear();out=Image.open(b/'jobber/lag007_03_del1av2/resultat.png').convert('RGB');ground=Image.open(b/'jobber/rom007_del1av2/resultat.png').convert('RGB')
+panel=Image.new('RGB',(768,288),(128,128,128));draw=ImageDraw.Draw(panel)
+for i,(name,im) in enumerate([('source03',source),('HD grunn',ground),('HD03',out)]):draw.text((i*256,5),name,fill='white');panel.paste(im.crop((0,624,128,720)).resize((256,192),Image.Resampling.NEAREST),(i*256,30))
+panel.save(r/'b-076-familie.png')
+(r/'b-objektkontroll.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(rows,indent=2))

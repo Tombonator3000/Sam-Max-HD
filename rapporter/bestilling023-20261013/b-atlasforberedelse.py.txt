@@ -1,0 +1,9 @@
+# Kildereferanser, ikke erstatningsgrafikk. Ingen originalfil endres.
+from pathlib import Path
+from PIL import Image
+r=Path('rapporter/bestilling023-20261013');out=Image.new('RGB',(1536,1536))
+for i,n in enumerate(range(3,12)):
+ im=Image.open(f'jobber/lag007_{n:02d}_del1av2/original_1x.png').convert('RGB').crop((144,88,168,112));out.paste(im.resize((512,512),Image.Resampling.NEAREST),(i%3*512,i//3*512))
+out.save(r/'b-tv-kildeatlas.png')
+for name,path,rect,size in [('b-tv-hdkontekst.png','jobber/rom007_del1av2/resultat.png',(560,448,688,576),(768,768)),('b-076-kilde.png','jobber/lag007_03_del1av2/referanse.png',(24,632,68,664),(704,512)),('b-076-hd.png','jobber/rom007_del1av2/resultat.png',(24,632,68,664),(704,512))]:
+ im=Image.open(path).convert('RGB').crop(rect).resize(size,Image.Resampling.NEAREST);im.info.clear();im.save(r/name)

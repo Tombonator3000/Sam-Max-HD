@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling023-20261013'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def rel(p):return str(p.relative_to(b))
+locks=json.loads((r/'kildehash.json').read_text());assert all(sha(b/v['fil'])==v['sha256'] for v in locks)
+objects=json.loads((r/'b-objektkontroll.json').read_text());rows=[];base=b/'jobber/rom007_del1av2/resultat.png';ba=np.array(Image.open(base).convert('RGB'))
+for n in range(3,12):
+ j=f'lag007_{n:02d}_del1av2';p=b/'jobber'/j/'resultat.png';a=np.array(Image.open(p).convert('RGB'));assert a.shape==(1024,1536,3) and np.all(a[:112]==128) and np.all(a[912:]==128)
+ d=np.any(a!=ba,axis=2);d[464:560,576:672]=False
+ if n==3:d[642:652,36:54]=False
+ assert not d.any()
+ original=(b/'jobber'/j/'prompt.txt').read_text();assert original in (r/'b-tv-prompt03.txt').read_text()
+ c=r/(j+'-kontroll.txt');assert 'Utfall: OK' in c.read_text();obj=[v for v in objects if v['jobb']==j]
+ attempts=4 if n in [3,5,8,9,11] else 3
+ row={'jobb':j,'resultat':rel(p),'sha256':sha(p),'egenkontroll':'OK','kontrollfil':rel(c),'forsok':attempts,'valgt_atlasforsok':3,'tv_tilstand_hex':f'{n:02X}','tv_felt':[576,464,96,96],'komponent':rel(r/(j+'-tv.png')),'komponent_sha256':sha(r/(j+'-tv.png')),'bakgrunn':rel(base),'bakgrunn_sha256':sha(base),'objektkontroll':obj,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True}
+ rows.append(row)
+ (p.parent/'notat.md').write_text(f'''# {j}\n\nTilstand obj071_{n:02X}, desimal {n}. Leveransen er et opakt fullromslag, ikke et atlas. Innebygd ChatGPT imagegen ble brukt, eksakt bildemodell er ikke eksponert. Tre felles TV-atlasforsøk, hvor tredje er valgt. Ett eget firefelts mikrorettingsforsøk brukes for05/08/09/0B; ett eget indikatorforsøk brukes bare for03. Jobbens relevante forsøkstall er {attempts}, ikke antall fullromsgenereringer.\n\nTV-felt [576,464,96,96]. Riktig grunnrom007 del1 beholdes byte-identisk utenfor dette og, bare for03, indikatorfelt [36,642,18,10]. Felles nytegnet kasse fra04. Skjermklippet følger den nye HD-tegningen, ikke en originalkontur. Ingen originalpiksler, originalmasker eller warp.\n\nOrdrett felles jobbprompt er med i de faktiske atlaspromptene. Lokale mikro- og indikatorprompter er bevart som sendt. Råbilder, mellomforsøk, atlasrutesporing og reproduksjonsoppskrifter ligger i rapportmappen.\n\nUendret kontroll: OK. Hvert oppført objekt er faktisk kantkontrollert; ingen varianshopp. Alle40kilder uendret. Resultat SHA-256: {sha(p)}. Bakgrunn SHA-256: {sha(base)}.\n\nSe b-tv-familie.png, b-076-familie.png, b-objektkontroll.json og b-kilde-qa.md. Små konturer/fargeoverganger er nytolket, ikke pikselsertifisert. Ny individuell brukergodkjenning, import, runtime og animasjonstiming er ikke utført.\n''')
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':rows},ensure_ascii=False,indent=2)+'\n')
+files=[p for p in r.iterdir() if p.name.startswith('b-') and ('raa' in p.name or 'prompt' in p.name)]
+(r/'b-proveniens.json').write_text(json.dumps({'verktoy':'innebygd ChatGPT imagegen','eksakt_modell':'ikke eksponert','genereringskall_totalt':5,'atlasforsok':3,'mikroatlasforsok':1,'indikatorforsok':1,'beskyttede_kilder_uendret':len(locks),'files':[{'fil':rel(p),'sha256':sha(p)} for p in sorted(files)],'originalmasker':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('Ni leveranser;40kilder uendret')

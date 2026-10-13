@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+import shutil,subprocess,json
+b=Path.cwd();r=b/'rapporter/bestilling023-20261013';paths={"b-tv-raa01.png":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-b75da23b-093e-46f2-bca8-1e81030e4f84.png","b-tv-raa02.png":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-9d7ede73-1493-4410-9e38-e5323a93f45d.png","b-076-raa01.png":"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-f740cc00-f65c-4f83-9ce9-c8c47451a0c8.png"}
+for n,p in paths.items():shutil.copy2(p,r/n)
+atlas=Image.open(r/'b-tv-raa02.png').convert('RGB');w,h=atlas.size
+base=Image.open(b/'jobber/rom007_del1av2/resultat.png').convert('RGB')
+for i,n in enumerate(range(3,12)):
+ j=f'lag007_{n:02d}_del1av2';x=i%3;y=i//3;rect=(round(x*w/3),round(y*h/3),round((x+1)*w/3),round((y+1)*h/3));tile=atlas.crop(rect).resize((96,96),Image.Resampling.LANCZOS);tile.save(r/(j+'-tv-kandidat02.png'));out=base.copy();out.paste(tile,(576,464))
+ if n==3:
+  ind=Image.open(r/'b-076-raa01.png').resize((44,32),Image.Resampling.LANCZOS);out.paste(ind.crop((12,10,30,20)),(36,642))
+ out.save(b/'jobber'/j/'resultat.png')
+ c=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(b/'jobber'/j/'resultat.png')],capture_output=True,text=True);(r/(j+'-kontroll.txt')).write_text(c.stdout+c.stderr);print(c.stdout)
+sheet=Image.new('RGB',(576,576))
+for i,n in enumerate(range(3,12)):sheet.paste(Image.open(r/(f'lag007_{n:02d}_del1av2-tv-kandidat02.png')).resize((192,192)),(i%3*192,i//3*192))
+sheet.save(r/'b-tv-kandidat02.png')
