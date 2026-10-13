@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil,subprocess,hashlib,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];g=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+spec=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+entries=[];rows=[]
+for j,f in json.loads((r/'a-raaregister.json').read_text()).items():
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());rp=r/f'a-{j}-raa01.png';shutil.copy2(g/f'exec-{f}.png',rp);raw=Image.open(rp).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS);base=Image.open(root/m['bilde_to']).convert('RGB');before=np.array(base);alpha=np.zeros((1024,1536),float);rects=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=128+4*x;y=112+4*y;w*=4;h*=4;
+  if j.startswith("lag050"):x-=8;y-=8;w+=16;h+=16
+  yy,xx=np.mgrid[:h,:w];al=np.clip(np.minimum.reduce([xx,w-1-xx,yy,h-1-yy])/4,0,1);alpha[y:y+h,x:x+w]=np.maximum(alpha[y:y+h,x:x+w],al);rects.append([x,y,w,h])
+ after=np.rint(np.array(raw)*alpha[...,None]+before*(1-alpha[...,None])).astype('uint8');base=Image.fromarray(after);base.save(d/'resultat.png');assert np.array_equal(after[alpha==0],before[alpha==0]);cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);part,_=c.part_of(base,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);metrics=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];v=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));metrics.append({'objekt':o['bilde'],'kantkorrelasjon':v});box=(128+4*x,112+4*y,128+4*(x+w),112+4*(y+h));rows.append((j+' '+o['bilde'],Image.open(d/'referanse.png').crop(box),base.crop(box)))
+ entries.append({'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':{0:'OK',1:'SJEKK',2:'FEIL'}.get(cp.returncode,'FEIL'),'kontrollfil':str((r/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':1,'objektkontroll':metrics,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':False,'proveniens':{'verktoy':'innebygd imagegen','eksakt_modell':'ikke eksponert','raa':str(rp.relative_to(root)),'raa_sha256':sha(rp),'prompt':str((r/f'a-{j}-prompt01.txt').relative_to(root))},'rektangler':rects,'utenfor_rektangler_byteidentisk':True})
+(r/'a-forelopige-leveranser.json').write_text(json.dumps({'leveranser':entries},indent=2))
+for page in range((len(rows)+5)//6):
+ can=Image.new('RGB',(1100,6*245),(185,185,185));dr=ImageDraw.Draw(can)
+ for i,(name,a,b) in enumerate(rows[page*6:page*6+6]):
+  dr.text((5,i*245+5),name+' original / HD',fill='black')
+  for k,im in enumerate([a,b]):
+   s=min(530/im.width,210/im.height);im=im.resize((round(im.width*s),round(im.height*s)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);can.paste(im,(k*550,i*245+25))
+ can.save(r/f'a-049050-objektqa-{page+1}.png')
+print([(e['jobb'],e['egenkontroll'],[round(o['kantkorrelasjon'],3) for o in e['objektkontroll']]) for e in entries])

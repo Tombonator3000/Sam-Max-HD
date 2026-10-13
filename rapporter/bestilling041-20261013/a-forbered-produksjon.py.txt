@@ -1,0 +1,20 @@
+from pathlib import Path
+import json
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1]
+notes={'lag049_01':'Flat polygon virtual reality scene. Explicit correction: the yellow sword is ABSENT, leave its brown/teal ground and gray rock behind. A red faceted heart is at canvas x696..764 y600..664. Match its exact asymmetric orientation. No new facets, no gradients, no texture. Second image is existing HD background, NOT the sword state.','lag049_02':'Flat polygon virtual reality scene. The yellow sword REMAINS in the rock. The small red heart has THIS source-specific rotation. No new facets, no gradients, no texture.','lag050_01':'Pink brain machine. Match all red monitor block shapes and exact blue, yellow and gray FREE hanging connectors. Green/orange retain this source state. Keep BUMPUSVILLE, all wires, sockets and puzzle topology.','lag050_02':'Pink brain machine. Match small red monitor blocks and FREE green/orange connectors; yellow connector is plugged IN at its own socket. Do not swap wire colors or terminals. Keep BUMPUSVILLE.','lag050_03':'Pink brain machine. Match broad red monitor shape and blue/green/gray/orange wires PLUGGED IN to their exact source sockets. Keep BUMPUSVILLE and all metal borders.'}
+for j,n in notes.items():
+ p=(root/'jobber'/j/'prompt.txt').read_text()+'\n\nSEPARATE SOURCE CLARIFICATION:\n'+n+'\nImage1 is strict source geometry/state. Image2 is HD background/style. Output the same 1536x1024 full canvas; art [128,112,1280,800], padding RGB128. Keep every field precisely positioned.\n';(r/f'a-{j}-prompt01.txt').write_text(p)
+base=Image.new('RGB',(1920,800));base.paste(Image.open(root/'jobber/rom052_del1av2/resultat.png').crop((0,112,1536,912)));base.paste(Image.open(root/'jobber/rom052_del2av2/resultat.png').crop((0,112,1536,912)),(384,0));base.save(r/'a-052-HD-grunnmaster.png')
+for s in ['01','02']:
+ Image.open(r/f'a-052-{s}-originalmaster.png').resize((1920,800),Image.Resampling.NEAREST).save(r/f'a-052-{s}-referansemaster.png')
+ p='\n\n'.join((root/f'jobber/lag052_{s}_del{k}av2/prompt.txt').read_text() for k in [1,2]);n={'01':'Closed horizontal toucan beak, own lizard snout, CLOSED metal entrance door on far right, telephone booth door swung OPEN to left. All four fields belong to the same panorama.','02':'OPEN toucan beak, own lizard snout, OPEN entrance doorway at far right retaining original car and outdoor shapes. Telephone booth remains base state.'}[s]
+ p+='\n\nSEPARATE SOURCE CLARIFICATION AND AUTHORIZED PANORAMA ASSEMBLY:\nThe two verbatim part prompts above describe ONE master. Output exactly 1920x800 with NO gray padding, geometry identical to first attached master. Image2 is matching existing HD background/style. '+n+' Preserve THE REPTILE QUEEN, every door edge, lizard pose and perch. NO new creature anatomy or objects. New paint only, not pixel upscale.\n';(r/f'a-052-{s}-prompt01.txt').write_text(p)
+rs=root/'rapporter/bestilling042-20261013';rs.mkdir(exist_ok=True)
+records=json.loads((r/'a-lagbevis.json').read_text())+json.loads((r/'a-042-kontekst-lagbevis.json').read_text())
+for e in records:
+ j=e['jobb']
+ if not j.startswith('lag052_') or int(j.split('_')[1])<3:continue
+ n=int(j.split('_')[1]);folder=r if n==3 else rs
+ state='Toucan head/eye changes AND specific lizard snout.' if n==3 else 'Toucan ABSENT, retain bare perch and uncovered wall; own lizard snout.' if n==4 else 'Specific small lizard SNOUT/MOUTH variant, follow exact source dark/green strokes. No invented teeth or tongue.' if n<=10 else 'Only the small forefoot/toes have a distinct pose.' if n==11 else 'Only the tiny eye shape changes, 12 source pixels are significant.'
+ p=(root/'jobber'/j/'prompt.txt').read_text()+'\n\nSEPARATE SOURCE CLARIFICATION:\n'+state+' Preserve the BASE entrance door and telephone booth states, and all nonactive areas. First attached image is exact state and geometry, second is matching HD background/style. The lizard is the same green animal lying on its rock. No new body pose. Output exactly1536x1024, art [0,112,1536,800], gray128 top/bottom.\n';(folder/f'a-{j}-prompt01.txt').write_text(p)

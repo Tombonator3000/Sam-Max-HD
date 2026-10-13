@@ -1,0 +1,26 @@
+from pathlib import Path
+import numpy as np,json,shutil
+from PIL import Image,ImageDraw,ImageFilter
+from collections import deque
+r=Path(__file__).resolve().parent;root=r.parents[1];g=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a');proof=[]
+rawfix=r/'a-049-sverdfravaer-raa03.png'
+for j in ['lag049_01','lag049_02']:
+ base=np.array(Image.open(root/'jobber/rom049/resultat.png').convert('RGB'));before=base.copy();raw=np.array(Image.open(r/f'a-{j}-raa01.png').convert('RGB'));x,y,w,h=672,592,96,96;a=raw[y:y+h,x:x+w].astype(float);src=np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'));pal=np.unique(src.reshape(-1,3),axis=0);redpal=pal[(pal[:,0]>100)&(pal[:,1]<30)&(pal[:,2]<40)].astype(float);assert len(redpal)==2
+ alpha=np.clip((a[:,:,0]-np.maximum(a[:,:,1],a[:,:,2])-35)/45,0,1);alpha*=(a[:,:,0]>90)&(a[:,:,0]>3*a[:,:,1])&(a[:,:,0]>3*a[:,:,2])
+ # Only new generator pixels define the red heart contour; no source geometry used.
+ distances=((a[:,:,None,:]-redpal[None,None,:,:])**2).sum(3);color=redpal[np.argmin(distances,2)];base[y:y+h,x:x+w]=np.rint(color*alpha[:,:,None]+base[y:y+h,x:x+w]*(1-alpha[:,:,None])).astype('uint8')
+ info={'jobb':j,'hjertemaske':'Bare NYgenerert RGB: alpha=clip((R-max(G,B)-35)/45,0,1)*(R>90)*(R>3G)*(R>3B), i kandidatens hjertenkontekst [672,592,96,96].','rode_kildefarger':redpal.tolist(),'nye_hjertepiksler':int((alpha>0).sum()),'konturfra_original':False}
+ if j.endswith('01'):
+  # Whole new crop scaled back, then source-palette color simplification independent of coordinates.
+  patch=np.array(Image.open(rawfix).convert('RGB').resize((192,208),Image.Resampling.LANCZOS));sourcecrop=np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop((200,128,248,180)));p=np.unique(sourcecrop.reshape(-1,3),axis=0).astype(float);flat=patch.reshape(-1,3).astype(float);dist=((flat[:,None,:]-p[None,:,:])**2).sum(2);flat=p[np.argmin(dist,1)].astype('uint8').reshape(patch.shape);
+  flat=np.array(Image.fromarray(flat).filter(ImageFilter.MedianFilter(3)))
+  Image.fromarray(flat).save(r/'a-049-sverdfravaer-fargeflat.png')
+  xx,yy,ww,hh=972,688,108,96;base[yy:yy+hh,xx:xx+ww]=flat[yy-624:yy-624+hh,xx-928:xx-928+ww];info.update({'underlagsrekt':[xx,yy,ww,hh],'raa_unike_farger':len(np.unique(patch.reshape(-1,3),axis=0)),'flat_unike_farger':len(np.unique(flat.reshape(-1,3),axis=0)),'fargemetode':'Global nærmeste RGB-farge fra kildeutsnittets palett, uten koordinatkart eller originalmaske. Bare NYgenerert pikselfarge endres. Medianfilter3 reduserer små genererte fargeflekk i den NYE kandidaten. Tidligere regionsegmentering ble forkastet fordi små turkise felt forsvant.'})
+ Image.fromarray(base).save(root/'jobber'/j/'resultat.png');info['endret_mot_grunn']=int(np.any(base!=before,2).sum());proof.append(info)
+(r/'a-049-fargebevis.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+c=Image.new('RGB',(1024,1024),(185,185,185));d=ImageDraw.Draw(c)
+for n,j in enumerate(['lag049_01','lag049_02']):
+ for k,box in enumerate([(656,576,792,704),(936,656,1104,816)]):
+  for i,fn in enumerate(['referanse.png','resultat.png']):
+   im=Image.open(root/'jobber'/j/fn).crop(box);im.thumbnail((500,220));im=im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST);c.paste(im,(i*512,(n*2+k)*256+20));d.text((i*512+4,(n*2+k)*256+4),j+' '+fn,fill='black')
+c.save(r/'a-049-fargeqa.png')

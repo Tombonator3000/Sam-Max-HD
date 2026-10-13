@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil,subprocess,hashlib,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];r42=root/'rapporter/bestilling042-20261013';g=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+spec=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c);entries=[];rows=[];scenes=[]
+for s,f in json.loads((r/'a-052-raaregister.json').read_text()).items():
+ n=int(s);rr=r if n<4 else r42;jobs=[f'lag052_{s}_del1av2',f'lag052_{s}_del2av2'] if n<=2 else [f'lag052_{s}_del'+('1' if n<=4 else '2')+'av2'];rawpath=rr/f'a-052-{s}-raa01.png';shutil.copy2(g/f'exec-{f}.png',rawpath);raw=Image.open(rawpath).convert('RGB');base=Image.open(r/'a-052-HD-grunnmaster.png').convert('RGB');before=np.array(base);new=before.copy();alpha=np.zeros(before.shape[:2],float);obs=[];rects=[]
+ if n<=2:new=np.array(raw.resize((1920,800),Image.Resampling.LANCZOS))
+ elif n<=4:new[:,:1536]=np.array(raw.resize((1536,1024),Image.Resampling.LANCZOS))[112:912]
+ else:new[544:736,864:1120]=np.array(raw.resize((256,192),Image.Resampling.LANCZOS))
+ if n==1:
+  dp=r/'a-052-01-dorer-raa02.png';shutil.copy2(g/'exec-3bf38fb8-cea5-4868-b0e5-f92580cb30f5.png',dp);new[160:704,1200:1920]=np.array(Image.open(dp).convert('RGB').resize((720,544),Image.Resampling.LANCZOS))
+ if n==3:
+  dp=r/'a-489-oye-raa02.png';shutil.copy2(g/'exec-8fc95cb0-d160-4d7d-a2de-d6f079345ee6.png',dp);new[208:312,336:440]=np.array(Image.open(dp).convert('RGB').resize((104,104),Image.Resampling.LANCZOS))
+ if n==12:
+  dp=rr/'a-488-oye-raa02.png';shutil.copy2(g/'exec-5cef5043-abcd-4aea-aa96-4e6235da106b.png',dp);new[544:736,864:1120]=np.array(Image.open(dp).convert('RGB').resize((256,192),Image.Resampling.LANCZOS))
+ for j in jobs:
+  m=json.loads((root/'jobber'/j/'jobb.json').read_text());obs+=m['objekter']
+ for o in obs:
+  x,y,w,h=[v*4 for v in o['rekt']];yy,xx=np.mgrid[:h,:w];edge=[xx,yy,w-1-xx,h-1-yy];al=np.clip(np.minimum.reduce(edge)/4,0,1);alpha[y:y+h,x:x+w]=np.maximum(alpha[y:y+h,x:x+w],al);rects.append([x,y,w,h])
+ out=np.rint(new*alpha[...,None]+before*(1-alpha[...,None])).astype('uint8');master=Image.fromarray(out);mp=rr/f'a-052-{s}-fullmaster.png';master.save(mp);assert np.array_equal(out[alpha==0],before[alpha==0])
+ for j in jobs:
+  d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());rx,ry,rw,rh=m['region'];canvas=Image.new('RGB',(1536,1024),(128,128,128));canvas.paste(master.crop((rx*4,0,(rx+rw)*4,800)),(0,112));canvas.save(d/'resultat.png');cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(rr/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);part,_=c.part_of(canvas,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);metrics=[]
+  for o in m['objekter']:
+   x,y,w,h=o['rekt'];x-=rx;v=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));metrics.append({'objekt':o['bilde'],'kantkorrelasjon':v});box=(x*4,112+y*4,(x+w)*4,112+(y+h)*4);rows.append((j+' '+o['bilde'],Image.open(d/'referanse.png').crop(box),canvas.crop(box)))
+  entries.append({'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':{0:'OK',1:'SJEKK',2:'FEIL'}.get(cp.returncode,'FEIL'),'kontrollfil':str((rr/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':1,'objektkontroll':metrics,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':False,'fullmaster':str(mp.relative_to(root)),'fullmaster_sha256':sha(mp),'proveniens':{'verktoy':'innebygd imagegen','eksakt_modell':'ikke eksponert','raa':str(rawpath.relative_to(root)),'raa_sha256':sha(rawpath)},'rektangler_i_master':rects,'utenfor_rektangler_byteidentisk':True});scenes.append((j,Image.open(d/'referanse.png'),canvas))
+for rr in [r,r42]:
+ es=[e for e in entries if (int(e['jobb'].split('_')[1])<4)==(rr==r)];(rr/'a-052-forelopige-leveranser.json').write_text(json.dumps({'leveranser':es},indent=2))
+for page in range((len(rows)+5)//6):
+ can=Image.new('RGB',(1100,6*245),(185,185,185));dr=ImageDraw.Draw(can)
+ for i,(name,a,b) in enumerate(rows[page*6:page*6+6]):
+  dr.text((5,i*245+5),name+' original / HD',fill='black')
+  for k,im in enumerate([a,b]):
+   s=min(530/im.width,210/im.height);im=im.resize((round(im.width*s),round(im.height*s)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);can.paste(im,(k*550,i*245+25))
+ can.save(r/f'a-052-objektqa-{page+1}.png')
+print([(e['jobb'],e['egenkontroll'],[round(o['kantkorrelasjon'],3) for o in e['objektkontroll']]) for e in entries])

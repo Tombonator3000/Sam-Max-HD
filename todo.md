@@ -79,3 +79,5 @@
 - [x] Levert bestilling 40 med 8 OK og 30 faktiske feltkontroller.
 
 - [x] Levert bestilling 43 med 8 OK og 21 faktiske feltkontroller.
+
+- [x] Levert bestilling 41 med 10 OK og 27 faktiske feltkontroller.

@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 00:07 (norsk tid)
+Oppdatert 2026-10-14 00:10 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 389 bilder levert (187 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 416 bilder levert (197 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -619,16 +619,16 @@ Rom 44, 45, 47, 48.
 
 Rom 49, 50, 52.
 
-- [ ] `lag049_01` (rom 49 Den virtuelle verdenen, lag 01 med 2 objektbilder, bilde to `jobber/rom049/resultat.png`)
-- [ ] `lag049_02` (rom 49 Den virtuelle verdenen, lag 02 med 1 objektbilde, bilde to `jobber/rom049/resultat.png`)
-- [ ] `lag050_01` (rom 50 Hjernen i VR-maskinen, lag 01 med 5 objektbilder, bilde to `jobber/rom050/resultat.png`)
-- [ ] `lag050_02` (rom 50 Hjernen i VR-maskinen, lag 02 med 5 objektbilder, bilde to `jobber/rom050/resultat.png`)
-- [ ] `lag050_03` (rom 50 Hjernen i VR-maskinen, lag 03 med 5 objektbilder, bilde to `jobber/rom050/resultat.png`)
-- [ ] `lag052_01_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`)
-- [ ] `lag052_01_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_02_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`)
-- [ ] `lag052_02_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
-- [ ] `lag052_03_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 03 med 2 objektbilder, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`)
+- [x] `lag049_01` (rom 49 Den virtuelle verdenen, lag 01 med 2 objektbilder, bilde to `jobber/rom049/resultat.png`)
+- [x] `lag049_02` (rom 49 Den virtuelle verdenen, lag 02 med 1 objektbilde, bilde to `jobber/rom049/resultat.png`)
+- [x] `lag050_01` (rom 50 Hjernen i VR-maskinen, lag 01 med 5 objektbilder, bilde to `jobber/rom050/resultat.png`)
+- [x] `lag050_02` (rom 50 Hjernen i VR-maskinen, lag 02 med 5 objektbilder, bilde to `jobber/rom050/resultat.png`)
+- [x] `lag050_03` (rom 50 Hjernen i VR-maskinen, lag 03 med 5 objektbilder, bilde to `jobber/rom050/resultat.png`)
+- [x] `lag052_01_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`)
+- [x] `lag052_01_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_02_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`)
+- [x] `lag052_02_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`)
+- [x] `lag052_03_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 03 med 2 objektbilder, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`)
 
 ## Bestilling 42
 
@@ -3511,3 +3511,5 @@ Bestilling 39: ti lag fra dyreutstillingen levert OK med 21 faktiske feltkontrol
 Bestilling 40: åtte lag levert OK med 30 faktiske feltkontroller, egne sangromstilstander, hjelmfravær og presist409-underlag. To sokkelhodetilstander venter på brukerens motivavklaring. Se `rapporter/bestilling040-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 
 Bestilling 43: åtte lag levert OK med 21 faktiske feltkontroller. Tomt pelsdrakthode og målerstilling er korrigert. Festsalfigurer og isblokk venter på motivavklaring. Se `rapporter/bestilling043-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
+
+Bestilling 41: ti lag levert OK med 27 faktiske feltkontroller og to byte-identiske panoramaoverlapper. VR-varianten uten sverd bruker allerede valgt vektormetode for samme rom. Se `rapporter/bestilling041-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.

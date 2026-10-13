@@ -1,0 +1,44 @@
+from pathlib import Path
+import json,hashlib
+import numpy as np
+from PIL import Image,ImageDraw
+r=Path(__file__).resolve().parent;root=r.parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+load=lambda j:Image.open(root/'jobber'/j/'original_1x.png').convert('RGB')
+locks=[]
+for j in ['rom049','rom050','rom052_del1av2','rom052_del2av2']:
+ for n in ['original_1x.png','referanse.png','prompt.txt','jobb.json']:
+  p=root/'jobber'/j/n;locks.append({'fil':str(p.relative_to(root)),'sha256':sha(p)})
+(r/'a-grunnrom-kildehash.json').write_text(json.dumps(locks,indent=2)+'\n')
+report={'panorama':[],'familie':[]}
+for state in ['01','02']:
+ a=load('lag052_'+state+'_del1av2');b=load('lag052_'+state+'_del2av2');master=Image.new('RGB',(480,200));master.paste(a);master.paste(b,(96,0));master.save(r/f'a-052-{state}-originalmaster.png')
+ same=np.array_equal(np.asarray(a)[:,96:],np.asarray(b)[:,:288]);report['panorama'].append({'tilstand':state,'master':[1920,800],'klipp_x':[0,384],'overlapp_hd':1152,'kildeoverlapp_identisk':same,'master_rgb_sha256':hashlib.sha256(master.tobytes()).hexdigest()})
+base=load('rom052_del1av2');base2=load('rom052_del2av2');master=Image.new('RGB',(480,200));master.paste(base);master.paste(base2,(96,0));master.save(r/'a-052-grunn-originalmaster.png')
+fields=json.loads((r/'a-feltbevis.json').read_text())+json.loads((r/'a-042-kontekst-feltbevis.json').read_text())
+items=[e for e in fields if e['objekt'].startswith(('obj483','obj486','obj487','obj488','obj489','obj490'))]
+c=Image.new('RGB',(1200,((len(items)+3)//4)*220),(185,185,185));d=ImageDraw.Draw(c)
+for k,e in enumerate(items):
+ x,y,w,h=e['rekt'];src=load(e['jobb']).crop(e['lokalt_klipp']);bg=master.crop((x,y,x+w,y+h));a=np.asarray(src);b=np.asarray(bg);yy,xx=np.where(np.any(a!=b,axis=2));colors,count=np.unique(a.reshape(-1,3),axis=0,return_counts=True)
+ report['familie'].append({'jobb':e['jobb'],'objekt':e['objekt'],'rekt':e['rekt'],'endret_mot_grunn':len(xx),'endringer':[{'xy':[int(x+i),int(y+j)],'fra':b[j,i].tolist(),'til':a[j,i].tolist()} for i,j in zip(xx,yy)] if len(xx)<=20 else None,'palett':[{'rgb':v.tolist(),'antall':int(n)} for v,n in zip(colors,count)]})
+ px=k%4*300;py=k//4*220;d.text((px+4,py+4),e['objekt']+' '+e['jobb'].split('_')[1],fill='black');c.paste(bg.resize((w*3,h*3),Image.Resampling.NEAREST),(px+4,py+24));c.paste(src.resize((w*3,h*3),Image.Resampling.NEAREST),(px+150,py+24))
+c.save(r/'a-052-familiebevis.png')
+# Full original and delivered HD comparisons for contextual base rooms.
+c=Image.new('RGB',(1536,4*330),(185,185,185));d=ImageDraw.Draw(c)
+for k,j in enumerate(['rom049','rom050','rom052_del1av2','rom052_del2av2']):
+ d.text((4,k*330+4),j+' original / eksisterende HD',fill='black')
+ for i,n in enumerate(['referanse.png','resultat.png']):
+  im=Image.open(root/'jobber'/j/n).convert('RGB');im.thumbnail((768,300));c.paste(im,(i*768,k*330+24))
+c.save(r/'a-grunnrom-kontekst.png')
+(r/'a-familiebevis.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+print(report['panorama']);print([(e['objekt'],e['endret_mot_grunn']) for e in report['familie']])
+for e in report['panorama']:
+ state=e['tilstand'];a=np.asarray(Image.open(r/f'a-052-{state}-originalmaster.png'));bg=np.asarray(master);mask=np.zeros((200,480),bool)
+ for part in ['1','2']:
+  m=json.loads((root/f'jobber/lag052_{state}_del{part}av2/jobb.json').read_text())
+  for ob in m['objekter']:
+   x,y,w,h=ob['rekt'];mask[y:y+h,x:x+w]=True
+ diff=np.any(a!=bg,axis=2);e['endret_mot_grunn_master']=int(diff.sum());e['endret_utenfor_begge_delers_objektunion']=int((diff&~mask).sum())
+a=Image.open(root/'jobber/rom052_del1av2/resultat.png').convert('RGB');b=Image.open(root/'jobber/rom052_del2av2/resultat.png').convert('RGB');report['eksisterende_HD_grunnrom_overlapp_identisk']=np.array_equal(np.asarray(a)[112:912,384:],np.asarray(b)[112:912,:1152])
+(r/'a-familiebevis.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+print(report['panorama']);print('HDoverlapp',report['eksisterende_HD_grunnrom_overlapp_identisk'])
