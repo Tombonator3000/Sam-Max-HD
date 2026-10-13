@@ -70,3 +70,4 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - CSV-filene i `docs/` skrives med LF (`lineterminator="\n"`), ellers klager `git diff --check`.
 - Dynamisk lys (normalkart og luminansmaske) er planlagt etter stilpiloten: valgfritt for spilleren, ingen kastede skygger (Tom 13. oktober). Samme plan i Zak.
 - Deling (13. oktober 2026): Tom tillater at grafikk og annet fra spillet deles utenfor repoet til hans eget private bruk (egne enheter, private steder). Offentlige sider og pakker har fortsatt ingen spillgrafikk. Spillfilene og det som lages fra dem holdes fortsatt utenfor `main`.
+- Unntak (13. oktober 2026, Toms bevisste beslutning): lystesten på GitHub Pages har kontoret (rom 7) og hovedarkene til Sam og Max. Offentlig side; filene hentes fra `gpt-arbeid` inn i Pages-pakken av `pages.yml` og sjekkes ikke inn i `main`.
