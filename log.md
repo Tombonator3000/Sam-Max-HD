@@ -262,3 +262,8 @@
 
 - Bestilling 33: ti lag levert OK med elleve faktiske objektkontroller, kikkertfragmenter fra felles master, to viserposisjoner med308underlag og egne gnister/ledningsender. Se `rapporter/bestilling033-20261013/RAPPORT.md`. Bestilling 34 og videre fortsetter.
 - 40 beskyttede kilder og 32 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T23:26:17+02:00 (Codex, Astra)
+
+- Bestilling 34: seks lag levert OK med sju faktiske objektkontroller, siste tre viserposisjoner, to mikrotilstander og trådfravær/lukket dør på nøstet. Fire jobber venter grønt motivinnhold og er ikke levert. Se `rapporter/bestilling034-20261013/RAPPORT.md`. Bestilling 35 og videre fortsetter.
+- 40 beskyttede kilder og 12 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

@@ -1,0 +1,7 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np
+p=Path('rapporter/bestilling034-20261013');a=Image.open(p/'c-305-raw1.png').convert('RGB').resize((1024,1536),Image.Resampling.LANCZOS);base=Image.open('jobber/rom031_del2av4/resultat.png').convert('RGB');under=Image.open('jobber/obj308_01/resultat.png').convert('RGB').crop((1088,368,1408,656));proof=[]
+for i,n in enumerate([7,8,9]):
+ j=f'lag031_{n:02d}_del2av4';field=a.crop((112,32+536*i,912,432+536*i)).resize((320,160),Image.Resampling.LANCZOS);field.save(p/f'c-obj305_0{i+3}-felt.png');im=base.copy();im.paste(under,(0,624));im.paste(field,(160,656));im.save('jobber/'+j+'/resultat.png');mask=np.zeros((1024,1536),bool);mask[624:912,:320]=True;mask[656:816,160:480]=True;diff=np.any(np.array(im)!=np.array(base),axis=2);u=np.array(im.crop((0,624,320,912)));v=np.array(under);um=np.ones((288,320),bool);um[32:192,160:320]=False;proof.append({'jobb':j,'utenfor_faktisk_union_avvik':int(np.count_nonzero(diff&~mask)),'underlag_byteidentisk_utenfor_305':bool(np.array_equal(u[um],v[um]))})
+(p/'c-komposisjonsbevis.json').write_text(json.dumps(proof,indent=2)+'\n')

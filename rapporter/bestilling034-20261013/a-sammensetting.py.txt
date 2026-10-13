@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil,subprocess,hashlib,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];g=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a');py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();files={'lag032_02_del1av2':'exec-ac63fb45-0e85-47fa-b6f6-87641b4896cb.png','lag032_04_del1av2':'exec-5400d1be-0007-4993-9bce-42b328b15113.png','lag033_01':'exec-596d2559-f1a8-452c-a016-2ecd67e94fe8.png'};proof={};entries=[];rows=[]
+spec=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+for j,f in files.items():
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());shutil.copy2(g/f,r/f'a-{j}-raa01.png');raw=Image.open(r/f'a-{j}-raa01.png').convert('RGB');base=Image.open(root/m['bilde_to']).convert('RGB');before=np.array(base);boxes=[]
+ if j.startswith('lag032'):
+  a=np.array(raw,dtype=int);gray=(a.max(2)-a.min(2)<15)&(a.mean(2)>120)&(a.mean(2)<180);components=[]
+  for half in [0,1]:
+   sub=gray.copy();sub[:,raw.width//2:] = False if half==0 else sub[:,raw.width//2:]
+   if half==1:sub[:,:raw.width//2]=False
+   yy,xx=np.nonzero(sub);b=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1));h=4 if '_02_' in j else 8;y=304 if h==4 else 300;x=248+16*half;cut=raw.crop(b).resize((4,h),Image.Resampling.LANCZOS);base.paste(cut,(x,y));boxes.append([x,y,4,h]);components.append({'generert_bbox':b,'plassert':[x,y,4,h],'rgb_min':np.array(cut).min(0).min(0).tolist(),'rgb_max':np.array(cut).max(0).max(0).tolist()})
+  proof[j]={'metode':'Kun nygenererte graakomponenters rektangulaere bokser; LANCZOS helskalering. Ingen originalmaske eller kildepikselfyll.','generert_fargesok':'max(RGB)-min(RGB)<15 og 120<mean(RGB)<180, to bildehalvdeler','komponenter':components}
+ else:
+  raw=raw.resize((1536,1024),Image.Resampling.LANCZOS)
+  for b in [[320,464,544,448],[928,240,128,96]]:
+   x,y,w,h=b;crop=(x,y,x+w,y+h);a=np.array(raw.crop(crop),float);bb=np.array(base.crop(crop),float);yy,xx=np.mgrid[:h,:w];edges=[xx,w-1-xx,yy]
+   if y+h<912:edges.append(h-1-yy)
+   alpha=np.clip(np.minimum.reduce(edges)/4,0,1)[...,None];base.paste(Image.fromarray(np.rint(a*alpha+bb*(1-alpha)).astype('uint8')),(x,y));boxes.append(b)
+  proof[j]={'rektangler':boxes,'kantovergang_hdpx':4}
+ base.save(d/'resultat.png');cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout);part,_=c.part_of(base,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);fields=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];v=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));fields.append({'objekt':o['bilde'],'kantkorrelasjon':v,'utfall':'OK' if v>=.6 else 'SJEKK' if v>=.5 else 'FEIL'});ax=m['bilde_i_lerret'][0];b=(ax+4*x,112+4*y,ax+4*(x+w),112+4*(y+h));rows.append((j+' '+o['bilde'],Image.open(d/'referanse.png').crop(b),base.crop(b)))
+ mask=np.ones(before.shape[:2],bool)
+ for x,y,w,h in boxes:mask[y:y+h,x:x+w]=False
+ assert np.array_equal(np.array(base)[mask],before[mask]);e={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':'OK' if cp.returncode==0 else 'SJEKK' if cp.returncode==1 else 'FEIL','kontrollfil':str((r/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':1,'objektkontroll':fields,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':cp.returncode==0,'proveniens':{'raa':str((r/f'a-{j}-raa01.png').relative_to(root)),'raa_sha256':sha(r/f'a-{j}-raa01.png'),'prompt':str((r/f'a-{j}-prompt01.txt').relative_to(root)),'prompt_sha256':sha(r/f'a-{j}-prompt01.txt')}};entries.append(e)
+ (d/'notat.md').write_text(f'# {j}\n\nInnebygd imagegen, ett forsøk, 2026-10-13. Eksakt modell ikke eksponert. Ordrett prompt med separat kildepresisering. Råfiler, prompter, SHA og oppskrift i bestilling034-rapportens a-filer.\n\nKildebestemt mikrotilstand eller fraværstilstand, ikke fullførte figurer. Se a-kilde-qa.md og a-komposisjonsbevis.json for presis skalering/plassering av nygenererte komponenter. Ingen originalmasker eller lokal warp. Uendret checker: {e["egenkontroll"]}. SHA-256 {e["sha256"]}. Ingen runtime eller individuell brukergodkjenning.\n')
+(r/'a-komposisjonsbevis.json').write_text(json.dumps(proof,indent=2));(r/'a-leveranser.json').write_text(json.dumps({'leveranser':entries,'genereringskall':3,'avventer_semantikk':['lag032_01_del1av2','lag032_03_del1av2','lag035_01_del1av2','lag035_02_del2av2'],'checker_sha256':sha(root/'verktoy/sjekk_leveranse.py')},indent=2));print([(e['jobb'],e['objektkontroll']) for e in entries])
+can=Image.new('RGB',(1200,len(rows)*340),(185,185,185));dr=ImageDraw.Draw(can)
+for i,(name,a,b) in enumerate(rows):
+ dr.text((5,i*340+5),name+' original / HD',fill='black')
+ for k,im in enumerate([a,b]):
+  s=min(570/im.width,300/im.height);im=im.resize((round(im.width*s),round(im.height*s)),Image.Resampling.NEAREST if i<2 or k==0 else Image.Resampling.LANCZOS);can.paste(im,(k*600,i*340+30))
+can.save(r/'a-objektqa.png')

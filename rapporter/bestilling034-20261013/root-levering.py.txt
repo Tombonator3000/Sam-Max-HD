@@ -1,0 +1,30 @@
+from pathlib import Path
+import hashlib, json, runpy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+root=Path(__file__).resolve().parents[2]
+r=Path(__file__).resolve().parent
+common=runpy.run_path(str(root/'rapporter/rom090-obj901-vektor-20261013/root-levering.py.txt'),run_name='delivery_helpers')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+m=json.loads((r/'fremdrift.json').read_text())
+s=json.loads((r/'sluttkontroll.json').read_text())
+assert s['utfall_antall']=={'OK':6,'SJEKK':0,'FEIL':0} and not s['ikke_klar_for_mottak']
+for e in json.loads((r/'kildehash.json').read_text()):
+    assert sha(root/e['fil'])==e['sha256']
+for e in m['leveranser']:
+    assert sha(root/e['resultat'])==e['sha256']
+    assert e['klar_for_mottak'] and not e['importert'] and not e['runtime_verifisert']
+objects=json.loads((r/'root-objektkontroll.json').read_text())
+assert len(objects)==7 and all(e['status']=='OK' and not e['hoppet_over'] for e in objects)
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+note='Bestilling 34: seks lag levert OK med sju faktiske objektkontroller, siste tre viserposisjoner, to mikrotilstander og trådfravær/lukket dør på nøstet. Fire jobber venter grønt motivinnhold og er ikke levert. Se `rapporter/bestilling034-20261013/RAPPORT.md`. Bestilling 35 og videre fortsetter.'
+counts=common['update_queue'](m['leveranser'],note)
+(r/'root-mottak.json').write_text(json.dumps({'dato':stamp,'telling':counts,'root_visuell_motivkontroll':True,'alle_7_objektfelt_kontrollert':True,'motorimport':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+p=root/'todo.md';text=p.read_text();old='- [ ] Fortsett bestilling 34'
+assert text.count(old)==1
+text=text.replace(old,'- [ ] Fullfør bestilling 34: seks OK levert; lag032_01/03 og lag035_01/02 venter avklaring av grønne former.\n- [ ] Fortsett bestilling 35')
+p.write_text(text)
+with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex, Astra)\n\n- '+note+'\n- 40 beskyttede kilder og 12 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.\n')
+commit=common['seal_and_push'](r,m['leveranser'],'GPT: bestilling 34, seks avklarte lag og viserfamilie')
+print(json.dumps({'commit':commit,'telling':counts},ensure_ascii=False))

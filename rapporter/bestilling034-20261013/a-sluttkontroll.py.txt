@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();mf=json.loads((r/'a-leveranser.json').read_text());can=Image.new('RGB',(1200,1290),(185,185,185));dr=ImageDraw.Draw(can)
+for i,e in enumerate(mf['leveranser']):
+ j=e['jobb'];m=json.loads((root/'jobber'/j/'jobb.json').read_text());refs=[f'rapporter/bestilling034-20261013/a-{j}-{k}.png' for k in ['kilde','hd']] if j.startswith('lag032') else [f'jobber/{j}/referanse.png',m['bilde_to'],'stil/rom007_del1av2.png'];e['proveniens']['referanser']=[{'fil':p,'sha256':sha(root/p)} for p in refs];e['oppskrift']='rapporter/bestilling034-20261013/a-sammensetting.py.txt';e['oppskrift_sha256']=sha(r/'a-sammensetting.py.txt');e['utenfor_rektangler_byteidentisk']=True
+ a=np.array(Image.open(root/'jobber'/j/'resultat.png'));pad=np.ones(a.shape[:2],bool);x,y,w,h=m['bilde_i_lerret'];pad[y:y+h,x:x+w]=False;assert np.all(a[pad]==128);assert a.shape==(1024,1536,3)
+ for k,n in enumerate(['referanse.png','resultat.png']):
+  im=Image.open(root/'jobber'/j/n);im.thumbnail((590,395));can.paste(im,(k*600,i*430+25))
+ dr.text((5,i*430+5),j+' original / HD',fill='black')
+can.save(r/'a-samlet-kontaktark.png');(r/'a-leveranser.json').write_text(json.dumps(mf,indent=2));locks=json.loads((r/'kildehash.json').read_text())+json.loads((r/'root-ekstra-kildehash.json').read_text());assert all(sha(root/e['fil'])==e['sha256'] for e in locks);(r/'a-kildehashkontroll.json').write_text(json.dumps({'antall':len(locks),'alle_uendret':True,'filer':locks},indent=2))

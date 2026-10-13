@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,importlib.util,subprocess
+p=Path('rapporter/bestilling034-20261013');py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';spec=importlib.util.spec_from_file_location('ck','verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(spec);spec.loader.exec_module(ck);rows=[];stats=[];full=[]
+for n,part in [(7,2),(8,2),(9,2)]:
+ j=f'lag031_{n:02d}_del{part}av4';d=Path('jobber')/j;r=Image.open(d/'resultat.png');src=Image.open(d/'referanse.png');m=json.loads((d/'jobb.json').read_text());metric=ck.compare(Image.open(d/'original_1x.png').convert('RGB'),r.crop((0,112,1536,912)))
+ log=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(d/'resultat.png')],capture_output=True,text=True);(p/f'{j}-kontroll.txt').write_text(log.stdout+log.stderr);print(log.stdout)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];bb=(x*4,112+y*4,(x+w)*4,112+(y+h)*4);co=float(ck.corr(metric['eo'][y:y+h,x:x+w],metric['es'][y:y+h,x:x+w]));stats.append({'jobb':j,'objekt':o['bilde'],'rekt':o['rekt'],'kantkorrelasjon':co})
+  scale=min(2,650/max(w*4,h*4));sz=(round(w*4*scale),round(h*4*scale));row=Image.new('RGB',(1320,max(140,sz[1]+30)),(160,160,160));ImageDraw.Draw(row).text((5,5),j+' '+o['bilde']+' original / HD '+str(round(co,3)),fill='black')
+  for k,img in enumerate([src,r]):row.paste(img.crop(bb).resize(sz,Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS),(k*660,28))
+  rows.append(row)
+ fr=Image.new('RGB',(1152,268),(128,128,128));ImageDraw.Draw(fr).text((4,0),j,fill='white');fr.paste(src.resize((576,256)),(0,12));fr.paste(r.resize((576,256)),(576,12));full.append(fr)
+for n,start in enumerate(range(0,len(rows),3),1):
+ rs=rows[start:start+3];im=Image.new('RGB',(1320,sum(r.height for r in rs)),(160,160,160));y=0
+ for row in rs:im.paste(row,(0,y));y+=row.height
+ im.save(p/f'c-objektqa-{n}.png')
+im=Image.new('RGB',(1152,sum(x.height for x in full)),(128,128,128));y=0
+for x in full:im.paste(x,(0,y));y+=x.height
+im.save(p/'c-helsceneqa.png');(p/'c-objektkontroll.json').write_text(json.dumps(stats,indent=2)+'\n')

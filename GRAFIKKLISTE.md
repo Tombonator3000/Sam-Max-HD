@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:24 (norsk tid)
+Oppdatert 2026-10-13 23:26 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 236 bilder levert (119 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 243 bilder levert (125 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -514,14 +514,14 @@ Rom 30, 31.
 
 Rom 31, 32, 33, 35.
 
-- [ ] `lag031_07_del2av4` (rom 31 Kikkerten med utsikten, lag 07 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
-- [ ] `lag031_08_del2av4` (rom 31 Kikkerten med utsikten, lag 08 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
-- [ ] `lag031_09_del2av4` (rom 31 Kikkerten med utsikten, lag 09 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
+- [x] `lag031_07_del2av4` (rom 31 Kikkerten med utsikten, lag 07 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
+- [x] `lag031_08_del2av4` (rom 31 Kikkerten med utsikten, lag 08 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
+- [x] `lag031_09_del2av4` (rom 31 Kikkerten med utsikten, lag 09 med 1 objektbilde, del 2/4, bilde to `jobber/rom031_del2av4/resultat.png`)
 - [ ] `lag032_01_del1av2` (rom 32 Fiskedekket på toppen av nøstet, lag 01 med 3 objektbilder, del 1/2, bilde to `jobber/rom032_del1av2/resultat.png`)
-- [ ] `lag032_02_del1av2` (rom 32 Fiskedekket på toppen av nøstet, lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom032_del1av2/resultat.png`)
+- [x] `lag032_02_del1av2` (rom 32 Fiskedekket på toppen av nøstet, lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom032_del1av2/resultat.png`)
 - [ ] `lag032_03_del1av2` (rom 32 Fiskedekket på toppen av nøstet, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom032_del1av2/resultat.png`)
-- [ ] `lag032_04_del1av2` (rom 32 Fiskedekket på toppen av nøstet, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom032_del1av2/resultat.png`)
-- [ ] `lag033_01` (rom 33 Toppen av nøstet, lag 01 med 2 objektbilder, bilde to `jobber/rom033/resultat.png`)
+- [x] `lag032_04_del1av2` (rom 32 Fiskedekket på toppen av nøstet, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom032_del1av2/resultat.png`)
+- [x] `lag033_01` (rom 33 Toppen av nøstet, lag 01 med 2 objektbilder, bilde to `jobber/rom033/resultat.png`)
 - [ ] `lag035_01_del1av2` (rom 35 World of Fish, lag 01 med 5 objektbilder, del 1/2, bilde to `jobber/rom035_del1av2/resultat.png`)
 - [ ] `lag035_02_del2av2` (rom 35 World of Fish, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom035_del2av2/resultat.png`)
 
@@ -3495,3 +3495,5 @@ Bestilling 32: ti lag levert OK med tolv faktiske objektkontroller, identisk tau
 Bestilling 31: åtte lag levert OK med 11 faktiske objektkontroller. To figurfragmenter i lag026_02 og lag026_03 venter nødvendig brukeravklaring; disse er ikke levert. SWING-variant og Dunk the Beast-tilstander. Se `rapporter/bestilling031-20261013/RAPPORT.md`. Bestilling 32 er levert; bestilling 33 og videre fortsetter.
 
 Bestilling 33: ti lag levert OK med elleve faktiske objektkontroller, kikkertfragmenter fra felles master, to viserposisjoner med308underlag og egne gnister/ledningsender. Se `rapporter/bestilling033-20261013/RAPPORT.md`. Bestilling 34 og videre fortsetter.
+
+Bestilling 34: seks lag levert OK med sju faktiske objektkontroller, siste tre viserposisjoner, to mikrotilstander og trådfravær/lukket dør på nøstet. Fire jobber venter grønt motivinnhold og er ikke levert. Se `rapporter/bestilling034-20261013/RAPPORT.md`. Bestilling 35 og videre fortsetter.
