@@ -1,5 +1,7 @@
 # To hovedark levert som pilotkandidater
 
+**Historisk førstegangsrapport.** Størrelse og plassering er senere rettet etter Toms valg av presis bildebehandling. Begge gjeldende ark har egenkontroll OK. Se [rapporten om rettingen](../hovedark-retting-20261013/PRESIS-RETTING.md), oppdaterte hovedarknotater og `fremdrift.json`. Målingene nedenfor beskriver de tidligere kandidatene før retting.
+
 2026-10-13 15:45 (norsk tid), Codex.
 
 Levert `hovedark/sam.png` og `hovedark/max.png`, med notater. Sam: fem forsøk, valgt forsøk 4. Max: tre forsøk, valgt forsøk 2. Begge er 1536 x 1024 RGBA med ekte alfa og fem visninger. Ingen etterbehandling av selve tegningene. Prompt, kildehash, råforsøk, valgt filhash og egenkontroll er bevart. `fremdrift.json` er leveranseregisteret.

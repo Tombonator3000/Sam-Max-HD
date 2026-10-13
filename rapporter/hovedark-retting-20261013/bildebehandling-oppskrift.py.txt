@@ -1,0 +1,144 @@
+from pathlib import Path
+from datetime import datetime
+import hashlib
+import json
+import shutil
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+
+ROOT = Path('/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren')
+REPORT = ROOT / 'rapporter/hovedark-retting-20261013'
+PLAN = json.loads((REPORT / 'retteplan.json').read_text())
+CANVAS = (1536, 1024)
+CORE = 128
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def bbox(image):
+    a = np.asarray(image.convert('RGBA'))[:, :, 3]
+    ys, xs = np.nonzero(a >= CORE)
+    if not len(xs):
+        raise ValueError('Ingen alfakjerne')
+    return [int(xs.min()), int(ys.min()), int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1)]
+
+
+def boxes(image):
+    a = np.asarray(image.convert('RGBA'))[:, :, 3]
+    cols = (a >= CORE).any(axis=0)
+    segments, start = [], None
+    for x, on in enumerate(list(cols) + [False]):
+        if on and start is None:
+            start = x
+        elif not on and start is not None:
+            if x - start > 8:
+                segments.append((start, x))
+            start = None
+    out = []
+    for x0, x1 in segments:
+        b = bbox(image.crop((x0, 0, x1, image.height)))
+        b[0] += x0
+        out.append(b)
+    return out
+
+
+def scaled_sprite(source, before, want):
+    x, y, w, h = before
+    _, _, tw, th = want
+    margin, pad = 18, 12
+    crop = source.crop((x - margin, y - margin, x + w + margin, y + h + margin)).convert('RGBa')
+    # Premultiplisert alfa hindrer at usynlig bakgrunnsfarge blandes inn i kanten.
+    # En liten justering kan trenges fordi den resamplede 128-konturen avrundes.
+    for dw, dh in sorted(((dw, dh) for dw in [0, 1, -1, 2, -2] for dh in [0, 1, -1, 2, -2]), key=lambda t: abs(t[0]) + abs(t[1])):
+        sx, sy = (tw + dw) / w, (th + dh) / h
+        sample = (margin - pad / sx, margin - pad / sy,
+                  margin + w + pad / sx, margin + h + pad / sy)
+        tile = crop.resize((tw + dw + 2 * pad, th + dh + 2 * pad), Image.Resampling.LANCZOS, box=sample).convert('RGBA')
+        measured = bbox(tile)
+        if measured[2:] == [tw, th]:
+            return tile, measured, {'skala_x': sx, 'skala_y': sy, 'avrunding_px': [dw, dh], 'metode': 'Lanczos med premultiplisert alfa'}
+    raise ValueError(f'Kunne ikke tilpasse boksen {before} til {want}')
+
+
+protected = {r['fil']: sha(ROOT / r['fil']) for r in json.loads((ROOT / 'rapporter/hovedark-20261013/kildehash.json').read_text())}
+report = {'dato': datetime.now().astimezone().isoformat(timespec='seconds'),
+          'autorisasjon': 'Tom: Fortsett i denne chatten, velger Ja bruk presis skalering og plassering',
+          'kildecommit': '09905c32', 'alfaterskel': CORE, 'lerret': list(CANVAS),
+          'beskyttede_kildehash': protected, 'leveranser': []}
+font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 20)
+final_rows = []
+
+for figure in PLAN['figurer']:
+    name = figure['figur']
+    source_path = ROOT / figure['kilde']
+    before_path = REPORT / f'{name}-for-presis.png'
+    if not before_path.exists():
+        assert sha(source_path) == figure['sha256_for'], 'Stopp: kildekandidaten er endret'
+        shutil.copyfile(source_path, before_path)
+    assert sha(before_path) == figure['sha256_for']
+    source = Image.open(before_path).convert('RGBA')
+    assert source.size == CANVAS
+    assert boxes(source) == [v['fra'] for v in figure['visninger']]
+    job = json.loads((ROOT / f'hovedark/{name}/jobb.json').read_text())
+    expected = [[(job['plassering'][0] + b[0]) * 4, (job['plassering'][1] + b[1]) * 4, b[2] * 4, b[3] * 4] for b in job['bokser']]
+    assert expected == [v['til'] for v in figure['visninger']]
+    out = Image.new('RGBA', CANVAS)
+    transforms = []
+    for i, (view, want) in enumerate(zip(figure['visninger'], expected), 1):
+        tile, measured, details = scaled_sprite(source, view['fra'], want)
+        paste = (want[0] - measured[0], want[1] - measured[1])
+        assert paste[0] >= 0 and paste[1] >= 0 and paste[0] + tile.width <= out.width and paste[1] + tile.height <= out.height
+        out.alpha_composite(tile, paste)
+        transforms.append({'visning': i, 'fra': view['fra'], 'bestilt': want, 'plassert_tile': list(paste), **details})
+    assert boxes(out) == expected, (name, boxes(out), expected)
+    temporary = source_path.with_name(f'{name}.presis.tmp.png')
+    out.save(temporary)
+    temporary.replace(source_path)
+    check = Image.open(source_path).convert('RGBA')
+    assert boxes(check) == expected
+    alpha = np.asarray(check)[:, :, 3]
+    report['leveranser'].append({'jobb': f'hovedark_{name}', 'resultat': figure['kilde'], 'sha256_for': sha(before_path), 'sha256': sha(source_path),
+                                'status': 'geometri_kontrollert', 'visuelt_godkjent': False, 'importert': False,
+                                'bokser_bestilt': expected, 'bokser_malt': boxes(check), 'transformasjoner': transforms,
+                                'andel_alfa_under_16': round(float((alpha < 16).mean()), 6),
+                                'halvgjennomsiktige_piksler': int(((alpha > 0) & (alpha < 240)).sum())})
+    # Kontaktark bruker samme utsnitt og skala i hver rad.
+    crop_box = (184, 336, 1400, 704) if name == 'sam' else (232, 376, 1312, 648)
+    reference = Image.open(ROOT / f'hovedark/{name}/referanse.png').convert('RGBA')
+    arr = np.array(reference)
+    keep = np.zeros(arr.shape[:2], dtype=bool)
+    for x, y, w, h in expected:
+        keep[y:y+h, x:x+w] = True
+    bg = np.array(job['bakgrunn'])
+    arr[:, :, 3] = ((arr[:, :, :3] != bg).any(axis=2) & keep).astype(np.uint8) * 255
+    reference = Image.fromarray(arr)
+    samples = [('Original 4x', reference), ('For presis retting', source), ('Etter presis retting', check)]
+    cw, ch = crop_box[2] - crop_box[0], crop_box[3] - crop_box[1]
+    contact = Image.new('RGB', (cw, 3 * (ch + 34)), '#d7d9df')
+    draw = ImageDraw.Draw(contact)
+    for i, (label, pic) in enumerate(samples):
+        row = Image.new('RGBA', (cw, ch), '#bfc4ce')
+        row.alpha_composite(pic.crop(crop_box))
+        y0 = i * (ch + 34)
+        draw.text((12, y0 + 5), f'{name.capitalize()}: {label}', font=font, fill='#202530')
+        contact.paste(row.convert('RGB'), (0, y0 + 34))
+    contact.save(REPORT / f'sammenligning-{name}.png')
+    final = Image.new('RGB', (cw, ch + 34), '#d7d9df')
+    row = Image.new('RGBA', (cw, ch), '#bfc4ce')
+    row.alpha_composite(check.crop(crop_box))
+    final.paste(row.convert('RGB'), (0, 34))
+    ImageDraw.Draw(final).text((12, 5), f'{name.capitalize()}: rettet hovedark', font=font, fill='#202530')
+    final_rows.append(final)
+    print(name, 'OK:', boxes(check), sha(source_path))
+
+assert all(sha(ROOT / path) == value for path, value in protected.items())
+report['beskyttede_kilder_uendret'] = True
+(REPORT / 'presis-kontroll.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+preview = Image.new('RGB', (max(r.width for r in final_rows), sum(r.height for r in final_rows) + 16), '#d7d9df')
+y = 0
+for row in final_rows:
+    preview.paste(row, (0, y)); y += row.height + 16
+preview.save(REPORT / 'sam-og-max-rettet.png')

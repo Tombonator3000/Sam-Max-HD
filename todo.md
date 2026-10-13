@@ -17,4 +17,5 @@
 - [ ] Rett Bigfoot-streken og kontroller nye Sam/Max-prøver mot valgt Purcell-referanse før produksjonsbruk.
 
 - [x] Levert hovedarkskandidater for Sam og Max 13. oktober, med ekte alfa, notater og egenkontroll SJEKK.
-- [ ] Rett eller avklar gjenstående mål- og plasseringsavvik i hovedarkene før bruk som geometrisk fasit. Tom vurderer stilen.
+- [x] Rettet mål og plassering i Sam- og Max-hovedarkene 13. oktober med Toms godkjente presise bildebehandling. Alle ti bokser er eksakte og egenkontroll er OK.
+- [ ] Tom vurderer design og stil i de rettede hovedarkene før de regnes som godkjente stilankere.

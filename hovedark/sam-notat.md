@@ -1,31 +1,37 @@
 # Hovedark for Sam
 
-Levert 2026-10-13 15:45 (norsk tid) av Codex, som stilpilotkandidat.
+Rettet 2026-10-13 16:31 (norsk tid) av Codex. Levert som stilpilotkandidat, ikke visuelt godkjent.
 
-Verktøy: ChatGPTs innebygde bildegenerator. Eksakt modellnavn er ikke oppgitt av verktøyet. Antall forsøk: 5. Valgt forsøk: 4. Resultatet er kopiert direkte fra generatoren, uten etterfølgende tegning, maskering eller skalering. Alle rå forsøk er bevart lokalt under rapportmappen og i generatorens originalmappe.
+## Verktøy og grunnlag
 
-Kilde: `hovedark/sam/referanse.png`, `original_1x.png`, `prompt.txt` og `jobb.json`. Kildehash finnes i `rapporter/hovedark-20261013/kildehash.json`. Originalreferansen bestemmer person, drakt, positurer, proporsjoner og normalpalett. Purcell-vedleggene brukes for strekens karakter. `ANALYSE.md` er fulgt for lettere, varierende kontur og skille mellom stil og spillinnhold. Ingen beskyttet jobbfil er endret.
+Tegningene kommer fra ChatGPTs innebygde bildegenerator. Eksakt modellnavn ble ikke eksponert. Fem opprinnelige genereringer og ett senere avvist generatorforsøk, seks totalt. Valgt originalforsøk: 4. Ingen ny bildegenerering i den presise rettingen.
 
-De første promptene bevarer den bestilte teksten og presiserer at referanse.png allerede er 4x. For Max presiseres at han ikke har klær, hatt eller slips. Nærbildets scenebakgrunn fjernes og ståfigurenes normalpalett brukes. Senere kall er avgrensede størrelseskorreksjoner med originalen som fasit for identitet og geometri. Samtlige benyttede prompter ligger i `rapporter/hovedark-20261013/sam-forsok-*.prompt.txt`.
+Tom valgte 13. oktober «Ja bruk presis skalering og plassering» og ba om å fortsette i denne chatten. Hver av de fem valgte tegningene er skalert og flyttet samlet med vanlig bildebehandling i Pillow. Lanczos med premultiplisert alfa bevarer myke kanter. Separat skalering langs x og y korrigerer sideforholdet mot originalboksen. Det er ikke tegnet på nytt, speilvendt eller maskert etter originalens pikselkontur.
+
+Kildene er `hovedark/sam/referanse.png`, `original_1x.png`, `prompt.txt` og `jobb.json`. Mål og plass beregnes fra `plassering` og `bokser` i `jobb.json`, ganger fire. Sam er hundedetektiven i blågrå dress og hatt. Max er den nakne kaninlignende figuren. Riktige hovedkostymer er 2 og 3, med nærbilder fra 27 og 28. Originalreferansene har prosjektets korrigerte normalpaletter. `ANALYSE.md` og Purcell-føringene er videreført. Beskyttede kilder er uendret.
 
 ## Kontroll
 
-PNG, RGBA, 1536 x 1024. Ekte alfa. 89.3% av lerretet har alfa under 16. Fem separate visninger funnet: forfra, mot høyre, bakfra, mot venstre og ansiktsnærbilde. Visuell gjennomgang bekrefter riktig hovedperson, drakt eller mangel på klær, fem visninger og ingen rekvisitter fra stilillustrasjonene. Figurenes ansiktstolkning og kontur er fortsatt en pilotprøve.
+PNG, RGBA, 1536 x 1024, ekte alfa. 89.8 prosent av lerretet har alfa under 16. Fem separate visninger: forfra, høyre, bakfra, venstre og ansiktsnærbilde.
 
-Egenkontroll: **SJEKK**, ingen FEIL i valgt fil. Kommando: appens medfølgende Python med `verktoy/sjekk_leveranse.py hovedark/sam.png`. Full utskrift i `rapporter/hovedark-20261013/sam-kontroll.txt`.
+Egenkontroll: **OK** for alle fem visningene. Full kontrollutskrift ligger i `rapporter/hovedark-retting-20261013/egenkontroll.txt`. Kontrollen ble kjørt med appens medfølgende Python og prosjektets uendrede `verktoy/sjekk_leveranse.py`.
 
-Faktiske bokser er målt på alfa minst 128, i lerretspiksler [x, y, bredde, høyde]. Egenkontrollen for hovedark måler antall og høyde, ikke alle disse plass- og breddeavvikene.
+Utvidet måling kontrollerer også bredde og plassering. Alle boksene nedenfor er nøyaktig like ved alfa minst 128, i lerretspiksler `[x, y, bredde, høyde]`.
 
 | Visning | Bestilt boks | Målt boks |
 | --- | --- | --- |
-| 1 | [224, 372, 192, 280] | [216, 367, 191, 299] |
-| 2 | [448, 372, 160, 280] | [462, 371, 156, 297] |
-| 3 | [640, 372, 180, 280] | [665, 372, 182, 294] |
-| 4 | [852, 372, 160, 280] | [892, 373, 157, 295] |
-| 5 | [1044, 444, 268, 208] | [1086, 447, 275, 212] |
+| 1 | [224, 372, 192, 280] | [224, 372, 192, 280] |
+| 2 | [448, 372, 160, 280] | [448, 372, 160, 280] |
+| 3 | [640, 372, 180, 280] | [640, 372, 180, 280] |
+| 4 | [852, 372, 160, 280] | [852, 372, 160, 280] |
+| 5 | [1044, 444, 268, 208] | [1044, 444, 268, 208] |
 
-Sam er 5 til 7 prosent for høy i ståvisningene. De to første står som SJEKK i egenkontrollen. Nærbildet er innenfor OK-grensen. Flere visninger er forskjøvet mot høyre og fotlinjen ligger for lavt.
+Målinger, transformasjoner og kildehash ligger i `rapporter/hovedark-retting-20261013/presis-kontroll.json`. Kontaktarket `rapporter/hovedark-retting-20261013/sammenligning-sam.png` viser original 4x, før og etter med samme utsnitt og skala. Visuell kontroll bekrefter at alle fem valgte tegninger er bevart, at fotlinjer og ytre bokser følger originalmålene, og at alfakantene er myke. Boksene beviser ikke samsvar for alle indre konturer eller ansiktsdetaljer.
 
-Disse avvikene må avklares eller rettes før arket brukes som fast geometrisk referanse i figurproduksjon. SJEKK er ikke teknisk mottaksgodkjenning. Tom har ikke godkjent designet. Ingen import, spillavspilling eller publisert HD-mod er utført. Dette hovedarket er en designprøve, ikke en animasjonsleveranse, og har derfor ikke et kostymerutekart.
+Tom har ikke godkjent designet. Ingen motorimport, animasjonsavspilling eller publisert HD-mod er utført. Hovedarket er en designprøve, ikke en animasjonsleveranse. De øvrige pilotjobbene er ikke utført i denne rettingen.
 
-SHA-256: `a00c29a5ad3e1bab9be9dcb22ee866cd37b8cf04f379a9ca0f19a644919d1980`.
+## Sporbarhet
+
+Før retting: `a00c29a5ad3e1bab9be9dcb22ee866cd37b8cf04f379a9ca0f19a644919d1980`. Kildetegningen finnes uendret i commit `09905c32` og som `rapporter/hovedark-retting-20261013/sam-for-presis.png`.
+
+Ferdig SHA-256: `3318856a0d8aee78be150b4cd223398a65c189e0c5e5929db22b5023ad9a2c7f`.

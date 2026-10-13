@@ -30,3 +30,12 @@
 - Levert de beste kandidatene som hovedark/sam.png og hovedark/max.png, med notater, benyttede prompter, kildehash, resultat-hash og kontroll i rapporter/hovedark-20261013/.
 - Begge har 1536 x 1024, RGBA, ekte alfa og fem visninger. Egenkontroll SJEKK, ingen FEIL i de valgte filene. Størrelse, bredde og plassering er fortsatt ikke helt kildetro; mål og begrensninger er dokumentert. Ikke godkjente stilankere.
 - Kryssene i GRAFIKKLISTE.md betyr at kandidatene er levert, ikke godkjent. status.csv og ORDRE.md er beholdt. Ingen andre pilotjobber, kodeendring, import eller spilltest. Eldre lokal stilpilot-mappe er urørt.
+
+## 2026-10-13 16:31 (Codex)
+
+- Tom ba om å fortsette i denne chatten etter mobil-timeout og valgte «Ja bruk presis skalering og plassering».
+- Rettet hovedark/sam.png og hovedark/max.png fra de leverte kandidatene i 09905c32. Hver av de ti visningene er skalert og plassert samlet mot jobb.json i 4x. Myke alfakanter bevart med Lanczos og premultiplisert alfa. Ingen nytegning eller ny bildegenerering.
+- Alle ti målte bokser [x, y, bredde, høyde] stemmer nøyaktig med originalmålene ved alfa minst 128. Prosjektets uendrede egenkontroll gir OK for begge arkene. Beskyttede kilder er verifisert uendret med SHA-256.
+- Sett original, før og etter på kontaktark. Tegningene er bevart, størrelser og plassering er rettet. Indre konturer og ansiktstolkning er fortsatt en stilpilot for Toms vurdering.
+- Notater og fremdrift er oppdatert. Kildetegninger, mål, transformasjoner, kontrollutskrift og kontaktark ligger i rapporter/hovedark-retting-20261013/. Tidligere rå generatorforsøk og stilpilot-mappe er bevart.
+- Ingen endring i main, motor, pipeline, beskyttede jobbfiler eller andre pilotjobber. Ingen motorimport, animasjonsavspilling eller publisert HD-mod.
