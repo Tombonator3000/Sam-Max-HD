@@ -252,3 +252,8 @@
 
 - Bestilling 32: ti lag levert OK med tolv faktiske objektkontroller, identisk taubaneoverlapp, museumsdør, redskapslag og fire kikkert/gnisttilstander. Se `rapporter/bestilling032-20261013/RAPPORT.md`. Bestilling 31 venter egne rettinger/avklaringer; videre arbeid fortsetter.
 - 40 beskyttede kilder og 16 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T23:15:11+02:00 (Codex, Astra)
+
+- Bestilling 31: åtte lag levert OK med 11 faktiske objektkontroller. To figurfragmenter i lag026_02 og lag026_03 venter nødvendig brukeravklaring; disse er ikke levert. SWING-variant og Dunk the Beast-tilstander. Se `rapporter/bestilling031-20261013/RAPPORT.md`. Bestilling 32 er levert; bestilling 33 og videre fortsetter.
+- 40 beskyttede kilder og 8 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

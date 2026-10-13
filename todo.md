@@ -56,7 +56,8 @@
 - [x] Levert bestilling 29 med ti OK, 17 faktiske objektkontroller, kildeegne underlag og ansiktsretting.
 - [x] Levert bestilling 30 med ti OK, 20 faktiske objektkontroller, brukeravklart stangfot og egne animasjonstilstander.
 - [x] Levert bestilling 32 med ti OK, tolv feltkontroller og identisk taubaneoverlapp.
-- [ ] Fortsett bestilling 31 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [ ] Fullfør bestilling 31: åtte OK levert, lag026_02 og lag026_03 venter avklaring av figur og lyst fragment.
+- [ ] Fortsett bestilling 33 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
 
 - [x] Rom090 og obj901_01 rettet og levert OK med uttrykkelig valgt vektorrekonstruksjon; tidligere bestilling 21-avvik erstattet.
 

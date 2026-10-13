@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json
+p=Path('rapporter/bestilling031-20261013');base=Image.open('jobber/rom026/resultat.png').convert('RGB');proof=[]
+for n in range(1,10):
+ j=f'lag026_{n:02d}';rawpath=p/f'{j}-raw1.png'
+ if n in [2,3]:continue # Avventer brukerens figuravklaring. Råforsøk bevares.
+ if n not in [4,6,8] and not rawpath.exists():continue
+ m=json.loads(Path('jobber/'+j+'/jobb.json').read_text());raw=Image.open(rawpath).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS) if rawpath.exists() else base;im=base.copy();mask=np.zeros((1024,1536),bool)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=x*4+128;y=y*4+112;w*=4;h*=4;bb=(x,y,x+w,y+h);old=np.array(im.crop(bb));new=np.array(raw.crop(bb))
+  if n in [4,6,8]:
+   row=[4,6,8].index(n);atlas=Image.open(p/'c-panel-raw2.png').convert('RGB').resize((1024,1024),Image.Resampling.LANCZOS);new=np.array(atlas.crop((64,row*336+32,480,row*336+320)))
+  if o['bilde']=='obj276_01':new=np.array(Image.open(p/'c-276-valgt-komponent.png').convert('RGB'))
+  if o['bilde']=='obj269_01':new=np.array(Image.open(p/'c-269-valgt-komponent.png').convert('RGB'))
+  if o['bilde']=='obj272_01':new=np.array(Image.open(p/'c-272-raw2.png').convert('RGB').resize((w,h),Image.Resampling.LANCZOS))
+  yy,xx=np.indices((h,w));a=np.minimum.reduce([xx,yy,w-1-xx,h-1-yy]).clip(0,4)/4
+  if o['bilde']=='obj272_01':a=np.ones((h,w)) # Kilden selv har hard rektangulaer avkutting, ingen gul rand fra grunnrommet.
+  out=np.rint(new*a[:,:,None]+old*(1-a[:,:,None])).astype('uint8');im.paste(Image.fromarray(out),(x,y));mask[y:y+h,x:x+w]=True
+ im.save('jobber/'+j+'/resultat.png');diff=np.any(np.array(im)!=np.array(base),axis=2);proof.append({'jobb':j,'utenfor_metadataunion_avvik':int(np.count_nonzero(diff&~mask))})
+(p/'c-komposisjonsbevis.json').write_text(json.dumps(proof,indent=2)+'\n')

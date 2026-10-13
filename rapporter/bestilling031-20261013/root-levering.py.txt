@@ -1,0 +1,34 @@
+from pathlib import Path
+import hashlib, json, runpy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+root=Path(__file__).resolve().parents[2]
+r=Path(__file__).resolve().parent
+common=runpy.run_path(str(root/'rapporter/rom090-obj901-vektor-20261013/root-levering.py.txt'),run_name='delivery_helpers')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+m=json.loads((r/'fremdrift.json').read_text())
+s=json.loads((r/'sluttkontroll.json').read_text())
+n=len(m['leveranser']);assert n in {8,10}
+assert s['utfall_antall']=={'OK':n,'SJEKK':0,'FEIL':0} and not s['ikke_klar_for_mottak']
+assert (r/'root-c-visuell-qa.md').is_file()
+for e in json.loads((r/'kildehash.json').read_text()):
+    assert sha(root/e['fil'])==e['sha256']
+for e in m['leveranser']:
+    assert sha(root/e['resultat'])==e['sha256']
+    assert e['klar_for_mottak'] and not e['importert'] and not e['runtime_verifisert']
+objects=json.loads((r/'root-objektkontroll.json').read_text())
+assert len(objects)==(11 if n==8 else 13) and all(e['status']=='OK' and not e['hoppet_over'] for e in objects)
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+note=('Bestilling 31: åtte lag levert OK med 11 faktiske objektkontroller. To figurfragmenter i lag026_02 og lag026_03 venter nødvendig brukeravklaring; disse er ikke levert. ' if n==8 else 'Bestilling 31: ti lag levert OK med 13 faktiske objektkontroller. ')+ 'SWING-variant og Dunk the Beast-tilstander. Se `rapporter/bestilling031-20261013/RAPPORT.md`. Bestilling 32 er levert; bestilling 33 og videre fortsetter.'
+
+counts=common['update_queue'](m['leveranser'],note)
+(r/'root-mottak.json').write_text(json.dumps({'dato':stamp,'telling':counts,'root_visuell_motivkontroll':True,'alle_faktiske_objektfelt_kontrollert':True,'motorimport':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+p=root/'todo.md';text=p.read_text();old='- [ ] Fortsett bestilling 31'
+assert text.count(old)==1
+replacement=('- [ ] Fullfør bestilling 31: åtte OK levert, lag026_02 og lag026_03 venter avklaring av figur og lyst fragment.\n- [ ] Fortsett bestilling 33' if n==8 else '- [x] Levert bestilling 31 med ti OK og13 objektkontroller.\n- [ ] Fortsett bestilling 33')
+text=text.replace(old,replacement)
+p.write_text(text)
+with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex, Astra)\n\n- '+note+'\n- 40 beskyttede kilder og 8 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.\n')
+commit=common['seal_and_push'](r,m['leveranser'],'GPT: bestilling 31, SWING og avklarte Dunk the Beast-tilstander')
+print(json.dumps({'commit':commit,'telling':counts},ensure_ascii=False))

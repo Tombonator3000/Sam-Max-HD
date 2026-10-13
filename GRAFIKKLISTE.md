@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:12 (norsk tid)
+Oppdatert 2026-10-13 23:15 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 214 bilder levert (101 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 225 bilder levert (109 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -469,16 +469,16 @@ Rom 22, 23, 24, 25.
 
 Rom 25, 26.
 
-- [ ] `lag025_03` (rom 25 Gator Golf, utslagsplassen (minispill), lag 03 med 1 objektbilde, bilde to `jobber/rom025/resultat.png`)
-- [ ] `lag026_01` (rom 26 Dunk the Beast, lag 01 med 4 objektbilder, bilde to `jobber/rom026/resultat.png`)
+- [x] `lag025_03` (rom 25 Gator Golf, utslagsplassen (minispill), lag 03 med 1 objektbilde, bilde to `jobber/rom025/resultat.png`)
+- [x] `lag026_01` (rom 26 Dunk the Beast, lag 01 med 4 objektbilder, bilde to `jobber/rom026/resultat.png`)
 - [ ] `lag026_02` (rom 26 Dunk the Beast, lag 02 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
 - [ ] `lag026_03` (rom 26 Dunk the Beast, lag 03 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
-- [ ] `lag026_04` (rom 26 Dunk the Beast, lag 04 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
-- [ ] `lag026_05` (rom 26 Dunk the Beast, lag 05 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
-- [ ] `lag026_06` (rom 26 Dunk the Beast, lag 06 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
-- [ ] `lag026_07` (rom 26 Dunk the Beast, lag 07 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
-- [ ] `lag026_08` (rom 26 Dunk the Beast, lag 08 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
-- [ ] `lag026_09` (rom 26 Dunk the Beast, lag 09 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
+- [x] `lag026_04` (rom 26 Dunk the Beast, lag 04 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
+- [x] `lag026_05` (rom 26 Dunk the Beast, lag 05 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
+- [x] `lag026_06` (rom 26 Dunk the Beast, lag 06 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
+- [x] `lag026_07` (rom 26 Dunk the Beast, lag 07 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
+- [x] `lag026_08` (rom 26 Dunk the Beast, lag 08 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
+- [x] `lag026_09` (rom 26 Dunk the Beast, lag 09 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
 
 ## Bestilling 32
 
@@ -3491,3 +3491,5 @@ Bestilling 29: ti lag levert OK med 17 faktiske objektkontroller. Egne Max-poser
 Bestilling 30: ti lag levert OK med 20 faktiske objektkontroller. Brukeravklart stangfot, Gator Golf-knapper og liggende Sam, fravær av brekkjern/griper og seks egne Tunnel of Love-tilstander. Se `rapporter/bestilling030-20261013/RAPPORT.md`. Bestilling 31 og videre fortsetter.
 
 Bestilling 32: ti lag levert OK med tolv faktiske objektkontroller, identisk taubaneoverlapp, museumsdør, redskapslag og fire kikkert/gnisttilstander. Se `rapporter/bestilling032-20261013/RAPPORT.md`. Bestilling 31 venter egne rettinger/avklaringer; videre arbeid fortsetter.
+
+Bestilling 31: åtte lag levert OK med 11 faktiske objektkontroller. To figurfragmenter i lag026_02 og lag026_03 venter nødvendig brukeravklaring; disse er ikke levert. SWING-variant og Dunk the Beast-tilstander. Se `rapporter/bestilling031-20261013/RAPPORT.md`. Bestilling 32 er levert; bestilling 33 og videre fortsetter.

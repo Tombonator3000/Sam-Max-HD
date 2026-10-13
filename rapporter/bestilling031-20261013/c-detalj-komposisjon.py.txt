@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+import numpy as np,json
+p=Path('rapporter/bestilling031-20261013')
+# Alt kunstgrunnlag og alle alfaer her er fra nye imagegen-bilder, aldri originalpiksler.
+splash=Image.open(p/'c-detalj-raw2.png').convert('RGB').crop((117,48,1057,439)).resize((224,96),Image.Resampling.LANCZOS)
+micro=Image.open(p/'c-269-raw5.png').convert('RGB')
+def pink(a):
+ r,g,b=np.moveaxis(a.astype(float),2,0)
+ return (r-g>10)&(b-g>5)&(b>r*.55)&(r<220)&(g<170)
+a=np.array(splash);m=pink(a);m[:35]=False;m[72:]=False;m[:,:48]=False;m[:,164:]=False
+alpha=Image.fromarray((m*255).astype('uint8')).filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(.6));alpha.save(p/'c-269-nygammelmerke-alfa.png')
+under=micro.crop((0,int(micro.height*.8),micro.width,micro.height)).resize(splash.size,Image.Resampling.LANCZOS);under.save(p/'c-269-nytt-hvitt-underlag.png')
+splash=Image.composite(under,splash,alpha)
+ma=Image.fromarray((pink(np.array(micro))*255).astype('uint8'));ma=ma.resize((108,24),Image.Resampling.LANCZOS);ma.save(p/'c-269-nymerke-alfa.png');marks=micro.resize((108,24),Image.Resampling.LANCZOS);splash.paste(marks,(48,40),ma);splash.save(p/'c-269-valgt-komponent.png')
+seat=Image.open(p/'c-detalj-raw2.png').convert('RGB').crop((117,576,793,968)).resize((160,96),Image.Resampling.LANCZOS)
+frag=Image.open(p/'c-276-raw4.png').convert('RGB').resize((56,44),Image.Resampling.LANCZOS).crop((16,12,40,32))
+# Rektangulaer overgang, to nye bilder. Ikke originalsilhuett.
+yy,xx=np.indices((frag.height,frag.width));a=np.minimum.reduce([xx,yy,frag.width-1-xx,frag.height-1-yy]).clip(0,4)/4;mask=Image.fromarray(np.rint(a*255).astype('uint8'))
+seat.paste(frag,(120,64),mask);seat.save(p/'c-276-valgt-komponent.png')
+(p/'c-detalj-komposisjonsbevis.json').write_text(json.dumps({'269':{'nytt_underlag':'c-269-raw5.png, nedre 20 prosent','alfa':'kun rosa farger i to nygenererte bilder','merkegruppe_rekt_i_objekt':[48,40,108,24],'kildeobservasjon':'sju rosa piksler; diagonalparet er én skrå todelt markering, dermed seks grupper'},'276':{'nygenerert_mikrofelt_i_objekt':[120,64,24,20],'rest':'c-detalj-raw2.png, stolpe beholdt'}},ensure_ascii=False,indent=2)+'\n')

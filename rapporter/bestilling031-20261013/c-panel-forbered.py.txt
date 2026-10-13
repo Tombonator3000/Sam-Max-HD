@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+p=Path('rapporter/bestilling031-20261013');a=Image.new('RGB',(1024,1024),(128,128,128));b=a.copy();bb=(448,176,864,464)
+for k,n in enumerate([4,6,8]):
+ for dst,f in [(a,f'jobber/lag026_{n:02d}/referanse.png'),(b,'jobber/rom026/resultat.png')]:dst.paste(Image.open(f).crop(bb),(64,k*336+32));ImageDraw.Draw(dst).text((64,k*336+8),f'lag026_{n:02d}',fill='white')
+a.save(p/'c-panel-source.png');b.save(p/'c-panel-hd.png')
+s=Path('jobber/lag026_04/prompt.txt').read_text()+'''\n\nLOCAL THREE-STATE CONTACT SHEET: This call redraws only three 416x288 object fields. Return a1024x1024 sheet with three field rectangles at x64,y32 / x64,y368 / x64,y704, each exactly416x288. The first image defines content and all geometry. The second image is HD style only and has the WRONG glass-panel pose; DO NOT copy that pose. Each source field has a large near-transparent glass pane swung LEFT OUTSIDE the brown tank frame, extending around x90 to220 locally, with a slanting white upper edge and two paleblue/white diagonal reflection stripes. Preserve each distinct left pane angle and corner from source; rows differ subtly, DO NOT make duplicate drawings. The right narrow white panel edge, hinge dots, dark brown frame, pink cloud and upper yellow sign sliver stay at their exact positions. Empty tank, no figures, no hand, no water splash. The large LEFT OUTSIDE pane is essential. No added handle/knob beyond source marks. Smooth HD hand-drawn shading like second image but all content/pose from first. Same layout and gray gaps as attached contact sheet.\n'''
+(p/'c-panel-prompt2.txt').write_text(s)
