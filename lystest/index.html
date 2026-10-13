@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lystest</title>
+<meta name="description" content="Testrom for valgfritt dynamisk lys med normalkart og lysmaske i HD-utgavene av SCUMM-spillene.">
+<style>
+  :root {
+    --bg: #f4efe6; --panel: #fffaf2; --text: #2b2118; --muted: #6b5d50;
+    --line: #d8cbb8; --accent: #b4532a; --accent-text: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17130f; --panel: #221c16; --text: #efe6da; --muted: #a8998a;
+      --line: #3a3027; --accent: #e07a4a; --accent-text: #17130f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17130f; --panel: #221c16; --text: #efe6da; --muted: #a8998a;
+    --line: #3a3027; --accent: #e07a4a; --accent-text: #17130f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1320px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  p { margin: 0 0 8px; color: var(--muted); }
+  #scene { position: relative; width: 100%; background: #000; border-radius: 6px; overflow: hidden;
+           touch-action: none; user-select: none; }
+  canvas#gl { display: block; width: 100%; height: auto; cursor: crosshair; }
+  #status { position: absolute; left: 8px; top: 8px; background: rgba(0,0,0,.55); color: #fff;
+            padding: 2px 8px; border-radius: 4px; font-size: 13px; pointer-events: none; }
+  #feil { display: none; padding: 24px; color: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 12px; }
+  fieldset { border: 1px solid var(--line); border-radius: 6px; background: var(--panel); margin: 0; padding: 10px 12px; min-width: 0; }
+  legend { font-weight: 600; padding: 0 4px; }
+  label { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+  label.slider { display: grid; grid-template-columns: 7.5em 1fr 3.2em; }
+  label.slider output { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  input[type=checkbox] { accent-color: var(--accent); width: 18px; height: 18px; }
+  select, button, input[type=file] { font: inherit; color: var(--text); }
+  select, button { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; }
+  button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  input[type=file] { min-width: 0; width: 100%; font-size: 13px; }
+  label.fil { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); }
+  .lys { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 6px; }
+  .lys:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+  .lysnavn { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .lysnavn input[type=color] { width: 32px; height: 22px; border: 0; padding: 0; background: none; margin-left: auto; }
+  kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; font-size: 12px; }
+  .small { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Lystest: dynamisk lys med normalkart og lysmaske</h1>
+  <p>Et testrom for det valgfrie lyset i HD-utgavene. Rommet og figuren er egen testgrafikk i samme stil som spillene (flate farger, mørk kontur), ikke grafikk fra spillene. Lyset regnes per piksel fra normalkartet. Det som lyser selv (lampepære, vindu), står i lysmasken og blir ikke skyggelagt. Ingen kastede skygger.</p>
+  <p class="small">Klikk eller trykk på gulvet for å flytte figuren. Lyset følger musen når «Musepeker» er på. <kbd>L</kbd> slår det dynamiske lyset av og på, <kbd>C</kbd> slår sammenligningen av og på, <kbd>Shift</kbd> + klikk flytter bordlampen.</p>
+
+  <div id="scene">
+    <canvas id="gl" width="1280" height="800"></canvas>
+    <div id="status"></div>
+    <div id="feil">Nettleseren har ikke WebGL2, som testen trenger.</div>
+  </div>
+
+  <div class="grid">
+    <fieldset>
+      <legend>Lyset</legend>
+      <label><input type="checkbox" id="paa" checked> Dynamisk lys på <span class="small">(i spillet er det av som standard)</span></label>
+      <label class="slider">Styrke <input type="range" id="styrke" min="0" max="1" step="0.01" value="1"><output></output></label>
+      <label class="slider">Omgivelseslys <input type="range" id="ambient" min="0" max="1.5" step="0.01" value="0.85"><output></output></label>
+      <label class="slider">Relieff <input type="range" id="relieff" min="0" max="120" step="1" value="30"><output></output></label>
+      <label><input type="checkbox" id="trinn"> Trinnvis lys (ett skyggetrinn og høylys, som tegneseriestilen)</label>
+      <label><input type="checkbox" id="sammenlign"> Sammenlign: original til venstre for streken</label>
+      <label>Vis <select id="visning">
+        <option value="0">Ferdig bilde</option>
+        <option value="1">Original (uten lys)</option>
+        <option value="2">Normalkart</option>
+        <option value="3">Lysmaske</option>
+        <option value="4">Bare lyset</option>
+      </select></label>
+    </fieldset>
+
+    <fieldset id="lysliste">
+      <legend>Lyskilder</legend>
+    </fieldset>
+
+    <fieldset>
+      <legend>Egne bilder (blir i nettleseren)</legend>
+      <p class="small">Last inn et HD-rom for å prøve lyset på ekte grafikk. Bildene leses lokalt og sendes ingen steder. Uten normalkart lages et fra lysstyrken i bildet.</p>
+      <label class="fil">Rom <input type="file" id="filRom" accept="image/*"></label>
+      <label class="fil">Normalkart <input type="file" id="filNormal" accept="image/*"></label>
+      <label><input type="checkbox" id="gronnOpp" checked> Normalkartet har grønt opp (OpenGL)</label>
+      <label class="fil">Lysmaske <input type="file" id="filMaske" accept="image/*"></label>
+      <label class="slider">Mykhet <input type="range" id="mykhet" min="0" max="12" step="1" value="3"><output></output></label>
+      <label><input type="checkbox" id="visFigur" checked> Vis testfiguren</label>
+      <button id="tilbake">Tilbake til testrommet</button>
+    </fieldset>
+  </div>
+  <p class="small" style="margin-top:12px">Del av Sam &amp; Max HD Remake. Lyset er et forsøk og skal være valgfritt for spilleren. Se todo i repoet.</p>
+</main>
+
+<script>
+"use strict";
+(() => {
+const canvas = document.getElementById("gl");
+const gl = canvas.getContext("webgl2", { premultipliedAlpha: false, antialias: false });
+if (!gl) {
+  canvas.style.display = "none";
+  document.getElementById("feil").style.display = "block";
+  return;
+}
+const $ = (id) => document.getElementById(id);
+
+// ---------- Testgrafikk: tegnes her, ingen filer ----------
+const W0 = 1280, H0 = 800, FLOOR_Y = 560;
+const INK = "#24170e";
+
+function lag(w, h) {
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  return { c, x: c.getContext("2d") };
+}
+
+// Ett lag med farge, høyde (gråtone) og lysmaske tegnes med samme former.
+function lagSett(w, h) {
+  const s = { w, h, farge: lag(w, h), hoyde: lag(w, h), maske: lag(w, h) };
+  s.hoyde.x.fillStyle = "#000"; s.hoyde.x.fillRect(0, 0, w, h);
+  s.maske.x.fillStyle = "#000"; s.maske.x.fillRect(0, 0, w, h);
+  return s;
+}
+function g(v) { const n = Math.round(v * 255); return `rgb(${n},${n},${n})`; }
+
+function form(s, path, farge, hoyde, opts = {}) {
+  const f = s.farge.x, h = s.hoyde.x, m = s.maske.x;
+  f.save(); path(f); f.fillStyle = farge; f.fill();
+  if (opts.skygge) { f.clip(); opts.skygge(f); }
+  f.restore();
+  if (opts.strek !== false) { f.save(); path(f); f.lineWidth = opts.strek || 5; f.strokeStyle = INK; f.lineJoin = "round"; f.stroke(); f.restore(); }
+  h.save(); path(h);
+  h.fillStyle = typeof hoyde === "function" ? hoyde(h) : g(hoyde); h.fill(); h.restore();
+  m.save(); path(m); m.fillStyle = g(opts.lyser || 0); m.fill(); m.restore();
+}
+const rect = (x, y, w, h) => (c) => { c.beginPath(); c.rect(x, y, w, h); };
+const ell = (x, y, rx, ry) => (c) => { c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); };
+const poly = (pts) => (c) => { c.beginPath(); c.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) c.lineTo(pts[i], pts[i + 1]); c.closePath(); };
+const skyggeH = (x, w, farge) => (c) => { c.fillStyle = farge; c.fillRect(x, 0, w, 4000); };
+const skyggeV = (y, h, farge) => (c) => { c.fillStyle = farge; c.fillRect(0, y, 4000, h); };
+// Avrundet høyde: lys midt, mørkere mot kanten
+const kuppel = (x, y, r, topp, kant) => (c) => { const gr = c.createRadialGradient(x, y - r * .25, r * .1, x, y, r); gr.addColorStop(0, g(topp)); gr.addColorStop(1, g(kant)); return gr; };
+const sylinder = (x0, x1, topp, kant) => (c) => { const gr = c.createLinearGradient(x0, 0, x1, 0); gr.addColorStop(0, g(kant)); gr.addColorStop(.45, g(topp)); gr.addColorStop(1, g(kant)); return gr; };
+
+function tegnRom() {
+  const s = lagSett(W0, H0);
+  // vegg og panel
+  form(s, rect(0, 0, W0, FLOOR_Y), "#d8b685", .12, { strek: false, skygge: skyggeV(0, 40, "#c9a673") });
+  for (let x = 40; x < W0; x += 160) form(s, rect(x, 40, 6, 360), "#cfa977", .16, { strek: false });
+  form(s, rect(0, 420, W0, 140), "#8b5b39", .24, { strek: 4, skygge: skyggeV(520, 40, "#774c2e") });
+  for (let x = 30; x < W0; x += 120) form(s, rect(x, 440, 90, 100), "#93623f", .3, { strek: 3 });
+  form(s, rect(0, 404, W0, 18), "#6f4328", .4, { strek: 4 });
+  // gulv
+  form(s, rect(0, FLOOR_Y, W0, H0 - FLOOR_Y), "#7a4b2c", .02, { strek: false });
+  for (let y = FLOOR_Y + 34, i = 0; y < H0; y += 40, i++) {
+    form(s, rect(0, y, W0, 3), "#5d3820", 0, { strek: false });
+    for (let x = (i % 2) * 110; x < W0; x += 220) form(s, rect(x, y - 37, 3, 37), "#5d3820", 0, { strek: false });
+  }
+  // teppe
+  form(s, ell(560, 700, 260, 62), "#c9a24a", .07, { strek: 5 });
+  form(s, ell(560, 700, 228, 48), "#8e2f2f", .09, { strek: 3, skygge: skyggeV(712, 60, "#7a2626") });
+  // skap til venstre
+  form(s, rect(50, 300, 200, 300), "#4f7180", .5, { skygge: skyggeH(205, 60, "#41606d") });
+  form(s, rect(70, 330, 160, 110), "#5b8291", .58, { strek: 4 });
+  form(s, rect(70, 460, 160, 110), "#5b8291", .58, { strek: 4 });
+  form(s, ell(150, 452, 9, 9), "#e0b341", .8, { strek: 3 });
+  form(s, rect(40, 288, 220, 18), "#3f5d6a", .62, { strek: 4 });
+  // bilde på veggen
+  form(s, rect(310, 110, 220, 160), "#a8742e", .42, { strek: 5 });
+  form(s, rect(330, 130, 180, 120), "#9cc3d6", .28, { strek: 3 });
+  form(s, poly([330, 250, 330, 205, 400, 160, 470, 210, 510, 190, 510, 250]), "#6d8f5a", .3, { strek: 3 });
+  form(s, ell(470, 160, 16, 16), "#f2d36b", .3, { strek: 3 });
+  // dør
+  form(s, rect(590, 150, 200, 410), "#9c6b43", .3, { skygge: skyggeH(760, 40, "#8a5c37") });
+  form(s, rect(615, 180, 150, 150), "#8d5f3a", .36, { strek: 4 });
+  form(s, rect(615, 360, 150, 170), "#8d5f3a", .36, { strek: 4 });
+  form(s, ell(760, 360, 11, 11), "#e0b341", kuppel(760, 360, 11, .85, .5), { strek: 3 });
+  // vindu med nattehimmel (lyser selv)
+  form(s, rect(860, 70, 320, 230), "#5c3a22", .45, { strek: 5 });
+  form(s, rect(880, 90, 280, 190), "#22305e", .08, { strek: 3, lyser: 1 });
+  form(s, ell(1100, 140, 28, 28), "#f3eab0", .08, { strek: false, lyser: 1 });
+  for (const [x, y] of [[910, 120], [960, 230], [1010, 110], [1130, 240], [1060, 200]]) form(s, ell(x, y, 3, 3), "#f6f0d0", .08, { strek: false, lyser: 1 });
+  form(s, rect(1010, 90, 14, 190), "#5c3a22", .45, { strek: 3 });
+  form(s, rect(880, 178, 280, 14), "#5c3a22", .45, { strek: 3 });
+  form(s, rect(850, 296, 340, 16), "#4e3019", .55, { strek: 4 });
+  // pult
+  form(s, rect(860, 500, 320, 150), "#7f512e", .5, { skygge: skyggeH(1130, 60, "#6c4426") });
+  form(s, rect(890, 525, 120, 40), "#8b5b35", .56, { strek: 3 });
+  form(s, rect(890, 580, 120, 40), "#8b5b35", .56, { strek: 3 });
+  form(s, rect(940, 540, 20, 8), "#e0b341", .7, { strek: 2 });
+  form(s, rect(940, 595, 20, 8), "#e0b341", .7, { strek: 2 });
+  form(s, rect(840, 476, 360, 28), "#a8703e", .62, { strek: 5, skygge: skyggeV(494, 12, "#93602f") });
+  // bøker og kopp på pulten
+  form(s, rect(1080, 420, 26, 56), "#3d6b9a", .7, { strek: 3 });
+  form(s, rect(1108, 430, 22, 46), "#b33a3a", .7, { strek: 3 });
+  form(s, rect(1132, 414, 24, 62), "#d9a441", .7, { strek: 3 });
+  form(s, rect(1010, 446, 30, 30), "#eeeae0", sylinder(1010, 1040, .8, .6), { strek: 3 });
+  // bordlampe (pæren lyser selv)
+  form(s, ell(915, 470, 44, 10), "#2f5a40", .7, { strek: 4 });
+  form(s, poly([910, 468, 920, 468, 952, 372, 944, 368]), "#2f5a40", .72, { strek: 3 });
+  form(s, ell(945, 392, 16, 13), "#fff4c4", .78, { strek: 3, lyser: 1 });
+  form(s, poly([892, 386, 998, 386, 976, 330, 914, 330]), "#3f7a55", sylinder(892, 998, .85, .62), { strek: 5, skygge: skyggeH(960, 60, "#346647") });
+  return s;
+}
+
+function tegnFigur() {
+  const w = 200, h = 380, s = lagSett(w, h);
+  for (const c of [s.farge.x, s.hoyde.x, s.maske.x]) c.clearRect(0, 0, w, h);
+  const cx = 100;
+  // sko og bein
+  form(s, ell(cx - 26, 366, 26, 11), "#3b2416", kuppel(cx - 26, 366, 26, .6, .3), { strek: 4 });
+  form(s, ell(cx + 26, 366, 26, 11), "#3b2416", kuppel(cx + 26, 366, 26, .6, .3), { strek: 4 });
+  form(s, rect(cx - 40, 270, 30, 92), "#3b4a6b", sylinder(cx - 40, cx - 10, .7, .4), { strek: 4, skygge: skyggeH(cx - 18, 10, "#2f3c58") });
+  form(s, rect(cx + 10, 270, 30, 92), "#3b4a6b", sylinder(cx + 10, cx + 40, .7, .4), { strek: 4, skygge: skyggeH(cx + 32, 10, "#2f3c58") });
+  // frakk
+  form(s, poly([cx - 46, 140, cx + 46, 140, cx + 62, 292, cx - 62, 292]), "#c9a052", sylinder(cx - 62, cx + 62, .95, .55), { strek: 5, skygge: skyggeH(cx + 30, 40, "#b08a40") });
+  form(s, rect(cx - 56, 216, 112, 14), "#7c5a26", .9, { strek: 3 });
+  form(s, poly([cx, 140, cx - 20, 140, cx, 200]), "#f2ede0", .9, { strek: 3 });
+  form(s, poly([cx, 150, cx - 6, 196, cx + 6, 196]), "#b33a3a", .95, { strek: 2 });
+  // armer
+  form(s, poly([cx - 46, 146, cx - 70, 150, cx - 78, 262, cx - 56, 262]), "#c0974a", sylinder(cx - 80, cx - 46, .85, .5), { strek: 4 });
+  form(s, poly([cx + 46, 146, cx + 70, 150, cx + 78, 262, cx + 56, 262]), "#c0974a", sylinder(cx + 46, cx + 80, .85, .5), { strek: 4 });
+  form(s, ell(cx - 67, 270, 13, 12), "#f0c090", kuppel(cx - 67, 270, 13, .9, .6), { strek: 3 });
+  form(s, ell(cx + 67, 270, 13, 12), "#f0c090", kuppel(cx + 67, 270, 13, .9, .6), { strek: 3 });
+  // hode
+  form(s, ell(cx, 100, 40, 44), "#f0c090", kuppel(cx, 100, 44, 1, .55), { strek: 5, skygge: skyggeH(cx + 18, 40, "#dca878") });
+  form(s, ell(cx + 6, 110, 13, 11), "#e7a878", kuppel(cx + 6, 110, 13, 1, .85), { strek: 3 });
+  form(s, ell(cx - 14, 92, 9, 10), "#ffffff", .95, { strek: 3 });
+  form(s, ell(cx + 18, 92, 9, 10), "#ffffff", .95, { strek: 3 });
+  form(s, ell(cx - 12, 94, 3.5, 4), INK, .96, { strek: false });
+  form(s, ell(cx + 20, 94, 3.5, 4), INK, .96, { strek: false });
+  form(s, poly([cx - 14, 128, cx + 18, 128, cx + 12, 134, cx - 8, 134]), "#8a3a2a", .92, { strek: 2 });
+  // hatt
+  form(s, ell(cx, 66, 62, 12), "#4a3a2a", kuppel(cx, 66, 62, .95, .7), { strek: 4 });
+  form(s, poly([cx - 34, 66, cx - 30, 22, cx + 30, 22, cx + 34, 66]), "#5a4632", sylinder(cx - 34, cx + 34, 1, .7), { strek: 4, skygge: skyggeH(cx + 14, 30, "#4a3a2a") });
+  form(s, rect(cx - 33, 50, 66, 10), "#2b2118", .98, { strek: 2 });
+  return { sett: s, ankerX: cx, ankerY: 372 };
+}
+
+// ---------- Høyde og maske til flyttall, uskarpt ----------
+function kanal(ctx, w, h) {
+  const d = ctx.getImageData(0, 0, w, h).data, out = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) out[i] = d[i * 4] / 255;
+  return out;
+}
+function lysstyrke(ctx, w, h) {
+  const d = ctx.getImageData(0, 0, w, h).data, out = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) out[i] = (0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]) / 255;
+  return out;
+}
+function blur(src, w, h, r) {
+  if (r < 1) return src;
+  const a = Float32Array.from(src), b = new Float32Array(w * h);
+  for (let pass = 0; pass < 2; pass++) {
+    for (let y = 0; y < h; y++) {           // vannrett
+      let sum = 0; const row = y * w;
+      for (let x = -r; x <= r; x++) sum += a[row + Math.min(w - 1, Math.max(0, x))];
+      for (let x = 0; x < w; x++) {
+        b[row + x] = sum / (2 * r + 1);
+        sum += a[row + Math.min(w - 1, x + r + 1)] - a[row + Math.max(0, x - r)];
+      }
+    }
+    for (let x = 0; x < w; x++) {           // loddrett
+      let sum = 0;
+      for (let y = -r; y <= r; y++) sum += b[Math.min(h - 1, Math.max(0, y)) * w + x];
+      for (let y = 0; y < h; y++) {
+        a[y * w + x] = sum / (2 * r + 1);
+        sum += b[Math.min(h - 1, y + r + 1) * w + x] - b[Math.max(0, y - r) * w + x];
+      }
+    }
+  }
+  return a;
+}
+
+// ---------- WebGL ----------
+const VS = `#version 300 es
+in vec2 aPos;
+uniform vec4 uRect;      // x, y, b, h i scenepiksler
+uniform vec2 uScene;
+out vec2 vUv;
+void main() {
+  vUv = aPos;
+  vec2 p = uRect.xy + aPos * uRect.zw;
+  gl_Position = vec4(p.x / uScene.x * 2.0 - 1.0, 1.0 - p.y / uScene.y * 2.0, 0.0, 1.0);
+}`;
+const FS = `#version 300 es
+precision highp float;
+in vec2 vUv;
+uniform sampler2D uFarge, uHoyde, uMaske, uNormal;
+uniform int uNormalModus;      // 0 fra høyde, 1 fra normalkart
+uniform float uGronnOpp, uSpeil;
+uniform vec4 uRect;
+uniform float uZBase, uZSkala, uRelieff, uAmbient, uStyrke, uSplit;
+uniform int uTrinn, uVisning, uPaa;
+uniform int uAntall;
+uniform vec3 uLysPos[4];
+uniform vec3 uLysFarge[4];
+uniform float uLysRadius[4];
+out vec4 frag;
+
+float h(ivec2 p, ivec2 size) { return texelFetch(uHoyde, clamp(p, ivec2(0), size - 1), 0).r; }
+
+void main() {
+  vec4 albedo = texture(uFarge, vUv);
+  if (albedo.a < 0.01) discard;
+  ivec2 size = textureSize(uHoyde, 0);
+  ivec2 p = ivec2(vUv * vec2(size));
+  float hc = h(p, size);
+  vec3 n;
+  if (uNormalModus == 1) {
+    n = texture(uNormal, vUv).xyz * 2.0 - 1.0;
+    n.y *= uGronnOpp;                       // skjermen har y nedover
+    n = normalize(vec3(n.xy * (uRelieff / 45.0), max(n.z, 0.05)));
+  } else {
+    float dx = (h(p + ivec2(1, 0), size) - h(p - ivec2(1, 0), size)) * 0.5;
+    float dy = (h(p + ivec2(0, 1), size) - h(p - ivec2(0, 1), size)) * 0.5;
+    n = normalize(vec3(-dx * uRelieff, -dy * uRelieff, 1.0));
+  }
+  n.x *= uSpeil;                            // figuren speilvendt mot venstre
+  vec2 pos = uRect.xy + vUv * uRect.zw;
+  vec3 frag3 = vec3(pos, uZBase + hc * uZSkala);
+  vec3 lys = vec3(uAmbient);
+  for (int i = 0; i < 4; i++) {
+    if (i >= uAntall) break;
+    vec3 L = uLysPos[i] - frag3;
+    float d = length(L);
+    float att = clamp(1.0 - d / uLysRadius[i], 0.0, 1.0);
+    att *= att;
+    float c = max(dot(n, L / max(d, 0.001)), 0.0) * att;
+    if (uTrinn == 1) c = 0.5 * smoothstep(0.16, 0.2, c) + 0.5 * smoothstep(0.52, 0.56, c);
+    lys += uLysFarge[i] * c;
+  }
+  float maske = texture(uMaske, vUv).r;
+  vec3 res = albedo.rgb * lys;
+  res = mix(albedo.rgb, res, uStyrke);
+  res = mix(res, albedo.rgb, maske);
+  if (uPaa == 0 || pos.x < uSplit) res = albedo.rgb;
+  if (uVisning == 1) res = albedo.rgb;
+  else if (uVisning == 2) res = vec3(n.x, -n.y, n.z) * 0.5 + 0.5;
+  else if (uVisning == 3) res = vec3(maske);
+  else if (uVisning == 4) res = vec3(mix(lys, vec3(1.0), maske)) * 0.6;
+  if (uSplit > 0.0 && abs(pos.x - uSplit) < 1.5) res = vec3(1.0);
+  frag = vec4(res, albedo.a);
+}`;
+
+function shader(type, src) {
+  const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+const prog = gl.createProgram();
+gl.attachShader(prog, shader(gl.VERTEX_SHADER, VS));
+gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FS));
+gl.bindAttribLocation(prog, 0, "aPos");
+gl.linkProgram(prog);
+if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+gl.useProgram(prog);
+const U = {};
+for (const n of ["uFarge", "uHoyde", "uMaske", "uNormal", "uNormalModus", "uGronnOpp", "uSpeil", "uRect", "uScene", "uZBase", "uZSkala",
+  "uRelieff", "uAmbient", "uStyrke", "uSplit", "uTrinn", "uVisning", "uPaa", "uAntall", "uLysPos", "uLysFarge", "uLysRadius"])
+  U[n] = gl.getUniformLocation(prog, n);
+gl.uniform1i(U.uFarge, 0); gl.uniform1i(U.uHoyde, 1); gl.uniform1i(U.uMaske, 2); gl.uniform1i(U.uNormal, 3);
+
+const vbo = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);
+gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+
+function tex(lin) {
+  const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+  const f = lin ? gl.LINEAR : gl.NEAREST;
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, f);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, f);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return t;
+}
+function texBilde(src) { const t = tex(true); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); return t; }
+function texFlyt(data, w, h) { const t = tex(false); gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, w, h, 0, gl.RED, gl.FLOAT, data); return t; }
+function texMaske(data, w, h) {
+  const b = new Uint8Array(w * h); for (let i = 0; i < b.length; i++) b[i] = Math.round(data[i] * 255);
+  const t = tex(true); gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, w, h, 0, gl.RED, gl.UNSIGNED_BYTE, b); return t;
+}
+const tomNormal = (() => { const t = tex(false); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([128, 128, 255, 255])); return t; })();
+
+function lagLag(sett, mykhet) {
+  const { w, h } = sett;
+  return {
+    w, h,
+    farge: texBilde(sett.farge.c),
+    hoyde: texFlyt(blur(kanal(sett.hoyde.x, w, h), w, h, mykhet), w, h),
+    maske: texMaske(blur(kanal(sett.maske.x, w, h), w, h, 1), w, h),
+    normal: null,
+  };
+}
+
+// ---------- Tilstand ----------
+let rom, scene = { w: W0, h: H0, gulv: FLOOR_Y };
+const figurData = tegnFigur();
+const figur = { lag: lagLag(figurData.sett, 2), x: 420, y: 700, mx: 420, my: 700, skala: 1, retning: 1 };
+let mus = { x: 640, y: 300, inne: false };
+
+const lys = [
+  { navn: "Bordlampe", paa: true, farge: "#ffd28a", styrke: 0.75, radius: 620, hoyde: 70, x: 945, y: 396, folger: null },
+  { navn: "Musepeker", paa: true, farge: "#ffffff", styrke: 0.55, radius: 420, hoyde: 90, x: 640, y: 300, folger: "mus" },
+  { navn: "Figuren (lommelykt)", paa: false, farge: "#bfe0ff", styrke: 0.9, radius: 360, hoyde: 60, x: 0, y: 0, folger: "figur" },
+];
+
+function byggTestrom() {
+  rom = lagLag(tegnRom(), 4);
+  scene = { w: W0, h: H0, gulv: FLOOR_Y };
+  lys[0].x = 945; lys[0].y = 396;
+  figur.skala = 1; figur.x = figur.mx = 420; figur.y = figur.my = 700;
+  settStorrelse();
+}
+function settStorrelse() { canvas.width = scene.w; canvas.height = scene.h; }
+
+// ---------- Kontroller ----------
+const verdi = (id) => parseFloat($(id).value);
+for (const el of document.querySelectorAll("label.slider")) {
+  const inp = el.querySelector("input"), out = el.querySelector("output");
+  const vis = () => { out.textContent = (+inp.value).toFixed(inp.step < 1 ? 2 : 0); };
+  inp.addEventListener("input", vis); vis();
+}
+function hexTilRgb(hex) { const n = parseInt(hex.slice(1), 16); return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; }
+
+const liste = $("lysliste");
+lys.forEach((l, i) => {
+  const d = document.createElement("div"); d.className = "lys";
+  d.innerHTML = `<div class="lysnavn"><input type="checkbox" ${l.paa ? "checked" : ""} data-k="paa"> ${l.navn}<input type="color" value="${l.farge}" data-k="farge"></div>
+    <label class="slider">Styrke <input type="range" min="0" max="2.5" step="0.01" value="${l.styrke}" data-k="styrke"><output></output></label>
+    <label class="slider">Rekkevidde <input type="range" min="50" max="1400" step="10" value="${l.radius}" data-k="radius"><output></output></label>
+    <label class="slider">Høyde <input type="range" min="5" max="300" step="1" value="${l.hoyde}" data-k="hoyde"><output></output></label>`;
+  for (const inp of d.querySelectorAll("input")) {
+    const out = inp.parentElement.querySelector("output");
+    const oppdater = () => {
+      const k = inp.dataset.k;
+      l[k] = inp.type === "checkbox" ? inp.checked : inp.type === "color" ? inp.value : +inp.value;
+      if (out) out.textContent = (+inp.value).toFixed(inp.step < 1 ? 2 : 0);
+    };
+    inp.addEventListener("input", oppdater); oppdater();
+  }
+  liste.appendChild(d);
+});
+
+function scenePunkt(e) {
+  const r = canvas.getBoundingClientRect();
+  return { x: (e.clientX - r.left) / r.width * scene.w, y: (e.clientY - r.top) / r.height * scene.h };
+}
+let ned = null;
+canvas.addEventListener("pointermove", (e) => {
+  const p = scenePunkt(e); mus = { x: p.x, y: p.y, inne: true };
+  if (ned && $("sammenlign").checked && ned.splitt) splitX = p.x;
+});
+canvas.addEventListener("pointerleave", () => { mus.inne = false; });
+canvas.addEventListener("pointerdown", (e) => {
+  const p = scenePunkt(e);
+  ned = { x: p.x, y: p.y, splitt: $("sammenlign").checked && Math.abs(p.x - splitX) < scene.w * 0.03 };
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener("pointerup", (e) => {
+  const p = scenePunkt(e);
+  if (ned && !ned.splitt && Math.hypot(p.x - ned.x, p.y - ned.y) < 12) {
+    if (e.shiftKey) { lys[0].x = p.x; lys[0].y = p.y; }
+    else if (p.y > scene.gulv) { figur.mx = p.x; figur.my = p.y; }
+  }
+  ned = null;
+});
+canvas.addEventListener("dblclick", (e) => { const p = scenePunkt(e); lys[0].x = p.x; lys[0].y = p.y; });
+
+let splitX = W0 / 2;
+window.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" && e.target.type !== "checkbox" && e.target.type !== "range") return;
+  if (e.key === "l" || e.key === "L") { $("paa").checked = !$("paa").checked; }
+  if (e.key === "c" || e.key === "C") { $("sammenlign").checked = !$("sammenlign").checked; }
+});
+$("sammenlign").addEventListener("change", () => { splitX = scene.w / 2; });
+
+// ---------- Egne bilder ----------
+let egne = { rom: null, normal: null, maske: null };
+async function lesBilde(fil) { return await createImageBitmap(fil); }
+function tilCtx(bilde, w, h) { const { c, x } = lag(w, h); x.drawImage(bilde, 0, 0, w, h); return x; }
+
+async function byggEgetRom() {
+  const b = egne.rom; if (!b) return;
+  const w = b.width, h = b.height, myk = verdi("mykhet");
+  const fctx = tilCtx(b, w, h);
+  const l = { w, h, farge: texBilde(fctx.canvas), normal: null };
+  l.hoyde = texFlyt(blur(lysstyrke(fctx, w, h), w, h, Math.max(1, myk)), w, h);
+  l.maske = egne.maske ? texMaske(lysstyrke(tilCtx(egne.maske, w, h), w, h), w, h) : texMaske(new Float32Array(w * h), w, h);
+  if (egne.normal) l.normal = texBilde(tilCtx(egne.normal, w, h).canvas);
+  rom = l;
+  scene = { w, h, gulv: h * 0.7 };
+  figur.skala = h / H0;
+  figur.x = figur.mx = w * 0.33; figur.y = figur.my = h * 0.88;
+  lys[0].x = w * 0.5; lys[0].y = h * 0.3;
+  settStorrelse();
+}
+$("filRom").addEventListener("change", async (e) => { if (e.target.files[0]) { egne.rom = await lesBilde(e.target.files[0]); await byggEgetRom(); } });
+$("filNormal").addEventListener("change", async (e) => { if (e.target.files[0]) { egne.normal = await lesBilde(e.target.files[0]); await byggEgetRom(); } });
+$("filMaske").addEventListener("change", async (e) => { if (e.target.files[0]) { egne.maske = await lesBilde(e.target.files[0]); await byggEgetRom(); } });
+$("mykhet").addEventListener("change", () => { if (egne.rom) byggEgetRom(); else { rom = lagLag(tegnRom(), verdi("mykhet")); } });
+$("tilbake").addEventListener("click", () => {
+  egne = { rom: null, normal: null, maske: null };
+  for (const id of ["filRom", "filNormal", "filMaske"]) $(id).value = "";
+  byggTestrom();
+});
+
+// ---------- Tegning ----------
+function tegnLag(l, x, y, w, h, zBase, zSkala) {
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, l.farge);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, l.hoyde);
+  gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, l.maske);
+  gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, l.normal || tomNormal);
+  gl.uniform1i(U.uNormalModus, l.normal ? 1 : 0);
+  gl.uniform4f(U.uRect, x, y, w, h);
+  gl.uniform1f(U.uSpeil, w < 0 ? -1 : 1);
+  gl.uniform1f(U.uZBase, zBase); gl.uniform1f(U.uZSkala, zSkala);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+let sist = performance.now();
+function ramme(t) {
+  const dt = Math.min(0.05, (t - sist) / 1000); sist = t;
+  // figuren går mot målet
+  const dx = figur.mx - figur.x, dy = figur.my - figur.y, d = Math.hypot(dx, dy);
+  const fart = 280 * figur.skala * dt;
+  if (d > 1) { figur.x += dx / d * Math.min(fart, d); figur.y += dy / d * Math.min(fart, d); if (Math.abs(dx) > 2) figur.retning = dx > 0 ? 1 : -1; }
+  // figurens størrelse etter dybden, som skalering i SCUMM
+  const dyp = 0.82 + 0.18 * (figur.y - scene.gulv) / (scene.h - scene.gulv);
+  const sk = figur.skala * dyp;
+  const fw = figur.lag.w * sk, fh = figur.lag.h * sk;
+  const fx = figur.x - figurData.ankerX * sk, fy = figur.y - figurData.ankerY * sk;
+
+  if (mus.inne || !lys[1].x) { lys[1].x = mus.x; lys[1].y = mus.y; }
+  lys[2].x = figur.x + 50 * sk * figur.retning; lys[2].y = figur.y - 250 * sk;
+
+  const aktive = lys.filter((l) => l.paa);
+  const pos = [], farger = [], rad = [];
+  for (const l of aktive) {
+    pos.push(l.x, l.y, l.hoyde);
+    const c = hexTilRgb(l.farge); farger.push(c[0] * l.styrke, c[1] * l.styrke, c[2] * l.styrke);
+    rad.push(l.radius * Math.max(scene.w / W0, scene.h / H0));
+  }
+  while (pos.length < 12) { pos.push(0, 0, 0); farger.push(0, 0, 0); rad.push(1); }
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.uniform2f(U.uScene, scene.w, scene.h);
+  gl.uniform1i(U.uAntall, aktive.length);
+  gl.uniform3fv(U.uLysPos, pos); gl.uniform3fv(U.uLysFarge, farger); gl.uniform1fv(U.uLysRadius, rad);
+  gl.uniform1f(U.uRelieff, verdi("relieff")); gl.uniform1f(U.uAmbient, verdi("ambient"));
+  gl.uniform1f(U.uStyrke, verdi("styrke")); gl.uniform1i(U.uTrinn, $("trinn").checked ? 1 : 0);
+  gl.uniform1i(U.uVisning, +$("visning").value); gl.uniform1i(U.uPaa, $("paa").checked ? 1 : 0);
+  gl.uniform1f(U.uGronnOpp, $("gronnOpp").checked ? -1 : 1);
+  gl.uniform1f(U.uSplit, $("sammenlign").checked ? splitX : -1);
+
+  tegnLag(rom, 0, 0, scene.w, scene.h, 0, 60);
+  if ($("visFigur").checked) {
+    if (figur.retning < 0) tegnLag(figur.lag, fx + fw, fy, -fw, fh, 40 * sk, 50 * sk);
+    else tegnLag(figur.lag, fx, fy, fw, fh, 40 * sk, 50 * sk);
+  }
+  $("status").textContent = $("paa").checked ? `Dynamisk lys på, ${aktive.length} lyskilder` : "Dynamisk lys av (originalen)";
+  requestAnimationFrame(ramme);
+}
+
+byggTestrom();
+requestAnimationFrame(ramme);
+})();
+</script>
+</body>
+</html>

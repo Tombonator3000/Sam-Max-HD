@@ -1,0 +1,40 @@
+name: lystest-pages
+
+# Publiserer testrommet for dynamisk lys (lystest/) på GitHub Pages.
+# Krever at Pages bruker GitHub Actions som kilde (Settings > Pages > Source).
+# Siden har bare egen testgrafikk; spillfiler og HD-bilder skal aldri hit.
+
+on:
+  push:
+    branches: [main]
+    paths: ["lystest/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publiser:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ingen bilder fra spillet
+        run: |
+          if find lystest -type f ! -name '*.html' | grep -q .; then
+            echo "lystest/ skal bare ha HTML-filer med egen testgrafikk"; find lystest -type f; exit 1
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: lystest
+      - id: deploy
+        uses: actions/deploy-pages@v4

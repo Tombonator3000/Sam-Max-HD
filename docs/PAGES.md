@@ -15,6 +15,16 @@ Alt under beskriver hvordan siden skal virke, etter The Dig sin nettside. Ingent
 
 `./spill.sh --nettleser` er en egen løsning som kjører nettleserversjonen på localhost fra filene på maskinen (se [SPILLTEST.md](SPILLTEST.md)).
 
+## Lystest (testrom for dynamisk lys)
+
+`lystest/index.html` er et testrom for det valgfrie dynamiske lyset (normalkart og lysmaske, ingen kastede skygger). Arbeidsflyten `.github/workflows/pages.yml` publiserer mappen på https://tombonator3000.github.io/Sam-Max-HD/ når `lystest/` endres i `main`, eller når den startes for hånd.
+
+- Rommet og figuren er egen testgrafikk tegnet i koden, i samme stil som spillene. Ingen grafikk fra spillet ligger på siden, og arbeidsflyten stopper hvis noe annet enn HTML havner i `lystest/`.
+- Egne bilder (for eksempel et HD-rom fra stilpiloten, normalkart og lysmaske) kan lastes inn i nettleseren. De leses lokalt og sendes ingen steder.
+- Lyset: bordlampe, musepeker og et lys på figuren, hver med farge, styrke, rekkevidde og høyde. Valg for omgivelseslys, relieff, trinnvis lys (ett skyggetrinn og høylys), sammenligning med originalen og visning av normalkart, lysmaske og bare lyset. `L` slår lyset av og på.
+- Første gang: Settings > Pages > Source må stå på GitHub Actions.
+- Testet 13. oktober 2026 i Chromium uten skjerm (SwiftShader): ingen feil i konsollen, lyset av og på, figuren som går, normalkart, sammenligning, eget bilde med normalkart og mobilbredde 375 px uten sideveis rulling. Ikke prøvd i Firefox, Safari eller på telefon.
+
 ## Spille
 
 Siden går rett inn i spillet, som originalen. Det er ingen knapper eller menyer rundt spillet. Grafikkvalget skal ligge i spillets egen meny.
