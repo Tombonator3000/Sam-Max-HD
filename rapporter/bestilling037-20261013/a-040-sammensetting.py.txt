@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil,subprocess,hashlib,importlib.util
+root=Path(__file__).resolve().parents[2];r37=root/'rapporter/bestilling037-20261013';r38=root/'rapporter/bestilling038-20261013';g=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';files=['0d3abb82-5810-43e0-af80-5573c5178475','ccb86794-918e-4832-9429-461935964c40','71cd0205-328e-49b3-a596-21a16181d656','b1960a72-9e3c-4971-aa50-7c41b1313d59','4d126666-dc81-410f-bf32-4133a0122f5e','1684b1a0-88ce-47e1-a0bb-0d8a5bce80f5'];glass=['5891cdd2-42fd-48d6-8cde-b1b09eb2deba','f0c9fe7d-b466-4725-973d-5e9c60bcd17c'];rects={1:[[448,272,128,64],[368,472,24,20],[328,828,120,52]],2:[[372,472,12,8],[340,836,88,44]],3:[[368,844,24,16]],4:[[412,392,20,40]],5:[[392,436,24,28],[336,824,112,52]],6:[[368,472,24,16],[328,836,120,44]]};entries=[];proof=[];rows=[]
+spec=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+for n,f in enumerate(files,1):
+ j=f'lag040_{n:02d}';r=r37 if n<=2 else r38;d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());rp=r/f'a-{j}-raa01.png';shutil.copy2(g/f'exec-{f}.png',rp);raw=Image.open(rp).convert('RGB');fullraw=raw if n<=2 else Image.new('RGB',(1536,1024),(128,128,128))
+ if n>=3:fullraw.paste(raw.resize((256,512),Image.Resampling.LANCZOS),(288,368))
+ base=Image.open(root/m['bilde_to']).convert('RGB');before=np.array(base);used=[]
+ def put(im,b,edge=4):
+  x,y,w,h=b;a=np.array(im,float);bb=np.array(base.crop((x,y,x+w,y+h)),float);yy,xx=np.mgrid[:h,:w];al=np.clip(np.minimum.reduce([xx,w-1-xx,yy,h-1-yy])/edge,0,1)[...,None] if edge else 1;base.paste(Image.fromarray(np.rint(a*al+bb*(1-al)).astype('uint8')),(x,y));used.append(b)
+ for b in rects[n]:
+  x,y,w,h=b;put(fullraw.crop((x,y,x+w,y+h)),b)
+ if n<=2:
+  gp=r/f'a-{j}-glass-raa02.png';shutil.copy2(g/f'exec-{glass[n-1]}.png',gp);put(Image.open(gp).convert('RGB').resize((256,320),Image.Resampling.LANCZOS),[832,400,256,320]);glassproof={'raa':str(gp.relative_to(root)),'sha256':sha(gp),'prompt':str((r/f'a-{j}-glass-prompt02.txt').relative_to(root))}
+ else:glassproof=None
+ drop=None
+ if n in [2,3,4]:
+  # Finn bare NYGENERERT lys dråpe i et på forhånd visuelt identifisert søkeområde.
+  zone=(365,550,390,590) if n==2 else (round(raw.width*.32),round(raw.height*(.57 if n==3 else .77)),round(raw.width*.39),round(raw.height*(.63 if n==3 else .83)))
+  a=np.array(raw);z=np.zeros(a.shape[:2],bool);x0,y0,x1,y1=zone;z[y0:y1,x0:x1]=True;hit=z&(a[:,:,0]>190)&(a[:,:,1]>200)&(a[:,:,2]>210);yy,xx=np.nonzero(hit);assert len(xx);bb=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1));dest=[376,{2:568,3:668,4:768}[n],4,12];put(raw.crop(bb).resize((4,12),Image.Resampling.LANCZOS),dest,0);drop={'nygenerert_bbox':bb,'destinasjon':dest,'kriterium':'RGB > [190,200,210] innen visuelt identifisert nytt dråpeområde, ingen kildekonturmaske'}
+ base.save(d/'resultat.png');after=np.array(base);mask=np.ones((1024,1536),bool)
+ for x,y,w,h in used:mask[y:y+h,x:x+w]=False
+ assert np.array_equal(after[mask],before[mask]);cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout);part,_=c.part_of(base,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);metrics=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];v=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));metrics.append({'objekt':o['bilde'],'kantkorrelasjon':v});box=(128+4*x,112+4*y,128+4*(x+w),112+4*(y+h));rows.append((j+' '+o['bilde'],Image.open(d/'referanse.png').crop(box),base.crop(box)))
+ e={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':{0:'OK',1:'SJEKK',2:'FEIL'}.get(cp.returncode,'FEIL'),'kontrollfil':str((r/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':2 if n<=2 else 1,'objektkontroll':metrics,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':False,'proveniens':{'verktoy':'innebygd imagegen','eksakt_modell':'ikke eksponert','raa':str(rp.relative_to(root)),'raa_sha256':sha(rp),'prompt':str((r/f'a-{j}-prompt01.txt').relative_to(root)),'prompt_sha256':sha(r/f'a-{j}-prompt01.txt'),'glassretting':glassproof},'rektangler':used,'utenfor_rektangler_byteidentisk':True,'dråpeplassering':drop};entries.append(e);proof.append({'jobb':j,'endret_hd':int(np.any(before!=after,2).sum()),'rektangler':used,'dråpeplassering':drop})
+mf=json.loads((r37/'a-leveranser.json').read_text());mf['leveranser']=[e for e in mf['leveranser'] if e['jobb'].startswith('lag039')]+entries[:2];mf['genereringskall']=12;mf['status']='under visuell kontroll';(r37/'a-leveranser.json').write_text(json.dumps(mf,indent=2));(r38/'a-leveranser.json').write_text(json.dumps({'leveranser':entries[2:],'genereringskall':4,'status':'under visuell kontroll'},indent=2));(r37/'a-040-komposisjonsbevis.json').write_text(json.dumps(proof,indent=2))
+for page in range((len(rows)+4)//5):
+ can=Image.new('RGB',(1000,5*380),(185,185,185));dr=ImageDraw.Draw(can)
+ for i,(name,a,b) in enumerate(rows[page*5:page*5+5]):
+  dr.text((5,i*380+5),name+' original / HD',fill='black')
+  for k,im in enumerate([a,b]):
+   s=min(480/im.width,340/im.height);im=im.resize((round(im.width*s),round(im.height*s)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);can.paste(im,(k*500,i*380+25))
+ can.save(r37/f'a-040-objektqa-{page+1}.png')
+print([(e['jobb'],e['egenkontroll'],e['objektkontroll']) for e in entries])

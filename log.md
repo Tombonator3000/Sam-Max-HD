@@ -272,3 +272,8 @@
 
 - Bestilling 36: ti lag levert OK, 16 faktiske feltkontroller, egne periskop-/fisketilstander og magnetmaster med identisk1152×800overlapp. Se `rapporter/bestilling036-20261013/RAPPORT.md`. Bestilling35 har fortsatt egen retting; øvrig HD-arbeid fortsetter.
 - 64 beskyttede/kontekstfiler er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-13T23:40:46+02:00 (Codex, Astra)
+
+- Bestilling37: ti lag levert OK med 28 faktiske feltkontroller, hjul/kiste/reflekser og kildeegne glass-/dråpeformer. Se `rapporter/bestilling037-20261013/RAPPORT.md`. Bestilling35s retting og resten av HD-arbeidet fortsetter.
+- Alle kilder er uendret; faktisk komposisjonsunion har null utenforavvik. Root har sett alle felt og helscener. Ingen motorimport, spilltest eller ny individuell bildeaksept.

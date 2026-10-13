@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:39 (norsk tid)
+Oppdatert 2026-10-13 23:40 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 259 bilder levert (135 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 287 bilder levert (145 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -559,16 +559,16 @@ Rom 37, 38.
 
 Rom 39, 40.
 
-- [ ] `lag039_01` (rom 39 Shuv-Oohls hule, lag 01 med 5 objektbilder, bilde to `jobber/rom039/resultat.png`)
-- [ ] `lag039_02` (rom 39 Shuv-Oohls hule, lag 02 med 5 objektbilder, bilde to `jobber/rom039/resultat.png`)
-- [ ] `lag039_03` (rom 39 Shuv-Oohls hule, lag 03 med 3 objektbilder, bilde to `jobber/rom039/resultat.png`)
-- [ ] `lag039_04` (rom 39 Shuv-Oohls hule, lag 04 med 3 objektbilder, bilde to `jobber/rom039/resultat.png`)
-- [ ] `lag039_05` (rom 39 Shuv-Oohls hule, lag 05 med 2 objektbilder, bilde to `jobber/rom039/resultat.png`)
-- [ ] `lag039_06` (rom 39 Shuv-Oohls hule, lag 06 med 2 objektbilder, bilde to `jobber/rom039/resultat.png`)
-- [ ] `lag039_07` (rom 39 Shuv-Oohls hule, lag 07 med 1 objektbilde, bilde to `jobber/rom039/resultat.png`)
-- [ ] `lag039_08` (rom 39 Shuv-Oohls hule, lag 08 med 2 objektbilder, bilde to `jobber/rom039/resultat.png`)
-- [ ] `lag040_01` (rom 40 Gavebutikken (opp ned), lag 01 med 3 objektbilder, bilde to `jobber/rom040/resultat.png`)
-- [ ] `lag040_02` (rom 40 Gavebutikken (opp ned), lag 02 med 2 objektbilder, bilde to `jobber/rom040/resultat.png`)
+- [x] `lag039_01` (rom 39 Shuv-Oohls hule, lag 01 med 5 objektbilder, bilde to `jobber/rom039/resultat.png`)
+- [x] `lag039_02` (rom 39 Shuv-Oohls hule, lag 02 med 5 objektbilder, bilde to `jobber/rom039/resultat.png`)
+- [x] `lag039_03` (rom 39 Shuv-Oohls hule, lag 03 med 3 objektbilder, bilde to `jobber/rom039/resultat.png`)
+- [x] `lag039_04` (rom 39 Shuv-Oohls hule, lag 04 med 3 objektbilder, bilde to `jobber/rom039/resultat.png`)
+- [x] `lag039_05` (rom 39 Shuv-Oohls hule, lag 05 med 2 objektbilder, bilde to `jobber/rom039/resultat.png`)
+- [x] `lag039_06` (rom 39 Shuv-Oohls hule, lag 06 med 2 objektbilder, bilde to `jobber/rom039/resultat.png`)
+- [x] `lag039_07` (rom 39 Shuv-Oohls hule, lag 07 med 1 objektbilde, bilde to `jobber/rom039/resultat.png`)
+- [x] `lag039_08` (rom 39 Shuv-Oohls hule, lag 08 med 2 objektbilder, bilde to `jobber/rom039/resultat.png`)
+- [x] `lag040_01` (rom 40 Gavebutikken (opp ned), lag 01 med 3 objektbilder, bilde to `jobber/rom040/resultat.png`)
+- [x] `lag040_02` (rom 40 Gavebutikken (opp ned), lag 02 med 2 objektbilder, bilde to `jobber/rom040/resultat.png`)
 
 ## Bestilling 38
 
@@ -3499,3 +3499,5 @@ Bestilling 33: ti lag levert OK med elleve faktiske objektkontroller, kikkertfra
 Bestilling 34: seks lag levert OK med sju faktiske objektkontroller, siste tre viserposisjoner, to mikrotilstander og trådfravær/lukket dør på nøstet. Fire jobber venter grønt motivinnhold og er ikke levert. Se `rapporter/bestilling034-20261013/RAPPORT.md`. Bestilling 35 og videre fortsetter.
 
 Bestilling 36: ti lag levert OK, 16 faktiske feltkontroller, egne periskop-/fisketilstander og magnetmaster med identisk1152×800overlapp. Se `rapporter/bestilling036-20261013/RAPPORT.md`. Bestilling35 har fortsatt egen retting; øvrig HD-arbeid fortsetter.
+
+Bestilling37: ti lag levert OK med 28 faktiske feltkontroller, hjul/kiste/reflekser og kildeegne glass-/dråpeformer. Se `rapporter/bestilling037-20261013/RAPPORT.md`. Bestilling35s retting og resten av HD-arbeidet fortsetter.

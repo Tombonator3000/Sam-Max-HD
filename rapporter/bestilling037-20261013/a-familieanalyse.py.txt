@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();fields=json.loads((r/'a-feltbevis.json').read_text());out=[];locks=[]
+for j in ['rom039','rom040']:
+ for n in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:p=root/'jobber'/j/n;locks.append({'fil':str(p.relative_to(root)),'sha256':sha(p)})
+can=Image.new('RGB',(1200,len(fields)*170),(185,185,185));dr=ImageDraw.Draw(can)
+for i,e in enumerate(fields):
+ m=json.loads((root/'jobber'/e['jobb']/'jobb.json').read_text());a=Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB');b=Image.open((root/m['bilde_to']).parent/'original_1x.png').convert('RGB');x,y,w,h=e['rekt'];box=(x,y,x+w,y+h);aa=np.array(a.crop(box));bb=np.array(b.crop(box));diff=np.any(aa!=bb,2);yy,xx=np.nonzero(diff);palette,count=np.unique(aa.reshape(-1,3),axis=0,return_counts=True);d={'jobb':e['jobb'],'objekt':e['objekt'],'rekt':e['rekt'],'hd_rekt':e['hd_rekt'],'endret_mot_grunn':int(diff.sum()),'bbox_endret':None if not len(xx) else [int(xx.min()+x),int(yy.min()+y),int(xx.max()+x+1),int(yy.max()+y+1)],'palett':[{'rgb':v.tolist(),'antall':int(c)} for v,c in zip(palette,count)]};out.append(d)
+ if len(xx)<30:d['endrede_piksler']=[{'xy':[int(px+x),int(py+y)],'grunn':bb[py,px].tolist(),'lag':aa[py,px].tolist()} for py,px in zip(yy,xx)]
+ for k,im in enumerate([b.crop(box),a.crop(box)]):im.thumbnail((500,140));im=im.resize((min(im.width*3,500),min(im.height*3,140)),Image.Resampling.NEAREST);can.paste(im,(k*600,i*170+25))
+ dr.text((5,i*170+5),e['jobb']+' '+e['objekt']+f' grunn / lag, {int(diff.sum())} endrede piksler',fill='black')
+can.save(r/'a-grunnromsfelt.png');(r/'a-familiebevis.json').write_text(json.dumps(out,indent=2));(r/'a-ekstra-kildehash.json').write_text(json.dumps(locks,indent=2));print([(e['jobb'],e['objekt'],e['endret_mot_grunn'],e['bbox_endret']) for e in out])
