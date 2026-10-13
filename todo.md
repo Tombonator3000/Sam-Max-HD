@@ -105,3 +105,5 @@
 - [x] Levert ti jobber i bestilling 53: 71 Sam-ruter og 66 Max-ruter. Én SJEKK for tilsiktede halsskjøter er dokumentert.
 
 - [x] Levert ni jobber i bestilling 54: 84 Sam-ruter og 68 Max-ruter. To SJEKK for tynne armkonturer er dokumentert; fig007_02 venter fortsatt på fem a07-ruter.
+
+- [x] Levert ti jobber i bestilling 55: 32 Max-ruter, ni Sam-ruter og 41 Mini Vortex-ruter. Alle OK. Åttende Vortex-ark er kontrollert og følger bestilling 56.

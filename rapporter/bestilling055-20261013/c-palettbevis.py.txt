@@ -1,0 +1,11 @@
+from pathlib import Path
+import json,collections,hashlib
+import numpy as np
+from PIL import Image
+R=Path.cwd();O=R/'rapporter/bestilling055-20261013';d=json.loads((O/'c-rutekart207.json').read_text());groups=collections.defaultdict(list)
+for c in d['ruter']:
+ p=np.array(Image.open(R/'jobber'/c['jobb']/'original_1x.png').convert('RGB').crop(c['synlig']));mapping={};ids=[]
+ for v in p.reshape(-1,3):
+  v=tuple(v);mapping.setdefault(v,len(mapping));ids.append(mapping[v])
+ h=hashlib.sha256(np.array(ids,dtype='uint8').tobytes()).hexdigest();groups[h].append(c['rute'])
+(O/'c-fargeinndelingsbevis.json').write_text(json.dumps({'metode':'Lik pikselvis fargeklasseinndeling etter første forekomst; beviser geometrisk lik fargeinndeling, ikke lik RGB eller runtime-palett.','grupper':list(groups.values())},indent=2)+'\n');print(list(groups.values()))

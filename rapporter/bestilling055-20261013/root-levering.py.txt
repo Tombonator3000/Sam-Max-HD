@@ -1,0 +1,24 @@
+from pathlib import Path
+import hashlib,json,runpy,re
+from datetime import datetime
+from zoneinfo import ZoneInfo
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+c=runpy.run_path(str(root/'rapporter/rom090-obj901-vektor-20261013/root-levering.py.txt'),run_name='delivery_helpers')
+seal=runpy.run_path(str(root/'rapporter/bestilling051-20261013/root-git-mottak.py.txt'))['seal_and_push']
+m=json.loads((r/'fremdrift.json').read_text());s=json.loads((r/'sluttkontroll.json').read_text());assert s['utfall_antall']=={'OK':10,'SJEKK':0,'FEIL':0} and s['figurruter']==82
+for e in json.loads((r/'kildehash.json').read_text()):assert sha(root/e['fil'])==e['sha256']
+for e in m['leveranser']:assert sha(root/e['resultat'])==e['sha256'] and e['klar_for_mottak'] and not e['runtime_verifisert']
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+note='Bestilling 55: ti figurark med 82 ruter levert, alle OK. Max006, Sam236 og sju Mini Vortex-ark er kilde- og plasseringskontrollert. Se `rapporter/bestilling055-20261013/RAPPORT.md`. Arbeidet fortsetter.'
+counts=c['update_queue'](m['leveranser'],note)
+q=root/'GRAFIKKLISTE.md';qt=q.read_text();ids=[j for j in re.findall(r'^- \[x\] `([^`]+)`',qt,re.M) if (root/'jobber'/j/'jobb.json').is_file()]
+metas=[json.loads((root/'jobber'/j/'jobb.json').read_text()) for j in ids];icons=[e for e in metas if e['type']=='ikon'];figures=[e for e in metas if e['type']=='figur']
+counts.update(ikonark=len(icons),ikonfelt=sum(len(e['objekter']) for e in icons),figurark=len(figures),figurruter=sum(len(e['ruter']) for e in figures))
+assert counts['grafikkjobber']==509 and counts['figurruter']==469 and counts['ikonfelt']==46
+qt=re.sub(r'(\| Ikonark [^|]+\|) [^|]+ \|',lambda mm:mm.group(1)+' '+str(counts['ikonfelt'])+' felt levert ('+str(counts['ikonark'])+' ark), inkludert 2 SJEKK |',qt,count=1)
+qt=re.sub(r'(\| Figurark [^|]+\|) [^|]+ \|',lambda mm:mm.group(1)+' '+str(counts['figurruter'])+' ruter levert ('+str(counts['figurark'])+' ark), pilotstil godkjent |',qt,count=1);q.write_text(qt)
+(r/'root-mottak.json').write_text(json.dumps({'dato':stamp,'telling':counts,'root_visuell_motivkontroll':True,'alle_82_figurruter_kontrollert':True,'figuridentitet_og_rel_kontrollert':True,'motorimport':False,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+with (root/'todo.md').open('a') as f:f.write('\n- [x] Levert ti jobber i bestilling 55: 32 Max-ruter, ni Sam-ruter og 41 Mini Vortex-ruter. Alle OK. Åttende Vortex-ark er kontrollert og følger bestilling 56.\n')
+with (root/'log.md').open('a') as f:f.write('\n## '+stamp+' (Codex, Astra)\n\n- '+note+'\n- Figurark har ekte RGBA; 38 ruter gjenbruker kildebeviste nye komponenter, 44 er nye motiver. Max-øyne, Vortex-lysvarianter, nedre småformer og verdensankre er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.\n')
+commit=seal(r,m['leveranser'],'GPT: 82 ruter for Max, Sam og Mini Vortex, bestilling 55')
+print(json.dumps({'commit':commit,'telling':counts},ensure_ascii=False))

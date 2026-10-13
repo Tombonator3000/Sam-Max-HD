@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageFilter,ImageDraw,ImageFont
+import json,hashlib
+import numpy as np
+R=Path.cwd();O=R/'rapporter/bestilling055-20261013';Q=R/'rapporter/bestilling056-20261013';s=(R/'rapporter/bestilling052-20261013/c-plasser.py.txt').read_text();exec(s[s.index('def box'):s.index('rois={')]);d=json.loads((O/'c-rutekart207.json').read_text());cs={c['rute']:c for c in d['ruter']};groups=json.loads((O/'c-genereringsgrupper.json').read_text())['grupper'];components={1920:Image.open(O/'c-1920-komponent04.png').convert('RGBA')};proof=[]
+for g in groups:
+ attempt=2 if g['gruppe'] in ['lys2','tom'] else 1;raw=Image.open(O/f"c-{g['gruppe']}-raa{attempt:02}.png").convert('RGBA');n=len(g['cels']);w=raw.width
+ for i,id in enumerate(g['cels']):
+  roi=(round(i*w/n)+(15 if g['gruppe']=='a10a' and i==1 else 0),0,round((i+1)*w/n),raw.height);p=raw.crop(roi);c=cs[id];x,y,z,t=c['synlig'];p,b=fit(p,(z-x)*4,(t-y)*4);components[id]=p;p.save(O/f'c-cel{id}.png');proof.append({'cel':id,'raw':f"c-{g['gruppe']}-raa{attempt:02}.png",'raw_roi':roi,'core_bbox':b})
+for ids in d['RGB_identiske_grupper']:
+ for id in ids:components[id]=components[ids[0]]
+for n in range(1,9):
+ name=f'fig207_{n:02}';j=json.loads((R/'jobber'/name/'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));rec=[]
+ for c in j['ruter']:
+  p=components[c['rute']];b=box(p);x,y,z,t=c['synlig'];out.alpha_composite(p,(64+x*4-b[0],32+y*4-b[1]));rec.append({'cel':c['rute'],'target':[64+x*4,32+y*4,64+z*4,32+t*4],'komponent_RGBA_sha256':hashlib.sha256(p.tobytes()).hexdigest()})
+ out.save(R/'jobber'/name/'resultat.png');o=Q if n==8 else O;bg=Image.new('RGBA',out.size,(225,225,225,255));bg.alpha_composite(out);bg.convert('RGB').save(o/f'c-{name}-kandidat.png');(o/f'c-{name}-rutekart.json').write_text(json.dumps(rec,indent=2)+'\n')
+font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',14)
+unique=[ids[0] for ids in d['RGB_identiske_grupper']]
+for start in range(0,24,4):
+ out=Image.new('RGB',(1200,1160),(225,225,225));dr=ImageDraw.Draw(out)
+ for i,id in enumerate(unique[start:start+4]):
+  c=cs[id];x=i%2*600;y=i//2*580;dr.text((x+4,y+4),str(id),font=font,fill='black');p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']);p=p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST);out.paste(p,(x+4,y+30));p=components[id];out.paste(p,(x+305,y+30),p)
+ out.save(O/f'c-unikqa-{start//4+1}.png')
+(O/'c-plasseringsbevis.json').write_text(json.dumps(proof,indent=2)+'\n')

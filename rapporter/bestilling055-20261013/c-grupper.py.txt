@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFont
+import json
+R=Path.cwd();O=R/'rapporter/bestilling055-20261013';d=json.loads((O/'c-rutekart207.json').read_text());cs={c['rute']:c for c in d['ruter']};groups={'lys1':[1921,1922,1936,1938],'lys2':[1939,1940,1941,1942],'lys3':[1945,1946],'tom':[1948,1949,1953,1954],'a10a':[1955,1956,1957,1959],'a10b':[1960,1961,1962,1963,1964]};records=[]
+for name,ids in groups.items():
+ out=Image.new('RGB',(len(ids)*320,560),(255,0,255))
+ for i,id in enumerate(ids):
+  c=cs[id];p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']);p=p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST);out.paste(p,(i*320+16,8))
+ out.save(O/f'c-{name}-original.png');records.append({'gruppe':name,'cels':ids,'original':f'c-{name}-original.png'})
+(O/'c-genereringsgrupper.json').write_text(json.dumps({'pilot':1920,'grupper':records,'uniketotalt':1+sum(len(v) for v in groups.values()),'status':'kildegrunnlag; ingen gruppe generert ennå'},indent=2)+'\n')

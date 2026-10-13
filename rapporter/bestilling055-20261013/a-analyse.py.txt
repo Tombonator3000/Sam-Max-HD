@@ -1,0 +1,44 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,collections
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();M=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text());locks={};context={};records=[];bases=[]
+for d in sorted((root/'jobber').glob('fig003_*')):
+ j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB')
+ for f in ['jobb.json','original_1x.png']:context[str((d/f).relative_to(root))]=sha(d/f)
+ for c in j['ruter']:
+  x,y,ex,ey=c['synlig'];bases.append((d.name,c,np.array(im.crop((x,y,ex,ey)))))
+for name in ['fig006_01','fig006_02']:
+ d=root/'jobber'/name;j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB');om={v['cel']:v for v in M['6']['cels']}
+ for f in ['jobb.json','prompt.txt','original_1x.png','referanse.png']:locks[str((d/f).relative_to(root))]=sha(d/f)
+ for c in j['ruter']:
+  x,y,ex,ey=c['synlig'];a=np.array(im.crop((x,y,ex,ey)));matches=[]
+  for bn,bc,ba in bases:
+   if a.shape==ba.shape and np.array_equal(a,ba):
+    old=next(v for v in M['3']['cels'] if v['cel']==bc['rute']);matches.append({'jobb':bn,'cel':bc['rute'],'RGB_identisk':True,'meta_forskjeller':{k:[old.get(k),v] for k,v in om[c['rute']].items() if old.get(k)!=v},'rekt':bc['rekt']})
+  records.append({'jobb':name,**c,'originalmetadata':om[c['rute']],'bakgrunn':j['bakgrunn'],'synlige_piksler':int(np.any(a!=j['bakgrunn'],2).sum()),'palett_RGB':np.unique(a[np.any(a!=j['bakgrunn'],2)],axis=0).tolist(),'003_treff':matches})
+context['konsept/2026-10-12/kostymer-originalmetadata.json']=sha(root/'konsept/2026-10-12/kostymer-originalmetadata.json');context['hovedark/max.png']=sha(root/'hovedark/max.png')
+(r/'a-kildehash.json').write_text(json.dumps({'antall':len(locks),'filer':locks},indent=2)+'\n');(r/'a-konteksthash.json').write_text(json.dumps(context,indent=2)+'\n');(r/'a-kildebevis.json').write_text(json.dumps({'ruter':records,'kostymemetadata':{k:{f:M[k][f] for f in ['room','format','farger','speil','kostymepalett','colours','animasjoner','retninger']} for k in ['3','6']}},ensure_ascii=False,indent=2)+'\n')
+can=Image.new('RGB',(1536,1024),(128,128,128))
+for i,name in enumerate(['fig006_01','fig006_02']):can.paste(Image.open(root/'jobber'/name/'referanse.png').resize((768,512)),(i*768,0))
+can.save(r/'a-original-kontaktark.png')
+for page in range((len(records)+7)//8):
+ can=Image.new('RGB',(1600,800),(205,205,205));dr=ImageDraw.Draw(can)
+ for i,e in enumerate(records[page*8:page*8+8]):
+  xx=i%4*400;yy=i//4*400;m=e['originalmetadata'];dr.text((xx+3,yy+3),f"{e['jobb']} cel{e['rute']} a{e['animasjon']} r{e['retning']} l{e['lag']} nr{e['nr']}",fill='black');dr.text((xx+3,yy+20),f"rel{m['rel_x']},{m['rel_y']} 003: {[v['cel'] for v in e['003_treff']]}",fill='black');x,y,ex,ey=e['synlig'];w,h=ex-x,ey-y;im=Image.open(root/'jobber'/e['jobb']/'original_1x.png').crop((x,y,ex,ey)).resize((w*5,h*5),Image.Resampling.NEAREST);im.thumbnail((390,345));can.paste(im,(xx+3,yy+45))
+ can.save(r/f'a-feltark-{page+1}.png')
+def cut(e):
+ x,y,ex,ey=e['synlig'];a=np.array(Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop((x,y,ex,ey)));return Image.fromarray(np.dstack((a,np.uint8(np.any(a!=e['bakgrunn'],2))*255)))
+# Static composition at common source origin, no production masks.
+can=Image.new('RGB',(1500,500),(205,205,205));dr=ImageDraw.Draw(can)
+for i,di in enumerate([1,2,3]):
+ plane=Image.new('RGBA',(90,90));arr=[v for v in records if v['animasjon']==1 and v['retning']==di]
+ for e in sorted(arr,key=lambda v:v['lag']):
+  m=e['originalmetadata'];plane.alpha_composite(cut(e),(45+m['rel_x']+e['synlig'][0]-e['rekt'][0],75+m['rel_y']+e['synlig'][1]-e['rekt'][1]))
+ dr.text((i*500+4,4),f'Retning{di}: '+str([(e['rute'],e['lag']) for e in arr]),fill='black');plane=plane.resize((450,450),Image.Resampling.NEAREST);can.paste(plane,(i*500,35),plane)
+can.save(r/'a-rel-grunnkomposisjon.png')
+for di in [1,2,3]:
+ arr=sorted([v for v in records if v['animasjon']==17 and v['retning']==di],key=lambda v:v['nr']);can=Image.new('RGB',(400*len(arr),600),(205,205,205));dr=ImageDraw.Draw(can)
+ for i,e in enumerate(arr):
+  plane=Image.new('RGBA',(100,140));m=e['originalmetadata'];plane.alpha_composite(cut(e),(50+m['rel_x']+e['synlig'][0]-e['rekt'][0],110+m['rel_y']+e['synlig'][1]-e['rekt'][1]));plane=plane.resize((400,560),Image.Resampling.NEAREST);can.paste(plane,(i*400,40),plane);dr.text((i*400+4,4),f"cel{e['rute']} nr{e['nr']} rel{m['rel_x']},{m['rel_y']}",fill='black');dr.line((i*400+200,40,i*400+200,600),fill=(255,0,0));dr.line((i*400,480,i*400+400,480),fill=(255,0,0))
+ can.save(r/f'a-a17-rel-retning{di}.png')
+print('Antall',collections.Counter(e['jobb'] for e in records));print('treff',[(e['rute'],e['003_treff']) for e in records if e['003_treff']]);print('grupper',collections.Counter((e['animasjon'],e['retning'],e['lag']) for e in records));print('palett',M['3']['kostymepalett'],M['6']['kostymepalett'])

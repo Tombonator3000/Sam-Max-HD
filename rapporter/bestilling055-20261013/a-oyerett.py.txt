@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+r=Path(__file__).resolve().parent;proof=[]
+sets={1:[([649,756,685,785],[652,866,688,895]),([741,756,755,784],[744,866,762,894])],2:[([615,750,650,779],[526,861,561,890]),([695,750,730,779],[608,861,643,890]),([1083,717,1118,746],[935,816,970,845]),([1160,717,1195,746],[1016,815,1051,844])]}
+for di,patches in sets.items():
+ im=Image.open(r/f'a-a17-r{di}-raa01.png').convert('RGBA');before=np.array(im);a=before.copy();new=Image.open(r/f'a-a17-r{di}-raa02-eyes.png').convert('RGBA');union=np.zeros(a.shape[:2],bool)
+ for dst,src in patches:
+  x,y,xx,yy=dst;w,h=xx-x,yy-y;q=np.array(new.crop(src).resize((w,h),Image.Resampling.LANCZOS));Y,X=np.mgrid[:h,:w];weight=np.minimum(np.minimum(X,w-1-X),np.minimum(Y,h-1-Y))/3;weight=np.clip(weight,0,1)[:,:,None];a[y:yy,x:xx,:3]=np.rint(q[:,:,:3]*weight+a[y:yy,x:xx,:3]*(1-weight)).astype('uint8');union[y:yy,x:xx]=True
+ Image.fromarray(a).save(r/f'a-a17-r{di}-valgt-raa.png');proof.append({'retning':di,'rektangler_dst_src':patches,'endret':int(np.any(a!=before,2).sum()),'utenfor_endret':int(np.any(a!=before,2)[~union].sum()),'alfa_uendret':bool(np.array_equal(a[:,:,3],before[:,:,3]))})
+(r/'a-oyeretting-bevis.json').write_text(json.dumps(proof,indent=2)+'\n')
+p=r/'a-plasser.py.txt';s=p.read_text().replace("raw=Image.open(r/f'a-a17-r{di}-raa01.png').convert('RGBA')","rawname=f'a-a17-r{di}-valgt-raa.png' if di<3 else f'a-a17-r{di}-raa01.png';raw=Image.open(r/rawname).convert('RGBA')").replace("'raw':f'a-a17-r{di}-raa01.png'","'raw':rawname");p.write_text(s)

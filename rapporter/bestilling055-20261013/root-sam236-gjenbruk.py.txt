@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil,subprocess,sys
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks=json.loads((r/'root-sam236-kildehash.json').read_text())
+for p,h in locks.items():assert sha(root/p)==h
+mm=json.loads((root/'jobber/fig236_01/jobb.json').read_text());dm=json.loads((root/'jobber/fig002_01/jobb.json').read_text())
+om=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text());out=[]
+for c in mm['ruter']:
+ dc=next(q for q in dm['ruter'] if q['rute']==c['rute']);a=next(q for q in om['236']['cels'] if q['cel']==c['rute']);b=next(q for q in om['2']['cels'] if q['cel']==c['rute'])
+ src=Image.open(root/'jobber/fig236_01/original_1x.png').convert('RGB').crop(tuple(c['synlig']));don=Image.open(root/'jobber/fig002_01/original_1x.png').convert('RGB').crop(tuple(dc['synlig']))
+ assert src.size==don.size and src.tobytes()==don.tobytes()
+ assert c['synlig']==dc['synlig']
+ for key in ['animasjon','retning','lag','nr']:assert c[key]==dc[key]
+ wp=[a['rel_x']+c['synlig'][0]-c['rekt'][0],a['rel_y']+c['synlig'][1]-c['rekt'][1]]
+ wd=[b['rel_x']+dc['synlig'][0]-dc['rekt'][0],b['rel_y']+dc['synlig'][1]-dc['rekt'][1]]
+ assert wp==wd,(c['rute'],wp,wd)
+ out.append({'cel':c['rute'],'maal_synlig':c['synlig'],'kilde_synlig':dc['synlig'],'maal_festepunkt':a,'donor_festepunkt':b,'synlig_verdensopprinnelse':wp,'donor_verdensopprinnelse':wd,'RGB_kildeidentisk':True})
+donor=root/'jobber/fig002_01/resultat.png';expected='45b434f4b7f44b5e27ffa0b8ed5f05b819dde86b388913c2a26736d7744fda7d';assert sha(donor)==expected
+p=root/'jobber/fig236_01/resultat.png';assert not p.exists();shutil.copyfile(donor,p);assert sha(p)==expected
+run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);assert run.returncode==0 and '7 av 7 ruter OK' in run.stdout
+(r/'root-fig236_01-kontroll.txt').write_text(run.stdout)
+(r/'root-sam236-gjenbruksbevis.json').write_text(json.dumps({'ruter':out,'donor':str(donor.relative_to(root)),'donor_sha256':expected,'resultat_sha256':sha(p),'hele_arket_byteidentisk':True,'sma_cels_eksplisitt_gjenbrukt':[512,513],'kildepalettforskjell':[255,14],'runtime':False},ensure_ascii=False,indent=2)+'\n')
+(root/'jobber/fig236_01/notat.md').write_text('# Sam236, ark 1\n\n14. oktober 2026. Ni kildecels er RGB-identiske med Sam002-piloten. Målrommet er47, palettindeks14 er14 mot255 i002; det finnes ingen synlig RGB-forskjell i disse ni rutene. Cel128,385 og384 har større metadatarektangler, men samme synlige verdensopprinnelse etter originalens offsets. Disse egne metadataene er beholdt.\n\nDet ferdige pilotarket er kopiert byteidentisk som ekte RGBA1536×1024, uten resampling eller ny generering. Opprinnelige råbilder, prompt og godkjenning tilhører pilotens proveniens. Små øyelokk512/513 er hver kopiert fra sin egen pilotcel; de to adskilte smådelene er sett, også kontrollert i Sam004-mottaket. Uendret checker: OK, sju ordinære ruter; de to små øyelokkene hoppes over av standardkontrollen og er derfor dokumentert separat.\n\nRot har sett referansen og den samme leverte grafikken samlet med kroppen i Sam004/piloten. Bevis: rapporter/bestilling055-20261013/root-sam236-gjenbruksbevis.json. Åtte låste kildefiler er uendret. Ingen ny individuell brukergodkjenning, motorimport eller runtime. Nytegningens tidligere modellnavn var ikke eksakt eksponert.\n\nSHA-256: '+expected+'\n')
+(r/'root-leveranser.json').write_text(json.dumps({'leveranser':[{'jobb':'fig236_01','resultat':str(p.relative_to(root)),'sha256':expected,'egenkontroll':'OK','klar_for_mottak':True,'metode':'Byteidentisk gjenbruk av kildebevist Sam002-pilot','forsok':0,'runtime':False,'ny_brukergodkjenning':False}]},ensure_ascii=False,indent=2)+'\n')
+print('Sam236 nine cells source/world-origin verified; full pilot RGBA copied, checker OK')

@@ -1,0 +1,44 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil
+R=Path.cwd();O=R/'rapporter/bestilling055-20261013';Q=R/'rapporter/bestilling056-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rel=lambda p:str(p.relative_to(R));D=json.loads((O/'c-rutekart207.json').read_text());proof=[];unique={};rmap={}
+for n in range(1,9):
+ o=Q if n==8 else O;name=f'fig207_{n:02}';j=json.loads((R/'jobber'/name/'jobb.json').read_text());im=Image.open(R/'jobber'/name/'resultat.png').convert('RGBA')
+ for c in j['ruter']:
+  x,y,z,t=c['synlig'];p=im.crop((64+4*x,32+4*y,64+4*z,32+4*t));rmap[c['rute']]={'cel':c['rute'],'RGBA_boks_sha256':hashlib.sha256(p.tobytes()).hexdigest(),'jobb':name,'synlig_HD':[64+4*x,32+4*y,64+4*z,32+4*t]}
+for ids in D['RGB_identiske_grupper']:
+ hashes={rmap[id]['RGBA_boks_sha256'] for id in ids};assert len(hashes)==1,(ids,hashes);proof.append({'cels':ids,'identisk_ny_RGBA':True,'sha256':next(iter(hashes))})
+(O/'c-dublettsluttbevis.json').write_text(json.dumps({'grupper':proof,'ruter':list(rmap.values()),'alle45':True,'unike24':True},indent=2)+'\n')
+prov=[]
+for raw in sorted(O.glob('c-*-raa*.png')):
+ stem=raw.stem;parts=stem.rsplit('-raa',1);prompt=O/(parts[0]+'-prompt'+parts[1]+'.txt');assert prompt.exists(),prompt;prov.append({'raw':rel(raw),'raw_sha256':sha(raw),'prompt':rel(prompt),'prompt_sha256':sha(prompt),'verktøy':'innebygd ChatGPT imagegen','modell':'ikke eksponert'})
+(O/'c-proveniens.json').write_text(json.dumps({'kall':prov,'valgt':{'1920':'forsøk02 + lokal nedre04','lys1':1,'lys2':2,'lys3':1,'tom':2,'a10a':1,'a10b':1},'forkastet':['1920 hel01: for mettet og avrundede dråper','1920 nedre03: metallføtter','lys2 første: for mørk','tom første: runde føtter'], 'oppskrifter':[rel(O/'c-plasser207.py.txt'),rel(O/'c-pilotretting.py.txt')],'runtime':False,'ny_brukergodkjenning':False},indent=2)+'\n')
+for o in [O,Q]:
+ locks=json.loads((o/'c-kildehash.json').read_text())['filer'];assert all(sha(R/p)==h for p,h in locks.items());(o/'c-kildesluttkontroll.json').write_text(json.dumps({'antall':len(locks),'uendret':True,'filer':locks},indent=2)+'\n')
+shutil.copy2(O/'c-fig207_08-kontroll.txt',Q/'c-fig207_08-kontroll.txt')
+for o,nums in [(O,range(1,8)),(Q,[8])]:
+ lever=[]
+ for n in nums:
+  name=f'fig207_{n:02}';p=R/'jobber'/name/'resultat.png';control=o/f'c-{name}-kontroll.txt';assert 'Utfall: OK' in control.read_text();j=json.loads((R/'jobber'/name/'jobb.json').read_text());r={'jobb':name,'resultat':rel(p),'sha256':sha(p),'egenkontroll':'OK','kontrollfil':rel(control),'ruter':len(j['ruter']),'forsok':'se c-proveniens, gjenbruk per cel','proveniens':rel(O/'c-proveniens.json'),'rutekart':rel(o/f'c-{name}-rutekart.json'),'runtime':False,'ny_brukergodkjenning':False,'klar_for_rotkontroll':True};lever.append(r)
+  (R/'jobber'/name/'notat.md').write_text(f'''# {name} — Mini Vortex
+
+Kostyme 207 fra gavebutikk rom 040. Opp-ned Sam/Max, glass-/lys-/åpningstilstand etter egne originaler; 06 er tom beholder. Ingen isblokk eller kjøkkenmotiv. {len(j['ruter'])} ruter. Resultat SHA-256: `{sha(p)}`. Uendret checker **OK**, `{rel(control)}`.
+
+Innebygd ChatGPT imagegen; eksakt modell ikke eksponert. Felles proveniens med alle råforsøk/prompt-SHA: `{rel(O/'c-proveniens.json')}`. Ordrett jobbprompt med separat avgrensning/kildepresisering. 24 unike nye komponenter og eksakt ny-RGBA-gjenbruk for 21 øvrige ruter; kildebevis/dublettsluttbevis i bestilling055. Ingen originalkonturmaske, lokal warp eller vektortrace. Nye alfa-kanter er renset og komponentene helskalert til metadataens synlige bokser.
+
+Alle 45 ruter er sett i hele ark, alle 24 unike i seks original/HD-detaljark. Opp-ned-identitet, tom06, høyre glassåpning, Max-økning til 69 × 126 og nedre anker er kontrollert. Behold kvalitetsforbehold: rundere glass, tydeligere ansikter, mer markerte figur-/glaskanter og enkelte fargetoner enn kildens grove/pale piksler. Ikke påstått piksel- eller palettidentitet. Rot vurderer mottak separat. Runtime/import og ny brukergodkjenning er uverifisert.
+''')
+ (o/'c-leveranser.json').write_text(json.dumps({'leveranser':lever,'familie':'fig207_01..08','totalt_ruter':45,'unike_komponenter':24,'gjenbrukte_ruter':21,'kilder_uendret':True,'runtime':False,'ny_brukergodkjenning':False},indent=2)+'\n')
+(O/'c-kilde-qa.md').write_text('''# Samlet slutt-QA — kostyme 207
+
+Alle åtte ark / 45 ruter er komponert, checker OK. 24 unike motiver og 21 eksakte gjenbruk dokumentert i c-dublettsluttbevis.json med faktisk RGBA-hash fra hvert leveransefelt. 28 + 4 beskyttede kildefiler uendret. Seks c-unikqa-sider og c-helarkqa er visuelt gjennomgått. Ingen kjøring i motoren, ny brukergodkjenning eller importtest er utført.
+
+Identitet: Sam med dress/slips/hatt og brune poter, hvit Max uten klær, begge opp ned. 06 viser bare beholder/glass, ingen påmalte personer. Glass flyttes mot høyre gjennom a9/a10; mørkt innvendig felt og økt Max-høyde i siste fem egne poser bevares. Ingen ny skilttekst, iskrystaller eller kjøkkenfortolkning.
+
+1920 første råforsøk avvist som for mettet; source-only forsøk02 beholdt, lokal nedre04 ga ulik tynn venstre, kantet midtre og kort høyre utstikker. c-pilot-utstikkere viser nærbildet. Rektangel [55,350,130,50] i ny komponent er eneste endring; resten byte-identisk, se c-1920-rettingsbevis.json. Lokal03 avvist som metallføtter. Lys2 og tom-gruppen fikk egne source-only forsøk02; forrige råbilder bevart. Tomme småformer er enklere/kantete, og glassmerkene firkantede. 1956 tilfeldig nabostrek ble fjernet ved avgrenset råutsnitt, ikke kildepikselmaske.
+
+Kvalitetsforbehold: HD-glass er rundere/mer regelmessig enn kilden; ansikter, klærsømmer, reflekskanter og enkelte fargetoner er tydeligere. Lysvariantene er selvstendige genereringer, ikke automatisk normalisert til mørk pilot eller matematisk palettidentiske. Små sourceforskjeller er bevart som egne komponenter, men en nesten identisk lysvariant er ikke påstått eksakt rekonstruert. Teknisk OK betyr bare avgrenset dimensjons-/omrisskontroll. Rot har separat ansvar for mottak.
+
+Kildeplan/c-rutekart207 gir animasjon/rel. Pakking bevarer nedre rel-anker ved høydene100/107/126, ingen normalisering til samme høyde. Samme retning brukes slik metadata viser; ingen ekstra speiling. Ordrette prompter, separat kildepresisering, råfiler og SHA finnes i c-proveniens.json. Eksakt bildegeneratormodell er ikke eksponert.
+''');(Q/'c-kilde-qa.md').write_text('# fig207_08 — slutt-QA\n\nFelles 45-ruters kontroll, proveniens og konkrete forbehold: `../bestilling055-20261013/c-kilde-qa.md`. Fire egne 69 × 126-ruter, nedre rel-anker beholdt, uendret checker OK. Ingen nye personer eller speiling. Fire beskyttede kilder uendret. Runtime, import og ny brukergodkjenning uverifisert.\n')
+print('sluttført',len(prov),'bildekall; 45 ruter; 24 unike; 32 kilder uendret')

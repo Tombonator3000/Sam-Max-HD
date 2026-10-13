@@ -1,0 +1,43 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1]
+read=lambda n:json.loads((r/n).read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks=read('a-kildehash.json')['filer'];context=read('a-konteksthash.json')
+for p,h in {**locks,**context}.items():assert sha(root/p)==h,p
+prov=read('a-proveniens.json')
+for p,h in prov['råfiler_og_prompter'].items():assert sha(r/p)==h,p
+assert sha(root/prov['donor']['fil'])==prov['donor']['sha256']
+om=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())
+dm=json.loads((root/'jobber/fig003_01/jobb.json').read_text());donor=Image.open(root/'jobber/fig003_01/resultat.png').convert('RGBA')
+placements=read('a-plasseringsbevis.json');records=[];reused=0;new=0
+for e in read('a-leveranser.json')['leveranser']:
+ j=e['jobb'];p=root/e['resultat'];assert sha(p)==e['sha256'];im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024)
+ meta=json.loads((root/'jobber'/j/'jobb.json').read_text());alpha=np.array(im)[:,:,3];used=np.zeros(alpha.shape,bool);cells=[]
+ for c in meta['ruter']:
+  cp=next(q for q in placements if q['jobb']==j and q['cel']==c['rute']);x,y,X,Y=c['synlig'];tx,ty,tw,th=64+4*x,32+4*y,4*(X-x),4*(Y-y)
+  used[max(0,ty-12):ty+th+12,max(0,tx-12):tx+tw+12]=True
+  if 'donor' in cp:
+   dc=next(q for q in dm['ruter'] if q['rute']==c['rute']);sx,sy=64+4*dc['synlig'][0],32+4*dc['synlig'][1]
+   a=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop(c['synlig']);b=Image.open(root/'jobber/fig003_01/original_1x.png').convert('RGB').crop(dc['synlig']);assert a.size==b.size and a.tobytes()==b.tobytes()
+   cm=next(q for q in om['6']['cels'] if q['cel']==c['rute']);dcm=next(q for q in om['3']['cels'] if q['cel']==c['rute'])
+   assert [cm['rel_x']+x-c['rekt'][0],cm['rel_y']+y-c['rekt'][1]]==[dcm['rel_x']+dc['synlig'][0]-dc['rekt'][0],dcm['rel_y']+dc['synlig'][1]-dc['rekt'][1]]
+   assert im.crop((tx-12,ty-12,tx+tw+12,ty+th+12)).tobytes()==donor.crop((sx-12,sy-12,sx+tw+12,sy+th+12)).tobytes();reused+=1
+  else:
+   assert cp['core_bbox']==[tx,ty,tx+tw,ty+th]
+   q=Image.open(r/f'a-cel{c["rute"]}-komponent.png').convert('RGBA');qa=np.array(q);ys,xs=np.nonzero(qa[:,:,3]>=128);bbox=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
+   assert bbox[2]-bbox[0]==tw and bbox[3]-bbox[1]==th
+   target=np.array(im.crop((tx-bbox[0],ty-bbox[1],tx-bbox[0]+q.width,ty-bbox[1]+q.height)));assert np.array_equal(target[:,:,3],qa[:,:,3]);assert np.array_equal(target[qa[:,:,3]>0],qa[qa[:,:,3]>0]);new+=1
+  cells.append({'cel':c['rute'],'metode':cp['metode'],'kontroll':'OK'})
+ assert not np.any(alpha[~used]);px,py,pw,ph=meta['bilde_i_lerret'];padding=np.ones(alpha.shape,bool);padding[py:py+ph,px:px+pw]=False;assert not np.any(alpha[padding])
+ run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);assert 'Utfall: OK' in run.stdout
+ (r/f'root-{j}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n');records.append({'jobb':j,'sha256':sha(p),'ruter':cells,'padding_utenfor_ruter_transparent':True})
+assert reused==8 and new==24
+for e in read('a-oyeretting-bevis.json'):
+ di=e['retning'];a=np.array(Image.open(r/f'a-a17-r{di}-raa01.png').convert('RGBA'));b=np.array(Image.open(r/f'a-a17-r{di}-valgt-raa.png').convert('RGBA'));outside=np.ones(a.shape[:2],bool)
+ for dst,src in e['rektangler_dst_src']:
+  x,y,X,Y=dst;outside[y:Y,x:X]=False
+ assert np.array_equal(a[:,:,3],b[:,:,3]);assert not np.any(np.any(a!=b,axis=2)&outside);assert int(np.any(a!=b,axis=2).sum())==e['endret']
+(r/'root-a-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':len(locks),'kontekst_uendret':len(context),'proveniens_laat':len(prov['råfiler_og_prompter']),'gjenbruk':8,'nye':24,'oyeendring_bare_avtalte_rektangler_alfa_uendret':True,'leveranser':records,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('A55: 32 ruter kontrollert; 8 source/world-origin/RGBA-donorer, 24 nye komponenter, begge ark OK')
