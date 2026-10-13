@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 21:16 (norsk tid)
+Oppdatert 2026-10-13 21:33 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 39 bilder levert (21 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 49 bilder levert (31 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -364,16 +364,16 @@ Rom 7.
 
 Rom 7.
 
-- [ ] `lag007_12_del1av2` (rom 7 Kontoret, lag 12 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_13_del1av2` (rom 7 Kontoret, lag 13 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_14_del1av2` (rom 7 Kontoret, lag 14 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_15_del1av2` (rom 7 Kontoret, lag 15 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_16_del1av2` (rom 7 Kontoret, lag 16 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_17_del1av2` (rom 7 Kontoret, lag 17 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_18_del1av2` (rom 7 Kontoret, lag 18 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_19_del1av2` (rom 7 Kontoret, lag 19 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_20_del1av2` (rom 7 Kontoret, lag 20 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
-- [ ] `lag007_21_del1av2` (rom 7 Kontoret, lag 21 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_12_del1av2` (rom 7 Kontoret, lag 12 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_13_del1av2` (rom 7 Kontoret, lag 13 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_14_del1av2` (rom 7 Kontoret, lag 14 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_15_del1av2` (rom 7 Kontoret, lag 15 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_16_del1av2` (rom 7 Kontoret, lag 16 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_17_del1av2` (rom 7 Kontoret, lag 17 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_18_del1av2` (rom 7 Kontoret, lag 18 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_19_del1av2` (rom 7 Kontoret, lag 19 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_20_del1av2` (rom 7 Kontoret, lag 20 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
+- [x] `lag007_21_del1av2` (rom 7 Kontoret, lag 21 med 1 objektbilde, del 1/2, bilde to `jobber/rom007_del1av2/resultat.png`)
 
 ## Bestilling 25
 
@@ -3473,3 +3473,5 @@ Rom090 og obj901_01 levert OK etter Toms uttrykkelige vektorvalg, med native SVG
 Bestilling 22: ti objektlag levert OK. Egne bil-/lystilstander, fire ørefliker og bevisst avskårne figurdeler beholdt. To kontormastere med identiske overlapp, små øye-/TV-/skallevarianter og alle 22 objektfelt kontrollert. Se `rapporter/bestilling022-20261013/RAPPORT.md`. Bestilling 23 og videre lag fortsetter.
 
 Bestilling 23: ti kontorlag levert OK. Ni egne TV-tilstander, lokal munn-/øyeretting og grønn indikator bare i lag03. Riktig HD-rom er bytebevart utenfor nye felt; lag02 del2 har identisk overlapp med bestilling22. Alle elleve objektfelt kontrollert. Se `rapporter/bestilling023-20261013/RAPPORT.md`. Bestilling 24 og videre lag fortsetter.
+
+Bestilling 24: ti TV-/signal-/antennelag levert OK. Identiske 0D/0E/0F kildebevist gjenbrukt, egne signalbrudd og to antenneløkker/fravær beholdt. Synlige veggskjøter rettet og uavhengig etterkontrollert. Alle ti objektfelt målt; marginal078_03-korrelasjon0,602296 beholdes som forbehold. Se `rapporter/bestilling024-20261013/RAPPORT.md`. Bestilling 25 og videre fortsetter.

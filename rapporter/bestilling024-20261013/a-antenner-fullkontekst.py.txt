@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import shutil,json,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling024-20261013';g=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a');py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for n,k,name in [(14,2,'exec-e8310d4d-d6a7-491e-8c72-1354eccfd282.png'),(17,3,'exec-eeef66de-b462-4880-aff2-a56b89917b81.png'),(20,2,'exec-669b6ee0-7e71-431e-b7d4-b0e8b13de705.png')]:
+ j=f'lag007_{n:02d}_del1av2';d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());x,y,w,h=m['objekter'][0]['rekt'];box=(x*4,112+y*4,(x+w)*4,112+(y+h)*4)
+ shutil.copy2(g/name,r/f'a-{j}-raa{k:02d}.png');shutil.copy2(r/f'a-{j}-prompt-full.txt',r/f'a-{j}-prompt{k:02d}.txt')
+ shutil.copy2(d/'resultat.png',r/f'a-{j}-foer-fullkontekst.png')
+ raw=Image.open(g/name).convert('RGB');assert raw.size==(1536,1024)
+ # Use an inset rectangle enclosing both old/new antenna, preserving the already
+ # delivered frame fragment and right-side bullet hole. This is a rectangle,
+ # not a source silhouette or color-derived mask.
+ inset=(box[0],box[1]+24,box[2]-16,box[3])
+ base=Image.open(root/m['bilde_to']).convert('RGB');base.paste(raw.crop(inset),inset[:2]);base.save(d/'resultat.png')
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)

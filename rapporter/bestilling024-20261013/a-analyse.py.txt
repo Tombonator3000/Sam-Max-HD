@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,csv
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling024-20261013';r.mkdir(exist_ok=True)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def arr(j):return np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'))
+jobs=[f'lag007_{i:02d}_del1av2' for i in range(12,22)]
+locked=[{'fil':str((root/'jobber'/j/f).relative_to(root)),'sha256':sha(root/'jobber'/j/f)} for j in jobs for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']]
+(r/'kildehash.json').write_text(json.dumps(locked,indent=2)+'\n')
+context=[f'lag007_{i:02d}_del1av2' for i in [2,3,4,11,22]]
+(r/'a-konteksthash.json').write_text(json.dumps([{'fil':f'jobber/{j}/{f}','sha256':sha(root/'jobber'/j/f)} for j in context for f in ['original_1x.png','jobb.json']]+[{'fil':'jobber/rom007_del1av2/resultat.png','sha256':sha(root/'jobber/rom007_del1av2/resultat.png')}],indent=2)+'\n')
+reg=list(csv.DictReader((root/'konsept/2026-10-12/objektbilder-959.csv').open()))
+full=Image.new('RGB',(1200,5*425),(190,190,190));fd=ImageDraw.Draw(full)
+tv=Image.new('RGB',(1000,4*300),(190,190,190));td=ImageDraw.Draw(tv)
+evidence=[];previous=arr(context[3]);alljobs=[context[3]]+jobs+[context[4]]
+for idx,j in enumerate(alljobs):
+    a=arr(j);m=json.loads((root/'jobber'/j/'jobb.json').read_text());obj=m['objekter'][0];box=a[88:112,144:168]
+    crop=Image.fromarray(box).resize((240,240),Image.Resampling.NEAREST);tv.paste(crop,((idx%4)*250,(idx//4)*300+35));td.text(((idx%4)*250+5,(idx//4)*300+5),j+' / '+obj['bilde'],fill='black')
+    if j not in jobs:continue
+    n=jobs.index(j);pic=Image.open(root/'jobber'/j/'referanse.png').convert('RGB');pic.thumbnail((595,395));full.paste(pic,((n%2)*600,(n//2)*425+25));fd.text(((n%2)*600+5,(n//2)*425+5),j+' / '+obj['bilde'],fill='black')
+    comparisons={}
+    for other in ['rom007_del1av2']+context+jobs:
+        b=arr(other);diff=np.any(a!=b,axis=2);outside=diff.copy();outside[88:112,144:168]=False
+        yy,xx=np.where(diff);comparisons[other]={'different_pixels':int(diff.sum()),'outside_tv':int(outside.sum()),'difference_bbox':None if len(xx)==0 else [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]}
+    prev=alljobs[idx-1];pa=arr(prev);diff=np.any(a!=pa,axis=2);ys,xs=np.where(diff)
+    cols,counts=np.unique(box.reshape(-1,3),axis=0,return_counts=True)
+    evidence.append({'jobb':j,'metadata':m,'register':[x for x in reg if x['kilde']==obj['bilde']+'.png'],'tv_hdrekt':[576,464,96,96],'palette':[{'rgb':c.tolist(),'count':int(n)} for c,n in zip(cols,counts)],'comparisons':comparisons,'previous_listing':prev,'changes_from_previous':[{'room_xy':[int(x),int(y)],'tv_xy':[int(x-144),int(y-88)],'before':pa[y,x].tolist(),'after':a[y,x].tolist()} for y,x in zip(ys,xs)]})
+(r/'a-tilstandsbevis.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+'\n');full.save(r/'original-kontaktark.png');tv.save(r/'a-tv-naerbilder.png')
+print(json.dumps([{'jobb':e['jobb'],'objekt':e['metadata']['objekter'][0]['bilde'],'mot_forrige':len(e['changes_from_previous']),'mot_lag03':e['comparisons']['lag007_03_del1av2'],'mot_lag02':e['comparisons']['lag007_02_del1av2']} for e in evidence],indent=2))

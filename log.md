@@ -206,4 +206,9 @@
 
 ## 2026-10-13T21:31:33+02:00 (Codex, Astra)
 
-- 17 rapportprompters opprinnelige bytes gjenopprettet ved å fjerne ett bevist ekstraLF. Alle224 tidligere versjonerte PNG-er (222 leverte og to uavklarte) er uendret. Leveringshjelperen bevarer heretter prompt-/oppskriftsbytes. Se rapporter/promptintegritet-20261013/.
+- 17 rapportprompters opprinnelige bytes gjenopprettet ved å fjerne ett bevist ekstraLF. Alle 224 tidligere versjonerte PNG-er (222 leverte og to uavklarte) er uendret. Leveringshjelperen bevarer heretter prompt-/oppskriftsbytes. Se rapporter/promptintegritet-20261013/.
+
+## 2026-10-13T21:33:50+02:00 (Codex, Astra)
+
+- Bestilling 24: ti TV-/signal-/antennelag levert OK. Identiske 0D/0E/0F kildebevist gjenbrukt, egne signalbrudd og to antenneløkker/fravær beholdt. Synlige veggskjøter rettet og uavhengig etterkontrollert. Alle ti objektfelt målt; marginal078_03-korrelasjon0,602296 beholdes som forbehold. Se `rapporter/bestilling024-20261013/RAPPORT.md`. Bestilling 25 og videre fortsetter.
+- 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

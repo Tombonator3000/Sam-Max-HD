@@ -1,0 +1,21 @@
+exec(compile((__import__('pathlib').Path(__file__).parent/'a-analyse.py.txt').read_text(),'a-analyse.py.txt','exec'))
+sheet=Image.new('RGB',(1000,5*250),(190,190,190));sd=ImageDraw.Draw(sheet)
+base=arr('rom007_del1av2');proof=[]
+for i,j in enumerate(jobs):
+    a=arr(j);m=json.loads((root/'jobber'/j/'jobb.json').read_text());p=m['objekter'][0];x,y,w,h=p['rekt']
+    crop=Image.fromarray(a[y:y+h,x:x+w]).resize((w*6,h*6),Image.Resampling.NEAREST);sheet.paste(crop,((i%2)*500,(i//2)*250+25));sd.text(((i%2)*500+5,(i//2)*250+5),j+' '+p['bilde'],fill='black')
+    outside=[]
+    for other in ['rom007_del1av2','lag007_02_del1av2','lag007_03_del1av2','lag007_04_del1av2']+jobs:
+        b=arr(other);d=np.any(a!=b,axis=2);d[y:y+h,x:x+w]=False;ys,xs=np.where(d)
+        outside.append({'against':other,'outside_actual_object':int(d.sum()),'positions':[[int(xx),int(yy)] for yy,xx in zip(ys,xs)]})
+    proof.append({'jobb':j,'objekt':p['bilde'],'rekt':p['rekt'],'hdrekt':[x*4,112+y*4,w*4,h*4],'outside':outside})
+sheet.save(r/'a-objektbokser.png')
+(r/'a-feltbevis.json').write_text(json.dumps(proof,indent=2)+'\n')
+# Family comparisons follow resource identity, not adjacent queue row.
+families={ '071':['lag007_11_del1av2','lag007_12_del1av2','lag007_15_del1av2','lag007_18_del1av2','lag007_21_del1av2'], '078':['lag007_13_del1av2','lag007_16_del1av2','lag007_19_del1av2','lag007_22_del1av2'], '067':['lag007_14_del1av2','lag007_17_del1av2','lag007_20_del1av2'] }
+f=[]
+for fam,names in families.items():
+    for aa,bb in zip(names,names[1:]):
+        a,b=arr(aa),arr(bb);ys,xs=np.where(np.any(a!=b,axis=2));f.append({'family':fam,'from':aa,'to':bb,'count':len(xs),'changes':[{'xy':[int(x),int(y)],'before':a[y,x].tolist(),'after':b[y,x].tolist()} for y,x in zip(ys,xs)]})
+(r/'a-familiedifferanser.json').write_text(json.dumps(f,indent=2)+'\n')
+print(json.dumps([{'jobb':e['jobb'],'rekt':e['rekt'],'mot_rom':e['outside'][0]['outside_actual_object'],'mot04':e['outside'][3]['outside_actual_object']} for e in proof],indent=2));print([(e['family'],e['from'],e['to'],e['count']) for e in f])

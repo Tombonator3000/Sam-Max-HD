@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling024-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+shutil.copy2('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a/exec-63dd7031-3912-4de8-b1ef-9ab292896ba0.png',r/'a-lag007_17_del1av2-raa02.png')
+logs=[]
+for n in range(12,22):
+ j=f'lag007_{n:02d}_del1av2';d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());x,y,w,h=m['objekter'][0]['rekt'];src=15 if n in [18,21] else n;k=2 if n==17 else 1
+ before=r/f'a-{j}-foer-skjot.png'
+ if not before.exists():shutil.copy2(d/'resultat.png',before)
+ patch=Image.open(r/f'a-lag007_{src:02d}_del1av2-raa{k:02d}.png').convert('RGB').resize((w*4,h*4),Image.Resampling.LANCZOS)
+ base=Image.open(root/m['bilde_to']).convert('RGB');box=(x*4,112+y*4,(x+w)*4,112+(y+h)*4);old=np.array(base.crop(box)).astype(float);new=np.array(patch).astype(float)
+ yy,xx=np.indices((h*4,w*4));distance=np.minimum(np.minimum(xx,w*4-1-xx),yy)
+ if w==24:distance=np.minimum(distance,h*4-1-yy)
+ # Rectangular compositing feather only; derived from patch dimensions, never source contours.
+ # Antenna lower boundary is not feathered: it would restore the removed HD stem in state03.
+ alpha=np.clip(distance/6,0,1)[...,None]
+ blended=np.round(old*(1-alpha)+new*alpha).astype(np.uint8);base.paste(Image.fromarray(blended),box[:2]);base.save(d/'resultat.png')
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+ logs.append({'jobb':j,'raa_forsok':k,'nygenerert_rekt':[box[0],box[1],w*4,h*4],'feather_hdpx':6,'sider':['venstre','hoyre','topp']+(['bunn'] if w==24 else []),'endret_vs_ubehandlet_patch':int(np.any(blended!=new,axis=2).sum()),'utenfor_rekt_byteidentisk':True})
+(r/'a-skjotbevis.json').write_text(json.dumps(logs,ensure_ascii=False,indent=2)+'\n')

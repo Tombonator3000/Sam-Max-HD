@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling024-20261013'
+g=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a')
+raws={12:'exec-679476ca-266e-4518-bb72-74f2bb80701c.png',13:'exec-4eff22b5-71b1-40f3-a9cc-e658ff7443bf.png',14:'exec-b05c2b9b-c463-432e-a106-20b0609f0a8d.png',15:'exec-f27bbd77-963b-4858-b676-982385c0a62f.png',16:'exec-387089fe-e274-4cfa-965c-54e90509c07d.png',17:'exec-9214ae39-373d-4d5c-838a-4a7d22597f9b.png',19:'exec-b5bf4224-5fd8-4ac8-8258-c23adadeadb6.png',20:'exec-1219c357-94c1-41a8-bf38-1479b0757374.png'}
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for n,name in raws.items():shutil.copy2(g/name,r/f'a-lag007_{n:02d}_del1av2-raa01.png')
+for n in range(12,22):
+ j=f'lag007_{n:02d}_del1av2';d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());x,y,w,h=m['objekter'][0]['rekt'];src=15 if n in [18,21] else n
+ patch=Image.open(r/f'a-lag007_{src:02d}_del1av2-raa01.png').convert('RGB').resize((w*4,h*4),Image.Resampling.LANCZOS)
+ base=Image.open(root/m['bilde_to']).convert('RGB');base.paste(patch,(x*4,112+y*4));base.save(d/'resultat.png')
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll01.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)

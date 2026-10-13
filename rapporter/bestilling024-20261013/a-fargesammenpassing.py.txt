@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling024-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+base=Image.open(root/'jobber/rom007_del1av2/resultat.png').convert('RGB');box=(544,392,688,464)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def smooth(v):
+ # Running median over 21 HD pixels removes isolated dark antenna pixels from
+ # the boundary color estimate. This estimates color only; no content mask.
+ p=np.pad(v,((10,10),(0,0)),mode='edge');return np.stack([np.median(p[i:i+21],axis=0) for i in range(len(v))])
+qa=Image.new('RGB',(1152,720),(128,128,128));draw=ImageDraw.Draw(qa);records=[]
+for row,(n,k) in enumerate([(14,2),(17,3),(20,2)]):
+ j=f'lag007_{n:02d}_del1av2';d=root/'jobber'/j;raw=r/f'a-{j}-raa{k:02d}.png';before=r/f'a-{j}-foer-fargesammenpassing.png'
+ if not before.exists():shutil.copy2(d/'resultat.png',before)
+ a=np.array(Image.open(raw).convert('RGB').crop(box),float);b=np.array(base.crop(box),float);delta=b-a
+ field=np.zeros_like(a)
+ field[0]=smooth(delta[0]);field[-1]=smooth(delta[-1]);field[:,0]=smooth(delta[:,0]);field[:,-1]=smooth(delta[:,-1])
+ for step in range(12000):
+  new=(field[:-2,1:-1]+field[2:,1:-1]+field[1:-1,:-2]+field[1:-1,2:])/4
+  change=float(np.max(abs(new-field[1:-1,1:-1])));field[1:-1,1:-1]=new
+  if change<0.0001:break
+ out=np.clip(np.rint(a+field),0,255).astype('uint8');im=base.copy();im.paste(Image.fromarray(out),box[:2]);im.save(d/'resultat.png')
+ np.save(r/f'a-{j}-fargefelt.npy',field)
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+ records.append({'jobb':j,'before_sha256':sha(before),'after_sha256':sha(d/'resultat.png'),'raw_sha256':sha(raw),'base_sha256':sha(root/'jobber/rom007_del1av2/resultat.png'),'rect':list(box),'method':'Harmonic additive RGB field; boundary deltas smoothed with fixed 21 px running median, 4-neighbour Jacobi','iterations':step+1,'convergence':change,'correction_min':field.min(axis=(0,1)).tolist(),'correction_max':field.max(axis=(0,1)).tolist(),'correction_mean':field.mean(axis=(0,1)).tolist(),'checker_exit':cp.returncode,'original_pixels_used':False,'geometry_warp':False})
+ context=(520,356,728,484)
+ for col,p in enumerate([d/'referanse.png',before,d/'resultat.png']):qa.paste(Image.open(p).crop(context).resize((374,230),Image.Resampling.NEAREST if col==0 else Image.Resampling.LANCZOS),(col*384,row*240+10))
+ draw.text((row*0,row*240),j+' original / before / after',fill='black')
+qa.save(r/'a-fargesammenpassing-naerkontroll.png');(r/'a-fargesammenpassing-bevis.json').write_text(json.dumps(records,indent=2)+'\n')
