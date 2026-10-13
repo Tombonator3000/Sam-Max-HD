@@ -1,0 +1,27 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling026-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+jobs=['lag011_01_del2av2','lag011_02_del1av2','lag012_01_del1av2','lag012_01_del2av2','lag012_02_del2av2','lag012_03_del1av2','lag012_04_del1av2']
+def paste(base,raw,box,feather=4):
+ x,y,z,t=box;w=z-x;h=t-y;a=np.array(raw.crop(box),float);b=np.array(base.crop(box),float);yy,xx=np.mgrid[:h,:w];edges=[yy,h-1-yy];
+ if x>0:edges.append(xx)
+ if z<base.width:edges.append(w-1-xx)
+ alpha=np.clip(np.minimum.reduce(edges)/feather,0,1)[...,None];base.paste(Image.fromarray(np.rint(a*alpha+b*(1-alpha)).astype('uint8')),(x,y))
+for j in [jobs[0],jobs[1],jobs[4]]:
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());base=Image.open(root/m['bilde_to']).convert('RGB');raw=Image.open(r/f'a-{j}-raa01.png').convert('RGB');assert raw.size==(1536,1024)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];paste(base,raw,(x*4,112+y*4,(x+w)*4,112+(y+h)*4))
+ base.save(d/'resultat.png')
+base=Image.open(r/'a-rom012-eksisterende-hd-master.png').convert('RGB');raw=Image.open(r/'a-lag012_01-master-raa01.png').convert('RGB');original_size=raw.size;raw=raw.resize((1920,800),Image.Resampling.LANCZOS)
+for part in jobs[2:4]:
+ for o in json.loads((root/'jobber'/part/'jobb.json').read_text())['objekter']:
+  x,y,w,h=o['rekt'];paste(base,raw,(x*4,y*4,(x+w)*4,(y+h)*4))
+base.save(r/'a-lag012_01-fullmaster.png')
+for j,x in [(jobs[2],0),(jobs[3],384)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(base.crop((x,0,x+1536,800)),(0,112));out.save(root/'jobber'/j/'resultat.png')
+base=Image.open(r/f'a-{jobs[5]}-raa01.png').convert('RGB');base.paste((128,128,128),(0,0,1536,112));base.paste((128,128,128),(0,912,1536,1024));base.save(root/'jobber'/jobs[5]/'resultat.png');base.save(r/'a-statue-felles-underlag.png')
+raw=Image.open(r/f'a-{jobs[6]}-raa01.png').convert('RGB');paste(base,raw,(736,368,1088,752));base.save(root/'jobber'/jobs[6]/'resultat.png')
+(r/'a-sammensetting-bevis.json').write_text(json.dumps({'master_raw_size':original_size,'master_target_size':[1920,800],'clips':[0,384],'overlap':[1152,800],'feather_hdpx':4,'feather_definition':'min distance to rectangular boundaries /4; no scene-edge feather','no_source_mask':True,'no_geometry_warp':True},indent=2)+'\n')
+for j in jobs:
+ p=root/'jobber'/j/'resultat.png';cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)

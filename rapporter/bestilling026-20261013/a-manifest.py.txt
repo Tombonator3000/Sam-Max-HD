@@ -1,0 +1,40 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling026-20261013'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def rel(p):return str(p.relative_to(root))
+objects=json.loads((r/'a-perobjektkontroll.json').read_text());jobs=list(dict.fromkeys(e['jobb'] for e in objects));entries=[]
+sourceprovenance={
+'lag011_01_del2av2':[('a-lag011_01_del2av2-raa01.png','a-lag011_01_del2av2-prompt01.txt',['jobber/lag011_01_del2av2/referanse.png','jobber/rom011_del2av2/resultat.png']),('a-obj126_01-raa02.png','a-obj126_01-prompt02.txt',['rapporter/bestilling026-20261013/a-obj126_01-kilde.png','rapporter/bestilling026-20261013/a-obj126_01-hd.png']),('a-lag011_01_del2av2-raa03.png','a-lag011_01_del2av2-prompt03.txt',['jobber/lag011_01_del2av2/referanse.png','jobber/rom011_del2av2/resultat.png'])]}
+for j in jobs:
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());a=np.array(Image.open(d/'resultat.png').convert('RGB'));base=np.array(Image.open(root/m['bilde_to']).convert('RGB'));mask=np.ones(a.shape[:2],bool)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];mask[112+y*4:112+(y+h)*4,x*4:(x+w)*4]=False
+ outside=int(np.any(a[mask]!=base[mask],axis=1).sum());own=[o for o in objects if o['jobb']==j];assert all(o['utfall']=='OK' for o in own)
+ master=j in ['lag012_01_del1av2','lag012_01_del2av2']
+ if j in sourceprovenance:prov=sourceprovenance[j]
+ elif master:prov=[('a-lag012_01-master-raa01.png','a-lag012_01-master-prompt01.txt',['rapporter/bestilling026-20261013/a-lag012_01-reference-master.png','rapporter/bestilling026-20261013/a-rom012-eksisterende-hd-master.png'])]
+ else:prov=[(f'a-{j}-raa01.png',f'a-{j}-prompt01.txt',[f'jobber/{j}/referanse.png','rapporter/bestilling026-20261013/a-lag012_03_del1av2-raa01.png' if j=='lag012_04_del1av2' else m['bilde_to']])]
+ provenance=[]
+ for n,(raw,prompt,refs) in enumerate(prov,1):
+  text=(r/prompt).read_text();assert (d/'prompt.txt').read_text().rstrip() in text
+  provenance.append({'forsok':n,'raa':rel(r/raw),'raa_sha256':sha(r/raw),'raa_size':list(Image.open(r/raw).size),'prompt':rel(r/prompt),'prompt_sha256':sha(r/prompt),'referanser':[{'fil':f,'sha256':sha(root/f)} for f in refs]})
+ entry={'jobb':j,'resultat':rel(d/'resultat.png'),'sha256':sha(d/'resultat.png'),'egenkontroll':'OK','kontrollfil':rel(r/f'a-{j}-kontroll.txt'),'forsok':len(prov) if j!='lag012_01_del2av2' else 0,'gjenbruk_fullmaster':master,'proveniens':provenance,'verktoy':'image_gen.imagegen','eksakt_modell':'ikke eksponert','objektkontroll':own,'utenfor_lokal_metadataunion_ulike_piksler_mot_grunnromHD':outside,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True,'oppskrifter':[rel(r/p) for p in ['a-forbered-produksjon.py.txt','a-sammensetting.py.txt','a-feltretting.py.txt','a-felt126-fullkontekst.py.txt','a-kontroll.py.txt','a-manifest.py.txt']]}
+ if master:entry.update({'fullmaster':rel(r/'a-lag012_01-fullmaster.png'),'fullmaster_sha256':sha(r/'a-lag012_01-fullmaster.png'),'klipp_x':m['region'][0]*4,'overlapp':[1152,800]})
+ if j.startswith('lag012_0') and j[8:10] in ['03','04']:entry['felles_statueunderlag_sha256']=sha(r/'a-statue-felles-underlag.png')
+ entries.append(entry)
+ descriptions={
+'lag011_01_del2av2':'Egen innvendig dørstilling, fjernet åpent varebrett, grønn iskule med oransje kjeks i glassfeltet. Korrigert lang horisontal eske og liten fremre eske. Felt 126 bruker rektangulær NYTEGNET kontekst [600,456,192,116] for å bevare sammenheng rundt esker som fortsetter forbi metadataens høyrekant; det er derfor bevisst ikke byte-identisk med grunnrom-HD overalt utenfor 126.',
+'lag011_02_del1av2':'Oransje diagonal ispinne i det innvendige glassfeltet. Øvrig grunnrom beholdt; dette er en annen tilstand enn lag011_01.',
+'lag012_01_del1av2':'Samordnet biltilstand fra én 1920 x 800-master. Svart/blå bil, hvitt tak/dør, gul stjerne og fire gule lykter; åpen dør og tomt koppfelt beholdt også der de er synlige i denne delen.',
+'lag012_01_del2av2':'Samme master som del1, klipp x=384, byte-identisk 1152 x 800-overlapp. Egen åpen blå dør, grønn iskule i glassfeltet og tomt koppfelt. Bilens synlige del følger masteren.',
+'lag012_02_del2av2':'Oransje ispinne i det utvendige glassfeltet. Grunnrommets kopp, lukkede dør og øvrige omgivelser beholdt.',
+'lag012_03_del1av2':'Brun segmentert dekorfigur med gul stråhatt, buet øvre form, stor krummet fremre form og tynne vedheng; kildeegne røde klipper. Skorpionbetegnelsen i kildeplan/prompt er en formtolkning, ikke sikkert artsbevis eller runtime-identitet.',
+'lag012_04_del1av2':'Brun gevir-/hareliknende dekorfigur med lange ører, lyst magefelt og store føtter. Samme nye røde klippeunderlag som 03, byte-identisk utenfor 133-feltet.'}
+ (d/'notat.md').write_text(f'# {j}\n\n{descriptions[j]}\n\nInnebygd imagegen, eksakt bildemodell ikke eksponert. Ordrette jobbpremisser med separat kildepresisering, alle råforsøk og referansehash er bevart i a-leveranser.json. {entry["forsok"]} egne genereringer for denne jobben; delte mastere dokumenteres særskilt.\n\nOpak RGB 1536 x 1024, motiv [0,112,1536,800], padding nøyaktig RGB 128. Vanlig helskalering, rektangulære klipp og fire HD-pikslers kantovergang mellom NYTEGNET materiale der angitt. Ingen originalpikselkopi til leveransen, originalkonturmaske, vektortrace eller lokal warp. Tomt koppfelt er fargesammenpasset med et jevnt additivt RGB-felt mot nytt HD-underlag. Oppskriftene angir faktisk behandlingsrekkefølge.\n\nUendret checker: OK. Alle egne objektfelt kontrollert og OK, med mål i a-perobjektkontroll.json. Fullscene og nærbilder kontrollert i a-samlet-kontaktark.png og a-feltqa-1/2.png. SHA-256: {entry["sha256"]}.\n\nIngen import eller runtime-test er utført. Ingen ny individuell brukergodkjenning. Root tar samlet mottak.\n')
+locks=json.loads((r/'kildehash.json').read_text());extra=json.loads((r/'a-ekstra-konteksthash.json').read_text());verified=[]
+for e in locks+extra:
+ assert sha(root/e['fil'])==e['sha256'];verified.append({'fil':e['fil'],'sha256':e['sha256'],'uendret':True})
+(r/'a-kildehashkontroll.json').write_text(json.dumps(verified,indent=2)+'\n');(r/'a-leveranser.json').write_text(json.dumps({'leveranser':entries,'genereringskall':8,'beskyttede_kilder_uendret':40,'ekstra_kontekstfiler_uendret':4,'checker_sha256':sha(root/'verktoy/sjekk_leveranse.py'),'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print([(e['jobb'],e['sha256']) for e in entries])

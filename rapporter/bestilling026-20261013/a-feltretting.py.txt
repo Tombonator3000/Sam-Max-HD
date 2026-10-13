@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,shutil,json,subprocess
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling026-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+j='lag011_01_del2av2';p=root/'jobber'/j/'resultat.png';before=r/f'a-{j}-foer-feltretting.png'
+if not before.exists():shutil.copy2(p,before)
+im=Image.open(before).convert('RGB');raw=Image.open(r/'a-obj126_01-raa02.png').convert('RGB').resize((128,96),Image.Resampling.LANCZOS);im.paste(raw,(608,464));im.save(p)
+# Match empty generated pavement to generated base with smooth RGB-only field.
+p=r/'a-lag012_01-fullmaster.png';before=r/'a-lag012_01-master-foer-feltretting.png'
+if not before.exists():shutil.copy2(p,before)
+im=Image.open(before).convert('RGB');base=Image.open(r/'a-rom012-eksisterende-hd-master.png').convert('RGB');box=(1248,640,1344,704)
+a=np.array(im.crop(box),float);b=np.array(base.crop(box),float);delta=b-a
+# The cup is inside this rectangle, not on its border. No original data here.
+field=np.zeros_like(delta);field[0]=delta[0];field[-1]=delta[-1];field[:,0]=delta[:,0];field[:,-1]=delta[:,-1]
+for step in range(10000):
+ n=(field[:-2,1:-1]+field[2:,1:-1]+field[1:-1,:-2]+field[1:-1,2:])/4;change=np.max(abs(n-field[1:-1,1:-1]));field[1:-1,1:-1]=n
+ if change<.0001:break
+im.paste(Image.fromarray(np.clip(np.rint(a+field),0,255).astype('uint8')),box[:2]);im.save(p);np.save(r/'a-obj135_01-fargefelt.npy',field)
+for j,x in [('lag012_01_del1av2',0),('lag012_01_del2av2',384)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im.crop((x,0,x+1536,800)),(0,112));out.save(root/'jobber'/j/'resultat.png')
+(r/'a-feltretting-bevis.json').write_text(json.dumps({'126':'New local imagegen crop, whole resize to128x96, no warp/mask','135':'harmonic additive RGB boundary matching against NEW HD base only','135_iterations':step+1,'135_field_min':field.min(axis=(0,1)).tolist(),'135_field_max':field.max(axis=(0,1)).tolist()},indent=2)+'\n')
+for j in ['lag011_01_del2av2','lag012_01_del1av2','lag012_01_del2av2']:
+ cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(root/'jobber'/j/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)

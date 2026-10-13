@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import shutil,subprocess
+import numpy as np
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling026-20261013';j='lag011_01_del2av2';p=root/'jobber'/j/'resultat.png';before=r/f'a-{j}-foer-fullkontekst126.png'
+if not before.exists():shutil.copy2(p,before)
+im=Image.open(p).convert('RGB');raw=Image.open(r/f'a-{j}-raa03.png').convert('RGB');box=(600,456,792,572)
+a=np.array(raw.crop(box),float);b=np.array(Image.open(root/'jobber/rom011_del2av2/resultat.png').convert('RGB').crop(box),float);h,w=a.shape[:2];yy,xx=np.mgrid[:h,:w];alpha=np.clip(np.minimum.reduce([xx,yy,w-1-xx,h-1-yy])/4,0,1)[...,None];im.paste(Image.fromarray(np.rint(a*alpha+b*(1-alpha)).astype('uint8')),box[:2]);im.save(p)
+im.crop((580,430,780,590)).resize((800,640),Image.Resampling.LANCZOS).save(r/'a-obj126_01-valgt-naer.png')
+cp=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3',str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)

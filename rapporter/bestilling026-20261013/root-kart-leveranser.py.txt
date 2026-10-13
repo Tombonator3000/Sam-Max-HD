@@ -1,0 +1,25 @@
+from pathlib import Path
+import json,hashlib
+
+r=Path(__file__).resolve().parent;root=r.parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+out=[]
+for k in range(5,8):
+    j=f'lag010_{k:02d}';attempt=2 if k==5 else 1
+    control=json.loads((r/f'root-{j}-kontroll{attempt:02d}.json').read_text())
+    assert control['checker_returncode']==0 and all(e['status']=='OK' and not e['hoppet_over'] for e in control['objekter'])
+    assert sha(root/'jobber'/j/'resultat.png')==control['resultat_sha256']
+    prompt_records=[]
+    for a in range(1,attempt+1):
+        prompt=r/f'root-{j}-prompt{a:02d}.txt'
+        # The tool request for first two scenes, scene04 and local repair omitted the saved final LF.
+        request=prompt.read_bytes()[:-1]
+        prompt_records.append({'fil':str(prompt.relative_to(root)),'sha256':sha(prompt),'sha256_faktisk_request_utf8':hashlib.sha256(request).hexdigest(),'siste_lf_kun_i_lagret_fil':True,'raa':str((r/f'root-{j}-raa{a:02d}.png').relative_to(root)),'raa_sha256':sha(r/f'root-{j}-raa{a:02d}.png')})
+    note=f'# {j}\n\nFull opak USA-kartkompositt med {len(control["objekter"])} kildeegne objektbilder på sine metadatafelter. Root har sett hele kilden, alle 15 familier over sju kartlag og dette bildets objektutsnitt. Feltlisten og alle faktiske kantmålinger står i rapporter/bestilling026-20261013/root-{j}-kontroll{attempt:02d}.json. Ingen felt er hoppet over; alle er OK.\n\nInnebygd ChatGPT-bildegenerator med ordrett originalprompt og separat kildepresisering. Eksakt bildemodellnavn er ikke eksponert. Godkjent HD-grunnkart er stil-/kartanker; tidligere nye HD-kart gir familieidentitet, mens aktuell original bestemmer tilstand og antall. Ingen originalmaske, kildepikselkopiering, vektorunntak eller lokal warp. Kun nøytral padding er normalisert; fullscenen er nytegnet.\n\n'
+    if k==5:note+='Uavhengig B-QA fant ekstra hvite merker og understrek på det lille grønne skiltet. Ett lokalt imagegen-forsøk rettet dette til seks separate nye hvite former, fire øverst og to til venstre nederst. Bare metadatafeltet [352,656,192,128] er innfelt; resten er målt byteidentisk. Førbildet er arkivert.\n\n'
+    note+='Nye ikonformer er jevnere/rundere og mer modellerte enn originalen. Fisk, krokodille og dinosaur har renere ansikts-/tannformer; gitar og ball har mer tydelig detalj. Steinstreker og teltinngang er grafiske tolkninger, ikke sertifisering av hver kildepiksel. Kildens forskjellige munn-/gapegrader, burgerhøyder, flagg/gitar/vimpeltilstander og tomme destinasjonsfelt skal fortsatt bevares. Fullscene følger HD-kartankeret, men er ikke byteidentisk med dette eller andre kartlag.\n\n'
+    note+=f'RGB 1536 × 1024, motiv [128,112,1280,800], eksakt padding RGB128. Uendret checker: OK. Proveniens og sendte prompter/råbilder er bevart i rapportmappen. Beskyttede kilder er uendret. Ingen motorimport, faktisk animasjon/timing/runtime eller ny individuell bildegodkjenning.\n\nSHA-256 resultat: {control["resultat_sha256"]}\n'
+    (root/'jobber'/j/'notat.md').write_text(note)
+    out.append({'jobb':j,'resultat':f'jobber/{j}/resultat.png','sha256':control['resultat_sha256'],'egenkontroll':'OK','kontrollfil':str((r/f'root-{j}-kontroll{attempt:02d}.txt').relative_to(root)),'forsok':attempt,'proveniens':prompt_records,'objektkontroll':control['objekter'],'klar_for_mottak':True,'visuelt_godkjent':False,'importert':False,'runtime':False,'runtime_verifisert':False,'produksjonsagent':'gpt-6-astra','visuelt_forbehold':'Renere/rundere, mer modellerte ikoner og nytegnet bakgrunn; konkrete tilstandsrettinger/forbehold i notat og uavhengig B-QA.'})
+(r/'root-leveranser.json').write_text(json.dumps({'leveranser':out},ensure_ascii=False,indent=2)+'\n')
+print('Tre kartleveranser med elleve faktisk kontrollerte objektfelt')

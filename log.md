@@ -217,3 +217,8 @@
 
 - Bestilling 25: ti lag levert OK, med45 faktiske objektkontroller. Fem egne vifteposer, to dørtilstander, skade-/hodefelt og kildebevist TV-gjenbruk. Fire kartlag med egne munn-/gape-/vimpeltilstander; tre konkrete kart03-avvik rettet og uavhengig etterkontrollert. Se `rapporter/bestilling025-20261013/RAPPORT.md`. Bestilling 26 og videre fortsetter.
 - 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T21:46:13+02:00 (Codex, Astra)
+
+- Bestilling 26: ti lag levert OK,22 faktiske objektfelt. Kartets siste elleve tilstander og rettet seksmerkers skilt, Snuckey’s dør-/is-/vare-/koppvarianter og felles bilmaster med1152-overlapp kontrollert. To egne skulpturer har felles rødklippelandskap. Utvidet ny eske-kontekst og bilens avklippingsforbehold dokumentert. Se `rapporter/bestilling026-20261013/RAPPORT.md`. Bestilling 27 og videre fortsetter.
+- 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

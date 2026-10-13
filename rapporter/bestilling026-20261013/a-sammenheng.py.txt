@@ -1,0 +1,24 @@
+exec(compile((__import__('pathlib').Path(__file__).parent/'a-analyse.py.txt').read_text(),'a-analyse.py.txt','exec'))
+def arr(j,f='original_1x.png'):return np.array(Image.open(root/'jobber'/j/f).convert('RGB'))
+details={};a=arr('lag012_01_del1av2');b=arr('lag012_01_del2av2');assert np.array_equal(a[:,96:],b[:,:288]);master=np.concatenate([a,b[:,288:]],axis=1);Image.fromarray(master).save(r/'a-lag012_01-original-master.png')
+details['lag012_01']={'master_original':[480,200],'master_hd':[1920,800],'klipp_hd_x':[0,384],'overlapp_hd':[1152,800],'original_overlapp_ulike_piksler':int(np.any(a[:,96:]!=b[:,:288],axis=2).sum())}
+for room in ['rom011','rom012']:
+ a=arr(room+'_del1av2','resultat.png')[112:912];b=arr(room+'_del2av2','resultat.png')[112:912]
+ details[room+'_hd']={'overlapp_ulike_piksler':int(np.any(a[:,384:]!=b[:,:1152],axis=2).sum()),'del1_sha256':sha(root/'jobber'/f'{room}_del1av2/resultat.png'),'del2_sha256':sha(root/'jobber'/f'{room}_del2av2/resultat.png')}
+ if np.array_equal(a[:,384:],b[:,:1152]):Image.fromarray(np.concatenate([a,b[:,1152:]],axis=1)).save(r/f'a-{room}-eksisterende-hd-master.png')
+outside=[];base=arr('rom012_del1av2');st=arr('lag012_03_del1av2');d=np.any(st!=base,axis=2);d[64:160,184:272]=False
+ys,xs=np.where(d);pairs={}
+for yy,xx in zip(ys,xs):
+ key=str(tuple(base[yy,xx]))+' -> '+str(tuple(st[yy,xx]));pairs[key]=pairs.get(key,0)+1
+details['statuebakgrunn']={'utenfor_objekt_antall':int(d.sum()),'utenfor_identisk_i_03_04_05':all(np.array_equal(arr(j)[d],st[d]) for j in ['lag012_04_del1av2','lag012_05_del1av2']),'fargeoverganger':pairs}
+for aa,bb in [('lag011_01_del2av2','lag011_02_del1av2'),('lag012_01_del2av2','lag012_02_del2av2'),('lag012_03_del1av2','lag012_04_del1av2'),('lag012_04_del1av2','lag012_05_del1av2')]:
+ ma=json.loads((root/'jobber'/aa/'jobb.json').read_text());mb=json.loads((root/'jobber'/bb/'jobb.json').read_text());ia=arr(aa);ib=arr(bb)
+ # Compare shared absolute room area, not unaligned canvases.
+ left=max(ma['region'][0],mb['region'][0]);right=min(ma['region'][0]+384,mb['region'][0]+384);ca=ia[:,left-ma['region'][0]:right-ma['region'][0]];cb=ib[:,left-mb['region'][0]:right-mb['region'][0]]
+ details[aa+' vs '+bb]={'overlapp_rom_x':[left,right],'ulike_piksler':int(np.any(ca!=cb,axis=2).sum())}
+(r/'a-sammenhengsbevis.json').write_text(json.dumps(details,ensure_ascii=False,indent=2)+'\n')
+out=Image.new('RGB',(1536,4*280),(190,190,190));dr=ImageDraw.Draw(out)
+for idx,j in enumerate(['rom012_del1av2','lag012_03_del1av2','lag012_04_del1av2','lag012_05_del1av2']):
+ im=Image.fromarray(arr(j)).resize((1152,600),Image.Resampling.NEAREST).crop((0,0,1152,270));out.paste(im,(0,idx*280+10));dr.text((1160,idx*280+10),j,fill='black')
+out.save(r/'a-statuer-bakgrunnsforskjell.png')
+print(json.dumps({k:v for k,v in details.items() if k!='statuebakgrunn'},indent=2));print('different outside133:',len(xs))

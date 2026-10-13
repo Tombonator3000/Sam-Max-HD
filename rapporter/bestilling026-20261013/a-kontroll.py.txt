@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,importlib.util
+root=Path(__file__).resolve().parents[2];r=root/'rapporter/bestilling026-20261013';spec=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+jobs=['lag011_01_del2av2','lag011_02_del1av2','lag012_01_del1av2','lag012_01_del2av2','lag012_02_del2av2','lag012_03_del1av2','lag012_04_del1av2'];records=[];rows=[]
+for j in jobs:
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());im=Image.open(d/'resultat.png').convert('RGB');source=Image.open(d/'original_1x.png').convert('RGB');part,_=c.part_of(im,m);met=c.compare(source,part);a=np.array(im);assert im.size==(1536,1024);assert np.all(a[:112]==128) and np.all(a[912:]==128)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];eo=met['eo'][y:y+h,x:x+w];es=met['es'][y:y+h,x:x+w];corr=float(c.corr(eo,es));status='OK' if corr>=.6 else 'SJEKK' if corr>=.5 else 'FEIL';records.append({'jobb':j,'objekt':o['bilde'],'originalrekt':o['rekt'],'kantkorrelasjon':corr,'utfall':status,'original_kantstd':float(eo.std()),'hoppet_over':False});box=(max(0,x*4-16),max(112,y*4+112-16),min(1536,(x+w)*4+16),min(912,(y+h)*4+112+16));rows.append((j,o['bilde'],Image.open(d/'referanse.png').crop(box),im.crop(box),status,corr))
+ print(j,[(z['objekt'],round(z['kantkorrelasjon'],3)) for z in records if z['jobb']==j])
+contact=Image.new('RGB',(1200,7*430),(180,180,180));dr=ImageDraw.Draw(contact)
+for row,j in enumerate(jobs):
+ for col,p in enumerate(['referanse.png','resultat.png']):
+  im=Image.open(root/'jobber'/j/p);im.thumbnail((590,395));contact.paste(im,(col*600,row*430+25))
+ dr.text((5,row*430+5),j+' original / HD',fill='black')
+contact.save(r/'a-samlet-kontaktark.png')
+for pg in range(2):
+ chunk=rows[pg*6:(pg+1)*6];img=Image.new('RGB',(1200,len(chunk)*310),(180,180,180));dr=ImageDraw.Draw(img)
+ for n,(j,o,s,h,st,co) in enumerate(chunk):
+  for col,im in enumerate([s,h]):
+   scale=min(570/im.width,275/im.height);im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.NEAREST if col==0 else Image.Resampling.LANCZOS);img.paste(im,(col*600,n*310+25))
+  dr.text((5,n*310+5),f'{j} {o}: {st} {co:.6f} original / HD',fill='black')
+ img.save(r/f'a-feltqa-{pg+1}.png')
+a=np.array(Image.open(root/'jobber/lag012_01_del1av2/resultat.png'));b=np.array(Image.open(root/'jobber/lag012_01_del2av2/resultat.png'));assert np.array_equal(a[112:912,384:],b[112:912,:1152])
+a=np.array(Image.open(root/'jobber/lag012_03_del1av2/resultat.png'));b=np.array(Image.open(root/'jobber/lag012_04_del1av2/resultat.png'));mask=np.ones(a.shape[:2],bool);mask[368:752,736:1088]=False;assert np.array_equal(a[mask],b[mask])
+locks=json.loads((r/'kildehash.json').read_text());extra=json.loads((r/'a-ekstra-konteksthash.json').read_text());print(type(extra))
+assert all(hashlib.sha256((root/e['fil']).read_bytes()).hexdigest()==e['sha256'] for e in locks)
+(r/'a-perobjektkontroll.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n');(r/'a-geometri-kildekontroll.json').write_text(json.dumps({'kilder_uendret':len(locks),'padding_rgb':[128,128,128],'canvas':[1536,1024],'master_overlap':[1152,800],'overlap_ulike_piksler':0,'statue_bakgrunn_ulike_piksler_utenfor_133':0,'runtime':False},indent=2)+'\n')

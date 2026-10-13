@@ -1,0 +1,36 @@
+from pathlib import Path
+import hashlib,json,sys,shutil,subprocess,importlib.util
+from PIL import Image,ImageDraw
+import numpy as np
+
+r=Path(__file__).resolve().parent;root=r.parents[1]
+python='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+j=sys.argv[1];attempt=int(sys.argv[2]);raw=Path(sys.argv[3]);folder=root/'jobber'/j
+target=r/f'root-{j}-raa{attempt:02d}.png'
+shutil.copyfile(raw,target)
+m=json.loads((folder/'jobb.json').read_text());x,y,w,h=m['bilde_i_lerret'];im=Image.open(target).convert('RGB');assert im.size==(1536,1024)
+out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im.crop((x,y,x+w,y+h)),(x,y))
+if len(sys.argv)>4:
+    config=json.loads((r/sys.argv[4]).read_text())
+    before=Image.open(folder/'resultat.png').convert('RGB');before.save(r/f'root-{j}-forretting{attempt:02d}.png')
+    out=before.copy();mask=np.zeros((1024,1536),dtype=bool)
+    for xx,yy,ww,hh in config['rektangler']:
+        out.paste(im.crop((xx,yy,xx+ww,yy+hh)),(xx,yy));mask[yy:yy+hh,xx:xx+ww]=True
+    assert np.array_equal(np.asarray(before)[~mask],np.asarray(out)[~mask])
+out.save(folder/'resultat.png')
+cp=subprocess.run([python,str(root/'verktoy/sjekk_leveranse.py'),str(folder/'resultat.png')],capture_output=True,text=True)
+(r/f'root-{j}-kontroll{attempt:02d}.txt').write_text(cp.stdout+cp.stderr)
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
+measure=mod.compare(Image.open(folder/'original_1x.png').convert('RGB'),out.crop((x,y,x+w,y+h)));objects=[]
+contact=Image.new('RGB',(1000,((len(m['objekter'])+1)//2)*224),(190,190,190));d=ImageDraw.Draw(contact)
+for idx,ob in enumerate(m['objekter']):
+    ox,oy,ow,oh=ob['rekt'];eo=measure['eo'][oy:oy+oh,ox:ox+ow];es=measure['es'][oy:oy+oh,ox:ox+ow];skip=ow<4 or oh<4 or eo.std()<1;cor=None if skip else mod.corr(eo,es)
+    objects.append({'objekt':ob['bilde'],'rekt':ob['rekt'],'hoppet_over':bool(skip),'kantkorrelasjon':cor,'status':'SKIPPED' if skip else 'OK' if cor>=.6 else 'SJEKK' if cor>=.5 else 'FEIL'})
+    xx=idx%2*500;yy=idx//2*224;d.text((xx+5,yy+3),ob['bilde'],fill=(0,0,0));d.text((xx+230,yy+3),'HD',fill=(0,0,0))
+    a=Image.open(folder/'original_1x.png').convert('RGB').crop((ox,oy,ox+ow,oy+oh)).resize((ow*4,oh*4),Image.Resampling.NEAREST)
+    b=out.crop((x+ox*4,y+oy*4,x+(ox+ow)*4,y+(oy+oh)*4))
+    contact.paste(a,(xx+8,yy+30));contact.paste(b,(xx+236,yy+30))
+contact.save(r/f'root-{j}-objektqa{attempt:02d}.png')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+(r/f'root-{j}-kontroll{attempt:02d}.json').write_text(json.dumps({'jobb':j,'raw':str(target.relative_to(root)),'raw_sha256':sha(target),'resultat_sha256':sha(folder/'resultat.png'),'checker_returncode':cp.returncode,'objekter':objects},ensure_ascii=False,indent=2)+'\n')
+print(cp.stdout);print(json.dumps(objects,ensure_ascii=False))

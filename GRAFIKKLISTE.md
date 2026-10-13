@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 21:36 (norsk tid)
+Oppdatert 2026-10-13 21:46 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 94 bilder levert (41 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 116 bilder levert (51 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -394,16 +394,16 @@ Rom 7, 8, 10.
 
 Rom 10, 11, 12.
 
-- [ ] `lag010_05` (rom 10 USA-kartet, lag 05 med 5 objektbilder, bilde to `jobber/rom010/resultat.png`)
-- [ ] `lag010_06` (rom 10 USA-kartet, lag 06 med 4 objektbilder, bilde to `jobber/rom010/resultat.png`)
-- [ ] `lag010_07` (rom 10 USA-kartet, lag 07 med 2 objektbilder, bilde to `jobber/rom010/resultat.png`)
-- [ ] `lag011_01_del2av2` (rom 11 Snuckey's, inne, lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom011_del2av2/resultat.png`)
-- [ ] `lag011_02_del1av2` (rom 11 Snuckey's, inne, lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom011_del1av2/resultat.png`)
-- [ ] `lag012_01_del1av2` (rom 12 Snuckey's, ute, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom012_del1av2/resultat.png`)
-- [ ] `lag012_01_del2av2` (rom 12 Snuckey's, ute, lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom012_del2av2/resultat.png`)
-- [ ] `lag012_02_del2av2` (rom 12 Snuckey's, ute, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom012_del2av2/resultat.png`)
-- [ ] `lag012_03_del1av2` (rom 12 Snuckey's, ute, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom012_del1av2/resultat.png`)
-- [ ] `lag012_04_del1av2` (rom 12 Snuckey's, ute, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom012_del1av2/resultat.png`)
+- [x] `lag010_05` (rom 10 USA-kartet, lag 05 med 5 objektbilder, bilde to `jobber/rom010/resultat.png`)
+- [x] `lag010_06` (rom 10 USA-kartet, lag 06 med 4 objektbilder, bilde to `jobber/rom010/resultat.png`)
+- [x] `lag010_07` (rom 10 USA-kartet, lag 07 med 2 objektbilder, bilde to `jobber/rom010/resultat.png`)
+- [x] `lag011_01_del2av2` (rom 11 Snuckey's, inne, lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom011_del2av2/resultat.png`)
+- [x] `lag011_02_del1av2` (rom 11 Snuckey's, inne, lag 02 med 1 objektbilde, del 1/2, bilde to `jobber/rom011_del1av2/resultat.png`)
+- [x] `lag012_01_del1av2` (rom 12 Snuckey's, ute, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom012_del1av2/resultat.png`)
+- [x] `lag012_01_del2av2` (rom 12 Snuckey's, ute, lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom012_del2av2/resultat.png`)
+- [x] `lag012_02_del2av2` (rom 12 Snuckey's, ute, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom012_del2av2/resultat.png`)
+- [x] `lag012_03_del1av2` (rom 12 Snuckey's, ute, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom012_del1av2/resultat.png`)
+- [x] `lag012_04_del1av2` (rom 12 Snuckey's, ute, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom012_del1av2/resultat.png`)
 
 ## Bestilling 27
 
@@ -3477,3 +3477,5 @@ Bestilling 23: ti kontorlag levert OK. Ni egne TV-tilstander, lokal munn-/øyere
 Bestilling 24: ti TV-/signal-/antennelag levert OK. Identiske 0D/0E/0F kildebevist gjenbrukt, egne signalbrudd og to antenneløkker/fravær beholdt. Synlige veggskjøter rettet og uavhengig etterkontrollert. Alle ti objektfelt målt; marginal078_03-korrelasjon0,602296 beholdes som forbehold. Se `rapporter/bestilling024-20261013/RAPPORT.md`. Bestilling 25 og videre fortsetter.
 
 Bestilling 25: ti lag levert OK, med45 faktiske objektkontroller. Fem egne vifteposer, to dørtilstander, skade-/hodefelt og kildebevist TV-gjenbruk. Fire kartlag med egne munn-/gape-/vimpeltilstander; tre konkrete kart03-avvik rettet og uavhengig etterkontrollert. Se `rapporter/bestilling025-20261013/RAPPORT.md`. Bestilling 26 og videre fortsetter.
+
+Bestilling 26: ti lag levert OK,22 faktiske objektfelt. Kartets siste elleve tilstander og rettet seksmerkers skilt, Snuckey’s dør-/is-/vare-/koppvarianter og felles bilmaster med1152-overlapp kontrollert. To egne skulpturer har felles rødklippelandskap. Utvidet ny eske-kontekst og bilens avklippingsforbehold dokumentert. Se `rapporter/bestilling026-20261013/RAPPORT.md`. Bestilling 27 og videre fortsetter.
