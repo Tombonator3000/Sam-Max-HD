@@ -1,6 +1,6 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-13 09:21 (norsk tid)
+Oppdatert 2026-10-13 10:45 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
