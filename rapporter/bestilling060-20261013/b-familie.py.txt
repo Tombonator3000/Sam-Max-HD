@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,collections,numpy as np
+r=Path('rapporter/bestilling060-20261013');data=json.loads((r/'b-ruteregister.json').read_text());rows=data['ruter'];sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();g=collections.defaultdict(list)
+for z in rows:g[z['rgba_sha256']].append(z['rute'])
+locks=json.loads((r/'b-kildehash.json').read_text())['filer'];assert all(sha(p)==h for p,h in locks.items());ctx=['konsept/2026-10-12/kostymer-originalmetadata.json','konsept/2026-10-12/skript-kostymekoblinger.tsv','konsept/2026-10-12/objektnavn-original.tsv','hovedark/sam.png','jobber/rom037_del1av2/referanse.png','jobber/fig114_01/original_1x.png','jobber/fig114_01/jobb.json','jobber/fig114_01/resultat.png'];(r/'b-konteksthash.json').write_text(json.dumps({'filer':{p:sha(p) for p in ctx}},indent=2));(r/'b-familiebevis.json').write_text(json.dumps({'ruter':52,'unike':len(g),'grupper':list(g.values()),'kilder16_uendret':True,'donor':{'jobb':'fig114_01','cel':0,'maal':[1920,1971],'kilde_rgba_identisk':True,'rel_delta':[0,0],'nativebredde_forskjell':[92,40],'forklaring':'Synlig RGBA og rel er identiske; tom nativebredde gir ingen tillatelse til å fylle sidefelt.'}},indent=2))
+out=Image.new('RGB',(1536,1024),(150,150,150));d=ImageDraw.Draw(out);room=Image.open(ctx[4]);room.thumbnail((768,512));out.paste(room,(0,25));d.text((5,5),'Originalrom037 og utvalgte cel-kilder',fill='black')
+for k,c in enumerate([1924,1925,1926,1946,1953,1957]):
+ z=next(z for z in rows if z['rute']==c);im=Image.open(Path('jobber')/z['jobb']/'original_1x.png').crop(z['synlig']);im=im.resize((im.width*3,im.height*3),Image.Resampling.NEAREST);x=(k%3)*256+768 if k<3 else (k%3)*400;y=65 if k<3 else 560;out.paste(im,(x,y));d.text((x,y-20),f'Cel{c}',fill='black')
+out.save(r/'b-kontekst.png')
+for anim in [1,7]:
+ rr=[z for z in rows if z['animasjon']==anim];out=Image.new('RGB',(1600,260*((len(rr)+5)//6)),(150,150,150));d=ImageDraw.Draw(out)
+ for i,z in enumerate(rr):
+  im=Image.open(Path('jobber')/z['jobb']/'original_1x.png').convert('RGBA').crop(z['synlig']);a=np.array(im);a[:,:,3]=np.where(np.all(a[:,:,:3]==[255,0,255],axis=2),0,255);im=Image.fromarray(a).resize((im.width*2,im.height*2),Image.Resampling.NEAREST);x=i%6*266;y=i//6*260;c=z['metadata'];out.paste(im,(x+90+c['rel_x']*2,y+220+c['rel_y']*2),im);d.text((x+5,y+5),f"{z['rute']} rel{c['rel_x']},{c['rel_y']}",fill='black')
+ out.save(r/f'b-rel-kilde-a{anim:02d}.png')
+dm=json.loads(Path('jobber/fig114_01/jobb.json').read_text());o=next(z for z in dm['ruter'] if z['rute']==0);sx,sy,ex,ey=o['synlig'];hd=Image.open('jobber/fig114_01/resultat.png').crop((64+sx*4,32+sy*4,64+ex*4,32+ey*4));hd.save(r/'b-donor114-cel0-kontekst.png');print('donor',hd.size,sha('jobber/fig114_01/resultat.png'))
+lines=['| Ark | Cel | Animasjon | Native w,h | Rel | Synlig x1,y1,x2,y2 |','|---|---:|---:|---|---|---|']
+for z in rows:
+ c=z['metadata'];lines.append(f"| {z['jobb']} | {z['rute']} | {z['animasjon']} | {c['w']},{c['h']} | {c['rel_x']},{c['rel_y']} | {z['synlig']} |")
+(r/'b-felttabell.md').write_text('\n'.join(lines)+'\n')

@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1];es=json.loads((r/'a-kildebevis.json').read_text())['ruter'];seen={};reps=[];mapping=[]
+for e in es:
+ im=Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop(e['synlig']);key=(im.size,hashlib.sha256(im.tobytes()).hexdigest());rep=seen.setdefault(key,e['rute']);mapping.append({'cel':e['rute'],'representant':rep,'jobb':e['jobb']})
+ if rep==e['rute']:reps.append(e)
+(r/'a-unik-kobling.json').write_text(json.dumps(mapping,indent=2))
+groups=[reps[:4],reps[4:8],reps[8:14],reps[14:20],reps[20:]]
+for g,arr in enumerate(groups,1):
+ can=Image.new('RGB',(1536,1024),(255,0,255));boxes=[]
+ for i,e in enumerate(arr):
+  im=Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop(e['synlig']);im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);x=i%3*512+256-im.width//2;y=i//3*512+480-im.height;can.paste(im,(x,y));boxes.append({'cel':e['rute'],'jobb':e['jobb'],'grid':[i%3*512,i//3*512,(i%3+1)*512,(i//3+1)*512],'source_image_box':[x,y,im.width,im.height]})
+ can.save(r/f'a-g{g}-kilde.png');(r/f'a-g{g}-bokser.json').write_text(json.dumps(boxes,indent=2))
+ original=(root/'jobber'/arr[0]['jobb']/'prompt.txt').read_text()
+ extra=f'''SCOPED SOURCE CORRECTION. Generate ONLY the {len(arr)} source composite sprites shown in the FIRST reference image, in the same 3-column 2-row grid, keep unused slots empty. Output 1536x1024 transparent RGBA. This is an intermediate production component sheet, not the final atlas. Each sprite includes BOTH the glass chamber AND the characters shown inside it. The chamber is a blue/lavender and white glass apparatus with thin orange side edges and tiny gray projections below. Keep its exact asymmetric outline, reflections, blue fill and overlaid glass panels. The characters are deliberately UPSIDE DOWN: Sam's feet at top, dog muzzle and fedora at bottom. DO NOT rotate, mirror or normalize them. Sam has brown dog fur, bare paws, blue-gray suit, white shirt, striped navy/black tie. Some later source sprites ALSO contain cream-white MAX, with warm beige shadows, elongated ears and teeth. Preserve his source-specific inverted/turning posture and warm palette, never replace with generic standing white Max. The two master sheets are ONLY identity and ink style anchors. The original FIRST source controls every pose, proportions, hand overlap and color. Keep the chamber consistent across cels. Source blue/lavender glass overlays ARE artwork, not transparent padding: preserve their tint over the figures where shown; do not put this overlay on poses where absent. Exterior magenta and gray alone become fully transparent. No floor shadows, no text, no labels, no glow, no extra mechanisms. Clean hand ink, flat colors with one shade, restrained highlights. Repaint the original clusters faithfully without enlarging heads or changing finger/foot/ear locations. Preserve all original partial forms. We will scale/place whole NEW composite sprites to exact original boxes without original masks or warping.'''
+ (r/f'a-g{g}-prompt-original.txt').write_text(original);(r/f'a-g{g}-kildeforing.txt').write_text(extra);(r/f'a-g{g}-prompt01.txt').write_text(original+'\n\n'+extra)
+print([[e['rute'] for e in a] for a in groups])

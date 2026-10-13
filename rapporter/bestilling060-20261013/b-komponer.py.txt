@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,subprocess
+r=Path('rapporter/bestilling060-20261013');rows=json.loads((r/'b-ruteregister.json').read_text())['ruter'];don={};rec=[]
+for z in rows:
+ p=r/f"b-cel{z['rute']}.png"
+ if p.exists():don[z['rgba_sha256']]=z['rute']
+for n in range(1,5):
+ j=f'fig196_{n:02d}';out=Image.new('RGBA',(1536,1024));rr=[]
+ for z in [z for z in rows if z['jobb']==j]:
+  c=don[z['rgba_sha256']];p=r/f'b-cel{c}.png';im=Image.open(p);sx,sy,ex,ey=z['synlig'];assert im.size==((ex-sx)*4,(ey-sy)*4);out.alpha_composite(im,(64+sx*4,32+sy*4));rr.append({'cel':z['rute'],'ny_donorcel':c,'komponent':str(p),'komponent_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'target':[64+sx*4,32+sy*4,im.width,im.height],'rel':[z['metadata']['rel_x'],z['metadata']['rel_y']],'kilde_rgba_sha256':z['rgba_sha256']})
+ out.save(Path('jobber')/j/'resultat.png');(r/f'b-{j}-mapping.json').write_text(json.dumps(rr,indent=2));run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr);print(j,run.stdout)

@@ -1,0 +1,6 @@
+from pathlib import Path
+import json,hashlib
+r=Path(__file__).resolve().parent;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();a=json.loads((r/'a-sendte-promptstrenger.json').read_text())+json.loads((r/'a-sendte-rettingsprompter.json').read_text());raw=['a-g1-raa01.png','a-g2-raa01.png','a-g3-avvist-raa01.png','a-g4-raa01.png','a-g5-raa01.png','a-g3-raa01.png','a-g6fix-raa01.png'];out=[]
+for e,f in zip(a,raw):
+ p=r/f'a-kall{e["kall"]:02d}-faktisk-prompt.txt';p.write_text(e['prompt']);out.append({**{k:v for k,v in e.items() if k!='prompt'},'promptfil':p.name,'prompt_sha256':sha(p),'raa':f,'raa_sha256':sha(r/f),'valgt':e['kall']!=3,'begrensning':'Kall6: bare fem første cels og eget punkt valgt;1942 erstattet avkall7' if e['kall']==6 else ''})
+(r/'a-bildekall.json').write_text(json.dumps({'kall':out,'antall':len(out),'unike_valgte_kompositter':22},ensure_ascii=False,indent=2)+'\n')

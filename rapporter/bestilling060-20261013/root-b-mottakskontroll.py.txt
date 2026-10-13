@@ -1,0 +1,60 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent; root=r.parents[1]
+read=lambda name:json.loads((r/name).read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks={**read('b-kildehash.json')['filer'],**read('b-konteksthash.json')['filer']}
+for p,h in locks.items():assert sha(root/p)==h,p
+calls=read('b-proveniens.json')['kall'];assert len(calls)==6
+for c in calls:
+    assert sha(root/c['raw'])==c['sha256']
+    assert sha(root/c['prompt'])==c['prompt_sha256']
+src={z['rute']:z for z in read('b-ruteregister.json')['ruter']}
+native={z['cel']:z for z in json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['196']['cels']}
+original={}; records=[]; deliveries=[]
+for c,z in src.items():
+    j=z['jobb']; job=json.loads((root/'jobber'/j/'jobb.json').read_text());actual=next(x for x in job['ruter'] if x['rute']==c)
+    assert actual['synlig']==z['synlig'] and actual['rekt']==z['rekt']
+    assert z['metadata']==native[c]
+    original[c]=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB').crop(z['synlig'])
+for entry in read('b-leveranser.json')['leveranser']:
+    j=entry['jobb'];p=root/entry['resultat'];im=Image.open(p)
+    assert sha(p)==entry['sha256'] and im.mode=='RGBA' and im.size==(1536,1024)
+    out=Image.new('RGBA',im.size);mapping=read(f'b-{j}-mapping.json')
+    for m in mapping:
+        c=m['cel'];d=m['ny_donorcel'];z=src[c];s=original[c];ds=original[d]
+        assert s.size==ds.size and s.tobytes()==ds.tobytes()
+        assert z['jobb']==j and m['rel']==[native[c]['rel_x'],native[c]['rel_y']]
+        x,y,X,Y=z['synlig'];target=[64+4*x,32+4*y,4*(X-x),4*(Y-y)];assert m['target']==target
+        q=Image.open(root/m['komponent']).convert('RGBA');assert sha(root/m['komponent'])==m['komponent_sha256']
+        assert q.size==tuple(target[2:]);out.alpha_composite(q,tuple(target[:2]))
+        a=np.array(q);b=np.array(im.crop((target[0],target[1],target[0]+target[2],target[1]+target[3])))
+        a[a[:,:,3]==0]=0;b[b[:,:,3]==0]=0;assert np.array_equal(a,b)
+        records.append({'jobb':j,'cel':c,'ny_donorcel':d,'egen_native_metadata':native[c],'target':target,'komponent_sha256':m['komponent_sha256'],'kildepar_byteidentisk':True})
+    assert im.tobytes()==out.tobytes(),j
+    run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True)
+    assert 'Utfall: OK' in run.stdout,(j,run.stdout)
+    (r/f'root-{j}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n')
+    deliveries.append({'jobb':j,'sha256':sha(p),'ruter':len(mapping),'rekonstruksjon':'byteidentisk','egenkontroll':'OK'})
+assert len(records)==52 and len({z['ny_donorcel'] for z in records})==20
+(r/'root-b-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':16,'kontekst_uendret':8,'native_bildekall_og_promptpar':6,'ruter':records,'leveranser':deliveries,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('B60: 52 ruter/20 unike kilder, 24 låser, 6 bildekall og alle4 RGBA-ark kontrollert OK.')
+
+# Verify the only historical donor and the bounded new-art hand correction independently.
+dj=json.loads((root/'jobber/fig114_01/jobb.json').read_text());dz=next(z for z in dj['ruter'] if z['rute']==0)
+def source_rgba(p,box):
+    a=np.array(Image.open(p).convert('RGB').crop(box));return np.dstack([a,np.where(np.all(a==[255,0,255],axis=2),0,255).astype('uint8')])
+d=source_rgba(root/'jobber/fig114_01/original_1x.png',dz['synlig'])
+for c in [1920,1971]:
+    z=src[c];a=source_rgba(root/'jobber'/z['jobb']/'original_1x.png',z['synlig']);assert np.array_equal(a,d)
+    assert [native[c]['rel_x'],native[c]['rel_y']]==[-18,-70]
+x,y,X,Y=dz['synlig'];donor=Image.open(root/'jobber/fig114_01/resultat.png').convert('RGBA').crop((64+4*x,32+4*y,64+4*X,32+4*Y));comp=Image.open(r/'b-cel1920.png').convert('RGBA');assert comp.size==donor.size and comp.tobytes()==donor.tobytes()
+h=read('b-1954-handkomponent-bevis.json');base=Image.open(r/'b-gruppe03-raa01.png').convert('RGBA');new=Image.open(r/h['raw_donor']).convert('RGBA');a=np.array(new.crop(h['ny_hand_crop']));a[:,:,3]=np.where(a[:,:,3]<16,0,np.minimum(255,a[:,:,3].astype(float)*255/254)).astype('uint8');hand=Image.fromarray(a).resize(tuple(h['target'][2:]),Image.Resampling.LANCZOS)
+assert hand.tobytes()==Image.open(r/'b-1954-ny-hand.png').convert('RGBA').tobytes()
+out=base.copy();out.alpha_composite(hand,tuple(h['target'][:2]));actual=Image.open(r/'b-gruppe03-rettet.png').convert('RGBA');assert actual.tobytes()==out.tobytes();diff=np.any(np.array(out)!=np.array(base),axis=2);yy,xx=np.nonzero(diff);assert int(diff.sum())==h['endret']==3719 and [int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1]==h['diff_bbox']
+for m in read('b-komponentmapping.json'):
+    raw=Image.open(root/m['raw']).convert('RGBA');a=np.array(raw.crop(m['slot']));a[:,:,3]=np.where(a[:,:,3]<16,0,np.minimum(255,a[:,:,3].astype(float)*255/254)).astype('uint8');q=Image.fromarray(a).crop(m['nyalfa_bbox']).resize(tuple(m['target_size']),Image.Resampling.LANCZOS);actual=Image.open(r/f"b-cel{m['cel']}.png").convert('RGBA');assert q.tobytes()==actual.tobytes()
+p=r/'root-b-mottakskontroll.json';proof=json.loads(p.read_text());proof.update(donor114_to_felt_byteidentisk=True,lokal_handretting_ny_til_ny_endret=3719,alle19_nye_komponenter_rekonstruert=True);p.write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+print('Ekstra kontroll: to eksakte114-donorutsnitt, ren håndpatch og alle19 nye komponenter byteidentiske.')

@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json
+r=Path('rapporter/bestilling060-20261013');groups=json.loads((r/'b-grupperegister.json').read_text());rows=json.loads((r/'b-ruteregister.json').read_text())['ruter'];records=[]
+for g in groups:
+ p=r/f"b-gruppe{g['gruppe']:02d}-raa01.png"
+ if not p.exists():continue
+ raw=Image.open(r/'b-gruppe03-rettet.png' if g['gruppe']==3 else p).convert('RGBA');qa=Image.new('RGB',(1536,1024),(155,155,155));d=ImageDraw.Draw(qa)
+ for k,z in enumerate(g['ruter']):
+  slot=list(z['slot']);slot[3]=1024 if False else slot[3];a=np.array(raw.crop(slot));a[:,:,3]=np.where(a[:,:,3]<16,0,np.minimum(255,a[:,:,3].astype(float)*255/254)).astype('uint8');ys,xs=np.where(a[:,:,3]>128);box=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)];im=Image.fromarray(a).crop(box);s=next(q for q in rows if q['rute']==z['cel']);sx,sy,ex,ey=s['synlig'];im=im.resize(((ex-sx)*4,(ey-sy)*4),Image.Resampling.LANCZOS);im.save(r/f"b-cel{z['cel']}.png");records.append({'cel':z['cel'],'raw':str(r/'b-gruppe03-rettet.png' if g['gruppe']==3 else p),'slot':slot,'nyalfa_bbox':box,'target_size':list(im.size),'alfa':'nygenerert, under16 null, oppskalert255/254','originalmasker':False});x=k%3*512;y=k//3*512;orig=Image.open(Path('jobber')/s['jobb']/'original_1x.png').crop(s['synlig']);orig=orig.resize((orig.width*2,orig.height*2),Image.Resampling.NEAREST);qa.paste(orig,(x+5,y+60));show=im.resize((im.width//2,im.height//2),Image.Resampling.LANCZOS);qa.paste(show,(x+260,y+60),show);d.text((x+5,y+20),f"Cel {z['cel']}: original / ny",fill='black')
+ qa.save(r/f"b-gruppe{g['gruppe']:02d}-qa.png")
+(r/'b-komponentmapping.json').write_text(json.dumps(records,indent=2))

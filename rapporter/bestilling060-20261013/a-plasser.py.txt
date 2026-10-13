@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+import numpy as np,json,subprocess,sys
+r=Path(__file__).resolve().parent;root=r.parents[1];es=json.loads((r/'a-kildebevis.json').read_text())['ruter'];mp=json.loads((r/'a-unik-kobling.json').read_text());components={};proof=[]
+def bbox(a):
+ ys,xs=np.where(a[:,:,3]>=128);return [int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)]
+for path in sorted(r.glob('a-*-raa01.png')):
+ group=path.name[2:-10]; bp=r/f'a-{group}-bokser.json'
+ if not bp.exists():continue
+ im=Image.open(path).convert('RGBA')
+ for i,entry in enumerate(json.loads(bp.read_text())):
+  e=next(e for e in es if e['rute']==entry['cel']);roi=[i%3*im.width//3,i//3*im.height//2,(i%3+1)*im.width//3,(i//3+1)*im.height//2];a=np.array(im.crop(roi))
+  if group=='g6fix':roi=[0,0,im.width,im.height];a=np.array(im)
+  if e['rute']==1941:a[:,:125]=0
+  before=int((a[:,:,3]>0).sum());reach=np.array(Image.fromarray(np.uint8(a[:,:,3]>=128)*255).filter(ImageFilter.MaxFilter(5)))>0;a[:,:,3][(~reach)|(a[:,:,3]<40)]=0;a[a[:,:,3]==0,:3]=0;b=bbox(a);q=Image.fromarray(a).crop((max(0,b[0]-3),max(0,b[1]-3),min(a.shape[1],b[2]+3),min(a.shape[0],b[3]+3)));b=bbox(np.array(q));x,y,xx,yy=e['synlig'];w=(xx-x)*4;h=(yy-y)*4
+  if e['rute']==1941:w=69*4
+  W=round(q.width*w/(b[2]-b[0]));H=round(q.height*h/(b[3]-b[1]));best=None
+  for dx in range(-3,4):
+   for dy in range(-3,4):
+    z=q.convert('RGBa').resize((W+dx,H+dy),Image.Resampling.LANCZOS).convert('RGBA');bb=bbox(np.array(z));sc=abs(bb[2]-bb[0]-w)+abs(bb[3]-bb[1]-h)
+    if best is None or sc<best[0]:best=(sc,z,bb)
+  assert best[0]==0;(score,q,b)=best;components[e['rute']]=(q,b);q.save(r/f'a-cel{e["rute"]}-komponent.png');proof.append({'cel':e['rute'],'raw':path.name,'roi':roi,'core_width_height':[w,h],'alfa_for':before,'alfa_etter':int((a[:,:,3]>0).sum())})
+outputs={}
+for m in mp:
+ if m['representant'] not in components:continue
+ e=next(e for e in es if e['rute']==m['cel']);q,b=components[m['representant']];out=outputs.setdefault(e['jobb'],Image.new('RGBA',(1536,1024)));x,y=e['synlig'][:2];out.alpha_composite(q,(64+x*4-b[0]+(36 if e['rute']==1941 else 0),32+y*4-b[1]))
+if 1941 in components:
+ raw=Image.open(r/'a-g3-raa01.png').convert('RGBA');q=raw.crop((592,772,642,820));bb=bbox(np.array(q));q=q.crop(bb).convert('RGBa').resize((4,4),Image.Resampling.LANCZOS).convert('RGBA');q.save(r/'a-1941-separat-nytt-punkt.png');outputs['fig209_03'].alpha_composite(q,(388,776));proof.append({'cel':1941,'separat_nygenerert_punkt':[388,776,4,4],'raw_crop':[592,772,642,820],'hovedbredde':276})
+for name,im in outputs.items():
+ p=r/f'a-{name}-partiell.png';im.save(p);print(name,len([m for m in mp if m['jobb']==name and m['representant'] in components]))
+(r/'a-plasseringsbevis.json').write_text(json.dumps(proof,indent=2)+'\n')

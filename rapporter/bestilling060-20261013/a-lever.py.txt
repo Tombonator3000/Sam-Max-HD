@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil,subprocess,sys
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();es=json.loads((r/'a-kildebevis.json').read_text())['ruter'];locks=json.loads((r/'a-kildehash.json').read_text())['filer'];assert all(sha(root/p)==h for p,h in locks.items());manifest=[];rutemap=[]
+for n in range(1,6):
+ name=f'fig209_{n:02d}';dest=root/'jobber'/name/'resultat.png';shutil.copyfile(r/f'a-{name}-partiell.png',dest);p=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(dest)],capture_output=True,text=True);(r/f'a-{name}-kontroll.txt').write_text(p.stdout+p.stderr);assert 'Utfall: OK' in p.stdout;im=Image.open(dest);a=np.array(im);assert im.mode=='RGBA';count=len([e for e in es if e['jobb']==name]);manifest.append({'jobb':name,'resultat':str(dest.relative_to(root)),'sha256':sha(dest),'egenkontroll':'OK','kontrollfil':str((r/f'a-{name}-kontroll.txt').relative_to(root)),'forsok':7,'ruter':count,'proveniens':'rapporter/bestilling060-20261013/a-bildekall.json','runtime':False,'ny_brukergodkjenning':False})
+ (dest.parent/'notat.md').write_text(f"# {name}\n\nEkte RGBA 1536 × 1024 med {count} ruter. SHA-256: `{sha(dest)}`. Uendret sjekk_leveranse.py gir OK.\n\nSam og Max i rom040s glassapparat, opp ned og med kildeegne blå/lilla overlegg og varm Max-palett. Familien har 36 ruter fra 22 ulike kildekomposisjoner, produsert gjennom 7 innebygde imagegen-kall. Eksakt modell er ikke eksponert. Egne native rel/retning/lag er beholdt. Kildeidentiske ruter deler ny art. 1941 har separat ny 4 × 4 lyseblå flekk; hovedkompositten er ikke strukket. 1936–1942 viser Max bakfra, ikke ansikt; to feilforsøk/feilcels er bevart i rapporten.\n\nProveniens, faktisk prompt, råfiler, oppskrift, alfaopprydding, kontroll og begrensninger: rapporter/bestilling060-20261013/a-bildekall.json og a-kilde-qa.md. Glass og små utstikkere er mer avrundet/modellert; ingen originalkonturmaskering eller warp. Alle 20 beskyttede kilder er uendret. Ingen runtime eller ny individuell brukergodkjenning.\n")
+
+for e in es:
+ x,y,xx,yy=e['synlig'];a=np.array(Image.open(root/'jobber'/e['jobb']/'resultat.png'));q=a[32+y*4:32+yy*4,64+x*4:64+xx*4];ys,xs=np.where(q[:,:,3]>=128);rutemap.append({'jobb':e['jobb'],'cel':e['rute'],'synlig':e['synlig'],'rekt':e['rekt'],'rel':e['originalmetadata'],'hd_kjerne_bbox':[64+x*4+int(xs.min()),32+y*4+int(ys.min()),64+x*4+int(xs.max()+1),32+y*4+int(ys.max()+1)],'komponent_RGBA_sha256':hashlib.sha256(q.tobytes()).hexdigest()})
+(r/'a-rutekart-hd.json').write_text(json.dumps(rutemap,ensure_ascii=False,indent=2)+'\n');(r/'a-leveranser.json').write_text(json.dumps({'leveranser':manifest},ensure_ascii=False,indent=2)+'\n')
+for page in range((len(es)+7)//8):
+ out=Image.new('RGB',(2400,660),(75,85,95));d=ImageDraw.Draw(out)
+ for i,e in enumerate(es[page*8:page*8+8]):
+  x,y,xx,yy=e['synlig'];rx,ry=e['rekt'][:2];m=e['originalmetadata'];d.text((i*300+5,5),f"{e['rute']} rel{m['rel_x']},{m['rel_y']}",fill='white');src=Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGBA').crop((x,y,xx,yy));a=np.array(src);a[:,:,3]=np.uint8(np.any(a[:,:,:3]!=e['bakgrunn'],2))*255;src=Image.fromarray(a).resize((src.width*2,src.height*2),Image.Resampling.NEAREST);hd=Image.open(root/'jobber'/e['jobb']/'resultat.png').crop((64+x*4,32+y*4,64+xx*4,32+yy*4));hd=hd.resize((hd.width//2,hd.height//2),Image.Resampling.LANCZOS);ox=i*300+230;oy=285;dx=(m['rel_x']+x-rx)*2;dy=(m['rel_y']+y-ry)*2
+  for j,im in enumerate([src,hd]):
+   out.paste(im,(ox+dx,oy+j*330+dy),im);d.line((ox,35+j*330,ox,310+j*330),fill=(125,135,145));d.line((i*300+10,oy+j*330,i*300+295,oy+j*330),fill=(125,135,145))
+ out.save(r/f'a-rel-slutt-{page+1}.png')
+full=Image.new('RGB',(1536,1536),(75,85,95))
+for n in range(1,6):
+ im=Image.open(root/'jobber'/f'fig209_{n:02d}'/'resultat.png');im.thumbnail((768,512));full.paste(im,((n-1)%2*768,(n-1)//2*512),im)
+full.save(r/'a-slutt-helark.png');print(json.dumps(manifest,indent=2))

@@ -1,0 +1,32 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];read=lambda n:json.loads((r/n).read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks={**read('a-kildehash.json')['filer'],**read('a-konteksthash.json')}
+for p,h in locks.items():assert sha(root/p)==h,p
+calls=read('a-bildekall.json')['kall'];assert len(calls)==7
+for c in calls:
+    assert sha(r/c['raa'])==c['raa_sha256'];assert sha(r/c['promptfil'])==c['prompt_sha256']
+src={z['rute']:z for z in read('a-kildebevis.json')['ruter']};mp=read('a-unik-kobling.json');native=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['209']['cels'];out={};original={};records=[]
+for c,z in src.items():
+    job=json.loads((root/'jobber'/z['jobb']/'jobb.json').read_text());actual=next(x for x in job['ruter'] if x['rute']==c)
+    assert actual['synlig']==z['synlig'] and actual['rekt']==z['rekt'];assert z['originalmetadata']==next(x for x in native if x['cel']==c)
+    original[c]=Image.open(root/'jobber'/z['jobb']/'original_1x.png').convert('RGB').crop(z['synlig'])
+for m in mp:
+    c=m['cel'];rep=m['representant'];z=src[c];j=z['jobb'];s=original[c];ds=original[rep];assert s.size==ds.size and s.tobytes()==ds.tobytes()
+    q=Image.open(r/f'a-cel{rep}-komponent.png').convert('RGBA');a=np.array(q);yy,xx=np.nonzero(a[:,:,3]>=128);b=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+    x,y,X,Y=z['synlig'];w=69 if c==1941 else X-x;assert b[2]-b[0]==4*w and b[3]-b[1]==4*(Y-y)
+    pos=(64+4*x-b[0]+(36 if c==1941 else 0),32+4*y-b[1]);out.setdefault(j,Image.new('RGBA',(1536,1024))).alpha_composite(q,pos)
+    records.append({'jobb':j,'cel':c,'representant':rep,'native':z['originalmetadata'],'komponent_sha256':sha(r/f'a-cel{rep}-komponent.png'),'plassering':pos,'kjerne':[4*w,4*(Y-y)]})
+assert len(mp)==36 and len({m['representant'] for m in mp})==22
+point=Image.open(r/'a-1941-separat-nytt-punkt.png').convert('RGBA');assert point.size==(4,4);out['fig209_03'].alpha_composite(point,(388,776))
+z=src[1941];im=Image.open(root/'jobber'/z['jobb']/'original_1x.png').convert('RGB');assert im.getpixel((81,186))!=(255,0,255)
+deliveries=[]
+for e in read('a-leveranser.json')['leveranser']:
+    j=e['jobb'];p=root/e['resultat'];im=Image.open(p);assert sha(p)==e['sha256'] and im.mode=='RGBA' and im.size==(1536,1024)
+    assert im.tobytes()==out[j].tobytes(),j
+    run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);assert 'Utfall: OK' in run.stdout
+    (r/f'root-{j}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n');deliveries.append({'jobb':j,'sha256':sha(p),'ruter':e['ruter'],'egenkontroll':'OK'})
+(r/'root-a-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':20,'kontekst_uendret':len(locks)-20,'faktiske_raw_promptpar':7,'ruter':records,'separat_ny_punktkomponent':{'cel':1941,'posisjon':[388,776],'størrelse':[4,4],'sha256':sha(r/'a-1941-separat-nytt-punkt.png')},'leveranser':deliveries,'byteidentisk_fullrekonstruksjon':True,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('A60:36 ruter/22 kildekomposisjoner, ett nytt punkt, sju bildekall og alle fem faktiske RGBA-ark OK.')

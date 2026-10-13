@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json
+r=Path(__file__).resolve().parent;root=r.parents[1];es=json.loads((r/'a-kildebevis.json').read_text())['ruter'];out=[]
+for cel in [e['rute'] for e in es]:
+ e=next(e for e in es if e['rute']==cel);x,y,xx,yy=e['synlig'];a=np.array(Image.open(root/'jobber'/e['jobb']/'original_1x.png').convert('RGB').crop((x,y,xx,yy)));mask=np.any(a!=e['bakgrunn'],2);seen=np.zeros(mask.shape,bool);cc=[]
+ for sy,sx in zip(*np.where(mask)):
+  if seen[sy,sx]:continue
+  seen[sy,sx]=1;q=[(sy,sx)];coords=[]
+  while q:
+   yy0,xx0=q.pop();coords.append((yy0,xx0))
+   for dy in [-1,0,1]:
+    for dx in [-1,0,1]:
+     Y,X=yy0+dy,xx0+dx
+     if 0<=Y<mask.shape[0] and 0<=X<mask.shape[1] and mask[Y,X] and not seen[Y,X]:seen[Y,X]=1;q.append((Y,X))
+  ys,xs=zip(*coords);cc.append({'antall':len(coords),'lokal_bbox':[min(xs),min(ys),max(xs)+1,max(ys)+1],'atlas_bbox':[x+min(xs),y+min(ys),x+max(xs)+1,y+max(ys)+1],'palett':np.unique(a[list(ys),list(xs)],axis=0).tolist()})
+ out.append({'cel':cel,'jobb':e['jobb'],'komponenter':sorted(cc,key=lambda c:-c['antall'])})
+(r/'a-kildekomponenter.json').write_text(json.dumps(out,indent=2,default=int)+'\n')

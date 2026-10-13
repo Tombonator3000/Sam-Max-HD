@@ -392,3 +392,8 @@
 
 - Bestilling59: ti figurark med115 ruter levert; Sam ved kista, Max med rasp/toalettnøkkel og20 kildeidentiske Max-felt. Ni OK, fig066_03 SJEKK for133s omriss. Se `rapporter/bestilling059-20261013/RAPPORT.md`. Arbeidet fortsetter.
 -16 native bildekall og33 nye donorutsnitt er dokumentert. Alle faktiske leveranser kan gjenoppbygges byteidentisk fra nye komponenter;63 unike kilde-/kontekstlåser er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T01:54:46+02:00 (Codex, Astra)
+
+- Bestilling60: ni figurark med88 ruter levert; Sam og Max i glassapparatet samt Sam-armbevegelser i Escher-rommet. Alle ni OK. Se `rapporter/bestilling060-20261013/RAPPORT.md`. Arbeidet fortsetter.
+-13 native bildekall er dokumentert. Alle ni faktiske leveranser kan gjenoppbygges byteidentisk fra nye komponenter;62 unike kilde-/kontekstlåser er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.

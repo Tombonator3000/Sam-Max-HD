@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json
+r=Path('rapporter/bestilling060-20261013');sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();rows=json.loads((r/'b-ruteregister.json').read_text())['ruter'];deliver=[]
+qa='''# Kilde og sluttkontroll for Sam 196
+
+Fire ark, 52 ruter og 20 kildeunike motiver. 19 motiver er nytegnet i fire komponentgrupper. Cel 1920 og 1971 bruker den kildebeviste nye komponenten fra fig114_01 cel 0. Donorfilens SHA256 er f94a4774d7305d15f40b1d9079cb908be284318918c527a818878ffa36d9febb. Synlig original og rel er identiske; transparent native bredde er ikke fylt ut.
+
+Alle elleve celQA-sider og begge rel-sekvensene er visuelt gjennomgått. Hatt, dress, slips, pekestillinger og kildens avkuttede blå erme er bevart. Cel 1924 har sin egen lille brune rest. Ingen hånd eller svart mansjett er tegnet inn utenfor de tilsiktede avkuttingene i 1925/1926. Ingen rekvisitt er utledet fra gestene. Fullscript og faktisk tidsforløp er ikke kontrollert.
+
+Cel 1954 hadde først manglende hånd. Et lokalt andre forsøk ga uønsket alfa/slør og er forkastet. Fra et tredje, kildebasert forsøk brukes bare en ren nygenerert hånd og mansjett. Resten av dette tredje bildet brukes ikke. Håndkomponenten er helskalert og komponert på første nye kropp, med bare 3719 endrede piksler innen [1377,147,1468,219] i det midlertidige gruppearket. Kildeidentiske 1955 bruker samme korrigerte komponent. Endelig oppskrift er b-1954-handkomponent.py.txt, ikke den historiske b-1954-innsett.py.txt. Sistnevnte og retting-beviset beskriver kun forkastet forsøk.
+
+Ny alfa bestemmer komponentenes kontur. Alfa under 16 nulles, øvrig alfa normaliseres 254 til 255. Hele nye motiver skaleres til synlig kildeboks ved 4×. Ingen originalmaske, konturtrace eller lokal warp er brukt. Mapping og b-sluttbevis.json beviser alle 52 innsettinger. Ordrette jobbprompter og egne kildepresiseringer er bevart.
+
+Uendret sjekk_leveranse.py gir fire OK og 52 av 52 ruter OK. Alle 16 beskyttede jobbfiler og åtte kontekstfiler er hashkontrollert uendret. HD har rundere fingre, større lesbarhet i ansiktet og renere jakkefolder; dette er tegningsfortolkninger, ikke pikselidentisk anatomi. Rel-arkene er statiske sammenstillinger, ikke runtime-test. Runtime og ny individuell brukergodkjenning er false.
+'''
+(r/'b-kilde-qa.md').write_text(qa)
+for n in range(1,5):
+ j=f'fig196_{n:02d}';p=Path('jobber')/j/'resultat.png';im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024);rr=[z for z in rows if z['jobb']==j];control=r/f'b-{j}-kontroll01.txt';assert 'Utfall: OK' in control.read_text();entry={'jobb':j,'resultat':str(p),'sha256':sha(p),'egenkontroll':'OK','kontrollfil':str(control),'forsok':0 if n==4 else 3 if n==3 else 1,'ruter':len(rr),'mapping':str(r/f'b-{j}-mapping.json'),'runtime':False,'ny_brukergodkjenning':False};deliver.append(entry)
+ (Path('jobber')/j/'notat.md').write_text(f'# Leveranse {j}\n\n{len(rr)} ruter, ekte RGBA 1536 × 1024. Uendret egenkontroll: OK. Resultat SHA256: `{sha(p)}`.\n\nInnebygd ChatGPT imagegen; eksakt bildemodellnavn er ikke eksponert. Familien bruker 19 nye motiver og én kildebevist fig114-komponent, med identiske kildevarianter gjenbrukt. Forsøk og lokal håndretting er spesifisert i b-proveniens.json og b-kilde-qa.md under rapporter/bestilling060-20261013. Kildehash finnes i b-kildehash.json; alle fire beskyttede jobbfiler er uendret.\n\nHele nye komponenter er plassert etter kildeboks og rel. Alfa kommer bare fra ny kunst. Ingen originalmaske eller warp. Sam har egne håndstillinger og tilsiktet avklippet erme; ingen ukjent rekvisitt er lagt til. Ansiktsstreker og fingre er renere og rundere enn kildepikslene. Alle ruter og rel-sekvenser er visuelt kontrollert. Runtime og ny individuell brukergodkjenning er false.\n')
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':deliver,'ruter':52,'unike_motiver':20,'nye_unike':19,'runtime':False,'ny_brukergodkjenning':False},indent=2))
+prov=[]
+for n,uid in enumerate(['facc1afa-d2a7-42a9-9e39-48f4b15e6a82','737aa4dd-b60d-4002-932f-5a56264fdc31','d0a6ab55-1617-4291-ad94-006780008650','4e0c1ec5-bc4e-41e1-b41a-f6bfe83ab02e'],1):
+ raw=r/f'b-gruppe{n:02d}-raa01.png';p=r/f'b-gruppe{n:02d}-prompt.txt';prov.append({'gruppe':n,'raw':str(raw),'sha256':sha(raw),'prompt':str(p),'prompt_sha256':sha(p),'tool_id':uid,'status':'brukt, gruppe03 med lokal håndretting' if n==3 else 'brukt'})
+for raw,p,uid,status in [('b-1954-retting-raa02.png','b-1954-retting-prompt.txt','f2bece0a-0220-4b95-ac9b-480129dda86f','forkastet: alfahaze'),('b-1954-omtegning-raa03.png','b-1954-omtegning-prompt.txt','427d81d5-8a9a-4136-97ec-6ba21f98fea0','bare ren hånd og mansjett brukt, resten forkastet')]:prov.append({'raw':str(r/raw),'sha256':sha(r/raw),'prompt':str(r/p),'prompt_sha256':sha(r/p),'tool_id':uid,'status':status})
+checks={}
+for name in ['b-kildehash.json','b-konteksthash.json']:
+ locks=json.loads((r/name).read_text())['filer'];checks[name]={p:sha(p)==h for p,h in locks.items()};assert all(checks[name].values())
+(r/'b-proveniens.json').write_text(json.dumps({'verktøy':'innebygd ChatGPT imagegen','eksakt_modellnavn':'ikke eksponert','kall':prov,'kildekontroll':checks,'oppskrift':['b-1954-handkomponent.py.txt','b-komponenter.py.txt','b-komponer.py.txt','b-sluttqa.py.txt','b-sluttdok.py.txt'],'runtime':False,'ny_brukergodkjenning':False},indent=2))
+print(json.dumps(deliver,indent=2))

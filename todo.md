@@ -115,3 +115,5 @@
 - [x] Levert bestilling57: seks Sam-ark med79 ruter og fire rekvisitter;45 kildeunike motiver og seks separate fargepunkter kontrollert. Alle OK.
 
 - [x] Levert bestilling59: ti figurark med115 ruter. Ni OK; Max066_03 beholder SJEKK for133s omriss. Øyelokk, donorhoder, kistelokk og kildebeviste rosa sålemerker kontrollert.
+
+- [x] Levert bestilling60: ni figurark med88 ruter, alle OK. Glassapparatets bak-/forsider, separate glasspunkt og52 egne arm-/håndstillinger kontrollert.

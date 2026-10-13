@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+import json
+r=Path('rapporter/bestilling060-20261013');rows=json.loads((r/'b-ruteregister.json').read_text())['ruter'];seen=set();unique=[]
+for z in rows:
+ if z['rgba_sha256'] not in seen:unique.append(z['rute']);seen.add(z['rgba_sha256'])
+unique=[i for i in unique if i!=1920];groups=[unique[i:i+6] for i in range(0,len(unique),6)];mapping=[]
+for gi,ids in enumerate(groups,1):
+ im=Image.new('RGB',(1536,1024),(255,0,255));rs=[]
+ for k,c in enumerate(ids):
+  z=next(z for z in rows if z['rute']==c);a=Image.open(Path('jobber')/z['jobb']/'original_1x.png').crop(z['synlig']);a=a.resize((a.width*4,a.height*4),Image.Resampling.NEAREST);x=k%3*512+(512-a.width)//2;y=k//3*512+(512-a.height)//2;im.paste(a,(x,y));rs.append({'cel':c,'slot':[k%3*512,k//3*512,(k%3+1)*512,(k//3+1)*512],'source_hd_box':[x,y,a.width,a.height]})
+ im.save(r/f'b-gruppe{gi:02d}-kilde.png');jobs=sorted({next(z for z in rows if z['rute']==c)['jobb'] for c in ids});prompt='\n\n'.join((Path('jobber')/j/'prompt.txt').read_text() for j in jobs);prompt+='\n\nSEPARATE SOURCE CLARIFICATION FOR THIS TEMPORARY COMPONENT SHEET: The first image overrides original sheet arrangement: only redraw its '+str(len(ids))+' visible isolated Sam poses, exactly in the same 3-column by 2-row slots, leaving unused slots empty. Each source pose is already 4x. This temporary sheet will be composed into the original job positions afterwards. Keep actual whole component shape and its internal relative positions. Preserve each precise Sam arm and pointing gesture. Sam holds NOTHING. In cel1924 the right edge contains only a thin brown hand remnant. In cel1925 and cel1926, the right arm ends abruptly in flat blue sleeve at the source clipping boundary: NO hand, NO wrist, NO black cuff opening, NO stump cross-section. It is occluded/cropped game art, not an amputated arm. Do not complete missing parts. In other poses preserve the actual pointing finger near the muzzle and forward pointing. No lid or prop. No extra pose/head/prop/label. Sam master is style and identity only, source determines actual colors/pose. Real transparent background. Smooth newly drawn cartoon art, no original pixel edges. Output 1536x1024.';(r/f'b-gruppe{gi:02d}-prompt.txt').write_text(prompt);mapping.append({'gruppe':gi,'ruter':rs,'jobber':jobs})
+(r/'b-grupperegister.json').write_text(json.dumps(mapping,indent=2));print([(g['gruppe'],[z['cel'] for z in g['ruter']]) for g in mapping])

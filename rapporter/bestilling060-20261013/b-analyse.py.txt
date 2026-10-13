@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,collections
+r=Path('rapporter/bestilling060-20261013');sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();allmeta=json.loads(Path('konsept/2026-10-12/kostymer-originalmetadata.json').read_text());meta=allmeta['196'];cm={z['cel']:z for z in meta['cels']};donors=collections.defaultdict(list);locks={};rows=[]
+def crop(p,o,m):
+ a=np.array(Image.open(p/'original_1x.png').convert('RGBA').crop(tuple(o['synlig'])));a[:,:,3]=np.where(np.all(a[:,:,:3]==m['bakgrunn'],axis=2),0,255);a[a[:,:,3]==0,:3]=0;return a
+for p in sorted(Path('jobber').glob('fig*')):
+ if not (p/'resultat.png').exists():continue
+ m=json.loads((p/'jobb.json').read_text())
+ for o in m.get('ruter',[]):
+  a=crop(p,o,m);sig=hashlib.sha256(a.tobytes()+str(a.shape).encode()).hexdigest();donors[sig].append({'jobb':p.name,'cel':o['rute'],'synlig':o['synlig'],'rekt':o['rekt'],'kostyme':m.get('kostyme'),'resultat_sha256':sha(p/'resultat.png')})
+for n in range(1,5):
+ p=Path('jobber',f'fig196_{n:02d}');m=json.loads((p/'jobb.json').read_text())
+ for f in ['original_1x.png','referanse.png','jobb.json','prompt.txt']:locks[str(p/f)]=sha(p/f)
+ for o in m['ruter']:
+  a=crop(p,o,m);sig=hashlib.sha256(a.tobytes()+str(a.shape).encode()).hexdigest();c,v=np.unique(a[a[:,:,3]>0,:3],axis=0,return_counts=True);rows.append({'jobb':p.name,**o,'metadata':cm[o['rute']],'antall_synlige':int((a[:,:,3]>0).sum()),'rgba_sha256':sig,'palett':[{'rgb':x.tolist(),'antall':int(y)} for x,y in zip(c,v)],'eksakte_rgb_donorer':donors.get(sig,[])})
+ for start in range(0,len(m['ruter']),8):
+  out=Image.new('RGB',(1400,900),(160,160,160));d=ImageDraw.Draw(out)
+  for k,o in enumerate(m['ruter'][start:start+8]):
+   a=Image.fromarray(crop(p,o,m));s=min(320/a.width,370/a.height);a=a.resize((round(a.width*s),round(a.height*s)),Image.Resampling.NEAREST);x=k%4*350;y=k//4*450;c=cm[o['rute']];d.text((x+5,y+5),f"{p.name} cel{o['rute']} lag{o['lag']} a{o['animasjon']}",fill='black');d.text((x+5,y+22),f"rel {c['rel_x']},{c['rel_y']} synlig {a.size}",fill='black');out.paste(a,(x+5,y+55),a)
+  out.save(r/f'b-kilder-{n:02d}-{start//8+1}.png')
+(r/'b-kildehash.json').write_text(json.dumps({'filer':locks},indent=2));(r/'b-ruteregister.json').write_text(json.dumps({'ruter':rows,'metadata196':meta},indent=2));print('count',len(rows));print('metadata', {k:v for k,v in meta.items() if k not in ['cels','animasjoner']});print('rows',[(z['jobb'],z['rute'],z['lag'],z['metadata']['rel_x'],z['metadata']['rel_y'],[(d['jobb'],d['cel']) for d in z['eksakte_rgb_donorer']]) for z in rows])
