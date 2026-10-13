@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib
+R=Path.cwd();O=R/'rapporter/bestilling058-20261013';cells=json.loads((O/'c-rutekart205.json').read_text())['ruter'];cand=json.loads((O/'c-dublettkandidater.json').read_text());allmeta=json.load(open(R/'konsept/2026-10-12/kostymer-originalmetadata.json'));don=[]
+for jf in (R/'jobber').glob('fig003_*/jobb.json'):
+ j=json.loads(jf.read_text());im=Image.open(jf.parent/'original_1x.png').convert('RGB')
+ for c in j['ruter']:don.append((jf.parent.name,c,im.crop(c['synlig']).transpose(Image.Transpose.FLIP_TOP_BOTTOM)))
+near=[];proof=[]
+for c in cells:
+ matches=[x for x in cand[str(c['rute'])] if x['jobb'].startswith('fig003_')]
+ if matches:
+  x=matches[0];dm=next(t for t in allmeta['3']['cels'] if t['cel']==x['cel']);proof.append({'cel205':c['rute'],'donor':x,'rel205':c['metadata'],'rel003':dm,'maalfelt':c['RGBA_maalfelt']});continue
+ p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').convert('RGB').crop(c['synlig']);a=np.array(p);opts=[]
+ for name,d,q in don:
+  if p.size==q.size:opts.append((int(np.any(a!=np.array(q),axis=2).sum()),name,d,q))
+ if opts:
+  count,name,d,q=min(opts,key=lambda z:z[0]);near.append({'cel205':c['rute'],'donor':name,'cel003':d['rute'],'avvik_RGB_piksler':count,'storrelse':list(p.size)});i=len(near);out=Image.new('RGB',(600,260),(0,200,200));dr=ImageDraw.Draw(out);dr.text((5,5),f"205 cel{c['rute']} / 003 cel{d['rute']} flipped; {count} pixels different",fill='black');out.paste(p.resize((p.width*6,p.height*6),Image.Resampling.NEAREST),(5,35));out.paste(q.resize((q.width*6,q.height*6),Image.Resampling.NEAREST),(305,35));out.save(O/f'c-naerdonor-{i}.png')
+(O/'c-donorrelbevis.json').write_text(json.dumps({'eksakte':proof,'naermeste_ikke_gjenbrukbare':near},indent=2)+'\n');print(near)

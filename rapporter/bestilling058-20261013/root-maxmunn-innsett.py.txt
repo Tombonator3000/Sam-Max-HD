@@ -1,0 +1,42 @@
+"""Engangsinnsetting av allerede genererte og visuelt kontrollerte munnfelter."""
+from pathlib import Path
+import hashlib,json,sys,subprocess
+import numpy as np
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1]
+read=lambda p:json.loads(Path(p).read_text())
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+archives=read(r/'root-donorarkiv.json');matches=read(r/'root-maxmunn-avhengigheter.json')['treff']
+patches={x['cel']:x for x in read(r/'b-munn-rettingbevis.json')}
+locks={};entries=[];records=[]
+for j in dict.fromkeys(x['jobb'] for x in matches):
+    folder=root/'jobber'/j;p=folder/'resultat.png'; key=str(p.relative_to(root));old=archives[key]
+    assert sha(p)==old['sha256'] and sha(root/old['arkiv'])==old['sha256'],j
+    m=read(folder/'jobb.json')
+    for n in ['jobb.json','prompt.txt','original_1x.png','referanse.png']:
+        f=folder/n;locks[str(f.relative_to(root))]=sha(f)
+    before=np.array(Image.open(p).convert('RGBA'));after=before.copy();allowed=np.zeros(before.shape[:2],bool);details=[]
+    for match in (x for x in matches if x['jobb']==j):
+        cel=match['cel'];cp=patches[cel];box=match['rekt_HD_med8'];x,y,X,Y=[box[0]+8,box[1]+8,box[2]-8,box[3]-8]
+        a=np.array(Image.open(r/f'b-cel{cel}-for.png'));z=np.array(Image.open(r/f'b-cel{cel}-rettet.png'))
+        assert np.array_equal(before[y:Y,x:X],a)
+        px,py,pX,pY=cp['mouth_patch'];rect=[x+px,y+py,x+pX,y+pY]
+        after[y+py:y+pY,x+px:x+pX,:3]=z[py:pY,px:pX,:3]
+        allowed[y+py:y+pY,x+px:x+pX]=True
+        details.append({'cel':cel,'lokal_felt':cp['mouth_patch'],'atlas_felt':rect,'ny_komponent_sha256':cp['sha256']})
+    changed=np.any(before!=after,axis=2)
+    assert not np.any(changed&~allowed) and np.array_equal(before[:,:,3],after[:,:,3])
+    Image.fromarray(after).save(p)
+    run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True)
+    assert 'Utfall: OK' in run.stdout,(j,run.stdout)
+    control=r/f'root-{j}-kontroll.txt';control.write_text((run.stdout+run.stderr).rstrip()+'\n')
+    note=folder/'notat.md'
+    cellnames=', '.join(str(x['cel']) for x in details)
+    note.write_text(note.read_text().rstrip()+f'\n\n## Kildetro munnretting 2026-10-14\n\nDe kildeidentiske munnfeltene {cellnames} er rettet med nye, lokalt genererte svart/hvite munnfelter fra bestilling 058. Originalen har ikke rødt i disse feltene. Bare RGB inne i de dokumenterte munnrektanglene er erstattet; all alfa og alle øvrige atlaspiksler er uendret. Førversjonen er bevart i `{old["arkiv"]}`. Bevis: `rapporter/bestilling058-20261013/root-maxmunn-rettingbevis.json`.\n\nNy SHA-256: `{sha(p)}`. Egenkontroll: OK. Ingen ny individuell brukergodkjenning, import eller runtime-test.\n')
+    entries.append({'jobb':j,'resultat':key,'sha256':sha(p),'egenkontroll':'OK','kontrollfil':str(control.relative_to(root)),'antall_ruter':len(m['ruter']),'retting_av_tidligere_levert':True,'klar_for_mottak':True,'runtime':False,'ny_brukergodkjenning':False})
+    records.append({'jobb':j,'for_sha256':old['sha256'],'arkiv':old['arkiv'],'etter_sha256':sha(p),'endringer':details,'endrede_RGBA_piksler':int(changed.sum()),'utenfor_rektangler':0,'alfa_identisk':True})
+for p,h in locks.items():assert sha(root/p)==h
+(r/'root-munn-kildehash.json').write_text(json.dumps(locks,indent=2)+'\n')
+(r/'root-maxmunn-rettingbevis.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
+(r/'root-leveranser.json').write_text(json.dumps({'leveranser':entries},ensure_ascii=False,indent=2)+'\n')
+print('Fire tidligere leverte ark rettet; seks forekomster, tre unike munnfelter; fire ekte kontroller OK.')

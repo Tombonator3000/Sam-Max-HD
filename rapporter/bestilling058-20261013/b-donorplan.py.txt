@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np
+r=Path('rapporter/bestilling058-20261013');a=json.loads((r/'b-ruteregister.json').read_text());meta=json.loads(Path('konsept/2026-10-12/kostymer-originalmetadata.json').read_text());rows=[];hashes={};sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+for z in a['ruter']:
+ d=next(x for x in z['eksakte_rgb_donorer'] if x['jobb'].startswith('fig003_')) if z['rute']!=0 else z['eksakte_rgb_donorer'][0];dm=json.loads(Path('jobber',d['jobb'],'jobb.json').read_text());dc=next(x for x in meta[str(dm['kostyme'])]['cels'] if x['cel']==d['cel']);s=d['synlig'];t=z['synlig'];box=[64+s[0]*4,32+s[1]*4,64+s[2]*4,32+s[3]*4];target=[64+t[0]*4,32+t[1]*4,64+t[2]*4,32+t[3]*4];rows.append({'jobb':z['jobb'],'cel':z['rute'],'donor_job':d['jobb'],'donor_cel':d['cel'],'donor_hd_box':box,'target_hd_box':target,'rgb_kilde_identisk':True,'rel_delta':[z['metadata']['rel_x']-dc['rel_x'],z['metadata']['rel_y']-dc['rel_y']],'source_w_h':[z['metadata']['w'],z['metadata']['h']],'donor_w_h':[dc['w'],dc['h']],'resultat_sha256':d['resultat_sha256']})
+ for f in ['jobb.json','original_1x.png','referanse.png','resultat.png']:p=Path('jobber',d['jobb'],f);hashes[str(p)]=sha(p)
+for start in range(0,len(rows),8):
+ out=Image.new('RGB',(1400,900),(160,160,160));dr=ImageDraw.Draw(out)
+ for k,z in enumerate(rows[start:start+8]):
+  im=Image.open(Path('jobber',z['donor_job'],'resultat.png')).crop(tuple(z['donor_hd_box']));s=min(320/im.width,370/im.height);im=im.resize((round(im.width*s),round(im.height*s)),Image.Resampling.LANCZOS);x=k%4*350;y=k//4*450;dr.text((x+5,y+5),f"325 cel{z['cel']} <- {z['donor_job']}:{z['donor_cel']}",fill='black');out.paste(im,(x+5,y+45),im)
+ out.save(r/f'b-donorer-{start//8+1}.png')
+(r/'b-donorbevis.json').write_text(json.dumps(rows,indent=2));(r/'b-donorhash.json').write_text(json.dumps(hashes,indent=2));print('rel_deltas',sorted(set(tuple(x['rel_delta']) for x in rows)));print('donors',sorted(set(x['donor_job'] for x in rows)))

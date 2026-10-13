@@ -1,0 +1,14 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import numpy as np,json
+r=Path('rapporter/bestilling058-20261013');reg=json.loads((r/'b-ruteregister.json').read_text())['ruter'];don=json.loads((r/'b-donorbevis.json').read_text());out=Image.new('RGB',(1500,700),(160,160,160));dr=ImageDraw.Draw(out);proof=[]
+for k,id in enumerate([395,402,418]):
+ z=next(x for x in reg if x['rute']==id);d=next(x for x in don if x['cel']==id);s=Image.open(Path('jobber',z['jobb'],'original_1x.png')).crop(tuple(z['synlig']));h=Image.open(Path('jobber',d['donor_job'],'resultat.png')).crop(tuple(d['donor_hd_box']));aa=np.array(s);mask=(aa[:,:,0]>aa[:,:,1]*1.3)&(aa[:,:,0]>aa[:,:,2]*1.3)&(aa[:,:,0]>100);# source nose/ear pink exists; only lower mouth portion
+ yy={395:26,402:27,418:24}[id];red=int(mask[yy:].sum());proof.append({'cel':id,'lower_y':yy,'source_lower_red_pixels':red,'donor':d['donor_job'],'red_mouth_in_hd_observed':True})
+ for q,im in enumerate([s,h]):
+  im=im.resize((220,280),Image.Resampling.NEAREST if q==0 else Image.Resampling.LANCZOS);out.paste(im,(k*500+q*245,40),im if im.mode=='RGBA' else None)
+ dr.text((k*500+5,5),f'cel{id} kilde / HD donor',fill='black')
+ # lower half closer
+ for q,im in enumerate([s,h]):
+  im=im.crop((0,int(im.height*.65),im.width,im.height));im=im.resize((235,250),Image.Resampling.NEAREST if q==0 else Image.Resampling.LANCZOS);out.paste(im,(k*500+q*245,400),im if im.mode=='RGBA' else None)
+out.save(r/'b-munn395-402-418.png');(r/'b-munnbevis.json').write_text(json.dumps(proof,indent=2));print(proof)

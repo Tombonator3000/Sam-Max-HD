@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,subprocess,hashlib,numpy as np
+r=Path('rapporter/bestilling058-20261013');ds=json.loads((r/'b-donorbevis.json').read_text());proof=[]
+for j in ['fig325_01','fig325_02']:
+ out=Image.new('RGBA',(1536,1024));rs=[z for z in ds if z['jobb']==j]
+ for z in rs:
+  id=z['cel'];don=Path('jobber',z['donor_job'],'resultat.png');im=Image.open(don).crop(tuple(z['donor_hd_box']));source=str(don)
+  if id in [395,402,418]:source=str(r/f'b-cel{id}-rettet.png');im=Image.open(source)
+  t=z['target_hd_box'];assert im.size==(t[2]-t[0],t[3]-t[1]);out.paste(im,t[:2]);proof.append({**z,'faktisk_komponent':source,'komponent_rgba_sha256':hashlib.sha256(im.tobytes()).hexdigest(),'helskalert':False,'runtime':False})
+ out.save(Path('jobber',j,'resultat.png'));run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll.txt').write_text(run.stdout+run.stderr);print(run.stdout)
+(r/'b-komposisjonsbevis.json').write_text(json.dumps(proof,indent=2));contact=Image.new('RGB',(1536,1024),(160,160,160))
+for n,j in enumerate(['fig325_01','fig325_02']):
+ for q in [0,1]:
+  im=Image.open(Path('jobber',j,'referanse.png' if q==0 else 'resultat.png')).resize((768,512));contact.paste(im,(q*768,n*512),im if im.mode=='RGBA' else None)
+contact.save(r/'b-325-helark.png')

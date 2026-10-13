@@ -1,0 +1,90 @@
+from pathlib import Path
+import hashlib, json, subprocess, sys
+import numpy as np
+from PIL import Image
+
+r=Path(__file__).resolve().parent; root=r.parents[1]
+read=lambda p:json.loads(Path(p).read_text())
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+rgba=lambda im:hashlib.sha256(im.tobytes()).hexdigest()
+archives=read(r/'root-donorarkiv.json')
+def historical(p,h):
+    q=root/p
+    if sha(q)!=h:
+        q=root/archives[p]['arkiv']; assert sha(q)==h
+    return q
+def meta(j): return read(root/'jobber'/j/'jobb.json')
+def cell(j,c): return next(x for x in meta(j)['ruter'] if x['rute']==c)
+def source(j,c):
+    m=meta(j); a=np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGBA').crop(cell(j,c)['synlig']))
+    a[:,:,3]=np.where(np.all(a[:,:,:3]==m['bakgrunn'],axis=2),0,255);a[a[:,:,3]==0,:3]=0
+    return Image.fromarray(a)
+def target(j,c):
+    x,y,X,Y=cell(j,c)['synlig']; return [64+4*x,32+4*y,64+4*X,32+4*Y]
+locks={**read(r/'b-kildehash.json')['filer'],**read(r/'c-kildehash.json')['filer']}
+for p,h in locks.items(): assert sha(root/p)==h,p
+for p,h in read(r/'b-donorhash.json').items(): historical(p,h)
+allmeta=read(root/'konsept/2026-10-12/kostymer-originalmetadata.json')
+native=lambda j,c:next(x for x in allmeta[str(meta(j)['kostyme'])]['cels'] if x['cel']==c)
+b=[]
+for cp in read(r/'b-komposisjonsbevis.json'):
+    j,c,d,dc=cp['jobb'],cp['cel'],cp['donor_job'],cp['donor_cel']
+    assert source(j,c).tobytes()==source(d,dc).tobytes()
+    s,t=native(j,c),native(d,dc)
+    assert [s['rel_x']-t['rel_x'],s['rel_y']-t['rel_y']]==[-1,19]
+    assert target(j,c)==cp['target_hd_box'] and target(d,dc)==cp['donor_hd_box']
+    old=Image.open(historical(f'jobber/{d}/resultat.png',cp['resultat_sha256'])).convert('RGBA').crop(cp['donor_hd_box'])
+    q=Image.open(root/'jobber'/j/'resultat.png').crop(cp['target_hd_box'])
+    expected=Image.open(root/cp['faktisk_komponent']) if c in (395,402,418) else old
+    assert q.tobytes()==expected.tobytes()
+    assert rgba(q)==cp['komponent_rgba_sha256']
+    b.append({'jobb':j,'cel':c,'RGB_kilde_og_RGBA_komponent':'OK','egen_rel_delta':[-1,19]})
+assert len(b)==33
+for cp in read(r/'b-munn-rettingbevis.json'):
+    a=np.array(Image.open(r/f"b-cel{cp['cel']}-for.png"));z=np.array(Image.open(r/f"b-cel{cp['cel']}-rettet.png"));different=np.any(a!=z,axis=2)
+    outside=np.ones(a.shape[:2],bool);x,y,X,Y=cp['mouth_patch'];outside[y:Y,x:X]=False
+    assert not np.any(different&outside) and np.array_equal(a[:,:,3],z[:,:,3])
+    assert int(different.sum())==cp['endrede'] and sha(r/f"b-cel{cp['cel']}-rettet.png")==cp['sha256']
+for cp in read(r/'b-smaaskjoter-bevis.json'):
+    q=np.array(Image.open(root/'jobber/fig325_01/resultat.png').crop(cp['target']))
+    assert list(q.shape[1::-1])==[56,8] and int((q[:,:,3]>128).sum())==cp['hd_alpha128']
+
+c=[]; copied=flipped=0
+for cp in read(r/'c-komponentbevis.json'):
+    j,cel=cp['jobb'],cp['cel']; assert target(j,cel)==cp['target']
+    assert native(j,cel)==cp['rel']
+    p=root/cp['komponent'];assert sha(p)==cp['sha256'];component=Image.open(p).convert('RGBA')
+    q=Image.open(root/'jobber'/j/'resultat.png').crop(cp['target'])
+    assert q.tobytes()==component.tobytes() and rgba(q)==cp['RGBA_sha256']
+    if cp['metode'] in ('vertikalt_snudd','lik'):
+        d=Path(cp['donor']).parent.name;dc=cp['donor_cel'];old=Image.open(historical(cp['donor'],cp['donor_sha256'])).convert('RGBA').crop(cp['donor_box'])
+        assert rgba(old)==cp['donor_RGBA_sha256']
+        # The separately generated corrected mouth replaces donor 395 before the proven vertical flip.
+        if cel==267: old=Image.open(r/'b-cel395-rettet.png').convert('RGBA')
+        s=source(d,dc)
+        if cp['metode']=='vertikalt_snudd': old=old.transpose(Image.Transpose.FLIP_TOP_BOTTOM);s=s.transpose(Image.Transpose.FLIP_TOP_BOTTOM);flipped+=1
+        else: copied+=1
+        assert s.tobytes()==source(j,cel).tobytes() and old.tobytes()==q.tobytes()
+    c.append({'jobb':j,'cel':cel,'felt_komponent_egen_rel':'OK','metode':cp['metode']})
+assert len(c)==57 and flipped==47 and copied==2
+assert Image.open(r/'c-cel258.png').tobytes()==Image.open(r/'c-cel295.png').tobytes()
+a=np.array(Image.open(r/'c-257-donor-nar.png'));z=np.array(Image.open(r/'c-cel257.png'));d=np.any(a!=z,axis=2);outside=np.ones(d.shape,bool);outside[4:8,62:68]=False
+assert not np.any(d&outside) and int(d.sum())==24
+local_alpha_changes=int(np.count_nonzero(a[:,:,3]!=z[:,:,3]));assert local_alpha_changes==9
+for cp in read(r/'c-proveniens.json')['kall']:
+    for k in ('raw','prompt'): assert sha(root/cp[k])==cp[k+'_sha256']
+deliveries=[]
+for prefix in ['b','c']:
+    for e in read(r/f'{prefix}-leveranser.json')['leveranser']:
+        j=e['jobb'];p=root/e['resultat'];assert sha(p)==e['sha256'];im=Image.open(p)
+        assert im.mode=='RGBA' and im.size==(1536,1024)
+        alpha=np.array(im)[:,:,3];allowed=np.zeros(alpha.shape,bool)
+        for cp in meta(j)['ruter']:
+            x,y,X,Y=target(j,cp['rute']);allowed[y:Y,x:X]=True
+        assert not np.any(alpha[~allowed]),j
+        run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True)
+        assert 'Utfall: OK' in run.stdout,(j,run.stdout)
+        (r/f'root-{j}-kontroll.txt').write_text((run.stdout+run.stderr).rstrip()+'\n')
+        deliveries.append({'jobb':j,'sha256':sha(p),'kontroll':'OK','antall_ruter':len(meta(j)['ruter'])})
+(r/'root-mottakskontroll.json').write_text(json.dumps({'kilder_uendret':len(locks),'b':b,'c':c,'vertikalvendinger':flipped,'uendrede_smalag':copied,'cel257_RGBA_endringer':24,'cel257_alfaendringer_inne_i_avgrenset_nytt_felt':local_alpha_changes,'leveranser':deliveries,'runtime':False,'ny_brukergodkjenning':False},ensure_ascii=False,indent=2)+'\n')
+print('B/C58: 90 ruter, 5 ark OK; kildeidentitet, metadata, donortransformasjoner, lokale rettinger og arkgrenser kontrollert.')

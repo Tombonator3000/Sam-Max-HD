@@ -109,3 +109,5 @@
 - [x] Levert ti jobber i bestilling 55: 32 Max-ruter, ni Sam-ruter og 41 Mini Vortex-ruter. Alle OK. Åttende Vortex-ark er kontrollert og følger bestilling 56.
 
 - [x] Levert sju jobber i bestilling56: 52 Sam/bøtteruter,34 Samhoder og fire siste Mini Vortex-ruter. Alle OK. Max066s rekvisitt er kildeavklart og fortsetter i59.
+
+- [x] Levert bestilling58: fem nye Max-ark,90 ruter; seks munnfelt rettet i fire tidligere ark. Alle ni ark OK.

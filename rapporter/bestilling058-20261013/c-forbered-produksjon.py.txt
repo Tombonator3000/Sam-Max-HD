@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib
+R=Path.cwd();O=R/'rapporter/bestilling058-20261013';cells=json.loads((O/'c-rutekart205.json').read_text())['ruter'];byid={x['rute']:x for x in cells};ids=[257,258,274,289,290,288,291];out=Image.new('RGB',(1600,900),(0,200,200))
+for i,cid in enumerate(ids):
+ c=byid[cid];p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']);q=p.resize((p.width*10,p.height*10),Image.Resampling.NEAREST);out.paste(q,(i%4*400+(400-q.width)//2,i//4*450+(450-q.height)//2))
+out.save(O/'c-egne-originalgruppe.png')
+# Newly painted donor style context only, stable unaffected head states, vertical flip.
+s=Image.new('RGBA',(900,420));d=ImageDraw.Draw(s)
+j=json.load(open(R/'jobber/fig003_01/jobb.json'));im=Image.open(R/'jobber/fig003_01/resultat.png')
+for i,cid in enumerate([384,386,389]):
+ c=next(x for x in j['ruter'] if x['rute']==cid);x,y,x2,y2=c['synlig'];p=im.crop((64+x*4,32+y*4,64+x2*4,32+y2*4)).transpose(Image.Transpose.FLIP_TOP_BOTTOM);p=p.resize((p.width*2,p.height*2),Image.Resampling.NEAREST);s.paste(p,(i*300+20,20))
+s.save(O/'c-ny-donorstil.png')
+base=(R/'jobber/fig205_01/prompt.txt').read_text();extra='''
+
+SEPARATE SOURCE CLARIFICATION AND GROUPING FOR THIS CALL:
+Generate only the seven isolated upside-down Max heads from image 1, in exactly its 4-column by 2-row layout (top row four, bottom row three, last cell empty). This is a production sub-sheet; final exact sizes/packing are done separately. No text, captions, background, bodies or extra variants. Keep generous blank separation. Real transparent alpha.
+Image 1 is the authoritative source for every expression, ear bend, head silhouette, palette and upside-down orientation. Image 2 contains previously NEW-painted Max head components as style-only context: clean restrained outline, cream-white, flat one-shade rendering. Image 3 is the approved identity sheet, also only for style. Do NOT turn the heads upright. Their ears extend DOWNWARD, mouths are at TOP of face and noses/eyes below mouth. These are Max, not hanging rabbits by a rope; no rope or clothes.
+Top left cel257: sideways head, closed white zigzag tooth grin at the TOP, small dark eyes and pink nose below, two asymmetric downward ears. Top second cel258: BACK of head, entirely blank cream face silhouette with no eyes, nose, mouth, teeth or pink ear interiors; two plain downward ears, source exact shapes. Top third cel274: small SIDE mouth opening at upper-left/top, black cavity and WHITE teeth only, no red tongue or red inside-mouth fill, downward ear bends as source. Top fourth cel289: front head with tiny red-brown tongue protruding UPWARD from the top mouth; keep that one source tongue, no broader red mouth area. Bottom left cel290: asymmetric upper-left small black/white mouth opening, no red fill/tongue; exact source ear and face angles. Bottom second cel288: front head with closed/narrow tooth row at top, two downward ears and tiny nose; no red mouth interior. Bottom third cel291: small dark pursed mouth near top with no teeth or tongue; nose/eyes and downward ears exactly as source.
+Preserve original cream/tan shadows and pink nose/ear interiors without intensifying. Match consistent same Max identity and head scale. Avoid new anatomy and expressive flourish. Smooth newly drawn contours, not enlarged pixel stairs.
+''';(O/'c-egne-prompt01.txt').write_text(base+extra)
+print(ids)

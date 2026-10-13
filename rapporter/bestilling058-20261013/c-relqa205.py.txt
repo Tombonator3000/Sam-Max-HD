@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np
+R=Path.cwd();O=R/'rapporter/bestilling058-20261013';C=json.loads((O/'c-rutekart205.json').read_text())['ruter'];D={x['rute']:x for x in C}
+def part(cid,hd):
+ c=D[cid]
+ if hd:
+  f=O/f'c-cel{cid}.png'
+  if not f.exists():return None
+  return Image.open(f).convert('RGBA')
+ p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']).convert('RGBA');a=np.array(p);a[:,:,3]=np.where(np.all(a[:,:,:3]==[0,200,200],axis=2),0,255);p=Image.fromarray(a);return p.resize((p.width*4,p.height*4),Image.Resampling.NEAREST)
+def compose(ids,hd):
+ out=Image.new('RGBA',(280,300))
+ for cid in ids:
+  p=part(cid,hd)
+  if p is None:continue
+  x,y,_,_=D[cid]['synlig_rel'];out.alpha_composite(p,(130+x*4,30+y*4))
+ return out
+sets=[[129,257],[129,257,385],[128,256],[128,256,384],[130,258]]
+out=Image.new('RGB',(1500,660),(150,160,160));dr=ImageDraw.Draw(out)
+for i,ids in enumerate(sets):
+ dr.text((i*300+5,5),str(ids),fill='black')
+ for k in [0,1]:p=compose(ids,bool(k));out.paste(p,(i*300,k*320+25),p)
+out.save(O/'c-rel-HD.png')
+for r,body in [(1,129),(2,128),(3,130)]:
+ arr=[c for c in C if c['animasjon']==4 and c['retning']==r];out=Image.new('RGB',(1680,320*((len(arr)+5)//6)),(150,160,160));dr=ImageDraw.Draw(out)
+ for i,c in enumerate(arr):
+  x=i%6*280;y=i//6*320;dr.text((x+5,y+3),f"body{body}+head{c['rute']}",fill='black');p=compose([body,c['rute']],True);out.paste(p,(x,y+20),p)
+ out.save(O/f'c-tale-rel-r{r}.png')

@@ -9,3 +9,9 @@ Innebygd ChatGPT imagegen, 2 kall knyttet til dette arket. Eksakt bildemodell er
 Uendret egenkontroll: **OK**. Se rapporter/bestilling053-20261013/b-fig003_02-kontroll-slutt.txt. Resultat SHA256: `afcb5daa277562c4c8a9a5c5c1ea6b6323beef4f08917594b3a797dc42515e78`. Kildelås og sluttbevis: b-kildehash.json, b-ankerhash.json og b-kildehash-slutt.json i rapporter/bestilling053-20261013. Alle 16 jobbkilder og 7 ankre er uendret.
 
 Alle ruter er sett i b-celqa og statiske rel-sammensettinger i b-sammensetting-hd-1..3. Det finnes 25 diagnostiske sammensettinger, men de beviser ikke animasjonstiming eller faktisk runtime. Tegningen har rundere lemmer/ansikter, renere tannformer, mer markert svart kontur og mykere skygger enn originalpikslene. Gestus er ikke gitt et ubekreftet funksjonsnavn. Runtime=false, ny individuell brukergodkjenning=false.
+
+## Kildetro munnretting 2026-10-14
+
+De kildeidentiske munnfeltene 418 er rettet med nye, lokalt genererte svart/hvite munnfelter fra bestilling 058. Originalen har ikke rødt i disse feltene. Bare RGB inne i de dokumenterte munnrektanglene er erstattet; all alfa og alle øvrige atlaspiksler er uendret. Førversjonen er bevart i `rapporter/bestilling058-20261013/root-fig003_02-for-munn.png`. Bevis: `rapporter/bestilling058-20261013/root-maxmunn-rettingbevis.json`.
+
+Ny SHA-256: `9469c98ea53587212d81a28a011301ec56aba7dce29ee01dc504f89dec03b6ef`. Egenkontroll: OK. Ingen ny individuell brukergodkjenning, import eller runtime-test.

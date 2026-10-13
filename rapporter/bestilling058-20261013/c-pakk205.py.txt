@@ -1,0 +1,43 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFilter
+import json,hashlib,numpy as np
+R=Path.cwd();O=R/'rapporter/bestilling058-20261013';C=json.loads((O/'c-rutekart205.json').read_text())['ruter'];cand=json.loads((O/'c-dublettkandidater.json').read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();records=[];raw=Image.open(O/'c-egne-raa01.png').convert('RGBA');ids=[257,258,274,289,290,288,291];new={}
+def fit(p,w,h):
+ a=np.array(p);bb=Image.fromarray((a[:,:,3]>=128).astype('uint8')*255).getbbox();p=p.crop(bb);a=np.array(p);reach=np.array(Image.fromarray((a[:,:,3]>=128).astype('uint8')*255).filter(ImageFilter.MaxFilter(5)))>0;a[:,:,3][(a[:,:,3]<32)&~reach]=0;p=Image.fromarray(a).convert('RGBa').resize((w,h),Image.Resampling.LANCZOS).convert('RGBA');return p
+for i,cid in enumerate(ids):
+ c=next(x for x in C if x['rute']==cid);x,y,x2,y2=c['RGBA_maalfelt'];p=raw.crop((i%4*raw.width//4,i//4*raw.height//2,(i%4+1)*raw.width//4,(i//4+1)*raw.height//2));new[cid]=fit(p,x2-x,y2-y)
+raw2=Image.open(O/'c-munn-raa02.png').convert('RGBA')
+for i,cid in enumerate([288,291]):
+ c=next(x for x in C if x['rute']==cid);x,y,x2,y2=c['RGBA_maalfelt'];new[cid]=fit(raw2.crop((i*raw2.width//2,0,(i+1)*raw2.width//2,raw2.height)),x2-x,y2-y)
+base257=Image.open(O/'c-257-donor-nar.png').convert('RGBA')
+# Newly generated tan rim fragment, ordinary rectangular scaling. Source supplies position only.
+piece=Image.open(O/'c-257-raa03.png').convert('RGBA').crop((898,53,935,78)).resize((6,4),Image.Resampling.LANCZOS)
+base257.paste(piece,(62,4));new[257]=base257
+new[295]=new[258].copy()
+for c in C:
+ cid=c['rute'];rec={'cel':cid,'jobb':c['jobb'],'target':c['RGBA_maalfelt'],'rel':c['metadata'],'synlig_rel':c['synlig_rel']}
+ if cid in new:p=new[cid];rec.update({'metode':'innebygd imagegen + helskalering','raw':'rapporter/bestilling058-20261013/c-egne-raa01.png','raw_sha256':sha(O/'c-egne-raa01.png')})
+ else:
+  d=next(x for x in cand[str(cid)] if x['jobb'].startswith('fig003_'));j=json.load(open(R/'jobber'/d['jobb']/'jobb.json'));dc=next(x for x in j['ruter'] if x['rute']==d['cel']);x,y,x2,y2=dc['synlig'];box=[64+x*4,32+y*4,64+x2*4,32+y2*4];df=R/'jobber'/d['jobb']/'resultat.png';p=Image.open(df).convert('RGBA').crop(box);rec.update({'metode':d['modus'],'donor':str(df.relative_to(R)),'donor_sha256':sha(df),'donor_cel':d['cel'],'donor_box':box,'donor_RGBA_sha256':hashlib.sha256(p.tobytes()).hexdigest(),'kildeRGB_eksakt':True})
+  if d['cel'] in [395,402,418]:
+   replacement=O/f'b-cel{d["cel"]}-rettet.png'
+   if not replacement.exists():rec['hold']='avventer korrigert donor';records.append(rec);continue
+   p=Image.open(replacement).convert('RGBA');rec['rettet_donor']=str(replacement.relative_to(R));rec['rettet_donor_sha256']=sha(replacement)
+  if d['modus']=='vertikalt_snudd':p=p.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+ if cid==257:rec.update({'raw':'rapporter/bestilling058-20261013/c-257-raa03.png','raw_sha256':sha(O/'c-257-raa03.png'),'underlag':'rapporter/bestilling058-20261013/c-257-donor-nar.png','underlag_sha256':sha(O/'c-257-donor-nar.png'),'nytt_felt':[62,4,6,4],'raw_utsnitt':[898,53,935,78]})
+ if cid in [288,291]:rec.update({'raw':'rapporter/bestilling058-20261013/c-munn-raa02.png','raw_sha256':sha(O/'c-munn-raa02.png')})
+ p.save(O/f'c-cel{cid}.png');rec['komponent']=str((O/f'c-cel{cid}.png').relative_to(R));rec['sha256']=sha(O/f'c-cel{cid}.png');rec['RGBA_sha256']=hashlib.sha256(p.tobytes()).hexdigest();records.append(rec)
+for n in range(1,4):
+ name=f'fig205_{n:02}';out=Image.new('RGBA',(1536,1024))
+ for c in C:
+  if c['jobb']!=name:continue
+  f=O/f'c-cel{c["rute"]}.png'
+  if f.exists():out.paste(Image.open(f),tuple(c['RGBA_maalfelt'][:2]))
+ out.save(O/f'c-{name}-kandidat.png')
+for start in range(0,len(C),8):
+ out=Image.new('RGB',(1440,720),(150,160,160));dr=ImageDraw.Draw(out)
+ for i,c in enumerate(C[start:start+8]):
+  x=i%4*360;y=i//4*360;dr.text((x+3,y+3),f"{c['jobb']} cel{c['rute']}",fill='black');p=Image.open(R/'jobber'/c['jobb']/'original_1x.png').crop(c['synlig']);p=p.resize((p.width*3,p.height*3),Image.Resampling.NEAREST);out.paste(p,(x+5,y+30));f=O/f'c-cel{c["rute"]}.png'
+  if f.exists():q=Image.open(f);q=q.resize((round(q.width*.75),round(q.height*.75)),Image.Resampling.LANCZOS);out.paste(q,(x+185,y+30),q)
+ out.save(O/f'c-ruteqa-{start//8+1}.png')
+(O/'c-komponentbevis.json').write_text(json.dumps(records,indent=2)+'\n');print('ready',sum('hold' not in z for z in records),'held',[(z['cel'],z.get('hold')) for z in records if 'hold' in z])

@@ -1,0 +1,34 @@
+from pathlib import Path
+import json,hashlib
+r=Path('rapporter/bestilling058-20261013');reg=json.loads((r/'b-ruteregister.json').read_text());d=json.loads((r/'b-donorbevis.json').read_text());text='''# Kildeplan for fig325_01 og fig325_02
+
+Motivet er Max, ikke Sam. Originalbildene, jobbnavn, prompt og RGB-identiske donorkilder samsvarer om dette. Ingen nye klær eller rekvisitter vises. Ark01 har29 cels:27 hoder og2 små separate skjøtecels. Hver skjøt inneholder to adskilte lyse former, så de fire synlige små merkene er to cels, ikke fire nye ruter. Ark02 har3 bakhoder og1 hel stående Max. Alle33 cels er visuelt sett i b-kilder-*.png. Ingen produksjon eller generering er startet.
+
+## Geometri og lag
+
+Begge originale atlas er352x240 med cyan bakgrunn(0,200,200). HD-lerret er1536x1024, innhold[64,32,1408,960]. Hver synlig-boks skaleres4x med offset(64,32). Hoder ligger på lag3, skjøtene512/513 pålag4, helfigur0 pålag0. Kildemetadata for kostyme325 er rom66, format0x58,16 farger, rom66-palett0, fire retninger og speil=false. Bevar originalens lyse kremfarge, beige skygge, rosa nese/ører og hver sorte/hvite/røde munnstilling.
+
+Alle33 valgte donorers originale synlig-RGBA er byte-identiske, også RGB-paletten, med325kilden. Original w/h er også identisk. Rel-koordinatene er IKKE like:325 har gjennomgående x-1,y+19 originalpiksler relativt til donor. Dette tilsvarer(-4,+76)HD ved lagplassering, ikke en beskjed om å flytte atlasruten.325metadata beholdes. Ingen antatt lik timing/runtime. Tabellen og b-donorbevis.json gir alle utsnitt og koordinater.
+
+## Kontekst og donorer
+
+Registeret skript-kostymekoblinger.tsv har325 i globale/scrp_065.txt:375 aktør9, globale/scrp_066.txt:195 aktør11, rom_022/inngang.txt:127 aktør6 og rom_042/lokal_201.txt:17 aktør7. Registerkoblinger er ikke lest fullscript eller bevist hendelsesforløp. Ingen konkret funksjonsfortelling er nødvendig for å bevare de identiske Max-cellene.
+
+Valgte nye donorer er fig003_01, fig003_02 og fig005_03. De32 første kan kopieres fra levert Max-kunst; helfigur0 har eksakt kildepartner fig005_03:0.386 og423 har samme originale synlig-RGBA; planen bruker003_01:386 for begge. Andre kildeidentiske kandidater finnes i b-ruteregister.json, men donorbytte må ikke være tilfeldig. b-donorhash.json låser12 donor-/kildefiler. Åtte325kildefiler er låst i b-kildehash.json. Fig326 er ikke endret.
+
+## Viktig visuell donorbegrensning
+
+Alle fem b-donorer-ark er sett. RGB-identisk original gir grunnlag for gjenbruk, men godkjenner ikke automatisk tidligere HD-tolkninger. Tre konkrete fargeforbehold:donor395 har en rød liten munnform der original395 har svart/hvitt;donor402 har rød strek nederst i munnen mens original402 ikke har rødt;donor418 har rød liten munnform mens original418 ikke har rødt. Dette skal avklares med rot før kopiering som ferdigleveranse. Øvrige hoder har renere, rundere øyne og bredere glatte munnkonturer.413/419s tidligere neserettede donorer har én rosa nese hver, egne o-munner;411 har ingen rød tunge etter rettingen.
+
+512/513 er14x2 originalpiksler og skal leveres56x8 med de to små adskilte nye formene beholdt. Checker kan hoppe over så små kildearealer; særskilt alfa-/pikselunion og donorhash kreves. Ikke slett dem for å fåOK. Helfigur0 må ikke få ekstra hode pålag3 uten faktisk animasjons-/sammensettingsbevis. Ingen Sam-hovedark brukes; Max-hovedarket er relevant identitetsanker.
+
+## Foreslått behandling
+
+Etter rotgjennomgang:presis bytekopiering av dokumenterte NYE donorutsnitt til hver325synlig-boks, uten generering der donor er motivmessig korrekt, uten originalsiluettmasker, skalering eller warp. Lokale native imagegen-rettinger bare for reelle arvede motivavvik, uten å endre fryste donorfiler. Kontroller alle33 cels, de to skjøtene særskilt, rel-lagplassering og uendrede kilder. Runtime og ny individuell brukergodkjenning forblir false.
+
+| Jobb | Cel | Lag | Rel | Donor | HD-målboks |
+|---|---:|---:|---|---|---|
+'''
+for z,p in zip(reg['ruter'],d):text+=f"| {z['jobb']} | {z['rute']} | {z['lag']} | {z['metadata']['rel_x']},{z['metadata']['rel_y']} | {p['donor_job']}:{p['donor_cel']} | {p['target_hd_box']} |\n"
+(r/'b-kildeplan.md').write_text(text)
+locks=json.loads((r/'b-kildehash.json').read_text())['filer'];dh=json.loads((r/'b-donorhash.json').read_text());bad=[p for p,h in {**locks,**dh}.items() if hashlib.sha256(Path(p).read_bytes()).hexdigest()!=h];assert not bad;(r/'b-kildehash-kontroll.json').write_text(json.dumps({'kilder':len(locks),'donorfiler':len(dh),'avvik':bad,'produksjon_startet':False},indent=2))

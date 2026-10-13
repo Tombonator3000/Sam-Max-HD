@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np,hashlib
+r=Path('rapporter/bestilling058-20261013');sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();ds=json.loads((r/'b-donorbevis.json').read_text());reg=json.loads((r/'b-ruteregister.json').read_text())['ruter'];small=[];lookup={};maps=[]
+for z in reg:
+ p=Path('jobber',z['jobb']);m=json.loads((p/'jobb.json').read_text());s=Image.open(p/'original_1x.png').convert('RGBA').crop(tuple(z['synlig']));a=np.array(s);a[:,:,3]=np.where(np.all(a[:,:,:3]==m['bakgrunn'],axis=2),0,255);s=Image.fromarray(a);d=next(v for v in ds if v['jobb']==z['jobb'] and v['cel']==z['rute']);h=Image.open(p/'resultat.png').crop(tuple(d['target_hd_box']));lookup[z['rute']]=(s,h,z);maps.append({'jobb':z['jobb'],'cel':z['rute'],'target':d['target_hd_box'],'rgba_sha256':hashlib.sha256(h.tobytes()).hexdigest()})
+ if z['rute'] in [512,513]:
+  donor=Image.open(Path('jobber',d['donor_job'],'resultat.png')).crop(tuple(d['donor_hd_box']));small.append({'cel':z['rute'],'source_synlig':z['synlig'],'source_opaque':int((a[:,:,3]>0).sum()),'hd_size':h.size,'hd_alpha128':int((np.array(h)[:,:,3]>128).sum()),'donor_rgba_identisk':bool(np.array_equal(np.array(h),np.array(donor))),'target':d['target_hd_box']})
+out=Image.new('RGB',(1500,650),(160,160,160));dr=ImageDraw.Draw(out)
+for k,ids in enumerate([[385,513],[384,512],[0]]):
+ for q in [0,1]:
+  canvas=Image.new('RGBA',(400,400))
+  for id in ids:
+   s,h,z=lookup[id];x,y,w,hh=z['rekt'];sx,sy,ex,ey=z['synlig'];c=z['metadata'];im=s.resize((s.width*4,s.height*4),Image.Resampling.NEAREST) if q==0 else h;canvas.alpha_composite(im,((50+c['rel_x']+sx-x)*4,(50+c['rel_y']+sy-y)*4))
+  canvas=canvas.resize((250,250));out.paste(canvas,(k*500+q*250,60),canvas);dr.text((k*500+q*250+5,10),f'{ids} '+['kilde','HD'][q],fill='black')
+out.save(r/'b-rel-kontroll.png');(r/'b-smaaskjoter-bevis.json').write_text(json.dumps(small,indent=2));(r/'b-rutekart-slutt.json').write_text(json.dumps(maps,indent=2));locks=json.loads((r/'b-kildehash.json').read_text())['filer'];don=json.loads((r/'b-donorhash.json').read_text());assert all(sha(p)==h for p,h in {**locks,**don}.items());(r/'b-kildehash-slutt.json').write_text(json.dumps({'kilder':8,'donorfiler':12,'avvik':[]},indent=2));deliver=[]
+for j in ['fig325_01','fig325_02']:
+ p=Path('jobber',j,'resultat.png');n=29 if j.endswith('01') else 4;rec={'jobb':j,'resultat':str(p),'sha256':sha(p),'egenkontroll':'OK','kontrollfil':str(r/f'b-{j}-kontroll.txt'),'forsok':1 if n==29 else 0,'antall_ruter':n,'smaaskjoter':2 if n==29 else 0,'klar_for_mottak':True,'runtime':False,'ny_brukergodkjenning':False};deliver.append(rec);Path('jobber',j,'notat.md').write_text(f'''# {j}
+
+Max kostyme325, {n} originale cels. Donorkildene er RGB-identiske med325, og w/h er identisk. Ny kunst kopieres uten skalering fra fig003_01/02 og fig005_03.325s egne rel-koordinater beholdes:delta(-1,+19) originalpiksler mot donor, ikke en flytting av atlasbokser.
+
+Tre munnfelt395/402/418 har fått fjernet kildefremmed rødt med ett lokalt innebygd ChatGPT imagegen-kall. Eksakt modellnavn er ikke eksponert. Bare små munnrektangler er endret; alfa og resten av hodene er byte-identisk. Separate korrigerte komponenter og råprompt er bevart i rapport58. Donorfiler er urørt. Ingen originalmasker, warp eller originalkunst i sluttbildene.
+
+Egenkontroll OK.325_01 har27 ordinære ruter kontrollert, samt2 små skjøtecels kontrollert separat med eksakt donor-RGBA og56x8 størrelse.325_02 har4/4OK. Alle33 cels er vist i kilde/donorark og helark. b-rel-kontroll.png viser statiske lagplasseringer, ikke runtime eller timing.
+
+Resultat SHA256:{rec['sha256']}. Kilder8 og donor-/kildefiler12 er uendret, se b-kildehash-slutt.json. Proveniens:b-donorbevis.json,b-komposisjonsbevis.json,b-munn-rettingbevis.json. HD beholder tidligere rundere øyne, renere tannkontur og lys skygge som tegningsforbehold. Runtime false, ny individuell brukergodkjenning false.
+''')
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':deliver,'runtime':False,'ny_brukergodkjenning':False},indent=2));(r/'b-kilde-qa.md').write_text('''# Max325 sluttkontroll
+
+Begge ark er OK:27 ordinære hodecels i01 og4 cels i02. De to14x2 skjøtene512/513 er bevart56x8 og donor-RGBA-identiske, med egen kontroll i b-smaaskjoter-bevis.json. Alle33 kildecels er RGB-identiske med valgte donorkilder.30 nye komponenter er kopiert byte-identisk,3 har avgrenset lokal munnretting. Alle andre piksler og alfa i de3 er uendret.
+
+Rot har sett og godtatt de3 korrigerte munnfeltene etter b-munn-rettet-qa.png.395/402/418 har ikke lenger nye røde munnfelt. Rosa neser/ører, egne munnvinkler og de øvrige donorenes eksisterende tegning består. Ingen fryste003-filer er endret av B.
+
+Alle fem kildeark, fem donorark, særskilt munnbevis og begge sammensatte helark er visuelt sett. Rel-bevis viser samme Max-hode/skjøtforhold med325s egne koordinater. Dette er statisk geometri, ingen runtime eller timing. Ingen nye rekvisitter, klær eller Sam-identitet er tilført. Fortsatte tegningsforbehold er rundere øyne, tydeligere tenner og lysere glatte skygger enn originalpikslene.
+
+Åtte kildefiler og tolv donor-/kildefiler er hashkontrollert uendret. b-leveranser.json låser faktiske sluttfiler. Råbilde/prompt/oppskrifter er bevart, ingen eksakt modellversjon påstås. Runtime og ny individuell brukergodkjenning false.
+''');print(small);print(deliver)

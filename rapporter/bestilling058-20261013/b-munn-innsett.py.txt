@@ -1,0 +1,14 @@
+from PIL import Image,ImageDraw
+from pathlib import Path
+import numpy as np,json,hashlib
+r=Path('rapporter/bestilling058-20261013');raw=Image.open(r/'b-munn-raa01.png').convert('RGBA');plan=json.loads((r/'b-munn-patchplan.json').read_text());proof=[];out=Image.new('RGB',(1500,700),(160,160,160));draw=ImageDraw.Draw(out)
+for k,z in enumerate(plan):
+ id=z['cel'];old=Image.open(r/f'b-cel{id}-for.png').convert('RGBA');a=np.array(raw.crop((k*640,0,(k+1)*640 if k<2 else raw.width,raw.height)));ys,xs=np.where(a[:,:,3]>128);bb=(int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1));new=Image.fromarray(a).crop(bb).resize(old.size,Image.Resampling.LANCZOS);arr=np.array(old);n=np.array(new);x,y,e,f=z['mouth_patch'];before=arr.copy();# only generated mouth rectangle, preserve alpha exactly
+ arr[y:f,x:e,:3]=n[y:f,x:e,:3];arr[:,:,3]=before[:,:,3];im=Image.fromarray(arr);p=r/f'b-cel{id}-rettet.png';im.save(p);diff=np.any(arr!=before,axis=2);outside=diff.copy();outside[y:f,x:e]=False;proof.append({'cel':id,'size':old.size,'raw_bbox_i_slot':bb,'mouth_patch':z['mouth_patch'],'endrede':int(diff.sum()),'utenfor':int(outside.sum()),'alfa_identisk':bool(np.array_equal(arr[:,:,3],before[:,:,3])),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+ for q,a in enumerate([old,im]):
+  a=a.resize((235,330),Image.Resampling.NEAREST);out.paste(a,(k*500+q*245,40),a)
+ draw.text((k*500+5,5),f'cel{id} før / rettet',fill='black')
+ # mouth enlarged
+ for q,a in enumerate([old,im]):
+  a=a.crop((max(0,x-5),max(0,y-5),min(old.width,e+5),min(old.height,f+5))).resize((235,200),Image.Resampling.NEAREST);out.paste(a,(k*500+q*245,440),a)
+out.save(r/'b-munn-rettet-qa.png');(r/'b-munn-rettingbevis.json').write_text(json.dumps(proof,indent=2));print(proof)
