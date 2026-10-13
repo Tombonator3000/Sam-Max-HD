@@ -37,4 +37,5 @@
 - [x] Rettet rom049 med Toms uttrykkelig valgte presise vektorrekonstruksjon. Egenkontroll OK; SVG-master, 41 originalfarger og delte grenser bevart. Enkelte trappekanter består ved tette knutepunkter, ingen ny individuell bildegodkjenning.
 - [x] Levert bestilling 12 med ti OK, to identiske romoverlapp og låst rom058-master.
 - [x] Levert bestilling 13 med åtte OK, to SJEKK og kildeavklart mammut/hyssing.
-- [ ] Fortsett bestilling 14 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 14 med sju OK og tre SJEKK, punktgrupper og kildefarger kontrollert.
+- [ ] Fortsett bestilling 15 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.

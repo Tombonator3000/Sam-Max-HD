@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 19:33 (norsk tid)
+Oppdatert 2026-10-13 19:40 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 56 hele rom og 1 delvis levert (88 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 32 levert, inkludert 6 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 60 hele rom levert (92 deler), inkludert 1 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 38 levert, inkludert 9 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -214,16 +214,16 @@ Rom 58, 59, 60, 61.
 
 Rom 61, 62, 66, 67, 68.
 
-- [ ] `rom061_del2av2` (rom 61 Strikkhoppgrotten i fjellet, del 2/2)
-- [ ] `rom062` (rom 62 Tjæregropen)
-- [ ] `rom066` (rom 66 Car Bomb (minispill))
-- [ ] `obj598_01` (rom 67 Rulletekst og fyrverkeri, objekt 598 tilstand 01)
-- [ ] `obj599_01` (rom 67 Rulletekst og fyrverkeri, objekt 599 tilstand 01)
-- [ ] `obj600_01` (rom 67 Rulletekst og fyrverkeri, objekt 600 tilstand 01)
-- [ ] `obj601_01` (rom 67 Rulletekst og fyrverkeri, objekt 601 tilstand 01)
-- [ ] `obj602_01` (rom 67 Rulletekst og fyrverkeri, objekt 602 tilstand 01)
-- [ ] `obj603_01` (rom 67 Rulletekst og fyrverkeri, objekt 603 tilstand 01)
-- [ ] `rom068` (rom 68 Highway Surfing (minispill))
+- [x] `rom061_del2av2` (rom 61 Strikkhoppgrotten i fjellet, del 2/2)
+- [x] `rom062` (rom 62 Tjæregropen)
+- [x] `rom066` (rom 66 Car Bomb (minispill))
+- [x] `obj598_01` (rom 67 Rulletekst og fyrverkeri, objekt 598 tilstand 01)
+- [x] `obj599_01` (rom 67 Rulletekst og fyrverkeri, objekt 599 tilstand 01)
+- [x] `obj600_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 67 Rulletekst og fyrverkeri, objekt 600 tilstand 01)
+- [x] `obj601_01` (rom 67 Rulletekst og fyrverkeri, objekt 601 tilstand 01)
+- [x] `obj602_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 67 Rulletekst og fyrverkeri, objekt 602 tilstand 01)
+- [x] `obj603_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 67 Rulletekst og fyrverkeri, objekt 603 tilstand 01)
+- [x] `rom068` (rom 68 Highway Surfing (minispill))
 
 ## Bestilling 15
 
@@ -3449,3 +3449,5 @@ Bestilling 12: ti OK levert, med kildekontrollert fest, bassengtilstander og gr�
 Bestilling 13: 8 OK og 2 SJEKK (obj566_01 og rom060 del 2). Ti bilder levert, kontrollavvik beholdt. Rom061-master og neste del er låst; se `rapporter/bestilling013-20261013/RAPPORT.md`. Bestilling 14 fortsetter.
 
 Rom049 er senere rettet etter Toms uttrykkelige vektorvalg og levert OK; tidligere avvist bestilling 11-kandidat er historikk. Se `rapporter/rom049-vektor-20261013/RAPPORT.md`. Noen trappekanter er bevart ved tette knutepunkter.
+
+Bestilling 14: 7 OK og 3 SJEKK, ti bilder levert. Komponentkontroll av stjerner og lokale figur-/palettrettinger bevart. Historisk promptmetadataavvik dokumentert, beskyttede kilder urørt. Se `rapporter/bestilling014-20261013/RAPPORT.md`. Bestilling 15 fortsetter.

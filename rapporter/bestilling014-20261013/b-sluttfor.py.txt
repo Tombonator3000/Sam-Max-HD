@@ -1,0 +1,34 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,subprocess,numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling014-20261013';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+m=json.loads((b/'rapporter/bestilling013-20261013/c-leveranser.json').read_text())
+e=next(e for e in m['fremtidige_deler'] if e['jobb']=='rom061_del2av2')
+assert sha(b/e['fullmaster'])==e['fullmaster_sha256']
+im=Image.open(b/e['fullmaster']);assert im.size==(1952,800)
+a=Image.new('RGB',(1536,1024),(128,128,128));a.paste(im.crop((416,0,1952,800)),(0,112));p=b/'jobber/rom061_del2av2/resultat.png';a.save(p)
+assert sha(p)==e['sha256']
+left=Image.open(b/'jobber/rom061_del1av2/resultat.png')
+assert np.array_equal(np.array(left)[112:912,416:1536],np.array(a)[112:912,:1120])
+q=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p)],capture_output=True,text=True)
+(r/'rom061_del2av2-kontroll.txt').write_text(q.stdout+q.stderr);print(q.stdout)
+own=['rom061_del2av2','rom062','rom066','rom068'];entries=[]
+notes={
+'rom061_del2av2':'Eksakt klipp fra låst 13-master, x=416, ingen generering. SHA identisk med forhåndskontrollert fremtidig del. Overlapp 1120 × 800 byte-identisk med del1. Plattform, sele, skjerm, fjellåpning og trær bevart.',
+'rom062':'Brunt dyrehode, åpen munn, lyse lange tenner, bøyd forlem og separat brunt fragment med hul grå ende bevart. Ingen art er fastslått. Begge synlige åpningsoverflater i høyre fragment beholdt. HD tolker pels og små tannkonturer; ingen ny badegjest.',
+'rom066':'Visuelt kontrollert 10 × 10 celler på oppreist brett og nederste perspektivbrett. Ingen nye markører. Max, CAR BOMB, to raketter, hydrantene, bombekasse, bomber, sluk og stolpe er med. Linjekryss og brettkontur sammenlignet med original ved samme størrelse. Ingen motorbasert celleplasseringstest er utført.',
+'rom068':'Time uten kolon og Score: med kolon, tomme innvendige tellefelt, oransjegul gradient og tomt svart spillefelt bevart. Ingen vei, biler, tall eller nye objekter. Det finnes svak generert tonestruktur i nesten svart felt; geometrien og tomheten er bevart.'
+}
+for j in own:
+ p=b/'jobber'/j/'resultat.png';c=r/(j+'-kontroll.txt');assert 'Utfall: OK' in c.read_text()
+ entry={'jobb':j,'resultat':str(p.relative_to(b)),'sha256':sha(p),'egenkontroll':'OK','kontrollfil':str(c.relative_to(b)),'forsok':0 if j.startswith('rom061') else 1,'runtime':False,'ny_brukergodkjenning':False}
+ if j.startswith('rom061'):entry.update(fullmaster=e['fullmaster'],fullmaster_sha256=e['fullmaster_sha256'],kilde_manifest='rapporter/bestilling013-20261013/c-leveranser.json')
+ else:entry.update(raw=str((r/(j+'-raa01.png')).relative_to(b)),raw_sha256=sha(r/(j+'-raa01.png')),prompt=str((r/(j+'-prompt01.txt')).relative_to(b)))
+ entries.append(entry)
+ sources=[v for v in json.loads((r/'kildehash.json').read_text()) if v['fil'].startswith('jobber/'+j+'/')]
+ for v in sources:assert sha(b/v['fil'])==v['sha256']
+ (b/'jobber'/j/'notat.md').write_text('# Leveransenotat\n\n'+notes[j]+'\n\nForsøk: '+str(entry['forsok'])+'. Innebygd ChatGPT imagegen for nye bilder; eksakt bildemodell er ikke eksponert. Uendret egenkontroll: OK. Canvas 1536 × 1024 med eksakt grå padding. Kun helskalering og plassering, ingen lokal warp eller originalmaskering.\n\nResultat SHA256: '+entry['sha256']+'\n\nBeskyttede kildehash: '+json.dumps(sources,ensure_ascii=False)+'\n\nRuntime: false. Ny individuell brukergodkjenning: false. Se rapportens prompt, råforsøk og b-kilde-qa.md.\n')
+allsource=json.loads((r/'kildehash.json').read_text())+json.loads((r/'ekstra-kildehash.json').read_text());assert all(sha(b/v['fil'])==v['sha256'] for v in allsource)
+(r/'b-leveranser.json').write_text(json.dumps({'leveranser':entries,'kilder_kontrollert':len(allsource),'kilder_uendret':True,'rom061_overlapp_byteidentisk':[1120,800]},ensure_ascii=False,indent=2)+'\n')
+(r/'b-kilde-qa.md').write_text('# Bestilling 14 B, kilde og egenkontroll\n\nAlle fire leveranser får OK i uendret sjekk_leveranse.py. Dette er ikke runtime eller individuell godkjenning. Alle '+str(len(allsource))+' låste kilder er kontrollert uendret. Det historiske promptmetadataavviket er dokumentert separat av root; faktisk promptinnhold er brukt ordrett før separat presisering.\n\n'+'\n\n'.join('**'+j+':** '+notes[j] for j in own)+'\n\nRutenettkontrollen var visuell kontroll av begge 10 × 10 flater, gjentatte linjer og perspektiv mot originalen; den tekniske helbildekontrollen alene beviser ikke cellefunksjon. Fine materialdetaljer, refleksjoner og pels er nytegnet tolkning. Motorimport, objektoverlegg og dynamisk spilltilstand gjenstår for kodeeiers mottak.\n\nRåforsøk og fullstendige prompter ligger her. b-levering.py.txt dokumenterer helskalering til 1536 × 1024 og innliming av det definerte motivfeltet på RGB128-padding. Ingen originalpiksler er brukt til å maskere konturer. b-sluttfor.py.txt dokumenterer rom061 SHA, klipp og overlapp.\n')
+print(json.dumps({'jobs':own,'protected':len(allsource),'all_OK':True}))

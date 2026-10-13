@@ -1,0 +1,24 @@
+from PIL import Image
+from pathlib import Path
+import shutil
+b=Path('/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren');r=b/'rapporter/bestilling014-20261013';g=Path('/home/tombonator3000t/.codex/generated_images/01a135e9-14ca-7082-b901-a0ecf3e0b936')
+files=[('obj600_01',1,'exec-fa3cb1a9-3880-474c-925f-e1a09dad249e.png'),('obj601_01',1,'exec-add7355f-f8f8-4a58-b996-1fd07f30d29d.png'),('obj602_01',1,'exec-2620728d-87d1-45fa-a1bb-839d44059514.png'),('obj602_01',2,'exec-2d1783a5-ef71-4b71-8d56-a5b24735670d.png'),('obj603_01',1,'exec-3e95341a-eb3c-41ae-b852-6252fa97667a.png'),('obj603_01',2,'exec-c1024004-a76c-410b-8878-983eb12051eb.png')]
+for j,n,f in files:shutil.copy(g/f,r/f'{j}-raa-{n}.png')
+for j,n,box,top,bottom in [('obj600_01',1,(98,358,1438,643),0,16),('obj601_01',1,(128,388,1408,656),20,0),('obj602_01',2,(128,368,1408,636),0,16),('obj603_01',2,(112,366,1424,645),20,0)]:
+ out=Image.new('RGB',(1536,1024),(128,128,128));panel=Image.new('RGB',(1280,288),(0,0,0));art=Image.open(r/f'{j}-raa-{n}.png').convert('RGB').crop(box).resize((1280,288-top-bottom),Image.Resampling.LANCZOS);panel.paste(art,(0,top));out.paste(panel,(128,368));out.save(b/'jobber'/j/'resultat.png')
+# Lokale imagegen-korreksjoner etter basisplasseringen over.
+import numpy as np
+for j,n,f in [('obj601_01',2,'exec-039ed481-7f87-4966-af49-2084615dbb08.png'),('obj603_01',3,'exec-13428d81-0246-4e4f-8ab4-d8771dd71ef7.png'),('obj603_01',4,'exec-2e1bf15b-3a70-45a8-958e-42c895fbb6e7.png')]:
+    if not (r/f'{j}-raa-{n}.png').exists():shutil.copy(g/f,r/f'{j}-raa-{n}.png')
+p=b/'jobber/obj601_01/resultat.png';im=Image.open(p).convert('RGB');box=(1155,521,1267,580);im.paste(Image.open(r/'obj601_01-raa-2.png').crop(box),box[:2]);im.save(p)
+p=b/'jobber/obj603_01/resultat.png';im=Image.open(p).convert('RGB');box=(496,410,624,466)
+patch=Image.open(r/'obj603_01-raa-4.png').convert('RGB').resize((128,56),Image.Resampling.LANCZOS)
+a=np.asarray(patch).astype(float);old=np.asarray(im.crop(box)).astype(float);yy,xx=np.mgrid[:56,:128]
+alpha=np.minimum.reduce([xx,127-xx,yy,55-yy,xx*0+3])/3
+im.paste(Image.fromarray(np.round(a*alpha[:,:,None]+old*(1-alpha[:,:,None])).astype('uint8')),box[:2]);im.save(p)
+# Lokal Max-ansiktskorreksjon, forsøk 5. Råfil bevart i rapportmappen.
+p=b/'jobber/obj603_01/resultat.png';im=Image.open(p).convert('RGB');box=(952,456,1168,560)
+patch=Image.open(r/'obj603_01-raa-5.png').convert('RGB').resize((216,104),Image.Resampling.LANCZOS)
+a=np.asarray(patch).astype(float);old=np.asarray(im.crop(box)).astype(float);yy,xx=np.mgrid[:104,:216]
+alpha=np.minimum.reduce([xx,215-xx,yy,103-yy,xx*0+3])/3
+im.paste(Image.fromarray(np.round(a*alpha[:,:,None]+old*(1-alpha[:,:,None])).astype('uint8')),box[:2]);im.save(p)

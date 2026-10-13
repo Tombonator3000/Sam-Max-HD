@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image,ImageChops
+import json,hashlib
+b=Path(__file__).resolve().parents[2]
+r=b/'rapporter/bestilling014-20261013'
+for j,cols,rows in [('obj598_01',11,8),('obj599_01',16,9)]:
+ im=Image.open(r/f'a-{j}-atlas02-raa.png').convert('RGB')
+ cs=json.loads((r/f'a-{j}-kildekomponenter.json').read_text())
+ meta=json.loads((b/'jobber'/j/'jobb.json').read_text());ox,oy,w,h=meta['bilde_i_lerret']
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste((0,0,0),(ox,oy,ox+w,oy+h))
+ mapping=[]
+ for i,c in enumerate(cs):
+  cx=i%cols;cy=i//cols
+  cell=[round(cx*im.width/cols)+8,round(cy*im.height/rows)+8,round((cx+1)*im.width/cols)-8,round((cy+1)*im.height/rows)-8]
+  cut=im.crop(tuple(cell));px=cut.load()
+  pts=[(x,y) for y in range(cut.height) for x in range(cut.width) if max(px[x,y])>32]
+  if not pts:raise RuntimeError(f'Missing generated component {j} {i+1}')
+  l=max(0,min(q[0] for q in pts)-2);t=max(0,min(q[1] for q in pts)-2);rr=min(cut.width,max(q[0] for q in pts)+3);bb=min(cut.height,max(q[1] for q in pts)+3)
+  rawbox=[cell[0]+l,cell[1]+t,cell[0]+rr,cell[1]+bb]
+  a,bb0,d,e=c['box'];target=[ox+a*4,oy+bb0*4,ox+d*4,oy+e*4]
+  sprite=im.crop(tuple(rawbox)).resize((target[2]-target[0],target[3]-target[1]),Image.Resampling.LANCZOS)
+  out.paste(ImageChops.lighter(out.crop(tuple(target)),sprite),target[:2])
+  mapping.append({'source_id':c['id'],'sourcebox':c['box'],'generatedcell':cell,'generatedbox':rawbox,'targetbox':target,'generated_sprite_sha256':hashlib.sha256(sprite.tobytes()).hexdigest()})
+ out.save(b/'jobber'/j/'resultat.png')
+ (r/f'a-{j}-slutt-punktkobling.json').write_text(json.dumps({'antall':len(mapping),'manglende':[],'metode':'Rektangulaere NY-genererte komponenter, ingen originalpikselmaske. Nykomponentens lysgrense32 brukes bare for klippeboks, ikke for a endre piksler.','koblinger':mapping},indent=2))
