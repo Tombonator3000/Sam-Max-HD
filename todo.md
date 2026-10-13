@@ -87,3 +87,5 @@
 - [x] Levert bestilling 44 med 8 OK, 2 SJEKK og 14 faktiske feltkontroller.
 
 - [x] Levert ni jobber i bestilling45 med22 faktiske feltkontroller;06801 avventer teknisk retting.
+
+- [x] Levert fem jobber i bestilling46 med19 faktiske feltkontroller,04 med SJEKK.

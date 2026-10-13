@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,importlib.util,math
+r=Path(__file__).resolve().parent;root=r.parents[1];s=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(s);s.loader.exec_module(c);out=[]
+for n in range(1,13):
+ d=root/f'jobber/lag068_{n:02d}'
+ if not (d/'resultat.png').exists():continue
+ ref=Image.open(d/'original_1x.png');hd,_=c.part_of(Image.open(d/'resultat.png'),json.loads((d/'jobb.json').read_text()));m=c.compare(ref,hd);blocks=[]
+ for y in [0,100]:
+  for x in [0,106,212]:
+   a=m['eo'][y:y+100,x:x+106];b=m['es'][y:y+100,x:x+106];dx,dy=c.phase_shift(a,b);blocks.append({'boks':[x,y,106,100],'skift':math.hypot(dx,dy),'dx':dx,'dy':dy,'teller_i_checker':bool(a.std()>=1e-3 and b.std()>=1e-3),'std_source':float(a.std()),'std_HD':float(b.std())})
+ out.append({'jobb':d.name,'blokker':blocks});print(d.name,sorted([(round(b['skift'],2),b['boks']) for b in blocks],reverse=True))
+(r/'a-blokkdiagnose.json').write_text(json.dumps(out,indent=2)+'\n')

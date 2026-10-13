@@ -1,0 +1,26 @@
+from pathlib import Path
+import json,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locked=[]
+for name in ['kildehash.json','root-ekstra-kildehash.json']:
+ for e in json.loads((r/name).read_text()):assert sha(root/e['fil'])==e['sha256'];locked.append(e)
+assert sha(root/'jobber/rom068/resultat.png')==json.loads((r/'root-ankerhash.json').read_text())['jobber/rom068/resultat.png']
+(r/'a-kildehashkontroll.json').write_text(json.dumps({'kontrollert':len(locked),'uendrede':len(locked),'rom068_sha256':sha(root/'jobber/rom068/resultat.png'),'checker_sha256':sha(root/'verktoy/sjekk_leveranse.py')},indent=2)+'\n')
+for batch in [45,46,47]:
+ rr=root/f'rapporter/bestilling{batch:03d}-20261013';m=json.loads((rr/'a-forelopige-leveranser.json').read_text())
+ for e in m['leveranser']:
+  j=e['jobb'];n=int(j.split('_')[1]);d=root/'jobber'/j
+  e['forsok']=2 if n in [1,11,12] else 1;e['klar_for_mottak']=e['egenkontroll']!='FEIL';e['status']='klar for mottak' if e['klar_for_mottak'] else 'holdt tilbake, teknisk FEIL uavklart';e['verktoy']='innebygd imagegen';e['eksakt_modell']='ikke eksponert';e['lerret']=[1536,1024];e['padding_RGB']=[128,128,128];e['oppskrift']=str((r/'a-sammensetting.py.txt').relative_to(root));e['oppskrift_sha256']=sha(r/'a-sammensetting.py.txt');e['kilder']=[{'fil':str((d/f).relative_to(root)),'sha256':sha(d/f)} for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']];e['proveniens']=[{'fil':str(p.relative_to(root)),'sha256':sha(p)} for p in sorted(rr.glob(f'a-{j}-*')) if 'raa' in p.name or 'prompt' in p.name];e['tonetilpasning_valgt']=n in [2,4];e['kontroll_sha256']=sha(root/e['kontrollfil'])
+  detail='Kildens separate veifragmenter, én gul strek og egen skjevhet er bevart.' if n<=10 else 'Kildens egne stolpelengder og svart/grålilla sidebelysning er bevart.'
+  if n==1:detail+=' Bakfra-Max uten ansikt, små avskårne deler helt til høyre og begge lave stolpeføtter. Veier fra forsøk2, øvrige motiver fra forsøk1.'
+  if n==11:detail+=' Forsøk2 retter venstre stolpe til lys høyreside, mens de to andre beholder lys venstreside.'
+  if n==12:detail+=' Faktisk metadata er [192,72,24,80], ikke x208 i tidligere kildeplan. Forsøk2 følger synlig sourcebbox [198,72,15,74].'
+  if n in [2,4]:detail+=' Én dokumentert kildepalettbasert tonetilpasning av NYTEGNET lilla veiflate er valgt. Ingen kontur eller posisjon er endret.'
+  detail+=' Komponentuttrekk bruker bare genererte farger; originalbildet er ikke maske. Små fjerne veisilhuetter er forenklet til kildens RGB19,19,19 og en oppfunnet innvendig strek i01 fjernet ved fylling av et lukket hull i NY generert komponent. Nøyaktig algoritme finnes i oppskriften. Det er ingen vektorrekonstruksjon eller lokal warp. Originalens dither er erstattet av glattere og noe lysere malt modellering.'
+  if e['egenkontroll']=='FEIL':detail+=' Uendret checker gir fortsatt FEIL i FFT-blokkmåling. Dette er ikke en godkjent eller ferdig OK-leveranse og skal ikke krysses av.'
+  if e['egenkontroll']=='SJEKK':detail+=' SJEKK gjelder FFT-blokk1,75. Dette oppgis uttrykkelig, ikke som OK.'
+  e['visuell_egenkontroll']=detail
+  (d/'notat.md').write_text(f'# {j}\n\n{detail}\n\nFaktisk uendret egenkontroll: {e["egenkontroll"]}. SHA256: {e["sha256"]}. {e["forsok"]} innebygde genereringsforsøk. Eksakt modell er ikke eksponert. Canvas1536 ×1024 med RGB128-padding. Ingen runtime/import eller ny individuell brukergodkjenning påstås.\n\nAlle kilde-, rå-, prompt- og kontrollhasher finnes i {rr.relative_to(root)}/a-leveranser.json. Samlet nærbilde-QA og kildebevis finnes i bestilling046. Rot eier mottak og Git.\n'.replace('Canvas1536 ×1024','Canvas 1536 × 1024').replace('RGB128','RGB 128'))
+ m.update({'status':'delvis klar; FEIL-kandidater holdt tilbake','runtime':False,'ny_brukergodkjenning':False,'genereringskall':2 if batch in [45,47] else 11,'kilde_qa':'rapporter/bestilling046-20261013/a-kilde-qa.md'});(rr/'a-leveranser.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+ (rr/'a-proveniensregister.json').write_text(json.dumps([{'fil':str(p.relative_to(root)),'sha256':sha(p)} for p in sorted(rr.glob('a-*')) if p.is_file() and any(s in p.name for s in ['raa','prompt','.py.txt'])],ensure_ascii=False,indent=2)+'\n')
+print('15 genereringskall; 4 OK,1 SJEKK,7 FEIL. 52 kilder uendret.')

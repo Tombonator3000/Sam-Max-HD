@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+base=np.array(Image.open(root/'jobber/rom068/resultat.png').convert('RGB'));out=[];rows=[];scenes=[]
+for n in range(1,13):
+ rr=root/f'rapporter/bestilling{45 if n==1 else 47 if n==12 else 46:03d}-20261013';j=f'lag068_{n:02d}';d=root/'jobber'/j;raw=rr/f'a-{j}-raa01.png'
+ if not raw.exists():continue
+ m=json.loads((d/'jobb.json').read_text());gen=Image.open(raw).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS);g=np.array(gen);alpha=np.zeros(base.shape[:2],float);rects=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=128+x*4;y=112+y*4;w=min(w*4,1408-x);h=min(h*4,912-y)
+  if w<=0 or h<=0:continue
+  rects.append([x,y,w,h]);alpha[y:y+h,x:x+w]=1
+ a=np.rint(g*alpha[:,:,None]+base*(1-alpha[:,:,None])).astype('uint8');a[:112]=128;a[912:]=128;a[:,:128]=128;a[:,1408:]=128
+ im=Image.fromarray(a);im.save(d/'resultat.png');cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);cf=rr/f'a-{j}-kontroll.txt';cf.write_text(cp.stdout+cp.stderr);part,_=c.part_of(im,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);obs=[];ref=Image.open(d/'referanse.png')
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];w=min(w,320-x);h=min(h,200-y);corr=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));obs.append({'objekt':o['bilde'],'kantkorrelasjon':corr});b=(128+x*4,112+y*4,128+(x+w)*4,112+(y+h)*4);rows.append((j+' '+o['bilde'],ref.crop(b),im.crop(b)))
+ e={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':{0:'OK',1:'SJEKK',2:'FEIL'}.get(cp.returncode,'FEIL'),'kontrollfil':str(cf.relative_to(root)),'forsok':1,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':False,'objektkontroll':obs,'rektangler':rects,'utenfor_rektangler_byteidentisk':bool(np.array_equal(a[alpha==0],base[alpha==0])),'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'prompt':str((rr/f'a-{j}-prompt01.txt').relative_to(root))};out.append(e);scenes.append((j,ref,im));print(j,e['egenkontroll'],[(o['objekt'],round(o['kantkorrelasjon'],3)) for o in obs])
+for b in [45,46,47]:
+ rr=root/f'rapporter/bestilling{b:03d}-20261013';es=[e for e in out if (45 if e['jobb']=='lag068_01' else 47 if e['jobb']=='lag068_12' else 46)==b];(rr/'a-forelopige-leveranser.json').write_text(json.dumps({'leveranser':es},ensure_ascii=False,indent=2)+'\n')
+for typ,items,num,height in [('objekt',rows,6,240),('fullscene',scenes,4,430)]:
+ for page in range((len(items)+num-1)//num):
+  can=Image.new('RGB',(1280,num*height),(185,185,185));dr=ImageDraw.Draw(can)
+  for i,(name,aa,bb) in enumerate(items[page*num:page*num+num]):
+   dr.text((5,i*height+4),name+' original / HD',fill='black')
+   for k,img in enumerate([aa,bb]):
+    s=min(620/img.width,(height-26)/img.height);img=img.resize((round(img.width*s),round(img.height*s)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);can.paste(img,(640*k,i*height+24))
+  can.save(r/f'a-{typ}qa-{page+1}.png')

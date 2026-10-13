@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil,subprocess,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';d=root/'jobber/lag068_06';out=r/'a-diagnose06-svarttest';out.mkdir(exist_ok=True)
+for f in ['original_1x.png','referanse.png','prompt.txt','jobb.json']:shutil.copy2(d/f,out/f)
+a=np.array(Image.open(d/'resultat.png').convert('RGB'));before=a.copy();box=[480,528,576,96];x,y,w,h=box;b=a[y:y+h,x:x+w];sel=b.max(axis=2)<=15;newcolor=np.median(b[sel],axis=0).round().astype('uint8');b[sel]=newcolor
+Image.fromarray(a).save(out/'resultat.png');cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(out/'resultat.png')],capture_output=True,text=True);(out/'kontroll.txt').write_text(cp.stdout+cp.stderr)
+s=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(s);s.loader.exec_module(c);m=json.loads((d/'jobb.json').read_text());metrics=[]
+for name,im in [('for',Image.fromarray(before)),('test',Image.fromarray(a))]:
+ part,_=c.part_of(im,m);met=c.compare(Image.open(d/'original_1x.png'),part);eo,es=met.pop('eo'),met.pop('es');ab,bb=eo[100:200,0:106],es[100:200,0:106];dx,dy=c.phase_shift(ab,bb);metrics.append({'variant':name,**met,'tellende_venstre_blokk':{'dx':dx,'dy':dy,'std_source':float(ab.std()),'std_ny':float(bb.std())}})
+mask=np.zeros(a.shape[:2],bool);mask[y:y+h,x:x+w]=True;proof={'hypotese':'Ny bakgrunnsvariasjon inne i hovedveiens faktiske metadatarektangel kan dominere blokkfase. Kun testkopi, ikke valgt.','kriterium':'max(R,G,B)<=15, bare inne i HD-rekt[480,528,576,96]','flat_ny_RGB':newcolor.tolist(),'valgte_piksler':int(sel.sum()),'endrede_piksler':int(np.any(a!=before,axis=2).sum()),'utenfor_felt_byteidentisk':bool(np.array_equal(a[~mask],before[~mask])),'maal':metrics,'checker_exit':cp.returncode}
+(r/'a-lokal-svarttest.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+can=Image.new('RGB',(1152,160),(185,185,185));dr=ImageDraw.Draw(can)
+for i,im in enumerate([Image.fromarray(before),Image.fromarray(a)]):dr.text((576*i+4,3),['Uendret kandidat','Kun lokal ny svart test'][i],fill='black');can.paste(im.crop((x,y,x+w,y+h)),(576*i,24))
+can.save(r/'a-lokal-svarttest.png');print(cp.stdout);print(json.dumps(proof,ensure_ascii=False))

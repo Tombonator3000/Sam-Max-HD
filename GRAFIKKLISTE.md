@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-14 00:22 (norsk tid)
+Oppdatert 2026-10-14 00:25 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 462 bilder levert (225 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 481 bilder levert (230 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -694,16 +694,16 @@ Rom 61, 66, 68.
 
 Rom 68.
 
-- [ ] `lag068_02` (rom 68 Highway Surfing (minispill), lag 02 med 5 objektbilder, bilde to `jobber/rom068/resultat.png`)
-- [ ] `lag068_03` (rom 68 Highway Surfing (minispill), lag 03 med 4 objektbilder, bilde to `jobber/rom068/resultat.png`)
-- [ ] `lag068_04` (rom 68 Highway Surfing (minispill), lag 04 med 4 objektbilder, bilde to `jobber/rom068/resultat.png`)
+- [x] `lag068_02` (rom 68 Highway Surfing (minispill), lag 02 med 5 objektbilder, bilde to `jobber/rom068/resultat.png`)
+- [x] `lag068_03` (rom 68 Highway Surfing (minispill), lag 03 med 4 objektbilder, bilde to `jobber/rom068/resultat.png`)
+- [x] `lag068_04` (rom 68 Highway Surfing (minispill), lag 04 med 4 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_05` (rom 68 Highway Surfing (minispill), lag 05 med 4 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_06` (rom 68 Highway Surfing (minispill), lag 06 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_07` (rom 68 Highway Surfing (minispill), lag 07 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
-- [ ] `lag068_08` (rom 68 Highway Surfing (minispill), lag 08 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
+- [x] `lag068_08` (rom 68 Highway Surfing (minispill), lag 08 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_09` (rom 68 Highway Surfing (minispill), lag 09 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_10` (rom 68 Highway Surfing (minispill), lag 10 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
-- [ ] `lag068_11` (rom 68 Highway Surfing (minispill), lag 11 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
+- [x] `lag068_11` (rom 68 Highway Surfing (minispill), lag 11 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
 
 ## Bestilling 47
 
@@ -3519,3 +3519,5 @@ Bestilling 42: ni lobbylag levert OK med ti faktiske feltkontroller. Festsallage
 Bestilling 44: ti lag levert, åtte OK og to SJEKK (portene, blokk 1,02). Alle 14 egne felt er OK; 570-underlag og panoramaoverlapp er bytekontrollert. Se `rapporter/bestilling044-20261013/RAPPORT.md`. Resten av HD-arbeidet fortsetter.
 
 Bestilling 45: ni lag levert OK med22 egne felt; springbrett02/03 rettet etter motivkontroll. Lag06801 holdes tilbake med FEIL og behandles videre med068-familien. Se `rapporter/bestilling045-20261013/RAPPORT.md`. HD-arbeidet fortsetter.
+
+Bestilling46: fem Highway Surfing-lag levert, fire OK og én SJEKK (04, blokk1,75). Alle19 felt erOK. Sju andre068-kandidater holdes tilbake med FEIL og behandles videre. Se `rapporter/bestilling046-20261013/RAPPORT.md`. HD-arbeidet fortsetter.

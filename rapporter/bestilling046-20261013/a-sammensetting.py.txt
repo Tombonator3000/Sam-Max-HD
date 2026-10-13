@@ -1,0 +1,79 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,importlib.util
+from collections import deque
+r=Path(__file__).resolve().parent;root=r.parents[1];py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
+base=np.array(Image.open(root/'jobber/rom068/resultat.png').convert('RGB'));out=[];rows=[];scenes=[]
+for n in range(1,13):
+ rr=root/f'rapporter/bestilling{45 if n==1 else 47 if n==12 else 46:03d}-20261013';j=f'lag068_{n:02d}';d=root/'jobber'/j;raw=rr/f'a-{j}-raa{2 if n in [11,12] else 1:02d}.png'
+ if not raw.exists():continue
+ m=json.loads((d/'jobb.json').read_text());gen=Image.open(raw).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS);g=np.array(gen)
+ if n==1:
+  other=np.array(Image.open(rr/f'a-{j}-raa02.png').convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS))
+  for o in m['objekter']:
+   if o['objekt']<=650:
+    x,y,w,h=o['rekt'];x=128+x*4;y=112+y*4;g[y:y+h*4,x:x+w*4]=other[y:y+h*4,x:x+w*4]
+ gp=g.copy();alpha=np.zeros(base.shape[:2],float);rects=[]
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x=128+x*4;y=112+y*4;w=min(w*4,1408-x);h=min(h*4,912-y)
+  if w<=0 or h<=0:continue
+  rects.append([x,y,w,h]);patch=gp[y:y+h,x:x+w].astype(float)
+  if o['objekt']<=650:
+   if o['objekt']>=634:
+    # NEW black silhouettes against generated yellow sky. No source contour input.
+    lum=patch.mean(axis=2);aa=np.clip((100-lum)/60,0,1)
+    # Fill only enclosed holes in NEW generated silhouette, removing invented tiny stripe.
+    core=aa>.5;bg=~core;seen=np.zeros_like(core);q=deque()
+    for xx in range(w):
+     for yy in [0,h-1]:
+      if bg[yy,xx] and not seen[yy,xx]:seen[yy,xx]=True;q.append((yy,xx))
+    for yy in range(h):
+     for xx in [0,w-1]:
+      if bg[yy,xx] and not seen[yy,xx]:seen[yy,xx]=True;q.append((yy,xx))
+    while q:
+     yy,xx=q.popleft()
+     for y2,x2 in [(yy-1,xx),(yy+1,xx),(yy,xx-1),(yy,xx+1)]:
+      if 0<=y2<h and 0<=x2<w and bg[y2,x2] and not seen[y2,x2]:seen[y2,x2]=True;q.append((y2,x2))
+    aa[bg&~seen]=1
+    g[y:y+h,x:x+w]=19
+   else:
+    # NEW blue-purple road or its yellow stripe, excluding generated black background.
+    purple=np.clip((patch[:,:,2]-np.maximum(patch[:,:,0],patch[:,:,1]))/6,0,1)
+    yellow=np.clip((np.minimum(patch[:,:,0],patch[:,:,1])-patch[:,:,2]-12)/25,0,1)
+    aa=np.maximum(purple,yellow)
+  elif o['objekt'] in [654,655,656,657,658,659]:
+   aa=np.clip((patch.max(axis=2)-25)/15,0,1)*((patch[:,:,2]>=patch[:,:,0])&(patch[:,:,2]>=patch[:,:,1]))
+   cut=max(0,min(h,464-y))
+   skyalpha=np.clip((140-patch[:cut].mean(axis=2))/80,0,1)
+   if cut>12:
+    cols=np.where((skyalpha[:cut-12]>.5).any(axis=0))[0]
+    keep=np.zeros(w)
+    if len(cols):keep[max(0,cols.min()-1):min(w,cols.max()+2)]=1
+    skyalpha*=keep
+   aa[:cut]=np.maximum(aa[:cut],skyalpha)
+  else:aa=np.ones((h,w))
+  alpha[y:y+h,x:x+w]=np.maximum(alpha[y:y+h,x:x+w],aa)
+ a=np.rint(g*alpha[:,:,None]+base*(1-alpha[:,:,None])).astype('uint8');a[:112]=128;a[912:]=128;a[:,:128]=128;a[:,1408:]=128
+ if n in [2,4]:
+  Image.fromarray(a).save(rr/f'a-{j}-for-tonetilpasning.png')
+  orig=np.array(Image.open(d/'original_1x.png').convert('RGB'))
+  for o in m['objekter']:
+   if o['objekt']>633:continue
+   xx,yy,ww,hh=o['rekt'];src=orig[yy:yy+hh,xx:xx+ww];b=a[112+yy*4:112+(yy+hh)*4,128+xx*4:128+(xx+ww)*4];p=b.astype(float);sm=(src[:,:,2]>src[:,:,0]+5)&(src[:,:,2]>src[:,:,1]+5);sel=(p[:,:,2]>p[:,:,0]+5)&(p[:,:,2]>p[:,:,1]+5)
+   if sm.any() and sel.any():
+    lo,hi=np.percentile(p[:,:,2][sel],[1,99]);tlo,thi=np.percentile(src[:,:,2][sm],[1,99]);v=np.clip((p[:,:,2]-lo)/max(1,hi-lo),0,1)*(thi-tlo)+tlo;new=np.stack([v-12,v-12,v],axis=2);b[sel]=np.clip(new[sel],0,255).astype('uint8')
+ im=Image.fromarray(a);im.save(d/'resultat.png');cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(d/'resultat.png')],capture_output=True,text=True);cf=rr/f'a-{j}-kontroll.txt';cf.write_text(cp.stdout+cp.stderr);part,_=c.part_of(im,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);obs=[];ref=Image.open(d/'referanse.png')
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];w=min(w,320-x);h=min(h,200-y);corr=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));obs.append({'objekt':o['bilde'],'kantkorrelasjon':corr});b=(128+x*4,112+y*4,128+(x+w)*4,112+(y+h)*4);rows.append((j+' '+o['bilde'],ref.crop(b),im.crop(b)))
+ e={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':{0:'OK',1:'SJEKK',2:'FEIL'}.get(cp.returncode,'FEIL'),'kontrollfil':str(cf.relative_to(root)),'forsok':1,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':False,'objektkontroll':obs,'rektangler':rects,'utenfor_rektangler_byteidentisk':bool(np.array_equal(a[alpha==0],base[alpha==0])),'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'prompt':str((rr/f'a-{j}-prompt01.txt').relative_to(root))};out.append(e);scenes.append((j,ref,im));print(j,e['egenkontroll'],[(o['objekt'],round(o['kantkorrelasjon'],3)) for o in obs])
+for b in [45,46,47]:
+ rr=root/f'rapporter/bestilling{b:03d}-20261013';es=[e for e in out if (45 if e['jobb']=='lag068_01' else 47 if e['jobb']=='lag068_12' else 46)==b];(rr/'a-forelopige-leveranser.json').write_text(json.dumps({'leveranser':es},ensure_ascii=False,indent=2)+'\n')
+for typ,items,num,height in [('objekt',rows,6,240),('fullscene',scenes,4,430)]:
+ for page in range((len(items)+num-1)//num):
+  can=Image.new('RGB',(1280,num*height),(185,185,185));dr=ImageDraw.Draw(can)
+  for i,(name,aa,bb) in enumerate(items[page*num:page*num+num]):
+   dr.text((5,i*height+4),name+' original / HD',fill='black')
+   for k,img in enumerate([aa,bb]):
+    s=min(620/img.width,(height-26)/img.height);img=img.resize((round(img.width*s),round(img.height*s)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);can.paste(img,(640*k,i*height+24))
+  can.save(r/f'a-{typ}qa-{page+1}.png')

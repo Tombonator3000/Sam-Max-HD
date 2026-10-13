@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];s=importlib.util.spec_from_file_location('c',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(s);s.loader.exec_module(c);out=[]
+for n in range(1,11):
+ d=root/f'jobber/lag068_{n:02d}';rr=root/f'rapporter/bestilling{45 if n==1 else 46:03d}-20261013'
+ if not (d/'resultat.png').exists():continue
+ im=Image.open(d/'resultat.png').convert('RGB');a=np.array(im);orig=np.array(Image.open(d/'original_1x.png').convert('RGB'));m=json.loads((d/'jobb.json').read_text());e={'jobb':d.name,'felt':[]}
+ # Only road rectangles, not Max/posts. Same global color mapping in each semantic road field.
+ for o in m['objekter']:
+  if o['objekt']>633:continue
+  x,y,w,h=o['rekt'];src=orig[y:y+h,x:x+w];b=a[112+y*4:112+(y+h)*4,128+x*4:128+(x+w)*4];p=b.astype(float)
+  sm=(src[:,:,2]>src[:,:,0]+5)&(src[:,:,2]>src[:,:,1]+5);sel=(p[:,:,2]>p[:,:,0]+5)&(p[:,:,2]>p[:,:,1]+5)
+  if not sm.any() or not sel.any():continue
+  # Range mapping of NEW blue-purple surface into measured original blue-purple range; no coordinate source map.
+  lo,hi=np.percentile(p[:,:,2][sel],[1,99]);tlo,thi=np.percentile(src[:,:,2][sm],[1,99]);v=np.clip((p[:,:,2]-lo)/max(1,hi-lo),0,1)*(thi-tlo)+tlo
+  new=np.stack([v-12,v-12,v],axis=2);b[sel]=np.clip(new[sel],0,255).astype('uint8');e['felt'].append({'objekt':o['bilde'],'generert_blatt_1_99':[lo,hi],'kilde_blatt_1_99':[tlo,thi],'piksler':int(sel.sum())})
+ cand=Image.fromarray(a);cand.save(rr/f'a-{d.name}-tonediagnose.png');part,_=c.part_of(cand,m);met=c.compare(Image.fromarray(orig),part);e['kontroll']={k:v for k,v in met.items() if k not in ['eo','es']};e['status']=c.judge(met)[0];out.append(e);print(d.name,e['status'],e['kontroll'])
+(r/'a-tonediagnose.json').write_text(json.dumps(out,indent=2)+'\n')
