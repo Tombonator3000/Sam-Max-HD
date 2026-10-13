@@ -82,7 +82,7 @@ What the sheet shows: {who}. The description is only a help; the input image dec
 Size rule (most important): draw every frame at exactly the size it has in the input, with the same height, the same width and the same proportions of head, body, arms, legs and props. One input pixel is 4 output pixels for every frame on this sheet and on every other sheet of this character, so the character never grows, shrinks or changes shape between frames. {sizes}
 
 Do:
-- Repaint every frame in high resolution with clean, natural detail: smooth shading instead of dithering, smooth anti-aliased outlines (no pixel steps), in the bold-outlined cartoon style of the original.
+- Trace every frame at 4x in high resolution, the way Day of the Tentacle Remastered redrew its characters: keep the pose, silhouette and proportions, and turn every cluster of pixels into the shape it shows (glasses, a tie, a shoe). Clean dark anti-aliased outlines with a little variation in weight, flat colors with one shade and a few highlights, the same color for every area as in the input. No dithering, no texture, no gradients, no pixel steps.
 - Keep the original design: the same character, the same colors, light direction, shadows and contrast as in the input.
 - Make all frames look identical apart from the pose: the same face, eyes, hat, clothes, colors and light in every frame. Any difference between frames flickers in the game.
 - Keep the pose and silhouette of every frame, and keep each frame in its place on the sheet, in the same rows and the same order.
@@ -846,7 +846,7 @@ Input: the attached image shows the original low-resolution frames of {name}, en
 
 Who it is: {who}.
 
-Draw on one sheet, in the clean high-resolution cartoon style of the game (bold dark outlines, smooth shading, no dithering, no pixel steps):
+Draw on one sheet, in the clean high-resolution cartoon style of the game, the way Day of the Tentacle Remastered redrew its characters: trace the input frames and turn every cluster of pixels into the shape it shows, with bold dark outlines, flat colors with one shade and a few highlights, and no gradients, texture, dithering or pixel steps:
 - the full figure from the front, from the right side, from behind and from the left side, in the same standing poses as the input,
 - a close-up of the face, as in the close-up frame,
 - the same proportions as the input frames: the same height of head, body and legs, the same width, and the same size of eyes, nose, mouth, hands and feet. Use the input frames as the exact measure, so the figures on this sheet are 4 times the size of the input frames.
