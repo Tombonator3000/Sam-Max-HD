@@ -1,0 +1,41 @@
+"""Kun formatkontroll som standard. --execute krever rotmottakets commit-ID.
+Ingen originalmasker: hele rektangulære NYE RGBA-cels kopieres med alfakant.
+"""
+from pathlib import Path
+import argparse,json,hashlib,shutil,subprocess,sys
+import numpy as np
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1]
+p=argparse.ArgumentParser();p.add_argument('--execute',action='store_true');p.add_argument('--received-commit');args=p.parse_args()
+if args.execute and not args.received_commit:p.error('Rotens mottak og commit-ID kreves før kopiering')
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+locked=json.loads((r/'a-kildehash.json').read_text())['filer']
+assert all(sha(root/f)==h for f,h in locked.items()),'Beskyttet kilde endret'
+links=json.loads((r/'a-gjenbrukskart.json').read_text())['ruter'];sources={};records=[]
+for e in links:
+ name=e['kildejobb'];f=root/'jobber'/name/'resultat.png'
+ if name=='fig002_06':f=root/'rapporter/bestilling052-20261013/c-fig002_06-partiell.png'
+ if name not in sources:
+  im=Image.open(f);assert im.mode=='RGBA' and im.size==(1536,1024),(f,im.mode,im.size)
+  a=np.array(im);outside=np.ones(a.shape[:2],bool);outside[32:992,64:1472]=False
+  assert not a[:,:,3][outside].any(),'Synlig canvaspadding'
+  sources[name]=(f,im.copy());records.append({'jobb':name,'fil':str(f.relative_to(root)),'sha256':sha(f),'mode':im.mode,'padding_alfa0':True,'transparentandel':float((a[:,:,3]==0).mean())})
+# Kopieringsvinduet har åtte HD-piksler transparent plass rundt metadatafeltet.
+# Dette bevarer nye antialfakanter uten resampling. Naborutene har 32 px avstand.
+for target in sorted({e['maaljobb'] for e in links}):
+ selected=[e for e in links if e['maaljobb']==target]
+ if target in ['fig004_01','fig004_02','fig004_03','fig004_04']:
+  result=sources[selected[0]['kildejobb']][1].copy()
+ else:
+  result=Image.new('RGBA',(1536,1024),(0,0,0,0))
+  for e in selected:
+   x,y,w,h=e['kilde_HD_xywh'];tx,ty,tw,th=e['maal_HD_xywh'];assert (w,h)==(tw,th)
+   crop=sources[e['kildejobb']][1].crop((x-8,y-8,x+w+8,y+h+8));aa=np.array(crop)[:,:,3]
+   assert not np.concatenate([aa[0],aa[-1],aa[:,0],aa[:,-1]]).any(),'Alfa når klippegrensen'
+   result.paste(crop,(tx-8,ty-8)) # RGBA bytekopi, ingen mask eller alphamultiplikasjon
+ if args.execute:
+  dest=root/'jobber'/target/'resultat.png';result.save(dest)
+  cp=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(dest)],capture_output=True,text=True)
+  (r/f'a-{target}-kontroll.txt').write_text(cp.stdout+cp.stderr)
+  assert cp.returncode==0,(target,cp.stdout,cp.stderr)
+print(json.dumps({'modus':'kopiert' if args.execute else 'forberedelse uten PNG-skriving','mottak_commit':args.received_commit,'kilder':records,'ruter':len(links),'runtime':False},ensure_ascii=False,indent=2))

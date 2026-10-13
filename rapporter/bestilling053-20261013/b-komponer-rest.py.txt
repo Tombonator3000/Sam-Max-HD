@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,subprocess
+r=Path('rapporter/bestilling053-20261013')
+slots={3:[(x,0,y,285) for x,y in zip([0,230,410,600,780,960,1140,1320],[230,410,600,780,960,1140,1320,1536])]+[(0,285,220,420),(220,285,395,420),(395,285,600,420),(0,420,230,555),(230,420,470,555),(0,555,225,690),(225,555,460,690),(40,690,118,735),(118,690,210,735),(0,735,255,1024),(255,735,500,1024)],4:[(0,0,320,300),(320,0,620,300),(0,300,345,580),(345,300,620,580),(0,580,180,680),(0,680,308,920),(308,680,640,920),(0,920,180,1024)],5:[(0,0,245,270),(245,0,440,270),(0,270,155,380),(155,270,260,380),(260,270,365,380),(365,270,475,380),(0,380,140,455),(140,380,220,455),(0,455,222,590),(222,455,385,590),(385,455,560,590),(0,590,235,735),(0,735,240,890),(240,735,402,890),(402,735,563,890),(563,735,740,890)]}
+for n in [3,4,5]:
+ j=f'fig003_{n:02d}';raw=Image.open(r/f'b-{j}-raa01.png').convert('RGBA');m=json.loads(Path('jobber',j,'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));records=[];assert len(slots[n])==len(m['ruter'])
+ for o,slot in zip(m['ruter'],slots[n]):
+  a=np.array(raw.crop(slot));a[:,:,3]=np.where(a[:,:,3]<16,0,np.minimum(255,a[:,:,3].astype(float)*255/254)).astype('uint8');ys,xs=np.where(a[:,:,3]>128);box=(int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1));im=Image.fromarray(a).crop(box);sx,sy,ex,ey=o['synlig'];target=(64+sx*4,32+sy*4,64+ex*4,32+ey*4);im=im.resize((target[2]-target[0],target[3]-target[1]),Image.Resampling.LANCZOS);out.alpha_composite(im,target[:2]);records.append({'cel':o['rute'],'raa_slot':slot,'nyalfa_bbox_i_slot':box,'target':target})
+ out.save(Path('jobber',j,'resultat.png'));(r/f'b-{j}-komponenter.json').write_text(json.dumps({'raw':f'b-{j}-raa01.png','ruter':records,'kildemaske':False},indent=2));run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);(r/f'b-{j}-kontroll01.txt').write_text(run.stdout+run.stderr);print(j,run.stdout[-600:])

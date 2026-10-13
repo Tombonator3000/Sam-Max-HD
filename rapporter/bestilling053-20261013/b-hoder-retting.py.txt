@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import json
+r=Path('rapporter/bestilling053-20261013');m=json.loads(Path('jobber/fig003_02/jobb.json').read_text());ids=[413,411,419]
+for role,name in [('kilde','referanse.png'),('ny','resultat.png')]:
+ out=Image.new('RGBA',(1536,512),(0,0,0,0));im=Image.open(Path('jobber/fig003_02',name)).convert('RGBA')
+ for k,id in enumerate(ids):
+  o=next(o for o in m['ruter'] if o['rute']==id);sx,sy,ex,ey=o['synlig'];a=im.crop((64+sx*4,32+sy*4,64+ex*4,32+ey*4));s=min(440/a.width,450/a.height);a=a.resize((round(a.width*s),round(a.height*s)),Image.Resampling.NEAREST if role=='kilde' else Image.Resampling.LANCZOS);out.alpha_composite(a,(k*512+(512-a.width)//2,(512-a.height)//2))
+ out.save(r/f'b-hoder-retting-{role}.png')
+p=Path('jobber/fig003_02/prompt.txt').read_text()+'\n\nLOCAL SOURCE CORRECTION ONLY: Produce ONLY these three separate Max head cels in one row, transparent background. Image1 = three original source heads, image2 = generated style/context. Preserve original geometry, poses and identity. Left cel413: tiny pink nose between eyes and mouth; mouth is a tiny BEIGE angled two-stroke pucker, NOT a black round O. Center cel411: pink nose; short flat horizontal black mouth opening with white teeth, NO red tongue or pink inside the mouth. Right cel419: tiny pink nose and tiny black round mouth BELOW the nose; the nose must not be omitted. All have two eyes and two long ears with pink insides. Do not add body, neck, labels or extra heads. Match thin dark contour and cream Max palette. EXACTLY3 heads with generous gap, output1536x512 or1536x1024.\n'
+(r/'b-hoder-retting-prompt.txt').write_text(p)

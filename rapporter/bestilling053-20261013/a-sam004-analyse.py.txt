@@ -1,0 +1,38 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,collections
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();M=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text());locks={};context={};records=[];groups=collections.defaultdict(list)
+base={}
+for d in sorted((root/'jobber').glob('fig002_*')):
+ j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB')
+ for f in ['jobb.json','original_1x.png','referanse.png']:context[str((d/f).relative_to(root))]=sha(d/f)
+ for c in j['ruter']:
+  x,y,w,h=c['rekt'];base[c['rute']]={'jobb':d.name,'meta':c,'rgb':np.array(im.crop((x,y,x+w,y+h))),'bg':j['bakgrunn']}
+orig2={e['cel']:e for e in M['2']['cels']};orig4={e['cel']:e for e in M['4']['cels']};summary=[]
+for n in range(1,7):
+ name=f'fig004_{n:02d}';d=root/'jobber'/name;j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGB');sheet=[]
+ for f in ['jobb.json','prompt.txt','referanse.png','original_1x.png']:locks[str((d/f).relative_to(root))]=sha(d/f)
+ for c in j['ruter']:
+  x,y,w,h=c['rekt'];a=np.array(im.crop((x,y,x+w,y+h)));b=base.get(c['rute']);o=orig4[c['rute']];e={'jobb':name,**c,'originalmetadata':o,'kilde_mode':Image.open(d/'original_1x.png').mode,'rgb_sha256':hashlib.sha256(a.tobytes()).hexdigest(),'bakgrunn':j['bakgrunn']}
+  mask=(a!=np.array(j['bakgrunn'])).any(2);aa=np.concatenate([a,np.uint8(mask[:,:,None])*255],axis=2);e['diagnostisk_rgba_sha256']=hashlib.sha256(aa.tobytes()).hexdigest();e['synlige_RGB']=np.unique(a[mask],axis=0).tolist()
+  if b:
+   bb=b['rgb'];bm=(bb!=np.array(b['bg'])).any(2);rgba=np.concatenate([bb,np.uint8(bm[:,:,None])*255],axis=2);same=a.shape==bb.shape;e.update({'002_jobb':b['jobb'],'002_cel':c['rute'],'samme_dimensjoner':same,'rgb_identisk':same and bool(np.array_equal(a,bb)),'diagnostisk_rgba_identisk':same and bool(np.array_equal(aa,rgba)),'endrede_RGB_piksler':int(np.any(a!=bb,axis=2).sum()) if same else None,'samme_rutemetadata':all(c.get(k)==b['meta'].get(k) for k in ['rekt','synlig','animasjon','retning','lag','nr']),'samme_original_celmetadata':o==orig2.get(c['rute'])})
+  else:e['002_jobb']=None
+  sheet.append(e);records.append(e);groups[(c['animasjon'],c['retning'],c['lag'])].append((e,Image.fromarray(a)))
+ summary.append({'jobb':name,'ruter':len(sheet),'rgb_identiske':sum(e.get('rgb_identisk',False) for e in sheet),'samme_rutemetadata':sum(e.get('samme_rutemetadata',False) for e in sheet),'innhold':j['innhold']})
+for key,arr in groups.items():
+ cw,ch=330,365;can=Image.new('RGB',(cw*min(5,len(arr)),ch*((len(arr)+4)//5)),(205,205,205));dr=ImageDraw.Draw(can)
+ for i,(e,im) in enumerate(arr):
+  x=(i%5)*cw;y=(i//5)*ch;dr.text((x+3,y+4),f"004 cel{e['rute']} nr{e['nr']} / 002 lik={e.get('rgb_identisk')}",fill='black');dr.text((x+3,y+22),f"rel{e['originalmetadata']['rel_x']},{e['originalmetadata']['rel_y']}",fill='black');im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);can.paste(im,(x+3,y+48))
+ can.save(r/f'a-sekvens-a{key[0]:02}-r{key[1]}-l{key[2]}.png')
+# Native original RGBA evidence exists for three archived sample cels only.
+native=[]
+for p in sorted((root/'konsept/2026-10-12/referanser/originaler').glob('costume004_*.png')):
+ q=p.with_name(p.name.replace('004_','002_'))
+ if q.exists():
+  a=np.array(Image.open(p).convert('RGBA'));b=np.array(Image.open(q).convert('RGBA'));native.append({'004':str(p.relative_to(root)),'002':str(q.relative_to(root)),'mode004':Image.open(p).mode,'mode002':Image.open(q).mode,'dim004':list(Image.open(p).size),'dim002':list(Image.open(q).size),'rgba_identisk':a.shape==b.shape and bool(np.array_equal(a,b)),'rgb_identisk':a.shape==b.shape and bool(np.array_equal(a[:,:,:3],b[:,:,:3])),'alpha_identisk':a.shape==b.shape and bool(np.array_equal(a[:,:,3],b[:,:,3]))});context[str(p.relative_to(root))]=sha(p);context[str(q.relative_to(root))]=sha(q)
+meta={k:{field:M[k][field] for field in ['room','format','farger','speil','kostymepalett','colours','animasjoner','retninger']} for k in ['2','4']}
+(r/'a-kildehash.json').write_text(json.dumps({'antall':len(locks),'filer':locks},indent=2)+'\n');(r/'a-konteksthash.json').write_text(json.dumps(context,indent=2)+'\n');(r/'a-sam004-kildebevis.json').write_text(json.dumps({'ark':summary,'ruter':records,'metadata':meta,'native_rgba':native,'runtime':False,'diagnostisk_alfa':'Bare analyse: magenta blir alfa0, alle andre RGB alfa255. Ikke nativ RGBA-bevis for alle cels og aldri produksjonsmaske.'},ensure_ascii=False,indent=2)+'\n')
+can=Image.new('RGB',(1536,1536),(128,128,128))
+for i in range(6):can.paste(Image.open(root/f'jobber/fig004_{i+1:02d}/referanse.png').resize((768,512)),((i%2)*768,(i//2)*512))
+can.save(r/'a-original-kontaktark.png');print(json.dumps(summary,ensure_ascii=False));print('NATIVE',json.dumps(native));print('META changes',[k for k in M['2'] if M['2'][k]!=M['4'].get(k)])

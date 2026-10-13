@@ -1,0 +1,5 @@
+from pathlib import Path
+from PIL import Image
+r=Path('rapporter/bestilling053-20261013');im=Image.open(r/'b-fig003_04-for-lokalnese.png');out=Image.new('RGBA',(1024,640));boxes=[(216,352,230,369),(457,354,471,371)]
+for k,b in enumerate(boxes):out.paste(im.crop(b).resize((448,544),Image.Resampling.NEAREST),(k*512+32,48))
+out.save(r/'b-tupp-kilde-ny.png');(r/'b-tupp-prompt.txt').write_text('Edit these TWO tiny enlarged cartoon muzzle-edge patches. They are NEW generated art with an erroneous red dot on each outer cheek. REMOVE the red spot completely and restore continuous cream cheek and thin black curved outer outline separating cheek from transparent outside. Keep geometry of every surrounding pixel shape and tooth/mouth edge. The nearby black vertical oval fragment is an eye, retain it. Do not add a new eye/nose. Each patch stays in its same rectangular location, left and right, same crop/framing. Use smooth HD drawing, no pixelation. Transparent RGBA1024x640, only these TWO corrected patches. Image2 shows both complete faces for context; only edit the cropped patches of image1.')

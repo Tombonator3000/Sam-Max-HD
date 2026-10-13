@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np
+r=Path('rapporter/bestilling053-20261013');p=Path('jobber/fig003_02/resultat.png');out=Image.open(r/'b-fig003_02-for-ansiktsretting.png').convert('RGBA');raw=Image.open(r/'b-hoder-retting-raa.png').convert('RGBA');m=json.loads(Path('jobber/fig003_02/jobb.json').read_text());proof=[]
+for id,slot in zip([413,411,419],[(0,0,730,raw.height),(730,0,1440,raw.height),(1440,0,raw.width,raw.height)]):
+ a=np.array(raw.crop(slot));ys,xs=np.where(a[:,:,3]>128);bbox=(int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1));a[:,:,3]=np.where(a[:,:,3]<32,0,np.minimum(255,a[:,:,3].astype(float)*255/254)).astype('uint8');im=Image.fromarray(a).crop(bbox);o=next(o for o in m['ruter'] if o['rute']==id);sx,sy,ex,ey=o['synlig'];target=(64+4*sx,32+4*sy,64+4*ex,32+4*ey);im=im.resize((target[2]-target[0],target[3]-target[1]),Image.Resampling.LANCZOS);out.paste((0,0,0,0),target);out.alpha_composite(im,target[:2]);proof.append({'cel':id,'raa_slot':slot,'new_alpha_bbox':bbox,'target':target,'omfang':'hele separate nytegnede hodekomponenten, øvrige20cels uendret'})
+out.save(p);before=np.array(Image.open(r/'b-fig003_02-for-ansiktsretting.png'));after=np.array(out);union=np.zeros(after.shape[:2],bool)
+for z in proof:x,y,X,Y=z['target'];union[y:Y,x:X]=1
+(r/'b-ansiktsretting-bevis.json').write_text(json.dumps({'ruter':proof,'endrede_piksler':int(np.any(before!=after,axis=2).sum()),'utenfor':int((np.any(before!=after,axis=2)&~union).sum())},indent=2))

@@ -1,0 +1,37 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image,ImageDraw
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();links=json.loads((r/'a-gjenbrukskart.json').read_text())['ruter'];locks=json.loads((r/'a-kildehash.json').read_text())['filer'];assert all(sha(root/p)==h for p,h in locks.items())
+proof=[];manifest=[];qa=[]
+for i in range(1,7):
+ name=f'fig004_{i:02d}';d=root/'jobber'/name;im=Image.open(d/'resultat.png');a=np.array(im);assert im.mode=='RGBA';rows=[];j=json.loads((d/'jobb.json').read_text());orig=Image.open(d/'original_1x.png').convert('RGB')
+ for e in [v for v in links if v['maaljobb']==name]:
+  donor=root/'jobber'/e['kildejobb']/'resultat.png'
+  if e['kildejobb']=='fig002_06':donor=root/'rapporter/bestilling052-20261013/c-fig002_06-partiell.png'
+  src=Image.open(donor);x,y,w,h=e['kilde_HD_xywh'];tx,ty,tw,th=e['maal_HD_xywh'];p=im.crop((tx-8,ty-8,tx+w+8,ty+h+8));q=src.crop((x-8,y-8,x+w+8,y+h+8));assert p.tobytes()==q.tobytes(),e
+  aa=np.array(p)[:,:,3];ys,xs=np.nonzero(aa>=128);bbox=[int(xs.min()+tx-8),int(ys.min()+ty-8),int(xs.max()+tx-7),int(ys.max()+ty-7)] if len(xs) else None
+  c=next(v for v in j['ruter'] if v['rute']==e['cel']);cx,cy,cw,ch=c['rekt'];o=orig.crop((cx,cy,cx+cw,cy+ch));oa=np.array(o);count=int(np.any(oa!=[255,0,255],axis=2).sum())
+  rows.append({'cel':e['cel'],'donor':str(donor.relative_to(root)),'donor_sha256':sha(donor),'RGBA_byteidentisk_med_donor':True,'ruteklipp_sha256':hashlib.sha256(p.tobytes()).hexdigest(),'bbox_alfa_ge128':bbox,'original_synlige_piksler':count,'checker_hopper_over_liten_rute':count<20,'nye_alfa_ge128_piksler':int((aa>=128).sum()),'festepunkt':e['maal_originalmetadata'],'metadataforskjeller':e['metadataforskjeller']})
+  qa.append((name,e['cel'],o,p,e))
+ check=(r/f'a-{name}-kontroll.txt').read_text();assert 'FEIL' not in check and 'SJEKK' not in check,check
+ entry={'jobb':name,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':'OK','kontrollfil':str((r/f'a-{name}-kontroll.txt').relative_to(root)),'forsok':0,'metode':'Gjenbruk av nye Sam002 RGBA-cels uten resampling','mottak_commit':'03e56d0cbbb7815cfeb743fe006d3d0b8c730aec','runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True}
+ manifest.append(entry);proof.append({'jobb':name,'sha256':entry['sha256'],'ruter':rows,'magenta_RGB_med_synlig_alfa':int(((a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0)).sum()),'magenta_RGB_alfa_over1':int(((a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>1)).sum())})
+ (d/'notat.md').write_text(f"# {name}\n\nGjenbrukt {len(rows)} nye Sam002-cels etter mottak 03e56d0cbbb7815cfeb743fe006d3d0b8c730aec. Ingen ny generering; donorens innebygde imagegen-proveniens gjelder, eksakt modellnavn er ikke eksponert. RGBA-byteidentitet er verifisert per cel med alfakant, uten resampling eller originalmaske. Egne målmetadata er beholdt.\n\nSHA256: {entry['sha256']}\n\nUendret sjekk_leveranse.py: OK. Se rapporter/bestilling053-20261013/a-celkart.json for alle celbokser, donorhash og små ruter som checker hopper over. Fullscene og felt er sammenlignet; øyelokk og rel_x169/170 behandles særskilt i a-kilde-qa.md. Runtime og ny individuell brukergodkjenning er ikke utført. Seks nesten usynlige magenta-kantpiksler med alfa1 fra donorene er bevart, ingen synlig bakgrunn er lagt til.\n")
+(r/'a-celkart.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(r/'a-leveranser.json').write_text(json.dumps({'leveranser':manifest},ensure_ascii=False,indent=2)+'\n')
+full=Image.new('RGB',(1536,1536),(210,210,210))
+for i in range(6):
+ im=Image.open(root/f'jobber/fig004_{i+1:02d}/resultat.png');bg=Image.new('RGBA',im.size,(210,210,210,255));bg.alpha_composite(im);full.paste(bg.convert('RGB').resize((768,512)),(i%2*768,i//2*512))
+full.save(r/'a-helscene-qa.png')
+for page in range((len(qa)+11)//12):
+ can=Image.new('RGB',(1600,1200),(210,210,210));dr=ImageDraw.Draw(can)
+ for k,(name,cel,o,p,e) in enumerate(qa[page*12:page*12+12]):
+  xx=k%4*400;yy=k//4*400;dr.text((xx+4,yy+4),f'{name} cel{cel}: original / ny',fill='black');dr.text((xx+4,yy+22),f"rel {e['maal_originalmetadata']['rel_x']},{e['maal_originalmetadata']['rel_y']}",fill='black')
+  o=o.resize((o.width*4,o.height*4),Image.Resampling.NEAREST);o.thumbnail((190,350));p.thumbnail((190,350));can.paste(o,(xx+3,yy+44));can.paste(p,(xx+202,yy+44),p)
+ can.save(r/f'a-feltqa-{page+1}.png')
+special=[v for v in qa if v[1] in [512,513,169,170]];can=Image.new('RGB',(1400,400*len(special)),(210,210,210));dr=ImageDraw.Draw(can)
+for k,(name,cel,o,p,e) in enumerate(special):
+ dr.text((4,k*400+4),f'{name} cel{cel} original | ny | rel forskjell {e["metadataforskjeller"]}',fill='black');o=o.resize((o.width*8,o.height*8),Image.Resampling.NEAREST);o.thumbnail((650,350));p=p.resize((p.width*2,p.height*2));p.thumbnail((650,350));can.paste(o,(4,k*400+35));can.paste(p,(700,k*400+35),p)
+can.save(r/'a-oyelokk-rel-qa.png')
+print([(p['jobb'],len(p['ruter']),p['magenta_RGB_med_synlig_alfa']) for p in proof])
+print('Small:',[(p['jobb'],v['cel'],v['original_synlige_piksler'],v['nye_alfa_ge128_piksler']) for p in proof for v in p['ruter'] if v['checker_hopper_over_liten_rute']])

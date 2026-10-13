@@ -1,0 +1,27 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np,hashlib,subprocess,importlib.util
+r=Path('rapporter/bestilling053-20261013');reg=json.loads((r/'b-ruteregister.json').read_text());meta=json.loads(Path('konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['3'];cels={c['cel']:c for c in meta['cels']};lookup={};jobs=[];sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+for n in range(1,6):
+ j=f'fig003_{n:02d}';m=json.loads(Path('jobber',j,'jobb.json').read_text());im=Image.open(Path('jobber',j,'resultat.png')).convert('RGBA')
+ for o in m['ruter']:
+  x,y,w,h=o['rekt'];lookup[o['rute']]=im.crop((64+x*4,32+y*4,64+(x+w)*4,32+(y+h)*4))
+ if n==1:continue
+ used=np.zeros((1024,1536),bool);allboxes=used.copy();smallboxes=used.copy();a=np.array(im);sm=[]
+ for o in m['ruter']:
+  sx,sy,ex,ey=o['synlig'];x,y,X,Y=64+4*sx,32+4*sy,64+4*ex,32+4*ey;allboxes[y:Y,x:X]=1
+  if o['rute'] in [551,552]:
+   smallboxes[y:Y,x:X]=1;sm.append({'cel':o['rute'],'rekt':[x,y,X-x,Y-y],'alfa128_piksler':int((a[y:Y,x:X,3]>=128).sum()),'ovre_innertone':a[y+2,x+18,:3].tolist(),'nedre_innertone':a[y+6,x+18,:3].tolist()})
+  else:used[max(0,y-16):min(1024,Y+16),max(0,x-16):min(1536,X+16)]=1
+ stray=(a[:,:,3]>=128)&~used
+ run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',f'jobber/{j}/resultat.png'],capture_output=True,text=True);cf=r/f'b-{j}-kontroll-slutt.txt';cf.write_text(run.stdout+run.stderr);status=run.stdout.split('Utfall: ')[-1].strip();print(j,status)
+ jobs.append({'jobb':j,'resultat':f'jobber/{j}/resultat.png','sha256':sha(f'jobber/{j}/resultat.png'),'egenkontroll':status,'kontrollfil':str(cf),'forsok':{2:2,3:1,4:4,5:1}[n],'runtime':False,'ny_brukergodkjenning':False,'ruter':len(m['ruter']),'rgba':im.mode,'alfa_utenfor_alle_rutebokser':int(((a[:,:,3]>=128)&~allboxes).sum()),'checker_stray':int(stray.sum()),'stray_i_halsskjotbokser':int((stray&smallboxes).sum()),'stray_utenfor_halsskjotbokser':int((stray&~smallboxes).sum()),'halsskjoter':sm})
+for start in range(0,len(reg['komposisjoner']),9):
+ out=Image.new('RGB',(1200,1200),(145,160,170));dr=ImageDraw.Draw(out)
+ for k,ids in enumerate(reg['komposisjoner'][start:start+9]):
+  im=Image.new('RGBA',(384,352))
+  for id in ids:
+   c=cels[id];im.alpha_composite(lookup[id],((36+c['rel_x'])*4,(64+c['rel_y'])*4))
+  x=k%3*400;y=k//3*400;out.paste(im,(x,y+30),im);dr.text((x+5,y+5),'cels '+','.join(map(str,ids))+' / kilde rel x4',fill='black')
+ out.save(r/f'b-sammensetting-hd-{start//9+1}.png')
+locks=json.loads((r/'b-kildehash.json').read_text())['filer'];locks.update(json.loads((r/'b-ankerhash.json').read_text()));check={p:sha(p)==s for p,s in locks.items()};assert all(check.values());(r/'b-kildehash-slutt.json').write_text(json.dumps({'antall':len(check),'uendret':all(check.values()),'filer':check},indent=2));(r/'b-leveranser.json').write_text(json.dumps({'leveranser':jobs,'runtime':False,'ny_brukergodkjenning':False},indent=2)+'\n')

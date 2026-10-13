@@ -1,0 +1,18 @@
+"""Read-only source inventory. Candidate equality is not delivery or runtime proof."""
+from pathlib import Path
+from PIL import Image
+import json,hashlib,collections
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda b:hashlib.sha256(b).hexdigest();groups=collections.defaultdict(list);locks=[];total=0
+for job in sorted((root/'jobber').glob('fig*')):
+ mp=job/'jobb.json'
+ if not mp.is_file():continue
+ m=json.loads(mp.read_text());ip=job/'original_1x.png';im=Image.open(ip).convert('RGB')
+ locks.append({'jobb':job.name,'metadata_sha256':sha(mp.read_bytes()),'original_sha256':sha(ip.read_bytes())})
+ for u in m['ruter']:
+  x,y,w,h=u['rekt'];crop=im.crop((x,y,x+w,y+h));digest=sha(crop.tobytes());identity=(m['navn'],m.get('bilde_to'),w,h,tuple(m['bakgrunn']),digest)
+  groups[identity].append({'jobb':job.name,'cel':u['bilde'],'rekt':u['rekt'],'synlig':u.get('synlig'),'animasjon':u['animasjon'],'retning':u['retning'],'lag':u['lag'],'nr':u['nr']});total+=1
+out=[]
+for key,rows in groups.items():
+ if len(rows)>1:out.append({'navn':key[0],'stilanker':key[1],'bredde':key[2],'hoyde':key[3],'bakgrunn':key[4],'kilde_RGB_sha256':key[5],'ruter':rows})
+summary={'ark':len(locks),'ruter':total,'unike_bilde_signaturer_innen_navn_anker':len(groups),'grupper_med_duplikater':len(out),'ekstra_likhetsforekomster':sum(len(g['ruter'])-1 for g in out),'forbehold':'Kandidatlikhet gjelder eksakte RGB-piksler, dimensjoner, bakgrunn, navn og stilanker. Relative verdenskoordinater, runtime, ny alpha og semantisk sammenheng må fremdeles kontrolleres før gjenbruk. Ingen produksjonsmaske eller ny grafikk laget.'}
+(r/'root-duplikatkandidater.json').write_text(json.dumps({'sammendrag':summary,'kildelaser':locks,'grupper':out},ensure_ascii=False,indent=2)+'\n');print(json.dumps(summary,ensure_ascii=False))

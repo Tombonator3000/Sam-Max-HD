@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json
+r=Path('rapporter/bestilling053-20261013');p=Path('jobber/fig003_04/resultat.png');out=Image.open(r/'b-fig003_04-for-lokalnese.png').convert('RGBA');before=np.array(out);raw=Image.open(r/'b-nese-lokal-raa03.png').convert('RGBA');data=[]
+for cel,crop,placement,rect in [(178,(50,31,939,633),(140,337,82,47),(217,354,228,366)),(179,(1100,35,1943,633),(379,338,83,47),(459,356,469,368))]:
+ x,y,w,h=placement;piece=raw.crop(crop).resize((w,h),Image.Resampling.LANCZOS);a=np.array(piece);a[:,:,3]=np.where(a[:,:,3]<32,0,a[:,:,3]);piece=Image.fromarray(a);xx,yy,X,Y=rect;patch=piece.crop((xx-x,yy-y,X-x,Y-y));pa=np.array(patch).astype(float);old=np.array(out.crop(rect)).astype(float);gy,gx=np.indices(pa.shape[:2]);f=np.minimum.reduce([gx+1,gy+1,pa.shape[1]-gx,pa.shape[0]-gy])/3;f=np.minimum(f,1)[:,:,None];patch=Image.fromarray(np.rint(pa*f+old*(1-f)).astype('uint8'));out.paste(patch,(xx,yy));data.append({'cel':cel,'nyraa_rekt':crop,'helskalering_plassering':placement,'lokalt_innklipp':rect})
+out.save(p);after=np.array(out);union=np.zeros(after.shape[:2],bool)
+for z in data:x,y,X,Y=z['lokalt_innklipp'];union[y:Y,x:X]=1
+(r/'b-nese-lokal-bevis.json').write_text(json.dumps({'komponenter':data,'endrede_piksler':int(np.any(after!=before,axis=2).sum()),'utenfor':int((np.any(after!=before,axis=2)&~union).sum()),'cel175':'allerede én rosa nese i x170..179,y120..124; ingen endring','kildemaske':False},indent=2))
+for id,b in [(178,(135,325,232,383)),(179,(375,325,475,390))]:out.crop(b).resize(((b[2]-b[0])*8,(b[3]-b[1])*8),Image.Resampling.NEAREST).save(r/f'b-nese-{id}-etter.png')

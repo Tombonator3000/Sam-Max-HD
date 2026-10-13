@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,collections,numpy as np
+r=Path('rapporter/bestilling053-20261013');meta=json.loads(Path('konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['3'];cels={c['cel']:c for c in meta['cels']};sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();locks={};records=[];groups=collections.defaultdict(list);lookup={}
+for n in range(1,6):
+ j=f'fig003_{n:02d}';p=Path('jobber',j);m=json.loads((p/'jobb.json').read_text());im=Image.open(p/'original_1x.png').convert('RGB');bg=tuple(m['bakgrunn'])
+ if n>1:
+  for f in ['jobb.json','prompt.txt','referanse.png','original_1x.png']:locks[str(p/f)]=sha(p/f)
+ for o in m['ruter']:
+  x,y,w,h=o['rekt'];crop=im.crop((x,y,x+w,y+h));rgba=crop.convert('RGBA');a=np.array(rgba);a[:,:,3]=np.where(np.all(a[:,:,:3]==bg,axis=2),0,255);lookup[o['rute']]=Image.fromarray(a)
+  if n==1:continue
+  sx,sy,ex,ey=o['synlig'];rec={'jobb':j,**o,'originalmetadata':cels[o['rute']],'hd_synlig':[64+sx*4,32+sy*4,64+ex*4,32+ey*4],'original_synlige_piksler':int(np.count_nonzero(a[:,:,3]))};records.append(rec);groups[(o['animasjon'],o['retning'],o['lag'])].append((rec,crop))
+for key,arr in groups.items():
+ out=Image.new('RGB',(300*min(5,len(arr)),340*((len(arr)+4)//5)),(225,225,225));dr=ImageDraw.Draw(out)
+ for ix,(z,im) in enumerate(arr):
+  x=ix%5*300;y=ix//5*340;c=z['originalmetadata'];dr.text((x+5,y+5),f"{z['jobb']} cel {z['rute']} nr {z['nr']}",fill='black');dr.text((x+5,y+22),f"rel({c['rel_x']},{c['rel_y']}) move({c['move_x']},{c['move_y']})",fill='black');out.paste(im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST),(x+5,y+45))
+ out.save(r/f'b-sekvens-a{key[0]:02d}-r{key[1]}-l{key[2]}.png')
+combos=[[128,406],[128,417],[130,424],[158,385],[160,385],[163,384],[164,384],[167,386,551],[168,386,552],[179,307],[179,308],[179,309],[179,310],[179,311],[185,313],[185,314],[185,315],[130,432],[130,433],[130,434],[130,427],[130,428],[130,429],[130,430],[130,431]]
+for start in range(0,len(combos),9):
+ out=Image.new('RGB',(1200,1200),(220,220,220));dr=ImageDraw.Draw(out)
+ for k,ids in enumerate(combos[start:start+9]):
+  im=Image.new('RGBA',(96,88))
+  for id in ids:
+   c=cels[id];im.alpha_composite(lookup[id],(36+c['rel_x'],64+c['rel_y']))
+  im=im.resize((384,352),Image.Resampling.NEAREST);x=k%3*400;y=k//3*400;out.paste(im,(x,y+30),im);dr.text((x+5,y+5),'cels '+','.join(map(str,ids))+' / source rel',fill='black')
+ out.save(r/f'b-sammensetting-{start//9+1}.png')
+contact=Image.new('RGB',(1536,1024),(128,128,128))
+for n in range(2,6):contact.paste(Image.open(f'jobber/fig003_{n:02d}/referanse.png').resize((768,512)),((n-2)%2*768,(n-2)//2*512))
+contact.save(r/'b-original-kontaktark.png');(r/'b-kildehash.json').write_text(json.dumps({'antall':len(locks),'filer':locks},indent=2)+'\n');anchors=['hovedark/max.png','jobber/fig003_01/resultat.png','jobber/fig003_01/jobb.json','jobber/fig003_01/original_1x.png','stil/fig003_01.png','konsept/2026-10-12/kostymer-originalmetadata.json','rapporter/stilpilot-fortsettelse-20261013/TOMS-GODKJENNING.json'];(r/'b-ankerhash.json').write_text(json.dumps({p:sha(p) for p in anchors},indent=2)+'\n');(r/'b-ruteregister.json').write_text(json.dumps({'ruter':records,'grupper':[{'animasjon':k[0],'retning':k[1],'lag':k[2],'cels':[z['rute'] for z,_ in arr]} for k,arr in groups.items()],'animasjonsmetadata':meta['animasjoner'],'komposisjoner':combos,'runtime':False},indent=2)+'\n');print('ruter',len(records),'grupper',len(groups),'sma',[(z['rute'],z['original_synlige_piksler']) for z in records if z['original_synlige_piksler']<20])

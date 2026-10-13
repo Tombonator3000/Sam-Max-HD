@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+r=Path('rapporter/bestilling053-20261013');boxes=[(140,333,230,387),(380,333,475,390)]
+for role,f in [('kilde','referanse.png'),('ny','resultat.png')]:
+ im=Image.open('jobber/fig003_04/'+f).convert('RGBA');out=Image.new('RGBA',(1200,400))
+ for k,b in enumerate(boxes):
+  a=im.crop(b).resize((570,342),Image.Resampling.NEAREST if role=='kilde' else Image.Resampling.LANCZOS);out.alpha_composite(a,(15+k*600,25))
+ out.save(r/f'b-nese-lokal-{role}.png')
+p='Edit ONLY the two pink extra nose bumps on the FAR RIGHT edge of each face in image2. Image1 shows original source; image2 two current HD face crops. Each has a proper small pink nose below the eyes, KEEP that central pink nose. REMOVE the SECOND RED SPOT on right outline of muzzle. At the removed red spot reconstruct smooth cream skin and black outer face outline. No second nose, no red spot at outer cheek. Keep all other mouth/eyes/crop/layout untouched, two crops side by side, transparent1200x400. This is a tiny localized correction; do not change expressions.'
+(r/'b-nese-lokal-prompt.txt').write_text(p)

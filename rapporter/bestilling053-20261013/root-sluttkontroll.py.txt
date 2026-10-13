@@ -1,0 +1,70 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys,importlib.util
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image
+import numpy as np
+sys.dont_write_bytecode=True
+r=Path(__file__).resolve().parent;root=r.parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+read=lambda n:json.loads((r/n).read_text())
+spec=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');checker=importlib.util.module_from_spec(spec);spec.loader.exec_module(checker)
+locks={**read('a-kildehash.json')['filer'],**read('b-kildehash.json')['filer']}
+assert len(locks)==40
+for p,h in {**locks,**read('b-ankerhash.json')}.items():assert sha(root/p)==h,p
+ap=read('root-a-gjenbrukskontroll.json');assert ap['ruter']==71 and ap['kilder_uendret']==24
+a=read('a-leveranser.json')['leveranser'];b=read('b-leveranser.json')['leveranser']
+for e in ap['leveranser']:
+ assert sha(root/'jobber'/e['jobb']/'resultat.png')==e['sha256']
+ for c in e['ruter']:assert sha(root/c['donor'])==c['donor_sha256']
+checks=[]
+for e in b:
+ j=e['jobb'];p=root/e['resultat'];assert sha(p)==e['sha256']
+ im=Image.open(p);assert im.mode=='RGBA' and im.size==(1536,1024)
+ arr=np.array(im);alpha=arr[:,:,3];allboxes=np.zeros(alpha.shape,bool);used=allboxes.copy();small=allboxes.copy();windows=allboxes.copy();cells=[]
+ meta=json.loads((root/'jobber'/j/'jobb.json').read_text());original=np.array(Image.open(root/'jobber'/j/'original_1x.png').convert('RGB'))
+ for c in meta['ruter']:
+  sx,sy,ex,ey=c['synlig'];x,y,X,Y=64+sx*4,32+sy*4,64+ex*4,32+ey*4
+  allboxes[y:Y,x:X]=True
+  windows[max(0,y-8):Y+8,max(0,x-8):X+8]=True
+  pixels=int(checker.original_mask(original,meta['bakgrunn'],(sx,sy,ex,ey)).sum())
+  core=int((alpha[y:Y,x:X]>=128).sum());assert core>0
+  if pixels<20:
+   assert j=='fig003_03' and c['rute'] in (551,552) and pixels==16
+   small[y:Y,x:X]=True
+   assert (X-x,Y-y)==(36,8)
+   assert arr[y+2,x+18,:3].tolist()==[207,195,179]
+   assert arr[y+6,x+18,:3].tolist()==([207,195,179] if c['rute']==551 else [255,243,227])
+  else:used[max(0,y-16):Y+16,max(0,x-16):X+16]=True
+  cells.append({'cel':c['rute'],'sourcepixels':pixels,'corepixels':core,'HD_xyxy':[x,y,X,Y]})
+ assert not np.any(alpha[~windows]),j
+ edge=alpha[(alpha>0)&~allboxes]
+ assert len(edge)==(23 if j=='fig003_04' else 0) and int(edge.max(initial=0))<128,j
+ stray=(alpha>=128)&~used
+ assert not np.any(stray&~small)
+ assert int(stray.sum())==(504 if j=='fig003_03' else 0)
+ magenta=(alpha>0)&(arr[:,:,0]>240)&(arr[:,:,1]<20)&(arr[:,:,2]>240)
+ assert not np.any(magenta),j
+ run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True)
+ status=run.stdout.split('Utfall: ')[-1].strip();assert status==e['egenkontroll'] and status in ('OK','SJEKK')
+ n=len(meta['ruter'])-(2 if j=='fig003_03' else 0);assert f'{n} av {n} ruter OK' in run.stdout
+ log=r/f'{j}-root-kontroll.txt';log.write_text(run.stdout+run.stderr);e['kontrollfil']=str(log.relative_to(root))
+ checks.append({'jobb':j,'sha256':sha(p),'status':status,'ruter':cells,'stray':int(stray.sum()),'stray_utenfor_halsskjoter':0,'alfa128_utenfor_rutebokser':0,'alfa_utenfor_rutevinduer':0,'antialias_utenfor_eksakt_boks':len(edge),'maks_antialias':int(edge.max(initial=0))})
+# Independently verify that each correction affects only its recorded new-art rectangles.
+for j,beforefile,proof in [('fig003_02','b-fig003_02-for-ansiktsretting.png','b-ansiktsretting-bevis.json'),('fig003_04','b-fig003_04-for-lokalnese.png','b-tupp-bevis.json')]:
+ before=np.array(Image.open(r/beforefile));after=np.array(Image.open(root/'jobber'/j/'resultat.png'));outside=np.ones(after.shape[:2],bool)
+ for c in read(proof)['ruter']:
+  x,y,X,Y=c['target'];outside[y:Y,x:X]=False
+ assert not np.any(np.any(before!=after,axis=2)&outside),j
+for c in read('b-proveniens.json')['kall']:
+ for k in ('raw','prompt'):assert sha(root/c[k])==c[k+'_sha256']
+records=a+b;assert len(records)==10
+for e in records:
+ assert sha(root/e['resultat'])==e['sha256']
+ e.update(klar_for_mottak=True,visuelt_godkjent=False,stil_godkjent_av_Tom=True,importert=False,runtime_verifisert=False)
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(timespec='seconds')
+outputs={'root-b-kontroll.json':checks,'kildehash.json':[{'fil':p,'sha256':h} for p,h in locks.items()],
+ 'fremdrift.json':{'dato':stamp,'gren':'gpt-arbeid','produksjonsagent':'gpt-6-astra','modell':'Eksakt bildemodellnavn ikke eksponert','leveranser':records},
+ 'sluttkontroll.json':{'dato':stamp,'antall_leveranser':10,'figurruter':137,'kilder_uendret':40,'B_ankre_uendret':7,'utfall_antall':{'OK':9,'SJEKK':1,'FEIL':0},'ikke_klar_for_mottak':[],'runtime':False,'importert':False,'ny_brukergodkjenning':False,'A_bevis':'root-a-gjenbrukskontroll.json','B_bevis':'root-b-kontroll.json'}}
+for name,data in outputs.items():(r/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+print('10 sheets: 137 figure cells; 9 OK and 1 documented SJEKK; 40 sources unchanged')

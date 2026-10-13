@@ -1,0 +1,64 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+from PIL import Image
+import numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks=json.loads((r/'a-kildehash.json').read_text())['filer'];assert len(locks)==24
+for p,h in locks.items():assert sha(root/p)==h,p
+records=json.loads((r/'a-leveranser.json').read_text())['leveranser'];assert len(records)==6
+links=json.loads((r/'a-gjenbrukskart.json').read_text())['ruter'];assert len(links)==71
+originalmeta=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())
+om={k:{c['cel']:c for c in originalmeta[k]['cels']} for k in ['2','4']}
+assert originalmeta['2']['kostymepalett'][14]==255 and originalmeta['4']['kostymepalett'][14]==14
+out=[];small=[];diffs=[]
+for e in records:
+ j=e['jobb'];p=root/e['resultat'];assert sha(p)==e['sha256'];im=Image.open(p);assert im.size==(1536,1024) and im.mode=='RGBA'
+ ar=np.array(im);used=np.zeros(ar.shape[:2],bool);cells=[]
+ meta=json.loads((root/'jobber'/j/'jobb.json').read_text());targetsource=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB')
+ for c in meta['ruter']:
+  cel=c['rute'];plan=next(q for q in links if q['maaljobb']==j and q['cel']==cel);donorjob=plan['kildejobb']
+  dm=json.loads((root/'jobber'/donorjob/'jobb.json').read_text());dc=next(q for q in dm['ruter'] if q['rute']==cel)
+  sourcecrop=Image.open(root/'jobber'/donorjob/'original_1x.png').convert('RGB').crop(tuple(dc['synlig']));targetcrop=targetsource.crop(tuple(c['synlig']))
+  assert sourcecrop.size==targetcrop.size and sourcecrop.tobytes()==targetcrop.tobytes(),(j,cel)
+  for key in ['animasjon','retning','lag','nr']:assert c[key]==dc[key]
+  a,b=om['2'][cel],om['4'][cel];diff={k:[a[k],b[k]] for k in a if a[k]!=b[k]}
+  assert diff==({'rel_x':[-18,-19]} if cel in [169,170] else {}),(j,cel,diff)
+  if diff:diffs.append({'jobb':j,'cel':cel,'forskjeller':diff})
+  # Use the visible bbox and whole new rectangular crop, never original masks.
+  def box(cc):
+   x,y,ex,ey=cc['synlig'];return [64+x*4,32+y*4,(ex-x)*4,(ey-y)*4]
+  assert box(dc)==plan['kilde_HD_xywh'] and box(c)==plan['maal_HD_xywh']
+  x,y,w,h=box(dc);tx,ty,tw,th=box(c);assert (w,h)==(tw,th)
+  donor=root/'jobber'/donorjob/'resultat.png'
+  if donorjob=='fig002_06':donor=root/'rapporter/bestilling052-20261013/c-fig002_06-partiell.png'
+  dcut=Image.open(donor).crop((x-8,y-8,x+w+8,y+h+8));tcut=im.crop((tx-8,ty-8,tx+w+8,ty+h+8))
+  assert dcut.tobytes()==tcut.tobytes(),(j,cel,'new pixels')
+  used[ty-8:ty+h+8,tx-8:tx+w+8]=True
+  ca=np.array(tcut)[:,:,3];ys,xs=np.nonzero(ca>=128);assert len(xs)
+  old=np.array(targetcrop);sourcecount=int((np.abs(old.astype(np.int16)-np.array(meta['bakgrunn'])).sum(2)>24).sum())
+  item={'jobb':j,'cel':cel,'RGB_kildeidentisk':True,'ny_RGBA_byteidentisk':True,'donor':str(donor.relative_to(root)),'donor_sha256':sha(donor),'ny_rute_sha256':hashlib.sha256(tcut.tobytes()).hexdigest(),'maal_HD_xywh':box(c),'kilde_synlige_piksler':sourcecount,'ny_kjerne_piksler':len(xs),'festepunkt':b}
+  cells.append(item)
+  if sourcecount<20:
+   assert cel in [512,513]
+   # Connected alpha components prove that both independent eyelid pieces remain.
+   mask=ca>=128;seen=np.zeros_like(mask);components=[]
+   for yy,xx in zip(*np.nonzero(mask)):
+    if seen[yy,xx]:continue
+    stack=[(int(yy),int(xx))];seen[yy,xx]=True;count=0
+    while stack:
+     yy2,xx2=stack.pop();count+=1
+     for dy,dx in [(0,1),(0,-1),(1,0),(-1,0)]:
+      ny,nx=yy2+dy,xx2+dx
+      if 0<=ny<mask.shape[0] and 0<=nx<mask.shape[1] and mask[ny,nx] and not seen[ny,nx]:seen[ny,nx]=True;stack.append((ny,nx))
+    components.append(count)
+   assert len(components)==2,(cel,components)
+   small.append(dict(item,ny_alfa_komponentareal=components,checker_hopper_over=True))
+ assert not np.any(ar[:,:,3][~used]),j
+ mag=(ar[:,:,3]>0)&(ar[:,:,0]>240)&(ar[:,:,1]<20)&(ar[:,:,2]>240);assert ar[:,:,3][mag].max(initial=0)<=1
+ run=subprocess.run([sys.executable,str(root/'verktoy/sjekk_leveranse.py'),str(p)],capture_output=True,text=True);assert run.returncode==0 and 'Utfall: OK' in run.stdout
+ expected=len(meta['ruter'])-sum(c['kilde_synlige_piksler']<20 for c in cells);assert f'{expected} av {expected} ruter OK' in run.stdout
+ (r/f'{j}-root-kontroll.txt').write_text(run.stdout)
+ out.append({'jobb':j,'sha256':sha(p),'ruter':cells,'utenfor_rutevinduer_alfa_null':True,'alfa1_magenta_piksler':int(mag.sum()),'checker':'OK'})
+assert sum(len(e['ruter']) for e in out)==71 and len(small)==2 and len(diffs)==2
+(r/'root-a-gjenbrukskontroll.json').write_text(json.dumps({'kilder_uendret':24,'nytegning':False,'ruter':71,'leveranser':out,'sma_oyelokk':small,'egne_festepunkter':diffs,'motorimport':False,'runtime':False},ensure_ascii=False,indent=2)+'\n')
+print('Six Sam004 sheets OK; 71 source/new comparisons, two tiny eyelid pairs and two own rel offsets independently verified')

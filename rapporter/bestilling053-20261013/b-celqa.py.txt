@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json
+r=Path('rapporter/bestilling053-20261013')
+for n in range(2,6):
+ j=f'fig003_{n:02d}';m=json.loads(Path('jobber',j,'jobb.json').read_text());src=Image.open(Path('jobber',j,'referanse.png')).convert('RGBA');hd=Image.open(Path('jobber',j,'resultat.png')).convert('RGBA')
+ for start in range(0,len(m['ruter']),8):
+  out=Image.new('RGB',(1200,1200),(145,160,170));dr=ImageDraw.Draw(out)
+  for k,o in enumerate(m['ruter'][start:start+8]):
+   sx,sy,ex,ey=o['synlig'];box=(64+sx*4,32+sy*4,64+ex*4,32+ey*4);x=k%2*600;y=k//2*300;dr.text((x+5,y+5),f"{j} cel{o['rute']} original / ny",fill='black')
+   for v,im in enumerate([src,hd]):
+    a=im.crop(box);scale=min(270/a.width,265/a.height);a=a.resize((round(a.width*scale),round(a.height*scale)),Image.Resampling.NEAREST if v==0 else Image.Resampling.LANCZOS);out.paste(a,(x+v*300+5,y+30),a)
+  out.save(r/f'b-celqa-{n:02d}-{start//8+1}.png')

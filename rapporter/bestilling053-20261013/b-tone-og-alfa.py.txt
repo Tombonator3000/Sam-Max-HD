@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np,hashlib,subprocess
+r=Path('rapporter/bestilling053-20261013');proof=[]
+for n in range(2,6):
+ j=f'fig003_{n:02d}';p=Path('jobber',j,'resultat.png');before=np.array(Image.open(p).convert('RGBA'));Image.fromarray(before).save(r/f'b-{j}-for-tone.png');a=before.copy();m=json.loads(Path('jobber',j,'jobb.json').read_text());small=[]
+ for o in m['ruter']:
+  sx,sy,ex,ey=o['synlig'];x,y,X,Y=64+sx*4,32+sy*4,64+ex*4,32+ey*4;v=a[y:Y,x:X];cel=o['rute']
+  if n==5 and cel in [308,309,310,311,314,315]:v[:,:,:3]=np.clip(v[:,:,:3].astype(int)-np.array([45,43,39]),0,255).astype('uint8')
+  if cel in [551,552]:
+   # Nykunstens egen alfa og omriss beholdes. Kun flate materialtoner.
+   lum=v[:,:,:3].mean(axis=2);edge=lum<125
+   v[:,:,:3]=[207,195,179]
+   if cel==552:v[4:,:,:3]=[255,243,227]
+   v[edge,:3]=[215,179,143]
+   small.append({'cel':cel,'target':[x,y,X-x,Y-y],'synlig_alfa128':int((v[:,:,3]>=128).sum()),'toner':np.unique(v[v[:,:,3]>=128,:3],axis=0).tolist()})
+ # Fjern utelukkende lavalfa glorie fra nygeneratoren; ikke originaldata.
+ a[:,:,3]=np.where(a[:,:,3]<32,0,a[:,:,3]);a[a[:,:,3]==0,:3]=0
+ Image.fromarray(a).save(p)
+ proof.append({'jobb':j,'endret_rgba_piksler':int(np.any(a!=before,axis=2).sum()),'halsskjoter':small,'kildemaske':False,'alfa_endring':'bare nygenerert alfa under32 nullstilles'})
+ run=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(p)],capture_output=True,text=True);(r/f'b-{j}-kontroll-slutt.txt').write_text(run.stdout+run.stderr);print(run.stdout)
+(r/'b-tonebevis.json').write_text(json.dumps(proof,indent=2))

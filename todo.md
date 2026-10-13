@@ -101,3 +101,5 @@
 - [x] Levert 10 jobber i bestilling 51: fem lag og fem ikonark, 67 OK-felt og tre tomme felt.
 
 - [x] Levert seks jobber i bestilling 52: 61 Sam-ruter og sju ikonfelt. Fig002_06 står ufullstendig med fem ventende a07-ruter.
+
+- [x] Levert ti jobber i bestilling 53: 71 Sam-ruter og 66 Max-ruter. Én SJEKK for tilsiktede halsskjøter er dokumentert.

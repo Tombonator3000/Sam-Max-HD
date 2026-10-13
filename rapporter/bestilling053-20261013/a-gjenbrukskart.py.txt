@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+b=json.loads((r/'a-sam004-kildebevis.json').read_text());m=json.loads((root/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text());out=[]
+for e in b['ruter']:
+ j=json.loads((root/'jobber'/e['002_jobb']/'jobb.json').read_text());s=next(v for v in j['ruter'] if v['rute']==e['rute']);o=next(v for v in m['2']['cels'] if v['cel']==e['rute'])
+ def box(v):
+  x,y,w,h=v;return [64+4*x,32+4*y,4*w,4*h]
+ out.append({'maaljobb':e['jobb'],'cel':e['rute'],'kildejobb':e['002_jobb'],'kilde_HD_xywh':box(s['rekt']),'maal_HD_xywh':box(e['rekt']),'RGB_identisk':e['rgb_identisk'],'sekvensmetadata_identisk':all(e[k]==s[k] for k in ['animasjon','retning','lag','nr']),'maal_originalmetadata':e['originalmetadata'],'002_originalmetadata':o,'metadataforskjeller':{k:[o.get(k),v] for k,v in e['originalmetadata'].items() if o.get(k)!=v}})
+(r/'a-gjenbrukskart.json').write_text(json.dumps({'status':'Kun plan, ingen HD kopiert. Rotens mottak av 002 avventes.','rektformat':'HD xywh på 1536 x 1024 canvas','ruter':out,'runtime':False},ensure_ascii=False,indent=2)+'\n')
+c=json.loads((r/'a-konteksthash.json').read_text())
+for s in ['konsept/2026-10-12/kostymer-originalmetadata.json','hovedark/sam.png','jobber/fig002_01/resultat.png','rapporter/bestilling052-20261013/c-rutekart-hd.json','rapporter/bestilling052-20261013/c-leveranser.json','rapporter/bestilling052-20261013/c-fig002_06-partiell.png']:
+ p=root/s
+ if p.exists():c[s]=sha(p)
+(r/'a-konteksthash.json').write_text(json.dumps(c,indent=2)+'\n')
+locks=json.loads((r/'a-kildehash.json').read_text())['filer'];assert all(sha(root/p)==h for p,h in locks.items())
+print('24 beskyttede kilder uendret;',len(out),'gjenbrukskoblinger;',sum(e['sekvensmetadata_identisk'] for e in out),'like sekvensmetadata')

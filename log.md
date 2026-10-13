@@ -357,3 +357,8 @@
 
 - Bestilling 52: fem Sam-ark med 61 ruter og ikon06 med sju felt levert OK. Seks avklarte ruter i ufullstendig fig002_06 er kontrollert separat; fem a07-ruter venter fortsatt. Se `rapporter/bestilling052-20261013/RAPPORT.md`. Arbeidet fortsetter.
 - Figurark har ekte RGBA; ikon06 har foreskrevet RGB/magenta. Potekorreksjon er kontrollert innenfor fire rektangler. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-14T01:04:31+02:00 (Codex, Astra)
+
+- Bestilling 53: ti figurark med 137 Sam/Max-ruter levert, ni OK og én dokumentert SJEKK for to tilsiktede halsskjøter. Se `rapporter/bestilling053-20261013/RAPPORT.md`. Arbeidet fortsetter.
+- Figurark har ekte RGBA; 71 Sam-ruter er bevist kildeidentiske og gjenbruker nye komponenter. Max-ansikter er korrigert og kontrollert lokalt. Ingen motorimport, spilltest eller ny individuell bildeaksept.
