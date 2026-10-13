@@ -39,3 +39,12 @@
 - Sett original, før og etter på kontaktark. Tegningene er bevart, størrelser og plassering er rettet. Indre konturer og ansiktstolkning er fortsatt en stilpilot for Toms vurdering.
 - Notater og fremdrift er oppdatert. Kildetegninger, mål, transformasjoner, kontrollutskrift og kontaktark ligger i rapporter/hovedark-retting-20261013/. Tidligere rå generatorforsøk og stilpilot-mappe er bevart.
 - Ingen endring i main, motor, pipeline, beskyttede jobbfiler eller andre pilotjobber. Ingen motorimport, animasjonsavspilling eller publisert HD-mod.
+
+## 2026-10-13 17:32 (Codex)
+
+- Tom godkjente de rettede hovedarkene og ba om resten av stilpiloten. Ferdigstilt kontoret i to deler og første figurark for Sam og Max med innebygd ChatGPT-bildegenerator. Eksakt bildemodellnavn er ikke eksponert.
+- Kontoret er sammenstilt til én 1952 x 800 fullscene og begge leveransene er skåret fra samme. 1120 x 800 overlapp er byte-identisk. Første del1-forsøk ble avvist på dørtekst/skrivebordsriss. Bakvendt dørskilt, LOVE og rommets rot er bevart.
+- Figurarkene har 9 og 28 ruter. Alle 37 ytre bokser er eksakte. Hode/kropp/hender og øyelokk er kontrollert samlet på originalens fester. Manglende Sam-øyelokkpar er rekonstruert fra nye genererte flekker. Max-frontens feilaktige magerring er rettet fra godkjent frontmaster. Pupiller og lokal hudgradient er tilpasset slik at blink lukker øynene uten mørke plaster.
+- Fire uendrede egenkontroller gir OK. Tilleggskontroll dekker de små øyelokkrutene som skriptet hopper over. Alle 18 låste kilde-/hovedarkfiler er bevart. Prosedyrer, prompter, råbilder, kildehash, rutekart, kontaktark og valgt-tempo gangdiagnose finnes i rapporter/stilpilot-fortsettelse-20261013/. Ingen originaltiming eller motoravspilling er påstått.
+- Tom godkjente deretter hele piloten og autoriserte resten av HD-konverteringen. Dette er registrert i TOMS-GODKJENNING.json og går foran det tidligere stoppunktet etter piloten. Han ba om fortsettelse med Astra; chatmodellinnstillingen er bekreftet gpt-6-astra.
+- Motor-/pipelinekode, beskyttede jobbfiler, status.csv og Claude-eide ORDRE.md er ikke endret. Ingen motorimport, spilltest eller publisert HD-mod i denne grafikkleveransen.

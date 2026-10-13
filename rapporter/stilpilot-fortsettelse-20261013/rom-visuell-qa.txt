@@ -1,0 +1,58 @@
+Kontoret, visuell QA og sammenstilling 2026-10-13
+
+Status: to leverte stilpilotkandidater. Ingen motorimport eller spilltest.
+Toms godkjenning av hovedarkene er ikke godkjenning av disse rombildene.
+
+Grunnlag
+Begge originalreferansene og original_1x er gjennomgått. Originalrommet
+er 488 x 200. Del 1 har region (0,0,384,200), del 2 (104,0,384,200).
+Originalenes 280 x 200 overlapp er byte-identisk. Ingen beskyttet fil er
+endret. SHA-256 før arbeidet ligger i kildehash.json og etter i
+rom-sammenstilling.json.
+
+Generering
+ChatGPTs innebygde bildegenerator, eksakt modellnavn ikke eksponert.
+Del 1: 2 forsøk, forsøk 2 valgt.
+Del 2: 1 forsøk. Del 1 ble vedlagt som referanse for felles innhold og stil.
+Råbilder og faktisk brukte prompter er bevart i denne rapportmappen.
+
+Sammenstilling
+Felles fullscene: kontor-helrom.png, 1952 x 800.
+Del 1 råbilde brukes til venstre for global x=912, del 2 til høyre for
+x=1039. Mellom x=912 og 1039 brukes 128 px smoothstep-blanding av RGB.
+Ingen skalering, vridning, geometrisk justering eller originalmaske.
+Begge leveranser skjæres fra denne samme fullscenen og settes inn på
+1536 x 1024 lerret ved y=112, med eksakte #808080 gråbånd oppe og nede.
+Leveranseoverlapp: del 1 x=416..1535, del 2 x=0..1119, y=112..911.
+Alle 896000 RGB-piksler i overlappen er byte-identiske.
+
+Visuell gjennomgang
+Kontorrommets bevisst skjeve vegger, tak, dør, lamper, vinduer og
+lysretning er bevart. De fire røde pilene er kontrollert ved forstørret
+sammenligning. Dørens bakvendte bokstavformer og LOVE som LO/VE er
+beholdt. TV/antenne, telefon/svarer, bilderammer og vegghull, skrivebord,
+stol, gulvpapirer, mat, grønn ramme, skrivemaskin og høyre hylles rekvisitter
+er sammenlignet med originalen.
+
+Fullscene og skjøtfelt er sett samlet. Ingen tydelig dobbel kontur eller
+vesentlig semantisk feil ble funnet ved skjøten. Råbildene varierer litt i
+farge, høylys og kontur; den avgrensede overgangen er kontrollert visuelt.
+Pilotene har glattere, lysere og renere fargeflater enn originalen.
+Stilvalg og små tolkninger av originalens pikselformer gjenstår for Toms
+vurdering. Ingen teknisk måling brukes som bevis på visuell godkjenning.
+
+Kontaktark
+kontor-for-etter.png: begge valgte råbilder mot de ferdige leveransene.
+kontor-helrom-kontaktark.png: hele originalrommet i 4x over hele HD-piloten.
+kontor-skjot-kontaktark.png: rå del 1, rå del 2 og ferdig skjøt ved samme sted.
+
+Uendret egenkontroll
+Del 1: OK, skift 0.04, største blokkskift 0.08, kantlikhet 0.98.
+Del 2: OK, skift 0.08, største blokkskift 0.09, kantlikhet 0.98.
+Begge avslutningskoder: 0. Full utskrift og interpreter er dokumentert i
+rom-egenkontroll.txt og rom-egenkontroll.json.
+
+Sporbarhet
+rom-sammenstilling.txt inneholder reproduserbar Pillow-kode.
+rom-sammenstilling.json knytter råbilder, mål, sammenstilling og SHA-256
+til fullscene, to leveranser og kontaktark.

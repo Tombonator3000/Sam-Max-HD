@@ -1,0 +1,84 @@
+from pathlib import Path
+from datetime import datetime
+import json
+import hashlib
+import subprocess
+import sys
+
+import numpy as np
+from PIL import Image
+
+ROOT = Path('/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren')
+REPORT = ROOT / 'rapporter/stilpilot-fortsettelse-20261013'
+JOBS = ['rom007_del1av2', 'rom007_del2av2', 'fig002_01', 'fig003_01']
+
+
+def digest(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def rect(mask, x=0, y=0):
+    ys, xs = np.nonzero(mask)
+    assert len(xs), 'Mangler alfakjerne'
+    return [int(xs.min()) + x, int(ys.min()) + y, int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1)]
+
+
+locked = json.loads((REPORT / 'kildehash.json').read_text())
+assert all(digest(ROOT / item['fil']) == item['sha256'] for item in locked)
+results = []
+all_rows = []
+combined_map = {}
+for job_id in JOBS:
+    path = ROOT / 'jobber' / job_id / 'resultat.png'
+    im = Image.open(path)
+    assert im.size == (1536, 1024), (job_id, im.size)
+    job = json.loads((path.parent / 'jobb.json').read_text())
+    check = subprocess.run([sys.executable, str(ROOT / 'verktoy/sjekk_leveranse.py'), str(path)], capture_output=True, text=True)
+    assert check.returncode == 0 and 'Utfall: OK' in check.stdout, (job_id, check.stdout, check.stderr)
+    (REPORT / f'{job_id}-sluttkontroll.txt').write_text(check.stdout)
+    record = {'jobb': job_id, 'resultat': str(path.relative_to(ROOT)), 'sha256': digest(path),
+              'egenkontroll': 'OK', 'visuelt_godkjent': False, 'importert': False,
+              'format': im.mode, 'storrelse': list(im.size), 'forsok': 2 if job_id == 'rom007_del1av2' else 1,
+              'kontrollfil': str((REPORT / f'{job_id}-sluttkontroll.txt').relative_to(ROOT))}
+    if job['type'] == 'figur':
+        assert im.mode == 'RGBA'
+        alpha = np.asarray(im)[:, :, 3]
+        assert (alpha < 16).mean() > 0.2
+        core = alpha >= 128
+        covered = np.zeros_like(core)
+        map_file = REPORT / ('rutekart-sam.json' if job_id == 'fig002_01' else 'rutekart-max.json')
+        entries = json.loads(map_file.read_text())[job_id]['ruter']
+        by_name = {entry['bilde']: entry['rect'] for entry in entries}
+        assert len(entries) == len(job['ruter']) and len(by_name) == len(entries)
+        combined_map[job_id] = {'ruter': entries}
+        for frame in job['ruter']:
+            sx, sy, ex, ey = frame['synlig']
+            expected = [64 + 4*sx, 32 + 4*sy, 4*(ex-sx), 4*(ey-sy)]
+            x, y, w, h = expected
+            x0, y0, x1, y1 = max(0, x-8), max(0, y-8), min(im.width, x+w+8), min(im.height, y+h+8)
+            measured = rect(core[y0:y1, x0:x1], x0, y0)
+            assert measured == expected == by_name[frame['bilde']], (job_id, frame['bilde'], measured, expected)
+            covered[y0:y1, x0:x1] |= core[y0:y1, x0:x1]
+            all_rows.append({'jobb': job_id, 'bilde': frame['bilde'], 'bestilt': expected, 'malt': measured, 'eksakt': True})
+        assert not (core & ~covered).any(), 'Uventede ekstra tegninger utenfor rutene'
+        record['ruter'] = len(entries)
+        record['rutekart'] = str(map_file.relative_to(ROOT))
+    else:
+        rgb = np.asarray(im.convert('RGB'))
+        assert (rgb[:112] == 128).all() and (rgb[912:] == 128).all()
+    results.append(record)
+
+room1 = np.asarray(Image.open(ROOT / 'jobber/rom007_del1av2/resultat.png').convert('RGB'))
+room2 = np.asarray(Image.open(ROOT / 'jobber/rom007_del2av2/resultat.png').convert('RGB'))
+assert np.array_equal(room1[112:912, 416:1536], room2[112:912, :1120])
+assert len(all_rows) == 37
+audit = {'dato': datetime.now().astimezone().isoformat(timespec='seconds'),
+         'leveranser': results, 'beskyttede_kilder_uendret': True, 'lasete_filer': len(locked),
+         'romoverlapp_byteidentisk': True, 'romoverlapp_hd': [1120,800],
+         'figur_bokser_eksakte': len(all_rows), 'ruter': all_rows,
+         'motorimport': False, 'motoravspilling': False, 'originaltiming_verifisert': False}
+(REPORT / 'sluttkontroll.json').write_text(json.dumps(audit, ensure_ascii=False, indent=2)+'\n')
+(REPORT / 'fremdrift.json').write_text(json.dumps({'dato': audit['dato'], 'gren':'gpt-arbeid',
+     'verktøy':'Innebygd ChatGPT-bildegenerator og autorisert presis bildebehandling i Pillow',
+     'modell':'Eksakt modellnavn ikke eksponert', 'leveranser': results}, ensure_ascii=False, indent=2)+'\n')
+print('PASS: fire leveranser, 37 eksakte rutebokser, byte-identisk romoverlapp, 18 låste kilder uendret.')

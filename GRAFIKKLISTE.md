@@ -8,27 +8,27 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
-| Hovedark (Sam og Max) | 2 kandidater levert, egenkontroll OK | 2 | Nå, i stilpiloten |
-| Rombakgrunner | 0 | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
+| Rombakgrunner | 1 pilotrom levert og visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 0 | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 0 | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
 ## Bestilling 1: stilpiloten (nå, samme som ORDRE.md)
 
 Hovedarkene for Sam og Max, kontoret og de første figurarkene. Tom godkjenner stilen før resten bestilles.
 
-- [x] `hovedark/sam.png` (hovedark for Sam, referanse i `hovedark/sam/`; pilotkandidat rettet 13. oktober, eksakte mål og plass, egenkontroll OK, ikke visuelt godkjent)
-- [x] `hovedark/max.png` (hovedark for Max, referanse i `hovedark/max/`; pilotkandidat rettet 13. oktober, eksakte mål og plass, egenkontroll OK, ikke visuelt godkjent)
-- [ ] `rom007_del1av2` (rom 7 Kontoret, del 1/2) (pilot)
-- [ ] `rom007_del2av2` (rom 7 Kontoret, del 2/2) (pilot)
-- [ ] `fig002_01` (figurark 1 for Sam (kostyme 2), 9 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`) (pilot)
-- [ ] `fig003_01` (figurark 1 for Max (kostyme 3), 28 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); gange mot høyre (8 ruter); snakking (lag 3, tegnes over kroppen) mot høyre (12 ruter), bilde to `hovedark/max.png`) (pilot)
+- [x] `hovedark/sam.png` (hovedark for Sam, referanse i `hovedark/sam/`; rettet 13. oktober, eksakte mål og plass, egenkontroll OK, `visuelt_godkjent=true` av Tom 2026-10-13: «Disse er bra, fortsett med resten»; godkjent hovedreferanse for resten av stilpiloten, SHA-256 i `hovedark/sam-notat.md`)
+- [x] `hovedark/max.png` (hovedark for Max, referanse i `hovedark/max/`; rettet 13. oktober, eksakte mål og plass, egenkontroll OK, `visuelt_godkjent=true` av Tom 2026-10-13: «Disse er bra, fortsett med resten»; godkjent hovedreferanse for resten av stilpiloten, SHA-256 i `hovedark/max-notat.md`)
+- [x] `rom007_del1av2` (rom 7 Kontoret, del 1/2) (pilot)
+- [x] `rom007_del2av2` (rom 7 Kontoret, del 2/2) (pilot)
+- [x] `fig002_01` (figurark 1 for Sam (kostyme 2), 9 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`) (pilot)
+- [x] `fig003_01` (figurark 1 for Max (kostyme 3), 28 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); gange mot høyre (8 ruter); snakking (lag 3, tegnes over kroppen) mot høyre (12 ruter), bilde to `hovedark/max.png`) (pilot)
 
 ## Etter godkjent stilpilot
 
-Ikke start disse før `ORDRE.md` sier at piloten er godkjent og stilankerne ligger i `stil/`.
+Tom godkjente stilpiloten direkte 13. oktober og ba om resten av HD-konverteringen. Se `rapporter/stilpilot-fortsettelse-20261013/TOMS-GODKJENNING.json`. Denne nyere brukerordren autoriserer videre arbeid; kilde- og leveringsreglene gjelder fortsatt.
 
 ## Bestilling 2
 
@@ -3422,4 +3422,4 @@ Figurark for Ildslukeren, Hette, Mann i rød skjorte.
 
 ## Ferdig
 
-Ingen godkjente produksjonsleveranser ennå. Hovedarkene er rettet og levert som pilotkandidater med egenkontroll OK og eksakte ytre bokser; se `rapporter/hovedark-retting-20261013/PRESIS-RETTING.md`. Toms visuelle godkjenning gjenstår.
+Tom har godkjent hovedarkene og stilpiloten 13. oktober og autorisert resten av HD-konverteringen. Kontoret i to deler, Sam fig002_01 og Max fig003_01 er levert med egenkontroll OK; se `rapporter/stilpilot-fortsettelse-20261013/RAPPORT.md`. Motorimport og spilltest er egne, foreløpig uverifiserte trinn.

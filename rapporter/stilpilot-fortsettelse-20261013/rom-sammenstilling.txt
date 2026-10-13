@@ -1,0 +1,148 @@
+"""Reproduserbar sammenstilling av kontoret. Kjor med Python og Pillow fra reporoten.
+
+Ingen generering, semantisk retusj eller bruk av originalmaske. Begge leveranser
+skjaeres fra samme fullscene for a fa eksakt samme overlapp.
+"""
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageStat
+import hashlib
+import json
+import shutil
+
+report = Path('rapporter/stilpilot-fortsettelse-20261013')
+raw1 = report / 'rom007_del1av2-forsok-02.png'
+raw2 = report / 'rom007_del2av2-forsok-01.png'
+generated2 = Path('/home/tombonator3000t/.codex/generated_images/01a13595-00a5-7010-b4a8-6a5195d4c61e/exec-92016f3c-7880-405c-ad76-9996684839a2.png')
+if not raw2.exists():
+    shutil.copy2(generated2, raw2)
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+a = Image.open(raw1).convert('RGB')
+b = Image.open(raw2).convert('RGB')
+assert a.size == b.size == (1536, 1024)
+crop = (0, 112, 1536, 912)
+part1, part2 = a.crop(crop), b.crop(crop)
+offset = 416
+overlap = 1120
+seam_center = 976
+blend_width = 128
+blend_left = seam_center - blend_width // 2
+blend_right = seam_center + blend_width // 2
+
+# Bevar venstre og hoyre del uten skalering eller forskyvning. I det
+# avgrensede overgangsfeltet blandes RGB med en myk smoothstep-vekt.
+full = Image.new('RGB', (1952, 800))
+full.paste(part1, (0, 0))
+full.paste(part2, (offset, 0))
+full.paste(part1.crop((0, 0, blend_left, 800)), (0, 0))
+left_patch = part1.crop((blend_left, 0, blend_right, 800))
+right_patch = part2.crop((blend_left-offset, 0, blend_right-offset, 800))
+weights = []
+for x in range(blend_width):
+    t = x / (blend_width - 1)
+    weights.append(round(255 * t*t*(3-2*t)))
+mask = Image.new('L', (blend_width, 800))
+mask.putdata(weights * 800)
+full.paste(Image.composite(right_patch, left_patch, mask), (blend_left, 0))
+fullpath = report / 'kontor-helrom.png'
+full.save(fullpath)
+
+outpaths = []
+for n, start in [(1, 0), (2, offset)]:
+    canvas = Image.new('RGB', (1536, 1024), (128, 128, 128))
+    canvas.paste(full.crop((start, 0, start+1536, 800)), (0, 112))
+    outpath = Path(f'jobber/rom007_del{n}av2/resultat.png')
+    canvas.save(outpath)
+    outpaths.append(outpath)
+
+final1, final2 = [Image.open(p).convert('RGB') for p in outpaths]
+overlap1 = final1.crop((416, 112, 1536, 912))
+overlap2 = final2.crop((0, 112, 1120, 912))
+assert overlap1.tobytes() == overlap2.tobytes()
+for im in (final1, final2):
+    for box in [(0, 0, 1536, 112), (0, 912, 1536, 1024)]:
+        assert im.crop(box).getextrema() == ((128,128),(128,128),(128,128))
+
+source1 = Image.open('jobber/rom007_del1av2/referanse.png').convert('RGB').crop(crop)
+source2 = Image.open('jobber/rom007_del2av2/referanse.png').convert('RGB').crop(crop)
+assert source1.crop((416,0,1536,800)).tobytes() == source2.crop((0,0,1120,800)).tobytes()
+source_full = Image.new('RGB', (1952,800))
+source_full.paste(source1)
+source_full.paste(source2, (416,0))
+source_full.save(report / 'kontor-original-helrom.png')
+
+try:
+    font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 24)
+except OSError:
+    font = ImageFont.load_default()
+
+def contact(items, columns, width, height, target):
+    gap, label = 16, 42
+    rows = (len(items) + columns - 1) // columns
+    sheet = Image.new('RGB', (columns*width+(columns+1)*gap, rows*(height+label)+(rows+1)*gap), '#eeeeee')
+    draw = ImageDraw.Draw(sheet)
+    for i, (title, im) in enumerate(items):
+        x = gap + (i % columns) * (width+gap)
+        y = gap + (i // columns) * (height+label+gap)
+        draw.text((x,y+4), title, fill='#111111', font=font)
+        if im.size != (width,height):
+            im = im.resize((width,height), Image.Resampling.LANCZOS)
+        sheet.paste(im, (x,y+label))
+    sheet.save(target)
+
+contact([
+    ('Del 1: ra generering, forsok 2', a),
+    ('Del 1: ferdig fra felles fullscene', final1),
+    ('Del 2: ra generering, forsok 1', b),
+    ('Del 2: ferdig fra felles fullscene', final2),
+], 2, 1536, 1024, report/'kontor-for-etter.png')
+contact([
+    ('Originalen: hele kontoret i 4x, ingen originalfil endret', source_full),
+    ('HD-pilot: hele kontoret, felles grunnlag for begge leveranser', full),
+], 1, 1952, 800, report/'kontor-helrom-kontaktark.png')
+seambox = (864, 0, 1088, 800)
+contact([
+    ('Ra del 1 ved skjot', part1.crop(seambox)),
+    ('Ra del 2 ved skjot', part2.crop((864-offset,0,1088-offset,800))),
+    ('Ferdig felles skjot', full.crop(seambox)),
+], 3, 224, 800, report/'kontor-skjot-kontaktark.png')
+
+protected = {}
+for job in ('rom007_del1av2','rom007_del2av2'):
+    for name in ('referanse.png','original_1x.png','prompt.txt','jobb.json'):
+        p = Path('jobber')/job/name
+        protected[str(p)] = sha(p)
+
+diff = ImageStat.Stat(ImageChops.difference(part1.crop((416,0,1536,800)), part2.crop((0,0,1120,800))))
+outputs = [fullpath, *outpaths, report/'kontor-original-helrom.png', report/'kontor-for-etter.png', report/'kontor-helrom-kontaktark.png', report/'kontor-skjot-kontaktark.png']
+record = {
+    'dato': '2026-10-13',
+    'metode': 'Pillow: uendrede utsnitt, 128 px smoothstep RGB-overgang, felles fullscene, to eksakte utsnitt',
+    'modell': 'ChatGPTs innebygde bildegenerator. Eksakt modellnavn er ikke eksponert.',
+    'raafiler': {str(raw1): sha(raw1), str(raw2): sha(raw2)},
+    'generert_del2_kilde': str(generated2),
+    'lerret': [1536,1024],
+    'bilde_i_lerret': [0,112,1536,800],
+    'fullscene': [1952,800],
+    'del2_global_x': offset,
+    'overlapp_hd': [416,0,1120,800],
+    'overlapp_original': [104,0,280,200],
+    'overlapp_del1_lerret': [416,112,1120,800],
+    'overlapp_del2_lerret': [0,112,1120,800],
+    'overlapp_byteidentisk': True,
+    'overlapp_antall_rgb_piksler': 896000,
+    'overlapp_sha256_rgb': hashlib.sha256(overlap1.tobytes()).hexdigest(),
+    'graabaand_rgb': [128,128,128],
+    'graabaand_hoyde': [112,112],
+    'overgang_global_x_halvaapent': [blend_left,blend_right],
+    'overgang_original_x': [blend_left/4,blend_right/4],
+    'ra_overlapp_gjennomsnitt_abs_rgb_avvik': [round(v,4) for v in diff.mean],
+    'beskyttede_filer_sha256': protected,
+    'utdata_sha256': {str(p):sha(p) for p in outputs},
+    'egenkontroll': 'Kjores separat med uendret verktoy/sjekk_leveranse.py; utskrift lagres i rom-egenkontroll.txt.',
+    'visuell_QA': 'Original, ra generering, felles fullscene og skjot gjennomgaas separat. Ikke runtime-testet. Ikke visuelt godkjent av Tom.',
+}
+(report/'rom-sammenstilling.json').write_text(json.dumps(record, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+print(json.dumps({'utdata_sha256':record['utdata_sha256'],'overlapp_byteidentisk':True,'overlapp_sha256_rgb':record['overlapp_sha256_rgb']},ensure_ascii=False,indent=2))

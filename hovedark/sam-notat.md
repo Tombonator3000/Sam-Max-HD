@@ -1,6 +1,6 @@
 # Hovedark for Sam
 
-Rettet 2026-10-13 16:31 (norsk tid) av Codex. Levert som stilpilotkandidat, ikke visuelt godkjent.
+Rettet 2026-10-13 16:31 (norsk tid) av Codex. Visuelt godkjent av Tom 2026-10-13 som hovedreferanse for resten av stilpiloten.
 
 ## Verktøy og grunnlag
 
@@ -28,7 +28,7 @@ Utvidet måling kontrollerer også bredde og plassering. Alle boksene nedenfor e
 
 Målinger, transformasjoner og kildehash ligger i `rapporter/hovedark-retting-20261013/presis-kontroll.json`. Kontaktarket `rapporter/hovedark-retting-20261013/sammenligning-sam.png` viser original 4x, før og etter med samme utsnitt og skala. Visuell kontroll bekrefter at alle fem valgte tegninger er bevart, at fotlinjer og ytre bokser følger originalmålene, og at alfakantene er myke. Boksene beviser ikke samsvar for alle indre konturer eller ansiktsdetaljer.
 
-Tom har ikke godkjent designet. Ingen motorimport, animasjonsavspilling eller publisert HD-mod er utført. Hovedarket er en designprøve, ikke en animasjonsleveranse. De øvrige pilotjobbene er ikke utført i denne rettingen.
+Tom godkjente de to rettede hovedarkene 2026-10-13 med «Disse er bra, fortsett med resten». `visuelt_godkjent=true` gjelder hovedarket med ferdig SHA-256 nedenfor, levert i commit `2b22fe71`. Dette er en godkjent visuell hovedreferanse og autorisasjon til resten av stilpiloten. Full serieproduksjon venter på godkjenning av den samlede stilpiloten. Ingen motorimport, animasjonsavspilling eller publisert HD-mod er utført. Hovedarket er ikke en animasjonsleveranse. De øvrige pilotjobbene er ikke utført i denne rettingen.
 
 ## Sporbarhet
 

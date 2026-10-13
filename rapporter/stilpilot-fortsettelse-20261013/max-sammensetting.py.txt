@@ -1,0 +1,93 @@
+from PIL import Image,ImageDraw,ImageFont
+from pathlib import Path
+import json,hashlib
+import numpy as np
+ROOT=Path('/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren')
+REPORT=ROOT/'rapporter/stilpilot-fortsettelse-20261013'
+job=json.loads((ROOT/'jobber/fig003_01/jobb.json').read_text())
+meta=json.loads((ROOT/'konsept/2026-10-12/kostymer-originalmetadata.json').read_text())['3']
+cels={c['cel']:c for c in meta['cels']}; routes={r['rute']:r for r in job['ruter']}
+out=Image.open(ROOT/'jobber/fig003_01/resultat.png').convert('RGBA')
+original=Image.open(ROOT/'jobber/fig003_01/original_1x.png').convert('RGB')
+font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',16)
+
+def tile(cid,hd):
+    r=routes[cid];sx0,sy0,sx1,sy1=r['synlig']
+    if hd:return out.crop((64+4*sx0,32+4*sy0,64+4*sx1,32+4*sy1))
+    t=original.crop((sx0,sy0,sx1,sy1)).convert('RGBA');a=np.array(t)
+    a[:,:,3]=np.where(np.abs(a[:,:,:3].astype(int)-np.array([0,200,200])).sum(axis=2)>24,255,0).astype(np.uint8)
+    return Image.fromarray(a).resize((4*(sx1-sx0),4*(sy1-sy0)),Image.Resampling.NEAREST)
+
+def paste_cel(im,cid,hd,anchor):
+    r=routes[cid];c=cels[cid];t=tile(cid,hd)
+    dx,dy=4*(r['synlig'][0]-r['rekt'][0]),4*(r['synlig'][1]-r['rekt'][1])
+    xy=(anchor[0]+4*c['rel_x']+dx,anchor[1]+4*c['rel_y']+dy)
+    im.alpha_composite(t,xy)
+    return xy
+
+def compose(ids,hd,wh=(300,288),anchor=(150,250)):
+    im=Image.new('RGBA',wh,'#f2f3f5')
+    for cid in ids:paste_cel(im,cid,hd,anchor)
+    return im.convert('RGB')
+
+# Tre reelle lagdelte staafigurer, kildeoffsets og samme fotanker.
+standing=Image.new('RGB',(1080,334),'#d7d9df');d=ImageDraw.Draw(standing)
+for j,(body,head,label) in enumerate([(129,385,'Hoeyre'),(128,384,'Front'),(130,386,'Bak')]):
+    for k,hd in enumerate([False,True]):
+        x=j*360+k*180
+        d.text((x+8,8),label+(' HD' if hd else ' original'),font=font,fill='#202530')
+        pic=compose([body,head],hd,(180,288),(90,250))
+        standing.paste(pic,(x,40))
+standing.save(REPORT/'max-staaende-sammensatt.png')
+
+blink_contact=Image.new('RGB',(960,550),'#d7d9df');d=ImageDraw.Draw(blink_contact)
+blink_report=[]
+for j,(head,blink,label,delta,eyes) in enumerate([
+ (385,513,'Hoeyre',(52,84),[(56,84,60,92),(100,84,104,92)]),
+ (384,512,'Front',(28,84),[(32,84,36,92),(80,84,84,92)])]):
+    hh=tile(head,True);bb=tile(blink,True);both=hh.copy();both.alpha_composite(bb,delta)
+    ha=np.array(hh);ba=np.array(both);fullblink=Image.new('RGBA',hh.size);fullblink.alpha_composite(bb,delta);la=np.array(fullblink)
+    counts=[]
+    for rect in eyes:
+        x0,y0,x1,y1=rect
+        dark=lambda a:(a[y0:y1,x0:x1,:3].max(axis=2)<100)&(a[y0:y1,x0:x1,3]>=128)
+        before=dark(ha);after=dark(ba);drawn_lid=dark(la)
+        residual=after & before & ~drawn_lid
+        assert not residual.any(),(head,rect,int(residual.sum()))
+        counts.append({'oeyefeste':list(rect),'svarte_pupillpiksler_aapent':int(before.sum()),'svarte_piksler_lukket':int(after.sum()),'egen_svart_blinkkontur':int(drawn_lid.sum()),'gjenstaaende_pupillpiksler_utenfor_blinkkontur':int(residual.sum())})
+    blink_report.append({'hode':head,'blink':blink,'delta_hd':list(delta),'oeyekontroll':counts})
+    for k,(hd,closed) in enumerate([(False,False),(False,True),(True,False),(True,True)]):
+        h=tile(head,hd)
+        if closed:h.alpha_composite(tile(blink,hd),delta)
+        bg=Image.new('RGBA',h.size,'white');bg.alpha_composite(h)
+        x=k*240;y=j*275
+        d.text((x+8,y+6),label+(' HD' if hd else ' original')+(' blink' if closed else ' aapen'),font=font,fill='#202530')
+        blink_contact.paste(bg.convert('RGB').resize((224,240),Image.Resampling.LANCZOS if hd else Image.Resampling.NEAREST),(x+8,y+30))
+blink_contact.save(REPORT/'max-blink-kontroll.png')
+(REPORT/'max-blink-kontroll.json').write_text(json.dumps({'forklaring':'Kildeoffsets, to separate oeyelokklag og kontroll av morke pupillpiksler foer/etter. Egen svart blinkkontur regnes ikke som gjenstaaende pupil.','kontroller':blink_report},ensure_ascii=False,indent=2)+'\n')
+
+# Hver gait-cel er allerede en hel figur. Samme fotanker, intet ekstra hode.
+frames=[];walk_contact=Image.new('RGB',(1280,330),'#d7d9df');d=ImageDraw.Draw(walk_contact)
+for i,cid in enumerate(range(148,156)):
+    frame=Image.new('RGB',(640,330),'#d7d9df');fd=ImageDraw.Draw(frame)
+    for k,hd in enumerate([False,True]):
+        fd.text((k*320+10,8),f'{cid}: '+('HD' if hd else 'Original 4x'),font=font,fill='#202530')
+        frame.paste(compose([cid],hd,(320,288),(150,250)),(k*320,34))
+    fd.text((10,312),'Diagnose: 100 ms/fase, IKKE originaltiming eller motoravspilling',font=font,fill='#202530')
+    frames.append(frame)
+    thumb=frame.resize((320,165),Image.Resampling.LANCZOS)
+    walk_contact.paste(thumb,((i%4)*320,(i//4)*165))
+frames[0].save(REPORT/'max-gange-diagnose.gif',save_all=True,append_images=frames[1:],duration=100,loop=0,optimize=False)
+walk_contact.save(REPORT/'max-gange-kontaktark.png')
+
+# Talehodene er vist sammen med samme staaende kropp og dokumenterte offsets.
+talks=[r['rute'] for r in job['ruter'] if r['animasjon']==4]
+talk_contact=Image.new('RGB',(1440,920),'#d7d9df');d=ImageDraw.Draw(talk_contact)
+for i,cid in enumerate(talks):
+    cell=Image.new('RGB',(360,300),'#d7d9df');cd=ImageDraw.Draw(cell)
+    for k,hd in enumerate([False,True]):
+        cd.text((k*180+6,6),f'{cid}: '+('HD' if hd else 'original'),font=font,fill='#202530')
+        cell.paste(compose([129,cid],hd,(180,270),(90,238)),(k*180,28))
+    talk_contact.paste(cell,((i%4)*360,(i//4)*306))
+talk_contact.save(REPORT/'max-tale-sammensatt.png')
+print('Staa, blink, gange og tale: diagnostikk lagret. Gjenstaaende pupillpiksler:',sum(e['gjenstaaende_pupillpiksler_utenfor_blinkkontur'] for b in blink_report for e in b['oeyekontroll']))

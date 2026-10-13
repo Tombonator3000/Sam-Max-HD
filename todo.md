@@ -18,4 +18,8 @@
 
 - [x] Levert hovedarkskandidater for Sam og Max 13. oktober, med ekte alfa, notater og egenkontroll SJEKK.
 - [x] Rettet mål og plassering i Sam- og Max-hovedarkene 13. oktober med Toms godkjente presise bildebehandling. Alle ti bokser er eksakte og egenkontroll er OK.
-- [ ] Tom vurderer design og stil i de rettede hovedarkene før de regnes som godkjente stilankere.
+- [x] Tom godkjente de to rettede Sam-/Max-hovedarkene som visuelle hovedreferanser 2026-10-13: «Disse er bra, fortsett med resten». Resten av stilpiloten er autorisert; full serieproduksjon venter på godkjenning av samlet stilpilot. Ferdige SHA-256 er bevart i hovedarknotatene og fremdriftsrapporten.
+
+- [x] Fullført resten av stilpiloten: rom007_del1av2, rom007_del2av2, fig002_01 og fig003_01. Fire egenkontroller OK, 37 eksakte rutebokser og separat blinkkontroll.
+- [x] Tom godkjente stilpiloten og autoriserte videre HD-konvertering: «veldig bra! godkjenner dette! sett inn i repo , fortsett med resten av HD konvertering».
+- [ ] Fortsett bestilling 2 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
