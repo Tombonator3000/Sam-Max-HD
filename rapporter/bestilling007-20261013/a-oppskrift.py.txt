@@ -1,0 +1,27 @@
+from PIL import Image
+from pathlib import Path
+import json,hashlib,subprocess,numpy as np
+p=Path('rapporter/bestilling007-20261013')
+# Each entry is generated raw filename, visible raw xyxy and exact job destination.
+jobs={
+ 'rom029':('a-rom029-raa.png',(128,112,1408,912)),
+ 'obj293_01':('a-obj293_01-raa.png',(262,185,1274,835)),
+ 'obj294_01':('a-obj294_01-raa02.png',(272,208,1264,816)),
+ 'obj295_01':('a-obj295_01-raa.png',(288,208,1248,816)),
+}
+def sha(f):return hashlib.sha256(Path(f).read_bytes()).hexdigest()
+rows=[]
+for name,(raw,box) in jobs.items():
+ j=json.loads(Path('jobber',name,'jobb.json').read_text());x,y,w,h=j['bilde_i_lerret']
+ im=Image.open(p/raw).convert('RGB').crop(box)
+ if im.size!=(w,h):im=im.resize((w,h),Image.Resampling.LANCZOS)
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im,(x,y));f=Path('jobber',name,'resultat.png');out.save(f)
+ arr=np.array(out);mask=np.ones(arr.shape[:2],bool);mask[y:y+h,x:x+w]=False;assert np.all(arr[mask]==128)
+ r=subprocess.run(['/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3','verktoy/sjekk_leveranse.py',str(f)],capture_output=True,text=True)
+ (p/('a-'+name+'-sluttkontroll.txt')).write_text(r.stdout+r.stderr)
+ status=r.stdout.split('Utfall: ')[-1].strip()
+ rows.append({'id':name,'resultat':str(f),'sha256':sha(f),'egenkontroll':status,'logg':str(p/('a-'+name+'-sluttkontroll.txt')),'raw':str(p/raw),'raw_sha256':sha(p/raw),'raw_rect':box,'bilde_i_lerret':[x,y,w,h],'padding_rgb128':True,'canvas':[1536,1024],'runtime':'UVERIFISERT','user_visual_QA':'ikke utført'})
+locked=json.loads((p/'kildehash.json').read_text());checks=[{'fil':v['fil'],'sha256':sha(v['fil']),'uendret':sha(v['fil'])==v['sha256']} for v in locked];assert all(v['uendret'] for v in checks)
+(p/'a-kildebevis.json').write_text(json.dumps(checks,indent=2)+'\n')
+(p/'a-leveranser.json').write_text(json.dumps(rows,indent=2,ensure_ascii=False)+'\n')
+print(json.dumps(rows,indent=2,ensure_ascii=False))

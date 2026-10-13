@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling007-20261013';r.mkdir(exist_ok=True)
+full=Image.new('RGB',(1664,1024),(128,128,128))
+for part,x in [(1,0),(2,128)]:
+ full.paste(Image.open(b/'jobber'/f'rom030_del{part}av2'/'referanse.png').convert('RGB').crop((0,112,1536,912)),(x,112))
+full.save(r/'rom030-fullkilde.png')
+p='\n\n'.join('Original prompt '+j+':\n'+(b/'jobber'/j/'prompt.txt').read_text() for j in ['rom030_del1av2','rom030_del2av2'])
+p+='\n\nSource-grounded fullscene clarification: first image is the complete joined original rotating seafood restaurant room30. Override only the part canvas instructions above: return one1664x1024 full panorama, scene (0,112,1664,800), plain #808080 padding. Both parts will be cropped from this one master. Image2 is approved painting style only. Copy SEAFOOD and FRESH FISH exactly, including the green fish graphic between FRESH and FISH. Keep all the fishing nets, all hanging round and conical lamp shades, roof beams and round blue window backdrop precisely as source, same number and arrangement. Preserve the central blue cylindrical glass structure and narrow gold-trim door/frame exactly, including the shapes visible inside; it is not an aquarium to fill with fish. Preserve all red booth seats, gray tables, bottles and condiment holders, the green fish-shaped decoration at left booth, the dark pedestal viewing device, counter and angled display at lower left, and the cropped structure at lower right. The large yellow toothed circular floor edge is part of the original world geometry; preserve every visible tooth, gaps and black pit boundary. No new people, guests, food, seats, fish, lamps or text. Keep the window background plain blue, the game adds other visual layers. Trace positions and sizes precisely, no invented texture or clutter.'
+(r/'rom030-prompt.txt').write_text(p)

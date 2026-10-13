@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 18:24 (norsk tid)
+Oppdatert 2026-10-13 18:38 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 25 rom levert (37 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 14 levert, inkludert én SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 28 rom levert (44 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 17 levert, inkludert to SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -109,16 +109,16 @@ Rom 22, 23, 24, 25, 26, 27, 28.
 
 Rom 29, 30, 31.
 
-- [ ] `rom029` (rom 29 Inne i hyssingnøstet)
-- [ ] `obj293_01` (rom 29 Inne i hyssingnøstet, objekt 293 tilstand 01)
-- [ ] `obj294_01` (rom 29 Inne i hyssingnøstet, objekt 294 tilstand 01)
-- [ ] `obj295_01` (rom 29 Inne i hyssingnøstet, objekt 295 tilstand 01)
-- [ ] `rom030_del1av2` (rom 30 Den roterende restauranten, del 1/2)
-- [ ] `rom030_del2av2` (rom 30 Den roterende restauranten, del 2/2)
-- [ ] `rom031_del1av4` (rom 31 Kikkerten med utsikten, del 1/4)
-- [ ] `rom031_del2av4` (rom 31 Kikkerten med utsikten, del 2/4)
-- [ ] `rom031_del3av4` (rom 31 Kikkerten med utsikten, del 3/4)
-- [ ] `rom031_del4av4` (rom 31 Kikkerten med utsikten, del 4/4)
+- [x] `rom029` (rom 29 Inne i hyssingnøstet)
+- [x] `obj293_01` (levert med egenkontroll SJEKK, se jobbnotat) (rom 29 Inne i hyssingnøstet, objekt 293 tilstand 01)
+- [x] `obj294_01` (rom 29 Inne i hyssingnøstet, objekt 294 tilstand 01)
+- [x] `obj295_01` (rom 29 Inne i hyssingnøstet, objekt 295 tilstand 01)
+- [x] `rom030_del1av2` (rom 30 Den roterende restauranten, del 1/2)
+- [x] `rom030_del2av2` (rom 30 Den roterende restauranten, del 2/2)
+- [x] `rom031_del1av4` (rom 31 Kikkerten med utsikten, del 1/4)
+- [x] `rom031_del2av4` (rom 31 Kikkerten med utsikten, del 2/4)
+- [x] `rom031_del3av4` (rom 31 Kikkerten med utsikten, del 3/4)
+- [x] `rom031_del4av4` (rom 31 Kikkerten med utsikten, del 4/4)
 
 ## Bestilling 8
 
@@ -3433,3 +3433,5 @@ Bestilling 4 er levert med ti bilder og egenkontroll OK, se `rapporter/bestillin
 Bestilling5:8OK,1SJEKK og1uavklartFEIL. Obj187_05 er ikke klar for mottak og forblir ukrysset. Se `rapporter/bestilling005-20261013/RAPPORT.md`. Uavhengig produksjon i bestilling6/7 fortsetter.
 
 Bestilling6: ti rombilder levert, alle egenkontroller OK. Rom022 er komplett med identisk overlapp over bestillingsgrensen. Se `rapporter/bestilling006-20261013/RAPPORT.md`. Obj187_05 fra bestilling5 er fortsatt uavklart.
+
+Bestilling7:9OK og obj293_01 SJEKK, ti bilder levert. Se `rapporter/bestilling007-20261013/RAPPORT.md`. Bestilling8 er startet. Obj187_05 fra5 forblir ukrysset/uavklart.

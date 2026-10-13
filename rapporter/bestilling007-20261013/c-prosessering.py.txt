@@ -1,0 +1,28 @@
+"""Kjør fra repoet. Autorisert lerret, svarte kildefelt og panoramaovergang."""
+from pathlib import Path
+from PIL import Image
+import numpy as np
+r = Path('rapporter/bestilling007-20261013')
+parts = []
+for i in range(1, 5):
+    a = np.array(Image.open(r / f'rom031_del{i}av4-raa-1.png').convert('RGB').crop((0, 112, 1536, 912)))
+    # Rektangulære svarte felt er selve kilden, ikke masker langs originale objekter.
+    a[:160] = 0
+    a[512:] = 0
+    parts.append(a)
+full = np.zeros((800, 4416, 3), dtype=np.uint8)
+full[:, :1536] = parts[0]
+for i in range(1, 4):
+    offset = i * 960
+    x0, x1 = offset + 256, offset + 320
+    old = full[:, x0:x1].astype(float)
+    new = parts[i][:, x0-offset:x1-offset].astype(float)
+    t = np.linspace(0, 1, x1-x0)[None, :, None]
+    t = t*t*(3-2*t)
+    full[:, x0:x1] = np.round(old*(1-t)+new*t).astype('uint8')
+    full[:, x1:offset+1536] = parts[i][:, x1-offset:]
+Image.fromarray(full).save(r / 'rom031-fullscene.png')
+for i in range(4):
+    canvas = Image.new('RGB', (1536, 1024), (128, 128, 128))
+    canvas.paste(Image.fromarray(full[:, i*960:i*960+1536]), (0, 112))
+    canvas.save(Path('jobber') / f'rom031_del{i+1}av4' / 'resultat.png')
