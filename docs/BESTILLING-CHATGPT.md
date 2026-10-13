@@ -242,7 +242,7 @@ Si fra hvis noe ikke lar seg gjøre trofast. Skriv et kort notat: verktøy, dato
 
 ## 12. Opphav
 
-*Sam & Max Hit the Road* eies av Disney/Lucasfilm. Repoet er offentlig etter Toms valg, men jobbene, referansene og resultatene ligger bare i grenen `gpt-arbeid` og i `work/`. De skal ikke deles utenfor repoet eller legges i `main`.
+*Sam & Max Hit the Road* eies av Disney/Lucasfilm. Repoet er offentlig etter Toms valg, men jobbene, referansene og resultatene ligger bare i grenen `gpt-arbeid` og i `work/`. De legges ikke i `main`. Tom kan dele dem utenfor repoet til eget, privat bruk.
 
 ## 13. Videre arbeidsmetode
 

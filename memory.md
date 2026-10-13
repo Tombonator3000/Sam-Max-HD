@@ -69,3 +69,4 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Romnavn i `docs/rom-oversikt.csv` (alle 85), engelske romnotater med skilttekst i `docs/gpt-romnotater.csv`, figurliste med navn og engelsk beskrivelse i `docs/figurer.csv`.
 - CSV-filene i `docs/` skrives med LF (`lineterminator="\n"`), ellers klager `git diff --check`.
 - Dynamisk lys (normalkart og luminansmaske) er planlagt etter stilpiloten: valgfritt for spilleren, ingen kastede skygger (Tom 13. oktober). Samme plan i Zak.
+- Deling (13. oktober 2026): Tom tillater at grafikk og annet fra spillet deles utenfor repoet til hans eget private bruk (egne enheter, private steder). Offentlige sider og pakker har fortsatt ingen spillgrafikk. Spillfilene og det som lages fra dem holdes fortsatt utenfor `main`.
