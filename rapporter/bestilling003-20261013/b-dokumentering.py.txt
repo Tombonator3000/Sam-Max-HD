@@ -1,0 +1,68 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling003-20261013'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+rows=json.loads((r/'kildehash.json').read_text())
+selected=[a for a in rows if any('/'+room+'_' in a['fil'] for room in ['rom011','rom015'])]
+assert len(selected)==16,len(selected)
+assert all(sha(b/a['fil'])==a['sha256'] for a in selected)
+entries=[]
+for room in ['rom011','rom015']:
+    start=384 if room=='rom011' else 992
+    first=np.asarray(Image.open(b/'jobber'/(room+'_del1av2')/'resultat.png'))
+    second=np.asarray(Image.open(b/'jobber'/(room+'_del2av2')/'resultat.png'))
+    overlap=np.array_equal(first[:,start:,:],second[:,:1536-start,:])
+    assert overlap
+    for part in [1,2]:
+        job=f'{room}_del{part}av2'
+        dest=b/'jobber'/job/'resultat.png'
+        source=b/'jobber'/job/'referanse.png'
+        e={'jobb':job,'resultat':str(dest.relative_to(b)),'sha256':sha(dest),'referanse_sha256':sha(source),'teknisk_kontroll':'OK','egenkontroll':'Fullscene og relevante skilt sett visuelt mot original. Se detaljer og begrensninger i notat.','runtime':False,'nybildegodkjenning':False,'overlapp_byteidentisk':overlap,'overlapp_bredde':1536-start,'master':f'rapporter/bestilling003-20261013/{room}-fullscene.png','master_sha256':sha(r/(room+'-fullscene.png')),'genereringer_fullscene':1,'lokal_bilderetting':room=='rom015'}
+        entries.append(e)
+        motive=("Snuckey's inne. Oransje disk og fem røde/oransje krakker, hyller med varer, vindusruter, donut-glassfelt, karusellstativ, klær og hengende varer. Hovedskiltet fountain er kontrollert. Prompttillegget sa ved en tellefeil fire krakker; originalen og levert bilde viser fem, inkludert den delvis skjulte bakerst. Kilden og det leverte bildet går foran den feilaktige teksttellingen." if room=='rom011' else "Karnevalinngangen. Kiosk, klovneformet søppelbøtte, skjeve telt, karikert inngangshode, sideplakater, karusellarm, grønt telt, gjerde og vegetasjon. KUSHMAN BROS SHOWS, CLOSED, HALL of ODDITIES, WEIRD og CREEPY er kontrollert. Delvis skjult høyreskilt er ikke fullført.")
+        correction=("Ett fullsceneforsøk, ingen lokal retting." if room=='rom011' else "Ett fullsceneforsøk og én avgrenset innebygd bilde-edit. Første D i ODDITIES var feilaktig P. Rettet generert bokstavutsnitt er plassert presist i fullscenen; begge deler er deretter skåret på nytt. Råforsøk2, rettingsprompt og oppskrift er bevart. Rettet skilt er inspisert i rom015-skiltkontroll-rettet.png.")
+        note=f"""# {job}
+
+Dato: 13. oktober 2026. Innebygd image_gen; eksakt bildemodell er ikke eksponert. {correction}
+
+## Kilde og motiv
+
+{motive}
+
+Kildegrunnlag: beskyttet jobbmetadata og originalreferanser, samt origin/main:docs/gpt-romnotater.csv ved 3df35f636f123584e4a8d454871fb9318f995d35. Begge deler er sett før produksjon. Godkjent stil/rom007_del1av2.png er kun stilanker. Begge originale prompt.txt er bevart ordrett i {room}-prompt.txt med presisering for én fullscene.
+
+## Plassering og kontroll
+
+Felles fullscene sikrer byte-identisk overlapp på {1536-start} piksler. Resultatet er 1536 x 1024, scene [0,112,1536,800] og eksakt #808080 padding. Hele generert panorama er normalisert med Lanczos til kildeformat, uten lokal geometriwarp. Delene er klippet fra samme master etter jobbens region.
+
+Uendret verktoy/sjekk_leveranse.py: OK. Kontrollutdata er bevart som {job}-kontroll.txt. Alle 16 beskyttede kildefiler for disse fire jobbene er kontrollert mot kildehash.json uten avvik.
+
+Referanse SHA-256: {e['referanse_sha256']}
+Resultat SHA-256: {e['sha256']}
+Master SHA-256: {e['master_sha256']}
+
+Visuell egenkontroll omfatter fullscene, hovedformer, skilt og overlapp. Små emballasjefigurer, varenes detaljer og plakatenes små tegn er tolkninger av lave pikselmengder; de er ikke bekreftet bokstav-/detaljidentiske. Nytegningen har jevnere og noe sterkere skygger enn kilden.
+
+Runtime: ikke utført. Nybildegodkjenning fra Tom: ikke gitt. Dette er arbeidsasset med teknisk og visuell egenkontroll, ikke dokumentert ferdig motorintegrasjon.
+"""
+        (b/'jobber'/job/'notat.md').write_text(note)
+(r/'b-leveranser.json').write_text(json.dumps({'dato':'2026-10-13','leveranser':entries},ensure_ascii=False,indent=2)+'\n')
+(r/'b-kilde-qa.md').write_text("""# Kilde-QA for Snuckey's og karnevalet
+
+Fire deljobber er levert fra to sammenhengende fullscener. Originalrommene er 480x200 og 632x200. Originaldelene er slått sammen uten endring og brukt som redigeringsmål. Godkjent kontor er stilanker, ingen sceneinnhold er hentet derfra.
+
+Verktøyet returnerte 1717x916 for rom011 og 1971x798 for rom015. Hele panoramabilder er normalisert til 1920x1024 og 2528x1024 med Lanczos. Bare global skala og marginal målavrunding er brukt, ingen lokal warp. Padding er satt til eksakt #808080. Endelige jobber er 1536x1024 med bildeområde [0,112,1536,800].
+
+Rom011 har delskift384 og overlapp1152 piksler; rom015 har delskift992 og overlapp544 piksler. Begge overlapp er kontrollert med array_equal og er byte-identiske. Alle fire kontroller gir OK.
+
+Karnevalets første D i ODDITIES ble feilaktig P i første forsøk. Avgrenset innebygd image_gen-edit rettet bokstaven. Bare det genererte bokstavutsnittet ble presist plassert i masteren, med myk rektangulær overgang. Dette er ikke originalpikselmaskering. Råbilde, førbilde, prompt, rettingsutsnitt, etterbilde og oppskrift er bevart.
+
+Kildetekst: origin/main:docs/gpt-romnotater.csv ved 3df35f636f123584e4a8d454871fb9318f995d35. Fem krakker er synlige i Snuckey's når den delvis skjulte bakerste regnes med. Prompttilleggets fire var en tellefeil; original og resultat har fem. De beskyttede promptfilene er ikke rørt.
+
+16 beskyttede kilder matcher kildehash.json. Ingen Git-mutasjoner, kodeendringer eller globale dokumentendringer er utført.
+
+Små vareetiketter og plakatglyfer kan ikke uten videre kalles identisk tekst; de store dokumenterte skiltene er kontrollert, inklusive rettet ODDITIES. Motorintegrasjon, objektlag og ny visuell godkjenning fra Tom er ikke utført. Runtime=false og nybildegodkjenning=false er ført i manifestet.
+""")
+print('Fire leveranser dokumentert, 16 kildehasher uendret, begge overlapp byte-identiske.')

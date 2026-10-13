@@ -1,0 +1,25 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+Note for this room: Outside Snuckey's. Copy both 'Snuckey's' signs exactly, letter by letter, with the same style of lettering.
+
+This is part 2 of 2 of a larger scene. The other parts are made separately and joined afterwards, so keep the edges of the picture natural, with no vignette, frame or fading.
+
+If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image.
+
+Source precision: exact rectangle x0 y112 width1536 height800. Image3 is the LEFT portion of same scene; requested RIGHT portion is global x384 pixels to the right, overlap1152. Match common Snuckey's signage/roofs/windows/colors exactly without shifting geometry. Only source1 controls composition. Roof sign remains cropped by top. Rightmost gable has half-round colored window with pink donut and orange/gold segments as source. Brown coin-operated horse on red pedestal, no rider, preserve its exact pose, tail and legs. Litter cup at curb, blue store windows and orange-brick wall preserved. Image2 office solely supplies ink/paint level. No new people, vehicles, products or writing.

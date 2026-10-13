@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import shutil,json,subprocess
+b=Path(__file__).resolve().parents[2]
+r=b/'rapporter/bestilling003-20261013'
+src=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a')
+jobs={'obj089_01':('exec-789477c5-8bc6-433c-af83-5f3769804989.png',(107,276,1430,778)), 'rom010':('exec-0d11e086-1577-4964-8ad0-94d1d32b7493.png',(128,112,1408,912))}
+for id,(name,box) in jobs.items():
+ shutil.copy2(src/name,r/f'{id}-forsok01.png')
+ im=Image.open(src/name).convert('RGB').crop(box)
+ meta=json.loads((b/f'jobber/{id}/jobb.json').read_text())
+ x,y,w,h=meta['bilde_i_lerret']
+ if im.size!=(w,h): im=im.resize((w,h),Image.Resampling.LANCZOS)
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(im,(x,y));out.save(b/f'jobber/{id}/resultat.png')
+ py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+ run=subprocess.run([py,str(b/'verktoy/sjekk_leveranse.py'),str(b/f'jobber/{id}/resultat.png')],capture_output=True,text=True)
+ (r/f'{id}-kontroll.txt').write_text(run.stdout+run.stderr)
+ print(run.stdout)

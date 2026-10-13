@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 17:48 (norsk tid)
+Oppdatert 2026-10-13 17:54 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -9,8 +9,8 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Del | Ferdig | Totalt | Når |
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
-| Rombakgrunner | 8 rom levert (10 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 2 levert, egenkontroll OK | 86 | Etter godkjent stilpilot, sammen med rommene |
+| Rombakgrunner | 12 rom levert (17 deler), pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
+| Store objektbilder (nærbilder, kart og store deler) | 5 levert, egenkontroll OK | 86 | Etter godkjent stilpilot, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 0 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
@@ -49,16 +49,16 @@ Rom 1, 2, 3, 4, 5, 6, 8, 9.
 
 Rom 9, 10, 11, 12, 15.
 
-- [ ] `obj089_01` (rom 9 Gaten utenfor kontoret, objekt 89 tilstand 01)
-- [ ] `rom010` (rom 10 USA-kartet)
-- [ ] `rom011_del1av2` (rom 11 Snuckey's, inne, del 1/2)
-- [ ] `rom011_del2av2` (rom 11 Snuckey's, inne, del 2/2)
-- [ ] `rom012_del1av2` (rom 12 Snuckey's, ute, del 1/2)
-- [ ] `rom012_del2av2` (rom 12 Snuckey's, ute, del 2/2)
-- [ ] `obj989_01` (rom 12 Snuckey's, ute, objekt 989 tilstand 01)
-- [ ] `obj989_02` (rom 12 Snuckey's, ute, objekt 989 tilstand 02)
-- [ ] `rom015_del1av2` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), del 1/2)
-- [ ] `rom015_del2av2` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), del 2/2)
+- [x] `obj089_01` (rom 9 Gaten utenfor kontoret, objekt 89 tilstand 01)
+- [x] `rom010` (rom 10 USA-kartet)
+- [x] `rom011_del1av2` (rom 11 Snuckey's, inne, del 1/2)
+- [x] `rom011_del2av2` (rom 11 Snuckey's, inne, del 2/2)
+- [x] `rom012_del1av2` (rom 12 Snuckey's, ute, del 1/2)
+- [x] `rom012_del2av2` (rom 12 Snuckey's, ute, del 2/2)
+- [x] `obj989_01` (rom 12 Snuckey's, ute, objekt 989 tilstand 01)
+- [x] `obj989_02` (rom 12 Snuckey's, ute, objekt 989 tilstand 02)
+- [x] `rom015_del1av2` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), del 1/2)
+- [x] `rom015_del2av2` (rom 15 Karnevalet, inngangen (Kushman Bros. Shows), del 2/2)
 
 ## Bestilling 4
 
@@ -3425,3 +3425,5 @@ Figurark for Ildslukeren, Hette, Mann i rød skjorte.
 Tom har godkjent hovedarkene og stilpiloten 13. oktober og autorisert resten av HD-konverteringen. Kontoret i to deler, Sam fig002_01 og Max fig003_01 er levert med egenkontroll OK; se `rapporter/stilpilot-fortsettelse-20261013/RAPPORT.md`. Motorimport og spilltest er egne, foreløpig uverifiserte trinn.
 
 Bestilling 2 er levert med ti bilder og egenkontroll OK. Se `rapporter/bestilling002-20261013/RAPPORT.md`. Kryss betyr levert grafikk; individuell visuell godkjenning, motorimport og spilltest er egne tilstander. Bestilling 3 er startet.
+
+Bestilling 3 er levert med ti bilder og egenkontroll OK, se `rapporter/bestilling003-20261013/RAPPORT.md`. Bestilling 4 er startet.

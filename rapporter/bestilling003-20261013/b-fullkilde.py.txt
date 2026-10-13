@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+import json
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling003-20261013'
+r.mkdir(exist_ok=True)
+for room in ['rom011','rom015']:
+    jobs=[room+'_del1av2',room+'_del2av2']
+    js=[json.loads((b/'jobber'/j/'jobb.json').read_text()) for j in jobs]
+    w=js[0]['rom_storrelse'][0]*4
+    im=Image.new('RGB',(w,1024),(128,128,128))
+    for j,m in zip(jobs,js):
+        p=Image.open(b/'jobber'/j/'referanse.png').convert('RGB').crop((0,112,1536,912))
+        im.paste(p,(m['region'][0]*4,112))
+    im.save(r/(room+'-fullkilde.png'))
+    prompt='\n\n'.join('Original prompt '+j+':\n'+(b/'jobber'/j/'prompt.txt').read_text() for j in jobs)
+    extra=f"""\n\nFull-scene production clarification: Both original job prompts above are retained verbatim. The edit target is their complete joined original panorama, width {w}, height 1024, with painted scene rectangle (0,112,{w},800). This overrides only the per-part canvas/output instructions: return ONE complete HD panorama at {w}x1024, with exact unchanged spatial layout. Both delivery crops will be cut out of this one panorama with identical shared pixels. Do not make two images, do not truncate the panorama or alter proportions. Pure #808080 top/bottom padding, scene full-width from y112 to y912. Image2 is the approved office style reference only; keep every original object and local scene color from image1. Smooth lively Purcell outlines, no harsh heavy outline around every small feature."""
+    if room=='rom011':
+        extra+=' Source identity: Snuckey\'s interior. Preserve all four orange counter stools, food case, containers, shelves and exact objects on shelves, window panes, donut stained-glass panel, magazine/postcard carousel and hanging goods at far right. Copy the lowercase cursive sign exactly: fountain. Small unreadable packages must keep their source glyph shapes rather than invented English brands or words. No people.'
+    else:
+        extra+=' Source identity: Carnival exterior. Copy source lettering exactly KUSHMAN BROS SHOWS, CLOSED, HALL of ODDITIES, WEIRD, CREEPY. Preserve the partially cropped LOST & FOU... sign on the far right, do not complete cropped letters. Preserve all three illustrated side posters, clown-shaped trash bin, giant carnival head with red nose and eye shapes, blue tents, green tent, ride, fence and shrubbery in their exact positions. No new people. Poster figures are illustrations, not living foreground characters. Never regularize the surreal skewed construction.'
+    (r/(room+'-prompt.txt')).write_text(prompt+extra)

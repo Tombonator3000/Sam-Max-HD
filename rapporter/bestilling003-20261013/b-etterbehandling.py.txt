@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil,subprocess
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling003-20261013'
+mapping=json.loads("{\"rom011\":\"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-c7ddd4a8-6bd1-4379-a998-63c036f46f2f.png\",\"rom015\":\"/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-9472e28a-3ab5-46b4-8dda-eb4e57271850.png\"}")
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for room,src in mapping.items():
+    raw=Image.open(src).convert('RGB')
+    shutil.copy2(src,r/(room+'-raaforsok1.png'))
+    m=json.loads((b/'jobber'/(room+'_del1av2')/'jobb.json').read_text())
+    w=m['rom_storrelse'][0]*4
+    print(room,'raw',raw.size,'target',(w,1024))
+    full=raw.resize((w,1024),Image.Resampling.LANCZOS)
+    # Kun uniform helbilde-normalisering med mindre avrunding av mål. Ingen lokal warp.
+    master=Image.new('RGB',(w,1024),(128,128,128))
+    master.paste(full.crop((0,112,w,912)),(0,112))
+    master.save(r/(room+'-fullscene.png'))
+    for part in [1,2]:
+        job=f'{room}_del{part}av2'
+        j=json.loads((b/'jobber'/job/'jobb.json').read_text())
+        x=j['region'][0]*4
+        out=master.crop((x,0,x+1536,1024))
+        dest=b/'jobber'/job/'resultat.png'
+        out.save(dest)
+        p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(dest)],cwd=b,text=True,capture_output=True)
+        (r/(job+'-kontroll.txt')).write_text(p.stdout+p.stderr)
+        print(job,p.returncode,p.stdout)

@@ -55,3 +55,10 @@
 - Gatens overlapp 1152 x 800 er byte-identisk fra én master. Historisk logo og dokumentert skilttekst kontrollert. Tilsiktede ufullstendige introansikter bevart for motorens separate animasjonslag. Bakre gangdørtekst er uleselig; dekorative løkker rettet til enkle tegnklaser uten ordgjetting.
 - Manifest, råforsøk, prompter, oppskrifter, samlet kontaktark og usikkerhet ligger i rapporter/bestilling002-20261013/. Innebygd bildeverktøy, eksakt bildemodell ikke eksponert.
 - Bestilling 3 startet etter samme autorisasjon. Ingen motorimport, spilltest eller individuell Tom-godkjenning av de ti nye bildene er påstått. Ingen endringer i beskyttede jobbfiler, kode, status.csv eller ORDRE.md.
+
+## 2026-10-13 17:54 (Codex, Astra)
+
+- Fullført bestilling 3, ti bilder. Alle egenkontroller OK; 40 beskyttede kilder uendret. Rom011/012-overlapp 1152 x 800 og rom015-overlapp 544 x 800 er byte-identisk.
+- Bilen, USA-kartets tomme reisemålsfelt og Snuckey-bakgrunnsvariantene kildeavklart. ODDITIES-tekstfeil fanget visuelt og rettet med innebygd bilde-edit. Små etikettglyfer ikke erklært detaljidentiske.
+- Bestilling 2 pushet i 829caa876e8b0459cce16cd2cbff44972b05f4cc; alle ti offentlige PNG-bytes verifisert med SHA mot lokalt. Bestilling 4 startet.
+- Notater, råforsøk, prompter, oppskrifter og samlet QA i rapporter/bestilling003-20261013/. Ingen kode/kildeendring, motorimport eller spilltest.

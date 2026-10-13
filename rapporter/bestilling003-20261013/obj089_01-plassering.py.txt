@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+b=Path(__file__).resolve().parents[2]
+p=b/'jobber/obj089_01/resultat.png'
+im=Image.open(p).convert('RGB')
+part=np.array(im.crop((304,336,1232,688)))
+# Global retting av malt motiv fire HD-piksler til venstre. Kantforlengelse av gatebakgrunn.
+part=np.pad(part,((0,0),(0,4),(0,0)),mode='edge')[:,4:932]
+im.paste(Image.fromarray(part),(304,336));im.save(p)

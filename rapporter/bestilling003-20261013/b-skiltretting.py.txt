@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFilter
+import shutil,json,subprocess
+b=Path("/home/tombonator3000t/Dokumenter/ChatGPT/Sam&Max HD Remake/Sam-Max-HD/work/.gpt-gren")
+r=b/'rapporter/bestilling003-20261013'
+src=Path("/home/tombonator3000t/.codex/generated_images/01a135e8-b174-7912-9a18-542f3fd40207/exec-e2792183-66d8-46de-b7eb-b7812713d403.png")
+shutil.copy2(src,r/'rom015-raaforsok2-skilt.png')
+fixed=Image.open(src).convert('RGB').resize((310,130),Image.Resampling.LANCZOS)
+# Generated local sign correction. No original-game pixels or silhouette mask.
+box=(30,56,68,114)
+patch=fixed.crop(box)
+master=Image.open(r/'rom015-fullscene.png').convert('RGB')
+master.save(r/'rom015-fullscene-for-skiltretting.png')
+mask=Image.new('L',patch.size,0)
+ImageDraw.Draw(mask).rectangle((2,2,patch.width-3,patch.height-3),fill=255)
+mask=mask.filter(ImageFilter.GaussianBlur(1))
+master.paste(patch,(1150+box[0],240+box[1]),mask)
+master.save(r/'rom015-fullscene.png')
+master.crop((1150,240,1460,370)).resize((930,390)).save(r/'rom015-skiltkontroll-rettet.png')
+py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+for part in [1,2]:
+    job=f'rom015_del{part}av2'
+    j=json.loads((b/'jobber'/job/'jobb.json').read_text())
+    x=j['region'][0]*4
+    dest=b/'jobber'/job/'resultat.png'
+    master.crop((x,0,x+1536,1024)).save(dest)
+    p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(dest)],cwd=b,text=True,capture_output=True)
+    (r/(job+'-kontroll.txt')).write_text(p.stdout+p.stderr)
+    print(p.stdout)
