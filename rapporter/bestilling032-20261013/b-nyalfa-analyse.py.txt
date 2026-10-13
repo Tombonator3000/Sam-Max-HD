@@ -1,0 +1,6 @@
+exec(open('rapporter/bestilling032-20261013/b-komponentanalyse.py.txt').read().split('base=np.array')[0])
+rows=[]
+for i in [1,2,3,4,5,7]:
+ batch=32 if i<=4 else 33;r0=root/f'rapporter/bestilling{batch:03d}-20261013';im=Image.open(r0/f'b-lag030_{i:02d}-raa01.png').convert('RGB');a=np.array(im).astype(float);h,w=a.shape[:2];cx,cy=(416,352) if i<=2 else(240,184);roi=(326,196,408,252) if i<=2 else ((130,32,206,86) if i<=4 else(40,60,100,142));x0,y0,x1,y1=[round(v*(w/cx if q%2==0 else h/cy)) for q,v in enumerate(roi)];mask=((a[:,:,2]>130)&(a[:,:,2]>a[:,:,0]*1.15))|((a[:,:,2]>180)&(a[:,:,2]>a[:,:,0]*.9)&(a[:,:,2]>a[:,:,1]*.9));valid=np.zeros((h,w),bool);valid[y0:y1,x0:x1]=True;mask &=valid
+ cs=[c for c in components(mask) if c['piksler']>=8];print(i,cs);rows.append({'tilstand':i,'raa_size':[w,h],'roi':list(roi),'komponenter':cs});alpha=Image.fromarray((mask*255).astype('uint8'));rgba=im.convert('RGBA');rgba.putalpha(alpha);rgba.save(r0/f'b-lag030_{i:02d}-nyalfa.png')
+(r/'b-nyalfa-bokser.json').write_text(json.dumps(rows,indent=2,default=int)+'\n')

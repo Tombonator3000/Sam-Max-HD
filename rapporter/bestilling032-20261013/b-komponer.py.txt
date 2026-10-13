@@ -1,0 +1,33 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,importlib.util
+root=Path.cwd();r=root/'rapporter/bestilling032-20261013';py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+sc={x['tilstand']:x['komponenter'] for x in json.loads((r/'b-gnist-kildebokser.json').read_text())};nc={x['tilstand']:x['komponenter'] for x in json.loads((r/'b-nyalfa-bokser.json').read_text())}
+# Explicit component selection: only new-art alpha, mapped to source bounding rectangles.
+mapping={1:[None,3,4,5],2:[0,1,3,2,5,4,6,7,8],3:[0,1,2,3,4,6,5],4:[0,1,2,3,4],5:[0,2,1,3,5,7],7:[0,1,2,3,5,6]}
+def feather(w,h,n):
+ y,x=np.mgrid[:h,:w];return Image.fromarray((np.clip(np.minimum.reduce([x+1,w-x,y+1,h-y])/n,0,1)*255).astype('uint8'))
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+spec=importlib.util.spec_from_file_location('ck',root/'verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(spec);spec.loader.exec_module(ck)
+proof=[];sheet=Image.new('RGB',(832,7*370),(128,128,128));d=ImageDraw.Draw(sheet)
+for i in range(1,8):
+ batch=32 if i<=4 else 33;r0=root/f'rapporter/bestilling{batch:03d}-20261013';j=f'lag030_{i:02d}_del1av2';p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());base=Image.open(root/m['bilde_to']).convert('RGB');out=base.copy();raw=Image.open(r0/f'b-lag030_{i:02d}-raa01.png').convert('RGB');rect=(208,448,624,800) if i<=2 else(400,624,640,808);new=base.copy();new.paste(raw.resize((rect[2]-rect[0],rect[3]-rect[1]),Image.Resampling.LANCZOS),rect[:2]);records=[]
+ if i in (1,2,6):
+  o=m['objekter'][0];x,y,w,h=o['rekt'];x*=4;y=112+y*4;w*=4;h*=4;out.paste(new.crop((x,y,x+w,y+h)),(x,y),feather(w,h,6))
+ if i==2:
+  # Remove generated spark area before adding correctly placed new components. Wires are below.
+  out.paste(base.crop((448,656,608,704)),(448,656))
+ if i in mapping:
+  art=Image.open(r0/f'b-lag030_{i:02d}-nyalfa.png').convert('RGBA');sources=sc[i][:9] if i==2 else sc[i]
+  for k,(s,ni) in enumerate(zip(sources,mapping[i])):
+   nb=[1140,720,91,52] if ni is None else nc[i][ni]['boks'];x,y,w,h=nb;comp=art.crop((x,y,x+w,y+h));sx,sy,sw,sh=s['boks'];dst=[sx*4,112+sy*4,sw*4,sh*4];comp=comp.resize((dst[2],dst[3]),Image.Resampling.LANCZOS);out.paste(comp,tuple(dst[:2]),comp);records.append({'ny_boks':nb,'kilde_boks':s['boks'],'hd_boks':dst,'alfa':'bare nygenerert bilde'})
+ out.save(p/'resultat.png');allow=np.zeros((1024,1536),bool)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];allow[112+y*4:112+(y+h)*4,x*4:(x+w)*4]=True
+ diff=np.any(np.array(out)!=np.array(base),axis=2);assert int((diff&~allow).sum())==0
+ res=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(p/'resultat.png')],capture_output=True,text=True);(r0/f'b-{j}-kontroll01.txt').write_text(res.stdout+res.stderr);print(j,res.stdout[-150:])
+ proof.append({'jobb':j,'sha256':sha(p/'resultat.png'),'utenfor_metadataunion_endret':0,'komponenter':records,'kontroll':res.stdout})
+ src=Image.open(p/'referanse.png').convert('RGB');crop=(208,448,624,800);sheet.paste(src.crop(crop),(0,(i-1)*370+18));sheet.paste(out.crop(crop),(416,(i-1)*370+18));d.text((0,(i-1)*370),j,fill='white')
+for batch in [32,33]:
+ r0=root/f'rapporter/bestilling{batch:03d}-20261013';(r0/'b-komposisjonsbevis.json').write_text(json.dumps([x for x in proof if (int(x['jobb'].split('_')[1])<=4)==(batch==32)],indent=2,ensure_ascii=False)+'\n')
+sheet.save(r/'b-030-sluttfamilie.png')

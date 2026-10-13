@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json
+root=Path.cwd();r=root/'rapporter/bestilling032-20261013'
+def components(mask):
+ seen=np.zeros(mask.shape,bool);out=[]
+ for y,x in zip(*np.where(mask)):
+  if seen[y,x]:continue
+  stack=[(y,x)];seen[y,x]=1;pts=[]
+  while stack:
+   a,b=stack.pop();pts.append((a,b))
+   for da in [-1,0,1]:
+    for db in [-1,0,1]:
+     c,e=a+da,b+db
+     if 0<=c<mask.shape[0] and 0<=e<mask.shape[1] and mask[c,e] and not seen[c,e]:seen[c,e]=1;stack.append((c,e))
+  yy,xx=zip(*pts);out.append({'boks':[min(xx),min(yy),max(xx)-min(xx)+1,max(yy)-min(yy)+1],'piksler':len(pts)})
+ return out
+base=np.array(Image.open(root/'jobber/rom030_del1av2/original_1x.png').convert('RGB'));rows=[]
+for i in [1,2,3,4,5,7]:
+ a=np.array(Image.open(root/f'jobber/lag030_{i:02d}_del1av2/original_1x.png').convert('RGB'));mask=np.any(a!=base,axis=2);mask[:136]=False;mask[:,:112]=False;mask[:,152:]=False;mask[168:]=False
+ c=components(mask);rows.append({'tilstand':i,'kilde_endret':int(mask.sum()),'komponenter':c});print(i,c)
+(r/'b-gnist-kildebokser.json').write_text(json.dumps(rows,indent=2,default=int)+'\n')

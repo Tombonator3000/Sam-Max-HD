@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFont
+import json,hashlib
+r=Path(__file__).resolve().parent;root=r.parents[1]
+f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',18)
+items=[('A: obj292, lag029_02 [0,0,80,56]','lag029_02',(0,0,80,56)),('B: obj293, tidligere avklart redskap','obj293_01',None),('C: obj294, metadata bilde_to','obj294_01',None),('D: obj295, annen redskapstilstand','obj295_01',None),('E: hele lag029_01','lag029_01',None),('F: hele lag029_02, flere overlappende deler','lag029_02',None)]
+can=Image.new('RGB',(1400,1020),(190,190,190));d=ImageDraw.Draw(can)
+for i,(label,j,box) in enumerate(items):
+ im=Image.open(root/'jobber'/j/'original_1x.png').convert('RGB')
+ if box:im=im.crop(box)
+ im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);im.thumbnail((680,295),Image.Resampling.NEAREST)
+ x=(i%2)*700;y=(i//2)*340;d.text((x+8,y+5),label,font=f,fill='black');can.paste(im,(x+8,y+35))
+can.save(r/'a-029-avklaring-A-F.png')
+checks=[]
+for name in ['kildehash.json','a-ekstra-kildehash.json']:
+ data=json.loads((r/name).read_text())
+ if isinstance(data,dict):data=data.get('filer',data)
+ for e in data:
+  p=root/e['fil'];actual=hashlib.sha256(p.read_bytes()).hexdigest();checks.append({'fil':e['fil'],'uendret':actual==e['sha256'],'sha256':actual})
+(r/'a-kildehashkontroll.json').write_text(json.dumps({'antall':len(checks),'alle_uendret':all(e['uendret'] for e in checks),'filer':checks},indent=2))
+print(len(checks),all(e['uendret'] for e in checks))

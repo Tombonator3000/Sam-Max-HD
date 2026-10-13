@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-13 23:00 (norsk tid)
+Oppdatert 2026-10-13 23:12 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -11,7 +11,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Hovedark (Sam og Max) | 2 visuelt godkjent 2026-10-13, egenkontroll OK | 2 | Hovedreferanser for resten av stilpiloten |
 | Rombakgrunner | 76 hele rom levert (115 deler), inkludert 3 SJEKK, pilotrom visuelt godkjent | 76 | Etter godkjent stilpilot (115 jobber, brede rom er delt) |
 | Store objektbilder (nærbilder, kart og store deler) | 84 levert, inkludert 19 SJEKK | 86 | Etter godkjent stilpilot, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 202 bilder levert (91 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 214 bilder levert (101 lagjobber) | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 0 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 37 pilotruter levert, stil godkjent | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
@@ -484,16 +484,16 @@ Rom 25, 26.
 
 Rom 27, 28, 29, 30.
 
-- [ ] `lag027_01_del1av2` (rom 27 World's Largest Ball of Twine, ute, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom027_del1av2/resultat.png`)
-- [ ] `lag027_01_del2av2` (rom 27 World's Largest Ball of Twine, ute, lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom027_del2av2/resultat.png`)
-- [ ] `lag027_02_del2av2` (rom 27 World's Largest Ball of Twine, ute, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom027_del2av2/resultat.png`)
-- [ ] `lag028_01` (rom 28 Hyssingmuseet, lag 01 med 1 objektbilde, bilde to `jobber/rom028/resultat.png`)
-- [ ] `lag029_01` (rom 29 Inne i hyssingnøstet, lag 01 med 1 objektbilde, bilde to `jobber/obj294_01/resultat.png`)
-- [ ] `lag029_02` (rom 29 Inne i hyssingnøstet, lag 02 med 1 objektbilde, bilde to `jobber/obj294_01/resultat.png`)
-- [ ] `lag030_01_del1av2` (rom 30 Den roterende restauranten, lag 01 med 2 objektbilder, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
-- [ ] `lag030_02_del1av2` (rom 30 Den roterende restauranten, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
-- [ ] `lag030_03_del1av2` (rom 30 Den roterende restauranten, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
-- [ ] `lag030_04_del1av2` (rom 30 Den roterende restauranten, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
+- [x] `lag027_01_del1av2` (rom 27 World's Largest Ball of Twine, ute, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom027_del1av2/resultat.png`)
+- [x] `lag027_01_del2av2` (rom 27 World's Largest Ball of Twine, ute, lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom027_del2av2/resultat.png`)
+- [x] `lag027_02_del2av2` (rom 27 World's Largest Ball of Twine, ute, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom027_del2av2/resultat.png`)
+- [x] `lag028_01` (rom 28 Hyssingmuseet, lag 01 med 1 objektbilde, bilde to `jobber/rom028/resultat.png`)
+- [x] `lag029_01` (rom 29 Inne i hyssingnøstet, lag 01 med 1 objektbilde, bilde to `jobber/obj294_01/resultat.png`)
+- [x] `lag029_02` (rom 29 Inne i hyssingnøstet, lag 02 med 1 objektbilde, bilde to `jobber/obj294_01/resultat.png`)
+- [x] `lag030_01_del1av2` (rom 30 Den roterende restauranten, lag 01 med 2 objektbilder, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
+- [x] `lag030_02_del1av2` (rom 30 Den roterende restauranten, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
+- [x] `lag030_03_del1av2` (rom 30 Den roterende restauranten, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
+- [x] `lag030_04_del1av2` (rom 30 Den roterende restauranten, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`)
 
 ## Bestilling 33
 
@@ -3489,3 +3489,5 @@ Bestilling 28: ti lag levert OK med 25 faktiske objektkontroller. Tre egne karne
 Bestilling 29: ti lag levert OK med 17 faktiske objektkontroller. Egne Max-poser og Sam-armunderlag, rosa skap med/uten rutefelt, åpent kistelokk og fem Tunnel of Love-tilstander. Pilavklipping og oppdiktet klovnenese/smil er rettet og kontrollert. Se `rapporter/bestilling029-20261013/RAPPORT.md`. Bestilling 30 og videre fortsetter.
 
 Bestilling 30: ti lag levert OK med 20 faktiske objektkontroller. Brukeravklart stangfot, Gator Golf-knapper og liggende Sam, fravær av brekkjern/griper og seks egne Tunnel of Love-tilstander. Se `rapporter/bestilling030-20261013/RAPPORT.md`. Bestilling 31 og videre fortsetter.
+
+Bestilling 32: ti lag levert OK med tolv faktiske objektkontroller, identisk taubaneoverlapp, museumsdør, redskapslag og fire kikkert/gnisttilstander. Se `rapporter/bestilling032-20261013/RAPPORT.md`. Bestilling 31 venter egne rettinger/avklaringer; videre arbeid fortsetter.

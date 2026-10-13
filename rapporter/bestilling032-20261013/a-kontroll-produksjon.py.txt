@@ -1,0 +1,39 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np,importlib.util
+r=Path(__file__).resolve().parent;root=r.parents[1];sp=importlib.util.spec_from_file_location('checker',root/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(sp);sp.loader.exec_module(c);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+rects=json.loads((r/'a-rektangler.json').read_text());rows=[];entries=[]
+refs={'027-master':['rapporter/bestilling032-20261013/a-027-master-kilde.png','rapporter/bestilling032-20261013/a-027-master-hdgrunn.png','stil/rom007_del1av2.png'],'lag027_02_del2av2':['jobber/lag027_02_del2av2/referanse.png','jobber/rom027_del2av2/resultat.png','stil/rom007_del1av2.png'],'lag028_01':['jobber/lag028_01/referanse.png','jobber/rom028/resultat.png','stil/rom007_del1av2.png'],'lag029_01':['jobber/lag029_01/referanse.png','rapporter/bestilling032-20261013/a-029-01-hdgrunn.png','stil/rom007_del1av2.png'],'lag029_02':['jobber/lag029_02/referanse.png','jobber/rom029/resultat.png','stil/rom007_del1av2.png']}
+for j,desc in rects.items():
+ d=root/'jobber'/j;m=json.loads((d/'jobb.json').read_text());out=Image.open(d/'resultat.png').convert('RGB');source=Image.open(d/'referanse.png').convert('RGB');part,_=c.part_of(out,m);met=c.compare(Image.open(d/'original_1x.png').convert('RGB'),part);fields=[];arr=np.array(out);pad=np.ones(arr.shape[:2],bool);ax,ay,aw,ah=m['bilde_i_lerret'];pad[ay:ay+ah,ax:ax+aw]=False;assert np.all(arr[pad]==128)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];x-=m['region'][0];v=float(c.corr(met['eo'][y:y+h,x:x+w],met['es'][y:y+h,x:x+w]));fields.append({'objekt':o['bilde'],'rekt':o['rekt'],'kantkorrelasjon':v,'utfall':'OK' if v>=.6 else 'SJEKK' if v>=.5 else 'FEIL'});b=(ax+x*4,ay+y*4,ax+(x+w)*4,ay+(y+h)*4);rows.append((j+' '+o['bilde'],source.crop(b),out.crop(b)))
+ key='027-master' if j.startswith('lag027_01') else j;attempts=2 if key=='027-master' else 1;prov=[]
+ for k in range(1,attempts+1):
+  raw=r/f'a-{key}-raa{k:02d}.png';p=r/f'a-{key}-prompt{k:02d}.txt';rf=refs[key] if k==1 else ['rapporter/bestilling032-20261013/a-027-kabin-kilde.png','rapporter/bestilling032-20261013/a-027-kabin-hd.png'];prov.append({'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'prompt':str(p.relative_to(root)),'prompt_sha256':sha(p),'valgt':k==1,'referanser':[{'fil':f,'sha256':sha(root/f)} for f in rf]})
+ e={'jobb':j,'resultat':str((d/'resultat.png').relative_to(root)),'sha256':sha(d/'resultat.png'),'egenkontroll':'OK','kontrollfil':str((r/f'a-{j}-kontroll.txt').relative_to(root)),'forsok':attempts,'objektkontroll':fields,'proveniens':prov,'komposisjon':desc,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':True}
+ if key=='027-master':e.update(fullmaster=str((r/'a-027-fullmaster.png').relative_to(root)),fullmaster_sha256=sha(r/'a-027-fullmaster.png'),bakgrunn_byteidentisk=False)
+ else:
+  base=np.array(Image.open(root/m['bilde_to'] if j.startswith(('lag027','lag028')) else root/'jobber/rom029/resultat.png').convert('RGB'));mask=np.ones(arr.shape[:2],bool)
+  for b in [desc['nytegnet_rekt'],desc.get('underlag_rekt')]:
+   if b:x,y,w,h=b;mask[y:y+h,x:x+w]=False
+  e['utenfor_dokumenterte_rektangler_ulike_piksler']=int(np.any(arr!=base,axis=2)[mask].sum());assert e['utenfor_dokumenterte_rektangler_ulike_piksler']==0
+ assert all(f['utfall']=='OK' for f in fields);entries.append(e)
+ (d/'notat.md').write_text(f'# {j}\n\nDato 2026-10-13. Innebygd ChatGPT imagegen; eksakt modellnavn er ikke eksponert. {attempts} forsøk berører denne leveransen. Ordrett prompt og separat kildepresisering, alle råforsøk og referansehash er bevart i rapporter/bestilling032-20261013/a-leveranser.json.\n\nOriginaler, metadata og familiekontekst er kontrollert før tegning. Se a-kildeplan.md og a-kilde-qa.md for motiv, tilstand, valgte rektangler og begrensninger. Kun vanlig helskalering og plassering av nytegnet kunst, samt dokumenterte rektangulære kantoverganger. Ingen originalmasker eller geometriwarp.\n\nUendret checker: OK. Alle jobbens metadatafelt er også eksplisitt målt OK. RGB 1536 × 1024 og eksakt grå padding 128. SHA-256: {e["sha256"]}.\n\n'+('Fullt nytegnet felles panorama, ikke byte-identisk bakgrunn utenfor objektene. Master 1888 × 800, klipp x=0/352, overlapp 1184 × 800. Lokalt kabinforsøk er ikke valgt fordi det ga skjøter.\n' if key=='027-master' else 'Eksisterende HD er byte-identisk utenfor dokumenterte sammensettingsrektangler.\n')+'\nIngen import, runtime eller ny individuell brukergodkjenning påstås.\n')
+a=Image.open(root/'jobber/lag027_01_del1av2/resultat.png').crop((352,112,1536,912));b=Image.open(root/'jobber/lag027_01_del2av2/resultat.png').crop((0,112,1184,912));assert a.tobytes()==b.tobytes()
+(r/'a-overlappbevis.json').write_text(json.dumps({'rgb_identisk':True,'storrelse':[1184,800],'rgb_sha256':hashlib.sha256(a.tobytes()).hexdigest()},indent=2))
+locks=json.loads((r/'kildehash.json').read_text())+json.loads((r/'a-ekstra-kildehash.json').read_text());assert all(sha(root/e['fil'])==e['sha256'] for e in locks);(r/'a-kildehashkontroll.json').write_text(json.dumps({'antall':len(locks),'alle_uendret':True,'filer':locks},indent=2));(r/'a-leveranser.json').write_text(json.dumps({'leveranser':entries,'genereringskall':6,'checker_sha256':sha(root/'verktoy/sjekk_leveranse.py'),'oppskrift':'rapporter/bestilling032-20261013/a-sammensetting.py.txt','oppskrift_sha256':sha(r/'a-sammensetting.py.txt')},indent=2));print([(e['jobb'],e['objektkontroll']) for e in entries])
+for start in range(0,len(rows),3):
+ sub=rows[start:start+3];can=Image.new('RGB',(1200,len(sub)*380),(180,180,180));dr=ImageDraw.Draw(can)
+ for i,(name,so,hd) in enumerate(sub):
+  dr.text((8,i*380+5),name+' original / HD',fill='black')
+  for k,im in enumerate([so,hd]):
+   sc=min(580/im.width,340/im.height);im=im.resize((round(im.width*sc),round(im.height*sc)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);can.paste(im,(k*600+5,i*380+30))
+ can.save(r/f'a-objektqa-{start//3+1}.png')
+# Panorama text and placement detail, not a new production input.
+so=Image.open(r/'a-027-master-kilde.png');hd=Image.open(r/'a-027-fullmaster.png');can=Image.new('RGB',(1400,1050),(180,180,180));dr=ImageDraw.Draw(can)
+for i,(label,box) in enumerate([('Skilt WORLD S / LARGEST BALL OF TWINE',(75,270,455,555)),('TRAM og MUSEUM med piler',(1280,290,1760,750)),('Tre hjul og kabin',(1200,75,1740,480))]):
+ dr.text((5,i*350+5),label+' original / HD',fill='black')
+ for k,im in enumerate([so,hd]):
+  cut=im.crop(box);cut.thumbnail((680,315));can.paste(cut,(k*700,i*350+30))
+can.save(r/'a-027-tekst-kabinqa.png')

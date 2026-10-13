@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil,subprocess
+r=Path(__file__).resolve().parent;root=r.parents[1];gen=Path('/home/tombonator3000t/.codex/generated_images/01a135e8-4929-7e50-b534-0f6727d4e21a');py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+files={'027-master':'exec-73e32622-e790-4049-94cb-2238ef91dd56.png','lag027_02_del2av2':'exec-7b30a1c3-0ef9-48d3-80f1-841cb7a8f0a1.png','lag028_01':'exec-ef2358cc-87a3-4297-babc-0ed4ac09d55b.png','lag029_01':'exec-ba3cd57d-d153-4f98-aac4-13999be0e435.png','lag029_02':'exec-a9d8294c-294e-404f-884e-7a2826dafa54.png'}
+for k,f in files.items():shutil.copy2(gen/f,r/f'a-{k}-raa01.png')
+def im(p):return Image.open(p).convert('RGB')
+def paste(base,raw,b,art,width=4):
+ x,y,w,h=b;box=(x,y,x+w,y+h);a=np.array(raw.crop(box),float);bb=np.array(base.crop(box),float);yy,xx=np.mgrid[:h,:w];edges=[]
+ if x>art[0]:edges.append(xx)
+ if y>art[1]:edges.append(yy)
+ if x+w<art[0]+art[2]:edges.append(w-1-xx)
+ if y+h<art[1]+art[3]:edges.append(h-1-yy)
+ alpha=np.clip(np.minimum.reduce(edges)/width,0,1)[...,None];base.paste(Image.fromarray(np.rint(a*alpha+bb*(1-alpha)).astype('uint8')),(x,y))
+master=im(r/'a-027-master-hdgrunn.png');raw=im(r/'a-027-master-raa01.png').resize((1888,800),Image.Resampling.LANCZOS)
+paste(master,raw,[0,544,416,192],[0,0,1888,800])
+shutil.copy2(gen/'exec-0b67f0af-ff73-4e6c-84e4-7864cd24eb3e.png',r/'a-027-master-raa02.png')
+local=im(r/'a-027-master-raa02.png').resize((480,384),Image.Resampling.LANCZOS);raw2=master.copy();raw2.paste(local,(1216,96));paste(master,raw2,[1216,96,480,384],[0,0,1888,800])
+master.save(r/'a-027-ikkevalgt-feltkompositt.png')
+master=raw.copy()
+master.save(r/'a-027-fullmaster.png');jobs={};proof={}
+for i,x in [(1,0),(2,352)]:
+ j=f'lag027_01_del{i}av2';out=Image.new('RGB',(1536,1024),(128,128,128));out.paste(master.crop((x,0,x+1536,800)),(0,112));jobs[j]=out;proof[j]={'master_klipp':[x,0,1536,800]}
+for j,b in [('lag027_02_del2av2',[1152,272,64,256]),('lag028_01',[192,368,128,352]),('lag029_01',[1088,656,192,160]),('lag029_02',[128,112,1024,704])]:
+ m=json.loads((root/'jobber'/j/'jobb.json').read_text());base=im(root/m['bilde_to']) if j.startswith(('lag027','lag028')) else im(root/'jobber/rom029/resultat.png');raw=im(r/f'a-{j}-raa01.png').resize((1536,1024),Image.Resampling.LANCZOS)
+ if j=='lag029_01':paste(base,im(r/'a-029-01-hdgrunn.png'),[160,208,992,608],m['bilde_i_lerret'],12)
+ paste(base,raw,b,m['bilde_i_lerret'],4 if j!='lag029_02' else 12);jobs[j]=base;proof[j]={'nytegnet_rekt':b,'underlag_rekt':[160,208,992,608] if j=='lag029_01' else None}
+for j,im1 in jobs.items():
+ im1.save(root/'jobber'/j/'resultat.png');cp=subprocess.run([py,str(root/'verktoy/sjekk_leveranse.py'),str(root/'jobber'/j/'resultat.png')],capture_output=True,text=True);(r/f'a-{j}-kontroll.txt').write_text(cp.stdout+cp.stderr);print(cp.stdout)
+(r/'a-rektangler.json').write_text(json.dumps(proof,indent=2))
+contact=Image.new('RGB',(1200,len(jobs)*430),(180,180,180));d=ImageDraw.Draw(contact)
+for i,(j,hd) in enumerate(jobs.items()):
+ for k,p in enumerate([root/'jobber'/j/'referanse.png',root/'jobber'/j/'resultat.png']):
+  z=im(p);z.thumbnail((590,395));contact.paste(z,(k*600,i*430+25))
+ d.text((5,i*430+5),j+' original / HD',fill='black')
+contact.save(r/'a-samlet-kontaktark.png')

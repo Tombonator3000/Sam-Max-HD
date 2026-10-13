@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,importlib.util
+root=Path.cwd();spec=importlib.util.spec_from_file_location('ck',root/'verktoy/sjekk_leveranse.py');ck=importlib.util.module_from_spec(spec);spec.loader.exec_module(ck)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,x):p.write_text(json.dumps(x,indent=2,ensure_ascii=False)+'\n')
+for batch,inds,extra in [(32,range(1,5),'a-ekstra-kildehash.json'),(33,range(5,8),'root-ekstra-kildehash.json')]:
+ r=root/f'rapporter/bestilling{batch:03d}-20261013';rows=[];calls=[];locks=[]
+ for f in ['kildehash.json',extra]:
+  for x in json.loads((r/f).read_text()):
+   h=sha(root/x['fil']);assert h==x['sha256'];locks.append(dict(x,faktisk_sha256=h,uendret=True))
+ save(r/'b-kildelas-slutt.json',{'antall':len(locks),'alle_uendret':True,'filer':locks})
+ for i in inds:
+  j=f'lag030_{i:02d}_del1av2';p=root/'jobber'/j;m=json.loads((p/'jobb.json').read_text());out=Image.open(p/'resultat.png').convert('RGB');orig=Image.open(p/'original_1x.png').convert('RGB');a=np.array(out);assert a.shape==(1024,1536,3) and (a[:112]==128).all() and (a[912:]==128).all();c=ck.compare(orig,out.crop((0,112,1536,912)));obs=[];qa=Image.new('RGB',(800,len(m['objekter'])*290),(128,128,128));d=ImageDraw.Draw(qa)
+  for k,o in enumerate(m['objekter']):
+   x,y,w,h=o['rekt'];cor=float(ck.corr(c['eo'][y:y+h,x:x+w],c['es'][y:y+h,x:x+w]));status='OK' if cor>=.6 else 'SJEKK' if cor>=.5 else 'FEIL';obs.append({'objekt':o['bilde'],'kantkorrelasjon':cor,'status':status});qa.paste(orig.crop((x,y,x+w,y+h)).resize((w*4,h*4),Image.Resampling.NEAREST),(0,k*290+20));qa.paste(out.crop((x*4,112+y*4,(x+w)*4,112+(y+h)*4)),(400,k*290+20));d.text((0,k*290),o['bilde'],fill='white')
+  qa.save(r/f'b-{j}-objektqa.png');ctl=r/f'b-{j}-kontroll01.txt';assert 'Utfall: OK' in ctl.read_text();print(j,obs)
+  prompt=r/f'b-lag030_{i:02d}-prompt01.txt';assert prompt.read_bytes().startswith((p/'prompt.txt').read_bytes());raw=r/f'b-lag030_{i:02d}-raa01.png';calls.append({'jobb':j,'prompt':str(prompt.relative_to(root)),'prompt_sha256':sha(prompt),'ordrett_originalprefix':True,'raa':str(raw.relative_to(root)),'raa_sha256':sha(raw),'verktoy':'innebygd ChatGPT imagegen','eksakt_bildemodell':'ikke eksponert'})
+  rows.append({'jobb':j,'resultat':str((p/'resultat.png').relative_to(root)),'sha256':sha(p/'resultat.png'),'egenkontroll':'OK','kontrollfil':str(ctl.relative_to(root)),'forsok':1,'fullmaster':None,'fullmaster_sha256':None,'objektkontroll':obs,'utenfor_metadataunion_endret':0,'runtime':False,'ny_brukergodkjenning':False,'klar_for_mottak':all(o['status']!='FEIL' for o in obs)})
+ save(r/'b-leveranser.json',{'leveranser':rows,'runtime':False,'ny_brukergodkjenning':False});save(r/'b-proveniens.json',{'kall':calls,'oppskrifter':['rapporter/bestilling032-20261013/b-forbered.py.txt','rapporter/bestilling032-20261013/b-komponentanalyse.py.txt','rapporter/bestilling032-20261013/b-nyalfa-analyse.py.txt','rapporter/bestilling032-20261013/b-komponer.py.txt','rapporter/bestilling032-20261013/b-sluttkontroll.py.txt'],'alfa':'Avledet utelukkende fra nygenererte bilders farger. Kilden gir bare separate rektangler og antall, ingen pikselmaske eller morfologi.'})

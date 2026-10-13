@@ -1,0 +1,5 @@
+from pathlib import Path
+from PIL import Image
+r=Path(__file__).resolve().parent;root=r.parents[1];box=(1216,96,1696,480)
+for kind,f in [('kilde','a-027-master-kilde.png'),('hd','a-027-master-hdgrunn.png')]:Image.open(r/f).crop(box).save(r/f'a-027-kabin-{kind}.png')
+p=(r/'a-027-master-prompt01.txt').read_text();p+='\n\nLOCAL RECTANGLE CORRECTION: Output480x384 image of ONLY this crop. Source1 supplies brown cabin with dark underside of roof, THREE wheels, posts, exact thin metal rail and TRAM lettering partly cropped at bottom. HD image2 supplies UNCHANGED blue sky and pale cloud band behind cabin, exact lighting and exterior border colors. Preserve image2 background sky at ALL FOUR crop edges to avoid a rectangular patch. Do not copy pixel art, redraw brown cabin smoothly. No full scene or gray padding in this local output.\n';(r/'a-027-master-prompt02.txt').write_text(p)

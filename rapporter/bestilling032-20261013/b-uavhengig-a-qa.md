@@ -1,0 +1,9 @@
+# Uavhengig visuell kontroll av A32
+
+Ingen konkrete vesentlige motiv-, tekst- eller antallsfeil ble funnet i den avgrensede kontrollen. Vurderingen gjelder de seks faktiske resultatene, med SHA kontrollert mot manifestet i [b-a-uavhengig-sha.json](b-a-uavhengig-sha.json).
+
+Jeg har lest a-kildeplan.md og a-kilde-qa.md og sett alle seks original/HD-helscenene, a-027-tekst-kabinqa.png og begge a-objektqa-arkene. 027-paret viser tom parkering med kildeegne flekker og den brune kabinen. Tre synlige hjul, takunderside, tynne stolper, kabelføring og avskårne åpninger er bevart. WORLDS / LARGEST BALL OF TWINE, TRAM og de to MUSEUM-feltene med venstrepekende piler leses riktig. Nytegningens trestriper, glasshøylys, skykanter og gressmodellering er endringer i detaljeringen; det nye panoramaet er ikke byte-identisk med eldre bakgrunn. Ingen ekstra kabin eller figur ble funnet. Dørstripens egen avkutting er beholdt.
+
+028 har åpen passasje med himmel, vegetasjon og brun ramme uten ny person. 029_01 viser den fargede humørringen og riktig eksisterende hånd/magnetunderlag, mens 029_02 viser to store overlappende hånd/magnetgrupper samt avskårne deler øverst. Ingen utilsiktet ring ble funnet i 02. De røde magnetene med grå poler, grønne redskapsdeler og brune fingre med gule negler beholder motividentiteten. De gjentatte gruppene er kildeegne komposittlag, ikke dokumentasjon av samtidighet i motoren.
+
+Forbehold: høylys og konturer er mer avrundet og ryddige, og 029-fingrenes rynker og negler er kraftigere modellerte. Små bokstavkonturer, parkeringsflekker og trådoverflater er fortolkede HD-former. Jeg har ikke kontrollert hvert enkelt gress-/trådpenselstrøk eller kjørt runtime. Denne uavhengige visuelle kontrollen erstatter ikke brukerens individuelle bildegodkjenning. Ingen A-fil eller leveranse er endret.

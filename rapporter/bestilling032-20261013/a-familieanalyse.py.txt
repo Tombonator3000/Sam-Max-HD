@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,itertools,numpy as np
+r=Path(__file__).resolve().parent;root=r.parents[1];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();out={};locks=[]
+for j in ['obj293_01','obj294_01','obj295_01','rom029']:
+ for n in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:locks.append({'fil':f'jobber/{j}/{n}','sha256':sha(root/'jobber'/j/n)})
+(r/'a-ekstra-kildehash.json').write_text(json.dumps(locks,indent=2))
+def src(j):return Image.open(root/'jobber'/j/'original_1x.png').convert('RGB')
+a=src('lag027_01_del1av2');b=src('lag027_01_del2av2');ov1=a.crop((88,0,384,200));ov2=b.crop((0,0,296,200));master=Image.new('RGB',(472,200));master.paste(a,(0,0));master.paste(b,(88,0));master.resize((1888,800),Image.Resampling.NEAREST).save(r/'a-027-master-kilde.png');base=Image.new('RGB',(472,200));base.paste(src('rom027_del1av2'),(0,0));base.paste(src('rom027_del2av2'),(88,0));mask=np.zeros((200,472),bool);mask[136:184,0:104]=True;mask[24:120,304:424]=True;diff=np.any(np.array(master)!=np.array(base),axis=2);out['027']={'master':[1888,800],'klipp_x':[0,352],'overlapp_hd':[1184,800],'overlapp_rgb_identisk':ov1.tobytes()==ov2.tobytes(),'overlapp_sha256':hashlib.sha256(ov1.tobytes()).hexdigest(),'fullscene_endret':int(diff.sum()),'utenfor_samlet277281_union':int((diff&~mask).sum())}
+target=np.array(src('lag029_02'));mask=np.zeros((200,320),bool);mask[:56,:80]=True;perms=[]
+for order in itertools.permutations(['obj295_01','obj294_01','obj293_01']):
+ im=src('rom029')
+ for j in order:
+  m=json.loads((root/'jobber'/j/'jobb.json').read_text());x,y,w,h=m['objekt_i_rom'];im.paste(src(j),(x,y))
+ d=np.any(np.array(im)!=target,axis=2);perms.append({'rekkefolge':order,'total_diff':int(d.sum()),'utenfor292':int((d&~mask).sum())})
+ if order==('obj295_01','obj294_01','obj293_01'):im.resize((1280,800),Image.Resampling.NEAREST).save(r/'a-029-underlag-rekonstruert.png')
+out['029_rektangulaer_underlagsprove']=perms
+# Original actual changes in sparks are tiny, keep all states distinct.
+states=['lag030_01_del1av2','lag030_02_del1av2','lag030_03_del1av2','lag030_04_del1av2'];pairs=[]
+for a,b in itertools.combinations(states,2):
+ aa=np.array(src(a).crop((112,136,152,168)));bb=np.array(src(b).crop((112,136,152,168)));pairs.append({'a':a,'b':b,'ulike301piksler':int(np.any(aa!=bb,axis=2).sum())})
+out['301_familie']=pairs;(r/'a-familiebevis.json').write_text(json.dumps(out,indent=2));print(json.dumps(out,indent=2))
+# Clear independent original/base crops for absence and ring/mechanism identity review.
+fields=json.loads((r/'a-feltbevis.json').read_text());can=Image.new('RGB',(1200,5*280),(190,190,190));dr=ImageDraw.Draw(can)
+for i,e in enumerate(fields[:5]):
+ j=e['jobb'];m=json.loads((root/'jobber'/j/'jobb.json').read_text());box=e['lokalt_klipp'];bs=src('rom029') if m['rom']==29 else src(Path(m['bilde_to']).parent.name)
+ for k,im in enumerate([bs.crop(box),src(j).crop(box)]):
+  im=im.resize((im.width*5,im.height*5),Image.Resampling.NEAREST);im.thumbnail((570,240),Image.Resampling.NEAREST);can.paste(im,(k*600,i*280+30))
+ dr.text((5,i*280+5),j+' grunnrom / lag',fill='black')
+can.save(r/'a-grunnromsfelt.png')

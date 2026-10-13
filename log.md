@@ -247,3 +247,8 @@
 
 - Bestilling 30: ti lag levert OK med 20 faktiske objektkontroller. Brukeravklart stangfot, Gator Golf-knapper og liggende Sam, fravær av brekkjern/griper og seks egne Tunnel of Love-tilstander. Se `rapporter/bestilling030-20261013/RAPPORT.md`. Bestilling 31 og videre fortsetter.
 - 40 beskyttede kilder og 12 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T23:12:38+02:00 (Codex, Astra)
+
+- Bestilling 32: ti lag levert OK med tolv faktiske objektkontroller, identisk taubaneoverlapp, museumsdør, redskapslag og fire kikkert/gnisttilstander. Se `rapporter/bestilling032-20261013/RAPPORT.md`. Bestilling 31 venter egne rettinger/avklaringer; videre arbeid fortsetter.
+- 40 beskyttede kilder og 16 ekstra kontekstfiler er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
