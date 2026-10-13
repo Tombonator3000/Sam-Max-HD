@@ -212,3 +212,8 @@
 
 - Bestilling 24: ti TV-/signal-/antennelag levert OK. Identiske 0D/0E/0F kildebevist gjenbrukt, egne signalbrudd og to antenneløkker/fravær beholdt. Synlige veggskjøter rettet og uavhengig etterkontrollert. Alle ti objektfelt målt; marginal078_03-korrelasjon0,602296 beholdes som forbehold. Se `rapporter/bestilling024-20261013/RAPPORT.md`. Bestilling 25 og videre fortsetter.
 - 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.
+
+## 2026-10-13T21:36:35+02:00 (Codex, Astra)
+
+- Bestilling 25: ti lag levert OK, med45 faktiske objektkontroller. Fem egne vifteposer, to dørtilstander, skade-/hodefelt og kildebevist TV-gjenbruk. Fire kartlag med egne munn-/gape-/vimpeltilstander; tre konkrete kart03-avvik rettet og uavhengig etterkontrollert. Se `rapporter/bestilling025-20261013/RAPPORT.md`. Bestilling 26 og videre fortsetter.
+- 40 beskyttede kilder er uendret. Root har sett original/HD og småtilstandene. Motorimport, spilltest og individuell bildegodkjenning er fortsatt ikke utført.

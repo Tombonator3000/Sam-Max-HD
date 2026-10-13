@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import hashlib,json
+r=Path(__file__).resolve().parent; root=r.parents[1]
+rows=[]
+for job,ob in [('lag010_01','obj104_01'),('lag010_03','obj104_02'),('lag010_02','obj112_02'),('lag010_03','obj112_03'),('lag010_01','obj106_01'),('lag010_03','obj106_02')]:
+ m=json.loads((root/'jobber'/job/'jobb.json').read_text());o=next(v for v in m['objekter'] if v['bilde']==ob);x,y,w,h=o['rekt'];a=Image.open(root/'jobber'/job/'original_1x.png').convert('RGB').crop((x,y,x+w,y+h));b=Image.open(root/'jobber'/job/'resultat.png').convert('RGB').crop((128+x*4,112+y*4,128+(x+w)*4,112+(y+h)*4));rows.append((job,ob,a.resize((w*8,h*8),Image.Resampling.NEAREST),b.resize((w*8,h*8),Image.Resampling.NEAREST)))
+out=Image.new('RGB',(640,6*350),(180,180,180));d=ImageDraw.Draw(out)
+for i,(j,o,a,b) in enumerate(rows):d.text((8,i*350+5),j+' '+o+' original / HD',fill='black');out.paste(a,(8,i*350+26));out.paste(b,(330,i*350+26))
+out.save(r/'b-kart-tilstandsutsnitt.png')
+json.dump({j:hashlib.sha256((root/'jobber'/j/'resultat.png').read_bytes()).hexdigest() for j in ['lag010_01','lag010_02','lag010_03']},open(r/'b-kart-forkontroll-sha.json','w'),indent=2)

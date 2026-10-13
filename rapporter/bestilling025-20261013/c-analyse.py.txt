@@ -1,0 +1,38 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,re,csv
+import numpy as np
+b=Path.cwd();r=b/'rapporter/bestilling025-20261013'
+sec=(b/'GRAFIKKLISTE.md').read_text().split('## Bestilling 25\n')[1].split('## Bestilling 26')[0];names=re.findall(r'^- \[.\] `([^`]+)`',sec,re.M);assert len(names)==10
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+locks=[dict(fil=str((Path('jobber')/n/f)),sha256=sha(b/'jobber'/n/f)) for n in names for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']]
+p=r/'kildehash.json'
+if p.exists():assert json.loads(p.read_text())==locks
+else:p.write_text(json.dumps(locks,ensure_ascii=False,indent=2)+'\n')
+meta=[json.loads((b/'jobber'/n/'jobb.json').read_text()) for n in names];(r/'c-metadata.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
+ims={n:Image.open(b/'jobber'/n/'original_1x.png').convert('RGB') for n in names}
+out=Image.new('RGB',(1536,2250),(90,90,90));d=ImageDraw.Draw(out)
+rows=[];objects=[];crops=[]
+for i,m in enumerate(meta):
+ n=m['id'];im=ims[n];a=np.array(im);baseid='rom007_del1av2' if m['rom']==7 else f"rom{m['rom']:03d}";base=np.array(Image.open(b/'jobber'/baseid/'original_1x.png').convert('RGB'));diff=np.any(a!=base,2);yy,xx=np.where(diff);mask=np.zeros(a.shape[:2],bool)
+ rect=m['bilde_i_lerret'];reg=m['region'];thumb=im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST);x=(i%2)*768;y=(i//2)*450;out.paste(thumb,(x,y+30));d.text((x+8,y+8),n,fill='white')
+ for ob in m['objekter']:
+  ox,oy,w,h=ob['rekt'];lx=ox-reg[0];ly=oy-reg[1];mask[ly:ly+h,lx:lx+w]=True;aa=a[ly:ly+h,lx:lx+w];bb=base[ly:ly+h,lx:lx+w];colors,cnt=np.unique(aa.reshape(-1,3),axis=0,return_counts=True);od=dict(jobb=n,**ob,hd_lerret_rekt=[rect[0]+lx*4,rect[1]+ly*4,w*4,h*4],endrede_piksler_mot_rom=int(np.any(aa!=bb,2).sum()),farger=[dict(rgb=c.tolist(),antall=int(k)) for c,k in zip(colors,cnt)]);objects.append(od);crops.append((n+' '+ob['bilde'],Image.fromarray(aa),Image.fromarray(bb)))
+ rows.append(dict(jobb=n,grunnrom=baseid,endrede_piksler=int(diff.sum()),bbox=[] if len(xx)==0 else [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],endrede_utenfor_metadata=int((diff&~mask).sum()),original_sha256=sha(b/'jobber'/n/'original_1x.png'),bilde_to_sha256=sha(b/m['bilde_to']),prompt=(b/'jobber'/n/'prompt.txt').read_text()))
+out.save(r/'original-kontaktark.png')
+for start in range(0,len(crops),8):
+ sheet=Image.new('RGB',(1400,8*250),(90,90,90));dr=ImageDraw.Draw(sheet)
+ for k,(label,im,base) in enumerate(crops[start:start+8]):
+  dr.text((8,k*250+8),label+' | original variant / grunnrom',fill='white')
+  for col,mm in enumerate([im,base]):
+   f=min(6,650/mm.width,210/mm.height);mm=mm.resize((round(mm.width*f),round(mm.height*f)),Image.Resampling.NEAREST);sheet.paste(mm,(col*700+8,k*250+32))
+ sheet.save(r/f'c-objektkontaktark-{start//8+1}.png')
+families=[]
+for room in [8,10]:
+ ns=[n for n,m in zip(names,meta) if m['rom']==room]
+ for ai,na in enumerate(ns):
+  for nb in ns[ai+1:]:
+   aa=np.array(ims[na]);bb=np.array(ims[nb]);di=np.any(aa!=bb,2);yy,xx=np.where(di);families.append(dict(fra=na,til=nb,endrede=int(di.sum()),bbox=[] if not len(xx) else [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]))
+reg=[z for z in csv.DictReader(open(b/'konsept/2026-10-12/objektbilder-959.csv')) if z['rom'] in ['7','8','10']]
+for name,data in [('c-kildebevis.json',rows),('c-objektbokser-paletter.json',objects),('c-familiedifferanser.json',families),('c-register.json',reg)]: (r/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps([{k:v for k,v in z.items() if k!='prompt'} for z in rows],indent=2));print('objects',len(objects))

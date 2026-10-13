@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil,subprocess
+b=Path.cwd();r=b/'rapporter/bestilling025-20261013';g=Path('/home/tombonator3000t/.codex/generated_images/01a135e9-14ca-7082-b901-a0ecf3e0b936');py='/home/tombonator3000t/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3'
+raws=['exec-a309e9a3-d970-4acd-b5ad-496aff841b49.png','exec-033261a7-671c-4f9a-9de7-39d1564b33bb.png','exec-be5b9a6b-fa53-4d67-9b57-e19bb8bf2255.png','exec-f36d2ff6-74b9-455b-a771-6fea4e23118a.png','exec-210e18df-2dc9-4670-b61d-f29bea411ebd.png']
+base=np.array(Image.open(b/'jobber/rom008/resultat.png').convert('RGB'));records=[];qa=Image.new('RGB',(1536,5*540),(80,80,80));dr=ImageDraw.Draw(qa)
+for i,raw in enumerate(raws,1):
+ n=f'lag008_{i:02d}';j=b/'jobber'/n;m=json.loads((j/'jobb.json').read_text());shutil.copyfile(g/raw,r/(n+'-raw1.png'));im=Image.open(g/raw).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS);new=np.array(im);alpha=np.zeros((1024,1536),float);rects=[]
+ for ob in m['objekter']:
+  x,y,w,h=ob['rekt'];x=128+4*x;y=112+4*y;w*=4;h*=4;yy,xx=np.mgrid[:h,:w];aa=np.clip(np.minimum.reduce([xx,yy,w-1-xx,h-1-yy])/3,0,1);alpha[y:y+h,x:x+w]=np.maximum(alpha[y:y+h,x:x+w],aa);rects.append([x,y,w,h])
+ out=np.uint8(np.rint(base*(1-alpha[...,None])+new*alpha[...,None]));Image.fromarray(out).save(j/'resultat.png');assert np.array_equal(out[alpha==0],base[alpha==0]);records.append(dict(jobb=n,felter=rects,kantblanding_px=3,utenfor_byteidentisk=True,raaforsok=raw))
+ p=subprocess.run([py,'verktoy/sjekk_leveranse.py',str(j/'resultat.png')],capture_output=True,text=True);(r/(n+'-kontroll1.txt')).write_text(p.stdout+p.stderr);print(p.stdout)
+ qa.paste(Image.open(j/'referanse.png').resize((768,512),Image.Resampling.NEAREST),(0,(i-1)*540+25));qa.paste(Image.fromarray(out).resize((768,512)),(768,(i-1)*540+25));dr.text((8,(i-1)*540+5),n+' original / HD',fill='white')
+(r/'c-gang-komposisjonsbevis.json').write_text(json.dumps(records,indent=2)+'\n');qa.save(r/'c-gang-familie.png')

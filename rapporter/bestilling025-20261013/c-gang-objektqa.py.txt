@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,importlib.util
+b=Path.cwd();r=b/'rapporter/bestilling025-20261013';sp=importlib.util.spec_from_file_location('c',b/'verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(sp);sp.loader.exec_module(c);rows=[];thumbs=[]
+for i in range(1,6):
+ n=f'lag008_{i:02d}';j=b/'jobber'/n;m=json.loads((j/'jobb.json').read_text());im=Image.open(j/'resultat.png').convert('RGB');part,_=c.part_of(im,m);metrics=c.compare(Image.open(j/'original_1x.png').convert('RGB'),part)
+ for o in m['objekter']:
+  x,y,w,h=o['rekt'];aa=metrics['eo'][y:y+h,x:x+w];bb=metrics['es'][y:y+h,x:x+w];rows.append(dict(jobb=n,**o,corr=float(c.corr(aa,bb)),std=float(aa.std()),skipped=bool(aa.std()<1 or min(w,h)<4)));box=(128+x*4,112+y*4,128+(x+w)*4,112+(y+h)*4);s=Image.open(j/'referanse.png').crop(box);q=im.crop(box);factor=min(2,480/s.width,300/s.height);size=(round(s.width*factor),round(s.height*factor));thumbs.append((n+' '+o['bilde'],s.resize(size,Image.Resampling.NEAREST),q.resize(size)))
+for start in range(0,len(thumbs),5):
+ out=Image.new('RGB',(1024,1700),(90,90,90));d=ImageDraw.Draw(out)
+ for ix,(n,s,q) in enumerate(thumbs[start:start+5]):d.text((8,ix*340+8),n+' original / HD',fill='white');out.paste(s,(8,ix*340+30));out.paste(q,(520,ix*340+30))
+ out.save(r/f'c-gang-objektqa-{start//5+1}.png')
+(r/'c-gang-objektkontroll.json').write_text(json.dumps(rows,indent=2)+'\n');print([(z['bilde'],round(z['corr'],3),z['skipped']) for z in rows])

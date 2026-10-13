@@ -1,0 +1,40 @@
+from pathlib import Path
+import json, hashlib
+from PIL import Image,ImageDraw
+import numpy as np
+
+r=Path(__file__).resolve().parent
+root=r.parents[1]
+base=np.asarray(Image.open(root/'jobber/rom010/original_1x.png').convert('RGB'))
+records=[];objects={}
+contact=Image.new('RGB',(1600,4*532),(190,190,190));d=ImageDraw.Draw(contact)
+locks=[]
+for k in range(1,8):
+    j=f'lag010_{k:02d}';folder=root/'jobber'/j
+    m=json.loads((folder/'jobb.json').read_text());im=Image.open(folder/'original_1x.png').convert('RGB');a=np.asarray(im)
+    mask=np.zeros(a.shape[:2],bool)
+    for ob in m['objekter']:
+        x,y,w,h=ob['rekt'];mask[y:y+h,x:x+w]=True
+        crop=im.crop((x,y,x+w,y+h));objects[ob['bilde']]={'jobb':j,'rekt':ob['rekt'],'image':crop,'rgb_sha256':hashlib.sha256(crop.tobytes()).hexdigest()}
+    outside=int(np.any(a!=base,axis=2)[~mask].sum())
+    records.append({'jobb':j,'objekter':m['objekter'],'ulike_RGB_piksler_utenfor_union_av_objektfelt':outside,'original_rgb_sha256':hashlib.sha256(im.tobytes()).hexdigest()})
+    for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+        locks.append({'fil':str((folder/f).relative_to(root)),'sha256':hashlib.sha256((folder/f).read_bytes()).hexdigest()})
+    x=(k-1)%2*800;y=(k-1)//2*532;contact.paste(im.resize((800,500),Image.Resampling.NEAREST),(x,y+26));d.text((x+8,y+7),j+' original',fill=(0,0,0))
+hd=Image.open(root/'jobber/rom010/resultat.png').convert('RGB').crop((128,112,1408,912));hd.thumbnail((800,500));contact.paste(hd,(800,3*532+26));d.text((808,3*532+7),'rom010 levert HD-basis',fill=(0,0,0))
+contact.save(r/'root-kart-oversikt.png')
+families=[]
+for sheet in range(3):
+    c=Image.new('RGB',(1200,5*222),(190,190,190));dr=ImageDraw.Draw(c)
+    for row,oid in enumerate(range(101+5*sheet,106+5*sheet)):
+        group=[]
+        for state in range(1,4):
+            key=f'obj{oid:03d}_{state:02X}';e=objects[key];im=e['image'];im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST)
+            xx=(state-1)*400;yy=row*222;dr.text((xx+6,yy+5),key+' '+e['jobb']+' '+str(e['rekt']),fill=(0,0,0));c.paste(im,(xx+20,yy+34));group.append(e)
+        pairs=[]
+        for a,b in zip(group,group[1:]):pairs.append(int(np.any(np.asarray(a['image'])!=np.asarray(b['image']),axis=2).sum()))
+        families.append({'objekt':oid,'kildetilstander':[{'jobb':e['jobb'],'rekt':e['rekt'],'rgb_sha256':e['rgb_sha256']} for e in group],'ulike_piksler_01_02_og_02_03':pairs})
+    c.save(r/f'root-kart-objektfamilier-{sheet+1}.png')
+(r/'root-kartbevis.json').write_text(json.dumps({'lag':records,'familier':families},ensure_ascii=False,indent=2)+'\n')
+(r/'root-kart-konteksthash.json').write_text(json.dumps(locks,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'lag':len(records),'objektfamilier':len(families),'utenfor_felt':[v['ulike_RGB_piksler_utenfor_union_av_objektfelt'] for v in records]}))

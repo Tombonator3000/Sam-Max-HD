@@ -49,6 +49,7 @@
 - [x] Levert bestilling 22 med ti OK, 22 faktiske objektkontroller og to identiske kontoroverlapp.
 - [x] Levert bestilling 23 med ti OK, elleve faktiske objektkontroller, ni TV-mikrotilstander og identisk kontoroverlapp.
 - [x] Levert bestilling 24 med ti OK, ti faktiske objektkontroller og etterkontrollerte antenneskjøter.
-- [ ] Fortsett bestilling 25 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
+- [x] Levert bestilling 25 med ti OK,45 faktiske objektkontroller, fem vifteposer og uavhengig kart-QA.
+- [ ] Fortsett bestilling 26 og resten av GRAFIKKLISTE.md med godkjente hovedark og pilotrom som stilgrunnlag. Bevar egenkontroll, kildehash, rutekart og visuell QA per jobb.
 
 - [x] Rom090 og obj901_01 rettet og levert OK med uttrykkelig valgt vektorrekonstruksjon; tidligere bestilling 21-avvik erstattet.

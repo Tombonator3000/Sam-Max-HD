@@ -1,0 +1,27 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+This picture is the room with some of the game's small objects (such as doors, switches, lights, panels and items) drawn in place on top of it. Paint everything faithfully by the rules above: the room and every object. The objects are cut out of your picture afterwards by their exact position, so every object must stay exactly where it is, with the same size, outline and colors as in the input. Do not leave out, move, merge or redesign any object.
+
+Note for this room: The map of the USA that the player uses to pick destinations. Keep the outline of the country, the coast, the grid lines and every map icon (burgers, fish, guitar, skull flag, tomato and so on) exactly in shape, size and position: they are clickable places. Copy 'GREETINGS from the USA' and the speech bubble 'HI THERE!' exactly. The game draws new destinations on top of the map; do not add any.
+
+If a second image is attached, it is the approved HD version of the same room, or of the large picture the objects lie on, without these objects. Paint the room the same way as in that image, and give the objects the same level of detail, brushwork and light, so they fit into it. Take all shapes, positions and colors from the first image.
+
+
+EXACT SOURCE ANALYSIS FOR lag010_03: Input1 is THIS ten-icon layout and THIS specific animation pose of each icon. Input2 delivered HD empty map fixes the already chosen printed typography/heads/grid/coast/land painting. Input3 is new HD lag01 only for shared icon identity/style, not its poses or extras. Input4 new HD lag02 supplies family context only. This source has TEN small icons: black skull/bones flag with this second skew/wave and exact white shapes; gray crosshatched ball in shifted left/up position with cord to right; yellow-orange fish with THIS mouth and widely ascending cyan bubble pattern; vertical black question-like glyph over purple spiral at left (different bend than01); GREEN crocodile with HIGH wide open jaw, white teeth, pink mouth and cyan water; plain irregular gray rock in its second rotated shape; brown guitar tilted farther down-left with purple notes clipped at the left of its own small field; southern gulf burger with upper bun lifted HIGH and much more RED/BROWN visible filling; cyan/yellow/white tent with the THIRD source red flag position; and a very LOW thin horizontal black road silhouette at southwest with one tiny vertical yellow center marking. The road has NO green sign yet. No tomato, dinosaur, cliff/palm, additional burgers or any other destinations. Keep each icon's exact original bounding extent and positions, preserve source counts; no new stage, extra object, word or scenic background. Full1536x1024 content[128,112,1280,800], gray128 padding, source composition determines all geometry.
+Fish in THIS third state specifically has a very small round orange mouth/O near right edge of its head, with ascending cyan bubbles. Do not retain the large pink open jaw from the two previous HD examples; its jaw silhouette and tiny circle change as first source shows.
