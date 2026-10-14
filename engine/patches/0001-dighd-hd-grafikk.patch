@@ -352,10 +352,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..a9ac233a
+index 00000000..67eba5ab
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,4071 @@
+@@ -0,0 +1,4222 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -447,6 +447,65 @@ index 00000000..a9ac233a
 +			const int f = v * 256 / t;
 +			if (f > 512 || (t > 64 && f < 48))
 +				return true;
++		}
++	}
++	return false;
++}
++
++// The nearest pixel with a colour in a cel's image around cx,cy (before the
++// mirror), within the rows and columns a scaled actor may drop. Sets code.
++bool DigHD::nearCode(const CelSlot &cs, int cx, int cy, byte &code) const {
++	const Graphics::Surface &ci = cs.image->idx;
++	const int rx = MIN(3, ci.w / MAX(1, cs.rw) + 1), ry = MIN(3, ci.h / MAX(1, cs.rh) + 1);
++	for (int d = 1; d <= MAX(rx, ry); d++) {
++		for (int dy = -MIN(d, ry); dy <= MIN(d, ry); dy++) {
++			for (int dx = -MIN(d, rx); dx <= MIN(d, rx); dx++) {
++				if (MAX(ABS(dx), ABS(dy)) != d)
++					continue;  // nearest ring first
++				int x = cx + dx;
++				const int y = cy + dy;
++				if (x < 0 || y < 0 || x >= ci.w || y >= ci.h)
++					continue;
++				if (cs.mirror)
++					x = ci.w - 1 - x;
++				const byte k = *((const byte *)ci.getBasePtr(x, y));
++				if ((int)k != cs.image->transparent) {
++					code = k;
++					return true;
++				}
++			}
++		}
++	}
++	return false;
++}
++
++// Whether a pixel a soft cel drew in colour idx at lx,ly of the drawn
++// rectangle is the cel's own art (and not a shadow or another effect). A
++// scaled actor drops rows and columns by the costume's scale table, not
++// evenly, so the pixel is compared with the codes around the point it maps
++// to in the original cel. Without that, the edges of scaled figures were
++// taken for effects and stayed original pixels around the HD figure.
++bool DigHD::softCelColour(const CelSlot &cs, int lx, int ly, byte idx) const {
++	const Graphics::Surface &ci = cs.image->idx;
++	int cx = CLIP(lx * ci.w / cs.rw, 0, ci.w - 1);
++	if (cs.mirror)
++		cx = ci.w - 1 - cx;
++	const int cy = CLIP(ly * ci.h / cs.rh, 0, ci.h - 1);
++	const int rx = MIN(3, ci.w / MAX(1, cs.rw) + 1), ry = MIN(3, ci.h / MAX(1, cs.rh) + 1);
++	for (int d = 0; d <= MAX(rx, ry); d++) {
++		for (int dy = -MIN(d, ry); dy <= MIN(d, ry); dy++) {
++			for (int dx = -MIN(d, rx); dx <= MIN(d, rx); dx++) {
++				if (MAX(ABS(dx), ABS(dy)) != d)
++					continue;  // nearest ring first
++				const int x = cx + dx, y = cy + dy;
++				if (x < 0 || y < 0 || x >= ci.w || y >= ci.h)
++					continue;
++				const byte code = *((const byte *)ci.getBasePtr(x, y));
++				if ((int)code == cs.image->transparent)
++					continue;
++				if (cs.raw ? code == idx : !wildColour(cs.image->basePal + code * 3, _pal + idx * 3))
++					return true;
++			}
 +		}
 +	}
 +	return false;
@@ -1034,7 +1093,8 @@ index 00000000..a9ac233a
 +	Common::Path soft(Common::String::format("costumes/costume%03d_%03d_hd.png", costume, cel));
 +	Common::Path hd(Common::String::format("costumes/costume%03d_%03d.png", costume, cel));
 +	Common::Path idx(Common::String::format("costumes/costume%03d_%03d_idx.png", costume, cel));
-+	if (!loadImage(soft, idx, width, height, *img, true) && !loadImage(hd, idx, width, height, *img)) {
++	if (!loadImage(soft, idx, width, height, *img, true) && !loadImage(hd, idx, width, height, *img) &&
++	    !smoothCel(idx, *img)) {
 +		delete img;
 +		img = nullptr;
 +	}
@@ -1110,6 +1170,8 @@ index 00000000..a9ac233a
 +		scheduleSoft(c);
 +	if (c.soft && _debugSoft)
 +		debug("DigHD: frame %u soft cel %d costume %d slot %d seq %u at %d,%d %dx%d", _frameNo, cel, c.costume, (int)(&c - _cels), c.seq, c.rx, c.ry, c.rw, c.rh);
++	else if (c.missing && _curFront && _debugSoft)
++		debug("DigHD: frame %u cel %d costume %d slot %d without HD image at %d,%d %dx%d", _frameNo, cel, c.costume, (int)(&c - _cels), c.rx, c.ry, c.rw, c.rh);
 +}
 +
 +void DigHD::CelLayer::clear() {
@@ -1169,26 +1231,50 @@ index 00000000..a9ac233a
 +	if (x0 >= x1 || y0 >= y1)
 +		return;
 +	const byte *buf = L->base;
++	const byte *back = vs.backBuf;
 +	CelMark *marks = L->mark.data();
 +
 +	if (c.image) {
 +		// The pixels where the cel's image has a colour, mapped as in compose()
 +		const Graphics::Surface &idx = c.image->idx;
-+		int col[1024];
-+		for (int x = x0; x < x1; x++) {
-+			const int cx = (x - left) * idx.w / c.rw;
-+			col[x - x0] = c.mirror ? idx.w - 1 - cx : cx;
++		// A scaled cel can draw one pixel outside the rectangle it reports
++		// (rounding in the scale table), so one more pixel around it is looked at
++		const int e = (c.rw != idx.w || c.rh != idx.h) ? 1 : 0;
++		const int xa = MAX(left - e, 0), xb = MIN(MIN(left + c.rw + e, L->pitch), left + 1023);
++		const int ya = MAX(top - e, 0), yb = MIN(top + c.rh + e, (int)vs.h);
++		int col[1026];
++		for (int x = xa; x < xb; x++) {
++			const int cx = CLIP((x - left) * idx.w / c.rw, 0, idx.w - 1);
++			col[x - xa] = c.mirror ? idx.w - 1 - cx : cx;
 +		}
-+		for (int y = y0; y < y1; y++) {
-+			const byte *row = (const byte *)idx.getBasePtr(0, (y - top) * idx.h / c.rh);
++		for (int y = ya; y < yb; y++) {
++			const bool inY = y >= top && y < top + c.rh;
++			const byte *row = (const byte *)idx.getBasePtr(0, CLIP((y - top) * idx.h / c.rh, 0, idx.h - 1));
 +			const size_t rowOff = (size_t)y * L->pitch + shift;
-+			for (int x = x0; x < x1; x++) {
++			for (int x = xa; x < xb; x++) {
 +				const size_t off = rowOff + x;
 +				if (off >= L->size)
 +					break;
-+				const byte code = row[col[x - x0]];
-+				if ((int)code == c.image->transparent)
-+					continue;
++				const bool inside = inY && x >= left && x < left + c.rw;
++				byte code = inside ? row[col[x - xa]] : (byte)c.image->transparent;
++				if (!inside || (int)code == c.image->transparent) {
++					// A scaled actor drops rows and columns by the costume's scale
++					// table, not evenly, so a pixel the renderer drew can map to a
++					// transparent pixel at the edge of the image. Such a pixel still
++					// belongs to the cel when it differs from the background and the
++					// image has a colour next to the point (else the edges of scaled
++					// figures stayed original pixels around the HD figure).
++					// The colour must fit the code next to it, and a pixel another
++					// cel drew and still holds is left to that cel.
++					if (c.image->transparent < 0 || !back || buf[off] == back[off] ||
++					    !nearCode(c, CLIP((x - left) * idx.w / c.rw, 0, idx.w - 1), CLIP((y - top) * idx.h / c.rh, 0, idx.h - 1), code))
++						continue;
++					if (c.raw ? code != buf[off] : wildColour(c.image->basePal + code * 3, _pal + buf[off] * 3))
++						continue;
++					const CelMark &o = marks[off];
++					if (o.seq && o.val == buf[off] && &_cels[o.slot] != &c && _cels[o.slot].seq == o.seq && _cels[o.slot].used)
++						continue;
++				}
 +				CelMark &m = marks[off];
 +				m.seq = c.seq;
 +				m.slot = slot;
@@ -1205,7 +1291,6 @@ index 00000000..a9ac233a
 +		// No HD image (yellow with Ctrl+Shift+H), and so no image that says which
 +		// pixels the cel drew. The pixels in its rectangle that differ from the
 +		// background count, except those still showing an HD cel drawn before.
-+		const byte *back = vs.backBuf;
 +		for (int y = y0; y < y1; y++) {
 +			const size_t rowOff = (size_t)y * L->pitch + shift;
 +			for (int x = x0; x < x1; x++) {
@@ -1668,14 +1753,8 @@ index 00000000..a9ac233a
 +							// under it (drawSoftCels()). Its shadows and effects stay
 +							// original pixels, under the cel.
 +							bool kept = true;
-+							if (lx >= 0 && ly >= 0 && lx < cs.rw && ly < cs.rh) {
-+								const Graphics::Surface &ci = cs.image->idx;
-+								int cx = lx * ci.w / cs.rw;
-+								if (cs.mirror)
-+									cx = ci.w - 1 - cx;
-+								const byte code = *((const byte *)ci.getBasePtr(cx, ly * ci.h / cs.rh));
-+								kept = (cs.raw && code != idx) || wildColour(cs.image->basePal + code * 3, _pal + idx * 3);
-+							}
++							if (lx >= -1 && ly >= -1 && lx <= cs.rw && ly <= cs.rh)
++								kept = !softCelColour(cs, lx, ly, idx);
 +							if (!kept) {
 +								softBase = true;
 +								baseIdx = b[c];
@@ -2408,6 +2487,78 @@ index 00000000..a9ac233a
 +		out = tmp;
 +		SWAP(cw, ch);
 +	}
++}
++
++// A cel with only its original (costumeCCC_NNN_idx.png, no HD image) in a
++// costume that has soft cels: the mod has the original so the cel is not
++// shown as blocks of original pixels next to the painted figure (Sam's hands
++// while the painted cel is held back). The outline is scaled with xBR, which
++// gives a soft alpha edge, and the colours with Scale4x. It is laid over the
++// picture as a soft cel with a margin of one original pixel.
++bool DigHD::smoothCel(const Common::Path &idxFile, Image &out) {
++	if (_scale != 4)
++		return false;
++	Common::FSNode idxNode(_modPath.join(idxFile));
++	if (!idxNode.exists())
++		return false;
++	::Image::PNGDecoder dec;
++	int transparent = -1;
++	Common::SeekableReadStream *raw = idxNode.createReadStream();
++	Common::SeekableReadStream *s = raw ? withoutTRNS(*raw, transparent) : nullptr;
++	delete raw;
++	const bool ok = s && dec.loadStream(*s);
++	delete s;
++	if (!ok || transparent < 0 || dec.getSurface()->format.bytesPerPixel != 1)
++		return false;
++	const Graphics::Surface *is = dec.getSurface();
++	const int pad = 1, pw = is->w + 2 * pad, ph = is->h + 2 * pad, W4 = pw * 4, H4 = ph * 4;
++	const byte tr = (byte)transparent;
++	Common::Array<byte> code(pw * ph, tr);
++	Common::Array<float> mask(pw * ph, 0.0f);
++	for (int y = 0; y < is->h; y++) {
++		const byte *row = (const byte *)is->getBasePtr(0, y);
++		for (int x = 0; x < is->w; x++) {
++			code[(y + pad) * pw + x + pad] = row[x];
++			mask[(y + pad) * pw + x + pad] = row[x] != tr ? 1.0f : 0.0f;
++		}
++	}
++	Common::Array<float> alpha;
++	xbr4(mask, pw, ph, alpha);
++	Common::Array<byte> two, big;
++	scale2x(code, pw, ph, two);
++	scale2x(two, pw * 2, ph * 2, big);
++
++	const Graphics::Palette &pal = dec.getPalette();
++	memset(out.basePal, 0, sizeof(out.basePal));
++	memcpy(out.basePal, pal.data(), MIN<uint>(pal.size() * 3, sizeof(out.basePal)));
++	out.free();
++	out.idx.copyFrom(*is);
++	out.transparent = transparent;
++	out.soft = true;
++	out.padX = out.padY = pad;
++	out.hd.create(W4, H4, _rgba);
++	for (int y = 0; y < H4; y++) {
++		uint32 *o = (uint32 *)out.hd.getBasePtr(0, y);
++		for (int x = 0; x < W4; x++) {
++			const float a = CLIP(alpha[y * W4 + x], 0.0f, 1.0f);
++			byte c = big[y * W4 + x];
++			if (c == tr && a > 0.0f) {
++				// Inside the smooth outline but outside the pixels: the nearest colour
++				for (int d = 1; d <= 2 && c == tr; d++)
++					for (int dy = -d; dy <= d && c == tr; dy++)
++						for (int dx = -d; dx <= d && c == tr; dx++) {
++							const int cx = CLIP(x / 4 + dx, 0, pw - 1), cy = CLIP(y / 4 + dy, 0, ph - 1);
++							c = code[cy * pw + cx];
++						}
++			}
++			if (c == tr || a <= 0.0f) {
++				o[x] = _rgba.ARGBToColor(0, 0, 0, 0);
++				continue;
++			}
++			o[x] = _rgba.ARGBToColor((byte)(a * 255.0f + 0.5f), out.basePal[c * 3], out.basePal[c * 3 + 1], out.basePal[c * 3 + 2]);
++		}
++	}
++	return true;
 +}
 +
 +void DigHD::makeGlyphHD(GlyphShape &s) {
@@ -4429,10 +4580,10 @@ index 00000000..a9ac233a
 +} // End of namespace Scumm
 diff --git a/engines/scumm/dighd.h b/engines/scumm/dighd.h
 new file mode 100644
-index 00000000..b64f6ba5
+index 00000000..1dcae60b
 --- /dev/null
 +++ b/engines/scumm/dighd.h
-@@ -0,0 +1,559 @@
+@@ -0,0 +1,562 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -4743,6 +4894,9 @@ index 00000000..b64f6ba5
 +	enum : uint32 { kCoverNone = 0, kCoverAll = 0xFFFFFFFFu };
 +	void setCover(size_t i, uint32 seq, uint16 slot);
 +	bool softRect(const CelSlot &c, Common::Rect &r) const;
++	bool softCelColour(const CelSlot &cs, int lx, int ly, byte idx) const;
++	bool nearCode(const CelSlot &cs, int cx, int cy, byte &code) const;
++	bool smoothCel(const Common::Path &idxFile, Image &out);
 +	void scheduleSoft(const CelSlot &c);
 +	void flushSoft();
 +	void softGain(CelSlot &c);

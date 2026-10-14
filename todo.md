@@ -49,6 +49,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Sjekk om blast-tekst brukes i Sam & Max: nei, bare blast-objekter (14. oktober)
 - [ ] Romtest: finn en måte å komme inn i de 12 rommene som henger etter testhoppet (lagret spill eller objekttilstander). Sjekket 14. oktober: rom 11 stopper på «state -1 is out of bounds» og rom 50 på «readArray: invalid array 261», fordi variablene ikke er satt uten vanlig spill. Krever lagrede spill fra en ekte gjennomspilling
 - [ ] Test The Dig med den utvidede patchen (i Dig-repoet) før patchen kopieres dit
+- [x] Piksler rundt HD-figurene (Toms skjermbilde 14. oktober): kantene på skalerte figurer merkes nå riktig, og ruter uten HD-bilde i kostymer med myke ruter glattes i motoren (15. oktober)
+- [ ] Kanten mot forgrunnen (z-masken, for eksempel stolen foran Sam i kontoret) er 4 x 4-blokker. Kan glattes med en myk maske laget fra HD-rommet
+- [ ] Hakking: spør Tom hvor det hakket (nettsiden, Linux eller Windows). Nettsiden henter nå HD-pakken i bakgrunnen. Hele skjermen tar 14 til 22 ms å bygge her; i nettleseren kan nedtoninger og rulling bli tunge. Mål med `DIGHD_BENCH` i nettleseren og se på å bygge bare det som er endret ved palettbytter
+- [ ] Toms punkt 4 i meldingen 14. oktober ble kuttet av: spør hva det var
 
 ### Pipeline
 

@@ -1362,6 +1362,13 @@ def test_smooth_figure_sheet_import(tmp_path):
     modpack.build_mod(ex, mod, scale=4, method="nearest", rooms=set(), own=tmp_path / "med-kart")
     for b in drawn:
         assert (mod / "costumes" / f"{b}_hd.png").exists() and (mod / "costumes" / f"{b}_idx.png").exists()
+    # Rutene i kostymet uten HD-bilde får bare indeksbildet, så motoren kan glatte dem (Sams hender)
+    rest = [p.name.replace("_idx.png", "") for p in (ex / "costumes").glob("costume014_*_idx.png")
+            if p.name.replace("_idx.png", "") not in drawn]
+    assert rest
+    for b in rest:
+        assert (mod / "costumes" / f"{b}_idx.png").exists()
+        assert not (mod / "costumes" / f"{b}_hd.png").exists() and not (mod / "costumes" / f"{b}.png").exists()
     assert not modpack.soft_size_ok((100, 100), (24, 48), 4)
 
 

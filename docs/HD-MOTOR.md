@@ -46,6 +46,8 @@ Resten, kort:
 - **Farger:** HD-pikselen ganges med forholdet mellom fargen spillet viser og originalfargen. Det gir toning, palettbytte og skygger. Fargesykling går gjennom et glatt fargekart over 3 x 3 originalpiksler.
 - **Figurer:** hver piksel en rute tegner, merkes med tegningen, ruten og verdien. Pikselen viser HD bare så lenge verdien står der.
 - **Myke figurer:** figurer i glatt stil med ekte alfa legges over etter blokkene, bak z-masken og under tekst og menyer.
+- **Skalerte figurer** (15. oktober, etter Toms skjermbilde med piksler rundt Sam og Max): ScummVM skalerer klassiske kostymer med en skalatabell som hopper over bestemte rader og kolonner, ikke jevnt, og kan tegne én piksel utenfor rektangelet den oppgir. Merkingen (`markCel`) regnet med jevn skalering, så kantpikslene ble ikke merket som figurens og ble stående som originalpiksler rundt HD-figuren. Nå tas en piksel rundt en skalert rute med når den skiller seg fra bakgrunnen, har en farge som passer koden like ved i originalruten (`nearCode`), og ingen annen rute i samme tegning eier den. Testen av skygger og effekter under myke ruter (`softCelColour`) ser på kodene rundt punktet på samme måte.
+- **Ruter uten HD-bilde i et kostyme med myke ruter:** modden har bare indeksbildet (`costumeCCC_NNN_idx.png`), og motoren lager en glatt utgave selv (`smoothCel`): omrisset med xBR (myk alfakant), fargene med Scale4x, en originalpiksels marg. Det gjelder for eksempel Sams hender (kostyme 4, rute 256), der den malte ruten er holdt tilbake. Uten dette sto slike ruter som blokker ved siden av de malte figurene.
 - **Klassisk grafikk:** valget HD Graphics i spillets egen meny (F5), Ctrl+H bytter, Ctrl+Shift+H gir gult felt der HD mangler.
 
 ## Det som må portes for v6

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {selectFiles, makeIndexes, privateFetch, summarize, treeRows, blobIds, RemoteSource, ApiError, REPO, GAME_ROOT, MOD_ROOT} from '../local-files.mjs';
+import {selectFiles, makeIndexes, privateFetch, summarize, treeRows, blobIds, RemoteSource, ApiError, REPO, GAME_ROOT, MOD_ROOT, prefetch} from '../local-files.mjs';
 
 const file = (name, content = 'sample') => ({name: name.split('/').at(-1), webkitRelativePath: name, size: content.length});
 
@@ -221,4 +221,26 @@ test('a lost connection is tried again until the file comes', async () => {
   bad.rows = source.rows;
   await assert.rejects(bad.read(GAME_ROOT + 'MT32_PCM.ROM'), error => error.status === 401);
   assert.equal(rejected, 1);
+});
+
+test('the HD pack is fetched in the background, figure cels first, each blob once', async () => {
+  const requests = [];
+  const library = memoryLibrary();
+  const source = new RemoteSource(library, null, github(requests));
+  const rows = await source.list();
+  const listed = requests.length;
+  // The game asks for a file while the background fetch has it on its way
+  const mod = rows.filter(r => r.path.startsWith(MOD_ROOT));
+  const [count] = await Promise.all([prefetch(source, rows), source.read(mod[0].path)]);
+  assert.equal(count, mod.length);
+  const fetched = requests.slice(listed).map(r => decodeURIComponent(new URL(r.url).pathname));
+  // Only the HD pack, each file once, and the game files are left to the game
+  assert.equal(fetched.length, mod.length);
+  assert.equal(new Set(fetched).size, fetched.length);
+  assert.ok(fetched.every(p => p.includes('/hd-mod/')));
+  const kinds = fetched.map(p => /\/costumes\//.test(p) ? 0 : /\/objects\//.test(p) ? 1 : /\/rooms\//.test(p) ? 2 : 3);
+  assert.deepEqual(kinds, [...kinds].sort((a, b) => a - b));
+  // A second time everything is in the browser
+  assert.equal(await prefetch(source, rows), mod.length);
+  assert.equal(requests.length, listed + mod.length);
 });
