@@ -39,6 +39,8 @@ KART = {
 
 STR = 96          # punktstørrelse når bokstavene tegnes
 TEGN = range(33, 127)
+# Tegn som spillets fonter tegner annerledes enn ASCII: apostrofen er skrå i Sam & Max
+TEGN_SOM = {39: "\u2019"}
 
 
 def tegn_bokstav(font: ImageFont.FreeTypeFont, ch: str) -> Image.Image | None:
@@ -61,7 +63,8 @@ def lag_skrift(out: Path, kart: dict[int, str] | None = None) -> dict:
     antall = {}
     for mappe in sorted(set(kart.values())):
         font = ImageFont.truetype(str(SKRIFTER / VARIANTER[mappe]), STR)
-        bokstaver = [(c, g) for c in TEGN if (g := tegn_bokstav(font, chr(c))) is not None]
+        bokstaver = [(c, g) for c in TEGN
+                     if (g := tegn_bokstav(font, TEGN_SOM.get(c, chr(c))) or tegn_bokstav(font, chr(c))) is not None]
         # Rader på inntil 1024 piksler, 2 piksler luft mellom bokstavene
         bredde, luft = 1024, 2
         x = y = rad = 0

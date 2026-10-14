@@ -142,3 +142,20 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 ## 2026-10-14 03:23 (Claude)
 
 - PR 10 flettet av Tom (myk.py velger riktig leveranse, status og dokumentasjon for første grafikkrunde). CI grønn, Codex hadde brukt opp kvoten og gjorde ingen gjennomgang. Sjekk-inn slettet.
+
+## 2026-10-14 03:55 (Claude)
+
+Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
+
+- Romtest: de svarte feltene var spredte piksler fra mørke streker grafikeren har tegnet en piksel ved siden av originalens. `tools/romtest.py` teller nå bare sammenhengende felt (minst 16 px): 2 kjøringer igjen av 24 (benken i rom 28 og en strek i rom 85), begge tegnefeil. Romnavnene i rapporten kommer fra `docs/rom-oversikt.csv`.
+- `build-mod` tar med objektbildene i rom uten bakgrunn (rom 81 og 82, 9 bilder), skalert alene. Ny test, og kjørt på de ekte bildene.
+- `tools/gpt_gren.sh send` stopper når AGENTS.md i `gpt-arbeid` har linjer som ikke står i `docs/gpt-arbeid-AGENTS.md`, så Codex sine tillegg ikke forsvinner. `AGENTS_OVERSKRIV=1` for å fjerne dem med vilje.
+- De 15 figurrutene til gjennomsyn: 12 hadde feil tegning (Max uten esken i fig091_05, for store hender i fig002_05, små deler i fig004_01, fig007_01 og fig236_01). `myk.py` versjon 5 skriver slike ruter (omriss for ulikt originalen) til `sjekk/costumes/` i stedet for `costumes/`, så de ikke kommer i modden. 3 ruter med bare størrelsesavvik er med som før.
+- `smhd gpt-ordre` leser `myke.json`: ordren sa 0 ferdige figurruter, nå 919 av 15 661, og rutene som er holdt ute står øverst i ordren. `gpt_gren.sh send` tar med `forhandsvisning/myk_<ark>.png` for de arkene.
+- Myke figurer tatt inn på nytt (73 ark), modden bygget på nytt (76 rom, 841 objektbilder, 919 figurruter), kort romtest i rom 2, 7, 9 og 28 uten feil, og lagt i `hd-mod` (24f561d). Ny ordre i `gpt-arbeid` (c2f66c7).
+- Motor: menyraden HD Graphics for v6. Raden står under Text Speed, og rammen er 14 piksler høyere nedover. Testet med F5 og klikk i introen: klikket gir klassisk grafikk.
+- Motor: HD-tekst for Sam & Max. `CharsetRendererClassic` melder glyfene, og DigHD har et eget lag for tekstlaget i v6 (`_textV6`, skjermkoordinater). Introen med undertekster og originalmenyen har HD-tekst, og `DIGHD_VERIFY` gir 0 piksler som ikke er bygget på nytt. `engine/test.sh` 0 avvik. Patchen passer mot ren ScummVM.
+- Blast-tekst: skriptene bruker ingen, bare blast-objekter.
+- Rommene som henger etter testhoppet stopper på skriptfeil fordi variablene ikke er satt (rom 11 «state -1 is out of bounds», rom 50 «readArray: invalid array 261»). Krever lagrede spill.
+- HD-skriften: apostrofen tegnes skrå (U+2019) som i spillets font. Kommer med i neste mod.
+- Merk: klikktesten lagret `dighd_classic=true` i `~/.config/scummvm/scummvm.ini` her; satt tilbake til false før de andre testene.

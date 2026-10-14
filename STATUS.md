@@ -4,7 +4,7 @@ Oppdatert 14. oktober 2026.
 
 ## Kort
 
-Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. Spillfilene ligger i `spilldata`, ScummVM med HD-patchen bygger og kjører spillet, all originalgrafikken er trukket ut, alle skriptene er dekompilert, og HD-motoren er på for Sam & Max: rom, objekter, blast-objekter og figurer får HD fra en mod. Teksten og menyraden HD Graphics er ikke portet. All grafikken er klargjort som jobber til ChatGPT (13. oktober). Første grafikkrunde er tatt inn 14. oktober: 76 rom, 841 objektbilder og 931 figurruter i HD ligger i `hd-mod` (e85f760), resten vises som originalen.
+Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. Spillfilene ligger i `spilldata`, ScummVM med HD-patchen bygger og kjører spillet, all originalgrafikken er trukket ut, alle skriptene er dekompilert, og HD-motoren er på for Sam & Max: rom, objekter, blast-objekter, figurer og teksten får HD fra en mod, og HD Graphics kan slås av og på i originalmenyen (14. oktober). All grafikken er klargjort som jobber til ChatGPT (13. oktober). Første grafikkrunde er tatt inn 14. oktober: 76 rom, 841 objektbilder og 919 figurruter i HD ligger i `hd-mod` (24f561d, 14. oktober; 12 ruter med feil omriss holdes ute), resten vises som originalen.
 
 ## Det som virker
 
@@ -30,11 +30,9 @@ Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. 
 
 ## Ikke portet eller ikke testet
 
-- Teksten (`CharsetRendererClassic`) og menyraden HD Graphics er ikke portet: teksten vises som originalpiksler, og HD velges med Ctrl+H. Se `docs/HD-MOTOR.md`.
 - The Dig er ikke testet med den utvidede patchen her (filene er ikke i dette repoet).
-- `tools/gpt_runde.sh` er ikke kjørt på ekte leveranser. Jobbene ligger i `gpt-arbeid` (13. oktober); bare stilpiloten er bestilt.
 - Kostymefargene: åtte kostymer har fått paletten fra rommene de brukes i. Resten bruker hjemrommet, som stemmer for de fleste, men er ikke sjekket kostyme for kostyme i spillet. Rulletekstpanelene i rom 67 og 77 er ikke sett i motoren.
-- Promptene i `gpt.py` og `figur.py` er skrevet om for Sam & Max, men ikke prøvd i ChatGPT. Bestillingen er aktiv bare for stilpiloten.
+- Promptene i `gpt.py` og `figur.py` er skrevet om for Sam & Max, men ikke prøvd i ChatGPT. Første runde er levert og tatt inn 14. oktober.
 - Figuridentiteten: navnene i `docs/figurer.csv` kommer fra replikkene i skriptene. De som står med «trolig», er tolket og ikke sett i spillet.
 - Spillet er ikke spilt med skjerm og lyd her. Musikken går med AdLib uten MIDI-utgang; MT-32 er slått av i byggingen.
 - Nettsiden: eget repo finnes ikke, ikke bygget eller prøvd.
