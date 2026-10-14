@@ -83,7 +83,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 ### Spillbart for Tom
 
 - [x] `./spill.sh` fra repoet (starter originalspillet)
-- [ ] Linux-pakken: kjør arbeidsflyten Linux-pakke for hånd og test AppImage-filen
+- [x] Linux-pakken: bygget fra main (407d763) og testet 15. oktober: AppImage lastet ned fra releasen, pakket ut og kjørt uten skjerm i rom 17 (HD-modden, Atkinson, MT-32)
 - [x] Windows-pakken: arbeidsflyten Windows-pakke bygger ScummVM med HD-patchen i MSYS2, legger ved spillet og HD-modden og publiserer release "windows" (14. oktober)
 - [ ] Tom tester Windows-pakken
 - [x] Nettsiden: repoet `Sam-Max-HD-Web` med arbeidsflyt som bygger og publiserer (14. oktober). Siden henter spillet uten nøkkel

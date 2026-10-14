@@ -290,3 +290,11 @@ Tom: ja til punkt 1 til 4 (pakkene på nytt, svarte felt, hakking, ressursbanken
 - Funnet under målingen: GitHub svarte 429 (for mange forespørsler) på bakgrunnshentingen, som prøvde å hente over 30 000 filer. Med uendelige nye forsøk ventet også spillets egne filer, og siden viste ventetid. Bakgrunnshentingen prøver nå hver fil én gang, venter et minutt ved grense og legger filen sist i køen (høyst tre forsøk); spillet henter selv en fil bakgrunnen ga opp. Indeksbildene for ruter uten HD-bilde står sist. Ny test, `node --test` 19 bestått.
 - Windows-pakken er bygget på nytt fra main og lagt i releasen «windows». Linux-pakken bygges.
 - Linux-pakken hang 50 minutter på testen i Debian 12 (spillet avsluttet ikke på TERM fra `timeout 30` i containeren). Kjøringen er avbrutt. Testen bruker nå `timeout -k 10 30` (godtar 124 og 137), og steget har `timeout-minutes: 10`. Releaseteksten sier ikke lenger at HD mangler. Arbeidsflyten må kjøres igjen fra main etter fletting.
+
+## 2026-10-15 00:30 (Claude)
+
+Tom: flettet PR 20, neste todo, så punkt 2 (The Dig) og 3 (grafikkordre).
+
+- Nettsiden bygget fra main og publisert (med SIMD og ny bakgrunnshenting). Linux-pakken bygget fra main: testen i Debian gikk gjennom med rettelsen, releasen «linux» oppdatert. AppImage lastet ned, pakket ut og kjørt her i rom 17: HD-modden, Atkinson og MT-32 lastes, bildet er i HD.
+- Ny ordre til ChatGPT (`smhd gpt-ordre` med beskjeder) sendt til `gpt-arbeid`: lapp-tilstandene tegnes som hele bilder (19 objekter listet), aldri magenta, obj049 på nytt, alfa og tydelig tekst på inventaresken obj995, ikke mørkere enn originalen (rom 8), bruk ressursbanken. Sams hender (fig004_01) står fortsatt øverst.
+- `build-mod`: en lapp-tilstand som ChatGPT leverer som helt bilde (dekker minst 80 prosent av den hele tilstanden) klippes med lappens maske; en lapp tegnet alene skaleres som før. Ny test, 51 bestått.
