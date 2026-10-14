@@ -184,3 +184,4 @@ Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
 - Startfil `tools/windows/Sam og Max HD.bat`: fullskjerm, HD-mod, innstillinger og lagrede spill i %APPDATA%\SamMaxHD.
 - HD-modden publisert på nytt med skriftrettingene (font 5 uten HD-skrift, skrå apostrof): hd-mod 5797a4b.
 - Ikke testet her: ingen Windows eller MinGW i sandkassen. Første test er kjøringen i Actions.
+- Windows-arbeidsflyten testet på grenen. Kjøring 1: bygg og pakke ok, testen fant ingen grafikkmodus (OpenGL uten skjerm). Kjøring 2: spillet startet med HD-modden, men stoppet på «IMuse initialization - Device not available» (ingen MIDI på maskinen). Kjøring 3 (38523014097) grønn med `--gfx-mode=surfacesdl` og `--music-driver=adlib` i testen. PR 14 mot main; releasen lages når den er flettet.
