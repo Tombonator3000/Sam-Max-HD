@@ -244,3 +244,31 @@ test('the HD pack is fetched in the background, figure cels first, each blob onc
   assert.equal(await prefetch(source, rows), mod.length);
   assert.equal(requests.length, listed + mod.length);
 });
+
+test('a limit from GitHub pauses the background fetch, and the game still gets its file', async () => {
+  const requests = [];
+  const library = memoryLibrary();
+  let limited = 2;
+  const base = github(requests);
+  const fetcher = async (url, options) => {
+    if (String(url).includes('raw.githubusercontent.com') && limited > 0) {
+      limited--;
+      requests.push({url: String(url)});
+      return new Response('', {status: 429, headers: {'retry-after': '0'}});
+    }
+    return base(url, options);
+  };
+  const source = new RemoteSource(library, null, fetcher, {sleep: async () => {}});
+  const rows = await source.list();
+  const mod = rows.filter(r => r.path.startsWith(MOD_ROOT));
+  const pauses = [];
+  const count = await prefetch(source, rows, {workers: 1, pause: 5, sleep: async ms => { pauses.push(ms); }});
+  // The limited files are tried again at the end, after a pause
+  assert.ok(pauses.length >= 1);
+  assert.equal(count, mod.length);
+  // The game's own read waits out a limit instead of failing
+  limited = 1;
+  const fresh = new RemoteSource(memoryLibrary(), null, fetcher, {sleep: async () => {}});
+  await fresh.list();
+  assert.equal(await (await fresh.read(GAME_ROOT + 'SAMNMAX.001')).text(), 'blob a1');
+});

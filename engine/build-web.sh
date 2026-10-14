@@ -67,6 +67,10 @@ if [ ! -f config.mk ] || [ "${RECONFIGURE:-0}" = "1" ]; then
 	# Sam & Max har MIDI-musikk (ingen CD-lydspor). --enable-mt32emu gir Roland MT-32-emulering
 	# med MT32_CONTROL.ROM og MT32_PCM.ROM fra spilldata (Tom 14. oktober). FluidSynth (General
 	# MIDI) er ikke med. Nettsidene stopper Web MIDI (requestMIDIAccess) og ber om MT-32.
+	# -msimd128: WebAssembly SIMD, så kompilatoren kan regne på flere piksler om gangen i DigHD
+	# (bildebyggingen og fargetoningen). Alle nyere nettlesere har det (Chrome 91, Firefox 89,
+	# Safari 16.4). Lagt til 15. oktober etter Toms melding om hakking.
+	CXXFLAGS="${CXXFLAGS:-} -msimd128" CFLAGS="${CFLAGS:-} -msimd128" \
 	emconfigure ./configure --host=wasm32-unknown-emscripten --build=wasm32-unknown-emscripten \
 		--disable-all-engines --enable-engine=scumm,scumm-7-8 \
 		--disable-engine=he,rebel2-psx --disable-detection-full \

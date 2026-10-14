@@ -231,13 +231,17 @@ export class RemoteSource {
 
   // One git blob, from the browser if it is there, else from GitHub. A blob that
   // is on its way (the game and the background fetch want the same) is fetched once.
+  // A background read (quiet) tries once and gives up on a limit from GitHub, so it
+  // never holds up the game; the game then fetches the blob itself.
   blob(part, name, before, total, quiet = false) {
     this.pending ??= new Map();
     let promise = this.pending.get(part.sha);
     if (!promise) {
       promise = this.fetchBlob(part, name, before, total, quiet).finally(() => this.pending.delete(part.sha));
+      promise.background = quiet;
       this.pending.set(part.sha, promise);
     }
+    if (!quiet && promise.background) return promise.catch(() => this.blob(part, name, before, total, false));
     return promise;
   }
 
@@ -251,7 +255,7 @@ export class RemoteSource {
       // A connection that breaks off can give a short body without an error
       if (body.size !== size) throw new TypeError('Filen kom ikke helt fram.');
       return body;
-    });
+    }, quiet ? 1 : Infinity);
     await this.library.putBlob(sha, blob);
     return blob;
   }
@@ -262,18 +266,34 @@ export class RemoteSource {
 // object or a room (it stopped for a moment each time, most in the middle of
 // animations). Figure cels first, then objects, rooms and the rest. Files that
 // are in the browser already cost one lookup. Returns the number of files read.
-export async function prefetch(source, rows, {workers = 2, stop = () => false} = {}) {
-  const rank = path => /\/costumes\//.test(path) ? 0 : /\/objects\//.test(path) ? 1 : /\/rooms\//.test(path) ? 2 : 3;
+export async function prefetch(source, rows, {workers = 2, stop = () => false, pause = 60000, sleep = ms => new Promise(r => setTimeout(r, ms))} = {}) {
+  // The index images of cels without an HD image (the engine smooths them) are
+  // many and small: last, the game fetches them itself when it needs them.
+  const paths = new Set(rows.map(row => row.path));
+  const indexOnly = path => /\/costumes\/.*_idx\.png$/.test(path) &&
+    !paths.has(path.replace(/_idx\.png$/, '_hd.png')) && !paths.has(path.replace(/_idx\.png$/, '.png'));
+  const rank = path => indexOnly(path) ? 4 : /\/costumes\//.test(path) ? 0 : /\/objects\//.test(path) ? 1 : /\/rooms\//.test(path) ? 2 : 3;
   const queue = rows.filter(row => row.path.startsWith(MOD_ROOT))
     .sort((a, b) => rank(a.path) - rank(b.path) || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
-  let next = 0, read = 0;
+  let next = 0, read = 0, pausedUntil = 0;
   const work = async () => {
     while (next < queue.length && !stop()) {
+      // GitHub limits the number of requests: on a limit the background fetch
+      // waits a minute, so the files the game needs come first
+      if (Date.now() < pausedUntil) {
+        await sleep(pausedUntil - Date.now());
+        continue;
+      }
       const row = queue[next++];
       try {
         if (await source.read(row.path, {quiet: true})) read++;
-      } catch {
-        // The game asks for the file again when it needs it
+      } catch (error) {
+        if (error instanceof ApiError && (error.status === 429 || error.status === 403 || error.rateLimited)) {
+          pausedUntil = Date.now() + pause;
+          row.tries = (row.tries || 0) + 1;
+          if (row.tries < 3) queue.push(row);  // tried again at the end
+        }
+        // Otherwise the game asks for the file again when it needs it
       }
     }
   };

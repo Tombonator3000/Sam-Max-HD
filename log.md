@@ -274,3 +274,19 @@ Tom: spillet krasjer på nettsiden når Sam plukker opp pengene i musehullet.
 - Gjenskapt i Chromium uten skjerm med testkrokene i adressen (`?DIGHD_TEST_ROOM=7&DIGHD_TEST_SCRIPT=700:206:0`; skript 206 er opplukkingen, fra `work/skript/rom_007/lokal_206.txt`). Med `?adlib` kom den egentlige feilen: «Common::Array: failure to allocate». Motorens minne vokste med rundt 3,5 MB per fil den hentet, til 2 GB etter to minutter.
 - Årsak: ScummVMs filsystem for nettleseren (`backends/fs/emscripten/http-fs.cpp`) hentet og tolket mappelisten (`index.json`) på nytt for hver fil som ble åpnet, og frigjorde aldri teksten, den tolkede JSON-en eller nodene. Mappen med figurruter fikk 15 000 nye filer i forrige runde (indeksbildene som motoren glatter), så hver lekkasje ble stor. Rettet: én delt liste per mappe (`listing()`), teksten og JSON-en frigjøres. Ligger nå i patchen. Kompilert med em++ (bare syntaks; nettbygget skjer i Actions).
 - Testkroken `DIGHD_TEST_CLICKS` tar høyreklikk (`r` til slutt), og loggen viser objektet under klikket.
+- Testet nettbygget fra grenen (arbeidsflyten i Sam-Max-HD-Web startet fra grenen sin, som bygger uten å publisere; artefakten lastet ned og servert lokalt) i Chromium med skript 206: minnet holdt seg på 276 MB gjennom 618 filhentinger og 7 minutter, ingen krasj. Den publiserte siden (før rettelsen) nådde 2 GB og krasjet etter 2 minutter. Tom fikk samme feil på gaten utenfor kontoret («failure to allocate»).
+- Grenen er lagt oppå main etter at PR 18 ble slått sammen til én commit (PR 19).
+- PR 19 flettet av Tom. Nettsiden bygget fra main og publisert; testet den publiserte siden i Chromium med skript 206 og MT-32: 278 MB gjennom 620 filhentinger, ingen krasj.
+
+## 2026-10-14 15:30 (Claude)
+
+Tom: ja til punkt 1 til 4 (pakkene på nytt, svarte felt, hakking, ressursbanken til ChatGPT).
+
+- Arbeidsflytene Windows-pakke og Linux-pakke startet fra main (med PR 18 og 19).
+- `tools/gpt_gren.sh` tar med `docs/GJENNOMGANG.md` som GJENNOMGANG.md; hentet (0 nye filer fra ChatGPT) og sendt til `gpt-arbeid`.
+- De små svarte feltene i rom 8 og 28 er ChatGPTs maling (mørkebrunt nesten svart i rekkverket), ikke motoren.
+- Hakking: `DIGHD_BENCH` virker nå uten skjermdumper (hvert 400. bilde), så den kan måles på nettsiden. Nettbygget kompileres med WebAssembly SIMD (`-msimd128`), så kompilatoren kan vektorisere bildebyggingen. Måles i nettleseren før og etter.
+- Målt i Chromium (nettbygget fra grenen, med SIMD): hele skjermen 20 til 30 ms per bygg i kontoret (native 13 ms).
+- Funnet under målingen: GitHub svarte 429 (for mange forespørsler) på bakgrunnshentingen, som prøvde å hente over 30 000 filer. Med uendelige nye forsøk ventet også spillets egne filer, og siden viste ventetid. Bakgrunnshentingen prøver nå hver fil én gang, venter et minutt ved grense og legger filen sist i køen (høyst tre forsøk); spillet henter selv en fil bakgrunnen ga opp. Indeksbildene for ruter uten HD-bilde står sist. Ny test, `node --test` 19 bestått.
+- Windows-pakken er bygget på nytt fra main og lagt i releasen «windows». Linux-pakken bygges.
+- Linux-pakken hang 50 minutter på testen i Debian 12 (spillet avsluttet ikke på TERM fra `timeout 30` i containeren). Kjøringen er avbrutt. Testen bruker nå `timeout -k 10 30` (godtar 124 og 137), og steget har `timeout-minutes: 10`. Releaseteksten sier ikke lenger at HD mangler. Arbeidsflyten må kjøres igjen fra main etter fletting.

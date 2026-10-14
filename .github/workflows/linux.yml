@@ -96,16 +96,19 @@ jobs:
       # Bildet hentes fra AWS-speilet av Docker Hub: Docker Hub stopper anonyme hentinger fra
       # GitHub-maskinene når grensen er nådd (toomanyrequests, 9. oktober 2026).
       - name: Test pakken på Debian 12 uten byggepakker
+        # Hang 50 minutter 14. oktober: spillet avsluttet ikke på TERM i containeren. KILL etter
+        # 10 sekunder til, og steget stoppes uansett etter 10 minutter.
+        timeout-minutes: 10
         run: |
           docker run --rm -v "$PWD/out/linux:/pakke:ro" public.ecr.aws/docker/library/debian:12-slim sh -c '
             apt-get update -qq && apt-get install -y -qq libgl1 libasound2 libfreetype6 libgbm1 libwayland-client0 libwayland-cursor0 libwayland-egl1 libxkbcommon0 > /dev/null
             cd /tmp && /pakke/SamMaxHD-x86_64.AppImage --appimage-extract > /dev/null
             echo "Biblioteker som mangler:"; LD_LIBRARY_PATH=squashfs-root/usr/lib ldd squashfs-root/usr/bin/scummvm | grep "not found" || echo "ingen"
-            HOME=/tmp/hjem SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout 30 squashfs-root/AppRun --debuglevel=1 > /tmp/test.log 2>&1
+            HOME=/tmp/hjem SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout -k 10 30 squashfs-root/AppRun --debuglevel=1 > /tmp/test.log 2>&1
             code=$?
             echo "Avslutningskode: $code"
             grep -E "Using gameid samnmax|Using MD5" /tmp/test.log || { tail -40 /tmp/test.log; exit 1; }
-            [ "$code" = 124 ] || { tail -40 /tmp/test.log; exit 1; }'
+            [ "$code" = 124 ] || [ "$code" = 137 ] || { tail -40 /tmp/test.log; exit 1; }'
 
       - name: Publiser som release
         env:
@@ -113,7 +116,7 @@ jobs:
         run: |
           {
             echo "Den komplette Linux-pakken: ScummVM med HD-patchen, spillet og talen i én fil."
-            echo "HD-grafikken er ikke med ennå: patchen er ikke portet til Sam & Max (SCUMM v6), så spillet vises som originalen."
+            echo "Med HD-grafikken (grenen hd-mod) og MT-32-musikk. Det som ikke er tegnet i HD ennå, glattes av motoren eller vises som originalen. Ctrl+H bytter mellom HD og originalgrafikk."
             echo
             echo "Last ned SamMaxHD-x86_64.AppImage, gjør den kjørbar og start den:"
             echo
