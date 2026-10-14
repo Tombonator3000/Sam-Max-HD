@@ -81,3 +81,4 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Musikken: Sam & Max CD har ingen CD-lydspor; musikken er iMuse-MIDI i SAMNMAX.001. Fra 14. oktober spilles den med Roland MT-32-emulering (`--enable-mt32emu`, `--music-driver=mt32`) og ROM-filene fra spilldata. `engine/build.sh` konfigurerer på nytt av seg selv når valgene endres (`.dighd-valg`).
 - Font 5 i Sam & Max er den pyntede fonten med bare store bokstaver. Den tegnes ikke med HD-skriften (Exo 2), bare skalert fra fontbildet.
 - Testene med klikk på HD Graphics lagrer `dighd_classic` i `~/.config/scummvm/scummvm.ini`. Sett den tilbake til false, ellers kjører senere tester uten HD.
+- Når en PR er flettet og grenen settes til ny main: ta med commits som kom etter PR-en (rebase på main), ikke `checkout -B origin/main` blindt. To logg-commits falt bort slik 14. oktober og ble lagt inn igjen.
