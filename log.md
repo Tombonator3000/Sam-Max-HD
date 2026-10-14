@@ -234,3 +234,11 @@ Tom (skjermbilder av kontoret i HD og klassisk): 1 piksler rundt HD-figurene, 2 
 
 - Full romtest med den nye motoren og modden (`--kamera ett`): 71 lastet, 60 ok med HD-bakgrunn, 0 krasj, 0 forskjøvet, 0 skjermavvik. De samme 12 rommene henger etter testhoppet som før.
 - Modden med de 48 nye indeksbildene er publisert i `hd-mod` (`tools/mod_gren.sh send`, 238 MB).
+
+## 2026-10-14 12:05 (Claude)
+
+Tom: nettsiden hakket, PR 17 flettet, punkt 4 var ikke skrevet ennå.
+
+- Kjørte arbeidsflyten i Sam-Max-HD-Web fra main; siden er ute med bakgrunnshentingen. Testet i Chromium uten skjerm (SwiftShader): ingen lange stopp over 50 ms på 30 sekunder i kontoret med MT-32.
+- Profilerte byggingen av hele skjermen med callgrind: fargetoningen (`tinted`) tok 55 prosent, med tre divisjoner per HD-piksel. Faktorene regnes nå én gang per originalpiksel (`tintFactors`, `applyTint`). Hele skjermen i kontoret gikk fra rundt 15 til rundt 11 ms. `engine/test.sh` 0 avvik, `DIGHD_VERIFY` 0 i 15 kontroller, patchen passer.
+- Nettsiden: `?adlib` velger AdLib i stedet for MT-32, så Tom kan sammenligne om MT-32-emuleringen er det som hakker.
