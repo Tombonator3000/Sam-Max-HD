@@ -48,7 +48,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Menyvalget HD Graphics i originalmenyen for v6 (14. oktober, testet med F5 og klikk)
 - [x] Sjekk om blast-tekst brukes i Sam & Max: nei, bare blast-objekter (14. oktober)
 - [ ] Romtest: finn en måte å komme inn i de 12 rommene som henger etter testhoppet (lagret spill eller objekttilstander). Sjekket 14. oktober: rom 11 stopper på «state -1 is out of bounds» og rom 50 på «readArray: invalid array 261», fordi variablene ikke er satt uten vanlig spill. Krever lagrede spill fra en ekte gjennomspilling
-- [ ] Test The Dig med den utvidede patchen (i Dig-repoet) før patchen kopieres dit
+- [x] Test The Dig med den utvidede patchen (15. oktober): patchene slått sammen, felles patch i begge repoer (Dig-PR)
 - [x] Piksler rundt HD-figurene (Toms skjermbilde 14. oktober): kantene på skalerte figurer merkes nå riktig, og ruter uten HD-bilde i kostymer med myke ruter glattes i motoren (15. oktober)
 - [x] Kanten mot forgrunnen (z-masken) glattes med xBR (15. oktober)
 - [x] Ressursbanken (`docs/GJENNOMGANG.md`) sendt til `gpt-arbeid` som GJENNOMGANG.md, med lenke i AGENTS.md der (15. oktober)
