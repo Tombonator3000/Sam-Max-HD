@@ -1136,6 +1136,8 @@ def test_figure_import_cut_and_mod(tmp_path):
             Image.open(done / "costumes" / f"{name}.png").tobytes()
         assert (tmp_path / "mod" / "costumes" / f"{name}_idx.png").exists()
     assert not (tmp_path / "mod" / "costumes" / "costume014_009.png").exists()
+    # Ruten uten HD-bilde får bare indeksbildet, som motoren glatter
+    assert (tmp_path / "mod" / "costumes" / "costume014_009_idx.png").exists()
     # Med --kostymer 14 skaleres resten (den gjennomsiktige ruten) automatisk, de egne er de samme
     m = modpack.build_mod(ex, tmp_path / "mod2", scale=4, method="nearest", rooms=set(), own=done, costumes={14})
     assert m["costume_cels"] == 10
@@ -1362,7 +1364,7 @@ def test_smooth_figure_sheet_import(tmp_path):
     modpack.build_mod(ex, mod, scale=4, method="nearest", rooms=set(), own=tmp_path / "med-kart")
     for b in drawn:
         assert (mod / "costumes" / f"{b}_hd.png").exists() and (mod / "costumes" / f"{b}_idx.png").exists()
-    # Rutene i kostymet uten HD-bilde får bare indeksbildet, så motoren kan glatte dem (Sams hender)
+    # Rutene uten HD-bilde får bare indeksbildet, så motoren kan glatte dem (Sams hender)
     rest = [p.name.replace("_idx.png", "") for p in (ex / "costumes").glob("costume014_*_idx.png")
             if p.name.replace("_idx.png", "") not in drawn]
     assert rest

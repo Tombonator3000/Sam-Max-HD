@@ -352,10 +352,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..6ca80b7b
+index 00000000..275c63a9
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,4248 @@
+@@ -0,0 +1,4307 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -1681,6 +1681,13 @@ index 00000000..6ca80b7b
 +					// What the glyph covers is the screen buffer itself, not the text surface
 +					if (text && idx != f[c])
 +						idx = vsSrc[r * vs->pitch + c];
++					// The edge of an HD glyph reaching into a pixel the glyph left
++					// transparent: only where the text surface is see-through there, so
++					// the screen shows the buffer. Text the screen no longer shows (a
++					// fade or a room change before the text surface is cleared) left
++					// dotted HD letters on the black screen.
++					else if (text && f[c] != vsSrc[r * vs->pitch + c])
++						text = 0;
 +				}
 +			}
 +			uint32 source = kSrcFlat;
@@ -2089,9 +2096,35 @@ index 00000000..6ca80b7b
 +		return 0;
 +	const GlyphShape &sh = _glyphShapes[_glyphStyles[own >> 12].shape];
 +	const int gx = (own >> 6) & 63, gy = own & 63;
-+	if (sh.lev[gy * sh.w + gx]) {
++	if (const byte lv = sh.lev[gy * sh.w + gx]) {
 +		if (shown != t.val[off])
 +			return 0;
++		// A pixel of one colour of the glyph (often its black shadow) next to
++		// pixels of its other colours counts only while one of those is still
++		// there. Text erased by painting over it in the shadow's colour (black
++		// before a room change) otherwise left the shadow pixels as HD letters.
++		if (sh.levels > 1) {
++			bool other = false, kept = false;
++			for (int dy = -1; dy <= 1 && !kept; dy++) {
++				const int ny = gy + dy;
++				if (ny < 0 || ny >= sh.h)
++					continue;
++				for (int dx = -1; dx <= 1 && !kept; dx++) {
++					const int nx = gx + dx;
++					if (nx < 0 || nx >= sh.w)
++						continue;
++					const byte nl = sh.lev[ny * sh.w + nx];
++					if (!nl || nl == lv)
++						continue;
++					other = true;
++					const ptrdiff_t noff = (ptrdiff_t)off + (ptrdiff_t)dy * t.pitch + dx;
++					kept = noff >= 0 && (size_t)noff < t.size &&
++					       t.own[noff] == ((own & ~0xFFFu) | ((uint32)nx << 6) | (uint32)ny) && t.base[noff] == t.val[noff];
++				}
++			}
++			if (other && !kept)
++				return 0;
++		}
 +		base = t.under[off];
 +		return own;
 +	}
@@ -3532,6 +3565,23 @@ index 00000000..6ca80b7b
 +			const int hx = ix * n, hy = iy * n;
 +			int f[3];
 +			const bool tint = tintFactors(idx, img->basePal, f);
++			// A pixel that is black in the original and still black cannot be
++			// tinted, and its HD pixel (an outline blending into the colours next
++			// to it) stays as it is. When the picture fades to black around it, the
++			// HD pixel must not be brighter than the colours around it are now:
++			// the outlines stayed lit on the black screen.
++			int cap[3] = { 255, 255, 255 };
++			const byte *bp = img->basePal + idx * 3;
++			const bool capped = !tint && !(bp[0] | bp[1] | bp[2]);
++			if (capped) {
++				cap[0] = cap[1] = cap[2] = 0;
++				for (int ny = MAX(sy - 1, 0); ny <= MIN(sy + 1, _h - 1); ny++)
++					for (int nx = MAX(sx - 1, 0); nx <= MIN(sx + 1, _w - 1); nx++) {
++						const byte *q = _pal + _shadow[ny * _w + nx] * 3;
++						for (int k = 0; k < 3; k++)
++							cap[k] = MAX(cap[k], (int)q[k]);
++					}
++			}
 +			for (int dy = 0; dy < n; dy++) {
 +				byte *o = out + dy * outPitch;
 +				const uint32 *t = (const uint32 *)hd->getBasePtr(hx, hy + dy);
@@ -3542,7 +3592,10 @@ index 00000000..6ca80b7b
 +					} else {
 +						byte ha, hr, hg, hb;
 +						_rgba.colorToARGB(t[dx], ha, hr, hg, hb);
-+						col = _fmt.RGBToColor(hr, hg, hb);
++						if (capped)
++							col = _fmt.RGBToColor(MIN((int)hr, cap[0]), MIN((int)hg, cap[1]), MIN((int)hb, cap[2]));
++						else
++							col = _fmt.RGBToColor(hr, hg, hb);
 +					}
 +					if (bpp == 4) WRITE_UINT32(o, col); else WRITE_UINT16(o, col);
 +				}
@@ -3607,6 +3660,12 @@ index 00000000..6ca80b7b
 +}
 +
 +void DigHD::writeRect(int x, int y, int width, int height) {
++	// One pixel more on every side: a pixel that is black in the original takes
++	// its brightest colour from the pixels around it (compose())
++	x--;
++	y--;
++	width += 2;
++	height += 2;
 +	if (x < 0) { width += x; x = 0; }
 +	if (y < 0) { height += y; y = 0; }
 +	width = MIN(width, _w - x);
