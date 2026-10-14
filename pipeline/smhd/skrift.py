@@ -14,7 +14,8 @@ Modden får:
 
 Ett bilde per skrift, så nettsiden henter to filer og ikke én per bokstav.
 
-Skriften er Exo 2 (SIL Open Font License 1.1, se skrifter/exo2/OFL.txt).
+Skriften er Atkinson Hyperlegible (fra 15. oktober 2026) eller Exo 2, begge SIL Open Font License 1.1
+(se skrifter/*/OFL.txt).
 """
 from __future__ import annotations
 
@@ -27,6 +28,7 @@ SKRIFTER = Path(__file__).parent / "skrifter"
 # Mappe i modden -> skriftfil. Tykkelsen er i forhold til bokstavhøyden,
 # for motoren strekker bokstaven til originalboksen.
 VARIANTER = {
+    "atkinson": "atkinson/atkinson-hyperlegible-latin-700-normal.woff",
     "exo2": "exo2/exo-2-latin-700-normal.woff",
     "exo2-600": "exo2/exo-2-latin-600-normal.woff",
 }
@@ -34,10 +36,13 @@ VARIANTER = {
 # Spillskrift -> mappe. Spillskrifter som ikke står her tegnes som før (xBR).
 # Font 5 i Sam & Max er den pyntede fonten med bare store bokstaver (rulleteksten, påkledningen,
 # Bumpusville). Den holdes utenfor, så formen blir som i originalen.
+# Atkinson Hyperlegible fra 15. oktober (Tom ville ha mer lettlest tekst): laget for lesbarhet, med
+# åpne former og tydelig forskjell på I, l og 1. Exo 2 ligger igjen som variant.
 KART = {
-    0: "exo2", 1: "exo2", 2: "exo2", 3: "exo2", 4: "exo2",
-    100: "exo2", 101: "exo2", 102: "exo2", 103: "exo2",
+    0: "atkinson", 1: "atkinson", 2: "atkinson", 3: "atkinson", 4: "atkinson",
+    100: "atkinson", 101: "atkinson", 102: "atkinson", 103: "atkinson",
 }
+LISENS = {"atkinson": "Atkinson Hyperlegible, Braille Institute of America", "exo2": "Exo 2"}
 
 STR = 96          # punktstørrelse når bokstavene tegnes
 TEGN = range(33, 127)
@@ -85,9 +90,13 @@ def lag_skrift(out: Path, kart: dict[int, str] | None = None) -> dict:
         linjer += [f"{c} {x} {y} {g.width} {g.height}" for c, x, y, g in plass]
         (fonts / f"{mappe}.txt").write_text("\n".join(linjer) + "\n")
         antall[mappe] = len(plass)
+    brukt = sorted(set(kart.values()))
+    navn = ", ".join(LISENS.get(m.split("-")[0], m) for m in brukt)
     linjer = ["# HD-skrift: <spillskrift> <mappe>. 0-9 er tegnsettene, 100 + n er FONTn.NUT.",
-              "# Skriften er Exo 2, SIL Open Font License 1.1."]
+              f"# Skriften er {navn}, SIL Open Font License 1.1."]
     linjer += [f"{k} {v}" for k, v in sorted(kart.items())]
     (fonts / "map.txt").write_text("\n".join(linjer) + "\n")
-    (fonts / "OFL.txt").write_bytes((SKRIFTER / "exo2" / "OFL.txt").read_bytes())
+    for m in brukt:
+        mappe_lisens = SKRIFTER / VARIANTER[m].split("/")[0] / "OFL.txt"
+        (fonts / f"OFL-{m}.txt").write_bytes(mappe_lisens.read_bytes())
     return antall

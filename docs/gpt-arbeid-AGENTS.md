@@ -6,6 +6,8 @@ Denne grenen er arbeidsbordet for HD-grafikken til Sam & Max HD Remake. Du er gr
 
 Les `ORDRE.md` først. Den er siste beskjed fra Claude, med jobbene du skal gjøre nå. Les deretter `BESTILLING.md`, som gjelder foran alt annet her.
 
+Les [ressursbanken](https://github.com/Tombonator3000/Sam-Max-HD/blob/main/docs/GJENNOMGANG.md) for hva som skjer i hvert rom, hvem som er der og hvilke ting som hører hjemme der (romnumrene står i jobbnavnene).
+
 Les også [ANALYSE.md](ANALYSE.md) før nytegning. Den bevarer Toms DOTT-/strekrettelser og skiller spillets stil fra eksemplene i andre spill.
 
 ## Kildetro grafikk før produksjon

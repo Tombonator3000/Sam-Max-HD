@@ -1,3 +1,159 @@
+diff --git a/backends/fs/emscripten/http-fs.cpp b/backends/fs/emscripten/http-fs.cpp
+index 7eecaf22..69f1ac06 100644
+--- a/backends/fs/emscripten/http-fs.cpp
++++ b/backends/fs/emscripten/http-fs.cpp
+@@ -53,19 +53,23 @@ HTTPFilesystemNode::HTTPFilesystemNode(const Common::String &p) : _path(p), _isV
+ 		_isValid = true;
+ 		_url = _path;
+ 	} else { // we need to peek in the parent folder to see if the node exists and if it's a directory
+-		AbstractFSNode *parent = getParent();
+-		AbstractFSList tmp = AbstractFSList();
+-		parent->getChildren(tmp, Common::FSNode::kListAll, true);
+-		for (AbstractFSList::iterator i = tmp.begin(); i != tmp.end(); ++i) {
+-			AbstractFSNode *child = *i;
+-			if (child->getPath() == _path) {
+-				_isDirectory = child->isDirectory();
++		// Dig HD: the parent's listing is read once per folder and shared (listing()).
++		// Before, every node fetched and parsed the parent's index.json again and kept
++		// the text, the parsed JSON and a node per entry: a few MB per file opened
++		// in a folder with thousands of files, until the browser ran out of memory.
++		HTTPFilesystemNode *parent = (HTTPFilesystemNode *)getParent();
++		if (parent && parent->_isValid && parent->_isDirectory) {
++			const HttpListing *list = listing(parent->_url);
++			const Common::String name = Common::lastPathComponent(_path, '/');
++			if (list && list->contains(name)) {
++				const HttpEntry &e = list->getVal(name);
++				_isDirectory = e.isDir;
+ 				_isValid = true;
+-				_url = ((HTTPFilesystemNode *)child)->_url;
+-				_size = ((HTTPFilesystemNode *)child)->_size;
+-				break;
++				_url = e.url;
++				_size = e.size;
+ 			}
+ 		}
++		delete parent;
+ 	}
+ 	assert(_isDirectory || _size >= 0 || !_isValid);
+ 	debug(5, "HTTPFilesystemNode::HTTPFilesystemNode(%s) -  %s isValid %s isDirectory %s", p.c_str(), _url.c_str(), _isValid ? "True" : "false", _isDirectory ? "True" : "false");
+@@ -135,54 +139,55 @@ EM_ASYNC_JS(bool, _httpFsFetchFile, (const char *url, byte *dataPtr, int dataSiz
+ 	return false;
+ });
+ 
+-bool HTTPFilesystemNode::getChildren(AbstractFSList &myList, ListMode mode, bool hidden) const {
+-	if (!_isValid) {
+-		return false;
+-	}
+-	assert(_isDirectory);
+-	if (_children->size() == 0) {
+-		// if we don't have a children list yet, we need to fetch it from the server
+-		debug(5, "HTTPFilesystemNode::getChildren Fetching Children: %s at %s", _path.c_str(), _url.c_str());
+-		Common::String url = _url + "/index.json";
+-		char *response = _httpFsFetchIndex(url.c_str());
+-		if (strcmp(response, "") == 0) {
+-			return false;
+-		}
+-
+-		Common::JSONObject jsonObj = Common::JSON::parse(response)->asObject();
+-		// add dummy element so we know that we fetched the list
+-		_children->push_back(new HTTPFilesystemNode(_path, ".", _url, false, false, 0));
+-		for (typename Common::HashMap<Common::String, Common::JSONValue *>::iterator i = jsonObj.begin(); i != jsonObj.end(); ++i) {
+-			Common::String name = i->_key;
+-			bool isDir = false;
+-			int size = -1;
+-			Common::String baseUrl = _url + "/" + name;
+-
+-			if (i->_value->isObject()) {
+-				isDir = true;
+-				if (i->_value->asObject().contains("baseUrl")) {
+-					debug(5, "HTTPFilesystemNode::directoryListedCallback - Directory with baseUrl %s", name.c_str());
+-					baseUrl = i->_value->asObject()["baseUrl"]->asString();
++// Dig HD: the listing of each folder (index.json), fetched and parsed once
++const HTTPFilesystemNode::HttpListing *HTTPFilesystemNode::listing(const Common::String &url) {
++	static Common::HashMap<Common::String, HttpListing *> listings;
++	if (listings.contains(url))
++		return listings[url];
++	char *response = _httpFsFetchIndex((url + "/index.json").c_str());
++	HttpListing *list = nullptr;
++	if (strcmp(response, "") != 0) {
++		Common::JSONValue *json = Common::JSON::parse(response);
++		if (json && json->isObject()) {
++			list = new HttpListing();
++			const Common::JSONObject &obj = json->asObject();
++			for (Common::JSONObject::const_iterator i = obj.begin(); i != obj.end(); ++i) {
++				HttpEntry e;
++				e.isDir = false;
++				e.size = -1;
++				e.url = url + "/" + i->_key;
++				if (i->_value->isObject()) {
++					e.isDir = true;
++					if (i->_value->asObject().contains("baseUrl"))
++						e.url = i->_value->asObject()["baseUrl"]->asString();
++				} else if (i->_value->isIntegerNumber()) {
++					e.size = i->_value->asIntegerNumber();
+ 				}
+-			} else if (i->_value->isIntegerNumber()) {
+-				size = i->_value->asIntegerNumber();
++				(*list)[i->_key] = e;
+ 			}
+-			HTTPFilesystemNode *file_node = new HTTPFilesystemNode(_path + "/" + name, name, baseUrl, true, isDir, size);
+-			_children->push_back(file_node);
+ 		}
++		delete json;
+ 	}
+-	for (AbstractFSList::iterator i = (*_children).begin(); i != (*_children).end(); ++i) {
+-		HTTPFilesystemNode *node = (HTTPFilesystemNode *)*i;
++	free(response);
++	if (list)
++		listings[url] = list;  // a failed fetch is tried again next time
++	return list;
++}
+ 
+-		if (node->_isValid && (mode == Common::FSNode::kListAll ||
+-							   (mode == Common::FSNode::kListFilesOnly && !node->_isDirectory) ||
+-							   (mode == Common::FSNode::kListDirectoriesOnly && node->_isDirectory))) {
+-			// we need to copy node here as FSNode will take ownership of the pointer and destroy it after use
+-			HTTPFilesystemNode *file_node = new HTTPFilesystemNode(*node);
+-			myList.push_back(file_node);
+-		} else {
+-			debug(5, "HTTPFilesystemNode::getChildren - skipping %s", node->_path.c_str());
+-		}
++bool HTTPFilesystemNode::getChildren(AbstractFSList &myList, ListMode mode, bool hidden) const {
++	if (!_isValid) {
++		return false;
++	}
++	assert(_isDirectory);
++	debug(5, "HTTPFilesystemNode::getChildren %s at %s", _path.c_str(), _url.c_str());
++	const HttpListing *list = listing(_url);
++	if (!list)
++		return false;
++	for (HttpListing::const_iterator i = list->begin(); i != list->end(); ++i) {
++		const HttpEntry &e = i->_value;
++		if (mode == Common::FSNode::kListAll || (mode == Common::FSNode::kListFilesOnly && !e.isDir) ||
++		    (mode == Common::FSNode::kListDirectoriesOnly && e.isDir))
++			myList.push_back(new HTTPFilesystemNode(_path + "/" + i->_key, i->_key, e.url, true, e.isDir, e.size));
+ 	}
+ 	return true;
+ }
+diff --git a/backends/fs/emscripten/http-fs.h b/backends/fs/emscripten/http-fs.h
+index 75bf8738..3b018481 100644
+--- a/backends/fs/emscripten/http-fs.h
++++ b/backends/fs/emscripten/http-fs.h
+@@ -33,6 +33,14 @@
+ class HTTPFilesystemNode : public AbstractFSNode {
+ protected:
+ 	static Common::HashMap<Common::String, AbstractFSList> _httpFolders;
++	// Dig HD: one shared listing per folder URL (see listing() in http-fs.cpp)
++	struct HttpEntry {
++		bool isDir;
++		int size;
++		Common::String url;
++	};
++	typedef Common::HashMap<Common::String, HttpEntry> HttpListing;
++	static const HttpListing *listing(const Common::String &url);
+ 	Common::String _displayName;
+ 	Common::String _path;
+ 	Common::String _url;
 diff --git a/engines/scumm/akos.cpp b/engines/scumm/akos.cpp
 index 8333a7ed..801959ae 100644
 --- a/engines/scumm/akos.cpp
@@ -352,10 +508,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..a07ea2c3
+index 00000000..93555f10
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,4415 @@
+@@ -0,0 +1,4459 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -682,7 +838,8 @@ index 00000000..a07ea2c3
 +		}
 +	}
 +
-+	// DIGHD_TEST_CLICKS=600:115/140,700:200/90 clicks the left mouse button at
++	// DIGHD_TEST_CLICKS=600:115/140,700:200/90 clicks the left mouse button (an r
++	// at the end: the right button) at
 +	// x/y (original pixels) at the given frames: the button goes down at the
 +	// frame and up 3 frames later. For the game's own menus without a mouse.
 +	if (const char *clicks = getenv("DIGHD_TEST_CLICKS")) {
@@ -690,8 +847,10 @@ index 00000000..a07ea2c3
 +		while (!tok.empty()) {
 +			const Common::String item = tok.nextToken();
 +			TestClick c;
-+			if (sscanf(item.c_str(), "%d:%d/%d", &c.frame, &c.x, &c.y) == 3)
++			if (sscanf(item.c_str(), "%d:%d/%d", &c.frame, &c.x, &c.y) == 3) {
++				c.right = item.lastChar() == 'r';  // 600:115/140r is the right button
 +				_testClicks.push_back(c);
++			}
 +		}
 +	}
 +
@@ -1004,7 +1163,7 @@ index 00000000..a07ea2c3
 +	return _drawn.size() - 1;
 +}
 +
-+void DigHD::beginBlast(VirtScreen *vs, int x, int y, int width, int height) {
++void DigHD::beginBlast(VirtScreen *vs, int x, int y, int width, int height, int scaleX, int scaleY) {
 +	_blastVs = nullptr;
 +	if (!vs || vs->number != kMainVirtScreen)
 +		return;
@@ -1024,6 +1183,8 @@ index 00000000..a07ea2c3
 +	// The rectangle the engine gave, for the object image's coordinates
 +	_blastObjX = x;
 +	_blastObjY = y;
++	_blastScaleX = CLIP(scaleX, 1, 255);
++	_blastScaleY = CLIP(scaleY, 1, 255);
 +	_blastObjW = width;
 +	_blastObjH = height;
 +}
@@ -1072,9 +1233,38 @@ index 00000000..a07ea2c3
 +			}
 +			painted++;
 +			m.kind = kBlastPlain;
-+			const int ox = _blastX + c - _blastObjX, oy = _blastY + r - _blastObjY;
-+			if (img && ox >= 0 && oy >= 0 && ox < img->idx.w && oy < img->idx.h && ox < 2048 && oy < 2048 &&
-+			    *((const byte *)img->idx.getBasePtr(ox, oy)) == post) {
++			// A scaled object (the small LucasArts logos in the intro) drops rows
++			// and columns by the BOMP scale table; the nearest pixel of the image
++			// with the colour drawn is used
++			int ox = _blastX + c - _blastObjX, oy = _blastY + r - _blastObjY;
++			const bool scaled = _blastScaleX != 255 || _blastScaleY != 255;
++			if (scaled) {
++				ox = ox * 255 / _blastScaleX;
++				oy = oy * 255 / _blastScaleY;
++			}
++			// The pixel shows the image's code, or another colour the object was
++			// drawn with (a colour table) that is close enough to be tinted from it
++			int code = -1;
++			if (img) {
++				const int rad = scaled ? 1 + 255 / MIN(_blastScaleX, _blastScaleY) : 0;
++				int best = -1;
++				for (int d = 0; d <= rad && best < 0; d++)
++					for (int dy = -d; dy <= d && best < 0; dy++)
++						for (int dx = -d; dx <= d && best < 0; dx++) {
++							const int x2 = ox + dx, y2 = oy + dy;
++							if (MAX(ABS(dx), ABS(dy)) != d || x2 < 0 || y2 < 0 || x2 >= img->idx.w || y2 >= img->idx.h)
++								continue;
++							if (*((const byte *)img->idx.getBasePtr(x2, y2)) == post) {
++								best = 1;
++								ox = x2;
++								oy = y2;
++							}
++						}
++				if (ox >= 0 && oy >= 0 && ox < img->idx.w && oy < img->idx.h)
++					code = *((const byte *)img->idx.getBasePtr(ox, oy));
++			}
++			if (code >= 0 && ox < 2048 && oy < 2048 && code != img->transparent &&
++			    (code == post || !wildColour(img->basePal + code * 3, _pal + post * 3))) {
 +				m.kind = kBlastImage;
 +				m.slot = slot;
 +				m.ox = ox;
@@ -3234,9 +3424,9 @@ index 00000000..a07ea2c3
 +// original cannot be scaled, so it takes the current colour directly (-1).
 +// Worked out once per original pixel; the HD pixels then need no division.
 +// Returns false when the colour is unchanged (the HD pixel as it is).
-+bool DigHD::tintFactors(byte idx, const byte *basePal, int f[3]) const {
++bool DigHD::tintFactors(byte idx, const byte *basePal, int f[3], int code) const {
 +	const byte *cur = _pal + idx * 3;
-+	const byte *base = basePal + idx * 3;
++	const byte *base = basePal + (code >= 0 ? code : idx) * 3;
 +	if (cur[0] == base[0] && cur[1] == base[1] && cur[2] == base[2])
 +		return false;
 +	for (int k = 0; k < 3; k++)
@@ -3646,14 +3836,17 @@ index 00000000..a07ea2c3
 +			const Graphics::Surface *hd = &img->hd;
 +			const int hx = ix * n, hy = iy * n;
 +			int f[3];
-+			const bool tint = tintFactors(idx, img->basePal, f);
++			// The image's own colour at this pixel: the same index as the one shown,
++			// except for a blast object drawn through a colour table
++			const byte code = *((const byte *)img->idx.getBasePtr(ix, iy));
++			const bool tint = tintFactors(idx, img->basePal, f, code);
 +			// A pixel that is black in the original and still black cannot be
 +			// tinted, and its HD pixel (an outline blending into the colours next
 +			// to it) stays as it is. When the picture fades to black around it, the
 +			// HD pixel must not be brighter than the colours around it are now:
 +			// the outlines stayed lit on the black screen.
 +			int cap[3] = { 255, 255, 255 };
-+			const byte *bp = img->basePal + idx * 3;
++			const byte *bp = img->basePal + code * 3;
 +			const bool capped = !tint && !(bp[0] | bp[1] | bp[2]);
 +			if (capped) {
 +				cap[0] = cap[1] = cap[2] = 0;
@@ -4068,10 +4261,17 @@ index 00000000..a07ea2c3
 +		ev.mouse = Common::Point(c.x * _scale + _scale / 2, c.y * _scale + _scale / 2);
 +		ev.type = Common::EVENT_MOUSEMOVE;
 +		g_system->getEventManager()->pushEvent(ev);
-+		ev.type = down ? Common::EVENT_LBUTTONDOWN : Common::EVENT_LBUTTONUP;
++		ev.type = c.right ? (down ? Common::EVENT_RBUTTONDOWN : Common::EVENT_RBUTTONUP)
++		                  : (down ? Common::EVENT_LBUTTONDOWN : Common::EVENT_LBUTTONUP);
 +		g_system->getEventManager()->pushEvent(ev);
 +		if (down)
-+			debug("DigHD: test, click at %d,%d at frame %u", c.x, c.y, _frameNo);
++		{
++			// The object under the click, in room coordinates (as the verb scripts find it)
++			const int obj = _vm->findObject(c.x + _vm->_virtscr[kMainVirtScreen].xstart, c.y);
++			const byte *name = obj ? _vm->getObjOrActorName(obj) : nullptr;
++			debug("DigHD: test, click at %d,%d at frame %u (the game had the mouse at %d,%d), object %d %s", c.x, c.y, _frameNo,
++			      _vm->_mouse.x, _vm->_mouse.y, obj, name ? (const char *)name : "");
++		}
 +	}
 +
 +	if (!_dumpDir.empty() && ((_dumpEvery > 0 && (_frameNo % _dumpEvery) == 0) || objStepEnd))
@@ -4773,10 +4973,10 @@ index 00000000..a07ea2c3
 +} // End of namespace Scumm
 diff --git a/engines/scumm/dighd.h b/engines/scumm/dighd.h
 new file mode 100644
-index 00000000..8348aba0
+index 00000000..e089ac77
 --- /dev/null
 +++ b/engines/scumm/dighd.h
-@@ -0,0 +1,565 @@
+@@ -0,0 +1,567 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -4950,7 +5150,7 @@ index 00000000..8348aba0
 +	 * gets the object's HD image (objects/objNNN_SS.png) when there is one.
 +	 * blastsRemoved(): the engine took the blast objects away (each frame).
 +	 */
-+	void beginBlast(VirtScreen *vs, int x, int y, int width, int height);
++	void beginBlast(VirtScreen *vs, int x, int y, int width, int height, int scaleX = 255, int scaleY = 255);
 +	void endBlast(int obj, int state, int shadowMode, const byte *shadowPalette);
 +	void blastsRemoved() { _blastGen++; }
 +
@@ -5108,6 +5308,7 @@ index 00000000..8348aba0
 +	Common::Array<byte> _blastPre;
 +	VirtScreen *_blastVs = nullptr;
 +	int _blastX = 0, _blastY = 0, _blastW = 0, _blastH = 0;
++	int _blastScaleX = 255, _blastScaleY = 255;
 +	int _blastObjX = 0, _blastObjY = 0, _blastObjW = 0, _blastObjH = 0;
 +	bool _logBlasts = false;  // DIGHD_DEBUG_BLAST
 +	bool _logFace = false;    // DIGHD_DEBUG_FACE
@@ -5184,7 +5385,7 @@ index 00000000..8348aba0
 +	uint32 textAt(const TextLayer &t, size_t off, byte shown, byte &base) const;
 +	void composeText(byte *out, int outPitch, uint32 ref);
 +	void recomputeTint();
-+	bool tintFactors(byte idx, const byte *basePal, int f[3]) const;
++	bool tintFactors(byte idx, const byte *basePal, int f[3], int code = -1) const;
 +	uint32 applyTint(uint32 rgba, const int f[3]) const;
 +	uint32 tinted(uint32 rgba, byte idx, const byte *basePal) const;
 +	void dumpFrame();
@@ -5278,6 +5479,7 @@ index 00000000..8348aba0
 +	struct TestClick {
 +		int frame;
 +		int x, y;  // original pixels
++		bool right = false;
 +	};
 +	Common::Array<TestClick> _testClicks;  // DIGHD_TEST_CLICKS
 +	struct TestScript {
@@ -5788,7 +5990,7 @@ index 7dc15ebe..89e4eec7 100644
  	struct {
  		uint16 width;
 diff --git a/engines/scumm/object.cpp b/engines/scumm/object.cpp
-index 0e97ae97..b839cf72 100644
+index 0e97ae97..e5e88a4b 100644
 --- a/engines/scumm/object.cpp
 +++ b/engines/scumm/object.cpp
 @@ -20,6 +20,7 @@
@@ -5832,7 +6034,7 @@ index 0e97ae97..b839cf72 100644
  
 +	// Dig HD: what the object covers and what it drew (shade or HD image)
 +	if (_digHD)
-+		_digHD->beginBlast(vs, bdd.x, bdd.y, bdd.srcwidth, bdd.srcheight);
++		_digHD->beginBlast(vs, bdd.x, bdd.y, bdd.srcwidth, bdd.srcheight, bdd.scale_x, bdd.scale_y);
  	drawBomp(bdd);
 +	if (_digHD)
 +		_digHD->endBlast(eo->number, digImage, bdd.shadowMode, bdd.shadowPalette);

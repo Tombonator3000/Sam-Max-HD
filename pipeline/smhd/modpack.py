@@ -105,13 +105,15 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
             continue
         want = (info["width"] * scale, info["height"] * scale)
         custom = own / "rooms" / f"room{num:03d}.png" if own else None
+        base = Image.open(src).convert("RGB")
         if custom and custom.exists():
             hd = Image.open(custom).convert("RGB")
             if not _check_size(hd, want, custom.name):
                 hd = None
+            else:
+                hd = _clean(hd, base, custom.name).convert("RGB")
         else:
             hd = None
-        base = Image.open(src).convert("RGB")
         if hd is None:
             hd = upscale(base, scale, method, **upscale_kw)
         hd.save(out / "rooms" / f"room{num:03d}.png")
@@ -144,6 +146,8 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
                     ohd = Image.open(custom).convert("RGBA")
                     if not _check_size(ohd, owant, custom.name):
                         ohd = None
+                    else:
+                        ohd = _clean(ohd, oim, custom.name)
                 if ohd is None:
                     ohd = _upscale_object_in_context(base, oim, obj["x"], obj["y"], scale, method, **upscale_kw)
                 ohd.save(out / "objects" / f"{name}.png")
@@ -185,15 +189,73 @@ def _own_objects_only(extract: Path, out: Path, own: Path, info: dict, scale: in
             osrc = extract / "objects" / f"{name}.png"
             if not custom.exists() or not osrc.exists():
                 continue
-            with Image.open(osrc) as oim:
-                owant = (oim.width * scale, oim.height * scale)
+            oim = Image.open(osrc).convert("RGBA")
+            owant = (oim.width * scale, oim.height * scale)
             ohd = Image.open(custom).convert("RGBA")
             if not _check_size(ohd, owant, custom.name):
                 continue
-            ohd.save(out / "objects" / f"{name}.png")
+            _clean(ohd, oim, custom.name).save(out / "objects" / f"{name}.png")
             shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
             done.append(name)
     return done
+
+
+def magenta_mask(rgb, orig4=None):
+    """Piksler i nøkkelfargen (magenta, bakgrunnen grafikerne bruker for gjennomsiktig) der originalen
+    ikke selv er magenta. rgb er (h, w, 3), orig4 originalen skalert med nærmeste nabo til samme størrelse."""
+    import numpy as np
+    a = rgb.astype(int)
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    m = (r > 200) & (b > 200) & (g < 60)
+    if orig4 is not None:
+        o = orig4.astype(int)
+        m &= ~((o[..., 0] > 100) & (o[..., 2] > 100) & (o[..., 1] * 5 < np.minimum(o[..., 0], o[..., 2]) * 3))
+    return m
+
+
+def remove_magenta(im: Image.Image, orig: Image.Image | None = None) -> tuple[Image.Image, int]:
+    """Fyller magentaflekker i et malt bilde fra fargene rundt (8 runder med snitt av nabopikslene som
+    ikke er flekk; det som er igjen, får originalens farge). Gir bildet og antall piksler som ble rettet."""
+    import numpy as np
+    rgba = np.asarray(im.convert("RGBA")).copy()
+    o4 = None
+    if orig is not None:
+        o4 = np.asarray(orig.convert("RGB").resize(im.size, Image.NEAREST))
+    mask = magenta_mask(rgba[..., :3], o4) & (rgba[..., 3] > 0)
+    n = int(mask.sum())
+    if not n:
+        return im, 0
+    rgb = rgba[..., :3].astype(float)
+    todo = mask.copy()
+    for _ in range(8):
+        if not todo.any():
+            break
+        good = ~todo
+        acc = np.zeros_like(rgb)
+        cnt = np.zeros(todo.shape)
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if not dy and not dx:
+                    continue
+                sh = np.roll(np.roll(rgb, dy, 0), dx, 1)
+                gs = np.roll(np.roll(good, dy, 0), dx, 1)
+                acc += sh * gs[..., None]
+                cnt += gs
+        fill = todo & (cnt > 0)
+        rgb[fill] = acc[fill] / cnt[fill][:, None]
+        todo &= ~fill
+    if todo.any() and o4 is not None:
+        rgb[todo] = o4[todo]
+    rgba[..., :3] = np.clip(rgb, 0, 255).astype(np.uint8)
+    return Image.fromarray(rgba, "RGBA"), n
+
+
+def _clean(hd: Image.Image, orig: Image.Image, name: str) -> Image.Image:
+    """Fjerner magentaflekker fra et malt bilde (se remove_magenta) og sier fra om det."""
+    cleaned, n = remove_magenta(hd, orig)
+    if n:
+        print(f"  {name}: {n} magentapiksler fylt")
+    return cleaned
 
 
 def _full_state(extract: Path, obj: dict) -> tuple[str, Image.Image] | None:
@@ -239,6 +301,8 @@ def _objects_without_room(extract: Path, out: Path, own: Path | None, info: dict
                 ohd = Image.open(custom).convert("RGBA")
                 if not _check_size(ohd, owant, custom.name):
                     ohd = None
+                else:
+                    ohd = _clean(ohd, oim, custom.name)
             if ohd is None and icons and method == "scale4x":
                 ohd = scale4x_rgba(oim)
             elif ohd is None:
@@ -324,7 +388,13 @@ def _build_costumes(extract: Path, out: Path, scale: int, method: str, costumes:
                 with Image.open(soft) as sim, Image.open(src) as oim:
                     ok = soft_size_ok(sim.size, oim.size, scale)
                 if ok:
-                    shutil.copyfile(soft, dest / f"{name}_hd.png")
+                    with Image.open(soft) as sim:
+                        cleaned, n = remove_magenta(sim)
+                    if n:
+                        cleaned.save(dest / f"{name}_hd.png")
+                        print(f"  {soft.name}: {n} magentapiksler fylt")
+                    else:
+                        shutil.copyfile(soft, dest / f"{name}_hd.png")
                     shutil.copyfile(extract / "costumes" / f"{name}_idx.png", dest / f"{name}_idx.png")
                     n_soft += 1
                     if not (auto or (custom and custom.exists())):

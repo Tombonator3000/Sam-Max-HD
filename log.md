@@ -254,3 +254,23 @@ Tom (fem skjermbilder fra nettsiden): piksler bak Max, rester rundt objekter, pi
 - Forgrunnen: z-masken glattes med xBR, så kanten mot stolen i kontoret er myk.
 - Inventaret: ikonene (rom 93) og inventartingene (rom 94) var ikke i modden fordi rommene er smalere enn skjermen. `build-mod` tar dem alltid med, skalert med Scale4x (ny metode for pikselgrafikk). Esken (obj995) er ChatGPTs tegning med den prikkete teksten fra originalen; kanten blir trappete fordi tegningen ikke har egen alfa (todo til grafikkordren).
 - Pipeline-tester 49 bestått, `engine/test.sh` 0 avvik, patchen passer. Hele skjermen 13 til 16 ms (litt mer enn før naboregelen).
+
+## 2026-10-14 13:40 (Claude)
+
+Tom (bilder fra nettsiden, før PR 18 er flettet): artefakter i HD-grafikken og flagget i rom 17, artefakter rundt logoen i introen, ønske om automatisk fjerning av slike feil, mer lettlest tekst, svarte kanter rundt Sam og Max foran svanen, piksler bak kjerubene. Og: legg inn gjennomgangen fra Just Adventure som ressursbank.
+
+- Introen: de små logoene er skalerte blast-objekter tegnet med fargetabell. Motoren godtar nå HD-bildet når fargen er en tonet utgave av koden, og slår opp riktig piksel i skalerte objekter. HD-andel 32 til 99,8 prosent.
+- Automatisk rensing: `build-mod` fyller magentaflekker i malte bilder fra fargene rundt; kjørt på modden: 9 085 piksler i 231 bilder (obj049 og karnevalsobjektene 661 til 807 mest). Rom 84 (Max's Wax, ekte magenta) er urørt. Ny test, 50 bestått.
+- Teksten: HD-skriften byttet fra Exo 2 til Atkinson Hyperlegible (fet, laget for lesbarhet, OFL). Sett i introen.
+- Svarte kanter foran svanen og pikslene bak kjerubene: svanen er en figur uten HD-tegning, og bak Sam ble bakgrunnen bygget uten svanen. Med PR 18 glattes figurer uten tegning og legges som egne myke figurer, så Sams kant faller på svanen. Kjerubene er animasjonslapper som flaggene.
+- Ressursbank: `docs/GJENNOMGANG.md`, egen oppsummering sted for sted med romnumre, hvem som er der og tingene som hører til; kilden lenket og kreditert. Henvist fra AGENTS.md og `docs/gpt-arbeid-AGENTS.md`.
+- Romtest med motoren fra PR 18: 71 lastet, 60 ok, 0 krasj, 0 skjermavvik, samme 12 hang. Små svarte felt i rom 8 og 28 (todo). `engine/test.sh` 0 avvik, patchen passer.
+
+## 2026-10-14 14:30 (Claude)
+
+Tom: spillet krasjer på nettsiden når Sam plukker opp pengene i musehullet.
+
+- PR 18 er flettet (uten den siste committen med logo, skrift og magenta). Nettsiden ble bygget fra main kl. 11:26.
+- Gjenskapt i Chromium uten skjerm med testkrokene i adressen (`?DIGHD_TEST_ROOM=7&DIGHD_TEST_SCRIPT=700:206:0`; skript 206 er opplukkingen, fra `work/skript/rom_007/lokal_206.txt`). Med `?adlib` kom den egentlige feilen: «Common::Array: failure to allocate». Motorens minne vokste med rundt 3,5 MB per fil den hentet, til 2 GB etter to minutter.
+- Årsak: ScummVMs filsystem for nettleseren (`backends/fs/emscripten/http-fs.cpp`) hentet og tolket mappelisten (`index.json`) på nytt for hver fil som ble åpnet, og frigjorde aldri teksten, den tolkede JSON-en eller nodene. Mappen med figurruter fikk 15 000 nye filer i forrige runde (indeksbildene som motoren glatter), så hver lekkasje ble stor. Rettet: én delt liste per mappe (`listing()`), teksten og JSON-en frigjøres. Ligger nå i patchen. Kompilert med em++ (bare syntaks; nettbygget skjer i Actions).
+- Testkroken `DIGHD_TEST_CLICKS` tar høyreklikk (`r` til slutt), og loggen viser objektet under klikket.
