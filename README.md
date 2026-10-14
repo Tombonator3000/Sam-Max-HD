@@ -17,7 +17,7 @@ Repoet er offentlig etter Toms valg. Spillfilene og alt som lages fra dem ligger
 | Uttrekk | `smhd extract` tar ut alt: 83 rombakgrunner, 959 objektbilder og 16 052 kostymeruter fra 348 kostymer, som PNG med metadata. Egne dekodere oversatt fra ScummVM |
 | Skript | Alle 1181 skript dekompilert med descumm (`tools/dekompiler_skript.py`), 1179 uten feil |
 | HD-grafikk | Første runde fra ChatGPT er i `hd-mod` (14. oktober): 76 rom, 841 objektbilder og 931 figurruter. Resten vises som originalen til det kommer ([docs/BESTILLING-CHATGPT.md](docs/BESTILLING-CHATGPT.md)) |
-| Spille | `./spill.sh` starter originalspillet. Linux-pakken er tilpasset, ikke bygget i Actions ennå. Nettsiden trenger eget repo |
+| Spille | `./spill.sh` starter spillet med HD-modden. Windows: last ned `SamMaxHD-Windows.zip` fra releasen «Sam & Max HD for Windows», pakk ut og start «Sam og Max HD.bat». Linux: releasen «Sam & Max HD for Linux». Nettsiden trenger eget repo |
 
 Detaljer: [STATUS.md](STATUS.md). Hva som gjenstår: [todo.md](todo.md).
 

@@ -176,3 +176,12 @@ Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
 - Motor: figurpiksler tegnet gjennom skyggetabellen (skyggene under figurene, lyskjegler med skyggemodus 0x20) bygges nå fra HD-bakgrunnen og tones, som blast-skyggene. Testet i rom 16: lyskjeglen og lysstrålen er glatte, `DIGHD_VERIFY` 0 piksler ikke bygget på nytt. `engine/test.sh` 0 avvik, patchen passer mot ren ScummVM.
 - Car Bomb-merkene (`drawBox` piksel for piksel) og noir-modusen står som åpne punkter i todo. Full romtest kjører.
 - Full romtest med skyggekoden: 71 lastet, 60 ok med HD-bakgrunn, 0 krasj, 0 forskjøvet, 0 skjermavvik, svarte felt i 2 kjøringer. 12 hang: de 11 fra før og rom 79 (snøkulen). Rom 79 stopper på samme bilde (540 etter 120 s) også med skyggekoden slått av, og bruker lite CPU; det går tregt etter testhoppet og treffer tidsgrensen noen ganger. Ikke en følge av endringen.
+
+## 2026-10-14 08:30 (Claude)
+
+- Tom ba om en Windows-utgave som release, med HD-grafikken. Jeg foreslo først en pakke uten spillgrafikk (AGENTS-regelen); Tom sa at hele poenget er at HD-grafikken skal være med. AGENTS endret: releasene har spillet og HD-grafikken, Toms beslutning 14. oktober.
+- Ny arbeidsflyt `.github/workflows/windows.yml`: bygger ScummVM med HD-patchen i MSYS2 (MINGW64) på Windows, henter spilldata og hd-mod, lager zip med `tools/pakke_windows.sh`, tester at spillet blir kjent igjen og at DigHD starter (SDL dummy, `DIGHD_QUIT_AT=600`), og publiserer release «windows» fra main. På andre grener blir zip-en en artefakt.
+- Startfil `tools/windows/Sam og Max HD.bat`: fullskjerm, HD-mod, innstillinger og lagrede spill i %APPDATA%\SamMaxHD.
+- HD-modden publisert på nytt med skriftrettingene (font 5 uten HD-skrift, skrå apostrof): hd-mod 5797a4b.
+- Ikke testet her: ingen Windows eller MinGW i sandkassen. Første test er kjøringen i Actions.
+- Windows-arbeidsflyten testet på grenen. Kjøring 1: bygg og pakke ok, testen fant ingen grafikkmodus (OpenGL uten skjerm). Kjøring 2: spillet startet med HD-modden, men stoppet på «IMuse initialization - Device not available» (ingen MIDI på maskinen). Kjøring 3 (38523014097) grønn med `--gfx-mode=surfacesdl` og `--music-driver=adlib` i testen. PR 14 mot main; releasen lages når den er flettet.
