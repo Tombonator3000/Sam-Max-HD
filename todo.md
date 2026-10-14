@@ -83,8 +83,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Nettsiden: repoet `Sam-Max-HD-Web` med arbeidsflyt som bygger og publiserer (14. oktober). Siden henter spillet uten nøkkel
 - [ ] Tom slår på Pages i Sam-Max-HD-Web (Settings > Pages > Source = GitHub Actions) og tester siden
 - [ ] Windows-pakken starter ikke på Toms jobb-PC (startfila lukker seg); startfilene viser nå feilkode og logg (%APPDATA%\SamMaxHD\scummvm.log)
-- [ ] MT-32-musikk: spillet har ingen CD-lydspor; musikken er MIDI. Med `--enable-mt32emu` og ROM-filene fra spilldata låter den som på originalutstyret
-- [ ] Vurder `--enable-mt32emu` når musikken skal testes (MT-32-ROM-filene ligger i `spilldata`)
+- [x] MT-32-musikk (14. oktober): motoren bygges med `--enable-mt32emu`, ROM-filene fra spilldata ligger i Linux- og Windows-pakken, og `engine/run.sh`, startfilene, AppImage og nettsiden velger `--music-driver=mt32`
+- [x] `--enable-mt32emu` (14. oktober)
 
 ## Senere
 

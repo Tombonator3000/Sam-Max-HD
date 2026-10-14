@@ -31,13 +31,16 @@ for p in "$HERE"/patches/*.patch; do
 done
 
 cd "$SRC"
-if [ ! -f config.mk ] || [ "${RECONFIGURE:-0}" = "1" ]; then
+# MT-32-emuleringen (musikken med MT32_CONTROL.ROM og MT32_PCM.ROM fra spilldata) er med fra 14. oktober.
+# Endres valgene, konfigureres motoren på nytt av seg selv.
+VALG="--disable-all-engines --enable-engine=scumm,scumm-7-8 --disable-engine=he,rebel2-psx --disable-detection-full \
+--disable-debug --enable-optimizations --enable-mt32emu --disable-fluidsynth --disable-cloud --disable-libcurl \
+--disable-sdlnet --disable-tts --disable-eventrecorder"
+if [ ! -f config.mk ] || [ "${RECONFIGURE:-0}" = "1" ] || [ "$(cat .dighd-valg 2>/dev/null)" != "$VALG" ]; then
 	echo "Konfigurerer (bare SCUMM-motoren) ..."
-	./configure --disable-all-engines --enable-engine=scumm,scumm-7-8 \
-		--disable-engine=he,rebel2-psx --disable-detection-full \
-		--disable-debug --enable-optimizations \
-		--disable-mt32emu --disable-fluidsynth --disable-cloud --disable-libcurl \
-		--disable-sdlnet --disable-tts --disable-eventrecorder > configure.log
+	# shellcheck disable=SC2086
+	./configure $VALG > configure.log
+	echo "$VALG" > .dighd-valg
 fi
 
 echo "Bygger med $JOBS tråder (første gang tar det noen minutter) ..."

@@ -90,10 +90,10 @@ jobs:
           cd out/windows/SamMaxHD-Windows
           export SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy DIGHD_MOD="$(cygpath -w "$PWD/mod")" DIGHD_QUIT_AT=600
           set +e
-          # Uten skjerm finner OpenGL ingen grafikkmodus, og maskinen har ingen MIDI-enhet; testen bruker
-          # SDL-overflaten (som spill.sh --programvare) og AdLib-musikk
+          # Uten skjerm finner OpenGL ingen grafikkmodus; testen bruker SDL-overflaten (som spill.sh
+          # --programvare) og MT-32-emuleringen, som startfilene
           timeout 300 ./scummvm.exe --config="$(cygpath -w "$RUNNER_TEMP")\\test.ini" --path=game \
-            --savepath="$(cygpath -w "$RUNNER_TEMP")" --themepath=. --extrapath=. --gfx-mode=surfacesdl --music-driver=adlib \
+            --savepath="$(cygpath -w "$RUNNER_TEMP")" --themepath=. --extrapath=. --gfx-mode=surfacesdl --music-driver=mt32 \
             --debuglevel=1 samnmax > "$RUNNER_TEMP/test.log" 2>&1
           code=$?
           set -e

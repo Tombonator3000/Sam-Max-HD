@@ -47,7 +47,7 @@ Spillfilene:
 | `SAMNMAX.000` | 9 080 byte | Indeksen |
 | `SAMNMAX.001` | 13 790 685 byte | Spillet, med musikken (MIDI) |
 | `MONSTER.SOU` | 183 195 967 byte | Talen. Ligger i `spilldata` i to deler (`MONSTER.SOU.001` og `.002`), og siden setter dem sammen i nettleseren |
-| `MT32_CONTROL.ROM`, `MT32_PCM.ROM` | 65 536 og 524 288 byte | Valgfrie. `engine/build.sh` og `engine/build-web.sh` bygger nå motoren med `--disable-mt32emu`, så de brukes ikke |
+| `MT32_CONTROL.ROM`, `MT32_PCM.ROM` | 65 536 og 524 288 byte | Musikken: motoren bygges med `--enable-mt32emu` (14. oktober), og siden starter med `--music-driver=mt32` når ROM-filene er med |
 
 Ikke målt: hvor mye som lastes ned før spillet kan vise noe, hvor mye minne siden bruker med talen, og om musikken spilles i nettleseren.
 
