@@ -158,4 +158,5 @@ Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
 - Blast-tekst: skriptene bruker ingen, bare blast-objekter.
 - Rommene som henger etter testhoppet stopper på skriptfeil fordi variablene ikke er satt (rom 11 «state -1 is out of bounds», rom 50 «readArray: invalid array 261»). Krever lagrede spill.
 - HD-skriften: apostrofen tegnes skrå (U+2019) som i spillets font. Kommer med i neste mod.
+- Romtest i alle 85 rom med den nye motoren: 71 lastet, 61 ok, 0 krasj, 0 forskjøvet, 0 skjermavvik, svarte felt i 2 kjøringer, 11 hang som før.
 - Merk: klikktesten lagret `dighd_classic=true` i `~/.config/scummvm/scummvm.ini` her; satt tilbake til false før de andre testene.
