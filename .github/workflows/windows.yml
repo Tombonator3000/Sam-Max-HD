@@ -1,0 +1,137 @@
+# Windows-pakken: ScummVM med HD-patchen, spillet, tale og HD-modden i én zip.
+# Bygges i MSYS2 (MINGW64) på Windows og publiseres som release "windows" i dette repoet.
+# Spillet og HD-grafikken tilhører Disney/Lucasfilm; Tom har bestemt (14. oktober 2026) at de er med
+# i pakken (se AGENTS.md).
+name: Windows-pakke
+
+on:
+  workflow_dispatch:
+  # Hver natt: ny pakke hvis HD-modden i grenen hd-mod er endret siden sist
+  schedule:
+    - cron: '27 2 * * *'
+  # Endringer i pakken selv bygges og testes på alle grener; publiseres bare fra main
+  push:
+    paths:
+      - '.github/workflows/windows.yml'
+      - 'tools/pakke_windows.sh'
+      - 'tools/windows/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-pakke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sjekk:
+    runs-on: ubuntu-latest
+    outputs:
+      bygg: ${{ steps.mod.outputs.bygg }}
+    steps:
+      - id: mod
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MOD=$(gh api repos/${{ github.repository }}/git/ref/heads/hd-mod --jq .object.sha)
+          SIST=$(gh api repos/${{ github.repository }}/releases/tags/windows --jq .body 2>/dev/null || true)
+          if [ "${{ github.event_name }}" = schedule ] && echo "$SIST" | grep -q "hd-mod: $MOD"; then
+            echo "HD-modden er den samme som i pakken ($MOD). Ingen ny pakke."
+            echo "bygg=nei" >> "$GITHUB_OUTPUT"
+          else
+            echo "bygg=ja" >> "$GITHUB_OUTPUT"
+          fi
+
+  pakke:
+    needs: sjekk
+    if: needs.sjekk.outputs.bygg == 'ja'
+    runs-on: windows-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      # Patchen må ha LF, ellers passer den ikke mot ScummVM-kildene
+      - name: Ingen CRLF i utsjekken
+        shell: pwsh
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git make zip
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-pkgconf
+            mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-libpng
+            mingw-w64-x86_64-zlib
+            mingw-w64-x86_64-freetype
+
+      - name: Bygg ScummVM med HD-patchen
+        run: |
+          git config --global --add safe.directory '*'
+          JOBS=$(nproc) engine/build.sh
+
+      - name: Spillet og talen (grenen spilldata)
+        run: tools/hent_spilldata.sh
+
+      - name: HD-modden (grenen hd-mod)
+        run: tools/mod_gren.sh hent
+
+      - name: Lag zip
+        run: tools/pakke_windows.sh
+
+      - name: Test pakken uten skjerm
+        run: |
+          cd out/windows/SamMaxHD-Windows
+          export SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy DIGHD_MOD="$PWD/mod" DIGHD_QUIT_AT=600
+          set +e
+          timeout 300 ./scummvm.exe --config="$RUNNER_TEMP/test.ini" --path=game --savepath="$RUNNER_TEMP" \
+            --themepath=. --extrapath=. --debuglevel=1 samnmax > "$RUNNER_TEMP/test.log" 2>&1
+          code=$?
+          set -e
+          # ScummVM på Windows skriver loggen til %APPDATA%\ScummVM\Logs
+          LOGG="$(cygpath "$APPDATA")/ScummVM/Logs/scummvm.log"
+          [ -f "$LOGG" ] && cat "$LOGG" >> "$RUNNER_TEMP/test.log"
+          echo "Avslutningskode: $code"
+          grep -E "Using gameid samnmax|Using MD5|DigHD: mod" "$RUNNER_TEMP/test.log" | head -5 || true
+          grep -q "d917f311a448e3cc7239c31bddb00dd2" "$RUNNER_TEMP/test.log" || { echo "Spillet ble ikke kjent igjen"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }
+          grep -q "DigHD" "$RUNNER_TEMP/test.log" || { echo "HD-motoren startet ikke"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }
+          [ "$code" = 0 ] || { echo "Spillet avsluttet ikke som ventet (kode $code)"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }
+
+      - name: Publiser som release
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Sam & Max HD for Windows: ScummVM med HD-patchen, spillet, talen og HD-modden i én zip."
+            echo
+            echo "Last ned SamMaxHD-Windows.zip, pakk ut hele mappen og start «Sam og Max HD.bat»."
+            echo "Spillet starter rett, i fullskjerm, med HD-grafikk. F5 gir spillets meny med valget HD Graphics, Ctrl+H bytter mellom HD og originalgrafikk, Alt+Enter bytter vindu og fullskjerm."
+            echo
+            echo "HD-grafikken lages fortsatt. Det som ikke er tegnet i HD ennå, vises som originalen."
+            echo
+            echo "Spillet og grafikken tilhører Disney/Lucasfilm."
+            echo
+            echo '```'
+            cat out/windows/SamMaxHD-Windows/BYGG.txt | tr -d '\r'
+            cat out/windows/SamMaxHD-Windows.zip.sha256
+            echo '```'
+          } > out/windows/notater.md
+          gh release view windows > /dev/null 2>&1 || gh release create windows --title "Sam & Max HD for Windows" --notes "Lages av arbeidsflyten Windows-pakke."
+          gh release upload windows out/windows/SamMaxHD-Windows.zip out/windows/SamMaxHD-Windows.zip.sha256 --clobber
+          gh release edit windows --notes-file out/windows/notater.md --latest
+
+      - name: Pakken som artefakt (grener utenom main)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SamMaxHD-Windows
+          path: out/windows/SamMaxHD-Windows.zip
+          retention-days: 3

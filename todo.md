@@ -76,6 +76,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 - [x] `./spill.sh` fra repoet (starter originalspillet)
 - [ ] Linux-pakken: kjør arbeidsflyten Linux-pakke for hånd og test AppImage-filen
+- [x] Windows-pakken: arbeidsflyten Windows-pakke bygger ScummVM med HD-patchen i MSYS2, legger ved spillet og HD-modden og publiserer release "windows" (14. oktober)
+- [ ] Tom tester Windows-pakken
 - [ ] Nettsiden: lag repoet `Sam-Max-HD-Web` (Tom), bygg i Actions og test. Sjekk at siden takler en `hd-mod` uten mod
 - [ ] Vurder `--enable-mt32emu` når musikken skal testes (MT-32-ROM-filene ligger i `spilldata`)
 
