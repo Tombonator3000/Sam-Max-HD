@@ -229,3 +229,8 @@ Tom (skjermbilder av kontoret i HD og klassisk): 1 piksler rundt HD-figurene, 2 
 - Testet i rom 7: Max helt ren, Sam ren bortsett fra kanten mot stolen (z-masken i 4 x 4-blokker, kjent begrensning, lagt i todo). `DIGHD_VERIFY`: 0 piksler ikke bygget på nytt i 15 kontroller. `engine/test.sh` 0 avvik. Patchen passer mot ren ScummVM.
 - Punkt 2: på PC laster motoren raskt (rom 7 på 77 ms, ruter rundt 1 ms). På nettsiden ble hver fil hentet fra GitHub første gang spillet trengte den, og spillet ventet imens. Nettsiden henter nå hele HD-pakken i bakgrunnen fem sekunder etter start, figurrutene først (`prefetch`), og samme fil hentes bare én gang selv om spillet og bakgrunnshentingen ber om den samtidig. Ny test, `node --test` 18 bestått. Hele skjermen tar 14 til 22 ms å bygge her; nedtoninger kan bli tunge i nettleseren (todo).
 - Punkt 3 var gjort (nettsiden bygget med MT-32 08:30 UTC). Punkt 4 må Tom si hva var.
+
+## 2026-10-14 11:40 (Claude)
+
+- Full romtest med den nye motoren og modden (`--kamera ett`): 71 lastet, 60 ok med HD-bakgrunn, 0 krasj, 0 forskjøvet, 0 skjermavvik. De samme 12 rommene henger etter testhoppet som før.
+- Modden med de 48 nye indeksbildene er publisert i `hd-mod` (`tools/mod_gren.sh send`, 238 MB).
