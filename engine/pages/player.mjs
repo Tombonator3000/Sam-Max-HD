@@ -208,7 +208,9 @@ async function launch(source, rows) {
     const args = ['--path=/data/games/samnmax', '--savepath=' + env.HOME, '--aspect-ratio', '--subtitles'];
     if (query.has('programvare') || !hasWebGL()) args.push('--gfx-mode=surfacesdl');
     // The music: Roland MT-32 emulation with the ROMs from spilldata (or the chosen game folder)
-    if (rows.some(row => /\/MT32_CONTROL\.ROM$/.test(row.path)) && rows.some(row => /\/MT32_PCM\.ROM$/.test(row.path))) args.push('--music-driver=mt32');
+    // ?adlib: AdLib instead, which costs far less in the browser (to compare if the game stutters)
+    if (query.has('adlib')) args.push('--music-driver=adlib');
+    else if (rows.some(row => /\/MT32_CONTROL\.ROM$/.test(row.path)) && rows.some(row => /\/MT32_PCM\.ROM$/.test(row.path))) args.push('--music-driver=mt32');
     args.push('samnmax');
     history.replaceState(null, '', location.pathname + location.search + '#' + args.join(' '));
 
