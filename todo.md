@@ -27,7 +27,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Hvilke objekter som har BOMP-bilde (103 blast-objektbilder, `kind` i rooms.json)
 - [x] Dekompiler alle skriptene med descumm (`tools/dekompiler_skript.py`, 1179 av 1181)
 - [x] Finn hvilke rom og palett hvert kostyme vises i fra skriptene (`tools/kostymer.py`, `docs/kostymefarger.csv`, 13. oktober)
-- [ ] Se de kostymene som står med «trolig» i `docs/figurer.csv` i spillet, og rulletekstpanelene i rom 67 og 77
+- [x] Se de kostymene som står med «trolig» i `docs/figurer.csv` i spillet, og rulletekstpanelene i rom 67 og 77 (14. oktober): kostyme 103 er Trixie (skript 120), panelene (objekt 600 til 603 lånt fra rom 67) får HD i rom 77. Rulleteksten avslørte to feil i HD-skriften, rettet
 - [ ] Finn mellomsekvensene og minispillene som tegnes av motoren
 - [x] Hvilke kostymer som er Sam, Max og de andre (`docs/figurer.csv`, 13. oktober)
 

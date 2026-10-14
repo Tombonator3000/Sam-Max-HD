@@ -32,8 +32,10 @@ VARIANTER = {
 }
 
 # Spillskrift -> mappe. Spillskrifter som ikke står her tegnes som før (xBR).
+# Font 5 i Sam & Max er den pyntede fonten med bare store bokstaver (rulleteksten, påkledningen,
+# Bumpusville). Den holdes utenfor, så formen blir som i originalen.
 KART = {
-    0: "exo2", 1: "exo2", 2: "exo2", 3: "exo2", 4: "exo2", 5: "exo2",
+    0: "exo2", 1: "exo2", 2: "exo2", 3: "exo2", 4: "exo2",
     100: "exo2", 101: "exo2", 102: "exo2", 103: "exo2",
 }
 

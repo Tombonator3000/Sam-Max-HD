@@ -32,8 +32,8 @@ Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. 
 ## Ikke portet eller ikke testet
 
 - The Dig er ikke testet med den utvidede patchen her (filene er ikke i dette repoet).
-- Kostymefargene: åtte kostymer har fått paletten fra rommene de brukes i. Resten bruker hjemrommet, som stemmer for de fleste, men er ikke sjekket kostyme for kostyme i spillet. Rulletekstpanelene i rom 67 og 77 er ikke sett i motoren.
+- Kostymefargene: åtte kostymer har fått paletten fra rommene de brukes i. Resten bruker hjemrommet, som stemmer for de fleste, men er ikke sjekket kostyme for kostyme i spillet. Rulletekstpanelene (objekt 600 til 603, lånt fra rom 67) er sett i rom 77 med HD 14. oktober.
 - Promptene i `gpt.py` og `figur.py` er skrevet om for Sam & Max, men ikke prøvd i ChatGPT. Første runde er levert og tatt inn 14. oktober.
-- Figuridentiteten: navnene i `docs/figurer.csv` kommer fra replikkene i skriptene. De som står med «trolig», er tolket og ikke sett i spillet.
+- Figuridentiteten: navnene i `docs/figurer.csv` kommer fra replikkene i skriptene. Den eneste som sto med «trolig» (kostyme 103), er bekreftet som Trixie fra skript 120.
 - Spillet er ikke spilt med skjerm og lyd her. Musikken går med AdLib uten MIDI-utgang; MT-32 er slått av i byggingen.
 - Nettsiden: eget repo finnes ikke, ikke bygget eller prøvd.

@@ -160,3 +160,11 @@ Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
 - HD-skriften: apostrofen tegnes skrå (U+2019) som i spillets font. Kommer med i neste mod.
 - Romtest i alle 85 rom med den nye motoren: 71 lastet, 61 ok, 0 krasj, 0 forskjøvet, 0 skjermavvik, svarte felt i 2 kjøringer, 11 hang som før.
 - Merk: klikktesten lagret `dighd_classic=true` i `~/.config/scummvm/scummvm.ini` her; satt tilbake til false før de andre testene.
+
+## 2026-10-14 07:05 (Claude)
+
+- PR 11 flettet av Tom. Grenen satt til ny main.
+- Todo «trolig»-kostymer og rulletekstpanelene: kostyme 103 er Trixie. Skript 120 setter kostymet mens fortelleren sier at hun leste godnatthistorier for Bruno. Rettet i `docs/figurer.csv` og i promptene til fig103_01 og fig103_02.
+- Rulleteksten kjørt i motoren (rom 77). Panelene lånes fra rom 67 (objekt 600 til 603) og får HD. Tittel-kostymet (328) og fjellene (329) er originalpiksler til grafikeren har tegnet dem.
+- To feil i HD-skriften funnet i rulleteksten og rettet: e, c og r ble store svarte former fordi kanten ble valgt som bokstav (`makeFaceGlyph` tegner nå slike glyfer fra fontbildet), og font 5 (pyntet, bare store bokstaver) ble små Exo 2-bokstaver. Font 5 er tatt ut av `skrift.py` og skaleres fra fontbildet.
+- Testet: rulleteksten ser ut som originalen med glatte kanter, dialogen i introen bruker fortsatt HD-skriften (30 glyfer, ingen avvist), `engine/test.sh` 0 avvik, `pytest -m "not game"` 44 bestått, patchen passer mot ren ScummVM.
