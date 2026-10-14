@@ -1892,6 +1892,15 @@ def test_build_mod_objects_in_room_without_background(tmp_path):
     assert hd.size == (24, 16) and hd.mode == "RGBA"
     assert hd.getpixel((1, 1))[3] == 0 and hd.getpixel((12, 8)) == (200, 40, 40, 255)
     assert (tmp_path / "mod" / "objects" / "obj825_01_idx.png").exists()
+    # Et rom smalere enn skjermen (ikonene i rom 93) tas med selv når det ikke står i romlisten
+    obj.save(ex / "objects" / "obj874_01.png")
+    Image.new("P", (6, 4)).save(ex / "objects" / "obj874_01_idx.png")
+    Image.new("RGB", (16, 200)).save(ex / "rooms" / "room093.png")
+    rooms["93"] = {"name": "", "width": 16, "height": 200, "objects": [{"id": 874, "x": 0, "y": 0, "states": ["01"]}]}
+    (ex / "rooms.json").write_text(json.dumps({"rooms": rooms}))
+    m = modpack.build_mod(ex, tmp_path / "mod2", scale=4, method="nearest", rooms={7}, text_font=False)
+    assert "obj874_01" in m["objects"] and m["rooms"] == []
+    assert (tmp_path / "mod2" / "objects" / "obj874_01.png").exists()
 
 
 def test_orders_count_soft_figures_and_list_held_cels(tmp_path):
@@ -1912,3 +1921,53 @@ def test_orders_count_soft_figures_and_list_held_cels(tmp_path):
     assert "- `fig091_05`: costume091_1963" in text and "costume091_1964" not in text.split("## Stilankere")[0]
     plain = gpt.write_orders(work, anchors=["stil.png"]).read_text()
     assert "Figurark: 0 av 1 godkjent" in plain and "holdt utenfor" not in plain
+
+
+def test_scale4x_keeps_colours_and_smooths_steps():
+    # Ikonene skaleres med Scale4x: ingen nye farger, og en diagonal trapp blir en rett skrå kant
+    import numpy as np
+    from smhd import upscale
+    im = Image.new("RGBA", (4, 4), (0, 0, 0, 0))
+    for i in range(4):
+        for j in range(i + 1):
+            im.putpixel((j, i), (200, 40, 40, 255))
+    big = upscale.scale4x_rgba(im)
+    assert big.size == (16, 16)
+    a = np.asarray(big)
+    colours = {tuple(c) for c in a.reshape(-1, 4)}
+    assert colours <= {(0, 0, 0, 0), (200, 40, 40, 255)}
+    # Nearest gir trappetrinn på 4 piksler; Scale4x fyller halve trinnet
+    near = np.asarray(im.resize((16, 16), Image.NEAREST))
+    assert (a[..., 3] > 0).sum() > (near[..., 3] > 0).sum()
+    assert "scale4x" in upscale.METHODS
+
+
+def test_patch_state_is_scaled_over_the_full_state(tmp_path):
+    # Flaggene i rom 17: tilstand 03 og 04 er bare lapper over en hel tilstand. En egen tegning av
+    # lappen alene brukes ikke; lappen skaleres på plass over den hele tilstanden.
+    import json
+    import numpy as np
+    from smhd import modpack
+    ex = tmp_path / "ex"
+    (ex / "rooms").mkdir(parents=True)
+    (ex / "objects").mkdir()
+    Image.new("RGB", (320, 200), (100, 150, 220)).save(ex / "rooms" / "room017.png")
+    Image.new("P", (320, 200)).save(ex / "rooms" / "room017_idx.png")
+    full = Image.new("RGBA", (8, 4), (40, 120, 40, 255))
+    full.save(ex / "objects" / "obj182_01.png")
+    patch = Image.new("RGBA", (8, 4), (0, 0, 0, 0))
+    patch.putpixel((7, 0), (60, 160, 60, 255))
+    patch.save(ex / "objects" / "obj182_03.png")
+    for st in ("01", "03"):
+        Image.new("P", (8, 4)).save(ex / "objects" / f"obj182_{st}_idx.png")
+    rooms = {"17": {"name": "", "width": 320, "height": 200,
+                    "objects": [{"id": 182, "x": 100, "y": 10, "states": ["01", "03"]}]}}
+    (ex / "rooms.json").write_text(json.dumps({"rooms": rooms}))
+    own = tmp_path / "own"
+    (own / "objects").mkdir(parents=True)
+    Image.new("RGBA", (32, 16), (0, 0, 255, 255)).save(own / "objects" / "obj182_03.png")
+    modpack.build_mod(ex, tmp_path / "mod", scale=4, method="nearest", rooms=None, own=own, text_font=False)
+    hd = np.asarray(Image.open(tmp_path / "mod" / "objects" / "obj182_03.png").convert("RGBA"))
+    assert hd.shape[:2] == (16, 32)
+    assert not (hd[..., 2] == 255).any()          # ikke den frittstående tegningen
+    assert tuple(hd[1, 30, :3]) == (60, 160, 60)  # lappen på plass

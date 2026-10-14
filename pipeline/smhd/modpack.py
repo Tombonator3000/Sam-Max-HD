@@ -41,7 +41,7 @@ from pathlib import Path
 from PIL import Image
 
 from . import skrift
-from .upscale import upscale, upscale_alpha
+from .upscale import scale4x_rgba, upscale, upscale_alpha
 
 MARGIN = 8  # piksler med bakgrunn rundt et objekt når det skaleres
 
@@ -76,6 +76,16 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
 
     for key, info in meta["rooms"].items():
         num = int(key)
+        if info.get("width", 320) < 320 and with_objects:
+            # Rom smalere enn skjermen vises aldri selv; de holder ikonene (93), inventartingene (94)
+            # og lignende som tegnes andre steder. Objektbildene tas alltid med, skalert alene.
+            # Ikoner er pikselgrafikk: Scale4x gir rette kanter uten uskarphet, til de er tegnet
+            extra = _objects_without_room(extract, out, own, info, scale, "scale4x" if scale == 4 and method != "nearest" else method,
+                                          icons=True)
+            if extra:
+                done_objects += extra
+                print(f"  rom {num:3d} {info['name']:<10} smalere enn skjermen: {len(extra)} objektbilder")
+            continue
         if rooms is not None and num not in rooms:
             if own and with_objects:
                 extra = _own_objects_only(extract, out, own, info, scale)
@@ -112,6 +122,7 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
         if not with_objects:
             continue
         for obj in info["objects"]:
+            full = _full_state(extract, obj)
             for state in obj["states"]:
                 name = f"obj{obj['id']:03d}_{state}"
                 osrc = extract / "objects" / f"{name}.png"
@@ -121,6 +132,14 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
                 owant = (oim.width * scale, oim.height * scale)
                 custom = own / "objects" / f"{name}.png" if own else None
                 ohd = None
+                if full is not None and state != full[0] and _is_patch(oim, full[1]):
+                    # En tilstand som bare er en lapp over en hel tilstand (flaggene i rom 17): den
+                    # skaleres på plass over den hele tilstanden, så kantene henger sammen. En egen
+                    # tegning av lappen alene passer ikke inn.
+                    ctx = base.copy()
+                    ctx.paste(full[1].convert("RGB"), (obj["x"], obj["y"]), full[1])
+                    ohd = _upscale_object_in_context(ctx, oim, obj["x"], obj["y"], scale, method, **upscale_kw)
+                    custom = None
                 if custom and custom.exists():
                     ohd = Image.open(custom).convert("RGBA")
                     if not _check_size(ohd, owant, custom.name):
@@ -177,8 +196,33 @@ def _own_objects_only(extract: Path, out: Path, own: Path, info: dict, scale: in
     return done
 
 
+def _full_state(extract: Path, obj: dict) -> tuple[str, Image.Image] | None:
+    """Tilstanden med flest piksler, når objektet har flere tilstander."""
+    if len(obj["states"]) < 2:
+        return None
+    best = None
+    for state in obj["states"]:
+        f = extract / "objects" / f"obj{obj['id']:03d}_{state}.png"
+        if not f.exists():
+            continue
+        im = Image.open(f).convert("RGBA")
+        n = im.getchannel("A").point(lambda a: 255 if a else 0).histogram()[255]
+        if best is None or n > best[0]:
+            best = (n, state, im)
+    return (best[1], best[2]) if best else None
+
+
+def _is_patch(im: Image.Image, full: Image.Image) -> bool:
+    """En lapp: samme størrelse som den hele tilstanden, men under 60 prosent av pikslene."""
+    if im.size != full.size:
+        return False
+    n = im.getchannel("A").point(lambda a: 255 if a else 0).histogram()[255]
+    m = full.getchannel("A").point(lambda a: 255 if a else 0).histogram()[255]
+    return m > 0 and n < 0.6 * m
+
+
 def _objects_without_room(extract: Path, out: Path, own: Path | None, info: dict, scale: int,
-                          method: str, **kw) -> list[str]:
+                          method: str, icons: bool = False, **kw) -> list[str]:
     """Objektbilder i et rom uten bakgrunn: egne bilder når de finnes, ellers skalert alene."""
     done = []
     for obj in info["objects"]:
@@ -195,7 +239,9 @@ def _objects_without_room(extract: Path, out: Path, own: Path | None, info: dict
                 ohd = Image.open(custom).convert("RGBA")
                 if not _check_size(ohd, owant, custom.name):
                     ohd = None
-            if ohd is None:
+            if ohd is None and icons and method == "scale4x":
+                ohd = scale4x_rgba(oim)
+            elif ohd is None:
                 ohd = upscale(_bleed(oim), scale, method, **kw).convert("RGBA")
                 ohd.putalpha(upscale_alpha(oim.getchannel("A"), scale))
             ohd.save(out / "objects" / f"{name}.png")

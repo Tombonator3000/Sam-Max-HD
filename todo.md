@@ -50,7 +50,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Romtest: finn en måte å komme inn i de 12 rommene som henger etter testhoppet (lagret spill eller objekttilstander). Sjekket 14. oktober: rom 11 stopper på «state -1 is out of bounds» og rom 50 på «readArray: invalid array 261», fordi variablene ikke er satt uten vanlig spill. Krever lagrede spill fra en ekte gjennomspilling
 - [ ] Test The Dig med den utvidede patchen (i Dig-repoet) før patchen kopieres dit
 - [x] Piksler rundt HD-figurene (Toms skjermbilde 14. oktober): kantene på skalerte figurer merkes nå riktig, og ruter uten HD-bilde i kostymer med myke ruter glattes i motoren (15. oktober)
-- [ ] Kanten mot forgrunnen (z-masken, for eksempel stolen foran Sam i kontoret) er 4 x 4-blokker. Kan glattes med en myk maske laget fra HD-rommet
+- [x] Kanten mot forgrunnen (z-masken) glattes med xBR (15. oktober)
+- [ ] Grafikkordre: animasjonstilstander som bare er lapper (flaggene og propellen i rom 17, 19 objekter i alt) må tegnes som hele bilder og klippes etterpå; inventaresken (obj995) trenger egen alfa så kanten blir myk; obj049 (LucasArts-logoen) har magentaflekker fra ChatGPT; ikonene i rom 93 og 94 er Scale4x til ikonarkene er tegnet
 - [ ] Hakking på nettsiden (Tom 14. oktober). Gjort: HD-pakken hentes i bakgrunnen, fargetoningen er raskere (15 til 11 ms per skjerm), `?adlib` for å sammenligne med MT-32. Tom tester igjen. Nettsiden henter nå HD-pakken i bakgrunnen. Hele skjermen tar 14 til 22 ms å bygge her; i nettleseren kan nedtoninger og rulling bli tunge. Mål med `DIGHD_BENCH` i nettleseren og se på å bygge bare det som er endret ved palettbytter
 
 ### Pipeline
