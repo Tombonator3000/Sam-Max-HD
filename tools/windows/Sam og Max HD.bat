@@ -25,7 +25,7 @@ if not exist "%CONF%\scummvm.ini" (
 if exist "%HERE%mod\mod.json" set "DIGHD_MOD=%HERE%mod"
 rem Vinduet blir stående mens spillet går. Stopper spillet med en feil, står meldingen og
 rem loggen her (%CONF%\scummvm.log).
-"%HERE%scummvm.exe" --config="%CONF%\scummvm.ini" --logfile="%CONF%\scummvm.log" --path="%HERE%game" --savepath="%CONF%\saves" --themepath="%HERE%." --extrapath="%HERE%." %* samnmax
+"%HERE%scummvm.exe" --config="%CONF%\scummvm.ini" --logfile="%CONF%\scummvm.log" --path="%HERE%game" --savepath="%CONF%\saves" --themepath="%HERE%." --extrapath="%HERE%." --music-driver=mt32 %* samnmax
 if errorlevel 1 (
 	echo.
 	echo Spillet stoppet med feilkode %errorlevel%. Loggen: %CONF%\scummvm.log

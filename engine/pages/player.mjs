@@ -196,6 +196,8 @@ async function launch(source, rows) {
     for (const [key, value] of query) if (/^DIGHD_(TEST_[A-Z0-9_]+|SKIP_VIDEO|TEXT|VERIFY|BENCH)$/.test(key)) env[key] = value;
     const args = ['--path=/data/games/samnmax', '--savepath=' + env.HOME, '--aspect-ratio', '--subtitles'];
     if (query.has('programvare') || !hasWebGL()) args.push('--gfx-mode=surfacesdl');
+    // The music: Roland MT-32 emulation with the ROMs from spilldata (or the chosen game folder)
+    if (rows.some(row => /\/MT32_CONTROL\.ROM$/.test(row.path)) && rows.some(row => /\/MT32_PCM\.ROM$/.test(row.path))) args.push('--music-driver=mt32');
     args.push('samnmax');
     history.replaceState(null, '', location.pathname + location.search + '#' + args.join(' '));
 
@@ -207,11 +209,8 @@ async function launch(source, rows) {
     }, true);
     // ScummVM asks for Web MIDI when it loads (dists/emscripten/custom_shell-pre.js),
     // and the browser then asks the player for permission. This blocks that question.
-    // The Dig uses digital audio and has no use for MIDI. Sam & Max plays its music
-    // as MIDI (iMUSE): with Web MIDI blocked, ScummVM finds no Web MIDI output and
-    // falls back to another music device, probably its AdLib emulation
-    // (audio/mididrv.cpp). Not tested in the browser. Remove this to let the
-    // browser offer MIDI devices.
+    // Sam & Max plays its music as MIDI (iMUSE), here through the MT-32 emulation
+    // in the engine (--music-driver=mt32), so Web MIDI is not needed.
     Object.defineProperty(navigator, 'requestMIDIAccess', {configurable: true, value: () => new Promise(() => {})});
     window.Module = {
       canvas,

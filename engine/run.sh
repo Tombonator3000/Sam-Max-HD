@@ -25,4 +25,7 @@ if [ "$MOD" != "ingen" ]; then
 	[ -d "$ROOT/mods/$MOD" ] || { echo "Fant ikke mods/$MOD. Lag den med: smhd build-mod --name $MOD (eller bruk engine/run.sh ingen)"; exit 1; }
 	export DIGHD_MOD="$ROOT/mods/$MOD"
 fi
-exec "$SRC/scummvm" --path="$ROOT/game" --gfx-mode=opengl --aspect-ratio "$@" samnmax
+# Musikken: Roland MT-32-emulering når ROM-filene ligger i game/ (fra spilldata), ellers ScummVM sitt valg
+MUSIKK=()
+[ -f "$ROOT/game/MT32_CONTROL.ROM" ] && [ -f "$ROOT/game/MT32_PCM.ROM" ] && MUSIKK=(--music-driver=mt32)
+exec "$SRC/scummvm" --path="$ROOT/game" --gfx-mode=opengl --aspect-ratio "${MUSIKK[@]}" "$@" samnmax

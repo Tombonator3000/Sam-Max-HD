@@ -6,7 +6,7 @@ Planen er den samme som for The Dig: en nettside som går rett inn i spillet, p�
 
 | Del | Status |
 | --- | --- |
-| Nettsiderepoet `Tombonator3000/Sam-Max-HD-Web` | Finnes (14. oktober). Arbeidsflyten `.github/workflows/pages.yml` der bygger motoren fra dette repoet og publiserer på https://tombonator3000.github.io/Sam-Max-HD-Web/ |
+| Nettsiderepoet `Tombonator3000/Sam-Max-HD-Web` | Publisert 14. oktober. Testet i Chromium uten skjerm (Playwright, SwiftShader): siden startet uten nøkkel, hentet spillet og HD-modden fra repoet, og viste kontoret med HD (`?DIGHD_TEST_ROOM=7`). Ikke testet på mobil eller med lyd. Arbeidsflyten `.github/workflows/pages.yml` der bygger motoren fra dette repoet og publiserer på https://tombonator3000.github.io/Sam-Max-HD-Web/ |
 | Nettsidekoden i `engine/pages` | Tilpasset Sam & Max. Ikke bygget og ikke testet i nettleser |
 | Motoren for nettleseren (`engine/build-web.sh`, `engine/build-pages.py`) | Bygges i Actions i web-repoet. I Claude sin sandkasse stopper proxyen nedlastingen av SDL3 fra GitHub-arkivet |
 | HD-grafikk | Motoren har HD for rom, objekter og figurer i Sam & Max, men det finnes ingen HD-mod i `hd-mod` ennå |
@@ -47,7 +47,7 @@ Spillfilene:
 | `SAMNMAX.000` | 9 080 byte | Indeksen |
 | `SAMNMAX.001` | 13 790 685 byte | Spillet, med musikken (MIDI) |
 | `MONSTER.SOU` | 183 195 967 byte | Talen. Ligger i `spilldata` i to deler (`MONSTER.SOU.001` og `.002`), og siden setter dem sammen i nettleseren |
-| `MT32_CONTROL.ROM`, `MT32_PCM.ROM` | 65 536 og 524 288 byte | Valgfrie. `engine/build.sh` og `engine/build-web.sh` bygger nå motoren med `--disable-mt32emu`, så de brukes ikke |
+| `MT32_CONTROL.ROM`, `MT32_PCM.ROM` | 65 536 og 524 288 byte | Musikken: motoren bygges med `--enable-mt32emu` (14. oktober), og siden starter med `--music-driver=mt32` når ROM-filene er med |
 
 Ikke målt: hvor mye som lastes ned før spillet kan vise noe, hvor mye minne siden bruker med talen, og om musikken spilles i nettleseren.
 

@@ -42,6 +42,8 @@ echo "Kopierer motoren, spillet, talen og HD-modden ..."
 install -m 755 "$SRC/scummvm" "$APPDIR/usr/bin/scummvm"
 strip "$APPDIR/usr/bin/scummvm" 2>/dev/null || true
 cp "$ROOT/game/SAMNMAX.000" "$ROOT/game/SAMNMAX.001" "$ROOT/game/MONSTER.SOU" "$DATA/game/"
+# Roland MT-32-ROM-ene til musikken (MT-32-emulering)
+cp "$ROOT/game/MT32_CONTROL.ROM" "$ROOT/game/MT32_PCM.ROM" "$DATA/game/" 2>/dev/null || echo "Merk: MT-32-ROM-ene mangler; musikken blir AdLib."
 if [ "$MED_MOD" = 1 ]; then
 	cp -r "$ROOT/mods/gpt" "$DATA/mods/gpt"
 	rm -f "$DATA/mods/gpt/README.md"
@@ -98,8 +100,10 @@ INI
 fi
 [ -d "$DATA/mods/gpt" ] && export DIGHD_MOD="${DIGHD_MOD:-$DATA/mods/gpt}"
 export LD_LIBRARY_PATH="$HERE/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+MUSIKK=""
+[ -f "$DATA/game/MT32_PCM.ROM" ] && MUSIKK="--music-driver=mt32"
 exec "$HERE/usr/bin/scummvm" --config="$CONF/scummvm.ini" --path="$DATA/game" --savepath="$SAVES" \
-	--themepath="$DATA" --extrapath="$DATA" "$@" samnmax
+	--themepath="$DATA" --extrapath="$DATA" $MUSIKK "$@" samnmax
 EOF
 chmod 755 "$OUT/AppRun"
 

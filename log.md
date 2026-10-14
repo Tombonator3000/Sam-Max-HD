@@ -207,3 +207,15 @@ Tom: Windows-pakken starter ikke (startfila lukker seg, kanskje jobb-PC), lag en
 - Windows: startfilene kjører nå ScummVM direkte (ikke `start`), skriver loggen til %APPDATA%\SamMaxHD\scummvm.log og blir stående med feilkoden hvis spillet stopper. Utviklerstarten og romlisten er med i pakken (Windows-bygget på grenen var grønt).
 - Nettsiden: koden i `engine/pages` henter nå fra det offentlige repoet uten nøkkel (fillister fra API-et, filer fra raw.githubusercontent.com) og ber om nøkkel bare når GitHub begrenser. Ny test; `node --test` 17 bestått.
 - Sam-Max-HD-Web: arbeidsflyt som sjekker ut Sam-Max-HD, bygger med `engine/build-web.sh` og `engine/build-pages.py`, sjekker at ingen spillfiler er med, og publiserer på Pages fra main. Lokalt bygg stoppet: proxyen i sandkassen gir 403 på SDL3-arkivet fra GitHub.
+
+## 2026-10-14 10:10 (Claude)
+
+- PR 15 (Sam-Max-HD) og PR 1 (Sam-Max-HD-Web) flettet av Tom. Arbeidsflyten i web-repoet bygde motoren fra main og publiserte siden på https://tombonator3000.github.io/Sam-Max-HD-Web/.
+- Testet siden i Chromium uten skjerm (Playwright med SwiftShader) med `?DIGHD_TEST_ROOM=7`: ingen nøkkel trengtes, spillfilene og HD-modden ble hentet fra repoet, talen lastet ned med fremdriftslinje, DigHD startet (1280 x 800) og kontoret vises med HD-bakgrunn, HD-figurer og inventaret. Ikke testet: lyd, mobil, en hel spilløkt.
+## 2026-10-14 10:35 (Claude)
+
+Tom: legg inn MT-32.
+
+- `engine/build.sh` og `engine/build-web.sh` bygger med `--enable-mt32emu`. `engine/build.sh` lagrer valgene i `.dighd-valg` og konfigurerer på nytt når de endres, så `./spill.sh` får MT-32 uten `RECONFIGURE=1`.
+- `engine/run.sh` (og dermed `./spill.sh`) velger `--music-driver=mt32` når ROM-filene ligger i `game/`. Linux-pakken og Windows-pakken tar med MT32_CONTROL.ROM og MT32_PCM.ROM, AppRun og startfilene velger MT-32, og nettsiden velger MT-32 når ROM-filene er med i spilldata. Windows-testen i Actions bruker nå MT-32 i stedet for AdLib.
+- Testet her: motoren bygget med `USE_MT32EMU`, spillet startet med `--music-driver=mt32` uten lydkort, ROM-ene ble funnet («Falling back to MT32»: MT-32-ROM-ene, ikke CM-32L), 1500 bilder, avsluttet normalt. Lyden er ikke hørt.

@@ -64,17 +64,15 @@ if [ ! -f config.mk ] || [ "${RECONFIGURE:-0}" = "1" ]; then
 	# Emscripten slår av valgfrie biblioteker som ikke er slått på; DigHD trenger PNG og zlib.
 	# Sam & Max (SCUMM v6) trenger ikke scumm-7-8, men dighd.cpp bruker ScummEngine_v7 uten
 	# #ifdef, og scumm_v7.h er tom uten ENABLE_SCUMM_7_8. Valget står derfor som før.
-	# Valgene er ellers de samme som for The Dig, som ikke bruker MIDI. For Sam & Max, som har
-	# MIDI-musikk, er de ikke vurdert eller testet: --disable-mt32emu betyr at MT32_CONTROL.ROM
-	# og MT32_PCM.ROM ikke brukes, og --disable-fluidsynth at FluidSynth (General MIDI) ikke er
-	# med. Nettsidene stopper i tillegg Web MIDI (requestMIDIAccess), så musikken faller trolig
-	# tilbake til AdLib-emuleringen. Vurder --enable-mt32emu når musikken skal testes.
+	# Sam & Max har MIDI-musikk (ingen CD-lydspor). --enable-mt32emu gir Roland MT-32-emulering
+	# med MT32_CONTROL.ROM og MT32_PCM.ROM fra spilldata (Tom 14. oktober). FluidSynth (General
+	# MIDI) er ikke med. Nettsidene stopper Web MIDI (requestMIDIAccess) og ber om MT-32.
 	emconfigure ./configure --host=wasm32-unknown-emscripten --build=wasm32-unknown-emscripten \
 		--disable-all-engines --enable-engine=scumm,scumm-7-8 \
 		--disable-engine=he,rebel2-psx --disable-detection-full \
 		--disable-debug --enable-optimizations \
 		--enable-png --enable-zlib \
-		--disable-mt32emu --disable-fluidsynth --disable-cloud --disable-libcurl \
+		--enable-mt32emu --disable-fluidsynth --disable-cloud --disable-libcurl \
 		--disable-sdlnet --disable-tts --disable-eventrecorder > configure.log 2>&1 \
 		|| { tail -30 configure.log; echo "Konfigureringen feilet, se $SRC/configure.log"; exit 1; }
 	rm -f scummvm-conf.*
