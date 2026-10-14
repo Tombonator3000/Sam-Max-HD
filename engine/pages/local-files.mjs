@@ -1,19 +1,18 @@
 // The game and the HD pack never come from this site. They are read from the
-// game repository on GitHub with the owner's own read-only key, or from folders
-// on this machine, and kept in IndexedDB. Only the ScummVM engine is downloaded
-// from the site.
+// game repository on GitHub (public: without a key from raw.githubusercontent.com,
+// or with the owner's own read-only key through the API), or from folders on this
+// machine, and kept in IndexedDB. Only the ScummVM engine is downloaded from the site.
 export const GAME_ROOT = '/data/games/samnmax/';
 export const MOD_ROOT = '/data/mods/gpt/';
 
-// The game repository and the branches the files come from. The branch hd-mod
-// does not exist yet for Sam & Max. Until it does, list() fails on it and the
-// page cannot start from the repository (not tested against GitHub).
+// The game repository and the branches the files come from.
 export const REPO = 'Tombonator3000/Sam-Max-HD';
 export const SOURCES = [
   {branch: 'spilldata', prefix: 'game/', kind: 'game'},
   {branch: 'hd-mod', prefix: '', kind: 'mod'}
 ];
 const API = 'https://api.github.com/repos/' + REPO + '/';
+const RAW = 'https://raw.githubusercontent.com/' + REPO + '/';
 
 export function selectFiles(files, kind) {
   const root = kind === 'game' ? GAME_ROOT : MOD_ROOT;
@@ -79,7 +78,7 @@ export function makeIndexes(rows, staticRoot = {}) {
 // MONSTER.SOU.001, MONSTER.SOU.002 and so on; they become one row with the parts
 // in order. A part number comes after the file's own extension, so SAMNMAX.000
 // and SAMNMAX.001 stay two files.
-export function treeRows(tree, prefix, kind) {
+export function treeRows(tree, prefix, kind, branch = '') {
   const files = new Map();
   for (const item of tree) {
     if (item.type !== 'blob' || !item.path.startsWith(prefix)) continue;
@@ -87,13 +86,14 @@ export function treeRows(tree, prefix, kind) {
     const relative = part ? part[1] : item.path.slice(prefix.length);
     const file = files.get(relative) || {name: relative.split('/').at(-1), webkitRelativePath: 'repo/' + relative, size: 0, parts: []};
     file.size += item.size;
-    file.parts.push({n: part ? Number(part[2]) : 0, sha: item.sha, size: item.size});
+    file.parts.push({n: part ? Number(part[2]) : 0, sha: item.sha, size: item.size, raw: branch ? branch + '/' + item.path : undefined});
     files.set(relative, file);
   }
   return selectFiles([...files.values()], kind).map(row => {
     const parts = row.blob.parts.sort((a, b) => a.n - b.n);
     const out = {path: row.path, size: row.size, sha: parts.map(p => p.sha).join('+')};
-    if (parts.length > 1) out.parts = parts.map(({sha, size}) => ({sha, size}));
+    if (parts.length > 1) out.parts = parts.map(({sha, size, raw}) => (raw ? {sha, size, raw} : {sha, size}));
+    else if (parts[0].raw) out.raw = parts[0].raw;
     return out;
   });
 }
@@ -152,8 +152,12 @@ export class RemoteSource {
     this.rows = new Map();
   }
 
+  // Without a key the repository is read as a public one: the file lists from the
+  // API (two requests), the files themselves from raw.githubusercontent.com.
   api(path, accept, cache = 'default') {
-    return this.fetch(API + path, {headers: {Authorization: 'Bearer ' + this.token, Accept: accept}, cache});
+    const headers = {Accept: accept};
+    if (this.token) headers.Authorization = 'Bearer ' + this.token;
+    return this.fetch(API + path, {headers, cache});
   }
 
   // Runs attempt() until it works. Network errors, 5xx, 429 and rate limits are
@@ -182,6 +186,14 @@ export class RemoteSource {
     throw error;
   }
 
+  async getRaw(raw) {
+    const response = await this.fetch(RAW + raw.split('/').map(encodeURIComponent).join('/'));
+    if (response.ok) return response;
+    const error = apiError(response.status);
+    error.retryAfter = Number(response.headers.get('retry-after')) || 0;
+    throw error;
+  }
+
   // The file lists of both branches. Offline, the last list is used.
   async list() {
     let rows = [];
@@ -190,7 +202,7 @@ export class RemoteSource {
         const data = await this.retry(async () =>
           (await this.get('git/trees/' + source.branch + '?recursive=1', 'application/vnd.github+json', 'no-store')).json(), 3);
         if (data.truncated) throw new Error('Fillisten fra GitHub ble avkortet.');
-        rows.push(...treeRows(data.tree, source.prefix, source.kind));
+        rows.push(...treeRows(data.tree, source.prefix, source.kind, source.branch));
       }
       await this.library.setMeta('listing', rows);
     } catch (error) {
@@ -206,7 +218,7 @@ export class RemoteSource {
     const row = this.rows.get(path);
     if (!row) return undefined;
     const name = path.split('/').at(-1);
-    const parts = row.parts || [{sha: row.sha, size: row.size}];
+    const parts = row.parts || [{sha: row.sha, size: row.size, raw: row.raw}];
     const blobs = [];
     let before = 0;
     for (const part of parts) {
@@ -217,12 +229,12 @@ export class RemoteSource {
   }
 
   // One git blob, from the browser if it is there, else from GitHub
-  async blob({sha, size}, name, before, total) {
+  async blob({sha, size, raw}, name, before, total) {
     const cached = await this.library.getBlob(sha);
     if (cached) return cached;
     const progress = this.progress && ((done) => this.progress(name, before + done, total));
     const blob = await this.retry(async () => {
-      const response = await this.get('git/blobs/' + sha, 'application/vnd.github.raw+json');
+      const response = !this.token && raw ? await this.getRaw(raw) : await this.get('git/blobs/' + sha, 'application/vnd.github.raw+json');
       const body = await readBody(response, size, progress && total >= 4 * 1048576 ? progress : null);
       // A connection that breaks off can give a short body without an error
       if (body.size !== size) throw new TypeError('Filen kom ikke helt fram.');

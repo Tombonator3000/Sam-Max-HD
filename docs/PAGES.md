@@ -6,9 +6,9 @@ Planen er den samme som for The Dig: en nettside som går rett inn i spillet, p�
 
 | Del | Status |
 | --- | --- |
-| Nettsiderepoet `Tombonator3000/Sam-Max-HD-Web` | Finnes ikke ennå |
+| Nettsiderepoet `Tombonator3000/Sam-Max-HD-Web` | Finnes (14. oktober). Arbeidsflyten `.github/workflows/pages.yml` der bygger motoren fra dette repoet og publiserer på https://tombonator3000.github.io/Sam-Max-HD-Web/ |
 | Nettsidekoden i `engine/pages` | Tilpasset Sam & Max. Ikke bygget og ikke testet i nettleser |
-| Motoren for nettleseren (`engine/build-web.sh`, `engine/build-pages.py`) | Ikke bygget for Sam & Max |
+| Motoren for nettleseren (`engine/build-web.sh`, `engine/build-pages.py`) | Bygges i Actions i web-repoet. I Claude sin sandkasse stopper proxyen nedlastingen av SDL3 fra GitHub-arkivet |
 | HD-grafikk | Motoren har HD for rom, objekter og figurer i Sam & Max, men det finnes ingen HD-mod i `hd-mod` ennå |
 
 Alt under beskriver hvordan siden skal virke, etter The Dig sin nettside. Ingenting av det er prøvd med Sam & Max.
@@ -30,7 +30,7 @@ Alt under beskriver hvordan siden skal virke, etter The Dig sin nettside. Ingent
 
 Siden går rett inn i spillet, som originalen. Det er ingen knapper eller menyer rundt spillet. Grafikkvalget skal ligge i spillets egen meny.
 
-Første gang ber siden om en lesenøkkel til repoet `Tombonator3000/Sam-Max-HD`, der spillet (grenen `spilldata`) og HD-pakken (grenen `hd-mod`) ligger. Nøkkelen lages på https://github.com/settings/personal-access-tokens/new:
+Sam-Max-HD er offentlig, så siden henter spillet (grenen `spilldata`) og HD-pakken (grenen `hd-mod`) uten nøkkel: fillistene fra api.github.com og filene fra raw.githubusercontent.com (14. oktober). Uten nøkkel tillater GitHub 60 API-forespørsler i timen per adresse; siden bruker to per start. Blir grensen nådd, ber siden om en lesenøkkel, som lages på https://github.com/settings/personal-access-tokens/new:
 
 - Repository access: Only select repositories, Sam-Max-HD
 - Permissions: Contents, Read-only

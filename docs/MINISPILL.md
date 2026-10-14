@@ -8,7 +8,7 @@ Sam & Max har ingen SMUSH-filmer. Alle mellomsekvensene er vanlige rom med kosty
 
 | Operasjon (antall i skriptene) | Hva motoren gjør | HD |
 | --- | --- | --- |
-| `drawBox` (86) | Fyller et rektangel med én palettfarge | Originalpiksler skalert opp. Flate felt ser like ut i 4x. I Car Bomb (rom 66) tegnes skipsmerkene piksel for piksel med `drawBox` (skript 207); de forblir blokkete, for det finnes ikke noe bilde å bytte ut |
+| `drawBox` (86) | Fyller et rektangel med én palettfarge | Originalpiksler skalert opp. Flate felt ser like ut i 4x. I Car Bomb (rom 66) tegnes skipsmerkene piksel for piksel med `drawBox` (skript 207). Fra 14. oktober (Toms ja til skriptnivå) kjenner `o6_drawBox` igjen den første boksen på 14 x 9 i skript 207; når skjermen bygges, leses merket ut av bufferen og tegnes som en glyf med xBR, så det blir glatt. Testet med `DIGHD_TEST_SCRIPT` i rom 66: 0 piksler ikke bygget på nytt |
 | `superBlastObject` (31) | Blast-objekter: inventaret, veibitene i Highway Surfing, Car Bomb, snøkulen | HD (testet i rom 68, 10. oktober) |
 | `setActorShadowMode` / `setupShadowPalette` (14 + 14), `actorOps.setShadowMode` (7) | Figurpiksler tegnes gjennom skyggetabellen: skyggene under figurene (farge 13) og hele aktører med modus 0x20 (lyskjegler og lysstråler) | HD fra 14. oktober: pikselen bygges fra HD-bakgrunnen og tones med fargeforholdet, som blast-skyggene. Testet i rom 16 (lyskjeglen på gulvet og lysstrålen fra døren) |
 | `shiftShadowPalette` (4) | Endrer skyggetabellen underveis | Følger med, fordi tabellen leses når skjermen bygges |
@@ -17,7 +17,7 @@ Sam & Max har ingen SMUSH-filmer. Alle mellomsekvensene er vanlige rom med kosty
 | `colorCycleDelay` (7) | Fargesykling | Glatt fargekart, som i The Dig |
 | `screenEffect` (26) | Overganger mellom rom | Går gjennom `drawStripToScreen` som alt annet. Ikke sett på hver for seg |
 | `shakeOn` (7) | Risting av skjermen | Ristingen skaleres med HD-skalaen (`gfx.cpp`) |
-| `noirMode` (2) | Skjult svart-hvitt-modus (tast b, skript 64). ScummVM gjør paletten grå når den lastes opp | Ikke testet: tastaturskriptet kjører ikke etter testhoppet. HD tones per fargekanal mot den grå paletten, så farger som skiller seg fra originalen kan skinne igjennom |
+| `noirMode` (2) | Skjult svart-hvitt-modus (tast b, skript 64). ScummVM gjør paletten grå når den lastes opp | Fra 14. oktober: DigHD får fargepaletten og gjør hele HD-bildet grått i siste steg (snittet av de tre kanalene, som ScummVM). Testet: introen hoppet over med Esc, tast b i kontoret slår noir på og av («DigHD: film noir on/off»), bildet er grått |
 | `clearCharsetMask` (3) | Tømmer tekstlaget | `_textV6` sammenligner verdiene, så borte tekst gir ikke HD-glyfer |
 
 ## Minispill og mellomsekvenser per rom
@@ -46,6 +46,4 @@ Sam & Max har ingen SMUSH-filmer. Alle mellomsekvensene er vanlige rom med kosty
 
 ## Det som gjenstår
 
-- Car Bomb-merkene blir blokkete. Skal de få HD, må skriptets `drawBox`-mønster kjennes igjen i motoren og byttes med et bilde. Det er skriptnivå (nivå 3 hos Double Fine) og trenger Toms ja.
-- Noir-modusen må testes med et lagret spill der tastaturskriptet kjører.
 - Overgangene (`screenEffect`) er ikke sett på hver for seg.

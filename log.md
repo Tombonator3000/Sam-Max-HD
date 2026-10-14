@@ -185,3 +185,25 @@ Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
 - HD-modden publisert på nytt med skriftrettingene (font 5 uten HD-skrift, skrå apostrof): hd-mod 5797a4b.
 - Ikke testet her: ingen Windows eller MinGW i sandkassen. Første test er kjøringen i Actions.
 - Windows-arbeidsflyten testet på grenen. Kjøring 1: bygg og pakke ok, testen fant ingen grafikkmodus (OpenGL uten skjerm). Kjøring 2: spillet startet med HD-modden, men stoppet på «IMuse initialization - Device not available» (ingen MIDI på maskinen). Kjøring 3 (38523014097) grønn med `--gfx-mode=surfacesdl` og `--music-driver=adlib` i testen. PR 14 mot main; releasen lages når den er flettet.
+
+## 2026-10-14 09:15 (Claude)
+
+- PR 14 flettet av Tom. Arbeidsflyten Windows-pakke kjørte fra main (38525134743, grønn) og publiserte release «Sam & Max HD for Windows»: SamMaxHD-Windows.zip (426 MB) med sjekksum.
+
+## 2026-10-14 09:30 (Claude)
+
+Tom: ja til Car Bomb på skriptnivå, implementer noir, lag en utviklermodus for å hoppe til områder.
+
+- Car Bomb: `o6_drawBox` kjenner igjen den første boksen (14 x 9) i lokalt skript 207 i rom 66 og melder merket til DigHD (`noteBoxMarker`). Når skjermen bygges, leses merket ut av bufferen og tegnes som en glyf med xBR. Testet med den nye testkroken `DIGHD_TEST_SCRIPT` (fem merker i rom 66): glatte merker, 0 piksler ikke bygget på nytt.
+- Noir: `updatePalette` gir DigHD fargepaletten og slår noir av og på (`setNoir`); DigHD gjør HD-bildet grått i `writeRect` og i dumpene, med samme snitt som ScummVM. Testet: introen hoppet over med Esc, tasten b i kontoret ved bilde 4400 og 5200 slår noir på og av, og bildet er grått.
+- Utviklermodus: ingen romhopp i spillet selv (skript 64 har bare noir, versjon, minne og «dummy verb mode»). Laget «Sam og Max HD - utvikler.bat» i Windows-pakken (hopp til rom med romliste, last lagret spill, vindu), `tools/romtest.py --lagret MAPPE` (kjører hvert lagrede spill med `--save-slot`, rommet leses fra loggen) og `DIGHD_TEST_SCRIPT`. Testet romtest `--lagret` med et autolagret spill i kontoret: rom 7 ok med HD-bakgrunn, 0 avvik.
+- `engine/test.sh` 0 avvik, patchen passer mot ren ScummVM. Dokumentert i SPILLTEST, HD-MOTOR og MINISPILL.
+
+## 2026-10-14 10:00 (Claude)
+
+Tom: Windows-pakken starter ikke (startfila lukker seg, kanskje jobb-PC), lag en nettløsning i Sam-Max-HD-Web, og er CD-musikken med?
+
+- CD-musikken: Sam & Max CD har ingen CD-lydspor. ScummVM setter ikke `GF_AUDIOTRACKS` for spillet (`detection_tables.h`: MDT_ADLIB, MDT_MIDI, foretrekker General MIDI). Musikken er iMuse-MIDI inne i SAMNMAX.001 og er med i alle pakkene; den spilles med AdLib-emulering eller MIDI. MT-32-emulering med ROM-filene fra spilldata er satt opp som todo.
+- Windows: startfilene kjører nå ScummVM direkte (ikke `start`), skriver loggen til %APPDATA%\SamMaxHD\scummvm.log og blir stående med feilkoden hvis spillet stopper. Utviklerstarten og romlisten er med i pakken (Windows-bygget på grenen var grønt).
+- Nettsiden: koden i `engine/pages` henter nå fra det offentlige repoet uten nøkkel (fillister fra API-et, filer fra raw.githubusercontent.com) og ber om nøkkel bare når GitHub begrenser. Ny test; `node --test` 17 bestått.
+- Sam-Max-HD-Web: arbeidsflyt som sjekker ut Sam-Max-HD, bygger med `engine/build-web.sh` og `engine/build-pages.py`, sjekker at ingen spillfiler er med, og publiserer på Pages fra main. Lokalt bygg stoppet: proxyen i sandkassen gir 403 på SDL3-arkivet fra GitHub.

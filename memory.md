@@ -77,5 +77,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - I Sam & Max (v6) tegnes tekst i hovedskjermen i tekstlaget `_textSurface`, i skjermkoordinater. DigHD har et eget lag for det (`_textV6`). Tekst med `ignoreCharsetMask` (menyen) går til bufferen og `_textMain` som i The Dig.
 - Lyskjeglene og skyggene under figurene i Sam & Max er kostymepiksler tegnet gjennom skyggetabellen. DigHD bygger dem fra HD-bakgrunnen og toner dem (14. oktober). Oversikt over det motoren tegner selv: `docs/MINISPILL.md`.
 - Releasene (Linux og Windows) har spillet og HD-grafikken med, etter Toms beslutning 14. oktober. Windows-pakken bygges i MSYS2 (`.github/workflows/windows.yml`, `tools/pakke_windows.sh`) og startes med «Sam og Max HD.bat»; innstillinger og lagrede spill i %APPDATA%\SamMaxHD.
+- Utviklermodus (14. oktober): «Sam og Max HD - utvikler.bat» i Windows-pakken, `./spill.sh --rom N` eller `--save-slot=N`, `tools/romtest.py --lagret MAPPE` for lagrede spill, og `DIGHD_TEST_SCRIPT` for å starte skript i testene. Spillet selv har ingen romhopp.
 - Font 5 i Sam & Max er den pyntede fonten med bare store bokstaver. Den tegnes ikke med HD-skriften (Exo 2), bare skalert fra fontbildet.
 - Testene med klikk på HD Graphics lagrer `dighd_classic` i `~/.config/scummvm/scummvm.ini`. Sett den tilbake til false, ellers kjører senere tester uten HD.

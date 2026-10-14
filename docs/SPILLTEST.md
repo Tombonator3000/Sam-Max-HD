@@ -87,6 +87,14 @@ Når det finnes HD-grafikk:
 
 Hvilke rom som er best å se på, står i `STATUS.md` når de første HD-rommene finnes.
 
+## Utviklermodus: hopp til et område
+
+- Windows: start «Sam og Max HD - utvikler.bat» i pakken. Velg 1 for å hoppe til et rom (romlisten står i `rom-liste.txt`), 2 for å laste et lagret spill, 3 for vanlig start i vindu.
+- Linux og repoet: `./spill.sh --rom 22` hopper til rom 22. `./spill.sh --save-slot=3` laster lagret spill 3 (valget går rett til ScummVM).
+- Hoppet setter ikke spillet i vanlig tilstand: figurer kan mangle, og noen rom henger fordi skriptene mangler variabler. Et lagret spill fra en ekte gjennomspilling er riktig tilstand.
+- Lagre i hvert nytt område mens du spiller (F5, Save), med romnavnet i beskrivelsen. Lagrede spill ligger i `%APPDATA%\SamMaxHD\saves` (Windows). Send mappen til Claude, så kjører romtesten alle områdene fra dem: `tools/romtest.py --lagret MAPPE`.
+- ScummVM sin konsoll (Ctrl+Alt+D) har kommandoer som `room N`, men den hopper på samme måte som testhoppet.
+
 ## Uten skjerm: alle rom
 
 Krever at patchen er portet, og at `tools/romtest.py` starter Sam & Max. Ikke kjørt med Sam & Max.

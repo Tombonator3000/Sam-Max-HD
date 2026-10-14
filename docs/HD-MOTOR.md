@@ -79,6 +79,7 @@ Krokene ligger i DigHD og virker for Sam & Max. Alle er miljøvariabler. Kjør m
 | `DIGHD_BENCH`, `DIGHD_QUIT_AT` | Tidsmåling og avslutning etter N bilder | |
 | `DIGHD_TEST_ROOM`, `DIGHD_TEST_AT`, `DIGHD_TEST_CAMX`, `DIGHD_TEST_CAMY` | Hopper til et rom og setter kameraet | |
 | `DIGHD_TEST_KEYS`, `DIGHD_TEST_CLICKS` | Taster og klikk ved gitte bilder | |
+| `DIGHD_TEST_SCRIPT` | Starter et skript med argumenter ved et gitt bilde, `900:207:3/4/1` (lokalt skript 207 med 3, 4 og 1). For minispill og effekter som er vanskelige å nå | Lagt til 14. oktober |
 | `DIGHD_TEST_OBJSTATE`, `DIGHD_TEST_OBJSTATE_AT`, `DIGHD_TEST_OBJSTATE_EVERY` | Setter objekter i hver tilstand | |
 | `DIGHD_TEST_COSTUME`, `DIGHD_TEST_ACTOR`, `DIGHD_TEST_POS`, `DIGHD_TEST_PALETTE`, `DIGHD_TEST_CHORE_EVERY`, `DIGHD_TEST_WALK`, `DIGHD_TEST_CLIP` | Setter inn en skuespiller med et kostyme og spiller animasjonene, går eller klipper mot z-masken | For klassiske kostymer leses animasjonene fra COST-hodet (alle med en offset). Noen kostymer har animasjoner som peker utenfor kostymet (se `advarsler` i costumes.json) |
 | `DIGHD_SKIP_VIDEO` | Hopper over filmer | Ingen virkning, det er ingen SMUSH-filmer |

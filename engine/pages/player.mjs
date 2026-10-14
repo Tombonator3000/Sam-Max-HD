@@ -1,11 +1,10 @@
 import {LocalLibrary, RemoteSource, ApiError, makeIndexes, privateFetch, blobIds} from './local-files.mjs';
 import {attachTouch} from './touch.mjs';
 
-// The page goes straight into the game. Only the first time (no key and no
-// chosen folders) it asks for the read-only key to the game repository.
-// HD or original graphics is chosen in the game's own menu (F5) in The Dig.
-// In Sam & Max the HD patch gives HD rooms, objects and figures; text stays original
-// pixels, and the HD row in the game's menu is not there yet (Ctrl+H switches).
+// The page goes straight into the game. The game repository is public, so the
+// files are read without a key; a read-only key is asked for only when GitHub
+// limits requests without one. HD or original graphics: the row HD Graphics in
+// the game's own menu (F5), or Ctrl+H.
 
 const baseURL = new URL('./', location.href);
 const library = new LocalLibrary(baseURL.pathname);
@@ -124,7 +123,10 @@ async function startRemote(token) {
   try {
     rows = await source.list();
   } catch (error) {
-    if (error instanceof ApiError && [401, 403, 404].includes(error.status)) {
+    if (error instanceof ApiError && !token) {
+      // Without a key GitHub allows 60 requests an hour per address
+      showKey('GitHub begrenser henting uten nøkkel akkurat nå. Lim inn en lesenøkkel, eller prøv igjen om en time.');
+    } else if (error instanceof ApiError && [401, 403, 404].includes(error.status)) {
       await library.setMeta('token', undefined);
       showKey(error.message);
     } else {
@@ -262,8 +264,9 @@ try {
   // ?ny-nokkel asks for a new key
   const token = query.has('ny-nokkel') ? null : await library.getMeta('token');
   if (token) await startRemote(token);
-  else if (!query.has('ny-nokkel') && library.metadata.game && library.metadata.mod) await startLocal();
-  else showKey();
+  else if (query.has('ny-nokkel')) showKey();
+  else if (library.metadata.game && library.metadata.mod) await startLocal();
+  else await startRemote(null);
 } catch (error) {
   status('Kunne ikke starte: ' + error.message, true);
 }
