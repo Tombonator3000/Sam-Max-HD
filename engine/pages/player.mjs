@@ -1,4 +1,4 @@
-import {LocalLibrary, RemoteSource, ApiError, makeIndexes, privateFetch, blobIds} from './local-files.mjs';
+import {LocalLibrary, RemoteSource, ApiError, makeIndexes, privateFetch, blobIds, prefetch} from './local-files.mjs';
 import {attachTouch} from './touch.mjs';
 
 // The page goes straight into the game. The game repository is public, so the
@@ -14,6 +14,9 @@ const $ = id => document.getElementById(id);
 const canvas = $('canvas');
 const statusElement = $('status');
 let started = false;
+// Resolved when the engine has drawn its first HD screen
+let engineRunning;
+const engineStarted = new Promise(resolve => { engineRunning = resolve; });
 
 function status(text = '', error = false) {
   statusElement.textContent = text;
@@ -142,6 +145,14 @@ async function startRemote(token) {
   await launch(source, withoutSound ? rows.filter(row => !/\/MONSTER\.SOU$/.test(row.path)) : rows);
   // Files an older HD pack had, are removed when the game has started
   setTimeout(() => library.pruneBlobs(blobIds(rows)).catch(() => {}), 30000);
+  // The rest of the HD pack comes in the background, so the game does not stop
+  // to wait for GitHub the first time it needs a figure or a room (?uten-forhenting: not)
+  if (!query.has('uten-forhenting')) {
+    engineStarted.then(() => new Promise(resolve => setTimeout(resolve, 5000)))
+      .then(() => prefetch(source, rows))
+      .then(count => console.log(`HD-pakken er i nettleseren (${count} filer)`))
+      .catch(() => {});
+  }
 }
 
 function startLocal() {
@@ -232,6 +243,7 @@ async function launch(source, rows) {
         // status line stays and the picture may be skewed until the window is
         // resized (Known Issues in dists/emscripten/README.md in ScummVM).
         if (/^DigHD: screen /.test(text)) {
+          engineRunning();
           setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
             if (!statusElement.classList.contains('error')) status();

@@ -259,6 +259,7 @@ def _build_costumes(extract: Path, out: Path, scale: int, method: str, costumes:
     Egne ruter (own/costumes, for eksempel figurruter fra ChatGPT) tas med for alle kostymer når
     størrelsen stemmer. For kostymene i `costumes` ({-1} er alle) skaleres resten av rutene
     automatisk. Andre kostymer får bare de egne rutene, og rutene uten HD-bilde vises som originalen.
+    I kostymer med myke ruter får rutene uten HD-bilde bare indeksbildet, og motoren glatter dem.
     """
     meta = json.loads((extract / "costumes.json").read_text())
     dest = out / "costumes"
@@ -305,9 +306,19 @@ def _build_costumes(extract: Path, out: Path, scale: int, method: str, costumes:
             hd.save(dest / f"{name}.png")
             shutil.copyfile(extract / "costumes" / f"{name}_idx.png", dest / f"{name}_idx.png")
             done.append(name)
+        n_glatt = 0
+        if n_soft:
+            # Ruter uten HD-bilde i et kostyme med myke ruter: bare indeksbildet tas med, og motoren
+            # lager en glatt utgave (xBR) så de ikke står som blokker ved siden av de malte rutene
+            for cel in info["cels"]:
+                name = f"costume{cid:03d}_{cel['cel']:03d}"
+                idx = extract / "costumes" / f"{name}_idx.png"
+                if idx.exists() and not (dest / f"{name}_idx.png").exists():
+                    shutil.copyfile(idx, dest / f"{name}_idx.png")
+                    n_glatt += 1
         if n_own or n_auto or n_soft:
-            print(f"  kostyme {cid:3d}: {len(info['cels'])} ruter, {n_own} egne, {n_soft} myke og "
-                  f"{n_auto} skalert automatisk")
+            print(f"  kostyme {cid:3d}: {len(info['cels'])} ruter, {n_own} egne, {n_soft} myke, "
+                  f"{n_auto} skalert automatisk og {n_glatt} glattet i motoren")
     return done
 
 

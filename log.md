@@ -219,3 +219,13 @@ Tom: legg inn MT-32.
 - `engine/build.sh` og `engine/build-web.sh` bygger med `--enable-mt32emu`. `engine/build.sh` lagrer valgene i `.dighd-valg` og konfigurerer på nytt når de endres, så `./spill.sh` får MT-32 uten `RECONFIGURE=1`.
 - `engine/run.sh` (og dermed `./spill.sh`) velger `--music-driver=mt32` når ROM-filene ligger i `game/`. Linux-pakken og Windows-pakken tar med MT32_CONTROL.ROM og MT32_PCM.ROM, AppRun og startfilene velger MT-32, og nettsiden velger MT-32 når ROM-filene er med i spilldata. Windows-testen i Actions bruker nå MT-32 i stedet for AdLib.
 - Testet her: motoren bygget med `USE_MT32EMU`, spillet startet med `--music-driver=mt32` uten lydkort, ROM-ene ble funnet («Falling back to MT32»: MT-32-ROM-ene, ikke CM-32L), 1500 bilder, avsluttet normalt. Lyden er ikke hørt.
+
+## 2026-10-14 11:05 (Claude)
+
+Tom (skjermbilder av kontoret i HD og klassisk): 1 piksler rundt HD-figurene, 2 hakker innimellom, 3 MT-32 på nettsiden, 4 (kuttet av).
+
+- Punkt 1, årsak: figurene er skalert i rommet (Sam tegnes 36 x 44, originalruten er 40 x 52). ScummVM hopper over bestemte rader og kolonner etter en skalatabell og kan tegne én piksel utenfor rektangelet. `markCel` regnet med jevn skalering, så kantpikslene ble ikke merket som figurens og sto igjen som originalpiksler. Rettet med `nearCode` (kodene rundt punktet), én piksel ekstra rundt skalerte ruter, fargesjekk og at en piksel en annen rute eier, ikke tas. `softCelColour` gjør det samme for skyggesjekken under myke ruter.
+- Punkt 1, del to: Sams hender er en egen rute (kostyme 4, rute 256) som er holdt tilbake (ChatGPT tegnet én hånd, ruten har to). Ruter uten HD-bilde i kostymer med myke ruter får nå bare indeksbildet i modden, og motoren glatter dem (`smoothCel`: xBR på omrisset, Scale4x på fargene). `build-mod` tar med indeksbildene (ny test, 47 bestått); lagt inn 48 indeksbilder i mods/gpt.
+- Testet i rom 7: Max helt ren, Sam ren bortsett fra kanten mot stolen (z-masken i 4 x 4-blokker, kjent begrensning, lagt i todo). `DIGHD_VERIFY`: 0 piksler ikke bygget på nytt i 15 kontroller. `engine/test.sh` 0 avvik. Patchen passer mot ren ScummVM.
+- Punkt 2: på PC laster motoren raskt (rom 7 på 77 ms, ruter rundt 1 ms). På nettsiden ble hver fil hentet fra GitHub første gang spillet trengte den, og spillet ventet imens. Nettsiden henter nå hele HD-pakken i bakgrunnen fem sekunder etter start, figurrutene først (`prefetch`), og samme fil hentes bare én gang selv om spillet og bakgrunnshentingen ber om den samtidig. Ny test, `node --test` 18 bestått. Hele skjermen tar 14 til 22 ms å bygge her; nedtoninger kan bli tunge i nettleseren (todo).
+- Punkt 3 var gjort (nettsiden bygget med MT-32 08:30 UTC). Punkt 4 må Tom si hva var.

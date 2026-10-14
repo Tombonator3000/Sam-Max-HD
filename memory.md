@@ -82,3 +82,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Font 5 i Sam & Max er den pyntede fonten med bare store bokstaver. Den tegnes ikke med HD-skriften (Exo 2), bare skalert fra fontbildet.
 - Testene med klikk på HD Graphics lagrer `dighd_classic` i `~/.config/scummvm/scummvm.ini`. Sett den tilbake til false, ellers kjører senere tester uten HD.
 - Når en PR er flettet og grenen settes til ny main: ta med commits som kom etter PR-en (rebase på main), ikke `checkout -B origin/main` blindt. To logg-commits falt bort slik 14. oktober og ble lagt inn igjen.
+- Skalerte figurer (15. oktober): ScummVM skalerer klassiske kostymer med en skalatabell som hopper over bestemte rader og kolonner, og kan tegne én piksel utenfor rektangelet den oppgir. Kartlegging med `lx * idx.w / rw` treffer derfor feil kode i kantene. `markCel` og `softCelColour` ser på kodene rundt punktet (`nearCode`). Det var pikslene Tom så rundt Sam og Max.
+- Ruter uten HD-bilde i kostymer med myke ruter får bare `_idx.png` i modden, og motoren glatter dem (`smoothCel`, xBR og Scale4x). Sams hender er kostyme 4, rute 256 (to hender på én rute; ChatGPT tegnet én).
+- Nettsiden henter HD-pakken i bakgrunnen etter start (`prefetch` i `local-files.mjs`); uten det hentet spillet hver fil fra GitHub første gang og stoppet imens.

@@ -38,7 +38,7 @@ Sam-Max-HD er offentlig, så siden henter spillet (grenen `spilldata`) og HD-pak
 
 Nøkkelen lagres bare i nettleseren (IndexedDB). Alle Pages-sider under tombonator3000.github.io deler opprinnelse og dermed nettleserlagring, så nøkkelen skal bare ha lesetilgang til dette ene repoet.
 
-Filene hentes fra GitHub med nøkkelen når spillet trenger dem, og lagres i nettleseren etter git-blob-ID. Ved hver start hentes fillisten for de to grenene på nytt, så ny HD-grafikk i `hd-mod` kommer med av seg selv, og bare filene som er endret, hentes. Ingen spillfil eller HD-fil ligger på nettsiden eller sendes dit. Forespørslene går bare til api.github.com for repoet.
+Filene hentes fra GitHub med nøkkelen når spillet trenger dem, og lagres i nettleseren etter git-blob-ID. Ved hver start hentes fillisten for de to grenene på nytt, så ny HD-grafikk i `hd-mod` kommer med av seg selv, og bare filene som er endret, hentes. Fem sekunder etter at spillet har startet, hentes resten av HD-pakken i bakgrunnen (to filer om gangen, figurrutene først, så objekter og rom), så spillet ikke stopper for å vente på GitHub første gang det trenger en figurrute eller et rom. Det var det som ga hakkingen innimellom (15. oktober). `?uten-forhenting` slår det av. Ingen spillfil eller HD-fil ligger på nettsiden eller sendes dit. Forespørslene går bare til api.github.com for repoet.
 
 Spillfilene:
 
@@ -58,7 +58,7 @@ Fra The Dig sin nettside, ventet å virke likt (ikke testet):
 - **Grafikk:** F5 åpner spillets meny, der raden HD Graphics skal velge HD eller originalgrafikk. Ctrl+H bytter også. Begge krever at patchen er portet.
 - **Mobil og nettbrett** (`engine/pages/touch.mjs`): trykk er klikk, dra flytter pekeren, hold fingeren i ro et halvt sekund for høyreklikk, to fingre åpner spillets meny (F5), tre fingre gir Esc. Første trykk gir fullskjerm.
 - **Nett:** mistes kontakten med GitHub mens spillet trenger en fil, venter spillet, og siden prøver igjen til filen er kommet. Bare en nøkkel GitHub avviser, stopper.
-- **Valg i adressen:** `?ny-nokkel` (be om ny nøkkel), `?programvare`, `?uten-lyd`, `?rom=N`, `?klassisk`, `?gult` og testkrokene fra motoren (`DIGHD_*`, se [HD-MOTOR.md](HD-MOTOR.md)). `?rom`, `?klassisk`, `?gult` og testkrokene virker ikke før patchen er portet.
+- **Valg i adressen:** `?ny-nokkel` (be om ny nøkkel), `?programvare`, `?uten-lyd`, `?uten-forhenting`, `?rom=N`, `?klassisk`, `?gult` og testkrokene fra motoren (`DIGHD_*`, se [HD-MOTOR.md](HD-MOTOR.md)). `?rom`, `?klassisk`, `?gult` og testkrokene virker ikke før patchen er portet.
 - **Uten nøkkel:** spillet kan kjøre fra mapper på maskinen (lenken under nøkkelfeltet): spillmappen med `SAMNMAX.000`, `SAMNMAX.001` og `MONSTER.SOU`, og HD-mappen (`mod.json`, `rooms`, vanligvis `mods/gpt`). Filene kopieres til nettleseren.
 - **Lagring:** lagrede spill og scummvm.ini ligger i nettleserens lagring (IDBFS) og blir der selv om spillfilene slettes. Nettlesere kan slette lokal lagring ved lite ledig plass, og privatmodus kan gjøre lagringen midlertidig.
 

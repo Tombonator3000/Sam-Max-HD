@@ -214,7 +214,8 @@ export class RemoteSource {
     return rows;
   }
 
-  async read(path) {
+  // quiet: no progress line (the background fetch, see prefetch())
+  async read(path, {quiet = false} = {}) {
     const row = this.rows.get(path);
     if (!row) return undefined;
     const name = path.split('/').at(-1);
@@ -222,17 +223,28 @@ export class RemoteSource {
     const blobs = [];
     let before = 0;
     for (const part of parts) {
-      blobs.push(await this.blob(part, name, before, row.size));
+      blobs.push(await this.blob(part, name, before, row.size, quiet));
       before += part.size;
     }
     return blobs.length === 1 ? blobs[0] : new Blob(blobs);
   }
 
-  // One git blob, from the browser if it is there, else from GitHub
-  async blob({sha, size, raw}, name, before, total) {
+  // One git blob, from the browser if it is there, else from GitHub. A blob that
+  // is on its way (the game and the background fetch want the same) is fetched once.
+  blob(part, name, before, total, quiet = false) {
+    this.pending ??= new Map();
+    let promise = this.pending.get(part.sha);
+    if (!promise) {
+      promise = this.fetchBlob(part, name, before, total, quiet).finally(() => this.pending.delete(part.sha));
+      this.pending.set(part.sha, promise);
+    }
+    return promise;
+  }
+
+  async fetchBlob({sha, size, raw}, name, before, total, quiet) {
     const cached = await this.library.getBlob(sha);
     if (cached) return cached;
-    const progress = this.progress && ((done) => this.progress(name, before + done, total));
+    const progress = !quiet && this.progress && ((done) => this.progress(name, before + done, total));
     const blob = await this.retry(async () => {
       const response = !this.token && raw ? await this.getRaw(raw) : await this.get('git/blobs/' + sha, 'application/vnd.github.raw+json');
       const body = await readBody(response, size, progress && total >= 4 * 1048576 ? progress : null);
@@ -243,6 +255,30 @@ export class RemoteSource {
     await this.library.putBlob(sha, blob);
     return blob;
   }
+}
+
+// Fetches the HD pack into the browser in the background while the game runs,
+// so the game does not wait for GitHub the first time it needs a figure cel, an
+// object or a room (it stopped for a moment each time, most in the middle of
+// animations). Figure cels first, then objects, rooms and the rest. Files that
+// are in the browser already cost one lookup. Returns the number of files read.
+export async function prefetch(source, rows, {workers = 2, stop = () => false} = {}) {
+  const rank = path => /\/costumes\//.test(path) ? 0 : /\/objects\//.test(path) ? 1 : /\/rooms\//.test(path) ? 2 : 3;
+  const queue = rows.filter(row => row.path.startsWith(MOD_ROOT))
+    .sort((a, b) => rank(a.path) - rank(b.path) || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+  let next = 0, read = 0;
+  const work = async () => {
+    while (next < queue.length && !stop()) {
+      const row = queue[next++];
+      try {
+        if (await source.read(row.path, {quiet: true})) read++;
+      } catch {
+        // The game asks for the file again when it needs it
+      }
+    }
+  };
+  await Promise.all(Array.from({length: workers}, work));
+  return read;
 }
 
 function requestResult(request) {
