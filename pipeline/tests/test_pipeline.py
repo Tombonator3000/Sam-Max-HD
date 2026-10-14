@@ -1567,6 +1567,24 @@ def test_soft_cel_override_sheet(tmp_path):
 
 # ---------------------------------------------------------------- Sam & Max: klargjøring av grafikken (13. oktober 2026)
 
+def test_deliveries_prefer_entry_matching_file(tmp_path):
+    # En rettet levering i en rapportmappe som sorteres før den gamle (bestilling058 < stilpilot)
+    # skal vinne når den stemmer med filen som ligger der.
+    import hashlib
+    import json
+    from smhd import myk
+    (tmp_path / "jobber" / "fig003_01").mkdir(parents=True)
+    png = tmp_path / "jobber" / "fig003_01" / "resultat.png"
+    Image.new("RGBA", (4, 4), (1, 2, 3, 255)).save(png)
+    sha = hashlib.sha256(png.read_bytes()).hexdigest()
+    for mappe, s in (("bestilling058", sha), ("stilpilot", "0" * 64)):
+        (tmp_path / "rapporter" / mappe).mkdir(parents=True)
+        (tmp_path / "rapporter" / mappe / "fremdrift.json").write_text(json.dumps(
+            {"leveranser": [{"jobb": "fig003_01", "resultat": "jobber/fig003_01/resultat.png", "sha256": s}]}))
+    got = myk.deliveries(tmp_path)
+    assert len(got) == 1 and got[0]["sha256"] == sha
+
+
 def test_soft_cel_size_spread(tmp_path):
     # En rute tegnet 20 prosent høyere enn resten av gruppen får status sjekk og storrelsesavvik
     import numpy as np

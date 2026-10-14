@@ -117,13 +117,23 @@ def _masked(rgba: np.ndarray, mask: np.ndarray) -> np.ndarray:
 
 def deliveries(gren: Path) -> list[dict]:
     """De leverte arkene i glatt stil: `leveranser` i rapporter/*/fremdrift.json på arbeidsgrenen.
-    Hver har jobb, resultat (stien til PNG-en) og sha256. Senere oppføringer for samme jobb vinner."""
-    out: dict[str, dict] = {}
+    Hver har jobb, resultat (stien til PNG-en) og sha256. Har en jobb flere oppføringer (rettet levering
+    i en senere rapport), vinner den som stemmer med filen som ligger der; ellers den siste. Rapportmappene
+    sorteres etter navn, ikke tid, så rekkefølgen alene sier ikke hvilken som er nyest."""
+    out: dict[str, list[dict]] = {}
     for f in sorted(gren.glob("rapporter/*/fremdrift.json")):
         for d in json.loads(f.read_text()).get("leveranser", []):
             if d.get("jobb") and d.get("resultat"):
-                out[d["jobb"]] = d
-    return list(out.values())
+                out.setdefault(d["jobb"], []).append(d)
+    valgt = []
+    for job, rows in out.items():
+        pick = rows[-1]
+        if len(rows) > 1:
+            src = gren / rows[-1]["resultat"]
+            sha = _sha(src) if src.exists() else None
+            pick = next((d for d in reversed(rows) if sha and d.get("sha256") == sha), rows[-1])
+        valgt.append(pick)
+    return valgt
 
 
 def _del_number(path: Path) -> tuple:

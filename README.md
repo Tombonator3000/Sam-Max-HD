@@ -16,7 +16,7 @@ Repoet er offentlig etter Toms valg. Spillfilene og alt som lages fra dem ligger
 | HD-motor | På for Sam & Max: rom, objekter, blast-objekter og figurer får HD fra modden. Testet med nearest-mod (0 avvik) og romtest i alle rom. Teksten og menyraden HD Graphics er ikke portet; Ctrl+H bytter ([docs/HD-MOTOR.md](docs/HD-MOTOR.md)) |
 | Uttrekk | `smhd extract` tar ut alt: 83 rombakgrunner, 959 objektbilder og 16 052 kostymeruter fra 348 kostymer, som PNG med metadata. Egne dekodere oversatt fra ScummVM |
 | Skript | Alle 1181 skript dekompilert med descumm (`tools/dekompiler_skript.py`), 1179 uten feil |
-| HD-grafikk | Alle jobbene til ChatGPT er klargjort: hovedark for Sam og Max, rom, objekter, ikoner og 1758 figurark med fast størrelse og egenkontroll ([docs/BESTILLING-CHATGPT.md](docs/BESTILLING-CHATGPT.md)). Stilpiloten først, ingen bilder laget ennå |
+| HD-grafikk | Første runde fra ChatGPT er i `hd-mod` (14. oktober): 76 rom, 841 objektbilder og 931 figurruter. Resten vises som originalen til det kommer ([docs/BESTILLING-CHATGPT.md](docs/BESTILLING-CHATGPT.md)) |
 | Spille | `./spill.sh` starter originalspillet. Linux-pakken er tilpasset, ikke bygget i Actions ennå. Nettsiden trenger eget repo |
 
 Detaljer: [STATUS.md](STATUS.md). Hva som gjenstår: [todo.md](todo.md).
