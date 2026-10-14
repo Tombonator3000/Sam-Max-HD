@@ -411,6 +411,18 @@ def mean3(a: np.ndarray) -> np.ndarray:
     return sum(p[dy:dy + h, dx:dx + w] for dy in range(3) for dx in range(3)) / 9
 
 
+def add_room_names(rooms_meta: dict) -> None:
+    """Uttrekket har ikke navn på rommene; de står i docs/rom-oversikt.csv."""
+    csv_path = Path(__file__).resolve().parent.parent / "docs" / "rom-oversikt.csv"
+    if not csv_path.exists():
+        return
+    with csv_path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            meta = rooms_meta.get(row.get("rom", ""))
+            if meta is not None and not meta.get("name"):
+                meta["name"] = row.get("navn", "")
+
+
 def components(mask: np.ndarray, weight: np.ndarray, min_area: int, limit: int) -> list[dict]:
     """Sammenhengende områder (8 naboer) i masken, sterkeste først (sum av vekten)."""
     h, w = mask.shape
@@ -564,8 +576,11 @@ def analyse(res: Result, out: Path, args, meta: dict) -> None:
 
     luma = lambda a: a[..., 0] * 0.299 + a[..., 1] * 0.587 + a[..., 2] * 0.114
     black = (luma(hd1) < 10) & (luma(fl1) > 40)
-    res.black_px = int(black.sum())
-    blacks = components(black, np.ones_like(diff), BLACK_MIN_AREA, CLOSEUPS_PER_KIND)
+    # Bare sammenhengende felt teller. Spredte piksler er tynne mørke streker grafikeren har tegnet
+    # en piksel ved siden av originalens, ikke hull i HD-bildet.
+    blacks = components(black, np.ones_like(diff), BLACK_MIN_AREA, 10**6)
+    res.black_px = sum(b["areal"] for b in blacks)
+    blacks = blacks[:CLOSEUPS_PER_KIND]
 
     # Figurer og ting som står foran bakgrunnen: originalpikslene som ikke er
     # originalbakgrunnen og ikke ligger i et objekt. Bare når paletten er den samme.
@@ -1302,6 +1317,7 @@ def main() -> int:
         print(f"Fant ikke {rooms_json}. Kjør smhd extract først.")
         return 1
     rooms_meta = json.loads(rooms_json.read_text())["rooms"]
+    add_room_names(rooms_meta)
     args.rooms_meta = rooms_meta
     all_rooms = sorted(int(k) for k in rooms_meta)
     rooms = parse_rooms(args.rom, all_rooms)

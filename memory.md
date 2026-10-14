@@ -73,3 +73,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Dynamisk lys (normalkart og luminansmaske) er planlagt etter stilpiloten: valgfritt for spilleren, ingen kastede skygger (Tom 13. oktober). Samme plan i Zak.
 - Deling (13. oktober 2026): Tom tillater at grafikk og annet fra spillet deles utenfor repoet til hans eget private bruk (egne enheter, private steder). Offentlige sider og pakker har fortsatt ingen spillgrafikk. Spillfilene og det som lages fra dem holdes fortsatt utenfor `main`.
 - Unntak (13. oktober 2026, Toms bevisste beslutning): lystesten på GitHub Pages har kontoret (rom 7) og hovedarkene til Sam og Max. Offentlig side; filene hentes fra `gpt-arbeid` inn i Pages-pakken av `pages.yml` og sjekkes ikke inn i `main`.
+- Figurruter med omriss for ulikt originalen (myk.py versjon 5) ligger i `work/gpt-ferdig/sjekk/costumes/` og kommer ikke i modden. De står øverst i ordren til de er tegnet på nytt (14. oktober).
+- I Sam & Max (v6) tegnes tekst i hovedskjermen i tekstlaget `_textSurface`, i skjermkoordinater. DigHD har et eget lag for det (`_textV6`). Tekst med `ignoreCharsetMask` (menyen) går til bufferen og `_textMain` som i The Dig.
+- Testene med klikk på HD Graphics lagrer `dighd_classic` i `~/.config/scummvm/scummvm.ini`. Sett den tilbake til false, ellers kjører senere tester uten HD.

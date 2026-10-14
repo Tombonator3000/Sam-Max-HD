@@ -1565,6 +1565,26 @@ def test_soft_cel_override_sheet(tmp_path):
     assert rep["kilde"] == "rettingsark" and rep["status"] == "ok" and rep["snitt_union"] > 0.9, rep
 
 
+def test_soft_cel_bad_outline_held_out_of_mod(tmp_path):
+    # Versjon 5: en rute med feil form på arket legges i sjekk/costumes/, ikke i costumes/, og en
+    # gammel fil i costumes/ fra før tas bort, så motoren viser originalen
+    import numpy as np
+    from smhd import myk
+
+    o = np.zeros((20, 12, 4), np.uint8)
+    o[2:18, 2:10] = (120, 120, 200, 255)
+    bad = np.zeros((40, 40, 4), np.uint8)
+    bad[2:12, 2:38] = (120, 120, 200, 255)
+    sheet, cels, boxes, ex = _soft_sheet_case(tmp_path, {"costume007_113": o}, {"costume007_113": bad})
+    out = tmp_path / "ut"
+    (out / "costumes").mkdir(parents=True)
+    Image.new("RGBA", (4, 4)).save(out / "costumes" / "costume007_113_hd.png")
+    rep = myk.import_sheet(sheet, cels, boxes, ex, out)["ruter"]["costume007_113"]
+    assert rep["status"] == "sjekk" and rep["i_modden"] is False, rep
+    assert rep["fil"] == "sjekk/costumes/costume007_113_hd.png" and (out / rep["fil"]).exists()
+    assert not (out / "costumes" / "costume007_113_hd.png").exists()
+
+
 # ---------------------------------------------------------------- Sam & Max: klargjøring av grafikken (13. oktober 2026)
 
 def test_deliveries_prefer_entry_matching_file(tmp_path):
@@ -1843,3 +1863,43 @@ def test_orders_in_style_pilot(tmp_path, monkeypatch):
     # Med stilankere er det vanlig drift
     normal = gpt.write_orders(work, batch=10, anchors=["room005.png"]).read_text()
     assert "## Gjør disse nå" in normal and "`lag005_01`" in normal
+
+
+def test_build_mod_objects_in_room_without_background(tmp_path):
+    import json
+    from smhd import modpack
+    ex = tmp_path / "ex"
+    (ex / "rooms").mkdir(parents=True)
+    (ex / "objects").mkdir()
+    obj = Image.new("RGBA", (6, 4), (200, 40, 40, 255))
+    obj.putpixel((0, 0), (0, 0, 0, 0))
+    obj.save(ex / "objects" / "obj825_01.png")
+    Image.new("P", (6, 4)).save(ex / "objects" / "obj825_01_idx.png")
+    rooms = {"81": {"name": "", "width": 0, "height": 200, "objects": [{"id": 825, "x": 232, "y": 136, "states": ["01"]}]}}
+    (ex / "rooms.json").write_text(json.dumps({"rooms": rooms}))
+    m = modpack.build_mod(ex, tmp_path / "mod", scale=4, method="nearest", rooms=None, text_font=False)
+    assert m["rooms"] == [] and m["objects"] == ["obj825_01"]
+    hd = Image.open(tmp_path / "mod" / "objects" / "obj825_01.png")
+    assert hd.size == (24, 16) and hd.mode == "RGBA"
+    assert hd.getpixel((1, 1))[3] == 0 and hd.getpixel((12, 8)) == (200, 40, 40, 255)
+    assert (tmp_path / "mod" / "objects" / "obj825_01_idx.png").exists()
+
+
+def test_orders_count_soft_figures_and_list_held_cels(tmp_path):
+    # Figurark i glatt stil tas inn med myke-figurer, ikke gpt-inn. Ordren teller derfra og ber om
+    # nye tegninger av rutene mottaket holdt utenfor modden.
+    import json
+    from smhd import gpt
+    work = tmp_path / "gpt"
+    (work / "jobber" / "fig091_05").mkdir(parents=True)
+    (work / "jobber" / "fig091_05" / "jobb.json").write_text(json.dumps(
+        {"type": "figur", "ruter": [{"bilde": "costume091_1963"}, {"bilde": "costume091_1964"}]}))
+    (work / "status.csv").write_text("jobb,type,rom,navn,del,status,kommentar\nfig091_05,figur,,,1/1,levert,\n")
+    soft = {"ruter_ok": 1, "ruter_sjekk": 1, "ark": {"fig091_05": {"ruter": {
+        "costume091_1963": {"status": "sjekk", "i_modden": False},
+        "costume091_1964": {"status": "ok", "i_modden": True}}}}}
+    text = gpt.write_orders(work, anchors=["stil.png"], soft=soft).read_text()
+    assert "Figurark: 1 av 1 tatt inn med figurmottaket. Ferdige figurruter: 1 av 2" in text
+    assert "- `fig091_05`: costume091_1963" in text and "costume091_1964" not in text.split("## Stilankere")[0]
+    plain = gpt.write_orders(work, anchors=["stil.png"]).read_text()
+    assert "Figurark: 0 av 1 godkjent" in plain and "holdt utenfor" not in plain

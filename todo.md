@@ -40,10 +40,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Blast-objekter (bildet som faktisk tegnes; testet i rom 68)
 - [x] Pekeren (`ScummEngine::updateCursor`), ikke sett på skjerm
 - [x] Ctrl+H bytter HD og klassisk
-- [ ] Tekst i `CharsetRendererClassic` (HD-glyfer som i The Dig)
-- [ ] Menyvalget HD Graphics i originalmenyen for v6 (raden står med v7-koordinater)
-- [ ] Sjekk om blast-tekst brukes i Sam & Max
-- [ ] Romtest: finn en måte å komme inn i de 12 rommene som henger etter testhoppet (lagret spill eller objekttilstander)
+- [x] Tekst i `CharsetRendererClassic` (HD-glyfer som i The Dig), med eget lag for tekstlaget i v6 (14. oktober)
+- [x] Menyvalget HD Graphics i originalmenyen for v6 (14. oktober, testet med F5 og klikk)
+- [x] Sjekk om blast-tekst brukes i Sam & Max: nei, bare blast-objekter (14. oktober)
+- [ ] Romtest: finn en måte å komme inn i de 12 rommene som henger etter testhoppet (lagret spill eller objekttilstander). Sjekket 14. oktober: rom 11 stopper på «state -1 is out of bounds» og rom 50 på «readArray: invalid array 261», fordi variablene ikke er satt uten vanlig spill. Krever lagrede spill fra en ekte gjennomspilling
 - [ ] Test The Dig med den utvidede patchen (i Dig-repoet) før patchen kopieres dit
 
 ### Pipeline
@@ -52,7 +52,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Uttrekk av rom, objekter og kostymeruter som indekserte PNG med JSON, i samme format som The Dig
 - [x] `smhd build-mod` med automatisk oppskalering (testet)
 - [x] Sammenlign uttrekket med motoren: alle bakgrunnspiksler finner HD-bildet sitt med nearest-mod ("background without HD 0")
-- [ ] `build-mod` hopper over objektbildene i rom uten bakgrunn (rom 81 og 82, 9 bilder); ta dem med
+- [x] `build-mod` tar med objektbildene i rom uten bakgrunn (rom 81 og 82, 9 bilder), skalert alene (14. oktober)
 - [x] `engine/test.sh` og `tools/romtest.sh` med Sam & Max
 - [x] Prompter og figurnavn i `gpt.py` og `figur.py` skrevet for Sam & Max (13. oktober)
 
@@ -64,9 +64,9 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Stilpilot: hovedark Sam og Max, rom 7 og fig002_01 og fig003_01 levert, kontrollert, sett i motoren og godkjent av Tom; stilankere i `stil/` (godkjent 13. oktober)
 - [x] Aktiver bestillingen og første grafikkrunde: gpt-inn, myke figurer, build-mod, romtest, `hd-mod` e85f760 og ny ordre i `gpt-arbeid` (14. oktober)
 - [ ] Neste grafikkrunder med `tools/gpt_runde.sh`: avvisningene først, så resten av GRAFIKKLISTE (ikoner 46 av 163, lag 534 av 701, objekter 83 av 86)
-- [ ] Se på de 15 figurrutene som myke-figurer merket til gjennomsyn
-- [ ] Finn hvor de små svarte feltene (17 til 78 px) i romtesten kommer fra
-- [ ] `tools/gpt_gren.sh send` skriver over AGENTS.md i `gpt-arbeid`; hold `docs/gpt-arbeid-AGENTS.md` lik det Codex legger til
+- [x] Se på de 15 figurrutene som myke-figurer merket til gjennomsyn (14. oktober): 12 med feil omriss (blant annet Max uten esken) holdes nå utenfor modden og står øverst i ordren; 3 med bare størrelsesavvik er med
+- [x] Finn hvor de små svarte feltene i romtesten kommer fra (14. oktober): spredte piksler fra mørke streker grafikeren har tegnet en piksel ved siden av. Romtesten teller nå bare sammenhengende felt; 2 kjøringer igjen (benken i rom 28, en strek i rom 85), begge tegnefeil, ikke motorfeil
+- [x] `tools/gpt_gren.sh send` stopper når AGENTS.md i `gpt-arbeid` har linjer som ikke står i `docs/gpt-arbeid-AGENTS.md` (14. oktober)
 - [x] Testrom for dynamisk lys på GitHub Pages (`lystest/`, 13. oktober). Tom slår på Pages med GitHub Actions som kilde
 - [ ] Dynamisk lys med normalkart og luminansmaske, etter godkjent stilpilot (Tom 13. oktober): valgfritt for spilleren (av som standard, eget valg i menyen), ingen kastede skygger. Prøv først i ett rom (kontoret med lampen) med normalkart regnet ut fra HD-bildene og lyset av og på med en tast. Lyset legges inn før fargeforholdet fra paletten, så nedtoning og blink fortsatt virker. Rommene har lyset malt inn, så det må vurderes i spillet om det løfter eller bare endrer
 

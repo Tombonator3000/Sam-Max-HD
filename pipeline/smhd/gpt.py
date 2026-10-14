@@ -1948,9 +1948,18 @@ def _order_line(work: Path, r: dict, status: dict[str, str], obj_rows: list[dict
     return f"`{r['jobb']}` ({what}, del {r['del']}).{why}"
 
 
+def _held_cels(soft: dict) -> dict[str, str]:
+    """Rutene figurmottaket holdt utenfor modden (i_modden false): rute -> ark."""
+    return {cel: sheet for sheet, a in soft.get("ark", {}).items()
+            for cel, r in (a.get("ruter") or {}).items() if r.get("i_modden") is False}
+
+
 def write_orders(work: Path, batch: int = 10, anchors: list[str] | None = None,
-                 messages: list[str] | None = None, tasks: Path | None = None) -> Path:
+                 messages: list[str] | None = None, tasks: Path | None = None, soft: dict | None = None) -> Path:
     """Skriver ORDRE.md: status, neste jobber og beskjeder. ChatGPT leser denne først.
+
+    soft: rapporten fra figurmottaket (myke.json). Figurark i glatt stil tas inn der og ikke i gpt-inn, så
+    ferdige figurruter telles derfra, og rutene mottaket holdt utenfor modden kommer øverst i ordren.
 
     Uten stilankere er arbeidet i stilpiloten: ordren har bare hovedarkene og pilotjobbene, og sier at
     resten venter til Tom har godkjent. Med stilankere i stil/ kommer de neste jobbene i vanlig rekkefølge.
@@ -1986,6 +1995,12 @@ def write_orders(work: Path, batch: int = 10, anchors: list[str] | None = None,
         if kind_rows:
             done, total = _piece_progress(work, rows, kind)
             ok = sum(r["status"] == "godkjent" for r in kind_rows)
+            if kind == "figur" and soft:
+                taken = [j for j, a in soft.get("ark", {}).items() if a.get("ruter")]
+                ok, done = len(taken), soft.get("ruter_ok", 0) + soft.get("ruter_sjekk", 0) - len(_held_cels(soft))
+                lines.append(f"- {jobs_label}: {ok} av {len(kind_rows)} tatt inn med figurmottaket. "
+                             f"Ferdige {label}: {done} av {total}")
+                continue
             lines.append(f"- {jobs_label}: {ok} av {len(kind_rows)} godkjent. Ferdige {label}: {done} av {total}")
     if masters:
         lines.append(f"- Hovedark: {sum(m['levert'] for m in masters)} av {len(masters)} levert")
@@ -2011,6 +2026,17 @@ def write_orders(work: Path, batch: int = 10, anchors: list[str] | None = None,
     else:
         queue = work_queue(rows, work)[:batch]
         lines += ["", "## Gjør disse nå", ""]
+        held = _held_cels(soft) if soft else {}
+        if held:
+            lines += ["Figurrutene under har feil omriss mot originalen og er holdt utenfor spillet. Tegn dem på "
+                      "nytt i samme ark og lever arket igjen. Se `forhandsvisning/myk_<ark>.png`: originalens omriss "
+                      "står i rødt. Ta med alt originalen har (for eksempel det figuren holder i hånden), med samme "
+                      "størrelse og form.", ""]
+            by_sheet: dict[str, list[str]] = {}
+            for cel, sheet in held.items():
+                by_sheet.setdefault(sheet, []).append(cel)
+            lines += [f"- `{sh}`: {', '.join(sorted(c))}" for sh, c in sorted(by_sheet.items())]
+            lines.append("")
         if not queue:
             lines.append("Alle jobber er levert. Vent på ny bestilling.")
         for i, r in enumerate(queue, 1):

@@ -85,6 +85,13 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
             continue
         src = extract / "rooms" / f"room{num:03d}.png"
         if not src.exists():
+            # Rom uten bakgrunn (81 og 82 i Sam & Max) har bare objektbilder som vises andre steder.
+            # De skaleres alene.
+            if with_objects:
+                extra = _objects_without_room(extract, out, own, info, scale, method, **upscale_kw)
+                if extra:
+                    done_objects += extra
+                    print(f"  rom {num:3d} {info['name']:<10} uten bakgrunn: {len(extra)} objektbilder")
             continue
         want = (info["width"] * scale, info["height"] * scale)
         custom = own / "rooms" / f"room{num:03d}.png" if own else None
@@ -164,6 +171,33 @@ def _own_objects_only(extract: Path, out: Path, own: Path, info: dict, scale: in
             ohd = Image.open(custom).convert("RGBA")
             if not _check_size(ohd, owant, custom.name):
                 continue
+            ohd.save(out / "objects" / f"{name}.png")
+            shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
+            done.append(name)
+    return done
+
+
+def _objects_without_room(extract: Path, out: Path, own: Path | None, info: dict, scale: int,
+                          method: str, **kw) -> list[str]:
+    """Objektbilder i et rom uten bakgrunn: egne bilder når de finnes, ellers skalert alene."""
+    done = []
+    for obj in info["objects"]:
+        for state in obj["states"]:
+            name = f"obj{obj['id']:03d}_{state}"
+            osrc = extract / "objects" / f"{name}.png"
+            if not osrc.exists():
+                continue
+            oim = Image.open(osrc).convert("RGBA")
+            owant = (oim.width * scale, oim.height * scale)
+            custom = own / "objects" / f"{name}.png" if own else None
+            ohd = None
+            if custom and custom.exists():
+                ohd = Image.open(custom).convert("RGBA")
+                if not _check_size(ohd, owant, custom.name):
+                    ohd = None
+            if ohd is None:
+                ohd = upscale(_bleed(oim), scale, method, **kw).convert("RGBA")
+                ohd.putalpha(upscale_alpha(oim.getchannel("A"), scale))
             ohd.save(out / "objects" / f"{name}.png")
             shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
             done.append(name)

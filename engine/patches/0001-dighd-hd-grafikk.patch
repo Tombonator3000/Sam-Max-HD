@@ -117,7 +117,7 @@ index d93b33e2..aad1ae94 100644
  	if (drawToBackBuf)
  		_out.setPixels(vs.getBackPixels(0, 0));
 diff --git a/engines/scumm/charset.cpp b/engines/scumm/charset.cpp
-index 190e1818..910c09bc 100644
+index 190e1818..0cf5f779 100644
 --- a/engines/scumm/charset.cpp
 +++ b/engines/scumm/charset.cpp
 @@ -21,6 +21,7 @@
@@ -128,7 +128,81 @@ index 190e1818..910c09bc 100644
  #include "scumm/file.h"
  #include "scumm/scumm.h"
  #include "scumm/macgui/macgui.h"
-@@ -2043,6 +2044,43 @@ int CharsetRendererV7::drawCharV7(byte *buffer, Common::Rect &clipRect, int x, i
+@@ -1106,6 +1107,7 @@ void CharsetRendererClassic::printChar(int chr, bool ignoreCharsetMask) {
+ 
+ 	translateColor();
+ 
++	_digHDChr = chr;
+ 	_vm->_charsetColorMap[1] = _color;
+ 	if (_vm->isScummvmKorTarget() && is2byte) {
+ 		setShadowMode(kNormalShadowType);
+@@ -1297,8 +1299,19 @@ void CharsetRendererClassic::printCharIntern(bool is2byte, const byte *charPtr,
+ 
+ 		if (is2byte && _vm->_game.platform != Common::kPlatformFMTowns)
+ 			drawBits1(dstSurface, (ignoreCharsetMask || !vs->hasTwoBuffers) ? _left + vs->xstart : _left, drawTop, charPtr, drawTop, origWidth, origHeight);
+-		else
++		else {
++			// Dig HD: the glyph is noted right before it is drawn (SCUMM v6: into the
++			// text surface for the main screen, else into the virtual screen buffer)
++			if (_vm->_digHD && _vm->_game.version == 6 && !_blitAlso) {
++				if (ignoreCharsetMask || !vs->hasTwoBuffers)
++					digHDNoteGlyph((const byte *)vs->getBasePtr(0, 0), vs->pitch, vs->xstart + _left, drawTop, vs->h,
++					               charPtr, *_fontPtr, origWidth, origHeight);
++				else
++					digHDNoteGlyph((const byte *)_vm->_textSurface.getPixels(), _vm->_textSurface.pitch, _left, drawTop,
++					               _vm->_textSurface.h, charPtr, *_fontPtr, origWidth, origHeight);
++			}
+ 			drawBitsN(dstSurface, dstPtr, charPtr, *_fontPtr, drawTop, origWidth, origHeight);
++		}
+ 
+ 		if (_blitAlso && vs->hasTwoBuffers) {
+ 			// FIXME: Revisiting this code, I think the _blitAlso mode is likely broken
+@@ -1337,6 +1350,44 @@ void CharsetRendererClassic::printCharIntern(bool is2byte, const byte *charPtr,
+ 	}
+ }
+ 
++void CharsetRendererClassic::digHDNoteGlyph(const byte *buffer, int pitch, int x, int y, int surfaceH,
++                                            const byte *src, byte bpp, int width, int height) {
++	if (bpp < 1 || bpp > 8 || width <= 0 || height <= 0 || width > 63 || height > 63)
++		return;
++	byte values[63 * 63], map[256];
++	byte b = *src++, nb = 8;
++	for (int i = 0; i < width * height; i++) {
++		values[i] = (b >> (8 - bpp)) & 0xFF;
++		b <<= bpp;
++		nb -= bpp;
++		if (nb == 0) {
++			b = *src++;
++			nb = 8;
++		}
++	}
++	memset(map, 0, sizeof(map));
++	memcpy(map, _vm->_charsetColorMap, sizeof(_vm->_charsetColorMap));
++	DigHD::GlyphDraw g;
++	g.buffer = buffer;
++	g.pitch = pitch;
++	g.x = x;
++	g.y = y;
++	g.w = width;
++	g.h = height;
++	g.values = values;
++	g.transparent = 0;
++	g.map = map;
++	// drawBitsN() draws every column, and the rows inside the surface
++	g.x0 = 0;
++	g.x1 = width;
++	g.y0 = MAX(0, -y);
++	g.y1 = MIN(height, surfaceH - y);
++	g.font = _curId;
++	g.chr = _digHDChr;
++	if (g.y0 < g.y1)
++		_vm->_digHD->noteGlyph(g);
++}
++
+ bool CharsetRendererClassic::prepareDraw(uint16 chr) {
+ 	bool is2byte = (chr >= 256 && _vm->_useCJKMode);
+ 	if (is2byte) {
+@@ -2043,6 +2094,43 @@ int CharsetRendererV7::drawCharV7(byte *buffer, Common::Rect &clipRect, int x, i
  	const byte *src = _charPtr;
  	byte *dst = buffer + (y + _offsY) * pitch + x;
  	uint8 bpp = *_fontPtr;
@@ -172,6 +246,21 @@ index 190e1818..910c09bc 100644
  	byte bits = *src++;
  	byte numbits = 8;
  	pitch -= _origWidth;
+diff --git a/engines/scumm/charset.h b/engines/scumm/charset.h
+index 7f288d7b..79a52ab6 100644
+--- a/engines/scumm/charset.h
++++ b/engines/scumm/charset.h
+@@ -170,6 +170,10 @@ protected:
+ 	// On which virtual screen will be drawn right now
+ 	VirtScreenNumber _drawScreen;
+ 
++	// Dig HD: the character being printed, and the glyph noted for HD text (SCUMM v6)
++	int _digHDChr = 0;
++	void digHDNoteGlyph(const byte *buffer, int pitch, int x, int y, int surfaceH, const byte *src, byte bpp, int width, int height);
++
+ public:
+ 	CharsetRendererClassic(ScummEngine *vm, int cjkSpacing) : CharsetRendererPC(vm), _width(0), _height(0), _origWidth(0), _origHeight(0),
+ 		_cjkSpacing(cjkSpacing), _offsX(0), _offsY(0), _charPtr(nullptr), _drawScreen(kMainVirtScreen) {}
 diff --git a/engines/scumm/costume.cpp b/engines/scumm/costume.cpp
 index aab00a03..d7b0704e 100644
 --- a/engines/scumm/costume.cpp
@@ -263,10 +352,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..b6bee81d
+index 00000000..72adb8ce
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,3901 @@
+@@ -0,0 +1,3929 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -1401,6 +1490,11 @@ index 00000000..b6bee81d
 +	                    _textMain.size == vsize && keyPitch == _textMain.pitch && keySrc >= vbase && textOff < _textMain.size;
 +	if (textOn && !_textMain.pending.empty())
 +		finishText(_textMain);
++	// SCUMM v6: the text surface, looked up with the screen position of the pixel
++	const bool textV6On = vsSrc && _textV6.any && vs->number == kMainVirtScreen &&
++	                      _textV6.base == (const byte *)_vm->_textSurface.getPixels();
++	if (textV6On && !_textV6.pending.empty())
++		finishText(_textV6);
 +	const bool celOn = mapping && _celMain.any && vbase == _celMain.base && _celMain.size == vsize &&
 +	                   keyPitch == _celMain.pitch && keySrc >= vbase && textOff < _celMain.size;
 +	const CelMark *celMarks = celOn ? _celMain.mark.data() : nullptr;
@@ -1425,6 +1519,15 @@ index 00000000..b6bee81d
 +				const size_t off = textOff + (size_t)r * keyPitch + c;
 +				if (off < _textMain.size)
 +					text = textAt(_textMain, off, f[c], idx);
++			}
++			if (!text && textV6On) {
++				const size_t off = (size_t)sy * _textV6.pitch + sx;
++				if (off < _textV6.size) {
++					text = textAt(_textV6, off, f[c], idx);
++					// What the glyph covers is the screen buffer itself, not the text surface
++					if (text && idx != f[c])
++						idx = vsSrc[r * vs->pitch + c];
++				}
 +			}
 +			uint32 source = kSrcFlat;
 +			uint32 coverSeq = kCoverAll;  // something other than a figure, until known
@@ -1650,6 +1753,7 @@ index 00000000..b6bee81d
 +	// The film picture replaces any text drawn into the game screen (banners).
 +	// SmushPlayer may draw into the game screen buffer, so the figures are gone too.
 +	_textMain.clear();
++	_textV6.clear();
 +	_celMain.clear();
 +	_celMain.saved.clear();
 +	_celMain.savedAny = false;
@@ -1721,6 +1825,7 @@ index 00000000..b6bee81d
 +
 +void DigHD::clearText() {
 +	_textMain.clear();
++	_textV6.clear();
 +}
 +
 +void DigHD::dirtyRect(int left, int right, int top, int bottom, int dirtybit) {
@@ -1877,6 +1982,18 @@ index 00000000..b6bee81d
 +		if (g.buffer != _smushTextBase || _textSmush.base != _smushTextBase)
 +			return false;
 +		t = &_textSmush;
++	} else if (_vm->_game.version < 7 && _vm->_textSurface.getPixels() &&
++	           g.buffer >= (const byte *)_vm->_textSurface.getPixels() &&
++	           g.buffer < (const byte *)_vm->_textSurface.getPixels() + (size_t)_vm->_textSurface.pitch * _vm->_textSurface.h) {
++		// SCUMM v6 draws text on the main screen into the text surface, which is
++		// composed over the screen in drawStripToScreen(); it is in screen coordinates
++		if (_vm->_textSurfaceMultiplier != 1)
++			return false;
++		const byte *base = (const byte *)_vm->_textSurface.getPixels();
++		const size_t size = (size_t)_vm->_textSurface.pitch * _vm->_textSurface.h;
++		if (_textV6.base != base || _textV6.size != size || _textV6.pitch != _vm->_textSurface.pitch)
++			_textV6.reset(base, size, _vm->_textSurface.pitch);
++		t = &_textV6;
 +	} else {
 +		const VirtScreen &vs = _vm->_virtscr[kMainVirtScreen];
 +		const byte *base = (const byte *)vs.getBasePtr(0, 0);
@@ -4170,10 +4287,10 @@ index 00000000..b6bee81d
 +} // End of namespace Scumm
 diff --git a/engines/scumm/dighd.h b/engines/scumm/dighd.h
 new file mode 100644
-index 00000000..bd028ad1
+index 00000000..28450574
 --- /dev/null
 +++ b/engines/scumm/dighd.h
-@@ -0,0 +1,543 @@
+@@ -0,0 +1,544 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -4643,6 +4760,7 @@ index 00000000..bd028ad1
 +	Common::HashMap<uint64, int> _glyphStyleIndex;  // shape << 32 | colours -> style
 +	TextLayer _textMain;    // the game screen (main virtual screen buffer)
 +	TextLayer _textSmush;   // the SMUSH frame buffer, between smushTextBegin() and smushTextEnd()
++	TextLayer _textV6;      // SCUMM v6: the text surface, composed over the game screen (screen coordinates)
 +	bool _textPass = false, _smushTextOpen = false, _overlayPass = false;
 +	Common::Array<uint32> _text;  // per screen pixel: glyph reference as in TextLayer::own, or 0
 +	Common::Array<byte> _base;    // per screen pixel: the value under the glyph, else the shown value
@@ -4822,7 +4940,7 @@ index bf85f13c..d9721f39 100644
  	while (now >= _shakeNextTick) {
  		_shakeFrame = (_shakeFrame + 1) % NUM_SHAKE_POSITIONS;
 diff --git a/engines/scumm/gfx_gui.cpp b/engines/scumm/gfx_gui.cpp
-index 133f6ec0..d81d9f68 100644
+index 133f6ec0..d7431ed7 100644
 --- a/engines/scumm/gfx_gui.cpp
 +++ b/engines/scumm/gfx_gui.cpp
 @@ -20,6 +20,7 @@
@@ -4837,11 +4955,11 @@ index 133f6ec0..d81d9f68 100644
  
  namespace Scumm {
  
-+// Dig HD: The Dig's main menu gets one more row, for the "HD Graphics" checkbox
++// Dig HD: the main menu of The Dig and Sam & Max gets one more row, for the "HD Graphics" checkbox
 +#define GUI_CTRL_DIGHD_CHECKBOX 25
 +
 +static int digHDMenuRow(const ScummEngine *vm) {
-+	return (vm->_digHD && vm->_game.id == GID_DIG) ? 14 : 0;
++	return (vm->_digHD && (vm->_game.id == GID_DIG || vm->_game.id == GID_SAMNMAX)) ? 14 : 0;
 +}
 +
  void ScummEngine::initBanners() {
@@ -4900,6 +5018,15 @@ index 133f6ec0..d81d9f68 100644
  	int yOffset = _useCJKMode ? 0 : 1;
  
  	// V6 auxiliary constant
+@@ -3923,7 +3945,7 @@ void ScummEngine_v6::setUpMainMenuControls() {
+ 		(_game.version == 7 ? 16 : 20),
+ 		(_game.version == 7 ? yCntr - calculatedHeight - yOffset : yConstantV6 - 60),
+ 		(_game.version == 7 ? 303 : 300),
+-		(_game.version == 7 ? yCntr + calculatedHeight + yOffset : yConstantV6 + 60),
++		(_game.version == 7 ? yCntr + calculatedHeight + yOffset : yConstantV6 + 60 + digHDMenuRow(this)),
+ 		_emptyMsg, 1, 1);
+ 
+ 	// Inner box
 @@ -3939,7 +3961,7 @@ void ScummEngine_v6::setUpMainMenuControls() {
  		(_game.version == 7 ? 22 : 26),
  		(_game.version == 7 ? yCntr - calculatedHeight + lh + 4 : yConstantV6 - 47),
@@ -4909,12 +5036,13 @@ index 133f6ec0..d81d9f68 100644
  		_emptyMsg, 1, 1);
  
  	if (_menuPage == GUI_PAGE_MAIN) {
-@@ -4091,6 +4113,24 @@ void ScummEngine_v6::setUpMainMenuControls() {
+@@ -4091,6 +4113,25 @@ void ScummEngine_v6::setUpMainMenuControls() {
  				_uncheckedBox, 1, 1);
  		}
  
 +		if (digHDMenuRow(this)) {
 +			// Dig HD: "HD Graphics" checkbox, one row under the text speed slider
++			// (v6: the box grows downwards by the row, the other controls stay where they are)
 +			setUpInternalGUIControl(GUI_CTRL_DIGHD_CHECKBOX,
 +				getBannerColor(9),
 +				getBannerColor(10),
@@ -4924,8 +5052,8 @@ index 133f6ec0..d81d9f68 100644
 +				getBannerColor(19),
 +				getBannerColor(11),
 +				getBannerColor(12),
-+				108,
-+				yCntr - calculatedHeight - yOffset + 113,
++				(_game.version == 7 ? 108 : 102),
++				(_game.version == 7 ? yCntr - calculatedHeight - yOffset + 113 : yConstantV6 + 45),
 +				-12,
 +				-12,
 +				_uncheckedBox, 1, 1);
@@ -4934,7 +5062,7 @@ index 133f6ec0..d81d9f68 100644
  		// Save button
  		setUpInternalGUIControl(GUI_CTRL_SAVE_BUTTON,
  			getBannerColor(4),
-@@ -4431,7 +4471,7 @@ void ScummEngine::updateMainMenuControls() {
+@@ -4431,7 +4472,7 @@ void ScummEngine::updateMainMenuControls() {
  
  	// V7 auxiliary constants
  	int yCntr = _screenHeight / 2;
@@ -4943,7 +5071,7 @@ index 133f6ec0..d81d9f68 100644
  	int textColor = getBannerColor(2);
  	int yOffset = _useCJKMode ? 0 : 1;
  
-@@ -4484,6 +4524,13 @@ void ScummEngine::updateMainMenuControls() {
+@@ -4484,6 +4525,13 @@ void ScummEngine::updateMainMenuControls() {
  	drawInternalGUIControl(GUI_CTRL_DISPLAY_TEXT_CHECKBOX, 0); // Display text checkbox
  	drawInternalGUIControl(GUI_CTRL_TEXT_SPEED_SLIDER,     0); // Text speed slider
  
@@ -4957,7 +5085,7 @@ index 133f6ec0..d81d9f68 100644
  	if (_game.version == 7) {
  		// Full Throttle has the "Spooled Music" checkbox,
  		// not rendered in the other games, so adjust that...
-@@ -4539,6 +4586,14 @@ void ScummEngine::updateMainMenuControls() {
+@@ -4539,6 +4587,14 @@ void ScummEngine::updateMainMenuControls() {
  		_internalGUIControls[GUI_CTRL_TEXT_SPEED_SLIDER].alternateTTSLabel = (const char *)msg;
  #endif
  
@@ -4972,7 +5100,22 @@ index 133f6ec0..d81d9f68 100644
  		drawLine(23, yCntr - calculatedHeight - yOffset + 77, 204, yCntr - calculatedHeight - yOffset + 77, getBannerColor(17));
  		drawLine(23, yCntr - calculatedHeight - yOffset + 78, 204, yCntr - calculatedHeight - yOffset + 78, getBannerColor(4));
  		drawLine(23, yCntr - calculatedHeight - yOffset + 79, 204, yCntr - calculatedHeight - yOffset + 79, getBannerColor(4));
-@@ -4661,7 +4716,7 @@ void ScummEngine::drawMainMenuTitle(const char *title) {
+@@ -4580,6 +4636,14 @@ void ScummEngine::updateMainMenuControls() {
+ 		_internalGUIControls[GUI_CTRL_TEXT_SPEED_SLIDER].alternateTTSLabel = (const char *)msg;
+ #endif
+ 
++		if (digHDRow) {
++			drawGUIText("HD Graphics", nullptr, 33, yConstantV6 + 48, textColor, false);
++#ifdef USE_TTS
++			_internalGUIControls[GUI_CTRL_DIGHD_CHECKBOX].alternateTTSLabel = "HD Graphics: ";
++			_internalGUIControls[GUI_CTRL_DIGHD_CHECKBOX].alternateTTSLabel += _internalGUIControls[GUI_CTRL_DIGHD_CHECKBOX].label;
++#endif
++		}
++
+ 		drawLine(27, yConstantV6 + 8,  201, yConstantV6 + 8,  getBannerColor(17));
+ 		drawLine(27, yConstantV6 + 9,  201, yConstantV6 + 9,  getBannerColor(4));
+ 		drawLine(27, yConstantV6 + 10, 201, yConstantV6 + 10, getBannerColor(4));
+@@ -4661,7 +4725,7 @@ void ScummEngine::drawMainMenuTitle(const char *title) {
  		int lh = getGUIStringHeight("ABC \x80\x78 \xb0\x78");
  		_charset->setCurID(cid);
  		int yCntr = _screenHeight / 2;

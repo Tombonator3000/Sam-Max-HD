@@ -6,7 +6,7 @@ Kort versjon for Sam & Max. Alle detaljer om hvordan motoren virker, innstilling
 
 - Patchen `engine/patches/0001-dighd-hd-grafikk.patch` er The Dig sin patch mot ScummVM-commit `c9091321` (`engine/SCUMMVM_COMMIT`), utvidet for Sam & Max 10. oktober. The Dig skal virke som før; det er ikke testet her, fordi The Dig-filene ikke er i dette repoet.
 - DigHD er på for The Dig og Sam & Max (`GID_SAMNMAX`) når `DIGHD_MOD` eller `dighd_mod` er satt.
-- I Sam & Max får rom, objekter, blast-objekter og kostymerutene HD. Teksten og menyraden er ikke portet (se listen under); teksten vises som originalpiksler.
+- I Sam & Max får rom, objekter, blast-objekter, kostymerutene og teksten på skjermen HD (14. oktober). Menyraden HD Graphics står i originalmenyen (F5), og teksten i menyen har også HD.
 - Miljøvariablene `DIGHD_*`, nøklene `dighd_*` i scummvm.ini og mod-formatet beholdes.
 
 ### Testet 10. oktober
@@ -16,6 +16,13 @@ Kort versjon for Sam & Max. Alle detaljer om hvordan motoren virker, innstilling
 - Kostymer: med en nearest-mod med alle 16 052 ruter i kontoret (rom 7) får Sam og Max HD-ruter. Avviket er 0,26 til 0,29 prosent av skjermen, i kantene av figurene, fordi de er skalert (motorens skalatabell mot en jevn skalering i DigHD, som i The Dig). `DIGHD_TEST_COSTUME=2` spilte alle animasjonene til Sam med HD-ruter og 0 avvik.
 - Blast-objekter: i motorveispillet (rom 68) får alle veibitene HD (for eksempel 6907 av 6907 piksler for objekt 604).
 - Ctrl+H bytter mellom HD og klassisk grafikk.
+
+### Testet 14. oktober
+
+- Menyraden: F5 i introen (bilde 1500) åpner originalmenyen med raden «HD Graphics» under Text Speed, avkrysset. Et klikk på ruten (108,151) gir klassisk grafikk («DigHD: classic graphics» i loggen, ingen HD-piksler etterpå). Rammen er 14 piksler høyere nedover, resten står der det sto.
+- Teksten: introen med `--subtitles` til bilde 6000 har HD-tekst (opptil 4158 HD-tekstpiksler per bilde) i HD-skriften, og «0 screen pixels differ» i alle 60 kontroller med `DIGHD_VERIFY`.
+- `engine/test.sh`: 0 av omtrent 1 million HD-piksler skiller seg sterkt fra originalen; HD-teksten telles for seg, som i The Dig.
+- Patchen passer mot en ren `engines/scumm` ved `c9091321` (`git apply --check`).
 
 ## Hva patchen gjør
 
@@ -41,16 +48,16 @@ Resten, kort:
 
 ## Det som må portes for v6
 
-Fra skillen `scumm-hd-remake` og The Dig sin erfaring, sjekket mot ScummVM-kilden ved `c9091321`. Punkt 1, 2, 3, 4, 6 og 9 er gjort 10. oktober. Teksten (5) og menyraden (8) gjenstår.
+Fra skillen `scumm-hd-remake` og The Dig sin erfaring, sjekket mot ScummVM-kilden ved `c9091321`. Punkt 1, 2, 3, 4, 6 og 9 er gjort 10. oktober, teksten (5) og menyraden (8) 14. oktober.
 
 1. **Slå på DigHD for Sam & Max.** Gjort: `DigHD::create` godtar `GID_SAMNMAX`. Testhoppet leser romstørrelsen fra RMHD i v6-formatet.
 2. **Kostymer.** Gjort: `ClassicCostumeRenderer::drawLimb` setter rutenummeret (lag * 128 + kode), `markAsDirty` husker rektangelet, og `paintCelByleRLE` kaller `noteCel` etter `byleRLEDecode`. `beginActor` i `base-costume.cpp` kalles nå også for klassiske kostymer. `DIGHD_TEST_COSTUME` leser animasjonene fra COST-hodet.
 3. **Figurfargene.** Klassiske kostymer har egen palett (`ClassicCostumeRenderer::setPalette`) som peker på indekser i rompaletten. Uttrekket lagrer de indeksene i `_idx.png`. Når spillet viser andre farger (andre rom, skuespillerpalett), tones HD-pikselen etter forholdet mellom fargene, som i The Dig.
 4. **v6 tegner teksten i et eget lag.** Gjort: `drawStripToScreen` legger tekstlaget over bufferen i `_compositeBuf` før det sendes videre i v6. DigHD får nå både den sammensatte kopien (verdiene) og området i bufferen (for merkene per piksel). Uten dette fikk ingen figurpiksler HD.
-5. **Tekst.** Ikke gjort. Teksten tegnes av `CharsetRendererClassic` i tekstlaget. Kroken (`noteGlyph`) finnes bare i `CharsetRendererV7::drawCharV7`. Teksten vises som originalpiksler.
-6. **Blast-objekter og blast-tekst.** Blast-objektene er v6-kode (`ScummEngine_v6::drawBlastObject`). Gjort: Sam & Max ber om bilde 0, og motoren bruker da bilde 1; kroken får nå bildet som faktisk tegnes, så `objNNN_01.png` brukes. En kommentar i `script_v6.cpp` tyder på at minispillet på motorveien bruker dem. Skillen nevner også blast-tekst. I ScummVM ved `c9091321` er `drawBlastTexts` og `removeBlastTexts` tomme i `ScummEngine_v6`, og køen for blast-tekst finnes bare i `ScummEngine_v7`. Hvordan Sam & Max tegner og fjerner tekst, må derfor sjekkes i spillet. `restoreCharsetBg` kaller `markRectAsDirty`, der patchen allerede nullstiller glyfene. Ikke testet.
+5. **Tekst.** Gjort 14. oktober: `CharsetRendererClassic::printCharIntern` melder hver glyf (`digHDNoteGlyph`) før `drawBitsN`. Tekst i hovedskjermen havner i tekstlaget (`_textSurface`), som er i skjermkoordinater; DigHD har et eget lag for det (`_textV6`) og slår opp med skjermposisjonen, så glyfene følger teksten også når kameraet står et annet sted. Det glyfen dekker, hentes fra bufferen under (`vsSrc`), ikke fra tekstlaget. Teksten i originalmenyen går gjennom `drawString` til bufferen i hovedskjermen og får HD på samme måte (3515 HD-tekstpiksler i menyen, testet 14. oktober).
+6. **Blast-objekter og blast-tekst.** Blast-objektene er v6-kode (`ScummEngine_v6::drawBlastObject`). Gjort: Sam & Max ber om bilde 0, og motoren bruker da bilde 1; kroken får nå bildet som faktisk tegnes, så `objNNN_01.png` brukes. En kommentar i `script_v6.cpp` tyder på at minispillet på motorveien bruker dem. Skillen nevner også blast-tekst. Sjekket 14. oktober: skriptene har ingen blast-tekst, bare blast-objekter (31 kall til `superBlastObject` og ett til `setBlastObjectWindow` i `work/skript`). I ScummVM ved `c9091321` er `drawBlastTexts` og `removeBlastTexts` tomme i `ScummEngine_v6`, og køen for blast-tekst finnes bare i `ScummEngine_v7`. Hvordan Sam & Max tegner og fjerner tekst, må derfor sjekkes i spillet. `restoreCharsetBg` kaller `markRectAsDirty`, der patchen allerede nullstiller glyfene. Ikke testet.
 7. **Ingen SMUSH.** Delene for filmer (`smush_player.cpp`, `nut_renderer.cpp`, filmrammer, undertekster over filmer) brukes ikke. `DIGHD_SKIP_VIDEO` gjør ingenting i v6. Mellomsekvensene og minispillene tegnes av motoren og går gjennom de samme krokene som resten.
-8. **Menyraden.** Ikke gjort. `digHDMenuRow` i `gfx_gui.cpp` gir raden HD Graphics bare for `GID_DIG`. Sam & Max bruker samme funksjon (`ScummEngine_v6::setUpMainMenuControls`), men raden er plassert med v7-koordinatene, og v6-menyen bruker andre (`yConstantV6`). Plasseringen må lages for v6 og sjekkes i originalmenyen.
+8. **Menyraden.** Gjort 14. oktober: `digHDMenuRow` gir raden også for `GID_SAMNMAX`. I v6 står ruten på `yConstantV6 + 45` og teksten på `yConstantV6 + 48`, og den ytre og indre rammen blir 14 piksler høyere nedover.
 9. **Musepekeren.** Gjort: kroken ligger nå også i `ScummEngine::updateCursor`, som Sam & Max bruker. Ikke sett på en ekte skjerm.
 10. **XOR 0x69.** ScummVM dekrypterer filene selv (`GF_USE_KEY`). Det gjelder uttrekket i pipelinen, ikke motoren.
 
