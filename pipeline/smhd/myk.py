@@ -36,6 +36,11 @@ Versjon 4 (Sam & Max, 13. oktober 2026): rapporten måler hvor stort hver rute e
 En rute som er tegnet mer enn SIZE_SPREAD større eller mindre enn resten av gruppen sin, får status sjekk,
 for tilpasningen kan bare rette FIT_RANGE og strekker da tegningen. Samme regel som
 tools/sjekk_leveranse.py, som grafikeren kjører før levering.
+
+Versjon 5 (14. oktober 2026): en rute der omrisset er for ulikt originalen (snitt_union under GOOD_IOU,
+dekning under GOOD_COVER eller kuttet) skrives til sjekk/costumes/ og ikke til costumes/, så den ikke
+kommer med i modden (i_modden false). I første runde var det blant annet Max uten esken han holder.
+Ruter som bare er merket for størrelsesavvik, kommer med som før.
 """
 from __future__ import annotations
 
@@ -59,7 +64,7 @@ GOOD_IOU = 0.6    # under dette er omrisset så ulikt originalen at ruten må se
 GOOD_COVER = 0.8  # andel av originalens piksler tegningen må dekke
 FIT_RANGE = 0.12  # hvor mye hver rute kan skaleres bort fra gruppens faktor, i bredde og høyde for seg
 FIT_SLACK = 0.03  # tilpasningen brukes når snitt/union er høyst så mye dårligere enn med gruppens faktor
-VERSION = 4       # økes når mottaket endres, så alle ark tas inn på nytt
+VERSION = 5       # økes når mottaket endres, så alle ark tas inn på nytt
 SIZE_SPREAD = 0.12  # en rute tegnet så mye større eller mindre enn gruppen (bredde eller høyde) må ses på
 FIT_SPREAD = 0.03 # tilpasning per rute i en retning bare når tegningene sprer mer enn originalene pluss dette
 OUTLIER_GAP = 6   # en liten del av originalen så langt unna resten (originalpiksler) er en utligger
@@ -622,8 +627,15 @@ def import_sheet(sheet: np.ndarray, cels: list[dict], boxes: dict[str, list[int]
         else:
             report[b] = {"status": "mangler", "grunn": "ingen del på arket for ruten"}
             continue
+        # En rute med omriss for ulikt originalen (feil tegning, manglende ting i hånden) legges i sjekk/
+        # i stedet for costumes/, så den ikke kommer med i modden. Motoren viser originalen til den er rettet.
+        held = status == "sjekk"
+        fil = f"sjekk/costumes/{b}_hd.png" if held else f"costumes/{b}_hd.png"
+        (out / fil).parent.mkdir(parents=True, exist_ok=True)
+        (out / ("costumes" if held else "sjekk/costumes") / f"{b}_hd.png").unlink(missing_ok=True)
+        dest = out / fil
         Image.fromarray(r["bilde"], "RGBA").save(dest, optimize=True)
-        report[b] = {"status": status, "kilde": kilde, "fil": f"costumes/{b}_hd.png", "sha256": _sha(dest),
+        report[b] = {"status": status, "kilde": kilde, "fil": fil, "sha256": _sha(dest), "i_modden": not held,
                      "storrelse": [r["bilde"].shape[1], r["bilde"].shape[0]], "marg": [r["margx"], r["margy"]],
                      "flytt_hd": r["flytt"], "snitt_union": r["snitt_union"], "dekning": r["dekning"],
                      "deler": len(nrs), "skala": round(scale_of.get(b, overall), 4), "tilpasset": r.get("tilpasset", False),

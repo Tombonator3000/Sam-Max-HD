@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -173,8 +174,11 @@ def cmd_gpt_inn(a) -> int:
 
 def cmd_gpt_ordre(a) -> int:
     anchors = sorted(p.name for p in Path(a.stil).glob("*.png")) if a.stil and Path(a.stil).is_dir() else []
+    soft = None
+    if a.myke and Path(a.myke).exists():
+        soft = json.loads(Path(a.myke).read_text())
     path = gpt.write_orders(Path(a.fra), batch=a.antall, anchors=anchors, messages=a.beskjed or None,
-                           tasks=Path(a.oppgaver) if a.oppgaver else None)
+                           tasks=Path(a.oppgaver) if a.oppgaver else None, soft=soft)
     gpt.write_list(Path(a.fra), batch=a.antall, pilot_phase=not anchors)
     print(f"Ordre skrevet: {path}")
     return 0
@@ -190,7 +194,7 @@ def cmd_myke_figurer(a) -> int:
     if rejected:
         print(f"Avviste ark, ikke tatt inn: {', '.join(rejected)}")
     print(f"Myke figurer: {len(r['ark']) - len(bad)} ark, {r['ruter_ok']} ruter ok, {r['ruter_sjekk']} til "
-          f"gjennomsyn, {r['ruter_mangler']} uten del på arket -> {Path(a.ut) / 'costumes'} (rapport i myke.json)")
+          f"gjennomsyn, {r['ruter_mangler']} uten del på arket -> {Path(a.ut) / 'costumes'}, ruter med feil omriss i {Path(a.ut) / 'sjekk'} (rapport i myke.json)")
     for j, why in sorted(bad.items()):
         print(f"  {j}: {why}")
     return 0
@@ -272,6 +276,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--beskjed", action="append", help="beskjed til ChatGPT (kan gjentas)")
     p.add_argument("--oppgaver", default=str(root / "docs" / "gpt-kodeoppgaver.md"),
                    help="kodeoppgaver som tas med i ORDRE.md (tom streng for ingen)")
+    p.add_argument("--myke", default=str(root / "work" / "gpt-ferdig" / "myke.json"),
+                   help="rapporten fra myke-figurer, for ferdige figurruter og ruter som må tegnes på nytt")
 
     p = sub.add_parser("myke-figurer", help="ta inn figurarkene i glatt stil som myke kostymeruter (_hd.png)")
     p.add_argument("--gren", default=str(root / "work" / ".gpt-gren"), help="arbeidsgrenen gpt-arbeid (sjekket ut)")

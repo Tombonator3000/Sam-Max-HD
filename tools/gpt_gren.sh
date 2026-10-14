@@ -52,6 +52,18 @@ copy_jobs_out() {
 			cp "$WORK/forhandsvisning/$id.png" "$TREE/forhandsvisning/"
 		fi
 	done
+	# Figurark med ruter som figurmottaket holdt utenfor modden (se ORDRE.md): myk_<ark>.png
+	if [ -f "$ROOT/work/gpt-ferdig/myke.json" ]; then
+		python3 -c 'import json,sys
+for s,a in json.load(open(sys.argv[1])).get("ark",{}).items():
+    if any(r.get("i_modden") is False for r in (a.get("ruter") or {}).values()): print(s)' "$ROOT/work/gpt-ferdig/myke.json" |
+		while read -r id; do
+			if [ -f "$WORK/forhandsvisning/myk_$id.png" ]; then
+				mkdir -p "$TREE/forhandsvisning"
+				cp "$WORK/forhandsvisning/myk_$id.png" "$TREE/forhandsvisning/"
+			fi
+		done
+	fi
 	# Hovedarkene: referanse, prompt og jobb.json. Leveransene (hovedark/<navn>.png) røres ikke.
 	for d in "$WORK"/hovedark/*/; do
 		[ -d "$d" ] || continue
@@ -64,6 +76,16 @@ copy_jobs_out() {
 	mkdir -p "$TREE/verktoy"
 	cp "$ROOT/tools/sjekk_leveranse.py" "$TREE/verktoy/sjekk_leveranse.py"
 	cp "$ROOT/docs/BESTILLING-CHATGPT.md" "$TREE/BESTILLING.md"
+	# Linjer Codex har lagt til i AGENTS.md i grenen, skal ikke forsvinne: de må inn i kilden i main først.
+	if [ -f "$TREE/AGENTS.md" ] && [ "${AGENTS_OVERSKRIV:-0}" != 1 ]; then
+		nye=$(grep -vxF -f "$ROOT/docs/gpt-arbeid-AGENTS.md" "$TREE/AGENTS.md" | grep -v '^[[:space:]]*$' || true)
+		if [ -n "$nye" ]; then
+			echo "AGENTS.md i gpt-arbeid har linjer som ikke står i docs/gpt-arbeid-AGENTS.md:" >&2
+			echo "$nye" >&2
+			echo "Legg dem inn i docs/gpt-arbeid-AGENTS.md, eller kjør med AGENTS_OVERSKRIV=1 for å fjerne dem." >&2
+			exit 1
+		fi
+	fi
 	cp "$ROOT/docs/gpt-arbeid-AGENTS.md" "$TREE/AGENTS.md"
 	[ -f "$TREE/README.md" ] || printf '# gpt-arbeid\n\nArbeidsbordet for HD-grafikken. Les AGENTS.md og BESTILLING.md.\n' > "$TREE/README.md"
 }
