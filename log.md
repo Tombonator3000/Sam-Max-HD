@@ -168,3 +168,10 @@ Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
 - Rulleteksten kjørt i motoren (rom 77). Panelene lånes fra rom 67 (objekt 600 til 603) og får HD. Tittel-kostymet (328) og fjellene (329) er originalpiksler til grafikeren har tegnet dem.
 - To feil i HD-skriften funnet i rulleteksten og rettet: e, c og r ble store svarte former fordi kanten ble valgt som bokstav (`makeFaceGlyph` tegner nå slike glyfer fra fontbildet), og font 5 (pyntet, bare store bokstaver) ble små Exo 2-bokstaver. Font 5 er tatt ut av `skrift.py` og skaleres fra fontbildet.
 - Testet: rulleteksten ser ut som originalen med glatte kanter, dialogen i introen bruker fortsatt HD-skriften (30 glyfer, ingen avvist), `engine/test.sh` 0 avvik, `pytest -m "not game"` 44 bestått, patchen passer mot ren ScummVM.
+
+## 2026-10-14 07:55 (Claude)
+
+- PR 12 flettet av Tom. Grenen satt til ny main, sjekk-inn avlyst.
+- Todo «mellomsekvenser og minispill som tegnes av motoren»: kartlagt fra skriptene i `docs/MINISPILL.md`. Ingen SMUSH; det motoren tegner selv er `drawBox`, blast-objekter, skyggetabellen for figurer, lånte objekter, palettendringer, risting og noir-modus.
+- Motor: figurpiksler tegnet gjennom skyggetabellen (skyggene under figurene, lyskjegler med skyggemodus 0x20) bygges nå fra HD-bakgrunnen og tones, som blast-skyggene. Testet i rom 16: lyskjeglen og lysstrålen er glatte, `DIGHD_VERIFY` 0 piksler ikke bygget på nytt. `engine/test.sh` 0 avvik, patchen passer mot ren ScummVM.
+- Car Bomb-merkene (`drawBox` piksel for piksel) og noir-modusen står som åpne punkter i todo. Full romtest kjører.

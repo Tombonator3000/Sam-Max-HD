@@ -352,10 +352,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..0268c81f
+index 00000000..1cdacfca
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,3940 @@
+@@ -0,0 +1,3966 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -1570,7 +1570,31 @@ index 00000000..0268c81f
 +						const int lx = vs->xstart + x + c - cs.rx, ly = ry - cs.ry;
 +						coverSeq = m.seq;
 +						coverSlot = m.slot;
-+						if (cs.used && cs.soft) {
++						// A figure pixel drawn through the shadow table (classic costumes:
++						// colour 13, or the whole actor with shadow mode 0x20, such as the
++						// light cones and the shadows under the figures in Sam & Max) is the
++						// background under it, darkened or lit. It is built from the HD
++						// background and tinted later (_shade), as the blast objects are.
++						const byte *shTab = _vm->_game.version == 6 ? _vm->_shadowPalette : nullptr;
++						if (shTab && shTab[b[c]] == idx) {
++							bool art = false;
++							if (cs.used && cs.image && lx >= 0 && ly >= 0 && lx < cs.rw && ly < cs.rh) {
++								const Graphics::Surface &ci = cs.image->idx;
++								int cx = lx * ci.w / cs.rw;
++								if (cs.mirror)
++									cx = ci.w - 1 - cx;
++								const byte code = *((const byte *)ci.getBasePtr(cx, ly * ci.h / cs.rh));
++								art = code == idx && (int)code != cs.image->transparent;
++							}
++							if (!art) {
++								shade = (uint16)((b[c] << 8) | idx);  // never 0: b[c] != idx
++								idx = baseIdx = b[c];
++								_statShadeCel++;
++							}
++						}
++						if (shade) {
++							// built from the background below
++						} else if (cs.used && cs.soft) {
 +							// A soft cel is laid over the HD picture of the background
 +							// under it (drawSoftCels()). Its shadows and effects stay
 +							// original pixels, under the cel.
@@ -3988,6 +4012,8 @@ index 00000000..0268c81f
 +		s += Common::String::format(", figure px kept original %u", _statCelKept);  // part of original px
 +	if (_statSoft)
 +		s += Common::String::format(", soft figure px %u", _statSoft);  // laid over the pixels counted above
++	if (_statShadeCel)
++		s += Common::String::format(", shaded figure px %u", _statShadeCel);  // figure shadows and light cones from the HD background
 +	if (_statShade)
 +		s += Common::String::format(", shaded px %u", _statShade);  // under a blast object's shade
 +	if (_showMissing)
@@ -4292,16 +4318,16 @@ index 00000000..0268c81f
 +		}
 +	}
 +	_statRoom = _statObject = _statCel = _statSan = _statFlat = _statMissing = _statCycle = _statText = 0;
-+	_statCelTint = _statCelKept = _statSoft = _statShade = 0;
++	_statCelTint = _statCelKept = _statSoft = _statShade = _statShadeCel = 0;
 +}
 +
 +} // End of namespace Scumm
 diff --git a/engines/scumm/dighd.h b/engines/scumm/dighd.h
 new file mode 100644
-index 00000000..28450574
+index 00000000..e6d64b17
 --- /dev/null
 +++ b/engines/scumm/dighd.h
-@@ -0,0 +1,544 @@
+@@ -0,0 +1,545 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -4840,6 +4866,7 @@ index 00000000..28450574
 +	uint32 _statCelTint = 0, _statCelKept = 0;  // HD sprite px tinted, figure px with HD image kept original
 +	uint32 _statShade = 0;  // pixels under a blast object's shade (inventory box), tinted HD
 +	uint32 _statSoft = 0;  // original px with a soft cel laid over them
++	uint32 _statShadeCel = 0;  // figure px drawn through the shadow table, built from the HD background
 +	Common::String statText() const;
 +};
 +
