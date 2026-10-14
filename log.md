@@ -277,3 +277,12 @@ Tom: spillet krasjer på nettsiden når Sam plukker opp pengene i musehullet.
 - Testet nettbygget fra grenen (arbeidsflyten i Sam-Max-HD-Web startet fra grenen sin, som bygger uten å publisere; artefakten lastet ned og servert lokalt) i Chromium med skript 206: minnet holdt seg på 276 MB gjennom 618 filhentinger og 7 minutter, ingen krasj. Den publiserte siden (før rettelsen) nådde 2 GB og krasjet etter 2 minutter. Tom fikk samme feil på gaten utenfor kontoret («failure to allocate»).
 - Grenen er lagt oppå main etter at PR 18 ble slått sammen til én commit (PR 19).
 - PR 19 flettet av Tom. Nettsiden bygget fra main og publisert; testet den publiserte siden i Chromium med skript 206 og MT-32: 278 MB gjennom 620 filhentinger, ingen krasj.
+
+## 2026-10-14 15:30 (Claude)
+
+Tom: ja til punkt 1 til 4 (pakkene på nytt, svarte felt, hakking, ressursbanken til ChatGPT).
+
+- Arbeidsflytene Windows-pakke og Linux-pakke startet fra main (med PR 18 og 19).
+- `tools/gpt_gren.sh` tar med `docs/GJENNOMGANG.md` som GJENNOMGANG.md; hentet (0 nye filer fra ChatGPT) og sendt til `gpt-arbeid`.
+- De små svarte feltene i rom 8 og 28 er ChatGPTs maling (mørkebrunt nesten svart i rekkverket), ikke motoren.
+- Hakking: `DIGHD_BENCH` virker nå uten skjermdumper (hvert 400. bilde), så den kan måles på nettsiden. Nettbygget kompileres med WebAssembly SIMD (`-msimd128`), så kompilatoren kan vektorisere bildebyggingen. Måles i nettleseren før og etter.

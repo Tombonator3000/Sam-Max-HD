@@ -508,10 +508,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..93555f10
+index 00000000..9b344d3b
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,4459 @@
+@@ -0,0 +1,4469 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -4272,6 +4272,16 @@ index 00000000..93555f10
 +			debug("DigHD: test, click at %d,%d at frame %u (the game had the mouse at %d,%d), object %d %s", c.x, c.y, _frameNo,
 +			      _vm->_mouse.x, _vm->_mouse.y, obj, name ? (const char *)name : "");
 +		}
++	}
++
++	// DIGHD_BENCH without dumps (the website cannot save them): the time to build
++	// the whole screen and send it, every 400 frames
++	if (_dumpDir.empty() && _bench > 0 && _frameNo > 0 && (_frameNo % 400) == 0) {
++		const uint32 start = g_system->getMillis();
++		for (int i = 0; i < _bench; i++)
++			writeRect(0, 0, _w, _h);
++		debug("DigHD: bench frame %u: whole screen %.2f ms (mean of %d)", _frameNo,
++		      (double)(g_system->getMillis() - start) / _bench, _bench);
 +	}
 +
 +	if (!_dumpDir.empty() && ((_dumpEvery > 0 && (_frameNo % _dumpEvery) == 0) || objStepEnd))

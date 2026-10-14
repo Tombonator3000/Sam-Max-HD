@@ -76,6 +76,8 @@ for s,a in json.load(open(sys.argv[1])).get("ark",{}).items():
 	mkdir -p "$TREE/verktoy"
 	cp "$ROOT/tools/sjekk_leveranse.py" "$TREE/verktoy/sjekk_leveranse.py"
 	cp "$ROOT/docs/BESTILLING-CHATGPT.md" "$TREE/BESTILLING.md"
+	# Ressursbanken: hva som skjer i hvert rom, hvem som er der og hvilke ting som hører til
+	cp "$ROOT/docs/GJENNOMGANG.md" "$TREE/GJENNOMGANG.md"
 	# Linjer Codex har lagt til i AGENTS.md i grenen, skal ikke forsvinne: de må inn i kilden i main først.
 	if [ -f "$TREE/AGENTS.md" ] && [ "${AGENTS_OVERSKRIV:-0}" != 1 ]; then
 		nye=$(grep -vxF -f "$ROOT/docs/gpt-arbeid-AGENTS.md" "$TREE/AGENTS.md" | grep -v '^[[:space:]]*$' || true)
