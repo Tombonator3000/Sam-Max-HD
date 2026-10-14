@@ -198,3 +198,12 @@ Tom: ja til Car Bomb på skriptnivå, implementer noir, lag en utviklermodus for
 - Noir: `updatePalette` gir DigHD fargepaletten og slår noir av og på (`setNoir`); DigHD gjør HD-bildet grått i `writeRect` og i dumpene, med samme snitt som ScummVM. Testet: introen hoppet over med Esc, tasten b i kontoret ved bilde 4400 og 5200 slår noir på og av, og bildet er grått.
 - Utviklermodus: ingen romhopp i spillet selv (skript 64 har bare noir, versjon, minne og «dummy verb mode»). Laget «Sam og Max HD - utvikler.bat» i Windows-pakken (hopp til rom med romliste, last lagret spill, vindu), `tools/romtest.py --lagret MAPPE` (kjører hvert lagrede spill med `--save-slot`, rommet leses fra loggen) og `DIGHD_TEST_SCRIPT`. Testet romtest `--lagret` med et autolagret spill i kontoret: rom 7 ok med HD-bakgrunn, 0 avvik.
 - `engine/test.sh` 0 avvik, patchen passer mot ren ScummVM. Dokumentert i SPILLTEST, HD-MOTOR og MINISPILL.
+
+## 2026-10-14 10:00 (Claude)
+
+Tom: Windows-pakken starter ikke (startfila lukker seg, kanskje jobb-PC), lag en nettløsning i Sam-Max-HD-Web, og er CD-musikken med?
+
+- CD-musikken: Sam & Max CD har ingen CD-lydspor. ScummVM setter ikke `GF_AUDIOTRACKS` for spillet (`detection_tables.h`: MDT_ADLIB, MDT_MIDI, foretrekker General MIDI). Musikken er iMuse-MIDI inne i SAMNMAX.001 og er med i alle pakkene; den spilles med AdLib-emulering eller MIDI. MT-32-emulering med ROM-filene fra spilldata er satt opp som todo.
+- Windows: startfilene kjører nå ScummVM direkte (ikke `start`), skriver loggen til %APPDATA%\SamMaxHD\scummvm.log og blir stående med feilkoden hvis spillet stopper. Utviklerstarten og romlisten er med i pakken (Windows-bygget på grenen var grønt).
+- Nettsiden: koden i `engine/pages` henter nå fra det offentlige repoet uten nøkkel (fillister fra API-et, filer fra raw.githubusercontent.com) og ber om nøkkel bare når GitHub begrenser. Ny test; `node --test` 17 bestått.
+- Sam-Max-HD-Web: arbeidsflyt som sjekker ut Sam-Max-HD, bygger med `engine/build-web.sh` og `engine/build-pages.py`, sjekker at ingen spillfiler er med, og publiserer på Pages fra main. Lokalt bygg stoppet: proxyen i sandkassen gir 403 på SDL3-arkivet fra GitHub.

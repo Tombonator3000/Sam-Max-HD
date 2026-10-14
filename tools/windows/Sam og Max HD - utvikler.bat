@@ -47,4 +47,9 @@ if "%VALG%"=="2" (
 	call set "EKSTRA=--save-slot=%%SLOT%%"
 )
 rem Ctrl+Shift+H viser gult der HD mangler. ScummVM sin konsoll: Ctrl+Alt+D.
-"%HERE%scummvm.exe" --config="%CONF%\scummvm.ini" --path="%HERE%game" --savepath="%CONF%\saves" --themepath="%HERE%." --extrapath="%HERE%." --no-fullscreen %EKSTRA% samnmax
+"%HERE%scummvm.exe" --config="%CONF%\scummvm.ini" --logfile="%CONF%\scummvm.log" --path="%HERE%game" --savepath="%CONF%\saves" --themepath="%HERE%." --extrapath="%HERE%." --no-fullscreen %EKSTRA% samnmax
+if errorlevel 1 (
+	echo.
+	echo Spillet stoppet med feilkode %errorlevel%. Loggen: %CONF%\scummvm.log
+	pause
+)

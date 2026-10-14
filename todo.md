@@ -80,7 +80,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Linux-pakken: kjør arbeidsflyten Linux-pakke for hånd og test AppImage-filen
 - [x] Windows-pakken: arbeidsflyten Windows-pakke bygger ScummVM med HD-patchen i MSYS2, legger ved spillet og HD-modden og publiserer release "windows" (14. oktober)
 - [ ] Tom tester Windows-pakken
-- [ ] Nettsiden: lag repoet `Sam-Max-HD-Web` (Tom), bygg i Actions og test. Sjekk at siden takler en `hd-mod` uten mod
+- [x] Nettsiden: repoet `Sam-Max-HD-Web` med arbeidsflyt som bygger og publiserer (14. oktober). Siden henter spillet uten nøkkel
+- [ ] Tom slår på Pages i Sam-Max-HD-Web (Settings > Pages > Source = GitHub Actions) og tester siden
+- [ ] Windows-pakken starter ikke på Toms jobb-PC (startfila lukker seg); startfilene viser nå feilkode og logg (%APPDATA%\SamMaxHD\scummvm.log)
+- [ ] MT-32-musikk: spillet har ingen CD-lydspor; musikken er MIDI. Med `--enable-mt32emu` og ROM-filene fra spilldata låter den som på originalutstyret
 - [ ] Vurder `--enable-mt32emu` når musikken skal testes (MT-32-ROM-filene ligger i `spilldata`)
 
 ## Senere

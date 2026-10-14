@@ -112,6 +112,12 @@ function github(requests, status = 200) {
     if (u.pathname.endsWith('/git/trees/spilldata')) return Response.json({tree, truncated: false});
     if (u.pathname.endsWith('/git/trees/hd-mod')) return Response.json({tree: modTree, truncated: false});
     if (u.pathname.includes('/git/blobs/')) return new Response('blob ' + u.pathname.split('/').at(-1));
+    if (u.hostname === 'raw.githubusercontent.com') {
+      // /<owner>/<repo>/<branch>/<path>: the same content as the blob in the tree
+      const [, , , branch, ...rest] = decodeURIComponent(u.pathname).split('/');
+      const item = (branch === 'hd-mod' ? modTree : tree).find(i => i.path === rest.join('/'));
+      return item ? new Response('blob ' + item.sha) : new Response('', {status: 404});
+    }
     return new Response('', {status: 404});
   };
 }
@@ -134,6 +140,17 @@ test('files come from the private branches with the key, once per blob id', asyn
   const offline = new RemoteSource(library, 'KEY', async () => { throw new TypeError('Failed to fetch'); });
   assert.equal((await offline.list()).length, 6);
   assert.equal(await (await offline.read(GAME_ROOT + 'SAMNMAX.001')).text(), 'blob a1');
+});
+
+test('without a key the public repository is read: lists from the API, files from raw.githubusercontent.com', async () => {
+  const requests = [];
+  const source = new RemoteSource(memoryLibrary(), null, github(requests));
+  const rows = await source.list();
+  assert.equal(rows.length, 6);
+  assert.ok(requests.every(r => r.auth === undefined));
+  assert.equal(await (await source.read(GAME_ROOT + 'SAMNMAX.001')).text(), 'blob a1');
+  assert.ok(requests.some(r => r.url === 'https://raw.githubusercontent.com/' + REPO + '/spilldata/game/SAMNMAX.001'));
+  assert.ok(!requests.some(r => r.url.includes('/git/blobs/')));
 });
 
 test('a key GitHub does not accept gives an error the page can show', async () => {
