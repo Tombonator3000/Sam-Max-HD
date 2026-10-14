@@ -276,3 +276,4 @@ Tom: spillet krasjer på nettsiden når Sam plukker opp pengene i musehullet.
 - Testkroken `DIGHD_TEST_CLICKS` tar høyreklikk (`r` til slutt), og loggen viser objektet under klikket.
 - Testet nettbygget fra grenen (arbeidsflyten i Sam-Max-HD-Web startet fra grenen sin, som bygger uten å publisere; artefakten lastet ned og servert lokalt) i Chromium med skript 206: minnet holdt seg på 276 MB gjennom 618 filhentinger og 7 minutter, ingen krasj. Den publiserte siden (før rettelsen) nådde 2 GB og krasjet etter 2 minutter. Tom fikk samme feil på gaten utenfor kontoret («failure to allocate»).
 - Grenen er lagt oppå main etter at PR 18 ble slått sammen til én commit (PR 19).
+- PR 19 flettet av Tom. Nettsiden bygget fra main og publisert; testet den publiserte siden i Chromium med skript 206 og MT-32: 278 MB gjennom 620 filhentinger, ingen krasj.
