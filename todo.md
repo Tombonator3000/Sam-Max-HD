@@ -54,7 +54,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Ressursbanken (`docs/GJENNOMGANG.md`) sendt til `gpt-arbeid` som GJENNOMGANG.md, med lenke i AGENTS.md der (15. oktober)
 - [x] Små svarte felt i rom 8 og 28: forskjeller i ChatGPTs maling (mørkebrune partier i rekkverket malt nesten svart), ikke motoren. Til grafikkordren
 - [ ] Grafikkordre: animasjonstilstander som bare er lapper (flaggene og propellen i rom 17, 19 objekter i alt) må tegnes som hele bilder og klippes etterpå; inventaresken (obj995) trenger egen alfa så kanten blir myk; obj049 (LucasArts-logoen) har magentaflekker fra ChatGPT; ikonene i rom 93 og 94 er Scale4x til ikonarkene er tegnet
-- [ ] Hakking på nettsiden (Tom 14. oktober). Gjort: HD-pakken hentes i bakgrunnen, fargetoningen er raskere (15 til 11 ms per skjerm), `?adlib` for å sammenligne med MT-32. Tom tester igjen. Nettsiden henter nå HD-pakken i bakgrunnen. Hele skjermen tar 14 til 22 ms å bygge her; i nettleseren kan nedtoninger og rulling bli tunge. Mål med `DIGHD_BENCH` i nettleseren og se på å bygge bare det som er endret ved palettbytter
+- [ ] Hakking på nettsiden (Tom 14. oktober). 15. oktober: SIMD i nettbygget (hele skjermen 20 til 30 ms i Chromium), bakgrunnshentingen venter ved grense fra GitHub (429 ga ventetid også for filene spillet trengte). Gjort: HD-pakken hentes i bakgrunnen, fargetoningen er raskere (15 til 11 ms per skjerm), `?adlib` for å sammenligne med MT-32. Tom tester igjen. Nettsiden henter nå HD-pakken i bakgrunnen. Hele skjermen tar 14 til 22 ms å bygge her; i nettleseren kan nedtoninger og rulling bli tunge. Mål med `DIGHD_BENCH` i nettleseren og se på å bygge bare det som er endret ved palettbytter
 
 ### Pipeline
 

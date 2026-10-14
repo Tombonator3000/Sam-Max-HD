@@ -286,3 +286,6 @@ Tom: ja til punkt 1 til 4 (pakkene på nytt, svarte felt, hakking, ressursbanken
 - `tools/gpt_gren.sh` tar med `docs/GJENNOMGANG.md` som GJENNOMGANG.md; hentet (0 nye filer fra ChatGPT) og sendt til `gpt-arbeid`.
 - De små svarte feltene i rom 8 og 28 er ChatGPTs maling (mørkebrunt nesten svart i rekkverket), ikke motoren.
 - Hakking: `DIGHD_BENCH` virker nå uten skjermdumper (hvert 400. bilde), så den kan måles på nettsiden. Nettbygget kompileres med WebAssembly SIMD (`-msimd128`), så kompilatoren kan vektorisere bildebyggingen. Måles i nettleseren før og etter.
+- Målt i Chromium (nettbygget fra grenen, med SIMD): hele skjermen 20 til 30 ms per bygg i kontoret (native 13 ms).
+- Funnet under målingen: GitHub svarte 429 (for mange forespørsler) på bakgrunnshentingen, som prøvde å hente over 30 000 filer. Med uendelige nye forsøk ventet også spillets egne filer, og siden viste ventetid. Bakgrunnshentingen prøver nå hver fil én gang, venter et minutt ved grense og legger filen sist i køen (høyst tre forsøk); spillet henter selv en fil bakgrunnen ga opp. Indeksbildene for ruter uten HD-bilde står sist. Ny test, `node --test` 19 bestått.
+- Windows-pakken er bygget på nytt fra main og lagt i releasen «windows». Linux-pakken bygges.
