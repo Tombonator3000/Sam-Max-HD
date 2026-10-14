@@ -186,6 +186,10 @@ Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
 - Ikke testet her: ingen Windows eller MinGW i sandkassen. Første test er kjøringen i Actions.
 - Windows-arbeidsflyten testet på grenen. Kjøring 1: bygg og pakke ok, testen fant ingen grafikkmodus (OpenGL uten skjerm). Kjøring 2: spillet startet med HD-modden, men stoppet på «IMuse initialization - Device not available» (ingen MIDI på maskinen). Kjøring 3 (38523014097) grønn med `--gfx-mode=surfacesdl` og `--music-driver=adlib` i testen. PR 14 mot main; releasen lages når den er flettet.
 
+## 2026-10-14 09:15 (Claude)
+
+- PR 14 flettet av Tom. Arbeidsflyten Windows-pakke kjørte fra main (38525134743, grønn) og publiserte release «Sam & Max HD for Windows»: SamMaxHD-Windows.zip (426 MB) med sjekksum.
+
 ## 2026-10-14 09:30 (Claude)
 
 Tom: ja til Car Bomb på skriptnivå, implementer noir, lag en utviklermodus for å hoppe til områder.
