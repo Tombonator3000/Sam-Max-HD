@@ -130,3 +130,11 @@ Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 - 13:41 PR 9 flettet. Pages er publisert: https://tombonator3000.github.io/Sam-Max-HD/ svarer med «Sam & Max lystest», og spill/hovedark/sam/jobb.json ligger i pakken (sjekket med curl). Dig PR 48 er også flettet.
 - 02:44 Tom ba om å flette og pulle gpt-arbeid. Fletting til main er ikke mulig (ingen felles historikk) og ikke tillatt (AGENTS). Hentet gpt-arbeid (bcd0a01, bestilling 60; stilpiloten godkjent av Tom 13. oktober, ankere i stil/) med `tools/gpt_gren.sh hent`: 1100 filer. `smhd gpt-inn` (13,5 min): godkjent 419, sjekk 31, avvist 26, levert 72 (figurark, venter på myke-figurer), ny 1716. Rom 76 av 76, objekter 83 av 86, lagbilder 534 av 701, ikoner 46 av 163, figurruter 0 av 15661 (ikke tatt inn ennå). Ikke bygget mod, ikke sendt rapport eller ordre tilbake.
 - 03:06 Figurmottaket (`myk.deliveries`) valgte oppføringen fra den rapportmappen som sorteres sist etter navn. Rettet fig003_01 i bestilling 58 tapte dermed mot den eldre pilotoppføringen («sha256 stemmer ikke»). Velger nå oppføringen som stemmer med filen. Ny test, `pytest -m "not game"` 41 bestått. `smhd myke-figurer` på nytt: 73 ark, 916 ruter ok, 15 til gjennomsyn. `smhd build-mod --name gpt --method lanczos-sharp --rooms <76 rom> --egne work/gpt-ferdig`: 76 rom, 841 objektbilder, 931 kostymeruter (238 MB). Romtest med modden startet.
+
+## 2026-10-14 03:17 (Claude)
+
+- Første grafikkrunde ferdig. Modden lagt i `hd-mod` (e85f760, 238 MB): 76 rom, 841 objektbilder, 931 figurruter.
+- Romtest med modden: 71 av 85 rom lastet, 61 ok med HD-bakgrunn, 0 krasj, 0 forskjøvet, 0 skjermavvik. 11 hang etter testhoppet, det samme som før HD. Små svarte felt (17 til 78 px) i 24 kjøringer. Disse er ikke forklart ennå.
+- Rapport, retur.md, status, ORDRE, GRAFIKKLISTE og BESTILLING lagt i `gpt-arbeid` (07f3e04). Ordren ber om avvisningene først og så resten av listen.
+- `gpt_gren.sh send` tok bort Codex sin linje om ANALYSE.md i AGENTS.md i `gpt-arbeid`. Rettet der (e5433e0) og i `docs/gpt-arbeid-AGENTS.md`.
+- STATUS, README, todo og memory oppdatert for runden.

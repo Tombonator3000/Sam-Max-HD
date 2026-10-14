@@ -1,10 +1,10 @@
 # Status
 
-Oppdatert 13. oktober 2026.
+Oppdatert 14. oktober 2026.
 
 ## Kort
 
-Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. Spillfilene ligger i `spilldata`, ScummVM med HD-patchen bygger og kjører spillet, all originalgrafikken er trukket ut, alle skriptene er dekompilert, og HD-motoren er på for Sam & Max: rom, objekter, blast-objekter og figurer får HD fra en mod. Teksten og menyraden HD Graphics er ikke portet. All grafikken er klargjort som jobber til ChatGPT (13. oktober), og stilpiloten venter på grafikeren og Tom. Ingen ferdig HD-grafikk ennå.
+Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. Spillfilene ligger i `spilldata`, ScummVM med HD-patchen bygger og kjører spillet, all originalgrafikken er trukket ut, alle skriptene er dekompilert, og HD-motoren er på for Sam & Max: rom, objekter, blast-objekter og figurer får HD fra en mod. Teksten og menyraden HD Graphics er ikke portet. All grafikken er klargjort som jobber til ChatGPT (13. oktober). Første grafikkrunde er tatt inn 14. oktober: 76 rom, 841 objektbilder og 931 figurruter i HD ligger i `hd-mod` (e85f760), resten vises som originalen.
 
 ## Det som virker
 
@@ -23,9 +23,10 @@ Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. 
 | Skript | `tools/bygg_descumm.sh` og `tools/dekompiler_skript.py`: 1181 skript til `work/skript` | 1179 uten feil, 2 stopper på opkoden 0xBD (ingen virkning i v6). Talereplikker, skriptnumre og romnumre kontrollert mot spillfilene |
 | Grafikkjobber | `smhd gpt-pakke --figurer alle`: 2 hovedark (Sam, Max), 115 romjobber for 76 rom, 86 objektjobber, 296 lagjobber (701 bilder), 9 ikonark (163 bilder) og 1758 figurark (15 661 ruter fra 343 kostymer). `smhd gpt-ordre` skriver ORDRE.md med bare stilpiloten til stilankerne finnes | Laget mot spillfilene 13. oktober i `work/gpt`. Stikkprøver av referanser og prompter sett på. Ikke sendt til grafikeren, ingen bilder laget ennå |
 | Egenkontroll | `tools/sjekk_leveranse.py` sjekker en leveranse før grafikeren committer: forskyvning og kanter for rom, objekter, lag og ikoner; størrelse, plass og omriss per rute for figurark; høyder for hovedark | Testet med syntetiske leveranser (riktig gir OK, rute 15 prosent for stor gir FEIL, rom forskjøvet 3 px gir FEIL) og i `pytest`. Ikke prøvd på ekte ChatGPT-bilder |
-| Myke figurer | `myk.py` versjon 4 (versjon 3 fra Dig): skalerer og plasserer hver rute etter originalen og merker grupper der tegnet størrelse spriker mer enn 12 prosent | Enhetstester med syntetiske ark. Ikke kjørt på ekte leveranser |
+| Myke figurer | `myk.py` versjon 4 (versjon 3 fra Dig): skalerer og plasserer hver rute etter originalen og merker grupper der tegnet størrelse spriker mer enn 12 prosent. Ved flere leveranser av samme jobb velges den med sha256 lik filen | Enhetstester med syntetiske ark. Kjørt på ekte leveranser 14. oktober: 73 ark, 916 ruter ok, 15 til gjennomsyn |
 | Kostymepaletter | `tools/kostymer.py` finner rommene hvert kostyme brukes i fra skriptene; `docs/kostymefarger.csv` gir 8 kostymer riktig palett i uttrekket. Skyggepiksler (indeks 13) tas bort fra figurarkene | `smhd extract` kjørt på nytt; game-test sjekker paletten for Sam. Rom 92 sett i motoren med samme farger som uttrekket |
 | build-mod | Mod med automatisk oppskalering fra uttrekket | `smhd build-mod --method lanczos --kostymer 2,3`: 83 rom, 950 objektbilder, 175 kostymeruter. Objektbildene i rom 81 og 82 (ingen bakgrunn) tas ikke med |
+| HD-mod fra grafikeren | `smhd gpt-inn`, `smhd myke-figurer` og `smhd build-mod --egne work/gpt-ferdig`, publisert med `tools/mod_gren.sh send mods/gpt` | 14. oktober: gpt-inn godkjente 419 leveranser (31 til sjekk, 26 avvist). Romtest med modden: 71 av 85 rom lastet, 61 ok med HD-bakgrunn, 0 krasj, 0 forskjøvet, 0 skjermavvik; 11 hang etter testhoppet som før; små svarte felt (17 til 78 px) i 24 kjøringer. Kontoret sammenlignet med originalen: riktig, bare inventarikonet er fortsatt originalt. Ikke spilt med skjerm |
 
 ## Ikke portet eller ikke testet
 

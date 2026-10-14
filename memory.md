@@ -30,7 +30,9 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Rutenummer i Sam & Max-kostymer = lag * 128 + kode (filnavn costumeCCC_NNN). Bare ruter som animasjonene bruker, tas ut. Kostyme 2 er Sam og 3 er Max (begge i rom 1).
 - Kostymefarger: COST-paletten peker på indekser i rompaletten; bare 0 til 15 er like i alle rom (Sam og Max bruker 234 til 255). RGBA-bildene bruker paletten i rommet kostymet ligger i.
 - Skriptene: `tools/bygg_descumm.sh` (scummvm-tools 8665aa1d) og `tools/dekompiler_skript.py` dekompilerer 1181 skript til work/skript (1179 uten feil; to stopper på 0xBD, som er o6_dummy i ScummVM).
-- Grenene `hd-mod` (README og SHA256SUMS, ingen mod) og `gpt-arbeid` (AGENTS, BESTILLING, ORDRE uten jobber) er startgrener.
+- `hd-mod` har første HD-mod fra 14. oktober (e85f760). `gpt-arbeid` har jobbene og ordren for neste runde.
+- `tools/gpt_gren.sh send` kopierer `docs/gpt-arbeid-AGENTS.md` over AGENTS.md i `gpt-arbeid`. Det Codex legger til der, må også inn i kilden i main, ellers forsvinner det.
+- `myk.py` velger leveransen med sha256 lik filen når en jobb har flere oppføringer i `fremdrift.json`; rapportmappene sorteres på navn, ikke tid.
 - Linux-arbeidsflyten kjører bare for hånd eller om natten når `hd-mod` endres; push-utløseren er av til HD virker.
 - Nettsiderepoet (planlagt `Tombonator3000/Sam-Max-HD-Web`) finnes ikke.
 
