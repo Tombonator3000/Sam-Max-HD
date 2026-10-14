@@ -352,10 +352,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..72adb8ce
+index 00000000..0268c81f
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,3929 @@
+@@ -0,0 +1,3940 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -2672,6 +2672,17 @@ index 00000000..72adb8ce
 +				fill = v;
 +				others = cand;
 +			}
++		}
++	}
++	// A letter whose chosen colour lies along the outside while another colour
++	// lies inside it (thin letters in a thick outline, as in the credits font of
++	// Sam & Max) is not a letter with outline: the outline would become the
++	// letter. Such glyphs are drawn from the font image.
++	for (int v = 1; v <= L && L >= 2; v++) {
++		if (v != fill && present[v] && outsideFrac[v] <= 0.1f && outsideFrac[fill] >= 0.5f) {
++			if (_logFace)
++				debug("DigHD: typeface not used for a %dx%d glyph: colour %d lies inside the chosen colour %d", w, h, v, fill);
++			return false;
 +		}
 +	}
 +	if (_logFace) {

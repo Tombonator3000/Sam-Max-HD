@@ -23,6 +23,7 @@ Kort versjon for Sam & Max. Alle detaljer om hvordan motoren virker, innstilling
 - Teksten: introen med `--subtitles` til bilde 6000 har HD-tekst (opptil 4158 HD-tekstpiksler per bilde) i HD-skriften, og «0 screen pixels differ» i alle 60 kontroller med `DIGHD_VERIFY`.
 - `engine/test.sh`: 0 av omtrent 1 million HD-piksler skiller seg sterkt fra originalen; HD-teksten telles for seg, som i The Dig.
 - Patchen passer mot en ren `engines/scumm` ved `c9091321` (`git apply --check`).
+- Rulleteksten (rom 77, `DIGHD_TEST_ROOM=77`): panelene som lånes fra rom 67 (`loadFlObject`, objekt 600 til 603) får HD (42 880 HD-objektpiksler). Teksten avslørte to feil i HD-skriften, rettet samme dag: (1) i en font med tynne bokstaver i tykk kant valgte skriften kanten som bokstav, og e, c og r ble store svarte former. Når fargen som er valgt ligger ytterst og en annen ligger helt inni, tegnes glyfen nå fra fontbildet. (2) Font 5 er en pyntet font med bare store bokstaver (rulleteksten, påkledningen, Bumpusville); den er tatt ut av HD-skriften (`skrift.py`) og skaleres fra fontbildet, så formen blir som i originalen.
 
 ## Hva patchen gjør
 
