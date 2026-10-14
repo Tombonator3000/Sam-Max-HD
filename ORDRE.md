@@ -1,35 +1,42 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-13 10:45 (norsk tid)
+Oppdatert 2026-10-14 03:14 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
 ## Status
 
-- Jobber: 2264. ny 2264
-- Ferdige rom: 0 av 76
-- Ferdige objekter: 0 av 86
-- Lagjobber: 0 av 296 godkjent. Ferdige objektbilder fra lag: 0 av 701
-- Ikonark: 0 av 9 godkjent. Ferdige bilder fra ikonark: 0 av 163
+- Jobber: 2264. avvist 26, godkjent 419, levert 72, ny 1716, sjekk 31
+- Ferdige rom: 73 av 76 (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61, 62, 66, 68, 70, 71, 73, 76, 77, 79, 84, 85, 86, 87, 88, 89, 90, 91)
+- Ferdige objekter: 64 av 86 (obj036_01, obj050_01, obj089_01, obj142_01, obj187_01, obj187_02, obj187_03, obj187_04, obj187_06, obj199_01, obj204_01, obj294_01, obj295_01, obj304_01, obj308_01, obj336_01, obj338_01, obj340_01, obj409_01, obj523_01, obj524_01, obj570_01, obj570_02, obj570_03, obj598_01, obj599_01, obj601_01, obj604_01, obj606_01, obj607_01, obj608_01, obj609_01, obj610_01, obj611_01, obj612_01, obj613_01, obj664_01, obj665_01, obj666_01, obj667_01, obj669_01, obj682_01, obj683_01, obj684_01, obj772_01, obj773_01, obj776_01, obj777_01, obj780_01, obj812_01, obj813_01, obj821_01, obj823_01, obj828_01, obj829_01, obj830_01, obj832_01, obj839_01, obj850_01, obj901_01, obj989_01, obj989_02, obj995_01, obj996_01)
+- Lagjobber: 239 av 296 godkjent. Ferdige objektbilder fra lag: 541 av 701
+- Ikonark: 4 av 9 godkjent. Ferdige bilder fra ikonark: 32 av 163
 - Figurark: 0 av 1758 godkjent. Ferdige figurruter: 0 av 15661
-- Hovedark: 0 av 2 levert
+- Hovedark: 2 av 2 levert
 
-## Stilpiloten (gjør dette nå)
+## Gjør disse nå
 
-Før noe annet males, lager vi en stilpilot som Tom godkjenner: hovedark for Sam og Max, kontoret (rom 7) og det første figurarket for hver av dem. Ta dem i denne rekkefølgen:
+1. `obj187_05` (rom 18, Wak-A-Rat (minispill), objekt 187 tilstand 05, del 1/1). Avvist: deler av bildet er flyttet eller zoomet (opptil 7.9 px). Les retur.md. Legg ved `jobber/obj187_01/resultat.png` som bilde to (ikke stilankeret), så tilstandene blir like. Lag denne etter obj187_01.
+2. `obj307_01` (rom 31, Kikkerten med utsikten, objekt 307 tilstand 01, del 1/1). Avvist: deler av bildet er flyttet eller zoomet (opptil 26.9 px). Les retur.md.
+3. `obj811_01` (rom 78, Kikkerten, utsnitt (landskapsbiter), objekt 811 tilstand 01, del 1/1). Avvist: deler av bildet er flyttet eller zoomet (opptil 10.0 px). Les retur.md.
+4. `lag002_01` (rom 2, Laboratoriet (intro), lag 01 med 6 objektbilder, del 1/1). Avvist: objekter er feil: obj896_01 mangler (kantlikhet 0.89, med bakgrunnen 0.95). Les retur.md. Legg ved `jobber/rom002/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+5. `lag030_04_del1av2` (rom 30, Den roterende restauranten, lag 04 med 1 objektbilde, del 1/2). Avvist: objekter er feil: obj301_04 mangler (kantlikhet 0.80, med bakgrunnen 0.91). Les retur.md. Legg ved `jobber/rom030_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+6. `lag037_01_del2av2` (rom 37, Mystery Vortex, inne (Escher-rommet), lag 01 med 8 objektbilder, del 2/2). Avvist: deler av bildet er flyttet eller zoomet (opptil 2.0 px); objekter er feil: obj352_01 mangler (kantlikhet 0.70, med bakgrunnen 0.97). Les retur.md. Legg ved `jobber/rom037_del2av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+7. `lag037_02_del1av2` (rom 37, Mystery Vortex, inne (Escher-rommet), lag 02 med 4 objektbilder, del 1/2). Avvist: objekter er feil: obj350_02 mangler (kantlikhet 0.85, med bakgrunnen 0.94). Les retur.md. Legg ved `jobber/rom037_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+8. `lag037_03_del1av2` (rom 37, Mystery Vortex, inne (Escher-rommet), lag 03 med 4 objektbilder, del 1/2). Avvist: objekter er feil: obj350_03 mangler (kantlikhet 0.46, med bakgrunnen 0.69), obj352_03 mangler (kantlikhet 0.43, med bakgrunnen 0.54). Les retur.md. Legg ved `jobber/rom037_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+9. `lag037_06_del2av2` (rom 37, Mystery Vortex, inne (Escher-rommet), lag 06 med 2 objektbilder, del 2/2). Avvist: objekter er feil: obj350_06 mangler (kantlikhet 0.60, med bakgrunnen 0.89). Les retur.md. Legg ved `jobber/rom037_del2av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+10. `lag045_03` (rom 45, Bumpusville, soverommet, lag 03 med 2 objektbilder, del 1/1). Avvist: objekter er feil: obj433_03 mangler (kantlikhet 0.82, med bakgrunnen 0.96). Les retur.md. Legg ved `jobber/rom045/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
 
-1. Hovedark for Sam: lag `hovedark/sam.png` etter `hovedark/sam/referanse.png` og `hovedark/sam/prompt.txt`, og skriv `hovedark/sam-notat.md`.
-2. Hovedark for Max: lag `hovedark/max.png` etter `hovedark/max/referanse.png` og `hovedark/max/prompt.txt`, og skriv `hovedark/max-notat.md`.
-3. `rom007_del1av2` (rom 7, Kontoret, del 1/2). (pilot)
-4. `rom007_del2av2` (rom 7, Kontoret, del 2/2). (pilot)
-5. `fig002_01` (figurark 1 for Sam (kostyme 2), 9 ruter: stående mot høyre, mot oss, bort (3 ruter); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter), del 1/1). (pilot) Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret). Lag denne etter at `hovedark/sam.png` er levert.
-6. `fig003_01` (figurark 1 for Max (kostyme 3), 28 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); gange mot høyre (8 ruter); snakking (lag 3, tegnes over kroppen) mot høyre (12 ruter), del 1/1). (pilot) Legg ved `hovedark/max.png` som bilde to (ikke stilankeret). Lag denne etter at `hovedark/max.png` er levert.
-
-**Stopp etter piloten.** Ikke start på jobbene i `GRAFIKKLISTE.md` under «Etter godkjent stilpilot» før Tom har godkjent piloten og Claude har lagt stilankerne i `stil/` og skrevet en ny ordre. Kjør `verktoy/sjekk_leveranse.py` på hver leveranse før du committer.
+Når disse er levert, fortsett med neste bestilling i `GRAFIKKLISTE.md` uten å vente på ny ordre.
 
 ## Stilankere
 
-Ingen ennå. De godkjente pilotbildene blir stilankerne.
+- `stil/fig002_01.png`
+- `stil/fig003_01.png`
+- `stil/rom007_del1av2.png`
+- `stil/rom007_del2av2.png`
+
+Legg ved det ankeret som ligner mest på rommet som bilde to.
 
 ## Leveringsformat
 
