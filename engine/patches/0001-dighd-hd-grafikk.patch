@@ -352,10 +352,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..67eba5ab
+index 00000000..a07ea2c3
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,4222 @@
+@@ -0,0 +1,4415 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -418,6 +418,9 @@ index 00000000..67eba5ab
 +	kSrcCel         = 3u << 30,
 +	kSrcMask        = 3u << 30
 +};
++
++// xBR 4x on a mask (see below)
++static void xbr4(const Common::Array<float> &mask, int w, int h, Common::Array<float> &out);
 +
 +static inline uint32 packRoom(int rx, int ry) { return kSrcRoom | ((uint32)ry << 15) | (uint32)rx; }
 +static inline uint32 packObject(int slot, int ox, int oy) { return kSrcObject | ((uint32)slot << 22) | ((uint32)oy << 11) | (uint32)ox; }
@@ -952,10 +955,13 @@ index 00000000..67eba5ab
 +		_objectImages[key] = img;
 +	}
 +
-+	// One stable slot per object for the current room. The slot index is
-+	// stored per pixel, so slots are never moved or removed until the room changes.
++	// One stable slot per object and state for the current room. The slot index
++	// is stored per pixel, so slots are never moved or removed until the room
++	// changes. Some animations draw a state that is only a patch over the one
++	// before (the flags in room 17): the pixels it leaves see-through still show
++	// the earlier state, and find its HD image in that state's slot.
 +	for (uint i = 0; i < _drawn.size(); i++) {
-+		if (_drawn[i].obj == obj && !_drawn[i].blast) {
++		if (_drawn[i].obj == obj && _drawn[i].state == state && !_drawn[i].blast) {
 +			_drawn[i].state = state;
 +			_drawn[i].x = x;
 +			_drawn[i].y = y;
@@ -1483,6 +1489,27 @@ index 00000000..67eba5ab
 +		const int zOff = zbuf ? _vm->_gdi->_imgBufOffs[zbuf] : 0;
 +		const int strips = _vm->_gdi ? _vm->_gdi->_numStrips : 0;
 +
++		// The z-plane mask is one bit per original pixel, so the edge against the
++		// foreground was 4 x 4 steps. Where the edge crosses the cel, the mask is
++		// scaled with xBR (2 pixels of margin, so every part gives the same
++		// result) and lays the cel over with that share.
++		Common::Array<float> zvis;
++		const int zx0 = r.left - 2, zy0 = r.top - 2, zw = r.width() + 4, zh = r.height() + 4;
++		if (zbuf && n == 4) {
++			Common::Array<float> m(zw * zh);
++			bool anyHidden = false, anyShown = false;
++			for (int yy = 0; yy < zh; yy++)
++				for (int xx = 0; xx < zw; xx++) {
++					const bool hid = zHidden(maskBase, maskSize, zOff, strips, vs.xstart + zx0 + xx, zy0 + yy + vyOff, vs.h);
++					m[yy * zw + xx] = hid ? 0.0f : 1.0f;
++					anyHidden |= hid;
++					anyShown |= !hid;
++				}
++			if (anyHidden && anyShown)
++				xbr4(m, zw, zh, zvis);
++		}
++		const bool zsmooth = !zvis.empty();
++
 +		for (int sy = r.top; sy < r.bottom; sy++) {
 +			const int vy = sy + vyOff;
 +			for (int sx = r.left; sx < r.right; sx++) {
@@ -1495,8 +1522,18 @@ index 00000000..67eba5ab
 +					continue;
 +				const int rx = vs.xstart + sx;
 +				// Hidden by the z-plane as the renderer hides the actor's pixels
-+				if (zbuf && zHidden(maskBase, maskSize, zOff, strips, rx, vy, vs.h))
-+					continue;
++				// (with the smooth mask: only where none of it shows)
++				const float *zrow = zsmooth ? zvis.data() + (size_t)((sy - zy0) * 4) * (zw * 4) + (sx - zx0) * 4 : nullptr;
++				if (zbuf && zHidden(maskBase, maskSize, zOff, strips, rx, vy, vs.h)) {
++					if (!zsmooth)
++						continue;
++					float any = 0.0f;
++					for (int dy = 0; dy < 4; dy++)
++						for (int dx = 0; dx < 4; dx++)
++							any += MAX(0.0f, zrow[dy * zw * 4 + dx]);
++					if (any <= 0.0f)
++						continue;
++				}
 +				byte *out = _outBuf.data() + ((sy - y) * n) * outPitch + ((sx - x) * n) * bpp;
 +				bool drew = false;
 +				for (int dy = 0; dy < n; dy++) {
@@ -1548,6 +1585,18 @@ index 00000000..67eba5ab
 +							pg = (uint32)acc[1];
 +							pb = (uint32)acc[2];
 +							pa = (uint32)(acc[3] * 255);
++						}
++						if (zrow) {
++							// The share of the smooth z-plane mask that shows the cel
++							const float zv = CLIP(zrow[dy * zw * 4 + dx], 0.0f, 1.0f);
++							if (zv <= 0.0f)
++								continue;
++							if (zv < 1.0f) {
++								pr = (uint32)(pr * zv);
++								pg = (uint32)(pg * zv);
++								pb = (uint32)(pb * zv);
++								pa = (uint32)(pa * zv);
++							}
 +						}
 +						// Tint (shadow, light, fades), at most full colour
 +						pr = MIN<uint32>((pr * c.gain[0]) >> 8, pa);
@@ -1655,6 +1704,14 @@ index 00000000..67eba5ab
 +	const bool blastOn = mapping && !_blastMarks.empty() && vbase == _blastBase && _blastSize == vsize &&
 +	                     keyPitch == _blastPitch && keySrc >= vbase && textOff < _blastSize;
 +
++	// For each object slot, the slot of the same object's latest drawing
++	int newest[256];
++	for (uint i = 0; i < _drawn.size(); i++) {
++		newest[i] = i;
++		for (uint j = 0; j < _drawn.size(); j++)
++			if (_drawn[j].obj == _drawn[i].obj && _drawn[j].blast == _drawn[i].blast && _drawn[j].seq > _drawn[newest[i]].seq)
++				newest[i] = j;
++	}
 +	for (int r = 0; r < height; r++) {
 +		const int sy = y + r;
 +		if (sy < 0 || sy >= _h)
@@ -1681,6 +1738,13 @@ index 00000000..67eba5ab
 +					// What the glyph covers is the screen buffer itself, not the text surface
 +					if (text && idx != f[c])
 +						idx = vsSrc[r * vs->pitch + c];
++					// The edge of an HD glyph reaching into a pixel the glyph left
++					// transparent: only where the text surface is see-through there, so
++					// the screen shows the buffer. Text the screen no longer shows (a
++					// fade or a room change before the text surface is cleared) left
++					// dotted HD letters on the black screen.
++					else if (text && f[c] != vsSrc[r * vs->pitch + c])
++						text = 0;
 +				}
 +			}
 +			uint32 source = kSrcFlat;
@@ -1787,6 +1851,17 @@ index 00000000..67eba5ab
 +						const int ox = rx - d.x, oy = ry - d.y;
 +						if (ox < 0 || oy < 0 || ox >= d.image->idx.w || oy >= d.image->idx.h)
 +							continue;
++						// An earlier state of an object counts only where its latest
++						// state is see-through (a patch over it). Elsewhere it gave
++						// ghosts of earlier frames, as the propeller in room 17.
++						const int nw = newest[i];
++						if (nw != (int)i) {
++							const DrawnObject &l = _drawn[nw];
++							const int lx2 = rx - l.x, ly2 = ry - l.y;
++							if (l.image && lx2 >= 0 && ly2 >= 0 && lx2 < l.image->idx.w && ly2 < l.image->idx.h &&
++							    (int)*((const byte *)l.image->idx.getBasePtr(lx2, ly2)) != l.image->transparent)
++								continue;
++						}
 +						const byte oi = *((const byte *)d.image->idx.getBasePtr(ox, oy));
 +						if (oi == baseIdx && (int)oi != d.image->transparent) {
 +							source = packObject(i, ox, oy);
@@ -2089,9 +2164,35 @@ index 00000000..67eba5ab
 +		return 0;
 +	const GlyphShape &sh = _glyphShapes[_glyphStyles[own >> 12].shape];
 +	const int gx = (own >> 6) & 63, gy = own & 63;
-+	if (sh.lev[gy * sh.w + gx]) {
++	if (const byte lv = sh.lev[gy * sh.w + gx]) {
 +		if (shown != t.val[off])
 +			return 0;
++		// A pixel of one colour of the glyph (often its black shadow) next to
++		// pixels of its other colours counts only while one of those is still
++		// there. Text erased by painting over it in the shadow's colour (black
++		// before a room change) otherwise left the shadow pixels as HD letters.
++		if (sh.levels > 1) {
++			bool other = false, kept = false;
++			for (int dy = -1; dy <= 1 && !kept; dy++) {
++				const int ny = gy + dy;
++				if (ny < 0 || ny >= sh.h)
++					continue;
++				for (int dx = -1; dx <= 1 && !kept; dx++) {
++					const int nx = gx + dx;
++					if (nx < 0 || nx >= sh.w)
++						continue;
++					const byte nl = sh.lev[ny * sh.w + nx];
++					if (!nl || nl == lv)
++						continue;
++					other = true;
++					const ptrdiff_t noff = (ptrdiff_t)off + (ptrdiff_t)dy * t.pitch + dx;
++					kept = noff >= 0 && (size_t)noff < t.size &&
++					       t.own[noff] == ((own & ~0xFFFu) | ((uint32)nx << 6) | (uint32)ny) && t.base[noff] == t.val[noff];
++				}
++			}
++			if (other && !kept)
++				return 0;
++		}
 +		base = t.under[off];
 +		return own;
 +	}
@@ -2489,6 +2590,40 @@ index 00000000..67eba5ab
 +	}
 +}
 +
++// An indexed image (transparent index tr) at 4x with a margin of pad original
++// pixels: the outline with xBR (alpha 0..1, soft edge), the colours with
++// Scale4x. Inside the smooth outline but outside the pixels, the nearest colour.
++void DigHD::smoothCodes(const byte *src, int pitch, int w, int h, byte tr, int pad,
++                        Common::Array<float> &alpha, Common::Array<byte> &big) const {
++	const int pw = w + 2 * pad, ph = h + 2 * pad, W4 = pw * 4, H4 = ph * 4;
++	Common::Array<byte> code(pw * ph, tr);
++	Common::Array<float> mask(pw * ph, 0.0f);
++	for (int y = 0; y < h; y++) {
++		const byte *row = src + y * pitch;
++		for (int x = 0; x < w; x++) {
++			code[(y + pad) * pw + x + pad] = row[x];
++			mask[(y + pad) * pw + x + pad] = row[x] != tr ? 1.0f : 0.0f;
++		}
++	}
++	xbr4(mask, pw, ph, alpha);
++	Common::Array<byte> two;
++	scale2x(code, pw, ph, two);
++	scale2x(two, pw * 2, ph * 2, big);
++	for (int y = 0; y < H4; y++) {
++		for (int x = 0; x < W4; x++) {
++			float &a = alpha[y * W4 + x];
++			a = CLIP(a, 0.0f, 1.0f);
++			byte &c = big[y * W4 + x];
++			if (c != tr || a <= 0.0f)
++				continue;
++			for (int d = 1; d <= 2 && c == tr; d++)
++				for (int dy = -d; dy <= d && c == tr; dy++)
++					for (int dx = -d; dx <= d && c == tr; dx++)
++						c = code[CLIP(y / 4 + dy, 0, ph - 1) * pw + CLIP(x / 4 + dx, 0, pw - 1)];
++		}
++	}
++}
++
 +// A cel with only its original (costumeCCC_NNN_idx.png, no HD image) in a
 +// costume that has soft cels: the mod has the original so the cel is not
 +// shown as blocks of original pixels next to the painted figure (Sam's hands
@@ -2511,22 +2646,11 @@ index 00000000..67eba5ab
 +	if (!ok || transparent < 0 || dec.getSurface()->format.bytesPerPixel != 1)
 +		return false;
 +	const Graphics::Surface *is = dec.getSurface();
-+	const int pad = 1, pw = is->w + 2 * pad, ph = is->h + 2 * pad, W4 = pw * 4, H4 = ph * 4;
++	const int pad = 1, W4 = (is->w + 2 * pad) * 4, H4 = (is->h + 2 * pad) * 4;
 +	const byte tr = (byte)transparent;
-+	Common::Array<byte> code(pw * ph, tr);
-+	Common::Array<float> mask(pw * ph, 0.0f);
-+	for (int y = 0; y < is->h; y++) {
-+		const byte *row = (const byte *)is->getBasePtr(0, y);
-+		for (int x = 0; x < is->w; x++) {
-+			code[(y + pad) * pw + x + pad] = row[x];
-+			mask[(y + pad) * pw + x + pad] = row[x] != tr ? 1.0f : 0.0f;
-+		}
-+	}
 +	Common::Array<float> alpha;
-+	xbr4(mask, pw, ph, alpha);
-+	Common::Array<byte> two, big;
-+	scale2x(code, pw, ph, two);
-+	scale2x(two, pw * 2, ph * 2, big);
++	Common::Array<byte> big;
++	smoothCodes((const byte *)is->getPixels(), is->pitch, is->w, is->h, tr, pad, alpha, big);
 +
 +	const Graphics::Palette &pal = dec.getPalette();
 +	memset(out.basePal, 0, sizeof(out.basePal));
@@ -2540,17 +2664,8 @@ index 00000000..67eba5ab
 +	for (int y = 0; y < H4; y++) {
 +		uint32 *o = (uint32 *)out.hd.getBasePtr(0, y);
 +		for (int x = 0; x < W4; x++) {
-+			const float a = CLIP(alpha[y * W4 + x], 0.0f, 1.0f);
-+			byte c = big[y * W4 + x];
-+			if (c == tr && a > 0.0f) {
-+				// Inside the smooth outline but outside the pixels: the nearest colour
-+				for (int d = 1; d <= 2 && c == tr; d++)
-+					for (int dy = -d; dy <= d && c == tr; dy++)
-+						for (int dx = -d; dx <= d && c == tr; dx++) {
-+							const int cx = CLIP(x / 4 + dx, 0, pw - 1), cy = CLIP(y / 4 + dy, 0, ph - 1);
-+							c = code[cy * pw + cx];
-+						}
-+			}
++			const float a = alpha[y * W4 + x];
++			const byte c = big[y * W4 + x];
 +			if (c == tr || a <= 0.0f) {
 +				o[x] = _rgba.ARGBToColor(0, 0, 0, 0);
 +				continue;
@@ -3115,19 +3230,37 @@ index 00000000..67eba5ab
 +
 +// ---------------------------------------------------------------- composing
 +
-+uint32 DigHD::tinted(uint32 rgba, byte idx, const byte *basePal) const {
-+	byte a, r, g, b;
-+	_rgba.colorToARGB(rgba, a, r, g, b);
++// Scale each channel by current/original; a channel that was black in the
++// original cannot be scaled, so it takes the current colour directly (-1).
++// Worked out once per original pixel; the HD pixels then need no division.
++// Returns false when the colour is unchanged (the HD pixel as it is).
++bool DigHD::tintFactors(byte idx, const byte *basePal, int f[3]) const {
 +	const byte *cur = _pal + idx * 3;
 +	const byte *base = basePal + idx * 3;
 +	if (cur[0] == base[0] && cur[1] == base[1] && cur[2] == base[2])
-+		return _fmt.RGBToColor(r, g, b);
-+	// Scale each channel by current/original; a channel that was black in the
-+	// original cannot be scaled, so it takes the current colour directly.
++		return false;
++	for (int k = 0; k < 3; k++)
++		f[k] = base[k] ? (cur[k] << 16) / base[k] : -1 - cur[k];
++	return true;
++}
++
++uint32 DigHD::applyTint(uint32 rgba, const int f[3]) const {
++	byte a, r, g, b;
++	_rgba.colorToARGB(rgba, a, r, g, b);
 +	int c[3] = { r, g, b };
 +	for (int k = 0; k < 3; k++)
-+		c[k] = base[k] ? MIN(255, c[k] * cur[k] / base[k]) : cur[k];
++		c[k] = f[k] < 0 ? -1 - f[k] : MIN(255, (c[k] * f[k]) >> 16);
 +	return _fmt.RGBToColor(c[0], c[1], c[2]);
++}
++
++uint32 DigHD::tinted(uint32 rgba, byte idx, const byte *basePal) const {
++	int f[3];
++	if (!tintFactors(idx, basePal, f)) {
++		byte a, r, g, b;
++		_rgba.colorToARGB(rgba, a, r, g, b);
++		return _fmt.RGBToColor(r, g, b);
++	}
++	return applyTint(rgba, f);
 +}
 +
 +// The original colour mixed half and half with yellow: marks a pixel without HD
@@ -3511,13 +3644,41 @@ index 00000000..67eba5ab
 +				continue;
 +			}
 +			const Graphics::Surface *hd = &img->hd;
-+			const byte *basePal = img->basePal;
 +			const int hx = ix * n, hy = iy * n;
++			int f[3];
++			const bool tint = tintFactors(idx, img->basePal, f);
++			// A pixel that is black in the original and still black cannot be
++			// tinted, and its HD pixel (an outline blending into the colours next
++			// to it) stays as it is. When the picture fades to black around it, the
++			// HD pixel must not be brighter than the colours around it are now:
++			// the outlines stayed lit on the black screen.
++			int cap[3] = { 255, 255, 255 };
++			const byte *bp = img->basePal + idx * 3;
++			const bool capped = !tint && !(bp[0] | bp[1] | bp[2]);
++			if (capped) {
++				cap[0] = cap[1] = cap[2] = 0;
++				for (int ny = MAX(sy - 1, 0); ny <= MIN(sy + 1, _h - 1); ny++)
++					for (int nx = MAX(sx - 1, 0); nx <= MIN(sx + 1, _w - 1); nx++) {
++						const byte *q = _pal + _shadow[ny * _w + nx] * 3;
++						for (int k = 0; k < 3; k++)
++							cap[k] = MAX(cap[k], (int)q[k]);
++					}
++			}
 +			for (int dy = 0; dy < n; dy++) {
 +				byte *o = out + dy * outPitch;
 +				const uint32 *t = (const uint32 *)hd->getBasePtr(hx, hy + dy);
 +				for (int dx = 0; dx < n; dx++, o += bpp) {
-+					const uint32 col = tinted(t[dx], idx, basePal);
++					uint32 col;
++					if (tint) {
++						col = applyTint(t[dx], f);
++					} else {
++						byte ha, hr, hg, hb;
++						_rgba.colorToARGB(t[dx], ha, hr, hg, hb);
++						if (capped)
++							col = _fmt.RGBToColor(MIN((int)hr, cap[0]), MIN((int)hg, cap[1]), MIN((int)hb, cap[2]));
++						else
++							col = _fmt.RGBToColor(hr, hg, hb);
++					}
 +					if (bpp == 4) WRITE_UINT32(o, col); else WRITE_UINT16(o, col);
 +				}
 +			}
@@ -3581,6 +3742,12 @@ index 00000000..67eba5ab
 +}
 +
 +void DigHD::writeRect(int x, int y, int width, int height) {
++	// One pixel more on every side: a pixel that is black in the original takes
++	// its brightest colour from the pixels around it (compose())
++	x--;
++	y--;
++	width += 2;
++	height += 2;
 +	if (x < 0) { width += x; x = 0; }
 +	if (y < 0) { height += y; y = 0; }
 +	width = MIN(width, _w - x);
@@ -3715,12 +3882,38 @@ index 00000000..67eba5ab
 +	const int bpp = _fmt.bytesPerPixel;
 +	const uint32 key = _fmt.aBits() ? _fmt.ARGBToColor(0, 255, 0, 255) : _fmt.RGBToColor(255, 0, 255);
 +	Common::Array<byte> buf(width * n * height * n * bpp);
-+	for (int y = 0; y < height * n; y++) {
-+		for (int x = 0; x < width * n; x++) {
-+			const byte i = cursor[(y / n) * width + (x / n)];
-+			const uint32 col = (i == transColor) ? key : _fmt.RGBToColor(_pal[i * 3], _pal[i * 3 + 1], _pal[i * 3 + 2]);
-+			byte *o = buf.data() + (y * width * n + x) * bpp;
++	if (n == 4 && !_classic && transColor >= 0 && transColor < 256) {
++		// Smooth like the figures without HD image (smoothCel()): outline with
++		// xBR, colours with Scale4x. The cursor has a key colour, not alpha, so
++		// the soft edge is cut at half.
++		Common::Array<float> alpha;
++		Common::Array<byte> big;
++		smoothCodes(cursor, width, width, height, (byte)transColor, 0, alpha, big);
++		for (int i = 0; i < width * n * height * n; i++) {
++			const byte c = big[i];
++			const uint32 col = (c == transColor || alpha[i] < 0.5f) ? key : _fmt.RGBToColor(_pal[c * 3], _pal[c * 3 + 1], _pal[c * 3 + 2]);
++			byte *o = buf.data() + i * bpp;
 +			if (bpp == 4) WRITE_UINT32(o, col); else WRITE_UINT16(o, col);
++		}
++	} else {
++		for (int y = 0; y < height * n; y++) {
++			for (int x = 0; x < width * n; x++) {
++				const byte i = cursor[(y / n) * width + (x / n)];
++				const uint32 col = (i == transColor) ? key : _fmt.RGBToColor(_pal[i * 3], _pal[i * 3 + 1], _pal[i * 3 + 2]);
++				byte *o = buf.data() + (y * width * n + x) * bpp;
++				if (bpp == 4) WRITE_UINT32(o, col); else WRITE_UINT16(o, col);
++			}
++		}
++	}
++	if (!_dumpDir.empty()) {
++		// For the tests: the cursor is not in the screen dumps
++		Graphics::Surface cs;
++		cs.init(width * n, height * n, width * n * bpp, buf.data(), _fmt);
++		Common::FSNode cnode(_dumpDir.join(Common::String::format("cursor_%06u.png", _frameNo)));
++		if (Common::WriteStream *cws = cnode.createWriteStream()) {
++			::Image::writePNG(*cws, cs);
++			cws->finalize();
++			delete cws;
 +		}
 +	}
 +	CursorMan.replaceCursor(buf.data(), width * n, height * n, hotspotX * n, hotspotY * n, key, &_fmt);
@@ -4121,7 +4314,7 @@ index 00000000..67eba5ab
 +		const ObjectData &od = _vm->_objs[idx];
 +		int slot = -1;
 +		for (uint i = 0; i < _drawn.size(); i++)
-+			if (_drawn[i].obj == h.obj)
++			if (_drawn[i].obj == h.obj && !_drawn[i].blast && (slot < 0 || _drawn[i].seq > _drawn[slot].seq))
 +				slot = i;
 +		Common::String drawn = "no";
 +		if (slot >= 0 && _drawn[slot].seq > h.seq)
@@ -4580,10 +4773,10 @@ index 00000000..67eba5ab
 +} // End of namespace Scumm
 diff --git a/engines/scumm/dighd.h b/engines/scumm/dighd.h
 new file mode 100644
-index 00000000..1dcae60b
+index 00000000..8348aba0
 --- /dev/null
 +++ b/engines/scumm/dighd.h
-@@ -0,0 +1,562 @@
+@@ -0,0 +1,565 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -4897,6 +5090,7 @@ index 00000000..1dcae60b
 +	bool softCelColour(const CelSlot &cs, int lx, int ly, byte idx) const;
 +	bool nearCode(const CelSlot &cs, int cx, int cy, byte &code) const;
 +	bool smoothCel(const Common::Path &idxFile, Image &out);
++	void smoothCodes(const byte *src, int pitch, int w, int h, byte tr, int pad, Common::Array<float> &alpha, Common::Array<byte> &big) const;
 +	void scheduleSoft(const CelSlot &c);
 +	void flushSoft();
 +	void softGain(CelSlot &c);
@@ -4990,6 +5184,8 @@ index 00000000..1dcae60b
 +	uint32 textAt(const TextLayer &t, size_t off, byte shown, byte &base) const;
 +	void composeText(byte *out, int outPitch, uint32 ref);
 +	void recomputeTint();
++	bool tintFactors(byte idx, const byte *basePal, int f[3]) const;
++	uint32 applyTint(uint32 rgba, const int f[3]) const;
 +	uint32 tinted(uint32 rgba, byte idx, const byte *basePal) const;
 +	void dumpFrame();
 +
