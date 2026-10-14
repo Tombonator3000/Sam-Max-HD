@@ -87,3 +87,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Nettsiden henter HD-pakken i bakgrunnen etter start (`prefetch` i `local-files.mjs`); uten det hentet spillet hver fil fra GitHub første gang og stoppet imens.
 - Toms runde 14. oktober: tekstskygge som ble malt over med svart ga prikkete HD-tekst (rettet i `textAt`); svarte originalpiksler ble stående lyse ved nedtoning (rettet med naboene; `writeRect` bygger én piksel ekstra); pekeren, z-kanten og figurer uten HD-bilde glattes i motoren. Inventaret kommer fram ved å starte fra begynnelsen, hoppe over introen med Esc (hvert 300. bilde til 3600) og klikke 20/185 ved bilde 4400; testhoppet åpner det ikke.
 - Rom smalere enn skjermen (69, 80 til 82, 93, 94) har ikoner og inventarting; `build-mod` tar alltid med objektene der, skalert med Scale4x.
+- Ressursbank: `docs/GJENNOMGANG.md` (sted for sted, med romnumre), egen oppsummering av Derek Waites gjennomgang hos Just Adventure. Teksten derfra er ikke kopiert inn (opphavsrett, offentlig repo).
+- HD-skriften er Atkinson Hyperlegible (fet, OFL) fra 15. oktober; `fonts/OFL-atkinson.txt` i modden.
+- `build-mod` fyller magentaflekker (nøkkelfargen) i malte bilder fra fargene rundt (`remove_magenta`), men ikke der originalen selv er magenta (Max's Wax, rom 84).

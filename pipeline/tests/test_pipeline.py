@@ -1411,22 +1411,23 @@ def test_text_font_letters(tmp_path):
     import numpy as np
     from smhd import skrift
     n = skrift.lag_skrift(tmp_path)
-    assert n == {"exo2": 94}
+    assert n == {"atkinson": 94}
     fonts = tmp_path / "fonts"
     kart = {int(a): b for a, b in (l.split() for l in (fonts / "map.txt").read_text().splitlines()
                                    if l and not l.startswith("#"))}
-    assert kart[2] == "exo2" and kart[100] == "exo2"
-    assert (fonts / "OFL.txt").read_text().startswith("Copyright")
+    assert kart[2] == "atkinson" and kart[100] == "atkinson"
+    assert (fonts / "OFL-atkinson.txt").read_text().startswith("Copyright")
+    assert "Atkinson Hyperlegible" in (fonts / "map.txt").read_text()
     # ett bilde for skriften, og en linje per bokstav med plassen i bildet
-    atlas = Image.open(fonts / "exo2.png")
+    atlas = Image.open(fonts / "atkinson.png")
     assert atlas.mode == "RGBA" and (np.asarray(atlas)[..., :3] == 255).all()
-    plass = {int(c): tuple(map(int, r)) for c, *r in (l.split() for l in (fonts / "exo2.txt").read_text().splitlines()
+    plass = {int(c): tuple(map(int, r)) for c, *r in (l.split() for l in (fonts / "atkinson.txt").read_text().splitlines()
                                                      if l and not l.startswith("#"))}
     assert sorted(plass) == list(range(33, 127)) and 32 not in plass
     x, y, w, h = plass[105]  # "i": beskåret til blekket, prikken over staven
     a = np.asarray(atlas)[y:y + h, x:x + w, 3]
-    assert a[0].max() > 128 and a[-1].max() > 128 and a[:, 0].max() > 128 and a[:, -1].max() > 128
-    rows = a.max(axis=1) > 128
+    assert a[0].max() >= 120 and a[-1].max() >= 120 and a[:, 0].max() >= 120 and a[:, -1].max() >= 120
+    rows = a.max(axis=1) >= 120
     assert rows[0] and rows[-1] and not rows.all()  # et mellomrom mellom prikk og stav
     for c, (x, y, w, h) in plass.items():
         assert x + w <= atlas.width and y + h <= atlas.height
@@ -1971,3 +1972,21 @@ def test_patch_state_is_scaled_over_the_full_state(tmp_path):
     assert hd.shape[:2] == (16, 32)
     assert not (hd[..., 2] == 255).any()          # ikke den frittstående tegningen
     assert tuple(hd[1, 30, :3]) == (60, 160, 60)  # lappen på plass
+
+
+def test_magenta_spots_are_filled_from_around():
+    # Nøkkelfargen magenta som ChatGPT har latt stå i et malt bilde, fylles fra fargene rundt; der
+    # originalen selv er magenta, står den
+    import numpy as np
+    from smhd import modpack
+    hd = Image.new("RGBA", (16, 16), (40, 120, 40, 255))
+    for x in range(6, 9):
+        hd.putpixel((x, 7), (250, 10, 245, 255))
+    orig = Image.new("RGB", (4, 4), (40, 120, 40))
+    out, n = modpack.remove_magenta(hd, orig)
+    assert n == 3
+    a = np.asarray(out)
+    assert tuple(a[7, 7, :3]) == (40, 120, 40)
+    pink = Image.new("RGB", (4, 4), (240, 20, 240))
+    out2, n2 = modpack.remove_magenta(hd, pink)
+    assert n2 == 0

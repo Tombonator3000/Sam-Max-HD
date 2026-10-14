@@ -10,6 +10,7 @@ Instrukser for alle KI-agenter som jobber i dette repoet (Claude, Codex, ChatGPT
 4. Les `STATUS.md` hvis du skal endre noe som er testet eller rapportert der.
 5. Les `docs/HD-REMASTER-METODE.md` og `docs/HD-MOTOR.md` ved arbeid med motor, pipeline eller grafikk. Referansen er The Dig HD Remake (github.com/Tombonator3000/Dig-HD-Remake), som dette repoet er kopiert fra og tilpasset.
 6. Før grafisk HD-arbeid, også stilpilot: les [remake-skillen](docs/skills/scumm-hd-remake/SKILL.md), særlig «Før HD-produksjon: avklar motiv og design». Avklar originalens betydning, funksjon, palett, figuridentitet og design før nytegning. Teknisk mottak alene er ikke visuell godkjenning.
+7. Ressursbank: `docs/GJENNOMGANG.md` sier sted for sted hva som skjer, hvem som er der og hvilke ting som hører til hvilket rom (romnumre). Bruk den før et rom eller en figur tegnes eller testes.
 
 ## Mens du jobber
 
