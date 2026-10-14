@@ -208,6 +208,10 @@ Tom: Windows-pakken starter ikke (startfila lukker seg, kanskje jobb-PC), lag en
 - Nettsiden: koden i `engine/pages` henter nå fra det offentlige repoet uten nøkkel (fillister fra API-et, filer fra raw.githubusercontent.com) og ber om nøkkel bare når GitHub begrenser. Ny test; `node --test` 17 bestått.
 - Sam-Max-HD-Web: arbeidsflyt som sjekker ut Sam-Max-HD, bygger med `engine/build-web.sh` og `engine/build-pages.py`, sjekker at ingen spillfiler er med, og publiserer på Pages fra main. Lokalt bygg stoppet: proxyen i sandkassen gir 403 på SDL3-arkivet fra GitHub.
 
+## 2026-10-14 10:10 (Claude)
+
+- PR 15 (Sam-Max-HD) og PR 1 (Sam-Max-HD-Web) flettet av Tom. Arbeidsflyten i web-repoet bygde motoren fra main og publiserte siden på https://tombonator3000.github.io/Sam-Max-HD-Web/.
+- Testet siden i Chromium uten skjerm (Playwright med SwiftShader) med `?DIGHD_TEST_ROOM=7`: ingen nøkkel trengtes, spillfilene og HD-modden ble hentet fra repoet, talen lastet ned med fremdriftslinje, DigHD startet (1280 x 800) og kontoret vises med HD-bakgrunn, HD-figurer og inventaret. Ikke testet: lyd, mobil, en hel spilløkt.
 ## 2026-10-14 10:35 (Claude)
 
 Tom: legg inn MT-32.

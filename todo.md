@@ -81,7 +81,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Windows-pakken: arbeidsflyten Windows-pakke bygger ScummVM med HD-patchen i MSYS2, legger ved spillet og HD-modden og publiserer release "windows" (14. oktober)
 - [ ] Tom tester Windows-pakken
 - [x] Nettsiden: repoet `Sam-Max-HD-Web` med arbeidsflyt som bygger og publiserer (14. oktober). Siden henter spillet uten nøkkel
-- [ ] Tom slår på Pages i Sam-Max-HD-Web (Settings > Pages > Source = GitHub Actions) og tester siden
+- [x] Nettsiden publisert på https://tombonator3000.github.io/Sam-Max-HD-Web/ (14. oktober); testet i Chromium uten skjerm
+- [ ] Tom tester nettsiden på PC og mobil
 - [ ] Windows-pakken starter ikke på Toms jobb-PC (startfila lukker seg); startfilene viser nå feilkode og logg (%APPDATA%\SamMaxHD\scummvm.log)
 - [x] MT-32-musikk (14. oktober): motoren bygges med `--enable-mt32emu`, ROM-filene fra spilldata ligger i Linux- og Windows-pakken, og `engine/run.sh`, startfilene, AppImage og nettsiden velger `--music-driver=mt32`
 - [x] `--enable-mt32emu` (14. oktober)

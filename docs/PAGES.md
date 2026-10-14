@@ -6,7 +6,7 @@ Planen er den samme som for The Dig: en nettside som går rett inn i spillet, p�
 
 | Del | Status |
 | --- | --- |
-| Nettsiderepoet `Tombonator3000/Sam-Max-HD-Web` | Finnes (14. oktober). Arbeidsflyten `.github/workflows/pages.yml` der bygger motoren fra dette repoet og publiserer på https://tombonator3000.github.io/Sam-Max-HD-Web/ |
+| Nettsiderepoet `Tombonator3000/Sam-Max-HD-Web` | Publisert 14. oktober. Testet i Chromium uten skjerm (Playwright, SwiftShader): siden startet uten nøkkel, hentet spillet og HD-modden fra repoet, og viste kontoret med HD (`?DIGHD_TEST_ROOM=7`). Ikke testet på mobil eller med lyd. Arbeidsflyten `.github/workflows/pages.yml` der bygger motoren fra dette repoet og publiserer på https://tombonator3000.github.io/Sam-Max-HD-Web/ |
 | Nettsidekoden i `engine/pages` | Tilpasset Sam & Max. Ikke bygget og ikke testet i nettleser |
 | Motoren for nettleseren (`engine/build-web.sh`, `engine/build-pages.py`) | Bygges i Actions i web-repoet. I Claude sin sandkasse stopper proxyen nedlastingen av SDL3 fra GitHub-arkivet |
 | HD-grafikk | Motoren har HD for rom, objekter og figurer i Sam & Max, men det finnes ingen HD-mod i `hd-mod` ennå |
