@@ -1,6 +1,6 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-14 03:36 (norsk tid)
+Oppdatert 2026-10-15 00:21 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
@@ -57,6 +57,14 @@ Legg ved det ankeret som ligner mest på rommet som bilde to.
 - Hovedarkene (`hovedark/<navn>.png`) leveres på gjennomsiktig bakgrunn, uten tekst.
 
 Kjør `python3 verktoy/sjekk_leveranse.py <resultat>` før du committer, og gjør om det som får FEIL. Skriv `notat.md` i jobbmappen. Commit 5 til 10 jobber om gangen i grenen `gpt-arbeid` og push.
+
+## Beskjeder
+
+- Animasjoner der en tilstand bare er en lapp over forrige bilde (flaggene og propellen i rom 17, kjerubene i rom 21, til sammen 19 objekter: 154, 155, 180 til 183, 222, 301, 318, 350, 352, 439, 444, 530, 833 til 836, 897): tegn hver tilstand som et helt bilde med hele figuren, i samme stil som den hele tilstanden. Mottaket klipper selv ut lappen. En lapp tegnet alene passer ikke inn og gir spøkelseslinjer i spillet.
+- Bruk aldri magenta (#FF00FF) som bakgrunn eller fyll. Rester av den ble liggende i obj049 (LucasArts-logoen) og flere objekter i karnevalet; mottaket fyller dem nå selv, men tegn dem bort. obj049_01 skal tegnes på nytt uten magenta.
+- Inventaresken obj995_01 (rom 94) trenger egen alfakanal med myk kant (ikke svart bakgrunn), og teksten på esken skal være tydelig malt, ikke prikkete som i originalen.
+- Ikke gjør partier mørkere enn originalen. I rom 8 er mørkebrune partier i rekkverket malt nesten svart.
+- Ressursbanken GJENNOMGANG.md i denne grenen sier hva som skjer i hvert rom og hvilke ting som hører til hvor. Bruk den når du tegner.
 
 ## Kodeoppgaver
 
