@@ -352,10 +352,10 @@ index 21938706..c10c362e 100644
  							hotspotX, hotspotY,
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..1cdacfca
+index 00000000..a9ac233a
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,3966 @@
+@@ -0,0 +1,4071 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -630,6 +630,31 @@ index 00000000..1cdacfca
 +			TestClick c;
 +			if (sscanf(item.c_str(), "%d:%d/%d", &c.frame, &c.x, &c.y) == 3)
 +				_testClicks.push_back(c);
++		}
++	}
++
++	// DIGHD_TEST_SCRIPT=900:207:3/4/1,950:207:5/2/15 starts a script (here local
++	// script 207 of the room, with arguments 3, 4 and 1) at the given frames.
++	// For minigames and effects that are hard to reach without playing.
++	if (const char *scripts = getenv("DIGHD_TEST_SCRIPT")) {
++		Common::StringTokenizer tok(scripts, ", ");
++		while (!tok.empty()) {
++			const Common::String item = tok.nextToken();
++			TestScript s;
++			memset(s.args, 0, sizeof(s.args));
++			char rest[256] = "";
++			const int got = sscanf(item.c_str(), "%d:%d:%255s", &s.frame, &s.script, rest);
++			if (got < 2)
++				continue;
++			int n = 0;
++			for (const char *p = rest; *p && n < 15; ) {
++				s.args[n++] = atoi(p);
++				const char *slash = strchr(p, '/');
++				if (!slash)
++					break;
++				p = slash + 1;
++			}
++			_testScripts.push_back(s);
 +		}
 +	}
 +
@@ -1464,10 +1489,54 @@ index 00000000..1cdacfca
 +
 +// ---------------------------------------------------------------- blits
 +
++void DigHD::noteBoxMarker(int x, int y, int w, int h) {
++	if (_boxMarkers.size() < 256)
++		_boxMarkers.push_back(Common::Rect(x, y, x + w, y + h));
++	debug(1, "DigHD: box marker at %d,%d (%dx%d)", x, y, w, h);
++}
++
++void DigHD::finishBoxMarkers() {
++	// Each marker is read back from the screen buffer once all its boxes are
++	// drawn, and noted as a glyph of its own colours (at most four), so the text
++	// renderer shows it smooth (xBR) while the pixels keep their values.
++	const VirtScreen &vs = _vm->_virtscr[kMainVirtScreen];
++	const byte *base = (const byte *)vs.getBasePtr(0, 0);
++	byte values[63 * 63], map[256];
++	for (int i = 0; i < 256; i++)
++		map[i] = (byte)i;
++	for (uint k = 0; k < _boxMarkers.size(); k++) {
++		const Common::Rect &r = _boxMarkers[k];
++		if (r.left < 0 || r.top < 0 || r.right > (int)vs.pitch || r.bottom > (int)vs.h || r.width() > 63 || r.height() > 63)
++			continue;
++		for (int yy = 0; yy < r.height(); yy++)
++			memcpy(values + yy * r.width(), base + (size_t)(r.top + yy) * vs.pitch + r.left, r.width());
++		GlyphDraw g;
++		g.buffer = base;
++		g.pitch = vs.pitch;
++		g.x = r.left;
++		g.y = r.top;
++		g.w = r.width();
++		g.h = r.height();
++		g.values = values;
++		g.transparent = 256;  // every pixel of the marker is drawn
++		g.map = map;
++		g.x0 = 0;
++		g.y0 = 0;
++		g.x1 = g.w;
++		g.y1 = g.h;
++		g.font = 200;  // no typeface: scaled from the pixels
++		g.chr = 0;
++		noteGlyph(g);
++	}
++	_boxMarkers.clear();
++}
++
 +void DigHD::blitVirtScreen(VirtScreen *vs, const byte *src, int pitch, int x, int y, int top, int width, int height,
 +                           const byte *vsSrc) {
 +	if (_vm->_currentRoom != _room)
 +		loadRoom(_vm->_currentRoom);
++	if (!_boxMarkers.empty() && vs->number == kMainVirtScreen)
++		finishBoxMarkers();
 +
 +	const bool mapping = vs->number == kMainVirtScreen && vs->hasTwoBuffers && !_vm->isSmushActive();
 +	const byte *back = mapping ? vs->getBackPixels(x, top) : nullptr;
@@ -3368,8 +3437,35 @@ index 00000000..1cdacfca
 +	if (width <= 0 || height <= 0)
 +		return;
 +	compose(x, y, width, height);
++	if (_noir)
++		grayOut(width * _scale * height * _scale);
 +	g_system->copyRectToScreen(_outBuf.data(), width * _scale * _fmt.bytesPerPixel,
 +	                           x * _scale, y * _scale, width * _scale, height * _scale);
++}
++
++void DigHD::grayOut(int count) {
++	// Film noir: the same gray as ScummVM's noir palette, the mean of the three channels
++	const int bpp = _fmt.bytesPerPixel;
++	byte *o = _outBuf.data();
++	for (int i = 0; i < count; i++, o += bpp) {
++		const uint32 col = bpp == 4 ? READ_UINT32(o) : READ_UINT16(o);
++		uint8 r, g, b;
++		_fmt.colorToRGB(col, r, g, b);
++		const uint8 v = (uint8)((r + g + b) / 3);
++		const uint32 gray = _fmt.RGBToColor(v, v, v);
++		if (bpp == 4)
++			WRITE_UINT32(o, gray);
++		else
++			WRITE_UINT16(o, gray);
++	}
++}
++
++void DigHD::setNoir(bool on) {
++	if (on == _noir)
++		return;
++	_noir = on;
++	debug(1, "DigHD: film noir %s", on ? "on" : "off");
++	writeRect(0, 0, _w, _h);
 +}
 +
 +void DigHD::setPalette(const byte *colors, uint first, uint num) {
@@ -3609,6 +3705,13 @@ index 00000000..1cdacfca
 +		ev.type = Common::EVENT_KEYUP;
 +		g_system->getEventManager()->pushEvent(ev);
 +		debug("DigHD: test, key %d with flags %d at frame %u", (int)_testKeys[i].keycode, (int)_testKeys[i].flags, _frameNo);
++	}
++
++	for (uint i = 0; i < _testScripts.size(); i++) {
++		if (_testScripts[i].frame != (int)_frameNo)
++			continue;
++		debug("DigHD: test, script %d at frame %u", _testScripts[i].script, _frameNo);
++		_vm->runScript(_testScripts[i].script, false, false, _testScripts[i].args);
 +	}
 +
 +	for (uint i = 0; i < _testClicks.size(); i++) {
@@ -4183,6 +4286,8 @@ index 00000000..1cdacfca
 +	const uint32 room0 = _statRoom, object0 = _statObject, cel0 = _statCel, flat0 = _statFlat;
 +	const uint32 text0 = _statText, cycle0 = _statCycle, soft0 = _statSoft;
 +	compose(0, 0, _w, _h);
++	if (_noir)
++		grayOut(_w * _scale * _h * _scale);
 +	Common::FSNode node(_dumpDir.join(fname));
 +	Common::WriteStream *ws = node.createWriteStream();
 +	if (ws) {
@@ -4324,10 +4429,10 @@ index 00000000..1cdacfca
 +} // End of namespace Scumm
 diff --git a/engines/scumm/dighd.h b/engines/scumm/dighd.h
 new file mode 100644
-index 00000000..e6d64b17
+index 00000000..b64f6ba5
 --- /dev/null
 +++ b/engines/scumm/dighd.h
-@@ -0,0 +1,545 @@
+@@ -0,0 +1,559 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -4474,6 +4579,12 @@ index 00000000..e6d64b17
 +	void screenRestored();
 +	/** On while the engine draws text and marks it dirty; dirtyRect() then keeps the text. */
 +	void setTextPass(bool on) { _textPass = on; }
++	// Sam & Max film noir mode: the HD picture is shown in gray (updatePalette())
++	void setNoir(bool on);
++	void grayOut(int count);
++	// Sam & Max, Car Bomb: a marker drawn with boxes, shown as one smooth glyph (finishBoxMarkers())
++	void noteBoxMarker(int x, int y, int w, int h);
++	void finishBoxMarkers();
 +	/**
 +	 * On while the engine marks a blast object it has drawn. Its transparent
 +	 * pixels leave the figures under it, so dirtyRect() keeps the figures there;
@@ -4819,6 +4930,12 @@ index 00000000..e6d64b17
 +		int x, y;  // original pixels
 +	};
 +	Common::Array<TestClick> _testClicks;  // DIGHD_TEST_CLICKS
++	struct TestScript {
++		int frame;
++		int script;
++		int args[16];
++	};
++	Common::Array<TestScript> _testScripts;  // DIGHD_TEST_SCRIPT
 +	uint32 _frameNo = 0;
 +	Common::Path _dumpDir;
 +	int _dumpEvery = 0;
@@ -4866,6 +4983,8 @@ index 00000000..e6d64b17
 +	uint32 _statCelTint = 0, _statCelKept = 0;  // HD sprite px tinted, figure px with HD image kept original
 +	uint32 _statShade = 0;  // pixels under a blast object's shade (inventory box), tinted HD
 +	uint32 _statSoft = 0;  // original px with a soft cel laid over them
++	Common::Array<Common::Rect> _boxMarkers;  // markers drawn since the screen was last built, buffer coordinates
++	bool _noir = false;      // film noir mode: the output is made gray in writeRect()
 +	uint32 _statShadeCel = 0;  // figure px drawn through the shadow table, built from the HD background
 +	Common::String statText() const;
 +};
@@ -5387,7 +5506,7 @@ index 0e97ae97..b839cf72 100644
  
  void ScummEngine_v6::restoreBlastObjectsRects() {
 diff --git a/engines/scumm/palette.cpp b/engines/scumm/palette.cpp
-index a3758d7f..a95fd624 100644
+index a3758d7f..ebba1ab3 100644
 --- a/engines/scumm/palette.cpp
 +++ b/engines/scumm/palette.cpp
 @@ -29,6 +29,7 @@
@@ -5398,7 +5517,27 @@ index a3758d7f..a95fd624 100644
  #include "scumm/scumm.h"
  #include "scumm/scumm_v6.h"
  #include "scumm/scumm_v8.h"
-@@ -1769,7 +1770,10 @@ void ScummEngine::updatePalette() {
+@@ -1706,7 +1707,8 @@ void ScummEngine::updatePalette() {
+ 
+ 			// Sam & Max film noir mode - Enhanced version.
+ 			// Convert the colors to grayscale before uploading them to the backend.
+-			if (noirMode && enhancementEnabled(kEnhMinorBugFixes)) {
++			// Dig HD gets the colours and makes the HD picture gray itself (setNoir()).
++			if (noirMode && enhancementEnabled(kEnhMinorBugFixes) && !_digHD) {
+ 				int r, g, b;
+ 				byte brightness;
+ 
+@@ -1727,6 +1729,9 @@ void ScummEngine::updatePalette() {
+ 		}
+ 	}
+ 
++	if (_digHD && _game.version == 6)
++		_digHD->setNoir(_game.id == GID_SAMNMAX && readVar(0x8000) && enhancementEnabled(kEnhMinorBugFixes));
++
+ 	_palDirtyMax = -1;
+ 	_palDirtyMin = 256;
+ 
+@@ -1769,7 +1774,10 @@ void ScummEngine::updatePalette() {
  			paletteColors[i] = levels[(paletteColors[i] >> 5) & 0x07];
  	}
  
@@ -5496,6 +5635,35 @@ index a04ee6cb..d3571302 100644
  	int16 cutSceneData[kMaxCutsceneNum];
  	int16 cutSceneScriptIndex;
  	byte cutSceneStackPointer;
+diff --git a/engines/scumm/script_v6.cpp b/engines/scumm/script_v6.cpp
+index e1e99d50..7ba843ec 100644
+--- a/engines/scumm/script_v6.cpp
++++ b/engines/scumm/script_v6.cpp
+@@ -33,6 +33,7 @@
+ #include "scumm/resource.h"
+ #include "scumm/scumm.h"
+ #include "scumm/scumm_v6.h"
++#include "scumm/dighd.h"
+ #include "scumm/scumm_v7.h"
+ #include "scumm/smush/smush_player.h"
+ #include "scumm/sound.h"
+@@ -2345,6 +2346,16 @@ void ScummEngine_v6::o6_drawBox() {
+ 	y = pop();
+ 	x = pop();
+ 	drawBox(x, y, x2, y2, color);
++
++	// Dig HD: the markers on the Car Bomb board (room 66) are drawn box by box by
++	// local script 207; each starts with a box of 14 x 9 pixels. The marker is
++	// shown smooth in HD once it is drawn (DigHD::noteBoxMarker()).
++	if (_digHD && _game.id == GID_SAMNMAX && _currentRoom == 66 && _currentScript != 0xFF &&
++	    vm.slot[_currentScript].number == 207 && x2 - x == 13 && y2 - y == 8) {
++		VirtScreen *vs = findVirtScreen(y);
++		if (vs && vs->number == kMainVirtScreen)
++			_digHD->noteBoxMarker(vs->xstart + x, y - vs->topline, 14, 9);
++	}
+ }
+ 
+ void ScummEngine_v6::o6_wait() {
 diff --git a/engines/scumm/scumm.cpp b/engines/scumm/scumm.cpp
 index d1baa70b..8abc0a15 100644
 --- a/engines/scumm/scumm.cpp

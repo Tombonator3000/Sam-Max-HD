@@ -29,8 +29,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Finn hvilke rom og palett hvert kostyme vises i fra skriptene (`tools/kostymer.py`, `docs/kostymefarger.csv`, 13. oktober)
 - [x] Se de kostymene som står med «trolig» i `docs/figurer.csv` i spillet, og rulletekstpanelene i rom 67 og 77 (14. oktober): kostyme 103 er Trixie (skript 120), panelene (objekt 600 til 603 lånt fra rom 67) får HD i rom 77. Rulleteksten avslørte to feil i HD-skriften, rettet
 - [x] Finn mellomsekvensene og minispillene som tegnes av motoren (14. oktober, `docs/MINISPILL.md`). Figurskygger og lyskjegler (skyggetabellen) får nå HD
-- [ ] Car Bomb (rom 66): skipsmerkene tegnes med `drawBox` piksel for piksel og blir blokkete. HD krever at motoren kjenner igjen mønsteret (skriptnivå, trenger Toms ja)
-- [ ] Noir-modusen (tast b): test med et lagret spill, og la HD bli grå i stedet for å tones per fargekanal
+- [x] Car Bomb (rom 66): skipsmerkene glatte i HD (Toms ja 14. oktober; merket tegnes som glyf med xBR)
+- [x] Noir-modusen (tast b): HD-bildet blir grått (14. oktober)
+- [x] Utviklermodus: «Sam og Max HD - utvikler.bat» (hopp til rom eller last lagret spill, i vindu), `tools/romtest.py --lagret MAPPE`, testkroken `DIGHD_TEST_SCRIPT` (14. oktober)
+- [ ] Tom lagrer i hvert nytt område under gjennomspillingen og sender lagrede spill; romtest `--lagret` på dem tester de 12 rommene som henger etter testhoppet
 - [x] Hvilke kostymer som er Sam, Max og de andre (`docs/figurer.csv`, 13. oktober)
 
 ### Motor (`docs/HD-MOTOR.md`)

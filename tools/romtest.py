@@ -68,9 +68,12 @@ class Run:
     camx: int | None = None
     camy: int | None = None
     objekter: bool = False   # DIGHD_TEST_OBJSTATE=alle: alle tilstandene til alle objektene i rommet
+    slot: int | None = None  # --lagret: lagret spill nummer slot i stedet for testhoppet (rommet leses fra loggen)
 
     @property
     def name(self) -> str:
+        if self.slot is not None:
+            return f"lagret{self.slot:02d}"
         s = f"rom{self.room:03d}"
         if self.camx is not None:
             s += f"_x{self.camx:04d}"
@@ -189,8 +192,6 @@ def run_engine(run: Run, args, out: Path, dense: bool = False) -> Result:
         "SDL_VIDEODRIVER": "dummy",
         "SDL_AUDIODRIVER": "dummy",
         "DIGHD_MOD": str(args.mod),
-        "DIGHD_TEST_ROOM": str(run.room),
-        "DIGHD_TEST_AT": str(args.hopp),
         "DIGHD_SKIP_VIDEO": "1",
         "DIGHD_QUIT_AT": str(quit_at),
         "DIGHD_DUMP_DIR": str(rundir),
@@ -199,6 +200,9 @@ def run_engine(run: Run, args, out: Path, dense: bool = False) -> Result:
     })
     if every:
         env["DIGHD_DUMP_EVERY"] = str(every)
+    if run.slot is None:
+        env["DIGHD_TEST_ROOM"] = str(run.room)
+        env["DIGHD_TEST_AT"] = str(args.hopp)
     if run.objekter:
         # Skjermen lagres ved slutten av hver tilstand
         env["DIGHD_TEST_OBJSTATE"] = "alle"
@@ -209,6 +213,9 @@ def run_engine(run: Run, args, out: Path, dense: bool = False) -> Result:
     if run.camy is not None:
         env["DIGHD_TEST_CAMY"] = str(run.camy)
     cmd = [str(args.motor), f"--path={args.spill}", "--debuglevel=1", "samnmax"]
+    if run.slot is not None:
+        # Det lagrede spillet lastes rett ved start (ScummVM --save-slot)
+        cmd[1:1] = [f"--savepath={args.lagret}", f"--save-slot={run.slot}"]
     log = rundir / "scummvm.log"
     t0 = time.monotonic()
     with open(log, "wb") as fh:
@@ -220,6 +227,10 @@ def run_engine(run: Run, args, out: Path, dense: bool = False) -> Result:
             code = None
     res.seconds = time.monotonic() - t0
     shutil.rmtree(home, ignore_errors=True)
+    if run.slot is not None:
+        # Rommet det lagrede spillet står i: det siste rommet i loggen
+        rooms_seen = re.findall(r"dumped frame \d+ \(room (\d+)", log.read_text(errors="replace"))
+        run.room = int(rooms_seen[-1]) if rooms_seen else 0
     if code is None:
         res.exit = f"tidsgrense {timeout} s"
     elif code < 0:
@@ -278,6 +289,9 @@ def parse_log(res: Result, args, out: Path, mod_rooms: set[int]) -> None:
     res.tail = [ln for ln in lines if ln.strip()][-6:]
     res.in_mod = run.room in mod_rooms
     jumped_at = None
+    if run.slot is not None:
+        res.jumped = True  # ingen testhopp: spillet starter i rommet fra det lagrede spillet
+        jumped_at = -1
     dumps: dict[int, dict] = {}
     stale: dict[int, int] = {}
     bad: dict[int, float] = {}
@@ -1294,6 +1308,7 @@ def main() -> int:
                          "(DIGHD_TEST_OBJSTATE=alle), med en dump og et nærbilde per tilstand")
     ap.add_argument("--objekt-bilder", type=int, default=40,
                     help="bilder hver objekttilstand vises før skjermen lagres (standard 40, omtrent 0,4 sekunder)")
+    ap.add_argument("--lagret", help="mappe med lagrede spill (samnmax.s01 osv.): kjør hvert av dem i stedet for testhoppet")
     ap.add_argument("--bare-rapport", action="store_true", help="ingen nye kjøringer, bare rapport og ark fra mappene som finnes")
     args = ap.parse_args()
 
@@ -1335,6 +1350,14 @@ def main() -> int:
                 pass
 
     runs = [r for room in rooms for r in camera_runs(room, rooms_meta.get(str(room), {}), args.kamera)]
+    if args.lagret:
+        # --lagret MAPPE: én kjøring per lagret spill (samnmax.s01 osv.) i stedet for testhoppene
+        args.lagret = Path(args.lagret).resolve()
+        slots = sorted(int(f.suffix[2:]) for f in args.lagret.glob("samnmax.s[0-9]*") if f.suffix[2:].isdigit())
+        runs = [Run(0, slot=n) for n in slots]
+        args.hopp = 0
+        args.objekter = False
+        print(f"{len(runs)} lagrede spill i {args.lagret}")
     # Med --objekter: én kjøring til per rom med objekttilstander
     obj_runs = [Run(room, objekter=True) for room in rooms
                 if args.objekter and object_steps(rooms_meta.get(str(room), {}))]

@@ -185,3 +185,12 @@ Tom: GPT har nådd bruksgrensen, fiks alt som kan fikses i mellomtiden.
 - HD-modden publisert på nytt med skriftrettingene (font 5 uten HD-skrift, skrå apostrof): hd-mod 5797a4b.
 - Ikke testet her: ingen Windows eller MinGW i sandkassen. Første test er kjøringen i Actions.
 - Windows-arbeidsflyten testet på grenen. Kjøring 1: bygg og pakke ok, testen fant ingen grafikkmodus (OpenGL uten skjerm). Kjøring 2: spillet startet med HD-modden, men stoppet på «IMuse initialization - Device not available» (ingen MIDI på maskinen). Kjøring 3 (38523014097) grønn med `--gfx-mode=surfacesdl` og `--music-driver=adlib` i testen. PR 14 mot main; releasen lages når den er flettet.
+
+## 2026-10-14 09:30 (Claude)
+
+Tom: ja til Car Bomb på skriptnivå, implementer noir, lag en utviklermodus for å hoppe til områder.
+
+- Car Bomb: `o6_drawBox` kjenner igjen den første boksen (14 x 9) i lokalt skript 207 i rom 66 og melder merket til DigHD (`noteBoxMarker`). Når skjermen bygges, leses merket ut av bufferen og tegnes som en glyf med xBR. Testet med den nye testkroken `DIGHD_TEST_SCRIPT` (fem merker i rom 66): glatte merker, 0 piksler ikke bygget på nytt.
+- Noir: `updatePalette` gir DigHD fargepaletten og slår noir av og på (`setNoir`); DigHD gjør HD-bildet grått i `writeRect` og i dumpene, med samme snitt som ScummVM. Testet: introen hoppet over med Esc, tasten b i kontoret ved bilde 4400 og 5200 slår noir på og av, og bildet er grått.
+- Utviklermodus: ingen romhopp i spillet selv (skript 64 har bare noir, versjon, minne og «dummy verb mode»). Laget «Sam og Max HD - utvikler.bat» i Windows-pakken (hopp til rom med romliste, last lagret spill, vindu), `tools/romtest.py --lagret MAPPE` (kjører hvert lagrede spill med `--save-slot`, rommet leses fra loggen) og `DIGHD_TEST_SCRIPT`. Testet romtest `--lagret` med et autolagret spill i kontoret: rom 7 ok med HD-bakgrunn, 0 avvik.
+- `engine/test.sh` 0 avvik, patchen passer mot ren ScummVM. Dokumentert i SPILLTEST, HD-MOTOR og MINISPILL.

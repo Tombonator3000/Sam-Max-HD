@@ -54,8 +54,13 @@ cp "$ROOT/game/SAMNMAX.000" "$ROOT/game/SAMNMAX.001" "$ROOT/game/MONSTER.SOU" "$
 cp -r "$ROOT/mods/gpt"/. "$DIR/mod/"
 rm -f "$DIR/mod/README.md"
 
-# Startfila må ha CRLF på Windows
-sed 's/\r*$/\r/' "$ROOT/tools/windows/Sam og Max HD.bat" > "$DIR/Sam og Max HD.bat"
+# Startfilene må ha CRLF på Windows
+for f in "Sam og Max HD.bat" "Sam og Max HD - utvikler.bat"; do
+	sed 's/\r*$/\r/' "$ROOT/tools/windows/$f" > "$DIR/$f"
+done
+# Romlisten til utviklermodusen
+gawk -v FPAT='([^,]*)|("[^"]*")' 'NR > 1 { n = $2; gsub(/^"|"$/, "", n); printf "%3d  %s\r\n", $1, n }' \
+	"$ROOT/docs/rom-oversikt.csv" > "$DIR/rom-liste.txt"
 
 {
 	echo "Sam & Max HD for Windows"
@@ -76,6 +81,12 @@ I spillet:
   Ctrl+H        bytter mellom HD og originalgrafikk (valget huskes)
   Ctrl+Shift+H  gult felt der HD mangler
   Alt+Enter     vindu og fullskjerm
+
+Utviklermodus: "Sam og Max HD - utvikler.bat" starter i vindu og lar deg hoppe til et rom
+(rom-liste.txt) eller laste et lagret spill. Hoppet setter ikke spillet i vanlig tilstand, så
+figurer kan mangle og skript kan henge; et lagret spill fra en ekte gjennomspilling er riktig.
+Lagre gjerne i hvert nytt område mens du spiller (F5 > Save), og send mappen %APPDATA%\SamMaxHD\saves
+til Claude: da kan romtesten kjøre alle områdene fra dem.
 
 HD-grafikken lages fortsatt. Det som ikke er tegnet i HD ennå, vises som originalen.
 Innstillinger og lagrede spill: %APPDATA%\SamMaxHD
