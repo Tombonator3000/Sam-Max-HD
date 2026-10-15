@@ -1,5 +1,7 @@
 # Samlet grafikkleveranse for import, 15. oktober 2026
 
+Nyere enn ZIP-pakken nedenfor: [seks nye rettede jobbresultater, fire komplette objektutsnitt og Toms feilbilder](rapporter/videre-grafikk-20261015/RAPPORT.md). Hent disse fra de ordinære jobb-/manifeststiene i repoet ved neste mottak. ZIP-pakken nedenfor er et tidligere datert øyeblikksbilde og inneholder ikke denne delrunden.
+
 Alle kildeleveranser, råforsøk, prompter og kontroller er versjonert på `gpt-arbeid`. [Samlet importpakke](rapporter/import-grafikk-20261015/importpakke.zip) inneholder 155 separate RGBA-bilder, 12 tilhørende indeksfiler og 5 verbhjulaliaser. [Manifest](rapporter/import-grafikk-20261015/manifest.json) kobler hvert pakkebilde til original sti i repoet, objekt-ID, SHA-256 og behandlingsmåte. Arkivets SHA-256 ligger [her](rapporter/import-grafikk-20261015/importpakke.sha256).
 
 Dette er inngangsdata til mottak og modbygg. Pakken er ikke en ferdig mod som kan kopieres direkte til spillet. Det er ikke gjort ny motorimport, webpublisering eller spilltest i dette pakkesteget.

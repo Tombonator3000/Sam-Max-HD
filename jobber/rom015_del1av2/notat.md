@@ -21,3 +21,9 @@ Master SHA-256: 28d1aa8a7271750ed684821268a3ab6758cc2e2d675a135bae11ab11416119c1
 Visuell egenkontroll omfatter fullscene, hovedformer, skilt og overlapp. Små emballasjefigurer, varenes detaljer og plakatenes små tegn er tolkninger av lave pikselmengder; de er ikke bekreftet bokstav-/detaljidentiske. Nytegningen har jevnere og noe sterkere skygger enn kilden.
 
 Runtime: ikke utført. Nybildegodkjenning fra Tom: ikke gitt. Dette er arbeidsasset med teknisk og visuell egenkontroll, ikke dokumentert ferdig motorintegrasjon.
+
+## Videre retting 15. oktober 2026
+
+Den rosa figuren bak billettboden er en menneskelig kjerub, sammen med en rød djevel. Feil griselignende ansikt er erstattet etter Toms avklaring, med rom21 som identitets-/stilreferanse. To native forsøk, forsøk2 valgt. Innebygd bildeverktøy; eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms tillatelse. Egenkontroll OK.
+
+SHA-256: acca3072182a699ed2979b0cae07e1ce07b5b2e762f077f4f69dae10852580f3. Se [rapport, prompter, råbilder og kontroll](../../rapporter/videre-grafikk-20261015/RAPPORT.md). Ingen spilltest, ny runtimeimport eller Toms individuelle godkjenning.

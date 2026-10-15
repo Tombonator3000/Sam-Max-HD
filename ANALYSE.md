@@ -93,3 +93,9 @@ Lærdommen som overføres er å fastslå riktig motiv før nytegning, skille per
 Objektene 833 til 836 lagres i rom 83, men tegnes i rom 54 av globale skript 108/109. Bruk rom 54s palett. Lagerrommets blå/hvite palett ga et feil inntrykk av skyer og hvit pels. Riktig original viser Sam og sasquatcher ved bassenget, samt en mørk flokk ved flettveggen. Ikke bruk den gamle skybeskrivelsen som motivgrunnlag. Se [kilde- og leveranserapport](rapporter/lapper-eske-logo-20261015/RAPPORT.md). Objekt 835 avventer avklaring av bart/munn.
 
 Inventareskens stempel skal være utvasket. Tom oppgir sannsynlig THX1138 og utydelig tekst under; ikke gjør dette til kildeverifisert, skarp tekst.
+
+## Toms motivrettelser og Sam091-målegrunnlag, 15. oktober 2026
+
+Figuren bak billettboden i rom15 er en rosa menneskelig kjerub med hvite vinger, sammen med en rød djevel. Det griselignende HD-ansiktet var feil. Bruk originalrom15 for den fjerne posituren og original/HD-rom21 for identiteten. Sams kartillustrasjon i rom10 skal ha den nedre tannrekken fullført på høyre underkjeve etter Toms avklaring.
+
+Åtte størrelsesreturer i fig091_03 til _05 sammenligner originalens hovedfigur uten en liten fotrest med HD-boksen som inkluderer fotresten. Hele HD-høyden er nøyaktig4x i alle åtte. Dette er et asymmetrisk målegrunnlag som må vurderes i mottaket, ikke et grunnlag for å krympe den riktige heltegningen. Se [rapport og bevis](rapporter/videre-grafikk-20261015/RAPPORT.md).

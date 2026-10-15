@@ -12,3 +12,9 @@ Original SHA-256: ddb8c45b60d828650fcff5bec7e999da4ab3e76c42c3e53e0e2d56d256feb2
 Resultat SHA-256: 96e2ad6757dc752a2d840fdbb7d2487b384cfd04b0be4b886f6fec785b1972d9
 
 Runtime: false. Ny individuell brukergodkjenning: false.
+
+## Videre retting 15. oktober 2026
+
+Komplette native objektutsnitt rettet fra originalen med det tilhørende HD-rommet som stilreferanse. Én kontaktarkgenerering, separate RGBA-bilder levert før lappklipp. Innebygd bildeverktøy; eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms tillatelse. Egenkontroll OK.
+
+SHA-256: 749889b8aff7e0aab06d275fc83df24a50b89856cf69369e71a41e58e32295e7. Se [rapport, prompter, råbilder og kontroll](../../rapporter/videre-grafikk-20261015/RAPPORT.md). Ingen spilltest, ny runtimeimport eller Toms individuelle godkjenning.

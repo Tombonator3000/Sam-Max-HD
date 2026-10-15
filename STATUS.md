@@ -35,3 +35,9 @@ Max-ikonet obj1008_01 er rettet etter Toms avvisning 15. oktober. Ny tegning fra
 44 separate RGBA-bilder levert, 22 jobbresultater oppdatert. Egenkontroll: 20 OK, 2 SJEKK, ingen FEIL. 36 av 39 lapp-tilstander har komplette tegninger kontrollert mot eksisterende lappklipp. Objekt 835s fire kandidatbilder holdes utenfor produksjon mens bart/munn avklares med Tom. Rom83-ressursene bruker rom54-paletten i bassengscenen og leveres separat med passende indeksfiler. Ingen runtimeimport av denne pakken. Se [rapport](rapporter/lapper-eske-logo-20261015/RAPPORT.md).
 
 Ny status fra Claude dc5fcba9: de tidligere 111 ikonene er tatt inn i hd-mod; pekeren er sett i spillet. Dette erstatter den tidligere opplysningen om at disse ikonene ikke var publisert.
+
+## Videre grafikk og Toms feilbilder, 15. oktober
+
+Seks jobber er oppdatert og består egenkontroll med OK: obj811_01, lag037_01_del2av2, lag037_02_del1av2, lag045_03, rom010 og rom015_del1av2. Kjerub-/djevelmotivet og Sams nedre tannrekke er rettet etter Tom. Fire komplette RGBA-objektutsnitt er levert separat. Nye forsøk på obj187_05 og obj307_01 består ikke kontrollen; tidligere resultater er beholdt.
+
+Sam091s åtte høydereturer skyldes ulike målebokser for original/HD når en løs fotrest filtreres bort fra originalen. Arkene er uendret; bevis er levert for mottaksvurdering. Toms rester etter opptak, hammerkanter og skadde chatrammer er dokumentert som åpne runtimeproblemer. Se [rapport](rapporter/videre-grafikk-20261015/RAPPORT.md). Ingen import av denne delrunden i hd-mod eller ny spilltest. Main har i mellomtiden fått myke romobjektkanter i 9e1b7b29 (#29); effekt på Toms feilbilder må bekreftes i spillet.

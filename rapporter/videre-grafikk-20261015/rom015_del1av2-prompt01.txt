@@ -1,0 +1,25 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+Note for this room: The carnival entrance. Copy the signs exactly: 'KUSHMAN BROS SHOWS', 'CLOSED', 'HALL of ODDITIES', 'WEIRD' and 'CREEPY'. Keep the posters on the tent as they are.
+
+This is part 1 of 2 of a larger scene. The other parts are made separately and joined afterwards, so keep the edges of the picture natural, with no vignette, frame or fading.
+
+If a second image is attached, it is an already approved HD picture from the same game. Match its level of detail and brushwork, but take all content, shapes and colors from the first image.
+
+TARGETED IDENTITY CORRECTION FROM TOM. Image1 is the existing HD carnival entrance EDIT TARGET. Image2 is the original carnival entrance geometry reference. Image3 is the original closer Tunnel of Love view, identity reference. Image4 is the existing HD close view, style/design reference only. Correct ONLY the small distant sculpture group behind the ticket booth, around x584..800,y184..380. The pink flying figure is a ROSY PINK HUMAN BABY CHERUB with pale feather wings, round baby cheeks, small HUMAN nose and mouth, tiny curl as visible, body/arms/legs in the ORIGINAL distant pose. It is NOT a pig, piglet, elephant or animal; remove the invented pig snout/nostrils and round pigface. Keep the original tiny baby face angle and silhouette, body size and pale feather wings pointing upward. Behind him is a RED DEVIL with original red horns and bat wings, face/expression consistent with the devil on the closer Tunnel of Love view. Preserve the source distant pose, size, occlusion and exact placement. Do not enlarge the figures or copy the closer view's composition, bow, hearts or lettering into the distant crop where absent. Keep rocks, sky and neighboring ticket sign exactly where they are. All other map/room pixels, lettering, tents, paths and gray padding unchanged,1536x1024. Smooth cartoon HD linework matching the edit target and closer approved room.

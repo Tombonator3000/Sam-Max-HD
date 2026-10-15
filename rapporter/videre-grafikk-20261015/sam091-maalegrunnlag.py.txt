@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib
+from smhd.myk import measure_mask,parts,assign_by_map,route_maps
+root=Path.cwd();r=root/'rapporter/videre-grafikk-20261015';maps=route_maps(root);out=[];tiles=[]
+def box(m):
+ y,x=np.nonzero(m);return [int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)] if len(x) else None
+for job in ['fig091_03','fig091_04','fig091_05']:
+ d=json.loads((root/'jobber'/job/'jobb.json').read_text());orig=np.array(Image.open(root/'jobber'/job/'original_1x.png').convert('RGB'));s=np.array(Image.open(root/'jobber'/job/'resultat.png').convert('RGBA'));_,labels,found=parts(s[:,:,3]);taken=assign_by_map(d['ruter'],found,labels,maps[job])
+ for cel in d['ruter']:
+  name=cel['bilde'];x,y,X,Y=cel['synlig'];a=orig[y:Y,x:X];alpha=np.any(a!=d['bakgrunn'],axis=2);rgba=np.dstack([a,alpha.astype('uint8')*255]);body,foot=measure_mask(rgba);ob=box(body);whole=box(body|foot);n=box(np.isin(labels,taken[name]));fac=(n[3]-n[1])/(ob[3]-ob[1])/4
+  if fac<=1.12:continue
+  e={'jobb':job,'bilde':name,'original_hele_boks':whole,'original_maaleboks':ob,'original_utliggerpiksler':int(foot.sum()),'native_hele_boks':n,'hoeydefaktor_mot_maaleboks':fac,'hoeydefaktor_mot_hel_original':(n[3]-n[1])/(whole[3]-whole[1])/4};out.append(e);assert e['hoeydefaktor_mot_hel_original']==1.0
+  tile=Image.new('RGBA',(600,360),(180,180,180,255));draw=ImageDraw.Draw(tile);draw.text((8,5),name+'   original 4x / native HD 4x',fill='black');im=Image.fromarray(rgba).resize((rgba.shape[1]*4,rgba.shape[0]*4),Image.Resampling.NEAREST);tile.alpha_composite(im,(8,32));q=Image.fromarray(s).crop(n);tile.alpha_composite(q,(310,32));draw.rectangle((8+ob[0]*4,32+ob[1]*4,8+ob[2]*4-1,32+ob[3]*4-1),outline=(255,0,0),width=2);tiles.append(tile)
+assert len(out)==8
+(r/'sam091-maalegrunnlag.json').write_text(json.dumps(out,indent=2)+'\n');sheet=Image.new('RGBA',(1200,1440),(180,180,180,255))
+for i,tile in enumerate(tiles):sheet.alpha_composite(tile,((i%2)*600,(i//2)*360))
+sheet.convert('RGB').save(r/'sam091-maalegrunnlag.png');print('8 ruter, korrekt helhøyde 4x; originalens fotrest er utelatt i måleboksen')

@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+import subprocess,io,numpy as np
+root=Path.cwd();r=root/'rapporter/videre-grafikk-20261015'
+base='6ffca8e8fba91c82efb43a0a26b17dfbd9ec3ab8'
+for job,raw,box in [('rom010','rom010-raa01.png',(895,235,976,310)),('rom015_del1av2','rom015_del1av2-raa02.png',(584,184,800,380))]:
+ before=Image.open(io.BytesIO(subprocess.check_output(['git','show',base+':jobber/'+job+'/resultat.png']))).convert('RGB');new=Image.open(r/raw).convert('RGB');assert new.size==before.size==(1536,1024);old=np.array(before.crop(box),float);paint=np.array(new.crop(box),float);hh,ww=old.shape[:2];yy,xx=np.mgrid[:hh,:ww];margin=8 if job=='rom010' else 12;weight=np.minimum.reduce([xx/margin,(ww-1-xx)/margin,yy/margin,(hh-1-yy)/margin,np.ones((hh,ww))]);weight=np.clip(weight,0,1)[:,:,None];before.paste(Image.fromarray((paint*weight+old*(1-weight)).round().astype('uint8')),box[:2]);before.save(root/'jobber'/job/'resultat.png')
+q=Image.open(r/'obj811_01-raa01.png').convert('RGB');out=Image.new('RGB',(1536,1024),(128,128,128));a=np.array(q.crop((128,336,1408,688)));a[a.max(axis=2)<12]=0;out.paste(Image.fromarray(a),(128,336));out.save(root/'jobber/obj811_01/resultat.png')
