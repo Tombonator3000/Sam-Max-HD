@@ -453,3 +453,15 @@ Natt: kontroll av lag002_01, lag017_03_del1av2, lag017_03_del2av2 og obj307_01 f
 - obj307_01: avvist. Toppen av kikkerten er riktig (to skruer, fasetter, åpningen), men satt sammen med godkjent obj304_01 under gir den en tydelig søm ved rad 40: himmelen er lysere (ca. 120,180,252 mot 103,166,250) og rammens kant og skygge møter ikke. I originalen er farge og ramme sammenhengende. Mottaket måler bare mot originalen og ser ikke dette.
 - Runden kjørt på nytt: begge står som avvist i status.csv, øverst i ORDRE.md med retur.md, og er sendt til `gpt-arbeid` (92392b21). Modden er bygget og publisert i `hd-mod` på nytt.
 - Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-15 22:20 (Claude)
+
+Natt: kontroll av lag002_01, lag017_04_del1av2, lag017_04_del2av2 og obj307_01 fra Codex (commit ad9e48c7 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (1b571af9). Mottaket godkjente alle fire.
+- Sett med øynene: utsnitt per objekt fra referanse.png og resultat.png side om side med originalobjektet i 4x.
+- lag002_01: godkjent. obj897_01 og obj900_01 har nå to ringer hver som i originalen: en sterk indre ring og en svakere ytre ring (gulgrønn rundt den lyse kulen, lilla rundt den grønne). Lampen obj896_01 er fortsatt tent gul. Returen fra 21:37 er rettet.
+- lag017_04_del1av2: godkjent. Den røde vimpelen obj180_04 har den lange remsen, de to oppstikkerne og den løse biten til venstre på samme plass som originalen.
+- lag017_04_del2av2: godkjent. Gul vimpel med åpen løkke til høyre, grønne rester med samme antall løse biter, propellen med fire blader i samme stilling og nesten vannrett høyreblad.
+- obj307_01: godkjent. Satt sammen med godkjent obj304_01 under: ingen synlig søm, himmelen er 109,164,248 på begge sider av skjøten, og snittforskjellen over skjøten er 3,1 mot 2,3 mellom to naborader i obj304_01. Rammen og skyggen møter. Toppen har to skruer, fasettene og den svarte åpningen som originalen. Returen fra 21:37 er rettet.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandsbyttene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
