@@ -14,6 +14,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Push fra denne maskinen til `gpt-arbeid` og `hd-mod` feiler (GitHub-innlogging, 15. oktober 20:04). To ordrecommiter ligger lokalt i `work/.gpt-gren`, modden i `mods/gpt` er bygget men ikke publisert. Trenger Tom
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
+- [ ] Tom: første natteskift med Claude og Codex (prosjektbiblioteket `samarbeid/`), først en kort prøve med `--timer 1 --jobber 1`
 
 - [x] Innført kildetro motiv- og designanalyse før HD-produksjon i `docs/skills/scumm-hd-remake/SKILL.md`, med henvisninger fra arbeidsinstruksene (12. oktober 2026)
 

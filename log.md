@@ -393,7 +393,13 @@ Tom: hent det nye fra hd-mod og gpt-arbeid inn i Sam & Max-repoet, og gi Dig HD 
 - Linux-pakken (16:52 UTC) og Windows-pakken (16:54 UTC) bygget fra main med den nye modden. Nettsiden henter modden selv.
 - Dig-HD-Remake: samme motorpatch (myke kanter på romobjekter) i PR 57 der, byte for byte lik. Ingen av de 640 objektbildene i Digs `hd-mod` har myk alfa, så The Dig ser ut som før. Ikke kjørt med The Dig.
 - Åpent fra grafikerens rapport: rester etter opplukking i kontoret, kantene rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet, og at mottaket måler Sam091 uten fotresten (8 ruter feilaktig til gjennomsyn).
+## 2026-10-15 19:02 (Claude)
 
+Tom: få Claude og ChatGPT til å samarbeide automatisk på Linux-maskinen og jobbe til i morgen, med grafikk og kode.
+
+- Natteskiftet ligger i prosjektbiblioteket (`samarbeid/`, grenen claude/sleepy-hawking-492gnq) siden det skal brukes i flere repoer. Rollene er de samme som i AGENTS.md: Codex tegner jobbene i ORDRE.md i `gpt-arbeid`, Claude kjører `tools/gpt_runde.sh` og ser på bildene; Claude koder fra todo.md på grenen `samarbeid/natt-<dato>`, Codex kontrollerer.
+- Codex kjører i sin egen sandkasse og kan ikke committe; skriptet committer bare `resultat.png`, `notat.md`, hovedark og `rapporter/` i `gpt-arbeid`. Det bruker samme arbeidstre som `tools/gpt_gren.sh` (`work/.gpt-gren`).
+- Ikke kjørt her ennå. Testet bare med falske agenter i Claude-økta.
 ## 2026-10-15 20:05 (Claude)
 
 Natt: kontroll av ny leveranse fra Codex (commit edec20f7 i `work/.gpt-gren`).

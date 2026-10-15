@@ -2166,3 +2166,36 @@ def test_soft_alpha_glatter_trapp_og_beholder_strek():
     assert a[8:12, 40:48].max() > 128                         # streken
     edge = a[20:24, 20:28]
     assert ((edge > 0) & (edge < 255)).any()                  # myk overgang langs trappen
+
+
+def test_importpakke_objektleveranser(tmp_path):
+    """rapporter/*/objektleveranser.json: et helt motiv (heltegning) tas inn som helt motiv for lappklipp,
+    og det kommer foran et eldre importmanifest for samme bilde."""
+    import hashlib
+    import json as _json
+
+    from PIL import Image as _Image
+
+    from smhd import importpakke
+
+    gren, extract, ut = tmp_path / "gren", tmp_path / "extract", tmp_path / "ut"
+    (extract / "objects").mkdir(parents=True)
+    (ut / "objects").mkdir(parents=True)
+    _Image.new("RGBA", (8, 4), (1, 2, 3, 255)).save(extract / "objects" / "obj200_02.png")
+    for folder, colour in (("import-grafikk-1", 10), ("videre-grafikk-1", 20)):
+        d = gren / "rapporter" / folder / "objects"
+        d.mkdir(parents=True)
+        f = d / "obj200_02.png"
+        _Image.new("RGBA", (32, 16), (colour, 0, 0, 255)).save(f)
+        sha = hashlib.sha256(f.read_bytes()).hexdigest()
+        rel = f"rapporter/{folder}/objects/obj200_02.png"
+        if folder.startswith("import"):
+            (gren / "rapporter" / folder / "manifest.json").write_text(_json.dumps({"filer": [
+                {"repo_fil": rel, "pakke_fil": "x/obj200_02.png", "sha256": sha, "behandling": "helt_motiv_for_lappklipp"}]}))
+        else:
+            (gren / "rapporter" / folder / "objektleveranser.json").write_text(_json.dumps([
+                {"bilde": "obj200_02", "fil": rel, "sha256": sha, "heltegning": True}]))
+    r = importpakke.import_all(gren, extract, ut)
+    assert r["bilder"]["obj200_02"]["status"] == "ok"
+    assert r["bilder"]["obj200_02"]["manifest"].endswith("objektleveranser.json")
+    assert _Image.open(ut / "objects" / "obj200_02.png").getpixel((0, 0)) == (20, 0, 0, 255)
