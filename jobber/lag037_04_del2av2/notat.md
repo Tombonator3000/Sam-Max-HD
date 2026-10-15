@@ -10,3 +10,9 @@ Original SHA-256: a1e97ab8827cb342f1ca622c29f6fedeadecf1eb9687dfd24e6e80d44474dd
 Resultat SHA-256: cbb89fc6140f4efc38ee8e1faf3ece623dcbe709815b59d5d17162665b118344
 
 Runtime: false. Ny individuell brukergodkjenning: false.
+
+## Retting 15. oktober 2026: hele motiver og alfa
+
+Nytegnet komplett motiv før mottakets lappklipp, med eksisterende HD-rom som stilgrunnlag. Innebygd bildeverktøy, eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms uttrykkelige tillatelse. Beskyttede originaler, jobbmetadata og prompter uendret.
+
+Egenkontroll: OK. Se [rapport, prompter, forsøk og SHA-256](../../rapporter/lapper-eske-logo-20261015/RAPPORT.md). Ingen ny motorimport eller spilltest av denne rettingen.
