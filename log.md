@@ -506,3 +506,14 @@ Natt: kontroll av lag022_02_del3av3, lag047_02, lag052_01_del2av2 og lag052_02_d
 - lag052_01_del2av2: godkjent. Vinduet med finnen til bilen utenfor (obj480), hyllen (obj481) og øglens munnfase obj486_01 uten oppdiktede røde merker.
 - lag052_02_del1av2: godkjent. Tukanen med åpent nebb (obj483_02) og øglens neste fase obj486_02 med én liten grålilla flate i gapet som originalen. Plakaten staves THE REPTILE QUEEN og COLOR. Tukanens øye er rundt i HD mens originalen har en smal strek; det er likt det godkjente rombildet og obj483_01, så det er ikke avvist her. Spørsmål til Tom ved stilgodkjenningen: skal tukanen ha det smale øyet fra originalen?
 - Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene for øglen og tukanen er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-15 23:33 (Claude)
+
+Natt: kontroll av lag052_03_del1av2, lag052_04_del1av2, lag052_05_del2av2 og lag052_06_del2av2 fra Codex (commit 68058936 i `work/.gpt-gren`, sikret etter 503-feil hos Codex). Ikke tegnet på nytt.
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (82805f06). Mottaket godkjente alle fire.
+- Sett med øynene: øglens munnfaser obj486_01 til 06 side om side (original i nearest over HD-objektbildet, og tett romutsnitt referanse over resultat), og utsnitt med 8 px marg for obj489_01 og obj490_01. Kort Python-måling av hvilke originalpiksler hver fase endrer, og av avviket i HD nede til venstre mellom fasene.
+- obj486_03 til 06: godkjent. Endringen ligger der originalen endrer seg: 03 en liten grålilla flate i gapet, 04 en større trekant, 05 en lang lys flate langs kjeven, 06 overkjeven løftet med lys flekk øverst til høyre. Foten og haken nede til venstre er lik i alle originalfasene; i HD er avviket mellom fasene der like lite som mellom de godkjente 01 og 02 (snitt 4 til 9 av 255 i RGB), så overgangene skal ikke hoppe synlig. Ikke sett i motoren.
+- obj489_01: godkjent. Tukanens lukkede øye med den olivengrønne folden ved nebbet, samme plass som originalen.
+- obj490_01: godkjent. Tom sittepinne uten tukan, tauene og stangen på samme plass som originalen. Merknad: stangen har noen små mørke merker på midten der originalen har en mørkere midtdel; de ser litt ut som tegn på nært hold, men er ikke tekst og leses som skygge i spillstørrelse. Tas med ved Toms stilgodkjenning.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom. STOPP-filen er ikke rørt.
