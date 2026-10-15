@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-15 14:31 (norsk tid)
+Oppdatert 2026-10-15 18:47 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -10,30 +10,18 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | --- | --- | --- | --- |
 | Hovedark (Sam og Max) | 2 levert | 2 | Ferdig eller under arbeid |
 | Rombakgrunner | 73 | 76 | Nå (115 jobber, brede rom er delt) |
-| Store objektbilder (nærbilder, kart og store deler) | 64 | 86 | Nå, sammen med rommene |
-| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 541 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
+| Store objektbilder (nærbilder, kart og store deler) | 65 | 86 | Nå, sammen med rommene |
+| Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 565 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
 | Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 0 | 15661 | Til slutt, Sam og Max først (1758 ark, 1758 jobber) |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
-Rom 2, 18, 30, 31, 37, 45, 78.
+Rom 2, 18, 31, 47, 52.
 
 - [ ] `obj187_05` (rom 18 Wak-A-Rat (minispill), objekt 187 tilstand 05) (avvist, les retur.md)
 - [ ] `obj307_01` (rom 31 Kikkerten med utsikten, objekt 307 tilstand 01) (avvist, les retur.md)
-- [ ] `obj811_01` (rom 78 Kikkerten, utsnitt (landskapsbiter), objekt 811 tilstand 01) (avvist, les retur.md)
 - [ ] `lag002_01` (rom 2 Laboratoriet (intro), lag 01 med 6 objektbilder, bilde to `jobber/rom002/resultat.png`) (avvist, les retur.md)
-- [ ] `lag030_04_del1av2` (rom 30 Den roterende restauranten, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/rom030_del1av2/resultat.png`) (avvist, les retur.md)
-- [ ] `lag037_01_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 01 med 8 objektbilder, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`) (avvist, les retur.md)
-- [ ] `lag037_02_del1av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 02 med 4 objektbilder, del 1/2, bilde to `jobber/rom037_del1av2/resultat.png`) (avvist, les retur.md)
-- [ ] `lag037_03_del1av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 03 med 4 objektbilder, del 1/2, bilde to `jobber/rom037_del1av2/resultat.png`) (avvist, les retur.md)
-- [ ] `lag037_06_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet), lag 06 med 2 objektbilder, del 2/2, bilde to `jobber/rom037_del2av2/resultat.png`) (avvist, les retur.md)
-- [ ] `lag045_03` (rom 45 Bumpusville, soverommet, lag 03 med 2 objektbilder, bilde to `jobber/rom045/resultat.png`) (avvist, les retur.md)
-
-## Bestilling 2
-
-Rom 47, 52.
-
 - [ ] `lag047_02` (rom 47 Bumpusville Sings (menasjeriet), lag 02 med 8 objektbilder, bilde to `jobber/rom047/resultat.png`) (avvist, les retur.md)
 - [ ] `lag052_01_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 01 med 3 objektbilder, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`) (avvist, les retur.md)
 - [ ] `lag052_02_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 02 med 2 objektbilder, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`) (avvist, les retur.md)
@@ -41,14 +29,14 @@ Rom 47, 52.
 - [ ] `lag052_04_del1av2` (rom 52 Savage Jungle Inn, lobbyen, lag 04 med 2 objektbilder, del 1/2, bilde to `jobber/rom052_del1av2/resultat.png`) (avvist, les retur.md)
 - [ ] `lag052_05_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 05 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`) (avvist, les retur.md)
 - [ ] `lag052_06_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 06 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`) (avvist, les retur.md)
+
+## Bestilling 2
+
+Rom 26, 52, 56, 61, 68. Figurark for Max.
+
 - [ ] `lag052_07_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 07 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`) (avvist, les retur.md)
 - [ ] `lag052_08_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 08 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`) (avvist, les retur.md)
 - [ ] `lag052_09_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 09 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`) (avvist, les retur.md)
-
-## Bestilling 3
-
-Rom 26, 32, 52, 56, 61, 68. Figurark for Max.
-
 - [ ] `lag052_10_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 10 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`) (avvist, les retur.md)
 - [ ] `lag052_11_del2av2` (rom 52 Savage Jungle Inn, lobbyen, lag 11 med 1 objektbilde, del 2/2, bilde to `jobber/rom052_del2av2/resultat.png`) (avvist, les retur.md)
 - [ ] `lag056_06` (rom 56 Kjøkkenet, lag 06 med 2 objektbilder, bilde to `jobber/rom056/resultat.png`) (avvist, les retur.md)
@@ -56,14 +44,14 @@ Rom 26, 32, 52, 56, 61, 68. Figurark for Max.
 - [ ] `lag068_08` (rom 68 Highway Surfing (minispill), lag 08 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`) (avvist, les retur.md)
 - [ ] `fig259_02` (figurark 2 for Max (kostyme 259), 3 ruter: animasjon 15 (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 16 (lag 2, tegnes over kroppen) mot høyre (2 ruter), bilde to `hovedark/max.png`) (avvist, les retur.md)
 - [ ] `lag026_02` (rom 26 Dunk the Beast, lag 02 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
+
+## Bestilling 3
+
+Rom 26, 32, 35, 41, 43, 45.
+
 - [ ] `lag026_03` (rom 26 Dunk the Beast, lag 03 med 1 objektbilde, bilde to `jobber/rom026/resultat.png`)
 - [ ] `lag032_01_del1av2` (rom 32 Fiskedekket på toppen av nøstet, lag 01 med 3 objektbilder, del 1/2, bilde to `jobber/rom032_del1av2/resultat.png`)
 - [ ] `lag032_03_del1av2` (rom 32 Fiskedekket på toppen av nøstet, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/rom032_del1av2/resultat.png`)
-
-## Bestilling 4
-
-Rom 35, 41, 43, 45, 53.
-
 - [ ] `lag035_01_del1av2` (rom 35 World of Fish, lag 01 med 5 objektbilder, del 1/2, bilde to `jobber/rom035_del1av2/resultat.png`)
 - [ ] `lag035_02_del2av2` (rom 35 World of Fish, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom035_del2av2/resultat.png`)
 - [ ] `lag041_01_del1av2` (rom 41 Frog Rock, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom041_del1av2/resultat.png`)
@@ -71,15 +59,14 @@ Rom 35, 41, 43, 45, 53.
 - [ ] `lag041_02_del2av2` (rom 41 Frog Rock, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom041_del2av2/resultat.png`)
 - [ ] `lag043_01_del1av2` (rom 43 Bumpusville, gangen, lag 01 med 1 objektbilde, del 1/2, bilde to `jobber/rom043_del1av2/resultat.png`)
 - [ ] `lag045_01` (rom 45 Bumpusville, soverommet, lag 01 med 4 objektbilder, bilde to `jobber/rom045/resultat.png`)
+
+## Bestilling 4
+
+Rom 45, 53, 68.
+
 - [ ] `lag045_02` (rom 45 Bumpusville, soverommet, lag 02 med 3 objektbilder, bilde to `jobber/rom045/resultat.png`)
 - [ ] `lag053_01_del1av2` (rom 53 Savage Jungle Inn, festsalen, lag 01 med 15 objektbilder, del 1/2, bilde to `jobber/rom053_del1av2/resultat.png`)
 - [ ] `lag053_02_del1av2` (rom 53 Savage Jungle Inn, festsalen, lag 02 med 3 objektbilder, del 1/2, bilde to `jobber/rom053_del1av2/resultat.png`)
-
-## Bestilling 5
-
-Rom 56, 68, 71.
-
-- [ ] `lag056_04` (rom 56 Kjøkkenet, lag 04 med 3 objektbilder, bilde to `jobber/rom056/resultat.png`)
 - [ ] `lag068_01` (rom 68 Highway Surfing (minispill), lag 01 med 9 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_05` (rom 68 Highway Surfing (minispill), lag 05 med 4 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_06` (rom 68 Highway Surfing (minispill), lag 06 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
@@ -87,13 +74,13 @@ Rom 56, 68, 71.
 - [ ] `lag068_09` (rom 68 Highway Surfing (minispill), lag 09 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_10` (rom 68 Highway Surfing (minispill), lag 10 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_12` (rom 68 Highway Surfing (minispill), lag 12 med 1 objektbilde, bilde to `jobber/rom068/resultat.png`)
+
+## Bestilling 5
+
+Rom 71, 83. Figurark for Sam, Sam og Max.
+
 - [ ] `lag071_05` (rom 71 Påkledning, Sam og Max, lag 05 med 3 objektbilder, bilde to `jobber/rom071/resultat.png`)
 - [ ] `lag071_15` (rom 71 Påkledning, Sam og Max, lag 15 med 2 objektbilder, bilde to `jobber/rom071/resultat.png`)
-
-## Bestilling 6
-
-Rom 83. Figurark for Sam, Sam og Max.
-
 - [ ] `lag083_01` (rom 83 Slutten (bigfootene i skyene), lag 01 med 4 objektbilder, bilde to `jobber/rom083/resultat.png`)
 - [ ] `lag083_02` (rom 83 Slutten (bigfootene i skyene), lag 02 med 4 objektbilder, bilde to `jobber/rom083/resultat.png`)
 - [ ] `lag083_03` (rom 83 Slutten (bigfootene i skyene), lag 03 med 4 objektbilder, bilde to `jobber/rom083/resultat.png`)
@@ -102,13 +89,13 @@ Rom 83. Figurark for Sam, Sam og Max.
 - [ ] `fig007_02` (figurark 2 for Sam (kostyme 7), 25 ruter: snakking (lag 3, tegnes over kroppen) mot oss, bort (15 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (5 ruter); animasjon 7 (lag 1, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig247_01` (figurark 1 for Sam og Max (kostyme 247), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig247_02` (figurark 2 for Sam og Max (kostyme 247), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig247_03` (figurark 3 for Sam og Max (kostyme 247), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig247_04` (figurark 4 for Sam og Max (kostyme 247), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 7
+## Bestilling 6
 
 Figurark for Sam og Max, Sam.
 
+- [ ] `fig247_03` (figurark 3 for Sam og Max (kostyme 247), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig247_04` (figurark 4 for Sam og Max (kostyme 247), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig247_05` (figurark 5 for Sam og Max (kostyme 247), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig247_06` (figurark 6 for Sam og Max (kostyme 247), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig247_07` (figurark 7 for Sam og Max (kostyme 247), 6 ruter: animasjon 8 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
@@ -117,13 +104,13 @@ Figurark for Sam og Max, Sam.
 - [ ] `fig247_10` (figurark 10 for Sam og Max (kostyme 247), 6 ruter: animasjon 8 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig247_11` (figurark 11 for Sam og Max (kostyme 247), 4 ruter: animasjon 8 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig116_01` (figurark 1 for Sam (kostyme 116), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig116_02` (figurark 2 for Sam (kostyme 116), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig116_03` (figurark 3 for Sam (kostyme 116), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 8
+## Bestilling 7
 
 Figurark for Sam.
 
+- [ ] `fig116_02` (figurark 2 for Sam (kostyme 116), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [ ] `fig116_03` (figurark 3 for Sam (kostyme 116), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig116_04` (figurark 4 for Sam (kostyme 116), 8 ruter: animasjon 8 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig116_05` (figurark 5 for Sam (kostyme 116), 5 ruter: animasjon 8 mot høyre (1 rute); animasjon 9 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig116_06` (figurark 6 for Sam (kostyme 116), 7 ruter: animasjon 9 mot høyre (6 ruter); animasjon 10 mot høyre (1 rute), bilde to `hovedark/sam.png`)
@@ -132,13 +119,13 @@ Figurark for Sam.
 - [ ] `fig116_09` (figurark 9 for Sam (kostyme 116), 5 ruter: animasjon 13 mot høyre (4 ruter); animasjon 14 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig249_01` (figurark 1 for Sam (kostyme 249), 2 ruter: stående mot høyre (1 rute); start mot oss (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig249_02` (figurark 2 for Sam (kostyme 249), 7 ruter: gange mot høyre (6 ruter); snakking (lag 2, tegnes over kroppen) mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig249_03` (figurark 3 for Sam (kostyme 249), 7 ruter: animasjon 6 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig249_04` (figurark 4 for Sam (kostyme 249), 5 ruter: animasjon 6 mot høyre (1 rute); animasjon 8 mot oss (4 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 9
+## Bestilling 8
 
 Figurark for Sam.
 
+- [ ] `fig249_03` (figurark 3 for Sam (kostyme 249), 7 ruter: animasjon 6 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig249_04` (figurark 4 for Sam (kostyme 249), 5 ruter: animasjon 6 mot høyre (1 rute); animasjon 8 mot oss (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig249_05` (figurark 5 for Sam (kostyme 249), 5 ruter: animasjon 9 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig249_06` (figurark 6 for Sam (kostyme 249), 11 ruter: animasjon 11 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig249_07` (figurark 7 for Sam (kostyme 249), 6 ruter: animasjon 11 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
@@ -147,13 +134,13 @@ Figurark for Sam.
 - [ ] `fig117_01` (figurark 1 for Sam (kostyme 117), 17 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig117_02` (figurark 2 for Sam (kostyme 117), 18 ruter: animasjon 8 mot høyre (9 ruter); animasjon 9 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig117_03` (figurark 3 for Sam (kostyme 117), 9 ruter: animasjon 10 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig117_04` (figurark 4 for Sam (kostyme 117), 9 ruter: animasjon 11 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig117_05` (figurark 5 for Sam (kostyme 117), 11 ruter: animasjon 12 mot høyre (10 ruter); animasjon 14 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 
-## Bestilling 10
+## Bestilling 9
 
 Figurark for Sam.
 
+- [ ] `fig117_04` (figurark 4 for Sam (kostyme 117), 9 ruter: animasjon 11 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig117_05` (figurark 5 for Sam (kostyme 117), 11 ruter: animasjon 12 mot høyre (10 ruter); animasjon 14 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig117_06` (figurark 6 for Sam (kostyme 117), 9 ruter: animasjon 15 mot høyre (8 ruter); animasjon 16 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig117_07` (figurark 7 for Sam (kostyme 117), 10 ruter: animasjon 17 mot høyre (9 ruter); animasjon 18 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig117_08` (figurark 8 for Sam (kostyme 117), 8 ruter: animasjon 19 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
@@ -162,13 +149,13 @@ Figurark for Sam.
 - [ ] `fig204_03` (figurark 3 for Sam (kostyme 204), 15 ruter: snakking (lag 2, tegnes over kroppen) mot oss, bort (15 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig204_04` (figurark 4 for Sam (kostyme 204), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig204_05` (figurark 5 for Sam (kostyme 204), 11 ruter: gange bort (8 ruter); animasjon 6 mot høyre, mot oss, bort (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig307_01` (figurark 1 for Sam (kostyme 307), 5 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig307_02` (figurark 2 for Sam (kostyme 307), 8 ruter: gange mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 11
+## Bestilling 10
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig307_01` (figurark 1 for Sam (kostyme 307), 5 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig307_02` (figurark 2 for Sam (kostyme 307), 8 ruter: gange mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig307_03` (figurark 3 for Sam (kostyme 307), 23 ruter: snakking (lag 3, tegnes over kroppen) mot høyre, mot oss (23 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig307_04` (figurark 4 for Sam (kostyme 307), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig307_05` (figurark 5 for Sam (kostyme 307), 8 ruter: gange bort (8 ruter), bilde to `hovedark/sam.png`)
@@ -177,13 +164,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig312_03` (figurark 3 for Sam og Max (kostyme 312), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig312_04` (figurark 4 for Sam og Max (kostyme 312), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig312_05` (figurark 5 for Sam og Max (kostyme 312), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig314_01` (figurark 1 for Sam (kostyme 314), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig314_02` (figurark 2 for Sam (kostyme 314), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 12
+## Bestilling 11
 
 Figurark for Sam, Max, Sam og Max.
 
+- [ ] `fig314_01` (figurark 1 for Sam (kostyme 314), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig314_02` (figurark 2 for Sam (kostyme 314), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig314_03` (figurark 3 for Sam (kostyme 314), 10 ruter: animasjon 7 mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig314_04` (figurark 4 for Sam (kostyme 314), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig294_01` (figurark 1 for Max (kostyme 294), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/max.png`)
@@ -192,13 +179,13 @@ Figurark for Sam, Max, Sam og Max.
 - [ ] `fig246_01` (figurark 1 for Sam og Max (kostyme 246), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_02` (figurark 2 for Sam og Max (kostyme 246), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_03` (figurark 3 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_04` (figurark 4 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_05` (figurark 5 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 13
+## Bestilling 12
 
 Figurark for Sam og Max.
 
+- [ ] `fig246_04` (figurark 4 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig246_05` (figurark 5 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_06` (figurark 6 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_07` (figurark 7 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_08` (figurark 8 for Sam og Max (kostyme 246), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
@@ -207,13 +194,13 @@ Figurark for Sam og Max.
 - [ ] `fig246_11` (figurark 11 for Sam og Max (kostyme 246), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_12` (figurark 12 for Sam og Max (kostyme 246), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_13` (figurark 13 for Sam og Max (kostyme 246), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_14` (figurark 14 for Sam og Max (kostyme 246), 3 ruter: animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_15` (figurark 15 for Sam og Max (kostyme 246), 3 ruter: animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 14
+## Bestilling 13
 
 Figurark for Sam og Max, Sam.
 
+- [ ] `fig246_14` (figurark 14 for Sam og Max (kostyme 246), 3 ruter: animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig246_15` (figurark 15 for Sam og Max (kostyme 246), 3 ruter: animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_16` (figurark 16 for Sam og Max (kostyme 246), 3 ruter: animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_17` (figurark 17 for Sam og Max (kostyme 246), 3 ruter: animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig246_18` (figurark 18 for Sam og Max (kostyme 246), 3 ruter: animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
@@ -222,13 +209,13 @@ Figurark for Sam og Max, Sam.
 - [ ] `fig220_01` (figurark 1 for Sam (kostyme 220), 8 ruter: start mot høyre (6 ruter); start (lag 14, tegnes over kroppen) mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig220_02` (figurark 2 for Sam (kostyme 220), 5 ruter: animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig220_03` (figurark 3 for Sam (kostyme 220), 5 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig220_04` (figurark 4 for Sam (kostyme 220), 5 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig220_05` (figurark 5 for Sam (kostyme 220), 5 ruter: animasjon 8 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 15
+## Bestilling 14
 
 Figurark for Sam.
 
+- [ ] `fig220_04` (figurark 4 for Sam (kostyme 220), 5 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig220_05` (figurark 5 for Sam (kostyme 220), 5 ruter: animasjon 8 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig220_06` (figurark 6 for Sam (kostyme 220), 5 ruter: animasjon 8 (lag 14, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig220_07` (figurark 7 for Sam (kostyme 220), 10 ruter: animasjon 8 (lag 15, tegnes over kroppen) mot høyre (5 ruter); animasjon 9 mot høyre (4 ruter); animasjon 9 (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig220_08` (figurark 8 for Sam (kostyme 220), 1 rute: animasjon 10 mot høyre (1 rute), bilde to `hovedark/sam.png`)
@@ -237,13 +224,13 @@ Figurark for Sam.
 - [ ] `fig110_03` (figurark 3 for Sam (kostyme 110), 18 ruter: animasjon 7 mot høyre (18 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig110_04` (figurark 4 for Sam (kostyme 110), 11 ruter: animasjon 7 mot høyre (6 ruter); animasjon 8 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig110_05` (figurark 5 for Sam (kostyme 110), 11 ruter: animasjon 8 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig110_06` (figurark 6 for Sam (kostyme 110), 17 ruter: animasjon 8 mot høyre (17 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig110_07` (figurark 7 for Sam (kostyme 110), 6 ruter: animasjon 9 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 16
+## Bestilling 15
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig110_06` (figurark 6 for Sam (kostyme 110), 17 ruter: animasjon 8 mot høyre (17 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig110_07` (figurark 7 for Sam (kostyme 110), 6 ruter: animasjon 9 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig152_01` (figurark 1 for Sam (kostyme 152), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig152_02` (figurark 2 for Sam (kostyme 152), 11 ruter: start mot høyre (6 ruter); animasjon 7 (lag 14, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig152_03` (figurark 3 for Sam (kostyme 152), 10 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (10 ruter), bilde to `hovedark/sam.png`)
@@ -252,13 +239,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig152_06` (figurark 6 for Sam (kostyme 152), 20 ruter: animasjon 9 (lag 14, tegnes over kroppen) mot høyre (11 ruter); animasjon 9 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig309_01` (figurark 1 for Sam og Max (kostyme 309), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig309_02` (figurark 2 for Sam og Max (kostyme 309), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig309_03` (figurark 3 for Sam og Max (kostyme 309), 6 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig309_04` (figurark 4 for Sam og Max (kostyme 309), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 17
+## Bestilling 16
 
 Figurark for Sam og Max, Sam.
 
+- [ ] `fig309_03` (figurark 3 for Sam og Max (kostyme 309), 6 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig309_04` (figurark 4 for Sam og Max (kostyme 309), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig309_05` (figurark 5 for Sam og Max (kostyme 309), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig215_01` (figurark 1 for Sam (kostyme 215), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig215_02` (figurark 2 for Sam (kostyme 215), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
@@ -267,13 +254,13 @@ Figurark for Sam og Max, Sam.
 - [ ] `fig300_01` (figurark 1 for Sam (kostyme 300), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig300_02` (figurark 2 for Sam (kostyme 300), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig300_03` (figurark 3 for Sam (kostyme 300), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig300_04` (figurark 4 for Sam (kostyme 300), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig168_01` (figurark 1 for Sam (kostyme 168), 26 ruter: start mot høyre (12 ruter); animasjon 7 mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 18
+## Bestilling 17
 
 Figurark for Sam, Max.
 
+- [ ] `fig300_04` (figurark 4 for Sam (kostyme 300), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [ ] `fig168_01` (figurark 1 for Sam (kostyme 168), 26 ruter: start mot høyre (12 ruter); animasjon 7 mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig168_02` (figurark 2 for Sam (kostyme 168), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig168_03` (figurark 3 for Sam (kostyme 168), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig336_01` (figurark 1 for Sam (kostyme 336), 31 ruter: start mot høyre (31 ruter), bilde to `hovedark/sam.png`)
@@ -282,13 +269,13 @@ Figurark for Sam, Max.
 - [ ] `fig337_01` (figurark 1 for Max (kostyme 337), 26 ruter: start mot høyre (26 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig337_02` (figurark 2 for Max (kostyme 337), 22 ruter: start mot høyre (22 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig337_03` (figurark 3 for Max (kostyme 337), 35 ruter: start mot høyre (5 ruter); animasjon 7 mot høyre (30 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig015_01` (figurark 1 for Max (kostyme 15), 29 ruter: start mot høyre (29 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig015_02` (figurark 2 for Max (kostyme 15), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `hovedark/max.png`)
 
-## Bestilling 19
+## Bestilling 18
 
 Figurark for Max, Sam.
 
+- [ ] `fig015_01` (figurark 1 for Max (kostyme 15), 29 ruter: start mot høyre (29 ruter), bilde to `hovedark/max.png`)
+- [ ] `fig015_02` (figurark 2 for Max (kostyme 15), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `hovedark/max.png`)
 - [ ] `fig193_01` (figurark 1 for Max (kostyme 193), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig193_02` (figurark 2 for Max (kostyme 193), 13 ruter: animasjon 7 mot høyre (13 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig298_01` (figurark 1 for Sam (kostyme 298), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
@@ -297,13 +284,13 @@ Figurark for Max, Sam.
 - [ ] `fig039_01` (figurark 1 for Sam (kostyme 39), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig113_01` (figurark 1 for Sam (kostyme 113), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig295_01` (figurark 1 for Max (kostyme 295), 11 ruter: start mot høyre (4 ruter); animasjon 7 mot høyre (7 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig346_01` (figurark 1 for Sam (kostyme 346), 3 ruter: start (lag 13, tegnes over kroppen) mot høyre (1 rute); start (lag 14, tegnes over kroppen) mot høyre (2 ruter))
-- [ ] `fig346_02` (figurark 2 for Sam (kostyme 346), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 
-## Bestilling 20
+## Bestilling 19
 
 Figurark for Sam.
 
+- [ ] `fig346_01` (figurark 1 for Sam (kostyme 346), 3 ruter: start (lag 13, tegnes over kroppen) mot høyre (1 rute); start (lag 14, tegnes over kroppen) mot høyre (2 ruter))
+- [ ] `fig346_02` (figurark 2 for Sam (kostyme 346), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_03` (figurark 3 for Sam (kostyme 346), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_04` (figurark 4 for Sam (kostyme 346), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_05` (figurark 5 for Sam (kostyme 346), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
@@ -312,13 +299,13 @@ Figurark for Sam.
 - [ ] `fig346_08` (figurark 8 for Sam (kostyme 346), 4 ruter: start (lag 14, tegnes over kroppen) mot høyre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_09` (figurark 9 for Sam (kostyme 346), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_10` (figurark 10 for Sam (kostyme 346), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_11` (figurark 11 for Sam (kostyme 346), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_12` (figurark 12 for Sam (kostyme 346), 3 ruter: start (lag 14, tegnes over kroppen) mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
 
-## Bestilling 21
+## Bestilling 20
 
 Figurark for Sam.
 
+- [ ] `fig346_11` (figurark 11 for Sam (kostyme 346), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
+- [ ] `fig346_12` (figurark 12 for Sam (kostyme 346), 3 ruter: start (lag 14, tegnes over kroppen) mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_13` (figurark 13 for Sam (kostyme 346), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_14` (figurark 14 for Sam (kostyme 346), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_15` (figurark 15 for Sam (kostyme 346), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
@@ -327,13 +314,13 @@ Figurark for Sam.
 - [ ] `fig346_18` (figurark 18 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_19` (figurark 19 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_20` (figurark 20 for Sam (kostyme 346), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_21` (figurark 21 for Sam (kostyme 346), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_22` (figurark 22 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 
-## Bestilling 22
+## Bestilling 21
 
 Figurark for Sam.
 
+- [ ] `fig346_21` (figurark 21 for Sam (kostyme 346), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
+- [ ] `fig346_22` (figurark 22 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_23` (figurark 23 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_24` (figurark 24 for Sam (kostyme 346), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_25` (figurark 25 for Sam (kostyme 346), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
@@ -342,13 +329,13 @@ Figurark for Sam.
 - [ ] `fig346_28` (figurark 28 for Sam (kostyme 346), 3 ruter: animasjon 9 (lag 5, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_29` (figurark 29 for Sam (kostyme 346), 3 ruter: animasjon 9 (lag 5, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_30` (figurark 30 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 5, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_31` (figurark 31 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 5, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_32` (figurark 32 for Sam (kostyme 346), 2 ruter: animasjon 9 (lag 5, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
 
-## Bestilling 23
+## Bestilling 22
 
 Figurark for Sam.
 
+- [ ] `fig346_31` (figurark 31 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 5, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
+- [ ] `fig346_32` (figurark 32 for Sam (kostyme 346), 2 ruter: animasjon 9 (lag 5, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_33` (figurark 33 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 7, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_34` (figurark 34 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 7, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_35` (figurark 35 for Sam (kostyme 346), 1 rute: animasjon 9 (lag 7, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
@@ -357,13 +344,13 @@ Figurark for Sam.
 - [ ] `fig346_38` (figurark 38 for Sam (kostyme 346), 1 rute: animasjon 9 (lag 10, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_39` (figurark 39 for Sam (kostyme 346), 2 ruter: animasjon 9 (lag 10, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_40` (figurark 40 for Sam (kostyme 346), 3 ruter: animasjon 9 (lag 10, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_41` (figurark 41 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 10, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_42` (figurark 42 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 10, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
 
-## Bestilling 24
+## Bestilling 23
 
 Figurark for Sam.
 
+- [ ] `fig346_41` (figurark 41 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 10, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
+- [ ] `fig346_42` (figurark 42 for Sam (kostyme 346), 4 ruter: animasjon 9 (lag 10, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_43` (figurark 43 for Sam (kostyme 346), 1 rute: animasjon 9 mot venstre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig345_01` (figurark 1 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter))
 - [ ] `fig345_02` (figurark 2 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
@@ -372,13 +359,13 @@ Figurark for Sam.
 - [ ] `fig345_05` (figurark 5 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_06` (figurark 6 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_07` (figurark 7 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_08` (figurark 8 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_09` (figurark 9 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 
-## Bestilling 25
+## Bestilling 24
 
 Figurark for Sam.
 
+- [ ] `fig345_08` (figurark 8 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [ ] `fig345_09` (figurark 9 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_10` (figurark 10 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_11` (figurark 11 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_12` (figurark 12 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
@@ -387,13 +374,13 @@ Figurark for Sam.
 - [ ] `fig345_15` (figurark 15 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_16` (figurark 16 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_17` (figurark 17 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_18` (figurark 18 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_19` (figurark 19 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 
-## Bestilling 26
+## Bestilling 25
 
 Figurark for Sam.
 
+- [ ] `fig345_18` (figurark 18 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [ ] `fig345_19` (figurark 19 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_20` (figurark 20 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_21` (figurark 21 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_22` (figurark 22 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
@@ -402,13 +389,13 @@ Figurark for Sam.
 - [ ] `fig345_25` (figurark 25 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_26` (figurark 26 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_27` (figurark 27 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_28` (figurark 28 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_29` (figurark 29 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 
-## Bestilling 27
+## Bestilling 26
 
 Figurark for Sam.
 
+- [ ] `fig345_28` (figurark 28 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [ ] `fig345_29` (figurark 29 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_30` (figurark 30 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_31` (figurark 31 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_32` (figurark 32 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
@@ -417,13 +404,13 @@ Figurark for Sam.
 - [ ] `fig345_35` (figurark 35 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_36` (figurark 36 for Sam (kostyme 345), 1 rute: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_37` (figurark 37 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_38` (figurark 38 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_39` (figurark 39 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
 
-## Bestilling 28
+## Bestilling 27
 
 Figurark for Sam.
 
+- [ ] `fig345_38` (figurark 38 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [ ] `fig345_39` (figurark 39 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_40` (figurark 40 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_41` (figurark 41 for Sam (kostyme 345), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig344_01` (figurark 1 for Sam (kostyme 344), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter))
@@ -432,13 +419,13 @@ Figurark for Sam.
 - [ ] `fig344_04` (figurark 4 for Sam (kostyme 344), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_05` (figurark 5 for Sam (kostyme 344), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_06` (figurark 6 for Sam (kostyme 344), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig344_01/resultat.png`)
-- [ ] `fig344_07` (figurark 7 for Sam (kostyme 344), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
-- [ ] `fig344_08` (figurark 8 for Sam (kostyme 344), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 
-## Bestilling 29
+## Bestilling 28
 
 Figurark for Sam.
 
+- [ ] `fig344_07` (figurark 7 for Sam (kostyme 344), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
+- [ ] `fig344_08` (figurark 8 for Sam (kostyme 344), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_09` (figurark 9 for Sam (kostyme 344), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_10` (figurark 10 for Sam (kostyme 344), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_11` (figurark 11 for Sam (kostyme 344), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
@@ -447,13 +434,13 @@ Figurark for Sam.
 - [ ] `fig344_14` (figurark 14 for Sam (kostyme 344), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_15` (figurark 15 for Sam (kostyme 344), 5 ruter: animasjon 7 mot høyre (5 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_16` (figurark 16 for Sam (kostyme 344), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig344_01/resultat.png`)
-- [ ] `fig344_17` (figurark 17 for Sam (kostyme 344), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig344_01/resultat.png`)
-- [ ] `fig344_18` (figurark 18 for Sam (kostyme 344), 5 ruter: animasjon 7 mot høyre (4 ruter); animasjon 8 (lag 1, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig344_01/resultat.png`)
 
-## Bestilling 30
+## Bestilling 29
 
 Figurark for Sam.
 
+- [ ] `fig344_17` (figurark 17 for Sam (kostyme 344), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig344_01/resultat.png`)
+- [ ] `fig344_18` (figurark 18 for Sam (kostyme 344), 5 ruter: animasjon 7 mot høyre (4 ruter); animasjon 8 (lag 1, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_19` (figurark 19 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_20` (figurark 20 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_21` (figurark 21 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
@@ -462,13 +449,13 @@ Figurark for Sam.
 - [ ] `fig344_24` (figurark 24 for Sam (kostyme 344), 8 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (8 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_25` (figurark 25 for Sam (kostyme 344), 1 rute: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_26` (figurark 26 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
-- [ ] `fig344_27` (figurark 27 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
-- [ ] `fig344_28` (figurark 28 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 
-## Bestilling 31
+## Bestilling 30
 
 Figurark for Sam.
 
+- [ ] `fig344_27` (figurark 27 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
+- [ ] `fig344_28` (figurark 28 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_29` (figurark 29 for Sam (kostyme 344), 3 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_30` (figurark 30 for Sam (kostyme 344), 2 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_31` (figurark 31 for Sam (kostyme 344), 5 ruter: animasjon 8 (lag 7, tegnes over kroppen) mot venstre (5 ruter), bilde to `jobber/fig344_01/resultat.png`)
@@ -477,13 +464,13 @@ Figurark for Sam.
 - [ ] `fig029_01` (figurark 1 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_02` (figurark 2 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_03` (figurark 3 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_04` (figurark 4 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_05` (figurark 5 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 32
+## Bestilling 31
 
 Figurark for Sam.
 
+- [ ] `fig029_04` (figurark 4 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig029_05` (figurark 5 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_06` (figurark 6 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_07` (figurark 7 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_08` (figurark 8 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
@@ -492,13 +479,13 @@ Figurark for Sam.
 - [ ] `fig029_11` (figurark 11 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_12` (figurark 12 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_13` (figurark 13 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_14` (figurark 14 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_15` (figurark 15 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 33
+## Bestilling 32
 
 Figurark for Sam.
 
+- [ ] `fig029_14` (figurark 14 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig029_15` (figurark 15 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_16` (figurark 16 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_17` (figurark 17 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_18` (figurark 18 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
@@ -507,13 +494,13 @@ Figurark for Sam.
 - [ ] `fig029_21` (figurark 21 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_22` (figurark 22 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig342_01` (figurark 1 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter))
-- [ ] `fig342_02` (figurark 2 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
-- [ ] `fig342_03` (figurark 3 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 
-## Bestilling 34
+## Bestilling 33
 
 Figurark for Sam.
 
+- [ ] `fig342_02` (figurark 2 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
+- [ ] `fig342_03` (figurark 3 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_04` (figurark 4 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_05` (figurark 5 for Sam (kostyme 342), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_06` (figurark 6 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
@@ -522,13 +509,13 @@ Figurark for Sam.
 - [ ] `fig342_09` (figurark 9 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_10` (figurark 10 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_11` (figurark 11 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
-- [ ] `fig342_12` (figurark 12 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
-- [ ] `fig342_13` (figurark 13 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 
-## Bestilling 35
+## Bestilling 34
 
 Figurark for Sam.
 
+- [ ] `fig342_12` (figurark 12 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
+- [ ] `fig342_13` (figurark 13 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_14` (figurark 14 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_15` (figurark 15 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_16` (figurark 16 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
@@ -537,13 +524,13 @@ Figurark for Sam.
 - [ ] `fig342_19` (figurark 19 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_20` (figurark 20 for Sam (kostyme 342), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig304_01` (figurark 1 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig304_02` (figurark 2 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig304_03` (figurark 3 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 36
+## Bestilling 35
 
 Figurark for Sam.
 
+- [ ] `fig304_02` (figurark 2 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig304_03` (figurark 3 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_04` (figurark 4 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_05` (figurark 5 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_06` (figurark 6 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
@@ -552,13 +539,13 @@ Figurark for Sam.
 - [ ] `fig304_09` (figurark 9 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_10` (figurark 10 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_11` (figurark 11 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig304_12` (figurark 12 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig304_13` (figurark 13 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 37
+## Bestilling 36
 
 Figurark for Sam.
 
+- [ ] `fig304_12` (figurark 12 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig304_13` (figurark 13 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_14` (figurark 14 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_15` (figurark 15 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_01` (figurark 1 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
@@ -567,13 +554,13 @@ Figurark for Sam.
 - [ ] `fig303_04` (figurark 4 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_05` (figurark 5 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_06` (figurark 6 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_07` (figurark 7 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_08` (figurark 8 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 38
+## Bestilling 37
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig303_07` (figurark 7 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig303_08` (figurark 8 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_09` (figurark 9 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_10` (figurark 10 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_11` (figurark 11 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
@@ -582,13 +569,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig303_14` (figurark 14 for Sam (kostyme 303), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig223_01` (figurark 1 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_02` (figurark 2 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig223_03` (figurark 3 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig223_04` (figurark 4 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 39
+## Bestilling 38
 
 Figurark for Sam og Max.
 
+- [ ] `fig223_03` (figurark 3 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig223_04` (figurark 4 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_05` (figurark 5 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_06` (figurark 6 for Sam og Max (kostyme 223), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_07` (figurark 7 for Sam og Max (kostyme 223), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
@@ -597,13 +584,13 @@ Figurark for Sam og Max.
 - [ ] `fig223_10` (figurark 10 for Sam og Max (kostyme 223), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_11` (figurark 11 for Sam og Max (kostyme 223), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_12` (figurark 12 for Sam og Max (kostyme 223), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig223_13` (figurark 13 for Sam og Max (kostyme 223), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig097_01` (figurark 1 for Sam og Max (kostyme 97), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 40
+## Bestilling 39
 
 Figurark for Sam og Max.
 
+- [ ] `fig223_13` (figurark 13 for Sam og Max (kostyme 223), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [ ] `fig097_01` (figurark 1 for Sam og Max (kostyme 97), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig097_02` (figurark 2 for Sam og Max (kostyme 97), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig097_03` (figurark 3 for Sam og Max (kostyme 97), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig097_04` (figurark 4 for Sam og Max (kostyme 97), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
@@ -612,13 +599,13 @@ Figurark for Sam og Max.
 - [ ] `fig097_07` (figurark 7 for Sam og Max (kostyme 97), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig097_08` (figurark 8 for Sam og Max (kostyme 97), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig097_09` (figurark 9 for Sam og Max (kostyme 97), 8 ruter: start (lag 15, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig097_10` (figurark 10 for Sam og Max (kostyme 97), 13 ruter: start (lag 15, tegnes over kroppen) mot høyre (13 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig097_11` (figurark 11 for Sam og Max (kostyme 97), 18 ruter: start (lag 15, tegnes over kroppen) mot høyre (18 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 41
+## Bestilling 40
 
 Figurark for Sam og Max, Sam.
 
+- [ ] `fig097_10` (figurark 10 for Sam og Max (kostyme 97), 13 ruter: start (lag 15, tegnes over kroppen) mot høyre (13 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig097_11` (figurark 11 for Sam og Max (kostyme 97), 18 ruter: start (lag 15, tegnes over kroppen) mot høyre (18 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig097_12` (figurark 12 for Sam og Max (kostyme 97), 9 ruter: start (lag 15, tegnes over kroppen) mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_01` (figurark 1 for Sam (kostyme 250), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_02` (figurark 2 for Sam (kostyme 250), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
@@ -627,13 +614,13 @@ Figurark for Sam og Max, Sam.
 - [ ] `fig250_05` (figurark 5 for Sam (kostyme 250), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_06` (figurark 6 for Sam (kostyme 250), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_07` (figurark 7 for Sam (kostyme 250), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig250_08` (figurark 8 for Sam (kostyme 250), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig250_09` (figurark 9 for Sam (kostyme 250), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 42
+## Bestilling 41
 
 Figurark for Sam.
 
+- [ ] `fig250_08` (figurark 8 for Sam (kostyme 250), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig250_09` (figurark 9 for Sam (kostyme 250), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_10` (figurark 10 for Sam (kostyme 250), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_11` (figurark 11 for Sam (kostyme 250), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_12` (figurark 12 for Sam (kostyme 250), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
@@ -642,13 +629,13 @@ Figurark for Sam.
 - [ ] `fig343_03` (figurark 3 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 - [ ] `fig343_04` (figurark 4 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 - [ ] `fig343_05` (figurark 5 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_06` (figurark 6 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_07` (figurark 7 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 
-## Bestilling 43
+## Bestilling 42
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig343_06` (figurark 6 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [ ] `fig343_07` (figurark 7 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 - [ ] `fig343_08` (figurark 8 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 - [ ] `fig343_09` (figurark 9 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 - [ ] `fig343_10` (figurark 10 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
@@ -657,13 +644,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig041_02` (figurark 2 for Sam og Max (kostyme 41), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig041_03` (figurark 3 for Sam og Max (kostyme 41), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig041_04` (figurark 4 for Sam og Max (kostyme 41), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig041_05` (figurark 5 for Sam og Max (kostyme 41), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig041_06` (figurark 6 for Sam og Max (kostyme 41), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 44
+## Bestilling 43
 
 Figurark for Sam og Max.
 
+- [ ] `fig041_05` (figurark 5 for Sam og Max (kostyme 41), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig041_06` (figurark 6 for Sam og Max (kostyme 41), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig041_07` (figurark 7 for Sam og Max (kostyme 41), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig041_08` (figurark 8 for Sam og Max (kostyme 41), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig041_09` (figurark 9 for Sam og Max (kostyme 41), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
@@ -672,13 +659,13 @@ Figurark for Sam og Max.
 - [ ] `fig164_02` (figurark 2 for Sam og Max (kostyme 164), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig164_03` (figurark 3 for Sam og Max (kostyme 164), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig164_04` (figurark 4 for Sam og Max (kostyme 164), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig164_05` (figurark 5 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig164_06` (figurark 6 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 
-## Bestilling 45
+## Bestilling 44
 
 Figurark for Sam og Max, Sam.
 
+- [ ] `fig164_05` (figurark 5 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [ ] `fig164_06` (figurark 6 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig164_07` (figurark 7 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig164_08` (figurark 8 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig164_09` (figurark 9 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
@@ -687,13 +674,13 @@ Figurark for Sam og Max, Sam.
 - [ ] `fig302_02` (figurark 2 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig302_03` (figurark 3 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig302_04` (figurark 4 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_05` (figurark 5 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_06` (figurark 6 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 46
+## Bestilling 45
 
 Figurark for Sam.
 
+- [ ] `fig302_05` (figurark 5 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig302_06` (figurark 6 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig302_07` (figurark 7 for Sam (kostyme 302), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig302_08` (figurark 8 for Sam (kostyme 302), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig302_09` (figurark 9 for Sam (kostyme 302), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
@@ -702,13 +689,13 @@ Figurark for Sam.
 - [ ] `fig047_02` (figurark 2 for Sam (kostyme 47), 8 ruter: start (lag 14, tegnes over kroppen) mot høyre (3 ruter); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_03` (figurark 3 for Sam (kostyme 47), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_04` (figurark 4 for Sam (kostyme 47), 6 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_05` (figurark 5 for Sam (kostyme 47), 11 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_06` (figurark 6 for Sam (kostyme 47), 8 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 47
+## Bestilling 46
 
 Figurark for Sam.
 
+- [ ] `fig047_05` (figurark 5 for Sam (kostyme 47), 11 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig047_06` (figurark 6 for Sam (kostyme 47), 8 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_07` (figurark 7 for Sam (kostyme 47), 11 ruter: animasjon 8 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_08` (figurark 8 for Sam (kostyme 47), 6 ruter: animasjon 8 (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_09` (figurark 9 for Sam (kostyme 47), 7 ruter: animasjon 8 (lag 15, tegnes over kroppen) mot høyre (7 ruter), bilde to `hovedark/sam.png`)
@@ -717,13 +704,13 @@ Figurark for Sam.
 - [ ] `fig251_03` (figurark 3 for Sam (kostyme 251), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig251_04` (figurark 4 for Sam (kostyme 251), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig251_05` (figurark 5 for Sam (kostyme 251), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig251_06` (figurark 6 for Sam (kostyme 251), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig251_07` (figurark 7 for Sam (kostyme 251), 6 ruter: animasjon 7 mot høyre (3 ruter); animasjon 8 (lag 15, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 48
+## Bestilling 47
 
 Figurark for Sam, Max.
 
+- [ ] `fig251_06` (figurark 6 for Sam (kostyme 251), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig251_07` (figurark 7 for Sam (kostyme 251), 6 ruter: animasjon 7 mot høyre (3 ruter); animasjon 8 (lag 15, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig251_08` (figurark 8 for Sam (kostyme 251), 4 ruter: animasjon 9 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig251_09` (figurark 9 for Sam (kostyme 251), 8 ruter: animasjon 9 mot høyre (2 ruter); animasjon 9 (lag 15, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig028_01` (figurark 1 for Max (kostyme 28), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
@@ -732,13 +719,13 @@ Figurark for Sam, Max.
 - [ ] `fig028_04` (figurark 4 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig028_05` (figurark 5 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig028_06` (figurark 6 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
+
+## Bestilling 48
+
+Figurark for Max, Sam og Max.
+
 - [ ] `fig028_07` (figurark 7 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig028_08` (figurark 8 for Max (kostyme 28), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `hovedark/max.png`)
-
-## Bestilling 49
-
-Figurark for Sam og Max.
-
 - [ ] `fig044_01` (figurark 1 for Sam og Max (kostyme 44), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig044_02` (figurark 2 for Sam og Max (kostyme 44), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig044_03` (figurark 3 for Sam og Max (kostyme 44), 6 ruter: start mot høyre (5 ruter); animasjon 7 mot høyre (1 rute), bilde to `hovedark/sam.png`)
@@ -747,13 +734,13 @@ Figurark for Sam og Max.
 - [ ] `fig044_06` (figurark 6 for Sam og Max (kostyme 44), 7 ruter: animasjon 8 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig044_07` (figurark 7 for Sam og Max (kostyme 44), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig044_08` (figurark 8 for Sam og Max (kostyme 44), 6 ruter: animasjon 8 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig088_01` (figurark 1 for Sam og Max (kostyme 88), 14 ruter: start (lag 14, tegnes over kroppen) mot høyre (1 rute); start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig088_02` (figurark 2 for Sam og Max (kostyme 88), 17 ruter: start mot høyre (17 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 50
+## Bestilling 49
 
 Figurark for Sam og Max, Max.
 
+- [ ] `fig088_01` (figurark 1 for Sam og Max (kostyme 88), 14 ruter: start (lag 14, tegnes over kroppen) mot høyre (1 rute); start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig088_02` (figurark 2 for Sam og Max (kostyme 88), 17 ruter: start mot høyre (17 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig088_03` (figurark 3 for Sam og Max (kostyme 88), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig088_04` (figurark 4 for Sam og Max (kostyme 88), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig088_05` (figurark 5 for Sam og Max (kostyme 88), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
@@ -762,13 +749,13 @@ Figurark for Sam og Max, Max.
 - [ ] `fig088_08` (figurark 8 for Sam og Max (kostyme 88), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig124_01` (figurark 1 for Max (kostyme 124), 8 ruter: start mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (4 ruter); animasjon 7 mot høyre (3 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_02` (figurark 2 for Max (kostyme 124), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig124_03` (figurark 3 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig124_04` (figurark 4 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
 
-## Bestilling 51
+## Bestilling 50
 
 Figurark for Max, Sam.
 
+- [ ] `fig124_03` (figurark 3 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
+- [ ] `fig124_04` (figurark 4 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_05` (figurark 5 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_06` (figurark 6 for Max (kostyme 124), 16 ruter: animasjon 7 mot høyre (4 ruter); animasjon 8 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_07` (figurark 7 for Max (kostyme 124), 12 ruter: animasjon 9 mot høyre (12 ruter), bilde to `hovedark/max.png`)
@@ -777,13 +764,13 @@ Figurark for Max, Sam.
 - [ ] `fig291_02` (figurark 2 for Sam (kostyme 291), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig291_03` (figurark 3 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig291_04` (figurark 4 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig291_05` (figurark 5 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig291_06` (figurark 6 for Sam (kostyme 291), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 52
+## Bestilling 51
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig291_05` (figurark 5 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig291_06` (figurark 6 for Sam (kostyme 291), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig291_07` (figurark 7 for Sam (kostyme 291), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig291_08` (figurark 8 for Sam (kostyme 291), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig096_01` (figurark 1 for Sam og Max (kostyme 96), 6 ruter: start (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
@@ -792,13 +779,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig096_04` (figurark 4 for Sam og Max (kostyme 96), 13 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter); start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig096_05` (figurark 5 for Sam og Max (kostyme 96), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig096_06` (figurark 6 for Sam og Max (kostyme 96), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig096_07` (figurark 7 for Sam og Max (kostyme 96), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig122_01` (figurark 1 for Sam og Max (kostyme 122), 6 ruter: start (lag 14, tegnes over kroppen) mot høyre (5 ruter); start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 
-## Bestilling 53
+## Bestilling 52
 
 Figurark for Sam og Max, Max.
 
+- [ ] `fig096_07` (figurark 7 for Sam og Max (kostyme 96), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig122_01` (figurark 1 for Sam og Max (kostyme 122), 6 ruter: start (lag 14, tegnes over kroppen) mot høyre (5 ruter); start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig122_02` (figurark 2 for Sam og Max (kostyme 122), 7 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (1 rute); animasjon 8 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig122_03` (figurark 3 for Sam og Max (kostyme 122), 6 ruter: animasjon 8 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig122_04` (figurark 4 for Sam og Max (kostyme 122), 4 ruter: animasjon 8 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
@@ -807,13 +794,13 @@ Figurark for Sam og Max, Max.
 - [ ] `fig122_07` (figurark 7 for Sam og Max (kostyme 122), 4 ruter: animasjon 9 (lag 14, tegnes over kroppen) mot høyre (2 ruter); animasjon 9 mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig162_01` (figurark 1 for Max (kostyme 162), 25 ruter: start mot høyre (25 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig162_02` (figurark 2 for Max (kostyme 162), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig162_03` (figurark 3 for Max (kostyme 162), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig162_04` (figurark 4 for Max (kostyme 162), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/max.png`)
 
-## Bestilling 54
+## Bestilling 53
 
 Figurark for Max, Sam.
 
+- [ ] `fig162_03` (figurark 3 for Max (kostyme 162), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/max.png`)
+- [ ] `fig162_04` (figurark 4 for Max (kostyme 162), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig162_05` (figurark 5 for Max (kostyme 162), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig162_06` (figurark 6 for Max (kostyme 162), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig162_07` (figurark 7 for Max (kostyme 162), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/max.png`)
@@ -822,13 +809,13 @@ Figurark for Max, Sam.
 - [ ] `fig222_03` (figurark 3 for Sam (kostyme 222), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig222_04` (figurark 4 for Sam (kostyme 222), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig222_05` (figurark 5 for Sam (kostyme 222), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig222_06` (figurark 6 for Sam (kostyme 222), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig222_07` (figurark 7 for Sam (kostyme 222), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 55
+## Bestilling 54
 
 Figurark for Sam.
 
+- [ ] `fig222_06` (figurark 6 for Sam (kostyme 222), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig222_07` (figurark 7 for Sam (kostyme 222), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig290_01` (figurark 1 for Sam (kostyme 290), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig290_02` (figurark 2 for Sam (kostyme 290), 4 ruter: start (lag 15, tegnes over kroppen) mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig290_03` (figurark 3 for Sam (kostyme 290), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
@@ -837,13 +824,13 @@ Figurark for Sam.
 - [ ] `fig290_06` (figurark 6 for Sam (kostyme 290), 7 ruter: animasjon 8 (lag 15, tegnes over kroppen) mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig290_07` (figurark 7 for Sam (kostyme 290), 2 ruter: animasjon 9 mot høyre (1 rute); animasjon 9 (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig042_01` (figurark 1 for Sam (kostyme 42), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
+
+## Bestilling 55
+
+Figurark for Sam.
+
 - [ ] `fig042_02` (figurark 2 for Sam (kostyme 42), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig042_03` (figurark 3 for Sam (kostyme 42), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-
-## Bestilling 56
-
-Figurark for Sam, Max.
-
 - [ ] `fig042_04` (figurark 4 for Sam (kostyme 42), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig042_05` (figurark 5 for Sam (kostyme 42), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig042_06` (figurark 6 for Sam (kostyme 42), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
@@ -852,13 +839,13 @@ Figurark for Sam, Max.
 - [ ] `fig072_03` (figurark 3 for Sam (kostyme 72), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig072_04` (figurark 4 for Sam (kostyme 72), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig072_05` (figurark 5 for Sam (kostyme 72), 20 ruter: start mot høyre (20 ruter), bilde to `hovedark/sam.png`)
+
+## Bestilling 56
+
+Figurark for Sam, Max, Sam og Max.
+
 - [ ] `fig072_06` (figurark 6 for Sam (kostyme 72), 23 ruter: start mot høyre (6 ruter); start (lag 15, tegnes over kroppen) mot høyre (17 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig098_01` (figurark 1 for Max (kostyme 98), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/max.png`)
-
-## Bestilling 57
-
-Figurark for Max, Sam og Max.
-
 - [ ] `fig098_02` (figurark 2 for Max (kostyme 98), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig098_03` (figurark 3 for Max (kostyme 98), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig098_04` (figurark 4 for Max (kostyme 98), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
@@ -867,13 +854,13 @@ Figurark for Max, Sam og Max.
 - [ ] `fig224_01` (figurark 1 for Sam og Max (kostyme 224), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig224_02` (figurark 2 for Sam og Max (kostyme 224), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig224_03` (figurark 3 for Sam og Max (kostyme 224), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig224_04` (figurark 4 for Sam og Max (kostyme 224), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig224_05` (figurark 5 for Sam og Max (kostyme 224), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 58
+## Bestilling 57
 
 Figurark for Sam og Max, Max, Sam.
 
+- [ ] `fig224_04` (figurark 4 for Sam og Max (kostyme 224), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig224_05` (figurark 5 for Sam og Max (kostyme 224), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig224_06` (figurark 6 for Sam og Max (kostyme 224), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig341_01` (figurark 1 for Max (kostyme 341), 2 ruter: start (lag 13, tegnes over kroppen) mot høyre (1 rute); start (lag 14, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig341_02` (figurark 2 for Max (kostyme 341), 6 ruter: start mot høyre (1 rute); animasjon 7 (lag 14, tegnes over kroppen) mot høyre (2 ruter); animasjon 8 mot høyre (2 ruter); animasjon 9 mot høyre (1 rute), bilde to `jobber/fig341_01/resultat.png`)
@@ -882,13 +869,13 @@ Figurark for Sam og Max, Max, Sam.
 - [ ] `fig341_05` (figurark 5 for Max (kostyme 341), 2 ruter: animasjon 13 mot høyre (2 ruter), bilde to `jobber/fig341_01/resultat.png`)
 - [ ] `fig341_06` (figurark 6 for Max (kostyme 341), 2 ruter: animasjon 13 mot høyre (2 ruter), bilde to `jobber/fig341_01/resultat.png`)
 - [ ] `fig031_01` (figurark 1 for Sam (kostyme 31), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig031_02` (figurark 2 for Sam (kostyme 31), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig031_03` (figurark 3 for Sam (kostyme 31), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 59
+## Bestilling 58
 
 Figurark for Sam.
 
+- [ ] `fig031_02` (figurark 2 for Sam (kostyme 31), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig031_03` (figurark 3 for Sam (kostyme 31), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig031_04` (figurark 4 for Sam (kostyme 31), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig031_05` (figurark 5 for Sam (kostyme 31), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig038_01` (figurark 1 for Sam (kostyme 38), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
@@ -897,13 +884,13 @@ Figurark for Sam.
 - [ ] `fig038_04` (figurark 4 for Sam (kostyme 38), 9 ruter: start mot høyre (5 ruter); start (lag 15, tegnes over kroppen) mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig038_05` (figurark 5 for Sam (kostyme 38), 13 ruter: start (lag 15, tegnes over kroppen) mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig082_01` (figurark 1 for Sam (kostyme 82), 26 ruter: start (lag 14, tegnes over kroppen) mot høyre (26 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig082_02` (figurark 2 for Sam (kostyme 82), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig082_03` (figurark 3 for Sam (kostyme 82), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 60
+## Bestilling 59
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig082_02` (figurark 2 for Sam (kostyme 82), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig082_03` (figurark 3 for Sam (kostyme 82), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig082_04` (figurark 4 for Sam (kostyme 82), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig082_05` (figurark 5 for Sam (kostyme 82), 26 ruter: animasjon 7 mot høyre (26 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig134_01` (figurark 1 for Sam og Max (kostyme 134), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
@@ -912,13 +899,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig134_04` (figurark 4 for Sam og Max (kostyme 134), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig134_05` (figurark 5 for Sam og Max (kostyme 134), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig143_01` (figurark 1 for Sam og Max (kostyme 143), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig143_02` (figurark 2 for Sam og Max (kostyme 143), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig143_03` (figurark 3 for Sam og Max (kostyme 143), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 61
+## Bestilling 60
 
 Figurark for Sam og Max, Sam.
 
+- [ ] `fig143_02` (figurark 2 for Sam og Max (kostyme 143), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [ ] `fig143_03` (figurark 3 for Sam og Max (kostyme 143), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig143_04` (figurark 4 for Sam og Max (kostyme 143), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig143_05` (figurark 5 for Sam og Max (kostyme 143), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig174_01` (figurark 1 for Sam (kostyme 174), 20 ruter: start mot høyre (20 ruter), bilde to `hovedark/sam.png`)
@@ -927,13 +914,13 @@ Figurark for Sam og Max, Sam.
 - [ ] `fig174_04` (figurark 4 for Sam (kostyme 174), 18 ruter: start mot høyre (18 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig174_05` (figurark 5 for Sam (kostyme 174), 19 ruter: start mot høyre (19 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig210_01` (figurark 1 for Sam (kostyme 210), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig210_02` (figurark 2 for Sam (kostyme 210), 13 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig210_03` (figurark 3 for Sam (kostyme 210), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 62
+## Bestilling 61
 
 Figurark for Sam, Max.
 
+- [ ] `fig210_02` (figurark 2 for Sam (kostyme 210), 13 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig210_03` (figurark 3 for Sam (kostyme 210), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig210_04` (figurark 4 for Sam (kostyme 210), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig210_05` (figurark 5 for Sam (kostyme 210), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig301_01` (figurark 1 for Sam (kostyme 301), 20 ruter: start mot høyre (20 ruter), bilde to `hovedark/sam.png`)
@@ -942,13 +929,13 @@ Figurark for Sam, Max.
 - [ ] `fig301_04` (figurark 4 for Sam (kostyme 301), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig301_05` (figurark 5 for Sam (kostyme 301), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig317_01` (figurark 1 for Max (kostyme 317), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig317_02` (figurark 2 for Max (kostyme 317), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig317_03` (figurark 3 for Max (kostyme 317), 13 ruter: animasjon 8 mot høyre (11 ruter); animasjon 9 mot høyre (2 ruter), bilde to `hovedark/max.png`)
 
-## Bestilling 63
+## Bestilling 62
 
 Figurark for Max, Sam.
 
+- [ ] `fig317_02` (figurark 2 for Max (kostyme 317), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/max.png`)
+- [ ] `fig317_03` (figurark 3 for Max (kostyme 317), 13 ruter: animasjon 8 mot høyre (11 ruter); animasjon 9 mot høyre (2 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig317_04` (figurark 4 for Max (kostyme 317), 8 ruter: animasjon 9 mot høyre (8 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig317_05` (figurark 5 for Max (kostyme 317), 16 ruter: animasjon 9 mot høyre (16 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig018_01` (figurark 1 for Max (kostyme 18), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/max.png`)
@@ -957,13 +944,13 @@ Figurark for Max, Sam.
 - [ ] `fig018_04` (figurark 4 for Max (kostyme 18), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig027_01` (figurark 1 for Sam (kostyme 27), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig027_02` (figurark 2 for Sam (kostyme 27), 16 ruter: animasjon 7 mot høyre (16 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig027_03` (figurark 3 for Sam (kostyme 27), 16 ruter: animasjon 7 mot høyre (16 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig027_04` (figurark 4 for Sam (kostyme 27), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 64
+## Bestilling 63
 
 Figurark for Sam, Max.
 
+- [ ] `fig027_03` (figurark 3 for Sam (kostyme 27), 16 ruter: animasjon 7 mot høyre (16 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig027_04` (figurark 4 for Sam (kostyme 27), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig099_01` (figurark 1 for Sam (kostyme 99), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig099_02` (figurark 2 for Sam (kostyme 99), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig099_03` (figurark 3 for Sam (kostyme 99), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
@@ -972,13 +959,13 @@ Figurark for Sam, Max.
 - [ ] `fig128_02` (figurark 2 for Max (kostyme 128), 1 rute: start mot høyre (1 rute), bilde to `hovedark/max.png`)
 - [ ] `fig128_03` (figurark 3 for Max (kostyme 128), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig128_04` (figurark 4 for Max (kostyme 128), 23 ruter: start mot høyre (23 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig157_01` (figurark 1 for Sam (kostyme 157), 18 ruter: start mot høyre (18 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig157_02` (figurark 2 for Sam (kostyme 157), 26 ruter: start mot høyre (6 ruter); animasjon 7 mot høyre (20 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 65
+## Bestilling 64
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig157_01` (figurark 1 for Sam (kostyme 157), 18 ruter: start mot høyre (18 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig157_02` (figurark 2 for Sam (kostyme 157), 26 ruter: start mot høyre (6 ruter); animasjon 7 mot høyre (20 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig157_03` (figurark 3 for Sam (kostyme 157), 26 ruter: animasjon 8 mot høyre (26 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig157_04` (figurark 4 for Sam (kostyme 157), 9 ruter: animasjon 8 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig200_01` (figurark 1 for Sam (kostyme 200), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
@@ -987,13 +974,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig200_04` (figurark 4 for Sam (kostyme 200), 19 ruter: animasjon 7 mot høyre (19 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig310_01` (figurark 1 for Sam og Max (kostyme 310), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig310_02` (figurark 2 for Sam og Max (kostyme 310), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig310_03` (figurark 3 for Sam og Max (kostyme 310), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig310_04` (figurark 4 for Sam og Max (kostyme 310), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 
-## Bestilling 66
+## Bestilling 65
 
 Figurark for Sam og Max, Max, Sam.
 
+- [ ] `fig310_03` (figurark 3 for Sam og Max (kostyme 310), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig310_04` (figurark 4 for Sam og Max (kostyme 310), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig012_01` (figurark 1 for Sam og Max (kostyme 12), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig012_02` (figurark 2 for Sam og Max (kostyme 12), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig012_03` (figurark 3 for Sam og Max (kostyme 12), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
@@ -1002,13 +989,13 @@ Figurark for Sam og Max, Max, Sam.
 - [ ] `fig032_03` (figurark 3 for Max (kostyme 32), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig034_01` (figurark 1 for Sam (kostyme 34), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig034_02` (figurark 2 for Sam (kostyme 34), 17 ruter: start mot høyre (17 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig034_03` (figurark 3 for Sam (kostyme 34), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig040_01` (figurark 1 for Sam (kostyme 40), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 67
+## Bestilling 66
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig034_03` (figurark 3 for Sam (kostyme 34), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig040_01` (figurark 1 for Sam (kostyme 40), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig040_02` (figurark 2 for Sam (kostyme 40), 10 ruter: start mot høyre (2 ruter); animasjon 7 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig040_03` (figurark 3 for Sam (kostyme 40), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig045_01` (figurark 1 for Sam (kostyme 45), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
@@ -1017,13 +1004,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig052_01` (figurark 1 for Sam og Max (kostyme 52), 21 ruter: start mot høyre (21 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig052_02` (figurark 2 for Sam og Max (kostyme 52), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig052_03` (figurark 3 for Sam og Max (kostyme 52), 5 ruter: animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig115_01` (figurark 1 for Sam (kostyme 115), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig115_02` (figurark 2 for Sam (kostyme 115), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 68
+## Bestilling 67
 
 Figurark for Sam, Sam og Max.
 
+- [ ] `fig115_01` (figurark 1 for Sam (kostyme 115), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig115_02` (figurark 2 for Sam (kostyme 115), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig115_03` (figurark 3 for Sam (kostyme 115), 64 ruter: start (lag 14, tegnes over kroppen) mot høyre (20 ruter); start (lag 15, tegnes over kroppen) mot høyre (12 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (12 ruter); animasjon 8 (lag 14, tegnes over kroppen) mot høyre (20 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig123_01` (figurark 1 for Sam og Max (kostyme 123), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig123_02` (figurark 2 for Sam og Max (kostyme 123), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
@@ -1032,13 +1019,13 @@ Figurark for Sam, Sam og Max.
 - [ ] `fig161_02` (figurark 2 for Sam og Max (kostyme 161), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig161_03` (figurark 3 for Sam og Max (kostyme 161), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig169_01` (figurark 1 for Sam (kostyme 169), 20 ruter: start mot høyre (20 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig169_02` (figurark 2 for Sam (kostyme 169), 26 ruter: start mot høyre (26 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig169_03` (figurark 3 for Sam (kostyme 169), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 
-## Bestilling 69
+## Bestilling 68
 
 Figurark for Sam, Max.
 
+- [ ] `fig169_02` (figurark 2 for Sam (kostyme 169), 26 ruter: start mot høyre (26 ruter), bilde to `hovedark/sam.png`)
+- [ ] `fig169_03` (figurark 3 for Sam (kostyme 169), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig230_01` (figurark 1 for Sam (kostyme 230), 21 ruter: start mot høyre (21 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig230_02` (figurark 2 for Sam (kostyme 230), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig230_03` (figurark 3 for Sam (kostyme 230), 32 ruter: start mot høyre (8 ruter); start (lag 15, tegnes over kroppen) mot høyre (24 ruter), bilde to `hovedark/sam.png`)
@@ -1047,13 +1034,13 @@ Figurark for Sam, Max.
 - [ ] `fig348_03` (figurark 3 for Max (kostyme 348), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig010_01` (figurark 1 for Sam (kostyme 10), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig010_02` (figurark 2 for Sam (kostyme 10), 25 ruter: start mot høyre (25 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig017_01` (figurark 1 for Max (kostyme 17), 34 ruter: start mot høyre (34 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig017_02` (figurark 2 for Max (kostyme 17), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
 
-## Bestilling 70
+## Bestilling 69
 
 Figurark for Max, Sam, Sam og Max.
 
+- [ ] `fig017_01` (figurark 1 for Max (kostyme 17), 34 ruter: start mot høyre (34 ruter), bilde to `hovedark/max.png`)
+- [ ] `fig017_02` (figurark 2 for Max (kostyme 17), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig037_01` (figurark 1 for Max (kostyme 37), 25 ruter: start mot høyre (25 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig037_02` (figurark 2 for Max (kostyme 37), 20 ruter: start mot høyre (20 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig046_01` (figurark 1 for Max (kostyme 46), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/max.png`)
@@ -1062,13 +1049,13 @@ Figurark for Max, Sam, Sam og Max.
 - [ ] `fig053_02` (figurark 2 for Sam (kostyme 53), 14 ruter: start (lag 15, tegnes over kroppen) mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig163_01` (figurark 1 for Sam og Max (kostyme 163), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig163_02` (figurark 2 for Sam og Max (kostyme 163), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+
+## Bestilling 70
+
+Figurark for Sam og Max, Max, Sam.
+
 - [ ] `fig217_01` (figurark 1 for Sam og Max (kostyme 217), 34 ruter: start mot høyre (34 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig217_02` (figurark 2 for Sam og Max (kostyme 217), 6 ruter: start (lag 15, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-
-## Bestilling 71
-
-Figurark for Max, Sam og Max, Sam.
-
 - [ ] `fig013_01` (figurark 1 for Max (kostyme 13), 5 ruter: stående (lag 0, tegnes over kroppen) bort (1 rute); start (lag 0, tegnes over kroppen) mot høyre (1 rute); stående bort (1 rute); snakking (lag 0, tegnes over kroppen) bort (1 rute); animasjon 6 bort (1 rute), bilde to `hovedark/max.png`)
 - [ ] `fig055_01` (figurark 1 for Sam og Max (kostyme 55), 30 ruter: start mot høyre (20 ruter); start (lag 15, tegnes over kroppen) mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig058_01` (figurark 1 for Sam (kostyme 58), 7 ruter: start mot høyre (3 ruter); animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
@@ -1077,13 +1064,13 @@ Figurark for Max, Sam og Max, Sam.
 - [ ] `fig131_01` (figurark 1 for Max (kostyme 131), 11 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (3 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig135_01` (figurark 1 for Max (kostyme 135), 23 ruter: start mot høyre (23 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig139_01` (figurark 1 for Sam (kostyme 139), 87 ruter: start mot høyre (87 ruter), bilde to `hovedark/sam.png`)
+
+## Bestilling 71
+
+Figurark for Sam, Sam og Max, Max.
+
 - [ ] `fig140_01` (figurark 1 for Sam (kostyme 140), 103 ruter: start mot høyre (103 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig141_01` (figurark 1 for Sam og Max (kostyme 141), 87 ruter: start mot høyre (87 ruter), bilde to `hovedark/sam.png`)
-
-## Bestilling 72
-
-Figurark for Sam og Max, Max, Sam.
-
 - [ ] `fig142_01` (figurark 1 for Sam og Max (kostyme 142), 103 ruter: start mot høyre (103 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig151_01` (figurark 1 for Sam og Max (kostyme 151), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig167_01` (figurark 1 for Max (kostyme 167), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/max.png`)
@@ -1092,13 +1079,13 @@ Figurark for Sam og Max, Max, Sam.
 - [ ] `fig218_01` (figurark 1 for Sam (kostyme 218), 21 ruter: start mot høyre (21 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig221_01` (figurark 1 for Max (kostyme 221), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig263_01` (figurark 1 for Max (kostyme 263), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
+
+## Bestilling 72
+
+Figurark for Max, Sam.
+
 - [ ] `fig270_01` (figurark 1 for Max (kostyme 270), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig305_01` (figurark 1 for Sam (kostyme 305), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
-
-## Bestilling 73
-
-Figurark for Sam.
-
 - [ ] `fig316_01` (figurark 1 for Sam (kostyme 316), 10 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig225_01` (figurark 1 for Sam (kostyme 225), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig225_02` (figurark 2 for Sam (kostyme 225), 17 ruter: start mot høyre (17 ruter), bilde to `hovedark/sam.png`)
@@ -1107,13 +1094,13 @@ Figurark for Sam.
 - [ ] `fig225_05` (figurark 5 for Sam (kostyme 225), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig225_06` (figurark 6 for Sam (kostyme 225), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig225_07` (figurark 7 for Sam (kostyme 225), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
+
+## Bestilling 73
+
+Figurark for Sam, Conroys håndlanger, Bruno.
+
 - [ ] `fig226_01` (figurark 1 for Sam (kostyme 226), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig226_02` (figurark 2 for Sam (kostyme 226), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
-
-## Bestilling 74
-
-Figurark for Sam, Conroys håndlanger, Bruno, Conroy Bumpus.
-
 - [ ] `fig226_03` (figurark 3 for Sam (kostyme 226), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig226_04` (figurark 4 for Sam (kostyme 226), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig069_01` (figurark 1 for Conroys håndlanger (kostyme 69), 13 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 5, tegnes over kroppen) mot høyre, mot oss (2 ruter); gange mot høyre (6 ruter))
@@ -1122,13 +1109,13 @@ Figurark for Sam, Conroys håndlanger, Bruno, Conroy Bumpus.
 - [ ] `fig069_04` (figurark 4 for Conroys håndlanger (kostyme 69), 1 rute: animasjon 7 (lag 6, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig069_01/resultat.png`)
 - [ ] `fig228_01` (figurark 1 for Bruno (kostyme 228), 5 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter))
 - [ ] `fig228_02` (figurark 2 for Bruno (kostyme 228), 8 ruter: gange mot høyre (8 ruter), bilde to `jobber/fig228_01/resultat.png`)
+
+## Bestilling 74
+
+Figurark for Bruno, Conroy Bumpus, Shep og Burl Kushman.
+
 - [ ] `fig228_03` (figurark 3 for Bruno (kostyme 228), 32 ruter: snakking (lag 3, tegnes over kroppen) mot høyre, mot oss (32 ruter), bilde to `jobber/fig228_01/resultat.png`)
 - [ ] `fig068_01` (figurark 1 for Conroy Bumpus (kostyme 68), 13 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående mot høyre (1 rute); start (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter); stående (lag 4, tegnes over kroppen) mot høyre (1 rute); gange (lag 1, tegnes over kroppen) mot høyre (6 ruter))
-
-## Bestilling 75
-
-Figurark for Conroy Bumpus, Shep og Burl Kushman.
-
 - [ ] `fig068_02` (figurark 2 for Conroy Bumpus (kostyme 68), 36 ruter: snakking (lag 3, tegnes over kroppen) mot høyre, mot oss (30 ruter); gange (lag 1, tegnes over kroppen) mot oss (6 ruter), bilde to `jobber/fig068_01/resultat.png`)
 - [ ] `fig068_03` (figurark 3 for Conroy Bumpus (kostyme 68), 28 ruter: gange (lag 1, tegnes over kroppen) bort (6 ruter); animasjon 6 (lag 3, tegnes over kroppen) mot høyre, mot oss (14 ruter); animasjon 8 (lag 4, tegnes over kroppen) mot høyre (7 ruter); animasjon 9 (lag 1, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig068_01/resultat.png`)
 - [ ] `fig068_04` (figurark 4 for Conroy Bumpus (kostyme 68), 22 ruter: animasjon 9 mot høyre (11 ruter); animasjon 14 mot høyre (6 ruter); animasjon 16 mot høyre (5 ruter), bilde to `jobber/fig068_01/resultat.png`)
@@ -1137,13 +1124,13 @@ Figurark for Conroy Bumpus, Shep og Burl Kushman.
 - [ ] `fig078_03` (figurark 3 for Shep og Burl Kushman (kostyme 78), 9 ruter: animasjon 6 (lag 3, tegnes over kroppen) mot høyre (9 ruter), bilde to `jobber/fig078_01/resultat.png`)
 - [ ] `fig078_04` (figurark 4 for Shep og Burl Kushman (kostyme 78), 12 ruter: animasjon 14 mot høyre (12 ruter), bilde to `jobber/fig078_01/resultat.png`)
 - [ ] `fig078_05` (figurark 5 for Shep og Burl Kushman (kostyme 78), 13 ruter: animasjon 14 (lag 3, tegnes over kroppen) mot høyre (1 rute); animasjon 14 (lag 4, tegnes over kroppen) mot høyre (1 rute); animasjon 18 mot høyre (1 rute); animasjon 18 (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 18 (lag 5, tegnes over kroppen) mot høyre (9 ruter), bilde to `jobber/fig078_01/resultat.png`)
-- [ ] `fig233_01` (figurark 1 for Conroy Bumpus (kostyme 233), 8 ruter: start (lag 1, tegnes over kroppen) mot høyre (1 rute); start (lag 6, tegnes over kroppen) mot høyre (1 rute); animasjon 18 (lag 1, tegnes over kroppen) mot oss (6 ruter))
-- [ ] `fig233_02` (figurark 2 for Conroy Bumpus (kostyme 233), 6 ruter: animasjon 18 (lag 5, tegnes over kroppen) mot oss (2 ruter); animasjon 18 (lag 6, tegnes over kroppen) mot oss (2 ruter); animasjon 19 (lag 1, tegnes over kroppen) mot oss (2 ruter), bilde to `jobber/fig233_01/resultat.png`)
 
-## Bestilling 76
+## Bestilling 75
 
 Figurark for Conroy Bumpus.
 
+- [ ] `fig233_01` (figurark 1 for Conroy Bumpus (kostyme 233), 8 ruter: start (lag 1, tegnes over kroppen) mot høyre (1 rute); start (lag 6, tegnes over kroppen) mot høyre (1 rute); animasjon 18 (lag 1, tegnes over kroppen) mot oss (6 ruter))
+- [ ] `fig233_02` (figurark 2 for Conroy Bumpus (kostyme 233), 6 ruter: animasjon 18 (lag 5, tegnes over kroppen) mot oss (2 ruter); animasjon 18 (lag 6, tegnes over kroppen) mot oss (2 ruter); animasjon 19 (lag 1, tegnes over kroppen) mot oss (2 ruter), bilde to `jobber/fig233_01/resultat.png`)
 - [ ] `fig233_03` (figurark 3 for Conroy Bumpus (kostyme 233), 17 ruter: animasjon 20 (lag 1, tegnes over kroppen) mot oss (17 ruter), bilde to `jobber/fig233_01/resultat.png`)
 - [ ] `fig233_04` (figurark 4 for Conroy Bumpus (kostyme 233), 11 ruter: animasjon 20 (lag 5, tegnes over kroppen) mot oss (11 ruter), bilde to `jobber/fig233_01/resultat.png`)
 - [ ] `fig233_05` (figurark 5 for Conroy Bumpus (kostyme 233), 10 ruter: animasjon 21 mot oss (9 ruter); animasjon 22 (lag 1, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig233_01/resultat.png`)
@@ -1152,13 +1139,13 @@ Figurark for Conroy Bumpus.
 - [ ] `fig232_01` (figurark 1 for Conroy Bumpus (kostyme 232), 2 ruter: start (lag 1, tegnes over kroppen) mot høyre (1 rute); start (lag 6, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig232_02` (figurark 2 for Conroy Bumpus (kostyme 232), 12 ruter: animasjon 10 mot oss (12 ruter), bilde to `jobber/fig232_01/resultat.png`)
 - [ ] `fig232_03` (figurark 3 for Conroy Bumpus (kostyme 232), 16 ruter: animasjon 10 (lag 5, tegnes over kroppen) mot oss (4 ruter); animasjon 11 mot oss (12 ruter), bilde to `jobber/fig232_01/resultat.png`)
-- [ ] `fig232_04` (figurark 4 for Conroy Bumpus (kostyme 232), 12 ruter: animasjon 11 mot oss (8 ruter); animasjon 12 mot oss (4 ruter), bilde to `jobber/fig232_01/resultat.png`)
-- [ ] `fig232_05` (figurark 5 for Conroy Bumpus (kostyme 232), 10 ruter: animasjon 13 (lag 6, tegnes over kroppen) mot oss (1 rute); animasjon 15 (lag 1, tegnes over kroppen) mot oss (2 ruter); animasjon 18 (lag 1, tegnes over kroppen) mot oss (2 ruter); animasjon 18 (lag 3, tegnes over kroppen) mot oss (5 ruter), bilde to `jobber/fig232_01/resultat.png`)
 
-## Bestilling 77
+## Bestilling 76
 
 Figurark for Conroy Bumpus, Bruno og Trixie, Trixie.
 
+- [ ] `fig232_04` (figurark 4 for Conroy Bumpus (kostyme 232), 12 ruter: animasjon 11 mot oss (8 ruter); animasjon 12 mot oss (4 ruter), bilde to `jobber/fig232_01/resultat.png`)
+- [ ] `fig232_05` (figurark 5 for Conroy Bumpus (kostyme 232), 10 ruter: animasjon 13 (lag 6, tegnes over kroppen) mot oss (1 rute); animasjon 15 (lag 1, tegnes over kroppen) mot oss (2 ruter); animasjon 18 (lag 1, tegnes over kroppen) mot oss (2 ruter); animasjon 18 (lag 3, tegnes over kroppen) mot oss (5 ruter), bilde to `jobber/fig232_01/resultat.png`)
 - [ ] `fig232_06` (figurark 6 for Conroy Bumpus (kostyme 232), 10 ruter: animasjon 19 (lag 1, tegnes over kroppen) mot oss (1 rute); animasjon 19 (lag 3, tegnes over kroppen) mot oss (6 ruter); animasjon 23 (lag 2, tegnes over kroppen) mot oss (3 ruter), bilde to `jobber/fig232_01/resultat.png`)
 - [ ] `fig237_01` (figurark 1 for Bruno og Trixie (kostyme 237), 4 ruter: start mot høyre (4 ruter))
 - [ ] `fig237_02` (figurark 2 for Bruno og Trixie (kostyme 237), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig237_01/resultat.png`)
@@ -1167,13 +1154,13 @@ Figurark for Conroy Bumpus, Bruno og Trixie, Trixie.
 - [ ] `fig237_05` (figurark 5 for Bruno og Trixie (kostyme 237), 17 ruter: animasjon 8 (lag 13, tegnes over kroppen) mot høyre (8 ruter); animasjon 8 (lag 14, tegnes over kroppen) mot høyre (8 ruter); animasjon 8 mot høyre (1 rute), bilde to `jobber/fig237_01/resultat.png`)
 - [ ] `fig237_06` (figurark 6 for Bruno og Trixie (kostyme 237), 3 ruter: animasjon 9 (lag 13, tegnes over kroppen) mot høyre (1 rute); animasjon 9 (lag 14, tegnes over kroppen) mot høyre (1 rute); animasjon 9 mot høyre (1 rute), bilde to `jobber/fig237_01/resultat.png`)
 - [ ] `fig229_01` (figurark 1 for Trixie (kostyme 229), 11 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 5, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 8, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 9, tegnes over kroppen) mot høyre, mot oss (2 ruter))
-- [ ] `fig229_02` (figurark 2 for Trixie (kostyme 229), 37 ruter: gange mot høyre (6 ruter); snakking (lag 3, tegnes over kroppen) mot høyre (5 ruter); snakking (lag 8, tegnes over kroppen) mot høyre (21 ruter); snakking (lag 3, tegnes over kroppen) mot oss (5 ruter), bilde to `jobber/fig229_01/resultat.png`)
-- [ ] `fig229_03` (figurark 3 for Trixie (kostyme 229), 42 ruter: snakking (lag 8, tegnes over kroppen) mot oss (19 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 4, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 5, tegnes over kroppen) mot høyre (5 ruter); animasjon 6 (lag 6, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot oss (1 rute); animasjon 6 (lag 4, tegnes over kroppen) mot oss (1 rute); animasjon 6 (lag 5, tegnes over kroppen) mot oss (4 ruter); animasjon 6 (lag 6, tegnes over kroppen) mot oss (3 ruter); animasjon 7 (lag 5, tegnes over kroppen) mot høyre (3 ruter), bilde to `jobber/fig229_01/resultat.png`)
 
-## Bestilling 78
+## Bestilling 77
 
 Figurark for Trixie, Shuv-Oohl, Conroys håndlanger.
 
+- [ ] `fig229_02` (figurark 2 for Trixie (kostyme 229), 37 ruter: gange mot høyre (6 ruter); snakking (lag 3, tegnes over kroppen) mot høyre (5 ruter); snakking (lag 8, tegnes over kroppen) mot høyre (21 ruter); snakking (lag 3, tegnes over kroppen) mot oss (5 ruter), bilde to `jobber/fig229_01/resultat.png`)
+- [ ] `fig229_03` (figurark 3 for Trixie (kostyme 229), 42 ruter: snakking (lag 8, tegnes over kroppen) mot oss (19 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 4, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 5, tegnes over kroppen) mot høyre (5 ruter); animasjon 6 (lag 6, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot oss (1 rute); animasjon 6 (lag 4, tegnes over kroppen) mot oss (1 rute); animasjon 6 (lag 5, tegnes over kroppen) mot oss (4 ruter); animasjon 6 (lag 6, tegnes over kroppen) mot oss (3 ruter); animasjon 7 (lag 5, tegnes over kroppen) mot høyre (3 ruter), bilde to `jobber/fig229_01/resultat.png`)
 - [ ] `fig229_04` (figurark 4 for Trixie (kostyme 229), 6 ruter: animasjon 7 (lag 5, tegnes over kroppen) mot oss (4 ruter); animasjon 7 (lag 6, tegnes over kroppen) mot oss (2 ruter), bilde to `jobber/fig229_01/resultat.png`)
 - [ ] `fig201_01` (figurark 1 for Shuv-Oohl (kostyme 201), 25 ruter: stående (lag 1, tegnes over kroppen) mot venstre (1 rute); stående mot venstre (1 rute); snakking mot høyre (23 ruter))
 - [ ] `fig201_02` (figurark 2 for Shuv-Oohl (kostyme 201), 28 ruter: gange (lag 0, tegnes over kroppen) mot oss (6 ruter); animasjon 6 (lag 0, tegnes over kroppen) mot oss (4 ruter); animasjon 7 (lag 1, tegnes over kroppen) mot oss (6 ruter); animasjon 7 mot oss (12 ruter), bilde to `jobber/fig201_01/resultat.png`)
@@ -1182,13 +1169,13 @@ Figurark for Trixie, Shuv-Oohl, Conroys håndlanger.
 - [ ] `fig293_02` (figurark 2 for Conroys håndlanger (kostyme 293), 13 ruter: start mot høyre (13 ruter), bilde to `jobber/fig293_01/resultat.png`)
 - [ ] `fig293_03` (figurark 3 for Conroys håndlanger (kostyme 293), 32 ruter: animasjon 7 mot høyre (32 ruter), bilde to `jobber/fig293_01/resultat.png`)
 - [ ] `fig129_01` (figurark 1 for Conroys håndlanger (kostyme 129), 24 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start mot høyre, mot oss (2 ruter); start (lag 5, tegnes over kroppen) mot høyre, mot oss (2 ruter); snakking mot høyre (17 ruter))
-- [ ] `fig129_02` (figurark 2 for Conroys håndlanger (kostyme 129), 23 ruter: snakking mot oss (17 ruter); animasjon 6 mot høyre (1 rute); animasjon 6 (lag 5, tegnes over kroppen) mot høyre (1 rute); animasjon 7 (lag 1, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 (lag 4, tegnes over kroppen) mot høyre (1 rute); animasjon 7 (lag 6, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig129_01/resultat.png`)
-- [ ] `fig245_01` (figurark 1 for Conroys håndlanger (kostyme 245), 22 ruter: stående (lag 1, tegnes over kroppen) mot høyre (1 rute); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot høyre (1 rute); stående (lag 5, tegnes over kroppen) mot høyre (1 rute); snakking (lag 3, tegnes over kroppen) mot høyre (17 ruter))
 
-## Bestilling 79
+## Bestilling 78
 
 Figurark for Conroys håndlanger, Bruno.
 
+- [ ] `fig129_02` (figurark 2 for Conroys håndlanger (kostyme 129), 23 ruter: snakking mot oss (17 ruter); animasjon 6 mot høyre (1 rute); animasjon 6 (lag 5, tegnes over kroppen) mot høyre (1 rute); animasjon 7 (lag 1, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 (lag 4, tegnes over kroppen) mot høyre (1 rute); animasjon 7 (lag 6, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig129_01/resultat.png`)
+- [ ] `fig245_01` (figurark 1 for Conroys håndlanger (kostyme 245), 22 ruter: stående (lag 1, tegnes over kroppen) mot høyre (1 rute); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot høyre (1 rute); stående (lag 5, tegnes over kroppen) mot høyre (1 rute); snakking (lag 3, tegnes over kroppen) mot høyre (17 ruter))
 - [ ] `fig245_02` (figurark 2 for Conroys håndlanger (kostyme 245), 10 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot høyre (4 ruter); animasjon 9 (lag 1, tegnes over kroppen) mot høyre (1 rute); animasjon 10 mot høyre (5 ruter), bilde to `jobber/fig245_01/resultat.png`)
 - [ ] `fig239_01` (figurark 1 for Bruno (kostyme 239), 8 ruter: start mot høyre (8 ruter))
 - [ ] `fig239_02` (figurark 2 for Bruno (kostyme 239), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig239_01/resultat.png`)
@@ -1197,13 +1184,13 @@ Figurark for Conroys håndlanger, Bruno.
 - [ ] `fig239_05` (figurark 5 for Bruno (kostyme 239), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig239_01/resultat.png`)
 - [ ] `fig239_06` (figurark 6 for Bruno (kostyme 239), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig239_01/resultat.png`)
 - [ ] `fig239_07` (figurark 7 for Bruno (kostyme 239), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig239_01/resultat.png`)
-- [ ] `fig239_08` (figurark 8 for Bruno (kostyme 239), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig239_01/resultat.png`)
-- [ ] `fig239_09` (figurark 9 for Bruno (kostyme 239), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig239_01/resultat.png`)
 
-## Bestilling 80
+## Bestilling 79
 
 Figurark for Bruno.
 
+- [ ] `fig239_08` (figurark 8 for Bruno (kostyme 239), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig239_01/resultat.png`)
+- [ ] `fig239_09` (figurark 9 for Bruno (kostyme 239), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig239_01/resultat.png`)
 - [ ] `fig239_10` (figurark 10 for Bruno (kostyme 239), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig239_01/resultat.png`)
 - [ ] `fig242_01` (figurark 1 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter))
 - [ ] `fig242_02` (figurark 2 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
@@ -1212,13 +1199,13 @@ Figurark for Bruno.
 - [ ] `fig242_05` (figurark 5 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
 - [ ] `fig242_06` (figurark 6 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
 - [ ] `fig242_07` (figurark 7 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
-- [ ] `fig242_08` (figurark 8 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
-- [ ] `fig242_09` (figurark 9 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
 
-## Bestilling 81
+## Bestilling 80
 
 Figurark for Bruno.
 
+- [ ] `fig242_08` (figurark 8 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
+- [ ] `fig242_09` (figurark 9 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
 - [ ] `fig242_10` (figurark 10 for Bruno (kostyme 242), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig242_01/resultat.png`)
 - [ ] `fig238_01` (figurark 1 for Bruno (kostyme 238), 10 ruter: start mot høyre (10 ruter))
 - [ ] `fig238_02` (figurark 2 for Bruno (kostyme 238), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig238_01/resultat.png`)
@@ -1227,13 +1214,13 @@ Figurark for Bruno.
 - [ ] `fig238_05` (figurark 5 for Bruno (kostyme 238), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig238_01/resultat.png`)
 - [ ] `fig238_06` (figurark 6 for Bruno (kostyme 238), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig238_01/resultat.png`)
 - [ ] `fig238_07` (figurark 7 for Bruno (kostyme 238), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig238_01/resultat.png`)
+
+## Bestilling 81
+
+Figurark for Bruno, Conroy Bumpus.
+
 - [ ] `fig238_08` (figurark 8 for Bruno (kostyme 238), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig238_01/resultat.png`)
 - [ ] `fig238_09` (figurark 9 for Bruno (kostyme 238), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig238_01/resultat.png`)
-
-## Bestilling 82
-
-Figurark for Conroy Bumpus.
-
 - [ ] `fig234_01` (figurark 1 for Conroy Bumpus (kostyme 234), 2 ruter: start (lag 1, tegnes over kroppen) mot høyre (1 rute); start (lag 6, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig234_02` (figurark 2 for Conroy Bumpus (kostyme 234), 10 ruter: animasjon 23 mot oss (8 ruter); animasjon 23 (lag 3, tegnes over kroppen) mot oss (1 rute); animasjon 23 (lag 6, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig234_01/resultat.png`)
 - [ ] `fig234_03` (figurark 3 for Conroy Bumpus (kostyme 234), 4 ruter: animasjon 25 (lag 1, tegnes over kroppen) mot oss (3 ruter); animasjon 25 mot oss (1 rute), bilde to `jobber/fig234_01/resultat.png`)
@@ -1242,13 +1229,13 @@ Figurark for Conroy Bumpus.
 - [ ] `fig234_06` (figurark 6 for Conroy Bumpus (kostyme 234), 7 ruter: animasjon 30 (lag 3, tegnes over kroppen) mot oss (6 ruter); animasjon 30 (lag 6, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig234_01/resultat.png`)
 - [ ] `fig125_01` (figurark 1 for Conroy Bumpus (kostyme 125), 10 ruter: start mot høyre (6 ruter); animasjon 7 mot høyre (4 ruter))
 - [ ] `fig125_02` (figurark 2 for Conroy Bumpus (kostyme 125), 10 ruter: animasjon 7 mot høyre (9 ruter); animasjon 8 mot høyre (1 rute), bilde to `jobber/fig125_01/resultat.png`)
-- [ ] `fig125_03` (figurark 3 for Conroy Bumpus (kostyme 125), 9 ruter: animasjon 9 mot høyre (3 ruter); animasjon 10 mot høyre (1 rute); animasjon 11 mot høyre (5 ruter), bilde to `jobber/fig125_01/resultat.png`)
-- [ ] `fig125_04` (figurark 4 for Conroy Bumpus (kostyme 125), 15 ruter: animasjon 11 mot høyre (15 ruter), bilde to `jobber/fig125_01/resultat.png`)
 
-## Bestilling 83
+## Bestilling 82
 
 Figurark for Conroy Bumpus, Trixie.
 
+- [ ] `fig125_03` (figurark 3 for Conroy Bumpus (kostyme 125), 9 ruter: animasjon 9 mot høyre (3 ruter); animasjon 10 mot høyre (1 rute); animasjon 11 mot høyre (5 ruter), bilde to `jobber/fig125_01/resultat.png`)
+- [ ] `fig125_04` (figurark 4 for Conroy Bumpus (kostyme 125), 15 ruter: animasjon 11 mot høyre (15 ruter), bilde to `jobber/fig125_01/resultat.png`)
 - [ ] `fig125_05` (figurark 5 for Conroy Bumpus (kostyme 125), 15 ruter: animasjon 11 mot høyre (15 ruter), bilde to `jobber/fig125_01/resultat.png`)
 - [ ] `fig240_01` (figurark 1 for Trixie (kostyme 240), 18 ruter: start mot høyre (18 ruter))
 - [ ] `fig240_02` (figurark 2 for Trixie (kostyme 240), 18 ruter: start mot høyre (18 ruter), bilde to `jobber/fig240_01/resultat.png`)
@@ -1257,13 +1244,13 @@ Figurark for Conroy Bumpus, Trixie.
 - [ ] `fig240_05` (figurark 5 for Trixie (kostyme 240), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig240_01/resultat.png`)
 - [ ] `fig241_01` (figurark 1 for Trixie (kostyme 241), 18 ruter: start mot høyre (18 ruter))
 - [ ] `fig241_02` (figurark 2 for Trixie (kostyme 241), 18 ruter: start mot høyre (18 ruter), bilde to `jobber/fig241_01/resultat.png`)
+
+## Bestilling 83
+
+Figurark for Trixie, Doug the Mole Man, Conroy Bumpus.
+
 - [ ] `fig241_03` (figurark 3 for Trixie (kostyme 241), 18 ruter: start mot høyre (18 ruter), bilde to `jobber/fig241_01/resultat.png`)
 - [ ] `fig241_04` (figurark 4 for Trixie (kostyme 241), 18 ruter: start mot høyre (18 ruter), bilde to `jobber/fig241_01/resultat.png`)
-
-## Bestilling 84
-
-Figurark for Trixie, Doug the Mole Man, Conroy Bumpus, Shuv-Oohl.
-
 - [ ] `fig241_05` (figurark 5 for Trixie (kostyme 241), 15 ruter: start mot høyre (15 ruter), bilde to `jobber/fig241_01/resultat.png`)
 - [ ] `fig102_01` (figurark 1 for Doug the Mole Man (kostyme 102), 35 ruter: start mot høyre (1 rute); start (lag 3, tegnes over kroppen) mot høyre (1 rute); start (lag 4, tegnes over kroppen) mot høyre (2 ruter); start (lag 8, tegnes over kroppen) mot høyre (1 rute); snakking (lag 3, tegnes over kroppen) mot høyre (22 ruter); slutt på snakking (lag 4, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 8, tegnes over kroppen) mot høyre (3 ruter); animasjon 9 (lag 3, tegnes over kroppen) mot høyre (3 ruter))
 - [ ] `fig102_02` (figurark 2 for Doug the Mole Man (kostyme 102), 17 ruter: animasjon 9 (lag 6, tegnes over kroppen) mot høyre (9 ruter); animasjon 9 (lag 9, tegnes over kroppen) mot høyre (2 ruter); animasjon 10 (lag 3, tegnes over kroppen) mot høyre (1 rute); animasjon 12 mot høyre (5 ruter), bilde to `jobber/fig102_01/resultat.png`)
@@ -1272,13 +1259,13 @@ Figurark for Trixie, Doug the Mole Man, Conroy Bumpus, Shuv-Oohl.
 - [ ] `fig231_01` (figurark 1 for Conroy Bumpus (kostyme 231), 6 ruter: start (lag 1, tegnes over kroppen) mot høyre (1 rute); start (lag 6, tegnes over kroppen) mot høyre (1 rute); slutt på snakking (lag 1, tegnes over kroppen) mot oss (4 ruter))
 - [ ] `fig231_02` (figurark 2 for Conroy Bumpus (kostyme 231), 20 ruter: slutt på snakking (lag 2, tegnes over kroppen) mot oss (17 ruter); animasjon 8 (lag 1, tegnes over kroppen) mot oss (3 ruter), bilde to `jobber/fig231_01/resultat.png`)
 - [ ] `fig231_03` (figurark 3 for Conroy Bumpus (kostyme 231), 17 ruter: animasjon 8 mot oss (9 ruter); animasjon 9 (lag 5, tegnes over kroppen) mot oss (8 ruter), bilde to `jobber/fig231_01/resultat.png`)
+
+## Bestilling 84
+
+Figurark for Conroy Bumpus, Shuv-Oohl, Trixie.
+
 - [ ] `fig231_04` (figurark 4 for Conroy Bumpus (kostyme 231), 12 ruter: animasjon 11 mot oss (12 ruter), bilde to `jobber/fig231_01/resultat.png`)
 - [ ] `fig202_01` (figurark 1 for Shuv-Oohl (kostyme 202), 23 ruter: start mot høyre (4 ruter); animasjon 7 mot høyre (19 ruter))
-
-## Bestilling 85
-
-Figurark for Shuv-Oohl, Conroy Bumpus, Trixie, Tre.
-
 - [ ] `fig202_02` (figurark 2 for Shuv-Oohl (kostyme 202), 17 ruter: animasjon 7 mot høyre (17 ruter), bilde to `jobber/fig202_01/resultat.png`)
 - [ ] `fig202_03` (figurark 3 for Shuv-Oohl (kostyme 202), 19 ruter: animasjon 8 mot høyre (19 ruter), bilde to `jobber/fig202_01/resultat.png`)
 - [ ] `fig130_01` (figurark 1 for Conroy Bumpus (kostyme 130), 22 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); start mot høyre, mot oss (2 ruter); stående (lag 4, tegnes over kroppen) mot høyre (1 rute); snakking mot høyre (15 ruter))
@@ -1287,13 +1274,13 @@ Figurark for Shuv-Oohl, Conroy Bumpus, Trixie, Tre.
 - [ ] `fig244_02` (figurark 2 for Conroy Bumpus (kostyme 244), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig244_01/resultat.png`)
 - [ ] `fig080_01` (figurark 1 for Trixie (kostyme 80), 13 ruter: stående mot høyre, mot oss (2 ruter); start (lag 3, tegnes over kroppen) mot høyre (1 rute); start (lag 5, tegnes over kroppen) mot høyre (1 rute); start (lag 8, tegnes over kroppen) mot høyre (1 rute); start (lag 9, tegnes over kroppen) mot høyre, mot oss (2 ruter); snakking (lag 3, tegnes over kroppen) mot høyre (6 ruter))
 - [ ] `fig080_02` (figurark 2 for Trixie (kostyme 80), 33 ruter: snakking (lag 8, tegnes over kroppen) mot høyre (21 ruter); slutt på snakking bort (1 rute); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 4, tegnes over kroppen) mot høyre (2 ruter); animasjon 6 (lag 5, tegnes over kroppen) mot høyre (5 ruter); animasjon 6 (lag 6, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig080_01/resultat.png`)
+
+## Bestilling 85
+
+Figurark for Trixie, Tre, Bigfoot (dørvakt), Gammel bigfoot.
+
 - [ ] `fig080_03` (figurark 3 for Trixie (kostyme 80), 3 ruter: animasjon 7 (lag 5, tegnes over kroppen) mot høyre (3 ruter), bilde to `jobber/fig080_01/resultat.png`)
 - [ ] `fig333_01` (figurark 1 for Tre (kostyme 333), 10 ruter: start mot høyre (10 ruter))
-
-## Bestilling 86
-
-Figurark for Tre, Bigfoot (dørvakt), Gammel bigfoot.
-
 - [ ] `fig333_02` (figurark 2 for Tre (kostyme 333), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig333_01/resultat.png`)
 - [ ] `fig333_03` (figurark 3 for Tre (kostyme 333), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig333_01/resultat.png`)
 - [ ] `fig333_04` (figurark 4 for Tre (kostyme 333), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig333_01/resultat.png`)
@@ -1302,13 +1289,13 @@ Figurark for Tre, Bigfoot (dørvakt), Gammel bigfoot.
 - [ ] `fig258_02` (figurark 2 for Bigfoot (dørvakt) (kostyme 258), 2 ruter: animasjon 10 mot høyre (1 rute); animasjon 13 mot høyre (1 rute), bilde to `jobber/fig258_01/resultat.png`)
 - [ ] `fig264_01` (figurark 1 for Gammel bigfoot (kostyme 264), 12 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss (2 ruter); start mot høyre, mot oss (2 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); gange (lag 1, tegnes over kroppen) mot høyre (6 ruter))
 - [ ] `fig264_02` (figurark 2 for Gammel bigfoot (kostyme 264), 32 ruter: snakking mot høyre, mot oss (32 ruter), bilde to `jobber/fig264_01/resultat.png`)
+
+## Bestilling 86
+
+Figurark for Gammel bigfoot, Tre, Ildslukeren, Svanebåten.
+
 - [ ] `fig264_03` (figurark 3 for Gammel bigfoot (kostyme 264), 7 ruter: gange (lag 1, tegnes over kroppen) mot oss (6 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig264_01/resultat.png`)
 - [ ] `fig334_01` (figurark 1 for Tre (kostyme 334), 9 ruter: start mot høyre (9 ruter))
-
-## Bestilling 87
-
-Figurark for Tre, Ildslukeren, Svanebåten, Glasskrukken.
-
 - [ ] `fig334_02` (figurark 2 for Tre (kostyme 334), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig334_01/resultat.png`)
 - [ ] `fig334_03` (figurark 3 for Tre (kostyme 334), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig334_01/resultat.png`)
 - [ ] `fig334_04` (figurark 4 for Tre (kostyme 334), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig334_01/resultat.png`)
@@ -1317,13 +1304,13 @@ Figurark for Tre, Ildslukeren, Svanebåten, Glasskrukken.
 - [ ] `fig067_02` (figurark 2 for Ildslukeren (kostyme 67), 26 ruter: snakking mot høyre (24 ruter); animasjon 6 mot venstre (2 ruter), bilde to `jobber/fig067_01/resultat.png`)
 - [ ] `fig092_01` (figurark 1 for Svanebåten (kostyme 92), 3 ruter: stående mot høyre (1 rute); animasjon 6 mot høyre (1 rute); animasjon 7 mot høyre (1 rute))
 - [ ] `fig092_02` (figurark 2 for Svanebåten (kostyme 92), 1 rute: animasjon 8 mot høyre (1 rute), bilde to `jobber/fig092_01/resultat.png`)
+
+## Bestilling 87
+
+Figurark for Glasskrukken.
+
 - [ ] `fig208_01` (figurark 1 for Glasskrukken (kostyme 208), 2 ruter: start mot høyre (1 rute); animasjon 7 (lag 14, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig208_02` (figurark 2 for Glasskrukken (kostyme 208), 15 ruter: animasjon 7 mot høyre (15 ruter), bilde to `jobber/fig208_01/resultat.png`)
-
-## Bestilling 88
-
-Figurark for Glasskrukken, Alligatorer.
-
 - [ ] `fig208_03` (figurark 3 for Glasskrukken (kostyme 208), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `jobber/fig208_01/resultat.png`)
 - [ ] `fig208_04` (figurark 4 for Glasskrukken (kostyme 208), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `jobber/fig208_01/resultat.png`)
 - [ ] `fig208_05` (figurark 5 for Glasskrukken (kostyme 208), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `jobber/fig208_01/resultat.png`)
@@ -1332,13 +1319,13 @@ Figurark for Glasskrukken, Alligatorer.
 - [ ] `fig208_08` (figurark 8 for Glasskrukken (kostyme 208), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `jobber/fig208_01/resultat.png`)
 - [ ] `fig208_09` (figurark 9 for Glasskrukken (kostyme 208), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `jobber/fig208_01/resultat.png`)
 - [ ] `fig208_10` (figurark 10 for Glasskrukken (kostyme 208), 13 ruter: animasjon 7 mot høyre (13 ruter), bilde to `jobber/fig208_01/resultat.png`)
+
+## Bestilling 88
+
+Figurark for Glasskrukken, Alligatorer, Bigfoot, Skapning (intro).
+
 - [ ] `fig208_11` (figurark 11 for Glasskrukken (kostyme 208), 5 ruter: animasjon 7 mot høyre (5 ruter), bilde to `jobber/fig208_01/resultat.png`)
 - [ ] `fig120_01` (figurark 1 for Alligatorer (kostyme 120), 20 ruter: stående (lag 0, tegnes over kroppen) mot høyre (1 rute); stående mot høyre (1 rute); start mot høyre (1 rute); gange mot høyre (1 rute); gange (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 6 (lag 0, tegnes over kroppen) mot høyre (1 rute); animasjon 6 mot høyre (3 ruter); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 7 (lag 0, tegnes over kroppen) mot høyre (1 rute); animasjon 7 mot høyre (3 ruter); animasjon 7 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 8 mot høyre (2 ruter); animasjon 8 (lag 2, tegnes over kroppen) mot høyre (2 ruter))
-
-## Bestilling 89
-
-Figurark for Alligatorer, Bigfoot, Skapning (intro).
-
 - [ ] `fig120_02` (figurark 2 for Alligatorer (kostyme 120), 27 ruter: animasjon 9 mot høyre (2 ruter); animasjon 9 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 10 mot høyre (2 ruter); animasjon 10 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 11 mot høyre (3 ruter); animasjon 11 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 12 mot høyre (3 ruter); animasjon 12 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 13 mot høyre (2 ruter); animasjon 13 (lag 2, tegnes over kroppen) mot høyre (2 ruter); animasjon 14 mot høyre (5 ruter), bilde to `jobber/fig120_01/resultat.png`)
 - [ ] `fig120_03` (figurark 3 for Alligatorer (kostyme 120), 10 ruter: animasjon 15 mot høyre (5 ruter); animasjon 16 mot høyre (5 ruter), bilde to `jobber/fig120_01/resultat.png`)
 - [ ] `fig256_01` (figurark 1 for Bigfoot (kostyme 256), 7 ruter: stående mot høyre (1 rute); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); stående (lag 5, tegnes over kroppen) mot høyre (1 rute); animasjon 9 mot høyre (4 ruter))
@@ -1347,13 +1334,13 @@ Figurark for Alligatorer, Bigfoot, Skapning (intro).
 - [ ] `fig020_01` (figurark 1 for Skapning (intro) (kostyme 20), 1 rute: start mot høyre (1 rute))
 - [ ] `fig020_02` (figurark 2 for Skapning (intro) (kostyme 20), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig020_01/resultat.png`)
 - [ ] `fig020_03` (figurark 3 for Skapning (intro) (kostyme 20), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig020_01/resultat.png`)
+
+## Bestilling 89
+
+Figurark for Skapning (intro), Forskeren (nærbilde).
+
 - [ ] `fig020_04` (figurark 4 for Skapning (intro) (kostyme 20), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig020_01/resultat.png`)
 - [ ] `fig020_05` (figurark 5 for Skapning (intro) (kostyme 20), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig020_01/resultat.png`)
-
-## Bestilling 90
-
-Figurark for Skapning (intro), Forskeren (nærbilde), Fiskeren.
-
 - [ ] `fig020_06` (figurark 6 for Skapning (intro) (kostyme 20), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig020_01/resultat.png`)
 - [ ] `fig020_07` (figurark 7 for Skapning (intro) (kostyme 20), 11 ruter: animasjon 8 mot høyre (2 ruter); animasjon 9 mot høyre (1 rute); animasjon 10 mot høyre (8 ruter), bilde to `jobber/fig020_01/resultat.png`)
 - [ ] `fig026_01` (figurark 1 for Forskeren (nærbilde) (kostyme 26), 2 ruter: start mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (1 rute))
@@ -1362,13 +1349,13 @@ Figurark for Skapning (intro), Forskeren (nærbilde), Fiskeren.
 - [ ] `fig026_04` (figurark 4 for Forskeren (nærbilde) (kostyme 26), 1 rute: animasjon 8 mot høyre (1 rute), bilde to `jobber/fig026_01/resultat.png`)
 - [ ] `fig026_05` (figurark 5 for Forskeren (nærbilde) (kostyme 26), 2 ruter: animasjon 9 mot høyre (1 rute); animasjon 9 (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig026_01/resultat.png`)
 - [ ] `fig026_06` (figurark 6 for Forskeren (nærbilde) (kostyme 26), 4 ruter: animasjon 10 mot høyre (1 rute); animasjon 10 (lag 15, tegnes over kroppen) mot høyre (3 ruter), bilde to `jobber/fig026_01/resultat.png`)
+
+## Bestilling 90
+
+Figurark for Fiskeren, Taubanevognen.
+
 - [ ] `fig165_01` (figurark 1 for Fiskeren (kostyme 165), 7 ruter: stående (lag 1, tegnes over kroppen) mot oss (1 rute); stående (lag 3, tegnes over kroppen) mot oss (1 rute); stående (lag 4, tegnes over kroppen) mot oss (1 rute); stående mot oss (1 rute); stående (lag 6, tegnes over kroppen) mot oss (2 ruter); snakking (lag 0, tegnes over kroppen) mot oss (1 rute))
 - [ ] `fig165_02` (figurark 2 for Fiskeren (kostyme 165), 45 ruter: snakking (lag 1, tegnes over kroppen) mot oss (29 ruter); snakking (lag 2, tegnes over kroppen) mot oss (1 rute); snakking (lag 3, tegnes over kroppen) mot oss (5 ruter); snakking (lag 4, tegnes over kroppen) mot oss (9 ruter); snakking mot oss (1 rute), bilde to `jobber/fig165_01/resultat.png`)
-
-## Bestilling 91
-
-Figurark for Fiskeren, Taubanevognen, Automaten.
-
 - [ ] `fig165_03` (figurark 3 for Fiskeren (kostyme 165), 6 ruter: snakking mot oss (6 ruter), bilde to `jobber/fig165_01/resultat.png`)
 - [ ] `fig165_04` (figurark 4 for Fiskeren (kostyme 165), 6 ruter: snakking mot oss (6 ruter), bilde to `jobber/fig165_01/resultat.png`)
 - [ ] `fig165_05` (figurark 5 for Fiskeren (kostyme 165), 12 ruter: snakking mot oss (4 ruter); snakking (lag 6, tegnes over kroppen) mot oss (2 ruter); animasjon 6 (lag 1, tegnes over kroppen) mot høyre (4 ruter); animasjon 7 (lag 1, tegnes over kroppen) mot oss (2 ruter), bilde to `jobber/fig165_01/resultat.png`)
@@ -1377,13 +1364,13 @@ Figurark for Fiskeren, Taubanevognen, Automaten.
 - [ ] `fig136_02` (figurark 2 for Taubanevognen (kostyme 136), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig136_01/resultat.png`)
 - [ ] `fig136_03` (figurark 3 for Taubanevognen (kostyme 136), 15 ruter: animasjon 7 mot høyre (15 ruter), bilde to `jobber/fig136_01/resultat.png`)
 - [ ] `fig136_04` (figurark 4 for Taubanevognen (kostyme 136), 61 ruter: animasjon 7 mot høyre (61 ruter), bilde to `jobber/fig136_01/resultat.png`)
+
+## Bestilling 91
+
+Figurark for Automaten, Snøre, Hvit form, Alligator, Stolpen, Gammel bigfoot.
+
 - [ ] `fig219_01` (figurark 1 for Automaten (kostyme 219), 15 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss (2 ruter); stående (lag 3, tegnes over kroppen) mot høyre (3 ruter); gange (lag 1, tegnes over kroppen) mot høyre, mot oss (4 ruter); animasjon 6 mot høyre (5 ruter); animasjon 7 mot høyre (1 rute))
 - [ ] `fig219_02` (figurark 2 for Automaten (kostyme 219), 23 ruter: animasjon 8 mot høyre (5 ruter); animasjon 9 (lag 4, tegnes over kroppen) mot høyre (2 ruter); animasjon 10 mot høyre (4 ruter); animasjon 11 (lag 4, tegnes over kroppen) mot høyre (2 ruter); animasjon 11 (lag 6, tegnes over kroppen) mot høyre (8 ruter); animasjon 13 (lag 6, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig219_01/resultat.png`)
-
-## Bestilling 92
-
-Figurark for Snøre, Hvit form, Alligator, Stolpen, Gammel bigfoot.
-
 - [ ] `fig299_01` (figurark 1 for Snøre (kostyme 299), 74 ruter: start mot høyre (19 ruter); animasjon 7 mot høyre (17 ruter); animasjon 8 mot høyre (14 ruter); animasjon 9 mot høyre (14 ruter); animasjon 10 mot høyre (10 ruter))
 - [ ] `fig299_02` (figurark 2 for Snøre (kostyme 299), 12 ruter: animasjon 11 mot høyre (12 ruter), bilde to `jobber/fig299_01/resultat.png`)
 - [ ] `fig095_01` (figurark 1 for Hvit form (kostyme 95), 1 rute: stående mot høyre (1 rute))
@@ -1392,13 +1379,13 @@ Figurark for Snøre, Hvit form, Alligator, Stolpen, Gammel bigfoot.
 - [ ] `fig335_01` (figurark 1 for Gammel bigfoot (kostyme 335), 17 ruter: start mot høyre (17 ruter))
 - [ ] `fig335_02` (figurark 2 for Gammel bigfoot (kostyme 335), 17 ruter: start mot høyre (17 ruter), bilde to `jobber/fig335_01/resultat.png`)
 - [ ] `fig335_03` (figurark 3 for Gammel bigfoot (kostyme 335), 9 ruter: start mot høyre (3 ruter); animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig335_01/resultat.png`)
+
+## Bestilling 92
+
+Figurark for Gammel bigfoot, Isblokken, Fisk, Stripe, Glitter, Figur.
+
 - [ ] `fig335_04` (figurark 4 for Gammel bigfoot (kostyme 335), 18 ruter: animasjon 7 mot høyre (18 ruter), bilde to `jobber/fig335_01/resultat.png`)
 - [ ] `fig335_05` (figurark 5 for Gammel bigfoot (kostyme 335), 18 ruter: animasjon 7 mot høyre (18 ruter), bilde to `jobber/fig335_01/resultat.png`)
-
-## Bestilling 93
-
-Figurark for Gammel bigfoot, Isblokken, Fisk, Stripe, Glitter, Figur, Mannen med turban.
-
 - [ ] `fig335_06` (figurark 6 for Gammel bigfoot (kostyme 335), 15 ruter: animasjon 7 mot høyre (3 ruter); animasjon 8 mot høyre (12 ruter), bilde to `jobber/fig335_01/resultat.png`)
 - [ ] `fig077_01` (figurark 1 for Isblokken (kostyme 77), 10 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (2 ruter))
 - [ ] `fig077_02` (figurark 2 for Isblokken (kostyme 77), 1 rute: animasjon 8 mot høyre (1 rute), bilde to `jobber/fig077_01/resultat.png`)
@@ -1407,13 +1394,13 @@ Figurark for Gammel bigfoot, Isblokken, Fisk, Stripe, Glitter, Figur, Mannen med
 - [ ] `fig227_01` (figurark 1 for Stripe (kostyme 227), 11 ruter: start mot høyre (3 ruter); animasjon 7 (lag 0, tegnes over kroppen) mot høyre (1 rute); animasjon 7 mot høyre (3 ruter); animasjon 8 (lag 0, tegnes over kroppen) mot høyre (1 rute); animasjon 8 mot høyre (3 ruter))
 - [ ] `fig292_01` (figurark 1 for Glitter (kostyme 292), 15 ruter: start mot høyre (6 ruter); animasjon 7 mot høyre (9 ruter))
 - [ ] `fig306_01` (figurark 1 for Figur (kostyme 306), 30 ruter: stående (lag 1, tegnes over kroppen) mot høyre (1 rute); stående mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot høyre (1 rute); snakking mot oss (16 ruter); animasjon 6 (lag 3, tegnes over kroppen) mot oss (3 ruter); animasjon 10 (lag 5, tegnes over kroppen) mot oss (6 ruter); animasjon 10 (lag 6, tegnes over kroppen) mot oss (1 rute))
-- [ ] `fig106_01` (figurark 1 for Mannen med turban (kostyme 106), 1 rute: start mot høyre (1 rute))
-- [ ] `fig106_02` (figurark 2 for Mannen med turban (kostyme 106), 10 ruter: animasjon 7 mot høyre (10 ruter), bilde to `jobber/fig106_01/resultat.png`)
 
-## Bestilling 94
+## Bestilling 93
 
 Figurark for Mannen med turban, Glitter.
 
+- [ ] `fig106_01` (figurark 1 for Mannen med turban (kostyme 106), 1 rute: start mot høyre (1 rute))
+- [ ] `fig106_02` (figurark 2 for Mannen med turban (kostyme 106), 10 ruter: animasjon 7 mot høyre (10 ruter), bilde to `jobber/fig106_01/resultat.png`)
 - [ ] `fig106_03` (figurark 3 for Mannen med turban (kostyme 106), 11 ruter: animasjon 8 mot høyre (11 ruter), bilde to `jobber/fig106_01/resultat.png`)
 - [ ] `fig106_04` (figurark 4 for Mannen med turban (kostyme 106), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `jobber/fig106_01/resultat.png`)
 - [ ] `fig106_05` (figurark 5 for Mannen med turban (kostyme 106), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `jobber/fig106_01/resultat.png`)
@@ -1422,13 +1409,13 @@ Figurark for Mannen med turban, Glitter.
 - [ ] `fig106_08` (figurark 8 for Mannen med turban (kostyme 106), 5 ruter: animasjon 9 mot høyre (5 ruter), bilde to `jobber/fig106_01/resultat.png`)
 - [ ] `fig106_09` (figurark 9 for Mannen med turban (kostyme 106), 7 ruter: animasjon 10 mot høyre (7 ruter), bilde to `jobber/fig106_01/resultat.png`)
 - [ ] `fig214_01` (figurark 1 for Glitter (kostyme 214), 4 ruter: start (lag 14, tegnes over kroppen) mot høyre (4 ruter))
-- [ ] `fig214_02` (figurark 2 for Glitter (kostyme 214), 10 ruter: start (lag 14, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig214_01/resultat.png`)
-- [ ] `fig214_03` (figurark 3 for Glitter (kostyme 214), 8 ruter: start (lag 14, tegnes over kroppen) mot høyre (8 ruter), bilde to `jobber/fig214_01/resultat.png`)
 
-## Bestilling 95
+## Bestilling 94
 
 Figurark for Glitter, Ildslukeren.
 
+- [ ] `fig214_02` (figurark 2 for Glitter (kostyme 214), 10 ruter: start (lag 14, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig214_01/resultat.png`)
+- [ ] `fig214_03` (figurark 3 for Glitter (kostyme 214), 8 ruter: start (lag 14, tegnes over kroppen) mot høyre (8 ruter), bilde to `jobber/fig214_01/resultat.png`)
 - [ ] `fig214_04` (figurark 4 for Glitter (kostyme 214), 6 ruter: start (lag 14, tegnes over kroppen) mot høyre (4 ruter); start mot høyre (2 ruter), bilde to `jobber/fig214_01/resultat.png`)
 - [ ] `fig214_05` (figurark 5 for Glitter (kostyme 214), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig214_01/resultat.png`)
 - [ ] `fig214_06` (figurark 6 for Glitter (kostyme 214), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig214_01/resultat.png`)
@@ -1437,13 +1424,13 @@ Figurark for Glitter, Ildslukeren.
 - [ ] `fig073_01` (figurark 1 for Ildslukeren (kostyme 73), 12 ruter: start mot høyre (12 ruter))
 - [ ] `fig073_02` (figurark 2 for Ildslukeren (kostyme 73), 15 ruter: start mot høyre (15 ruter), bilde to `jobber/fig073_01/resultat.png`)
 - [ ] `fig073_03` (figurark 3 for Ildslukeren (kostyme 73), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig073_01/resultat.png`)
+
+## Bestilling 95
+
+Figurark for Ildslukeren, Kvinne med lang hals.
+
 - [ ] `fig073_04` (figurark 4 for Ildslukeren (kostyme 73), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig073_01/resultat.png`)
 - [ ] `fig073_05` (figurark 5 for Ildslukeren (kostyme 73), 10 ruter: start mot høyre (5 ruter); start (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `jobber/fig073_01/resultat.png`)
-
-## Bestilling 96
-
-Figurark for Ildslukeren, Kvinne med lang hals, Strikken.
-
 - [ ] `fig073_06` (figurark 6 for Ildslukeren (kostyme 73), 27 ruter: start (lag 15, tegnes over kroppen) mot høyre (27 ruter), bilde to `jobber/fig073_01/resultat.png`)
 - [ ] `fig073_07` (figurark 7 for Ildslukeren (kostyme 73), 2 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig073_01/resultat.png`)
 - [ ] `fig105_01` (figurark 1 for Kvinne med lang hals (kostyme 105), 13 ruter: start mot høyre (13 ruter))
@@ -1452,13 +1439,13 @@ Figurark for Ildslukeren, Kvinne med lang hals, Strikken.
 - [ ] `fig105_04` (figurark 4 for Kvinne med lang hals (kostyme 105), 16 ruter: animasjon 8 mot høyre (16 ruter), bilde to `jobber/fig105_01/resultat.png`)
 - [ ] `fig105_05` (figurark 5 for Kvinne med lang hals (kostyme 105), 10 ruter: animasjon 8 mot høyre (2 ruter); animasjon 9 mot høyre (8 ruter), bilde to `jobber/fig105_01/resultat.png`)
 - [ ] `fig105_06` (figurark 6 for Kvinne med lang hals (kostyme 105), 14 ruter: animasjon 9 mot høyre (14 ruter), bilde to `jobber/fig105_01/resultat.png`)
+
+## Bestilling 96
+
+Figurark for Strikken, Fisk.
+
 - [ ] `fig313_01` (figurark 1 for Strikken (kostyme 313), 19 ruter: start mot høyre (19 ruter))
 - [ ] `fig313_02` (figurark 2 for Strikken (kostyme 313), 20 ruter: start mot høyre (20 ruter), bilde to `jobber/fig313_01/resultat.png`)
-
-## Bestilling 97
-
-Figurark for Strikken, Fisk, Taubanevognen.
-
 - [ ] `fig313_03` (figurark 3 for Strikken (kostyme 313), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig313_01/resultat.png`)
 - [ ] `fig313_04` (figurark 4 for Strikken (kostyme 313), 16 ruter: animasjon 7 mot høyre (16 ruter), bilde to `jobber/fig313_01/resultat.png`)
 - [ ] `fig313_05` (figurark 5 for Strikken (kostyme 313), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `jobber/fig313_01/resultat.png`)
@@ -1467,13 +1454,13 @@ Figurark for Strikken, Fisk, Taubanevognen.
 - [ ] `fig172_02` (figurark 2 for Fisk (kostyme 172), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig172_01/resultat.png`)
 - [ ] `fig172_03` (figurark 3 for Fisk (kostyme 172), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig172_01/resultat.png`)
 - [ ] `fig172_04` (figurark 4 for Fisk (kostyme 172), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig172_01/resultat.png`)
+
+## Bestilling 97
+
+Figurark for Fisk, Taubanevognen, Mannshode med turban, Kokken.
+
 - [ ] `fig172_05` (figurark 5 for Fisk (kostyme 172), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig172_01/resultat.png`)
 - [ ] `fig138_01` (figurark 1 for Taubanevognen (kostyme 138), 4 ruter: start mot høyre (4 ruter))
-
-## Bestilling 98
-
-Figurark for Taubanevognen, Mannshode med turban, Kokken.
-
 - [ ] `fig138_02` (figurark 2 for Taubanevognen (kostyme 138), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig138_01/resultat.png`)
 - [ ] `fig138_03` (figurark 3 for Taubanevognen (kostyme 138), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig138_01/resultat.png`)
 - [ ] `fig138_04` (figurark 4 for Taubanevognen (kostyme 138), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig138_01/resultat.png`)
@@ -1482,13 +1469,13 @@ Figurark for Taubanevognen, Mannshode med turban, Kokken.
 - [ ] `fig158_03` (figurark 3 for Mannshode med turban (kostyme 158), 12 ruter: animasjon 10 mot oss (11 ruter); animasjon 10 (lag 6, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig158_01/resultat.png`)
 - [ ] `fig158_04` (figurark 4 for Mannshode med turban (kostyme 158), 9 ruter: animasjon 11 (lag 4, tegnes over kroppen) mot oss (4 ruter); animasjon 12 (lag 2, tegnes over kroppen) mot oss (2 ruter); animasjon 13 (lag 2, tegnes over kroppen) mot oss (1 rute); animasjon 14 (lag 2, tegnes over kroppen) mot oss (1 rute); animasjon 15 (lag 2, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig158_01/resultat.png`)
 - [ ] `fig159_01` (figurark 1 for Kokken (kostyme 159), 14 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss (2 ruter); gange mot høyre, mot oss (12 ruter))
+
+## Bestilling 98
+
+Figurark for Kokken, Isblokken, Taubanevognen.
+
 - [ ] `fig159_02` (figurark 2 for Kokken (kostyme 159), 10 ruter: animasjon 6 mot høyre (6 ruter); animasjon 7 (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); animasjon 8 (lag 4, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig159_01/resultat.png`)
 - [ ] `fig159_03` (figurark 3 for Kokken (kostyme 159), 16 ruter: animasjon 8 (lag 5, tegnes over kroppen) mot oss (14 ruter); animasjon 8 (lag 6, tegnes over kroppen) mot oss (2 ruter), bilde to `jobber/fig159_01/resultat.png`)
-
-## Bestilling 99
-
-Figurark for Kokken, Isblokken, Taubanevognen, Helikopter.
-
 - [ ] `fig159_04` (figurark 4 for Kokken (kostyme 159), 5 ruter: animasjon 9 (lag 3, tegnes over kroppen) mot høyre (5 ruter), bilde to `jobber/fig159_01/resultat.png`)
 - [ ] `fig296_01` (figurark 1 for Isblokken (kostyme 296), 9 ruter: start mot høyre (9 ruter))
 - [ ] `fig296_02` (figurark 2 for Isblokken (kostyme 296), 3 ruter: start mot høyre (2 ruter); animasjon 7 mot høyre (1 rute), bilde to `jobber/fig296_01/resultat.png`)
@@ -1497,13 +1484,13 @@ Figurark for Kokken, Isblokken, Taubanevognen, Helikopter.
 - [ ] `fig137_01` (figurark 1 for Taubanevognen (kostyme 137), 67 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (66 ruter))
 - [ ] `fig137_02` (figurark 2 for Taubanevognen (kostyme 137), 13 ruter: animasjon 7 mot høyre (13 ruter), bilde to `jobber/fig137_01/resultat.png`)
 - [ ] `fig137_03` (figurark 3 for Taubanevognen (kostyme 137), 5 ruter: animasjon 7 mot høyre (5 ruter), bilde to `jobber/fig137_01/resultat.png`)
-- [ ] `fig178_01` (figurark 1 for Helikopter (kostyme 178), 66 ruter: start mot høyre (66 ruter))
-- [ ] `fig178_02` (figurark 2 for Helikopter (kostyme 178), 24 ruter: start mot høyre (24 ruter), bilde to `jobber/fig178_01/resultat.png`)
 
-## Bestilling 100
+## Bestilling 99
 
 Figurark for Helikopter, Fiskesnøre, Gnister, Silhuett.
 
+- [ ] `fig178_01` (figurark 1 for Helikopter (kostyme 178), 66 ruter: start mot høyre (66 ruter))
+- [ ] `fig178_02` (figurark 2 for Helikopter (kostyme 178), 24 ruter: start mot høyre (24 ruter), bilde to `jobber/fig178_01/resultat.png`)
 - [ ] `fig178_03` (figurark 3 for Helikopter (kostyme 178), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig178_01/resultat.png`)
 - [ ] `fig188_01` (figurark 1 for Fiskesnøre (kostyme 188), 51 ruter: start mot høyre (51 ruter))
 - [ ] `fig188_02` (figurark 2 for Fiskesnøre (kostyme 188), 37 ruter: start mot høyre (37 ruter), bilde to `jobber/fig188_01/resultat.png`)
@@ -1512,13 +1499,13 @@ Figurark for Helikopter, Fiskesnøre, Gnister, Silhuett.
 - [ ] `fig248_02` (figurark 2 for Gnister (kostyme 248), 4 ruter: gange mot høyre (4 ruter), bilde to `jobber/fig248_01/resultat.png`)
 - [ ] `fig248_03` (figurark 3 for Gnister (kostyme 248), 5 ruter: gange mot høyre (2 ruter); animasjon 6 (lag 4, tegnes over kroppen) mot høyre (3 ruter), bilde to `jobber/fig248_01/resultat.png`)
 - [ ] `fig339_01` (figurark 1 for Silhuett (kostyme 339), 4 ruter: start mot høyre (1 rute); animasjon 6 mot høyre, bort (3 ruter))
+
+## Bestilling 100
+
+Figurark for Silhuett, Ekspeditør (Snuckey's), Alligatorer, Bigfoot.
+
 - [ ] `fig339_02` (figurark 2 for Silhuett (kostyme 339), 6 ruter: animasjon 7 mot høyre (2 ruter); animasjon 8 mot høyre (2 ruter); animasjon 9 mot høyre (2 ruter), bilde to `jobber/fig339_01/resultat.png`)
 - [ ] `fig339_03` (figurark 3 for Silhuett (kostyme 339), 4 ruter: animasjon 10 mot høyre (2 ruter); animasjon 11 mot høyre (2 ruter), bilde to `jobber/fig339_01/resultat.png`)
-
-## Bestilling 101
-
-Figurark for Ekspeditør (Snuckey's), Alligatorer, Bigfoot.
-
 - [ ] `fig063_01` (figurark 1 for Ekspeditør (Snuckey's) (kostyme 63), 28 ruter: start mot høyre (1 rute); stående (lag 6, tegnes over kroppen) mot høyre (1 rute); start (lag 7, tegnes over kroppen) mot høyre (1 rute); snakking mot høyre (10 ruter); snakking (lag 4, tegnes over kroppen) mot høyre (11 ruter); snakking (lag 5, tegnes over kroppen) mot høyre (3 ruter); animasjon 6 (lag 6, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig063_02` (figurark 2 for Ekspeditør (Snuckey's) (kostyme 63), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot høyre (1 rute); animasjon 8 (lag 6, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig063_01/resultat.png`)
 - [ ] `fig126_01` (figurark 1 for Alligatorer (kostyme 126), 8 ruter: stående mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot høyre (1 rute); stående (lag 5, tegnes over kroppen) mot høyre (1 rute); stående (lag 6, tegnes over kroppen) mot høyre (1 rute); stående (lag 7, tegnes over kroppen) mot høyre (1 rute); stående (lag 8, tegnes over kroppen) mot høyre (1 rute); animasjon 6 (lag 2, tegnes over kroppen) mot høyre (1 rute))
@@ -1527,13 +1514,13 @@ Figurark for Ekspeditør (Snuckey's), Alligatorer, Bigfoot.
 - [ ] `fig255_02` (figurark 2 for Bigfoot (kostyme 255), 14 ruter: animasjon 6 mot høyre (6 ruter); animasjon 6 (lag 4, tegnes over kroppen) mot høyre (8 ruter), bilde to `jobber/fig255_01/resultat.png`)
 - [ ] `fig265_01` (figurark 1 for Bigfoot (kostyme 265), 22 ruter: start (lag 0, tegnes over kroppen) mot høyre (1 rute); stående (lag 1, tegnes over kroppen) mot høyre (1 rute); stående mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); snakking mot oss (18 ruter))
 - [ ] `fig265_02` (figurark 2 for Bigfoot (kostyme 265), 12 ruter: animasjon 6 mot oss (7 ruter); animasjon 7 mot oss (4 ruter); animasjon 8 mot oss (1 rute), bilde to `jobber/fig265_01/resultat.png`)
+
+## Bestilling 101
+
+Figurark for Bigfoot, Barn, Alligator, Flagg, Car Bomb, Snøkulen.
+
 - [ ] `fig267_01` (figurark 1 for Bigfoot (kostyme 267), 5 ruter: stående (lag 0, tegnes over kroppen) mot høyre (1 rute); stående mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot høyre (1 rute); stående (lag 5, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig267_02` (figurark 2 for Bigfoot (kostyme 267), 32 ruter: snakking mot oss (14 ruter); snakking (lag 3, tegnes over kroppen) mot oss (8 ruter); snakking (lag 4, tegnes over kroppen) mot oss (6 ruter); slutt på snakking (lag 3, tegnes over kroppen) mot oss (1 rute); animasjon 6 mot oss (3 ruter), bilde to `jobber/fig267_01/resultat.png`)
-
-## Bestilling 102
-
-Figurark for Barn, Alligator, Flagg, Car Bomb, Snøkulen.
-
 - [ ] `fig311_01` (figurark 1 for Barn (kostyme 311), 21 ruter: stående (lag 1, tegnes over kroppen) mot høyre (1 rute); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot høyre (1 rute); stående (lag 6, tegnes over kroppen) mot høyre (1 rute); snakking (lag 2, tegnes over kroppen) mot oss (9 ruter); animasjon 6 (lag 4, tegnes over kroppen) mot oss (4 ruter); animasjon 7 (lag 3, tegnes over kroppen) mot oss (3 ruter))
 - [ ] `fig311_02` (figurark 2 for Barn (kostyme 311), 7 ruter: animasjon 8 mot oss (7 ruter), bilde to `jobber/fig311_01/resultat.png`)
 - [ ] `fig119_01` (figurark 1 for Alligator (kostyme 119), 22 ruter: start mot høyre (22 ruter))
@@ -1542,13 +1529,13 @@ Figurark for Barn, Alligator, Flagg, Car Bomb, Snøkulen.
 - [ ] `fig133_01` (figurark 1 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter))
 - [ ] `fig133_02` (figurark 2 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_03` (figurark 3 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
-- [ ] `fig133_04` (figurark 4 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
-- [ ] `fig133_05` (figurark 5 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 
-## Bestilling 103
+## Bestilling 102
 
 Figurark for Snøkulen.
 
+- [ ] `fig133_04` (figurark 4 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
+- [ ] `fig133_05` (figurark 5 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_06` (figurark 6 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_07` (figurark 7 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_08` (figurark 8 for Snøkulen (kostyme 133), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
@@ -1557,13 +1544,13 @@ Figurark for Snøkulen.
 - [ ] `fig133_11` (figurark 11 for Snøkulen (kostyme 133), 4 ruter: start (lag 15, tegnes over kroppen) mot høyre (4 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_12` (figurark 12 for Snøkulen (kostyme 133), 2 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_13` (figurark 13 for Snøkulen (kostyme 133), 2 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
-- [ ] `fig133_14` (figurark 14 for Snøkulen (kostyme 133), 2 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
-- [ ] `fig133_15` (figurark 15 for Snøkulen (kostyme 133), 2 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 
-## Bestilling 104
+## Bestilling 103
 
 Figurark for Snøkulen.
 
+- [ ] `fig133_14` (figurark 14 for Snøkulen (kostyme 133), 2 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
+- [ ] `fig133_15` (figurark 15 for Snøkulen (kostyme 133), 2 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_16` (figurark 16 for Snøkulen (kostyme 133), 2 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_17` (figurark 17 for Snøkulen (kostyme 133), 5 ruter: start (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_18` (figurark 18 for Snøkulen (kostyme 133), 3 ruter: start (lag 15, tegnes over kroppen) mot høyre (1 rute); animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
@@ -1572,13 +1559,13 @@ Figurark for Snøkulen.
 - [ ] `fig133_21` (figurark 21 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_22` (figurark 22 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_23` (figurark 23 for Snøkulen (kostyme 133), 3 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig133_01/resultat.png`)
-- [ ] `fig133_24` (figurark 24 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
-- [ ] `fig133_25` (figurark 25 for Snøkulen (kostyme 133), 4 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig133_01/resultat.png`)
 
-## Bestilling 105
+## Bestilling 104
 
 Figurark for Snøkulen.
 
+- [ ] `fig133_24` (figurark 24 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
+- [ ] `fig133_25` (figurark 25 for Snøkulen (kostyme 133), 4 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (4 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_26` (figurark 26 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_27` (figurark 27 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_28` (figurark 28 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
@@ -1587,13 +1574,13 @@ Figurark for Snøkulen.
 - [ ] `fig133_31` (figurark 31 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_32` (figurark 32 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_33` (figurark 33 for Snøkulen (kostyme 133), 3 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig133_01/resultat.png`)
-- [ ] `fig133_34` (figurark 34 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
-- [ ] `fig133_35` (figurark 35 for Snøkulen (kostyme 133), 5 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (5 ruter), bilde to `jobber/fig133_01/resultat.png`)
 
-## Bestilling 106
+## Bestilling 105
 
 Figurark for Snøkulen.
 
+- [ ] `fig133_34` (figurark 34 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
+- [ ] `fig133_35` (figurark 35 for Snøkulen (kostyme 133), 5 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (5 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_36` (figurark 36 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_37` (figurark 37 for Snøkulen (kostyme 133), 3 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_38` (figurark 38 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
@@ -1602,13 +1589,13 @@ Figurark for Snøkulen.
 - [ ] `fig133_41` (figurark 41 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_42` (figurark 42 for Snøkulen (kostyme 133), 3 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_43` (figurark 43 for Snøkulen (kostyme 133), 2 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig133_01/resultat.png`)
+
+## Bestilling 106
+
+Figurark for Snøkulen, Silhuett (nærbilde).
+
 - [ ] `fig133_44` (figurark 44 for Snøkulen (kostyme 133), 3 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig133_01/resultat.png`)
 - [ ] `fig133_45` (figurark 45 for Snøkulen (kostyme 133), 1 rute: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig133_01/resultat.png`)
-
-## Bestilling 107
-
-Figurark for Silhuett (nærbilde).
-
 - [ ] `fig030_01` (figurark 1 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter))
 - [ ] `fig030_02` (figurark 2 for Silhuett (nærbilde) (kostyme 30), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_03` (figurark 3 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
@@ -1617,13 +1604,13 @@ Figurark for Silhuett (nærbilde).
 - [ ] `fig030_06` (figurark 6 for Silhuett (nærbilde) (kostyme 30), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_07` (figurark 7 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_08` (figurark 8 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
-- [ ] `fig030_09` (figurark 9 for Silhuett (nærbilde) (kostyme 30), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig030_01/resultat.png`)
-- [ ] `fig030_10` (figurark 10 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 
-## Bestilling 108
+## Bestilling 107
 
 Figurark for Silhuett (nærbilde).
 
+- [ ] `fig030_09` (figurark 9 for Silhuett (nærbilde) (kostyme 30), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig030_01/resultat.png`)
+- [ ] `fig030_10` (figurark 10 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_11` (figurark 11 for Silhuett (nærbilde) (kostyme 30), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_12` (figurark 12 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_13` (figurark 13 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
@@ -1632,13 +1619,13 @@ Figurark for Silhuett (nærbilde).
 - [ ] `fig030_16` (figurark 16 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_17` (figurark 17 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_18` (figurark 18 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
-- [ ] `fig030_19` (figurark 19 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
-- [ ] `fig030_20` (figurark 20 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 
-## Bestilling 109
+## Bestilling 108
 
 Figurark for Silhuett (nærbilde).
 
+- [ ] `fig030_19` (figurark 19 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
+- [ ] `fig030_20` (figurark 20 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_21` (figurark 21 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_22` (figurark 22 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_23` (figurark 23 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
@@ -1647,13 +1634,13 @@ Figurark for Silhuett (nærbilde).
 - [ ] `fig030_26` (figurark 26 for Silhuett (nærbilde) (kostyme 30), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_27` (figurark 27 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_28` (figurark 28 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
-- [ ] `fig030_29` (figurark 29 for Silhuett (nærbilde) (kostyme 30), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig030_01/resultat.png`)
-- [ ] `fig030_30` (figurark 30 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 
-## Bestilling 110
+## Bestilling 109
 
 Figurark for Silhuett (nærbilde), Virvel.
 
+- [ ] `fig030_29` (figurark 29 for Silhuett (nærbilde) (kostyme 30), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig030_01/resultat.png`)
+- [ ] `fig030_30` (figurark 30 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_31` (figurark 31 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_32` (figurark 32 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
 - [ ] `fig030_33` (figurark 33 for Silhuett (nærbilde) (kostyme 30), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig030_01/resultat.png`)
@@ -1662,13 +1649,13 @@ Figurark for Silhuett (nærbilde), Virvel.
 - [ ] `fig331_03` (figurark 3 for Virvel (kostyme 331), 3 ruter: start (lag 14, tegnes over kroppen) mot høyre (3 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_04` (figurark 4 for Virvel (kostyme 331), 12 ruter: start (lag 14, tegnes over kroppen) mot høyre (12 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_05` (figurark 5 for Virvel (kostyme 331), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
-- [ ] `fig331_06` (figurark 6 for Virvel (kostyme 331), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
-- [ ] `fig331_07` (figurark 7 for Virvel (kostyme 331), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 
-## Bestilling 111
+## Bestilling 110
 
 Figurark for Virvel.
 
+- [ ] `fig331_06` (figurark 6 for Virvel (kostyme 331), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
+- [ ] `fig331_07` (figurark 7 for Virvel (kostyme 331), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_08` (figurark 8 for Virvel (kostyme 331), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_09` (figurark 9 for Virvel (kostyme 331), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_10` (figurark 10 for Virvel (kostyme 331), 11 ruter: start mot høyre (9 ruter); animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
@@ -1677,13 +1664,13 @@ Figurark for Virvel.
 - [ ] `fig331_13` (figurark 13 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_14` (figurark 14 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_15` (figurark 15 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
-- [ ] `fig331_16` (figurark 16 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
-- [ ] `fig331_17` (figurark 17 for Virvel (kostyme 331), 1 rute: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig331_01/resultat.png`)
 
-## Bestilling 112
+## Bestilling 111
 
 Figurark for Virvel, Forskeren (nærbilde).
 
+- [ ] `fig331_16` (figurark 16 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
+- [ ] `fig331_17` (figurark 17 for Virvel (kostyme 331), 1 rute: animasjon 7 (lag 1, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_18` (figurark 18 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_19` (figurark 19 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_20` (figurark 20 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
@@ -1692,13 +1679,13 @@ Figurark for Virvel, Forskeren (nærbilde).
 - [ ] `fig331_23` (figurark 23 for Virvel (kostyme 331), 3 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (3 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig331_24` (figurark 24 for Virvel (kostyme 331), 2 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig331_01/resultat.png`)
 - [ ] `fig025_01` (figurark 1 for Forskeren (nærbilde) (kostyme 25), 6 ruter: start mot høyre (6 ruter))
-- [ ] `fig025_02` (figurark 2 for Forskeren (nærbilde) (kostyme 25), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig025_01/resultat.png`)
-- [ ] `fig025_03` (figurark 3 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
 
-## Bestilling 113
+## Bestilling 112
 
 Figurark for Forskeren (nærbilde).
 
+- [ ] `fig025_02` (figurark 2 for Forskeren (nærbilde) (kostyme 25), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig025_01/resultat.png`)
+- [ ] `fig025_03` (figurark 3 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
 - [ ] `fig025_04` (figurark 4 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
 - [ ] `fig025_05` (figurark 5 for Forskeren (nærbilde) (kostyme 25), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig025_01/resultat.png`)
 - [ ] `fig025_06` (figurark 6 for Forskeren (nærbilde) (kostyme 25), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig025_01/resultat.png`)
@@ -1707,13 +1694,13 @@ Figurark for Forskeren (nærbilde).
 - [ ] `fig025_09` (figurark 9 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
 - [ ] `fig025_10` (figurark 10 for Forskeren (nærbilde) (kostyme 25), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig025_01/resultat.png`)
 - [ ] `fig025_11` (figurark 11 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
-- [ ] `fig025_12` (figurark 12 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
-- [ ] `fig025_13` (figurark 13 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
 
-## Bestilling 114
+## Bestilling 113
 
 Figurark for Forskeren (nærbilde), Fiskeren.
 
+- [ ] `fig025_12` (figurark 12 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
+- [ ] `fig025_13` (figurark 13 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
 - [ ] `fig025_14` (figurark 14 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
 - [ ] `fig025_15` (figurark 15 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
 - [ ] `fig025_16` (figurark 16 for Forskeren (nærbilde) (kostyme 25), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig025_01/resultat.png`)
@@ -1722,13 +1709,13 @@ Figurark for Forskeren (nærbilde), Fiskeren.
 - [ ] `fig179_01` (figurark 1 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter))
 - [ ] `fig179_02` (figurark 2 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig179_03` (figurark 3 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
-- [ ] `fig179_04` (figurark 4 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
-- [ ] `fig179_05` (figurark 5 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
 
-## Bestilling 115
+## Bestilling 114
 
 Figurark for Fiskeren.
 
+- [ ] `fig179_04` (figurark 4 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
+- [ ] `fig179_05` (figurark 5 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig179_06` (figurark 6 for Fiskeren (kostyme 179), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig179_07` (figurark 7 for Fiskeren (kostyme 179), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig179_08` (figurark 8 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
@@ -1737,13 +1724,13 @@ Figurark for Fiskeren.
 - [ ] `fig179_11` (figurark 11 for Fiskeren (kostyme 179), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig179_12` (figurark 12 for Fiskeren (kostyme 179), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig179_13` (figurark 13 for Fiskeren (kostyme 179), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig179_01/resultat.png`)
-- [ ] `fig179_14` (figurark 14 for Fiskeren (kostyme 179), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig179_01/resultat.png`)
-- [ ] `fig179_15` (figurark 15 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
 
-## Bestilling 116
+## Bestilling 115
 
 Figurark for Fiskeren, Forskeren (nærbilde).
 
+- [ ] `fig179_14` (figurark 14 for Fiskeren (kostyme 179), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig179_01/resultat.png`)
+- [ ] `fig179_15` (figurark 15 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig179_16` (figurark 16 for Fiskeren (kostyme 179), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig179_17` (figurark 17 for Fiskeren (kostyme 179), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig179_01/resultat.png`)
 - [ ] `fig022_01` (figurark 1 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter))
@@ -1752,13 +1739,13 @@ Figurark for Fiskeren, Forskeren (nærbilde).
 - [ ] `fig022_04` (figurark 4 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig022_01/resultat.png`)
 - [ ] `fig022_05` (figurark 5 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig022_01/resultat.png`)
 - [ ] `fig022_06` (figurark 6 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig022_01/resultat.png`)
+
+## Bestilling 116
+
+Figurark for Forskeren (nærbilde).
+
 - [ ] `fig022_07` (figurark 7 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig022_01/resultat.png`)
 - [ ] `fig022_08` (figurark 8 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig022_01/resultat.png`)
-
-## Bestilling 117
-
-Figurark for Forskeren (nærbilde), Grantrær.
-
 - [ ] `fig022_09` (figurark 9 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig022_01/resultat.png`)
 - [ ] `fig022_10` (figurark 10 for Forskeren (nærbilde) (kostyme 22), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig022_01/resultat.png`)
 - [ ] `fig022_11` (figurark 11 for Forskeren (nærbilde) (kostyme 22), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig022_01/resultat.png`)
@@ -1767,13 +1754,13 @@ Figurark for Forskeren (nærbilde), Grantrær.
 - [ ] `fig022_14` (figurark 14 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig022_01/resultat.png`)
 - [ ] `fig022_15` (figurark 15 for Forskeren (nærbilde) (kostyme 22), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig022_01/resultat.png`)
 - [ ] `fig022_16` (figurark 16 for Forskeren (nærbilde) (kostyme 22), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig022_01/resultat.png`)
-- [ ] `fig062_01` (figurark 1 for Grantrær (kostyme 62), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute))
-- [ ] `fig062_02` (figurark 2 for Grantrær (kostyme 62), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig062_01/resultat.png`)
 
-## Bestilling 118
+## Bestilling 117
 
 Figurark for Grantrær.
 
+- [ ] `fig062_01` (figurark 1 for Grantrær (kostyme 62), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute))
+- [ ] `fig062_02` (figurark 2 for Grantrær (kostyme 62), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig062_01/resultat.png`)
 - [ ] `fig062_03` (figurark 3 for Grantrær (kostyme 62), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
 - [ ] `fig062_04` (figurark 4 for Grantrær (kostyme 62), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
 - [ ] `fig062_05` (figurark 5 for Grantrær (kostyme 62), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
@@ -1782,13 +1769,13 @@ Figurark for Grantrær.
 - [ ] `fig062_08` (figurark 8 for Grantrær (kostyme 62), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
 - [ ] `fig062_09` (figurark 9 for Grantrær (kostyme 62), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
 - [ ] `fig062_10` (figurark 10 for Grantrær (kostyme 62), 2 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
-- [ ] `fig062_11` (figurark 11 for Grantrær (kostyme 62), 2 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
-- [ ] `fig062_12` (figurark 12 for Grantrær (kostyme 62), 2 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
 
-## Bestilling 119
+## Bestilling 118
 
 Figurark for Grantrær, Skapning (intro).
 
+- [ ] `fig062_11` (figurark 11 for Grantrær (kostyme 62), 2 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
+- [ ] `fig062_12` (figurark 12 for Grantrær (kostyme 62), 2 ruter: animasjon 8 (lag 1, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
 - [ ] `fig062_13` (figurark 13 for Grantrær (kostyme 62), 2 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
 - [ ] `fig062_14` (figurark 14 for Grantrær (kostyme 62), 2 ruter: animasjon 8 (lag 6, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
 - [ ] `fig062_15` (figurark 15 for Grantrær (kostyme 62), 2 ruter: animasjon 8 (lag 7, tegnes over kroppen) mot venstre (2 ruter), bilde to `jobber/fig062_01/resultat.png`)
@@ -1797,13 +1784,13 @@ Figurark for Grantrær, Skapning (intro).
 - [ ] `fig019_02` (figurark 2 for Skapning (intro) (kostyme 19), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig019_01/resultat.png`)
 - [ ] `fig019_03` (figurark 3 for Skapning (intro) (kostyme 19), 2 ruter: animasjon 7 mot høyre (1 rute); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig019_01/resultat.png`)
 - [ ] `fig019_04` (figurark 4 for Skapning (intro) (kostyme 19), 4 ruter: animasjon 8 mot høyre (4 ruter), bilde to `jobber/fig019_01/resultat.png`)
+
+## Bestilling 119
+
+Figurark for Skapning (intro).
+
 - [ ] `fig019_05` (figurark 5 for Skapning (intro) (kostyme 19), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig019_01/resultat.png`)
 - [ ] `fig019_06` (figurark 6 for Skapning (intro) (kostyme 19), 3 ruter: animasjon 8 mot høyre (3 ruter), bilde to `jobber/fig019_01/resultat.png`)
-
-## Bestilling 120
-
-Figurark for Skapning (intro), Cone of Tragedy.
-
 - [ ] `fig019_07` (figurark 7 for Skapning (intro) (kostyme 19), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig019_01/resultat.png`)
 - [ ] `fig019_08` (figurark 8 for Skapning (intro) (kostyme 19), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig019_01/resultat.png`)
 - [ ] `fig019_09` (figurark 9 for Skapning (intro) (kostyme 19), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig019_01/resultat.png`)
@@ -1812,13 +1799,13 @@ Figurark for Skapning (intro), Cone of Tragedy.
 - [ ] `fig019_12` (figurark 12 for Skapning (intro) (kostyme 19), 9 ruter: animasjon 10 (lag 15, tegnes over kroppen) mot høyre (8 ruter); animasjon 11 mot høyre (1 rute), bilde to `jobber/fig019_01/resultat.png`)
 - [ ] `fig019_13` (figurark 13 for Skapning (intro) (kostyme 19), 3 ruter: animasjon 12 mot høyre (3 ruter), bilde to `jobber/fig019_01/resultat.png`)
 - [ ] `fig019_14` (figurark 14 for Skapning (intro) (kostyme 19), 2 ruter: animasjon 12 mot høyre (2 ruter), bilde to `jobber/fig019_01/resultat.png`)
+
+## Bestilling 120
+
+Figurark for Skapning (intro), Cone of Tragedy.
+
 - [ ] `fig019_15` (figurark 15 for Skapning (intro) (kostyme 19), 2 ruter: animasjon 12 mot høyre (2 ruter), bilde to `jobber/fig019_01/resultat.png`)
 - [ ] `fig087_01` (figurark 1 for Cone of Tragedy (kostyme 87), 10 ruter: start (lag 14, tegnes over kroppen) mot høyre (10 ruter))
-
-## Bestilling 121
-
-Figurark for Cone of Tragedy.
-
 - [ ] `fig087_02` (figurark 2 for Cone of Tragedy (kostyme 87), 10 ruter: start (lag 14, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig087_01/resultat.png`)
 - [ ] `fig087_03` (figurark 3 for Cone of Tragedy (kostyme 87), 9 ruter: start (lag 14, tegnes over kroppen) mot høyre (9 ruter), bilde to `jobber/fig087_01/resultat.png`)
 - [ ] `fig087_04` (figurark 4 for Cone of Tragedy (kostyme 87), 8 ruter: start (lag 14, tegnes over kroppen) mot høyre (8 ruter), bilde to `jobber/fig087_01/resultat.png`)
@@ -1827,13 +1814,13 @@ Figurark for Cone of Tragedy.
 - [ ] `fig087_07` (figurark 7 for Cone of Tragedy (kostyme 87), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig087_01/resultat.png`)
 - [ ] `fig087_08` (figurark 8 for Cone of Tragedy (kostyme 87), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig087_01/resultat.png`)
 - [ ] `fig087_09` (figurark 9 for Cone of Tragedy (kostyme 87), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig087_01/resultat.png`)
-- [ ] `fig087_10` (figurark 10 for Cone of Tragedy (kostyme 87), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig087_01/resultat.png`)
-- [ ] `fig087_11` (figurark 11 for Cone of Tragedy (kostyme 87), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig087_01/resultat.png`)
 
-## Bestilling 122
+## Bestilling 121
 
 Figurark for Cone of Tragedy, Bilen.
 
+- [ ] `fig087_10` (figurark 10 for Cone of Tragedy (kostyme 87), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig087_01/resultat.png`)
+- [ ] `fig087_11` (figurark 11 for Cone of Tragedy (kostyme 87), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig087_01/resultat.png`)
 - [ ] `fig087_12` (figurark 12 for Cone of Tragedy (kostyme 87), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig087_01/resultat.png`)
 - [ ] `fig087_13` (figurark 13 for Cone of Tragedy (kostyme 87), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig087_01/resultat.png`)
 - [ ] `fig087_14` (figurark 14 for Cone of Tragedy (kostyme 87), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig087_01/resultat.png`)
@@ -1842,13 +1829,13 @@ Figurark for Cone of Tragedy, Bilen.
 - [ ] `fig056_03` (figurark 3 for Bilen (kostyme 56), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig056_01/resultat.png`)
 - [ ] `fig056_04` (figurark 4 for Bilen (kostyme 56), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig056_01/resultat.png`)
 - [ ] `fig056_05` (figurark 5 for Bilen (kostyme 56), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig056_01/resultat.png`)
-- [ ] `fig056_06` (figurark 6 for Bilen (kostyme 56), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig056_01/resultat.png`)
-- [ ] `fig056_07` (figurark 7 for Bilen (kostyme 56), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig056_01/resultat.png`)
 
-## Bestilling 123
+## Bestilling 122
 
 Figurark for Bilen, Vann.
 
+- [ ] `fig056_06` (figurark 6 for Bilen (kostyme 56), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig056_01/resultat.png`)
+- [ ] `fig056_07` (figurark 7 for Bilen (kostyme 56), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig056_01/resultat.png`)
 - [ ] `fig056_08` (figurark 8 for Bilen (kostyme 56), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig056_01/resultat.png`)
 - [ ] `fig056_09` (figurark 9 for Bilen (kostyme 56), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig056_01/resultat.png`)
 - [ ] `fig056_10` (figurark 10 for Bilen (kostyme 56), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig056_01/resultat.png`)
@@ -1857,13 +1844,13 @@ Figurark for Bilen, Vann.
 - [ ] `fig056_13` (figurark 13 for Bilen (kostyme 56), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig056_01/resultat.png`)
 - [ ] `fig181_01` (figurark 1 for Vann (kostyme 181), 14 ruter: start mot høyre (14 ruter))
 - [ ] `fig181_02` (figurark 2 for Vann (kostyme 181), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig181_01/resultat.png`)
+
+## Bestilling 123
+
+Figurark for Vann.
+
 - [ ] `fig181_03` (figurark 3 for Vann (kostyme 181), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig181_01/resultat.png`)
 - [ ] `fig181_04` (figurark 4 for Vann (kostyme 181), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig181_01/resultat.png`)
-
-## Bestilling 124
-
-Figurark for Vann, Fiskeren.
-
 - [ ] `fig181_05` (figurark 5 for Vann (kostyme 181), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig181_01/resultat.png`)
 - [ ] `fig181_06` (figurark 6 for Vann (kostyme 181), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig181_01/resultat.png`)
 - [ ] `fig181_07` (figurark 7 for Vann (kostyme 181), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig181_01/resultat.png`)
@@ -1872,13 +1859,13 @@ Figurark for Vann, Fiskeren.
 - [ ] `fig181_10` (figurark 10 for Vann (kostyme 181), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig181_01/resultat.png`)
 - [ ] `fig181_11` (figurark 11 for Vann (kostyme 181), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig181_01/resultat.png`)
 - [ ] `fig181_12` (figurark 12 for Vann (kostyme 181), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig181_01/resultat.png`)
+
+## Bestilling 124
+
+Figurark for Vann, Fiskeren.
+
 - [ ] `fig181_13` (figurark 13 for Vann (kostyme 181), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig181_01/resultat.png`)
 - [ ] `fig186_01` (figurark 1 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter))
-
-## Bestilling 125
-
-Figurark for Fiskeren.
-
 - [ ] `fig186_02` (figurark 2 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
 - [ ] `fig186_03` (figurark 3 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
 - [ ] `fig186_04` (figurark 4 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
@@ -1887,13 +1874,13 @@ Figurark for Fiskeren.
 - [ ] `fig186_07` (figurark 7 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
 - [ ] `fig186_08` (figurark 8 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
 - [ ] `fig186_09` (figurark 9 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
-- [ ] `fig186_10` (figurark 10 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
-- [ ] `fig186_11` (figurark 11 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
 
-## Bestilling 126
+## Bestilling 125
 
 Figurark for Fiskeren, Vann.
 
+- [ ] `fig186_10` (figurark 10 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
+- [ ] `fig186_11` (figurark 11 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
 - [ ] `fig186_12` (figurark 12 for Fiskeren (kostyme 186), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig186_01/resultat.png`)
 - [ ] `fig186_13` (figurark 13 for Fiskeren (kostyme 186), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig186_01/resultat.png`)
 - [ ] `fig285_01` (figurark 1 for Vann (kostyme 285), 3 ruter: start mot høyre (3 ruter))
@@ -1902,13 +1889,13 @@ Figurark for Fiskeren, Vann.
 - [ ] `fig285_04` (figurark 4 for Vann (kostyme 285), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig285_01/resultat.png`)
 - [ ] `fig285_05` (figurark 5 for Vann (kostyme 285), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig285_01/resultat.png`)
 - [ ] `fig285_06` (figurark 6 for Vann (kostyme 285), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig285_01/resultat.png`)
-- [ ] `fig285_07` (figurark 7 for Vann (kostyme 285), 4 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig285_01/resultat.png`)
-- [ ] `fig285_08` (figurark 8 for Vann (kostyme 285), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `jobber/fig285_01/resultat.png`)
 
-## Bestilling 127
+## Bestilling 126
 
 Figurark for Vann, Cone of Tragedy.
 
+- [ ] `fig285_07` (figurark 7 for Vann (kostyme 285), 4 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig285_01/resultat.png`)
+- [ ] `fig285_08` (figurark 8 for Vann (kostyme 285), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `jobber/fig285_01/resultat.png`)
 - [ ] `fig285_09` (figurark 9 for Vann (kostyme 285), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig285_01/resultat.png`)
 - [ ] `fig285_10` (figurark 10 for Vann (kostyme 285), 12 ruter: animasjon 8 mot høyre (6 ruter); animasjon 9 (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `jobber/fig285_01/resultat.png`)
 - [ ] `fig285_11` (figurark 11 for Vann (kostyme 285), 8 ruter: animasjon 9 mot høyre (2 ruter); animasjon 10 mot høyre (6 ruter), bilde to `jobber/fig285_01/resultat.png`)
@@ -1917,13 +1904,13 @@ Figurark for Vann, Cone of Tragedy.
 - [ ] `fig085_02` (figurark 2 for Cone of Tragedy (kostyme 85), 10 ruter: start (lag 14, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig085_01/resultat.png`)
 - [ ] `fig085_03` (figurark 3 for Cone of Tragedy (kostyme 85), 10 ruter: start (lag 14, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig085_01/resultat.png`)
 - [ ] `fig085_04` (figurark 4 for Cone of Tragedy (kostyme 85), 10 ruter: start (lag 14, tegnes over kroppen) mot høyre (8 ruter); start mot høyre (2 ruter), bilde to `jobber/fig085_01/resultat.png`)
-- [ ] `fig085_05` (figurark 5 for Cone of Tragedy (kostyme 85), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig085_01/resultat.png`)
-- [ ] `fig085_06` (figurark 6 for Cone of Tragedy (kostyme 85), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig085_01/resultat.png`)
 
-## Bestilling 128
+## Bestilling 127
 
 Figurark for Cone of Tragedy, Vann.
 
+- [ ] `fig085_05` (figurark 5 for Cone of Tragedy (kostyme 85), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig085_01/resultat.png`)
+- [ ] `fig085_06` (figurark 6 for Cone of Tragedy (kostyme 85), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig085_01/resultat.png`)
 - [ ] `fig085_07` (figurark 7 for Cone of Tragedy (kostyme 85), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig085_01/resultat.png`)
 - [ ] `fig085_08` (figurark 8 for Cone of Tragedy (kostyme 85), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig085_01/resultat.png`)
 - [ ] `fig085_09` (figurark 9 for Cone of Tragedy (kostyme 85), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig085_01/resultat.png`)
@@ -1932,13 +1919,13 @@ Figurark for Cone of Tragedy, Vann.
 - [ ] `fig182_01` (figurark 1 for Vann (kostyme 182), 6 ruter: start mot høyre (6 ruter))
 - [ ] `fig182_02` (figurark 2 for Vann (kostyme 182), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig182_01/resultat.png`)
 - [ ] `fig182_03` (figurark 3 for Vann (kostyme 182), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig182_01/resultat.png`)
-- [ ] `fig182_04` (figurark 4 for Vann (kostyme 182), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig182_01/resultat.png`)
-- [ ] `fig182_05` (figurark 5 for Vann (kostyme 182), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig182_01/resultat.png`)
 
-## Bestilling 129
+## Bestilling 128
 
 Figurark for Vann, Støv.
 
+- [ ] `fig182_04` (figurark 4 for Vann (kostyme 182), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig182_01/resultat.png`)
+- [ ] `fig182_05` (figurark 5 for Vann (kostyme 182), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig182_01/resultat.png`)
 - [ ] `fig182_06` (figurark 6 for Vann (kostyme 182), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig182_01/resultat.png`)
 - [ ] `fig182_07` (figurark 7 for Vann (kostyme 182), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig182_01/resultat.png`)
 - [ ] `fig182_08` (figurark 8 for Vann (kostyme 182), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig182_01/resultat.png`)
@@ -1947,13 +1934,13 @@ Figurark for Vann, Støv.
 - [ ] `fig182_11` (figurark 11 for Vann (kostyme 182), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig182_01/resultat.png`)
 - [ ] `fig014_01` (figurark 1 for Støv (kostyme 14), 3 ruter: start mot høyre (3 ruter))
 - [ ] `fig014_02` (figurark 2 for Støv (kostyme 14), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig014_01/resultat.png`)
-- [ ] `fig014_03` (figurark 3 for Støv (kostyme 14), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig014_01/resultat.png`)
-- [ ] `fig014_04` (figurark 4 for Støv (kostyme 14), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig014_01/resultat.png`)
 
-## Bestilling 130
+## Bestilling 129
 
 Figurark for Støv, Bilen.
 
+- [ ] `fig014_03` (figurark 3 for Støv (kostyme 14), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig014_01/resultat.png`)
+- [ ] `fig014_04` (figurark 4 for Støv (kostyme 14), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig014_01/resultat.png`)
 - [ ] `fig014_05` (figurark 5 for Støv (kostyme 14), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig014_01/resultat.png`)
 - [ ] `fig014_06` (figurark 6 for Støv (kostyme 14), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig014_01/resultat.png`)
 - [ ] `fig014_07` (figurark 7 for Støv (kostyme 14), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig014_01/resultat.png`)
@@ -1962,13 +1949,13 @@ Figurark for Støv, Bilen.
 - [ ] `fig014_10` (figurark 10 for Støv (kostyme 14), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig014_01/resultat.png`)
 - [ ] `fig054_01` (figurark 1 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter))
 - [ ] `fig054_02` (figurark 2 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig054_01/resultat.png`)
-- [ ] `fig054_03` (figurark 3 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig054_01/resultat.png`)
-- [ ] `fig054_04` (figurark 4 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig054_01/resultat.png`)
 
-## Bestilling 131
+## Bestilling 130
 
 Figurark for Bilen, Cone of Tragedy.
 
+- [ ] `fig054_03` (figurark 3 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig054_01/resultat.png`)
+- [ ] `fig054_04` (figurark 4 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig054_01/resultat.png`)
 - [ ] `fig054_05` (figurark 5 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig054_01/resultat.png`)
 - [ ] `fig054_06` (figurark 6 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig054_01/resultat.png`)
 - [ ] `fig054_07` (figurark 7 for Bilen (kostyme 54), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig054_01/resultat.png`)
@@ -1977,13 +1964,13 @@ Figurark for Bilen, Cone of Tragedy.
 - [ ] `fig054_10` (figurark 10 for Bilen (kostyme 54), 9 ruter: start mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (8 ruter), bilde to `jobber/fig054_01/resultat.png`)
 - [ ] `fig084_01` (figurark 1 for Cone of Tragedy (kostyme 84), 6 ruter: start (lag 14, tegnes over kroppen) mot høyre (1 rute); start mot høyre (5 ruter))
 - [ ] `fig084_02` (figurark 2 for Cone of Tragedy (kostyme 84), 20 ruter: start mot høyre (20 ruter), bilde to `jobber/fig084_01/resultat.png`)
-- [ ] `fig084_03` (figurark 3 for Cone of Tragedy (kostyme 84), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig084_01/resultat.png`)
-- [ ] `fig084_04` (figurark 4 for Cone of Tragedy (kostyme 84), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig084_01/resultat.png`)
 
-## Bestilling 132
+## Bestilling 131
 
 Figurark for Cone of Tragedy, Fiskesnøre.
 
+- [ ] `fig084_03` (figurark 3 for Cone of Tragedy (kostyme 84), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig084_01/resultat.png`)
+- [ ] `fig084_04` (figurark 4 for Cone of Tragedy (kostyme 84), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig084_01/resultat.png`)
 - [ ] `fig084_05` (figurark 5 for Cone of Tragedy (kostyme 84), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig084_01/resultat.png`)
 - [ ] `fig084_06` (figurark 6 for Cone of Tragedy (kostyme 84), 17 ruter: start mot høyre (12 ruter); animasjon 7 (lag 14, tegnes over kroppen) mot høyre (5 ruter), bilde to `jobber/fig084_01/resultat.png`)
 - [ ] `fig084_07` (figurark 7 for Cone of Tragedy (kostyme 84), 11 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (11 ruter), bilde to `jobber/fig084_01/resultat.png`)
@@ -1992,13 +1979,13 @@ Figurark for Cone of Tragedy, Fiskesnøre.
 - [ ] `fig084_10` (figurark 10 for Cone of Tragedy (kostyme 84), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `jobber/fig084_01/resultat.png`)
 - [ ] `fig189_01` (figurark 1 for Fiskesnøre (kostyme 189), 22 ruter: start mot høyre (22 ruter))
 - [ ] `fig189_02` (figurark 2 for Fiskesnøre (kostyme 189), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig189_01/resultat.png`)
-- [ ] `fig189_03` (figurark 3 for Fiskesnøre (kostyme 189), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig189_01/resultat.png`)
-- [ ] `fig189_04` (figurark 4 for Fiskesnøre (kostyme 189), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig189_01/resultat.png`)
 
-## Bestilling 133
+## Bestilling 132
 
 Figurark for Fiskesnøre.
 
+- [ ] `fig189_03` (figurark 3 for Fiskesnøre (kostyme 189), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig189_01/resultat.png`)
+- [ ] `fig189_04` (figurark 4 for Fiskesnøre (kostyme 189), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig189_01/resultat.png`)
 - [ ] `fig189_05` (figurark 5 for Fiskesnøre (kostyme 189), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig189_01/resultat.png`)
 - [ ] `fig189_06` (figurark 6 for Fiskesnøre (kostyme 189), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig189_01/resultat.png`)
 - [ ] `fig189_07` (figurark 7 for Fiskesnøre (kostyme 189), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig189_01/resultat.png`)
@@ -2007,13 +1994,13 @@ Figurark for Fiskesnøre.
 - [ ] `fig189_10` (figurark 10 for Fiskesnøre (kostyme 189), 4 ruter: start mot høyre (3 ruter); animasjon 7 mot høyre (1 rute), bilde to `jobber/fig189_01/resultat.png`)
 - [ ] `fig190_01` (figurark 1 for Fiskesnøre (kostyme 190), 13 ruter: start mot høyre (13 ruter))
 - [ ] `fig190_02` (figurark 2 for Fiskesnøre (kostyme 190), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig190_01/resultat.png`)
-- [ ] `fig190_03` (figurark 3 for Fiskesnøre (kostyme 190), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig190_01/resultat.png`)
-- [ ] `fig190_04` (figurark 4 for Fiskesnøre (kostyme 190), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig190_01/resultat.png`)
 
-## Bestilling 134
+## Bestilling 133
 
 Figurark for Fiskesnøre, Vann.
 
+- [ ] `fig190_03` (figurark 3 for Fiskesnøre (kostyme 190), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig190_01/resultat.png`)
+- [ ] `fig190_04` (figurark 4 for Fiskesnøre (kostyme 190), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig190_01/resultat.png`)
 - [ ] `fig190_05` (figurark 5 for Fiskesnøre (kostyme 190), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig190_01/resultat.png`)
 - [ ] `fig190_06` (figurark 6 for Fiskesnøre (kostyme 190), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig190_01/resultat.png`)
 - [ ] `fig190_07` (figurark 7 for Fiskesnøre (kostyme 190), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig190_01/resultat.png`)
@@ -2022,13 +2009,13 @@ Figurark for Fiskesnøre, Vann.
 - [ ] `fig190_10` (figurark 10 for Fiskesnøre (kostyme 190), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig190_01/resultat.png`)
 - [ ] `fig281_01` (figurark 1 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter))
 - [ ] `fig281_02` (figurark 2 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig281_01/resultat.png`)
-- [ ] `fig281_03` (figurark 3 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig281_01/resultat.png`)
-- [ ] `fig281_04` (figurark 4 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig281_01/resultat.png`)
 
-## Bestilling 135
+## Bestilling 134
 
 Figurark for Vann, Aubergine.
 
+- [ ] `fig281_03` (figurark 3 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig281_01/resultat.png`)
+- [ ] `fig281_04` (figurark 4 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig281_01/resultat.png`)
 - [ ] `fig281_05` (figurark 5 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig281_01/resultat.png`)
 - [ ] `fig281_06` (figurark 6 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig281_01/resultat.png`)
 - [ ] `fig281_07` (figurark 7 for Vann (kostyme 281), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig281_01/resultat.png`)
@@ -2037,13 +2024,13 @@ Figurark for Vann, Aubergine.
 - [ ] `fig281_10` (figurark 10 for Vann (kostyme 281), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig281_01/resultat.png`)
 - [ ] `fig347_01` (figurark 1 for Aubergine (kostyme 347), 8 ruter: start mot høyre (8 ruter))
 - [ ] `fig347_02` (figurark 2 for Aubergine (kostyme 347), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig347_01/resultat.png`)
-- [ ] `fig347_03` (figurark 3 for Aubergine (kostyme 347), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig347_01/resultat.png`)
-- [ ] `fig347_04` (figurark 4 for Aubergine (kostyme 347), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig347_01/resultat.png`)
 
-## Bestilling 136
+## Bestilling 135
 
 Figurark for Aubergine, Forskeren (nærbilde).
 
+- [ ] `fig347_03` (figurark 3 for Aubergine (kostyme 347), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig347_01/resultat.png`)
+- [ ] `fig347_04` (figurark 4 for Aubergine (kostyme 347), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig347_01/resultat.png`)
 - [ ] `fig347_05` (figurark 5 for Aubergine (kostyme 347), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig347_01/resultat.png`)
 - [ ] `fig347_06` (figurark 6 for Aubergine (kostyme 347), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig347_01/resultat.png`)
 - [ ] `fig347_07` (figurark 7 for Aubergine (kostyme 347), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig347_01/resultat.png`)
@@ -2052,13 +2039,13 @@ Figurark for Aubergine, Forskeren (nærbilde).
 - [ ] `fig347_10` (figurark 10 for Aubergine (kostyme 347), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig347_01/resultat.png`)
 - [ ] `fig023_01` (figurark 1 for Forskeren (nærbilde) (kostyme 23), 16 ruter: start (lag 14, tegnes over kroppen) mot høyre (16 ruter))
 - [ ] `fig023_02` (figurark 2 for Forskeren (nærbilde) (kostyme 23), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig023_01/resultat.png`)
-- [ ] `fig023_03` (figurark 3 for Forskeren (nærbilde) (kostyme 23), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig023_01/resultat.png`)
-- [ ] `fig023_04` (figurark 4 for Forskeren (nærbilde) (kostyme 23), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig023_01/resultat.png`)
 
-## Bestilling 137
+## Bestilling 136
 
 Figurark for Forskeren (nærbilde), Fisk.
 
+- [ ] `fig023_03` (figurark 3 for Forskeren (nærbilde) (kostyme 23), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig023_01/resultat.png`)
+- [ ] `fig023_04` (figurark 4 for Forskeren (nærbilde) (kostyme 23), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig023_01/resultat.png`)
 - [ ] `fig023_05` (figurark 5 for Forskeren (nærbilde) (kostyme 23), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig023_01/resultat.png`)
 - [ ] `fig023_06` (figurark 6 for Forskeren (nærbilde) (kostyme 23), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig023_01/resultat.png`)
 - [ ] `fig023_07` (figurark 7 for Forskeren (nærbilde) (kostyme 23), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig023_01/resultat.png`)
@@ -2067,13 +2054,13 @@ Figurark for Forskeren (nærbilde), Fisk.
 - [ ] `fig180_01` (figurark 1 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter))
 - [ ] `fig180_02` (figurark 2 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
 - [ ] `fig180_03` (figurark 3 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
-- [ ] `fig180_04` (figurark 4 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
-- [ ] `fig180_05` (figurark 5 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
 
-## Bestilling 138
+## Bestilling 137
 
 Figurark for Fisk, Vann.
 
+- [ ] `fig180_04` (figurark 4 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
+- [ ] `fig180_05` (figurark 5 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
 - [ ] `fig180_06` (figurark 6 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
 - [ ] `fig180_07` (figurark 7 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
 - [ ] `fig180_08` (figurark 8 for Fisk (kostyme 180), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig180_01/resultat.png`)
@@ -2082,13 +2069,13 @@ Figurark for Fisk, Vann.
 - [ ] `fig284_02` (figurark 2 for Vann (kostyme 284), 5 ruter: animasjon 7 mot høyre (5 ruter), bilde to `jobber/fig284_01/resultat.png`)
 - [ ] `fig284_03` (figurark 3 for Vann (kostyme 284), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig284_01/resultat.png`)
 - [ ] `fig284_04` (figurark 4 for Vann (kostyme 284), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig284_01/resultat.png`)
-- [ ] `fig284_05` (figurark 5 for Vann (kostyme 284), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig284_01/resultat.png`)
-- [ ] `fig284_06` (figurark 6 for Vann (kostyme 284), 1 rute: animasjon 8 mot høyre (1 rute), bilde to `jobber/fig284_01/resultat.png`)
 
-## Bestilling 139
+## Bestilling 138
 
 Figurark for Vann, Cone of Tragedy.
 
+- [ ] `fig284_05` (figurark 5 for Vann (kostyme 284), 2 ruter: animasjon 8 mot høyre (2 ruter), bilde to `jobber/fig284_01/resultat.png`)
+- [ ] `fig284_06` (figurark 6 for Vann (kostyme 284), 1 rute: animasjon 8 mot høyre (1 rute), bilde to `jobber/fig284_01/resultat.png`)
 - [ ] `fig284_07` (figurark 7 for Vann (kostyme 284), 12 ruter: animasjon 9 (lag 14, tegnes over kroppen) mot høyre (5 ruter); animasjon 9 mot høyre (7 ruter), bilde to `jobber/fig284_01/resultat.png`)
 - [ ] `fig284_08` (figurark 8 for Vann (kostyme 284), 5 ruter: animasjon 9 mot høyre (5 ruter), bilde to `jobber/fig284_01/resultat.png`)
 - [ ] `fig284_09` (figurark 9 for Vann (kostyme 284), 1 rute: animasjon 9 mot høyre (1 rute), bilde to `jobber/fig284_01/resultat.png`)
@@ -2097,13 +2084,13 @@ Figurark for Vann, Cone of Tragedy.
 - [ ] `fig086_03` (figurark 3 for Cone of Tragedy (kostyme 86), 8 ruter: start (lag 14, tegnes over kroppen) mot høyre (8 ruter), bilde to `jobber/fig086_01/resultat.png`)
 - [ ] `fig086_04` (figurark 4 for Cone of Tragedy (kostyme 86), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig086_01/resultat.png`)
 - [ ] `fig086_05` (figurark 5 for Cone of Tragedy (kostyme 86), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig086_01/resultat.png`)
+
+## Bestilling 139
+
+Figurark for Cone of Tragedy, Kvinne med lang hals.
+
 - [ ] `fig086_06` (figurark 6 for Cone of Tragedy (kostyme 86), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig086_01/resultat.png`)
 - [ ] `fig086_07` (figurark 7 for Cone of Tragedy (kostyme 86), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig086_01/resultat.png`)
-
-## Bestilling 140
-
-Figurark for Cone of Tragedy, Kvinne med lang hals, Gnister.
-
 - [ ] `fig086_08` (figurark 8 for Cone of Tragedy (kostyme 86), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig086_01/resultat.png`)
 - [ ] `fig104_01` (figurark 1 for Kvinne med lang hals (kostyme 104), 11 ruter: start mot høyre (5 ruter); animasjon 7 mot høyre (6 ruter))
 - [ ] `fig104_02` (figurark 2 for Kvinne med lang hals (kostyme 104), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `jobber/fig104_01/resultat.png`)
@@ -2112,13 +2099,13 @@ Figurark for Cone of Tragedy, Kvinne med lang hals, Gnister.
 - [ ] `fig104_05` (figurark 5 for Kvinne med lang hals (kostyme 104), 10 ruter: animasjon 10 mot høyre (2 ruter); animasjon 11 mot høyre (8 ruter), bilde to `jobber/fig104_01/resultat.png`)
 - [ ] `fig104_06` (figurark 6 for Kvinne med lang hals (kostyme 104), 16 ruter: animasjon 11 mot høyre (16 ruter), bilde to `jobber/fig104_01/resultat.png`)
 - [ ] `fig104_07` (figurark 7 for Kvinne med lang hals (kostyme 104), 18 ruter: animasjon 11 mot høyre (18 ruter), bilde to `jobber/fig104_01/resultat.png`)
+
+## Bestilling 140
+
+Figurark for Kvinne med lang hals, Gnister, Fiskesnøre.
+
 - [ ] `fig104_08` (figurark 8 for Kvinne med lang hals (kostyme 104), 12 ruter: animasjon 11 mot høyre (12 ruter), bilde to `jobber/fig104_01/resultat.png`)
 - [ ] `fig156_01` (figurark 1 for Gnister (kostyme 156), 11 ruter: start mot høyre (11 ruter))
-
-## Bestilling 141
-
-Figurark for Gnister, Fiskesnøre.
-
 - [ ] `fig156_02` (figurark 2 for Gnister (kostyme 156), 13 ruter: animasjon 7 mot høyre (8 ruter); animasjon 8 mot høyre (5 ruter), bilde to `jobber/fig156_01/resultat.png`)
 - [ ] `fig156_03` (figurark 3 for Gnister (kostyme 156), 7 ruter: animasjon 8 mot høyre (7 ruter), bilde to `jobber/fig156_01/resultat.png`)
 - [ ] `fig156_04` (figurark 4 for Gnister (kostyme 156), 4 ruter: animasjon 8 mot høyre (4 ruter), bilde to `jobber/fig156_01/resultat.png`)
@@ -2127,13 +2114,13 @@ Figurark for Gnister, Fiskesnøre.
 - [ ] `fig156_07` (figurark 7 for Gnister (kostyme 156), 4 ruter: animasjon 8 mot høyre (4 ruter), bilde to `jobber/fig156_01/resultat.png`)
 - [ ] `fig156_08` (figurark 8 for Gnister (kostyme 156), 6 ruter: animasjon 8 mot høyre (6 ruter), bilde to `jobber/fig156_01/resultat.png`)
 - [ ] `fig171_01` (figurark 1 for Fiskesnøre (kostyme 171), 6 ruter: start mot høyre (6 ruter))
-- [ ] `fig171_02` (figurark 2 for Fiskesnøre (kostyme 171), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig171_01/resultat.png`)
-- [ ] `fig171_03` (figurark 3 for Fiskesnøre (kostyme 171), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig171_01/resultat.png`)
 
-## Bestilling 142
+## Bestilling 141
 
 Figurark for Fiskesnøre, Gammel bigfoot.
 
+- [ ] `fig171_02` (figurark 2 for Fiskesnøre (kostyme 171), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig171_01/resultat.png`)
+- [ ] `fig171_03` (figurark 3 for Fiskesnøre (kostyme 171), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig171_01/resultat.png`)
 - [ ] `fig171_04` (figurark 4 for Fiskesnøre (kostyme 171), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig171_01/resultat.png`)
 - [ ] `fig171_05` (figurark 5 for Fiskesnøre (kostyme 171), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig171_01/resultat.png`)
 - [ ] `fig171_06` (figurark 6 for Fiskesnøre (kostyme 171), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig171_01/resultat.png`)
@@ -2142,13 +2129,13 @@ Figurark for Fiskesnøre, Gammel bigfoot.
 - [ ] `fig275_01` (figurark 1 for Gammel bigfoot (kostyme 275), 10 ruter: start mot høyre (10 ruter))
 - [ ] `fig275_02` (figurark 2 for Gammel bigfoot (kostyme 275), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig275_01/resultat.png`)
 - [ ] `fig275_03` (figurark 3 for Gammel bigfoot (kostyme 275), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig275_01/resultat.png`)
-- [ ] `fig275_04` (figurark 4 for Gammel bigfoot (kostyme 275), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig275_01/resultat.png`)
-- [ ] `fig275_05` (figurark 5 for Gammel bigfoot (kostyme 275), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig275_01/resultat.png`)
 
-## Bestilling 143
+## Bestilling 142
 
 Figurark for Gammel bigfoot.
 
+- [ ] `fig275_04` (figurark 4 for Gammel bigfoot (kostyme 275), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig275_01/resultat.png`)
+- [ ] `fig275_05` (figurark 5 for Gammel bigfoot (kostyme 275), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig275_01/resultat.png`)
 - [ ] `fig275_06` (figurark 6 for Gammel bigfoot (kostyme 275), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig275_01/resultat.png`)
 - [ ] `fig275_07` (figurark 7 for Gammel bigfoot (kostyme 275), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig275_01/resultat.png`)
 - [ ] `fig275_08` (figurark 8 for Gammel bigfoot (kostyme 275), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig275_01/resultat.png`)
@@ -2157,13 +2144,13 @@ Figurark for Gammel bigfoot.
 - [ ] `fig276_03` (figurark 3 for Gammel bigfoot (kostyme 276), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig276_01/resultat.png`)
 - [ ] `fig276_04` (figurark 4 for Gammel bigfoot (kostyme 276), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig276_01/resultat.png`)
 - [ ] `fig276_05` (figurark 5 for Gammel bigfoot (kostyme 276), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig276_01/resultat.png`)
+
+## Bestilling 143
+
+Figurark for Gammel bigfoot, Virvel.
+
 - [ ] `fig276_06` (figurark 6 for Gammel bigfoot (kostyme 276), 11 ruter: start mot høyre (11 ruter), bilde to `jobber/fig276_01/resultat.png`)
 - [ ] `fig276_07` (figurark 7 for Gammel bigfoot (kostyme 276), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig276_01/resultat.png`)
-
-## Bestilling 144
-
-Figurark for Gammel bigfoot, Virvel, Mannen med turban.
-
 - [ ] `fig276_08` (figurark 8 for Gammel bigfoot (kostyme 276), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig276_01/resultat.png`)
 - [ ] `fig330_01` (figurark 1 for Virvel (kostyme 330), 11 ruter: start mot høyre (11 ruter))
 - [ ] `fig330_02` (figurark 2 for Virvel (kostyme 330), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig330_01/resultat.png`)
@@ -2172,13 +2159,13 @@ Figurark for Gammel bigfoot, Virvel, Mannen med turban.
 - [ ] `fig330_05` (figurark 5 for Virvel (kostyme 330), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig330_01/resultat.png`)
 - [ ] `fig330_06` (figurark 6 for Virvel (kostyme 330), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig330_01/resultat.png`)
 - [ ] `fig330_07` (figurark 7 for Virvel (kostyme 330), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig330_01/resultat.png`)
+
+## Bestilling 144
+
+Figurark for Virvel, Mannen med turban, Gammel bigfoot.
+
 - [ ] `fig330_08` (figurark 8 for Virvel (kostyme 330), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig330_01/resultat.png`)
 - [ ] `fig071_01` (figurark 1 for Mannen med turban (kostyme 71), 8 ruter: start mot høyre (1 rute); animasjon 7 (lag 14, tegnes over kroppen) mot høyre (1 rute); animasjon 7 mot høyre (6 ruter))
-
-## Bestilling 145
-
-Figurark for Mannen med turban, Gammel bigfoot.
-
 - [ ] `fig071_02` (figurark 2 for Mannen med turban (kostyme 71), 18 ruter: animasjon 7 mot høyre (18 ruter), bilde to `jobber/fig071_01/resultat.png`)
 - [ ] `fig071_03` (figurark 3 for Mannen med turban (kostyme 71), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `jobber/fig071_01/resultat.png`)
 - [ ] `fig071_04` (figurark 4 for Mannen med turban (kostyme 71), 14 ruter: animasjon 7 mot høyre (14 ruter), bilde to `jobber/fig071_01/resultat.png`)
@@ -2187,13 +2174,13 @@ Figurark for Mannen med turban, Gammel bigfoot.
 - [ ] `fig071_07` (figurark 7 for Mannen med turban (kostyme 71), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `jobber/fig071_01/resultat.png`)
 - [ ] `fig277_01` (figurark 1 for Gammel bigfoot (kostyme 277), 10 ruter: start mot høyre (10 ruter))
 - [ ] `fig277_02` (figurark 2 for Gammel bigfoot (kostyme 277), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig277_01/resultat.png`)
-- [ ] `fig277_03` (figurark 3 for Gammel bigfoot (kostyme 277), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig277_01/resultat.png`)
-- [ ] `fig277_04` (figurark 4 for Gammel bigfoot (kostyme 277), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig277_01/resultat.png`)
 
-## Bestilling 146
+## Bestilling 145
 
 Figurark for Gammel bigfoot, Vann.
 
+- [ ] `fig277_03` (figurark 3 for Gammel bigfoot (kostyme 277), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig277_01/resultat.png`)
+- [ ] `fig277_04` (figurark 4 for Gammel bigfoot (kostyme 277), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig277_01/resultat.png`)
 - [ ] `fig277_05` (figurark 5 for Gammel bigfoot (kostyme 277), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig277_01/resultat.png`)
 - [ ] `fig277_06` (figurark 6 for Gammel bigfoot (kostyme 277), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig277_01/resultat.png`)
 - [ ] `fig277_07` (figurark 7 for Gammel bigfoot (kostyme 277), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig277_01/resultat.png`)
@@ -2202,13 +2189,13 @@ Figurark for Gammel bigfoot, Vann.
 - [ ] `fig286_03` (figurark 3 for Vann (kostyme 286), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig286_01/resultat.png`)
 - [ ] `fig286_04` (figurark 4 for Vann (kostyme 286), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig286_01/resultat.png`)
 - [ ] `fig286_05` (figurark 5 for Vann (kostyme 286), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig286_01/resultat.png`)
+
+## Bestilling 146
+
+Figurark for Vann, Røyk, Grener.
+
 - [ ] `fig286_06` (figurark 6 for Vann (kostyme 286), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig286_01/resultat.png`)
 - [ ] `fig286_07` (figurark 7 for Vann (kostyme 286), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig286_01/resultat.png`)
-
-## Bestilling 147
-
-Figurark for Røyk, Grener.
-
 - [ ] `fig011_01` (figurark 1 for Røyk (kostyme 11), 17 ruter: start mot høyre (17 ruter))
 - [ ] `fig011_02` (figurark 2 for Røyk (kostyme 11), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig011_01/resultat.png`)
 - [ ] `fig011_03` (figurark 3 for Røyk (kostyme 11), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig011_01/resultat.png`)
@@ -2217,13 +2204,13 @@ Figurark for Røyk, Grener.
 - [ ] `fig011_06` (figurark 6 for Røyk (kostyme 11), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig011_01/resultat.png`)
 - [ ] `fig060_01` (figurark 1 for Grener (kostyme 60), 9 ruter: start mot høyre (9 ruter))
 - [ ] `fig060_02` (figurark 2 for Grener (kostyme 60), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig060_01/resultat.png`)
+
+## Bestilling 147
+
+Figurark for Grener.
+
 - [ ] `fig060_03` (figurark 3 for Grener (kostyme 60), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig060_01/resultat.png`)
 - [ ] `fig060_04` (figurark 4 for Grener (kostyme 60), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig060_01/resultat.png`)
-
-## Bestilling 148
-
-Figurark for Grener, Cone of Tragedy.
-
 - [ ] `fig060_05` (figurark 5 for Grener (kostyme 60), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig060_01/resultat.png`)
 - [ ] `fig060_06` (figurark 6 for Grener (kostyme 60), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig060_01/resultat.png`)
 - [ ] `fig061_01` (figurark 1 for Grener (kostyme 61), 2 ruter: start mot høyre (2 ruter))
@@ -2232,13 +2219,13 @@ Figurark for Grener, Cone of Tragedy.
 - [ ] `fig061_04` (figurark 4 for Grener (kostyme 61), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig061_01/resultat.png`)
 - [ ] `fig061_05` (figurark 5 for Grener (kostyme 61), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig061_01/resultat.png`)
 - [ ] `fig061_06` (figurark 6 for Grener (kostyme 61), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig061_01/resultat.png`)
-- [ ] `fig089_01` (figurark 1 for Cone of Tragedy (kostyme 89), 13 ruter: start (lag 14, tegnes over kroppen) mot høyre (1 rute); start mot høyre (12 ruter))
-- [ ] `fig089_02` (figurark 2 for Cone of Tragedy (kostyme 89), 30 ruter: start mot høyre (30 ruter), bilde to `jobber/fig089_01/resultat.png`)
 
-## Bestilling 149
+## Bestilling 148
 
 Figurark for Cone of Tragedy, Kapselen.
 
+- [ ] `fig089_01` (figurark 1 for Cone of Tragedy (kostyme 89), 13 ruter: start (lag 14, tegnes over kroppen) mot høyre (1 rute); start mot høyre (12 ruter))
+- [ ] `fig089_02` (figurark 2 for Cone of Tragedy (kostyme 89), 30 ruter: start mot høyre (30 ruter), bilde to `jobber/fig089_01/resultat.png`)
 - [ ] `fig089_03` (figurark 3 for Cone of Tragedy (kostyme 89), 27 ruter: start mot høyre (27 ruter), bilde to `jobber/fig089_01/resultat.png`)
 - [ ] `fig089_04` (figurark 4 for Cone of Tragedy (kostyme 89), 16 ruter: animasjon 8 mot høyre (8 ruter); animasjon 9 mot høyre (1 rute); animasjon 10 mot høyre (4 ruter); animasjon 11 mot høyre (3 ruter), bilde to `jobber/fig089_01/resultat.png`)
 - [ ] `fig089_05` (figurark 5 for Cone of Tragedy (kostyme 89), 17 ruter: animasjon 11 mot høyre (17 ruter), bilde to `jobber/fig089_01/resultat.png`)
@@ -2247,13 +2234,13 @@ Figurark for Cone of Tragedy, Kapselen.
 - [ ] `fig144_02` (figurark 2 for Kapselen (kostyme 144), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig144_01/resultat.png`)
 - [ ] `fig144_03` (figurark 3 for Kapselen (kostyme 144), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig144_01/resultat.png`)
 - [ ] `fig144_04` (figurark 4 for Kapselen (kostyme 144), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig144_01/resultat.png`)
+
+## Bestilling 149
+
+Figurark for Kapselen, Kokken, Figur i pels.
+
 - [ ] `fig144_05` (figurark 5 for Kapselen (kostyme 144), 13 ruter: start mot høyre (13 ruter), bilde to `jobber/fig144_01/resultat.png`)
 - [ ] `fig144_06` (figurark 6 for Kapselen (kostyme 144), 11 ruter: start mot høyre (11 ruter), bilde to `jobber/fig144_01/resultat.png`)
-
-## Bestilling 150
-
-Figurark for Kokken, Figur i pels.
-
 - [ ] `fig160_01` (figurark 1 for Kokken (kostyme 160), 15 ruter: start mot høyre (15 ruter))
 - [ ] `fig160_02` (figurark 2 for Kokken (kostyme 160), 13 ruter: start mot høyre (13 ruter), bilde to `jobber/fig160_01/resultat.png`)
 - [ ] `fig160_03` (figurark 3 for Kokken (kostyme 160), 13 ruter: start mot høyre (13 ruter), bilde to `jobber/fig160_01/resultat.png`)
@@ -2262,13 +2249,13 @@ Figurark for Kokken, Figur i pels.
 - [ ] `fig160_06` (figurark 6 for Kokken (kostyme 160), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig160_01/resultat.png`)
 - [ ] `fig262_01` (figurark 1 for Figur i pels (kostyme 262), 10 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 5, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig262_02` (figurark 2 for Figur i pels (kostyme 262), 8 ruter: gange mot høyre (8 ruter), bilde to `jobber/fig262_01/resultat.png`)
-- [ ] `fig262_03` (figurark 3 for Figur i pels (kostyme 262), 17 ruter: snakking (lag 3, tegnes over kroppen) mot høyre (7 ruter); snakking (lag 4, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig262_01/resultat.png`)
-- [ ] `fig262_04` (figurark 4 for Figur i pels (kostyme 262), 8 ruter: gange mot oss (8 ruter), bilde to `jobber/fig262_01/resultat.png`)
 
-## Bestilling 151
+## Bestilling 150
 
 Figurark for Figur i pels, Gammel bigfoot.
 
+- [ ] `fig262_03` (figurark 3 for Figur i pels (kostyme 262), 17 ruter: snakking (lag 3, tegnes over kroppen) mot høyre (7 ruter); snakking (lag 4, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig262_01/resultat.png`)
+- [ ] `fig262_04` (figurark 4 for Figur i pels (kostyme 262), 8 ruter: gange mot oss (8 ruter), bilde to `jobber/fig262_01/resultat.png`)
 - [ ] `fig262_05` (figurark 5 for Figur i pels (kostyme 262), 8 ruter: gange bort (8 ruter), bilde to `jobber/fig262_01/resultat.png`)
 - [ ] `fig262_06` (figurark 6 for Figur i pels (kostyme 262), 1 rute: animasjon 6 (lag 0, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig262_01/resultat.png`)
 - [ ] `fig271_01` (figurark 1 for Gammel bigfoot (kostyme 271), 10 ruter: start mot høyre (10 ruter))
@@ -2277,13 +2264,13 @@ Figurark for Figur i pels, Gammel bigfoot.
 - [ ] `fig271_04` (figurark 4 for Gammel bigfoot (kostyme 271), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig271_01/resultat.png`)
 - [ ] `fig271_05` (figurark 5 for Gammel bigfoot (kostyme 271), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig271_01/resultat.png`)
 - [ ] `fig271_06` (figurark 6 for Gammel bigfoot (kostyme 271), 11 ruter: start mot høyre (4 ruter); animasjon 7 (lag 14, tegnes over kroppen) mot høyre (6 ruter); animasjon 7 mot høyre (1 rute), bilde to `jobber/fig271_01/resultat.png`)
-- [ ] `fig274_01` (figurark 1 for Gammel bigfoot (kostyme 274), 9 ruter: start mot høyre (9 ruter))
-- [ ] `fig274_02` (figurark 2 for Gammel bigfoot (kostyme 274), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig274_01/resultat.png`)
 
-## Bestilling 152
+## Bestilling 151
 
 Figurark for Gammel bigfoot.
 
+- [ ] `fig274_01` (figurark 1 for Gammel bigfoot (kostyme 274), 9 ruter: start mot høyre (9 ruter))
+- [ ] `fig274_02` (figurark 2 for Gammel bigfoot (kostyme 274), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig274_01/resultat.png`)
 - [ ] `fig274_03` (figurark 3 for Gammel bigfoot (kostyme 274), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig274_01/resultat.png`)
 - [ ] `fig274_04` (figurark 4 for Gammel bigfoot (kostyme 274), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig274_01/resultat.png`)
 - [ ] `fig274_05` (figurark 5 for Gammel bigfoot (kostyme 274), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig274_01/resultat.png`)
@@ -2292,13 +2279,13 @@ Figurark for Gammel bigfoot.
 - [ ] `fig279_02` (figurark 2 for Gammel bigfoot (kostyme 279), 11 ruter: start mot høyre (11 ruter), bilde to `jobber/fig279_01/resultat.png`)
 - [ ] `fig279_03` (figurark 3 for Gammel bigfoot (kostyme 279), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig279_01/resultat.png`)
 - [ ] `fig279_04` (figurark 4 for Gammel bigfoot (kostyme 279), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig279_01/resultat.png`)
+
+## Bestilling 152
+
+Figurark for Gammel bigfoot, Bigfootene, Tittelen.
+
 - [ ] `fig279_05` (figurark 5 for Gammel bigfoot (kostyme 279), 15 ruter: start mot høyre (15 ruter), bilde to `jobber/fig279_01/resultat.png`)
 - [ ] `fig279_06` (figurark 6 for Gammel bigfoot (kostyme 279), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig279_01/resultat.png`)
-
-## Bestilling 153
-
-Figurark for Bigfootene, Tittelen.
-
 - [ ] `fig289_01` (figurark 1 for Bigfootene (kostyme 289), 1 rute: start (lag 14, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig289_02` (figurark 2 for Bigfootene (kostyme 289), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig289_01/resultat.png`)
 - [ ] `fig289_03` (figurark 3 for Bigfootene (kostyme 289), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `jobber/fig289_01/resultat.png`)
@@ -2307,13 +2294,13 @@ Figurark for Bigfootene, Tittelen.
 - [ ] `fig289_06` (figurark 6 for Bigfootene (kostyme 289), 2 ruter: animasjon 8 mot høyre (1 rute); animasjon 9 mot høyre (1 rute), bilde to `jobber/fig289_01/resultat.png`)
 - [ ] `fig328_01` (figurark 1 for Tittelen (kostyme 328), 7 ruter: start mot høyre (7 ruter))
 - [ ] `fig328_02` (figurark 2 for Tittelen (kostyme 328), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig328_01/resultat.png`)
-- [ ] `fig328_03` (figurark 3 for Tittelen (kostyme 328), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig328_01/resultat.png`)
-- [ ] `fig328_04` (figurark 4 for Tittelen (kostyme 328), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig328_01/resultat.png`)
 
-## Bestilling 154
+## Bestilling 153
 
 Figurark for Tittelen, Ildkule, Svanebåten.
 
+- [ ] `fig328_03` (figurark 3 for Tittelen (kostyme 328), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig328_01/resultat.png`)
+- [ ] `fig328_04` (figurark 4 for Tittelen (kostyme 328), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig328_01/resultat.png`)
 - [ ] `fig328_05` (figurark 5 for Tittelen (kostyme 328), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig328_01/resultat.png`)
 - [ ] `fig328_06` (figurark 6 for Tittelen (kostyme 328), 5 ruter: animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (4 ruter), bilde to `jobber/fig328_01/resultat.png`)
 - [ ] `fig074_01` (figurark 1 for Ildkule (kostyme 74), 9 ruter: start mot høyre (9 ruter))
@@ -2322,13 +2309,13 @@ Figurark for Tittelen, Ildkule, Svanebåten.
 - [ ] `fig074_04` (figurark 4 for Ildkule (kostyme 74), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig074_01/resultat.png`)
 - [ ] `fig074_05` (figurark 5 for Ildkule (kostyme 74), 11 ruter: start (lag 15, tegnes over kroppen) mot høyre (11 ruter), bilde to `jobber/fig074_01/resultat.png`)
 - [ ] `fig093_01` (figurark 1 for Svanebåten (kostyme 93), 6 ruter: start mot høyre (6 ruter))
-- [ ] `fig093_02` (figurark 2 for Svanebåten (kostyme 93), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig093_01/resultat.png`)
-- [ ] `fig093_03` (figurark 3 for Svanebåten (kostyme 93), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig093_01/resultat.png`)
 
-## Bestilling 155
+## Bestilling 154
 
 Figurark for Svanebåten, Fisk, Gammel bigfoot.
 
+- [ ] `fig093_02` (figurark 2 for Svanebåten (kostyme 93), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig093_01/resultat.png`)
+- [ ] `fig093_03` (figurark 3 for Svanebåten (kostyme 93), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig093_01/resultat.png`)
 - [ ] `fig093_04` (figurark 4 for Svanebåten (kostyme 93), 15 ruter: start mot høyre (2 ruter); start (lag 15, tegnes over kroppen) mot høyre (13 ruter), bilde to `jobber/fig093_01/resultat.png`)
 - [ ] `fig093_05` (figurark 5 for Svanebåten (kostyme 93), 8 ruter: start (lag 15, tegnes over kroppen) mot høyre (8 ruter), bilde to `jobber/fig093_01/resultat.png`)
 - [ ] `fig191_01` (figurark 1 for Fisk (kostyme 191), 9 ruter: start mot høyre (9 ruter))
@@ -2337,13 +2324,13 @@ Figurark for Svanebåten, Fisk, Gammel bigfoot.
 - [ ] `fig191_04` (figurark 4 for Fisk (kostyme 191), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig191_01/resultat.png`)
 - [ ] `fig191_05` (figurark 5 for Fisk (kostyme 191), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig191_01/resultat.png`)
 - [ ] `fig273_01` (figurark 1 for Gammel bigfoot (kostyme 273), 10 ruter: start mot høyre (10 ruter))
-- [ ] `fig273_02` (figurark 2 for Gammel bigfoot (kostyme 273), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig273_01/resultat.png`)
-- [ ] `fig273_03` (figurark 3 for Gammel bigfoot (kostyme 273), 11 ruter: start mot høyre (11 ruter), bilde to `jobber/fig273_01/resultat.png`)
 
-## Bestilling 156
+## Bestilling 155
 
 Figurark for Gammel bigfoot, Tre, Forskerens hode (nærbilde).
 
+- [ ] `fig273_02` (figurark 2 for Gammel bigfoot (kostyme 273), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig273_01/resultat.png`)
+- [ ] `fig273_03` (figurark 3 for Gammel bigfoot (kostyme 273), 11 ruter: start mot høyre (11 ruter), bilde to `jobber/fig273_01/resultat.png`)
 - [ ] `fig273_04` (figurark 4 for Gammel bigfoot (kostyme 273), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig273_01/resultat.png`)
 - [ ] `fig273_05` (figurark 5 for Gammel bigfoot (kostyme 273), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig273_01/resultat.png`)
 - [ ] `fig287_01` (figurark 1 for Tre (kostyme 287), 4 ruter: start mot høyre (4 ruter))
@@ -2352,13 +2339,13 @@ Figurark for Gammel bigfoot, Tre, Forskerens hode (nærbilde).
 - [ ] `fig287_04` (figurark 4 for Tre (kostyme 287), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig287_01/resultat.png`)
 - [ ] `fig287_05` (figurark 5 for Tre (kostyme 287), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig287_01/resultat.png`)
 - [ ] `fig033_01` (figurark 1 for Forskerens hode (nærbilde) (kostyme 33), 18 ruter: start mot høyre (18 ruter))
+
+## Bestilling 156
+
+Figurark for Forskerens hode (nærbilde), Rød gjenstand, Telt.
+
 - [ ] `fig033_02` (figurark 2 for Forskerens hode (nærbilde) (kostyme 33), 18 ruter: start mot høyre (18 ruter), bilde to `jobber/fig033_01/resultat.png`)
 - [ ] `fig033_03` (figurark 3 for Forskerens hode (nærbilde) (kostyme 33), 18 ruter: start mot høyre (18 ruter), bilde to `jobber/fig033_01/resultat.png`)
-
-## Bestilling 157
-
-Figurark for Forskerens hode (nærbilde), Rød gjenstand, Telt, Slagsmål.
-
 - [ ] `fig033_04` (figurark 4 for Forskerens hode (nærbilde) (kostyme 33), 22 ruter: start mot høyre (12 ruter); start (lag 15, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig033_01/resultat.png`)
 - [ ] `fig043_01` (figurark 1 for Rød gjenstand (kostyme 43), 70 ruter: start mot høyre (70 ruter))
 - [ ] `fig043_02` (figurark 2 for Rød gjenstand (kostyme 43), 18 ruter: start mot høyre (18 ruter), bilde to `jobber/fig043_01/resultat.png`)
@@ -2367,13 +2354,13 @@ Figurark for Forskerens hode (nærbilde), Rød gjenstand, Telt, Slagsmål.
 - [ ] `fig076_01` (figurark 1 for Telt (kostyme 76), 3 ruter: start mot høyre (3 ruter))
 - [ ] `fig076_02` (figurark 2 for Telt (kostyme 76), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig076_01/resultat.png`)
 - [ ] `fig076_03` (figurark 3 for Telt (kostyme 76), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig076_01/resultat.png`)
+
+## Bestilling 157
+
+Figurark for Telt, Slagsmål, Svanebåten, Kvinne med lang hals.
+
 - [ ] `fig076_04` (figurark 4 for Telt (kostyme 76), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig076_01/resultat.png`)
 - [ ] `fig079_01` (figurark 1 for Slagsmål (kostyme 79), 20 ruter: start mot høyre (1 rute); start (lag 3, tegnes over kroppen) mot høyre (1 rute); start (lag 4, tegnes over kroppen) mot høyre (1 rute); start (lag 5, tegnes over kroppen) mot høyre (1 rute); start (lag 6, tegnes over kroppen) mot høyre (1 rute); animasjon 8 (lag 4, tegnes over kroppen) mot høyre (15 ruter))
-
-## Bestilling 158
-
-Figurark for Slagsmål, Svanebåten, Kvinne med lang hals.
-
 - [ ] `fig079_02` (figurark 2 for Slagsmål (kostyme 79), 10 ruter: animasjon 10 (lag 3, tegnes over kroppen) mot høyre (10 ruter), bilde to `jobber/fig079_01/resultat.png`)
 - [ ] `fig079_03` (figurark 3 for Slagsmål (kostyme 79), 12 ruter: animasjon 15 mot høyre (12 ruter), bilde to `jobber/fig079_01/resultat.png`)
 - [ ] `fig079_04` (figurark 4 for Slagsmål (kostyme 79), 2 ruter: animasjon 15 (lag 3, tegnes over kroppen) mot høyre (1 rute); animasjon 15 (lag 4, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig079_01/resultat.png`)
@@ -2382,13 +2369,13 @@ Figurark for Slagsmål, Svanebåten, Kvinne med lang hals.
 - [ ] `fig094_03` (figurark 3 for Svanebåten (kostyme 94), 9 ruter: start mot høyre (5 ruter); start (lag 15, tegnes over kroppen) mot høyre (4 ruter), bilde to `jobber/fig094_01/resultat.png`)
 - [ ] `fig094_04` (figurark 4 for Svanebåten (kostyme 94), 15 ruter: start (lag 15, tegnes over kroppen) mot høyre (15 ruter), bilde to `jobber/fig094_01/resultat.png`)
 - [ ] `fig107_01` (figurark 1 for Kvinne med lang hals (kostyme 107), 6 ruter: start mot høyre (6 ruter))
+
+## Bestilling 158
+
+Figurark for Kvinne med lang hals, Vann, Helikopter.
+
 - [ ] `fig107_02` (figurark 2 for Kvinne med lang hals (kostyme 107), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig107_01/resultat.png`)
 - [ ] `fig107_03` (figurark 3 for Kvinne med lang hals (kostyme 107), 9 ruter: start mot høyre (4 ruter); start (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `jobber/fig107_01/resultat.png`)
-
-## Bestilling 159
-
-Figurark for Kvinne med lang hals, Vann, Helikopter, Fiskeren.
-
 - [ ] `fig107_04` (figurark 4 for Kvinne med lang hals (kostyme 107), 8 ruter: animasjon 7 mot høyre (4 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (4 ruter), bilde to `jobber/fig107_01/resultat.png`)
 - [ ] `fig173_01` (figurark 1 for Vann (kostyme 173), 21 ruter: start mot høyre (21 ruter))
 - [ ] `fig173_02` (figurark 2 for Vann (kostyme 173), 24 ruter: start mot høyre (24 ruter), bilde to `jobber/fig173_01/resultat.png`)
@@ -2397,13 +2384,13 @@ Figurark for Kvinne med lang hals, Vann, Helikopter, Fiskeren.
 - [ ] `fig177_01` (figurark 1 for Helikopter (kostyme 177), 28 ruter: start mot høyre (28 ruter))
 - [ ] `fig177_02` (figurark 2 for Helikopter (kostyme 177), 26 ruter: start mot høyre (26 ruter), bilde to `jobber/fig177_01/resultat.png`)
 - [ ] `fig177_03` (figurark 3 for Helikopter (kostyme 177), 44 ruter: start mot høyre (44 ruter), bilde to `jobber/fig177_01/resultat.png`)
+
+## Bestilling 159
+
+Figurark for Helikopter, Fiskeren, Fisk, Virvel.
+
 - [ ] `fig177_04` (figurark 4 for Helikopter (kostyme 177), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig177_01/resultat.png`)
 - [ ] `fig183_01` (figurark 1 for Fiskeren (kostyme 183), 6 ruter: start mot høyre (6 ruter))
-
-## Bestilling 160
-
-Figurark for Fiskeren, Fisk, Virvel.
-
 - [ ] `fig183_02` (figurark 2 for Fiskeren (kostyme 183), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig183_01/resultat.png`)
 - [ ] `fig183_03` (figurark 3 for Fiskeren (kostyme 183), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig183_01/resultat.png`)
 - [ ] `fig183_04` (figurark 4 for Fiskeren (kostyme 183), 15 ruter: start mot høyre (15 ruter), bilde to `jobber/fig183_01/resultat.png`)
@@ -2412,13 +2399,13 @@ Figurark for Fiskeren, Fisk, Virvel.
 - [ ] `fig184_03` (figurark 3 for Fisk (kostyme 184), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig184_01/resultat.png`)
 - [ ] `fig184_04` (figurark 4 for Fisk (kostyme 184), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig184_01/resultat.png`)
 - [ ] `fig198_01` (figurark 1 for Virvel (kostyme 198), 32 ruter: start mot høyre (32 ruter))
+
+## Bestilling 160
+
+Figurark for Virvel, Flygende tallerken.
+
 - [ ] `fig198_02` (figurark 2 for Virvel (kostyme 198), 27 ruter: start mot høyre (27 ruter), bilde to `jobber/fig198_01/resultat.png`)
 - [ ] `fig198_03` (figurark 3 for Virvel (kostyme 198), 24 ruter: start mot høyre (24 ruter), bilde to `jobber/fig198_01/resultat.png`)
-
-## Bestilling 161
-
-Figurark for Virvel, Flygende tallerken, Bigfoot.
-
 - [ ] `fig198_04` (figurark 4 for Virvel (kostyme 198), 17 ruter: start mot høyre (17 ruter), bilde to `jobber/fig198_01/resultat.png`)
 - [ ] `fig199_01` (figurark 1 for Virvel (kostyme 199), 36 ruter: start mot høyre (36 ruter))
 - [ ] `fig199_02` (figurark 2 for Virvel (kostyme 199), 25 ruter: start mot høyre (25 ruter), bilde to `jobber/fig199_01/resultat.png`)
@@ -2427,13 +2414,13 @@ Figurark for Virvel, Flygende tallerken, Bigfoot.
 - [ ] `fig212_01` (figurark 1 for Flygende tallerken (kostyme 212), 32 ruter: start mot høyre (32 ruter))
 - [ ] `fig212_02` (figurark 2 for Flygende tallerken (kostyme 212), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig212_01/resultat.png`)
 - [ ] `fig212_03` (figurark 3 for Flygende tallerken (kostyme 212), 10 ruter: start mot høyre (4 ruter); animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig212_01/resultat.png`)
+
+## Bestilling 161
+
+Figurark for Flygende tallerken, Bigfoot, Vann.
+
 - [ ] `fig212_04` (figurark 4 for Flygende tallerken (kostyme 212), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `jobber/fig212_01/resultat.png`)
 - [ ] `fig243_01` (figurark 1 for Bigfoot (kostyme 243), 23 ruter: start mot høyre (23 ruter))
-
-## Bestilling 162
-
-Figurark for Bigfoot, Vann.
-
 - [ ] `fig243_02` (figurark 2 for Bigfoot (kostyme 243), 10 ruter: start mot høyre (10 ruter), bilde to `jobber/fig243_01/resultat.png`)
 - [ ] `fig243_03` (figurark 3 for Bigfoot (kostyme 243), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig243_01/resultat.png`)
 - [ ] `fig243_04` (figurark 4 for Bigfoot (kostyme 243), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig243_01/resultat.png`)
@@ -2442,13 +2429,13 @@ Figurark for Bigfoot, Vann.
 - [ ] `fig282_03` (figurark 3 for Vann (kostyme 282), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig282_01/resultat.png`)
 - [ ] `fig282_04` (figurark 4 for Vann (kostyme 282), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig282_01/resultat.png`)
 - [ ] `fig283_01` (figurark 1 for Vann (kostyme 283), 4 ruter: start mot høyre (4 ruter))
-- [ ] `fig283_02` (figurark 2 for Vann (kostyme 283), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig283_01/resultat.png`)
-- [ ] `fig283_03` (figurark 3 for Vann (kostyme 283), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig283_01/resultat.png`)
 
-## Bestilling 163
+## Bestilling 162
 
 Figurark for Vann, Detaljer, Forskeren (nærbilde).
 
+- [ ] `fig283_02` (figurark 2 for Vann (kostyme 283), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig283_01/resultat.png`)
+- [ ] `fig283_03` (figurark 3 for Vann (kostyme 283), 8 ruter: start mot høyre (8 ruter), bilde to `jobber/fig283_01/resultat.png`)
 - [ ] `fig283_04` (figurark 4 for Vann (kostyme 283), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig283_01/resultat.png`)
 - [ ] `fig332_01` (figurark 1 for Detaljer (kostyme 332), 5 ruter: start mot høyre (5 ruter))
 - [ ] `fig332_02` (figurark 2 for Detaljer (kostyme 332), 3 ruter: start mot høyre (3 ruter), bilde to `jobber/fig332_01/resultat.png`)
@@ -2457,13 +2444,13 @@ Figurark for Vann, Detaljer, Forskeren (nærbilde).
 - [ ] `fig021_01` (figurark 1 for Forskeren (nærbilde) (kostyme 21), 32 ruter: start mot høyre (32 ruter))
 - [ ] `fig021_02` (figurark 2 for Forskeren (nærbilde) (kostyme 21), 34 ruter: start mot høyre (34 ruter), bilde to `jobber/fig021_01/resultat.png`)
 - [ ] `fig021_03` (figurark 3 for Forskeren (nærbilde) (kostyme 21), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig021_01/resultat.png`)
-- [ ] `fig024_01` (figurark 1 for Forskeren (nærbilde) (kostyme 24), 26 ruter: start mot høyre (26 ruter))
-- [ ] `fig024_02` (figurark 2 for Forskeren (nærbilde) (kostyme 24), 18 ruter: animasjon 7 mot høyre (18 ruter), bilde to `jobber/fig024_01/resultat.png`)
 
-## Bestilling 164
+## Bestilling 163
 
 Figurark for Forskeren (nærbilde), Mann (Snuckey's), Karusellbetjenten, Wak-A-Rat.
 
+- [ ] `fig024_01` (figurark 1 for Forskeren (nærbilde) (kostyme 24), 26 ruter: start mot høyre (26 ruter))
+- [ ] `fig024_02` (figurark 2 for Forskeren (nærbilde) (kostyme 24), 18 ruter: animasjon 7 mot høyre (18 ruter), bilde to `jobber/fig024_01/resultat.png`)
 - [ ] `fig024_03` (figurark 3 for Forskeren (nærbilde) (kostyme 24), 23 ruter: animasjon 7 mot høyre (23 ruter), bilde to `jobber/fig024_01/resultat.png`)
 - [ ] `fig065_01` (figurark 1 for Mann (Snuckey's) (kostyme 65), 14 ruter: stående mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); animasjon 6 mot oss (12 ruter))
 - [ ] `fig065_02` (figurark 2 for Mann (Snuckey's) (kostyme 65), 28 ruter: animasjon 6 mot oss (7 ruter); animasjon 6 (lag 3, tegnes over kroppen) mot oss (21 ruter), bilde to `jobber/fig065_01/resultat.png`)
@@ -2472,13 +2459,13 @@ Figurark for Forskeren (nærbilde), Mann (Snuckey's), Karusellbetjenten, Wak-A-R
 - [ ] `fig081_02` (figurark 2 for Karusellbetjenten (kostyme 81), 14 ruter: animasjon 6 (lag 4, tegnes over kroppen) mot høyre (1 rute); animasjon 6 (lag 5, tegnes over kroppen) mot høyre (6 ruter); animasjon 7 mot høyre (6 ruter); animasjon 7 (lag 4, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig081_01/resultat.png`)
 - [ ] `fig081_03` (figurark 3 for Karusellbetjenten (kostyme 81), 8 ruter: animasjon 7 mot oss (1 rute); animasjon 8 mot høyre (1 rute); animasjon 10 (lag 5, tegnes over kroppen) mot høyre (6 ruter), bilde to `jobber/fig081_01/resultat.png`)
 - [ ] `fig090_01` (figurark 1 for Wak-A-Rat (kostyme 90), 16 ruter: start mot høyre (1 rute); animasjon 6 mot oss (4 ruter); animasjon 8 mot oss (1 rute); animasjon 9 mot oss (5 ruter); animasjon 12 mot oss (5 ruter))
+
+## Bestilling 164
+
+Figurark for Wak-A-Rat, Mann i prikkete skjorte, Fisk, Helikopter.
+
 - [ ] `fig090_02` (figurark 2 for Wak-A-Rat (kostyme 90), 12 ruter: animasjon 15 mot oss (5 ruter); animasjon 17 mot oss (1 rute); animasjon 18 mot oss (2 ruter); animasjon 19 mot oss (2 ruter); animasjon 20 mot oss (2 ruter), bilde to `jobber/fig090_01/resultat.png`)
 - [ ] `fig090_03` (figurark 3 for Wak-A-Rat (kostyme 90), 2 ruter: animasjon 21 mot oss (2 ruter), bilde to `jobber/fig090_01/resultat.png`)
-
-## Bestilling 165
-
-Figurark for Mann i prikkete skjorte, Fisk, Helikopter, Hode med briller.
-
 - [ ] `fig109_01` (figurark 1 for Mann i prikkete skjorte (kostyme 109), 4 ruter: stående (lag 1, tegnes over kroppen) mot høyre (1 rute); stående mot høyre (1 rute); stående (lag 5, tegnes over kroppen) mot høyre (1 rute); stående (lag 9, tegnes over kroppen) mot høyre (1 rute))
 - [ ] `fig109_02` (figurark 2 for Mann i prikkete skjorte (kostyme 109), 36 ruter: snakking mot høyre (23 ruter); animasjon 6 mot høyre (6 ruter); animasjon 7 (lag 1, tegnes over kroppen) mot høyre (4 ruter); animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig109_01/resultat.png`)
 - [ ] `fig109_03` (figurark 3 for Mann i prikkete skjorte (kostyme 109), 13 ruter: animasjon 7 (lag 7, tegnes over kroppen) mot høyre (6 ruter); animasjon 8 (lag 5, tegnes over kroppen) mot høyre (6 ruter); animasjon 9 (lag 5, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig109_01/resultat.png`)
@@ -2487,13 +2474,13 @@ Figurark for Mann i prikkete skjorte, Fisk, Helikopter, Hode med briller.
 - [ ] `fig175_03` (figurark 3 for Fisk (kostyme 175), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig175_01/resultat.png`)
 - [ ] `fig176_01` (figurark 1 for Helikopter (kostyme 176), 24 ruter: start mot høyre (24 ruter))
 - [ ] `fig176_02` (figurark 2 for Helikopter (kostyme 176), 35 ruter: start mot høyre (35 ruter), bilde to `jobber/fig176_01/resultat.png`)
+
+## Bestilling 165
+
+Figurark for Helikopter, Hode med briller, Bigfoot, Isblokken.
+
 - [ ] `fig176_03` (figurark 3 for Helikopter (kostyme 176), 35 ruter: start mot høyre (35 ruter), bilde to `jobber/fig176_01/resultat.png`)
 - [ ] `fig206_01` (figurark 1 for Hode med briller (kostyme 206), 20 ruter: stående (lag 1, tegnes over kroppen) mot høyre (1 rute); stående (lag 2, tegnes over kroppen) mot høyre (1 rute); start mot høyre (1 rute); stående (lag 4, tegnes over kroppen) mot oss (1 rute); snakking mot oss (13 ruter); animasjon 6 mot oss (3 ruter))
-
-## Bestilling 166
-
-Figurark for Hode med briller, Bigfoot, Isblokken, Snø.
-
 - [ ] `fig206_02` (figurark 2 for Hode med briller (kostyme 206), 27 ruter: animasjon 7 mot oss (3 ruter); animasjon 8 mot oss (3 ruter); animasjon 9 mot oss (4 ruter); animasjon 10 mot oss (8 ruter); animasjon 11 (lag 2, tegnes over kroppen) mot oss (9 ruter), bilde to `jobber/fig206_01/resultat.png`)
 - [ ] `fig206_03` (figurark 3 for Hode med briller (kostyme 206), 9 ruter: animasjon 11 mot oss (3 ruter); animasjon 12 mot oss (1 rute); animasjon 13 mot oss (1 rute); animasjon 14 mot oss (2 ruter); animasjon 15 mot oss (2 ruter), bilde to `jobber/fig206_01/resultat.png`)
 - [ ] `fig257_01` (figurark 1 for Bigfoot (kostyme 257), 7 ruter: start (lag 1, tegnes over kroppen) mot høyre, mot venstre (2 ruter); start (lag 2, tegnes over kroppen) mot høyre (1 rute); start (lag 5, tegnes over kroppen) mot høyre (1 rute); animasjon 7 (lag 1, tegnes over kroppen) mot høyre (1 rute); animasjon 7 (lag 2, tegnes over kroppen) mot høyre (2 ruter))
@@ -2502,13 +2489,13 @@ Figurark for Hode med briller, Bigfoot, Isblokken, Snø.
 - [ ] `fig268_01` (figurark 1 for Isblokken (kostyme 268), 2 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (1 rute))
 - [ ] `fig268_02` (figurark 2 for Isblokken (kostyme 268), 2 ruter: animasjon 8 mot høyre (1 rute); animasjon 9 mot høyre (1 rute), bilde to `jobber/fig268_01/resultat.png`)
 - [ ] `fig268_03` (figurark 3 for Isblokken (kostyme 268), 1 rute: animasjon 10 mot høyre (1 rute), bilde to `jobber/fig268_01/resultat.png`)
-- [ ] `fig269_01` (figurark 1 for Snø (kostyme 269), 32 ruter: start mot høyre (32 ruter))
-- [ ] `fig269_02` (figurark 2 for Snø (kostyme 269), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig269_01/resultat.png`)
 
-## Bestilling 167
+## Bestilling 166
 
 Figurark for Snø, Gammel bigfoot, Kvinnen (intro), Kvinne med lang hals.
 
+- [ ] `fig269_01` (figurark 1 for Snø (kostyme 269), 32 ruter: start mot høyre (32 ruter))
+- [ ] `fig269_02` (figurark 2 for Snø (kostyme 269), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig269_01/resultat.png`)
 - [ ] `fig269_03` (figurark 3 for Snø (kostyme 269), 20 ruter: start mot høyre (20 ruter), bilde to `jobber/fig269_01/resultat.png`)
 - [ ] `fig278_01` (figurark 1 for Gammel bigfoot (kostyme 278), 12 ruter: start mot høyre (12 ruter))
 - [ ] `fig278_02` (figurark 2 for Gammel bigfoot (kostyme 278), 12 ruter: start mot høyre (12 ruter), bilde to `jobber/fig278_01/resultat.png`)
@@ -2517,13 +2504,13 @@ Figurark for Snø, Gammel bigfoot, Kvinnen (intro), Kvinne med lang hals.
 - [ ] `fig008_02` (figurark 2 for Kvinnen (intro) (kostyme 8), 7 ruter: animasjon 6 (lag 1, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 mot oss (2 ruter); animasjon 7 (lag 3, tegnes over kroppen) mot oss (1 rute); animasjon 8 mot oss (1 rute); animasjon 8 (lag 3, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig008_01/resultat.png`)
 - [ ] `fig103_01` (figurark 1 for Kvinne med lang hals (kostyme 103), 7 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (6 ruter))
 - [ ] `fig103_02` (figurark 2 for Kvinne med lang hals (kostyme 103), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `jobber/fig103_01/resultat.png`)
+
+## Bestilling 167
+
+Figurark for Kvinne med lang hals, Helikopter, Gjenstand, Bilen, Gammel mann.
+
 - [ ] `fig108_01` (figurark 1 for Kvinne med lang hals (kostyme 108), 8 ruter: start mot høyre (8 ruter))
 - [ ] `fig108_02` (figurark 2 for Kvinne med lang hals (kostyme 108), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig108_01/resultat.png`)
-
-## Bestilling 168
-
-Figurark for Helikopter, Gjenstand, Bilen, Gammel mann, Virvel.
-
 - [ ] `fig145_01` (figurark 1 for Helikopter (kostyme 145), 41 ruter: start mot høyre (41 ruter))
 - [ ] `fig145_02` (figurark 2 for Helikopter (kostyme 145), 69 ruter: start mot høyre (69 ruter), bilde to `jobber/fig145_01/resultat.png`)
 - [ ] `fig146_01` (figurark 1 for Gjenstand (kostyme 146), 87 ruter: start mot høyre (87 ruter))
@@ -2532,13 +2519,13 @@ Figurark for Helikopter, Gjenstand, Bilen, Gammel mann, Virvel.
 - [ ] `fig147_02` (figurark 2 for Bilen (kostyme 147), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig147_01/resultat.png`)
 - [ ] `fig148_01` (figurark 1 for Gammel mann (kostyme 148), 39 ruter: stående (lag 1, tegnes over kroppen) mot høyre (1 rute); start mot høyre, mot oss (2 ruter); start (lag 4, tegnes over kroppen) mot oss (1 rute); snakking mot oss (23 ruter); animasjon 6 mot oss (1 rute); animasjon 9 mot oss (11 ruter))
 - [ ] `fig148_02` (figurark 2 for Gammel mann (kostyme 148), 5 ruter: animasjon 10 mot oss (1 rute); animasjon 11 mot oss (2 ruter); animasjon 12 mot oss (2 ruter), bilde to `jobber/fig148_01/resultat.png`)
+
+## Bestilling 168
+
+Figurark for Virvel, Flygende tallerken, Gjenstand, Figur i pels.
+
 - [ ] `fig197_01` (figurark 1 for Virvel (kostyme 197), 36 ruter: start mot høyre (36 ruter))
 - [ ] `fig197_02` (figurark 2 for Virvel (kostyme 197), 14 ruter: start mot høyre (14 ruter), bilde to `jobber/fig197_01/resultat.png`)
-
-## Bestilling 169
-
-Figurark for Flygende tallerken, Gjenstand, Figur i pels.
-
 - [ ] `fig213_01` (figurark 1 for Flygende tallerken (kostyme 213), 11 ruter: start mot høyre (11 ruter))
 - [ ] `fig213_02` (figurark 2 for Flygende tallerken (kostyme 213), 13 ruter: start mot høyre (13 ruter), bilde to `jobber/fig213_01/resultat.png`)
 - [ ] `fig216_01` (figurark 1 for Gjenstand (kostyme 216), 41 ruter: stående (lag 1, tegnes over kroppen) mot høyre (6 ruter); stående mot høyre (6 ruter); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); snakking mot høyre (21 ruter); animasjon 6 (lag 0, tegnes over kroppen) mot oss (7 ruter))
@@ -2547,13 +2534,13 @@ Figurark for Flygende tallerken, Gjenstand, Figur i pels.
 - [ ] `fig253_02` (figurark 2 for Gjenstand (kostyme 253), 18 ruter: snakking (lag 2, tegnes over kroppen) mot oss (6 ruter); animasjon 6 mot oss (1 rute); animasjon 6 (lag 3, tegnes over kroppen) mot oss (4 ruter); animasjon 6 (lag 4, tegnes over kroppen) mot oss (7 ruter), bilde to `jobber/fig253_01/resultat.png`)
 - [ ] `fig260_01` (figurark 1 for Figur i pels (kostyme 260), 12 ruter: start mot høyre (12 ruter))
 - [ ] `fig260_02` (figurark 2 for Figur i pels (kostyme 260), 7 ruter: start mot høyre (7 ruter), bilde to `jobber/fig260_01/resultat.png`)
+
+## Bestilling 169
+
+Figurark for Figur i pels, Yeti, Car Bomb, Esken, Sprut, Rotte, Prikker.
+
 - [ ] `fig261_01` (figurark 1 for Figur i pels (kostyme 261), 8 ruter: start mot høyre (8 ruter))
 - [ ] `fig261_02` (figurark 2 for Figur i pels (kostyme 261), 6 ruter: start mot høyre (6 ruter), bilde to `jobber/fig261_01/resultat.png`)
-
-## Bestilling 170
-
-Figurark for Yeti, Car Bomb, Esken, Sprut, Rotte, Prikker, Katt.
-
 - [ ] `fig266_01` (figurark 1 for Yeti (kostyme 266), 3 ruter: stående (lag 1, tegnes over kroppen) mot oss (1 rute); start mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot oss (1 rute))
 - [ ] `fig266_02` (figurark 2 for Yeti (kostyme 266), 17 ruter: snakking mot oss (15 ruter); animasjon 7 mot oss (1 rute); animasjon 7 (lag 3, tegnes over kroppen) mot oss (1 rute), bilde to `jobber/fig266_01/resultat.png`)
 - [ ] `fig319_01` (figurark 1 for Car Bomb (kostyme 319), 10 ruter: start (lag 1, tegnes over kroppen) mot høyre, mot oss (2 ruter); start mot høyre, mot oss (2 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 5, tegnes over kroppen) mot høyre, mot oss (2 ruter))
@@ -2562,13 +2549,13 @@ Figurark for Yeti, Car Bomb, Esken, Sprut, Rotte, Prikker, Katt.
 - [ ] `fig016_01` (figurark 1 for Sprut (kostyme 16), 10 ruter: start mot høyre (10 ruter))
 - [ ] `fig035_01` (figurark 1 for Rotte (kostyme 35), 12 ruter: start mot høyre, mot oss, bort (3 ruter); gange mot høyre (4 ruter); animasjon 6 mot høyre (5 ruter))
 - [ ] `fig036_01` (figurark 1 for Prikker (kostyme 36), 46 ruter: start mot høyre (46 ruter))
+
+## Bestilling 170
+
+Figurark for Katt, Rotte, Rotter, Bilen, Mann (Snuckey's), Flamme, Cone of Tragedy, Flaggermus.
+
 - [ ] `fig048_01` (figurark 1 for Katt (kostyme 48), 24 ruter: start mot høyre (24 ruter))
 - [ ] `fig049_01` (figurark 1 for Rotte (kostyme 49), 12 ruter: start mot høyre, mot oss, bort (3 ruter); gange mot høyre (4 ruter); animasjon 6 mot høyre (5 ruter))
-
-## Bestilling 171
-
-Figurark for Rotter, Katt, Bilen, Mann (Snuckey's), Flamme, Cone of Tragedy, Flaggermus, Gnist, Fiskeskjelett.
-
 - [ ] `fig050_01` (figurark 1 for Rotter (kostyme 50), 24 ruter: start mot høyre (11 ruter); animasjon 7 mot høyre (13 ruter))
 - [ ] `fig051_01` (figurark 1 for Katt (kostyme 51), 29 ruter: start mot høyre (16 ruter); animasjon 7 mot høyre (13 ruter))
 - [ ] `fig057_01` (figurark 1 for Bilen (kostyme 57), 18 ruter: start mot høyre (10 ruter); animasjon 7 mot høyre (8 ruter))
@@ -2577,13 +2564,13 @@ Figurark for Rotter, Katt, Bilen, Mann (Snuckey's), Flamme, Cone of Tragedy, Fla
 - [ ] `fig070_01` (figurark 1 for Flamme (kostyme 70), 50 ruter: start mot høyre (50 ruter))
 - [ ] `fig083_01` (figurark 1 for Cone of Tragedy (kostyme 83), 10 ruter: start mot høyre (10 ruter))
 - [ ] `fig100_01` (figurark 1 for Flaggermus (kostyme 100), 19 ruter: start mot høyre (9 ruter); animasjon 7 mot høyre (10 ruter))
+
+## Bestilling 171
+
+Figurark for Gnist, Fiskeskjelett, Hyssing, Sky, Fugl, Fiskeren, Fisk, Fiskebein, Svart form, Trekuben.
+
 - [ ] `fig101_01` (figurark 1 for Gnist (kostyme 101), 20 ruter: start mot høyre (6 ruter); animasjon 7 mot høyre (7 ruter); animasjon 8 mot høyre (7 ruter))
 - [ ] `fig149_01` (figurark 1 for Fiskeskjelett (kostyme 149), 5 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (1 rute); animasjon 9 mot høyre (1 rute); animasjon 10 mot høyre (1 rute))
-
-## Bestilling 172
-
-Figurark for Hyssing, Sky, Fugl, Fiskeren, Fisk, Fiskebein, Svart form, Trekuben, Vann, Gjenstand.
-
 - [ ] `fig150_01` (figurark 1 for Hyssing (kostyme 150), 20 ruter: start mot høyre (20 ruter))
 - [ ] `fig154_01` (figurark 1 for Sky (kostyme 154), 4 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (1 rute); animasjon 9 mot høyre (1 rute))
 - [ ] `fig155_01` (figurark 1 for Fugl (kostyme 155), 20 ruter: start mot høyre (1 rute); start (lag 2, tegnes over kroppen) mot høyre (1 rute); start (lag 3, tegnes over kroppen) mot høyre (1 rute); gange mot høyre (5 ruter); gange (lag 2, tegnes over kroppen) mot høyre (1 rute); animasjon 6 mot høyre (6 ruter); animasjon 7 mot høyre (5 ruter))
@@ -2592,13 +2579,13 @@ Figurark for Hyssing, Sky, Fugl, Fiskeren, Fisk, Fiskebein, Svart form, Trekuben
 - [ ] `fig192_01` (figurark 1 for Fiskebein (kostyme 192), 24 ruter: stående mot oss (1 rute); animasjon 6 (lag 2, tegnes over kroppen) mot oss (1 rute); animasjon 6 (lag 3, tegnes over kroppen) mot oss (3 ruter); animasjon 7 mot oss (1 rute); animasjon 7 (lag 3, tegnes over kroppen) mot oss (10 ruter); animasjon 7 (lag 4, tegnes over kroppen) mot oss (1 rute); animasjon 7 (lag 5, tegnes over kroppen) mot oss (1 rute); animasjon 7 (lag 6, tegnes over kroppen) mot oss (6 ruter))
 - [ ] `fig194_01` (figurark 1 for Svart form (kostyme 194), 1 rute: stående mot høyre (1 rute))
 - [ ] `fig195_01` (figurark 1 for Trekuben (kostyme 195), 1 rute: stående mot høyre (1 rute))
+
+## Bestilling 172
+
+Figurark for Vann, Gjenstand, Stolpen, Car Bomb, Eksplosjon, Fjell.
+
 - [ ] `fig288_01` (figurark 1 for Vann (kostyme 288), 5 ruter: start mot høyre (5 ruter))
 - [ ] `fig297_01` (figurark 1 for Gjenstand (kostyme 297), 24 ruter: stående (lag 1, tegnes over kroppen) mot høyre (1 rute); stående mot høyre (1 rute); stående (lag 3, tegnes over kroppen) mot høyre (1 rute); snakking mot oss (20 ruter); animasjon 6 (lag 1, tegnes over kroppen) mot oss (1 rute))
-
-## Bestilling 173
-
-Figurark for Stolpen, Car Bomb, Eksplosjon, Fjell, Gjenstand, Ball, Ildslukeren.
-
 - [ ] `fig318_01` (figurark 1 for Stolpen (kostyme 318), 16 ruter: start mot høyre (14 ruter); animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (1 rute))
 - [ ] `fig320_01` (figurark 1 for Car Bomb (kostyme 320), 10 ruter: start mot høyre, mot oss (2 ruter); start (lag 2, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 5, tegnes over kroppen) mot høyre, mot oss (2 ruter))
 - [ ] `fig321_01` (figurark 1 for Car Bomb (kostyme 321), 8 ruter: start (lag 1, tegnes over kroppen) mot høyre, mot oss (2 ruter); start mot høyre, mot oss (2 ruter); start (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter); start (lag 4, tegnes over kroppen) mot høyre, mot oss (2 ruter))
@@ -2607,13 +2594,13 @@ Figurark for Stolpen, Car Bomb, Eksplosjon, Fjell, Gjenstand, Ball, Ildslukeren.
 - [ ] `fig327_01` (figurark 1 for Eksplosjon (kostyme 327), 23 ruter: start mot høyre (23 ruter))
 - [ ] `fig329_01` (figurark 1 for Fjell (kostyme 329), 3 ruter: start mot høyre (3 ruter))
 - [ ] `fig338_01` (figurark 1 for Gjenstand (kostyme 338), 36 ruter: start mot høyre (36 ruter))
+
+## Bestilling 173
+
+Figurark for Ball, Ildslukeren, Hette, Mann i rød skjorte.
+
 - [ ] `fig340_01` (figurark 1 for Ball (kostyme 340), 20 ruter: start mot høyre (1 rute); animasjon 6 mot oss (4 ruter); animasjon 7 mot oss (5 ruter); animasjon 8 mot oss (5 ruter); animasjon 9 mot oss (5 ruter))
 - [ ] `fig075_01` (figurark 1 for Ildslukeren (kostyme 75), 9 ruter: start mot høyre (9 ruter))
-
-## Bestilling 174
-
-Rom 19. Figurark for Ildslukeren, Hette, Mann i rød skjorte.
-
 - [ ] `fig075_02` (figurark 2 for Ildslukeren (kostyme 75), 4 ruter: start mot høyre (4 ruter), bilde to `jobber/fig075_01/resultat.png`)
 - [ ] `fig075_03` (figurark 3 for Ildslukeren (kostyme 75), 5 ruter: start mot høyre (5 ruter), bilde to `jobber/fig075_01/resultat.png`)
 - [ ] `fig075_04` (figurark 4 for Ildslukeren (kostyme 75), 9 ruter: start mot høyre (9 ruter), bilde to `jobber/fig075_01/resultat.png`)
@@ -2622,13 +2609,13 @@ Rom 19. Figurark for Ildslukeren, Hette, Mann i rød skjorte.
 - [ ] `fig252_03` (figurark 3 for Hette (kostyme 252), 1 rute: animasjon 9 mot høyre (1 rute), bilde to `jobber/fig252_01/resultat.png`)
 - [ ] `fig254_01` (figurark 1 for Mann i rød skjorte (kostyme 254), 30 ruter: stående mot høyre, mot oss, bort (3 ruter); start (lag 2, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); snakking (lag 2, tegnes over kroppen) mot høyre, mot oss, bort (24 ruter))
 - [ ] `fig254_02` (figurark 2 for Mann i rød skjorte (kostyme 254), 12 ruter: animasjon 6 (lag 2, tegnes over kroppen) mot høyre, mot oss (6 ruter); animasjon 7 (lag 2, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); animasjon 8 mot høyre, mot oss, bort (3 ruter), bilde to `jobber/fig254_01/resultat.png`)
+
+## Bestilling 174
+
+Rom 19, 29, 36, 59, 60, 67. Figurark for Mann i rød skjorte.
+
 - [ ] `fig254_03` (figurark 3 for Mann i rød skjorte (kostyme 254), 8 ruter: animasjon 9 mot høyre, mot oss, bort (3 ruter); animasjon 10 mot høyre, mot oss, bort (3 ruter); animasjon 11 mot oss (2 ruter), bilde to `jobber/fig254_01/resultat.png`)
 - [ ] `obj202_01` (rom 19 Wak-A-Rat med Max (minispill), objekt 202 tilstand 01) (kan bli bedre)
-
-## Bestilling 175
-
-Rom 29, 36, 59, 60, 67, 68.
-
 - [ ] `obj293_01` (rom 29 Inne i hyssingnøstet, objekt 293 tilstand 01) (kan bli bedre)
 - [ ] `obj335_01` (rom 36 Mystery Vortex, ute, objekt 335 tilstand 01) (kan bli bedre)
 - [ ] `obj337_01` (rom 36 Mystery Vortex, ute, objekt 337 tilstand 01) (kan bli bedre)
@@ -2637,13 +2624,13 @@ Rom 29, 36, 59, 60, 67, 68.
 - [ ] `rom060_del2av2` (rom 60 Tarpit Slide, del 2/2) (kan bli bedre)
 - [ ] `obj600_01` (rom 67 Rulletekst og fyrverkeri, objekt 600 tilstand 01) (kan bli bedre)
 - [ ] `obj602_01` (rom 67 Rulletekst og fyrverkeri, objekt 602 tilstand 01) (kan bli bedre)
+
+## Bestilling 175
+
+Rom 67, 68, 69, 77, 79, 80.
+
 - [ ] `obj603_01` (rom 67 Rulletekst og fyrverkeri, objekt 603 tilstand 01) (kan bli bedre)
 - [ ] `obj605_01` (rom 68 Highway Surfing (minispill), objekt 605 tilstand 01) (kan bli bedre)
-
-## Bestilling 176
-
-Rom 68, 69, 77, 79, 80, 82, 83.
-
 - [ ] `obj649_01` (rom 68 Highway Surfing (minispill), objekt 649 tilstand 01) (kan bli bedre)
 - [ ] `obj650_01` (rom 68 Highway Surfing (minispill), objekt 650 tilstand 01) (kan bli bedre)
 - [ ] `obj668_01` (rom 69 Highway Surfing, deler (skilt, politibil, horisont), objekt 668 tilstand 01) (kan bli bedre)
@@ -2652,13 +2639,13 @@ Rom 68, 69, 77, 79, 80, 82, 83.
 - [ ] `obj781_01` (rom 77 Rulletekst (paneler), objekt 781 tilstand 01) (kan bli bedre)
 - [ ] `obj819_01` (rom 79 Snøkulen fra Mystery Vortex, objekt 819 tilstand 01) (kan bli bedre)
 - [ ] `obj822_01` (rom 80 Slangene i nøstet (deler), objekt 822 tilstand 01) (kan bli bedre)
+
+## Bestilling 176
+
+Rom 60, 68, 79, 82, 83, 92.
+
 - [ ] `obj831_01` (rom 82 Slangene i nøstet (deler), objekt 831 tilstand 01) (kan bli bedre)
 - [ ] `rom083` (rom 83 Slutten (bigfootene i skyene)) (kan bli bedre)
-
-## Bestilling 177
-
-Rom 1, 60, 68, 69, 79, 92.
-
 - [ ] `rom092` (rom 92 Alkoven (nærbilde)) (kan bli bedre)
 - [ ] `lag060_01_del2av2` (rom 60 Tarpit Slide, lag 01 med 1 objektbilde, del 2/2, bilde to `jobber/rom060_del2av2/resultat.png`) (kan bli bedre)
 - [ ] `lag060_02_del2av2` (rom 60 Tarpit Slide, lag 02 med 1 objektbilde, del 2/2, bilde to `jobber/rom060_del2av2/resultat.png`) (kan bli bedre)
@@ -2667,6 +2654,11 @@ Rom 1, 60, 68, 69, 79, 92.
 - [ ] `lag079_03_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 03 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`) (kan bli bedre)
 - [ ] `lag079_04_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 04 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`) (kan bli bedre)
 - [ ] `lag079_05_del1av2` (rom 79 Snøkulen fra Mystery Vortex, lag 05 med 1 objektbilde, del 1/2, bilde to `jobber/obj819_01/resultat.png`) (kan bli bedre)
+
+## Bestilling 177
+
+Rom 1, 69.
+
 - [ ] `ikon01` (ikonark 1 med 6 ikoner) (kan bli bedre)
 - [ ] `ikon02` (ikonark 2 med 8 ikoner) (kan bli bedre)
 
@@ -2822,6 +2814,7 @@ Rom 1, 60, 68, 69, 79, 92.
 - [x] `obj776_01` (rom 77 Rulletekst (paneler))
 - [x] `obj777_01` (rom 77 Rulletekst (paneler))
 - [x] `obj780_01` (rom 77 Rulletekst (paneler))
+- [x] `obj811_01` (rom 78 Kikkerten, utsnitt (landskapsbiter))
 - [x] `obj812_01` (rom 78 Kikkerten, utsnitt (landskapsbiter))
 - [x] `obj813_01` (rom 78 Kikkerten, utsnitt (landskapsbiter))
 - [x] `rom079_del1av2` (rom 79 Snøkulen fra Mystery Vortex)
@@ -2955,6 +2948,7 @@ Rom 1, 60, 68, 69, 79, 92.
 - [x] `lag030_01_del1av2` (rom 30 Den roterende restauranten)
 - [x] `lag030_02_del1av2` (rom 30 Den roterende restauranten)
 - [x] `lag030_03_del1av2` (rom 30 Den roterende restauranten)
+- [x] `lag030_04_del1av2` (rom 30 Den roterende restauranten)
 - [x] `lag030_05_del1av2` (rom 30 Den roterende restauranten)
 - [x] `lag030_06_del1av2` (rom 30 Den roterende restauranten)
 - [x] `lag030_07_del1av2` (rom 30 Den roterende restauranten)
@@ -2978,8 +2972,12 @@ Rom 1, 60, 68, 69, 79, 92.
 - [x] `lag036_05_del2av2` (rom 36 Mystery Vortex, ute)
 - [x] `lag036_06_del2av2` (rom 36 Mystery Vortex, ute)
 - [x] `lag037_01_del1av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
+- [x] `lag037_01_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
+- [x] `lag037_02_del1av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
+- [x] `lag037_03_del1av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
 - [x] `lag037_04_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
 - [x] `lag037_05_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
+- [x] `lag037_06_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
 - [x] `lag037_07_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
 - [x] `lag037_08_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
 - [x] `lag037_09_del2av2` (rom 37 Mystery Vortex, inne (Escher-rommet))
@@ -3015,6 +3013,7 @@ Rom 1, 60, 68, 69, 79, 92.
 - [x] `lag044_10` (rom 44 Bumpusville, troférommet (Edutainment))
 - [x] `lag044_11` (rom 44 Bumpusville, troférommet (Edutainment))
 - [x] `lag044_12` (rom 44 Bumpusville, troférommet (Edutainment))
+- [x] `lag045_03` (rom 45 Bumpusville, soverommet)
 - [x] `lag047_01` (rom 47 Bumpusville Sings (menasjeriet))
 - [x] `lag047_03` (rom 47 Bumpusville Sings (menasjeriet))
 - [x] `lag047_04` (rom 47 Bumpusville Sings (menasjeriet))
@@ -3034,6 +3033,7 @@ Rom 1, 60, 68, 69, 79, 92.
 - [x] `lag056_01` (rom 56 Kjøkkenet)
 - [x] `lag056_02` (rom 56 Kjøkkenet)
 - [x] `lag056_03` (rom 56 Kjøkkenet)
+- [x] `lag056_04` (rom 56 Kjøkkenet)
 - [x] `lag056_05` (rom 56 Kjøkkenet)
 - [x] `lag058_01_del1av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore))
 - [x] `lag058_01_del2av2` (rom 58 Dino Bungee National Memorial (Mount Rushmore))
