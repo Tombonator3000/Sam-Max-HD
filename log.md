@@ -471,7 +471,7 @@ Natt: kontroll av lag002_01, lag017_04_del1av2, lag017_04_del2av2 og obj307_01 f
 Natt: kodeoppgave, kontroll av PR 32 (Codex, `codex/hd-masker-inventory`, native inventarkort og glassmasker).
 
 - ScummVM `c9091321` hentet til /tmp, patchen fra main og fra PR 32 lagt på hver sin kopi (begge gikk rent). Hele kodeforskjellen lest (316 linjer i fire filer), med koden rundt. Patchen i natt-grenen er lik main.
-- Fem funn i `docs/KONTROLL-PR32.md`. Viktigst: blast og romobjekt deler bildebufferen, og lastes `_hd.png` først som blast, mister romobjektet den myke alfaen (`softEdge` regnes ikke ut med marg på). Treffer trolig ikke dagens innhold: alle 113 `_hd.png` i `mods/gpt` er uten marg, og inventarikonene er SMAP-objekter i rom 93 og 94. Ellers: fargetoningen for myke romobjekter er nå ett snitt per bilde, de myke kantene fra PR 29 (bilen i rom 9) tones nå med rommets farge, og patchen er ikke lenger lik den i Dig.
+- Fem funn i `docs/KONTROLL-PR32.md`. Viktigst: blast og romobjekt deler bildebufferen, og lastes `_hd.png` først som blast, mister romobjektet den myke alfaen (`softEdge` regnes ikke ut med marg på). Treffer trolig ikke dagens innhold: alle 113 `_hd.png` i `mods/gpt` er uten marg, og inventarikonene er SMAP-objekter i rom 93 og 94. (Rettet 23:00: feil, 13 inventarikoner i rom 93 er BOMP, se oppføringen 23:00.) Ellers: fargetoningen for myke romobjekter er nå ett snitt per bilde, de myke kantene fra PR 29 (bilen i rom 9) tones nå med rommets farge, og patchen er ikke lenger lik den i Dig.
 - Ingen funn som stopper flettingen av det som treffer dagens innhold. Ikke flettet, ikke rettet, ingen kommentar lagt på PR-en.
 - Ikke bygget og ikke kjørt: maskinen har ingen C++-kompilator, og ingenting er installert. `engine/test.sh` er ikke kjørt med PR 32.
 - Testene i natt-grenen: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått.
@@ -484,3 +484,13 @@ Natt: retting etter Codex sin kontroll av PR 32-kontrollen.
 - Arbeidskopiene i `/tmp/smhd-pr32` (2,4 GB: ScummVM to ganger og patchene) er slettet. Enig i at de brøt nattregelen om ingen endringer utenfor repoet. Ingenting annet ble lagt utenfor repoet. Linjen under «Hvordan» i kontrollen sier nå at mappen er slettet. Neste gang en patch skal sjekkes mot ScummVM, bruker jeg en mappe under `work/`, som ikke sjekkes inn.
 - Lot være: resten av kontrollen, som Codex ikke hadde innvendinger mot.
 - Testene: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått, `git diff --check` uten feil.
+
+## 2026-10-15 23:00 (Claude)
+
+Natt: retting etter Codex sin andre kontroll av PR 32-kontrollen.
+
+- Codex har rett. `work/extract/rooms.json` viser 13 BOMP-objekter blant inventarikonene i rom 93: obj874 til obj878, obj883 til obj886 og obj889 til obj892. Alle 13 har `_hd.png` i `mods/gpt/objects`. Sjekket med et kort Python-oppslag i `rooms.json` og filene. Rom 94 har bare SMAP.
+- Rettet i `docs/KONTROLL-PR32.md`: linjen under «Hvordan», funn 1 og konklusjonen. Funn 1 er vurdert på nytt: forskyvningen treffer ikke (ingen marg), men den tapte myke alfaen kan treffe de 13 ikonene hvis samme objekt og tilstand tegnes både som blast og som romobjekt i samme rom. Det er ikke vist. Konklusjonen sier nå at funn 1 bør rettes, eller inventaret i rom 93 ses i spillet, før fletting.
+- Begrunnelsen i oppføringen 22:20 er markert som feil med henvisning hit; resten av den oppføringen står.
+- Lot være: å sjekke om ikonene faktisk går gjennom `blastSlot`. ScummVM-kilden ble slettet fra /tmp, og ny henting utenfor `work/` er ikke ønsket i natt; spillet kan heller ikke kjøres her. Spørsmål til neste kodeøkt eller Tom: tegnes BOMP-ikonene i rom 93 med `drawBlastObject`, som romobjekt, eller begge?
+- Testene: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått, `git diff --check` uten feil. Motortesten er ikke kjørt (ingen C++-kompilator).
