@@ -305,3 +305,7 @@ Tom: flettet PR 20, neste todo, så punkt 2 (The Dig) og 3 (grafikkordre).
 - Slått sammen tre-veis fra Dig main 36cd09f: 10 konflikter (blast, markCel, z-kant, palettmasker og skyggetabell, objektoppslag). Digs kostyme- og objektnumre (119, 298 til 300, bølgene, pekerobjekt 650 og 688) gjelder nå bare The Dig. Objektoppslaget: Digs krav om at tilstanden fortsatt gjelder, sammen med Sam & Max sine lapp-tilstander (newest[]).
 - Testet: Sam & Max `engine/test.sh` 0 avvik. Romtest Sam & Max: samme som før (rom 1 viste «hoppet ikke» fordi testkroken fra Dig ikke hopper når spillet alt står i rommet; `tools/romtest.py` godtar nå det). The Dig: intro 3000 bilder, skjermen lik full ombygging i alle 12 kontroller, kantene rene; romtest i 106 rom likt med Digs egen patch og den felles (105 lastet, 0 krasj, 0 heng). pytest 51 bestått.
 - PR 21 åpnet for build-mod-klippingen og ordren fra forrige runde.
+
+## 2026-10-15 04:40 (Claude)
+- Dig PR 53 hadde konflikt mot Digs main (PR 52: listen `dighd-uten-hd.txt` over det som vises uten HD). Endringen er slått inn i den felles patchen, og patchen er lik i begge repoer igjen. Gjelder også Sam & Max: filen skrives i lagringsmappen, `DIGHD_MANGLER=0` slår den av.
+- Testet: `engine/test.sh` 0 avvik, rom 7 skriver listen, The Dig introen 12 av 12 kontroller lik full ombygging.
