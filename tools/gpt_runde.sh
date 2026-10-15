@@ -4,7 +4,7 @@
 #   1. Setter opp det som mangler (spillfiler, pipeline, uttrekk, jobber)
 #   2. Henter nye bilder fra grenen gpt-arbeid
 #   3. Kontrollerer dem (smhd gpt-inn) og lager HD-rom, HD-objekter og HD-figurruter, og tar inn
-#      figurarkene i glatt stil som myke figurruter (smhd myke-figurer)
+#      figurarkene i glatt stil som myke figurruter (smhd myke-figurer) og ikonene med egen alfa (smhd myke-ikoner)
 #   4. Bygger modden mods/gpt av de godkjente rommene, objektbildene og figurrutene og publiserer den i grenen hd-mod
 #   5. Skriver ny ORDRE.md og sender status, rapport og retur tilbake til grenen
 #
@@ -28,13 +28,14 @@ done
 # 1. Oppsett
 [ -f game/SAMNMAX.001 ] || tools/hent_spilldata.sh
 if ! command -v smhd >/dev/null 2>&1; then
-	[ -x .venv/bin/smhd ] || { python3 -m venv .venv && .venv/bin/pip install -q -e "pipeline[dev,uttrekk]"; }
+	# uttrekk (thedig-textures) lar seg ikke alltid hente; Sam & Max bruker egne dekodere og trenger det ikke
+	[ -x .venv/bin/smhd ] || { python3 -m venv .venv && { .venv/bin/pip install -q -e "pipeline[dev,uttrekk]" || .venv/bin/pip install -q -e "pipeline[dev]"; }; }
 	export PATH="$ROOT/.venv/bin:$PATH"
 fi
 [ -f work/extract/rooms.json ] || smhd extract
 
 # 2. Hent
-before="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json 2>/dev/null | sha256sum || true)"
+before="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json work/gpt-ferdig/myke_ikoner.json 2>/dev/null | sha256sum || true)"
 status_before="$(sha256sum work/gpt/status.csv 2>/dev/null || true)"
 tools/gpt_gren.sh hent
 
@@ -42,7 +43,9 @@ tools/gpt_gren.sh hent
 #    med egen alfa og marg rundt rutene (costumes/costumeCCC_NNN_hd.png).
 smhd gpt-inn
 smhd myke-figurer
-after="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json 2>/dev/null | sha256sum || true)"
+# Ikonene med egen myk alfa (rapporter/*/ikonmanifest.json) som objNNN_SS_hd.png, når ikonarket er godtatt
+smhd myke-ikoner
+after="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json work/gpt-ferdig/myke_ikoner.json 2>/dev/null | sha256sum || true)"
 
 # 4. Mod, bare når noe nytt er godkjent. Rommene med HD-bakgrunn velges med --rooms.
 #    Godkjente objektbilder i work/gpt-ferdig/objects kommer med uansett, også i rom

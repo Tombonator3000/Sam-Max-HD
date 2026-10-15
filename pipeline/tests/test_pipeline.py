@@ -2020,3 +2020,44 @@ def test_patch_state_painted_whole_is_cut_with_the_patch_mask(tmp_path):
     hd = np.asarray(Image.open(tmp_path / "mod" / "objects" / "obj182_03.png").convert("RGBA"))
     assert tuple(hd[1, 30]) == (10, 200, 30, 255)  # tegningen der lappen er
     assert hd[10, 4, 3] == 0                       # klippet bort utenfor lappen
+
+
+def test_myke_ikoner_tas_inn_bare_fra_godtatt_ark(tmp_path):
+    """smhd myke-ikoner: RGBA-ikonet fra manifestet blir objNNN_SS_hd.png når arket er godtatt,
+    sjekksum og størrelse stemmer; ellers hoppes det over. build-mod tar _hd.png med."""
+    import hashlib
+    import json as _json
+
+    from PIL import Image as _Image
+
+    from smhd import ikoner
+
+    gren, extract, ut = tmp_path / "gren", tmp_path / "extract", tmp_path / "ut"
+    (gren / "rapporter" / "r1" / "ikoner").mkdir(parents=True)
+    (extract / "objects").mkdir(parents=True)
+    (ut / "objects").mkdir(parents=True)
+    rows = []
+    for name, size, ok_sheet in (("obj900_01", (8, 6), True), ("obj901_01", (8, 6), False), ("obj902_01", (8, 6), True)):
+        _Image.new("RGBA", size, (10, 20, 30, 255)).save(extract / "objects" / f"{name}.png")
+        if ok_sheet:
+            _Image.new("RGBA", (size[0] * 4, size[1] * 4), (1, 2, 3, 255)).save(ut / "objects" / f"{name}.png")
+        hd = _Image.new("RGBA", (size[0] * 4 + (4 if name == "obj902_01" else 0), size[1] * 4 + 8), (200, 100, 50, 128))
+        f = gren / "rapporter" / "r1" / "ikoner" / f"{name}.png"
+        hd.save(f)
+        rows.append({"bilde": name, "fil": f"rapporter/r1/ikoner/{name}.png",
+                     "sha256": hashlib.sha256(f.read_bytes()).hexdigest()})
+    (gren / "rapporter" / "r1" / "ikonmanifest.json").write_text(_json.dumps(rows))
+    # obj900: marg 1 x 1 originalpiksel, godtatt ark -> ok. obj901: arket ikke godtatt. obj902: ujevn marg.
+    _Image.open(gren / "rapporter/r1/ikoner/obj900_01.png").resize((40, 32)).save(gren / "rapporter/r1/ikoner/obj900_01.png")
+    rows[0]["sha256"] = hashlib.sha256((gren / "rapporter/r1/ikoner/obj900_01.png").read_bytes()).hexdigest()
+    (gren / "rapporter" / "r1" / "ikonmanifest.json").write_text(_json.dumps(rows))
+    r = ikoner.import_all(gren, extract, ut)
+    assert r["ikoner"]["obj900_01"]["status"] == "ok" and r["ikoner"]["obj900_01"]["marg"] == [1, 1]
+    assert (ut / "objects" / "obj900_01_hd.png").exists()
+    assert r["ikoner"]["obj901_01"]["status"] == "hoppet over"
+    assert r["ikoner"]["obj902_01"]["status"] == "hoppet over"
+    assert not (ut / "objects" / "obj902_01_hd.png").exists()
+    # Avvist med sjekksum: tas ikke inn
+    r = ikoner.import_all(gren, extract, ut, rejections={"obj900_01": {"jobb": "obj900_01", "sha256_resultat": "*",
+                                                                          "grunn": "test", "status": "avvist"}})
+    assert r["ok"] == 0 and not (ut / "objects" / "obj900_01_hd.png").exists()
