@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib
+root=Path.cwd();r=root/'rapporter/rom009-bilkanter-20261015';src=root.parent/'kantdiagnose-20261015'
+mod=Image.open(src/'obj089_01-mod.png').convert('RGBA');idx=Image.open(src/'obj089_01_idx.png');room=Image.open(src/'room009-mod.png').convert('RGBA');native=Image.open(root/'jobber/obj089_01/resultat.png').crop((304,336,1232,688)).convert('RGBA')
+a=np.array(mod.getchannel('A'));mask=idx.convert('RGBA').getchannel('A').resize(mod.size,Image.Resampling.NEAREST)
+assert np.array_equal(a,np.array(mask));assert np.unique(a).tolist()==[0,255]
+back=room.crop((992,416,1920,768));back.alpha_composite(mod)
+# Kun diagnostisk sammenstilling, ikke en ny leveranse eller motorrettelse.
+qa=Image.new('RGB',(1856,390),(210,210,210));d=ImageDraw.Draw(qa);d.text((8,8),'Native HD-tegning, før originalmasken',fill='black');d.text((936,8),'Publisert objekt med originalmasken, over HD-rommet',fill='black');qa.paste(native.convert('RGB'),(0,32));qa.paste(back.convert('RGB'),(928,32));qa.save(r/'sammenligning.png')
+roof=Image.new('RGB',(1120,282),(210,210,210));d=ImageDraw.Draw(roof);d.text((8,8),'Native kontur',fill='black');d.text((568,8),'Hard originalmaske',fill='black')
+for i,im in enumerate([native,back]):roof.paste(im.crop((260,20,540,145)).resize((560,250),Image.Resampling.NEAREST).convert('RGB'),(i*560,32))
+roof.save(r/'tak-kontroll.png')
+files={'native':root/'jobber/obj089_01/resultat.png','publisert_objekt':src/'obj089_01-mod.png','publisert_indeks':src/'obj089_01_idx.png','publisert_rom':src/'room009-mod.png','skjermbilde':r/'toms-skjermbilde.png'}
+report={'rom':9,'objekt':89,'tilstand':1,'original_mal':list(idx.size),'hd_mal':list(mod.size),'publisert_alfa_verdier':np.unique(a).tolist(),'alfa_identisk_med_original_nearest_4x':True,'main_commit':'6269b68e6542eb9f4423d5db87feac0aaed8809f','hd_mod_commit':'e3b7a785d679658e9b68dcc23509807d7b3024ec','sha256':{n:hashlib.sha256(p.read_bytes()).hexdigest() for n,p in files.items()},'motorrettet':False,'runtime_reproduksjon':False}
+(r/'diagnose.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))
