@@ -383,13 +383,10 @@ Tom: PR 29 flettet.
 - Bygget fra main (9e1b7b2) med hd-mod 9512fd8: Linux-pakken (release «linux», 16:03 UTC), Windows-pakken (release «windows», 16:06 UTC) og nettsiden (Sam-Max-HD-Web, kjøring 38765138956). Alle tre arbeidsflytene grønne, siden svarer 200.
 - Alle tre har nå de nye grafikkleveransene fra i dag og de myke kantene på romobjektene. Pakkene og siden er ikke spilt med skjerm etter denne byggingen.
 
-## 2026-10-15 18:56 (Claude)
+## 2026-10-15 19:02 (Claude)
 
-Tom: hent det nye fra hd-mod og gpt-arbeid inn i Sam & Max-repoet, og gi Dig HD Remake samme motorpatch.
+Tom: få Claude og ChatGPT til å samarbeide automatisk på Linux-maskinen og jobbe til i morgen, med grafikk og kode.
 
-- `hd-mod` og `gpt-arbeid` flettes ikke inn i main (spillgrafikk). Det nye i `gpt-arbeid` (18:06): seks rettede jobber (rom010 Sams tenner, rom015_del1av2 kjerub og djevel, lag037_01_del2av2, lag037_02_del1av2, lag045_03, obj811_01) og fire hele objektutsnitt med eget manifest (`rapporter/videre-grafikk-20261015/objektleveranser.json`).
-- Runden: `gpt-inn` godkjente alle seks. `smhd importpakke` leser nå også `objektleveranser.json` (PR 30): 60 tatt inn, 0 hoppet over. Ny test, pytest 52 bestått.
-- Modden bygget (76 rom, 959 objektbilder, 923 figurruter) og publisert i `hd-mod` (dd43c31). Rom 10 og rom 15 sett uten skjerm: tennene og kjeruben med djevelen er der. Ny ordre med status sendt til `gpt-arbeid`.
-- Linux-pakken (16:52 UTC) og Windows-pakken (16:54 UTC) bygget fra main med den nye modden. Nettsiden henter modden selv.
-- Dig-HD-Remake: samme motorpatch (myke kanter på romobjekter) i PR 57 der, byte for byte lik. Ingen av de 640 objektbildene i Digs `hd-mod` har myk alfa, så The Dig ser ut som før. Ikke kjørt med The Dig.
-- Åpent fra grafikerens rapport: rester etter opplukking i kontoret, kantene rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet, og at mottaket måler Sam091 uten fotresten (8 ruter feilaktig til gjennomsyn).
+- Natteskiftet ligger i prosjektbiblioteket (`samarbeid/`, grenen claude/sleepy-hawking-492gnq) siden det skal brukes i flere repoer. Rollene er de samme som i AGENTS.md: Codex tegner jobbene i ORDRE.md i `gpt-arbeid`, Claude kjører `tools/gpt_runde.sh` og ser på bildene; Claude koder fra todo.md på grenen `samarbeid/natt-<dato>`, Codex kontrollerer.
+- Codex kjører i sin egen sandkasse og kan ikke committe; skriptet committer bare `resultat.png`, `notat.md`, hovedark og `rapporter/` i `gpt-arbeid`. Det bruker samme arbeidstre som `tools/gpt_gren.sh` (`work/.gpt-gren`).
+- Ikke kjørt her ennå. Testet bare med falske agenter i Claude-økta.
