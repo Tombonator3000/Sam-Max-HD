@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+import json
+
+p=Path('rapporter/natt-fig091_04-20261015')
+base=Image.open(p/'forrige-resultat.png').convert('RGBA')
+job=json.loads(Path('jobber/fig091_04/jobb.json').read_text())
+ref=np.array(Image.open('jobber/fig091_04/referanse.png').convert('RGB'))
+sources={1957:('ra-forsok3.png',[(56,71,1001,1196),(229,1305,351,1418)]),1958:('ra-forsok2.png',[(62,64,1126,981),(264,1091,369,1239)])}
+for c in job['ruter'][1:]:
+ x0,y0,x1,y1=c['synlig'];x0=(x0+16)*4;y0=(y0+8)*4;x1=(x1+16)*4;y1=(y1+8)*4
+ base.paste((0,0,0,0),(x0-16,y0-16,x1+16,y1+16))
+ f,boxes=sources[1957 if c['rute']==1957 else 1958]
+ raw=np.array(Image.open(p/f).convert('RGBA'))
+ raw[:,:,3]=np.where(raw[:,:,3]<16,0,np.minimum(255,np.rint(raw[:,:,3].astype(float)*255/254))).astype('uint8')
+ raw=Image.fromarray(raw)
+ mask=np.any(ref[y0:y1,x0:x1]!=[255,0,255],axis=2)
+ ys=np.flatnonzero(mask.any(axis=1));groups=np.split(ys,np.where(np.diff(ys)>1)[0]+1)
+ for source,rows in zip(boxes,groups):
+  top,bottom=int(rows[0]),int(rows[-1]+1);xs=np.flatnonzero(mask[top:bottom].any(axis=0));left,right=int(xs[0]),int(xs[-1]+1)
+  part=raw.crop(source).resize((right-left,bottom-top),Image.Resampling.LANCZOS)
+  base.alpha_composite(part,(x0+left,y0+top))
+base.save('jobber/fig091_04/resultat.png')
