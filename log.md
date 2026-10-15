@@ -327,3 +327,8 @@ Tom: ta inn ny grafikk til spillet.
 - Modden bygget (76 rom, 958 objektbilder, 923 figurruter, 304 MB) og publisert i `hd-mod`.
 - Testet uten skjerm i rom 7: pekeren er det myke ikonet obj889 uten rosa rand (det utklipte hadde rosa rand). Inventaret åpnet seg ikke med testklikk eller tast etter testhoppet, så de nye inventarikonene er ikke sett i spillet.
 - Ny ordre til ChatGPT med beskjed om ikonene og de 11 rutene, sendt til `gpt-arbeid`. Toms presisering i AGENTS.md der (se originalen og stilreferansene, spør ved uklart motiv) er tatt inn i `docs/gpt-arbeid-AGENTS.md`.
+
+## 2026-10-15 15:45 (Claude)
+- Ny 0001 fra Zak McKracken HD (5782de2): `compose()` i `dighd.cpp` kopierer HD-pikslene rett når fargen er uendret, uten tak og med 32-bits skjerm i samme format som HD-bildet (alfa 255 som før). Ellers den gamle veien; 16-bits skjerm er uendret.
+- Målt i Zak (OpenGL under Xvfb, nearest-mod): 4,7 til 5,9 ms ned til 1,6 til 2,7 ms for hele skjermen. `engine/test.sh` 0 avvik med 16 og 32 bit, og bilder byte for byte like med gammel motor. Ikke testet med dette spillet.
+- Bare `engine/patches/0001-dighd-hd-grafikk.patch` endret, byte for byte lik den i Zak, Sam & Max, The Dig og Dig-HD-Web.
