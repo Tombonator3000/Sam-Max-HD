@@ -6,7 +6,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 - [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
 - [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)
-- [ ] Samme patch i Dig-HD-Remake
+- [x] Samme patch i Dig-HD-Remake (Dig PR 57, venter på fletting)
+- [ ] Tom fletter PR 30 (objektleveranser.json i importpakke)
+- [ ] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn
+- [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
 - [ ] Tom: første natteskift med Claude og Codex (prosjektbiblioteket `samarbeid/`), først en kort prøve med `--timer 1 --jobber 1`
 
