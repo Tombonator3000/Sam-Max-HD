@@ -179,3 +179,5 @@ Planen er som for The Dig: én AppImage med ScummVM med HD-patchen, spillet, tal
 ## Si fra
 
 Skriv hva du så, i hvilket rom og omtrent hvor, og legg ved skjermbilde (Alt+S) hvis du kan. Gi det til Claude i chatten, eller legg det i `rapporter/` i grenen `gpt-arbeid`.
+
+Legg også ved `dighd-uten-hd.txt` fra mappen med de lagrede spillene (Linux-pakken: `~/.local/share/sam-max-hd/saves/`). Motoren skriver der alt som har stått på skjermen uten HD mens du spilte i HD, med rom og hvor lenge. Slett fila for å begynne på nytt.

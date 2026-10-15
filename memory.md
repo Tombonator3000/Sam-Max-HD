@@ -93,3 +93,4 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
 ## Felles motorpatch med Dig-HD-Remake (15. oktober 2026)
 - `engine/patches/0001-dighd-hd-grafikk.patch` er den samme her og i Dig-HD-Remake. Spillspesifikke numre sperres med `_vm->_game.id` eller `_game.version`. Endres patchen i ett repo, kopieres den til det andre eller slås sammen tre-veis.
+- Patchen har lista over det som vises uten HD (`dighd-uten-hd.txt` i lagringsmappen, `DIGHD_MANGLER=0` slår av). `engine/test.sh` gir fra før 0,4 til 0,8 prosent kraftige avvik i noen dumper i rom 3 med nearest-modden (sett 15. oktober, også før den felles patchen).
