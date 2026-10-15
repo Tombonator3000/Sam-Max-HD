@@ -578,3 +578,15 @@ Natt: kontroll av fig259_02, lag026_02, lag026_03 og lag032_01_del1av2 fra Codex
 - Etter ny runde: fig259_02 står som levert og er ikke lenger i returen i ORDRE.md. Ingen rad i `docs/gpt-avvisninger.csv`.
 - Testene: pytest i `pipeline` 59 bestått, `git diff --check` uten feil.
 - Ikke testet i spillet, tilstandene og håndanimasjonen er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 01:35 (Claude)
+
+Natt: kontroll av lag032_03_del1av2, lag035_01_del1av2, lag035_02_del2av2 og lag041_01_del1av2 fra Codex (commit 87de0bc3e2 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`. Mottaket gav godkjent på alle fire.
+- Sett med øynene: forhåndsvisningene (original 4x, leveransen, etter fargelås) og per objekt originalen i nearest ved siden av HD-objektbildet i `mods/gpt/objects`. For obj384_01 og obj322_01, som er opake lapper, også lagt inn i HD-rommet for å se skjøten.
+- lag032_03_del1av2 (obj317_02, rom 32): godkjent. Den gule kassen med grønt fiskeinnhold, rekkverket og skyen som originalen.
+- lag035_01_del1av2 (rom 35): godkjent. obj322_01 er tomt gress etter bøtten, skjøten mot rommet er ren. obj323_01 nettet med de grønne fiskene, obj324_01 fisken med åpen munn mot høyre, obj327_01 vannkrusningen, obj328_01 fisken delvis nede i vannet. Form, retning og plassering følger originalen. Svak lys kant ytterst på konturen av obj324_01, bare synlig mot magenta; ikke avvist.
+- lag035_02_del2av2 (obj329_01, rom 35): godkjent. Den store fisken på nettet med munnen mot venstre, som originalen.
+- lag041_01_del1av2 (obj384_01, rom 41): godkjent. Tom vei og himmel der bilen ellers står, med de hvite løkkene i gresset. Bilen står i originalrommet og i HD-rommet, så lappen fjerner den som originalen. Skjøten mot HD-rommet er ren. lag041_01 venter fortsatt på del 2.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
