@@ -1,12 +1,11 @@
 # Rapport fra gpt-inn
 
-Laget 2026-10-16 00:50
+Laget 2026-10-16 01:02
 
 | Status | Romjobber | Objektjobber | Lagjobber | Ikonark | Figurark |
 | --- | --- | --- | --- | --- | --- |
-| avvist | 0 | 0 | 0 | 0 | 1 |
 | godkjent | 114 | 74 | 267 | 7 | 0 |
-| levert | 0 | 0 | 0 | 0 | 72 |
+| levert | 0 | 0 | 0 | 0 | 73 |
 | ny | 0 | 0 | 24 | 0 | 1685 |
 | sjekk | 1 | 12 | 5 | 2 | 0 |
 
@@ -44,6 +43,5 @@ Må sees på (se `retur.md` i jobbmappen):
 | lag079_05_del1av2 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.1 px) |
 | ikon01 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.3 px) |
 | ikon02 | sjekk | plassering rettet med +0.0, -0.3 originalpiksler; deler av bildet er flyttet eller zoomet (opptil 1.3 px) |
-| fig259_02 | avvist | ruter er feil: costume259_313 omrisset avviker (overlapp 0.20), costume259_314 omrisset avviker (overlapp 0.20), costume259_315 omrisset avviker (overlapp 0.20) |
 
 Forhåndsvisning per jobb i `forhandsvisning/`: original 4x, ChatGPT, etter fargelås.
