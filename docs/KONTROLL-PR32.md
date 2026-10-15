@@ -4,7 +4,7 @@ PR 32 «Rett native inventarkort og glassmasker i HD-motoren» fra Codex, grenen
 
 ## Hvordan
 
-- ScummVM ved `c9091321` hentet til en mappe i /tmp. Patchen fra main og patchen fra PR 32 lagt på hver sin kopi, begge gikk rent på. Kodeforskjellen mellom dem lest i sin helhet (4 filer: `base-costume.cpp`, `costume.cpp`, `dighd.cpp`, `dighd.h`, 316 linjer diff).
+- ScummVM ved `c9091321` hentet til en mappe i /tmp (slettet igjen etter kontrollen, se loggen). Patchen fra main og patchen fra PR 32 lagt på hver sin kopi, begge gikk rent på. Kodeforskjellen mellom dem lest i sin helhet (4 filer: `base-costume.cpp`, `costume.cpp`, `dighd.cpp`, `dighd.h`, 316 linjer diff).
 - Patchen i natt-grenen er byte for byte lik patchen i `origin/main`, så forskjellen er bare PR 32.
 - Lest koden rundt: `loadImage`, objektbanen (`noteObject`), `blastSlot`, `noteCel`, `celImage`, `tintFactors`, fargetoningen i sammensetningen og `drawSoftObjectEdges`.
 - Sjekket de 113 `objects/*_hd.png` i `mods/gpt`: alle har nøyaktig 4x størrelse uten marg, så alle blir tatt inn av den nye objektbanen. Inventarikonene (obj874 til obj894, obj995 til obj1086) er SMAP-objekter i rom 93 og 94, altså vanlige romobjekter, slik PR-en sier. obj049 er BOMP (blast) i rom 1.
@@ -18,7 +18,7 @@ PR 32 «Rett native inventarkort og glassmasker i HD-motoren» fra Codex, grenen
 
 3. Endret oppførsel for de myke kantene fra PR 29 (bilen i rom 9). Før ble rompikselen under kanten tonet med objektets snittfaktor; nå tones den med rommets egen faktor per piksel (`tintFactors` på romkoden). Det er trolig riktigere, men det endrer et godkjent resultat og står ikke i PR-teksten. Bilen i rom 9 bør ses i en nedtoning før fletting.
 
-4. Patchen er ikke lenger felles med The Dig. AGENTS.md og logg 15. oktober sier at motorpatchen er byte for byte lik i begge repoer (Dig PR 57). PR 32 endrer `base-costume.cpp` (`recordCelPixel` kalles nå også for klassiske kostymer) og objektbanen. The Dig bruker AKOS og har ingen myke romobjekter, så det skal ikke endre noe der, men det er ikke kjørt (PR-en sier det samme). Enten tas samme endring inn i Dig, eller avviket noteres i `docs/HD-MOTOR.md`.
+4. Patchen er ikke lenger felles med The Dig. PR 32 endrer `base-costume.cpp` (`recordCelPixel` kalles nå også for klassiske kostymer) og objektbanen. Avviket er allerede dokumentert i PR-en: `docs/HD-MOTOR.md` linje 7 sier at tillegget ennå ikke er samkjørt med The Dig. Ingen ny dokumentasjon trengs. The Dig bruker AKOS og har ingen myke romobjekter, så endringen skal ikke endre noe der, men det er ikke kjørt (PR-en sier det samme). Om samme endring skal inn i Dig, avgjøres etter flettingen.
 
 5. Små ting:
    - Diagnoserapporten for objekter (rundt linje 4864 i `dighd.cpp`) sjekker bare `objNNN_SS.png`, ikke `_hd.png`. Viser «no» for et objekt som bare har `_hd.png`. I dagens mod finnes begge, så det treffer ikke nå.

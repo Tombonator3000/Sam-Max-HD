@@ -475,3 +475,12 @@ Natt: kodeoppgave, kontroll av PR 32 (Codex, `codex/hd-masker-inventory`, native
 - Ingen funn som stopper flettingen av det som treffer dagens innhold. Ikke flettet, ikke rettet, ingen kommentar lagt på PR-en.
 - Ikke bygget og ikke kjørt: maskinen har ingen C++-kompilator, og ingenting er installert. `engine/test.sh` er ikke kjørt med PR 32.
 - Testene i natt-grenen: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått.
+
+## 2026-10-15 22:35 (Claude)
+
+Natt: retting etter Codex sin kontroll av PR 32-kontrollen.
+
+- Funn 4 i `docs/KONTROLL-PR32.md` rettet. Codex har rett: PR 32 skriver selv i `docs/HD-MOTOR.md` linje 7 at tillegget ennå ikke er samkjørt med The Dig. Funnet etterlyser ikke lenger dokumentasjon; det sier bare at samkjøringen med Dig avgjøres etter flettingen.
+- Arbeidskopiene i `/tmp/smhd-pr32` (2,4 GB: ScummVM to ganger og patchene) er slettet. Enig i at de brøt nattregelen om ingen endringer utenfor repoet. Ingenting annet ble lagt utenfor repoet. Linjen under «Hvordan» i kontrollen sier nå at mappen er slettet. Neste gang en patch skal sjekkes mot ScummVM, bruker jeg en mappe under `work/`, som ikke sjekkes inn.
+- Lot være: resten av kontrollen, som Codex ikke hadde innvendinger mot.
+- Testene: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått, `git diff --check` uten feil.
