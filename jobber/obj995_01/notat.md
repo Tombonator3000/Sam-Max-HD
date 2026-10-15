@@ -15,3 +15,9 @@ OK    hele bildet (lerret): skift 0.37, blokker 0.96, kantlikhet 0.88
 ```
 
 Teknisk kontroll er ikke individuell brukergodkjenning. Import og runtime er uverifisert.
+
+## Retting 15. oktober 2026: hele motiver og alfa
+
+Eksisterende native eske er fintegnet med mykere stempel og egen alfa. Tom: utvasket stempel, sannsynligvis THX1138 og uklar tekst under. Lesningen er tentativ; teksten er ikke gjort til en ny skarp etikett. Innebygd bildeverktøy, eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms uttrykkelige tillatelse. Beskyttede originaler, jobbmetadata og prompter uendret.
+
+Egenkontroll: OK. Se [rapport, prompter, forsøk og SHA-256](../../rapporter/lapper-eske-logo-20261015/RAPPORT.md). Ingen ny motorimport eller spilltest av denne rettingen.
