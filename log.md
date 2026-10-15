@@ -590,3 +590,15 @@ Natt: kontroll av lag032_03_del1av2, lag035_01_del1av2, lag035_02_del2av2 og lag
 - lag035_02_del2av2 (obj329_01, rom 35): godkjent. Den store fisken på nettet med munnen mot venstre, som originalen.
 - lag041_01_del1av2 (obj384_01, rom 41): godkjent. Tom vei og himmel der bilen ellers står, med de hvite løkkene i gresset. Bilen står i originalrommet og i HD-rommet, så lappen fjerner den som originalen. Skjøten mot HD-rommet er ren. lag041_01 venter fortsatt på del 2.
 - Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 01:50 (Claude)
+
+Natt: kontroll av lag041_01_del2av2, lag041_02_del2av2, lag043_01_del1av2 og lag045_01 fra Codex (commit 71eab2efb2 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`. Mottaket gav godkjent på alle fire.
+- Sett med øynene: originalobjektet i nearest ved siden av HD-objektbildet i `mods/gpt/objects`, og hvert objekt lagt inn i HD-rommet ved siden av rommet uten objektet for å se skjøten.
+- lag041_01_del2av2 (obj385_01, rom 41): godkjent. De brune, tørre hårtrådene på steinen uten de gule feltene, samme plassering og utbredelse som originalen. lag041_01 er nå levert i begge deler.
+- lag041_02_del2av2 (obj385_02, rom 41): godkjent. Hårtrådene med de to lave gule feltene og de spredte gule flekkene, plassert som i originalen. Ingen ansiktsform. Skjøten mot steinen er ren.
+- lag043_01_del1av2 (obj392_01, rom 43): godkjent. Den ovale metallgrillen på Conroy-statuen med blått under, oransje jakke og hånden med gitaren. Skjøten mot HD-rommet er ren.
+- lag045_01 (rom 45): godkjent. obj428_01 er sengen uten den store puten, slik originalen viser tilstanden, og skjøten mot veggen er ren. obj429_01 er det røde håret på utstillingshodet med skyggen bak, uten ansikt, og sitter på sokkelen i HD-rommet. obj430_01 den blå boken i hyllen, obj433_01 trappens nedre del. Form og plassering følger originalen.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandsovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
