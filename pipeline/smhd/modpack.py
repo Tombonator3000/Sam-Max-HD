@@ -135,12 +135,14 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
                 custom = own / "objects" / f"{name}.png" if own else None
                 ohd = None
                 if full is not None and state != full[0] and _is_patch(oim, full[1]):
-                    # En tilstand som bare er en lapp over en hel tilstand (flaggene i rom 17): den
-                    # skaleres på plass over den hele tilstanden, så kantene henger sammen. En egen
-                    # tegning av lappen alene passer ikke inn.
-                    ctx = base.copy()
-                    ctx.paste(full[1].convert("RGB"), (obj["x"], obj["y"]), full[1])
-                    ohd = _upscale_object_in_context(ctx, oim, obj["x"], obj["y"], scale, method, **upscale_kw)
+                    # En tilstand som bare er en lapp over en hel tilstand (flaggene i rom 17). En egen
+                    # tegning av hele bildet (som ordren ber om) klippes med lappens maske. En tegning av
+                    # lappen alene passer ikke inn; da skaleres lappen på plass over den hele tilstanden.
+                    ohd = _patch_from_full_painting(custom, oim, full[1], scale) if custom else None
+                    if ohd is None:
+                        ctx = base.copy()
+                        ctx.paste(full[1].convert("RGB"), (obj["x"], obj["y"]), full[1])
+                        ohd = _upscale_object_in_context(ctx, oim, obj["x"], obj["y"], scale, method, **upscale_kw)
                     custom = None
                 if custom and custom.exists():
                     ohd = Image.open(custom).convert("RGBA")
@@ -256,6 +258,24 @@ def _clean(hd: Image.Image, orig: Image.Image, name: str) -> Image.Image:
     if n:
         print(f"  {name}: {n} magentapiksler fylt")
     return cleaned
+
+
+def _patch_from_full_painting(custom: Path, patch: Image.Image, full: Image.Image, scale: int) -> Image.Image | None:
+    """En malt lapp-tilstand tegnet som helt bilde: klippes med lappens maske. Gir None når tegningen ikke
+    er et helt bilde (dekker under 80 prosent av den hele tilstanden) eller har feil størrelse."""
+    if not custom.exists():
+        return None
+    want = (patch.width * scale, patch.height * scale)
+    hd = Image.open(custom).convert("RGBA")
+    if hd.size != want:
+        return None
+    cover = hd.getchannel("A").point(lambda a: 255 if a else 0).histogram()[255]
+    full_cover = full.getchannel("A").point(lambda a: 255 if a else 0).histogram()[255] * scale * scale
+    if full_cover == 0 or cover < 0.8 * full_cover:
+        return None
+    hd = _clean(hd, patch, custom.name)
+    hd.putalpha(upscale_alpha(patch.getchannel("A"), scale))
+    return hd
 
 
 def _full_state(extract: Path, obj: dict) -> tuple[str, Image.Image] | None:

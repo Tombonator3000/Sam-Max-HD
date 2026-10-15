@@ -1966,7 +1966,9 @@ def test_patch_state_is_scaled_over_the_full_state(tmp_path):
     (ex / "rooms.json").write_text(json.dumps({"rooms": rooms}))
     own = tmp_path / "own"
     (own / "objects").mkdir(parents=True)
-    Image.new("RGBA", (32, 16), (0, 0, 255, 255)).save(own / "objects" / "obj182_03.png")
+    alone = Image.new("RGBA", (32, 16), (0, 0, 0, 0))  # lappen tegnet alene
+    alone.paste((0, 0, 255, 255), (28, 0, 32, 4))
+    alone.save(own / "objects" / "obj182_03.png")
     modpack.build_mod(ex, tmp_path / "mod", scale=4, method="nearest", rooms=None, own=own, text_font=False)
     hd = np.asarray(Image.open(tmp_path / "mod" / "objects" / "obj182_03.png").convert("RGBA"))
     assert hd.shape[:2] == (16, 32)
@@ -1990,3 +1992,31 @@ def test_magenta_spots_are_filled_from_around():
     pink = Image.new("RGB", (4, 4), (240, 20, 240))
     out2, n2 = modpack.remove_magenta(hd, pink)
     assert n2 == 0
+
+
+def test_patch_state_painted_whole_is_cut_with_the_patch_mask(tmp_path):
+    # Ordren ber om lapp-tilstander tegnet som hele bilder; mottaket klipper ut lappen
+    import json
+    import numpy as np
+    from smhd import modpack
+    ex = tmp_path / "ex"
+    (ex / "rooms").mkdir(parents=True)
+    (ex / "objects").mkdir()
+    Image.new("RGB", (320, 200), (100, 150, 220)).save(ex / "rooms" / "room017.png")
+    Image.new("P", (320, 200)).save(ex / "rooms" / "room017_idx.png")
+    Image.new("RGBA", (8, 4), (40, 120, 40, 255)).save(ex / "objects" / "obj182_01.png")
+    patch = Image.new("RGBA", (8, 4), (0, 0, 0, 0))
+    patch.putpixel((7, 0), (60, 160, 60, 255))
+    patch.save(ex / "objects" / "obj182_03.png")
+    for st in ("01", "03"):
+        Image.new("P", (8, 4)).save(ex / "objects" / f"obj182_{st}_idx.png")
+    rooms = {"17": {"name": "", "width": 320, "height": 200,
+                    "objects": [{"id": 182, "x": 100, "y": 10, "states": ["01", "03"]}]}}
+    (ex / "rooms.json").write_text(json.dumps({"rooms": rooms}))
+    own = tmp_path / "own"
+    (own / "objects").mkdir(parents=True)
+    Image.new("RGBA", (32, 16), (10, 200, 30, 255)).save(own / "objects" / "obj182_03.png")  # hel tegning
+    modpack.build_mod(ex, tmp_path / "mod", scale=4, method="nearest", rooms=None, own=own, text_font=False)
+    hd = np.asarray(Image.open(tmp_path / "mod" / "objects" / "obj182_03.png").convert("RGBA"))
+    assert tuple(hd[1, 30]) == (10, 200, 30, 255)  # tegningen der lappen er
+    assert hd[10, 4, 3] == 0                       # klippet bort utenfor lappen

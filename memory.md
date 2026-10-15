@@ -90,3 +90,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Ressursbank: `docs/GJENNOMGANG.md` (sted for sted, med romnumre), egen oppsummering av Derek Waites gjennomgang hos Just Adventure. Teksten derfra er ikke kopiert inn (opphavsrett, offentlig repo).
 - HD-skriften er Atkinson Hyperlegible (fet, OFL) fra 15. oktober; `fonts/OFL-atkinson.txt` i modden.
 - `build-mod` fyller magentaflekker (nøkkelfargen) i malte bilder fra fargene rundt (`remove_magenta`), men ikke der originalen selv er magenta (Max's Wax, rom 84).
+
+## Felles motorpatch med Dig-HD-Remake (15. oktober 2026)
+- `engine/patches/0001-dighd-hd-grafikk.patch` er den samme her og i Dig-HD-Remake. Spillspesifikke numre sperres med `_vm->_game.id` eller `_game.version`. Endres patchen i ett repo, kopieres den til det andre eller slås sammen tre-veis.
