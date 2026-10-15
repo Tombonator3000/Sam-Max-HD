@@ -1,7 +1,13 @@
 # lag052_02_del1av2
 
-Egne kildeobjekter nytegnet med innebygd imagegen; bare dokumenterte rektangler komponert mot riktig levert HD-grunnrom. Fire piksler innvendig rektangulær kantblanding. Ingen kildekonturmaske eller lokal geometriwarp. Penselmodellering er ikke identisk med originalens dither. Panorama er 1920×800 med klipp 0/384 og 1152 HD-overlapp; synlige samtidige felt følger begge deler.
+15. oktober 2026. 4 nye forsøk. Innebygd image_gen er brukt til all nytegning. Eksakt modellversjon er ikke eksponert.
 
-Faktisk uendret sjekk_leveranse.py: OK. Resultat SHA256: 8b6fe7c6cdb5e9ab2945091a62dd3b907054c7de8c3c189c6b338eb09eebe573. Lerret 1536×1024, eksakt RGB 128 utenfor motivrektangelet. 1 dokumenterte forsøk/metodetrinn. Innebygd imagegen ble brukt; verktøyet eksponerer ikke eksakt modellnavn.
+Savage Jungle Inn, rom 52. Obj483_02 er tukanens åpne nebb. Obj486_02 er øglens neste munnfase med en liten kjølig grålilla flate foran i gapet. Bilde to var jobber/rom052_del1av2/resultat.png. Første helbilde ga riktig tilstand, men la inn varme munnmerker. Forsøk 2 kopierte hvilestillingen for mye. Forsøk 3 ga flere grå blokker enn originalen. Forsøk 4 beholder én liten grålilla flate og fjerner de øvrige merkene. Bare feltet [934,748,60,48] fra siste nytegning er satt inn i helbildet.
 
-Kilder, råfiler, prompter, oppskrift og alle feltkorrelasjoner: rapporter/bestilling041-20261013/a-leveranser.json. Helscene og metadatafelt er kontrollert samlet. Runtime/import er ikke testet. Ingen ny individuell brukergodkjenning påstås.
+Prompt.txt er brukt ordrett som første del av hovedforsøket, med returteksten og separate kildepresiseringer etterpå. Beskyttede promptfiler og originaler er uendret. Alle brukte prompter og råforsøk er bevart i rapporter/natt-returer-rom22-47-52-20261015. Python er brukt til rensing av grå ramme og presis plassering av nytegnet grafikk etter Toms uttrykkelige tillatelse. Ingen originalkontur er brukt som klippemaske.
+
+Levering: RGB PNG, 1536 x 1024, eksakt grå ramme. Egenkontroll: OK. Den strengere kontrollen med smhd.gpt.check_pieces og piece_problem består også for alle objekter i jobben. Rapport: [RAPPORT.md](../../rapporter/natt-returer-rom22-47-52-20261015/RAPPORT.md).
+
+Resultat SHA-256: 4fa000a4bb261bdb6aea574f546634edea255cb919bb897aeb3312e063153acd
+
+Den lille grålilla flaten er bevart som form fra originalen uten å gi den en ny betydning. Kontroller faseovergangen i motoren før visuell godkjenning. Ingen motorimport, skjerm-/lydtest eller ny godkjenning fra Tom er gjort i denne økten.

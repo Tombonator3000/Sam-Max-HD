@@ -1,7 +1,13 @@
 # lag052_01_del2av2
 
-Egne kildeobjekter nytegnet med innebygd imagegen; bare dokumenterte rektangler komponert mot riktig levert HD-grunnrom. Fire piksler innvendig rektangulær kantblanding. Ingen kildekonturmaske eller lokal geometriwarp. Penselmodellering er ikke identisk med originalens dither. Panorama er 1920×800 med klipp 0/384 og 1152 HD-overlapp; synlige samtidige felt følger begge deler. Eget nærforsøk retter de forskjøvne dørbladene og telefonboksens innvendige grå felt.
+15. oktober 2026. 4 nye forsøk. Innebygd image_gen er brukt til all nytegning. Eksakt modellversjon er ikke eksponert.
 
-Faktisk uendret sjekk_leveranse.py: OK. Resultat SHA256: 726a78377b1c998de0938ad5ca36c358b6dd26a1c2dee9a7add0a9546e575c07. Lerret 1536×1024, eksakt RGB 128 utenfor motivrektangelet. 2 dokumenterte forsøk/metodetrinn. Innebygd imagegen ble brukt; verktøyet eksponerer ikke eksakt modellnavn.
+Savage Jungle Inn, rom 52. Obj486_01 er en liten munnfase på den hvilende grønne øglen, ikke en ny figur. Originalen og det godkjente jobber/rom052_del2av2/resultat.png styrer identitet og palett. Første helbilde ga riktig tilstand, men la til røde munnmerker. Forsøk 2 kopierte hvilestillingen for mye og ble forkastet. Forsøk 3 beholdt uønskede grå blokker. Forsøk 4 fjerner de oppdiktede innvendige merkene. Bare et nytegnet felt [550,748,60,48] fra siste forsøk er plassert i helbildet.
 
-Kilder, råfiler, prompter, oppskrift og alle feltkorrelasjoner: rapporter/bestilling041-20261013/a-leveranser.json. Helscene og metadatafelt er kontrollert samlet. Runtime/import er ikke testet. Ingen ny individuell brukergodkjenning påstås.
+Prompt.txt er brukt ordrett som første del av hovedforsøket, med returteksten og separate kildepresiseringer etterpå. Beskyttede promptfiler og originaler er uendret. Alle brukte prompter og råforsøk er bevart i rapporter/natt-returer-rom22-47-52-20261015. Python er brukt til rensing av grå ramme og presis plassering av nytegnet grafikk etter Toms uttrykkelige tillatelse. Ingen originalkontur er brukt som klippemaske.
+
+Levering: RGB PNG, 1536 x 1024, eksakt grå ramme. Egenkontroll: OK. Den strengere kontrollen med smhd.gpt.check_pieces og piece_problem består også for alle objekter i jobben. Rapport: [RAPPORT.md](../../rapporter/natt-returer-rom22-47-52-20261015/RAPPORT.md).
+
+Resultat SHA-256: 41e946271639988322c31616cd2d145ad184cd3c294959b092e03392a134a040
+
+Kontroller munnfasen mot tilstand 02 og de senere fasene i spillet. Automatisk kantlikhet er ikke godkjenning av hele animasjonen. Ingen motorimport, skjerm-/lydtest eller ny godkjenning fra Tom er gjort i denne økten.

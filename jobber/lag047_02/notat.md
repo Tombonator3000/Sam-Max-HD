@@ -1,18 +1,13 @@
 # lag047_02
 
-Kildetro lagkompositt med innebygd ChatGPT-bildegenerator. Eksakt bildemodell er ikke eksponert. 2 relevante genereringsforsøk; enkelte katte- og mikrofelt deler nygenererte komponenter fra familiearbeidet. Ordrett originalprompt med separat kildepresisering, alle råbilder og oppskrifter er bevart i rapporter/bestilling040-20261013.
+15. oktober 2026. 1 nytt forsøk. Innebygd image_gen er brukt til all nytegning. Eksakt modellversjon er ikke eksponert.
 
-Egenkontroll: OK, uendret sjekk_leveranse.py. Se rapporter/bestilling040-20261013/b-lag047_02-sluttkontroll.txt. Opakt RGB 1536 × 1024, motiv [128,112,1280,800], padding128. Null endringer utenfor metadataunionen. Originaler brukes som motivreferanser og til hele felt-/komponentbokser, ikke resultatpiksler, originalalfa eller warp.
+Bumpusville Sings, rom 47. Obj442_01 er øvre del av det brune dyrehodet ved høyre kant av sceneskiltet. Originalens øre- og øyeparti skiller seg fra rombakgrunnen. Bilde to var jobber/rom047/resultat.png. Bare det nytegnede rektangelet [768,208,160,64] er satt inn i forrige levering. De øvrige tilstandene, inkludert det lille øyet obj453_01, er beholdt.
 
-Visuell kontroll: faktisk kildeegen tilstand, avkutting og fravær er gjennomgått i b-sluttfelt-1.png til b-sluttfelt-4.png samt b-sluttfamilie.png. HD har fyldigere øyelokk, munnkonturer og dekor enn kildepikslene. Dette er et tegningsforbehold, ikke påstand om identisk anatomi eller runtime.
+Prompt.txt er brukt ordrett som første del av hovedforsøket, med returteksten og separate kildepresiseringer etterpå. Beskyttede promptfiler og originaler er uendret. Alle brukte prompter og råforsøk er bevart i rapporter/natt-returer-rom22-47-52-20261015. Python er brukt til rensing av grå ramme og presis plassering av nytegnet grafikk etter Toms uttrykkelige tillatelse. Ingen originalkontur er brukt som klippemaske.
 
-Original SHA-256: 6b765fafd370390134f11648593b189bc1816c4b6ac6d0cf7177cb745a28abbe
-Resultat SHA-256: 3442cfd940798969686b6b901fc80ac69e3c6f5e79fb793bce94b2dc850bc790
+Levering: RGB PNG, 1536 x 1024, eksakt grå ramme. Egenkontroll: OK. Den strengere kontrollen med smhd.gpt.check_pieces og piece_problem består også for alle objekter i jobben. Rapport: [RAPPORT.md](../../rapporter/natt-returer-rom22-47-52-20261015/RAPPORT.md).
 
-Runtime: false. Ny individuell brukergodkjenning: false.
+Resultat SHA-256: 0fb93d1d37a15a70fe08951a6540a8b4da82293900728588c991b37ef17cdfc6
 
-## Retting 15. oktober 2026: hele motiver og alfa
-
-Nytegnet komplett motiv før mottakets lappklipp, med eksisterende HD-rom som stilgrunnlag. Innebygd bildeverktøy, eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms uttrykkelige tillatelse. Beskyttede originaler, jobbmetadata og prompter uendret.
-
-Egenkontroll: OK. Se [rapport, prompter, forsøk og SHA-256](../../rapporter/lapper-eske-logo-20261015/RAPPORT.md). Ingen ny motorimport eller spilltest av denne rettingen.
+Første helbilde bestod egenkontrollen, men den strengere kontrollen fant at obj453_01 manglet. Den kandidaten er derfor ikke levert som helbilde. Kontroller dyrehodets overgang ved faktisk avspilling. Ingen motorimport, skjerm-/lydtest eller ny godkjenning fra Tom er gjort i denne økten.

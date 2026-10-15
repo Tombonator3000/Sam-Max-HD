@@ -1,15 +1,13 @@
 # lag022_02_del3av3
 
-Åpen svart port, eget høyere øksegrep og løftet vannrett hånd på blå erme. Hettefigur, armer, hode-/kurvgruppe og tilstøtende figur er sammenhengende, ikke løse objektbiter.
+15. oktober 2026. 1 nytt forsøk. Innebygd image_gen er brukt til all nytegning. Eksakt modellversjon er ikke eksponert.
 
-Innebygd ChatGPT image_gen, forsøk 2; eksakt bildemodell eksponeres ikke av verktøyet. Ordrett låst prompt står først i lagrede prompter, fulgt av separat kildepresisering. Råforsøk, SHA og oppskrift er bevart i rapporter/bestilling029-20261013/b-proveniens.json.
+Tunnel of Love, rom 22. Originalen viser en åpen mørk dør, den sentrale øksefiguren og Henrik VIII med hånden løftet. Obj228_02 er tegnet i den løftede posituren, med hånd og erme samlet. Bilde to var jobber/rom022_del3av3/resultat.png. Hele den nytegnede scenen brukes, med renset grå ramme.
 
-Egenkontroll OK med uendret sjekk_leveranse.py og eksplisitt kontroll av hvert objektfelt. Resultat SHA-256: c370ea60ba28f3660fcbb203ebef7ef23d3664a291611ee93deb495ad069bab5. Fire kildehash for jobben står i b-leveranser.json; alle 40 batchkilder og 16 ekstra kontekstfiler er uendret. Resultatet er opakt RGB 1536 × 1024 med eksakt grå padding. Utenfor metadataunionen er riktig levert HD-grunnrom byteidentisk.
+Prompt.txt er brukt ordrett som første del av hovedforsøket, med returteksten og separate kildepresiseringer etterpå. Beskyttede promptfiler og originaler er uendret. Alle brukte prompter og råforsøk er bevart i rapporter/natt-returer-rom22-47-52-20261015. Python er brukt til rensing av grå ramme og presis plassering av nytegnet grafikk etter Toms uttrykkelige tillatelse. Ingen originalkontur er brukt som klippemaske.
 
-Vanlig helskalering og fjæring langs rektanglenes samlede ytterkant brukes på nye bilder. Ingen originalsilhuettmasker, kildepikselkopiering, lokal warp eller vektortrace. De to 022-ansiktene er lokalt korrigert med ett felles source-identisk imagegen-utsnitt: flat oransjebrun nese/munn, små rette øyne, ingen rund rød nese, øyenbryn eller smil. Bare boksen [884,512,60,48] endres ved denne rettingen; b-ansiktsretting.json beviser uendret rest. Forbehold: renere, tykkere gullkanter, mer avrundede ansikter/fingre/tenner og mer modellerte materialer enn originalen. Små tone- og strekforskjeller mellom nytegning og grunnrom består. Teknisk OK er ikke semantisk sertifisering av hver lavoppløst detalj. Runtime=false og ny individuell brukergodkjenning=false. Se b-kilde-qa.md.
+Levering: RGB PNG, 1536 x 1024, eksakt grå ramme. Egenkontroll: OK. Den strengere kontrollen med smhd.gpt.check_pieces og piece_problem består også for alle objekter i jobben. Rapport: [RAPPORT.md](../../rapporter/natt-returer-rom22-47-52-20261015/RAPPORT.md).
 
-## Retting 15. oktober 2026: hele motiver og alfa
+Resultat SHA-256: 91e0ef6e40c261e781d9bc2c398c5bd6fb46cf3a49dbe82007c02f1d39054b98
 
-Nytegnet komplett motiv før mottakets lappklipp, med eksisterende HD-rom som stilgrunnlag. Innebygd bildeverktøy, eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms uttrykkelige tillatelse. Beskyttede originaler, jobbmetadata og prompter uendret.
-
-Egenkontroll: OK. Se [rapport, prompter, forsøk og SHA-256](../../rapporter/lapper-eske-logo-20261015/RAPPORT.md). Ingen ny motorimport eller spilltest av denne rettingen.
+Se særlig at hånden ikke etterlater det nedhengende ermet fra hvilestillingen når motoren klipper og setter sammen tilstanden. Ingen motorimport, skjerm-/lydtest eller ny godkjenning fra Tom er gjort i denne økten.
