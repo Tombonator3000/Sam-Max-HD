@@ -415,3 +415,13 @@ Natt: kontroll av obj187_05 (oppgaven pekte på commit cb4ecc3e i `work/.gpt-gre
 - Sett med øynene mot originalen og referanse.png i forhåndsvisningen: avvisningen stemmer. Klubbehodet og hånden ligger lenger til venstre og høyere enn i referansen, hullene har mørke flekker rundt kanten, og fargen i bakgrunnen er jevnet ut. Ingenting lagt til eller fjernet, teksten på brettet er bare et utsnitt og ser lik ut.
 - Ingen ny rad i `docs/gpt-avvisninger.csv`: mottaket avviste allerede, og `retur.md` med forslag ligger i jobben fra før.
 - Fortsatt åpent spørsmål til Tom: push fra denne maskinen krever ny innlogging mot GitHub. Lokale commits i `work/.gpt-gren` (edec20f7, dcd9962d, cb4ecc3e) er ikke pushet. Ikke testet i spillet.
+
+## 2026-10-15 20:25 (Claude)
+
+Natt: kodeoppgave fra todo, mottaket for myke figurer måler Sam091 uten fotresten.
+
+- Årsak: `measure_mask` tar den løse fotresten (36 eller 37 originalpiksler) ut som utligger, men tegningen ble målt med fotresten fra rutekartet. Høyden ble da 23 til 30 prosent for stor, plasseringen ble gjort mot originalen uten fotrest, og fotresten ble i tillegg lagt inn fra originalen.
+- Rettet i `pipeline/smhd/myk.py`, versjon 6 (alle ark tas inn på nytt): ny `drawn_outliers`. Har originalen utliggere, tegningen mer enn én del, og ligger forholdet mellom høyde og bredde i tegningen nærmere originalen med utliggerne enn uten, måles og plasseres ruten med utliggerne på begge sider, og de legges ikke inn fra originalen.
+- Ny test `test_soft_cel_drawn_outlier`. Sjekket at den feiler uten rettelsen. pytest i `pipeline`: 55 bestått.
+- Kjørt på alle leverte ark i `work/.gpt-gren` til en midlertidig mappe i /tmp (ikke `work/gpt-ferdig`, ikke modden): 931 ruter ok og 0 til gjennomsyn, mot 920 og 11 før. De eneste som endret status er de 11 kjente: fig091_03 til 05 (fotresten, snitt delt på union nå 0,90 til 0,96) og fig209_03 og fig272_02 (én løs originalpiksel langt til siden som grafikeren har tegnet, så bredden ble målt 1,13 og 3,24 mot 4x; nå 1,0). Forhåndsvisningene for fig091_04 og fig272_02 sett med øynene: fotresten og pikselen ligger på originalens plass innenfor omrisset.
+- Ikke gjort: modden er ikke bygget på nytt og ORDRE.md er ikke endret. Endringen ligger på natt-grenen og må gjennom PR mot main før `tools/gpt_runde.sh` tar inn rutene. Ikke testet i spillet.

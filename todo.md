@@ -8,7 +8,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)
 - [x] Samme patch i Dig-HD-Remake (Dig PR 57, venter på fletting)
 - [ ] Tom fletter PR 30 (objektleveranser.json i importpakke)
-- [ ] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn
+- [x] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn (rettet 15. oktober 20:25, `myk.py` versjon 6, på grenen samarbeid/natt-2026-10-15)
+  - [ ] Neste `tools/gpt_runde.sh` etter fletting tar inn de 11 rutene (fig091_03 til 05, fig209_03, fig272_02); fjern da beskjeden om ny tegning i ORDRE.md
   - 15. oktober 20:05: fig091_03 (rute 1955, ny utgave) og fig091_04 sett av Claude, bokser like originalen i 4x, holdes likevel ute og ordren ber om ny tegning. Beskjed i ORDRE.md om ikke å tegne dem på nytt. Når mottaket er rettet, kommer de inn uten ny leveranse
 - [ ] Push fra denne maskinen til `gpt-arbeid` og `hd-mod` feiler (GitHub-innlogging, 15. oktober 20:04). To ordrecommiter ligger lokalt i `work/.gpt-gren`, modden i `mods/gpt` er bygget men ikke publisert. Trenger Tom
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
@@ -75,7 +76,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Windows-pakken bygget på nytt med den nye modden
 - [ ] Se inventaret i spillet med de nye ikonene (testhoppet åpner det ikke; krever lagret spill eller å spille dit)
 - [ ] Tom ser på det nye Max-ikonet (obj1008_01) og de andre ikonene
-- [ ] 11 figurruter til gjennomsyn (fig091_03 til 05, fig209_03, fig272_02): tegnet i annen størrelse enn gruppen, sendt tilbake i ordren
+- [ ] 11 figurruter til gjennomsyn (fig091_03 til 05, fig209_03, fig272_02): var målefeil i mottaket (utligger tegnet, men målt bare i originalen). Med versjon 6 er alle 11 ok; se dem i spillet etter neste runde
 - [ ] Hakking på nettsiden (Tom 14. oktober). 15. oktober: SIMD i nettbygget (hele skjermen 20 til 30 ms i Chromium), bakgrunnshentingen venter ved grense fra GitHub (429 ga ventetid også for filene spillet trengte). Gjort: HD-pakken hentes i bakgrunnen, fargetoningen er raskere (15 til 11 ms per skjerm), `?adlib` for å sammenligne med MT-32. Tom tester igjen. Nettsiden henter nå HD-pakken i bakgrunnen. Hele skjermen tar 14 til 22 ms å bygge her; i nettleseren kan nedtoninger og rulling bli tunge. Mål med `DIGHD_BENCH` i nettleseren og se på å bygge bare det som er endret ved palettbytter
 
 ### Pipeline

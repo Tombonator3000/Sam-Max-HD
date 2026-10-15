@@ -1537,6 +1537,36 @@ def test_soft_cel_technical_and_outliers(tmp_path):
     assert not (out / "costumes" / "costume007_001_hd.png").exists()
 
 
+def test_soft_cel_drawn_outlier(tmp_path):
+    # Versjon 6: Sams løse fotrest (kostyme 91) er en utligger i originalen, men grafikeren tegner den.
+    # Da måles og plasseres ruten med fotresten på begge sider, og den legges ikke inn fra originalen.
+    import numpy as np
+    from smhd import myk
+
+    originals, drawings = {}, {}
+    for i, rest in enumerate((True, True, False)):
+        o = np.zeros((60, 30, 4), np.uint8)
+        o[2:42, 4:26] = (120, 140, 200, 255)           # kroppen, 22 x 40
+        d = np.zeros((260, 130, 4), np.uint8)
+        d[8:168, 16:104] = (120, 140, 200, 255)        # 88 x 160 = kroppen i 4x
+        if rest:
+            o[52:56, 12:16] = (180, 100, 40, 255)      # fotresten, 16 piksler, 10 under kroppen
+            d[208:224, 48:64] = (180, 100, 40, 255)
+        originals[f"costume091_19{i}"] = o
+        drawings[f"costume091_19{i}"] = d
+    o = originals["costume091_190"]
+    keep, outlier = myk.measure_mask(o)
+    assert outlier.sum() == 16
+    sheet, cels, boxes, ex = _soft_sheet_case(tmp_path, originals, drawings)
+    rep = myk.import_sheet(sheet, cels, boxes, ex, tmp_path / "ut")["ruter"]
+    for b, r in rep.items():
+        assert r["status"] == "ok" and r["snitt_union"] > 0.9, (b, r)
+        assert r["tegnet_mot_4x"] == [1.0, 1.0], (b, r)
+        assert "utligger" not in r["kilde"], (b, r)
+    # Uten tegnet fotrest (én del) legges utliggeren inn fra originalen som før
+    assert not myk.drawn_outliers(keep, outlier, np.ones((160, 88), bool), 1)
+
+
 def test_soft_cel_no_head_pulse(tmp_path):
     # Codex 11. oktober: munnstillinger der originalen er 12 og 13 piksler høy og tegningene like høye,
     # fikk hodet strukket 8 prosent. Når tegningene ikke sprer mer enn originalene, brukes gruppens skala.
