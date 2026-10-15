@@ -332,3 +332,11 @@ Tom: ta inn ny grafikk til spillet.
 - Ny 0001 fra Zak McKracken HD (5782de2): `compose()` i `dighd.cpp` kopierer HD-pikslene rett når fargen er uendret, uten tak og med 32-bits skjerm i samme format som HD-bildet (alfa 255 som før). Ellers den gamle veien; 16-bits skjerm er uendret.
 - Målt i Zak (OpenGL under Xvfb, nearest-mod): 4,7 til 5,9 ms ned til 1,6 til 2,7 ms for hele skjermen. `engine/test.sh` 0 avvik med 16 og 32 bit, og bilder byte for byte like med gammel motor. Ikke testet med dette spillet.
 - Bare `engine/patches/0001-dighd-hd-grafikk.patch` endret, byte for byte lik den i Zak, Sam & Max, The Dig og Dig-HD-Web.
+
+## 2026-10-15 15:58 (Claude)
+
+Tom: lag oppdatert Linux-pakke.
+
+- Arbeidsflyten Linux-pakke startet fra main (PR 24 trengs ikke, pakken tar modden fra `hd-mod`). Pakken ble bygget og testet uten skjerm, men Debian 12-testen fikk `toomanyrequests` fra public.ecr.aws, også ved ny kjøring, så releasen ble ikke publisert.
+- Rettet: testen henter Debian-bildet fra første speil som svarer (public.ecr.aws, mirror.gcr.io, docker.io). Grenen `linux-debian-speil`, PR 26. Arbeidsflyten kjørt fra grenen: mirror.gcr.io brukt, ingen manglende biblioteker, spillet startet, releasen «linux» publisert (hd-mod e3b7a78, modden fra 15. oktober 14:22).
+- Testet: AppImage lastet ned fra releasen, sjekksummen stemmer, 111 myke ikoner med i modden, startet uten skjerm i rom 7 med HD-rom, HD-objekter, myke figurer og Atkinson-skriften. Ikke testet med skjerm og lyd.

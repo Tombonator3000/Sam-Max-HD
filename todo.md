@@ -56,6 +56,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Grafikkordre: animasjonstilstander som bare er lapper (flaggene og propellen i rom 17, 19 objekter i alt) må tegnes som hele bilder og klippes etterpå; inventaresken (obj995) trenger egen alfa så kanten blir myk; obj049 (LucasArts-logoen) har magentaflekker fra ChatGPT; ikonene i rom 93 og 94 er Scale4x til ikonarkene er tegnet
 - [x] Ny grafikk fra `gpt-arbeid` 15. oktober tatt inn: rettede rutekart (920 av 931 ruter), 111 ikoner med egen myk alfa (`smhd myke-ikoner`, PR 24), hd-mod publisert
 - [ ] Tom fletter PR 24 (mottaket for myke ikoner), så nettsiden og pakkene bygges på nytt med den nye modden
+- [x] Linux-pakken bygget på nytt med modden fra 15. oktober (release «linux», 15:57)
+- [ ] Tom fletter PR 26 (Debian-testen bruker speil); Windows-pakken og nettsiden er ikke bygget på nytt
 - [ ] Se inventaret i spillet med de nye ikonene (testhoppet åpner det ikke; krever lagret spill eller å spille dit)
 - [ ] Tom ser på det nye Max-ikonet (obj1008_01) og de andre ikonene
 - [ ] 11 figurruter til gjennomsyn (fig091_03 til 05, fig209_03, fig272_02): tegnet i annen størrelse enn gruppen, sendt tilbake i ordren
