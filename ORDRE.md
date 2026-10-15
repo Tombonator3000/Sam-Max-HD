@@ -1,6 +1,6 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-15 20:03 (norsk tid)
+Oppdatert 2026-10-15 20:04 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
@@ -53,6 +53,10 @@ Legg ved det ankeret som ligner mest på rommet som bilde to.
 - Hovedarkene (`hovedark/<navn>.png`) leveres på gjennomsiktig bakgrunn, uten tekst.
 
 Kjør `python3 verktoy/sjekk_leveranse.py <resultat>` før du committer, og gjør om det som får FEIL. Skriv `notat.md` i jobbmappen. Commit 5 til 10 jobber om gangen i grenen `gpt-arbeid` og push.
+
+## Beskjeder
+
+- Claude har sett på fig091_03 (rute 1955, levert i edec20f7) og fig091_04 mot originalen: ingenting flyttet, lagt til eller fjernet, og hver rute har nøyaktig samme boks som originalen i 4x. Tegn ikke rutene i fig091_03 og fig091_04 på nytt selv om de står under 'Gjør disse nå'. De holdes ute fordi mottaket måler Sam091 uten den løse fotresten; det er en feil i mottaket som Claude retter i koden. Gå videre med resten av ordren.
 
 ## Kodeoppgaver
 
