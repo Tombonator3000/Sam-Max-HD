@@ -57,7 +57,12 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Ny grafikk fra `gpt-arbeid` 15. oktober tatt inn: rettede rutekart (920 av 931 ruter), 111 ikoner med egen myk alfa (`smhd myke-ikoner`, PR 24), hd-mod publisert
 - [ ] Tom fletter PR 24 (mottaket for myke ikoner), så nettsiden og pakkene bygges på nytt med den nye modden
 - [x] Linux-pakken bygget på nytt med modden fra 15. oktober (release «linux», 15:57)
-- [ ] Tom fletter PR 26 (Debian-testen bruker speil); Windows-pakken og nettsiden er ikke bygget på nytt
+- [x] PR 26 flettet
+- [x] Importpakken 15. oktober 16:17 tatt inn (`smhd importpakke`, PR 28), hd-mod og Linux-pakken oppdatert
+- [ ] Tom fletter PR 28
+- [ ] Se bassenget i rom 54 (objekt 833, 834, 836) i spillet; rom 54 henger etter testhoppet
+- [ ] obj835 (bart eller åpen munn) venter på Toms avklaring
+- [ ] Windows-pakken bygges på nytt med den nye modden
 - [ ] Se inventaret i spillet med de nye ikonene (testhoppet åpner det ikke; krever lagret spill eller å spille dit)
 - [ ] Tom ser på det nye Max-ikonet (obj1008_01) og de andre ikonene
 - [ ] 11 figurruter til gjennomsyn (fig091_03 til 05, fig209_03, fig272_02): tegnet i annen størrelse enn gruppen, sendt tilbake i ordren

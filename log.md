@@ -347,3 +347,14 @@ Tom: push ny grafikk til nettutgaven også.
 
 - Nettsiden (Sam-Max-HD-Web) henter HD-modden i nettleseren rett fra grenen `hd-mod` (fillisten uten mellomlager, filene etter sjekksum), så den nye modden fra 14:22 er med uten ny bygging. Motoren på siden ble sist bygget fra main 16:00 (kjøring 38747604195), med samme patch.
 - Sjekket: fillisten i `hd-mod` har 111 myke ikoner, raw.githubusercontent.com gir samme obj1008_01_hd.png som modden (sjekksum lik), siden svarer 200. Ikke sett i en nettleser denne gangen.
+
+## 2026-10-15 16:52 (Claude)
+
+Tom: pakk ny Linux-pakke med den nye grafikken.
+
+- Ny grafikk i `gpt-arbeid` siden forrige mod: hele animasjonsmotiver og alfa (15:17, 22 jobbresultater) og en samlet importpakke (16:17, `rapporter/import-grafikk-20261015/manifest.json`): 30 hele motiver for lapp-tilstander, 12 tilstander av objekt 833, 834 og 836 med indeksbilder i rom 54-paletten, egen alfa for inventaresken obj995_01 og logoen obj049_01, og ikonene. obj835 avventer Toms avklaring og er ikke med.
+- Runden: `gpt-inn` (ferdige objektbilder fra lag 534 av 701, ikoner 163 av 163), `myke-figurer` (920 ruter ok, 11 til gjennomsyn som før), `myke-ikoner` (111).
+- Nytt steg `smhd importpakke` (`pipeline/smhd/importpakke.py`) tar inn pakken etter behandlingen i manifestet: 56 tatt inn, 0 hoppet over. `build-mod` bruker et eget indeksbilde fra `--egne` foran uttrekkets. Ny test, pytest 50 bestått. PR 28.
+- Modden bygget (76 rom, 958 objektbilder, 923 figurruter, 113 myke objektbilder) og publisert i `hd-mod` (b5f33fd).
+- Testet uten skjerm: rom 17 viser flaggene og teltene i HD uten lapp-blokker. Rom 54 henger etter testhoppet (kjent), så bassenget er ikke sett i spillet.
+- Linux-pakken bygget fra main med den nye modden og publisert i releasen «linux» (bygget 14:48 UTC, Debian-testen gikk gjennom). Lastet ned: sjekksummen stemmer, ikonene, obj995 og indeksbildene for rom 54 er med, startet i rom 17 med HD.
