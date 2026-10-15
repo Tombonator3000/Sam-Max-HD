@@ -494,3 +494,15 @@ Natt: retting etter Codex sin andre kontroll av PR 32-kontrollen.
 - Begrunnelsen i oppføringen 22:20 er markert som feil med henvisning hit; resten av den oppføringen står.
 - Lot være: å sjekke om ikonene faktisk går gjennom `blastSlot`. ScummVM-kilden ble slettet fra /tmp, og ny henting utenfor `work/` er ikke ønsket i natt; spillet kan heller ikke kjøres her. Spørsmål til neste kodeøkt eller Tom: tegnes BOMP-ikonene i rom 93 med `drawBlastObject`, som romobjekt, eller begge?
 - Testene: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått, `git diff --check` uten feil. Motortesten er ikke kjørt (ingen C++-kompilator).
+
+## 2026-10-15 22:53 (Claude)
+
+Natt: kontroll av lag022_02_del3av3, lag047_02, lag052_01_del2av2 og lag052_02_del1av2 fra Codex (commit e107128e i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (8389ad1e). Mottaket godkjente alle fire.
+- Sett med øynene: hele referanse.png over resultat.png, utsnitt per objekt med 8 px marg (referanse i nearest, resultat side om side), og originalobjektene i `work/extract/objects` i 12x mot objektbildene i `mods/gpt/objects`.
+- lag022_02_del3av3: godkjent. obj219_02 er den åpne mørke døren i buen, obj222_02 er øksefiguren med lutten og mannen med bøtta i samme stilling, obj228_02 er Henrik VIII med løftet åpen hånd. Ermet henger ikke igjen fra hvilestillingen.
+- lag047_02: godkjent. Alle åtte objekter på plass: kameraet ved høyre kant (obj436), nebbdyret (obj437), frosken med åpen munn (obj438), bjørnehodet ved skiltet (obj442), katten (obj444_02 med lukket munn og rød nese som originalen), kamelens øye (obj447), figuren til venstre (obj451) og tukanens lille øye (obj453_01, som manglet i første forsøk). Skiltet staves BUMPUSVILLE SINGS som originalen.
+- lag052_01_del2av2: godkjent. Vinduet med finnen til bilen utenfor (obj480), hyllen (obj481) og øglens munnfase obj486_01 uten oppdiktede røde merker.
+- lag052_02_del1av2: godkjent. Tukanen med åpent nebb (obj483_02) og øglens neste fase obj486_02 med én liten grålilla flate i gapet som originalen. Plakaten staves THE REPTILE QUEEN og COLOR. Tukanens øye er rundt i HD mens originalen har en smal strek; det er likt det godkjente rombildet og obj483_01, så det er ikke avvist her. Spørsmål til Tom ved stilgodkjenningen: skal tukanen ha det smale øyet fra originalen?
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene for øglen og tukanen er ikke sett i motoren. Stilen er ikke godkjent av Tom.
