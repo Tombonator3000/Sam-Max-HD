@@ -2294,3 +2294,38 @@ def test_importpakke_objektleveranser(tmp_path):
     assert r["bilder"]["obj200_02"]["status"] == "ok"
     assert r["bilder"]["obj200_02"]["manifest"].endswith("objektleveranser.json")
     assert _Image.open(ut / "objects" / "obj200_02.png").getpixel((0, 0)) == (20, 0, 0, 255)
+
+
+def test_icon_sheet_on_other_background_gets_no_halo(tmp_path):
+    """Et ikonark levert på en annen flat farge enn bestilt: fargelåsen skal ikke dra kantene på
+    ikonene mot den bestilte fargen (ikon01 i Sam & Max kom på grønt i stedet for magenta)."""
+    import json
+    import numpy as np
+    from smhd import gpt
+
+    ex, room = _layer_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "ikon01"
+    job = json.loads((d / "jobb.json").read_text())
+    bg = tuple(job["bakgrunn"])
+    other = next(b for b, _ in gpt.SHEET_BACKGROUNDS if b != bg)
+    ref = np.asarray(Image.open(d / "referanse.png").convert("RGB")).copy()
+    ref[np.all(ref == bg, axis=2)] = other
+    Image.fromarray(ref, "RGB").save(d / "referanse_annen.png")
+    Image.open(d / "referanse_annen.png").save(d / "resultat.png")
+    (d / "referanse_annen.png").unlink()
+    gpt.import_results(work, ex, done)
+    status = {r["jobb"]: r for r in gpt.read_status(work)}
+    assert status["ikon01"]["status"] == "godkjent"
+    prov = json.loads((done / "provenance.json").read_text())
+    assert prov["obj025_01"]["jobber"][0]["arkfarge_levert"] == list(other)
+    # Kanten på ikonet (ytterste 4 HD-piksler) er som levert, ikke farget av den bestilte bakgrunnen
+    hd = np.asarray(Image.open(done / "objects" / "obj025_01.png").convert("RGB"), dtype=np.float64)
+    ox, oy = job["plassering"]
+    x, y = job["objekter"][0]["rekt"][:2]
+    crop = np.asarray(Image.open(d / "resultat.png").convert("RGB").crop(
+        ((ox + x) * 4, (oy + y) * 4, (ox + x + 16) * 4, (oy + y + 16) * 4)), dtype=np.float64)
+    ring = np.ones(hd.shape[:2], bool)
+    ring[4:-4, 4:-4] = False
+    assert np.abs(hd - crop)[ring].mean() < 8

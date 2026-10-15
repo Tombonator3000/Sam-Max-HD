@@ -602,3 +602,14 @@ Natt: kontroll av lag041_01_del2av2, lag041_02_del2av2, lag043_01_del1av2 og lag
 - lag043_01_del1av2 (obj392_01, rom 43): godkjent. Den ovale metallgrillen på Conroy-statuen med blått under, oransje jakke og hånden med gitaren. Skjøten mot HD-rommet er ren.
 - lag045_01 (rom 45): godkjent. obj428_01 er sengen uten den store puten, slik originalen viser tilstanden, og skjøten mot veggen er ren. obj429_01 er det røde håret på utstillingshodet med skyggen bak, uten ansikt, og sitter på sokkelen i HD-rommet. obj430_01 den blå boken i hyllen, obj433_01 trappens nedre del. Form og plassering følger originalen.
 - Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandsovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 01:48 (Claude)
+
+Natt, kodeoppgave: farget glorie rundt ikoner fra ikonark levert på feil bakgrunnsfarge.
+
+- Funnet i `status.csv`: ikon01 hadde fargeavvik 150,6 mot under 16 for alle andre jobber. Codex leverte arket på grønt (0,177,64), mens jobben ber om magenta. Fargelåsen trekker de grove fargene mot originalen, så kantene på ikonene ble dratt mot magenta. Sett med øynene i modden: obj661_01 (politibilen) har magenta kant langs hele omrisset i `mods/gpt/objects`.
+- `pipeline/smhd/gpt.py`: ny `_sheet_bg_as_delivered`. For ikonark måles arkfargen i leveransen der originalarket er bakgrunn (krympet 2 piksler fra ikonene). Ligger den mer enn `SHEET_BG_TOL` (40) fra bestilt farge, brukes den leverte fargen som bakgrunn i originalen fargelåsen sammenligner med. Fargen står som `arkfarge_levert` i resultatet og i provenance. Kontrollen (`compare`, `check_pieces`) er uendret, så status endres ikke.
+- Ny test `test_icon_sheet_on_other_background_gets_no_halo`: ikonarket levert på en annen arkfarge. Med den gamle koden er kantavviket på ikonet 71,5 (og `arkfarge_levert` mangler), nå under 8.
+- Tørrkjøring med `_evaluate` på det ekte ikon01 (ingenting skrevet til modden): `arkfarge_levert` [0, 177, 64], status fortsatt sjekk (blokkavvik 1,3). obj661_01 utklippet med `_with_alpha` og sett over mørk grønn: magentakanten er borte, bare en svak lys strek øverst på taket.
+- Ikke kjørt: `tools/gpt_runde.sh` og ny modd, så modden har fortsatt glorien. Ikke testet i spillet.
+- Testene: pytest i `pipeline` 60 bestått, `git diff --check` uten feil.

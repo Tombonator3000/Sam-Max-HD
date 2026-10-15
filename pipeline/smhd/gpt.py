@@ -64,6 +64,7 @@ CHECK_SHIFT, CHECK_BLOCK, CHECK_EDGES = 1.5, 2.0, 0.40
 # (ikke figurark, som har egen kontroll per rute)
 FIX_SHIFT_MIN = 0.25
 FIX_BLOCK_TOL = 0.1          # blokkavviket kan ikke øke mer enn dette ved rettingen (originalpiksler)
+SHEET_BG_TOL = 40.0          # en levert arkfarge lenger unna bestilt farge enn dette (RGB) brukes i fargelåsen
 FIX_PIECE_TOL = 0.05         # kantlikheten til et objektbilde i lag og ikonark kan ikke falle mer enn dette
 
 # Stilpiloten: rommet som males først, sammen med hovedarkene og de første figurarkene for Sam og Max
@@ -1225,6 +1226,32 @@ def _pieces_worse(before: dict[str, dict | None] | None, after: dict[str, dict |
     return False
 
 
+def _sheet_bg_as_delivered(original: Image.Image, part: Image.Image,
+                           bg: list[int]) -> tuple[Image.Image, list[int] | None]:
+    """Originalarket med bakgrunnen i fargen arket faktisk er levert på.
+
+    Leveres et ikonark på en annen flat farge enn bestilt (grønt i stedet for magenta), drar
+    fargelåsen kantene på ikonene mot den bestilte fargen, og utklippet får en farget glorie.
+    Gir (originalen, None) når fargen er som bestilt, ellers (originalen med levert farge, fargen).
+    """
+    o = np.asarray(original.convert("RGB"))
+    mask = np.all(o == np.array(bg, dtype=o.dtype), axis=2)
+    inner = mask.copy()
+    for _ in range(2):
+        p = np.pad(inner, 1, constant_values=False)
+        inner = np.logical_and.reduce([p[dy:dy + inner.shape[0], dx:dx + inner.shape[1]]
+                                       for dy in range(3) for dx in range(3)])
+    if inner.sum() < 16:
+        return original, None
+    small = np.asarray(part.convert("RGB").resize(original.size, Image.BOX), dtype=np.float64)
+    got = np.median(small[inner], axis=0)
+    if float(np.linalg.norm(got - np.array(bg, dtype=np.float64))) <= SHEET_BG_TOL:
+        return original, None
+    out = o.copy()
+    out[mask] = np.round(got).astype(o.dtype)
+    return Image.fromarray(out, "RGB"), [int(v) for v in np.round(got)]
+
+
 def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, sigma: float, strength: float,
               preview_dir: Path) -> tuple[dict, np.ndarray | None]:
     """Kontrollerer én leveranse for en jobb. Gir resultatraden og det fargelåste bildet (None hvis avvist på format)."""
@@ -1266,7 +1293,12 @@ def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, 
             part, m, status, checks = part2, m2, status2, checks2
             fx, fy = r["plassering_rettet"]
             why = "; ".join(filter(None, [f"plassering rettet med {-fx:+.1f}, {-fy:+.1f} originalpiksler", why2]))
-    orig4 = np.asarray(original.resize((w * SCALE, h * SCALE), Image.LANCZOS), dtype=np.float64)
+    lock_ref = original
+    if job.type == "ikon" and job.bakgrunn:
+        lock_ref, delivered = _sheet_bg_as_delivered(original, part, job.bakgrunn)
+        if delivered:
+            r["arkfarge_levert"] = delivered
+    orig4 = np.asarray(lock_ref.resize((w * SCALE, h * SCALE), Image.LANCZOS), dtype=np.float64)
     locked = lock_colors(np.asarray(part, dtype=np.float64), orig4, sigma, strength)
     if job.objekter:
         # Lag og ikonark: hvert objekt må også ligne på originalen, ellers blir utklippet feil

@@ -18,6 +18,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Push fra denne maskinen til `gpt-arbeid` og `hd-mod` feiler (GitHub-innlogging, 15. oktober 20:04). To ordrecommiter ligger lokalt i `work/.gpt-gren`, modden i `mods/gpt` er bygget men ikke publisert. Trenger Tom
 - [x] Mottaket retter hele bilder som er forskjøvet 0,25 til 1,5 originalpiksler (klipper på nytt der innholdet ligger, ikke figurark), 16. oktober 00:24, nattgrenen. Tørrkjøring på de 32 sjekk-jobbene: 12 blir godkjent, 7 til får bedre plassering men står fortsatt til sjekk
   - [ ] Neste `tools/gpt_runde.sh` tar det i bruk; se de 12 som blir godkjent (obj293_01, obj335_01, obj339_01, obj566_01, obj602_01, obj774_01, obj775_01, obj822_01, rom060_del2av2, rom092, lag060_01_del2av2, lag060_02_del2av2) med øynene før de regnes som kontrollert
+- [x] Ikonark levert på en annen flat farge enn bestilt (ikon01 på grønt, ikke magenta) fikk magenta glorie rundt ikonene etter fargelåsen, også i modden (obj661_01 til obj670_01). Fargelåsen bruker nå arkfargen som er levert (16. oktober, nattgrenen)
+  - [ ] Neste `tools/gpt_runde.sh` tar det i bruk; se politibilene og skiltet fra ikon01 (obj661_01, obj662_01, obj663_01, obj670_01) i modden med øynene. ikon01 står fortsatt til sjekk (blokkavvik 1,3)
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
 - [ ] Tom: første natteskift med Claude og Codex (prosjektbiblioteket `samarbeid/`), først en kort prøve med `--timer 1 --jobber 1`
