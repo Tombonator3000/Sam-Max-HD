@@ -1,7 +1,19 @@
 # lag068_08
 
-Kildens separate veifragmenter, én gul strek og egen skjevhet er bevart. Komponentuttrekk bruker bare genererte farger; originalbildet er ikke maske. Små fjerne veisilhuetter er forenklet til kildens RGB19,19,19 og en oppfunnet innvendig strek i01 fjernet ved fylling av et lukket hull i NY generert komponent. Nøyaktig algoritme finnes i oppskriften. Det er ingen vektorrekonstruksjon eller lokal warp. Originalens dither er erstattet av glattere og noe lysere malt modellering.
+Dato: 16. oktober 2026, norsk tid. Returarbeid i gpt-arbeid.
 
-Faktisk uendret egenkontroll: OK. SHA256: f6e7996564e2c7085f2a6e186ac8bc9f89077ca04ea6fb2ad24dd3e69437a638. 1 innebygde genereringsforsøk. Eksakt modell er ikke eksponert. Canvas 1536 × 1024 med RGB 128-padding. Ingen runtime/import eller ny individuell brukergodkjenning påstås.
+Verktøy: innebygd image_gen. Eksakt modellnavn vises ikke. Antall bildeforsøk i denne runden: 1. Python med Pillow og numpy brukes til presis plassering og rensing etter Toms tillatelse. Ingen originalpiksler erstatter nytegningen.
 
-Alle kilde-, rå-, prompt- og kontrollhasher finnes i rapporter/bestilling046-20261013/a-leveranser.json. Samlet nærbilde-QA og kildebevis finnes i bestilling046. Rot eier mottak og Git.
+Grunnlag: referanse.png og original_1x.png er sett sammen med godkjent romanker `jobber/rom068/resultat.png`. Romkonteksten er kontrollert i GJENNOMGANG.md og ressursmetadata i jobb.json og work/extract/rooms.json. Uttrekkets objektbilder er brukt til kontroll av tilstand, mål og plassering. ANALYSE.md og remake-skillens motivregler er fulgt.
+
+Motiv og funksjon: obj641_01: det fjerneste, svært flate veisegmentet ved horisonten. obj631_01 og obj621_01 er de to nærmere segmentene, med én gul veistrek på det nærmeste.
+
+Utførelse: Verktøyet tegnet det lille motivet 62 × 8. Alfa er trukket fra nytegningen uten originalkonturmaske. Motivet er skalert til originalens 56 × 8 og plassert ved (748, 440). Bakgrunnen i feltet er hentet fra godkjent rom068. Rå kopiering av hele feltet flyttet horisonten og ga 0,443 i objektkontrollen. Den kandidaten er forkastet. De andre to segmentene er beholdt fra forrige leveranse. Resten av forrige resultat er bevart. Prompt.txt er brukt ordrett i helbildeforsøkene, med returteksten og konkret tilstandsbeskrivelse lagt til. Alle faktisk brukte prompter og råbilder ligger i `rapporter/natt-returer4-20261015`. Oppskriften er plassering.py.
+
+Kontroll: Egenkontrollen gir OK. Mottakets check_pieces og piece_problem er kjørt lesende mot ekte objektmasker. Alle objekter passerer. Visuell kontroll omfatter tilstand, omriss, plassering og sammenheng med romstilen, i helbilde og forstørret utsnitt. Lerretet er 1536 × 1024 med eksakt RGB 128 utenfor motivet.
+
+De fire beskyttede filene er byteidentiske med HEAD. Metadataenes lagrede prompt-hash stemmer ikke med den innkomne prompt.txt. Ingen av dem er endret. Faktiske kildehash står i leveranser.json.
+
+Usikkerhet: Spillavspilling, tilstandsoverganger og faktisk import er ikke kontrollert i denne runden. Ingen ny godkjenning fra Tom påstås. Claude må kontrollere og importere leveransen.
+
+Resultat SHA256: `3f3636881b7679b47cdcf461cbb3a428abd76bf07eccc535c477c39a115be66f`. Felles målinger og kildehash: `rapporter/natt-returer4-20261015/leveranser.json`.
