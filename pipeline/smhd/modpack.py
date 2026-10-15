@@ -154,7 +154,7 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
                 if ohd is None:
                     ohd = _upscale_object_in_context(base, oim, obj["x"], obj["y"], scale, method, **upscale_kw)
                 ohd.save(out / "objects" / f"{name}.png")
-                shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
+                _copy_idx(extract, own, out, name)
                 _copy_soft(own, out, name, scale)
                 done_objects.append(name)
 
@@ -183,6 +183,14 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
     return manifest
 
 
+def _copy_idx(extract: Path, own: Path | None, out: Path, name: str) -> None:
+    """Indeksbildet: et eget fra --egne (samme piksler, annen palett, som objektene fra rom 83 som tegnes i
+    rom 54, smhd importpakke) går foran uttrekkets. Motoren toner fargene mot paletten i indeksbildet."""
+    mine = own / "objects" / f"{name}_idx.png" if own else None
+    shutil.copyfile(mine if mine and mine.exists() else extract / "objects" / f"{name}_idx.png",
+                    out / "objects" / f"{name}_idx.png")
+
+
 def _copy_soft(own: Path | None, out: Path, name: str, scale: int) -> None:
     """Et eget mykt objektbilde (objects/<name>_hd.png, egen alfa, lik marg på begge sider) tas med som det er.
     Motoren bruker det foran objNNN_SS.png for blast-objekter og pekeren (ikonene, smhd myke-ikoner)."""
@@ -207,7 +215,7 @@ def _own_objects_only(extract: Path, out: Path, own: Path, info: dict, scale: in
             if not _check_size(ohd, owant, custom.name):
                 continue
             _clean(ohd, oim, custom.name).save(out / "objects" / f"{name}.png")
-            shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
+            _copy_idx(extract, own, out, name)
             _copy_soft(own, out, name, scale)
             done.append(name)
     return done
@@ -340,7 +348,7 @@ def _objects_without_room(extract: Path, out: Path, own: Path | None, info: dict
                 ohd = upscale(_bleed(oim), scale, method, **kw).convert("RGBA")
                 ohd.putalpha(upscale_alpha(oim.getchannel("A"), scale))
             ohd.save(out / "objects" / f"{name}.png")
-            shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
+            _copy_idx(extract, own, out, name)
             _copy_soft(own, out, name, scale)
             done.append(name)
     return done

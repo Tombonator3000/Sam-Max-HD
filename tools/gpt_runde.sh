@@ -35,7 +35,7 @@ fi
 [ -f work/extract/rooms.json ] || smhd extract
 
 # 2. Hent
-before="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json work/gpt-ferdig/myke_ikoner.json 2>/dev/null | sha256sum || true)"
+before="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json work/gpt-ferdig/myke_ikoner.json work/gpt-ferdig/importpakke.json 2>/dev/null | sha256sum || true)"
 status_before="$(sha256sum work/gpt/status.csv 2>/dev/null || true)"
 tools/gpt_gren.sh hent
 
@@ -45,7 +45,10 @@ smhd gpt-inn
 smhd myke-figurer
 # Ikonene med egen myk alfa (rapporter/*/ikonmanifest.json) som objNNN_SS_hd.png, når ikonarket er godtatt
 smhd myke-ikoner
-after="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json work/gpt-ferdig/myke_ikoner.json 2>/dev/null | sha256sum || true)"
+# Importpakken (rapporter/import-grafikk-*/manifest.json): hele motiver for lapp-tilstandene etter gpt-inn,
+# egen alfa for inventaresken og logoen, indeksbilder med riktig palett
+smhd importpakke
+after="$(cat work/gpt-ferdig/provenance.json work/gpt-ferdig/myke.json work/gpt-ferdig/myke_ikoner.json work/gpt-ferdig/importpakke.json 2>/dev/null | sha256sum || true)"
 
 # 4. Mod, bare når noe nytt er godkjent. Rommene med HD-bakgrunn velges med --rooms.
 #    Godkjente objektbilder i work/gpt-ferdig/objects kommer med uansett, også i rom
