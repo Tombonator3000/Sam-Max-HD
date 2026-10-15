@@ -60,6 +60,9 @@ BORDER = (128, 128, 128)     # grå kant rundt bildet på lerretet
 # Grenser for vurdering (originalpiksler). Kan justeres når vi ser ekte resultater.
 OK_SHIFT, OK_BLOCK, OK_EDGES = 0.75, 1.0, 0.55
 CHECK_SHIFT, CHECK_BLOCK, CHECK_EDGES = 1.5, 2.0, 0.40
+# Hele bildet forskjøvet mellom disse grensene: mottaket klipper på nytt der innholdet ligger
+# (ikke figurark, som har egen kontroll per rute)
+FIX_SHIFT_MIN = 0.25
 
 # Stilpiloten: rommet som males først, sammen med hovedarkene og de første figurarkene for Sam og Max
 # (figur.FIG_PILOT). Resten venter til Tom har godkjent piloten og stilankerne ligger i stil/.
@@ -1163,6 +1166,42 @@ def repair_edges(part: Image.Image, sides: set[str], max_px: int = 8, factor: fl
     return Image.fromarray(np.clip(np.rint(a), 0, 255).astype(np.uint8)), fixed
 
 
+def _cut_part(res: Image.Image, layout: str, job: "Job",
+              off: tuple[float, float] = (0.0, 0.0)) -> tuple[Image.Image, dict[str, int]]:
+    """Utsnittet av leveransen i 4x, og radene som ble rettet mot den grå kanten.
+
+    `off` er hvor langt innholdet ligger ved siden av riktig plass, i originalpiksler (dx, dy fra
+    compare). Da klippes det så mange piksler lenger bort, med delpiksler. Utenfor bildet gjentas
+    kantpikslene.
+    """
+    x, y, w, h = job.region
+    ox, oy = job.plassering
+    size = (w * SCALE, h * SCALE)
+    if layout == "lerret":
+        sx, sy = res.width / CANVAS[0], res.height / CANVAS[1]
+        box = (ox * SCALE * sx, oy * SCALE * sy, (ox + w) * SCALE * sx, (oy + h) * SCALE * sy)
+    else:
+        sx, sy = res.width / size[0], res.height / size[1]
+        box = (0.0, 0.0, float(res.width), float(res.height))
+    if off == (0.0, 0.0):
+        if layout == "lerret":
+            part = res.crop(tuple(round(v) for v in box)).resize(size, Image.LANCZOS)
+        else:
+            part = res.resize(size, Image.LANCZOS)
+    else:
+        dx, dy = off[0] * SCALE * sx, off[1] * SCALE * sy
+        pad = int(math.ceil(max(abs(dx), abs(dy)))) + 4
+        a = np.pad(np.asarray(res), ((pad, pad), (pad, pad), (0, 0)), mode="edge")
+        part = Image.fromarray(a).resize(size, Image.LANCZOS, box=(box[0] + pad + dx, box[1] + pad + dy,
+                                                                   box[2] + pad + dx, box[3] + pad + dy))
+    if layout != "lerret":
+        return part, {}
+    # Sider som grenser mot den grå kanten: ChatGPT lar ofte kanten blø noen piksler inn
+    sides = {s for s, touch in (("venstre", ox > 0), ("hoyre", ox + w < TILE[0]),
+                                 ("topp", oy > 0), ("bunn", oy + h < TILE[1])) if touch}
+    return repair_edges(part, sides)
+
+
 def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, sigma: float, strength: float,
               preview_dir: Path) -> tuple[dict, np.ndarray | None]:
     """Kontrollerer én leveranse for en jobb. Gir resultatraden og det fargelåste bildet (None hvis avvist på format)."""
@@ -1176,23 +1215,29 @@ def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, 
                  f"referanse.png (1536x1024) eller {w}:{h} som utsnittet (for eksempel {w * SCALE}x{h * SCALE})")
         return r, None
     r["format"] = layout
-    if layout == "lerret":
-        sx, sy = res.width / CANVAS[0], res.height / CANVAS[1]
-        box = (ox * SCALE * sx, oy * SCALE * sy, (ox + w) * SCALE * sx, (oy + h) * SCALE * sy)
-        part = res.crop(tuple(round(v) for v in box)).resize((w * SCALE, h * SCALE), Image.LANCZOS)
-        # Sider som grenser mot den grå kanten: ChatGPT lar ofte kanten blø noen piksler inn
-        sides = {s for s, touch in (("venstre", ox > 0), ("hoyre", ox + w < TILE[0]),
-                                     ("topp", oy > 0), ("bunn", oy + h < TILE[1])) if touch}
-        part, fixed = repair_edges(part, sides)
-        if fixed:
-            r["kantreparasjon"] = fixed
-    else:
-        part = res.resize((w * SCALE, h * SCALE), Image.LANCZOS)
+    part, fixed = _cut_part(res, layout, job)
+    if fixed:
+        r["kantreparasjon"] = fixed
     if min(res.width / (w * SCALE), res.height / (h * SCALE)) < 0.6:
         r["merknad"] = "lav oppløsning fra generatoren"
     original = Image.open(d / "original_1x.png").convert("RGB")
     m = compare(original, part)
     status, why = judge(m)
+    shift = math.hypot(m["skift_x"], m["skift_y"])
+    if job.type != "figur" and FIX_SHIFT_MIN <= shift <= CHECK_SHIFT:
+        # Hele bildet ligger litt ved siden av: klipp på nytt der innholdet faktisk ligger, og bruk
+        # det bare når kontrollen blir minst like god og forskyvningen mindre
+        part2, fixed2 = _cut_part(res, layout, job, (m["skift_x"], m["skift_y"]))
+        m2 = compare(original, part2)
+        status2, why2 = judge(m2)
+        if RANK[status2] >= RANK[status] and math.hypot(m2["skift_x"], m2["skift_y"]) < shift:
+            r["plassering_rettet"] = [m["skift_x"], m["skift_y"]]
+            r.pop("kantreparasjon", None)
+            if fixed2:
+                r["kantreparasjon"] = fixed2
+            part, m, status = part2, m2, status2
+            fx, fy = r["plassering_rettet"]
+            why = "; ".join(filter(None, [f"plassering rettet med {-fx:+.1f}, {-fy:+.1f} originalpiksler", why2]))
     orig4 = np.asarray(original.resize((w * SCALE, h * SCALE), Image.LANCZOS), dtype=np.float64)
     locked = lock_colors(np.asarray(part, dtype=np.float64), orig4, sigma, strength)
     if job.objekter:

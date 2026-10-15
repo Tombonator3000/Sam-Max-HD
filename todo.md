@@ -16,6 +16,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
   - [ ] Neste `tools/gpt_runde.sh` etter fletting tar inn de 11 rutene (fig091_03 til 05, fig209_03, fig272_02); fjern da beskjeden om ny tegning i ORDRE.md
   - 15. oktober 20:05: fig091_03 (rute 1955, ny utgave) og fig091_04 sett av Claude, bokser like originalen i 4x, holdes likevel ute og ordren ber om ny tegning. Beskjed i ORDRE.md om ikke å tegne dem på nytt. Når mottaket er rettet, kommer de inn uten ny leveranse
 - [ ] Push fra denne maskinen til `gpt-arbeid` og `hd-mod` feiler (GitHub-innlogging, 15. oktober 20:04). To ordrecommiter ligger lokalt i `work/.gpt-gren`, modden i `mods/gpt` er bygget men ikke publisert. Trenger Tom
+- [x] Mottaket retter hele bilder som er forskjøvet 0,25 til 1,5 originalpiksler (klipper på nytt der innholdet ligger, ikke figurark), 16. oktober 00:24, nattgrenen. Tørrkjøring på de 32 sjekk-jobbene: 12 blir godkjent, 7 til får bedre plassering men står fortsatt til sjekk
+  - [ ] Neste `tools/gpt_runde.sh` tar det i bruk; se de 12 som blir godkjent (obj293_01, obj335_01, obj339_01, obj566_01, obj602_01, obj774_01, obj775_01, obj822_01, rom060_del2av2, rom092, lag060_01_del2av2, lag060_02_del2av2) med øynene før de regnes som kontrollert
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
 - [ ] Tom: første natteskift med Claude og Codex (prosjektbiblioteket `samarbeid/`), først en kort prøve med `--timer 1 --jobber 1`

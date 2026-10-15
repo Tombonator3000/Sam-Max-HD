@@ -542,3 +542,14 @@ Natt: kontroll av lag052_11_del2av2, lag056_06, lag061_01_del1av2 og lag068_08 f
 - lag061_01_del1av2 (rom 61): godkjent. obj582_01 er brettenden med den knekte enden til høyre som originalen. obj585_01 er den grønne og gule strikken i løkke fra ringen, med festet til høyre for ringen og den lille grå krokbiten nede til venstre. obj581_01 er lik rommet også i originalen og er uendret.
 - lag068_08 (rom 68): godkjent. De tre vegsegmentene med ett gult skråstrek på det nærmeste. I resultat.png er asfalten lysere enn originalen, men etter fargelåsen har objektbildene i `mods/gpt/objects` samme median som originalen (obj621_01 28,28,36 mot 27,27,35; obj631_01 26,25,28 mot 23,23,27). Den gule streken er litt lengre og bredere enn originalen; ikke avvist.
 - Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 00:24 (Claude)
+
+Natt, kodeoppgave: mottaket retter små forskyvninger i leveransene.
+
+- 32 jobber stod til sjekk i `status.csv`, de fleste fordi hele bildet lå 0,5 til 1,1 originalpiksler (2 til 4 HD-piksler) ved siden av. Sjekk-jobbene tas inn i modden, så objektene lå forskjøvet mot rommet.
+- `pipeline/smhd/gpt.py`: ny `_cut_part` klipper utsnittet av leveransen, med valgfri forskyvning i delpiksler (kantpikslene gjentas utenfor bildet). `_evaluate` klipper på nytt der innholdet faktisk ligger når hele bildet er forskjøvet 0,25 til 1,5 originalpiksler (`FIX_SHIFT_MIN` og `CHECK_SHIFT`), og bruker det bare når kontrollen blir minst like god og forskyvningen mindre. Gjelder rom, objekter, lag og ikonark, ikke figurark. Rettingen står i kommentaren («plassering rettet med ...») og som `plassering_rettet` i provenance.
+- Ny test `test_gpt_import_fixes_small_shift`: lerret forskjøvet 4 HD-piksler i begge retninger og bare bildet klippet 4 HD-piksler skjevt blir godkjent med retting; riktig plassert leveranse rettes ikke.
+- Tørrkjøring med `_evaluate` på de 32 ekte sjekk-jobbene (ingenting skrevet til modden): 12 blir godkjent (obj293_01, obj335_01, obj339_01, obj566_01, obj602_01, obj774_01, obj775_01, obj822_01, rom060_del2av2, rom092, lag060_01_del2av2, lag060_02_del2av2), 7 får rettet plassering men står fortsatt til sjekk for blokkavvik, resten er uendret. Bare forhåndsvisningen av obj602_01 er sett med øynene (rulletekstpanelet, ser riktig ut). De andre 11 er bare teknisk kontrollert og må ses før de regnes som visuelt kontrollert.
+- Ikke kjørt: `tools/gpt_runde.sh` og ny modd med rettingen. Ikke testet i spillet.
+- Testene: pytest i `pipeline` 57 bestått, `git diff --check` uten feil.

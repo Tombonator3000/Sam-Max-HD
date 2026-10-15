@@ -457,6 +457,37 @@ def _fake_extract(tmp_path):
     return ex, room, big
 
 
+def test_gpt_import_fixes_small_shift(tmp_path):
+    import json
+    from PIL import ImageFilter
+    from smhd import gpt
+
+    ex, room, big = _fake_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "obj241_01"
+    ref = Image.open(d / "referanse.png").filter(ImageFilter.GaussianBlur(1.5))
+    ox, oy, bw, bh = json.loads((d / "jobb.json").read_text())["bilde_i_lerret"]
+    # Hele lerretet ligger 4 HD-piksler (1 originalpiksel) til høyre og 4 ned: rettes i mottaket
+    ref.transform(ref.size, Image.AFFINE, (1, 0, -4, 0, 1, -4)).save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["obj241_01"]
+    assert row["status"] == "godkjent" and "plassering rettet" in row["kommentar"], row
+    assert abs(float(row["skift_x"])) < 0.25 and abs(float(row["skift_y"])) < 0.25
+    job = json.loads((done / "provenance.json").read_text())["obj241_01"]["jobber"][0]
+    assert all(abs(v - 1) < 0.25 for v in job["plassering_rettet"])
+    # Samme med bare bildet (ikke lerretet), klippet 4 HD-piksler for langt til høyre
+    ref.crop((ox + 4, oy, ox + 4 + bw, oy + bh)).save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["obj241_01"]
+    assert row["status"] == "godkjent" and "plassering rettet med +1.0, +0.0" in row["kommentar"], row
+    # Riktig plassert: ingen retting
+    ref.save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["obj241_01"]
+    assert row["status"] == "godkjent" and row["kommentar"] == ""
+
+
 def test_gpt_object_jobs_and_import(tmp_path):
     import json
     from PIL import ImageFilter
