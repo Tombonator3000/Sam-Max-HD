@@ -465,3 +465,13 @@ Natt: kontroll av lag002_01, lag017_04_del1av2, lag017_04_del2av2 og obj307_01 f
 - lag017_04_del2av2: godkjent. Gul vimpel med åpen løkke til høyre, grønne rester med samme antall løse biter, propellen med fire blader i samme stilling og nesten vannrett høyreblad.
 - obj307_01: godkjent. Satt sammen med godkjent obj304_01 under: ingen synlig søm, himmelen er 109,164,248 på begge sider av skjøten, og snittforskjellen over skjøten er 3,1 mot 2,3 mellom to naborader i obj304_01. Rammen og skyggen møter. Toppen har to skruer, fasettene og den svarte åpningen som originalen. Returen fra 21:37 er rettet.
 - Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandsbyttene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-15 22:20 (Claude)
+
+Natt: kodeoppgave, kontroll av PR 32 (Codex, `codex/hd-masker-inventory`, native inventarkort og glassmasker).
+
+- ScummVM `c9091321` hentet til /tmp, patchen fra main og fra PR 32 lagt på hver sin kopi (begge gikk rent). Hele kodeforskjellen lest (316 linjer i fire filer), med koden rundt. Patchen i natt-grenen er lik main.
+- Fem funn i `docs/KONTROLL-PR32.md`. Viktigst: blast og romobjekt deler bildebufferen, og lastes `_hd.png` først som blast, mister romobjektet den myke alfaen (`softEdge` regnes ikke ut med marg på). Treffer trolig ikke dagens innhold: alle 113 `_hd.png` i `mods/gpt` er uten marg, og inventarikonene er SMAP-objekter i rom 93 og 94. Ellers: fargetoningen for myke romobjekter er nå ett snitt per bilde, de myke kantene fra PR 29 (bilen i rom 9) tones nå med rommets farge, og patchen er ikke lenger lik den i Dig.
+- Ingen funn som stopper flettingen av det som treffer dagens innhold. Ikke flettet, ikke rettet, ingen kommentar lagt på PR-en.
+- Ikke bygget og ikke kjørt: maskinen har ingen C++-kompilator, og ingenting er installert. `engine/test.sh` er ikke kjørt med PR 32.
+- Testene i natt-grenen: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått.

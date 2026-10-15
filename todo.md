@@ -8,6 +8,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)
 - [x] Samme patch i Dig-HD-Remake (Dig PR 57, venter på fletting)
 - [ ] Tom fletter PR 30 (objektleveranser.json i importpakke)
+- [x] Kontroll av PR 32 (Codex, native inventarkort og glassmasker i motoren): koden lest, fem funn i `docs/KONTROLL-PR32.md` (15. oktober 22:20, natt). Ikke bygget eller kjørt, maskinen har ingen C++-kompilator
+  - [ ] Codex: felles bilde for blast og romobjekt gir `softEdge = false` når blast lastes først (funn 1)
+  - [ ] Se bilen i rom 9 i en nedtoning med PR 32 (kanten tones nå med rommets farge, funn 3)
+  - [ ] Tom fletter PR 32, og avgjør om Dig skal få samme endring (funn 4)
 - [x] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn (rettet 15. oktober 20:25, `myk.py` versjon 6, på grenen samarbeid/natt-2026-10-15)
   - [ ] Neste `tools/gpt_runde.sh` etter fletting tar inn de 11 rutene (fig091_03 til 05, fig209_03, fig272_02); fjern da beskjeden om ny tegning i ORDRE.md
   - 15. oktober 20:05: fig091_03 (rute 1955, ny utgave) og fig091_04 sett av Claude, bokser like originalen i 4x, holdes likevel ute og ordren ber om ny tegning. Beskjed i ORDRE.md om ikke å tegne dem på nytt. Når mottaket er rettet, kommer de inn uten ny leveranse
