@@ -1088,7 +1088,9 @@ def has_native_alpha(path: Path) -> bool:
     """Har bildet sin egen myke alfakant (ny stil), ikke bare en flat bakgrunn?
 
     Figurark i den gamle stilen leveres på en flat bakgrunnsfarge (RGB). Den glatte stilen leveres
-    som RGBA med gjennomsiktig bakgrunn og mellomnivåer i kantene.
+    som RGBA med gjennomsiktig bakgrunn og mellomnivåer i kantene. Kantene måles både mot hele lerretet
+    og mot det synlige: et ark med bare noen få små ruter (tre hender i fig259_02) har for få
+    kantpiksler mot lerretet, men like myke kanter som de store arkene.
     """
     with Image.open(path) as im:
         if im.mode not in ("RGBA", "LA", "PA") and "transparency" not in im.info:
@@ -1096,7 +1098,8 @@ def has_native_alpha(path: Path) -> bool:
         a = np.asarray(im.convert("RGBA"))[..., 3]
     transparent = float((a < 16).mean())
     soft = float(((a > 16) & (a < 240)).mean())
-    return transparent > 0.2 and soft > 0.0005
+    visible = float((a > 16).mean())
+    return transparent > 0.2 and (soft > 0.0005 or (visible > 0 and soft / visible > 0.02))
 
 
 def _find_result(d: Path) -> Path | None:

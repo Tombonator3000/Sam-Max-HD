@@ -1260,6 +1260,20 @@ def test_figure_sheet_in_smooth_style_is_not_cut_with_the_old_mask(tmp_path):
     # Et ark i gammel stil (flat bakgrunn) har ingen egen alfakant
     Image.new("RGB", (1536, 1024), (0, 200, 200)).save(tmp_path / "flat.png")
     assert not gpt.has_native_alpha(tmp_path / "flat.png")
+    # Et lite ark med bare noen få små ruter (som fig259_02) har også egen alfakant
+    a = Image.new("L", (1536, 1024), 0)
+    for x, y in ((20, 20), (20, 100), (100, 90)):
+        a.paste(255, (x, y, x + 24, y + 16))
+    a = a.filter(ImageFilter.GaussianBlur(1))
+    small = Image.new("RGBA", (1536, 1024), (200, 120, 60, 0))
+    small.putalpha(a)
+    small.save(tmp_path / "liten.png")
+    assert gpt.has_native_alpha(tmp_path / "liten.png")
+    # Gjennomsiktig bakgrunn med harde kanter er ikke den glatte stilen
+    hard = Image.new("RGBA", (1536, 1024), (200, 120, 60, 0))
+    hard.paste((200, 120, 60, 255), (20, 20, 60, 50))
+    hard.save(tmp_path / "hard.png")
+    assert not gpt.has_native_alpha(tmp_path / "hard.png")
 
 
 def test_figure_rejections_and_orders(tmp_path):

@@ -563,3 +563,18 @@ Natt, retting etter Codex' kontroll av «Mottaket retter små forskyvninger» (f
 - Ekte data, tørrkjøring med `_evaluate` (ingenting skrevet til modden): obj202_01 rettes ikke lenger, blokkavvik 1,11, sjekk. Den leverte lag017_03_del2av2 er godkjent uten retting både før og nå; Codex' tilfelle var en forskjøvet variant i minnet og dekkes av den nye lagtesten. Av de 32 sjekk-jobbene blir de samme 12 godkjent som i forrige tørrkjøring. Rettet, men fortsatt sjekk: 3 (obj600_01, obj781_01, ikon02) mot 7 før; obj202_01 og obj337_01 rettes ikke lenger.
 - Lot være: ingen. Ikke kjørt `tools/gpt_runde.sh` eller ny modd, ikke testet i spillet. De 11 nye godkjenningene utenom obj602_01 er fortsatt bare teknisk kontrollert.
 - Testene: pytest i `pipeline` 59 bestått, `git diff --check` uten feil.
+
+## 2026-10-16 01:05 (Claude)
+
+Natt: kontroll av fig259_02, lag026_02, lag026_03 og lag032_01_del1av2 fra Codex (commit 109a9ef81b i `work/.gpt-gren`), og en retting i mottaket.
+
+- `tools/gpt_runde.sh` gikk helt gjennom to ganger (før og etter rettingen): henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`.
+- Sett med øynene: forhåndsvisningene (original 4x, leveransen, etter fargelås) og per objekt originalen i nearest ved siden av HD-objektbildet i `mods/gpt/objects`. For fig259_02 originalrutene i 16x ved siden av de myke rutene i `mods/gpt/costumes` og `forhandsvisning/myk_fig259_02.png`.
+- lag026_02 (obj275_02, rom 26): godkjent. Sam og Max i buret med døren åpen, Sams brune føtter opp og Max lys grå, som originalen.
+- lag026_03 (obj275_03, rom 26): godkjent. Døren åpen, bare Sams og Max' hender over kanten nede til venstre, som originalen.
+- lag032_01_del1av2 (rom 32): godkjent. obj317_01 fiskehodet med nettet og kassene, obj316_01 den mørke døråpningen med rekkverket, obj313_01 hyttedøren med vinduet. Codex har lagt til en sky i himmelen i leveransen, men bakgrunnen brukes ikke fra lagjobber; bare objektrutene tas inn.
+- fig259_02 (kostyme 259, tre hender til Max, rute 313 til 315): godkjent visuelt. Gestene, åpningen under øverste hånd og de bøyde fingrene følger originalen. Figurmottaket (myk.py) gav snitt/union 0,88, 0,90 og 0,91 og la alle tre i modden.
+- Feil i mottaket: gpt-inn avviste fig259_02 med «omrisset avviker (overlapp 0.20)» fordi `has_native_alpha` målte de myke kantpikslene mot hele lerretet. Arket har bare tre små hender, så andelen ble 0,00029, under grensen 0,0005, og arket ble kontrollert som gammel stil med flat bakgrunn (gjennomsiktig svart talte som figur). Retting i `pipeline/smhd/gpt.py`: kantene godtas også når de er over 2 prosent av de synlige pikslene. Ingen andre figurark endrer klassifisering (sjekket på alle figurjobbene med resultat). Testen `test_figure_sheet_in_smooth_style_is_not_cut_with_the_old_mask` har fått et lite ark (feiler med den gamle koden) og et ark med harde kanter (skal ikke regnes som glatt stil).
+- Etter ny runde: fig259_02 står som levert og er ikke lenger i returen i ORDRE.md. Ingen rad i `docs/gpt-avvisninger.csv`.
+- Testene: pytest i `pipeline` 59 bestått, `git diff --check` uten feil.
+- Ikke testet i spillet, tilstandene og håndanimasjonen er ikke sett i motoren. Stilen er ikke godkjent av Tom.
