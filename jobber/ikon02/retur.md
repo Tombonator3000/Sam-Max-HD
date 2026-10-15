@@ -1,6 +1,6 @@
 # ikon02: sjekk
 
-Grunn: deler av bildet er flyttet eller zoomet (opptil 1.6 px)
+Grunn: plassering rettet med +0.0, -0.3 originalpiksler; deler av bildet er flyttet eller zoomet (opptil 1.3 px)
 
 Forslag til nytt forsøk (lim inn sammen med referanse.png):
 

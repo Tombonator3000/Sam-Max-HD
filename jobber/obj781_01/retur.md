@@ -1,6 +1,6 @@
 # obj781_01: sjekk
 
-Grunn: forskjøvet +0.0, -1.1 originalpiksler; deler av bildet er flyttet eller zoomet (opptil 1.9 px)
+Grunn: plassering rettet med -0.0, +1.1 originalpiksler; deler av bildet er flyttet eller zoomet (opptil 1.0 px)
 
 Forslag til nytt forsøk (lim inn sammen med referanse.png):
 
