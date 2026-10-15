@@ -553,3 +553,13 @@ Natt, kodeoppgave: mottaket retter små forskyvninger i leveransene.
 - Tørrkjøring med `_evaluate` på de 32 ekte sjekk-jobbene (ingenting skrevet til modden): 12 blir godkjent (obj293_01, obj335_01, obj339_01, obj566_01, obj602_01, obj774_01, obj775_01, obj822_01, rom060_del2av2, rom092, lag060_01_del2av2, lag060_02_del2av2), 7 får rettet plassering men står fortsatt til sjekk for blokkavvik, resten er uendret. Bare forhåndsvisningen av obj602_01 er sett med øynene (rulletekstpanelet, ser riktig ut). De andre 11 er bare teknisk kontrollert og må ses før de regnes som visuelt kontrollert.
 - Ikke kjørt: `tools/gpt_runde.sh` og ny modd med rettingen. Ikke testet i spillet.
 - Testene: pytest i `pipeline` 57 bestått, `git diff --check` uten feil.
+
+## 2026-10-16 00:52 (Claude)
+
+Natt, retting etter Codex' kontroll av «Mottaket retter små forskyvninger» (f8785db4). Enig i begge funnene, begge rettet.
+
+- `pipeline/smhd/gpt.py`, `_evaluate`: objektkontrollen i lag og ikonark kjøres nå både på det opprinnelige og det rettede utsnittet før rettingen velges. Rettingen brukes bare når forskyvningen blir mindre, sluttstatusen etter objektkontrollen ikke blir dårligere, ingen objektbilder får ny feil eller faller mer enn 0,05 i kantlikhet (`FIX_PIECE_TOL`), og blokkavviket ikke øker mer enn 0,1 originalpiksler (`FIX_BLOCK_TOL`). Før var lik status nok, også når blokkavviket økte (obj202_01: 1,11 til 1,95).
+- Nye regresjonstester: `test_gpt_import_shift_fix_keeps_blocks` (det meste forskjøvet 1 originalpiksel, én blokk en halv den andre veien; rettingen ville gitt blokkavvik 1,5) og `test_gpt_import_shift_fix_keeps_pieces` (laget med forskjøvet bakgrunn og riktig plasserte objekter, som Codex' lag017_03_del2av2). Begge feiler med koden i f8785db4 og består nå.
+- Ekte data, tørrkjøring med `_evaluate` (ingenting skrevet til modden): obj202_01 rettes ikke lenger, blokkavvik 1,11, sjekk. Den leverte lag017_03_del2av2 er godkjent uten retting både før og nå; Codex' tilfelle var en forskjøvet variant i minnet og dekkes av den nye lagtesten. Av de 32 sjekk-jobbene blir de samme 12 godkjent som i forrige tørrkjøring. Rettet, men fortsatt sjekk: 3 (obj600_01, obj781_01, ikon02) mot 7 før; obj202_01 og obj337_01 rettes ikke lenger.
+- Lot være: ingen. Ikke kjørt `tools/gpt_runde.sh` eller ny modd, ikke testet i spillet. De 11 nye godkjenningene utenom obj602_01 er fortsatt bare teknisk kontrollert.
+- Testene: pytest i `pipeline` 59 bestått, `git diff --check` uten feil.

@@ -63,6 +63,8 @@ CHECK_SHIFT, CHECK_BLOCK, CHECK_EDGES = 1.5, 2.0, 0.40
 # Hele bildet forskjøvet mellom disse grensene: mottaket klipper på nytt der innholdet ligger
 # (ikke figurark, som har egen kontroll per rute)
 FIX_SHIFT_MIN = 0.25
+FIX_BLOCK_TOL = 0.1          # blokkavviket kan ikke øke mer enn dette ved rettingen (originalpiksler)
+FIX_PIECE_TOL = 0.05         # kantlikheten til et objektbilde i lag og ikonark kan ikke falle mer enn dette
 
 # Stilpiloten: rommet som males først, sammen med hovedarkene og de første figurarkene for Sam og Max
 # (figur.FIG_PILOT). Resten venter til Tom har godkjent piloten og stilankerne ligger i stil/.
@@ -1202,6 +1204,24 @@ def _cut_part(res: Image.Image, layout: str, job: "Job",
     return repair_edges(part, sides)
 
 
+def _piece_status(status: str, checks: dict[str, dict | None] | None) -> str:
+    """Status etter objektkontrollen i lag og ikonark: avvist når et objektbilde er feil."""
+    if checks and any(piece_problem(c) for c in checks.values()):
+        return "avvist"
+    return status
+
+
+def _pieces_worse(before: dict[str, dict | None] | None, after: dict[str, dict | None] | None) -> bool:
+    """Om et objektbilde ligner mindre på originalen etter rettingen av plasseringen enn før."""
+    for name, b in (before or {}).items():
+        a = (after or {}).get(name)
+        if b is None or a is None:
+            continue
+        if a["objekt"] < b["objekt"] - FIX_PIECE_TOL or (piece_problem(a) and not piece_problem(b)):
+            return True
+    return False
+
+
 def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, sigma: float, strength: float,
               preview_dir: Path) -> tuple[dict, np.ndarray | None]:
     """Kontrollerer én leveranse for en jobb. Gir resultatraden og det fargelåste bildet (None hvis avvist på format)."""
@@ -1223,26 +1243,30 @@ def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, 
     original = Image.open(d / "original_1x.png").convert("RGB")
     m = compare(original, part)
     status, why = judge(m)
+    checks = check_pieces(original, part, job, extract) if job.objekter else None
     shift = math.hypot(m["skift_x"], m["skift_y"])
     if job.type != "figur" and FIX_SHIFT_MIN <= shift <= CHECK_SHIFT:
-        # Hele bildet ligger litt ved siden av: klipp på nytt der innholdet faktisk ligger, og bruk
-        # det bare når kontrollen blir minst like god og forskyvningen mindre
+        # Hele bildet ligger litt ved siden av: klipp på nytt der innholdet faktisk ligger. Bruk det
+        # bare når forskyvningen blir mindre, sluttstatusen ikke dårligere, blokkavviket ikke større
+        # og ingen objektbilder i lag og ikonark ligner mindre på originalen enn før
         part2, fixed2 = _cut_part(res, layout, job, (m["skift_x"], m["skift_y"]))
         m2 = compare(original, part2)
         status2, why2 = judge(m2)
-        if RANK[status2] >= RANK[status] and math.hypot(m2["skift_x"], m2["skift_y"]) < shift:
+        checks2 = check_pieces(original, part2, job, extract) if job.objekter else None
+        if (math.hypot(m2["skift_x"], m2["skift_y"]) < shift and m2["blokk_maks"] <= m["blokk_maks"] + FIX_BLOCK_TOL
+                and RANK[_piece_status(status2, checks2)] >= RANK[_piece_status(status, checks)]
+                and not _pieces_worse(checks, checks2)):
             r["plassering_rettet"] = [m["skift_x"], m["skift_y"]]
             r.pop("kantreparasjon", None)
             if fixed2:
                 r["kantreparasjon"] = fixed2
-            part, m, status = part2, m2, status2
+            part, m, status, checks = part2, m2, status2, checks2
             fx, fy = r["plassering_rettet"]
             why = "; ".join(filter(None, [f"plassering rettet med {-fx:+.1f}, {-fy:+.1f} originalpiksler", why2]))
     orig4 = np.asarray(original.resize((w * SCALE, h * SCALE), Image.LANCZOS), dtype=np.float64)
     locked = lock_colors(np.asarray(part, dtype=np.float64), orig4, sigma, strength)
     if job.objekter:
         # Lag og ikonark: hvert objekt må også ligne på originalen, ellers blir utklippet feil
-        checks = check_pieces(original, part, job, extract)
         r["objektkontroll"] = checks
         bad = [f"{n} {piece_problem(c)}" for n, c in checks.items() if piece_problem(c)]
         if bad:

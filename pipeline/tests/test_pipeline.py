@@ -488,6 +488,56 @@ def test_gpt_import_fixes_small_shift(tmp_path):
     assert row["status"] == "godkjent" and row["kommentar"] == ""
 
 
+def test_gpt_import_shift_fix_keeps_blocks(tmp_path):
+    import json
+    from PIL import ImageFilter
+    from smhd import gpt
+
+    ex, room, big = _fake_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "obj241_01"
+    ox, oy, bw, bh = json.loads((d / "jobb.json").read_text())["bilde_i_lerret"]
+    ref = Image.open(d / "referanse.png").convert("RGB").filter(ImageFilter.GaussianBlur(1.5))
+    # Det meste ligger 1 originalpiksel til høyre, men én blokk ligger en halv til venstre. Retting
+    # av hele bildet ville øke blokkavviket fra 1,0 til 1,5, og skal ikke brukes selv om status er lik
+    res = ref.transform(ref.size, Image.AFFINE, (1, 0, -4, 0, 1, 0))
+    box = (ox + 2 * bw // 3, oy, ox + bw, oy + bh // 2)
+    res.paste(ref.transform(ref.size, Image.AFFINE, (1, 0, 2, 0, 1, 0)).crop(box), box[:2])
+    res.save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["obj241_01"]
+    assert row["status"] == "sjekk" and "plassering rettet" not in row["kommentar"], row
+    assert float(row["blokk_maks"]) <= 1.1
+
+
+def test_gpt_import_shift_fix_keeps_pieces(tmp_path):
+    import json
+    from smhd import gpt
+    from PIL import ImageFilter
+
+    ex, room = _layer_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "lag006_01"
+    data = json.loads((d / "jobb.json").read_text())
+    ox, oy = data["plassering"]
+    ref = Image.open(d / "referanse.png").convert("RGB").filter(ImageFilter.GaussianBlur(1.2))
+    # Bakgrunnen ligger 1 originalpiksel forskjøvet, men objektene i laget ligger riktig. Rettingen
+    # ville flytte objektene, så utsnittet beholdes (som lag017_03_del2av2)
+    res = ref.transform(ref.size, Image.AFFINE, (1, 0, -4, 0, 1, -4))
+    for p in data["objekter"]:
+        x, y, w, h = p["rekt"]
+        box = ((ox + x) * 4, (oy + y) * 4, (ox + x + w) * 4, (oy + y + h) * 4)
+        res.paste(ref.crop(box), box[:2])
+    res.save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["lag006_01"]
+    assert row["status"] == "sjekk" and "plassering rettet" not in row["kommentar"], row
+    job = json.loads((done / "provenance.json").read_text())["obj021_01"]["jobber"][0]
+    assert "plassering_rettet" not in job and job["kantlikhet_objekt"]["objekt"] > 0.9
+
+
 def test_gpt_object_jobs_and_import(tmp_path):
     import json
     from PIL import ImageFilter
