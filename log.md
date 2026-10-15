@@ -393,3 +393,14 @@ Tom: hent det nye fra hd-mod og gpt-arbeid inn i Sam & Max-repoet, og gi Dig HD 
 - Linux-pakken (16:52 UTC) og Windows-pakken (16:54 UTC) bygget fra main med den nye modden. Nettsiden henter modden selv.
 - Dig-HD-Remake: samme motorpatch (myke kanter på romobjekter) i PR 57 der, byte for byte lik. Ingen av de 640 objektbildene i Digs `hd-mod` har myk alfa, så The Dig ser ut som før. Ikke kjørt med The Dig.
 - Åpent fra grafikerens rapport: rester etter opplukking i kontoret, kantene rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet, og at mottaket måler Sam091 uten fotresten (8 ruter feilaktig til gjennomsyn).
+
+## 2026-10-15 20:05 (Claude)
+
+Natt: kontroll av ny leveranse fra Codex (commit edec20f7 i `work/.gpt-gren`).
+
+- Oppgaven nevnte fig091_04, men edec20f7 leverer en ny utgave av fig091_03 (bare rute 1955 tegnet om). fig091_04 er fra bestilling 59 (41bcb1b5). Begge er sett på.
+- `tools/gpt_runde.sh`: henting, `gpt-inn`, `myke-figurer`, `myke-ikoner`, `importpakke` og byggingen av modden (76 rom, 959 objektbilder, 923 figurruter) gikk. Push til `hd-mod` feilet på innlogging mot GitHub, så runden stoppet før ordren. Kjørte `smhd gpt-ordre` og `tools/gpt_gren.sh send` med `SEND_UTEN_PUSH=1`: ordren er committet lokalt i `work/.gpt-gren` (dcd9962d, cb4ecc3e), ikke pushet. Klonen har ingen git-identitet; satt Claude som forfatter med miljøvariabler for den ene commiten, ingen konfigurasjon endret.
+- Kontroll mot referanse.png, sett med øynene og målt: fig091_04 seks ruter, boksen rundt det synlige er lik originalen i 4x for alle, snitt delt på union 0,95, 0,96 og 0,85 (rute 1958 til 1961; forskjellen er konturtykkelse og den lille fotresten). Ingen ruter flyttet, lagt til eller fjernet, samme rekkefølge, lokket med gul stjerne og den løse fotresten er med. fig091_03 rute 1955: samme boks, snitt delt på union 0,93, positur, lokk og fotrest som originalen. Ingen tekst på arkene.
+- Ingen avvisning: ingenting å legge i `docs/gpt-avvisninger.csv`.
+- Figurmottaket holder likevel rute 1955 og 1957 til 1961 ute (status sjekk, tegnet 1,28 mot 4x), og ordren ber Codex tegne dem på nytt. Det er den kjente målefeilen (Sam091 uten fotresten, todo). La inn beskjed i ORDRE.md om ikke å tegne dem på nytt. Mottaket er ikke rettet i natt.
+- Spørsmål til Tom: push fra denne maskinen krever ny innlogging mot GitHub. Ikke testet i spillet.

@@ -9,6 +9,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Samme patch i Dig-HD-Remake (Dig PR 57, venter på fletting)
 - [ ] Tom fletter PR 30 (objektleveranser.json i importpakke)
 - [ ] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn
+  - 15. oktober 20:05: fig091_03 (rute 1955, ny utgave) og fig091_04 sett av Claude, bokser like originalen i 4x, holdes likevel ute og ordren ber om ny tegning. Beskjed i ORDRE.md om ikke å tegne dem på nytt. Når mottaket er rettet, kommer de inn uten ny leveranse
+- [ ] Push fra denne maskinen til `gpt-arbeid` og `hd-mod` feiler (GitHub-innlogging, 15. oktober 20:04). To ordrecommiter ligger lokalt i `work/.gpt-gren`, modden i `mods/gpt` er bygget men ikke publisert. Trenger Tom
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
 
