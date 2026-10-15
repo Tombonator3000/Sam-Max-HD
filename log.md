@@ -369,3 +369,9 @@ Tom: fiks bilkantene i rom 9 (rapporten i `gpt-arbeid`, `rapporter/rom009-bilkan
 - Modden bygget på nytt med myk alfa og publisert i `hd-mod` (9512fd8). Motoren i main bruker ikke alfaen for romobjekter, så den gir samme bilde som før til PR 29 er flettet.
 - Linux-pakken bygget fra grenen `myke-objektkanter` og publisert i releasen «linux» (15:38 UTC) så Tom kan teste. Lastet ned, sjekksummen stemmer, startet i rom 9.
 - Patchen er felles med Dig-HD-Remake; Dig-repoet har ikke fått endringen ennå.
+
+## 2026-10-15 17:55 (Claude)
+
+Tom: løs konfliktene i PR 29.
+
+- PR 28 ble slått sammen til én commit i main, så PR 29 hadde den gamle importpakke-committen under seg og fikk konflikt i `pipeline/tests/test_pipeline.py`. Rettelsen for romobjektene er lagt oppå main på nytt, uten innholdsendring. pytest 51 bestått lokalt, CI grønn, PR 29 kan flettes.
