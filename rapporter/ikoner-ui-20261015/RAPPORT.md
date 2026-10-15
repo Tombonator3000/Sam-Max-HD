@@ -1,5 +1,7 @@
 # Verb- og inventarikoner, 15. oktober 2026
 
+Oppdatert etter Toms avvisning av Max-ikonet obj1008_01. Det første resultatet lignet en generisk kanin, og vår visuelle kontroll overså figurfeilen. Dette ene ikonet er nå tegnet på nytt med riktig original, godkjent Max-hovedark og Purcell-referanse. Ny tegning har små svarte øyne og det brede tanngliset. Ekte alfa er bevart. De øvrige 110 RGBA-ikonene og ikon07/ikon09 er uendret. Se [rettingsrapporten](../max-ikon-retting-20261015/RAPPORT.md). Tom har ikke godkjent rettingen ennå.
+
 Toms prioritering: start med ikoner til verbhjul og inventory. Dette går foran rekkefølgen i ORDRE. Tom ga også uttrykkelig ja til Python for rensing og presis plassering av de nytegnede ikonene.
 
 ## Leveranse
@@ -36,7 +38,7 @@ Skript 1 setter menyikonene 879, 880, 881, 882 og 888. Skript 48/51 kobler se ti
 
 ## Produksjon
 
-Seks innebygde image_gen-kall. Eksakt bildemodellnavn var ikke eksponert. Fire råbilder bidrar til leveransen: tre grunnark og ett større rettingsark med tolv motiver. To andre rettingsforsøk ble forkastet, blant annet et forsøk som falt tilbake til pikselgrafikk. Sendte prompter og råbilder er bevart.
+Først seks innebygde image_gen-kall. Eksakt bildemodellnavn var ikke eksponert. Tre grunnark og ett større rettingsark bidro til første leveranse. To andre rettingsforsøk ble forkastet, blant annet et forsøk som falt tilbake til pikselgrafikk. Deretter ett eget image_gen-kall som erstatter bare Max-ikonet etter Toms avvisning. Samlet sju kall, fem valgte råbilder. Sendte prompter og råbilder er bevart.
 
 Første generering ga blant annet generisk Max-ansikt, ny Gator-tekst, feil totemmotiv og påfunn på noen portretter. Tolv motiver ble derfor generert på nytt som større komponenter. Valgte nye komponenter er renset for grønn bakgrunn og plassert etter originalens synlige bokser. `klargjor-ikoner.py.txt` gjenskaper leveransen. Både kildeidentiske fragmenter og de fire tomme beige kortene gjenbruker samme nye bildebytes.
 

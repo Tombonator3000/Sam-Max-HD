@@ -21,6 +21,9 @@ def sha(p):
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def clean(im):
+    # Bevar ekte alfa fra den korrigerte Max-tegningen.
+    if im.mode=='RGBA' and im.getextrema()[3][0]<255:
+        return im.copy()
     a=np.array(im.convert('RGB'),dtype=float)
     # Bare bakgrunnsfargen som henger sammen med kanten fjernes. Grønt
     # INNE I et motiv beholdes, også når det ligner arkets nøkkelfarge.
@@ -103,7 +106,10 @@ for name in ['ikon07','ikon08','ikon09']:
             q,box,donor=source_hash_to_component[source_sha]
             origin='byteidentisk kilde, gjenbrukt ny tegning'
         else:
-            if obj['bilde'] in corrections:
+            if obj['bilde']=='obj1008_01':
+                img=Image.open(ROOT/'rapporter/max-ikon-retting-20261015/max-raa01.png')
+                origin='rapporter/max-ikon-retting-20261015/max-raa01.png'
+            elif obj['bilde'] in corrections:
                 entry=corrections[obj['bilde']]
                 xx,yy,ww,hh=entry['celle']
                 img=Image.open(REPORT/'retting12-raa01.png').crop((xx,yy,xx+ww,yy+hh))

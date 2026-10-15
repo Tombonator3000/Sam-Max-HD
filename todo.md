@@ -132,3 +132,6 @@
 - [x] Levert de tre siste ikonarkene: ikon07, ikon08 og ikon09, alle OK i egenkontroll.
 - [x] Eksportert 21 handlingspekere og 90 inventar-/samtalebilder med ekte alfa og manifest, pluss fem navngitte grunnikoner for verbhjul.
 - [ ] Kontroller de nye ikonene i mottaket og spillet, særlig alfa/nøkkelfarge og små motivtolkninger.
+
+- [x] Rettet Max-ikonet obj1008_01 etter Toms avvisning med original og godkjente figur-/stilreferanser.
+- [ ] Tom vurderer rettet Max-ikon. Kontroller videre i mottak og spill.

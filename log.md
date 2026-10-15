@@ -410,3 +410,8 @@
 - Tom prioriterte verbhjul/inventory og ga ja til Python for rensing og plassering.
 - Levert ikon07, ikon08 og ikon09: 117 bilder i arkene, 21 separate handlingspekere og 90 inventar-/samtalebilder som RGBA, pluss fem navngitte verbhjulikoner. Tre ark OK, 12 beskyttede filer uendret, kildeidentiske familier eksportert identisk.
 - Spillets egne skript avklarte de tidligere ukjente ikonmotivene. Seks bildekall; to forsøk forkastet. Tolv motiver rettet i større utsnitt. Ingen motorendring, import, hd-mod eller spilltest. Se rapporter/ikoner-ui-20261015/RAPPORT.md.
+
+## 2026-10-15: Max-ikon etter Toms rettelse
+
+- Tom avviste obj1008_01 som generisk kanin. Ett nytt innebygd image_gen-kall med originalikon, godkjent Max-hovedark og Purcell-referanse. Tannglis og små svarte øyne tilbake; ekte alfa bevart. Ikon08 og eksport oppdatert, andre ikoner uendret.
+- Alle tre ark OK; 12 beskyttede filer uendret. Brukerføringen om alltid å se stilreferanser og spørre ved usikkert motiv er lagt i AGENTS.md og ANALYSE.md. Ingen ny brukergodkjenning, motorimport eller spilltest.

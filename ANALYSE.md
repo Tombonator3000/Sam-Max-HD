@@ -62,6 +62,12 @@ Kilderegisteret [Steve's Sam & Max arts](https://samandmax.fandom.com/wiki/Steve
 
 ## Minste kontrollgrunnlag før et produksjonsark
 
+### Rettelse fra Tom 15. oktober 2026: Max-ikonet
+
+Tom avviste Max-ikonet `obj1008_01` fra ikonpakken: ansiktet lignet en generisk kanin. Den runde dobbeltbuede munnen og røde innslaget i øynene fjernet Max-uttrykket. Bruk alltid originalen sammen med godkjente stilreferanser før hvert motiv tegnes, også små inventar- og samtaleikoner. Spør Tom når identitet eller betydning fortsatt er usikker. Walkthroughs kan avklare gjenstander og steder, men en slik kilde erstatter ikke riktig original og godkjent figurdesign. Kilder og eventuell usikkerhet dokumenteres i jobbnotatet. Teknisk kontroll er fortsatt ikke kontroll av figuridentitet.
+
+For dette ikonet er identiteten avklart: Max. Originalens ørebøy, små svarte øyne, lille rosa nese og brede lukkede tannglis styrer formen. `hovedark/max.png`, godkjent av Tom 13. oktober, og Purcell-referansen styrer figuridentitet og strek. Det avviste kaninansiktet brukes ikke som stilanker.
+
 | Felt | Det som skal være avklart |
 | --- | --- |
 | Identitet | Personens navn eller eksplisitt uavklart rolle, kostymevariant og tilstand |

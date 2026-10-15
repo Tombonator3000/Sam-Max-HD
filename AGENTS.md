@@ -18,6 +18,8 @@ Regelen gjelder også når jobbformatet ber om ordrett prompt. Ved påvist feil 
 
 ## Faste regler
 
+- Tom presiserte 15. oktober 2026: se alltid originalen og de relevante godkjente stilreferansene før nytegning, også for små ikoner. Spør Tom hvis det fortsatt er uklart hva et motiv er. Walkthroughs og spillgjennomganger på nettet kan brukes til å avklare gjenstander, steder og brukssituasjoner, med kilder i notatet. En gjetning skal ikke bli produksjonsgrunnlag.
+
 - Jobb bare i denne grenen (`gpt-arbeid`). Aldri push til `main`, og lag ikke egne grener eller PR-er for grafikken.
 - Endre aldri `referanse.png`, `original_1x.png`, `prompt.txt` eller `jobb.json`, verken i `jobber/` eller i `hovedark/`.
 - Lever `jobber/<jobb>/resultat.png` og `jobber/<jobb>/notat.md`. Hovedarkene leveres som `hovedark/<navn>.png` med `hovedark/<navn>-notat.md`.
