@@ -1,15 +1,15 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-15 18:47 (norsk tid)
+Oppdatert 2026-10-15 20:03 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
 ## Status
 
-- Jobber: 2264. avvist 19, godkjent 430, levert 72, ny 1712, sjekk 31
+- Jobber: 2264. avvist 24, godkjent 425, levert 72, ny 1712, sjekk 31
 - Ferdige rom: 73 av 76 (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61, 62, 66, 68, 70, 71, 73, 76, 77, 79, 84, 85, 86, 87, 88, 89, 90, 91)
 - Ferdige objekter: 65 av 86 (obj036_01, obj050_01, obj089_01, obj142_01, obj187_01, obj187_02, obj187_03, obj187_04, obj187_06, obj199_01, obj204_01, obj294_01, obj295_01, obj304_01, obj308_01, obj336_01, obj338_01, obj340_01, obj409_01, obj523_01, obj524_01, obj570_01, obj570_02, obj570_03, obj598_01, obj599_01, obj601_01, obj604_01, obj606_01, obj607_01, obj608_01, obj609_01, obj610_01, obj611_01, obj612_01, obj613_01, obj664_01, obj665_01, obj666_01, obj667_01, obj669_01, obj682_01, obj683_01, obj684_01, obj772_01, obj773_01, obj776_01, obj777_01, obj780_01, obj811_01, obj812_01, obj813_01, obj821_01, obj823_01, obj828_01, obj829_01, obj830_01, obj832_01, obj839_01, obj850_01, obj901_01, obj989_01, obj989_02, obj995_01, obj996_01)
-- Lagjobber: 246 av 296 godkjent. Ferdige objektbilder fra lag: 565 av 701
+- Lagjobber: 241 av 296 godkjent. Ferdige objektbilder fra lag: 553 av 701
 - Ikonark: 7 av 9 godkjent. Ferdige bilder fra ikonark: 149 av 163
 - Figurark: 73 av 1758 tatt inn med figurmottaket. Ferdige figurruter: 923 av 15661
 - Hovedark: 2 av 2 levert
@@ -25,13 +25,13 @@ Figurrutene under har feil omriss mot originalen og er holdt utenfor spillet. Te
 1. `obj187_05` (rom 18, Wak-A-Rat (minispill), objekt 187 tilstand 05, del 1/1). Avvist: deler av bildet er flyttet eller zoomet (opptil 7.9 px). Les retur.md. Legg ved `jobber/obj187_01/resultat.png` som bilde to (ikke stilankeret), så tilstandene blir like. Lag denne etter obj187_01.
 2. `obj307_01` (rom 31, Kikkerten med utsikten, objekt 307 tilstand 01, del 1/1). Avvist: deler av bildet er flyttet eller zoomet (opptil 26.9 px). Les retur.md.
 3. `lag002_01` (rom 2, Laboratoriet (intro), lag 01 med 6 objektbilder, del 1/1). Avvist: objekter er feil: obj896_01 mangler (kantlikhet 0.89, med bakgrunnen 0.95). Les retur.md. Legg ved `jobber/rom002/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-4. `lag047_02` (rom 47, Bumpusville Sings (menasjeriet), lag 02 med 8 objektbilder, del 1/1). Avvist: objekter er feil: obj442_01 mangler (kantlikhet 0.87, med bakgrunnen 0.94). Les retur.md. Legg ved `jobber/rom047/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-5. `lag052_01_del2av2` (rom 52, Savage Jungle Inn, lobbyen, lag 01 med 3 objektbilder, del 2/2). Avvist: objekter er feil: obj486_01 mangler (kantlikhet 0.39, med bakgrunnen 0.83). Les retur.md. Legg ved `jobber/rom052_del2av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-6. `lag052_02_del1av2` (rom 52, Savage Jungle Inn, lobbyen, lag 02 med 2 objektbilder, del 1/2). Avvist: objekter er feil: obj486_02 mangler (kantlikhet 0.62, med bakgrunnen 0.80). Les retur.md. Legg ved `jobber/rom052_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-7. `lag052_03_del1av2` (rom 52, Savage Jungle Inn, lobbyen, lag 03 med 2 objektbilder, del 1/2). Avvist: objekter er feil: obj486_03 mangler (kantlikhet 0.61, med bakgrunnen 0.67), obj489_01 mangler (kantlikhet 0.73, med bakgrunnen 0.98). Les retur.md. Legg ved `jobber/rom052_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-8. `lag052_04_del1av2` (rom 52, Savage Jungle Inn, lobbyen, lag 04 med 2 objektbilder, del 1/2). Avvist: objekter er feil: obj486_04 mangler (kantlikhet 0.50, med bakgrunnen 0.71). Les retur.md. Legg ved `jobber/rom052_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-9. `lag052_05_del2av2` (rom 52, Savage Jungle Inn, lobbyen, lag 05 med 1 objektbilde, del 2/2). Avvist: objekter er feil: obj486_05 mangler (kantlikhet 0.42, med bakgrunnen 0.87). Les retur.md. Legg ved `jobber/rom052_del2av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-10. `lag052_06_del2av2` (rom 52, Savage Jungle Inn, lobbyen, lag 06 med 1 objektbilde, del 2/2). Avvist: objekter er feil: obj486_06 mangler (kantlikhet 0.41, med bakgrunnen 0.85). Les retur.md. Legg ved `jobber/rom052_del2av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+4. `lag017_03_del1av2` (rom 17, Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), lag 03 med 3 objektbilder, del 1/2). Avvist: objekter er feil: obj180_03 tegnet om (kantlikhet 0.06). Les retur.md. Legg ved `jobber/rom017_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+5. `lag017_03_del2av2` (rom 17, Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), lag 03 med 2 objektbilder, del 2/2). Avvist: objekter er feil: obj182_03 tegnet om (kantlikhet -0.08). Les retur.md. Legg ved `jobber/rom017_del2av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+6. `lag017_04_del1av2` (rom 17, Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), lag 04 med 1 objektbilde, del 1/2). Avvist: objekter er feil: obj180_04 tegnet om (kantlikhet 0.31). Les retur.md. Legg ved `jobber/rom017_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+7. `lag017_04_del2av2` (rom 17, Midway (Cone of Tragedy, Wak-A-Rat, Trixies vogn), lag 04 med 3 objektbilder, del 2/2). Avvist: objekter er feil: obj181_04 tegnet om (kantlikhet 0.46), obj182_04 tegnet om (kantlikhet -0.01). Les retur.md. Legg ved `jobber/rom017_del2av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+8. `lag022_02_del3av3` (rom 22, Tunnel of Love, inne, lag 02 med 3 objektbilder, del 3/3). Avvist: objekter er feil: obj228_02 tegnet om (kantlikhet 0.48). Les retur.md. Legg ved `jobber/rom022_del3av3/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+9. `lag047_02` (rom 47, Bumpusville Sings (menasjeriet), lag 02 med 8 objektbilder, del 1/1). Avvist: objekter er feil: obj442_01 mangler (kantlikhet 0.87, med bakgrunnen 0.94). Les retur.md. Legg ved `jobber/rom047/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+10. `lag052_01_del2av2` (rom 52, Savage Jungle Inn, lobbyen, lag 01 med 3 objektbilder, del 2/2). Avvist: objekter er feil: obj486_01 mangler (kantlikhet 0.39, med bakgrunnen 0.83). Les retur.md. Legg ved `jobber/rom052_del2av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
 
 Når disse er levert, fortsett med neste bestilling i `GRAFIKKLISTE.md` uten å vente på ny ordre.
 
@@ -53,10 +53,6 @@ Legg ved det ankeret som ligner mest på rommet som bilde to.
 - Hovedarkene (`hovedark/<navn>.png`) leveres på gjennomsiktig bakgrunn, uten tekst.
 
 Kjør `python3 verktoy/sjekk_leveranse.py <resultat>` før du committer, og gjør om det som får FEIL. Skriv `notat.md` i jobbmappen. Commit 5 til 10 jobber om gangen i grenen `gpt-arbeid` og push.
-
-## Beskjeder
-
-- Runde 15. oktober kl. 19 (Claude): de seks jobbene fra 18:06 er godkjent i mottaket, og de fire hele objektutsnittene (objektleveranser.json) er tatt inn som hele motiver for lappklipp. Modden er publisert i hd-mod. Rom 10 (Sams tenner) og rom 15 (kjerub og djevel) er sett uten skjerm. Måleforskjellen for Sam091 (fotresten) ser jeg på i mottaket.
 
 ## Kodeoppgaver
 
