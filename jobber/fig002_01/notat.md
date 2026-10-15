@@ -23,3 +23,8 @@ Uendret `verktoy/sjekk_leveranse.py` gir OK, 7 av 7 målte ruter. Skriptet hoppe
 Kropp, hode og hender er sett sammen i tre retninger med originalens relative koordinater. Åpne øyne og blink er kontrollert separat, og ingen svarte piksler står igjen i de fire øyekerner når riktig øyelokk legges på. Kontaktarkene `sam-kropp-hode-kontaktark.png`, `sam-blink-overlay.png` og `sam-blink-naerbilde.png` viser kontrollen. Dette er diagnostiske stillbilder. Rutelistene er dedupliserte, så de beviser ikke originaltiming, blinkaktivering eller motoravspilling.
 
 Rutekartet er `rapporter/stilpilot-fortsettelse-20261013/rutekart-sam.json`. SHA-256 og målinger finnes i `sam-egenkontroll.json`. Import, motorvisning og Toms vurdering av det nye figurarket gjenstår.
+
+
+15. oktober 2026, Toms feilrunde 2: frontkroppen i rute128 hadde to tydelige fingre i hånden på bildets venstre side. Lokal håndretting med innebygd bildeverktøy, modellnavn ikke eksponert, ett forsøk. Original og godkjent Sam-hovedark undersøkt. Tre avrundede fingre etter Toms rettelse; klær og andre ruter bevart. Python til rensing/plassering etter Toms tidligere uttrykkelige tillatelse. Fjernet 134 klart uvedkommende røde/grønne/gule/magenta/cyan kantpiksler i arket. Egenkontroll OK, 7 av 7 hovedruter. Ingen import eller spillgodkjenning. Prompt, råbilde, reproduksjon og rutekart: `rapporter/feilrunde2-20261015/`. SHA-256: 15b8323308c049e144a8e952937eac21b09e4ecb4c48d38fbc09583293517ec7.
+
+Lokal prøveimport i feilrunde 2: 9 ruter OK for dette arket, ingen til sjekk eller manglende. Kostyme 2 er sett i motoren; kostyme 4 er ikke vist separat. Ingen publisering av denne delrunden i hd-mod eller godkjenning fra Tom.

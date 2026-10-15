@@ -94,6 +94,12 @@ Objektene 833 til 836 lagres i rom 83, men tegnes i rom 54 av globale skript 108
 
 Inventareskens stempel skal være utvasket. Tom oppgir sannsynlig THX1138 og utydelig tekst under; ikke gjør dette til kildeverifisert, skarp tekst.
 
+## Feilrunde 2, 15. oktober
+
+Inventarkortene går også gjennom ordinær romobjekttegning, ikke bare blast-veien. Motorens feil filvalg og palettolkning gjorde rene RGBA-ikoner kantete og farget kanten. Klassiske maskekostymer trenger registrering av dekoderens faktiske pikseloperasjoner for å beholde riktig figur under glasset. Dette er bekreftet med før/etter-spillbilder, se [rapporten](rapporter/feilrunde2-20261015/RAPPORT.md).
+
+Et malt motiv i rombakgrunnen kan fortsatt bli stående etter at den tilsvarende animasjonslappen endres. Null avvik mot full gjenoppbygging beviser ikke at bakgrunnen er fri for slike motiver. Øksen i rom22 er et konkret uløst tilfelle. Sams tredje finger er Toms uttrykkelige rettelse; akkurat denne originalhånden er forenklet og gir ikke et sikkert opptalt fasitsvar.
+
 ## Toms motivrettelser og Sam091-målegrunnlag, 15. oktober 2026
 
 Figuren bak billettboden i rom15 er en rosa menneskelig kjerub med hvite vinger, sammen med en rød djevel. Det griselignende HD-ansiktet var feil. Bruk originalrom15 for den fjerne posituren og original/HD-rom21 for identiteten. Sams kartillustrasjon i rom10 skal ha den nedre tannrekken fullført på høyre underkjeve etter Toms avklaring.

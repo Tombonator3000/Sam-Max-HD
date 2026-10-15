@@ -1,0 +1,35 @@
+from pathlib import Path
+import hashlib, io, json, subprocess
+import numpy as np
+from PIL import Image
+
+R = Path(__file__).resolve().parent
+ROOT = R.parents[1]
+BASE = 'e925851f889e6471aecb6b4a347800d2305e4feb'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+rows = json.loads((ROOT/'rapporter/ikoner-ui-20261015/ikonmanifest.json').read_text())
+assert len(rows) == 111
+for row in rows:
+    p = ROOT/row['fil']
+    assert sha(p) == row['sha256']
+    old = Image.open(io.BytesIO(subprocess.check_output(['git','show',BASE+':'+row['fil']],cwd=ROOT))).convert('RGBA')
+    new = Image.open(p).convert('RGBA')
+    assert old.size == new.size == tuple(row['storrelse'])
+    assert np.array_equal(np.asarray(old)[:,:,3], np.asarray(new)[:,:,3])
+aliases = json.loads((ROOT/'rapporter/ikoner-ui-20261015/handlingsmanifest.json').read_text())
+for row in aliases:
+    src = next(r for r in rows if r['bilde'] == f"obj{row['objekt']:03}_01")
+    assert (ROOT/row['grunnikon']).read_bytes() == (ROOT/src['fil']).read_bytes()
+    assert sha(ROOT/row['grunnikon']) == row['sha256']
+assert len(aliases) == 5
+protected = json.loads((R/'beskyttede-kilder.json').read_text())
+for path, expected in protected.items():
+    assert sha(ROOT/path) == expected
+for row in json.loads((R/'fremdrift.json').read_text())['leveranser']:
+    assert sha(ROOT/row['resultat']) == row['sha256']
+for row in json.loads((R/'feilbilder.json').read_text()):
+    assert sha(R/row['fil']) == row['sha256']
+wash = json.loads((R/'ikon-kantvask.json').read_text())
+assert len(wash) == 110
+assert sum(r['rensede_kantpiksler'] for r in wash) == 17134
+print('OK: 111 ikonfiler med uendret alfa og størrelse, 5 aliaser, 8 beskyttede kilder, 2 Sam-ark, 6 feilbilder, 110 kantvasker / 17134 piksler')

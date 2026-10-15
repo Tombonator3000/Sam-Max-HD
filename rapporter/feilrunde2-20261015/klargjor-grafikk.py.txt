@@ -1,0 +1,36 @@
+from pathlib import Path
+import subprocess,io,json,hashlib
+from PIL import Image
+from scipy import ndimage as ndi
+import numpy as np
+R=Path(__file__).resolve().parent
+ROOT=R.parents[1]
+BASE='e925851f889e6471aecb6b4a347800d2305e4feb'
+def original(path):
+    return Image.open(io.BytesIO(subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT))).convert('RGBA')
+im=Image.open(R/'sam-raa01.png').convert('RGBA');a=np.array(im);y,x=np.indices(a.shape[:2]);rgb=a[:,:,:3].astype(int)
+orange=(rgb[:,:,0]>130)&(rgb[:,:,0]>rgb[:,:,1]*1.2)&(rgb[:,:,1]>45)&(rgb[:,:,1]>rgb[:,:,2]*1.3)&(a[:,:,3]>100)&(x<im.width*.25)&(y>im.height*.38)&(y<im.height*.65)
+lab,n=ndi.label(orange);counts=np.bincount(lab.ravel());counts[0]=0;core=lab==counts.argmax();dist=ndi.distance_transform_edt(~core)
+take=((dist<=11)&(a[:,:,3]>0)&(rgb.max(2)<80))|core;a[:,:,3]=np.where(take,a[:,:,3],0)
+yy,xx=np.where(a[:,:,3]>0);hand=Image.fromarray(a).crop((int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1))).resize((44,37),Image.Resampling.LANCZOS)
+for job in ['fig002_01','fig004_01']:
+    path=f'jobber/{job}/resultat.png';old=original(path);out=old.copy()
+    out.paste((0,0,0,0),(270,144,316,183));out.alpha_composite(hand,(272,144));out.paste(old.crop((314,144,320,170)),(314,144))
+    a=np.array(out);rr,gg,bb=a[:,:,:3].astype(int).transpose(2,0,1)
+    keys=((rr>200)&(gg<100)&(bb<100))|((gg>180)&(rr<140)&(bb<160))|((rr>180)&(bb>170)&(gg<120))|((bb>180)&(gg>180)&(rr<120))|((rr>180)&(gg>180)&(bb<100))
+    bad=keys&(ndi.distance_transform_edt(a[:,:,3]>0)<=2.5)&(a[:,:,3]>0);assert int(bad.sum())==134;a[bad,3]=0
+    Image.fromarray(a).save(ROOT/path)
+manifest=ROOT/'rapporter/ikoner-ui-20261015/ikonmanifest.json';rows=json.loads(manifest.read_text())
+for row in rows:
+    p=ROOT/row['fil'];im=original(row['fil']);a=np.array(im);rr,gg,bb=a[:,:,:3].astype(float).transpose(2,0,1)
+    green=(gg>rr*1.15+6)&(gg>bb*1.15+6)&(a[:,:,3]>0);bad=green&(ndi.distance_transform_edt(a[:,:,3]>0)<=2.0)
+    if bad.any():
+        good=(a[:,:,3]>=200)&(~green);_,inds=ndi.distance_transform_edt(~good,return_indices=True);a[bad,:3]=a[inds[0][bad],inds[1][bad],:3]
+        assert np.array_equal(a[:,:,3],np.asarray(im)[:,:,3]);Image.fromarray(a).save(p)
+    row['sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+manifest.write_text(json.dumps(rows,indent=2,ensure_ascii=False)+'\n')
+# Verbhjulaliasene holdes byteidentiske med sine fem grunnpekere.
+p=ROOT/'rapporter/ikoner-ui-20261015/handlingsmanifest.json';aliases=json.loads(p.read_text())
+for row in aliases:
+    src=next(r for r in rows if r['bilde']==f"obj{row['objekt']:03}_01");(ROOT/row['grunnikon']).write_bytes((ROOT/src['fil']).read_bytes());row['sha256']=src['sha256']
+p.write_text(json.dumps(aliases,indent=2,ensure_ascii=False)+'\n')

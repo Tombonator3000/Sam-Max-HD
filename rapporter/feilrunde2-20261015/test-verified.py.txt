@@ -1,0 +1,22 @@
+from pathlib import Path
+import os,subprocess,shutil,json,concurrent.futures,re,time
+w=Path.cwd().parent; d=Path.cwd(); running=Path((d/'app-path.txt').read_text()); new=d/'squashfs-root'
+for path in ['saves','test-home']:(d/path).mkdir(exist_ok=True)
+for p in Path('/home/tom/.local/share/sam-max-hd/saves').glob('samnmax.s*'):shutil.copy2(p,d/'saves'/p.name)
+scenes=[('inventory-verified',2,{'DIGHD_TEST_CLICKS':'80:10/185,160:210/30'},280),('akvarium-verified',1,{'DIGHD_TEST_ROOM':'16','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'320'},240),('cafeteria-verified',2,{'DIGHD_TEST_ROOM':'30','DIGHD_TEST_AT':'10'},240)]
+results=[]
+def run(task):
+ label,slot,extra,frames,version=task; target=d/f'test-{version}-{label}'; target.mkdir(exist_ok=True); home=target/'home';home.mkdir(exist_ok=True)
+ env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')}; env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),'XDG_CACHE_HOME':str(home/'.cache'),'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(d/'qa-mod'),'DIGHD_QUIT_AT':str(frames),'DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'40','DIGHD_DUMP_FLAT':'1','DIGHD_VERIFY':'1','DIGHD_SHOW_MISSING':'0','DIGHD_DEBUG_BLAST':'1'});env.update(extra)
+ bin=w/'motor-retting/engine/scummvm/scummvm'; game=running/'usr/share/sam-max-hd/game'
+ cmd=[str(bin),'--config='+str(home/'scummvm.ini'),'--path='+str(game),'--savepath='+str(d/'saves'),'--music-driver=null','--debuglevel=1','samnmax']
+ if slot is not None:cmd.insert(1,'--save-slot='+str(slot))
+ start=time.monotonic()
+ with open(target/'scummvm.log','wb') as f:
+  try:code=subprocess.run(cmd,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=50).returncode
+  except subprocess.TimeoutExpired:code='timeout'
+ log=(target/'scummvm.log').read_text(errors='replace'); row={'scene':label,'version':version,'exit':code,'seconds':round(time.monotonic()-start,1),'dumps':len(list(target.glob('frame_*_room*.png'))),'rooms':re.findall('DigHD: room (\\d+) loaded',log),'verify':re.findall('DigHD: verify[^\\n]+',log)[-3:]}
+ print(json.dumps(row),flush=True);return row
+with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
+ for row in ex.map(run,[(a,b,c,e,v) for a,b,c,e in scenes for v in ['new']]):results.append(row)
+(d/'verifisert-resultater.json').write_text(json.dumps(results,indent=2)+'\n')

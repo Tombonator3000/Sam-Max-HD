@@ -1,5 +1,7 @@
 # Status 15. oktober 2026
 
+Siste feilrunde: Sams frontvendte hånd er rettet i fig002_01 og fig004_01, og 110 separate RGBA-ikoner har fått grønn kantmatte renset uten endring av alfa eller størrelse. Lokal motorretting er bygget og testet: inventarkortene er rene, og rosa/blå maskefeil i akvarium og cafeteriarør er borte i prøvene. Grafikken er klar for mottak, kode går via egen PR; denne delrunden er ikke publisert som ny spillpakke. Øks-/bakgrunnsrester, kranhode/dumpling, faktisk opptak og bilens avreise gjenstår. [Rapport og overlevering](rapporter/feilrunde2-20261015/RAPPORT.md).
+
 Oppdatert status for grafikkgrenen: stilpiloten er godkjent, første HD-mod er laget, og siste ORDRE gjelder videre arbeid. Avsnittene nedenfor er historiske og beskriver de tidligere konsept- og pilotrundene.
 
 15. oktober er rutekartformatet rettet for alle 73 leverte figurark, 931 ruter. Mottaket kunne tidligere lese kart for bare 2 ark. Alle 12 returrutene øverst i ORDRE har to tegnede komponenter; radgjettingen utelot én av dem. Begge er nå koblet, uten endring av PNG-ene.
