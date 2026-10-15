@@ -404,3 +404,14 @@ Natt: kontroll av ny leveranse fra Codex (commit edec20f7 i `work/.gpt-gren`).
 - Ingen avvisning: ingenting å legge i `docs/gpt-avvisninger.csv`.
 - Figurmottaket holder likevel rute 1955 og 1957 til 1961 ute (status sjekk, tegnet 1,28 mot 4x), og ordren ber Codex tegne dem på nytt. Det er den kjente målefeilen (Sam091 uten fotresten, todo). La inn beskjed i ORDRE.md om ikke å tegne dem på nytt. Mottaket er ikke rettet i natt.
 - Spørsmål til Tom: push fra denne maskinen krever ny innlogging mot GitHub. Ikke testet i spillet.
+
+## 2026-10-15 20:19 (Claude)
+
+Natt: kontroll av obj187_05 (oppgaven pekte på commit cb4ecc3e i `work/.gpt-gren`).
+
+- cb4ecc3e er Claudes egen ordre-commit fra 20:05, ikke en ny leveranse. `origin/gpt-arbeid` står fortsatt på 55061f0d. `jobber/obj187_05/resultat.png` ble sist endret 13. oktober (61b58eaf), så det finnes ingen ny utgave av obj187_05.
+- `tools/gpt_runde.sh`: henting, `gpt-inn`, `myke-figurer`, `myke-ikoner`, `importpakke` og byggingen av modden (76 rom, 959 objektbilder, 923 figurruter) gikk. Push til `hd-mod` feilet igjen på innlogging mot GitHub, så runden stoppet før ordren. Ordren er ikke skrevet på nytt: ingenting nytt er kommet inn, og beskjeden fra 20:05 i ORDRE.md skal stå.
+- RAPPORT.md: obj187_05 avvist av mottaket (deler flyttet eller zoomet, opptil 7,9 px, kantlikhet 0,97).
+- Sett med øynene mot originalen og referanse.png i forhåndsvisningen: avvisningen stemmer. Klubbehodet og hånden ligger lenger til venstre og høyere enn i referansen, hullene har mørke flekker rundt kanten, og fargen i bakgrunnen er jevnet ut. Ingenting lagt til eller fjernet, teksten på brettet er bare et utsnitt og ser lik ut.
+- Ingen ny rad i `docs/gpt-avvisninger.csv`: mottaket avviste allerede, og `retur.md` med forslag ligger i jobben fra før.
+- Fortsatt åpent spørsmål til Tom: push fra denne maskinen krever ny innlogging mot GitHub. Lokale commits i `work/.gpt-gren` (edec20f7, dcd9962d, cb4ecc3e) er ikke pushet. Ikke testet i spillet.
