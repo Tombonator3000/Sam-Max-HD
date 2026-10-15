@@ -2061,3 +2061,55 @@ def test_myke_ikoner_tas_inn_bare_fra_godtatt_ark(tmp_path):
     r = ikoner.import_all(gren, extract, ut, rejections={"obj900_01": {"jobb": "obj900_01", "sha256_resultat": "*",
                                                                           "grunn": "test", "status": "avvist"}})
     assert r["ok"] == 0 and not (ut / "objects" / "obj900_01_hd.png").exists()
+
+
+def test_importpakke_hele_motiver_egen_alfa_og_indeks(tmp_path):
+    """smhd importpakke: helt motiv erstatter utklippet, egen alfa blir _hd.png, indeksbilde med samme piksler
+    og annen palett tas inn, avventende og feil størrelse hoppes over. build-mod bruker det egne indeksbildet."""
+    import hashlib
+    import json as _json
+
+    import numpy as _np
+    from PIL import Image as _Image
+
+    from smhd import importpakke
+
+    gren, extract, ut = tmp_path / "gren", tmp_path / "extract", tmp_path / "ut"
+    d = gren / "rapporter" / "import-grafikk-1"
+    (d / "f").mkdir(parents=True)
+    (extract / "objects").mkdir(parents=True)
+    (ut / "objects").mkdir(parents=True)
+    filer = []
+
+    def add(name, im, kind):
+        f = d / "f" / f"{name}.png"
+        im.save(f)
+        filer.append({"repo_fil": f"rapporter/import-grafikk-1/f/{name}.png", "pakke_fil": f"x/objects/{name}.png",
+                      "sha256": hashlib.sha256(f.read_bytes()).hexdigest(), "behandling": kind})
+
+    for n in ("obj100_02", "obj101_01", "obj102_01", "obj103_01"):
+        _Image.new("RGBA", (8, 4), (1, 2, 3, 255)).save(extract / "objects" / f"{n}.png")
+    idx = _Image.fromarray(_np.arange(32, dtype=_np.uint8).reshape(4, 8), "P")
+    idx.putpalette([0] * 768)
+    idx.save(extract / "objects" / "obj104_01_idx.png")
+    add("obj100_02", _Image.new("RGBA", (32, 16), (9, 9, 9, 255)), "helt_motiv_for_lappklipp")
+    add("obj101_01", _Image.new("RGBA", (40, 24), (9, 9, 9, 128)), "egen_alfa")
+    add("obj102_01", _Image.new("RGBA", (30, 16), (9, 9, 9, 255)), "helt_motiv_for_lappklipp")
+    add("obj103_01", _Image.new("RGBA", (32, 16), (9, 9, 9, 255)), "helt_motiv_for_lappklipp")
+    idx2 = idx.copy()
+    idx2.putpalette([200] * 768)
+    add("obj104_01_idx", idx2, "indekspiksler_original_palett_rom54")
+    (d / "manifest.json").write_text(_json.dumps({"avventer": ["obj103_01"], "filer": filer}))
+    r = importpakke.import_all(gren, extract, ut)
+    st = {k: v["status"] for k, v in r["bilder"].items()}
+    assert st == {"obj100_02": "ok", "obj101_01": "ok", "obj102_01": "hoppet over", "obj103_01": "hoppet over",
+                  "obj104_01_idx": "ok"}
+    assert _Image.open(ut / "objects" / "obj100_02.png").getpixel((0, 0)) == (9, 9, 9, 255)
+    assert (ut / "objects" / "obj101_01_hd.png").exists() and not (ut / "objects" / "obj101_01.png").exists()
+    assert _Image.open(ut / "objects" / "obj104_01_idx.png").getpalette()[0] == 200
+
+    from smhd import modpack
+    out = tmp_path / "mod"
+    (out / "objects").mkdir(parents=True)
+    modpack._copy_idx(extract, ut, out, "obj104_01")
+    assert _Image.open(out / "objects" / "obj104_01_idx.png").getpalette()[0] == 200

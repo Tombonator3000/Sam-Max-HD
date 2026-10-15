@@ -10,6 +10,7 @@
   smhd gpt-ordre                    Skriver ORDRE.md med neste jobber til ChatGPT
   smhd myke-figurer                 Tar inn figurarkene i glatt stil (ekte alfa) som myke kostymeruter
   smhd myke-ikoner                  Tar inn ikonene med egen myk alfa (inventar og pekere) som objNNN_SS_hd.png
+  smhd importpakke                  Tar inn importpakken (hele motiver for lapper, egen alfa, rom 54-paletter)
 """
 from __future__ import annotations
 
@@ -18,7 +19,7 @@ import json
 import sys
 from pathlib import Path
 
-from . import export, gamedata, gpt, ikoner, modpack, myk
+from . import export, gamedata, gpt, ikoner, importpakke, modpack, myk
 from .upscale import METHODS
 
 # Sam & Max Hit the Road, engelsk CD-utgave (ScummVM scumm-md5.h)
@@ -195,6 +196,16 @@ def cmd_myke_ikoner(a) -> int:
     return 0
 
 
+def cmd_importpakke(a) -> int:
+    r = importpakke.import_all(Path(a.gren), Path(a.extract), Path(a.ut),
+                               rejections=gpt.read_rejections(Path(a.avvisninger) if a.avvisninger else None))
+    print(f"Importpakken: {r['ok']} tatt inn, {r['hoppet_over']} hoppet over -> {Path(a.ut) / 'objects'} (rapport i importpakke.json)")
+    for b, x in sorted(r["bilder"].items()):
+        if x["status"] != "ok":
+            print(f"  {b}: {x['grunn']}")
+    return 0
+
+
 def cmd_myke_figurer(a) -> int:
     only = {j.strip() for j in a.jobb.split(",") if j.strip()} if a.jobb else None
     r = myk.import_all(Path(a.gren), Path(a.extract), Path(a.ut), only=only,
@@ -306,11 +317,17 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--ut", default=str(root / "work" / "gpt-ferdig"))
     p.add_argument("--avvisninger", default=str(root / "docs" / "gpt-avvisninger.csv"))
 
+    p = sub.add_parser("importpakke", help="ta inn importpakken fra grafikeren (rapporter/import-grafikk-*/manifest.json)")
+    p.add_argument("--gren", default=str(root / "work" / ".gpt-gren"), help="arbeidsgrenen gpt-arbeid (sjekket ut)")
+    p.add_argument("--extract", default=str(root / "work" / "extract"))
+    p.add_argument("--ut", default=str(root / "work" / "gpt-ferdig"))
+    p.add_argument("--avvisninger", default=str(root / "docs" / "gpt-avvisninger.csv"))
+
     a = ap.parse_args(argv)
     return {"info": cmd_info, "extract": cmd_extract, "build-mod": cmd_build_mod,
             "compare": cmd_compare, "gpt-pakke": cmd_gpt_pakke,
             "gpt-inn": cmd_gpt_inn, "gpt-ordre": cmd_gpt_ordre, "myke-figurer": cmd_myke_figurer,
-            "myke-ikoner": cmd_myke_ikoner}[a.command](a)
+            "myke-ikoner": cmd_myke_ikoner, "importpakke": cmd_importpakke}[a.command](a)
 
 
 if __name__ == "__main__":
