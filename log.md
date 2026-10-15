@@ -530,3 +530,15 @@ Natt: kontroll av lag052_07_del2av2, lag052_08_del2av2, lag052_09_del2av2 og lag
 - obj486_09: godkjent. Øyet lukket, mindre dråpe som originalen.
 - obj486_0A: godkjent. Øyet lukket, ingen dråpe, som originalen.
 - Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 00:20 (Claude)
+
+Natt: kontroll av lag052_11_del2av2, lag056_06, lag061_01_del1av2 og lag068_08 fra Codex (commit c0b5f112 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (e004175e). Mottaket godkjente alle fire.
+- Sett med øynene: hele referanse.png over resultat.png, og per objekt romoriginalen og tilstanden i nearest over godkjent romanker og resultat.png. Kort Python-måling: i alle fire jobbene ligger alle endrede HD-piksler (mot godkjent romanker) innenfor objektrutene, ingenting annet i rommet er rørt.
+- lag052_11_del2av2 (obj487_01, rom 52): godkjent. Klørne på øglens fot er flyttet som i originalen: øvre grå klo vannrett mot høyre og nedre klo lenger ned. Notatet fra Codex kaller motivet munn og underkjeve; det er foten, men tegningen følger originalen.
+- lag056_06 (rom 56): godkjent. obj539_01 er fryseren med åpen dør, mørk åpning med istapper og skrutrekkeren i vinduet som originalen. obj537_01 er bare en liten skyggeendring på rørbøyen i originalen, og HD-endringen er like liten og på samme sted.
+- lag061_01_del1av2 (rom 61): godkjent. obj582_01 er brettenden med den knekte enden til høyre som originalen. obj585_01 er den grønne og gule strikken i løkke fra ringen, med festet til høyre for ringen og den lille grå krokbiten nede til venstre. obj581_01 er lik rommet også i originalen og er uendret.
+- lag068_08 (rom 68): godkjent. De tre vegsegmentene med ett gult skråstrek på det nærmeste. I resultat.png er asfalten lysere enn originalen, men etter fargelåsen har objektbildene i `mods/gpt/objects` samme median som originalen (obj621_01 28,28,36 mot 27,27,35; obj631_01 26,25,28 mot 23,23,27). Den gule streken er litt lengre og bredere enn originalen; ikke avvist.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
