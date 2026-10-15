@@ -7,3 +7,9 @@ Egne smale røde/gule/grønne fragmenter og fire propellarmer, inklusive den nes
 Alle synlige objektfelt fra begge deler inngår i en felles 2528 × 800-master. Klipp x = 0 og 992, 544 × 800 byteidentisk overlapp. Nytegnet HD-grunnrom gjenbrukes utenfor sammensettingsfeltene. Hel skalering, rektangulær innplassering, 3 px kantfjæring og jevnt bilineært RGB-tonefelt på nytegnete vimpler; ingen originalpiksler, originalsilhuettmasker, lokal geometriwarp eller vektortrace.
 
 Uendret egenkontroll: OK. Resultat SHA-256: `4f0c5c0506c54a98f75911872b317030f793bc814e176fd1aa7daae1214367cf`. Proveniens, råforsøk, prompter og SHA i `rapporter/bestilling028-20261013/c-leveranser.json`; oppskrift c-komposisjon.py.txt og samlet kilde-/motivkontroll c-kilde-qa.md. Beskyttede kilder uendret. Runtime/import og ny individuell brukergodkjenning er ikke verifisert.
+
+## Retting 15. oktober 2026: hele motiver og alfa
+
+Nytegnet komplett motiv før mottakets lappklipp, med eksisterende HD-rom som stilgrunnlag. Innebygd bildeverktøy, eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms uttrykkelige tillatelse. Beskyttede originaler, jobbmetadata og prompter uendret.
+
+Egenkontroll: OK. Se [rapport, prompter, forsøk og SHA-256](../../rapporter/lapper-eske-logo-20261015/RAPPORT.md). Ingen ny motorimport eller spilltest av denne rettingen.

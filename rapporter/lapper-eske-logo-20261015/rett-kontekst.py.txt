@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+import json
+base=Path.cwd();root=base/'grafikk';r=root/'rapporter/lapper-eske-logo-20261015';ex=base/'retting-grunnlag/extract'
+a=json.loads((r/'objektfamilier.json').read_text());meta=json.loads((ex/'rooms.json').read_text())
+lookup={o['id']:(int(n),o) for n,d in meta['rooms'].items() for o in d['objects']}
+seq={180,181,182,183,350,352}
+for f in a:
+ id=f['objekt'];n,o=lookup[id];full=Image.open(ex/'objects'/f'{f["heltilstand"]}.png').convert('RGBA')
+ room=Image.open(ex/'rooms'/f'room{n:03d}.png').convert('RGBA');xy=(o['x'],o['y'],o['x']+o['w'],o['y']+o['h'])
+ background=room.crop(xy)
+ prior=background.copy()
+ for st in f['tilstander']:
+  im=Image.open(ex/'objects'/f'{st["bilde"]}.png').convert('RGBA')
+  if id in seq:
+   prior.alpha_composite(im);q=prior.copy();basis='sekvens 1..N fra lokalt skript, over rommets original'
+  elif id in [833,834,835,836]:
+   q=full.copy() if st['lapp'] else Image.new('RGBA',im.size);q.alpha_composite(im);basis='tilstand 4 før egen tilstand, globale skript 108/109'
+  else:
+   q=background.copy();q.alpha_composite(im);basis='rommets original med aktuell setState/drawObject-tilstand'
+  q.save(root/st['kilde_hel']);st['kontekstgrunnlag']=basis
+ f['rom']=n
+(r/'objektfamilier.json').write_text(json.dumps(a,indent=2)+'\n')

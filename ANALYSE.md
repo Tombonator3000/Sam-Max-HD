@@ -87,3 +87,9 @@ Behold beskyttede jobbfiler. Hvis en prompt har feil motiv eller motsier brukere
 Den fullstendige [figur- og objektanalysen fra 12. oktober](rapporter/sam-max-konseptanalyse-20261012/ANALYSE.md) er bevart som et datert eksempel. Tellinger, kostymer, egennavn og tekniske funn der gjelder Sam & Max og det daværende uttrekket, ikke Zak eller The Dig. Rapporten må leses sammen med rettelsene og nyere repoanalyse; den er ikke et godkjent produksjonsgrunnlag alene.
 
 Lærdommen som overføres er å fastslå riktig motiv før nytegning, skille personer fra objekter og effekter, bevare identitet gjennom alle varianter, bruke riktig palett og kontrollere hele animasjonen. Spesifikke SCUMM-formater, kostymenumre og avspillingsdetaljer må verifiseres i hvert spill.
+
+## Bassenggrafikk i lagerrom 83, 15. oktober 2026
+
+Objektene 833 til 836 lagres i rom 83, men tegnes i rom 54 av globale skript 108/109. Bruk rom 54s palett. Lagerrommets blå/hvite palett ga et feil inntrykk av skyer og hvit pels. Riktig original viser Sam og sasquatcher ved bassenget, samt en mørk flokk ved flettveggen. Ikke bruk den gamle skybeskrivelsen som motivgrunnlag. Se [kilde- og leveranserapport](rapporter/lapper-eske-logo-20261015/RAPPORT.md). Objekt 835 avventer avklaring av bart/munn.
+
+Inventareskens stempel skal være utvasket. Tom oppgir sannsynlig THX1138 og utydelig tekst under; ikke gjør dette til kildeverifisert, skarp tekst.

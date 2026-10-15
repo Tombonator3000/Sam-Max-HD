@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np
+b=Path.cwd();root=b/'grafikk';r=root/'rapporter/lapper-eske-logo-20261015';ex=b/'retting-grunnlag/extract';a=json.loads((r/'objektfamilier.json').read_text());meta=json.loads((ex/'rooms.json').read_text())['rooms']['83'];room=Image.open(b/'retting-grunnlag/rom54/rooms/room054.png').convert('RGBA');pal=Image.open(b/'retting-grunnlag/rom54/rooms/room054_idx.png').getpalette()
+for id in [833,834,835,836]:
+ f=next(f for f in a if f['objekt']==id);o=next(o for o in meta['objects'] if o['id']==id);out=Image.new('RGB',(1536,1024),(0,177,64))
+ full=Image.open(ex/'objects'/f'{f["heltilstand"]}_idx.png');full.putpalette(pal);full=full.convert('RGBA')
+ for e in f['produksjon']:
+  st=next(st for st in f['tilstander'] if st['bilde']==e['bilde']);im=Image.open(ex/'objects'/f'{e["bilde"]}_idx.png');im.putpalette(pal);im=im.convert('RGBA')
+  q=room.crop((o['x'],o['y'],o['x']+o['w'],o['y']+o['h']))
+  if st['lapp']:q.alpha_composite(full)
+  q.alpha_composite(im);q.save(r/'kilder'/f'{e["bilde"]}-rom54-hel.png')
+  x,y,w,h=e['motiv'];im=q.resize((w,h),Image.Resampling.NEAREST);out.paste(im,(x,y),im)
+ out.save(r/f'obj{id}-referanse-rom54.png')

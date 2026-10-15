@@ -1,0 +1,40 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,sys
+import numpy as np
+root=Path.cwd();r=root/'rapporter/lapper-eske-logo-20261015';sys.path.insert(0,str(root.parent/'repo/pipeline'))
+from smhd.modpack import _patch_from_full_painting
+m=json.loads((r/'leveranser.json').read_text());by={e['bilde']:e for e in m};families=json.loads((r/'objektfamilier.json').read_text());checks=[]
+for f in families:
+ full=Image.open(root.parent/'retting-grunnlag/extract/objects'/f'{f["heltilstand"]}.png').convert('RGBA')
+ for st in f['tilstander']:
+  if not st['lapp']:continue
+  name=st['bilde']
+  if name not in by:checks.append({'bilde':name,'status':'AVVENTER_MOTIVAVKLARING'});continue
+  patch=Image.open(root.parent/'retting-grunnlag/extract/objects'/f'{name}.png').convert('RGBA');result=_patch_from_full_painting(root/by[name]['fil'],patch,full,4)
+  assert result is not None,name
+  checks.append({'bilde':name,'status':'OK','utklipp_storrelse':list(result.size)})
+for e in m:
+ p=root/e['fil'];im=Image.open(p).convert('RGBA');a=np.array(im);assert im.size==tuple(e['storrelse']) and hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'];mag=(a[:,:,0]>220)&(a[:,:,1]<40)&(a[:,:,2]>220)&(a[:,:,3]>0);assert not mag.any(),e['bilde']
+ e['synlig_magenta']=int(mag.sum());e['alfa_mellomverdier']=int(((a[:,:,3]>0)&(a[:,:,3]<255)).sum())
+(r/'teknisk-kontroll.json').write_text(json.dumps({'lapper':checks,'leveranser':m},indent=2)+'\n')
+protected=json.loads((r/'beskyttede-kildehash.json').read_text());bad=[p for p,h in protected.items() if hashlib.sha256((root/p).read_bytes()).hexdigest()!=h];assert not bad,bad
+print('Beskyttede filer uendret:',len(protected));print('Lapper:',len(checks), 'OK:',sum(c['status']=='OK' for c in checks))
+# Kontaktsider: original komplett motiv og ferdig native HD ved samme displaymål.
+for page,start in enumerate(range(0,len(m),12),1):
+ sheet=Image.new('RGB',(1440,1080),(220,220,220));d=ImageDraw.Draw(sheet)
+ for n,e in enumerate(m[start:start+12]):
+  name=e['bilde'];col=n%3;row=n//3;x=col*480;y=row*270;d.text((x+8,y+5),name,fill='black');q=Image.open(root/e['fil']).convert('RGBA')
+  paths=[r/'kilder'/f'{name}-rom54-hel.png',r/'kilder'/f'{name}-hel.png',root.parent/'retting-grunnlag/extract/objects'/f'{name}.png']
+  src=next((p for p in paths if p.exists()),None)
+  if src:
+   orig=Image.open(src).convert('RGBA');orig=orig.resize((min(224,int(orig.width*min(224/orig.width,236/orig.height))),min(236,int(orig.height*min(224/orig.width,236/orig.height)))),Image.Resampling.NEAREST);sheet.paste(orig,(x+8,y+28),orig)
+  q.thumbnail((224,236),Image.Resampling.LANCZOS);sheet.paste(q,(x+248,y+28),q)
+ sheet.save(r/f'visuell-kontroll-{page:02d}.jpg',quality=92)
+# Eske og logo på fire bakgrunner, alfa uten sjakkmønster i bildeinnhold.
+sheet=Image.new('RGB',(1400,1050));d=ImageDraw.Draw(sheet)
+for i,bg in enumerate([(0,0,0),(255,255,255),(0,177,64),(220,40,70)]):
+ x=(i%2)*700;y=(i//2)*525;d.rectangle((x,y,x+699,y+524),fill=bg)
+ for name,off,lim in [('obj995_01',(10,10),(680,425)),('obj049_01',(10,440),(76,76))]:
+  im=Image.open(root/by[name]['fil']).convert('RGBA');im.thumbnail(lim,Image.Resampling.LANCZOS);sheet.paste(im,(x+off[0],y+off[1]),im)
+sheet.save(r/'alfa-kontroll.png')

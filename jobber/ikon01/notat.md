@@ -11,3 +11,9 @@ Uendret sjekk_leveranse.py: **SJEKK**. Globalt skift 0.15, blokkskift 1.42, kant
 SHA-256: fa97b5e0f71ed519bb17f64233c2a8f236517e7b49f09d04376e57691babab93
 
 Kilder, alle råforsøk, prompts, faktisk oppskrift og feltbehandling ligger i a-leveranser.json/a-ikon-proveniens.json og a-ikon-forelopig-kontroll.json i rapportene bestilling051/052. Samlet kildeplan: rapporter/bestilling051-20261013/a-kildeplan-ikoner.md. Alle 36 beskyttede ikonfiler er SHA-kontrollert uendret. Motorimport og spilltest er ikke utført.
+
+## Retting 15. oktober 2026: hele motiver og alfa
+
+Eksisterende native logo beholdt, magentanøkkel renset og separat RGBA levert. Innebygd bildeverktøy, eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms uttrykkelige tillatelse. Beskyttede originaler, jobbmetadata og prompter uendret.
+
+Egenkontroll: SJEKK. Se [rapport, prompter, forsøk og SHA-256](../../rapporter/lapper-eske-logo-20261015/RAPPORT.md). Ingen ny motorimport eller spilltest av denne rettingen.

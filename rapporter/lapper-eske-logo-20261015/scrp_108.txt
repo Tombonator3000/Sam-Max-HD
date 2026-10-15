@@ -1,0 +1,34 @@
+; Globalt skript 108 (SCRP i rom 54, offset 0xB470 fra ROOM-blokken)
+
+[0000] (5D) if (!getRandomNumber(6) && ifClassOfIs(833,[6])) {
+[0013] (5D)   if (getState(833) == 2) {
+[001E] (61)     drawObject(833,4)
+[0025] (73)   } else {
+[0028] (61)     drawObject(833,2)
+[002F] (**)   }
+[002F] (**) }
+[002F] (5D) if (!getRandomNumber(6) && ifClassOfIs(834,[6])) {
+[0042] (5D)   if (getState(834) == 2) {
+[004D] (61)     drawObject(834,4)
+[0054] (73)   } else {
+[0057] (61)     drawObject(834,2)
+[005E] (**)   }
+[005E] (**) }
+[005E] (5D) if (!getRandomNumber(6) && ifClassOfIs(835,[6])) {
+[0071] (5D)   if (getState(835) == 2) {
+[007C] (61)     drawObject(835,4)
+[0083] (73)   } else {
+[0086] (61)     drawObject(835,2)
+[008D] (**)   }
+[008D] (**) }
+[008D] (5D) if (!getRandomNumber(6) && ifClassOfIs(836,[6])) {
+[00A0] (5D)   if (getState(836) == 2) {
+[00AB] (61)     drawObject(836,4)
+[00B2] (73)   } else {
+[00B5] (61)     drawObject(836,2)
+[00BC] (**)   }
+[00BC] (**) }
+[00BC] (CA) delayFrames(1)
+[00C0] (73) jump 0
+[00C3] (66) stopObjectCodeB()
+END

@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,math
+base=Path.cwd();root=base/'grafikk';r=root/'rapporter/lapper-eske-logo-20261015';a=json.loads((r/'objektfamilier.json').read_text())
+for f in a:
+ id=f['objekt'];states=f['tilstander'] if id in [833,834,835,836] else [s for s in f['tilstander'] if s['lapp']]
+ if id==318:continue
+ n=len(states);cols=2;rows=2
+ # Fire faste celler med synlig intern margin, samme skala i alle tilstander.
+ sheet=Image.new('RGB',(1536,1024),(0,177,64));draw=ImageDraw.Draw(sheet);entries=[]
+ w,h=f['storrelse'];factor=min(672/w,432/h)
+ ww,hh=round(w*factor),round(h*factor)
+ for i,s in enumerate(states):
+  x=(i%2)*768+(768-ww)//2;y=(i//2)*512+(512-hh)//2
+  im=Image.open(root/s['kilde_hel']).convert('RGBA').resize((ww,hh),Image.Resampling.NEAREST)
+  sheet.paste(im,(x,y),im)
+  entries.append({'bilde':s['bilde'],'celle':[i%2*768,i//2*512,768,512],'motiv':[x,y,ww,hh],'native_mal':[w*4,h*4]})
+ dest=r/f'obj{id:03d}-referanse.png';sheet.save(dest)
+ f['produksjon']=entries
+ # HD-stilkontekst: det eksisterende rombildet, ikke en avvist tegning.
+ job=next(s['jobber'][0] for s in f['tilstander'] if s['jobber'])
+ d=json.loads((root/'jobber'/job/'jobb.json').read_text())
+ f['stilreferanse']=d['bilde_to']
+(r/'objektfamilier.json').write_text(json.dumps(a,indent=2)+'\n')
+print([(f['objekt'],len(f.get('produksjon',[])),f.get('stilreferanse')) for f in a])

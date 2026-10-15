@@ -29,3 +29,9 @@ Se [ANALYSE.md](ANALYSE.md): tynnere Bigfoot-strek og Steve Purcell-referansene 
 To hovedark er levert som pilotkandidater: hovedark/sam.png og hovedark/max.png, med notater, prompter, SHA-256 og kontroll i rapporter/hovedark-20261013/. Begge er PNG 1536 x 1024 med ekte alfa og fem visninger. Egenkontroll SJEKK, ingen FEIL i valgte kandidater. Sam er 5 til 7 prosent for høy i ståvisningene; Max 10 til 12 prosent for lav. Bredde og plassering er også dokumentert som avvik. Ikke godkjente stilankere eller ferdige produksjonsark. Ingen motorimport eller spilltest.
 
 Max-ikonet obj1008_01 er rettet etter Toms avvisning 15. oktober. Ny tegning fra originalen, godkjent hovedark og Purcell-referanse, med små svarte øyne og tannglis. Ikon08 består egenkontroll; de øvrige 110 RGBA-ikonene er uendret. Toms godkjenning og spilltest gjenstår. Se [rettingsrapport](rapporter/max-ikon-retting-20261015/RAPPORT.md).
+
+## Retting av lapper, eske og logo 15. oktober
+
+44 separate RGBA-bilder levert, 22 jobbresultater oppdatert. Egenkontroll: 20 OK, 2 SJEKK, ingen FEIL. 36 av 39 lapp-tilstander har komplette tegninger kontrollert mot eksisterende lappklipp. Objekt 835s fire kandidatbilder holdes utenfor produksjon mens bart/munn avklares med Tom. Rom83-ressursene bruker rom54-paletten i bassengscenen og leveres separat med passende indeksfiler. Ingen runtimeimport av denne pakken. Se [rapport](rapporter/lapper-eske-logo-20261015/RAPPORT.md).
+
+Ny status fra Claude dc5fcba9: de tidligere 111 ikonene er tatt inn i hd-mod; pekeren er sett i spillet. Dette erstatter den tidligere opplysningen om at disse ikonene ikke var publisert.

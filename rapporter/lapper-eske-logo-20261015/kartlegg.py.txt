@@ -1,0 +1,36 @@
+from pathlib import Path
+import json,math
+from PIL import Image,ImageDraw
+import numpy as np
+base=Path.cwd();root=base/'grafikk';ex=base/'retting-grunnlag/extract';out=base/'grafikk/rapporter/lapper-eske-logo-20261015';out.mkdir(exist_ok=True)
+ids=[154,155,180,181,182,183,222,301,318,350,352,439,444,530,833,834,835,836,897]
+jobs={}
+for p in (root/'jobber').glob('*/jobb.json'):
+ d=json.loads(p.read_text())
+ for o in d.get('objekter',[]):
+  if o.get('objekt') in ids:jobs.setdefault(o['bilde'],[]).append({'jobb':p.parent.name,'objekt':o,'meta':d})
+rows=[]
+preview=Image.new('RGB',(1400,math.ceil(len(ids)/4)*240),(72,72,72));draw=ImageDraw.Draw(preview)
+for ix,id in enumerate(ids):
+ files=sorted((ex/'objects').glob(f'obj{id:03d}_*.png'));files=[p for p in files if not p.stem.endswith('_idx')]
+ ims=[Image.open(p).convert('RGBA') for p in files]
+ counts=[np.count_nonzero(np.array(im)[...,3]) for im in ims];best=max(range(len(ims)),key=lambda i:counts[i]);full=ims[best]
+ states=[]
+ for p,im,n in zip(files,ims,counts):
+  patch=im.size==full.size and n<.6*counts[best]
+  q=full.copy() if patch else Image.new('RGBA',im.size)
+  q.alpha_composite(im)
+  dest=out/'kilder'/f'{p.stem}-hel.png';dest.parent.mkdir(exist_ok=True);q.save(dest)
+  states.append({'bilde':p.stem,'lapp':bool(patch),'synlig':int(n),'hel_synlig':int(np.count_nonzero(np.array(q)[...,3])),'kilde_hel':str(dest.relative_to(root)),'jobber':[j['jobb'] for j in jobs.get(p.stem,[])]})
+ lapp=[s for s in states if s['lapp']]
+ rows.append({'objekt':id,'heltilstand':files[best].stem,'storrelse':list(full.size),'tilstander':states})
+ x=(ix%4)*350;y=(ix//4)*240
+ draw.text((x+10,y+8),f'{id}: {len(states)} tilstander, {len(lapp)} lapper',fill='white')
+ for k,st in enumerate([states[best],lapp[0] if lapp else states[-1]]):
+  im=Image.open(root/st['kilde_hel']);f=min(160/im.width,180/im.height)
+  im=im.resize((round(im.width*f),round(im.height*f)),Image.Resampling.NEAREST)
+  preview.paste(im,(x+10+k*170+(160-im.width)//2,y+30+(180-im.height)//2),im)
+preview.save(out/'analyse-19-familier.png')
+(out/'objektfamilier.json').write_text(json.dumps(rows,indent=2)+'\n')
+print([(r['objekt'],len(r['tilstander']),sum(s['lapp'] for s in r['tilstander'])) for r in rows])
+print('patches',sum(s['lapp'] for r in rows for s in r['tilstander']))
