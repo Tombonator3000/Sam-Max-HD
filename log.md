@@ -314,3 +314,16 @@ Tom: flettet PR 20, neste todo, så punkt 2 (The Dig) og 3 (grafikkordre).
 ## 2026-10-15 05:55 (Claude)
 - Den felles patchen har fått tre tillegg for Zak McKracken (FM-Towns), der HD-laget nå virker: `GID_ZAK` i `DigHD::create`, `objNNN_01` uansett tilstand i v3, testhoppet mot spillflaten. Byte for byte lik Dig PR 55.
 - Testet: `engine/test.sh` med motoren bygget fra patchen, 12 av 12 kontroller lik full ombygging; avvikene mot originalen i rom 3 som før.
+
+## 2026-10-15 14:34 (Claude)
+
+Tom: ta inn ny grafikk til spillet.
+
+- Ny grafikk i `gpt-arbeid` fra i dag: rettede rutekart for 73 figurark (931 ruter), tre ikonark med 111 ikoner til verbene og inventaret som egne RGBA-filer med myk alfa, og et nytt Max-ikon (obj1008_01) etter Toms avvisning.
+- Oppsett på ny maskin: spilldata, pipelinen (uten `uttrekk`, thedig-textures lot seg ikke hente; `gpt_runde.sh` faller nå tilbake til det), `smhd extract`, motoren bygget fra patchen.
+- `smhd gpt-inn`: alle 163 ikoner fra ikonarkene godtatt. `smhd myke-figurer`: 920 ruter ok, 11 til gjennomsyn (tegnet i annen størrelse enn gruppen, se todo).
+- Nytt steg `smhd myke-ikoner` (`pipeline/smhd/ikoner.py`): ikonene fra `ikonmanifest.json` blir `objNNN_SS_hd.png` med egen alfa når arket er godtatt og sjekksum og størrelse stemmer. `build-mod` tar dem med. Motoren bruker `_hd.png` for blast-objekter og pekeren fra før. Ny test, pytest 49 bestått. PR 24.
+- Ikonene sett på et kontaktark: motivene stemmer med originalene, de fire tomme kortene og det rosa feltet (obj887) er slik i originalen.
+- Modden bygget (76 rom, 958 objektbilder, 923 figurruter, 304 MB) og publisert i `hd-mod`.
+- Testet uten skjerm i rom 7: pekeren er det myke ikonet obj889 uten rosa rand (det utklipte hadde rosa rand). Inventaret åpnet seg ikke med testklikk eller tast etter testhoppet, så de nye inventarikonene er ikke sett i spillet.
+- Ny ordre til ChatGPT med beskjed om ikonene og de 11 rutene, sendt til `gpt-arbeid`. Toms presisering i AGENTS.md der (se originalen og stilreferansene, spør ved uklart motiv) er tatt inn i `docs/gpt-arbeid-AGENTS.md`.
