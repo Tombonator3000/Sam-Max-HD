@@ -382,3 +382,11 @@ Tom: PR 29 flettet.
 
 - Bygget fra main (9e1b7b2) med hd-mod 9512fd8: Linux-pakken (release «linux», 16:03 UTC), Windows-pakken (release «windows», 16:06 UTC) og nettsiden (Sam-Max-HD-Web, kjøring 38765138956). Alle tre arbeidsflytene grønne, siden svarer 200.
 - Alle tre har nå de nye grafikkleveransene fra i dag og de myke kantene på romobjektene. Pakkene og siden er ikke spilt med skjerm etter denne byggingen.
+
+## 2026-10-15 19:02 (Claude)
+
+Tom: få Claude og ChatGPT til å samarbeide automatisk på Linux-maskinen og jobbe til i morgen, med grafikk og kode.
+
+- Natteskiftet ligger i prosjektbiblioteket (`samarbeid/`, grenen claude/sleepy-hawking-492gnq) siden det skal brukes i flere repoer. Rollene er de samme som i AGENTS.md: Codex tegner jobbene i ORDRE.md i `gpt-arbeid`, Claude kjører `tools/gpt_runde.sh` og ser på bildene; Claude koder fra todo.md på grenen `samarbeid/natt-<dato>`, Codex kontrollerer.
+- Codex kjører i sin egen sandkasse og kan ikke committe; skriptet committer bare `resultat.png`, `notat.md`, hovedark og `rapporter/` i `gpt-arbeid`. Det bruker samme arbeidstre som `tools/gpt_gren.sh` (`work/.gpt-gren`).
+- Ikke kjørt her ennå. Testet bare med falske agenter i Claude-økta.
