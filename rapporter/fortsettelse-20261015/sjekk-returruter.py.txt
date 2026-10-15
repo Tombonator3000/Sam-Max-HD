@@ -1,0 +1,58 @@
+"""Lesekontroll av deltilordning og originalomriss. Endrer ingen bilder."""
+from pathlib import Path
+import json
+import numpy as np
+from PIL import Image
+from smhd.myk import parts, assign_by_map, assign_by_rows, measure_mask, route_maps, SMALL
+
+root = Path(__file__).resolve().parents[2]
+report = Path(__file__).resolve().parent
+targets = {'fig002_05':[257,258,259,260,261], 'fig004_01':[256], 'fig007_01':[256],
+           'fig091_03':[1953], 'fig091_04':[1956], 'fig091_05':[1963,1966], 'fig236_01':[256]}
+maps = route_maps(root)
+proof = []
+for job, numbers in targets.items():
+    folder = root/'jobber'/job
+    meta = json.loads((folder/'jobb.json').read_text())
+    sheet = np.asarray(Image.open(folder/'resultat.png').convert('RGBA'))
+    orig = np.asarray(Image.open(folder/'original_1x.png').convert('RGB'))
+    _, labels, found = parts(sheet[...,3])
+    visible = {}
+    original_masks = {}
+    for cel in meta['ruter']:
+        x,y,right,bottom = cel['synlig']
+        region = orig[y:bottom,x:right]
+        rgba = np.concatenate([region,np.uint8(np.any(region!=meta['bakgrunn'],axis=2))[...,None]*255],axis=2)
+        body,outlier = measure_mask(rgba)
+        original_masks[cel['bilde']] = body|outlier
+        visible[cel['bilde']] = int((body|outlier).sum())
+    small = SMALL if any(v>=SMALL for v in visible.values()) else 1
+    big = [c for c in meta['ruter'] if visible[c['bilde']]>=small]
+    areas = sorted([p['areal'] for p in found],reverse=True)
+    min_area = areas[len(big)-1] if 0<len(big)<=len(areas) else 1
+    old = assign_by_rows(big,found,min_area)
+    assert old is not None, job
+    new = assign_by_map(meta['ruter'],found,labels,maps[job])
+    for cel in meta['ruter']:
+        if cel['rute'] not in numbers:
+            continue
+        name = cel['bilde']
+        x,y,right,bottom = cel['synlig']
+        ox,oy = meta['plassering']
+        mask = np.repeat(np.repeat(original_masks[name],4,axis=0),4,axis=1)
+        cut = labels[(oy+y)*4:(oy+bottom)*4,(ox+x)*4:(ox+right)*4]
+        prior = np.isin(cut,old.get(name,[]))
+        fresh = np.isin(cut,new[name])
+        def overlap(a):
+            return {'dekning':round(float((a&mask).sum()/mask.sum()),4),
+                    'snitt_union':round(float((a&mask).sum()/(a|mask).sum()),4)}
+        proof.append({'jobb':job,'bilde':name,'komponenter_for':old.get(name,[]),
+                      'komponenter_etter':new[name], 'omriss_for':overlap(prior),
+                      'omriss_etter':overlap(fresh),'rect':maps[job][name]})
+        assert len(new[name]) == 2, name
+        assert overlap(fresh)['dekning'] >= .8 and overlap(fresh)['snitt_union'] >= .6, name
+
+assert len(proof)==12
+(report/'returruter-kontroll.json').write_text(json.dumps(proof,indent=2)+'\n')
+for p in proof:
+    print(p['bilde'],len(p['komponenter_for']),'->',len(p['komponenter_etter']),p['omriss_for'],'->',p['omriss_etter'])

@@ -1,0 +1,85 @@
+"""Leser eksisterende PNG-er og skriver bare rutekart og kontrollmetadata.
+
+Ingen bildebytes eller beskyttede jobbfiler endres. Boksene er [x,y,b,h].
+Kjør med PYTHONPATH som inkluderer main/pipeline og scipy.
+"""
+from pathlib import Path
+import hashlib
+import json
+import numpy as np
+from PIL import Image
+from smhd.myk import parts, assign_by_map, route_maps, deliveries
+
+ROOT = Path(__file__).resolve().parents[2]
+REPORT = Path(__file__).resolve().parent
+
+def sha(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+before = route_maps(ROOT)
+maps = {}
+proof = []
+sources = {}
+for delivery in sorted(deliveries(ROOT), key=lambda d: d['jobb']):
+    name = delivery['jobb']
+    folder = ROOT / 'jobber' / name
+    meta_path = folder / 'jobb.json'
+    if not meta_path.exists():
+        continue
+    meta = json.loads(meta_path.read_text())
+    if meta.get('type') != 'figur':
+        continue
+    path = ROOT / delivery['resultat']
+    assert path.exists() and sha(path) == delivery['sha256'], name
+    for filename in ['jobb.json', 'referanse.png', 'original_1x.png', 'prompt.txt', 'resultat.png']:
+        p = folder / filename
+        sources[str(p.relative_to(ROOT))] = sha(p)
+    with Image.open(path) as im:
+        assert im.size == (1536, 1024) and im.mode == 'RGBA', name
+        sheet = np.asarray(im)
+    _, labels, found = parts(sheet[..., 3])
+    cels = meta['ruter']
+    ox, oy = meta['plassering']
+    rx, ry, _, _ = meta['region']
+    nominal = {}
+    for cel in cels:
+        x, y, right, bottom = cel['synlig']
+        nominal[cel['bilde']] = [(ox+x-rx)*4, (oy+y-ry)*4, (right-x)*4, (bottom-y)*4]
+    assigned = assign_by_map(cels, found, labels, nominal)
+    ids = [n for values in assigned.values() for n in values]
+    assert len(ids) == len(set(ids)), name
+    missing = [p for p in found if p['nr'] not in ids]
+    assert not missing, (name, 'komponenter uten eier', missing)
+    rows = []
+    for cel in cels:
+        selected = [p for p in found if p['nr'] in assigned[cel['bilde']]]
+        assert selected, (name, 'tom rute', cel['bilde'])
+        x = min(p['boks'][0] for p in selected)
+        y = min(p['boks'][1] for p in selected)
+        right = max(p['boks'][0]+p['boks'][2] for p in selected)
+        bottom = max(p['boks'][1]+p['boks'][3] for p in selected)
+        rows.append({'bilde': cel['bilde'], 'rect': [x,y,right-x,bottom-y],
+                     'kostyme': cel['kostyme'], 'rute': cel['rute'], 'lag': cel['lag']})
+    maps[name] = {'ruter': rows, 'sha256_resultat': sha(path)}
+    reread = assign_by_map(cels, found, labels, {r['bilde']:r['rect'] for r in rows})
+    assert reread == assigned, name
+    proof.append({'jobb': name, 'sha256': sha(path), 'ruter': len(rows),
+                  'komponenter': len(found), 'alle_komponenter_koblet': True,
+                  'lesbart_kart_for': name in before,
+                  'flerdelte_ruter': [{'bilde':r['bilde'], 'komponenter':len(assigned[r['bilde']]),
+                                      'rect':r['rect']} for r in rows if len(assigned[r['bilde']]) > 1]})
+
+names = sorted(maps)
+for offset in range(0,len(names),10):
+    piece = {name:maps[name] for name in names[offset:offset+10]}
+    (REPORT/f'rutekart-{offset//10+1:02d}.json').write_text(json.dumps(piece,indent=2)+'\n')
+after = route_maps(ROOT)
+assert all(after.get(name) == {r['bilde']:r['rect'] for r in item['ruter']} for name,item in maps.items())
+assert all(sha(ROOT/p) == h for p,h in sources.items())
+summary = {'ark':len(proof), 'ruter':sum(p['ruter'] for p in proof),
+           'lesbare_kart_for':len(before), 'lesbare_kart_etter':len(after),
+           'bildeendringer':0, 'beskyttede_filer_og_resultater_uendret':len(sources),
+           'ark_kontroll':proof}
+(REPORT/'rutekart-kontroll.json').write_text(json.dumps(summary,indent=2)+'\n')
+(REPORT/'kildehash.json').write_text(json.dumps(sources,indent=2)+'\n')
+print(json.dumps({k:v for k,v in summary.items() if k != 'ark_kontroll'}))

@@ -397,3 +397,10 @@
 
 - Bestilling60: ni figurark med88 ruter levert; Sam og Max i glassapparatet samt Sam-armbevegelser i Escher-rommet. Alle ni OK. Se `rapporter/bestilling060-20261013/RAPPORT.md`. Arbeidet fortsetter.
 -13 native bildekall er dokumentert. Alle ni faktiske leveranser kan gjenoppbygges byteidentisk fra nye komponenter;62 unike kilde-/kontekstlåser er kontrollert. Ingen motorimport, spilltest eller ny individuell bildeaksept.
+
+## 2026-10-15T10:07:53+02:00 (Codex)
+
+- Gjennomgått siste ORDRE og 65 fremdriftsrapporter. Den opprinnelige chatten var ikke tilgjengelig.
+- Rettet rutekartformatet for 73 eksisterende figurark, 931 ruter. Mottaket leste tidligere bare 2 kart og mistet separate deler ved radgjetting. Alle 12 returrutene øverst i ORDRE har nå begge tegnede komponenter koblet. Ingen bildebytes eller beskyttede jobbfiler endret.
+- Kontroll: mottakets kartleser og komponenttilordning, kildehash for 365 filer og egenkontroll på alle ark (69 OK, 4 SJEKK, 0 FEIL). Direkte omrissdekning minst 80 prosent for de 12 returrutene. Ingen ny motorimport, hd-mod eller spilltest.
+- Seks nye bildeforsøk er holdt utenfor leveransen på grunn av alfaslør eller blokkforskyvning. Separat korrigert kildebrief for obj307_01. Se rapporter/fortsettelse-20261015/RAPPORT.md.

@@ -117,3 +117,11 @@
 - [x] Levert bestilling59: ti figurark med115 ruter. Ni OK; Max066_03 beholder SJEKK for133s omriss. Øyelokk, donorhoder, kistelokk og kildebeviste rosa sålemerker kontrollert.
 
 - [x] Levert bestilling60: ni figurark med88 ruter, alle OK. Glassapparatets bak-/forsider, separate glasspunkt og52 egne arm-/håndstillinger kontrollert.
+
+## Fortsettelse 15. oktober 2026
+
+- [x] Gjennomgått siste ordre, rapportene og faktisk filstatus.
+- [x] Levert lesbare rutekart for alle 73 eksisterende figurark og 931 ruter, med alle separate deler.
+- [x] Bekreftet at de 12 returrutene mister én komponent ved radgjetting og får begge med kart. Ingen PNG-er endret.
+- [ ] Kjør nytt myke-figurer-mottak med kartene og spilltest de 12 returrutene før de krysses av i ORDRE.
+- [ ] Fortsett avviste objekter/lag, hele lapp-tilstander, inventaresken og de resterende ikon-/figurarkene etter ORDRE. Seks nye bildeforsøk fra denne runden er ikke levert.

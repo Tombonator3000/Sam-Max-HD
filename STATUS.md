@@ -1,4 +1,14 @@
-# Status 12. oktober 2026
+# Status 15. oktober 2026
+
+Oppdatert status for grafikkgrenen: stilpiloten er godkjent, første HD-mod er laget, og siste ORDRE gjelder videre arbeid. Avsnittene nedenfor er historiske og beskriver de tidligere konsept- og pilotrundene.
+
+15. oktober er rutekartformatet rettet for alle 73 leverte figurark, 931 ruter. Mottaket kunne tidligere lese kart for bare 2 ark. Alle 12 returrutene øverst i ORDRE har to tegnede komponenter; radgjettingen utelot én av dem. Begge er nå koblet, uten endring av PNG-ene.
+
+Kontroll: alle 73 kart leses av mottakets eksisterende kartleser, alle alfakjerner har én eier, 365 kilde-/resultatfiler er uendret. Egenkontroll: 69 OK, 4 SJEKK, ingen FEIL. Ny motorimport, hd-mod og spilltest er ikke utført. Se [rapporten](rapporter/fortsettelse-20261015/RAPPORT.md).
+
+Mangler resultatfil: 1685 figurark, 28 lagjobber og 3 ikonark. Alle 115 romjobber og 86 store objektjobber har resultatfiler, men enkelte er fortsatt avvist eller trenger retting etter ORDRE. Filtilstedeværelse betyr ikke godkjenning.
+
+## Historisk status 12. oktober 2026
 
 Delvis konseptleveranse i [galleriet](konsept/2026-10-12/index.html), med [analyse](konsept/2026-10-12/ANALYSE.md).
 
