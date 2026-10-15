@@ -340,3 +340,10 @@ Tom: lag oppdatert Linux-pakke.
 - Arbeidsflyten Linux-pakke startet fra main (PR 24 trengs ikke, pakken tar modden fra `hd-mod`). Pakken ble bygget og testet uten skjerm, men Debian 12-testen fikk `toomanyrequests` fra public.ecr.aws, også ved ny kjøring, så releasen ble ikke publisert.
 - Rettet: testen henter Debian-bildet fra første speil som svarer (public.ecr.aws, mirror.gcr.io, docker.io). Grenen `linux-debian-speil`, PR 26. Arbeidsflyten kjørt fra grenen: mirror.gcr.io brukt, ingen manglende biblioteker, spillet startet, releasen «linux» publisert (hd-mod e3b7a78, modden fra 15. oktober 14:22).
 - Testet: AppImage lastet ned fra releasen, sjekksummen stemmer, 111 myke ikoner med i modden, startet uten skjerm i rom 7 med HD-rom, HD-objekter, myke figurer og Atkinson-skriften. Ikke testet med skjerm og lyd.
+
+## 2026-10-15 16:17 (Claude)
+
+Tom: push ny grafikk til nettutgaven også.
+
+- Nettsiden (Sam-Max-HD-Web) henter HD-modden i nettleseren rett fra grenen `hd-mod` (fillisten uten mellomlager, filene etter sjekksum), så den nye modden fra 14:22 er med uten ny bygging. Motoren på siden ble sist bygget fra main 16:00 (kjøring 38747604195), med samme patch.
+- Sjekket: fillisten i `hd-mod` har 111 myke ikoner, raw.githubusercontent.com gir samme obj1008_01_hd.png som modden (sjekksum lik), siden svarer 200. Ikke sett i en nettleser denne gangen.
