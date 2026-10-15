@@ -99,8 +99,20 @@ jobs:
         # Hang 50 minutter 14. oktober: spillet avsluttet ikke på TERM i containeren. KILL etter
         # 10 sekunder til, og steget stoppes uansett etter 10 minutter.
         timeout-minutes: 10
+        # 15. oktober: public.ecr.aws svarte toomanyrequests to ganger på rad. Bildet hentes nå fra
+        # første speil som svarer, med nye forsøk.
         run: |
-          docker run --rm -v "$PWD/out/linux:/pakke:ro" public.ecr.aws/docker/library/debian:12-slim sh -c '
+          BILDE=""
+          for forsok in 1 2 3; do
+            for b in public.ecr.aws/docker/library/debian:12-slim mirror.gcr.io/library/debian:12-slim docker.io/library/debian:12-slim; do
+              if docker pull -q "$b" > /dev/null 2>&1; then BILDE="$b"; break 2; fi
+              echo "Fikk ikke hentet $b"
+            done
+            sleep 20
+          done
+          [ -n "$BILDE" ] || { echo "Fant ikke Debian 12 i noe speil"; exit 1; }
+          echo "Bruker $BILDE"
+          docker run --rm -v "$PWD/out/linux:/pakke:ro" "$BILDE" sh -c '
             apt-get update -qq && apt-get install -y -qq libgl1 libasound2 libfreetype6 libgbm1 libwayland-client0 libwayland-cursor0 libwayland-egl1 libxkbcommon0 > /dev/null
             cd /tmp && /pakke/SamMaxHD-x86_64.AppImage --appimage-extract > /dev/null
             echo "Biblioteker som mangler:"; LD_LIBRARY_PATH=squashfs-root/usr/lib ldd squashfs-root/usr/bin/scummvm | grep "not found" || echo "ingen"
