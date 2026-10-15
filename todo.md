@@ -4,6 +4,11 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
+- [ ] Tom fletter PR 28 og så PR 29; deretter nettsiden og Windows-pakken på nytt
+- [ ] Samme patch i Dig-HD-Remake
+- [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
+
 - [x] Innført kildetro motiv- og designanalyse før HD-produksjon i `docs/skills/scumm-hd-remake/SKILL.md`, med henvisninger fra arbeidsinstruksene (12. oktober 2026)
 
 - [x] Løs konfliktene i PR 2 mot main uten å miste motorarbeidet fra PR 3 (12. oktober, Codex)

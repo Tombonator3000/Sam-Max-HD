@@ -358,3 +358,14 @@ Tom: pakk ny Linux-pakke med den nye grafikken.
 - Modden bygget (76 rom, 958 objektbilder, 923 figurruter, 113 myke objektbilder) og publisert i `hd-mod` (b5f33fd).
 - Testet uten skjerm: rom 17 viser flaggene og teltene i HD uten lapp-blokker. Rom 54 henger etter testhoppet (kjent), så bassenget er ikke sett i spillet.
 - Linux-pakken bygget fra main med den nye modden og publisert i releasen «linux» (bygget 14:48 UTC, Debian-testen gikk gjennom). Lastet ned: sjekksummen stemmer, ikonene, obj995 og indeksbildene for rom 54 er med, startet i rom 17 med HD.
+
+## 2026-10-15 17:42 (Claude)
+
+Tom: fiks bilkantene i rom 9 (rapporten i `gpt-arbeid`, `rapporter/rom009-bilkanter-20261015/RAPPORT.md`).
+
+- Bekreftet årsaken: romobjekter bygges per originalpiksel, og alfaen i objektbildet ble ikke brukt, så kanten på bilen (obj089_01) fulgte originalens maske i trinn på 4 x 4 HD-piksler.
+- `build-mod` gir malte objekter i rom med HD-bakgrunn myk alfa (`soft_alpha`). Motoren legger kanten over HD-rommet (`drawSoftObjectEdges`, aktiv bare for objektbilder med myk alfa). PR 29, bygger på PR 28.
+- Testet: pytest 51 bestått. `engine/test.sh` 12 av 12 kontroller lik full ombygging, avvikene i rom 3 som før. Rom 9 uten skjerm med kameraet på bilen: tak, frontrute, støtfanger og halefinne glatte; lik full ombygging i alle kontroller, også etter Ctrl+H. Ikke sett: Sam og Max foran bilen, bilen som kjører bort.
+- Modden bygget på nytt med myk alfa og publisert i `hd-mod` (9512fd8). Motoren i main bruker ikke alfaen for romobjekter, så den gir samme bilde som før til PR 29 er flettet.
+- Linux-pakken bygget fra grenen `myke-objektkanter` og publisert i releasen «linux» (15:38 UTC) så Tom kan teste. Lastet ned, sjekksummen stemmer, startet i rom 9.
+- Patchen er felles med Dig-HD-Remake; Dig-repoet har ikke fått endringen ennå.
