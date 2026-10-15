@@ -27,7 +27,7 @@ export function selectFiles(files, kind) {
       // Sam & Max CD: index, data (with the music), speech, and the optional MT-32 ROMs
       if (!/^(SAMNMAX\.(000|001)|MONSTER\.SOU|MT32_(CONTROL|PCM)\.ROM)$/.test(relative)) continue;
     } else {
-      if (!/^(mod\.json|rooms\/room\d+(_idx)?\.png|objects\/obj\d+_[0-9a-fA-F]{2}(_idx)?\.png|costumes\/costume\d+_\d+(_idx|_hd)?\.png|fonts\/[a-z0-9-]+\.(txt|png))$/.test(relative)) continue;
+      if (!/^(mod\.json|rooms\/room\d+(_idx)?\.png|objects\/obj\d+_[0-9a-fA-F]{2}(_idx|_hd)?\.png|costumes\/costume\d+_\d+(_idx|_hd)?\.png|fonts\/[a-z0-9-]+\.(txt|png))$/.test(relative)) continue;
     }
     const path = root + relative;
     if (selected.has(path)) throw new Error('To filer har samme navn: ' + relative);
@@ -44,13 +44,14 @@ export function selectFiles(files, kind) {
 
 // What the page shows about a chosen folder. Counts the HD images, not the _idx files.
 // A figure cel can have both a cut-out image and a soft one (_hd.png); it counts once.
+// The same for an object image (the icons with their own soft alpha, objNNN_SS_hd.png).
 export function summarize(rows, created = null) {
   const count = re => rows.filter(row => re.test(row.path)).length;
   return {
     files: rows.map(({path, size}) => ({path, size})),
     bytes: rows.reduce((sum, row) => sum + row.size, 0),
     rooms: count(/\/rooms\/room\d+\.png$/),
-    objects: count(/\/objects\/obj\d+_[0-9a-fA-F]{2}\.png$/),
+    objects: new Set(rows.map(row => row.path.match(/\/objects\/(obj\d+_[0-9a-fA-F]{2})(_hd)?\.png$/)?.[1]).filter(Boolean)).size,
     cels: new Set(rows.map(row => row.path.match(/\/costumes\/(costume\d+_\d+)(_hd)?\.png$/)?.[1]).filter(Boolean)).size,
     created
   };
