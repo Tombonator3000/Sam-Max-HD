@@ -1,0 +1,39 @@
+Task: faithful HD remaster of one background picture from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. A game engine lays it exactly on top of the original picture, so the geometry must not change at all.
+
+Input: the attached image is the original low-resolution artwork enlarged 4x with hard pixel edges. It sits on a plain gray (#808080) border. The border is only padding.
+
+Do:
+- Repaint the picture inside the gray border in high resolution: smooth gradients instead of dithering and color banding, clean crisp outlines, and painted shading in the style of the original.
+- Keep the original look: the same hand-painted cartoon style of the 1993 LucasArts game, with its bold dark outlines, saturated colors, exaggerated tilted and curved perspective, and the same light direction, shadows, mood and contrast.
+- Keep every shape exactly where it is: outlines, horizon, edges, doorways, signs, furniture and highlights must line up with the original pixels. Tilted and curved lines stay tilted and curved.
+- Copy every sign, label and piece of lettering exactly, letter by letter: the same words, spelling, letter shapes, size and position. Where a letter cannot be read in the input, keep its shape instead of guessing a word.
+
+Do not:
+- Do not move, zoom, crop, rotate, mirror or reframe anything. Do not extend the picture into the gray border. Keep the border plain gray (#808080).
+- Do not add, remove or replace anything: no new objects, people, creatures, text, signs, symbols, patterns, plants, clutter or details. Keep the number of things the same (windows, posts, books, bottles, stars, teeth, fingers).
+- Do not fix, tidy, straighten, complete or reinterpret anything, even when it looks odd: the oddities are part of the game. Plain areas stay plain; the game often draws objects or characters on them.
+- No photorealism, no modern 3D look, no film grain, no vignette, no frame, no watermark, no signature.
+
+Output: one image, exactly 1536 x 1024 pixels, with the same layout as the input. Before delivering, run python3 verktoy/sjekk_leveranse.py on the result and redo the picture if it reports FEIL.
+
+This picture is a large image that the game draws on top of the room, such as a close-up, a map or a panel. Treat it as a background picture and follow all the rules above.
+
+Note for this room: Close-up of the Wak-A-Rat game. Copy 'WAK-A-RAT' on the box and the score panel 'HIT 20 WIN' exactly. Keep the five holes as they are: the game draws the rats in them.
+
+This picture is one of several states of the same image in the game, and the game switches between them. If a second image is attached, it is the approved HD version of the first state. Copy everything that looks the same in both from that second image, so the states match exactly, and only paint the parts that differ.
+
+
+Source correction for this specific state, overriding only the generic room note above: image 1 is the sole geometry and content authority for object 187 state 05. It shows Sam hitting the front left hole with a RED WOODEN MALLET. His orange-brown hand grips the diagonal red handle, with gray-purple sleeve, pale cuff and blue-black tie. The mallet is a vertical wooden cylinder at the lower left, not a metal hammer. Only THREE holes are visible because the mallet and hand occlude the other two. Preserve this exact occlusion and all contact points. Do not paint five visible holes. The partial WAK-A lettering is cropped at the lower edge exactly as in image 1. HIT 20 WIN is outside this object crop and must not be added. Preserve the cropped Sam face and body, without completing them.
+
+Image 2 is the approved HD state 01: use the identical blue backdrop, mallet material, Sam identity, outlines, palette and machine surfaces wherever they are unchanged. Do NOT copy its raised mallet pose or five visible holes. Image 3 is the approved Sam model sheet for identity only; retain image 1's gray-purple suit and lighting.
+
+Precise correction of the attached HD picture. The previous result did not line up with the original. Start again from referanse.png and keep every outline, edge and object at exactly the same pixel position as in that image. Do not zoom, shift, crop or reframe. Keep the gray border plain gray. Same size 1536 x 1024.
+
+Keep the full canvas 1536 x 1024. The colored artwork rectangle is exactly x=352, y=192, width=832, height=640. Everything outside is solid RGB(128,128,128). Keep the dark blue left edge at precisely its original location. Trace the original at 4x, smoothing the stair steps into curves without shifting their centerline. Smooth painted blue background, clean varied dark outlines and original flat shadow shapes. Add nothing.
+
+
+For this retry, copy the blue backdrop EXACTLY from the approved HD state 01, image 2, wherever it is unobstructed in image 1. Treat this as a locked common background shared by the animation. Do not redesign its shading or add texture. Its left edge is a very NARROW dark blue taper, only 36 pixels wide at the TOP, tapering to zero over 256 pixels of height; do not widen it. The two color bands within that taper must follow image 1 precisely. The remainder is the SAME horizontal blue transition as image 2, with no speckling, grain, or stippling.
+
+All outlines, color-zone boundaries, shadow lines and mallet woodgrain should follow image 1 closely, simply replacing its staircase edges with smooth lines centered on the same paths. Do not make the shading more elaborate. Keep the grip silhouette and original thumb shape EXACTLY. The clean HD linework and materials are supplied by image 2, the pose by image 1. Color fills must remain restrained, cartoon-style.
+
+Output perfectly flat medium gray padding, not a photographed gray page. No noise anywhere on the canvas. The artwork has hard rectangular boundaries x=352 through x=1183, y=192 through y=831 inclusive.
