@@ -431,3 +431,12 @@ Natt: kodeoppgave fra todo, mottaket for myke figurer måler Sam091 uten fotrest
 - Ny test `test_soft_cel_drawn_outlier`. Sjekket at den feiler uten rettelsen. pytest i `pipeline`: 55 bestått.
 - Kjørt på alle leverte ark i `work/.gpt-gren` til en midlertidig mappe i /tmp (ikke `work/gpt-ferdig`, ikke modden): 931 ruter ok og 0 til gjennomsyn, mot 920 og 11 før. De eneste som endret status er de 11 kjente: fig091_03 til 05 (fotresten, snitt delt på union nå 0,90 til 0,96) og fig209_03 og fig272_02 (én løs originalpiksel langt til siden som grafikeren har tegnet, så bredden ble målt 1,13 og 3,24 mot 4x; nå 1,0). Forhåndsvisningene for fig091_04 og fig272_02 sett med øynene: fotresten og pikselen ligger på originalens plass innenfor omrisset.
 - Ikke gjort: modden er ikke bygget på nytt og ORDRE.md er ikke endret. Endringen ligger på natt-grenen og må gjennom PR mot main før `tools/gpt_runde.sh` tar inn rutene. Ikke testet i spillet.
+
+## 2026-10-15 21:10 (Claude)
+
+Natt: kontroll av ny leveranse fra Codex, obj187_05 (commit 01a36834 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom denne gangen: henting, mottak, myke figurer (73 ark, 931 ruter ok, 0 til gjennomsyn, nå med myk.py versjon 6), bygging av modden (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md sendt til `gpt-arbeid`. Innloggingen mot GitHub virker igjen.
+- RAPPORT.md: obj187_05 står på sjekk (deler flyttet eller zoomet opptil 1,3 px), mot avvist med 7,9 px i forrige utgave. Codex sin egenkontroll: skift 0,07 originalpiksler, kantlikhet 0,94. Resultatet er 1430 x 1100, som er 208:160.
+- Sett med øynene mot originalen og i forhåndsvisningen, og som et halvt gjennomsiktig lag over originalen i 4x: klubbehodet, hånden, armen, slipset, snuten og de tre hullene ligger der de ligger i originalen, uten doble konturer. Ingenting lagt til eller fjernet, ingen rotter eller treffeffekter. Den avskårne teksten på brettet («AK-A» til høyre og bokstavresten til venstre) er lik originalen. Det mørke rundt hullene og den utjevnede bakgrunnen fra forrige utgave er borte.
+- Godkjent i kontrollen, ingen rad i `docs/gpt-avvisninger.csv`. Stilen er ikke godkjent av Tom. Ikke testet i spillet, og hele animasjonen med de andre tilstandene er ikke sett i motoren.
