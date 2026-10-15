@@ -42,7 +42,7 @@ from pathlib import Path
 from PIL import Image
 
 from . import skrift
-from .upscale import scale4x_rgba, upscale, upscale_alpha
+from .upscale import scale4x_rgba, soft_alpha, upscale, upscale_alpha
 
 MARGIN = 8  # piksler med bakgrunn rundt et objekt når det skaleres
 
@@ -151,6 +151,9 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
                         ohd = None
                     else:
                         ohd = _clean(ohd, oim, custom.name)
+                        # Malt objekt over HD-rommet: myk kant i stedet for originalens trappetrinn.
+                        # Motoren blander kanten over rommet (drawSoftObjectEdges, bilen i rom 9).
+                        ohd.putalpha(soft_alpha(oim.getchannel("A"), scale))
                 if ohd is None:
                     ohd = _upscale_object_in_context(base, oim, obj["x"], obj["y"], scale, method, **upscale_kw)
                 ohd.save(out / "objects" / f"{name}.png")

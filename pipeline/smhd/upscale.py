@@ -100,6 +100,35 @@ def upscale(im: Image.Image, scale: int, method: str, *, tool: str | None = None
     raise SystemExit(f"Ukjent metode: {method}. Velg en av: {', '.join(METHODS)}")
 
 
+def soft_alpha(alpha: Image.Image, scale: int, sigma: float = 0.55, gain: float = 2.2) -> Image.Image:
+    """Alfa med myk, glatt kant fra originalens harde maske (romobjekter, Tom 15. oktober 2026: bilen i rom 9).
+
+    Masken skaleres med nærmeste nabo og glattes med en gaussisk uskarphet (sigma i originalpiksler), og
+    overgangen strammes inn rundt midten (gain). Trappetrinn blir skrå linjer gjennom midten av trinnene,
+    og en strek på én originalpiksel blir stående. Innenfor masken der alle naboene også er med, og utenfor
+    der ingen er med, er alfa som før. Motoren legger kanten over HD-rommet (drawSoftObjectEdges)."""
+    import numpy as np
+    a = np.asarray(alpha.convert("L"), dtype=np.float64) / 255.0
+    on = a >= 0.5
+    big = np.repeat(np.repeat(on.astype(np.float64), scale, 0), scale, 1)
+    blurred = np.asarray(Image.fromarray((big * 255).astype(np.uint8)).filter(
+        ImageFilter.GaussianBlur(sigma * scale)), dtype=np.float64) / 255.0
+    soft = np.clip((blurred - 0.5) * gain + 0.5, 0.0, 1.0)
+    pad = np.pad(on, 1)
+    h, w = on.shape
+    near = np.zeros_like(on)
+    inner = np.ones_like(on)
+    for dy in range(3):
+        for dx in range(3):
+            win = pad[dy:dy + h, dx:dx + w]
+            near |= win
+            inner &= win
+    near4 = np.repeat(np.repeat(near, scale, 0), scale, 1)
+    inner4 = np.repeat(np.repeat(inner, scale, 0), scale, 1)
+    soft = np.where(inner4, 1.0, np.where(near4, soft, 0.0))
+    return Image.fromarray(np.rint(soft * 255).astype(np.uint8), "L")
+
+
 def upscale_alpha(alpha: Image.Image, scale: int) -> Image.Image:
     """Alfakanalen skaleres med nærmeste nabo, så kantene blir like skarpe som i originalen."""
     return alpha.resize((alpha.width * scale, alpha.height * scale), Image.NEAREST)

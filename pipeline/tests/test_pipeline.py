@@ -523,7 +523,11 @@ def test_gpt_object_jobs_and_import(tmp_path):
     # Med rommet valgt: bakgrunnen og det lille objektet skaleres automatisk, det store er det egne
     m = modpack.build_mod(ex, tmp_path / "mod2", scale=4, method="nearest", rooms={5}, own=done)
     assert m["rooms"] == [5] and m["objects"] == ["obj007_01", "obj241_01"]
-    assert Image.open(tmp_path / "mod2" / "objects" / "obj241_01.png").tobytes() == hd.tobytes()
+    got = Image.open(tmp_path / "mod2" / "objects" / "obj241_01.png")
+    assert got.convert("RGB").tobytes() == hd.convert("RGB").tobytes()
+    # Myk kant: verdier mellom 0 og 255 langs omrisset, helt dekket inni og helt borte langt ute
+    alpha = set(got.getchannel("A").getdata())
+    assert 0 in alpha and 255 in alpha and any(0 < v < 255 for v in alpha)
 
 
 def test_gpt_orders_with_objects(tmp_path):
@@ -795,8 +799,9 @@ def test_gpt_layer_import_and_mod(tmp_path):
     m = modpack.build_mod(ex, tmp_path / "mod", scale=4, method="nearest", rooms={6}, own=done)
     for name in ("obj021_01", "obj021_02", "obj022_01", "obj023_01", "obj025_01"):
         assert name in m["objects"]
-        assert Image.open(tmp_path / "mod" / "objects" / f"{name}.png").tobytes() == \
-            Image.open(done / "objects" / f"{name}.png").tobytes()
+        # Fargene er de egne; alfaen er myk i rom med HD-bakgrunn (soft_alpha, bilen i rom 9)
+        assert Image.open(tmp_path / "mod" / "objects" / f"{name}.png").convert("RGB").tobytes() == \
+            Image.open(done / "objects" / f"{name}.png").convert("RGB").tobytes()
     assert "obj020_01" in m["objects"]                       # ikke ferdig: automatisk oppskalert
     m = modpack.build_mod(ex, tmp_path / "mod2", scale=4, method="nearest", rooms=set(), own=done)
     assert m["objects"] == ["obj021_01", "obj021_02", "obj022_01", "obj023_01", "obj025_01"]
@@ -2113,3 +2118,21 @@ def test_importpakke_hele_motiver_egen_alfa_og_indeks(tmp_path):
     (out / "objects").mkdir(parents=True)
     modpack._copy_idx(extract, ut, out, "obj104_01")
     assert _Image.open(out / "objects" / "obj104_01_idx.png").getpalette()[0] == 200
+def test_soft_alpha_glatter_trapp_og_beholder_strek():
+    """soft_alpha: en trapp får mellomverdier langs kanten, en strek på én originalpiksel blir stående,
+    det indre er helt dekket og det som ligger mer enn en originalpiksel unna, er borte."""
+    import numpy as _np
+    from PIL import Image as _Image
+
+    from smhd.upscale import soft_alpha
+    m = _np.zeros((12, 12), _np.uint8)
+    for i in range(12):
+        m[i, : i + 1] = 255           # trapp
+    m[2, 8:12] = 255                  # strek på én piksel
+    a = _np.asarray(soft_alpha(_Image.fromarray(m, "L"), 4))
+    assert a.shape == (48, 48)
+    assert a[44:48, 0:4].min() == 255                        # inni
+    assert a[0:4, 44:48].max() == 0                           # langt unna
+    assert a[8:12, 40:48].max() > 128                         # streken
+    edge = a[20:24, 20:28]
+    assert ((edge > 0) & (edge < 255)).any()                  # myk overgang langs trappen
