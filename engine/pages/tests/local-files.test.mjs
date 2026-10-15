@@ -31,20 +31,22 @@ test('HD references, prompts and film frames are excluded; an incomplete mod is 
 test('HD objects and figure cels are imported and counted without their _idx files', () => {
   const rows = selectFiles([
     file('gpt/mod.json'), file('gpt/rooms/room022.png'), file('gpt/rooms/room022_idx.png'),
-    file('gpt/objects/obj097_0a.png'), file('gpt/objects/obj097_0a_idx.png'),
+    file('gpt/objects/obj097_0a.png'), file('gpt/objects/obj097_0a_idx.png'), file('gpt/objects/obj097_0a_hd.png'),
+    file('gpt/objects/obj1008_01_hd.png'), file('gpt/objects/obj1008_01_idx.png'),
     file('gpt/costumes/costume014_003.png'), file('gpt/costumes/costume014_003_idx.png'),
     file('gpt/costumes/costume014_016.png'), file('gpt/costumes/costume014_016_idx.png'),
     file('gpt/costumes/costume014_016_hd.png'),
     file('gpt/fonts/map.txt'), file('gpt/fonts/exo2.png'), file('gpt/fonts/exo2.txt'), file('gpt/fonts/OFL.txt'),
     file('gpt/SHA256SUMS'), file('gpt/README.md')], 'mod');
-  assert.equal(rows.length, 13);
+  assert.equal(rows.length, 16);
+  assert.ok(rows.some(row => row.path === MOD_ROOT + 'objects/obj097_0a_hd.png'));
   assert.ok(rows.some(row => row.path === MOD_ROOT + 'fonts/map.txt'));
   assert.ok(rows.some(row => row.path === MOD_ROOT + 'fonts/exo2.png'));
   assert.ok(rows.some(row => row.path === MOD_ROOT + 'costumes/costume014_016_hd.png'));
   assert.ok(rows.some(row => row.path === MOD_ROOT + 'costumes/costume014_016_idx.png'));
   const sum = summarize(rows, '2026-10-09 09:49');
-  assert.deepEqual([sum.rooms, sum.objects, sum.cels, sum.created], [1, 1, 2, '2026-10-09 09:49']);
-  assert.equal(sum.bytes, 13 * 'sample'.length);
+  assert.deepEqual([sum.rooms, sum.objects, sum.cels, sum.created], [1, 2, 2, '2026-10-09 09:49']);
+  assert.equal(sum.bytes, 16 * 'sample'.length);
 });
 
 test('ScummVM directory indexes combine local game/HD files with built-in themes', () => {
