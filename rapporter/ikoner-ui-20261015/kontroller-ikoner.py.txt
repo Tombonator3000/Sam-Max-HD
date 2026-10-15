@@ -1,0 +1,70 @@
+"""Kontrollerer leverte PNG-er og lager sammenligningsark for visuell QA."""
+from pathlib import Path
+import hashlib
+import json
+import subprocess
+import numpy as np
+from PIL import Image,ImageDraw
+
+ROOT=Path(__file__).resolve().parents[2]
+REPORT=Path(__file__).resolve().parent
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+protected=json.loads((REPORT/'kildehash.json').read_text())
+assert all(sha(ROOT/p)==h for p,h in protected.items())
+manifest=json.loads((REPORT/'ikonmanifest.json').read_text())
+assert len(manifest)==111 and len({e['bilde'] for e in manifest})==111
+assert sum(e['rom']==93 for e in manifest)==21
+assert sum(e['rom']==94 for e in manifest)==90
+export={e['bilde']:e for e in manifest}
+for e in manifest:
+    path=ROOT/e['fil'];im=Image.open(path)
+    assert im.mode=='RGBA' and list(im.size)==e['storrelse']
+    assert sha(path)==e['sha256']
+    assert np.asarray(im)[...,3].max()>128
+for group in [[1000,1002,1003],[1007,1012,1014],[1064,1065,1066,1067]]:
+    files=[ROOT/export[f'obj{n:03d}_01']['fil'] for n in group]
+    assert len({sha(p) for p in files})==1,group
+
+checks=[]
+tiles=[]
+for name in ['ikon07','ikon08','ikon09']:
+    folder=ROOT/'jobber'/name
+    job=json.loads((folder/'jobb.json').read_text())
+    original=Image.open(folder/'referanse.png').convert('RGB')
+    result=Image.open(folder/'resultat.png').convert('RGB')
+    assert result.size==(1536,1024)
+    a=np.asarray(result)
+    # Hele ytterkanten er bytepresis grå, ikke generatorens tekstur.
+    assert np.all(a[:32]==128) and np.all(a[992:]==128)
+    assert np.all(a[:,:64]==128) and np.all(a[:,1472:]==128)
+    cmd=[__import__('sys').executable,str(ROOT/'verktoy/sjekk_leveranse.py'),str(folder/'resultat.png')]
+    proc=subprocess.run(cmd,capture_output=True,text=True)
+    (REPORT/(name+'-kontroll.txt')).write_text(proc.stdout+proc.stderr)
+    assert proc.returncode==0,(name,proc.stdout)
+    checks.append({'jobb':name,'sha256':sha(folder/'resultat.png'),'egenkontroll':'OK',
+                   'objektbilder':len(job['objekter'])})
+    for obj in job['objekter']:
+        x,y,w,h=obj['rekt'];box=(64+x*4,32+y*4,64+(x+w)*4,32+(y+h)*4)
+        left=original.crop(box)
+        if obj['bilde'] in export:
+            q=Image.open(ROOT/export[obj['bilde']]['fil']).convert('RGBA')
+            right=Image.new('RGBA',q.size,(128,128,128,255));right.alpha_composite(q)
+            right=right.convert('RGB')
+        else:right=result.crop(box)
+        tile=Image.new('RGB',(360,150),(128,128,128));draw=ImageDraw.Draw(tile)
+        draw.text((4,3),obj['bilde']+'  original / HD',fill='white')
+        for i,im in enumerate([left,right]):
+            scale=min(174/im.width,124/im.height)
+            size=(round(im.width*scale),round(im.height*scale))
+            im=im.resize(size,Image.Resampling.NEAREST)
+            tile.paste(im,(i*180+(180-im.width)//2,22+(124-im.height)//2))
+        tiles.append(tile)
+for offset in range(0,len(tiles),24):
+    page=Image.new('RGB',(1440,900),(80,80,80))
+    for i,tile in enumerate(tiles[offset:offset+24]):page.paste(tile,((i%4)*360,(i//4)*150))
+    page.save(REPORT/f'sammenligning-{offset//24+1:02d}.png')
+(REPORT/'sluttkontroll.json').write_text(json.dumps({'kilder_uendret':len(protected),
+    'ikonark':checks,'eksporterte_ikoner':111,'handlingsikoner':21,'inventar_samtale':90,
+    'alle_117_felt_i_sammenligningsark':len(tiles),'identiske_kildefamilier_eksportert_identisk':True,
+    'motorimport':False,'spilltest':False},indent=2)+'\n')
+print('3 ark OK; 117 felt; 111 RGBA-ikoner; 12 beskyttede filer uendret')

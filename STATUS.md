@@ -6,7 +6,9 @@ Oppdatert status for grafikkgrenen: stilpiloten er godkjent, første HD-mod er l
 
 Kontroll: alle 73 kart leses av mottakets eksisterende kartleser, alle alfakjerner har én eier, 365 kilde-/resultatfiler er uendret. Egenkontroll: 69 OK, 4 SJEKK, ingen FEIL. Ny motorimport, hd-mod og spilltest er ikke utført. Se [rapporten](rapporter/fortsettelse-20261015/RAPPORT.md).
 
-Mangler resultatfil: 1685 figurark, 28 lagjobber og 3 ikonark. Alle 115 romjobber og 86 store objektjobber har resultatfiler, men enkelte er fortsatt avvist eller trenger retting etter ORDRE. Filtilstedeværelse betyr ikke godkjenning.
+Mangler resultatfil: 1685 figurark og 28 lagjobber. Alle 9 ikonark, 115 romjobber og 86 store objektjobber har nå resultatfiler, men enkelte er fortsatt avvist eller trenger retting etter ORDRE. Filtilstedeværelse betyr ikke godkjenning.
+
+Verb/inventar, 15. oktober: ikon07, ikon08 og ikon09 er levert og består egenkontroll. 21 handlingspekere og 90 inventar-/samtalebilder er eksportert separat med ekte alfa, med fem navngitte verbhjulikoner og manifest. Alle 117 felt i de tre arkene er visuelt gjennomgått. Ingen ny motorimport eller spilltest. Se [ikonrapporten](rapporter/ikoner-ui-20261015/RAPPORT.md).
 
 ## Historisk status 12. oktober 2026
 

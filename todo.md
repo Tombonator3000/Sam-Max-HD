@@ -125,3 +125,10 @@
 - [x] Bekreftet at de 12 returrutene mister én komponent ved radgjetting og får begge med kart. Ingen PNG-er endret.
 - [ ] Kjør nytt myke-figurer-mottak med kartene og spilltest de 12 returrutene før de krysses av i ORDRE.
 - [ ] Fortsett avviste objekter/lag, hele lapp-tilstander, inventaresken og de resterende ikon-/figurarkene etter ORDRE. Seks nye bildeforsøk fra denne runden er ikke levert.
+
+## Verb og inventar 15. oktober 2026
+
+- [x] Avklart ikonidentitet fra originale skript, inkludert tidligere uavklarte motiver.
+- [x] Levert de tre siste ikonarkene: ikon07, ikon08 og ikon09, alle OK i egenkontroll.
+- [x] Eksportert 21 handlingspekere og 90 inventar-/samtalebilder med ekte alfa og manifest, pluss fem navngitte grunnikoner for verbhjul.
+- [ ] Kontroller de nye ikonene i mottaket og spillet, særlig alfa/nøkkelfarge og små motivtolkninger.

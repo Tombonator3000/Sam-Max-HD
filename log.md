@@ -404,3 +404,9 @@
 - Rettet rutekartformatet for 73 eksisterende figurark, 931 ruter. Mottaket leste tidligere bare 2 kart og mistet separate deler ved radgjetting. Alle 12 returrutene øverst i ORDRE har nå begge tegnede komponenter koblet. Ingen bildebytes eller beskyttede jobbfiler endret.
 - Kontroll: mottakets kartleser og komponenttilordning, kildehash for 365 filer og egenkontroll på alle ark (69 OK, 4 SJEKK, 0 FEIL). Direkte omrissdekning minst 80 prosent for de 12 returrutene. Ingen ny motorimport, hd-mod eller spilltest.
 - Seks nye bildeforsøk er holdt utenfor leveransen på grunn av alfaslør eller blokkforskyvning. Separat korrigert kildebrief for obj307_01. Se rapporter/fortsettelse-20261015/RAPPORT.md.
+
+## 2026-10-15T10:41:31+02:00 (Codex)
+
+- Tom prioriterte verbhjul/inventory og ga ja til Python for rensing og plassering.
+- Levert ikon07, ikon08 og ikon09: 117 bilder i arkene, 21 separate handlingspekere og 90 inventar-/samtalebilder som RGBA, pluss fem navngitte verbhjulikoner. Tre ark OK, 12 beskyttede filer uendret, kildeidentiske familier eksportert identisk.
+- Spillets egne skript avklarte de tidligere ukjente ikonmotivene. Seks bildekall; to forsøk forkastet. Tolv motiver rettet i større utsnitt. Ingen motorendring, import, hd-mod eller spilltest. Se rapporter/ikoner-ui-20261015/RAPPORT.md.
