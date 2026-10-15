@@ -98,6 +98,7 @@ Pekerne (rom 93), inventaret og samtaleikonene (rom 94) og små deler som spille
 - Jobbene heter `ikonNN`. Tilstandene til et ikon (for eksempel vanlig og uthevet) står ved siden av hverandre. Et nytt rom begynner på ny rad.
 - Mal hvert bilde trofast i ruten sin, med samme størrelse, omriss og bokstaver. Hold bakgrunnen flat, uten rammer, rutenett, skygger eller glød.
 - Leveres som rommene, med stilankeret som bilde to.
+- I tillegg kan hvert ikon leveres som eget RGBA-bilde med myk alfa, i 4x av originalen (lik marg på begge sider er lov), oppført i `rapporter/*/ikonmanifest.json` med `bilde`, `fil` og `sha256`. `smhd myke-ikoner` tar dem inn som `objNNN_SS_hd.png` når ikonarket er godtatt, og motoren bruker dem i inventaret og pekeren med den myke kanten. Uten egen fil brukes ikonet klippet ut av arket, med originalens kant.
 
 ### Figurark
 

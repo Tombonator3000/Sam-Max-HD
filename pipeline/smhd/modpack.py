@@ -6,6 +6,7 @@ Oppsett (N = skala, for eksempel 4):
   mods/<navn>/rooms/roomNNN_idx.png    original 8-bit bakgrunn med palett (fra eksporten)
   mods/<navn>/objects/objNNN_SS.png    HD-objektbilde, RGBA, eksakt N ganger originalen
   mods/<navn>/objects/objNNN_SS_idx.png  original 8-bit objektbilde
+  mods/<navn>/objects/objNNN_SS_hd.png   eget mykt bilde med egen alfa (ikoner), når det finnes i --egne
 
 Objekter skaleres sammen med bakgrunnen rundt seg og klippes ut etterpå. Da får de samme
 detaljnivå og farger som bakgrunnen og stikker seg ikke ut.
@@ -154,6 +155,7 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
                     ohd = _upscale_object_in_context(base, oim, obj["x"], obj["y"], scale, method, **upscale_kw)
                 ohd.save(out / "objects" / f"{name}.png")
                 shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
+                _copy_soft(own, out, name, scale)
                 done_objects.append(name)
 
     has_own_cels = bool(own and (own / "costumes").is_dir() and any((own / "costumes").glob("costume*.png")))  # også _hd.png
@@ -181,6 +183,14 @@ def build_mod(extract: Path, out: Path, *, scale: int, method: str, rooms: set[i
     return manifest
 
 
+def _copy_soft(own: Path | None, out: Path, name: str, scale: int) -> None:
+    """Et eget mykt objektbilde (objects/<name>_hd.png, egen alfa, lik marg på begge sider) tas med som det er.
+    Motoren bruker det foran objNNN_SS.png for blast-objekter og pekeren (ikonene, smhd myke-ikoner)."""
+    soft = own / "objects" / f"{name}_hd.png" if own else None
+    if soft and soft.exists():
+        shutil.copyfile(soft, out / "objects" / f"{name}_hd.png")
+
+
 def _own_objects_only(extract: Path, out: Path, own: Path, info: dict, scale: int) -> list[str]:
     """Egne objektbilder for et rom som ikke er med i modden. Ingen bakgrunn, ingen automatisk oppskalering."""
     done = []
@@ -198,6 +208,7 @@ def _own_objects_only(extract: Path, out: Path, own: Path, info: dict, scale: in
                 continue
             _clean(ohd, oim, custom.name).save(out / "objects" / f"{name}.png")
             shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
+            _copy_soft(own, out, name, scale)
             done.append(name)
     return done
 
@@ -330,6 +341,7 @@ def _objects_without_room(extract: Path, out: Path, own: Path | None, info: dict
                 ohd.putalpha(upscale_alpha(oim.getchannel("A"), scale))
             ohd.save(out / "objects" / f"{name}.png")
             shutil.copyfile(extract / "objects" / f"{name}_idx.png", out / "objects" / f"{name}_idx.png")
+            _copy_soft(own, out, name, scale)
             done.append(name)
     return done
 
