@@ -251,7 +251,7 @@ index dcfe41db..bd1264b6 100644
  	// pointer to various parts of the costume resource
  	const AkosHeader *_akhd; // Header
 diff --git a/engines/scumm/base-costume.cpp b/engines/scumm/base-costume.cpp
-index d93b33e2..e751eeb6 100644
+index d93b33e2..031dd3bb 100644
 --- a/engines/scumm/base-costume.cpp
 +++ b/engines/scumm/base-costume.cpp
 @@ -24,6 +24,9 @@
@@ -284,7 +284,7 @@ index d93b33e2..e751eeb6 100644
  		byleRLEDecodeFast(compData, xmap);
  		return;
  	}
-@@ -340,6 +347,8 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
+@@ -340,20 +347,26 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
  
  					if (color && !masked) {
  						uint16 pcolor;
@@ -293,7 +293,18 @@ index d93b33e2..e751eeb6 100644
  
  						if (!_akosRendering) {
  							if (_shadowMode & 0x20) {
-@@ -354,6 +363,7 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
++								digPaletteMask = true;
+ 								pcolor = _shadowTable[*dst];
+ 							} else {
+ 								pcolor = _palette[color];
+-								if (pcolor == 13 && _shadowTable)
++								if (pcolor == 13 && _shadowTable) {
++									digPaletteMask = true;
+ 									pcolor = _shadowTable[*dst];
++								}
+ 							}
+ 						} else {
+ 							pcolor = _palette[color];
  
  							if (_shadowMode == 1) {
  								if (pcolor == 13) {
@@ -301,7 +312,7 @@ index d93b33e2..e751eeb6 100644
  									// In shadow mode 1 skipColumn works more or less the same way as in shadow
  									// mode 3. It is only ever checked and applied if pcolor is 13.
  									skipColumn = (lastColumnX == compData.x);
-@@ -378,6 +388,7 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
+@@ -378,6 +391,7 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
  									pcolor = (pcolor << 8) + *dst;
  									pcolor = xmap[pcolor];
  								} else if (pcolor < 8) {
@@ -309,16 +320,16 @@ index d93b33e2..e751eeb6 100644
  									// This mode is used in COMI. The column skip only takes place when the shading
  									// is actually applied (for pcolor < 8). The skip avoids shading of pixels that
  									// already have been shaded.
-@@ -392,6 +403,8 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
+@@ -392,6 +406,8 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
  								WRITE_UINT16(dst, pcolor);
  							} else {
  								*dst = pcolor;
-+								if (_vm->_digHD && _akosRendering)
++								if (_vm->_digHD)
 +									_vm->_digHD->recordCelPixel(dst, compData.sourceColumn, _height - height, digPaletteMask, digBefore);
  							}
  						}
  					}
-@@ -401,6 +414,7 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
+@@ -401,6 +417,7 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
  				y++;
  			}
  			if (!--height) {
@@ -326,7 +337,7 @@ index d93b33e2..e751eeb6 100644
  				if (!--compData.skipWidth)
  					return;
  				height = _height;
-@@ -437,6 +451,7 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
+@@ -437,6 +454,7 @@ void BaseCostumeRenderer::byleRLEDecode(ByleRLEData &compData, int16 actorHitX,
  }
  
  void BaseCostumeRenderer::skipCelLines(ByleRLEData &compData, int num) {
@@ -492,7 +503,7 @@ index 7f288d7b..79a52ab6 100644
  	CharsetRendererClassic(ScummEngine *vm, int cjkSpacing) : CharsetRendererPC(vm), _width(0), _height(0), _origWidth(0), _origHeight(0),
  		_cjkSpacing(cjkSpacing), _offsX(0), _offsY(0), _charPtr(nullptr), _drawScreen(kMainVirtScreen) {}
 diff --git a/engines/scumm/costume.cpp b/engines/scumm/costume.cpp
-index aab00a03..d7b0704e 100644
+index aab00a03..83708605 100644
 --- a/engines/scumm/costume.cpp
 +++ b/engines/scumm/costume.cpp
 @@ -23,6 +23,7 @@
@@ -503,12 +514,25 @@ index aab00a03..d7b0704e 100644
  #include "scumm/sound.h"
  #include "scumm/util.h"
  
-@@ -138,10 +139,16 @@ byte ClassicCostumeRenderer::paintCelByleRLE(int xMoveCur, int yMoveCur) {
+@@ -127,6 +128,13 @@ byte ClassicCostumeRenderer::paintCelByleRLE(int xMoveCur, int yMoveCur) {
+ 
+ 	compData.maskPtr = _vm->getMaskBuffer(0, compData.y, _zbuf);
+ 
++	// Track only actual writes for native/smoothed HD cels. The legacy hard
++	// nearest-neighbour path keeps its post-decode mapping for compatibility.
++	const bool digClassic = _vm->_digHD && !c64Cost && !newAmiCost && !pcEngCost;
++	const bool digExact = digClassic && _vm->_digHD->beginClassicCel(_digCel, _digRect.left, _digRect.top,
++	                     _digRect.width(), _digRect.height(), !_drawActorToRight,
++	                     _vm->_virtscr[kMainVirtScreen].xstart, _shadowMode);
++
+ 	if (c64Cost) {
+ 		// The v1 costume renderer needs the actor number, which is
+ 		// the same thing as the costume renderer's _actorID.
+@@ -138,10 +146,15 @@ byte ClassicCostumeRenderer::paintCelByleRLE(int xMoveCur, int yMoveCur) {
  	else
  		byleRLEDecode(compData);
  
-+	// Dig HD (Sam & Max): the cel's pixels may show an HD cel (costumes/costumeCCC_NNN.png)
-+	if (_vm->_digHD && !c64Cost && !newAmiCost && !pcEngCost)
++	if (digClassic && !digExact)
 +		_vm->_digHD->noteCel(_digCel, _digRect.left, _digRect.top, _digRect.width(), _digRect.height(),
 +		                     !_drawActorToRight, _vm->_virtscr[kMainVirtScreen].xstart, false);
 +
@@ -520,7 +544,7 @@ index aab00a03..d7b0704e 100644
  	if (_vm->_game.version == 1) {
  		// V1 games uses 8 x 8 pixels for actors
  		_vm->markRectAsDirty(kMainVirtScreen, rect.left, rect.right + 8, rect.top, rect.bottom, _actorID);
-@@ -609,6 +616,8 @@ byte ClassicCostumeRenderer::drawLimb(const Actor *a, int limb) {
+@@ -609,6 +622,8 @@ byte ClassicCostumeRenderer::drawLimb(const Actor *a, int limb) {
  
  	// Code 0x7B indicates a limb for which there is nothing to draw
  	if (code != 0x7B) {
@@ -611,10 +635,10 @@ index 21938706..17d0c967 100644
  	width *= 8;
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..d69f127a
+index 00000000..cb4b5803
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,5357 @@
+@@ -0,0 +1,5447 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -791,6 +815,7 @@ index 00000000..d69f127a
 +	transparent = -1;
 +	soft = false;
 +	softEdge = false;
++	gainPal = 0;
 +	padX = padY = 0;
 +	nearCycle.clear();
 +	nearCycleGen = 0;
@@ -1295,9 +1320,16 @@ index 00000000..d69f127a
 +	Image *img = nullptr;
 +	if (!_objectImages.tryGetVal(key, img)) {
 +		img = new Image();
++		Common::Path soft(Common::String::format("objects/obj%03d_%02X_hd.png", obj, image));
 +		Common::Path hd(Common::String::format("objects/obj%03d_%02X.png", obj, image));
 +		Common::Path idx(Common::String::format("objects/obj%03d_%02X_idx.png", obj, image));
-+		if (!loadImage(hd, idx, width, height, *img)) {
++		// Sam & Max draws inventory/dialog cards as ordinary room objects too.
++		// These native RGBA images currently have no margin; their original mask
++		// must not reveal the old keyed/masked painting underneath.
++		if (loadImage(soft, idx, width, height, *img)) {
++			img->soft = true;
++			img->softEdge = true;
++		} else if (!loadImage(hd, idx, width, height, *img)) {
 +			delete img;
 +			img = nullptr;
 +		}
@@ -1620,6 +1652,16 @@ index 00000000..d69f127a
 +		gain[ch] = base[ch] ? MIN<uint32>(512, shown[ch] * 256 / base[ch]) : 256;
 +}
 +
++// Native object art has a free outline. Per-original-pixel colour factors
++// otherwise turn its new edge colours into key-colour fringes in inventory.
++const int *DigHD::objectGain(Image &image) {
++	if (image.gainPal != _palVersion) {
++		objectPaletteGain(image.idx, image.transparent, image.basePal, _pal, image.gain);
++		image.gainPal = _palVersion;
++	}
++	return image.gain;
++}
++
 +// Room objects are built per original pixel: an object pixel shows the object's
 +// HD block, a background pixel the room's. With the original's hard mask the
 +// edge of a painted object becomes 4 x 4 steps (the car in room 9, Tom 15
@@ -1631,16 +1673,21 @@ index 00000000..d69f127a
 +void DigHD::drawSoftObjectEdges(int x, int y, int width, int height) {
 +	if (!_roomImage.valid())
 +		return;
++	bool active[256] = {};
++	for (uint i = 0; i < _source.size(); i++)
++		if ((_source[i] & kSrcMask) == kSrcObject)
++			active[(_source[i] >> 22) & 0xFF] = true;
 +	int soft[256], nSoft = 0;
 +	for (uint i = 0; i < _drawn.size() && nSoft < 256; i++)
-+		if (_drawn[i].image && !_drawn[i].blast && _drawn[i].image->softEdge)
++		if (active[i] && _drawn[i].image && !_drawn[i].blast && _drawn[i].image->softEdge)
 +			soft[nSoft++] = i;
 +	if (!nSoft)
 +		return;
 +	const int n = _scale, bpp = _fmt.bytesPerPixel, pitch = width * n * bpp;
 +	const Image &room = _roomImage;
 +	const int roomW = room.idx.w, roomH = room.idx.h;
-+	auto blend = [&](byte *out, uint32 top, int topGain[3], const uint32 *under, int underGain[3]) {
++	auto blend = [&](byte *out, uint32 top, int topGain[3], const uint32 *under, int underGain[3],
++	                 const uint32 *roomPixel, int roomGain[3]) {
 +		byte a, r, g, b;
 +		_rgba.colorToARGB(top, a, r, g, b);
 +		const uint32 dst = bpp == 4 ? READ_UINT32(out) : READ_UINT16(out);
@@ -1648,9 +1695,19 @@ index 00000000..d69f127a
 +		if (under) {
 +			byte ua;
 +			_rgba.colorToARGB(*under, ua, dr, dg, db);
-+			dr = MIN(255, dr * underGain[0] >> 8);
-+			dg = MIN(255, dg * underGain[1] >> 8);
-+			db = MIN(255, db * underGain[2] >> 8);
++			auto roomChannel = [&](byte value, int channel) {
++				return roomGain[channel] < 0 ? -1 - roomGain[channel] : MIN(255, (value * roomGain[channel]) >> 16);
++			};
++			dr = roomPixel ? MIN(255, dr * underGain[0] >> 8) : roomChannel(dr, 0);
++			dg = roomPixel ? MIN(255, dg * underGain[1] >> 8) : roomChannel(dg, 1);
++			db = roomPixel ? MIN(255, db * underGain[2] >> 8) : roomChannel(db, 2);
++			if (roomPixel && ua < 255) {
++				byte ra, rr, rg, rb;
++				_rgba.colorToARGB(*roomPixel, ra, rr, rg, rb);
++				dr = (dr * ua + roomChannel(rr, 0) * (255 - ua) + 127) / 255;
++				dg = (dg * ua + roomChannel(rg, 1) * (255 - ua) + 127) / 255;
++				db = (db * ua + roomChannel(rb, 2) * (255 - ua) + 127) / 255;
++			}
 +			// The object's own (already tinted) colour is what the block holds
 +			_fmt.colorToRGB(dst, r, g, b);
 +		} else {
@@ -1668,10 +1725,14 @@ index 00000000..d69f127a
 +		const DrawnObject &d = _drawn[slot];
 +		const Image &im = *d.image;
 +		int gain[3];
-+		objectPaletteGain(im.idx, im.transparent, im.basePal, _pal, gain);
-+		for (int r = 0; r < height; r++) {
++		memcpy(gain, objectGain(*d.image), sizeof(gain));
++		const VirtScreen &vs = _vm->_virtscr[kMainVirtScreen];
++		const int vyOff = _vm->_screenTop - vs.topline;
++		const int r0 = MAX(0, d.y - vyOff - y), r1 = MIN(height, d.y + im.idx.h - vyOff - y);
++		const int c0 = MAX(0, d.x - vs.xstart - x), c1 = MIN(width, d.x + im.idx.w - vs.xstart - x);
++		for (int r = r0; r < r1; r++) {
 +			const int sy = y + r;
-+			for (int c = 0; c < width; c++) {
++			for (int c = c0; c < c1; c++) {
 +				const int sx = x + c;
 +				const uint32 src = _source[sy * _w + sx];
 +				const uint32 kind = src & kSrcMask;
@@ -1686,9 +1747,17 @@ index 00000000..d69f127a
 +					rx = d.x + ox;
 +					ry = d.y + oy;
 +					own = true;
-+				} else if (kind == kSrcRoom) {
-+					rx = src & 0x7FFF;
-+					ry = (src >> 15) & 0x7FFF;
++				} else if (kind == kSrcRoom ||
++				           (im.soft && kind == kSrcObject && ((src >> 22) & 0xFF) < _drawn.size() &&
++				            _drawn[(src >> 22) & 0xFF].seq < d.seq)) {
++					if (kind == kSrcRoom) {
++						rx = src & 0x7FFF;
++						ry = (src >> 15) & 0x7FFF;
++					} else {
++						const DrawnObject &below = _drawn[(src >> 22) & 0xFF];
++						rx = below.x + (src & 0x7FF);
++						ry = below.y + ((src >> 11) & 0x7FF);
++					}
 +					ox = rx - d.x;
 +					oy = ry - d.y;
 +					if (ox < 0 || oy < 0 || ox >= im.idx.w || oy >= im.idx.h || im.visibleAt(ox, oy))
@@ -1708,17 +1777,47 @@ index 00000000..d69f127a
 +				}
 +				if (rx < 0 || ry < 0 || rx >= roomW || ry >= roomH)
 +					continue;
++				if (own) {
++					bool opaque = true;
++					for (int dy = 0; dy < n && opaque; dy++) {
++						const uint32 *row = (const uint32 *)im.hd.getBasePtr(ox * n, oy * n + dy);
++						for (int dx = 0; dx < n; dx++) {
++							byte a, rr, gg, bb;
++							_rgba.colorToARGB(row[dx], a, rr, gg, bb);
++							if (a != 255) { opaque = false; break; }
++						}
++					}
++					if (opaque) continue;
++				}
++				// UI alpha reveals the inventory box, not the room behind the box.
++				const DrawnObject *below = nullptr;
++				if (own && im.soft)
++					for (uint j = 0; j < _drawn.size(); j++) {
++						const DrawnObject &b = _drawn[j];
++						const int bx = rx - b.x, by = ry - b.y;
++						if (!active[j] || !b.image || b.blast || b.obj == d.obj || b.seq >= d.seq ||
++						    (below && b.seq < below->seq) || _vm->getState(b.obj) != b.state ||
++						    bx < 0 || by < 0 || bx >= b.image->idx.w || by >= b.image->idx.h || !b.image->visibleAt(bx, by))
++							continue;
++						below = &b;
++					}
++				int roomGain[3] = { 65536, 65536, 65536 }, underGain[3] = { 256, 256, 256 };
++				const byte roomCode = *(const byte *)room.idx.getBasePtr(rx, ry);
++				tintFactors(roomCode, room.basePal, roomGain, roomCode);
++				if (below)
++					memcpy(underGain, objectGain(*below->image), sizeof(underGain));
 +				byte *out = _outBuf.data() + (r * n) * pitch + (c * n) * bpp;
 +				for (int dy = 0; dy < n; dy++) {
 +					const uint32 *top = (const uint32 *)im.hd.getBasePtr(ox * n, oy * n + dy);
-+					const uint32 *under = (const uint32 *)room.hd.getBasePtr(rx * n, ry * n + dy);
++					const uint32 *roomRow = (const uint32 *)room.hd.getBasePtr(rx * n, ry * n + dy);
++					const uint32 *under = below ? (const uint32 *)below->image->hd.getBasePtr((rx - below->x) * n, (ry - below->y) * n + dy) : roomRow;
 +					byte *o = out + dy * pitch;
 +					for (int dx = 0; dx < n; dx++, o += bpp) {
 +						byte a, rr, gg, bb;
 +						_rgba.colorToARGB(top[dx], a, rr, gg, bb);
 +						if (own ? a == 255 : a == 0)
 +							continue;
-+						blend(o, top[dx], gain, own ? under + dx : nullptr, gain);
++						blend(o, top[dx], gain, own ? under + dx : nullptr, underGain, below ? roomRow + dx : nullptr, roomGain);
 +					}
 +				}
 +			}
@@ -1742,7 +1841,7 @@ index 00000000..d69f127a
 +		               d.x - vs.xstart + im.idx.w + im.padX, d.y - vyOff + im.idx.h + im.padY);
 +		r.clip(area);
 +		int gain[3];
-+		objectPaletteGain(im.idx, im.transparent, im.basePal, _pal, gain);
++		memcpy(gain, objectGain(*_drawn[d.slot].image), sizeof(gain));
 +		for (int sy = r.top; sy < r.bottom; sy++) {
 +			for (int sx = r.left; sx < r.right; sx++) {
 +				const uint16 top = _softBlastRef[sy * _w + sx];
@@ -1878,6 +1977,15 @@ index 00000000..d69f127a
 +		debug("DigHD: frame %u soft cel %d costume %d slot %d seq %u at %d,%d %dx%d", _frameNo, cel, c.costume, (int)(&c - _cels), c.seq, c.rx, c.ry, c.rw, c.rh);
 +	else if (c.missing && _curFront && _debugSoft)
 +		debug("DigHD: frame %u cel %d costume %d slot %d without HD image at %d,%d %dx%d", _frameNo, cel, c.costume, (int)(&c - _cels), c.rx, c.ry, c.rw, c.rh);
++}
++
++bool DigHD::beginClassicCel(int cel, int left, int top, int width, int height, bool mirror, int xstart, int shadowMode) {
++	_recordSlot = -1;
++	Image *image = celImage(_curCostume, cel, -1, -1);
++	if (!image || !image->soft)
++		return false;
++	noteCel(cel, left, top, width, height, mirror, xstart, false, true, shadowMode);
++	return true;
 +}
 +
 +void DigHD::recordCelPixel(const byte *dest, int sourceX, int sourceY, bool paletteMask, byte before) {
@@ -4530,7 +4638,13 @@ index 00000000..d69f127a
 +			// The image's own colour at this pixel: the same index as the one shown,
 +			// except for a blast object drawn through a colour table
 +			const byte code = *((const byte *)img->idx.getBasePtr(ix, iy));
-+			const bool tint = tintFactors(idx, img->basePal, f, code);
++			bool tint;
++			if (kind == kSrcObject && img->soft) {
++				memcpy(f, objectGain(*img), sizeof(f));
++				tint = f[0] != 256 || f[1] != 256 || f[2] != 256;
++				for (int ch = 0; ch < 3; ch++) f[ch] <<= 8; // applyTint uses 16 fractional bits
++			} else
++				tint = tintFactors(idx, img->basePal, f, code);
 +			// A pixel that is black in the original and still black cannot be
 +			// tinted, and its HD pixel (an outline blending into the colours next
 +			// to it) stays as it is. When the picture fades to black around it, the
@@ -4538,7 +4652,7 @@ index 00000000..d69f127a
 +			// the outlines stayed lit on the black screen.
 +			int cap[3] = { 255, 255, 255 };
 +			const byte *bp = img->basePal + code * 3;
-+			const bool capped = !tint && !(bp[0] | bp[1] | bp[2]);
++			const bool capped = !tint && !(kind == kSrcObject && img->soft) && !(bp[0] | bp[1] | bp[2]);
 +			if (capped) {
 +				cap[0] = cap[1] = cap[2] = 0;
 +				for (int ny = MAX(sy - 1, 0); ny <= MIN(sy + 1, _h - 1); ny++)
@@ -5974,10 +6088,10 @@ index 00000000..d69f127a
 +} // End of namespace Scumm
 diff --git a/engines/scumm/dighd.h b/engines/scumm/dighd.h
 new file mode 100644
-index 00000000..5bdea476
+index 00000000..bbeafe80
 --- /dev/null
 +++ b/engines/scumm/dighd.h
-@@ -0,0 +1,641 @@
+@@ -0,0 +1,647 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -6176,6 +6290,9 @@ index 00000000..5bdea476
 +	 * recordCelPixel() instead of reconstructing ownership from the image.
 +	 */
 +	void noteCel(int cel, int left, int top, int width, int height, bool mirror, int xstart, bool raw, bool precise = false, int shadowMode = 0);
++	/** Start exact classic-costume tracking for native/smoothed RGBA cels.
++	 * Hard nearest-neighbour cels retain their original post-decode mapping. */
++	bool beginClassicCel(int cel, int left, int top, int width, int height, bool mirror, int xstart, int shadowMode);
 +	/** Byle RLE: called immediately after a real, unmasked pixel write. */
 +	void recordCelPixel(const byte *dest, int sourceX, int sourceY, bool paletteMask = false, byte before = 0);
 +
@@ -6228,6 +6345,8 @@ index 00000000..5bdea476
 +		// padY original pixels on each side, and its own alpha (see drawSoftCels())
 +		bool soft = false;
 +		int padX = 0, padY = 0;
++		uint32 gainPal = 0;
++		int gain[3] = { 256, 256, 256 };
 +		// A room object image (objNNN_SS.png, no margin) whose alpha has soft
 +		// values: its edge is blended over the HD room (drawSoftObjectEdges())
 +		bool softEdge = false;
@@ -6313,6 +6432,7 @@ index 00000000..5bdea476
 +	Common::Array<uint16> _softBlastRef;  // top soft blast instance per screen pixel
 +	void drawSoftBlasts(int x, int y, int width, int height);
 +	void drawSoftObjectEdges(int x, int y, int width, int height);
++	const int *objectGain(Image &image);
 +
 +	bool loadImage(const Common::Path &hdFile, const Common::Path &idxFile, int origW, int origH, Image &out, bool pad = false);
 +	void loadRoom(int room);

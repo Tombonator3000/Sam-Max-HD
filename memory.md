@@ -94,3 +94,9 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 ## Felles motorpatch med Dig-HD-Remake (15. oktober 2026)
 - `engine/patches/0001-dighd-hd-grafikk.patch` er den samme her og i Dig-HD-Remake. Spillspesifikke numre sperres med `_vm->_game.id` eller `_game.version`. Endres patchen i ett repo, kopieres den til det andre eller slås sammen tre-veis.
 - Patchen har lista over det som vises uten HD (`dighd-uten-hd.txt` i lagringsmappen, `DIGHD_MANGLER=0` slår av). `engine/test.sh` gir fra før 0,4 til 0,8 prosent kraftige avvik i noen dumper i rom 3 med nearest-modden (sett 15. oktober, også før den felles patchen).
+
+## Native inventar og klassiske maskekostymer (15. oktober 2026)
+
+- Inventar/samtalekort i Sam & Max tegnes også som ordinære romobjekter. Bare å støtte native RGBA i blast- og pekerbanen er utilstrekkelig. Denne runden gir `noteObject` native `_hd.png` uten marg, samlet bufret palettfaktor og aktivt objektlag under alfaen.
+- Myke klassiske kostymer må registrere dekoderens faktiske pikseloperasjoner, særlig palettmasker som farger figurer under glass. Boksbasert eierskap ga rosa/blå felt i akvariet og cafeteriarøret. Hard nearest beholder den tidligere koblingen.
+- Tom ga Codex uttrykkelig lov til motorretting og PR for denne feilrunden. Generell rollefordeling og separate grafikk-/kodegrener beholdes. Dette tillegget er ikke testet med The Dig.

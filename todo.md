@@ -4,6 +4,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [ ] Gjennomgå PR fra `codex/hd-masker-inventory`, importer nye Sam-ark og kantvaskede ikoner fra feilrunde2-rapporten, og bygg Linux/Windows/web sammen. Lokale motorprøver for inventar, akvarium og cafeteriarør består; dette er ikke distribuert ennå.
+- [ ] Rom22: sammenheng mellom statisk øks i HD-rommet og objekt222s tilstandslapper. Rom16: alle faktiske bevegelser i kranhode154 og Chicken Dumpling155. Rester i motivenes bakgrunn forsvinner ikke av full skjermopptegning.
+- [ ] Gjør et faktisk vellykket opptak med riktig kameratilstand. Siste automatiserte opptaksforsøk traff objekt 0 og bekrefter ikke løsningen.
+
 - [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
 - [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)
 - [x] Samme patch i Dig-HD-Remake (Dig PR 57, venter på fletting)

@@ -393,3 +393,11 @@ Tom: hent det nye fra hd-mod og gpt-arbeid inn i Sam & Max-repoet, og gi Dig HD 
 - Linux-pakken (16:52 UTC) og Windows-pakken (16:54 UTC) bygget fra main med den nye modden. Nettsiden henter modden selv.
 - Dig-HD-Remake: samme motorpatch (myke kanter på romobjekter) i PR 57 der, byte for byte lik. Ingen av de 640 objektbildene i Digs `hd-mod` har myk alfa, så The Dig ser ut som før. Ikke kjørt med The Dig.
 - Åpent fra grafikerens rapport: rester etter opplukking i kontoret, kantene rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet, og at mottaket måler Sam091 uten fotresten (8 ruter feilaktig til gjennomsyn).
+
+## 2026-10-15 20:32 (Codex)
+
+- Tom ga uttrykkelig lov til motorretting og PR for inventar, glassmasker og grafikkartefakter. Egen kodegren `codex/hd-masker-inventory`; bilder bare i `gpt-arbeid`.
+- Native RGBA lastes nå også for ordinære romobjekter. Bufret samlet palettfaktor hindrer nøkkelfargekanter; kortalfa viser inventaresken under. Presise dekodermerker for myke klassiske kostymer bevarer palettmasker og underliggende figurer.
+- ScummVM bygget, patchen kontrollert på ren låst base, alle 30 kildefiler byteidentiske. 51 pipelinetester og 19 nettlesertester bestått. Inventar åpne/lukke, akvarium og cafeteriarør sett i lokale spillbilder; siste kjernekontroller 0 bufferavvik. Nearest har dokumenterte avvik, ikke null.
+- Sams tredje finger rettet i to ark og grønn kantmatte fjernet fra 110 ikoner, uten endring av ikonalfamaskene. Lokal import 18 Sam-ruter OK. Rapport og før/etter-bilder i grafikkgrenen: `rapporter/feilrunde2-20261015/`.
+- Fortsatt åpent: statisk bakgrunn og øksens tilstandslapper i rom22; kranhode/dumpling i faktisk bevegelse; opptakstesten traff objekt0 og beviser ikke at opptaksrester er løst; bilens avreise. Ingen ny utgave publisert av denne runden.
