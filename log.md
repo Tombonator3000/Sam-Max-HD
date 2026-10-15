@@ -310,3 +310,7 @@ Tom: flettet PR 20, neste todo, så punkt 2 (The Dig) og 3 (grafikkordre).
 - Tom (i Dig-økta): fiks den felles motorpatchen i Dig og Sam & Max, med rettingen fra kontrollen. Dig PR 53 er flettet; den felles patchen med lista over det som vises uten HD og rettingen (bakgrunn under myke figurer telles ikke) er Dig PR 54.
 - `engine/patches/0001-dighd-hd-grafikk.patch` her er nå byte for byte lik den i Dig PR 54. Lista er beskrevet kort i `docs/HD-MOTOR.md` og `docs/SPILLTEST.md`. Tatt med fra grenen ccr-f99918a6-v2s5v1 er bare patchen; testfila `dighd-uten-hd.txt` som ble lagt i roten der, er ikke tatt med.
 - Testet: spillfilene hentet, `smhd extract` (83 rom, 959 objektbilder, 16 052 ruter), `engine/test.sh` med motoren bygget fra patchen: skjermen lik full ombygging i 12 av 12 kontroller. Fem dumper i rom 3 (bilde 1500 til 2500) har 0,4 til 0,8 prosent HD-piksler som avviker kraftig fra originalen; det samme kom med patchen i main før endringen (0,38 til 0,48 prosent), så det er ikke nytt. Ikke undersøkt videre.
+
+## 2026-10-15 05:55 (Claude)
+- Den felles patchen har fått tre tillegg for Zak McKracken (FM-Towns), der HD-laget nå virker: `GID_ZAK` i `DigHD::create`, `objNNN_01` uansett tilstand i v3, testhoppet mot spillflaten. Byte for byte lik Dig PR 55.
+- Testet: `engine/test.sh` med motoren bygget fra patchen, 12 av 12 kontroller lik full ombygging; avvikene mot originalen i rom 3 som før.

@@ -84,6 +84,8 @@ Rekkefølgen fra The Dig: rom og objekter først, testet med en `nearest`-mod. D
 
 Lista over det som vises uten HD (fra Dig PR 52, 15. oktober): mens spillet spilles i HD, skriver motoren alt som står på skjermen som originalpiksler fordi modden mangler HD-bilde, til `dighd-uten-hd.txt` i lagringsmappen (Linux-pakken: `~/.local/share/sam-max-hd/saves/`). Én linje per bilde og rom: type (rute, objekt, rom, film), id som i modden, rom, hvor mange bilder det sto der, flest piksler i ett bilde og når det ble sett først. Svart, rom 0, klassisk grafikk og bakgrunn under myke figurer telles ikke. `DIGHD_MANGLER=0` slår av. Beskrevet i `docs/HD-MOTOR.md` i Dig-repoet, under «Liste over det som vises uten HD».
 
+Zak McKracken (FM-Towns, SCUMM v3) bruker den samme patchen fra 15. oktober 2026. Tilleggene for Zak gjelder bare Zak: `GID_ZAK` i `DigHD::create`, `objNNN_01` uansett tilstand i v3, og testhoppet mot høyden på spillflaten. Sam & Max: `engine/test.sh` 12 av 12 kontroller som før.
+
 ## Testkrokene
 
 Krokene ligger i DigHD og virker for Sam & Max. Alle er miljøvariabler. Kjør med `SDL_VIDEODRIVER=dummy` og `SDL_AUDIODRIVER=dummy`.
