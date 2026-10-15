@@ -1,30 +1,26 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-15 00:21 (norsk tid)
+Oppdatert 2026-10-15 14:31 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
 ## Status
 
-- Jobber: 2264. avvist 26, godkjent 419, levert 72, ny 1716, sjekk 31
+- Jobber: 2264. avvist 26, godkjent 422, levert 72, ny 1713, sjekk 31
 - Ferdige rom: 73 av 76 (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61, 62, 66, 68, 70, 71, 73, 76, 77, 79, 84, 85, 86, 87, 88, 89, 90, 91)
 - Ferdige objekter: 64 av 86 (obj036_01, obj050_01, obj089_01, obj142_01, obj187_01, obj187_02, obj187_03, obj187_04, obj187_06, obj199_01, obj204_01, obj294_01, obj295_01, obj304_01, obj308_01, obj336_01, obj338_01, obj340_01, obj409_01, obj523_01, obj524_01, obj570_01, obj570_02, obj570_03, obj598_01, obj599_01, obj601_01, obj604_01, obj606_01, obj607_01, obj608_01, obj609_01, obj610_01, obj611_01, obj612_01, obj613_01, obj664_01, obj665_01, obj666_01, obj667_01, obj669_01, obj682_01, obj683_01, obj684_01, obj772_01, obj773_01, obj776_01, obj777_01, obj780_01, obj812_01, obj813_01, obj821_01, obj823_01, obj828_01, obj829_01, obj830_01, obj832_01, obj839_01, obj850_01, obj901_01, obj989_01, obj989_02, obj995_01, obj996_01)
 - Lagjobber: 239 av 296 godkjent. Ferdige objektbilder fra lag: 541 av 701
-- Ikonark: 4 av 9 godkjent. Ferdige bilder fra ikonark: 32 av 163
-- Figurark: 73 av 1758 tatt inn med figurmottaket. Ferdige figurruter: 919 av 15661
+- Ikonark: 7 av 9 godkjent. Ferdige bilder fra ikonark: 149 av 163
+- Figurark: 73 av 1758 tatt inn med figurmottaket. Ferdige figurruter: 923 av 15661
 - Hovedark: 2 av 2 levert
 
 ## Gjør disse nå
 
 Figurrutene under har feil omriss mot originalen og er holdt utenfor spillet. Tegn dem på nytt i samme ark og lever arket igjen. Se `forhandsvisning/myk_<ark>.png`: originalens omriss står i rødt. Ta med alt originalen har (for eksempel det figuren holder i hånden), med samme størrelse og form.
 
-- `fig002_05`: costume002_257, costume002_258, costume002_259, costume002_260, costume002_261
-- `fig004_01`: costume004_256
-- `fig007_01`: costume007_256
-- `fig091_03`: costume091_1953
-- `fig091_04`: costume091_1956
-- `fig091_05`: costume091_1963, costume091_1966
-- `fig236_01`: costume236_256
+- `fig091_03`: costume091_1955
+- `fig091_04`: costume091_1957, costume091_1958, costume091_1959, costume091_1960, costume091_1961
+- `fig091_05`: costume091_1962, costume091_1964
 
 1. `obj187_05` (rom 18, Wak-A-Rat (minispill), objekt 187 tilstand 05, del 1/1). Avvist: deler av bildet er flyttet eller zoomet (opptil 7.9 px). Les retur.md. Legg ved `jobber/obj187_01/resultat.png` som bilde to (ikke stilankeret), så tilstandene blir like. Lag denne etter obj187_01.
 2. `obj307_01` (rom 31, Kikkerten med utsikten, objekt 307 tilstand 01, del 1/1). Avvist: deler av bildet er flyttet eller zoomet (opptil 26.9 px). Les retur.md.
@@ -60,11 +56,8 @@ Kjør `python3 verktoy/sjekk_leveranse.py <resultat>` før du committer, og gjø
 
 ## Beskjeder
 
-- Animasjoner der en tilstand bare er en lapp over forrige bilde (flaggene og propellen i rom 17, kjerubene i rom 21, til sammen 19 objekter: 154, 155, 180 til 183, 222, 301, 318, 350, 352, 439, 444, 530, 833 til 836, 897): tegn hver tilstand som et helt bilde med hele figuren, i samme stil som den hele tilstanden. Mottaket klipper selv ut lappen. En lapp tegnet alene passer ikke inn og gir spøkelseslinjer i spillet.
-- Bruk aldri magenta (#FF00FF) som bakgrunn eller fyll. Rester av den ble liggende i obj049 (LucasArts-logoen) og flere objekter i karnevalet; mottaket fyller dem nå selv, men tegn dem bort. obj049_01 skal tegnes på nytt uten magenta.
-- Inventaresken obj995_01 (rom 94) trenger egen alfakanal med myk kant (ikke svart bakgrunn), og teksten på esken skal være tydelig malt, ikke prikkete som i originalen.
-- Ikke gjør partier mørkere enn originalen. I rom 8 er mørkebrune partier i rekkverket malt nesten svart.
-- Ressursbanken GJENNOMGANG.md i denne grenen sier hva som skjer i hvert rom og hvilke ting som hører til hvor. Bruk den når du tegner.
+- Runde 15. oktober 14:30 (Claude): de 111 RGBA-ikonene fra ikonmanifest.json er tatt inn med egen myk alfa (objNNN_SS_hd.png) og ligger i hd-mod. Pekeren er sett i spillet med det nye ikonet; inventaret er ikke sett i spillet ennå. Max-ikonet obj1008_01 venter på Toms godkjenning. Fortsett å levere ikoner som separate RGBA-filer i ikonmanifest.json, i 4x av originalen (marg er lov, lik på begge sider).
+- Figurarkene: 920 av 931 ruter er tatt inn etter de rettede rutekartene. 11 står til gjennomsyn fordi de er tegnet i en annen størrelse enn resten av gruppen: fig091_03 til 05 (kostyme 91, høyde +20 til +30 prosent), fig209_03 (rute 1941, bredde +13 prosent) og fig272_02 (rute 1941, bredde +224 prosent). Tegn dem i samme størrelse som de andre rutene i gruppen.
 
 ## Kodeoppgaver
 
