@@ -517,3 +517,16 @@ Natt: kontroll av lag052_03_del1av2, lag052_04_del1av2, lag052_05_del2av2 og lag
 - obj489_01: godkjent. Tukanens lukkede øye med den olivengrønne folden ved nebbet, samme plass som originalen.
 - obj490_01: godkjent. Tom sittepinne uten tukan, tauene og stangen på samme plass som originalen. Merknad: stangen har noen små mørke merker på midten der originalen har en mørkere midtdel; de ser litt ut som tegn på nært hold, men er ikke tekst og leses som skygge i spillstørrelse. Tas med ved Toms stilgodkjenning.
 - Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom. STOPP-filen er ikke rørt.
+
+## 2026-10-15 23:57 (Claude)
+
+Natt: kontroll av lag052_07_del2av2, lag052_08_del2av2, lag052_09_del2av2 og lag052_10_del2av2 fra Codex (commit 3bdf5ce6 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (6803a651). Mottaket godkjente alle fire.
+- Alle fire er obj486 i rom 52 (rute 232,152, 24x24), fasene 07, 08, 09 og 0A. Obj486 er øglens øye med dråpen under, ikke munnen som jeg skrev i de to forrige oppføringene; rutene der gjelder samme objekt, så kontrollen står.
+- Sett med øynene: originalobjektene 06 til 0A i 10x nearest over HD-objektbildene i `mods/gpt/objects`, og romutsnitt av referanse.png over resultat.png for fase 06 til 0A. Kort Python-måling: alle piksler som endrer seg fra den godkjente fase 06 ligger innenfor objektruten (x 545 til 638, y 721 til 814 i lerretet), ingenting annet i rommet er rørt.
+- obj486_07: godkjent. Øyelokket halvt ned, den grålilla dråpen under øyet som originalen.
+- obj486_08: godkjent. Øyet lukket med den lange dråpen.
+- obj486_09: godkjent. Øyet lukket, mindre dråpe som originalen.
+- obj486_0A: godkjent. Øyet lukket, ingen dråpe, som originalen.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
