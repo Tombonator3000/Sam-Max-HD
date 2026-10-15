@@ -5,7 +5,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 ## Neste
 
 - [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
-- [ ] Tom fletter PR 28 og så PR 29; deretter nettsiden og Windows-pakken på nytt
+- [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)
 - [ ] Samme patch i Dig-HD-Remake
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
 
@@ -67,7 +67,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Tom fletter PR 28
 - [ ] Se bassenget i rom 54 (objekt 833, 834, 836) i spillet; rom 54 henger etter testhoppet
 - [ ] obj835 (bart eller åpen munn) venter på Toms avklaring
-- [ ] Windows-pakken bygges på nytt med den nye modden
+- [x] Windows-pakken bygget på nytt med den nye modden
 - [ ] Se inventaret i spillet med de nye ikonene (testhoppet åpner det ikke; krever lagret spill eller å spille dit)
 - [ ] Tom ser på det nye Max-ikonet (obj1008_01) og de andre ikonene
 - [ ] 11 figurruter til gjennomsyn (fig091_03 til 05, fig209_03, fig272_02): tegnet i annen størrelse enn gruppen, sendt tilbake i ordren

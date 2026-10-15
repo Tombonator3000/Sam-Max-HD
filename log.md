@@ -375,3 +375,10 @@ Tom: fiks bilkantene i rom 9 (rapporten i `gpt-arbeid`, `rapporter/rom009-bilkan
 Tom: løs konfliktene i PR 29.
 
 - PR 28 ble slått sammen til én commit i main, så PR 29 hadde den gamle importpakke-committen under seg og fikk konflikt i `pipeline/tests/test_pipeline.py`. Rettelsen for romobjektene er lagt oppå main på nytt, uten innholdsendring. pytest 51 bestått lokalt, CI grønn, PR 29 kan flettes.
+
+## 2026-10-15 18:08 (Claude)
+
+Tom: PR 29 flettet.
+
+- Bygget fra main (9e1b7b2) med hd-mod 9512fd8: Linux-pakken (release «linux», 16:03 UTC), Windows-pakken (release «windows», 16:06 UTC) og nettsiden (Sam-Max-HD-Web, kjøring 38765138956). Alle tre arbeidsflytene grønne, siden svarer 200.
+- Alle tre har nå de nye grafikkleveransene fra i dag og de myke kantene på romobjektene. Pakkene og siden er ikke spilt med skjerm etter denne byggingen.
