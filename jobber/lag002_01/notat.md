@@ -1,23 +1,15 @@
-# lag002_01 – HD-kandidat
+# lag002_01
 
-Ett imagegen-forsøk med lagoriginal og levert rom002-HD som bilde to. Hele rommet er nytegnet; grunnrommet er derfor IKKE byteidentisk utenfor objektene. Seks komponenter er kontrollert: lav mørk bilrutedel med oransje lys uten hel bil; lys nedrast stein; mørk stein ved pæren; lite oransje/gult panellys; limekrans ved blå kule; lilla krans ved grønn kule. Full opak RGB-romkompositt, ingen atlas/alfa/nøkkelfarge. Ingen objekter fra lag002_02..05. Nærbilder og tall er i c-seksobjekt-qa.png og c-seksobjekt-kontroll.json. Kransenes små tagger og steinenes bruddstreker er HD-tolkninger, ikke eksakt pikselidentisk detalj. Ekte lagkomposisjon/import/runtime er ikke testet.
+Ett nytt forsøk med referanse.png som redigeringsgrunnlag og jobber/rom002/resultat.png som bilde to. Objekt 896, tilstand 01, er den lille tente gule og oransje indikatorlampen bak den skrå kontrollpulten, til høyre for skallen. Tidligere svart kuppel med oransje kant er erstattet med tent gul kuppel som i originalen.
 
-Innebygd ChatGPT-bildegenerator brukt; eksakt modellversjon er ikke eksponert. Originalprompt er bevart ordrett med separat kildepresisering. Råforsøk/prompter og presis klipp-/plasseringsoppskrift finnes i rapporter/bestilling021-20261013/. Ingen originalkonturmasker, lokal warp eller vektortrace.
+To falne steiner, lavt kjøretøyfragment, to energiringer og øvrige kontroller er bevart fra forrige levering. Bare det nytegnede lampefeltet [1096,768,104,72] er plassert inn, med smal fjæring i rektangelkanten. Ingen originalmaske. Lampens avrunding og høylys er en HD-tolkning.
 
-Motivfelt [x,y,b,h]: [128, 112, 1280, 800]. Canvas 1536 x 1024 RGB, padding bytekontrollert RGB128.
+Egenkontroll: OK. Globalt skift 0,04, blokkskift 0,09, kantlikhet 0,960. Supplerende smhd.gpt.check_pieces består for alle seks objekter. Lampen har kantlikhet 0,680 mot objektet og 0,233 mot bakgrunnen. Før var tallene 0,885 og 0,955. Dermed er den konkrete mangelfeilen også kontrollert.
 
-SHA-256: `d7340796f47daf819dfc2ae9a49095e553856cc425f4fb911630ad91943e1a54`.
+SHA-256: 7ceccb139dc29b5b4356b6e58542479bd3ba70fd0d74cd3fd4e28e8ee328e67c.
 
-```
-== lag002_01 (lag): jobber/lag002_01/resultat.png
-OK    hele bildet (lerret): skift 0.03, blokker 0.09, kantlikhet 0.97
-   Utfall: OK
-```
+Innebygd image_gen, eksakt modellnavn ikke eksponert. Dato: 15. oktober 2026. Originalen i 1x og 4x og relevant godkjent stilbilde er sett før tegning. Prompt.txt er brukt ordrett med returteksten og separat kildepresisering. Beskyttede kilder er SHA-256-kontrollert uendret mot HEAD.
 
-Teknisk kontroll er ikke individuell brukergodkjenning. Import og runtime er uverifisert.
+Python er brukt etter Toms tillatelse til presis plassering, egen alfa og grå ramme. 1536 x 1024 RGB, eksakt RGB128-ramme. Original, tidligere levering, ny levering og overlegg er visuelt sammenlignet. Ingen ny motorimport, full animasjonsavspilling eller godkjenning fra Tom.
 
-## Retting 15. oktober 2026: hele motiver og alfa
-
-Nytegnet komplett motiv før mottakets lappklipp, med eksisterende HD-rom som stilgrunnlag. Innebygd bildeverktøy, eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms uttrykkelige tillatelse. Beskyttede originaler, jobbmetadata og prompter uendret.
-
-Egenkontroll: OK. Se [rapport, prompter, forsøk og SHA-256](../../rapporter/lapper-eske-logo-20261015/RAPPORT.md). Ingen ny motorimport eller spilltest av denne rettingen.
+Råforsøk, prompter, forrige levering, oppskrift, kontroll, sjekksummer og sammenligningsbilder: [nattrapport](../../rapporter/natt-fire-returer-20261015/RAPPORT.md).

@@ -1,21 +1,15 @@
 # obj307_01
 
-Dato: 2026-10-13. Innebygd ChatGPT image_gen, eksakt modellnavn ikke eksponert. To fullmasterforsøk. Alle tre paneldeler kommer fra samme valgte forsøk2.
+To nye forsøk. Forsøk 2 er levert. Stilanker: stil/rom007_del1av2.png. Motivet er bare øverste 320 x 40 originalpiksler av myntkikkertens grålilla innfatning i rom 31, objekt 307, tilstand 01. To mørke skruer, asymmetrisk fasett, blå himmel på sidene og avskåret svart åpning beholdes.
 
-Ett myntkikkertpanel, sammensatt original307→304→308. Original1x/4x, metadata, felles ordrett prompt og b-kildeplan er lest før generering. Godkjent stil/rom007_del1av2.png er stilanker. Rom031 fra forrige bestilling er ikke brukt som godkjent stilanker. Ingen ubevist figuridentitet eller kropp innført.
+Romnotatets myntsliss, 25-centtekst og landskap beskriver hele rommet og inngår ikke i toppstripen. Presiseringen ligger i separate promptfiler. Første nye forsøk glattet bort skillet mellom de to øvre fasettene og fikk FEIL. Andre forsøk bevarer skillet og består. Motivet er klippet rektangulært ved [128,432,1280,160] uten skalering. Ingen originalmaske.
 
-To mørke toppskruer og fire lyse bunnskruer, 25¢, myntsliss, spak/skala, avklipt nedre åpning, brune hender/hvite mansjetter/blå ermer og synlig landskap beholdt. Åpningen er gjengitt som originalens synlige kompositt; maskering/import skal behandles separat av Claude.
+Egenkontroll: OK. Globalt skift 0,16, største blokkskift 0,13 originalpiksler, kantlikhet 0,960. Overgangen mot nabopanelet er ikke testet i motoren.
 
-Råforsøk2 er klippet ved[128,109,1408,914] og hele motivet skalert samlet til1280x800. Denne jobben er klippet fra masterrektangel[0, 0, 1280, 160] og lagt i[128, 432, 1280, 160] på1536x1024 med eksakt RGB128-padding. Sammenstilte leveransedeler er byte-identiske med fullmasteren. Ingen delmiks, originalmaskering, lokale geometriflytt eller terskelendring.
+SHA-256: a25fe3d6d28ca26e70be36f87821de19f57b50e38f9e0d0a70b25083c38aa87b.
 
-Toppstripen har fortsatt FEIL. Globalt skift0.13, blokk19.94, kantlikhet0.94. Midtblokk106..212x0..40 har ustabilt stort faseskift; venstre1.47 og høyre0.88. Dette er ikke bevist falsk positiv. Toppens flate skygge/høylys og glattet buerand avviker noe fra pikseloriginalen. Ikke teknisk ferdig.
+Innebygd image_gen, eksakt modellnavn ikke eksponert. Dato: 15. oktober 2026. Originalen i 1x og 4x og relevant godkjent stilbilde er sett før tegning. Prompt.txt er brukt ordrett med returteksten og separat kildepresisering. Beskyttede kilder er SHA-256-kontrollert uendret mot HEAD.
 
-Egenkontroll: FEIL. Kontrollfil: rapporter/bestilling008-20261013/a-obj307_01-kontroll02.txt.
-Resultat SHA-256: 2e62e11ea4628ff388e427aa09660b6535bd7e8adcb2599196e282ae1bd91727
-Fullmaster: rapporter/bestilling008-20261013/a-panel-fullmaster02.png
-Fullmaster SHA-256: 383b52ffc22bc674ed7aaacbc8ed2fa4747258e09b711fa63e7e3350ce87f6b6
-Råfil: rapporter/bestilling008-20261013/a-panel-raa02.png
-Råfil SHA-256: 7ccb7eb881cc875045bd03b62d8c0fa341a31ce9f2d6dd792812e90a21621c0f
-Oppskrift: rapporter/bestilling008-20261013/a-panel-oppskrift02.py.txt.
+Python er brukt etter Toms tillatelse til presis plassering, egen alfa og grå ramme. 1536 x 1024 RGB, eksakt RGB128-ramme. Original, tidligere levering, ny levering og overlegg er visuelt sammenlignet. Ingen ny motorimport, full animasjonsavspilling eller godkjenning fra Tom.
 
-Kildebevis, begge prompter, begge råforsøk/mastere og blokkdiagnoser bevart i rapportmappen.40beskyttede kilder uendret. Git, kode og globale filer urørt. Runtime=false. Ny brukergodkjenning=false.
+Råforsøk, prompter, forrige levering, oppskrift, kontroll, sjekksummer og sammenligningsbilder: [nattrapport](../../rapporter/natt-fire-returer-20261015/RAPPORT.md).

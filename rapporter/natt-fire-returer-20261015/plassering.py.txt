@@ -1,0 +1,71 @@
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFilter
+import numpy as np
+
+p = Path('rapporter/natt-fire-returer-20261015')
+# Valgt kikkertstripe: rektangulært uttak, ingen skalering.
+raw = Image.open(p / 'obj307_01-raa02.png').convert('RGB')
+panel = Image.new('RGB', (1536,1024), (128,128,128))
+panel.paste(raw.crop((128,432,1408,592)), (128,432))
+panel.save(p / 'obj307_01-kandidat02.png')
+# Lampen klippes rektangulært fra nytegningen. Ingen originalmaske.
+old = Image.open(p / 'lag002_01-forrige.png').convert('RGB')
+raw = Image.open(p / 'lag002_01-raa01.png').convert('RGB')
+box = (1096, 768, 1200, 840)
+w, h = box[2] - box[0], box[3] - box[1]
+mask = Image.new('L', (w, h), 0)
+ImageDraw.Draw(mask).rectangle((4, 4, w-5, h-5), fill=255)
+mask = mask.filter(ImageFilter.GaussianBlur(1.5))
+old.paste(raw.crop(box), box[:2], mask)
+old.save(p / 'lag002_01-kandidat01.png')
+
+def colored_patch(raw, box, color):
+    patch = raw.crop(box).convert('RGB')
+    a = np.asarray(patch).astype(float)
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    if color == 'red':
+        score = r - np.maximum(g, b)
+    elif color == 'yellow':
+        score = np.minimum(r-b, g-b)
+    else:
+        score = np.minimum(g-r, g-b)
+    alpha = np.uint8(np.clip((score-3)/12, 0, 1)*255)
+    # Alfa kommer bare fra den nye tegningens farge mot blå himmel.
+    # Ingen originalpiksler eller originalalfa brukes i komposisjonen.
+    return patch, Image.fromarray(alpha)
+
+a = Image.open(p / 'lag017_03_del1av2-forrige.png').convert('RGB')
+b = Image.open(p / 'lag017_03_del2av2-forrige.png').convert('RGB')
+base1 = Image.open('jobber/rom017_del1av2/resultat.png').convert('RGB')
+base2 = Image.open('jobber/rom017_del2av2/resultat.png').convert('RGB')
+raw1 = Image.open(p / 'lag017_03_del1av2-raa01.png').convert('RGB')
+raw2 = Image.open(p / 'lag017_03_del2av2-raa01.png').convert('RGB')
+for box in ((880,128,1092,244), (1116,204,1284,312)):
+    a.paste(base1.crop(box), box[:2])
+for box, color in (((912,168,1076,220), 'red'), ((1132,252,1272,296), 'yellow')):
+    patch, alpha = colored_patch(raw1, box, color)
+    a.paste(patch, box[:2], alpha)
+    rgba = patch.convert('RGBA'); rgba.putalpha(alpha)
+    rgba.save(p / ('flagg-' + color + '-nytegnet.png'))
+# Samme synlige fragmenter i overlappen fra én nytegning.
+# Bare flaggfeltene kopieres, ikke andens hode eller skyene ellers.
+for box in ((992,144,1100,244), (1116,204,1284,312)):
+    b.paste(a.crop(box), (box[0]-992, box[1]))
+box = (880,128,1064,208)
+b.paste(base2.crop(box), box[:2])
+box = (904,152,1040,200)
+patch, alpha = colored_patch(raw2, box, 'green')
+b.paste(patch, box[:2], alpha)
+rgba = patch.convert('RGBA'); rgba.putalpha(alpha)
+rgba.save(p / 'flagg-green-nytegnet.png')
+# Nytegnet propellfelt fra samme fullbildeforsøk fjerner den eldre
+# rektangulære sømmen gjennom andehodet. Ingen originalalfa.
+box = (520,112,696,248)
+patch = raw2.crop(box)
+w, h = patch.size
+mask = Image.new('L', (w,h), 0)
+ImageDraw.Draw(mask).rectangle((8,0,w-9,h-9), fill=255)
+mask = mask.filter(ImageFilter.GaussianBlur(2))
+b.paste(patch,box[:2],mask)
+a.save(p / 'lag017_03_del1av2-kandidat01.png')
+b.save(p / 'lag017_03_del2av2-kandidat01.png')

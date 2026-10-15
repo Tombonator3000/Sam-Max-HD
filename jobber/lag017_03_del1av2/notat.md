@@ -1,15 +1,19 @@
 # lag017_03_del1av2
 
-Innebygd ChatGPT imagegen, 2 forsøk knyttet til denne delen. Eksakt modellnavn er ikke eksponert. Originalprompt er brukt ordrett med separat kildepresisering.
+Ett nytt forsøk med referanse.png og godkjent jobber/rom017_del1av2/resultat.png som bilde to. Komplette dokumenterte kildetilstander for objekt 180 og 181 er også sett.
 
-Egne fragmenterte røde/gule/grønne vimpler med hull og separate prikker, to røde spaktopper og tre synlige propellarmretninger. Rød/gul vimpel er rettet med felles lokalt imagegen-forsøk til jevne konturer. Separate prikker, T-form og tynne fragmenter er bevart. De nye formene er rundere og mer blanke enn kilden. Ingen fylt flaggduk. Kjegle, lukket dør, rød linse og lukket WIN-front følger denne tilstandens originalgrunnlag.
+Jobbarket viser sparsomme røde og gule animasjonslapper over himmelen. Tidligere komplette flaggflater i jobbkompositten ga mottaksfeil. Nytegningen bevarer avbrutte former, separate prikker, smale deler og himmelhull. Kontrollpultens to røde spaktopper, objekt 184 tilstand 02, er bevart.
 
-Alle synlige objektfelt fra begge deler inngår i en felles 2528 × 800-master. Klipp x = 0 og 992, 544 × 800 byteidentisk overlapp. Nytegnet HD-grunnrom gjenbrukes utenfor sammensettingsfeltene. Hel skalering, rektangulær innplassering, 3 px kantfjæring og jevnt bilineært RGB-tonefelt på nytegnete vimpler; ingen originalpiksler, originalsilhuettmasker, lokal geometriwarp eller vektortrace.
+Alfa er hentet fra de nye fragmentenes farger mot himmelen, uten originalpiksler eller originalalfa. Fragmentene er plassert over godkjent HD-himmel. Bare flaggfeltene er skiftet. Samme røde og gule nytegning brukes i den synlige overlappen med del 2.
 
-Uendret egenkontroll: OK. Resultat SHA-256: `e7de776d8758721351136fd97937d9d7a2309b3beadb9e5778786e03d0113a74`. Proveniens, råforsøk, prompter og SHA i `rapporter/bestilling028-20261013/c-leveranser.json`; oppskrift c-komposisjon.py.txt og samlet kilde-/motivkontroll c-kilde-qa.md. Beskyttede kilder uendret. Runtime/import og ny individuell brukergodkjenning er ikke verifisert.
+Egenkontroll: OK. Globalt skift 0,32, blokkskift 0,63, kantlikhet 0,918. Supplerende maskert objektkontroll består: rødt flagg 0,990, gult flagg 0,962, kontrollpult 0,953. Rødt flagg hadde tidligere 0,062.
 
-## Retting 15. oktober 2026: hele motiver og alfa
+Dette retter jobbkompositten. Separate komplette flaggtegninger fra lapper-eske-logo-20261015 er bevart og må fortsatt kontrolleres ved import og lappklipp.
 
-Nytegnet komplett motiv før mottakets lappklipp, med eksisterende HD-rom som stilgrunnlag. Innebygd bildeverktøy, eksakt modellnavn ikke eksponert. Python brukt til rensing og plassering etter Toms uttrykkelige tillatelse. Beskyttede originaler, jobbmetadata og prompter uendret.
+SHA-256: 4d6ecfaf10c25d12702a9ef2f2bafbbf80d52a85152a15d2cb70e8bd472b820b.
 
-Egenkontroll: OK. Se [rapport, prompter, forsøk og SHA-256](../../rapporter/lapper-eske-logo-20261015/RAPPORT.md). Ingen ny motorimport eller spilltest av denne rettingen.
+Innebygd image_gen, eksakt modellnavn ikke eksponert. Dato: 15. oktober 2026. Originalen i 1x og 4x og relevant godkjent stilbilde er sett før tegning. Prompt.txt er brukt ordrett med returteksten og separat kildepresisering. Beskyttede kilder er SHA-256-kontrollert uendret mot HEAD.
+
+Python er brukt etter Toms tillatelse til presis plassering, egen alfa og grå ramme. 1536 x 1024 RGB, eksakt RGB128-ramme. Original, tidligere levering, ny levering og overlegg er visuelt sammenlignet. Ingen ny motorimport, full animasjonsavspilling eller godkjenning fra Tom.
+
+Råforsøk, prompter, forrige levering, oppskrift, kontroll, sjekksummer og sammenligningsbilder: [nattrapport](../../rapporter/natt-fire-returer-20261015/RAPPORT.md).
