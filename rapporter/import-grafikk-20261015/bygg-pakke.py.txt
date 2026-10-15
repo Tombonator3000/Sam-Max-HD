@@ -1,0 +1,33 @@
+from pathlib import Path
+import json,hashlib,zipfile
+root=Path(__file__).resolve().parents[2];out=Path(__file__).resolve().parent
+sha=lambda b:hashlib.sha256(b).hexdigest()
+icons=json.loads((root/'rapporter/ikoner-ui-20261015/ikonmanifest.json').read_text())
+objects=json.loads((root/'rapporter/lapper-eske-logo-20261015/leveranser.json').read_text())
+alias=json.loads((root/'rapporter/ikoner-ui-20261015/handlingsmanifest.json').read_text())
+entries=[];files={}
+def add(src,dest,checksum,**meta):
+ b=(root/src).read_bytes();assert sha(b)==checksum,src;assert dest not in files,dest
+ files[dest]=b;entries.append({'repo_fil':src,'pakke_fil':dest,'sha256':checksum,**meta})
+for e in icons:
+ add(e['fil'],'ikoner/objects/'+e['bilde']+'.png',e['sha256'],bilde=e['bilde'],storrelse=e['storrelse'],behandling='egen_ikon_alfa')
+for e in objects:
+ name=e['bilde'];assert not name.startswith('obj835_')
+ group='basseng-rom054' if e.get('runtime_rom')==54 else ('egen-alfa' if name in ['obj049_01','obj995_01'] else 'hele-motiver')
+ add(e['fil'],group+'/objects/'+name+'.png',e['sha256'],bilde=name,storrelse=e['storrelse'],behandling=('rom54_palett_og_lappklipp' if group=='basseng-rom054' else ('egen_alfa' if group=='egen-alfa' else 'helt_motiv_for_lappklipp')))
+ if 'indeksfil' in e:add(e['indeksfil'],group+'/objects/'+name+'_idx.png',e['indeks_sha256'],bilde=name,behandling='indekspiksler_original_palett_rom54')
+for e in alias:add(e['grunnikon'],'verbhjul/'+e['handling']+'.png',e['sha256'],handling=e['handling'],behandling='alias')
+assert len(icons)==111 and len(objects)==44 and len(alias)==5 and len(entries)==172
+manifest={'dato':'2026-10-15','kildecommit':'0cb5b4790a6b1d774d7859d987aea0996c0ef875','rgba_bilder':155,'indeksfiler':12,'verbhjulaliaser':5,'avventer':['obj835_01','obj835_02','obj835_03','obj835_04'],'filer':entries}
+data=(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n').encode();(out/'manifest.json').write_bytes(data);files['manifest.json']=data
+files['LES-MEG.md']=(root/'IMPORT-GRAFIKK-20261015.md').read_bytes()
+files['handlingsmanifest.json']=(root/'rapporter/ikoner-ui-20261015/handlingsmanifest.json').read_bytes()
+z=out/'importpakke.zip'
+with zipfile.ZipFile(z,'w',zipfile.ZIP_DEFLATED) as archive:
+ for name,b in sorted(files.items()):
+  info=zipfile.ZipInfo(name,date_time=(2026,10,15,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16;archive.writestr(info,b)
+with zipfile.ZipFile(z) as archive:
+ assert archive.testzip() is None
+ for e in entries:assert sha(archive.read(e['pakke_fil']))==e['sha256']
+(out/'importpakke.sha256').write_text(sha(z.read_bytes())+'  importpakke.zip\n')
+print(json.dumps({'rgba':155,'indeksfiler':12,'aliaser':5,'arkivfiler':len(files),'byte':z.stat().st_size}))
