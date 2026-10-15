@@ -14,6 +14,9 @@ Manifestet kobler hvert bilde til filen i repoet (`repo_fil`), sjekksum og `beha
 - `egen_alfa`: objektbilder med egen myk alfa (inventaresken obj995, LucasArts-logoen obj049). Legges som
   objNNN_SS_hd.png (motorens myke bilde for blast-objekter og pekeren) og som objNNN_SS.png.
 
+Objektmanifest (`rapporter/*/objektleveranser.json`, 15. oktober 18:06) med hele tegninger tas inn som
+`helt_motiv_for_lappklipp`.
+
 Bilder i `avventer` tas ikke inn. Avvisninger i docs/gpt-avvisninger.csv (jobb = bildenavnet) gjelder.
 Står samme bilde i flere manifester, vinner det siste (mappene sortert etter navn).
 """
@@ -39,18 +42,30 @@ def _sha(path: Path) -> str:
 
 
 def entries(gren: Path) -> tuple[dict[str, dict], set[str]]:
+    """Importmanifestene og objektmanifestene (rapporter/*/objektleveranser.json: en liste med bilde, fil,
+    sha256 og heltegning; et helt motiv behandles som helt_motiv_for_lappklipp). Alle sorteres etter sti,
+    og det siste vinner."""
     out: dict[str, dict] = {}
     waiting: set[str] = set()
-    for f in sorted(gren.glob("rapporter/import-grafikk-*/manifest.json")):
+    files = sorted(list(gren.glob("rapporter/import-grafikk-*/manifest.json")) +
+                   list(gren.glob("rapporter/*/objektleveranser.json")))
+    for f in files:
         try:
             m = json.loads(f.read_text())
         except (OSError, json.JSONDecodeError):
+            continue
+        rel = str(f.relative_to(gren))
+        if isinstance(m, list):
+            for r in m:
+                if isinstance(r, dict) and r.get("bilde") and r.get("fil") and r.get("heltegning"):
+                    out[r["bilde"]] = {"repo_fil": r["fil"], "pakke_fil": r["fil"], "sha256": r.get("sha256"),
+                                       "behandling": "helt_motiv_for_lappklipp", "navn": r["bilde"], "manifest": rel}
             continue
         waiting |= set(m.get("avventer", []))
         for r in m.get("filer", []):
             if r.get("repo_fil") and r.get("pakke_fil") and r.get("behandling"):
                 name = Path(r["pakke_fil"]).stem
-                out[name] = {**r, "navn": name, "manifest": str(f.relative_to(gren))}
+                out[name] = {**r, "navn": name, "manifest": rel}
     return out, waiting
 
 
