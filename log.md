@@ -440,3 +440,16 @@ Natt: kontroll av ny leveranse fra Codex, obj187_05 (commit 01a36834 i `work/.gp
 - RAPPORT.md: obj187_05 står på sjekk (deler flyttet eller zoomet opptil 1,3 px), mot avvist med 7,9 px i forrige utgave. Codex sin egenkontroll: skift 0,07 originalpiksler, kantlikhet 0,94. Resultatet er 1430 x 1100, som er 208:160.
 - Sett med øynene mot originalen og i forhåndsvisningen, og som et halvt gjennomsiktig lag over originalen i 4x: klubbehodet, hånden, armen, slipset, snuten og de tre hullene ligger der de ligger i originalen, uten doble konturer. Ingenting lagt til eller fjernet, ingen rotter eller treffeffekter. Den avskårne teksten på brettet («AK-A» til høyre og bokstavresten til venstre) er lik originalen. Det mørke rundt hullene og den utjevnede bakgrunnen fra forrige utgave er borte.
 - Godkjent i kontrollen, ingen rad i `docs/gpt-avvisninger.csv`. Stilen er ikke godkjent av Tom. Ikke testet i spillet, og hele animasjonen med de andre tilstandene er ikke sett i motoren.
+
+## 2026-10-15 21:37 (Claude)
+
+Natt: kontroll av lag002_01, lag017_03_del1av2, lag017_03_del2av2 og obj307_01 fra Codex (commit 3f64f318 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`. Mottaket godkjente alle fire.
+- Sett med øynene: utsnitt per objekt fra referanse.png og resultat.png side om side, og originalobjektet mot rommet i 1x for å se hva tilstanden legger til.
+- lag017_03_del1av2: godkjent. Rødt og gult flagg har samme brutte former, prikker og himmelhull som originalen. Kontrollpulten med de to røde spakene (obj184_02) har samme plass og antall knapper.
+- lag017_03_del2av2: godkjent. Det grønne flagget har samme bruddstykker og prikker. Propellen på anda har tre blader i samme retninger og samme nav.
+- lag002_01: avvist i `docs/gpt-avvisninger.csv`. Lampen obj896_01 er nå tent gul som i originalen. Men obj897_01 og obj900_01 har i originalen to ringer hver: den indre som også står i rommet, og en tynnere ytre ring som er selve tilstanden. Leveransen har bare én takket ring rundt hver kule, så tilstanden mister den ytre ringen. Notatet sier at to ringer er bevart; det stemmer ikke med bildet. Feilen sto også i forrige leveranse.
+- obj307_01: avvist. Toppen av kikkerten er riktig (to skruer, fasetter, åpningen), men satt sammen med godkjent obj304_01 under gir den en tydelig søm ved rad 40: himmelen er lysere (ca. 120,180,252 mot 103,166,250) og rammens kant og skygge møter ikke. I originalen er farge og ramme sammenhengende. Mottaket måler bare mot originalen og ser ikke dette.
+- Runden kjørt på nytt: begge står som avvist i status.csv, øverst i ORDRE.md med retur.md, og er sendt til `gpt-arbeid` (92392b21). Modden er bygget og publisert i `hd-mod` på nytt.
+- Ikke testet i spillet. Stilen er ikke godkjent av Tom.
