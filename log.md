@@ -714,3 +714,16 @@ Natt: kontroll av fig002_06, lag068_12, lag071_05 og lag071_15 fra Codex (commit
 - lag071_15: avvist. Parykken obj764_01: i originalen henger hårstråene ned over pannen og øynene, i leveransen er luggen kort og Max har fått synlige øyne.
 - To rader i `docs/gpt-avvisninger.csv` med grunn og forslag. Runden kjørt på nytt; begge står som avvist i status.csv og i ORDRE.md med retur.
 - Levert 4, visuelt kontrollert 4, godkjent 2, importert 2 (obj658_01 og 11 figurruter i kostyme 2). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 05:09 (Claude)
+
+Natt: kontroll av lag071_05, lag071_15, fig007_02 og fig247_01 fra Codex (commit 4e57d4b6d0 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 970 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente begge lagjobbene og satte de to figurarkene til levert; ingen av de fire står under sjekk i RAPPORT.md.
+- Sett med øynene: original_1x i nearest ved siden av resultatet beskåret etter `plassering` og `skala`, forstørret 6 ganger, forhåndsvisningene, og referanse.png over resultatet på grønn bakgrunn for figurarkene.
+- lag071_05 (retur): godkjent. Skiltet på kassen i obj719_01 sier "$1.00 EACH" med dollartegn, stort 1-tall og hevet 00, som originalen. Ingen pil og ingen PUSH ME!. Resten er som i forrige forsøk.
+- lag071_15 (retur): godkjent. Hårstråene i obj764_01 henger ned over pannen og øynene med lyse striper mellom, ingen øyne synes, nese og tenner står. Sam og den gylne rekvisitten er uendret.
+- fig007_02 (Sam, kostyme 7, 25 ruter): godkjent. Riktig figur og positur i alle ruter: 13 hoder med munnstillinger, to hatter, fem hånd- og ørepar og fem kroppsbilder med hendene samlet foran. Ingen ekstra ruter. Figurmottaket: alle 25 ok, skala innen 1 prosent, snitt/union minst 0,85.
+- fig247_01 (Sam og Max med VR-hjelm, kostyme 247, 3 ruter): godkjent. Hjelm med grønt visir, kablene i tre ulike former som i originalen, Max oppreist, vannrett og oppreist, det oransje partiet under Max i midtruten beholdt. Figurmottaket: alle 3 ok, snitt/union minst 0,75. I tredje rute er originalens løse kabeltupp øverst til venstre tegnet som del av en sammenhengende løkke; ikke en avvisningsgrunn.
+- De gamle avvisningsradene for lag071_05 og lag071_15 i `docs/gpt-avvisninger.csv` gjelder de forrige leveransene (sha256) og står. Ingen nye rader, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (obj719_01, obj741_01, obj749_01 og obj764_01 med resten av lagene, og 28 figurruter: 25 i kostyme 7 og 3 i kostyme 247; 942 til 970). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
