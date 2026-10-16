@@ -1,9 +1,9 @@
 # lag045_02: avvist
 
-Grunn: obj430_02 (boken i hyllen, rekt 24,32,24,24) er tegnet om. I originalen er tilstanden en lys blå bok med et rektangulært, rutet felt på forsiden. Leveransen har en mørkere blå bok med hvite bølgestreker, et mønster som ikke finnes i originalen. Mottaket gav kantlikhet 0,82. Auberginen obj429_02 og trappen obj433_02 er riktige.
+Grunn: objekter er feil: obj430_02 mangler (kantlikhet 0.85, med bakgrunnen 0.93)
 
 Forslag til nytt forsøk (lim inn sammen med referanse.png):
 
 ```text
-Behold auberginen, trappen og resten av bildet. Tegn om bare boken obj430_02 (rekt 24,32,24,24): samme lyse blå farge, størrelse og stilling som i referanse.png, med det rektangulære rutede feltet på forsiden. Ingen bølgestreker eller annet nytt mønster.
+Precise correction of the attached picture. Some of the small objects did not match the original: they were missing, moved or painted differently. Start again from referanse.png. Paint every object exactly where it is, with the same outline, size and colors, and keep every other shape in place. Do not zoom, shift, crop or reframe. Keep the gray border plain gray. Same size 1536 x 1024.
 ```
