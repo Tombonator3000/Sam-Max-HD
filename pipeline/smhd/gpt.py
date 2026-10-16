@@ -1858,8 +1858,13 @@ def _report(work: Path, jobs: list[Job], results: dict[str, dict], done_rooms: l
         sheets = {j.bilde for j in jobs if j.type == "figur"}
         ok = {j.bilde for j in jobs if j.type == "figur"} - {
             j.bilde for j in jobs if j.type == "figur" and results.get(j.id, {}).get("status") not in ("godkjent", "sjekk")}
+        # Figurark i glatt stil får status levert her og tas inn av figurmottaket (smhd myke-figurer), som
+        # kjører etter gpt-inn; rutene derfra telles i ORDRE.md og myke.json, ikke her
+        handed = {j.bilde for j in jobs if j.type == "figur" and results.get(j.id, {}).get("status") == "levert"}
         lines.append(f"- Figurark: {len(ok)} av {len(sheets)} godtatt. Ferdige figurruter: "
-                     f"{len(done_pieces.get('figur', []))} av {pieces_total['figur']}")
+                     f"{len(done_pieces.get('figur', []))} av {pieces_total['figur']}"
+                     + (f". {len(handed)} ark levert til figurmottaket (smhd myke-figurer); rutene derfra "
+                        "telles i ORDRE.md og myke.json" if handed else ""))
     if incomplete:
         lines += ["", "Bilder som venter på flere deler:", ""] + [f"- {s}" for s in incomplete]
     bad = [(j, results[j.id]) for j in jobs if results.get(j.id, {}).get("status") in ("avvist", "sjekk")]
@@ -1872,7 +1877,9 @@ def _report(work: Path, jobs: list[Job], results: dict[str, dict], done_rooms: l
             "rom_totalt": rooms_total, "objekter_totalt": objects_total, "venter": incomplete,
             "ferdige_lagobjekter": done_pieces.get("lag", []), "lagobjekter_totalt": pieces_total["lag"],
             "ferdige_ikoner": done_pieces.get("ikon", []), "ikoner_totalt": pieces_total["ikon"],
-            "ferdige_figurruter": done_pieces.get("figur", []), "figurruter_totalt": pieces_total["figur"]}
+            "ferdige_figurruter": done_pieces.get("figur", []), "figurruter_totalt": pieces_total["figur"],
+            "figurark_levert": len({j.bilde for j in jobs if j.type == "figur"
+                                    and results.get(j.id, {}).get("status") == "levert"})}
 
 
 # ---------------------------------------------------------------- ordre til ChatGPT

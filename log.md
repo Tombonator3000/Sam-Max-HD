@@ -727,3 +727,14 @@ Natt: kontroll av lag071_05, lag071_15, fig007_02 og fig247_01 fra Codex (commit
 - fig247_01 (Sam og Max med VR-hjelm, kostyme 247, 3 ruter): godkjent. Hjelm med grønt visir, kablene i tre ulike former som i originalen, Max oppreist, vannrett og oppreist, det oransje partiet under Max i midtruten beholdt. Figurmottaket: alle 3 ok, snitt/union minst 0,75. I tredje rute er originalens løse kabeltupp øverst til venstre tegnet som del av en sammenhengende løkke; ikke en avvisningsgrunn.
 - De gamle avvisningsradene for lag071_05 og lag071_15 i `docs/gpt-avvisninger.csv` gjelder de forrige leveransene (sha256) og står. Ingen nye rader, så runden er ikke kjørt på nytt.
 - Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (5 objektbilder: obj719_01, obj741_01, obj749_01, obj735_01 og obj764_01, og 28 figurruter: 25 i kostyme 7 og 3 i kostyme 247; 942 til 970). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 05:30 (Claude)
+
+Natt, kodeoppgave: RAPPORT.md fra gpt-inn viste «Figurark: 0 av 1758 godtatt. Ferdige figurruter: 0 av 15661», mens modden har 970 figurruter.
+
+- Årsak: figurarkene i glatt stil får status levert i gpt-inn og tas inn av `smhd myke-figurer`, som kjører etter gpt-inn i `tools/gpt_runde.sh`. Rapporten telte bare godkjente ark og ruter klippet ut i gpt-inn. ORDRE.md teller allerede riktig fra myke.json.
+- `pipeline/smhd/gpt.py`, `_report`: figurarklinjen får tillegget «N ark levert til figurmottaket (smhd myke-figurer); rutene derfra telles i ORDRE.md og myke.json» når noen ark har status levert. Rapporten leser ikke myke.json, fordi den fra gpt-inn alltid ville være fra forrige runde. Returverdien har `figurark_levert`, og `smhd gpt-inn` skriver tallet på skjermen.
+- Ny test `test_report_names_figure_sheets_handed_to_soft_intake`. pytest i `pipeline` 64 bestått, `pytest -m "not game"` 61 bestått, `git diff --check` uten feil.
+- Ikke kjørt `tools/gpt_runde.sh`, så RAPPORT.md i gpt-arbeid har fortsatt den gamle linjen til neste runde. Ingen grafikk endret.
+- Sjekket samtidig todo-punktet om de 11 figurrutene: myke.json versjon 6 har fig091_03 til 05, fig209_03 og fig272_02 som ok, og ORDRE.md nevner ikke fig091. Krysset av. Ikke sett i spillet.
+- Trenger Codex-kodekontroll.

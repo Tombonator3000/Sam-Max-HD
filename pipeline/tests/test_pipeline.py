@@ -2054,6 +2054,22 @@ def test_orders_count_soft_figures_and_list_held_cels(tmp_path):
     assert "Figurark: 0 av 1 godkjent" in plain and "holdt utenfor" not in plain
 
 
+def test_report_names_figure_sheets_handed_to_soft_intake(tmp_path):
+    # Figurark i glatt stil får status levert i gpt-inn; rapporten skal ikke stå igjen med bare "0 av N"
+    from smhd import gpt
+
+    def job(jid, sheet, cel):
+        return gpt.Job(id=jid, rom=91, navn="fig", del_nr=1, deler=1, rom_storrelse=(10, 10), region=(0, 0, 10, 10),
+                       plassering=(0, 0), type="figur", kostyme=91, lag=sheet, ruter=[{"bilde": cel}])
+    jobs = [job("fig091_03", 3, "costume091_1955"), job("fig091_04", 4, "costume091_1958")]
+    s = gpt._report(tmp_path, jobs, {"fig091_03": {"status": "levert"}}, [], [], [])
+    text = (tmp_path / "RAPPORT.md").read_text()
+    assert "Ferdige figurruter: 0 av 2. 1 ark levert til figurmottaket (smhd myke-figurer)" in text
+    assert s["figurark_levert"] == 1
+    gpt._report(tmp_path, jobs, {}, [], [], [])
+    assert "levert til figurmottaket" not in (tmp_path / "RAPPORT.md").read_text()
+
+
 def test_scale4x_keeps_colours_and_smooths_steps():
     # Ikonene skaleres med Scale4x: ingen nye farger, og en diagonal trapp blir en rett skrå kant
     import numpy as np

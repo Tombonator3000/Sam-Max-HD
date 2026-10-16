@@ -13,7 +13,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
   - [ ] Se bilen i rom 9 i en nedtoning med PR 32 (kanten tones nå med rommets farge, funn 3)
   - [ ] Tom fletter PR 32, og avgjør om Dig skal få samme endring (funn 4)
 - [x] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn (rettet 15. oktober 20:25, `myk.py` versjon 6, på grenen samarbeid/natt-2026-10-15)
-  - [ ] Neste `tools/gpt_runde.sh` etter fletting tar inn de 11 rutene (fig091_03 til 05, fig209_03, fig272_02); fjern da beskjeden om ny tegning i ORDRE.md
+  - [x] Neste `tools/gpt_runde.sh` etter fletting tar inn de 11 rutene (fig091_03 til 05, fig209_03, fig272_02); fjern da beskjeden om ny tegning i ORDRE.md. Sjekket 16. oktober 05:30: myke.json versjon 6 har alle 11 som ok (970 ok, 0 til gjennomsyn), og ORDRE.md i gpt-arbeid nevner ikke fig091 lenger. Ikke sett i spillet
   - 15. oktober 20:05: fig091_03 (rute 1955, ny utgave) og fig091_04 sett av Claude, bokser like originalen i 4x, holdes likevel ute og ordren ber om ny tegning. Beskjed i ORDRE.md om ikke å tegne dem på nytt. Når mottaket er rettet, kommer de inn uten ny leveranse
 - [x] GitHub-innlogging og push fra denne maskinen er rettet i nattoppsettet. Gjentatte faktiske push til gpt-arbeid, hd-mod og nattgrenen er bekreftet på GitHub; ingen uavklart pushblokkering fra 15. oktober 20:04
 - [x] Mottaket retter hele bilder som er forskjøvet 0,25 til 1,5 originalpiksler (klipper på nytt der innholdet ligger, ikke figurark), 16. oktober 00:24, nattgrenen. Tørrkjøring på de 32 sjekk-jobbene: 12 blir godkjent, 7 til får bedre plassering men står fortsatt til sjekk
@@ -28,6 +28,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
       - [x] Codex: kodekontroll av andre trinn de951ff7, 04:15 den 16. oktober. 63 pipelinetester og kontroll på 163 ikoner
       - [ ] Neste import: kontroller andre trinn i faktisk sluttmodd på mørk og lys bakgrunn, særlig biltak/bakrute, obj824_01, lilla felt i obj049_01 og ikon07/08. Førbilder fra første trinn er sikret i Codex-arbeidsmappens output/natt-kantrens-20261016/etter
       - [ ] obj049_01 (LucasArts-logoen): den lyse magenta kanten rundt figuren og øyevippene står fortsatt, rettes ikke av kantrensen (står allerede i grafikkordren)
+- [x] RAPPORT.md fra gpt-inn sa «Ferdige figurruter: 0 av 15661» selv om 970 figurruter ligger i modden: figurarkene i glatt stil får status levert og tas inn av `smhd myke-figurer` etter gpt-inn. Linjen sier nå hvor mange ark som er levert til figurmottaket og at rutene telles i ORDRE.md og myke.json (16. oktober, nattgrenen). Trenger Codex-kodekontroll
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
 - [x] Første natteskift med Claude og Codex er i gang etter prøveturen 15. oktober. Nattløpet stopper 16. oktober klokken 08:00; nattkontroll følger med
