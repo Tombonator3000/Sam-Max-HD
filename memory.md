@@ -2,6 +2,8 @@
 
 Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
+- 16. oktober 22:14: Åtte nye Gator Golf-ark fig117_01 til 08 (91 ruter) og ny munndel costume249_257 er importert i hd-mod 9a855936 (1226 native ruter). Alle 19 370 tidligere PNG-er er bevart. 13 tvungne animasjoner, alle 91 ruter sett i motorutsnitt, null skjermbufferavvik. Tre egenkontrollmerknader om omriss står dokumentert, mens separat mottak godtar alle 98 ruter inkludert seks eksisterende gangeruter. Inventory-knappen fra forrige modd er beholdt. Nedlastingspakkene har fortsatt 1095; neste Sam-ark er fig204_01, opp ned. Ingen ny natt-automatikk.
+
 - 16. oktober 19:35: Den lille inventory-knappen nederst til venstre er aktør 1 med kostyme 1, rute 2, ikke objekt888. Ny native eske i fig001_01 er sett med inventar åpnet/lukket. Arbeidsmodd 9fbf5a67 har 1134 native figurruter etter 39 additive PNG-er, alle tidligere grafikkfiler bevart. Linux-/Windows-releasen har fortsatt a6c286bd med 1095. Fig249_02 er gjenopprettet til godkjent nattleveranse; munndelsforsøket 6fbad801 består teknisk, men er pikselert i motoren og holdes ute. Neste Sam-ark er fig117_01. Natt-automatikken forblir pauset.
 
 ## Mål
