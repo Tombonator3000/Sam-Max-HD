@@ -1,6 +1,6 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-16 05:51 (norsk tid)
+Oppdatert 2026-10-16 06:01 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
@@ -11,7 +11,7 @@ Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENT
 - Ferdige objekter: 74 av 86 (obj036_01, obj050_01, obj089_01, obj142_01, obj187_01, obj187_02, obj187_03, obj187_04, obj187_06, obj199_01, obj204_01, obj293_01, obj294_01, obj295_01, obj304_01, obj307_01, obj308_01, obj335_01, obj336_01, obj338_01, obj339_01, obj340_01, obj409_01, obj523_01, obj524_01, obj566_01, obj570_01, obj570_02, obj570_03, obj598_01, obj599_01, obj601_01, obj602_01, obj604_01, obj606_01, obj607_01, obj608_01, obj609_01, obj610_01, obj611_01, obj612_01, obj613_01, obj664_01, obj665_01, obj666_01, obj667_01, obj669_01, obj682_01, obj683_01, obj684_01, obj772_01, obj773_01, obj774_01, obj775_01, obj776_01, obj777_01, obj780_01, obj811_01, obj812_01, obj813_01, obj821_01, obj822_01, obj823_01, obj828_01, obj829_01, obj830_01, obj832_01, obj839_01, obj850_01, obj901_01, obj989_01, obj989_02, obj995_01, obj996_01)
 - Lagjobber: 287 av 296 godkjent. Ferdige objektbilder fra lag: 677 av 701
 - Ikonark: 7 av 9 godkjent. Ferdige bilder fra ikonark: 149 av 163
-- Figurark: 84 av 1758 tatt inn med figurmottaket. Ferdige figurruter: 1012 av 15661
+- Figurark: 83 av 1758 tatt inn med figurmottaket. Ferdige figurruter: 1008 av 15661
 - Hovedark: 2 av 2 levert
 
 ## Gjør disse nå
@@ -47,6 +47,10 @@ Legg ved det ankeret som ligner mest på rommet som bilde to.
 - Hovedarkene (`hovedark/<navn>.png`) leveres på gjennomsiktig bakgrunn, uten tekst.
 
 Kjør `python3 verktoy/sjekk_leveranse.py <resultat>` før du committer, og gjør om det som får FEIL. Skriv `notat.md` i jobbmappen. Commit 5 til 10 jobber om gangen i grenen `gpt-arbeid` og push.
+
+## Beskjeder
+
+- Fig247_02 er sendt i konkret retur etter ekstra originalkontroll: de grønne hjelmstripene mangler i alle fire ruter. Rett bare båndene og bevar resten. Originalens design og farger går foran avvik i tidligere HD-ark.
 
 ## Kodeoppgaver
 
