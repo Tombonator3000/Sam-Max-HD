@@ -43,3 +43,8 @@ Ny status fra Claude dc5fcba9: de tidligere 111 ikonene er tatt inn i hd-mod; pe
 Seks jobber er oppdatert og består egenkontroll med OK: obj811_01, lag037_01_del2av2, lag037_02_del1av2, lag045_03, rom010 og rom015_del1av2. Kjerub-/djevelmotivet og Sams nedre tannrekke er rettet etter Tom. Fire komplette RGBA-objektutsnitt er levert separat. Nye forsøk på obj187_05 og obj307_01 består ikke kontrollen; tidligere resultater er beholdt.
 
 Sam091s åtte høydereturer skyldes ulike målebokser for original/HD når en løs fotrest filtreres bort fra originalen. Arkene er uendret; bevis er levert for mottaksvurdering. Toms rester etter opptak, hammerkanter og skadde chatrammer er dokumentert som åpne runtimeproblemer. Se [rapport](rapporter/videre-grafikk-20261015/RAPPORT.md). Ingen import av denne delrunden i hd-mod eller ny spilltest. Main har i mellomtiden fått myke romobjektkanter i 9e1b7b29 (#29); effekt på Toms feilbilder må bekreftes i spillet.
+
+
+## HD-produksjon 2026-10-16T12:57:09+02:00
+
+Fem nye ark med32 ruter og én munndelretting levert til kontroll i gpt-arbeid. fig249_02 og fig249_04 har egenkontroll OK; fig249_05 til fig249_08 SJEKK. Ingen ny import eller motoravspilling. Se rapporter/produksjon-20261016/RAPPORT.md.

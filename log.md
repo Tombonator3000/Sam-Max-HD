@@ -415,3 +415,10 @@
 
 - Tom avviste obj1008_01 som generisk kanin. Ett nytt innebygd image_gen-kall med originalikon, godkjent Max-hovedark og Purcell-referanse. Tannglis og små svarte øyne tilbake; ekte alfa bevart. Ikon08 og eksport oppdatert, andre ikoner uendret.
 - Alle tre ark OK; 12 beskyttede filer uendret. Brukerføringen om alltid å se stilreferanser og spørre ved usikkert motiv er lagt i AGENTS.md og ANALYSE.md. Ingen ny brukergodkjenning, motorimport eller spilltest.
+
+
+## 2026-10-16T12:57:09+02:00 (Codex, videre HD-produksjon)
+
+- Fem nye Sam-ark fig249_04 til fig249_08, 32 ruter, og rettet munndel i fig249_02. Innebygd image_gen, 11 bildekall, originale ruter og godkjent Sam-hovedark brukt. Python-rensing/plassering innenfor tidligere autorisasjon.
+- Endelig egenkontroll: fig249_02 og fig249_04 OK; fig249_05 til fig249_08 SJEKK, ingen FEIL. Omrissmerknader står åpne; mislykkede delingsforsøk forkastet. Seks godkjente gangruter uendret. Munndekning 0,9034, IoU 0,8833.
+- 24 beskyttede jobbfiler uendret. Faktiske slutt-SHA, rutekart, prompter, råforsøk, notater og sammenligninger i rapporter/produksjon-20261016. Ingen ny Tom-godkjenning, import, hd-mod, release eller motoravspilling.

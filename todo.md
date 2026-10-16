@@ -135,3 +135,10 @@
 
 - [x] Rettet Max-ikonet obj1008_01 etter Toms avvisning med original og godkjente figur-/stilreferanser.
 - [ ] Tom vurderer rettet Max-ikon. Kontroller videre i mottak og spill.
+
+
+## Videre produksjon 2026-10-16T12:57:09+02:00
+
+- [x] Tegnet fig249_04 til fig249_08 og rettet bare munndelen i fig249_02. Rapport: rapporter/produksjon-20261016.
+- [ ] Mottak og visuell vurdering av nye SHA-er. To ark OK, fire SJEKK. Ikke tell 32 nye ruter som importert ennå.
+- [ ] Vurder omriss og gjentatte kroppsfaser i fig249_05 til fig249_08 før ferdiggodkjenning.

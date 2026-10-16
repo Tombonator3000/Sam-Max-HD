@@ -1,11 +1,13 @@
 # fig249_02
 
-Fullført leveransedokumentasjon 2026-10-16T08:36:03+02:00, Codex. Selve bildet ble laget i nattløpet og pushet i 1666a2c5. Ingen bildepiksler er endret nå.
+Dato: 2026-10-16T12:57:09+02:00, Codex.
 
-Sams seks gangruter i rom49 og én separat munndel for snakking. Munnen tegnes som lag over kroppen, og er ikke gjort til et helt hode.
+Sam i den virtuelle verdenen, rom49: sverdbevegelse, dragehjerte og nøkkel. Originalens kostyme249 styrer positur, palett og retninger; hovedark/sam.png er godkjent stilreferanse.
 
-Verktøy: imagegen via Codex gpt-6.1-sol. Bildeverktøyets interne modell er ikke oppgitt. Ett hovedforsøk og ett avgrenset forsøk på munndelen. Råforsøk, prompter og plasseringsgrunnlag ligger i rapporter/natt-20261016-0745. Python ble brukt i natt til rensing og plassering med Toms tillatelse.
+Verktøy: innebygd image_gen. Intern bildemodell er ikke oppgitt. Python brukt til rensing og nøyaktig plassering, etter Toms tidligere autorisasjon dokumentert i log.md 15. oktober. Hele lerretet er 1536 x 1024 med ekte alfa.
 
-Originalreferansen og Sams hovedark er grunnlaget. Codex har nå sett original og sluttark side ved side: samme antall ruter, positurer, synsvinkel og synlige rekvisitter. Egenkontrollen fra nattløpet gir alle 7 ruter OK. Rutekartet er gjenopprettet fra faktisk alfa over 128 og jobbens originale ruteområder. Notatet er skrevet fra de bevarte filene og transkriptet etter fristavbruddet.
+Bare munndelen costume249_257 er endret. Seks gangruter er uendret mot godkjent HEAD. Direkte dekning 0,9034 og snitt/union 0,8833. Tidligere godkjenning gjelder gammel SHA; denne rettingen er ikke automatisk Tom-godkjent.
 
-Tom godkjente leveransen i chatten: «pull alt som er laget og godkjenner dette». Godkjenningen er festet til SHA-256 867fc97d830b5a2b99dd42f680467e2155ab14f0ba5b93d036bea38dcc468108. Teknisk import kontrolleres i mottaket. Ingen avspilling i motoren er utført i denne kontrollen.
+Egenkontroll: OK. Se ../../rapporter/produksjon-20261016/fig249_02-egenkontroll.txt og sammenligningsbildet. Ingen motorimport eller spillavspilling utført. Råforsøk, endelige prompter, SHA og rutekart ligger i ../../rapporter/produksjon-20261016/.
+
+SHA-256: 6fbad801be377128d974701423bd00474c3388bbcbe8147168be4351087915ee
