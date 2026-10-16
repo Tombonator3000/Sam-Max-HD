@@ -1,0 +1,69 @@
+from pathlib import Path
+import json
+import numpy as np
+from PIL import Image
+from scipy import ndimage
+
+p = Path('rapporter/natt-fire-20261016-0517')
+for name in ['fig247_02', 'fig247_03', 'fig247_04', 'fig247_05']:
+    job = json.loads(Path('jobber', name, 'jobb.json').read_text())
+    a = np.array(Image.open(p / (name + '-raa.png')).convert('RGBA'))
+    labels, n = ndimage.label(a[:, :, 3] > 128)
+    components = []
+    for i, s in enumerate(ndimage.find_objects(labels)):
+        if s is not None and np.sum(labels[s] == i + 1) > 1000:
+            components.append((i + 1, [s[1].start, s[0].start, s[1].stop, s[0].stop]))
+    components.sort(key=lambda c: c[1][0])
+    assert len(components) == len(job['ruter'])
+    canvas = Image.new('RGBA', (1536, 1024))
+    record = []
+    for frame, (label, box) in zip(job['ruter'], components):
+        x0, y0, x1, y1 = box
+        margin = 3
+        piece = a[y0-margin:y1+margin, x0-margin:x1+margin].copy()
+        local = labels[y0-margin:y1+margin, x0-margin:x1+margin]
+        keep = ndimage.binary_dilation(local == label, iterations=2)
+        piece[:, :, 3][~keep] = 0
+        piece[:, :, 3][piece[:, :, 3] >= 250] = 255
+        crop = Image.fromarray(piece)
+        tx0, ty0, tx1, ty1 = frame['synlig']
+        ox, oy = job['plassering']
+        target = [(ox+tx0)*4, (oy+ty0)*4, (ox+tx1)*4, (oy+ty1)*4]
+        scale = ((target[2]-target[0])/(x1-x0), (target[3]-target[1])/(y1-y0))
+        # Pillow RGBA resize uses premultiplied alpha internally.
+        crop = crop.resize((round(crop.width*scale[0]), round(crop.height*scale[1])), Image.Resampling.LANCZOS)
+        xy = (round(target[0]-margin*scale[0]), round(target[1]-margin*scale[1]))
+        canvas.alpha_composite(crop, xy)
+        record.append({'bilde': frame['bilde'], 'kildeboks': box, 'maalboks': target, 'skala': scale, 'plassering': xy})
+    # Normalize the cable/body junction separately from the outer frame box.
+    # These visually measured horizontal anchors keep the helmet and body
+    # at original height without stretching the body to match long cables.
+    source_anchor, target_anchor = {
+        'fig247_02': (232, 244), 'fig247_03': (243, 248),
+        'fig247_04': (227, 244), 'fig247_05': (234, 244),
+    }[name]
+    before = canvas.copy()
+    canvas = Image.new('RGBA', (1536, 1024))
+    for frame in job['ruter']:
+        tx0, ty0, tx1, ty1 = frame['synlig']
+        ox, oy = job['plassering']
+        x0, y0, x1, y1 = (ox+tx0)*4-3, (oy+ty0)*4-3, (ox+tx1)*4+3, (oy+ty1)*4+3
+        upper = before.crop((x0, y0, x1, source_anchor))
+        lower = before.crop((x0, source_anchor, x1, y1))
+        upper = upper.resize((x1-x0, target_anchor-y0), Image.Resampling.LANCZOS)
+        lower = lower.resize((x1-x0, y1-target_anchor), Image.Resampling.LANCZOS)
+        canvas.alpha_composite(upper, (x0, y0))
+        canvas.alpha_composite(lower, (x0, target_anchor))
+    record.append({'hjelm_kropp_feste_y': [source_anchor, target_anchor],
+                   'metode': 'To vertikale delskaleringer av nytegningen, uten originalmaske'})
+    a = np.array(canvas)
+    opaque = a[:, :, 3] >= 128
+    _, indices = ndimage.distance_transform_edt(~opaque, return_indices=True)
+    edge = (a[:, :, 3] > 0) & (a[:, :, 3] < 100)
+    a[:, :, :3][edge] = a[indices[0][edge], indices[1][edge], :3]
+    a[:, :, :3][a[:, :, 3] == 0] = 0
+    Image.fromarray(a).save(Path('jobber', name, 'resultat.png'))
+    (p / (name + '-plassering.json')).write_text(json.dumps(record, indent=2) + '\n')
+    preview = Image.new('RGBA', (1536, 1024), (96, 96, 96, 255))
+    preview.alpha_composite(Image.fromarray(a))
+    preview.convert('RGB').save(p / (name + '-kontroll-graa.png'))

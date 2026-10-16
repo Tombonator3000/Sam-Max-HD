@@ -1,0 +1,102 @@
+from pathlib import Path
+import json, hashlib
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image
+import numpy as np
+
+p = Path('rapporter/natt-fire-20261016-0517')
+jobs = ['fig247_02', 'fig247_03', 'fig247_04', 'fig247_05']
+motifs = {
+    'fig247_02': 'Fire sammensatte ruter med Sam som holder Max vannrett ut til siden. Sams grep under Max, hengende føtter, ørepositurer og fire kabelfaser er sammenlignet med originalen.',
+    'fig247_03': 'Seks ruter med Sam som holder den gylne nøkkelen foran brystet. Nøkkelskaftet peker til venstre. Ingen Max på dette arket. Nøkkelen og grepet er bevart i alle seks ruter.',
+    'fig247_04': 'Seks ruter med Sam som senker nøkkelen og legger den i lommen. Første rute viser nøkkelen fremover, andre og tredje senker den, fjerde har hånden på vei i lommen, femte og sjette har hånden i lommen. Synlig nøkkel, hånd og albue er kontrollert rute for rute.',
+    'fig247_05': 'Sju ruter med Sam som trekker hånden ut av lommen og senker den. De tre første har hånden i lommen, fjerde på vei ut, femte høyere hånd og sjette og sjuende senket hånd. Ingen Max eller synlig nøkkel på dette arket.',
+}
+now = datetime.now(ZoneInfo('Europe/Oslo')).isoformat()
+deliveries = []
+for name in jobs:
+    job = json.loads(Path('jobber', name, 'jobb.json').read_text())
+    file = Path('jobber', name, 'resultat.png')
+    a = np.array(Image.open(file).convert('RGBA'))
+    assert a.shape == (1024, 1536, 4)
+    routes = []
+    for r in job['ruter']:
+        x0, y0, x1, y1 = r['synlig']
+        ox, oy = job['plassering']
+        x0, y0, x1, y1 = (ox+x0)*4-8, (oy+y0)*4-8, (ox+x1)*4+8, (oy+y1)*4+8
+        ys, xs = np.where(a[y0:y1, x0:x1, 3] > 128)
+        assert len(xs)
+        routes.append({k:r[k] for k in ['bilde', 'kostyme', 'rute', 'lag', 'animasjon', 'retning']} | {'rect':[int(xs.min()+x0), int(ys.min()+y0), int(xs.max()-xs.min()+1), int(ys.max()-ys.min()+1)]})
+    mapfile = p / ('rutekart-' + name + '.json')
+    mapfile.write_text(json.dumps({name:{'ruter':routes}}, ensure_ascii=False, indent=2)+'\n')
+    checkfile = p / (name + '-egenkontroll.txt')
+    check = checkfile.read_text()
+    assert 'FEIL' not in check
+    status = 'SJEKK' if 'Utfall: SJEKK' in check else 'OK'
+    sha = hashlib.sha256(file.read_bytes()).hexdigest()
+    delivery = {'jobb':name, 'resultat':str(file), 'sha256':sha, 'forsok':1,
+                'egenkontroll':status, 'kontrollfil':str(checkfile), 'rutekart':str(mapfile),
+                'ruter':len(routes), 'visuelt_kontrollert_statisk':True, 'visuelt_godkjent':False,
+                'importert':False, 'motoravspilt':False, 'godkjent_av_Tom':False,
+                'klar_for_mottak':True, 'alfa':{'helt_gjennomsiktige_piksler':int((a[:,:,3]==0).sum()),
+                'myke_kantpiksler':int(((a[:,:,3]>0)&(a[:,:,3]<255)).sum())}}
+    deliveries.append(delivery)
+    limitation = ('Én rute, costume247_1926, får SJEKK på omriss med snitt/union avrundet til 0,75. Tre av fire ruter får OK. Den siste ruten må vurderes av Claude før godkjenning.' if status == 'SJEKK' else f'Alle {len(routes)} ruter får OK i egenkontrollen.')
+    note = f'''# {name}
+
+Dato: {now}
+
+Verktøy: innebygd image_gen.imagegen. Eksakt modellnavn vises ikke. Ett bildeforsøk. Pillow, numpy og scipy er brukt til den tillatte rensingen og presise plasseringen av nytegnet grafikk. Ingen programkode eller beskyttede jobbfiler er endret.
+
+Motiv: kostyme 247 i rom 48, VR-handlingen i Bumpusville. {motifs[name]} Sam har svart VR-hjelm, grønt ugjennomsiktig visir foran øynene og grå kabler over hodet. Originalen styrer motiv, palett, utstyr, tilstand og geometri. Godkjente hovedark/sam.png og hovedark/max.png styrer identitet og strek. Original_1x.png, referanse.png og begge hovedark er sett før nytegning.
+
+Promptens generiske fedora er et kjent feilpremiss. For ark03 til 05 er også den generiske beskrivelsen av begge figurer korrigert til bare Sam. Korrigert prompt er lagret separat i rapporten som korrigert-prompt-{name}.txt. Den beskyttede prompt.txt er uendret. Originalen er bilde én, Sams hovedark bilde to, Max sitt hovedark bilde tre. Nøkkelkonteksten er dokumentert i rapportens log.md med kilder.
+
+Nytegningens egne alfakomponenter er isolert, skalert og plassert til originalens synlig-bokser. Kabelpartiet og resten av figuren er høydejustert hver for seg ved hjelmens topp, slik at lange kabler ikke gjør kroppen for høy. Plasseringsoppskrift og kilde- og målbokser er bevart i rapporten. Originalmasken er ikke brukt til å klippe produksjonsgrafikken. Myk alfa fra nytegningen er bevart, svak løs bakgrunnssmitte er fjernet, og RGB langs svært myke kanter er renset. Hele lerretet er 1536 x 1024 med ekte alfa og tom nedre halvdel.
+
+Egenkontroll: {status}, ingen FEIL. {limitation} Kontroll kjørt med eksisterende /home/tom/Sam-Max-HD/.venv/bin/python3, fordi systemets python3 mangler numpy. Ingen installasjon er gjort. Utskrift: {checkfile}.
+
+Original og ferdig HD er sammenlignet statisk på {p}/{name}-sammenligning.png. Samme figuridentitet, hjelm, visir, rekvisittstatus og antall ruter er kontrollert. Indre konturer, kabelkurver og strekdetaljer er nytegnet og er ikke pikselidentiske med originalen. Rutekartet bruker faktisk alfa over 128. Timing, overganger mellom ark og motorvisning er ikke kontrollert i denne runden.
+
+Levert til mottakskontroll, ikke godkjent av Tom. Statisk visuell egenkontroll utført. Import og motoravspilling ikke utført. Claude må kontrollere mottak, palett, kontaktpunkter og sammenheng med fig247_01 før eventuell godkjenning.
+
+SHA-256: {sha}
+'''
+    Path('jobber', name, 'notat.md').write_text(note)
+
+summary = {'dato':now, 'gren':'gpt-arbeid', 'verktøy':'image_gen.imagegen',
+           'modell':'Ikke oppgitt av verktøyet', 'leveranser':deliveries,
+           'telling':{'levert':4, 'ruter':23, 'visuelt_kontrollert_statisk':4,
+           'egenkontroll_OK':3, 'egenkontroll_SJEKK':1, 'egenkontroll_FEIL':0,
+           'importert':0, 'motoravspilt':0, 'godkjent_av_Tom':0},
+           'utelatt':['lag083_01','lag083_02','lag083_03','lag083_04']}
+(p/'fremdrift.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2)+'\n')
+hashes = json.loads((p/'kildehash.json').read_text())
+assert all(hashlib.sha256(Path(f).read_bytes()).hexdigest()==sha for f,sha in hashes.items())
+(p/'beskyttede-filer-kontroll.json').write_text(json.dumps({'uendret':True, 'filer':len(hashes)},indent=2)+'\n')
+(p/'RAPPORT.md').write_text('''# Fire VR-figurark til mottak
+
+16. oktober 2026. Levert: fig247_02, fig247_03, fig247_04 og fig247_05, totalt 23 ruter. Alle har 1536 x 1024 RGBA med myk alfa. Egenkontroll: tre OK, ett SJEKK, ingen FEIL. fig247_02 har én rute til omrissvurdering, costume247_1926. Full sporing og rutekart finnes i fremdrift.json.
+
+Fire ark er statisk visuelt kontrollert av Codex. Null ark er importert eller avspilt i motoren i denne runden. Ingen ny godkjenning fra Tom påstås. Dette er leveranser til Claudes mottakskontroll.
+
+lag083_01 til lag083_04 er hoppet over fordi rom083 ikke er godkjent, og fordi feil palett og uavklart objekt835 allerede er dokumentert. Ingen nye skybilder er produsert.
+
+Sam bærer VR-hjelm og grønt visir i alle rutene. Ark02 viser Sam som holder Max, ark03 nøkkelen i hånden, ark04 innlegging i lommen og ark05 uttrekking av hånden. Korrigerte prompter ligger separat. Original og begge godkjente hovedark er sett før nytegning. Beskyttede filer er kontrollert uendret. Ett bildeforsøk per ark.
+
+Python er brukt til rensing og presis plassering etter Toms uttrykkelige tillatelse. Kabelparti og kropp er høydejustert ved hjelmens topp etter den første visuelle sammenligningen. Ingen originalsilhuett er brukt som produksjonsmaske. Råbilder, plasseringsdata, oppskrift, sammenligninger og egenkontroll er bevart her.
+
+Git pull var sperret av sandkassen fordi FETCH_HEAD ligger utenfor repoets skrivbare område. Ingen commit, push, grenbytte, PR eller kodeendring utføres. PR32-kontrollen er ikke gjentatt.
+''')
+(p/'todo.md').write_text('''# Til Claude
+
+Kontroller mottak av de fire arkene med rutekartene i denne rapporten. Vurder costume247_1926 separat på grunn av SJEKK for omriss. Kontroller kabelfaser, hjelmdesign, nøkkelgrep og overganger mot fig247_01. Arkene er ikke motoravspilt her.
+
+Ingen nye konkrete kodebehov er funnet under grafikkontrollen. Kontroll av den lille alfa-rettingen tilhører kodesporet og er ikke gjort i denne grafikkrunden.
+
+Behold sperren for lag083 inntil romgrunnlag, rom54-palett og objekt835 er avklart. Det gamle skygrunnlaget skal ikke brukes til ny produksjon.
+''')
+with (p/'log.md').open('a') as f:
+    f.write(f'\nFullført {now}: fire ark og 23 ruter levert, fire statisk visuelt kontrollert, null importert. Tre OK og ett SJEKK, ingen FEIL. Ingen kodeendring eller ny motor-/Tom-godkjenning.\n')
+print(json.dumps(summary['telling']))
