@@ -1,13 +1,7 @@
-# fig249_02
+# Fig249_02, Sam og separat munndel
 
-Dato: 2026-10-16T12:57:09+02:00, Codex.
+Resultat.png er gjenopprettet 16. oktober 2026 fra 1666a2c5, den tidligere godkjente nattleveransen. Det bevarer de seks gangerutene og lar den mangelfulle munndelen fortsatt holdes ute av teknisk mottak, slik som i publisert hd-mod a6c286bd.
 
-Sam i den virtuelle verdenen, rom49: sverdbevegelse, dragehjerte og nøkkel. Originalens kostyme249 styrer positur, palett og retninger; hovedark/sam.png er godkjent stilreferanse.
+Forsøket fra 417f4ff9, SHA 6fbad801be377128d974701423bd00474c3388bbcbe8147168be4351087915ee, fikk senere teknisk OK for munndelen, men motoravspilling av animasjon 4 viste harde pikseltrinn og dårlig skjøt med hodet. Det er ikke valgt til arbeidsmodden. Hele forsøksarket, notatet, native kandidat og motorbilde er bevart i rapporter/figurer-videre-20261016.
 
-Verktøy: innebygd image_gen. Intern bildemodell er ikke oppgitt. 2 bildekall knyttet til jobben, inkludert forkastede forsøk og eventuelle delbilder. Python brukt til rensing og nøyaktig plassering, etter Toms tidligere autorisasjon dokumentert i log.md 15. oktober. Hele lerretet er 1536 x 1024 med ekte alfa.
-
-Bare munndelen costume249_257 er endret. Seks gangruter er uendret mot godkjent HEAD. Direkte dekning 0,9034 og snitt/union 0,8833. Tidligere godkjenning gjelder gammel SHA; denne rettingen er ikke automatisk Tom-godkjent.
-
-Egenkontroll: OK. Se ../../rapporter/produksjon-20261016/fig249_02-egenkontroll.txt og sammenligningsbildet. Ingen motorimport eller spillavspilling utført. Råforsøk, endelige prompter, SHA og rutekart ligger i ../../rapporter/produksjon-20261016/.
-
-SHA-256: 6fbad801be377128d974701423bd00474c3388bbcbe8147168be4351087915ee
+Neste retting gjelder bare costume249_257. De seks gangerutene skal bevares, og munndelen må tegnes med myke kanter og ses sammen med hodet. Teknisk IoU alene er ikke visuell godkjenning. Ingen beskyttede jobbfiler er endret.
