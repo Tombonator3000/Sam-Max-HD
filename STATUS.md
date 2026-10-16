@@ -37,3 +37,7 @@ Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. 
 - Figuridentiteten: navnene i `docs/figurer.csv` kommer fra replikkene i skriptene. Den eneste som sto med «trolig» (kostyme 103), er bekreftet som Trixie fra skript 120.
 - Spillet er ikke spilt med skjerm og lyd her. Musikken går med Roland MT-32-emulering og ROM-filene fra spilldata (fra 14. oktober); testet uten lydkort (ROM-ene lastes, spillet går 1500 bilder uten feil), ikke hørt.
 - Nettsiden: eget repo finnes ikke, ikke bygget eller prøvd.
+
+## Ikonetterkontroll på nattgrenen, 2026-10-16 02:29
+
+Kode 6ea6d4b0 er Codex-kontrollert med 60 pipelinetester og brukt i hd-mod 8f3f82a7. Fire ikon01-bilder er sammenlignet med original og førbilder: kraftig magentaglorie redusert, alfa og størrelse uendret. Små grønne/lilla kantpiksler gjenstår på bilene og er ført til videre retting i todo.md. Før/etter-bilder og hasher er sikret lokalt. Dette er kontroll av PNG-filene, uten motoravspilling eller Toms stilgodkjenning. Nattens kode er ikke flettet til main eller bygget inn i nye Linux-/Windows-pakker.

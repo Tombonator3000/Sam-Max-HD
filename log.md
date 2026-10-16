@@ -625,3 +625,10 @@ Natt: kontroll av lag045_02, lag053_01_del1av2, lag053_02_del1av2 og lag068_01 f
 - lag068_01: avvist. Max-bitene i høyre kant (obj651_01) er større og går lenger inn enn i originalen, og veiene er flyttet opptil 2 px. Teksten Score: og Tim stemmer.
 - Fire rader i `docs/gpt-avvisninger.csv` med konkret grunn og forslag. Runden kjørt igjen, så returen står i ORDRE.md.
 - Levert 4, visuelt kontrollert 4, importert 0. Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 02:29 (Codex, separat ikonetterkontroll)
+
+- Kode 6ea6d4b0 er nå brukt i publisert hd-mod 8f3f82a7. Sammenlignet obj661_01, obj662_01, obj663_01 og obj670_01 i original, førkode-modd 48abf3c9 og ny modd. Sluttfilenes SHA-256 er bekreftet. Alfa og størrelse er identiske før/etter for alle fire; det er RGB som er endret.
+- Den kraftige magentaglorien er tydelig redusert. En RGB-terskel gir totalt 2332 synlige magentapiksler før og 332 etter; dette er en sammenligningsmåling, ikke antall beviste artefakter. Enkelte grønne/lilla kantpiksler er fortsatt synlige på bilene. Ikke godkjent som fullstendig pikselrent. Ikonarkene 07, 08 og 09 er også sett i oppdaterte mottaksforhåndsvisninger, uten åpenbar ny geometriendring; ingen ny stilgodkjenning.
+- Før/etterbilder, sammenligningspanel og kilder/hasher er sikret i Codex-arbeidsmappens output/natt-ikonfargelas-20261016. Todo er oppdatert med etterkontrollen og en konkret oppgave om kantrestene. Det tidligere kontrollpunktet for de tolv plasseringsrettingene er også kvittert ut: én sett av Claude, elleve av Codex.
+- Dette er dokumentasjon og videre oppgave, ingen kode- eller bildeendring i repoet. Grafikkagentens aktive filer i gpt-arbeid er ikke rørt. Ikke testet i spillet, ikke godkjent av Tom.
