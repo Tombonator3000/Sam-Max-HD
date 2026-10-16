@@ -831,3 +831,16 @@ Natt: retting etter Codex-kontroll av import_results-rettingen (1ec0d92f).
 - STATUS.md: raden HD-mod fra grafikeren har fått rettingen og testresultatet.
 - Lot koden være: Codex fant ingen funksjonelle feil.
 - `pytest` i pipeline: 65 grønne. `git diff --check` ren. Bare dokumentasjon endret.
+
+## 2026-10-16 07:47 (Claude)
+
+Natt: kontroll av fig116_05, fig116_06, fig116_07 og fig116_08 fra Codex (commit dddbe4ae8a i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 1075 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` e65d8457). Første fulle runde med import_results-rettingen (1ec0d92f); status.csv har levert for alle fire. RAPPORT.md: 94 figurark levert til figurmottaket. `myke.json` versjon 6: alle 27 nye ruter ok og i modden, snitt/union 0,83 til 0,96, tegnet mot 4x innen 0,8 prosent; 0 til gjennomsyn.
+- Sett med øynene: referanse.png ved siden av resultatet på grå bakgrunn for hele arket, og hodene forfra og i profil (fig116_05, 06, 08) og alligatorene i fig116_07 forstørret.
+- fig116_05 (5 ruter): godkjent. Sam forfra med hendene ned, så fire ruter bakfra fra stående til balanse på ett ben, samme arm- og fotstillinger.
+- fig116_06 (7 ruter): godkjent. Fire balansestillinger bakfra med armene ut, to stående bakfra og Sam i trekvart profil med snute og slips, som originalen.
+- fig116_07 (9 ruter): godkjent. Fem ruter uten alligator, fire med alligatoren under føttene på samme sted; alligatorhode, øye, rygg og hale som i originalen.
+- fig116_08 (6 ruter): godkjent. Sam i profil på alligatoren, fire bakfra på alligatoren og siste rute i luften uten alligator, som originalen.
+- Små 1x1-rester i arkene beholdt som i originalen. Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, godkjent 4, avvist 0, importert 4 (27 figurruter; modden har 1075 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
