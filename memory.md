@@ -105,3 +105,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
 
 - Kostyme 247: separat Codex-kontroll av hjelmutsnittene i alle 26 ruter fra fig247_01 til 05 avviser bare fig247_02 for manglende grønne kuppelbånd i alle fire ruter. De andre arkene er ikke avvist. Aktuell resultat-hash står i docs/gpt-avvisninger.csv. Ikke tell arket som ferdig før ny versjon er kontrollert. Bevis i output/natt-vr-design-20261016/fig247_02-for-retur i Codex-arbeidsmappen. Ingen grafikk eller beskyttet prompt er endret av kontrollen.
+
+
+- Native alfa-figurark går i import_results direkte til status levert uten manuell avvisning. myke-figurer håndhever avvist SHA og fjerner rutene, men ORDRE bygger på status.csv og mistet returen. Fig247_02 sin genererte status/retur.md er midlertidig korrigert etter kontroll. Varig kodeoppgave står øverst i todo: respekter manuell avvisning før alfa-handoff og test at ny SHA behandles normalt. Ingen beskyttet grafikkilde er endret.

@@ -4,6 +4,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [ ] Prioritert kodeoppgave: import_results i gpt.py hopper over manuelle avvisninger for figurark med ekte alfa og setter alltid status levert. myke-figurer utelater korrekt arket, men status.csv og ORDRE får ikke returen først. Rett med regresjon for avvist SHA og ny SHA, bevar skillet levert/godkjent. Codex skal kontrollere koden. Midlertidig er bare fig247_02 sin ordrestatus og retur.md rettet etter kontroll, mens kildene er uendret
+
 - [ ] Grafikkretur fig247_02: grønne bånd på VR-hjelmkuppelen mangler i fire ruter, mens original og andre kontrollerte ark har dem. Retur per kildehash i docs/gpt-avvisninger.csv, Codex 16. oktober. Bevar øvrig grafikk og kontroller fargene mellom arkene etter rettingen
 
 - [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
