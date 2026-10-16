@@ -1,0 +1,52 @@
+from pathlib import Path
+import json
+import numpy as np
+from PIL import Image
+from scipy import ndimage as nd
+p=Path('rapporter/natt-fire-20261016-0540')
+for name in ['fig247_06','fig247_07','fig247_08','fig247_09']:
+ job=json.loads(Path('jobber',name,'jobb.json').read_text())
+ a=np.array(Image.open(p/(name+'-raa.png')).convert('RGBA'))
+ labels,n=nd.label(a[:,:,3]>128)
+ parts=[]
+ for i,s in enumerate(nd.find_objects(labels)):
+  if s is not None and np.sum(labels[s]==i+1)>1000:parts.append((i+1,[s[1].start,s[0].start,s[1].stop,s[0].stop]))
+ parts.sort(key=lambda v:v[1][0]);assert len(parts)==len(job['ruter'])
+ orig=np.array(Image.open(Path('jobber',name,'referanse.png')).convert('RGB'))
+ canvas=Image.new('RGBA',(1536,1024));record=[]
+ for r,(label,box) in zip(job['ruter'],parts):
+  x0,y0,x1,y1=box;m=3
+  ex0,ey0=max(0,x0-m),max(0,y0-m);ex1,ey1=min(a.shape[1],x1+m),min(a.shape[0],y1+m)
+  piece=a[ey0:ey1,ex0:ex1].copy();local=labels[ey0:ey1,ex0:ex1]
+  keep=nd.binary_dilation(local==label,iterations=2)
+  piece[:,:,3][~keep]=0;piece[:,:,3][piece[:,:,3]>=250]=255
+  tx0,ty0,tx1,ty1=r['synlig'];ox,oy=job['plassering']
+  target=[(ox+tx0)*4,(oy+ty0)*4,(ox+tx1)*4,(oy+ty1)*4]
+  def anchor(arr,alpha=None):
+   v=arr.astype(float);green=(v[:,:,1]>v[:,:,0]*1.25)&(v[:,:,1]>v[:,:,2]*1.20)&(v[:,:,1]>45)
+   if alpha is not None:green &= alpha>128
+   rows=np.flatnonzero(green.sum(axis=1)>arr.shape[1]*.20)
+   assert len(rows)>0
+   return int(rows[0])
+  sa=anchor(piece[:,:,:3],piece[:,:,3]);ta=anchor(orig[target[1]:target[3],target[0]:target[2]])
+  if name=='fig247_06':ta=272-target[1]
+  # Separate vertical scaling at the green visor keeps the cable/body ratio fixed.
+  outw=target[2]-target[0]+6
+  upper=Image.fromarray(piece[:sa]).resize((outw,ta+3),Image.Resampling.LANCZOS)
+  lower=Image.fromarray(piece[sa:]).resize((outw,target[3]-target[1]-ta+3),Image.Resampling.LANCZOS)
+  dest=(target[0]-3,target[1]-3)
+  canvas.alpha_composite(upper,dest);canvas.alpha_composite(lower,(dest[0],target[1]+ta))
+  record.append({'bilde':r['bilde'],'kildeboks':box,'maalboks':target,'visir_feste_kilde_y':ey0+sa,'visir_feste_maal_y':target[1]+ta,'metode':'Nytegningens egen alfa, todelt skalering ved visiret, uten originalmaskeklipping'})
+ a=np.array(canvas);opaque=a[:,:,3]>=128
+ _,ix=nd.distance_transform_edt(~opaque,return_indices=True)
+ edge=(a[:,:,3]>0)&(a[:,:,3]<100)
+ a[:,:,:3][edge]=a[ix[0][edge],ix[1][edge],:3];a[:,:,:3][a[:,:,3]==0]=0
+ result=Image.fromarray(a);result.save(Path('jobber',name,'resultat.png'))
+ (p/(name+'-plassering.json')).write_text(json.dumps(record,indent=2)+'\n')
+ preview=Image.new('RGBA',(1536,1024),(96,96,96,255));preview.alpha_composite(result)
+ preview.convert('RGB').save(p/(name+'-kontroll-graa.png'))
+ compare=Image.new('RGB',(1536,1024),(96,96,96))
+ compare.paste(Image.open(Path('jobber',name,'referanse.png')).crop((0,0,1536,540)),(0,0))
+ compare.paste(preview.convert('RGB').crop((0,0,1536,540)),(0,520))
+ compare.save(p/(name+'-sammenligning.png'))
+ print(name,record)
