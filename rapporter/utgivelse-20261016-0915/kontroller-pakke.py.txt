@@ -1,0 +1,84 @@
+"""Kjør de eksisterende inventar-/glassprøvene mot den nedlastede Linux-pakken."""
+
+import concurrent.futures
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import time
+
+ROOT = Path(__file__).resolve().parent
+PACKAGE = ROOT / 'squashfs-root'
+DATA = PACKAGE / 'usr/share/sam-max-hd'
+SAVES = ROOT / 'saves'
+SAVES.mkdir(exist_ok=True)
+SOURCE_SAVES = ROOT.parent / 'feilrunde2-grunnlag/saves'
+for source in SOURCE_SAVES.glob('samnmax.s*'):
+    shutil.copy2(source, SAVES / source.name)
+
+scenes = [
+    ('inventory', 2, {'DIGHD_TEST_CLICKS': '80:10/185,160:210/30'}, 280),
+    ('akvarium', 1, {'DIGHD_TEST_ROOM': '16', 'DIGHD_TEST_AT': '10', 'DIGHD_TEST_CAMX': '320'}, 240),
+    ('cafeteria', 2, {'DIGHD_TEST_ROOM': '30', 'DIGHD_TEST_AT': '10'}, 240),
+]
+
+
+def run(scene):
+    label, slot, extra, frames = scene
+    target = ROOT / ('test-' + label)
+    home = target / 'home'
+    home.mkdir(parents=True, exist_ok=True)
+    env = {k: v for k, v in os.environ.items() if not k.startswith('DIGHD_')}
+    env.update({
+        'HOME': str(home), 'XDG_CONFIG_HOME': str(home / '.config'),
+        'XDG_DATA_HOME': str(home / '.local/share'), 'XDG_CACHE_HOME': str(home / '.cache'),
+        'SDL_VIDEODRIVER': 'dummy', 'SDL_AUDIODRIVER': 'dummy',
+        'DIGHD_QUIT_AT': str(frames), 'DIGHD_DUMP_DIR': str(target),
+        'DIGHD_DUMP_EVERY': '40', 'DIGHD_DUMP_FLAT': '1',
+        'DIGHD_VERIFY': '1', 'DIGHD_SHOW_MISSING': '0',
+    })
+    env.update(extra)
+    command = [str(PACKAGE / 'AppRun'), '--save-slot=' + str(slot),
+               '--savepath=' + str(SAVES), '--gfx-mode=surfacesdl', '--no-fullscreen',
+               '--gui-theme=builtin', '--music-driver=null', '--debuglevel=1']
+    started = time.monotonic()
+    with (target / 'scummvm.log').open('wb') as output:
+        try:
+            code = subprocess.run(command, env=env, stdout=output,
+                                  stderr=subprocess.STDOUT, timeout=60).returncode
+        except subprocess.TimeoutExpired:
+            code = 'timeout'
+    log = (target / 'scummvm.log').read_text(errors='replace')
+    verification = re.findall(r'DigHD: verify[^\n]+', log)
+    row = {'scene': label, 'exit': code, 'seconds': round(time.monotonic() - started, 1),
+           'rooms': re.findall(r'DigHD: room (\d+) loaded', log),
+           'dumps': len(list(target.glob('frame_*_room*.png'))),
+           'verify': verification[-3:],
+           'screen_differences': [int(x) for x in re.findall(
+               r'(\d+) screen pixels differ from the whole screen built again', log)]}
+    print(json.dumps(row), flush=True)
+    return row
+
+
+with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+    results = list(pool.map(run, scenes))
+
+mod = DATA / 'mods/gpt'
+info = {
+    'build': (DATA / 'BYGG.txt').read_text(),
+    'binary_sha256': hashlib.sha256((PACKAGE / 'usr/bin/scummvm').read_bytes()).hexdigest(),
+    'native_cels': len(list((mod / 'costumes').glob('*_hd.png'))),
+    'native_objects': len(list((mod / 'objects').glob('*_hd.png'))),
+    'held_mouth_native_absent': not (mod / 'costumes/costume249_257_hd.png').exists(),
+    'held_mouth_index_present': (mod / 'costumes/costume249_257_idx.png').is_file(),
+    'scenes': results,
+}
+info['rooms'] = len([p for p in (mod / 'rooms').glob('room*.png') if not p.stem.endswith('_idx')])
+(ROOT / 'kontroll.json').write_text(json.dumps(info, indent=2) + '\n')
+assert all(row['exit'] == 0 and row['dumps'] > 0 for row in results), 'En scene kjørte ikke ferdig'
+assert all(row['screen_differences'] and max(row['screen_differences']) == 0 for row in results), 'Skjermbuffer avviker'
+assert info['native_cels'] == 1095, 'Uventet antall native ruter'
+assert info['held_mouth_native_absent'] and info['held_mouth_index_present'], 'Munndelens kontrollstatus er ikke bevart'
