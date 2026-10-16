@@ -47,4 +47,4 @@ Sam091s åtte høydereturer skyldes ulike målebokser for original/HD når en l�
 
 ## HD-produksjon 2026-10-16T12:57:09+02:00
 
-Fem nye ark med32 ruter og én munndelretting levert til kontroll i gpt-arbeid. fig249_02 og fig249_04 har egenkontroll OK; fig249_05 til fig249_08 SJEKK. Ingen ny import eller motoravspilling. Se rapporter/produksjon-20261016/RAPPORT.md.
+Fem nye ark med 32 ruter og én munndelretting levert til kontroll i gpt-arbeid. fig249_02 og fig249_04 har egenkontroll OK; fig249_05 til fig249_08 SJEKK. Ingen ny import eller motoravspilling. Se rapporter/produksjon-20261016/RAPPORT.md.
