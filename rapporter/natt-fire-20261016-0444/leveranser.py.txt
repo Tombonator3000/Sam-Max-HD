@@ -1,0 +1,96 @@
+from pathlib import Path
+from datetime import datetime
+import json,hashlib,subprocess
+import numpy as np
+from PIL import Image
+
+p=Path('rapporter/natt-fire-20261016-0444')
+now=datetime.now().astimezone().isoformat()
+jobs=['lag071_05','lag071_15','fig007_02','fig247_01']
+entries=[]
+for name in jobs:
+ d=Path('jobber')/name
+ run=subprocess.run(['/home/tom/Sam-Max-HD/.venv/bin/python3','verktoy/sjekk_leveranse.py',str(d/'resultat.png')],capture_output=True,text=True)
+ (p/f'{name}-egenkontroll.txt').write_text(run.stdout+run.stderr)
+ assert run.returncode<2,(name,run.stdout,run.stderr)
+ status='OK' if run.returncode==0 else 'SJEKK'
+ sha=hashlib.sha256((d/'resultat.png').read_bytes()).hexdigest()
+ entry={'jobb':name,'resultat':str(d/'resultat.png'),'sha256':sha,'forsok':1 if name.startswith('lag') else 2,'egenkontroll':status,'kontrollfil':str(p/f'{name}-egenkontroll.txt'),'visuelt_kontrollert_statisk':True,'visuelt_godkjent':False,'importert':False,'motoravspilt':False,'godkjent_av_Tom':False,'klar_for_mottak':True}
+ if name.startswith('fig'):
+  j=json.loads((d/'jobb.json').read_text()); a=np.array(Image.open(d/'resultat.png').convert('RGBA')); ruter=[]
+  for f in j['ruter']:
+   x0,y0,x1,y1=f['synlig'];ox,oy=j['plassering'];wx0=max(0,(ox+x0-4)*4);wy0=max(0,(oy+y0-4)*4);wx1=min(1536,(ox+x1+4)*4);wy1=min(1024,(oy+y1+4)*4)
+   ys,xs=np.nonzero(a[wy0:wy1,wx0:wx1,3]>128);assert len(xs)>0
+   rec={k:f[k]for k in ['bilde','kostyme','rute','lag','animasjon','retning']};rec['rect']=[int(wx0+xs.min()),int(wy0+ys.min()),int(xs.max()-xs.min()+1),int(ys.max()-ys.min()+1)];ruter.append(rec)
+  (p/f'rutekart-{name}.json').write_text(json.dumps({name:{'ruter':ruter}},ensure_ascii=False,indent=2)+'\n')
+  entry['rutekart']=str(p/f'rutekart-{name}.json');entry['ruter']=len(ruter)
+  entry['alfa']={'helt_gjennomsiktige_piksler':int((a[:,:,3]==0).sum()),'myke_kantpiksler':int(((a[:,:,3]>0)&(a[:,:,3]<255)).sum())}
+ entries.append(entry)
+
+common=f'''Dato: {now}
+
+Verktøy: image_gen.imagegen, innebygd bildeverktøy. Eksakt modellnavn vises ikke. To bildeforsøk i denne runden. Pillow, numpy og scipy er brukt til tillatt rensing og presis plassering av nytegnet grafikk. Ingen programkode eller beskyttede jobbfiler er endret.
+
+AGENTS.md, BESTILLING.md, ORDRE.md, ANALYSE.md, GJENNOMGANG.md og nattoverleveringen er lest. Remake-skillen er lest fra lokal main. Original_1x.png og referanse.png er sett før nytegning sammen med de godkjente hovedarkene. Kildesjekksummer står i rapportens kildehash.json.
+'''
+notes={
+'fig007_02':'''Motiv: Sam, kostyme 7. Arket har 13 snakkehoder mot oss, to hoder bakfra, fem ruter med to separate hånddeler hver og fem hele Sam-positurer. Dette er 25 ruter, ikke 30 selv om hånddelene ligger adskilt. Retninger, rute-ID og lag følger jobb.json. Hatt, snute, ører, dress, slips og føtter er kontrollert mot hovedark/sam.png. Originalen bestemmer farger, munnformer og kontaktpunkter.
+
+Prompt.txt beskriver hele arket som kropp uten hode, men originalen viser også hoder og hele figurer. Denne påviste feilen er rettet i separat korrigert-prompt-fig007_02.txt, uten å endre jobbfilen. Bilde én var originalreferansen, bilde to hovedark/sam.png. Første bildeforsøk hadde åpne munner med tunge og tenner i første og tredje kroppspositur. Andre forsøk rettet disse til originalens lukkede munn. Bare de to lokale munnområdene fra forsøket er satt inn i det ferdig plasserte arket. Sluttbildets leppekant er kontrollert for rester av tenner.
+
+Hver nytegnet rute er plassert etter originalens synlig-boks. De to hånddelene er plassert hver for seg etter sine egne originale bokser og mellomrom. Ingen del er fullført eller speilvendt. Egen generert alfa er beholdt med myke kanter, og svakt bakgrunnssmitte er renset i RGB langs kanten. Originalens trappemaske er ikke brukt til klipping. Etterarbeidsoppskrifter og faktiske transformasjoner ligger i rapporten.
+
+Egenkontroll: OK, 25 av 25 ruter OK. Statisk visuell kontroll omfatter alle ruter, forskjellene i munnform, hånddeler og de fem kroppene med hode samlet. Løse hoder er ikke montert på kropp og avspilt i motoren. Rutekart-fig007_02.json viser faktisk boks for alfa over 128, ikke en antatt standardrute.''',
+'fig247_01':'''Motiv: Sam og Max under en VR-handling, kostyme 247, rom 48. Tre sammensatte ruter med Sam som holder Max. Sam har svart VR-hjelm, grønt visir som skjuler øynene og lange grå kabler. Max står oppreist i første og tredje rute og ligger vannrett i midtruten. Det brune håndpartiet under Max sin munn i midtruten finnes også i originalen og er beholdt. Kablenes tre ulike positurer er kontrollert mot originalen. Hovedark/sam.png og hovedark/max.png bestemmer figuridentitet og strek, mens originalen bestemmer utstyret og den aktuelle posen.
+
+Første forsøk brukte prompt.txt ordrett med originalen som bilde én og hovedarkene som bilde to og tre. Det fikk feilaktig Sams vanlige hatt og manglet VR-utstyret. Forsøket er forkastet. Den generiske beskrivelsen av fedora i prompten er erstattet med korrekt hjelmbeskrivelse i separat korrigert-prompt-fig247_01.txt. Beskyttet prompt.txt er uendret. Andre bildeforsøk har hjelm, visir, kabler og alle tre positurer.
+
+De tre komplette nytegningene er skalert og plassert til sine originale synlig-bokser. Egen generert myk alfa er beholdt. Løs bakgrunnssmitte er renset i RGB langs kanten, uten originalmaskeklipping. Plasseringsoppskriften og kilde- og målbokser er bevart i rapporten.
+
+Egenkontroll: SJEKK, ingen FEIL. Alle tre ruter er 100 prosent av originalens bredde og høyde. Midtpunktene avviker 0,1 til 0,3 originalpiksler. Snitt/union for omriss er henholdsvis 0,75, 0,70 og 0,72, slik at alle tre må vurderes av Claude. Ytre rutemål er riktige, men de indre silhuettene og kontaktpunktene er ikke pikselidentiske med originalen. Dette er en kandidat til mottakskontroll, ikke en godkjent leveranse. Rutekart-fig247_01.json viser faktisk alfa over 128.'''}
+for entry in entries:
+ if not entry['jobb'].startswith('fig'):continue
+ name=entry['jobb']
+ note=f'''# {name}
+
+{common}
+{notes[name]}
+
+Kontroll kjørt med eksisterende /home/tom/Sam-Max-HD/.venv/bin/python3 fordi systemets python3 mangler numpy. Ingen installasjon er gjort. Full utskrift: {entry['kontrollfil']}.
+
+Statisk visuelt kontrollert av Codex: ja. Import: ikke utført i denne runden. Motoravspilling: ikke utført. Toms godkjenning: ikke innhentet. Claude må kontrollere mottak, sammensetting og hele animasjonen i spillet før eventuell godkjenning.
+
+SHA-256: {entry['sha256']}
+'''
+ (Path('jobber')/name/'notat.md').write_text(note)
+
+progress={'dato':now,'gren':'gpt-arbeid','verktøy':'image_gen.imagegen','modell':'Ikke oppgitt av verktøyet','leveranser':entries,'telling':{'levert':4,'visuelt_kontrollert_statisk':4,'egenkontroll_OK':3,'egenkontroll_SJEKK':1,'importert':0,'motoravspilt':0,'godkjent_av_Tom':0},'utelatt':['lag083_01','lag083_02','lag083_03','lag083_04']}
+(p/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+(p/'RAPPORT.md').write_text('''# Fire grafikkjobber, nattrunde 16. oktober 2026 klokken 04:44
+
+Levert: 4. Statisk visuelt kontrollert av Codex: 4. Egenkontroll OK: 3. Egenkontroll SJEKK: 1. Importert i denne økten: 0. Motoravspilt: 0. Godkjent av Tom: 0.
+
+Rekkefølge: lag071_05, lag071_15, fig007_02, fig247_01. Lag083_01 til lag083_04 er utelatt fordi ORDRE.md krever godkjent rom083, mens status.csv viser sjekk. ANALYSE.md advarer dessuten om gammel skybeskrivelse og feil palett. Se log.md.
+
+Retur lag071_05 er rettet: skiltet viser dollartegn, stort 1-tall, hevet 00 og EACH. Pil og PUSH ME! er fjernet fra skiltet. Bare den nye skiltflaten er satt inn, resten er identisk med forrige leveranse. Retur lag071_15 er rettet: lange hårstrå dekker øynene, med lyse ansiktsstriper mellom. Resten er bevart. Begge har OK i egenkontrollen.
+
+Fig007_02 har 25 ruter med ekte alfa. Første forsøk fikk tunge og tenner i to kroppspositurer som skal ha lukket munn. Dette er rettet med bildeverktøyet. Alle 25 ruter har OK i sluttkontrollen. Kontroller sammensetting og hele animasjonen i mottaket.
+
+Fig247_01 har tre ruter med ekte alfa. Første forsøk med den ordrette, generiske fedora-prompten ga feil hatt og ble forkastet. Andre forsøk viser riktig VR-hjelm, grønt visir og kabler. Det er levert som SJEKK for omriss: snitt/union 0,75, 0,70 og 0,72. Alle ruter har riktig bredde og høyde, men de indre silhuettene og kontaktpunktene er ikke pikselidentiske. Ikke marker arket godkjent uten Claudes vurdering. Det brune håndpartiet under Max sin munn i midtruten finnes også i originalen.
+
+Resultat.png og notat.md ligger i hver jobbmappe. Fremdrift.json har SHA-256 og skiller levering, statisk visuell kontroll, import og motoravspilling. Begge figurark har rutekart med faktisk alfa over 128. Rå bildeforsøk, korrigerte promper, plasseringsdata, etterarbeidsoppskrifter og kontrollbilder er bevart her. Kontrollbilder fra mellomstadier skal leses som historikk, ikke som den siste leveransen.
+
+Git pull ble forsøkt på gpt-arbeid, men Git-metadataenes FETCH_HEAD ligger utenfor skrivbar sandkasse. Ingen commit, push, grenbytte, PR, fletting eller historieendring. Systemets python3 mangler numpy, så kontrollen brukte prosjektets eksisterende .venv uten installasjon. Ingen kode er endret. PR32 og fig091_03 til fig091_05 er ikke kontrollert eller tegnet om på nytt. Kildesjekksummer står i kildehash.json; beskyttede jobbfiler er uendret.
+
+Ingen konkrete kodefeil som hindrer grafikkimport er funnet i denne runden. Se todo.md for mottaksbehov. Ingen resultatfil er godkjent av Tom eller verifisert i motoren her.
+''')
+(p/'todo.md').write_text('''# Til Claude etter denne runden
+
+1. Kontroller og importer de to returrettelsene, med riktig objektstilstand og utsnitt.
+2. Kontroller fig007_02 med kropp og løse hodedeler samlet, og se hele animasjonen.
+3. Vurder fig247_01 separat. Egenkontrollen har SJEKK for omriss i alle tre ruter selv om mål og plassering består. Kontroller grep, kropp, hjelm og kabler før godkjenning eller import.
+4. Rom083-lagene venter på godkjent bakgrunn og avklart grunnlag som beskrevet i ANALYSE.md.
+
+Ingen nye kodebehov er påvist. Ingen ny PR32-kontroll eller funksjonsutvikling er utført.
+''')
+print(json.dumps(progress['telling'],ensure_ascii=False))

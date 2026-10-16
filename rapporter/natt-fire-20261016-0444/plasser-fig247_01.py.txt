@@ -1,0 +1,39 @@
+from pathlib import Path
+import json
+import numpy as np
+from PIL import Image
+from scipy import ndimage
+
+p=Path('rapporter/natt-fire-20261016-0444')
+j=json.loads(Path('jobber/fig247_01/jobb.json').read_text())
+a=np.array(Image.open(p/'fig247_01-nytegning2.png').convert('RGBA'))
+labels,n=ndimage.label(a[:,:,3]>128)
+components=[]
+for i,s in enumerate(ndimage.find_objects(labels)):
+    if s is not None and np.sum(labels[s]==i+1)>1000:
+        components.append({'label':i+1,'box':[s[1].start,s[0].start,s[1].stop,s[0].stop]})
+components.sort(key=lambda c:c['box'][0])
+assert len(components)==3
+canvas=Image.new('RGBA',(1536,1024));record=[]
+for frame,c in zip(j['ruter'],components):
+    x0,y0,x1,y1=c['box'];margin=3
+    piece=a[y0-margin:y1+margin,x0-margin:x1+margin].copy()
+    local=labels[y0-margin:y1+margin,x0-margin:x1+margin]
+    keep=ndimage.binary_dilation(local==c['label'],iterations=2)
+    piece[:,:,3][~keep]=0
+    piece[:,:,3][piece[:,:,3]>=250]=255
+    crop=Image.fromarray(piece)
+    tx0,ty0,tx1,ty1=frame['synlig'];ox,oy=j['plassering']
+    target=[(ox+tx0)*4,(oy+ty0)*4,(ox+tx1)*4,(oy+ty1)*4]
+    scale=((target[2]-target[0])/(x1-x0),(target[3]-target[1])/(y1-y0))
+    crop=crop.resize((round(crop.width*scale[0]),round(crop.height*scale[1])),Image.Resampling.LANCZOS)
+    xy=(round(target[0]-margin*scale[0]),round(target[1]-margin*scale[1]))
+    canvas.alpha_composite(crop,xy)
+    record.append({'bilde':frame['bilde'],'kildeboks':c['box'],'maalboks':target,'skala':scale,'plassering':xy})
+a=np.array(canvas);opaque=a[:,:,3]>=128
+_,indices=ndimage.distance_transform_edt(~opaque,return_indices=True)
+edge=(a[:,:,3]>0)&(a[:,:,3]<100)
+a[:,:,:3][edge]=a[indices[0][edge],indices[1][edge],:3]
+a[:,:,:3][a[:,:,3]==0]=0
+Image.fromarray(a).save('jobber/fig247_01/resultat.png')
+(p/'fig247_01-plassering.json').write_text(json.dumps(record,indent=2)+'\n')

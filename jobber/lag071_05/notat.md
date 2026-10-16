@@ -1,21 +1,15 @@
-# lag071_05
+# lag071_05, retur rettet
 
-Dato: 2026-10-16T04:23:52.797027+02:00
+Dato: 2026-10-16T04:46:34.057124+02:00
 
-Verktøy: image_gen.imagegen, innebygd bildeverktøy. Eksakt modellnavn ble ikke vist. Antall bildeforsøk: 1. Python med Pillow, numpy og scipy er brukt til tillatt rensing og plassering.
+Verktøy: image_gen.imagegen, innebygd bildeverktøy. Eksakt modellnavn er ikke oppgitt. Ett nytt bildeforsøk i denne runden, etter det tidligere avviste forsøket.
 
-## Grunnlag
+Original_1x.png og referanse.png er sett sammen med godkjent jobber/rom071/resultat.png før tegning. Motiv: påkledningsspillet, Sam med høy hatt, frakk, seler og kasse, Max i rød og gullfarget drakt. Ressurser obj719_01, obj741_01 og obj749_01. Retur.md avklarer den aktuelle tilstanden: kassen har dollartegn, stort 1-tall, hevet 00 og EACH. Den har ingen pil eller PUSH ME!.
 
-Paakledningsspillet, obj719_01, obj741_01 og obj749_01. Sam har frakk med seler og kasse med PUSH ME!, samt hoy hatt. Max har rod og gullfarget drakt med svarte sko. Originalen bestemmer draktdeler og plassering; rom071/resultat.png bestemmer strek og lys.
+Prompt.txt har feil skilttekst for denne tilstanden. Beskyttet fil er beholdt. Korrigert prompt er lagret i rapportens korrigert-prompt-lag071_05.txt. Bilde én var originalreferansen, bilde to godkjent rom071, bilde tre forrige HD-bilde som avgrenset redigeringsgrunnlag. Bare skiltflaten fra nytegningen er satt inn med Pillow. Alt utenfor skiltpolygonet er identisk med forrige resultat, også de øvrige godkjente kostymedelene. Ingen originalmaske er brukt til pikselklipping.
 
-Original_1x.png og referanse.png er sett før nytegning, sammen med stilreferansen. ANALYSE.md, GJENNOMGANG.md og remake-skillen fra lokal main er lest. Prompt.txt ble brukt ordrett i første forsøk. Beskyttede jobbfiler er uendret.
+Egenkontroll: OK, skift 0,04 px, blokkavvik 0,12 px og kantlikhet 0,97. Systemets python3 mangler numpy; eksisterende prosjektmiljø /home/tom/Sam-Max-HD/.venv/bin/python3 er brukt uten installasjon. Kontrollutskrift ligger i rapporter/natt-fire-20261016-0444/lag071_05-egenkontroll.txt.
 
-## Etterarbeid
+Statisk visuell kontroll: skiltet viser riktig pris og EACH, uten pil. Resten av bildet er bevart. Import: ikke utført. Motoravspilling: ikke utført. Toms godkjenning: ikke innhentet. Claude må kontrollere mottak og tilstandsskifte.
 
-Ett bildeforsok. Python renset bare rammen utenfor romutsnittet til flat #808080. Ingen flytting eller skalering av rommet eller kostymedelene.
-
-## Kontroll og usikkerhet
-
-Egenkontroll: OK. Se [lag071_05-egenkontroll.txt](../../rapporter/natt-fire-20261016-0406/lag071_05-egenkontroll.txt). Resultatet er sammenlignet statisk med original og stilreferanse. Størrelse, retning, motiv og synlige tilstander er kontrollert som enkeltbilder. Ingen motoravspilling, import eller ny godkjenning fra Tom er utført. Claude må kontrollere sammensetting og tilstandsskifte i mottaket. Ingen uavklart motivbetydning ble brukt som nytt designgrunnlag.
-
-SHA-256 resultat: `2e771314c25004f0865253161eafb937807d408b11a7f497c7d19b4cd099a9fd`.
+SHA-256: 13e1ba236351b286a5d7a7674db80d4832c0b29701e61964986fc02a486f6a31

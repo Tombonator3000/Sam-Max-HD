@@ -1,21 +1,15 @@
-# lag071_15
+# lag071_15, retur rettet
 
-Dato: 2026-10-16T04:23:52.797027+02:00
+Dato: 2026-10-16T04:47:54.886010+02:00
 
-Verktøy: image_gen.imagegen, innebygd bildeverktøy. Eksakt modellnavn ble ikke vist. Antall bildeforsøk: 1. Python med Pillow, numpy og scipy er brukt til tillatt rensing og plassering.
+Verktøy: image_gen.imagegen. Eksakt modellnavn vises ikke. Ett nytt bildeforsøk i denne runden etter det tidligere avviste forsøket.
 
-## Grunnlag
+Original_1x.png og referanse.png er sett sammen med godkjent jobber/rom071/resultat.png før tegning. Motiv: påkledningsspillet, obj735_01 og obj764_01. Sam holder den gylne runde rekvisitten med kors. Max har svart parykk og gullringer på øret til høyre i bildet. Retur.md presiserer at lange svarte hårstrå dekker øynene ned mot tennene, med lyse ansiktsstriper mellom. Ingen øyne skal synes.
 
-Paakledningsspillet, obj735_01 og obj764_01. Sam holder den gylne runde rekvisitten med kors. Max har svart piggete haar og gullringer paa det hoyre oret i bildet. Originalen bestemmer delene, og godkjent rom071/resultat.png bestemmer strek og lys.
+Prompt.txt ble brukt ordrett med returrettelsen lagt til. Hele verktøyprompten finnes i rapporter/natt-fire-20261016-0444/prompt-lag071_15.txt. Bilde én var originalreferansen, bilde to godkjent rom071, bilde tre forrige HD-bilde som avgrenset redigeringsgrunnlag. Pillow satte bare den nytegnede luggen over pannen og øynene, med en smal myk skjøt. Den øvrige parykken, ører med gullringer, tennene, kroppen og Sam med rekvisitten er bevart fra forrige leveranse. Ingen originalmaske er brukt til pikselklipping.
 
-Original_1x.png og referanse.png er sett før nytegning, sammen med stilreferansen. ANALYSE.md, GJENNOMGANG.md og remake-skillen fra lokal main er lest. Prompt.txt ble brukt ordrett i første forsøk. Beskyttede jobbfiler er uendret.
+Egenkontroll: OK, skift 0,07 px, blokkavvik 0,11 px og kantlikhet 0,94. Kontroll kjørt med eksisterende /home/tom/Sam-Max-HD/.venv/bin/python3 fordi systemets python3 mangler numpy. Ingen installasjon. Full utskrift finnes i rapportens lag071_15-egenkontroll.txt.
 
-## Etterarbeid
+Statisk visuell kontroll: lange hårstrå over begge øyeplasseringene, lyse ansiktsstriper og ingen synlige øyne. Import: ikke utført. Motoravspilling: ikke utført. Toms godkjenning: ikke innhentet. Claude må kontrollere mottak og tilstandsskifte.
 
-Ett bildeforsok. Python renset bare rammen utenfor romutsnittet til flat #808080. Ingen flytting eller skalering av rommet eller kostymedelene.
-
-## Kontroll og usikkerhet
-
-Egenkontroll: OK. Se [lag071_15-egenkontroll.txt](../../rapporter/natt-fire-20261016-0406/lag071_15-egenkontroll.txt). Resultatet er sammenlignet statisk med original og stilreferanse. Størrelse, retning, motiv og synlige tilstander er kontrollert som enkeltbilder. Ingen motoravspilling, import eller ny godkjenning fra Tom er utført. Claude må kontrollere sammensetting og tilstandsskifte i mottaket. Ingen uavklart motivbetydning ble brukt som nytt designgrunnlag.
-
-SHA-256 resultat: `7d425bf4dc48d1837e84f5b1730258836bc41b1035c67566042069af323a8189`.
+SHA-256: 4dcfe00989531a5b89a21e0d6bd77a68db7a93e1bc01cdfffdfeae18589ad3d8

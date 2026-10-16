@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFilter
+from scipy import ndimage
+import numpy as np
+
+p=Path('rapporter/natt-fire-20261016-0444')
+old=Image.open('jobber/fig007_02/resultat.png').convert('RGBA')
+new=Image.open(p/'fig007_02-munnretting-plassert.png').convert('RGBA')
+old.save(p/'fig007_02-for-munnretting.png')
+mask=Image.new('L',old.size)
+d=ImageDraw.Draw(mask)
+d.polygon([(131,601),(157,603),(211,612),(211,630),(190,635),(157,635),(137,621)],fill=255)
+d.polygon([(511,612),(535,615),(587,625),(587,633),(572,637),(538,636),(515,628)],fill=255)
+mask=mask.filter(ImageFilter.GaussianBlur(1.2))
+rgb=Image.composite(new,old,mask)
+a=np.array(rgb)
+# Rens farget bakgrunnssmitte i halvtransparente kantpiksler uten å endre alfa.
+opaque=a[:,:,3]>=128
+_,indices=ndimage.distance_transform_edt(~opaque,return_indices=True)
+edge=(a[:,:,3]>0)&(a[:,:,3]<100)
+a[:,:,:3][edge]=a[indices[0][edge],indices[1][edge],:3]
+a[:,:,:3][a[:,:,3]==0]=0
+Image.fromarray(a).save('jobber/fig007_02/resultat.png')
