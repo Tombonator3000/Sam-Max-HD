@@ -1,0 +1,70 @@
+from pathlib import Path
+from PIL import Image, ImageFilter
+import numpy as np
+
+r = Path('rapporter/natt-fire-0322-20261016')
+
+# Bok: bare den manglende grå ryggen, resten av forrige leveranse beholdes.
+im = Image.open(r/'lag045_02-forrige-resultat.png').convert('RGB')
+n = Image.open(r/'lag045_02-forsok1.png').convert('RGB')
+im.paste(n.crop((240,276,252,328)).resize((16,52),Image.Resampling.LANCZOS),(252,276))
+im.save('jobber/lag045_02/resultat.png')
+
+# Gjester: munn og nese fra nærtegningen, og armen i riktig retning.
+n = Image.open(r/'lag053_02_del1av2-forsok2.png').convert('RGB').resize((240,160),Image.Resampling.LANCZOS)
+im = Image.open(r/'lag053_02_del1av2-forrige-resultat.png').convert('RGB')
+for x,y,w,h,feather in [(872,584,48,48,5),(928,592,96,64,8)]:
+    part = n.crop((x-816,y-528,x-816+w,y-528+h))
+    yy,xx = np.mgrid[:h,:w]
+    a = np.minimum.reduce([xx,yy,w-1-xx,h-1-yy])
+    a = (np.clip(a/feather,0,1)*255).astype('uint8')
+    im.paste(part,(x,y),Image.fromarray(a))
+im.save('jobber/lag053_02_del1av2/resultat.png')
+
+# Stolper: bare de to objektrektanglene erstattes.
+im = Image.open(r/'lag068_01-forrige-resultat.png').convert('RGB')
+n = Image.open(r/'lag068_01-forsok1.png').convert('RGB')
+for box in [(1088,464,1184,624),(1184,464,1280,624)]:
+    im.paste(n.crop(box),box[:2])
+im.save('jobber/lag068_01/resultat.png')
+
+# Veilag: nytegnet omriss og detalj, med originalens grove fargefelt.
+base = Image.open('jobber/rom068/resultat.png').convert('RGB')
+im = base.copy()
+g = Image.open(r/'lag068_05-forsok1.png').convert('RGB')
+o = Image.open('jobber/lag068_05/referanse.png').convert('RGB')
+for box in [(384,592,1152,688),(576,496,960,560)]:
+    n = np.asarray(g.crop(box)).astype(float)
+    s = np.asarray(o.crop(box)).astype(float)
+    ma = (n[:,:,2]-n[:,:,0]>3)&(n[:,:,2]>20)
+    sm = (s[:,:,2]-s[:,:,0]>3)&(s[:,:,2]>20)
+    wt = np.asarray(Image.fromarray(np.uint8(sm)*255).filter(ImageFilter.GaussianBlur(8))).astype(float)/255
+    prem = np.asarray(Image.fromarray(np.uint8(s*sm[:,:,None])).filter(ImageFilter.GaussianBlur(8))).astype(float)
+    col = prem/np.maximum(wt[:,:,None],.001)
+    detail = n-np.asarray(g.crop(box).filter(ImageFilter.GaussianBlur(8))).astype(float)
+    a = np.asarray(Image.fromarray(np.uint8(ma)*255).filter(ImageFilter.GaussianBlur(.35))).astype(float)/255
+    out = np.asarray(base.crop(box)).astype(float)*(1-a[:,:,None])+np.clip(col+.25*detail,0,255)*a[:,:,None]
+    im.paste(Image.fromarray(np.uint8(np.clip(out,0,255))),box[:2])
+
+# Den gule streken er en egen fargeflate innenfor den nye veien.
+box = (576,496,960,560)
+n = np.asarray(g.crop(box)).astype(float)
+s = np.asarray(o.crop(box)).astype(float)
+out = np.asarray(im.crop(box)).astype(float)
+m = (n[:,:,0]>65)&(n[:,:,1]>60)&(n[:,:,2]<n[:,:,0]*.6)
+sm = (s[:,:,0]>60)&(s[:,:,1]>60)&(s[:,:,2]<s[:,:,0]*.6)
+color = np.median(s[sm],axis=0)+.15*(n-n[m].mean(axis=0))
+a = np.asarray(Image.fromarray(np.uint8(m)*255).filter(ImageFilter.GaussianBlur(.35))).astype(float)/255
+out = out*(1-a[:,:,None])+np.clip(color,0,255)*a[:,:,None]
+im.paste(Image.fromarray(np.uint8(np.clip(out,0,255))),box[:2])
+
+# De to fjerne veifeltene beholder nytegnet kant og originalens nesten svarte tone.
+box = (704,432,832,464)
+n = np.asarray(g.crop(box)).astype(float)
+b = np.asarray(base.crop(box)).astype(float)
+m = (n[:,:,0]<90)&(n[:,:,1]<90)&(n[:,:,2]<90)
+m[-3:] = m[-4:-3]
+a = np.asarray(Image.fromarray(np.uint8(m)*255).filter(ImageFilter.GaussianBlur(.25))).astype(float)/255
+out = b*(1-a[:,:,None])+(n*.4)*a[:,:,None]
+im.paste(Image.fromarray(np.uint8(out)),box[:2])
+im.save('jobber/lag068_05/resultat.png')
