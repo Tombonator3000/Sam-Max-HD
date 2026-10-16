@@ -1,0 +1,53 @@
+from pathlib import Path
+import hashlib
+import json
+import numpy as np
+from PIL import Image
+from scipy import ndimage as nd
+
+root = Path(__file__).resolve().parents[2]
+report = root / 'rapporter/figurer-videre-20261016'
+jobdir = root / 'jobber/fig001_01'
+assert not (jobdir / 'resultat.png').exists(), 'Bevar eksisterende leveranse'
+job = json.loads((jobdir / 'jobb.json').read_text())
+rgba = np.asarray(Image.open(report / 'fig001_01-raa01.png').convert('RGBA')).copy()
+labels, count = nd.label(rgba[:, :, 3] > 220)
+sizes = np.bincount(labels.ravel())
+ids = [int(i) for i in np.argsort(sizes[1:])[-1:] + 1]
+assert len(ids) == 1 and all(sizes[i] > 10000 for i in ids)
+boxes = nd.find_objects(labels)
+ids.sort(key=lambda i: (0 if boxes[i - 1][0].start < 500 else 1, boxes[i - 1][1].start))
+
+output = Image.new('RGBA', tuple(job['lerret']))
+maps = []
+for cel, component in zip(job['ruter'], ids):
+    core = labels == component
+    distance, nearest = nd.distance_transform_edt(~core, return_indices=True)
+    keep = distance <= 1.5
+    cut = rgba.copy()
+    cut[:, :, 3][~keep] = 0
+    edge = keep & ~core
+    cut[:, :, :3][edge] = rgba[nearest[0][edge], nearest[1][edge], :3]
+    image = Image.fromarray(cut)
+    box = image.getchannel('A').point(lambda a: 255 if a > 128 else 0).getbbox()
+    x0, y0, x1, y1 = cel['synlig']
+    dx = (job['plassering'][0] + x0) * 4
+    dy = (job['plassering'][1] + y0) * 4
+    width, height = (x1 - x0) * 4, (y1 - y0) * 4
+    sprite = image.crop(box).resize((width, height), Image.Resampling.LANCZOS)
+    output.alpha_composite(sprite, (dx, dy))
+    actual = sprite.getchannel('A').point(lambda a: 255 if a > 128 else 0).getbbox()
+    maps.append({'bilde': cel['bilde'], 'kostyme': cel['kostyme'], 'rute': cel['rute'],
+                 'rect': [dx + actual[0], dy + actual[1], actual[2] - actual[0], actual[3] - actual[1]],
+                 'kildeboks': list(box)})
+
+output.save(jobdir / 'resultat.png')
+digest = hashlib.sha256((jobdir / 'resultat.png').read_bytes()).hexdigest()
+(report / 'rutekart-fig001_01.json').write_text(json.dumps({'fig001_01': {'sha256_resultat': digest, 'ruter': maps}}, indent=2) + '\n')
+progress = json.loads((report / 'fremdrift.json').read_text())
+progress['leveranser'].append({'jobb': 'fig001_01', 'resultat': 'jobber/fig001_01/resultat.png', 'sha256': digest,
+                               'ruter': 1, 'rutekart': 'rapporter/figurer-videre-20261016/rutekart-fig001_01.json',
+                               'egenkontroll': 'ikke kjørt', 'visuelt_kontrollert_av': 'ikke kontrollert',
+                               'godkjent_av_Tom': False, 'motoravspilt': False, 'importert': False})
+(report / 'fremdrift.json').write_text(json.dumps(progress, ensure_ascii=False, indent=2) + '\n')
+print(digest)
