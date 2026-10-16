@@ -102,3 +102,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
 
 - Andre kantrinn de951ff7 er visuelt etterkontrollert i hd-mod 183850f6 og bekreftet identisk for alle 163 ikoner i 037f4298. Alfa/størrelse uendret, 47 PNG med RGB-endring. 14 utvalgte PNG sett på mørk og lys bakgrunn; mindre lilla på biltak, uten åpenbar ny skade på ekte farger. Trappetrinn og logoens lyse magenta gjenstår. Bevis: output/natt-kantrens-trinn2-20261016 i Codex-arbeidsmappen. Ikke motoravspilling eller Toms stilgodkjenning. Rom71s skilttekst må følge hver originaltilstand; det brede PUSH ME-romnotatet er teknisk oppgave i todo, ikke grunn til å tegne om riktige skilt.
+
+
+- Kostyme 247: separat Codex-kontroll av hjelmutsnittene i alle 26 ruter fra fig247_01 til 05 avviser bare fig247_02 for manglende grønne kuppelbånd i alle fire ruter. De andre arkene er ikke avvist. Aktuell resultat-hash står i docs/gpt-avvisninger.csv. Ikke tell arket som ferdig før ny versjon er kontrollert. Bevis i output/natt-vr-design-20261016/fig247_02-for-retur i Codex-arbeidsmappen. Ingen grafikk eller beskyttet prompt er endret av kontrollen.

@@ -4,6 +4,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [ ] Grafikkretur fig247_02: grønne bånd på VR-hjelmkuppelen mangler i fire ruter, mens original og andre kontrollerte ark har dem. Retur per kildehash i docs/gpt-avvisninger.csv, Codex 16. oktober. Bevar øvrig grafikk og kontroller fargene mellom arkene etter rettingen
+
 - [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
 - [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)
 - [x] Samme patch i Dig-HD-Remake (Dig PR 57, venter på fletting)

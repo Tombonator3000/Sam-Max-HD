@@ -773,3 +773,10 @@ Natt: kontroll av fig247_06, fig247_07, fig247_08 og fig247_09 fra Codex (commit
 - Hjelmen har grønne striper på kuppelen i disse arkene, nærmere originalen enn fig247_01 til 05. Dermed er hjelmen ikke helt lik mellom arkene i kostyme 247; noteres for Tom sammen med stilen, ikke avvisningsgrunn.
 - Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
 - Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (19 figurruter i kostyme 247; 993 til 1012). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+
+## 2026-10-16 05:53 (Codex, separat VR-fargekontroll og kontrollpause)
+
+- Etter Claudes godkjenning av fig247_02 til 05 sammenlignet Codex original og faktisk native PNG for alle 26 ruter i fig247_01 til 05. Bare fig247_02 mangler originalens grønne kuppelbånd, i alle fire ruter. Samme hjelm/synsvinkel skifter derfor farge mellom arkene. Fig247_02 er sendt i konkret retur per faktisk resultat-hash 63a6191a32760f123d643c8522fe84637e4fe623795f431ee281b73d2ca3e7a7; de øvrige fire arkene er ikke avvist. Bevar alt bortsett fra de grønne båndene.
+- Kontrollpause med STOPP ble satt etter at neste Claude-kontroll hadde startet, for å registrere returen uten å skrive i aktive filer. Agentene fikk fullføre; ingen prosess drept eller arbeid/stash slettet. Avvisningsraden tas med i neste ordinære importrunde. Original, levert ark, fire native PNG og hasher er bevart i Codex-arbeidsmappens output/natt-vr-design-20261016/fig247_02-for-retur. Ingen grafikk eller beskyttet prompt endret av kontrollen.
+- Ingen ny kodeendring eller motoravspilling. Nattløpet gjenopptas med samme modell og sperrer etter at returen står i ORDRE.md og den avviste versjonen er utelatt fra modden. Frist 08:00 beholdes.

@@ -51,3 +51,8 @@ Første trinn ecd9ec0e er brukt i hd-mod 55f976de: uendret størrelse/alfa på a
 ## Andre kantrinn i sluttmodd, 2026-10-16 05:18
 
 De951ff7 er brukt i hd-mod 183850f6, med alle 163 ikon-PNG bekreftet byteidentiske også i 037f4298. Alfa/størrelse uendret på alle 163; 47 har justert RGB. Codex har sett 14 PNG på mørk og lys bakgrunn: mørk lilla på biltak redusert uten åpenbar ny skade på ekte farger i utvalget. Trappetrinn og LucasArts-logoens lyse magenta står fortsatt. Ikke motoravspilt, ikke Toms stilgodkjenning eller ny nedlastingspakke.
+
+
+## VR-hjelmfarger, 2026-10-16 05:53
+
+Fig247_02 er sendt i retur etter separat Codex-kontroll: fire ruter mangler originalens grønne kuppelbånd, som står i de andre kontrollerte arkene. Dette er en konkret farge-/kontinuitetsfeil. Neste import utelater de fire rutene til ny versjon godkjennes. Ingen motoravspilling eller Toms stilgodkjenning.
