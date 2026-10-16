@@ -1,19 +1,21 @@
 # fig247_10
 
-Dato: 2026-10-16T06:18:39.351524+02:00
+Retur for costume247_1967 og 1968, rute 3 og 4. Sam løfter VR-hjelmen i rom 48. Rute 3 har nå en smal lyseblå hattestilk uten synlig brem, flatpresset ansikt og to lukkede øyestreker. Rute 4 har lav brem, lukkede øyestreker og liten svart åpen munn under snuten. Totalt fire bildeforsøk i denne økten. Første helarkforsøk ble forkastet; avgrenset nytegning ble rettet og skjøtene reparert med bildeverktøyet. Separate presiseringer gjelder den konkrete returen; den generiske beskrivelsen av begge figurene er ikke motivfasit for disse Sam-rutene. hovedark/max.png var bilde tre i første forsøk.
 
-Verktøy: innebygd image_gen.imagegen. Modellnavnet vises ikke. Python, Pillow, numpy og scipy er brukt til tillatt rensing, alfa og presis plassering. Ingen pipelinekode er endret.
+Rute 1, 2, 5 og 6 er byteidentiske i RGBA med forrige leveranse. Hender, kabler, slips og grønne hjelmpiksler er bevart. Bare hodefeltene og de smale ermeflatene som avdekkes av endret hatt, er satt inn fra nytegningen. Ny alfa gjelder de endrede hodefeltene. Strekkfasen er sammenlignet med originalen; motoravspilling gjenstår.
 
-Kostyme 247 i rom48, animasjon8, ruter1965 til 1970. Sam løfter VR-hjelmen. De første to rutene skjuler hatten under hjelmen; i de siste fire avdekkes fedoraen. Originalens kabelkurver, håndgrep, hjelmheving, slipsbevegelse og den grønne kuppelen er sammenlignet statisk. Originalens tredje hode har et særskilt presset uttrykk med smale øyne og liten svart munnåpning. Det første forsøket gjorde dette nøytralt. Ett ekstra bildeforsøk rettet hodet lokalt. Bare den nye ansiktsfargen og ansiktsmerkene er satt inn innenfor den eksisterende HD-hodeflaten; arkets alfa er beholdt. Totalt to bildeforsøk. Alle seks ruter OK.
+Dato: 2026-10-16T06:56:11.524399+02:00
 
-Original_1x.png, referanse.png og relevante godkjente hovedark er sett før nytegning. hovedark/sam.png styrer Sam-identitet og strek. For kostyme247 er hovedark/max.png bilde tre. Originalen styrer motiv, drakt, lokal palett, positurer og tilstander. Sam har VR-hjelm i kostyme247; den generiske prompten beskriver fedora og begge figurer også når de ikke er synlige. Rettet prompt og kildebegrunnelse er bevart separat i rapporten. Beskyttede jobbfiler er uendret.
+Verktøy: innebygd image_gen.imagegen. Eksakt modellnavn vises ikke. Python, Pillow, numpy og scipy i prosjektets eksisterende miljø er brukt til tillatt alfarensing, komponentuttrekk og presis plassering. Ingen installasjon eller pipelineendring.
 
-Nytegningens egen alfa er renset. Svak løs bakgrunnssmitte er fjernet, myke kanter beholdt og farge langs svært svake kanter renset. I nye VR-ark er plasseringen normalisert ved visirets høyde for å bevare forholdet mellom kabler og kropp. Originalmasken brukes bare til kontroll og målbokser, aldri til å klippe produksjonstegningen. Hele lerretet er 1536 x 1024 med ekte alfa. Rutekartet følger faktisk alfa over 128 og inkluderer frakoblede deler.
+Original_1x.png, referanse.png og hovedark/sam.png er kontrollgrunnlag. Originalen styrer motiv, palett, positur og 4x-geometri. Hovedarket styrer Sam-identitet og strek. ANALYSE.md, GJENNOMGANG.md og remake-skillen i lokal main er lest. Prompt.txt er sendt ordrett i første bildeforsøk. Beskyttede jobbfiler er byteidentiske med HEAD. Eldre sha256_prompt i jobb.json stemmer ikke med dagens promptfil; filen er ikke endret i denne økten. Faktiske kildehash er dokumentert i rapporten.
 
-Egenkontroll: OK. Systemets python3 mangler numpy. Samme kontrollskript er derfor kjørt med den eksisterende /home/tom/Sam-Max-HD/.venv/bin/python3 uten installasjon. Kontrollutskrift: rapporter/natt-fire-20261016-0610/fig247_10-egenkontroll.txt.
+Leveranse: hele lerretet, 1536 x 1024, ekte alfa. Rutekart inkluderer samtlige synlige deler, også adskilte små prikker. Originalmasker brukes til kontroll og komponentmål, ikke til å klippe den nytegnede produksjonskonturen.
 
-Statisk visuell egenkontroll er utført mot original og stilreferanser. Dette er levering til Claudes mottakskontroll. Import, motoravspilling, animasjonstiming og Toms godkjenning er ikke utført. Eventuelle forskjeller i geometri og strek innenfor originalboksene må vurderes ved mottaket.
+Egenkontroll: OK, 6 av 6 ruter OK. Systemets python3 mangler numpy. Samme kontrollskript er kjørt med /home/tom/Sam-Max-HD/.venv/bin/python uten installasjon. Kontrollutskrift: rapporter/natt-20261016-fig24710-116/fig247_10-egenkontroll.txt.
 
-Rapport, råforsøk, korrigerte prompter, plassering og rutekart: rapporter/natt-fire-20261016-0610/.
+Statisk visuell egenkontroll er utført mot original og godkjent hovedark, også på grå bakgrunn. Leveransen er klar for Claudes mottakskontroll. Importert: nei. Motoravspilt: nei. Animasjonstiming, faktisk hode/kropp-sammensetting i motoren og Toms godkjenning: ikke kontrollert.
 
-SHA-256: 725a8d1615f3b2fc471769183bad585558e11d5c1984be5f6c734bd6ee705af5
+SHA-256: 3119bb46c86bface338da25e3b2e55e0d2d5e9c4ee783600a2433a7460973de3
+
+Rapport, råforsøk, presiseringer, plassering og rutekart: rapporter/natt-20261016-fig24710-116/.
