@@ -1,0 +1,54 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage
+import numpy as np,json
+p=Path('rapporter/natt-fire-20261016-0406')
+j=json.loads(Path('jobber/fig002_06/jobb.json').read_text())
+a=np.array(Image.open(p/'fig002_06-raa01.png').convert('RGBA'))
+lab,n=ndimage.label(a[:,:,3]>128)
+c=json.loads((p/'fig002_06-komponenter.json').read_text())
+c=sorted(c,key=lambda it: (0 if it['box'][1]<200 else 1 if it['box'][1]<600 else 2,it['box'][0]))
+canvas=Image.new('RGBA',(1536,1024))
+record=[]
+for cell,co in zip(j['ruter'],c):
+ x0,y0,x1,y1=co['box']; margin=3
+ x0-=margin;y0-=margin;x1+=margin;y1+=margin
+ piece=a[y0:y1,x0:x1].copy()
+ # Bevar egen myk alfa rundt den genererte figuren. Fjern bare andre komponenter.
+ keep=ndimage.binary_dilation(lab[y0:y1,x0:x1]==co['label'],iterations=3)
+ piece[:,:,3][~keep]=0
+ crop=Image.fromarray(piece)
+ sx0,sy0,sx1,sy1=cell['synlig']
+ target=(4*(sx1-sx0),4*(sy1-sy0))
+ core=(co['box'][2]-co['box'][0],co['box'][3]-co['box'][1])
+ # Tre piksler myk kant følger skaleringen. Ingen originalmaske brukes til klipping.
+ scale=(target[0]/core[0],target[1]/core[1])
+ crop=crop.resize((round(crop.width*scale[0]),round(crop.height*scale[1])),Image.Resampling.LANCZOS)
+ paste=(4*(j['plassering'][0]+sx0)-round(margin*scale[0]),4*(j['plassering'][1]+sy0)-round(margin*scale[1]))
+ canvas.alpha_composite(crop,paste)
+ record.append({'bilde':cell['bilde'],'kildeboks':co['box'],'skala':scale,'plassering':paste})
+canvas.save('jobber/fig002_06/resultat.png')
+(p/'fig002_06-plassering.json').write_text(json.dumps(record,indent=2))
+# Lag068: behold det godkjente rommet; legg kun den nytegnede stolpen over.
+bg=Image.open('jobber/rom068/resultat.png').convert('RGB')
+raw=np.array(Image.open(p/'lag068_12-raa02.png').convert('RGB'))
+# Stolpens lilla metall har blaa kanal langt over svart/gul bakgrunn.
+box=(916,396,984,700);x0,y0,x1,y1=box
+piece=raw[y0:y1,x0:x1]; mask=(piece[:,:,2]>30)&(piece[:,:,0]<160)
+# Egen generert kontur, ikke originalens trappemaske.
+mask=ndimage.binary_fill_holes(mask)
+rgba=np.dstack([piece,mask.astype(np.uint8)*255])
+bg.paste(Image.fromarray(rgba),box[:2],Image.fromarray(rgba[:,:,3]))
+bg.save('jobber/lag068_12/resultat.png')
+# Presis plassering av den komplette nytegnede stolpen uten aa tape lyse metallpartier.
+bg=Image.open('jobber/rom068/resultat.png').convert('RGB')
+bg.paste((7,7,0),(128,464,1408,912))
+raw=np.array(Image.open(p/'lag068_12-raa02.png').convert('RGB'))
+box=(916,396,984,700);x0,y0,x1,y1=box
+piece=raw[y0:y1,x0:x1];mask=(piece[:,:,2]>20)&(piece[:,:,2]>piece[:,:,0]*.8)
+mask=ndimage.binary_fill_holes(mask)
+ys,xs=np.nonzero(mask);b=(xs.min(),ys.min(),xs.max()+1,ys.max()+1)
+rgba=np.dstack([piece,mask.astype(np.uint8)*255])
+pole=Image.fromarray(rgba).crop(b).resize((60,296),Image.Resampling.LANCZOS)
+bg.paste(pole,(920,400),pole.getchannel('A'))
+bg.save('jobber/lag068_12/resultat.png')

@@ -1,0 +1,50 @@
+from pathlib import Path
+import json,hashlib,datetime,subprocess
+from PIL import Image
+import numpy as np
+p=Path('rapporter/natt-fire-20261016-0406')
+now=datetime.datetime.now().astimezone().isoformat()
+jobs=['lag068_12','lag071_05','lag071_15','fig002_06']
+descriptions={
+'lag068_12':'Highway Surfing, objekt obj658_01. Den smale lillagraa stolpen med bredere sokkel er avklart visuelt fra original_1x.png og referanse.png. Rom 68s godkjente HD-bilde er bilde to. Ingen biler, skilt eller tall er lagt til.',
+'lag071_05':'Paakledningsspillet, obj719_01, obj741_01 og obj749_01. Sam har frakk med seler og kasse med PUSH ME!, samt hoy hatt. Max har rod og gullfarget drakt med svarte sko. Originalen bestemmer draktdeler og plassering; rom071/resultat.png bestemmer strek og lys.',
+'lag071_15':'Paakledningsspillet, obj735_01 og obj764_01. Sam holder den gylne runde rekvisitten med kors. Max har svart piggete haar og gullringer paa det hoyre oret i bildet. Originalen bestemmer delene, og godkjent rom071/resultat.png bestemmer strek og lys.',
+'fig002_06':'Sam i hovedkostyme 2, med vanlig blaagraa dress, hatt og stripet slips. Fem ruter der hendene samles, tre ruter med utstrakt arm og tre boyde positurer, i retningene fra jobb.json. Hovedark/sam.png er godkjent designreferanse. Alle 11 ruter er hele figurer; ingen separate hoder eller nye venstreruter er lagt til.'}
+cleanup={
+'lag068_12':'To genereringer. Forste forsok beholdt pikseltrinn og la skytekstur til bakgrunnen, og ble forkastet. Andre forsok har presiseringen i rapportens lag068_12-presisering.txt. Python skilte den komplette nytegnede stolpen fra bakgrunnen og plasserte den i originalens synlige boks, 60 x 296 HD-piksler ved (920,400). Den godkjente rombakgrunnen er beholdt over horisonten. Den nesten svarte flaten under horisonten er renset til originalens flate RGB (7,7,0). Dette fjernet falske blokkskift fra bakgrunnstekstur. Ingen originalmaske er brukt til aa klippe stolpens kontur.',
+'lag071_05':'Ett bildeforsok. Python renset bare rammen utenfor romutsnittet til flat #808080. Ingen flytting eller skalering av rommet eller kostymedelene.',
+'lag071_15':'Ett bildeforsok. Python renset bare rammen utenfor romutsnittet til flat #808080. Ingen flytting eller skalering av rommet eller kostymedelene.',
+'fig002_06':'Ett bildeforsok. Bildemodellen tegnet rutene for store og med for stor avstand. Python skilte de 11 genererte figurene ved egen alfa, skalerte hver heltegning til originalens synlige bredde og hoyde og plasserte den i riktig rute. Myk alfa rundt nytegningen er bevart. Originalens pikselmaske er ikke brukt til kantklipping. Tilpasningen og kildeboksene er lagret i tilpass.py.txt og fig002_06-plassering.json.'}
+manifest={'dato':now,'gren':'gpt-arbeid','verktøy':'image_gen.imagegen','modell':'Eksakt bildemodellnavn er ikke oppgitt av verktøyet.','leveranser':[],'telling':{'levert':4,'visuelt_kontrollert_statisk':4,'importert':0,'motoravspilt':0,'godkjent_av_Tom':0},'utelatt':['lag083_01','lag083_02','lag083_03','lag083_04']}
+sources={}
+for name in jobs:
+ d=Path('jobber')/name;j=json.loads((d/'jobb.json').read_text())
+ sources[name]={f:hashlib.sha256((d/f).read_bytes()).hexdigest() for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']}
+ assert sources[name]['referanse.png']==j['sha256_referanse']
+ sources[name]['metadata_sha256_prompt']=j['sha256_prompt']
+ assert sources[name]['prompt.txt']==hashlib.sha256(subprocess.check_output(['git','show','HEAD:'+str(d/'prompt.txt')])).hexdigest()
+ (p/(name+'-prompt01.txt')).write_bytes((d/'prompt.txt').read_bytes())
+ proc=subprocess.run(['/home/tom/Sam-Max-HD/.venv/bin/python3','verktoy/sjekk_leveranse.py',str(d/'resultat.png')],capture_output=True,text=True)
+ (p/(name+'-egenkontroll.txt')).write_text(proc.stdout+proc.stderr)
+ assert proc.returncode==0,(name,proc.stdout)
+ sha=hashlib.sha256((d/'resultat.png').read_bytes()).hexdigest()
+ manifest['leveranser'].append({'jobb':name,'resultat':str(d/'resultat.png'),'sha256':sha,'forsok':2 if name=='lag068_12' else 1,'egenkontroll':'OK','kontrollfil':str(p/(name+'-egenkontroll.txt')),'visuelt_kontrollert_statisk':True,'visuelt_godkjent':False,'importert':False,'runtime_verifisert':False,'ny_brukergodkjenning':False,'klar_for_mottak':True})
+ note=f'''# {name}\n\nDato: {now}\n\nVerktøy: image_gen.imagegen, innebygd bildeverktøy. Eksakt modellnavn ble ikke vist. Antall bildeforsøk: {2 if name=='lag068_12' else 1}. Python med Pillow, numpy og scipy er brukt til tillatt rensing og plassering.\n\n## Grunnlag\n\n{descriptions[name]}\n\nOriginal_1x.png og referanse.png er sett før nytegning, sammen med stilreferansen. ANALYSE.md, GJENNOMGANG.md og remake-skillen fra lokal main er lest. Prompt.txt ble brukt ordrett i første forsøk. Beskyttede jobbfiler er uendret.\n\n## Etterarbeid\n\n{cleanup[name]}\n\n## Kontroll og usikkerhet\n\nEgenkontroll: OK. Se [{name}-egenkontroll.txt](../../{p}/{name}-egenkontroll.txt). Resultatet er sammenlignet statisk med original og stilreferanse. Størrelse, retning, motiv og synlige tilstander er kontrollert som enkeltbilder. Ingen motoravspilling, import eller ny godkjenning fra Tom er utført. Claude må kontrollere sammensetting og tilstandsskifte i mottaket. Ingen uavklart motivbetydning ble brukt som nytt designgrunnlag.\n\nSHA-256 resultat: `{sha}`.\n'''
+ (d/'notat.md').write_text(note)
+(p/'fremdrift.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+(p/'kildehash.json').write_text(json.dumps(sources,indent=2)+'\n')
+j=json.loads(Path('jobber/fig002_06/jobb.json').read_text());alpha=np.array(Image.open('jobber/fig002_06/resultat.png'))[:,:,3]
+rows=[]
+for c in j['ruter']:
+ x,y,x1,y1=c['synlig'];x0=(16+x)*4-12;y0=(8+y)*4-12;xx1=(16+x1)*4+12;yy1=(8+y1)*4+12
+ ys,xs=np.nonzero(alpha[y0:yy1,x0:xx1]>128)
+ rows.append({'bilde':c['bilde'],'rect':[int(x0+xs.min()),int(y0+ys.min()),int(xs.max()-xs.min()+1),int(ys.max()-ys.min()+1)],'kostyme':c['kostyme'],'rute':c['rute'],'lag':c['lag'],'animasjon':c['animasjon'],'retning':c['retning']})
+(p/'rutekart-fig002_06.json').write_text(json.dumps({'fig002_06':{'ruter':rows}},indent=2)+'\n')
+(p/'RAPPORT.md').write_text('''# Fire grafikkjobber, 16. oktober 2026\n\nLevert: 4. Statisk visuelt kontrollert av Codex: 4. Importert i denne økten: 0. Motoravspilt: 0. Ny godkjenning fra Tom: 0. Alle fire har OK i egenkontrollen.\n\nRekkefølge: lag068_12, lag071_05, lag071_15, fig002_06. Lag083_01 til _04 er hoppet over fordi ORDRE.md krever godkjent rom083, mens status.csv fortsatt sier sjekk. ANALYSE.md beskriver dessuten tidligere feil palett og uavklart bart/munn i objekt835. Disse lagene skal ikke produseres fra skybeskrivelsen.\n\nGit pull ble forsøkt på gpt-arbeid, men sandkassen nektet skriving til FETCH_HEAD utenfor arbeidskopien. Ingen grenbytte, commit, push, PR, fletting eller historieendring. Ingen kode er endret. PR32 og fig091_03 til _05 er ikke behandlet på nytt.\n\nSystemets python3 mangler numpy. Kontrollen er kjørt med eksisterende /home/tom/Sam-Max-HD/.venv/bin/python3, uten installasjon. Se egenkontrollfilene.\n\nRå bildeforsøk, ordrette promper, presisering for stolpen, etterarbeidsoppskrift, rutekart og sjekksummer er bevart her. Resultatfilene og jobbnotatene ligger i jobber/. Fremdrift.json registrerer leveranser og skiller levering, statisk visuell kontroll og import.\n\nPromptfilenes faktiske SHA-256 avviker fra de eldre verdiene i jobb.json. Alle fire promptfiler er identiske med HEAD, og de faktiske filene ble brukt ordrett i første forsøk. Kildehash.json registrerer begge verdier. Beskyttede filer er ikke endret.\n\nIngen konkrete kodefeil som hindrer import er påvist i denne økten. Claude må importere de fire filene og kontrollere tilstandsskifte og Sam-animasjonen samlet. Statisk kontroll er ikke motoravspilling eller Toms godkjenning.\n''')
+# Kontrollflate med lys bakgrunn for aa se alfa og komplette leveranser.
+qa=Image.new('RGB',(1536,1024),(224,224,224))
+for name,xy in zip(jobs,[(0,0),(768,0),(0,512),(768,512)]):
+ im=Image.open('jobber/'+name+'/resultat.png').convert('RGBA')
+ panel=Image.new('RGBA',im.size,(232,232,232,255));panel.alpha_composite(im)
+ qa.paste(panel.convert('RGB').resize((768,512),Image.Resampling.LANCZOS),xy)
+qa.save(p/'sluttkontroll.png')
