@@ -7,15 +7,42 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Gjennomgå PR fra `codex/hd-masker-inventory`, importer nye Sam-ark og kantvaskede ikoner fra feilrunde2-rapporten, og bygg Linux/Windows/web sammen. Lokale motorprøver for inventar, akvarium og cafeteriarør består; dette er ikke distribuert ennå.
 - [ ] Rom22: sammenheng mellom statisk øks i HD-rommet og objekt222s tilstandslapper. Rom16: alle faktiske bevegelser i kranhode154 og Chicken Dumpling155. Rester i motivenes bakgrunn forsvinner ikke av full skjermopptegning.
 - [ ] Gjør et faktisk vellykket opptak med riktig kameratilstand. Siste automatiserte opptaksforsøk traff objekt 0 og bekrefter ikke løsningen.
+- [ ] Kun munndelen costume249_257 i fig249_02 står til teknisk sjekk etter Toms godkjenning 16. oktober: dekning 0,783, snitt/union 0,768. De andre 20 nye rutene er importert. Bevar de seks gangrutene, rett bare munndelens form mot originalen, og behold eget munnlag. Ingen terskel er svekket; originalbasert rute brukes foreløpig
+
+- [x] Prioritert kodeoppgave: import_results i gpt.py hopper over manuelle avvisninger for figurark med ekte alfa og setter alltid status levert. myke-figurer utelater korrekt arket, men status.csv og ORDRE får ikke returen først. Rett med regresjon for avvist SHA og ny SHA, bevar skillet levert/godkjent. Codex skal kontrollere koden. Midlertidig er bare fig247_02 sin ordrestatus og retur.md rettet etter kontroll, mens kildene er uendret. Feilen slo til igjen 16. oktober 06:37 for fig247_10: runde to etter avvisningen ga uendret status.csv og ingen ny ORDRE. Claude rettet status.csv og retur.md for fig247_10 for hånd på samme måte og kjørte gpt-ordre og gpt_gren.sh send. Gammel retur.md for fig247_02 er fjernet etter at ny versjon ble godkjent
+  - [x] Rettet 16. oktober 07:10 (Claude, nattgrenen): native alfa-ark leser nå den manuelle avvisningen per SHA (`manual_rejection`, felles med `_evaluate`), får status avvist eller sjekk med retur.md, og en ny SHA får levert og mister gammel retur.md. Regresjonstest for avvist SHA og ny SHA. 65 pipelinetester grønne. Den manuelle status- og returrettingen trengs ikke lenger
+  - [x] Codex: kodekontroll av rettingen 16. oktober 07:17. 65 tester bestått, SHA/wildcard/sjekk og returprioritering kontrollert. Tatt i bruk i full gpt_runde 07:36 til 07:46
+
+- [x] Grafikkretur fig247_02: grønne hjelmstriper rettet i SHA 7ea6eef6 og Claude-godkjent 16. oktober 06:38. Fire ruter importert; øvrig figur, grep og kabel beholdt. Tom har nå godkjent leveransen per SHA i chatten
 
 - [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
 - [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)
 - [x] Samme patch i Dig-HD-Remake (Dig PR 57, venter på fletting)
 - [ ] Tom fletter PR 30 (objektleveranser.json i importpakke)
-- [ ] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn
+- [x] Kontroll av PR 32 (Codex, native inventarkort og glassmasker i motoren): koden lest, fem funn i `docs/KONTROLL-PR32.md` (15. oktober 22:20, natt). Ikke bygget eller kjørt, maskinen har ingen C++-kompilator
+  - [ ] Codex: felles bilde for blast og romobjekt gir `softEdge = false` når blast lastes først (funn 1)
+  - [ ] Se bilen i rom 9 i en nedtoning med PR 32 (kanten tones nå med rommets farge, funn 3)
+  - [ ] Tom fletter PR 32, og avgjør om Dig skal få samme endring (funn 4)
+- [x] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn (rettet 15. oktober 20:25, `myk.py` versjon 6, på grenen samarbeid/natt-2026-10-15)
+  - [x] Neste `tools/gpt_runde.sh` etter fletting tar inn de 11 rutene (fig091_03 til 05, fig209_03, fig272_02); fjern da beskjeden om ny tegning i ORDRE.md. Sjekket 16. oktober 05:30: myke.json versjon 6 har alle 11 som ok (970 ok, 0 til gjennomsyn), og ORDRE.md i gpt-arbeid nevner ikke fig091 lenger. Ikke sett i spillet
+  - 15. oktober 20:05: fig091_03 (rute 1955, ny utgave) og fig091_04 sett av Claude, bokser like originalen i 4x, holdes likevel ute og ordren ber om ny tegning. Beskjed i ORDRE.md om ikke å tegne dem på nytt. Når mottaket er rettet, kommer de inn uten ny leveranse
+- [x] GitHub-innlogging og push fra denne maskinen er rettet i nattoppsettet. Gjentatte faktiske push til gpt-arbeid, hd-mod og nattgrenen er bekreftet på GitHub; ingen uavklart pushblokkering fra 15. oktober 20:04
+- [x] Mottaket retter hele bilder som er forskjøvet 0,25 til 1,5 originalpiksler (klipper på nytt der innholdet ligger, ikke figurark), 16. oktober 00:24, nattgrenen. Tørrkjøring på de 32 sjekk-jobbene: 12 blir godkjent, 7 til får bedre plassering men står fortsatt til sjekk
+  - [x] Tatt i bruk og visuelt plasseringskontrollert 16. oktober: obj602_01 av Claude, de øvrige elleve av Codex rundt 01:42. Original, mottaksbilde og fargelåst bilde sett; hele rom60 også sett for delskjøten. Ingen åpenbar ny feilplassering eller avklipping. Ikke motoravspilt eller stilgodkjent av Tom
+- [x] Ikonark levert på en annen flat farge enn bestilt (ikon01 på grønt, ikke magenta) fikk magenta glorie rundt ikonene etter fargelåsen, også i modden (obj661_01 til obj670_01). Fargelåsen bruker nå arkfargen som er levert (16. oktober, nattgrenen)
+  - [x] Tatt i bruk i hd-mod 8f3f82a7 og sett av Codex 16. oktober: de fire PNG-filene er sammenlignet med original og førbilder. Kraftig magentaglorie tydelig redusert, identisk alfa og størrelse. Enkelte grønne/lilla kantpiksler gjenstår på bilene. ikon01 står fortsatt til sjekk (blokkavvik 1,3)
+  - [x] Rens de gjenværende grønne/lilla kantpikslene på obj661_01, obj662_01 og obj663_01, og kontroller obj670_01 samtidig. Bevar form og alfa, sammenlign original og ny modd på mørk og lys bakgrunn. Ny retting skal ha Codex-kodekontroll; visuell etterkontroll og motoravspilling gjenstår før dette regnes helt ferdig
+    - [x] Kantrens i mottaket for ikonark (`clean_sheet_edge` i `gpt.py`), 16. oktober, nattgrenen. Tørrkjørt på de 163 ikonene i modden: grønt på bilene 692/944/351 til 0/3/0 piksler, magenta 447/445/463 til 113/29/74, magentastripen på obj670_01 borte, alfa uendret
+    - [x] Codex: kodekontroll av kantrensen ecd9ec0e, 03:21 den 16. oktober. 62 pipelinetester og tørrkjøring på 163 ikoner
+    - [x] Tatt i bruk i hd-mod 55f976de. Codex har sett 22 faktiske PNG mot original og førbilder på mørk og lys bakgrunn, blant annet bilene, obj670_01, grønne felt i obj824_01 og utvalg fra ikon07/08. Tydelig færre fargerester, ingen åpenbar ny skade på ekte farger i utvalget. Alle 163 har uendret størrelse/alfa. Mørk lilla og trappetrinn gjensto i denne modden; ikke motoravspilt
+    - [x] Litt mørk lilla står igjen langs taket på obj661_01 (blanding av svart og magenta som ikke ligner en ren blanding). Rettet 16. oktober: kantpiksler med arkfargens fargetone som ikke er en ren blanding, mister fargetonen (lysstyrken står), med vern to originalpiksler fra samme fargetone i originalen
+      - [x] Codex: kodekontroll av andre trinn de951ff7, 04:15 den 16. oktober. 63 pipelinetester og kontroll på 163 ikoner
+      - [x] Andre trinn sett i publisert hd-mod 183850f6 og bekreftet byteidentisk for alle 163 ikoner i sluttmodd 037f4298. Codex sammenlignet 14 PNG mot original/før/etter på mørk og lys bakgrunn: biltak/bakrute, obj824_01, logoen og utvalg fra ikon07/08. Mørk lilla redusert, ingen åpenbar ny skade på ekte farger i utvalget. Alle 163 har uendret alfa/størrelse, 47 endret RGB; trappetrinn og logoens lyse magenta står. Ikke motoravspilt. Bevis: output/natt-kantrens-trinn2-20261016 i Codex-arbeidsmappen
+      - [ ] obj049_01 (LucasArts-logoen): den lyse magenta kanten rundt figuren og øyevippene står fortsatt, rettes ikke av kantrensen (står allerede i grafikkordren)
+- [x] RAPPORT.md fra gpt-inn sa «Ferdige figurruter: 0 av 15661» selv om 970 figurruter ligger i modden: figurarkene i glatt stil får status levert og tas inn av `smhd myke-figurer` etter gpt-inn. Linjen sier nå hvor mange ark som er levert til figurmottaket og at rutene telles i ORDRE.md og myke.json (a9d26856, nattgrenen). Codex-godkjent 16. oktober 05:15 med 64 pipelinetester; rapportlinjen oppdateres ved neste import
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
-- [ ] Tom: første natteskift med Claude og Codex (prosjektbiblioteket `samarbeid/`), først en kort prøve med `--timer 1 --jobber 1`
+- [x] Første natteskift med Claude og Codex er i gang etter prøveturen 15. oktober. Nattløpet stopper 16. oktober klokken 08:00; nattkontroll følger med
 
 - [x] Innført kildetro motiv- og designanalyse før HD-produksjon i `docs/skills/scumm-hd-remake/SKILL.md`, med henvisninger fra arbeidsinstruksene (12. oktober 2026)
 
@@ -78,7 +105,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Windows-pakken bygget på nytt med den nye modden
 - [ ] Se inventaret i spillet med de nye ikonene (testhoppet åpner det ikke; krever lagret spill eller å spille dit)
 - [ ] Tom ser på det nye Max-ikonet (obj1008_01) og de andre ikonene
-- [ ] 11 figurruter til gjennomsyn (fig091_03 til 05, fig209_03, fig272_02): tegnet i annen størrelse enn gruppen, sendt tilbake i ordren
+- [ ] 11 figurruter til gjennomsyn (fig091_03 til 05, fig209_03, fig272_02): var målefeil i mottaket (utligger tegnet, men målt bare i originalen). Med versjon 6 er alle 11 ok; se dem i spillet etter neste runde
 - [ ] Hakking på nettsiden (Tom 14. oktober). 15. oktober: SIMD i nettbygget (hele skjermen 20 til 30 ms i Chromium), bakgrunnshentingen venter ved grense fra GitHub (429 ga ventetid også for filene spillet trengte). Gjort: HD-pakken hentes i bakgrunnen, fargetoningen er raskere (15 til 11 ms per skjerm), `?adlib` for å sammenligne med MT-32. Tom tester igjen. Nettsiden henter nå HD-pakken i bakgrunnen. Hele skjermen tar 14 til 22 ms å bygge her; i nettleseren kan nedtoninger og rulling bli tunge. Mål med `DIGHD_BENCH` i nettleseren og se på å bygge bare det som er endret ved palettbytter
 
 ### Pipeline
@@ -117,6 +144,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Windows-pakken starter ikke på Toms jobb-PC (startfila lukker seg); startfilene viser nå feilkode og logg (%APPDATA%\SamMaxHD\scummvm.log)
 - [x] MT-32-musikk (14. oktober): motoren bygges med `--enable-mt32emu`, ROM-filene fra spilldata ligger i Linux- og Windows-pakken, og `engine/run.sh`, startfilene, AppImage og nettsiden velger `--music-driver=mt32`
 - [x] `--enable-mt32emu` (14. oktober)
+- [ ] Kodeoppgave: avgrens romnotatet for rom 71 i `docs/gpt-romnotater.csv`, som feilaktig ber om "PUSH ME!" for hele rommet. Skiltteksten varierer mellom tilstandene og skal kopieres fra originalreferansen; lag071_05/obj719_01 viser "$1.00 EACH". Undersøk først hvordan endret romnotat påvirker prompt-hasher, ny ordre og allerede godkjente jobber. Bevar riktige leveranser og aktive beskyttede prompter; gjør eventuell regenerering i en ledig fase og la Codex kontrollere endringen. Dette er en konkret feil i grafikkgrunnlaget innen nattens kodeoppdrag. Returordren har overstyrt romnotatet i den nå godkjente rettingen.
 
 ## Senere
 

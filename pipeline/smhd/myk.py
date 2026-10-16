@@ -41,6 +41,12 @@ Versjon 5 (14. oktober 2026): en rute der omrisset er for ulikt originalen (snit
 dekning under GOOD_COVER eller kuttet) skrives til sjekk/costumes/ og ikke til costumes/, så den ikke
 kommer med i modden (i_modden false). I første runde var det blant annet Max uten esken han holder.
 Ruter som bare er merket for størrelsesavvik, kommer med som før.
+
+Versjon 6 (15. oktober 2026): har grafikeren tegnet utliggeren selv (den løse fotresten til Sam i kostyme 91,
+36 eller 37 originalpiksler under kroppen), måles og plasseres ruten med utliggeren på begge sider, og
+den legges ikke inn fra originalen i tillegg. Før ble tegningen målt med fotresten og originalen uten, så
+rutene sto 23 til 30 prosent for høye og ble holdt ute. Tegningen regnes å ha utliggeren når den har mer
+enn én del og forholdet mellom høyde og bredde ligger nærmere originalen med utliggeren enn uten.
 """
 from __future__ import annotations
 
@@ -64,7 +70,7 @@ GOOD_IOU = 0.6    # under dette er omrisset så ulikt originalen at ruten må se
 GOOD_COVER = 0.8  # andel av originalens piksler tegningen må dekke
 FIT_RANGE = 0.12  # hvor mye hver rute kan skaleres bort fra gruppens faktor, i bredde og høyde for seg
 FIT_SLACK = 0.03  # tilpasningen brukes når snitt/union er høyst så mye dårligere enn med gruppens faktor
-VERSION = 5       # økes når mottaket endres, så alle ark tas inn på nytt
+VERSION = 6       # økes når mottaket endres, så alle ark tas inn på nytt
 SIZE_SPREAD = 0.12  # en rute tegnet så mye større eller mindre enn gruppen (bredde eller høyde) må ses på
 FIT_SPREAD = 0.03 # tilpasning per rute i en retning bare når tegningene sprer mer enn originalene pluss dette
 OUTLIER_GAP = 6   # en liten del av originalen så langt unna resten (originalpiksler) er en utligger
@@ -110,6 +116,23 @@ def measure_mask(rgba: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
             if dist[comp].min() > OUTLIER_GAP:
                 outlier |= comp
     return real & ~outlier, outlier
+
+
+def _box(mask: np.ndarray) -> tuple[int, int]:
+    """Bredde og høyde på boksen rundt pikslene i masken."""
+    ys, xs = np.nonzero(mask)
+    return int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1)
+
+
+def drawn_outliers(keep: np.ndarray, outlier: np.ndarray, drawn: np.ndarray, n_parts: int) -> bool:
+    """Om tegningen har med utliggerne selv: originalen har utliggere, tegningen har mer enn én del, og
+    forholdet mellom høyde og bredde i tegningen (drawn, maske) ligger nærmere originalen med utliggerne
+    enn uten. Forholdet er uavhengig av skalaen arket er tegnet i."""
+    if not outlier.any() or not keep.any() or n_parts < 2 or not drawn.any():
+        return False
+    (kw, kh), (fw, fh), (nw, nh) = _box(keep), _box(keep | outlier), _box(drawn)
+    a = nh / nw
+    return abs(math.log(a / (fh / fw))) < abs(math.log(a / (kh / kw)))
 
 
 def _masked(rgba: np.ndarray, mask: np.ndarray) -> np.ndarray:
@@ -528,6 +551,16 @@ def import_sheet(sheet: np.ndarray, cels: list[dict], boxes: dict[str, list[int]
     # arket litt ulikt. Rutene deles derfor i grupper (samme animasjon og lag, samme rad på arket),
     # og hver gruppe får én skala som gir originalens høyde. Innen gruppen pulserer ikke figuren.
     info: dict[str, dict] = {}
+    # Har tegningen utliggerne med (Sams fotrest), måles begge sider med dem
+    for c in cels:
+        b = c["bilde"]
+        nrs = taken.get(b) or []
+        if b in overrides or not nrs or b not in originals:
+            continue
+        keep, outlier = masks[b]
+        if drawn_outliers(keep, outlier, np.isin(core_lab, nrs), len(nrs)):
+            masks[b] = (keep | outlier, np.zeros_like(outlier))
+            fit_orig[b] = _masked(originals[b], masks[b][0])
     for c in cels:
         b = c["bilde"]
         nrs = taken.get(b) or []

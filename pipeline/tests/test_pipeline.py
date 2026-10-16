@@ -457,6 +457,87 @@ def _fake_extract(tmp_path):
     return ex, room, big
 
 
+def test_gpt_import_fixes_small_shift(tmp_path):
+    import json
+    from PIL import ImageFilter
+    from smhd import gpt
+
+    ex, room, big = _fake_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "obj241_01"
+    ref = Image.open(d / "referanse.png").filter(ImageFilter.GaussianBlur(1.5))
+    ox, oy, bw, bh = json.loads((d / "jobb.json").read_text())["bilde_i_lerret"]
+    # Hele lerretet ligger 4 HD-piksler (1 originalpiksel) til høyre og 4 ned: rettes i mottaket
+    ref.transform(ref.size, Image.AFFINE, (1, 0, -4, 0, 1, -4)).save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["obj241_01"]
+    assert row["status"] == "godkjent" and "plassering rettet" in row["kommentar"], row
+    assert abs(float(row["skift_x"])) < 0.25 and abs(float(row["skift_y"])) < 0.25
+    job = json.loads((done / "provenance.json").read_text())["obj241_01"]["jobber"][0]
+    assert all(abs(v - 1) < 0.25 for v in job["plassering_rettet"])
+    # Samme med bare bildet (ikke lerretet), klippet 4 HD-piksler for langt til høyre
+    ref.crop((ox + 4, oy, ox + 4 + bw, oy + bh)).save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["obj241_01"]
+    assert row["status"] == "godkjent" and "plassering rettet med +1.0, +0.0" in row["kommentar"], row
+    # Riktig plassert: ingen retting
+    ref.save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["obj241_01"]
+    assert row["status"] == "godkjent" and row["kommentar"] == ""
+
+
+def test_gpt_import_shift_fix_keeps_blocks(tmp_path):
+    import json
+    from PIL import ImageFilter
+    from smhd import gpt
+
+    ex, room, big = _fake_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "obj241_01"
+    ox, oy, bw, bh = json.loads((d / "jobb.json").read_text())["bilde_i_lerret"]
+    ref = Image.open(d / "referanse.png").convert("RGB").filter(ImageFilter.GaussianBlur(1.5))
+    # Det meste ligger 1 originalpiksel til høyre, men én blokk ligger en halv til venstre. Retting
+    # av hele bildet ville øke blokkavviket fra 1,0 til 1,5, og skal ikke brukes selv om status er lik
+    res = ref.transform(ref.size, Image.AFFINE, (1, 0, -4, 0, 1, 0))
+    box = (ox + 2 * bw // 3, oy, ox + bw, oy + bh // 2)
+    res.paste(ref.transform(ref.size, Image.AFFINE, (1, 0, 2, 0, 1, 0)).crop(box), box[:2])
+    res.save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["obj241_01"]
+    assert row["status"] == "sjekk" and "plassering rettet" not in row["kommentar"], row
+    assert float(row["blokk_maks"]) <= 1.1
+
+
+def test_gpt_import_shift_fix_keeps_pieces(tmp_path):
+    import json
+    from smhd import gpt
+    from PIL import ImageFilter
+
+    ex, room = _layer_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "lag006_01"
+    data = json.loads((d / "jobb.json").read_text())
+    ox, oy = data["plassering"]
+    ref = Image.open(d / "referanse.png").convert("RGB").filter(ImageFilter.GaussianBlur(1.2))
+    # Bakgrunnen ligger 1 originalpiksel forskjøvet, men objektene i laget ligger riktig. Rettingen
+    # ville flytte objektene, så utsnittet beholdes (som lag017_03_del2av2)
+    res = ref.transform(ref.size, Image.AFFINE, (1, 0, -4, 0, 1, -4))
+    for p in data["objekter"]:
+        x, y, w, h = p["rekt"]
+        box = ((ox + x) * 4, (oy + y) * 4, (ox + x + w) * 4, (oy + y + h) * 4)
+        res.paste(ref.crop(box), box[:2])
+    res.save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["lag006_01"]
+    assert row["status"] == "sjekk" and "plassering rettet" not in row["kommentar"], row
+    job = json.loads((done / "provenance.json").read_text())["obj021_01"]["jobber"][0]
+    assert "plassering_rettet" not in job and job["kantlikhet_objekt"]["objekt"] > 0.9
+
+
 def test_gpt_object_jobs_and_import(tmp_path):
     import json
     from PIL import ImageFilter
@@ -1152,6 +1233,45 @@ def test_figure_import_cut_and_mod(tmp_path):
     assert modpack.build_mod(ex, tmp_path / "mod3", scale=4, method="nearest", rooms=set())["costume_cels"] == 0
 
 
+def test_rejected_smooth_figure_sheet_gets_return_order_and_new_sha_is_delivered(tmp_path):
+    # En manuell avvisning av et ark med ekte alfa skal gi status avvist og retur.md (og dermed returen
+    # først i ORDRE.md), ikke levert. En ny leveranse med annen sjekksum blir levert igjen, ikke godkjent.
+    from PIL import ImageFilter
+    from smhd import gpt
+
+    ex = _figure_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work, figures="pilot")
+    jd = work / "jobber" / "fig014_01"
+
+    def sheet(colour):
+        a = Image.new("L", (1536, 1024), 0)
+        a.paste(255, (200, 200, 600, 800))
+        im = Image.new("RGBA", (1536, 1024), colour + (0,))
+        im.putalpha(a.filter(ImageFilter.GaussianBlur(6)))
+        im.save(jd / "resultat.png")
+        return gpt._sha(jd / "resultat.png")
+
+    old = sheet((200, 120, 60))
+    rej = tmp_path / "avvisninger.csv"
+    rej.write_text("jobb,sha256_resultat,grunn,forslag,status\n"
+                   f"fig014_01,{old},Hatten mangler,Tegn hatten,avvist\n", encoding="utf-8")
+    gpt.import_results(work, ex, done, rejections=rej)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["fig014_01"]
+    assert row["status"] == "avvist" and row["kommentar"] == "Hatten mangler"
+    assert "Tegn hatten" in (jd / "retur.md").read_text()
+    queue = gpt.work_queue(gpt.read_status(work), work)
+    assert queue and queue[0]["jobb"] == "fig014_01"
+    assert not list((done / "costumes").glob("*.png"))
+
+    sheet((180, 110, 70))
+    gpt.import_results(work, ex, done, rejections=rej)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["fig014_01"]
+    assert row["status"] == "levert" and "myke kanter" in row["kommentar"]
+    assert not (jd / "retur.md").exists()
+    assert "fig014_01" not in [r["jobb"] for r in gpt.work_queue(gpt.read_status(work), work)]
+
+
 def test_figure_sheet_in_smooth_style_is_not_cut_with_the_old_mask(tmp_path):
     # Tom avviste trappekantene: et ark med egen alfakant (RGBA, myke kanter) skal ikke klippes med
     # originalens pikselmaske, men vente på mottaket for myke kanter
@@ -1179,6 +1299,20 @@ def test_figure_sheet_in_smooth_style_is_not_cut_with_the_old_mask(tmp_path):
     # Et ark i gammel stil (flat bakgrunn) har ingen egen alfakant
     Image.new("RGB", (1536, 1024), (0, 200, 200)).save(tmp_path / "flat.png")
     assert not gpt.has_native_alpha(tmp_path / "flat.png")
+    # Et lite ark med bare noen få små ruter (som fig259_02) har også egen alfakant
+    a = Image.new("L", (1536, 1024), 0)
+    for x, y in ((20, 20), (20, 100), (100, 90)):
+        a.paste(255, (x, y, x + 24, y + 16))
+    a = a.filter(ImageFilter.GaussianBlur(1))
+    small = Image.new("RGBA", (1536, 1024), (200, 120, 60, 0))
+    small.putalpha(a)
+    small.save(tmp_path / "liten.png")
+    assert gpt.has_native_alpha(tmp_path / "liten.png")
+    # Gjennomsiktig bakgrunn med harde kanter er ikke den glatte stilen
+    hard = Image.new("RGBA", (1536, 1024), (200, 120, 60, 0))
+    hard.paste((200, 120, 60, 255), (20, 20, 60, 50))
+    hard.save(tmp_path / "hard.png")
+    assert not gpt.has_native_alpha(tmp_path / "hard.png")
 
 
 def test_figure_rejections_and_orders(tmp_path):
@@ -1535,6 +1669,36 @@ def test_soft_cel_technical_and_outliers(tmp_path):
     assert n[(my + 58) * 4 + 2, (mx + 78) * 4 + 2, 3] > 128   # utliggeren er med
     assert rep["costume007_001"]["status"] == "teknisk"
     assert not (out / "costumes" / "costume007_001_hd.png").exists()
+
+
+def test_soft_cel_drawn_outlier(tmp_path):
+    # Versjon 6: Sams løse fotrest (kostyme 91) er en utligger i originalen, men grafikeren tegner den.
+    # Da måles og plasseres ruten med fotresten på begge sider, og den legges ikke inn fra originalen.
+    import numpy as np
+    from smhd import myk
+
+    originals, drawings = {}, {}
+    for i, rest in enumerate((True, True, False)):
+        o = np.zeros((60, 30, 4), np.uint8)
+        o[2:42, 4:26] = (120, 140, 200, 255)           # kroppen, 22 x 40
+        d = np.zeros((260, 130, 4), np.uint8)
+        d[8:168, 16:104] = (120, 140, 200, 255)        # 88 x 160 = kroppen i 4x
+        if rest:
+            o[52:56, 12:16] = (180, 100, 40, 255)      # fotresten, 16 piksler, 10 under kroppen
+            d[208:224, 48:64] = (180, 100, 40, 255)
+        originals[f"costume091_19{i}"] = o
+        drawings[f"costume091_19{i}"] = d
+    o = originals["costume091_190"]
+    keep, outlier = myk.measure_mask(o)
+    assert outlier.sum() == 16
+    sheet, cels, boxes, ex = _soft_sheet_case(tmp_path, originals, drawings)
+    rep = myk.import_sheet(sheet, cels, boxes, ex, tmp_path / "ut")["ruter"]
+    for b, r in rep.items():
+        assert r["status"] == "ok" and r["snitt_union"] > 0.9, (b, r)
+        assert r["tegnet_mot_4x"] == [1.0, 1.0], (b, r)
+        assert "utligger" not in r["kilde"], (b, r)
+    # Uten tegnet fotrest (én del) legges utliggeren inn fra originalen som før
+    assert not myk.drawn_outliers(keep, outlier, np.ones((160, 88), bool), 1)
 
 
 def test_soft_cel_no_head_pulse(tmp_path):
@@ -1929,6 +2093,22 @@ def test_orders_count_soft_figures_and_list_held_cels(tmp_path):
     assert "Figurark: 0 av 1 godkjent" in plain and "holdt utenfor" not in plain
 
 
+def test_report_names_figure_sheets_handed_to_soft_intake(tmp_path):
+    # Figurark i glatt stil får status levert i gpt-inn; rapporten skal ikke stå igjen med bare "0 av N"
+    from smhd import gpt
+
+    def job(jid, sheet, cel):
+        return gpt.Job(id=jid, rom=91, navn="fig", del_nr=1, deler=1, rom_storrelse=(10, 10), region=(0, 0, 10, 10),
+                       plassering=(0, 0), type="figur", kostyme=91, lag=sheet, ruter=[{"bilde": cel}])
+    jobs = [job("fig091_03", 3, "costume091_1955"), job("fig091_04", 4, "costume091_1958")]
+    s = gpt._report(tmp_path, jobs, {"fig091_03": {"status": "levert"}}, [], [], [])
+    text = (tmp_path / "RAPPORT.md").read_text()
+    assert "Ferdige figurruter: 0 av 2. 1 ark levert til figurmottaket (smhd myke-figurer)" in text
+    assert s["figurark_levert"] == 1
+    gpt._report(tmp_path, jobs, {}, [], [], [])
+    assert "levert til figurmottaket" not in (tmp_path / "RAPPORT.md").read_text()
+
+
 def test_scale4x_keeps_colours_and_smooths_steps():
     # Ikonene skaleres med Scale4x: ingen nye farger, og en diagonal trapp blir en rett skrå kant
     import numpy as np
@@ -2169,3 +2349,126 @@ def test_importpakke_objektleveranser(tmp_path):
     assert r["bilder"]["obj200_02"]["status"] == "ok"
     assert r["bilder"]["obj200_02"]["manifest"].endswith("objektleveranser.json")
     assert _Image.open(ut / "objects" / "obj200_02.png").getpixel((0, 0)) == (20, 0, 0, 255)
+
+
+def test_icon_sheet_on_other_background_gets_no_halo(tmp_path):
+    """Et ikonark levert på en annen flat farge enn bestilt: fargelåsen skal ikke dra kantene på
+    ikonene mot den bestilte fargen (ikon01 i Sam & Max kom på grønt i stedet for magenta)."""
+    import json
+    import numpy as np
+    from smhd import gpt
+
+    ex, room = _layer_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "ikon01"
+    job = json.loads((d / "jobb.json").read_text())
+    bg = tuple(job["bakgrunn"])
+    other = next(b for b, _ in gpt.SHEET_BACKGROUNDS if b != bg)
+    ref = np.asarray(Image.open(d / "referanse.png").convert("RGB")).copy()
+    ref[np.all(ref == bg, axis=2)] = other
+    Image.fromarray(ref, "RGB").save(d / "referanse_annen.png")
+    Image.open(d / "referanse_annen.png").save(d / "resultat.png")
+    (d / "referanse_annen.png").unlink()
+    gpt.import_results(work, ex, done)
+    status = {r["jobb"]: r for r in gpt.read_status(work)}
+    assert status["ikon01"]["status"] == "godkjent"
+    prov = json.loads((done / "provenance.json").read_text())
+    assert prov["obj025_01"]["jobber"][0]["arkfarge_levert"] == list(other)
+    # Kanten på ikonet (ytterste 4 HD-piksler) er som levert, ikke farget av den bestilte bakgrunnen
+    hd = np.asarray(Image.open(done / "objects" / "obj025_01.png").convert("RGB"), dtype=np.float64)
+    ox, oy = job["plassering"]
+    x, y = job["objekter"][0]["rekt"][:2]
+    crop = np.asarray(Image.open(d / "resultat.png").convert("RGB").crop(
+        ((ox + x) * 4, (oy + y) * 4, (ox + x + 16) * 4, (oy + y + 16) * 4)), dtype=np.float64)
+    ring = np.ones(hd.shape[:2], bool)
+    ring[4:-4, 4:-4] = False
+    assert np.abs(hd - crop)[ring].mean() < 8
+
+
+def test_icon_sheet_edge_keeps_no_sheet_colour(tmp_path):
+    """Ikonet er tegnet litt mindre enn originalen på et ark i en annen farge enn bestilt: arkfargen
+    som blir stående innenfor originalens alfa, skal ikke bli en grønn eller lilla kant i utklippet."""
+    import json
+    import numpy as np
+    from smhd import gpt
+
+    ex, room = _layer_extract(tmp_path)
+    # Ikonet i grått, så ingen av pikslene i originalen har arkfargens fargetone (de røres ikke)
+    icon_path = ex / "objects" / "obj025_01.png"
+    Image.open(icon_path).convert("L").convert("RGBA").save(icon_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "ikon01"
+    job = json.loads((d / "jobb.json").read_text())
+    bg = tuple(job["bakgrunn"])
+    other = next(b for b, _ in gpt.SHEET_BACKGROUNDS if b != bg)
+    ref = np.asarray(Image.open(d / "referanse.png").convert("RGB")).copy()
+    ref[np.all(ref == bg, axis=2)] = other
+    ox, oy = job["plassering"]
+    x, y = job["objekter"][0]["rekt"][:2]
+    x0, y0 = (ox + x) * 4, (oy + y) * 4
+    icon = ref[y0:y0 + 64, x0:x0 + 64].astype(np.float64)
+    ring = np.zeros((64, 64), bool)
+    ring[:2], ring[-2:], ring[:, :2], ring[:, -2:] = True, True, True, True
+    blend = np.zeros((64, 64), bool)
+    blend[2:-2, 2:-2] = True
+    blend[3:-3, 3:-3] = False
+    icon[ring] = other
+    icon[blend] = (icon[blend] + np.array(other)) / 2
+    ref[y0:y0 + 64, x0:x0 + 64] = np.rint(icon).astype(np.uint8)
+    Image.fromarray(ref, "RGB").save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    status = {r["jobb"]: r for r in gpt.read_status(work)}
+    assert status["ikon01"]["status"] == "godkjent"
+    hd = np.asarray(Image.open(done / "objects" / "obj025_01.png").convert("RGB"), dtype=np.float64)
+    edge = ring | blend
+    near_bg = np.linalg.norm(hd - np.array(other, dtype=np.float64), axis=2) < 60
+    assert near_bg[edge].sum() == 0
+    prov = json.loads((done / "provenance.json").read_text())
+    assert prov["obj025_01"]["kantrens"] > 0
+    # Innenfor kanten er ikonet som levert
+    inside = np.zeros((64, 64), bool)
+    inside[8:-8, 8:-8] = True
+    assert np.abs(hd - icon)[inside].mean() < 8
+
+
+def test_clean_sheet_edge_keeps_colours_from_the_original():
+    """Kantrensen tar arkfargen ved kanten, men ikke grønt som også er grønt i originalen."""
+    import numpy as np
+    from smhd import gpt
+
+    original = np.full((8, 8, 3), 100, np.uint8)
+    original[:, 0] = (0, 150, 0)
+    hd = np.repeat(np.repeat(original, 4, 0), 4, 1)
+    hd[:, -2:] = (0, 177, 64)
+    alpha = np.full((32, 32), 255, np.uint8)
+    out, n = gpt.clean_sheet_edge(hd, alpha, [[0, 177, 64]], original)
+    assert n == 64
+    assert np.abs(out[:, -2:].astype(int) - 100).max() <= 1
+    assert (out[:, :4] == (0, 150, 0)).all()
+    # Uten originalen er det ingenting som verner den grønne kanten til venstre
+    _, n2 = gpt.clean_sheet_edge(hd, alpha, [[0, 177, 64]])
+    assert n2 > n
+
+
+def test_clean_sheet_edge_takes_sheet_tone_from_dark_outline():
+    """En mørk omrisskant blandet med magenta mot et hvitt tak er ikke en ren blanding av taket og
+    arkfargen. Den skal miste den lilla fargetonen og bli like mørk, men ikke når originalen er lilla der."""
+    import numpy as np
+    from smhd import gpt
+
+    original = np.full((9, 8, 3), 240, np.uint8)
+    hd = np.repeat(np.repeat(original, 4, 0), 4, 1)
+    hd[4:6] = (80, 44, 114)                      # mørk lilla kant øverst i ikonet
+    alpha = np.full((36, 32), 255, np.uint8)
+    alpha[:4] = 0                                # gjennomsiktig rad over kanten
+    out, n = gpt.clean_sheet_edge(hd, alpha, [[255, 0, 255]], original)
+    edge = out[4:6].astype(int)
+    assert n == 64
+    assert np.ptp(edge, axis=2).max() < 40 and abs(edge.mean() - 79) < 2   # nesten grå, samme lysstyrke
+    assert (out[6:] == 240).all()
+    # Er originalen lilla to originalpiksler unna, står fargen
+    original[3] = (120, 40, 140)
+    out2, _ = gpt.clean_sheet_edge(hd, alpha, [[255, 0, 255]], original)
+    assert (out2[4:6] == (80, 44, 114)).all()
