@@ -1,0 +1,22 @@
+import hashlib,json,subprocess
+from pathlib import Path
+from PIL import Image
+import numpy as np
+p=Path('rapporter/natt-fig091_03-20261015');j=Path('jobber/fig091_03')
+job=json.loads((j/'jobb.json').read_text());old=np.asarray(Image.open(p/'forrige-resultat.png').convert('RGBA'));new=np.asarray(Image.open(j/'resultat.png').convert('RGBA'));ref=np.asarray(Image.open(j/'referanse.png').convert('RGBA'))
+sha=hashlib.sha256((j/'resultat.png').read_bytes()).hexdigest()
+ruter=[]
+for c in job['ruter']:
+ x0,y0,x1,y1=c['synlig'];ox,oy=job['plassering'];x0=(x0+ox)*4;y0=(y0+oy)*4;x1=(x1+ox)*4;y1=(y1+oy)*4
+ wx0,wy0=max(0,x0-16),max(0,y0-16);wx1,wy1=min(1536,x1+16),min(1024,y1+16)
+ ys,xs=np.nonzero(new[wy0:wy1,wx0:wx1,3]>128)
+ ruter.append({'bilde':c['bilde'],'rect':[int(xs.min()+wx0),int(ys.min()+wy0),int(xs.max()-xs.min()+1),int(ys.max()-ys.min()+1)],'kostyme':c['kostyme'],'rute':c['rute'],'lag':c['lag']})
+(p/'rutekart-fig091_03.json').write_text(json.dumps({'fig091_03':{'ruter':ruter,'sha256_resultat':sha}},ensure_ascii=False,indent=2)+'\n')
+mask=np.ones(new.shape[:2],bool);mask[656:964,1080:1388]=False
+m=(np.any(ref[672:948,1096:1372,:3]!=[255,0,255],axis=2));a=old[672:948,1096:1372,3]>128;b=new[672:948,1096:1372,3]>128
+metrics={'andre_piksler_uendret':bool(np.array_equal(old[mask],new[mask])),'rute1955_snitt_union_for':float((m&a).sum()/(m|a).sum()),'rute1955_snitt_union_etter':float((m&b).sum()/(m|b).sum()),'original_hoveddel':[1096,672,276,212],'original_fotrest':[1096,904,28,44],'lerret':list(Image.open(j/'resultat.png').size),'sha256':sha}
+(p/'kontroll-geometri.json').write_text(json.dumps(metrics,ensure_ascii=False,indent=2)+'\n')
+assert metrics['andre_piksler_uendret']
+for name,h in json.loads((p/'kildehash.json').read_text()).items():assert hashlib.sha256((j/name).read_bytes()).hexdigest()==h,name
+(p/'fremdrift.json').write_text(json.dumps({'dato':'2026-10-15','leveranser':[{'jobb':'fig091_03','resultat':'jobber/fig091_03/resultat.png','sha256':sha,'rutekart':str(p/'rutekart-fig091_03.json'),'egenkontroll':'OK','retur_ruter':['costume091_1955'],'antall_ruter':13,'importert':False,'runtime_verifisert':False,'visuelt_godkjent':False}]},ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(metrics,ensure_ascii=False,indent=2))

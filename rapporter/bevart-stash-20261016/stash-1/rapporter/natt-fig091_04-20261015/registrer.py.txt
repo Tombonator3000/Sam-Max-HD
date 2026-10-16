@@ -1,0 +1,32 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+import json,hashlib,subprocess,sys
+
+p=Path('rapporter/natt-fig091_04-20261015');j=Path('jobber/fig091_04')
+job=json.loads((j/'jobb.json').read_text())
+old=np.array(Image.open(p/'forrige-resultat.png').convert('RGBA'))
+new=np.array(Image.open(j/'resultat.png').convert('RGBA'))
+ref=np.array(Image.open(j/'referanse.png').convert('RGB'))
+sha=hashlib.sha256((j/'resultat.png').read_bytes()).hexdigest()
+maps=[];metrics=[];outside=np.ones(new.shape[:2],bool)
+for c in job['ruter']:
+ x,y,x1,y1=c['synlig'];x=(x+16)*4;y=(y+8)*4;x1=(x1+16)*4;y1=(y1+8)*4
+ wx,wy=max(0,x-16),max(0,y-16);wx1,wy1=min(1536,x1+16),min(1024,y1+16)
+ ys,xs=np.nonzero(new[wy:wy1,wx:wx1,3]>128)
+ maps.append({'bilde':c['bilde'],'rect':[int(xs.min()+wx),int(ys.min()+wy),int(xs.max()-xs.min()+1),int(ys.max()-ys.min()+1)],'kostyme':91,'rute':c['rute'],'lag':c['lag']})
+ m=np.any(ref[y:y1,x:x1]!=[255,0,255],axis=2);a=old[y:y1,x:x1,3]>128;b=new[y:y1,x:x1,3]>128
+ metrics.append({'bilde':c['bilde'],'snitt_union_for':float((m&a).sum()/(m|a).sum()),'snitt_union_etter':float((m&b).sum()/(m|b).sum())})
+ if c['rute']!=1956:outside[wy:wy1,wx:wx1]=False
+assert np.array_equal(old[outside],new[outside]),'Endringer utenfor returrutene'
+for f,h in json.loads((p/'kildehash.json').read_text()).items():assert hashlib.sha256((j/f).read_bytes()).hexdigest()==h,f
+assert Image.open(j/'resultat.png').size==(1536,1024)
+assert Image.open(j/'resultat.png').mode=='RGBA'
+(p/'rutekart-fig091_04.json').write_text(json.dumps({'fig091_04':{'ruter':maps,'sha256_resultat':sha}},ensure_ascii=False,indent=2)+'\n')
+(p/'kontroll-geometri.json').write_text(json.dumps({'sha256':sha,'andre_piksler_uendret':True,'beskyttede_filer_uendret':True,'ruter':metrics,'kildeidentiske_ruter':[1958,1959,1960,1961]},ensure_ascii=False,indent=2)+'\n')
+r=subprocess.run([sys.executable,'verktoy/sjekk_leveranse.py',str(j/'resultat.png')],text=True,capture_output=True)
+(p/'egenkontroll.txt').write_text(r.stdout+r.stderr)
+assert r.returncode==0,r.stdout+r.stderr
+(p/'fremdrift.json').write_text(json.dumps({'dato':'2026-10-15','leveranser':[{'jobb':'fig091_04','resultat':str(j/'resultat.png'),'sha256':sha,'rutekart':str(p/'rutekart-fig091_04.json'),'egenkontroll':'OK','retur_ruter':['costume091_'+str(i) for i in range(1957,1962)],'antall_ruter':6,'importert':False,'runtime_verifisert':False,'visuelt_godkjent':False}]},ensure_ascii=False,indent=2)+'\n')
+print(sha)
+print(r.stdout)

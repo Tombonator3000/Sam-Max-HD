@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+
+p=Path('rapporter/natt-fig091_03-20261015')
+base=Image.open(p/'forrige-resultat.png').convert('RGBA')
+raw=Image.open(p/'ra-forsok2.png').convert('RGBA')
+a=np.asarray(raw).copy()
+a[:,:,3]=np.where(a[:,:,3]<16,0,np.minimum(255,np.rint(a[:,:,3].astype(float)*255/254))).astype('uint8')
+raw=Image.fromarray(a)
+# Kun layout av nye bildeverktøykomponenter. Ingen originalmaske brukes.
+base.paste((0,0,0,0),(1080,656,1388,964))
+for source,target in [((104,86,1172,960),(1096,672,276,212)),((105,1023,209,1177),(1096,904,28,44))]:
+ x,y,w,h=target
+ part=raw.crop(source).resize((w,h),Image.Resampling.LANCZOS)
+ base.alpha_composite(part,(x,y))
+base.save('jobber/fig091_03/resultat.png')
