@@ -400,6 +400,13 @@ Tom: få Claude og ChatGPT til å samarbeide automatisk på Linux-maskinen og jo
 - Natteskiftet ligger i prosjektbiblioteket (`samarbeid/`, grenen claude/sleepy-hawking-492gnq) siden det skal brukes i flere repoer. Rollene er de samme som i AGENTS.md: Codex tegner jobbene i ORDRE.md i `gpt-arbeid`, Claude kjører `tools/gpt_runde.sh` og ser på bildene; Claude koder fra todo.md på grenen `samarbeid/natt-<dato>`, Codex kontrollerer.
 - Codex kjører i sin egen sandkasse og kan ikke committe; skriptet committer bare `resultat.png`, `notat.md`, hovedark og `rapporter/` i `gpt-arbeid`. Det bruker samme arbeidstre som `tools/gpt_gren.sh` (`work/.gpt-gren`).
 - Ikke kjørt her ennå. Testet bare med falske agenter i Claude-økta.
+## 2026-10-15 20:32 (Codex)
+
+- Tom ga uttrykkelig lov til motorretting og PR for inventar, glassmasker og grafikkartefakter. Egen kodegren `codex/hd-masker-inventory`; bilder bare i `gpt-arbeid`.
+- Native RGBA lastes nå også for ordinære romobjekter. Bufret samlet palettfaktor hindrer nøkkelfargekanter; kortalfa viser inventaresken under. Presise dekodermerker for myke klassiske kostymer bevarer palettmasker og underliggende figurer.
+- ScummVM bygget, patchen kontrollert på ren låst base, alle 30 kildefiler byteidentiske. 51 pipelinetester og 19 nettlesertester bestått. Inventar åpne/lukke, akvarium og cafeteriarør sett i lokale spillbilder; siste kjernekontroller 0 bufferavvik. Nearest har dokumenterte avvik, ikke null.
+- Sams tredje finger rettet i to ark og grønn kantmatte fjernet fra 110 ikoner, uten endring av ikonalfamaskene. Lokal import 18 Sam-ruter OK. Rapport og før/etter-bilder i grafikkgrenen: `rapporter/feilrunde2-20261015/`.
+- Fortsatt åpent: statisk bakgrunn og øksens tilstandslapper i rom22; kranhode/dumpling i faktisk bevegelse; opptakstesten traff objekt0 og beviser ikke at opptaksrester er løst; bilens avreise. Ingen ny utgave publisert av denne runden.
 ## 2026-10-15 20:05 (Claude)
 
 Natt: kontroll av ny leveranse fra Codex (commit edec20f7 i `work/.gpt-gren`).

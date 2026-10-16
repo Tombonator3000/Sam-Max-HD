@@ -4,6 +4,9 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [ ] Gjennomgå PR fra `codex/hd-masker-inventory`, importer nye Sam-ark og kantvaskede ikoner fra feilrunde2-rapporten, og bygg Linux/Windows/web sammen. Lokale motorprøver for inventar, akvarium og cafeteriarør består; dette er ikke distribuert ennå.
+- [ ] Rom22: sammenheng mellom statisk øks i HD-rommet og objekt222s tilstandslapper. Rom16: alle faktiske bevegelser i kranhode154 og Chicken Dumpling155. Rester i motivenes bakgrunn forsvinner ikke av full skjermopptegning.
+- [ ] Gjør et faktisk vellykket opptak med riktig kameratilstand. Siste automatiserte opptaksforsøk traff objekt 0 og bekrefter ikke løsningen.
 - [ ] Kun munndelen costume249_257 i fig249_02 står til teknisk sjekk etter Toms godkjenning 16. oktober: dekning 0,783, snitt/union 0,768. De andre 20 nye rutene er importert. Bevar de seks gangrutene, rett bare munndelens form mot originalen, og behold eget munnlag. Ingen terskel er svekket; originalbasert rute brukes foreløpig
 
 - [x] Prioritert kodeoppgave: import_results i gpt.py hopper over manuelle avvisninger for figurark med ekte alfa og setter alltid status levert. myke-figurer utelater korrekt arket, men status.csv og ORDRE får ikke returen først. Rett med regresjon for avvist SHA og ny SHA, bevar skillet levert/godkjent. Codex skal kontrollere koden. Midlertidig er bare fig247_02 sin ordrestatus og retur.md rettet etter kontroll, mens kildene er uendret. Feilen slo til igjen 16. oktober 06:37 for fig247_10: runde to etter avvisningen ga uendret status.csv og ingen ny ORDRE. Claude rettet status.csv og retur.md for fig247_10 for hånd på samme måte og kjørte gpt-ordre og gpt_gren.sh send. Gammel retur.md for fig247_02 er fjernet etter at ny versjon ble godkjent

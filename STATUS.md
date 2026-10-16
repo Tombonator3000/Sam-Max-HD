@@ -1,5 +1,7 @@
 # Status
 
+15. oktober, ny motorretting til PR: inventar- og samtalekort finner nå de native RGBA-filene også som ordinære romobjekter. Presise klassiske kostymemerker fjerner rosa/blå glassfeil i akvarium og cafeteriarør i lokale spillprøver. ScummVM bygget og patch kontrollert mot ren låst base; 51 pipeline- og 19 nettlesertester består. Dette er ikke en ny nedlastbar utgave. Øks-/bakgrunnsrester, øvrige animasjonstilstander, vellykket opptak og bilens avreise gjenstår. [Detaljer](docs/ARTEFAKTER-20261015.md).
+
 Oppdatert 14. oktober 2026.
 
 ## Kort

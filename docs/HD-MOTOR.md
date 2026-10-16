@@ -4,6 +4,8 @@ Kort versjon for Sam & Max. Alle detaljer om hvordan motoren virker, innstilling
 
 ## Status
 
+15. oktober, Codex etter Toms uttrykkelige tillatelse: native RGBA brukes også for ordinære romobjekter, og klassiske myke kostymer registrerer faktiske dekoderskrivinger/palettmasker. Inventar, akvarium og cafeteriarør er kontrollert uten skjerm. Native objektbilder må ha 4x størrelse uten marg; palettfaktoren bufres per bilde/palettversjon. Kortets alfa viser aktive eldre objektlag under, som inventaresken. Se [testgrunnlag og åpne feil](ARTEFAKTER-20261015.md). Dette tillegget er ennå ikke samkjørt med The Dig eller publisert som ny pakke.
+
 - Patchen `engine/patches/0001-dighd-hd-grafikk.patch` er The Dig sin patch mot ScummVM-commit `c9091321` (`engine/SCUMMVM_COMMIT`), utvidet for Sam & Max 10. oktober. The Dig skal virke som før; det er ikke testet her, fordi The Dig-filene ikke er i dette repoet.
 - DigHD er på for The Dig og Sam & Max (`GID_SAMNMAX`) når `DIGHD_MOD` eller `dighd_mod` er satt.
 - I Sam & Max får rom, objekter, blast-objekter, kostymerutene og teksten på skjermen HD (14. oktober). Menyraden HD Graphics står i originalmenyen (F5), og teksten i menyen har også HD.
@@ -37,7 +39,7 @@ Spillet kjører uendret i 320 x 200 og 256 farger, med skript, lagring og lyd so
 | Det som står der | Kilde |
 | --- | --- |
 | Uendret rombakgrunn, lik bakgrunnsbufferen og lik indeksbildet `roomNNN_idx.png` | `rooms/roomNNN.png` |
-| Et objekt som nettopp er tegnet, og som stemmer med indeksbildet | `objects/objNNN_SS.png` |
+| Et objekt som nettopp er tegnet, og som stemmer med indeksbildet | `objects/objNNN_SS_hd.png` med egen alfa hvis det finnes i støttet størrelse, ellers `objects/objNNN_SS.png` |
 | En kostymerute | `costumes/costumeCCC_NNN.png`, eller `costumeCCC_NNN_hd.png` for myke figurer |
 | Tekst | HD-glyf laget av spillets egen font, eller HD-skriften (Exo 2) |
 | Filmramme (SMUSH) | `san/FILM/NNNNN.png`. Brukes ikke i Sam & Max |
