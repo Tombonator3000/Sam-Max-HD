@@ -786,3 +786,16 @@ Natt: kontroll av fig247_06, fig247_07, fig247_08 og fig247_09 fra Codex (commit
 
 - Ordinær import fullførte uten feil og utelot de fire avviste native rutene; modden har 1008 ruter. Kontroll fant en konkret feil i ordregrunnlaget: import_results går rett til status levert for native alfa uten å lese den manuelle avvisningen, mens myke-figurer korrekt merker fig247_02 avvist og fjerner rutene. Derfor kom ikke arket først i ORDRE, og retur.md manglet.
 - Midlertidig korrigert bare fig247_02 sin genererte status til avvist, med samme grunn og kildehash som docs/gpt-avvisninger.csv og myke.json, og skrevet retur.md. Ordinær gpt-ordre og gpt_gren.sh send har publisert riktig prioritert retur. Ingen prompt, referanse, tegning eller kode er endret. Varig retting er konkret prioritert i kodesporet med regresjon og separat Codex-kontroll. Dette overstyrer ingen kvalitetskontroll; det gjenspeiler avvisningen som mottaket allerede håndhever.
+
+## 2026-10-16 06:37 (Claude)
+
+Natt: kontroll av fig247_02 (retur), fig116_01, fig247_10 og fig247_11 fra Codex (commit a137d6de6d i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 1030 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). RAPPORT.md: 87 figurark levert til figurmottaket; ingen av de fire under sjekk. `myke.json`: alle 22 nye ruter ok, snitt/union 0,77 til 0,91, tegnet mot 4x innen 1,2 prosent.
+- Sett med øynene: referanse.png over resultatet på grønn og grå bakgrunn, og hodene og hjelmene forstørret.
+- fig247_02 (ny SHA 7ea6eef6): godkjent. Kuppelen har nå grønne bånd i alle fire ruter, lik fig247_03 og originalen. Sam, Max, grep og kabelfaser som før. Den gamle avvisningen gjelder bare forrige SHA.
+- fig116_01 (8 ruter, Gator Golf): godkjent. Sam med fedora balanserer og hopper på alligatorene i samme positurer som originalen, luftruten uten alligator under føttene, alligatorene og vannlinjene på samme steder, de små 1x1-restene beholdt.
+- fig247_11 (4 ruter): godkjent. Hendene mot hjelmen, så én hånd ut, så armene nede; hjelmen med grønne bånd henger over fedoraen som i originalen.
+- fig247_10 (6 ruter): avvist. Rute 3 og 4 mangler strekkgagen: originalen har hatten strukket opp som en smal stilk uten brem og flatpresset ansikt med lukkede øyne i rute 3, og bremmen ned over øynene med smale øyne og åpen svart munn i rute 4. HD viser vanlig fedora og nøytralt ansikt. Rad i `docs/gpt-avvisninger.csv` med grunn og forslag.
+- Runde to: myke-figurer utelot fig247_10 (1024 ruter i modden), men status.csv ble stående levert og ORDRE ble ikke skrevet på nytt. Dette er den kjente feilen i import_results (øverste todo-punkt). Rettet status.csv og skrev retur.md for fig247_10 for hånd, fjernet gammel retur.md for fig247_02, og kjørte `smhd gpt-ordre` og `tools/gpt_gren.sh send`. Returen for fig247_10 står først i ORDRE.md (gpt-arbeid 60679d55). Ingen kode endret.
+- Levert 4, visuelt kontrollert 4, godkjent 3, avvist 1, importert 3 (18 figurruter; modden har 1024 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
