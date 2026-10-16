@@ -613,3 +613,15 @@ Natt, kodeoppgave: farget glorie rundt ikoner fra ikonark levert på feil bakgru
 - Tørrkjøring med `_evaluate` på det ekte ikon01 (ingenting skrevet til modden): `arkfarge_levert` [0, 177, 64], status fortsatt sjekk (blokkavvik 1,3). obj661_01 utklippet med `_with_alpha` og sett over mørk grønn: magentakanten er borte, bare en svak lys strek øverst på taket.
 - Ikke kjørt: `tools/gpt_runde.sh` og ny modd, så modden har fortsatt glorien. Ikke testet i spillet.
 - Testene: pytest i `pipeline` 60 bestått, `git diff --check` uten feil.
+
+## 2026-10-16 02:10 (Claude)
+
+Natt: kontroll av lag045_02, lag053_01_del1av2, lag053_02_del1av2 og lag068_01 fra Codex (commit b16d4e20b4 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 931 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket avviste alle fire.
+- Sett med øynene: referanse.png og resultat.png side om side per objektfelt, og hele bildet for rom 53 og 68. Avvisningene stemmer i alle fire; ingen feil i mottaket funnet.
+- lag045_02: avvist. Boken obj430_02 har fått hvite bølgestreker i stedet for det rutede feltet. Auberginen obj429_02 og trappen obj433_02 er riktige.
+- lag053_01_del1av2 og lag053_02_del1av2: avvist. Gjestene i salen er glatte silhuetter uten ansiktene i originalen, og musikerne holder armer og instrumenter annerledes.
+- lag068_01: avvist. Max-bitene i høyre kant (obj651_01) er større og går lenger inn enn i originalen, og veiene er flyttet opptil 2 px. Teksten Score: og Tim stemmer.
+- Fire rader i `docs/gpt-avvisninger.csv` med konkret grunn og forslag. Runden kjørt igjen, så returen står i ORDRE.md.
+- Levert 4, visuelt kontrollert 4, importert 0. Ikke testet i spillet. Stilen er ikke godkjent av Tom.
