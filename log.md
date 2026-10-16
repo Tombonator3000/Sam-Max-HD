@@ -738,3 +738,10 @@ Natt, kodeoppgave: RAPPORT.md fra gpt-inn viste «Figurark: 0 av 1758 godtatt. F
 - Ikke kjørt `tools/gpt_runde.sh`, så RAPPORT.md i gpt-arbeid har fortsatt den gamle linjen til neste runde. Ingen grafikk endret.
 - Sjekket samtidig todo-punktet om de 11 figurrutene: myke.json versjon 6 har fig091_03 til 05, fig209_03 og fig272_02 som ok, og ORDRE.md nevner ikke fig091. Krysset av. Ikke sett i spillet.
 - Trenger Codex-kodekontroll.
+
+
+## 2026-10-16 05:18 (Codex, kvittering av andre kantrinn)
+
+- Kvitterer allerede utført visuell etterkontroll av de951ff7 i publisert hd-mod 183850f6. Alle 163 faktiske ikon-PNG er sammenlignet med første trinn: alfa/størrelse identiske, 116 byteidentiske og 47 med synlig RGB-endring. RGB-snittet endres høyst en tredjedel av ett nivå. Alle 163 nye PNG er også bekreftet byteidentiske i avsluttende modd 037f4298 etter Claudes grafikkretur.
+- Codex har sett 14 utvalgte PNG mot original/før/etter på mørk grønn og lys grå bakgrunn. Biltakenes mørke lilla er redusert og blir blågrå/mørk, uten åpenbar ny skade på ekte grønne/lilla felt i utvalget. Trappetrinn fra uendret alfa og logoens lyse magentakant står fortsatt. Ikke helt pikselrent, ikke motoravspilt, ikke Toms stilgodkjenning. PNG, seks paneler og kilde-/bildehasher finnes i Codex-arbeidsmappens output/natt-kantrens-trinn2-20261016.
+- Todo kvittert for andre trinns import/visuelle kontroll og for rapportrettingen a9d26856, som er separat Codex-godkjent med 64 tester. Rom71-notatet presisert som teknisk kodeoppgave: undersøk konsekvensen for prompter/ordre og bevar godkjente leveranser før den for brede skiltinstruksen rettes. Ingen romnotat, beskyttet prompt, kode eller grafikk endret nå. Arbeidstreet var rent og bare grafikkagenten i separat worktree var aktiv.

@@ -99,3 +99,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
 
 - Kantrens ecd9ec0e er visuelt etterkontrollert av Codex i hd-mod 55f976de: alle 163 PNG har uendret størrelse/alfa, og 22 utvalgte er sett på mørk og lys bakgrunn uten åpenbar ny skade på ekte farger. Tynne mørke/lilla streker og trappetrinn gjensto. Andre trinn de951ff7 er Codex-kodegodkjent med 63 tester, men må ses etter neste import. Førbilder fra første trinn, 163 faktiske PNG, ligger i Codex-arbeidsmappens output/natt-kantrens-20261016/etter. Første trinns visuelle kontroll er ikke en kontroll av det senere trinnet eller av motoren.
+
+
+- Andre kantrinn de951ff7 er visuelt etterkontrollert i hd-mod 183850f6 og bekreftet identisk for alle 163 ikoner i 037f4298. Alfa/størrelse uendret, 47 PNG med RGB-endring. 14 utvalgte PNG sett på mørk og lys bakgrunn; mindre lilla på biltak, uten åpenbar ny skade på ekte farger. Trappetrinn og logoens lyse magenta gjenstår. Bevis: output/natt-kantrens-trinn2-20261016 i Codex-arbeidsmappen. Ikke motoravspilling eller Toms stilgodkjenning. Rom71s skilttekst må følge hver originaltilstand; det brede PUSH ME-romnotatet er teknisk oppgave i todo, ikke grunn til å tegne om riktige skilt.

@@ -46,3 +46,8 @@ Kode 6ea6d4b0 er Codex-kontrollert med 60 pipelinetester og brukt i hd-mod 8f3f8
 ## Kantrens på nattgrenen, 2026-10-16 04:18
 
 Første trinn ecd9ec0e er brukt i hd-mod 55f976de: uendret størrelse/alfa på alle 163 ikon-PNG og separat Codex-etterkontroll av 22 utvalgte på mørk og lys bakgrunn. Fargerestene er tydelig redusert, men trappetrinn og tynne mørke/lilla streker gjensto. Andre trinn de951ff7 er Codex-kodegodkjent med 63 pipelinetester; nybygd modd og visuell etterkontroll av dette trinnet gjenstår. Ikke motoravspilt, ikke Toms stilgodkjenning, ikke flettet til main eller lagt i nye nedlastingspakker.
+
+
+## Andre kantrinn i sluttmodd, 2026-10-16 05:18
+
+De951ff7 er brukt i hd-mod 183850f6, med alle 163 ikon-PNG bekreftet byteidentiske også i 037f4298. Alfa/størrelse uendret på alle 163; 47 har justert RGB. Codex har sett 14 PNG på mørk og lys bakgrunn: mørk lilla på biltak redusert uten åpenbar ny skade på ekte farger i utvalget. Trappetrinn og LucasArts-logoens lyse magenta står fortsatt. Ikke motoravspilt, ikke Toms stilgodkjenning eller ny nedlastingspakke.
