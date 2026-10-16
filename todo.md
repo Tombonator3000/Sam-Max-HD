@@ -15,21 +15,22 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn (rettet 15. oktober 20:25, `myk.py` versjon 6, på grenen samarbeid/natt-2026-10-15)
   - [ ] Neste `tools/gpt_runde.sh` etter fletting tar inn de 11 rutene (fig091_03 til 05, fig209_03, fig272_02); fjern da beskjeden om ny tegning i ORDRE.md
   - 15. oktober 20:05: fig091_03 (rute 1955, ny utgave) og fig091_04 sett av Claude, bokser like originalen i 4x, holdes likevel ute og ordren ber om ny tegning. Beskjed i ORDRE.md om ikke å tegne dem på nytt. Når mottaket er rettet, kommer de inn uten ny leveranse
-- [ ] Push fra denne maskinen til `gpt-arbeid` og `hd-mod` feiler (GitHub-innlogging, 15. oktober 20:04). To ordrecommiter ligger lokalt i `work/.gpt-gren`, modden i `mods/gpt` er bygget men ikke publisert. Trenger Tom
+- [x] GitHub-innlogging og push fra denne maskinen er rettet i nattoppsettet. Gjentatte faktiske push til gpt-arbeid, hd-mod og nattgrenen er bekreftet på GitHub; ingen uavklart pushblokkering fra 15. oktober 20:04
 - [x] Mottaket retter hele bilder som er forskjøvet 0,25 til 1,5 originalpiksler (klipper på nytt der innholdet ligger, ikke figurark), 16. oktober 00:24, nattgrenen. Tørrkjøring på de 32 sjekk-jobbene: 12 blir godkjent, 7 til får bedre plassering men står fortsatt til sjekk
   - [x] Tatt i bruk og visuelt plasseringskontrollert 16. oktober: obj602_01 av Claude, de øvrige elleve av Codex rundt 01:42. Original, mottaksbilde og fargelåst bilde sett; hele rom60 også sett for delskjøten. Ingen åpenbar ny feilplassering eller avklipping. Ikke motoravspilt eller stilgodkjent av Tom
 - [x] Ikonark levert på en annen flat farge enn bestilt (ikon01 på grønt, ikke magenta) fikk magenta glorie rundt ikonene etter fargelåsen, også i modden (obj661_01 til obj670_01). Fargelåsen bruker nå arkfargen som er levert (16. oktober, nattgrenen)
   - [x] Tatt i bruk i hd-mod 8f3f82a7 og sett av Codex 16. oktober: de fire PNG-filene er sammenlignet med original og førbilder. Kraftig magentaglorie tydelig redusert, identisk alfa og størrelse. Enkelte grønne/lilla kantpiksler gjenstår på bilene. ikon01 står fortsatt til sjekk (blokkavvik 1,3)
   - [x] Rens de gjenværende grønne/lilla kantpikslene på obj661_01, obj662_01 og obj663_01, og kontroller obj670_01 samtidig. Bevar form og alfa, sammenlign original og ny modd på mørk og lys bakgrunn. Ny retting skal ha Codex-kodekontroll; visuell etterkontroll og motoravspilling gjenstår før dette regnes helt ferdig
     - [x] Kantrens i mottaket for ikonark (`clean_sheet_edge` i `gpt.py`), 16. oktober, nattgrenen. Tørrkjørt på de 163 ikonene i modden: grønt på bilene 692/944/351 til 0/3/0 piksler, magenta 447/445/463 til 113/29/74, magentastripen på obj670_01 borte, alfa uendret
-    - [ ] Codex: kodekontroll av kantrensen
-    - [ ] Neste `tools/gpt_runde.sh` tar den i bruk i modden; se da obj661_01 til obj663_01, obj670_01, obj824_01 (det grønne bladet skal stå) og ikonene fra ikon07 og ikon08 på mørk og lys bakgrunn
+    - [x] Codex: kodekontroll av kantrensen ecd9ec0e, 03:21 den 16. oktober. 62 pipelinetester og tørrkjøring på 163 ikoner
+    - [x] Tatt i bruk i hd-mod 55f976de. Codex har sett 22 faktiske PNG mot original og førbilder på mørk og lys bakgrunn, blant annet bilene, obj670_01, grønne felt i obj824_01 og utvalg fra ikon07/08. Tydelig færre fargerester, ingen åpenbar ny skade på ekte farger i utvalget. Alle 163 har uendret størrelse/alfa. Mørk lilla og trappetrinn gjensto i denne modden; ikke motoravspilt
     - [x] Litt mørk lilla står igjen langs taket på obj661_01 (blanding av svart og magenta som ikke ligner en ren blanding). Rettet 16. oktober: kantpiksler med arkfargens fargetone som ikke er en ren blanding, mister fargetonen (lysstyrken står), med vern to originalpiksler fra samme fargetone i originalen
-      - [ ] Codex: kodekontroll av dette andre trinnet i `clean_sheet_edge`
+      - [x] Codex: kodekontroll av andre trinn de951ff7, 04:15 den 16. oktober. 63 pipelinetester og kontroll på 163 ikoner
+      - [ ] Neste import: kontroller andre trinn i faktisk sluttmodd på mørk og lys bakgrunn, særlig biltak/bakrute, obj824_01, lilla felt i obj049_01 og ikon07/08. Førbilder fra første trinn er sikret i Codex-arbeidsmappens output/natt-kantrens-20261016/etter
       - [ ] obj049_01 (LucasArts-logoen): den lyse magenta kanten rundt figuren og øyevippene står fortsatt, rettes ikke av kantrensen (står allerede i grafikkordren)
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
-- [ ] Tom: første natteskift med Claude og Codex (prosjektbiblioteket `samarbeid/`), først en kort prøve med `--timer 1 --jobber 1`
+- [x] Første natteskift med Claude og Codex er i gang etter prøveturen 15. oktober. Nattløpet stopper 16. oktober klokken 08:00; nattkontroll følger med
 
 - [x] Innført kildetro motiv- og designanalyse før HD-produksjon i `docs/skills/scumm-hd-remake/SKILL.md`, med henvisninger fra arbeidsinstruksene (12. oktober 2026)
 

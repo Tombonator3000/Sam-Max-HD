@@ -96,3 +96,6 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - Patchen har lista over det som vises uten HD (`dighd-uten-hd.txt` i lagringsmappen, `DIGHD_MANGLER=0` slår av). `engine/test.sh` gir fra før 0,4 til 0,8 prosent kraftige avvik i noen dumper i rom 3 med nearest-modden (sett 15. oktober, også før den felles patchen).
 
 - Ikonetterkontroll 16. oktober: 6ea6d4b0 er med i hd-mod 8f3f82a7. Obj661_01, obj662_01, obj663_01 og obj670_01 er sett av Codex mot original og førbilder. Kraftig magentaglorie redusert, identisk alfa/størrelse, men små grønne/lilla kantpiksler gjenstår på bilene og står i todo. Ikke regn dette som helt pikselrent eller motorverifisert. De tolv eldre plasseringsrettingene har nå separat visuell kontroll (én av Claude, elleve av Codex), ikke Toms stilgodkjenning.
+
+
+- Kantrens ecd9ec0e er visuelt etterkontrollert av Codex i hd-mod 55f976de: alle 163 PNG har uendret størrelse/alfa, og 22 utvalgte er sett på mørk og lys bakgrunn uten åpenbar ny skade på ekte farger. Tynne mørke/lilla streker og trappetrinn gjensto. Andre trinn de951ff7 er Codex-kodegodkjent med 63 tester, men må ses etter neste import. Førbilder fra første trinn, 163 faktiske PNG, ligger i Codex-arbeidsmappens output/natt-kantrens-20261016/etter. Første trinns visuelle kontroll er ikke en kontroll av det senere trinnet eller av motoren.

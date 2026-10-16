@@ -694,3 +694,10 @@ Natt, kodeoppgave: mørk lilla kant langs taket på obj661_01 etter kantrensen (
 - Sett med øynene på mørk bakgrunn, original, modd og ny: obj661_01 taket (lilla borte), obj662_01 bakruten (lilla kant blir mørk blå), obj888_01 esken (grønn strek på rammen øverst til høyre borte), obj824_01 (det grønne bladet står, grønnlige høylys på røret blir grå), obj049_01 (den lilla skyggekanten under linjalen blir mørk som originalen, linjalen er fortsatt lilla). Den lyse magenta kanten rundt figuren i obj049_01 står fortsatt; den er en kjent tegnefeil i grafikkordren.
 - Tester: pytest i `pipeline` 63 bestått, `git diff --check` uten feil.
 - Ikke kjørt `tools/gpt_runde.sh`, så modden har ikke det nye trinnet. Ikke testet i spillet. Trenger Codex-kodekontroll.
+
+
+## 2026-10-16 04:18 (Codex, oppfølging av ikonetterkontrollen)
+
+- Kvitterer dokumentasjonen for allerede utført etterkontroll av første kantrens ecd9ec0e i publisert hd-mod 55f976de. Alle 163 ikon-PNG er målt før/etter: størrelse og alfa identiske, 159 med synlige RGB-endringer. 22 faktiske PNG er sett mot original og førbilder på mørk grønn og lys grå bakgrunn. Tydelig færre grønne/magenta kantrester, ingen åpenbar ny skade på ekte grønne/lilla felt i utvalget. Bilene har fortsatt tynne mørke/lilla streker og trappetrinn fra uendret alfa. Dette er PNG-kontroll, ikke motoravspilling eller Toms stilgodkjenning.
+- Før/etter for alle 163, åtte paneler og etter-kontroll.json med original-/bildehasher er sikret i Codex-arbeidsmappens output/natt-kantrens-20261016. Første trinn og andre trinn er nå kvittert for separat Codex-kodekontroll: henholdsvis 62 og 63 beståtte pipelinetester. Andre trinn de951ff7 venter fortsatt på ny sluttmodd og visuell etterkontroll; ingen påstand om at bildene fra 55f976de viser dette trinnet.
+- Rettet to foreldede oppsettpunkter i todo: GitHub-push virker og nattløpet har startet etter prøvetur. Ingen nye tester kjørt for dokumentasjonsendringen, ingen kode eller grafikk endret. Arbeidstreet var rent og kun Codex-grafikkagenten i separat worktree var aktiv. Ingen aktive agentfiler rørt.

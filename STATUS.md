@@ -41,3 +41,8 @@ Repoet har samme oppsett som The Dig HD Remake, kopiert og tilpasset Sam & Max. 
 ## Ikonetterkontroll på nattgrenen, 2026-10-16 02:29
 
 Kode 6ea6d4b0 er Codex-kontrollert med 60 pipelinetester og brukt i hd-mod 8f3f82a7. Fire ikon01-bilder er sammenlignet med original og førbilder: kraftig magentaglorie redusert, alfa og størrelse uendret. Små grønne/lilla kantpiksler gjenstår på bilene og er ført til videre retting i todo.md. Før/etter-bilder og hasher er sikret lokalt. Dette er kontroll av PNG-filene, uten motoravspilling eller Toms stilgodkjenning. Nattens kode er ikke flettet til main eller bygget inn i nye Linux-/Windows-pakker.
+
+
+## Kantrens på nattgrenen, 2026-10-16 04:18
+
+Første trinn ecd9ec0e er brukt i hd-mod 55f976de: uendret størrelse/alfa på alle 163 ikon-PNG og separat Codex-etterkontroll av 22 utvalgte på mørk og lys bakgrunn. Fargerestene er tydelig redusert, men trappetrinn og tynne mørke/lilla streker gjensto. Andre trinn de951ff7 er Codex-kodegodkjent med 63 pipelinetester; nybygd modd og visuell etterkontroll av dette trinnet gjenstår. Ikke motoravspilt, ikke Toms stilgodkjenning, ikke flettet til main eller lagt i nye nedlastingspakker.
