@@ -657,3 +657,17 @@ Natt, kodeoppgave: grønne og lilla kantpiksler på ikonene fra ikonark (todo, e
 - Sett med øynene, original, modd og renset på grått og lyst: bilene, trådkorset obj874_01 (grønn kant blir svart som originalen), munnen obj877_01, blyanten obj893_01, eplet obj891_01, obj890_01 og ikoner med grønt eller lilla i originalen (obj049_01 LucasArts-logoen, obj887_01 med rosa bakgrunn, obj1037_01 plommen, obj671_01 skiltet, obj791_01 og obj800_01 trærne, obj1059_01 flasken). Ingen synlig skade på ekte farger. Litt mørk lilla står igjen langs taket på obj661_01.
 - Tester: `test_icon_sheet_edge_keeps_no_sheet_colour` (ikonet tegnet mindre på annen arkfarge; 496 kantpiksler nær arkfargen med den gamle koden, 0 nå) og `test_clean_sheet_edge_keeps_colours_from_the_original`. pytest i `pipeline` 62 bestått, `git diff --check` uten feil.
 - Ikke kjørt `tools/gpt_runde.sh`, så modden har fortsatt de gamle kantene. Ikke testet i spillet. Trenger Codex-kodekontroll.
+
+## 2026-10-16 03:58 (Claude)
+
+Natt: kontroll av lag045_02, lag053_02_del1av2, lag068_01 og lag068_05 fra Codex (commit f30484650a i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 931 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente alle fire; ingen av dem står under sjekk i RAPPORT.md.
+- Sett med øynene: original_1x i nearest ved siden av resultatet per objektfelt, forstørret 3 til 10 ganger, og pikseldiff mot forrige leveranse (ccc36110) for de tre returjobbene.
+- lag045_02: godkjent. Den smale mørk grå boken står nå mellom de grønne bøkene og den blå boken, på samme sted og i samme bredde som originalen. Bare feltet x 252 til 267, y 276 til 327 i lerretet er endret fra forrige leveranse. Auberginen og trappen er uendret.
+- lag053_02_del1av2: godkjent. obj507_01 har den brede åpne munnen, obj509_01 har armen over magen og hånden til høyre som originalen. Endringen ligger bare i x 873 til 1022, y 585 til 654. Musikeren obj499_01 er uendret og riktig.
+- lag068_01: godkjent. Stolpene har rett underkant, venstre stolpe er lys til venstre og mørk til høyre, høyre stolpe mørk til venstre og lys til høyre. Bakgrunnen i det innsatte feltet er 3 nivåer lysere enn rundt, men den er gjennomsiktig i obj656_01 og obj659_01, så den synes ikke. Bare stolpefeltet er endret.
+- lag068_05: godkjent (første leveranse). Fire veifelt med kantene innen omtrent 2 originalpiksler fra originalen målt rad for rad, samme slingring som i godkjent lag068_01. Den gule streken i obj628_01 ligger på samme sted. Fjernfeltene obj638_01 og obj648_01 har samme form og plassering.
+- Modden: obj656_01 i `mods/gpt` ligger nærmere ny leveranse (snittavvik 10,4) enn forrige (20,5), så den nye er tatt inn; resten er fargelås.
+- Ingen nye avvisninger, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, importert 4 (19 objektbilder). Ikke testet i spillet, minispillet i rom 68 er ikke avspilt. Stilen er ikke godkjent av Tom.
