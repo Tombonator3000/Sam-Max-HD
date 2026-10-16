@@ -4,11 +4,13 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [ ] Kun munndelen costume249_257 i fig249_02 står til teknisk sjekk etter Toms godkjenning 16. oktober: dekning 0,783, snitt/union 0,768. De andre 20 nye rutene er importert. Bevar de seks gangrutene, rett bare munndelens form mot originalen, og behold eget munnlag. Ingen terskel er svekket; originalbasert rute brukes foreløpig
+
 - [x] Prioritert kodeoppgave: import_results i gpt.py hopper over manuelle avvisninger for figurark med ekte alfa og setter alltid status levert. myke-figurer utelater korrekt arket, men status.csv og ORDRE får ikke returen først. Rett med regresjon for avvist SHA og ny SHA, bevar skillet levert/godkjent. Codex skal kontrollere koden. Midlertidig er bare fig247_02 sin ordrestatus og retur.md rettet etter kontroll, mens kildene er uendret. Feilen slo til igjen 16. oktober 06:37 for fig247_10: runde to etter avvisningen ga uendret status.csv og ingen ny ORDRE. Claude rettet status.csv og retur.md for fig247_10 for hånd på samme måte og kjørte gpt-ordre og gpt_gren.sh send. Gammel retur.md for fig247_02 er fjernet etter at ny versjon ble godkjent
   - [x] Rettet 16. oktober 07:10 (Claude, nattgrenen): native alfa-ark leser nå den manuelle avvisningen per SHA (`manual_rejection`, felles med `_evaluate`), får status avvist eller sjekk med retur.md, og en ny SHA får levert og mister gammel retur.md. Regresjonstest for avvist SHA og ny SHA. 65 pipelinetester grønne. Den manuelle status- og returrettingen trengs ikke lenger
-  - [ ] Codex: kodekontroll av rettingen
+  - [x] Codex: kodekontroll av rettingen 16. oktober 07:17. 65 tester bestått, SHA/wildcard/sjekk og returprioritering kontrollert. Tatt i bruk i full gpt_runde 07:36 til 07:46
 
-- [ ] Grafikkretur fig247_02: grønne bånd på VR-hjelmkuppelen mangler i fire ruter, mens original og andre kontrollerte ark har dem. Retur per kildehash i docs/gpt-avvisninger.csv, Codex 16. oktober. Bevar øvrig grafikk og kontroller fargene mellom arkene etter rettingen
+- [x] Grafikkretur fig247_02: grønne hjelmstriper rettet i SHA 7ea6eef6 og Claude-godkjent 16. oktober 06:38. Fire ruter importert; øvrig figur, grep og kabel beholdt. Tom har nå godkjent leveransen per SHA i chatten
 
 - [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
 - [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)

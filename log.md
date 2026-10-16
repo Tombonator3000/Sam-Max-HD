@@ -844,3 +844,25 @@ Natt: kontroll av fig116_05, fig116_06, fig116_07 og fig116_08 fra Codex (commit
 - fig116_08 (6 ruter): godkjent. Sam i profil på alligatoren, fire bakfra på alligatoren og siste rute i luften uten alligator, som originalen.
 - Små 1x1-rester i arkene beholdt som i originalen. Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
 - Levert 4, visuelt kontrollert 4, godkjent 4, avvist 0, importert 4 (27 figurruter; modden har 1075 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+
+## 2026-10-16 08:45 (Codex, hent alt og Toms godkjenning)
+
+- Tom ba «pull alt som er laget og godkjenner dette». Hentet siste nattgren og gpt-arbeid med fast-forward. Lokal main i begge kodekopier er oppdatert til publisert 5f6bebaa. Toms godkjenning av de 72 gjeldende nattresultatene er dokumentert per SHA i rapporter/godkjenning-20261016/godkjenning.json på grafikkgrenen. Ingen bildepiksel eller beskyttet jobbfil er endret.
+- Fire siste ark fra fristavbruddet: fig116_09 og fig249_01 til 03, totalt 21 ruter. Codex har sett original og sluttark side ved side: alligatorfragmentene, Sams bakfra-/profilstillinger, den separate munndelen og det enkle gule sverdet er beholdt. Notat.md, fremdrift og rutekart er fullført fra faktiske alfapiksler og bevart nattgrunnlag, pushet i 24d600df. Ordinær import er startet; resultatet logges etter at runden er ferdig. Ingen nytegning.
+- Nattens kodeendringer er samlet i PR33, https://github.com/Tombonator3000/Sam-Max-HD/pull/33. PR-en er knyttet til chatten og CI er grønn. Koden var allerede separat Codex-kontrollert med 65 tester. Kodekontroll-punktet og den ferdige VR-returen er kvittert i todo; memory og STATUS nevner nå fullført importbruk og Toms godkjenning. Natt-automatikken forblir pauset.
+
+
+## 2026-10-16 08:51 (Codex, godkjent import fullført)
+
+- Ordinær tools/gpt_runde.sh fullførte med exit 0 og publiserte hd-mod a6c286bd og ordre 6771422f. Deretter er hd-mod hentet fra GitHub med tools/mod_gren.sh hent; SHA256SUMS består. Modden har 76 rom, 959 objektbilder og 1095 native figurruter.
+- 20 av de 21 siste rutene er teknisk tatt inn. Costume249_257, den separate munndelen i fig249_02, har snitt/union 0,768 og dekning 0,783 og ligger til sjekk. Ingen terskel eller kontroll er overstyrt av Toms godkjenning. Native munndel er bekreftet utelatt, og originalbasert indeksbilde er med. Eget todo-punkt for bare munndelen.
+- Alle 72 resultatfiler og de siste fire jobbenes beskyttede kilder er SHA-kontrollert uendret. Alle 20 nye faktiske native PNG er sammenlignet med mottaket etter den eksisterende magentarensen. Mottakskvittering pushet på gpt-arbeid 8335cba2, rapporter/godkjenning-20261016/mottak.json. Toms godkjenning er registrert separat fra teknisk status og motoravspilling.
+- Lokal grafikkarbeidskopi i denne chattens mappe er også hentet fram med fast-forward, i tillegg til hovedrepoets grafikkgren. PR33 samler nattkoden. Ingen kode eller bildepiksler er endret i denne økten, bare dokumentasjon og rutekart. Natt-automatikken er fortsatt PAUSED, tre stasher er bevart.
+
+
+## 2026-10-16 08:56 (Codex, PR33 flettet og hentet)
+
+- Tom flettet PR33 på GitHub 16. oktober 08:44, merge 3c6d2572, etter grønn CI. Oppdatert main er hentet med fast-forward til kodearbeidskopien. Kildekoden fra nattarbeidet er dermed med i main.
+- Godkjennings- og mottaksdokumentasjonen i a75e96a4 kom etter flettingen; de fire dokumentasjonsfilene er tatt med hit. Ingen kodeendring eller grafikk sjekket inn i main. De 72 bildefilenes godkjenning og 20/21 nye rutekontroller står i gpt-arbeid, og hd-mod a6c286bd er hentet med korrekte sjekksummer.
+- PR32 er fortsatt åpen. Ingen ny motoravspilling eller pakkebygging er kjørt i denne hente-/godkjenningsrunden. Automatikken forblir pauset.
