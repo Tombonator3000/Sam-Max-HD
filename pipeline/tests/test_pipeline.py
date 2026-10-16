@@ -2395,3 +2395,25 @@ def test_clean_sheet_edge_keeps_colours_from_the_original():
     # Uten originalen er det ingenting som verner den grønne kanten til venstre
     _, n2 = gpt.clean_sheet_edge(hd, alpha, [[0, 177, 64]])
     assert n2 > n
+
+
+def test_clean_sheet_edge_takes_sheet_tone_from_dark_outline():
+    """En mørk omrisskant blandet med magenta mot et hvitt tak er ikke en ren blanding av taket og
+    arkfargen. Den skal miste den lilla fargetonen og bli like mørk, men ikke når originalen er lilla der."""
+    import numpy as np
+    from smhd import gpt
+
+    original = np.full((9, 8, 3), 240, np.uint8)
+    hd = np.repeat(np.repeat(original, 4, 0), 4, 1)
+    hd[4:6] = (80, 44, 114)                      # mørk lilla kant øverst i ikonet
+    alpha = np.full((36, 32), 255, np.uint8)
+    alpha[:4] = 0                                # gjennomsiktig rad over kanten
+    out, n = gpt.clean_sheet_edge(hd, alpha, [[255, 0, 255]], original)
+    edge = out[4:6].astype(int)
+    assert n == 64
+    assert np.ptp(edge, axis=2).max() < 40 and abs(edge.mean() - 79) < 2   # nesten grå, samme lysstyrke
+    assert (out[6:] == 240).all()
+    # Er originalen lilla to originalpiksler unna, står fargen
+    original[3] = (120, 40, 140)
+    out2, _ = gpt.clean_sheet_edge(hd, alpha, [[255, 0, 255]], original)
+    assert (out2[4:6] == (80, 44, 114)).all()

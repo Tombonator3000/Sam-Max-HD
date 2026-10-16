@@ -24,7 +24,9 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
     - [x] Kantrens i mottaket for ikonark (`clean_sheet_edge` i `gpt.py`), 16. oktober, nattgrenen. Tørrkjørt på de 163 ikonene i modden: grønt på bilene 692/944/351 til 0/3/0 piksler, magenta 447/445/463 til 113/29/74, magentastripen på obj670_01 borte, alfa uendret
     - [ ] Codex: kodekontroll av kantrensen
     - [ ] Neste `tools/gpt_runde.sh` tar den i bruk i modden; se da obj661_01 til obj663_01, obj670_01, obj824_01 (det grønne bladet skal stå) og ikonene fra ikon07 og ikon08 på mørk og lys bakgrunn
-    - [ ] Litt mørk lilla står igjen langs taket på obj661_01 (blanding av svart og magenta som ikke ligner en ren blanding). Ikke rettet
+    - [x] Litt mørk lilla står igjen langs taket på obj661_01 (blanding av svart og magenta som ikke ligner en ren blanding). Rettet 16. oktober: kantpiksler med arkfargens fargetone som ikke er en ren blanding, mister fargetonen (lysstyrken står), med vern to originalpiksler fra samme fargetone i originalen
+      - [ ] Codex: kodekontroll av dette andre trinnet i `clean_sheet_edge`
+      - [ ] obj049_01 (LucasArts-logoen): den lyse magenta kanten rundt figuren og øyevippene står fortsatt, rettes ikke av kantrensen (står allerede i grafikkordren)
 - [ ] Rester etter opplukking i kontoret (rom 7), kanter rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet (grafikerens rapport 15. oktober 18:06)
 - [ ] Se Sam og Max foran bilen i rom 9 og bilen som kjører bort
 - [ ] Tom: første natteskift med Claude og Codex (prosjektbiblioteket `samarbeid/`), først en kort prøve med `--timer 1 --jobber 1`

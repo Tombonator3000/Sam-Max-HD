@@ -682,3 +682,15 @@ Natt: kontroll av lag068_06, lag068_07, lag068_09 og lag068_10 fra Codex (commit
 - Merknad: i leveransen starter den midterste biten én originalpiksel lavere enn originalen (rad 88 er svart mellom himmel og vei). I modden fylles toppraden av fargelåsen; obj629_01, obj630_01, obj632_01 og obj633_01 har veifarge fra rad 0. Ikke en avvisningsgrunn.
 - Godkjent alle fire. Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
 - Levert 4, visuelt kontrollert 4, importert 4 (12 objektbilder: obj619 til 623 unntatt 621, obj629 til 633 unntatt 631, obj639 til 643 unntatt 641, alle tilstand 01). Ikke testet i spillet, minispillet i rom 68 er ikke avspilt. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 04:12 (Claude)
+
+Natt, kodeoppgave: mørk lilla kant langs taket på obj661_01 etter kantrensen (todo).
+
+- Årsak: pikslene er den mørke omrisskanten blandet med magenta, for eksempel (80,44,114), mens fargen innenfor er det hvite taket. De ligner ikke en blanding av taket og arkfargen, så `clean_sheet_edge` lot dem stå.
+- `pipeline/smhd/gpt.py`, `clean_sheet_edge`: nytt andre trinn. Kantpiksler med arkfargens fargetone som ikke ble rettet i første trinn, mister bare den delen av fargen som går i arkfargens retning; snittet av RGB (lysstyrken) står. (80,44,114) blir omtrent (62,79,96), mørk blågrå. Vernet er bredere her: ingen endring innen to originalpiksler fra samme fargetone i originalen (første trinn bruker én). Uten vernet på to ble venstre kant av den lilla linjalen i obj049_01 grå. Antallet i `kantrens` tar med begge trinn.
+- Ny test `test_clean_sheet_edge_takes_sheet_tone_from_dark_outline`: mørk lilla kant over hvitt blir nesten grå med samme lysstyrke, og står når originalen er lilla to piksler unna.
+- Tørrkjøring på de 163 ikonene i `mods/gpt/objects` (allerede renset med første trinn i runden 04:05; ingenting skrevet til modden, bildene i `work/tmp_lilla`): piksler med magentatone innenfor alfa på obj661_01, obj662_01 og obj663_01 fra 85, (ikke talt), (ikke talt) til 0, 13 og 5. 2659 piksler endret i alt, 113 ikoner uendret.
+- Sett med øynene på mørk bakgrunn, original, modd og ny: obj661_01 taket (lilla borte), obj662_01 bakruten (lilla kant blir mørk blå), obj888_01 esken (grønn strek på rammen øverst til høyre borte), obj824_01 (det grønne bladet står, grønnlige høylys på røret blir grå), obj049_01 (den lilla skyggekanten under linjalen blir mørk som originalen, linjalen er fortsatt lilla). Den lyse magenta kanten rundt figuren i obj049_01 står fortsatt; den er en kjent tegnefeil i grafikkordren.
+- Tester: pytest i `pipeline` 63 bestått, `git diff --check` uten feil.
+- Ikke kjørt `tools/gpt_runde.sh`, så modden har ikke det nye trinnet. Ikke testet i spillet. Trenger Codex-kodekontroll.

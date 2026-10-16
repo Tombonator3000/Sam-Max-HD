@@ -1669,7 +1669,9 @@ def clean_sheet_edge(img: np.ndarray, alpha: np.ndarray, bgs: list[list[int]],
     Utklippet bruker originalens alfa. Der det tegnede ikonet er litt mindre enn originalen, blir
     arkfargen (eller en blanding med den) stående innenfor alfaen som en grønn eller lilla kant.
     Piksler nær kanten (eller bildekanten) med arkfargens fargetone får fargen fra pikslene innenfor,
-    når de ligner en blanding av den og arkfargen. Med originalen (RGB i 1x) røres ikke piksler der
+    når de ligner en blanding av den og arkfargen. Andre slike piksler mister bare arkfargens
+    fargetone (lysstyrken står), når originalen ikke har den fargetonen innen to
+    originalpiksler. Med originalen (RGB i 1x) røres ikke piksler der
     originalen har samme fargetone innen én originalpiksel, så grønne og lilla ting i ikonet blir stående.
     Gir (bildet, antall pikslene som er endret).
     """
@@ -1680,16 +1682,23 @@ def clean_sheet_edge(img: np.ndarray, alpha: np.ndarray, bgs: list[list[int]],
         near = _grow(near)
     bg = np.array(bgs, dtype=np.float64).reshape(-1, 3)
     scale = alpha.shape[0] // original.shape[0] if original is not None else 0
-    tints = []
+    tints, guards = [], []
     for b in bg:
         t = opaque & near & _tinted(rgb, b)
+        guard = np.zeros(alpha.shape, bool)
         if scale:
             own = _tinted(original.astype(np.float64), b) & opaque[::scale, ::scale]
             p = np.pad(own, 1, constant_values=False)
             own = np.logical_or.reduce([p[dy:dy + own.shape[0], dx:dx + own.shape[1]]
                                         for dy in range(3) for dx in range(3)])
             t &= ~np.repeat(np.repeat(own, scale, 0), scale, 1)
+            # Fargetonen tas bare bort lenger enn to originalpiksler fra samme fargetone i originalen
+            p = np.pad(own, 1, constant_values=False)
+            own = np.logical_or.reduce([p[dy:dy + own.shape[0], dx:dx + own.shape[1]]
+                                        for dy in range(3) for dx in range(3)])
+            guard = np.repeat(np.repeat(own, scale, 0), scale, 1)
         tints.append(t)
+        guards.append(guard)
     cand = np.logical_or.reduce(tints)
     if not cand.any():
         return img, 0
@@ -1715,7 +1724,20 @@ def clean_sheet_edge(img: np.ndarray, alpha: np.ndarray, bgs: list[list[int]],
         fix |= tint & have & (t > EDGE_MIN_T) & (off < EDGE_FIT)
     out = img.copy()
     out[fix] = np.clip(np.rint(inner[fix]), 0, 255).astype(img.dtype)
-    return out, int(fix.sum())
+    # Resten er blandinger av en annen farge enn den innenfor og arkfargen, som en mørk omrisskant
+    # mot et hvitt tak. Der tas bare arkfargens fargetone bort; lysstyrken (snittet av RGB) står.
+    rest = np.zeros(alpha.shape, bool)
+    for b, tint, guard in zip(bg, tints, guards):
+        sel = tint & ~guard & ~fix & ~rest
+        if not sel.any():
+            continue
+        u = b - b.mean()
+        u /= max(float(np.linalg.norm(u)), 1e-6)
+        px = rgb[sel]
+        k = np.maximum(((px - px.mean(axis=1, keepdims=True)) * u).sum(axis=1), 0)
+        out[sel] = np.clip(np.rint(px - k[:, None] * u), 0, 255).astype(img.dtype)
+        rest |= sel
+    return out, int(fix.sum() + rest.sum())
 
 
 def _with_alpha(img: np.ndarray, original: Path) -> Image.Image:
