@@ -94,3 +94,17 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 ## Felles motorpatch med Dig-HD-Remake (15. oktober 2026)
 - `engine/patches/0001-dighd-hd-grafikk.patch` er den samme her og i Dig-HD-Remake. Spillspesifikke numre sperres med `_vm->_game.id` eller `_game.version`. Endres patchen i ett repo, kopieres den til det andre eller slås sammen tre-veis.
 - Patchen har lista over det som vises uten HD (`dighd-uten-hd.txt` i lagringsmappen, `DIGHD_MANGLER=0` slår av). `engine/test.sh` gir fra før 0,4 til 0,8 prosent kraftige avvik i noen dumper i rom 3 med nearest-modden (sett 15. oktober, også før den felles patchen).
+
+- Ikonetterkontroll 16. oktober: 6ea6d4b0 er med i hd-mod 8f3f82a7. Obj661_01, obj662_01, obj663_01 og obj670_01 er sett av Codex mot original og førbilder. Kraftig magentaglorie redusert, identisk alfa/størrelse, men små grønne/lilla kantpiksler gjenstår på bilene og står i todo. Ikke regn dette som helt pikselrent eller motorverifisert. De tolv eldre plasseringsrettingene har nå separat visuell kontroll (én av Claude, elleve av Codex), ikke Toms stilgodkjenning.
+
+
+- Kantrens ecd9ec0e er visuelt etterkontrollert av Codex i hd-mod 55f976de: alle 163 PNG har uendret størrelse/alfa, og 22 utvalgte er sett på mørk og lys bakgrunn uten åpenbar ny skade på ekte farger. Tynne mørke/lilla streker og trappetrinn gjensto. Andre trinn de951ff7 er Codex-kodegodkjent med 63 tester, men må ses etter neste import. Førbilder fra første trinn, 163 faktiske PNG, ligger i Codex-arbeidsmappens output/natt-kantrens-20261016/etter. Første trinns visuelle kontroll er ikke en kontroll av det senere trinnet eller av motoren.
+
+
+- Andre kantrinn de951ff7 er visuelt etterkontrollert i hd-mod 183850f6 og bekreftet identisk for alle 163 ikoner i 037f4298. Alfa/størrelse uendret, 47 PNG med RGB-endring. 14 utvalgte PNG sett på mørk og lys bakgrunn; mindre lilla på biltak, uten åpenbar ny skade på ekte farger. Trappetrinn og logoens lyse magenta gjenstår. Bevis: output/natt-kantrens-trinn2-20261016 i Codex-arbeidsmappen. Ikke motoravspilling eller Toms stilgodkjenning. Rom71s skilttekst må følge hver originaltilstand; det brede PUSH ME-romnotatet er teknisk oppgave i todo, ikke grunn til å tegne om riktige skilt.
+
+
+- Kostyme 247: separat Codex-kontroll av hjelmutsnittene i alle 26 ruter fra fig247_01 til 05 avviser bare fig247_02 for manglende grønne kuppelbånd i alle fire ruter. De andre arkene er ikke avvist. Aktuell resultat-hash står i docs/gpt-avvisninger.csv. Ikke tell arket som ferdig før ny versjon er kontrollert. Bevis i output/natt-vr-design-20261016/fig247_02-for-retur i Codex-arbeidsmappen. Ingen grafikk eller beskyttet prompt er endret av kontrollen.
+
+
+- Native alfa-figurark i import_results følger nå docs/gpt-avvisninger.csv (1ec0d92f, 16. oktober): avvist SHA eller `*` gir status avvist og retur.md, så returen kommer først i ORDRE; ny SHA gir levert og fjerner gammel retur.md. myke-figurer utelater fortsatt avvist SHA. Regresjonstest i test_pipeline.py, 65 tester grønne, kode kontrollert av Codex. Levert er ikke godkjent. Ikke kjørt i en full gpt_runde ennå.

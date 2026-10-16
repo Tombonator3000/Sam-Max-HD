@@ -167,7 +167,8 @@ def cmd_gpt_inn(a) -> int:
     if s["ikoner_totalt"]:
         print(f"Ferdige ikoner fra ikonark: {len(s['ferdige_ikoner'])} av {s['ikoner_totalt']}")
     if s["figurruter_totalt"]:
-        print(f"Ferdige figurruter fra figurark: {len(s['ferdige_figurruter'])} av {s['figurruter_totalt']}")
+        print(f"Ferdige figurruter fra figurark: {len(s['ferdige_figurruter'])} av {s['figurruter_totalt']}"
+              + (f" ({s['figurark_levert']} ark levert til smhd myke-figurer)" if s.get("figurark_levert") else ""))
     for line in s["venter"]:
         print("  venter:", line)
     print(f"Rapport: {Path(a.fra) / 'RAPPORT.md'}. Bruk resultatet med: smhd build-mod --egne {a.ut}")

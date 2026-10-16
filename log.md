@@ -383,6 +383,16 @@ Tom: PR 29 flettet.
 - Bygget fra main (9e1b7b2) med hd-mod 9512fd8: Linux-pakken (release «linux», 16:03 UTC), Windows-pakken (release «windows», 16:06 UTC) og nettsiden (Sam-Max-HD-Web, kjøring 38765138956). Alle tre arbeidsflytene grønne, siden svarer 200.
 - Alle tre har nå de nye grafikkleveransene fra i dag og de myke kantene på romobjektene. Pakkene og siden er ikke spilt med skjerm etter denne byggingen.
 
+## 2026-10-15 18:56 (Claude)
+
+Tom: hent det nye fra hd-mod og gpt-arbeid inn i Sam & Max-repoet, og gi Dig HD Remake samme motorpatch.
+
+- `hd-mod` og `gpt-arbeid` flettes ikke inn i main (spillgrafikk). Det nye i `gpt-arbeid` (18:06): seks rettede jobber (rom010 Sams tenner, rom015_del1av2 kjerub og djevel, lag037_01_del2av2, lag037_02_del1av2, lag045_03, obj811_01) og fire hele objektutsnitt med eget manifest (`rapporter/videre-grafikk-20261015/objektleveranser.json`).
+- Runden: `gpt-inn` godkjente alle seks. `smhd importpakke` leser nå også `objektleveranser.json` (PR 30): 60 tatt inn, 0 hoppet over. Ny test, pytest 52 bestått.
+- Modden bygget (76 rom, 959 objektbilder, 923 figurruter) og publisert i `hd-mod` (dd43c31). Rom 10 og rom 15 sett uten skjerm: tennene og kjeruben med djevelen er der. Ny ordre med status sendt til `gpt-arbeid`.
+- Linux-pakken (16:52 UTC) og Windows-pakken (16:54 UTC) bygget fra main med den nye modden. Nettsiden henter modden selv.
+- Dig-HD-Remake: samme motorpatch (myke kanter på romobjekter) i PR 57 der, byte for byte lik. Ingen av de 640 objektbildene i Digs `hd-mod` har myk alfa, så The Dig ser ut som før. Ikke kjørt med The Dig.
+- Åpent fra grafikerens rapport: rester etter opplukking i kontoret, kantene rundt Sam og hammeren i Wak-A-Rat, chatrammene i spillet, og at mottaket måler Sam091 uten fotresten (8 ruter feilaktig til gjennomsyn).
 ## 2026-10-15 19:02 (Claude)
 
 Tom: få Claude og ChatGPT til å samarbeide automatisk på Linux-maskinen og jobbe til i morgen, med grafikk og kode.
@@ -390,3 +400,447 @@ Tom: få Claude og ChatGPT til å samarbeide automatisk på Linux-maskinen og jo
 - Natteskiftet ligger i prosjektbiblioteket (`samarbeid/`, grenen claude/sleepy-hawking-492gnq) siden det skal brukes i flere repoer. Rollene er de samme som i AGENTS.md: Codex tegner jobbene i ORDRE.md i `gpt-arbeid`, Claude kjører `tools/gpt_runde.sh` og ser på bildene; Claude koder fra todo.md på grenen `samarbeid/natt-<dato>`, Codex kontrollerer.
 - Codex kjører i sin egen sandkasse og kan ikke committe; skriptet committer bare `resultat.png`, `notat.md`, hovedark og `rapporter/` i `gpt-arbeid`. Det bruker samme arbeidstre som `tools/gpt_gren.sh` (`work/.gpt-gren`).
 - Ikke kjørt her ennå. Testet bare med falske agenter i Claude-økta.
+## 2026-10-15 20:05 (Claude)
+
+Natt: kontroll av ny leveranse fra Codex (commit edec20f7 i `work/.gpt-gren`).
+
+- Oppgaven nevnte fig091_04, men edec20f7 leverer en ny utgave av fig091_03 (bare rute 1955 tegnet om). fig091_04 er fra bestilling 59 (41bcb1b5). Begge er sett på.
+- `tools/gpt_runde.sh`: henting, `gpt-inn`, `myke-figurer`, `myke-ikoner`, `importpakke` og byggingen av modden (76 rom, 959 objektbilder, 923 figurruter) gikk. Push til `hd-mod` feilet på innlogging mot GitHub, så runden stoppet før ordren. Kjørte `smhd gpt-ordre` og `tools/gpt_gren.sh send` med `SEND_UTEN_PUSH=1`: ordren er committet lokalt i `work/.gpt-gren` (dcd9962d, cb4ecc3e), ikke pushet. Klonen har ingen git-identitet; satt Claude som forfatter med miljøvariabler for den ene commiten, ingen konfigurasjon endret.
+- Kontroll mot referanse.png, sett med øynene og målt: fig091_04 seks ruter, boksen rundt det synlige er lik originalen i 4x for alle, snitt delt på union 0,95, 0,96 og 0,85 (rute 1958 til 1961; forskjellen er konturtykkelse og den lille fotresten). Ingen ruter flyttet, lagt til eller fjernet, samme rekkefølge, lokket med gul stjerne og den løse fotresten er med. fig091_03 rute 1955: samme boks, snitt delt på union 0,93, positur, lokk og fotrest som originalen. Ingen tekst på arkene.
+- Ingen avvisning: ingenting å legge i `docs/gpt-avvisninger.csv`.
+- Figurmottaket holder likevel rute 1955 og 1957 til 1961 ute (status sjekk, tegnet 1,28 mot 4x), og ordren ber Codex tegne dem på nytt. Det er den kjente målefeilen (Sam091 uten fotresten, todo). La inn beskjed i ORDRE.md om ikke å tegne dem på nytt. Mottaket er ikke rettet i natt.
+- Spørsmål til Tom: push fra denne maskinen krever ny innlogging mot GitHub. Ikke testet i spillet.
+
+## 2026-10-15 20:19 (Claude)
+
+Natt: kontroll av obj187_05 (oppgaven pekte på commit cb4ecc3e i `work/.gpt-gren`).
+
+- cb4ecc3e er Claudes egen ordre-commit fra 20:05, ikke en ny leveranse. `origin/gpt-arbeid` står fortsatt på 55061f0d. `jobber/obj187_05/resultat.png` ble sist endret 13. oktober (61b58eaf), så det finnes ingen ny utgave av obj187_05.
+- `tools/gpt_runde.sh`: henting, `gpt-inn`, `myke-figurer`, `myke-ikoner`, `importpakke` og byggingen av modden (76 rom, 959 objektbilder, 923 figurruter) gikk. Push til `hd-mod` feilet igjen på innlogging mot GitHub, så runden stoppet før ordren. Ordren er ikke skrevet på nytt: ingenting nytt er kommet inn, og beskjeden fra 20:05 i ORDRE.md skal stå.
+- RAPPORT.md: obj187_05 avvist av mottaket (deler flyttet eller zoomet, opptil 7,9 px, kantlikhet 0,97).
+- Sett med øynene mot originalen og referanse.png i forhåndsvisningen: avvisningen stemmer. Klubbehodet og hånden ligger lenger til venstre og høyere enn i referansen, hullene har mørke flekker rundt kanten, og fargen i bakgrunnen er jevnet ut. Ingenting lagt til eller fjernet, teksten på brettet er bare et utsnitt og ser lik ut.
+- Ingen ny rad i `docs/gpt-avvisninger.csv`: mottaket avviste allerede, og `retur.md` med forslag ligger i jobben fra før.
+- Fortsatt åpent spørsmål til Tom: push fra denne maskinen krever ny innlogging mot GitHub. Lokale commits i `work/.gpt-gren` (edec20f7, dcd9962d, cb4ecc3e) er ikke pushet. Ikke testet i spillet.
+
+## 2026-10-15 20:25 (Claude)
+
+Natt: kodeoppgave fra todo, mottaket for myke figurer måler Sam091 uten fotresten.
+
+- Årsak: `measure_mask` tar den løse fotresten (36 eller 37 originalpiksler) ut som utligger, men tegningen ble målt med fotresten fra rutekartet. Høyden ble da 23 til 30 prosent for stor, plasseringen ble gjort mot originalen uten fotrest, og fotresten ble i tillegg lagt inn fra originalen.
+- Rettet i `pipeline/smhd/myk.py`, versjon 6 (alle ark tas inn på nytt): ny `drawn_outliers`. Har originalen utliggere, tegningen mer enn én del, og ligger forholdet mellom høyde og bredde i tegningen nærmere originalen med utliggerne enn uten, måles og plasseres ruten med utliggerne på begge sider, og de legges ikke inn fra originalen.
+- Ny test `test_soft_cel_drawn_outlier`. Sjekket at den feiler uten rettelsen. pytest i `pipeline`: 55 bestått.
+- Kjørt på alle leverte ark i `work/.gpt-gren` til en midlertidig mappe i /tmp (ikke `work/gpt-ferdig`, ikke modden): 931 ruter ok og 0 til gjennomsyn, mot 920 og 11 før. De eneste som endret status er de 11 kjente: fig091_03 til 05 (fotresten, snitt delt på union nå 0,90 til 0,96) og fig209_03 og fig272_02 (én løs originalpiksel langt til siden som grafikeren har tegnet, så bredden ble målt 1,13 og 3,24 mot 4x; nå 1,0). Forhåndsvisningene for fig091_04 og fig272_02 sett med øynene: fotresten og pikselen ligger på originalens plass innenfor omrisset.
+- Ikke gjort: modden er ikke bygget på nytt og ORDRE.md er ikke endret. Endringen ligger på natt-grenen og må gjennom PR mot main før `tools/gpt_runde.sh` tar inn rutene. Ikke testet i spillet.
+
+## 2026-10-15 21:10 (Claude)
+
+Natt: kontroll av ny leveranse fra Codex, obj187_05 (commit 01a36834 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom denne gangen: henting, mottak, myke figurer (73 ark, 931 ruter ok, 0 til gjennomsyn, nå med myk.py versjon 6), bygging av modden (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md sendt til `gpt-arbeid`. Innloggingen mot GitHub virker igjen.
+- RAPPORT.md: obj187_05 står på sjekk (deler flyttet eller zoomet opptil 1,3 px), mot avvist med 7,9 px i forrige utgave. Codex sin egenkontroll: skift 0,07 originalpiksler, kantlikhet 0,94. Resultatet er 1430 x 1100, som er 208:160.
+- Sett med øynene mot originalen og i forhåndsvisningen, og som et halvt gjennomsiktig lag over originalen i 4x: klubbehodet, hånden, armen, slipset, snuten og de tre hullene ligger der de ligger i originalen, uten doble konturer. Ingenting lagt til eller fjernet, ingen rotter eller treffeffekter. Den avskårne teksten på brettet («AK-A» til høyre og bokstavresten til venstre) er lik originalen. Det mørke rundt hullene og den utjevnede bakgrunnen fra forrige utgave er borte.
+- Godkjent i kontrollen, ingen rad i `docs/gpt-avvisninger.csv`. Stilen er ikke godkjent av Tom. Ikke testet i spillet, og hele animasjonen med de andre tilstandene er ikke sett i motoren.
+
+## 2026-10-15 21:37 (Claude)
+
+Natt: kontroll av lag002_01, lag017_03_del1av2, lag017_03_del2av2 og obj307_01 fra Codex (commit 3f64f318 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`. Mottaket godkjente alle fire.
+- Sett med øynene: utsnitt per objekt fra referanse.png og resultat.png side om side, og originalobjektet mot rommet i 1x for å se hva tilstanden legger til.
+- lag017_03_del1av2: godkjent. Rødt og gult flagg har samme brutte former, prikker og himmelhull som originalen. Kontrollpulten med de to røde spakene (obj184_02) har samme plass og antall knapper.
+- lag017_03_del2av2: godkjent. Det grønne flagget har samme bruddstykker og prikker. Propellen på anda har tre blader i samme retninger og samme nav.
+- lag002_01: avvist i `docs/gpt-avvisninger.csv`. Lampen obj896_01 er nå tent gul som i originalen. Men obj897_01 og obj900_01 har i originalen to ringer hver: den indre som også står i rommet, og en tynnere ytre ring som er selve tilstanden. Leveransen har bare én takket ring rundt hver kule, så tilstanden mister den ytre ringen. Notatet sier at to ringer er bevart; det stemmer ikke med bildet. Feilen sto også i forrige leveranse.
+- obj307_01: avvist. Toppen av kikkerten er riktig (to skruer, fasetter, åpningen), men satt sammen med godkjent obj304_01 under gir den en tydelig søm ved rad 40: himmelen er lysere (ca. 120,180,252 mot 103,166,250) og rammens kant og skygge møter ikke. I originalen er farge og ramme sammenhengende. Mottaket måler bare mot originalen og ser ikke dette.
+- Runden kjørt på nytt: begge står som avvist i status.csv, øverst i ORDRE.md med retur.md, og er sendt til `gpt-arbeid` (92392b21). Modden er bygget og publisert i `hd-mod` på nytt.
+- Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-15 22:20 (Claude)
+
+Natt: kontroll av lag002_01, lag017_04_del1av2, lag017_04_del2av2 og obj307_01 fra Codex (commit ad9e48c7 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (1b571af9). Mottaket godkjente alle fire.
+- Sett med øynene: utsnitt per objekt fra referanse.png og resultat.png side om side med originalobjektet i 4x.
+- lag002_01: godkjent. obj897_01 og obj900_01 har nå to ringer hver som i originalen: en sterk indre ring og en svakere ytre ring (gulgrønn rundt den lyse kulen, lilla rundt den grønne). Lampen obj896_01 er fortsatt tent gul. Returen fra 21:37 er rettet.
+- lag017_04_del1av2: godkjent. Den røde vimpelen obj180_04 har den lange remsen, de to oppstikkerne og den løse biten til venstre på samme plass som originalen.
+- lag017_04_del2av2: godkjent. Gul vimpel med åpen løkke til høyre, grønne rester med samme antall løse biter, propellen med fire blader i samme stilling og nesten vannrett høyreblad.
+- obj307_01: godkjent. Satt sammen med godkjent obj304_01 under: ingen synlig søm, himmelen er 109,164,248 på begge sider av skjøten, og snittforskjellen over skjøten er 3,1 mot 2,3 mellom to naborader i obj304_01. Rammen og skyggen møter. Toppen har to skruer, fasettene og den svarte åpningen som originalen. Returen fra 21:37 er rettet.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandsbyttene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-15 22:20 (Claude)
+
+Natt: kodeoppgave, kontroll av PR 32 (Codex, `codex/hd-masker-inventory`, native inventarkort og glassmasker).
+
+- ScummVM `c9091321` hentet til /tmp, patchen fra main og fra PR 32 lagt på hver sin kopi (begge gikk rent). Hele kodeforskjellen lest (316 linjer i fire filer), med koden rundt. Patchen i natt-grenen er lik main.
+- Fem funn i `docs/KONTROLL-PR32.md`. Viktigst: blast og romobjekt deler bildebufferen, og lastes `_hd.png` først som blast, mister romobjektet den myke alfaen (`softEdge` regnes ikke ut med marg på). Treffer trolig ikke dagens innhold: alle 113 `_hd.png` i `mods/gpt` er uten marg, og inventarikonene er SMAP-objekter i rom 93 og 94. (Rettet 23:00: feil, 13 inventarikoner i rom 93 er BOMP, se oppføringen 23:00.) Ellers: fargetoningen for myke romobjekter er nå ett snitt per bilde, de myke kantene fra PR 29 (bilen i rom 9) tones nå med rommets farge, og patchen er ikke lenger lik den i Dig.
+- Ingen funn som stopper flettingen av det som treffer dagens innhold. Ikke flettet, ikke rettet, ingen kommentar lagt på PR-en.
+- Ikke bygget og ikke kjørt: maskinen har ingen C++-kompilator, og ingenting er installert. `engine/test.sh` er ikke kjørt med PR 32.
+- Testene i natt-grenen: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått.
+
+## 2026-10-15 22:35 (Claude)
+
+Natt: retting etter Codex sin kontroll av PR 32-kontrollen.
+
+- Funn 4 i `docs/KONTROLL-PR32.md` rettet. Codex har rett: PR 32 skriver selv i `docs/HD-MOTOR.md` linje 7 at tillegget ennå ikke er samkjørt med The Dig. Funnet etterlyser ikke lenger dokumentasjon; det sier bare at samkjøringen med Dig avgjøres etter flettingen.
+- Arbeidskopiene i `/tmp/smhd-pr32` (2,4 GB: ScummVM to ganger og patchene) er slettet. Enig i at de brøt nattregelen om ingen endringer utenfor repoet. Ingenting annet ble lagt utenfor repoet. Linjen under «Hvordan» i kontrollen sier nå at mappen er slettet. Neste gang en patch skal sjekkes mot ScummVM, bruker jeg en mappe under `work/`, som ikke sjekkes inn.
+- Lot være: resten av kontrollen, som Codex ikke hadde innvendinger mot.
+- Testene: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått, `git diff --check` uten feil.
+
+## 2026-10-15 23:00 (Claude)
+
+Natt: retting etter Codex sin andre kontroll av PR 32-kontrollen.
+
+- Codex har rett. `work/extract/rooms.json` viser 13 BOMP-objekter blant inventarikonene i rom 93: obj874 til obj878, obj883 til obj886 og obj889 til obj892. Alle 13 har `_hd.png` i `mods/gpt/objects`. Sjekket med et kort Python-oppslag i `rooms.json` og filene. Rom 94 har bare SMAP.
+- Rettet i `docs/KONTROLL-PR32.md`: linjen under «Hvordan», funn 1 og konklusjonen. Funn 1 er vurdert på nytt: forskyvningen treffer ikke (ingen marg), men den tapte myke alfaen kan treffe de 13 ikonene hvis samme objekt og tilstand tegnes både som blast og som romobjekt i samme rom. Det er ikke vist. Konklusjonen sier nå at funn 1 bør rettes, eller inventaret i rom 93 ses i spillet, før fletting.
+- Begrunnelsen i oppføringen 22:20 er markert som feil med henvisning hit; resten av den oppføringen står.
+- Lot være: å sjekke om ikonene faktisk går gjennom `blastSlot`. ScummVM-kilden ble slettet fra /tmp, og ny henting utenfor `work/` er ikke ønsket i natt; spillet kan heller ikke kjøres her. Spørsmål til neste kodeøkt eller Tom: tegnes BOMP-ikonene i rom 93 med `drawBlastObject`, som romobjekt, eller begge?
+- Testene: pytest i `pipeline` 56 bestått, nettlesertestene 19 bestått, `git diff --check` uten feil. Motortesten er ikke kjørt (ingen C++-kompilator).
+
+## 2026-10-15 22:53 (Claude)
+
+Natt: kontroll av lag022_02_del3av3, lag047_02, lag052_01_del2av2 og lag052_02_del1av2 fra Codex (commit e107128e i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (8389ad1e). Mottaket godkjente alle fire.
+- Sett med øynene: hele referanse.png over resultat.png, utsnitt per objekt med 8 px marg (referanse i nearest, resultat side om side), og originalobjektene i `work/extract/objects` i 12x mot objektbildene i `mods/gpt/objects`.
+- lag022_02_del3av3: godkjent. obj219_02 er den åpne mørke døren i buen, obj222_02 er øksefiguren med lutten og mannen med bøtta i samme stilling, obj228_02 er Henrik VIII med løftet åpen hånd. Ermet henger ikke igjen fra hvilestillingen.
+- lag047_02: godkjent. Alle åtte objekter på plass: kameraet ved høyre kant (obj436), nebbdyret (obj437), frosken med åpen munn (obj438), bjørnehodet ved skiltet (obj442), katten (obj444_02 med lukket munn og rød nese som originalen), kamelens øye (obj447), figuren til venstre (obj451) og tukanens lille øye (obj453_01, som manglet i første forsøk). Skiltet staves BUMPUSVILLE SINGS som originalen.
+- lag052_01_del2av2: godkjent. Vinduet med finnen til bilen utenfor (obj480), hyllen (obj481) og øglens munnfase obj486_01 uten oppdiktede røde merker.
+- lag052_02_del1av2: godkjent. Tukanen med åpent nebb (obj483_02) og øglens neste fase obj486_02 med én liten grålilla flate i gapet som originalen. Plakaten staves THE REPTILE QUEEN og COLOR. Tukanens øye er rundt i HD mens originalen har en smal strek; det er likt det godkjente rombildet og obj483_01, så det er ikke avvist her. Spørsmål til Tom ved stilgodkjenningen: skal tukanen ha det smale øyet fra originalen?
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene for øglen og tukanen er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-15 23:33 (Claude)
+
+Natt: kontroll av lag052_03_del1av2, lag052_04_del1av2, lag052_05_del2av2 og lag052_06_del2av2 fra Codex (commit 68058936 i `work/.gpt-gren`, sikret etter 503-feil hos Codex). Ikke tegnet på nytt.
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (82805f06). Mottaket godkjente alle fire.
+- Sett med øynene: øglens munnfaser obj486_01 til 06 side om side (original i nearest over HD-objektbildet, og tett romutsnitt referanse over resultat), og utsnitt med 8 px marg for obj489_01 og obj490_01. Kort Python-måling av hvilke originalpiksler hver fase endrer, og av avviket i HD nede til venstre mellom fasene.
+- obj486_03 til 06: godkjent. Endringen ligger der originalen endrer seg: 03 en liten grålilla flate i gapet, 04 en større trekant, 05 en lang lys flate langs kjeven, 06 overkjeven løftet med lys flekk øverst til høyre. Foten og haken nede til venstre er lik i alle originalfasene; i HD er avviket mellom fasene der like lite som mellom de godkjente 01 og 02 (snitt 4 til 9 av 255 i RGB), så overgangene skal ikke hoppe synlig. Ikke sett i motoren.
+- obj489_01: godkjent. Tukanens lukkede øye med den olivengrønne folden ved nebbet, samme plass som originalen.
+- obj490_01: godkjent. Tom sittepinne uten tukan, tauene og stangen på samme plass som originalen. Merknad: stangen har noen små mørke merker på midten der originalen har en mørkere midtdel; de ser litt ut som tegn på nært hold, men er ikke tekst og leses som skygge i spillstørrelse. Tas med ved Toms stilgodkjenning.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom. STOPP-filen er ikke rørt.
+
+## 2026-10-15 23:57 (Claude)
+
+Natt: kontroll av lag052_07_del2av2, lag052_08_del2av2, lag052_09_del2av2 og lag052_10_del2av2 fra Codex (commit 3bdf5ce6 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (6803a651). Mottaket godkjente alle fire.
+- Alle fire er obj486 i rom 52 (rute 232,152, 24x24), fasene 07, 08, 09 og 0A. Obj486 er øglens øye med dråpen under, ikke munnen som jeg skrev i de to forrige oppføringene; rutene der gjelder samme objekt, så kontrollen står.
+- Sett med øynene: originalobjektene 06 til 0A i 10x nearest over HD-objektbildene i `mods/gpt/objects`, og romutsnitt av referanse.png over resultat.png for fase 06 til 0A. Kort Python-måling: alle piksler som endrer seg fra den godkjente fase 06 ligger innenfor objektruten (x 545 til 638, y 721 til 814 i lerretet), ingenting annet i rommet er rørt.
+- obj486_07: godkjent. Øyelokket halvt ned, den grålilla dråpen under øyet som originalen.
+- obj486_08: godkjent. Øyet lukket med den lange dråpen.
+- obj486_09: godkjent. Øyet lukket, mindre dråpe som originalen.
+- obj486_0A: godkjent. Øyet lukket, ingen dråpe, som originalen.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og faseovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 00:20 (Claude)
+
+Natt: kontroll av lag052_11_del2av2, lag056_06, lag061_01_del1av2 og lag068_08 fra Codex (commit c0b5f112 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` (e004175e). Mottaket godkjente alle fire.
+- Sett med øynene: hele referanse.png over resultat.png, og per objekt romoriginalen og tilstanden i nearest over godkjent romanker og resultat.png. Kort Python-måling: i alle fire jobbene ligger alle endrede HD-piksler (mot godkjent romanker) innenfor objektrutene, ingenting annet i rommet er rørt.
+- lag052_11_del2av2 (obj487_01, rom 52): godkjent. Klørne på øglens fot er flyttet som i originalen: øvre grå klo vannrett mot høyre og nedre klo lenger ned. Notatet fra Codex kaller motivet munn og underkjeve; det er foten, men tegningen følger originalen.
+- lag056_06 (rom 56): godkjent. obj539_01 er fryseren med åpen dør, mørk åpning med istapper og skrutrekkeren i vinduet som originalen. obj537_01 er bare en liten skyggeendring på rørbøyen i originalen, og HD-endringen er like liten og på samme sted.
+- lag061_01_del1av2 (rom 61): godkjent. obj582_01 er brettenden med den knekte enden til høyre som originalen. obj585_01 er den grønne og gule strikken i løkke fra ringen, med festet til høyre for ringen og den lille grå krokbiten nede til venstre. obj581_01 er lik rommet også i originalen og er uendret.
+- lag068_08 (rom 68): godkjent. De tre vegsegmentene med ett gult skråstrek på det nærmeste. I resultat.png er asfalten lysere enn originalen, men etter fargelåsen har objektbildene i `mods/gpt/objects` samme median som originalen (obj621_01 28,28,36 mot 27,27,35; obj631_01 26,25,28 mot 23,23,27). Den gule streken er litt lengre og bredere enn originalen; ikke avvist.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 00:24 (Claude)
+
+Natt, kodeoppgave: mottaket retter små forskyvninger i leveransene.
+
+- 32 jobber stod til sjekk i `status.csv`, de fleste fordi hele bildet lå 0,5 til 1,1 originalpiksler (2 til 4 HD-piksler) ved siden av. Sjekk-jobbene tas inn i modden, så objektene lå forskjøvet mot rommet.
+- `pipeline/smhd/gpt.py`: ny `_cut_part` klipper utsnittet av leveransen, med valgfri forskyvning i delpiksler (kantpikslene gjentas utenfor bildet). `_evaluate` klipper på nytt der innholdet faktisk ligger når hele bildet er forskjøvet 0,25 til 1,5 originalpiksler (`FIX_SHIFT_MIN` og `CHECK_SHIFT`), og bruker det bare når kontrollen blir minst like god og forskyvningen mindre. Gjelder rom, objekter, lag og ikonark, ikke figurark. Rettingen står i kommentaren («plassering rettet med ...») og som `plassering_rettet` i provenance.
+- Ny test `test_gpt_import_fixes_small_shift`: lerret forskjøvet 4 HD-piksler i begge retninger og bare bildet klippet 4 HD-piksler skjevt blir godkjent med retting; riktig plassert leveranse rettes ikke.
+- Tørrkjøring med `_evaluate` på de 32 ekte sjekk-jobbene (ingenting skrevet til modden): 12 blir godkjent (obj293_01, obj335_01, obj339_01, obj566_01, obj602_01, obj774_01, obj775_01, obj822_01, rom060_del2av2, rom092, lag060_01_del2av2, lag060_02_del2av2), 7 får rettet plassering men står fortsatt til sjekk for blokkavvik, resten er uendret. Bare forhåndsvisningen av obj602_01 er sett med øynene (rulletekstpanelet, ser riktig ut). De andre 11 er bare teknisk kontrollert og må ses før de regnes som visuelt kontrollert.
+- Ikke kjørt: `tools/gpt_runde.sh` og ny modd med rettingen. Ikke testet i spillet.
+- Testene: pytest i `pipeline` 57 bestått, `git diff --check` uten feil.
+
+## 2026-10-16 00:52 (Claude)
+
+Natt, retting etter Codex' kontroll av «Mottaket retter små forskyvninger» (f8785db4). Enig i begge funnene, begge rettet.
+
+- `pipeline/smhd/gpt.py`, `_evaluate`: objektkontrollen i lag og ikonark kjøres nå både på det opprinnelige og det rettede utsnittet før rettingen velges. Rettingen brukes bare når forskyvningen blir mindre, sluttstatusen etter objektkontrollen ikke blir dårligere, ingen objektbilder får ny feil eller faller mer enn 0,05 i kantlikhet (`FIX_PIECE_TOL`), og blokkavviket ikke øker mer enn 0,1 originalpiksler (`FIX_BLOCK_TOL`). Før var lik status nok, også når blokkavviket økte (obj202_01: 1,11 til 1,95).
+- Nye regresjonstester: `test_gpt_import_shift_fix_keeps_blocks` (det meste forskjøvet 1 originalpiksel, én blokk en halv den andre veien; rettingen ville gitt blokkavvik 1,5) og `test_gpt_import_shift_fix_keeps_pieces` (laget med forskjøvet bakgrunn og riktig plasserte objekter, som Codex' lag017_03_del2av2). Begge feiler med koden i f8785db4 og består nå.
+- Ekte data, tørrkjøring med `_evaluate` (ingenting skrevet til modden): obj202_01 rettes ikke lenger, blokkavvik 1,11, sjekk. Den leverte lag017_03_del2av2 er godkjent uten retting både før og nå; Codex' tilfelle var en forskjøvet variant i minnet og dekkes av den nye lagtesten. Av de 32 sjekk-jobbene blir de samme 12 godkjent som i forrige tørrkjøring. Rettet, men fortsatt sjekk: 3 (obj600_01, obj781_01, ikon02) mot 7 før; obj202_01 og obj337_01 rettes ikke lenger.
+- Lot være: ingen. Ikke kjørt `tools/gpt_runde.sh` eller ny modd, ikke testet i spillet. De 11 nye godkjenningene utenom obj602_01 er fortsatt bare teknisk kontrollert.
+- Testene: pytest i `pipeline` 59 bestått, `git diff --check` uten feil.
+
+## 2026-10-16 01:05 (Claude)
+
+Natt: kontroll av fig259_02, lag026_02, lag026_03 og lag032_01_del1av2 fra Codex (commit 109a9ef81b i `work/.gpt-gren`), og en retting i mottaket.
+
+- `tools/gpt_runde.sh` gikk helt gjennom to ganger (før og etter rettingen): henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`.
+- Sett med øynene: forhåndsvisningene (original 4x, leveransen, etter fargelås) og per objekt originalen i nearest ved siden av HD-objektbildet i `mods/gpt/objects`. For fig259_02 originalrutene i 16x ved siden av de myke rutene i `mods/gpt/costumes` og `forhandsvisning/myk_fig259_02.png`.
+- lag026_02 (obj275_02, rom 26): godkjent. Sam og Max i buret med døren åpen, Sams brune føtter opp og Max lys grå, som originalen.
+- lag026_03 (obj275_03, rom 26): godkjent. Døren åpen, bare Sams og Max' hender over kanten nede til venstre, som originalen.
+- lag032_01_del1av2 (rom 32): godkjent. obj317_01 fiskehodet med nettet og kassene, obj316_01 den mørke døråpningen med rekkverket, obj313_01 hyttedøren med vinduet. Codex har lagt til en sky i himmelen i leveransen, men bakgrunnen brukes ikke fra lagjobber; bare objektrutene tas inn.
+- fig259_02 (kostyme 259, tre hender til Max, rute 313 til 315): godkjent visuelt. Gestene, åpningen under øverste hånd og de bøyde fingrene følger originalen. Figurmottaket (myk.py) gav snitt/union 0,88, 0,90 og 0,91 og la alle tre i modden.
+- Feil i mottaket: gpt-inn avviste fig259_02 med «omrisset avviker (overlapp 0.20)» fordi `has_native_alpha` målte de myke kantpikslene mot hele lerretet. Arket har bare tre små hender, så andelen ble 0,00029, under grensen 0,0005, og arket ble kontrollert som gammel stil med flat bakgrunn (gjennomsiktig svart talte som figur). Retting i `pipeline/smhd/gpt.py`: kantene godtas også når de er over 2 prosent av de synlige pikslene. Ingen andre figurark endrer klassifisering (sjekket på alle figurjobbene med resultat). Testen `test_figure_sheet_in_smooth_style_is_not_cut_with_the_old_mask` har fått et lite ark (feiler med den gamle koden) og et ark med harde kanter (skal ikke regnes som glatt stil).
+- Etter ny runde: fig259_02 står som levert og er ikke lenger i returen i ORDRE.md. Ingen rad i `docs/gpt-avvisninger.csv`.
+- Testene: pytest i `pipeline` 59 bestått, `git diff --check` uten feil.
+- Ikke testet i spillet, tilstandene og håndanimasjonen er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 01:35 (Claude)
+
+Natt: kontroll av lag032_03_del1av2, lag035_01_del1av2, lag035_02_del2av2 og lag041_01_del1av2 fra Codex (commit 87de0bc3e2 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`. Mottaket gav godkjent på alle fire.
+- Sett med øynene: forhåndsvisningene (original 4x, leveransen, etter fargelås) og per objekt originalen i nearest ved siden av HD-objektbildet i `mods/gpt/objects`. For obj384_01 og obj322_01, som er opake lapper, også lagt inn i HD-rommet for å se skjøten.
+- lag032_03_del1av2 (obj317_02, rom 32): godkjent. Den gule kassen med grønt fiskeinnhold, rekkverket og skyen som originalen.
+- lag035_01_del1av2 (rom 35): godkjent. obj322_01 er tomt gress etter bøtten, skjøten mot rommet er ren. obj323_01 nettet med de grønne fiskene, obj324_01 fisken med åpen munn mot høyre, obj327_01 vannkrusningen, obj328_01 fisken delvis nede i vannet. Form, retning og plassering følger originalen. Svak lys kant ytterst på konturen av obj324_01, bare synlig mot magenta; ikke avvist.
+- lag035_02_del2av2 (obj329_01, rom 35): godkjent. Den store fisken på nettet med munnen mot venstre, som originalen.
+- lag041_01_del1av2 (obj384_01, rom 41): godkjent. Tom vei og himmel der bilen ellers står, med de hvite løkkene i gresset. Bilen står i originalrommet og i HD-rommet, så lappen fjerner den som originalen. Skjøten mot HD-rommet er ren. lag041_01 venter fortsatt på del 2.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 01:50 (Claude)
+
+Natt: kontroll av lag041_01_del2av2, lag041_02_del2av2, lag043_01_del1av2 og lag045_01 fra Codex (commit 71eab2efb2 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom: henting, mottak, myke figurer, modden bygget (76 rom, 959 objektbilder, 931 figurruter), push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`. Mottaket gav godkjent på alle fire.
+- Sett med øynene: originalobjektet i nearest ved siden av HD-objektbildet i `mods/gpt/objects`, og hvert objekt lagt inn i HD-rommet ved siden av rommet uten objektet for å se skjøten.
+- lag041_01_del2av2 (obj385_01, rom 41): godkjent. De brune, tørre hårtrådene på steinen uten de gule feltene, samme plassering og utbredelse som originalen. lag041_01 er nå levert i begge deler.
+- lag041_02_del2av2 (obj385_02, rom 41): godkjent. Hårtrådene med de to lave gule feltene og de spredte gule flekkene, plassert som i originalen. Ingen ansiktsform. Skjøten mot steinen er ren.
+- lag043_01_del1av2 (obj392_01, rom 43): godkjent. Den ovale metallgrillen på Conroy-statuen med blått under, oransje jakke og hånden med gitaren. Skjøten mot HD-rommet er ren.
+- lag045_01 (rom 45): godkjent. obj428_01 er sengen uten den store puten, slik originalen viser tilstanden, og skjøten mot veggen er ren. obj429_01 er det røde håret på utstillingshodet med skyggen bak, uten ansikt, og sitter på sokkelen i HD-rommet. obj430_01 den blå boken i hyllen, obj433_01 trappens nedre del. Form og plassering følger originalen.
+- Ingen rad i `docs/gpt-avvisninger.csv`. Ikke testet i spillet, og tilstandsovergangene er ikke sett i motoren. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 01:48 (Claude)
+
+Natt, kodeoppgave: farget glorie rundt ikoner fra ikonark levert på feil bakgrunnsfarge.
+
+- Funnet i `status.csv`: ikon01 hadde fargeavvik 150,6 mot under 16 for alle andre jobber. Codex leverte arket på grønt (0,177,64), mens jobben ber om magenta. Fargelåsen trekker de grove fargene mot originalen, så kantene på ikonene ble dratt mot magenta. Sett med øynene i modden: obj661_01 (politibilen) har magenta kant langs hele omrisset i `mods/gpt/objects`.
+- `pipeline/smhd/gpt.py`: ny `_sheet_bg_as_delivered`. For ikonark måles arkfargen i leveransen der originalarket er bakgrunn (krympet 2 piksler fra ikonene). Ligger den mer enn `SHEET_BG_TOL` (40) fra bestilt farge, brukes den leverte fargen som bakgrunn i originalen fargelåsen sammenligner med. Fargen står som `arkfarge_levert` i resultatet og i provenance. Kontrollen (`compare`, `check_pieces`) er uendret, så status endres ikke.
+- Ny test `test_icon_sheet_on_other_background_gets_no_halo`: ikonarket levert på en annen arkfarge. Med den gamle koden er kantavviket på ikonet 71,5 (og `arkfarge_levert` mangler), nå under 8.
+- Tørrkjøring med `_evaluate` på det ekte ikon01 (ingenting skrevet til modden): `arkfarge_levert` [0, 177, 64], status fortsatt sjekk (blokkavvik 1,3). obj661_01 utklippet med `_with_alpha` og sett over mørk grønn: magentakanten er borte, bare en svak lys strek øverst på taket.
+- Ikke kjørt: `tools/gpt_runde.sh` og ny modd, så modden har fortsatt glorien. Ikke testet i spillet.
+- Testene: pytest i `pipeline` 60 bestått, `git diff --check` uten feil.
+
+## 2026-10-16 02:10 (Claude)
+
+Natt: kontroll av lag045_02, lag053_01_del1av2, lag053_02_del1av2 og lag068_01 fra Codex (commit b16d4e20b4 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 931 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket avviste alle fire.
+- Sett med øynene: referanse.png og resultat.png side om side per objektfelt, og hele bildet for rom 53 og 68. Avvisningene stemmer i alle fire; ingen feil i mottaket funnet.
+- lag045_02: avvist. Boken obj430_02 har fått hvite bølgestreker i stedet for det rutede feltet. Auberginen obj429_02 og trappen obj433_02 er riktige.
+- lag053_01_del1av2 og lag053_02_del1av2: avvist. Gjestene i salen er glatte silhuetter uten ansiktene i originalen, og musikerne holder armer og instrumenter annerledes.
+- lag068_01: avvist. Max-bitene i høyre kant (obj651_01) er større og går lenger inn enn i originalen, og veiene er flyttet opptil 2 px. Teksten Score: og Tim stemmer.
+- Fire rader i `docs/gpt-avvisninger.csv` med konkret grunn og forslag. Runden kjørt igjen, så returen står i ORDRE.md.
+- Levert 4, visuelt kontrollert 4, importert 0. Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 02:29 (Codex, separat ikonetterkontroll)
+
+- Kode 6ea6d4b0 er nå brukt i publisert hd-mod 8f3f82a7. Sammenlignet obj661_01, obj662_01, obj663_01 og obj670_01 i original, førkode-modd 48abf3c9 og ny modd. Sluttfilenes SHA-256 er bekreftet. Alfa og størrelse er identiske før/etter for alle fire; det er RGB som er endret.
+- Den kraftige magentaglorien er tydelig redusert. En RGB-terskel gir totalt 2332 synlige magentapiksler før og 332 etter; dette er en sammenligningsmåling, ikke antall beviste artefakter. Enkelte grønne/lilla kantpiksler er fortsatt synlige på bilene. Ikke godkjent som fullstendig pikselrent. Ikonarkene 07, 08 og 09 er også sett i oppdaterte mottaksforhåndsvisninger, uten åpenbar ny geometriendring; ingen ny stilgodkjenning.
+- Før/etterbilder, sammenligningspanel og kilder/hasher er sikret i Codex-arbeidsmappens output/natt-ikonfargelas-20261016. Todo er oppdatert med etterkontrollen og en konkret oppgave om kantrestene. Det tidligere kontrollpunktet for de tolv plasseringsrettingene er også kvittert ut: én sett av Claude, elleve av Codex.
+- Dette er dokumentasjon og videre oppgave, ingen kode- eller bildeendring i repoet. Grafikkagentens aktive filer i gpt-arbeid er ikke rørt. Ikke testet i spillet, ikke godkjent av Tom.
+
+## 2026-10-16 03:08 (Claude)
+
+Natt: kontroll av nye forsøk på lag045_02, lag053_01_del1av2, lag053_02_del1av2 og lag068_01 fra Codex (commit ccc36110a7 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 931 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente lag053_01_del1av2 og lag068_01 og avviste lag045_02 og lag053_02_del1av2.
+- Sett med øynene: original_1x i nearest over resultatet (beskåret med `bilde_i_lerret`) per objektfelt, forstørret 4 til 8 ganger, og for lag045_02 også rommet mot obj430_01, 02 og 03 fra `work/extract`.
+- lag053_01_del1av2: godkjent. Gjestene har nå øyne, munner og armer på samme sted som originalen, gjesten obj508_01 har den åpne o-munnen. Musikerne holder instrumentene som originalen. Ingen flaske på bordet, som originalen. De 15 objektbildene ligger i modden.
+- lag045_02: avvist. Det rutede feltet på boken er nå riktig, men tilstanden er den smale mørk grå boken til venstre for den blå, og den er borte. Svart i obj430_02.png er gjennomsiktig, så den røde boken skal stå. Mottakets avvisning stemmer; returen er skrevet om med den faktiske feilen.
+- lag053_02_del1av2: avvist. obj507_01 mangler den brede åpne munnen, obj509_01 har annen armstilling. Mottakets avvisning stemmer.
+- lag068_01: avvist, selv om mottaket godkjente. Max-bitene, veiene og teksten er nå riktige, men venstre stolpe obj656_01 har et hakk i underkanten, og lyset på stolpene stemmer ikke med originalen (høyre stolpe er lys der originalen er svart).
+- Tre rader i `docs/gpt-avvisninger.csv` med grunn og forslag. Runden kjørt igjen; returen står i ORDRE.md og RAPPORT.md.
+- Levert 4, visuelt kontrollert 4, importert 1 (lag053_01_del1av2). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 03:18 (Claude)
+
+Natt, kodeoppgave: grønne og lilla kantpiksler på ikonene fra ikonark (todo, etter Codex' etterkontroll 02:29).
+
+- Årsak: ikonene klippes ut med originalens alfa i 4x. Der det tegnede ikonet er litt mindre enn originalen, blir arkfargen (grønt fra ikon01) eller en blanding med den stående innenfor alfaen. Lilla kom fra blanding av svart kant og magenta.
+- `pipeline/smhd/gpt.py`: ny `clean_sheet_edge`, brukt i `_finish_pieces` for ikonark før `match_state`. Piksler innenfor 6 HD-piksler fra kanten eller bildekanten, med samme fargetone som bestilt eller levert arkfarge, får fargen fra pikslene innenfor når de ligner en blanding av den og arkfargen. Piksler der originalen selv har den fargetonen innen én originalpiksel røres ikke. Alfa endres ikke. Antallet står som `kantrens` i provenance.
+- Første utkast uten vernet gjorde det grønne bladet på obj824_01 svart; vernet ble lagt til etter at jeg så det.
+- Tørrkjøring på de 163 ikonobjektene i `mods/gpt/objects` (ingenting skrevet til modden, bildene i `work/tmp_kant`): grønne piksler på obj661_01, obj662_01 og obj663_01 fra 692, 944 og 351 til 0, 3 og 0; magenta fra 447, 445 og 463 til 113, 29 og 74. obj670_01: magentastripen nederst og til høyre er borte. Alfa er lik før og etter.
+- Sett med øynene, original, modd og renset på grått og lyst: bilene, trådkorset obj874_01 (grønn kant blir svart som originalen), munnen obj877_01, blyanten obj893_01, eplet obj891_01, obj890_01 og ikoner med grønt eller lilla i originalen (obj049_01 LucasArts-logoen, obj887_01 med rosa bakgrunn, obj1037_01 plommen, obj671_01 skiltet, obj791_01 og obj800_01 trærne, obj1059_01 flasken). Ingen synlig skade på ekte farger. Litt mørk lilla står igjen langs taket på obj661_01.
+- Tester: `test_icon_sheet_edge_keeps_no_sheet_colour` (ikonet tegnet mindre på annen arkfarge; 496 kantpiksler nær arkfargen med den gamle koden, 0 nå) og `test_clean_sheet_edge_keeps_colours_from_the_original`. pytest i `pipeline` 62 bestått, `git diff --check` uten feil.
+- Ikke kjørt `tools/gpt_runde.sh`, så modden har fortsatt de gamle kantene. Ikke testet i spillet. Trenger Codex-kodekontroll.
+
+## 2026-10-16 03:58 (Claude)
+
+Natt: kontroll av lag045_02, lag053_02_del1av2, lag068_01 og lag068_05 fra Codex (commit f30484650a i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 931 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente alle fire; ingen av dem står under sjekk i RAPPORT.md.
+- Sett med øynene: original_1x i nearest ved siden av resultatet per objektfelt, forstørret 3 til 10 ganger, og pikseldiff mot forrige leveranse (ccc36110) for de tre returjobbene.
+- lag045_02: godkjent. Den smale mørk grå boken står nå mellom de grønne bøkene og den blå boken, på samme sted og i samme bredde som originalen. Bare feltet x 252 til 267, y 276 til 327 i lerretet er endret fra forrige leveranse. Auberginen og trappen er uendret.
+- lag053_02_del1av2: godkjent. obj507_01 har den brede åpne munnen, obj509_01 har armen over magen og hånden til høyre som originalen. Endringen ligger bare i x 873 til 1022, y 585 til 654. Musikeren obj499_01 er uendret og riktig.
+- lag068_01: godkjent. Stolpene har rett underkant, venstre stolpe er lys til venstre og mørk til høyre, høyre stolpe mørk til venstre og lys til høyre. Bakgrunnen i det innsatte feltet er 3 nivåer lysere enn rundt, men den er gjennomsiktig i obj656_01 og obj659_01, så den synes ikke. Bare stolpefeltet er endret.
+- lag068_05: godkjent (første leveranse). Fire veifelt med kantene innen omtrent 2 originalpiksler fra originalen målt rad for rad, samme slingring som i godkjent lag068_01. Den gule streken i obj628_01 ligger på samme sted. Fjernfeltene obj638_01 og obj648_01 har samme form og plassering.
+- Modden: obj656_01 i `mods/gpt` ligger nærmere ny leveranse (snittavvik 10,4) enn forrige (20,5), så den nye er tatt inn; resten er fargelås.
+- Ingen nye avvisninger, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, importert 4 (19 objektbilder). Ikke testet i spillet, minispillet i rom 68 er ikke avspilt. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 04:08 (Claude)
+
+Natt: kontroll av lag068_06, lag068_07, lag068_09 og lag068_10 fra Codex (commit edd5696649 i `work/.gpt-gren`). Tre veibiter per lag i Highway Surfing, rom 68.
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 931 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente alle fire; ingen av dem står under sjekk i RAPPORT.md.
+- Sett med øynene: original_1x i nearest over resultatet (beskåret med `bilde_i_lerret`), rommets x 84 til 236, y 76 til 132 i 4x, og stripene forstørret 8 ganger side om side.
+- Målt rad for rad på resultatet nedskalert til 1x: veikantene ligger innen 1 originalpiksel (06, 07), 2 (09) og 3 på én rad (10, rad 109 høyre kant). Avvikende piksler utenfor originalens veiflater er kantutjevning langs skråkantene. Den gule streken har samme midtpunkt innen 0,6 originalpiksler og samme utstrekning (x og y innen 1 piksel) i alle fire. Ingen biler, tall eller nye merker. Fjernbitene har samme form og plassering.
+- Merknad: i leveransen starter den midterste biten én originalpiksel lavere enn originalen (rad 88 er svart mellom himmel og vei). I modden fylles toppraden av fargelåsen; obj629_01, obj630_01, obj632_01 og obj633_01 har veifarge fra rad 0. Ikke en avvisningsgrunn.
+- Godkjent alle fire. Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, importert 4 (12 objektbilder: obj619 til 623 unntatt 621, obj629 til 633 unntatt 631, obj639 til 643 unntatt 641, alle tilstand 01). Ikke testet i spillet, minispillet i rom 68 er ikke avspilt. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 04:12 (Claude)
+
+Natt, kodeoppgave: mørk lilla kant langs taket på obj661_01 etter kantrensen (todo).
+
+- Årsak: pikslene er den mørke omrisskanten blandet med magenta, for eksempel (80,44,114), mens fargen innenfor er det hvite taket. De ligner ikke en blanding av taket og arkfargen, så `clean_sheet_edge` lot dem stå.
+- `pipeline/smhd/gpt.py`, `clean_sheet_edge`: nytt andre trinn. Kantpiksler med arkfargens fargetone som ikke ble rettet i første trinn, mister bare den delen av fargen som går i arkfargens retning; snittet av RGB (lysstyrken) står. (80,44,114) blir omtrent (62,79,96), mørk blågrå. Vernet er bredere her: ingen endring innen to originalpiksler fra samme fargetone i originalen (første trinn bruker én). Uten vernet på to ble venstre kant av den lilla linjalen i obj049_01 grå. Antallet i `kantrens` tar med begge trinn.
+- Ny test `test_clean_sheet_edge_takes_sheet_tone_from_dark_outline`: mørk lilla kant over hvitt blir nesten grå med samme lysstyrke, og står når originalen er lilla to piksler unna.
+- Tørrkjøring på de 163 ikonene i `mods/gpt/objects` (allerede renset med første trinn i runden 04:05; ingenting skrevet til modden, bildene i `work/tmp_lilla`): piksler med magentatone innenfor alfa på obj661_01, obj662_01 og obj663_01 fra 85, (ikke talt), (ikke talt) til 0, 13 og 5. 2659 piksler endret i alt, 113 ikoner uendret.
+- Sett med øynene på mørk bakgrunn, original, modd og ny: obj661_01 taket (lilla borte), obj662_01 bakruten (lilla kant blir mørk blå), obj888_01 esken (grønn strek på rammen øverst til høyre borte), obj824_01 (det grønne bladet står, grønnlige høylys på røret blir grå), obj049_01 (den lilla skyggekanten under linjalen blir mørk som originalen, linjalen er fortsatt lilla). Den lyse magenta kanten rundt figuren i obj049_01 står fortsatt; den er en kjent tegnefeil i grafikkordren.
+- Tester: pytest i `pipeline` 63 bestått, `git diff --check` uten feil.
+- Ikke kjørt `tools/gpt_runde.sh`, så modden har ikke det nye trinnet. Ikke testet i spillet. Trenger Codex-kodekontroll.
+
+
+## 2026-10-16 04:18 (Codex, oppfølging av ikonetterkontrollen)
+
+- Kvitterer dokumentasjonen for allerede utført etterkontroll av første kantrens ecd9ec0e i publisert hd-mod 55f976de. Alle 163 ikon-PNG er målt før/etter: størrelse og alfa identiske, 159 med synlige RGB-endringer. 22 faktiske PNG er sett mot original og førbilder på mørk grønn og lys grå bakgrunn. Tydelig færre grønne/magenta kantrester, ingen åpenbar ny skade på ekte grønne/lilla felt i utvalget. Bilene har fortsatt tynne mørke/lilla streker og trappetrinn fra uendret alfa. Dette er PNG-kontroll, ikke motoravspilling eller Toms stilgodkjenning.
+- Før/etter for alle 163, åtte paneler og etter-kontroll.json med original-/bildehasher er sikret i Codex-arbeidsmappens output/natt-kantrens-20261016. Første trinn og andre trinn er nå kvittert for separat Codex-kodekontroll: henholdsvis 62 og 63 beståtte pipelinetester. Andre trinn de951ff7 venter fortsatt på ny sluttmodd og visuell etterkontroll; ingen påstand om at bildene fra 55f976de viser dette trinnet.
+- Rettet to foreldede oppsettpunkter i todo: GitHub-push virker og nattløpet har startet etter prøvetur. Ingen nye tester kjørt for dokumentasjonsendringen, ingen kode eller grafikk endret. Arbeidstreet var rent og kun Codex-grafikkagenten i separat worktree var aktiv. Ingen aktive agentfiler rørt.
+
+## 2026-10-16 04:42 (Claude)
+
+Natt: kontroll av fig002_06, lag068_12, lag071_05 og lag071_15 fra Codex (commit e8805b7654 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 942 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente de tre lagjobbene og satte fig002_06 til levert; ingen av dem står under sjekk i RAPPORT.md.
+- Sett med øynene: original_1x i nearest ved siden av resultatet beskåret med `bilde_i_lerret`, forstørret 5 til 8 ganger, og forhåndsvisningene.
+- fig002_06 (Sam, kostyme 2, 11 ruter): godkjent. Riktig figur, positur og retning i alle ruter, ingen ekstra ruter. Målt omriss mot originalens synlige felt: bredde og høyde innen 0,25 originalpiksler i alle 11. Tatt inn med figurmottaket for myke kanter (931 til 942 ruter, 0 til gjennomsyn); de 11 `costume002_*_hd.png` i modden er sett på grønn bakgrunn uten magentakant.
+- lag068_12 (stolpen obj658_01, rom 68): godkjent. Samme plassering, topp og sokkel som originalen, lys venstre side og mørk kant, ingen nye detaljer.
+- lag071_05: avvist. Skiltet på kassen i obj719_01 sier "$1.00 EACH" i originalen, leveransen har pil og "PUSH ME!". Romnotatet for rom 71 ber om PUSH ME! for hele rommet og har trolig styrt dette; spørsmål lagt i todo.
+- lag071_15: avvist. Parykken obj764_01: i originalen henger hårstråene ned over pannen og øynene, i leveransen er luggen kort og Max har fått synlige øyne.
+- To rader i `docs/gpt-avvisninger.csv` med grunn og forslag. Runden kjørt på nytt; begge står som avvist i status.csv og i ORDRE.md med retur.
+- Levert 4, visuelt kontrollert 4, godkjent 2, importert 2 (obj658_01 og 11 figurruter i kostyme 2). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 05:09 (Claude)
+
+Natt: kontroll av lag071_05, lag071_15, fig007_02 og fig247_01 fra Codex (commit 4e57d4b6d0 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 970 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente begge lagjobbene og satte de to figurarkene til levert; ingen av de fire står under sjekk i RAPPORT.md.
+- Sett med øynene: original_1x i nearest ved siden av resultatet beskåret etter `plassering` og `skala`, forstørret 6 ganger, forhåndsvisningene, og referanse.png over resultatet på grønn bakgrunn for figurarkene.
+- lag071_05 (retur): godkjent. Skiltet på kassen i obj719_01 sier "$1.00 EACH" med dollartegn, stort 1-tall og hevet 00, som originalen. Ingen pil og ingen PUSH ME!. Resten er som i forrige forsøk.
+- lag071_15 (retur): godkjent. Hårstråene i obj764_01 henger ned over pannen og øynene med lyse striper mellom, ingen øyne synes, nese og tenner står. Sam og den gylne rekvisitten er uendret.
+- fig007_02 (Sam, kostyme 7, 25 ruter): godkjent. Riktig figur og positur i alle ruter: 13 hoder med munnstillinger, to hatter, fem hånd- og ørepar og fem kroppsbilder med hendene samlet foran. Ingen ekstra ruter. Figurmottaket: alle 25 ok, skala innen 1 prosent, snitt/union minst 0,85.
+- fig247_01 (Sam og Max med VR-hjelm, kostyme 247, 3 ruter): godkjent. Hjelm med grønt visir, kablene i tre ulike former som i originalen, Max oppreist, vannrett og oppreist, det oransje partiet under Max i midtruten beholdt. Figurmottaket: alle 3 ok, snitt/union minst 0,75. I tredje rute er originalens løse kabeltupp øverst til venstre tegnet som del av en sammenhengende løkke; ikke en avvisningsgrunn.
+- De gamle avvisningsradene for lag071_05 og lag071_15 i `docs/gpt-avvisninger.csv` gjelder de forrige leveransene (sha256) og står. Ingen nye rader, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (5 objektbilder: obj719_01, obj741_01, obj749_01, obj735_01 og obj764_01, og 28 figurruter: 25 i kostyme 7 og 3 i kostyme 247; 942 til 970). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 05:30 (Claude)
+
+Natt, kodeoppgave: RAPPORT.md fra gpt-inn viste «Figurark: 0 av 1758 godtatt. Ferdige figurruter: 0 av 15661», mens modden har 970 figurruter.
+
+- Årsak: figurarkene i glatt stil får status levert i gpt-inn og tas inn av `smhd myke-figurer`, som kjører etter gpt-inn i `tools/gpt_runde.sh`. Rapporten telte bare godkjente ark og ruter klippet ut i gpt-inn. ORDRE.md teller allerede riktig fra myke.json.
+- `pipeline/smhd/gpt.py`, `_report`: figurarklinjen får tillegget «N ark levert til figurmottaket (smhd myke-figurer); rutene derfra telles i ORDRE.md og myke.json» når noen ark har status levert. Rapporten leser ikke myke.json, fordi den fra gpt-inn alltid ville være fra forrige runde. Returverdien har `figurark_levert`, og `smhd gpt-inn` skriver tallet på skjermen.
+- Ny test `test_report_names_figure_sheets_handed_to_soft_intake`. pytest i `pipeline` 64 bestått, `pytest -m "not game"` 61 bestått, `git diff --check` uten feil.
+- Ikke kjørt `tools/gpt_runde.sh`, så RAPPORT.md i gpt-arbeid har fortsatt den gamle linjen til neste runde. Ingen grafikk endret.
+- Sjekket samtidig todo-punktet om de 11 figurrutene: myke.json versjon 6 har fig091_03 til 05, fig209_03 og fig272_02 som ok, og ORDRE.md nevner ikke fig091. Krysset av. Ikke sett i spillet.
+- Trenger Codex-kodekontroll.
+
+
+## 2026-10-16 05:18 (Codex, kvittering av andre kantrinn)
+
+- Kvitterer allerede utført visuell etterkontroll av de951ff7 i publisert hd-mod 183850f6. Alle 163 faktiske ikon-PNG er sammenlignet med første trinn: alfa/størrelse identiske, 116 byteidentiske og 47 med synlig RGB-endring. RGB-snittet endres høyst en tredjedel av ett nivå. Alle 163 nye PNG er også bekreftet byteidentiske i avsluttende modd 037f4298 etter Claudes grafikkretur.
+- Codex har sett 14 utvalgte PNG mot original/før/etter på mørk grønn og lys grå bakgrunn. Biltakenes mørke lilla er redusert og blir blågrå/mørk, uten åpenbar ny skade på ekte grønne/lilla felt i utvalget. Trappetrinn fra uendret alfa og logoens lyse magentakant står fortsatt. Ikke helt pikselrent, ikke motoravspilt, ikke Toms stilgodkjenning. PNG, seks paneler og kilde-/bildehasher finnes i Codex-arbeidsmappens output/natt-kantrens-trinn2-20261016.
+- Todo kvittert for andre trinns import/visuelle kontroll og for rapportrettingen a9d26856, som er separat Codex-godkjent med 64 tester. Rom71-notatet presisert som teknisk kodeoppgave: undersøk konsekvensen for prompter/ordre og bevar godkjente leveranser før den for brede skiltinstruksen rettes. Ingen romnotat, beskyttet prompt, kode eller grafikk endret nå. Arbeidstreet var rent og bare grafikkagenten i separat worktree var aktiv.
+
+## 2026-10-16 05:34 (Claude)
+
+Natt: kontroll av fig247_02, fig247_03, fig247_04 og fig247_05 fra Codex (commit d68faa7b4c i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 993 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). RAPPORT.md: 80 figurark levert til figurmottaket; ingen av de fire står under sjekk. `myke.json`: alle 23 nye ruter ok og i modden, snitt/union 0,77 til 0,91, tegnet mot 4x innen 0,6 prosent.
+- Sett med øynene: referanse.png over resultatet på grønn bakgrunn, ruteområdet i full HD-oppløsning.
+- fig247_02 (4 ruter, start mot høyre): godkjent. Sam med VR-hjelm holder Max vannrett ut til venstre i alle fire, Max med hengende føtter og ørestillingene som i originalen, kabelløkken i første rute og de tre andre kabelformene som i originalen. costume247_1926 har lavest snitt/union (0,77), men figur og positur er riktig.
+- fig247_03 (6 ruter, animasjon 7): godkjent. Bare Sam, gyllen nøkkel holdt foran brystet med skaftet mot venstre, den andre hånden hengende ved siden, i alle seks ruter.
+- fig247_04 (6 ruter, animasjon 7): godkjent. Nøkkelen foran i første rute, senket med nøkkelen ned i andre og tredje, hånden på vei mot lommen i fjerde og i lommen i femte og sjette, som originalen.
+- fig247_05 (7 ruter, animasjon 7): godkjent. Hånden i lommen i de tre første, på vei ut i fjerde, løftet i femte og senket i sjette og sjuende. Ingen nøkkel og ingen Max, som originalen.
+- Hjelmen er svart kuppel med grønt visir som i godkjente fig247_01; originalen har grønne striper på kuppelen, også i den godkjente. Ikke avvisningsgrunn, men noteres for Tom sammen med stilen.
+- Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (23 figurruter i kostyme 247; 970 til 993). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 05:55 (Claude)
+
+Natt: kontroll av fig247_06, fig247_07, fig247_08 og fig247_09 fra Codex (commit 272aa4d150 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 1012 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). RAPPORT.md: 84 figurark levert til figurmottaket; ingen av de fire står under sjekk. `myke.json`: alle 19 nye ruter ok og i modden, snitt/union 0,82 til 0,91, tegnet mot 4x innen 1,2 prosent.
+- Sett med øynene: referanse.png over resultatet på grønn bakgrunn, hele ruteområdet, og hodene forstørret for munnstillingene i fig247_08 og 09.
+- fig247_06 (1 rute, animasjon 7): godkjent. Sam alene med VR-hjelm, hendene hengende, ingen nøkkel og ingen Max.
+- fig247_07 (6 ruter, animasjon 8): godkjent. To ruter med hendene nede, venstre hånd litt ut i tredje, venstre hånd ut til siden og høyre foran brystet i fjerde, begge hender på hjelmen i femte og sjette, som originalen.
+- fig247_08 (6 ruter): godkjent. Begge hender på hjelmen i alle seks, hodet løftes fra fjerde rute, lukket munn i de tre første og liten åpen munn i de tre siste.
+- fig247_09 (6 ruter): godkjent. Begge hender på hjelmen, hodet senket i de fire første og løftet i de to siste, åpen munn bare i femte og sjette.
+- Hjelmen har grønne striper på kuppelen i disse arkene, nærmere originalen enn fig247_01 til 05. Dermed er hjelmen ikke helt lik mellom arkene i kostyme 247; noteres for Tom sammen med stilen, ikke avvisningsgrunn.
+- Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (19 figurruter i kostyme 247; 993 til 1012). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+
+## 2026-10-16 05:53 (Codex, separat VR-fargekontroll og kontrollpause)
+
+- Etter Claudes godkjenning av fig247_02 til 05 sammenlignet Codex original og faktisk native PNG for alle 26 ruter i fig247_01 til 05. Bare fig247_02 mangler originalens grønne kuppelbånd, i alle fire ruter. Samme hjelm/synsvinkel skifter derfor farge mellom arkene. Fig247_02 er sendt i konkret retur per faktisk resultat-hash 63a6191a32760f123d643c8522fe84637e4fe623795f431ee281b73d2ca3e7a7; de øvrige fire arkene er ikke avvist. Bevar alt bortsett fra de grønne båndene.
+- Kontrollpause med STOPP ble satt etter at neste Claude-kontroll hadde startet, for å registrere returen uten å skrive i aktive filer. Agentene fikk fullføre; ingen prosess drept eller arbeid/stash slettet. Avvisningsraden tas med i neste ordinære importrunde. Original, levert ark, fire native PNG og hasher er bevart i Codex-arbeidsmappens output/natt-vr-design-20261016/fig247_02-for-retur. Ingen grafikk eller beskyttet prompt endret av kontrollen.
+- Ingen ny kodeendring eller motoravspilling. Nattløpet gjenopptas med samme modell og sperrer etter at returen står i ORDRE.md og den avviste versjonen er utelatt fra modden. Frist 08:00 beholdes.
+
+
+## 2026-10-16 06:07 (Codex, ordrestatus for avvist alfa-ark)
+
+- Ordinær import fullførte uten feil og utelot de fire avviste native rutene; modden har 1008 ruter. Kontroll fant en konkret feil i ordregrunnlaget: import_results går rett til status levert for native alfa uten å lese den manuelle avvisningen, mens myke-figurer korrekt merker fig247_02 avvist og fjerner rutene. Derfor kom ikke arket først i ORDRE, og retur.md manglet.
+- Midlertidig korrigert bare fig247_02 sin genererte status til avvist, med samme grunn og kildehash som docs/gpt-avvisninger.csv og myke.json, og skrevet retur.md. Ordinær gpt-ordre og gpt_gren.sh send har publisert riktig prioritert retur. Ingen prompt, referanse, tegning eller kode er endret. Varig retting er konkret prioritert i kodesporet med regresjon og separat Codex-kontroll. Dette overstyrer ingen kvalitetskontroll; det gjenspeiler avvisningen som mottaket allerede håndhever.
+
+## 2026-10-16 06:37 (Claude)
+
+Natt: kontroll av fig247_02 (retur), fig116_01, fig247_10 og fig247_11 fra Codex (commit a137d6de6d i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 1030 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). RAPPORT.md: 87 figurark levert til figurmottaket; ingen av de fire under sjekk. `myke.json`: alle 22 nye ruter ok, snitt/union 0,77 til 0,91, tegnet mot 4x innen 1,2 prosent.
+- Sett med øynene: referanse.png over resultatet på grønn og grå bakgrunn, og hodene og hjelmene forstørret.
+- fig247_02 (ny SHA 7ea6eef6): godkjent. Kuppelen har nå grønne bånd i alle fire ruter, lik fig247_03 og originalen. Sam, Max, grep og kabelfaser som før. Den gamle avvisningen gjelder bare forrige SHA.
+- fig116_01 (8 ruter, Gator Golf): godkjent. Sam med fedora balanserer og hopper på alligatorene i samme positurer som originalen, luftruten uten alligator under føttene, alligatorene og vannlinjene på samme steder, de små 1x1-restene beholdt.
+- fig247_11 (4 ruter): godkjent. Hendene mot hjelmen, så én hånd ut, så armene nede; hjelmen med grønne bånd henger over fedoraen som i originalen.
+- fig247_10 (6 ruter): avvist. Rute 3 og 4 mangler strekkgagen: originalen har hatten strukket opp som en smal stilk uten brem og flatpresset ansikt med lukkede øyne i rute 3, og bremmen ned over øynene med smale øyne og åpen svart munn i rute 4. HD viser vanlig fedora og nøytralt ansikt. Rad i `docs/gpt-avvisninger.csv` med grunn og forslag.
+- Runde to: myke-figurer utelot fig247_10 (1024 ruter i modden), men status.csv ble stående levert og ORDRE ble ikke skrevet på nytt. Dette er den kjente feilen i import_results (øverste todo-punkt). Rettet status.csv og skrev retur.md for fig247_10 for hånd, fjernet gammel retur.md for fig247_02, og kjørte `smhd gpt-ordre` og `tools/gpt_gren.sh send`. Returen for fig247_10 står først i ORDRE.md (gpt-arbeid 60679d55). Ingen kode endret.
+- Levert 4, visuelt kontrollert 4, godkjent 3, avvist 1, importert 3 (18 figurruter; modden har 1024 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 07:08 (Claude)
+
+Natt: kontroll av fig247_10 (retur), fig116_02, fig116_03 og fig116_04 fra Codex (commit 3b5614a2b0 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 1048 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). RAPPORT.md: 90 figurark levert til figurmottaket. `myke.json` versjon 6: alle 24 nye ruter ok og i modden, snitt/union 0,81 til 0,92, tegnet mot 4x innen 1,1 prosent; 0 ruter til gjennomsyn.
+- Sett med øynene: referanse.png ved siden av resultatet på grå bakgrunn for hele arket, rute 3 og 4 i fig247_10 forstørret, og hodene i fig116_04 forstørret mot originalen.
+- fig247_10 (ny SHA 3119bb46): godkjent. Rute 3 har nå hatten som smal lyseblå stilk inn mot hjelmen uten brem, lukkede øyestreker og sur munn; rute 4 har bremmen lavt ned mot øynene, smale øyne og liten svart åpen munn, som originalen. Ansiktet i rute 3 er mindre flatpresset enn originalen, men gagen leses. Rute 1, 2, 5 og 6, kabler, hjelmens grønne bånd og slips uendret. Den gamle avvisningen gjelder bare forrige SHA; gammel retur.md fjernet.
+- fig116_02 (1 rute): godkjent. Sam forfra med hendene ned, alligatorhode med ett øye i profil, hale og bølgeflate på samme steder.
+- fig116_03 (9 ruter): godkjent. Balanse- og sparkestillingene som originalen, alligatordeler bare i de fem rutene som har dem.
+- fig116_04 (8 ruter): godkjent. Åtte balansestillinger uten alligator, samme arm- og fotstillinger; hodet forfra med stor nese og ingen synlige øyne under bremmen, som originalen og godkjent fig116_01.
+- Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt. status.csv står riktig som levert for alle fire.
+- Levert 4, visuelt kontrollert 4, godkjent 4, avvist 0, importert 4 (24 figurruter; modden har 1048 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 07:10 (Claude, kodesporet)
+
+Natt: retting av øverste todo-punkt, import_results for figurark med ekte alfa.
+
+- Feilen: `gpt.import_results` satte alltid status levert for native alfa-ark uten å lese `docs/gpt-avvisninger.csv`. `smhd myke-figurer` utelot det avviste arket riktig, men status.csv ble stående levert, retur.md ble ikke skrevet og returen kom ikke først i ORDRE.md (fig247_02 og fig247_10 i natt, rettet for hånd).
+- Rettet i `pipeline/smhd/gpt.py`: ny `manual_rejection(manual, jobb, sha)` gir status, grunn og forslag når avvisningen gjelder akkurat denne sjekksummen eller `*`. `_evaluate` bruker den samme funksjonen som før (uendret oppførsel). I grenen for native alfa gir en treff status avvist (eller sjekk) med grunn og forslag i status.csv og retur.md. Uten treff blir arket levert som før, og en gammel retur.md fjernes. Levert er fortsatt ikke godkjent.
+- Regresjonstest `test_rejected_smooth_figure_sheet_gets_return_order_and_new_sha_is_delivered`: avvist SHA gir avvist, retur.md med forslaget og jobben først i arbeidskøen; ny SHA gir levert, ingen retur.md og ute av køen. Testen feiler mot forrige gpt.py og går gjennom med rettingen.
+- `pytest` i pipeline: 65 tester grønne (med game/). Sjekket mot dagens data: avvisningene for fig247_02 og fig247_10 gjelder de gamle SHA-ene, så dagens leveranser 7ea6eef6 og 3119bb46 gir levert. Ikke kjørt `gpt_runde.sh` med rettingen; neste ordinære runde tar den i bruk.
+- Codex skal kontrollere koden. Ingen grafikk endret.
+
+## 2026-10-16 07:13 (Claude, kodesporet)
+
+Natt: retting etter Codex-kontroll av import_results-rettingen (1ec0d92f).
+
+- Enig i begge punktene. memory.md: punktet om at native alfa-figurark går rett til levert er byttet ut med det som gjelder nå (avvisninger følges, ny SHA gir levert, regresjonstest, ikke kjørt i full runde).
+- STATUS.md: raden HD-mod fra grafikeren har fått rettingen og testresultatet.
+- Lot koden være: Codex fant ingen funksjonelle feil.
+- `pytest` i pipeline: 65 grønne. `git diff --check` ren. Bare dokumentasjon endret.
+
+## 2026-10-16 07:47 (Claude)
+
+Natt: kontroll av fig116_05, fig116_06, fig116_07 og fig116_08 fra Codex (commit dddbe4ae8a i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 1075 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid` e65d8457). Første fulle runde med import_results-rettingen (1ec0d92f); status.csv har levert for alle fire. RAPPORT.md: 94 figurark levert til figurmottaket. `myke.json` versjon 6: alle 27 nye ruter ok og i modden, snitt/union 0,83 til 0,96, tegnet mot 4x innen 0,8 prosent; 0 til gjennomsyn.
+- Sett med øynene: referanse.png ved siden av resultatet på grå bakgrunn for hele arket, og hodene forfra og i profil (fig116_05, 06, 08) og alligatorene i fig116_07 forstørret.
+- fig116_05 (5 ruter): godkjent. Sam forfra med hendene ned, så fire ruter bakfra fra stående til balanse på ett ben, samme arm- og fotstillinger.
+- fig116_06 (7 ruter): godkjent. Fire balansestillinger bakfra med armene ut, to stående bakfra og Sam i trekvart profil med snute og slips, som originalen.
+- fig116_07 (9 ruter): godkjent. Fem ruter uten alligator, fire med alligatoren under føttene på samme sted; alligatorhode, øye, rygg og hale som i originalen.
+- fig116_08 (6 ruter): godkjent. Sam i profil på alligatoren, fire bakfra på alligatoren og siste rute i luften uten alligator, som originalen.
+- Små 1x1-rester i arkene beholdt som i originalen. Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, godkjent 4, avvist 0, importert 4 (27 figurruter; modden har 1075 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.

@@ -60,6 +60,16 @@ BORDER = (128, 128, 128)     # grå kant rundt bildet på lerretet
 # Grenser for vurdering (originalpiksler). Kan justeres når vi ser ekte resultater.
 OK_SHIFT, OK_BLOCK, OK_EDGES = 0.75, 1.0, 0.55
 CHECK_SHIFT, CHECK_BLOCK, CHECK_EDGES = 1.5, 2.0, 0.40
+# Hele bildet forskjøvet mellom disse grensene: mottaket klipper på nytt der innholdet ligger
+# (ikke figurark, som har egen kontroll per rute)
+FIX_SHIFT_MIN = 0.25
+FIX_BLOCK_TOL = 0.1          # blokkavviket kan ikke øke mer enn dette ved rettingen (originalpiksler)
+SHEET_BG_TOL = 40.0          # en levert arkfarge lenger unna bestilt farge enn dette (RGB) brukes i fargelåsen
+# Kantrensen for ikonark: piksler innenfor EDGE_BAND (4x) fra kanten som har arkfargens fargetone
+# (cos over EDGE_COS og fargemetning over EDGE_CHROMA), får fargen innenfra når de er en blanding mot
+# arkfargen (andel over EDGE_MIN_T, avvik fra blandingen under EDGE_FIT)
+EDGE_BAND, EDGE_COS, EDGE_CHROMA, EDGE_MIN_T, EDGE_FIT = 6, 0.85, 24.0, 0.12, 90.0
+FIX_PIECE_TOL = 0.05         # kantlikheten til et objektbilde i lag og ikonark kan ikke falle mer enn dette
 
 # Stilpiloten: rommet som males først, sammen med hovedarkene og de første figurarkene for Sam og Max
 # (figur.FIG_PILOT). Resten venter til Tom har godkjent piloten og stilankerne ligger i stil/.
@@ -1083,7 +1093,9 @@ def has_native_alpha(path: Path) -> bool:
     """Har bildet sin egen myke alfakant (ny stil), ikke bare en flat bakgrunn?
 
     Figurark i den gamle stilen leveres på en flat bakgrunnsfarge (RGB). Den glatte stilen leveres
-    som RGBA med gjennomsiktig bakgrunn og mellomnivåer i kantene.
+    som RGBA med gjennomsiktig bakgrunn og mellomnivåer i kantene. Kantene måles både mot hele lerretet
+    og mot det synlige: et ark med bare noen få små ruter (tre hender i fig259_02) har for få
+    kantpiksler mot lerretet, men like myke kanter som de store arkene.
     """
     with Image.open(path) as im:
         if im.mode not in ("RGBA", "LA", "PA") and "transparency" not in im.info:
@@ -1091,7 +1103,8 @@ def has_native_alpha(path: Path) -> bool:
         a = np.asarray(im.convert("RGBA"))[..., 3]
     transparent = float((a < 16).mean())
     soft = float(((a > 16) & (a < 240)).mean())
-    return transparent > 0.2 and soft > 0.0005
+    visible = float((a > 16).mean())
+    return transparent > 0.2 and (soft > 0.0005 or (visible > 0 and soft / visible > 0.02))
 
 
 def _find_result(d: Path) -> Path | None:
@@ -1114,6 +1127,18 @@ def read_rejections(path: Path | None) -> dict[str, dict]:
         return {}
     with path.open(newline="", encoding="utf-8") as f:
         return {r["jobb"].strip(): r for r in csv.DictReader(f) if r.get("jobb", "").strip()}
+
+
+def manual_rejection(manual: dict[str, dict], job: str, sha: str) -> tuple[str, str, str] | None:
+    """Status, grunn og forslag fra en manuell avvisning som gjelder denne leveransen (samme sha256
+    eller "*"), ellers None. Status er avvist eller sjekk."""
+    rej = manual.get(job)
+    if not rej or rej.get("sha256_resultat", "").strip() not in ("*", sha):
+        return None
+    status = (rej.get("status") or "").strip()
+    if status not in ("avvist", "sjekk"):
+        status = "avvist"
+    return status, rej.get("grunn", "").strip() or f"{status} ved gjennomsyn", rej.get("forslag", "").strip()
 
 
 RANK = {"avvist": 0, "sjekk": 1, "godkjent": 2}
@@ -1163,6 +1188,86 @@ def repair_edges(part: Image.Image, sides: set[str], max_px: int = 8, factor: fl
     return Image.fromarray(np.clip(np.rint(a), 0, 255).astype(np.uint8)), fixed
 
 
+def _cut_part(res: Image.Image, layout: str, job: "Job",
+              off: tuple[float, float] = (0.0, 0.0)) -> tuple[Image.Image, dict[str, int]]:
+    """Utsnittet av leveransen i 4x, og radene som ble rettet mot den grå kanten.
+
+    `off` er hvor langt innholdet ligger ved siden av riktig plass, i originalpiksler (dx, dy fra
+    compare). Da klippes det så mange piksler lenger bort, med delpiksler. Utenfor bildet gjentas
+    kantpikslene.
+    """
+    x, y, w, h = job.region
+    ox, oy = job.plassering
+    size = (w * SCALE, h * SCALE)
+    if layout == "lerret":
+        sx, sy = res.width / CANVAS[0], res.height / CANVAS[1]
+        box = (ox * SCALE * sx, oy * SCALE * sy, (ox + w) * SCALE * sx, (oy + h) * SCALE * sy)
+    else:
+        sx, sy = res.width / size[0], res.height / size[1]
+        box = (0.0, 0.0, float(res.width), float(res.height))
+    if off == (0.0, 0.0):
+        if layout == "lerret":
+            part = res.crop(tuple(round(v) for v in box)).resize(size, Image.LANCZOS)
+        else:
+            part = res.resize(size, Image.LANCZOS)
+    else:
+        dx, dy = off[0] * SCALE * sx, off[1] * SCALE * sy
+        pad = int(math.ceil(max(abs(dx), abs(dy)))) + 4
+        a = np.pad(np.asarray(res), ((pad, pad), (pad, pad), (0, 0)), mode="edge")
+        part = Image.fromarray(a).resize(size, Image.LANCZOS, box=(box[0] + pad + dx, box[1] + pad + dy,
+                                                                   box[2] + pad + dx, box[3] + pad + dy))
+    if layout != "lerret":
+        return part, {}
+    # Sider som grenser mot den grå kanten: ChatGPT lar ofte kanten blø noen piksler inn
+    sides = {s for s, touch in (("venstre", ox > 0), ("hoyre", ox + w < TILE[0]),
+                                 ("topp", oy > 0), ("bunn", oy + h < TILE[1])) if touch}
+    return repair_edges(part, sides)
+
+
+def _piece_status(status: str, checks: dict[str, dict | None] | None) -> str:
+    """Status etter objektkontrollen i lag og ikonark: avvist når et objektbilde er feil."""
+    if checks and any(piece_problem(c) for c in checks.values()):
+        return "avvist"
+    return status
+
+
+def _pieces_worse(before: dict[str, dict | None] | None, after: dict[str, dict | None] | None) -> bool:
+    """Om et objektbilde ligner mindre på originalen etter rettingen av plasseringen enn før."""
+    for name, b in (before or {}).items():
+        a = (after or {}).get(name)
+        if b is None or a is None:
+            continue
+        if a["objekt"] < b["objekt"] - FIX_PIECE_TOL or (piece_problem(a) and not piece_problem(b)):
+            return True
+    return False
+
+
+def _sheet_bg_as_delivered(original: Image.Image, part: Image.Image,
+                           bg: list[int]) -> tuple[Image.Image, list[int] | None]:
+    """Originalarket med bakgrunnen i fargen arket faktisk er levert på.
+
+    Leveres et ikonark på en annen flat farge enn bestilt (grønt i stedet for magenta), drar
+    fargelåsen kantene på ikonene mot den bestilte fargen, og utklippet får en farget glorie.
+    Gir (originalen, None) når fargen er som bestilt, ellers (originalen med levert farge, fargen).
+    """
+    o = np.asarray(original.convert("RGB"))
+    mask = np.all(o == np.array(bg, dtype=o.dtype), axis=2)
+    inner = mask.copy()
+    for _ in range(2):
+        p = np.pad(inner, 1, constant_values=False)
+        inner = np.logical_and.reduce([p[dy:dy + inner.shape[0], dx:dx + inner.shape[1]]
+                                       for dy in range(3) for dx in range(3)])
+    if inner.sum() < 16:
+        return original, None
+    small = np.asarray(part.convert("RGB").resize(original.size, Image.BOX), dtype=np.float64)
+    got = np.median(small[inner], axis=0)
+    if float(np.linalg.norm(got - np.array(bg, dtype=np.float64))) <= SHEET_BG_TOL:
+        return original, None
+    out = o.copy()
+    out[mask] = np.round(got).astype(o.dtype)
+    return Image.fromarray(out, "RGB"), [int(v) for v in np.round(got)]
+
+
 def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, sigma: float, strength: float,
               preview_dir: Path) -> tuple[dict, np.ndarray | None]:
     """Kontrollerer én leveranse for en jobb. Gir resultatraden og det fargelåste bildet (None hvis avvist på format)."""
@@ -1176,28 +1281,43 @@ def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, 
                  f"referanse.png (1536x1024) eller {w}:{h} som utsnittet (for eksempel {w * SCALE}x{h * SCALE})")
         return r, None
     r["format"] = layout
-    if layout == "lerret":
-        sx, sy = res.width / CANVAS[0], res.height / CANVAS[1]
-        box = (ox * SCALE * sx, oy * SCALE * sy, (ox + w) * SCALE * sx, (oy + h) * SCALE * sy)
-        part = res.crop(tuple(round(v) for v in box)).resize((w * SCALE, h * SCALE), Image.LANCZOS)
-        # Sider som grenser mot den grå kanten: ChatGPT lar ofte kanten blø noen piksler inn
-        sides = {s for s, touch in (("venstre", ox > 0), ("hoyre", ox + w < TILE[0]),
-                                     ("topp", oy > 0), ("bunn", oy + h < TILE[1])) if touch}
-        part, fixed = repair_edges(part, sides)
-        if fixed:
-            r["kantreparasjon"] = fixed
-    else:
-        part = res.resize((w * SCALE, h * SCALE), Image.LANCZOS)
+    part, fixed = _cut_part(res, layout, job)
+    if fixed:
+        r["kantreparasjon"] = fixed
     if min(res.width / (w * SCALE), res.height / (h * SCALE)) < 0.6:
         r["merknad"] = "lav oppløsning fra generatoren"
     original = Image.open(d / "original_1x.png").convert("RGB")
     m = compare(original, part)
     status, why = judge(m)
-    orig4 = np.asarray(original.resize((w * SCALE, h * SCALE), Image.LANCZOS), dtype=np.float64)
+    checks = check_pieces(original, part, job, extract) if job.objekter else None
+    shift = math.hypot(m["skift_x"], m["skift_y"])
+    if job.type != "figur" and FIX_SHIFT_MIN <= shift <= CHECK_SHIFT:
+        # Hele bildet ligger litt ved siden av: klipp på nytt der innholdet faktisk ligger. Bruk det
+        # bare når forskyvningen blir mindre, sluttstatusen ikke dårligere, blokkavviket ikke større
+        # og ingen objektbilder i lag og ikonark ligner mindre på originalen enn før
+        part2, fixed2 = _cut_part(res, layout, job, (m["skift_x"], m["skift_y"]))
+        m2 = compare(original, part2)
+        status2, why2 = judge(m2)
+        checks2 = check_pieces(original, part2, job, extract) if job.objekter else None
+        if (math.hypot(m2["skift_x"], m2["skift_y"]) < shift and m2["blokk_maks"] <= m["blokk_maks"] + FIX_BLOCK_TOL
+                and RANK[_piece_status(status2, checks2)] >= RANK[_piece_status(status, checks)]
+                and not _pieces_worse(checks, checks2)):
+            r["plassering_rettet"] = [m["skift_x"], m["skift_y"]]
+            r.pop("kantreparasjon", None)
+            if fixed2:
+                r["kantreparasjon"] = fixed2
+            part, m, status, checks = part2, m2, status2, checks2
+            fx, fy = r["plassering_rettet"]
+            why = "; ".join(filter(None, [f"plassering rettet med {-fx:+.1f}, {-fy:+.1f} originalpiksler", why2]))
+    lock_ref = original
+    if job.type == "ikon" and job.bakgrunn:
+        lock_ref, delivered = _sheet_bg_as_delivered(original, part, job.bakgrunn)
+        if delivered:
+            r["arkfarge_levert"] = delivered
+    orig4 = np.asarray(lock_ref.resize((w * SCALE, h * SCALE), Image.LANCZOS), dtype=np.float64)
     locked = lock_colors(np.asarray(part, dtype=np.float64), orig4, sigma, strength)
     if job.objekter:
         # Lag og ikonark: hvert objekt må også ligne på originalen, ellers blir utklippet feil
-        checks = check_pieces(original, part, job, extract)
         r["objektkontroll"] = checks
         bad = [f"{n} {piece_problem(c)}" for n, c in checks.items() if piece_problem(c)]
         if bad:
@@ -1221,13 +1341,9 @@ def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, 
         if bad or flick:
             status = "avvist"
             r["forslag"] = figur.FIG_RETRY if bad else figur.FIG_FLICKER_RETRY
-    rej = manual.get(job.id)
-    if rej and rej.get("sha256_resultat", "").strip() in ("*", r["sha256_resultat"]):
-        status = (rej.get("status") or "").strip()
-        if status not in ("avvist", "sjekk"):
-            status = "avvist"
-        why = rej.get("grunn", "").strip() or f"{status} ved gjennomsyn"
-        r["forslag"] = rej.get("forslag", "").strip()
+    rej = manual_rejection(manual, job.id, r["sha256_resultat"])
+    if rej:
+        status, why, r["forslag"] = rej
     r.update(m, status=status, kommentar=why)
     _preview(preview_dir / f"{job.id}.png", original, part, locked)
     return r, locked
@@ -1283,9 +1399,19 @@ def import_results(work: Path, extract: Path, out: Path, *, sigma: float = 6.0, 
             continue
         if job.type == "figur" and has_native_alpha(res_path):
             # Ny, glatt stil med egen alfakant: klippes ikke med originalens pikselmaske (Tom avviste
-            # trappekantene). Tas inn med figurmottaket for ekte alfa (smhd glatte-figurer).
-            results[job.id] = {"status": "levert", "sha256_resultat": _sha(res_path),
-                               "kommentar": "glatt stil med ekte alfa, tas inn med figurmottaket for myke kanter"}
+            # trappekantene). Tas inn med figurmottaket for ekte alfa (smhd glatte-figurer). En manuell
+            # avvisning av akkurat denne leveransen gjelder også her, så returen kommer først i ORDRE.md
+            # (figurmottaket utelater det avviste arket selv). Levert er ikke godkjent.
+            sha = _sha(res_path)
+            rej = manual_rejection(manual, job.id, sha)
+            if rej:
+                r = {"status": rej[0], "sha256_resultat": sha, "kommentar": rej[1], "forslag": rej[2]}
+                _write_return(d, r)
+            else:
+                r = {"status": "levert", "sha256_resultat": sha,
+                     "kommentar": "glatt stil med ekte alfa, tas inn med figurmottaket for myke kanter"}
+                (d / "retur.md").unlink(missing_ok=True)
+            results[job.id] = r
             tiles.setdefault(job.bilde, []).append((job, None))
             continue
         r, locked = _evaluate(res_path, job, d, extract, manual, sigma, strength, preview_dir)
@@ -1482,6 +1608,14 @@ def _finish_pieces(name: str, parts: list[tuple[Job, np.ndarray | None]], result
             continue
         src = extract / "objects" / f"{bilde}.png"
         hd = _cut(first.storrelse, [(j.region, kept[j.id]) for j in holders[bilde]], p["rekt"], src)
+        cleaned = 0
+        if first.type == "ikon":
+            bgs = [b for j in holders[bilde] for b in (j.bakgrunn, results[j.id].get("arkfarge_levert")) if b]
+            if bgs:
+                with Image.open(src) as o:
+                    o = o.convert("RGBA")
+                    alpha = np.asarray(upscale_alpha(o.getchannel("A"), SCALE))
+                    hd, cleaned = clean_sheet_edge(hd, alpha, bgs, np.asarray(o.convert("RGB")))
         if base != bilde:
             hd = match_state(hd, finished[base], extract / "objects" / f"{bilde}_idx.png",
                              extract / "objects" / f"{base}_idx.png")
@@ -1502,6 +1636,8 @@ def _finish_pieces(name: str, parts: list[tuple[Job, np.ndarray | None]], result
             "lag": name, "rekt_i_lag": p["rekt"], "underlag": first.underlag or [],
             "fargelås": settings, "jobber": made_by,
         }
+        if cleaned:
+            prov[bilde]["kantrens"] = cleaned
         if base != bilde:
             prov[bilde]["likt_med"] = base
     return done, not_done, waiting, prov
@@ -1527,6 +1663,99 @@ def match_state(img: np.ndarray, base_hd: np.ndarray, idx: Path, base_idx: Path,
         mask = np.clip(blur(mask, feather), 0, 1)
     out = base_hd.astype(np.float64) * (1 - mask[..., None]) + img.astype(np.float64) * mask[..., None]
     return np.clip(np.rint(out), 0, 255).astype(np.uint8)
+
+
+def _grow(m: np.ndarray) -> np.ndarray:
+    """Masken utvidet med én piksel i alle retninger. Utenfor bildet regnes som med i masken."""
+    p = np.pad(m, 1, constant_values=True)
+    return np.logical_or.reduce([p[dy:dy + m.shape[0], dx:dx + m.shape[1]] for dy in range(3) for dx in range(3)])
+
+
+def _tinted(rgb: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Pikslene som har samme fargetone som fargen b (cos over EDGE_COS og fargemetning over EDGE_CHROMA)."""
+    chroma = rgb - rgb.mean(axis=2, keepdims=True)
+    cb = b - b.mean()
+    size = np.linalg.norm(chroma, axis=2)
+    cos = (chroma * cb).sum(axis=2) / np.maximum(size * np.linalg.norm(cb), 1e-6)
+    return (cos > EDGE_COS) & (size > EDGE_CHROMA)
+
+
+def clean_sheet_edge(img: np.ndarray, alpha: np.ndarray, bgs: list[list[int]],
+                     original: np.ndarray | None = None) -> tuple[np.ndarray, int]:
+    """Tar arkfargen ut av kantene på et ikon klippet ut av et ikonark.
+
+    Utklippet bruker originalens alfa. Der det tegnede ikonet er litt mindre enn originalen, blir
+    arkfargen (eller en blanding med den) stående innenfor alfaen som en grønn eller lilla kant.
+    Piksler nær kanten (eller bildekanten) med arkfargens fargetone får fargen fra pikslene innenfor,
+    når de ligner en blanding av den og arkfargen. Andre slike piksler mister bare arkfargens
+    fargetone (lysstyrken står), når originalen ikke har den fargetonen innen to
+    originalpiksler. Med originalen (RGB i 1x) røres ikke piksler der
+    originalen har samme fargetone innen én originalpiksel, så grønne og lilla ting i ikonet blir stående.
+    Gir (bildet, antall pikslene som er endret).
+    """
+    rgb = img.astype(np.float64)
+    opaque = alpha > 0
+    near = ~opaque
+    for _ in range(EDGE_BAND):
+        near = _grow(near)
+    bg = np.array(bgs, dtype=np.float64).reshape(-1, 3)
+    scale = alpha.shape[0] // original.shape[0] if original is not None else 0
+    tints, guards = [], []
+    for b in bg:
+        t = opaque & near & _tinted(rgb, b)
+        guard = np.zeros(alpha.shape, bool)
+        if scale:
+            own = _tinted(original.astype(np.float64), b) & opaque[::scale, ::scale]
+            p = np.pad(own, 1, constant_values=False)
+            own = np.logical_or.reduce([p[dy:dy + own.shape[0], dx:dx + own.shape[1]]
+                                        for dy in range(3) for dx in range(3)])
+            t &= ~np.repeat(np.repeat(own, scale, 0), scale, 1)
+            # Fargetonen tas bare bort lenger enn to originalpiksler fra samme fargetone i originalen
+            p = np.pad(own, 1, constant_values=False)
+            own = np.logical_or.reduce([p[dy:dy + own.shape[0], dx:dx + own.shape[1]]
+                                        for dy in range(3) for dx in range(3)])
+            guard = np.repeat(np.repeat(own, scale, 0), scale, 1)
+        tints.append(t)
+        guards.append(guard)
+    cand = np.logical_or.reduce(tints)
+    if not cand.any():
+        return img, 0
+    # Fargen innenfra: snittet av kjente naboer, spredd utover ett trinn om gangen
+    have = opaque & ~cand
+    inner = np.where(have[..., None], rgb, 0.0)
+    H, W = alpha.shape
+    for _ in range(EDGE_BAND + 4):
+        if not (cand & ~have).any():
+            break
+        p = np.pad(inner, ((1, 1), (1, 1), (0, 0)))
+        q = np.pad(have.astype(np.float64), 1)
+        s = sum(p[dy:dy + H, dx:dx + W] for dy in range(3) for dx in range(3))
+        n = sum(q[dy:dy + H, dx:dx + W] for dy in range(3) for dx in range(3))
+        new = cand & ~have & (n > 0)
+        inner[new] = s[new] / n[new, None]
+        have |= new
+    fix = np.zeros(alpha.shape, bool)
+    for b, tint in zip(bg, tints):
+        v = b - inner
+        t = ((rgb - inner) * v).sum(axis=2) / np.maximum((v * v).sum(axis=2), 1.0)
+        off = np.linalg.norm(rgb - (inner + t[..., None] * v), axis=2)
+        fix |= tint & have & (t > EDGE_MIN_T) & (off < EDGE_FIT)
+    out = img.copy()
+    out[fix] = np.clip(np.rint(inner[fix]), 0, 255).astype(img.dtype)
+    # Resten er blandinger av en annen farge enn den innenfor og arkfargen, som en mørk omrisskant
+    # mot et hvitt tak. Der tas bare arkfargens fargetone bort; lysstyrken (snittet av RGB) står.
+    rest = np.zeros(alpha.shape, bool)
+    for b, tint, guard in zip(bg, tints, guards):
+        sel = tint & ~guard & ~fix & ~rest
+        if not sel.any():
+            continue
+        u = b - b.mean()
+        u /= max(float(np.linalg.norm(u)), 1e-6)
+        px = rgb[sel]
+        k = np.maximum(((px - px.mean(axis=1, keepdims=True)) * u).sum(axis=1), 0)
+        out[sel] = np.clip(np.rint(px - k[:, None] * u), 0, 255).astype(img.dtype)
+        rest |= sel
+    return out, int(fix.sum() + rest.sum())
 
 
 def _with_alpha(img: np.ndarray, original: Path) -> Image.Image:
@@ -1647,8 +1876,13 @@ def _report(work: Path, jobs: list[Job], results: dict[str, dict], done_rooms: l
         sheets = {j.bilde for j in jobs if j.type == "figur"}
         ok = {j.bilde for j in jobs if j.type == "figur"} - {
             j.bilde for j in jobs if j.type == "figur" and results.get(j.id, {}).get("status") not in ("godkjent", "sjekk")}
+        # Figurark i glatt stil får status levert her og tas inn av figurmottaket (smhd myke-figurer), som
+        # kjører etter gpt-inn; rutene derfra telles i ORDRE.md og myke.json, ikke her
+        handed = {j.bilde for j in jobs if j.type == "figur" and results.get(j.id, {}).get("status") == "levert"}
         lines.append(f"- Figurark: {len(ok)} av {len(sheets)} godtatt. Ferdige figurruter: "
-                     f"{len(done_pieces.get('figur', []))} av {pieces_total['figur']}")
+                     f"{len(done_pieces.get('figur', []))} av {pieces_total['figur']}"
+                     + (f". {len(handed)} ark levert til figurmottaket (smhd myke-figurer); rutene derfra "
+                        "telles i ORDRE.md og myke.json" if handed else ""))
     if incomplete:
         lines += ["", "Bilder som venter på flere deler:", ""] + [f"- {s}" for s in incomplete]
     bad = [(j, results[j.id]) for j in jobs if results.get(j.id, {}).get("status") in ("avvist", "sjekk")]
@@ -1661,7 +1895,9 @@ def _report(work: Path, jobs: list[Job], results: dict[str, dict], done_rooms: l
             "rom_totalt": rooms_total, "objekter_totalt": objects_total, "venter": incomplete,
             "ferdige_lagobjekter": done_pieces.get("lag", []), "lagobjekter_totalt": pieces_total["lag"],
             "ferdige_ikoner": done_pieces.get("ikon", []), "ikoner_totalt": pieces_total["ikon"],
-            "ferdige_figurruter": done_pieces.get("figur", []), "figurruter_totalt": pieces_total["figur"]}
+            "ferdige_figurruter": done_pieces.get("figur", []), "figurruter_totalt": pieces_total["figur"],
+            "figurark_levert": len({j.bilde for j in jobs if j.type == "figur"
+                                    and results.get(j.id, {}).get("status") == "levert"})}
 
 
 # ---------------------------------------------------------------- ordre til ChatGPT
