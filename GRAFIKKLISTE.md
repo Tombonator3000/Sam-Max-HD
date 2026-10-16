@@ -34,14 +34,14 @@ Rom 83. Figurark for Sam.
 
 Figurark for Sam.
 
-- [ ] `fig117_01` (figurark 1 for Sam (kostyme 117), 17 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig117_02` (figurark 2 for Sam (kostyme 117), 18 ruter: animasjon 8 mot høyre (9 ruter); animasjon 9 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig117_03` (figurark 3 for Sam (kostyme 117), 9 ruter: animasjon 10 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig117_04` (figurark 4 for Sam (kostyme 117), 9 ruter: animasjon 11 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig117_05` (figurark 5 for Sam (kostyme 117), 11 ruter: animasjon 12 mot høyre (10 ruter); animasjon 14 mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig117_06` (figurark 6 for Sam (kostyme 117), 9 ruter: animasjon 15 mot høyre (8 ruter); animasjon 16 mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig117_07` (figurark 7 for Sam (kostyme 117), 10 ruter: animasjon 17 mot høyre (9 ruter); animasjon 18 mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig117_08` (figurark 8 for Sam (kostyme 117), 8 ruter: animasjon 19 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig117_01` (figurark 1 for Sam (kostyme 117), 17 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig117_02` (figurark 2 for Sam (kostyme 117), 18 ruter: animasjon 8 mot høyre (9 ruter); animasjon 9 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig117_03` (figurark 3 for Sam (kostyme 117), 9 ruter: animasjon 10 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig117_04` (figurark 4 for Sam (kostyme 117), 9 ruter: animasjon 11 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig117_05` (figurark 5 for Sam (kostyme 117), 11 ruter: animasjon 12 mot høyre (10 ruter); animasjon 14 mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig117_06` (figurark 6 for Sam (kostyme 117), 9 ruter: animasjon 15 mot høyre (8 ruter); animasjon 16 mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig117_07` (figurark 7 for Sam (kostyme 117), 10 ruter: animasjon 17 mot høyre (9 ruter); animasjon 18 mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig117_08` (figurark 8 for Sam (kostyme 117), 8 ruter: animasjon 19 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig204_01` (figurark 1 for Sam (kostyme 204), 8 ruter: start (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 2, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig204_02` (figurark 2 for Sam (kostyme 204), 22 ruter: gange mot høyre (8 ruter); snakking (lag 2, tegnes over kroppen) mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 

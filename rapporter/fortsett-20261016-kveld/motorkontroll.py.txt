@@ -1,0 +1,34 @@
+from pathlib import Path
+import sys, json, re
+
+ROOT = Path('/home/tom/Sam-Max-HD/out/fortsett-20261016-kveld')
+ART = Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/fortsett-20261016-kveld')
+sys.path.insert(0, '/home/tom/Sam-Max-HD/out/inventoryknapp-20261016')
+import kontroll as k
+k.ROOT = ROOT
+mod = ROOT / 'mod-kandidat'
+env = {'DIGHD_TEST_ROOM':'25', 'DIGHD_TEST_AT':'10',
+       'DIGHD_TEST_COSTUME':'117', 'DIGHD_TEST_DIRECTION':'1',
+       'DIGHD_TEST_CHORE_EVERY':'1000', 'DIGHD_TEST_STATIC_SCENE':'1',
+       'DIGHD_TEST_SCALE':'255', 'DIGHD_TEST_POS':'160,180',
+       'DIGHD_DUMP_EVERY':'4', 'DIGHD_DEBUG_SOFT':'1'}
+results = []
+for animation in [1,7,8,9,10,11,12,14,15,16,17,18,19]:
+    label = 'slutt2-gator-anim' + str(animation)
+    row = k.run(label, k.NEW, dict(env, DIGHD_TEST_ANIMATION=str(animation)), 120, mod)
+    log = (ROOT / label / 'scummvm.log').read_text(errors='replace')
+    row['tegnede_ruter'] = sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*117', log)))
+    results.append(row)
+    (ART / 'motor-gator.json').write_text(json.dumps(results, indent=2)+'\n')
+    assert row['exit'] == 0 and row['dumps'] and row['screen_differences'] and max(row['screen_differences']) == 0
+
+expected = set(range(1920,2011))
+seen = set(n for row in results for n in row['tegnede_ruter'])
+summary = {'animasjoner':len(results), 'forventede_ruter':len(expected),
+           'sett_tegnet':len(expected & seen), 'mangler_i_avspilling':sorted(expected-seen),
+           'skjermbufferavvik':sum(sum(row['screen_differences']) for row in results),
+           'bilder_per_animasjon':120,
+           'naturlig_spillforlop':False}
+(ART / 'motor-oppsummering.json').write_text(json.dumps(summary, indent=2)+'\n')
+print(json.dumps(summary), flush=True)
+assert not (expected-seen), sorted(expected-seen)

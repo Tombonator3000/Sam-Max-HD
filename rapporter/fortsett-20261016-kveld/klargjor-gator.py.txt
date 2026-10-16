@@ -1,0 +1,149 @@
+from pathlib import Path
+import sys, json, hashlib
+import numpy as np
+from PIL import Image, ImageFilter
+from scipy import ndimage as nd
+
+root = Path(__file__).resolve().parents[2]
+report = root / 'rapporter/fortsett-20261016-kveld'
+jobname = sys.argv[1]
+jobdir = root / 'jobber' / jobname
+assert not (jobdir / 'resultat.png').exists(), 'Ikke overskriv en leveranse'
+job = json.loads((jobdir / 'jobb.json').read_text())
+windows = json.loads((report / (jobname + '-rawbokser.json')).read_text())
+raw_file = sys.argv[2] if len(sys.argv) > 2 else jobname + '-raa02.png'
+raw = Image.open(report / raw_file).convert('RGBA')
+assert len(windows) == len(job['ruter'])
+output = Image.new('RGBA', tuple(job['lerret']))
+maps = []
+
+def bounds(mask):
+    ys, xs = np.nonzero(mask)
+    return (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
+
+def materials(a):
+    core = a[:, :, 3] > 220
+    rgb = a[:, :, :3].astype(float)
+    yy = np.indices(core.shape)[0]
+    green = core & (rgb[:, :, 1] > 25) & (rgb[:, :, 1] - rgb[:, :, 0] > 15) & (rgb[:, :, 1] - rgb[:, :, 2] > 10) & (rgb[:, :, 1] > rgb[:, :, 0] * 1.2) & (rgb[:, :, 1] > rgb[:, :, 2] * 1.3)
+    water = np.zeros_like(core)
+    if green.any():
+        water = core & (rgb[:, :, 0] < 60) & (rgb[:, :, 1] > 50) & (rgb[:, :, 2] > rgb[:, :, 1] * 1.25) & (yy >= np.nonzero(green)[0].min())
+    base = green | water
+    body = core & ~base & (rgb.max(axis=2) > 55)
+    black = core & ~base & ~body
+    if base.any():
+        db = nd.distance_transform_edt(~body)
+        dg = nd.distance_transform_edt(~base)
+        body |= black & (db <= dg)
+        base |= black & (dg < db)
+    else:
+        body |= black
+    # These sheets contain one connected Sam per window. Detached generated
+    # glow/specks must not widen his placement box; genuine detached source
+    # fragments are handled separately below.
+    labels, number = nd.label(body)
+    if number:
+        sizes = np.bincount(labels.ravel())
+        sizes[0] = 0
+        body = labels == int(sizes.argmax())
+    return body, base
+
+body_file = jobname + '-raa02.png'
+body_raw = Image.open(report / body_file).convert('RGBA') if (report / body_file).exists() else raw
+if not (report / body_file).exists():
+    body_file = raw_file
+
+for cel, window in zip(job['ruter'], windows):
+    a = np.asarray(raw.crop(window)).copy()
+    body_a = np.asarray(body_raw.crop(window)).copy()
+    _, base = materials(a)
+    body, _ = materials(body_a)
+    # The original is used only for material bounds/contact positions, never
+    # to clip the new silhouette. Green/water and Sam are placed separately
+    # so a long water fragment cannot squeeze the character's proportions.
+    original = np.asarray(Image.open(root.parents[1] / 'work/extract/costumes' / (cel['bilde'] + '.png')).convert('RGBA'))
+    o = original[:, :, :3].astype(int)
+    oy = np.indices(o.shape[:2])[0]
+    # Keep isolated source specks outside Sam as separate original fragments;
+    # they must not stretch the whole character to their bounding rectangle.
+    original_alpha = original[:, :, 3] > 0
+    olab, on = nd.label(original_alpha)
+    osizes = np.bincount(olab.ravel())
+    loose = []
+    for oi in range(1, on + 1):
+        if osizes[oi] <= 4:
+            loose.append(bounds(olab == oi))
+            original_alpha[olab == oi] = False
+    obase = original_alpha & (o[:, :, 1] > 60) & (o[:, :, 1] > o[:, :, 0] * 1.2) & (o[:, :, 1] > o[:, :, 2] * 1.3)
+    if obase.any():
+        obase |= original_alpha & (o[:, :, 0] < 60) & (o[:, :, 1] > 50) & (o[:, :, 2] > o[:, :, 1] * 1.25) & (oy >= np.nonzero(obase)[0].min())
+    obody = original_alpha & ~obase & (o.max(axis=2) > 55)
+    oblack = original_alpha & ~obase & ~obody
+    if obase.any():
+        db = nd.distance_transform_edt(~obody)
+        dg = nd.distance_transform_edt(~obase)
+        obody |= oblack & (db <= dg)
+        obase |= oblack & (dg < db)
+    else:
+        obody |= oblack
+    origin_x, origin_y = (job['plassering'][0] + cel['rekt'][0]) * 4, (job['plassering'][1] + cel['rekt'][1]) * 4
+    for mask, target, isbase, pixels in ((base, obase, True, a), (body, obody, False, body_a)):
+        if not target.any():
+            continue
+        assert mask.any(), (cel['bilde'], 'mangler materiale')
+        distance, nearest = nd.distance_transform_edt(~mask, return_indices=True)
+        keep = distance <= 1.5
+        part = pixels.copy()
+        part[:, :, 3][~keep] = 0
+        edge = keep & ~mask
+        part[:, :, :3][edge] = pixels[nearest[0][edge], nearest[1][edge], :3]
+        image = Image.fromarray(part)
+        rb = bounds(mask); tb = bounds(target)
+        image = image.crop(rb).resize(((tb[2] - tb[0]) * 4, (tb[3] - tb[1]) * 4), Image.Resampling.LANCZOS)
+        if isbase:
+            # Clean the generated fragment's own jagged edge after resizing.
+            image = image.filter(ImageFilter.GaussianBlur(.55))
+        output.alpha_composite(image, (origin_x + tb[0] * 4, origin_y + tb[1] * 4))
+        if isbase and jobname == 'fig117_01' and raw_file == 'fig117_01-raa01.png':
+            # The first drawing preserves the source's black eye/nostril
+            # details; the edited attempt supplies its missing thin blue edge.
+            # Place that generated edge by bounds, without clipping the new
+            # artwork to the original hard pixel outline.
+            alt = np.asarray(Image.open(report/'fig117_01-raa02.png').convert('RGBA').crop(window)).copy()
+            ar = alt[:, :, :3].astype(float)
+            ag = (alt[:, :, 3]>220)&(ar[:, :, 1]>60)&(ar[:, :, 1]>ar[:, :, 0]*1.2)&(ar[:, :, 1]>ar[:, :, 2]*1.3)
+            wy = np.indices(ag.shape)[0]
+            wm = (alt[:, :, 3]>220)&(ar[:, :, 0]<80)&(ar[:, :, 1]>40)&(ar[:, :, 2]>ar[:, :, 1]*1.3)&(wy>=np.nonzero(ag)[0].min())
+            ow = (original[:, :, 3]>0)&(o[:, :, 0]<80)&(o[:, :, 1]>40)&(o[:, :, 2]>o[:, :, 1]*1.3)&(oy>=np.nonzero(obase)[0].min())
+            if wm.any() and ow.any():
+                alt[:, :, 3][~wm]=0
+                wb, wt=bounds(wm),bounds(ow)
+                water_part=Image.fromarray(alt).crop(wb).resize(((wt[2]-wt[0])*4,(wt[3]-wt[1])*4),Image.Resampling.LANCZOS)
+                water_part=water_part.filter(ImageFilter.GaussianBlur(.4))
+                output.alpha_composite(water_part,(origin_x+wt[0]*4,origin_y+wt[1]*4))
+    for lx0, ly0, lx1, ly1 in loose:
+        # These 1-pixel blue/gray source fragments have no redrawn counterpart.
+        # Preserve them with soft resize edges rather than invent their meaning.
+        tiny = Image.new('RGBA', (lx1-lx0+2, ly1-ly0+2))
+        tiny.paste(Image.fromarray(original).crop((lx0,ly0,lx1,ly1)), (1,1))
+        tiny = tiny.resize((tiny.width*4,tiny.height*4), Image.Resampling.LANCZOS)
+        output.alpha_composite(tiny, (origin_x+(lx0-1)*4,origin_y+(ly0-1)*4))
+    sx0, sy0, sx1, sy1 = cel['synlig']
+    box = ((sx0+16)*4,(sy0+8)*4,(sx1+16)*4,(sy1+8)*4)
+    actual = output.crop(box).getchannel('A').point(lambda v: 255 if v > 128 else 0).getbbox()
+    maps.append({'bilde':cel['bilde'],'kostyme':cel['kostyme'],'rute':cel['rute'],
+                 'rect':[box[0]+actual[0],box[1]+actual[1],actual[2]-actual[0],actual[3]-actual[1]],'raa_boks':window,
+                 'kropp_raw':body_file,'alligator_raw':raw_file})
+
+output.save(jobdir / 'resultat.png')
+sha = hashlib.sha256((jobdir / 'resultat.png').read_bytes()).hexdigest()
+(report / ('rutekart-' + jobname + '.json')).write_text(json.dumps({jobname:{'sha256_resultat':sha,'ruter':maps}},indent=2)+'\n')
+progress = json.loads((report / 'fremdrift.json').read_text())
+progress['leveranser'] = [row for row in progress['leveranser'] if row['jobb'] != jobname]
+progress['leveranser'].append({'jobb':jobname,'resultat':'jobber/'+jobname+'/resultat.png','sha256':sha,'ruter':len(maps),
+    'rutekart':'rapporter/fortsett-20261016-kveld/rutekart-'+jobname+'.json','egenkontroll':'ikke kjørt',
+    'motoravspilt':False,'importert':False,'godkjent_av_Tom':False,
+    'antall_bildekall':len(list(report.glob(jobname+'-prompt*.txt'))),'valgt_raw':raw_file,'kropp_raw':body_file})
+(report/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+print(jobname,sha)

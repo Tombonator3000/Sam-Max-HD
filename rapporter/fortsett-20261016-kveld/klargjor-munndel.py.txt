@@ -1,0 +1,47 @@
+from pathlib import Path
+import hashlib, json
+import numpy as np
+from PIL import Image
+from scipy import ndimage as nd
+
+root = Path(__file__).resolve().parents[2]
+report = root / 'rapporter/fortsett-20261016-kveld'
+job = root / 'jobber/fig249_02'
+before = Image.open(report / 'fig249_02-for-resultat.png').convert('RGBA')
+assert hashlib.sha256((job / 'resultat.png').read_bytes()).hexdigest() == '867fc97d830b5a2b99dd42f680467e2155ab14f0ba5b93d036bea38dcc468108'
+rgba = np.asarray(Image.open(report / 'munndel-raa01.png').convert('RGBA')).copy()
+labels, count = nd.label(rgba[:, :, 3] > 220)
+sizes = np.bincount(labels.ravel())
+core = labels == int(sizes[1:].argmax() + 1)
+distance, nearest = nd.distance_transform_edt(~core, return_indices=True)
+keep = distance <= 1.5
+rgba[:, :, 3][~keep] = 0
+edge = keep & ~core
+rgba[:, :, :3][edge] = rgba[nearest[0][edge], nearest[1][edge], :3]
+patch = Image.fromarray(rgba)
+box = patch.getchannel('A').point(lambda a: 255 if a > 128 else 0).getbbox()
+patch = patch.crop(box).resize((40, 32), Image.Resampling.LANCZOS)
+after = before.copy()
+after.paste((0, 0, 0, 0), (72, 676, 128, 724))
+after.alpha_composite(patch, (80, 684))
+a, b = np.asarray(before), np.asarray(after)
+allowed = np.zeros(a.shape[:2], bool)
+allowed[676:724, 72:128] = True
+assert not np.any(a[~allowed] != b[~allowed]), 'De seks gangerutene skal være byteidentiske'
+after.save(job / 'resultat.png')
+sha = hashlib.sha256((job / 'resultat.png').read_bytes()).hexdigest()
+mapping = json.loads((root / 'rapporter/natt-20261016-0745/rutekart-fig249_02.json').read_text())
+mapping['fig249_02']['sha256_resultat'] = sha
+for cel in mapping['fig249_02']['ruter']:
+    if cel['bilde'] == 'costume249_257':
+        rect = patch.getchannel('A').point(lambda a: 255 if a > 128 else 0).getbbox()
+        cel['rect'] = [80 + rect[0], 684 + rect[1], rect[2] - rect[0], rect[3] - rect[1]]
+(report / 'rutekart-fig249_02.json').write_text(json.dumps(mapping, indent=2) + '\n')
+progress = {'verktøy': 'innebygd image_gen', 'leveranser': [{
+    'jobb': 'fig249_02', 'resultat': 'jobber/fig249_02/resultat.png', 'sha256': sha,
+    'ruter': 7, 'nye_ruter': 1, 'rettet': 'bare munndelen costume249_257',
+    'rutekart': 'rapporter/fortsett-20261016-kveld/rutekart-fig249_02.json',
+    'egenkontroll': 'ikke kjørt', 'motoravspilt': False, 'importert': False,
+    'godkjent_av_Tom': False, 'antall_bildekall': 1}]}
+(report / 'fremdrift.json').write_text(json.dumps(progress, ensure_ascii=False, indent=2) + '\n')
+print(sha)

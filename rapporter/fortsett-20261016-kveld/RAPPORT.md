@@ -1,0 +1,21 @@
+# Videre figurproduksjon 16. oktober 2026, kveld
+
+Tom ba om pull og videre grafikkarbeid. Main og gpt-arbeid var allerede oppdatert. Ingen åpne kode-PR-er. Ingen ny natt-automatikk er startet.
+
+Åtte nye Sam-ark, fig117_01 til 08, gir 91 ruter fra Gator Golf. Costume249_257 er nytegnet som en separat munndel i fig249_02; de seks gangerutene og alle øvrige kildepiksler utenfor munndelsregionen er bevart. Ni ark med 98 ruter til mottaket, hvorav seks allerede publiserte gangeruter. Totalt 92 nye native bilder. Inventory-knappen er allerede med fra forrige publiserte modd, costume001_002.
+
+Innebygd image_gen, 13 bildekall. Modellnavn ikke oppgitt. Godkjent Sam-hovedark og originalene er sett før tegning. Python-rensing og plassering er tidligere uttrykkelig godkjent av Tom. Full prompt, alle råforsøk, mellomvarianter, faktisk klargjøringsskript, kildehasher og rutekart er bevart. 36 beskyttede jobbfiler er kontrollert uendret fra grafikkgrenens HEAD. Promptens eksisterende metadatahash er bevart separat fra filens bytehash.
+
+Gator Golf: originalens grønne deler er lave alligatorhoder/-rygger ved vannlinjen. Forstørret original og klassisk motorvisning bekrefter svarte øye-/nesedetaljer på hodene. En tidlig tolkning om å fjerne alle svarte detaljer var feil og er reversert i det valgte materialet. Små separate hauger får ikke nye ansikter. Fig117_06 forsøk02 fjernet oppdiktede øyne på slike hauger og runde poteputer. Kropp og vannfragmenter plasseres hver for seg. Mørke grønne skygger beholdes i alligatorlaget. Originalens løsrevne blå/grå småfragmenter finnes også i klassisk motorvisning og er beholdt separat med myk oppskalering; de er ikke fullt nytegnet. De strekker ikke kroppen eller vannkanten. Ingen nytegning klippes med originalens harde pikselomriss.
+
+Egenkontroll gir 95 ruter OK og tre SJEKK, ingen FEIL. SJEKK gjelder 1962 og 1963 i fig117_03, samt 1964 i fig117_04, med direkte IoU 0,73, 0,74 og 0,68. Alle har samme kildeboks i 4x og null forskyvning. Disse er særskilt sett mot original/native på lys bakgrunn. Forskjellen i omriss er dokumentert og står fortsatt som SJEKK i egenkontrollen. Separat myke-figurer-mottak, med eksisterende uendrede grenser, gir 98 OK, null til sjekk og null manglende. Dette er teknisk mottak, ikke Toms stilgodkjenning eller en separat Claude-kontroll.
+
+Finale Gator Golf-prøver: 13 tvungne animasjoner i rom25, 120 bilder hver. Alle 91 ruter er registrert tegnet; alle 91 har faktiske skjermutsnitt som Codex har sett i kontaktark. 390 skjermbufferkontroller gir null avvik, alle prosesser avslutter normalt. Native kandidatfiler er hashkontrollert. En tidligere 180-bildersrunde er også bevart. Dette er tvunget animasjonsavspilling, ikke naturlig gjennomspilling av gåten eller alle rombytter. Z-kantmålingene er ikke null og skal ikke forveksles med skjermbufferkontroll.
+
+Munndelen er sett med hodet i rom49, animasjon4. Den nye kanten er jevnere enn det tidligere pikselerte forsøket. Det kunstige hoppet fra cafeteriasave til rom49 gir fortsatt 160 skjermbufferavvik ved frame36 både før og etter denne munndelsendringen; alle målte bilder etter hoppet gir null. Den tidligere registrerte motorbegrensningen er ikke erklært løst.
+
+Arbeidsmodden bygges additivt på 9fbf5a67: 19 370 tidligere PNG-er er bevart byte for byte, inkludert alle seks publiserte gangeruter. 92 nye native bilder gir 1226 native figurruter. Modmetadata får kostyme117 og ny dato. Publiserings- og tilbakehentingskvittering registreres nedenfor etter at den er utført. Linux-/Windows-pakkene er ikke bygget på nytt i denne runden og har fortsatt 1095 native ruter fra a6c286bd. Ingen faktisk nettleseravspilling er utført i denne runden.
+
+Direkte telling: 113 av 1758 figurjobber har resultat.png, 1645 mangler. Levert er ikke det samme som godkjent, og kjente returer kommer i tillegg. Neste ordinære Sam-bestilling er fig204_01. Identitet, lagdeler og sammensetning skal ses før produksjon.
+
+Brukte bibliotekskilder: losninger/grafikk/figurark-fast-storrelse.md, losninger/bygg/publisert-mod-er-fasit.md og losninger/testing/logg-over-det-som-mangler-hd.md. Metodene er gjenbrukt med Sam & Max sine egne referanser, mottak og motorprøver. Ingen biblioteksendring, ny motorfunksjon eller produksjonskode er publisert fra denne runden.

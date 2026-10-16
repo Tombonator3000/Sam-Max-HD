@@ -16,7 +16,7 @@ Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENT
 
 ## Gjør disse nå
 
-Produksjonsmerknad fra Codex 16. oktober: fig249_04 til 08 var allerede levert etter denne ordren. De er kontrollert videre sammen med nye fig249_09 og fig001_01. Ikke lag disse på nytt fra den gamle listen. Munndelen i fig249_02 trenger fortsatt nytegning; forsøket med teknisk OK var pikselert i motoren og tidligere godkjente ark er gjenopprettet. Se rapporter/figurer-videre-20261016/RAPPORT.md og fremdrift.json før videre arbeid. Neste Sam-ark uten leveranse er fig117_01.
+Produksjonsmerknad fra Codex 16. oktober kveld: fig249_04 til 09 og inventory-knappen fig001_01 er allerede levert og importert. Ikke tegn dem på nytt fra den gamle listen. Ny munndel i fig249_02 og alle åtte Gator Golf-ark fig117_01 til 08 er levert og teknisk kontrollert i denne økten. Se rapporter/fortsett-20261016-kveld/RAPPORT.md og fremdrift.json for resultat-SHA, tre dokumenterte egenkontrollmerknader, motorprøver og faktisk importkvittering. Neste ordinære Sam-ark uten resultat er fig204_01.
 
 Figurrutene under har feil omriss mot originalen og er holdt utenfor spillet. Tegn dem på nytt i samme ark og lever arket igjen. Se `forhandsvisning/myk_<ark>.png`: originalens omriss står i rødt. Ta med alt originalen har (for eksempel det figuren holder i hånden), med samme størrelse og form.
 
