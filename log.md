@@ -701,3 +701,16 @@ Natt, kodeoppgave: mørk lilla kant langs taket på obj661_01 etter kantrensen (
 - Kvitterer dokumentasjonen for allerede utført etterkontroll av første kantrens ecd9ec0e i publisert hd-mod 55f976de. Alle 163 ikon-PNG er målt før/etter: størrelse og alfa identiske, 159 med synlige RGB-endringer. 22 faktiske PNG er sett mot original og førbilder på mørk grønn og lys grå bakgrunn. Tydelig færre grønne/magenta kantrester, ingen åpenbar ny skade på ekte grønne/lilla felt i utvalget. Bilene har fortsatt tynne mørke/lilla streker og trappetrinn fra uendret alfa. Dette er PNG-kontroll, ikke motoravspilling eller Toms stilgodkjenning.
 - Før/etter for alle 163, åtte paneler og etter-kontroll.json med original-/bildehasher er sikret i Codex-arbeidsmappens output/natt-kantrens-20261016. Første trinn og andre trinn er nå kvittert for separat Codex-kodekontroll: henholdsvis 62 og 63 beståtte pipelinetester. Andre trinn de951ff7 venter fortsatt på ny sluttmodd og visuell etterkontroll; ingen påstand om at bildene fra 55f976de viser dette trinnet.
 - Rettet to foreldede oppsettpunkter i todo: GitHub-push virker og nattløpet har startet etter prøvetur. Ingen nye tester kjørt for dokumentasjonsendringen, ingen kode eller grafikk endret. Arbeidstreet var rent og kun Codex-grafikkagenten i separat worktree var aktiv. Ingen aktive agentfiler rørt.
+
+## 2026-10-16 04:42 (Claude)
+
+Natt: kontroll av fig002_06, lag068_12, lag071_05 og lag071_15 fra Codex (commit e8805b7654 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 942 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente de tre lagjobbene og satte fig002_06 til levert; ingen av dem står under sjekk i RAPPORT.md.
+- Sett med øynene: original_1x i nearest ved siden av resultatet beskåret med `bilde_i_lerret`, forstørret 5 til 8 ganger, og forhåndsvisningene.
+- fig002_06 (Sam, kostyme 2, 11 ruter): godkjent. Riktig figur, positur og retning i alle ruter, ingen ekstra ruter. Målt omriss mot originalens synlige felt: bredde og høyde innen 0,25 originalpiksler i alle 11. Tatt inn med figurmottaket for myke kanter (931 til 942 ruter, 0 til gjennomsyn); de 11 `costume002_*_hd.png` i modden er sett på grønn bakgrunn uten magentakant.
+- lag068_12 (stolpen obj658_01, rom 68): godkjent. Samme plassering, topp og sokkel som originalen, lys venstre side og mørk kant, ingen nye detaljer.
+- lag071_05: avvist. Skiltet på kassen i obj719_01 sier "$1.00 EACH" i originalen, leveransen har pil og "PUSH ME!". Romnotatet for rom 71 ber om PUSH ME! for hele rommet og har trolig styrt dette; spørsmål lagt i todo.
+- lag071_15: avvist. Parykken obj764_01: i originalen henger hårstråene ned over pannen og øynene, i leveransen er luggen kort og Max har fått synlige øyne.
+- To rader i `docs/gpt-avvisninger.csv` med grunn og forslag. Runden kjørt på nytt; begge står som avvist i status.csv og i ORDRE.md med retur.
+- Levert 4, visuelt kontrollert 4, godkjent 2, importert 2 (obj658_01 og 11 figurruter i kostyme 2). Ikke testet i spillet. Stilen er ikke godkjent av Tom.

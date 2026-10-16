@@ -132,6 +132,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [ ] Windows-pakken starter ikke på Toms jobb-PC (startfila lukker seg); startfilene viser nå feilkode og logg (%APPDATA%\SamMaxHD\scummvm.log)
 - [x] MT-32-musikk (14. oktober): motoren bygges med `--enable-mt32emu`, ROM-filene fra spilldata ligger i Linux- og Windows-pakken, og `engine/run.sh`, startfilene, AppImage og nettsiden velger `--music-driver=mt32`
 - [x] `--enable-mt32emu` (14. oktober)
+- [ ] Romnotatet for rom 71 i `docs/gpt-romnotater.csv` sier "Copy 'PUSH ME!' exactly" for hele rommet, men i lag071_05 står det "$1.00 EACH" på skiltet, og Codex tegnet PUSH ME!. Notatet bør si at teksten på skiltet varierer mellom tilstandene og skal kopieres fra referansen. Endringen gir nye prompter for alle rom 71-jobber, så den venter på avklaring av om det trigger nye jobber (Claude, 2026-10-16).
 
 ## Senere
 
