@@ -1,12 +1,13 @@
 # Rapport fra gpt-inn
 
-Laget 2026-10-16 01:42
+Laget 2026-10-16 02:09
 
 | Status | Romjobber | Objektjobber | Lagjobber | Ikonark | Figurark |
 | --- | --- | --- | --- | --- | --- |
+| avvist | 0 | 0 | 4 | 0 | 0 |
 | godkjent | 114 | 74 | 275 | 7 | 0 |
 | levert | 0 | 0 | 0 | 0 | 73 |
-| ny | 0 | 0 | 16 | 0 | 1685 |
+| ny | 0 | 0 | 12 | 0 | 1685 |
 | sjekk | 1 | 12 | 5 | 2 | 0 |
 
 - Ferdige rom: 76 av 76 (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 66, 68, 70, 71, 73, 76, 77, 79, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92)
@@ -32,6 +33,10 @@ Må sees på (se `retur.md` i jobbmappen):
 | obj819_01 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
 | obj831_01 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
 | rom083 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
+| lag045_02 | avvist | objekter er feil: obj430_02 mangler (kantlikhet 0.82, med bakgrunnen 0.88) |
+| lag053_01_del1av2 | avvist | objekter er feil: obj498_01 mangler (kantlikhet 0.66, med bakgrunnen 0.93), obj501_01 mangler (kantlikhet 0.79, med bakgrunnen 0.97), obj502_01 mangler (kantlikhet 0.74, med bakgrunnen 0.84), obj504_01 mangler (kantlikhet 0.42, med bakgrunnen 0.81), obj505_01 mangler (kantlikhet 0.80, med bakgrunnen 0.90) og 3 til |
+| lag053_02_del1av2 | avvist | objekter er feil: obj499_01 mangler (kantlikhet 0.56, med bakgrunnen 0.93), obj507_01 mangler (kantlikhet 0.07, med bakgrunnen 0.81), obj509_01 mangler (kantlikhet 0.29, med bakgrunnen 0.89) |
+| lag068_01 | avvist | deler av bildet er flyttet eller zoomet (opptil 2.0 px); objekter er feil: obj651_01 tegnet om (kantlikhet 0.16) |
 | lag068_04 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.8 px) |
 | lag079_02_del1av2 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.1 px) |
 | lag079_03_del1av2 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.1 px) |

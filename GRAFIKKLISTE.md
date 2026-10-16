@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-16 01:43 (norsk tid)
+Oppdatert 2026-10-16 02:10 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -19,10 +19,10 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 
 Rom 45, 53, 68.
 
-- [ ] `lag045_02` (rom 45 Bumpusville, soverommet, lag 02 med 3 objektbilder, bilde to `jobber/rom045/resultat.png`)
-- [ ] `lag053_01_del1av2` (rom 53 Savage Jungle Inn, festsalen, lag 01 med 15 objektbilder, del 1/2, bilde to `jobber/rom053_del1av2/resultat.png`)
-- [ ] `lag053_02_del1av2` (rom 53 Savage Jungle Inn, festsalen, lag 02 med 3 objektbilder, del 1/2, bilde to `jobber/rom053_del1av2/resultat.png`)
-- [ ] `lag068_01` (rom 68 Highway Surfing (minispill), lag 01 med 9 objektbilder, bilde to `jobber/rom068/resultat.png`)
+- [ ] `lag045_02` (rom 45 Bumpusville, soverommet, lag 02 med 3 objektbilder, bilde to `jobber/rom045/resultat.png`) (avvist, les retur.md)
+- [ ] `lag053_01_del1av2` (rom 53 Savage Jungle Inn, festsalen, lag 01 med 15 objektbilder, del 1/2, bilde to `jobber/rom053_del1av2/resultat.png`) (avvist, les retur.md)
+- [ ] `lag053_02_del1av2` (rom 53 Savage Jungle Inn, festsalen, lag 02 med 3 objektbilder, del 1/2, bilde to `jobber/rom053_del1av2/resultat.png`) (avvist, les retur.md)
+- [ ] `lag068_01` (rom 68 Highway Surfing (minispill), lag 01 med 9 objektbilder, bilde to `jobber/rom068/resultat.png`) (avvist, les retur.md)
 - [ ] `lag068_05` (rom 68 Highway Surfing (minispill), lag 05 med 4 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_06` (rom 68 Highway Surfing (minispill), lag 06 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)
 - [ ] `lag068_07` (rom 68 Highway Surfing (minispill), lag 07 med 3 objektbilder, bilde to `jobber/rom068/resultat.png`)

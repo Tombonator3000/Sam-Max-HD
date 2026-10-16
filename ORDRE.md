@@ -1,12 +1,12 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-16 01:43 (norsk tid)
+Oppdatert 2026-10-16 02:10 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
 ## Status
 
-- Jobber: 2264. godkjent 470, levert 73, ny 1701, sjekk 20
+- Jobber: 2264. avvist 4, godkjent 470, levert 73, ny 1697, sjekk 20
 - Ferdige rom: 75 av 76 (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 66, 68, 70, 71, 73, 76, 77, 79, 84, 85, 86, 87, 88, 89, 90, 91, 92)
 - Ferdige objekter: 74 av 86 (obj036_01, obj050_01, obj089_01, obj142_01, obj187_01, obj187_02, obj187_03, obj187_04, obj187_06, obj199_01, obj204_01, obj293_01, obj294_01, obj295_01, obj304_01, obj307_01, obj308_01, obj335_01, obj336_01, obj338_01, obj339_01, obj340_01, obj409_01, obj523_01, obj524_01, obj566_01, obj570_01, obj570_02, obj570_03, obj598_01, obj599_01, obj601_01, obj602_01, obj604_01, obj606_01, obj607_01, obj608_01, obj609_01, obj610_01, obj611_01, obj612_01, obj613_01, obj664_01, obj665_01, obj666_01, obj667_01, obj669_01, obj682_01, obj683_01, obj684_01, obj772_01, obj773_01, obj774_01, obj775_01, obj776_01, obj777_01, obj780_01, obj811_01, obj812_01, obj813_01, obj821_01, obj822_01, obj823_01, obj828_01, obj829_01, obj830_01, obj832_01, obj839_01, obj850_01, obj901_01, obj989_01, obj989_02, obj995_01, obj996_01)
 - Lagjobber: 275 av 296 godkjent. Ferdige objektbilder fra lag: 625 av 701
@@ -16,10 +16,10 @@ Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENT
 
 ## Gjør disse nå
 
-1. `lag045_02` (rom 45, Bumpusville, soverommet, lag 02 med 3 objektbilder, del 1/1). Legg ved `jobber/rom045/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-2. `lag053_01_del1av2` (rom 53, Savage Jungle Inn, festsalen, lag 01 med 15 objektbilder, del 1/2). Legg ved `jobber/rom053_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-3. `lag053_02_del1av2` (rom 53, Savage Jungle Inn, festsalen, lag 02 med 3 objektbilder, del 1/2). Legg ved `jobber/rom053_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-4. `lag068_01` (rom 68, Highway Surfing (minispill), lag 01 med 9 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+1. `lag045_02` (rom 45, Bumpusville, soverommet, lag 02 med 3 objektbilder, del 1/1). Avvist: objekter er feil: obj430_02 mangler (kantlikhet 0.82, med bakgrunnen 0.88). Les retur.md. Legg ved `jobber/rom045/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+2. `lag053_01_del1av2` (rom 53, Savage Jungle Inn, festsalen, lag 01 med 15 objektbilder, del 1/2). Avvist: objekter er feil: obj498_01 mangler (kantlikhet 0.66, med bakgrunnen 0.93), obj501_01 mangler (kantlikhet 0.79, med bakgrunnen 0.97), obj502_01 mangler (kantlikhet 0.74, med bakgrunnen 0.84), obj504_01 mangler (kantlikhet 0.42, med bakgrunnen 0.81), obj505_01 mangler (kantlikhet 0.80, med bakgrunnen 0.90) og 3 til. Les retur.md. Legg ved `jobber/rom053_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+3. `lag053_02_del1av2` (rom 53, Savage Jungle Inn, festsalen, lag 02 med 3 objektbilder, del 1/2). Avvist: objekter er feil: obj499_01 mangler (kantlikhet 0.56, med bakgrunnen 0.93), obj507_01 mangler (kantlikhet 0.07, med bakgrunnen 0.81), obj509_01 mangler (kantlikhet 0.29, med bakgrunnen 0.89). Les retur.md. Legg ved `jobber/rom053_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+4. `lag068_01` (rom 68, Highway Surfing (minispill), lag 01 med 9 objektbilder, del 1/1). Avvist: deler av bildet er flyttet eller zoomet (opptil 2.0 px); objekter er feil: obj651_01 tegnet om (kantlikhet 0.16). Les retur.md. Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
 5. `lag068_05` (rom 68, Highway Surfing (minispill), lag 05 med 4 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
 6. `lag068_06` (rom 68, Highway Surfing (minispill), lag 06 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
 7. `lag068_07` (rom 68, Highway Surfing (minispill), lag 07 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
