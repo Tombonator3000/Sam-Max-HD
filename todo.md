@@ -5,7 +5,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 ## Neste
 
 - [x] PR32 flettet av Tom 16. oktober 09:00. Sam-ark og kantvaskede ikoner er med i hd-mod a6c286bd. Linux-pakken og nettutgaven er bygget fra main 74ab2af2 og publisert. Nedlastet Linux-pakke sjekksumkontrollert og kjørt med inventar, akvarium og cafeteriarør, alle tre med normal avslutning og null skjermbufferavvik. Nettmotorens publiserte WASM er sjekksumkontrollert; spilling i nettleseren er ikke kontrollert i denne runden.
-- [ ] Bygg Windows-pakken med PR32 og hd-mod a6c286bd. Linux/web er oppdatert 16. oktober 09:11, Windows er ikke bygget i samme runde.
+- [x] Windows-pakken er bygget 16. oktober 09:30 fra 9b5a9197 med PR32 og hd-mod a6c286bd. Linux er bygget på nytt fra samme commit og lagt sammen med Windows i felles release sam-max-hd-2026-10-16, Latest klokken 12:28. Begge sjekksumkontrollert og alle moddfiler sammenlignet; ingen forskjell i HD-innhold.
 - [ ] Rom22: sammenheng mellom statisk øks i HD-rommet og objekt222s tilstandslapper. Rom16: alle faktiske bevegelser i kranhode154 og Chicken Dumpling155. Rester i motivenes bakgrunn forsvinner ikke av full skjermopptegning.
 - [ ] Gjør et faktisk vellykket opptak med riktig kameratilstand. Siste automatiserte opptaksforsøk traff objekt 0 og bekrefter ikke løsningen.
 - [ ] Kun munndelen costume249_257 i fig249_02 står til teknisk sjekk etter Toms godkjenning 16. oktober: dekning 0,783, snitt/union 0,768. De andre 20 nye rutene er importert. Bevar de seks gangrutene, rett bare munndelens form mot originalen, og behold eget munnlag. Ingen terskel er svekket; originalbasert rute brukes foreløpig
@@ -19,7 +19,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Trappetrinn rundt bilen i rom 9: myk alfa for romobjekter og kanten lagt over HD-rommet i motoren (PR 29, 15. oktober)
 - [x] PR 28 og PR 29 flettet; Linux, Windows og nettsiden bygget på nytt fra main (15. oktober 18:00)
 - [x] Samme patch i Dig-HD-Remake (Dig PR 57, venter på fletting)
-- [ ] Tom fletter PR 30 (objektleveranser.json i importpakke)
+- [x] PR30 (objektleveranser.json i importpakke) er flettet; kontrollert på GitHub 16. oktober
 - [x] Kontroll av PR 32 (Codex, native inventarkort og glassmasker i motoren): koden lest, fem funn i `docs/KONTROLL-PR32.md` (15. oktober 22:20, natt). Ikke bygget eller kjørt, maskinen har ingen C++-kompilator
   - [ ] Codex: felles bilde for blast og romobjekt gir `softEdge = false` når blast lastes først (funn 1)
   - [ ] Se bilen i rom 9 i en nedtoning med PR 32 (kanten tones nå med rommets farge, funn 3)
