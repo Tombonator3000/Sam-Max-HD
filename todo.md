@@ -4,7 +4,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
-- [ ] Gjennomgå PR fra `codex/hd-masker-inventory`, importer nye Sam-ark og kantvaskede ikoner fra feilrunde2-rapporten, og bygg Linux/Windows/web sammen. Lokale motorprøver for inventar, akvarium og cafeteriarør består; dette er ikke distribuert ennå.
+- [x] PR32 flettet av Tom 16. oktober 09:00. Sam-ark og kantvaskede ikoner er med i hd-mod a6c286bd. Linux-pakken og nettutgaven er bygget fra main 74ab2af2 og publisert. Nedlastet Linux-pakke sjekksumkontrollert og kjørt med inventar, akvarium og cafeteriarør, alle tre med normal avslutning og null skjermbufferavvik. Nettmotorens publiserte WASM er sjekksumkontrollert; spilling i nettleseren er ikke kontrollert i denne runden.
+- [ ] Bygg Windows-pakken med PR32 og hd-mod a6c286bd. Linux/web er oppdatert 16. oktober 09:11, Windows er ikke bygget i samme runde.
 - [ ] Rom22: sammenheng mellom statisk øks i HD-rommet og objekt222s tilstandslapper. Rom16: alle faktiske bevegelser i kranhode154 og Chicken Dumpling155. Rester i motivenes bakgrunn forsvinner ikke av full skjermopptegning.
 - [ ] Gjør et faktisk vellykket opptak med riktig kameratilstand. Siste automatiserte opptaksforsøk traff objekt 0 og bekrefter ikke løsningen.
 - [ ] Kun munndelen costume249_257 i fig249_02 står til teknisk sjekk etter Toms godkjenning 16. oktober: dekning 0,783, snitt/union 0,768. De andre 20 nye rutene er importert. Bevar de seks gangrutene, rett bare munndelens form mot originalen, og behold eget munnlag. Ingen terskel er svekket; originalbasert rute brukes foreløpig
@@ -22,7 +23,8 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 - [x] Kontroll av PR 32 (Codex, native inventarkort og glassmasker i motoren): koden lest, fem funn i `docs/KONTROLL-PR32.md` (15. oktober 22:20, natt). Ikke bygget eller kjørt, maskinen har ingen C++-kompilator
   - [ ] Codex: felles bilde for blast og romobjekt gir `softEdge = false` når blast lastes først (funn 1)
   - [ ] Se bilen i rom 9 i en nedtoning med PR 32 (kanten tones nå med rommets farge, funn 3)
-  - [ ] Tom fletter PR 32, og avgjør om Dig skal få samme endring (funn 4)
+  - [x] Tom flettet PR32 16. oktober 09:00, merge 74ab2af2
+  - [ ] Tom avgjør om Dig skal få samme endring (funn 4)
 - [x] Mottaket måler Sam091 uten den løse fotresten (measure_mask), så 8 ruter står feilaktig til gjennomsyn (rettet 15. oktober 20:25, `myk.py` versjon 6, på grenen samarbeid/natt-2026-10-15)
   - [x] Neste `tools/gpt_runde.sh` etter fletting tar inn de 11 rutene (fig091_03 til 05, fig209_03, fig272_02); fjern da beskjeden om ny tegning i ORDRE.md. Sjekket 16. oktober 05:30: myke.json versjon 6 har alle 11 som ok (970 ok, 0 til gjennomsyn), og ORDRE.md i gpt-arbeid nevner ikke fig091 lenger. Ikke sett i spillet
   - 15. oktober 20:05: fig091_03 (rute 1955, ny utgave) og fig091_04 sett av Claude, bokser like originalen i 4x, holdes likevel ute og ordren ber om ny tegning. Beskjed i ORDRE.md om ikke å tegne dem på nytt. Når mottaket er rettet, kommer de inn uten ny leveranse

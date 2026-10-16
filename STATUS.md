@@ -1,6 +1,6 @@
 # Status
 
-15. oktober, ny motorretting til PR: inventar- og samtalekort finner nå de native RGBA-filene også som ordinære romobjekter. Presise klassiske kostymemerker fjerner rosa/blå glassfeil i akvarium og cafeteriarør i lokale spillprøver. ScummVM bygget og patch kontrollert mot ren låst base; 51 pipeline- og 19 nettlesertester består. Dette er ikke en ny nedlastbar utgave. Øks-/bakgrunnsrester, øvrige animasjonstilstander, vellykket opptak og bilens avreise gjenstår. [Detaljer](docs/ARTEFAKTER-20261015.md).
+16. oktober 09:17: Linux-pakken og nettutgaven er publisert fra main 74ab2af2 med den flettede motorrettingen PR32. Linux har hd-mod a6c286bd med 1095 native figurruter; nettutgaven henter samme grafikkgren ved oppstart. AppImage er lastet ned og sjekksumkontrollert. Inventar, akvarium og cafeteriarør er kjørt og sett i den faktiske Linux-pakken, med rene inventarkort og uten de tidligere rosa glassfeltene i prøvene. Alle tre kjøringer avsluttet normalt med null skjermbufferavvik. Nettmotorens publiserte WASM stemmer med build.json og 19 nettsidetester består; spilling i nettleseren er ikke kontrollert i denne runden. Windows er ikke bygget på nytt. Øks-/bakgrunnsrester, øvrige animasjonstilstander, vellykket opptak og bilens avreise gjenstår. [Utgivelseskontroll](https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/utgivelse-20261016-0915/RAPPORT.md).
 
 Oppdatert 14. oktober 2026.
 
