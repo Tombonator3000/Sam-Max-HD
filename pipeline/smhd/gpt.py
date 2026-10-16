@@ -1129,6 +1129,18 @@ def read_rejections(path: Path | None) -> dict[str, dict]:
         return {r["jobb"].strip(): r for r in csv.DictReader(f) if r.get("jobb", "").strip()}
 
 
+def manual_rejection(manual: dict[str, dict], job: str, sha: str) -> tuple[str, str, str] | None:
+    """Status, grunn og forslag fra en manuell avvisning som gjelder denne leveransen (samme sha256
+    eller "*"), ellers None. Status er avvist eller sjekk."""
+    rej = manual.get(job)
+    if not rej or rej.get("sha256_resultat", "").strip() not in ("*", sha):
+        return None
+    status = (rej.get("status") or "").strip()
+    if status not in ("avvist", "sjekk"):
+        status = "avvist"
+    return status, rej.get("grunn", "").strip() or f"{status} ved gjennomsyn", rej.get("forslag", "").strip()
+
+
 RANK = {"avvist": 0, "sjekk": 1, "godkjent": 2}
 
 
@@ -1329,13 +1341,9 @@ def _evaluate(res_path: Path, job: "Job", d: Path, extract: Path, manual: dict, 
         if bad or flick:
             status = "avvist"
             r["forslag"] = figur.FIG_RETRY if bad else figur.FIG_FLICKER_RETRY
-    rej = manual.get(job.id)
-    if rej and rej.get("sha256_resultat", "").strip() in ("*", r["sha256_resultat"]):
-        status = (rej.get("status") or "").strip()
-        if status not in ("avvist", "sjekk"):
-            status = "avvist"
-        why = rej.get("grunn", "").strip() or f"{status} ved gjennomsyn"
-        r["forslag"] = rej.get("forslag", "").strip()
+    rej = manual_rejection(manual, job.id, r["sha256_resultat"])
+    if rej:
+        status, why, r["forslag"] = rej
     r.update(m, status=status, kommentar=why)
     _preview(preview_dir / f"{job.id}.png", original, part, locked)
     return r, locked
@@ -1391,9 +1399,19 @@ def import_results(work: Path, extract: Path, out: Path, *, sigma: float = 6.0, 
             continue
         if job.type == "figur" and has_native_alpha(res_path):
             # Ny, glatt stil med egen alfakant: klippes ikke med originalens pikselmaske (Tom avviste
-            # trappekantene). Tas inn med figurmottaket for ekte alfa (smhd glatte-figurer).
-            results[job.id] = {"status": "levert", "sha256_resultat": _sha(res_path),
-                               "kommentar": "glatt stil med ekte alfa, tas inn med figurmottaket for myke kanter"}
+            # trappekantene). Tas inn med figurmottaket for ekte alfa (smhd glatte-figurer). En manuell
+            # avvisning av akkurat denne leveransen gjelder også her, så returen kommer først i ORDRE.md
+            # (figurmottaket utelater det avviste arket selv). Levert er ikke godkjent.
+            sha = _sha(res_path)
+            rej = manual_rejection(manual, job.id, sha)
+            if rej:
+                r = {"status": rej[0], "sha256_resultat": sha, "kommentar": rej[1], "forslag": rej[2]}
+                _write_return(d, r)
+            else:
+                r = {"status": "levert", "sha256_resultat": sha,
+                     "kommentar": "glatt stil med ekte alfa, tas inn med figurmottaket for myke kanter"}
+                (d / "retur.md").unlink(missing_ok=True)
+            results[job.id] = r
             tiles.setdefault(job.bilde, []).append((job, None))
             continue
         r, locked = _evaluate(res_path, job, d, extract, manual, sigma, strength, preview_dir)

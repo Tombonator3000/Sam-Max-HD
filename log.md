@@ -812,3 +812,13 @@ Natt: kontroll av fig247_10 (retur), fig116_02, fig116_03 og fig116_04 fra Codex
 - fig116_04 (8 ruter): godkjent. Åtte balansestillinger uten alligator, samme arm- og fotstillinger; hodet forfra med stor nese og ingen synlige øyne under bremmen, som originalen og godkjent fig116_01.
 - Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt. status.csv står riktig som levert for alle fire.
 - Levert 4, visuelt kontrollert 4, godkjent 4, avvist 0, importert 4 (24 figurruter; modden har 1048 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 07:10 (Claude, kodesporet)
+
+Natt: retting av øverste todo-punkt, import_results for figurark med ekte alfa.
+
+- Feilen: `gpt.import_results` satte alltid status levert for native alfa-ark uten å lese `docs/gpt-avvisninger.csv`. `smhd myke-figurer` utelot det avviste arket riktig, men status.csv ble stående levert, retur.md ble ikke skrevet og returen kom ikke først i ORDRE.md (fig247_02 og fig247_10 i natt, rettet for hånd).
+- Rettet i `pipeline/smhd/gpt.py`: ny `manual_rejection(manual, jobb, sha)` gir status, grunn og forslag når avvisningen gjelder akkurat denne sjekksummen eller `*`. `_evaluate` bruker den samme funksjonen som før (uendret oppførsel). I grenen for native alfa gir en treff status avvist (eller sjekk) med grunn og forslag i status.csv og retur.md. Uten treff blir arket levert som før, og en gammel retur.md fjernes. Levert er fortsatt ikke godkjent.
+- Regresjonstest `test_rejected_smooth_figure_sheet_gets_return_order_and_new_sha_is_delivered`: avvist SHA gir avvist, retur.md med forslaget og jobben først i arbeidskøen; ny SHA gir levert, ingen retur.md og ute av køen. Testen feiler mot forrige gpt.py og går gjennom med rettingen.
+- `pytest` i pipeline: 65 tester grønne (med game/). Sjekket mot dagens data: avvisningene for fig247_02 og fig247_10 gjelder de gamle SHA-ene, så dagens leveranser 7ea6eef6 og 3119bb46 gir levert. Ikke kjørt `gpt_runde.sh` med rettingen; neste ordinære runde tar den i bruk.
+- Codex skal kontrollere koden. Ingen grafikk endret.

@@ -1233,6 +1233,45 @@ def test_figure_import_cut_and_mod(tmp_path):
     assert modpack.build_mod(ex, tmp_path / "mod3", scale=4, method="nearest", rooms=set())["costume_cels"] == 0
 
 
+def test_rejected_smooth_figure_sheet_gets_return_order_and_new_sha_is_delivered(tmp_path):
+    # En manuell avvisning av et ark med ekte alfa skal gi status avvist og retur.md (og dermed returen
+    # først i ORDRE.md), ikke levert. En ny leveranse med annen sjekksum blir levert igjen, ikke godkjent.
+    from PIL import ImageFilter
+    from smhd import gpt
+
+    ex = _figure_extract(tmp_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work, figures="pilot")
+    jd = work / "jobber" / "fig014_01"
+
+    def sheet(colour):
+        a = Image.new("L", (1536, 1024), 0)
+        a.paste(255, (200, 200, 600, 800))
+        im = Image.new("RGBA", (1536, 1024), colour + (0,))
+        im.putalpha(a.filter(ImageFilter.GaussianBlur(6)))
+        im.save(jd / "resultat.png")
+        return gpt._sha(jd / "resultat.png")
+
+    old = sheet((200, 120, 60))
+    rej = tmp_path / "avvisninger.csv"
+    rej.write_text("jobb,sha256_resultat,grunn,forslag,status\n"
+                   f"fig014_01,{old},Hatten mangler,Tegn hatten,avvist\n", encoding="utf-8")
+    gpt.import_results(work, ex, done, rejections=rej)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["fig014_01"]
+    assert row["status"] == "avvist" and row["kommentar"] == "Hatten mangler"
+    assert "Tegn hatten" in (jd / "retur.md").read_text()
+    queue = gpt.work_queue(gpt.read_status(work), work)
+    assert queue and queue[0]["jobb"] == "fig014_01"
+    assert not list((done / "costumes").glob("*.png"))
+
+    sheet((180, 110, 70))
+    gpt.import_results(work, ex, done, rejections=rej)
+    row = {r["jobb"]: r for r in gpt.read_status(work)}["fig014_01"]
+    assert row["status"] == "levert" and "myke kanter" in row["kommentar"]
+    assert not (jd / "retur.md").exists()
+    assert "fig014_01" not in [r["jobb"] for r in gpt.work_queue(gpt.read_status(work), work)]
+
+
 def test_figure_sheet_in_smooth_style_is_not_cut_with_the_old_mask(tmp_path):
     # Tom avviste trappekantene: et ark med egen alfakant (RGBA, myke kanter) skal ikke klippes med
     # originalens pikselmaske, men vente på mottaket for myke kanter
