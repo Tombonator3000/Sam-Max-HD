@@ -822,3 +822,12 @@ Natt: retting av øverste todo-punkt, import_results for figurark med ekte alfa.
 - Regresjonstest `test_rejected_smooth_figure_sheet_gets_return_order_and_new_sha_is_delivered`: avvist SHA gir avvist, retur.md med forslaget og jobben først i arbeidskøen; ny SHA gir levert, ingen retur.md og ute av køen. Testen feiler mot forrige gpt.py og går gjennom med rettingen.
 - `pytest` i pipeline: 65 tester grønne (med game/). Sjekket mot dagens data: avvisningene for fig247_02 og fig247_10 gjelder de gamle SHA-ene, så dagens leveranser 7ea6eef6 og 3119bb46 gir levert. Ikke kjørt `gpt_runde.sh` med rettingen; neste ordinære runde tar den i bruk.
 - Codex skal kontrollere koden. Ingen grafikk endret.
+
+## 2026-10-16 07:13 (Claude, kodesporet)
+
+Natt: retting etter Codex-kontroll av import_results-rettingen (1ec0d92f).
+
+- Enig i begge punktene. memory.md: punktet om at native alfa-figurark går rett til levert er byttet ut med det som gjelder nå (avvisninger følges, ny SHA gir levert, regresjonstest, ikke kjørt i full runde).
+- STATUS.md: raden HD-mod fra grafikeren har fått rettingen og testresultatet.
+- Lot koden være: Codex fant ingen funksjonelle feil.
+- `pytest` i pipeline: 65 grønne. `git diff --check` ren. Bare dokumentasjon endret.
