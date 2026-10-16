@@ -1,18 +1,18 @@
 # Rapport fra gpt-inn
 
-Laget 2026-10-16 02:56
+Laget 2026-10-16 03:06
 
 | Status | Romjobber | Objektjobber | Lagjobber | Ikonark | Figurark |
 | --- | --- | --- | --- | --- | --- |
-| avvist | 0 | 0 | 2 | 0 | 0 |
-| godkjent | 114 | 74 | 277 | 7 | 0 |
+| avvist | 0 | 0 | 3 | 0 | 0 |
+| godkjent | 114 | 74 | 276 | 7 | 0 |
 | levert | 0 | 0 | 0 | 0 | 73 |
 | ny | 0 | 0 | 12 | 0 | 1685 |
 | sjekk | 1 | 12 | 5 | 2 | 0 |
 
 - Ferdige rom: 76 av 76 (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 66, 68, 70, 71, 73, 76, 77, 79, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92)
 - Ferdige objekter: 86 av 86 (obj036_01, obj050_01, obj089_01, obj142_01, obj187_01, obj187_02, obj187_03, obj187_04, obj187_05, obj187_06, obj199_01, obj202_01, obj204_01, obj293_01, obj294_01, obj295_01, obj304_01, obj307_01, obj308_01, obj335_01, obj336_01, obj337_01, obj338_01, obj339_01, obj340_01, obj409_01, obj523_01, obj524_01, obj566_01, obj570_01, obj570_02, obj570_03, obj598_01, obj599_01, obj600_01, obj601_01, obj602_01, obj603_01, obj604_01, obj605_01, obj606_01, obj607_01, obj608_01, obj609_01, obj610_01, obj611_01, obj612_01, obj613_01, obj649_01, obj650_01, obj664_01, obj665_01, obj666_01, obj667_01, obj668_01, obj669_01, obj682_01, obj683_01, obj684_01, obj772_01, obj773_01, obj774_01, obj775_01, obj776_01, obj777_01, obj780_01, obj781_01, obj811_01, obj812_01, obj813_01, obj819_01, obj821_01, obj822_01, obj823_01, obj828_01, obj829_01, obj830_01, obj831_01, obj832_01, obj839_01, obj850_01, obj901_01, obj989_01, obj989_02, obj995_01, obj996_01)
-- Ferdige objektbilder fra lag: 657 av 701
+- Ferdige objektbilder fra lag: 648 av 701
 - Ferdige ikoner fra ikonark: 163 av 163
 - Figurark: 0 av 1758 godtatt. Ferdige figurruter: 0 av 15661
 
@@ -33,8 +33,9 @@ Må sees på (se `retur.md` i jobbmappen):
 | obj819_01 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
 | obj831_01 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
 | rom083 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
-| lag045_02 | avvist | objekter er feil: obj430_02 mangler (kantlikhet 0.85, med bakgrunnen 0.93) |
-| lag053_02_del1av2 | avvist | objekter er feil: obj507_01 mangler (kantlikhet 0.34, med bakgrunnen 0.50), obj509_01 mangler (kantlikhet 0.63, med bakgrunnen 0.76) |
+| lag045_02 | avvist | obj430_02 (rekt 24,32,24,24) mangler det som er selve tilstanden. Boken med det rutede feltet er nå riktig, men i originalen står en smal mørk grå bok mellom de grønne bøkene og den blå boken (ca. x 31 til 35, y 36 til 54). I leveransen er den borte, og den blå boken er flyttet mot venstre og står rett inntil de grønne bøkene. Mottaket gav kantlikhet 0,85 mot 0,93 for rommet uten tilstanden. Auberginen obj429_02 og trappen obj433_02 er riktige. |
+| lag053_02_del1av2 | avvist | Gjestene har fått ansikter, men tilstanden mangler det den viser. Den midterste gjesten obj507_01 (rekt 216,112,16,24) har i originalen en bred, åpen munn; i leveransen har den bare øyne og ingen munn. obj509_01 (rekt 232,120,24,16), armen og hånden til gjesten til høyre, har annen stilling enn originalen. Mottaket gav kantlikhet 0,34 og 0,63. Musikerne og resten av bildet er riktige. |
+| lag068_01 | avvist | Max-bitene i høyre kant, veiene og teksten er nå riktige. Feil i stolpene: venstre stolpe obj656_01 (rekt 240,88,24,40) har et hakk i nedre kant, høyre del av foten går ca. 2 px lenger ned enn venstre del, mens originalen har rett underkant. Lyset er også endret: i originalen er venstre stolpe lys til venstre og svart på høyre halvdel, og høyre stolpe obj659_01 (rekt 264,88,24,40) svart på venstre halvdel og lys til høyre. I leveransen har høyre stolpe lyset i midten og mørk høyre kant, altså omvendt av originalen, og venstre stolpe mangler den svarte høyre halvdelen. |
 | lag068_04 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.8 px) |
 | lag079_02_del1av2 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.1 px) |
 | lag079_03_del1av2 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.1 px) |

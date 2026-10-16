@@ -1,31 +1,31 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-16 02:57 (norsk tid)
+Oppdatert 2026-10-16 03:08 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
 ## Status
 
-- Jobber: 2264. avvist 2, godkjent 472, levert 73, ny 1697, sjekk 20
+- Jobber: 2264. avvist 3, godkjent 471, levert 73, ny 1697, sjekk 20
 - Ferdige rom: 75 av 76 (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 66, 68, 70, 71, 73, 76, 77, 79, 84, 85, 86, 87, 88, 89, 90, 91, 92)
 - Ferdige objekter: 74 av 86 (obj036_01, obj050_01, obj089_01, obj142_01, obj187_01, obj187_02, obj187_03, obj187_04, obj187_06, obj199_01, obj204_01, obj293_01, obj294_01, obj295_01, obj304_01, obj307_01, obj308_01, obj335_01, obj336_01, obj338_01, obj339_01, obj340_01, obj409_01, obj523_01, obj524_01, obj566_01, obj570_01, obj570_02, obj570_03, obj598_01, obj599_01, obj601_01, obj602_01, obj604_01, obj606_01, obj607_01, obj608_01, obj609_01, obj610_01, obj611_01, obj612_01, obj613_01, obj664_01, obj665_01, obj666_01, obj667_01, obj669_01, obj682_01, obj683_01, obj684_01, obj772_01, obj773_01, obj774_01, obj775_01, obj776_01, obj777_01, obj780_01, obj811_01, obj812_01, obj813_01, obj821_01, obj822_01, obj823_01, obj828_01, obj829_01, obj830_01, obj832_01, obj839_01, obj850_01, obj901_01, obj989_01, obj989_02, obj995_01, obj996_01)
-- Lagjobber: 277 av 296 godkjent. Ferdige objektbilder fra lag: 649 av 701
+- Lagjobber: 276 av 296 godkjent. Ferdige objektbilder fra lag: 640 av 701
 - Ikonark: 7 av 9 godkjent. Ferdige bilder fra ikonark: 149 av 163
 - Figurark: 73 av 1758 tatt inn med figurmottaket. Ferdige figurruter: 931 av 15661
 - Hovedark: 2 av 2 levert
 
 ## Gjør disse nå
 
-1. `lag045_02` (rom 45, Bumpusville, soverommet, lag 02 med 3 objektbilder, del 1/1). Avvist: objekter er feil: obj430_02 mangler (kantlikhet 0.85, med bakgrunnen 0.93). Les retur.md. Legg ved `jobber/rom045/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-2. `lag053_02_del1av2` (rom 53, Savage Jungle Inn, festsalen, lag 02 med 3 objektbilder, del 1/2). Avvist: objekter er feil: obj507_01 mangler (kantlikhet 0.34, med bakgrunnen 0.50), obj509_01 mangler (kantlikhet 0.63, med bakgrunnen 0.76). Les retur.md. Legg ved `jobber/rom053_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-3. `lag068_05` (rom 68, Highway Surfing (minispill), lag 05 med 4 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-4. `lag068_06` (rom 68, Highway Surfing (minispill), lag 06 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-5. `lag068_07` (rom 68, Highway Surfing (minispill), lag 07 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-6. `lag068_09` (rom 68, Highway Surfing (minispill), lag 09 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-7. `lag068_10` (rom 68, Highway Surfing (minispill), lag 10 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-8. `lag068_12` (rom 68, Highway Surfing (minispill), lag 12 med 1 objektbilde, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-9. `lag071_05` (rom 71, Påkledning, Sam og Max, lag 05 med 3 objektbilder, del 1/1). Legg ved `jobber/rom071/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
-10. `lag071_15` (rom 71, Påkledning, Sam og Max, lag 15 med 2 objektbilder, del 1/1). Legg ved `jobber/rom071/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+1. `lag045_02` (rom 45, Bumpusville, soverommet, lag 02 med 3 objektbilder, del 1/1). Avvist: obj430_02 (rekt 24,32,24,24) mangler det som er selve tilstanden. Boken med det rutede feltet er nå riktig, men i originalen står en smal mørk grå bok mellom de grønne bøkene og den blå boken (ca. x 31 til 35, y 36 til 54). I leveransen er den borte, og den blå boken er flyttet mot venstre og står rett inntil de grønne bøkene. Mottaket gav kantlikhet 0,85 mot 0,93 for rommet uten tilstanden. Auberginen obj429_02 og trappen obj433_02 er riktige.. Les retur.md. Legg ved `jobber/rom045/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+2. `lag053_02_del1av2` (rom 53, Savage Jungle Inn, festsalen, lag 02 med 3 objektbilder, del 1/2). Avvist: Gjestene har fått ansikter, men tilstanden mangler det den viser. Den midterste gjesten obj507_01 (rekt 216,112,16,24) har i originalen en bred, åpen munn; i leveransen har den bare øyne og ingen munn. obj509_01 (rekt 232,120,24,16), armen og hånden til gjesten til høyre, har annen stilling enn originalen. Mottaket gav kantlikhet 0,34 og 0,63. Musikerne og resten av bildet er riktige.. Les retur.md. Legg ved `jobber/rom053_del1av2/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+3. `lag068_01` (rom 68, Highway Surfing (minispill), lag 01 med 9 objektbilder, del 1/1). Avvist: Max-bitene i høyre kant, veiene og teksten er nå riktige. Feil i stolpene: venstre stolpe obj656_01 (rekt 240,88,24,40) har et hakk i nedre kant, høyre del av foten går ca. 2 px lenger ned enn venstre del, mens originalen har rett underkant. Lyset er også endret: i originalen er venstre stolpe lys til venstre og svart på høyre halvdel, og høyre stolpe obj659_01 (rekt 264,88,24,40) svart på venstre halvdel og lys til høyre. I leveransen har høyre stolpe lyset i midten og mørk høyre kant, altså omvendt av originalen, og venstre stolpe mangler den svarte høyre halvdelen.. Les retur.md. Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+4. `lag068_05` (rom 68, Highway Surfing (minispill), lag 05 med 4 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+5. `lag068_06` (rom 68, Highway Surfing (minispill), lag 06 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+6. `lag068_07` (rom 68, Highway Surfing (minispill), lag 07 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+7. `lag068_09` (rom 68, Highway Surfing (minispill), lag 09 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+8. `lag068_10` (rom 68, Highway Surfing (minispill), lag 10 med 3 objektbilder, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+9. `lag068_12` (rom 68, Highway Surfing (minispill), lag 12 med 1 objektbilde, del 1/1). Legg ved `jobber/rom068/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
+10. `lag071_05` (rom 71, Påkledning, Sam og Max, lag 05 med 3 objektbilder, del 1/1). Legg ved `jobber/rom071/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet.
 
 Når disse er levert, fortsett med neste bestilling i `GRAFIKKLISTE.md` uten å vente på ny ordre.
 
