@@ -1,0 +1,101 @@
+from pathlib import Path
+import json
+from collections import deque
+import numpy as np
+from PIL import Image, ImageFilter
+
+R = Path('rapporter/natt-fire-0346-20261016')
+base = Image.open('jobber/rom068/resultat.png').convert('RGB')
+base.paste((7,7,0),(128,464,1408,912))
+
+def blur(a, radius):
+    return np.asarray(Image.fromarray(np.uint8(np.clip(a, 0, 255))).filter(ImageFilter.GaussianBlur(radius))).astype(float)
+
+def interior_components(mask):
+    # Fjern generatorens horisontstripe fra den lille veibiten.
+    m = mask.copy()
+    keep = np.zeros_like(mask)
+    h, w = m.shape
+    for y, x in zip(*np.where(mask)):
+        if not m[y, x]:
+            continue
+        q = deque([(y, x)]); m[y, x] = False; pixels = []; touches = False
+        while q:
+            yy, xx = q.popleft(); pixels.append((yy, xx))
+            touches |= yy in (0, h-1) or xx in (0, w-1)
+            for dy, dx in [(0,1),(0,-1),(1,0),(-1,0)]:
+                y2, x2 = yy+dy, xx+dx
+                if 0 <= y2 < h and 0 <= x2 < w and m[y2,x2]:
+                    m[y2,x2] = False; q.append((y2,x2))
+        if not touches:
+            for yy, xx in pixels:
+                keep[yy,xx] = True
+    return keep
+
+def make(j):
+    d = json.loads(Path('jobber', j, 'jobb.json').read_text())
+    g = Image.open(R/f'{j}-raa01.png').convert('RGB')
+    o = Image.open(Path('jobber', j, 'referanse.png')).convert('RGB')
+    out = base.copy()
+    for p in d['objekter']:
+        x,y,w,h = p['rekt']; x=128+x*4; y=112+y*4; w*=4; h*=4
+        box=(x,y,x+w,y+h)
+        n=np.asarray(g.crop(box)).astype(float)
+        s=np.asarray(o.crop(box)).astype(float)
+        b=np.asarray(base.crop(box)).astype(float)
+        if p['rekt'][1] == 80:
+            wide=np.asarray(g.crop((x-16,y,x+w+16,y+h))).astype(float)
+            raw=(wide.max(axis=2)<90)
+            ma=interior_components(raw.copy())
+            sm=(s.max(axis=2)<90)
+            ys,xs=np.where(ma); oy,ox=np.where(sm)
+            sb=(xs.min(),ys.min(),xs.max()+1,ys.max()+1)
+            db=(ox.min(),oy.min(),ox.max()+1,oy.max()+1)
+            fitted=Image.new('L',(w,h))
+            fitted.paste(Image.fromarray(np.uint8(ma)*255).crop(sb).resize((db[2]-db[0],db[3]-db[1]),Image.Resampling.LANCZOS),db[:2])
+            a=np.asarray(fitted.filter(ImageFilter.GaussianBlur(.25))).astype(float)/255
+            col=np.broadcast_to(np.median(s[sm],axis=0),n.shape)
+        else:
+            ma=(n[:,:,2]-n[:,:,0]>3)&(n[:,:,2]>20)
+            sm=(s[:,:,2]-s[:,:,0]>3)&(s[:,:,2]>20)
+            yellow=(n[:,:,0]>65)&(n[:,:,1]>60)&(n[:,:,2]<n[:,:,0]*.6)
+            ma |= yellow
+            # Rens svarte hull rundt den genererte streken før den plasseres.
+            cleaned=np.asarray(Image.fromarray(np.uint8(ma)*255).filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.MinFilter(7)))>128
+            near=np.asarray(Image.fromarray(np.uint8(yellow)*255).filter(ImageFilter.MaxFilter(31)))>0
+            ma |= cleaned & near
+            # Størrelse og plass låses med boksen, uten originalkontur som maske.
+            ys,xs=np.where(ma); oy,ox=np.where(sm)
+            sb=(xs.min(),ys.min(),xs.max()+1,ys.max()+1)
+            db=(ox.min(),oy.min(),ox.max()+1,oy.max()+1)
+            fitted=Image.new('L',(w,h))
+            fitted.paste(Image.fromarray(np.uint8(ma)*255).crop(sb).resize((db[2]-db[0],db[3]-db[1]),Image.Resampling.LANCZOS),db[:2])
+            weight=blur(sm*255,4)/255
+            col=blur(s*sm[:,:,None],4)/np.maximum(weight[:,:,None],.001)
+            detail=n-blur(n,8)
+            detail*=1-np.clip(blur(yellow*255,8)/12,0,1)[:,:,None]
+            col+=.20*detail
+            a=np.asarray(fitted.filter(ImageFilter.GaussianBlur(.35))).astype(float)/255
+        final=b*(1-a[:,:,None])+np.clip(col,0,255)*a[:,:,None]
+        if p['rekt'][1]==104:
+            yellow=(n[:,:,0]>65)&(n[:,:,1]>60)&(n[:,:,2]<n[:,:,0]*.6)
+            sy=(s[:,:,0]>60)&(s[:,:,1]>60)&(s[:,:,2]<s[:,:,0]*.6)
+            # Egen generert gul strek, tilpasset originalens boks og palett.
+            ys,xs=np.where(yellow); oy,ox=np.where(sy)
+            if len(ys) and len(oy):
+                srcbox=(xs.min(),ys.min(),xs.max()+1,ys.max()+1)
+                dstbox=(ox.min(),oy.min(),ox.max()+1,oy.max()+1)
+                stripe=Image.fromarray(np.uint8(yellow)*255).crop(srcbox).resize((dstbox[2]-dstbox[0],dstbox[3]-dstbox[1]),Image.Resampling.LANCZOS)
+                mask=Image.new('L',(w,h));mask.paste(stripe,dstbox[:2])
+                ya=np.asarray(mask).astype(float)/255
+                color=np.median(s[sy],axis=0)
+                final=final*(1-ya[:,:,None])+color*ya[:,:,None]
+        out.paste(Image.fromarray(np.uint8(np.clip(final,0,255))),box[:2])
+    # Rammen skal være flat, også når stilankeret har små avvik.
+    out.paste((128,128,128),(0,0,1536,112));out.paste((128,128,128),(0,912,1536,1024))
+    out.paste((128,128,128),(0,112,128,912));out.paste((128,128,128),(1408,112,1536,912))
+    out.save(Path('jobber',j,'resultat.png'))
+
+if __name__=='__main__':
+    import sys
+    for j in sys.argv[1:]:make(j)
