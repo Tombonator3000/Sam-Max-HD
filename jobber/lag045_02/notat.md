@@ -1,11 +1,11 @@
 # lag045_02
 
-Dato: 16. oktober 2026. Verktøy: innebygd image_gen. Eksakt modellnavn vises ikke. To bildeforsøk.
+Dato: 16. oktober 2026. Verktøy: innebygd image_gen og Pillow. Eksakt modellnavn er ikke vist. Ett nytt bildeforsøk i denne returrunden, etter de to historiske forsøkene. Hele prompt.txt er sendt ordrett med returrettingen som tillegg. Den faktiske prompten ligger i rapporter/natt-retur4-20261016/lag045_02-prompt1.txt.
 
-Originalen, originalens 4x-referanse, jobbmetadata, ANALYSE.md og ressursbanken er grunnlaget. Bilde én var referanse.png, bilde to var godkjent jobber/rom045/resultat.png. Første forsøk brukte prompt.txt ordrett. Det utelot auberginen og er forkastet. Forsøk to brukte samme prompt med avgrenset rettelse, bevart i rapportmappen.
+Originalens referanse.png var bilde én, godkjent rom045/resultat.png bilde to, forrige lagleveranse bilde tre og et forstørret originalutsnitt av boken bilde fire. original_1x.png, jobb.json, ANALYSE.md, GJENNOMGANG.md og remake-skillen fra lokal origin/main er lest. Boken er den blå boken over døren i Conroys soverom. Originalens lyse blå ytterflate og mørkere rektangulære rutefelt er fasit. HD-rommets hvite bølgestreker er ikke fasit for denne tilstanden. Ingen tekst er gjettet inn i feltet.
 
-obj429_02 viser Conroy-auberginen på sokkelen etter byttet med tupéen. Lilla form, grønne blader, mørke briller og skyggen til høyre følger originalen. Funksjonen er kontrollert mot [spillets hintbok](https://www.mocagh.org/lucasfilm/sammax-hintbook.pdf), som beskriver auberginen som erstatning for parykken. obj430_02 er den blå boken over døren. obj433_02 er trappens aktuelle tilstand. Ingen ny tekst er tolket inn i bokmerkene. Bilskiltet MA TRUK er bevart.
+Bare utsnittet [224,240,96,96] fra det nye bildeforsøket er lagt inn, uten flytting eller skalering. Auberginen, trappen og alle piksler utenfor dette utsnittet er identiske med forrige leveranse, som retur.md fant riktige på disse punktene. Ingen originalpiksler er kopiert inn i resultatet. Sammenligning av original, rettet bok og forrige bok ligger i bok-kontroll.png i rapportmappen.
 
-Pillow er brukt til flat grå ramme og kontrollbilder. Ingen geometriwarp eller kopiering av originalpiksler. Resultat: 1536 x 1024. Egenkontroll: OK, skift 0,09, blokkavvik 0,16, kantlikhet 0,972. Objektutsnittene er visuelt sammenlignet med original og godkjent rom. Detaljene i det lille ansiktet er HD-tolkning av originalens former.
+Leveranse: 1536 x 1024, flat grå ramme. Egenkontroll med prosjektets eksisterende Python-miljø: OK, skift 0,09, blokkavvik 0,16, kantlikhet 0,97. Hele bildet og de tre objektutsnittene er visuelt kontrollert av Codex. Det lille rutefeltet er en HD-tolkning av synlige originalformer, ikke verifisert lesbar tekst.
 
-Råforsøk, rettingsprompt, overlegg, objektkontroll og SHA256 ligger i rapporter/natt-fire-45-53-68-20261016/. Beskyttede jobbfiler er identiske med HEAD. Importert i denne økten: 0. Motoravspilling og Toms godkjenning er ikke gjennomført.
+Råforsøk, prompt, plassering, sjekksummer og kontrollbilder ligger i rapporter/natt-retur4-20261016/. Importert i denne økten: 0. Motoravspilling og Toms godkjenning er ikke gjennomført. Ingen kodeendring.

@@ -1,0 +1,44 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,subprocess,sys,json,hashlib,importlib.util
+p=Path('rapporter/natt-retur4-20261016')
+jobs=['lag045_02','lag053_01_del1av2','lag053_02_del1av2','lag068_01']
+s=importlib.util.spec_from_file_location('c','verktoy/sjekk_leveranse.py');c=importlib.util.module_from_spec(s);s.loader.exec_module(c)
+sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest()
+manifest={'dato':'2026-10-16','gren':'gpt-arbeid','levert':4,'visuelt_kontrollert_av_codex':4,'importert_i_okten':0,'motoravspilling':False,'tom_godkjent':False,'leveranser':[],'objektutsnitt':[]}
+sources={};cards_all=[]
+for name,count in zip(jobs,[1,4,2,3]):
+ d=Path('jobber')/name;j=json.loads((d/'jobb.json').read_text());ref=Image.open(d/'referanse.png').convert('RGB');result=Image.open(d/'resultat.png').convert('RGB');style=Image.open(j['bilde_to']).convert('RGB')
+ for f in [d/'referanse.png',d/'original_1x.png',d/'prompt.txt',d/'jobb.json']:
+  assert f.read_bytes()==subprocess.check_output(['git','show','HEAD:'+str(f)]),f
+  sources[str(f)]={'sha256':sha(f),'identisk_med_HEAD':True}
+ sources[j['bilde_to']]={'sha256':sha(j['bilde_to'])}
+ assert result.size==(1536,1024)
+ a=np.array(result);x,y,w,h=j['bilde_i_lerret'];outside=np.ones((1024,1536),bool);outside[y:y+h,x:x+w]=False;assert np.all(a[outside]==128)
+ run=subprocess.run([sys.executable,'verktoy/sjekk_leveranse.py',str(d/'resultat.png')],text=True,capture_output=True);(p/(name+'-egenkontroll.txt')).write_text(run.stdout+run.stderr);assert run.returncode==0,run.stdout
+ part,_=c.part_of(result,j);m=c.compare(Image.open(d/'original_1x.png'),part)
+ manifest['leveranser'].append({'jobb':name,'resultat':str(d/'resultat.png'),'sha256':sha(d/'resultat.png'),'forsok_i_returrunden':count,'egenkontroll':'OK',**{k:v for k,v in m.items() if k not in ['eo','es']},'visuelt_kontrollert_av':'Codex','importert_i_okten':False,'motoravspilling':False,'tom_godkjent':False})
+ Image.blend(ref,result,.5).save(p/(name+'-overlegg.png'))
+ cards=[];rx,ry,rw,rh=j['region'];ox,oy=j['plassering']
+ for obj in j['objekter']:
+  x,y,w,h=obj['rekt'];x0,y0=max(rx,x),max(ry,y);x1,y1=min(rx+rw,x+w),min(ry+rh,y+h)
+  if x1<=x0 or y1<=y0:continue
+  box=((x0-rx+ox)*4,(y0-ry+oy)*4,(x1-rx+ox)*4,(y1-ry+oy)*4)
+  factor=min(4,380/(box[2]-box[0]),200/(box[3]-box[1]));size=(round((box[2]-box[0])*factor),round((box[3]-box[1])*factor))
+  card=Image.new('RGB',(1200,size[1]+45),(205,205,205));draw=ImageDraw.Draw(card);draw.text((8,5),obj['bilde']+'  Original | Leveranse | Godkjent rom',fill='black')
+  for n,im in enumerate([ref,result,style]):card.paste(im.crop(box).resize(size,Image.Resampling.NEAREST if n==0 else Image.Resampling.LANCZOS),(n*400+8,35))
+  cards.append(card)
+  score=c.corr(m['eo'][y0-ry:y1-ry,x0-rx:x1-rx],m['es'][y0-ry:y1-ry,x0-rx:x1-rx]);manifest['objektutsnitt'].append({'jobb':name,'bilde':obj['bilde'],'rekt':obj['rekt'],'synlig_utsnitt':[x0,y0,x1-x0,y1-y0],'kantlikhet':round(score,4),'maaling':'hele rektangelet, ikke originalens objektmaske'})
+ chunk=5 if name.startswith('lag053_01') else (3 if name=='lag068_01' else 5)
+ for n,start in enumerate(range(0,len(cards),chunk),1):
+  group=cards[start:start+chunk];sheet=Image.new('RGB',(1200,sum(k.height for k in group)),(205,205,205));yy=0
+  for card in group:sheet.paste(card,(0,yy));yy+=card.height
+  f=p/(name+'-objektkontroll-'+str(n)+'.png');sheet.save(f);cards_all.append(str(f))
+ print(run.stdout.strip())
+for name,box in [('hoyrekant',(1368,176,1408,352)),('veifelt',(384,424,1152,696))]:
+ ref=Image.open('jobber/lag068_01/referanse.png').convert('RGB');res=Image.open('jobber/lag068_01/resultat.png').convert('RGB');factor=2 if name=='hoyrekant' else 1;size=((box[2]-box[0])*factor,(box[3]-box[1])*factor);card=Image.new('RGB',(size[0]*2,size[1]+24),(128,128,128));dr=ImageDraw.Draw(card)
+ for n,(im,lab) in enumerate([(ref,'Original'),(res,'Leveranse')]):dr.text((n*size[0],0),lab,fill='white');card.paste(im.crop(box).resize(size,Image.Resampling.NEAREST),(n*size[0],24))
+ card.save(p/('lag068_01-'+name+'-sluttkontroll.png'))
+manifest['objektantall_registrert']=len(manifest['objektutsnitt']);manifest['kontrollbilder']=cards_all
+(p/'leveranser.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');(p/'kildehash.json').write_text(json.dumps(sources,ensure_ascii=False,indent=2)+'\n');(p/'raafiler-sha256.json').write_text(json.dumps({str(f):sha(f) for f in p.glob('*raa*.png')},indent=2)+'\n')
+print('16 beskyttede jobbfiler uendret. Fire OK. Objektutsnitt:',len(manifest['objektutsnitt']))

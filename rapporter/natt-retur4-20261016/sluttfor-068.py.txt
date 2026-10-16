@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+import numpy as np,json
+p=Path('rapporter/natt-retur4-20261016')
+b=Image.open(p/'lag068_01-forrige-resultat.png').convert('RGB')
+old=b.copy();bg=Image.open('jobber/rom068/resultat.png').convert('RGB')
+clean=Image.open(p/'lag068_01-kandidat7-fargelaas.png').convert('RGB')
+b.paste(clean.crop((1368,176,1408,352)),(1368,176))
+log=[]
+for name,roi,tb in [('midt',(580,490,960,555),(604,496,932,544)),('fjern',(700,444,840,465),(720,448,820,464)),('topp',(740,424,800,444),(752,432,788,440))]:
+ x0,y0,x1,y1=roi;a=np.array(old.crop(roi));mask=(a.min(2)>12)&(a.max(2)<110);yy,xx=np.where(mask);sb=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1))
+ c=old.crop(roi).convert('RGBA');cc=np.array(c);mask=(cc[:,:,:3].min(2)>9)&(cc[:,:,:3].max(2)<110)
+ if name=='midt':
+  yellow=(cc[:,:,0]>100)&(cc[:,:,1]>80)&(cc[:,:,2]<110);yy,xx=np.where(yellow)
+  stripe=c.copy();stripe.putalpha(Image.fromarray((yellow*255).astype('uint8')))
+  stripebox=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1));stripe=stripe.crop(stripebox).resize((4,20),Image.Resampling.LANCZOS)
+  lo,hi=int(xx.min()),int(xx.max()+1)
+  for x in range(max(0,lo-2),min(cc.shape[1],hi+2)):cc[:,x,:3]=cc[:,max(0,lo-4),:3]
+  c=Image.fromarray(cc);mask=(cc[:,:,:3].min(2)>9)&(cc[:,:,:3].max(2)<110)
+ c.putalpha(Image.fromarray((mask*255).astype('uint8')).filter(ImageFilter.GaussianBlur(.3)))
+ c=c.crop(sb).resize((tb[2]-tb[0],tb[3]-tb[1]),Image.Resampling.LANCZOS)
+ sur=np.array(old);left=sur[y0:y1,x0-1,:].astype(float);right=sur[y0:y1,x1,:].astype(float);t=np.linspace(0,1,x1-x0)[None,:,None];clear=Image.fromarray(np.clip(left[:,None,:]*(1-t)+right[:,None,:]*t,0,255).astype('uint8'));b.paste(clear,roi[:2]);b.paste(c,tb[:2],c)
+ if name=='midt':b.paste(stripe,(768,496),stripe)
+ log.append({'del':name,'nytegnet_kildeboks':[x0+sb[0],y0+sb[1],x0+sb[2],y0+sb[3]],'maalboks':tb,'kilde':'tidligere nytegnet leveranse'})
+# Nytegnet naerveg, 2x reduksjon av et 8x originalutsnitt, med grove kildefarger.
+raw=Image.open(p/'lag068_01-raa3-naervei.png').convert('RGB').crop((0,416,1536,608)).resize((768,96),Image.Resampling.LANCZOS);a=np.array(raw).astype(float);mask=(a.min(2)>12)&(a.max(2)<150)
+original=Image.open('jobber/lag068_01/referanse.png').convert('RGB').crop((384,592,1152,688))
+coarse=np.array(original.filter(ImageFilter.GaussianBlur(8))).astype(float)
+fine=a-np.array(raw.filter(ImageFilter.GaussianBlur(8))).astype(float)
+paint=np.clip(coarse+fine*.4,0,255).astype('uint8');patch=Image.fromarray(paint).convert('RGBA');patch.putalpha(Image.fromarray((mask*255).astype('uint8')).filter(ImageFilter.GaussianBlur(.3)))
+b.paste(bg.crop((384,592,1152,688)),(384,592));b.paste(patch,(384,592),patch)
+for box in [(0,0,1536,112),(0,912,1536,1024),(0,112,128,912),(1408,112,1536,912)]:b.paste((128,128,128),box)
+b.save('jobber/lag068_01/resultat.png')
+log.append({'del':'narmest','nytegnet_kilde':'lag068_01-raa3-naervei.png','utsnitt':[0,416,1536,192],'reduksjon':2,'plassering':[384,592],'grovfarger':'referanse.png, GaussianBlur 8 HD-piksler','HD_detaljer_faktor':.4,'maalboks':[400,608,1136,688]})
+(p/'lag068_01-sluttplassering.json').write_text(json.dumps(log,ensure_ascii=False,indent=2)+'\n')

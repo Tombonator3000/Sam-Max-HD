@@ -1,0 +1,17 @@
+from PIL import Image,ImageFilter
+from pathlib import Path
+import json
+p=Path('rapporter/natt-retur4-20261016');j='lag053_02_del1av2'
+raws={'musikk':'exec-6987fd1a-fe3c-457b-aaf3-c369d7577f09.png','gjester':'exec-1a1fc55a-d8a5-4085-a24f-4a420ffa8066.png'}
+b=Image.open(p/(j+'-forrige-resultat.png')).convert('RGB')
+log=[]
+for n,(name,f) in enumerate(raws.items(),1):
+ a=Image.open('/home/tom/.codex/generated_images/01a14215-207e-76d2-8c95-f098252fcacb/'+f).convert('RGB');a.save(p/(j+'-raa'+str(n)+'-'+name+'.png'))
+ layout=json.loads((p/(j+'-'+name+'-layout.json')).read_text());x,y,w,h=layout['inner'];src=layout['original_crop'];factor=layout['scale']//4
+ patch=a.crop((x,y,x+w,y+h)).resize((w//factor,h//factor),Image.Resampling.LANCZOS)
+ m=Image.new('L',patch.size,255);r=3
+ for box in [(0,0,patch.width,r),(0,patch.height-r,patch.width,patch.height),(0,0,r,patch.height),(patch.width-r,0,patch.width,patch.height)]:m.paste(0,box)
+ m=m.filter(ImageFilter.GaussianBlur(2));dest=(src[0]*4,112+src[1]*4);b.paste(patch,dest,m)
+ log.append({'del':name,'raafil':str(p/(j+'-raa'+str(n)+'-'+name+'.png')),'utsnitt':layout['inner'],'nedsampling':factor,'plassering':dest,'kantblanding':r})
+for box in [(0,0,1536,112),(0,912,1536,1024)]:b.paste((128,128,128),box)
+b.save('jobber/'+j+'/resultat.png');(p/(j+'-plassering.json')).write_text(json.dumps(log,ensure_ascii=False,indent=2)+'\n')

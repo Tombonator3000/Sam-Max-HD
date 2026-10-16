@@ -1,0 +1,59 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+import numpy as np,json
+p=Path('rapporter/natt-retur4-20261016')
+raw=Image.open(p/'lag068_01-raa1.png').convert('RGB')
+old=Image.open(p/'lag068_01-forrige-resultat.png').convert('RGB')
+bg=Image.open('jobber/rom068/resultat.png').convert('RGB')
+ref=Image.open('jobber/lag068_01/referanse.png').convert('RGB')
+b=old.copy()
+# Bare de bevegelige vegdelene ryddes til det godkjente, malte underlaget.
+# Stolpene er korrekte i forrige leveranse og bevares byte for byte.
+b.paste(bg.crop((128,352,1408,912)),(128,352))
+for box in [(1096,460,1184,608),(1192,460,1280,608)]:b.paste(old.crop(box),box[:2])
+a=np.array(raw).astype(float);o=np.array(ref).astype(float)
+log=[]
+for name,(x0,y0,x1,y1) in [('narmest',(380,602,1152,700)),('midt',(580,490,960,555)),('fjern',(700,444,840,465)),('topp',(740,424,800,444))]:
+ def getbox(aa):
+  c=aa[y0:y1,x0:x1];m=(c.min(2)>12)&(c.max(2)<110);yy,xx=np.where(m)
+  return (int(xx.min()+x0),int(yy.min()+y0),int(xx.max()+x0+1),int(yy.max()+y0+1))
+ sb,tb=getbox(a),getbox(o)
+ c=raw.crop(sb).convert('RGBA');cc=np.array(c)
+ dark=(cc[:,:,:3].min(2)>9)&(cc[:,:,:3].max(2)<110)
+ # Vegens gule strek behandles separat, slik at hoyden forblir 20 HD-piksler.
+ if name=='midt':
+  yellow=(cc[:,:,0]>120)&(cc[:,:,1]>100)&(cc[:,:,2]<120)
+  yy,xx=np.where(yellow)
+  if len(xx):
+   lo,hi=int(xx.min()),int(xx.max()+1)
+   for col in range(lo,hi):cc[:,col,:3]=cc[:,max(0,lo-2),:3]
+   c=Image.fromarray(cc)
+   dark=(cc[:,:,:3].min(2)>9)&(cc[:,:,:3].max(2)<110)
+ alpha=Image.fromarray((dark*255).astype('uint8')).filter(ImageFilter.GaussianBlur(.35))
+ c.putalpha(alpha)
+ target=(tb[2]-tb[0],tb[3]-tb[1]);c=c.resize(target,Image.Resampling.LANCZOS)
+ b.paste(c,tb[:2],c)
+ log.append({'del':name,'nytegnet_kildeboks':sb,'originalens_maalboks':tb})
+# Den nytegnede streken renses fra bakgrunnen og gis originalens mal og plass.
+x0,y0,x1,y1=750,490,786,530
+c=raw.crop((x0,y0,x1,y1)).convert('RGBA');cc=np.array(c);m=(cc[:,:,0]>120)&(cc[:,:,1]>100)&(cc[:,:,2]<120);yy,xx=np.where(m)
+sb=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1));c.putalpha(Image.fromarray((m*255).astype('uint8')))
+c=c.crop(sb).resize((4,20),Image.Resampling.LANCZOS);b.paste(c,(768,496),c)
+log.append({'del':'gul_strek','nytegnet_kildeboks':[x0+sb[0],y0+sb[1],x0+sb[2],y0+sb[3]],'originalens_maalboks':[768,496,772,516]})
+# Maksdelene ved hoyrekanten er avklipte deler, ikke en hel figur.
+# Tidligere nytegnet, korrekt farget grafikk renses og tilpasses originalens synlige mal.
+for name,roi,tb in [('ore',(1396,176,1408,220),(1404,188,1408,204)),('hand',(1368,248,1408,300),(1376,256,1408,288)),('fot',(1380,316,1408,352),(1388,324,1408,344))]:
+ x0,y0,x1,y1=roi
+ b.paste(bg.crop(roi),roi[:2])
+ c=old.crop(roi).convert('RGBA');cc=np.array(c).astype(float);mx=cc[:,:,:3].max(2);mn=cc[:,:,:3].min(2);sat=(mx-mn)/(mx+1e-6)
+ mask=(sat<.65)
+ yy,xx=np.where(mask);sb=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1))
+ c.putalpha(Image.fromarray((mask*255).astype('uint8')).filter(ImageFilter.GaussianBlur(.35)))
+ c=c.crop(sb).resize((tb[2]-tb[0],tb[3]-tb[1]),Image.Resampling.LANCZOS)
+ b.paste(c,tb[:2],c)
+ log.append({'del':name,'nytegnet_kildeboks':[x0+sb[0],y0+sb[1],x0+sb[2],y0+sb[3]],'originalens_maalboks':tb,'kilde':'forrige nytegnede leveranse'})
+# Fast flat ramme, originalens hele lerret.
+for box in [(0,0,1536,112),(0,912,1536,1024),(0,112,128,912),(1408,112,1536,912)]:b.paste((128,128,128),box)
+b.save('jobber/lag068_01/resultat.png')
+(p/'lag068_01-plassering.json').write_text(json.dumps(log,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(log,ensure_ascii=False,indent=2))
