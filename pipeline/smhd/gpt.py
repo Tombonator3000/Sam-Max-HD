@@ -65,6 +65,10 @@ CHECK_SHIFT, CHECK_BLOCK, CHECK_EDGES = 1.5, 2.0, 0.40
 FIX_SHIFT_MIN = 0.25
 FIX_BLOCK_TOL = 0.1          # blokkavviket kan ikke øke mer enn dette ved rettingen (originalpiksler)
 SHEET_BG_TOL = 40.0          # en levert arkfarge lenger unna bestilt farge enn dette (RGB) brukes i fargelåsen
+# Kantrensen for ikonark: piksler innenfor EDGE_BAND (4x) fra kanten som har arkfargens fargetone
+# (cos over EDGE_COS og fargemetning over EDGE_CHROMA), får fargen innenfra når de er en blanding mot
+# arkfargen (andel over EDGE_MIN_T, avvik fra blandingen under EDGE_FIT)
+EDGE_BAND, EDGE_COS, EDGE_CHROMA, EDGE_MIN_T, EDGE_FIT = 6, 0.85, 24.0, 0.12, 90.0
 FIX_PIECE_TOL = 0.05         # kantlikheten til et objektbilde i lag og ikonark kan ikke falle mer enn dette
 
 # Stilpiloten: rommet som males først, sammen med hovedarkene og de første figurarkene for Sam og Max
@@ -1586,6 +1590,14 @@ def _finish_pieces(name: str, parts: list[tuple[Job, np.ndarray | None]], result
             continue
         src = extract / "objects" / f"{bilde}.png"
         hd = _cut(first.storrelse, [(j.region, kept[j.id]) for j in holders[bilde]], p["rekt"], src)
+        cleaned = 0
+        if first.type == "ikon":
+            bgs = [b for j in holders[bilde] for b in (j.bakgrunn, results[j.id].get("arkfarge_levert")) if b]
+            if bgs:
+                with Image.open(src) as o:
+                    o = o.convert("RGBA")
+                    alpha = np.asarray(upscale_alpha(o.getchannel("A"), SCALE))
+                    hd, cleaned = clean_sheet_edge(hd, alpha, bgs, np.asarray(o.convert("RGB")))
         if base != bilde:
             hd = match_state(hd, finished[base], extract / "objects" / f"{bilde}_idx.png",
                              extract / "objects" / f"{base}_idx.png")
@@ -1606,6 +1618,8 @@ def _finish_pieces(name: str, parts: list[tuple[Job, np.ndarray | None]], result
             "lag": name, "rekt_i_lag": p["rekt"], "underlag": first.underlag or [],
             "fargelås": settings, "jobber": made_by,
         }
+        if cleaned:
+            prov[bilde]["kantrens"] = cleaned
         if base != bilde:
             prov[bilde]["likt_med"] = base
     return done, not_done, waiting, prov
@@ -1631,6 +1645,77 @@ def match_state(img: np.ndarray, base_hd: np.ndarray, idx: Path, base_idx: Path,
         mask = np.clip(blur(mask, feather), 0, 1)
     out = base_hd.astype(np.float64) * (1 - mask[..., None]) + img.astype(np.float64) * mask[..., None]
     return np.clip(np.rint(out), 0, 255).astype(np.uint8)
+
+
+def _grow(m: np.ndarray) -> np.ndarray:
+    """Masken utvidet med én piksel i alle retninger. Utenfor bildet regnes som med i masken."""
+    p = np.pad(m, 1, constant_values=True)
+    return np.logical_or.reduce([p[dy:dy + m.shape[0], dx:dx + m.shape[1]] for dy in range(3) for dx in range(3)])
+
+
+def _tinted(rgb: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Pikslene som har samme fargetone som fargen b (cos over EDGE_COS og fargemetning over EDGE_CHROMA)."""
+    chroma = rgb - rgb.mean(axis=2, keepdims=True)
+    cb = b - b.mean()
+    size = np.linalg.norm(chroma, axis=2)
+    cos = (chroma * cb).sum(axis=2) / np.maximum(size * np.linalg.norm(cb), 1e-6)
+    return (cos > EDGE_COS) & (size > EDGE_CHROMA)
+
+
+def clean_sheet_edge(img: np.ndarray, alpha: np.ndarray, bgs: list[list[int]],
+                     original: np.ndarray | None = None) -> tuple[np.ndarray, int]:
+    """Tar arkfargen ut av kantene på et ikon klippet ut av et ikonark.
+
+    Utklippet bruker originalens alfa. Der det tegnede ikonet er litt mindre enn originalen, blir
+    arkfargen (eller en blanding med den) stående innenfor alfaen som en grønn eller lilla kant.
+    Piksler nær kanten (eller bildekanten) med arkfargens fargetone får fargen fra pikslene innenfor,
+    når de ligner en blanding av den og arkfargen. Med originalen (RGB i 1x) røres ikke piksler der
+    originalen har samme fargetone innen én originalpiksel, så grønne og lilla ting i ikonet blir stående.
+    Gir (bildet, antall pikslene som er endret).
+    """
+    rgb = img.astype(np.float64)
+    opaque = alpha > 0
+    near = ~opaque
+    for _ in range(EDGE_BAND):
+        near = _grow(near)
+    bg = np.array(bgs, dtype=np.float64).reshape(-1, 3)
+    scale = alpha.shape[0] // original.shape[0] if original is not None else 0
+    tints = []
+    for b in bg:
+        t = opaque & near & _tinted(rgb, b)
+        if scale:
+            own = _tinted(original.astype(np.float64), b) & opaque[::scale, ::scale]
+            p = np.pad(own, 1, constant_values=False)
+            own = np.logical_or.reduce([p[dy:dy + own.shape[0], dx:dx + own.shape[1]]
+                                        for dy in range(3) for dx in range(3)])
+            t &= ~np.repeat(np.repeat(own, scale, 0), scale, 1)
+        tints.append(t)
+    cand = np.logical_or.reduce(tints)
+    if not cand.any():
+        return img, 0
+    # Fargen innenfra: snittet av kjente naboer, spredd utover ett trinn om gangen
+    have = opaque & ~cand
+    inner = np.where(have[..., None], rgb, 0.0)
+    H, W = alpha.shape
+    for _ in range(EDGE_BAND + 4):
+        if not (cand & ~have).any():
+            break
+        p = np.pad(inner, ((1, 1), (1, 1), (0, 0)))
+        q = np.pad(have.astype(np.float64), 1)
+        s = sum(p[dy:dy + H, dx:dx + W] for dy in range(3) for dx in range(3))
+        n = sum(q[dy:dy + H, dx:dx + W] for dy in range(3) for dx in range(3))
+        new = cand & ~have & (n > 0)
+        inner[new] = s[new] / n[new, None]
+        have |= new
+    fix = np.zeros(alpha.shape, bool)
+    for b, tint in zip(bg, tints):
+        v = b - inner
+        t = ((rgb - inner) * v).sum(axis=2) / np.maximum((v * v).sum(axis=2), 1.0)
+        off = np.linalg.norm(rgb - (inner + t[..., None] * v), axis=2)
+        fix |= tint & have & (t > EDGE_MIN_T) & (off < EDGE_FIT)
+    out = img.copy()
+    out[fix] = np.clip(np.rint(inner[fix]), 0, 255).astype(img.dtype)
+    return out, int(fix.sum())
 
 
 def _with_alpha(img: np.ndarray, original: Path) -> Image.Image:

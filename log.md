@@ -645,3 +645,15 @@ Natt: kontroll av nye forsøk på lag045_02, lag053_01_del1av2, lag053_02_del1av
 - lag068_01: avvist, selv om mottaket godkjente. Max-bitene, veiene og teksten er nå riktige, men venstre stolpe obj656_01 har et hakk i underkanten, og lyset på stolpene stemmer ikke med originalen (høyre stolpe er lys der originalen er svart).
 - Tre rader i `docs/gpt-avvisninger.csv` med grunn og forslag. Runden kjørt igjen; returen står i ORDRE.md og RAPPORT.md.
 - Levert 4, visuelt kontrollert 4, importert 1 (lag053_01_del1av2). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 03:40 (Claude)
+
+Natt, kodeoppgave: grønne og lilla kantpiksler på ikonene fra ikonark (todo, etter Codex' etterkontroll 02:29).
+
+- Årsak: ikonene klippes ut med originalens alfa i 4x. Der det tegnede ikonet er litt mindre enn originalen, blir arkfargen (grønt fra ikon01) eller en blanding med den stående innenfor alfaen. Lilla kom fra blanding av svart kant og magenta.
+- `pipeline/smhd/gpt.py`: ny `clean_sheet_edge`, brukt i `_finish_pieces` for ikonark før `match_state`. Piksler innenfor 6 HD-piksler fra kanten eller bildekanten, med samme fargetone som bestilt eller levert arkfarge, får fargen fra pikslene innenfor når de ligner en blanding av den og arkfargen. Piksler der originalen selv har den fargetonen innen én originalpiksel røres ikke. Alfa endres ikke. Antallet står som `kantrens` i provenance.
+- Første utkast uten vernet gjorde det grønne bladet på obj824_01 svart; vernet ble lagt til etter at jeg så det.
+- Tørrkjøring på de 163 ikonobjektene i `mods/gpt/objects` (ingenting skrevet til modden, bildene i `work/tmp_kant`): grønne piksler på obj661_01, obj662_01 og obj663_01 fra 692, 944 og 351 til 0, 3 og 0; magenta fra 447, 445 og 463 til 113, 29 og 74. obj670_01: magentastripen nederst og til høyre er borte. Alfa er lik før og etter.
+- Sett med øynene, original, modd og renset på grått og lyst: bilene, trådkorset obj874_01 (grønn kant blir svart som originalen), munnen obj877_01, blyanten obj893_01, eplet obj891_01, obj890_01 og ikoner med grønt eller lilla i originalen (obj049_01 LucasArts-logoen, obj887_01 med rosa bakgrunn, obj1037_01 plommen, obj671_01 skiltet, obj791_01 og obj800_01 trærne, obj1059_01 flasken). Ingen synlig skade på ekte farger. Litt mørk lilla står igjen langs taket på obj661_01.
+- Tester: `test_icon_sheet_edge_keeps_no_sheet_colour` (ikonet tegnet mindre på annen arkfarge; 496 kantpiksler nær arkfargen med den gamle koden, 0 nå) og `test_clean_sheet_edge_keeps_colours_from_the_original`. pytest i `pipeline` 62 bestått, `git diff --check` uten feil.
+- Ikke kjørt `tools/gpt_runde.sh`, så modden har fortsatt de gamle kantene. Ikke testet i spillet. Trenger Codex-kodekontroll.

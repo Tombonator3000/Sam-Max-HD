@@ -2329,3 +2329,69 @@ def test_icon_sheet_on_other_background_gets_no_halo(tmp_path):
     ring = np.ones(hd.shape[:2], bool)
     ring[4:-4, 4:-4] = False
     assert np.abs(hd - crop)[ring].mean() < 8
+
+
+def test_icon_sheet_edge_keeps_no_sheet_colour(tmp_path):
+    """Ikonet er tegnet litt mindre enn originalen på et ark i en annen farge enn bestilt: arkfargen
+    som blir stående innenfor originalens alfa, skal ikke bli en grønn eller lilla kant i utklippet."""
+    import json
+    import numpy as np
+    from smhd import gpt
+
+    ex, room = _layer_extract(tmp_path)
+    # Ikonet i grått, så ingen av pikslene i originalen har arkfargens fargetone (de røres ikke)
+    icon_path = ex / "objects" / "obj025_01.png"
+    Image.open(icon_path).convert("L").convert("RGBA").save(icon_path)
+    work, done = tmp_path / "gpt", tmp_path / "gpt-ferdig"
+    gpt.make_jobs(ex, work)
+    d = work / "jobber" / "ikon01"
+    job = json.loads((d / "jobb.json").read_text())
+    bg = tuple(job["bakgrunn"])
+    other = next(b for b, _ in gpt.SHEET_BACKGROUNDS if b != bg)
+    ref = np.asarray(Image.open(d / "referanse.png").convert("RGB")).copy()
+    ref[np.all(ref == bg, axis=2)] = other
+    ox, oy = job["plassering"]
+    x, y = job["objekter"][0]["rekt"][:2]
+    x0, y0 = (ox + x) * 4, (oy + y) * 4
+    icon = ref[y0:y0 + 64, x0:x0 + 64].astype(np.float64)
+    ring = np.zeros((64, 64), bool)
+    ring[:2], ring[-2:], ring[:, :2], ring[:, -2:] = True, True, True, True
+    blend = np.zeros((64, 64), bool)
+    blend[2:-2, 2:-2] = True
+    blend[3:-3, 3:-3] = False
+    icon[ring] = other
+    icon[blend] = (icon[blend] + np.array(other)) / 2
+    ref[y0:y0 + 64, x0:x0 + 64] = np.rint(icon).astype(np.uint8)
+    Image.fromarray(ref, "RGB").save(d / "resultat.png")
+    gpt.import_results(work, ex, done)
+    status = {r["jobb"]: r for r in gpt.read_status(work)}
+    assert status["ikon01"]["status"] == "godkjent"
+    hd = np.asarray(Image.open(done / "objects" / "obj025_01.png").convert("RGB"), dtype=np.float64)
+    edge = ring | blend
+    near_bg = np.linalg.norm(hd - np.array(other, dtype=np.float64), axis=2) < 60
+    assert near_bg[edge].sum() == 0
+    prov = json.loads((done / "provenance.json").read_text())
+    assert prov["obj025_01"]["kantrens"] > 0
+    # Innenfor kanten er ikonet som levert
+    inside = np.zeros((64, 64), bool)
+    inside[8:-8, 8:-8] = True
+    assert np.abs(hd - icon)[inside].mean() < 8
+
+
+def test_clean_sheet_edge_keeps_colours_from_the_original():
+    """Kantrensen tar arkfargen ved kanten, men ikke grønt som også er grønt i originalen."""
+    import numpy as np
+    from smhd import gpt
+
+    original = np.full((8, 8, 3), 100, np.uint8)
+    original[:, 0] = (0, 150, 0)
+    hd = np.repeat(np.repeat(original, 4, 0), 4, 1)
+    hd[:, -2:] = (0, 177, 64)
+    alpha = np.full((32, 32), 255, np.uint8)
+    out, n = gpt.clean_sheet_edge(hd, alpha, [[0, 177, 64]], original)
+    assert n == 64
+    assert np.abs(out[:, -2:].astype(int) - 100).max() <= 1
+    assert (out[:, :4] == (0, 150, 0)).all()
+    # Uten originalen er det ingenting som verner den grønne kanten til venstre
+    _, n2 = gpt.clean_sheet_edge(hd, alpha, [[0, 177, 64]])
+    assert n2 > n
