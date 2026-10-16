@@ -745,3 +745,17 @@ Natt, kodeoppgave: RAPPORT.md fra gpt-inn viste «Figurark: 0 av 1758 godtatt. F
 - Kvitterer allerede utført visuell etterkontroll av de951ff7 i publisert hd-mod 183850f6. Alle 163 faktiske ikon-PNG er sammenlignet med første trinn: alfa/størrelse identiske, 116 byteidentiske og 47 med synlig RGB-endring. RGB-snittet endres høyst en tredjedel av ett nivå. Alle 163 nye PNG er også bekreftet byteidentiske i avsluttende modd 037f4298 etter Claudes grafikkretur.
 - Codex har sett 14 utvalgte PNG mot original/før/etter på mørk grønn og lys grå bakgrunn. Biltakenes mørke lilla er redusert og blir blågrå/mørk, uten åpenbar ny skade på ekte grønne/lilla felt i utvalget. Trappetrinn fra uendret alfa og logoens lyse magentakant står fortsatt. Ikke helt pikselrent, ikke motoravspilt, ikke Toms stilgodkjenning. PNG, seks paneler og kilde-/bildehasher finnes i Codex-arbeidsmappens output/natt-kantrens-trinn2-20261016.
 - Todo kvittert for andre trinns import/visuelle kontroll og for rapportrettingen a9d26856, som er separat Codex-godkjent med 64 tester. Rom71-notatet presisert som teknisk kodeoppgave: undersøk konsekvensen for prompter/ordre og bevar godkjente leveranser før den for brede skiltinstruksen rettes. Ingen romnotat, beskyttet prompt, kode eller grafikk endret nå. Arbeidstreet var rent og bare grafikkagenten i separat worktree var aktiv.
+
+## 2026-10-16 05:34 (Claude)
+
+Natt: kontroll av fig247_02, fig247_03, fig247_04 og fig247_05 fra Codex (commit d68faa7b4c i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 993 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). RAPPORT.md: 80 figurark levert til figurmottaket; ingen av de fire står under sjekk. `myke.json`: alle 23 nye ruter ok og i modden, snitt/union 0,77 til 0,91, tegnet mot 4x innen 0,6 prosent.
+- Sett med øynene: referanse.png over resultatet på grønn bakgrunn, ruteområdet i full HD-oppløsning.
+- fig247_02 (4 ruter, start mot høyre): godkjent. Sam med VR-hjelm holder Max vannrett ut til venstre i alle fire, Max med hengende føtter og ørestillingene som i originalen, kabelløkken i første rute og de tre andre kabelformene som i originalen. costume247_1926 har lavest snitt/union (0,77), men figur og positur er riktig.
+- fig247_03 (6 ruter, animasjon 7): godkjent. Bare Sam, gyllen nøkkel holdt foran brystet med skaftet mot venstre, den andre hånden hengende ved siden, i alle seks ruter.
+- fig247_04 (6 ruter, animasjon 7): godkjent. Nøkkelen foran i første rute, senket med nøkkelen ned i andre og tredje, hånden på vei mot lommen i fjerde og i lommen i femte og sjette, som originalen.
+- fig247_05 (7 ruter, animasjon 7): godkjent. Hånden i lommen i de tre første, på vei ut i fjerde, løftet i femte og senket i sjette og sjuende. Ingen nøkkel og ingen Max, som originalen.
+- Hjelmen er svart kuppel med grønt visir som i godkjente fig247_01; originalen har grønne striper på kuppelen, også i den godkjente. Ikke avvisningsgrunn, men noteres for Tom sammen med stilen.
+- Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (23 figurruter i kostyme 247; 970 til 993). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
