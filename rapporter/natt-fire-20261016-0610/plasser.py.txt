@@ -1,0 +1,61 @@
+from pathlib import Path
+import json
+import numpy as np
+from PIL import Image
+from scipy import ndimage as nd
+P=Path('rapporter/natt-fire-20261016-0610')
+def take(a,l,ids,box):
+ x,y,x1,y1=box;m=3;x=max(0,x-m);y=max(0,y-m);x1=min(a.shape[1],x1+m);y1=min(a.shape[0],y1+m)
+ p=a[y:y1,x:x1].copy();keep=nd.binary_dilation(np.isin(l[y:y1,x:x1],ids),iterations=2)
+ p[:,:,3][~keep]=0;p[:,:,3][p[:,:,3]>=250]=255
+ return p
+for name in ['fig247_10','fig247_11','fig116_01']:
+ j=json.loads(Path('jobber',name,'jobb.json').read_text());a=np.array(Image.open(P/(name+'-raa.png')).convert('RGBA'))
+ l,n=nd.label(a[:,:,3]>128);parts={}
+ for i,s in enumerate(nd.find_objects(l)):
+  if s is not None and (l[s]==i+1).sum()>100:parts[i+1]=[s[1].start,s[0].start,s[1].stop,s[0].stop]
+ ref=np.array(Image.open(Path('jobber',name,'referanse.png')).convert('RGB'));canvas=Image.new('RGBA',(1536,1024));record=[]
+ if name.startswith('fig247'):
+  groups=[[i] for i in sorted(parts,key=lambda k:parts[k][0])]
+ else:groups=[[2,4],[1,6],[3,5],[8,10],[9],[7,11,12],[14,15,17],[13,16,18]]
+ for r,ids in zip(j['ruter'],groups):
+  x,y,x1,y1=r['synlig'];ox,oy=j['plassering'];target=[(x+ox)*4,(y+oy)*4,(x1+ox)*4,(y1+oy)*4]
+  tx,ty,tx1,ty1=target
+  if name.startswith('fig247'):
+   box=parts[ids[0]];piece=take(a,l,ids,box)
+   def anchor(rgb,alpha=None):
+    rgb=rgb.astype(float);g=(rgb[:,:,1]>rgb[:,:,0]*1.25)&(rgb[:,:,1]>rgb[:,:,2]*1.2)&(rgb[:,:,1]>45)
+    if alpha is not None:g &= alpha>128
+    rows=g.sum(axis=1);return int(np.flatnonzero(rows>=max(rows)*.80)[0])
+   sa=anchor(piece[:,:,:3],piece[:,:,3]);ta=anchor(ref[ty:ty1,tx:tx1])
+   upper=Image.fromarray(piece[:sa]).resize((tx1-tx+6,ta+3),Image.Resampling.LANCZOS)
+   lower=Image.fromarray(piece[sa:]).resize((tx1-tx+6,ty1-ty-ta+3),Image.Resampling.LANCZOS)
+   canvas.alpha_composite(upper,(tx-3,ty-3));canvas.alpha_composite(lower,(tx-3,ty+ta))
+   record.append({'bilde':r['bilde'],'kilde':box,'maal':target,'feste':[sa,ta]})
+  else:
+   # Map disconnected NEW drawing components to original component boxes. No original production mask.
+   crop=ref[ty:ty1,tx:tx1];om=np.any(crop!=[255,0,255],axis=2);ol,on=nd.label(om)
+   ob=[];tiny=[]
+   for k,s in enumerate(nd.find_objects(ol)):
+    if s is None:continue
+    bb=[s[1].start+tx,s[0].start+ty,s[1].stop+tx,s[0].stop+ty]
+    if (ol[s]==k+1).sum()>100:ob.append(bb)
+    else:tiny.append(bb)
+   ob.sort(key=lambda b:b[0]);ids.sort(key=lambda k:parts[k][0]);assert len(ob)==len(ids)
+   for k,b in zip(ids,ob):
+    piece=take(a,l,[k],parts[k]);bx,by,bx1,by1=b
+    piece=Image.fromarray(piece).resize((bx1-bx+6,by1-by+6),Image.Resampling.LANCZOS)
+    canvas.alpha_composite(piece,(bx-3,by-3))
+    record.append({'bilde':r['bilde'],'kilde':parts[k],'maal':b})
+   # Original contains isolated 1x1-pixel green flecks. Preserve their placement as tiny samples
+   # from the newly painted green surface, with the new painting's alpha.
+   for b in tiny:
+    green=a[(a[:,:,1]>a[:,:,0]*1.5)&(a[:,:,1]>a[:,:,2]*1.2)&(a[:,:,3]>250)][0]
+    patch=Image.new('RGBA',(2,2),tuple(green)).resize((4,4),Image.Resampling.LANCZOS)
+    canvas.alpha_composite(patch,(b[0],b[1]));record.append({'bilde':r['bilde'],'liten_fargerest':b,'kilde':'fargeprøve fra nytegnet alligator'})
+ a=np.array(canvas);opaque=a[:,:,3]>=128;_,idx=nd.distance_transform_edt(~opaque,return_indices=True)
+ edge=(a[:,:,3]>0)&(a[:,:,3]<100);a[:,:,:3][edge]=a[idx[0][edge],idx[1][edge],:3];a[:,:,:3][a[:,:,3]==0]=0
+ out=Image.fromarray(a);out.save(Path('jobber',name,'resultat.png'))
+ (P/(name+'-plassering.json')).write_text(json.dumps(record,indent=2)+'\n')
+ bg=Image.new('RGBA',out.size,(96,96,96,255));bg.alpha_composite(out);bg.convert('RGB').save(P/(name+'-kontroll.png'))
+ print(name,'plassert')

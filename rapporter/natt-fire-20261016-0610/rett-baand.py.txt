@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np
+from scipy import ndimage as nd
+p=Path('rapporter/natt-fire-20261016-0610')
+a=np.array(Image.open(p/'fig247_02-for.png').convert('RGBA'))
+b=np.array(Image.open(p/'fig247_02-raa.png').convert('RGBA'))
+mask=(b[:,:,1]>70)&(b[:,:,1]>b[:,:,0]*1.6)&(b[:,:,1]>b[:,:,2]*1.25)
+labels,n=nd.label(mask)
+bands=np.zeros(mask.shape,bool)
+for i,s in enumerate(nd.find_objects(labels)):
+ if s is None:continue
+ y,x=s
+ if 246<=y.start<=250 and 272<=y.stop<=301 and x.stop-x.start>15:
+  bands |= labels==i+1
+# Transfer only the generated green bands. Existing alpha and all other pixels are preserved.
+source=[(264,242,387,305),(620,242,743,305),(972,242,1095,305),(1324,242,1447,305)]
+target=[(272,243,385,300),(625,243,738,300),(970,243,1083,300),(1313,243,1426,300)]
+for sb,tb in zip(source,target):
+ x,y,x1,y1=sb;tx,ty,tx1,ty1=tb
+ c=b[y:y1,x:x1,:3].copy();m=bands[y:y1,x:x1]
+ # Fill mask edge color from generated green surface, then antialias its boundary.
+ _,idx=nd.distance_transform_edt(~m,return_indices=True)
+ c=c[idx[0],idx[1]]
+ rgba=np.dstack((c,m.astype('uint8')*255))
+ patch=np.array(Image.fromarray(rgba).resize((tx1-tx,ty1-ty),Image.Resampling.LANCZOS))
+ w=patch[:,:,3:4].astype(float)/255
+ old=a[ty:ty1,tx:tx1,:3]
+ old[:]=np.rint(old*(1-w)+patch[:,:,:3]*w).astype('uint8')
+Image.fromarray(a).save('jobber/fig247_02/resultat.png')
+old=np.array(Image.open(p/'fig247_02-for.png'))
+changed=np.any(a[:,:,:3]!=old[:,:,:3],axis=2)
+assert np.array_equal(a[:,:,3],old[:,:,3])
+ys,xs=np.where(changed)
+print('Endrede RGB-piksler',len(xs),'endringsboks',[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)],'alfa uendret')
