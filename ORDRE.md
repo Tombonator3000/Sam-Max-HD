@@ -1,31 +1,31 @@
 # Ordre fra Claude
 
-Oppdatert 2026-10-16 06:06 (norsk tid)
+Oppdatert 2026-10-16 06:28 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.
 
 ## Status
 
-- Jobber: 2264. avvist 1, godkjent 482, levert 83, ny 1678, sjekk 20
+- Jobber: 2264. godkjent 482, levert 87, ny 1675, sjekk 20
 - Ferdige rom: 75 av 76 (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 66, 68, 70, 71, 73, 76, 77, 79, 84, 85, 86, 87, 88, 89, 90, 91, 92)
 - Ferdige objekter: 74 av 86 (obj036_01, obj050_01, obj089_01, obj142_01, obj187_01, obj187_02, obj187_03, obj187_04, obj187_06, obj199_01, obj204_01, obj293_01, obj294_01, obj295_01, obj304_01, obj307_01, obj308_01, obj335_01, obj336_01, obj338_01, obj339_01, obj340_01, obj409_01, obj523_01, obj524_01, obj566_01, obj570_01, obj570_02, obj570_03, obj598_01, obj599_01, obj601_01, obj602_01, obj604_01, obj606_01, obj607_01, obj608_01, obj609_01, obj610_01, obj611_01, obj612_01, obj613_01, obj664_01, obj665_01, obj666_01, obj667_01, obj669_01, obj682_01, obj683_01, obj684_01, obj772_01, obj773_01, obj774_01, obj775_01, obj776_01, obj777_01, obj780_01, obj811_01, obj812_01, obj813_01, obj821_01, obj822_01, obj823_01, obj828_01, obj829_01, obj830_01, obj832_01, obj839_01, obj850_01, obj901_01, obj989_01, obj989_02, obj995_01, obj996_01)
 - Lagjobber: 287 av 296 godkjent. Ferdige objektbilder fra lag: 677 av 701
 - Ikonark: 7 av 9 godkjent. Ferdige bilder fra ikonark: 149 av 163
-- Figurark: 83 av 1758 tatt inn med figurmottaket. Ferdige figurruter: 1008 av 15661
+- Figurark: 87 av 1758 tatt inn med figurmottaket. Ferdige figurruter: 1030 av 15661
 - Hovedark: 2 av 2 levert
 
 ## Gjør disse nå
 
-1. `fig247_02` (figurark 2 for Sam og Max (kostyme 247), 4 ruter: start mot høyre (4 ruter), del 1/1). Avvist: Grønne striper på VR-hjelmkuppelen mangler i alle fire ruter costume247_1923 til costume247_1926. Originalen har grønne bånd over kuppelen. Her er kuppelen helt svart/grå, mens samme bånd er grønne i fig247_01, fig247_03, fig247_04 og fig247_05. Samme hjelm og synsvinkel skifter dermed farge mellom arkene. Dette er en konkret farge-/kontinuitetsfeil. Positur, Max og kabelfaser er ellers riktige.. Les retur.md. Legg ved `hovedark/sam.png` og `hovedark/max.png` som bilde to og tre (ikke stilankeret).
-2. `lag083_01` (rom 83, Slutten (bigfootene i skyene), lag 01 med 4 objektbilder, del 1/1). Legg ved `jobber/rom083/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet. Lag denne etter at rom083 er godkjent.
-3. `lag083_02` (rom 83, Slutten (bigfootene i skyene), lag 02 med 4 objektbilder, del 1/1). Legg ved `jobber/rom083/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet. Lag denne etter at rom083 er godkjent.
-4. `lag083_03` (rom 83, Slutten (bigfootene i skyene), lag 03 med 4 objektbilder, del 1/1). Legg ved `jobber/rom083/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet. Lag denne etter at rom083 er godkjent.
-5. `lag083_04` (rom 83, Slutten (bigfootene i skyene), lag 04 med 4 objektbilder, del 1/1). Legg ved `jobber/rom083/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet. Lag denne etter at rom083 er godkjent.
-6. `fig247_10` (figurark 10 for Sam og Max (kostyme 247), 6 ruter: animasjon 8 mot høyre (6 ruter), del 1/1). Legg ved `hovedark/sam.png` og `hovedark/max.png` som bilde to og tre (ikke stilankeret).
-7. `fig247_11` (figurark 11 for Sam og Max (kostyme 247), 4 ruter: animasjon 8 mot høyre (4 ruter), del 1/1). Legg ved `hovedark/sam.png` og `hovedark/max.png` som bilde to og tre (ikke stilankeret).
-8. `fig116_01` (figurark 1 for Sam (kostyme 116), 8 ruter: start mot høyre (8 ruter), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
-9. `fig116_02` (figurark 2 for Sam (kostyme 116), 1 rute: start mot høyre (1 rute), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
-10. `fig116_03` (figurark 3 for Sam (kostyme 116), 9 ruter: animasjon 7 mot høyre (9 ruter), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
+1. `lag083_01` (rom 83, Slutten (bigfootene i skyene), lag 01 med 4 objektbilder, del 1/1). Legg ved `jobber/rom083/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet. Lag denne etter at rom083 er godkjent.
+2. `lag083_02` (rom 83, Slutten (bigfootene i skyene), lag 02 med 4 objektbilder, del 1/1). Legg ved `jobber/rom083/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet. Lag denne etter at rom083 er godkjent.
+3. `lag083_03` (rom 83, Slutten (bigfootene i skyene), lag 03 med 4 objektbilder, del 1/1). Legg ved `jobber/rom083/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet. Lag denne etter at rom083 er godkjent.
+4. `lag083_04` (rom 83, Slutten (bigfootene i skyene), lag 04 med 4 objektbilder, del 1/1). Legg ved `jobber/rom083/resultat.png` som bilde to (ikke stilankeret), så objektene får samme stil og lys som HD-bildet. Lag denne etter at rom083 er godkjent.
+5. `fig116_02` (figurark 2 for Sam (kostyme 116), 1 rute: start mot høyre (1 rute), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
+6. `fig116_03` (figurark 3 for Sam (kostyme 116), 9 ruter: animasjon 7 mot høyre (9 ruter), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
+7. `fig116_04` (figurark 4 for Sam (kostyme 116), 8 ruter: animasjon 8 mot høyre (8 ruter), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
+8. `fig116_05` (figurark 5 for Sam (kostyme 116), 5 ruter: animasjon 8 mot høyre (1 rute); animasjon 9 mot høyre (4 ruter), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
+9. `fig116_06` (figurark 6 for Sam (kostyme 116), 7 ruter: animasjon 9 mot høyre (6 ruter); animasjon 10 mot høyre (1 rute), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
+10. `fig116_07` (figurark 7 for Sam (kostyme 116), 9 ruter: animasjon 11 mot høyre (9 ruter), del 1/1). Legg ved `hovedark/sam.png` som bilde to (ikke stilankeret).
 
 Når disse er levert, fortsett med neste bestilling i `GRAFIKKLISTE.md` uten å vente på ny ordre.
 
@@ -47,10 +47,6 @@ Legg ved det ankeret som ligner mest på rommet som bilde to.
 - Hovedarkene (`hovedark/<navn>.png`) leveres på gjennomsiktig bakgrunn, uten tekst.
 
 Kjør `python3 verktoy/sjekk_leveranse.py <resultat>` før du committer, og gjør om det som får FEIL. Skriv `notat.md` i jobbmappen. Commit 5 til 10 jobber om gangen i grenen `gpt-arbeid` og push.
-
-## Beskjeder
-
-- Fig247_02 er første retur: rett bare grønne hjelmstriper, bevar resten. Statusen er korrigert fra levert til avvist i samsvar med myke.json og den manuelle originalkontrollen.
 
 ## Kodeoppgaver
 
