@@ -671,3 +671,14 @@ Natt: kontroll av lag045_02, lag053_02_del1av2, lag068_01 og lag068_05 fra Codex
 - Modden: obj656_01 i `mods/gpt` ligger nærmere ny leveranse (snittavvik 10,4) enn forrige (20,5), så den nye er tatt inn; resten er fargelås.
 - Ingen nye avvisninger, så runden er ikke kjørt på nytt.
 - Levert 4, visuelt kontrollert 4, importert 4 (19 objektbilder). Ikke testet i spillet, minispillet i rom 68 er ikke avspilt. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 04:08 (Claude)
+
+Natt: kontroll av lag068_06, lag068_07, lag068_09 og lag068_10 fra Codex (commit edd5696649 i `work/.gpt-gren`). Tre veibiter per lag i Highway Surfing, rom 68.
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 931 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente alle fire; ingen av dem står under sjekk i RAPPORT.md.
+- Sett med øynene: original_1x i nearest over resultatet (beskåret med `bilde_i_lerret`), rommets x 84 til 236, y 76 til 132 i 4x, og stripene forstørret 8 ganger side om side.
+- Målt rad for rad på resultatet nedskalert til 1x: veikantene ligger innen 1 originalpiksel (06, 07), 2 (09) og 3 på én rad (10, rad 109 høyre kant). Avvikende piksler utenfor originalens veiflater er kantutjevning langs skråkantene. Den gule streken har samme midtpunkt innen 0,6 originalpiksler og samme utstrekning (x og y innen 1 piksel) i alle fire. Ingen biler, tall eller nye merker. Fjernbitene har samme form og plassering.
+- Merknad: i leveransen starter den midterste biten én originalpiksel lavere enn originalen (rad 88 er svart mellom himmel og vei). I modden fylles toppraden av fargelåsen; obj629_01, obj630_01, obj632_01 og obj633_01 har veifarge fra rad 0. Ikke en avvisningsgrunn.
+- Godkjent alle fire. Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, importert 4 (12 objektbilder: obj619 til 623 unntatt 621, obj629 til 633 unntatt 631, obj639 til 643 unntatt 641, alle tilstand 01). Ikke testet i spillet, minispillet i rom 68 er ikke avspilt. Stilen er ikke godkjent av Tom.
