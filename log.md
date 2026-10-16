@@ -799,3 +799,16 @@ Natt: kontroll av fig247_02 (retur), fig116_01, fig247_10 og fig247_11 fra Codex
 - fig247_10 (6 ruter): avvist. Rute 3 og 4 mangler strekkgagen: originalen har hatten strukket opp som en smal stilk uten brem og flatpresset ansikt med lukkede øyne i rute 3, og bremmen ned over øynene med smale øyne og åpen svart munn i rute 4. HD viser vanlig fedora og nøytralt ansikt. Rad i `docs/gpt-avvisninger.csv` med grunn og forslag.
 - Runde to: myke-figurer utelot fig247_10 (1024 ruter i modden), men status.csv ble stående levert og ORDRE ble ikke skrevet på nytt. Dette er den kjente feilen i import_results (øverste todo-punkt). Rettet status.csv og skrev retur.md for fig247_10 for hånd, fjernet gammel retur.md for fig247_02, og kjørte `smhd gpt-ordre` og `tools/gpt_gren.sh send`. Returen for fig247_10 står først i ORDRE.md (gpt-arbeid 60679d55). Ingen kode endret.
 - Levert 4, visuelt kontrollert 4, godkjent 3, avvist 1, importert 3 (18 figurruter; modden har 1024 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 07:08 (Claude)
+
+Natt: kontroll av fig247_10 (retur), fig116_02, fig116_03 og fig116_04 fra Codex (commit 3b5614a2b0 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 1048 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). RAPPORT.md: 90 figurark levert til figurmottaket. `myke.json` versjon 6: alle 24 nye ruter ok og i modden, snitt/union 0,81 til 0,92, tegnet mot 4x innen 1,1 prosent; 0 ruter til gjennomsyn.
+- Sett med øynene: referanse.png ved siden av resultatet på grå bakgrunn for hele arket, rute 3 og 4 i fig247_10 forstørret, og hodene i fig116_04 forstørret mot originalen.
+- fig247_10 (ny SHA 3119bb46): godkjent. Rute 3 har nå hatten som smal lyseblå stilk inn mot hjelmen uten brem, lukkede øyestreker og sur munn; rute 4 har bremmen lavt ned mot øynene, smale øyne og liten svart åpen munn, som originalen. Ansiktet i rute 3 er mindre flatpresset enn originalen, men gagen leses. Rute 1, 2, 5 og 6, kabler, hjelmens grønne bånd og slips uendret. Den gamle avvisningen gjelder bare forrige SHA; gammel retur.md fjernet.
+- fig116_02 (1 rute): godkjent. Sam forfra med hendene ned, alligatorhode med ett øye i profil, hale og bølgeflate på samme steder.
+- fig116_03 (9 ruter): godkjent. Balanse- og sparkestillingene som originalen, alligatordeler bare i de fem rutene som har dem.
+- fig116_04 (8 ruter): godkjent. Åtte balansestillinger uten alligator, samme arm- og fotstillinger; hodet forfra med stor nese og ingen synlige øyne under bremmen, som originalen og godkjent fig116_01.
+- Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt. status.csv står riktig som levert for alle fire.
+- Levert 4, visuelt kontrollert 4, godkjent 4, avvist 0, importert 4 (24 figurruter; modden har 1048 ruter). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
