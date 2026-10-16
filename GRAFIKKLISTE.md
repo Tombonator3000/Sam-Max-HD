@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-16 02:10 (norsk tid)
+Oppdatert 2026-10-16 02:19 (norsk tid)
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 

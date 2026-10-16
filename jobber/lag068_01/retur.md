@@ -1,9 +1,9 @@
 # lag068_01: avvist
 
-Grunn: deler av bildet er flyttet eller zoomet (opptil 2.0 px); objekter er feil: obj651_01 tegnet om (kantlikhet 0.16)
+Grunn: Max-bitene i høyre kant (obj651_01, rekt 312,8,48,56) er tegnet om: i originalen stikker bare et øretupp, en hånd og en fot noen få piksler inn i bildet fra høyre, i leveransen er hånden og foten større og går lenger inn. Veiene er i tillegg flyttet opptil 2 px. Max oppe til venstre (obj660_01), stolpene og veistykkene har ellers riktig form, og teksten Score: og Tim er riktig.
 
 Forslag til nytt forsøk (lim inn sammen med referanse.png):
 
 ```text
-Precise correction of the attached picture. Some of the small objects did not match the original: they were missing, moved or painted differently. Start again from referanse.png. Paint every object exactly where it is, with the same outline, size and colors, and keep every other shape in place. Do not zoom, shift, crop or reframe. Keep the gray border plain gray. Same size 1536 x 1024.
+Start fra referanse.png. Tegn Max-bitene i høyre kant nøyaktig så store og så langt inne som i originalen, bare de små delene som synes. Ikke flytt eller forstørr veistykkene; kantene skal ligge på samme piksel som i referanse.png.
 ```

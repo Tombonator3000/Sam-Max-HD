@@ -1,6 +1,6 @@
 # Rapport fra gpt-inn
 
-Laget 2026-10-16 02:09
+Laget 2026-10-16 02:18
 
 | Status | Romjobber | Objektjobber | Lagjobber | Ikonark | Figurark |
 | --- | --- | --- | --- | --- | --- |
@@ -33,10 +33,10 @@ Må sees på (se `retur.md` i jobbmappen):
 | obj819_01 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
 | obj831_01 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
 | rom083 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.2 px) |
-| lag045_02 | avvist | objekter er feil: obj430_02 mangler (kantlikhet 0.82, med bakgrunnen 0.88) |
-| lag053_01_del1av2 | avvist | objekter er feil: obj498_01 mangler (kantlikhet 0.66, med bakgrunnen 0.93), obj501_01 mangler (kantlikhet 0.79, med bakgrunnen 0.97), obj502_01 mangler (kantlikhet 0.74, med bakgrunnen 0.84), obj504_01 mangler (kantlikhet 0.42, med bakgrunnen 0.81), obj505_01 mangler (kantlikhet 0.80, med bakgrunnen 0.90) og 3 til |
-| lag053_02_del1av2 | avvist | objekter er feil: obj499_01 mangler (kantlikhet 0.56, med bakgrunnen 0.93), obj507_01 mangler (kantlikhet 0.07, med bakgrunnen 0.81), obj509_01 mangler (kantlikhet 0.29, med bakgrunnen 0.89) |
-| lag068_01 | avvist | deler av bildet er flyttet eller zoomet (opptil 2.0 px); objekter er feil: obj651_01 tegnet om (kantlikhet 0.16) |
+| lag045_02 | avvist | obj430_02 (boken i hyllen, rekt 24,32,24,24) er tegnet om. I originalen er tilstanden en lys blå bok med et rektangulært, rutet felt på forsiden. Leveransen har en mørkere blå bok med hvite bølgestreker, et mønster som ikke finnes i originalen. Mottaket gav kantlikhet 0,82. Auberginen obj429_02 og trappen obj433_02 er riktige. |
+| lag053_01_del1av2 | avvist | Gjestene i salen har mistet ansiktene. I originalen har de mørke figurene (obj501_01 til obj513_01) synlige øyne, munner og armer foran kroppen; i leveransen er de fleste glatte silhuetter med bare ett lite øye, og formene på flere av dem er endret. Musikerne på scenen (obj498_01, obj502_01, obj504_01) har fått annen holdning på armer og instrumenter enn originalen. Mottaket fant 8 av 15 objekter som ikke stemmer (kantlikhet ned til 0,42). |
+| lag053_02_del1av2 | avvist | Samme feil som lag053_01_del1av2: gjestene obj507_01 og obj509_01 er glatte silhuetter uten ansiktene originalen har (kantlikhet 0,07 og 0,29), og venstre musiker obj499_01 holder instrumentet annerledes enn originalen (0,56). |
+| lag068_01 | avvist | Max-bitene i høyre kant (obj651_01, rekt 312,8,48,56) er tegnet om: i originalen stikker bare et øretupp, en hånd og en fot noen få piksler inn i bildet fra høyre, i leveransen er hånden og foten større og går lenger inn. Veiene er i tillegg flyttet opptil 2 px. Max oppe til venstre (obj660_01), stolpene og veistykkene har ellers riktig form, og teksten Score: og Tim er riktig. |
 | lag068_04 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.8 px) |
 | lag079_02_del1av2 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.1 px) |
 | lag079_03_del1av2 | sjekk | deler av bildet er flyttet eller zoomet (opptil 1.1 px) |
