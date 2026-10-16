@@ -1,0 +1,77 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import hashlib, importlib.util, json, subprocess
+
+root = Path('rapporter/natt-fire-45-53-68-20261016')
+jobs = ['lag045_02', 'lag053_01_del1av2', 'lag053_02_del1av2', 'lag068_01']
+attempts = [2, 1, 1, 3]
+spec = importlib.util.spec_from_file_location('egenkontroll', 'verktoy/sjekk_leveranse.py')
+check = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(check)
+sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
+manifest = {'dato': '2026-10-16', 'gren': 'gpt-arbeid', 'levert': 4,
+            'visuelt_kontrollert_av_codex': 4, 'importert_i_okten': 0,
+            'motoravspilling': False, 'tom_godkjent': False, 'leveranser': [], 'objekter': []}
+sources = {}
+for j, count in zip(jobs, attempts):
+    d = Path('jobber') / j
+    job = json.loads((d / 'jobb.json').read_text())
+    for name in ['referanse.png', 'original_1x.png', 'prompt.txt', 'jobb.json']:
+        p = d / name
+        head = subprocess.check_output(['git', 'show', f'HEAD:{p}'])
+        assert p.read_bytes() == head, p
+        sources[str(p)] = {'sha256': sha(p), 'identisk_med_HEAD': True}
+    result = Image.open(d / 'resultat.png').convert('RGB')
+    assert result.size == (1536, 1024)
+    x, y, w, h = job['bilde_i_lerret']
+    import numpy as np
+    a = np.array(result)
+    outside = np.ones((1024, 1536), dtype=bool)
+    outside[y:y+h, x:x+w] = False
+    assert np.all(a[outside] == 128)
+    part, _ = check.part_of(result, job)
+    metrics = check.compare(Image.open(d / 'original_1x.png'), part)
+    run = subprocess.run(['python3', 'verktoy/sjekk_leveranse.py', str(d / 'resultat.png')], capture_output=True, text=True)
+    (root / f'{j}-egenkontroll.txt').write_text(run.stdout + run.stderr)
+    assert run.returncode < 2, run.stdout
+    manifest['leveranser'].append({'jobb': j, 'resultat': str(d / 'resultat.png'),
+        'sha256': sha(d / 'resultat.png'), 'forsok': count, 'prompt': str(d / 'prompt.txt'),
+        'bilde_to': job['bilde_to'], 'sha256_bilde_to': sha(job['bilde_to']),
+        'egenkontroll': 'OK' if run.returncode == 0 else 'SJEKK',
+        **{k: v for k, v in metrics.items() if k not in ['eo', 'es']},
+        'visuelt_kontrollert_av': 'Codex', 'importert_i_okten': False,
+        'motoravspilling': False, 'tom_godkjent': False})
+    ox, oy = job['plassering']; rx, ry, rw, rh = job['region']
+    columns = [Image.open(d / 'referanse.png').convert('RGB'), result, Image.open(job['bilde_to']).convert('RGB')]
+    cards = []
+    for obj in job['objekter']:
+        bx, by, bw, bh = obj['rekt']
+        x0, y0 = max(rx, bx), max(ry, by)
+        x1, y1 = min(rx+rw, bx+bw), min(ry+rh, by+bh)
+        if x1 <= x0 or y1 <= y0:
+            continue
+        box = ((x0-rx+ox)*4, (y0-ry+oy)*4, (x1-rx+ox)*4, (y1-ry+oy)*4)
+        corr = check.corr(metrics['eo'][y0-ry:y1-ry, x0-rx:x1-rx], metrics['es'][y0-ry:y1-ry, x0-rx:x1-rx])
+        manifest['objekter'].append({'jobb': j, 'bilde': obj['bilde'], 'rekt': obj['rekt'],
+            'synlig_utsnitt': [x0, y0, x1-x0, y1-y0], 'kantlikhet': round(corr, 4)})
+        height = min(260, max(112, (y1-y0)*4))
+        card = Image.new('RGB', (1200, height+50), (205, 205, 205))
+        draw = ImageDraw.Draw(card)
+        draw.text((8, 5), obj['bilde'] + '  Original | Leveranse | Godkjent HD-rom', fill='black')
+        for n, col in enumerate(columns):
+            crop = col.crop(box)
+            crop.thumbnail((384, height), Image.Resampling.LANCZOS)
+            card.paste(crop, (n*400+8, 35))
+        cards.append(card)
+    sheet = Image.new('RGB', (1200, sum(c.height for c in cards)), (205, 205, 205))
+    yy = 0
+    for card in cards:
+        sheet.paste(card, (0, yy)); yy += card.height
+    sheet.save(root / f'{j}-objektkontroll.png')
+    ref = Image.open(d / 'referanse.png').convert('RGB')
+    Image.blend(ref, result, 0.5).save(root / f'{j}-overlegg.png')
+    print(j, run.stdout.strip())
+(root / 'kildehash.json').write_text(json.dumps(sources, ensure_ascii=False, indent=2)+'\n')
+(root / 'leveranser.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
+raw = {str(p): sha(p) for p in root.glob('*raa*.png')}
+(root / 'raafiler-sha256.json').write_text(json.dumps(raw, indent=2)+'\n')
