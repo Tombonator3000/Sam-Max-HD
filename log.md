@@ -632,3 +632,16 @@ Natt: kontroll av lag045_02, lag053_01_del1av2, lag053_02_del1av2 og lag068_01 f
 - Den kraftige magentaglorien er tydelig redusert. En RGB-terskel gir totalt 2332 synlige magentapiksler før og 332 etter; dette er en sammenligningsmåling, ikke antall beviste artefakter. Enkelte grønne/lilla kantpiksler er fortsatt synlige på bilene. Ikke godkjent som fullstendig pikselrent. Ikonarkene 07, 08 og 09 er også sett i oppdaterte mottaksforhåndsvisninger, uten åpenbar ny geometriendring; ingen ny stilgodkjenning.
 - Før/etterbilder, sammenligningspanel og kilder/hasher er sikret i Codex-arbeidsmappens output/natt-ikonfargelas-20261016. Todo er oppdatert med etterkontrollen og en konkret oppgave om kantrestene. Det tidligere kontrollpunktet for de tolv plasseringsrettingene er også kvittert ut: én sett av Claude, elleve av Codex.
 - Dette er dokumentasjon og videre oppgave, ingen kode- eller bildeendring i repoet. Grafikkagentens aktive filer i gpt-arbeid er ikke rørt. Ikke testet i spillet, ikke godkjent av Tom.
+
+## 2026-10-16 03:08 (Claude)
+
+Natt: kontroll av nye forsøk på lag045_02, lag053_01_del1av2, lag053_02_del1av2 og lag068_01 fra Codex (commit ccc36110a7 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 931 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). Mottaket godkjente lag053_01_del1av2 og lag068_01 og avviste lag045_02 og lag053_02_del1av2.
+- Sett med øynene: original_1x i nearest over resultatet (beskåret med `bilde_i_lerret`) per objektfelt, forstørret 4 til 8 ganger, og for lag045_02 også rommet mot obj430_01, 02 og 03 fra `work/extract`.
+- lag053_01_del1av2: godkjent. Gjestene har nå øyne, munner og armer på samme sted som originalen, gjesten obj508_01 har den åpne o-munnen. Musikerne holder instrumentene som originalen. Ingen flaske på bordet, som originalen. De 15 objektbildene ligger i modden.
+- lag045_02: avvist. Det rutede feltet på boken er nå riktig, men tilstanden er den smale mørk grå boken til venstre for den blå, og den er borte. Svart i obj430_02.png er gjennomsiktig, så den røde boken skal stå. Mottakets avvisning stemmer; returen er skrevet om med den faktiske feilen.
+- lag053_02_del1av2: avvist. obj507_01 mangler den brede åpne munnen, obj509_01 har annen armstilling. Mottakets avvisning stemmer.
+- lag068_01: avvist, selv om mottaket godkjente. Max-bitene, veiene og teksten er nå riktige, men venstre stolpe obj656_01 har et hakk i underkanten, og lyset på stolpene stemmer ikke med originalen (høyre stolpe er lys der originalen er svart).
+- Tre rader i `docs/gpt-avvisninger.csv` med grunn og forslag. Runden kjørt igjen; returen står i ORDRE.md og RAPPORT.md.
+- Levert 4, visuelt kontrollert 4, importert 1 (lag053_01_del1av2). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
