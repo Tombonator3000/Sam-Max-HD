@@ -759,3 +759,17 @@ Natt: kontroll av fig247_02, fig247_03, fig247_04 og fig247_05 fra Codex (commit
 - Hjelmen er svart kuppel med grønt visir som i godkjente fig247_01; originalen har grønne striper på kuppelen, også i den godkjente. Ikke avvisningsgrunn, men noteres for Tom sammen med stilen.
 - Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
 - Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (23 figurruter i kostyme 247; 970 til 993). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
+
+## 2026-10-16 05:55 (Claude)
+
+Natt: kontroll av fig247_06, fig247_07, fig247_08 og fig247_09 fra Codex (commit 272aa4d150 i `work/.gpt-gren`).
+
+- `tools/gpt_runde.sh` gikk helt gjennom (76 rom, 959 objektbilder, 1012 figurruter, push til `hd-mod` og ny ORDRE.md til `gpt-arbeid`). RAPPORT.md: 84 figurark levert til figurmottaket; ingen av de fire står under sjekk. `myke.json`: alle 19 nye ruter ok og i modden, snitt/union 0,82 til 0,91, tegnet mot 4x innen 1,2 prosent.
+- Sett med øynene: referanse.png over resultatet på grønn bakgrunn, hele ruteområdet, og hodene forstørret for munnstillingene i fig247_08 og 09.
+- fig247_06 (1 rute, animasjon 7): godkjent. Sam alene med VR-hjelm, hendene hengende, ingen nøkkel og ingen Max.
+- fig247_07 (6 ruter, animasjon 8): godkjent. To ruter med hendene nede, venstre hånd litt ut i tredje, venstre hånd ut til siden og høyre foran brystet i fjerde, begge hender på hjelmen i femte og sjette, som originalen.
+- fig247_08 (6 ruter): godkjent. Begge hender på hjelmen i alle seks, hodet løftes fra fjerde rute, lukket munn i de tre første og liten åpen munn i de tre siste.
+- fig247_09 (6 ruter): godkjent. Begge hender på hjelmen, hodet senket i de fire første og løftet i de to siste, åpen munn bare i femte og sjette.
+- Hjelmen har grønne striper på kuppelen i disse arkene, nærmere originalen enn fig247_01 til 05. Dermed er hjelmen ikke helt lik mellom arkene i kostyme 247; noteres for Tom sammen med stilen, ikke avvisningsgrunn.
+- Ingen nye rader i `docs/gpt-avvisninger.csv`, så runden er ikke kjørt på nytt.
+- Levert 4, visuelt kontrollert 4, godkjent 4, importert 4 (19 figurruter i kostyme 247; 993 til 1012). Ikke testet i spillet. Stilen er ikke godkjent av Tom.
