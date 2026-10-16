@@ -19,3 +19,5 @@ Arbeidsmodden bygges additivt på 9fbf5a67: 19 370 tidligere PNG-er er bevart by
 Direkte telling: 113 av 1758 figurjobber har resultat.png, 1645 mangler. Levert er ikke det samme som godkjent, og kjente returer kommer i tillegg. Neste ordinære Sam-bestilling er fig204_01. Identitet, lagdeler og sammensetning skal ses før produksjon.
 
 Brukte bibliotekskilder: losninger/grafikk/figurark-fast-storrelse.md, losninger/bygg/publisert-mod-er-fasit.md og losninger/testing/logg-over-det-som-mangler-hd.md. Metodene er gjenbrukt med Sam & Max sine egne referanser, mottak og motorprøver. Ingen biblioteksendring, ny motorfunksjon eller produksjonskode er publisert fra denne runden.
+
+Publisert og hentet tilbake 2026-10-16 22:14: hd-mod 9a85593680fefb5e116b8d40eb6f2edb840e183e. SHA256SUMS består, alle 92 nye native bilder og alle kandidatens PNG-er er hashkontrollert mot den publiserte modden. Fremdrift er kvittert importert per resultat-SHA. 1226 native figurruter i arbeidsmodden; nedlastingspakkene er fortsatt fra a6c286bd.
