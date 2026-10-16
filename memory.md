@@ -2,6 +2,8 @@
 
 Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
+- 16. oktober 19:35: Den lille inventory-knappen nederst til venstre er aktør 1 med kostyme 1, rute 2, ikke objekt888. Ny native eske i fig001_01 er sett med inventar åpnet/lukket. Arbeidsmodd 9fbf5a67 har 1134 native figurruter etter 39 additive PNG-er, alle tidligere grafikkfiler bevart. Linux-/Windows-releasen har fortsatt a6c286bd med 1095. Fig249_02 er gjenopprettet til godkjent nattleveranse; munndelsforsøket 6fbad801 består teknisk, men er pikselert i motoren og holdes ute. Neste Sam-ark er fig117_01. Natt-automatikken forblir pauset.
+
 ## Mål
 - HD-versjon av *Sam & Max Hit the Road* (LucasArts 1993, SCUMM v6): HD-bakgrunner, HD-objekter, HD-figurer og HD-tekst, lagt oppå originalen slik som i The Dig HD.
 - Tom vil ha det samme som for The Dig: spillet starter rett inn som originalen, HD eller originalgrafikk velges i spillets egen meny, det virker på mobil, og det finnes en komplett fil til nedlasting (Linux først).
