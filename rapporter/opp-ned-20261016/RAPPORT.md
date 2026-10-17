@@ -21,3 +21,5 @@ Brukt prosjektbibliotekets kilder om fast figurstørrelse, bevaring av publisert
 ## Publisert 2026-10-17 11:11
 
 Grafikkilder pushet i 567a1f71. Additiv hd-mod 5212c395ce621dc2d72424affda4e6e19d77a151 er publisert og hentet tilbake. SHA256SUMS besto; alle 19 526 kandidat-PNG-er er identiske med publisert modd, inkludert alle 64 nye native filer. Totalt 1290 native figurruter. Alle 19 462 tidligere PNG-er er bevart. Kvitteringen og fremdriften skiller import, motoravspilling og godkjenning.
+
+Pakkene er senere bygget, nedlastet og kontrollert med alle 1290 ruter. Felles Latest-release publisert 2026-10-17 11:25: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-17. Begge pakker har identisk HD-innhold. Se rapporter/felles-release-20261017.

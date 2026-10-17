@@ -1,0 +1,54 @@
+"""Kontroller den nedlastede pakken med egne hjemmemapper og kopierte saves."""
+import hashlib, json, os, re, shutil, subprocess, time
+from pathlib import Path
+ROOT=Path(__file__).resolve().parent
+PACKAGE=ROOT/'linux/squashfs-root'
+DATA=PACKAGE/'usr/share/sam-max-hd'
+MOD=DATA/'mods/gpt'
+BINARY=PACKAGE/'usr/bin/scummvm'
+SAVES=ROOT/'saves'
+SAVES.mkdir(exist_ok=True)
+for source in Path('/home/tom/Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/feilrunde2-grunnlag/saves').glob('samnmax.s*'):
+    shutil.copy2(source,SAVES/source.name)
+scenes=[
+ ('inventory',2,{'DIGHD_TEST_CLICKS':'80:10/185,160:210/30'},280),
+ ('akvarium',1,{'DIGHD_TEST_ROOM':'16','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'320'},240),
+ ('cafeteria',2,{'DIGHD_TEST_ROOM':'30','DIGHD_TEST_AT':'10'},240),
+]
+for label,animation in [('sam-oppned-blink',3),('sam-oppned-snakke',4)]:
+    scenes.append((label,2,{'DIGHD_TEST_ROOM':'40','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'204',
+    'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255',
+    'DIGHD_TEST_POS':'160,80','DIGHD_TEST_ANIMATION':str(animation),'DIGHD_DEBUG_SOFT':'1','DIGHD_DUMP_EVERY':'4'},160))
+rows=[]
+for label,slot,extra,frames in scenes:
+    target=ROOT/('test-'+label)
+    home=target/'home'
+    home.mkdir(parents=True,exist_ok=True)
+    env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')}
+    env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),
+    'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(PACKAGE/'usr/lib'),
+    'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(MOD),'DIGHD_VERIFY':'1',
+    'DIGHD_QUIT_AT':str(frames),'DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'40','DIGHD_DUMP_FLAT':'1',
+    'DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0'})
+    env.update(extra)
+    cmd=[str(BINARY),'--config='+str(target/'scummvm.ini'),'--path='+str(DATA/'game'),
+    '--savepath='+str(SAVES),'--save-slot='+str(slot),'--gfx-mode=normal','--no-fullscreen',
+    '--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+    start=time.monotonic()
+    with (target/'scummvm.log').open('wb') as out:
+        code=subprocess.run(cmd,env=env,stdout=out,stderr=subprocess.STDOUT,timeout=90).returncode
+    log=(target/'scummvm.log').read_text(errors='replace')
+    row={'scene':label,'exit':code,'seconds':round(time.monotonic()-start,1),
+    'rooms':re.findall(r'DigHD: room (\d+) loaded',log),'dumps':len(list(target.glob('frame_*_room*.png'))),
+    'screen_differences':[int(x) for x in re.findall(r'(\d+) screen pixels differ from the whole screen built again',log)],
+    'tegnede_costume204_ruter':sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*204',log))),
+    'verify_tail':re.findall(r'DigHD: verify[^\n]+',log)[-3:]}
+    print(json.dumps(row,ensure_ascii=False),flush=True)
+    rows.append(row)
+    assert code==0 and row['dumps'] and row['screen_differences'] and max(row['screen_differences'])==0,label
+info={'binary_sha256':hashlib.sha256(BINARY.read_bytes()).hexdigest(),'build':(DATA/'BYGG.txt').read_text(),
+    'native_cels':len(list((MOD/'costumes').glob('*_hd.png'))),'scenes':rows,
+    'test_configuration':'Pakkens uendrede binar, spill og modd; minimal ini, gfx-mode=normal, builtin GUI, dummy lyd/skjerm, null musikk. Kopierte saves, isolert HOME/XDG.'}
+assert info['native_cels']==1290
+assert all(row['tegnede_costume204_ruter'] for row in rows if row['scene'].startswith('sam-oppned'))
+(ROOT/'linux-kontroll.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
