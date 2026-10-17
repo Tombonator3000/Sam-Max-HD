@@ -2,6 +2,8 @@
 
 Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 
+- 17. oktober 11:25: Felles Linux-/Windows-release sam-max-hd-2026-10-17 er publisert og bekreftet Latest. Begge har kode 6c181dec og hd-mod 5212c395 med 1290 native ruter. Alle 19 531 runtime moddfiler identiske med hverandre og publisert modd; README.md utelates av pakkeskriptene. Begge nedlastinger og opplastinger sjekksumkontrollert. Linux: oppstart, Debian 12 og fem målrettede prøver med 99 nullkontroller. Windows: automatisert oppstart med HD og MT-32. Neste figurjobb fig307_01; 1640 figurark uten resultat pluss returer.
+
 - 17. oktober 11:12: Fem Sam opp ned-ark fig204_01 til 05 er publisert i hd-mod 5212c395 med 64 nye native ruter, totalt 1290. Blinklag og øyeplassering er kontrollert i motoren etter retting. Alle tidligere PNG-er bevart. Denne økten: 13 nye Sam-ark med 155 ruter og én ny munndel, 156 nye native filer. 63 av 64 ruter i opp ned-bunken er sett tegnet; rute286 er ikke observert. 118 av 1758 figurjobber har resultat, 1640 mangler pluss returer. Neste Sam-ark fig307_01. Natt-automatikken er pauset. Plattformpakkene fra 17. oktober har 1226; nye bygg med 1290 er startet.
 
 - 16. oktober 22:14: Åtte nye Gator Golf-ark fig117_01 til 08 (91 ruter) og ny munndel costume249_257 er importert i hd-mod 9a855936 (1226 native ruter). Alle 19 370 tidligere PNG-er er bevart. 13 tvungne animasjoner, alle 91 ruter sett i motorutsnitt, null skjermbufferavvik. Tre egenkontrollmerknader om omriss står dokumentert, mens separat mottak godtar alle 98 ruter inkludert seks eksisterende gangeruter. Inventory-knappen fra forrige modd er beholdt. Nedlastingspakkene har fortsatt 1095; neste Sam-ark er fig204_01, opp ned. Ingen ny natt-automatikk.
