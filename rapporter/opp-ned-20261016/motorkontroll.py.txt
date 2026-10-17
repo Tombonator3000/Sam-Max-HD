@@ -1,0 +1,39 @@
+from pathlib import Path
+import sys, json, re
+
+ROOT=Path('/home/tom/Sam-Max-HD/out/opp-ned-20261016')
+REPORT=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/opp-ned-20261016')
+sys.path.insert(0,'/home/tom/Sam-Max-HD/out/inventoryknapp-20261016')
+import kontroll as k
+k.ROOT=ROOT
+env={'DIGHD_TEST_ROOM':'40','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'204',
+     'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1',
+     'DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'160,80',
+     'DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1'}
+results=[]
+for animation,directions in [(1,[1,2,3]),(2,[1,2,3]),(3,[1,2]),(4,[1,2,3]),(6,[1,2,3])]:
+    for direction in directions:
+        label=f'anim{animation}-retning{direction}'
+        row=k.run(label,k.NEW,dict(env,DIGHD_TEST_ANIMATION=str(animation),DIGHD_TEST_DIRECTION=str(direction)),120,ROOT/'mod-kandidat')
+        log=(ROOT/label/'scummvm.log').read_text(errors='replace')
+        row['tegnede_ruter']=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*204',log)))
+        results.append(row)
+        (REPORT/'motor-runder.json').write_text(json.dumps(results,indent=2)+'\n')
+        assert row['exit']==0 and row['dumps'] and row['screen_differences'] and max(row['screen_differences'])==0
+expected={int(row['bilde'].split('_')[1]) for row in json.loads((REPORT/'tillegg.json').read_text())['tillegg']}
+seen={n for row in results for n in row['tegnede_ruter']}
+if expected-seen == {286}:
+    label='anim4-retning2-lang'
+    row=k.run(label,k.NEW,dict(env,DIGHD_TEST_ANIMATION='4',DIGHD_TEST_DIRECTION='2'),160,ROOT/'mod-kandidat')
+    log=(ROOT/label/'scummvm.log').read_text(errors='replace')
+    row['tegnede_ruter']=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*204',log)))
+    results.append(row)
+    (REPORT/'motor-runder.json').write_text(json.dumps(results,indent=2)+'\n')
+    assert row['exit']==0 and row['dumps'] and row['screen_differences'] and max(row['screen_differences'])==0
+    seen={n for row in results for n in row['tegnede_ruter']}
+summary={'runder':len(results),'ruter_forventet':len(expected),'ruter_tegnet':len(expected&seen),
+         'mangler_i_avspilling':sorted(expected-seen),'skjermbufferavvik':sum(sum(row['screen_differences']) for row in results),
+         'naturlig_gjennomspilling':False}
+(REPORT/'motor-oppsummering.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(json.dumps(summary),flush=True)
+assert not expected-seen,sorted(expected-seen)

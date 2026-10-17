@@ -16,7 +16,7 @@ Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENT
 
 ## Gjør disse nå
 
-Produksjonsmerknad fra Codex 16. oktober kveld: fig249_04 til 09 og inventory-knappen fig001_01 er allerede levert og importert. Ikke tegn dem på nytt fra den gamle listen. Ny munndel i fig249_02 og alle åtte Gator Golf-ark fig117_01 til 08 er levert og teknisk kontrollert i denne økten. Se rapporter/fortsett-20261016-kveld/RAPPORT.md og fremdrift.json for resultat-SHA, tre dokumenterte egenkontrollmerknader, motorprøver og faktisk importkvittering. Neste ordinære Sam-ark uten resultat er fig204_01.
+Produksjonsmerknad fra Codex 16. oktober kveld: fig249_04 til 09 og inventory-knappen fig001_01 er allerede levert og importert. Ikke tegn dem på nytt fra den gamle listen. Ny munndel i fig249_02 og alle åtte Gator Golf-ark fig117_01 til 08 er levert og teknisk kontrollert i denne økten. Se rapporter/fortsett-20261016-kveld/RAPPORT.md og fremdrift.json for resultat-SHA, tre dokumenterte egenkontrollmerknader, motorprøver og faktisk importkvittering. Fig204_01 til 05 er også levert, se rapporter/opp-ned-20261016. Blinkreturen er rettet etter motorprøve. Costume204_286 er ikke observert i avspilling og må fortsatt kontrolleres. Neste jobb tas fra GRAFIKKLISTE.md etter disse fem arkene.
 
 Figurrutene under har feil omriss mot originalen og er holdt utenfor spillet. Tegn dem på nytt i samme ark og lever arket igjen. Se `forhandsvisning/myk_<ark>.png`: originalens omriss står i rødt. Ta med alt originalen har (for eksempel det figuren holder i hånden), med samme størrelse og form.
 

@@ -42,16 +42,16 @@ Figurark for Sam.
 - [x] `fig117_06` (figurark 6 for Sam (kostyme 117), 9 ruter: animasjon 15 mot høyre (8 ruter); animasjon 16 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [x] `fig117_07` (figurark 7 for Sam (kostyme 117), 10 ruter: animasjon 17 mot høyre (9 ruter); animasjon 18 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [x] `fig117_08` (figurark 8 for Sam (kostyme 117), 8 ruter: animasjon 19 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig204_01` (figurark 1 for Sam (kostyme 204), 8 ruter: start (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 2, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig204_02` (figurark 2 for Sam (kostyme 204), 22 ruter: gange mot høyre (8 ruter); snakking (lag 2, tegnes over kroppen) mot høyre (14 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig204_01` (figurark 1 for Sam (kostyme 204), 8 ruter: start (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); start (lag 2, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig204_02` (figurark 2 for Sam (kostyme 204), 22 ruter: gange mot høyre (8 ruter); snakking (lag 2, tegnes over kroppen) mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 3
 
 Figurark for Sam, Sam og Max.
 
-- [ ] `fig204_03` (figurark 3 for Sam (kostyme 204), 15 ruter: snakking (lag 2, tegnes over kroppen) mot oss, bort (15 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig204_04` (figurark 4 for Sam (kostyme 204), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig204_05` (figurark 5 for Sam (kostyme 204), 11 ruter: gange bort (8 ruter); animasjon 6 mot høyre, mot oss, bort (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig204_03` (figurark 3 for Sam (kostyme 204), 15 ruter: snakking (lag 2, tegnes over kroppen) mot oss, bort (15 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig204_04` (figurark 4 for Sam (kostyme 204), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig204_05` (figurark 5 for Sam (kostyme 204), 11 ruter: gange bort (8 ruter); animasjon 6 mot høyre, mot oss, bort (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig307_01` (figurark 1 for Sam (kostyme 307), 5 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig307_02` (figurark 2 for Sam (kostyme 307), 8 ruter: gange mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig307_03` (figurark 3 for Sam (kostyme 307), 23 ruter: snakking (lag 3, tegnes over kroppen) mot høyre, mot oss (23 ruter), bilde to `hovedark/sam.png`)

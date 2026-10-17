@@ -1,0 +1,83 @@
+from pathlib import Path
+import json, hashlib, shutil
+import numpy as np
+from PIL import Image, ImageFilter
+from scipy import ndimage as nd
+
+root=Path(__file__).resolve().parents[2]
+report=root/'rapporter/opp-ned-20261016'
+receipt=json.loads((root.parents[1]/'out/opp-ned-20261016/myke.json').read_text())
+progress=json.loads((report/'fremdrift.json').read_text())
+details=[]
+for name in ['fig204_01','fig204_02','fig204_03']:
+    job=json.loads((root/'jobber'/name/'jobb.json').read_text())
+    path=root/'jobber'/name/'resultat.png'
+    backup=report/(name+'-for-oyeplassering.png')
+    if backup.exists():
+        assert path.read_bytes()==backup.read_bytes(), 'Ikke bruk plasseringen to ganger'
+    else:
+        shutil.copy2(path,backup)
+    p=np.asarray(Image.open(path).convert('RGBA')).copy()
+    for cel in job['ruter']:
+        if cel['lag']!=2 or cel['retning'] not in [1,2]:continue
+        original=Image.open(root.parents[1]/'work/extract/costumes'/(cel['bilde']+'.png')).convert('RGBA')
+        original_pixels=np.asarray(original)
+        hb=original.getchannel('A').getbbox()
+        base_x=(16+cel['synlig'][0]-hb[0])*4
+        base_y=(8+cel['synlig'][1]-hb[1])*4
+        first_x=33 if cel['retning']==1 else 30
+        # flytt_hd is the placement of the crop inside the sparse 70x70 cel,
+        # not a shift to subtract from this already placed source sheet.
+        shift=[0,0]
+        for ox in [first_x,first_x+4]:
+            source=original_pixels[56:58,ox:ox+2]
+            mask=(source[:,:,3]>0)&(source[:,:,:3].max(axis=2)<35)
+            if not mask.any():continue
+            ys,xs=np.nonzero(mask)
+            ex=base_x+(ox+int(xs.min()))*4-shift[0]
+            ey=base_y+(56+int(ys.min()))*4-shift[1]
+            ew=(int(xs.max())-int(xs.min())+1)*4
+            eh=(int(ys.max())-int(ys.min())+1)*4
+            rx,ry=ex-5,ey-5
+            region=p[ry:ey+eh+5,rx:ex+ew+5].copy()
+            black=(region[:,:,3]>200)&(region[:,:,:3].max(axis=2)<45)
+            labels,n=nd.label(black)
+            choices=[]
+            for component in range(1,n+1):
+                yy,xx=np.nonzero(labels==component)
+                if len(xx)<4 or np.ptp(yy)+1 <= np.ptp(xx)+1:continue
+                center=((xx.min()+xx.max())/2,(yy.min()+yy.max())/2)
+                distance=(center[0]-(5+ew/2))**2+(center[1]-(5+eh/2))**2
+                choices.append((distance,component))
+            assert choices,(cel['bilde'],ox,'ingen tegnet oyekomponent')
+            distance,component=min(choices)
+            assert distance<70,(cel['bilde'],ox,'oyet ligger for langt unna')
+            core=labels==component
+            yy,xx=np.nonzero(core)
+            old_box=(int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1)
+            skin=(region[:,:,3]>200)&(region[:,:,0]>150)&(region[:,:,1]>70)&(region[:,:,2]<110)
+            assert skin.any()
+            color=np.median(region[:,:,:3][skin],axis=0).astype(np.uint8)
+            # Reuse the eye already drawn by image_gen, with a soft extracted
+            # alpha. Move/resize it into the original eye's actual bounds.
+            eye=Image.new('RGBA',(region.shape[1],region.shape[0]))
+            eye.putalpha(Image.fromarray((core*255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(.3)))
+            eye=eye.crop(old_box).resize((ew,eh),Image.Resampling.LANCZOS)
+            erase=nd.binary_dilation(core,iterations=1)
+            region[:,:,:3][erase]=color
+            p[ry:ey+eh+5,rx:ex+ew+5]=region
+            canvas=Image.fromarray(p)
+            canvas.alpha_composite(eye,(ex,ey));p=np.asarray(canvas).copy()
+            details.append({'bilde':cel['bilde'],'original_oye':[ox+int(xs.min()),56+int(ys.min()),ew//4,eh//4],
+                            'ny_boks_hd':[ex,ey,ew,eh],'gjenbrukt_tegnet_oye_boks':[rx+old_box[0],ry+old_box[1],old_box[2]-old_box[0],old_box[3]-old_box[1]],
+                            'kompensert_mottaksflytt_hd':shift})
+    Image.fromarray(p).save(path)
+    sha=hashlib.sha256(path.read_bytes()).hexdigest()
+    cart_path=report/('rutekart-'+name+'.json')
+    cart=json.loads(cart_path.read_text());cart[name]['sha256_resultat']=sha
+    cart_path.write_text(json.dumps(cart,indent=2)+'\n')
+    row=next(row for row in progress['leveranser'] if row['jobb']==name);row['sha256']=sha
+    print(name,sha,flush=True)
+(report/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+(report/'oyeplassering.json').write_text(json.dumps({'metode':'rensing og plassering av eksisterende image_gen-oyne, i originalens oyebokser','oyne':details},ensure_ascii=False,indent=2)+'\n')
+print(len(details),'oyne',flush=True)
