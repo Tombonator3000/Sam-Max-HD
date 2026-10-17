@@ -12,8 +12,12 @@ Motorgrunnlaget har 14 korte prøver og én forlenget prøve, 460 skjermbufferko
 
 Etter øye- og blinkrettingene er bare de berørte stå-/blink-/snakkeprøvene kjørt igjen. Mellomprøven har seks kjøringer og 190 nullkontroller. Siste korrigerte kandidat har fire blink-/snakkeprøver med 130 skjermbufferkontroller uten avvik. Dette er tvunget animasjon med lokale QA-kroker, ikke naturlig gjennomspilling. Z-kantmålingene er ikke null. Ingen produksjonskode eller QA-kroker er publisert i main.
 
-Additiv kandidat fra hd-mod9a855936: 64 nye native PNG-er, 1290 totalt. Alle 19 462 tidligere PNG-er er bevart byteidentiske. Inventaresken, Gator Golf og munndelen fra forrige leveranse er beholdt. Publisering kvitteres nedenfor. Linux-/Windows-pakkene er ikke bygget på nytt og har fortsatt 1095 native ruter fra a6c286bd. Ny nettleseravspilling er ikke utført.
+Additiv kandidat fra hd-mod9a855936: 64 nye native PNG-er, 1290 totalt. Alle 19 462 tidligere PNG-er er bevart byteidentiske. Inventaresken, Gator Golf og munndelen fra forrige leveranse er beholdt. Publisering kvitteres nedenfor. Linux-/Windows-plattformpakkene ble automatisk oppdatert 17. oktober med 1226 native ruter fra 9a855936. Den felles releasen fra 16. oktober har fortsatt 1095 fra a6c286bd. Nye bygg med alle 1290 er startet, Linux 39020147979 og Windows 39020149118. Ny nettleseravspilling er ikke utført.
 
 Direkte telling etter denne bunken: 118 av 1758 figurjobber har resultat, 1640 mangler, i tillegg til returer og visuell godkjenning. Denne økten har gitt 13 nye Sam-ark med 155 ruter og én ny munndel, 156 nye native bilder. Neste bestilling leses fra GRAFIKKLISTE.md; allerede leverte ark skal ikke tegnes på nytt. Natt-automatikken forblir pauset.
 
 Brukt prosjektbibliotekets kilder om fast figurstørrelse, bevaring av publisert modd og logging av manglende HD. Sam & Max sine egne paletter, referanser og mottaksgrenser er beholdt. Sluttkontroll 2026-10-17 11:06.
+
+## Publisert 2026-10-17 11:11
+
+Grafikkilder pushet i 567a1f71. Additiv hd-mod 5212c395ce621dc2d72424affda4e6e19d77a151 er publisert og hentet tilbake. SHA256SUMS besto; alle 19 526 kandidat-PNG-er er identiske med publisert modd, inkludert alle 64 nye native filer. Totalt 1290 native figurruter. Alle 19 462 tidligere PNG-er er bevart. Kvitteringen og fremdriften skiller import, motoravspilling og godkjenning.
