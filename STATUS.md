@@ -74,3 +74,10 @@ PR33 ble flettet av Tom 16. oktober 08:44 etter grønn CI. Nattens pipelinekode 
 ## Videre Sam-figurer, 2026-10-16 22:15
 
 Gator Golf fig117_01 til 08 og ny munndel i fig249_02 er levert og importert i hd-mod 9a855936: 92 nye native bilder, 1226 totalt. Alle tidligere PNG-er bevart. 13 tvungne animasjoner, alle 91 Gator Golf-ruter sett i motoren, 390 skjermbufferkontroller uten avvik. Tre egenkontrollmerknader om omriss er dokumentert; separat mottak godtar alle 98 ruter inkludert seks eksisterende gangeruter. Ikke naturlig gjennomspilling, separat Claude-kontroll eller Toms nye stilgodkjenning. Kjent kunstig rom49-hopp med 160 avvik står uendret. Nedlastingspakkene har fortsatt a6c286bd og 1095 native ruter. Se rapporter/fortsett-20261016-kveld på gpt-arbeid for bilder, prompter og per-SHA-kvittering.
+
+
+## Sam opp ned, 2026-10-17 11:12
+
+17. oktober 11:12: Fem Sam opp ned-ark fig204_01 til 05 er publisert i hd-mod 5212c395 med 64 nye native ruter, totalt 1290. Blinklag og øyeplassering er kontrollert i motoren etter retting. Alle tidligere PNG-er bevart. Denne økten: 13 nye Sam-ark med 155 ruter og én ny munndel, 156 nye native filer. 63 av 64 ruter i opp ned-bunken er sett tegnet; rute286 er ikke observert. 118 av 1758 figurjobber har resultat, 1640 mangler pluss returer. Neste Sam-ark fig307_01. Natt-automatikken er pauset. Plattformpakkene fra 17. oktober har 1226; nye bygg med 1290 er startet.
+
+Egenkontroll 61 OK, én SJEKK om omriss, to små blinkruter kontrollert særskilt. Separat native mottak: 64 OK med uendrede grenser. Alle 64 sett som PNG mot originalene; 63 registrert tegnet i motoren. Fire siste blink-/snakkeprøver av korrigert kandidat har 130 skjermbufferkontroller uten avvik. Ikke naturlig gjennomspilling, separat Claude-kontroll eller Toms nye stilgodkjenning. Kjent kunstig rom49-hopp og andre motiv-/animasjonsfeil står fortsatt åpne. Se rapporter/opp-ned-20261016 på gpt-arbeid.
