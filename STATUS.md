@@ -88,3 +88,11 @@ Egenkontroll 61 OK, én SJEKK om omriss, to små blinkruter kontrollert særskil
 Sam-max-hd-2026-10-17 er publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-17. Begge pakker bruker main 6c181dec, hd-mod 5212c395 og 1290 native figurruter. Alle 19 531 runtime moddfiler er byteidentiske med publisert modd og hverandre; bare README.md utelates av pakkeskriptene. Nedlastingene og alle fire opplastede filer er sjekksumkontrollert.
 
 Linux består oppstart og Debian 12, og den nedlastede pakken har bestått inventar, akvarium, cafeteriarør og Sam opp ned med blinking og tale. Fem prøver, 99 skjermbufferkontroller uten avvik, alle fem prøvebildene sett. Pakkens uendrede motor og data med minimal ini, dummy lyd/skjerm, kopierte saves og isolerte hjemmemapper. Windows består automatisert oppstart med HD og MT-32. Ikke full gjennomspilling eller interaktiv Windows-test. Z-kantmålingene, bakgrunnsrester, costume204_286 og øvrige kjente begrensninger står åpne. Se rapporter/felles-release-20261017 på gpt-arbeid.
+
+## Gjennomspillingsagenten, 2026-10-17 (Claude)
+
+- Styringskanalen `DIGHD_STYRING` i motoren, `tools/styr.py`, `tools/gjennomspill.sh` og `docs/GJENNOMSPILLING.md`. Patchen er laget på nytt og passer på ScummVM c9091321 (`git apply --check` på en ren kopi); `engine/build.sh` bygget den.
+- Testet uten skjerm i Claude-økta med hd-mod fra 17. oktober: klikk, høyreklikk, taster, `kontroll`, bilder (HD, original, gult), lagre og laste, markørbytte, `klikkting` i et rom som ruller, og inventaret.
+- To ekte økter med Claude som spiller: den andre kom på 20 minutter fra introen til karnevalet (rom 7, 8, 9, 10 og 15), lagret 8 spill og skrev 6 funn. Agenten fant også en feil i `styr.py` (hel sti i `DIGHD_MANGLER` stoppet motoren), som er rettet.
+- Ikke testet: hele spillet, minispillene, en natt på Toms PC, `engine/test.sh` og romtesten etter patchendringen.
+

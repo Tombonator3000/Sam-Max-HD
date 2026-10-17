@@ -105,12 +105,14 @@ Krokene ligger i DigHD og virker for Sam & Max. Alle er miljøvariabler. Kjør m
 | `DIGHD_TEST_OBJSTATE`, `DIGHD_TEST_OBJSTATE_AT`, `DIGHD_TEST_OBJSTATE_EVERY` | Setter objekter i hver tilstand | |
 | `DIGHD_TEST_COSTUME`, `DIGHD_TEST_ACTOR`, `DIGHD_TEST_POS`, `DIGHD_TEST_PALETTE`, `DIGHD_TEST_CHORE_EVERY`, `DIGHD_TEST_WALK`, `DIGHD_TEST_CLIP` | Setter inn en skuespiller med et kostyme og spiller animasjonene, går eller klipper mot z-masken | For klassiske kostymer leses animasjonene fra COST-hodet (alle med en offset). Noen kostymer har animasjoner som peker utenfor kostymet (se `advarsler` i costumes.json) |
 | `DIGHD_SKIP_VIDEO` | Hopper over filmer | Ingen virkning, det er ingen SMUSH-filmer |
+| `DIGHD_STYRING` | En mappe der et program styrer spillet mens det går: `kommando.txt` (første linje `id N`, så klikk, høyreklikk, flytt, pek, tast, vent, kontroll, bilde, lagre, last, avslutt) og `status.json` tilbake (rom, kontroll, markørobjekt, ting på skjermen med navn og klikkpunkt, figurer, inventar, replikken, det som vises uten HD). `bilde` lagrer HD, originalpikslene og gult. Brukes av `tools/styr.py` og gjennomspillingsagenten (`docs/GJENNOMSPILLING.md`) | Lagt til 17. oktober. Markøren settes i v6 med `setCursorFromImg`, som melder objektet til DigHD bare for agenten (ingen endring i tegningen) |
 | `DIGHD_DEBUG_SOFT`, `DIGHD_DEBUG_BLAST`, `DIGHD_DEBUG_FACE` | Logger myke ruter, blast-objekter og valg i HD-skriften | |
 
 Verktøyene rundt:
 
 - `engine/test.sh`: lager en mod med `nearest` og sjekker at HD-bildet er likt originalen skalert opp (0 avvik, unntatt skalerte figurer).
 - `tools/romtest.sh`: kjører hvert rom uten skjerm og lager rapport og kontaktark.
+- `tools/styr.py` og `tools/gjennomspill.sh`: Claude spiller gjennom spillet uten skjerm med `DIGHD_STYRING` og skriver feil i `work/gjennomspill/FUNN.md`.
 - Begge virker med Sam & Max (se Testet over).
 
 ## Lærdom fra The Dig som gjelder her

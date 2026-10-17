@@ -4,6 +4,12 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [x] Gjennomspillingsagent (17. oktober, Claude): styringskanalen `DIGHD_STYRING` i motoren, `tools/styr.py`, `tools/gjennomspill.sh` og instruksen `docs/GJENNOMSPILLING.md`. Prøvd med ekte Claude uten skjerm her i skyen.
+- [ ] Tom: start gjennomspillingen på PC-en (`tools/gjennomspill.sh`), gjerne samtidig med grafikknatteskiftet. Funnene kommer i grenen `gjennomspilling`.
+- [ ] Rett HD-teksten for `^`: i spillets tekst er `^` tre prikker i spillets skrift, men HD-skriften tegner `^` («Loading Sounds...Please Wait», «people...except Max»). Funnet med styringen og av agenten 17. oktober.
+- [ ] Se på hodet og ørene til Max i kontoret (rom 7): større og annerledes plassert enn i originalen (funnet 17. oktober, `tools/styr.py`-avviket ved 112,96).
+- [ ] Figurer uten HD-tegning (katten i rom 9, Flambe i rom 15) skaleres opp automatisk og ser uskarpe ut, men gult-bildet og `dighd-uten-hd.txt` viser dem ikke. Bør telles som uten HD, så det synes hvilke figurer som mangler mest (agenten 17. oktober).
+- [ ] Samme patch i Dig-HD-Remake (styringskanalen er felles kode; v7 melder markøren gjennom `noteCursorObject`).
 - [x] Den lille inventory-knappen er nytegnet som fig001_01, costume001_002. Den er et figurkostyme, ikke objekt888. Egenkontroll og mottak OK, sett i spillet med inventar åpnet/lukket og null skjermbufferavvik. Arbeidsmodden får 38 nye Sam-ruter og denne esken; ny nedlastingspakke gjenstår.
 - [ ] Undersøk ekstra avvik ved det kunstige hoppet fra cafeteriasave til rom49: frame36 gir 160 skjermbufferavvik med de nye rutene, åtte med a6c286bd. Alle målte bilder etterpå er uten avvik. Naturlige rombytter er ikke prøvd. Se rapporter/figurer-videre-20261016 på gpt-arbeid.
 - [x] Fig204_01 til 05, Sam opp ned i rom40: 64 nye native ruter publisert i hd-mod 5212c395, totalt 1290. Blink- og øyeplassering rettet; siste fire motorprøver har 130 skjermbufferkontroller uten avvik. Rute286 er ikke observert tegnet, men PNG-en er kontrollert. Ikke Toms nye stilgodkjenning.

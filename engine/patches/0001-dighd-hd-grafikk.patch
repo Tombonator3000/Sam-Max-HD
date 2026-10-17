@@ -568,7 +568,7 @@ index 7e14948f..28f427e5 100644
  
  class NESCostumeRenderer : public BaseCostumeRenderer {
 diff --git a/engines/scumm/cursor.cpp b/engines/scumm/cursor.cpp
-index 21938706..17d0c967 100644
+index 21938706..eac1ba46 100644
 --- a/engines/scumm/cursor.cpp
 +++ b/engines/scumm/cursor.cpp
 @@ -28,6 +28,7 @@
@@ -613,7 +613,18 @@ index 21938706..17d0c967 100644
  	uint size;
  	byte *dst;
  
-@@ -777,6 +791,10 @@ void ScummEngine_v6::setCursorFromImg(uint img, uint room, uint imgindex) {
+@@ -734,6 +748,10 @@ void ScummEngine_v6::setCursorFromImg(uint img, uint room, uint imgindex) {
+ 	if (room == (uint) - 1)
+ 		room = getObjectRoom(img);
+ 
++	// DigHD: the playthrough agent is told which cursor is chosen (walk, look, use ...)
++	if (_digHD)
++		_digHD->noteControlCursor(img, imgindex);
++
+ 	findObjectInRoom(&foir, foCodeHeader | foImageHeader | foCheckAlreadyLoaded, img, room);
+ 	imhd = (const ImageHeader *)findResourceData(MKTAG('I','M','H','D'), foir.obim);
+ 
+@@ -777,6 +795,10 @@ void ScummEngine_v6::setCursorFromImg(uint img, uint room, uint imgindex) {
  #ifdef ENABLE_SCUMM_7_8
  void ScummEngine_v7::setCursorFromImg(uint img, uint room, uint imgindex) {
  	ScummEngine_v6::setCursorFromImg(img, room, imgindex);
@@ -624,7 +635,7 @@ index 21938706..17d0c967 100644
  
  	// There are several occasions in which the screen is not updated
  	// between subsequent cursor changes, and as a result we would never
-@@ -832,6 +850,8 @@ void ScummEngine_v6::useIm01Cursor(const byte *im, int w, int h) {
+@@ -832,6 +854,8 @@ void ScummEngine_v6::useIm01Cursor(const byte *im, int w, int h) {
  }
  
  void ScummEngine_v6::useBompCursor(const byte *im, int width, int height) {
@@ -635,10 +646,10 @@ index 21938706..17d0c967 100644
  	width *= 8;
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..cb4b5803
+index 00000000..0d8be76a
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,5447 @@
+@@ -0,0 +1,5839 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -962,33 +973,19 @@ index 00000000..cb4b5803
 +			const size_t colon = item.findFirstOf(':');
 +			if (colon == Common::String::npos || colon == 0)
 +				continue;
-+			const Common::String combo = item.substr(colon + 1);
-+			const size_t plus = combo.findLastOf('+');
-+			const Common::String name = plus == Common::String::npos ? combo : combo.substr(plus + 1);
 +			TestKey k;
-+			k.frame = atoi(item.substr(0, colon).c_str());
-+			if (name.size() == 1 && name[0] >= 'a' && name[0] <= 'z') {
-+				k.keycode = (Common::KeyCode)(Common::KEYCODE_a + (name[0] - 'a'));
-+				k.ascii = name[0];
-+			} else if (name.size() == 1 && name[0] >= '0' && name[0] <= '9') {
-+				k.keycode = (Common::KeyCode)(Common::KEYCODE_0 + (name[0] - '0'));
-+				k.ascii = name[0];
-+			} else if (name.size() >= 2 && name[0] == 'f' && atoi(name.c_str() + 1) >= 1 && atoi(name.c_str() + 1) <= 12) {
-+				k.keycode = (Common::KeyCode)(Common::KEYCODE_F1 + atoi(name.c_str() + 1) - 1);
-+				k.ascii = Common::ASCII_F1 + atoi(name.c_str() + 1) - 1;
-+			} else if (name == "space") {
-+				k.keycode = Common::KEYCODE_SPACE;
-+				k.ascii = ' ';
-+			} else if (name == "escape" || name == "esc") {
-+				k.keycode = Common::KEYCODE_ESCAPE;
-+				k.ascii = Common::ASCII_ESCAPE;
-+			} else {
++			if (!parseTestKey(item.substr(colon + 1), k))
 +				continue;
-+			}
-+			k.flags = (combo.contains("ctrl+") ? Common::KBD_CTRL : 0) |
-+			          (combo.contains("shift+") ? Common::KBD_SHIFT : 0) |
-+			          (combo.contains("alt+") ? Common::KBD_ALT : 0);
++			k.frame = atoi(item.substr(0, colon).c_str());
 +			_testKeys.push_back(k);
++		}
++	}
++
++	// DIGHD_STYRING=mappe: the playthrough agent plays through the folder (see controlFrame())
++	if (const char *ctl = getenv("DIGHD_STYRING")) {
++		if (*ctl) {
++			_ctlDir = Common::Path(ctl, Common::Path::kNativeSeparator);
++			debug("DigHD: controlled through %s", _ctlDir.toString(Common::Path::kNativeSeparator).c_str());
 +		}
 +	}
 +
@@ -5198,6 +5195,8 @@ index 00000000..cb4b5803
 +	// DIGHD_TEST_OBJSTATE: true at the end of a step, when the object shows the state
 +	const bool objStepEnd = testObjectStates();
 +
++	controlFrame();
++
 +	for (uint i = 0; i < _testKeys.size(); i++) {
 +		if (_testKeys[i].frame != (int)_frameNo)
 +			continue;
@@ -5684,25 +5683,7 @@ index 00000000..cb4b5803
 +	if (runOwner)
 +		_missCount[runOwner] += run;
 +	for (Common::HashMap<uint32, uint32>::const_iterator it = _missCount.begin(); it != _missCount.end(); ++it) {
-+		const uint32 o = it->_key;
-+		Common::String key;
-+		switch (o & (7u << 29)) {
-+		case kMissCel:
-+			key = Common::String::format("rute\tcostume%03d_%03d\t%d", (int)((o >> 12) & 0xFFF), (int)(o & 0xFFF), _room);
-+			break;
-+		case kMissObject:
-+			key = Common::String::format("objekt\tobj%03d_%02X\t%d", (int)((o >> 8) & 0x1FFFFF), (int)(o & 0xFF), _room);
-+			break;
-+		case kMissRoom:
-+			key = Common::String::format("rom\troom%03d\t%d", (int)(o & 0xFFFF), (int)(o & 0xFFFF));
-+			break;
-+		case kMissFilm:
-+			if ((o & 0xFFFF) < _missFilms.size())
-+				key = Common::String::format("film\t%s\t%d", _missFilms[o & 0xFFFF].c_str(), (int)_vm->_currentRoom);
-+			break;
-+		default:
-+			break;
-+		}
++		const Common::String key = missingKey(it->_key);
 +		if (!key.empty())
 +			noteMissing(key, it->_value);
 +	}
@@ -6085,13 +6066,435 @@ index 00000000..cb4b5803
 +	_statCelTint = _statCelKept = _statSoft = _statShade = _statShadeCel = 0;
 +}
 +
++
++bool DigHD::parseTestKey(const Common::String &comboIn, TestKey &k) const {
++	Common::String combo(comboIn);
++	combo.toLowercase();
++	const size_t plus = combo.findLastOf('+');
++	const Common::String name = plus == Common::String::npos ? combo : combo.substr(plus + 1);
++	if (name.size() == 1 && name[0] >= 'a' && name[0] <= 'z') {
++		k.keycode = (Common::KeyCode)(Common::KEYCODE_a + (name[0] - 'a'));
++		k.ascii = name[0];
++	} else if (name.size() == 1 && name[0] >= '0' && name[0] <= '9') {
++		k.keycode = (Common::KeyCode)(Common::KEYCODE_0 + (name[0] - '0'));
++		k.ascii = name[0];
++	} else if (name.size() >= 2 && name[0] == 'f' && atoi(name.c_str() + 1) >= 1 && atoi(name.c_str() + 1) <= 12) {
++		k.keycode = (Common::KeyCode)(Common::KEYCODE_F1 + atoi(name.c_str() + 1) - 1);
++		k.ascii = Common::ASCII_F1 + atoi(name.c_str() + 1) - 1;
++	} else if (name == "space") {
++		k.keycode = Common::KEYCODE_SPACE;
++		k.ascii = ' ';
++	} else if (name == "escape" || name == "esc") {
++		k.keycode = Common::KEYCODE_ESCAPE;
++		k.ascii = Common::ASCII_ESCAPE;
++	} else if (name == "enter" || name == "return") {
++		k.keycode = Common::KEYCODE_RETURN;
++		k.ascii = Common::ASCII_RETURN;
++	} else if (name == "period" || name == ".") {
++		k.keycode = Common::KEYCODE_PERIOD;
++		k.ascii = '.';
++	} else {
++		return false;
++	}
++	k.flags = (combo.contains("ctrl+") ? Common::KBD_CTRL : 0) |
++	          (combo.contains("shift+") ? Common::KBD_SHIFT : 0) |
++	          (combo.contains("alt+") ? Common::KBD_ALT : 0);
++	return true;
++}
++
++Common::String DigHD::missingKey(uint32 o) const {
++	switch (o & (7u << 29)) {
++	case kMissCel:
++		return Common::String::format("rute\tcostume%03d_%03d\t%d", (int)((o >> 12) & 0xFFF), (int)(o & 0xFFF), _room);
++	case kMissObject:
++		return Common::String::format("objekt\tobj%03d_%02X\t%d", (int)((o >> 8) & 0x1FFFFF), (int)(o & 0xFF), _room);
++	case kMissRoom:
++		return Common::String::format("rom\troom%03d\t%d", (int)(o & 0xFFFF), (int)(o & 0xFFFF));
++	case kMissFilm:
++		if ((o & 0xFFFF) < _missFilms.size())
++			return Common::String::format("film\t%s\t%d", _missFilms[o & 0xFFFF].c_str(), (int)_vm->_currentRoom);
++		return Common::String();
++	default:
++		return Common::String();
++	}
++}
++
++bool DigHD::playerHasControl() const {
++	// The game takes the cursor and the input away in cut scenes and while
++	// it walks, talks or plays something by itself
++	return _vm->_userPut > 0 && _vm->_cursor.state > 0;
++}
++
++static Common::String jsonText(const Common::String &in) {
++	Common::String out;
++	for (uint i = 0; i < in.size(); i++) {
++		const byte c = (byte)in[i];
++		if (c == '"' || c == '\\') {
++			out += '\\';
++			out += (char)c;
++		} else if (c == '\t') {
++			out += "\\t";
++		} else if (c >= 32 && c < 127) {
++			out += (char)c;
++		}  // the game's own control codes and characters outside ASCII are left out
++	}
++	return out;
++}
++
++static Common::String gameText(const byte *p, int max) {
++	// The game's strings have control codes (0xFF and an argument); only the text is kept
++	Common::String out;
++	for (int i = 0; i < max && p && p[i]; i++) {
++		if (p[i] == 0xFF || p[i] == 0xFE) {
++			const byte code = i + 1 < max ? p[i + 1] : 0;
++			i += (code == 1 || code == 2 || code == 3 || code == 8) ? 1 : 3;
++			out += ' ';
++			continue;
++		}
++		if (p[i] < 32)
++			out += ' ';  // line breaks
++		else if (p[i] < 127)
++			out += (char)p[i];
++	}
++	return out;
++}
++
++/*
++ * DIGHD_STYRING: the playthrough agent. Each new kommando.txt (first line "id N",
++ * N higher than the last one) is read once; the commands run in order, frame by
++ * frame, and status.json is written when they are done. Coordinates are original
++ * screen pixels (320 x 200), as the agent sees them in the images divided by 4.
++ *
++ *   klikk X Y        left button at X,Y (down, up 3 frames later)
++ *   hoyreklikk X Y   right button (Sam & Max: the next cursor)
++ *   flytt X Y        the mouse to X,Y without a click
++ *   klikkting NR     left click on thing NR where it is on the screen now (also hoyreklikkting)
++ *   pek X Y          the object under X,Y in the status (no click); can be given many times
++ *   tast COMBO       a key, as in DIGHD_TEST_KEYS (ctrl+h, f5, escape, period, 1)
++ *   vent N           N frames
++ *   kontroll [N]     until the player has control again (cursor and input), at most N frames (900)
++ *   bilde NAVN       NAVN.png (HD), NAVN_flat.png (original pixels) and NAVN_gult.png (yellow where HD is missing)
++ *   lagre SLOT TEKST save the game in SLOT (samnmax.sNN), as from the menu
++ *   last SLOT        load SLOT
++ *   avslutt          quit
++ */
++void DigHD::controlFrame() {
++	if (_ctlDir.empty())
++		return;
++
++	if (_ctlUpAt >= 0) {
++		if ((int)_frameNo < _ctlUpAt)
++			return;
++		Common::Event ev;
++		ev.mouse = Common::Point(_ctlMouse.x * _scale + _scale / 2, _ctlMouse.y * _scale + _scale / 2);
++		ev.type = _ctlRight ? Common::EVENT_RBUTTONUP : Common::EVENT_LBUTTONUP;
++		g_system->getEventManager()->pushEvent(ev);
++		_ctlUpAt = -1;
++	}
++	if (_ctlWaitUntil >= 0) {
++		if ((int)_frameNo < _ctlWaitUntil)
++			return;
++		_ctlWaitUntil = -1;
++	}
++	if (_ctlControlUntil >= 0) {
++		if (!playerHasControl() && (int)_frameNo < _ctlControlUntil)
++			return;
++		if (!playerHasControl())
++			_ctlError += "kontroll: spilleren fikk ikke kontrollen tilbake; ";
++		_ctlControlUntil = -1;
++	}
++
++	while (!_ctlQueue.empty()) {
++		const ControlCmd c = _ctlQueue.front();
++		_ctlQueue.remove_at(0);
++		runControl(c);
++		if (_ctlUpAt >= 0 || _ctlWaitUntil >= 0 || _ctlControlUntil >= 0)
++			return;
++	}
++
++	if (_ctlBusy) {
++		_ctlBusy = false;
++		writeControlStatus();
++		return;
++	}
++
++	// A new command file? Looked for every third frame.
++	if (_frameNo % 3)
++		return;
++	Common::FSNode node(_ctlDir.join("kommando.txt"));
++	if (!node.exists())
++		return;
++	Common::SeekableReadStream *in = node.createReadStream();
++	if (!in)
++		return;
++	Common::Array<ControlCmd> cmds;
++	int id = 0;
++	while (!in->eos() && !in->err()) {
++		Common::String line = in->readLine();
++		line.trim();
++		if (line.empty() || line[0] == '#')
++			continue;
++		ControlCmd c;
++		const size_t sp = line.findFirstOf(' ');
++		c.verb = sp == Common::String::npos ? line : line.substr(0, sp);
++		c.rest = sp == Common::String::npos ? Common::String() : line.substr(sp + 1);
++		c.rest.trim();
++		c.verb.toLowercase();
++		sscanf(c.rest.c_str(), "%d %d", &c.a, &c.b);
++		if (c.verb == "id")
++			id = c.a;
++		else
++			cmds.push_back(c);
++	}
++	delete in;
++	if (id <= _ctlLastId)
++		return;  // done already, or written while we read it (the agent writes a new file and renames it)
++	_ctlLastId = _ctlId = id;
++	_ctlQueue = cmds;
++	_ctlBusy = true;
++	_ctlError.clear();
++	_ctlPointed.clear();
++	debug("DigHD: control, %u commands with id %d at frame %u", cmds.size(), id, _frameNo);
++}
++
++void DigHD::runControl(const ControlCmd &c) {
++	const int xstart = _vm->_virtscr[kMainVirtScreen].xstart;
++	if (c.verb == "klikk" || c.verb == "hoyreklikk") {
++		_ctlRight = c.verb == "hoyreklikk";
++		_ctlMouse = Common::Point(CLIP(c.a, 0, _w - 1), CLIP(c.b, 0, _h - 1));
++		Common::Event ev;
++		ev.mouse = Common::Point(_ctlMouse.x * _scale + _scale / 2, _ctlMouse.y * _scale + _scale / 2);
++		ev.type = Common::EVENT_MOUSEMOVE;
++		g_system->getEventManager()->pushEvent(ev);
++		ev.type = _ctlRight ? Common::EVENT_RBUTTONDOWN : Common::EVENT_LBUTTONDOWN;
++		g_system->getEventManager()->pushEvent(ev);
++		_ctlUpAt = _frameNo + 3;
++	} else if (c.verb == "klikkting" || c.verb == "hoyreklikkting") {
++		// A click on a thing by its number, where it is on the screen now (rooms
++		// that scroll move the camera while Sam walks, so a point from an earlier
++		// status can be wrong). The middle of the thing, or the first point in it
++		// that finds the thing, as the verb scripts see it.
++		const int ytop = _vm->_virtscr[kMainVirtScreen].topline;
++		int at = -1;
++		for (int i = 1; i < _vm->_numLocalObjects; i++)
++			if (_vm->_objs[i].obj_nr == c.a)
++				at = i;
++		if (at < 0) {
++			_ctlError += Common::String::format("%s: ting %d er ikke i rommet; ", c.verb.c_str(), c.a);
++			return;
++		}
++		const ObjectData &od = _vm->_objs[at];
++		Common::Point hit(-1, -1);
++		const int mx = od.x_pos + od.width / 2, my = od.y_pos + od.height / 2;
++		if (_vm->findObject(mx, my) == c.a)
++			hit = Common::Point(mx, my);
++		for (int y = od.y_pos + 2; hit.x < 0 && y < od.y_pos + od.height; y += 4)
++			for (int x = od.x_pos + 2; hit.x < 0 && x < od.x_pos + od.width; x += 4)
++				if (x - xstart >= 0 && x - xstart < _w && _vm->findObject(x, y) == c.a)
++					hit = Common::Point(x, y);
++		if (hit.x < 0 || hit.x - xstart < 0 || hit.x - xstart >= _w) {
++			_ctlError += Common::String::format("%s: ting %d er ikke synlig på skjermen nå; ", c.verb.c_str(), c.a);
++			return;
++		}
++		ControlCmd click;
++		click.verb = c.verb == "klikkting" ? "klikk" : "hoyreklikk";
++		click.a = hit.x - xstart;
++		click.b = hit.y - ytop;
++		runControl(click);
++	} else if (c.verb == "flytt") {
++		Common::Event ev;
++		ev.mouse = Common::Point(CLIP(c.a, 0, _w - 1) * _scale + _scale / 2, CLIP(c.b, 0, _h - 1) * _scale + _scale / 2);
++		ev.type = Common::EVENT_MOUSEMOVE;
++		g_system->getEventManager()->pushEvent(ev);
++		_ctlWaitUntil = _frameNo + 2;
++	} else if (c.verb == "pek") {
++		const int obj = _vm->findObject(c.a + xstart, c.b);
++		const byte *name = obj ? _vm->getObjOrActorName(obj) : nullptr;
++		if (!_ctlPointed.empty())
++			_ctlPointed += ", ";
++		_ctlPointed += Common::String::format("{\"x\": %d, \"y\": %d, \"nr\": %d, \"navn\": \"%s\"}", c.a, c.b, obj,
++		                                      jsonText(name ? (const char *)name : "").c_str());
++	} else if (c.verb == "tast") {
++		TestKey k;
++		if (!parseTestKey(c.rest, k)) {
++			_ctlError += Common::String::format("ukjent tast %s; ", c.rest.c_str());
++			return;
++		}
++		Common::Event ev;
++		ev.type = Common::EVENT_KEYDOWN;
++		ev.kbd = Common::KeyState(k.keycode, k.ascii, k.flags);
++		g_system->getEventManager()->pushEvent(ev);
++		ev.type = Common::EVENT_KEYUP;
++		g_system->getEventManager()->pushEvent(ev);
++		_ctlWaitUntil = _frameNo + 2;
++	} else if (c.verb == "vent") {
++		_ctlWaitUntil = _frameNo + MAX(1, c.a);
++	} else if (c.verb == "kontroll") {
++		_ctlControlUntil = _frameNo + (c.a > 0 ? c.a : 900);
++		_ctlWaitUntil = _frameNo + 2;  // the click before gets to take the control first
++	} else if (c.verb == "bilde") {
++		if (c.rest.empty() || c.rest.contains('/') || c.rest.contains('\\') || c.rest.contains(".."))
++			_ctlError += "bilde: ugyldig navn; ";
++		else
++			controlImage(c.rest);
++	} else if (c.verb == "lagre") {
++		const size_t sp = c.rest.findFirstOf(' ');
++		const Common::String desc = sp == Common::String::npos ? Common::String::format("Agent %d", c.a) : c.rest.substr(sp + 1);
++		if (c.a < 1 || c.a > 99)
++			_ctlError += "lagre: plass 1 til 99; ";
++		else
++			_vm->requestSave(c.a, desc);
++		_ctlWaitUntil = _frameNo + 10;
++	} else if (c.verb == "last") {
++		if (c.a < 0 || c.a > 99)
++			_ctlError += "last: plass 0 til 99; ";
++		else
++			_vm->requestLoad(c.a);
++		_ctlWaitUntil = _frameNo + 30;
++	} else if (c.verb == "avslutt") {
++		writeControlStatus();
++		_vm->quitGame();
++	} else if (c.verb != "status") {
++		_ctlError += Common::String::format("ukjent kommando %s; ", c.verb.c_str());
++	}
++}
++
++void DigHD::controlImage(const Common::String &name) {
++	Graphics::Surface s;
++	s.init(_w * _scale, _h * _scale, _w * _scale * _fmt.bytesPerPixel, _outBuf.data(), _fmt);
++	const bool showMissing = _showMissing;
++	struct Pass {
++		const char *suffix;
++		bool flat, yellow;
++	};
++	static const Pass passes[] = { { "", false, false }, { "_flat", true, false }, { "_gult", false, true } };
++	for (int i = 0; i < ARRAYSIZE(passes); i++) {
++		_forceFlat = passes[i].flat;
++		_showMissing = passes[i].yellow;
++		compose(0, 0, _w, _h);
++		Common::FSNode node(_ctlDir.join(name + passes[i].suffix + ".png"));
++		if (Common::WriteStream *ws = node.createWriteStream()) {
++			::Image::writePNG(*ws, s);
++			ws->finalize();
++			delete ws;
++		} else {
++			_ctlError += Common::String::format("bilde: kunne ikke skrive %s; ", name.c_str());
++		}
++	}
++	_forceFlat = false;
++	_showMissing = showMissing;
++	compose(0, 0, _w, _h);
++}
++
++void DigHD::writeControlStatus() {
++	ScummEngine *vm = _vm;
++	const VirtScreen &vs = vm->_virtscr[kMainVirtScreen];
++	const int xstart = vs.xstart, ytop = vs.topline;
++	Common::String j = Common::String::format(
++		"{\n\"id\": %d,\n\"bilde\": %u,\n\"rom\": %d,\n\"kontroll\": %s,\n\"userput\": %d,\n\"markor\": %d,\n\"kamera\": %d,\n",
++		_ctlId, _frameNo, (int)vm->_currentRoom, playerHasControl() ? "true" : "false", (int)vm->_userPut,
++		(int)vm->_cursor.state, (int)vm->camera._cur.x);
++
++	const int ego = vm->VAR_EGO != 0xFF ? vm->VAR(vm->VAR_EGO) : 0;
++	j += Common::String::format("\"ego\": %d,\n", ego);
++
++	// The cursor: Sam & Max draws an object as the cursor (walk, look, use, talk, pick up,
++	// or a thing from the inventory). Its name says which one is chosen.
++	const int cursorObj = _ctlCursorObj ? _ctlCursorObj : _cursorObject;
++	const int cursorState = _ctlCursorObj ? _ctlCursorState : _cursorState;
++	const byte *cursorName = cursorObj > 0 ? vm->getObjOrActorName(cursorObj) : nullptr;
++	j += Common::String::format("\"markor_objekt\": {\"nr\": %d, \"tilstand\": %d, \"navn\": \"%s\"},\n", cursorObj,
++	                            cursorState, jsonText(cursorName ? (const char *)cursorName : "").c_str());
++
++	// Objects on the screen that can be clicked, with names where they have one (the middle is where to click)
++	j += "\"objekter\": [";
++	bool first = true;
++	for (int i = 1; i < vm->_numLocalObjects; i++) {
++		const ObjectData &od = vm->_objs[i];
++		if (!od.obj_nr || vm->getClass(od.obj_nr, kObjectClassUntouchable))
++			continue;
++		// Things without a name are listed too: exits and stairs are often such objects
++		const byte *name = vm->getObjOrActorName(od.obj_nr);
++		if (!name)
++			name = (const byte *)"";
++		const int x = od.x_pos - xstart, y = od.y_pos - ytop, w = od.width, h = od.height;
++		if (x + w <= 0 || x >= _w || y + h <= 0 || y >= _h || w <= 0 || h <= 0)
++			continue;
++		const int cx = CLIP(x + w / 2, 0, _w - 1), cy = CLIP(y + h / 2, 0, _h - 1);
++		// Things from another room (fl_object_index) are the inventory box and its icons
++		j += Common::String::format("%s\n  {\"nr\": %d, \"navn\": \"%s\", \"x\": %d, \"y\": %d, \"venstre\": %d, \"topp\": %d, \"b\": %d, \"h\": %d, \"tilstand\": %d, \"under_midten\": %d, \"fra_annet_rom\": %s}",
++		                            first ? "" : ",", od.obj_nr, jsonText((const char *)name).c_str(), cx, cy, x, y, w, h,
++		                            (int)vm->getState(od.obj_nr), vm->findObject(cx + xstart, cy + ytop),
++		                            od.fl_object_index ? "true" : "false");
++		first = false;
++	}
++	j += "\n],\n";
++
++	// Figures in the room
++	j += "\"figurer\": [";
++	first = true;
++	for (int i = 1; i < vm->_numActors; i++) {
++		Actor *a = vm->_actors[i];
++		if (!a || !a->isInCurrentRoom() || !a->_costume)
++			continue;
++		const byte *name = vm->getObjOrActorName(vm->actorToObj(i));
++		const Common::Point p = a->getRealPos();
++		j += Common::String::format("%s\n  {\"nr\": %d, \"navn\": \"%s\", \"x\": %d, \"y\": %d, \"synlig\": %s}",
++		                            first ? "" : ",", i, jsonText(name ? (const char *)name : "").c_str(),
++		                            p.x - xstart, p.y - ytop, a->_visible ? "true" : "false");
++		first = false;
++	}
++	j += "\n],\n";
++
++	// The inventory of the one the player plays
++	j += "\"inventar\": [";
++	first = true;
++	for (int i = 1; ego > 0 && i <= 80; i++) {
++		const int obj = vm->findInventory(ego, i);
++		if (!obj)
++			break;
++		const byte *name = vm->getObjOrActorName(obj);
++		j += Common::String::format("%s{\"nr\": %d, \"navn\": \"%s\"}", first ? "" : ", ", obj,
++		                            jsonText(name ? (const char *)name : "").c_str());
++		first = false;
++	}
++	j += "],\n";
++
++	// The line being said or shown now
++	j += Common::String::format("\"tekst\": \"%s\",\n",
++	                            vm->_haveMsg ? jsonText(gameText(vm->_charsetBuffer, sizeof(vm->_charsetBuffer))).c_str() : "");
++
++	// What the screen shows without HD now (as in the missing-HD log)
++	j += "\"uten_hd\": [";
++	first = true;
++	for (Common::HashMap<uint32, uint32>::const_iterator it = _missCount.begin(); it != _missCount.end(); ++it) {
++		const Common::String key = missingKey(it->_key);
++		if (key.empty())
++			continue;
++		j += Common::String::format("%s{\"hva\": \"%s\", \"px\": %u}", first ? "" : ", ", jsonText(key).c_str(), it->_value);
++		first = false;
++	}
++	j += "],\n";
++
++	j += Common::String::format("\"pekt\": [%s],\n", _ctlPointed.c_str());
++	j += Common::String::format("\"feil\": \"%s\"\n}\n", jsonText(_ctlError).c_str());
++
++	Common::FSNode node(_ctlDir.join("status.json"));
++	if (Common::WriteStream *ws = node.createWriteStream()) {
++		ws->writeString(j);
++		ws->finalize();
++		delete ws;
++	}
++	debug("DigHD: control, status for id %d at frame %u (room %d)", _ctlId, _frameNo, (int)vm->_currentRoom);
++}
++
 +} // End of namespace Scumm
 diff --git a/engines/scumm/dighd.h b/engines/scumm/dighd.h
 new file mode 100644
-index 00000000..bbeafe80
+index 00000000..340c057d
 --- /dev/null
 +++ b/engines/scumm/dighd.h
-@@ -0,0 +1,647 @@
+@@ -0,0 +1,678 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -6260,6 +6663,7 @@ index 00000000..bbeafe80
 +	void moveScreen(int dx, int dy, int height);
 +	/** Object/state selected by setCursorFromImg; zero clears a buffer or builtin cursor. */
 +	void noteCursorObject(int obj, int state);
++	void noteControlCursor(int obj, int state) { _ctlCursorObj = obj; _ctlCursorState = state; }
 +	void updateCursor(const byte *cursor, int width, int height, int hotspotX, int hotspotY, int transColor);
 +	void noteObject(int obj, int state, int x, int y, int width, int height);
 +
@@ -6654,6 +7058,29 @@ index 00000000..bbeafe80
 +		int args[16];
 +	};
 +	Common::Array<TestScript> _testScripts;  // DIGHD_TEST_SCRIPT
++
++	// DIGHD_STYRING=mappe: a program outside (the playthrough agent) plays the game.
++	// It writes kommando.txt in the folder (first line "id N", then one command per
++	// line); the engine runs the commands of a new id, frame by frame, and then
++	// writes status.json there (room, who has control, objects and figures on the
++	// screen with names and places, the inventory, what is shown without HD). See
++	// controlFrame() for the commands.
++	struct ControlCmd {
++		Common::String verb, rest;
++		int a = 0, b = 0;
++	};
++	Common::Path _ctlDir;
++	Common::Array<ControlCmd> _ctlQueue;
++	int _ctlLastId = 0, _ctlId = 0;
++	bool _ctlBusy = false;
++	int _ctlWaitUntil = -1;     // vent: the frame to go on
++	int _ctlControlUntil = -1;  // kontroll: wait for the player's control until this frame
++	int _ctlUpAt = -1;          // klikk: the button goes up at this frame
++	bool _ctlRight = false;
++	Common::Point _ctlMouse;
++	Common::String _ctlPointed;  // pek: the object under a point, for the status
++	Common::String _ctlError;
++	int _ctlCursorObj = 0, _ctlCursorState = 0;  // the cursor object the game set last (v6)
 +	uint32 _frameNo = 0;
 +	Common::Path _dumpDir;
 +	int _dumpEvery = 0;
@@ -6690,6 +7117,13 @@ index 00000000..bbeafe80
 +	int _testObjAt = 30, _testObjEvery = 40, _testObjStep = -1, _testObjRoom = -1;
 +	uint32 _testObjFrom = 0;  // first frame of the first step
 +	bool testObjectStates();
++	bool parseTestKey(const Common::String &combo, TestKey &k) const;
++	void controlFrame();
++	void runControl(const ControlCmd &c);
++	void controlImage(const Common::String &name);
++	void writeControlStatus();
++	bool playerHasControl() const;
++	Common::String missingKey(uint32 owner) const;
 +	bool testObjectDrawable(int obj, int state);
 +	void holdTestObject(int obj, int state, const char *why);
 +	void putTestObjectState(int obj, int state);

@@ -134,3 +134,12 @@ Faste fakta og beslutninger. Oppdateres når noe endrer seg.
 - 16. oktober 09:11: Linux-release er oppdatert fra main 74ab2af2 med hd-mod a6c286bd (1095 native figurruter). Nedlastet AppImage SHA-256 551b03aea0e1c022b34288f1fe7e738844b2472f8c1d2a98825a7c0b2e575a9b består. De tre lokale spillprøvene inventar/akvarium/cafeteriarør består med pakkens egen motor og grafikk. Nettutgaven er også publisert fra samme kildecommit; faktisk WASM SHA-256 f83ae4bfe25ed0e34bbf5bf32e00b22ceea368c5a7fa1f660f21f05d20989756 stemmer med manifestet. Webspilling og ny Windows-pakke er ikke kontrollert i denne runden. Rapport og skjermbilder ligger på gpt-arbeid under rapporter/utgivelse-20261016-0915.
 
 - 16. oktober 12:28: Felles release sam-max-hd-2026-10-16 er publisert som Latest med Linux-AppImage og Windows-ZIP og hver sin SHA-256-fil. Begge er bygget fra kode 9b5a9197 og hd-mod a6c286bd. Linux-bygg 38886201631, Windows-bygg 38866752358. Alle 19 336 moddfiler er identiske. Linux SHA-256 aac361d35fdd801b31f966c4e4c9abdb51d28c8f439f6527c43bd27d08bf1f18, Windows ed34bc93a22bb3d2b4a1c43941122496c93e1f65ff4f798bebd9d8ff2a5e5425. Gamle plattformreleaser er beholdt. Alle kode-PR-er 1 til 33 er flettet. Tre grafikkstasher er i tillegg bevart som historisk arkiv på gpt-arbeid, rapporter/bevart-stash-20261016; de erstatter ikke nyere leveranser, de opprinnelige stashene er beholdt, og alle 72 godkjente resultat-SHA-er er uendret.
+
+## Gjennomspillingsagenten (17. oktober 2026)
+
+- `DIGHD_STYRING=mappe` i motoren: `kommando.txt` med `id N` først (bare en høyere id kjøres), `status.json` tilbake. Klikk er originalpiksler. `bilde` lagrer HD, `_flat` og `_gult`. Se `controlFrame()` i `dighd.cpp` og `docs/HD-MOTOR.md`.
+- Markøren i Sam & Max er et objekt (v6 `setCursorFromImg`). Rekkefølgen med høyreklikk: gå 889, se 883, hånd 884, snakk 885, hånd med figur 886. Over noe brukbart: gå 890, se 875, hånd 876, figur 878. Objektene har ikke navn i spillet.
+- Spilleren beholder kontrollen mens Sam går. Etter et gåklikk må agenten vente (`vent`), ikke `kontroll`.
+- `DIGHD_MANGLER` tar bare et filnavn i lagringsmappen. En hel sti stopper motoren med en assert i posix-fs (agenten fant det 17. oktober).
+- `tools/gjennomspill.sh` kopierer modden (hardlenker) og motoren til `work/gjennomspill`, så natteskiftet kan bygge ny modd mens agenten spiller. Funnene pushes til grenen `gjennomspilling`, ikke `main`.
+
