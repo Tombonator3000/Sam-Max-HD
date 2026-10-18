@@ -88,3 +88,12 @@ Egenkontroll 61 OK, én SJEKK om omriss, to små blinkruter kontrollert særskil
 Sam-max-hd-2026-10-17 er publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-17. Begge pakker bruker main 6c181dec, hd-mod 5212c395 og 1290 native figurruter. Alle 19 531 runtime moddfiler er byteidentiske med publisert modd og hverandre; bare README.md utelates av pakkeskriptene. Nedlastingene og alle fire opplastede filer er sjekksumkontrollert.
 
 Linux består oppstart og Debian 12, og den nedlastede pakken har bestått inventar, akvarium, cafeteriarør og Sam opp ned med blinking og tale. Fem prøver, 99 skjermbufferkontroller uten avvik, alle fem prøvebildene sett. Pakkens uendrede motor og data med minimal ini, dummy lyd/skjerm, kopierte saves og isolerte hjemmemapper. Windows består automatisert oppstart med HD og MT-32. Ikke full gjennomspilling eller interaktiv Windows-test. Z-kantmålingene, bakgrunnsrester, costume204_286 og øvrige kjente begrensninger står åpne. Se rapporter/felles-release-20261017 på gpt-arbeid.
+
+
+## Strikkhopp, 2026-10-18 13:40
+
+Ti nye ark (fig307_01 til 05 og fig312_01 til 05), 96 native HD-ruter, publisert og hentet tilbake i hd-mod f7a3f275. Alle 96 består egenkontroll og separat mottak med uendrede grenser. Alle 96 visuelt sett mot originalen og som motorutsnitt, og registrert tegnet i tvungne animasjoner. 340 skjermbufferkontroller fra figurstart uten avvik. Ikke naturlig gjennomspilling, separat Claude-kontroll eller ny stilgodkjenning fra Tom.
+
+Kjent kunstig rom61-hopp gir 160 avvik ved frame 36 også med uendret grunnlag 5212c395, før figuren settes inn ved frame 40. Første assert stoppet; baselineforklaringen og rålogger er bevart. Dette er ikke rettet i grafikkrunden. Z-kantmålingene og øvrige kjente motiv-/bakgrunnsfeil står åpne.
+
+40 beskyttede kildefiler uendret, alle 19 526 tidligere PNG-er bevart, alle 19 622 kandidat-PNG-er identiske med publisert modd. 1386 native totalt. Direkte telling 128 av 1758 figurjobber med resultat, 1630 mangler pluss returer. Neste fig314_01 til 04, så fig294_01 til 02. Rapport, prompter, kilde-/motorbilder og importkvittering i gpt-arbeid/rapporter/strikkhopp-20261018. Nedlastingspakkene må bygges på nytt for å få de 96 siste rutene.
