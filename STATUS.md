@@ -97,3 +97,10 @@ Ti nye ark (fig307_01 til 05 og fig312_01 til 05), 96 native HD-ruter, publisert
 Kjent kunstig rom61-hopp gir 160 avvik ved frame 36 også med uendret grunnlag 5212c395, før figuren settes inn ved frame 40. Første assert stoppet; baselineforklaringen og rålogger er bevart. Dette er ikke rettet i grafikkrunden. Z-kantmålingene og øvrige kjente motiv-/bakgrunnsfeil står åpne.
 
 40 beskyttede kildefiler uendret, alle 19 526 tidligere PNG-er bevart, alle 19 622 kandidat-PNG-er identiske med publisert modd. 1386 native totalt. Direkte telling 128 av 1758 figurjobber med resultat, 1630 mangler pluss returer. Neste fig314_01 til 04, så fig294_01 til 02. Rapport, prompter, kilde-/motorbilder og importkvittering i gpt-arbeid/rapporter/strikkhopp-20261018. Nedlastingspakkene må bygges på nytt for å få de 96 siste rutene.
+
+
+## Felles nedlasting med 1386 ruter, 2026-10-18 14:00
+
+Sam-max-hd-2026-10-18 er publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-18. Begge pakker fra main ed7a1fac og hd-mod f7a3f275, 1386 native ruter. Alle 19 627 runtime moddfiler identiske med publisert modd og hverandre; sjekksummer og alle fire opplastede filer verifisert. Grafikken fra dagens ti ark er med. Ingen ny motorkode siden forrige fellespakke.
+
+Linux består oppstart og Debian 12; Windows består automatisert oppstart med HD og MT-32. Den nedlastede produksjons-Linux-pakken har ni lokale prøver, alle 44 kostyme312-ruter observert, 350 skjermbufferkontroller fra figurstart uten avvik. Fire kjente oppstartsavvik 160 ved frame 36 før testfigur, øvrige målinger null. Åtte prøvebilder sett. Ikke full naturlig gjennomspilling, interaktiv Windows-test eller ny nettleserprøve. Bakgrunns-/kantrester, z-kantmålinger, uobservert costume204_286 og stilkontroll står fortsatt åpne. Se gpt-arbeid/rapporter/felles-release-20261018.
