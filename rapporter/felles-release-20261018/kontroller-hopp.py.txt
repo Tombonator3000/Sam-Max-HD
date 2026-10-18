@@ -1,0 +1,85 @@
+"""Kontroller den nedlastede pakken med egne hjemmemapper og kopierte saves."""
+import hashlib, json, os, re, shutil, subprocess, time
+from pathlib import Path
+ROOT=Path(__file__).resolve().parent
+PACKAGE=ROOT/'linux/squashfs-root'
+DATA=PACKAGE/'usr/share/sam-max-hd'
+MOD=DATA/'mods/gpt'
+BINARY=PACKAGE/'usr/bin/scummvm'
+SAVES=ROOT/'saves'
+SAVES.mkdir(exist_ok=True)
+for source in Path('/home/tom/Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/feilrunde2-grunnlag/saves').glob('samnmax.s*'):
+    shutil.copy2(source,SAVES/source.name)
+scenes=[
+ ('inventory',2,{'DIGHD_TEST_CLICKS':'80:10/185,160:210/30'},280),
+ ('akvarium',1,{'DIGHD_TEST_ROOM':'16','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'320'},240),
+ ('cafeteria',2,{'DIGHD_TEST_ROOM':'30','DIGHD_TEST_AT':'10'},240),
+]
+for label,animation in [('sam-oppned-blink',3),('sam-oppned-snakke',4)]:
+    scenes.append((label,2,{'DIGHD_TEST_ROOM':'40','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'204',
+    'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255',
+    'DIGHD_TEST_POS':'160,80','DIGHD_TEST_ANIMATION':str(animation),'DIGHD_DEBUG_SOFT':'1','DIGHD_DUMP_EVERY':'4'},160))
+# Ny grafikk testes med produksjonsmotoren uten lokal retningskrok.
+# Den publiserte testen velger retning2 ved eksplisitt animasjon.
+# Den første312-prøven følger kildens ordinære animasjonsliste i500 bilder.
+# Denne når bare forberedelsen i chore1; kontroller-hopp.py spiller derfor
+# hele chore7 separat. De opprinnelige åtte prøveutfallene beholdes.
+for label,animation,frames in [('sam-sele-staa',3,120),('sam-sele-tale',4,160)]:
+    scenes.append((label,2,{'DIGHD_TEST_ROOM':'61','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'307',
+    'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255',
+    'DIGHD_TEST_POS':'160,180','DIGHD_TEST_ANIMATION':str(animation),'DIGHD_DEBUG_SOFT':'1','DIGHD_DUMP_EVERY':'4'},frames))
+scenes.append(('sam-max-strikkhopp',2,{'DIGHD_TEST_ROOM':'61','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'312',
+    'DIGHD_TEST_CHORE_EVERY':'200','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255',
+    'DIGHD_TEST_POS':'160,180','DIGHD_DEBUG_SOFT':'1','DIGHD_DUMP_EVERY':'4'},500))
+scenes=[('sam-max-hopp-sekvens',2,{'DIGHD_TEST_ROOM':'61','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'312',
+'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255',
+'DIGHD_TEST_POS':'160,180','DIGHD_TEST_ANIMATION':'7','DIGHD_DEBUG_SOFT':'1','DIGHD_DUMP_EVERY':'4'},440)]
+rows=[]
+for label,slot,extra,frames in scenes:
+    target=ROOT/('test-'+label)
+    home=target/'home'
+    home.mkdir(parents=True,exist_ok=True)
+    env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')}
+    env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),
+    'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(PACKAGE/'usr/lib'),
+    'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(MOD),'DIGHD_VERIFY':'1',
+    'DIGHD_QUIT_AT':str(frames),'DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'40','DIGHD_DUMP_FLAT':'1',
+    'DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0'})
+    env.update(extra)
+    cmd=[str(BINARY),'--config='+str(target/'scummvm.ini'),'--path='+str(DATA/'game'),
+    '--savepath='+str(SAVES),'--save-slot='+str(slot),'--gfx-mode=normal','--no-fullscreen',
+    '--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+    start=time.monotonic()
+    with (target/'scummvm.log').open('wb') as out:
+        code=subprocess.run(cmd,env=env,stdout=out,stderr=subprocess.STDOUT,timeout=90).returncode
+    log=(target/'scummvm.log').read_text(errors='replace')
+    row={'scene':label,'exit':code,'seconds':round(time.monotonic()-start,1),
+    'rooms':re.findall(r'DigHD: room (\d+) loaded',log),'dumps':len(list(target.glob('frame_*_room*.png'))),
+    'screen_differences':[int(x) for x in re.findall(r'(\d+) screen pixels differ from the whole screen built again',log)],
+    'tegnede_costume204_ruter':sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*204',log))),
+    'verify_tail':re.findall(r'DigHD: verify[^\n]+',log)[-3:]}
+    print(json.dumps(row,ensure_ascii=False),flush=True)
+    checks=[(int(f),int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+    row['skjermbuffer_fra_figurstart']=[n for f,n in checks if f>=40]
+    row['oppstartsavvik']=[{'frame':f,'avvik':n} for f,n in checks if f<40 and n]
+    row['tegnede_costume307_ruter']=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*307',log)))
+    row['tegnede_costume312_ruter']=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*312',log)))
+    rows.append(row)
+    (ROOT/'linux-hopp-underveis.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+    assert code==0 and row['dumps'] and row['screen_differences'],label
+    if label.startswith('sam-sele') or label in ['sam-max-strikkhopp','sam-max-hopp-sekvens']:
+        assert row['oppstartsavvik']==[{'frame':36,'avvik':160}],label
+        assert row['skjermbuffer_fra_figurstart'] and max(row['skjermbuffer_fra_figurstart'])==0,label
+        assert row['tegnede_costume307_ruter'] or row['tegnede_costume312_ruter'],label
+    else:
+        assert max(row['screen_differences'])==0,label
+info={'binary_sha256':hashlib.sha256(BINARY.read_bytes()).hexdigest(),'build':(DATA/'BYGG.txt').read_text(),
+    'native_cels':len(list((MOD/'costumes').glob('*_hd.png'))),'scenes':rows,
+    'test_configuration':'Pakkens uendrede binar, spill og modd; minimal ini, gfx-mode=normal, builtin GUI, dummy lyd/skjerm, null musikk. Kopierte saves, isolert HOME/XDG.'}
+assert info['native_cels']==1386
+assert all(row['tegnede_costume204_ruter'] for row in rows if row['scene'].startswith('sam-oppned'))
+info['naturlig_gjennomspilling']=False
+info['lokal_retningskrok_i_pakken']=False
+info['merknad']='Ekstra full chore7 i pakkens standard retning2. Krever kjent160 ved frame36 og null etter figurstart. Ingen lokal retningskrok.'
+(ROOT/'linux-hopp-kontroll.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'runder':len(rows),'native':info['native_cels'],'nye312_ruter_observert':len(set(n for row in rows for n in row['tegnede_costume312_ruter'])),'kontroller_fra_figurstart':sum(len(row['skjermbuffer_fra_figurstart']) for row in rows),'avvik_fra_figurstart':sum(sum(row['skjermbuffer_fra_figurstart']) for row in rows)}))

@@ -8,16 +8,16 @@ Se [kildegrunnlag.md](kildegrunnlag.md) for originaltolkning, spillkontekst, hov
 
 | Jobb | Ruter | Produksjon og retting |
 | --- | ---: | --- |
-| fig307_01 | 5 | [prompt01](fig307_01-prompt01.txt), [prompt02](fig307_01-prompt02.txt); bare høyrehodet fra rettingen |
-| fig307_02 | 8 | [prompt01](fig307_02-prompt01.txt) |
-| fig307_03 | 23 | [prompt01](fig307_03-prompt01.txt), [prompt02](fig307_03-prompt02.txt), [prompt03](fig307_03-prompt03.txt) |
-| fig307_04 | 8 | [prompt01](fig307_04-prompt01.txt) |
-| fig307_05 | 8 | [prompt01](fig307_05-prompt01.txt) |
-| fig312_01 | 10 | [prompt01](fig312_01-prompt01.txt), [prompt02](fig312_01-prompt02.txt) |
-| fig312_02 | 11 | [prompt01](fig312_02-prompt01.txt), [prompt02](fig312_02-prompt02.txt); andre hele bilde avvist, bare øyelokkelement brukt |
-| fig312_03 | 9 | [prompt01](fig312_03-prompt01.txt) |
-| fig312_04 | 8 | [prompt01](fig312_04-prompt01.txt) |
-| fig312_05 | 6 | [prompt01](fig312_05-prompt01.txt) |
+| [fig307_01](../../jobber/fig307_01/resultat.png) | 5 | [prompt01](fig307_01-prompt01.txt), [prompt02](fig307_01-prompt02.txt); bare høyrehodet fra rettingen |
+| [fig307_02](../../jobber/fig307_02/resultat.png) | 8 | [prompt01](fig307_02-prompt01.txt) |
+| [fig307_03](../../jobber/fig307_03/resultat.png) | 23 | [prompt01](fig307_03-prompt01.txt), [prompt02](fig307_03-prompt02.txt), [prompt03](fig307_03-prompt03.txt) |
+| [fig307_04](../../jobber/fig307_04/resultat.png) | 8 | [prompt01](fig307_04-prompt01.txt) |
+| [fig307_05](../../jobber/fig307_05/resultat.png) | 8 | [prompt01](fig307_05-prompt01.txt) |
+| [fig312_01](../../jobber/fig312_01/resultat.png) | 10 | [prompt01](fig312_01-prompt01.txt), [prompt02](fig312_01-prompt02.txt) |
+| [fig312_02](../../jobber/fig312_02/resultat.png) | 11 | [prompt01](fig312_02-prompt01.txt), [prompt02](fig312_02-prompt02.txt); andre hele bilde avvist, bare øyelokkelement brukt |
+| [fig312_03](../../jobber/fig312_03/resultat.png) | 9 | [prompt01](fig312_03-prompt01.txt) |
+| [fig312_04](../../jobber/fig312_04/resultat.png) | 8 | [prompt01](fig312_04-prompt01.txt) |
+| [fig312_05](../../jobber/fig312_05/resultat.png) | 6 | [prompt01](fig312_05-prompt01.txt) |
 
 Tidlige haketapper og lilla perler er avvist. Sam beholdes uendret under Max sin avgrensede øyelokkrens. Førbilder, avviste råforsøk og metadata er bevart, så de ikke blir forvekslet med siste resultat. Kun bilder som rutekartene peker på er valgt.
 
