@@ -39,3 +39,5 @@ Kildeark og kontrollbevis publiseres på gpt-arbeid. Native modden publiseres de
 Direkte telling etter disse ti: 128 av 1758 figurjobber har resultat. 1630 mangler resultat, i tillegg til kjente returer og særskilt stil-/spillkontroll. Neste Sam-jobber er fig314_01 til 04, så fig294_01 til 02. Andre motiv-/bakgrunnsrester og manglende observert costume204_286 er fortsatt åpne.
 
 ![Sam og Max fra faktisk motorprøve](sam-max-loft-motor.png)
+
+Publisert og hentet tilbake 2026-10-18T13:39:52.774950+02:00: kildecommit e63675d6ce38cc820ffffa4aa0a35abe9deea829, hd-mod f7a3f275d62de5327d5a0d08153dfbc17ffdb9c9. Alle 19 622 kandidat-PNG-er er identiske med publisert modd, alle 96 nye native SHA-er er bekreftet, 1386 native totalt. SHA256SUMS er godkjent ved hent. Se mottak-publisert.json.
