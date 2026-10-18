@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-16 08:44 (norsk tid)
+Oppdatert 2026-10-18 13:35 (norsk tid). Nyeste tillegg er levert og egenkontrollert, ikke ny Tom-/Claude-godkjenning. Se rapporter/strikkhopp-20261018.
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -52,21 +52,21 @@ Figurark for Sam, Sam og Max.
 - [x] `fig204_03` (figurark 3 for Sam (kostyme 204), 15 ruter: snakking (lag 2, tegnes over kroppen) mot oss, bort (15 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig204_04` (figurark 4 for Sam (kostyme 204), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig204_05` (figurark 5 for Sam (kostyme 204), 11 ruter: gange bort (8 ruter); animasjon 6 mot høyre, mot oss, bort (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig307_01` (figurark 1 for Sam (kostyme 307), 5 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig307_02` (figurark 2 for Sam (kostyme 307), 8 ruter: gange mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig307_03` (figurark 3 for Sam (kostyme 307), 23 ruter: snakking (lag 3, tegnes over kroppen) mot høyre, mot oss (23 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig307_04` (figurark 4 for Sam (kostyme 307), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig307_05` (figurark 5 for Sam (kostyme 307), 8 ruter: gange bort (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig312_01` (figurark 1 for Sam og Max (kostyme 312), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig312_02` (figurark 2 for Sam og Max (kostyme 312), 11 ruter: animasjon 7 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig307_01` (figurark 1 for Sam (kostyme 307), 5 ruter: stående (lag 1, tegnes over kroppen) mot høyre, mot oss, bort (3 ruter); stående (lag 3, tegnes over kroppen) mot høyre, mot oss (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig307_02` (figurark 2 for Sam (kostyme 307), 8 ruter: gange mot høyre (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig307_03` (figurark 3 for Sam (kostyme 307), 23 ruter: snakking (lag 3, tegnes over kroppen) mot høyre, mot oss (23 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig307_04` (figurark 4 for Sam (kostyme 307), 8 ruter: gange mot oss (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig307_05` (figurark 5 for Sam (kostyme 307), 8 ruter: gange bort (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig312_01` (figurark 1 for Sam og Max (kostyme 312), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig312_02` (figurark 2 for Sam og Max (kostyme 312), 11 ruter: animasjon 7 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 4
 
 Figurark for Sam og Max, Sam, Max.
 
-- [ ] `fig312_03` (figurark 3 for Sam og Max (kostyme 312), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig312_04` (figurark 4 for Sam og Max (kostyme 312), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig312_05` (figurark 5 for Sam og Max (kostyme 312), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig312_03` (figurark 3 for Sam og Max (kostyme 312), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig312_04` (figurark 4 for Sam og Max (kostyme 312), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig312_05` (figurark 5 for Sam og Max (kostyme 312), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig314_01` (figurark 1 for Sam (kostyme 314), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig314_02` (figurark 2 for Sam (kostyme 314), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig314_03` (figurark 3 for Sam (kostyme 314), 10 ruter: animasjon 7 mot høyre (10 ruter), bilde to `hovedark/sam.png`)

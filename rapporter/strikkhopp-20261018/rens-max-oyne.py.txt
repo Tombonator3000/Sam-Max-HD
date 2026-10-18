@@ -1,0 +1,37 @@
+"""Gjenskap den avgrensede øyerensen til en privat kontrollfil.
+
+Kjør med repoets .venv/bin/python. Endrer aldri originaler eller valgt resultat.
+Toms tidligere tillatelse til Python-rensing og plassering gjelder.
+"""
+from pathlib import Path
+from PIL import Image
+import numpy as np
+import json
+
+ROOT = Path('/home/tom/Sam-Max-HD')
+REPORT = ROOT / 'work/.gpt-gren/rapporter/strikkhopp-20261018'
+meta = json.loads((REPORT / 'max-oynerens.json').read_text())
+original = np.array(Image.open(REPORT / meta['grunnlag']).convert('RGBA'))
+result = original.copy()
+element = np.array(Image.open(REPORT / 'max-oyelokk-ai-element.png').convert('RGBA'))
+assert element.shape == (4,18,4)
+assert np.all(element[:,:,:3] == meta['original_oyelokk_rgb'])
+assert np.all(element[:,:,3] == 255)
+allowed = np.zeros(original.shape[:2], bool)
+for patch in meta['patcher']:
+    # Hudplatene bruker eksisterende malt ansiktsfarge rundt de gamle pupillene.
+    # Disse medianfargene og de fire kildebekreftede plasseringene er kvittert.
+    x0,y0,x1,y1 = patch['hudplate']
+    result[y0:y1,x0:x1,:3] = patch['hudfarge']
+    allowed[y0:y1,x0:x1] = True
+    x,y,w,h = patch['nytt_oyelokk']
+    result[y:y+h,x:x+w,:3] = element[:,:,:3]
+    allowed[y:y+h,x:x+w] = True
+assert np.array_equal(original[:,:,3], result[:,:,3])
+assert np.array_equal(original[~allowed], result[~allowed])
+assert int(np.any(original != result,axis=2).sum()) == meta['endrede_piksler'] == 630
+selected = np.array(Image.open(REPORT / 'fig312_02-oynerens.png').convert('RGBA'))
+assert np.array_equal(result, selected)
+dest = ROOT / 'out/strikkhopp-20261018/oynerens-gjenskapt.png'
+Image.fromarray(result).save(dest)
+print(f'Gjenskapt pikselidentisk: {dest}. Alfa og Sam er uendret.')

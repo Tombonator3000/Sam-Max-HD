@@ -1,0 +1,10 @@
+# Kildegrunnlag for strikkhopp, 18. oktober 2026
+
+Kostyme307 er Sam med rød strikkhoppsele, jf. docs/figurer.csv og rom61 i GJENNOMGANG.md. Sam-master er stil-/identitetsanker; drakt og ekstrautstyr tas fra originalen. Kildebilder, alle fem ark og master er sett før tegning. En originalmotorprøve i rom61 med kostyme307 viser at gule felt og lilla øye-/ørefelt er tilsiktet hodeutstyr. De er ikke magentarester og skal ikke erstattes av vanlige ører eller fjernes av kantrens. Første to kropper i ark01 mangler hode fordi motoren tegner det separat; bakfrafiguren har hode og hatt. Ark03 er separate talehoder med ulike munnformer. Ingen ny full figur skal oppfinnes rundt disse delene.
+
+Walkthrough støtter skifte bak skjermen i rommet, bruk av strikk og tar-opptak: https://www.arrpeegeez.com/2023/08/sam-max-hit-road-walkthrough-guide.html , avsnitt Dino Bungee National Memorial. Geometri, gult/lilla utstyr og farger er fastslått fra egne originale spillbilder, ikke utledet av walkthrough-teksten. Prøven er tvunget QA, ikke et naturlig strikkhoppforløp.
+
+Bruker prosjektbibliotekets løsningskort figurark-fast-storrelse, publisert-mod-er-fasit og logg-over-det-som-mangler-hd. Beholder ScummVM c9091321 og prosjektets eksisterende myk.py/grenser. Python-rensing/plassering er tidligere uttrykkelig godkjent av Tom. Ingen motor-/pipelineendring bestilt i denne runden.
+
+
+Kostyme312 består av Sam som tar tak i og løfter Max før hoppet. Alle fem ark og Max-master er sett. Ark01 har bare Sam, selv om den generelle kostymebeskrivelsen sier Sam og Max. Den påviste feilbeskrivelsen korrigeres bare i rapportens produksjonsprompt; beskyttet prompt.txt røres ikke. Ark02 viser Max bare i de tre siste rutene. Ark03 er løfting og vending, med Sam sin brune hånd rundt livet til Max; dette er ikke klær på Max. Ark04 viser begge bakfra og gir ikke Max et ansikt. Ark05 viser avsprang og fall; de siste rutene er til dels skjulte figurer og til slutt bare en fot-/bukse-/seledel. De skal ikke fullføres til nye hele figurer. Gule/lilla hodefelt og rød sele bevares. Sam/Max-identitet fra begge godkjente mastere.

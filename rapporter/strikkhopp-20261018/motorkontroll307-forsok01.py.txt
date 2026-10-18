@@ -1,0 +1,27 @@
+from pathlib import Path
+import sys,json,re
+ROOT=Path('/home/tom/Sam-Max-HD/out/strikkhopp-20261018')
+REPORT=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/strikkhopp-20261018')
+sys.path.insert(0,'/home/tom/Sam-Max-HD/out/inventoryknapp-20261016')
+import kontroll as k
+k.ROOT=ROOT
+env={'DIGHD_TEST_ROOM':'61','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'307',
+'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255',
+'DIGHD_TEST_POS':'160,180','DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1'}
+rows=[]
+for anim,dirs in [(3,[1,2,3]),(2,[1,2,3]),(4,[1,2])]:
+    for direction in dirs:
+        label=f'sam307-anim{anim}-retning{direction}'
+        row=k.run(label,k.NEW,dict(env,DIGHD_TEST_ANIMATION=str(anim),DIGHD_TEST_DIRECTION=str(direction)),160 if anim==4 else 120,ROOT/'mod-kandidat')
+        log=(ROOT/label/'scummvm.log').read_text(errors='replace')
+        row['tegnede_ruter']=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*307',log)))
+        rows.append(row)
+        (REPORT/'motor307-runder.json').write_text(json.dumps(rows,indent=2)+'\n')
+        assert row['exit']==0 and row['dumps'] and row['screen_differences'] and max(row['screen_differences'])==0,label
+expected={int(x['bilde'].split('_')[1]) for x in json.loads((REPORT/'tillegg307.json').read_text())['tillegg']}
+seen={n for row in rows for n in row['tegnede_ruter']}
+summary={'runder':len(rows),'ruter_forventet':len(expected),'ruter_tegnet':len(expected&seen),'mangler_i_avspilling':sorted(expected-seen),
+'skjermbufferkontroller':sum(len(x['screen_differences']) for x in rows),'skjermbufferavvik':sum(sum(x['screen_differences']) for x in rows),'naturlig_gjennomspilling':False}
+(REPORT/'motor307-oppsummering.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(json.dumps(summary),flush=True)
+assert not expected-seen,sorted(expected-seen)

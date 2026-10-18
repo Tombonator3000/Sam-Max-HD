@@ -1,0 +1,60 @@
+from pathlib import Path
+import sys,json,hashlib
+import numpy as np
+from PIL import Image
+from scipy import ndimage as nd
+ROOT=Path(__file__).resolve().parents[2]
+REPORT=ROOT/'rapporter/strikkhopp-20261018'
+jobname=sys.argv[1]
+jobdir=ROOT/'jobber'/jobname
+assert not (jobdir/'resultat.png').exists(),'Bevar eller versjoner resultatet før ny klargjøring'
+job=json.loads((jobdir/'jobb.json').read_text())
+specs=json.loads((REPORT/(jobname+'-rawbokser.json')).read_text())
+assert len(specs)==len(job['ruter'])
+output=Image.new('RGBA',tuple(job['lerret']))
+maps=[]
+for cel,spec in zip(job['ruter'],specs):
+    raw=np.asarray(Image.open(REPORT/spec['raw']).convert('RGBA').crop(spec['box'])).copy()
+    if spec.get('palett_raw'):
+        # Keep the previous approved-for-QA skin tone while using the new
+        # image_gen chin contour. Preserve the alpha and all non-skin colors.
+        prior=np.asarray(Image.open(REPORT/spec['palett_raw']).convert('RGBA').crop(spec['palett_box'])).astype(float)
+        def skin(a):
+            return (a[:,:,3]>220)&(a[:,:,0]>120)&(a[:,:,1]>50)&(a[:,:,0]>a[:,:,1]*1.4)&(a[:,:,2]<a[:,:,1]*.7)
+        fm=raw.astype(float);m=skin(fm);pm=skin(prior)
+        assert m.any() and pm.any()
+        delta=np.median(prior[:,:,:3][pm],axis=0)-np.median(fm[:,:,:3][m],axis=0)
+        assert np.abs(delta).max()<=35,delta
+        raw[:,:,:3][m]=np.clip(fm[:,:,:3][m]+delta,0,255).astype(np.uint8)
+        spec['hudfarge_delta']=delta.tolist()
+    core=raw[:,:,3]>220
+    labs,n=nd.label(core)
+    sizes=np.bincount(labs.ravel());sizes[0]=0
+    id=int(sizes.argmax());assert id and sizes[id]>20
+    keepcore=labs==id
+    distance,nearest=nd.distance_transform_edt(~keepcore,return_indices=True)
+    keep=distance<=1.5
+    raw[:,:,3][~keep]=0
+    edge=keep&~keepcore
+    raw[:,:,:3][edge]=raw[nearest[0][edge],nearest[1][edge],:3]
+    y,x=np.nonzero(keepcore);box=(int(x.min()),int(y.min()),int(x.max())+1,int(y.max())+1)
+    cut=Image.fromarray(raw).crop(box)
+    x0,y0,x1,y1=cel['synlig']
+    dx,dy=(job['plassering'][0]+x0)*4,(job['plassering'][1]+y0)*4
+    cut=cut.resize(((x1-x0)*4,(y1-y0)*4),Image.Resampling.LANCZOS)
+    output.alpha_composite(cut,(dx,dy))
+    alpha=np.asarray(cut)[:,:,3]>128
+    y,x=np.nonzero(alpha)
+    maps.append({'bilde':cel['bilde'],'kostyme':cel['kostyme'],'rute':cel['rute'],
+      'rect':[dx+int(x.min()),dy+int(y.min()),int(x.max()-x.min()+1),int(y.max()-y.min()+1)],
+      'raw':spec['raw'],'raw_boks':spec['box'],'opprinnelig_kjerne_boks':list(box),'hudfarge_delta':spec.get('hudfarge_delta')})
+output.save(jobdir/'resultat.png')
+sha=hashlib.sha256((jobdir/'resultat.png').read_bytes()).hexdigest()
+(REPORT/('rutekart-'+jobname+'.json')).write_text(json.dumps({jobname:{'sha256_resultat':sha,'ruter':maps}},indent=2)+'\n')
+f=json.loads((REPORT/'fremdrift.json').read_text());f['leveranser']=[r for r in f['leveranser'] if r['jobb']!=jobname]
+f['leveranser'].append({'jobb':jobname,'resultat':str((jobdir/'resultat.png').relative_to(ROOT)),'sha256':sha,
+ 'ruter':len(maps),'rutekart':str((REPORT/('rutekart-'+jobname+'.json')).relative_to(ROOT)),
+ 'antall_bildekall':len(list(REPORT.glob(jobname+'-prompt*.txt'))),'egenkontroll':'ikke kjørt',
+ 'motoravspilt':False,'importert':False,'godkjent_av_Tom':False,'claude_kontroll':False})
+(REPORT/'fremdrift.json').write_text(json.dumps(f,ensure_ascii=False,indent=2)+'\n')
+print(jobname,sha)
