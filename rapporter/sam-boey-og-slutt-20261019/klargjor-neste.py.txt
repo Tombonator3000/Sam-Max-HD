@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,csv
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam-boey-og-slutt-20261019';R.mkdir(exist_ok=True);O=P/'out/sam-boey-og-slutt-20261019';O.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();protected={};items=[];plan={};descriptions=list(csv.DictReader((P/'docs/figurer.csv').open()))
+for c in(168,336):
+ jobs=sorted((A/'jobber').glob(f'fig{c}_*'));board=Image.new('RGB',(1536,825),'#3f4449');d=ImageDraw.Draw(board)
+ for i,job in enumerate(jobs):
+  assert not(job/'resultat.png').exists();j=json.loads((job/'jobb.json').read_text());items.append(dict(jobb=job.name,kostyme=c,rom=j['rom'],ruter=len(j['ruter']),animasjoner=sorted(set(r['animasjon'] for r in j['ruter']))));original=Image.open(job/'original_1x.png').convert('RGBA');view=original.resize((704,480),Image.Resampling.NEAREST);view.thumbnail((748,375));board.paste(view,((i%2)*768+10,(i//2)*412+28),view);d.text(((i%2)*768+12,(i//2)*412+7),job.name,fill='white')
+  for n in('referanse.png','original_1x.png','prompt.txt','jobb.json'):protected[(job/n).relative_to(A).as_posix()]=sha(job/n)
+  for cel in j['ruter']:
+   x,y,w,h=cel['rekt'];cut=original.crop((x,y,x+w,y+h));digest=hashlib.sha256(cut.tobytes()).hexdigest();key=(cut.size,digest)
+   if key not in plan:plan[key]=dict(bilde=cel['bilde'],kildejobb=job.name,rekt=cel['rekt'],rgba_sha256=digest,malruter=[])
+   plan[key]['malruter'].append(dict(jobb=job.name,bilde=cel['bilde'],rekt=cel['rekt'],animasjon=cel['animasjon'],retning=cel['retning'],lag=cel['lag']))
+ board.save(R/f'originalreferanser-kostyme{c}.png')
+(R/'klargjort.json').write_text(json.dumps(items,ensure_ascii=False,indent=2)+'\n');(R/'beskyttede-kilder.json').write_text(json.dumps(protected,indent=2)+'\n');(R/'ruteplan-unik.json').write_text(json.dumps(dict(ruter=list(plan.values())),indent=2)+'\n');(R/'grunnlag-filer-fb21d04b.json').write_text(json.dumps({p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in(P/'mods/gpt').rglob('*') if p.is_file()},indent=2)+'\n')
+source=P.parent/'Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/ikon-grunnlag/skript';prov=[]
+for room,file in [(35,'lokal_206.txt'),(32,'lokal_200.txt'),(86,'lokal_202.txt'),(86,'inngang.txt')]:
+ p=source/f'rom_{room:03}'/file;dest=R/f'kildeskript-rom{room:03}-{file}';shutil.copy2(p,dest);prov.append(dict(kilde=str(p),fil=dest.name,sha256=sha(dest),spillfiler_verifisert_i_frog_rock_rapport=True))
+(R/'kildeskript-proveniens.json').write_text(json.dumps(prov,ensure_ascii=False,indent=2)+'\n');(R/'kostymebeskrivelser.json').write_text(json.dumps([r for r in descriptions if r['kostyme'] in('168','336')],ensure_ascii=False,indent=2)+'\n')
+print('Next jobs',len(items),'cels',sum(j['ruter'] for j in items),'unique',len(plan),'protected',len(protected))

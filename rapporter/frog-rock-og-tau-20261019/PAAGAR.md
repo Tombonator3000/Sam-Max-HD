@@ -1,3 +1,3 @@
-# Åtte ark kontrollert, publisering gjenstår
+# Bunken publisert og hentet tilbake
 
-75 native fra 66 ulike helruter. 64 egenkontroll OK, 11 SJEKK, ingen FEIL. Native 75 OK, alle visuelt sett og registrert tegnet. 264 nullkontroller fra figurstart. Native kandidat 1851; faktisk publisering føres i mottak-publisert.json. Pakken har1776. Neste fig168_01 til03, så fig336_01 til03.
+Åtte ark,75 nye native. Kilde dcfdceb610763971d20aa03b070dc8506ccfdb82, hd-mod fb21d04ba10ceb6fe86f5286dc142d361863bd59,1851 native totalt. Alle nye og tidligere PNG-er bekreftet etter hent. Alle75 visuelt sett og motorobservert. 264 kontroller fra figurstart uten avvik. Egenkontroll64 OK,11 SJEKK; native75 OK. Ingen ny Tom-/Claude-godkjenning. Pakken har1776 og mangler75. Neste fig168_01 til03, deretter fig336_01 til03. Ikke bestill215/300 på nytt.

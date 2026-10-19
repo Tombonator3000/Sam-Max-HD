@@ -33,3 +33,5 @@ Faktisk nedlastet senkveldsmotor, SHA c00096cbbee45c4e56ad7f0ae1e677f02aabe1cb70
 Dette er egenkontroll, native mottak og motorobservasjon. Det er ikke naturlig gjennomspilling, separat Claude-kontroll eller ny Tom-stilgodkjenning. Ingen ny Windows-/nettleserprøve. Felles publisert Linux-/Windows-pakke sam-max-hd-2026-10-19-senkveld har 1 776 og mangler de 75 nye; pakker oppdateres ved neste samlepunkt. Ny grafikk skal ikke inn i main.
 
 Neste uavhengige arbeid er fig168_01 til 03, deretter fig336_01 til 03. Kildeavklar hver i spillkontekst før generering. Tidligere avviste golf-E og VR-G skal ikke bestilles på nytt eller omgås. Automatisk grafikkfortsettelse er fortsatt aktiv.
+
+Publisering og tilbakehenting bekreftet: kilde dcfdceb610763971d20aa03b070dc8506ccfdb82, hd-mod fb21d04ba10ceb6fe86f5286dc142d361863bd59. Alle 20 087 kandidat-PNG-er og alle 20 012 tidligere PNG-er kontrollert. Alle 75 nye native-SHA-er stemmer. Totalt 1 851 native. De 32 beskyttede kildene og tre stasher er bevart. Se mottak-publisert.json.

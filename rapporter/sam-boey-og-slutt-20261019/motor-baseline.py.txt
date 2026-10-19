@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import importlib.util,json,hashlib,shutil,re
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/sam-boey-og-slutt-20261019';R=P/'work/.gpt-gren/rapporter/sam-boey-og-slutt-20261019';spec=importlib.util.spec_from_file_location('kontroll',P/'out/inventoryknapp-20261016/kontroll.py');k=importlib.util.module_from_spec(spec);spec.loader.exec_module(k);k.ROOT=O;pkg=P/'out/felles-release-20261019-senkveld/linux/squashfs-root/usr';k.NEW=pkg/'bin/scummvm';k.LIB=pkg/'lib';k.PROJECT=pkg/'share/sam-max-hd';mod=P/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert json.loads((mod/'mod.json').read_text())['costume_cels']==1851;source_saves=k.SAVES;rows=[]
+for c,room,pos,anims in [(168,35,'74,103',(1,7,8)),(336,86,'104,192',(1,7))]:
+ for anim in anims:
+  k.SAVES=O/f'saves-{c}-{anim}';k.SAVES.mkdir(exist_ok=True)
+  for p in source_saves.glob('samnmax.s*'):shutil.copy2(p,k.SAVES/p.name)
+  env={'DIGHD_TEST_ROOM':str(room),'DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':str(c),'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':pos,'DIGHD_TEST_CAMX':'160','DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)};row=k.run(f'baseline{c}-anim{anim}',k.NEW,env,300,mod);row.update(kostyme=c,rom=room,animasjon=anim,pos=pos,camx=160,binar_sha256=sha(k.NEW));rows.append(row);assert row['exit']==0 and row['dumps'];log=(O/row['scene']/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];row['kontroller_med_frame']=checks;assert checks;row['avvik_fra_figurstart']=[p for p in checks if p['frame']>=40 and p['avvik']];row['null_fra_figurstart']=not bool(row['avvik_fra_figurstart'])
+  board=Image.new('RGB',(1920,850),'#243340');d=ImageDraw.Draw(board)
+  for i,f in enumerate((60,92,124,156,188,220)):
+   p=O/row['scene']/f'frame_{f:06}_room{room:03d}.png';assert p.is_file();im=Image.open(p).convert('RGB');im.thumbnail((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));d.text((x+5,y+5),f'kostyme{c} anim{anim}, frame{f}, original',fill='white')
+  board.save(R/f'originalmotor-{c}-animasjon{anim}.png');(R/'motor-baseline.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');print(c,anim,'original,75 kontroller',flush=True)
+shutil.copy2(__file__,R/'motor-baseline.py.txt')

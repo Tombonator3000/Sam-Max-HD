@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-19 22:49 (norsk tid). Åtte nye ark,75 native mottatt og visuelt sett i motoren. Egenkontroll64 OK,11 SJEKK. Se rapporter/frog-rock-og-tau-20261019/mottak-publisert.json for faktisk publisering; kandidat1851, grunnlag1776.183 av1758 resultatark. Ingen ny Tom-/Claude-godkjenning.
+Oppdatert 2026-10-19 22:49 (norsk tid). Åtte nye ark,75 native mottatt og visuelt sett i motoren. Egenkontroll64 OK,11 SJEKK. Se rapporter/frog-rock-og-tau-20261019/mottak-publisert.json for faktisk publisering i fb21d04b,1851 native. Grunnlag1776.183 av1758 resultatark. Ingen ny Tom-/Claude-godkjenning.
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -13,7 +13,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 183 ark med resultat; kandidat1851 native, publisert1776 til kvittering | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 183 ark med resultat; 1851 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 

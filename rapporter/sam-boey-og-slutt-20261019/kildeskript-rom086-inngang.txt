@@ -1,0 +1,51 @@
+; Inngangsskriptet til rom 86 (ENCD)
+
+[0000] (5D) if (var166 == 10) {
+[000A] (9B)   resourceRoutines.lockSound(92)
+[0010] (9B)   resourceRoutines.loadSound(92)
+[0012] (9B)   resourceRoutines.lockSound(93)
+[0018] (9B)   resourceRoutines.loadSound(93)
+[001A] (9B)   resourceRoutines.lockCostume(335)
+[0020] (9B)   resourceRoutines.loadCostume(335)
+[0022] (9B)   resourceRoutines.lockCostume(336)
+[0028] (9B)   resourceRoutines.loadCostume(336)
+[002A] (9B)   resourceRoutines.lockCostume(337)
+[0030] (9B)   resourceRoutines.loadCostume(337)
+[0032] (9B)   resourceRoutines.lockCostume(228)
+[0038] (9B)   resourceRoutines.loadCostume(228)
+[003A] (9B)   resourceRoutines.lockCostume(229)
+[0040] (9B)   resourceRoutines.loadCostume(229)
+[0042] (9B)   resourceRoutines.lockCostume(338)
+[0048] (9B)   resourceRoutines.loadCostume(338)
+[004A] (9B)   resourceRoutines.lockCostume(264)
+[0050] (9B)   resourceRoutines.loadCostume(264)
+[0052] (73) } else {
+[0055] (9B)   resourceRoutines.lockCostume(333)
+[005B] (9B)   resourceRoutines.loadCostume(333)
+[005D] (9B)   resourceRoutines.lockCostume(334)
+[0063] (9B)   resourceRoutines.loadCostume(334)
+[0065] (**) }
+[0065] (43) VAR_V6_SOUNDMODE = 2
+[006B] (B6) printDebug.begin()
+[006D] (B6) printDebug.msg(sound(0xA047BAE, 0xA) + " ")
+[0081] (43) VAR_V6_SOUNDMODE = 0
+[0087] (43) VAR_V6_SOUNDMODE = 2
+[008D] (B6) printDebug.begin()
+[008F] (B6) printDebug.msg(sound(0xA04FDDB, 0xA) + " ")
+[00A3] (43) VAR_V6_SOUNDMODE = 0
+[00A9] (43) VAR_V6_SOUNDMODE = 2
+[00AF] (B6) printDebug.begin()
+[00B1] (B6) printDebug.msg(sound(0x9F9B4A1, 0xA) + " ")
+[00C5] (43) VAR_V6_SOUNDMODE = 0
+[00CB] (43) VAR_V6_SOUNDMODE = 2
+[00D1] (B6) printDebug.begin()
+[00D3] (B6) printDebug.msg(sound(0x9EB744E, 0xA) + " ")
+[00E7] (43) VAR_V6_SOUNDMODE = 0
+[00ED] (9C) roomOps.setScreen(0,200)
+[00F5] (5D) if (var166 != 10) {
+[00FF] (5E)   startScript(0,200,[])
+[0109] (73) } else {
+[010C] (5E)   startScript(0,202,[])
+[0116] (**) }
+[0116] (65) stopObjectCodeA()
+END
