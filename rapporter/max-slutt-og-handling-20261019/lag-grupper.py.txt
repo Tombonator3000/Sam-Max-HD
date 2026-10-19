@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/max-slutt-og-handling-20261019';O=P/'out/max-slutt-og-handling-20261019'
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];groups=[];n=0
+for identity,seq in [('Max337',[v for v in plan if v['bilde'].startswith('costume337') and int(v['bilde'].split('_')[1])<1973]),('Max015',[v for v in plan if v['bilde'].startswith('costume015')])]:
+ for first in range(0,len(seq),6):
+  letter=chr(65+n);n+=1;items=seq[first:first+6];im=Image.new('RGB',(1536,1024),(68,73,78));draw=ImageDraw.Draw(im)
+  for i,v in enumerate(items):
+   source=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');scale=min(420/source.width,420/source.height);s=source.resize((round(source.width*scale),round(source.height*scale)),Image.Resampling.NEAREST);x=i%3*512+(512-s.width)//2;y=i//3*512+55+(430-s.height)//2;im.paste(s,(x,y),s);draw.text((i%3*512+12,i//3*512+12),f'{i+1}: {v["bilde"]}, source {source.width}x{source.height}',fill='white')
+  im.save(R/f'unik-{letter}-referanse.png');(R/f'unik-{letter}-plan.json').write_text(json.dumps(items,indent=2)+'\n');groups.append(dict(gruppe=letter,identitet=identity,unike=len(items),kilder=[v['bilde'] for v in items]));print(letter,identity,[v['bilde'] for v in items])
+(R/'bildegrupper.json').write_text(json.dumps(groups,indent=2)+'\n');shutil.copy2(__file__,R/'lag-grupper.py.txt')
+s=(P/'out/sam-boey-og-slutt-20261019/registrer-raa.py').read_text().replace('sam-boey-og-slutt-20261019','max-slutt-og-handling-20261019');(O/'registrer-raa.py').write_text(s)

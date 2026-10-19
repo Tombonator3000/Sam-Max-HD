@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/max-slutt-og-handling-20261019';save=R/'foerste-forsok';save.mkdir(exist_ok=True)
+for p in list(R.glob('*-prototype.png'))+list(R.glob('*-egenkontroll.txt'))+[R/'fremdrift.json',R/'prototype-kvitteringer.json',R/'plasser-unike.py.txt']:
+ shutil.copy2(p,save/p.name)
+names=['costume337_1965','costume337_1966','costume337_1967','costume015_1946','costume015_1950','costume337_1947'];im=Image.new('RGB',(1536,1024),'#44494e');d=ImageDraw.Draw(im);plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];seq=[next(x for x in plan if x['bilde']==n) for n in names]
+for i,v in enumerate(seq):
+ s=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');sc=min(420/s.width,420/s.height);s=s.resize((round(s.width*sc),round(s.height*sc)),Image.Resampling.NEAREST);im.paste(s,(i%3*512+256-s.width//2,i//3*512+270-s.height//2),s);d.text((i%3*512+10,i//3*512+10),v['bilde'],fill='white')
+im.save(R/'unik-O-referanse.png');(R/'unik-O-plan.json').write_text(json.dumps(seq,indent=2)+'\n')
+p='''Use case: style-transfer.
+Asset type: SIX precisely traced HD Max cels, transparent1536x1024,3x2panels.
+Image1 authoritative original silhouettes and proportions. Image2 only approved face and clean line quality, never anatomy proportions or pose for these distorted cels. Draw ONLY Image1's SIX poses in the same panels. Trace the source at high resolution: clean smooth dark contour, flat cream/pink source colors with one restrained shade. No gray background, halo, floor, shadows, labels, new props or added body parts.
+The previous pass moved heads, hands and body mass. Correct by following IMAGE1's exact landmark positions inside each figure's bounding box. Do NOT recenter a head over the feet, straighten a leaned neck, slim the belly, enlarge the eyes/head, or make raised hands lower. Preserve the original bent angular weirdness, negative space and DISTORTED poses. Do NOT convert to ordinary standing Max.
+Panel1 top-left: tall stretched Max, 38x58source. Ears sweep horizontally far RIGHT, while the small face is at the LEFT edge, neck starts beneath face at left/center and body is bent; long arms hang widely at sides, toes span lower-left. Source head/neck/body leaning must remain. His mouth is tiny straight, no big sad frown. Do not shift face toward the center or narrow the arms.
+Panel2 top-middle: 39x55source. Max with puffed cheeks and closed eyes, screen-left ear vertical and screen-right ear slanting RIGHT. Short round body, hands wide at exact source height. Weight centered above feet, both arms near horizontal, no extra large gloves.
+Panel3 top-right: same silhouette as panel2, open tiny black eyes and exact subtly different cheek. Keep hands, belly, ears and feet at Image1 positions.
+Panel4 bottom-left: 43x36source. Very squashed Max, hands held beside upper face and ears flopping mostly sideways. Face is SMALL and wide with NO toothy grin, just tiny dark marks, nose pink. Large flat foot projects LEFT and other foot points lower-right. Trace exact source, do NOT add a broad smile or a big taller face.
+Panel5 bottom-middle: 36x26source. INTENTIONALLY PARTIAL layer: NO head or ears or face. Round upper torso/shoulder stub at top, arms bent with hands on hips, oval belly, one short leg and long flat foot projecting far LEFT, other leg goes down RIGHT into a long flat foot at bottom. Preserve original height proportions: compact upper body is large relative to feet; no tall protruding neck, belly button not pink if source tan. Do not complete missing head.
+Panel6 bottom-right: Max holding bitten dark brown chocolate with narrow orange foil strip beneath in screen-left paw, other paw lowered at right. 36x51source. Straight horizontal tiny mouth, left ear vertical, right ear slants right. Match exact image1 head/body/feet proportions, not a larger modern bunny face. No cord unless source shows one.
+Exactly six drawings on REAL alpha-zero transparent background. Keep every source-confirmed visible finger and both original feet. No new accessories. All shapes must remain smooth curves, no pixels or staircases.'''
+(R/'unik-O-prompt01.txt').write_text(p+'\n');shutil.copy2(__file__,R/'omriss-retting.py.txt')

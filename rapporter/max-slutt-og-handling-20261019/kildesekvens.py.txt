@@ -1,0 +1,8 @@
+from pathlib import Path
+import os,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/max-slutt-og-handling-20261019';O=P/'out/max-slutt-og-handling-20261019/kildesekvens';O.mkdir(exist_ok=True);pkg=P/'out/felles-release-20261019-natt/linux/squashfs-root';home=O/'home';home.mkdir(exist_ok=True);saves=O/'saves';saves.mkdir(exist_ok=True)
+for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(pkg/'usr/lib'),'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(P/'mods/gpt'),'DIGHD_VERIFY':'1','DIGHD_QUIT_AT':'5000','DIGHD_DUMP_DIR':str(O),'DIGHD_DUMP_EVERY':'20','DIGHD_DUMP_FLAT':'1','DIGHD_SHOW_MISSING':'0','DIGHD_TEST_ROOM':'86','DIGHD_TEST_AT':'10','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCRIPT':'50:202','DIGHD_TEST_CAMX':'160','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1'})
+cmd=[str(pkg/'usr/bin/scummvm'),'--config='+str(O/'scummvm.ini'),'--path='+str(pkg/'usr/share/sam-max-hd/game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+with (O/'scummvm.log').open('wb') as f: code=subprocess.run(cmd,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=180).returncode
+shutil.copy2(__file__,R/'kildesekvens.py.txt');print('Originalskrift202 ferdig',code, 'dumps',len(list(O.glob('frame_*.png'))))

@@ -1,0 +1,3 @@
+# Smådeler sett i originalsekvensen
+
+Originalt lokalt skript202 i rom86 er kjørt uendret gjennom motorens eksisterende testkrok,5000 frames, isolert save/HOME. Ved4310 til4570 er kostyme337-lagene sett svirre rundt høvdingens hodeplagg. Utsnitt4320 til4420 viser grå vinger over svart kropp i vekslende smal og bred fase, kretsende rundt hodet. Dette avklarer motivet som en bitteliten flue. Ikke Sam, ny hatt eller løs sjokolade. Identifikasjonen bygger på form, bevegelse og sammensatt originalsekvens, ikke filnavnet. Smådelene får bare sine eksisterende grå/svarte masser uten oppfunne detaljer. Se smaadeler-i-kildesekvens.png, kildesekvens-oversikt.png og originalskriptet. Ingen endring av spillets skript eller motor.

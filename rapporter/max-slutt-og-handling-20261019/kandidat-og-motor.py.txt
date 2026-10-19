@@ -1,0 +1,36 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,shutil,subprocess,os,re
+P=Path('/home/tom/Sam-Max-HD');ART=P/'work/.gpt-gren';O=P/'out/max-slutt-og-handling-20261019';R=ART/'rapporter/max-slutt-og-handling-20261019';base=P/'mods/gpt';candidate=O/'mod-kandidat';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();entries=[]
+for c,count,folder in [(337,83,'mottak337'),(15,30,'mottak15-v2')]:
+ receipt=json.loads((O/folder/'myke.json').read_text());assert receipt['ruter_ok']==count and receipt['ruter_sjekk']==receipt['ruter_mangler']==receipt['ruter_teknisk']==0;shutil.copy2(O/folder/'myke.json',R/f'myke{c}-kvittering.json')
+ for job,sheet in receipt['ark'].items():
+  for name,cel in sheet['ruter'].items():
+   src=O/folder/cel['fil'];assert cel['status']=='ok' and cel['i_modden'] and sha(src)==cel['sha256'];assert cel['kilde']=='arket' or name=='costume337_1951';entries.append(dict(jobb=job,bilde=name,fil=cel['fil'],sha256=sha(src),animasjon=cel['animasjon'],retning=cel['retning'],lag=cel['lag'],kostyme=c,kilde=cel['kilde'],mottaksmappe=folder))
+assert len(entries)==113;assert not candidate.exists();old=json.loads((R/'grunnlag-filer-2776cff3.json').read_text());old=old.get('filer',old) if isinstance(old,dict) else old
+assert isinstance(old,dict),type(old)
+for p,dig in old.items():assert sha(base/p)==dig,p
+shutil.copytree(base,candidate)
+for e in entries:
+ dest=candidate/e['fil'];assert not dest.exists();shutil.copy2(O/e['mottaksmappe']/e['fil'],dest)
+meta=json.loads((base/'mod.json').read_text());assert meta['costume_cels']==1960;meta['costume_cels']+=113
+for c in (337,15):
+ assert f'costume{c:03}' not in meta['costumes'];meta['costumes'].append(f'costume{c:03}')
+meta['costumes'].sort();(candidate/'mod.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n');(R/'tillegg.json').write_text(json.dumps(dict(tillegg=entries),ensure_ascii=False,indent=2)+'\n')
+extra=[e for e in entries if e['kilde']!='arket'];(R/'native-utliggertillegg.json').write_text(json.dumps(dict(ruter=extra,oppsummering='112 hele ruter kommer fra arket alene. Én rute,337_1951, kommer fra arket pluss1 originalpiksel som eksisterende v6-mottak legger mykt tilbake som kildebekreftet utligger. Ingen hel originalrute eller hard originalsilhuettmaske. Ikke kall denne ene tilleggspikselen nytegnet.'),ensure_ascii=False,indent=2)+'\n')
+pkg=P/'out/felles-release-20261019-natt/linux/squashfs-root';binary=pkg/'usr/bin/scummvm';data=pkg/'usr/share/sam-max-hd';assert sha(binary)=='e541253b77801b7473351cf72c416ecd9169a3696a7245b9fe87a17cfa331dcf';settings={337:(86,'104,192'),15:(2,'134,173')}
+def run_case(case):
+ costume,anim,stage=case;room,pos=settings[costume];target=O/f'{stage}{costume}-anim{anim}';target.mkdir(exist_ok=True);home=target/'home';home.mkdir(exist_ok=True);saves=target/'saves';saves.mkdir(exist_ok=True)
+ for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+ env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(pkg/'usr/lib'),'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(base if stage=='grunnlag' else candidate),'DIGHD_VERIFY':'1','DIGHD_QUIT_AT':'320','DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'4','DIGHD_DUMP_FLAT':'1','DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0','DIGHD_TEST_ROOM':str(room),'DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':str(costume),'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':pos,'DIGHD_TEST_CAMX':'160','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)})
+ command=[str(binary),'--config='+str(target/'scummvm.ini'),'--path='+str(data/'game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+ with (target/'scummvm.log').open('wb') as f:code=subprocess.run(command,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120).returncode
+ assert code==0;log=(target/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];drawn=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*'+str(costume),log)));row=dict(scene=target.name,kostyme=costume,rom=room,animasjon=anim,pos=pos,kontroller=checks,tegnede_ruter=drawn,dumps=len(list(target.glob(f'frame_*_room{room:03d}.png'))),exit=code,binar_sha256=sha(binary));assert len(checks)==80 and row['dumps'];(target/'kvittering.json').write_text(json.dumps(row,indent=2)+'\n');print(target.name,len(drawn),'ruter',[(v['frame'],v['avvik']) for v in checks if v['avvik']],flush=True);return row
+cases=[(c,a) for c in (337,15) for a in(1,7)]
+with ThreadPoolExecutor(max_workers=2) as pool:baseline=list(pool.map(run_case,[(c,a,'grunnlag') for c,a in cases]))
+with ThreadPoolExecutor(max_workers=2) as pool:final=list(pool.map(run_case,[(c,a,'final') for c,a in cases]))
+for b,f in zip(baseline,final):
+ assert [v['frame'] for v in b['kontroller']]==[v['frame'] for v in f['kontroller']];extra=[dict(frame=v['frame'],kandidat=v['avvik'],grunnlag=w['avvik']) for v,w in zip(f['kontroller'],b['kontroller']) if v['avvik']>w['avvik']];f['nye_eller_oekte_avvik']=extra;assert not extra,extra
+expected={e['bilde'] for e in entries};seen={f"costume{r['kostyme']:03}_{n}" for r in final for n in r['tegnede_ruter']};assert expected<=seen,sorted(expected-seen)
+(R/'motor-grunnlag-natt.json').write_text(json.dumps(baseline,indent=2)+'\n');(R/'motor-runder.json').write_text(json.dumps(final,indent=2)+'\n');summary=dict(runder=4,baseline_runder_samme_binar=4,ruter_forventet=113,ruter_tegnet=len(expected&seen),mangler_i_avspilling=sorted(expected-seen),skjermbufferkontroller=sum(len(r['kontroller']) for r in final),kontroller_fra_figurstart=sum(v['frame']>=40 for r in final for v in r['kontroller']),nye_eller_oekte_avvik=[],avvik_ogsaa_i_grunnlag=[dict(scene=row['scene'],**v) for row in final for v in row['kontroller'] if v['avvik']],produksjonsbinar_sha256=sha(binary),naturlig_gjennomspilling=False,baseline='2776cff3 med1960 native, samme nedlastede natt-binær, rom, posisjon, kamera, scale og animasjon',merknad='320frames per forløp. To kjente160-avvik i rom86 ved36 før testfiguren; null fra40. Rom2 null i alle målinger. Kildesekvens202 brukt til motivavklaring, ikke naturlig sluttspilling.')
+(R/'motor-oppsummering.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'kandidat-og-motor.py.txt');print(json.dumps(summary,ensure_ascii=False),flush=True)
