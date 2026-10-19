@@ -33,3 +33,5 @@ Ikke naturlig gjennomspilling, ny interaktiv Windows-/webtest, ny Tom-godkjennin
 Felles Linux-/Windows-release sam-max-hd-2026-10-19-natt er allerede publisert med1960 native. Den bygges ikke om per ark. Denne bunken113 kommer med ved neste samlepunkt; pakkene kalles ikke2073 før de faktisk er lastet ned og kontrollert.
 
 Neste bunke: fig193_01/02, fig298_01/02 og fig009_01. Kildeavklar identitet, rom og handling før nye kall. Automatisk fortsettelse består; ingen gjenstart av de gamle nattprosessene.
+
+Publisering og tilbakehenting bekreftet: kilde 42cb05bf07d3979a2165fc0dca4d224c698d3f7b, hd-mod 6512f670f828c7b8c52e5141d3267fd15c548fb1. Alle20309 kandidat-PNG-er og alle20196 tidligere PNG-er bekreftet.113 nye native-SHA-er stemmer,2073 native totalt. Alle20 beskyttede kilder og tre stasher uendret. Se mottak-publisert.json. Pakkene har fortsatt1960 til neste samlepunkt.

@@ -1,0 +1,35 @@
+; Inngangsskriptet til rom 57 (ENCD)
+
+[0000] (9B) resourceRoutines.lockScript(114)
+[0006] (9B) resourceRoutines.loadScript(114)
+[0008] (9B) resourceRoutines.lockSound(79)
+[000E] (9B) resourceRoutines.loadSound(79)
+[0010] (9B) resourceRoutines.lockCostume(297)
+[0016] (9B) resourceRoutines.loadCostume(297)
+[0018] (9B) resourceRoutines.lockCostume(298)
+[001E] (9B) resourceRoutines.loadCostume(298)
+[0020] (9D) actorOps.setCurActor(3)
+[0025] (9D) actorOps.setCostume(5)
+[002A] (9D) actorOps.setCurActor(2)
+[002F] (9D) actorOps.setCostume(4)
+[0034] (74) startSound(79)
+[0038] (43) var169 = getRandomNumberRange(0,1)
+[0042] (AC) soundKludge([15,79,0,var169])
+[0052] (80) putActorAtObject(2,541,57)
+[005C] (5E) startScript(0,200,[])
+[0066] (79) actorFollowCamera(VAR_EGO)
+[006A] (9D) actorOps.setCurActor(4)
+[006F] (9D) actorOps.init()
+[0071] (9D) actorOps.setCostume(297)
+[0076] (9D) actorOps.setIgnoreBoxes()
+[0078] (9D) actorOps.setAlwayZClip(1)
+[007D] (9D) actorOps.setTalkColor(2)
+[0082] (47) array184[4] = 202
+[008B] (47) array185[4] = 299
+[0094] (47) array186[4] = 127
+[009D] (7F) putActorInXY(4,356,99,57)
+[00AA] (82) animateActor(4,250)
+[00B1] (6E) setClass(4,[146])
+[00BB] (43) var194 = 203
+[00C1] (65) stopObjectCodeA()
+END

@@ -1,0 +1,15 @@
+# Neste fem jobber, kildeavklaring pågår
+
+fig193_01/02,fig298_01/02 ogfig009_01.61 spillruter fra55 eksakt ulike hele kildeutsnitt,20 beskyttede SHA-er. Publisert grunnlag6512f670,2073 native, alle20315 fil-SHA-er bevart. Ingen bildekall, resultat.png eller notat.md i denne bunken ennå. Ikke dupliser ferdig337/015.
+
+De fem originalarkene er sett samlet.193 er Max med en grønn fisk ved World of Fish, rom35, kildepos305,168. Originalt lokalt skript213 bruker aktør3,kostyme193, animasjon6/7. Bevar fangst/løft/kast og fiskens form, men se originalmotoren før nytegning. Kameraet i rom35 må passe den kildeposisjonen. Ikke gjenbruk74,103 fra168.
+
+298 er ikke bare Sam. Kilden inneholder også museumsdamen fra aktør4/kostyme297 og overgangslag ved overleveringen. Ressursbanken sier grønnsaksmuseet, rom57. Lokalt201: aktør5 med298 ved299,128 viser et innrammet portrett av John Muir til damen. Hun skjules med elevation200 mens felleskostymet spiller. Skript114 bruker samme aktør/kostyme/pos i animasjon7 når John Muir-grønnsaken hentes. Sam og damen har dermed felles tegninger; generisk Sam-master kan ikke erstatte hennes identitet. Se297 og aktuell originalsekvens, bekreft nøyaktige grønnsaks-/håndlag, portrett, palett og kontaktpunkter før kall. Ikke kall det en bukett eller ny person ut fra bare filnavnet.
+
+009 er Sam i introens laboratorium,rom2 ved164,170, globalt65, rett etter «Hello?». Normaldrakt, hender beveges mot lommene. Animasjon7 er kun delvis kroppslag uten hode. Bevar det delvise laget, ikke fyll inn hatt/hode. Se originalmotoren og Sam-master før kall.
+
+Kildeavklaring er påbegynt, ikke fullført motor-/designkontroll. Åtte originale motorforløp er nå kjørt og sett:193/298/009 animasjon1/7 og to ekstra298-forløp i samme rom ved170,165. Alle61 forventede ruter er observert;50 ved kildeposisjon og11 flere i synlig diagnose.298 ved299,128 ligger for langt til høyre i det første tvungne kameraet, derfor tilleggsdiagnosen. Bekreft fortsatt korrekt naturlig kamera og297-damens figuranker før nytegning av298.193 gir de samme27 gamle inventarikantpikslene ved40-56,61 ved36, som det tidligere rom35-grunnlaget.298/009 har null. Se motor-grunnlag-oppsummering.json og alle åtte kontaktark. Ingen nye bildekall/resultater. Bruk den faktiske nedlastede Linux-nattmotoren e541253b fra sam-max-hd-2026-10-19-natt med2073 som additivt grunnlag. Gamle rom35-inventarkantavvik er dokumentert fra168; sammenlign samme binær/pos/kamera med grunnlaget, ikke anta null.
+
+Pakken1960 er allerede publisert og skal oppdateres ved neste samlepunkt. Grafikkmodden2073 er nyere. Automatisk fortsettelse består; de gamle nattprosessene er ikke startet.
+
+Sammensatt298 viser bekreftet Sam, innrammet svart/hvitt-portrett av skjeggete John Muir, museumsdamen med oppsatt orangebrunt hår og vegetabilsk lilla/grønt tilbehør, deretter John Muir-grønnsaken som leveres. Ikke tegn en generell blomsterbukett. Originalark og motorforløp er form-/fargegrunnlaget; Sam-master er bare Sam/linjekvalitet og må ikke gjøre damen til en hund eller endre portrettets person.

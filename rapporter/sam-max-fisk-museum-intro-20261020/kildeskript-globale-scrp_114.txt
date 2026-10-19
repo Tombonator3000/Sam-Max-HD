@@ -1,0 +1,336 @@
+; Globalt skript 114 (SCRP i rom 57, offset 0xD816 fra ROOM-blokken)
+
+[0000] (9D) actorOps.setCurActor(2)
+[0005] (9D) actorOps.setCostume(7)
+[000A] (9D) actorOps.setTalkColor(6)
+[000F] (5E) startScript(0,9,[])
+[0019] (5E) startScript(0,15,[1])
+[0026] (5D) if ((bitvar135 == 1) && (bitvar137 == 1)) {
+[0038] (73) } else {
+[003B] (5E)   startScript(0,14,[])
+[0045] (43)   var171 = 0
+[004B] (43)   var169 = getRandomNumber(1)
+[0052] (6C)   breakHere()
+[0053] (5D)   unless (var171) jump 4b
+[0059] (0C)   dup[1] = var171
+[005D] (5D)   if (dup[1] == 998) {
+[0064] (BB)     talkEgo(sound(0x971BA75, 0xA) + "This is a monument to human ingenuity." + startAnim(13))
+[00A1] (A9)     wait.waitForMessage()
+[00A3] (BA)     talkActor(sound(0x9727420, 0xA) + "Thanks bunches, sonny.",4)
+[00CE] (A9)     wait.waitForMessage()
+[00D0] (82)     animateActor(2,24)
+[00D7] (CA)     delayFrames(4)
+[00DB] (73)     jump 3b1
+[00DE] (5D)   } else if (dup[1] == 1001) {
+[00E9] (BA)     talkActor(sound(0x9730F4B, 0xA) + "Incidentally, we're out of milk.",3)
+[011F] (A9)     wait.waitForMessage()
+[0121] (BB)     talkEgo(sound(0x9739FF6, 0xA) + "I'll make a note.")
+[0144] (A9)     wait.waitForMessage()
+[0146] (73)     jump 3b1
+[0149] (5D)   } else if (dup[1] == 997) {
+[0154] (5D)     if (!bitvar138) {
+[015C] (43)       bitvar138 = 1
+[0162] (BB)       talkEgo(sound(0x973E9A1, 0xA) + "What the Holy Mother of Gourd is this?" + startAnim(15))
+[019E] (CA)       delayFrames(29)
+[01A2] (82)       animateActor(2,24)
+[01A9] (CA)       delayFrames(4)
+[01AD] (BA)       talkActor(sound(0x974A4CC, 0xA) + "Isn't it obvious?  I grow vegetables in the shapes of famous celebrities." + wait() + "For a small fee I'll grow a vegetable from a photograph.",4)
+[0245] (A9)       wait.waitForMessage()
+[0247] (BB)       talkEgo(sound(0x977FF77, 0xA) + "Oh, that would have been my second guess.")
+[0282] (A9)       wait.waitForMessage()
+[0284] (73)       jump 3b1
+[0287] (73)     } else {
+[028A] (82)       animateActor(2,17)
+[0291] (CA)       delayFrames(10)
+[0295] (BA)       talkActor(sound(0x978AE22, 0xA) + "So, how did you get started in this^line of work?",2)
+[02DB] (A9)       wait.waitForMessage()
+[02DD] (82)       animateActor(2,29)
+[02E4] (CA)       delayFrames(27)
+[02E8] (BA)       talkActor(sound(0x979938D, 0xA) + "I'm a natural.  My mother's an artist.  My father's a farmer." + wait() + "And my great-grandfather was a village idiot." + wait() + "It's in my blood.",4)
+[037C] (A9)       wait.waitForMessage()
+[037E] (BA)       talkActor(sound(0x97C7378, 0xA) + "I see.",2)
+[0399] (A9)       wait.waitForMessage()
+[039B] (73)       jump 3b1
+[039E] (**)     }
+[039E] (5D)   } else if (dup[1] == 999) {
+[03A9] (73)     jump 1358
+[03AD] (73)     /* jump 3b1; */
+[03B0] (**)   }
+[03B0] (43)   var301 = 4
+[03B7] (5D)   while (var301 <= var196) {
+[03C1] (47)     array195[var301] = 0
+[03CA] (4F)     var301++
+[03CD] (**)   }
+[03D0] (5E)   startScript(0,11,[])
+[03DA] (43)   var196 = 3
+[03E0] (5D)   if (!localvar1) {
+[03E7] (5E)     startScript(0,13,[1025])
+[03F4] (**)   }
+[03F4] (5D)   if (!localvar0) {
+[03FB] (5E)     startScript(0,13,[1061])
+[0408] (**)   }
+[0408] (5E)   startScript(0,14,[])
+[0412] (43)   var171 = 0
+[0418] (43)   var169 = getRandomNumber(1)
+[041F] (6C)   breakHere()
+[0420] (5D)   unless (var171) jump 418
+[0426] (0C)   dup[5] = var171
+[042A] (5D)   if (dup[5] == 998) {
+[0431] (BB)     talkEgo(sound(0x97CBAA3, 0xA) + "I grow more fascinated by the moment.")
+[0469] (A9)     wait.waitForMessage()
+[046B] (73)     jump 3b1
+[046E] (5D)   } else if (dup[5] == 1001) {
+[0479] (5D)     if (bitvar164) {
+[0480] (BA)       talkActor(sound(0x97D74CE, 0xA) + "I feel chock full of vitamins and ready to go!",3)
+[04C3] (A9)       wait.waitForMessage()
+[04C5] (73)     } else {
+[04C8] (43)       bitvar164 = 1
+[04CE] (82)       animateActor(2,18)
+[04D5] (CA)       delayFrames(9)
+[04D9] (BA)       talkActor(sound(0x97E3E39, 0xA) + "So, what's the biggest thing in vegetable celebrities right now?",2)
+[052E] (A9)       wait.waitForMessage()
+[0530] (43)       bitvar2 = 1
+[0536] (6C)       breakHere()
+[0537] (5D)       unless (bitvar3) jump 536
+[053D] (81)       faceActor(3,2)
+[0544] (A9)       wait.waitForMessage()
+[0546] (BA)       talkActor(sound(0x97F2B64, 0xA) + "I can't believe I lived long enough to hear you say that, Sam.",3)
+[0599] (A9)       wait.waitForMessage()
+[059B] (BA)       talkActor(sound(0x980458F, 0xA) + "You may not believe this, sonny, but the biggest thing right now is miniaturization.",4)
+[0604] (81)       faceActor(3,4)
+[060B] (A9)       wait.waitForMessage()
+[060D] (BA)       talkActor(sound(0x9826CFA, 0xA) + "Miniaturization?",2)
+[0632] (A9)       wait.waitForMessage()
+[0634] (BA)       talkActor(sound(0x982DE25, 0xA) + "Peas.",4)
+[064E] (A9)       wait.waitForMessage()
+[0650] (BA)       talkActor(sound(0x9831610, 0xA) + "Peas?",2)
+[066A] (A9)       wait.waitForMessage()
+[066C] (BA)       talkActor(sound(0x983543B, 0xA) + "I know, I know, it seems impossible." + wait() + "All we are saying^" + wait() + "^is give peas a chance.",4)
+[06D2] (A9)       wait.waitForMessage()
+[06D4] (82)       animateActor(2,27)
+[06DB] (CA)       delayFrames(7)
+[06DF] (**)     }
+[06DF] (73)     jump 3b1
+[06E2] (5D)   } else if (dup[5] == 997) {
+[06ED] (82)     animateActor(2,17)
+[06F5] (CA)     delayFrames(10)
+[06F9] (82)     animateActor(2,21)
+[0700] (CA)     delayFrames(7)
+[0704] (BB)     talkEgo(sound(0x985D6A6, 0xA) + "How late are you open?")
+[072C] (A9)     wait.waitForMessage()
+[072E] (82)     animateActor(2,22)
+[0735] (CA)     delayFrames(10)
+[0739] (BA)     talkActor(sound(0x98628D1, 0xA) + "As late as you want." + wait() + "Gotta grab the sales when you can in this business.",4)
+[0797] (A9)     wait.waitForMessage()
+[0799] (82)     animateActor(2,26)
+[07A0] (CA)     delayFrames(9)
+[07A4] (73)     jump 3b1
+[07A7] (5D)   } else if (dup[5] == 999) {
+[07B2] (BB)     talkEgo(sound(0x987AB7C, 0xA) + "Well, bye.")
+[07CF] (A9)     wait.waitForMessage()
+[07D1] (73)     jump 1358
+[07D4] (5D)   } else if (dup[5] == 1025) {
+[07DF] (43)     localvar1 = 1
+[07E6] (5D)     if (!bitvar133) {
+[07ED] (BB)       talkEgo(sound(0x98810A7, 0xA) + "So what do you know about bigfoots?")
+[0822] (A9)       wait.waitForMessage()
+[0824] (BA)       talkActor(sound(0x988A0D2, 0xA) + "Well, they don't translate well into vegetables." + wait() + "I've been experimenting with the idea for a while^" + wait() + "there's just no such thing as a furry vegetable.",4)
+[08CF] (A9)       wait.waitForMessage()
+[08D1] (BA)       talkActor(sound(0x98C04FD, 0xA) + "Check out our fridge.",3)
+[08FB] (A9)       wait.waitForMessage()
+[08FD] (43)       bitvar133 = 1
+[0903] (73)       jump 3b1
+[0906] (73)     } else {
+[0909] (BA)       talkActor(sound(0x98C71E8, 0xA) + "What about Sasquatches?",2)
+[0935] (A9)       wait.waitForMessage()
+[0937] (BA)       talkActor(sound(0x98CE913, 0xA) + "What about 'em?",4)
+[095B] (A9)       wait.waitForMessage()
+[095D] (73)       jump 3b1
+[0960] (**)     }
+[0960] (5D)   } else if (dup[5] == 1061) {
+[096B] (43)     localvar0 = 1
+[0972] (5D)     if (!bitvar134) {
+[0979] (BB)       talkEgo(sound(0x98D2F3E, 0xA) + "What prompted that batch of Conroy heads over there?")
+[09BF] (A9)       wait.waitForMessage()
+[09C1] (BA)       talkActor(sound(0x98DF469, 0xA) + "Well, I was trying a new growth hormone for some of my more^" + wait() + "distinguished personalities, when I realized it was no good." + wait() + "Now it won't stop.  They just keep growing like that^" + wait() + "big misshapen growths on top." + wait() + "Reminded me of Conroy Bumpus, so I ran a special.",4)
+[0AD9] (A9)       wait.waitForMessage()
+[0ADB] (43)       bitvar134 = 1
+[0AE1] (73)       jump 3b1
+[0AE4] (73)     } else {
+[0AE7] (BB)       talkEgo(sound(0x993FFD4, 0xA) + "Know anything else about Conroy?")
+[0B19] (A9)       wait.waitForMessage()
+[0B1B] (BA)       talkActor(sound(0x9948DFF, 0xA) + "What's there to know?  My eggplant is a fine representation of all" + wait() + "his charm, wit and personality." + wait() + "Need to know anything else?",4)
+[0BB0] (A9)       wait.waitForMessage()
+[0BB2] (BB)       talkEgo(sound(0x997D9AA, 0xA) + "That'll do it for Conroy, thanks.")
+[0BE5] (A9)       wait.waitForMessage()
+[0BE7] (73)       jump 3b1
+[0BEA] (**)     }
+[0BEA] (73)     /* jump bee; */
+[0BED] (**)   }
+[0BED] (43)   var301 = 4
+[0BF4] (5D)   while (var301 <= var196) {
+[0BFE] (47)     array195[var301] = 0
+[0C07] (4F)     var301++
+[0C0A] (**)   }
+[0C0D] (5E)   startScript(0,11,[])
+[0C17] (43)   var196 = 3
+[0C1D] (**) }
+[0C1D] (5D) if ((bitvar135 && bitvar137) && !bitvar136) {
+[0C2C] (5E)   startScript(0,13,[1042])
+[0C39] (**) }
+[0C39] (5E) startScript(0,14,[])
+[0C43] (43) var171 = 0
+[0C49] (43) var169 = getRandomNumber(1)
+[0C50] (6C) breakHere()
+[0C51] (5D) unless (var171) jump c49
+[0C57] (0C) dup[11] = var171
+[0C5B] (5D) if (dup[11] == 997) {
+[0C62] (BB)   talkEgo(sound(0x9987B55, 0xA) + "Ok, I think I've had just about all the vegetables I can take for a while." + wait() + "How about you?")
+[0CCF] (A9)   wait.waitForMessage()
+[0CD1] (BA)   talkActor(sound(0x999EE80, 0xA) + "I feel chock full of vitamins and ready to go.",3)
+[0D14] (A9)   wait.waitForMessage()
+[0D16] (73)   jump bee
+[0D19] (5D) } else if (dup[11] == 998) {
+[0D24] (81)   faceActor(2,3)
+[0D2C] (6C)   breakHere()
+[0D2D] (81)   faceActor(3,2)
+[0D34] (6C)   breakHere()
+[0D35] (0C)   dup[13] = getRandomNumberRange(1,3)
+[0D3D] (5D)   if (dup[13] == 1) {
+[0D44] (BB)     talkEgo(sound(0x99AB7AB, 0xA) + "This place is really starting to grow on me.")
+[0D83] (A9)     wait.waitForMessage()
+[0D85] (73)     jump bee
+[0D88] (5D)   } else if (dup[13] == 2) {
+[0D93] (BB)     talkEgo(sound(0x99B75D6, 0xA) + "Where to after this?")
+[0DBA] (A9)     wait.waitForMessage()
+[0DBC] (BA)     talkActor(sound(0x99BD801, 0xA) + "Beets me.",3)
+[0DDA] (A9)     wait.waitForMessage()
+[0DDC] (5D)   } else if (dup[13] == 3) {
+[0DE7] (BB)     talkEgo(sound(0x99C266C, 0xA) + "I think I've had just about all the veggie culture I can take.")
+[0E38] (A9)     wait.waitForMessage()
+[0E3A] (BA)     talkActor(sound(0x99D2417, 0xA) + "I'm with you. Lettuce be going and see what else we can turnip.",3)
+[0E8E] (A9)     wait.waitForMessage()
+[0E90] (73)     /* jump e94; */
+[0E93] (**)   }
+[0E93] (81)   faceActor(2,4)
+[0E9B] (CA)   delayFrames(2)
+[0E9F] (73)   jump bee
+[0EA2] (5D) } else if (dup[13] == 1001) {
+[0EAD] (81)   faceActor(2,3)
+[0EB5] (A9)   wait.waitForActor(-7,2)
+[0EBC] (BB)   talkEgo(sound(0x99E1D82, 0xA) + "It's great what science can do to vegetables.")
+[0EFB] (A9)   wait.waitForMessage()
+[0EFD] (BA)   talkActor(sound(0x99ED7AD, 0xA) + "Personally, I can do without food high in personality.",3)
+[0F48] (A9)   wait.waitForMessage()
+[0F4A] (81)   faceActor(2,4)
+[0F51] (CA)   delayFrames(2)
+[0F55] (73)   jump bee
+[0F58] (5D) } else if (dup[13] == 999) {
+[0F63] (81)   faceActor(2,4)
+[0F6B] (A9)   wait.waitForActor(-7,2)
+[0F72] (BB)   talkEgo(sound(0x99FED18, 0xA) + "Thanks, bye.")
+[0F90] (A9)   wait.waitForMessage()
+[0F92] (73)   jump 1358
+[0F95] (5D) } else if (dup[13] == 1042) {
+[0FA0] (BA)   talkActor(sound(0x9A050C3, 0xA) + "Where's my John Muir vegetable?",2)
+[0FD5] (A9)   wait.waitForMessage()
+[0FD7] (5D)   if (!bitvar137 && (bitvar135 == 1)) {
+[0FE6] (BA)     talkActor(sound(0x9A0E2EE, 0xA) + "It's not done yet.",4)
+[100D] (A9)     wait.waitForMessage()
+[100F] (73)     jump 1167
+[1012] (**)   }
+[1012] (5D)   if ((bitvar137 == 1) && (bitvar135 == 1)) {
+[1024] (9D)     actorOps.setCurActor(5)
+[1029] (9D)     actorOps.init()
+[102B] (9D)     actorOps.setCostume(298)
+[1030] (7F)     putActorInXY(5,299,128,57)
+[103D] (82)     animateActor(5,250)
+[1044] (82)     animateActor(5,7)
+[104B] (9D)     actorOps.setCurActor(2)
+[1050] (9D)     actorOps.setCostume(236)
+[1055] (82)     animateActor(2,249)
+[105C] (9D)     actorOps.setCurActor(4)
+[1061] (9D)     actorOps.setElevation(200)
+[1066] (CA)     delayFrames(6)
+[106A] (9D)     actorOps.setCurActor(2)
+[106F] (9D)     actorOps.setElevation(200)
+[1074] (CA)     delayFrames(3)
+[1078] (9D)     actorOps.setCurActor(4)
+[107D] (9D)     actorOps.setElevation(0)
+[1082] (CA)     delayFrames(6)
+[1086] (7F)     putActorInXY(5,0,0,0)
+[1093] (9D)     actorOps.setCurActor(2)
+[1098] (9D)     actorOps.setCostume(2)
+[109D] (9D)     actorOps.setElevation(0)
+[10A2] (82)     animateActor(2,8)
+[10A9] (CA)     delayFrames(4)
+[10AD] (9D)     actorOps.setCurActor(2)
+[10B2] (9D)     actorOps.setElevation(0)
+[10B7] (9D)     actorOps.setCurActor(2)
+[10BC] (9D)     actorOps.setCostume(7)
+[10C1] (82)     animateActor(2,3)
+[10C8] (81)     faceActor(2,4)
+[10CF] (6C)     breakHere()
+[10D0] (BA)     talkActor(sound(0x9A17219, 0xA) + "Here you go, son, a zucchini squash that looks just like John Muir.",4)
+[1128] (A9)     wait.waitForMessage()
+[112A] (43)     localvar4 = 1
+[1130] (BA)     talkActor(sound(0x9A34BC4, 0xA) + "Gee, thanks, Ma'am!",3)
+[1158] (A9)     wait.waitForMessage()
+[115A] (43)     bitvar136 = 1
+[1160] (73)     jump bee
+[1163] (**)   }
+[1163] (73)   /* jump 1167; */
+[1166] (**) }
+[1166] (43) var301 = 4
+[116D] (5D) while (var301 <= var196) {
+[1177] (47)   array195[var301] = 0
+[1180] (4F)   var301++
+[1183] (**) }
+[1186] (5E) startScript(0,11,[])
+[1190] (43) var196 = 3
+[1196] (5E) startScript(0,14,[])
+[11A0] (43) var171 = 0
+[11A6] (43) var169 = getRandomNumber(1)
+[11AD] (6C) breakHere()
+[11AE] (5D) unless (var171) jump 11a6
+[11B4] (0C) dup[19] = var171
+[11B8] (5D) if (dup[19] == 997) {
+[11BF] (81)   faceActor(2,3)
+[11C7] (CA)   delayFrames(2)
+[11CB] (A9)   wait.waitForActor(-7,2)
+[11D2] (BB)   talkEgo(sound(0x9A3A9AF, 0xA) + "Ok, I think I've had just about all the vegetables I can take for a while." + wait() + "How about you?")
+[123E] (A9)   wait.waitForMessage()
+[1240] (BA)   talkActor(sound(0x9A530DA, 0xA) + "Sure, lettuce be going.",3)
+[126C] (A9)   wait.waitForMessage()
+[126E] (73)   jump 1167
+[1271] (5D) } else if (dup[19] == 998) {
+[127C] (81)   faceActor(2,3)
+[1284] (CA)   delayFrames(2)
+[1288] (BB)   talkEgo(sound(0x9A5AA05, 0xA) + "Let's go see what we can turnip.")
+[12BA] (A9)   wait.waitForMessage()
+[12BC] (73)   jump 1167
+[12BF] (5D) } else if (dup[19] == 1001) {
+[12CA] (81)   faceActor(2,3)
+[12D2] (CA)   delayFrames(2)
+[12D6] (BB)   talkEgo(sound(0x9A620B0, 0xA) + "Where to now?")
+[12F5] (A9)   wait.waitForMessage()
+[12F7] (BA)   talkActor(sound(0x9A66D5B, 0xA) + "Beets me.",3)
+[1315] (A9)   wait.waitForMessage()
+[1317] (73)   jump 1167
+[131A] (5D) } else if (dup[19] == 999) {
+[1325] (81)   faceActor(2,4)
+[132D] (CA)   delayFrames(2)
+[1331] (BB)   talkEgo(sound(0x9A6ABC6, 0xA) + "Thanks, bye.")
+[134F] (A9)   wait.waitForMessage()
+[1351] (73)   jump 1358
+[1354] (73)   /* jump 1358; */
+[1357] (**) }
+[1357] (9D) actorOps.setCurActor(2)
+[135D] (9D) actorOps.setCostume(4)
+[1362] (A9) wait.waitForMessage()
+[1364] (5E) startScript(0,10,[])
+[136E] (5D) if (localvar4) {
+[1374] (5F)   startScriptQuick(54,[548])
+[137E] (**) }
+[137E] (66) stopObjectCodeB()
+END
