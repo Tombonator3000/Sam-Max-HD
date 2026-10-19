@@ -1,0 +1,46 @@
+; Objekt 71 "office-tv" i rom 7 (OBCD/VERB)
+; Verbtabell (verb: offset fra starten av VERB-blokken): 3: 0x0056, 4: 0x0012
+; Mellom verbtabellen og første inngang: 1 x (01, uint16) = 18. Ingen inngang peker dit, og descumm hopper over dem. Satt som klasser gir de samme bitene som DOBJ har for objektet.
+
+Events:
+   3 - 0056
+   4 - 0012
+[0012] (BB) talkEgo(sound(0x3308C4, 0xA) + "We've been through a lot together, this TV and I.")
+[0055] (65) stopObjectCodeA()
+[0056] (5D) if (ifClassOfIs(var7,[146])) {
+[0063] (68)   beginCutscene([])
+[0067] (7D)   walkActorToObj(2,71,0)
+[0071] (A9)   wait.waitForActor(-7,2)
+[0078] (9D)   actorOps.setCurActor(2)
+[007D] (9D)   actorOps.init()
+[007F] (9D)   actorOps.setCostume(39)
+[0084] (82)   animateActor(2,6)
+[008B] (6E)   setClass(var7,[18])
+[0095] (5E)   startScript(0,211,[0])
+[00A2] (CA)   delayFrames(8)
+[00A6] (9D)   actorOps.setCurActor(2)
+[00AB] (9D)   actorOps.init()
+[00AD] (9D)   actorOps.setCostume(2)
+[00B2] (9D)   actorOps.setTalkColor(6)
+[00B7] (9D)   actorOps.setTalkPos(0,-110)
+[00BF] (67)   endCutscene()
+[00C0] (73) } else {
+[00C3] (68)   beginCutscene([])
+[00C7] (7D)   walkActorToObj(2,71,0)
+[00D1] (A9)   wait.waitForActor(-7,2)
+[00D8] (9D)   actorOps.setCurActor(2)
+[00DD] (9D)   actorOps.init()
+[00DF] (9D)   actorOps.setCostume(39)
+[00E4] (82)   animateActor(2,6)
+[00EB] (6E)   setClass(var7,[146])
+[00F5] (5E)   startScript(0,211,[1])
+[0102] (CA)   delayFrames(8)
+[0106] (9D)   actorOps.setCurActor(2)
+[010B] (9D)   actorOps.init()
+[010D] (9D)   actorOps.setCostume(2)
+[0112] (9D)   actorOps.setTalkColor(6)
+[0117] (9D)   actorOps.setTalkPos(0,-110)
+[011F] (67)   endCutscene()
+[0120] (**) }
+[0120] (65) stopObjectCodeA()
+END

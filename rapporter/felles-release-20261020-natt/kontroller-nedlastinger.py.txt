@@ -1,0 +1,12 @@
+from pathlib import Path
+import json,hashlib,zipfile,subprocess,shutil
+O=Path(__file__).resolve().parent;P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/felles-release-20261020-natt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();code='791234afdaaf27898051dfa12373842ee539cd54';native='bdd4aec8b14581a0e090d976262818cda9246175';checks=[]
+for platform,names in [('linux',['SamMaxHD-x86_64.AppImage','SamMaxHD-x86_64.AppImage.sha256']),('windows',['SamMaxHD-Windows.zip','SamMaxHD-Windows.zip.sha256'])]:
+ run=json.loads((O/f'run-{platform}.json').read_text());assert run['conclusion']=='success' and run['status']=='completed' and run['headSha']==code;meta=json.loads((O/f'release-{platform}.json').read_text());assert native in meta['body'] and ('Sam-Max-HD: '+code[:7]+'\n') in meta['body']
+ for name in names:
+  p=O/platform/name;a=next(a for a in meta['assets'] if a['name']==name);h=sha(p);assert p.stat().st_size==a['size'] and a['digest']=='sha256:'+h;checks.append(dict(plattform=platform,fil=name,sha256=h,bytes=p.stat().st_size,asset_id=a['id']))
+ assert (O/platform/names[1]).read_text().split()[0]==sha(O/platform/names[0])
+(O/'assetkontroll.json').write_text(json.dumps(checks,indent=2)+'\n');(R/'assetkontroll.json').write_text(json.dumps(checks,indent=2)+'\n');print(json.dumps(checks),flush=True)
+linux=O/'linux';assert not(linux/'squashfs-root').exists()
+with(linux/'extract.log').open('wb') as f:subprocess.run([str(linux/'SamMaxHD-x86_64.AppImage'),'--appimage-extract'],cwd=linux,stdout=f,stderr=subprocess.STDOUT,check=True)
+print('Linux AppImage pakket ut',flush=True)

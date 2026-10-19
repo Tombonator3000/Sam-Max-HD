@@ -1,0 +1,15 @@
+# Bestilling12, kildearbeid pågår
+
+Ti jobber: fig039_01, fig113_01, fig295_01 og fig346_01 til07. 43 spillruter fra40 eksakt ulike hele kildeutsnitt,40 beskyttede SHA-er. Publisert grunnlag bdd4aec8,2134 native, alle20376 fil-SHA-er bevart. Ingen bildekall, resultat.png eller notat.md i denne bunken ennå. Ikke dupliser ferdig193/298/009.
+
+039 er Sam som rekker fram og slår TV-en på/av på kontoret, rom7. Objekt71 office-tv har bruksskript som setter aktør2 til39. Ingen ny rekvisitt i hånden. Nøyaktig walkActorToObj-posisjon er ikke utledet fra hotspot ennå; en prøve ved130,174 er synlig diagnose, ikke påstått kildeposisjon.
+
+113 er Sam som tar fram og vrir en lys golfkølle på Gator Golf, rom25. Lokalt207 setter113 ved119,177,217 ved117,177 i møtet med Conroy/Lee Harvey. Grønn/blå drakt fra Sam-master, den lyse tynne køllen og hver grep-/rotasjonsfase fra originalen. Ikke en kjepp eller pistol. Dette er en annen originalsekvens enn den tidligere avviste110_05/06; den gamle avviste runden skal ikke bestilles på nytt.
+
+295 er Max i kjøkkenet, rom56. Lokalt210/211 setter aktør3,kostyme295 ved64,142 og spiller6/7 sammen med andre lag/objekter ved fryseren. Start-/sluttlag er bevisst delvise fragmenter; ikke fullfør manglende kropp/ører. Se faktisk motor sammen med fryseren før nytegning.
+
+346 er Sam i alkovenærbildet, rom92. Lokalt201 bruker aktør6 ved159,101 og342 til346 etter tur. Den varme brune/orange paletten er tilsiktet romlys, bekreftet i gpt-romnotater.csv og figurer.csv; ikke normal blågrå drakt fra master. Arkene har lag13 for torso og lag14 for hode/overkropp med pilgag. Bevar kildebekreftede sugekopper/piler, hatt, ansikt, avkuttede skuldre og varm palett. Ikke tegn kroppslagene som hele figurer. Første sju346-jobber er bare begynnelsen av346-serien, ikke hele kostymet. Se originalmotorens lag sammen før detaljering, og bruk Sam-master kun til identitet/strek, ikke til å endre kildefargene.
+
+Sju primærskript og originalark er sett. Motor-/designkontroll gjenstår før nye kall. Pakkebygg2134 kjører ved samlepunktet felles-release-20261020-natt, Linux39340616184/Windows39340620900. Ikke start dem på nytt eller send ny hd-mod mens grunnlaget sikres. Kildearbeid/nytegning i jobbmappen kan fortsette uavhengig.
+
+Fem originale motorforløp er nå kjørt og sett. Alle43 forventede ruter er observert,400 skjermbufferkontroller. Rom7 har kjent160 ved36 før testfiguren, null fra40; øvrige forløp null.039 er fortsatt diagnosepos130,174.295 viser Max som går ut av/inn i fryseren med bevisst avkuttede lag; ikke fjern kildens manglende områder.346 er den tydelige sugepil-gagen foran hjerteobjektet i alkoven: lilla sugekopper, gule skaft og lilla styrefjær, varmbrun Sam-drakt og varm hud, torso/head tegnes sammen. Kostyme346 har flere senere lag enn de første sju jobbene her; ikke kall hele serien ferdig. Ingen ny bildegenerering ennå.

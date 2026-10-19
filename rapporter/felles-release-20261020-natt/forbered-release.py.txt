@@ -1,0 +1,20 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-natt';R=A/'rapporter/felles-release-20261020-natt';h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();m=json.loads((O/'linux-kontroll.json').read_text());assert m['nye_native_observert']==174 and not m['mangler_i_avspilling'] and m['runder']==15;assert m['skjermbufferkontroller']==980 and m['kontroller_fra_figurstart']==871 and m['null_fra_figurstart']==861
+imgs=sorted(R.glob('pakke-motorbilder-*.png'));assert len(imgs)==2;review=dict(kontrollert_utc=datetime.now(timezone.utc).isoformat(),kontrollert_av='Codex',motorbilder_sett=15,kontaktark={p.name:h(p) for p in imgs},nye_native_observert=174,ruter_med_egen_visuell_kontroll=174,begge_nedlastinger_sjekksumkontrollert=True,begge_modder_filvis_kontrollert=True,konklusjon='Ingen nye/økte skjermbufferavvik. Fire tidligere omrissmerknader i193-bunken og ni i337/015-bunken er fortsatt dokumentert; ingen ny Tom-/Claude-godkjenning.',begrensning='Tvungne tester, ikke naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Kjente27 inventarkantpiksler i rom35 er ikke rettet.');(R/'visuell-kontroll.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n')
+body='''Linux og Windows har nå samme kontrollerte grafikkpakke med **2134 native HD-ruter**, 174 flere enn forrige fellesutgave. Nye animasjoner viser Max med sjokolademedaljongen og fisken, Sam og museumsdamen med John Muir-portrettet/grønnsaken, samt flere introposer. Grafikkarbeidet fortsetter.
+
+Last ned **SamMaxHD-Windows.zip** for Windows eller **SamMaxHD-x86_64.AppImage** for Linux. Spillet og talen følger med. Linux: gjør filen kjørbar og start den. Ctrl+H bytter grafikk, F5 åpner originalmenyen.
+
+Begge faktiske nedlastinger og SHA-filer er kontrollert. Alle 20 375 runtime moddfiler per pakke er identiske med publisert modd. Linux: 15 prøver, alle 174 nye ruter observert og 980 skjermbufferkontroller uten nye eller økte avvik. Inventar, akvarium og cafeteria er kontrollert. Et kjent lite inventarkantavvik i fiskerommet står fortsatt dokumentert. Windows har grønt pakkebygg og samme grafikkfiler. Ikke full gjennomspilling eller ny interaktiv Windows-test.
+
+Kilde: 791234afdaaf27898051dfa12373842ee539cd54
+hd-mod: bdd4aec8b14581a0e090d976262818cda9246175
+Linux-bygg: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39340616184
+Windows-bygg: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39340620900
+Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/felles-release-20261020-natt/RAPPORT.md
+
+Spillet og grafikken tilhører Disney/Lucasfilm.
+'''
+(O/'utgivelse-notat.md').write_text(body);shutil.copy2(O/'utgivelse-notat.md',R/'utgivelse-notat.md');prior=json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/releases?per_page=100'],cwd=P,text=True));assert not any(v['tag_name']=='sam-max-hd-2026-10-20-natt' for v in prior);assert len(prior)==9;assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]=='bdd4aec8b14581a0e090d976262818cda9246175';(O/'releaser-foer.json').write_text(json.dumps(prior,indent=2)+'\n');shutil.copy2(O/'releaser-foer.json',R/'releaser-foer.json');shutil.copy2(__file__,R/'forbered-release.py.txt');print('15 motorbilder visuelt kontrollert, konkret releasebeskrivelse og ni tidligere utgivelser lagret')

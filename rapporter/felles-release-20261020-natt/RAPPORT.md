@@ -1,0 +1,13 @@
+# Felles Linux-/Windows-pakke med 2134 native
+
+2026-10-20 01:30, Codex. Linux39340616184 og Windows39340620900 er grønne fra main791234afdaaf27898051dfa12373842ee539cd54 og hd-mod bdd4aec8b14581a0e090d976262818cda9246175. Kodeendringene siden forrige pakke er bare minne/status/todo/logg, ingen ny motor-/pipelinekode.174 nye native siden1960-pakken:113 fra337/015 og61 fra193/298/009. Begge bygg ble startet én gang. Statushjelperens to avvik er logget separat og rettet uten ny dispatch.
+
+Begge faktiske nedlastinger og begge SHA-filer er kontrollert mot alle fire API-digester/størrelser. Linux SHA256:3b14cca0d426b08b9a541768bc339b404f2e163d2a6d507c551df4be85079f62. Windows SHA256:3039715804c655141cf8bc3c9b0acc33ebb0e924d48e5e7a1f6f5f012dfd4bc1. BYGG.txt viser korrekt kort kode-SHA791234a og full mod-SHA; de fulle kode-SHA-ene er bekreftet mot begge Actions-run-ID-ene. Ingen ombygging var nødvendig for denne metadataforskjellen.
+
+Alle20375 runtime moddfiler i hver pakke er byteidentiske med den publiserte modden og hverandre. Pakkeskriptene utelater bare mod-grenens README.md.2134 native bekreftet både i mod.json og faktisk filantall. Alle174 nye SHA-er bekreftet i pakkene. Se assetkontroll.json og moddfiler-kontroll.json.
+
+Den faktisk nedlastede Linux-binæren har SHA256 d025b6736517d56564f1691498a54fcc3d3feeb6e4f287afd5aad2faaea7b428.15 isolerte prøver med egneHOME/XDG/saves: inventar åpne/lukke, akvarium, cafeteria og12 figurforløp. Alle174 nye native logget tegnet. 980 skjermbufferkontroller, 871 fra figurstart; 861 null. De øvrige ti målingene etter figurstart har de samme27 inventarkantpikslene i rom35 ved40 til56, fem per193-forløp. Kjente oppstartsavvik61 i rom35 og160 i rom86 ved36 er like produksjonsgrunnlaget. Ingen nye/økte avvik tillatt. Tre UI-prøver helt null. Alle nye ruter er også visuelt kontrollert i produksjonsbunkene. Pakkekontrollen har15 hele motorbilder på to kontaktark; visuell vurdering lagres separat etter at de er sett.
+
+Tvungne forløp, ikke naturlig gjennomspilling. Museumsrutene suppleres med synlig diagnose170,165. Ingen ny interaktiv Windows-/webtest, Tom-godkjenning eller separat Claude-kontroll. Windows har grønt pakkebygg, CI-startprøve og samme grafikkfiler.
+
+Ny fellesrelease planlagt som sam-max-hd-2026-10-20-natt. Publiseres først etter kontroll av alle fire opplastede filer, og kontrolleres igjen etter publisering. De tidligere fellesutgivelsene og deres assets bevares. Se publisert.json for faktisk publisering, URL og Latest-status. Grafikkproduksjonen fortsetter med bestilling12, ikke ferdig HD-utgave.

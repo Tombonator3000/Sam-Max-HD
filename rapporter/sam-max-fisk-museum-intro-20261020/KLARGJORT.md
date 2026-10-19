@@ -1,3 +1,7 @@
+# Status: bunken er levert
+
+Fem ark og61 native er publisert i bdd4aec8. Se RAPPORT.md og mottak-publisert.json. Kildeklargjøringen nedenfor er historikk, ikke neste produksjonsjobb. Neste bestilling12 står i egen rapportmappe.
+
 # Neste fem jobber, kildeavklaring pågår
 
 fig193_01/02,fig298_01/02 ogfig009_01.61 spillruter fra55 eksakt ulike hele kildeutsnitt,20 beskyttede SHA-er. Publisert grunnlag6512f670,2073 native, alle20315 fil-SHA-er bevart. Ingen bildekall, resultat.png eller notat.md i denne bunken ennå. Ikke dupliser ferdig337/015.

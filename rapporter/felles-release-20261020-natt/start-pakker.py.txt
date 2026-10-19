@@ -1,0 +1,14 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-natt';R=A/'rapporter/felles-release-20261020-natt';O.mkdir(exist_ok=False);R.mkdir(exist_ok=False);api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True));code='791234afdaaf27898051dfa12373842ee539cd54';native='bdd4aec8b14581a0e090d976262818cda9246175'
+assert api('git/ref/heads/main')['object']['sha']==code and api('git/ref/heads/hd-mod')['object']['sha']==native
+changes=subprocess.check_output(['git','diff','--name-only','51c0130f019bbba1fc57c4bcfa2aaee4feab94c3',code],cwd=P,text=True).splitlines();assert set(changes)<={'memory.md','todo.md','STATUS.md','log.md'},changes
+prior=api('releases?per_page=100');(O/'releaser-foer-bygg.json').write_text(json.dumps(prior,indent=2)+'\n');running=api('actions/runs?per_page=30')['workflow_runs'];assert not any(r['name'] in ('Linux-pakke','Windows-pakke') and r['status']!='completed' for r in running)
+results=[]
+for wf in ('linux.yml','windows.yml'):
+ subprocess.run(['gh','workflow','run',wf,'--ref','main'],cwd=P,check=True)
+ new=json.loads(subprocess.check_output(['gh','run','list','--workflow',wf,'--event','workflow_dispatch','--limit','1','--json','databaseId,headSha,status,createdAt,url'],cwd=P,text=True))[0];assert new['headSha']==code and new['databaseId'] not in [v['id'] for v in running];results.append(new);print(wf,new,flush=True)
+state=dict(startet_utc=datetime.now(timezone.utc).isoformat(),kode=code,kode_siden_forrige_bare_dokumentasjon=changes,hd_mod=native,native=2134,nye_siden_pakken=174,linux_run=results[0]['databaseId'],windows_run=results[1]['databaseId'],status='bygger',faktiske_nedlastinger_kontrollert=False,publisert=False,planlagt_felles_tag='sam-max-hd-2026-10-20-natt',gammel_verifisert_release='sam-max-hd-2026-10-19-natt',gammel_native=1960,merknad='Ikke publiser ny hd-mod før begge bygg har hentet grunnlaget og faktiske pakker er kontrollert. Ikke dupliser disse byggene.')
+for d in (O,R):(d/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+(R/'PAAGAR.md').write_text(f'# Samlepunkt pågår\n\nLinux {state["linux_run"]}, Windows {state["windows_run"]}, main {code}, hd-mod {native}, 2134 native. 174 nye siden1960-pakken:113 fra337/015 og61 fra193/298/009. Begge bygg startet én gang. Faktisk nedlasting, sjekksummer, innholdskontroll og relevant Linux-avspilling gjenstår før ny fellesrelease. Bevar tidligere releaser. Ikke start nye bygg eller send ny hd-mod mens dette grunnlaget sikres. Neste grafikkbestilling12 kan kildeklargjøres uavhengig.\n');shutil.copy2(__file__,R/'start-pakker.py.txt')
