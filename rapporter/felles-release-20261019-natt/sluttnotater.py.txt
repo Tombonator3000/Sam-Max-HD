@@ -1,0 +1,38 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,zipfile,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/felles-release-20261019-natt';O=P/'out/felles-release-20261019-natt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();stamp=datetime.now(ZoneInfo('Europe/Oslo')).isoformat()
+(R/'visuell-kontroll.json').write_text(json.dumps(dict(dato=stamp,vurdert_av='Codex',hele_motorbilder_sett=15,ny_native_observert=184,bilder={p.name:sha(p) for p in R.glob('pakke-motorbilder-*.png')},kilde_native_motor_vurdert_i_bunkene=True,naturlig_gjennomspilling=False,interaktiv_Windows=False,ny_webtest=False,ny_Tom_godkjenning=False,separat_Claude_kontroll=False),ensure_ascii=False,indent=2)+'\n');p=R/'RAPPORT.md';p.write_text(p.read_text().replace('Videre visuell vurdering registreres separat etter at bildene er sett.','Alle15 hele motorbilder er sett av Codex, se visuell-kontroll.json.'))
+notes='''Begge pakkene har samme kontrollerte HD-grafikk med 1 960 native animasjonsruter. 184 flere enn forrige fellespakke: nye Sam-/Max-animasjoner ved Frog Rock, dinosaurhyssingen, World of Fish og sluttscenen med medaljongen. Grafikkarbeidet fortsetter; dette er ikke en fullført HD-utgave.
+
+Last ned **SamMaxHD-Windows.zip** for Windows eller **SamMaxHD-x86_64.AppImage** for Linux. Spillet og talen følger med. Linux: gjør filen kjørbar og start den. Ctrl+H bytter grafikk, F5 åpner originalmenyen.
+
+Begge faktiske nedlastinger og SHA-filer er kontrollert. Alle 20 201 runtime moddfiler per pakke er identiske. Linux: 15 prøver, alle 184 nye ruter observert, inventar/akvarium/cafeteria kontrollert. Ingen nye skjermavvik mot grunnlaget. Et lite kjent fargeavvik ved inventariknappen under tvunget romhopp er dokumentert. Windows har grønt pakkebygg og samme grafikkfiler. Ikke full gjennomspilling eller ny interaktiv Windows-test.
+
+Kilde: 51c0130f019bbba1fc57c4bcfa2aaee4feab94c3
+hd-mod: 2776cff3eb9abcbcfde5bc0bef570989e0e76665
+Linux-bygg: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39329444531
+Windows-bygg: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39329448080
+Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/felles-release-20261019-natt/RAPPORT.md
+
+Spillet og grafikken tilhører Disney/Lucasfilm.
+'''
+(O/'utgivelse-notat.md').write_text(notes);(R/'utgivelse-notat.md').write_text(notes)
+N=A/'rapporter/max-slutt-og-handling-20261019';B=P/'out/max-slutt-og-handling-20261019';base=json.loads((N/'motor-baseline.json').read_text());expected={t['bilde'] for p in json.loads((N/'ruteplan-unik.json').read_text())['ruter'] for t in p['malruter']};seen={f"costume{r['kostyme']:03}_{n}" for r in base for n in r['tegnede_ruter']};assert expected<=seen;proof={}
+with zipfile.ZipFile(N/'originalmotor-logger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for r in base:
+  p=B/r['scene']/'scummvm.log';rel=p.relative_to(B).as_posix();z.write(p,rel);proof[rel]=sha(p)
+(N/'originalmotor-logger-manifest.json').write_text(json.dumps(proof,indent=2)+'\n');(N/'KLARGJORT.md').write_text('''# Neste fem jobber, originalgrunnlag bevart
+
+fig337_01 til03 og fig015_01 til02.113 spillruter fra69 eksakt ulike hele originalutsnitt,20 beskyttede kilder. Publisert grunnlag2776cff3,1960 native, alle20202 fil-SHA-er bevart. Ingen nye bildekall, resultat.png eller notat.md i denne bunken ennå. Ikke dupliser ferdige168/336 eller215/300.
+
+337 animasjon1:53 Max-ruter i rom86 ved104,192, først med medaljongen, så pakker han av folien, spiser sjokoladen og reagerer med komisk strekk. Originaldialogen sier uttrykkelig «Foil-covered chocolaty goodness». Medaljongen er derfor en sjokolademedaljong i folie, ikke en permanent metallmedalje eller kokosnøtt. Bevar alle faser, mistede biter og folien etter kilden. Godkjent Max-master.337_01/02 er bare Max.337_03 har de siste fem Max-rutene og30 mikro-lag i animasjon7. Disse30 består av bare to ulike grå/svarte former,1x2 og3x2: en grå øvre piksel/svart nedre, eller to grå øvre og en svart nedre. De beveger seg rundt x24-35,y124-130 når aktøren står104,192. Dette er ikke Sam og skal ikke tegnes som en ny stor hatt. Kildeskriptet bruker ekstraaktør6 samtidig med høvding335/264 og Sam336 når høvdingen tilbyr sitt rituelle hodeplagg. Se dem sammensatt i den relevante sekvensen og avklar deres funksjon før eventuell detaljering; ikke gjett nytt motiv. Andre uavhengige jobber kan fortsette.
+
+015 er Max i introens laboratorium i rom2, ikke gaten ved kontoret. Globalt skript65 bruker aktør3, pos134,173. Animasjon1 har Max som dukker fram, med helt svarte/tunge grå silhuettfaser før kremfargede squash-/strekkfaser. Ikke gjør de mørke fasene lyse eller legg klær på Max. Animasjon7 er én delvis/flat Max-cel. Hold den delvis, ikke fyll hele kroppen eller ørene. Godkjent Max-master, kildepalett i rom2.
+
+Alle fem originalark og fire hele originalmotorforløp er sett.113 forventede ruter er logget i fire forløp med c00096cb, ingen nye337/015-native i modden. Rom86 har kjent160 ved36 før testfiguren og null fra40. Rom2 har null avvik. Alle320-frame-forløp er bevart. Dette er kildeklargjøring og ingen nye leveranser. Før hver nytegning må aktuelle kildepose og riktig master ses igjen. Ikke gjenbruk samme generelle Max-prompt for mikro-lagene.
+
+Linux39329444531 og Windows39329448080 med1960 kontrolleres ved samlepunktet felles-release-20261019-natt. Se den rapporten for faktisk publisering. Ikke send ny hd-mod før pakkegrunnlaget er sikret; etter publisert1960-pakke kan neste kandidat bygges additivt fra2776cff3.
+''')
+shutil.copy2(__file__,R/'sluttnotater.py.txt');print('Pakkevisualer og kildegrunnlag113 bekreftet. Ingen generering i neste bunke.')
