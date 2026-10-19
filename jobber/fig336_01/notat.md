@@ -19,3 +19,5 @@ Alle109 er sammenlignet visuelt som original, native og faktisk motorbilde. Ått
 ## Status
 
 Nytegnet, egenkontrollert, native mottatt, visuelt sett og motorobservert av Codex. Faktisk publisering og tilbakehenting står i mottak-publisert.json når den finnes. Ikke naturlig gjennomspilling, separat Claude-kontroll eller ny Tom-godkjenning. Ingen ny interaktiv Windows-/webtest. Den verifiserte fellespakken har1776 native og mangler184 mot kandidat1960. Ny pakke blir først omtalt som oppdatert etter faktiske nedlastinger og filhashkontroll.
+
+Pakkeoppdatering 2026-10-20 00:01: inkludert og verifisert i faktisk nedlastet Linux-/Windows-release sam-max-hd-2026-10-19-natt,1960 native. Alle20201 runtime moddfiler per pakke stemmer med2776cff3. Se rapporter/felles-release-20261019-natt/publisert.json.

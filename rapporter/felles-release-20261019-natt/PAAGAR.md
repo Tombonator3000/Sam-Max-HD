@@ -1,7 +1,3 @@
-# Ny fellespakke,1960 native
+# Pakkeoppdateringen er fullført
 
-2026-10-19 23:44. Linux39329444531 og Windows39329448080 bygger fra samme main51c0130f og publisert hd-mod2776cff3eb9abcbcfde5bc0bef570989e0e76665. Begge er startet én gang ved samlepunktet. De tar med184 nye native siden senkveldspakken1776:75 fra215/300 og109 fra168/336.
-
-Ikke kall pakken oppdatert ennå. Last ned begge faktiske pakker og SHA-filer fra linux/windows-release når byggene er grønne, kontroller sjekksummer, alle runtime moddfiler mot2776cff3 og kjør relevant motoravspilling med den faktiske Linux-binæren. Bevar eksisterende releaser og lag ny fellesrelease sam-max-hd-2026-10-19-natt først etter kontroll. Ny webtest, interaktiv Windows-test og naturlig gjennomspilling skal fortsatt skilles fra disse testene.
-
-Ikke endre hd-mod under byggingen. Fortsett kildeklargjøring av neste337/015 i mellomtiden. Nattkontrollen fra15. oktober skal ikke startes igjen.
+https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-19-natt er publisert og bekreftet Latest,1960 native.184 nye siden1776-pakken. Begge nedlastinger, SHA-filer, fire opplastinger og20201 runtime moddfiler per pakke kontrollert.15 Linux-prøver, alle184 nye ruter observert, ingen nye/økte avvik; kjent inventarikantavvik dokumentert. Ikke bygg dette samlepunktet på nytt. Neste grafikkbunke er klargjort i max-slutt-og-handling-20261019:113 ruter,69 ulike kilder,20 beskyttede SHA-er, ingen bildekall/resultater ennå. Se KLARGJORT.md for mikro-lag som må forstås sammensatt.

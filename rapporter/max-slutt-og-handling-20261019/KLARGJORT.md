@@ -9,3 +9,5 @@ fig337_01 til03 og fig015_01 til02.113 spillruter fra69 eksakt ulike hele origin
 Alle fem originalark og fire hele originalmotorforløp er sett.113 forventede ruter er logget i fire forløp med c00096cb, ingen nye337/015-native i modden. Rom86 har kjent160 ved36 før testfiguren og null fra40. Rom2 har null avvik. Alle320-frame-forløp er bevart. Dette er kildeklargjøring og ingen nye leveranser. Før hver nytegning må aktuelle kildepose og riktig master ses igjen. Ikke gjenbruk samme generelle Max-prompt for mikro-lagene.
 
 Linux39329444531 og Windows39329448080 med1960 kontrolleres ved samlepunktet felles-release-20261019-natt. Se den rapporten for faktisk publisering. Ikke send ny hd-mod før pakkegrunnlaget er sikret; etter publisert1960-pakke kan neste kandidat bygges additivt fra2776cff3.
+
+Pakkeoppdateringen er nå bekreftet ferdig: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-19-natt,1960 native. Neste grafikk kan etter kontroll av gjeldende fjern-SHA publiseres additivt fra2776cff3; ikke gjenta pakkebyggene.

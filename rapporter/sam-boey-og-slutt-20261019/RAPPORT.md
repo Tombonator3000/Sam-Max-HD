@@ -33,3 +33,5 @@ Neste bunker fra bestilling11: fig337_01 til03 og fig015_01 til02. Disse er ikke
 Bibliotek brukt: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Tilpasset prosjektets v6-mottak og faktiske produksjonsbinær. Rawprompter og denne rapporten skiller nytegnet, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert.
 
 Publisering og tilbakehenting bekreftet: kilde 4274457c09e5a5a69e0ec5512c4973ad29289a91, hd-mod 2776cff3eb9abcbcfde5bc0bef570989e0e76665. Alle20196 kandidat-PNG-er og alle20087 tidligere PNG-er bekreftet.109 nye native-SHA-er stemmer.1960 native totalt. Alle24 beskyttede kilder og tre stasher uendret. Se mottak-publisert.json.
+
+Pakkeoppdatering fullført 2026-10-20 00:01: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-19-natt,1960 native,184 nye siden1776-pakken. Begge faktiske nedlastinger, SHA-er,20201 moddfiler per pakke og alle fire opplastinger verifisert. Alle184 nye native observert i15 Linux-prøver. Se felles-release-20261019-natt/publisert.json.
