@@ -7,3 +7,5 @@ Kostyme 220 og rom 43, Bumpusvilles gang. Docs/GJENNOMGANG.md beskriver vedlikeh
 Ruteplanen beviser identisk størrelse og RGBA for gjenbruk mellom flere kostymelag. Ikke slå sammen ulike kilder. Samme kilde får samme tegningsgrunnlag, men alle 44 native ruter og alle lag beholdes. Se også små kontroll-/dekselbilder i fig220_01 og 07. Ikke tegn hele Sam på en liten del.
 
 Publisert grunnlag er hd-mod d31c30f269ed7b0b8746b5b1dfb5c50551cc900d med 1546 native; gpt-arbeid må hentes og faktisk status telles før neste import. Publisert modd skal utvides additivt. Fire avviste VR-ark fig246_16 til 19 står separat åpne; de er ikke gjenbestilt.
+
+Oppfølging samme dato: alle åtte ark er nå faktisk produsert, kontrollert og publisert. Se RAPPORT.md, fremdrift.json og mottak-publisert.json. Klargjøringsteksten over er historisk, ikke en åpen jobb.

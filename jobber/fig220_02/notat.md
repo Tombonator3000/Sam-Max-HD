@@ -10,3 +10,5 @@ Siste egenkontroll: OK for alle rutene. Native mottak: alle OK med uendrede gren
 
 Resultat SHA-256: e308ec8326895f8f3b5833524fcab90436c55d2257a15a33b0cefabebaa13d54
 Rutekart: rapporter/sam-automat-20261019/rutekart-fig220_02.json
+
+Publisert i kildecommit 48ded06de6b64c2f4435b24b9e19846c3f9beb34, native i hd-mod 9e9f22dfd7f5c254b000cd43fb4e1857499b2fdd. Alle 44 nye native SHA-er og alle 19 826 kandidat-PNG-er er bekreftet etter hent.

@@ -47,3 +47,7 @@ Kildene leveres på gpt-arbeid. Native publiseres additivt fra d31c30f2 etter ko
 Felles Linux-/Windows-release fra 19. oktober har fortsatt 1546 native ruter. Denne nye bunken på 44 er foreløpig en oppdatering av kilde- og modgrenen; ikke kall nedlastingspakkene oppdatert til 1590. Pakkene oppdateres ved neste samlepunkt og kontrolleres fra faktiske nedlastinger.
 
 ![Sam og roboten i produksjonsmotoren](sam-og-robot-motor.png)
+
+## Faktisk publisert og hentet tilbake
+
+Kildecommit 48ded06de6b64c2f4435b24b9e19846c3f9beb34, hd-mod 9e9f22dfd7f5c254b000cd43fb4e1857499b2fdd. Alle 44 nye native SHA-er og alle 19 826 kandidat-PNG-er stemmer etter tilbakehenting med SHA256SUMS-kontroll. Alle 19 782 tidligere PNG-er og alle tidligere filer er bevart. De 32 beskyttede kildefilene er uendret og de tre stashene beholdt. 1590 native totalt. Kvittering i mottak-publisert.json; fremdriftens importert/publisert er nå true. Ingen ny Tom- eller Claude-godkjenning. Nedlastingspakken har fortsatt 1546.
