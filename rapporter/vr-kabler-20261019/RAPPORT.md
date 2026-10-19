@@ -41,3 +41,7 @@ Grafikk og bevis går til gpt-arbeid. Native legges additivt til hd-mod fra db0b
 145 av 1758 figurjobber har resultat, 1613 mangler pluss returer og stil-/spillkontroll. Neste jobb er fig246_11. Dette avslutter ikke Toms bestilling om all grafikken. Den nye automasjonen Fullfør Sam & Max-grafikken er ACTIVE hvert 20. minutt i samme chat og gjenopptar arbeidet. Gammel nattkontroll fra 15. oktober forblir PAUSED. Maskinen og skrivebordsappen må kjøre for lokale filer. Pakkene fra 18. oktober har fortsatt 1386 native til nye pakker faktisk er bygget og kontrollert.
 
 ![Sam med VR-hjelmen, fra motorprøven](sam-med-vr-hjelm-motor.png)
+
+## Faktisk publisert og hentet tilbake
+
+Kildecommit 5e65f9a00acc56bfed877b7c520b0d4bbc5e2368, hd-mod 44dbaf3b8ee03ea87096ef5f81adea4a964f65c2. Alle 62 nye native SHA-er og alle 19 762 kandidat-PNG-er stemmer etter tilbakehenting og SHA256SUMS-kontroll. Alle 19 700 tidligere PNG-er er uendret. 1526 native totalt. Ti resultat-SHA-er er de samme som i den kontrollerte kildecommiten. Kvittering i mottak-publisert.json. Dette er ikke ny Tom-/Claude-godkjenning.
