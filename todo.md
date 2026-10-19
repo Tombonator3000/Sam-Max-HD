@@ -4,7 +4,11 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
-- [ ] Gjenoppta neste grafikkbunke337/015 i rapporter/max-slutt-og-handling-20261019.113 ruter,69 ulike kilder,20 beskyttede SHA-er, fem originalark og fire originalmotorforløp sett.337 animasjon1 er Max som pakker ut og spiser sjokolademedaljongen;015 er Max i intro-laboratoriet, med mørke silhuettfaser.337 animasjon7 har30 mikro-lag fra to grå/svarte former som må forstås sammensatt før detaljering. Fortsett uavhengige jobber mens det undersøkes. Ingen bildekall eller resultater der ennå. Publisert grunnlag2776cff3,1960 native, nå også i kontrollert fellespakke.
+- [ ] Gjenoppta neste fem jobber fig193_01/02,fig298_01/02 ogfig009_01 i rapporter/sam-max-fisk-museum-intro-20261020.61 ruter,55 ulike kilder,20 beskyttede SHA-er, fem originalark og åtte motorforløp sett, alle61 kilde-ruter observert.11 av298-rutene krevde ekstra synlig diagnose170,165 i samme rom.193 er Max med fisk i rom35 ved305,168.298 har både Sam og museumsdamen, portrett/grønnsak ved overleveringen i rom57 ved299,128; se297 og originalsekvens før nytegning, ikke anta bare Sam eller bukett.009 er Sam i intro-laboratoriet ved164,170, med delvis kroppslag i animasjon7. Ingen bildekall/resultater i neste bunke. Publisert grunnlag6512f670,2073 native. Les siste KLARGJORT.md og originalmotorlogg før valg av kall.
+
+- [x] Fig337_01 til03 ogfig015_01 til02 publisert i6512f670,113 nye native,2073 totalt. Alle113 visuelt sett og motorobservert,284 kontroller fra figurstart uten avvik.72 egenkontroll OK,9 SJEKK,32 små manuelt sett,0 FEIL; native113 OK. Én mykt tilbakeført originalpiksel i337_1951 dokumentert.20 kilder og tre stasher bevart.194 av1758 resultatark. Se max-slutt-og-handling-20261019/mottak-publisert.json.
+
+- [ ] Ved neste samlepunkt: oppdater felles Linux-/Windows-release fra1960 til gjeldende publisert modd. Nå2073,113 flere enn den ferdig kontrollerte nattpakken. Kall ikke pakker oppdatert før begge faktiske nedlastinger, sjekksummer, moddfiler og relevant produksjonsavspilling er kontrollert.
 
 - [ ] Rotårsak til27 HD-pikslers avvik på nederkant inventarknappen i rom35 ved tvunget romhopp: frames40-56, HD-boks114,740 til159,744,maksRGB9. Lokalisert og identiske koordinater i gammel1851-mod og ny1960-mod, begge testposisjoner. Ingen nye figuravvik. Se sam-boey-og-slutt-20261019/grunnlagsavvik-lokalisert.json. Ikke påstå rettet eller helt grønn motorprøve.
 
