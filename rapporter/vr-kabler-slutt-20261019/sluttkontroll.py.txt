@@ -1,0 +1,51 @@
+from pathlib import Path
+from PIL import Image
+import hashlib, json, numpy as np
+REPO=Path('/home/tom/Sam-Max-HD');ART=REPO/'work/.gpt-gren'
+REPORT=ART/'rapporter/vr-kabler-slutt-20261019';MOD=REPO/'out/vr-kabler-slutt-20261019/mod-kandidat'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+protected=json.loads((REPORT/'beskyttede-kilder.json').read_text())
+assert len(protected)==40 and all(sha(ART/p)==h for p,h in protected.items())
+base=json.loads((REPORT/'grunnlag-filer-44dbaf3b.json').read_text())
+files={p.relative_to(MOD).as_posix():sha(p) for p in MOD.rglob('*') if p.is_file()}
+assert set(base['filer'])<=set(files)
+assert {p for p,h in base['filer'].items() if files[p]!=h}=={'mod.json'}
+entries=json.loads((REPORT/'tillegg.json').read_text())['tillegg']
+assert len(entries)==20 and {e['fil'] for e in entries}==set(files)-set(base['filer'])
+for e in entries:
+    assert files[e['fil']]==e['sha256']
+    im=Image.open(MOD/e['fil']);a=np.array(im)
+    assert im.mode=='RGBA' and im.width%4==0 and im.height%4==0
+    assert (a[:,:,3]==0).any() and (a[:,:,3]>128).any()
+    assert not ((a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0)).any()
+meta=json.loads((MOD/'mod.json').read_text());assert set(meta)==set(base['mod_json'])
+assert meta['costume_cels']==1546 and len(list((MOD/'costumes').glob('*_hd.png')))==1546
+assert {k for k in meta if meta[k]!=base['mod_json'][k]}=={'costume_cels'}
+plan=json.loads((REPORT/'ruteplan-unik.json').read_text())['ruter']
+assert len(plan)==21 and sum(len(p['mottakere']) for p in plan)==32
+oldplan=json.loads((REPORT.parent/'vr-kabler-20261019/ruteplan-unik.json').read_text())['ruter']
+for p in plan:
+    original=Image.open(ART/'jobber'/p['kildejobb']/'original_1x.png').convert('RGBA')
+    x,y,w,h=p['kilderekt'];reference=np.array(original.crop((x,y,x+w,y+h)))
+    for target in p['mottakere']:
+        source=Image.open(ART/'jobber'/target['jobb']/'original_1x.png').convert('RGBA')
+        x,y,w,h=target['rekt'];assert np.array_equal(np.array(source.crop((x,y,x+w,y+h))),reference)
+    if p['tidligere_prototype']:
+        old=next(o for o in oldplan if o['id']==p['tidligere_prototype'])
+        source=Image.open(ART/'jobber'/old['kildejobb']/'original_1x.png').convert('RGBA')
+        x,y,w,h=old['kilderekt'];assert np.array_equal(np.array(source.crop((x,y,x+w,y+h))),reference)
+        assert sha(REPORT/(p['id']+'-prototype.png'))==sha(REPORT.parent/'vr-kabler-20261019'/(p['tidligere_prototype']+'-prototype.png'))
+f=json.loads((REPORT/'fremdrift.json').read_text())
+assert len(f['leveranser'])==6 and all(e['egenkontroll'] in ['OK','SJEKK'] for e in f['leveranser'])
+assert len(f['faktiske_bildekall'])==8 and f['antall_foresporsler']==9
+assert all(sha(ART/e['resultat'])==e['sha256'] for e in f['leveranser'])
+assert not any((ART/'jobber'/f'fig246_{i:02}'/'resultat.png').exists() for i in range(16,20))
+pngs=sum(p.endswith('.png') for p in files);assert pngs==19782
+summary={'beskyttede_kilder_uendret':40,'tidligere_png_byteidentiske':19762,'tidligere_filer_bevart':len(base['filer']),
+         'endrede_tidligere_filer':['mod.json'],'nye_native':20,'native_totalt':1546,'png_totalt':pngs,
+         'figurjobber_med_resultat':len(list((ART/'jobber').glob('fig*/resultat.png'))),'figurjobber_totalt':1758,
+         'unike_originalruter_planlagt':21,'unike_tegninger_levert_i_seks_ark':17,'tre_eksakt_like_kilder_og_prototyper_verifisert':True,
+         'apne_ark':4,'apne_ruter':12,'verktøyavslag':'unik-G-feil01.json'}
+assert summary['figurjobber_med_resultat']==151
+(REPORT/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(summary))

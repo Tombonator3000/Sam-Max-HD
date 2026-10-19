@@ -1,0 +1,40 @@
+from pathlib import Path
+import sys, json, re, hashlib
+REPO=Path('/home/tom/Sam-Max-HD')
+OUT=REPO/'out/vr-kabler-slutt-20261019'
+REPORT=REPO/'work/.gpt-gren/rapporter/vr-kabler-slutt-20261019'
+sys.path.insert(0,str(REPO/'out/inventoryknapp-20261016'))
+import kontroll as k
+k.ROOT=OUT
+PACKAGE=REPO/'out/felles-release-20261018/linux/squashfs-root'
+k.NEW=PACKAGE/'usr/bin/scummvm';k.LIB=PACKAGE/'usr/lib'
+env={'DIGHD_TEST_ROOM':'48','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'246','DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'160,180','DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1'}
+entries=json.loads((REPORT/'tillegg.json').read_text())['tillegg']
+baseline={r['animasjon']:r for r in json.loads((REPORT/'motor-baseline.json').read_text())}
+# Denne tidligere kandidaten er byteidentisk med publisert 44dbaf3b for samtlige PNG-er.
+baseline[1]=json.loads((REPORT.parent/'vr-kabler-20261019/motor-runde.json').read_text())
+seen=set();rows=[]
+for anim,frames in [(1,360),(7,260),(8,260)]:
+    env['DIGHD_TEST_ANIMATION']=str(anim)
+    label=f'sam246-final-anim{anim}'
+    row=k.run(label,k.NEW,env,frames,OUT/'mod-kandidat')
+    log=(OUT/label/'scummvm.log').read_text(errors='replace')
+    checks=[{'frame':int(f),'avvik':int(n)} for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+    row.update(animasjon=anim,kontroller=checks,tegnede_ruter=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*246',log))))
+    seen.update(row['tegnede_ruter'])
+    expected_start=[c for c in baseline[anim]['kontroller'] if c['frame']<40 and c['avvik']]
+    assert [c for c in checks if c['frame']<40 and c['avvik']]==expected_start
+    assert row['exit']==0 and row['dumps'] and checks
+    assert not [c for c in checks if c['frame']>=40 and c['avvik']]
+    rows.append(row)
+    (REPORT/'motor-runder.json').write_text(json.dumps(rows,indent=2)+'\n')
+expected={int(e['bilde'].split('_')[1]) for e in entries}
+summary={'runder':len(rows),'ruter_forventet':len(expected),'ruter_tegnet':len(expected&seen),'mangler_i_avspilling':sorted(expected-seen),
+         'skjermbufferkontroller':sum(len(r['kontroller']) for r in rows),'kontroller_fra_figurstart':sum(c['frame']>=40 for r in rows for c in r['kontroller']),
+         'avvik_fra_figurstart':sum(c['avvik'] for r in rows for c in r['kontroller'] if c['frame']>=40),
+         'oppstartsavvik':[{'animasjon':r['animasjon'],**c} for r in rows for c in r['kontroller'] if c['avvik']],
+         'produksjonsbinar_sha256':hashlib.sha256(k.NEW.read_bytes()).hexdigest(),'lokal_retningskrok':False,'naturlig_gjennomspilling':False,
+         'baseline_animasjon1':'../vr-kabler-20261019/motor-runde.json','baseline_animasjon7_8':'motor-baseline.json'}
+(REPORT/'motor-oppsummering.json').write_text(json.dumps(summary,indent=2)+'\n')
+assert not expected-seen,sorted(expected-seen)
+print(json.dumps(summary))
