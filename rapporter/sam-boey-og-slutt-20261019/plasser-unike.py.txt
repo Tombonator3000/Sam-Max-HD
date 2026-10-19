@@ -1,0 +1,60 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam-boey-og-slutt-20261019';O=P/'out/sam-boey-og-slutt-20261019';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];components={p['bilde']:p['deler'] for p in json.loads((R/'kildekomponenter.json').read_text())};cache={};prototypes={};audit=[]
+def load(g):
+ if g not in cache:
+  a=np.array(Image.open(R/f'unik-{g}-raa01.png').convert('RGBA'));lab,n=nd.label(a[:,:,3]>220);cache[g]=(a,lab)
+ return cache[g]
+def draw(g,ids,size,clip=None,colour=None):
+ a,lab=load(g);core=np.isin(lab,ids)
+ if clip:
+  x,y,x1,y1=clip;m=np.zeros(core.shape,bool);m[y:y1,x:x1]=1;core &=m
+ yy,xx=np.nonzero(core);assert len(xx)>20,(g,ids,clip);x,y,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1;xa,ya,xb,yb=max(0,x-2),max(0,y-2),min(a.shape[1],x1+2),min(a.shape[0],y1+2);local=core[ya:yb,xa:xb];out=a[ya:yb,xa:xb].copy();dist,near=nd.distance_transform_edt(~local,return_indices=True);allow=dist<=1.5;out[:,:,3][~allow|((lab[ya:yb,xa:xb]>0)&~local)]=0;edge=allow&~local;out[:,:,:3][edge]=out[near[0][edge],near[1][edge],:3]
+ if colour is not None:out[:,:,:3]=np.rint(colour).astype('uint8')
+ im=Image.fromarray(out).crop((x-xa,y-ya,x1-xa,y1-ya)).resize(size,Image.Resampling.LANCZOS);return im,dict(raw=f'unik-{g}-raa01.png',komponenter=ids,gen_utsnitt=clip,raa_boks=[x,y,x1,y1],mal=list(size),kildens_farge=None if colour is None else [float(v) for v in colour],original_pikselmaske_brukt=False)
+# Explicit panel components. Floating source parts are fitted separately below, never removed.
+for group in json.loads((R/'bildegrupper.json').read_text()):
+ g=group['gruppe'];a,lab=load(g);cand=[]
+ for sid,s in enumerate(nd.find_objects(lab),1):
+  size=int((lab[s]==sid).sum());yy,xx=np.nonzero(lab==sid)
+  if size>500:cand.append((sid,size,float(xx.mean()),float(yy.mean())))
+ for i,p in enumerate(json.loads((R/f'unik-{g}-plan.json').read_text())):
+  name=p['bilde'];src=np.array(Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA'));h,w=src.shape[:2];out=Image.new('RGBA',(w*4,h*4));parts=components[name];main=max(parts,key=lambda v:v['piksler']);col,row=i%3,i//3;poss=[v for v in cand if int(v[2]//512)==col and int(v[3]//512)==row];assert poss,(g,i);sid=max(poss,key=lambda v:v[1])[0];specs=[]
+  def place(part,sg,ids,clip=None,colour=None):
+   x,y,x1,y1=part['rekt'];im,detail=draw(sg,ids,((x1-x)*4,(y1-y)*4),clip,colour);out.alpha_composite(im,(x*4,y*4));specs.append(dict(kilde_del=part['id'],kilde_rekt=part['rekt'],**detail))
+  used=set()
+  if name=='costume168_1920':place(main,'L',[3]);used.add(main['id'])
+  elif name=='costume168_1921':place(main,'L',[1]);used.add(main['id'])
+  elif name=='costume168_1932':place(main,'L',[2]);used.add(main['id'])
+  elif name=='costume336_1940':
+   mappings={1:('B',[5],None),2:('B',[6],None),4:('B',[9],None),5:('B',[10],None)}
+   for p2 in parts:
+    if p2['id'] in mappings:
+     sg,ids,clip=mappings[p2['id']];place(p2,sg,ids,clip);used.add(p2['id'])
+  elif name=='costume336_1941':
+   # Generated right ear and body are joined by a thin generated remnant. Rectangular editing splits the parts without any original silhouette mask.
+   mappings={1:('B',[4],[800,530,900,705]),2:('B',[7],None),3:('B',[4],[815,658,860,727]),4:('B',[4],[660,725,1000,1000]),5:('B',[11],None)}
+   for p2 in parts:
+    if p2['id'] in mappings:
+     sg,ids,clip=mappings[p2['id']];place(p2,sg,ids,clip);used.add(p2['id'])
+  else:place(main,g,[sid]);used.add(main['id'])
+  for p2 in parts:
+   if p2['id'] in used:continue
+   x,y,x1,y1=p2['rekt'];slab,n=nd.label(src[:,:,3]>128);colour=src[:,:,:3][slab==p2['id']].mean(0);place(p2,'L',[4],colour=colour);used.add(p2['id'])
+  assert used=={p['id'] for p in parts}
+  arr=np.array(out);bad=(arr[:,:,:3]==[255,0,255]).all(2)&(arr[:,:,3]>0);roundoff=int(bad.sum())
+  if roundoff:
+   assert (arr[:,:,3][bad]<=2).all();_,near=nd.distance_transform_edt(arr[:,:,3]<128,return_indices=True);arr[:,:,:3][bad]=arr[near[0][bad],near[1][bad],:3];out=Image.fromarray(arr)
+  path=R/(name+'-prototype.png');out.save(path);prototypes[name]=out;audit.append(dict(bilde=name,prototype_sha256=sha(path),kilde_deler=len(parts),deler=specs,original_pikselmaske_brukt=False,rgb_avrundingsrens=roundoff))
+(R/'prototype-kvitteringer.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-19',verktøy='innebygd image_gen',modell='Eksakt modellnavn ikke vist',faktiske_bildekall=[f'unik-{g}-raa01.png' for g in 'ABCDEFGHIJKL'],leveranser=[],merknad='Tolv innebygde bildekall. F1/F2 og I1 avvist visuelt og erstattet med L1/L2/L3. Kildebestemte småstreker og fragmenter bruker generert L4 med kildefarge. Ekte generert alfa, ingen harde originalsilhuetter.')
+for job in json.loads((R/'klargjort.json').read_text()):
+ name=job['jobb'];d=A/'jobber'/name;j=json.loads((d/'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));rows=[]
+ for cel in j['ruter']:
+  p=next(p for p in plan if any(t['bilde']==cel['bilde'] for t in p['malruter']));x,y,w,h=cel['rekt'];source=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(source.tobytes()).hexdigest()==p['rgba_sha256'];im=prototypes[p['bilde']];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;assert im.size==(w*4,h*4);out.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>128);rows.append(dict(bilde=cel['bilde'],kostyme=j['kostyme'],rute=cel['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=p['bilde'],kilde_rgba_sha256=p['rgba_sha256'],prototype=p['bilde']+'-prototype.png'))
+ out.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{name}.json').write_text(json.dumps({name:dict(sha256_resultat=digest,ruter=rows)},ensure_ascii=False,indent=2)+'\n');used=sorted({part['raw'] for row in rows for rec in audit if rec['bilde']==row['representant'] for part in rec['deler']});e=dict(jobb=name,resultat=f'jobber/{name}/resultat.png',sha256=digest,ruter=len(rows),rutekart=f'rapporter/sam-boey-og-slutt-20261019/rutekart-{name}.json',delte_bildekall=used,egenkontroll='ikke kjørt',native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False)
+ result=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',e['resultat']],cwd=A,capture_output=True,text=True);(R/(name+'-egenkontroll.txt')).write_text(result.stdout+result.stderr);e['egenkontroll']={0:'OK',1:'SJEKK',2:'FEIL'}[result.returncode];progress['leveranser'].append(e);print(name,e['egenkontroll'],result.stdout,flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser-unike.py.txt')

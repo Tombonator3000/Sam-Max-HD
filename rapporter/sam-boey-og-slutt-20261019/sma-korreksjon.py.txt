@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam-boey-og-slutt-20261019'
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];catalog=[]
+for p in plan:
+ a=np.array(Image.open(P/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA'));lab,n=nd.label(a[:,:,3]>128);rows=[]
+ for k,s in enumerate(nd.find_objects(lab),1):
+  y,x=s;rows.append(dict(id=k,piksler=int((lab[s]==k).sum()),rekt=[x.start,y.start,x.stop,y.stop]))
+ catalog.append(dict(bilde=p['bilde'],deler=rows))
+(R/'kildekomponenter.json').write_text(json.dumps(catalog,indent=2)+'\n')
+im=Image.new('RGB',(1536,1024),(68,73,78));d=ImageDraw.Draw(im)
+for i,name in enumerate(['costume168_1920','costume168_1921','costume168_1932']):
+ src=Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA');factor=min(420/src.width,420/src.height);src=src.resize((round(src.width*factor),round(src.height*factor)),Image.Resampling.NEAREST);x=i*512+(512-src.width)//2;y=60+(420-src.height)//2;im.paste(src,(x,y),src);d.text((i*512+16,16),str(i+1)+' '+name,fill='white')
+a=np.array(Image.open(P/'work/extract/costumes/costume168_1924.png').convert('RGBA'));lab,n=nd.label(a[:,:,3]>128)
+small=[v for v in catalog if v['bilde']=='costume168_1924'][0]['deler'];p=next(v for v in small if 3<=v['piksler']<=5);x,y,x1,y1=p['rekt'];src=Image.fromarray(a[y:y1,x:x1]);src=src.resize((min(400,src.width*70),src.height*70),Image.Resampling.NEAREST);im.paste(src,((512-src.width)//2,720),src);d.text((16,530),'4 short motion dash, same pale tan as reference',fill='white');im.save(R/'unik-L-referanse.png')
+text='''Use case: style-transfer. Asset: four tiny partial animation-layer shapes for a 4x HD Sam & Max remake. Image 1 is the EXACT original shape reference in a 3 by 2 grid, 1536 by 1024. The other two images are approved character style references ONLY. These are intentionally very small visible fragments, not whole characters. Reproduce the colored silhouette of each source, tracing its outer geometry smoothly and preserving its internal simple colors. DO NOT add anatomy, embellishments or inferred missing parts.
+Top-left panel 1: tiny tan-gray/cream shape with a small upper protrusion, wider horizontal middle and narrow lower protrusion, from a 6 x 6 source. It must keep that compact almost square irregular silhouette, NOT become a thin triangle or a long ear. No pink, black face, teeth or extra ear.
+Top-middle panel 2: 11 x 12 partial cream/tan/gray and white rabbit animation fragment. Its white horizontal blocks are a partial tooth/muzzle layer. Match all source shapes but smooth their edges. There is NO pink and NO black in this panel; do NOT add pink inner ears, eyes, nose or other invented anatomy. The short top point remains short.
+Top-right panel 3: 10 x 10 orange/brown partial paw/forearm shape, diagonally rising to the right, with a narrow tip at top and left and some rounded protrusions. Use source orange and brown shading. NO blue sleeve, white cuff, second hand, head or completed body. The visible fragment alone is the whole requested drawing.
+Bottom-left panel 4: a single short smooth pale tan/cream horizontal motion dash, narrow capsule, matching source color. No glow, black border or shadow on this tiny dash.
+Bottom-middle and bottom-right entirely empty. Exactly four drawings in these positions. Flat cel color, a restrained shadow in the first three, clean fine dark contour appropriate to the approved masters, no texture, fur or gradients. Genuine alpha transparency outside shapes, no backgrounds, labels, checkerboard, magenta, haze or halos. Preserve broad silhouette proportions of every source, do not transform fragments into complete motifs.'''
+(R/'unik-L-prompt01.txt').write_text(text+'\n')
+print('Source components catalogued',sum(len(p['deler']) for p in catalog))
+print('Small detached',[(v['bilde'],[(p['id'],p['piksler'],p['rekt']) for p in v['deler'] if p['piksler']<=40]) for v in catalog if len(v['deler'])>1])

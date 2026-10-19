@@ -1,0 +1,71 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam-boey-og-slutt-20261019';O=P/'out/sam-boey-og-slutt-20261019';stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');f=json.loads((R/'fremdrift.json').read_text());checks=json.loads((R/'bevaringskontroll.json').read_text())
+for e in f['leveranser']:
+ job=e['jobb'];c=int(job[3:6]);context=('World of Fish, rom35. Max animasjon1/8 spretter/strekker seg ut av glassfiberfisken, Sam animasjon7 kommer ut bøyd og retter seg opp. Sam har vanlig blågrå dress, fedora, skjorte og slips. Kildebestemte småbiter er ikke gjort om til hele figurer.' if c==168 else 'Slutten ved Savage Jungle Inn, rom86. Max animasjon1 gestikulerer og får familiemedaljongen fra Sasquatch-høvdingen. Medaljongen henger på en snor rundt halsen i rutene, er brun/oker med enkle ringer. Sam animasjon7 har vanlige kropps-/munnfaser. Ingen oppdiktede symboler eller tekst.')
+ note=f'''# {job}, nytegnet {stamp}
+
+{e['ruter']} ruter levert med innebygd image_gen. Eksakt modellnavn ble ikke vist. Råbilder, faktiske forespørsler, prompter, SHA-er og rutekart ligger i rapporter/sam-boey-og-slutt-20261019. Bunken har12 bildekall; alle12 råbilder brukes helt eller delvis. De første småfragmentene F1/F2 og I1 er utelatt og erstattet med L1/L2/L3 etter visuell kontroll.
+
+## Kilde og stil
+
+{context}
+
+Begge kostymer inneholder både Sam og Max, selv om den generelle jobbteksten og bilde_to bare sier Sam. Derfor brukes separat kildebegrunnet prompt og riktig godkjent hovedark fra hovedark/sam.png eller max.png. De fire beskyttede jobbfilene er uendret. Originalene er sett i motoren, i referansearkene og sammen med lokale originalskript. Tidligere stilanker er fulgt.
+
+Ekte generert alfa er bevart. Python renser genereringshaze, tilpasser til kildebekreftede bokser og setter rutene på faste4x-koordinater. Ingen originalsilhuett klipper den nye tegningen. Alle85 kildekomponenter i60 ulike helruter har en nytegnet del, også de små løse delene og bevegelsesstrekene. De små genererte strekene fargekalibreres fra sin egen kildedel. Helt like originalutsnitt deler samme nytegning og samme native-SHA.
+
+## Kontroller
+
+Egenkontroll for arket: {e['egenkontroll']}. Se {job}-egenkontroll.txt. Hele bunken har107 målte ruter:103 OK,4 SJEKK,0 FEIL. To6x6-mikroruter er for små for måleskriptet, men er manuelt sett og native OK. Native v6 tar alle109 som OK fra arket, uten hele originalruter eller originalutliggertillegg. Ingen mottaksgrenser er endret.
+
+Alle109 er sammenlignet visuelt som original, native og faktisk motorbilde. Åtte kandidatavspillinger og åtte tilsvarende grunnlagsprøver med faktisk nedlastet senkveldsmotor c00096cb.93 av109 ruter synlige ved kildeposisjon;16 tidlige168-ruter er i tillegg observert i samme rom ved diagnostisk posisjon220,170 fordi kildeprøvens kameravindu skjulte dem. Kamera leses per frame for utsnittene.540 skjermbufferkontroller,468 fra figurstart. Ingen nye eller økte avvik mot grunnlaget.438 av468 er null;30 har de kjente27 gamle pikslene i rom35 ved40-56. Disse er lokalisert til nederkant inventariknappen, med eksakt samme koordinater i grunnlag og kandidat, begge posisjoner. Ikke rettet her. Rom86 har null fra figurstart, kjent160 ved36 før figuren. Se motor-oppsummering.json og grunnlagsavvik-lokalisert.json.
+
+## Status
+
+Nytegnet, egenkontrollert, native mottatt, visuelt sett og motorobservert av Codex. Faktisk publisering og tilbakehenting står i mottak-publisert.json når den finnes. Ikke naturlig gjennomspilling, separat Claude-kontroll eller ny Tom-godkjenning. Ingen ny interaktiv Windows-/webtest. Den verifiserte fellespakken har1776 native og mangler184 mot kandidat1960. Ny pakke blir først omtalt som oppdatert etter faktiske nedlastinger og filhashkontroll.
+'''
+ (A/'jobber'/job/'notat.md').write_text(note)
+report=f'''# Seks Sam-/Max-ark, fisk og sluttscene
+
+{stamp}, Codex. fig168_01 til03 og fig336_01 til03:109 nytegnede ruter fra60 eksakt ulike helruter og85 kildekomponenter. Tolv faktiske innebygde image_gen-kall. Seks resultat.png og notat.md er levert, med faste1536x1024 RGBA-ark.189 av1758 figurjobber har nå resultat,1569 mangler resultat pluss returer og sluttkontroller.
+
+## Motiv og kilde
+
+Begge kostymer har Sam OG Max. Jobbens generiske Sam-premiss er korrigert i separate faktiske prompter og dette notatet, uten å endre referanse.png, original_1x.png, prompt.txt eller jobb.json. Sam-/Max-masterne er brukt etter faktisk figur i ruten.
+
+168 er World of Fish, rom35 lokalt206, også brukt i rom32 lokalt200. Max spretter og strekkes i animasjon1/8, Sam kommer ut bøyd og retter seg i animasjon7. Første cels er tilsiktede små fragmenter, ikke fullstendige personer.
+
+336 er sluttscenen ved Savage Jungle Inn, rom86 lokalt202. Max animasjon1, Sam animasjon7. Originaldialogen bekrefter familiens medaljong fra Sasquatch-høvdingen. I tegningen er dette en brun/oker rund medaljong med enkle ringer, på snor rundt Max sin hals. Ingen nye bokstaver eller symboler. Delvis synlige øre-/hodefaser1939-1941 og1959-1960 beholdes, ikke fullført som hele hoder.
+
+## Produksjon og kontroller
+
+Tolv råbilder A tilL med faktiske forespørsler er bevart. F1/F2 og I1 besto ikke visuell sammenligning og er erstattet med L1/L2/L3. Python fjerner generert haze med den genererte kjernens avstand, bevarer ekte alfa og plasserer figurene i kildebekreftede bokser. Små kildebestemte delfragmenter og bevegelsesstreker får generert L4-alfa med kildens farge. Ingen harde originale silhuettmasker brukes. Se prototype-kvitteringer.json, delkart, fremdrift og rutekart.
+
+Egenkontroll:107 målt,103 OK,4 SJEKK,0 FEIL. Merknader:168_1923,168_1927,168_1961,336_1941. De er visuelt sett ved original/native/motor. De to6x6-rutene168_1920/1954 er for små for måleskriptet, manuelt sett og native OK. Native v6:109 OK,0 SJEKK,0 manglende,0 tekniske feil. Alle109 kommer fra de nye arkene, uten hele originalruter eller ekstra originale utliggerpiksler. Helt like originalutsnitt har helt like native-SHA-er. Uendrede kontrollgrenser.
+
+Åtte faktiske kandidatavspillinger og åtte grunnlagsavspillinger med samme nedlastede produksjonsbinær c00096cb.93 ruter ved kildeposisjon,16 flere i tre synlige diagnoseforløp for168 i samme rom ved220,170. Første all-synlige-assert stoppet fordi disse16 ikke var tegnet ved kildeposisjonen; feilen og første kontrollkode er bevart. Det skyldtes kameravinduet, dokumentert med whole screen-logg. Utsnittene leser kameravindu per frame. Ingen motor eller pipeline endret.
+
+540 skjermbufferkontroller,468 fra figurstart.438 null,30 har samme27 gamle avvikspiksler ved40-56 i rom35. Ingen nye eller økte avvik. Begge rom86-prøver er null fra40, kjent160 ved36. World of Fish har61 ved36 og27 ved40-56 både før og etter tegningene. Pixelkoordinatene er identiske i fire sammenlignede forløp ved både kilde- og diagnoseposisjon; avviket er ved nederkant av eksisterende inventarknapp, HD-boks114,740 til159,744. MaksRGB-forskjell9. Rotårsak er ikke fastslått eller rettet. Se grunnlagsavvik-lokalisert.json og de bevarte gamle feilene. Dette omtales ikke som en helt avviksfri motorprøve.
+
+Alle109 er sett i10 original/native/motor-kontaktark samt fire hele scener. Se visuell-vurdering.json. Egenkontroll er ikke Tom-/Claude-godkjenning. Ikke naturlig gjennomspilling, ny webtest eller interaktiv Windows-prøve.
+
+## Bevaring og publisering
+
+Grunnlag hd-mod fb21d04ba10ceb6fe86f5286dc142d361863bd59 med1851 native. Kandidat1960 native,20196 PNG-er,20202 filer. Alle20087 tidligere PNG-er er byteidentiske og alle20093 tidligere filbaner er bevart. Bare mod.json endres før send; send oppdaterer SHA256SUMS.24 beskyttede kilder og de tre opprinnelige stashene er bevart. Ny grafikk går bare til gpt-arbeid og hd-mod. Faktisk publisert full-SHA og tilbakehentede hashes kommer i mottak-publisert.json.
+
+Den felles senkveldspakken har1776 native og mangler184 mot denne kandidaten. Ny Linux-/Windows-runde tas ved dette samlepunktet og kalles ikke oppdatert før nedlasting og kontroll av faktisk inkludert grafikk.
+
+Neste bunker fra bestilling11: fig337_01 til03 og fig015_01 til02. Disse er ikke tegnet eller kildeavklart i denne bunken. Ikke gjenta168/336,215/300 eller de avviste golf-/VR-grunnlagene.
+
+Bibliotek brukt: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Tilpasset prosjektets v6-mottak og faktiske produksjonsbinær. Rawprompter og denne rapporten skiller nytegnet, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert.
+'''
+(R/'RAPPORT.md').write_text(report);(R/'PAAGAR.md').write_text(f'# Bunken klar til publisering\n\n{stamp}. Seks ark109 nye native, kandidat1960. Alle sett i motoren, ingen økte grunnlagsavvik. Kjent inventarikantavvik beholdt presist i rapporten. Se RAPPORT.md og mottak-publisert.json for faktisk publisering. Neste337/015, ikke start disse på nytt.\n')
+p=A/'ORDRE.md';s=p.read_text();anchor='## Gjør disse nå\n';notice=f'\nProduksjon {stamp}: fig168_01 til03 og fig336_01 til03 ferdig nytegnet,109 native fra60 ulike helruter. Native109 OK uten originalutliggertillegg; egenkontroll103 OK,4 SJEKK,2 for små til automatisk måling. Alle109 visuelt sett og motorobservert.93 ved kildeposisjon,16 gjennom ekstra synlig diagnose i samme rom.540 kontroller, ingen nye/økte avvik, kjent27-pikslers avvik ved inventariknappen i rom35 beholdt og lokalisert. Se rapporter/sam-boey-og-slutt-20261019/RAPPORT.md og mottak-publisert.json for faktisk publisering. Kandidat1960, grunnlag1851.189 av1758 resultatark,1569 mangler pluss returer. Neste fig337_01 til03 og fig015_01 til02. Pakken1776 mangler184, samlepunkt nå. Ikke ny Tom-/Claude-godkjenning.\n';assert anchor in s;p.write_text(s.replace(anchor,anchor+notice,1))
+p=A/'GRAFIKKLISTE.md';s=p.read_text();s=re.sub(r'^Oppdatert .*?\n',f'Oppdatert {stamp} (norsk tid). Seks nye ark109 native, alle visuelt sett og motorobservert. Egenkontroll103 OK,4 SJEKK,2 mikroruter manuelt kontrollert. Se rapporter/sam-boey-og-slutt-20261019/mottak-publisert.json for faktisk publisering. Kandidat1960, grunnlag1851.189 av1758 resultatark. Ikke ny Tom-/Claude-godkjenning.\n',s,count=1,flags=re.M);s=s.replace('183 ark med resultat; 1851 native ruter i publisert modd','189 ark med resultat; kandidat1960 native, publisert1851 til kvittering')
+for e in f['leveranser']:s=s.replace('- [ ] `'+e['jobb']+'`','- [x] `'+e['jobb']+'`')
+p.write_text(s)
+p=R/'grunnlagsavvik-lokalisert.json';v=json.loads(p.read_text());v['funn']='Eksakt samme avvikskoordinater i grunnlag og kandidat, både kildeposisjon og synlig diagnose.27 HD-piksler ved40-56 ligger på nederkant av eksisterende inventariknapp. MaksRGB-forskjell9. Rotårsak ikke fastslått eller rettet; det er ikke en ny168-/336-tegning.';p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'skriv-rapport.py.txt');print(stamp,'6 jobbnotater, rapport, ordre og grafikkliste oppdatert')

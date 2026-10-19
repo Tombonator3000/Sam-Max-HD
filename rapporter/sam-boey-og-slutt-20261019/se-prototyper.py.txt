@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam-boey-og-slutt-20261019';plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter']
+for first in range(0,len(plan),12):
+ board=Image.new('RGB',(1500,1120),'#3b434b');d=ImageDraw.Draw(board)
+ for i,p in enumerate(plan[first:first+12]):
+  x=i%3*500;y=i//3*280;src=Image.open(P/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);new=Image.open(R/(p['bilde']+'-prototype.png')).convert('RGBA');factor=min(1,235/max(src.width,new.width),245/max(src.height,new.height));
+  for k,im in enumerate([src,new]):
+   im=im.resize((round(im.width*factor),round(im.height*factor)),Image.Resampling.NEAREST if k==0 else Image.Resampling.LANCZOS);board.paste(im,(x+k*250+(250-im.width)//2,y+28+(245-im.height)//2),im)
+  d.text((x+8,y+6),p['bilde']+' original | nytegnet',fill='white')
+ board.save(R/f'prototyper-kontroll-{first//12+1:02d}.png')
+print('5 kilde/prototype-kontaktark')

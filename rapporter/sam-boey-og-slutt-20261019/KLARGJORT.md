@@ -1,3 +1,7 @@
+# Produksjonen er fullført i denne bunken
+
+Seks ark109 nye native er nytegnet, teknisk og visuelt kontrollert og motorobservert. Se RAPPORT.md og mottak-publisert.json for faktisk publisering. Ikke gjenoppta disse seks fra det historiske klargjøringsnotatet nedenfor. Neste fig337_01 til03 og fig015_01 til02.
+
 # Neste seks figurjobber, kildegrunnlaget er sett
 
 fig168_01 til03 og fig336_01 til03: 109 ruter fra60 eksakt ulike hele originalutsnitt.24 beskyttede jobb-SHA-er. Ingen nytegning, bildekall, resultater eller nye native i disse seks ennå. Publisert grunnlag er fb21d04b med1851 native, SHA-kart bevart. Pakken1776 mangler foreløpig75 fra forrige bunke.
