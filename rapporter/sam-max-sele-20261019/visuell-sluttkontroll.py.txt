@@ -1,0 +1,73 @@
+"""Kontrollbilder fra uendret original, native PNG og faktisk romdump."""
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
+import json, re, math, shutil
+
+REPO = Path('/home/tom/Sam-Max-HD')
+ART = REPO / 'work/.gpt-gren'
+REPORT = ART / 'rapporter/sam-max-sele-20261019'
+OUT = REPO / 'out/sam-max-sele-20261019'
+MOD = OUT / 'mod-kandidat'
+font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14)
+small = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 12)
+entries = json.loads((REPORT / 'tillegg.json').read_text())['tillegg']
+receipts = {}
+for costume in [309]:
+    data = json.loads((REPORT / f'myke{costume}-kvittering.json').read_text())
+    for sheet in data['ark'].values():
+        receipts.update(sheet['ruter'])
+
+scenes = [(f'sammax309-final-anim{a}',61) for a in (1,7)]
+draws = {}
+for scene, room in scenes:
+    log = (OUT / scene / 'scummvm.log').read_text(errors='replace')
+    for match in re.finditer(r'frame (\d+) soft cel (\d+) costume (309) .*? at (-?\d+),(-?\d+) (\d+)x(\d+)', log):
+        frame, cel, costume, x, y, w, h = map(int, match.groups())
+        name = f'costume{costume}_{cel}'
+        screenshot = OUT / scene / f'frame_{frame+4:06}_room{room:03}.png'
+        if name not in draws and screenshot.exists():
+            draws[name] = dict(scene=scene, logg_frame=frame,
+                               bildeframe=frame+4, x=x, y=y, w=w, h=h,
+                               fil=str(screenshot.relative_to(OUT)))
+
+def composite(src, size):
+    im = src.copy().convert('RGBA')
+    # Små fragmenter forstørres også, men kun i kontrollbildet.
+    factor = min(size[0] / im.width, size[1] / im.height)
+    im = im.resize((max(1, round(im.width*factor)), max(1, round(im.height*factor))),
+                   Image.Resampling.NEAREST if factor > 1 else Image.Resampling.LANCZOS)
+    bg = Image.new('RGB', size, '#d0d5dc')
+    d = ImageDraw.Draw(bg)
+    for yy in range(0, size[1], 12):
+        for xx in range(0, size[0], 12):
+            if (xx//12+yy//12) % 2:
+                d.rectangle((xx, yy, xx+11, yy+11), fill='#bcc4ce')
+    bg.paste(im, ((size[0]-im.width)//2, (size[1]-im.height)//2), im)
+    return bg
+
+records = []
+for costume in [309]:
+    batch = [e for e in entries if e['bilde'].startswith(f'costume{costume}_')]
+    for page in range(math.ceil(len(batch)/12)):
+        canvas = Image.new('RGB', (1440, 1240), '#243340')
+        d = ImageDraw.Draw(canvas)
+        for i, e in enumerate(batch[page*12:page*12+12]):
+            name = e['bilde']; meta = draws[name]; rec = receipts[name]
+            original = Image.open(REPO/'work/extract/costumes'/f'{name}.png').convert('RGBA')
+            native = Image.open(MOD/e['fil']).convert('RGBA')
+            scene = Image.open(OUT/meta['fil']).convert('RGB')
+            mx, my = rec['marg']; xx = (meta['x']-mx)*4; yy = (meta['y']-my)*4
+            crop = scene.crop((xx, yy, xx+native.width, yy+native.height))
+            x = (i % 3)*480; y = (i//3)*310
+            d.text((x+6, y+3), f"{e['jobb']} / {name}", font=font, fill='white')
+            for j, (label, im) in enumerate([('Original', original.resize((original.width*4, original.height*4), Image.Resampling.NEAREST)), ('Native HD', native), ('Fra motor', crop)]):
+                d.text((x+j*160+5, y+26), label, font=small, fill='white')
+                canvas.paste(composite(im, (154, 238)), (x+j*160+3, y+44))
+            d.text((x+5, y+286), f"{meta['scene']} / bilde {meta['bildeframe']}", font=small, fill='#ced7e1')
+            records.append(dict(bilde=name, jobb=e['jobb'], native_sha256=e['sha256'], **meta))
+        canvas.save(REPORT/f'motor-og-kilde{costume}-final-{page+1:02}.png')
+assert len(records) == 40 and len({r['bilde'] for r in records}) == 40
+(REPORT/'visuelle-kontrollbilder.json').write_text(json.dumps({'antall':len(records), 'merknad':'Romdump f+4 viser cel som logges ved tegning f. Utsnittet inkluderer andre lag og scenen. Ingen original eller leveranse endres.', 'ruter':records}, indent=2)+'\n')
+for scene, frame, room, name in [('sammax309-final-anim1',132,61,'sam-max-sele-tilbake-motor.png'),('sammax309-final-anim7',100,61,'sam-max-sele-ned-motor.png')]:
+    shutil.copy2(OUT/scene/f'frame_{frame:06}_room{room:03}.png', REPORT/name)
+print('40 kontrollutsnitt og to motorstillbilder lagret')

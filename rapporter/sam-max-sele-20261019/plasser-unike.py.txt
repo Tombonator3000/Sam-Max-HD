@@ -1,0 +1,120 @@
+"""Plasser genererte deler i kildebokser; originalmasker brukes aldri til klipping."""
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,subprocess,shutil
+REPO=Path('/home/tom/Sam-Max-HD');ART=REPO/'work/.gpt-gren'
+R=ART/'rapporter/sam-max-sele-20261019'
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter']
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+# Hver nøkkel er en faktisk kildekomponent. Verdien velger genererte komponenter.
+maps={
+1920:('A','02',{1:[1],2:[13]}),1921:('A','02',{1:[2],2:[11]}),
+1922:('A','02',{1:[3],2:[12]}),1924:('A','02',{1:[4],2:[14]}),
+1925:('A','02',{1:[5],2:[10]}),1926:('A','02',{1:[6]}),1927:('A','02',{1:[7]}),
+1928:('B','01',{1:[1],2:[5],3:'blue',4:[6]}),1929:('B','01',{1:[2],2:[4],3:[7]}),
+1930:('B','01',{1:[3],2:[8]}),1931:('B','01',{1:[9],2:[11]}),1932:('B','01',{1:[10],2:'cord'}),
+1933:('C','01',{1:[1],2:[6]}),1934:('C','01',{1:[3],2:[5]}),1935:('C','01',{1:[2],2:[4],3:[7]}),
+1936:('C','01',{1:[9],2:[11]}),1937:('C','01',{1:[10],2:[13]}),1938:('C','01',{1:[8],2:[12]}),
+1942:('D','01',{1:[1],2:[6],3:[9]}),1943:('D','01',{1:[3],2:[5,8]}),1944:('D','01',{1:[2],2:[4,7]}),
+1945:('D','01',{1:[10],2:[15,16]}),1946:('D','01',{1:[11],2:[13,14],3:'cord'}),
+1947:('D','01',{1:'cord',2:[12],3:[17,18],4:'cord'}),
+1948:('E','01',{1:[1],2:[4],3:[7]}),1949:('E','01',{1:[2],2:[5],3:[8]}),
+1950:('E','01',{1:'cord',2:[3],3:[6],4:[9]}),1951:('E','01',{1:'cord',2:[14],3:[21],4:[22]}),
+1952:('E','01',{1:[12],2:[11],3:[13],4:[15],5:[16],6:[16],7:[17],8:[19]}),
+1953:('E','01',{1:[10],2:[18],3:[20]}),1954:('F','01',{1:[1],2:[4],3:[7]}),
+1955:('F','01',{1:[2],2:[5],3:[8]}),1956:('F','01',{1:[3],2:[6],3:[9]}),
+1957:('F','01',{1:[10],2:[12],3:[14]}),1959:('F','01',{1:[11],2:[13],3:[15]})}
+cache={};audit=[];prototypes={}
+def load(raw):
+    if raw not in cache:
+        a=np.array(Image.open(R/raw).convert('RGBA'));labels,_=nd.label(a[:,:,3]>220);cache[raw]=(a,labels)
+    return cache[raw]
+def drawing(raw,ids,size):
+    a,labels=load(raw);core=np.isin(labels,ids);yy,xx=np.nonzero(core);assert len(xx)>20
+    x0,y0,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1
+    xa,ya,xb,yb=max(0,x0-2),max(0,y0-2),min(a.shape[1],x1+2),min(a.shape[0],y1+2)
+    local=core[ya:yb,xa:xb];cut=a[ya:yb,xa:xb].copy()
+    distance,nearest=nd.distance_transform_edt(~local,return_indices=True);permitted=distance<=1.5
+    cut[:,:,3][~permitted|((labels[ya:yb,xa:xb]>0)&~local)]=0
+    edge=permitted&~local;cut[:,:,:3][edge]=cut[nearest[0][edge],nearest[1][edge],:3]
+    im=Image.fromarray(cut).crop((x0-xa,y0-ya,x1-xa,y1-ya)).resize(size,Image.Resampling.LANCZOS)
+    z=np.array(im);hit=(z[:,:,:3]==[255,0,255]).all(2)&(z[:,:,3]>0)
+    if hit.any():
+        assert (z[:,:,3][hit]<=2).all()
+        _,nearest=nd.distance_transform_edt(z[:,:,3]<128,return_indices=True)
+        z[:,:,:3][hit]=z[nearest[0][hit],nearest[1][hit],:3]
+    return Image.fromarray(z),dict(raw=raw,komponenter=ids,raw_boks=[x0,y0,x1,y1],mal=list(size),original_pikselmaske_brukt=False,rgb_avrundingsrens=int(hit.sum()))
+def rope_placement(im,source):
+    """Myk posisjonsendring av generert strikk, aldri klipping med kilde-alfa."""
+    from scipy.interpolate import PchipInterpolator
+    a=np.array(im).astype(float);h,w=a.shape[:2]
+    colored=(source[:,:,1]>150)&(source[:,:,2]<120)&(source[:,:,3]>128)
+    ys=np.flatnonzero(colored.any(1));assert len(ys)>50
+    centers=np.array([np.where(colored[y])[0].mean()+0.5 for y in ys])
+    centers=nd.gaussian_filter1d(centers,0.8,mode='nearest')
+    interpolate=PchipInterpolator((ys+0.5)*4-0.5,centers*4-0.5,extrapolate=True)
+    destination=interpolate(np.arange(h))
+    target_width=float(np.median(colored[ys].sum(1))*4)
+    gen=(a[:,:,1]>130)&(a[:,:,2]<120)&(a[:,:,3]>220)
+    genrows=np.flatnonzero(gen.any(1));assert len(genrows)>180
+    start=max(float((ys[0]+0.5)*4),float(genrows[0]+4))
+    gx=[];gw=[]
+    for y in range(h):
+        pixels=np.flatnonzero(a[y,:,3]>220)
+        gx.append((pixels[0]+pixels[-1])/2 if len(pixels) else w/2)
+        gw.append(max(1,len(pixels)))
+    gx=nd.gaussian_filter1d(np.array(gx),1);gw=nd.gaussian_filter1d(np.array(gw,dtype=float),1)
+    yy,xx=np.mgrid[:h,:w];weight=np.clip((np.arange(h)-start)/12,0,1)
+    mapped=(xx-destination[:,None])/(target_width/gw[:,None])+gx[:,None]
+    mapped=xx*(1-weight[:,None])+mapped*weight[:,None]
+    out=np.empty_like(a)
+    for c in range(4):out[:,:,c]=nd.map_coordinates(a[:,:,c],[yy,mapped],order=1,mode='constant',cval=0)
+    return Image.fromarray(np.uint8(np.clip(np.rint(out),0,255))),dict(metode='Myk horisontal plassering langs kildebekreftet strikksenter, PCHIP og glattet posisjon. Bare generert RGBA flyttes; kilde-alfa klipper aldri resultatet.',strikkbredde_hd=target_width,start_rad=start)
+for p in plan:
+    num=int(p['bilde'].rsplit('_',1)[1]);group,version,spec=maps[num]
+    source=np.array(Image.open(REPO/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA'))
+    labels,n=nd.label(source[:,:,3]>128);slices=nd.find_objects(labels)
+    assert set(spec)==set(range(1,n+1))
+    w,h=p['rekt'][2:];assert source.shape[:2]==(h,w)
+    out=Image.new('RGBA',(w*4,h*4));parts=[]
+    # Store deler først, deretter løse smådeler når boksene overlapper.
+    for sid in sorted(spec,key=lambda sid:-int((labels==sid).sum())):
+        s=slices[sid-1];x,y,x1,y1=s[1].start,s[0].start,s[1].stop,s[0].stop;size=((x1-x)*4,(y1-y)*4)
+        choice=spec[sid]
+        if choice=='cord':
+            im,detail=drawing('unik-A-raa02.png',[13],size)
+            detail['gjenbrukt_generert_strikkdel']=True
+        elif choice=='blue':
+            a,lab=load('unik-B-raa01.png');points=np.argwhere(lab==5)
+            target=source[labels==sid,:3].mean(0)
+            dif=((a[points[:,0],points[:,1],:3].astype(float)-target)**2).sum(1)
+            py,px=points[np.argmin(dif)];im=Image.fromarray(a[py-1:py+2,px-1:px+2]).resize(size,Image.Resampling.LANCZOS)
+            detail=dict(raw='unik-B-raa01.png',komponenter=[5],raw_boks=[int(px-1),int(py-1),int(px+2),int(py+2)],mal=list(size),original_pikselmaske_brukt=False,gjenbrukt_generert_blaa_jakkedel=True)
+        else:im,detail=drawing(f'unik-{group}-raa{version}.png',choice,size)
+        if num in (1926,1927) and sid==1:
+            im,warp=rope_placement(im,source);detail['kurveplassering']=warp
+        out.alpha_composite(im,(x*4,y*4));parts.append(dict(kildekomponent=sid,kildeboks=[x,y,x1,y1],kildepiksler=int((labels==sid).sum()),**detail))
+    dest=R/(p['bilde']+'-prototype.png');out.save(dest);prototypes[p['bilde']]=out
+    audit.append(dict(bilde=p['bilde'],prototype_sha256=sha(dest),deler=parts,original_pikselmaske_brukt=False))
+(R/'prototype-kvitteringer.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-19',verktøy='innebygd image_gen',modell='Eksakt modellnavn ikke vist',faktiske_bildekall=[f'unik-{g}-raa01.png' for g in 'ABCDEF']+['unik-A-raa02.png'],leveranser=[],merknad='Sju faktiske kall, seks brukt i sluttbildene. Kildekomponentenes rektangler styrer plassering, ingen original silhuettmaske klipper generert grafikk. Alle kildekomponenter har en generert del. Små strikkfragmenter deles fra A02 når de mangler i et råbilde. En blå jakkepiksel bruker generert blått jakkestoff fra samme råbilde. E sin femte lille ørebevegelsesstrek deler generert strek fra samme kildefarge. Oppdiktede nedre A02-fragmenter er utelatt i1926/1927, hvor originalen har sammenhengende strikk.')
+for number in range(1,6):
+    name=f'fig309_{number:02d}';d=ART/'jobber'/name;j=json.loads((d/'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));rows=[]
+    for cel in j['ruter']:
+        p=next(p for p in plan if any(t['bilde']==cel['bilde'] for t in p['malruter']))
+        x,y,w,h=cel['rekt'];source=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h))
+        assert hashlib.sha256(source.tobytes()).hexdigest()==p['rgba_sha256']
+        im=prototypes[p['bilde']];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4
+        assert im.size==(w*4,h*4);out.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>128)
+        rows.append(dict(bilde=cel['bilde'],kostyme=309,rute=cel['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=p['bilde'],kilde_rgba_sha256=p['rgba_sha256'],prototype=p['bilde']+'-prototype.png'))
+    out.save(d/'resultat.png');digest=sha(d/'resultat.png')
+    (R/f'rutekart-{name}.json').write_text(json.dumps({name:dict(sha256_resultat=digest,ruter=rows)},ensure_ascii=False,indent=2)+'\n')
+    used=sorted({part['raw'] for row in rows for rec in audit if rec['bilde']==row['representant'] for part in rec['deler']})
+    e=dict(jobb=name,resultat=f'jobber/{name}/resultat.png',sha256=digest,ruter=len(rows),rutekart=f'rapporter/sam-max-sele-20261019/rutekart-{name}.json',delte_bildekall=used,egenkontroll='ikke kjørt',native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False)
+    result=subprocess.run([str(REPO/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',e['resultat']],cwd=ART,capture_output=True,text=True)
+    (R/(name+'-egenkontroll.txt')).write_text(result.stdout+result.stderr);assert result.returncode in (0,1,2)
+    e['egenkontroll']={0:'OK',1:'SJEKK',2:'FEIL'}[result.returncode];progress['leveranser'].append(e)
+    print(name,e['egenkontroll'],result.stdout,flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'plasser-unike.py.txt')

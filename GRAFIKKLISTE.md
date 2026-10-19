@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-19 21:12 (norsk tid). Siste tillegg: seks fig152-ark,82 native, alle visuelt sett og motorobservert;75 egenkontroll OK,7 SJEKK, native82 OK. Se rapporter/sam-gripearm-20261019. Ingen ny Tom-/Claude-godkjenning. Fire VR-ark og to golfark står åpne etter dokumenterte bildeverktøyavslag.
+Oppdatert 2026-10-19 21:39 (norsk tid). Fem fig309-ark:40 nye native, alle visuelt sett og motorobservert. Egenkontroll32 OK,8 SJEKK, native40 OK. Se rapporter/sam-max-sele-20261019. Ingen ny Tom-/Claude-godkjenning. Fire VR-ark og to golfark står åpne etter dokumenterte bildeverktøyavslag.
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -140,11 +140,11 @@ Figurark for Sam.
 Figurark for Sam, Sam og Max.
 
 - [x] `fig152_06` (figurark 6 for Sam (kostyme 152), 20 ruter: animasjon 9 (lag 14, tegnes over kroppen) mot høyre (11 ruter); animasjon 9 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig309_01` (figurark 1 for Sam og Max (kostyme 309), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig309_02` (figurark 2 for Sam og Max (kostyme 309), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig309_03` (figurark 3 for Sam og Max (kostyme 309), 6 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig309_04` (figurark 4 for Sam og Max (kostyme 309), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig309_05` (figurark 5 for Sam og Max (kostyme 309), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig309_01` (figurark 1 for Sam og Max (kostyme 309), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig309_02` (figurark 2 for Sam og Max (kostyme 309), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig309_03` (figurark 3 for Sam og Max (kostyme 309), 6 ruter: start mot høyre (1 rute); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig309_04` (figurark 4 for Sam og Max (kostyme 309), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig309_05` (figurark 5 for Sam og Max (kostyme 309), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig215_01` (figurark 1 for Sam (kostyme 215), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig215_02` (figurark 2 for Sam (kostyme 215), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig215_03` (figurark 3 for Sam (kostyme 215), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
