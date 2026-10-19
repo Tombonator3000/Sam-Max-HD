@@ -1,0 +1,16 @@
+Use case: style-transfer
+Asset type: faithful HD animation production source for Sam & Max Hit the Road (1993), costume152, room28 (the twine museum).
+Input image 1 contains exactly 7 different original poses, in row-major order, enlarged 12x with nearest-neighbor for clear reference. The gray border and magenta are padding. Image 2 is the approved Sam design and line/color style only. Pose, shape, view, scale, visible parts and prop content come from image 1.
+Primary request: redraw each visible shape of image 1 as smooth hand-drawn high-resolution 2D cartoon art. Isolated brown hand-shaped attachment and the red fish magnet / small white mood ring only where visible in each original. These are small separate moving layers of the golf ball retriever puzzle, with the exact partial shapes and occlusions shown. Do not complete hidden fingers, and do not add Sam, a body, wrist, arm, scissors, or background.
+Style: approved Sam & Max game look from image2, clean dark antialiased contours, flat colors with restrained cel shading, no pixel stairs, no dithering or grain. Preserve original forms, relative proportions and colors. Keep all separate parts in each pose, including tiny authentic marks and the changing head/hat angles.
+Composition: exactly the same number of poses, rows and left-to-right order as image1. Each pose stays at its listed size and position, all equally scaled. Do not merge, duplicate, redesign, rotate or complete missing parts. Keep clear separation between poses. Do not add labels, text, grid, shadows or scenery.
+Reference rectangles, measured in this staged drawing image:
+1: 360 x 132 px, top-left (112,80), source costume152_1975
+2: 240 x 132 px, top-left (568,80), source costume152_1976
+3: 192 x 180 px, top-left (904,80), source costume152_1979
+4: 180 x 192 px, top-left (1192,80), source costume152_1980
+5: 168 x 192 px, top-left (112,380), source costume152_1981
+6: 144 x 180 px, top-left (376,380), source costume152_1982
+7: 108 x 180 px, top-left (616,380), source costume152_1983
+This is an enlarged drawing source. Final production placement will resample each pose into its exact original size times four in the fixed original job sheet. Keep the original aspect ratio, exact silhouette, gripping points and motion phase, rather than expanding a pose to fill a gap. Do not clip the new antialiased shape to a hard pixel mask.
+Output: one landscape PNG with real transparent background, 1536 x 1024, no magenta, gray border, opaque background or checkerboard.

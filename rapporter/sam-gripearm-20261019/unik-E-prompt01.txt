@@ -1,0 +1,16 @@
+Use case: style-transfer
+Asset type: faithful HD animation production source for Sam & Max Hit the Road (1993), costume152, room28 (the twine museum).
+Input image 1 contains exactly 7 different original poses, in row-major order, enlarged 4x with nearest-neighbor for clear reference. The gray border and magenta are padding. Image 2 is the approved Sam design and line/color style only. Pose, shape, view, scale, visible parts and prop content come from image 1.
+Primary request: redraw each visible shape of image 1 as smooth hand-drawn high-resolution 2D cartoon art. Sam, the brown dog detective, in his blue-gray fedora and suit, white shirt and blue/black striped tie. In this action he manipulates a green extending pantograph golf-ball retriever with its brown hand attachment. The red fish magnet and white mood ring are separate small layers in this costume; include them only if actually visible in a body pose in image1. Do not add these attachments to body poses that omit them. Preserve the precise hand grip, green crossed metal bars, visible openings between them, contact points, raised leg, long stretched back-and-arms cartoon poses, hat and tie as each original shows. The end attachment is part of the game puzzle; draw it exactly as in the input. Do not replace it with a hammer, golf club, plant, or snake. Do not normalize the deliberately stretched poses.
+Style: approved Sam & Max game look from image2, clean dark antialiased contours, flat colors with restrained cel shading, no pixel stairs, no dithering or grain. Preserve original forms, relative proportions and colors. Keep all separate parts in each pose, including tiny authentic marks and the changing head/hat angles.
+Composition: exactly the same number of poses, rows and left-to-right order as image1. Each pose stays at its listed size and position, all equally scaled. Do not merge, duplicate, redesign, rotate or complete missing parts. Keep clear separation between poses. Do not add labels, text, grid, shadows or scenery.
+Reference rectangles, measured in this staged drawing image:
+1: 316 x 236 px, top-left (80,48), source costume152_1961
+2: 292 x 236 px, top-left (444,48), source costume152_1962
+3: 264 x 248 px, top-left (784,48), source costume152_1964
+4: 216 x 268 px, top-left (1096,48), source costume152_1965
+5: 184 x 272 px, top-left (80,368), source costume152_1966
+6: 148 x 272 px, top-left (312,368), source costume152_1967
+7: 160 x 268 px, top-left (508,368), source costume152_1968
+This is an enlarged drawing source. Final production placement will resample each pose into its exact original size times four in the fixed original job sheet. Keep the original aspect ratio, exact silhouette, gripping points and motion phase, rather than expanding a pose to fill a gap. Do not clip the new antialiased shape to a hard pixel mask.
+Output: one landscape PNG with real transparent background, 1536 x 1024, no magenta, gray border, opaque background or checkerboard.

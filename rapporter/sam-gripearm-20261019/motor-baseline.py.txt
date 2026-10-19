@@ -1,0 +1,19 @@
+from pathlib import Path
+import importlib.util,json,hashlib,shutil
+REPO=Path('/home/tom/Sam-Max-HD');OUT=REPO/'out/sam-gripearm-20261019';OUT.mkdir(exist_ok=True)
+REPORT=REPO/'work/.gpt-gren/rapporter/sam-gripearm-20261019'
+spec=importlib.util.spec_from_file_location('kontroll',REPO/'out/inventoryknapp-20261016/kontroll.py')
+k=importlib.util.module_from_spec(spec);spec.loader.exec_module(k);k.ROOT=OUT
+pkg=REPO/'out/felles-release-20261019/linux/squashfs-root/usr';k.NEW=pkg/'bin/scummvm';k.LIB=pkg/'lib';k.PROJECT=pkg/'share/sam-max-hd'
+mod=REPO/'mods/gpt';base={p.relative_to(mod).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in mod.rglob('*') if p.is_file()}
+(REPORT/'grunnlag-filer-bd65ce87.json').write_text(json.dumps(base,indent=2)+'\n')
+meta=json.loads((mod/'mod.json').read_text());assert meta['costume_cels']==1654
+print(json.dumps({'native':meta['costume_cels'],'png':sum(n.endswith('.png') for n in base),'files':len(base),'source_results':len(list((REPO/'work/.gpt-gren/jobber').glob('fig*/resultat.png')))}),flush=True)
+rows=[]
+for anim in (1,7,8,9):
+ env={'DIGHD_TEST_ROOM':'28','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'152','DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'160,180','DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)}
+ row=k.run(f'baseline152-anim{anim}',k.NEW,env,300,mod);row['animasjon']=anim;rows.append(row)
+ (REPORT/'motor-baseline.json').write_text(json.dumps(rows,indent=2)+'\n')
+ assert row['exit']==0 and row['dumps']
+shutil.copy2(__file__,REPORT/'motor-baseline.py.txt')
+print('Fire uendrede baseline-prøver ferdige.',flush=True)

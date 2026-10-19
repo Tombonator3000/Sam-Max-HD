@@ -1,0 +1,27 @@
+from pathlib import Path
+import hashlib,json,re
+from PIL import Image,ImageDraw
+r=Path(__file__).parent
+selections=[('test-inventory',120),('test-akvarium',200),('test-cafeteria',200),('test-costume220-anim1',80),('test-costume220-anim7',120),('test-costume220-anim8',160),('test-costume220-anim9',160),('test-costume220-anim10',160),('test-costume110-anim1',80),('test-costume110-anim7',84),('test-costume110-anim8',76),('test-costume110-anim9',80)]
+rows=[]
+for scene,frame in selections:
+    matches=[p for p in (r/scene).glob(f'frame_{frame:06d}_room*.png') if re.fullmatch(r'frame_\d+_room\d+\.png',p.name)]
+    assert len(matches)==1,(scene,frame,matches)
+    p=matches[0];rows.append({'scene':scene,'frame':frame,'fil':p.relative_to(r).as_posix(),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+for page in range(2):
+    b=Image.new('RGB',(1920,840),(55,60,65));d=ImageDraw.Draw(b)
+    for i,row in enumerate(rows[page*6:page*6+6]):
+        p=r/row['fil'];im=Image.open(p).convert('RGB');im.thumbnail((640,400));xx=(i%3)*640;yy=(i//3)*420
+        b.paste(im,(xx,yy+20));d.text((xx+4,yy+4),row['scene']+' '+str(row['frame']),fill='white')
+    b.save(r/f'motoroversikt-{page+1}.png')
+(r/'valgte-motorbilder.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+# Uendrede native PNG-er fra den faktiske nedlastingen, med egen alfa.
+mod=r/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+names=['costume220_1664_hd.png','costume220_1808_hd.png','costume110_1920_hd.png','costume110_1976_hd.png']
+b=Image.new('RGB',(1360,430),(45,52,62));d=ImageDraw.Draw(b);sources=[]
+for i,n in enumerate(names):
+    p=mod/'costumes'/n;im=Image.open(p).convert('RGBA');assert im.width<=330 and im.height<=380
+    b.paste(im,(i*340+(340-im.width)//2,400-im.height),im);d.text((i*340+10,410),n,fill=(220,225,235))
+    sources.append({'fil':'costumes/'+n,'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'storrelse':list(im.size),'endret_eller_skalert':False})
+b.save(r/'forhandsvisning.png');(r/'forhandsvisning-kilder.json').write_text(json.dumps(sources,indent=2)+'\n')
+print('Tolv motorbilder og fire uendrede native PNG-er fra nedlastingen klargjort.')
