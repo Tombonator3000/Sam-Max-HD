@@ -1,0 +1,30 @@
+from pathlib import Path
+import sys,json,re
+ROOT=Path('/home/tom/Sam-Max-HD/out/strikk-og-kjokken-20261019')
+REPORT=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/strikk-og-kjokken-20261019')
+sys.path.insert(0,'/home/tom/Sam-Max-HD/out/inventoryknapp-20261016')
+import kontroll as k
+k.ROOT=ROOT
+PACKAGE=Path('/home/tom/Sam-Max-HD/out/felles-release-20261018/linux/squashfs-root')
+k.NEW=PACKAGE/'usr/bin/scummvm'
+k.LIB=PACKAGE/'usr/lib'
+env={'DIGHD_TEST_ROOM':'61','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'315','DIGHD_TEST_CHORE_EVERY':'1000',
+'DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'160,180','DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1'}
+rows=[]
+for animation in [1]:
+    label=f'sam315-anim{animation}'
+    row=k.run(label,k.NEW,dict(env,DIGHD_TEST_ANIMATION=str(animation)),200,ROOT/'mod-kandidat')
+    log=(ROOT/label/'scummvm.log').read_text(errors='replace')
+    row['tegnede_ruter']=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*315',log)))
+    checks=[(int(f),int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+    row['skjermbuffer_fra_figurstart']=[n for f,n in checks if f>=40]
+    row['oppstartsavvik']=[{'frame':f,'avvik':n} for f,n in checks if f<40 and n]
+    rows.append(row);(REPORT/'motor315-runder.json').write_text(json.dumps(rows,indent=2)+'\n')
+    assert row['exit']==0 and row['dumps'] and row['skjermbuffer_fra_figurstart'] and max(row['skjermbuffer_fra_figurstart'])==0,label
+    assert row['oppstartsavvik']==[{'frame':36,'avvik':160}],label
+expected={int(x['bilde'].split('_')[1]) for x in json.loads((REPORT/'tillegg315.json').read_text())['tillegg']}
+seen={n for row in rows for n in row['tegnede_ruter']}
+summary={'runder':len(rows),'ruter_forventet':len(expected),'ruter_tegnet':len(expected&seen),'mangler_i_avspilling':sorted(expected-seen),
+'skjermbufferkontroller':sum(len(x['screen_differences']) for x in rows),'kontroller_fra_figurstart':sum(len(x['skjermbuffer_fra_figurstart']) for x in rows),'avvik_fra_figurstart':sum(sum(x['skjermbuffer_fra_figurstart']) for x in rows),'kjent_oppstartsavvik_frame36':160,'naturlig_gjennomspilling':False,'produksjonsbinar_uten_lokal_retningskrok':True}
+(REPORT/'motor315-oppsummering.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps(summary),flush=True)
+assert not expected-seen,sorted(expected-seen)

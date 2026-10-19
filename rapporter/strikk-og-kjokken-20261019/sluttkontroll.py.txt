@@ -1,0 +1,66 @@
+"""Kontroller bevaring og endelig grafikk. Endrer ingen bilder."""
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import hashlib, json, numpy as np
+
+REPO = Path('/home/tom/Sam-Max-HD')
+ART = REPO/'work/.gpt-gren'
+REPORT = ART/'rapporter/strikk-og-kjokken-20261019'
+BASE = REPO/'mods/gpt'
+MOD = REPO/'out/strikk-og-kjokken-20261019/mod-kandidat'
+
+def sha(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+protected = json.loads((REPORT/'beskyttede-kilder.json').read_text())
+assert len(protected) == 28
+assert all(sha(ART/rel) == digest for rel, digest in protected.items())
+base_files = {p.relative_to(BASE).as_posix():sha(p) for p in BASE.rglob('*') if p.is_file()}
+candidate_files = {p.relative_to(MOD).as_posix():sha(p) for p in MOD.rglob('*') if p.is_file()}
+assert set(base_files) <= set(candidate_files)
+changed = [rel for rel in base_files if base_files[rel] != candidate_files[rel]]
+assert changed == ['mod.json'] or set(changed) == {'mod.json'}, changed
+additions = json.loads((REPORT/'tillegg.json').read_text())['tillegg']
+assert len(additions) == 78
+assert set(candidate_files)-set(base_files) == {e['fil'] for e in additions}
+for e in additions:
+    assert candidate_files[e['fil']] == e['sha256']
+    assert (MOD/e['fil']).suffix == '.png'
+    im = Image.open(MOD/e['fil'])
+    assert im.mode == 'RGBA'
+    assert im.width % 4 == 0 and im.height % 4 == 0
+    a = np.array(im)
+    assert (a[:,:,3] == 0).any() and (a[:,:,3] > 128).any()
+    assert not (((a[:,:,:3] == [255,0,255]).all(2)) & (a[:,:,3] > 0)).any()
+metadata = json.loads((MOD/'mod.json').read_text())
+oldmetadata = json.loads((BASE/'mod.json').read_text())
+assert metadata['costume_cels'] == 1464
+assert metadata['created'] == '2026-10-19'
+assert set(metadata) == set(oldmetadata)
+assert {k for k in metadata if metadata[k] != oldmetadata[k]} == {'costume_cels', 'costumes', 'created'}
+assert set(metadata['costumes'])-set(oldmetadata['costumes']) == {'costume314', 'costume294', 'costume315'}
+assert all(isinstance(s,str) for s in metadata['costumes'])
+base_png = [p for p in base_files if p.endswith('.png')]
+new_png = [p for p in candidate_files if p.endswith('.png')]
+native = list((MOD/'costumes').glob('*_hd.png'))
+assert len(base_png) == 19622 and len(new_png) == 19700 and len(native) == 1464
+checks = []
+for n in range(1920, 1926):
+    name = f'costume315_{n}'
+    a = np.array(Image.open(MOD/'costumes'/f'{name}_hd.png'))[:,:,3] >= 128
+    labs, num = nd.label(a)
+    areas = sorted([int((labs == i).sum()) for i in range(1,num+1)], reverse=True)
+    receipt = json.loads((REPORT/'myke315-kvittering.json').read_text())['ark']['fig315_01']['ruter'][name]
+    checks.append({'bilde':name, 'native_alfa_komponentareal':areas, 'mottak':receipt})
+assert [len(r['native_alfa_komponentareal']) for r in checks] == [1,2,2,2,2,2]
+(REPORT/'minste-seks-ekstrakontroll.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2)+'\n')
+summary = {'beskyttede_kilder_uendret':len(protected), 'publisert_grunnlag':'f7a3f275d62de5327d5a0d08153dfbc17ffdb9c9',
+           'tidligere_png_byteidentiske':len(base_png), 'tidligere_filer_bevart':len(base_files),
+           'endrede_tidligere_filer':changed, 'nye_filer':len(additions), 'png_totalt':len(new_png),
+           'native_totalt':len(native), 'leverte_resultatark':len(list((ART/'jobber').glob('fig*/resultat.png'))),
+           'figurjobber_totalt':len(list((ART/'jobber').glob('fig*/jobb.json'))),
+           'merknad':'Alle gamle filer beholdt. Bare mod.json er oppdatert; SHA256SUMS skrives av publiseringsverktøyet. Ingen tegning bruker originalens harde pikselmaske.'}
+assert summary['leverte_resultatark'] == 135 and summary['figurjobber_totalt'] == 1758
+(REPORT/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(summary,ensure_ascii=False))

@@ -1,0 +1,46 @@
+"""Rens RGB-avrunding ved alfa1 etter RGBA-skalering. Behold all alfa."""
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np, hashlib, json, shutil
+
+ROOT = Path('/home/tom/Sam-Max-HD/work/.gpt-gren')
+REPORT = ROOT/'rapporter/strikk-og-kjokken-20261019'
+records = []
+progress = json.loads((REPORT/'fremdrift.json').read_text())
+for job in ['fig314_01','fig314_02','fig314_03','fig314_04']:
+    p = ROOT/'jobber'/job/'resultat.png'
+    before_sha = hashlib.sha256(p.read_bytes()).hexdigest()
+    before = np.array(Image.open(p).convert('RGBA'))
+    after = before.copy()
+    hit = (before[:,:,:3] == [255,0,255]).all(2) & (before[:,:,3] > 0)
+    assert hit.any() and (before[:,:,3][hit] == 1).all()
+    _, nearest = nd.distance_transform_edt(before[:,:,3] < 128, return_indices=True)
+    after[:,:,:3][hit] = before[nearest[0][hit], nearest[1][hit],:3]
+    assert np.array_equal(before[:,:,3], after[:,:,3])
+    assert np.array_equal(before[~hit], after[~hit])
+    dest = REPORT/(job+'-for-magenta1-rens.png')
+    assert not dest.exists()
+    shutil.copy2(p, dest)
+    Image.fromarray(after).save(p)
+    after_sha = hashlib.sha256(p.read_bytes()).hexdigest()
+    yy, xx = np.nonzero(hit)
+    audit = {'jobb':job, 'for_sha256':before_sha, 'etter_sha256':after_sha,
+             'endrede_rgb_piksler':int(hit.sum()), 'alfa_uendret':True,
+             'punkter':[{'x':int(x),'y':int(y),'alfa':1,'rgb_for':[255,0,255],
+                        'rgb_etter':after[y,x,:3].tolist()} for x,y in zip(xx,yy)]}
+    records.append(audit)
+    rp = REPORT/('rutekart-'+job+'.json')
+    shutil.copy2(rp, REPORT/('rutekart-'+job+'-for-magenta1-rens.json'))
+    maps = json.loads(rp.read_text())
+    assert maps[job]['sha256_resultat'] == before_sha
+    maps[job]['sha256_resultat'] = after_sha
+    maps[job]['rgb_avrundingsrens'] = audit
+    rp.write_text(json.dumps(maps,ensure_ascii=False,indent=2)+'\n')
+    row = next(r for r in progress['leveranser'] if r['jobb'] == job)
+    assert row['sha256'] == before_sha
+    row['sha256'] = after_sha
+assert sum(r['endrede_rgb_piksler'] for r in records) == 17
+(REPORT/'magenta1-rens.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
+(REPORT/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+print('17 RGB-piksler renset. All alfa og øvrige piksler er uendret.')

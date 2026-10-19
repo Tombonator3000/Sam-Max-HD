@@ -1,0 +1,61 @@
+"""Plasser de faktiske AI-tegnede delene i kildens delbokser.
+
+Kun rektangulære mål og posisjoner fra originalen brukes. Ingen original
+pikselmaske klipper tegningen. Løse hatter/hender får sine egne riktige mål.
+"""
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np
+import json,hashlib
+
+ROOT=Path('/home/tom/Sam-Max-HD/work/.gpt-gren')
+REPORT=ROOT/'rapporter/strikk-og-kjokken-20261019'
+JOB='fig315_01'
+job=json.loads((ROOT/'jobber'/JOB/'jobb.json').read_text())
+specs=json.loads((REPORT/'fig315_01-delbokser.json').read_text())
+output=Image.new('RGBA',(1536,1024))
+cache={}
+maps=[]
+for cel,parts in zip(job['ruter'],specs):
+    rx,ry,rw,rh=cel['rekt']
+    details=[]
+    for part in parts:
+        name=part['raw']
+        if name not in cache:
+            full=np.array(Image.open(REPORT/name).convert('RGBA'))
+            labs,_=nd.label(full[:,:,3]>220)
+            cache[name]=(full,labs)
+        full,labs=cache[name]
+        keep=np.isin(labs,part['ids'])
+        yy,xx=np.nonzero(keep)
+        assert len(xx)>20
+        x0,y0,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1
+        xa,ya,xb,yb=max(0,x0-2),max(0,y0-2),min(full.shape[1],x1+2),min(full.shape[0],y1+2)
+        cut=full[ya:yb,xa:xb].copy()
+        local=keep[ya:yb,xa:xb]
+        distance,nearest=nd.distance_transform_edt(~local,return_indices=True)
+        permitted=distance<=1.5
+        cut[:,:,3][~permitted|((labs[ya:yb,xa:xb]>0)&~local)]=0
+        edge=permitted&~local
+        cut[:,:,:3][edge]=cut[nearest[0][edge],nearest[1][edge],:3]
+        im=Image.fromarray(cut).crop((x0-xa,y0-ya,x1-xa,y1-ya))
+        sx,sy,w,h=part['source_box']
+        assert 0<=sx and 0<=sy and sx+w<=rw and sy+h<=rh
+        dx,dy=(job['plassering'][0]+rx+sx)*4,(job['plassering'][1]+ry+sy)*4
+        il,it,ir,ib=part.get('inset_hd',[0,0,0,0])
+        im=im.resize((w*4-il-ir,h*4-it-ib),Image.Resampling.LANCZOS)
+        output.alpha_composite(im,(dx+il,dy+it))
+        details.append({'raw':name,'raw_komponenter':part['ids'],'raw_boks':[x0,y0,x1,y1],'kilde_delboks':[sx,sy,w,h],'inset_hd':[il,it,ir,ib],'plassering_hd':[dx+il,dy+it,w*4-il-ir,h*4-it-ib]})
+    x,y,w,h=cel['rekt'];dx,dy=(job['plassering'][0]+x)*4,(job['plassering'][1]+y)*4
+    a=np.array(output.crop((dx,dy,dx+w*4,dy+h*4)))[:,:,3]>128
+    yy,xx=np.nonzero(a);assert len(xx)
+    maps.append({'bilde':cel['bilde'],'kostyme':315,'rute':cel['rute'],'rect':[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],'deler':details})
+dest=ROOT/'jobber'/JOB/'resultat.png'
+output.save(dest)
+sha=hashlib.sha256(dest.read_bytes()).hexdigest()
+(REPORT/('rutekart-'+JOB+'.json')).write_text(json.dumps({JOB:{'sha256_resultat':sha,'ruter':maps}},indent=2)+'\n')
+p=REPORT/'fremdrift.json';data=json.loads(p.read_text());data['leveranser']=[r for r in data['leveranser'] if r['jobb']!=JOB]
+data['leveranser'].append({'jobb':JOB,'resultat':'jobber/'+JOB+'/resultat.png','sha256':sha,'ruter':26,'rutekart':'rapporter/strikk-og-kjokken-20261019/rutekart-'+JOB+'.json','antall_bildekall':3,'egenkontroll':'ikke kjort','motoravspilt':False,'importert':False,'godkjent_av_Tom':False,'claude_kontroll':False})
+p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+print(JOB,sha)

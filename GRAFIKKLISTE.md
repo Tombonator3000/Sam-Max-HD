@@ -13,7 +13,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 128 ark med resultat; 1386 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 135 ark med resultat; 1464 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
@@ -67,13 +67,13 @@ Figurark for Sam og Max, Sam, Max.
 - [x] `fig312_03` (figurark 3 for Sam og Max (kostyme 312), 9 ruter: animasjon 7 mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig312_04` (figurark 4 for Sam og Max (kostyme 312), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig312_05` (figurark 5 for Sam og Max (kostyme 312), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig314_01` (figurark 1 for Sam (kostyme 314), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig314_02` (figurark 2 for Sam (kostyme 314), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig314_03` (figurark 3 for Sam (kostyme 314), 10 ruter: animasjon 7 mot høyre (10 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig314_04` (figurark 4 for Sam (kostyme 314), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig294_01` (figurark 1 for Max (kostyme 294), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig294_02` (figurark 2 for Max (kostyme 294), 16 ruter: animasjon 7 mot høyre (16 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig315_01` (figurark 1 for Sam (kostyme 315), 26 ruter: start mot høyre (26 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig314_01` (figurark 1 for Sam (kostyme 314), 10 ruter: start mot høyre (10 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig314_02` (figurark 2 for Sam (kostyme 314), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig314_03` (figurark 3 for Sam (kostyme 314), 10 ruter: animasjon 7 mot høyre (10 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig314_04` (figurark 4 for Sam (kostyme 314), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig294_01` (figurark 1 for Max (kostyme 294), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/max.png`)
+- [x] `fig294_02` (figurark 2 for Max (kostyme 294), 16 ruter: animasjon 7 mot høyre (16 ruter), bilde to `hovedark/max.png`)
+- [x] `fig315_01` (figurark 1 for Sam (kostyme 315), 26 ruter: start mot høyre (26 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 5
 

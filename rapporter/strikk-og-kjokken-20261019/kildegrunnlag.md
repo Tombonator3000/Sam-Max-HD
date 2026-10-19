@@ -1,0 +1,11 @@
+# Kilder og avklaringer, 19. oktober 2026
+
+Originalene for alle sju jobber, Sam- og Max-hovedarkene og tidligere Sam-ark fig307_01 er sett før nytegning. De beskyttede jobbfilene er beholdt. Motivet er avklart fra jobbens originalruter, originaluttrekket, docs/figurer.csv og romoversikten i docs/GJENNOMGANG.md i main. Ingen uavklart gjenstand er erstattet med en gjetning.
+
+- Kostyme314, fire ark og 32 ruter: Sam i sele med grønn strikk i rom 61, Strikkhoppgrotten i fjellet. Originalen bekrefter rødt seletøy, gult hodeutstyr med lilla felt, blågrå dress og hatt, tynn limegrønn strikk og sølvfarget C-feste. Lilla utstyr og løse grønne strikkdeler er motiv, ikke feil som skal fjernes. Det generelle Sam-premisset i prompt.txt er supplert i separate produksjonsprompter uten å endre jobbfilen.
+- Kostyme294, to ark og 20 ruter: Max på kjøkkenet i rom 56. Ingen klær. De to første rutene har lukkede beige øyelokk; øvrige har åpne svarte øyne. Kildens gråbeige skyggelag på bevegelige armer og føtter er beholdt, uten nye tilbehør eller ekstra hender.
+- Kostyme315, ett ark og 26 ruter: hatten og hånden, små deler, i rom 61. Dette står uttrykkelig i figurer.csv. Den generelle Sam-prompten ville gitt feil motiv. Bare originalens hatte-, hånd- og ermefragmenter er tegnet; ingen hel Sam er lagt til. Åpne hakk og avstander mellom løse deler er bevart. Kostyme315_1935 har en liten oransje hånddel nederst, som er kontrollert i forstørrelse og beholdt.
+
+Prosjektbiblioteket ble søkt før produksjon, først med prosjekt-/symptomord og deretter med --match any ved svakt treff. Tre løsninger er brukt som referanser: losninger/grafikk/figurark-fast-storrelse.md, losninger/bygg/publisert-mod-er-fasit.md og losninger/testing/logg-over-det-som-mangler-hd.md under /home/tom/.local/share/prosjektbibliotek. Kortenes kontrollerte arbeidsmåte er brukt med prosjektets eksisterende v6-mottak og motor. Ingen fremmed implementasjon eller ukontrollert kode er kopiert.
+
+Kildegrunnlag: main a4e08bd49bbd53ff4d7a5a4b5571ed1e29a93459, gpt-arbeid cb7775085af176777efce28d53abd5e228f2099f og publisert hd-mod f7a3f275d62de5327d5a0d08153dfbc17ffdb9c9. Se grunnlag.json og beskyttede-kilder.json. Denne leveransen gjelder Toms videre grafikkbestilling; natt-automatikken er fortsatt pauset.
