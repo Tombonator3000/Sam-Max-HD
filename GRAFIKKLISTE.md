@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-19 23:37 (norsk tid). Seks nye ark109 native, alle visuelt sett og motorobservert. Egenkontroll103 OK,4 SJEKK,2 mikroruter manuelt kontrollert. Se rapporter/sam-boey-og-slutt-20261019/mottak-publisert.json for faktisk publisering. Kandidat1960, grunnlag1851.189 av1758 resultatark. Ikke ny Tom-/Claude-godkjenning.
+Oppdatert 2026-10-19 23:37 (norsk tid). Seks nye ark109 native, alle visuelt sett og motorobservert. Egenkontroll103 OK,4 SJEKK,2 mikroruter manuelt kontrollert. Se rapporter/sam-boey-og-slutt-20261019/mottak-publisert.json for faktisk publisering. Publisert1960, grunnlag1851.189 av1758 resultatark. Ikke ny Tom-/Claude-godkjenning.
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -13,7 +13,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 189 ark med resultat; kandidat1960 native, publisert1851 til kvittering | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 189 ark med resultat; 1960 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 

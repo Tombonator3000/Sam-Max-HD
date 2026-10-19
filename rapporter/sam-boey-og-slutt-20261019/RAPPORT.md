@@ -31,3 +31,5 @@ Den felles senkveldspakken har1776 native og mangler184 mot denne kandidaten. Ny
 Neste bunker fra bestilling11: fig337_01 til03 og fig015_01 til02. Disse er ikke tegnet eller kildeavklart i denne bunken. Ikke gjenta168/336,215/300 eller de avviste golf-/VR-grunnlagene.
 
 Bibliotek brukt: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Tilpasset prosjektets v6-mottak og faktiske produksjonsbinær. Rawprompter og denne rapporten skiller nytegnet, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert.
+
+Publisering og tilbakehenting bekreftet: kilde 4274457c09e5a5a69e0ec5512c4973ad29289a91, hd-mod 2776cff3eb9abcbcfde5bc0bef570989e0e76665. Alle20196 kandidat-PNG-er og alle20087 tidligere PNG-er bekreftet.109 nye native-SHA-er stemmer.1960 native totalt. Alle24 beskyttede kilder og tre stasher uendret. Se mottak-publisert.json.
