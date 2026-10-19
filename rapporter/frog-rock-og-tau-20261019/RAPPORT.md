@@ -35,3 +35,6 @@ Dette er egenkontroll, native mottak og motorobservasjon. Det er ikke naturlig g
 Neste uavhengige arbeid er fig168_01 til 03, deretter fig336_01 til 03. Kildeavklar hver i spillkontekst før generering. Tidligere avviste golf-E og VR-G skal ikke bestilles på nytt eller omgås. Automatisk grafikkfortsettelse er fortsatt aktiv.
 
 Publisering og tilbakehenting bekreftet: kilde dcfdceb610763971d20aa03b070dc8506ccfdb82, hd-mod fb21d04ba10ceb6fe86f5286dc142d361863bd59. Alle 20 087 kandidat-PNG-er og alle 20 012 tidligere PNG-er kontrollert. Alle 75 nye native-SHA-er stemmer. Totalt 1 851 native. De 32 beskyttede kildene og tre stasher er bevart. Se mottak-publisert.json.
+
+
+Presisering fra mottakskildene: samtlige75 hele ruter kommer fra nytegnede ark, ingen hel rute bruker originalfragment-fallback. Det eksisterende v6-mottaket har i tillegg lagt inn26 kildebekreftede originalpiksler fordelt på8 ruter som utliggere der det fant hull i den importerte tegningen. Disse er skalert mykt med forhåndsmultiplisert Lanczos og ekte alfa. De er ikke nytegnet i selve native-tillegget, selv om resultatarkene har genererte smådeler. Dette er bevart og dokumentert i native-utliggertillegg.json; ikke kall alle native-piksler AI-genererte. Ingen bilde eller motor/pipeline er endret av denne presiseringen.
