@@ -1,5 +1,7 @@
 # Felles Linux-/Windows-pakke med 1546 native ruter, 19. oktober 2026
 
+[Sam-max-hd-2026-10-19 er publisert og bekreftet Latest](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-19), med Linux-AppImage, Windows-ZIP og hver sin SHA-256-fil.
+
 Begge nedlastede pakker har main 73b63a9b2b7af18fc045ac2431db7b7b1f2f8339 og hd-mod d31c30f269ed7b0b8746b5b1dfb5c50551cc900d. Det er 1546 native figurruter, 160 flere enn fellespakken fra 18. oktober. Sam i strikk, Max på kjøkkenet, hatte-/hånddelene og 82 VR-ruter er med. Grafikken er fortsatt under arbeid. Dette er ikke en ferdig HD-utgave av alle figurene.
 
 [Linux-bygg 39286953973](https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39286953973) og [Windows-bygg 39286957890](https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39286957890) er begge completed/success og har samme fulle kilde-SHA. Linux består oppstart og Debian 12, Windows består automatisert oppstart med HD og MT-32. Pakkenes faktiske BYGG.txt og moddfiler er lest. Tidspunktet da et bygg ble bestilt brukes ikke som bevis for hvilken modd det inneholder.
@@ -29,7 +31,7 @@ Ikke full naturlig gjennomspilling, interaktiv Windows-test eller ny nettleserpr
 
 ## Publisering og neste grafikkarbeid
 
-Felles release sam-max-hd-2026-10-19 opprettes som draft med fire filer. Alle opplastede størrelser og SHA-256-digester skal kontrolleres før den publiseres som Latest. Faktisk publisering kvitteres etterpå i publisert.json og avsnittet nedenfor. Gamle felles- og plattformreleaser beholdes.
+Felles release sam-max-hd-2026-10-19 ble laget som draft. Alle fire opplastede størrelser og SHA-256-digester stemte før publisering og er kontrollert igjen i den publiserte metadataen. Release-ID 417521854 er publisert og bekreftet Latest. Kvitteringer i opplastinger-kontroll.json og publisert.json. Gamle felles- og plattformreleaser er beholdt.
 
 151 av 1758 figurjobber har resultat. Fire VR-ark fig246_16 til 19 har fortsatt 12 ruter etter bildeverktøyets avslag; ingen omgåelse eller ny bestilling av det avviste grunnlaget. Neste uavhengige bunke er fig220_01 til 08, 44 ruter fra 21 ulike originalutsnitt. Se ../sam-automat-20261019/KLARGJORT.md. Den aktive automasjonen fortsetter grafikkarbeidet; gammel nattkontroll forblir pauset.
 
