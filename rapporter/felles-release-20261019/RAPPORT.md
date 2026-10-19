@@ -4,6 +4,8 @@
 
 Begge nedlastede pakker har main 73b63a9b2b7af18fc045ac2431db7b7b1f2f8339 og hd-mod d31c30f269ed7b0b8746b5b1dfb5c50551cc900d. Det er 1546 native figurruter, 160 flere enn fellespakken fra 18. oktober. Sam i strikk, Max på kjøkkenet, hatte-/hånddelene og 82 VR-ruter er med. Grafikken er fortsatt under arbeid. Dette er ikke en ferdig HD-utgave av alle figurene.
 
+Grafikken er laget med det innebygde image_gen-verktøyet. Faktiske produksjonsprompter, råforsøk og kildekontroller finnes i rapportene for [Sam i strikk og Max på kjøkkenet](../strikk-og-kjokken-20261019/RAPPORT.md), [de første ti VR-arkene](../vr-kabler-20261019/RAPPORT.md) og [de seks siste leverte VR-arkene](../vr-kabler-slutt-20261019/RAPPORT.md).
+
 [Linux-bygg 39286953973](https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39286953973) og [Windows-bygg 39286957890](https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39286957890) er begge completed/success og har samme fulle kilde-SHA. Linux består oppstart og Debian 12, Windows består automatisert oppstart med HD og MT-32. Pakkenes faktiske BYGG.txt og moddfiler er lest. Tidspunktet da et bygg ble bestilt brukes ikke som bevis for hvilken modd det inneholder.
 
 ## Faktiske nedlastinger
