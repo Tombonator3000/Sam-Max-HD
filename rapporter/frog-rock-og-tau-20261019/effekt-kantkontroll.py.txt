@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+import numpy as np,json
+from scipy import ndimage as nd
+from smhd.myk import place
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/frog-rock-og-tau-20261019';O=P/'out/frog-rock-og-tau-20261019'
+def grow_generated(im,pixels):
+ # Increase the width of generated micro-strokes, with subpixel placement and new nearest-valid edge RGB.
+ size=im.size;im=im.resize((size[0]*4,size[1]*4),Image.Resampling.LANCZOS);a=np.array(im);radius=round(pixels*4);old=a[:,:,3].copy();new=np.array(Image.fromarray(old).filter(ImageFilter.MaxFilter(radius*2+1)));_,near=nd.distance_transform_edt(old<128,return_indices=True);edge=new>old;a[:,:,:3][edge]=a[near[0][edge],near[1][edge],:3];a[:,:,3]=new;return Image.fromarray(a).resize(size,Image.Resampling.LANCZOS)
+rows=[]
+for name in [f'costume215_{n}' for n in range(1956,1968)]+['costume300_1946']:
+ original=np.array(Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA'));im=Image.open(R/(name+'-prototype.png')).convert('RGBA')
+ scores=[]
+ for pixels in (.25,.5,.75,1.0):
+  new=grow_generated(im,pixels);placed=place(np.array(new),original,1.0);scores.append(dict(utvidelse_hd=pixels,snitt_union=placed['snitt_union'],dekning=placed['dekning'],flytt=placed['flytt']));new.save(O/f'{name}-kant{pixels}.png')
+ print(name,scores,flush=True);rows.append(dict(bilde=name,valg=scores))
+(R/'effekt-kantbreddeanalyse.json').write_text(json.dumps(rows,indent=2)+'\n')

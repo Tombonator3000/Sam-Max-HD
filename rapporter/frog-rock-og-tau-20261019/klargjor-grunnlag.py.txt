@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/frog-rock-og-tau-20261019'
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];groups={};sources={}
+for p in plan:
+ a=np.array(Image.open(P/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA'));lab,n=nd.label(a[:,:,3]>128)
+ for sid,s in enumerate(nd.find_objects(lab),1):
+  y,x=s;cut=a[y,x].copy();cut[lab[y,x]!=sid]=0;size=int((lab[y,x]==sid).sum());h=hashlib.sha256(cut.tobytes()).hexdigest();key=(cut.shape,h)
+  if key not in groups:groups[key]=dict(id=len(groups)+1,bilde=p['bilde'],sid=sid,size=size,rect=[x.start,y.start,x.stop,y.stop],sha=h,targets=[]);sources[groups[key]['id']]=Image.fromarray(cut)
+  groups[key]['targets'].append(dict(bilde=p['bilde'],sid=sid,rect=[x.start,y.start,x.stop,y.stop]))
+items=list(groups.values());(R/'delplan-unik.json').write_text(json.dumps(items,indent=2)+'\n')
+# All large Sam components are generated as 3 by 2 pose sheets. Small parts are catalogued independently.
+bodies=[p for p in items if p['size']>1000];small=[p for p in items if p['size']<=1000]
+for costume in (215,300):
+ seq=[p for p in bodies if p['bilde'].startswith('costume'+str(costume)+'_')]
+ for bi in range(0,len(seq),6):
+  batch=seq[bi:bi+6];letter=chr(65+(bi//6)+(0 if costume==215 else 4));im=Image.new('RGB',(1536,1024),(68,73,78));d=ImageDraw.Draw(im)
+  for i,p in enumerate(batch):
+   src=sources[p['id']];fac=min(440/src.width,430/src.height);src=src.resize((round(src.width*fac),round(src.height*fac)),Image.Resampling.NEAREST);x=(i%3)*512+(512-src.width)//2;y=(i//3)*512+56+(440-src.height)//2;im.paste(src,(x,y),src);d.text(((i%3)*512+16,(i//3)*512+16),f"{p['id']} | {p['bilde']}",fill='white')
+  im.save(R/f'unik-{letter}-referanse.png');(R/f'unik-{letter}-plan.json').write_text(json.dumps(batch,indent=2)+'\n')
+# Inspection catalogue for smaller source components, at 6x with stable ID and use count.
+for bi in range(0,len(small),30):
+ batch=small[bi:bi+30];im=Image.new('RGB',(1500,1200),(68,73,78));d=ImageDraw.Draw(im)
+ for i,p in enumerate(batch):
+  src=sources[p['id']];fac=min(6,260/src.width,155/src.height);src=src.resize((max(1,round(src.width*fac)),max(1,round(src.height*fac))),Image.Resampling.NEAREST);x=i%5*300+(300-src.width)//2;y=i//5*200+35+(155-src.height)//2;im.paste(src,(x,y),src);d.text((i%5*300+10,i//5*200+8),f"{p['id']} px{p['size']} use{len(p['targets'])} {sources[p['id']].size}",fill='white')
+ im.save(R/f'smadeler-kilde-{bi//30+1:02d}.png')
+print('body',len(bodies),'small',len(small));print('big sheets',[(p.name,len(json.loads(p.read_text()))) for p in sorted(R.glob('unik-*-plan.json'))]);print('small nontrivial',[(p['id'],p['size'],sources[p['id']].size,p['bilde']) for p in small if p['size']>5])

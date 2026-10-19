@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+import numpy as np
+s=Path(__file__).with_name('plasser-unike.py').read_text().split('prototypes={};audit=[]')[0].replace("for group in 'ABCDEFGHIJOP':","for group in '':")
+exec(s,globals());current_name='costume300_1946';source=np.array(Image.open(P/'work/extract/costumes'/(current_name+'.png')).convert('RGBA'));h,w=source.shape[:2];segments,dust=rope_segments(source,np.zeros((h,w),bool));fn=Path(__file__).with_name('plasser-unike.py').read_text();start=fn.index('def place_twine(');stop=fn.index('prototypes={};audit=[]');function=fn[start:stop];target=np.repeat(np.repeat(source[:,:,3]>128,4,0),4,1)
+for width in (4,4.5,4.8,5,5.2,5.5):
+ exec(function.replace('*1.6+3.5',f'*{8/width}+3.5'),globals())
+ for grow in (0,1,2,3,4):
+  out=Image.new('RGBA',(w*4,h*4))
+  for mask,rect,thin in segments:
+   x,y,x1,y1=rect
+   if thin:im,detail=place_twine(mask,rect)
+   else:
+    im,detail=material_drawing('knot',((x1-x)*12,(y1-y)*12),source[:,:,:3][mask].mean(0))
+    a=np.array(im);alpha=np.array(Image.fromarray(a[:,:,3]).filter(ImageFilter.MaxFilter(grow*2+1))) if grow else a[:,:,3];_,near=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);a[:,:,:3]=a[near[0],near[1],:3];a[:,:,3]=alpha;im=Image.fromarray(a).resize(((x1-x)*4,(y1-y)*4),Image.Resampling.LANCZOS)
+   out.alpha_composite(im,(x*4,y*4))
+  got=np.array(out)[:,:,3]>=128;inter=(got&target).sum();union=(got|target).sum();val=float(inter/union);print(width,grow,round(val,4))
+  if val>.615:out.save(O/f'tau-kontroll-{width}-{grow}.png')

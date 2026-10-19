@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,numpy as np,shutil
+from scipy import ndimage as nd
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/frog-rock-og-tau-20261019';parts=json.loads((R/'delplan-unik.json').read_text())
+for n in ('fig215_04','fig300_04'):
+ shutil.copy2(P/'work/.gpt-gren/jobber'/n/'resultat.png',R/f'{n}-for-retting.png');shutil.copy2(R/f'{n}-egenkontroll.txt',R/f'{n}-egenkontroll-for-retting.txt')
+ids=[116,119,125,127,134,135,136,67,72,88,93,103]
+for bi in range(0,len(ids),6):
+ batch=[next(p for p in parts if p['id']==sid) for sid in ids[bi:bi+6]];g='OP'[bi//6];im=Image.new('RGB',(1536,1024),(68,73,78));d=ImageDraw.Draw(im)
+ for i,p in enumerate(batch):
+  a=np.array(Image.open(P/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA'));lab,n=nd.label(a[:,:,3]>128);x,y,x1,y1=p['rect'];cut=a[y:y1,x:x1].copy();cut[lab[y:y1,x:x1]!=p['sid']]=0;src=Image.fromarray(cut);fac=min(330/src.width,350/src.height);src=src.resize((round(src.width*fac),round(src.height*fac)),Image.Resampling.NEAREST);xx=i%3*512+(512-src.width)//2;yy=i//3*512+65+(370-src.height)//2;im.paste(src,(xx,yy),src);d.text((i%3*512+12,i//3*512+12),str(p['id']),fill='white')
+ im.save(R/f'unik-{g}-referanse.png');(R/f'unik-{g}-plan.json').write_text(json.dumps(batch,indent=2)+'\n');(R/f'unik-{g}-prompt01.txt').write_text('''Use case: style-transfer. Asset type: tiny smooth hand-painted HD effect fragments, Sam & Max Frog Rock. First image is the exact geometry reference for six small fragments. Second is approved cartoon rendering reference. These fragments are coarse brown Bigfoot hairs with occasional pale yellow magic powder grains. Faithfully redraw EACH exact source fragment shape in the same three-column two-row order. Keep the same thin irregular short strands, branches, tiny holes, bends, widths, endpoints and the source colour placement. They are fragmentary wisps, not whole tufts or feathers; DO NOT fill or extend them into a full tuft, leaf, plume or nest. Make the pixel edges into smooth curved lines of the same thickness and area as the reference. Dark ochre, golden brown hairs, small yellow/cream highlights only where the source has them. Minimal smooth shading, clean gently antialiased edges, real transparent RGBA everywhere between and around the strands. No background, no glow haze, no shadows, no labels, no text, no added specks. Preserve very simple source shapes; do not add decorative branches or extra fibres.\n''')
+# Tightened brief for the five broad hair clusters that still cover too much empty space.
+s=(R/'unik-J-prompt01.txt').read_text();s+='\nCritical correction: these are extremely SPARSE wisps of coarse hair, about one original pixel thick along each branch. Preserve exact negative space and branch geometry from image one; do NOT add extra feather-like tufts, leaves, thick plumes, textured filling or extra branching. Top middle and top right have very narrow winding stems with a compact cluster only at the TOP, the lower portion is one or two thin strands. Bottom left and bottom middle are tiny upright ragged tufts with a few short cross strands; do not fan them out. Match the source overall silhouette and occupied area, not just its bounding box.\n';(R/'unik-J-prompt02.txt').write_text(s)
+# Compact comparison of the effect-only cels before the return is corrected.
+names=[f'costume215_{n}' for n in range(1960,1968)]+['costume300_1946'];im=Image.new('RGB',(1440,960),'#243340');d=ImageDraw.Draw(im)
+for i,name in enumerate(names):
+ original=Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA');new=Image.open(R/(name+'-prototype.png')).convert('RGBA');x=i%3*480;y=i//3*320;d.text((x+4,y+3),name,fill='white')
+ for j,img in enumerate((original,new)):
+  fac=min(215/img.width,285/img.height);img=img.resize((round(img.width*fac),round(img.height*fac)),Image.Resampling.NEAREST);bg=Image.new('RGB',(230,292),'#71808c');bg.paste(img,((230-img.width)//2,(292-img.height)//2),img);im.paste(bg,(x+j*240+5,y+23))
+im.save(R/'effekter-for-retting.png')

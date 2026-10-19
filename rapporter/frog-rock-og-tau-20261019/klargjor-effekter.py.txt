@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib
+from scipy import ndimage as nd
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/frog-rock-og-tau-20261019';items=json.loads((R/'delplan-unik.json').read_text());plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter']
+# Hair and embedded powder clusters need their own drawings; loose sub-five-pixel dust uses generated material samples.
+def part(p):
+ a=np.array(Image.open(P/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA'));lab,n=nd.label(a[:,:,3]>128);x,y,x1,y1=p['rect'];cut=a[y:y1,x:x1].copy();cut[lab[y:y1,x:x1]!=p['sid']]=0;return Image.fromarray(cut)
+hair=[p for p in items if p['bilde'].startswith('costume215') and p['size']>=60 and p['size']<=1000]
+for bi in range(0,len(hair),6):
+ batch=hair[bi:bi+6];letter=chr(72+bi//6);im=Image.new('RGB',(1536,1024),(68,73,78));d=ImageDraw.Draw(im)
+ for i,p in enumerate(batch):
+  src=part(p);fac=min(400/src.width,380/src.height);src=src.resize((round(src.width*fac),round(src.height*fac)),Image.Resampling.NEAREST);x=(i%3)*512+(512-src.width)//2;y=(i//3)*512+70+(380-src.height)//2;im.paste(src,(x,y),src);d.text(((i%3)*512+12,(i//3)*512+14),str(p['id']),fill='white')
+ im.save(R/f'unik-{letter}-referanse.png');(R/f'unik-{letter}-plan.json').write_text(json.dumps(batch,indent=2)+'\n')
+ropes={};roperows=[]
+for p in plan:
+ if not p['bilde'].startswith('costume300'):continue
+ a=np.array(Image.open(P/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA'));lab,n=nd.label(a[:,:,3]>128);components=json.loads((R/'kildekomponenter.json').read_text());this=next(v for v in components if v['bilde']==p['bilde']);body=[c['id'] for c in this['parts'] if c['size']>1000]
+ # Outside Sam: warm twine, and neutral dust, based on original palette.
+ outside=(a[:,:,3]>128)&~np.isin(lab,body);warm=(a[:,:,0]>a[:,:,2]+5)&outside;dust=outside&~warm
+ for cat,mask in [('tau',warm),('stov',dust)]:
+  if not mask.any():continue
+  yy,xx=np.nonzero(mask);x,y,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1;cut=a[y:y1,x:x1].copy();cut[~mask[y:y1,x:x1]]=0;sha=hashlib.sha256(cut.tobytes()).hexdigest();key=(cat,cut.shape,sha)
+  if key not in ropes:ropes[key]=dict(id=f"{cat}{len(ropes)+1}",type=cat,sha=sha,targets=[],image=Image.fromarray(cut))
+  ropes[key]['targets'].append(dict(bilde=p['bilde'],rect=[x,y,x1,y1],komponenter=sorted(int(z) for z in np.unique(lab[mask]))))
+for bi in range(0,len(ropes),6):
+ batch=list(ropes.values())[bi:bi+6];letter=chr(75+bi//6);im=Image.new('RGB',(1536,1024),(68,73,78));d=ImageDraw.Draw(im)
+ for i,p in enumerate(batch):
+  src=p['image'];fac=min(400/src.width,390/src.height);src=src.resize((round(src.width*fac),round(src.height*fac)),Image.Resampling.NEAREST);x=(i%3)*512+(512-src.width)//2;y=(i//3)*512+65+(390-src.height)//2;im.paste(src,(x,y),src);d.text(((i%3)*512+12,(i//3)*512+14),p['id'],fill='white')
+ im.save(R/f'unik-{letter}-referanse.png');(R/f'unik-{letter}-plan.json').write_text(json.dumps([{k:v for k,v in p.items() if k!='image'} for p in batch],indent=2)+'\n')
+print('hairgroups',len(hair),'rope/dustgroups',len(ropes),[(p['id'],p['image'].size,len(p['targets'])) for p in ropes.values()])

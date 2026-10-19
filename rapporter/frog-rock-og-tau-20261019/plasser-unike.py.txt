@@ -1,0 +1,133 @@
+"""Sammensetting av nytegnet RGBA i kildebekreftede bokser og baner, uten silhuettklipp."""
+from pathlib import Path
+from PIL import Image,ImageFilter
+from scipy import ndimage as nd
+from scipy.interpolate import PchipInterpolator
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');ART=P/'work/.gpt-gren';R=ART/'rapporter/frog-rock-og-tau-20261019';O=P/'out/frog-rock-og-tau-20261019'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];parts=json.loads((R/'delplan-unik.json').read_text());componentplan=json.loads((R/'kildekomponenter.json').read_text());rawcache={};partdrawings={};partreceipts={}
+def load(name):
+ if name not in rawcache:
+  a=np.array(Image.open(R/name).convert('RGBA'));lab,n=nd.label(a[:,:,3]>220);rawcache[name]=(a,lab)
+ return rawcache[name]
+def drawing(raw,ids,size):
+ a,lab=load(raw);core=np.isin(lab,ids);yy,xx=np.nonzero(core);assert len(xx)>20
+ x0,y0,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1;xa,ya,xb,yb=max(0,x0-2),max(0,y0-2),min(a.shape[1],x1+2),min(a.shape[0],y1+2)
+ local=core[ya:yb,xa:xb];cut=a[ya:yb,xa:xb].copy();distance,near=nd.distance_transform_edt(~local,return_indices=True);allowed=distance<=1.5
+ cut[:,:,3][~allowed|((lab[ya:yb,xa:xb]>0)&~local)]=0;edge=allowed&~local;cut[:,:,:3][edge]=cut[near[0][edge],near[1][edge],:3]
+ im=Image.fromarray(cut).crop((x0-xa,y0-ya,x1-xa,y1-ya)).resize(size,Image.Resampling.LANCZOS)
+ return im,dict(raw=raw,komponenter=ids,raw_boks=[x0,y0,x1,y1],mal=list(size),original_pikselmaske_brukt=False)
+def sourcepart(p):
+ a=np.array(Image.open(P/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA'));lab,n=nd.label(a[:,:,3]>128);x,y,x1,y1=p['rect'];cut=a[y:y1,x:x1].copy();cut[lab[y:y1,x:x1]!=p['sid']]=0;return cut
+# The largest generated connected component in each panel is Sam / the requested hair clump.
+for group in 'ABCDEFGHIJOP':
+ items=json.loads((R/f'unik-{group}-plan.json').read_text());version='02' if group=='J' else '01';raw=f'unik-{group}-raa{version}.png';a,lab=load(raw);candidates=[]
+ for sid,s in enumerate(nd.find_objects(lab),1):
+  size=int((lab[s]==sid).sum())
+  if size>5000:
+   yy,xx=np.nonzero(lab==sid);candidates.append((sid,size,float(xx.mean()),float(yy.mean())))
+ selected=[]
+ for i,p in enumerate(items):
+  if group=='P' and p['id']!=136:continue
+  col,row=i%3,i//3
+  poss=[v for v in candidates if int(v[2]//512)==col and (int(v[3]//512)==row or group=='D')]
+  assert poss,(group,p['id'],candidates);sid=max(poss,key=lambda v:v[1])[0];ids=[sid]
+  if group>='H':
+   # Retain genuine glowing dabs inside the same requested sprite region. Small remote haze specks are excluded.
+   bbox=nd.find_objects(lab)[sid-1];y,x=bbox
+   for k,s in enumerate(nd.find_objects(lab),1):
+    if k==sid:continue
+    size=int((lab[s]==k).sum());cy=(s[0].start+s[0].stop)/2;cx=(s[1].start+s[1].stop)/2
+    if size>20 and x.start<=cx<x.stop and y.start<=cy<y.stop:ids.append(k)
+  x,y,x1,y1=p['rect'];im,detail=drawing(raw,ids,((x1-x)*4,(y1-y)*4));partdrawings[p['id']]=im;partreceipts[p['id']]=detail
+# Tiny generated materials retain source colour and location; no original alpha is applied to them.
+material={"grain":3,"spark":2,"hair":1,"dust":6,"twine":4,"knot":5}
+def material_drawing(kind,size,colour=None):
+ im,detail=drawing('unik-N-raa01.png',[material[kind]],size)
+ if kind=='knot':
+  # At a three-source-pixel knot the generated line needs one HD pixel of stroke width.
+  im,detail=drawing('unik-N-raa01.png',[material[kind]],(size[0]*3,size[1]*3));a=np.array(im);alpha=np.array(Image.fromarray(a[:,:,3]).filter(ImageFilter.MaxFilter(7)));_,near=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);a[:,:,:3]=a[near[0],near[1],:3];a[:,:,3]=alpha;im=Image.fromarray(a).resize(size,Image.Resampling.LANCZOS);detail['generert_knutestrek_tilpasset']=dict(arbeidsskala=3,strekutvidelse_hd=1,kilde_alfa_brukt=False)
+ if colour is not None:
+  a=np.array(im).astype(float);mask=a[:,:,3]>128;mean=a[:,:,:3][mask].mean(0) if mask.any() else np.array([220,200,130]);ratio=np.array(colour)/np.maximum(mean,1);a[:,:,:3]=np.clip(a[:,:,:3]*ratio,0,255);im=Image.fromarray(np.uint8(np.rint(a)));detail['kildens_gjennomsnittsfarge']=[float(v) for v in colour];detail['fargekalibrering']=True
+ detail['generert_materiale']=kind
+ return im,detail
+for p in parts:
+ if p['id'] in partdrawings:continue
+ if p['bilde'].startswith('costume300'):continue
+ cut=sourcepart(p);mask=cut[:,:,3]>128;colour=cut[:,:,:3][mask].mean(0);w,h=cut.shape[1],cut.shape[0]
+ brown=colour[0]<200 and colour[1]<170
+ kind='hair' if brown and p['size']>=6 else ('spark' if p['size']>=4 and w>1 and h>1 else 'grain')
+ im,detail=material_drawing(kind,(w*4,h*4),colour);partdrawings[p['id']]=im;partreceipts[p['id']]=detail
+# Connect only the short gaps within a thin twine segment, retaining major occlusion gaps.
+def rope_segments(source,body):
+ a=source.astype(int);outside=(a[:,:,3]>128)&~body;warm=outside&(a[:,:,0]>a[:,:,2]+5);dust=outside&~warm
+ # Source-confirmed dense little knots are separate from the long, dotted cotton string.
+ segments=[];clab,cn=nd.label(warm)
+ for cid,z in enumerate(nd.find_objects(clab),1):
+  yy,xx=z;mask=clab==cid;size=int(mask.sum())
+  if size>=6 and 1<xx.stop-xx.start<=12 and 2<yy.stop-yy.start<=12:
+   segments.append((mask,[xx.start,yy.start,xx.stop,yy.stop],False));warm=warm&~mask
+ joined=nd.binary_dilation(warm,iterations=1);lab,n=nd.label(joined,structure=np.ones((3,3)))
+ for sid in range(1,n+1):
+  mask=warm&(lab==sid)
+  if not mask.any():continue
+  yy,xx=np.nonzero(mask);x,y,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1
+  ys=np.unique(yy);spans=np.array([np.ptp(np.where(mask[q])[0])+1 for q in ys]);thin=(y1-y)>=12 and np.quantile(spans,.75)<=3
+  segments.append((mask,[x,y,x1,y1],thin))
+ return segments,dust
+# Warp the genuine generated cotton-string RGBA strip along a smoothed source centreline.
+def place_twine(mask,rect):
+ x,y,x1,y1=rect;ys=np.flatnonzero(mask.any(1));xs=np.array([np.flatnonzero(mask[q]).mean()+.5 for q in ys]);xs=nd.gaussian_filter1d(xs,.65,mode='nearest');curve=PchipInterpolator((ys+.5)*4-.5,xs*4-.5,extrapolate=True)
+ h,w=(y1-y)*4,(x1-x)*4;strip,detail=drawing('unik-N-raa01.png',[4],(8,max(32,h+8)));s=np.array(strip).astype(float)
+ yy,xx=np.mgrid[:h,:w];global_y=yy+y*4;centers=curve(np.arange(h)+y*4);slope=np.gradient(centers);normal=np.sqrt(1+slope*slope)
+ # Width is four HD pixels for the one-pixel source twine; source rows determine its centre, never its alpha boundary.
+ mapped_x=(xx+x*4-centers[:,None])/normal[:,None]*1.6+3.5;mapped_y=yy*(s.shape[0]-1)/max(h-1,1)
+ a=np.zeros((h,w,4),float)
+ for c in range(4):a[:,:,c]=nd.map_coordinates(s[:,:,c],[mapped_y,mapped_x],order=1,mode='constant',cval=0)
+ colour=np.array(Image.open(P/'work/extract/costumes'/(current_name+'.png')).convert('RGBA'))[:,:,:3][mask].mean(0);valid=a[:,:,3]>128;mean=a[:,:,:3][valid].mean(0);a[:,:,:3]=np.clip(a[:,:,:3]*(colour/np.maximum(mean,1)),0,255)
+ detail.update(metode='Generert RGBA-hyssing plassert langs PCHIP-glattet originalkurve. Originalens korte punktmellomrom forbindes, større skjulingsgap beholdes. Ingen original silhuettmaske klipper.',bredde_hd=5,kildens_farge=colour.tolist())
+ return Image.fromarray(np.uint8(np.rint(np.clip(a,0,255)))),detail
+def grow_generated(im,pixels):
+ size=im.size;im=im.resize((size[0]*4,size[1]*4),Image.Resampling.LANCZOS);a=np.array(im);old=a[:,:,3].copy();new=np.array(Image.fromarray(old).filter(ImageFilter.MaxFilter(round(pixels*4)*2+1)));_,near=nd.distance_transform_edt(old<128,return_indices=True);edge=new>old;a[:,:,:3][edge]=a[near[0][edge],near[1][edge],:3];a[:,:,3]=new;return Image.fromarray(a).resize(size,Image.Resampling.LANCZOS)
+prototypes={};audit=[]
+for p in plan:
+ current_name=p['bilde'];source=np.array(Image.open(P/'work/extract/costumes'/(current_name+'.png')).convert('RGBA'));lab,n=nd.label(source[:,:,3]>128);h,w=source.shape[:2];out=Image.new('RGBA',(w*4,h*4));effect=Image.new('RGBA',out.size);receipts=[];covered=set()
+ exactparts=[v for v in parts if any(t['bilde']==current_name for t in v['targets'])]
+ if current_name.startswith('costume215'):
+  for v in exactparts:
+   for t in (t for t in v['targets'] if t['bilde']==current_name):
+    x,y,x1,y1=t['rect'];assert partdrawings[v['id']].size==((x1-x)*4,(y1-y)*4);(out if v['size']>1000 else effect).alpha_composite(partdrawings[v['id']],(x*4,y*4));covered.add(t['sid']);receipts.append(dict(kildekomponenter=[t['sid']],kildeboks=t['rect'],eksakt_del_id=v['id'],kildedel_sha256=v['sha'],**partreceipts[v['id']]))
+  out.alpha_composite(grow_generated(effect,.5))
+ else:
+  body=np.zeros((h,w),bool)
+  for v in exactparts:
+   if v['size']<=1000:continue
+   for t in (t for t in v['targets'] if t['bilde']==current_name):
+    x,y,x1,y1=t['rect'];out.alpha_composite(partdrawings[v['id']],(x*4,y*4));body|=lab==t['sid'];covered.add(t['sid']);receipts.append(dict(kildekomponenter=[t['sid']],kildeboks=t['rect'],eksakt_del_id=v['id'],kildedel_sha256=v['sha'],**partreceipts[v['id']]))
+  segments,dust=rope_segments(source,body)
+  for mask,rect,thin in segments:
+   x,y,x1,y1=rect
+   if thin:im,detail=place_twine(mask,rect)
+   else:
+    col=source[:,:,:3][mask].mean(0);kind='knot' if int(mask.sum())>=6 and (x1-x)>1 and (y1-y)>2 else 'grain';im,detail=material_drawing(kind,((x1-x)*4,(y1-y)*4),col)
+   out.alpha_composite(im,(x*4,y*4));ids=sorted(int(z) for z in np.unique(lab[mask]));covered.update(ids);receipts.append(dict(kildekomponenter=ids,kildeboks=rect,tynn_hyssing=bool(thin),**detail))
+  for sid,s in enumerate(nd.find_objects(lab),1):
+   if not (dust&(lab==sid)).any():continue
+   y,x=s;size=((x.stop-x.start)*4,(y.stop-y.start)*4);colour=source[:,:,:3][lab==sid].mean(0);im,detail=material_drawing('dust',size,colour);out.alpha_composite(im,(x.start*4,y.start*4));covered.add(sid);receipts.append(dict(kildekomponenter=[sid],kildeboks=[x.start,y.start,x.stop,y.stop],**detail))
+ if current_name=='costume300_1946':out=grow_generated(out,.25)
+ assert covered==set(range(1,n+1)),(current_name,sorted(set(range(1,n+1))-covered))
+ a=np.array(out);bad=(a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0);roundoff=int(bad.sum())
+ if roundoff:
+  assert (a[:,:,3][bad]==1).all();_,near=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);a[:,:,:3][bad]=a[near[0][bad],near[1][bad],:3];out=Image.fromarray(a)
+ target=R/(current_name+'-prototype.png');out.save(target);prototypes[current_name]=out;audit.append(dict(bilde=current_name,prototype_sha256=sha(target),rgb_avrundingsrens=roundoff,alfa_uendret_ved_rgb_rens=True,generert_effekt_strekutvidelse_hd=(.5 if current_name.startswith('costume215') else .25 if current_name=='costume300_1946' else 0),kildekomponenter=n,dekkede_kildekomponenter=sorted(covered),deler=receipts,original_pikselmaske_brukt=False))
+(R/'prototype-kvitteringer.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-19',verktøy='innebygd image_gen',modell='Eksakt modellnavn ikke vist',faktiske_bildekall=[f'unik-{g}-raa01.png' for g in 'ABCDEFGHIJNOP']+['unik-J-raa02.png'],leveranser=[],merknad='Fjorten faktiske bildekall. J01 og de fem gule P-variantene er utelatt etter visuell kontroll. Eksakt like RGBA-kildedeler deler generert grafikk; små bekreftede pulverkorn, hårfragmenter og støv bruker N-materialer med kildefarge. Tynn hyssing er generert RGBA plassert langs originalkurven. Originalmasker brukes bare til analyse, bokser og koordinater, aldri til silhuettklipping.')
+for job in json.loads((R/'klargjort.json').read_text()):
+ name=job['jobb'];d=ART/'jobber'/name;j=json.loads((d/'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));rows=[]
+ for cel in j['ruter']:
+  p=next(p for p in plan if any(t['bilde']==cel['bilde'] for t in p['malruter']));x,y,w,h=cel['rekt'];source=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(source.tobytes()).hexdigest()==p['rgba_sha256'];im=prototypes[p['bilde']];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;assert im.size==(w*4,h*4);out.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>128);rows.append(dict(bilde=cel['bilde'],kostyme=j['kostyme'],rute=cel['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=p['bilde'],kilde_rgba_sha256=p['rgba_sha256'],prototype=p['bilde']+'-prototype.png'))
+ out.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{name}.json').write_text(json.dumps({name:dict(sha256_resultat=digest,ruter=rows)},ensure_ascii=False,indent=2)+'\n')
+ used=sorted({part['raw'] for row in rows for rec in audit if rec['bilde']==row['representant'] for part in rec['deler']});e=dict(jobb=name,resultat=f'jobber/{name}/resultat.png',sha256=digest,ruter=len(rows),rutekart=f'rapporter/frog-rock-og-tau-20261019/rutekart-{name}.json',delte_bildekall=used,egenkontroll='ikke kjørt',native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False)
+ result=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',e['resultat']],cwd=ART,capture_output=True,text=True);(R/(name+'-egenkontroll.txt')).write_text(result.stdout+result.stderr);assert result.returncode in (0,1,2);e['egenkontroll']={0:'OK',1:'SJEKK',2:'FEIL'}[result.returncode];progress['leveranser'].append(e);print(name,e['egenkontroll'],result.stdout,flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser-unike.py.txt')

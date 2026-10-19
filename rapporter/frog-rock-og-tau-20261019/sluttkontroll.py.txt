@@ -1,0 +1,50 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np,subprocess,zipfile,re,shutil
+from datetime import datetime
+from zoneinfo import ZoneInfo
+P=Path('/home/tom/Sam-Max-HD');ART=P/'work/.gpt-gren';R=ART/'rapporter/frog-rock-og-tau-20261019';O=P/'out/frog-rock-og-tau-20261019';MOD=O/'mod-kandidat';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(n):return json.loads((R/n).read_text())
+def write(n,d):(R/n).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+protected=read('beskyttede-kilder.json');assert len(protected)==32 and all(sha(ART/p)==h for p,h in protected.items());base=read('grunnlag-filer-6513908a.json');assert len(base)==20018
+files={p.relative_to(MOD).as_posix():sha(p) for p in MOD.rglob('*') if p.is_file()};assert set(base)<=set(files) and {p for p,h in base.items() if files[p]!=h}=={'mod.json'}
+entries=read('tillegg.json')['tillegg'];assert len(entries)==75 and {e['fil'] for e in entries}==set(files)-set(base);bycel={e['bilde']:e for e in entries}
+for e in entries:
+ assert files[e['fil']]==e['sha256'];im=Image.open(MOD/e['fil']);a=np.array(im);assert im.mode=='RGBA' and im.width%4==im.height%4==0;assert(a[:,:,3]==0).any() and(a[:,:,3]>128).any();assert not((a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0)).any()
+meta=read('tillegg.json');meta=json.loads((MOD/'mod.json').read_text());old=json.loads((P/'mods/gpt/mod.json').read_text());assert old['costume_cels']==1776 and meta['costume_cels']==1851 and len(list((MOD/'costumes').glob('*_hd.png')))==1851;assert set(meta)==set(old) and{k for k in meta if meta[k]!=old[k]}=={'costume_cels','costumes'};assert set(meta['costumes'])-set(old['costumes'])=={'costume215','costume300'}
+plan=read('ruteplan-unik.json')['ruter'];assert len(plan)==66 and sum(len(p['malruter']) for p in plan)==75
+for p in plan:
+ x,y,w,h=p['rekt'];source=np.array(Image.open(ART/'jobber'/p['kildejobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h)));assert hashlib.sha256(source.tobytes()).hexdigest()==p['rgba_sha256'];hashes=[]
+ for t in p['malruter']:
+  x,y,w,h=t['rekt'];a=np.array(Image.open(ART/'jobber'/t['jobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h)));assert np.array_equal(source,a);hashes.append(bycel[t['bilde']]['sha256'])
+ assert len(set(hashes))==1
+protos=read('prototype-kvitteringer.json');assert len(protos)==66
+for p in protos:
+ assert not p['original_pikselmaske_brukt'] and sha(R/(p['bilde']+'-prototype.png'))==p['prototype_sha256'];assert all(not d['original_pikselmaske_brukt'] for d in p['deler']);assert p['dekkede_kildekomponenter']==list(range(1,p['kildekomponenter']+1))
+visual=read('visuelle-kontrollbilder.json');assert visual['antall']==75 and {p['bilde'] for p in visual['ruter']}==set(bycel);assert all(p['native_sha256']==bycel[p['bilde']]['sha256'] and(O/p['fil']).is_file() for p in visual['ruter']);motor=read('motor-oppsummering.json');assert motor['ruter_tegnet']==75 and not motor['mangler_i_avspilling'] and motor['avvik_fra_figurstart']==0;assert motor['skjermbufferkontroller']==300 and motor['kontroller_fra_figurstart']==264;assert len(motor['oppstartsavvik'])==4
+for c,count in [(215,48),(300,27)]:
+ native=read(f'myke{c}-kvittering.json');assert native['ruter_ok']==count and all(native[k]==0 for k in('ruter_sjekk','ruter_mangler','ruter_teknisk'))
+f=read('fremdrift.json');assert len(f['faktiske_bildekall'])==14 and len(f['leveranser'])==8;warnings=[]
+for e in f['leveranser']:
+ txt=(R/f"{e['jobb']}-egenkontroll.txt").read_text();assert 'FEIL' not in txt;warnings+=re.findall(r'^SJEKK (costume\d+_\d+):.*$',txt,re.M)
+ assert sha(ART/e['resultat'])==e['sha256'];im=Image.open(ART/e['resultat']);assert im.size==(1536,1024) and im.mode=='RGBA';route=json.loads((ART/e['rutekart']).read_text())[e['jobb']];assert route['sha256_resultat']==e['sha256'] and len(route['ruter'])==e['ruter'];e.update(native_mottatt=True,visuelt_kontrollert=True,motoravspilt=True,importert=False,publisert=False)
+assert len(warnings)==11;write('fremdrift.json',f)
+used={d['raw'] for p in protos for d in p['deler']};assert len(used)==13;calls=[]
+for name in f['faktiske_bildekall']:
+ g,v=re.fullmatch(r'unik-([A-P])-raa(\d+).png',name).groups();rec=read(f'unik-{g}-kvittering{v}.json');assert sha(R/name)==rec['raa_sha256'] and sha(R/rec['prompt'])==rec['prompt_sha256'];calls.append(dict(**rec,brukt_i_sluttresultat=name in used))
+write('bildekall.json',dict(verktøy='innebygd image_gen',modell='Eksakt modellnavn ikke vist',kall=calls,antall_kall=14,antall_bilder=14,brukte_raabilder=13,avslag_eller_avbrudd=0,delvis_brukt=dict(P='Bare den brune opprette hårdelen136. De fem gule motivene ble for hårete og er visuelt utelatt.')))
+assert sum(p.endswith('.png') for p in files)==20087 and len(files)==20093
+summary=dict(beskyttede_kilder_uendret=32,tidligere_png_byteidentiske=20012,tidligere_filer_bevart=20018,endrede_tidligere_filer=['mod.json'],nye_native=75,native_totalt=1851,png_totalt=20087,filer_totalt=20093,figurjobber_med_resultat=len(list((ART/'jobber').glob('fig*/resultat.png'))),figurjobber_totalt=1758,unike_helruter=66,unike_kildedeler=175,kildekomponenter_i_66_helruter=sum(p['kildekomponenter'] for p in protos),produksjonsruter=75,egenkontroll_ok=64,egenkontroll_sjekk=11,egenkontroll_feil=0,egenkontroll_merknader=warnings,native_ok=75,alle_kildealiaser_og_native_filer_eksakt_like=True,lokal_stash_antall=len(subprocess.check_output(['git','stash','list'],cwd=P,text=True).splitlines()))
+assert summary['figurjobber_med_resultat']==183 and summary['lokal_stash_antall']==3;write('bevaringskontroll.json',summary)
+manifest={}
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for stage in ('baseline-senkveld','final'):
+  for c in(215,300):
+   for anim in(1,7):
+    p=O/f'{stage}{c}-anim{anim}'/'scummvm.log';rel=p.relative_to(O).as_posix();z.write(p,rel);manifest[rel]=sha(p)
+write('motorlogger-manifest.json',manifest)
+images=sorted(R.glob('motor-og-kilde*-final-*.png'))+[R/n for n in('frog-rock-pulver-motor.png','frog-rock-haar-motor.png','sam-hyssing-tann-motor.png','hyssing-alene-motor.png')];assert len(images)==11
+write('visuell-vurdering.json',dict(dato=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(),vurdert_av='Codex',ruter=75,kilde_native_motor_sett=True,motorlogg_kontrollert=True,alle_hele_motorbilder_sett=True,bilder={p.name:sha(p) for p in images},gjenstaende_egenkontroll_merknader=warnings,Tom_godkjent=False,separat_Claude_kontroll=False,rettinger=['J02 erstatter for fyldige hårklumper; O og brun P1 erstatter feil småfragmenter.','De genererte små effektstrekene er utvidet0,5 HD-piksel, hyssing04 med0,25. Ekte alfa og hull beholdt; bare generert alfa/RGB bearbeidet. Ingen kilde-alfa klipper ny grafikk.','Kilden sine tynne hyssingbaner og kompakte knuter behandles separat.','Kontrollutsnittet for rom41 er rettet for kameravinduets venstrekant160. Første svarte utsnitt var feil i kontrollbildet, ikke i spillgrafikken.'],begrensninger=['Tvungne animasjoner, ikke naturlig gjennomspilling.','Fire kjente oppstartsavvik frame36 før testfiguren som grunnlaget.','Ingen ny Tom-/Claude-godkjenning, interaktiv Windows-test eller nettleserprøve.']))
+for src in ('visuell-sluttkontroll.py','sluttkontroll.py','registrer-raa.py','klargjor-grunnlag.py','klargjor-effekter.py','effekt-kantkontroll.py','retur-grunnlag.py','tau-etterkontroll.py'):shutil.copy2(O/src,R/(src+'.txt'))
+write('visuell-retur.json',dict(status='rettet og egenkontrollert før publisering',før_retting=['fig215_04-for-retting.png','fig300_04-for-retting.png','effekter-for-retting.png'],råforkastet=['unik-J-raa01.png'],delvis_forkastet='P01 bare136 brukt',tiltak='J02 og småfragmenterO/P1. Separat knute,5 HD-piksler tynn hyssing,0,25 og0,5 HD-piksel justering av generert effektstrek. Samme egenkontroll- og native-grenser beholdt.',egenkontroll_feil_sist=0,native_ok_sist=75))
+print(json.dumps(summary,ensure_ascii=False))
