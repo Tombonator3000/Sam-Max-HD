@@ -1,0 +1,89 @@
+from pathlib import Path
+from PIL import Image
+import hashlib, json, numpy as np, shutil, zipfile, subprocess
+
+REPO = Path('/home/tom/Sam-Max-HD')
+ART = REPO / 'work/.gpt-gren'
+REPORT = ART / 'rapporter/sam-golf-20261019'
+OUT = REPO / 'out/sam-golf-20261019'
+MOD = OUT / 'mod-kandidat'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+protected = json.loads((REPORT / 'beskyttede-kilder.json').read_text())
+assert len(protected) == 28 and all(sha(ART / p) == h for p, h in protected.items())
+base = json.loads((REPORT / 'grunnlag-filer-9e9f22df.json').read_text())
+files = {p.relative_to(MOD).as_posix(): sha(p) for p in MOD.rglob('*') if p.is_file()}
+assert len(base) == 19832 and set(base) <= set(files)
+assert {p for p, h in base.items() if files[p] != h} == {'mod.json'}
+entries = json.loads((REPORT / 'tillegg.json').read_text())['tillegg']
+assert len(entries) == 64 and {e['fil'] for e in entries} == set(files) - set(base)
+for e in entries:
+    assert files[e['fil']] == e['sha256']
+    im = Image.open(MOD / e['fil']); a = np.array(im)
+    assert im.mode == 'RGBA' and im.width % 4 == 0 and im.height % 4 == 0
+    assert (a[:, :, 3] == 0).any() and (a[:, :, 3] > 128).any()
+    assert not ((a[:, :, :3] == [255, 0, 255]).all(2) & (a[:, :, 3] > 0)).any()
+meta = json.loads((MOD / 'mod.json').read_text())
+oldmeta = json.loads((REPO / 'mods/gpt/mod.json').read_text())
+assert meta['costume_cels'] == 1654 and len(list((MOD / 'costumes').glob('*_hd.png'))) == 1654
+assert set(meta) == set(oldmeta)
+assert {k for k in meta if meta[k] != oldmeta[k]} == {'costume_cels', 'costumes'}
+assert set(meta['costumes']) - set(oldmeta['costumes']) == {'costume110'}
+assert set(oldmeta['costumes']) < set(meta['costumes'])
+plan = json.loads((REPORT / 'ruteplan-unik.json').read_text())['ruter']
+assert len(plan) == 41 and sum(len(p['malruter']) for p in plan) == 92
+bycel = {e['bilde']: e for e in entries}
+representatives = []
+for p in plan:
+    x, y, w, h = p['rekt']
+    reference = np.array(Image.open(ART / 'jobber' / p['kildejobb'] / 'original_1x.png').convert('RGBA').crop((x, y, x+w, y+h)))
+    hashes = []
+    for target in p['malruter']:
+        source = Image.open(ART / 'jobber' / target['jobb'] / 'original_1x.png').convert('RGBA')
+        x, y, w, h = target['rekt']
+        assert np.array_equal(np.array(source.crop((x, y, x+w, y+h))), reference)
+        if target['bilde'] in bycel:
+            hashes.append(bycel[target['bilde']]['sha256'])
+    if hashes:
+        assert len(set(hashes)) == 1
+        representatives.append(p['bilde'])
+assert len(representatives) == 25
+assert all(not (ART/'jobber'/f'fig110_{n:02d}'/'resultat.png').exists() for n in (5, 6))
+visual = json.loads((REPORT / 'visuelle-kontrollbilder.json').read_text())
+assert visual['antall'] == 64 and {r['bilde'] for r in visual['ruter']} == set(bycel)
+assert all(r['native_sha256'] == bycel[r['bilde']]['sha256'] for r in visual['ruter'])
+motor = json.loads((REPORT / 'motor-oppsummering.json').read_text())
+assert motor['ruter_tegnet'] == 64 and not motor['mangler_i_avspilling']
+assert motor['avvik_totalt'] == 0 and motor['skjermbufferkontroller'] == 260
+assert motor['kontroller_fra_figurstart'] == 224
+native = json.loads((REPORT / 'myke110-kvittering.json').read_text())
+assert native['ruter_ok'] == 64 and all(native[k] == 0 for k in ('ruter_sjekk', 'ruter_mangler', 'ruter_teknisk'))
+f = json.loads((REPORT / 'fremdrift.json').read_text())
+assert {e['jobb'] for e in f['leveranser']} == {f'fig110_{n:02d}' for n in (1, 2, 3, 4, 7)}
+for e in f['leveranser']:
+    assert e['egenkontroll'] == 'OK' and sha(ART / e['resultat']) == e['sha256']
+    route = json.loads((ART / e['rutekart']).read_text())[e['jobb']]
+    assert route['sha256_resultat'] == e['sha256'] and len(route['ruter']) == e['ruter']
+    e.update(native_mottatt=True, visuelt_kontrollert=True, motoravspilt=True, importert=False, publisert=False)
+(REPORT / 'fremdrift.json').write_text(json.dumps(f, ensure_ascii=False, indent=2) + '\n')
+pngs = sum(p.endswith('.png') for p in files)
+assert pngs == 19890 and len(files) == 19896
+summary = {'beskyttede_kilder_uendret': 28, 'tidligere_png_byteidentiske': 19826,
+    'tidligere_filer_bevart': len(base), 'endrede_tidligere_filer': ['mod.json'],
+    'nye_native': 64, 'native_totalt': 1654, 'png_totalt': pngs,
+    'figurjobber_med_resultat': len(list((ART / 'jobber').glob('fig*/resultat.png'))),
+    'figurjobber_totalt': 1758, 'unike_leverte_originalruter': 25,
+    'produksjonsruter': 64, 'alle_kildealiaser_og_native_filer_eksakt_like': True,
+    'lokal_stash_antall': len(subprocess.check_output(['git', 'stash', 'list'], cwd=REPO, text=True).splitlines())}
+assert summary['figurjobber_med_resultat'] == 164 and summary['lokal_stash_antall'] == 3
+(REPORT / 'bevaringskontroll.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n')
+manifest = {}
+with zipfile.ZipFile(REPORT / 'motorlogger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+    for prefix in ('baseline110-anim', 'sam110-for-felleskropp-anim', 'sam110-final-anim'):
+        paths = sorted(OUT.glob(prefix + '*/scummvm.log')); assert len(paths) == 4
+        for p in paths:
+            rel = p.relative_to(OUT).as_posix(); z.write(p, rel); manifest[rel] = sha(p)
+assert len(manifest) == 12
+(REPORT / 'motorlogger-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+for src in ('visuell-sluttkontroll.py', 'sluttkontroll.py'):
+    shutil.copy2(OUT / src, REPORT / (src + '.txt'))
+print(json.dumps(summary, ensure_ascii=False))

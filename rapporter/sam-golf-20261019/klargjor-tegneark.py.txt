@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil
+ART=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');REPORT=ART/'rapporter/sam-golf-20261019'
+plan=json.loads((REPORT/'ruteplan-unik.json').read_text())
+groups={'A':(0,7,4),'B':(7,15,4),'C':(15,20,3),'D':(20,25,3),'E':(25,31,3),'F':(31,36,3),'G':(36,41,3)}
+for label,(start,end,cols) in groups.items():
+ out=Image.new('RGB',(1536,1024),(128,128,128));out.paste((255,0,255),(64,32,1472,992));x,y=4,4
+ for k,p in enumerate(plan['ruter'][start:end]):
+  if k and k%cols==0:x,y=4,100
+  sx,sy,w,h=p['rekt'];crop=Image.open(ART/'jobber'/p['kildejobb']/'original_1x.png').convert('RGBA').crop((sx,sy,sx+w,sy+h))
+  assert hashlib.sha256(crop.tobytes()).hexdigest()==p['rgba_sha256']
+  assert x+w<=352 and y+h<=240
+  out.paste(crop.convert('RGB').resize((w*4,h*4),Image.Resampling.NEAREST),(64+x*4,32+y*4))
+  p.update(tegneark=label,tegneboks_1x=[x,y,w,h]);x+=w+10
+ out.save(REPORT/f'unik-{label}-referanse.png')
+(REPORT/'ruteplan-unik.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,REPORT/'klargjor-tegneark.py.txt')
+print('41 unike originalruter, sju tegningsgrunnlag, 92 runtime-ID-er beholdt.')

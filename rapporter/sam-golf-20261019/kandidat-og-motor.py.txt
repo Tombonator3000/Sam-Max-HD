@@ -1,0 +1,35 @@
+from pathlib import Path
+import importlib.util,json,hashlib,re,shutil
+REPO=Path('/home/tom/Sam-Max-HD');OUT=REPO/'out/sam-golf-20261019';REPORT=REPO/'work/.gpt-gren/rapporter/sam-golf-20261019'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+receipt=json.loads((OUT/'mottak110/myke.json').read_text());assert receipt['ruter_ok']==64 and receipt['ruter_sjekk']==receipt['ruter_mangler']==0
+shutil.copy2(OUT/'mottak110/myke.json',REPORT/'myke110-kvittering.json')
+base=REPO/'mods/gpt';candidate=OUT/'mod-kandidat';assert not candidate.exists();shutil.copytree(base,candidate)
+entries=[]
+for job,sheet in receipt['ark'].items():
+ for name,cel in sheet['ruter'].items():
+  assert cel['status']=='ok' and cel['i_modden'];src=OUT/'mottak110'/cel['fil'];dest=candidate/cel['fil']
+  assert not dest.exists() and sha(src)==cel['sha256'];shutil.copy2(src,dest)
+  entries.append({'jobb':job,'bilde':name,'fil':cel['fil'],'sha256':sha(dest),'animasjon':cel['animasjon'],'retning':cel['retning'],'lag':cel['lag']})
+meta=json.loads((candidate/'mod.json').read_text());assert meta['costume_cels']==1590
+meta['costume_cels']+=64
+if 'costume110' not in meta['costumes']:meta['costumes'].append('costume110');meta['costumes'].sort()
+(candidate/'mod.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n');(REPORT/'tillegg.json').write_text(json.dumps({'tillegg':entries},ensure_ascii=False,indent=2)+'\n')
+spec=importlib.util.spec_from_file_location('kontroll',REPO/'out/inventoryknapp-20261016/kontroll.py')
+k=importlib.util.module_from_spec(spec);spec.loader.exec_module(k);k.ROOT=OUT
+pkg=REPO/'out/felles-release-20261019/linux/squashfs-root/usr';k.NEW=pkg/'bin/scummvm';k.LIB=pkg/'lib';k.PROJECT=pkg/'share/sam-max-hd'
+checks=lambda log:[{'frame':int(f),'avvik':int(n)} for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+seen=set();rows=[]
+for anim in (1,7,8,9):
+ env={'DIGHD_TEST_ROOM':'25','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'110','DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'80,180','DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)}
+ label=f'sam110-final-anim{anim}';row=k.run(label,k.NEW,env,260,candidate)
+ log=(OUT/label/'scummvm.log').read_text(errors='replace');actual=checks(log);baseline=checks((OUT/f'baseline110-anim{anim}'/'scummvm.log').read_text(errors='replace'))
+ row.update(animasjon=anim,kontroller=actual,tegnede_ruter=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*110',log))))
+ seen.update(row['tegnede_ruter']);assert row['exit']==0 and row['dumps'] and actual
+ assert not [c for c in actual if c['avvik']]
+ assert not [c for c in baseline if c['avvik']]
+ rows.append(row);(REPORT/'motor-runder.json').write_text(json.dumps(rows,indent=2)+'\n')
+expected={int(e['bilde'].split('_')[1]) for e in entries}
+summary={'runder':len(rows),'ruter_forventet':len(expected),'ruter_tegnet':len(expected&seen),'mangler_i_avspilling':sorted(expected-seen),'skjermbufferkontroller':sum(len(r['kontroller']) for r in rows),'kontroller_fra_figurstart':sum(c['frame']>=40 for r in rows for c in r['kontroller']),'avvik_totalt':sum(c['avvik'] for r in rows for c in r['kontroller']),'produksjonsbinar_sha256':sha(k.NEW),'produksjonsbinar':'Linux-pakken 19. oktober','lokal_retningskrok':False,'naturlig_gjennomspilling':False,'baseline':'9e9f22df, fire animasjoner, posisjon 160/180','sluttposisjon':'80/180, for fri sikt fra rommets andre figurer'}
+(REPORT/'motor-oppsummering.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');assert not expected-seen,sorted(expected-seen)
+shutil.copy2(__file__,REPORT/'kandidat-og-motor.py.txt');print(json.dumps(summary),flush=True)
