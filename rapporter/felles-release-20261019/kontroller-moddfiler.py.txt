@@ -1,0 +1,37 @@
+"""Sammenlign begge pakkene med den publiserte modden, uten a endre pakker."""
+from pathlib import Path
+import hashlib,json,zipfile
+ROOT=Path(__file__).resolve().parent
+EXPECTED=Path('/home/tom/Sam-Max-HD/mods/gpt')
+LINUX=ROOT/'linux/squashfs-root/usr/share/sam-max-hd'
+WINDOWS=ROOT/'windows/SamMaxHD-Windows.zip'
+MOD_SHA='d31c30f269ed7b0b8746b5b1dfb5c50551cc900d'
+h=lambda b:hashlib.sha256(b).hexdigest()
+# Begge pakkeskriptene utelater bare mod-grenens README.md med hensikt.
+assert (EXPECTED/'README.md').is_file()
+files={p.relative_to(EXPECTED).as_posix():h(p.read_bytes()) for p in EXPECTED.rglob('*') if p.is_file() and p.relative_to(EXPECTED).as_posix()!='README.md'}
+rows=[]
+linuxfiles={p.relative_to(LINUX/'mods/gpt').as_posix():h(p.read_bytes()) for p in (LINUX/'mods/gpt').rglob('*') if p.is_file()}
+assert linuxfiles==files,'Linux-modden er ulik publisert modd'
+linuxbuild=(LINUX/'BYGG.txt').read_text()
+assert MOD_SHA in linuxbuild
+rows.append({'platform':'linux','build':linuxbuild,'moddfiler_kontrollert':len(files),'identisk_med_publisert_modd':True})
+with zipfile.ZipFile(WINDOWS) as z:
+    names=z.namelist()
+    buildname=next(n for n in names if n.endswith('/BYGG.txt'))
+    winbuild=z.read(buildname).decode().replace('\r\n','\n')
+    assert MOD_SHA in winbuild
+    marker='/mod/mod.json'
+    modname=next(n for n in names if n.endswith(marker))
+    prefix=modname[:-len('mod.json')]
+    winfiles={n[len(prefix):]:h(z.read(n)) for n in names if n.startswith(prefix) and not n.endswith('/')}
+    assert winfiles==files,'Windows-modden er ulik publisert modd'
+    native=sum(n.startswith('costumes/') and n.endswith('_hd.png') for n in winfiles)
+    assert native==1546
+    assert json.loads(z.read(prefix+'mod.json'))['costume_cels']==1546
+    rows.append({'platform':'windows','build':winbuild,'moddfiler_kontrollert':len(files),'identisk_med_publisert_modd':True,'native_cels':native})
+assert len(list((EXPECTED/'costumes').glob('*_hd.png')))==1546
+info={'utelatt_dokumentasjon':['README.md'],'utelatelse_fra':'tools/pakke_linux.sh:49 og tools/pakke_windows.sh:57','hd_mod':MOD_SHA,'native_cels':1546,'pakker_identiske_i_hd_innhold':True,'kontroll':rows,
+'filmanifest_sha256':h('\n'.join(k+' '+v for k,v in sorted(files.items())).encode())}
+(ROOT/'moddfiler-kontroll.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'moddfiler_per_pakke':len(files),'native':1546,'begge_identiske_med_publisert_modd':True}))

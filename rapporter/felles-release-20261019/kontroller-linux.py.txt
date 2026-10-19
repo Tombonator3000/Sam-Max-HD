@@ -1,0 +1,82 @@
+"""Kontroller faktisk nedlastet produksjonsmotor, data og all ny grafikk."""
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import os, subprocess, json, re, hashlib, shutil
+ROOT=Path(__file__).resolve().parent
+REPO=Path('/home/tom/Sam-Max-HD')
+ART=REPO/'work/.gpt-gren'
+PACKAGE=ROOT/'linux/squashfs-root'
+DATA=PACKAGE/'usr/share/sam-max-hd'
+MOD=DATA/'mods/gpt'
+BINARY=PACKAGE/'usr/bin/scummvm'
+SAVES=ROOT/'saves';SAVES.mkdir(exist_ok=True)
+for p in (REPO/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):
+    shutil.copy2(p,SAVES/p.name)
+assert (SAVES/'samnmax.s02').exists() and (SAVES/'samnmax.s01').exists()
+assert json.loads((MOD/'mod.json').read_text())['costume_cels']==1546
+assert 'd31c30f269ed7b0b8746b5b1dfb5c50551cc900d' in (DATA/'BYGG.txt').read_text()
+expected=[]
+for rel in ['strikk-og-kjokken-20261019/tillegg314.json','strikk-og-kjokken-20261019/tillegg294.json','strikk-og-kjokken-20261019/tillegg315.json','vr-kabler-20261019/tillegg.json','vr-kabler-slutt-20261019/tillegg.json']:
+    expected.extend(json.loads((ART/'rapporter'/rel).read_text())['tillegg'])
+assert len(expected)==160 and len({e['fil'] for e in expected})==160
+for e in expected:
+    assert hashlib.sha256((MOD/e['fil']).read_bytes()).hexdigest()==e['sha256']
+cases=[('inventory',2,{'DIGHD_TEST_CLICKS':'80:10/185,160:210/30'},280),
+       ('akvarium',1,{'DIGHD_TEST_ROOM':'16','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'320'},240),
+       ('cafeteria',2,{'DIGHD_TEST_ROOM':'30','DIGHD_TEST_AT':'10'},240)]
+for costume,room,animations in [(314,61,[(1,200),(7,200)]),(294,56,[(1,200),(7,200)]),(315,61,[(1,200)]),(246,48,[(1,360),(7,260),(8,260)])]:
+    for anim,frames in animations:
+        env={'DIGHD_TEST_ROOM':str(room),'DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':str(costume),'DIGHD_TEST_CHORE_EVERY':'1000',
+             'DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'160,180','DIGHD_DUMP_EVERY':'4',
+             'DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)}
+        cases.append((f'costume{costume}-anim{anim}',2,env,frames))
+
+def run_case(case):
+    label,slot,extra,frames=case
+    target=ROOT/('test-'+label);target.mkdir(exist_ok=True)
+    home=target/'home';home.mkdir(exist_ok=True)
+    saves=target/'saves';saves.mkdir(exist_ok=True)
+    for p in SAVES.glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+    env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')}
+    env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),
+                'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(PACKAGE/'usr/lib'),
+                'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(MOD),'DIGHD_VERIFY':'1',
+                'DIGHD_QUIT_AT':str(frames),'DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'40','DIGHD_DUMP_FLAT':'1',
+                'DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0'})
+    env.update(extra)
+    cmd=[str(BINARY),'--config='+str(target/'scummvm.ini'),'--path='+str(DATA/'game'),
+         '--savepath='+str(saves),'--save-slot='+str(slot),'--gfx-mode=normal','--no-fullscreen',
+         '--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+    with (target/'scummvm.log').open('wb') as out:
+        code=subprocess.run(cmd,env=env,stdout=out,stderr=subprocess.STDOUT,timeout=90).returncode
+    log=(target/'scummvm.log').read_text(errors='replace')
+    row={'scene':'test-'+label,'exit':code,'dumps':len(list(target.glob('frame_*_room*.png')))}
+    checks=[{'frame':int(f),'avvik':int(n)} for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+    drawn=sorted(set((int(c),int(n)) for n,c in re.findall(r'soft cel\s+(\d+) costume\s*(\d+)',log)))
+    row.update(kontroller=checks,tegnede_ruter=[f'costume{c}_{n}' for c,n in drawn],
+               oppstartsavvik=[c for c in checks if c['frame']<40 and c['avvik']])
+    assert row['exit']==0 and row['dumps'] and checks,label
+    if label.startswith('costume314') or label.startswith('costume315') or label.startswith('costume246'):
+        assert row['oppstartsavvik']==[{'frame':36,'avvik':160}],label
+        assert not [c for c in checks if c['frame']>=40 and c['avvik']],label
+    else:
+        assert not [c for c in checks if c['avvik']],label
+    return row
+
+# Tre separate spillprosesser med hver sin ini, hjemmemappe og dumpmappe.
+with ThreadPoolExecutor(max_workers=3) as pool:
+    rows=list(pool.map(run_case,cases))
+seen={n for row in rows for n in row['tegnede_ruter']}
+missing=sorted({e['bilde'] for e in expected}-seen)
+info={'build':(DATA/'BYGG.txt').read_text(),'binary_sha256':hashlib.sha256(BINARY.read_bytes()).hexdigest(),'native_cels':1546,
+      'runder':len(rows),'nye_native_forventet':160,'nye_native_observert':160-len(missing),'mangler_i_avspilling':missing,
+      'skjermbufferkontroller':sum(len(r['kontroller']) for r in rows),
+      'kontroller_fra_figurstart':sum(c['frame']>=40 for r in rows for c in r['kontroller']),
+      'avvik_fra_figurstart':sum(c['avvik'] for r in rows for c in r['kontroller'] if c['frame']>=40),
+      'oppstartsavvik':[{'scene':r['scene'],**c} for r in rows for c in r['oppstartsavvik']],
+      'naturlig_gjennomspilling':False,'lokal_retningskrok':False,
+      'konfigurasjon':'Nedlastet uendret produksjonsbinær, spill og modd. Isolert HOME/XDG, kopierte saves, dummy lyd/skjerm, gfx normal, builtin GUI og null musikk.',
+      'scenes':rows}
+(ROOT/'linux-kontroll.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
+assert not missing,missing
+print(json.dumps({k:v for k,v in info.items() if k not in ['scenes','build']},ensure_ascii=False))
