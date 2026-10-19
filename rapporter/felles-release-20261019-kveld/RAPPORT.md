@@ -1,6 +1,6 @@
 # Felles Linux-/Windows-pakke med 1654 native ruter, 19. oktober kveld
 
-Begge nye pakker er bygget og kontrollert fra main 01ee58f75bffd77870f5c197deeaf5842d8efd06 og hd-mod bd65ce87f0f690ac19aa1c316f376a2e23810193. 1654 native figurruter er med, 108 flere enn forrige fellespakke fra i dag: 44 Sam-/robotruter og 64 Sam-golfruter. Grafikkarbeidet er fortsatt under arbeid. Felles publisering kvitteres i publisert.json når den er gjennomført.
+Begge nye pakker er bygget og kontrollert fra main 01ee58f75bffd77870f5c197deeaf5842d8efd06 og hd-mod bd65ce87f0f690ac19aa1c316f376a2e23810193. 1654 native figurruter er med, 108 flere enn forrige fellespakke fra i dag: 44 Sam-/robotruter og 64 Sam-golfruter. Grafikkarbeidet er fortsatt under arbeid. [Felles kveldspakke er publisert og bekreftet Latest](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-19-kveld). Release-ID 417611325; alle fire opplastinger kontrollert både før og etter publisering. Se publisert.json.
 
 Linux-bygg 39300993297 og Windows-bygg 39301000180 er begge completed/success og har samme fulle kode-SHA. Linux består oppstart og Debian 12 uten byggepakker. Windows består automatisert oppstart med HD og MT-32. Det er ingen endringer i engine, pipeline, tools eller .github siden forrige fellespakkes 73b63a9b; dette er en datapakkeoppdatering. Alle byggesteg og faktiske BYGG.txt er bevart i kontrollfilene.
 
@@ -30,3 +30,7 @@ Grafikken og faktiske bildekall finnes i ../sam-automat-20261019 og ../sam-golf-
 164 av 1758 figurjobber har resultat, 1594 mangler pluss returer. Fig110_05/06 har 28 åpne ruter etter avslag E, fig246_16 til 19 har tolv åpne VR-ruter etter et separat avslag. Ingen gjentakelse eller omgåelse av avviste grunnlag. Neste uavhengige bunke fig152_01 til 06 er klargjort med 82 spillruter, 46 ulike kilder og 24 beskyttede SHA-er. Alle seks originale ark, godkjent Sam-hovedark og fire originale motorforløp er sett. Grønn pantograf, håndtilbehør, fiskemagnet og humørring er kildeavklart. Ingen nytegning eller bildekall for 152 fra denne klargjøringen. Automatisk fortsettelse består; gammel nattkontroll og tre opprinnelige stasher er bevart.
 
 ![Uendrede native-bilder fra nedlastet pakke](forhandsvisning.png)
+
+## Publisering bekreftet
+
+Draften ble kontrollert før publisering, deretter offentliggjort 19. oktober 18:30:42 UTC (20:30 norsk tid) og bekreftet Latest. Alle fire filer har riktig størrelse og SHA-256-digest i publisert GitHub-metadata. Tidligere felles- og plattformreleaser er beholdt. Dette kontrollpunktet er fullført; neste arbeid er faktisk nytegning av den allerede klargjorte 152-bunken.

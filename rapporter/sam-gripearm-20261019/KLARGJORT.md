@@ -1,3 +1,5 @@
 # Neste uavhengige bunke, Sam med grønn gripearm
 
 Fig152_01 til 06, kostyme152, rom28, Hyssingmuseet. 82 spillruter, 46 ulike kildeutsnitt, 24 beskyttede SHA-er. Ingen retur, resultat eller bildekall fra denne klargjøringen. Figurer.csv beskriver lang grønn gripearm, men konkret redskap, lagkobling og handling skal avklares fra originalkontekst før tegning. Se begge originale kontaktark og godkjent Sam-hovedark. Lag14 tegnes over kroppen og skal ikke gjøres om til en hel figur. Eksisterende golf- og VR-avslag skal ikke bestilles på nytt. Pakkeoppdateringen med 1654 pågår parallelt; ikke publiser ny modd før byggene har hentet riktig grunnlag.
+
+Kildeavklart før første kall: originalmotoren for animasjon1/7/8/9 er sett, sammen med hele kildene og Sam-hovedarket. Separate små ruter er fiskemagneten (F) og magnet med humørring (G, der kilden viser den), ikke ekstra hender. Faktiske prompter er korrigert før noe kall. Ingen nytegning ennå, start A. Pakkeoppdateringen er nå ferdig, bd65ce87 er fortsatt gjeldende hd-mod. Ny produksjon kan fortsette uten å vente på pakkebygg.

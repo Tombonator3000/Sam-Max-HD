@@ -31,3 +31,5 @@ Bibliotekskilder: figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelr
 ## Publisering bekreftet
 
 Kildecommit 5ed07eca694b7ce3c92d989c36f8951321d2cff9, hd-mod bd65ce87f0f690ac19aa1c316f376a2e23810193. Hentet tilbake og kontrollert: alle 64 nye SHA-er, alle 19 890 kandidat-PNG-er og alle 19 826 tidligere PNG-er stemmer. Alle gamle filstier bevart. Bare mod.json og generert SHA256SUMS endres. 1654 native bekreftet. Felles pakke har fortsatt 1546 til nytt bygg er kontrollert.
+
+Senere samme kveld er felles Linux-/Windows-pakke med 1654 native publisert og kontrollert: ../felles-release-20261019-kveld/RAPPORT.md. Begge faktiske nedlastinger har alle 64 golfruter, alle nye SHA-er og hele moddinnholdet bekreftet.
