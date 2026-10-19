@@ -4,11 +4,15 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
-- [ ] Gjenoppta neste fem jobber fig193_01/02,fig298_01/02 ogfig009_01 i rapporter/sam-max-fisk-museum-intro-20261020.61 ruter,55 ulike kilder,20 beskyttede SHA-er, fem originalark og åtte motorforløp sett, alle61 kilde-ruter observert.11 av298-rutene krevde ekstra synlig diagnose170,165 i samme rom.193 er Max med fisk i rom35 ved305,168.298 har både Sam og museumsdamen, portrett/grønnsak ved overleveringen i rom57 ved299,128; se297 og originalsekvens før nytegning, ikke anta bare Sam eller bukett.009 er Sam i intro-laboratoriet ved164,170, med delvis kroppslag i animasjon7. Ingen bildekall/resultater i neste bunke. Publisert grunnlag6512f670,2073 native. Les siste KLARGJORT.md og originalmotorlogg før valg av kall.
+- [ ] Fullfør påbegynt samlepunkt felles-release-20261020-natt: Linux39340616184 og Windows39340620900, main791234af, hd-mod bdd4aec8,2134 native. Begge startet én gang. Last ned begge faktiske pakker og SHA-filer, sjekk alle20375 runtime moddfiler og prøv relevant grafikk i nedlastet Linux. Lag fellesrelease først etter kontroll. Ikke start duplikatbygg eller send ny hd-mod mens grunnlaget sikres. Forrige verifiserte pakke1960 er fortsatt gjeldende til ny publiseringskvittering.
+
+- [ ] Kildeklargjør neste bestilling12 frafig039_01,fig113_01,fig295_01 ogfig346_01 til07. Se originalark, skript, romkontekst og godkjente stilankere før nye kall. Ikke gjenta193/298/009.
+
+- [x] Fig193_01/02,fig298_01/02 ogfig009_01 publisert i bdd4aec8,61 nye native,2134 totalt. Alle61 visuelt sett/motorobservert;640 kontroller, ingen nye/økte avvik.57 OK,4 SJEKK,0 FEIL;native61 OK. Ingen originalutliggertillegg.20 kilder og tre stasher bevart.199 av1758 resultatark,1559 mangler pluss returer. Se sam-max-fisk-museum-intro-20261020/mottak-publisert.json.
 
 - [x] Fig337_01 til03 ogfig015_01 til02 publisert i6512f670,113 nye native,2073 totalt. Alle113 visuelt sett og motorobservert,284 kontroller fra figurstart uten avvik.72 egenkontroll OK,9 SJEKK,32 små manuelt sett,0 FEIL; native113 OK. Én mykt tilbakeført originalpiksel i337_1951 dokumentert.20 kilder og tre stasher bevart.194 av1758 resultatark. Se max-slutt-og-handling-20261019/mottak-publisert.json.
 
-- [ ] Ved neste samlepunkt: oppdater felles Linux-/Windows-release fra1960 til gjeldende publisert modd. Nå2073,113 flere enn den ferdig kontrollerte nattpakken. Kall ikke pakker oppdatert før begge faktiske nedlastinger, sjekksummer, moddfiler og relevant produksjonsavspilling er kontrollert.
+- [x] Samlepunktet2134 er startet,174 nye siden1960. Nedlasting og sluttkontroll står i første åpne punkt, ikke fullført release.
 
 - [ ] Rotårsak til27 HD-pikslers avvik på nederkant inventarknappen i rom35 ved tvunget romhopp: frames40-56, HD-boks114,740 til159,744,maksRGB9. Lokalisert og identiske koordinater i gammel1851-mod og ny1960-mod, begge testposisjoner. Ingen nye figuravvik. Se sam-boey-og-slutt-20261019/grunnlagsavvik-lokalisert.json. Ikke påstå rettet eller helt grønn motorprøve.
 
