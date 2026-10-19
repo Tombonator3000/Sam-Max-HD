@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-20 01:13. Fem nye ark, 61 native, alle visuelt sett og motorobservert. 57 OK, fire SJEKK, ingen FEIL. Publisert2134, grunnlag2073. 199 av1758 resultatark. Se rapporter/sam-max-fisk-museum-intro-20261020/mottak-publisert.json. Ikke ny Tom-/Claude-godkjenning.
+Oppdatert 2026-10-20 01:13. Fem nye ark, 61 native, alle visuelt sett og motorobservert. 57 OK, fire SJEKK, ingen FEIL. Publisert2134, grunnlag2073. 199 av1758 resultatark. Se rapporter/sam-max-fisk-museum-intro-20261020/mottak-publisert.json. Ikke ny Tom-/Claude-godkjenning. Felles Linux-/Windows-pakke2134 er publisert og kontrollert: sam-max-hd-2026-10-20-natt. Neste bestilling12 er kildeklargjort, ingen bildekall/resultater ennå.
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 

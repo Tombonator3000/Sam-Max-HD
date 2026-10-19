@@ -39,3 +39,5 @@ Felles Linux-/Windows-release sam-max-hd-2026-10-19-natt har 1960 native. Moddka
 Neste kildearbeid: fig039_01, fig113_01, fig295_01 og fig346_01 til 07. Følg bestilling 12 og avklar rekvisitter, palett og lag i originalmotoren før nye kall. Automatisk fortsettelse består, den gamle nattkontrollen forblir pauset.
 
 Publisering og tilbakehenting bekreftet: kilde c0e364bfe2c249dcc692116c3cd03a923335eeda, hd-mod bdd4aec8b14581a0e090d976262818cda9246175. Alle 20370 kandidat-PNG-er og alle 20309 tidligere PNG-er bekreftet. 61 nye native-SHA-er stemmer, 2134 native totalt. 20 beskyttede kilder og tre stasher uendret. Se mottak-publisert.json. Pakken har fortsatt 1960 til samlepunktkontrollen.
+
+Samlepunkt fullført: alle61 nye i denne bunken og de113 foregående er inkludert i begge faktisk nedlastede2134-pakkene, https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-natt. Alle174 native-SHA-er og20375 moddfiler per pakke er kontrollert.15 nye Linux-prøver,980 kontroller uten nye/økte avvik. Se felles-release-20261020-natt/publisert.json.

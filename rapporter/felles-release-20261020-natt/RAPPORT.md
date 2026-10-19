@@ -11,3 +11,5 @@ Den faktisk nedlastede Linux-binæren har SHA256 d025b6736517d56564f1691498a54fc
 Tvungne forløp, ikke naturlig gjennomspilling. Museumsrutene suppleres med synlig diagnose170,165. Ingen ny interaktiv Windows-/webtest, Tom-godkjenning eller separat Claude-kontroll. Windows har grønt pakkebygg, CI-startprøve og samme grafikkfiler.
 
 Ny fellesrelease planlagt som sam-max-hd-2026-10-20-natt. Publiseres først etter kontroll av alle fire opplastede filer, og kontrolleres igjen etter publisering. De tidligere fellesutgivelsene og deres assets bevares. Se publisert.json for faktisk publisering, URL og Latest-status. Grafikkproduksjonen fortsetter med bestilling12, ikke ferdig HD-utgave.
+
+Fellesrelease publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-natt. ReleaseID417853511, publisert2026-10-19T23:34:28Z. Alle fire opplastinger kontrollert både før og etter publisering. Begge faktiske nedlastinger og20375 runtime moddfiler per pakke stemmer. Samtlige ni tidligere releaser og deres assets fra etter de nødvendige plattformbyggene er bevart. Se publisert.json.
