@@ -27,3 +27,7 @@ Bildeverktøyets outputkontroll avviste E med moderation_blocked, kategori other
 Direkte telling: 164 av 1758 figurjobber har resultat, 1594 mangler, i tillegg til returer og utestede helheter. Arbeidet er ikke ferdig. Oppdater felles Linux-/Windows-nedlasting ved dette samlepunktet med kontroll av nedlasting, sjekksummer og faktisk moddinnhold.
 
 Bibliotekskilder: figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelruter for mål, skygger og lag; publisert-mod-er-fasit for additiv bevaring. PASS i opphavet er kontrollert på denne bunken med faktiske kilde-, kandidat- og motorresultater. Ingen produksjonskode endret.
+
+## Publisering bekreftet
+
+Kildecommit 5ed07eca694b7ce3c92d989c36f8951321d2cff9, hd-mod bd65ce87f0f690ac19aa1c316f376a2e23810193. Hentet tilbake og kontrollert: alle 64 nye SHA-er, alle 19 890 kandidat-PNG-er og alle 19 826 tidligere PNG-er stemmer. Alle gamle filstier bevart. Bare mod.json og generert SHA256SUMS endres. 1654 native bekreftet. Felles pakke har fortsatt 1546 til nytt bygg er kontrollert.

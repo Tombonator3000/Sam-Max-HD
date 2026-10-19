@@ -10,3 +10,5 @@ Egenkontroll OK og native mottak OK for alle rutene i arket. Samlet bunke: 64 av
 
 Resultat SHA-256: a38a3a47c2e08efd50b0c594dfc3352a4a2eddc1cc3e672f4e82a5023e86f6ac
 Rutekart: rapporter/sam-golf-20261019/rutekart-fig110_07.json
+
+Publisert i kildecommit 5ed07eca694b7ce3c92d989c36f8951321d2cff9, native i hd-mod bd65ce87f0f690ac19aa1c316f376a2e23810193. Alle 64 nye native SHA-er og alle 19 890 kandidat-PNG-er er bekreftet etter hent.
