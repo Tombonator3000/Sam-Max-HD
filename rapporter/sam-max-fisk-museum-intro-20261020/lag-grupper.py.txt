@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam-max-fisk-museum-intro-20261020';O=P/'out/sam-max-fisk-museum-intro-20261020'
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];groups=[];parts=[];n=0
+for c,name in [(193,'Max med fisk'),(298,'Sam og museumsdamen'),(9,'Sam intro')]:
+ seq=[v for v in plan if v['bilde'].startswith(f'costume{c:03}_')]
+ for first in range(0,len(seq),6):
+  letter=chr(65+n);n+=1;items=seq[first:first+6];im=Image.new('RGB',(1536,1024),(68,73,78));draw=ImageDraw.Draw(im)
+  for i,v in enumerate(items):
+   source=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');scale=min(420/source.width,420/source.height);s=source.resize((round(source.width*scale),round(source.height*scale)),Image.Resampling.NEAREST);x=i%3*512+(512-s.width)//2;y=i//3*512+55+(430-s.height)//2;im.paste(s,(x,y),s);draw.text((i%3*512+12,i//3*512+12),f'{i+1}: {v["bilde"]}, source {source.width}x{source.height}',fill='white')
+   a=np.array(source);lab,_=nd.label(a[:,:,3]>0);pp=[]
+   for sid,z in enumerate(nd.find_objects(lab),1):
+    mask=lab[z]==sid;rgb=np.median(a[z][:,:,:3][mask],axis=0).tolist();pp.append(dict(id=sid,piksler=int(mask.sum()),rekt=[int(z[1].start),int(z[0].start),int(z[1].stop),int(z[0].stop)],rgb=rgb))
+   parts.append(dict(bilde=v['bilde'],deler=pp))
+  im.save(R/f'unik-{letter}-referanse.png');(R/f'unik-{letter}-plan.json').write_text(json.dumps(items,indent=2)+'\n');groups.append(dict(gruppe=letter,kostyme=c,identitet=name,unike=len(items),kilder=[v['bilde'] for v in items]));print(letter,c,[v['bilde'] for v in items])
+(R/'bildegrupper.json').write_text(json.dumps(groups,ensure_ascii=False,indent=2)+'\n');(R/'kildekomponenter.json').write_text(json.dumps(parts,indent=2)+'\n');shutil.copy2(__file__,R/'lag-grupper.py.txt')
+s=(P/'out/max-slutt-og-handling-20261019/registrer-raa.py').read_text().replace('max-slutt-og-handling-20261019','sam-max-fisk-museum-intro-20261020');(O/'registrer-raa.py').write_text(s)
+p=R/'KLARGJORT.md';s=p.read_text();s=s.replace('museumsdamen med oppsatt orangebrunt hår og vegetabilsk lilla/grønt tilbehør','museumsdamen med orangebrunt krøllete hår, beige stråhatt med små hvite blomster/grønne blader på høyre side og gul bluse');s+='\nKildeavklaring20. oktober: eget sammensatt originalanker fra kostyme297 er sett, museumsdamen297-originalanker.png. Hatten og blomstene er hodeplagg, lilla/grønt er den separate John Muir-grønnsaken. De tvungne motorprøvene dokumenterer ruter og lag i riktig rom, ikke naturlig gjennomspilling. Sam-/Max-master og kildemotor er sett før produksjon.\n';p.write_text(s)

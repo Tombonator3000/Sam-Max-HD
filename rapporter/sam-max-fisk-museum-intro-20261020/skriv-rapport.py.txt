@@ -1,0 +1,75 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam-max-fisk-museum-intro-20261020';f=json.loads((R/'fremdrift.json').read_text());t=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+desc={
+'fig193_01':'Max plukker opp og senker en liten grønn fisk ved World of Fish, rom 35. Originalt lokalt skript 213 bruker aktør 3, kostyme 193, posisjon 305,168. Fangst, gripehånd, ører og fotstilling følger hver kildepose. Ingen pistol eller andre nye rekvisitter.',
+'fig193_02':'Max vender seg og kaster den grønne fisken mot akvariet ved World of Fish, rom 35. Fisken går fra hånden til adskilte flygende fragmenter. Kropp, gripehånd, hode, hale og den lille håndstreken er beholdt i egne kildebekreftede delbokser. Frigjorte deler er ikke festet til armen eller fullført til ekstra fisk.',
+'fig298_01':'Sam viser et innrammet svart-hvitt-portrett av John Muir ved Celebrity Vegetable Museum, rom 57. Lokalt skript 201 bruker aktør 5 med kostyme 298 ved 299,128, mens museumsdamen i kostyme 297 skjules. Portrettet har svart bred hatt og hvitt skjegg i gullramme. Damen har orangebrunt krøllet hår, beige stråhatt med hvite blomster/grønne blader og gul bluse. Hun vises bare som hode, hals, krage og arm der kilden viser disse lagene. Ingen ny hel kropp.',
+'fig298_02':'Museumsdamen overleverer den lilla John Muir-grønnsaken med grønne blader til Sam. Globalt skript 114, rom 57, samme aktør/kostyme/posisjon som portrettsekvensen. Tidlige ruter viser bare dame-/grønnsaksfragment, midtre begge figurer og siste bare Sam med grønnsaken. Dette er en skulpturert grønnsak, ikke en blomsterbukett.',
+'fig009_01':'Sam i introens laboratorium, rom 2, globalt skript 65 etter «Hello?», posisjon 164,170. Hendene går gradvis inn i lommene. Siste rute 1930 er bare jakke, krage/slips, bukser og føtter uten hode/hatt. Den manglende delen er ikke fylt inn.'}
+for e in f['leveranser']:
+ name=e['jobb'];(A/'jobber'/name/'notat.md').write_text(f'''# {name}
+
+{t}, Codex.
+
+{desc[name]}
+
+Originalark, relevante originale motorforløp og godkjent Sam-/Max-master er sett før nytegning. Museumsdamen er i tillegg avklart mot et sammensatt originalanker fra kostyme 297. Kildeskript, kildeproveniens og dette ankeret er bevart i rapportmappen. Sam-master er bare referanse for Sam og strek; den endrer ikke den menneskelige damen eller portrettet.
+
+Laget med innebygd image_gen. Eksakt modellnavn er ikke vist. Bunken har elleve faktiske bildekall og elleve bevarte råbilder; ti brukes helt eller delvis. Dette arket bruker {len(e['delte_bildekall'])} delte råbilder. F er forkastet fordi hatten fikk ekstra krone; K erstatter de seks posene med riktig flat hatteform. Faktiske prompter, strukturerte forespørsler, referansestier og SHA-er ligger i rapporter/sam-max-fisk-museum-intro-20261020. De beskyttede prompt.txt, jobb.json, original_1x.png og referanse.png er uendret. Kildeavklaringen og de separate delpromptene presiserer feil/ufullstendige generelle jobbtekster og grupperer unike hele ruter uten å endre originaljobbene.
+
+Ekte generert alfa, renset og plassert med Python etter Toms uttrykkelige tillatelse. Hele genererte deler tilpasses kildebekreftede delbokser. Ingen hard originalsilhuettmaske, hel originalfallback eller originalutliggertillegg i native-mottaket. Isolerte kildebekreftede ettpikselpunkter er gjenskapt med mykt generert småmateriale og kildefarge. Identiske hele kildeutsnitt har eksakt like native PNG-er.
+
+Resultat 1536 x 1024 RGBA, SHA256 {e['sha256']}. {e['ruter']} runtime-ruter. Egenkontroll: {e['egenkontroll']}; se arkets kontrollfil for presise omrissmerknader. Hele bunken gir 57 OK, fire SJEKK, null FEIL. De fire SJEKK gjelder 193_1921/1922/1925/1931, med snitt/union 0,72 til 0,75, men 100 % bredde/høyde og null forskyvning. De er manuelt sett og beholdt som merknader, ikke skjult som stilgodkjenning.
+
+Native mottak: alle 61 OK med uendrede terskler. Alle 61 visuelt sett mot original/native/motor, og logget tegnet i åtte tvungne animasjonsforløp i faktisk nedlastet Linux-nattmotor e541253b. 50 ved kildeposisjon, 11 flere museumsruter i synlig diagnose ved 170,165. 640 skjermbufferkontroller, 568 fra figurstart; ingen nye eller økte avvik mot samme binær og grunnlag. Rom 35 har fortsatt det kjente inventarkantavviket: 61 ved frame 36 og 27 ved 40 til 56, null fra 60. Rom 57 og 2 har null.
+
+Publisering og tilbakehenting dokumenteres i mottak-publisert.json. Native mottak, egen visuell kontroll og motorobservasjon er skilt fra Toms stilgodkjenning og separat Claude-kontroll. Ingen ny slik godkjenning, naturlig gjennomspilling eller interaktiv Windows-/webtest.
+''')
+report=f'''# Max med fisk, museumssekvens og Sam i introen
+
+{t}, Codex. Fem nye ark: fig193_01/02, fig298_01/02 og fig009_01. 61 native-ruter fra 55 eksakt ulike hele kildeutsnitt og 81 kildekomponenter. Kandidaten har 2134 native mot publisert grunnlag 2073. 199 av 1758 figurjobber har resultat; 1559 mangler resultat, i tillegg til returer og samlet spill-/stilkontroll. Faktisk publisering og hentet tilbake kontroll dokumenteres i mottak-publisert.json.
+
+## Motiv og originalgrunnlag
+
+193: Max plukker opp og kaster en liten grønn fisk mot akvariet ved World of Fish, rom 35. Originalt lokalt skript 213 bruker aktør 3, kostyme 193 ved 305,168. Fiskens grep, flyvende kropp/hode/hale og små restfragmenter er beholdt gjennom animasjon 1 og 7. Ingen pistol, plante eller ekstra hel fisk.
+
+298: Sam viser John Muir-portrettet og mottar John Muir-grønnsaken ved Celebrity Vegetable Museum, rom 57. Lokalt 201 og globalt 114 bruker aktør 5 med kostyme 298 ved 299,128, mens museumsdamen i aktør 4/kostyme 297 skjules under fellesanimasjonen. Originaldialogen identifiserer John Muir. Portrettet er svart/hvitt med svart bred hatt, hvitt skjegg og gullramme. Damen er avklart mot kostyme 297: orangebrunt krøllet hår, tan/beige stråhatt med små hvite blomster/grønne blader og gul bluse. Lilla/grønt er grønnsaken som leveres, ikke damens klær eller en bukett. Bare hode/hals/krage/hånd der originalen viser disse fragmentene, ingen fullført kropp.
+
+009: Sam i introens laboratorium, rom 2, globalt 65, etter «Hello?», ved 164,170. Hendene går mot og inn i lommene. Animasjon 7 er et delvis kroppslag uten hode/hatt, beholdt slik. Ingen normalisering til en hel figur.
+
+Originalark, åtte originale motorforløp, Sam-/Max-master og damens sammensatte originalanker er sett før nytegning. Primære skript og SHA-proveniens er bevart. De tvungne motorprøvene viser ruter og lag i riktig rom; de er ikke naturlig gjennomspilling. Museumsprøven ved kildeposisjon fikk kameraklipp, derfor suppleres den med synlig diagnose i samme rom ved 170,165. Dette er ikke fremstilt som en naturlig kamerasekvens.
+
+Bibliotekskilder brukt: figurark-fast-storrelse.md og scumm-v6-kostymer-skygge-og-soppelruter.md under prosjektbibliotek/losninger/grafikk, samt publisert-mod-er-fasit.md under losninger/bygg. Eksisterende v6-mottak, SHA-fremdrift og rutekart brukes med uendrede terskler.
+
+## Produksjon
+
+Elleve innebygde image_gen-kall, faktiske prompter/forespørsler og råbilder bevart. Ti råbilder brukes helt/delvis. F ga hatten en ekstra krone; K erstatter alle seks F-poser og følger originalens flate hattekant. F er beholdt som forkastet utkast. Ingen CLI-/API-fallback, avslag eller avbrutte bildekall i denne bunken.
+
+Python renser generert kantalfa og plasserer hele genererte deler i originale delbokser. Originalens pikselmaske brukes ikke til å klippe nye silhuetter. Kildebekreftede separate fiskedeler, hvite blomsterpunkter og en håndstrek beholdes. Små ettpikselpunkter bruker generert mykt småmateriale med kildefarge. Seks magentafargeavrundinger med alfa 1 til 3 i 298_1935 er renset med alfa uendret. Alle 61 native kommer kun fra arkene, ingen originalutliggertillegg og ingen hel originalfallback. Identiske hele kildeutsnitt gir byteidentiske native PNG-er.
+
+## Kontroller
+
+Egenkontroll: 61 målte, 57 OK, fire SJEKK, null FEIL. SJEKK gjelder Max 193_1921, 1922, 1925 og 1931: snitt/union 0,72 til 0,75, 100 % bredde/høyde og null forskyvning. Alle fire er manuelt sett og står fortsatt som merknader. Ingen terskel er endret.
+
+Native mottak: 61 OK, null til gjennomsyn, null mangler, null tekniske feil. Alle 61 er sett i seks kilde/native/motor-kontaktark og seks hele motorbilder. Alle er registrert tegnet i åtte tvungne motorforløp: 50 ved kildeposisjon og 11 flere i museets synlige diagnose. Den faktiske Linux-binæren e541253b fra nattpakken er brukt, med samme rom, posisjon, kamera, skala og animasjon mot uendret grunnlag 6512f670 først.
+
+640 skjermbufferkontroller, 568 fra figurstart. Ingen nye eller økte avvik. Rom 57 og 2 er null. Rom 35 har fortsatt de tidligere inventarkantpikslene: 61 ved frame 36 og 27 ved 40 til 56 i begge forløp, null fra 60. De er lokalisert og dokumentert i tidligere sam-boey-og-slutt-rapport; denne grafikkleveransen retter ikke den motorfeilen.
+
+Alle 20 beskyttede jobbfiler og tre opprinnelige stasher er bevart. Alle 20309 tidligere PNG-er byteidentiske, alle 20315 tidligere filstier bevart. Bare mod.json endres blant gamle kandidatfiler. Alle 20370 kandidat-PNG-er og 61 nye native-SHA-er skal også bekreftes etter faktisk hent.
+
+## Gjenstår
+
+Ny Tom-godkjenning, separat Claude-kontroll, naturlig gjennomspilling og ny interaktiv Windows-/webtest er ikke utført. Dette er egenkontroll og motorobservasjon, ikke endelig stilgodkjenning.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-19-natt har 1960 native. Moddkandidaten har 174 flere. Pakkene oppdateres ved samlepunkt med faktisk nedlasting, sjekksummer og innholdskontroll før de kalles 2134.
+
+Neste kildearbeid: fig039_01, fig113_01, fig295_01 og fig346_01 til 07. Følg bestilling 12 og avklar rekvisitter, palett og lag i originalmotoren før nye kall. Automatisk fortsettelse består, den gamle nattkontrollen forblir pauset.
+'''
+(R/'RAPPORT.md').write_text(report);(R/'PAAGAR.md').write_text('# Fem ark kontrollert\n\n61 nye native fra193/298/009 er laget, kontrollert og motorobservert. Se RAPPORT.md og mottak-publisert.json for faktisk publisering. Ikke tegn dem på nytt. Neste bestilling12 frafig039_01.\n')
+p=A/'GRAFIKKLISTE.md';s=p.read_text()
+for e in f['leveranser']:s=s.replace('- [ ] `'+e['jobb']+'`','- [x] `'+e['jobb']+'`')
+start=s.index('Oppdatert ');end=s.index('\n\n',start);s=s[:start]+f'Oppdatert {t}. Fem nye ark, 61 native, alle visuelt sett og motorobservert. 57 OK, fire SJEKK, ingen FEIL. Kandidat2134, publisert2073 til kvittering. 199 av1758 resultatark. Se rapporter/sam-max-fisk-museum-intro-20261020/mottak-publisert.json. Ikke ny Tom-/Claude-godkjenning.'+s[end:];s=s.replace('194 ark med resultat; 2073 native ruter i publisert modd','199 ark med resultat; kandidat2134, publisert2073 til kvittering');p.write_text(s)
+p=A/'ORDRE.md';s=p.read_text();anchor='## Gjør disse nå\n';notice=f'\nProduksjon {t}: fig193_01/02,fig298_01/02 ogfig009_01 er ferdig nytegnet, 61 native fra55 ulike helruter. Alle61 native OK, visuelt sett og motorobservert; 640 kontroller,568 fra figurstart, ingen nye/økte avvik. 50 ruter ved kildeposisjon og11 flere i synlig museumsdiagnose. Egenkontroll57 OK,4 SJEKK,0 FEIL. Alle61 fra arket alene, ingen originalutliggertillegg. Kandidat2134, grunnlag2073. 199 av1758 resultatark,1559 mangler pluss returer. Se rapporter/sam-max-fisk-museum-intro-20261020/RAPPORT.md og mottak-publisert.json. Neste bestilling12: fig039_01,fig113_01,fig295_01,fig346_01 til07, kildeavklar først. Pakken1960 mangler174, samlepunkt nå. Ingen ny Tom-/Claude-godkjenning.\n';p.write_text(s.replace(anchor,anchor+notice,1));shutil.copy2(__file__,R/'skriv-rapport.py.txt');print('Fem notater, rapport og neste ordre skrevet')

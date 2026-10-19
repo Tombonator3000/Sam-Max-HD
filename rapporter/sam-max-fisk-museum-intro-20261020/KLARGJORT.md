@@ -12,4 +12,6 @@ Kildeavklaring er påbegynt, ikke fullført motor-/designkontroll. Åtte origina
 
 Pakken1960 er allerede publisert og skal oppdateres ved neste samlepunkt. Grafikkmodden2073 er nyere. Automatisk fortsettelse består; de gamle nattprosessene er ikke startet.
 
-Sammensatt298 viser bekreftet Sam, innrammet svart/hvitt-portrett av skjeggete John Muir, museumsdamen med oppsatt orangebrunt hår og vegetabilsk lilla/grønt tilbehør, deretter John Muir-grønnsaken som leveres. Ikke tegn en generell blomsterbukett. Originalark og motorforløp er form-/fargegrunnlaget; Sam-master er bare Sam/linjekvalitet og må ikke gjøre damen til en hund eller endre portrettets person.
+Sammensatt298 viser bekreftet Sam, innrammet svart/hvitt-portrett av skjeggete John Muir, museumsdamen med orangebrunt krøllete hår, beige stråhatt med små hvite blomster/grønne blader på høyre side og gul bluse, deretter John Muir-grønnsaken som leveres. Ikke tegn en generell blomsterbukett. Originalark og motorforløp er form-/fargegrunnlaget; Sam-master er bare Sam/linjekvalitet og må ikke gjøre damen til en hund eller endre portrettets person.
+
+Kildeavklaring20. oktober: eget sammensatt originalanker fra kostyme297 er sett, museumsdamen297-originalanker.png. Hatten og blomstene er hodeplagg, lilla/grønt er den separate John Muir-grønnsaken. De tvungne motorprøvene dokumenterer ruter og lag i riktig rom, ikke naturlig gjennomspilling. Sam-/Max-master og kildemotor er sett før produksjon.
