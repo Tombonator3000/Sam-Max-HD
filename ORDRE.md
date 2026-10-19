@@ -16,6 +16,8 @@ Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENT
 
 ## Gjør disse nå
 
+Produksjonsmerknad 19. oktober 2026, VR-kabler: fig246_01 til 10 er levert med 62 ruter fra 19 eksakt unike originalposer. Armfeilen i 1924 er rettet. Alle 62 er sett mot original og motorutsnitt og registrert tegnet. Egenkontroll 61 OK og én dokumentert SJEKK (1925); native mottak 62 OK, null til gjennomsyn. Ikke tegn disse ti på nytt. Se rapporter/vr-kabler-20261019/RAPPORT.md og fremdrift.json for faktisk publisering og skillet til Tom-/Claude-godkjenning. Neste fig246_11. Tom har nå bestilt automatisk fortsettelse til all grafikk er ferdig; dette er en ny oppgave, gammel nattkontroll forblir pauset.
+
 Produksjonsmerknad 19. oktober 2026: fig314_01 til 04, fig294_01 til 02 og fig315_01 er levert med 78 nye ruter. Alle er kontrollert mot originalen og registrert tegnet i produksjonsmotoren. Ikke tegn disse sju på nytt. Se rapporter/strikk-og-kjokken-20261019/RAPPORT.md og fremdrift.json for egne kontroller, faktisk publisering og status for Tom-/Claude-godkjenning. Neste jobb er fig246_01. Direkte telling 135 av 1758 resultatark, 1623 mangler pluss returer. De eldre ordre-/statuslinjene under er historiske.
 
 Produksjonsmerknad 18. oktober 2026: fig307_01 til05 og fig312_01 til05 er levert med 96 nye ruter, alle sett mot originalen og observert i motoren. Ikke tegn dem på nytt. Se rapporter/strikkhopp-20261018/RAPPORT.md for skillet mellom egenkontroll, mottak, publisering og ny stilgodkjenning. Neste Sam-ark er fig314_01 til 04; deretter fig294_01 til 02. Den eldre ordreteksten og oversiktstallene under er historiske, ikke fasit for dagens leveranser.

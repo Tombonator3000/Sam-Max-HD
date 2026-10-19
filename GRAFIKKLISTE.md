@@ -13,7 +13,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 135 ark med resultat; 1464 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 145 ark med resultat; 1526 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
@@ -79,16 +79,16 @@ Figurark for Sam og Max, Sam, Max.
 
 Figurark for Sam og Max.
 
-- [ ] `fig246_01` (figurark 1 for Sam og Max (kostyme 246), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_02` (figurark 2 for Sam og Max (kostyme 246), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_03` (figurark 3 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_04` (figurark 4 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_05` (figurark 5 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_06` (figurark 6 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_07` (figurark 7 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_08` (figurark 8 for Sam og Max (kostyme 246), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_09` (figurark 9 for Sam og Max (kostyme 246), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig246_10` (figurark 10 for Sam og Max (kostyme 246), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_01` (figurark 1 for Sam og Max (kostyme 246), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_02` (figurark 2 for Sam og Max (kostyme 246), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_03` (figurark 3 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_04` (figurark 4 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_05` (figurark 5 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_06` (figurark 6 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_07` (figurark 7 for Sam og Max (kostyme 246), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_08` (figurark 8 for Sam og Max (kostyme 246), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_09` (figurark 9 for Sam og Max (kostyme 246), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig246_10` (figurark 10 for Sam og Max (kostyme 246), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 6
 

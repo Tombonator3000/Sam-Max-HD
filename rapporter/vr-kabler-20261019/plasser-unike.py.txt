@@ -1,0 +1,71 @@
+"""Rens tegningens egen alfa, plasser og del eksakt like kilder.
+
+Originalen brukes til rektangulære mål og identitetsbevis, ikke som klippemaske.
+"""
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np, json, hashlib
+
+ART=Path('/home/tom/Sam-Max-HD/work/.gpt-gren')
+REPORT=ART/'rapporter/vr-kabler-20261019'
+plan=json.loads((REPORT/'ruteplan-unik.json').read_text())['ruter']
+specs=json.loads((REPORT/'prototyper-rawvalg.json').read_text())
+cache={}; prototypes={}; audit=[]
+for pose in plan:
+    spec=specs[pose['id']]; name=spec['raw']
+    if name not in cache:
+        a=np.array(Image.open(REPORT/name).convert('RGBA'))
+        labels,_=nd.label(a[:,:,3]>220)
+        cache[name]=(a,labels)
+    a,labels=cache[name]
+    core=np.isin(labels,spec['ids'])
+    yy,xx=np.nonzero(core); assert len(xx)>20
+    x0,y0,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1
+    xa,ya,xb,yb=max(0,x0-2),max(0,y0-2),min(a.shape[1],x1+2),min(a.shape[0],y1+2)
+    local=core[ya:yb,xa:xb]; cut=a[ya:yb,xa:xb].copy()
+    distance,nearest=nd.distance_transform_edt(~local,return_indices=True)
+    permitted=distance<=1.5
+    cut[:,:,3][~permitted|((labels[ya:yb,xa:xb]>0)&~local)]=0
+    edge=permitted&~local
+    cut[:,:,:3][edge]=cut[nearest[0][edge],nearest[1][edge],:3]
+    im=Image.fromarray(cut).crop((x0-xa,y0-ya,x1-xa,y1-ya))
+    _,_,w,h=pose['kilderekt']
+    im=im.resize((w*4,h*4),Image.Resampling.LANCZOS)
+    clean=np.array(im)
+    hit=(clean[:,:,:3]==[255,0,255]).all(2)&(clean[:,:,3]>0)
+    if hit.any():
+        assert (clean[:,:,3][hit]<=2).all(),pose['id']
+        _,nearest=nd.distance_transform_edt(clean[:,:,3]<128,return_indices=True)
+        clean[:,:,:3][hit]=clean[nearest[0][hit],nearest[1][hit],:3]
+    im=Image.fromarray(clean);im.save(REPORT/(pose['id']+'-prototype.png'))
+    audit.append({'bilde':pose['id'],'raw':name,'raw_komponenter':spec['ids'],
+                  'raw_boks':[x0,y0,x1,y1],'mal':[w*4,h*4],
+                  'rgb_avrundingsrens':int(hit.sum()),'prototype_sha256':hashlib.sha256((REPORT/(pose['id']+'-prototype.png')).read_bytes()).hexdigest()})
+    prototypes[pose['id']]=im
+
+progress={'dato':'2026-10-19','verktøy':'innebygd image_gen',
+          'faktiske_bildekall':sorted(set(s['raw'] for s in specs.values())),
+          'merknad':'Bildekallgrunnlag deles bare ved eksakt lik kilde-RGBA og størrelse. Summer ikke delte kall over jobbene.',
+          'leveranser':[]}
+for i in range(1,11):
+    name=f'fig246_{i:02}';d=ART/'jobber'/name;j=json.loads((d/'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));maps=[]
+    for cel in j['ruter']:
+        pose=next(p for p in plan if any(t['bilde']==cel['bilde'] for t in p['mottakere']))
+        x,y,w,h=cel['rekt'];source=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h))
+        assert hashlib.sha256(source.tobytes()).hexdigest()==pose['kilde_rgba_sha256']
+        im=prototypes[pose['id']];assert im.size==(w*4,h*4)
+        dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;out.alpha_composite(im,(dx,dy))
+        yy,xx=np.nonzero(np.array(im)[:,:,3]>128)
+        maps.append({'bilde':cel['bilde'],'kostyme':246,'rute':cel['rute'],
+                     'rect':[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],
+                     'representant':pose['id'],'kilde_rgba_sha256':pose['kilde_rgba_sha256'],
+                     'prototype':pose['id']+'-prototype.png','raw':specs[pose['id']]['raw']})
+    out.save(d/'resultat.png');digest=hashlib.sha256((d/'resultat.png').read_bytes()).hexdigest()
+    (REPORT/('rutekart-'+name+'.json')).write_text(json.dumps({name:{'sha256_resultat':digest,'ruter':maps}},ensure_ascii=False,indent=2)+'\n')
+    progress['leveranser'].append({'jobb':name,'resultat':f'jobber/{name}/resultat.png','sha256':digest,'ruter':len(maps),
+            'rutekart':f'rapporter/vr-kabler-20261019/rutekart-{name}.json','delte_bildekall':sorted(set(m['raw'] for m in maps)),
+            'egenkontroll':'ikke kjørt','native_mottatt':False,'visuelt_kontrollert':False,'motoravspilt':False,'importert':False,'godkjent_av_Tom':False,'claude_kontroll':False})
+(REPORT/'prototype-kvitteringer.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n')
+(REPORT/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+print('19 prototyper fordelt på62 ruter i10 ark.')

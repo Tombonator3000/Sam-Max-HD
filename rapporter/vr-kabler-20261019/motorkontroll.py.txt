@@ -1,0 +1,32 @@
+from pathlib import Path
+import sys, json, re, hashlib
+REPO=Path('/home/tom/Sam-Max-HD')
+OUT=REPO/'out/vr-kabler-20261019'
+REPORT=REPO/'work/.gpt-gren/rapporter/vr-kabler-20261019'
+sys.path.insert(0,str(REPO/'out/inventoryknapp-20261016'))
+import kontroll as k
+k.ROOT=OUT
+PACKAGE=REPO/'out/felles-release-20261018/linux/squashfs-root'
+k.NEW=PACKAGE/'usr/bin/scummvm';k.LIB=PACKAGE/'usr/lib'
+env={'DIGHD_TEST_ROOM':'48','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'246','DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'160,180','DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':'1'}
+row=k.run('sam246-final-anim1',k.NEW,env,360,OUT/'mod-kandidat')
+log=(OUT/'sam246-final-anim1/scummvm.log').read_text(errors='replace')
+checks=[{'frame':int(f),'avvik':int(n)} for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+seen=set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*246',log))
+expected={int(e['bilde'].split('_')[1]) for e in json.loads((REPORT/'tillegg.json').read_text())['tillegg']}
+baseline=json.loads((REPORT/'motor-baseline.json').read_text())
+row['tegnede_ruter']=sorted(seen)
+row['kontroller']=checks
+row['oppstartsavvik']=[c for c in checks if c['frame']<40 and c['avvik']]
+summary={'runder':1,'ruter_forventet':62,'ruter_tegnet':len(expected&seen),'mangler_i_avspilling':sorted(expected-seen),
+         'skjermbufferkontroller':len(checks),'kontroller_fra_figurstart':sum(c['frame']>=40 for c in checks),
+         'avvik_fra_figurstart':sum(c['avvik'] for c in checks if c['frame']>=40),
+         'oppstartsavvik':row['oppstartsavvik'],'produksjonsbinar_sha256':hashlib.sha256(k.NEW.read_bytes()).hexdigest(),
+         'lokal_retningskrok':False,'naturlig_gjennomspilling':False}
+(REPORT/'motor-runde.json').write_text(json.dumps(row,indent=2)+'\n')
+(REPORT/'motor-oppsummering.json').write_text(json.dumps(summary,indent=2)+'\n')
+assert row['exit']==0 and row['dumps'] and checks
+assert row['oppstartsavvik']==[c for c in baseline['kontroller'] if c['frame']<40 and c['avvik']]
+assert summary['avvik_fra_figurstart']==0
+assert not expected-seen,sorted(expected-seen)
+print(json.dumps(summary))
