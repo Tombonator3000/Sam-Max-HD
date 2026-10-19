@@ -41,3 +41,9 @@ Fig246_16 til 19 har 12 ruter og ingen resultatfil. Tre unike kildeposer dekker 
 Kildene går til gpt-arbeid, native legges additivt til hd-mod fra 44dbaf3b etter kontroll av at remote ikke er endret. Faktisk publisering og tilbakehenting kvitteres i mottak-publisert.json. Ingen grafikk går til main.
 
 ![Sam og Max, fra motorprøven](sam-og-max-vr-motor.png)
+
+## Faktisk publisert og hentet tilbake
+
+Kildecommit 64ed48d9dc73f25dc43ba1929fbac1b58135e8c8, hd-mod d31c30f269ed7b0b8746b5b1dfb5c50551cc900d. Alle 20 nye native SHA-er og alle 19 782 kandidat-PNG-er stemmer etter tilbakehenting og SHA256SUMS-kontroll. Alle 19 762 tidligere PNG-er er byteidentiske. 1546 native totalt. De seks resultat-SHA-ene er uendret. Kvittering i mottak-publisert.json.
+
+Et avgrenset søk etter flere gjenbruksmuligheter er gjort mot 17 allerede fullstendig motor-/visuelt kontrollerte ark med aktuell resultat-SHA. Deres 68 unike originale RGBA-utsnitt ga ingen eksakte treff i de uleverte figurjobbene. Dette gjelder bare det strenge utvalget, ikke all eldre grafikk. Ingen nye ruter er produsert eller telt av denne analysen. Se gjenbruk-muligheter.json.
