@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image
+import hashlib, json, shutil
+
+ART=Path('/home/tom/Sam-Max-HD/work/.gpt-gren')
+REPORT=ART/'rapporter/sam-automat-20261019'
+plan=json.loads((REPORT/'ruteplan-unik.json').read_text())
+groups={'A':list(range(6)), 'B':list(range(8,13)), 'C':list(range(13,18)), 'D':[6,7,18,19,20]}
+for label,indices in groups.items():
+    out=Image.new('RGB',(1536,1024),(128,128,128))
+    out.paste((255,0,255),(64,32,1472,992))
+    x,y=4,4
+    for k,idx in enumerate(indices):
+        p=plan['ruter'][idx]
+        sx,sy,w,h=p['rekt']
+        orig=Image.open(ART/'jobber'/p['kildejobb']/'original_1x.png').convert('RGBA')
+        crop=orig.crop((sx,sy,sx+w,sy+h))
+        assert hashlib.sha256(crop.tobytes()).hexdigest()==p['rgba_sha256']
+        scale=1
+        if label in ('B','C') and k==3: x,y=4,90
+        if label=='D':
+            x,y=[(4,4),(132,10),(184,10),(132,92),(218,92)][k]
+            scale=4
+        assert x+w*scale<=352 and y+h*scale<=240
+        out.paste(crop.convert('RGB').resize((w*4*scale,h*4*scale),Image.Resampling.NEAREST),(64+x*4,32+y*4))
+        p.update(tegneark=label,tegneboks_1x=[x,y,w*scale,h*scale],kilde_forstorrelse=scale)
+        x+=w+8
+    out.save(REPORT/f'unik-{label}-referanse.png')
+(REPORT/'ruteplan-unik.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,REPORT/'klargjor-tegneark.py.txt')
+print('21 unike originaler, fire tegningsgrunnlag, alle 44 produksjonsruter beholdt.')

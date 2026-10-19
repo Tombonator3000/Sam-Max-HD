@@ -1,0 +1,61 @@
+from pathlib import Path
+import importlib.util, json, hashlib, re, shutil
+
+REPO=Path('/home/tom/Sam-Max-HD');OUT=REPO/'out/sam-automat-20261019'
+REPORT=REPO/'work/.gpt-gren/rapporter/sam-automat-20261019'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+receipt=json.loads((OUT/'mottak220/myke.json').read_text())
+assert receipt['ruter_ok']==44 and receipt['ruter_sjekk']==receipt['ruter_mangler']==0
+shutil.copy2(OUT/'mottak220/myke.json',REPORT/'myke220-kvittering.json')
+base=REPO/'mods/gpt';candidate=OUT/'mod-kandidat'
+assert not candidate.exists()
+shutil.copytree(base,candidate)
+entries=[]
+for job,sheet in receipt['ark'].items():
+    for name,cel in sheet['ruter'].items():
+        assert cel['status']=='ok' and cel['i_modden']
+        src=OUT/'mottak220'/cel['fil'];dest=candidate/cel['fil']
+        assert not dest.exists() and sha(src)==cel['sha256']
+        shutil.copy2(src,dest)
+        entries.append({'jobb':job,'bilde':name,'fil':cel['fil'],'sha256':sha(dest),
+                        'animasjon':cel['animasjon'],'retning':cel['retning'],'lag':cel['lag']})
+meta=json.loads((candidate/'mod.json').read_text());assert meta['costume_cels']==1546
+meta['costume_cels']+=len(entries)
+assert 'costume220' not in meta['costumes'];meta['costumes'].append('costume220');meta['costumes'].sort()
+(candidate/'mod.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
+(REPORT/'tillegg.json').write_text(json.dumps({'tillegg':entries},ensure_ascii=False,indent=2)+'\n')
+
+spec=importlib.util.spec_from_file_location('kontroll',REPO/'out/inventoryknapp-20261016/kontroll.py')
+k=importlib.util.module_from_spec(spec);spec.loader.exec_module(k);k.ROOT=OUT
+pkg=REPO/'out/felles-release-20261019/linux/squashfs-root/usr'
+k.NEW=pkg/'bin/scummvm';k.LIB=pkg/'lib';k.PROJECT=pkg/'share/sam-max-hd'
+checks=lambda log:[{'frame':int(f),'avvik':int(n)} for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+rows=[];seen=set()
+for anim in (1,7,8,9,10):
+    env={'DIGHD_TEST_ROOM':'43','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'220',
+         'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1',
+         'DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'160,180','DIGHD_DUMP_EVERY':'4',
+         'DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)}
+    label=f'sam220-final-anim{anim}'
+    row=k.run(label,k.NEW,env,240,candidate)
+    log=(OUT/label/'scummvm.log').read_text(errors='replace');actual=checks(log)
+    baseline=checks((OUT/f'baseline220-anim{anim}'/'scummvm.log').read_text(errors='replace'))
+    row.update(animasjon=anim,kontroller=actual,tegnede_ruter=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*220',log))))
+    seen.update(row['tegnede_ruter'])
+    assert row['exit']==0 and row['dumps'] and actual
+    assert [c for c in actual if c['frame']<40 and c['avvik']]==[c for c in baseline if c['frame']<40 and c['avvik']]
+    assert not [c for c in actual if c['frame']>=40 and c['avvik']]
+    rows.append(row);(REPORT/'motor-runder.json').write_text(json.dumps(rows,indent=2)+'\n')
+expected={int(e['bilde'].split('_')[1]) for e in entries}
+summary={'runder':len(rows),'ruter_forventet':len(expected),'ruter_tegnet':len(expected&seen),'mangler_i_avspilling':sorted(expected-seen),
+         'skjermbufferkontroller':sum(len(r['kontroller']) for r in rows),
+         'kontroller_fra_figurstart':sum(c['frame']>=40 for r in rows for c in r['kontroller']),
+         'avvik_fra_figurstart':sum(c['avvik'] for r in rows for c in r['kontroller'] if c['frame']>=40),
+         'oppstartsavvik':[{'animasjon':r['animasjon'],**c} for r in rows for c in r['kontroller'] if c['avvik']],
+         'produksjonsbinar_sha256':sha(k.NEW),'produksjonsbinar':'Linux-pakken 19. oktober',
+         'lokal_retningskrok':False,'naturlig_gjennomspilling':False,'baseline':'d31c30f2, fem animasjoner i samme produksjonsmotor'}
+(REPORT/'motor-oppsummering.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+assert not expected-seen,sorted(expected-seen)
+print(json.dumps(summary),flush=True)
+shutil.copy2(__file__,REPORT/'kandidat-og-motor.py.txt')
+shutil.copy2(OUT/'motor-baseline.py',REPORT/'motor-baseline.py.txt')

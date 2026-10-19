@@ -1,0 +1,78 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import hashlib, json, numpy as np, shutil, zipfile, subprocess
+
+REPO=Path('/home/tom/Sam-Max-HD');ART=REPO/'work/.gpt-gren'
+REPORT=ART/'rapporter/sam-automat-20261019';OUT=REPO/'out/sam-automat-20261019';MOD=OUT/'mod-kandidat'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+protected=json.loads((REPORT/'beskyttede-kilder.json').read_text())
+assert len(protected)==32 and all(sha(ART/p)==h for p,h in protected.items())
+base=json.loads((REPORT/'grunnlag-filer-d31c30f2.json').read_text())
+files={p.relative_to(MOD).as_posix():sha(p) for p in MOD.rglob('*') if p.is_file()}
+assert set(base)<=set(files)
+assert {p for p,h in base.items() if files[p]!=h}=={'mod.json'}
+entries=json.loads((REPORT/'tillegg.json').read_text())['tillegg']
+assert len(entries)==44 and {e['fil'] for e in entries}==set(files)-set(base)
+for e in entries:
+    assert files[e['fil']]==e['sha256']
+    im=Image.open(MOD/e['fil']);a=np.array(im)
+    assert im.mode=='RGBA' and im.width%4==0 and im.height%4==0
+    assert (a[:,:,3]==0).any() and (a[:,:,3]>128).any()
+    assert not ((a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0)).any()
+meta=json.loads((MOD/'mod.json').read_text());oldmeta=json.loads((REPO/'mods/gpt/mod.json').read_text())
+assert meta['costume_cels']==1590 and len(list((MOD/'costumes').glob('*_hd.png')))==1590
+assert set(meta)==set(oldmeta)
+assert {k for k in meta if meta[k]!=oldmeta[k]}=={'costume_cels','costumes'}
+assert set(oldmeta['costumes'])<set(meta['costumes']) and set(meta['costumes'])-set(oldmeta['costumes'])=={'costume220'}
+plan=json.loads((REPORT/'ruteplan-unik.json').read_text())['ruter']
+assert len(plan)==21 and sum(len(p['malruter']) for p in plan)==44
+bycel={e['bilde']:e for e in entries}
+for p in plan:
+    x,y,w,h=p['rekt'];reference=np.array(Image.open(ART/'jobber'/p['kildejobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h)))
+    hashes=[]
+    for target in p['malruter']:
+        source=Image.open(ART/'jobber'/target['jobb']/'original_1x.png').convert('RGBA')
+        x,y,w,h=target['rekt'];assert np.array_equal(np.array(source.crop((x,y,x+w,y+h))),reference)
+        hashes.append(bycel[target['bilde']]['sha256'])
+    assert len(set(hashes))==1
+# Alle tre 4x4-grådelene og alle små grå prikker er kildebekreftet.
+pebbles=[];graypoints=[]
+for cel in (1670,1671,1672):
+    p=next(p for p in plan if p['bilde']==f'costume220_{cel}');x,y,w,h=p['rekt']
+    a=np.array(Image.open(ART/'jobber'/p['kildejobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h)))
+    mask=(a[:,:,3]>0)&~(a[:,:,:3]==[255,0,255]).all(2);labels,n=nd.label(mask)
+    for k,s in enumerate(nd.find_objects(labels),1):
+        hit=labels==k;size=int(hit.sum())
+        if size==12:
+            cut=a[s].copy();cut[labels[s]!=k]=0;pebbles.append(cut)
+        if size==1 and (a[hit,:3]==[71,71,71]).all():graypoints.append([cel,int(s[1].start),int(s[0].start)])
+assert len(pebbles)==3 and np.array_equal(pebbles[1],pebbles[0][::-1]) and np.array_equal(pebbles[1],pebbles[2]) and len(graypoints)==8
+visual=json.loads((REPORT/'visuelle-kontrollbilder.json').read_text())
+assert visual['antall']==44 and {r['bilde'] for r in visual['ruter']}==set(bycel)
+motor=json.loads((REPORT/'motor-oppsummering.json').read_text());assert motor['ruter_tegnet']==44 and motor['avvik_fra_figurstart']==0
+f=json.loads((REPORT/'fremdrift.json').read_text())
+assert len(f['leveranser'])==8 and all(e['egenkontroll']=='OK' for e in f['leveranser'])
+for e in f['leveranser']:
+    assert sha(ART/e['resultat'])==e['sha256']
+    e.update(native_mottatt=True,visuelt_kontrollert=True,motoravspilt=True,importert=False)
+(REPORT/'fremdrift.json').write_text(json.dumps(f,ensure_ascii=False,indent=2)+'\n')
+pngs=sum(p.endswith('.png') for p in files);assert pngs==19826
+summary={'beskyttede_kilder_uendret':32,'tidligere_png_byteidentiske':19782,'tidligere_filer_bevart':len(base),
+         'endrede_tidligere_filer':['mod.json'],'nye_native':44,'native_totalt':1590,'png_totalt':pngs,
+         'figurjobber_med_resultat':len(list((ART/'jobber').glob('fig*/resultat.png'))),'figurjobber_totalt':1758,
+         'unike_originalruter':21,'produksjonsruter':44,'alle_kildealiaser_og_native_filer_eksakt_like':True,
+         'graa_deler_4x4_samme_kilde_med_vending':3,'graa_enkeltprikker_bevart':8,'lokal_stash_antall':len(subprocess.check_output(['git','stash','list'],cwd=REPO,text=True).splitlines())}
+assert summary['figurjobber_med_resultat']==159 and summary['lokal_stash_antall']==3
+(REPORT/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+manifest={}
+with zipfile.ZipFile(REPORT/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+    for prefix in ('baseline220-anim','sam220-for-delvending-anim','sam220-final-anim'):
+        paths=sorted(OUT.glob(prefix+'*/scummvm.log'));assert len(paths)==5
+        for p in paths:
+            rel=p.relative_to(OUT).as_posix();z.write(p,rel);manifest[rel]=sha(p)
+(REPORT/'motorlogger-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+assert len(manifest)==15  # Fem baseline, fem før delvending og fem endelige prøver.
+for src in ('visuell-sluttkontroll.py','sluttkontroll.py'):
+    shutil.copy2(OUT/src,REPORT/(src+'.txt'))
+print(json.dumps(summary,ensure_ascii=False))

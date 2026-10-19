@@ -109,14 +109,14 @@ Figurark for Sam og Max.
 
 Figurark for Sam.
 
-- [ ] `fig220_01` (figurark 1 for Sam (kostyme 220), 8 ruter: start mot høyre (6 ruter); start (lag 14, tegnes over kroppen) mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig220_02` (figurark 2 for Sam (kostyme 220), 5 ruter: animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig220_03` (figurark 3 for Sam (kostyme 220), 5 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig220_04` (figurark 4 for Sam (kostyme 220), 5 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig220_05` (figurark 5 for Sam (kostyme 220), 5 ruter: animasjon 8 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig220_06` (figurark 6 for Sam (kostyme 220), 5 ruter: animasjon 8 (lag 14, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig220_07` (figurark 7 for Sam (kostyme 220), 10 ruter: animasjon 8 (lag 15, tegnes over kroppen) mot høyre (5 ruter); animasjon 9 mot høyre (4 ruter); animasjon 9 (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig220_08` (figurark 8 for Sam (kostyme 220), 1 rute: animasjon 10 mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig220_01` (figurark 1 for Sam (kostyme 220), 8 ruter: start mot høyre (6 ruter); start (lag 14, tegnes over kroppen) mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig220_02` (figurark 2 for Sam (kostyme 220), 5 ruter: animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig220_03` (figurark 3 for Sam (kostyme 220), 5 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig220_04` (figurark 4 for Sam (kostyme 220), 5 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig220_05` (figurark 5 for Sam (kostyme 220), 5 ruter: animasjon 8 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig220_06` (figurark 6 for Sam (kostyme 220), 5 ruter: animasjon 8 (lag 14, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig220_07` (figurark 7 for Sam (kostyme 220), 10 ruter: animasjon 8 (lag 15, tegnes over kroppen) mot høyre (5 ruter); animasjon 9 mot høyre (4 ruter); animasjon 9 (lag 15, tegnes over kroppen) mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig220_08` (figurark 8 for Sam (kostyme 220), 1 rute: animasjon 10 mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig110_01` (figurark 1 for Sam (kostyme 110), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig110_02` (figurark 2 for Sam (kostyme 110), 14 ruter: start mot høyre (8 ruter); animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 

@@ -1,0 +1,33 @@
+Task: faithful HD remaster of a sheet of animation frames from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. Every frame replaces one original frame in the game, at the same size and position, and the frames are played one after another.
+
+Input: the attached image is the original low-resolution sheet enlarged exactly 4x with hard pixel edges. The frames stand apart on a plain flat magenta background (#FF00FF). Around the sheet is a plain gray (#808080) border. The background and the border are only padding.
+
+What the sheet shows: Sam, the dog detective (a big brown dog in a light blue-gray suit, white shirt, striped dark blue tie and a blue-gray fedora). The description is only a help; the input image decides. On this sheet, row by row from left to right: animation 10, facing right (1 frame). The game mirrors the frames facing right when the character faces left, so there are no frames facing left; do not add any.
+
+Size rule (most important): draw every frame at exactly the size it has in the input, with the same height, the same width and the same proportions of head, body, arms, legs and props. One input pixel is 4 output pixels for every frame on this sheet and on every other sheet of this character, so the character never grows, shrinks or changes shape between frames. The frame on this sheet is 108 x 192 pixels in the input (the box around its visible pixels).
+
+Do:
+- Trace every frame at 4x in high resolution, so it looks like the characters of Day of the Tentacle Remastered next to their originals: keep the pose, silhouette and proportions, and turn every cluster of pixels into the shape it shows (glasses, a tie, a shoe). Clean dark anti-aliased outlines with a little variation in weight, flat colors with one shade and a few highlights, the same color for every area as in the input. No dithering, no texture, no gradients, no pixel steps.
+- Keep the original design: the same character, the same colors, light direction, shadows and contrast as in the input.
+- Make all frames look identical apart from the pose: the same face, eyes, hat, clothes, colors and light in every frame. Any difference between frames flickers in the game.
+- Keep the pose and silhouette of every frame, and keep each frame in its place on the sheet, in the same rows and the same order.
+- Glowing effects (light, lightning, sparks, fire) are painted as soft glow that fades into transparency.
+
+Do not:
+- Do not add, remove, merge, split or redesign frames.
+- Do not add anything that is not in the input: no new props, accessories, patterns, logos, text, shadows, floor, numbers, labels, frames or grid lines.
+- Do not change colors, clothes or proportions, and do not make heads, hands or eyes bigger than in the input.
+- Some frames show only part of the character (a body without a head, a head alone, an arm), because the game draws the parts separately. Paint them as they are and do not complete them.
+- Do not let frames touch or overlap each other.
+- No photorealism, no modern 3D look, no film grain, no vignette, no watermark, no signature.
+
+Output: one PNG image, exactly 1536 x 1024 pixels, with a fully transparent background (real alpha: no background color and no gray border) and every frame in the same place as in the input. Before delivering, run python3 verktoy/sjekk_leveranse.py jobber/fig220_08/resultat.png and redo the frames it reports as too big, too small, moved or missing. List the delivery with its sha256 in the fremdrift.json of your report and add a rutekart (the box around each frame's drawing, alpha above 128).
+
+If a second image is attached, it is the approved master sheet (hovedark) of this character, or an already approved HD sheet of the same character, or an approved HD picture from the same game. Paint the character exactly as in that image: the same face, hair, clothes, colors and level of detail. Take every pose, size and position from the first image. If a third image is attached, it is the master sheet of the second character on the sheet.
+
+
+Source-verified correction and temporary staging layout:
+The generic description above is inaccurate for the pictured contents. Image 1 contains FIVE separate robot/control-part drawings, not Sam: one red maintenance robot from room 43 Bumpusville at left and FOUR small control/cover fragments to its right. Image 2 is Sam's approved master sheet for clean dark line and flat-shaded color treatment only; do NOT draw Sam or a character face. The five source crops have been enlarged 4 times extra only for this staging reference, so keep every part's proportions as shown.
+The red maintenance robot at left has a low broad gray arched frame above a black inset with a green horizontal strip and two tiny pale yellow lights, a red top cap and two small gray lateral antenna/propeller prongs at the very top, a broad red horizontal rim, red angular cylindrical lower body with a square red panel at left and a stepped/notched shape at right, a gray connector below and a small dark gray rounded wheel. Retain the open negative space under the arch. This is not a beverage dispenser or a human figure. Keep its simple original surfaces; no extra labels, windows, arms or buttons.
+Four fragments at right, read upper row left to right then lower row left to right: (1) simple upright red L/stepped cover, (2) open gray horizontal control tray with blue connector, a black gap and a thin orange/red horizontal wire, (3) same control tray in a different closing state, with red side cover visible on its right and orange wire left, (4) almost closed vertical red side panel with narrow gray/black/orange strip at left. Keep each fragment separate, without completing a whole robot around it. Image 1 decides these exact shapes/colors, no new circuitry.
+Produce exactly five separate smooth dark-outlined cartoon drawings in exactly this staging arrangement. Fully transparent RGBA, no painted background, checkerboard, fog, haze, colored glow, floor, cast shadow or halo. Pixel clusters become smooth contours. Output 1536x1024.

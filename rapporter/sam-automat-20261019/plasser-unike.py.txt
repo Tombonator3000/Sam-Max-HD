@@ -1,0 +1,98 @@
+"""Rens generert alfa og plasser tegninger etter originale rektangler.
+
+Ingen original pikselmaske klipper nye tegninger. Små originale grå deler
+plasseres separat fra den genererte grå delen, ikke fra originale piksler.
+"""
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np, json, hashlib, shutil, subprocess
+
+REPO=Path('/home/tom/Sam-Max-HD');ART=REPO/'work/.gpt-gren'
+REPORT=ART/'rapporter/sam-automat-20261019'
+plan=json.loads((REPORT/'ruteplan-unik.json').read_text())['ruter']
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+specs={}
+for cel,k in zip(range(1664,1670),[4,5,6,3,1,2]):
+    specs[f'costume220_{cel}']={'raw':'unik-A-raa01.png','ids':[k]}
+for cel,ids in [(1673,[11]),(1674,[10])]:
+    specs[f'costume220_{cel}']={'raw':'unik-B-raa01.png','ids':ids}
+for cel,ids in [(1675,[6,7,1]),(1676,[8,3]),(1677,[4,5,2]),(1678,[9]),(1679,[10])]:
+    specs[f'costume220_{cel}']={'raw':'unik-C-raa01.png','ids':ids}
+for cel,k in [(1808,1),(1937,2),(1682,3),(1683,4),(1684,5)]:
+    specs[f'costume220_{cel}']={'raw':'unik-D-raa01.png','ids':[k]}
+
+# Animasjonsrestene langt fra hovedmotivet skal ikke gjøre Sam bredere.
+# Bare rektangler og komponentidentitet fra originalen styrer plasseringen.
+for cel,core,rect,pebble,points in [
+    (1670,1,[2,0,87,69],[11,36,4,4],[(18,38),(19,40),(0,52)]),
+    (1671,3,[21,0,79,64],[9,23,4,4],[(92,46),(64,48),(65,49),(0,53),(61,53)]),
+    (1672,2,[47,0,69,68],[0,35,4,4],[])]:
+    parts=[{'ids':[core],'rekt':rect},{'ids':[6],'rekt':pebble,'kildedel':'grå 4x4-del','vend_vertikalt':cel in (1671,1672)}]
+    parts.extend({'ids':[7],'rekt':[x,y,1,1],'kildedel':'grå enkeltprikk'} for x,y in points)
+    specs[f'costume220_{cel}']={'raw':'unik-B-raa01.png','deler':parts}
+(REPORT/'prototyper-rawvalg.json').write_text(json.dumps(specs,ensure_ascii=False,indent=2)+'\n')
+
+cache={};audit=[];prototypes={}
+def drawing(raw,ids,size):
+    if raw not in cache:
+        a=np.array(Image.open(REPORT/raw).convert('RGBA'));labels,_=nd.label(a[:,:,3]>220)
+        cache[raw]=(a,labels)
+    a,labels=cache[raw];core=np.isin(labels,ids);yy,xx=np.nonzero(core)
+    assert len(xx)>10
+    x0,y0,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1
+    xa,ya,xb,yb=max(0,x0-2),max(0,y0-2),min(a.shape[1],x1+2),min(a.shape[0],y1+2)
+    local=core[ya:yb,xa:xb];cut=a[ya:yb,xa:xb].copy()
+    distance,nearest=nd.distance_transform_edt(~local,return_indices=True);permitted=distance<=1.5
+    cut[:,:,3][~permitted|((labels[ya:yb,xa:xb]>0)&~local)]=0
+    edge=permitted&~local;cut[:,:,:3][edge]=cut[nearest[0][edge],nearest[1][edge],:3]
+    im=Image.fromarray(cut).crop((x0-xa,y0-ya,x1-xa,y1-ya)).resize(size,Image.Resampling.LANCZOS)
+    clean=np.array(im);hit=(clean[:,:,:3]==[255,0,255]).all(2)&(clean[:,:,3]>0)
+    if hit.any():
+        assert (clean[:,:,3][hit]<=2).all()
+        _,nearest=nd.distance_transform_edt(clean[:,:,3]<128,return_indices=True)
+        clean[:,:,:3][hit]=clean[nearest[0][hit],nearest[1][hit],:3]
+    return Image.fromarray(clean),{'raw':raw,'komponenter':ids,'raw_boks':[x0,y0,x1,y1],'mal':size,'rgb_avrundingsrens':int(hit.sum())}
+
+for pose in plan:
+    name=pose['bilde'];spec=specs[name];_,_,w,h=pose['rekt'];im=Image.new('RGBA',(w*4,h*4));details=[]
+    parts=spec.get('deler',[{'ids':spec.get('ids'),'rekt':[0,0,w,h]}])
+    for part in parts:
+        x,y,pw,ph=part['rekt'];draw,detail=drawing(spec['raw'],part['ids'],(pw*4,ph*4))
+        if part.get('vend_vertikalt'):draw=draw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+        im.alpha_composite(draw,(x*4,y*4));details.append({**detail,'plassering_1x':part['rekt'],'kildedel':part.get('kildedel'),'vend_vertikalt':part.get('vend_vertikalt',False)})
+    path=REPORT/(name+'-prototype.png');im.save(path);prototypes[name]=im
+    audit.append({'bilde':name,'prototype_sha256':sha(path),'deler':details,'original_pikselmaske_brukt':False})
+
+progress={'dato':'2026-10-19','verktøy':'innebygd image_gen','modell':'Eksakt modellnavn ikke vist',
+          'faktiske_bildekall':[f'unik-{label}-raa01.png' for label in 'ADBC'],
+          'leveranser':[],'merknad':'21 unike originale RGBA-utsnitt gir 44 produksjonsruter. Delte kall skal ikke summeres per jobb.'}
+for i in range(1,9):
+    name=f'fig220_{i:02}';d=ART/'jobber'/name;j=json.loads((d/'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));maps=[]
+    for cel in j['ruter']:
+        pose=next(p for p in plan if any(t['bilde']==cel['bilde'] for t in p['malruter']))
+        x,y,w,h=cel['rekt'];source=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h))
+        assert hashlib.sha256(source.tobytes()).hexdigest()==pose['rgba_sha256']
+        im=prototypes[pose['bilde']];assert im.size==(w*4,h*4)
+        dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;out.alpha_composite(im,(dx,dy))
+        yy,xx=np.nonzero(np.array(im)[:,:,3]>128)
+        maps.append({'bilde':cel['bilde'],'kostyme':220,'rute':cel['rute'],
+                     'rect':[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],
+                     'representant':pose['bilde'],'kilde_rgba_sha256':pose['rgba_sha256'],
+                     'prototype':pose['bilde']+'-prototype.png','raw':specs[pose['bilde']]['raw']})
+    out.save(d/'resultat.png');digest=sha(d/'resultat.png')
+    (REPORT/f'rutekart-{name}.json').write_text(json.dumps({name:{'sha256_resultat':digest,'ruter':maps}},ensure_ascii=False,indent=2)+'\n')
+    progress['leveranser'].append({'jobb':name,'resultat':f'jobber/{name}/resultat.png','sha256':digest,'ruter':len(maps),
+        'rutekart':f'rapporter/sam-automat-20261019/rutekart-{name}.json','delte_bildekall':sorted(set(m['raw'] for m in maps)),
+        'egenkontroll':'ikke kjørt','native_mottatt':False,'visuelt_kontrollert':False,'motoravspilt':False,
+        'importert':False,'godkjent_av_Tom':False,'claude_kontroll':False})
+(REPORT/'prototype-kvitteringer.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n')
+(REPORT/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,REPORT/'plasser-unike.py.txt')
+for row in progress['leveranser']:
+    r=subprocess.run([str(REPO/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',row['resultat']],cwd=ART,capture_output=True,text=True)
+    (REPORT/(row['jobb']+'-egenkontroll.txt')).write_text(r.stdout+r.stderr)
+    print(row['jobb'],r.returncode,r.stdout[-500:])
+    assert r.returncode in (0,1,2)
+    row['egenkontroll']={0:'OK',1:'SJEKK',2:'FEIL'}[r.returncode]
+(REPORT/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
