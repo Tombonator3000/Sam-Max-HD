@@ -1042,3 +1042,7 @@ Egenkontroll 64 OK, 11 SJEKK om omriss, 0 FEIL; separat native mottak 75 OK med 
 
 
 Neste kildeklargjøring: alle fem originalforløp for168/336 er sett. Rom35 gir61 avvik ved frame36 og27 ved40,44,48,52,56, deretter null fra60, likt i alle tre168-animasjoner før noen ny168-grafikk er laget. Den strenge nulltesten stoppet på dette; funnet og første kontrollkode er bevart. Kamera/fiskeobjekter flyttes i prøven. Dette er ikke rettet eller erklært grønt. Rom86/336 har det kjente160-avviket ved36 og null fra40. Prioriter de uavhengige336-arkene mens168-grunnlaget undersøkes. Se rapporter/sam-boey-og-slutt-20261019/KLARGJORT.md på gpt-arbeid. Ingen nye resultater eller bildekall i denne klargjøringen.
+
+
+Presisering fra mottakskildene: samtlige75 hele ruter kommer fra nytegnede ark, ingen hel rute bruker originalfragment-fallback. Det eksisterende v6-mottaket har i tillegg lagt inn26 kildebekreftede originalpiksler fordelt på8 ruter som utliggere der det fant hull i den importerte tegningen. Disse er skalert mykt med forhåndsmultiplisert Lanczos og ekte alfa. De er ikke nytegnet i selve native-tillegget, selv om resultatarkene har genererte smådeler. Dette er bevart og dokumentert i native-utliggertillegg.json; ikke kall alle native-piksler AI-genererte. Ingen bilde eller motor/pipeline er endret av denne presiseringen.
+ Se gpt-arbeid/rapporter/frog-rock-og-tau-20261019/native-utliggertillegg.json.
