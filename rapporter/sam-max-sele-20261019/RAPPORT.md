@@ -33,3 +33,5 @@ Grunnlag: hd-mod69d5f1ff15fd1b9c7b388a74041b65ccf83d8ec1 med1736 native. Kandida
 Den eksisterende felles Linux-/Windows-releasen sam-max-hd-2026-10-19-kveld har1654 native. Den mangler nå82 gripearmruter og disse40 strikkrutene,122 i alt. Neste samlepakke må lastes ned og sammenlignes før den kalles oppdatert. Ingen ny grafikk går til main.
 
 Neste uavhengige serie er fig215_01 til04, Sam ved Frog Rock i rom41,48 spillruter. Betydningen av de gule delene ved føttene skal kontrolleres mot originalmotor og spillkontekst før nytegning. Fig300_01 til04, Sam med langt tau i rom58,27 ruter, kan tas i samme praktiske bunke etter egen kildekontroll. Avviste golf-E- og VR-G-grunnlag bestilles ikke på nytt.
+
+Publisering bekreftet: kildecommit 9b6da3b8a40694663f857c43ad8250030ac0a428, hd-mod 6513908aa6d47dd73abd58f6f101ff9641c25d6b. Alle 20 012 kandidat-PNG-er stemmer etter tilbakehenting; alle 19 972 tidligere PNG-er er byteidentiske. Alle 40 nye native-SHA-er er verifisert. Native totalt1776. Se mottak-publisert.json.

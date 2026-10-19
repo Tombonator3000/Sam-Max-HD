@@ -1,0 +1,38 @@
+from pathlib import Path
+import hashlib,json,subprocess,datetime,shutil
+repo=Path('/home/tom/Sam-Max-HD');art=repo/'work/.gpt-gren';r=art/'rapporter/sam-max-sele-20261019'
+candidate=repo/'out/sam-max-sele-20261019/mod-kandidat';fetched=repo/'mods/gpt'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def snapshot(root):return {p.relative_to(root).as_posix():sha(p) for p in root.rglob('*') if p.is_file()}
+base=json.loads((r/'grunnlag-filer-69d5f1ff.json').read_text());actual=snapshot(fetched);expected=snapshot(candidate)
+assert len(actual)==20018 and set(actual)==set(expected)
+assert {p for p in expected if expected[p]!=actual[p]}=={'SHA256SUMS'}
+assert all(actual[p]==h for p,h in expected.items() if p.endswith('.png'))
+assert all(actual[p]==h for p,h in base.items() if p.endswith('.png'))
+assert {p for p,h in base.items() if actual[p]!=h}=={'mod.json','SHA256SUMS'}
+entries=json.loads((r/'tillegg.json').read_text())['tillegg'];assert len(entries)==40
+assert all(actual[e['fil']]==e['sha256'] for e in entries)
+assert sum(p.endswith('.png') for p in actual)==20012 and len(list((fetched/'costumes').glob('*_hd.png')))==1776
+assert json.loads((fetched/'mod.json').read_text())['costume_cels']==1776
+protected=json.loads((r/'beskyttede-kilder.json').read_text());assert len(protected)==20 and all(sha(art/p)==h for p,h in protected.items())
+source=subprocess.check_output(['git','rev-parse','HEAD'],cwd=art,text=True).strip();assert source=='9b6da3b8a40694663f857c43ad8250030ac0a428'
+native=subprocess.check_output(['git','rev-parse','origin/hd-mod'],cwd=repo,text=True).strip()
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=repo,text=True).split()[0]
+assert remote==native=='6513908aa6d47dd73abd58f6f101ff9641c25d6b'
+stash=subprocess.check_output(['git','stash','list'],cwd=repo,text=True).splitlines();assert len(stash)==3
+f=json.loads((r/'fremdrift.json').read_text())
+for e in f['leveranser']:
+    assert sha(art/e['resultat'])==e['sha256']
+    e.update(native_mottatt=True,visuelt_kontrollert=True,motoravspilt=True,importert=True,publisert=True,kildecommit=source,hd_mod_sha=native)
+(r/'fremdrift.json').write_text(json.dumps(f,ensure_ascii=False,indent=2)+'\n')
+receipt=dict(utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),kildecommit=source,hd_mod_grunnlag='69d5f1ff15fd1b9c7b388a74041b65ccf83d8ec1',hd_mod_sha=native,
+ nye_native=40,native_totalt=1776,alle_kandidat_png_verifisert=20012,tidligere_png_byteidentiske=19972,tidligere_filer_bevart=19978,endrede_tidligere_filer=['mod.json','SHA256SUMS'],
+ nye_native_sha_verifisert=True,nedlastet_igjen=True,sha256sums_kontrollert=True,beskyttede_kilder_uendret=20,tre_stasher_bevart=True,figurjobber_med_resultat=175,figurjobber_totalt=1758,
+ egenkontroll=dict(ok=32,sjekk=8,feil=0),native_mottak=dict(ok=40,sjekk=0,mangler=0,teknisk=0),visuelt_sett=40,motorobservert=40,motor_kontroller=150,fra_figurstart=132,avvik_fra_figurstart=0,kjente_oppstartsavvik=dict(antall=2,frame=36,avvik=160,identisk_med_grunnlag=True),
+ naturlig_gjennomspilling=False,ny_Tom_godkjenning=False,separat_Claude_kontroll=False,
+ nedlastingspakker=dict(release='sam-max-hd-2026-10-19-kveld',native=1654,mangler_denne_bunken=40,mangler_siden_pakken=122,oppdateres_ved_samlepunkt=True),tillegg=entries)
+(r/'mottak-publisert.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+(r/'RAPPORT.md').write_text((r/'RAPPORT.md').read_text()+f'\nPublisering bekreftet: kildecommit {source}, hd-mod {native}. Alle 20 012 kandidat-PNG-er stemmer etter tilbakehenting; alle 19 972 tidligere PNG-er er byteidentiske. Alle 40 nye native-SHA-er er verifisert. Native totalt1776. Se mottak-publisert.json.\n')
+(r/'PAAGAR.md').write_text(f'# Bunken er publisert og hentet tilbake\n\nFem fig309-ark,40 nye native. Kilde {source}, hd-mod {native},1776 totalt. Alle nye og tidligere PNG-hasher verifisert etter hent. Alle40 visuelt sett og motorobservert;132 nullkontroller fra figurstart. Egenkontroll32 OK,8 SJEKK, native40 OK. Ingen ny Tom-/Claude-godkjenning. Ikke bestill nye309-bilder. Neste fig215_01 til04 og eventuelt fig300_01 til04. Pakken har1654 og mangler122 siden forrige samlepunkt.\n')
+shutil.copy2(Path(__file__),r/'bekreft-publisering.py.txt')
+print(json.dumps({k:v for k,v in receipt.items() if k!='tillegg'},ensure_ascii=False))
