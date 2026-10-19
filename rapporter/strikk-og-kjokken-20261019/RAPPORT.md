@@ -39,3 +39,5 @@ Direkte telling etter de sju arkene: 135 av 1758 figurjobber har resultat; 1623 
 ![To av de nye spillrutene](forhandsvisning.png)
 
 [Max på kjøkkenet fra motorprøven](max-kjokken-motor.png)
+
+Publisert og hentet tilbake 2026-10-19T17:11:54.663662+02:00: kildecommit 2ef799f80980155e0f39d8216c316c9536aee4ca, hd-mod db0b45d78fd3a78ac361c6e78c8640d88e889eca. Alle 19 700 kandidat-PNG-er og alle 78 nye native SHA-er er bekreftet i publisert modd. Alle 19 622 tidligere PNG-er er bevart, 1464 native totalt. SHA256SUMS godkjent ved hent. Se mottak-publisert.json.

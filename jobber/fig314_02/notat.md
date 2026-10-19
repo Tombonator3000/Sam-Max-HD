@@ -10,4 +10,4 @@ Python-rensing/plassering bruker Toms tidligere uttrykkelige tillatelse. Ekte al
 
 Egenkontroll OK med uendrede grenser. Separat native mottak: alle 6 OK, null til gjennomsyn. Alle 6 sett som original/native/motorutsnitt og registrert tegnet i produksjonsmotoren uten lokal retningskrok. Hele bunken: fem tvungne prøver, 78 ruter, 250 skjermbufferkontroller, 205 fra figurstart uten avvik. Max på kjøkkenet har null i alle 100 målinger; tre rom 61-prøver har hver kjent avvik 160 ved frame 36 før figurstart. Dette er ikke en motorretting eller naturlig gjennomspilling.
 
-Separat Claude-kontroll og Toms nye stilgodkjenning gjenstår. Faktisk publisering/import kvitteres per SHA i fremdrift.json og mottak-publisert.json etter tilbakehenting fra hd-mod. Nedlastingspakkene fra 18. oktober er ikke bygget på nytt i denne runden.
+Separat Claude-kontroll og Toms nye stilgodkjenning gjenstår. Publisert og hentet tilbake 2026-10-19T17:11:54.663662+02:00 i hd-mod db0b45d78fd3a78ac361c6e78c8640d88e889eca. Alle 6 native SHA-er bekreftet; kvittering i fremdrift.json og mottak-publisert.json. Nedlastingspakkene fra 18. oktober er ikke bygget på nytt i denne runden.

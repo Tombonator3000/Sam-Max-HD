@@ -16,7 +16,9 @@ def sha(p):
 protected = json.loads((REPORT/'beskyttede-kilder.json').read_text())
 assert len(protected) == 28
 assert all(sha(ART/rel) == digest for rel, digest in protected.items())
-base_files = {p.relative_to(BASE).as_posix():sha(p) for p in BASE.rglob('*') if p.is_file()}
+baseline = json.loads((REPORT/'grunnlag-filer-f7a3f275.json').read_text())
+assert baseline['hd_mod'] == 'f7a3f275d62de5327d5a0d08153dfbc17ffdb9c9'
+base_files = baseline['filer']
 candidate_files = {p.relative_to(MOD).as_posix():sha(p) for p in MOD.rglob('*') if p.is_file()}
 assert set(base_files) <= set(candidate_files)
 changed = [rel for rel in base_files if base_files[rel] != candidate_files[rel]]
@@ -34,7 +36,7 @@ for e in additions:
     assert (a[:,:,3] == 0).any() and (a[:,:,3] > 128).any()
     assert not (((a[:,:,:3] == [255,0,255]).all(2)) & (a[:,:,3] > 0)).any()
 metadata = json.loads((MOD/'mod.json').read_text())
-oldmetadata = json.loads((BASE/'mod.json').read_text())
+oldmetadata = baseline['mod_json']
 assert metadata['costume_cels'] == 1464
 assert metadata['created'] == '2026-10-19'
 assert set(metadata) == set(oldmetadata)
