@@ -1,0 +1,13 @@
+# Neste bunke: Sam og Max i strikksele
+
+Fig309_01 til05, 40 spillruter, 35 eksakt ulike originale RGBA-utsnitt, 20 beskyttede SHA-er. Kostyme309, rom61, strikkhoppgrotten. Ingen eksisterende resultater eller returer i disse fem jobbene. Denne klargjøringen er ikke grafikkproduksjon og telles ikke som nye leveranser. Ingen bildekall er gjort for309.
+
+Alle fem hele originalark og begge godkjente hovedark/sam.png og max.png er sett. Begge originale motorforløp1 og7 er kjørt i den uendrede, nedlastede Linux-kveldsmotoren, og to kontaktark med seks spillbilder hver er sett. Hver prøve har75 skjermbufferkontroller, én kjent160 ved frame36 før testfiguren og ellers null. Native grunnlag69d5f1ff med1736 er bevart i grunnlag-filer-69d5f1ff.json. Spillets GJENNOMGANG.md rom61 og riktig kostyme309-rad i docs/figurer.csv er kontrollert. Ingen ekstern fortolkning trengs for det som fremgår tydelig her.
+
+Motiv: Sam og Max kommer opp fra strikkhopp, står sammen i Sam sin røde sele, og Sam setter Max ned igjen. Sam har de kildebekreftede gule/purpur strikkbrillene, blågrå dress/fedora, hvit skjorte og blått/svart slips. Max har lange lyse ører, kremhvit kropp, bar hud og karakteristisk smil. Sam-/Max-identiteten følger hovedarkene, posituren og de spesifikke tilbehørsfargene følger originalen.
+
+Viktige kildedeler: De første åtte rutene er bare grå krok og grønn/gul strikk med varierende rette, prikkede eller bøyde segmenter. De skal ikke fylles med figurer. De to neste rutene er delvise Sam-poser på vei inn i utsnittet, ikke hele figurer som mangler i uttrekket. Løse strikksegmenter nederst og små kildebekreftede deler er beholdt. Ikke rydd bort disse eller fyll transparente mellomrom. Flere senere hele kroppssilhuetter har både Sam, Max og strikk i samme rute. Ingen nye figurer skal legges til når Max har blitt satt ned utenfor den aktuelle celen.
+
+Bruk ruteplan-unik.json for35 kilder og alle40 runtime-ID-er, ikke tegn eksakt like aliaser på nytt. gjenbruk-sok.json søker de170 tidligere resultatjobbene etter eksakt kilde-RGBA. Treff alene er ikke ny godkjenning. Originalens beskyttede filer og prompter skal aldri endres; eventuelt supplerende motivpremiss lagres separat. Se kildene igjen før hvert bildekall.
+
+Fullfør disse fem jobbene med faktisk innebygd image_gen, råbilder og faktiske prompter, egenkontroll, native mottak, visuell original/native/motor-sammenligning og korrekt avspilling. Ikke bland dem med de ferdige82 fig152-rutene, eller bestill avvist golf-E/VR-G på nytt. Neste samlepakke må få de82 nye fig152-rutene pluss det som blir kontrollert før samlepunktet. Den eksisterende fellespakken har1654, den publiserte modden1736.

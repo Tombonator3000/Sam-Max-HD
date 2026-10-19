@@ -1,0 +1,34 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import importlib.util,json,hashlib,shutil,re
+REPO=Path('/home/tom/Sam-Max-HD');OUT=REPO/'out/sam-max-sele-20261019'
+REPORT=REPO/'work/.gpt-gren/rapporter/sam-max-sele-20261019'
+spec=importlib.util.spec_from_file_location('kontroll',REPO/'out/inventoryknapp-20261016/kontroll.py')
+k=importlib.util.module_from_spec(spec);spec.loader.exec_module(k);k.ROOT=OUT
+pkg=REPO/'out/felles-release-20261019-kveld/linux/squashfs-root/usr'
+k.NEW=pkg/'bin/scummvm';k.LIB=pkg/'lib';k.PROJECT=pkg/'share/sam-max-hd'
+mod=REPO/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+base={p.relative_to(mod).as_posix():sha(p) for p in mod.rglob('*') if p.is_file()}
+(REPORT/'grunnlag-filer-69d5f1ff.json').write_text(json.dumps(base,indent=2)+'\n')
+assert json.loads((mod/'mod.json').read_text())['costume_cels']==1736
+source_saves=k.SAVES
+rows=[]
+for anim in (1,7):
+    k.SAVES=OUT/f'saves-anim{anim}';k.SAVES.mkdir(exist_ok=True)
+    for p in source_saves.glob('samnmax.s*'):shutil.copy2(p,k.SAVES/p.name)
+    env={'DIGHD_TEST_ROOM':'61','DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'309','DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'170,180','DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)}
+    row=k.run(f'baseline309-anim{anim}',k.NEW,env,300,mod);row['animasjon']=anim;rows.append(row)
+    assert row['exit']==0 and row['dumps']
+    log=(OUT/row['scene']/'scummvm.log').read_text(errors='replace')
+    checks=[(int(f),int(n)) for f,n in re.findall(r'frame (\d+).*?(\d+) screen pixels differ from the whole screen built again',log)]
+    row['kontroller_med_frame']=checks
+    row['binar_sha256']=sha(k.NEW)
+    board=Image.new('RGB',(1920,850),'#243340');d=ImageDraw.Draw(board)
+    for i,f in enumerate((60,76,92,108,124,144)):
+        p=OUT/row['scene']/f'frame_{f:06}_room061.png';assert p.is_file()
+        im=Image.open(p).convert('RGB');im.thumbnail((640,400),Image.Resampling.LANCZOS)
+        x=(i%3)*640;y=(i//3)*425;board.paste(im,(x,y+25));d.text((x+5,y+5),f'kostyme309 anim{anim}, frame{f}, original',fill='white')
+    board.save(REPORT/f'originalmotor-animasjon{anim}.png')
+    (REPORT/'motor-baseline.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,REPORT/'motor-baseline.py.txt')
+print('To grunnlagsprøver fullført, bare kildekontroll, ingen nye resultater.')

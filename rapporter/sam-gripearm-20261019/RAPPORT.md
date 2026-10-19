@@ -34,3 +34,5 @@ Grunnlag er hd-mod bd65ce87f0f690ac19aa1c316f376a2e23810193 med 1654 native. Kan
 Den felles Linux-/Windows-nedlastingen sam-max-hd-2026-10-19-kveld inneholder 1654 native. Disse 82 nye er foreløpig ikke i pakken. Pakker oppdateres ved neste samlepunkt eller avslutning, etter ny nedlasting og filkontroll. Ny grafikk går ikke til main.
 
 Neste uavhengige bunke er fig309_01 til 05, Sam og Max, 40 spillruter. Avklar kostyme 309 i spillkontekst og se begge godkjente hovedark før nytegning. Ikke bestill de avviste golf-E- eller VR-G-grunnlagene på nytt.
+
+Publisering bekreftet: kildecommit 140f44b4c0fd329c3c4211eac80acb4c123f4dff, hd-mod 69d5f1ff15fd1b9c7b388a74041b65ccf83d8ec1. Alle 19 972 kandidat-PNG-er stemmer etter tilbakehenting, alle 19 890 tidligere PNG-er er byteidentiske. Alle 82 nye native-filer kontrollert mot de siste SHA-ene. Native totalt 1736. mottak-publisert.json skiller publisering fra Tom-/Claude-godkjenning.
