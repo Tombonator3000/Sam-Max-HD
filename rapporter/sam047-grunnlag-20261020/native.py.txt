@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+import json,numpy as np,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam047';M=P/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+base=json.loads((R/'grunnlag-produksjon.json').read_text());assert all(sha(M/f)==h for f,h in base['filer'].items());auto=json.loads((O/'mottak25/myke.json').read_text());assert auto['ruter_ok']==25 and all(auto[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk'])
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash'];shutil.copy2(O/'mottak25/myke.json',R/'myke-automatisk.json');assert not C.exists();shutil.copytree(M,C)
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];protos={e['bilde']:e for e in json.loads((R/'prototyper.json').read_text())};added=[]
+for v in plan:
+    targets=[t for t in v['malruter'] if t['jobb'] in ['fig047_01','fig047_02','fig047_03']]
+    if not targets:continue
+    f=R/protos[v['bilde']]['prototype'];out=Image.open(f).convert('RGBA');w,h=v['rekt'][2:];assert out.size==(w*4+16,h*4+16);a=np.array(out)
+    assert not((a[:,:,0]>220)&(a[:,:,1]<100)&(a[:,:,2]>220)&(a[:,:,3]>0)).any();assert not a[a[:,:,3]==0,:3].any()
+    for t in targets:
+        target=C/'costumes'/(t['bilde']+'_hd.png');assert not target.exists();src=np.array(Image.open(P/'work/extract/costumes'/(t['bilde']+'.png')).convert('RGBA'));assert hashlib.sha256(src.tobytes()).hexdigest()==v['canonical_rgba_sha256'];mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cover=_iou(a[:,:,3]>=CORE,mask,-8,-8);assert iou>=GOOD_IOU and cover>=GOOD_COVER,(t['bilde'],iou,cover)
+        out.save(target,optimize=True);added.append(dict(bilde=t['bilde'],jobb=t['jobb'],fil=target.relative_to(C).as_posix(),sha256=sha(target),representant=v['bilde'],prototype_sha256=sha(f),canonical_rgba_sha256=v['canonical_rgba_sha256'],snitt_union=iou,dekning=cover,marg_original=[2,2],flytt_hd=[0,0],fast_4x=True,hard_originalmaske=False,originalfragment_fallback=False))
+meta=json.loads((C/'mod.json').read_text());assert meta['costume_cels']==2609;meta['costume_cels']=2634;(C/'mod.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n');files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()}
+assert len(added)==25 and len(files)==20877 and set(base['filer'])<=set(files);assert {f for f,h in base['filer'].items() if files[f]!=h}=={'mod.json'} and set(files)-set(base['filer'])=={v['fil'] for v in added};assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in files)==2634
+held=json.loads((R/'fremdrift.json').read_text())['returer'];assert len(held)==17 and all(not(C/'costumes'/(b+'_hd.png')).exists() for b in held);assert all(not(C/f'costumes/costume164_{n}_hd.png').exists() for n in [1943,1944])
+(R/'native-fast4x-samlet.json').write_text(json.dumps(dict(native_totalt=2634,tillegg=25,retur=17,ruter=added),indent=2)+'\n');(R/'kandidatfilhash.json').write_text(json.dumps(files,sort_keys=True,indent=2)+'\n');shutil.copy2(__file__,R/'native.py.txt');print('25 nye native,2634 totalt,20877 filer;alle20852 gamle stier bevart,bare mod.json endret.17 utkastmål og164_1943/1944 er holdt utenfor.')

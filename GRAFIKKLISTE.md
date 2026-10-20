@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Oppdatert 2026-10-20 18:19: Tre nye hele ark047_01..03/25 native er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert.365 av1758 resultatark,1393 gjenstår inkludert returene047_04/05. To effektark er FEIL og ligger bare som utkast,17 mål er holdt utenfor native/pakker.11 bildekall/11 råbilder bevart,A03R retter munn,A07/A06R ubrukt i sluttprototypene. To ark OK,ett SJEKK/tre omrissvarsler;25 automatisk native OK.160 kontroller/158 null,samme to tidlige160-avvik som2609-grunnlaget;132 frafigurstart null,ingen nye/økte avvik. Kandidat2634,20877filer/20871PNG,alle tidligere stier/PNG og796kilder/tre stash bevart. Ingen ny Tom-/Claude-godkjenning. Publisering/hent og fellespakker følger separat;pakker har foreløpig2609. Gjenoppta047_04/05 før videre047_06..09,ikke gjenta01..03.164_04fortsatt blokkert. Se rapporter/sam047-grunnlag-20261020/NESTE.md.
+
 Oppdatert 2026-10-20 17:30: Hele Sam302 er produsert,ti hele ark/50 native,egenkontrollert,native mottatt,visuelt sett,motorobservert,publisert og i kontrollert felles2609. https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam302. Grafikkilde95ba93702de5b11f39a7c1078f5d02a7ae1fa7f2,hd-mod647d80e02afbef7a305f87dd24e721142ad479ba,kode7ac038f34421a9de88d8859ed9a2747e13e1c4bb. Begge faktiske pakker og20851runtime-filer hver SHA-kontrollert,alle50 nye i faktisk Linux.304 kontroller,303null,samme kjente firepikslers overgangsrest;alle66 fra60null,ingen nye/økte avvik.12 omrissvarsler bevart.362 av1758 resultatark,1396 gjenstår pluss returer/katalogfeil/sluttkontroll.796kilder/tre stasher/alle tidligere grafikkfiler og releaser bevart. Ingen ny Tom-/Claude-godkjenning. Native-frys frigitt. Neste047_01 til05 er kildeklare,42mål/23helkilder,0kall/0resultat. Bevar Max i komposittposer og hvite spor/brune treff i effektlag. Les sam047-grunnlag-20261020/KILDEGRUNNLAG.md og NESTE.md.164_04 er fortsatt blokkert,ingen omprøve.
 
 Oppdatert 2026-10-20 16:28: Ni nye164-ark/32 native er publisert og med i kontrollert felles2559,Latest bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-fall164. Grafikkildea221498b,hd-mod67c32d2b79d01ac6c076a264f914ee2bc272b61f,kode8ff8b8db59ca7506dd0094eef8cd007620639b24. Begge faktiske pakker og20801runtime-filer hver er SHA-kontrollert,alle32nye motorobservert.304 kontroller,303null,samme160-overgangsrest før figurstart;66 fra60null,ingen nye/økte avvik.14 omrissvarsler bevart.352 av1758 resultatark,1406 gjenstår pluss returer/katalogfeil/sluttkontroll.1943/1944/fig164_04 er fortsatt blokkert etter sikkerhetsavvisning,ingen omprøve.756kilder og trestash bevart. Ingen ny Tom-/Claude-godkjenning. Native-frys frigitt. Neste fem302_01til05 kildeklare,29mål/21helkilder,0kall/0resultat. Se sam302-foerste-20261020/NESTE.md.
@@ -655,14 +657,14 @@ Figurark for Sam.
 - [x] `fig302_08` (figurark 8 for Sam (kostyme 302), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig302_09` (figurark 9 for Sam (kostyme 302), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig302_10` (figurark 10 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_01` (figurark 1 for Sam (kostyme 47), 5 ruter: start mot høyre (2 ruter); start (lag 14, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_01` (figurark 1 for Sam (kostyme 47), 5 ruter: start mot høyre (2 ruter); start (lag 14, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 39
 
 Figurark for Sam.
 
-- [ ] `fig047_02` (figurark 2 for Sam (kostyme 47), 8 ruter: start (lag 14, tegnes over kroppen) mot høyre (3 ruter); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_03` (figurark 3 for Sam (kostyme 47), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_02` (figurark 2 for Sam (kostyme 47), 8 ruter: start (lag 14, tegnes over kroppen) mot høyre (3 ruter); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_03` (figurark 3 for Sam (kostyme 47), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_04` (figurark 4 for Sam (kostyme 47), 6 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_05` (figurark 5 for Sam (kostyme 47), 11 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_06` (figurark 6 for Sam (kostyme 47), 8 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)

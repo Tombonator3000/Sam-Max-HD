@@ -1,0 +1,28 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import os,subprocess,json,re,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;BASE=P/'mods/gpt';PK=P/'out/felles-release-20261020-sam302/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert sha(B)=='1a687f613dc3faa22ce9719d5005b04f1e034292144d88fa933d95aed7823577'
+def run(case):
+    name,mod,forced,chore=case;T=O/name;assert not T.exists();T.mkdir();h=T/'home';h.mkdir();s=T/'saves';s.mkdir()
+    for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,s/p.name)
+    env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update(HOME=str(h),XDG_CONFIG_HOME=str(h/'.config'),XDG_DATA_HOME=str(h/'.local/share'),XDG_CACHE_HOME=str(h/'.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(mod),DIGHD_VERIFY='1',DIGHD_QUIT_AT='320',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='4',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='8',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+    if forced:env.update(DIGHD_TEST_COSTUME='47',DIGHD_TEST_ACTOR='4',DIGHD_TEST_CLIP='0',DIGHD_TEST_CHORE_EVERY='1000',DIGHD_TEST_STATIC_SCENE='1',DIGHD_TEST_SCALE='255',DIGHD_TEST_POS='174,149',DIGHD_TEST_ANIMATION=str(chore))
+    args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(s),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+    with (T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=240).returncode
+    log=(T/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+    draws=[dict(frame=int(f),cel=int(n)) for f,n in re.findall(r'frame (\d+) soft cel\s+(\d+) costume\s*47\b',log)]
+    rec=dict(scene=name,exit=code,binar_sha256=sha(B),mod_json_sha256=sha(mod/'mod.json'),tvunget_kostyme=forced,naturlig_gjennomspilling=False,elevation_test=0 if forced else None,elevation_primarskript_ikke_eksplisitt_satt=True,andre_aktorer_ikke_overstyrt=True,sett047=sorted({v['cel'] for v in draws}),tegninger=draws,kontroller=checks,helprove_uten_avvik=bool(code==0 and checks and not any(v['avvik'] for v in checks)),logg_sha256=sha(T/'scummvm.log'))
+    (T/'kvittering.json').write_text(json.dumps(rec,indent=2)+'\n')
+    assert code==0 and len(checks)==80,(name,code,len(checks))
+    print(name,'avvik',[(v['frame'],v['avvik']) for v in checks if v['avvik']],len(rec['sett047']),'047-ruter',flush=True)
+    return rec
+C=O/'mod-sam047'
+cases=[('grunnlag047-anim6',BASE,True,6),('kandidat047-anim6',C,True,6),('grunnlag047-anim7',BASE,True,7),('kandidat047-anim7',C,True,7)]
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,cases))
+wanted={int(v['bilde'].split('_')[-1]) for v in json.loads((R/'native-fast4x-samlet.json').read_text())['ruter']};seen=set().union(*(set(v['sett047']) for v in rows if v['scene'].startswith('kandidat')))
+assert len(wanted)==25 and wanted<=seen
+pairs=[]
+for chore in [6,7]:
+ old=next(v for v in rows if v['scene']==f'grunnlag047-anim{chore}');new=next(v for v in rows if v['scene']==f'kandidat047-anim{chore}');assert old['kontroller']==new['kontroller'];pairs.append(dict(chore=chore,kontroller=len(new['kontroller']),null=sum(v['avvik']==0 for v in new['kontroller']),avvik=[v for v in new['kontroller'] if v['avvik']],fra_foerste_tegning=[v for v in new['kontroller'] if v['frame']>=60],ingen_nye_eller_okte_avvik=True))
+proof=dict(runder=rows,par=pairs,forventede=sorted(wanted),sett=sorted(wanted&seen),mangler=sorted(wanted-seen),nye_native=25,tvangsaktor=4,rom=8,pos=[174,149],skala_test=255,ikke_naturlig_gjennomspilling=True,normalaktor2_3_ikke_skjult_i_denne_testen=True,ingen_nye_eller_okte_avvik=True)
+(R/'motorproeve.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'motorproeve.py.txt');print('25/25 nye native motorlogget. Begge animasjoner har samme verify-resultat før/etter.',flush=True)

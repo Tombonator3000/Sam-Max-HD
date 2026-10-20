@@ -1,0 +1,32 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,zipfile,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam047';M=P/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+base=json.loads((R/'grunnlag-produksjon.json').read_text());protected=json.loads((R/'beskyttede-samlet.json').read_text());assert len(protected)==796 and all(sha(A/f)==h for f,h in protected.items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash'];assert all(sha(M/f)==h for f,h in base['filer'].items());expected=json.loads((R/'kandidatfilhash.json').read_text());assert len(expected)==20877 and {p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()}==expected
+progress=json.loads((R/'fremdrift.json').read_text());assert len(progress['leveranser'])==3 and len(progress['utkast'])==2 and len(progress['returer'])==17;assert len(list((A/'jobber').glob('fig*/resultat.png')))==365;assert all(sha(A/e['resultat'])==e['sha256'] for e in progress['leveranser']+progress['utkast']);assert all(not(A/f'jobber/fig047_{n:02}/resultat.png').exists() for n in [4,5]);assert [e['egenkontroll'] for e in progress['leveranser']]==['OK','OK','SJEKK']
+calls=list((R/'kall').iterdir());assert len(calls)==11
+for k in calls:
+    assert all((k/f).exists() for f in ['raa.png','argumenter.json','prompt-faktisk.txt','referansehasher.json','raabilde.json']);args=json.loads((k/'argumenter.json').read_text());assert args['prompt']==(k/'prompt-faktisk.txt').read_text() and args['transparent_background']
+    assert all(sha(Path(v['fil']))==v['sha256'] for v in json.loads((k/'referansehasher.json').read_text()))
+proof=json.loads((R/'motorproeve.json').read_text());obs=json.loads((R/'motorobservasjoner.json').read_text());assert proof['ingen_nye_eller_okte_avvik'] and len(proof['sett'])==obs['sett']==25 and not proof['mangler'];pairs=proof['par'];assert len(pairs)==2 and sum(v['kontroller'] for v in pairs)==160 and sum(v['null'] for v in pairs)==158;assert all(v['avvik']==[dict(frame=36,avvik=160)] for v in pairs);assert sum(len(v['fra_foerste_tegning']) for v in pairs)==132 and not any(c['avvik'] for v in pairs for c in v['fra_foerste_tegning'])
+native=json.loads((R/'native-fast4x-samlet.json').read_text());assert len(native['ruter'])==25 and len({e['representant'] for e in native['ruter']})==12;assert all(sha(C/e['fil'])==e['sha256'] for e in native['ruter']);diff=json.loads((R/'pikselkontroll.json').read_text());assert len(diff)==3 and not any(v['utenfor_nye_cels_og_marg'] for v in diff)
+views=[f'original-native-motor-side{i}.png' for i in range(1,6)]+[v['fil'] for v in json.loads((R/'hele-motorbilder.json').read_text())]+[f'foer-etter-ch{c}-{f}.png' for c,f in [(6,80),(6,72),(7,88)]];assert len(views)==17 and all((R/f).exists() for f in views)
+(R/'motor-visuelt-sett.json').write_text(json.dumps(dict(ruter=25,original_native_motor_sett=25,hele_motorbilder=9,foer_etter=3,visuelt_sett=True,godkjent_av_Tom=False,claude_kontroll=False,naturlig_gjennomspilling=False,normalaktor2_3_ikke_skjult_i_den_tvungne_testen=True,filer=[dict(fil=f,sha256=sha(R/f)) for f in views]),indent=2)+'\n')
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+    for kind in ['grunnlag','kandidat']:
+        for ch in [6,7]:
+            T=O/f'{kind}047-anim{ch}'
+            for name in ['scummvm.log','kvittering.json']:z.write(T/name,f'{T.name}/{name}')
+progress.update(brukte_kall=9,ubrukt_kall=['A07','A06R'],native_rutekoblinger_levert=25,hele_canonical_kilder_levert=12,eksakte_hele_aliasmaal_levert=13,native_rutekoblinger_tilbakeholdt=17)
+for e in progress['leveranser']:e.update(native_mottatt=True,native_mottatt_ruter=e['ruter'],motorobservert=True,visuelt_kontrollert=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+for n in range(1,6):
+    J=A/f'jobber/fig047_{n:02}';s=(J/'notat.md').read_text().replace('11 faktiske bildekall/11 råbilder bevart.','11 faktiske bildekall/11 råbilder bevart. A07 og A06R er ubrukt i de endelige prototypene.');s+='\nEndelig bunkeutfall: tre leverte hele ark047_01..03/25 native,12 hele canonical kilder/13 eksakte aliasmål. To effektark047_04..05 er FEIL og ligger bare som utkast i rapporten,17 mål er holdt utenfor native. Samtlige25 leverte er automatisk mottatt,visuelt sett og motorobservert;160 kontroller/158null,132 frafigurstart null,samme to kjente160-avvik før figurstart som grunnlaget. Ingen ny Tom-/Claude-godkjenning.\n';(J/'notat.md').write_text(s)
+    if n>3:shutil.copy2(J/'notat.md',R/'utkast'/J.name/'notat.md')
+board=Image.new('RGB',(1200,660),'#e1e6ea');d=ImageDraw.Draw(board)
+for i,b in enumerate([1699,1792,1702,1704,1707,1715]):
+    im=Image.open(C/f'costumes/costume047_{b}_hd.png').convert('RGBA');im.thumbnail((370,294),Image.Resampling.LANCZOS);x=i%3*400+(400-im.width)//2;y=i//3*330+24;board.paste(im,(x,y),im)
+    d.text((i%3*400+14,i//3*330+8),f'Ny HD-rute047_{b}',fill='#27333d')
+board.save(R/'nye-sam-max-forhandsvisning.png')
+summary=dict(nye_native=25,native_totalt=2634,figurjobber=365,figurjobber_totalt=1758,figurjobber_gjenstaar=1393,utkastark=2,tilbakeholdte_utkastmaal=17,beskyttede_kilder=796,tre_stasher_bevart=True,alle_tidligere_stier_bevart=True,alle20846_tidligere_png_bevart=True,alle_kandidatfiler=20877,alle_kandidat_png=20871,egenkontroll_hele_ark=['OK','OK','SJEKK'],omrissvarsler=3,native_automatisk_ok=25,visuelt_sett=25,motorobservert=25,kontroller=160,nullkontroller=158,kjente_tidlige160_avvik=2,kontroller_fra_figurstart=132,ingen_nye_eller_okte_avvik=True,helprove_uten_avvik=False,naturlig_gjennomspilling=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False)
+(R/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'kontroller.py.txt');print(json.dumps(summary,ensure_ascii=False))

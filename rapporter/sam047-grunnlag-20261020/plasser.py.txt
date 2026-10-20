@@ -1,0 +1,148 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+import numpy as np, json, hashlib, math, shutil
+from smhd.myk import _iou, CORE, GOOD_IOU, GOOD_COVER
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+H=R/'prototyper'; H.mkdir(exist_ok=True)
+plan={v['bilde']:v for v in json.loads((R/'ruteplan-unik.json').read_text())['ruter']}
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+raw={}; components={}; operations=[]
+for k in [f'A{call:02}' for call in range(1,9)]+['A03R','A06R','A07R']:
+    raw[k]=np.array(Image.open(R/'kall'/k/'raa.png').convert('RGBA'))
+    components[k]=nd.label(raw[k][:,:,3]>=128,np.ones((3,3)))[0]
+
+def own(call, rect=None, ids=None, only_brown=False, only_white=False):
+    a=raw[call]; lab=components[call]
+    sel=(a[:,:,3]>=128) if ids is None else np.isin(lab,ids)
+    if rect is not None:
+        x,y,w,h=rect; region=np.zeros(sel.shape,bool); region[y:y+h,x:x+w]=True;sel &= region
+    if only_brown:
+        rgb=a[:,:,:3].astype(int);hue=(rgb[:,:,0]>rgb[:,:,1]+12)&(rgb[:,:,1]>rgb[:,:,2]+3)&sel
+        near_brown=nd.distance_transform_edt(~hue)<=20
+        sel &= hue|(np.all(rgb<55,axis=2)&near_brown)
+    if only_white:sel &= np.all(a[:,:,:3]>220,axis=2)
+    yy,xx=np.nonzero(sel); assert len(xx)>0,(call,rect,ids)
+    gx,gy,gw,gh=int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)
+    dist,near=nd.distance_transform_edt(~sel,return_indices=True)
+    allow=(dist<=2)&((lab==0)|sel); z=a.copy();z[:,:,3][~allow]=0;z[:,:,3][sel]=255
+    edge=allow&~sel;z[edge,:3]=z[near[0][edge],near[1][edge],:3];z[z[:,:,3]==0,:3]=0
+    operations.append(dict(kall=call,egen_region=rect,egne_komponenter=ids,egen_kjerne=[gx,gy,gw,gh]))
+    return Image.fromarray(z),[gx,gy,gw,gh]
+
+def place(canvas, art, rect):
+    im,(gx,gy,gw,gh)=art; x,y,w,h=rect
+    sx=gw/(w*4);sy=gh/(h*4)
+    z=im.transform(canvas.size,Image.Transform.AFFINE,(sx,0,gx-(8+x*4)*sx,0,sy,gy-(8+y*4)*sy),Image.Resampling.BICUBIC)
+    q=np.array(z);_,near=nd.distance_transform_edt(q[:,:,3]<128,return_indices=True)
+    weak=(q[:,:,3]>0)&(q[:,:,3]<=4);q[weak,:3]=q[near[0][weak],near[1][weak],:3];q[q[:,:,3]==0,:3]=0
+    canvas.alpha_composite(Image.fromarray(q));return canvas
+
+def blank(b):
+    w,h=plan[f'costume047_{b}']['rekt'][2:];return Image.new('RGBA',(w*4+16,h*4+16))
+
+def srcparts(b):
+    a=np.array(Image.open(P/f'work/extract/costumes/costume047_{b}.png').convert('RGBA'))
+    lab,n=nd.label(a[:,:,3]>0,np.ones((3,3)));out=[]
+    for i in range(1,n+1):
+        yy,xx=np.nonzero(lab==i);out.append((i,[int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)]))
+    return out
+
+frames={}; hole=own('A08',ids=[1,2]);fleck=own('A08',ids=[4]);sliver=own('A08',ids=[3])
+characters={1699:('A01',[2]),1792:('A01',[1]),1702:('A03R',[1]),1703:('A03',[1]),1704:('A03',[2]),1707:('A04',[1]),1715:('A04',[2])}
+for b,(call,ids) in characters.items():
+    w,h=plan[f'costume047_{b}']['rekt'][2:];frames[b]=place(blank(b),own(call,ids=ids),[0,0,w,h])
+frames[1793]=place(blank(1793),own('A02',[0,0,565,1024]),[0,0,97,61])
+for b,body,bodyrect in [(1794,2,[130,0,68,55]),(1795,3,[70,0,53,58])]:
+    frames[b]=place(blank(b),own('A02',ids=[body]),bodyrect)
+    for comp,rect in srcparts(b):
+        if comp==1: continue
+        if (b==1794 and comp==14) or (b==1795 and comp==6): art=hole
+        elif b==1794 and comp==2: art=own('A05',[0,0,768,512])
+        elif b==1794 and comp==7: art=own('A05',ids=[10])
+        else: art=fleck if max(rect[2:])<=2 else sliver
+        place(frames[b],art,rect)
+frames[1797]=place(blank(1797),hole,[0,0,5,11])
+frames[1796]=place(place(blank(1796),hole,[153,0,5,11]),fleck,[0,41,2,2])
+whole_effects={1804:('A05',[0,512,768,512]),1805:('A05',[768,512,768,512]),1806:('A06',[0,0,768,341]),1807:('A06',[768,0,768,341]),1808:('A06',[0,341,768,341]),1809:('A06',[768,341,768,341]),1810:('A06',[0,682,768,342]),1811:('A06',[768,682,768,342]),1991:('A07',[0,0,1536,341]),1992:('A07',[0,341,1536,341]),1993:('A07',[0,682,1536,342])}
+for b,(call,rect) in whole_effects.items():
+    w,h=plan[f'costume047_{b}']['rekt'][2:];frames[b]=place(blank(b),own(call,rect),[0,0,w,h])
+
+def moments(points, pixelvariance):
+    center=points.mean(axis=0);cov=np.cov(points,rowvar=False,bias=True) if len(points)>1 else np.zeros((2,2))
+    vals,vecs=np.linalg.eigh(cov+np.eye(2)*pixelvariance)
+    # Orient the major axis consistently towards positive x.
+    if vecs[0,1]<0:vecs[:,1]*=-1
+    if np.linalg.det(vecs)<0:vecs[:,0]*=-1
+    return center,vals,vecs
+
+def place_moments(canvas,art,source_points,description):
+    # Global geometric statistics only: center,2x2 covariance and ink area.
+    # No per-pixel source outline,scanline,alpha or silhouette is copied to art.
+    im,bbox=art;a=np.array(im);yy,xx=np.nonzero(a[:,:,3]>=128)
+    mu,ev,U=moments(np.c_[xx,yy].astype(float),1/12)
+    pts=np.array(source_points,float)*4+9.5;target,tv,V=moments(pts,16/12)
+    scales=np.sqrt(tv/ev)
+    scales[0]*=.9
+    trans=V@np.diag(scales)@U.T;inv=np.linalg.inv(trans);offset=mu-inv@target
+    z=im.transform(canvas.size,Image.Transform.AFFINE,(inv[0,0],inv[0,1],offset[0],inv[1,0],inv[1,1],offset[1]),Image.Resampling.BICUBIC)
+    canvas.alpha_composite(z)
+    operations.append(dict(metode='Egen hel komponent,geometrisk affin plassering med senter,2x2-spredning og samlet areal,ingen originalmaske',beskrivelse=description,maalt_senter=target.tolist(),maalt_spredning=tv.tolist(),samlet_areal=len(pts)*16,affin=trans.tolist()))
+
+plain=own('A05',[185,225,280,45],ids=[1]);plain_short=own('A06',ids=[3]);tipdown=own('A05',ids=[22]);tipup=own('A06',ids=[29]);large=own('A06',ids=[28]);wind=own('A06',ids=[27]);arc=own('A07',[893,90,77,175],only_brown=True);arc2=own('A07',[890,467,84,140],only_brown=True)
+for b in whole_effects:
+    if b==1804:continue
+    frames[b]=blank(b);a=np.array(Image.open(P/f'work/extract/costumes/costume047_{b}.png').convert('RGBA')).astype(int)
+    impact=(a[:,:,0]>a[:,:,1]+10)&(a[:,:,1]>a[:,:,2]+10)
+    if b>=1991:
+        xgate={1991:53,1992:55,1993:56}[b]
+        impact[:,xgate:] |= np.all(a[:,xgate:,:3]<20,axis=2)
+    impact &= a[:,:,3]>0
+    for typ,sel in [('treff',impact),('spor',(a[:,:,3]>0)&~impact)]:
+        lab,n=nd.label(sel,np.ones((3,3)))
+        for comp in range(1,n+1):
+            yy,xx=np.nonzero(lab==comp);rect=[int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)]
+            if typ=='treff':
+                art=arc if b==1991 and len(xx)>30 else arc2 if b==1992 and len(xx)>30 else hole if len(xx)>15 else fleck if max(rect[2:])<=2 else sliver
+                place_moments(frames[b],art,np.c_[xx,yy],f'{b}:{typ}:{comp},rekt{rect}')
+            else:
+                gray=np.any(a[lab==comp,:3].mean(axis=1)<210)
+                if b==1810 and comp==1:art=large
+                elif b==1811 and comp==1:art=wind
+                elif (b,comp) in [(1806,8),(1807,1),(1807,6),(1807,9),(1808,8),(1809,2)]:
+                    art=own('A06',ids=[{(1806,8):11,(1807,1):1,(1807,6):10,(1807,9):13,(1808,8):24,(1809,2):18}[(b,comp)]])
+                elif gray:art=tipup if len(xx)>1 and np.cov(xx,yy,bias=True)[0,1]<0 else tipdown
+                else:art=plain_short if rect[2]<12 else plain
+                place_moments(frames[b],art,np.c_[xx,yy],f'{b}:{typ}:{comp},rekt{rect}')
+
+for i,b in enumerate([1991,1992,1993]):
+    if b!=1991:
+        w,h=plan[f'costume047_{b}']['rekt'][2:];frames[b]=place(blank(b),own('A07R',[0,i*341,1536,341]),[0,0,w,h]);continue
+    frames[b]=blank(b);a=np.array(Image.open(P/f'work/extract/costumes/costume047_{b}.png').convert('RGBA')).astype(int)
+    impact=(a[:,:,0]>a[:,:,1]+10)&(a[:,:,1]>a[:,:,2]+10);gate={1991:53,1992:55,1993:56}[b];impact[:,gate:] |= np.all(a[:,gate:,:3]<20,axis=2);impact &= a[:,:,3]>0
+    for sel,art in [(impact,own('A07R',[0,i*341,1536,341],only_brown=True)),((a[:,:,3]>0)&~impact,own('A07R',[0,i*341,1536,341],only_white=True))]:
+        yy,xx=np.nonzero(sel);place(frames[b],art,[int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)])
+
+# One HD pixel repairs the underweight own paint strokes in the corrected1991.
+# Its color and silhouette come solely from the generated drawing,not source pixels.
+q=np.array(frames[1991]);alpha=nd.maximum_filter(q[:,:,3],size=3);edge=(alpha>0)&(q[:,:,3]==0)
+_,near=nd.distance_transform_edt(q[:,:,3]==0,return_indices=True);q[edge,:3]=q[near[0][edge],near[1][edge],:3];q[:,:,3]=nd.gaussian_filter(alpha.astype(float),.35).clip(0,255).astype('uint8');q[q[:,:,3]==0,:3]=0;frames[1991]=Image.fromarray(q)
+operations.append(dict(bilde='costume047_1991',egen_strekreparasjon_hd=1,egen_alpha=True,originalmaske=False))
+
+rows=[]
+for b,im in frames.items():
+    q=np.array(im);q[q[:,:,3]==0,:3]=0;im=Image.fromarray(q);src=np.array(Image.open(P/f'work/extract/costumes/costume047_{b}.png').convert('RGBA'))
+    mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cover=_iou(q[:,:,3]>=CORE,mask,-8,-8)
+    out=H/f'costume047_{b}.png';im.save(out)
+    rows.append(dict(bilde=f'costume047_{b}',prototype=out.relative_to(R).as_posix(),sha256=sha(out),snitt_union=iou,dekning=cover,native_ok=iou>=GOOD_IOU and cover>=GOOD_COVER,hard_originalmaske=False,originalfragment_fallback=False,metode='Egen image_gen-alfa og kantfarge;rektangulær plassering av egne hele komponenter,kilden brukes bare til geometri og kontroll'))
+    print(b,round(iou,3),round(cover,3),rows[-1]['native_ok'],flush=True)
+(R/'prototyper.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');(R/'plassering-operasjoner.json').write_text(json.dumps(operations,indent=2)+'\n');shutil.copy2(__file__,R/'plasser.py.txt')
+for page in range(math.ceil(len(rows)/4)):
+    sub=rows[page*4:page*4+4];board=Image.new('RGB',(1800,len(sub)*410),'#293a45');d=ImageDraw.Draw(board)
+    for i,v in enumerate(sub):
+        src=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);im=Image.open(R/v['prototype']).convert('RGBA')
+        for col,(z,t) in enumerate([(src,'Original'),(im,'Eget maleri')]):
+            z.thumbnail((875,380));board.paste(z,(col*900,i*410+30),z);d.text((col*900+8,i*410+8),v['bilde']+' '+t,fill='white')
+    board.save(R/f'sammenligning-maleri-side{page+1}.png')

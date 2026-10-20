@@ -1,0 +1,2 @@
+## Codex egen retur 2026-10-20
+Kun disse effektmålene holdes utenfor native mottak/publisering: costume047_1804, costume047_1805, costume047_1806, costume047_1807, costume047_1808, costume047_1809. De hvite sporene og treffmerkene har fortsatt for ulik silhuett/dekning. Ingen originalfragment-fallback eller senkede mottaksgrenser. Gjenoppta fra bevarte råbilder,prompter og prototyper i rapporter/sam047-grunnlag-20261020. Andre mål i arket kan importeres bare med dokumentert egenkontroll og motorprøve.
