@@ -1,0 +1,1 @@
+Ferdig samlepunkt:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-vr251-slutt. Begge faktiske pakker/2722native og Latest bekreftet,nativefrys frigitt. Fortsett Max028_01..08,17nye malerier gir88mål.164_04fortsatt blokkert.
