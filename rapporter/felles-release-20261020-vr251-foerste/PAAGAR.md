@@ -1,0 +1,1 @@
+Ferdig samlepunkt:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-vr251-foerste. Begge faktiske pakker/2700native kontrollert,Latest bekreftet,nativefrys frigitt. Fortsett kildeklare251_06..09.164_04fortsatt blokkert.
