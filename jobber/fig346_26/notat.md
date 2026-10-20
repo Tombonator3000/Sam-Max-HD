@@ -11,3 +11,5 @@ Automatisk native mottak17 OK med uendrede terskler. Sluttmottaket gjenbruker17 
 Alle17 er sett som original/native/motor og observert ved kildeposisjonen i ett tvunget animasjon7-forløp. Samme nedlastede e541253b-binær og innstillinger som grunnlag ca6258e7 med2199 native.80 skjermbufferkontroller, alle null,71 fra figurstart. Faktisk publisering og tilbakehenting i mottak-publisert.json. Ingen ny Tom-/Claude-godkjenning, naturlig gjennomspilling eller interaktiv Windows-/webtest.
 
 2026-10-20: Overtegningsretur. 1 hele kilde-RGBA-identiske aliaser har fått samme egne sammenhengende klesmaleri og native som de kanoniske hodelagene. M01 fra sam346-klesskjot-retur-20261020 er eneste nye maleri, ingen nye bildekall i denne returen. Uendrede ruter på arket er bytekontrollert. Førbilder er bevart i sam346-overtegning-20261020/foer. Resultat SHA256 994085392f17f4129d02315dd9d8998bdf57cdf24e5b69af56de2d5073a91a68. Se fremdrift.json for mottak, motor og publisering.
+
+Med i kontrollert fellespakke sam-max-hd-2026-10-20-samlag, hd-mod 1481ab600c1a5a6c045b0ae210408b6af0de2068. Begge faktiske pakker og SHA-er er verifisert.

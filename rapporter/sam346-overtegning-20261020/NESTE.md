@@ -1,1 +1,1 @@
-Publiser og hent denne kildebekreftede 23-kopiersreturen etter kontroll av fjern-SHA 10734a9c. Deretter oppdateres begge pakker som et nytt samlepunkt, ikke som duplikat av første 2427. Kontroller begge forløp i faktiske pakker. Sam342_06 til 10 er fortsatt kildeklare, uten nye bildekall.
+Alle 23 overtegningskopier er publisert, hentet og med i kontrollert fellespakke sam-max-hd-2026-10-20-samlag. Sammen med de 24 første er 47 kleslag kontrollert i begge forløp. Neste er faktisk produksjon fra sam342-06til10-20261020. Ikke gjenta denne returen eller pakkebyggene.

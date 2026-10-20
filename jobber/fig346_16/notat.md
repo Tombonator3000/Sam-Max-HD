@@ -17,3 +17,5 @@ Alle 22 er visuelt sett mot original/native/motor og observert ved kildeposisjon
 Publisering og faktisk tilbakehenting føres i mottak-publisert.json. Ingen ny Tom-godkjenning, separat Claude-kontroll, naturlig gjennomspilling eller interaktiv Windows-/webtest. Resten av serien og Max-nærbildene gjenstår.
 
 2026-10-20: Overtegningsretur. 2 hele kilde-RGBA-identiske aliaser har fått samme egne sammenhengende klesmaleri og native som de kanoniske hodelagene. M01 fra sam346-klesskjot-retur-20261020 er eneste nye maleri, ingen nye bildekall i denne returen. Uendrede ruter på arket er bytekontrollert. Førbilder er bevart i sam346-overtegning-20261020/foer. Resultat SHA256 64ad9d4d7ae7b37521fd165d27fc6edfaab64f7b179af6dd501e833ffc780cbb. Se fremdrift.json for mottak, motor og publisering.
+
+Med i kontrollert fellespakke sam-max-hd-2026-10-20-samlag, hd-mod 1481ab600c1a5a6c045b0ae210408b6af0de2068. Begge faktiske pakker og SHA-er er verifisert.

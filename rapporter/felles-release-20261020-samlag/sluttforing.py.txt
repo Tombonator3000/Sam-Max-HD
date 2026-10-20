@@ -1,0 +1,66 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib,json,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent
+R=A/'rapporter/felles-release-20261020-samlag';S=A/'rapporter/sam346-overtegning-20261020'
+T=A/'rapporter/sam346-klesskjot-retur-20261020';N=A/'rapporter/sam342-06til10-20261020'
+proof=json.loads((R/'publisert.json').read_text());tag=proof['release_tag'];native=proof['hd_mod'];url=proof['url']
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert proof['Latest_bekreftet'] and proof['skjermbufferkontroller']==proof['nullkontroller']==384 and proof['windows_forsoek']==1
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==native
+files=json.loads((R/'moddfiler-2427.json').read_text());assert len(files)==20670 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==307
+names=['alkove-siste-20261020','alkove-fortsettelse-20261020','alkove-gjenbruk-20261020','sam-sugepil-345-20261020','sam345-gjenbruk-a-20261020','sam345-gjenbruk-b-20261020','sam345-tilbake-20261020','sam345-slutthoder-20261020','sam344-foerste-20261020','sam344-fortsettelse-20261020','aubergine347-grunnlag-20261020','max-alkove341-grunnlag-20261020','sam342-foerste-20261020',T.name,N.name,S.name]
+protected={}
+for n in names:
+ for fname in ['beskyttede-kilder.json','beskyttede-kildefeil-raw32.json','beskyttede-kilder-utvidet.json']:
+  p=A/'rapporter'/n/fname
+  if p.exists():
+   for f,h in json.loads(p.read_text()).items():
+    assert f not in protected or protected[f]==h
+    protected[f]=h
+assert len(protected)==572 and all(sha(A/f)==h for f,h in protected.items())
+stash=['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==stash
+for rname in ['sam342-foerste-20261020',T.name,S.name]:
+ p=A/'rapporter'/rname/'fremdrift.json';v=json.loads(p.read_text())
+ for e in v['leveranser']:
+  assert sha(A/e['resultat'])==e['sha256']
+  e.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=native,pakke_native=2427)
+ p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+v=json.loads((T/'overtegningsalias-oppfolging.json').read_text())
+for e in v['aliaser']:
+ actual=sha(P/'mods/gpt/costumes'/(e['overtegning']+'_hd.png'))
+ assert actual==sha(P/'mods/gpt/costumes'/(e['kanonisk']+'_hd.png'))==e['kanonisk_ny_native_sha256']
+ e.update(oppdatert_i_hd_mod=True,oppdatert_sha256=actual,i_fellespakke=True)
+v.update(retur_fortsatt_aapen=False,oppfolging_rapport=S.name,hd_mod_sha=native,fellespakke=tag)
+(T/'overtegningsalias-oppfolging.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+v=json.loads((S/'bevaringskontroll.json').read_text());v.update(pakkene_alias_retur=23,i_fellespakke=True,fellespakke_tag=tag)
+(S/'bevaringskontroll.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+v=json.loads((N/'kildegrunnlag.json').read_text());v.update(native_frosset_til_felles2427_er_kontrollert=False,native_frys_sha=native,senere_samlag_pakke_kontrollert=True,nyeste_fellespakke=tag,merknad_frys='Samlag-pakken er kontrollert og Latest bekreftet. Begge faktiske pakker har riktig modd. Native-frysen er frigitt. Kildeklargjoringens tidligere native_sha beholdes som historisk grunnlag.')
+(N/'kildegrunnlag.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+nexttext=f'Fortsett faktisk image_gen-produksjon av fig342_06 til 10. Ti ruter fra fem ulike hele RGBA-kilder. Originalark, motorposer, primærskript og godkjent anker er sett. Ingen nye bildekall eller resultater i disse fem jobbene ennå. Les KILDEGRUNNLAG.md og siste retur/fremdrift. Ikke gjenta 01 til 05 eller Sam346-returen.\n\nFellespakken {tag} er publisert og kontrollert: {url}. Begge faktiske pakker har 2427 native og alle 47 rettede Sam346-kleslag. Native-frysen på {native} er frigitt. Ikke gjenta bygg {proof["linux_run"]} eller {proof["windows_run"]}.\n'
+(N/'NESTE.md').write_text(nexttext)
+(A/'rapporter/sam342-foerste-20261020/NESTE.md').write_text(nexttext)
+with (N/'KILDEGRUNNLAG.md').open('a') as f:f.write(f'\nSenere samlepunkt {tag} har også de 23 rettede overtegningskopiene, til sammen 47 kleslag. Begge faktiske pakker og alle filer er kontrollert; native-frysen på {native} er frigitt. Fortsett produksjon av disse fem kildeklare jobbene uten nye påståtte leveranser fra denne dokumentoppdateringen.\n')
+with (T/'RAPPORT.md').open('a') as f:f.write(f'\nOppfølging: 23 eldre overtegningskopier ble oppdaget etter første pakke. De er nå rettet ved kildeidentisk hel-RGBA-gjenbruk av eget maleri og publisert i {native}, med i {tag}. Det er totalt 47 rettede kleslag, alle observert i både animasjon 1 og 7 i faktisk ny pakke. Begge pakker er filkontrollert og 384 sluttbufferkontroller er null. Se {S.name} og felles-release-20261020-samlag. Den tidligere rettingen av 24 alene var ikke komplett for overtegningsforløpet.\n')
+status=f'Oppdatert {datetime.now(ZoneInfo("Europe/Oslo")).strftime("%Y-%m-%d %H:%M")}: Fem nye Sam342-ark 01 til 05 er levert, egenkontrollert, native mottatt, visuelt sett og motorobservert. Ni nye native. Sam346-klesreturen omfatter nå 47 kleslag, inkludert 23 overtegningskopier som manglet i første 2427-pakke. Alle er publisert og hentet i {native}, 2427 native totalt. Alle 20670 moddfiler og 20664 PNG-er er SHA-bekreftet; alle tidligere stier og øvrig grafikk er bevart. Felles Linux-/Windows-utgave er publisert og bekreftet Latest: {url}. Begge faktiske nedlastinger, SHA-er, fire opplastinger og alle 20669 runtime moddfiler per pakke er kontrollert. Begge Sam-forløp viser alle 47 kleslag; seks pakkeprøver og seks grunnlagsprøver i samme nye binær, 384 sluttbufferkontroller null. Ti hele pakkebilder og to før/etter er visuelt sett. Windows besto første forsøk denne gangen; den tidligere SDL-startfeilen er fortsatt uavklart. 307 av 1758 hele figurjobber har resultat, 1451 gjenstår pluss returer, kildefeil og samlet kontroll. Ingen ny Tom-/Claude-godkjenning. To omrissvarsler per kanonisk/alias-retur er beholdt og visuelt vurdert. 572 beskyttede kildefiler og tre stasher er uendret. Neste fig342_06 til 10 er kildeklargjort med ti ruter fra fem hele kilder, uten nye bildekall/resultater ennå. Native-frysen er frigitt. Ikke gjenta disse byggene eller returen.'
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;text=p.read_text();paras=text.split('\n\n');assert paras[1].startswith('Oppdatert 2026-10-20:');paras[1]=status;p.write_text('\n\n'.join(paras))
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+body=f'''Fellesutgaven med hele Sam346-klesreturen er publisert og bekreftet Latest: {url}, releaseID {proof['release_id']}. Kode {proof['kode']}, hd-mod {native}, grafikkilde for de 23 kopiene f01324c8cb04f893f040f69e6d527d99d6a4e087. Begge pakker har 2427 native. De fem nye Sam342-arkene med ni nye ruter fra første samlepunkt er fortsatt med. Sams kropp og øvre kleslag er nå rettet i alle 47 native, inklusive de 23 kildeidentiske overtegningskopiene som jeg overså i første retting. Førbilder og hele RGBA-aliasbevis er bevart. Ingen ekstra bildekall for kopiene; samme eget sammenhengende klesmaleri brukes. Tolv tidligere hele ark er returnert, ikke telt som nye jobber. Egenkontroll 10 OK og to SJEKK for de kopierte hodene, native mottak 23 OK. Varsler er beholdt og visuelt vurdert.
+
+Linux {proof['linux_run']} og Windows {proof['windows_run']} ble sendt én gang hver og besto første forsøk. Begge faktiske nedlastinger og SHA-filer, fire opplastinger og alle 20669 runtime moddfiler per pakke er kontrollert; grafikken er byteidentisk mellom plattformene og publisert modd. Alle {proof['bevarte_tidligere_releaser']} tidligere releaser og deres vedlegg er bevart. Den nye faktiske Linux-binæren har SHA256 {proof['linux_binar_sha256']}. Seks pakkeprøver og seks grunnlagsprøver med samme nye binær: inventar i rom 30, akvarium, cafeteria, 820 bilder fra rom 92s skript og to separate 320-bilders Sam346-forløp (animasjon 1 og 7). Begge forløp logger alle 47 kleslag; 384 sluttbufferkontroller null. Ti hele pakkebilder og to før/etter er visuelt sett; den horisontale klesovergangen er sammenhengende også i overtegningsforløpet. Den tidligere Windows SDL-startfeilen i 39392600746 er fortsatt uavklart, selv om dette bygget besto uten omprøve. Ingen motor-/pipelinekode eller tester er endret.
+
+307 av 1758 hele figurjobber har resultat, 1451 gjenstår pluss returer, katalogfeil og samlet kontroll. Alle 572 beskyttede kildefiler og tre opprinnelige stasher er uendret. Alle tidligere moddfilstier er bevart; bare 23 dokumenterte alias-PNG-er og SHA256SUMS ble endret i den siste native-returen. Neste produksjon er fig342_06 til 10: ti ruter fra fem hele RGBA-kilder, originaler/motor/anker sett, ingen nye bildekall eller resultater i disse fem ennå. Native-frysen på {native} er frigitt etter faktisk pakkekontroll. Ikke gjenta dette samlepunktet.
+
+Bevis på gpt-arbeid: rapporter/felles-release-20261020-samlag/publisert.json, rapporter/sam346-overtegning-20261020 og rapporter/sam342-06til10-20261020/NESTE.md. Ingen naturlig gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning. Kjent liten inventarkant i rom 35, tidlig romhoppfelt, senere romhoppstans og kataloganalysen er fortsatt åpne. Grafikkautomatikk fortsetter; gammel nattkontroll forblir pauset. Ny grafikk ligger bare i gpt-arbeid og hd-mod; main får bare memory, todo, STATUS og log.
+'''
+for name in ['memory.md','STATUS.md']:
+ p=P/name;p.write_text(p.read_text()+f'\n\n## Hele Sam346-klesreturen i begge pakker, {now}\n\n'+body)
+p=P/'log.md';p.write_text(p.read_text()+f'\n\n## {now} (Codex)\n\n'+body)
+p=P/'todo.md';text=p.read_text();needle='## Neste\n';assert needle in text;text=text.replace(needle,needle+f'\n- [x] {now}: Alle 47 Sam346-kleslag er rettet, inkludert 23 eldre overtegningskopier. Native {native}; alle filer hentet og kontrollert.\n- [x] Fellesutgave {tag} publisert og Latest, begge faktiske pakker og alle 20669 moddfiler per pakke kontrollert. Begge Sam-forløp viser alle 47 lag; 384 sluttbufferkontroller null. Windows og Linux besto første forsøk. Ikke gjenta byggene.\n- [ ] Fortsett faktisk produksjon av de kildeklare fig342_06 til 10. Ti ruter fra fem hele kilder, ingen nye bildekall eller resultater der ennå. Se sam342-06til10-20261020/NESTE.md.\n',1);p.write_text(text)
+last=dict(tid_norsk=now,beskyttede_kilder=572,alle_beskyttede_SHA_uendret=True,figurjobber_med_resultat=307,figurjobber_totalt=1758,tre_stasher=stash,alle20670_moddfiler_SHA_bekreftet=True,native_sha=native,release_url=url,ingen_nye_bildekall_eller_resultater_i_neste_bunke=True)
+(R/'sluttbevaring.json').write_text(json.dumps(last,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'sluttforing.py.txt');print(json.dumps(last,ensure_ascii=False),flush=True)

@@ -1,1 +1,1 @@
-Nytt samlepunkt med de 23 overtegningsrettingene. Første 2427-pakke bevares. Native fryses ved SHA i bygg-startet.json. Kontroller begge faktiske pakker og begge Sam-forløp før ny fellesrelease. Ingen kodeendring. Ikke dupliser dispatchene.
+Ferdig samlepunkt: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-samlag, Latest bekreftet. Alle 47 berørte kleslag er med og motorobservert. Native-frysen er frigitt. Neste produksjon: Sam342_06 til 10, kildeklare uten nye bildekall. Ikke gjenta disse byggene.
