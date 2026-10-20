@@ -1,0 +1,6 @@
+from pathlib import Path
+import sys,shutil,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';S=A/'rapporter/sam251-slutt-20261020';call=sys.argv[1];p=Path(sys.argv[2]);C=S/'kall'/call;out=C/'raa.png';sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+if out.exists():assert sha(out)==sha(p)
+else:shutil.copy2(p,out)
+(C/'raabilde.json').write_text(json.dumps(dict(kilde=str(p),sha256=sha(out),verktøy='innebygd image_gen',original_bevart=True),ensure_ascii=False,indent=2)+'\n');print(call,sha(out))

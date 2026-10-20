@@ -1,0 +1,1 @@
+Kildeavklart polygonstil og faktiske synlige deler fra rom49/lokal210. Generisk Sam-premiss erstattet separat fordi det også er drage/sverdlag. Originaler,jobbkort og prompt.txt urørt. V04 bruker12x inspeksjonsproxy for små fragmenter,sluttleveranse og native bruker fast4x. Ingen fullføring av skjulte deler.

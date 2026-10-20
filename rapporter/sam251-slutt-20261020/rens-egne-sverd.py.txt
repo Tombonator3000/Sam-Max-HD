@@ -1,0 +1,50 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import _iou
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+backup=R/'utkast/V02R-ubrukt';backup.mkdir(exist_ok=False)
+for b in ['costume251_1813','costume251_1814']:
+ for f in [R/f'{b}-prototype.json',R/f'{b}-sammenligning.png',R/f'prototyper/{b}.png']:shutil.copy2(f,backup/f.name)
+ old=json.loads((R/'utkast/V02'/f'{b}-prototype.json').read_text());dest=R/old['prototype'];shutil.copy2(R/'utkast/V02'/f'{b}.png',dest);assert sha(dest)==old['sha256'];shutil.copy2(R/'utkast/V02'/f'{b}-prototype.json',R/f'{b}-prototype.json');shutil.copy2(R/'utkast/V02'/f'{b}-sammenligning.png',R/f'{b}-sammenligning.png')
+def rdp(p,eps):
+ p=np.asarray(p,float)
+ if len(p)<3:return p
+ v=p[-1]-p[0];den=np.linalg.norm(v);d=np.linalg.norm(p-p[0],axis=1) if den==0 else abs(v[0]*(p[:,1]-p[0,1])-v[1]*(p[:,0]-p[0,0]))/den;k=int(np.argmax(d))
+ if d[k]<=eps:return p[[0,-1]]
+ return np.concatenate((rdp(p[:k+1],eps)[:-1],rdp(p[k:],eps)))
+def loops(mask):
+ ed={}
+ for y,x in zip(*np.nonzero(mask)):
+  sides=[((x,y),(x+1,y),y==0 or not mask[y-1,x]),((x+1,y),(x+1,y+1),x==mask.shape[1]-1 or not mask[y,x+1]),((x+1,y+1),(x,y+1),y==mask.shape[0]-1 or not mask[y+1,x]),((x,y+1),(x,y),x==0 or not mask[y,x-1])]
+  for a,b,on in sides:
+   if on:ed.setdefault(a,[]).append(b)
+ out=[]
+ while ed:
+  start=next(iter(ed));p=[start];cur=start;prev=None
+  while True:
+   opts=ed[cur];nxt=opts[0]
+   if len(opts)>1 and prev is not None:
+    v=(cur[0]-prev[0],cur[1]-prev[1]);nxt=max(opts,key=lambda b:v[0]*(b[1]-cur[1])-v[1]*(b[0]-cur[0]))
+   opts.remove(nxt)
+   if not opts:del ed[cur]
+   if nxt==start:break
+   p.append(nxt);prev,cur=cur,nxt
+  out.append(np.asarray(p,float))
+ return out
+backup=R/'utkast/V04-foer-egenkantrens';backup.mkdir(exist_ok=False);recs=[]
+for b in ['costume251_1947','costume251_1948','costume251_1949']:
+ meta=json.loads((R/f'{b}-prototype.json').read_text());path=R/meta['prototype'];a=np.array(Image.open(path).convert('RGBA'));own=a[:,:,3]>=128;lab,n=nd.label(own);SS=4;out=Image.new('L',(a.shape[1]*SS,a.shape[0]*SS));dr=ImageDraw.Draw(out);details=[]
+ for cid in range(1,n+1):
+  mask=lab==cid;area=int(mask.sum());eps=2.4 if area>150 else 0.35
+  for p in loops(mask):
+   signed=float(np.sum(p[:,0]*np.roll(p[:,1],-1)-p[:,1]*np.roll(p[:,0],-1))/2);k=int(np.argmax(np.sum((p-p[0])**2,axis=1)));q=np.concatenate((rdp(p[:k+1],eps)[:-1],rdp(np.concatenate((p[k:],p[:1])),eps)[:-1]));assert len(q)>=3;dr.polygon([tuple(v*SS) for v in q],fill=255 if signed>0 else 0);details.append(dict(eget_component=cid,area=area,punkter_for=len(p),punkter_etter=len(q),toleranse_hd=eps))
+ alpha=np.array(out.resize((a.shape[1],a.shape[0]),Image.Resampling.LANCZOS));_,near=nd.distance_transform_edt(~own,return_indices=True);rgb=a[near[0],near[1],:3].astype(float);rgb=nd.gaussian_filter(rgb,sigma=(.6,.6,0));q=np.dstack((np.round(rgb).astype('uint8'),alpha));q[alpha==0,:3]=0
+ src=np.array(Image.open(P/'work/extract/costumes'/f'{b}.png').convert('RGBA'));iou,cov=_iou(q[:,:,3]>=128,np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1),-8,-8);assert iou>=.6 and cov>=.8
+ before=nd.label(own)[1];after=nd.label(q[:,:,3]>=128)[1];assert before==after,(b,before,after)
+ for f in [path,R/f'{b}-prototype.json',R/f'{b}-sammenligning.png']:shutil.copy2(f,backup/f.name)
+ Image.fromarray(q).save(path);meta.update(sha256=sha(path),snitt_union=iou,dekning=cov,egen_kontur_rens=True,konturrens=dict(kilde='kun eget image_gen-maleri',metode='RDP paa egen alfakontur og4xantialias; egne farger',komponenter_for=before,komponenter_etter=after,detaljer=details),metode=meta['metode']+'; trappetrinn renset bare fra egen malte kontur');(R/f'{b}-prototype.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n');recs.append(meta)
+ board=Image.new('RGB',(800,420),'#344556');d=ImageDraw.Draw(board);s=Image.fromarray(src).resize((src.shape[1]*8,src.shape[0]*8),Image.Resampling.NEAREST);im=Image.fromarray(q).resize((q.shape[1]*2,q.shape[0]*2),Image.Resampling.NEAREST);board.paste(s,(10,40),s);board.paste(im,(400,24),im);d.text((10,8),b+' original / renset egen kontur',fill='white');board.save(R/f'{b}-sammenligning.png');print(b,round(iou,3),round(cov,3),'egne komponenter',before,after,flush=True)
+(R/'V04-egenkantrens.json').write_text(json.dumps(recs,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/(Path(__file__).name+'.txt'))

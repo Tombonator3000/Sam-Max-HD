@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import _iou
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name;K=R/'kall/V04';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();raw=np.array(Image.open(K/'raa.png').convert('RGBA'));core=raw[:,:,3]>=128;labels,n=nd.label(core);areas=np.bincount(labels.ravel());prim=sorted(sorted(range(1,n+1),key=lambda i:areas[i],reverse=True)[:3],key=lambda i:nd.center_of_mass(core,labels,i)[1]);assert min(areas[i] for i in prim)>2000;dist=[nd.distance_transform_edt(labels!=i) for i in prim];groups=[[i] for i in prim]
+for i in range(1,n+1):
+ if i in prim:continue
+ cy,cx=nd.center_of_mass(core,labels,i);g=min(range(3),key=lambda g:dist[g][int(round(cy)),int(round(cx))]);groups[g].append(i)
+backup=R/'utkast/V04-foer-helgrupper';backup.mkdir(parents=True,exist_ok=False);reports=[]
+for e,ids in zip(json.loads((K/'plan.json').read_text())['ruter'],groups):
+ b=e['bilde'];sel=np.isin(labels,ids);yy,xx=np.nonzero(sel);x,y,w,h=int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1);d,near=nd.distance_transform_edt(~sel,return_indices=True);allow=d<=2;q=raw.copy();q[:,:,3][~allow]=0;q[:,:,3][sel]=255;edge=allow&~sel;q[edge,:3]=q[near[0][edge],near[1][edge],:3];q[q[:,:,3]==0,:3]=0;s=np.array(Image.open(P/'work/extract/costumes'/(b+'.png')).convert('RGBA'));H,W=s.shape[0]*4,s.shape[1]*4;aff=[w/W,0,x-8*w/W,0,h/H,y-8*h/H];im=Image.fromarray(q).transform((W+16,H+16),Image.Transform.AFFINE,aff,Image.Resampling.BICUBIC);a=np.array(im);a[a[:,:,3]==0,:3]=0;_,near=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);weak=(a[:,:,3]>0)&(a[:,:,3]<=4);a[weak,:3]=a[near[0][weak],near[1][weak],:3];mask=np.repeat(np.repeat(s[:,:,3]>0,4,0),4,1);iou,cov=_iou(a[:,:,3]>=128,mask,-8,-8)
+ for f in [R/f'{b}-prototype.json',R/f'{b}-sammenligning.png',R/f'prototyper/{b}.png']:shutil.copy2(f,backup/f.name)
+ out=R/f'prototyper/{b}.png';Image.fromarray(a).save(out);rec=dict(bilde=b,kall='V04',prototype=str(out.relative_to(R)),sha256=sha(out),raa_sha256=sha(K/'raa.png'),snitt_union=iou,dekning=cov,native_ok=iou>=.6 and cov>=.8,originalmaske=False,originalfragment_fallback=False,egen_alfa=True,metode='Alle hele egne komponenter gruppert rundt tre største egne malte motiver,så én affin per helgruppe',egne_komponenter=ids,egen_boks=[x,y,w,h],affin=aff);(R/f'{b}-prototype.json').write_text(json.dumps(rec,ensure_ascii=False,indent=2)+'\n');reports.append(rec);print(b,round(iou,3),round(cov,3),rec['native_ok'])
+ board=Image.new('RGB',(800,420),'#344556');dr=ImageDraw.Draw(board);src=Image.fromarray(s).resize((W,H),Image.Resampling.NEAREST);im=Image.fromarray(a);src=src.resize((src.width*2,src.height*2),Image.Resampling.NEAREST);im=im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST);board.paste(src,(10,40),src);board.paste(im,(400,24),im);dr.text((10,8),b+' original / egen helgruppe',fill='white');board.save(R/f'{b}-sammenligning.png')
+(R/'V04-helgrupper.json').write_text(json.dumps(reports,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser-v04-hele.py.txt')
