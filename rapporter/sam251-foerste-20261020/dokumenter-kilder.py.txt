@@ -1,0 +1,52 @@
+from pathlib import Path
+import json, hashlib, struct
+from smhd import gamedata
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter/sam251-foerste-20261020'
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+proof = read(R / 'motor-kildeproeve.json')
+assert len(proof['sett']) == 17 and not proof['mangler']
+assert len(proof['runder']) == 2 and all(v['exit'] == 0 for v in proof['runder'])
+assert all([x for x in v['kontroller'] if x['avvik']] == [dict(frame=36, avvik=160)] for v in proof['runder'])
+assert sum(len([x for x in v['kontroller'] if x['frame'] >= 60 and x['avvik'] == 0]) for v in proof['runder']) == 132
+tab = read(R / 'COST251-tabellgrenser.json')
+d, _ = gamedata.load(P / 'game/SAMNMAX.001')
+b = d[tab['COST_offset'] + 8:tab['COST_offset'] + tab['COST_size']]
+off = struct.unpack_from('<H', b, tab['data_offsets'] + 25 * 2)[0]
+assert tab['data_offsets'] + tab['num_anim'] * 2 <= off < len(b)
+assert next(v['ruter'] for v in tab['animasjoner'] if v['valg'] == 5) == next(v['ruter'] for v in tab['animasjoner'] if v['valg'] == 25)
+tab['motor_ekstra_raw25'] = dict(raw=25, offset=off, gyldig=True, samme_celsekvens_som_raw5=True)
+save(R / 'COST251-tabellgrenser.json', tab)
+obs = read(R / 'motor-kildeobservasjoner.json')
+assert obs['sett'] == 17
+imgs = sorted(R.glob('kildeposer-motor-side*.png')) + [R / v['fil'] for v in obs['hele_bilder']]
+assert len(imgs) == 7
+save(R / 'visuell-kildekontroll.json', dict(fem_originalark_sett=True, kildeposer_sett=17,
+     hele_kildebilder_sett=4, kildefiler_SHA={p.name: sha(p) for p in imgs}, nytegnet=0, ny_Tom_Claude_godkjenning=False))
+d = read(R / 'kildegrunnlag.json')
+d.update(motivkontroll_gjenstaar=False, motor_observert=17, originalark_sett=5, kildeposer_sett=17,
+         hele_kildebilder_sett=4, skjermbufferkontroller=160, nullkontroller=158,
+         null_fra60=132, ikke_naturlig_gjennomspilling=True)
+save(R / 'kildegrunnlag.json', d)
+(R / 'KILDEGRUNNLAG.md').write_text('''# Neste fem figurark251, 17 mål, 20. oktober2026
+
+Fig251_01 til05 er kildeklare.17 mål fra17 ulike hele canonical RGBA-kilder:1920..1925 og1798..1808. Fem originalark,alle17 canonical/motor-utsnitt og fire hele motorbilder er sett.0 nye bildekall,0 resultater,0 native fra251. Ikke tell kildeklargjøringen som levert grafikk.371 av1758 resultatark er fortsatt gjeldende.
+
+Rom49 er VR-verdenen ved dragen,sverdet og steinen,med kantete grønne fjell og lilla himmel/borg. Sam er selv en kantet polygonfigur her,med flat blågrå dress/hatt,brune hender/føtter,lang snute og mørkt stripet slips. Dragen er oransje/oker,mørk rød inni munnen,lange kantete horn/snute,segmentert hals/hale og enkle skarpe lemmer. Gyllent sverd med rosa/rød gardering er i dragens hånd når kilden viser det. Dette særpreget er bevisst. Bevar flat polygonstil,adskilte hals-/halesegmenter og riktige fargeflater. Ikke gjør dragen til en vanlig detaljert drage eller Sam til rund vanlig Sam. Ikke lim sammen segmentene eller fyll tilsiktede hull. Hovedark gir identitet/palett,originalens polygonstil styrer disse motivene.
+
+Kostyme251 er en komposittsekvens der dragen tar Sam i munnen og svelger ham. Sam og dragen finnes i SAMME cel.1920 viser begge stående,dragen med åpen munn.1921..1925 viser hodet senket over Sam mens dragens lange segmenterte hals bøyer seg.1798..1806 løfter og tipper dragens hode med Sams dress/bein stikkende ut.1807/1808 viser ikke Sam synlig lenger,men dragen og sverdet. Ikke tegn en ny Sam inn i dem. Samme motiv,person,farger og antall gjennom hele sekvensen. Den generiske etiketten Sam/start er utilstrekkelig og må korrigeres separat i faktisk prompt.
+
+Primær lokalskript210 i rom49 setter aktør2 tilkostyme251,vender249,bruker chore6 eller9 avhengig av eierskap til objekt458,deretter chore7. Kostyme248/aktor4 heves200 mens komposittcelen spiller,senkes igjen. Sekvensen fjerner458 og laster rom48. Lokal204/211-konteksten plasserer Sam ved234,171. Skriptkopier og SHA-er er bevart i skriptproveniens.json. Kildejobbenes rom49 er bekreftet.
+
+Tvungen kildeprøve bruker aktor2,kostyme251,chore6/7,zclip0,scale255,pos234,171,cam160,320 bilder per prøve. Faktisk nedlastet2634-Linux-binær443c145b5c41f98fc9ae587dd3087f57d1dc1d5b4232844bba403280e001900d og publisert2683-mod som ennå ikke har251. Begge avsluttet0,alle17 mål logget og visuelt sett.160 kontroller,158 null,samme kjente160-pikslers overgangsrest ved36 i hver prøve før251start60;alle132 fra60null. Ikke naturlig gjennomspilling. Andre aktører/objekter er ikke skjult i den tvungne prøven. Det ekstra gylne sverdet ved bakken kommer fra separat251_1953-lag i chore7 og inngår ikke i de17 første mål. Ikke bak det inn i nye helcels.
+
+COST-offset8993544,33918bytes,num_anim40,data_offsets74. Brukte raw5 og29 har gyldige tabelloffset154/159. Motorens raw25 er også kontrollert innen ekte40-tabell og har samme1920..1925-sekvens somraw5. Ingen dekoderadvarsler. Alle17 cels gyldige og kildemål stemmer med jobbkortene.832 beskyttede jobbkilder inkludert de20 nye SHA-ene,tre stasher og tidligere grafikk bevares.
+
+Nytegningen må bruke innebygd image_gen. Korriger generisk prompt separat,la beskyttet prompt/jobbfiler urørt. Bruk hele egne malerier i fast4x med ekte alfa,ingen hard originalsilhuettmaske,originalfragment-fallback eller senkede grenser. Kjør hele ark-kontrollen og native/motor/visuell kontroll. Ikke endre f108392586e1af5816f0b5548a8cbfce975052f3 mens2683-fellespakkene bygges og kontrolleres. Fig164_04/1943/1944 fortsatt blokkert,ingen omprøve. Ikke gjenta de ferdige047-arkene eller pakkebyggene.
+''')
+(R / 'NESTE.md').write_text('Fem251_01..05 er kildeklare,17 mål fra17 ulike hele kilder. Alle fem originalark,17 kildeposer og fire hele motorbilder sett. Les KILDEGRUNNLAG.md,skript og ruteplan-unik.json før kall. Dragen svelger polygon-Sam;bevar begge i samme cel,flat polygonstil,segmentert hals/hale,oransje drage og gyllent sverd.0 nye bildekall/resultater/native. Bevar832 kildehasher/tre stasher. Native er frosset på2683 til fellespakkecheckpoint er bekreftet ferdig. Nytegning på arbeidsbordet kan fortsette uavhengig. Ingen omprøve av blokkert164_04. Ikke gjenta047 eller2683-byggene.\n')
+print('Kilde251:5ark/17ulike/17sett/4hele,160kontroller158null,132fra60null,832beskyttet,0kall/0resultat.')

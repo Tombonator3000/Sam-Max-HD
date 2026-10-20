@@ -23,3 +23,5 @@ Publisering og tilbakehenting føres i mottak-publisert.json. Felles Linux-/Wind
 Bibliotekskilder:losninger/grafikk/figurark-fast-storrelse.md og losninger/bygg/publisert-mod-er-fasit.md. De eksisterende oppskriftene er tilpasset disse seks arkene og prøvd på prosjektets gjeldende binær,uten terskelendring.
 
 Publisert og hentet tilbake fra hd-mod f108392586e1af5816f0b5548a8cbfce975052f3,grafikkilde aa6d819a4ab72359d07537f8191ab144e03315d2. Alle20926 filer/20920PNG SHA-bekreftet. Alle20877 tidligere stier og20871PNG er bevart,baremod.json/SHA256SUMS endret. Ny native fryses gjennom det kommende fellespakke-samlepunktet.
+
+Med i kontrollert fellesutgave sam-max-hd-2026-10-20-gang047-slutt: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-gang047-slutt. Begge faktiske pakker og20925 runtime moddfiler per pakke er bekreftet. Alle49 nye observert i faktisk Linux.464 kontroller,461null og samme tre kjente160-overgangsavvik før figurstart som2634-grunnlaget.198 fra60null,ingen nye/økte avvik. Alle23 tidligere releaser og vedlegg bevart. Ingen ny Tom-/Claude-godkjenning.

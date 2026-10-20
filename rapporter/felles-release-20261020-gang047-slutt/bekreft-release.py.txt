@@ -1,0 +1,98 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import json, subprocess, hashlib, shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+S = A / 'rapporter/sam047-slutt-20261020'
+E = A / 'rapporter/sam047-effektretur-20261020'
+N = A / 'rapporter/sam251-foerste-20261020'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+api = lambda p: json.loads(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + p], cwd=P, text=True))
+state = read(O / 'bygg-startet.json')
+tag, code, mod = (state[k] for k in ['release_tag', 'kode', 'hd_mod'])
+meta = api('releases/tags/' + tag)
+latest = api('releases/latest')
+assert meta['id'] == latest['id'] and not meta['draft'] and not meta['prerelease']
+assets = read(O / 'assetkontroll.json')
+assert len(meta['assets']) == len(assets) == 4
+for v in assets:
+    a = next(a for a in meta['assets'] if a['name'] == v['fil'])
+    assert a['size'] == v['bytes'] and a['digest'] == 'sha256:' + v['sha256']
+    assert sha(O / v['plattform'] / v['fil']) == v['sha256']
+ref = api('git/ref/tags/' + tag)['object']
+if ref['type'] == 'tag':
+    ref = api('git/tags/' + ref['sha'])['object']
+assert ref['sha'] == code and ref['type'] == 'commit'
+prior = read(O / 'releaser-foer.json')
+after = api('releases?per_page=100')
+assert len(after) == len(prior) + 1
+aset = lambda v: {(a['id'], a['name'], a['size'], a['digest']) for a in v['assets']}
+for v in prior:
+    assert aset(v) == aset(next(x for x in after if x['id'] == v['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha'] == mod
+files = read(R / 'moddfiler-2683.json')
+assert len(files) == 20926 and all(sha(P / 'mods/gpt' / f) == h for f, h in files.items())
+assert all(f'costumes/costume164_{n}_hd.png' not in files for n in [1943, 1944])
+runtime = read(O / 'linux-kontroll.json')
+assert runtime['skjermbufferkontroller'] == 464 and runtime['nullkontroller'] == 461
+assert runtime['nye_native_observert'] == 49 and not runtime['nye_eller_oekte_avvik']
+assert len(read(R / 'motorbilder.json')) == 12
+runs = {k: api('actions/runs/' + str(state['plattform'][k]['run_id'])) for k in ['linux', 'windows']}
+assert all(v['conclusion'] == 'success' and v['run_attempt'] == 1 for v in runs.values())
+protected = read(N / 'beskyttede-samlet.json')
+assert len(protected) == 832 and all(sha(A / f) == h for f, h in protected.items())
+base = read(S / 'grunnlag-produksjon.json')
+assert subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines() == base['stash']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 371
+progresses = [(D, read(D / 'fremdrift.json')) for D in [E, S]]
+assert sum(len(d['leveranser']) for D, d in progresses) == 6
+assert all(sha(A / e['resultat']) == e['sha256'] for D, d in progresses for e in d['leveranser'])
+proof = dict(tid_utc=datetime.now(timezone.utc).isoformat(), url=meta['html_url'], release_id=meta['id'],
+             release_tag=tag, Latest_bekreftet=True, kode=code, hd_mod=mod, native=2683,
+             nye_native_siden_felles2634=49, nye_hele_ark=6, kostyme047_native=74,
+             kostyme164_mangler=[1943, 1944], figurjobber_med_resultat=371,
+             figurjobber_totalt=1758, gjenstaar_hele_jobber=1387,
+             faktiske_nedlastinger_begge=True, runtime_moddfiler_per_pakke_bekreftet=20925,
+             fire_assets_digest_og_bytes_verifisert=True, bevarte_tidligere_releaser=len(prior),
+             alle_tidligere_assets_bevart=True, linux_run=state['plattform']['linux']['run_id'],
+             windows_run=state['plattform']['windows']['run_id'], windows_forsoek=1, linux_forsoek=1,
+             linux_binar_sha256=runtime['binar_sha256'], skjermbufferkontroller=464, nullkontroller=461,
+             kjente_tidlige160_avvik=3, kontroller_fra_figurstart=198,
+             ingen_nye_eller_okte_avvik=True, helprove_uten_avvik=False,
+             hele_motorbilder_sett=12, foer_etter_sett=3, beskyttede_kilder=832,
+             tre_stasher_bevart=True, ny_Tom_Claude_godkjenning=False,
+             naturlig_gjennomspilling=False, ny_interaktiv_windows_eller_webtest=False,
+             tidligere_timeout_816_836_og_SDL_feil_ikke_erklaert_rettet=True,
+             neste251_kildeklare_ark=5, neste251_mal=17, neste251_bildekall=0)
+for D in [O, R]:
+    save(D / 'publisert.json', proof)
+    save(D / 'release-publisert.json', meta)
+state.update(status='fellesrelease_publisert_og_kontrollert', Latest_bekreftet=True,
+             native_frys_kan_frigis=True, release_url=meta['html_url'])
+for D in [O, R]:
+    save(D / 'bygg-startet.json', state)
+for D, d in progresses:
+    d.update(i_fellespakke=True, fellespakke_tag=tag, pakke_hd_mod_sha=mod, pakke_native=2683)
+    for e in d['leveranser']:
+        e.update(i_fellespakke=True, fellespakke_tag=tag, pakke_hd_mod_sha=mod, pakke_native=2683)
+    save(D / 'fremdrift.json', d)
+    p = D / 'RAPPORT.md'
+    p.write_text(p.read_text().rstrip() + f'\n\nMed i kontrollert fellesutgave {tag}: {meta["html_url"]}. Begge faktiske pakker og20925 runtime moddfiler per pakke er bekreftet. Alle49 nye observert i faktisk Linux.464 kontroller,461null og samme tre kjente160-overgangsavvik før figurstart som2634-grunnlaget.198 fra60null,ingen nye/økte avvik. Alle{len(prior)} tidligere releaser og vedlegg bevart. Ingen ny Tom-/Claude-godkjenning.\n')
+for f in ['sluttkontroll.json', 'mottak-publisert.json']:
+    d = read(S / f)
+    d.update(i_fellespakke=True, fellespakke_tag=tag, pakke_native=2683)
+    save(S / f, d)
+for D in [E, S]:
+    (D / 'NESTE.md').write_text(f'Alle047_01..09 er grafikklevert,74native. Siste seks04..09/49 nye er med i kontrollert felles2683:{meta["html_url"]}. Native-frys frigitt. Ikke gjenta047 eller byggene.371 av1758 figurjobber,1387 gjenstår pluss returer/katalogfeil/sluttkontroll. Neste fig251_01..05 er kildeklare,17 ulike hele kilder,0kall/0resultat. Les sam251-foerste-20261020/KILDEGRUNNLAG.md og NESTE.md,bevar polygon-Sam og dragen i samme cel.832 kildehasher/tre stasher bevart.164_04 er fortsatt blokkert,ingen omprøve. Automatisk grafikkproduksjon fortsetter.\n')
+p = N / 'NESTE.md'
+p.write_text(p.read_text().rstrip() + f'\n\nFelles2683 er nå faktisk kontrollert og publisert:{meta["html_url"]}. Native-frys frigitt. Fortsett faktisk251-nytegning ved neste kjøring,ikke gjenta047 eller pakkebyggene.\n')
+p = R / 'RAPPORT.md'
+p.write_text(p.read_text().rstrip() + f'\n\nPublisert og Latest bekreftet:{meta["html_url"]},releaseID{meta["id"]}. Begge bygg bestod første forsøk,alle{len(prior)} tidligere releaser og vedlegg bevart. Native-frys frigitt.\n')
+(R / 'PAAGAR.md').write_text(f'Ferdig samlepunkt:{meta["html_url"]}. Latest og2683 native i begge faktiske pakker bekreftet. Fortsett kildeklare251_01..05,ikke gjenta047 eller2683-byggene.164_04 forblir blokkert.\n')
+shutil.copy2(__file__, R / 'bekreft-release.py.txt')
+print(json.dumps(proof, ensure_ascii=False), flush=True)

@@ -1,0 +1,54 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json, subprocess, shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+d = json.loads((R / 'publisert.json').read_text())
+receipt = json.loads((A / 'rapporter/sam047-slutt-20261020/mottak-publisert.json').read_text())
+assert d['Latest_bekreftet'] and d['native'] == 2683 and d['nye_native_siden_felles2634'] == 49
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=P, text=True).strip()
+now = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+extra = json.loads((R / 'ekstra-taggbygg.json').read_text())
+extra_text = f'Denne fellesrelease-taggen startet også det kjente uønskede Windows-taggbygget{extra["id"]},status{extra["status"]}/{extra.get("conclusion") or ""}. Det er ikke hovedbygget{d["windows_run"]} som leverte pakken. Push-filterfeilen er fortsatt åpen;ingen ekstra dispatch eller omprøve.' if extra else 'Ingen ekstra Windows-taggkjøring funnet ved denne kontrollen;kjent push-filterfeil står fortsatt åpen.'
+body = f'''## Hele gang047 og felles2683, neste polygon251, {now}
+
+Alle ni047-ark er levert som grafikk,74 native. Siste seks fig047_04 til09 gir49 nye ruter fra33 ulike canonical helkilder:31 nye malerier,to tidligere egne prototyper og16 eksakte hele aliasmål.19 faktiske innebygde image_gen-kall/19 råbilder er bevart,18 nye denne økten,15 brukt og fire utkast holdt utenfor. Retur04/05 er rettet. Ett helt ark OK,fem SJEKK,23 omrissvarsler visuelt vurdert og beholdt.1818 er manuelt/native kontrollert selv om ark-kontrollen hopper over firepikslerskilden.49 automatisk native OK. Sju automatiske kontrollkopier hadde originaltillegg og er ikke brukt i native. Alle49 publiserte er egne faste4x-prototyper,ekte alfa,egne kantfarger,ingen originalsilhuettmaske/originalfragment-fallback eller senkede grenser. Ingen motor-/pipelinekode er endret. Ingen ny Tom-/Claude-godkjenning.
+
+Grafikkilde {receipt['kildecommit']}. Publisert og hentet hd-mod {d['hd_mod']},2683 native. Alle20926 filer/20920PNG SHA-bekreftet. Alle20877 tidligere stier og20871PNG er bevart.832 beskyttede kildefiler og tre opprinnelige stasher er uendret. Direkte telling:371 av1758 figurjobber har resultat,1387 gjenstår pluss returer,katalogfeil og samlet sluttkontroll.164_04/1943/1944 fortsatt blokkert etter tidligere verktøyavslag,ingen omprøve.
+
+Felles Linux-/Windows-utgave er publisert og Latest bekreftet: {d['url']},releaseID{d['release_id']}. Kode {d['kode']}. Linux{d['linux_run']} og Windows{d['windows_run']} bestod første forsøk. Begge faktiske nedlastinger,SHA-filer,fire publiserte assets med serverdigest/størrelse og alle20925 runtime moddfiler per pakke er kontrollert. Begge pakker har samme publiserte grafikk,alle49 nye og tidligere25 fra047 er med. Alle{d['bevarte_tidligere_releaser']} tidligere releaser og vedlegg er bevart ved fellespubliseringen. Native-frysen er frigitt. Ikke gjenta047 eller disse byggene.
+
+Faktisk ny Linux-binær SHA256 {d['linux_binar_sha256']}. Sju pakkeprøver og sju tilsvarende grunnlagsprøver med samme nye binær:inventar,akvarium,cafeteria,820 bilder fra rom92s egne skript og047/chore6/7/8. Alle49 nye observert.464 kandidatbufferkontroller,461 null,samme tre kjente160-avvik ved36 før047-start60 som2634-grunnlaget. Alle198 fra60 null,ingen nye/økte avvik. Tolv hele pakkebilder og tre før/etter er sett. Alle49 nye pakkemotorbilder er rasteridentiske med de sette produksjonsbildene. Tre bildepar har0 endringer utenfor alle aktive nye cels med kontrollmarg. Helprøven er ikke avviksfri. Normalaktor2/3 fortsatt synlig i tvungen aktor4-prøve,så ekstra Max er testoppsett,ikke bakt inn i grafikken. Ingen ny hjertekontur eller rosa akvarium/rør sett i disse prøvene. Turbanfiguren er fortsatt original pikselgrafikk. Full naturlig gjennomspilling,interaktiv Windows-/ny webtest,historiske SDL-/testhopp-/inventarkantfeil gjenstår.
+
+Neste fem fig251_01 til05 er kildeklare,17 mål fra17 ulike hele canonical kilder. Fem originalark,alle17 kildeposer og fire hele motorbilder er sett. Dragen svelger polygon-Sam i VR-rom49,lokal210. Bevar begge i samme cel,flat polygonstil,oransje drage,segmentert hals/hale og kildebekreftet gyllent sverd. Gyllent bakke-sverd i separat1953-lag skal ikke bakes inn i de17 første celene. Aktor2/chore6/7,pos234171 bekreftet. COST8993544/33918bytes,num_anim40,gyldige raw5/25/29,ingen dekoderadvarsler.160 kildekontroller158 null,samme to tidlige160-avvik;132 fra60 null.0 nye251-bildekall/resultater/native. Les sam251-foerste-20261020/KILDEGRUNNLAG.md og NESTE.md på gpt-arbeid,se stil-/kildereferansene før kall og fortsett faktisk produksjon av denne bunken.
+
+{extra_text}
+
+Ett GitHub-statusoppslag fikk en forbigående nettfeil;senere lesestatus lyktes,begge tilsiktede bygg bestod,ingen ny dispatch. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er fulgt. Automatisk grafikkproduksjon fortsetter uten gammel nattfrist;gammel nattkontroll gjenstartes ikke. Grafikk bare på gpt-arbeid/hd-mod;main får bare memory,todo,STATUS og log.
+'''
+for f in ['memory.md', 'STATUS.md']:
+    p = P / f
+    head, rest = p.read_text().split('\n', 1)
+    p.write_text(head + '\n\n' + body.rstrip() + '\n' + rest)
+p = P / 'todo.md'
+head, rest = p.read_text().split('\n', 1)
+todo = f'''## Neste, oppdatert {now}
+
+- [x] Alle ni047-ark/74native er levert,siste seks04..09/49nye er publisert og med i kontrollert felles2683:{d['url']}. Ikke gjenta047 eller byggene.
+- [x] Begge faktiske pakker,20925runtimefiler hver og alle49nye i Linux er kontrollert.464 kontroller461null,samme tre kjente160-avvik før figurstart.198 fra60null,ingen nye/økte avvik. Native-frys frigitt.23 omrissvarsler beholdt,ingen ny Tom-/Claude-godkjenning.
+- [ ] Fortsett faktisk nytegning av kildeklare251_01..05,17 ulike helkilder. Les sam251-foerste-20261020/KILDEGRUNNLAG.md,se original/motor og stilreferanser før kall. Dragen svelger polygon-Sam;bevar begge i samme cel,flat polygonstil,segmentert hals/hale og gyllent sverd.0bildekall/0resultat ennå. Ikke bak separat1953-bakkesverd inn i de17.
+- [ ] Bevar832beskyttede kildefiler,alle tidligere grafikkfiler/releaser og tre stasher. Ingen originalsilhuettmasker/fallback eller senkede grenser. Fortsett resterende1387 hele figurjobber pluss returer/katalogfeil/sluttkontroll.371 av1758 har resultat;all grafikk er ikke ferdig.
+- [ ] 164_04/1943/1944 fortsatt blokkert,ingen omprøve. Historiske overgangsrester,Windows SDL,testhopp816/836,inventarkant rom35 og ekstra taggbygg står åpne. Nytt ekstra taggbygg er dokumentert separat fra det vellykkede hovedbygget.
+'''
+p.write_text(head + '\n\n' + todo.rstrip() + '\n' + rest)
+p = P / 'log.md'
+p.write_text(p.read_text().rstrip() + f'\n\n## {now} (Codex)\n\n' + body.split('\n', 2)[2].rstrip() + '\n')
+p = A / 'ORDRE.md'
+head, rest = p.read_text().split('\n', 1)
+p.write_text(head + f'\n\nFerdig samlepunkt {now}: Alle047_01..09/74native er levert,siste seks04..09/49nye er med i kontrollert felles2683:{d["url"]}. Begge faktiske pakker/20925runtimefiler og49nye motorbilder kontrollert,464kontroller461null,samme tre kjente160-overgangsavvik;198fra60null,ingen nye/økte. Native-frys frigitt.371 av1758resultatark,1387gjenstår. Neste251_01..05 er kildeklare,17ulikehelkilder,0kall/0resultat. Les sam251-foerste-20261020/KILDEGRUNNLAG.md og NESTE.md,se alle relevante stil-/kildereferanser før nytegning. Bevar polygon-Sam og oransje segmentert drage i samme cel.832kildehasher/trestash bevart.164_04fortsatt blokkert,ingen omprøve. Ingen ny Tom-/Claude-godkjenning. Ikke gjenta047 eller2683-byggene. Automatisk produksjon fortsetter.\n' + rest)
+shutil.copy2(__file__, R / 'oppdater-status.py.txt')
+print('Bare fire hoveddokumenter og artordren oppdatert med kontrollert felles2683 og neste251.')
