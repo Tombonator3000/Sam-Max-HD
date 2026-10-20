@@ -9,3 +9,5 @@ Alle ti nye ruter er observert både i kildekorrekt tvungen chore 6 og rom 92s e
 Kandidat 2466 native, 20703 PNG-er og 20709 filer. Alle 20699 gamle stier og 20693 gamle PNG-er er bevart byteidentisk; bare mod.json endres før publiseringens sjekksumskriving. 632 beskyttede kildefiler og tre opprinnelige stasher er uendret. 327 av 1758 figurjobber har resultat, 1431 gjenstår pluss returer, katalogfeil og samlet sluttkontroll.
 
 Bibliotekskilden figurark-fast-storrelse og prosjektets remake-metode er brukt. Ingen motor-/pipelineendring. Publisering, tilbakehenting og pakkeinnhold bekreftes separat. Felles Linux-/Windows-pakker er fortsatt bekreftet 2456; disse ti nye er ennå ikke med. Neste samlepunkt er etter de resterende seks Sam343-arkene. Ikke gjenta det fullførte 2456-bygget.
+
+Publisert og hentet: grafikkilde 7d7e574c6c1150b77c4989115a0e5f0dcd09d572, hd-mod 16bf826c8dab1080fd6da3986e90a42e6d7c428b. Alle 20709 filer og 20703 PNG-er stemmer etter hent, og alle 20693 tidligere PNG-er er byteidentiske. Alle tidligere filstier og tre stasher er bevart. Pakkene har fortsatt 2456, og disse ti nye kommer ved neste samlepunkt. Ikke gjenta denne produksjonen.

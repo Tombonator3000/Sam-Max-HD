@@ -1,0 +1,1 @@
+Kildene til fig343_06 til 11 er klargjort og sett. Sju nye motiver gir tolv native ved seks eksakte 1935-aliaser. Ingen bildekall eller resultater for denne bunken ennå. De fem første343-arkene er allerede publisert i hd-mod16bf826c med2466 native. Ikke gjenta dem eller2456-pakkene. Fortsett faktisk produksjon med343_06. Les KILDEGRUNNLAG.md.
