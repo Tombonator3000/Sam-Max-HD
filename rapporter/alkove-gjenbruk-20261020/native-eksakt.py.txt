@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/alkove-gjenbruk-20261020';O=P/'out/alkove-gjenbruk-20261020';D=O/'mottak346';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+j=json.loads((D/'myke.json').read_text());assert j['ruter_ok']==17 and j['ruter_sjekk']==j['ruter_teknisk']==0;shutil.copy2(D/'myke.json',R/'myke346-automatisk.json')
+old={}
+for folder in ['bestilling12-20261020','alkove-fortsettelse-20261020']:
+ for s in json.loads((A/'rapporter'/folder/'myke346-kvittering.json').read_text())['ark'].values():old.update(s['ruter'])
+matches={v['bilde']:v for v in json.loads((R/'eksakte-tidligere-kilder.json').read_text())['ruter']};rows=[]
+for job,s in j['ark'].items():
+ for name,c in s['ruter'].items():
+  source=matches[name];before=dict(c);parent=old[source['eksakt_kildeforgjenger']];src=P/'mods/gpt'/source['native_fil'];dest=D/c['fil'];assert sha(src)==source['native_sha256']==parent['sha256']
+  shutil.copy2(src,dest)
+  for key in ['storrelse','marg','flytt_hd','snitt_union','dekning','tilpasset','skala_xy','tegnet_mot_4x']:c[key]=parent.get(key)
+  c['sha256']=sha(dest);c['produksjonstilpasning']='Eksakt samme hele kilde-RGBA og genererte prototype som tidligere publisert native, gjenbrukt byteidentisk.'
+  rows.append(dict(foer_sha256=before['sha256'],etter_sha256=c['sha256'],automatisk=before,slutt=c,**source))
+assert len(rows)==17;(D/'myke.json').write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n');(R/'native-eksakt-gjenbruk.json').write_text(json.dumps(dict(ruter=rows,antall=17,ulik_automatisk_sha=sum(v['foer_sha256']!=v['etter_sha256'] for v in rows),terskler_endret=False,original_pikselmaske_brukt=False),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'native-eksakt.py.txt');print('17 native-SHA-er identiske med kildefestede forgjengere')

@@ -1,0 +1,88 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,re,zipfile,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/alkove-gjenbruk-20261020';O=P/'out/alkove-gjenbruk-20261020';M=O/'mod-kandidat';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda n:json.loads((R/n).read_text())
+base=read('grunnlag-filer-ca6258e7.json');files={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()};assert len(base)==20441 and set(base)<=set(files);assert{p for p in base if base[p]!=files[p]}=={'mod.json'}
+entries=read('tillegg.json')['tillegg'];assert len(entries)==17 and{e['fil'] for e in entries}==set(files)-set(base);bycel={v['bilde']:v for v in entries}
+assert all(files[e['fil']]==e['sha256'] and e['kilde']=='arket' for e in entries)
+for e in entries:
+ a=np.array(Image.open(M/e['fil']));assert a.shape[0]%4==a.shape[1]%4==0 and a.shape[2]==4
+ assert (a[:,:,3]==0).any() and(a[:,:,3]>128).any() and not((a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0)).any()
+original=json.loads((P/'mods/gpt/mod.json').read_text());meta=json.loads((M/'mod.json').read_text());assert original['costume_cels']==2199 and meta['costume_cels']==2216;assert{k for k in meta if meta[k]!=original[k]}=={'costume_cels'}
+protected=read('beskyttede-kilder.json');assert len(protected)==36 and all(sha(A/p)==h for p,h in protected.items())
+previous=json.loads((A/'rapporter/alkove-fortsettelse-20261020/beskyttede-kilder.json').read_text());assert len(previous)==40 and all(sha(A/p)==h for p,h in previous.items())
+matches=read('eksakte-tidligere-kilder.json')['ruter'];assert len(matches)==17
+for v in matches:
+ assert sha(A/v['prototype_fil'])==v['prototype_sha256'] and bycel[v['bilde']]['sha256']==v['native_sha256']
+plan=read('ruteplan-unik.json')['ruter'];assert len(plan)==12 and sum(len(p['malruter']) for p in plan)==17
+for p in plan:
+ x,y,w,h=p['rekt'];src=Image.open(A/'jobber'/p['kildejobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(src.tobytes()).hexdigest()==p['rgba_sha256']
+ for v in p['malruter']:
+  x,y,w,h=v['rekt'];im=Image.open(A/'jobber'/v['jobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert im.tobytes()==src.tobytes()
+ assert len({bycel[v['bilde']]['sha256'] for v in p['malruter']})==1
+f=read('fremdrift.json');assert not f['faktiske_bildekall'] and len(f['leveranser'])==9;warnings=[];ok=checked=0
+for e in f['leveranser']:
+ assert sha(A/e['resultat'])==e['sha256'];im=Image.open(A/e['resultat']);assert im.mode=='RGBA' and im.size==(1536,1024)
+ rt=json.loads((A/e['rutekart']).read_text())[e['jobb']];assert rt['sha256_resultat']==e['sha256'] and len(rt['ruter'])==e['ruter']
+ j=json.loads((A/'jobber'/e['jobb']/'jobb.json').read_text());mask=np.zeros((1024,1536),bool)
+ for cel in j['ruter']:
+  x,y,w,h=cel['rekt'];dx,dy=(x+j['plassering'][0])*4,(y+j['plassering'][1])*4;mask[dy:dy+h*4,dx:dx+w*4]=1
+ assert not((np.array(im)[:,:,3]>0)&~mask).any()
+ text=(R/f"{e['jobb']}-egenkontroll.txt").read_text();assert 'FEIL' not in text;warnings+=re.findall(r'^SJEKK (costume\d+_\d+):',text,re.M);nums=re.search(r'(\d+) av (\d+) ruter OK',text);ok+=int(nums.group(1));checked+=int(nums.group(2));e.update(native_mottatt=True,visuelt_kontrollert=True,motoravspilt=True)
+assert checked==17 and ok==15 and set(warnings)=={'costume346_1936','costume346_1938'}
+vis=read('visuelle-kontrollbilder.json');assert vis['antall']==17 and{v['bilde'] for v in vis['ruter']}==set(bycel)
+assert all(v['native_sha256']==bycel[v['bilde']]['sha256'] for v in vis['ruter'])
+motor=read('motor-oppsummering.json');assert motor['ruter_tegnet']==motor['ruter_ved_kildepos']==17 and not motor['nye_eller_oekte_avvik'] and not motor['avvik_ogsaa_i_grunnlag']
+assert motor['skjermbufferkontroller']==80 and motor['kontroller_fra_figurstart']==71
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stashes==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+summary=dict(nye_native=17,native_totalt=2216,figurjobber_med_resultat=len(list((A/'jobber').glob('fig*/resultat.png'))),figurjobber_totalt=1758,unike_kilder=12,nye_bildekall=0,eksakte_tidligere_runtime_native=17,beskyttede_nye_kilder=36,forrige_bunkes40_kilder_uendret=True,tidligere_filer_bevart=len(base),tidligere_png_byteidentiske=sum(p.endswith('.png') for p in base),png_totalt=sum(p.endswith('.png') for p in files),filer_totalt=len(files),endrede_gamle_filer=['mod.json'],egenkontroll_ok=15,egenkontroll_sjekk=2,egenkontroll_feil=0,native_ok=17,original_fallback=0,originalutliggertillegg=0,visuelt_sett=17,motorobservert=17,motor_kontroller=80,fra_figurstart=71,alle_kontroller_null=True,stash_shaer=stashes)
+assert summary['figurjobber_med_resultat']==228 and summary['png_totalt']==20452 and len(files)==20458
+(R/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(R/'fremdrift.json').write_text(json.dumps(f,ensure_ascii=False,indent=2)+'\n')
+manifest={}
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for scene in ['baseline346-anim7','final346-anim7']:
+  p=O/scene/'scummvm.log';z.write(p,f'{scene}/scummvm.log');manifest[f'{scene}/scummvm.log']=sha(p)
+(R/'motorlogger-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+images=sorted(R.glob('motor-og-kilde*-final-*.png'))+sorted(R.glob('sam-gjenbruk-*-motor.png'));assert len(images)==5
+(R/'visuell-vurdering.json').write_text(json.dumps(dict(dato=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(),vurdert_av='Codex',alle17_original_native_motor_sett=True,tre_hele_motorbilder_sett=True,bilder={p.name:sha(p) for p in images},omrissmerknader=warnings,Tom_godkjent=False,separat_Claude_kontroll=False,naturlig_gjennomspilling=False),ensure_ascii=False,indent=2)+'\n')
+t=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+for e in f['leveranser']:
+ (A/'jobber'/e['jobb']/'notat.md').write_text(f'''# {e['jobb']}
+
+{t}, Codex. Sam i alkovenærbildet, rom92, kildepos159,101, aktør6, clip0, animasjon7. Tilsiktet varm brun/orange palett, kremgul skjorte, grått/svart slips, lilla sugekopper/fjær og gule skaft. Originalene og motorforløpet er sett, godkjent Sam-master brukes for identitet/strek.
+
+Ingen nye bildekall eller nye motiver. Hele RGBA-utsnittet og målene er eksakt likt tidligere kontrollerte kilder i bestilling12-20261020 eller alkove-fortsettelse-20261020. Genererte prototyper er gjenbrukt byteidentisk og plassert i dette jobbarkets egne rutebokser med ekte alfa. Eksakte kilde-, prototype-, native-SHA-er og kildecommit står i rapporter/alkove-gjenbruk-20261020/eksakte-tidligere-kilder.json og rutekartet. Ingen hard originalmaske eller ny tolkning av motivet.
+
+Resultat1536x1024RGBA, SHA256 {e['sha256']}, {e['ruter']} runtime-ruter. Egenkontroll {e['egenkontroll']}. Samlet17 målte:15 OK,to SJEKK(1936/1938,snitt/union0,72,100%mål,0 forskyvning),0 FEIL. Begge merknadene er manuelt sett.
+
+Automatisk native mottak17 OK med uendrede terskler. Sluttmottaket gjenbruker17 tidligere native byteidentisk ved eksakt samme hele kilde-RGBA; før-/ettermetadata er bevart i native-eksakt-gjenbruk.json. Ingen originalutliggerpiksler eller hel originalfallback.
+
+Alle17 er sett som original/native/motor og observert ved kildeposisjonen i ett tvunget animasjon7-forløp. Samme nedlastede e541253b-binær og innstillinger som grunnlag ca6258e7 med2199 native.80 skjermbufferkontroller, alle null,71 fra figurstart. Faktisk publisering og tilbakehenting i mottak-publisert.json. Ingen ny Tom-/Claude-godkjenning, naturlig gjennomspilling eller interaktiv Windows-/webtest.
+''')
+(R/'RAPPORT.md').write_text(f'''# Eksakt gjenbruk i alkoveseriens andre forløp
+
+{t}, Codex. Ni figurark, fig346_18 til26.17 nye runtime-ruter fra12 eksakt like tidligere kildeutsnitt. Ingen nye bildekall eller nye tegninger; gjenbruk av eksisterende innebygd image_gen-produksjon med kilde-/prototype-/native-SHA og kildecommit.
+
+Sam i rom92, kildepos159,101, aktør6, clip0, animasjon7. Varm brun/orange palett, kremgul skjorte, grått/svart slips, lilla kopper/fjær og gule skaft. Originalark, motorforløpet og relevante godkjente stilankere er sett. Hele kildens RGBA og mål er eksakt lik tidligere kontrollerte kilder, ikke bare lignende positur. Se eksakte-tidligere-kilder.json. Ingen motiv-, palett- eller identitetsgjetting. Bibliotekets figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelruter er samme kompatible v6-grunnlag som forrige bunke.
+
+Resultatarkene er satt sammen med ekte generert alfa, nye SHA-festede rutekart og uendrede beskyttede kilder. Tidligere genererte klær/hoder og små separate deler følger de eksakte kildeforgjengerne. Ingen hard originalmaske, originalutliggertillegg eller hel originalfallback.
+
+Egenkontroll17 målte,15 OK,to SJEKK,0 FEIL.1936/1938 har IoU0,72,100%mål og0 forskyvning. Begge er manuelt sett og merknadene beholdt. Automatisk native mottak17 OK med uendrede terskler. Sluttmottaket kopierer de17 tidligere native byteidentisk ved samme hele kilde-RGBA for å unngå at arkgrupper endrer plasseringen. Automatisk førmetadata og slutt-SHA er bevart.
+
+Alle17 er visuelt sett i to original/native/motor-kontaktark og tre hele motorbilder. Ett grunnlags- og ett sluttforløp med samme nedlastede e541253b-motor og kildeposisjon/aktør/clip/kamera/skala.80 sluttkontroller, alle null,71 fra figurstart. Tvungen animasjon, ikke naturlig gjennomspilling.
+
+36 nye beskyttede jobbfiler og de40 fra forrige bunke er uendret, tre stasher bevart. Alle20435 tidligere PNG-er og20441 gamle filstier bevart. Kandidat2216 native,20452 PNG-er,20458 filer.228 av1758 figurjobber har resultat,1530 mangler pluss returer og sluttkontroll. Bare mod.json endres blant gamle kandidatfiler. Faktisk send/hent og full hashkontroll føres i mottak-publisert.json.
+
+Ingen ny Tom-/Claude-godkjenning eller interaktiv Windows-/webtest. Fellespakken sam-max-hd-2026-10-20-natt har2134 native,82 bak etter denne publiseringen. Pakker oppdateres ved neste samlepunkt med faktisk nedlasting og kontroll.
+
+Neste fig346_27 har også et eksakt kildetreff mot1808, men er animasjon9/retning0 og krever egen observasjon av rute656. Ingen resultatfil eller leveringspåstand for27 i denne bunken. Bruk eksisterende testkroker og kildeskript; ikke anta at valgt animasjon9 med fast høyrevendt retning dekker den. Senere346-jobber og Max-nærbilder gjenstår. Automatisk fortsettelse er aktiv, gammel nattkontroll forblir pauset.
+''')
+(R/'PAAGAR.md').write_text('# Ni ark kontrollert\n\n17 runtime-ruter, alle fra tidligere eksakt samme hele kilder. Ingen nye bildekall. Se RAPPORT.md og mottak-publisert.json. Neste fig346_27, krev observasjon av rute656 i riktig animasjon/retning.\n')
+p=A/'GRAFIKKLISTE.md';s=p.read_text();q=chr(96)
+for e in f['leveranser']:s=s.replace('- [ ] '+q+e['jobb']+q,'- [x] '+q+e['jobb']+q)
+start=s.index('Oppdatert ');end=s.index('\n\n',start);s=s[:start]+f'Oppdatert {t}. Ni nye ark,17 runtime-ruter fra12 eksakt like tidligere tegninger.15 OK,to SJEKK,0 FEIL; alle17 visuelt sett og motorobservert. Kandidat2216, publisert2199 til kvittering.228 av1758 resultatark. Se rapporter/alkove-gjenbruk-20261020/mottak-publisert.json. Ingen ny Tom-/Claude-godkjenning.'+s[end:];s=s.replace('219 ark med resultat; 2199 native ruter i publisert modd','228 ark med resultat; kandidat2216, publisert2199 til kvittering');p.write_text(s)
+p=A/'ORDRE.md';s=p.read_text();anchor='## Gjør disse nå\n';p.write_text(s.replace(anchor,anchor+f'\nProduksjon {t}: fig346_18 til26 kontrollert,17 runtime fra12 eksakt samme hele kilder som tidligere generert grafikk. Ingen nye bildekall.17 native OK,15 egenkontroll OK,to SJEKK,ingen FEIL. Alle17 sett/motorobservert,80 målinger null. Kandidat2216,grunnlag2199.228 av1758 resultatark. Se rapporter/alkove-gjenbruk-20261020/RAPPORT.md og mottak-publisert.json. Neste fig346_27 med egen animasjon9/retning0-observasjon av656. Ikke gjenta08 til26. Pakker2134 blir82 bak.\n',1))
+for name in ['sluttkontroll-og-notater.py','motor-baseline.py','native-eksakt.py','kandidat-og-motor.py','visuell-sluttkontroll.py']:shutil.copy2(O/name,R/(name+'.txt'))
+print(json.dumps(summary,ensure_ascii=False))

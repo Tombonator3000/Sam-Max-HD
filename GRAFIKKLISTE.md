@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-20 02:48. Ti nye ark, 22 native, alle visuelt sett og motorobservert. 19 OK, to SJEKK, én smal manuelt sett, ingen FEIL. Publisert 2199, grunnlag 2177. 219 av 1758 resultatark. Se rapporter/alkove-fortsettelse-20261020/mottak-publisert.json. Ingen ny Tom-/Claude-godkjenning.
+Oppdatert 2026-10-20 02:58. Ni nye ark,17 runtime-ruter fra12 eksakt like tidligere tegninger.15 OK,to SJEKK,0 FEIL; alle17 visuelt sett og motorobservert. Kandidat2216, publisert2199 til kvittering.228 av1758 resultatark. Se rapporter/alkove-gjenbruk-20261020/mottak-publisert.json. Ingen ny Tom-/Claude-godkjenning.
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -13,7 +13,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 219 ark med resultat; 2199 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 228 ark med resultat; kandidat2216, publisert2199 til kvittering | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
@@ -214,15 +214,15 @@ Figurark for Sam.
 
 Figurark for Sam.
 
-- [ ] `fig346_18` (figurark 18 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_19` (figurark 19 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_20` (figurark 20 for Sam (kostyme 346), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_21` (figurark 21 for Sam (kostyme 346), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_22` (figurark 22 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_23` (figurark 23 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_24` (figurark 24 for Sam (kostyme 346), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_25` (figurark 25 for Sam (kostyme 346), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
-- [ ] `fig346_26` (figurark 26 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_18` (figurark 18 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_19` (figurark 19 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_20` (figurark 20 for Sam (kostyme 346), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_21` (figurark 21 for Sam (kostyme 346), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_22` (figurark 22 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_23` (figurark 23 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_24` (figurark 24 for Sam (kostyme 346), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_25` (figurark 25 for Sam (kostyme 346), 3 ruter: animasjon 7 mot høyre (3 ruter), bilde to `jobber/fig346_01/resultat.png`)
+- [x] `fig346_26` (figurark 26 for Sam (kostyme 346), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 - [ ] `fig346_27` (figurark 27 for Sam (kostyme 346), 1 rute: animasjon 9 (lag 5, tegnes over kroppen) mot venstre (1 rute), bilde to `jobber/fig346_01/resultat.png`)
 
 ## Bestilling 15

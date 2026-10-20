@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/alkove-gjenbruk-20261020';O=P/'out/alkove-gjenbruk-20261020';R.mkdir();O.mkdir();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();jobs=[f'fig346_{n:02}' for n in range(18,27)]
+hist={}
+for folder,commit in [('bestilling12-20261020','253f10b7ca1ca9e7f7a0fea20bb92993d3d05db9'),('alkove-fortsettelse-20261020','33ac0406607f5b8a9ee486d7620e3037f896e7ad')]:
+ r=A/'rapporter'/folder
+ for v in json.loads((r/'ruteplan-unik.json').read_text())['ruter']:hist[(tuple(v['rekt'][2:]),v['rgba_sha256'])]=(r,v,commit)
+protected={};rows=[];unics={};matches=[];progress=dict(dato='2026-10-20',verktøy='Eksakt gjenbruk av tidligere innebygd image_gen-produksjon',faktiske_bildekall=[],leveranser=[],merknad='Ingen nye bildekall eller nye motiver; hele kilde-RGBA og mål er eksakt like tidligere publiserte og kontrollerte ruter. Alle nye rutenummer krever eget mottak og motorobservasjon.')
+for job in jobs:
+ d=A/'jobber'/job;assert not(d/'resultat.png').exists() and not(d/'retur.md').exists();j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGBA');out=Image.new('RGBA',(1536,1024));rt=[]
+ for n in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:protected[f'jobber/{job}/{n}']=sha(d/n)
+ for cel in j['ruter']:
+  x,y,w,h=cel['rekt'];src=im.crop((x,y,x+w,y+h));dig=hashlib.sha256(src.tobytes()).hexdigest();key=(src.size,dig);assert key in hist,(job,cel['bilde']);oldr,old,commit=hist[key];proto=oldr/(old['bilde']+'-prototype.png');image=Image.open(proto).convert('RGBA');assert image.size==(w*4,h*4)
+  dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;out.alpha_composite(image,(dx,dy))
+  if key not in unics:unics[key]=dict(bilde=cel['bilde'],kildejobb=job,rekt=cel['rekt'],rgba_sha256=dig,malruter=[])
+  unics[key]['malruter'].append(dict(jobb=job,bilde=cel['bilde'],rekt=cel['rekt'],animasjon=cel['animasjon'],retning=cel['retning'],lag=cel['lag']))
+  import numpy as np
+  yy,xx=np.nonzero(np.array(image)[:,:,3]>128);rt.append(dict(bilde=cel['bilde'],kostyme=346,rute=cel['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=old['bilde'],kilde_rgba_sha256=dig,prototype=str(proto.relative_to(A)),prototype_sha256=sha(proto),kildecommit=commit,eksakt_kildeforgjenger=old['bilde']))
+  matches.append(dict(jobb=job,bilde=cel['bilde'],eksakt_kildeforgjenger=old['bilde'],prototype_fil=str(proto.relative_to(A)),prototype_sha256=sha(proto),kilde_rgba_sha256=dig,kildecommit=commit,native_fil=f"costumes/{old['bilde']}_hd.png",native_sha256=sha(P/'mods/gpt/costumes'/f"{old['bilde']}_hd.png")))
+ out.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=rt)},indent=2)+'\n')
+ e=dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(rt),rutekart=f'rapporter/alkove-gjenbruk-20261020/rutekart-{job}.json',egenkontroll='ikke kjørt',native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False)
+ r=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',e['resultat']],cwd=A,capture_output=True,text=True);assert r.returncode in [0,1];e['egenkontroll']={0:'OK',1:'SJEKK'}[r.returncode];(R/f'{job}-egenkontroll.txt').write_text(r.stdout+r.stderr);progress['leveranser'].append(e);rows.append(dict(jobb=job,ruter=len(rt),rom=j['rom'],kostyme=346,animasjoner=sorted({c['animasjon'] for c in j['ruter']})));print(job,r.stdout,flush=True)
+for n,v in [('beskyttede-kilder.json',protected),('klargjort.json',rows),('ruteplan-unik.json',dict(ruter=list(unics.values()))),('eksakte-tidligere-kilder.json',dict(ruter=matches)),('fremdrift.json',progress)]: (R/n).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+assert len(matches)==17 and len(unics)==12 and len(protected)==36
+native=subprocess.check_output(['git','rev-parse','origin/hd-mod'],cwd=P,text=True).strip();assert native=='ca6258e71ce130c228d45be233830945c1ceb16d';base={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in(P/'mods/gpt').rglob('*') if p.is_file()};assert json.loads((P/'mods/gpt/mod.json').read_text())['costume_cels']==2199;(R/'grunnlag-filer-ca6258e7.json').write_text(json.dumps(base,indent=2)+'\n')
+oldR=A/'rapporter/alkove-fortsettelse-20261020'
+for n in ['kildeskript-rom_092-inngang.txt','kildeskript-rom_092-lokal_201.txt']:shutil.copy2(oldR/n,R/n)
+for page in range(2):
+ subset=rows[page*5:page*5+5];b=Image.new('RGB',(1560,555*((len(subset)+1)//2)),'#3d454b');d=ImageDraw.Draw(b)
+ for i,row in enumerate(subset):
+  im=Image.open(A/'jobber'/row['jobb']/'original_1x.png').convert('RGB');im=im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST);b.paste(im,(i%2*780+12,i//2*555+35));d.text((i%2*780+12,i//2*555+10),row['jobb'],fill='white')
+ b.save(R/f'originalreferanser346-del{page+1}.png')
+shutil.copy2(__file__,R/'gjenbruk-og-plasser.py.txt')
+print('9 nye ark,17 runtime fra12 tidligere eksakt like prototyper. Ingen nye bildekall.')
