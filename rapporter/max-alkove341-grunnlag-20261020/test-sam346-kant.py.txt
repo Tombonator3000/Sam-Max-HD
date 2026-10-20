@@ -1,0 +1,13 @@
+from pathlib import Path
+import os,shutil,subprocess,json,re,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/max-alkove341-grunnlag-20261020';R=P/'work/.gpt-gren/rapporter/max-alkove341-grunnlag-20261020';PK=P/'out/felles-release-20261020-hjertebytte/linux/squashfs-root';DATA=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm';MOD=O/'mod-sam346-kantforsok';T=O/'sam346-kantforsok820';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert not T.exists() and not MOD.exists();shutil.copytree(P/'mods/gpt',MOD);rows=json.loads((R/'sam346-kantforsok.json').read_text())['ruter']
+for c in rows:
+ assert sha(MOD/c['fil'])==c['foer_sha256'];shutil.copy2(O/'sam346-kantforsok'/Path(c['fil']).name,MOD/c['fil']);assert sha(MOD/c['fil'])==c['etter_sha256']
+T.mkdir();home=T/'home';home.mkdir();saves=T/'saves';saves.mkdir()
+for p in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update(HOME=str(home),XDG_CONFIG_HOME=str(home/'.config'),XDG_DATA_HOME=str(home/'.local/share'),XDG_CACHE_HOME=str(home/'.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(MOD),DIGHD_VERIFY='1',DIGHD_QUIT_AT='820',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='4',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='92',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(DATA/'game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+with(T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=180).returncode
+log=(T/'scummvm.log').read_text();checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];assert code==0 and checks and not any(r['avvik'] for r in checks)
+row=dict(exit=code,binar_sha256=sha(B),ruter=rows,kontroller=checks,kun_romhopp_ingen_kostyme_aktor_overstyring=True,naturlig_gjennomspilling=False);(R/'sam346-motor-kantforsok.json').write_text(json.dumps(row,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'test-sam346-kant.py.txt');print('Sam346 kantforsok820 bestatt',len(checks),'nullkontroller',flush=True)

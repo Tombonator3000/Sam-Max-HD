@@ -1,0 +1,41 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/max-alkove341-grunnlag-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();B=R/'foerste-prototyper';B.mkdir(exist_ok=True)
+for p in R.glob('costume341_*-prototype.png'):
+ if not(B/p.name).exists():shutil.copy2(p,B/p.name)
+master=np.array(Image.open(R/'max341-startmaster-renset.png').convert('RGBA'))
+# Position and clean existing generated ink only. Shape comes from image_gen;
+# source coordinates measure placement, never clip the painted silhouette.
+def ink_piece(a,mask):
+ ys,xs=np.nonzero(mask);x0,x1=max(0,xs.min()-2),min(a.shape[1],xs.max()+3);y0,y1=max(0,ys.min()-2),min(a.shape[0],ys.max()+3);patch=a[y0:y1,x0:x1].copy();m=ndimage.binary_dilation(mask,iterations=2)[y0:y1,x0:x1];core=a[mask,:3].astype(float);color=np.median(core,axis=0);bg=np.median(patch[~m,:3],axis=0) if (~m).any() else np.array([255,220,165]);alpha=np.clip((bg[0]-patch[:,:,0].astype(float))/max(1,bg[0]-color[0]),0,1);alpha[~m]=0;alpha[alpha<.025]=0;out=np.zeros_like(patch);out[:,:,:3]=np.clip(color,0,255).astype('uint8');out[:,:,3]=np.rint(alpha*255).astype('uint8');out[out[:,:,3]==0,:3]=0
+ return Image.fromarray(out),[int(x0),int(y0),int(x1),int(y1)],m
+
+def fill_own(a,mask):
+ # Local smooth skin inferred solely from neighboring pixels of this painting.
+ ys,xs=np.nonzero(mask);x0,x1=max(0,xs.min()-8),min(a.shape[1],xs.max()+9);y0,y1=max(0,ys.min()-8),min(a.shape[0],ys.max()+9);b=a[y0:y1,x0:x1];Y,X=np.indices(b.shape[:2]);full=mask[y0:y1,x0:x1];good=(~full)&(b[:,:,0]>190)&(b[:,:,1]>140)&(b[:,:,3]>250);basis=np.stack([np.ones_like(X),X,Y,X*Y],2).astype(float);assert good.sum()>25
+ coef=np.linalg.lstsq(basis[good],b[:,:,:3][good],rcond=None)[0];pred=np.clip(basis@coef,0,255).astype('uint8');b[full,:3]=pred[full];a[y0:y1,x0:x1]=b
+moves=[]
+for window,dest in [((42,492,90,558),(52,524,64,556)),((258,518,306,578),(260,548,272,572))]:
+ x0,y0,x1,y1=window;mask=np.zeros(master.shape[:2],bool);mask[y0:y1,x0:x1]=(master[y0:y1,x0:x1,:3].max(2)<90);piece,box,_=ink_piece(master,mask);full=ndimage.binary_dilation(mask,iterations=3);fill_own(master,full);overlay=Image.new('RGBA',(432,800));overlay.alpha_composite(piece.resize((dest[2]-dest[0],dest[3]-dest[1]),Image.Resampling.LANCZOS),(dest[0],dest[1]));master=np.array(Image.alpha_composite(Image.fromarray(master),overlay));moves.append(dict(egen_ink_bbox=box,maal_rekt=list(dest)))
+masterim=Image.fromarray(master);masterim.save(R/'max341-startmaster-justert.png')
+for cel,rect in [(1668,(0,0,432,680)),(1795,(48,512,308,580)),(1920,(100,680,388,800))]:masterim.crop(rect).save(R/f'costume341_{cel}-prototype.png')
+blink=master.copy()
+for x0,y0,x1,y1 in [(48,520,68,560),(256,544,276,576)]:
+ mask=np.zeros(blink.shape[:2],bool);mask[y0:y1,x0:x1]=(blink[y0:y1,x0:x1,:3].max(2)<120);fill_own(blink,ndimage.binary_dilation(mask,iterations=2))
+b=np.array(Image.open(B/'costume341_1793-prototype.png').convert('RGBA'));l,n=ndimage.label((b[:,:,:3].max(2)<150)&(b[:,:,3]>128));s=np.array(Image.open(P/'work/extract/costumes/costume341_1793.png').convert('RGBA'));sl,sn=ndimage.label(np.all(s[:,:,:3]==[119,107,135],2));targets=[]
+for k in range(1,sn+1):
+ yy,xx=np.nonzero(sl==k)
+ if len(xx)>=3 and xx.min()>4 and xx.max()<69 and yy.min()<14 and (xx.max()<25 or xx.min()>45):targets.append([int(xx.min()*4+16),int(yy.min()*4+512),int((xx.max()+1)*4+16),int((yy.max()+1)*4+512)])
+targets.sort();parts=[]
+for k in range(1,n+1):
+ yy,xx=np.nonzero(l==k)
+ if len(xx)>40 and xx.max()-xx.min()<80 and yy.max()-yy.min()<20:parts.append((int(xx.min()),k))
+parts.sort();assert len(parts)==len(targets)==2,(parts,targets)
+for (_,k),dest in zip(parts,targets):
+ piece,box,_=ink_piece(b,l==k);overlay=Image.new('RGBA',(432,800));overlay.alpha_composite(piece.resize((dest[2]-dest[0],dest[3]-dest[1]),Image.Resampling.LANCZOS),(dest[0],dest[1]));blink=np.array(Image.alpha_composite(Image.fromarray(blink),overlay))
+Image.fromarray(blink).crop((16,512,308,580)).save(R/'costume341_1793-prototype.png')
+# B02 is the same source gesture, now with its source-confirmed long left finger.
+a=np.array(Image.open(R/'raa-B02.png').convert('RGBA'));a[:,:,3]=np.minimum(255,np.rint(a[:,:,3].astype(float)*255/254)).astype('uint8');bad=((a[:,:,0]>180)&(a[:,:,1]>150)&(a[:,:,2]<60))|((a[:,:,0]>180)&(a[:,:,1]<70)&(a[:,:,2]>150))|((a[:,:,0]<60)&(a[:,:,1]>180)&(a[:,:,2]>180));a[bad]=0;l,n=ndimage.label(a[:,:,3]>=32);sizes=np.bincount(l.ravel());keep=np.isin(l,np.flatnonzero(sizes>=40)[1:]);keep=ndimage.binary_dilation(keep,iterations=2);a[~keep]=0;a[a[:,:,3]==0,:3]=0;box=Image.fromarray((a[:,:,3]>=32).astype('uint8')*255).getbbox();hand=Image.fromarray(a).crop(box).resize((448,256),Image.Resampling.LANCZOS);hand.save(R/'costume341_1927-prototype.png')
+(R/'blink-og-handretting.json').write_text(json.dumps(dict(eyebevegelser=moves,blinkmaal=targets,egen_master_sha256=sha(R/'max341-startmaster-justert.png'),handkilde='B02',hand_alfa_bbox=box,hand_sha256=sha(R/'costume341_1927-prototype.png'),forklaring='Egne genererte øyestreker plassert etter kildebokser. B01s rektangelramme forkastet. Blinkeplaten er samme egne A01-hud,nese,alfa og munn;bare genererte øyestreker skifter. Ingen originalsilhuettmaske.'),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'rens-blink-og-hand341.py.txt');print('Retting lagret',targets,flush=True)

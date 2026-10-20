@@ -1,0 +1,7 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/max-alkove341-grunnlag-20261020';R=P/'work/.gpt-gren/rapporter/max-alkove341-grunnlag-20261020';B=P/'out/felles-release-20261020-hjertebytte/pakke2399-rom92-skript';T=O/'sam346-kantforsok820';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();board=Image.new('RGB',(1600,840),'#253341');d=ImageDraw.Draw(board);obs=[]
+for i,k in enumerate([B,T]):
+ f=k/'frame_000784_room092.png';im=Image.open(f).convert('RGB');im.thumbnail((790,600),Image.Resampling.LANCZOS);board.paste(im,(i*800,24));d.text((i*800+10,6),'Før' if i==0 else 'Etter',fill='white');im=Image.open(f).convert('RGB').crop((0,488,800,540)).resize((1600,104),Image.Resampling.NEAREST);board.paste(im,(0,620+i*108));obs.append(dict(fil=str(f),sha256=sha(f)))
+a=np.array(Image.open(B/'frame_000784_room092.png').convert('RGB'));b=np.array(Image.open(T/'frame_000784_room092.png').convert('RGB'));diff=np.any(a!=b,2);y,x=np.nonzero(diff);assert len(x) and y.min()==y.max()==507;stats=dict(endrede_skjermpiksler=len(x),endret_rekt=[int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)],utenfor_manglende_rad_byteidentisk=True,kontrollbilder=obs);(R/'sam346-visuell-som-kontroll.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2)+'\n');board.save(R/'sam346-for-etter-motor.png');shutil.copy2(__file__,R/'vis-sam346-etter.py.txt');print(json.dumps(stats),flush=True)

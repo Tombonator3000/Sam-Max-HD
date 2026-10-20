@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/max-alkove341-grunnlag-20261020';B=R/'foer-handuttak';B.mkdir(exist_ok=True);master=Image.open(R/'max341-startmaster-justert.png').convert('RGBA');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=[];board=Image.new('RGB',(1500,1250),'#c0cbd1');d=ImageDraw.Draw(board)
+for i,(cel,ids,world) in enumerate([(1925,[5,7],(237,160)),(1926,[5],(224,152)),(1927,[2,4,5],(202,136)),(1928,[4,5,16],(207,144))]):
+ p=R/f'costume341_{cel}-prototype.png';assert not(B/p.name).exists();shutil.copy2(p,B/p.name);a=np.array(Image.open(p).convert('RGBA'));ink=(a[:,:,:3].max(2)<110)&(a[:,:,3]>0);light=(~ink)&(a[:,:,3]>128)&(a[:,:,0]>140)&(a[:,:,1]>110);l,n=ndimage.label(light);keep=np.isin(l,ids);keep=ndimage.binary_fill_holes(ndimage.binary_dilation(keep,iterations=2));b=a.copy();b[~keep]=0
+ # Only the lower screen crop cuts the own forearm. Continue its own color to
+ # the last row instead of retaining a fictional horizontal frame stroke.
+ for yy in range(a.shape[0]-3,a.shape[0]):
+  on=(b[yy,:,3]>0)&(b[-5,:,3]>128);b[yy,on]=b[-5,on]
+ b[b[:,:,3]==0,:3]=0;hand=Image.fromarray(b);hand.save(R/f'costume341_{cel}-egen-hand.png');x,y=world;rect=((x-212)*4,y*4,(x-212)*4+a.shape[1],y*4+a.shape[0]);base=master.crop(rect);base.alpha_composite(hand);base.save(p)
+ for k,im in enumerate([Image.fromarray(a),hand,base]):
+  im=im.copy();im.thumbnail((490,520),Image.Resampling.LANCZOS);xx=k*500;yy=i//2*620+(i%2)*300;board.paste(im,(xx+5,yy+25),im);d.text((xx+5,yy+5),f'{cel}: '+['før','egen hånd','felles ansikt/kropp'][k],fill='black')
+ rows.append(dict(bilde=f'costume341_{cel}',egen_renset_kilde_sha256=sha(B/p.name),egen_lys_komponenter=ids,egen_handalfa_sha256=sha(R/f'costume341_{cel}-egen-hand.png'),egen_master_rekt=list(rect),etter_sha256=sha(p),originalsilhuettmaske=False))
+board.save(R/'handlag-felles-ansikt-kontroll.png');(R/'handlag-sammenstilling.json').write_text(json.dumps(dict(ruter=rows,metode='Bare den genererte håndens egne fargeflater og blekkgrenser klippes ut. Ingen ny håndtegning eller originalpikselmaske. Legges over samme sammenhengende A01-ansikt,kropp og kastskygge som startbildet;de oppdiktede rektangelstrekene og dupliserte munnene brukes ikke.'),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'samle-handlag341.py.txt');print('Fire håndfaser fra egne genererte konturer på én felles malt Max')

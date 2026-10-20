@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/max-alkove341-grunnlag-20261020';raw=Path('/home/tom/.codex/generated_images/01a13e87-e58d-7480-98ea-be8a83c16f7a/exec-4b00f51f-dc46-4e9a-9f54-a88bf2e0b637.png');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();shutil.copy2(raw,R/'raa-A01.png')
+m=json.loads((R/'bildekall.json').read_text());v=m['kall'][0];assert all(sha(Path(p))==h for p,h in v['referanse_sha256'].items());v.update(utfoert=True,raa='raa-A01.png',raa_kilde=str(raw),sha256=sha(raw),status='forelopig_master',prompt='prompt-A01.txt',prompt_sha256=sha(R/'prompt-A01.txt'),args_sha256=sha(R/'bildekall-A01.json'));(R/'bildekall.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+im=Image.open(raw).convert('RGBA');b=np.array(im);yellow=(b[:,:,0]>180)&(b[:,:,1]>150)&(b[:,:,2]<60);magenta=(b[:,:,0]>180)&(b[:,:,1]<70)&(b[:,:,2]>150);cyan=(b[:,:,0]<60)&(b[:,:,1]>180)&(b[:,:,2]>180);bad=(yellow|magenta|cyan)&(b[:,:,3]>0);n=int(bad.sum());b[bad]=0;b[b[:,:,3]==0,:3]=0;clean=Image.fromarray(b);bbox=Image.fromarray(np.uint8(b[:,:,3]>32)*255).getbbox();master=clean.crop(bbox).resize((432,800),Image.Resampling.LANCZOS);c=np.array(master);c[c[:,:,3]==0,:3]=0;master=Image.fromarray(c);master.save(R/'max341-startmaster.png');master.save(R/'max341-startmaster-A01.png')
+(R/'A01-master-klargjoring.json').write_text(json.dumps(dict(raa_sha256=sha(raw),raa_storrelse=list(im.size),egen_alfa_bbox=list(bbox),eget_maleri_mal=[432,800],uonskede_gule_magenta_cyan_alfapiksler_fjernet=n,original_pikselmaske=False,master_sha256=sha(R/'max341-startmaster.png')),indent=2)+'\n')
+obs=json.loads((R/'motor-kildeobservasjoner-820.json').read_text())['tegninger']
+for cel in [1668,1795,1793,1920,1925,1926,1927,1928,1931,1932,1933,1934,1935]:print(cel,obs[f'costume341_{cel}']['pos'],obs[f'costume341_{cel}']['maal'])
+shutil.copy2(__file__,R/'registrer-master341.py.txt');print('Master',master.size,'fjernet feilfarge',n)

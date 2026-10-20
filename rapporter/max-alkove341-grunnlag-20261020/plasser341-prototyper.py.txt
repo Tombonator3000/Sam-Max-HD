@@ -1,0 +1,38 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage
+import json,hashlib,shutil,numpy as np
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/max-alkove341-grunnlag-20261020';O=P/'out/max-alkove341-grunnlag-20261020';rawdir=Path('/home/tom/.codex/generated_images/01a13e87-e58d-7480-98ea-be8a83c16f7a');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+manifest=json.loads((R/'bildekall.json').read_text())
+for key,name in [('D01','exec-c51bb7fd-d4cb-4959-9a25-97f5ddc55e92.png'),('E01','exec-c7cdb61b-4b20-4cd8-bd44-7d879638be25.png')]:
+ raw=rawdir/name;shutil.copy2(raw,R/f'raa-{key}.png');v=next(v for v in manifest['kall'] if v['kall']==key);v.update(utfoert=True,raa=f'raa-{key}.png',raa_kilde=str(raw),sha256=sha(raw),status='egenkontroll_gjenstaar')
+for v in manifest['kall']:
+ assert v['utfoert'] and sha(R/v['raa'])==v['sha256'];assert all(sha(Path(p))==h for p,h in v['referanse_sha256'].items());v.update(prompt=f'prompt-{v["kall"]}.txt',prompt_sha256=sha(R/f'prompt-{v["kall"]}.txt'),args_sha256=sha(R/v['args']))
+(R/'bildekall.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+processing=[]
+def clean(im):
+ b=np.array(im.convert('RGBA'));before=b[:,:,3].copy();b[:,:,3]=np.minimum(255,np.rint(b[:,:,3].astype(float)*255/254)).astype('uint8')
+ bad=((b[:,:,0]>180)&(b[:,:,1]>150)&(b[:,:,2]<60))|((b[:,:,0]>180)&(b[:,:,1]<70)&(b[:,:,2]>150))|((b[:,:,0]<60)&(b[:,:,1]>180)&(b[:,:,2]>180));bad &= b[:,:,3]>0;b[bad]=0;b[b[:,:,3]==0,:3]=0
+ return b,dict(feilfarge_alfapiksler=int(bad.sum()),alfa254_normalisert_til255=True,skjult_RGB_null=True)
+def part(key,cel,roi):
+ raw=Image.open(R/f'raa-{key}.png').convert('RGBA');b,info=clean(raw.crop(roi));labels,n=ndimage.label(b[:,:,3]>=32);sizes=np.bincount(labels.ravel());keep=[i for i in range(1,n+1) if sizes[i]>=8];mask=np.isin(labels,keep);mask=ndimage.binary_dilation(mask,iterations=2);b[~mask]=0;b[b[:,:,3]==0,:3]=0;box=Image.fromarray((b[:,:,3]>=32).astype('uint8')*255).getbbox();assert box
+ piece=Image.fromarray(b).crop(box);source=Image.open(P/f'work/extract/costumes/costume341_{cel}.png').convert('RGBA');out=piece.resize((source.width*4,source.height*4),Image.Resampling.LANCZOS);c=np.array(out);c[c[:,:,3]==0,:3]=0;out=Image.fromarray(c);p=R/f'costume341_{cel}-prototype.png';out.save(p)
+ processing.append(dict(bilde=f'costume341_{cel}',kall=key,egen_roi=list(roi),egen_alfa_bbox=list(box),egne_komponenter=[int(sizes[k]) for k in keep],original_storrelse=list(source.size),utdata=list(out.size),sha256=sha(p),originalmaske=False,**info));return out
+# Only the generated artwork controls alpha. Logical rectangular game layers
+# are cropped from one continuous painted master, keeping the base join exact.
+b,info=clean(Image.open(R/'max341-startmaster-A01.png'));master=Image.fromarray(b);master.save(R/'max341-startmaster-renset.png')
+for cel,rect in [(1668,(0,0,432,680)),(1795,(48,512,308,580)),(1920,(100,680,388,800))]:
+ im=master.crop(rect);p=R/f'costume341_{cel}-prototype.png';im.save(p);processing.append(dict(bilde=f'costume341_{cel}',kall='A01',egen_master_rekt=list(rect),utdata=list(im.size),sha256=sha(p),originalmaske=False,**info))
+for cel,roi in [(1793,(50,140,740,360)),(1925,(1000,140,1410,380)),(1926,(15,470,470,785)),(1927,(515,470,1040,805)),(1928,(1020,470,1520,805))]:part('B01',cel,roi)
+for key,cels,regions in [('C01',[1931,1932],[(30,0,750,1000),(790,0,1536,1000)]),('D01',[1933,1934],[(0,0,760,1000),(780,0,1536,1000)]),('E01',[1935],[(200,0,1300,1024)])]:
+ for cel,roi in zip(cels,regions):part(key,cel,roi)
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];checks=[]
+for v in plan:
+ cel=int(v['bilde'].rsplit('_',1)[1]);im=Image.open(R/f'{v["bilde"]}-prototype.png').convert('RGBA');src=np.array(Image.open(P/'work/extract/costumes'/f'{v["bilde"]}.png').convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,axis=0),4,axis=1);iou,cover=_iou(np.array(im)[:,:,3]>=CORE,mask,0,0);checks.append(dict(bilde=v['bilde'],snitt_union=iou,dekning=cover,ok=iou>=GOOD_IOU and cover>=GOOD_COVER))
+board=Image.new('RGB',(1800,2200),'#243340');d=ImageDraw.Draw(board)
+for i,v in enumerate(plan):
+ name=v['bilde'];im=Image.open(R/f'{name}-prototype.png').convert('RGBA');src=Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA');xx=i%4*450;yy=i//4*550;d.text((xx+5,yy+5),name,fill='white')
+ for j,vis in enumerate([src,im]):
+  factor=min(212/vis.width,490/vis.height);vis=vis.resize((max(1,round(vis.width*factor)),max(1,round(vis.height*factor))),Image.Resampling.NEAREST if j==0 else Image.Resampling.LANCZOS);bg=Image.new('RGB',(216,500),'#bfc8d1');bg.paste(vis,((216-vis.width)//2,(500-vis.height)//2),vis);board.paste(bg,(xx+j*225+3,yy+30))
+board.save(R/'original-og-foerste-prototyper.png');(R/'prototype-egenkontroll.json').write_text(json.dumps(checks,indent=2)+'\n');(R/'prototype-rensing-og-plassering.json').write_text(json.dumps(processing,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser341-prototyper.py.txt');print(json.dumps(checks,indent=2),flush=True)

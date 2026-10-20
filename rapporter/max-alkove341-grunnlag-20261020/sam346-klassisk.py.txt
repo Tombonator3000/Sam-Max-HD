@@ -1,0 +1,10 @@
+from pathlib import Path
+import subprocess,os,json,re,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/max-alkove341-grunnlag-20261020';R=P/'work/.gpt-gren/rapporter/max-alkove341-grunnlag-20261020';PK=P/'out/felles-release-20261020-hjertebytte/linux/squashfs-root';binary=PK/'usr/bin/scummvm';D=PK/'usr/share/sam-max-hd';target=O/'sam346-klassisk820';assert not target.exists();target.mkdir();home=target/'home';home.mkdir();saves=target/'saves';saves.mkdir()
+for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update(HOME=str(home),XDG_CONFIG_HOME=str(home/'.config'),XDG_DATA_HOME=str(home/'.local/share'),XDG_CACHE_HOME=str(home/'.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(D/'mods/gpt'),DIGHD_CLASSIC='1',DIGHD_VERIFY='1',DIGHD_QUIT_AT='820',DIGHD_DUMP_DIR=str(target),DIGHD_DUMP_EVERY='4',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='92',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0')
+args=[str(binary),'--config='+str(target/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+with (target/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=180).returncode
+assert code==0 and(target/'frame_000784_room092.png').exists()
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();row=dict(exit=code,binar_sha256=sha(binary),frames=820,modus='klassisk',kun_romhopp=True,logg_sha256=sha(target/'scummvm.log'),ny_grafikk_eller_motorretting=False)
+(R/'sam346-klassisk820.json').write_text(json.dumps(row,indent=2)+'\n');shutil.copy2(__file__,R/'sam346-klassisk.py.txt');print(json.dumps(row),flush=True)

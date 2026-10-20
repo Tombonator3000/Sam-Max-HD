@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/max-alkove341-grunnlag-20261020';B=R/'foer-svakmagenta';B.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();records=[]
+for p in sorted(R.glob('costume341_*-prototype.png')):
+ a=np.array(Image.open(p).convert('RGBA'));old=a.copy();bad=(((a[:,:,0]>180)&(a[:,:,1]<70)&(a[:,:,2]>150))|((a[:,:,0]<60)&(a[:,:,1]>180)&(a[:,:,2]>180)))&(a[:,:,3]>0)
+ if not bad.any():continue
+ shutil.copy2(p,B/p.name);valid=(a[:,:,3]>=128)&~bad;idx=ndimage.distance_transform_edt(~valid,return_distances=False,return_indices=True);a[bad,:3]=a[idx[0][bad],idx[1][bad],:3];a[a[:,:,3]==0,:3]=0;assert np.array_equal(a[:,:,3],old[:,:,3]);Image.fromarray(a).save(p);records.append(dict(bilde=p.stem,piksler=int(bad.sum()),alfa_min=int(a[bad,3].min()),alfa_max=int(a[bad,3].max()),alfa_byteidentisk=True,foer_sha256=sha(B/p.name),etter_sha256=sha(p)))
+progress=json.loads((R/'fremdrift.json').read_text());q=json.loads((R/'ruteplan-unik.json').read_text())['ruter']
+for num in [4,5,6]:
+ job=f'fig341_{num:02}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());shutil.copy2(d/'resultat.png',B/(job+'-resultat.png'));shutil.copy2(R/f'rutekart-{job}.json',B/f'rutekart-{job}.json');canvas=Image.new('RGBA',(1536,1024));mapping=json.loads((R/f'rutekart-{job}.json').read_text())
+ for c in j['ruter']:
+  rep=next(v for v in q if any(m['bilde']==c['bilde'] for m in v['malruter']));p=R/(rep['bilde']+'-prototype.png');im=Image.open(p).convert('RGBA');x,y,w,h=c['rekt'];canvas.alpha_composite(im,((j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4));next(row for row in mapping[job]['ruter'] if row['bilde']==c['bilde'])['prototype_sha256']=sha(p)
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');mapping[job]['sha256_resultat']=digest;(R/f'rutekart-{job}.json').write_text(json.dumps(mapping,indent=2)+'\n');next(v for v in progress['leveranser'] if v['jobb']==job)['sha256']=digest;run=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(run.stdout+run.stderr);assert run.returncode==0,run.stdout;(d/'notat.md').write_text((d/'notat.md').read_text()+f'\nSiste kantrensing: svake magenta RGB-piksler med alfa 1 er erstattet med nærmeste egen malte kjernefarge. Alfa er byteidentisk. Endelig resultat SHA256 {digest}. Se svakmagenta-rensing.json.\n')
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');(R/'svakmagenta-rensing.json').write_text(json.dumps(records,indent=2)+'\n');shutil.copy2(__file__,R/'rens-svakmagenta341.py.txt');print('Renset',sum(v['piksler'] for v in records),'RGB-piksler i',len(records),'ulike ruter; alle alfaer identiske',flush=True)

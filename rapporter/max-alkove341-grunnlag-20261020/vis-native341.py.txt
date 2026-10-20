@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFont
+import re,json,math,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/max-alkove341-grunnlag-20261020';O=P/'out/max-alkove341-grunnlag-20261020';M=O/'mod-max341-prove1';T=O/'max341-prove1-romskript820';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];entries=json.loads((R/'native-prove1.json').read_text())['ruter'];log=(T/'scummvm.log').read_text();cams={int(f):(int(x),int(y)) for f,x,y in re.findall(r'whole screen frame (\d+) \(room \d+, screen at (-?\d+),(-?\d+)\)',log)};draws={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*341 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,cel,x,y,w,h=map(int,m.groups());p=T/f'frame_{f+4:06}_room092.png';name=f'costume341_{cel}'
+ if name not in draws and p.exists():draws[name]=dict(frame=f+4,pos=[x,y],maal=[w,h],kamera=list(cams[f+4]),fil=str(p),sha256=sha(p))
+def show(im,size):
+ im=im.convert('RGBA');im.thumbnail(size,Image.Resampling.LANCZOS);bg=Image.new('RGB',size,'#c0cbd3');bg.paste(im,((size[0]-im.width)//2,(size[1]-im.height)//2),im);return bg
+records=[]
+for page in range(4):
+ batch=entries[page*6:page*6+6]
+ if not batch:break
+ canvas=Image.new('RGB',(1500,1470),'#253442');d=ImageDraw.Draw(canvas)
+ for i,e in enumerate(batch):
+  name=e['bilde'];v=draws[name];x=i%2*750;y=i//2*490;d.text((x+6,y+6),f'{name}, motor {v["frame"]}',fill='white');orig=Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA');native=Image.open(M/e['fil']).convert('RGBA');scene=Image.open(v['fil']).convert('RGB');cx=(v['pos'][0]-v['kamera'][0]-2)*4;cy=(v['pos'][1]-v['kamera'][1]-2)*4;crop=scene.crop((cx,cy,cx+native.width,cy+native.height))
+  for k,(lab,im) in enumerate([('Original',orig.resize((orig.width*4,orig.height*4),Image.Resampling.NEAREST)),('Native HD',native),('Motor',crop)]):d.text((x+k*250+5,y+28),lab,fill='white');canvas.paste(show(im,(244,420)),(x+k*250+3,y+50))
+  records.append(dict(bilde=name,native_sha256=e['sha256'],**v))
+ canvas.save(R/f'max341-kontroll-prove1-{page+1}.png')
+sel=['costume341_1793','costume341_1794','costume341_1925','costume341_1926','costume341_1927','costume341_1928','costume341_1931','costume341_1932','costume341_1933','costume341_1934','costume341_1935','costume341_1936'];board=Image.new('RGB',(1920,1700),'#253442');d=ImageDraw.Draw(board)
+for i,name in enumerate(sel):
+ v=draws[name];p=Path(v['fil']);im=Image.open(p).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));d.text((x+5,y+6),f'{name}, frame {v["frame"]}',fill='white');shutil.copy2(p,R/f'{name}-motor-prove1.png')
+board.save(R/'max341-hele-motorbilder-prove1.png');(R/'max341-visuelle-prove1.json').write_text(json.dumps(dict(sett=19,kontrollbilder=records),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'vis-native341.py.txt');print('19 kilde/native/motor-utsnitt,12 hele stillbilder')

@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,re,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/max-alkove341-grunnlag-20261020';O=P/'out/max-alkove341-grunnlag-20261020';D=O/'sam346-kantforsok';D.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();MOD=P/'mods/gpt';log=(P/'out/felles-release-20261020-hjertebytte/pakke2399-rom92-skript/scummvm.log').read_text();draws={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*346 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,cel,x,y,w,h=map(int,m.groups())
+ if 1792<=cel<1920 and y+h==127:draws[cel]=(x,y,w,h)
+body=np.array(Image.open(MOD/'costumes/costume346_1664_hd.png').convert('RGBA'));body_margin=((body.shape[1]-154*4)//2,(body.shape[0]-73*4)//2);body_origin=(-body_margin[0],127*4-body_margin[1]);rows=[]
+for cel,(x,y,w,h) in sorted(draws.items()):
+ src=MOD/f'costumes/costume346_{cel}_hd.png';im=Image.open(src).convert('RGBA');a=np.array(im);before=a.copy();mx=(im.width-w*4)//2;my=(im.height-h*4)//2;assert mx*2==im.width-w*4 and my*2==im.height-h*4
+ origin=(x*4-mx,y*4-my);target_row=127*4-1-origin[1];assert 0<target_row<a.shape[0]-1
+ count=0
+ for xx in range(a.shape[1]):
+  wx=origin[0]+xx;bx=wx-body_origin[0];by=127*4-body_origin[1]
+  if 0<=bx<body.shape[1] and a[target_row,xx,3]==0 and a[target_row-1,xx,3]>=128 and body[by,bx,3]>=128:
+   a[target_row,xx]=a[target_row-1,xx];a[target_row,xx,3]=255;count+=1
+ if not count:continue
+ assert np.array_equal(a[before[:,:,3]>0],before[before[:,:,3]>0]);diff=np.any(a!=before,2);assert diff.sum()==count and np.flatnonzero(diff.any(1)).tolist()==[target_row]
+ dest=D/src.name;Image.fromarray(a).save(dest);backup=R/'sam346-foer'/src.name;backup.parent.mkdir(exist_ok=True);shutil.copy2(src,backup)
+ rows.append(dict(bilde=f'costume346_{cel}',fil=f'costumes/{src.name}',foer_sha256=sha(src),etter_sha256=sha(dest),nye_alfapiksler=count,native_rad=target_row,world_rad=507,original_marg=[mx,my],bare_tidligere_helt_gjennomsiktige_piksler=True,alle_tidligere_synlige_RGBA_byteidentiske=True,kilde='egen malt naborekke og den egne malte torsoens alfa,ingen originalpikselmaske'))
+(R/'sam346-kantforsok.json').write_text(json.dumps(dict(ruter=rows,maaling='Samme egne layer14-bilder,kun innvendig logisk rutekutt y127,mot den samme eksisterende egne torsoen. Ingen flytting,skalering eller endring av eksisterende malte piksler. Forst prøve,ikke publisert.'),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'prov-sam346-kant.py.txt');print(json.dumps(rows,ensure_ascii=False,indent=2),flush=True)
