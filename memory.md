@@ -1,5 +1,21 @@
 # memory.md
 
+## Sam029 komplett håndanimasjon publisert, 2026-10-21 01:24
+
+Siste sju hele ark fig029_16 til22 er levert med17nye native ruter. Dermed er alle22ark/70ruter i Sams tauanimasjon produsert, egenkontrollert, native mottatt, visuelt sett og motorobservert. De to siste bunkene gir14ark/40nye ruter siden felles2918. Siste bunke har13nye hele canonical malerier og fire mål som bruker to tidligere hele malerier med identisk hel kilde-RGBA. Det er ikke17nye håndmalerier.
+
+T05-råbildets tre uleverte motiver er gjenopptatt. Fem nye innebygde bildeverktøykall T06/T07/T08/T09/R04 er bevart med råbilder og faktiske prompter.1975bevarer en tanfarget tauflis fra eget R03-maleri etter bekreftet identisk kildepiksel. R04 retter den tynne sammenhengende tråden i1987.1973bevarer en høy mørk grå flekk og stort transparent gap uten å krympe armen. Kilden har helt identisk hånd-/ermekomponent i1980til1989. De ni neste rutene bruker derfor hele egenmalte1980arm med kildebekreftet plassering, mens tauet beholder sin bevegelse. Ingen originale piksler, hard originalmaske, originalfragment-fallback eller senkede grenser.
+
+Alle7ark/17automatiske native er OK.15ulike original/native/motor,7hele resultatark,7hele motorbilder og3før/etter er sett. Samme faktisk nedlastede Linux-binær c961e62c brukes i2941-grunnlaget og2958-kandidaten.240skjermbufferkontroller,239null og samme kjente160ved36før figurstart60. Alle211fra60null, ingen nye eller økte avvik. Alle70Sam029-ruter er logget. Tre før/etter har null endringer utenfor nytt håndlag og marg. Avgrenset kildekorrekt tvungen håndanimasjon i rom5,aktør10,kostyme29,posisjon267109. Ikke naturlig gjennomspilling eller ny Tom-/Claude-godkjenning.
+
+Publisert og hentet hd-mod 93371e4fd3e5064ad4f8a45ee87602423a848731,2958native,21201filer/21195PNG,alle filhash kontrollert. Grafikkilde a673302c7cb78b16cbdeecbfbae473df38220c35. Alle21184tidligere stier/21178PNG,1000beskyttede jobbfiler og tre opprinnelige stasher er bevart.418av1758hele figurjobber har resultat;1340gjenstår pluss returer,katalogfeil og samlet sluttkontroll. Full grafikk er fortsatt under arbeid.
+
+Fellespakkene har2918native og mangler40fra de to siste bunkene. Native fryses nå ved93371e4f til ett nytt bygg per plattform er lastet ned og kontrollert før felles Latest oppdateres. Neste selvstendige figurfamilie velges fra gjeldende ORDRE/GRAFIKKLISTE etter samlepunktet.029skal ikke tegnes pånytt. Motor-/pipelinekode er ikke endret. Main får bare memory,todo,STATUS og log.
+
+Åpne eldre forhold beholdes: ekstra Windows-taggbygg, historiske SDL-/testhoppstans, inventarkant35 og inventarikon-RGB under044-eksplosjonen. De to tidligere1000-rammers prøvene ble avbrutt ved387 og regnes ikke som fullførte. Full naturlig gjennomspilling,interaktiv Windows- og ny webtest gjenstår.164_04/1943/1944og øvrige avviste motiver skal ikke omprøves. Ugyldige344/346-katalogruter skal ikke tegnes eller spilles. Ingen gamle nattprosesser startes.
+
+Rapport:gpt-arbeid/rapporter/sam029-slutt-20261021. Bibliotekskilder:figurark-fast-storrelse og publisert-mod-er-fasit. Aktiv grafikkautomatikk fortsetter.
+
 ## Sam029 fortsettelse publisert, 2026-10-21 01:09
 
 Sju nye hele ark fig029_09 til 15 er levert og publisert med 23 nye native animasjonsruter. 11 ulike hele canonical kilder: seks malerier tas inn første gang, fem tidligere publiserte hele malerier gjenbrukes ved eksakt hel source-RGBA, og 12 ekstra aliasmål deler disse hele kildene. Fire uleverte prototyper er gjenopptatt fra T03/T04. To nye innebygde image_gen-kall med råbilder og faktiske prompter er bevart. T05 maler 1967 og tre fremtidige poser. R03 tegner hele 1955 om med en manglende tanfarget tauflis ved 9,50. Den er ikke grå. R03s råbilde på 1850x850 er bevart og tilrettelagt med bevart aspekt før 4x-plassering. Ingen originale piksler eller hard originalmaske.
