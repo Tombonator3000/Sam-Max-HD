@@ -16,6 +16,8 @@ Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENT
 
 ## Gjør disse nå
 
+Publisert og hentet tilbake: kilde 8a67424c072d0720fb1d9de22b8d51ad7bd2373d, hd-mod 640cef04badabe8f4b441c02ce89b9d1a744206e, 2237 native totalt. Alle 20473 kandidat-PNG-er, 20463 gamle PNG-er og 10 nye native-SHA-er stemmer. Alle 20469 gamle stier, 40 nye kilder,forrige40kilder og tre stasher bevart. Ingen nye bildekall. Alle10 sett/motorobservert,80nullkontroller. Neste345_21. Se mottak-publisert.json.
+
 2026-10-20 03:47:345_11 til20 er produsert ved eksakt tidligere kilde/prototype/native-gjenbruk. 10runtime,0bildekall,egenkontroll/native10OK,alle10sett/motorobservert,80nullkontroller. Kandidat2237,grunnlag2227. Sesam345-gjenbruk-a-20261020/RAPPORT.md og mottak-publisert.json for faktisk publisering. Neste345_21. Ikke produser346_27 til43 før kildefeil er rettet.
 
 Publisert og hentet tilbake: kilde 32c0dc4fc2067f7c078f16637ca66176cdc32b16, hd-mod 6a5eff6aaef63412f45b71bb2b51c6feb7c7e046, 2227 native totalt. Alle 20463 kandidat-PNG-er, 20452 gamle PNG-er og 11 nye native-SHA-er stemmer. Alle 20458 gamle stier, 40 nye og 144 tidligere beskyttede kilder og tre stasher bevart. Pakkene2134 er93bak. Neste345_11 til20. Se mottak-publisert.json.
