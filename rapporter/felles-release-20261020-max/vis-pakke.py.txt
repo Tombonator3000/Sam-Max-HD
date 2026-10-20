@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil,re
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter/felles-release-20261020-max';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();cases=[('inventory',120),('akvarium',200),('cafeteria',200),('rom92-skript',396),('rom92-skript',760),('rom92-skript',784)];board=Image.new('RGB',(1920,850),'#243340');d=ImageDraw.Draw(board);records=[]
+for i,(label,frame) in enumerate(cases):
+ found=list((O/('pakke2418-'+label)).glob(f'frame_{frame:06}_room[0-9][0-9][0-9].png'));assert len(found)==1,(label,frame);p=found[0];room=int(re.search(r'_room(\d+)',p.name)[1]);im=Image.open(p).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));d.text((x+6,y+6),f'{label}, rom {room}, bilde {frame}, faktisk pakke 2418',fill='white');shutil.copy2(p,R/f'pakke-{label}-{frame}.png');records.append(dict(scene=label,frame=frame,rom=room,kilde_fil=str(p.relative_to(O)),sha256=sha(p)))
+board.save(R/'seks-pakke-motorbilder.png');(R/'motorbilder.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
+b=Image.new('RGB',(1920,625),'#243340');d=ImageDraw.Draw(b)
+for i,(label,folder) in enumerate([('2399-grafikk, samme nye binær','grunnlag2399-rom92-skript'),('Ny 2418-pakke, samme nye binær','pakke2418-rom92-skript')]):
+ p=O/folder/'frame_000760_room092.png';im=Image.open(p).convert('RGB').resize((960,600),Image.Resampling.LANCZOS);b.paste(im,(i*960,25));d.text((i*960+6,6),label,fill='white')
+b.save(R/'max-for-etter-i-pakke.png');a=np.array(Image.open(O/'grunnlag2399-rom92-skript/frame_000760_room092.png').convert('RGB'));z=np.array(Image.open(O/'pakke2418-rom92-skript/frame_000760_room092.png').convert('RGB'));diff=np.any(a!=z,2);outside=diff.copy();outside[:,760:]=False;assert not outside.any();maxchanges=int(diff.sum())
+a=Image.open(O/'grunnlag2399-rom92-skript/frame_000784_room092.png').convert('RGB');z=Image.open(O/'pakke2418-rom92-skript/frame_000784_room092.png').convert('RGB');aa=np.array(a);zz=np.array(z);diff=np.any(aa[:540,:720]!=zz[:540,:720],2);yy,xx=np.nonzero(diff);assert len(xx)==581 and yy.min()==yy.max()==507
+b=Image.new('RGB',(1600,820),'#243340');d=ImageDraw.Draw(b)
+for i,im in enumerate([a,z]):
+ small=im.copy();small.thumbnail((790,540),Image.Resampling.LANCZOS);b.paste(small,(i*800,25));d.text((i*800+6,6),'Før' if i==0 else 'Etter, faktisk pakke',fill='white');im=im.crop((0,488,800,540)).resize((1600,104),Image.Resampling.NEAREST);b.paste(im,(0,590+i*108))
+b.save(R/'sam-retur-for-etter-i-pakke.png');(R/'pakke-pikselkontroll.json').write_text(json.dumps(dict(Max_frame760_endrede_piksler=maxchanges,Max_frame760_utenfor_Max_omrade=0,Sam_frame784_endrede_piksler_i_venstre_720x540=581,Sam_endrede_rader=[507],alle_ovrige_piksler_i_Sam_utsnitt_byteidentiske=True,samme_nye_binar=True),ensure_ascii=False,indent=2)+'\n')
+for n in ['kontroller-pakker.py','kontroller-linux.py','vis-pakke.py','klargjor-linux.py','hent-pakker.py','hent-status.py']:shutil.copy2(O/n,R/(n+'.txt'))
+print('Seks faktiske pakkestillbilder. Max-endringer bare i høyre figurregion, Sam-retur bare 581 piksler på rad507.',flush=True)

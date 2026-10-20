@@ -1,0 +1,49 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter/felles-release-20261020-max';state=json.loads((O/'bygg-startet.json').read_text());tag=state['release_tag'];code=state['kode'];mod=state['hd_mod'];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True));motor=json.loads((O/'linux-kontroll.json').read_text());files=json.loads((O/'moddfiler-kontroll.json').read_text());assets=json.loads((O/'assetkontroll.json').read_text());assert motor['native']==2418 and motor['nye_native_observert']==19 and not motor['mangler_i_avspilling'] and not motor['nye_eller_oekte_avvik'];assert motor['runder']==motor['grunnlagsrunder_samme_binar']==4 and motor['skjermbufferkontroller']==motor['nullkontroller']==224;assert files['moddfiler_per_pakke']==20660 and files['begge_faktiske_nedlastinger_verifisert'] and files['begge_modder_byteidentiske'] and files['kode']==code and files['hd_mod']==mod and len(assets)==4
+for v in assets:
+ p=O/v['plattform']/v['fil'];assert p.stat().st_size==v['bytes'] and sha(p)==v['sha256']
+assert motor['sam_returrute_sha256']=='b1943800affe8d87e86cbd09541e409f48eee0611b52a06f1db4f0415f5911da';pix=json.loads((R/'pakke-pikselkontroll.json').read_text());assert pix['Max_frame760_utenfor_Max_omrade']==0 and pix['Sam_frame784_endrede_piksler_i_venstre_720x540']==581 and pix['Sam_endrede_rader']==[507];assert len(json.loads((R/'motorbilder.json').read_text()))==6
+review=dict(hele_motorbilder_sett=6,Max_for_etter_sett=True,Sam_retur_for_etter_sett=True,ekte_nedlastet_pakke=True,hjertekontur_fortsatt_borte=True,begrenset_Sam_retting_581_piksler_ikke_alle_klesoverganger=True,ny_Tom_Claude_godkjenning=False,kontrollbilder={n:sha(R/n) for n in ['seks-pakke-motorbilder.png','max-for-etter-i-pakke.png','sam-retur-for-etter-i-pakke.png']});(R/'visuell-kontroll.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n');motor['hjertekontur_visuell_kontroll_gjenstaar']=False
+for d in [O,R]:(d/'linux-kontroll.json').write_text(json.dumps(motor,ensure_ascii=False,indent=2)+'\n')
+logs={}
+with zipfile.ZipFile(R/'linux-motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for p in sorted(O.glob('*/scummvm.log')):
+  rel=p.relative_to(O).as_posix();z.write(p,rel);logs[rel]=sha(p)
+assert len(logs)==8;(R/'linux-motorlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n');lr=state['plattform']['linux']['run_id'];wr=state['plattform']['windows']['run_id']
+body=f'''Linux og Windows har samme kontrollerte pakke med **2418 native HD-bildelag**, 19 flere enn forrige fellesutgave. Seks nye Max-ark gir sammenhengende ansikt, blinking, håndbevegelser og latter i alkoven. En gjennomsiktig rad på Sams jakke i én av nærbildefasene er også rettet. Øvrig HD-grafikk er fortsatt under arbeid.
+
+Last ned **SamMaxHD-Windows.zip** for Windows eller **SamMaxHD-x86_64.AppImage** for Linux. Spill og tale følger med. Linux: gjør filen kjørbar og start den. Ctrl+H bytter grafikk, F5 åpner originalmenyen.
+
+Begge faktiske nedlastinger, SHA-filer og alle 20 660 runtime moddfiler per pakke er kontrollert. Grafikkfilene er identiske mellom plattformene og publisert modd. Linux: inventar, akvarium, cafeteria og 820 bilder fra alkovens egne skript, sammenlignet med forrige grafikk i samme nye binær. Alle 19 nye Max-lag og Sam-returen er observert, 224 skjermbufferkontroller uten avvik. Seks hele pakkebilder og før/etter er visuelt kontrollert. Windows har grønt bygg og startprøve. Andre fargeoverganger mellom Sams jakkelag, uferdige figurer og samlet gjennomspilling gjenstår; dette er ikke ny interaktiv Windows-/webtest.
+
+Kode: {code}
+hd-mod: {mod}
+Grafikkilde: 64499698496609236927e07ab66648240aa47361
+Linux-bygg: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{lr}
+Windows-bygg: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{wr}
+Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/felles-release-20261020-max/RAPPORT.md
+
+Spillet og grafikken tilhører Disney/Lucasfilm.
+''';(O/'utgivelse-notat.md').write_text(body);shutil.copy2(O/'utgivelse-notat.md',R/'utgivelse-notat.md')
+prior=api('releases?per_page=100');before=json.loads((O/'releaser-foer-bygg.json').read_text());assert len(before)>=14 and not any(v['tag_name']==tag for v in prior) and {v['id'] for v in before}<={v['id'] for v in prior};aset=lambda v:{(a['id'],a['name'],a['size'],a['digest']) for a in v['assets']}
+for old in before:
+ if old['tag_name'] not in ['linux','windows']:assert aset(old)==aset(next(v for v in prior if v['id']==old['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod;(O/'releaser-foer.json').write_text(json.dumps(prior,indent=2)+'\n');shutil.copy2(O/'releaser-foer.json',R/'releaser-foer.json')
+(R/'RAPPORT.md').write_text(f'''# Felles Linux-/Windows-pakke med Max i alkoven
+
+{datetime.now(timezone.utc).isoformat()}, Codex. Linux {lr} og Windows {wr} er grønne fra kode {code} og hd-mod {mod}. Begge bygg er sendt en gang. 2418 native, 19 nye Max341-lag fra seks hele ark, pluss én avgrenset retur av Sam346_1801. Kildecommit for grafikken er 64499698496609236927e07ab66648240aa47361. Bare dokumentasjon er endret siden siste pipelinekode 4213c162. Ingen ny motor-/pipelineendring eller hard originalsilhuettmaske.
+
+Begge faktiske pakker og SHA-filer er lastet ned og kontrollert mot filstørrelser og API-digester. BYGG.txt og Actions viser korrekte kode-/mod-SHA-er. Alle 20660 runtime moddfiler i hver pakke er byteidentiske med publisert modd og hverandre. Bare README.md utelates. 2418 native bekreftet i metadata og faktiske filnavn. Alle 19 nye native-SHA-er og Sam-returen med SHA256 {motor['sam_returrute_sha256']} er med i begge pakker. De tidligere grafikkfilene og førbildet til den avgrensede returen er bevart i grafikkrapporten. Spillet og talen følger med.
+
+Faktisk Linux-binær SHA256 {motor['binar_sha256']}. Fire isolerte pakkeprøver og fire 2399-grunnlagsprøver med samme nye binær og egne HOME/XDG/saves: inventar åpne/lukke i rom 30, akvarium i rom 16, cafeteria i rom 30 og rom 92s egne skript til 820. Ingen aktør-/kostyme-/choreoverstyring i alkovekjøringen. Alle 19 nye Max-ruter og Sam346_1801 er logget tegnet. 224 sluttbufferkontroller, alle null, og ingen nye/økte avvik mot grunnlaget. Seks hele pakkebilder og Max/Sam-før-etter er visuelt sett. Max-endringer i frame 760 ligger bare i høyre figurregion. Sam-utsnittet i frame 784 endrer bare 581 piksler på skjermrad 507; alle øvrige piksler i utsnittet er identiske. Original objekt901-dekning er fortsatt med og hjertekonturen er borte.
+
+Sam-returen fyller bare en tidligere tom HD-rad. Den retter ikke øvrige farge-/geometrioverganger mellom de andre øvre jakkelagene og torsoen. Disse står fortsatt som egen retur. Den lille inventarkanten i rom 35 er heller ikke omprøvd/rettet av denne inventaråpningen i rom 30. Tidligere romhoppstans ved 836 er ikke kjørt igjen eller påstått løst. Ikke naturlig gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+302 av 1758 hele figurjobber har resultat; 1456 gjenstår pluss returer, kildefeil og samlet kontroll. Neste fem Sam342-ark er kildeklargjort, ni ruter fra åtte hele kilder, men ingen nye bildekall for dem ennå. Alle originalark, ni gyldige motorposer og godkjent Sam-anker er sett. 524 beskyttede kildefiler er nå festet: 504 tidligere og 20 i neste bunke. Tre tidligere stasher er bevart. En analyse av kostymetabellene identifiserer 368 mulige falske rutemål uten overlapp med publiserte native, men ingen kode eller historisk nevner er endret fra denne analysen. Den krever egen testet PR. Gammel nattkontroll forblir pauset; aktiv grafikkproduksjon fortsetter.
+
+Ny fellesrelease {tag} er klargjort med fire kontrollerte filer. Alle {len(prior)} tidligere releaser og deres assets skal bevares. Publisering og Latest-status bekreftes i publisert.json før fellesutgaven kalles oppdatert. Ikke gjenta dette 2418-samlepunktet.
+''')
+for n in ['hent-status.py','hent-pakker.py','klargjor-linux.py','kontroller-pakker.py','kontroller-linux.py','vis-pakke.py','forbered-release.py']:shutil.copy2(O/n,R/(n+'.txt'))
+print('Fire assets, to faktiske pakker, 20660 filer per pakke, 19 nye lag, Sam-retur og visuell kontroll bekreftet. Klar til publisering.',flush=True)

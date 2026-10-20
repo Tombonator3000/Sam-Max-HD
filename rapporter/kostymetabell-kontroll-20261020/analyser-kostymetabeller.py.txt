@@ -1,0 +1,16 @@
+from pathlib import Path
+from smhd import gamedata,v6grafikk
+import struct,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/kostymetabell-kontroll-20261020';R.mkdir(exist_ok=True);d,_=gamedata.load(P/'game/SAMNMAX.001');idx=gamedata.read_index(P/'game/SAMNMAX.000');rooms=gamedata.read_rooms(P/'game/SAMNMAX.001');ids=gamedata.costume_ids(idx,rooms);n=0;rows=[];removed=[];real=set();allold=set()
+for room in sorted(rooms.values(),key=lambda r:r.offset):
+ for off in room.cost_offsets:
+  cid=ids[n];n+=1;loc=room.offset+off;size=gamedata.be32(d,loc+4);base=d[loc+8:loc+size];fmt=base[7]&127
+  if fmt not in [0x58,0x59,0x60,0x61]:continue
+  ncol=32 if fmt in [0x59,0x61] else 16;data_offsets=8+ncol+34;cmd=struct.unpack_from('<H',base,8+ncol)[0];num=base[6];minimum=data_offsets+num*2;bad=[]
+  for raw in range(num+1):
+   if data_offsets+raw*2+2>len(base):break
+   rel=struct.unpack_from('<H',base,data_offsets+raw*2)[0]
+   if 0<rel<minimum:bad.append(dict(raw=raw,rel=rel))
+  anims=v6grafikk._anim_frames(base,cmd,data_offsets,num,[]);old={(cid,c) for a in anims for c in a['ruter']};good={(cid,c) for a in anims if a['valg'] not in {v['raw'] for v in bad} for c in a['ruter']};allold|=old;real|=good
+  if bad:rows.append(dict(kostyme=cid,num_anim=num,data_offsets=data_offsets,minste_gyldige_dataoffset=minimum,avviste_oppslag=bad,ruter_foer=len(old),ruter_etter=len(good),bare_falske_ruter=sorted(c for _,c in old-good)));removed+=sorted(old-good)
+files={tuple(map(int,p.stem.replace('costume','').replace('_hd','').split('_'))) for p in(P/'mods/gpt/costumes').glob('*_hd.png')};impact=sorted(files & set(removed));out=dict(kostymer=n,foer_ruter=len(allold),etter_ruter=len(real),fjernede_ruter=len(set(removed)),publiserte_native_som_kun_kom_fra_disse=len(impact),publiserte_berort=impact,ressurser=rows,metode='Analysehypotese,ikke implementert: avvis ikke-null animasjonsoffset lavere enn data_offsets+num_anim*2. Inklusiv raw-iterasjon beholdes. Analyse av uendrede spilldata,ingen eksport eller jobbendring.');(R/'alle-kostymer-analyse.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'analyser-kostymetabeller.py.txt');print(json.dumps({k:v for k,v in out.items() if k!='ressurser'},ensure_ascii=False));print([(r['kostyme'],r['avviste_oppslag']) for r in rows])
