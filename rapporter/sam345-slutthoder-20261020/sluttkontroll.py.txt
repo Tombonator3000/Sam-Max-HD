@@ -1,0 +1,104 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import numpy as np,json,hashlib,subprocess,re,zipfile,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam345-slutthoder-20261020';O=P/'out/sam345-slutthoder-20261020';M=O/'mod-kandidat'
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda n:json.loads((R/n).read_text())
+base=read('grunnlag-filer-7d1aa364.json');actual={p.relative_to(M).as_posix():h(p) for p in M.rglob('*') if p.is_file()};entries=read('tillegg.json')['tillegg'];by={e['bilde']:e for e in entries}
+assert len(base)==20498 and len(entries)==27 and len(actual)==20525 and sum(p.endswith('.png') for p in actual)==20519
+assert set(base)<=set(actual) and set(actual)-set(base)=={e['fil'] for e in entries}
+assert {p for p in base if base[p]!=actual[p]}=={'mod.json'}
+old=json.loads((P/'mods/gpt/mod.json').read_text());new=json.loads((M/'mod.json').read_text());assert old['costume_cels']==2256 and new['costume_cels']==2283
+assert {k for k in new if old[k]!=new[k]}=={'costume_cels'}
+for e in entries:
+ p=M/e['fil'];assert e['kilde']=='arket' and h(p)==e['sha256'];im=Image.open(p);a=np.array(im)
+ assert im.mode=='RGBA' and im.width%4==im.height%4==0
+ assert (a[:,:,3]==0).any() and (a[:,:,3]==255).any() and ((a[:,:,3]>0)&(a[:,:,3]<255)).any()
+ assert not (((a[:,:,:3]==[255,0,255]).all(2))&(a[:,:,3]>0)).any()
+ assert not a[a[:,:,3]==0,:3].any()
+protected=read('beskyttede-kilder.json');assert len(protected)==24 and all(h(A/p)==dig for p,dig in protected.items());prev={}
+for folder in ['alkove-siste-20261020','alkove-fortsettelse-20261020','alkove-gjenbruk-20261020','sam-sugepil-345-20261020','sam345-gjenbruk-a-20261020','sam345-gjenbruk-b-20261020','sam345-tilbake-20261020']:
+ q=json.loads((A/'rapporter'/folder/'beskyttede-kilder.json').read_text());assert all(h(A/p)==dig for p,dig in q.items());prev.update(q)
+assert len(prev)==284
+plan=read('ruteplan-unik.json')['ruter'];assert len(plan)==15 and sum(len(v['malruter']) for v in plan)==27
+for q in plan:
+ x,y,w,hh=q['rekt'];src=Image.open(A/'jobber'/q['kildejobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+hh))
+ assert hashlib.sha256(src.tobytes()).hexdigest()==q['rgba_sha256']
+ for v in q['malruter']:
+  x,y,w,hh=v['rekt'];im=Image.open(A/'jobber'/v['jobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+hh));assert im.size==src.size and im.tobytes()==src.tobytes()
+ assert len({by[v['bilde']]['sha256'] for v in q['malruter']})==1
+f=read('fremdrift.json');assert len(f['leveranser'])==6 and f['faktiske_bildekall']==['A01','B01','C01'];ok=total=0
+for e in f['leveranser']:
+ assert h(A/e['resultat'])==e['sha256'];im=Image.open(A/e['resultat']);assert im.mode=='RGBA' and im.size==(1536,1024)
+ rt=json.loads((A/e['rutekart']).read_text())[e['jobb']];assert rt['sha256_resultat']==e['sha256'] and len(rt['ruter'])==e['ruter']
+ j=json.loads((A/'jobber'/e['jobb']/'jobb.json').read_text());mask=np.zeros((1024,1536),bool)
+ for c in j['ruter']:
+  x,y,w,hh=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;mask[dy:dy+hh*4,dx:dx+w*4]=True
+ assert not ((np.array(im)[:,:,3]>0)&~mask).any()
+ t=(R/f"{e['jobb']}-egenkontroll.txt").read_text();assert 'FEIL' not in t and 'SJEKK' not in t;m=re.search(r'(\d+) av (\d+) ruter OK',t);ok+=int(m[1]);total+=int(m[2]);e.update(native_mottatt=True,visuelt_kontrollert=True,motoravspilt=True)
+assert ok==total==27
+native=read('myke345-kvittering.json');assert native['ruter_ok']==27 and native['ruter_sjekk']==native['ruter_mangler']==native['ruter_teknisk']==0
+n=read('native-fast-plassering.json');assert n['antall']==27 and n['automatisk_utliggertillegg']==n['originalutliggertillegg_i_slutt']==0 and not n['originalmaske_brukt'] and not n['terskler_endret']
+assert min(v['slutt']['snitt_union'] for v in n['ruter'])>=.933 and min(v['slutt']['dekning'] for v in n['ruter'])>=.957
+assert all(v['automatisk']['flytt_hd']==[0,0] and v['automatisk']['marg']==[2,2] for v in n['ruter'])
+vis=read('visuelle-kontrollbilder.json');assert vis['antall']==27 and {v['bilde'] for v in vis['ruter']}==set(by)
+assert all(v['native_sha256']==by[v['bilde']]['sha256'] for v in vis['ruter'])
+motor=read('motor-oppsummering.json');assert motor['ruter_tegnet']==motor['ruter_ved_kildepos']==27 and motor['skjermbufferkontroller']==80 and not motor['nye_eller_oekte_avvik'] and not motor['avvik_ogsaa_i_grunnlag']
+rows=read('motor-runder.json');checks=rows[0]['kontroller'];assert len(checks)==80 and not any(v['avvik'] for v in checks)
+motor.update(telling_fra_frame40=71,kontroller_fra_figurstart_feltnavn_er_historisk=True,faktisk_foerste_nye_draw_frame=60,kontroller_fra_foerste_nye_draw=sum(v['frame']>=60 for v in checks));assert motor['kontroller_fra_foerste_nye_draw']==66
+(R/'motor-oppsummering.json').write_text(json.dumps(motor,ensure_ascii=False,indent=2)+'\n')
+placement=read('plassering.json');assert not placement['original_pikselmaske_brukt'] and placement['kildebekreftede_roede_punkter_unike']==11
+redby={v['bilde']:len(v['kildebekreftede_roede_punkter']) for v in placement['ruter']}
+redruntime=sum(len(q['malruter'])*redby.get(q['bilde'],0) for q in plan)
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stashes==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');images=sorted(R.glob('motor-og-kilde345-final-*.png'))+[R/'fire-hele-motorbilder.png',R/'tre-nye-ansiktsformer-samlet.png'];assert len(images)==5
+(R/'visuell-vurdering.json').write_text(json.dumps(dict(dato=now,vurdert_av='Codex',original_native_motor_sett=27,hele_motorbilder_sett=4,bilder={p.name:h(p) for p in images},konklusjon='Tre munntilstander og torso passer sammen uten ny rektangelstrek ved lagsømmen. Utilsiktet C01-kragefragment er fjernet ved valg av egenprodusert munnkomponent,ikke med originalmaske. Små kildebekreftede røde punkter på jakkeavslutningen er mykt bevart;de er dekket av hjertets forgrunn i de sette motorbildene.',naturlig_gjennomspilling=False,Tom_godkjent=False,separat_Claude_kontroll=False),ensure_ascii=False,indent=2)+'\n')
+logs={}
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for scene in ['baseline345-anim7','final345-anim7']:
+  p=O/scene/'scummvm.log';z.write(p,scene+'/scummvm.log');logs[scene+'/scummvm.log']=h(p)
+(R/'motorlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n')
+summary=dict(nye_native=27,native_totalt_kandidat=2283,publisert_native_foer=2256,jobber=6,figurjobber_med_resultat=len(list((A/'jobber').glob('fig*/resultat.png'))),figurjobber_totalt=1758,ulike_hele_kilder=15,bildekall=3,raa_brukt=3,sourcebekreftede_ansiktsregioner=3,kildebekreftede_roede_fargepunkter_unike=11,kildebekreftede_roede_fargepunkter_runtime=redruntime,originalutliggertillegg_i_slutt=0,hel_original_fallback=0,hard_originalmaske_brukt=False,egenkontroll_ok=27,native_ok=27,visuelt_sett=27,motorobservert=27,sluttbufferkontroller=80,nullkontroller=80,kontroller_fra_frame40=71,faktisk_foerste_nye_draw=60,kontroller_fra_foerste_nye_draw=66,tidligere_filer_bevart=20498,tidligere_png_byteidentiske=20492,png_totalt=20519,filer_totalt=20525,beskyttede_nye_kilder=24,beskyttede_tidligere_kilder=284,stash_shaer=stashes)
+assert summary['figurjobber_med_resultat']==269
+(R/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(R/'fremdrift.json').write_text(json.dumps(f,ensure_ascii=False,indent=2)+'\n')
+calls=read('bildekall.json')
+for c in calls['kall']:
+ key=c['kall'];assert c['utfoert'] and h(R/c['raa'])==c['raa_sha256'];c.update(status='brukt',prompt=f'prompt-{key}.txt',prompt_sha256=h(R/f'prompt-{key}.txt'),args_sha256=h(R/c['args']))
+(R/'bildekall.json').write_text(json.dumps(calls,ensure_ascii=False,indent=2)+'\n')
+for e in f['leveranser']:
+ (A/'jobber'/e['jobb']/'notat.md').write_text(f'''# {e['jobb']}
+
+{now}, Codex. Sam som snakker/smiler ved hjerteobjektet i rom92. Originalark, primærskript lokalt201 og motorforløp med gyldig chore7 er sett. Aktør6 ved159,101,clip0,scale255. Sam-master og tidligere kontrollert varm345-prototype styrer identitet/strek; kilden bestemmer brun drakt,oransje hud og krem-/gråsvart skjorte/slips. Ingen synlig aubergine eller annen ny prop. De fire beskyttede jobbfiler er uendret.
+
+Tre innebygde image_gen-kall. A01 er en sammenhengende ny Sam-pose;B01/C01 er munnvarianter. Egen generert maling plasseres i kildebekreftede høydebånd og hattens boks,så øyebunn,hake og drakt får riktig størrelse. Øynene er urørt av hattens horisontale tilpasning. Logiske lagrektangler skiller torso fra nedre ansikt og jakkestripe. Ingen originalsilhuettmaske klipper nye omriss. Alle tre72x40 ansiktskilder er eksakt identiske innen hver kildegruppe. B/C brukes bare som nytegnet munn,plassert etter originalens tannboks. Mellomproduktets gamle munn er renset med kinnfarge fra egen tegning. C01s utilsiktede kragebit ble fjernet med egen generert munnalfa. Jakkestripen bruker egen generert alfa til hver kildebekreftet boks.11 bekreftede røde kildepunkter fordelt på ulike kilder er beholdt som myke4x4-fargepunkter,ikke hard pikselmaske eller hel originalfallback. Se plassering.json og delsekvenser.json.
+
+{e['ruter']} ruter i1536x1024RGBA,SHA256 {e['sha256']}. Egenkontroll27OK,ingen SJEKK/FEIL. Native27OK;automatisk mottak hadde allerede0,0/marg2 og0originalutliggertillegg. Fast4x-sluttbildene bevarer hele egne myke omriss og er målt med uendrede terskler:IoU0,933..0,952,dekning0,957..0,979. Alle27 visuelt sett mot original/native/faktisk motor. Tre kontaktark og fire hele motorbilder sett etter munnrensing.80 sluttbufferkontroller null,66 fra faktisk første nye tegning vedframe60. Feltetkontroller_fra_figurstart i eldre hjelper betyrfra40,ikke faktisk start;dette er presisert i motor-oppsummering.json.
+
+Dette er egenkontroll og tvunget avspilling,ikke naturlig gjennomspilling,ny Tom-godkjenning eller separat Claude-kontroll. Kildeskript har elevasjon1,testkrok0. Import/publisering og ny hente-/filkontroll bekreftes separat i mottak-publisert.json. Fellespakken2242 mangler41 mot kandidat2283;den er ikke påstått oppdatert med denne bunken.
+''')
+(R/'RAPPORT.md').write_text(f'''# Siste seks ark i kostyme345
+
+{now}, Codex. Fig345_36 til41:seks ark,27 native-ruter fra15 ulike hele kilder. Tre faktiske innebygde image_gen-kall,tre råbilder brukt. A01 gir sammenhengende kropp/ansikt;B01/C01 nye munnformer. Ingen API-/CLI-fallback,kvotefeil eller verktøyavslag. Jobbpromptens auberginepremiss er korrigert separat etter primærkildene. Ingen motor-/pipelinekode endret.
+
+Betydning:Sam som snakker/smiler i varm brun/orange palett ved hjerteobjektet.1832 inneholder torso,hatt og øyne med ansiktsutsparing;1961..1986 inneholder nedre ansikt/nese/munn og jakkestripe. De komplette72x40 ansiktsregionene faller i tre eksakt like RGBA-grupper. A01 er plassert i sammenhengende høydebånd mot øyebunn/hake og hattens boks. Egne alfaomriss bevares,ingen originalsilhuettmaske. Logiske rektangulære lagsnitt og samme underliggende maling gir sammenheng uten oppdiktet lagsømstrek.
+
+Den opprinnelige A-munnen er renset fra eget mellomprodukt før plassering i originalens tannbokser. B/Cs egenproduserte munnalfa velger bare selve munnkomponenten. Dette fjernet en utilsiktet kragebit fraC01. Jakkestripen bruker egen generert alfa til hver kildebekreftet boks.11 bekreftede røde fargepunkter i ulike kilder,24 i runtime med aliaser,er beholdt som myke4x4-punkter. De er dekket av hjertets forgrunn i de sette motorbildene. Ingen hel originalfallback eller automatiske originalutliggertillegg.
+
+Egenkontroll27OK,native27OK,ingen SJEKK/FEIL. Automatisk mottak hadde allerede0,0 ogmarg2 uten originalutliggertillegg. Sluttfilene bruker fast4x og hele myke omriss med ny måling,uendrede terskler. IoU0,933..0,952,dekning0,957..0,979. Alle27 sett som original/native/motor;tre kontaktark og fire hele sluttbilder. Alle27 faktisk tegnet ved kildepos159,101,aktør6,clip0,scale255,chore7. Samme faktisk nedlastede adfdf7fc-binær som2256-grunnlaget.80 bufferkontroller i sluttforløpet,alle null,66 fra faktisk første nye tegning vedframe60. Hjelperens eldre feltnavnkontroller_fra_figurstart teller71 fraframe40;presisert separat,ikke feiltelt som faktisk start.
+
+Kandidat2283,grunnlag7d1aa364/2256. Alle20498gamle stier og20492gamle PNG-er er bevart;bare mod.json.costume_cels er endret.20519 PNG-er/20525 filer i kandidat.24 nye og284 tidligere beskyttede kildefiler og tre opprinnelige stasher uendret.269 av1758 registrerte figurjobber har resultat,1489 mangler pluss returer og samlet spill-/stilkontroll. Ingen ny Tom-/Claude-godkjenning,naturlig gjennomspilling eller interaktiv Windows-/webtest. Kildens elevasjon1/testkrok0 er dokumentert.
+
+Alle41 jobbark i kostyme345 har nå resultat:67 native i de fem produksjonsbunkene,som hver har egen kilde-/native-/motor- og publiseringskvittering. Dette betyr ikke at resten av Sams kostymer eller all HD er ferdig. Neste gyldige bestilling er fig344_01 til10.17jobber346_27 til43 med feil kildegrunnlag står fortsatt åpne,ingen44ruter der er produsert. Ikke gjenta raw36,eller tidligere avviste golf-/VR-grunnlag.
+
+Felles Linux-/Windows-utgave sam-max-hd-2026-10-20-alkove har fortsatt2242 native og er41 bak kandidat2283. Ny pakkeoppdatering krever begge faktiske nedlastinger,SHA-filer,filvis moddkontroll og relevante motorprøver. Ikke kall pakkene oppdatert før det er gjennomført. Native publisering/hent bekreftes i mottak-publisert.json. Automatisk grafikkfortsettelse består,gammel nattkontroll forblir pauset.
+
+Bibliotek:figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelruter,brukt med aktuellv6-pipeline og bekreftet mot faktiske omriss og motorlag. Lokale oppsettsfeil før rensing ble stoppet uten bildekall eller filskade:system-Python mangletnumpy,to ekstra kall rettet tilprosjektetsvenv;ett JS-hjelperkall hadde syntaksfeil og kjørte ikke. Ingen sperre ble omgått.
+''')
+assert redruntime==24
+for e in f['leveranser']:
+ p=A/'GRAFIKKLISTE.md';s=p.read_text().replace('- [ ] '+chr(96)+e['jobb']+chr(96),'- [x] '+chr(96)+e['jobb']+chr(96));p.write_text(s)
+p=A/'ORDRE.md';s=p.read_text().replace('## Gjør disse nå\n','## Gjør disse nå\n'+f'\n{now}:fig345_36 til41 produsert/kontrollert,27native,kandidat2283,269resultatark. Tre bildekall,tre kildebekreftede munnformer og sammenhengende egne lag. Alle27 sett/motorobservert,80 sluttkontroller null. Se sam345-slutthoder-20261020/RAPPORT.md og mottak-publisert.json for publisering. Hele345-serien har41 resultatark/67native. Neste344_01 til10. Fellespakken2242 ligger41bak kandidat.346_27 til43 har kildefeil og skal fortsatt ikke produseres.\n',1);p.write_text(s)
+p=A/'GRAFIKKLISTE.md';s=p.read_text();p.write_text(s.split('\n',1)[0]+f'\n\nOppdatert {now}:269 av1758 figurjobber har resultat. Fig345_36 til41 har27 egenkontrollerte native,kandidat2283,alle27 sett/motorobservert. Publisering bekreftes separat i sam345-slutthoder-20261020/mottak-publisert.json. Neste344_01 til10. Pakken2242 er41bak kandidaten.\n'+s.split('\n',1)[1])
+for p in O.glob('*.py'):shutil.copy2(p,R/(p.name+'.txt'))
+print(json.dumps(summary,ensure_ascii=False))

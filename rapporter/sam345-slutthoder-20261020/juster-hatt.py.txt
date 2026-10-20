@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam345-slutthoder-20261020'
+p=R/'A01-kildejustert.png';a=np.array(Image.open(R/'A01-kildejustert-foer-hatt.png').convert('RGBA'));out=a.copy()
+for y in range(178):
+ mix=min(1.,max(0.,(y-160)/18));scale=(432/448)*(1-mix)+mix;offset=(144-148*(432/448))*(1-mix)
+ row=Image.fromarray(a[y:y+1]).transform((640,1),Image.Transform.AFFINE,(1/scale,0,-offset/scale,0,1,0),Image.Resampling.BICUBIC)
+ out[y:y+1]=np.array(row)
+out[out[:,:,3]<=3]=0;Image.fromarray(out).save(p)
+j=json.loads((R/'A01-geometriplassering.json').read_text());j.update(hatt_tilpasning=dict(generert_x_bbox=[148,596],maal_x_bbox=[144,576],scale=432/448,fade_y=[160,178],oyne_urort=True,originalmaske=False),sha256=hashlib.sha256(p.read_bytes()).hexdigest());(R/'A01-geometriplassering.json').write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'juster-hatt.py.txt')

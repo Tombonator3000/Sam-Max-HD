@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam345-slutthoder-20261020';O=P/'out/sam345-slutthoder-20261020'
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();S=P/'work/extract/costumes'
+body=Image.open(S/'costume345_1832.png').convert('RGBA')
+f=Image.open(S/'costume345_1961.png').convert('RGBA')
+full=Image.new('RGBA',(160,176));full.alpha_composite(body);full.alpha_composite(f,(64,56));full.resize((640,704),Image.Resampling.NEAREST).save(R/'kilde-sam345-full-1961-4x.png')
+proof={};tops={};strips={}
+for n in range(1961,1987):
+ im=Image.open(S/f'costume345_{n}.png').convert('RGBA');face=im.crop((0,0,72,40));strip=im.crop((72,0,im.width,77))
+ top=hashlib.sha256(face.tobytes()).hexdigest();tail=hashlib.sha256(strip.tobytes()).hexdigest();tops.setdefault(top,[]).append(n);strips.setdefault((strip.size,tail),[]).append(n)
+ proof[f'costume345_{n}']=dict(face_rect=[0,0,72,40],face_rgba_sha256=top,coat_rect=[72,0,im.width,77],coat_rgba_sha256=tail,coat_bbox=list(strip.getbbox()))
+assert len(tops)==3
+(R/'delsekvenser.json').write_text(json.dumps(dict(body_source='costume345_1832',body_size=[144,176],full_context_size=[160,176],layers=dict(body_xy=[0,25],overlay_xy=[64,81]),face_source_groups=list(tops.values()),coat_source_groups=list(strips.values()),ruter=proof,merknad='Det er hele72x40RGBA-regioner som er identiske i tre grupper. Resten av patchen er jakkestripen. Ingen kildepikselmaske brukes på nytegning; internt skilles generert sammenhengende maling i logiske lagrektangler.'),ensure_ascii=False,indent=2)+'\n')
+sheet=Image.new('RGBA',(1536,1024))
+for i,n in enumerate([1961,1962,1963]):
+ im=Image.open(S/f'costume345_{n}.png').convert('RGBA').crop((0,0,72,40)).resize((576,320),Image.Resampling.NEAREST)
+ sheet.alpha_composite(im,(100,40+i*325))
+sheet.save(R/'kilde-tre-munnformer.png')
+shutil.copy2(__file__,R/'produksjonsgrunnlag.py.txt')
+print('Sammenhengende original og tre eksakt kildebekreftede ansiktsregioner lagret. Ingen bildekall eller nye resultater ennå.')

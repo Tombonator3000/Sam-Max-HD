@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage
+import numpy as np,hashlib,shutil,json
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam345-slutthoder-20261020';srcs={'B01':'exec-a729f070-7e19-492b-8826-8e6d0fc5af3d.png','C01':'exec-9c6db66b-9710-41b6-a45e-62e7ec1f5e24.png'}
+for k,f in srcs.items():
+ p=Path('/home/tom/.codex/generated_images/01a13e87-e58d-7480-98ea-be8a83c16f7a')/f;shutil.copy2(p,R/f'raa-{k}.png')
+ a=np.array(Image.open(p).convert('RGBA'));a[a[:,:,3]<=3]=0;box=Image.fromarray(a[:,:,3]>=128).getbbox();im=Image.fromarray(a).crop(box).resize((640,704),Image.Resampling.LANCZOS);im.save(R/f'{k}-normalisert.png');print(k,'raw',a.shape,'bbox',box)
+for k in ['A01','B01','C01']:
+ p=R/('A01-kildejustert.png' if k=='A01' else f'{k}-normalisert.png');a=np.array(Image.open(p).convert('RGBA'));m=(a[:,:,0]>170)&(a[:,:,1]>145)&(a[:,:,2]>130)&(a[:,:,3]>128);labs,num=ndimage.label(m);chosen=[]
+ for n,sl in enumerate(ndimage.find_objects(labs),1):
+  if sl is None:continue
+  y,x=sl;count=int((labs[sl]==n).sum())
+  if 280<x.start<390 and 270<y.start<380 and 5<count<2000:chosen.append([count,x.start,y.start,x.stop,y.stop])
+ print(k,chosen)
+for n in [1961,1962,1963]:
+ a=np.array(Image.open(P/'work/extract/costumes'/f'costume345_{n}.png').convert('RGBA'));m=(a[:,:,:3]==[187,179,151]).all(2);y,x=np.nonzero(m);print('ORIG',n,[int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)])
+calls=json.loads((R/'bildekall.json').read_text())
+for c in calls['kall']:
+ k=c['kall'];c.update(utfoert=True,status='raa_lagret_klargjoring',raa=f'raa-{k}.png',raa_sha256=hashlib.sha256((R/f'raa-{k}.png').read_bytes()).hexdigest())
+(R/'bildekall.json').write_text(json.dumps(calls,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'munn-grunnlag.py.txt')

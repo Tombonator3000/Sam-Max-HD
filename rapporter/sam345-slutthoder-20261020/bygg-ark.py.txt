@@ -1,0 +1,60 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFilter
+from scipy import ndimage
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam345-slutthoder-20261020';S=P/'work/extract/costumes';h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+base=Image.open(R/'A01-kildejustert.png').convert('RGBA');a=np.array(base)
+# Rens mellomproduktets gamle munn før den flyttes til kildebekreftet boks.
+x0,y0,x1,y1=328,308,378,362
+for y in range(y0,y1):
+ for x in range(x0,x1):
+  t=(x-x0)/(x1-x0);a[y,x,:3]=np.rint(a[y,x0,:3].astype(float)*(1-t)+a[y,x1,:3].astype(float)*t).astype(np.uint8)
+base=Image.fromarray(a);base.save(R/'A01-ren-kinnflate.png')
+face0=base.crop((256,224,552,384)).resize((288,160),Image.Resampling.LANCZOS)
+body=base.crop((0,0,576,704));b=np.array(body);b[224:384,256:576]=0;b[384:532,544:576]=0;body=Image.fromarray(b);body.save(R/'costume345_1832-prototype.png')
+coat=base.crop((552,224,640,532));c=np.array(coat);bbox=Image.fromarray(c[:,:,3]>=128).getbbox();coat=coat.crop(bbox)
+print('coat bbox generated',bbox,'size',coat.size,flush=True)
+states={};mouths=[];whitebounds={}
+for key,n in [('A01',1961),('B01',1962),('C01',1963)]:
+ gen=Image.open(R/('A01-kildejustert.png' if key=='A01' else f'{key}-normalisert.png')).convert('RGBA');ar=np.array(gen)
+ mask=(ar[:,:,0]>170)&(ar[:,:,1]>145)&(ar[:,:,2]>130)&(ar[:,:,3]>128);labs,num=ndimage.label(mask);parts=[]
+ for lab,sl in enumerate(ndimage.find_objects(labs),1):
+  if sl is None:continue
+  yy,xx=sl;count=int((labs[sl]==lab).sum())
+  if 280<xx.start<390 and 270<yy.start<380 and 5<count<2000:parts.append([xx.start,yy.start,xx.stop,yy.stop])
+ assert parts
+ gx0,gy0=min(q[0] for q in parts),min(q[1] for q in parts);gx1,gy1=max(q[2] for q in parts),max(q[3] for q in parts)
+ orig=np.array(Image.open(S/f'costume345_{n}.png').convert('RGBA'))[:40,:72];gray=(orig[:,:,:3]==[187,179,151]).all(2);yy,xx=np.nonzero(gray);target=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1))
+ tx0,ty0,tx1,ty1=[v*4 for v in target];sx=(tx1-tx0)/(gx1-gx0);sy=(ty1-ty0)/(gy1-gy0);pad=10
+ piece=gen.crop((gx0-pad,gy0-pad,gx1+pad,gy1+pad));w,hh=round(piece.width*sx),round(piece.height*sy);piece=piece.resize((w,hh),Image.Resampling.LANCZOS)
+ # Bare selve egenproduserte tann-/munnkomponenten,ikke kragen i nærliggende RGB.
+ keep=np.zeros(ar.shape[:2],bool)
+ for xx0,yy0,xx1,yy1 in parts:keep[yy0:yy1,xx0:xx1]|=mask[yy0:yy1,xx0:xx1]
+ own_support=ndimage.binary_dilation(keep,iterations=4).astype(np.uint8)*255
+ support=Image.fromarray(own_support).filter(ImageFilter.GaussianBlur(.6)).crop((gx0-pad,gy0-pad,gx1+pad,gy1+pad)).resize((w,hh),Image.Resampling.LANCZOS)
+ piece.putalpha(Image.fromarray(np.minimum(np.array(piece)[:,:,3],np.array(support))))
+ face=face0.copy();dest=(round(tx0-pad*sx),round(ty0-pad*sy));face.alpha_composite(piece,dest);states[hashlib.sha256(orig.tobytes()).hexdigest()]=(face,key)
+ face.save(R/f'ansiktsregion-{key}.png');mouths.append(dict(kall=key,kilde=n,genererte_tenner=[gx0,gy0,gx1,gy1],kilde_tenner=list(target),maal=[tx0,ty0,tx1,ty1],generert_munnutsnitt=[gx0-pad,gy0-pad,gx1+pad,gy1+pad],plassering=list(dest),skala=[sx,sy],egen_generert_munnkomponent=True,alfa_dilatasjon=4,alfa_blur=.6))
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];protos={'costume345_1832':body};evidence=[];redtotal=0
+for q in plan:
+ name=q['bilde']
+ if name=='costume345_1832':continue
+ src=Image.open(S/f'{name}.png').convert('RGBA');ar=np.array(src);head=Image.new('RGBA',(src.width*4,308));key=hashlib.sha256(src.crop((0,0,72,40)).tobytes()).hexdigest();face,used=states[key];head.alpha_composite(face)
+ originalstrip=src.crop((72,0,src.width,77));sb=originalstrip.getbbox();sx0,sy0,sx1,sy1=sb;patch=coat.resize(((sx1-sx0)*4,(sy1-sy0)*4),Image.Resampling.LANCZOS);head.alpha_composite(patch,((72+sx0)*4,sy0*4))
+ # Kildebekreftede få røde fargepunkter på jakkeavslutningen bevares mykt.
+ yy,xx=np.nonzero((ar[:,:,:3]==[203,55,23]).all(2)&(ar[:,:,3]>0));points=[]
+ for x,y in zip(xx,yy):
+  dot=Image.new('RGBA',(4,4));ImageDraw.Draw(dot).ellipse((0,0,3,3),fill=(203,55,23,220));head.alpha_composite(dot,(int(x)*4,int(y)*4));points.append([int(x),int(y)])
+ redtotal+=len(points);clean=np.array(head);clean[clean[:,:,3]<=3]=0;head=Image.fromarray(clean);head.save(R/f'{name}-prototype.png');protos[name]=head
+ evidence.append(dict(bilde=name,munn_kall=used,face_source_sha256=key,generert_ansiktsregion=used,coat_source_box=list(sb),coat_generated_box=list(bbox),coat_placement=[(72+sx0)*4,sy0*4,(sx1-sx0)*4,(sy1-sy0)*4],kildebekreftede_roede_punkter=points,sha256=h(R/f'{name}-prototype.png')))
+(R/'plassering.json').write_text(json.dumps(dict(munn=mouths,ruter=evidence,internt_lagsnitt=dict(body=[0,0,144,176],face_source=[0,0,72,40],face_actor=[64,56,136,96],coat_actor=[136,56,161,133],generert_ansiktsutsnitt=[256,224,552,384],generert_jakkeutsnitt=[552,224,640,532]),original_pikselmaske_brukt=False,kildebekreftede_roede_punkter_unike=redtotal,rens_av_intermediaer_munn=dict(rekt=[x0,y0,x1,y1],metode='RGB interpolert bare fra egen generert kinnflate langs samme rad;alfa uendret. Nytegnet munn plassert i kildens tannboks med egenprodusert munnalfa.'),merknad='Ny sammenhengende A01 deles i logiske lagrektangler. Egne alfaomriss beholdes. B01/C01 brukes bare til nytegnet munn etter rensing av en utilsiktet nærliggende kragebit iC01,slik at resten av ansikt/kropp har samme maling. Tre72x40 kilde-RGBA-regioner er eksakt identiske på tvers av sekvensen;jakkeavslutningen plasseres til hver kildebekreftet boks. Ingen originalsilhuett klipper nye omriss.'),ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-20',verktøy='innebygd image_gen og tillatt Python-rensing/plassering',faktiske_bildekall=['A01','B01','C01'],leveranser=[])
+for row in json.loads((R/'klargjort.json').read_text()):
+ job=row['jobb'];d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());canvas=Image.new('RGBA',(1536,1024));rt=[]
+ for c in j['ruter']:
+  rep=next(q for q in plan if any(v['bilde']==c['bilde'] for v in q['malruter']));proto=protos[rep['bilde']];x,y,w,hh=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;assert proto.size==(w*4,hh*4);canvas.alpha_composite(proto,(dx,dy));yy,xx=np.nonzero(np.array(proto)[:,:,3]>128);rt.append(dict(bilde=c['bilde'],kostyme=345,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=f'rapporter/sam345-slutthoder-20261020/{rep["bilde"]}-prototype.png',prototype_sha256=h(R/(rep['bilde']+'-prototype.png'))))
+ canvas.save(d/'resultat.png');digest=h(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=rt)},indent=2)+'\n')
+ proc=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(proc.stdout+proc.stderr);print(job,proc.returncode,proc.stdout,flush=True);assert proc.returncode in [0,1]
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(rt),rutekart=f'rapporter/sam345-slutthoder-20261020/rutekart-{job}.json',egenkontroll={0:'OK',1:'SJEKK'}[proc.returncode],native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False))
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'bygg-ark.py.txt')
+print('3 bildekall,6 resultatark,27 ruter;egenkontroll utført. Ikke native importert eller visuelt godkjent ennå.',flush=True)

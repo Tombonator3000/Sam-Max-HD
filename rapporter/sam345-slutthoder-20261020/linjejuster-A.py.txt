@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam345-slutthoder-20261020'
+im=Image.open(R/'A01-normalisert.png').convert('RGBA');src=[0,272,420,704];dst=[0,224,384,704]
+out=Image.new('RGBA',(640,704))
+for s0,s1,d0,d1 in zip(src,src[1:],dst,dst[1:]):
+ patch=im.crop((0,s0,640,s1)).resize((640,d1-d0),Image.Resampling.LANCZOS);out.paste(patch,(0,d0))
+ar=np.array(out);ar[ar[:,:,3]<=3]=0;out=Image.fromarray(ar);out.save(R/'A01-kildejustert.png')
+(R/'A01-geometriplassering.json').write_text(json.dumps(dict(kilde='raa-A01.png',generert_bbox=[3,4,1194,1279],fastmaal=[640,704],genererte_y_fester=src,kilde_y_fester=dst,metode='Sammenhengende generert maling plasseres i tre rektangulære høydebånd mot originalens øyebunn og hake. Ingen originalalfa eller pikselmaske brukes. Alle bånd har egen generert alfa; fortsatt hel sammenhengende tegning.',sha256=hashlib.sha256((R/'A01-kildejustert.png').read_bytes()).hexdigest()),ensure_ascii=False,indent=2)+'\n')
+for key,n in [('B01',1962),('C01',1963)]:
+ im=Image.open(P/'work/extract/costumes'/f'costume345_{n}.png').convert('RGBA').crop((0,0,72,40));im.resize((576,320),Image.Resampling.NEAREST).save(R/f'kilde-munn-{key}.png')
+shutil.copy2(__file__,R/'linjejuster-A.py.txt')

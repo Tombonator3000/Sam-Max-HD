@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Oppdatert 2026-10-20 04:59:269 av1758 figurjobber har resultat. Fig345_36 til41 har27 egenkontrollerte native,kandidat2283,alle27 sett/motorobservert. Publisering bekreftes separat i sam345-slutthoder-20261020/mottak-publisert.json. Neste344_01 til10. Pakken2242 er41bak kandidaten.
+
 263 av 1758 figurjobber har resultat,2256 native er publisert og hentet tilbake. Neste fig345_36 til41 er kildeklargjort (27 ruter,15 ulike kilder),men ikke tegnet. Fellespakken2242 er publisert og kontrollert,14 etterfølgende ruter kommer ved neste samlepunkt. Se sam345-slutthoder-20261020/KLARGJORT.md og sam345-tilbake-20261020/mottak-publisert.json.
 
 Oppdatert2026-10-20 04:20:345_26 til35 er produsert og kontrollert,14 native, publisert2256,263resultatark. Ni bildekall/sju råbilder brukt. Alle14 sett/motorobservert,80nullkontroller. Fellespakken2242 er publisert,denne14-bunken kom etter pakkefrys. Neste345_36. Se sam345-tilbake-20261020.
@@ -315,12 +317,12 @@ Figurark for Sam.
 Figurark for Sam.
 
 - [x] `fig345_35` (figurark 35 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_36` (figurark 36 for Sam (kostyme 345), 1 rute: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_37` (figurark 37 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_38` (figurark 38 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_39` (figurark 39 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_40` (figurark 40 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_41` (figurark 41 for Sam (kostyme 345), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_36` (figurark 36 for Sam (kostyme 345), 1 rute: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_37` (figurark 37 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_38` (figurark 38 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_39` (figurark 39 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_40` (figurark 40 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_41` (figurark 41 for Sam (kostyme 345), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig344_01` (figurark 1 for Sam (kostyme 344), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter))
 - [ ] `fig344_02` (figurark 2 for Sam (kostyme 344), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)
 - [ ] `fig344_03` (figurark 3 for Sam (kostyme 344), 2 ruter: start (lag 14, tegnes over kroppen) mot høyre (2 ruter), bilde to `jobber/fig344_01/resultat.png`)

@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam345-slutthoder-20261020';raw=Path('/home/tom/.codex/generated_images/01a13e87-e58d-7480-98ea-be8a83c16f7a/exec-237ccb67-d4aa-4480-ab01-a6a24e4da8e3.png')
+assert not(R/'raa-A01.png').exists();shutil.copy2(raw,R/'raa-A01.png')
+a=np.array(Image.open(raw).convert('RGBA'));print('RAW',a.shape,'alphamax',a[:,:,3].max());a[a[:,:,3]<=3]=0
+if a[:,:,3].max()==254:a[:,:,3]=np.clip(a[:,:,3].astype(float)*255/254,0,255).astype(np.uint8)
+im=Image.fromarray(a);bbox=Image.fromarray(a[:,:,3]>=128).getbbox();print('bbox',bbox);im=im.crop(bbox).resize((640,704),Image.Resampling.LANCZOS);im.save(R/'A01-normalisert.png')
+ar=np.array(im);m=(ar[:,:,:3].max(2)<35)&(ar[:,:,3]>128);m[:140]=False;m[320:]=False;m[:,:300]=False;m[:,500:]=False
+labs,n=ndimage.label(m)
+for i,sl in enumerate(ndimage.find_objects(labs),1):
+ if sl is None:continue
+ y,x=sl;count=(labs[sl]==i).sum()
+ if count>15:print('blackfeatures',count,x.start,y.start,x.stop,y.stop)
+b=Image.new('RGB',(1340,760),'#bac9cd');d=ImageDraw.Draw(b)
+for i,p in enumerate([R/'kilde-sam345-full-1961-4x.png',R/'A01-normalisert.png']):
+ pic=Image.open(p).convert('RGBA');b.paste(pic,(i*670,30),pic)
+ for y in [224,384,532]:d.line((i*670,30+y,i*670+640,30+y),fill='red');d.text((i*670+5,30+y),str(y),fill='black')
+b.save(R/'A01-geometri-kontroll.png')
+j=json.loads((R/'bildekall.json').read_text());j['kall'][0].update(utfoert=True,status='raa_lagret_geometri_vurderes',raa='raa-A01.png',raa_sha256=hashlib.sha256((R/'raa-A01.png').read_bytes()).hexdigest());(R/'bildekall.json').write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n')

@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,shutil
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam345-slutthoder-20261020';O=P/'out/sam345-slutthoder-20261020';D=O/'mottak345';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+v=json.loads((D/'myke.json').read_text());assert v['ruter_ok']==27;shutil.copy2(D/'myke.json',R/'myke345-automatisk.json');q=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];records=[]
+for job,s in v['ark'].items():
+ for name,c in s['ruter'].items():
+  rep=next(p for p in q if any(m['bilde']==name for m in p['malruter']));proto=R/(rep['bilde']+'-prototype.png');im=Image.open(proto).convert('RGBA');pad=8;out=Image.new('RGBA',(im.width+pad*2,im.height+pad*2));out.alpha_composite(im,(pad,pad))
+  src=np.array(Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,axis=0),4,axis=1);iou,cover=_iou(np.array(out)[:,:,3]>=CORE,mask,-pad,-pad)
+  assert iou>=GOOD_IOU and cover>=GOOD_COVER,(name,iou,cover);before=dict(c);out.save(D/c['fil'],optimize=True)
+  c.update(sha256=sha(D/c['fil']),storrelse=list(out.size),marg=[2,2],flytt_hd=[0,0],snitt_union=round(iou,3),dekning=round(cover,3),tilpasset=False,skala_xy=[1.,1.],tegnet_mot_4x=[1.,1.],kilde='arket',produksjonstilpasning='Fast4x uten omrissflytting. Alle genererte hoved-/hånd-/småfragmenter beholdt, uten automatisk originalutliggertillegg.')
+  records.append(dict(jobb=job,bilde=name,automatisk=before,slutt=dict(c),prototype=proto.name,prototype_sha256=sha(proto)))
+(D/'myke.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');(R/'native-fast-plassering.json').write_text(json.dumps(dict(ruter=records,antall=27,terskler_endret=False,originalmaske_brukt=False,originalutliggertillegg_i_slutt=0,automatisk_utliggertillegg=sum(int(c['automatisk']['kilde'].split(' og ')[1].split()[0]) for c in records if ' og ' in c['automatisk']['kilde']),grunn='Automatisk mottak hadde allerede27OK,0,0-flytting,marg2 og ingen originalutliggertillegg. Fast4x og sammenhengende egne lag er bekreftet med ny omrissmåling,uendrede terskler og faktisk motor. Ingen originalsilhuettmaske.'),ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'native-fast.py.txt');print([(x['bilde'],x['slutt']['snitt_union'],x['slutt']['dekning']) for x in records])
