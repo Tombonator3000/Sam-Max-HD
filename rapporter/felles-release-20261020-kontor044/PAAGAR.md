@@ -1,0 +1,1 @@
+Ferdig samlepunkt: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-kontor044. Begge faktiske pakker,2888native og Latest er bekreftet. Nativefrysen er frigitt. Fortsett kildeavklaring og faktisk produksjon av neste gyldige figurjobb. Ikke gjenta044,2888bygg eller blokkerte164_04.

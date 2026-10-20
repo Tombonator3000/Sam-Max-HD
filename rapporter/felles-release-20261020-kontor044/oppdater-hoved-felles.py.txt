@@ -1,0 +1,24 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam-max044-foerste-20261020';v=json.loads((R/'publisert.json').read_text());assert v['native']==2888 and v['nye_native_siden_felles2810']==78 and v['Latest_bekreftet'];stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');heading='Kontrollert felles2888, '+stamp
+body=f'''Hele Sam og Max044 i kontorintroen er levert som grafikk: åtte hele ark og 78 nye native-rutekoblinger fra 47 hele malerier og 31 ekstra eksakte hele RGBA-aliaser. 14 innebygde image_gen-kall med faktiske prompter og råbilder er bevart. Rekvisittretur, to munnuttrykk og én størrelsesvariasjon er rettet. Alle åtte ark og alle 78 automatiske native er OK. Originaler i spillkontekst og begge godkjente hovedark er brukt. Egen alfa og egne konturer bevarer hodeløst snakkelag, små flygende deler, hvite vindusglimt og svart silhuett. Ingen hard originalmaske, originalfragmenter, senkede grenser, motor-/pipelineendring eller ny Tom-/Claude-godkjenning.
+
+Grafikkilde 620ef5ee23e2aaef5c18bd37820265e24b97b6ee. Publisert og hentet hd-mod {v['hd_mod']}, 2888 native. Alle 21131 filer og 21125 PNG-er er SHA-bekreftet. Alle 21053 tidligere filstier og 21047 tidligere PNG-er, 912 beskyttede kilder og de tre opprinnelige stashene er bevart. 396 av 1758 hele figurjobber har resultat; 1362 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. All grafikk er ikke ferdig.
+
+Felles Linux-/Windows-utgave er publisert og Latest bekreftet: {v['url']}, releaseID {v['release_id']}. Pakkekode {v['kode']}. Linux {v['linux_run']} og Windows {v['windows_run']} bestod første forsøk. Begge faktiske nedlastinger, SHA-filer, fire serverdigester/størrelser og alle 21130 runtime-moddfiler per pakke er kontrollert. Begge inneholder samme publiserte modd og alle 78 nye. Alle {v['bevarte_tidligere_releaser']} tidligere releaser og vedlegg er bevart ved fellespubliseringen. Nativefrysen er frigitt. Ikke gjenta044 eller2888-byggene.
+
+Fem pakkeprøver og fem grunnlagsprøver brukte samme nye Linux-binær SHA256 {v['linux_binar_sha256']}: inventar, akvarium, cafeteria, 820 bilder fra rom92s egne skript og 1200 bilder fra originalskript66 i kontoret. 524 kontroller ga524 null i begge moddversjoner. Alle78 nye ruter er motorobservert. Alle78 figurutsnitt er rasteridentiske med visuelt sette produksjonsbilder. Tolv hele pakkebilder og tre før/etter er sett. Kontorprøven overstyrer ikke aktor, kostyme eller animasjon. Dette er avgrenset avspilling, ikke full naturlig gjennomspilling.
+
+{v['rgb_sammenligning']}
+
+Interaktiv Windows- og ny webtest gjenstår. Historiske SDL-startfeil, testhopp816/836, senere stopp1384, inventarkant i rom35 og Windows-taggfilter er ikke erklært rettet. Den gamle uønskede taggjobben39494082933 feilet før spillgjenkjenning og publiserte ikke. Eventuelt nytt uønsket taggbygg etter denne fellesreleasen registreres separat fra det tilsiktede grønne Windows-bygget. Ingen ny dispatch, omprøve eller kansellering av slike taggjobber i grafikkrunden.
+
+Neste gyldige kandidat er Sam029 i rom5, fig029_01 til22, 70 mål fra30 ulike hele kilder. Bare029_01/referanse.png er sett: separat hånd/arm med blågrå erme og tynn brun frynset snor. Ikke Sam-hode. Nøyaktig rekvisittfunksjon, resten av kildene og hel spillkontekst må avklares før nye bildekall. Ingen029-kall, resultater eller native ennå. Les sam-max044-foerste-20261020/NESTE.md.164_04/1943/1944 og tidligere blokkeringer skal ikke omprøves; ugyldige katalogruter skal ikke tegnes.
+
+Rapporter ligger på gpt-arbeid i sam-max044-foerste-20261020 og felles-release-20261020-kontor044. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er fulgt. Automatisk grafikkproduksjon fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke. Grafikk går til gpt-arbeid og hd-mod; main får bare memory,todo,STATUS og log.
+'''
+for name in ['memory.md','todo.md','STATUS.md']:
+ p=P/name;s=p.read_text();assert 'Kontrollert felles2888,' not in s[:100];first,rest=s.split('\n',1);p.write_text(first+'\n\n## '+heading+'\n\n'+body+'\n'+rest.lstrip('\n'))
+p=P/'log.md';p.write_text(p.read_text().rstrip()+'\n\n## '+stamp+' (Codex)\n\n'+body+'\n');shutil.copy2(__file__,R/'oppdater-hoved-felles.py.txt');print(heading,flush=True)

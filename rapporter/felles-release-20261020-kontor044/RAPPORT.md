@@ -20,3 +20,7 @@ Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/ra
 Spillet og grafikken tilhører Disney/Lucasfilm.
 
 Linux-binær SHA256 4440ce2e2e6bcf85d6d2f117e87d633e5baefadace0f91d3d9d9320a62890ad1. Alle 27 tidligere releaser og vedlegg bevares ved fellespubliseringen. 396 av 1758 hele figurjobber har resultat, 1362 gjenstår pluss returer, katalogfeil og sluttkontroll. 912 beskyttede kilder og tre stasher er bevart. Fellespublisering og Latest bekreftes separat.
+
+Fellespublisert og Latest bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-kontor044, releaseID 418919773. Begge faktiske pakker og alle 21130 runtime-moddfiler per pakke er bekreftet. Alle 78 nye er motorobservert og har samme figurraster som visuelt kontrollerte produksjonsbilder. 524 kontroller ga 524 null i både grunnlag og pakke med samme nye binær. Alle 27 tidligere releaser og vedlegg er bevart. Nativefrysen er frigitt. RGB-funn står separat i visuell-kontroll.json og er ikke nullerklært. Ingen ny Tom-/Claude-godkjenning.
+
+Etter fellespublisering er uønsket Windows-taggbygg39504399685 registrert separat: in_progress/None. Dette er ikke det tilsiktede grønne bygget39501496632. Ingen ny dispatch,omprøve eller kansellering. Kontroller sluttstatus neste gang; fellesrelease har egne verifiserte vedlegg.
