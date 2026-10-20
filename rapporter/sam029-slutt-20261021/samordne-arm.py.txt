@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from smhd.myk import _iou
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam029-slutt-20261021';D=R/'for-samordnet-arm';D.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def source(n):
+ a=np.array(Image.open(P/f'work/extract/costumes/costume029_{n}.png').convert('RGBA'));lab,_=nd.label(a[:,:,3]>0,np.ones((3,3)));k=max(range(1,lab.max()+1),key=lambda k:(lab==k).sum());yy,xx=np.nonzero(lab==k);box=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];x,y,x1,y1=box;q=a[y:y1,x:x1].copy();q[lab[y:y1,x:x1]!=k]=0;return a,box,hashlib.sha256(q.tobytes()).hexdigest()
+def own(a):
+ lab,_=nd.label(a[:,:,3]>=128,np.ones((3,3)));k=max(range(1,lab.max()+1),key=lambda k:(lab==k).sum());_,ix=nd.distance_transform_edt(lab==0,return_indices=True);owners=lab[ix[0],ix[1]];return (owners==k)&(a[:,:,3]>0)
+dp=R/'prototyper/costume029_1980.png';donor=np.array(Image.open(dp).convert('RGBA'));dm=own(donor);q=donor.copy();q[~dm]=0;_,db,dh=source(1980);records=[]
+for n in range(1981,1990):
+ src,sb,sh=source(n);assert sh==dh;name=f'costume029_{n}';p=R/'prototyper'/(name+'.png');meta=R/(name+'-prototype.json');v=json.loads(meta.read_text());shutil.copy2(p,D/p.name);shutil.copy2(meta,D/meta.name);a=np.array(Image.open(p).convert('RGBA'));a[own(a)]=0;dx,dy=(sb[0]-db[0])*4,(sb[1]-db[1])*4;canvas=Image.fromarray(a);canvas.alpha_composite(Image.fromarray(q),(dx,dy));z=np.array(canvas);z[z[:,:,3]==0,:3]=0;Image.fromarray(z).save(p);mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cov=_iou(z[:,:,3]>=128,mask,-8,-8);assert iou>=.6 and cov>=.8
+ v.update(sha256=sha(p),snitt_union=iou,dekning=cov,native_ok=True,egen_hel_arm_gjenbrukt=dict(fra='costume029_1980',prototype=str(dp.relative_to(R)),sha256=sha(dp),kilde_hel_komponent_RGBA_identisk=True,kilde_komponent_RGBA_sha256=dh,kildedonor_boks_1x=db,kilde_boks_1x=sb,egen_pixel_forskyvning_hd=[dx,dy],egen_alfakomponent=True,originalmaske=False,originalpiksler=False),foer_samordning=str((D/p.name).relative_to(R)));meta.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');records.append(dict(bilde=name,snitt_union=iou,dekning=cov,egen_hel_arm_gjenbrukt=v['egen_hel_arm_gjenbrukt']));print(name,round(iou,3),round(cov,3))
+(R/'identisk-kildearm-samordnet.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'samordne-arm.py.txt')

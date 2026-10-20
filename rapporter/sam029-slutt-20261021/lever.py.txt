@@ -1,0 +1,46 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam029-tau-20261021'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');assert base['native']==2941 and all(sha(P/'mods/gpt'/f)==h for f,h in base['filer'].items())
+prot=read(R/'beskyttede-samlet.json');assert len(prot)==1000 and all(sha(A/f)==h for f,h in prot.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==411
+plan=read(R/'ruteplan-unik.json');jobs=plan['jobber'];assert len(jobs)==7 and plan['maal']==17 and len(plan['ruter'])==15
+protos={}
+for e in plan['ruter']:
+    v=read(R/(e['bilde']+'-prototype.json'));v['art']=R/v['prototype'];assert v['native_ok'] and sha(v['art'])==v['sha256'];protos[e['bilde']]=v
+assert protos['costume029_1973']['kall']=='T09' and protos['costume029_1987']['kall']=='R04'
+assert sum(v.get('tidligere_publisert_hel_canonical',False) for v in protos.values())==2
+progress=dict(leveranser=[],nye_jobber=7,native_rutekoblinger_levert=17,nye_hele_canonical_i_native=13,tidligere_hele_canonical_gjenbrukt=2,ytterligere_hele_aliasmaal=2,nye_bildekall=5,nye_raabilder=5,tidligere_kall_i_bruk=2,grunnlag_native=2941,egen_alpha=True,originalmaske=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False)
+maps=[]
+for job in jobs:
+    J=A/'jobber'/job;j=read(J/'jobb.json');canvas=Image.new('RGBA',(1536,1024));mapping=[]
+    for c in j['ruter']:
+        e=next(e for e in plan['ruter'] if any(t['bilde']==c['bilde'] for t in e['malruter']));v=protos[e['bilde']]
+        src=Image.open(P/'work/extract/costumes'/(c['bilde']+'.png')).convert('RGBA');assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']
+        im=Image.open(v['art']).convert('RGBA');x,y,w,h=c['rekt'];assert im.size==(w*4+16,h*4+16);dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8
+        assert dx>=0 and dy>=0 and dx+im.width<=1536 and dy+im.height<=1024;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128)
+        mapping.append(dict(bilde=c['bilde'],kostyme=29,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical=e['bilde'],canonical_rgba_sha256=e['rgba_sha256'],canonical_fil_sha256=sha(P/'work/extract/costumes'/(c['bilde']+'.png')),prototype=str(v['art'].relative_to(A)),prototype_sha256=sha(v['art']),kall=v['kall'],egen_alpha=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,tidligere_publisert_hel_canonical=v.get('tidligere_publisert_hel_canonical',False),egne_smaadeler_gjenbrukt=v.get('egne_smaadeler_gjenbrukt',[]),eksakt_helt_alias=e['bilde'] if e['bilde']!=c['bilde'] else None))
+    assert not (J/'resultat.png').exists();canvas.save(J/'resultat.png');digest=sha(J/'resultat.png');save(R/f'rutekart-{job}.json',{job:dict(sha256_resultat=digest,ruter=mapping)})
+    test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True);(R/f'{job}-egenkontroll.txt').write_text(test.stdout+test.stderr);assert test.returncode in [0,1],(job,test.stdout);state='OK' if test.returncode==0 else 'SJEKK';print(job,state,test.stdout[-130:],flush=True)
+    progress['leveranser'].append(dict(jobb=job,resultat=str((J/'resultat.png').relative_to(A)),sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll=state,egenkontrollert=True,visuelt_kontrollert=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False));maps+=mapping
+    (J/'notat.md').write_text(f'''# {job},21. oktober2026
+
+Siste sju ark fig029_16til22:17nye native mål fra15ulike hele kildeformer.13canonical malerier tas inn første gang, ogfire mål bruker to tidligere hele malerier ved identisk hel source-RGBA. To av de17er ytterligere hele aliasmål. Dette fullfører alle22ark/70ruter i kostyme029, men ikke all Sam & Max-grafikk.
+
+Motivet er Sams hånd og lange blågrå erme ved tauenden rundt kvinnen i introens rom5. Primærskript65 og faktisk kildeavspilling viser grep og slipp. At alle knutene løsnes er ikke dokumentert. Originalene er sett i spillkontekst, med godkjent Sam-hovedark og kroppsanker. Egen T01R-prøve gir kontinuitet og er ikke ny godkjenning. Ingen hel Sam, ny rekvisitt eller ekstra finger legges til.
+
+Tre uleverte motiver1975/1976/1980 gjenopptas fra bevart T05-råbilde. Fem nye innebygde image_gen-kall er bevart med faktiske prompter: T06,T07,T08,T09 og R04. R04 retter manglende tynn forbindelse i1987tauet. T07-versjonen av denne ruten forkastes før levering.1975manglet én TAN tauflis; kilden har eksakt samme ene RGBA-piksel som1955. Bare egen nymalt R03-flis gjenbrukes, uten kildepiksler.1988har sin tanflis fraT07.1973har en enslig MØRK grå flekk høyt over armen. Hele flekken, mellomrommet og armens normale høyde er bevart.
+
+Kilden har nøyaktig samme hele hånd-/ermekomponent i1980til1989, SHA256fe40fc31647733522a9dc198a0306d5955be701139e477b9303544350335a420. Hele EGEN malte1980arm gjenbrukes derfor i de ni neste rutene. Bare egen alfa isolerer komponenten; kildens komponent brukes til identitetsbevis og rektangulær plassering.1983har kildebekreftet4HD-pikslers sideforskyvning. Tauet og kildeekte separate smådeler beholder sin særegne bevegelse. Dette fjerner generert armvariasjon der kilden er helt stillestående.
+
+Ekte egen alfa,4x med8HD-piksler marg, ingen hard originalmaske, ingen originale piksler eller originalfragment-fallback. Svak egen glød fjernes etter egen alfa, med to piksler egen kant. Hele egne motiver og allerede separate egne fragmenter affinplasseres; kildegeometri brukes bare til måling og delrektangler. T08viser ett motiv og uthentes fra hele eget lerret, slik at ingen egen arm klippes ved kvadrantkanten. CORE128, IoU0,6 og dekning0,8 er uendret.
+
+Resultat SHA256:{digest}. Egenkontroll:{state}. Native mottak, visuell sluttkontroll, motorobservasjon, publisering og pakker føres separat. Ingen ny Tom-/Claude-godkjenning.1000beskyttede jobbfiler og tre stasher er urørt. Bibliotekskilder:figurark-fast-storrelse og publisert-mod-er-fasit.
+''')
+save(R/'fremdrift.json',progress);save(R/'prototyper-endelig.json',maps)
+assert len(maps)==17 and len({v['bilde'] for v in maps})==17 and len(list((A/'jobber').glob('fig*/resultat.png')))==418
+assert all(sha(A/f)==h for f,h in prot.items());shutil.copy2(__file__,R/'lever.py.txt');print('7hele ark,17nye mål,13nye hele canonical i native og2gamle,418resultatark',flush=True)

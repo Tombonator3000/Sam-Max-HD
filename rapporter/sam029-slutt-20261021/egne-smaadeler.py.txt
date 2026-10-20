@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam029-slutt-20261021';S=A/'rapporter/sam029-fortsettelse-20261021';D=R/'egne-smaadeler';D.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rules={}
+p=S/'prototyper/costume029_1955.png';a=np.array(Image.open(p).convert('RGBA'));lab,n=nd.label(a[:,:,3]>=128,np.ones((3,3)));parts=[]
+for k,s in enumerate(nd.find_objects(lab),1):
+ if s is not None:parts.append(dict(k=k,box=[s[1].start, s[0].start,s[1].stop,s[0].stop],area=int((lab[s]==k).sum())))
+want=[v*4+8 for v in [9,50,10,51]];part=min(parts,key=lambda v:sum((x-y)**2 for x,y in zip(v['box'],want)));assert part['area']<50
+_,ix=nd.distance_transform_edt(lab==0,return_indices=True);owners=lab[ix[0],ix[1]];q=a.copy();q[owners!=part['k']]=0;x0,y0,x1,y1=part['box'];out=D/'tan-tauflis-fra-egen-R03.png';Image.fromarray(q).crop((x0-2,y0-2,x1+2,y1+2)).save(out)
+for target,box in [('costume029_1975',[8,50,9,51])]:
+ t=np.array(Image.open(P/'work/extract/costumes'/(target+'.png')).convert('RGBA'));src=np.array(Image.open(P/'work/extract/costumes/costume029_1955.png').convert('RGBA'));x,y,xx,yy=box;ta=t[y:yy,x:xx];da=src[50:51,9:10];assert np.array_equal(ta,da) and ta[0,0].tolist()==[159,119,51,255]
+ rules[target]=[dict(donor=str(out.relative_to(R)),sha256=sha(out),egen_original_proto=str(p.relative_to(A)),egen_original_sha256=sha(p),egen_kjerne=[2,2,x1-x0,y1-y0],kilde_boks_1x=box,kildedonor='costume029_1955',kilde_RGBA_identisk=True,kilde_RGBA_sha256=hashlib.sha256(ta.tobytes()).hexdigest(),begrunnelse='Kilden har eksakt samme ene tanfargede piksel som1955. T05 manglet den. Bare egen nymalt R03-tauflis gjenbrukes; ingen originale piksler eller klippemaske.')]
+(R/'egne-fragmentdonorer.json').write_text(json.dumps(rules,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'egne-smaadeler.py.txt');print('1975 egen tanflis bevart, kildeidentitet bekreftet.')

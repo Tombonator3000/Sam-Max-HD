@@ -1,0 +1,43 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam029-fortsettelse-20261021';F=A/'rapporter/sam029-tau-20261021'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+if R.exists():
+ assert set(p.name for p in R.iterdir())=={'beskyttede-samlet.json','grunnlag-produksjon.json'}
+ assert subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True).strip()=='?? rapporter/sam029-slutt-20261021/'
+else:
+ assert not subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True).strip();R.mkdir()
+base=read(S/'publiserte-moddfiler-2941.json');assert len(base)==21184 and all(sha(P/'mods/gpt'/f)==h for f,h in base.items())
+remote=subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/ref/heads/hd-mod','--jq','.object.sha'],cwd=P,text=True).strip();assert remote==read(S/'mottak-publisert.json')['hd_mod']
+prot=read(S/'beskyttede-samlet.json');assert len(prot)==1000 and all(sha(A/f)==h for f,h in prot.items());save(R/'beskyttede-samlet.json',prot)
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==read(S/'grunnlag-produksjon.json')['stash'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==411
+save(R/'grunnlag-produksjon.json',dict(native=2941,native_sha=remote,filer=base,stash=stash,hele_figurjobber=411,beskyttede=1000,art_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),main_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip()))
+jobs=[f'fig029_{i:02}' for i in range(16,23)];wanted={c['bilde'] for j in jobs for c in read(A/'jobber'/j/'jobb.json')['ruter']};full=read(S/'ruteplan-hele029.json');plan=[dict(e,malruter=[t for t in e['malruter'] if t['bilde'] in wanted]) for e in full['ruter'] if any(t['bilde'] in wanted for t in e['malruter'])]
+assert len(wanted)==17 and len(plan)==15;save(R/'ruteplan-unik.json',dict(jobber=jobs,maal=17,ulike_hele_kilder=15,nye_hele_kilder=13,tidligere_hele_kilder=2,ruter=plan));shutil.copy2(S/'ruteplan-hele029.json',R/'ruteplan-hele029.json')
+(R/'prototyper').mkdir();inherited=[]
+for e in plan:
+    b=e['bilde'];p=S/(b+'-prototype.json')
+    if not p.exists():continue
+    d=read(p);q=S/d['prototype'];assert sha(q)==d['sha256'];dest=R/'prototyper'/q.name;shutil.copy2(q,dest);d.update(forrige_prototype=str(q),forrige_notat_sha256=sha(p),gjenopptatt=True,tidligere_publisert_hel_canonical=(P/'mods/gpt/costumes'/(b+'_hd.png')).exists());save(R/p.name,d);inherited.append(dict(bilde=b,prototype=d['prototype'],sha256=d['sha256'],tidligere_publisert=d['tidligere_publisert_hel_canonical']))
+assert len(inherited)==2;save(R/'gjenopptatte-prototyper.json',inherited)
+for name in ['T05','T06','T07','T08','T09']:
+    origin=S/'kall'/name if name=='T05' else F/'kall'/name
+    shutil.copytree(origin,R/'kall'/name)
+for page in range(math.ceil(len(plan)/4)):
+    sub=plan[page*4:page*4+4];board=Image.new('RGB',(2100,len(sub)*370),'#344556');d=ImageDraw.Draw(board)
+    # The package log contains all70 cels, not only the30 previously delivered ones.
+    import re
+    T=P/'out/felles-release-20261021-tau029-foerste/pakke2918-sam029';obs={}
+    for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*29\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',(T/'scummvm.log').read_text()):
+        f,n,x,y,w,h=map(int,m.groups());obs.setdefault(f'costume029_{n}',dict(frame=(f//2+1)*2,pos=[x,y],maal=[w,h]))
+    for i,e in enumerate(sub):
+        b=e['bilde'];v=obs[b];x,y=v['pos'];w,h=v['maal'];src=Image.open(P/'work/extract/costumes'/(b+'.png')).convert('RGBA').resize((w*4,h*4),Image.Resampling.NEAREST);motor=Image.open(T/f'frame_{v["frame"]:06}_room005.png').convert('RGBA').crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8));q=R/'prototyper'/(b+'.png')
+        images=[('original',src),('kilde i faktisk2918-pakke',motor)]
+        if q.exists():images.append(('bevaret eget maleri',Image.open(q).convert('RGBA')))
+        for k,(title,z) in enumerate(images):board.paste(z,(k*700+8,i*370+40),z);d.text((k*700+8,i*370+8),b+' '+title,fill='white')
+    board.save(R/f'kilde-og-gjenopptatt-side{page+1}.png')
+save(R/'kildereferanse.json',dict(forra_rapport='rapporter/sam029-tau-20261021',primaerskript65_sha256=sha(F/'primærkilde-scrp_065.txt'),motorkilde=str(T),binar_sha256=sha(P/'out/felles-release-20261021-tau029-foerste/linux/squashfs-root/usr/bin/scummvm'),rom=5,kostyme=29,aktor=10,palett=0,pos=[267,109],tvungen_isolert_avspilling=True,naturlig_gjennomspilling=False,motiv='Synlig håndgrep og slipp av tauende ved kvinnen. Ikke dokumentert at alle knuter løsnes.',bevarte_raakall=['T05'],tidligere_T04_tiny1955='Én tanfarget tauflis ved9,50, kildefarge15911951. Den er ikke grå. Ingen ny rekvisitt.'))
+(R/'NESTE.md').write_text('Påbegynt siste029_16til22,sju ark/17mål fra15ulike hele kilder,13nye og2tidligere. T05råbilde er kopiert fra forrige bunke og skal gjenopptas for1975/76/1980. T06..T09 er bare forberedt.2918-fellespakkene mangler23publiserte ruter og oppdateres etter disse17. Bevar1973høye grå flekk og nativearmens størrelse.1975liten tanflis må bevares. Ingen nye bildekall/resultat/native i denne sluttrapporten ennå.\n')
+shutil.copy2(__file__,R/'klargjor.py.txt');print('Grunnlag2941;1000kilder/3stasher;7jobber17mål/15helkilder,13nye;T05råbilde gjenopptatt.',flush=True)

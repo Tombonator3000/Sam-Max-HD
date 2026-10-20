@@ -1,0 +1,15 @@
+# fig029_19,21. oktober2026
+
+Siste sju ark fig029_16til22:17nye native mål fra15ulike hele kildeformer.13canonical malerier tas inn første gang, ogfire mål bruker to tidligere hele malerier ved identisk hel source-RGBA. To av de17er ytterligere hele aliasmål. Dette fullfører alle22ark/70ruter i kostyme029, men ikke all Sam & Max-grafikk.
+
+Motivet er Sams hånd og lange blågrå erme ved tauenden rundt kvinnen i introens rom5. Primærskript65 og faktisk kildeavspilling viser grep og slipp. At alle knutene løsnes er ikke dokumentert. Originalene er sett i spillkontekst, med godkjent Sam-hovedark og kroppsanker. Egen T01R-prøve gir kontinuitet og er ikke ny godkjenning. Ingen hel Sam, ny rekvisitt eller ekstra finger legges til.
+
+Tre uleverte motiver1975/1976/1980 gjenopptas fra bevart T05-råbilde. Fem nye innebygde image_gen-kall er bevart med faktiske prompter: T06,T07,T08,T09 og R04. R04 retter manglende tynn forbindelse i1987tauet. T07-versjonen av denne ruten forkastes før levering.1975manglet én TAN tauflis; kilden har eksakt samme ene RGBA-piksel som1955. Bare egen nymalt R03-flis gjenbrukes, uten kildepiksler.1988har sin tanflis fraT07.1973har en enslig MØRK grå flekk høyt over armen. Hele flekken, mellomrommet og armens normale høyde er bevart.
+
+Kilden har nøyaktig samme hele hånd-/ermekomponent i1980til1989, SHA256fe40fc31647733522a9dc198a0306d5955be701139e477b9303544350335a420. Hele EGEN malte1980arm gjenbrukes derfor i de ni neste rutene. Bare egen alfa isolerer komponenten; kildens komponent brukes til identitetsbevis og rektangulær plassering.1983har kildebekreftet4HD-pikslers sideforskyvning. Tauet og kildeekte separate smådeler beholder sin særegne bevegelse. Dette fjerner generert armvariasjon der kilden er helt stillestående.
+
+Ekte egen alfa,4x med8HD-piksler marg, ingen hard originalmaske, ingen originale piksler eller originalfragment-fallback. Svak egen glød fjernes etter egen alfa, med to piksler egen kant. Hele egne motiver og allerede separate egne fragmenter affinplasseres; kildegeometri brukes bare til måling og delrektangler. T08viser ett motiv og uthentes fra hele eget lerret, slik at ingen egen arm klippes ved kvadrantkanten. CORE128, IoU0,6 og dekning0,8 er uendret.
+
+Resultat SHA256:6b457ddf13f23764da5e54e8cb679edb59080a64e488a614e77b517c165bd27e. Egenkontroll:OK. Native mottak, visuell sluttkontroll, motorobservasjon, publisering og pakker føres separat. Ingen ny Tom-/Claude-godkjenning.1000beskyttede jobbfiler og tre stasher er urørt. Bibliotekskilder:figurark-fast-storrelse og publisert-mod-er-fasit.
+
+Sluttkontroll:7hele ark/17native automatisk OK.15ulike original/native/motor,7hele resultatark,7hele motorbilder og3før/etter er sett.240skjermbufferkontroller,239null og samme160ved36som2941-grunnlaget før første figurtegning60. Alle211fra60null,ingen nye eller økte avvik. Tre før/etter har null endringer utenfor nytt lag og marg. Alle70Sam029-ruter er logget; de siste17nye er visuelt kontrollert i samme faktiske Linux-binær som grunnlaget. Ikke naturlig gjennomspilling eller ny Tom-/Claude-godkjenning.
