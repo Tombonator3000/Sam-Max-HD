@@ -4,9 +4,11 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [ ] Fortsett faktisk produksjon i rapporter/alkove-fortsettelse-20261020, fig346_08 til17.22 ruter fra17 ulike kilder: ni runtime-ruter fra seks tidligere eksakte prototyper, elleve nye ulike kilder til tretten øvrige runtime-ruter.40 beskyttede kilder, originalark og to grunnlagsmotorforløp sett, alle22 observert og160 kontroller null. Ingen nye bildekall/resultater ennå. Bevar varm brun/orange palett, tredje sugekopp på nesen, reelle pilfragmenter og brun1x19-avslutningsrute uten gjetting. Neste samlebygg må ta med de43 nye rutene siden2134-pakken.
+
 - [x] Samlepunkt felles-release-20261020-natt fullført og Latest,2134 native,174 nye siden1960. Begge faktiske nedlastinger, SHA-filer og20375 moddfiler per pakke kontrollert. Alle174 observert i15 Linux-prøver,980 kontroller uten nye/økte avvik; ti kjente27-pikslers inventarkantmålinger dokumentert. Ikke bygg39340616184/39340620900 på nytt. Se felles-release-20261020-natt/publisert.json.
 
-- [ ] Gjenoppta faktisk produksjon av neste bestilling12: fig039_01,fig113_01,fig295_01 ogfig346_01 til07 i rapporter/bestilling12-20261020.43 ruter fra40 ulike hele kilder,40 beskyttede SHA-er. Originalark, sju primærskript og fem originalmotorforløp sett; alle43 forventede observert.355 kontroller fra figurstart uten avvik. Ingen bildekall/resultater ennå.039=TV-bryter,113=lys golfkølle,295=Max ved fryseren med delvise lag,346=varm brun/orange alkove-palett og separate torso/hodelag med sugepilgag. Ikke gjør346 blågrå eller fullfør delvise lag.039-pos130,174 er diagnose. Les KLARGJORT.md. Pakke2134 er fullført, ny native kan publiseres additivt fra bdd4aec8 etter neste kontroll.
+- [x] Bestilling12 publisert i5fe0f25f og hentet tilbake: ti ark43 native,2177 totalt. Alle43 visuelt sett/motorobservert,355 nullkontroller fra figurstart.37 OK,seks SJEKK,ingen FEIL; native43 OK. Alle gamle filer,40 beskyttede kilder og tre stasher bevart.209 av1758 resultatark. Se bestilling12-20261020/mottak-publisert.json.
 
 - [x] Fig193_01/02,fig298_01/02 ogfig009_01 publisert i bdd4aec8,61 nye native,2134 totalt. Alle61 visuelt sett/motorobservert;640 kontroller, ingen nye/økte avvik.57 OK,4 SJEKK,0 FEIL;native61 OK. Ingen originalutliggertillegg.20 kilder og tre stasher bevart.199 av1758 resultatark,1559 mangler pluss returer. Se sam-max-fisk-museum-intro-20261020/mottak-publisert.json.
 

@@ -1,5 +1,16 @@
 # Status
 
+## TV, golfkølle, fryser og alkove, 2026-10-20 02:16
+
+Ti nye figurark i bestilling12 er publisert og hentet tilbake i hd-mod 5fe0f25fb0b7c66a4ba63281e71c18235ce7316f, 2177 native totalt. Kilde 253f10b7ca1ca9e7f7a0fea20bb92993d3d05db9. 43 nye ruter fra 40 ulike helruter og 44 deler. Alle 43 visuelt sett og motorobservert, 35 ved kildeposisjon og åtte TV-ruter i synlig diagnose. 400 skjermbufferkontroller, alle 355 fra figurstart null; samme kjente160 ved36 i rom7 før testfiguren. Egenkontroll 37 OK, seks SJEKK, null FEIL, native43 OK fra arkene alene. Ekstra Max-nese, fotfragmentets pikseltrapp, to hode/pil-forhold og oppdiktet strek mellom interne hode-/jakkelag rettet før publisering. Alle 20413 kandidat-PNG-er, 20370 tidligere PNG-er og 43 nye native-SHA-er stemmer etter hent. Alle 20376 gamle filstier, 40 beskyttede kilder og tre stasher bevart. 209 av 1758 figurjobber har resultat, 1549 mangler pluss returer og sluttkontroll. Ingen naturlig gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Neste bunke alkove-fortsettelse-20261020 er klargjort: fig346_08 til17, 22 ruter fra17 ulike helkilder, 40 beskyttede SHA-er. Seks tidligere eksakt like prototyper dekker ni runtime-ruter; elleve nye ulike kilder dekker de andre tretten. To grunnlagsmotorforløp og originalark sett, alle22 nye kildenummer observert,160 kontroller uten avvik. Nytt motiv har også tredje sugekopp på nesen.346_14 har flygende sugepiler og delvise lag, mens1x19-ruten1956 er en brun loddrett avslutningsrute, ikke ny pil/kropp. Ingen bildekall eller resultater i neste bunke ennå. Gjenbruk kildefestede prototyper med nye rutekart/native mottak, ikke tegn samme bilde om igjen.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-20-natt har fortsatt2134 native og mangler disse43 til neste samlepunkt. Ingen nye pakkebygg startet i denne bunken. Ikke kall pakkene2177 eller gjenstart ferdige2134-bygg. Grafikkautomatiseringen fullf-r-sam-max-grafikken er bekreftet ACTIVE, gammel nattkontroll forblir pauset.
+
+[Kontrollrapport](https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/bestilling12-20261020/RAPPORT.md).
+
+
 
 ## Felles pakke med2134 native, 2026-10-20 01:36
 
