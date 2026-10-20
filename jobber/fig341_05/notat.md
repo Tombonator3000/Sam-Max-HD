@@ -9,3 +9,5 @@ Start, blink og håndfasene bruker ett sammenhengende nytegnet ansikt og kropp. 
 2 ruter. Resultat SHA256 05cbd3331e58f420420621e00cd367c4b145dc70654c9143f09872ceb47300b9. Egenkontroll OK. Se fremdrift.json og motor-/nativekvitteringene for endelig import og publisering. Ingen ny Tom- eller Claude-godkjenning. Romskriptprøven er ikke en naturlig gjennomspilling. Beskyttede jobbfiler er uendret.
 
 Siste kantrensing: svake magenta RGB-piksler med alfa 1 er erstattet med nærmeste egen malte kjernefarge. Alfa er byteidentisk. Endelig resultat SHA256 eca84206da6cc0a965b5d8fb5ad3c591095d64f19e0e1b79063c5168a3bd90fa. Se svakmagenta-rensing.json.
+
+2026-10-20 09:22: Publisert og hentet i hd-mod 89a6d754206b096c92dcf2455675a20f80efca00, kildecommit 64499698496609236927e07ab66648240aa47361. Hele kandidatens runtimefiler og alle nye native-SHA-er er kontrollert etter hent. Ingen ny Tom-/Claude-godkjenning. Fellespakkene har fortsatt 2399 og oppdateres ved dette samlepunktet.
