@@ -1,0 +1,15 @@
+# Auberginen settes på sokkelen
+
+2026-10-20 07:19. Fig347_01 til 05 er fem nye hele ark med 30 native ruter fra åtte ulike hele kilder. Tre innebygde image_gen-kall er brukt. Alle faktiske argumenter, prompter, referansehash og råbilder er bevart. Motivet er kontrollert mot originalene, rom 92s skript og faktiske kildefaser med Sam, trehjertet og sokkelen. Utsparingene i frukten gir plass til fingrene. Jobbpromptens feilaktige virvelbeskrivelse er korrigert separat.
+
+Rutene bruker egen generert alfa og fast 4x-plassering. Ingen hard originalsilhuettmaske, originalutliggertillegg eller hel originalfallback. Bare eksakt identiske hele kildevarianter kopieres. Sluttkontrollen fant 35 svake magenta RGB-piksler i seks malerier, med alfa 5 til 11. Fargen er hentet fra maleriets egen nærmeste kjerne; alfaen er beholdt byte for byte. De ferdig rensede filene er tatt inn og motorprøvd på nytt.
+
+Alle 30 består egenkontroll og uendrede native-terskler. IoU er 0,866 til 0,977 og dekning 0,928 til 0,991. Alle er visuelt sett som original/native/motor, inklusive samspillet med Sams hender og det roterte hjertet. Samme nedlastede adfdf7fc-binær er brukt til grunnlag og sluttprøver. Gyldig lagprøve har 130 nullkontroller, og rommets egne skript har 190. Henholdsvis 116 og 70 kontroller er fra første nye tegning. Ingen nye eller økte bufferavvik. Dette er målrettet runtimekontroll, ikke naturlig gjennomspilling, ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Den gamle hjertekonturen i HD-visningen er ikke til stede i helt klassisk kontroll. Et forsøk med den eksisterende tomtilstanden som native objektbilde fjernet den ikke. Forsøket er bevart som avvist og er ikke med i sluttkandidaten. Se HJERTEREST.md. Null bufferavvik beviser ikke at denne strukturelle visningsfeilen er borte. Avgrenset objekt-/motorretting må prioriteres før neste samlepakke.
+
+Kandidaten har 2363 native, 20599 PNG-er og 20605 filer. Alle 20569 gamle PNG-er og 20575 tidligere stier er bevart; bare mod.json endrer metadata. 480 beskyttede kildefiler og tre stasher er uendret. 291 av 1758 figurjobber har resultat. 1467 gjenstår, i tillegg til returer, katalogfeil og samlet spill-/stilkontroll. Publisering og hent bekreftes separat i mottak-publisert.json. Felles Linux-/Windows-utgave er fortsatt 2333 og inneholder ikke disse 30.
+
+Bibliotekets PASS-kilder figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelruter er brukt med eksisterende v6-mottak. Neste produksjon er de fem allerede kildeklargjorte arkene fig347_06 til 10. Ikke gjenta 2333-byggene eller de leverte 347-arkene. Ingen raw28, raw32 eller raw36 skal tegnes eller avspilles. Gammel nattkontroll forblir pauset.
+
+Publisering bekreftet 2026-10-20 07:22: Kildecommit 3756138ff1b1b610e050e6988043015967a259ec, hd-mod 8b27f6ea89f0790262868506a76cee369c360154, hentet og kontrollert. Alle 20599 kandidat-PNG-er og alle 30 nye native-hasher stemmer. Alle 20569 gamle PNG-er og 20575 tidligere stier er bevart. Den avviste objektvarianten er ikke med. Pakkene med 2333 native inneholder fortsatt ikke denne bunken.

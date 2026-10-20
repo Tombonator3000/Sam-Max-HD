@@ -1,0 +1,27 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/aubergine347-grunnlag-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+q=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];progress=json.loads((R/'fremdrift.json').read_text());assert len(progress['leveranser'])==5;progress['faktiske_bildekall']=['A01','B01','C01','D01','E01','G01'];progress['brukt_bildekall']=['A01','B01','C01','D01','G01'];progress['avvist_bildekall']=['E01']
+for n in range(6,11):
+ job=f'fig347_{n:02}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());canvas=Image.new('RGBA',(1536,1024));rt=[]
+ for c in j['ruter']:
+  rep=next(v for v in q if any(m['bilde']==c['bilde'] for m in v['malruter']));p=R/(rep['bilde']+'-prototype.png');im=Image.open(p).convert('RGBA');x,y,w,h=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;assert im.size==(w*4,h*4);canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128)
+  source=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(source.tobytes()).hexdigest()==rep['rgba_sha256'];assert np.array_equal(np.array(Image.open(P/f'work/extract/costumes/{c["bilde"]}.png').convert('RGBA')),np.array(Image.open(P/f'work/extract/costumes/{rep["bilde"]}.png').convert('RGBA')))
+  rt.append(dict(bilde=c['bilde'],kostyme=347,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=f'rapporter/{R.name}/{p.name}',prototype_sha256=sha(p)))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=rt)},indent=2)+'\n')
+ run=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(run.stdout+run.stderr);print(job,run.returncode,run.stdout,flush=True);assert run.returncode==0
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(rt),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll='OK',native_mottatt=False,visuelt_kontrollert=False,motorobservert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False))
+ (d/'notat.md').write_text(f'''# {job}
+
+2026-10-20. Laget med innebygd image_gen og Toms uttrykkelig tillatte Python-rensing/plassering. Faktiske kall og råbilder i rapporter/{R.name}/bildekall.json. Modellnavn ble ikke oppgitt av verktøyet. Beskyttede jobbfiler er uendret.
+
+Kildeavklart rom92: samme lilla aubergine settes på sokkelen mens Sam tar trehjertet. Utsparingene gir plass til Sam/handlag,ikke bitt eller ny figur. Brune deler er det bevegelige trehjertet og dets overlag. Promptens feilaktige appelsin-/virvelbeskrivelse er korrigert i separat faktisk prompt,med originale spillbilder og godkjent strekanker før tegning. 4x,riktig lilla/grønn palett,ekte alfa. Ingen hard originalsilhuettmaske. Bare SHA-bekreftede identiske hele kildevarianter kopieres.
+
+Resultat SHA256 {digest}. {len(rt)} ruter. Egenkontroll OK. Native og motor kontrolleres før publisering;egenkontroll er ikke ny Tom-/Claude-godkjenning. Se fremdrift.json og sluttkvitteringen for endelig tilstand.
+''')
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+distinct=[v for v in q if any(m['jobb'] in {f'fig347_{n:02}' for n in range(6,11)} for m in v['malruter'])];board=Image.new('RGB',(1536,4160),'#c1d6d3');draw=ImageDraw.Draw(board)
+for i,v in enumerate(distinct):
+ im=Image.open(R/(v['bilde']+'-prototype.png')).convert('RGBA');im.thumbnail((740,460),Image.Resampling.LANCZOS);bg=Image.new('RGBA',im.size,'#c1d6d3');bg.alpha_composite(im);x=i%2*768;y=i//2*520;board.paste(bg.convert('RGB'),(x+12,y+30));draw.text((x+12,y+8),v['bilde'],fill='#111111')
+board.save(R/'siste-fem-nytegning.png');shutil.copy2(__file__,R/'lever-slutt347.py.txt')

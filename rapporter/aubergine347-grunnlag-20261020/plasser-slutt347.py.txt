@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage
+import numpy as np,json,hashlib,sys,shutil
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/aubergine347-grunnlag-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();key=sys.argv[1];a=np.array(Image.open(R/f'raa-{key}.png').convert('RGBA'));mx=int(a[:,:,3].max());assert mx in(254,255);a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/mx).clip(0,255).astype('uint8');a[a[:,:,3]<=4]=0;labs,n=ndimage.label(a[:,:,3]>=128);counts=np.bincount(labs.ravel());counts[0]=0;slots=json.loads((R/f'kildebrett-{key}.json').read_text());records=[]
+if key=='D01':
+ groups=[]
+ for i in range(3):
+  region=np.zeros(labs.shape,bool)
+  if i==0:region[:565,:790]=True
+  elif i==1:region[:565,790:]=True
+  else:region[565:,:]=True
+  ids=[l for l in range(1,n+1) if counts[l]>=120 and np.any((labs==l)&region)];assert ids;groups.append(ids)
+else:
+ # Reading-order grouping of the newly painted connected strips, never source masks.
+ ids=sorted(range(1,n+1),key=lambda l:-counts[l])[:len(slots)];assert len(ids)==len(slots)
+ ids=sorted(ids,key=lambda l:float(np.nonzero(labs==l)[0].mean()));groups=[]
+ for i in range(0,len(ids),2):groups.extend([[l] for l in sorted(ids[i:i+2],key=lambda l:float(np.nonzero(labs==l)[1].mean()))])
+for s,ids in zip(slots,groups):
+ own=np.isin(labs,ids);yy,xx=np.nonzero(own);box=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];x,y,x1,y1=box;piece=a[y:y1,x:x1].copy();piece[~ndimage.binary_dilation(own,iterations=2)[y:y1,x:x1]]=0
+ name=s['bilde'];src=Image.open(P/f'work/extract/costumes/{name}.png').convert('RGBA');sx,sy,sw,sh=s['kilde_rekt'];crop=src.crop((sx,sy,sx+sw,sy+sh));sb=crop.getbbox();assert sb
+ l,t,r,b=sb;target=(4*(r-l),4*(b-t));piece=Image.fromarray(piece).resize(target,Image.Resampling.LANCZOS);v=np.array(piece);v[v[:,:,3]<=4]=0;bad=(v[:,:,:3]==[255,0,255]).all(2)&(v[:,:,3]>0);repairs=[]
+ if bad.any():
+  assert int(v[bad,3].max())<=16;near=ndimage.distance_transform_edt(v[:,:,3]<128,return_distances=False,return_indices=True);yy,xx=np.nonzero(bad);repairs=[dict(x=int(x),y=int(y),alfa=int(v[y,x,3])) for y,x in zip(yy,xx)];v[yy,xx,:3]=v[near[0,yy,xx],near[1,yy,xx],:3]
+ out=Image.new('RGBA',(sw*4,sh*4));out.alpha_composite(Image.fromarray(v),(l*4,t*4));kind='prototype' if key=='D01' else f'fot-{key}';path=R/f'{name}-{kind}.png';assert not path.exists();out.save(path);bg=Image.new('RGBA',out.size,'#c1d6d3');bg.alpha_composite(out);bg.convert('RGB').save(R/f'{name}-{kind}-kontroll.png')
+ if key=='D01':
+  shutil.copy2(R/f'{name}-{kind}-kontroll.png',R/f'{name}-kontroll.png');mask=np.repeat(np.repeat(np.array(src)[:,:,3]>0,4,axis=0),4,axis=1);iou,cover=_iou(np.array(out)[:,:,3]>=CORE,mask,0,0);assert iou>=GOOD_IOU and cover>=GOOD_COVER,(name,iou,cover)
+ else:iou=cover=None
+ records.append(dict(bilde=name,kall=key,raa=f'raa-{key}.png',egen_generert_boks=box,kilde_logisk_rekt=s['kilde_rekt'],kilde_synlig_boks=list(sb),fil=path.name,sha256=sha(path),snitt_union=iou,dekning=cover,original_pikselmaske=False,alfa_bevart_i_RGB_rensing=True,RGB_rensing=repairs));print(name,box,'target',out.size,'IoU',iou,'cover',cover,flush=True)
+(R/f'plassering-{key}.json').write_text(json.dumps(dict(ruter=records,raa_alfa_maks=mx,originalmaske=False),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser-slutt347.py.txt')

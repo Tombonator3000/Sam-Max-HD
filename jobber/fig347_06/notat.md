@@ -1,0 +1,11 @@
+# fig347_06
+
+2026-10-20 07:54, Codex. 6 ruter, resultat SHA256 759bb73f250d44612d4c3c16cc80ae4d95750c1f40072a341ab3abd2d3f4c74b. Egenkontroll OK, native mottatt, sett mot original/native/motor og motorobservert. Publisering, hent og kildecommit bekreftes separat i mottak-publisert-slutt.json. Ingen ny Tom-/Claude-godkjenning eller naturlig gjennomspilling.
+
+Sam bytter trehjertet mot samme lilla aubergine på trykksokkelen i rom 92. Originalark, romskript og kildeposer i motoren er undersøkt før produksjon; godkjent Sam-strek og de første 347-nytegningene er stilankere. Små mørkebrune sideformer er kildebekreftet og bevart uten ny identitetspåstand. Fruktens utsparinger gir plass til Sams håndlag. De frittliggende brune delene i 1950/1951 er det utgående trehjertet.
+
+Innebygd image_gen D01 gir de to sammensatte overgangsbildene og fruktplaten. G01 gir en separat egenmalt oval base. De 13 stående kildevariantene bygges fra samme nye frukt og base med kildebestemt forskyvning oppover og hele logiske nedre rutegrenser. To mellomfaser bruker 0,5 HD-piksel baseforskyvning. Dette er en kildeforankret bevegelsesmodell, ikke 13 uavhengige bildekall eller pikseleksakt gjenskaping. E01 er avvist og ubrukt fordi det ikke bevarte denne bevegelsen. Alle faktiske kall, prompter, referanse-SHA-er og råbilder er bevart i rapporten.
+
+Fast 4x med egen ekte alfa, grønn kalott, lilla skygger og glatte konturer. Ingen hard originalsilhuettmaske, originalutliggertillegg eller hel originalfallback. Bare hele byteidentiske RGBA-kildealiaser gjenbruker et helt nytt bilde. Beskyttede referanse.png, original_1x.png, prompt.txt og jobb.json er uendret. 36 nye native samlet, uendrede mottaksterskler. Relevante kilder og detaljert sammensetting står i rapporter/aubergine347-grunnlag-20261020/.
+
+Alle 36 nye og alle 66 i kostyme 347 er observert i rommets egne tre skript. 320 bufferkontroller før objektmetadata og 190 med den endelige kanoniske objektdekningen gir null avvik. Den gamle hjertekonturen er fjernet ved separat original tegnedekning for objekt 901, ikke ved å klippe nytegningen eller endre motorpatchen. Pipeline PR 34, 66 tester bestått. Pakkene oppdateres samlet ved dette samlepunktet; se egen fellespakkerapport for faktisk inkludert grafikk.
