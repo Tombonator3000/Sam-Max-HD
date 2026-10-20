@@ -1,5 +1,16 @@
 # memory.md
 
+## Max028 publisert,2026-10-20 22:28
+
+Hele Max028 er laget,kontrollert,publisert og hentet:fig028_01 til08,8 hele ark/88 nye native fra17 hele malerier og71 ekstra eksakte hele aliasmål. Grafikkilde cdad822fb0aa757a5072c456c43e78144779dbeb,hd-mod 0fb4055dd079779ce22c5cc6535cde17d3ddbe2d,2810 native. Alle21053 filer/21047 PNG er SHA-bekreftet. Alle20965 tidligere stier/20959 PNG,880 beskyttede kilder og3 stasher er bevart.388 av1758 hele figurjobber har resultat,1370 gjenstår pluss returer,katalogfeil og sluttkontroll.
+
+11 innebygde image_gen-kall med råbilder og faktiske prompter bevart. To teknisk grønne utkast ble visuelt returnert for scenery-rektangler og ørebasebånd. Sluttresultat:8 hele ark og88 automatisk native OK.17 unike original/native/motor,8 hele ark på kontakt,8 hele motorbilder og3 før/etter er sett.160 motorkontroller160null,alle88 nye ruter motorlogget. Egen ansiktskontur,egen alfa og egne kantfarger.13 heldekkende helkilder bruker eget publisert romutsnitt under eget ansikt;4 transparente helkilder beholder egen alfa. Ingen originalmaske,originalfragmenter,senkede grenser,motor-/pipelineendring eller ny Tom-/Claude-godkjenning. Isolert tvungen Max-test i rom4,chore6/7 er ikke naturlig gjennomspilling;Sam sitt separate hode er ikke aktivert i disse prøvene.
+
+Felles2810 bygges én gang per plattform mot kode 76bfd3aa4d1bb159597879cb05b308b1ac5d4a19:Linux 39491921444,Windows 39491926086. Nativefrys gjelder til begge faktiske nedlastinger,alle filhash,motorbilder og fellesrelease er bekreftet. Foreløpig Latest felles2722 mangler de88 nye;ikke kall pakkene oppdatert ennå. Rapport:felles-release-20261020-max028.
+
+Neste fig044_01 til05 krever kildeklargjøring og motivavklaring fra primærskript. Ikke gjenta028 eller dispatch2810 på nytt.164_04/1943/1944 fortsatt blokkert uten omprøve. Full naturlig gjennomspilling,interaktiv Windows-/ny webtest,historiske SDL-/testhopp-/inventarkantfeil og Windows-taggfilter gjenstår. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Automatisk produksjon fortsetter uten gammel nattfrist.
+
+
 ## Hele VR251 og felles2722,2026-10-20 21:41
 
 De ni figurarkene for VR-sekvensens kostyme 251 er levert, med 39 native animasjonsruter. De fire siste arkene gir 22 nye ruter fra 13 nye malerier og hele egne malerier gjenbrukt ved eksakt kildelikhet. Seks innebygde image_gen-kall og råbilder er bevart. Fem kall brukes; utkast med grove pikseltrinn er forkastet. Tre nye ark fikk OK, ett fikk SJEKK med ett omrissvarsel for 1814. Det er visuelt vurdert og beholdt. Alle 22 bestod native-kontrollen. Egne bilder har fast 4x, ekte alfa og egne kantfarger. Ingen hard originalmaske, originalfragment-fallback eller senkede kontrollgrenser. Ingen motor- eller pipelineendring og ingen ny Tom-/Claude-godkjenning.
