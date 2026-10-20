@@ -1,0 +1,24 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-max';R=A/'rapporter/felles-release-20261020-max';source=A/'rapporter/max-alkove341-grunnlag-20261020';O.mkdir(exist_ok=True);R.mkdir(exist_ok=True);assert not(O/'bygg-startet.json').exists()
+run=lambda args:subprocess.check_output(args,cwd=P,text=True);code=run(['git','rev-parse','HEAD']).strip();remote=run(['git','ls-remote','origin','refs/heads/main','refs/heads/hd-mod']);mod='89a6d754206b096c92dcf2455675a20f80efca00';assert code+'\trefs/heads/main' in remote and mod+'\trefs/heads/hd-mod' in remote;assert set(run(['git','diff','--name-only','4213c1627372ae051aa773a32a26a3e0f4ac97a6','HEAD']).splitlines())<={'memory.md','todo.md','STATUS.md','log.md'}
+prior=json.loads(run(['gh','api','repos/Tombonator3000/Sam-Max-HD/releases?per_page=100']));tag='sam-max-hd-2026-10-20-max';assert not any(v['tag_name']==tag for v in prior);(O/'releaser-foer-bygg.json').write_text(json.dumps(prior,indent=2)+'\n')
+for workflow in ['linux.yml','windows.yml']:
+ rows=json.loads(run(['gh','run','list','--workflow',workflow,'--limit','5','--json','databaseId,status,headSha,event']));assert all(v['status']=='completed' for v in rows),rows
+files=json.loads((source/'publiserte-moddfiler-2418.json').read_text());assert len(files)==20661;(R/'moddfiler-2418.json').write_text(json.dumps(files,sort_keys=True,indent=2)+'\n');entries=json.loads((source/'tillegg.json').read_text())['tillegg'];assert len(entries)==19;(R/'nye-native-19.json').write_text(json.dumps(dict(tillegg=entries),ensure_ascii=False,indent=2)+'\n')
+state=dict(start_utc=datetime.now(timezone.utc).isoformat(),status='bygg sendes en gang per plattform',kode=code,hd_mod=mod,native=2418,nye_native=19,forrige_felles_native=2399,release_tag=tag,ingen_ny_motor_pipelinekode=True,sam_returrute='costume346_1801',sam_returrute_sha256=files['costumes/costume346_1801_hd.png'],plattform={})
+def save():
+ for d in [O,R]:(d/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+save()
+for platform in ['linux','windows']:
+ row=dict(dispatch_forsoek_utc=datetime.now(timezone.utc).isoformat(),status='sendt_venter_kvittering');state['plattform'][platform]=row;save();p=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,text=True,capture_output=True);row.update(dispatch_exit=p.returncode,stdout=p.stdout,stderr=p.stderr);save();assert p.returncode==0,(platform,p.stderr);m=re.search(r'/actions/runs/(\d+)',p.stdout);assert m,(platform,p.stdout);row.update(run_id=int(m[1]),run_url=m[0],status='queued');save();print(platform,row['run_id'],flush=True)
+old=P/'out/felles-release-20261020-hjertebytte'
+for name in ['hent-status.py','hent-pakker.py','klargjor-linux.py','kontroller-pakker.py']:
+ text=(old/name).read_text().replace('felles-release-20261020-hjertebytte','felles-release-20261020-max').replace('20641','20660').replace('2399','2418').replace('nye_native=66','nye_native=19');(O/name).write_text(text)
+(R/'PAAGAR.md').write_text('''# Fellespakke 2418 bygges
+
+Linux og Windows er sendt en gang hver. Se bygg-startet.json for eksakte run-id-er og frosne kode-/mod-SHA-er. Ikke send samme samlepunkt på nytt. Ikke publiser mer native før begge bygg har hentet og bekreftet 89a6d754206b096c92dcf2455675a20f80efca00. 19 nye Max341-ruter og Sam346_1801-returen med 581 nye alfapiksler skal med. Kodeendringene siden 4213 er bare dokumentasjon. Siste ferdige fellesrelease er 2399-hjertebytte, ikke bygg den på nytt.
+
+Hent faktiske pakker og SHA-filer, kontroller alle 20660 runtime moddfiler i begge og ny Linux-avspilling før ny fellesrelease publiseres. Øvrig Sam-retur og neste Sam342-kildearbeid kan undersøkes mens byggene går, uten å endre frossen native. Ingen ny Tom-/Claude-godkjenning, naturlig gjennomspilling eller interaktiv Windows-/webtest er påstått. Aktiv grafikkautomatikk fortsetter; gammel nattkontroll forblir pauset.
+''');shutil.copy2(__file__,R/'start-felles2418.py.txt');print(json.dumps(state,ensure_ascii=False),flush=True)
