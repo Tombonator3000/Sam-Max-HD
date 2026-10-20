@@ -4,7 +4,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
-- [ ] Fortsett faktisk produksjon i rapporter/alkove-fortsettelse-20261020, fig346_08 til17.22 ruter fra17 ulike kilder: ni runtime-ruter fra seks tidligere eksakte prototyper, elleve nye ulike kilder til tretten øvrige runtime-ruter.40 beskyttede kilder, originalark og to grunnlagsmotorforløp sett, alle22 observert og160 kontroller null. Ingen nye bildekall/resultater ennå. Bevar varm brun/orange palett, tredje sugekopp på nesen, reelle pilfragmenter og brun1x19-avslutningsrute uten gjetting. Neste samlebygg må ta med de43 nye rutene siden2134-pakken.
+- [ ] Neste bunke er klargjort i rapporter/alkove-siste-20261020: fig346_27 til43,44 runtime fra17 ulike hele kilder,alle med eksakte tidligere kilde-/prototype-/native-treff,68 beskyttede filer. Originalarkene er sett. Lever i to bunker:A27 til36,ti ark27 ruter;B37 til43,sju ark17 ruter. Ingen nye bildekall/resultater i disse17 jobbene ennå. Kildene har animasjon9/retning0 og andre lag. Første valgt9-prøve tegnet0 av44 mål og ble ikke feiltelt som dekning; kort retningssyklus viste riktig chore9/dir0. Siste grunnlagsprøve: 21 av44 mål observert, 825 bufferkontroller, 0 med avvik. Se grunnlagsproeve-slutt.json for nøyaktig forløp og videre metode.
+- [ ] Samle nye Linux-/Windows-pakker etter346_43: nå2216 native,82 nyere enn verifisert2134-pakke. Faktiske nedlastinger, SHA-filer og moddfiler må kontrolleres. Ingen ny byggdispatch ennå.
+
+- [x] Alkove-fortsettelse08 til17 publisert/hentet i ca6258e7:22 native. Gjenbruk18 til26 publisert/hentet i482f0e52:17 native.39 nye runtime,19 ark,2216 totalt. Alle39 sett/motorobservert,240 sluttkontroller null.34 OK,fire SJEKK,én smal manuelt sett,ingen FEIL. Alle gamle filer,76 kilder og tre stasher bevart.228 av1758 resultatark. Se begge mottak-publisert.json.
 
 - [x] Samlepunkt felles-release-20261020-natt fullført og Latest,2134 native,174 nye siden1960. Begge faktiske nedlastinger, SHA-filer og20375 moddfiler per pakke kontrollert. Alle174 observert i15 Linux-prøver,980 kontroller uten nye/økte avvik; ti kjente27-pikslers inventarkantmålinger dokumentert. Ikke bygg39340616184/39340620900 på nytt. Se felles-release-20261020-natt/publisert.json.
 
