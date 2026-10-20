@@ -1,0 +1,41 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil,math
+from scipy import ndimage as nd
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;F=A/'rapporter/sam302-foerste-20261020';H=R/'prototyper';H.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan={v['bilde']:v for v in json.loads((R/'ruteplan-unik.json').read_text())['ruter']};rows=[];raw={}
+for call in ['V06','V07','V08','V08R','V09']:
+ a=np.array(Image.open(R/'kall'/call/'raa.png').convert('RGBA'));l,n=nd.label(a[:,:,3]>=128,np.ones((3,3),int));raw[call]=(a,l)
+def piece(call,ids,w,h):
+ a,l=raw[call];sel=np.isin(l,ids);yy,xx=np.nonzero(sel);gx,gy=int(xx.min()),int(yy.min());gw,gh=int(xx.max()-gx+1),int(yy.max()-gy+1);z=a.copy();dist,near=nd.distance_transform_edt(~sel,return_indices=True);allow=(dist<=2)&((l==0)|sel);z[:,:,3][~allow]=0;z[:,:,3][sel]=255;edge=allow&~sel;z[edge,:3]=z[near[0][edge],near[1][edge],:3];z[z[:,:,3]==0,:3]=0;sx,sy=gw/(w*4),gh/(h*4)
+ if call=='V09' and ids in [[2],[3],[4]]:
+  from scipy.ndimage import map_coordinates
+  shaft={2:(312,326,29,186,216,739,752,813,148,133,137),3:(798,811,28,250,279,739,758,816,135,120,124),4:(1295,1309,25,311,340,739,758,818,119,104,108)}[ids[0]];xl,xr,c,yt,ya,yb,yp,ye,hh,cy,py=shaft
+  xx=np.interp(np.arange(w*4+16)-8,[0,c*4,(c+1)*4,w*4],[gx,xl,xr,gx+gw]);yy=np.interp(np.arange(h*4+16)-8,[0,24,cy*4,py*4,h*4],[yt,ya,yb,yp,ye]);ym,xm=np.meshgrid(yy,xx,indexing='ij');q=np.stack([map_coordinates(z[:,:,k].astype(float),[ym,xm],order=1,mode='constant',cval=0) for k in range(4)],2).clip(0,255).astype('uint8');q[:8]=0;q[-8:]=0;q[:,:8]=0;q[:,-8:]=0;im=Image.fromarray(q)
+ else:im=Image.fromarray(z).transform((w*4+16,h*4+16),Image.Transform.AFFINE,(sx,0,gx-8*sx,0,sy,gy-8*sy),Image.Resampling.BICUBIC)
+ q=np.array(im);_,near=nd.distance_transform_edt(q[:,:,3]<128,return_indices=True);weak=(q[:,:,3]>0)&(q[:,:,3]<=4);q[weak,:3]=q[near[0][weak],near[1][weak],:3];q[q[:,:,3]==0,:3]=0;return Image.fromarray(q),dict(kall=call,own_ids=ids,own_core=[gx,gy,gw,gh],scale=[sx,sy],geometrisk_skaft_tilpasning=({'egen_x':[gx,xl,xr,gx+gw],'maal_x':[0,c*4,(c+1)*4,w*4],'egen_y':[yt,ya,yb,yp,ye],'maal_y':[0,24,cy*4,py*4,h*4]} if call=='V09' and ids in [[2],[3],[4]] else None))
+def srccomp(n,label):
+ a=np.array(Image.open(P/f'work/extract/costumes/costume302_{n}.png').convert('RGBA'));l,_=nd.label(a[:,:,3]>0,np.ones((3,3),int));y,x=nd.find_objects(l)[label-1];z=a[y,x].copy();z[l[y,x]!=label]=0;return hashlib.sha256(z.tobytes()).hexdigest()
+ropehash=srccomp(1964,1);assert all(srccomp(n,1)==ropehash for n in [1960,1961,1962,1963]);(R/'kildekomponent-bevis.json').write_text(json.dumps(dict(hel_hyssing_rgba_sha256=ropehash,kildeidentiske_ruter=[1960,1961,1962,1963,1964],rope_rekt=[10,0,38,148],prikk_rekt=[0,31,1,1],merknad='Originalkomponent bare analysert/hashet; ingen originalbiter eller maske i nye malerier.'),indent=2)+'\n')
+for v in plan.values():
+ b=v['bilde'];n=int(b.split('_')[-1]);w,h=v['rekt'][2:];parts=[];out=Image.new('RGBA',(w*4+16,h*4+16))
+ if n==1949:
+  f=F/'prototyper/costume302_1948.png';assert hashlib.sha256(Image.open(P/'work/extract/costumes/costume302_1948.png').convert('RGBA').tobytes()).hexdigest()==v['canonical_rgba_sha256'];shutil.copy2(f,H/(b+'.png'));out=Image.open(H/(b+'.png')).convert('RGBA');parts=[dict(gjenbruk_egen_prototype='sam302-foerste-20261020/prototyper/costume302_1948.png',sha256=sha(f),begrunnelse='Eksakt hele canonical RGBA-kildeidentitet med1949 og1950.')]
+ else:
+  spec={1951:('V06',[1]),1952:('V06',[2]),1955:('V06',[3]),1956:('V06',[4]),1957:('V07',[4,8]),1958:('V07',[3,6]),1959:('V07',[1,7]),1965:('V09',[3]),1966:('V09',[4])}
+  if n in spec:
+   call,ids=spec[n];rect=[10,0,w-10,h] if n==1959 else [0,0,w,h];im,m=piece(call,ids,rect[2],rect[3]);out.alpha_composite(im,(rect[0]*4,rect[1]*4));m['kilde_rekt']=rect;parts.append(m)
+  if 1960<=n<=1964:
+   im,m=piece('V09',[2],38,148);out.alpha_composite(im,(40,0));m['kilde_rekt']=[10,0,38,148];m['kildekomponent_rgba_sha256']=ropehash;parts.append(m)
+   if n!=1964:
+    call,ids,rect={1960:('V07',[5],[47,71,36,72]),1961:('V08',[4],[48,73,38,73]),1962:('V08',[5],[50,73,34,70]),1963:('V08R',[3],[52,73,34,72])}[n];im,m=piece(call,ids,rect[2],rect[3]);out.alpha_composite(im,(rect[0]*4,rect[1]*4));m['kilde_rekt']=rect;parts.append(m)
+  if 1959<=n<=1964:
+   im,m=piece('V09',[5],1,1);q=np.array(im);q[q[:,:,3]>0,:3]=[115,167,223];im=Image.fromarray(q);out.alpha_composite(im,(0,124));m['kilde_rekt']=[0,31,1,1];m['palettilpasning']=[115,167,223];parts.append(m)
+ q=np.array(out);q[q[:,:,3]==0,:3]=0;out=Image.fromarray(q);f=H/(b+'.png');out.save(f);src=np.array(Image.open(P/f'work/extract/costumes/{b}.png').convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cover=_iou(q[:,:,3]>=CORE,mask,-8,-8);e=dict(bilde=b,prototype=f.relative_to(R).as_posix(),sha256=sha(f),deler=parts,snitt_union=iou,dekning=cover,native_ok=iou>=GOOD_IOU and cover>=GOOD_COVER,hard_originalmaske=False,originalfragment_fallback=False,metode='Egne malte hele komponenter og egen blå prikk til kildebekreftede rektangler;original kun geometri/kontroll');rows.append(e);print(b,round(iou,3),round(cover,3),e['native_ok'],flush=True)
+(R/'prototyper.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser.py.txt')
+for page in range(math.ceil(len(rows)/4)):
+ sub=rows[page*4:page*4+4];board=Image.new('RGB',(1800,len(sub)*650),'#293a45');d=ImageDraw.Draw(board)
+ for i,v in enumerate(sub):
+  src=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);im=Image.open(R/v['prototype']).convert('RGBA')
+  for col,(z,t) in enumerate([(src,'Original'),(im,'Eget maleri')]):z.thumbnail((875,620));board.paste(z,(col*900,i*650+30),z);d.text((col*900+8,i*650+8),v['bilde']+' '+t,fill='white')
+ board.save(R/f'sammenligning-maleri-side{page+1}.png')

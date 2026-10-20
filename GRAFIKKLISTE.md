@@ -638,21 +638,21 @@ Figurark for Sam og Max, Sam.
 - [x] `fig164_08` (figurark 8 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [x] `fig164_09` (figurark 9 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [x] `fig164_10` (figurark 10 for Sam og Max (kostyme 164), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_01` (figurark 1 for Sam (kostyme 302), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_01` (figurark 1 for Sam (kostyme 302), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 38
 
 Figurark for Sam.
 
-- [ ] `fig302_02` (figurark 2 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_03` (figurark 3 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_04` (figurark 4 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_05` (figurark 5 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_06` (figurark 6 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_07` (figurark 7 for Sam (kostyme 302), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_08` (figurark 8 for Sam (kostyme 302), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_09` (figurark 9 for Sam (kostyme 302), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig302_10` (figurark 10 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_02` (figurark 2 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_03` (figurark 3 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_04` (figurark 4 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_05` (figurark 5 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_06` (figurark 6 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_07` (figurark 7 for Sam (kostyme 302), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_08` (figurark 8 for Sam (kostyme 302), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_09` (figurark 9 for Sam (kostyme 302), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig302_10` (figurark 10 for Sam (kostyme 302), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig047_01` (figurark 1 for Sam (kostyme 47), 5 ruter: start mot høyre (2 ruter); start (lag 14, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 39

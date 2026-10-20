@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,re,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;T=P/'out/sam302-foerste-20261020/kilde302-anim6';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();wanted={v['bilde'] for q in range(6,11) for v in json.loads((A/'jobber'/f'fig302_{q:02}'/'jobb.json').read_text())['ruter']};draws={}
+log=(T/'scummvm.log').read_text()
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*302 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,cel,x,y,w,h=map(int,m.groups());name=f'costume302_{cel}';shot=(f//4+1)*4;p=T/f'frame_{shot:06}_room059.png'
+ if name in wanted and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p))
+assert len(draws)==21
+for page in range(3):
+ board=Image.new('RGB',(1920,1275),'#243340');dd=ImageDraw.Draw(board)
+ for i,(name,v) in enumerate(list(draws.items())[page*9:page*9+9]):
+  im=Image.open(v['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));dd.text((x+5,y+5),name+' kilde i faktisk rom59',fill='white')
+ board.save(R/f'kildeposer-motor-side{page+1}.png')
+rec=json.loads((T/'kvittering.json').read_text());assert rec['exit']==0 and len(rec['kontroller'])==80 and [v for v in rec['kontroller'] if v['avvik']]==[dict(frame=36,avvik=4)]
+(R/'motor-kildeobservasjoner.json').write_text(json.dumps(dict(ruter=21,logget=21,ny_grafikk=False,scene=str(T),tegninger=draws,binar_sha256=rec['binar_sha256'],kontroller=80,nullkontroller=79,fire_piksler_foer_figurstart=True,helprove_bestatt=False,avsluttet_normalt=True),indent=2)+'\n')
+meta=json.loads((R/'kildegrunnlag.json').read_text());meta.update(originalark_sett=5,motor_observert=21,hele_animasjonen_logget=50,helprove_bestatt=False,tidlig4_frame36=True,kontroller_fra_figurstart60=66,kontroller_fra_figurstart60_null=66,exit=0,motivkontroll_gjenstaar=True);(R/'kildegrunnlag.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
+with zipfile.ZipFile(R/'kildemotorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for p in (P/'out/sam302-foerste-20261020').glob('kilde302-*/scummvm.log'):z.write(p,p.relative_to(P/'out/sam302-foerste-20261020').as_posix())
+shutil.copy2(__file__,R/'vis-kilder.py.txt');print('21 source poses ready,80checks/79zero and four pixels before first pose;normal exit',flush=True)
