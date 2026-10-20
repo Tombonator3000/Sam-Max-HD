@@ -1,4 +1,6 @@
 # Grafikkliste
+Oppdatert 2026-10-20 16:18: Ni nye hele ark av Sam/Max-fall164 er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert:32 mål fra26 ulike canonical kilder.352 av1758 resultatark,1406 gjenstår pluss returer/katalogfeil/sluttkontroll. Fire ark OK,fem SJEKK,14 bevarte omrissvarsler,0 FEIL;32 automatisk native OK. Alle32 original/native/motor,ni hele motorbilder og tre før/etter sett.160 kontroller,158 null,samme to kjente160-avvik før figurstart;132 frafigurstart null,ingen nye/økte avvik. Kandidat2559,20802filer/20796PNG;736beskyttede kilder/tre stash uendret. Fig164_04 og1943/1944 mangler etter bildeverktøyets sikkerhetsavvisning,ingen omprøve eller omgåelse. Rapport sam-max-fall164-foerste-20261020 og sam-max-fall164-slutt-20261020. Ingen ny Tom-/Claude-godkjenning eller kodeendring. Publisering/hent og pakker følger; felles2527 mangler32 til kontrollert nytt samlepunkt. Neste ordinære302_01 til05 må kildeklargjøres.
+
 
 Oppdatert 2026-10-20 15:15: Hele041 er levert og med i kontrollert felles Linux-/Windows-utgave2527: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-kontorintro. Ti hele ark49 nye native fra41 ulike hele kilder,åtte ark egenkontroll OK,to SJEKK,tre omrissvarsler visuelt vurdert og beholdt. Alle49 native OK,visuelt sett og motorobservert. Grafikkilder c32a5e05 og50539f6a,hd-mod 887aa441386ee48a52c430bc8232f3c235dd5a16. Alle20770 moddfiler og20764 PNG-er SHA-bekreftet. Tidligere grafikk/stier,19 tidligere releaser/assets,716 beskyttede kilder og tre stasher bevart.343 av1758 resultatark,1415 gjenstår pluss returer/katalogfeil/sluttkontroll.
 
@@ -76,7 +78,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 343 ark med resultat; 2527 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 352 ark med resultat; 2527 publisert, 2559 i kontrollert kandidat | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
@@ -616,21 +618,21 @@ Figurark for Sam og Max.
 - [x] `fig041_08` (figurark 8 for Sam og Max (kostyme 41), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig041_09` (figurark 9 for Sam og Max (kostyme 41), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig041_10` (figurark 10 for Sam og Max (kostyme 41), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig164_01` (figurark 1 for Sam og Max (kostyme 164), 18 ruter: start mot høyre (18 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig164_01` (figurark 1 for Sam og Max (kostyme 164), 18 ruter: start mot høyre (18 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 37
 
 Figurark for Sam og Max, Sam.
 
-- [ ] `fig164_02` (figurark 2 for Sam og Max (kostyme 164), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig164_03` (figurark 3 for Sam og Max (kostyme 164), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig164_02` (figurark 2 for Sam og Max (kostyme 164), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig164_03` (figurark 3 for Sam og Max (kostyme 164), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig164_04` (figurark 4 for Sam og Max (kostyme 164), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig164_05` (figurark 5 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig164_06` (figurark 6 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig164_07` (figurark 7 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig164_08` (figurark 8 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig164_09` (figurark 9 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig164_10` (figurark 10 for Sam og Max (kostyme 164), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig164_05` (figurark 5 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig164_06` (figurark 6 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig164_07` (figurark 7 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig164_08` (figurark 8 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig164_09` (figurark 9 for Sam og Max (kostyme 164), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig164_10` (figurark 10 for Sam og Max (kostyme 164), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig302_01` (figurark 1 for Sam (kostyme 302), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 38

@@ -1,0 +1,40 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil
+from scipy import ndimage as nd
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;H=R/'prototyper';H.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();raw={};labels={}
+for call in ['U06R','U07','U08','U09','U10']:
+ raw[call]=np.array(Image.open(R/f'kall/{call}/raa.png').convert('RGBA'));labels[call]=nd.label(raw[call][:,:,3]>=128)[0]
+def part(call,ids,box,meaning,clip_top=None):return dict(call=call,ids=ids,box=box,meaning=meaning,clip_top=clip_top)
+spec={
+1946:[part('U06R',[1],[0,0,187,177],'Paired falling figures,correct gray soles')],
+1947:[part('U07',[1],[0,0,208,182],'Max and source-visible Sam behind')],
+1948:[part('U08',[1],[0,0,205,195],'Close cropped Max face and Sam arm')],
+1949:[part('U09',[1],[0,0,56,67],'Independent small Max ear'),part('U09',[2],[0,9,202,182],'Large Max ear over cropped Sam')],
+1950:[part('U10',[1],[0,0,193,101],'Cropped Sam with cream foreground piece')],
+1951:[part('U10',[2],[0,0,168,76],'Cropped Sam exit1')],
+1952:[part('U10',[3],[0,0,76,56],'Cropped Sam exit2')],
+1953:[part('U10',[4],[0,0,30,6],'Tiny source-confirmed hat edge')],
+}
+def piece(v,size):
+ a=raw[v['call']].copy();l=labels[v['call']];sel=np.isin(l,v['ids'])
+ if v['clip_top'] is not None:sel[:v['clip_top']]=False
+ yy,xx=np.nonzero(sel);gx,gy=int(xx.min()),int(yy.min());gw,gh=int(xx.max()-gx+1),int(yy.max()-gy+1);dist,near=nd.distance_transform_edt(~sel,return_indices=True);allow=(dist<=2)&((l==0)|sel)
+ if v['clip_top'] is not None:allow[:v['clip_top']]=False
+ a[:,:,3][~allow]=0;a[:,:,3][sel]=255;edge=allow&~sel;a[edge,:3]=a[near[0][edge],near[1][edge],:3];a[a[:,:,3]==0,:3]=0;x0,y0,x1,y1=v['box'];sx=gw/((x1-x0)*4);sy=gh/((y1-y0)*4)
+ im=Image.fromarray(a).transform(size,Image.Transform.AFFINE,(sx,0,gx-(x0*4+8)*sx,0,sy,gy-(y0*4+8)*sy),Image.Resampling.BICUBIC);return im,dict(**v,own_core=[gx,gy,gw,gh],sx=sx,sy=sy)
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];records=[]
+for v in plan:
+ n=int(v['bilde'].split('_')[-1])
+ if n not in spec:continue
+ w,h=v['rekt'][2:];im=Image.new('RGBA',(w*4+16,h*4+16));trace=[]
+ for p in spec[n]:z,tr=piece(p,im.size);im.alpha_composite(z);trace.append(tr)
+ a=np.array(im);_,near=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);weak=(a[:,:,3]>0)&(a[:,:,3]<=4);a[weak,:3]=a[near[0][weak],near[1][weak],:3];a[a[:,:,3]==0,:3]=0;im=Image.fromarray(a);f=H/(v['bilde']+'.png');im.save(f);a=np.array(im);src=np.array(Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA'));m=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cover=_iou(a[:,:,3]>=CORE,m,-8,-8);records.append(dict(bilde=v['bilde'],prototype=str(f.relative_to(R)),sha256=sha(f),semantiske_deler=trace,snitt_union=iou,dekning=cover,native_ok=iou>=GOOD_IOU and cover>=GOOD_COVER,hard_originalmaske=False,originalfragment_fallback=False));print(v['bilde'],round(iou,3),round(cover,3),records[-1]['native_ok'])
+(R/'prototyper.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser.py.txt')
+for start in range(0,len(records),4):
+ sub=records[start:start+4];b=Image.new('RGB',(1800,420*len(sub)),'#293a45');d=ImageDraw.Draw(b)
+ for row,v in enumerate(sub):
+  src=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);own=Image.open(R/v['prototype']).convert('RGBA')
+  for col,(z,t) in enumerate([(src,'Original'),(own,'Own painting')]):z.thumbnail((880,380));b.paste(z,(col*900,row*420+30),z);d.text((col*900+5,row*420+6),v['bilde']+' '+t,fill='white')
+ b.save(R/f'sammenligning-maleri-side{start//4+1}.png')

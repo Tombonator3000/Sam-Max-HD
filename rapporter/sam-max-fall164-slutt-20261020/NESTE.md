@@ -1,0 +1,1 @@
+Ni ark/32 native produsert og motorsett.1943/1944 og fig164_04 mangler etter verktøyavvisning,ikke omprøv. Publiser/hent additivt,kontrolleralle20802filer,bygg begge pakker fra samme2559-SHA og kontroller faktiske nedlastinger før fellesrelease. Pakker2527mangler32 til da. Neste ordinære jobb302_01 til05,kildeklargjør først. Bevar736kilder/trestash. Ingen ny stilgodkjenning.

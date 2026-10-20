@@ -1,0 +1,30 @@
+Task: faithful HD remaster of a sheet of animation frames from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. Every frame replaces one original frame in the game, at the same size and position, and the frames are played one after another.
+
+Input: the attached image is the original low-resolution sheet enlarged exactly 4x with hard pixel edges. The frames stand apart on a plain flat magenta background (#FF00FF). Around the sheet is a plain gray (#808080) border. The background and the border are only padding.
+
+What the sheet shows: Sam and Max together: Sam, the dog detective (a big brown dog in a light blue-gray suit, white shirt, striped dark blue tie and a blue-gray fedora) and Max, the white rabbit-like creature (long ears, wide toothy grin, no clothes). The description is only a help; the input image decides. On this sheet, row by row from left to right: start pose, facing right (4 frames). The game mirrors the frames facing right when the character faces left, so there are no frames facing left; do not add any.
+
+Size rule (most important): draw every frame at exactly the size it has in the input, with the same height, the same width and the same proportions of head, body, arms, legs and props. One input pixel is 4 output pixels for every frame on this sheet and on every other sheet of this character, so the character never grows, shrinks or changes shape between frames. On this sheet the frames are from 24 to 404 pixels tall and from 120 to 772 pixels wide in the input (the box around each frame's visible pixels); jobb.json lists every frame's box under ruter (synlig, in original pixels: multiply by 4).
+
+Do:
+- Trace every frame at 4x in high resolution, so it looks like the characters of Day of the Tentacle Remastered next to their originals: keep the pose, silhouette and proportions, and turn every cluster of pixels into the shape it shows (glasses, a tie, a shoe). Clean dark anti-aliased outlines with a little variation in weight, flat colors with one shade and a few highlights, the same color for every area as in the input. No dithering, no texture, no gradients, no pixel steps.
+- Keep the original design: the same character, the same colors, light direction, shadows and contrast as in the input.
+- Make all frames look identical apart from the pose: the same face, eyes, hat, clothes, colors and light in every frame. Any difference between frames flickers in the game.
+- Keep the pose and silhouette of every frame, and keep each frame in its place on the sheet, in the same rows and the same order.
+- Glowing effects (light, lightning, sparks, fire) are painted as soft glow that fades into transparency.
+
+Do not:
+- Do not add, remove, merge, split or redesign frames.
+- Do not add anything that is not in the input: no new props, accessories, patterns, logos, text, shadows, floor, numbers, labels, frames or grid lines.
+- Do not change colors, clothes or proportions, and do not make heads, hands or eyes bigger than in the input.
+- Some frames show only part of the character (a body without a head, a head alone, an arm), because the game draws the parts separately. Paint them as they are and do not complete them.
+- Do not let frames touch or overlap each other.
+- No photorealism, no modern 3D look, no film grain, no vignette, no watermark, no signature.
+
+Output: one PNG image, exactly 1536 x 1024 pixels, with a fully transparent background (real alpha: no background color and no gray border) and every frame in the same place as in the input. Before delivering, run python3 verktoy/sjekk_leveranse.py jobber/fig164_10/resultat.png and redo the frames it reports as too big, too small, moved or missing. List the delivery with its sha256 in the fremdrift.json of your report and add a rutekart (the box around each frame's drawing, alpha above 128).
+
+If a second image is attached, it is the approved master sheet (hovedark) of this character, or an already approved HD sheet of the same character, or an approved HD picture from the same game. Paint the character exactly as in that image: the same face, hair, clothes, colors and level of detail. Take every pose, size and position from the first image. If a third image is attached, it is the master sheet of the second character on the sheet.
+
+Production clarification from canonical source and primary global84: these are the last source cels of the single paired falling animation, Sam and Max tumbling toward and past the camera outside the restaurant of the giant ball of twine, actual room33. Keep Sam blue-gray suit/fedora,white shirt/cuff,blue/black tie if visible,brown fur; Max cream with pink inner ears,black eyes and source-specific mouth/teeth. Every visible shape comes from image1. Some portions meet a straight edge because of the original scene framing; keep exactly those straight cuts and do not extend the drawings beyond them. Do not add a character or full figure if image1 has only a cropped portion. Use images2/3 for character identity only,never for the pose or proportions. Preserve the exact tongue if visible in image1,teeth,fingers,tilt,foreshortening and overlap. Paint clean smooth dark outlines and flat colors with one restrained shadow,not pixels or halos. Output one1536x1024 RGBA PNG,true alpha,all source cels in original order and positions,no background,labels or extra objects.
+
+Final exit-cels: exactly FOUR separate cropped sprite fragments,in image1 order. First is Sam with arm and muzzle,with a cream foreground Max fragment at the lower-left. Second has much less Sam below the same straight horizontal scene boundary. Third is the smaller cropped head/hat/muzzle sliver. Fourth is ONLY a tiny blue-gray HAT EDGE strip,not a complete Sam or a new face. Preserve that tiny strip as a small independent mark with real alpha. Do not complete the four figures or equalize their sizes; the different source-sized fragments are intentional as the figures leave the scene.

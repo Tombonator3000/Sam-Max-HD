@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam-max-fall164-slutt-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();C=O/'mod-fall164';assert C.exists() and not(O/'mod-fall164-foer-alfarand').exists();C.rename(O/'mod-fall164-foer-alfarand');changes=[]
+for report in [R,S]:
+ prot=json.loads((report/'prototyper.json').read_text());old=report/'foer-alfarand';old.mkdir(exist_ok=True);shutil.copy2(report/'prototyper.json',old/'prototyper.json')
+ for v in prot:
+  p=report/v['prototype'];a=np.array(Image.open(p).convert('RGBA'));bad=(a[:,:,0]>220)&(a[:,:,1]<100)&(a[:,:,2]>220)&(a[:,:,3]>0);_,near=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);weak=(a[:,:,3]>0)&(a[:,:,3]<=4);b=a.copy();b[weak,:3]=a[near[0][weak],near[1][weak],:3];b[b[:,:,3]==0,:3]=0;assert np.array_equal(a[:,:,3],b[:,:,3]);assert not((b[:,:,0]>220)&(b[:,:,1]<100)&(b[:,:,2]>220)&(b[:,:,3]>0)).any()
+  if not np.array_equal(a,b):
+   shutil.copy2(p,old/p.name);before=sha(p);Image.fromarray(b).save(p);v['sha256']=sha(p);changes.append(dict(bilde=v['bilde'],for_sha256=before,etter_sha256=sha(p),magenta_svake_rgb=int(bad.sum()),svake_rgb_rettet=int(np.any(a[:,:,:3]!=b[:,:,:3],2).sum()),alfa_uendret=True,metode='nearest own opaque core RGB only for alpha1..4'))
+ (report/'prototyper.json').write_text(json.dumps(prot,ensure_ascii=False,indent=2)+'\n')
+ progress=json.loads((report/'fremdrift.json').read_text())
+ for e in progress['leveranser']:
+  J=A/'jobber'/e['jobb'];mapping=json.loads((A/e['rutekart']).read_text());m=mapping[e['jobb']];canvas=Image.new('RGBA',(1536,1024));j=json.loads((J/'jobb.json').read_text());pmap={v['bilde']:v for v in prot}
+  for c,route in zip(j['ruter'],m['ruter']):
+   v=pmap[route['representant']];p=report/v['prototype'];im=Image.open(p).convert('RGBA');x,y,w,h=c['rekt'];dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;canvas.alpha_composite(im,(dx,dy));route['prototype_sha256']=sha(p)
+  backup=old/e['jobb'];backup.mkdir(exist_ok=True)
+  for name in ['resultat.png','notat.md']:shutil.copy2(J/name,backup/name)
+  oldhash=e['sha256'];canvas.save(J/'resultat.png');newhash=sha(J/'resultat.png');m['sha256_resultat']=newhash;e['sha256']=newhash;(A/e['rutekart']).write_text(json.dumps(mapping,indent=2)+'\n');note=(J/'notat.md').read_text().replace(oldhash,newhash);(J/'notat.md').write_text(note+'\nSvakeste alfa1..4 fikk nærmeste egen kjernefarge etter plassering for å fjerne interpolert feil-RGB. Alfa,geometri og motiv er uendret. Førbildet er bevart i rapportens foer-alfarand/.\n');run=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{e["jobb"]}/resultat.png'],cwd=A,capture_output=True,text=True);assert run.returncode in [0,1] and 'FEIL' not in run.stdout;(report/(e['jobb']+'-egenkontroll.txt')).write_text(run.stdout+run.stderr);assert e['egenkontroll']==('OK' if run.returncode==0 else 'SJEKK')
+ (report/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+(R/'alfarand-kontroll.json').write_text(json.dumps(dict(egen_alfa_og_geometri_uendret=True,ingen_originalmaske=True,tidligere_kandidat_bevart='mod-fall164-foer-alfarand',endringer=changes),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'alfarand.py.txt');print(json.dumps(changes,ensure_ascii=False),flush=True)
