@@ -1,0 +1,48 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam344-fortsettelse-20261020';O=P/'out/sam344-fortsettelse-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();q=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];protos={};evidence=[]
+# Boksene er maleriets egne logiske klesrektangler, ikke masker fra originalens omriss.
+boxes={'B01':[(94,182,493,460),(539,182,946,460),(988,182,1422,460),(95,700,505,962),(541,700,942,962)],'C01':[(46,460,487,756),(534,460,977,756),(1019,460,1491,756)],'D01':[(60,186,514,495),(541,186,986,495),(1015,186,1462,495),(60,538,514,854),(542,538,988,854)]}
+for key,rects in boxes.items():
+ raw=R/f'raa-{key}.png';a=np.array(Image.open(raw).convert('RGBA'));mx=int(a[:,:,3].max());assert mx in(254,255);a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/mx).clip(0,255).astype('uint8');a[a[:,:,3]<=3]=0
+ rows=[v for v in q if v['kildejobb']=={'B01':'fig344_15','C01':'fig344_16','D01':'fig344_17'}[key]]
+ assert len(rows)==len(rects)
+ for v,box in zip(rows,rects):
+  x,y,x1,y1=box;w,h=v['rekt'][2:];basey=(h-69)*4;canvas=Image.new('RGBA',(w*4,h*4))
+  # Bare innvendige logiske rektangelkanter renses. Ingen figurkant eller prop maske brukes.
+  lo=a[y+2:y1-2,x+2:x1-2].copy();patch=Image.fromarray(lo).resize((w*4,276),Image.Resampling.LANCZOS);canvas.alpha_composite(patch,(0,basey))
+  upperbox=None
+  if basey:
+   # Finn toppen i denne genererte ruten. Regiongrensene skiller selvstendige tegninger.
+   starty=0 if y<500 else 500;upper=a[starty:y+2,x:x1].copy();labs,_=ndimage.label(upper[:,:,3]>=128);counts=np.bincount(labs.ravel());counts[0]=0
+   valid=np.flatnonzero(counts>40);own=np.isin(labs,valid);ys,xs=np.nonzero(own);assert len(ys)
+   top=int(ys.min());support=ndimage.binary_dilation(own,iterations=2);upper[~support]=0;upper=upper[top:];upperbox=[x,starty+top,x1,y+2]
+   up=Image.fromarray(upper).resize((w*4,basey),Image.Resampling.LANCZOS);canvas.alpha_composite(up,(0,0))
+  b=np.array(canvas);b[b[:,:,3]<=3]=0;canvas=Image.fromarray(b);protos[v['bilde']]=canvas;canvas.save(R/(v['bilde']+'-prototype.png'))
+  src=np.array(Image.open(P/'work/extract/costumes'/f'{v["bilde"]}.png').convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,axis=0),4,axis=1);iou,cover=_iou(b[:,:,3]>=CORE,mask,0,0)
+  row=dict(bilde=v['bilde'],raa=raw.name,raa_sha256=sha(raw),eget_klesrektangel=box,egen_oevre_del=upperbox,oevre_destinasjon=[0,0,w*4,basey],nedre_destinasjon=[0,basey,w*4,276],snitt_union=float(iou),dekning=float(cover),alfa_maks_raa=mx,original_pikselmaske=False);evidence.append(row);print(v['bilde'],round(iou,3),round(cover,3),flush=True)
+for n in [1830,1931]:protos[f'costume344_{n}']=Image.open(R/f'costume344_{n}-prototype.png').convert('RGBA')
+# A01 er malt sammenhengende, og bare delt i spillets interne rektangler.
+evidence=[dict(bilde=f'costume344_{n}',raa='raa-A01.png',logiske_rektangler=json.loads((R/'plassering-A01.json').read_text()),original_pikselmaske=False) for n in [1830,1931]]+evidence
+for v in q:
+ im=protos[v['bilde']];b=np.array(im);src=np.array(Image.open(P/'work/extract/costumes'/f'{v["bilde"]}.png').convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,axis=0),4,axis=1);iou,cover=_iou(b[:,:,3]>=CORE,mask,0,0);row=next(e for e in evidence if e['bilde']==v['bilde']);row.update(snitt_union=float(iou),dekning=float(cover),prototype_sha256=sha(R/(v['bilde']+'-prototype.png')));assert iou>=GOOD_IOU and cover>=GOOD_COVER,(v['bilde'],iou,cover)
+ bg=Image.new('RGBA',im.size,'#d0e0e0');bg.alpha_composite(im);bg.convert('RGB').save(R/(v['bilde']+'-kontroll.png'))
+(R/'plassering.json').write_text(json.dumps(dict(ruter=evidence,original_pikselmaske_brukt=False,merknad='A01 deles i egne logiske rektangler. B/C/D beholder egen generert alfa og deles kun langs de rektangulære kleslagene, slik at høyde på frukt og klesrektangel er riktig. Ingen hard original silhuettmaske.'),ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-20',verktoy='innebygd image_gen og tillatt Python-rensing/plassering',faktiske_bildekall=[v['kall'] for v in json.loads((R/'bildekall.json').read_text())['kall'] if v['utfoert']],leveranser=[])
+for n in range(13,18):
+ job=f'fig344_{n:02}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());canvas=Image.new('RGBA',(1536,1024));rt=[]
+ for c in j['ruter']:
+  rep=next(v for v in q if any(m['bilde']==c['bilde'] for m in v['malruter']));im=protos[rep['bilde']];x,y,w,h=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128)
+  original=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(original.tobytes()).hexdigest()==rep['rgba_sha256'];assert np.array_equal(np.array(Image.open(P/'work/extract/costumes'/f'{c["bilde"]}.png').convert('RGBA')),np.array(Image.open(P/'work/extract/costumes'/f'{rep["bilde"]}.png').convert('RGBA')))
+  rt.append(dict(bilde=c['bilde'],kostyme=344,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=f"rapporter/{R.name}/{rep['bilde']}-prototype.png",prototype_sha256=sha(R/(rep['bilde']+'-prototype.png'))))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=rt)},indent=2)+'\n');p=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(p.stdout+p.stderr);print(job,p.returncode,p.stdout,flush=True);assert p.returncode in(0,1)
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(rt),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',egenkontroll={0:'OK',1:'SJEKK'}[p.returncode],native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False))
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+# Søm/kropp kontroll før teknisk mottak.
+body=protos['costume344_1830'];board=Image.new('RGB',(1992,2360),'#d0e0e0');draw=ImageDraw.Draw(board)
+for i,v in enumerate(q[1:]):
+ full=body.copy();part=protos[v['bilde']];full.alpha_composite(part,(0,708-part.height));bg=Image.new('RGBA',full.size,'#d0e0e0');bg.alpha_composite(full);x=i%4*498;y=i//4*590;board.paste(bg.convert('RGB').resize((498,531),Image.Resampling.LANCZOS),(x,y+30));draw.text((x+5,y+7),v['bilde'],fill='#101010')
+board.save(R/'samlede-poser-foer-mottak.png');shutil.copy2(__file__,R/'plasser.py.txt')

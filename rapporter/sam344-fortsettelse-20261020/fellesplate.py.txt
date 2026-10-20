@@ -1,0 +1,46 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam344-fortsettelse-20261020';O=P/'out/sam344-fortsettelse-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();q=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];evidence=[];protos={}
+a=np.array(Image.open(R/'raa-E01.png').convert('RGBA'));mx=int(a[:,:,3].max());assert mx in(254,255);a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/mx).clip(0,255).astype('uint8');a[a[:,:,3]<=4]=0
+labs,_=ndimage.label(a[:,:,3]>=128);counts=np.bincount(labs.ravel());counts[0]=0;l=int(counts.argmax());yy,xx=np.nonzero(labs==l);box=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];x,y,x1,y1=box;own=ndimage.binary_dilation(labs==l,iterations=2);piece=a[y:y1,x:x1].copy();piece[~own[y:y1,x:x1]]=0;plate=Image.fromarray(piece).resize((664,708),Image.Resampling.LANCZOS);b=np.array(plate);b[b[:,:,3]<=4]=0;plate=Image.fromarray(b);plate.save(R/'sam344-felles-klesplate.png');body=b.copy();body[432:,:384]=0;protos['costume344_1830']=Image.fromarray(body)
+for v in q[1:]:
+ name=v['bilde'];path=R/(name+'-prototype.png');backup=R/(name+'-med-soem-prototype.png')
+ if not backup.exists():shutil.copy2(path,backup)
+ src=np.array(Image.open(backup).convert('RGBA'));rgb=src[:,:,:3].astype(float);red,green,blue=rgb.transpose(2,0,1);alpha=src[:,:,3].astype(float)/255
+ # Utskilling bygger bare på de nye malerienes egne hud-/frukt-/blekkfarger, ikke originalmaske.
+ hand=(red>160)&(green>65)&(green<190)&(blue<140)&(red>green*1.25)&(alpha>.1)
+ fruit=((blue>green*1.15)&(blue>45)&(red>green*1.2))|((green>red*1.2)&(green>blue*1.15)&(green>50));fruit&=alpha>.1
+ white=(red>210)&(green>165)&(blue>90)&(red>blue*1.05)&(alpha>.1);wl,_=ndimage.label(white);cuff=np.zeros(hand.shape,bool);cuffs=[]
+ for label,s in enumerate(ndimage.find_objects(wl),1):
+  if s is None:continue
+  m=wl==label;n=int(m.sum());ys,xs=np.nonzero(m)
+  if n<100 or float(xs.mean())>=290 or int(ys.max()-ys.min()+1)>150:continue
+  if np.any(m&ndimage.binary_dilation(hand,iterations=7)):
+   cuff|=m;cuffs.append(dict(boks=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)],piksler=n))
+ seeds=hand|fruit|cuff;dist=ndimage.distance_transform_edt(~seeds);ink=(red<85)&(green<65)&(blue<85);mat=np.where(seeds,1,np.where(ink,np.clip(5-dist,0,1),0));mat*=alpha
+ # Antialfa langs bare egne separerte streker, uten farget klærand.
+ ml,_=ndimage.label(mat>=.5);mc=np.bincount(ml.ravel());mc[0]=0;keep=np.isin(ml,np.flatnonzero(mc>=100));mat[~ndimage.binary_dilation(keep,iterations=1)]=0;mat=ndimage.gaussian_filter(mat,sigma=.35);over=src.copy();over[:,:,3]=np.rint(np.clip(mat,0,1)*255).astype('uint8');over[over[:,:,3]<=4]=0;overlay=Image.fromarray(over);overlay.save(R/(name+'-hand-frukt.png'))
+ h=src.shape[0];basey=h-276;out=Image.new('RGBA',(384,h));out.alpha_composite(plate.crop((0,432,384,708)),(0,basey));out.alpha_composite(overlay);protos[name]=out
+ evidence.append(dict(bilde=name,opprinnelig_maleri=backup.name,opprinnelig_sha256=sha(backup),overlay=name+'-hand-frukt.png',overlay_sha256=sha(R/(name+'-hand-frukt.png')),hud_piksler=int(hand.sum()),frukt_piksler=int(fruit.sum()),mansjetter=cuffs,felles_klesplate='sam344-felles-klesplate.png',nedre_klipp=[0,432,384,276],nedre_dest=[0,basey],original_pikselmaske=False))
+for v in q:
+ name=v['bilde'];im=protos[name];b=np.array(im);original=np.array(Image.open(P/f'work/extract/costumes/{name}.png').convert('RGBA'));mask=np.repeat(np.repeat(original[:,:,3]>0,4,axis=0),4,axis=1);iou,cover=_iou(b[:,:,3]>=CORE,mask,0,0);assert iou>=GOOD_IOU and cover>=GOOD_COVER,(name,iou,cover);im.save(R/(name+'-prototype.png'));bg=Image.new('RGBA',im.size,'#d0e0e0');bg.alpha_composite(im);bg.convert('RGB').save(R/(name+'-kontroll.png'));e=next((v for v in evidence if v['bilde']==name),None)
+ if e is None:e=dict(bilde=name,raa='raa-E01.png',generert_boks=box,alfa_maks_raa=mx,logisk_utsparing=[0,432,384,276],original_pikselmaske=False);evidence.insert(0,e)
+ e.update(prototype_sha256=sha(R/(name+'-prototype.png')),snitt_union=float(iou),dekning=float(cover));print(name,round(iou,3),round(cover,3),flush=True)
+(R/'plassering.json').write_text(json.dumps(dict(ruter=evidence,plate_sha256=sha(R/'sam344-felles-klesplate.png'),terskler_endret=False,original_pikselmaske_brukt=False,begrunnelse='Første sammensetting hadde synlig klessøm. E01 maler en sammenhengende klesplate. Bare egne genererte hud/frukt/mansjett/blekkfarger skiller bevegelige deler fra B/C/D og A. Klesplaten deles langs spill-lagenes logiske rektangler. Ingen originalsilhuett brukes til klipping.'),ensure_ascii=False,indent=2)+'\n')
+# Bygg hele leveranser og deres SHA-festede rutekart på nytt etter sømrettingen.
+progress=dict(dato='2026-10-20',verktoy='innebygd image_gen og tillatt Python-rensing/plassering',faktiske_bildekall=[v['kall'] for v in json.loads((R/'bildekall.json').read_text())['kall'] if v['utfoert']],leveranser=[])
+for n in range(13,18):
+ job=f'fig344_{n:02}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());canvas=Image.new('RGBA',(1536,1024));rt=[]
+ for c in j['ruter']:
+  rep=next(v for v in q if any(m['bilde']==c['bilde'] for m in v['malruter']));im=protos[rep['bilde']];x,y,w,h=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128);original=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(original.tobytes()).hexdigest()==rep['rgba_sha256'];assert np.array_equal(np.array(Image.open(P/f'work/extract/costumes/{c["bilde"]}.png').convert('RGBA')),np.array(Image.open(P/f'work/extract/costumes/{rep["bilde"]}.png').convert('RGBA')))
+  rt.append(dict(bilde=c['bilde'],kostyme=344,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=f'rapporter/{R.name}/{rep["bilde"]}-prototype.png',prototype_sha256=sha(R/(rep['bilde']+'-prototype.png'))))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=rt)},indent=2)+'\n');proc=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(proc.stdout+proc.stderr);print(job,proc.returncode,proc.stdout,flush=True);assert proc.returncode==0
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(rt),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',egenkontroll='OK',native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False))
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+board=Image.new('RGB',(1992,2360),'#d0e0e0');draw=ImageDraw.Draw(board)
+for i,v in enumerate(q[1:]):
+ full=protos['costume344_1830'].copy();part=protos[v['bilde']];full.alpha_composite(part,(0,708-part.height));bg=Image.new('RGBA',full.size,'#d0e0e0');bg.alpha_composite(full);x=i%4*498;y=i//4*590;board.paste(bg.convert('RGB').resize((498,531),Image.Resampling.LANCZOS),(x,y+30));draw.text((x+5,y+7),v['bilde'],fill='#101010')
+board.save(R/'samlede-poser-foer-mottak.png');shutil.copy2(__file__,R/'fellesplate.py.txt')

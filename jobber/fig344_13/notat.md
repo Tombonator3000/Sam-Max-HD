@@ -1,0 +1,9 @@
+# fig344_13
+
+2026-10-20 06:29, Codex. Sam holder, kaster og fanger en ekte lilla aubergine med grønn stilk i rom 92. Kilde: originalark, kildeskript lokalt 201 og faktisk chore 7 ved aktør 6, posisjon 159,101, clip 0 og scale 255. Sam-master og kontrollert varm 344/345-stil er sett. Brun drakt/hatt, oransje hud, kremfarget skjorte og gråsvart slips fra scenen. Alle fingre, fruktens rotasjon og løs frukt over hånden er bevart.
+
+Innebygd image_gen, fem faktiske kall med alle råbilder og faktiske prompter i rapporter/sam344-fortsettelse-20261020. A01 malte kroppen og første hold sammen, B/C/D malte hånd-/fruktposene. Første sammensetting viste en rektangulær klessøm selv om størrelseskontrollen var OK. E01 malte en sammenhengende klesplate. Hånd, frukt, blader, mansjett og strek er skilt med de nye malerienes egne farger og alfa og lagt over samme plate. Ingen original silhuettmaske eller original fallback. Bare spill-lagenes interne rektangler er delt, i fast 4x. Små løse rensefragmenter er fjernet fra egne masker uten å fjerne kildebekreftede deler. Sømmen er kontrollert samlet i motoren.
+
+Dette arket har 1 ruter. Egenkontroll og native mottak OK. Alle 28 gyldige native i bunken er sett som original/native/motor, inklusive fire ekte sluttalias fra blandet jobb18. Jobb18 er ikke telt som hel og feil148 er ikke produsert. Uendrede mottaksterskler, 80 sluttbufferkontroller uten avvik med adfdf7fc-binæren og samme grunnlag. 66 kontroller fra faktisk første nye tegning ved frame 60. Tvunget kildeforløp med kildeelevasjon 1 mot testkrok 0, ikke naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Ingen ny Tom-/Claude-godkjenning.
+
+Resultat SHA256: a07f20e088612ee116b9790128c56c3d65d85a2a4629c47e30a2688db2e22513. Rutekart: rapporter/sam344-fortsettelse-20261020/rutekart-fig344_13.json. Native publisering og hent bekreftes separat i mottak-publisert.json. Beskyttede jobbfiler er uendret.

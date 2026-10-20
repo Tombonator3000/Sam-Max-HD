@@ -1,0 +1,68 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import numpy as np,json,hashlib,subprocess,re,zipfile,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam344-fortsettelse-20261020';O=P/'out/sam344-fortsettelse-20261020';M=O/'mod-kandidat-renset';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda n:json.loads((R/n).read_text());old=read('grunnlag-filer-eb9f340b.json');entries=read('tillegg.json')['tillegg'];by={v['bilde']:v for v in entries};actual={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert len(old)==20547 and len(entries)==28 and len(actual)==20575 and sum(f.endswith('.png') for f in actual)==20569;assert set(old)<=set(actual) and set(actual)-set(old)=={v['fil'] for v in entries};assert {f for f in old if old[f]!=actual[f]}=={'mod.json'}
+base=json.loads((P/'mods/gpt/mod.json').read_text());meta=json.loads((M/'mod.json').read_text());assert base['costume_cels']==2305 and meta['costume_cels']==2333 and {k for k in base if base[k]!=meta[k]}=={'costume_cels'}
+for v in entries:
+ p=M/v['fil'];assert sha(p)==v['sha256'];im=Image.open(p);ar=np.array(im);assert im.mode=='RGBA' and im.width%4==im.height%4==0;assert (ar[:,:,3]==0).any() and (ar[:,:,3]==255).any() and ((ar[:,:,3]>0)&(ar[:,:,3]<255)).any();assert not ar[ar[:,:,3]==0,:3].any();assert not (((ar[:,:,:3]==[255,0,255]).all(2))&(ar[:,:,3]>0)).any();assert not (((ar[:,:,:3]==[0,200,200]).all(2))&(ar[:,:,3]>0)).any()
+protected={}
+for folder,file in [('alkove-siste-20261020','beskyttede-kilder.json'),('alkove-fortsettelse-20261020','beskyttede-kilder.json'),('alkove-gjenbruk-20261020','beskyttede-kilder.json'),('sam-sugepil-345-20261020','beskyttede-kilder.json'),('sam345-gjenbruk-a-20261020','beskyttede-kilder.json'),('sam345-gjenbruk-b-20261020','beskyttede-kilder.json'),('sam345-tilbake-20261020','beskyttede-kilder.json'),('sam345-slutthoder-20261020','beskyttede-kilder.json'),('sam344-foerste-20261020','beskyttede-kilder-utvidet.json'),(R.name,'beskyttede-kilder.json'),(R.name,'beskyttede-kildefeil-raw32.json')]:
+ q=json.loads((A/'rapporter'/folder/file).read_text());assert all(sha(A/f)==h for f,h in q.items());protected.update(q)
+assert len(protected)==440
+plan=read('ruteplan-unik.json')['ruter'];assert len(plan)==15 and sum(len(v['malruter']) for v in plan)==24
+for v in plan:
+ x,y,w,h=v['rekt'];src=Image.open(A/'jobber'/v['kildejobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(src.tobytes()).hexdigest()==v['rgba_sha256']
+ for alias in v['malruter']:
+  x,y,w,h=alias['rekt'];im=Image.open(A/'jobber'/alias['jobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert im.size==src.size and im.tobytes()==src.tobytes()
+ assert len({by[alias['bilde']]['sha256'] for alias in v['malruter']})==1
+assert len({by[f'costume344_{n}']['sha256'] for n in [1951,1953,1954,1955,1956,1957]})==1
+assert not(A/'jobber/fig344_18/resultat.png').exists() and all(not(A/f'jobber/fig344_{n:02}/resultat.png').exists() for n in range(19,34));assert 'costumes/costume344_148_hd.png' not in actual
+progress=read('fremdrift.json');assert len(progress['leveranser'])==5 and progress['faktiske_bildekall']==['A01','B01','C01','D01','E01'];total=0
+for v in progress['leveranser']:
+ assert sha(A/v['resultat'])==v['sha256'];im=Image.open(A/v['resultat']);assert im.mode=='RGBA' and im.size==(1536,1024);rt=json.loads((A/v['rutekart']).read_text())[v['jobb']];assert rt['sha256_resultat']==v['sha256'] and len(rt['ruter'])==v['ruter'];j=json.loads((A/'jobber'/v['jobb']/'jobb.json').read_text());allowed=np.zeros((1024,1536),bool)
+ for c in j['ruter']:
+  x,y,w,h=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;allowed[dy:dy+h*4,dx:dx+w*4]=True
+ assert not ((np.array(im)[:,:,3]>0)&~allowed).any();t=(R/f"{v['jobb']}-egenkontroll.txt").read_text();assert 'FEIL' not in t and 'SJEKK' not in t;m=re.search(r'(\d+) av (\d+) ruter OK',t);assert m[1]==m[2];total+=int(m[1]);v.update(native_mottatt=True,visuelt_kontrollert=True,motoravspilt=True,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False)
+assert total==24;native=read('myke344-kvittering.json');assert native['ruter_ok']==24 and all(native[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']);fixed=read('native-fast-plassering.json');assert fixed['antall']==24 and not fixed['originalmaske_brukt'] and not fixed['terskler_endret'];vis=read('visuelle-kontrollbilder.json');assert vis['antall']==28 and {v['bilde'] for v in vis['ruter']}==set(by);motor=read('motor-oppsummering.json');assert motor['ruter_tegnet']==motor['ruter_ved_kildepos']==28 and motor['skjermbufferkontroller']==motor['nullkontroller']==80 and not motor['nye_eller_oekte_avvik'];assert motor['faktisk_foerste_nye_draw_frame']==60 and motor['kontroller_fra_foerste_nye_draw']==66
+review=read('visuell-vurdering.json');assert review['original_native_motor_sett']==28 and review['hele_motorbilder_sett']==6 and review['siste_fire_sett'] and review['klessoem_rettet'];assert all(sha(R/f)==h for f,h in review['kontrollbilder'].items())
+calls=read('bildekall.json');assert len(calls['kall'])==5
+for v in calls['kall']:
+ assert v['utfoert'] and sha(R/v['raa'])==v['sha256'];args=read(v['args']);assert (R/f"prompt-{v['kall']}.txt").read_text()==args['prompt'];assert all(sha(Path(f))==h for f,h in v['referanse_sha256'].items());v.update(status='brukt',prompt=f"prompt-{v['kall']}.txt",prompt_sha256=sha(R/f"prompt-{v['kall']}.txt"),args_sha256=sha(R/v['args']))
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stashes==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+logs={}
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for scene in ['baseline344-anim7','final344-anim7-28-renset']:
+  p=O/scene/'scummvm.log';z.write(p,scene+'/scummvm.log');logs[scene+'/scummvm.log']=sha(p)
+(R/'motorlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n');progress['separat_tillegg']=read('ekte-sluttruter-native.json');summary=dict(nye_native=28,native_totalt_kandidat=2333,publisert_native_foer=2305,hele_jobber=5,hele_jobbruter=24,separate_ekte_sluttruter=4,hel_jobb18=False,figurjobber_med_resultat=len(list((A/'jobber').glob('fig*/resultat.png'))),figurjobber_totalt=1758,ulike_kilder=15,bildekall=5,raa_brukt=5,klessoem_rettet=True,originalutliggertillegg_i_slutt=0,hel_original_fallback=0,hard_originalmaske_brukt=False,egenkontroll_ok=24,native_ok=28,visuelt_sett=28,motorobservert=28,sluttbufferkontroller=80,nullkontroller=80,faktisk_foerste_nye_draw=60,kontroller_fra_foerste_nye_draw=66,tidligere_filer_bevart=20547,tidligere_png_byteidentiske=20541,png_totalt=20569,filer_totalt=20575,beskyttede_kilder=440,stash_shaer=stashes)
+assert summary['figurjobber_med_resultat']==286;(R/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');(R/'bildekall.json').write_text(json.dumps(calls,ensure_ascii=False,indent=2)+'\n');now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+for v in progress['leveranser']:
+ (A/'jobber'/v['jobb']/'notat.md').write_text(f'''# {v['jobb']}
+
+{now}, Codex. Sam holder, kaster og fanger en ekte lilla aubergine med grønn stilk i rom 92. Kilde: originalark, kildeskript lokalt 201 og faktisk chore 7 ved aktør 6, posisjon 159,101, clip 0 og scale 255. Sam-master og kontrollert varm 344/345-stil er sett. Brun drakt/hatt, oransje hud, kremfarget skjorte og gråsvart slips fra scenen. Alle fingre, fruktens rotasjon og løs frukt over hånden er bevart.
+
+Innebygd image_gen, fem faktiske kall med alle råbilder og faktiske prompter i rapporter/{R.name}. A01 malte kroppen og første hold sammen, B/C/D malte hånd-/fruktposene. Første sammensetting viste en rektangulær klessøm selv om størrelseskontrollen var OK. E01 malte en sammenhengende klesplate. Hånd, frukt, blader, mansjett og strek er skilt med de nye malerienes egne farger og alfa og lagt over samme plate. Ingen original silhuettmaske eller original fallback. Bare spill-lagenes interne rektangler er delt, i fast 4x. Små løse rensefragmenter er fjernet fra egne masker uten å fjerne kildebekreftede deler. Sømmen er kontrollert samlet i motoren.
+
+Dette arket har {v['ruter']} ruter. Egenkontroll og native mottak OK. Alle 28 gyldige native i bunken er sett som original/native/motor, inklusive fire ekte sluttalias fra blandet jobb18. Jobb18 er ikke telt som hel og feil148 er ikke produsert. Uendrede mottaksterskler, 80 sluttbufferkontroller uten avvik med adfdf7fc-binæren og samme grunnlag. 66 kontroller fra faktisk første nye tegning ved frame 60. Tvunget kildeforløp med kildeelevasjon 1 mot testkrok 0, ikke naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Ingen ny Tom-/Claude-godkjenning.
+
+Resultat SHA256: {v['sha256']}. Rutekart: {v['rutekart']}. Native publisering og hent bekreftes separat i mottak-publisert.json. Beskyttede jobbfiler er uendret.
+''')
+(R/'RAPPORT.md').write_text(f'''# Sam holder, kaster og fanger auberginen
+
+{now}, Codex. Fig344_13 til17 er fem hele ark med24 ruter fra15 ulike kilder. Fire ekte sluttalias1954..1957 er i tillegg levert separat fra1951 etter eksakt hel RGBA-kildekontroll. Blandede jobb18 forblir ufullført som helt ark, og feil148/raw32 er ikke produsert eller motorprøvd. Kostyme344 har dermed50 gyldige native totalt,22 tidligere og28 nye.15 helt ugyldige344-jobber og den blandede18 samt17 ugyldige346-jobber må håndteres i en avgrenset katalog-/pipeline-PR. Ingen beskyttede kilder eller pipelinekode er endret.
+
+Fem faktiske innebygde image_gen-kall og alle råbilder er bevart med faktiske argumenter, prompter og referanse-SHA-er. Første sammensetting hadde klessøm og er bevart som feilbilde. E01 lager felles sammenhengende klær; bevegelig hånd/frukt/blader/mansjett bruker bare de nye malerienes egne farger og alfa. Ingen hard originalsilhuettmaske, originalutligger eller hel fallback. Alle24 ruter i hele ark består egenkontroll, og alle28 native består uendrede mottaksterskler. IoU0,848..1,000 og dekning0,911..1,000. Visuell vurdering gjelder også sammenhengende slips, alle fingre, løs frukt og sluttposene, ikke bare telling/teknisk mottak.
+
+Alle28 original/native/motor-utsnitt og seks hele motorbilder er sett.320frames med samme faktisk nedlastede adfdf7fc-binær som2305-grunnlaget,rom92,aktør6 ved159,101,clip0,scale255,chore7. Alle80 sluttbufferkontroller er null,66 fra faktisk første nye tegning vedframe60. Ingen nye/økte avvik. Tvunget kildeforløp,ikke naturlig gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning. Max i scenen er en annen, fortsatt uferdig kostymevariant.
+
+Kandidaten har2333 native,20569 PNG-er og20575 filer. Alle20541 gamle PNG-er og20547 tidligere stier er bevart;bare mod.json/ruteantallet endres.440 beskyttede kildefiler og tre originale stasher er uendret.286 av1758 figurjobber har resultat,1472 mangler pluss returer og samlet kontroll. Ny grafikk ligger bare pågpt-arbeid og i native-kandidaten,aldri imain.
+
+Bibliotekskildene figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelruter er brukt med eksisterende v6-pipeline. Native publisering/hent/fulle SHA-er bekreftes i mottak-publisert.json. Felles Linux-/Windows-utgave2283 er ennå50 native bak2333-kandidaten;oppdater begge ved dette samlepunktet med faktiske nedlastinger og kontroll,før pakken kalles oppdatert. Ikke gjenta2283-byggene.
+''')
+(R/'NESTE.md').write_text('''# Gyldig Sam344-bunke ferdig kontrollert
+
+Fig344_13 til17 og fire separate ekte sluttalias fra blandet18 er ferdig produsert og motorobservert,28 nye native. Ikke lag dem om igjen. Kildecommit,publisering og hent gjenstår før2333 kan kalles publisert. Fellespakken2283 er50 bak kandidaten og skal oppdateres samlet etter publisering. Nyeste neste mulige katalogjobb er fig347_01,Aubergine i rom92;se faktisk gyldig kilde og stil først.15 ugyldige344-jobber,én blandet18 og17 ugyldige346-jobber står kildeavklart og skal ikke feilproduseres. Ikke tegn eller motorprøv raw32/raw36. Gammel nattkontroll forblir pauset.
+''')
+shutil.copy2(__file__,R/'sluttkontroll.py.txt');shutil.copy2(O/'plasser-med-soem.py',R/'plasser-med-soem.py.txt');print(json.dumps(summary,ensure_ascii=False),flush=True)

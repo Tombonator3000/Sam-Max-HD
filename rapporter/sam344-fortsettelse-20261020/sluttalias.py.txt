@@ -1,0 +1,8 @@
+from pathlib import Path
+from copy import deepcopy
+from PIL import Image
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam344-fortsettelse-20261020';D=P/'out/sam344-fortsettelse-20261020/mottak344-renset';v=json.loads((D/'myke.json').read_text());source=v['ark']['fig344_17']['ruter']['costume344_1951'];rows=[];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();s=np.array(Image.open(P/'work/extract/costumes/costume344_1951.png').convert('RGBA'));assert not(A/'jobber/fig344_18/resultat.png').exists()
+for n in range(1954,1958):
+ name=f'costume344_{n}';assert np.array_equal(s,np.array(Image.open(P/f'work/extract/costumes/{name}.png').convert('RGBA')));c=deepcopy(source);c.update(rute=n,fil=f'costumes/{name}_hd.png',produksjonstilpasning='Eksakt hele RGBA-kildealias til1951. Separat ekte tilleggsleveranse fra blandet jobb18,ikke hel jobb18.');assert not(D/c['fil']).exists();shutil.copy2(D/source['fil'],D/c['fil']);c['sha256']=sha(D/c['fil']);rows.append(dict(jobb='fig344_18_delvis',kildejobb='fig344_18',bilde=name,representant='costume344_1951',kilde_rgba_sha256=hashlib.sha256(s.tobytes()).hexdigest(),hel_jobb18_levert=False,**c))
+(R/'ekte-sluttruter-native.json').write_text(json.dumps(dict(antall=4,ikke_hel_job18=True,ingen_resultat_for_job18=True,ingen_feil148_produksjon=True,ruter=rows),ensure_ascii=False,indent=2)+'\n');shutil.copy2(D/'myke.json',R/'myke344-kvittering.json');shutil.copy2(__file__,R/'sluttalias.py.txt');print('24 hele native og4 ekte sluttalias klare.')
