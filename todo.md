@@ -1,5 +1,12 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-20 14:29
+
+- [x] Første fem041_01 til05: fem hele resultatark og33 native, publisert og hentet e12660e1,2511 totalt; alle filhasher og tidligere grafikk/stasher bevart.338 av1758 hele figurjobber har resultat.
+- [ ] Produser neste fem041_06 til10,16 ulike helkilder. Originaler, grep, kildeposer og ankere er sett,20 nye kildehasher beskyttet. Se sam-max-kontor041-slutt-20261020/KILDEGRUNNLAG.md på gpt-arbeid. Ikke gjenta første fem.
+- [ ] Sammenlign videre motorprøver mot samme grunnlag; tidlig160-avvik36 er ikke rettet. Første33 ga132 nullkontroller fra60 og ingen nye/økte avvik. Testavgrensningene elevation/aktør3 står åpne.
+- [ ] Oppdater begge pakker ved neste samlepunkt; siste fellespakke2478 mangler33. Ikke bygg2478 om igjen. Historiske SDL-/testhopp-/inventarkant- og katalogfunn står fortsatt åpne. Ingen ny Tom-/Claude-godkjenning.
+
 Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `log.md`.
 
 ## Neste
