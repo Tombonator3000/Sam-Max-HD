@@ -1,3 +1,5 @@
 # Siste fem ark av fall164
 
 Fig164_06 til10,åtte egne native fraåtte ulike canonical kilder. Fem ark,tre OK,to SJEKK,alleåtte native OK,visuelt sett og motorobservert. Seks image_gen-kall,fem brukt; U06s første feilfargede såler er forkastet for U06R. Kilder og råbilder ligger her. Felles motor-,bevarings- og publiseringskontroll for alle32 nye: ../sam-max-fall164-foerste-20261020/RAPPORT.md. Ark04s to ruter er fortsatt blokkert og mangler. Ingen ny Tom-/Claude-godkjenning.
+
+Med i kontrollert fellesutgave sam-max-hd-2026-10-20-fall164: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-fall164. Begge faktiske pakker og alle20801 runtime moddfiler per pakke er bekreftet. Alle32 nye fall164-ruter observert i faktisk Linux.304 kontroller,303 null og én kjent160-pikslers overgangsrest før figurstart,identisk med2527-grunnlaget.66 kontroller frafigurstart null,ingen nye/økte avvik. Alle20 tidligere releaser og vedlegg bevart. Ingen ny Tom-/Claude-godkjenning.1943/1944 er fortsatt IKKE produsert etter verktøyavvisning.

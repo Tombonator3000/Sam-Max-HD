@@ -1,0 +1,26 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import os,subprocess,json,re,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'uaktuell';BASE=P/'mods/gpt'
+PK=P/'out/felles-release-20261020-kontorintro/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert sha(B)=='b7ab7d7b179ea2da9a2ff99cf949341c59da40ce916c36a0388b9a06bdd56736'
+assert json.loads((BASE/'mod.json').read_text())['costume_cels']==2559
+def run(case):
+    name,mod,forced=case;T=O/name;assert not T.exists();T.mkdir();h=T/'home';h.mkdir();s=T/'saves';s.mkdir()
+    for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,s/p.name)
+    env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update(HOME=str(h),XDG_CONFIG_HOME=str(h/'.config'),XDG_DATA_HOME=str(h/'.local/share'),XDG_CACHE_HOME=str(h/'.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(mod),DIGHD_VERIFY='1',DIGHD_QUIT_AT='320',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='4',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='59',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+    if forced:env.update(DIGHD_TEST_COSTUME='302',DIGHD_TEST_ACTOR='2',DIGHD_TEST_CLIP='0',DIGHD_TEST_CHORE_EVERY='1000',DIGHD_TEST_STATIC_SCENE='1',DIGHD_TEST_SCALE='255',DIGHD_TEST_POS='218,175',DIGHD_TEST_ANIMATION='6')
+    args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(s),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+    with (T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=240).returncode
+    log=(T/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+    draws=[dict(frame=int(f),cel=int(n)) for f,n in re.findall(r'frame (\d+) soft cel\s+(\d+) costume\s*302\b',log)]
+    rec=dict(scene=name,exit=code,binar_sha256=sha(B),mod_json_sha256=sha(mod/'mod.json'),tvunget_kostyme=forced,naturlig_gjennomspilling=False,elevation_test=0 if forced else None,elevation_primarskript_ikke_eksplisitt_satt=True,andre_aktorer_ikke_overstyrt=True,sett302=sorted({v['cel'] for v in draws}),tegninger=draws,kontroller=checks,helprove_uten_avvik=bool(code==0 and checks and not any(v['avvik'] for v in checks)),logg_sha256=sha(T/'scummvm.log'))
+    (T/'kvittering.json').write_text(json.dumps(rec,indent=2)+'\n')
+    assert code==0 and len(checks)==80,(name,code,len(checks))
+    if forced: assert set(range(1920,1949))<=set(rec['sett302'])
+    print(name,'avvik',[(v['frame'],v['avvik']) for v in checks if v['avvik']],len(rec['sett302']),'302-ruter',flush=True)
+    return rec
+cases=[('kilde302-anim6',BASE,True)]
+rows=[run(c) for c in cases]
+(R/'kildemotor.json').write_text(json.dumps(dict(runder=rows,ny_grafikk=False,naturlig_gjennomspilling=False,ny_Tom_Claude_godkjenning=False),indent=2)+'\n')
+shutil.copy2(__file__,R/'kildemotor.py.txt')

@@ -1,0 +1,1 @@
+Ferdig samlepunkt: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-fall164. Latest og2559 native i begge faktiske pakker bekreftet. Fortsett de fem kildeklare302_01 til05. Ikke gjenta164 eller disse byggene.1943/1944 er blokkert,ikke omprøv.
