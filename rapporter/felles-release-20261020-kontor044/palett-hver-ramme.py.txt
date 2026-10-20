@@ -1,0 +1,10 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,shutil
+O=Path(__file__).resolve().parent
+source=(O/'kontroller-linux.py').read_text().split('with ThreadPoolExecutor(max_workers=3) as pool:')[0]
+ns={'__file__':str(O/'kontroller-linux.py')};exec(compile(source,str(O/'kontroller-linux.py'),'exec'),ns)
+case=dict(label='kontor044-hver-ramme',slot=2,extra={'DIGHD_TEST_ROOM':'7','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'160','DIGHD_TEST_SCRIPT':'20:66','DIGHD_DUMP_EVERY':'1','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1'},frames=1000)
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(lambda b:ns['run'](case,b),[False,True]))
+assert all(r['exit']==0 and len(r['kontroller'])==1000 and all(c['avvik']==0 for c in r['kontroller']) for r in rows)
+R=ns['R'];(R/'palett-ekstraprove.json').write_text(json.dumps(dict(arsak='Uavklart ikonfarge i fjerderammedump ved eksplosjon. Originalskript66,1000rammer,dump1,ingen RNG-,palett-,aktor- eller animasjonsoverstyring.',resultat=rows),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'palett-hver-ramme.py.txt');print('To avgrensede ekstraavspillinger,1000/1000null hver,alle rammer bevart.',flush=True)

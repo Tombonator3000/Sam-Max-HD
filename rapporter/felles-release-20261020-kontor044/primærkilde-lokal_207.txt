@@ -1,0 +1,36 @@
+; Lokalt skript 207 i rom 7 (LSCR)
+
+Script# 207
+[0000] (0C) dup[1] = getRandomNumberRange(1,8)
+[0008] (5D) if (dup[1] == 2) {
+[000F] (5D)   if (!isScriptRunning(206)) {
+[0018] (9D)     actorOps.setCurActor(4)
+[001D] (9D)     actorOps.init()
+[001F] (9D)     actorOps.setCostume(35)
+[0024] (9D)     actorOps.setIgnoreBoxes()
+[0026] (9D)     actorOps.setAlwayZClip(3)
+[002B] (9D)     actorOps.setScale(140)
+[0030] (7F)     putActorInXY(4,106,106,7)
+[003D] (5E)     startScript(1,208,[])
+[0047] (7E)     walkActorTo(4,114,113)
+[0051] (A9)     wait.waitForActor(-7,4)
+[0058] (9D)     actorOps.setCurActor(4)
+[005D] (9D)     actorOps.setIgnoreBoxes()
+[005F] (9D)     actorOps.setAlwayZClip(2)
+[0064] (7E)     walkActorTo(4,140,119)
+[006E] (A9)     wait.waitForActor(-7,4)
+[0075] (7E)     walkActorTo(4,232,155)
+[007F] (A9)     wait.waitForActor(-7,4)
+[0086] (9D)     actorOps.setCurActor(4)
+[008B] (9D)     actorOps.setIgnoreBoxes()
+[008D] (9D)     actorOps.setAlwayZClip(1)
+[0092] (7E)     walkActorTo(4,488,179)
+[009C] (A9)     wait.waitForActor(-7,4)
+[00A3] (**)   }
+[00A3] (73)   /* jump a7; */
+[00A6] (**) }
+[00A6] (7C) stopScript(208)
+[00AB] (B1) delaySeconds(4)
+[00AF] (73) jump 0
+[00B2] (66) stopObjectCodeB()
+END

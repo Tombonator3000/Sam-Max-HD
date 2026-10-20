@@ -1,0 +1,9 @@
+from pathlib import Path
+import json,hashlib,subprocess,re
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter/felles-release-20261020-kontor044';state=json.loads((O/'bygg-startet.json').read_text());meta=json.loads((O/'release-linux.json').read_text());code=re.search(r'Sam-Max-HD:\s*([0-9a-f]{7,40})',meta['body']);assert code and state['kode'].startswith(code[1]) and state['hd_mod'] in meta['body'];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for name in ['SamMaxHD-x86_64.AppImage','SamMaxHD-x86_64.AppImage.sha256']:
+ p=O/'linux'/name;a=next(a for a in meta['assets'] if a['name']==name);assert p.stat().st_size==a['size'] and a['digest']=='sha256:'+sha(p)
+assert (O/'linux/SamMaxHD-x86_64.AppImage.sha256').read_text().split()[0]==sha(O/'linux/SamMaxHD-x86_64.AppImage');app=O/'linux/SamMaxHD-x86_64.AppImage';app.chmod(0o755)
+if not(O/'linux/squashfs-root').exists():
+ with(O/'linux/extract.log').open('wb') as f:subprocess.run([str(app),'--appimage-extract'],cwd=O/'linux',stdout=f,stderr=subprocess.STDOUT,check=True)
+D=O/'linux/squashfs-root/usr/share/sam-max-hd';expected={p:h for p,h in json.loads((R/'moddfiler-2888.json').read_text()).items() if p!='README.md'};actual={p.relative_to(D/'mods/gpt').as_posix():sha(p) for p in(D/'mods/gpt').rglob('*') if p.is_file()};assert len(actual)==21130 and actual==expected;assert state['kode'][:7] in(D/'BYGG.txt').read_text() and state['hd_mod'] in(D/'BYGG.txt').read_text();assert json.loads((D/'mods/gpt/mod.json').read_text())['costume_cels']==2888;print('Faktisk Linux,alle21130 runtime-filer og2888 native SHA-kontrollert før motorprøve.',flush=True)

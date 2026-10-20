@@ -1,0 +1,38 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json, re, hashlib, shutil
+import numpy as np
+from scipy.ndimage import label, find_objects
+
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+def events(d):
+    rows=[]
+    for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*44\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',(d/'scummvm.log').read_text()):
+        f,c,x,y,w,h=map(int,m.groups());rows.append(dict(f=f,cel=c,pos=[x,y],maal=[w,h]))
+    shots=[]
+    for p in sorted(d.glob('frame_*_room007.png')):
+        f=int(p.name.split('_')[1]);previous=[e for e in rows if e['f']<f]
+        if previous:shots.append(dict(previous[-1],frame=f,fil=str(p)))
+    return shots
+new=events(O/'pakke2888-kontor044-skript066');old=events(O/'grunnlag2810-kontor044-skript066');initial=json.loads((R/'pakke-pikselkontroll.json').read_text());out=[]
+for cel in [1936,1950,1978]:
+    nr=[e for e in new if e['cel']==cel];br=[e for e in old if e['cel']==cel];candidates=[]
+    for n in nr:
+        for b in br:
+            if (n['pos'],n['maal'])!=(b['pos'],b['maal']):continue
+            na=np.array(Image.open(n['fil']).convert('RGB'));ba=np.array(Image.open(b['fil']).convert('RGB'));delta=np.any(na!=ba,2);outside=delta.copy();x,y=n['pos'];w,h=n['maal'];outside[max(0,y*4-12):min(800,(y+h)*4+12),max(0,x*4-12):min(1280,(x+w)*4+12)]=False
+            candidates.append(dict(bilde=f'costume044_{cel}',grunnlag_frame=b['frame'],pakke_frame=n['frame'],pos=n['pos'],maal=n['maal'],grunnlag_fil=b['fil'],pakke_fil=n['fil'],grunnlag_sha256=sha(Path(b['fil'])),pakke_sha256=sha(Path(n['fil'])),utenfor_nye_cels_og_marg=int(outside.sum())))
+    assert candidates
+    best=min(candidates,key=lambda v:(v['utenfor_nye_cels_og_marg'],v['pakke_frame'],v['grunnlag_frame']));out.append(dict(valgt=best,alle_kandidater=candidates))
+    ba=Image.open(best['grunnlag_fil']).convert('RGB');na=Image.open(best['pakke_fil']).convert('RGB');b=Image.new('RGB',(1280,430),'#283943');d=ImageDraw.Draw(b);b.paste(ba.resize((640,400)),(0,30));b.paste(na.resize((640,400)),(640,30));d.text((6,6),f'Samme cel/pos/maal,044_{cel},grunnlag{best["grunnlag_frame"]}/pakke{best["pakke_frame"]},utenfor{best["utenfor_nye_cels_og_marg"]}',fill='white');b.save(R/f'pakke-fasefestet-044_{cel}.png')
+    original=next(v for v in initial if v['bilde']==f'costume044_{cel}');bp=O/'grunnlag2810-kontor044-skript066'/f'frame_{original["grunnlag_frame"]:06}_room007.png';np_=O/'pakke2888-kontor044-skript066'/f'frame_{original["pakke_frame"]:06}_room007.png';aa=np.array(Image.open(bp).convert('RGB'));bb=np.array(Image.open(np_).convert('RGB'));delta=np.any(aa!=bb,2);x,y=nr[0]['pos'];w,h=nr[0]['maal'];delta[max(0,y*4-12):min(800,(y+h)*4+12),max(0,x*4-12):min(1280,(x+w)*4+12)]=False
+    labs,count=label(delta,np.ones((3,3)));comps=[]
+    for i,s in enumerate(find_objects(labs),1):
+        if s is not None:comps.append(dict(piksler=int((labs[s]==i).sum()),boks=[s[1].start,s[0].start,s[1].stop,s[0].stop]))
+    out[-1]['foerstepar_utenfor_komponenter']=comps
+    vis=Image.new('RGB',(1280,800),'black');vis.paste(Image.fromarray(np.where(delta[:,:,None],bb,0).astype('uint8')));vis.save(R/f'pakke-opprinnelig-utenfor-044_{cel}.png')
+save(R/'pakke-fasefesting.json',dict(akseptgrenser_ikke_endret=True,alle_aktorer_bevart=True,opprinnelige_par_bevart=True,par=out));shutil.copy2(__file__,R/'fasejuster-pakke.py.txt')
+print(json.dumps([v['valgt'] for v in out],ensure_ascii=False))
+print(json.dumps({v['valgt']['bilde']:v['foerstepar_utenfor_komponenter'] for v in out},ensure_ascii=False))

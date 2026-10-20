@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam-max044-foerste-20261020';root=Path('/home/tom/Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/ikon-grunnlag/skript')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+cases=[('telefonblink',564,(0,512,128,608),range(520,604,4)),('inventarikon_palett',860,(0,700,164,800),range(4,1204,4)),('musehull',860,(400,400,460,460),range(780,944,4))];rows=[]
+for name,n,box,frames in cases:
+    p=O/'pakke2888-kontor044-skript066'/f'frame_{n:06}_room007.png';actual=Image.open(p).convert('RGB').crop(box);needle=np.array(actual);matches=[]
+    for f in frames:
+        q=O/'grunnlag2810-kontor044-skript066'/f'frame_{f:06}_room007.png'
+        if q.exists() and np.array_equal(np.array(Image.open(q).convert('RGB').crop(box)),needle):matches.append(dict(frame=f,fil=str(q),sha256=sha(q)))
+    rows.append(dict(tilstand=name,pakke_frame=n,boks=box,pakke_sha256=sha(p),eksakt_lik_grunnlagsraster=bool(matches),match=matches));print(name,'baseline matches',[v['frame'] for v in matches],flush=True)
+    if matches:
+        old=Image.open(matches[0]['fil']).convert('RGB').crop(box);w,h=actual.size;board=Image.new('RGB',(w*4,h*2+28),'#283943');d=ImageDraw.Draw(board);board.paste(old.resize((w*2,h*2)),(0,28));board.paste(actual.resize((w*2,h*2)),(w*2,28));d.text((3,4),f'{name},grunnlag{matches[0]["frame"]}/pakke{n},rasteridentiske',fill='white');board.save(R/f'tilstandsbevis-{name}.png')
+sources={}
+for rel in ['rom_007/lokal_204.txt','rom_007/lokal_207.txt','globale/scrp_066.txt']:
+    p=root/rel;sources[rel]=sha(p);shutil.copy2(p,R/('primærkilde-'+p.name))
+manifest=json.loads((R/'moddfiler-2888.json').read_text());old=json.loads((S/'grunnlag-produksjon.json').read_text())['filer'];unchanged={f:h for f,h in manifest.items() if f in old and (f.startswith('objects/') or f.startswith('costumes/costume035') or 'inventory' in f.lower() or 'verbind' in f.lower())};assert unchanged and all(old[f]==h and sha(P/'mods/gpt'/f)==h for f,h in unchanged.items())
+rooms=json.loads((P/'work/extract/rooms.json').read_text());obj=next(v for v in rooms['rooms']['7']['objects'] if v['id']==76);assert obj['x']==0 and obj['y']==128 and obj['w']==32 and obj['h']==24
+classifications=[]
+for v in json.loads((R/'pakke-pikselkontroll.json').read_text()):
+    b=O/'grunnlag2810-kontor044-skript066'/f'frame_{v["grunnlag_frame"]:06}_room007.png';n=O/'pakke2888-kontor044-skript066'/f'frame_{v["pakke_frame"]:06}_room007.png';aa=np.array(Image.open(b).convert('RGB'));bb=np.array(Image.open(n).convert('RGB'));d=np.any(aa!=bb,2);obs=json.loads((R/'motorobservasjoner78.json').read_text())['tegninger'][v['bilde']];x,y=obs['pos'];w,h=obs['maal'];d[max(0,y*4-12):min(800,(y+h)*4+12),max(0,x*4-12):min(1280,(x+w)*4+12)]=False;counts={}
+    for name,_,box,_ in cases:
+        x0,y0,x1,y1=box;counts[name]=int(d[y0:y1,x0:x1].sum());d[y0:y1,x0:x1]=False
+    assert not d.any(),v;classifications.append(dict(bilde=v['bilde'],opprinnelig_utenfor=v['utenfor_nye_cels_og_marg'],fordeling=counts,utenfor_disse_og_044=0))
+assert rows[0]['eksakt_lik_grunnlagsraster'] and rows[2]['eksakt_lik_grunnlagsraster']
+save(R/'andre-tilstander-bevis.json',dict(tilstander=rows,kildeskript_sha256=sources,objekt76=obj,uendrede_filer=unchanged,fordeling=classifications,akseptgrenser_ikke_endret=True,ingen_aktor_skjult=True,ingen_RNG_eller_palett_overstyring=True,ikkelik_RGB_sammenligning_bevart=True,foerste_antagelse_om_ikon_rasterlikhet_feilet=True,ikon_rasterlikhet_bekreftet=rows[1]['eksakt_lik_grunnlagsraster'],merknad='Telefon76 blinker med30delay i primær204. Primær207 velger musebevegelse tilfeldig. Primær066 bytter palett1/0 og rister skjermen ved eksplosjonen. Telefon og mus er rasteridentiske med andre grunnlagsbilder. Inventarikontilstand skal bare erklæres identisk ved faktisk match; ved ingen match er denne RGB-forskjellen fortsatt uavklart og ikke rettet. Alle opprinnelige forskjeller bevares.'))
+shutil.copy2(__file__,R/'avklar-andre-tilstander.py.txt')

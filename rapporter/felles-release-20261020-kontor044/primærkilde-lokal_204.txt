@@ -1,0 +1,19 @@
+; Lokalt skript 204 i rom 7 (LSCR)
+
+Script# 204
+[0000] (5D) if (!var230) {
+[0007] (43)   var230 = getRandomNumberRange(0,1)
+[0011] (**) }
+[0011] (5D) if (var230) {
+[0017] (5D)   if (!(VAR_VERB_SCRIPT == 60)) {
+[0022] (61)     drawObject(76,0)
+[0029] (**)   }
+[0029] (B0)   delay(30)
+[002D] (5D)   if (!(VAR_VERB_SCRIPT == 60)) {
+[0038] (70)     setState(76,0)
+[003F] (**)   }
+[003F] (B0)   delay(30)
+[0043] (73)   jump 17
+[0046] (**) }
+[0046] (66) stopObjectCodeB()
+END
