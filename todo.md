@@ -4,6 +4,13 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [x] 2026-10-20 09:23: Fig341_01 til 06 levert, 19 nye native, 2418 totalt. Egenkontroll, native, visuell kontroll, 820-frame romskript, publisering/hent/SHA bestått. Ingen ny Tom-/Claude-godkjenning.
+- [x] Avgrenset Sam346_1801-retur: 581 nye alfapiksler, alle tidligere synlige piksler bevart, før/etter bare rad 507. Andre klesoverganger gjenstår.
+- [ ] Nytt felles 2418-samlepunkt med de 19 nye og Sam-returen. Send ett bygg per plattform; frys native til begge har hentet riktig SHA, last ned begge, kontroller hele modden og ny Linux-runtime før fellesrelease.
+- [ ] Undersøk de øvrige Sam346-farge-/geometriovergangene som egen retur. Ikke forveksle dem med den ene nå fylte tomme raden.
+- [ ] Kildeklargjør Sam342_01 til 05, så 06 til 10: ekte COST-tabell, rom/skript/palett, originale motorposer og godkjent Sam-anker. Ingen 342-bildekall er startet. Ikke gjenta Max341-bunken.
+
+
 - [x] 2026-10-20 08:18: Felles2399-pakke publisert og Latest: sam-max-hd-2026-10-20-hjertebytte. Begge faktiske nedlastinger, SHA-filer, fire opplastinger og 20641 runtime-filer per pakke kontrollert. Alle 66 nye ruter observert, 224 sluttkontroller null, hjertekontur visuelt borte. 13 tidligere releaser og assets bevart. Ikke gjenta 39377609902/39377612089.
 - [ ] Undersøk og rett konkret eksisterende Sam346-søm ved y127. Se max-alkove341-grunnlag-20261020/RETUR-SAM346.md med native1801/kropp1664, nøyaktige SHA-er og byteidentisk før/etter-utsnitt. Klassisk sammenligning og lokal grafikkretur før full sammensettingskontroll. Ikke endre alle figurer eller bruk originalsilhuettmaske.
 - [ ] Produser de seks kildeklare Max341-arkene:19 ruter fra 13 ulike hele kilder, 24 beskyttede filer, alle originalark og 19 motorposer sett. Ingen bildekall eller nye resultater der ennå. Se NESTE.md. Kostymets ekstra raw56 skal ikke brukes, gyldige kildeanimasjoner er bevart.
