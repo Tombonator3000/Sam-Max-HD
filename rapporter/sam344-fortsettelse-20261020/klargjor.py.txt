@@ -1,0 +1,50 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from smhd.gamedata import load,read_index,read_rooms
+import json,hashlib,struct,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam344-fortsettelse-20261020';O=P/'out/sam344-fortsettelse-20261020';assert not R.exists() and not O.exists();R.mkdir();O.mkdir();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=[];protected={};unique={}
+for n in range(13,18):
+ job=f'fig344_{n:02d}';d=A/'jobber'/job;assert not(d/'resultat.png').exists() and not(d/'retur.md').exists();j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGBA')
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:protected[f'jobber/{job}/{f}']=sha(d/f)
+ for c in j['ruter']:
+  assert c['animasjon']==7;x,y,w,h=c['rekt'];crop=im.crop((x,y,x+w,y+h));key=(crop.size,hashlib.sha256(crop.tobytes()).hexdigest())
+  if key not in unique:unique[key]=dict(bilde=c['bilde'],kildejobb=job,rekt=c['rekt'],rgba_sha256=key[1],malruter=[])
+  unique[key]['malruter'].append(dict(jobb=job,bilde=c['bilde'],rekt=c['rekt'],animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']))
+ rows.append(dict(jobb=job,kostyme=344,rom=92,ruter=len(j['ruter']),animasjoner=[7]))
+assert len(protected)==20 and sum(r['ruter'] for r in rows)==24
+for name,value in [('klargjort.json',rows),('ruteplan-unik.json',dict(ruter=list(unique.values()))),('beskyttede-kilder.json',protected)]: (R/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+board=Image.new('RGB',(1560,1665),'#3d454b');draw=ImageDraw.Draw(board)
+for i,row in enumerate(rows):
+ im=Image.open(A/'jobber'/row['jobb']/'original_1x.png').convert('RGB').resize((768,512),Image.Resampling.NEAREST);x=i%2*780;y=i//2*555;board.paste(im,(x+12,y+35));draw.text((x+12,y+10),row['jobb'],fill='white')
+board.save(R/'originalreferanser344-fortsettelse.png')
+# Primærkilde: grenser i selve COST-ressursen, ikke tvungen avspilling av feil tabellrad.
+d,_=load(P/'game/SAMNMAX.001');ix=read_index(P/'game/SAMNMAX.000');rooms=read_rooms(P/'game/SAMNMAX.001');room,rel=ix.costume_dir[344];off=rooms[room].offset+rel;assert d[off:off+4]==b'COST';size=struct.unpack_from('>I',d,off+4)[0];base=d[off+8:off+size];num=base[6];cols=32 if (base[7]&127) in(0x59,0x61) else 16;start=8+cols+34;table=[(i,int.from_bytes(base[start+i*2:start+i*2+2],'little')) for i in range(num+1)];first=min(v for i,v in table[:-1] if v);assert num==32 and start==74 and first==138 and start+num*2==first and table[-1]==(32,3)
+bad=[];bp={};valid_tail=[]
+for n in range(18,34):
+ job=f'fig344_{n:02d}';f=A/'jobber'/job;j=json.loads((f/'jobb.json').read_text());assert not(f/'resultat.png').exists()
+ for name in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:bp[f'jobber/{job}/{name}']=sha(f/name)
+ wrong=[c['bilde'] for c in j['ruter'] if c['animasjon']==8];good=[c['bilde'] for c in j['ruter'] if c['animasjon']==7];bad.append(dict(jobb=job,ugyldige_ruter=wrong,gyldige_ruter=good,helt_ugyldig=not good))
+ if good:valid_tail.extend(good)
+assert len(bad)==16 and len(valid_tail)==4 and len(bp)==64
+fault=dict(kostyme=344,rom=92,game_sha256_raw=sha(P/'game/SAMNMAX.001'),game_sha256_dekryptert=hashlib.sha256(d).hexdigest(),cost_offset=off,cost_size=size,num_anim_byte=num,ncol=cols,data_offsets=start,gyldige_ikke_tomme_valg=[i for i,v in table[:-1] if v],forste_animasjonsdata=first,siste_ekte_tabellbyte=137,raw32_tabellbyte=[138,139],raw32_offset=3,raw32_lest_fra_forste_lagmaske='03 00',feil='Ekstra tabelloppslag32 overlapper første lagmaske og peker til byte3 inne i ressursheaderen,ikke en animasjonsheader.',berorte_jobber=bad,berorte_ugyldige_ruter=sum(len(v['ugyldige_ruter']) for v in bad),gyldige_siste_ruter_i_blandet_job18=valid_tail,ingen_resultater_eller_native_laget_for_de_ugyldige=True,ingen_kilder_endret=True,raw32_ikke_motorproevd=True,ingen_global_numAnim_endring=True,scummvm_commit=(P/'engine/SCUMMVM_COMMIT').read_text().strip(),pipeline='pipeline/smhd/v6grafikk.py:_anim_frames',primarkilde='game/SAMNMAX.001:COST344',relatert='rapporter/alkove-siste-20261020/kildefeil-raw36.json')
+(R/'kildefeil-raw32.json').write_text(json.dumps(fault,ensure_ascii=False,indent=2)+'\n');(R/'beskyttede-kildefeil-raw32.json').write_text(json.dumps(bp,indent=2)+'\n')
+(R/'KILDEFEIL.md').write_text(f'''# Ikke tegn fig344 fra det ekstra raw32-oppslaget
+
+COST344 har samme ressursbestemte tabelloverlapp som tidligere påvist i346. num_anim-byte32,32 farger,data_offsets74. Ekte tabellrader0..31 slutter ved137. Den første ekte animasjonsheaderen starter ved138 med lagmasken03 00. Pipelineoppslag32 leser de samme bytene som en offset3 og går inn i ressursheaderen. De angivelige animasjon8-rutene er derfor ikke et gyldig produksjonsgrunnlag.
+
+Dette rammer16 jobber:15 helt ugyldige fig344_19 til33,og fig344_18 som blander fire ekte chore7-ruter1954..1957 med én feilutledet rute148 fra animasjon8. Totalt{fault['berorte_ugyldige_ruter']} feilutledede rutekoblinger. Ingen av disse ugyldige er produsert eller publisert. Ikke kjør raw32,ikke tegn dem som en ny handling og ikke rett numAnim med en blind global endring. Ressurs-/tabellgrensen og det blandede jobbarket må behandles gjennom en avgrenset testet PR eller separat kildebegrunnet leveranseplan. Beskyttede jobbfiler skal bevares.
+
+De første12 jobbene med start/chore1 er gyldige og publisert som22 native i eb9f340b78e0ddb912ee959e0ddbbb1a0c4dea25. Neste fem hele gyldige jobber13..17 har24 ruter fra chore7. De fire ekte rutene i blandet jobb18 gjenstår og må ikke glemmes når slutten kontrolleres. Ikke kall hele chore7 fullført bare fordi13..17 er levert. Se kildefeil-raw32.json og de64 beskyttede kildehashene.
+''')
+meta=json.loads((P/'mods/gpt/mod.json').read_text());assert meta['costume_cels']==2305;remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0];assert remote=='eb9f340b78e0ddb912ee959e0ddbbb1a0c4dea25'
+basefiles={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in(P/'mods/gpt').rglob('*') if p.is_file()};assert len(basefiles)==20547;(R/'grunnlag-filer-eb9f340b.json').write_text(json.dumps(basefiles,indent=2)+'\n')
+for name in ['kildeskript-rom_092-lokal_201.txt','kildeskript-rom_092-inngang.txt']:shutil.copy2(A/'rapporter/sam344-foerste-20261020'/name,R/name)
+(R/'NESTE.md').write_text('''# Neste gyldige Sam-bunke
+
+Fig344_13 til17,fem ark med24 runtime-ruter,alle chore7. Første12 jobbene er ferdig produsert,22 native publisert i eb9f340b,2305 totalt. Fellespakken har2283 og er22 bak modden. Ikke gjenta de seks ferdige bildekallene eller2283-pakkebyggene.
+
+De nye originalene er klargjort,men må ses i gyldig chore7 sammen med Sam-master og varm kontrollert344/345-stil før bildekall. Søk etter eksakte tidligere kilde-/prototypekoblinger før nytegning. Ingen nye bildekall eller resultater her ennå.20 beskyttede kildehash-er og hele2305-grunnlaget er festet.
+
+Les KILDEFEIL.md først. Animasjon8 fra raw32 er påvist ugyldig,ikke motorprøv eller tegn den. Job18 har fire ekte chore7-ruter1954..1957 som blandes med en feilutledet rute148. Ikke hopp over de fire ekte ved sluttkontroll,og ikke tell hele jobb18 som ferdig. Behold alle beskyttede jobbfiler.15 hele jobber19..33 er ugyldige og skal ikke produseres fra dette grunnlaget. Gammel nattkontroll forblir pauset;automatisk grafikkarbeid fortsetter med gyldige jobber.
+''')
+shutil.copy2(__file__,R/'klargjor.py.txt');print('Klargjort fem gyldige jobber,24 ruter,',len(unique),'ulike hele kilder. raw32-feil:',fault['berorte_ugyldige_ruter'],'ruter i16 jobber,herav én blandet jobb med4 ekte gjenstående. Ingen nye bildekall/resultater.')

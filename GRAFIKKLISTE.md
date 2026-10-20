@@ -1,5 +1,10 @@
 # Grafikkliste
 
+Oppdatert 2026-10-20 06:04: fig344_01 til 12 er levert i to seksarksbunker. 22 nye native er egenkontrollert, native mottatt, visuelt sett og motorobservert. Publisert og hentet i eb9f340b78e0ddb912ee959e0ddbbb1a0c4dea25, 2305 native totalt. Alle 20541 kandidat-PNG-er og 22 nye hasher stemmer, alle 20519 tidligere PNG-er og 20525 tidligere stier er bevart. 281 av 1758 figurjobber har resultat. De tre opprinnelig manglende overtegningsaliasene er også med; hele det første kastet vises i HD. Ingen ny Tom-/Claude-godkjenning. Felles Linux-/Windows-pakke er fortsatt kontrollert 2283, 22 bak modden. Ikke kall pakkene oppdatert med denne bunken eller bygg 2283 på nytt. Se rapporter/sam344-foerste-20261020/mottak-publisert.json.
+
+Neste fem gyldige jobber fig344_13 til 17 er kildeklargjort i sam344-fortsettelse-20261020: 24 ruter fra 15 ulike hele kilder. Alle fem originalark, de 15 ulike posene i motor og fire ekte sluttposer i blandet jobb18 er sett. Alle 28 er logget i gyldig chore7, 80 nullkontroller. Ingen nye bildekall/resultater der ennå. Raw32/animasjon8 er kildefeil: 40 ruter i 16 jobber, derav 15 helt ugyldige jobber19..33 og blandet jobb18 med fire ekte chore7-ruter1954..1957 og én ugyldig148. Ikke tegn eller avspill raw32, ikke endre numAnim globalt. De fire ekte sluttrutene er RGBA-identiske med1951 og kan behandles i en separat kildebekreftet tilleggsleveranse når1951 er malt. Ikke tell hele jobb18 ferdig eller legg resultat for feil148. Bevar de beskyttede jobbfiler og se KILDEFEIL.md før videre arbeid.
+
+
 Oppdatert 2026-10-20 05:26: fellespakken https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam er publisert og bekreftet Latest med 2283 native. Alle 41 nye ruter siden 2242 er observert i faktisk Linux-pakke; begge pakker og alle moddfiler er kontrollert. 269 av 1758 figurjobber har resultat. Neste er fig344_01 til 10, ferdig kildeklargjort, men 0 bildekall/resultater. Se rapporter/felles-release-20261020-sam/publisert.json og rapporter/sam344-foerste-20261020/NESTE.md. Pakkegrunnlaget er sikret; videre grafikkproduksjon kan fortsette. Ikke gjenta byggene.
 
 
@@ -28,7 +33,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 269 ark med resultat; 2283 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 281 ark med resultat; 2305 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 

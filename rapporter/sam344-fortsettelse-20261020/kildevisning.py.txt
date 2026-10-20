@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,re,hashlib,shutil,zipfile,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam344-fortsettelse-20261020';O=P/'out/sam344-fortsettelse-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];expected={v['bilde'] for u in plan for v in u['malruter']};tail={f'costume344_{n}' for n in range(1954,1958)};log=(O/'baseline344-anim7/scummvm.log').read_text();draws={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*344 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());name=f'costume344_{n}';p=O/'baseline344-anim7'/f'frame_{f+4:06}_room092.png'
+ if name in expected|tail and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,h],fil=p.name,sha256=sha(p))
+assert len(expected)==24 and len(draws)==28 and expected|tail==set(draws);base=json.loads((R/'motor-baseline.json').read_text())[0];assert len(base['kontroller_med_frame'])==80 and not any(v['avvik'] for v in base['kontroller_med_frame'])
+for page in range(2):
+ board=Image.new('RGB',(1920,1275),'#243340');d=ImageDraw.Draw(board)
+ for i,v in enumerate(plan[page*9:(page+1)*9]):
+  meta=draws[v['bilde']];im=Image.open(O/'baseline344-anim7'/meta['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));d.text((x+6,y+6),f"{v['bilde']}, faktisk kilde frame{meta['bildeframe']}",fill='white')
+ board.save(R/f'kildeposer-i-motor-{page+1}.png')
+(R/'kildevisning.json').write_text(json.dumps(dict(native_grunnlag=2305,hd_mod_sha='eb9f340b78e0ddb912ee959e0ddbbb1a0c4dea25',jobber=5,malruter=24,ulike_hele_kilder=15,malruter_motorobservert=24,ekte_siste_ruter_i_blandet_job18=sorted(tail),alle_28_gyldige_ruter_observert=True,kontroller=80,nullkontroller=80,binar_sha256=base['binar_sha256'],aktor=6,pos=[159,101],scale=255,clip=0,animasjon=7,elevasjon_original=1,elevasjon_test=0,naturlig_gjennomspilling=False,bildekall=0,ny_grafikk=False,tegnede_ruter=draws),ensure_ascii=False,indent=2)+'\n')
+with zipfile.ZipFile(R/'grunnlagsmotorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:z.write(O/'baseline344-anim7/scummvm.log','baseline344-anim7/scummvm.log')
+(R/'KILDEGRUNNLAG.md').write_text('''# Sam holder og kaster den lilla auberginen, gyldig chore7
+
+Fem hele gyldige jobber13..17 har24 ruter fra15 ulike hele kilder.1830 er Sams hode/øvre kropp og den smale høyre jakkedelen,med en logisk rektangulær utsparing for nedre venstre kropp,hånd og frukt. Lag15 delene1931..1952 fyller denne handlingen;1931..1939 har like hele kildeutsnitt. Frukten holdes,roteres,kastes og fanges. Både løse frukt-/bladformer og hånd/jakke-/slipsfragmenter skal bevares,og møtes uten en ny mørk strek ved den interne lagsømmen. Se jobb13 sammen med alle hånd-/fruktposene i motoren. Ingen ny prop eller ansiktsvariant på skjønn.
+
+Alle fem originalark er sett. Samme rom92/lokalt201,aktør6 ved159,101,scale255,clip0,kamerax160. Den nye gyldige chore7-grunnlagsprøven med2305-modden observerer alle24 mål pluss de fire ekte sluttrutene1954..1957 i blandet jobb18.80 skjermbufferkontroller uten avvik medadfdf7fc-binæren. Originalelevasjon1 mot testkrok0 er dokumentert. Ikke naturlig gjennomspilling. De to kildekontaktarkene er valgt fra faktisk tegning f+4,ikke oppstart.
+
+Bruk godkjent Sam-master og den kontrollerte varme344/345-stilen. Brun drakt/hatt,oransje hud,kremfarget skjorte og gråsvart slips. Cyan er bare polstring;lilla aubergine og grønne blader skal være opake med rene kanter. Bevar alle fingre og intern rektangelskjøt med egen generert alfa,ikke en hard originalsilhuettmaske. Søk etter kildeidentiske tidligere tegninger før kall. Eksakt rektangelsøk mot første elleve hele344-poser ga0 av15 treff;ikke klipp de gamle figurene vilkårlig for å fylle nye poser. Se eksakte-rektangelkilder.json.
+
+Raw32/animasjon8 har påvist kildefeil,og er ikke motorprøvd eller produsert. Job18 blander fire ekte sluttposer frachore7 med feilutledet148. De fire ekte er sett i den gyldige prøven og må behandles separat eller gjennom avgrenset testet kilde-/pipeline-PR før hele jobb18 kan leveres.15 hele jobber19..33 er ugyldige. Se KILDEFEIL.md. Ikke gjenta raw32 eller raw36,og ikke gjør blind global numAnim-endring.
+
+Ingen nye bildekall eller resultater i denne bunken ennå. Fellespakken2283 er kontrollert og publisert,22 bak den nye2305-modden. Ikke gjenta pakken eller de tolv ferdige figurarkene.
+''')
+shutil.copy2(__file__,R/'kildevisning.py.txt');print('Neste24 mål og fire ekte sluttposer observert i gyldig chore7;80 nullkontroller. To kontaktark skal ses før produksjon.')

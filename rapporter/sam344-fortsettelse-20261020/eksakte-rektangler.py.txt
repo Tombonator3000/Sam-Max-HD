@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam344-fortsettelse-20261020';old=A/'rapporter/sam344-foerste-20261020';q=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];parents=json.loads((old/'ruteplan-utvidet.json').read_text())['ruter'];source={v['bilde']:np.array(Image.open(P/'work/extract/costumes'/f'{v["bilde"]}.png').convert('RGBA')) for v in parents};rows=[]
+for v in q:
+ s=np.array(Image.open(P/'work/extract/costumes'/f'{v["bilde"]}.png').convert('RGBA'));h,w=s.shape[:2];colors,counts=np.unique(s.reshape(-1,4),axis=0,return_counts=True);opaque=np.where(colors[:,3]>0)[0];ci=min(opaque,key=lambda i:counts[i]);color=colors[ci];sy,sx=np.argwhere((s==color).all(2))[0];matches=[]
+ for name,t in source.items():
+  if t.shape[0]<h or t.shape[1]<w:continue
+  for ty,tx in np.argwhere((t==color).all(2)):
+   y,x=int(ty-sy),int(tx-sx)
+   if x<0 or y<0 or y+h>t.shape[0] or x+w>t.shape[1]:continue
+   if np.array_equal(s,t[y:y+h,x:x+w]):
+    proto=old/(name+'-prototype.png');matches.append(dict(representant=name,kilderekt=[x,y,w,h],foreldre_original_rgba_sha256=hashlib.sha256(t.tobytes()).hexdigest(),prototype=str(proto.relative_to(A)),prototype_sha256=hashlib.sha256(proto.read_bytes()).hexdigest(),kilde_crop_rgba_sha256=hashlib.sha256(s.tobytes()).hexdigest()));break
+ rows.append(dict(bilde=v['bilde'],kildejobb=v['kildejobb'],native_original_rgba_sha256=hashlib.sha256(s.tobytes()).hexdigest(),treff=matches))
+(R/'eksakte-rektangelkilder.json').write_text(json.dumps(dict(ruter=rows,ulike_kilder=len(rows),eksakt_treff=sum(bool(v['treff']) for v in rows),merknad='Bare kildeundersøkelse. Ingen ny prototype,resultat eller native laget. Hele rektanglet må være eksakt RGBA-likt,ingen silhuettmaske eller skjønnsmessig positurmatch. Ved eventuell bruk behold foreldremaleriets egen alfa og riktig4x-rektangel;kontroller lagsømmen sammen i motor.'),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'eksakte-rektangler.py.txt');print([(r['bilde'],r['treff'][0]['representant'] if r['treff'] else None) for r in rows])
