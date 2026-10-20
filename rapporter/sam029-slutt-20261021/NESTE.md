@@ -1,1 +1,3 @@
 Alle029_01til22/70native er ferdig produsert,egenkontrollert,native mottatt,visuelt sett og motorobservert.2958native,418resultatark. Publisering/hent følger før felles Linux/Windows-samlepunkt for40nye siden2918. Ikke generer029pånytt. De13nye kildene i siste bunke er kontrollert. Nye figurer velges fra gjeldende ORDRE/GRAFIKKLISTE etter at pakken er sikret.1340resultatark gjenstår,pluss returer/katalogfeil/sluttkontroll.164_04forblir blokkert.1000kilder/3stasher uendret,ingen ny Tom-/Claude-godkjenning.
+
+Publisert og hentet 93371e4fd3e5064ad4f8a45ee87602423a848731,totalt2958native. Alle70Sam029i native. Pakker har2918 og mangler40. Frys native nå til felles Linux/Windows-samlepunkt er ferdig kontrollert.
