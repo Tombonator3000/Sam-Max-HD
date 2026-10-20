@@ -1,5 +1,14 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-20 18:47
+
+- [x] Tre hele047_01..03/25 native er publisert, hentet og med i kontrollert felles 2634:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-gang047. Ikke gjenta disse arkene eller byggene.
+- [x] Begge faktiske pakker, 20876 runtime moddfiler hver og alle 25 nye i Linux er kontrollert.384 kontroller/382 null, samme to kjente160-avvik før figurstart.132 fra 60 null, ingen nye/økte avvik. Native-frys frigitt.
+- [ ] Gjenoppta retur047_04/05,to utkastark/17 mål med FEIL, ikke importert. Les rapporter/sam047-grunnlag-20261020/utkast, retur.md og faktiske kontroller på gpt-arbeid. Ny rettingsrapport på2634-grunnlaget; ikke omkjør gamle engangshjelpere eller overskriv01..03. Bevar796 kilder/tre stasher og alle tidligere grafikkfiler. Ingen originalmasker/fallback eller senkede grenser. E01 for1805 er allerede laget i sam047-effektretur-20261020,men første hele plassering feiler;gjenoppta råbildet der før eventuelt nytt kall.
+- [ ] Deretter kildeklargjør047_06..09 og se relevant chore 8 før produksjon. Bevar Max i komposittcels og alle kildebekreftede effektlag. Ikke bruk ugyldig47-tabelloppslag36.
+- [ ] Øvrige1393 hele figurjobber, returer, katalogfeil og sluttkontroll gjenstår.365 av 1758 har resultat. Ingen ny Tom-/Claude-godkjenning; ikke kall all HD-grafikk ferdig.
+- [ ] 164_04/1943/1944 er fortsatt blokkert etter verktøyavvisning, ingen omprøve/omgåelse. Historiske overgangsrester, Windows SDL-startfeil, ekstra taggbygg, testhopp816/836 og inventarkant i rom 35 står åpne.
+
 ## Neste, oppdatert 2026-10-20 17:30
 
 - [x] Hele302,ti ark/50 native, publisert og i kontrollert felles2609: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam302. Alle tidligere grafikkfiler/releaser og tre stasher bevart. Ikke gjenta302 eller byggene.
