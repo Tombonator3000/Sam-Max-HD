@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Publisert og hentet 2026-10-20 14:28: første fem041_01 til05, grafikkilde c32a5e05fd836ef18105a342aa3ecd3977df1424, hd-mod e12660e1d39c515f705613adcb62331ac0ff4aaf,2511 native totalt. Alle20754 filer og20748 PNG-er SHA-bekreftet, alle20715 tidligere PNG-er/stier og tre stasher bevart.676 beskyttede kilder uendret.338 av1758 hele figurjobber har resultat. Alle33 nye egenkontroll/native OK, visuelt sett og motorobservert;132 nullkontroller frafigurstart, samme to tidlige160-avvik som grunnlaget. Pakker har2478 og mangler33. Neste041_06 til10 er nå kildeklargjort med16 kilder og20 nye kildehasher; alle originaler/grepsdetaljer/kildeposer sett. Bevar støtstjerner, papir og Max opp ned i Sams grep. Ingen bildekall/resultater der ennå. Ingen ny Tom-/Claude-godkjenning.
+
 Oppdatert 2026-10-20 14:23: Fig041_01 til05 er fem nye hele ark,33 native fra25 ulike hele canonical kilder. Sju innebygde bildekall, inkludert ett forkastet helruteutkast og én brukt egen malt munnretting. Sam og Max i kontorintroen, med flygende hatt, løse øre-/ansiktsdeler og papirark. Fem egenkontroller OK,33 automatisk native OK, alle33 visuelt sett og motorobservert.160 kandidatkontroller:158 null og de samme to tidlige160-avvikene ved36 som grunnlaget. Alle132 frafigurstart60 null; helprøven er ikke avviksfri. Ingen ny Tom-/Claude-godkjenning eller motor-/pipelinekode.
 
 Kandidat2511 native,20748 PNG-er,20754 filer.676 beskyttede kilder, tre stasher og alle tidligere filer bevart.338 av1758 hele figurjobber har resultat,1420 gjenstår pluss returer/katalogfeil/sluttkontroll. Publisering/hent kvitteres i sam-max-kontor041-grunnlag-20261020/mottak-publisert.json. Fellespakker har2478 og mangler33; ikke gjenta2478-bygget. Neste fem er041_06 til10,16 ruter, klargjør før nye kall. Ikke gjenta første fem.
@@ -60,7 +62,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 338 ark med resultat; 2478 publisert, 2511 i kontrollert kandidat | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 338 ark med resultat; 2511 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
