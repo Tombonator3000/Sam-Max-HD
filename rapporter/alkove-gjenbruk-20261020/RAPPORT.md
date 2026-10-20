@@ -15,3 +15,5 @@ Alle17 er visuelt sett i to original/native/motor-kontaktark og tre hele motorbi
 Ingen ny Tom-/Claude-godkjenning eller interaktiv Windows-/webtest. Fellespakken sam-max-hd-2026-10-20-natt har2134 native,82 bak etter denne publiseringen. Pakker oppdateres ved neste samlepunkt med faktisk nedlasting og kontroll.
 
 Neste fig346_27 har også et eksakt kildetreff mot1808, men er animasjon9/retning0 og krever egen observasjon av rute656. Ingen resultatfil eller leveringspåstand for27 i denne bunken. Bruk eksisterende testkroker og kildeskript; ikke anta at valgt animasjon9 med fast høyrevendt retning dekker den. Senere346-jobber og Max-nærbilder gjenstår. Automatisk fortsettelse er aktiv, gammel nattkontroll forblir pauset.
+
+Faktisk publisering/hent bekreftet: kilde 3912fe5dac74fce9ada70e88283ac93d3b8ac959,hd-mod 482f0e52f6a59ed383d84a2ca3e9e0ea1f6fc056,2216 native totalt. Alle20452 kandidat-PNG-er, alle20435 gamle PNG-er og17 nye native-SHA-er stemmer. Alle20441 gamle filstier,36 nye+40 tidligere beskyttede jobbfiler og tre stasher bevart. Pakker2134 fortsatt82 bak. Se mottak-publisert.json.

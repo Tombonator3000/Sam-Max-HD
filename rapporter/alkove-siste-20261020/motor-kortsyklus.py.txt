@@ -1,0 +1,19 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,re,os,subprocess
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/alkove-siste-20261020';R=P/'work/.gpt-gren/rapporter/alkove-siste-20261020';pkg=P/'out/felles-release-20261019-natt/linux/squashfs-root';binary=pkg/'usr/bin/scummvm';data=pkg/'usr/share/sam-max-hd';mod=P/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert json.loads((mod/'mod.json').read_text())['costume_cels']==2216
+settings={39:(7,'130,174',29,0,'synlig diagnose, kildepos ikke utledet'),113:(25,'119,177',29,0,'kildepos i lokalt207'),295:(56,'64,142',29,1,'kildepos/clip i lokalt210/211'),346:(92,'159,101',6,0,'kildepos/aktor i lokalt201')}
+def run(case):
+ c,anim=case;room,pos,actor,clip,meaning=settings[c];target=O/f'baseline{c}-retningssyklus-kort';assert not target.exists();target.mkdir();home=target/'home';home.mkdir();saves=target/'saves';saves.mkdir()
+ for p in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+ env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(pkg/'usr/lib'),'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(mod),'DIGHD_VERIFY':'1','DIGHD_QUIT_AT':'320','DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'4','DIGHD_DUMP_FLAT':'1','DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0','DIGHD_TEST_ROOM':str(room),'DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':str(c),'DIGHD_TEST_ACTOR':str(actor),'DIGHD_TEST_CLIP':str(clip),'DIGHD_TEST_CHORE_EVERY':'4','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':pos,'DIGHD_TEST_CAMX':'160','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)})
+ command=[str(binary),'--config='+str(target/'scummvm.ini'),'--path='+str(data/'game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+ with(target/'scummvm.log').open('wb') as f:code=subprocess.run(command,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120).returncode
+ assert code==0;log=(target/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];drawn=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*'+str(c),log)));row=dict(scene=target.name,kostyme=c,rom=room,animasjon=anim,pos=pos,camx=160,aktor=actor,clip=clip,kontekst=meaning,kontroller_med_frame=checks,tegnede_ruter=drawn,dumps=len(list(target.glob(f'frame_*_room{room:03d}.png'))),exit=code,binar_sha256=sha(binary));assert checks and row['dumps'];row['avvik_fra_figurstart']=[p for p in checks if p['frame']>=40 and p['avvik']];(target/'kvittering.json').write_text(json.dumps(row,indent=2)+'\n')
+ board=Image.new('RGB',(1920,850),'#243340');d=ImageDraw.Draw(board)
+ for i,f in enumerate((64,76,92,108,140,196)):
+  path=target/f'frame_{f:06}_room{room:03d}.png';assert path.is_file();im=Image.open(path).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));d.text((x+5,y+5),f'kostyme{c} anim{anim}, frame{f}, grunnlag2216',fill='white')
+ board.save(R/f'grunnlagsmotor-{c}-retningssyklus-kort.png');print(c,anim,len(drawn),'ruter','avvik',[(d['frame'],d['avvik']) for d in checks if d['avvik']],flush=True);return row
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,[(346,-1)]))
+(R/'motor-baseline-kortsyklus.json').write_text(json.dumps(rows,indent=2)+'\n');shutil.copy2(__file__,R/'motor-kortsyklus.py.txt')

@@ -1,0 +1,38 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/alkove-siste-20261020';O=P/'out/alkove-siste-20261020';R.mkdir();O.mkdir();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();hist={}
+for folder,commit in [('bestilling12-20261020','253f10b7ca1ca9e7f7a0fea20bb92993d3d05db9'),('alkove-fortsettelse-20261020','33ac0406607f5b8a9ee486d7620e3037f896e7ad')]:
+ r=A/'rapporter'/folder
+ for v in json.loads((r/'ruteplan-unik.json').read_text())['ruter']:hist[(tuple(v['rekt'][2:]),v['rgba_sha256'])]=(r,v,commit)
+rows=[];protected={};unics={};matches=[]
+for n in range(27,44):
+ job=f'fig346_{n:02}';d=A/'jobber'/job;assert not(d/'resultat.png').exists() and not(d/'retur.md').exists();j=json.loads((d/'jobb.json').read_text());source=Image.open(d/'original_1x.png').convert('RGBA');rows.append(dict(jobb=job,ruter=len(j['ruter']),rom=92,kostyme=346,animasjoner=sorted({c['animasjon'] for c in j['ruter']}),bunkemerke='A' if n<=36 else 'B'))
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:protected[f'jobber/{job}/{f}']=sha(d/f)
+ for c in j['ruter']:
+  x,y,w,h=c['rekt'];src=source.crop((x,y,x+w,y+h));dig=hashlib.sha256(src.tobytes()).hexdigest();key=(src.size,dig);assert key in hist;oldR,old,commit=hist[key];proto=oldR/(old['bilde']+'-prototype.png')
+  if key not in unics:unics[key]=dict(bilde=c['bilde'],kildejobb=job,rekt=c['rekt'],rgba_sha256=dig,malruter=[])
+  unics[key]['malruter'].append(dict(jobb=job,bilde=c['bilde'],rekt=c['rekt'],animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']))
+  native=P/'mods/gpt/costumes'/f"{old['bilde']}_hd.png";assert native.exists()
+  matches.append(dict(jobb=job,bilde=c['bilde'],eksakt_kildeforgjenger=old['bilde'],prototype_fil=str(proto.relative_to(A)),prototype_sha256=sha(proto),kilde_rgba_sha256=dig,kildecommit=commit,native_fil=str(native.relative_to(P/'mods/gpt')),native_sha256=sha(native),animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']))
+for name,v in [('klargjort.json',rows),('beskyttede-kilder.json',protected),('ruteplan-unik.json',dict(ruter=list(unics.values()))),('eksakte-tidligere-kilder.json',dict(ruter=matches))]:(R/name).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+assert len(matches)==44 and len(protected)==68
+base={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in (P/'mods/gpt').rglob('*') if p.is_file()};assert json.loads((P/'mods/gpt/mod.json').read_text())['costume_cels']==2216;assert subprocess.check_output(['git','rev-parse','origin/hd-mod'],cwd=P,text=True).strip()=='482f0e52f6a59ed383d84a2ca3e9e0ea1f6fc056';(R/'grunnlag-filer-482f0e52.json').write_text(json.dumps(base,indent=2)+'\n')
+for page in range(4):
+ subset=rows[page*5:page*5+5];b=Image.new('RGB',(1560,555*((len(subset)+1)//2)),'#3d454b');d=ImageDraw.Draw(b)
+ for i,row in enumerate(subset):
+  im=Image.open(A/'jobber'/row['jobb']/'original_1x.png').convert('RGB');im=im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST);b.paste(im,(i%2*780+12,i//2*555+35));d.text((i%2*780+12,i//2*555+10),row['jobb'],fill='white')
+ b.save(R/f'originalreferanser346-del{page+1}.png')
+for n in ['kildeskript-rom_092-inngang.txt','kildeskript-rom_092-lokal_201.txt']:shutil.copy2(A/'rapporter/alkove-fortsettelse-20261020'/n,R/n)
+(R/'KLARGJORT.md').write_text(f'''# Siste del av346, klargjøring
+
+Fig346_27 til43,44 runtime fra{len(unics)} ulike hele kilder. Alle44 er eksakt like tidligere genererte/kontrollerte kilder med SHA-festet prototype og eksisterende native. Grunnlag482f0e52,2216 native,68 beskyttede jobbfiler. Ingen nye bildekall, resultat.png eller notat.md i disse17 jobbene.
+
+Produser i to bunker: A har27 til36 (ti ark,27 ruter), B har37 til43 (sju ark,17 ruter). Gjenbruk eksakt kildefestet generert alfa og native, med egne rutekart, egenkontroll og mottak. Ingen originalsilhuettmasker, ingen nytegning av samme motiv. Sam i varm brun/orange alkove, rom92, kildepos159,101,aktør6,clip0. Alle17 jobber er animasjon9/retning0, andre lag enn forrige forløp.
+
+Motorobservasjon må bekrefte disse rutenumrene i riktig forløp. Fastsatt animasjon velger retning2 i eksisterende motor-testkrok, så ikke anta at det dekker9/0. En grunnlagsprøve med valgt9 prøves først. Hvis den ikke tegner44 mål, bruk eksisterende retningssyklus med tilstrekkelig tid, ikke endre motoren eller påstå observasjon. Se motor-baseline.json når prøven er ferdig.
+
+Modden har2216, felles Linux-/Windows-pakke2134 er82 bak. Gammel nattkontroll forblir pauset. Ikke gjenta346_01 til26 eller tidligere avviste110/246-jobber.
+''');shutil.copy2(__file__,R/'klargjor.py.txt')
+s=(P/'out/alkove-gjenbruk-20261020/motor-baseline.py').read_text().replace('alkove-gjenbruk-20261020','alkove-siste-20261020').replace('==2199','==2216').replace('grunnlag2199','grunnlag2216').replace('[(346,7)]','[(346,9)]');(O/'motor-baseline.py').write_text(s)
+print(len(rows),'jobber',len(matches),'runtime',len(unics),'ulike, alle eksakt tidligere kildetreff')
