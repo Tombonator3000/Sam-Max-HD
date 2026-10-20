@@ -7,3 +7,5 @@ Neste er fig347_06 til 10, 36 native koblinger fra 15 ulike hele kilder. Ingen b
 Den gamle hjertekonturen etter objekt 901 forsvinner i klassisk visning, men står fortsatt i HD. Forsøket med native tomtilstand er avvist og fjernet. Ikke publiser den objektvarianten. Se HJERTEREST.md. Avgrenset objekt-/motorfeilsøking og eventuell testet PR må prioriteres før neste samlepakke. Pakkene 2333 er 30 native bak 2363-kandidaten. Oppdater Linux og Windows samlet ved neste praktiske samlepunkt etter resten av 347. Ikke gjenta de ferdige 2333-byggene.
 
 Bevar alle tidligere native, beskyttede kilder og tre stasher. Ingen raw28/32/36. Gammel nattkontroll er pauset; den aktive grafikkautomatikken fortsetter.
+
+Publisert og hentet 2026-10-20 07:22: 8b27f6ea89f0790262868506a76cee369c360154, 2363 native. Kilde 3756138ff1b1b610e050e6988043015967a259ec. Hele SHA-kontrollen bestått. Fortsett de fem gjenstående 347-arkene; ikke gjør de første fem om igjen.

@@ -7,3 +7,5 @@ Innebygd image_gen, tre faktiske kall for fem ark, med råbilder, argumenter, pr
 Alle 30 ruter i bunken består egenkontroll og native mottak, og er sett som original/native/motor. De endelig rensede filene er observert i både gyldig chore 1 og rommets egne skript. 320 sluttbufferkontroller er null. Målrettet motorprøve med romhopp, ikke naturlig gjennomspilling eller ny Tom-/Claude-godkjenning. Den eldre hjertekonturen etter objekt 901 er fortsatt åpen og dokumentert separat i HJERTEREST.md.
 
 Resultat SHA256: 92b9ae9d27730f41ae7973466cad3066da8ad2aaf694da3740b4127c3442a2a2. Rutekart: rapporter/aubergine347-grunnlag-20261020/rutekart-fig347_02.json. Publisering og hent bekreftes i mottak-publisert.json. Linux-/Windows-pakken med 2333 native inneholder ennå ingen av disse 30.
+
+2026-10-20 07:22: Publisert og hentet i hd-mod 8b27f6ea89f0790262868506a76cee369c360154. Kildecommit 3756138ff1b1b610e050e6988043015967a259ec. Alle native PNG-hasher er kontrollert etter hent. Ingen ny Tom-/Claude-godkjenning. Pakkene er fortsatt 2333.
