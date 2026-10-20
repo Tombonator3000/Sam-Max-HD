@@ -1,0 +1,27 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from smhd import gamedata,v6grafikk
+import json,hashlib,struct,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;S=A/'rapporter'/O.name;S.mkdir(exist_ok=True);R=A/'rapporter/sam047-grunnlag-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();protected=json.loads((R/'beskyttede-samlet.json').read_text());assert len(protected)==796 and all(sha(A/f)==h for f,h in protected.items());base=json.loads((R/'publiserte-moddfiler-2634.json').read_text());assert all(sha(P/'mods/gpt'/f)==h for f,h in base.items());rows=[];unique={};aliases={}
+for i in range(1,10):
+ J=A/f'jobber/fig047_{i:02}';j=json.loads((J/'jobb.json').read_text())
+ if i>=6:
+  assert not(J/'resultat.png').exists()
+  for name in ['jobb.json','prompt.txt','original_1x.png','referanse.png']:protected[(J/name).relative_to(A).as_posix()]=sha(J/name)
+ for c in j['ruter']:
+  src=P/'work/extract/costumes'/(c['bilde']+'.png');im=Image.open(src).convert('RGBA');key=(im.size,hashlib.sha256(im.tobytes()).hexdigest());rep=aliases.setdefault(key,c['bilde'])
+  if i<6:continue
+  v=unique.setdefault(key,dict(bilde=c['bilde'],kildejobb=j['id'],rekt=c['rekt'],canonical_rgba_sha256=key[1],canonical_fil_sha256=sha(src),hel_alias_publisert=rep if rep!=c['bilde'] else None,malruter=[]));v['malruter'].append(dict(jobb=j['id'],bilde=c['bilde'],rekt=c['rekt'],animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']));rows.append(c)
+assert len(rows)==32 and len(protected)==812
+found=json.loads((R/'COST047-tabellgrenser.json').read_text())['COST_offset'];d,_=gamedata.load(P/'game/SAMNMAX.001');size=gamedata.be32(d,found+4);blob=d[found+8:found+size];num_anim=blob[6];ncol=32 if blob[7]&127 in(0x59,0x61) else 16;offsets=8+ncol+34;table=[]
+for raw in sorted({r['animasjon']*4+r['retning'] for r in rows}):
+ assert raw<num_anim;off=struct.unpack_from('<H',blob,offsets+2*raw)[0];assert offsets+num_anim*2<=off<len(blob);table.append(dict(raw=raw,offset=off))
+c=v6grafikk.decode_costume(d,found);valid={cel for an in c.animations if an['valg']<num_anim for cel in an['ruter']};assert {r['rute'] for r in rows}<=valid
+(S/'beskyttede-samlet.json').write_text(json.dumps(protected,indent=2)+'\n');(S/'ruteplan-unik.json').write_text(json.dumps(dict(ruter=list(unique.values())),ensure_ascii=False,indent=2)+'\n');(S/'COST047-tabellgrenser.json').write_text(json.dumps(dict(COST_offset=found,COST_size=size,num_anim=num_anim,data_offsets=offsets,brugte_oppslag=table,dekoderadvarsler=c.errors,alle32_gyldige=True,ugyldig36_ikke_brukt=True),ensure_ascii=False,indent=2)+'\n')
+(S/'grunnlag-produksjon.json').write_text(json.dumps(dict(native_sha=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0],art_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),native=2634,figurjobber_etter_returer=367,stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines(),filer=base),indent=2)+'\n')
+for page in range(2):
+ board=Image.new('RGB',(1536,540),'#344556');dr=ImageDraw.Draw(board)
+ for k,i in enumerate(range(6+page*2,8+page*2)):
+  ref=Image.open(A/f'jobber/fig047_{i:02}/referanse.png').convert('RGB').resize((768,512),Image.Resampling.NEAREST);board.paste(ref,(k*768,28));dr.text((k*768+8,8),f'fig047_{i:02} originalreferanse',fill='white')
+ board.save(S/f'originalreferanser-side{page+1}.png')
+shutil.copy2(__file__,S/'klargjor-kilder.py.txt');print('32mal',len(unique),'ulike canonical',len(protected),'beskyttet',table,c.errors)

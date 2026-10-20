@@ -1,0 +1,144 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib, json, shutil, subprocess, zipfile
+import numpy as np
+from PIL import Image
+from smhd.myk import _iou, CORE, GOOD_IOU, GOOD_COVER
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+S = A / 'rapporter' / O.name
+E = A / 'rapporter/sam047-effektretur-20261020'
+C = O / 'mod-sam047-slutt'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+resolve = lambda f: Path(f) if Path(f).is_absolute() else A / f
+
+protected = read(S / 'beskyttede-samlet.json')
+assert len(protected) == 812
+assert all(sha(A / f) == h for f, h in protected.items())
+base = read(S / 'grunnlag-produksjon.json')
+assert subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines() == base['stash']
+files = read(S / 'kandidatfilhash.json')
+actual = {p.relative_to(C).as_posix(): sha(p) for p in C.rglob('*') if p.is_file()}
+assert actual == files and len(files) == 20926
+assert {f for f, h in base['filer'].items() if files[f] != h} == {'mod.json'}
+assert sum(f.endswith('.png') for f in files) == 20920
+assert read(C / 'mod.json')['costume_cels'] == 2683
+assert (CORE, GOOD_IOU, GOOD_COVER) == (128, .6, .8)
+
+native = read(S / 'native-fast4x-samlet.json')
+rows = native['ruter']
+assert len(rows) == len({v['bilde'] for v in rows}) == 49
+assert set(files) - set(base['filer']) == {v['fil'] for v in rows}
+for v in rows:
+    assert sha(C / v['fil']) == v['sha256']
+    assert sha(resolve(v['prototype'])) == v['prototype_sha256']
+    a = np.array(Image.open(C / v['fil']).convert('RGBA'))
+    proto = np.array(Image.open(resolve(v['prototype'])).convert('RGBA'))
+    assert np.array_equal(a[:, :, 3], proto[:, :, 3])
+    assert not a[a[:, :, 3] == 0, :3].any()
+    assert not ((a[:, :, 0] > 220) & (a[:, :, 1] < 100) & (a[:, :, 2] > 220) & (a[:, :, 3] > 0)).any()
+    src = np.array(Image.open(P / 'work/extract/costumes' / (v['bilde'] + '.png')).convert('RGBA'))
+    assert hashlib.sha256(src.tobytes()).hexdigest() == v['canonical_rgba_sha256']
+    h, w = src.shape[:2]
+    assert a.shape[:2] == (h * 4 + 16, w * 4 + 16)
+    iou, coverage = _iou(a[:, :, 3] >= CORE, np.repeat(np.repeat(src[:, :, 3] > 0, 4, 0), 4, 1), -8, -8)
+    assert iou >= GOOD_IOU and coverage >= GOOD_COVER
+    assert v['hard_originalmaske'] is False and v['originalfragment_fallback'] is False
+assert sum(bool(v['eksakt_helt_alias']) for v in rows) == 16
+native.pop('nye_hele_canonical_malerier', None)
+native.update(hele_canonical_kilder_nye_i_native=33, nye_malerier_denne_okten=31,
+              tidligere_egne_prototyper_gjenbrukt=2, tidligere_egne_prototyper=[1804, 1991])
+save(S / 'native-fast4x-samlet.json', native)
+
+raw_calls = []
+for R, expected in [(E, 13), (S, 6)]:
+    dirs = sorted(p for p in (R / 'kall').iterdir() if p.is_dir() and (p / 'argumenter.json').exists())
+    assert len(dirs) == expected
+    for d in dirs:
+        args = read(d / 'argumenter.json')
+        assert args['transparent_background'] is True
+        assert (d / 'prompt-faktisk.txt').read_text().rstrip('\n') == args['prompt'].rstrip('\n')
+        assert sha(d / 'raa.png') == read(d / 'raabilde.json')['sha256']
+        refs = read(d / 'referansehasher.json')
+        refs = list(refs.items()) if isinstance(refs, dict) else [(x['fil'], x['sha256']) for x in refs]
+        assert all(sha(resolve(f)) == h for f, h in refs)
+        assert all(Path(f).exists() for f in args['referenced_image_paths'])
+        raw_calls.append(dict(kall=d.name, rapport=R.name, raabilde_sha256=sha(d / 'raa.png'),
+                              argumenter_sha256=sha(d / 'argumenter.json'), referanser=len(refs)))
+
+deliveries = []
+warnings = 0
+for R in [E, S]:
+    progress = read(R / 'fremdrift.json')
+    for v in progress['leveranser']:
+        assert sha(A / v['resultat']) == v['sha256']
+        assert Image.open(A / v['resultat']).size == (1536, 1024)
+        route = read(A / v['rutekart'])[v['jobb']]
+        assert route['sha256_resultat'] == v['sha256'] and len(route['ruter']) == v['ruter']
+        result = (R / (v['jobb'] + '-egenkontroll.txt')).read_text()
+        assert 'Utfall: FEIL' not in result
+        warnings += sum(line.startswith('SJEKK ') for line in result.splitlines())
+        v.update(visuelt_kontrollert=True, native_mottatt=True, motorobservert=True,
+                 publisert=False, i_fellespakke=False, godkjent_av_Tom=False, claude_kontroll=False)
+        deliveries.append(v)
+    n = sum(v['ruter'] for v in progress['leveranser'])
+    progress.update(native_mottatt=n, motorobservert=n, visuelt_kontrollert=True,
+                    importert=True, publisert=False, i_fellespakke=False)
+    save(R / 'fremdrift.json', progress)
+assert len(deliveries) == 6 and sum(v['ruter'] for v in deliveries) == 49 and warnings == 23
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 371
+
+motor = read(S / 'motorproeve.json')
+assert motor['sett'] == motor['forventede'] and len(motor['sett']) == 49
+assert motor['mangler'] == [] and motor['ingen_nye_eller_okte_avvik'] is True
+assert sum(v['kontroller'] for v in motor['par']) == 160
+assert sum(v['null'] for v in motor['par']) == 158
+assert sum(len(v['fra_foerste_tegning']) for v in motor['par']) == 132
+assert all(x['avvik'] == 0 for v in motor['par'] for x in v['fra_foerste_tegning'])
+assert all(v['avvik'] == [dict(frame=36, avvik=160)] for v in motor['par'])
+for i in range(2):
+    assert motor['runder'][i]['kontroller'] == motor['runder'][i + 2]['kontroller']
+    assert motor['runder'][i]['binar_sha256'] == motor['runder'][i + 2]['binar_sha256']
+assert all(v['utenfor_nye_cels_og_marg'] == 0 for v in read(S / 'pikselkontroll.json'))
+observed = read(S / 'motorobservasjoner.json')
+assert observed['sett'] == 49 and not observed['mangler']
+assert all(sha(Path(v['fil'])) == v['sha256'] for v in observed['tegninger'].values())
+viewed = [S / f'original-native-motor-side{i}.png' for i in range(1, 11)]
+viewed += [S / v['fil'] for v in read(S / 'hele-motorbilder.json')]
+viewed += [S / f'foer-etter-ch{ch}-{frame}.png' for ch, frame in [(7, 92), (7, 112), (8, 104)]]
+assert len(viewed) == 25
+visual = dict(sett_i_chat=True, filer={p.relative_to(S).as_posix(): sha(p) for p in viewed},
+              original_native_motor=49, hele_motorbilder=12, foer_etter=3,
+              ogsaa_sett_hele_resultatark=6, ogsaa_sett_unike_malerisammenligninger=23,
+              merknad='Tvungen aktor4. Normalaktor2/3 ikke skjult: ekstra Max i testbildet er testoppsett, ikke bakt inn i celen. Ikke naturlig gjennomspilling.')
+save(S / 'visuell-kontroll.json', visual)
+with zipfile.ZipFile(S / 'motorlogger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+    for name in ['kilde047-anim7', 'kilde047-anim8', 'kandidat047-anim7', 'kandidat047-anim8']:
+        for f in ['scummvm.log', 'scummvm.ini', 'kvittering.json']:
+            z.write(O / name / f, name + '/' + f)
+report = dict(kontroll_utc=datetime.now(timezone.utc).isoformat(), beskyttede=812, stasher=base['stash'],
+              figurjobber=371, figurjobber_totalt=1758, gjenstar=1387, nye_ark=6, nye_native=49,
+              native_totalt=2683, kandidatfiler=20926, kandidat_png=20920, bildekall_med_raa=19,
+              nye_kall_denne_okten=18, tidligere_kall_gjenopptatt=1, brukte_kall=15, ubrukte_kall=['E01', 'E08', 'E09', 'E09R'],
+              nye_hele_malerier=31, tidligere_egne_prototyper=2, hele_canonical_kilder=33, eksakte_hele_aliasmaal=16,
+              hele_ark_OK=1, hele_ark_SJEKK=5, omrissvarsler=23, automatisk_native_OK=49,
+              automatisk_originaltillegg_kun_kontrollkopier=7, native_egen_alfa_ingen_originalfragment=True,
+              liten_1818='4 originale grå piksler, bevart som egen 4x-tegning. Hoppes over av ark-kontrollens SMALL-grense, manuelt og native kontrollert.',
+              kontroller=160, null=158, null_fra60=132, nye_eller_okte_avvik=0,
+              visuelt_sett=True, motorobservert=49, publisert=False, i_fellespakke=False,
+              godkjent_av_Tom=False, claude_kontroll=False, råkall=raw_calls)
+save(S / 'sluttkontroll.json', report)
+for v in deliveries:
+    p = A / 'jobber' / v['jobb'] / 'notat.md'
+    p.write_text(p.read_text().rstrip() + '\n\nSluttkontroll 20. oktober: hele arket, alle nye original/native/motor-utsnitt og relevante hele motorbilder er visuelt sett. Samlet49 native mottatt og motorobservert,160 kontroller158 null,samme to160-avvik ved36 før figurstart;132 fra60null. Ingen nye/økte avvik. Egenkontrollens23 omrissvarsler samlet er beholdt.1818 er manuelt/native kontrollert selv om ark-kontrollen hopper over den lille celen. Publisering og pakker dokumenteres i sam047-slutt-20261020/mottak-publisert.json og eget fellespakkebevis. Ingen ny Tom-/Claude-godkjenning.\n')
+    if v['jobb'] in ['fig047_04', 'fig047_05']:
+        p = A / 'jobber' / v['jobb'] / 'retur.md'
+        p.write_text(p.read_text().rstrip() + '\n\nCodex20.oktober: FEIL-utkastet er erstattet med kildeavklarte egne malerier. Hele arket har nå SJEKK,ingen FEIL. Returens mål er native mottatt,visuelt sett og motorobservert i samlet49-prøve. Tidligere feilutkast er bevart i rapportene. Ingen ny Tom-/Claude-godkjenning.\n')
+(E / 'NESTE.md').write_text('Retur047_04/05 er ferdig rettet,17 av49 nye mål native mottatt,visuelt sett og motorobservert. Alle seks ark04..09 er ferdige som grafikkleveranser. Publisering/hent og felles2683-pakker følger samlet i rapporter/sam047-slutt-20261020. Ikke gjenta returene eller de25 tidligere publiserte047-rutene. Neste ordinære jobb fig251_01 må kildeklargjøres.164_04 er fortsatt blokkert,ingen omprøve.\n')
+(S / 'NESTE.md').write_text('Seks hele ark047_04..09,49nye native,er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert. Publisering/hent og kontrollert felles2683 gjenstår til kvitteringene finnes. Ikke gjenta disse seks eller gamle047_01..03.371 av1758 resultatark,1387 gjenstår pluss returer/katalogfeil/sluttkontroll. Neste ordinære fig251_01..05 trenger kildeskript,motorkontekst og stilreferanser før nytegning.164_04 fortsatt blokkert,ingen omprøve.\n')
+shutil.copy2(__file__, S / 'kontroller.py.txt')
+print('PASS: 6ark/49native/371resultater/812kilder/3stash/19raabilder,alle49sett,ingen nye motoravvik.')

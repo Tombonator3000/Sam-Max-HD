@@ -1,0 +1,1 @@
+Visuelt avvist selv om prototypen består0,6/0,8: oppdiktede mørke ovale prosjektilhoder langs hvite/grå fartstreker. Kilden1811 har ikke slike hoder. Bevares,ikke native. E08R er retting med samme beskyttede kilde.

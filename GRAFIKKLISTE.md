@@ -669,12 +669,12 @@ Figurark for Sam.
 
 - [x] `fig047_02` (figurark 2 for Sam (kostyme 47), 8 ruter: start (lag 14, tegnes over kroppen) mot høyre (3 ruter); animasjon 7 mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig047_03` (figurark 3 for Sam (kostyme 47), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_04` (figurark 4 for Sam (kostyme 47), 6 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_05` (figurark 5 for Sam (kostyme 47), 11 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_06` (figurark 6 for Sam (kostyme 47), 8 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_07` (figurark 7 for Sam (kostyme 47), 11 ruter: animasjon 8 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_08` (figurark 8 for Sam (kostyme 47), 6 ruter: animasjon 8 (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig047_09` (figurark 9 for Sam (kostyme 47), 7 ruter: animasjon 8 (lag 15, tegnes over kroppen) mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_04` (figurark 4 for Sam (kostyme 47), 6 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_05` (figurark 5 for Sam (kostyme 47), 11 ruter: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_06` (figurark 6 for Sam (kostyme 47), 8 ruter: animasjon 7 (lag 15, tegnes over kroppen) mot høyre (8 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_07` (figurark 7 for Sam (kostyme 47), 11 ruter: animasjon 8 mot høyre (11 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_08` (figurark 8 for Sam (kostyme 47), 6 ruter: animasjon 8 (lag 14, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig047_09` (figurark 9 for Sam (kostyme 47), 7 ruter: animasjon 8 (lag 15, tegnes over kroppen) mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig251_01` (figurark 1 for Sam (kostyme 251), 4 ruter: start (lag 15, tegnes over kroppen) mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig251_02` (figurark 2 for Sam (kostyme 251), 4 ruter: start (lag 15, tegnes over kroppen) mot høyre (2 ruter); animasjon 7 mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 

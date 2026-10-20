@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess,shutil
+from smhd.myk import _iou
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';E=A/'rapporter/sam047-effektretur-20261020';R=A/'rapporter/sam047-grunnlag-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();old=json.loads((R/'publiserte-moddfiler-2634.json').read_text());assert len(old)==20877;assert all(sha(P/'mods/gpt'/f)==h for f,h in old.items());protected=json.loads((R/'beskyttede-samlet.json').read_text());assert len(protected)==796 and all(sha(A/f)==h for f,h in protected.items())
+protos={};legacy={v['bilde']:v for v in json.loads((R/'prototyper.json').read_text())}
+for b in [1804,1991]:
+ v=legacy[f'costume047_{b}'];assert v['native_ok'];protos[v['bilde']]={**v,'art':R/v['prototype'],'kall':'A05' if b==1804 else 'A07R','forrige_eget_maleri':True}
+for call,suffix in [('E02',''),('E03',''),('E04','-endelig'),('E05',''),('E06',''),('E07',''),('E08R','-endelig'),('E09R2','-deler'),('E10','')]:
+ v=json.loads((E/f'prototype-{call}{suffix}.json').read_text());assert v['native_ok'],v;protos[v['bilde']]={**v,'art':E/v['prototype']}
+rep=np.array(Image.open(P/'work/extract/costumes/costume047_1797.png').convert('RGBA'));own=P/'mods/gpt/costumes/costume047_1797_hd.png';assert sha(own)==old[str(own.relative_to(P/'mods/gpt'))]
+for b in range(1985,1991):
+ src=np.array(Image.open(P/f'work/extract/costumes/costume047_{b}.png').convert('RGBA'));assert src.shape==rep.shape and np.array_equal(src,rep);protos[f'costume047_{b}']=dict(art=own,kall='A08',eksakt_helt_alias='costume047_1797',canonical_rgba_sha256=hashlib.sha256(src.tobytes()).hexdigest(),native_ok=True)
+rows=[];progress=dict(leveranser=[],bildekall_retur=len(list((E/'kall').glob('*/raa.png'))),utkast_som_ikke_er_brukt=['E01','E08','E09','E09R'],importert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False)
+for num in [4,5]:
+ job=f'fig047_{num:02}';J=A/'jobber'/job;assert not(J/'resultat.png').exists();j=json.loads((J/'jobb.json').read_text());canvas=Image.new('RGBA',(1536,1024));mapping=[]
+ for c in j['ruter']:
+  v=protos[c['bilde']];im=Image.open(v['art']).convert('RGBA');x,y,w,h=c['rekt'];assert im.size==(w*4+16,h*4+16),(c['bilde'],im.size,(w,h));dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128);src=np.array(Image.open(P/'work/extract/costumes'/(c['bilde']+'.png')).convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cov=_iou(np.array(im)[:,:,3]>=128,mask,-8,-8);assert iou>=.6 and cov>=.8
+  mapping.append(dict(bilde=c['bilde'],kostyme=47,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],prototype=str(v['art'].relative_to(A)) if v['art'].is_relative_to(A) else str(v['art']),prototype_sha256=sha(v['art']),canonical_rgba_sha256=hashlib.sha256(src.tobytes()).hexdigest(),canonical_fil_sha256=sha(P/'work/extract/costumes'/(c['bilde']+'.png')),kall=v['kall'],eksakt_helt_alias=v.get('eksakt_helt_alias'),native_marg_hd=8,egen_alpha=True,originalmaske=False,originalfragment_fallback=False,snitt_union=iou,dekning=cov))
+ T=E/'kontrollkopier'/job;T.mkdir(parents=True,exist_ok=True)
+ for n in ['jobb.json','prompt.txt','referanse.png','original_1x.png']:shutil.copy2(J/n,T/n)
+ canvas.save(T/'resultat.png');test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(T/'resultat.png')],cwd=A,text=True,capture_output=True);(E/f'{job}-egenkontroll-utkast.txt').write_text(test.stdout+test.stderr);print(test.stdout,flush=True)
+ row=dict(jobb=job,resultat=str((T/'resultat.png').relative_to(A)),sha256=sha(T/'resultat.png'),ruter=len(mapping),egenkontroll='FEIL' if test.returncode==2 else 'SJEKK' if test.returncode==1 else 'OK',laget=True,egenkontrollert=True,visuelt_kontrollert=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False)
+ (E/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=row['sha256'],ruter=mapping)},ensure_ascii=False,indent=2)+'\n');progress['leveranser'].append(row);rows+=mapping
+(E/'prototyper-endelig.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');(E/'fremdrift-arkutkast.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,E/'bygg-hele-ark.py.txt');print('native prototype bestått',len(rows))

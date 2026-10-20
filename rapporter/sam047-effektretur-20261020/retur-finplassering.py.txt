@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import _iou
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');E=P/'work/.gpt-gren/rapporter/sam047-effektretur-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(call,b,q,method,ops):
+ q[q[:,:,3]==0,:3]=0;im=Image.fromarray(q);out=E/'prototyper'/f'costume047_{b}-{call}-endelig.png';im.save(out);s=np.array(Image.open(P/f'work/extract/costumes/costume047_{b}.png').convert('RGBA'));mask=np.repeat(np.repeat(s[:,:,3]>0,4,0),4,1);iou,cov=_iou(q[:,:,3]>=128,mask,-8,-8);rec=json.loads((E/f'prototype-{call}.json').read_text());rec.update(prototype=str(out.relative_to(E)),sha256=sha(out),snitt_union=iou,dekning=cov,native_ok=iou>=.6 and cov>=.8,rettemetode=method,operasjoner=ops);(E/f'prototype-{call}-endelig.json').write_text(json.dumps(rec,ensure_ascii=False,indent=2)+'\n');board=Image.new('RGB',(1600,max(260,q.shape[0]+60)),'#445566');d=ImageDraw.Draw(board);d.text((10,8),f'{b} Original',fill='white');d.text((810,8),f'{call} eget maleri {iou:.3f}/{cov:.3f}',fill='white');z=Image.fromarray(s).resize((s.shape[1]*4,s.shape[0]*4),Image.Resampling.NEAREST);board.paste(z,(10,40),z);board.paste(im,(802,32),im);board.save(E/f'sammenligning-{call}-endelig.png');print(call,iou,cov,rec['native_ok'])
+# Align whole generated trace groups; input alpha supplies every new shape and edge.
+rec=json.loads((E/'prototype-E04.json').read_text());a=np.array(Image.open(E/rec['prototype']).convert('RGBA'));lab,n=nd.label(a[:,:,3]>=128,np.ones((3,3)));canvas=Image.new('RGBA',(748,220));ops=[]
+for ids,rect in [([1],[0,0,53,5]),([2],[55,4,26,3]),([3],[86,7,2,1]),([4],[94,8,54,5]),([5],[0,27,142,6]),([6],[146,27,15,1]),([7],[176,27,7,1]),(list(range(8,15)),[120,42,63,9])]:
+ sel=np.isin(lab,ids);yy,xx=np.nonzero(sel);gx,gy,gw,gh=int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1);dist,near=nd.distance_transform_edt(~sel,return_indices=True);allow=(dist<=2)&((lab==0)|sel);q=a.copy();q[:,:,3][~allow]=0;edge=allow&~sel;q[edge,:3]=q[near[0][edge],near[1][edge],:3];q[q[:,:,3]==0,:3]=0;x,y,w,h=rect;sx=gw/(w*4);sy=gh/(h*4);z=Image.fromarray(q).transform(canvas.size,Image.Transform.AFFINE,(sx,0,gx-(8+x*4)*sx,0,sy,gy-(8+y*4)*sy),Image.Resampling.BICUBIC);canvas.alpha_composite(z);ops.append(dict(egen_komponentgruppe=ids,egen_boks=[gx,gy,gw,gh],kilde_maalrekt=rect,affin=[sx,0,gx-(8+x*4)*sx,0,sy,gy-(8+y*4)*sy]))
+save('E04',1807,np.array(canvas),'Hele egne strekgrupper plassert med kildebekreftede samlede rektangler,ingen originalmaske',ops)
+for call,b in [('E08R',1811),('E09R',1992)]:
+ rec=json.loads((E/f'prototype-{call}.json').read_text());q=np.array(Image.open(E/rec['prototype']).convert('RGBA'));alpha=nd.maximum_filter(q[:,:,3],size=3);_,near=nd.distance_transform_edt(q[:,:,3]<128,return_indices=True);edge=alpha>q[:,:,3];q[edge,:3]=q[near[0][edge],near[1][edge],:3];q[:,:,3]=nd.gaussian_filter(alpha.astype(float),.3).clip(0,255).astype('uint8');save(call,b,q,'Egen undervektig strek styrket med1HD-piksel fra egen alfa og kantfarge,ingen originalmaske',[dict(egen_alfa_styrket_hd=1)])
+shutil.copy2(__file__,E/'retur-finplassering.py.txt')

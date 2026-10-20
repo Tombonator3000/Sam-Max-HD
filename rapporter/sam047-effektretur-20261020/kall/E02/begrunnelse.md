@@ -1,0 +1,1 @@
+E01 er vurdert i råbilde og tre plasseringer. Den har glød og avviker i tynne streker og brune detaljer. E02 ber om kildepresis,ikke lysende nytegning av samme kildemotiv. Generisk Sam-/glødeffekt-premiss tas ikke med fordi det er kildefeil. Beskyttet prompt.txt er uendret.

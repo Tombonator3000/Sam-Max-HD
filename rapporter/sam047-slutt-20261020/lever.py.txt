@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;S=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((S/'ruteplan-unik.json').read_text())['ruter'];base=json.loads((S/'grunnlag-produksjon.json').read_text());assert all(sha(P/'mods/gpt'/f)==h for f,h in base['filer'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash'];protected=json.loads((S/'beskyttede-samlet.json').read_text());assert len(protected)==812 and all(sha(A/f)==h for f,h in protected.items());assert len([f for f in (A/'jobber').glob('fig*/resultat.png') if f.parent.name not in [f'fig047_{n:02}' for n in range(6,10)]])==367
+protos={}
+for p in plan:
+ if p.get('hel_alias_publisert'):
+  f=P/'mods/gpt/costumes'/(p['hel_alias_publisert']+'_hd.png');assert sha(f)==base['filer'][str(f.relative_to(P/'mods/gpt'))];v=dict(bilde=p['bilde'],art=f,prototype=str(f),sha256=sha(f),kall='A04',native_ok=True,eksakt_helt_alias=p['hel_alias_publisert'])
+ else:
+  v=json.loads((S/(p['bilde']+'-prototype.json')).read_text());assert v['native_ok'];v['art']=S/v['prototype'];assert sha(v['art'])==v['sha256']
+ protos[p['bilde']]=v
+progress=dict(leveranser=[],nye_jobber=4,native_rutekoblinger_levert=32,nye_hele_canonical_malerier=22,eksakte_hele_aliasmaal=10,bildekall=6,raabilder=6,brukte_kall=6,grunnlag_native=2634,egen_alpha=True,originalmaske=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False);maps=[]
+for num in range(6,10):
+ job=f'fig047_{num:02}';J=A/'jobber'/job;j=json.loads((J/'jobb.json').read_text());canvas=Image.new('RGBA',(1536,1024));mapping=[]
+ for c in j['ruter']:
+  pp=next(p for p in plan if any(t['bilde']==c['bilde'] for t in p['malruter']));v=protos[pp['bilde']];src=Image.open(P/'work/extract/costumes'/(c['bilde']+'.png')).convert('RGBA');assert hashlib.sha256(src.tobytes()).hexdigest()==pp['canonical_rgba_sha256'];im=Image.open(v['art']).convert('RGBA');x,y,w,h=c['rekt'];assert im.size==(w*4+16,h*4+16);dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128)
+  mapping.append(dict(bilde=c['bilde'],kostyme=47,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],canonical_rgba_sha256=pp['canonical_rgba_sha256'],canonical_fil_sha256=sha(P/'work/extract/costumes'/(c['bilde']+'.png')),prototype=str(v['art'].relative_to(A)) if v['art'].is_relative_to(A) else str(v['art']),prototype_sha256=sha(v['art']),kall=v['kall'],eksakt_helt_alias=v.get('eksakt_helt_alias'),egen_alpha=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8))
+
+ if (J/'resultat.png').exists():
+  import io
+  buf=io.BytesIO();canvas.save(buf,format='PNG');assert hashlib.sha256(buf.getvalue()).hexdigest()==sha(J/'resultat.png')
+ else:canvas.save(J/'resultat.png')
+ digest=sha(J/'resultat.png');(S/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=mapping)},ensure_ascii=False,indent=2)+'\n');test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True);(S/f'{job}-egenkontroll.txt').write_text(test.stdout+test.stderr);print(test.stdout,flush=True);assert test.returncode in [0,1],(job,'FEIL');state='OK' if test.returncode==0 else 'SJEKK'
+  # no branch/source input is changed by this helper
+ row=dict(jobb=job,resultat=str((J/'resultat.png').relative_to(A)),sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{S.name}/rutekart-{job}.json',laget=True,egenkontroll=state,egenkontrollert=True,visuelt_kontrollert=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False);progress['leveranser'].append(row);maps+=mapping
+ (J/'notat.md').write_text(f'''# {job},2026-10-20
+Codex. Fire hele siste047-ark med32 mål,22 nye hele canonical malerier og10 eksakte hele aliasmål av allerede publisert1715. Seks innebygde image_gen-kall/seks råbilder,alle brukt,modellnavn ikke oppgitt. Faktiske prompter,referansehasher,råbilder og SHA-festet rutekart er bevart i rapporter/{S.name}. Beskyttede jobbkilder urørt.
+Kostyme047 i gangen,rom8/lokal204/chore7og8.1728 er ny komposittpose med Sam og Max,store åpen Sam-munn og Max med kort blikk/tann-grimase. Andre nye cels viser kun tynne hvite/grå fartstreker,brune splinter og svarte hull etter skuddsekvensen. Kildeforståelse,32canonical/motor-kilder og begge godkjente hoved-/stilark er sett. Fontekte2x2grå1818 beholdt;1816s firebrune kildepiksler beholdt;oppdiktet brunt i1819 er malt hvitt i egen tegning uten alfaendring.
+Egen alpha og egne kantfarger,fast4x,8HD-pikslers marg. Bare to affine plasseringsvalg per kilde,fast referanseanker eller samlet egen boks;ingen originalsilhuettmaske eller originalfragment-fallback. Originalalpha bare til analyse/kontroll. Råbilder med svak ytre glød er renset fra egen alfa før plassering. Ingen motor-/pipelinekode. Python tillatt av Tom.
+Resultat SHA256{digest}. Egenkontroll{state},ingen FEIL. Native mottak,visuell sluttkontroll,motorobservasjon,publisering og faktiske pakker føres separat. Ingen ny Tom-/Claude-godkjenning. En kjent160-pikslers overgangsrest ved36 finnes i hver tvungen kildeprøve før47start60;alle132 kontroller fra60varnull,ikke naturlig gjennomspilling. Dekodervarsel36 er et ugyldig oppslag utenfor ekte36-tabell,ikke brukt.\n''')
+(S/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');(S/'prototyper-endelig.json').write_text(json.dumps(maps,ensure_ascii=False,indent=2)+'\n')
+for page in range(math.ceil(len(plan)/4)):
+ sub=plan[page*4:page*4+4];board=Image.new('RGB',(1600,len(sub)*360),'#344556');d=ImageDraw.Draw(board)
+ for i,p in enumerate(sub):
+  v=protos[p['bilde']];src=Image.open(P/'work/extract/costumes'/(p['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);im=Image.open(v['art']).convert('RGBA');src.thumbnail((780,315));im.thumbnail((796,330));board.paste(src,(10,i*360+35),src);board.paste(im,(802,i*360+27),im);d.text((10,i*360+8),p['bilde']+' Original / eget maleri '+v['kall'],fill='white')
+ board.save(S/f'sammenligning-maleri-side{page+1}.png')
+assert all(sha(A/f)==h for f,h in protected.items());shutil.copy2(__file__,S/'lever.py.txt');print('4hele sisteark/32mål,totalt371resultatark')

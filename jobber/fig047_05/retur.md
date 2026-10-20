@@ -1,2 +1,3 @@
-## Codex egen retur 2026-10-20
-Kun disse effektmålene holdes utenfor native mottak/publisering: costume047_1810, costume047_1811, costume047_1985, costume047_1986, costume047_1987, costume047_1988, costume047_1989, costume047_1990, costume047_1991, costume047_1992, costume047_1993. De hvite sporene og treffmerkene har fortsatt for ulik silhuett/dekning. Ingen originalfragment-fallback eller senkede mottaksgrenser. Gjenoppta fra bevarte råbilder,prompter og prototyper i rapporter/sam047-grunnlag-20261020. Andre mål i arket kan importeres bare med dokumentert egenkontroll og motorprøve.
+Returen er levert som helt rettet ark med egenkontroll SJEKK uten FEIL. Native,motor,publisering og faktisk pakke må fullføres før returen kalles importert. Gamle utkast og avviste råbilder er bevart i rapportene.
+
+Codex20.oktober: FEIL-utkastet er erstattet med kildeavklarte egne malerier. Hele arket har nå SJEKK,ingen FEIL. Returens mål er native mottatt,visuelt sett og motorobservert i samlet49-prøve. Tidligere feilutkast er bevart i rapportene. Ingen ny Tom-/Claude-godkjenning.
