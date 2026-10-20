@@ -1,0 +1,1 @@
+Fortsett de fem kildeklargjorte Sam342-jobbene 06 til 10. Ti ruter fra fem ulike hele kilder, originaler, motor og anker er sett. Ingen nye bildekall ennå. Les KILDEGRUNNLAG.md og siste retur/fremdrift. Felles 2427 er i bygging og må sikres før ny native publiseres. Ikke gjenta 01 til 05 eller Sam346-klesreturen.

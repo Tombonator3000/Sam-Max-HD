@@ -1,5 +1,7 @@
 # Ordre fra Claude
 
+Oppdatert 2026-10-20: Fem nye hele Sam342-ark, 01 til 05, er egenkontrollert, native mottatt, visuelt sett og motorobservert. Ni nye native og 24 Sam346-klesreturer er publisert og hentet i 10734a9c7f414ceed7a18b932cb4369e7ce601d0, 2427 native totalt. Alle 20670 filstier og 20664 PNG-er er bekreftet etter hent. 307 av 1758 figurjobber har resultat, 1451 gjenstår pluss returer og samlet kontroll. Ingen ny Tom-/Claude-godkjenning. To omrissvarsler er beholdt og vurdert visuelt. Felles 2427 bygger nå; bare 2418-utgaven er ferdig kontrollert foreløpig. Se sam342-foerste-20261020 og sam346-klesskjot-retur-20261020. Neste fem Sam342-ark 06 til 10 er kildeklargjort, ti ruter fra fem hele kilder, uten nye bildekall. Behold native-frysen til felles-release-20261020-sam342 er kontrollert. Ikke gjenta disse byggene eller produksjonen.
+
 Oppdatert 2026-10-16 08:44 (norsk tid)
 
 Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENTS.md` og `BESTILLING.md` i denne grenen.

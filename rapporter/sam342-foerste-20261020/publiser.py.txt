@@ -1,0 +1,18 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-foerste-20261020';S=A/'rapporter/sam346-klesskjot-retur-20261020';O=P/'out/sam342-foerste-20261020';C=O/'mod-sam342-klesretur';M=P/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();base=json.loads((S/'grunnlag.json').read_text());source=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip();remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/gpt-arbeid','refs/heads/hd-mod'],cwd=P,text=True)
+assert source+'\trefs/heads/gpt-arbeid' in remote and base['native_sha']+'\trefs/heads/hd-mod' in remote
+assert all(sha(M/f)==h for f,h in base['filer'].items());proof=json.loads((R/'bevaringskontroll.json').read_text());assert proof['native_totalt']==2427 and proof['nullkontroller']==285
+subprocess.run(['bash','tools/mod_gren.sh','send',str(C)],cwd=P,check=True);subprocess.run(['bash','tools/mod_gren.sh','hent'],cwd=P,check=True)
+pub=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0];assert subprocess.check_output(['git','rev-parse','origin/hd-mod'],cwd=P,text=True).strip()==pub
+expected={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};files={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()};assert set(expected)==set(files) and len(files)==20670;assert all(files[f]==h for f,h in expected.items() if f!='SHA256SUMS');ret=json.loads((S/'kandidat02-renset.json').read_text())['ruter'];allow={'costumes/'+v['bilde']+'_hd.png' for v in ret}|{'mod.json','SHA256SUMS'};assert {f for f,h in base['filer'].items() if files[f]!=h}==allow
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash'];now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+for report in [R,S]:
+ progress=json.loads((report/'fremdrift.json').read_text())
+ for e in progress['leveranser']:
+  assert sha(A/e['resultat'])==e['sha256'];e.update(publisert=True,importert=True,hd_mod_sha=pub,kildecommit=source,i_fellespakke=False)
+  note=A/'jobber'/e['jobb']/'notat.md';note.write_text(note.read_text()+f'\n{now}: Publisert og hentet i hd-mod {pub}, kildecommit {source}. Alle runtimefiler er hashkontrollert etter hent. Fellespakken har fortsatt 2418 fram til dette samlepunktet er kontrollert. Ingen ny Tom-/Claude-godkjenning.\n')
+ (report/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');p=report/'RAPPORT.md';p.write_text(p.read_text()+f'\n{now}: Grafikken er pushet i {source}, publisert og hentet som hd-mod {pub}. Alle 20670 filstier og 20664 PNG-er er kontrollert etter hent. Nye pakker med 2427 bygges ved dette samlepunktet.\n')
+proof.update(publisert=True,hd_mod_sha=pub,kildecommit=source);(R/'bevaringskontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'publiserte-moddfiler-2427.json').write_text(json.dumps(files,sort_keys=True,indent=2)+'\n');receipt=dict(dato=now,kildecommit=source,grunnlag_hd_mod=base['native_sha'],hd_mod=pub,native=2427,nye_native=9,retur_native=24,nye_hele_jobber=5,returjobber=13,alle20670_filer_hentet=True,alle20664_PNG_SHA_bekreftet=True,tre_stasher_bevart=True,skjermbufferkontroller=285,nullkontroller=285,pakkene_native=2418,figurjobber_med_resultat=307,gjenstaar_hele_jobber=1451);(R/'mottak-publisert.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'publiser.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)

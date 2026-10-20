@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Oppdatert 2026-10-20: Fem nye hele Sam342-ark, 01 til 05, er egenkontrollert, native mottatt, visuelt sett og motorobservert. Ni nye native og 24 Sam346-klesreturer er publisert og hentet i 10734a9c7f414ceed7a18b932cb4369e7ce601d0, 2427 native totalt. Alle 20670 filstier og 20664 PNG-er er bekreftet etter hent. 307 av 1758 figurjobber har resultat, 1451 gjenstår pluss returer og samlet kontroll. Ingen ny Tom-/Claude-godkjenning. To omrissvarsler er beholdt og vurdert visuelt. Felles 2427 bygger nå; bare 2418-utgaven er ferdig kontrollert foreløpig. Se sam342-foerste-20261020 og sam346-klesskjot-retur-20261020. Neste fem Sam342-ark 06 til 10 er kildeklargjort, ti ruter fra fem hele kilder, uten nye bildekall. Behold native-frysen til felles-release-20261020-sam342 er kontrollert. Ikke gjenta disse byggene eller produksjonen.
+
 Oppdatert 2026-10-20 06:04: fig344_01 til 12 er levert i to seksarksbunker. 22 nye native er egenkontrollert, native mottatt, visuelt sett og motorobservert. Publisert og hentet i eb9f340b78e0ddb912ee959e0ddbbb1a0c4dea25, 2305 native totalt. Alle 20541 kandidat-PNG-er og 22 nye hasher stemmer, alle 20519 tidligere PNG-er og 20525 tidligere stier er bevart. 281 av 1758 figurjobber har resultat. De tre opprinnelig manglende overtegningsaliasene er også med; hele det første kastet vises i HD. Ingen ny Tom-/Claude-godkjenning. Felles Linux-/Windows-pakke er fortsatt kontrollert 2283, 22 bak modden. Ikke kall pakkene oppdatert med denne bunken eller bygg 2283 på nytt. Se rapporter/sam344-foerste-20261020/mottak-publisert.json.
 
 Neste fem gyldige jobber fig344_13 til 17 er kildeklargjort i sam344-fortsettelse-20261020: 24 ruter fra 15 ulike hele kilder. Alle fem originalark, de 15 ulike posene i motor og fire ekte sluttposer i blandet jobb18 er sett. Alle 28 er logget i gyldig chore7, 80 nullkontroller. Ingen nye bildekall/resultater der ennå. Raw32/animasjon8 er kildefeil: 40 ruter i 16 jobber, derav 15 helt ugyldige jobber19..33 og blandet jobb18 med fire ekte chore7-ruter1954..1957 og én ugyldig148. Ikke tegn eller avspill raw32, ikke endre numAnim globalt. De fire ekte sluttrutene er RGBA-identiske med1951 og kan behandles i en separat kildebekreftet tilleggsleveranse når1951 er malt. Ikke tell hele jobb18 ferdig eller legg resultat for feil148. Bevar de beskyttede jobbfiler og se KILDEFEIL.md før videre arbeid.
@@ -416,11 +418,11 @@ Figurark for Sam.
 
 - [ ] `fig029_21` (figurark 21 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_22` (figurark 22 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig342_01` (figurark 1 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter))
-- [ ] `fig342_02` (figurark 2 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
-- [ ] `fig342_03` (figurark 3 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
-- [ ] `fig342_04` (figurark 4 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
-- [ ] `fig342_05` (figurark 5 for Sam (kostyme 342), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig342_01/resultat.png`)
+- [x] `fig342_01` (figurark 1 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter))
+- [x] `fig342_02` (figurark 2 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
+- [x] `fig342_03` (figurark 3 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
+- [x] `fig342_04` (figurark 4 for Sam (kostyme 342), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
+- [x] `fig342_05` (figurark 5 for Sam (kostyme 342), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_06` (figurark 6 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_07` (figurark 7 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_08` (figurark 8 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)

@@ -1,0 +1,22 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-sam342';R=A/'rapporter/felles-release-20261020-sam342';source=A/'rapporter/sam342-foerste-20261020';O.mkdir(exist_ok=True);R.mkdir(exist_ok=True);assert not(O/'bygg-startet.json').exists()
+run=lambda args:subprocess.check_output(args,cwd=P,text=True);code=run(['git','rev-parse','HEAD']).strip();mod=json.loads((source/'mottak-publisert.json').read_text())['hd_mod'];remote=run(['git','ls-remote','origin','refs/heads/main','refs/heads/hd-mod']);assert code+'\trefs/heads/main' in remote and mod+'\trefs/heads/hd-mod' in remote;assert set(run(['git','diff','--name-only','4213c1627372ae051aa773a32a26a3e0f4ac97a6','HEAD']).splitlines())<={'memory.md','todo.md','STATUS.md','log.md'}
+prior=json.loads(run(['gh','api','repos/Tombonator3000/Sam-Max-HD/releases?per_page=100']));tag='sam-max-hd-2026-10-20-sam342';assert not any(v['tag_name']==tag for v in prior);(O/'releaser-foer-bygg.json').write_text(json.dumps(prior,indent=2)+'\n')
+for workflow in ['linux.yml','windows.yml']:
+ rows=json.loads(run(['gh','run','list','--workflow',workflow,'--limit','5','--json','databaseId,status,headSha,event']));assert all(v['status']=='completed' for v in rows),rows
+files=json.loads((source/'publiserte-moddfiler-2427.json').read_text());assert len(files)==20670;(R/'moddfiler-2427.json').write_text(json.dumps(files,sort_keys=True,indent=2)+'\n');entries=json.loads((source/'native-fast4x.json').read_text())['ruter'];assert len(entries)==9;(R/'nye-native-9.json').write_text(json.dumps(dict(tillegg=entries),ensure_ascii=False,indent=2)+'\n');shutil.copy2(A/'rapporter/sam346-klesskjot-retur-20261020/kandidat02-renset.json',R/'retur-native24.json')
+state=dict(start_utc=datetime.now(timezone.utc).isoformat(),status='bygg sendes en gang per plattform',kode=code,hd_mod=mod,native=2427,nye_native=9,retur_native=24,forrige_felles_native=2418,release_tag=tag,ingen_ny_motor_pipelinekode=True,plattform={})
+def save():
+ for d in [O,R]:(d/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+save()
+for platform in ['linux','windows']:
+ row=dict(dispatch_forsoek_utc=datetime.now(timezone.utc).isoformat(),status='sendt_venter_kvittering');state['plattform'][platform]=row;save();p=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,text=True,capture_output=True);row.update(dispatch_exit=p.returncode,stdout=p.stdout,stderr=p.stderr);save();assert p.returncode==0,(platform,p.stderr);m=re.search(r'/actions/runs/(\d+)',p.stdout);assert m,(platform,p.stdout);row.update(run_id=int(m[1]),status='queued');save();print(platform,row['run_id'],flush=True)
+old=P/'out/felles-release-20261020-max'
+for name in ['hent-status.py','hent-pakker.py','klargjor-linux.py','kontroller-pakker.py']:
+ text=(old/name).read_text().replace('felles-release-20261020-max','felles-release-20261020-sam342').replace('20660','20669').replace('2418','2427').replace('nye_native=19','nye_native=9');(O/name).write_text(text)
+(R/'PAAGAR.md').write_text('''# Fellespakke 2427 bygges
+
+Linux og Windows er sendt én gang hver. Native er fryst ved SHA i bygg-startet.json til begge bygg har sikret riktig innhold. Ni nye Sam342-ruter og 24 rettede Sam346-kleslag skal med. Den ferdige 2418-utgaven bevares og bygges ikke på nytt. Begge faktiske pakker, SHA-filer og alle 20669 runtime moddfiler per pakke skal kontrolleres før fellesutgaven kalles oppdatert. Ingen ny motor-/pipelineendring. Fortsett deretter med fig342_06, etter kilde- og motorkontroll. Gammel nattkontroll forblir pauset.
+''');shutil.copy2(__file__,R/'start-felles2427.py.txt');print(json.dumps(state,ensure_ascii=False),flush=True)
