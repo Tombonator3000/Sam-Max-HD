@@ -4,9 +4,14 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [x] 2026-10-20 13:44: Hele Sam343 er produsert, 11 ark og 22 nye native, publisert og hentet. Begge faktiske pakker i sam-max-hd-2026-10-20-sam343 er kontrollert med 2478 native og alle 20720 runtime moddfiler per pakke. 304 nullkontroller. Ikke gjenta disse byggene eller arkene.
+- [ ] Gjenoppta de fem kildeklargjorte fig041_01 til 05 etter kilde-/stilkoll. 33 ruter fra 25 hele canonical kilder; ingen bildekall eller resultater ennå. Bevar løse papirark, hatt og smådeler. Se sam-max-kontor041-grunnlag-20261020/NESTE.md.
+- [ ] Undersøk og sammenlign kildeprøvens 160-pikslers avvik ved frame 36 i rom 7, før første 041-tegning ved 60. Alle 66 kontroller fra 60 er null, men helprøven bestod ikke. Ikke endre nullgrenser eller påstå retting.
+- [ ] Rett den avgrensede Windows-workflowfeilen med ekstra taggbygg ved anledning, via testet PR. Den tidligere taggkjøringen 39410011861 feilet med kjent SDL-startfeil; ordinære nye2478-bygg bestod første forsøk.
+
 - [x] 2026-10-20 12:45: Hele Sam342, 20 ark og 38 native, er levert, kontrollert og med i fellesutgave sam-max-hd-2026-10-20-sam342-ferdig. Begge faktiske pakker og alle 20698 runtime moddfiler per pakke er bekreftet. 384 nullkontroller i faktisk Linux-pakke, begge plattformbygg bestod første forsøk. Ikke gjenta byggene.
-- [ ] Fortsett faktisk produksjon av de kildeklare fig343_01 til 05. Ti ruter fra ti hele kilder, originaler/motor/anker sett, ingen nye bildekall eller resultater ennå. Se sam343-foerste-20261020/NESTE.md. Native-frysen er frigitt.
-- [ ] Fullfør øvrige figurjobber og returer, og behold kildefeil og samlet sluttkontroll som egne åpne punkter. Status er 322 av 1758 resultatark, 2456 native. Ikke kall hele HD-grafikken ferdig.
+- [x] Fortsett faktisk produksjon av de kildeklare fig343_01 til 05. Ti ruter fra ti hele kilder, originaler/motor/anker sett, ingen nye bildekall eller resultater ennå. Se sam343-foerste-20261020/NESTE.md. Native-frysen er frigitt. Utført, hele Sam343 er nå med i felles 2478.
+- [ ] Fullfør øvrige figurjobber og returer, og behold kildefeil og samlet sluttkontroll som egne åpne punkter. Status er 333 av 1758 resultatark, 2478 native. Ikke kall hele HD-grafikken ferdig.
 
 - [x] 2026-10-20 11:49: Fig342_06 til 10 publisert og hentet, ti nye native, 2437 totalt. Alle ti sett/motorobservert, 285 nullkontroller.
 - [x] Fortsett fig342_11 til 15 fra kildeklargjort bunke: ti mål, tre nye motiver og fem eksakt kildeidentiske eksisterende mål. Ingen nye bildekall eller resultater der ennå.
