@@ -1,0 +1,39 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,shutil,numpy as np
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/alkove-fortsettelse-20261020';O=P/'out/alkove-fortsettelse-20261020';D=O/'mottak346-klestemplate2';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+receipt=json.loads((D/'myke.json').read_text());assert receipt['ruter_ok']==22
+shutil.copy2(D/'myke.json',R/'myke346-automatisk-klestemplate.json')
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter']
+oldmaps={e['bilde']:e for e in json.loads((R/'eksakte-tidligere-kilder.json').read_text())['ruter']}
+oldmeta={}
+for s in json.loads((A/'rapporter/bestilling12-20261020/myke346-kvittering.json').read_text())['ark'].values():oldmeta.update(s['ruter'])
+rows=[]
+for job,sheet in receipt['ark'].items():
+ for name,cel in sheet['ruter'].items():
+  rep=next(p for p in plan if any(t['bilde']==name for t in p['malruter']))
+  target=D/cel['fil'];before=sha(target);before_meta=dict(cel);which=rep['bilde']
+  if which in oldmaps:
+   item=oldmaps[which];old=oldmeta[item['eksakt_kildeforgjenger']];source=P/'mods/gpt'/old['fil'];assert sha(source)==old['sha256']
+   shutil.copy2(source,target)
+   for key in ('storrelse','marg','flytt_hd','snitt_union','dekning','tilpasset','skala_xy','tegnet_mot_4x'):cel[key]=old.get(key)
+   cel['produksjonstilpasning']='Eksakt samme hele kilde-RGBA og prototype: byteidentisk tidligere native-rute, uendret tidligere fil.'
+   provenance=dict(eksakt_gjenbruk=item,tidligere_native_sha256=sha(source),tidligere_native_fil=old['fil'])
+  elif which.startswith('costume346_18'):
+   # Fixed 4x source dimensions, with a transparent native margin. No fitted offset or source alpha mask.
+   proto=R/(which+'-prototype.png');image=Image.open(proto).convert('RGBA');pad=8;out=Image.new('RGBA',(image.width+pad*2,image.height+pad*2));out.alpha_composite(image,(pad,pad))
+   out.save(target,optimize=True)
+   cel.update(storrelse=list(out.size),marg=[2,2],flytt_hd=[0,0],tilpasset=False,skala_xy=[1.0,1.0],tegnet_mot_4x=[1.0,1.0])
+   source=np.array(Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA'));mask=np.repeat(np.repeat(source[:,:,3]>0,4,axis=0),4,axis=1)
+   iou,cover=_iou(np.array(out)[:,:,3]>=CORE,mask,-pad,-pad);assert iou>=GOOD_IOU and cover>=GOOD_COVER,(name,iou,cover)
+   cel['snitt_union']=round(iou,3);cel['dekning']=round(cover,3)
+   cel['produksjonstilpasning']='Nytt hodelag plassert ved kildens faste 4x-mål og 0,0. Bevarer lagmøtet ved y128 i stedet for automatisk omrissflytting. Bare generert alfa.'
+   provenance=dict(prototype_sha256=sha(proto),torso_sha256=sha(P/'mods/gpt/costumes/costume346_1664_hd.png'),gjenbrukt_generert_klestemplate='rapporter/bestilling12-20261020/costume346_1793-prototype.png',template_sha256=sha(A/'rapporter/bestilling12-20261020/costume346_1793-prototype.png'),original_pikselmaske_brukt=False)
+  else:continue
+  cel['automatisk_flytt_hd']=before_meta['flytt_hd'];cel['sha256']=sha(target)
+  rows.append(dict(bilde=name,jobb=job,foer_sha256=before,etter_sha256=sha(target),automatisk=before_meta,slutt=cel,**provenance))
+assert len(rows)==18
+(D/'myke.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+(R/'intern-lagkant-retting.json').write_text(json.dumps(dict(antall=18,ni_eksakte_nativealiaser=9,ni_runtime_fra_sju_nye_hoder=9,automatisk_mottak_ok=22,terskler_endret=False,original_pikselmaske_brukt=False,merknad='Visuell helbildekontroll avdekket flat RGB-skjøt og bakgrunnsgap ved automatisk lagflytting. Nye hodelag er satt sammen med sammenhengende genererte klær fra tidligere kontrollert head1793; hodet og sugepilene bevarer egen generert alfa uten originalmaske og holdes på kildens 4x-posisjon. Eksakt samme hele kilde-RGBA gjenbruker tidligere byteidentisk native, så arkgruppe ikke gir ulik plassering. Tidligere publiserte filer endres ikke. Både første og ny automatisk mottakskvittering beholdes; sluttkvitteringen viser produksjonstilpasningen og ny SHA. Ny motorprøve kreves.',ruter=rows),ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'native-kantrett.py.txt');print('18 produksjonstilpasninger, fire rekvisitt-ruter uendret')

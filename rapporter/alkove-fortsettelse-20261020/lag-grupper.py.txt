@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/alkove-fortsettelse-20261020';O=P/'out/alkove-fortsettelse-20261020'
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];byname={p['bilde']:p for p in plan};groups=[];parts=[]
+batches=[('A',[1807,1808],2,1),('B',[1809,1810],2,1),('C',[1811,1812],2,1),('D',[1813],2,1),('E',[1944,1945,1957],2,2)]
+for l,nums,cols,rows in batches:
+ items=[byname[f'costume346_{n}'] for n in nums];im=Image.new('RGB',(1536,1024),(68,73,78));draw=ImageDraw.Draw(im);cw,ch=1536//cols,1024//rows
+ for i,v in enumerate(items):
+  source=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');scale=min((cw-70)/source.width,(ch-100)/source.height);s=source.resize((round(source.width*scale),round(source.height*scale)),Image.Resampling.NEAREST);x=i%cols*cw+(cw-s.width)//2;y=i//cols*ch+55+(ch-70-s.height)//2;im.paste(s,(x,y),s);draw.text((i%cols*cw+12,i//cols*ch+12),f'{i+1}: {v["bilde"]}, source {source.width}x{source.height}',fill='white')
+ im.save(R/f'unik-{l}-referanse.png');(R/f'unik-{l}-plan.json').write_text(json.dumps(items,indent=2)+'\n');groups.append(dict(gruppe=l,kostyme=346,cols=cols,rows=rows,unike=len(items),kilder=[v['bilde'] for v in items]));print(l,[v['bilde'] for v in items])
+for v in plan:
+ source=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');a=np.array(source);lab,_=nd.label(a[:,:,3]>0);pp=[]
+ for sid,z in enumerate(nd.find_objects(lab),1):
+  mask=lab[z]==sid;pp.append(dict(id=sid,piksler=int(mask.sum()),rekt=[int(z[1].start),int(z[0].start),int(z[1].stop),int(z[0].stop)],rgb=np.median(a[z][:,:,:3][mask],axis=0).tolist()))
+ parts.append(dict(bilde=v['bilde'],deler=pp))
+(R/'bildegrupper.json').write_text(json.dumps(groups,indent=2)+'\n');(R/'kildekomponenter.json').write_text(json.dumps(parts,indent=2)+'\n');shutil.copy2(__file__,R/'lag-grupper.py.txt')
+s=(P/'out/bestilling12-20261020/registrer-raa.py').read_text().replace('bestilling12-20261020','alkove-fortsettelse-20261020');(O/'registrer-raa.py').write_text(s)

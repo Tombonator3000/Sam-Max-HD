@@ -1,0 +1,80 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/alkove-fortsettelse-20261020';O=P/'out/alkove-fortsettelse-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];components={p['bilde']:p['deler'] for p in json.loads((R/'kildekomponenter.json').read_text())};cache={};prototypes={};audit=[]
+def load(g):
+ if g not in cache:
+  a=np.array(Image.open(R/f'unik-{g}-raa01.png').convert('RGBA'));lab,n=nd.label(a[:,:,3]>220);cache[g]=(a,lab)
+ return cache[g]
+def draw(g,ids,size,colour=None):
+ a,lab=load(g);core=np.isin(lab,ids);yy,xx=np.nonzero(core);assert len(xx)>20
+ x,y,x1,y1=int(xx.min()),int(yy.min()),int(xx.max())+1,int(yy.max())+1;xa,ya,xb,yb=max(0,x-2),max(0,y-2),min(a.shape[1],x1+2),min(a.shape[0],y1+2)
+ local=core[ya:yb,xa:xb];out=a[ya:yb,xa:xb].copy();dist,near=nd.distance_transform_edt(~local,return_indices=True);allow=dist<=1.5
+ out[:,:,3][~allow|((lab[ya:yb,xa:xb]>0)&~local)]=0;edge=allow&~local;out[:,:,:3][edge]=out[near[0][edge],near[1][edge],:3]
+ if colour is not None:out[:,:,:3]=np.rint(colour).astype('uint8')
+ return Image.fromarray(out).crop((x-xa,y-ya,x1-xa,y1-ya)).resize(size,Image.Resampling.LANCZOS),dict(raw=f'unik-{g}-raa01.png',komponenter=ids,raa_boks=[x,y,x1,y1],mal=list(size),kildens_farge=colour,original_pikselmaske_brukt=False)
+manual={'A':[2,1],'B':[2,1],'C':[2,1],'D':[1],'E':[1,2,3]}
+for group in json.loads((R/'bildegrupper.json').read_text()):
+ g=group['gruppe']
+ for i,p in enumerate(json.loads((R/f'unik-{g}-plan.json').read_text())):
+  name=p['bilde'];src=np.array(Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA'));h,w=src.shape[:2];out=Image.new('RGBA',(w*4,h*4));parts=components[name];main=max(parts,key=lambda v:v['piksler']);specs=[]
+  for part in parts:
+   x,y,x1,y1=part['rekt'];small=part['id']!=main['id']
+   if small:assert part['piksler']<=2
+   im,detail=draw('E' if small else g,[1] if small else [manual[g][i]],((x1-x)*4,(y1-y)*4),colour=part['rgb'] if small else None)
+   out.alpha_composite(im,(x*4,y*4));specs.append(dict(kilde_del=part['id'],kilde_rekt=part['rekt'],**detail))
+  seam=0
+  if g in 'ABCD':
+   arr=np.array(out);original=arr.copy();worldtop=(128-h)*4
+   # Extract the new generated head and props. The mask comes only from generated colors/alpha, never original pixels.
+   rgb=arr[:,:,:3].astype(float)
+   seed=((((rgb[:,:,0]>160)&(rgb[:,:,2]<110)&((rgb[:,:,0]-rgb[:,:,1])>65))|((rgb[:,:,0]>180)&(rgb[:,:,1]>140)&(rgb[:,:,2]<100)&((rgb[:,:,0]-rgb[:,:,2])>145)))|((rgb[:,:,0]>70)&(rgb[:,:,2]>rgb[:,:,1]*1.3)&(rgb[:,:,0]>rgb[:,:,2]*1.1)))&(arr[:,:,3]>128)
+   seed[:max(0,350-worldtop)]=arr[:max(0,350-worldtop),:,3]>128
+   seed=nd.binary_fill_holes(seed);seed=nd.binary_dilation(seed,iterations=3);head=arr.copy();head[:,:,3][~seed]=0
+   # Reuse coherent generated clothing from the previously checked head layer; keep its joint to the published torso.
+   template_path=A/'rapporter/bestilling12-20261020/costume346_1793-prototype.png'
+   template=Image.open(template_path).convert('RGBA');m=Image.new('L',template.size,0);ImageDraw.Draw(m).polygon([(0,353),(209,320),(244,347),(291,367),(339,377),(385,376),(433,359),(484,353),(578,373),(592,412),(0,412)],fill=255)
+   ta=np.array(template);ta[:,:,3]=np.minimum(ta[:,:,3],np.array(m))
+   # The lifted ear exposes this generated shoulder. Continue jacket material instead of preserving an empty ear notch.
+   for xx in range(210):
+    ys=np.flatnonzero(np.array(m)[:,xx])
+    if len(ys):
+     top=int(ys.min());ta[top:356,xx,:3]=ta[370,xx,:3];ta[top:356,xx,3]=np.array(m)[top:356,xx]
+   tm=Image.fromarray(ta);ImageDraw.Draw(tm).line([(0,353),(209,320)],fill=(49,23,8,255),width=3);ta=np.array(tm)
+   # A short vertical continuation of the generated shirt behind a raised chin.
+   for xx in range(216,411):
+    ys=np.flatnonzero(ta[:,xx,3]>220)
+    if len(ys):ta[280:ys.min()+8,xx]=ta[min(ys.min()+8,411),xx]
+   base=Image.new('RGBA',out.size);base.alpha_composite(Image.fromarray(ta).resize((616,412),Image.Resampling.LANCZOS),(0,100-worldtop));base.alpha_composite(Image.fromarray(head));out=base;seam=0
+  if name=='costume346_1944':
+   # Source ends in the middle of the cup. Continue generated near-fill, without an invented vertical cap stroke.
+   arr=np.array(out);arr[:,-4:,:]=arr[:,-5:-4,:];out=Image.fromarray(arr)
+  arr=np.array(out);bad=(arr[:,:,:3]==[255,0,255]).all(2)&(arr[:,:,3]>0);roundoff=int(bad.sum())
+  if roundoff:
+   assert (arr[:,:,3][bad]<=3).all();_,near=nd.distance_transform_edt(arr[:,:,3]<128,return_indices=True);arr[:,:,:3][bad]=arr[near[0][bad],near[1][bad],:3];out=Image.fromarray(arr)
+  path=R/(name+'-prototype.png');out.save(path);prototypes[name]=out
+  audit.append(dict(bilde=name,prototype_sha256=sha(path),kilde_deler=len(parts),deler=specs,original_pikselmaske_brukt=False,rgb_avrundingsrens=roundoff,kildebekreftet_intern_klippekant_rens_hdpx=seam,gjenbruk=False,intern_skjot_materiale='rapporter/bestilling12-20261020/costume346_1793-prototype.png' if g in 'ABCD' else None))
+# A literal opaque 1x19 brown end cel; not an arrow and not a new detailed character drawing.
+name='costume346_1956';raw=A/'rapporter/bestilling12-20261020/unik-F-raa01.png';box=(250,450,254,526);a=np.array(Image.open(raw).convert('RGBA').crop(box));assert (a[:,:,3]>220).all();a[:,:,3]=255
+source=np.array(Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA'));assert source.shape==(19,1,4)
+for y in range(19):a[y*4:(y+1)*4,:,:3]=source[y,0,:3]
+out=Image.fromarray(a);path=R/(name+'-prototype.png');out.save(path);prototypes[name]=out
+audit.append(dict(bilde=name,prototype_sha256=sha(path),kilde_deler=1,deler=[dict(kilde_del=1,kilde_rekt=[0,0,1,19],raw='../bestilling12-20261020/unik-F-raa01.png',raa_sha256=sha(raw),raa_boks=list(box),mal=[4,76],kildens_fargeband=[dict(rgb=list(map(int,c)),rader=int(n)) for c,n in zip(*np.unique(source[:,:,:3].reshape(-1,3),axis=0,return_counts=True))],original_pikselmaske_brukt=False)],original_pikselmaske_brukt=False,gjenbruk=True,metode='Enkel kildebekreftet brun endestripe. Generert brunt materiale beskåret og farget til kildens to brune band; ingen silhuettmaske.'))
+old_audit={v['bilde']:v for v in json.loads((A/'rapporter/bestilling12-20261020/prototype-kvitteringer.json').read_text())}
+for item in json.loads((R/'eksakte-tidligere-kilder.json').read_text())['ruter']:
+ src=A/item['prototype_fil'];assert sha(src)==item['prototype_sha256'];name=item['bilde'];dest=R/(name+'-prototype.png');shutil.copy2(src,dest);prototypes[name]=Image.open(dest).convert('RGBA')
+ rec=json.loads(json.dumps(old_audit[item['eksakt_kildeforgjenger']]))
+ for d in rec['deler']:d['raw']='../bestilling12-20261020/'+d['raw']
+ rec.update(bilde=name,prototype_sha256=sha(dest),gjenbruk=True,eksakt_gjenbruk=item,kildecommit=item['kildecommit'],ny_kantrens=False);audit.append(rec)
+assert len(prototypes)==len(audit)==17
+(R/'prototype-kvitteringer.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-20',verktøy='innebygd image_gen',modell='Eksakt modellnavn ikke vist',faktiske_bildekall=[f'unik-{g}-raa01.png' for g in 'ABCDE'],leveranser=[],merknad='Fem nye bildekall: sju hodelag og tre sugepil-deler. Ni runtime-aliaser gjenbruker seks byteidentiske tidligere prototyper fra eksakt like hele kildeutsnitt. En 1x19 brun endestripe er tilpasset fra tidligere generert brunt materiale. Små separate kildebekreftede deler bevart fra generert materiale. Ingen hard originalmaske.')
+for job in json.loads((R/'klargjort.json').read_text()):
+ name=job['jobb'];d=A/'jobber'/name;j=json.loads((d/'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));rows=[]
+ for cel in j['ruter']:
+  p=next(p for p in plan if any(t['bilde']==cel['bilde'] for t in p['malruter']));x,y,w,h=cel['rekt'];source=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(source.tobytes()).hexdigest()==p['rgba_sha256'];im=prototypes[p['bilde']];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;assert im.size==(w*4,h*4);out.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>128);rows.append(dict(bilde=cel['bilde'],kostyme=j['kostyme'],rute=cel['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=p['bilde'],kilde_rgba_sha256=p['rgba_sha256'],prototype=p['bilde']+'-prototype.png'))
+ dest=d/'resultat.png';out.save(dest);digest=sha(dest);(R/f'rutekart-{name}.json').write_text(json.dumps({name:dict(sha256_resultat=digest,ruter=rows)},ensure_ascii=False,indent=2)+'\n');used=sorted({part['raw'] for row in rows for rec in audit if rec['bilde']==row['representant'] for part in rec['deler']});e=dict(jobb=name,resultat=f'jobber/{name}/resultat.png',sha256=digest,ruter=len(rows),rutekart=f'rapporter/alkove-fortsettelse-20261020/rutekart-{name}.json',delte_bildekall=used,egenkontroll='ikke kjørt',native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False)
+ result=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',e['resultat']],cwd=A,capture_output=True,text=True);(R/(name+'-egenkontroll.txt')).write_text(result.stdout+result.stderr);e['egenkontroll']={0:'OK',1:'SJEKK',2:'FEIL'}[result.returncode];progress['leveranser'].append(e);print(name,e['egenkontroll'],result.stdout,flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser-unike.py.txt')

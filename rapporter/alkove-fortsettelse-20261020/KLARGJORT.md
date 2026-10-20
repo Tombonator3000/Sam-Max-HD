@@ -1,3 +1,7 @@
+# Status etter produksjon
+
+2026-10-20 02:48: alle ti ark laget og sluttkontrollert, 22 native. Fem bildekall. Se RAPPORT.md og mottak-publisert.json. Teksten nedenfor er historisk klargjøring.
+
 # Alkoveserien, neste bunke
 
 Ti jobber fig346_08 til17, 22 runtime-ruter fra 17 eksakt ulike hele kilder, 40 beskyttede filer. Grunnlag 5fe0f25f, 2177 native, alle 20419 publiserte fil-SHA-er bevart.

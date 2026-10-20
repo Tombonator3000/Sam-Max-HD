@@ -1,0 +1,34 @@
+from pathlib import Path
+from PIL import Image,ImageDraw,ImageFont
+import json,re,math,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/alkove-fortsettelse-20261020';O=P/'out/alkove-fortsettelse-20261020';M=O/'mod-kandidat-klestemplate2';font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',14);small=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',12)
+entries=json.loads((R/'tillegg.json').read_text())['tillegg'];receipts={}
+for c in(346,):
+ data=json.loads((R/f'myke{c}-kvittering.json').read_text())
+ for s in data['ark'].values():receipts.update(s['ruter'])
+scenes=[('final346-klestemplate2-anim1',92),('final346-klestemplate2-anim7',92)];draws={}
+for scene,room in scenes:
+ log=(O/scene/'scummvm.log').read_text(errors='replace');cameras={int(f):(int(x),int(y)) for f,x,y in re.findall(r'whole screen frame (\d+) \(room \d+, screen at (-?\d+),(-?\d+)\)',log)}
+ for match in re.finditer(r'frame (\d+) soft cel (\d+) costume (346) .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+  frame,cel,c,x,y,w,h=map(int,match.groups());name=f'costume{c:03}_{cel}';screenshot=O/scene/f'frame_{frame+4:06}_room{room:03}.png'
+  if name not in draws and screenshot.exists():draws[name]=dict(scene=scene,logg_frame=frame,bildeframe=frame+4,x=x,y=y,w=w,h=h,kamera_venstre=cameras[frame+4][0],kamera_topp=cameras[frame+4][1],fil=str(screenshot.relative_to(O)))
+def composite(src,size):
+ im=src.copy().convert('RGBA');factor=min(size[0]/im.width,size[1]/im.height);im=im.resize((max(1,round(im.width*factor)),max(1,round(im.height*factor))),Image.Resampling.NEAREST if factor>1 else Image.Resampling.LANCZOS);bg=Image.new('RGB',size,'#d0d5dc');d=ImageDraw.Draw(bg)
+ for yy in range(0,size[1],12):
+  for xx in range(0,size[0],12):
+   if (xx//12+yy//12)%2:d.rectangle((xx,yy,xx+11,yy+11),fill='#bcc4ce')
+ bg.paste(im,((size[0]-im.width)//2,(size[1]-im.height)//2),im);return bg
+records=[]
+for c in(346,):
+ batch=[e for e in entries if e['kostyme']==c]
+ for page in range(math.ceil(len(batch)/12)):
+  canvas=Image.new('RGB',(1440,1240),'#243340');d=ImageDraw.Draw(canvas)
+  for i,e in enumerate(batch[page*12:page*12+12]):
+   name=e['bilde'];meta=draws[name];rec=receipts[name];original=Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA');native=Image.open(M/e['fil']).convert('RGBA');scene=Image.open(O/meta['fil']).convert('RGB');mx,my=rec['marg'];xx=(meta['x']-meta['kamera_venstre']-mx)*4;yy=(meta['y']-meta['kamera_topp']-my)*4;crop=scene.crop((xx,yy,xx+native.width,yy+native.height));x=(i%3)*480;y=(i//3)*310;d.text((x+6,y+3),f"{e['jobb']} / {name}",font=font,fill='white')
+   for j,(label,im) in enumerate([('Original',original.resize((original.width*4,original.height*4),Image.Resampling.NEAREST)),('Native HD',native),('Fra motor',crop)]):d.text((x+j*160+5,y+26),label,font=small,fill='white');canvas.paste(composite(im,(154,238)),(x+j*160+3,y+44))
+   d.text((x+5,y+286),f"{meta['scene']} / bilde {meta['bildeframe']}",font=small,fill='#ced7e1');records.append(dict(bilde=name,jobb=e['jobb'],native_sha256=e['sha256'],**meta))
+  canvas.save(R/f'motor-og-kilde{c}-final-{page+1:02}.png')
+assert len(records)==22 and len({r['bilde'] for r in records})==22
+(R/'visuelle-kontrollbilder.json').write_text(json.dumps(dict(antall=22,merknad='Romdump f+4 viser cel logget ved tegning f. Kamera per bildeframe fra faktisk whole screen-logg. Alle22 ved kildepos159,101, aktør6, clip0. Utsnitt inkluderer andre lag/scenen. Ingen original eller leveranse endres.',ruter=records),ensure_ascii=False,indent=2)+'\n')
+for scene,frame,room,name in [('final346-klestemplate2-anim1',124,92,'sam-alkove-tre-piler-motor.png'),('final346-klestemplate2-anim1',132,92,'sam-alkove-hoey-hatt-motor.png'),('final346-klestemplate2-anim1',144,92,'sam-alkove-tilbake-motor.png'),('final346-klestemplate2-anim7',76,92,'sam-alkove-andre-forloep-motor.png'),('final346-klestemplate2-anim1',116,92,'sam-alkove-pilfragment-motor.png'),('final346-klestemplate2-anim1',64,92,'sam-alkove-flygende-pil-motor.png')]:shutil.copy2(O/scene/f'frame_{frame:06}_room{room:03}.png',R/name)
+shutil.copy2(__file__,R/'visuell-sluttkontroll.py.txt');print('22 kontrollutsnitt og seks motorstillbilder lagret')
