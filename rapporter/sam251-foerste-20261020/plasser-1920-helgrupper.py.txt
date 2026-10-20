@@ -1,0 +1,78 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+import numpy as np, json, hashlib, shutil
+from smhd.myk import _iou
+
+P = Path('/home/tom/Sam-Max-HD')
+R = P / 'work/.gpt-gren/rapporter/sam251-foerste-20261020'
+K = R / 'kall/P01'
+name = 'costume251_1920'
+src = np.array(Image.open(P / 'work/extract/costumes' / (name + '.png')).convert('RGBA'))
+raw = np.array(Image.open(K / 'raa.png').convert('RGBA'))
+entry = json.loads((K / 'plan.json').read_text())['ruter'][0]
+x, y, w, h = entry['celle']
+region = np.zeros(raw.shape[:2], bool)
+region[y:y+h, x:x+w] = True
+own = (raw[:, :, 3] >= 128) & region
+def groups(a, mask):
+    labels, _ = nd.label(mask)
+    rgb = a[:, :, :3].astype(int)
+    blue = (rgb[:, :, 2] > rgb[:, :, 0] + 10) & (rgb[:, :, 1] > rgb[:, :, 0] + 4) & mask
+    ids = set(np.unique(labels[blue])) - {0}
+    sam = np.isin(labels, list(ids))
+    assert sam.any() and (mask & ~sam).any()
+    return dict(Sam=sam, drage=mask & ~sam)
+sg = groups(src, src[:, :, 3] > 0)
+og = groups(raw, own)
+H, W = src.shape[:2]
+out = Image.new('RGBA', (W * 4 + 16, H * 4 + 16))
+ops = []
+for role in ['drage', 'Sam']:
+    sy, sx = np.nonzero(sg[role])
+    yy, xx = np.nonzero(og[role])
+    sb = [int(sx.min()), int(sy.min()), int(sx.max() + 1), int(sy.max() + 1)]
+    ob = [int(xx.min()), int(yy.min()), int(xx.max() + 1), int(yy.max() + 1)]
+    dist, near = nd.distance_transform_edt(~og[role], return_indices=True)
+    allow = (dist <= 2) & region
+    a = raw.copy()
+    a[:, :, 3][~allow] = 0
+    a[:, :, 3][og[role]] = 255
+    edge = allow & ~og[role]
+    a[edge, :3] = a[near[0][edge], near[1][edge], :3]
+    a[a[:, :, 3] == 0, :3] = 0
+    tw, th = (sb[2] - sb[0]) * 4, (sb[3] - sb[1]) * 4
+    scx, scy = (ob[2] - ob[0]) / tw, (ob[3] - ob[1]) / th
+    dx, dy = sb[0] * 4 + 8, sb[1] * 4 + 8
+    aff = [scx, 0, ob[0] - dx * scx, 0, scy, ob[1] - dy * scy]
+    z = Image.fromarray(a).transform(out.size, Image.Transform.AFFINE, aff, Image.Resampling.BICUBIC)
+    out.alpha_composite(z)
+    ops.append(dict(rolle=role, kilde_boks_kun_analyse=sb, egen_boks=ob, egen_hel_gruppe_affin=aff))
+a = np.array(out)
+core = a[:, :, 3] >= 128
+_, near = nd.distance_transform_edt(~core, return_indices=True)
+weak = (a[:, :, 3] > 0) & (a[:, :, 3] <= 4)
+a[weak, :3] = a[near[0][weak], near[1][weak], :3]
+a[a[:, :, 3] == 0, :3] = 0
+mask = np.repeat(np.repeat(src[:, :, 3] > 0, 4, 0), 4, 1)
+iou, cov = _iou(core, mask, -8, -8)
+assert iou >= .6 and cov >= .8, (iou, cov)
+path = R / 'prototyper' / (name + '-helgrupper.png')
+Image.fromarray(a).save(path)
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+record = dict(bilde=name, kall='P01', prototype=str(path.relative_to(R)), sha256=sha(path),
+              raa_sha256=sha(K / 'raa.png'), snitt_union=iou, dekning=cov, native_ok=True,
+              originalmaske=False, originalfragment_fallback=False, egen_alfa=True,
+              metode='To hele egne figurgrupper, Sam og drage, med alle egne delkomponenter', operasjoner=ops)
+(R / (name + '-helgrupper.json')).write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n')
+board = Image.new('RGB', (1600, H * 4 + 65), '#344556')
+dr = ImageDraw.Draw(board)
+dr.text((10, 8), name + ' original', fill='white')
+dr.text((810, 8), f'P01 hele egne grupper, ingen avskjaring {iou:.3f}/{cov:.3f}', fill='white')
+im = Image.fromarray(src).resize((W * 4, H * 4), Image.Resampling.NEAREST)
+board.paste(im, (10, 40), im)
+im = Image.fromarray(a)
+board.paste(im, (802, 32), im)
+board.save(R / (name + '-helgrupper-sammenligning.png'))
+shutil.copy2(__file__, R / 'plasser-1920-helgrupper.py.txt')
+print(name, round(iou, 3), round(cov, 3), ops)

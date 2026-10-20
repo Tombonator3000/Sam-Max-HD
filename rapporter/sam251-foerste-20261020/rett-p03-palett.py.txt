@@ -1,0 +1,71 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+import json, hashlib, shutil
+import numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+R = P / 'work/.gpt-gren/rapporter/sam251-foerste-20261020'
+B = R / 'utkast/P03-foer-palettretting'
+assert not B.exists()
+B.mkdir(parents=True)
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+records = []
+for n in [1800, 1801]:
+    name = f'costume251_{n}'
+    p = R / 'prototyper' / (name + '.png')
+    meta = R / (name + '-prototype.json')
+    shutil.copy2(p, B / p.name)
+    shutil.copy2(meta, B / meta.name)
+    shutil.copy2(R / (name + '-sammenligning.png'), B / (name + '-sammenligning.png'))
+    a = np.array(Image.open(p).convert('RGBA'))
+    old_alpha = a[:, :, 3].copy()
+    rgb = a[:, :, :3]
+    core = a[:, :, 3] >= 128
+    white = (rgb.min(2) > 210) & (a[:, :, 3] > 0)
+    blue = (rgb[:, :, 2].astype(int) > rgb[:, :, 0].astype(int) + 10) & (rgb[:, :, 1].astype(int) > rgb[:, :, 0].astype(int) + 3) & core
+    assert blue.any() and white.any()
+    _, near = nd.distance_transform_edt(~blue, return_indices=True)
+    rgb[white] = rgb[near[0][white], near[1][white]]
+    orange = (rgb[:, :, 0] > 130) & (rgb[:, :, 1] > 50) & (rgb[:, :, 1] < 185) & (rgb[:, :, 2] < 100) & (rgb[:, :, 0] > rgb[:, :, 1].astype(float) * 1.3) & core
+    labels, count = nd.label(orange)
+    feet = np.zeros(core.shape, bool)
+    chosen = []
+    for label, sl in enumerate(nd.find_objects(labels), 1):
+        group = labels == label
+        yy, xx = np.nonzero(group)
+        if len(xx) > 64 and yy.mean() < a.shape[0] * .32:
+            feet |= group
+            chosen.append(dict(egen_komponent=label, piksler=len(xx), boks=[sl[1].start, sl[0].start, sl[1].stop, sl[0].stop]))
+    assert len(chosen) == 2, (name, chosen)
+    # Whole OWN color components. No source alpha/silhouette or source pixel positions are used.
+    before = rgb[feet].astype(float).mean(0)
+    target = np.array([207, 119, 51.])
+    rgb[feet] = np.clip(rgb[feet].astype(float) + target - before, 0, 255).astype('uint8')
+    _, near = nd.distance_transform_edt(~core, return_indices=True)
+    edge = (a[:, :, 3] > 0) & ~core
+    rgb[edge] = rgb[near[0][edge], near[1][edge]]
+    rgb[a[:, :, 3] == 0] = 0
+    assert np.array_equal(old_alpha, a[:, :, 3])
+    Image.fromarray(a).save(p)
+    rec = dict(bilde=name, hvite_fremmede_mansjettpiksler_rettet=int(white.sum()),
+               egne_hele_fotkomponenter=chosen, egen_fotfarge_foer=before.tolist(),
+               kildebekreftet_brun_referanse=target.tolist(), alfa_uendret=True,
+               hard_originalmaske=False, originalfragment_fallback=False, foer_sha256=sha(B / p.name), etter_sha256=sha(p))
+    records.append(rec)
+    d = json.loads(meta.read_text())
+    d.update(sha256=sha(p), egen_palettretting=rec)
+    meta.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+    src = Image.open(P / 'work/extract/costumes' / (name + '.png')).convert('RGBA')
+    src = src.resize((src.width * 4, src.height * 4), Image.Resampling.NEAREST)
+    board = Image.new('RGB', (1600, max(320, src.height + 65)), '#344556')
+    dr = ImageDraw.Draw(board)
+    dr.text((10, 8), name + ' original', fill='white')
+    dr.text((810, 8), 'P03 eget maleri, kildebrune fotter, ingen hvite ankelband', fill='white')
+    board.paste(src, (10, 40), src)
+    im = Image.fromarray(a)
+    board.paste(im, (802, 32), im)
+    board.save(R / (name + '-sammenligning.png'))
+(R / 'P03-palettretting.json').write_text(json.dumps(records, ensure_ascii=False, indent=2) + '\n')
+shutil.copy2(__file__, R / 'rett-p03-palett.py.txt')
+print([(v['bilde'], v['hvite_fremmede_mansjettpiksler_rettet']) for v in records])

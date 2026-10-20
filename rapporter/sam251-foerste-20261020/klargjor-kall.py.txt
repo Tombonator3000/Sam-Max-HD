@@ -1,0 +1,57 @@
+from pathlib import Path
+from PIL import Image
+import json, hashlib, subprocess, shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+protected = json.loads((R / 'beskyttede-samlet.json').read_text())
+assert len(protected) == 832 and all(sha(A / f) == h for f, h in protected.items())
+native = json.loads((A / 'rapporter/sam047-slutt-20261020/publiserte-moddfiler-2683.json').read_text())
+assert all(sha(P / 'mods/gpt' / f) == h for f, h in native.items())
+base = dict(native_sha=subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/hd-mod'], cwd=P, text=True).split()[0],
+            art_sha=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=A, text=True).strip(),
+            native=2683, figurjobber=371, stash=subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines(), filer=native)
+assert base['native_sha'] == 'f108392586e1af5816f0b5548a8cbfce975052f3'
+assert not (R / 'grunnlag-produksjon.json').exists()
+(R / 'grunnlag-produksjon.json').write_text(json.dumps(base, indent=2) + '\n')
+for num in range(1, 6):
+    job = f'fig251_{num:02}'
+    J = A / 'jobber' / job
+    d = json.loads((J / 'jobb.json').read_text())
+    assert not (J / 'resultat.png').exists() and not (J / 'retur.md').exists()
+    call = f'P{num:02}'
+    K = R / 'kall' / call
+    assert not K.exists()
+    K.mkdir(parents=True)
+    entries = []
+    cols = 2
+    nrows = (len(d['ruter']) + cols - 1) // cols
+    cw, ch = 1536 // cols, 1024 // nrows
+    board = Image.new('RGB', (1536, 1024), '#ff00ff')
+    for i, c in enumerate(d['ruter']):
+        src = Image.open(P / 'work/extract/costumes' / (c['bilde'] + '.png')).convert('RGBA')
+        z = src.resize((src.width * 4, src.height * 4), Image.Resampling.NEAREST)
+        dx = i % cols * cw + (cw - z.width) // 2
+        dy = i // cols * ch + (ch - z.height) // 2
+        assert dx >= 0 and dy >= 0 and dx + z.width <= 1536 and dy + z.height <= 1024
+        board.paste(z, (dx, dy), z)
+        entries.append(dict(bilde=c['bilde'], kilde_rekt=[0, 0, src.width, src.height], referanseskala=4,
+                            proxy_rekt=[dx, dy, z.width, z.height], celle=[i % cols * cw, i // cols * ch, cw, ch]))
+    board.save(K / 'malereferanse.png')
+    refs = [K / 'malereferanse.png', A / 'hovedark/sam.png', A / 'stil/fig002_01.png']
+    prompt = f'''Use case: precise-object-edit. Production animation cel redraw for Sam & Max Hit the Road. Faithful HD remaster, not a redesigned illustration. Output1536x1024 PNG with a real transparent RGBA background. Image1 is the exact edit target and determines all content, geometry, colors, poses and placement. Images2/3 are approved Sam identity and costume references only. This source is the game's deliberately angular POLYGON VR world. Do NOT copy the rounded shapes, smooth shading or outlines of images2/3 into this special polygon scene.
+Source-verified correction to the generic protected Sam-only job prompt:every cell is a whole source composition containing the orange VR DRAGON and only the parts of polygon Sam actually visible in that cell. Preserve every source character, part, tiny fragment and genuine transparent gap. The long dragon neck and tail consist of deliberately SEPARATED triangular orange segments. Do not connect them,fill the gaps,add segments or turn the geometry into a conventional dragon neck. Keep all head/body proportions and spacing exact. Keep both characters in the same cel,not split into new cells.
+Source geometry:exactly{len(entries)} independent drawings in{nrows}rows and2columns,reading order{[v['bilde'] for v in entries]}. Each source pixel is FOUR output pixels. Keep each composition exactly at the location and size shown in image1. Layout:{entries}. Names/IDs here are provenance only;paint no text,IDs,borders,labels or cell boxes.
+The dragon uses flat orange/ochre polygon fills,small darker orange facets,red mouth interior,black source eye,sharp horn points,long angular snout,slim angular arms and bent legs. Sam uses flat blue-gray suit/fedora,white shirt/cuffs,dark blue/black striped tie,brown bare feet/hands,long brown dog muzzle and dark source facial details. Golden yellow sword with coral/red handguard stays ONLY where image1 shows it,in the dragon's hand. Preserve the complete source sword,blade direction and grip. Do not add a second sword on the ground from the game context. Preserve source arm/hand/foot/finger counts. Some cells show Sam's body or legs emerging from the dragon's mouth;other cells show only the dragon. Do not draw a new Sam head or body where the source has hidden it. No Max,no other people,no new props or effects.
+Redraw the large intended polygon boundaries as crisp high-resolution straight edges with subtle antialiasing. Keep sharp corners and simple flat color facets. Remove only small pixel stair steps. Do not round the angular geometry,make new anatomy,ink extra contour lines or invent facial features. No scales,fur texture,detailed teeth,metal reflections,gradients,volume shading,3D rendering,dramatic lighting,glow,haze,bloom,blur,cast shadows or floor. No restoration of hidden parts. Preserve all authentic disconnected orange triangles,limbs,horns and small colored details.
+All background,between separate neck/tail pieces and between drawings,must be fully transparent. The magenta reference backing is not part of the art:remove it completely. No black/white/magenta matte,background scene,ground,cell fill,frame,grid,text,watermark or signature.'''
+    (K / 'prompt-faktisk.txt').write_text(prompt + '\n')
+    (K / 'argumenter.json').write_text(json.dumps(dict(prompt=prompt, referenced_image_paths=[str(p) for p in refs], transparent_background=True), ensure_ascii=False, indent=2) + '\n')
+    (K / 'plan.json').write_text(json.dumps(dict(jobber=[job], ruter=entries, cols=cols, nrows=nrows, originalprompt_sha256=sha(J / 'prompt.txt')), indent=2) + '\n')
+    (K / 'referansehasher.json').write_text(json.dumps([dict(fil=str(p.relative_to(A)), sha256=sha(p)) for p in refs], indent=2) + '\n')
+    (K / 'begrunnelse.md').write_text('Det beskyttede Sam/start-premisset er utilstrekkelig. Kilden og rom49/lokal210 viser kompositt av polygon-Sam og segmentert oransje drage. Korrigert faktisk prompt er separat. Polygonstil,personer,segmenter,farger og sverd styres av originalen;hovedark brukes bare til identitet. Ingen beskyttede filer er endret.\n')
+    print(call, job, [v['bilde'] for v in entries])
+shutil.copy2(__file__, R / 'klargjor-kall.py.txt')
