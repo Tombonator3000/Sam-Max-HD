@@ -4,8 +4,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
-- [ ] Fortsett faktisk tegning av fig345_36 til41: seks ark,27 ruter fra15 ulike kilder. Kildeklargjort i sam345-slutthoder-20261020,24 beskyttede SHA-er. Originaler/primærskript/seks motorbilder sett,alle27 observert,80 bufferkontroller null. Torso/hatt/øyne og nedre ansikt er separate lag;unngå oppdiktet intern kantstrek. Se KILDEGRUNNLAG.md før nye kall. Ingen bildekall/resultater i de seks jobbene ennå.
-- [ ] Neste pakkeoppdatering ved samlepunkt: publisert modd2256 har14 nyere ruter enn verifisert fellespakke2242. Ikke start de ferdige2242-byggene på nytt. Behold pakken og kontroller faktisk innhold og sjekksummer ved neste nye samlepunkt.
+- [ ] Fortsett fig344_01 til10:ti ark,19 ruter. Kildeavklar og se original/motor/stil før kall. Lokal201 i rom92 setter344,chore6/7,aktør6 ved159,101. Ikke tegn fra generisk auberginepremiss uten kildebekreftelse.
+
+- [x] Fig345_36 til41 publisert og hentet i9ed54398:27 native,2283 totalt. Alle27 sett/motorobservert,80 nullkontroller,27 egenkontroll/native OK.24 nye/284 tidligere beskyttede kilder og tre stasher bevart. Se sam345-slutthoder-20261020/mottak-publisert.json.
+- [ ] Samlepunkt2283 etter fullført kostyme345:41 nye siden fellespakken2242. Begge pakker fra samme ferske kode-/native-SHA,faktiske nedlastinger,SHA-filer,alle moddfiler og relevant motor skal kontrolleres før ny fellesrelease. Se felles-release-20261020-sam/bygg-startet.json før dispatch,ikke dupliser bygg.
 
 - [x] Samlepunkt2242 er publisert og Latest: sam-max-hd-2026-10-20-alkove.108 nye siden2134;begge faktiske nedlastinger,SHA-filer,fire opplastinger og20483 runtime moddfiler per pakke kontrollert. Ti Linux-prøver og ti grunnlagsprøver,alle108 observert,579 sluttkontroller uten nye/økte avvik. Ikke gjenta39355894188/39355897105.
 - [x] Fig345_26 til35 publisert og hentet i7d1aa364:14 native,2256 totalt. Alle14 sett/motorobservert,80 nullkontroller,14 egenkontroll/native OK. Alle gamle filer,40 nye/244 eldre beskyttede kilder og tre stasher bevart. Se sam345-tilbake-20261020/mottak-publisert.json.
