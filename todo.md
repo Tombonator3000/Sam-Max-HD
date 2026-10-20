@@ -4,8 +4,11 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
-- [ ] Samlepunkt2242,108 nye siden2134: felles-release-20261020-alkove. Start begge plattformbygg én gang etter fersk SHA-kontroll, hent faktiske pakker, sjekk SHA-filer og alle moddfiler, kjør relevant motor. Hold hd-mod uendret mens byggene henter.
-- [ ] Fortsett fig345_26 til35: ti ark,14runtime fra7ulike helkilder. Original/motor/stil før nye kall. Ingen resultater/bildekall i denne bunken ennå.
+- [ ] Fortsett faktisk tegning av fig345_36 til41: seks ark,27 ruter fra15 ulike kilder. Kildeklargjort i sam345-slutthoder-20261020,24 beskyttede SHA-er. Originaler/primærskript/seks motorbilder sett,alle27 observert,80 bufferkontroller null. Torso/hatt/øyne og nedre ansikt er separate lag;unngå oppdiktet intern kantstrek. Se KILDEGRUNNLAG.md før nye kall. Ingen bildekall/resultater i de seks jobbene ennå.
+- [ ] Neste pakkeoppdatering ved samlepunkt: publisert modd2256 har14 nyere ruter enn verifisert fellespakke2242. Ikke start de ferdige2242-byggene på nytt. Behold pakken og kontroller faktisk innhold og sjekksummer ved neste nye samlepunkt.
+
+- [x] Samlepunkt2242 er publisert og Latest: sam-max-hd-2026-10-20-alkove.108 nye siden2134;begge faktiske nedlastinger,SHA-filer,fire opplastinger og20483 runtime moddfiler per pakke kontrollert. Ti Linux-prøver og ti grunnlagsprøver,alle108 observert,579 sluttkontroller uten nye/økte avvik. Ikke gjenta39355894188/39355897105.
+- [x] Fig345_26 til35 publisert og hentet i7d1aa364:14 native,2256 totalt. Alle14 sett/motorobservert,80 nullkontroller,14 egenkontroll/native OK. Alle gamle filer,40 nye/244 eldre beskyttede kilder og tre stasher bevart. Se sam345-tilbake-20261020/mottak-publisert.json.
 - [ ] Rett ressursgrensekontrollen gjennom testet PR:346_27 til43 er17jobber/44ruter fra tabelloppslag36 som overlapper første lagmaske. Se kildefeil-raw36.json. Ikke tegn eller tell disse ferdig, ikke gjenta raw36-testen eller gjør blind global numAnim-endring. Gyldige346_01til26 bevares.
 - [x] 2026-10-20 03:52:345_01til25 publisert i tre bunker,26runtime,2242native,253resultatark. Alle26sett/motorobservert,240kontroller null,egenkontroll/native26OK. Seks bildekall,fireråbilder brukt. Alle tidligere filer og stasher bevart. Se de tre mottak-publisert.json.
 
