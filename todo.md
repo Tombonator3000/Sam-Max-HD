@@ -1,5 +1,19 @@
 # todo.md
 
+## Sam029 fortsettelse publisert, 2026-10-21 01:09
+
+Sju nye hele ark fig029_09 til 15 er levert og publisert med 23 nye native animasjonsruter. 11 ulike hele canonical kilder: seks malerier tas inn første gang, fem tidligere publiserte hele malerier gjenbrukes ved eksakt hel source-RGBA, og 12 ekstra aliasmål deler disse hele kildene. Fire uleverte prototyper er gjenopptatt fra T03/T04. To nye innebygde image_gen-kall med råbilder og faktiske prompter er bevart. T05 maler 1967 og tre fremtidige poser. R03 tegner hele 1955 om med en manglende tanfarget tauflis ved 9,50. Den er ikke grå. R03s råbilde på 1850x850 er bevart og tilrettelagt med bevart aspekt før 4x-plassering. Ingen originale piksler eller hard originalmaske.
+
+Alle sju ark og 23 automatiske native er OK. 11 ulike original/native/motor, sju hele resultatark, sju hele motorbilder og tre før/etter er sett. Den faktisk nedlastede Linux-binæren c961e62c fra felles2918 er brukt på både 2918-grunnlaget og kandidat2941. 240 skjermbufferkontroller, 239 null og samme kjente 160 ved 36 før første figurtegning ved 60. Alle 211 fra 60 er null, ingen nye eller økte avvik. Alle 23 nye er motorobservert; hele Sam029 har nå 53 av 70 native. Tre før/etter har null endringer utenfor nytt håndlag og marg. Tvungen kildekorrekt håndanimasjon i rom 5, aktor 10, ikke naturlig gjennomspilling. Ingen ny Tom-/Claude-godkjenning eller motor-/pipelineendring.
+
+Publisert og hentet hd-mod 089ab39f3eecc72e0657fb93c66217abc3e6a8d8, 2941 native. Grafikkilde cdfd2fdcebaf08b4765c2bd1462d0a35438987c2. Alle 21184 filer og 21178 PNG-er er SHA-bekreftet. Alle 21161 tidligere filstier og 21155 tidligere PNG-er, 1000 beskyttede jobbfiler og tre opprinnelige stasher er bevart. 411 av 1758 hele figurjobber har resultat; 1347 gjenstår pluss returer, katalogfeil og samlet sluttkontroll.
+
+Fellespakkene har fortsatt 2918 native og mangler disse 23. De oppdateres ved samlepunktet etter resten av Sam029. Neste er fig029_16 til 22, sju ark med 17 mål fra 13 ulike hele kilder. Gjenoppta T05-råbildet her for 1975, 1976 og 1980, ikke kall på nytt. 1975 mangler en liten tanflis som kan kildekontrolleres mot egen R03/1955-flis. T06 til T09 er bare forberedte kall i sam029-tau-20261021. 1973 har en høy grå flekk og et langt transparent gap; armen må ikke krympes etter hele lerretets høyde. Ingen nativefrys mellom grafikkbunkene; frys igjen når begge pakkebygg startes ved samlepunktet.
+
+Ekstra Windows-taggbygg 39510987546 er nå completed/success, separat fra tilsiktet felles2918-Windows 39509505844. Ingen ekstra dispatch, omprøve eller kansellering. Taggfilter, historiske SDL-/testhoppstans, inventarkant 35 og inventarikon-RGB under 044-eksplosjonen står fortsatt åpne. Full naturlig gjennomspilling, interaktiv Windows- og ny webtest gjenstår. Blokkerte motiver, inklusive 164_04/1943/1944, skal ikke omprøves. Ugyldige 344/346-katalogruter skal ikke tegnes eller spilles.
+
+Rapport: gpt-arbeid/rapporter/sam029-fortsettelse-20261021. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Aktiv grafikkautomatikk fortsetter; gamle nattprosesser gjenstartes ikke. Main får bare memory, todo, STATUS og log.
+
 ## Kontrollert felles2918, 2026-10-21 00:51
 
 Åtte nye hele Sam-ark fig029_01 til 08 er levert, kontrollert og publisert. De gir 30 nye native animasjonsruter fra 11 hele malerier og 19 ekstra mål med identisk hel RGBA. Seks faktiske innebygde image_gen-kall med råbilder og prompter er bevart; fire brukes i bunken. Tauforbindelsene i to motiver er tegnet om. To små egne taufliser er gjenbrukt med kildebelegg. Ekte egen alfa, kildekorrekt geometri og godkjente Sam-ankere er brukt. Ingen hard originalmaske, originale pikselfragmenter eller senkede kontrollgrenser. Ingen motor-/pipelineendring eller ny Tom-/Claude-godkjenning.
