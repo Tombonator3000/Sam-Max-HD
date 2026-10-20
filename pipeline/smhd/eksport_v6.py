@@ -7,6 +7,7 @@ oppskaleringen og grafikkjobbene kan bruke dem:
   rooms/roomNNN_idx.png      samme bilde som 8-bits indeksbilde med paletten
   objects/objNNN_SS.png      objektbilde i tilstand SS (heksadesimalt, som IMxx) i RGBA
   objects/objNNN_SS_idx.png  indeksbilde, med den gjennomsiktige indeksen som tRNS
+  objects/objNNN_SS_mask.png faktisk tegnedekning fra dekoderen, 0 eller 255
   costumes/costumeCCC_NNN.png      kostymerute i RGBA (rutenummer = lag * 128 + kode)
   costumes/costumeCCC_NNN_idx.png  indeksbilde med palettindeksene i rommet
   rooms.json, costumes.json  metadata
@@ -42,8 +43,8 @@ def _transparent_index(pixels: bytearray, mask: bytearray, prefer: int) -> int:
 
 
 def _save_pair(dest: Path, name: str, w: int, h: int, pixels: bytearray, mask: bytearray, palette: bytes,
-               transparent: int | None):
-    """Lagrer name.png (RGB eller RGBA) og name_idx.png."""
+               transparent: int | None, *, coverage: bool = False):
+    """Lagrer bilde, indeksbilde og valgfri original tegnedekning."""
     data = bytearray(pixels)
     if transparent is not None:
         for i, m in enumerate(mask):
@@ -64,6 +65,12 @@ def _save_pair(dest: Path, name: str, w: int, h: int, pixels: bytearray, mask: b
         black = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         black.paste(rgba, (0, 0), alpha)
         black.save(dest / f"{name}.png")
+    if coverage:
+        # An opaque object owns these pixels even when its palette index is
+        # identical to the room beneath. This is drawing metadata, not an
+        # alpha mask to cut the painted HD image with.
+        Image.frombytes("L", (w, h), bytes(255 if m else 0 for m in mask)).save(
+            dest / f"{name}_mask.png")
 
 
 def _room_blocks(d: bytes, room: gamedata.Room) -> dict:
@@ -140,7 +147,8 @@ def export_rooms(game: Path, out: Path, rooms_filter: set[int] | None = None) ->
                     else:
                         raise ValueError("verken SMAP eller BOMP")
                     trans = _transparent_index(bm.pixels, bm.mask, tcol if kind == "smap" else 255)
-                    _save_pair(out / "objects", name, bm.width, bm.height, bm.pixels, bm.mask, palette, trans)
+                    _save_pair(out / "objects", name, bm.width, bm.height, bm.pixels, bm.mask, palette, trans,
+                               coverage=True)
                     entry["states"].append(state)
                     entry["kind"][state] = kind
                     if kind == "bomp":

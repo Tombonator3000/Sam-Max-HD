@@ -6,6 +6,7 @@ Oppsett (N = skala, for eksempel 4):
   mods/<navn>/rooms/roomNNN_idx.png    original 8-bit bakgrunn med palett (fra eksporten)
   mods/<navn>/objects/objNNN_SS.png    HD-objektbilde, RGBA, eksakt N ganger originalen
   mods/<navn>/objects/objNNN_SS_idx.png  original 8-bit objektbilde
+  mods/<navn>/objects/objNNN_SS_mask.png  original tegnedekning, uavhengig av HD-alfa
   mods/<navn>/objects/objNNN_SS_hd.png   eget mykt bilde med egen alfa (ikoner), når det finnes i --egne
 
 Objekter skaleres sammen med bakgrunnen rundt seg og klippes ut etterpå. Da får de samme
@@ -192,6 +193,28 @@ def _copy_idx(extract: Path, own: Path | None, out: Path, name: str) -> None:
     mine = own / "objects" / f"{name}_idx.png" if own else None
     shutil.copyfile(mine if mine and mine.exists() else extract / "objects" / f"{name}_idx.png",
                     out / "objects" / f"{name}_idx.png")
+    # Keep source drawing coverage separate from the new painting's free
+    # outline. Without it, opaque eraser states can be mistaken for the HD
+    # room where their original palette colours match (room 92's heart).
+    mask = extract / "objects" / f"{name}_mask.png"
+    original = extract / "objects" / f"{name}.png"
+    coverage = None
+    if mask.exists():
+        with Image.open(mask) as im:
+            coverage = im.convert("L")
+    elif original.exists():
+        # Older v6 extracts already saved the decoder's mask in RGBA alpha.
+        # Never infer coverage from an own/HD painting's alpha.
+        with Image.open(original) as im:
+            coverage = im.convert("RGBA").getchannel("A")
+    if coverage is not None:
+        with Image.open(out / "objects" / f"{name}_idx.png") as idx:
+            if coverage.size != idx.size:
+                raise ValueError(f"{name}: tegnedekning {coverage.size} passer ikke indeksbildet {idx.size}")
+        if mask.exists():
+            shutil.copyfile(mask, out / "objects" / f"{name}_mask.png")
+        else:
+            coverage.save(out / "objects" / f"{name}_mask.png")
 
 
 def _copy_soft(own: Path | None, out: Path, name: str, scale: int) -> None:

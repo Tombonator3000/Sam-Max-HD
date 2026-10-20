@@ -34,6 +34,8 @@ Fra 15. oktober 2026 er patchen den samme her og i Dig-HD-Remake. Endringene i b
 
 ## Hva patchen gjør
 
+20. oktober 2026: v6-uttrekk og modbygging bevarer objektets originale tegnedekning som `objects/objNNN_SS_mask.png`. Motorens eksisterende `opacity`-støtte bruker denne til å skille et ugjennomsiktig objekt fra rommet selv om begge har samme palettindeks. Uten metadataene kunne den tomme tilstanden til objekt 901 i rom 92 etterlate hjertekonturen fra HD-bakgrunnen. Dette er dekoderens skrivedekning, uavhengig av den nye HD-tegningens alfa. Eldre uttrekk kan hente dekningen fra originalens RGBA-alfa. Ingen endring i motorpatchen er nødvendig. Testet med ekte romuttrekk, native mottak og 760 bilder fra romskriptene i eksisterende nedlastet Linux-binær: 190 bufferkontroller uten avvik; før/etter-sammenligningen endrer ingen piksler utenfor objektets rektangel. Dokumentasjon og bilder ligger i `gpt-arbeid`, `rapporter/aubergine347-grunnlag-20261020/`.
+
 Spillet kjører uendret i 320 x 200 og 256 farger, med skript, lagring og lyd som før. Bare det siste steget endres: når et område sendes til skjermen (`drawStripToScreen`), bygger DigHD det samme området i 4x og full farge. For hver piksel avgjøres kilden ut fra hva som står i 8-bitsbufferen:
 
 | Det som står der | Kilde |
