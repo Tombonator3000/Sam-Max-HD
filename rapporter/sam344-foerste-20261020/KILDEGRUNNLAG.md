@@ -1,5 +1,7 @@
 # Sam kaster en lilla aubergine mellom hendene
 
+Oppfølging: produksjonen er nå fullført for fig344_01 til12, inkludert tre ekstra kildebekreftede overtegningsaliaser. Se RAPPORT.md og NESTE.md. Beskrivelsen nedenfor bevarer det opprinnelige klargjøringsgrunnlaget før de seks faktiske bildekallene.
+
 Originalene og faktisk avspilling i rom92 viser en ekte lilla aubergine med grønn stilk. Sam løfter den opp,slipper/kaster den og fanger den med motsatt hånd,mens den roterer. Alle fingre,håndstillinger,grønne stilkblader,fruktens form og retning må følge hver kildepose. Dette er en ny handlingsdel før kostyme345/346 i lokalt201. Her stemmer auberginepremisset i jobbprompten. Ikke overfør345-seriens korrigering om ingen synlig prop til344.
 
 Ti originalark,primærskript ogni kildeposer i motoren er sett. Alle19 aktuelle rutenummer er faktisk observert,80 bufferkontroller null med2283-grunnlaget ogadfdf7fc-binæren.11 ulike hele kilder;åtte andre rutekoblinger er eksakt likeRGBA/størrelse og kan gjenbruke riktig nytegnet kildepose etter kontroll. Dette er kildedekning,ingen ny HD eller nytt bildekall i denne bunken.

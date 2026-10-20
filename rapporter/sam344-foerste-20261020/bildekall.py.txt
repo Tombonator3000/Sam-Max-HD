@@ -1,0 +1,12 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,shutil,sys
+R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/sam344-foerste-20261020');key=sys.argv[2];manifest=R/'bildekall.json';j=json.loads(manifest.read_text())
+if sys.argv[1]=='etter':
+ src=Path(sys.argv[3]);dest=R/f'raa-{key}.png';assert not dest.exists();shutil.copy2(src,dest);v=next(v for v in j['kall'] if v['kall']==key);assert not v['utfoert'];v.update(utfoert=True,status='raa_lagret_ikke_kontrollert',raa=dest.name,raa_kilde=str(src),sha256=hashlib.sha256(dest.read_bytes()).hexdigest());print('Lagret',dest.name)
+else:
+ a=json.loads((R/f'bildekall-{key}-planlagt.json').read_text());assert not(R/f'bildekall-{key}.json').exists();old=a['referenced_image_paths'];a['referenced_image_paths']=[old[0],str(R.parents[1]/'jobber/fig344_01/resultat.png'),old[1],old[2]]
+ a['prompt']=a['prompt'].replace('Ref1 is the exact production target, ref2 the approved Sam identity master, ref3 a previously controlled warm costume345 style/palette anchor.','Ref1 is the exact production target for each new toss pose. Ref2 is the newly source-controlled preceding costume344 sheet for exact head, clothing, fruit and line continuity, not the target poses. Ref3 is the approved Sam identity master. Ref4 is a previously controlled warm costume345 style/palette anchor. Preserve the exact new hand, fruit rotation, silhouette and occlusion poses from Ref1; do not copy the poses from Ref2.')
+ (R/f'bildekall-{key}.json').write_text(json.dumps(a,ensure_ascii=False,indent=2)+'\n');(R/f'prompt-{key}.txt').write_text(a['prompt']);n=ord(key[0])-ord('A')+1
+ j['kall'].append(dict(kall=key,jobb=f'fig344_{n:02d}',args=f'bildekall-{key}.json',utfoert=False,status='argumenter_lagret_foer_kall',utc=datetime.now(timezone.utc).isoformat(),referanse_sha256={p:hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in a['referenced_image_paths']}));print(json.dumps(a,ensure_ascii=False))
+manifest.write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'bildekall.py.txt')

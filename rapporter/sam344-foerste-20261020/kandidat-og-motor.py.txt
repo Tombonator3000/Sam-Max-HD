@@ -1,0 +1,37 @@
+from pathlib import Path
+import json,hashlib,shutil,subprocess,os,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/sam344-foerste-20261020';R=A/'rapporter/sam344-foerste-20261020';D=O/'mottak344';base=P/'mods/gpt';candidate=O/'mod-kandidat';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]=='9ed54398f31ba742edfc3f724eaa1a1f9df2a085'
+v=json.loads((D/'myke.json').read_text());assert v['ruter_ok']==22 and all(v[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']);entries=[]
+for job,s in v['ark'].items():
+ for name,c in s['ruter'].items():
+  assert c['status']=='ok' and c['i_modden'] and c['kilde']=='arket' and sha(D/c['fil'])==c['sha256']
+  entries.append(dict(jobb=job,bilde=name,fil=c['fil'],sha256=c['sha256'],kostyme=344,animasjon=c['animasjon'],retning=c['retning'],lag=c['lag'],kilde='arket'))
+assert len(entries)==22;old=json.loads((R/'grunnlag-filer-9ed54398.json').read_text());assert len(old)==20525
+for f,h in old.items():assert sha(base/f)==h,f
+assert not candidate.exists();shutil.copytree(base,candidate)
+for e in entries:
+ dst=candidate/e['fil'];assert not dst.exists();shutil.copy2(D/e['fil'],dst)
+meta=json.loads((base/'mod.json').read_text());assert meta['costume_cels']==2283;meta['costume_cels']=2305
+if 'costume344' not in meta['costumes']:meta['costumes'].append('costume344')
+meta['costumes'].sort();(candidate/'mod.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n')
+(R/'tillegg.json').write_text(json.dumps(dict(tillegg=entries),ensure_ascii=False,indent=2)+'\n');shutil.copy2(D/'myke.json',R/'myke344-kvittering.json')
+pkg=P/'out/felles-release-20261020-alkove/linux/squashfs-root';binary=pkg/'usr/bin/scummvm';data=pkg/'usr/share/sam-max-hd';b=json.loads((R/'motor-baseline.json').read_text())[0]
+assert b['kostyme']==344 and sha(binary)==b['binar_sha256']=='adfdf7fcf54a2547eeaaf37450120f1e2b82d62fc75a59d74f1258e5e0ff94d0'
+target=O/'final344-anim1-22';assert not target.exists();target.mkdir();home=target/'home';home.mkdir();saves=target/'saves';saves.mkdir()
+for f in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(f,saves/f.name)
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(pkg/'usr/lib'),'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(candidate),'DIGHD_VERIFY':'1','DIGHD_QUIT_AT':'320','DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'4','DIGHD_DUMP_FLAT':'1','DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0','DIGHD_TEST_ROOM':str(b['rom']),'DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':'344','DIGHD_TEST_ACTOR':str(b['aktor']),'DIGHD_TEST_CLIP':str(b['clip']),'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':b['pos'],'DIGHD_TEST_CAMX':str(b['camx']),'DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(b['animasjon'])})
+command=[str(binary),'--config='+str(target/'scummvm.ini'),'--path='+str(data/'game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+with(target/'scummvm.log').open('wb') as f:code=subprocess.run(command,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120).returncode
+assert code==0;log=(target/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];drawn=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*344',log)));assert len(checks)==80 and [v['frame'] for v in checks]==[v['frame'] for v in b['kontroller_med_frame']]
+extra=[dict(frame=v['frame'],kandidat=v['avvik'],grunnlag=w['avvik']) for v,w in zip(checks,b['kontroller_med_frame']) if v['avvik']>w['avvik']];assert not extra,extra
+expected={v['bilde'] for v in entries};seen={f'costume344_{n}' for n in drawn};assert expected<=seen,sorted(expected-seen)
+draws={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*344 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());name=f'costume344_{n}';image=target/f'frame_{f+4:06}_room092.png'
+ if name in expected and name not in draws and image.exists():draws[name]=dict(logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,h],fil=image.name,sha256=sha(image))
+assert len(draws)==22;first=min(v['logg_frame'] for v in draws.values())
+row=dict(scene=target.name,grunnlag_scene=b['scene'],kostyme=344,rom=b['rom'],animasjon=b['animasjon'],pos=b['pos'],camx=b['camx'],aktor=b['aktor'],clip=b['clip'],kontekst=b['kontekst'],kontroller=checks,tegnede_ruter=drawn,exit=code,binar_sha256=sha(binary),nye_eller_oekte_avvik=extra,dumps=len(list(target.glob('frame_*_room092.png'))))
+(target/'kvittering.json').write_text(json.dumps(row,indent=2)+'\n');(R/'motor-runder.json').write_text(json.dumps([row],indent=2)+'\n');(R/'motor-tegninger.json').write_text(json.dumps(draws,indent=2)+'\n')
+summary=dict(runder=1,baseline_runder_samme_binar=1,ruter_forventet=22,ruter_tegnet=22,ruter_ved_kildepos=22,mangler_i_avspilling=[],skjermbufferkontroller=len(checks),nullkontroller=sum(v['avvik']==0 for v in checks),kontroller_fra_frame40=sum(v['frame']>=40 for v in checks),faktisk_foerste_nye_draw_frame=first,kontroller_fra_foerste_nye_draw=sum(v['frame']>=first for v in checks),nye_eller_oekte_avvik=extra,avvik_ogsaa_i_grunnlag=[v for v in checks if v['avvik']],produksjonsbinar_sha256=sha(binary),naturlig_gjennomspilling=False,grunnlag='9ed54398 med2283 native, samme adfdf7fc-binær, rom92, kildepos159,101, aktør6, clip0, kamera160, scale255 og animasjon1',merknad='320frames, samme tvungne kildeforløp som grunnlaget. Original elevasjon1,testkrok0. Ingen nye eller økte bufferavvik. Ikke naturlig gjennomspilling.')
+(R/'motor-oppsummering.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'kandidat-og-motor.py.txt');print(json.dumps(summary,ensure_ascii=False),flush=True)

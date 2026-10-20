@@ -1,0 +1,46 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam344-foerste-20261020';O=P/'out/sam344-foerste-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+q=json.loads((R/'ruteplan-utvidet.json').read_text())['ruter'];protos={};evidence=[]
+for n,key in enumerate(['A01','B01','C01','D01','E01','F01']):
+ raw=R/f'raa-{key}.png'
+ if not raw.exists():continue
+ rows=[v for v in q if v['kildejobb']==f'fig344_{n+1:02d}'];a=np.array(Image.open(raw).convert('RGBA'));amax=int(a[:,:,3].max());assert amax in(254,255)
+ a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/amax).clip(0,255).astype(np.uint8);a[a[:,:,3]<=3]=0
+ labs,num=ndimage.label(a[:,:,3]>=128);parts=[]
+ for label,s in enumerate(ndimage.find_objects(labs),1):
+  if s is None:continue
+  count=int(np.count_nonzero(labs[s]==label))
+  if count>100:parts.append(dict(label=label,pixels=count,box=[s[1].start,s[0].start,s[1].stop,s[0].stop]))
+ assert len(parts)==len(rows),(key,parts,len(rows));parts.sort(key=lambda t:t['box'][0])
+ for v,g in zip(rows,parts):
+  x0,y0,x1,y1=g['box'];own=ndimage.binary_dilation(labs==g['label'],iterations=2);piece=a[y0:y1,x0:x1].copy();piece[~own[y0:y1,x0:x1]]=0
+  _,_,w,h=v['rekt'];im=Image.fromarray(piece).resize((w*4,h*4),Image.Resampling.LANCZOS);b=np.array(im);b[b[:,:,3]<=3]=0;im=Image.fromarray(b)
+  im.save(R/(v['bilde']+'-prototype.png'));protos[v['bilde']]=im
+  src=np.array(Image.open(P/'work/extract/costumes'/f'{v["bilde"]}.png').convert('RGBA'));sx,sy,sw,sh=v['rekt'];source_crop=Image.open(A/'jobber'/v['kildejobb']/'original_1x.png').convert('RGBA').crop((sx,sy,sx+sw,sy+sh));assert hashlib.sha256(source_crop.tobytes()).hexdigest()==v['rgba_sha256']
+  mask=np.repeat(np.repeat(src[:,:,3]>0,4,axis=0),4,axis=1);iou,cover=_iou(b[:,:,3]>=CORE,mask,0,0)
+  row=dict(bilde=v['bilde'],raa=raw.name,raa_sha256=sha(raw),generert_boks=g['box'],generert_kjernepiksler=g['pixels'],destinasjon=[0,0,w*4,h*4],prototype_sha256=sha(R/(v['bilde']+'-prototype.png')),snitt_union=float(iou),dekning=float(cover),alfa_maks_raa=amax,original_pikselmaske_brukt=False)
+  evidence.append(row);print(v['bilde'],round(iou,3),round(cover,3),flush=True)
+  bg=Image.new('RGBA',im.size,'#d0e0e0');bg.alpha_composite(im);bg.convert('RGB').save(R/(v['bilde']+'-kontroll.png'))
+(R/'plassering.json').write_text(json.dumps(dict(ruter=evidence,original_pikselmaske_brukt=False,merknad='Hele egne genererte figurer tilpasset sourceboks i4x. Bare egen generert komponent og dens antialfa brukes, ikke original silhuettmaske. RGB ved alpha0 nulles,alpha<=3 nulles og global maks254 normaliseres255.'),ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-20',verktøy='innebygd image_gen og tillatt Python-rensing/plassering',faktiske_bildekall=[v['kall'] for v in json.loads((R/'bildekall.json').read_text())['kall'] if v['utfoert']],leveranser=[])
+for jobnum in range(1,13):
+ job=f'fig344_{jobnum:02d}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());selected=[]
+ for c in j['ruter']:
+  rep=next(v for v in q if any(m['bilde']==c['bilde'] for m in v['malruter']))
+  if rep['bilde'] not in protos:break
+  selected.append((c,rep))
+ if len(selected)!=len(j['ruter']):continue
+ canvas=Image.new('RGBA',(1536,1024));rt=[]
+ for c,rep in selected:
+  image=protos[rep['bilde']];x,y,w,h=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(image,(dx,dy));yy,xx=np.nonzero(np.array(image)[:,:,3]>128)
+  src=np.array(Image.open(P/'work/extract/costumes'/f'{c["bilde"]}.png').convert('RGBA'));native_rep=np.array(Image.open(P/'work/extract/costumes'/f'{rep["bilde"]}.png').convert('RGBA'));assert np.array_equal(src,native_rep);source_crop=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(source_crop.tobytes()).hexdigest()==rep['rgba_sha256']
+  rt.append(dict(bilde=c['bilde'],kostyme=344,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=f"rapporter/sam344-foerste-20261020/{rep['bilde']}-prototype.png",prototype_sha256=sha(R/(rep['bilde']+'-prototype.png'))))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=rt)},indent=2)+'\n')
+ proc=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(proc.stdout+proc.stderr);print(job,proc.returncode,proc.stdout,flush=True)
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(rt),rutekart=f'rapporter/sam344-foerste-20261020/rutekart-{job}.json',egenkontroll={0:'OK',1:'SJEKK',2:'FEIL'}.get(proc.returncode,'FEIL'),native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False))
+ assert proc.returncode in(0,1)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser.py.txt')
