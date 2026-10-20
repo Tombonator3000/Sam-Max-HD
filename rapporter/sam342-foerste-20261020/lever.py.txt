@@ -1,0 +1,47 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-foerste-20261020';O=P/'out/sam342-foerste-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];audit=[];protos={}
+for i in range(1,6):
+ reps=[v for v in plan if v['kildejobb']==f'fig342_{i:02}'];raw=np.array(Image.open(R/f'raa-S{i:02}.png').convert('RGBA'));lab,n=nd.label(raw[:,:,3]>=128);parts=[]
+ for k in range(1,n+1):
+  y,x=np.nonzero(lab==k)
+  if len(x)>10000:parts.append((int(x.min()),k,int(x.max()),int(y.min()),int(y.max()),len(x)))
+ parts.sort();assert len(parts)==len(reps),(i,parts)
+ for rep,part in zip(reps,parts):
+  x,k,x1,y,y1,count=part;selected=lab==k;dist,near=nd.distance_transform_edt(~selected,return_indices=True);allow=dist<=2
+  arr=raw.copy();arr[:,:,3][~allow]=0;edge=allow&~selected;arr[edge,:3]=arr[near[0][edge],near[1][edge],:3];arr[arr[:,:,3]==0,:3]=0
+  # A common logical bottom cut, using only the generated painting, removes unequal sheet-bottom truncation.
+  bot=[]
+  for col in range(x+int((x1-x)*.10),x+int((x1-x)*.70)):
+   ys=np.flatnonzero(selected[:,col]);
+   if len(ys):bot.append(int(ys.max()))
+  cut=int(np.percentile(bot,10))+1;assert y1-cut<30,(rep['bilde'],y1,cut)
+  box=[max(0,x-1),max(0,y-1),min(raw.shape[1],x1+2),min(cut,raw.shape[0])];w,h=rep['rekt'][2:];im=Image.fromarray(arr).crop(box).resize((w*4,h*4),Image.Resampling.LANCZOS);a=np.array(im);weak=(a[:,:,3]>0)&(a[:,:,3]<=4);_,nearest=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);a[weak,:3]=a[nearest[0][weak],nearest[1][weak],:3];a[a[:,:,3]==0,:3]=0;im=Image.fromarray(a);p=R/(rep['bilde']+'-prototype.png');im.save(p);protos[rep['bilde']]=im
+  audit.append(dict(bilde=rep['bilde'],raa=f'raa-S{i:02}.png',raa_sha256=sha(R/f'raa-S{i:02}.png'),generert_komponent=k,raa_boks=box,intern_bunnavskjaering_px=max(0,y1+1-cut),sluttmaal=[w*4,h*4],prototype_sha256=sha(p),egen_alpha=True,originalmaske_brukt=False))
+progress=dict(dato='2026-10-20',verktoy='innebygd image_gen, Python til rensing og plassering tillatt av Tom',nye_jobber=5,leveranser=[])
+board=Image.new('RGB',(1600,850),(48,50,52));dr=ImageDraw.Draw(board)
+for i,row in enumerate(audit):
+ im=protos[row['bilde']].copy();im.thumbnail((385,390),Image.Resampling.LANCZOS);x=i%4*400;y=i//4*425;board.paste(im,(x,y+25),im);dr.text((x+4,y+4),row['bilde'],fill='white')
+board.save(R/'aatte-nye-sam342-poser.png')
+for n in range(1,6):
+ job=f'fig342_{n:02}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text())
+ if (d/'resultat.png').exists():
+  old=json.loads((R/'fremdrift.json').read_text());assert sha(d/'resultat.png')==next(v['sha256'] for v in old['leveranser'] if v['jobb']==job);back=R/'foer-svakkantrens';back.mkdir(exist_ok=True)
+  if not(back/(job+'-resultat.png')).exists():shutil.copy2(d/'resultat.png',back/(job+'-resultat.png'))
+ canvas=Image.new('RGBA',(1536,1024));rt=[]
+ for c in j['ruter']:
+  rep=next(v for v in plan if any(t['bilde']==c['bilde'] for t in v['malruter']));im=protos[rep['bilde']];x,y,w,h=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128);rt.append(dict(bilde=c['bilde'],kostyme=342,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=f'rapporter/{R.name}/{rep["bilde"]}-prototype.png',prototype_sha256=sha(R/(rep['bilde']+'-prototype.png'))))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=rt)},indent=2)+'\n');run=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(run.stdout+run.stderr);assert run.returncode==0,(job,run.stdout,run.stderr)
+ (d/'notat.md').write_text(f'''# {job}
+
+2026-10-20. Innebygd image_gen. Modellnavn er ikke oppgitt av verktøyet. Faktisk kall S{n:02}, prompter, argumenter, råbilde og referansehasher er bevart i rapporter/{R.name}/bildekall.json. Python-rensing og plassering er uttrykkelig tillatt av Tom.
+
+Kilde: Sam342 i rom92, lokalt201, aktør6, pos159,101, scale255. Alle ni kilderuter er sett i rommets skript og originalen. Sam rekker med tom hånd mot trehjertet. Standardpromptens aubergine er feil for dette tidlige forløpet og er korrigert i et separat notat og den faktiske prompten. Godkjent Sam-anker styrer identitet og strek; originalene styrer den varme brune scenepaletten, de tre synlige krummede fingertuppene, mansjetten, hatten og den gradvise belysningen. Sam holder ikke noe i disse rutene.
+
+Rensing bruker egen generert alfa og egne komponentgrenser, aldri en hard originalsilhuett. Bare helt identiske RGBA-kilder gjenbrukes: 1920 og1921 er samme hele kilde. Alle andre poser er egne. Faste 4x-mål og intern plassering. Egenkontroll OK. Resultat SHA256 {digest}. Native mottak, visuell kontroll, motorobservasjon, publisering og pakkeimport rapporteres hver for seg i fremdrift.json. Ingen ny Tom- eller Claude-godkjenning.
+''')
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(rt),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll='OK',native_mottatt=False,visuelt_kontrollert=False,motorobservert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False));print(job,'OK',len(rt),flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');(R/'prototype-kvitteringer.json').write_text(json.dumps(audit,indent=2)+'\n');shutil.copy2(__file__,R/'lever.py.txt')

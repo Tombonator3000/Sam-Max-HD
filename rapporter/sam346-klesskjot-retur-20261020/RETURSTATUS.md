@@ -1,0 +1,1 @@
+Klesreturen for 1664 og 1793..1815 er egenkontrollert, visuelt sett og motorobservert. Se sam342-foerste-20261020 for samlet sluttkontroll. To omrissvarsler er bevart. Tidligere rapporter er historikk; ikke gjenoppta den gamle en-radsreturen eller kopier de feilaktige klessoemmene. Andre kostymer og samlet gjennomspilling gjenstaar.

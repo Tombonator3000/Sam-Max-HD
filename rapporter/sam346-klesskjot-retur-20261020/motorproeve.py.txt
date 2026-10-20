@@ -1,0 +1,16 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,shutil,os,re,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam346-klesskjot-retur-20261020';O=P/'out/sam346-klesskjot-retur-20261020';PK=P/'out/felles-release-20261020-max/linux/squashfs-root';B=PK/'usr/bin/scummvm';D=PK/'usr/share/sam-max-hd';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def run(case):
+ name,mod,forced,limit=case;T=O/name;assert not T.exists();T.mkdir();h=T/'home';h.mkdir();s=T/'saves';s.mkdir()
+ for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,s/p.name)
+ env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update(HOME=str(h),XDG_CONFIG_HOME=str(h/'.config'),XDG_DATA_HOME=str(h/'.local/share'),XDG_CACHE_HOME=str(h/'.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(mod),DIGHD_VERIFY='1',DIGHD_QUIT_AT=str(limit),DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='4',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='92',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+ if forced:env.update(DIGHD_TEST_COSTUME='346',DIGHD_TEST_ACTOR='6',DIGHD_TEST_CLIP='0',DIGHD_TEST_CHORE_EVERY='1000',DIGHD_TEST_STATIC_SCENE='1',DIGHD_TEST_SCALE='255',DIGHD_TEST_POS='159,101',DIGHD_TEST_ANIMATION='1')
+ args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(s),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+ with (T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=180).returncode
+ log=(T/'scummvm.log').read_text();checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];seen=sorted(set(int(n) for n in re.findall(r'soft cel\s+(\d+) costume\s*346',log)));rec=dict(scene=name,exit=code,binar_sha256=sha(B),tvunget_kostyme=forced,naturlig_gjennomspilling=False,sett=seen,kontroller=checks);(T/'kvittering.json').write_text(json.dumps(rec,indent=2)+'\n');assert code==0 and checks and not any(v['avvik'] for v in checks),(name,code,checks);print(name,len(seen),'ruter',len(checks),'nullkontroller',flush=True);return rec
+cases=[('grunnlag2418-anim1',P/'mods/gpt',True,320),('kandidat01-anim1',O/'mod-klesmaster01',True,320),('kandidat01-romskript820',O/'mod-klesmaster01',False,820)]
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,cases))
+expected={int(v['bilde'].split('_')[-1]) for v in json.loads((R/'kandidat01.json').read_text())['ruter']};seen=set().union(*(set(v['sett']) for v in rows[1:]));assert expected<=seen,expected-seen
+(R/'motorproeve01.json').write_text(json.dumps(dict(runder=rows,alle_24_sett=True,full_gjennomspilling=False),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'motorproeve.py.txt')

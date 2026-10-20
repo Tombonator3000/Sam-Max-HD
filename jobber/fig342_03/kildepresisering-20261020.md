@@ -1,0 +1,1 @@
+Sam har tom hånd og rekker mot trehjertet i rom92. Den beskyttede standardpromptens aubergine er feil for disse tidlige342-posene. Korrigert faktisk prompt og motorgrunnlag ligger i rapporter/sam342-foerste-20261020. Originalen og stilankeret er sett før produksjon.

@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-foerste-20261020';S=A/'rapporter/sam346-klesskjot-retur-20261020';O=P/'out/sam342-foerste-20261020';C=O/'mod-sam342-klesretur';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+if not C.exists():shutil.copytree(P/'out/sam346-klesskjot-retur-20261020/mod-klesmaster01',C)
+assert {p.stem for p in (C/'costumes').glob('costume342_*_hd.png')} <= {f'costume342_{n}_hd' for n in range(1920,1929)}
+rec=json.loads((S/'kandidat01.json').read_text());clean=[]
+for v in rec['ruter']:
+ old=S/v['prototype'];a=np.array(Image.open(old).convert('RGBA'));b=a.copy();weak=(a[:,:,3]>0)&(a[:,:,3]<=4);_,near=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);b[weak,:3]=a[near[0][weak],near[1][weak],:3];b[b[:,:,3]==0,:3]=0;assert np.array_equal(a[:,:,3],b[:,:,3]);p=S/(v['bilde']+'-retur-renset-prototype.png');Image.fromarray(b).save(p);out=Image.new('RGBA',(b.shape[1]+16,b.shape[0]+16));out.alpha_composite(Image.fromarray(b),(8,8));target=C/'costumes'/(v['bilde']+'_hd.png');out.save(target,optimize=True);clean.append(dict(bilde=v['bilde'],svake_kantpiksler=int(np.any(b!=a,2).sum()),alfa_uendret=True,foer_sha256=sha(old),etter_sha256=sha(p)));v.update(prototype=p.name,prototype_sha256=sha(p),etter_sha256=sha(target))
+rec.update(svakkantrens=True,motorproevd=False,visuelt_godkjent=False);(S/'kandidat02-renset.json').write_text(json.dumps(rec,indent=2)+'\n');(S/'svakkantrens.json').write_text(json.dumps(clean,indent=2)+'\n')
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];added=[]
+for v in plan:
+ p=R/(v['bilde']+'-prototype.png');im=Image.open(p).convert('RGBA');out=Image.new('RGBA',(im.width+16,im.height+16));out.alpha_composite(im,(8,8));a=np.array(out);assert not ((a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0)).any()
+ for t in v['malruter']:
+  target=C/'costumes'/(t['bilde']+'_hd.png')
+  if target.exists():
+   prev=np.array(Image.open(target));assert np.array_equal(a[:,:,3],prev[:,:,3]) and np.array_equal(a[a[:,:,3]>4],prev[a[:,:,3]>4])
+  src=np.array(Image.open(P/'work/extract/costumes'/(t['bilde']+'.png')).convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cover=_iou(a[:,:,3]>=CORE,mask,-8,-8);assert iou>=GOOD_IOU and cover>=GOOD_COVER,(t['bilde'],iou,cover);out.save(target,optimize=True);added.append(dict(bilde=t['bilde'],jobb=t['jobb'],fil=str(target.relative_to(C)),sha256=sha(target),snitt_union=iou,dekning=cover,marg=[2,2],flytt_hd=[0,0],originalmaske_brukt=False))
+meta=json.loads((C/'mod.json').read_text());assert meta['costume_cels']==2418;meta['costume_cels']=2427
+if 'costume342' not in meta['costumes']:meta['costumes'].append('costume342');meta['costumes'].sort()
+(C/'mod.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n');(R/'native-fast4x.json').write_text(json.dumps(dict(ruter=added,native_totalt=2427,tillegg=9,retur=24),indent=2)+'\n');shutil.copy2(__file__,R/'native-slutt.py.txt');print('2427 native,9 nye,24 klesreturer,',sum(v['svake_kantpiksler'] for v in clean),'svake RGB-kantpiksler renset. Alfa identisk.',flush=True)
