@@ -11,3 +11,5 @@ Alle66 ruter er observert i en520-frame tvungen kildeprøve ved kildeposisjon og
 De nye kildene har40 beskyttede filer. Ingen nye bildekall,resultater,native eller publiseringspåstand her. Ti jobber,66 native-koblinger,23 ulike kilder. Felles2333-pakkene bygges av én dispatch hver. Behold frysen på hd-mod til faktiske pakker er sikret. Gammel nattkontroll er fortsatt pauset.
 
 I2333-kontekstprøven skimtes en tynn rest etter trehjertets kontur når objekt901 fjernes. Ikke kall dette rettet av Sam344-leveransen eller av null bufferavvik. Sammenlign med helt klassisk visning før årsaken avgjøres. Dette gjelder neste objekt-/347-sammenspillskontroll,ikke et nytt stilvalg fra Tom.
+
+Samlepunktet2333 er nå publisert og faktisk kontrollert i begge pakker,alle50 nye native inkludert. Pakkefrysen er sikret. Gjenoppta første fem347-jobber uten å gjenta byggene eller kildeprøvene ovenfor.
