@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,re,hashlib,shutil,math,zipfile
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/aubergine347-grunnlag-20261020';O=P/'out/aubergine347-grunnlag-20261020';scene=O/'baseline347-anim1';log=(scene/'scummvm.log').read_text();plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];draws={};expected={a['bilde'] for v in plan for a in v['malruter']}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*347 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());name=f'costume347_{n}';p=scene/f'frame_{f+4:06}_room092.png'
+ if name in expected and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,h],fil=p.name,sha256=hashlib.sha256(p.read_bytes()).hexdigest())
+assert len(draws)==66 and set(draws)==expected
+for page in range(math.ceil(len(plan)/9)):
+ board=Image.new('RGB',(1920,1275),'#243340');d=ImageDraw.Draw(board)
+ for i,v in enumerate(plan[page*9:(page+1)*9]):
+  meta=draws[v['bilde']];im=Image.open(scene/meta['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));d.text((x+5,y+5),f"{v['bilde']}, f{meta['bildeframe']}, kildepos aktor8",fill='white')
+ board.save(R/f'kildeposer-i-motor-{page+1}.png')
+base=json.loads((R/'motor-baseline.json').read_text())[0];checks=base['kontroller_med_frame'];assert len(checks)==130 and not any(v['avvik'] for v in checks);(R/'kildevisning.json').write_text(json.dumps(dict(kilder=23,ruter=66,alle66_motorobservert=True,aktor=8,pos=[159,100],clip=0,scale=255,chore1_samme_gyldige_data_som_kildens_chore6=True,raw28_ikke_brukt=True,binar_sha256=base['binar_sha256'],kontroller=130,nullkontroller=130,tegninger=draws,motivavklaring_i_sammenheng_gjenstaar=True),ensure_ascii=False,indent=2)+'\n')
+with zipfile.ZipFile(R/'grunnlagsmotorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:z.write(scene/'scummvm.log','baseline347-anim1/scummvm.log')
+shutil.copy2(__file__,R/'kildevisning.py.txt');print('66 ekte rutekoblinger observert,130 nullkontroller.23 ulike sourceposer i tre ark;funksjon i full scene gjenstår.')

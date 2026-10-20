@@ -1,0 +1,1 @@
+Begge2333-pakkebygg er startet én gang. Ikke start dem på nytt. Hent status med run_id i bygg-startet.json og følg opp med faktisk nedlasting,fire asset-SHA-er,alle moddfiler og motorprøve før fellesrelease publiseres. Hovedrepo main har bare dokumentasjonsendringer siden forrige pakke. Grafikkproduksjon fortsetter med gyldige kilder mens byggene går.

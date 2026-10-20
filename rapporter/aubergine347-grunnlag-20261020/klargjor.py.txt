@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from smhd.gamedata import load,read_index,read_rooms
+import json,hashlib,shutil,struct
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/aubergine347-grunnlag-20261020';O=P/'out/aubergine347-grunnlag-20261020';assert not R.exists() and not O.exists();R.mkdir();O.mkdir();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=[];protected={};unique={}
+for f in sorted((A/'jobber').glob('fig347_*/jobb.json')):
+ j=json.loads(f.read_text());job=f.parent.name;assert not(f.parent/'resultat.png').exists() and not(f.parent/'retur.md').exists();im=Image.open(f.parent/'original_1x.png').convert('RGBA');rows.append(dict(jobb=job,ruter=len(j['ruter']),animasjoner=sorted({c['animasjon'] for c in j['ruter']})))
+ for name in ['jobb.json','original_1x.png','prompt.txt','referanse.png']:protected[f'jobber/{job}/{name}']=sha(f.parent/name)
+ for c in j['ruter']:
+  assert c['animasjon']==1;x,y,w,h=c['rekt'];crop=im.crop((x,y,x+w,y+h));key=(crop.size,hashlib.sha256(crop.tobytes()).hexdigest());unique.setdefault(key,dict(bilde=c['bilde'],kildejobb=job,rekt=c['rekt'],rgba_sha256=key[1],malruter=[]))['malruter'].append(dict(jobb=job,bilde=c['bilde'],rekt=c['rekt'],animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']))
+assert len(rows)==10 and sum(v['ruter'] for v in rows)==66 and len(unique)==23 and len(protected)==40
+for name,value in [('klargjort.json',rows),('ruteplan-unik.json',dict(ruter=list(unique.values()))),('beskyttede-kilder.json',protected)]: (R/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+board=Image.new('RGB',(1560,2775),'#39434c');draw=ImageDraw.Draw(board)
+for i,row in enumerate(rows):
+ im=Image.open(A/'jobber'/row['jobb']/'original_1x.png').convert('RGB').resize((768,512),Image.Resampling.NEAREST);x=i%2*780;y=i//2*555;board.paste(im,(x+12,y+35));draw.text((x+12,y+10),row['jobb'],fill='white')
+board.save(R/'originalreferanser347.png')
+script=Path('/home/tom/Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/ikon-grunnlag/skript/rom_092');proof={}
+for name in ['inngang.txt','lokal_202.txt','lokal_201.txt']:
+ target=R/('kildeskript-rom_092-'+name);shutil.copy2(script/name,target);proof[name]=dict(kilde=str(script/name),sha256=sha(script/name),kopi=target.name)
+(R/'kildeskript-proveniens.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+d,_=load(P/'game/SAMNMAX.001');ix=read_index(P/'game/SAMNMAX.000');rooms=read_rooms(P/'game/SAMNMAX.001');room,rel=ix.costume_dir[347];off=rooms[room].offset+rel;size=struct.unpack_from('>I',d,off+4)[0];base=d[off+8:off+size];num=base[6];start=74;table=[(i,int.from_bytes(base[start+i*2:start+i*2+2],'little')) for i in range(num+1)];assert num==28 and table[4][1]==130 and start+num*2==130 and table[-1]==(28,1)
+(R/'ressursgrense.json').write_text(json.dumps(dict(kostyme=347,rom=room,cost_offset=off,cost_size=size,num_anim_byte=num,data_offsets=start,gyldige_ikke_tomme=[i for i,v in table[:-1] if v],chore1_raw4_og_kildens_chore6_raw24_samme_offset=130,raw28_ugyldig_overlapper_forste_lagmaske=True,raw28_offset=1,alle66_jobbruter_kommer_fra_gyldig_animasjon1=True,ingen_raw28_proeve=True,spill_sha256=sha(P/'game/SAMNMAX.001')),ensure_ascii=False,indent=2)+'\n')
+(R/'NESTE.md').write_text('''# Aubergine347 klargjort, ingen nye kall
+
+Ti jobber fig347_01 til10,66 kildefestede rutekoblinger fra23 ulike hele kilder.40 beskyttede filer. Ingen resultater eller bildekall her. Kildeskript rom92/lokalt202 bruker aktør8,kostyme347,scale255,pos159,100,neverZClip og chore6 etter108 spillframes. Den gyldige chore6/raw24 peker til samme130 som katalogens chore1/raw4. Raw28 overlapper første lagmaske og peker feil tilbyte1;ikke kjør den. Alle disse66 rutene er fra gyldig chore1,ikke raw28.
+
+Originalene har store utsparinger og noen brune deler. Disse skal ikke gjettes som bitt/menneske/øyne. Se faktisk sammenhengende rom92-forløp med Sam/aktør6 og objekt901 for å avklare funksjon,figur-/håndoverlapping og de brune delene før generering. Se egne tidligere kontrollerte lilla auberginer som stil,men ta nye former fra originalene. Ingen motivspørsmål til Tom før kilde-/motorkonteksten er undersøkt. Ingen hard originalmaske. Sam344 er ferdig gyldig50 native,publisert i2333-modden. Nye2333-pakker bygger;ikke dupliser dem eller send ny modd før pakkefrysen er sikret.
+''');shutil.copy2(__file__,R/'klargjor.py.txt');print('10 jobber,66 gyldige rutekoblinger,23 ulike kilder. Motif/lagsammenheng skal ses før generering.')

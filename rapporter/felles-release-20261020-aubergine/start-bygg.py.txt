@@ -1,0 +1,22 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,hashlib,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-aubergine';R=A/'rapporter/felles-release-20261020-aubergine';assert not O.exists() and not R.exists();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True));mod=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0];rec=json.loads((A/'rapporter/sam344-fortsettelse-20261020/mottak-publisert.json').read_text());assert mod==rec['hd_mod_sha'] and rec['native_etter']==2333;assert json.loads((P/'mods/gpt/mod.json').read_text())['costume_cels']==2333
+code=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip();assert subprocess.check_output(['git','branch','--show-current'],cwd=P,text=True).strip()=='main' and not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True);remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/main'],cwd=P,text=True).split()[0];assert remote==code;old=json.loads((P/'out/felles-release-20261020-sam/bygg-startet.json').read_text());diff=subprocess.check_output(['git','diff','--name-only',old['kode'],code],cwd=P,text=True).splitlines();assert set(diff)<={'memory.md','todo.md','STATUS.md','log.md'}
+prior=api('releases?per_page=100');tag='sam-max-hd-2026-10-20-aubergine';assert not any(v['tag_name']==tag for v in prior);assert len(prior)==12
+runs={}
+for platform in ['linux','windows']:
+ rows=api(f'actions/workflows/{platform}.yml/runs?per_page=6')['workflow_runs'];assert all(v['status']=='completed' for v in rows);runs[platform]=rows
+O.mkdir();R.mkdir();(O/'releaser-foer-bygg.json').write_text(json.dumps(prior,indent=2)+'\n');shutil.copy2(O/'releaser-foer-bygg.json',R/'releaser-foer-bygg.json')
+entries=[]
+for folder in ['sam344-foerste-20261020','sam344-fortsettelse-20261020']:entries+=json.loads((A/'rapporter'/folder/'tillegg.json').read_text())['tillegg']
+assert len(entries)==50 and len({e['fil'] for e in entries})==50 and all(sha(P/'mods/gpt'/v['fil'])==v['sha256'] for v in entries);(R/'nye-native-50.json').write_text(json.dumps(dict(tillegg=entries),ensure_ascii=False,indent=2)+'\n');files={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in(P/'mods/gpt').rglob('*') if p.is_file()};assert len(files)==20575;(R/'moddfiler-2333.json').write_text(json.dumps(files,indent=2)+'\n');state=dict(start_utc=datetime.now(timezone.utc).isoformat(),status='bygger2333_begge_plattformer_ikke_publisert_felles_enna',kode=code,hd_mod=mod,native=2333,nye_native=50,forrige_felles_native=2283,release_tag=tag,main_kun_dokumentasjon_siden_forrige_release=True,main_diff=diff,plattform={})
+def save():
+ for p in [O,R]:(p/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+for platform in ['linux','windows']:
+ (O/f'runs-{platform}-foer.json').write_text(json.dumps(runs[platform],indent=2)+'\n');state['plattform'][platform]=dict(dispatch_forsoek_utc=datetime.now(timezone.utc).isoformat(),status='dispatch_startes_en_gang');save();p=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,capture_output=True,text=True);state['plattform'][platform].update(dispatch_exit=p.returncode,stdout=p.stdout,stderr=p.stderr);save();assert p.returncode==0,(platform,p.stderr);m=re.search(r'/actions/runs/(\d+)',p.stdout)
+ if m:rid=int(m[1])
+ else:
+  after=api(f'actions/workflows/{platform}.yml/runs?per_page=6')['workflow_runs'];new=[v for v in after if v['id'] not in{r['id'] for r in runs[platform]} and v['head_sha']==code and v['event']=='workflow_dispatch'];assert len(new)==1;rid=new[0]['id']
+ state['plattform'][platform].update(run_id=rid,run_url=f'https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{rid}',status='queued');save();print(platform,rid,flush=True)
+(R/'PAAGAR.md').write_text('Begge2333-pakkebygg er startet én gang. Ikke start dem på nytt. Hent status med run_id i bygg-startet.json og følg opp med faktisk nedlasting,fire asset-SHA-er,alle moddfiler og motorprøve før fellesrelease publiseres. Hovedrepo main har bare dokumentasjonsendringer siden forrige pakke. Grafikkproduksjon fortsetter med gyldige kilder mens byggene går.\n');shutil.copy2(__file__,R/'start-bygg.py.txt');print('Begge bygg sendt én gang. Native',mod,'kode',code,flush=True)

@@ -7,3 +7,5 @@ Innebygd image_gen, fem faktiske kall med alle råbilder og faktiske prompter i 
 Dette arket har 3 ruter. Egenkontroll og native mottak OK. Alle 28 gyldige native i bunken er sett som original/native/motor, inklusive fire ekte sluttalias fra blandet jobb18. Jobb18 er ikke telt som hel og feil148 er ikke produsert. Uendrede mottaksterskler, 80 sluttbufferkontroller uten avvik med adfdf7fc-binæren og samme grunnlag. 66 kontroller fra faktisk første nye tegning ved frame 60. Tvunget kildeforløp med kildeelevasjon 1 mot testkrok 0, ikke naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Ingen ny Tom-/Claude-godkjenning.
 
 Resultat SHA256: 611f7a255e523aa88efe1ceee0c11eb3ab5153d32043818e5a8c1259d25a4e5f. Rutekart: rapporter/sam344-fortsettelse-20261020/rutekart-fig344_16.json. Native publisering og hent bekreftes separat i mottak-publisert.json. Beskyttede jobbfiler er uendret.
+
+Publisering og hent bekreftet i hd-mod a55db07c2a57907ebe530957a0b6580dd5bf0849. Resultatets SHA er uendret. Fellespakken2283 inneholder ennå ikke denne bunken.

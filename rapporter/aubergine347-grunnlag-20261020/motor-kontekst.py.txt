@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,re,os,subprocess
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/aubergine347-grunnlag-20261020';R=P/'work/.gpt-gren/rapporter/aubergine347-grunnlag-20261020';pkg=P/'out/felles-release-20261020-alkove/linux/squashfs-root';binary=pkg/'usr/bin/scummvm';data=pkg/'usr/share/sam-max-hd';target=O/'rom92-skriptkontekst';assert not target.exists();target.mkdir();home=target/'home';home.mkdir();saves=target/'saves';saves.mkdir()
+for p in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(pkg/'usr/lib'),'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(P/'mods/gpt'),'DIGHD_VERIFY':'1','DIGHD_QUIT_AT':'600','DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'4','DIGHD_DUMP_FLAT':'1','DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0','DIGHD_TEST_ROOM':'92','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'160','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1'})
+command=[str(binary),'--config='+str(target/'scummvm.ini'),'--path='+str(data/'game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+with(target/'scummvm.log').open('wb') as f:code=subprocess.run(command,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120).returncode
+log=(target/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];draws=[]
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*347 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());p=target/f'frame_{f+4:06}_room092.png'
+ if p.exists():draws.append(dict(bilde=f'costume347_{n}',logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,h],fil=p.name,sha256=hashlib.sha256(p.read_bytes()).hexdigest()))
+row=dict(exit=code,rom=92,native_grunnlag=2333,rute_krok_brukt=False,kostymekrok_brukt=False,kun_romhopp=True,ingen_tvangsraw28=True,ruter_sett=sorted({v['bilde'] for v in draws}),kontroller=checks,tegninger=draws,binar_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),naturlig_spilloppsett_ikke_pastatt=True);(R/'motor-skriptkontekst.json').write_text(json.dumps(row,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'motor-kontekst.py.txt');print('Skriptkontekst',code,len(row['ruter_sett']),'347ruter,',len(checks),'kontroller,',sum(v['avvik']>0 for v in checks),'avvik',flush=True);assert code==0
