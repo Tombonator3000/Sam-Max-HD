@@ -1,0 +1,1 @@
+Sam i rom 92, aktør 6, lokalt skript 201, chore 6. Ekte lilla aubergine med grønn stjerne øverst, source-korrekt håndgrep og brun scene-palett. Canonical 1935 til 1940 er eksakte hele RGBA-aliaser. Beskyttede kilder er urørt. Se rapporter/sam343-slutt-20261020/KILDEGRUNNLAG.md og faktiske prompter.

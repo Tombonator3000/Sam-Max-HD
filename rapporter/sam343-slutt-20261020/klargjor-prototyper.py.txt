@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+import numpy as np,json,hashlib,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam343-slutt-20261020';n=int(sys.argv[1]);call=sys.argv[2] if len(sys.argv)>2 else f'J{n:02}';job=f'fig343_{n:02}';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+rawfile=R/f'raa-{call}.png';raw=np.array(Image.open(rawfile).convert('RGBA'));lab,total=nd.label(raw[:,:,3]>=128);parts=[]
+for k in range(1,total+1):
+ y,x=np.nonzero(lab==k)
+ if len(x)>10000:parts.append(dict(k=k,x=int(x.min()),y=int(y.min()),x1=int(x.max()),y1=int(y.max()),piksler=len(x)))
+parts.sort(key=lambda v:v['x']);assert len(parts)==2,parts
+j=json.loads((A/'jobber'/job/'jobb.json').read_text());plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];rows=[]
+for c,part in zip(j['ruter'],parts):
+ selected=lab==part['k'];dist,near=nd.distance_transform_edt(~selected,return_indices=True);allow=dist<=2;arr=raw.copy();arr[:,:,3][~allow]=0;edge=allow&~selected;arr[edge,:3]=arr[near[0][edge],near[1][edge],:3];arr[arr[:,:,3]==0,:3]=0
+ box=[max(0,part['x']-1),max(0,part['y']-1),min(raw.shape[1],part['x1']+2),min(raw.shape[0],part['y1']+2)];w,h=c['rekt'][2:];im=Image.fromarray(arr).crop(box).resize((w*4,h*4),Image.Resampling.LANCZOS);a=np.array(im);weak=(a[:,:,3]>0)&(a[:,:,3]<=4);_,nearest=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);a[weak,:3]=a[nearest[0][weak],nearest[1][weak],:3];a[a[:,:,3]==0,:3]=0;im=Image.fromarray(a)
+ out=R/(c['bilde']+'-prototype.png');assert not out.exists(),out;im.save(out)
+ src=np.array(Image.open(P/'work/extract/costumes'/(c['bilde']+'.png')).convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cover=_iou(a[:,:,3]>=CORE,mask,0,0);assert iou>=GOOD_IOU and cover>=GOOD_COVER,(c['bilde'],iou,cover)
+ rows.append(dict(bilde=c['bilde'],kall=call,raa_sha256=sha(rawfile),egen_komponent=part,raa_boks=box,maal=[w*4,h*4],alfa_kilde='Kun egen generert kjerne og2px ytterkant',fjernet_egen_halo_utenfor_kjerne2px=True,svak_kant_RGB_renset=int(weak.sum()),hard_originalmaske=False,originalfragment_fallback=False,sha256=sha(out),snitt_union=iou,dekning=cover))
+p=R/'prototype-kvitteringer.json';data=json.loads(p.read_text()) if p.exists() else [];data.extend(rows);p.write_text(json.dumps(data,indent=2)+'\n')
+board=Image.new('RGB',(1440,1480),'#263441');d=ImageDraw.Draw(board)
+for i,v in enumerate(rows):
+ src=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);im=Image.open(R/(v['bilde']+'-prototype.png')).convert('RGBA')
+ for k,(label,a) in enumerate([('Original',src),('Ny egen alfa',im)]):
+  board.paste(a,(k*720,i*740+30),a);d.text((k*720+5,i*740+5),v['bilde']+' '+label,fill='white')
+board.save(R/(job+'-original-prototype.png'))
+style=Image.new('RGBA',(1536,1024))
+for c in j['ruter']:
+ x,y,w,h=c['rekt'];im=Image.open(R/(c['bilde']+'-prototype.png'));style.alpha_composite(im,((j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4))
+style.save(R/(job+'-stilark.png'));shutil.copy2(__file__,R/'klargjor-prototyper.py.txt');print([(v['bilde'],round(v['snitt_union'],3),round(v['dekning'],3)) for v in rows],flush=True)

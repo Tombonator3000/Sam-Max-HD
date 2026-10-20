@@ -1,0 +1,39 @@
+from pathlib import Path
+import json, hashlib, sys, shutil
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter/sam343-slutt-20261020'
+n = int(sys.argv[1])
+assert n in [6, 7, 8, 11]
+call = f'K{n:02}'
+J = A / f'jobber/fig343_{n:02}'
+previous = {6: A / 'jobber/fig343_05/resultat.png', 7: R / 'fig343_06-stilark.png',
+            8: R / 'fig343_07-stilark.png', 11: R / 'fig343_08-stilark.png'}[n]
+details = {
+    6: 'Both source cels hold the pear-shaped purple aubergine upright with its green star/calyx at the TOP near the chin. In the right cel the narrow upper tip is raised and elongated slightly relative to the left. Trace the exact purple contour, green star location and each supporting finger. Both poses retain the same head/body geometry with only the tiny source changes.',
+    7: 'Both cels hold the purple aubergine upright near the chin, green star at TOP. The right cel has a slightly higher, narrower tip and a subtly shifted foreground empty hand at lower left. Preserve these small animation differences, the exact fruit silhouette and all fingers.',
+    8: 'LEFT: upright purple aubergine near the chin, green star at TOP. RIGHT: Sam raises/straightens his head and LOWERS the fruit below the chin, revealing more of the shirt and striped tie. Follow the distinct original head angle and lower fruit size and position, do not repeat the left pose on the right.',
+    11: 'LEFT: lowered purple aubergine with green star at TOP and straight head, same source pose as the preceding sheet second frame. RIGHT: Sam tilts his head/fedora slightly and lowers the fruit a little further. Preserve this exact final head angle and fruit grip. The left drawing is a continuity reference and will be discarded in favor of the already-painted exact canonical alias from sheet 08. The right drawing is the new delivery.'
+}
+refs = [str(J / 'referanse.png'), str(previous), str(A / 'stil/fig002_01.png')]
+prompt = (J / 'prompt.txt').read_text() + '''
+
+Exact source and continuity instructions:
+Image 1 is the exact original geometry and arrangement for these two cels. Image 2 is OUR preceding painted animation sheet. Match its brown fedora and suit, orange-tan dog face and long ears, cream shirt/cuffs, black and blue-gray striped tie, clean dark outlines and restrained shading. Image 3 is the approved identity anchor; do not copy its BLUE suit palette. Keep head-to-body and hand-to-head proportions from the source, and every visible finger and thumb. Draw exactly TWO chest-up cutouts, transparent 1536x1024 landscape sheet, in the same two original positions and sizes. No legs or additional figures.
+''' + details[n] + '''
+The flat bottom and angular indentation on the lower right are INTERNAL ANIMATION BOUNDARIES behind the foreground pedestal. Keep those exact cut boundaries and make the cutout beyond them fully transparent. Do not invent a brown panel in the missing corner. The violet/purple fruit and green star are real painted parts. No cyan padding, gray border, background, shadows, halo or diffuse brown haze outside the figures. Genuine clean antialiased alpha. Original source pose overrides the previous painted pose.
+'''
+args = dict(prompt=prompt, referenced_image_paths=refs, transparent_background=True)
+assert not (R / f'bildekall-{call}.json').exists()
+(R / f'prompt-{call}.txt').write_text(prompt)
+(R / f'bildekall-{call}.json').write_text(json.dumps(args, ensure_ascii=False, indent=2) + '\n')
+p = R / 'bildekall.json'
+data = json.loads(p.read_text()) if p.exists() else dict(verktoy='innebygd image_gen', modell='ikke oppgitt', kall=[])
+assert not any(v['kall'] == call for v in data['kall'])
+data['kall'].append(dict(kall=call, jobb=J.name, args=f'bildekall-{call}.json', prompt=f'prompt-{call}.txt',
+    arkivprompt_ordrett_bevart_i_faktisk_prompt=True, korrigert_premiss=False,
+    referanse_sha256={f: hashlib.sha256(Path(f).read_bytes()).hexdigest() for f in refs}, utfoert=False,
+    planlagt_brukte_ruter=[c['bilde'] for c in json.loads((J / 'jobb.json').read_text())['ruter'] if n != 11 or c['rute'] == 1941]))
+p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+(J / 'kildepresisering-20261020.md').write_text('Sam i rom 92, aktør 6, lokalt skript 201, chore 6. Ekte lilla aubergine med grønn stjerne øverst, source-korrekt håndgrep og brun scene-palett. Canonical 1935 til 1940 er eksakte hele RGBA-aliaser. Beskyttede kilder er urørt. Se rapporter/sam343-slutt-20261020/KILDEGRUNNLAG.md og faktiske prompter.\n')
+shutil.copy2(__file__, R / 'forbered-ark.py.txt')

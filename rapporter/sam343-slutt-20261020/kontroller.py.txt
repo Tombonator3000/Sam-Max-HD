@@ -1,0 +1,95 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import json, hashlib, subprocess, shutil, zipfile
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+C = O / 'mod-sam343-slutt'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+base = json.loads((R / 'grunnlag-produksjon.json').read_text())
+native = json.loads((R / 'native-fast4x.json').read_text())
+count, total = native['tillegg'], native['native_totalt']
+assert (count, total) == (12, 2478)
+expected = json.loads((R / 'kandidatfilhash.json').read_text())
+actual = {p.relative_to(C).as_posix(): sha(p) for p in C.rglob('*') if p.is_file()}
+assert expected == actual and len(actual) == len(base['filer']) + count
+assert set(base['filer']) <= set(actual)
+assert {f for f, h in base['filer'].items() if actual[f] != h} == {'mod.json'}
+auto = json.loads((R / 'myke-automatisk.json').read_text())
+assert auto['ruter_ok'] == count and all(auto[k] == 0 for k in ['ruter_sjekk', 'ruter_mangler', 'ruter_teknisk'])
+motor = json.loads((R / 'motorproeve.json').read_text())
+assert motor['skjermbufferkontroller'] == motor['nullkontroller'] == 285
+assert len(json.loads((R / 'motorobservasjoner.json').read_text())['tegninger']) == count
+assert all(set(range(1930, 1942)) <= set(v['sett343']) for v in motor['runder'])
+progress = json.loads((R / 'fremdrift.json').read_text())
+jobs = progress['leveranser']
+assert len(jobs) == 6 and len(list((A / 'jobber').glob('fig*/resultat.png'))) == base['hele_resultatjobber'] + 6
+for e in jobs:
+    assert sha(A / e['resultat']) == e['sha256'] == json.loads((A / e['rutekart']).read_text())[e['jobb']]['sha256_resultat']
+    assert 'Utfall: OK' in (R / (e['jobb'] + '-egenkontroll.txt')).read_text()
+    e.update(native_mottatt=True, visuelt_kontrollert=True, motorobservert=True, publisert=False, importert=False, i_fellespakke=False)
+(R / 'fremdrift.json').write_text(json.dumps(progress, ensure_ascii=False, indent=2) + '\n')
+calls = json.loads((R / 'bildekall.json').read_text())['kall']
+assert len(calls) == 4 and all(c['utfoert'] and c['brukt'] and sha(R / c['raa']) == c['raa_sha256'] for c in calls)
+for c in calls:
+    for f, h in c['referanse_sha256'].items():
+        assert sha(Path(f)) == h
+names = ['alkove-siste-20261020', 'alkove-fortsettelse-20261020', 'alkove-gjenbruk-20261020',
+         'sam-sugepil-345-20261020', 'sam345-gjenbruk-a-20261020', 'sam345-gjenbruk-b-20261020',
+         'sam345-tilbake-20261020', 'sam345-slutthoder-20261020', 'sam344-foerste-20261020',
+         'sam344-fortsettelse-20261020', 'aubergine347-grunnlag-20261020', 'max-alkove341-grunnlag-20261020',
+         'sam346-klesskjot-retur-20261020', 'sam346-overtegning-20261020']
+names += [p.name for p in (A / 'rapporter').glob('sam342-*')] + ['sam343-foerste-20261020', R.name]
+protected = {}
+for name in names:
+    for fn in ['beskyttede-kilder.json', 'beskyttede-kildefeil-raw32.json', 'beskyttede-kilder-utvidet.json']:
+        p = A / 'rapporter' / name / fn
+        if p.exists():
+            for f, h in json.loads(p.read_text()).items():
+                assert f not in protected or protected[f] == h
+                protected[f] = h
+assert all(sha(A / f) == h for f, h in protected.items())
+assert subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines() == base['stash']
+shots = json.loads((R / 'hele-motorbilder.json').read_text())
+assert len(shots) == 7 and all(sha(R / v['fil']) == v['sha256'] for v in shots)
+review = dict(tid_utc=datetime.now(timezone.utc).isoformat(), seks_resultatark_sett=True,
+    alle_original_native_motor_sett=count, hele_motorbilder_sett=7, foer_etter_sett=2,
+    ansikt_hatt_fingre_og_gronn_stilk_vurdert=True, lilla_frukt_bevart=True,
+    intern_kildegrense_skjules_av_sokkel_i_motor=True, magenta_eller_halo_ikke_sett=True,
+    ny_Tom_Claude_godkjenning=False)
+(R / 'visuell-vurdering.json').write_text(json.dumps(review, ensure_ascii=False, indent=2) + '\n')
+logs = {}
+with zipfile.ZipFile(R / 'motorlogger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+    for p in sorted(O.glob('*/scummvm.log')):
+        rel = p.relative_to(O).as_posix()
+        z.write(p, rel)
+        logs[rel] = sha(p)
+assert len(logs) == 4  # Fire nye prøver; kildeobservasjonen viser forrige grunnlagsprøve.
+(R / 'motorlogger-manifest.json').write_text(json.dumps(logs, indent=2) + '\n')
+oldpng = sum(f.endswith('.png') for f in base['filer'])
+proof = dict(nye_hele_jobber=6, nye_native=count, native_totalt=total,
+    figurjobber_med_resultat=base['hele_resultatjobber'] + 6, figurjobber_totalt=1758,
+    egenkontroll_ark_OK=6, automatisk_native_OK=count, visuelt_sett_native=count,
+    motorobservert_native=count, bildekall=4, brukte_malte_poser=7,
+    beskyttede_kilder_SHA_uendret=len(protected), tre_stasher_uendret=True,
+    alle_tidligere_filstier_bevart=True, tidligere_png_byteidentiske=oldpng,
+    kandidat_png=oldpng + count, kandidat_filer=len(actual), kontroller=285, nullkontroller=285,
+    publisert=False, i_fellespakke=False, hard_originalmaske=False, originalfragment_fallback=False,
+    naturlig_gjennomspilling=False, ny_Tom_Claude_godkjenning=False)
+(R / 'bevaringskontroll.json').write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
+(R / 'RAPPORT.md').write_text(f"""# Sam343, siste seks ark
+
+Fig343_06 til 11 er levert som seks hele resultatark med tolv nye native fra sju ulike hele canonical RGBA-kilder. Fire innebygde image_gen-kall og åtte rå cutouts; sju nye malte poser brukes. K11s venstre cutout1940 brukes ikke, siden 1935 til 1940 er eksakt kildeidentiske og bruker K08s kontrollerte1935-maleri. De seks øvrige kildene er ulike. Begge kildetyper (opakt referanseutsnitt og canonical med ekte alfa) er SHA-festet. Alle faktiske prompter, referanser, råbilder, prototyper, rutekart og leveranse-SHA-er er bevart.
+
+Sam holder ekte lilla aubergine med grønn stjerne øverst, løfter/senker den, retter hodet og gjør den siste lille hodevinkelen. Håndgrep, fingre, mansjetter, brun scene-palett og identitet er vurdert mot originaler og tidligere eget maleri. Svak generert brun ytterglorie er renset bare med egen alfa og kantfarger. Fast 4x, åtte HD-pikslers native-marg, ingen hard originalsilhuettmaske eller originalfragment-fallback. Den interne høyre utsparingen bevares og ligger bak sokkelen i motoren.
+
+Seks egenkontroller OK og tolv av tolv automatisk native OK med uendrede grenser. Alle tolv original/native/motor-sammenligninger, sju hele motorbilder og to før/etter er sett. Alle tolv nye er logget tegnet i kildekorrekt tvungen chore6 og rom92s egne skript til820, med den faktisk nedlastede Linux-binæren27c58fde274620118ff45c16d388187274b533b0e5364339640e28627937b0ce. 285 sluttbufferkontroller null og tilsvarende285 grunnlagskontroller null i samme binær. Ingen endringer utenfor Sam ved x700 i to pikselkontroller. Testhopp er ikke naturlig gjennomspilling, interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Kandidat2478 native, {oldpng + count} PNG-er og {len(actual)} filer. Alle {len(base['filer'])} gamle stier og {oldpng} gamle PNG-er er bevart byteidentisk; bare mod.json endres før publiseringens sjekksumskriving. {len(protected)} beskyttede kilder og tre stasher er uendret. 333 av1758 hele figurjobber har resultat,1425 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Ingen motor-/pipelineendring. Bibliotekskilden figurark-fast-storrelse og remake-metoden er fulgt.
+
+Publisering, hent og faktisk pakkeinnhold bekreftes separat. Felles Linux-/Windows-pakker er fortsatt kontrollert2456 og mangler hele Sam343 med22 nye. Oppdater ved dette samlepunktet etter at native er publisert og hentet, og frys native til begge bygg har sikret samme SHA. Ikke gjenta det fullførte2456-bygget.
+""")
+shutil.copy2(__file__, R / 'kontroller.py.txt')
+print(json.dumps(proof, ensure_ascii=False), flush=True)
