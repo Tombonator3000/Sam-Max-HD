@@ -1,5 +1,12 @@
 # todo.md
 
+## Neste,2026-10-20 20:39
+
+- [x] Første251_01..05,fem hele ark/17nye native,publisert og hentet2700. Alle fem ark OK uten varsler,alle17 motorobservert og sett. Ingen ny Tom-/Claude-godkjenning.
+- [ ] Fullfør nytt felles2700-samlepunkt. Native frosset. Kontroller begge faktiske nedlastinger,SHA-filer,20942runtime-moddfiler,motor og fellesrelease før pakkene kalles oppdatert. Ikke dispatch to ganger.
+- [ ] Kildeklargjør og fortsett251_06..09,22mål,chore7/8/9. Bakkesverd1953 separat. Ikke gjenta01..05.376 av1758 resultatark,1382gjenstår pluss returer/katalogfeil/sluttkontroll.
+- [ ] Bevar832beskyttede kilder,alle tidligere publiserte filer/releaser og tre stasher.164_04/1943/1944fortsatt blokkert,ingen omprøve. Kjente160-overgangsavvik,SDL,testhopp,inventarkant og ekstra taggbygg står åpne.
+
 ## Neste, oppdatert 2026-10-20 20:08
 
 - [x] Alle ni047-ark/74native er levert,siste seks04..09/49nye er publisert og med i kontrollert felles2683:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-gang047-slutt. Ikke gjenta047 eller byggene.

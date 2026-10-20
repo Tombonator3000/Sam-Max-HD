@@ -1,5 +1,17 @@
 # memory.md
 
+## Første polygon251,17 nye native, 2026-10-20 20:39
+
+Fig251_01 til05 er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert,publisert og hentet tilbake. Fem hele ark og17 ulike nye helmalerier fra fem innebygde image_gen-kall/fem råbilder. Alle fem ark OK uten varsler,17 automatisk native OK. Egne faste4x-prototyper og ekte alfa,ingen originalsilhuettmaske/originalfragment-fallback eller senkede grenser.1920 er plassert som to hele egne figurgrupper;oppdiktede hvite ankelbånd i1800/1801 er korrigert i egen RGB uten alfaendring. Råbilder,prompter,SHA-rutekart,feilutkast og full kontroll i sam251-foerste-20261020 på gpt-arbeid. Ingen motor-/pipelinekode eller ny Tom-/Claude-godkjenning.
+
+Kildebekreftet polygon-Sam svelges av drage i VR-rom49/lokal210. Alle17 original/native/motor,fem hele resultatark,åtte hele motorbilder og tre før/etter er sett. Samme faktiske Linux-binær f4b7222ec23aa4ec34e46740fb8696a0b718608ea978224a3fadef5a36307001 prøvde2683-grunnlag og2700-kandidat.160 kontroller158null,samme to kjente160-overgangsavvik ved36 før figurstart60. Alle132 fra60null,ingen nye/økte avvik. Tre bildepar har0endringer utenfor aktive nye cels og marg. Ikke naturlig gjennomspilling. Bakkesverd1953 er separat og fortsatt original.
+
+Grafikkilde 822da44f8f1f75c9db2a1cfd459dc323831902a9. hd-mod ac624e84fd7983f96f68426065f716c341d5a019,2700 native. Alle20943filer/20937PNG er hentet og SHA-bekreftet. Alle20926gamle stier/20920PNG,832beskyttede kilder og tre opprinnelige stasher bevart. Direkte telling376 av1758 hele figurjobber med resultat,1382gjenstår pluss returer/katalogfeil/sluttkontroll.164_04/1943/1944 fortsatt blokkert,ingen omprøve.
+
+Fellespakker er foreløpig2683 og mangler17. Nå nytt felles2700-samlepunkt for både Linux og Windows. Native fryses til begge faktiske nedlastinger,filhasher,motor og fellesrelease er bekreftet. Ikke kall pakkene oppdatert ennå eller dupliser bygg. Neste251_06..09,22mål,kildeklargjøres mens byggene går. Ikke gjenta01..05 eller bruk gamle engangshjelpere med feil grunnlagstelling. Historiske tidlige overgangsavvik,Windows SDL,testhopp816/836,inventarkant rom35 og ekstra Windows-taggbygg står åpne. Interaktiv Windows-/ny webtest og naturlig full gjennomspilling gjenstår.
+
+Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er fulgt. Automatisk grafikkproduksjon fortsetter uten gammel nattfrist;gammel nattkontroll gjenstartes ikke. Grafikk bare på gpt-arbeid/hd-mod,main bare fire dokumenter.
+
 ## Hele gang047 og felles2683, neste polygon251, 2026-10-20 20:08
 
 Alle ni047-ark er levert som grafikk,74 native. Siste seks fig047_04 til09 gir49 nye ruter fra33 ulike canonical helkilder:31 nye malerier,to tidligere egne prototyper og16 eksakte hele aliasmål.19 faktiske innebygde image_gen-kall/19 råbilder er bevart,18 nye denne økten,15 brukt og fire utkast holdt utenfor. Retur04/05 er rettet. Ett helt ark OK,fem SJEKK,23 omrissvarsler visuelt vurdert og beholdt.1818 er manuelt/native kontrollert selv om ark-kontrollen hopper over firepikslerskilden.49 automatisk native OK. Sju automatiske kontrollkopier hadde originaltillegg og er ikke brukt i native. Alle49 publiserte er egne faste4x-prototyper,ekte alfa,egne kantfarger,ingen originalsilhuettmaske/originalfragment-fallback eller senkede grenser. Ingen motor-/pipelinekode er endret. Ingen ny Tom-/Claude-godkjenning.
