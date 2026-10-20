@@ -1,0 +1,25 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';folder=sys.argv[1];O=P/'out'/folder;R=A/'rapporter'/folder;cfg=json.loads((R/'config.json').read_text());n=cfg['antall'];M=P/'mods/gpt';C=O/'mod-kandidat';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def snap(p):return{f.relative_to(p).as_posix():sha(f) for f in p.rglob('*') if f.is_file()}
+actual=snap(M);expected=snap(C);base=json.loads((R/'grunnlag-filer.json').read_text());assert set(actual)==set(expected) and len(actual)==cfg['gamle_filer']+n
+assert {p for p in actual if actual[p]!=expected[p]}=={'SHA256SUMS'} and {p for p in base if actual[p]!=base[p]}=={'mod.json','SHA256SUMS'}
+assert all(actual[p]==h for p,h in expected.items() if p.endswith('.png')) and all(actual[p]==h for p,h in base.items() if p.endswith('.png'))
+entries=json.loads((R/'tillegg.json').read_text())['tillegg'];assert len(entries)==n and all(actual[e['fil']]==e['sha256'] for e in entries)
+assert json.loads((M/'mod.json').read_text())['costume_cels']==len(list((M/'costumes').glob('*_hd.png')))==cfg['native_etter']
+source=(O/'kilde-commit.txt').read_text().strip();assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip()==source
+native=subprocess.check_output(['git','rev-parse','origin/hd-mod'],cwd=P,text=True).strip();assert native==subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0] and native!=cfg['native_grunnlag']
+for f in [R/'beskyttede-kilder.json',A/'rapporter/sam-sugepil-345-20261020/beskyttede-kilder.json',A/'rapporter/alkove-siste-20261020/beskyttede-kilder.json']:
+ q=json.loads(f.read_text());assert all(sha(A/p)==h for p,h in q.items())
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stashes==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+f=json.loads((R/'fremdrift.json').read_text())
+for e in f['leveranser']:assert sha(A/e['resultat'])==e['sha256'];e.update(importert=True,publisert=True,kildecommit=source,hd_mod_sha=native)
+(R/'fremdrift.json').write_text(json.dumps(f,ensure_ascii=False,indent=2)+'\n')
+receipt=dict(utc=datetime.now(timezone.utc).isoformat(),kildecommit=source,hd_mod_grunnlag=cfg['native_grunnlag'],hd_mod_sha=native,nye_native=n,native_totalt=cfg['native_etter'],nye_figurark=n,figurjobber_med_resultat=len(list((A/'jobber').glob('fig*/resultat.png'))),figurjobber_registrert=1758,kildefeil_utestaaende_jobber=17,alle_kandidat_png_verifisert=cfg['gamle_png']+n,tidligere_png_byteidentiske=cfg['gamle_png'],tidligere_filer_bevart=cfg['gamle_filer'],endrede_tidligere_filer=['mod.json','SHA256SUMS'],nye_native_sha_verifisert=True,nedlastet_igjen=True,sha256sums_kontrollert=True,beskyttede_nye_kilder_uendret=4*n,forrige40_kilder_uendret=True,tre_stasher_bevart=True,native_mottak=dict(ok=n,originalutliggertillegg_i_slutt=0,hel_original_fallback=0,eksakte_tidligere_native=n),egenkontroll=dict(ok=n,sjekk=0,feil=0),visuelt_sett=n,motorobservert=n,kildeposisjon_observert=n,motor_kontroller=80,nullkontroller=80,fra_figurstart=71,naturlig_gjennomspilling=False,ny_Tom_godkjenning=False,separat_Claude_kontroll=False,nye_bildekall=0,ulike_kildeposer=1,nedlastingspakker=dict(release='sam-max-hd-2026-10-20-natt',native=2134,mangler=cfg['native_etter']-2134,oppdateres_ved_samlepunkt=True),tillegg=entries)
+(R/'mottak-publisert.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+text=f'\nPublisert og hentet tilbake: kilde {source}, hd-mod {native}, {cfg["native_etter"]} native totalt. Alle {cfg["gamle_png"]+n} kandidat-PNG-er, {cfg["gamle_png"]} gamle PNG-er og {n} nye native-SHA-er stemmer. Alle {cfg["gamle_filer"]} gamle stier, {4*n} nye kilder,forrige40kilder og tre stasher bevart. Ingen nye bildekall. Alle{n} sett/motorobservert,80nullkontroller. Neste345_{cfg["end"]+1:02}. Se mottak-publisert.json.\n'
+(R/'RAPPORT.md').write_text((R/'RAPPORT.md').read_text()+text);(R/'PAAGAR.md').write_text('# Publisert og hentet tilbake\n'+text)
+p=A/'ORDRE.md';p.write_text(p.read_text().replace('## Gjør disse nå\n','## Gjør disse nå\n'+text,1))
+p=A/'GRAFIKKLISTE.md';p.write_text(p.read_text().replace(f'Kandidat{cfg["native_etter"]}',f'Publisert{cfg["native_etter"]}'))
+shutil.copy2(__file__,R/'bekreft-gjenbruk345.py.txt');print(json.dumps({k:v for k,v in receipt.items() if k!='tillegg'},ensure_ascii=False))

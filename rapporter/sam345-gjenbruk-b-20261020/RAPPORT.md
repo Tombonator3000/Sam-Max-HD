@@ -9,3 +9,5 @@ Egenkontroll5OK, native5OK. Sluttmottaket kopierer eksakt tidligere kontrollert 
 Kandidat2242, publisert grunnlag2237(640cef04badabe8f4b441c02ce89b9d1a744206e). Alle20479gamle stier og20473gamle PNG-er bevart. Bare costume_cels i mod.json endres.4x5nye kilder,forrige40kilder og tre stasher bevart. 253 av1758 registrerte figurjobber har resultat;17 andre346-jobber har påvist kildefeil og regnes ikke ferdig. Publisering/hent bekreftes separat i mottak-publisert.json.
 
 Neste345_26. Ingen endring i motor/pipeline/main her. Linux-/Windows-pakkene har2134 til nytt kontrollert samlepunkt.
+
+Publisert og hentet tilbake: kilde f0826b12a3d951fdbef8de03e99c50804af14632, hd-mod 32b43950364fae71bab3a68e64e81a91c84e3c22, 2242 native totalt. Alle 20478 kandidat-PNG-er, 20473 gamle PNG-er og 5 nye native-SHA-er stemmer. Alle 20479 gamle stier, 20 nye kilder,forrige40kilder og tre stasher bevart. Ingen nye bildekall. Alle5 sett/motorobservert,80nullkontroller. Neste345_26. Se mottak-publisert.json.

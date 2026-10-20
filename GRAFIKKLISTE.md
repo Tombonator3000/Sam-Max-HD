@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-20 03:50:345_21 til25, 5runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle5sett/motorobservert,80nullkontroller. Kandidat2242,253resultatark. Sesam345-gjenbruk-b-20261020/mottak-publisert.json. Neste345_26.346-kildefeilen er fortsatt åpen.
+Oppdatert 2026-10-20 03:50:345_21 til25, 5runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle5sett/motorobservert,80nullkontroller. Publisert2242,253resultatark. Sesam345-gjenbruk-b-20261020/mottak-publisert.json. Neste345_26.346-kildefeilen er fortsatt åpen.
 
 Oppdatert 2026-10-20 03:47:345_11 til20, 10runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle10sett/motorobservert,80nullkontroller. Publisert2237,248resultatark. Sesam345-gjenbruk-a-20261020/mottak-publisert.json. Neste345_21.346-kildefeilen er fortsatt åpen.
 
