@@ -1,5 +1,13 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-20 20:08
+
+- [x] Alle ni047-ark/74native er levert,siste seks04..09/49nye er publisert og med i kontrollert felles2683:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-gang047-slutt. Ikke gjenta047 eller byggene.
+- [x] Begge faktiske pakker,20925runtimefiler hver og alle49nye i Linux er kontrollert.464 kontroller461null,samme tre kjente160-avvik før figurstart.198 fra60null,ingen nye/økte avvik. Native-frys frigitt.23 omrissvarsler beholdt,ingen ny Tom-/Claude-godkjenning.
+- [ ] Fortsett faktisk nytegning av kildeklare251_01..05,17 ulike helkilder. Les sam251-foerste-20261020/KILDEGRUNNLAG.md,se original/motor og stilreferanser før kall. Dragen svelger polygon-Sam;bevar begge i samme cel,flat polygonstil,segmentert hals/hale og gyllent sverd.0bildekall/0resultat ennå. Ikke bak separat1953-bakkesverd inn i de17.
+- [ ] Bevar832beskyttede kildefiler,alle tidligere grafikkfiler/releaser og tre stasher. Ingen originalsilhuettmasker/fallback eller senkede grenser. Fortsett resterende1387 hele figurjobber pluss returer/katalogfeil/sluttkontroll.371 av1758 har resultat;all grafikk er ikke ferdig.
+- [ ] 164_04/1943/1944 fortsatt blokkert,ingen omprøve. Historiske overgangsrester,Windows SDL,testhopp816/836,inventarkant rom35 og ekstra taggbygg står åpne. Nytt ekstra taggbygg er dokumentert separat fra det vellykkede hovedbygget.
+
 ## Neste, oppdatert 2026-10-20 19:51
 
 - [x] Alle ni047-ark er levert. Siste seks04..09 gir49 nye native,publisert og tilbakehentet i f108392586e1af5816f0b5548a8cbfce975052f3. Kostyme047 har74 native;ikke gjenta det.
