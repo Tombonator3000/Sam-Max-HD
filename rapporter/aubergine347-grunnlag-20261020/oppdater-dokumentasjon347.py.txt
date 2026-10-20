@@ -1,0 +1,30 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/aubergine347-grunnlag-20261020';v=json.loads((R/'mottak-publisert.json').read_text());now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');assert subprocess.check_output(['git','branch','--show-current'],cwd=P,text=True).strip()=='main';assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True).strip();report_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip();assert report_sha=='9070a46de288c795ab2935f3c0605c91f0383a69'
+title=f'## Auberginen på sokkelen: 30 nye native, 2363 totalt, {now}'
+body=f'''Fig347_01 til 05 er fem nye hele ark med 30 native ruter fra åtte ulike hele kilder. Kildecommit {v['kildecommit']}, rapportcommit {report_sha}, hd-mod {v['publisert_hd_mod_sha']}. Alle 30 er produsert med innebygd image_gen, egenkontrollert, native mottatt, visuelt sett som original/native/motor og observert i gyldig lagprøve og rommets egne skript. 320 sluttbufferkontroller null, henholdsvis 116 og 70 fra faktisk første nye tegning. Samme adfdf7fc-binær som grunnlaget. Målrettede prøver med romhopp, ikke naturlig gjennomspilling, ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning. Fruktens utsparinger gir plass til Sams fingre; brune deler er det roterte trehjertet. Promptens feilaktige virvelbeskrivelse er korrigert separat. 35 svake magenta RGB-piksler med alfa 5 til 11 er renset fra malerienes egne kjernefarger, med alfa byteidentisk. De endelige filene er tatt inn og motorprøvd igjen. Ingen hard originalsilhuettmaske, originalutliggertillegg eller hel fallback.
+
+Alle 20599 kandidat-PNG-er og 30 nye native-hasher stemmer etter hent. Alle 20569 gamle PNG-er og 20575 tidligere filstier er bevart. 480 beskyttede kildefiler og tre opprinnelige stasher er uendret. Ingen motor-/pipelineendring. Main får bare denne dokumentasjonen; grafikken ligger på gpt-arbeid og hd-mod.
+
+Den gamle hjertekonturen etter objekt 901 er nå sammenlignet med helt klassisk forløp og er HD-spesifikk. Native tomtilstand alene fjernet den ikke. Forsøket er avvist, bevart i rapporten og ikke publisert. Null bufferavvik beviser ikke at denne strukturelle feilen er borte. Avgrenset objekt-/motorfeilsøking og eventuell testet PR må prioriteres før neste samlepakke. Se HJERTEREST.md med klassisk/HD/kandidat-sammenligning.
+
+291 av 1758 figurjobber har resultat; 1467 gjenstår pluss returer, kildefeil og samlet kontroll. Neste er de fem allerede kildeklargjorte fig347_06 til 10, 36 native koblinger fra 15 ulike hele kilder. Ingen nye bildekall/resultater for dem ennå. Bevar kildebekreftede mørke småformer og den bevegelige sokkelbasen; de 13 stående kildevariantene kan ikke blindt kopieres som hele aliaser. Ingen raw28, raw32 eller raw36. Felles Linux-/Windows-pakke sam-max-hd-2026-10-20-aubergine er fortsatt 2333 og inneholder ikke disse 30. Oppdater begge ved neste praktiske samlepunkt etter resten av 347 og relevant feilkontroll; ikke gjenta de ferdige 2333-byggene. Den aktive grafikkautomatikken fortsetter, gammel nattkontroll er fortsatt pauset. Se rapporter/aubergine347-grunnlag-20261020/mottak-publisert.json og NESTE.md på gpt-arbeid.
+'''
+for name in ['STATUS.md','memory.md','log.md']:
+ p=P/name;s=p.read_text();first,rest=s.split('\n',1);assert title not in s;p.write_text(first+'\n\n'+title+'\n\n'+body+'\n'+rest.lstrip('\n'))
+p=P/'todo.md';s=p.read_text();lines=s.splitlines();changed=0;out=[]
+for line in lines:
+ if line.startswith('- [ ] Sammenlign hjertekonturen etter objekt901'):
+  out.append('- [x] Hjertekonturen er sammenlignet med helt klassisk rom92-forløp og er HD-spesifikk. Native tomtilstand alene løste den ikke; forsøket er avvist og ikke publisert. Se aubergine347-grunnlag-20261020/HJERTEREST.md.')
+  out.append('- [ ] Rett den strukturelle objekt-/kantdekningen etter objekt901 i en avgrenset testet PR før neste samlepakke. Klassisk visning er fri for konturen, HD-rommets gamle omriss blir delvis igjen. 190 nullkontroller i prøverettelsen beviste ikke visuell retting. Bevar faktisk før/etter/kildegrunnlag og test Sam, objektbytte, inventar og forgrunn.')
+  changed+=1
+ elif line.startswith('- [ ] Fortsett fig347_01 til05'):
+  out.append(f"- [x] {now}: Fig347_01 til 05 publisert og hentet i {v['publisert_hd_mod_sha']}. 30 nye native, 2363 totalt. Alle 30 egenkontroll/native OK, visuelt sett og motorobservert, 320 nullkontroller. 291 av 1758 resultatark. Alle gamle grafikkfiler, 480 kildehash-er og tre stasher bevart. Se mottak-publisert.json.")
+  out.append('- [ ] Fortsett fig347_06 til 10 fra det ferdige kildegrunnlaget: fem ark, 36 native koblinger, 15 ulike hele kilder. Ingen bildekall/resultater for disse ennå. Se originalreferanser347-side2.png, kildeposer, siste-fem-kildebevegelser.json og NESTE.md. Bevar ekte alfa, mørke småformer og de siste små bunnendringene. Ikke gjenta de første fem, deres A01/B01/C01 eller rensingen. Ingen raw28/32/36.')
+  changed+=1
+ elif line.startswith('- [ ] Neste samlepakke først ved ny praktisk grafikkbunke.'):
+  out.append('- [ ] Neste felles Linux-/Windows-samlepakke etter resten av347 og relevant hjerterestkontroll. Native2363 er30 foran faktisk kontrollert pakke2333. Ikke gjenta bygg39370294810/39370297171. Frys ferske kode-/native-SHA-er, kontroller faktiske nedlastinger, SHA-filer og all inkludert grafikk før oppdatert release påstås.')
+ else:out.append(line)
+assert changed==2,changed;p.write_text('\n'.join(out)+'\n');shutil.copy2(__file__,R/'oppdater-dokumentasjon347.py.txt');print('Bare STATUS,memory,todo og log er oppdatert i main.')
