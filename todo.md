@@ -4,10 +4,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
-- [ ] Fortsett fig344_01 til10:ti ark,19 ruter. Kildeavklar og se original/motor/stil før kall. Lokal201 i rom92 setter344,chore6/7,aktør6 ved159,101. Ikke tegn fra generisk auberginepremiss uten kildebekreftelse.
+- [ ] Fortsett faktisk produksjon av fig344_01 til 10: ti ark, 19 ruter fra elleve ulike hele kilder. Originalark, primærskript, stil og faktisk motor er sett; alle 19 mål observert. Ekte lilla aubergine med grønn stilk, cyan er polstring. Seks prompter bare planlagt, 0 bildekall/resultater. Se sam344-foerste-20261020/NESTE.md. Ikke gjenta kildeforberedelsen eller de ferdige pakkebyggene.
 
 - [x] Fig345_36 til41 publisert og hentet i9ed54398:27 native,2283 totalt. Alle27 sett/motorobservert,80 nullkontroller,27 egenkontroll/native OK.24 nye/284 tidligere beskyttede kilder og tre stasher bevart. Se sam345-slutthoder-20261020/mottak-publisert.json.
-- [ ] Samlepunkt2283 etter fullført kostyme345:41 nye siden fellespakken2242. Begge pakker fra samme ferske kode-/native-SHA,faktiske nedlastinger,SHA-filer,alle moddfiler og relevant motor skal kontrolleres før ny fellesrelease. Se felles-release-20261020-sam/bygg-startet.json før dispatch,ikke dupliser bygg.
+- [x] Samlepunkt 2283 publisert og bekreftet Latest: sam-max-hd-2026-10-20-sam. Begge faktiske pakker og SHA-filer, fire opplastinger og 20524 runtime moddfiler per pakke kontrollert. Fem Linux-prøver og fem grunnlagsprøver, alle 41 nye native observert, 179 nullkontroller og fem hele motorbilder sett. Elleve tidligere releaser bevart. Ikke gjenta bygg 39362309325/39362311476. Se felles-release-20261020-sam/publisert.json.
 
 - [x] Samlepunkt2242 er publisert og Latest: sam-max-hd-2026-10-20-alkove.108 nye siden2134;begge faktiske nedlastinger,SHA-filer,fire opplastinger og20483 runtime moddfiler per pakke kontrollert. Ti Linux-prøver og ti grunnlagsprøver,alle108 observert,579 sluttkontroller uten nye/økte avvik. Ikke gjenta39355894188/39355897105.
 - [x] Fig345_26 til35 publisert og hentet i7d1aa364:14 native,2256 totalt. Alle14 sett/motorobservert,80 nullkontroller,14 egenkontroll/native OK. Alle gamle filer,40 nye/244 eldre beskyttede kilder og tre stasher bevart. Se sam345-tilbake-20261020/mottak-publisert.json.
