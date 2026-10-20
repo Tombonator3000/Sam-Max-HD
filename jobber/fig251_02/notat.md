@@ -5,3 +5,5 @@ Egen alfa og egne kantfarger, fast4x,8HD-pikslers marg. Svak glød i råbildene 
 Resultat SHA256 f0fa982aec3ac2f74c40075576cd1c3016988d2d5d56283592787abea1c84d59. Egenkontroll OK, ingen FEIL. Native, visuell sluttkontroll, motor, publisering og faktiske pakker føres separat. Ingen ny Tom-/Claude-godkjenning. Kildeforsøkene var tvunget aktor2, ikke naturlig gjennomspilling; samme160-pikslers overgangsrest ved36 før figurstart60,132 kontroller fra60 null.
 
 Sluttkontroll: fem hele ark OK uten varsler.17 native mottatt,alle17 original/native/motor og åtte hele motorbilder sett.160 kontroller158 null,samme to kjente160-avvik ved36 før figurstart60;132 fra60 null. Ingen nye/økte avvik. Tre bildepar har0 endringer utenfor nye cels og marg. Ikke naturlig gjennomspilling. Publisering og faktiske pakker kvitteres separat. Ingen ny Tom-/Claude-godkjenning.
+
+Kilderettelse20.oktober:1953 er helt transparent1x1,ikke bakkesverdet. Det gule bakkesverdet finnes i originalrom049 og er holdt utenfor de nye251-celene. Se KILDERETTELSE-1953.md. Grafikken og kildefilene er uendret.
