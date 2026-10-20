@@ -1,0 +1,60 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,numpy as np,re,zipfile,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';folder=sys.argv[1];O=P/'out'/folder;R=A/'rapporter'/folder;cfg=json.loads((R/'config.json').read_text());n=cfg['antall'];M=O/'mod-kandidat';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rd=lambda x:json.loads((R/x).read_text())
+base=rd('grunnlag-filer.json');files={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()};entries=rd('tillegg.json')['tillegg'];by={e['bilde']:e for e in entries}
+assert len(entries)==n and set(base)<=set(files) and set(files)-set(base)=={e['fil'] for e in entries} and {p for p in base if base[p]!=files[p]}=={'mod.json'}
+assert len(files)==cfg['gamle_filer']+n and sum(p.endswith('.png') for p in files)==cfg['gamle_png']+n
+for e in entries:
+ assert e['kilde']=='arket' and files[e['fil']]==e['sha256'];im=Image.open(M/e['fil']);a=np.array(im);assert im.mode=='RGBA' and im.width%4==im.height%4==0 and (a[:,:,3]==0).any() and(a[:,:,3]==255).any() and not((a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0)).any()
+meta=json.loads((M/'mod.json').read_text());old=json.loads((P/'mods/gpt/mod.json').read_text());assert meta['costume_cels']==cfg['native_etter'] and old['costume_cels']==cfg['native_foer'] and{k for k in meta if meta[k]!=old[k]}=={'costume_cels'}
+protected=rd('beskyttede-kilder.json');assert len(protected)==4*n and all(sha(A/p)==dig for p,dig in protected.items())
+parent=json.loads((A/'rapporter/sam-sugepil-345-20261020/beskyttede-kilder.json').read_text());assert len(parent)==40 and all(sha(A/p)==dig for p,dig in parent.items())
+for r in rd('eksakte-tidligere-kilder.json')['ruter']:assert sha(A/r['prototype_fil'])==r['prototype_sha256'] and by[r['bilde']]['sha256']==r['native_sha256']
+plan=rd('ruteplan-unik.json')['ruter'];assert len(plan)==1 and len(plan[0]['malruter'])==n
+p=plan[0];x,y,w,h=p['rekt'];src=Image.open(A/'jobber'/p['kildejobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(src.tobytes()).hexdigest()==p['rgba_sha256']
+for v in p['malruter']:
+ x,y,w,h=v['rekt'];s=Image.open(A/'jobber'/v['jobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert s.tobytes()==src.tobytes()
+assert len({e['sha256'] for e in entries})==1
+f=rd('fremdrift.json');assert not f['faktiske_bildekall'] and len(f['leveranser'])==n;ok=0
+for e in f['leveranser']:
+ assert sha(A/e['resultat'])==e['sha256'];im=Image.open(A/e['resultat']);assert im.mode=='RGBA' and im.size==(1536,1024);rt=json.loads((A/e['rutekart']).read_text())[e['jobb']];assert rt['sha256_resultat']==e['sha256'] and len(rt['ruter'])==1
+ t=(R/f"{e['jobb']}-egenkontroll.txt").read_text();assert 'FEIL' not in t and 'SJEKK' not in t and '1 av 1 ruter OK' in t;ok+=1;e.update(native_mottatt=True,visuelt_kontrollert=True,motoravspilt=True)
+vis=rd('visuelle-kontrollbilder.json');assert vis['antall']==n and {v['bilde'] for v in vis['ruter']}==set(by);motor=rd('motor-oppsummering.json');assert motor['ruter_tegnet']==motor['ruter_ved_kildepos']==n and not motor['nye_eller_oekte_avvik'] and not motor['avvik_ogsaa_i_grunnlag'] and motor['skjermbufferkontroller']==80 and motor['kontroller_fra_figurstart']==71
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stashes==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');count=len(list((A/'jobber').glob('fig*/resultat.png')))
+images=sorted(R.glob('motor-og-kilde*-final-*.png'))+sorted(R.glob('sam-345-*-motor.png'));assert len(images)==4
+(R/'visuell-vurdering.json').write_text(json.dumps(dict(dato=now,vurdert_av='Codex',original_native_motor_sett=n,hele_motorbilder_sett=3,bilder={p.name:sha(p) for p in images},Tom_godkjent=False,separat_Claude_kontroll=False,naturlig_gjennomspilling=False,merknad='Samme genererte native som kilde345_1923, nå visuelt kontrollert ved de nye rutenumrenes faktiske motortidspunkter. Egne glatte hender/småfragmenter og ekte alfa beholdt.'),ensure_ascii=False,indent=2)+'\n')
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for scene in ['baseline345-anim1','final345-anim1']:z.write(O/scene/'scummvm.log',scene+'/scummvm.log')
+summary=dict(nye_native=n,native_totalt=cfg['native_etter'],figurjobber_med_resultat=count,figurjobber_totalt=1758,unike_hele_kilder=1,nye_bildekall=0,eksakte_tidligere_native=n,egenkontroll_ok=ok,native_ok=n,originalutliggertillegg_i_slutt=0,beskyttede_nye_kilder=4*n,forrige40_kilder_uendret=True,alle_tidligere_filer_bevart=len(base),tidligere_png_byteidentiske=cfg['gamle_png'],png_totalt=cfg['gamle_png']+n,filer_totalt=len(files),visuelt_sett=n,motorobservert=n,motor_kontroller=80,nullkontroller=80,fra_figurstart=71,stash_shaer=stashes)
+(R/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(R/'fremdrift.json').write_text(json.dumps(f,ensure_ascii=False,indent=2)+'\n')
+for e in f['leveranser']:
+ (A/'jobber'/e['jobb']/'notat.md').write_text(f'''# {e['jobb']}
+
+{now}, Codex. Sam i alkoven, rom92, aktør6 ved159,101,clip0,scale255,chore1. Varm brun/orange palett og delvise hender/snute rundt forgrunnshjertet. Sam-master og de originale hele kildeposene er sett. Ingen ny gjenstand fyller åpningene, ingen hard originalmaske.
+
+Ingen nye bildekall eller nye tegninger. Hele kilde-RGBA og størrelse er eksakt samme somcostume345_1923 fra kildecommit{cfg['kildecommit_til_gjenbruk']}. Generert prototype og tidligere kontrollerte native er gjenbrukt med rutekart og eksakte kilde-/prototype-/native-SHA-er i rapporter/{folder}. Kun ny rutekobling. Beholdte småfragmenter er de genererte, uten automatisk originalutliggertillegg.
+
+1536x1024RGBA, SHA256{e['sha256']}. Egenkontroll OK. Native mottak{n}OK; før-/ettermetadata ved eksplisitt byteidentisk native-gjenbruk er bevart. Alle{n} visuelt sett og faktisk motorobservert ved kildepos, samme e541253b-binær som publisert{cfg['native_foer']}-grunnlag.80kontroller null,71frafigurstart. Egenkontroll er ikke Tom-/Claude-godkjenning eller naturlig gjennomspilling. Faktisk publisering/hent står i mottak-publisert.json når den er gjort.
+''')
+(R/'RAPPORT.md').write_text(f'''# Eksakt gjenbruk i Sam345, {cfg['start']} til{cfg['end']}
+
+{now}, Codex. {n} ark og{n} nye runtime-ruter fra én eksakt samme hele kilde-RGBA og mål som tidligere tegnet345_1923. Ingen nye bildekall eller nye tegninger. Generert prototype, native-SHA og kildecommit{cfg['kildecommit_til_gjenbruk']} er festet i rutekart og eksakte-tidligere-kilder.json.
+
+Sam i rom92, kildepos159,101,aktør6,clip0,scale255,chore1. Bevisste transparente hull, separate høyrefingre og mørk sliver beholdt med generert egen alfa. Ingen aubergine lagt inn. Identitet/strek fra Sam-master, palett fra originalen i rommet. De opprinnelige småfarge-/alfarettingene gjelder fortsatt. Ingen ny originalmaskeklipping eller originalutliggertillegg.
+
+Egenkontroll{n}OK, native{n}OK. Sluttmottaket kopierer eksakt tidligere kontrollert native byteidentisk; det automatiske førmottaket bevares med sine23originalutliggerpiksler per rute. Ingen slike tillegg i slutt. Alle{n} visuelt sett som original/native/motor og faktisk observert ved nye rutenumres tidspunkter i motoren.80bufferkontroller null,71frafigurstart, samme e541253b-binær/innstillinger som grunnlaget. Ett kontaktark og tre hele motorbilder sett. Ingen ny Tom-/Claude-godkjenning, naturlig gjennomspilling eller interaktiv Windows-/webtest.
+
+Kandidat{cfg['native_etter']}, publisert grunnlag{cfg['native_foer']}({cfg['native_grunnlag']}). Alle{cfg['gamle_filer']}gamle stier og{cfg['gamle_png']}gamle PNG-er bevart. Bare costume_cels i mod.json endres.4x{n}nye kilder,forrige40kilder og tre stasher bevart. {count} av1758 registrerte figurjobber har resultat;17 andre346-jobber har påvist kildefeil og regnes ikke ferdig. Publisering/hent bekreftes separat i mottak-publisert.json.
+
+Neste345_{cfg['end']+1:02}. Ingen endring i motor/pipeline/main her. Linux-/Windows-pakkene har2134 til nytt kontrollert samlepunkt.
+''')
+p=A/'GRAFIKKLISTE.md';s=p.read_text()
+for e in f['leveranser']:s=s.replace('- [ ] '+chr(96)+e['jobb']+chr(96),'- [x] '+chr(96)+e['jobb']+chr(96))
+s=s.split('\n',1)[0]+f'\n\nOppdatert {now}:345_{cfg["start"]:02} til{cfg["end"]:02}, {n}runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle{n}sett/motorobservert,80nullkontroller. Kandidat{cfg["native_etter"]},{count}resultatark. Se{folder}/mottak-publisert.json. Neste345_{cfg["end"]+1:02}.346-kildefeilen er fortsatt åpen.\n'+s.split('\n',1)[1];p.write_text(s)
+p=A/'ORDRE.md';s=p.read_text().replace('## Gjør disse nå\n',f'## Gjør disse nå\n\n{now}:345_{cfg["start"]:02} til{cfg["end"]:02} er produsert ved eksakt tidligere kilde/prototype/native-gjenbruk. {n}runtime,0bildekall,egenkontroll/native{n}OK,alle{n}sett/motorobservert,80nullkontroller. Kandidat{cfg["native_etter"]},grunnlag{cfg["native_foer"]}. Se{folder}/RAPPORT.md og mottak-publisert.json for faktisk publisering. Neste345_{cfg["end"]+1:02}. Ikke produser346_27 til43 før kildefeil er rettet.\n',1);p.write_text(s)
+for p in O.glob('*.py'):shutil.copy2(p,R/(p.name+'.txt'))
+shutil.copy2(__file__,R/'sluttkontroll-gjenbruk345.py.txt');print(json.dumps(summary,ensure_ascii=False))
