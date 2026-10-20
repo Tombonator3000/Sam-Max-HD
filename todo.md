@@ -4,10 +4,10 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
-- [ ] Fullfør felles 2427 etter Windows-omprøve 39392600746, forsøk 2. Linux 39392597428 er faktisk hentet og kontrollert, 304 nullkontroller. Første Windows-start feilet i SDL før spillet. Behold feil og native-frys 10734a9c; ikke fjern testen eller dupliser dispatch. Pakker og fellesrelease bekreftes separat.
+- [x] 2026-10-20 10:47: Felles 2427 publisert og Latest, https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam342. Begge faktiske pakker og alle 20669 moddfiler per pakke kontrollert, 304 sluttbufferkontroller null. Windows besto identisk omprøve; første SDL-feil er bevart. Native-frysen er frigitt. Ikke gjenta byggene.
 - [ ] Fortsett fig342_06 til 10 etter dette samlepunktet. Ti ruter fra fem hele kilder er kildeklare, originaler/motor/anker sett, ingen nye bildekall der. Se sam342-06til10-20261020.
 - [x] Fem nye Sam342-ark og 24 Sam346-kleslag er publisert og hentet, 2427 native. Alle 33 visuelt sett og motorobservert; 285 sluttbufferkontroller null. To omrissvarsler beholdt. 307 av 1758 hele figurjobber har resultat.
-- [ ] Undersøk den dokumenterte Windows SDL-startfeilen dersom identisk omprøve feiler igjen. Ved bestått omprøve beholdes første feil som uavklart oppstartsavvik, ikke som løst rotårsak.
+- [ ] Undersøk årsaken til den første Windows SDL-startfeilen ved anledning. Identisk omprøve besto uten kode-/testendring; første feil er beholdt som uavklart oppstartsavvik. Se felles-release-20261020-sam342/WINDOWS-FEIL.md. Dette er ikke en påstått motorretting.
 
 - [x] 2026-10-20 09:45: Felles 2418-utgave er bekreftet Latest, https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-max. Begge faktiske pakker, SHA-er, alle 20660 runtime moddfiler per pakke og fire opplastinger kontrollert. 224 pakkebufferkontroller null; alle 19 nye Max-lag og Sam-returen observert. Ikke gjenta byggene.
 - [x] Sam346-klesreturen er rettet i kropp 1664 og øvre lag 1793 til 1815. Ny sammenhengende jakke/skjorte/slips, 24 native, førbilder bevart. Se sam346-klesskjot-retur-20261020.
