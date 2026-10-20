@@ -4,9 +4,15 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [x] 2026-10-20 09:45: Felles 2418-utgave er bekreftet Latest, https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-max. Begge faktiske pakker, SHA-er, alle 20660 runtime moddfiler per pakke og fire opplastinger kontrollert. 224 pakkebufferkontroller null; alle 19 nye Max-lag og Sam-returen observert. Ikke gjenta byggene.
+- [ ] Fortsett den konkrete Sam346-klesreturen før bredere Sam342-produksjon. Bare den tomme raden i 1801 er rettet; andre farge-/geometrioverganger gjenstår.
+- [x] Sam342_01 til 05 er kildeklargjort, ni ruter fra åtte hele originaler. Alle originaler, ni motorposer, primærskript og godkjent Sam-anker er sett; tabelloppslagene er gyldige. Ingen bildekall/resultater ennå.
+- [ ] Gjør avgrenset tabell-/offsetretting som testet PR. Analyse av alle 348 COST-ressurser gir 368 mulige falske celtargets uten overlap med publisert native. Bevar inklusiv motorsemantikk og alle beskyttede jobbfiler; ikke korriger historisk nevner fra analyse alene.
+
+
 - [x] 2026-10-20 09:23: Fig341_01 til 06 levert, 19 nye native, 2418 totalt. Egenkontroll, native, visuell kontroll, 820-frame romskript, publisering/hent/SHA bestått. Ingen ny Tom-/Claude-godkjenning.
 - [x] Avgrenset Sam346_1801-retur: 581 nye alfapiksler, alle tidligere synlige piksler bevart, før/etter bare rad 507. Andre klesoverganger gjenstår.
-- [ ] Nytt felles 2418-samlepunkt med de 19 nye og Sam-returen. Send ett bygg per plattform; frys native til begge har hentet riktig SHA, last ned begge, kontroller hele modden og ny Linux-runtime før fellesrelease.
+- [x] Felles 2418-samlepunkt med de 19 nye og Sam-returen er publisert og kontrollert. Historisk bestilling: Send ett bygg per plattform; frys native til begge har hentet riktig SHA, last ned begge, kontroller hele modden og ny Linux-runtime før fellesrelease.
 - [ ] Undersøk de øvrige Sam346-farge-/geometriovergangene som egen retur. Ikke forveksle dem med den ene nå fylte tomme raden.
 - [ ] Kildeklargjør Sam342_01 til 05, så 06 til 10: ekte COST-tabell, rom/skript/palett, originale motorposer og godkjent Sam-anker. Ingen 342-bildekall er startet. Ikke gjenta Max341-bunken.
 
