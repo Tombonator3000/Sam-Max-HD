@@ -1,5 +1,15 @@
 # Logg
 
+## Auberginen på sokkelen: 30 nye native, 2363 totalt, 2026-10-20 07:23
+
+Fig347_01 til 05 er fem nye hele ark med 30 native ruter fra åtte ulike hele kilder. Kildecommit 3756138ff1b1b610e050e6988043015967a259ec, rapportcommit 9070a46de288c795ab2935f3c0605c91f0383a69, hd-mod 8b27f6ea89f0790262868506a76cee369c360154. Alle 30 er produsert med innebygd image_gen, egenkontrollert, native mottatt, visuelt sett som original/native/motor og observert i gyldig lagprøve og rommets egne skript. 320 sluttbufferkontroller null, henholdsvis 116 og 70 fra faktisk første nye tegning. Samme adfdf7fc-binær som grunnlaget. Målrettede prøver med romhopp, ikke naturlig gjennomspilling, ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning. Fruktens utsparinger gir plass til Sams fingre; brune deler er det roterte trehjertet. Promptens feilaktige virvelbeskrivelse er korrigert separat. 35 svake magenta RGB-piksler med alfa 5 til 11 er renset fra malerienes egne kjernefarger, med alfa byteidentisk. De endelige filene er tatt inn og motorprøvd igjen. Ingen hard originalsilhuettmaske, originalutliggertillegg eller hel fallback.
+
+Alle 20599 kandidat-PNG-er og 30 nye native-hasher stemmer etter hent. Alle 20569 gamle PNG-er og 20575 tidligere filstier er bevart. 480 beskyttede kildefiler og tre opprinnelige stasher er uendret. Ingen motor-/pipelineendring. Main får bare denne dokumentasjonen; grafikken ligger på gpt-arbeid og hd-mod.
+
+Den gamle hjertekonturen etter objekt 901 er nå sammenlignet med helt klassisk forløp og er HD-spesifikk. Native tomtilstand alene fjernet den ikke. Forsøket er avvist, bevart i rapporten og ikke publisert. Null bufferavvik beviser ikke at denne strukturelle feilen er borte. Avgrenset objekt-/motorfeilsøking og eventuell testet PR må prioriteres før neste samlepakke. Se HJERTEREST.md med klassisk/HD/kandidat-sammenligning.
+
+291 av 1758 figurjobber har resultat; 1467 gjenstår pluss returer, kildefeil og samlet kontroll. Neste er de fem allerede kildeklargjorte fig347_06 til 10, 36 native koblinger fra 15 ulike hele kilder. Ingen nye bildekall/resultater for dem ennå. Bevar kildebekreftede mørke småformer og den bevegelige sokkelbasen; de 13 stående kildevariantene kan ikke blindt kopieres som hele aliaser. Ingen raw28, raw32 eller raw36. Felles Linux-/Windows-pakke sam-max-hd-2026-10-20-aubergine er fortsatt 2333 og inneholder ikke disse 30. Oppdater begge ved neste praktiske samlepunkt etter resten av 347 og relevant feilkontroll; ikke gjenta de ferdige 2333-byggene. Den aktive grafikkautomatikken fortsetter, gammel nattkontroll er fortsatt pauset. Se rapporter/aubergine347-grunnlag-20261020/mottak-publisert.json og NESTE.md på gpt-arbeid.
+
 Alt som gjøres i prosjektet, med tidspunkt (norsk tid). Nyeste nederst.
 
 ## 2026-10-09 21:37
