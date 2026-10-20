@@ -1,0 +1,57 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;H=R/'prototyper';H.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+raw={};labels={}
+for call in ['T06','T07','T08','T09','T10','T07R']:
+    raw[call]=np.array(Image.open(R/f'kall/{call}/raa.png').convert('RGBA'));labels[call]=nd.label(raw[call][:,:,3]>=128)[0]
+top=[];bottom=[]
+for i,sl in enumerate(nd.find_objects(labels['T06']),1):
+    if sl is not None and sl[1].start<700:
+        (top if sl[0].start<530 else bottom).append(i)
+spec={
+1953:('T06',[(top,[0,8,101,83],'Begge figurer med gul stotstjerne'),([1],[165,0,184,16],'papir venstre'),([2],[201,4,225,14],'papir hoyre')]),
+1954:('T06',[(bottom,[0,5,102,81],'Begge figurer og alle smaa stotstraler'),([7],[170,7,184,26],'papir venstre'),([5],[211,0,231,10],'papir hoyre')]),
+1955:('T07',[([2],[0,15,133,76],'Begge figurer'),([3],[183,22,198,35],'papir venstre'),([1],[231,0,244,12],'papir hoyre')]),
+1956:('T07',[([4],[0,7,132,66],'Begge figurer'),([5],[216,0,236,12],'papir')]),
+1957:('T07',[([1],[0,0,139,56],'Begge figurer fra nytt maleri','T07R'),([7],[199,4,228,12],'papir')]),
+1958:('T08',[([2],[0,4,139,50],'Begge figurer'),([1],[188,0,215,10],'papir')]),
+1959:('T08',[([3],[0,8,136,52],'Begge figurer'),([4],[179,0,205,13],'papir')]),
+1960:('T08',[([5],[0,0,136,44],'Begge figurer'),([6],[203,6,233,10],'papir')]),
+1961:('T08',[([7],[0,0,114,46],'Begge figurer'),([8],[206,0,231,9],'papir')]),
+1962:('T09',[([1],[0,0,106,45],'Begge figurer'),([2],[211,3,231,13],'papir')]),
+1963:('T09',[([3],[0,0,94,51],'Begge figurer'),([4],[193,21,217,28],'papir')]),
+1964:('T09',[([6],[0,0,85,59],'Begge figurer i delvis rotasjon'),([7],[185,39,198,42],'siste papirrest, hører til1964')]),
+1965:('T09',[([5],[0,0,73,62],'Sam holder Max opp ned, ikke papir')]),
+1966:('T10',[([2],[0,0,69,69],'Sam holder Max opp ned')]),
+1967:('T10',[([3],[0,0,67,69],'Sam holder Max opp ned')]),
+1968:('T10',[([1],[0,0,67,69],'Sam holder Max opp ned')]),
+}
+def piece(call,ids,box,size):
+    a=raw[call].copy();l=labels[call];sel=np.isin(l,ids);yy,xx=np.nonzero(sel);gx,gy=int(xx.min()),int(yy.min());gw,gh=int(xx.max()-gx+1),int(yy.max()-gy+1);dist,near=nd.distance_transform_edt(~sel,return_indices=True);allow=(dist<=2)&((l==0)|sel);a[:,:,3][~allow]=0;edge=allow&~sel;a[edge,:3]=a[near[0][edge],near[1][edge],:3];a[a[:,:,3]==0,:3]=0
+    x0,y0,x1,y1=box;sx=gw/((x1-x0)*4);sy=gh/((y1-y0)*4)
+    im=Image.fromarray(a).transform(size,Image.Transform.AFFINE,(sx,0,gx-(x0*4+8)*sx,0,sy,gy-(y0*4+8)*sy),Image.Resampling.BICUBIC)
+    return im,dict(egne_komponenter=ids,egen_kjerne=[gx,gy,gw,gh],kilde_plasseringsboks=box,sx=sx,sy=sy)
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];records=[]
+for v in plan:
+    num=int(v['bilde'].split('_')[-1]);w,h=v['rekt'][2:];out=Image.new('RGBA',(w*4+16,h*4+16));call,parts=spec[num];trace=[]
+    for item in parts:
+        ids,box,meaning,*override=item;pcall=override[0] if override else call
+        im,tr=piece(pcall,ids,box,out.size);out.alpha_composite(im);tr['betydning']=meaning;tr['kall']=pcall;trace.append(tr)
+    a=np.array(out);_,near=nd.distance_transform_edt(a[:,:,3]<128,return_indices=True);weak=(a[:,:,3]>0)&(a[:,:,3]<=4);a[weak,:3]=a[near[0][weak],near[1][weak],:3];a[a[:,:,3]==0,:3]=0;out=Image.fromarray(a);f=H/(v['bilde']+'.png');out.save(f)
+    src=np.array(Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA'));m=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cover=_iou(a[:,:,3]>=CORE,m,-8,-8)
+    records.append(dict(bilde=v['bilde'],prototype=str(f.relative_to(R)),sha256=sha(f),kall=call,semantiske_deler=trace,snitt_union=iou,dekning=cover,native_ok=iou>=GOOD_IOU and cover>=GOOD_COVER,hard_originalmaske=False,originalfragment_fallback=False))
+    print(v['bilde'],round(iou,3),round(cover,3),'OK' if records[-1]['native_ok'] else 'SJEKK')
+(R/'prototyper.json').write_text(json.dumps(records,indent=2)+'\n');shutil.copy2(__file__,R/'plasser.py.txt')
+for start in range(0,16,4):
+    board=Image.new('RGB',(2000,1600),'#293a45');d=ImageDraw.Draw(board)
+    for row,v in enumerate(plan[start:start+4]):
+        src=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);im=Image.open(H/(v['bilde']+'.png')).convert('RGBA')
+        for col,(z,title) in enumerate([(src,'Original'),(im,'Nytt maleri')]):
+            board.paste(z,(col*1000,row*400+30),z);d.text((col*1000+5,row*400+7),v['bilde']+' '+title,fill='white')
+    board.save(R/f'sammenligning-maleri-side{start//4+1}.png')
+(R/'presisering-papir1964.md').write_text('''# Siste papirrest tilhører1964
+Den faktiske T09-prompten sa feilaktig at siste lille papirbit lå i fjerde cel. Canonical1964 har en separat papirrest ved185,39 til198,42; canonical1965 har bare den sammenhengende figurgruppen73x62. Begge SHA-festede originaler og håndgrepet er kontrollert. T09s egen malte lille papirkomponent7 er derfor plassert på1964 og ikke1965, med hele egen alfa og ingen originalfragmenter. Ingen motivdel er lagt til eller fjernet, og den faktisk brukte prompten er bevart uendret for sporbarhet.
+''')

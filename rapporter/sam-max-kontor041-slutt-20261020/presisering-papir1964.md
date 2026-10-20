@@ -1,0 +1,2 @@
+# Siste papirrest tilhører1964
+Den faktiske T09-prompten sa feilaktig at siste lille papirbit lå i fjerde cel. Canonical1964 har en separat papirrest ved185,39 til198,42; canonical1965 har bare den sammenhengende figurgruppen73x62. Begge SHA-festede originaler og håndgrepet er kontrollert. T09s egen malte lille papirkomponent7 er derfor plassert på1964 og ikke1965, med hele egen alfa og ingen originalfragmenter. Ingen motivdel er lagt til eller fjernet, og den faktisk brukte prompten er bevart uendret for sporbarhet.
