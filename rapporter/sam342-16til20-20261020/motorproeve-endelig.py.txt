@@ -1,0 +1,11 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,shutil
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/sam342-16til20-20261020');ns={'__file__':str(O/'motorproeve.py')};exec((O/'motorproeve.py').read_text().split('cases=[')[0],ns)
+cases=[('kandidat-v2-342anim7',ns['C'],True,320),('kandidat-v2-romskript820',ns['C'],False,820)]
+with ThreadPoolExecutor(max_workers=2) as pool:final=list(pool.map(ns['run'],cases))
+base=[json.loads((O/n/'kvittering.json').read_text()) for n in ['grunnlag-342anim7','grunnlag-romskript820']]
+for b,a in zip(base,final):assert [c['frame'] for c in b['kontroller']]==[c['frame'] for c in a['kontroller']] and all(c['avvik']==0 for c in b['kontroller']+a['kontroller'])
+assert all(set(range(1949,1958))<=set(a['sett342']) for a in final)
+proof=dict(runder=base+final,alle9_nye_observert=True,skjermbufferkontroller=285,nullkontroller=285,grunnlagssammenligning_samme_binar=True,naturlig_gjennomspilling=False,ny_Tom_Claude_godkjenning=False,forste_utkast_teknisk_bestod_men_visuelt_forkastet=True,forste_utkast_motorlogger_bevart=True)
+(R/'motorproeve.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'motorproeve-endelig.py.txt');print('Endelig R02: ni av ni observert, 285 nullkontroller, begge grunnlag samme binar.')

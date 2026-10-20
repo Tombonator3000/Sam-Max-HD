@@ -1,0 +1,1 @@
+Kildepresisert Sam i rom92, kostyme342, aktør6, lokalt201, gyldig chore7/raw29. Tom hånd, ingen aubergine. Les rapporter/sam342-16til20-20261020/KILDEGRUNNLAG.md og faktiske bildekall. Beskyttede jobbfiler er uendret.

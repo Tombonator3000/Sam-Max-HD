@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-16til20-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];progress=dict(dato='2026-10-20',nye_jobber=5,native_rutekoblinger=9,hele_rgba_kilder=6,nye_malte_poser=2,eksakte_tidligere_native_maal=6,bildekall=4,leveranser=[])
+for n in range(16,21):
+ job=f'fig342_{n:02}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());assert not(d/'resultat.png').exists();canvas=Image.new('RGBA',(1536,1024));mapping=[]
+ for c in j['ruter']:
+  rep=next(v for v in plan if any(t['bilde']==c['bilde'] for t in v['malruter']));proto=R/(rep['bilde']+'-prototype.png');im=Image.open(proto).convert('RGBA');x,y,w,h=c['rekt'];assert im.size==(w*4,h*4);dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128);mapping.append(dict(bilde=c['bilde'],kostyme=342,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=proto.relative_to(A).as_posix(),prototype_sha256=sha(proto)))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=mapping)},indent=2)+'\n');run=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(run.stdout+run.stderr);assert run.returncode==0,(job,run.stdout,run.stderr)
+ (d/'notat.md').write_text(f'''# {job}
+2026-10-20. Innebygd image_gen, fire faktiske kall, med S14R02 og S15R02 brukt og første utkast visuelt forkastet, modellnavn ikke oppgitt. Sam i varm brun drakt i rom92s alkove, aktør6, lokalt201, gyldig animasjon7/raw29. Tom hånd foran snuten senkes til brystet og Sam bøyer hodet. Alle synlige fingre og tomler og små deler i begge hender følger originalen. Ingen aubergine; originalarkivpromptens feil er presisert separat.
+To nye malerier og seks eksakt kildeidentiske publiserte mål gir ni nye native i fem hele ark. 1955 og1956 er også hel-RGBA-identiske. Eksakte referanser, prompter, råbilder og kildehash-er i rapporter/{R.name}. Python-rensing/plassering er tillatt av Tom; egen generert alfa med renset svak ytterkant, fast4x, ingen hard originalsilhuettmaske eller originalfragment-fallback. Originalark, alle kildeposer i motor og godkjent Sam-anker er sett.
+Egenkontroll OK. Resultat SHA256 {digest}. Native mottatt, visuelt sett, motorobservert, publisert og faktisk pakkeimport holdes separat i fremdrift.json. Ingen ny Tom-/Claude-godkjenning.
+''')
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll='OK',native_mottatt=False,visuelt_kontrollert=False,motorobservert=False,publisert=False,importert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False));print(job,'OK',flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');p=R/'bildekall.json';v=json.loads(p.read_text());assert len(v['kall'])==4
+for c in v['kall']:assert c['utfoert'];c['brukt']=c['kall'].endswith('R02')
+p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'lever.py.txt')
