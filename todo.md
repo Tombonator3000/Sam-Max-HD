@@ -1,5 +1,13 @@
 # todo.md
 
+## Neste,2026-10-20 20:57
+
+- [x] Første251_01..05,fem hele ark/17nye native,er publisert/hentet og med i kontrollert felles2700:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-vr251-foerste. Begge faktiske pakker/20942runtime-moddfiler og alle17nye kontrollert. Ikke gjenta disse eller byggene. Nativefrys frigitt.
+- [x] Alle fem ark OK uten varsler.384pakkekontroller382null,samme to kjente160-avvik før figurstart;132fra60null,ingen nye/økte. Ingen ny Tom-/Claude-godkjenning.
+- [ ] Fortsett kildeklare251_06..09,22mål/19helkilder,13nye malerier trengs og6publiserte hele egne kan gjenbrukes. Les sam251-slutt-20261020/KILDEGRUNNLAG.md,NESTE.md og aliasbevis,se stil/original/motor før kall.0nye kall/resultater. Etter251følger028_01.
+- [ ] Bevar848beskyttede kilder,alle tidligere publiserte filer/releaser og tre stasher.376 av1758hele figurjobber har resultat,1382gjenstår pluss returer/katalogfeil/sluttkontroll.164_04/1943/1944fortsatt blokkert,ingen omprøve.
+- [ ] 1953er tomtransparent1x1,ikke bakkesverdet;se kilderettelse. Kjente160-overgangsavvik,Windows SDL,testhopp816/836,inventarkant rom35 og ekstra Windows-taggbygg står fortsatt åpne. Full naturlig gjennomspilling/interaktiv Windows/ny webtest gjenstår.
+
 ## Neste,2026-10-20 20:39
 
 - [x] Første251_01..05,fem hele ark/17nye native,publisert og hentet2700. Alle fem ark OK uten varsler,alle17 motorobservert og sett. Ingen ny Tom-/Claude-godkjenning.
