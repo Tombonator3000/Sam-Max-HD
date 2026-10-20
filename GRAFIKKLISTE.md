@@ -1,6 +1,8 @@
 # Grafikkliste
 
-Oppdatert2026-10-20 04:20:345_26 til35 er produsert og kontrollert,14native,kandidat2256,263resultatark. Ni bildekall/sju råbilder brukt. Alle14 sett/motorobservert,80nullkontroller. Fellespakken2242 er publisert,denne14-bunken kom etter pakkefrys. Neste345_36. Se sam345-tilbake-20261020.
+263 av 1758 figurjobber har resultat,2256 native er publisert og hentet tilbake. Neste fig345_36 til41 er kildeklargjort (27 ruter,15 ulike kilder),men ikke tegnet. Fellespakken2242 er publisert og kontrollert,14 etterfølgende ruter kommer ved neste samlepunkt. Se sam345-slutthoder-20261020/KLARGJORT.md og sam345-tilbake-20261020/mottak-publisert.json.
+
+Oppdatert2026-10-20 04:20:345_26 til35 er produsert og kontrollert,14 native, publisert2256,263resultatark. Ni bildekall/sju råbilder brukt. Alle14 sett/motorobservert,80nullkontroller. Fellespakken2242 er publisert,denne14-bunken kom etter pakkefrys. Neste345_36. Se sam345-tilbake-20261020.
 
 Oppdatert 2026-10-20 03:50:345_21 til25, 5runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle5sett/motorobservert,80nullkontroller. Publisert2242,253resultatark. Sesam345-gjenbruk-b-20261020/mottak-publisert.json. Neste345_26.346-kildefeilen er fortsatt åpen.
 

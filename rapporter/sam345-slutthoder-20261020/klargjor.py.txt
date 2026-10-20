@@ -1,0 +1,40 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';folder='sam345-slutthoder-20261020';R=A/'rapporter'/folder;O=P/'out'/folder
+assert not R.exists() and not O.exists();R.mkdir();O.mkdir();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+protected={};rows=[];unics={}
+for n in range(36,42):
+ job=f'fig345_{n:02}';d=A/'jobber'/job
+ assert not(d/'resultat.png').exists() and not(d/'retur.md').exists()
+ j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGBA')
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:protected[f'jobber/{job}/{f}']=sha(d/f)
+ for c in j['ruter']:
+  x,y,w,h=c['rekt'];s=im.crop((x,y,x+w,y+h));key=(s.size,hashlib.sha256(s.tobytes()).hexdigest())
+  if key not in unics:unics[key]=dict(bilde=c['bilde'],kildejobb=job,rekt=c['rekt'],rgba_sha256=key[1],malruter=[])
+  unics[key]['malruter'].append(dict(jobb=job,bilde=c['bilde'],rekt=c['rekt'],animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']))
+ rows.append(dict(jobb=job,ruter=len(j['ruter']),kostyme=345,rom=92,animasjoner=[7]))
+assert len(unics)==15 and sum(r['ruter'] for r in rows)==27 and len(protected)==24
+for name,v in [('klargjort.json',rows),('ruteplan-unik.json',dict(ruter=list(unics.values()))),('beskyttede-kilder.json',protected)]:(R/name).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+b=Image.new('RGB',(1560,1665),'#3d454b');d=ImageDraw.Draw(b)
+for i,row in enumerate(rows):
+ im=Image.open(A/'jobber'/row['jobb']/'original_1x.png').convert('RGB').resize((768,512),Image.Resampling.NEAREST);x=i%2*780;y=i//2*555;b.paste(im,(x+12,y+35));d.text((x+12,y+10),row['jobb'],fill='white')
+b.save(R/'originalreferanser345-chore7.png')
+for f in ['kildeskript-rom_092-inngang.txt','kildeskript-rom_092-lokal_201.txt']:shutil.copy2(A/'rapporter/sam-sugepil-345-20261020'/f,R/f)
+assert json.loads((P/'mods/gpt/mod.json').read_text())['costume_cels']==2256
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+assert remote=='7d1aa36436d9cbb19afd75fedf249b7b67490756'
+base={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in(P/'mods/gpt').rglob('*') if p.is_file()}
+(R/'grunnlag-filer-7d1aa364.json').write_text(json.dumps(base,indent=2)+'\n')
+s=(P/'out/sam345-tilbake-20261020/motor-baseline.py').read_text().replace('sam345-tilbake-20261020',folder).replace('==2242','==2256').replace('grunnlag2242','grunnlag2256').replace('[(345,1)]','[(345,7)]').replace('(168,176,184,192,208,220)','(44,60,76,92,124,148)')
+s=s.replace("pkg=P/'out/felles-release-20261019-natt/linux/squashfs-root'","pkg=P/'out/felles-release-20261020-alkove/linux/squashfs-root'")
+(O/'motor-baseline.py').write_text(s);shutil.copy2(__file__,R/'klargjor.py.txt')
+(R/'KLARGJORT.md').write_text('''# Siste del av kostyme345: torso og hoder
+
+Seks jobber fig345_36 til41, 27 runtime-ruter fra15 eksakt ulike hele kilder.24 beskyttede kildefiler og2256-grunnlaget SHA-festet. Ingen bildekall eller resultater i denne bunken.
+
+Gyldig chore7 i rom92. Kildeskript lokalt201 bruker først chore6, så7. Aktør6 ved159,101,clip0,scale255. Referansebetydning, overgangen mellom torso/hoder og spillekontekst må være sett før nye prompter. Jobbpromptens generiske auberginebeskrivelse er ikke bekreftet for disse pikslene. Kilden styrer varm brun/orange palett; Sam-master og kontrollert345-serie er stilankere. Ikke fyll originale transparente utsparinger eller klipp med originalsilhuetter.
+
+Originalark og grunnlagsmotor må ses og kvitteres separat i kildevisning.json. Ingen påstand om ny HD eller visuelt kontrollert før det er gjort.17jobber346_27 til43 har kildefeil og skal ikke gjentas. Felles2242-pakken er publisert og ferdig kontrollert;ikke bygg den på nytt.2256-modden har14 nyere ruter som kom etter pakkefrys. Gammel nattkontroll forblir pauset.
+''')
+print('Klargjort6 jobber/27 ruter/15 ulike kilder/24 beskyttede filer. Ingen nye bildebestillinger eller resultater.')

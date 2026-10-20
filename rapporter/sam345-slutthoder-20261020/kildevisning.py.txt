@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from datetime import datetime,timezone
+import json,hashlib,re,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam345-slutthoder-20261020';O=P/'out/sam345-slutthoder-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+p=O/'motor-baseline.py';s=p.read_text().replace('(44,60,76,92,124,148)','(64,72,108,112,148,164)');p.write_text(s);shutil.copy2(p,R/'motor-baseline.py.txt')
+shutil.copy2(R/'grunnlagsmotor-345-animasjon7.png',O/'grunnlagsmotor-foer-bildeframekontroll.png')
+frames=[64,72,108,112,148,164];board=Image.new('RGB',(1920,850),'#243340');d=ImageDraw.Draw(board);imgs={}
+for i,f in enumerate(frames):
+ p=O/'baseline345-anim7'/f'frame_{f:06}_room092.png';im=Image.open(p).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));d.text((x+5,y+5),f'kostyme345 chore7, frame{f}, grunnlag2256',fill='white');imgs[str(f)]=dict(fil=p.name,sha256=sha(p))
+board.save(R/'grunnlagsmotor-345-animasjon7.png')
+expected={v['bilde'] for q in json.loads((R/'ruteplan-unik.json').read_text())['ruter'] for v in q['malruter']}
+log=(O/'baseline345-anim7/scummvm.log').read_text();draws={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*345 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());name=f'costume345_{n}';p=O/'baseline345-anim7'/f'frame_{f+4:06}_room092.png'
+ if name in expected and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,h],fil=p.name,sha256=sha(p))
+assert set(draws)==expected and len(draws)==27
+row=json.loads((R/'motor-baseline.json').read_text())[0];assert len(row['kontroller_med_frame'])==80 and not any(v['avvik'] for v in row['kontroller_med_frame'])
+j=dict(utc=datetime.now(timezone.utc).isoformat(),status='originalark og primærskript sett; korrigert motorark må ses før status settes visuelt sett',jobber=6,ruter=27,ulike_helkilder=15,beskyttede_filer=24,native_grunnlag=2256,hd_mod_sha='7d1aa36436d9cbb19afd75fedf249b7b67490756',ruter_motorobservert=27,bufferkontroller=80,nullkontroller=80,binar_sha256=row['binar_sha256'],ny_grafikk_laget=False,bildekall=0,naturlig_gjennomspilling=False,merknad='Motor er publisert2256 med original345-chore7,ikke ny HD. Frame44 viste gammel oppstartsplassholder før de nye lagene,frame60 viste forrige figur før inntegning. Sluttarket bruker faktisk logget tegningf+4:64,72,108,112,148,164. Svart oppstartsrute telles ikke som nytt figurresultat. Elevasjon1 i kildeskriptet,0 i testkroken. Behold alle lagutsparinger og interne sømmer uten oppdiktet kantstrek.',bilder=imgs,tegnede_ruter=draws)
+(R/'kildevisning.json').write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'kildevisning.py.txt')
+print('27 kilde-ruter observert,80bufferkontroller null. Korrigert bildevalg etter faktisk f+4.')
