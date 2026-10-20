@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,re
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter/felles-release-20261020-hjertebytte';MR=P/'work/.gpt-gren/rapporter/max-alkove341-grunnlag-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+cases=[('inventory',120),('akvarium',200),('cafeteria',200),('rom92-skript',608),('rom92-skript',748),('rom92-skript',784)];b=Image.new('RGB',(1920,850),'#243340');d=ImageDraw.Draw(b);records=[]
+for i,(label,frame) in enumerate(cases):
+ found=list((O/('pakke2399-'+label)).glob(f'frame_{frame:06}_room[0-9][0-9][0-9].png'));assert len(found)==1,(label,frame);p=found[0];room=int(re.search(r'_room(\d+)',p.name)[1]);im=Image.open(p).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;b.paste(im,(x,y+25));d.text((x+8,y+6),f'{label}, rom {room}, frame {frame}, faktisk 2399-pakke',fill='white');records.append(dict(scene=label,frame=frame,rom=room,kilde_fil=str(p.relative_to(O)),sha256=sha(p)))
+b.save(R/'pakke-motorbilder-1.png');(R/'motorbilder.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
+board=Image.new('RGB',(1920,625),'#243340');draw=ImageDraw.Draw(board)
+for i,(label,folder) in enumerate([('Forrige 2333-grafikk, samme nye pakke-binar','grunnlag2333-rom92-skript'),('Ny 2399-grafikk og original objektdekning','pakke2399-rom92-skript')]):
+ p=O/folder/'frame_000748_room092.png';im=Image.open(p).convert('RGB').resize((960,600),Image.Resampling.LANCZOS);board.paste(im,(i*960,25));draw.text((i*960+8,6),label,fill='white')
+board.save(R/'pakke-hjertekontur-foer-etter.png')
+scene=O/'pakke2399-rom92-skript';log=(scene/'scummvm.log').read_text();expected={v['bilde'] for e in json.loads((MR/'ruteplan-unik.json').read_text())['ruter'] for v in e['malruter']};draws={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*341 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,cel,x,y,w,h=map(int,m.groups());name=f'costume341_{cel}';p=scene/f'frame_{f+4:06}_room092.png'
+ if name in expected and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p))
+assert set(draws)==expected,(len(draws),expected-set(draws))
+(MR/'motor-kildeobservasjoner-820.json').write_text(json.dumps(dict(ruter=19,sett=len(draws),mangler=[],ny_grafikk=False,scene=str(scene),logg_sha256=sha(scene/'scummvm.log'),binar_sha256=sha(O/'linux/squashfs-root/usr/bin/scummvm'),tegninger=draws),indent=2)+'\n')
+b=Image.new('RGB',(1920,850),'#243340');d=ImageDraw.Draw(b)
+for i,cel in enumerate((1933,1934,1935,1936)):
+ v=draws[f'costume341_{cel}'];im=Image.open(v['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;b.paste(im,(x,y+25));d.text((x+5,y+5),f'costume341_{cel}, faktisk pakke frame {v["bildeframe"]}',fill='white')
+b.save(MR/'vier-siste-kildeposer-i-motor.png')
+for f in ['kontroller-pakker.py','kontroller-linux.py','vis-pakke.py','klargjor-linux.py','hent-pakker.py','hent-status.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('Seks hele pakkemotorbilder og hjertefor/etter klare. Alle 19 Max-kilder sett i motorloggen.',flush=True)

@@ -1,0 +1,43 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,re,struct,csv,zipfile
+from smhd import gamedata,v6grafikk
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/max-alkove341-grunnlag-20261020';R=A/'rapporter/max-alkove341-grunnlag-20261020';O.mkdir(exist_ok=True);R.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+jobs=sorted((A/'jobber').glob('fig341_*/jobb.json'));assert len(jobs)==6;protected={};rows=[];unique={}
+for j in jobs:
+ d=json.loads(j.read_text());assert not(j.parent/'resultat.png').exists() and not(j.parent/'retur.md').exists()
+ for n in ['jobb.json','original_1x.png','referanse.png','prompt.txt']:protected[(j.parent/n).relative_to(A).as_posix()]=sha(j.parent/n)
+ for c in d['ruter']:
+  x,y,w,h=c['rekt'];im=Image.open(j.parent/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));key=(im.size,hashlib.sha256(im.tobytes()).hexdigest());v=unique.setdefault(key,dict(bilde=c['bilde'],kildejobb=d['id'],rekt=c['rekt'],rgba_sha256=key[1],malruter=[]));v['malruter'].append(dict(jobb=d['id'],bilde=c['bilde'],rekt=c['rekt'],animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']));rows.append(c)
+assert len(rows)==19 and len({r['bilde'] for r in rows})==19
+assert not list((P/'mods/gpt/costumes').glob('costume341_*_hd.png'))
+(R/'beskyttede-kilder.json').write_text(json.dumps(protected,sort_keys=True,indent=2)+'\n');(R/'ruteplan-unik.json').write_text(json.dumps(dict(ruter=list(unique.values())),indent=2)+'\n')
+d,_=gamedata.load(P/'game/SAMNMAX.001');idx=gamedata.read_index(P/'game/SAMNMAX.000');rooms=gamedata.read_rooms(P/'game/SAMNMAX.001');ids=gamedata.costume_ids(idx,rooms);n=0;found=None
+for room in sorted(rooms.values(),key=lambda r:r.offset):
+ for off in room.cost_offsets:
+  cid=ids[n];n+=1
+  if cid==341:found=room.offset+off
+assert found is not None;size=gamedata.be32(d,found+4);base=d[found+8:found+size];ncol=32 if base[7]&127 in(0x59,0x61) else 16;data_offsets=8+ncol+34;num_anim=base[6];needed={r['animasjon']*4+r['retning'] for r in rows};table=[]
+for raw in sorted(needed):
+ assert raw<num_anim;off=struct.unpack_from('<H',base,data_offsets+2*raw)[0];assert off>=data_offsets+num_anim*2 and off<len(base);table.append(dict(raw=raw,offset=off))
+c=v6grafikk.decode_costume(d,found);assert c.errors==['animasjon 56 peker utenfor kostymet'],c.errors;valid={cel for a in c.animations if a['valg']<num_anim for cel in a['ruter']};assert {r['rute'] for r in rows}<=valid
+(R/'COST341-tabellgrenser.json').write_text(json.dumps(dict(COST_offset=found,COST_size=size,num_anim=num_anim,data_offsets=data_offsets,brukte_oppslag=table,alle19_innen_ekte_tabell=True,ekstra_tabelloppslag_avvist=c.errors,ugyldig_ekstra_raw=56,ingen_kjente_raw28_32_36_for_344_346_347=True),indent=2)+'\n')
+script=Path('/home/tom/Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/ikon-grunnlag/skript/rom_092/lokal_200.txt');shutil.copy2(script,R/'kildeskript-rom092-lokal200.txt');(R/'skriptproveniens.json').write_text(json.dumps(dict(kilde=str(script),sha256=sha(script),aktor=7,kostyme=341,pos=[159,100],skala=255,zclip=1),indent=2)+'\n')
+# The previous genuine room-script run already shows Max; do not duplicate it.
+scene=P/'out/aubergine347-grunnlag-20261020/obj901-kanonisk-romskript';log=(scene/'scummvm.log').read_text();draws={};wanted={r['bilde'] for r in rows}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*341 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,cel,x,y,w,h=map(int,m.groups());name=f'costume341_{cel}';p=scene/f'frame_{f+4:06}_room092.png'
+ if name in wanted and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p))
+(R/'motor-kildeobservasjoner.json').write_text(json.dumps(dict(ruter=19,sett=len(draws),mangler=sorted(wanted-set(draws)),ny_grafikk=False,scene=str(scene),tegninger=draws),indent=2)+'\n')
+for page in range(3):
+ board=Image.new('RGB',(1536,540),'#243340');dd=ImageDraw.Draw(board)
+ for i,j in enumerate(jobs[page*2:page*2+2]):
+  im=Image.open(j.parent/'referanse.png').convert('RGB').resize((768,512),Image.Resampling.NEAREST);board.paste(im,(i*768,28));dd.text((i*768+8,8),j.parent.name+' originalreferanse',fill='white')
+ board.save(R/f'originalreferanser341-side{page+1}.png')
+for page in range((len(draws)+8)//9):
+ board=Image.new('RGB',(1920,1275),'#243340');dd=ImageDraw.Draw(board)
+ for i,(name,v) in enumerate(sorted(draws.items())[page*9:page*9+9]):
+  im=Image.open(v['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));dd.text((x+5,y+5),f'{name}, motor f{v["bildeframe"]}',fill='white')
+ board.save(R/f'kildeposer-i-motor-{page+1}.png')
+manifest=dict(arbeidsgrein_sha=__import__('subprocess').check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),native_sha='907a218238cfb14481da7fadaaa2736fd70571ec',jobber=6,ruter=19,ulike_hele_kilder=len(unique),beskyttede_filer=24,eksisterende_resultater=0,bildekall=0,ny_native=0,originalkontekst='rom92,alkoven,varmt Max-naerbilde',stilanker='stil/fig003_01.png',stilanker_sha256=sha(A/'stil/fig003_01.png'),motor_allerede_observert=len(draws),mangler_motor=sorted(wanted-set(draws)))
+(R/'kildegrunnlag.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'klargjor-max341.py.txt');print(json.dumps(manifest,ensure_ascii=False),flush=True)
