@@ -1,0 +1,20 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import sys,shutil,json,hashlib
+from PIL import Image
+import numpy as np
+from scipy import ndimage as nd
+r=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/bestilling12-20261020')
+label=sys.argv[1];source=Path(sys.argv[2]);attempt=sys.argv[3] if len(sys.argv)>3 else '01'
+dest=r/f'unik-{label}-raa{attempt}.png'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+if dest.exists():assert sha(dest)==sha(source)
+else:shutil.copy2(source,dest)
+a=np.array(Image.open(dest).convert('RGBA'));labels,n=nd.label(a[:,:,3]>220);parts=[]
+for k,z in enumerate(nd.find_objects(labels),1):
+    size=int((labels[z]==k).sum())
+    if size>20:parts.append({'id':k,'piksler':size,'boks':[int(z[1].start),int(z[0].start),int(z[1].stop),int(z[0].stop)]})
+(r/f'unik-{label}-raa{attempt}-komponenter.json').write_text(json.dumps(parts,indent=2)+'\n')
+prompt=r/f'unik-{label}-prompt{attempt}.txt'
+(r/f'unik-{label}-kvittering{attempt}.json').write_text(json.dumps({'verktøy':'innebygd image_gen','modell':'Eksakt modellnavn ikke vist','utc':datetime.now(timezone.utc).isoformat(),'prompt':prompt.name,'prompt_sha256':sha(prompt),'generert_fil':str(source),'raa_fil':dest.name,'raa_sha256':sha(dest),'resultat_eller_mottak':False},ensure_ascii=False,indent=2)+'\n')
+print(label,Image.open(dest).mode,Image.open(dest).size,parts)

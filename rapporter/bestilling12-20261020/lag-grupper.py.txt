@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/bestilling12-20261020';O=P/'out/bestilling12-20261020'
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];groups=[];parts=[];n=0
+for c,name in [(39,'Sam ved TV'),(113,'Sam med golfkoelle'),(295,'Max ved fryser'),(346,'Sam i varm alkove')]:
+ seq=[v for v in plan if v['bilde'].startswith(f'costume{c:03}_')];cols,rows=(2,1) if c==346 else (3,2);per=cols*rows
+ for first in range(0,len(seq),per):
+  letter=chr(65+n);n+=1;items=seq[first:first+per];im=Image.new('RGB',(1536,1024),(68,73,78));draw=ImageDraw.Draw(im);cw,ch=1536//cols,1024//rows
+  for i,v in enumerate(items):
+   source=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');scale=min((cw-70)/source.width,(ch-100)/source.height);s=source.resize((round(source.width*scale),round(source.height*scale)),Image.Resampling.NEAREST);x=i%cols*cw+(cw-s.width)//2;y=i//cols*ch+55+(ch-70-s.height)//2;im.paste(s,(x,y),s);draw.text((i%cols*cw+12,i//cols*ch+12),f'{i+1}: {v["bilde"]}, source {source.width}x{source.height}',fill='white')
+   a=np.array(source);lab,_=nd.label(a[:,:,3]>0);pp=[]
+   for sid,z in enumerate(nd.find_objects(lab),1):
+    mask=lab[z]==sid;rgb=np.median(a[z][:,:,:3][mask],axis=0).tolist();pp.append(dict(id=sid,piksler=int(mask.sum()),rekt=[int(z[1].start),int(z[0].start),int(z[1].stop),int(z[0].stop)],rgb=rgb))
+   parts.append(dict(bilde=v['bilde'],deler=pp))
+  im.save(R/f'unik-{letter}-referanse.png');(R/f'unik-{letter}-plan.json').write_text(json.dumps(items,indent=2)+'\n');groups.append(dict(gruppe=letter,kostyme=c,identitet=name,cols=cols,rows=rows,unike=len(items),kilder=[v['bilde'] for v in items]));print(letter,c,[v['bilde'] for v in items])
+(R/'bildegrupper.json').write_text(json.dumps(groups,ensure_ascii=False,indent=2)+'\n');(R/'kildekomponenter.json').write_text(json.dumps(parts,indent=2)+'\n');shutil.copy2(__file__,R/'lag-grupper.py.txt')
+s=(P/'out/sam-max-fisk-museum-intro-20261020/registrer-raa.py').read_text().replace('sam-max-fisk-museum-intro-20261020','bestilling12-20261020');(O/'registrer-raa.py').write_text(s)

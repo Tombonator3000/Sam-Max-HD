@@ -1,0 +1,39 @@
+# Sam ved TV og med golfkølle, Max ved fryser, alkovenærbilder
+
+2026-10-20 02:08, Codex. Ti nye ark: fig039_01, fig113_01, fig295_01 og fig346_01 til 07. 43 native-ruter fra 40 eksakt ulike hele kildeutsnitt og 44 kildekomponenter. Kandidat 2177 native, grunnlag 2134. 209 av 1758 figurjobber har resultat, 1549 mangler pluss returer og sluttkontroll.
+
+## Kilder og motiver
+
+Sam rekker fram og slår kontorets TV på/av, rom 7, objekt 71 office-tv. Ingen ny rekvisitt. Primært objektskript bruker aktør 2 og kostyme 39. Motorprøven bruker synlig diagnose ved 130,174; nøyaktig walkActorToObj-hotspot er ikke utledet.
+
+Sam tar fram, vrir og senker en lys grå golfkølle ved Gator Golf, rom 25. Lokalt skript 207 setter kostyme 113 ved 119,177, og 217 bruker 117,177. Tynn lys stang, bøyd grå køllehode og mørkt grep følger kildefasene. Dette er en annen originalsekvens enn den tidligere avviste 110_05/06; den gamle avviste runden er ikke forsøkt igjen.
+
+Max går ut av og inn i kjøkkenets fryser, rom 56. Lokalt 210/211 bruker kostyme 295 ved 64,142 og AlwaysZClip 1. Bevisst avkuttede hoder/kropper og siste lille fotfragment beholdes. Ingen manglende kropp eller øre fullføres. Den ekstra rosa nesen i råbilde D6 ble fjernet med bildekall L. Fotfragmentets grove M01-utkast ble forkastet og erstattet med glatt M02.
+
+Sam i alkovenærbildet, rom 92, lokalt 201, aktør 6 ved 159,101. Varm brun/orange palett er tilsiktet lys: brun hatt/drakt, varm kremgul skjorte, grått/svart slips. Sugepilene har lilla gummikopper og fjær, gule skaft. Lag 13 er torso, lag 14 hode/øvre skuldre. Ingen fullført kropp, ingen bytting til blågrå drakt. Bare de første sju jobbene i 346-serien er levert her. To hode/pil-forhold ble korrigert i N/O. Oppdiktede vannrette klippekantstreker mellom egne lag ble renset før publisering, og sammensetningen avspilt på nytt.
+
+Sju primærskript, originalark, fem originale motorforløp og godkjente stilankere er sett. Originalmotorprøvene dekker alle 43 kilder. Eksisterende v6-mottak, SHA-festet fremdrift og rutekart brukes med uendrede terskler. Bibliotekskilder: figurark-fast-storrelse.md og scumm-v6-kostymer-skygge-og-soppelruter.md under prosjektbibliotek/losninger/grafikk. Disse er kompatible med prosjektets eksisterende klassiske SCUMM v6-kostymer og lokale myke mottak, og er kontrollert her.
+
+## Produksjon og rettinger
+
+Seksten innebygde image_gen-kall med faktiske prompter, forespørsler og råbilder. Femten råbilder brukes helt eller delvis. Ingen CLI/API-fallback, avslag eller avbrutte kall i denne bunken. L erstatter ekstra nesetipp i D6. N/O retter for store hoder og for korte sugepiler i G2/H2; øvrige G/H-poser er fortsatt brukt. M01 beholdt som forkastet pikseltrapp, M02 er glatt fragment. Alle råbilder og promptforsøk er bevart.
+
+Python renser generert alfa og plasserer hele genererte deler i kildebekreftede delbokser. Kildepikselmasker brukes ikke til å klippe nye silhuetter. Separate fotfragmenter og små kildebekreftede fargemerker er gjenskapt fra generert materiale. Første motorvisning avdekket oppdiktede vannrette kantstreker i råbildenes interne hode-/torsoklipp. Disse er fjernet før publisering ved å fortsette egne genererte nabofarger/alfa over seks HD-rader. Ny avspilling av 346 og hele sammensetningen er sett. Metode og før/etter-SHA-er i intern-lagkant-retting.json.
+
+Alle 43 native kommer fra arkene alene, null originalutliggerpiksler, null hel originalfallback. Ingen magenta med synlig alfa. Ingen alfa utenfor jobbrutene. Identiske hele kildeutsnitt gir byteidentiske native PNG-er.
+
+## Kontroller
+
+Egenkontroll: 43 målte, 37 OK, seks SJEKK, null FEIL. SJEKK er 113_1926 og 295_1920/1924/1925/1929/1930: snitt/union 0,67 til 0,74, 100 % bredde/høyde og null forskyvning. Alle seks er manuelt sett og står som merknader. Ingen terskler endret.
+
+Native mottak: 43 OK, null til gjennomsyn, mangler og tekniske feil. Alle 43 er sett i fire original/native/motor-kontaktark og seks hele motorbilder. Fem tvungne motorforløp med samme nedlastede e541253b-binær, rom, posisjon, aktør, clip, kamera, skala og animasjon som grunnlaget. 35 ruter ved kildeposisjon og åtte TV-ruter i synlig diagnose. 400 skjermbufferkontroller, 355 fra figurstart, alle 355 null. Bare samme kjente 160 ved frame 36 i rom 7 før testfiguren. Ingen nye eller økte avvik. Første 346-prøve og ny kantrettingsprøve er begge bevart; sluttmålingen teller de fem endelige forløpene.
+
+Alle 40 beskyttede kilder og tre opprinnelige stasher er bevart. Alle 20370 tidligere PNG-er byteidentiske, alle 20376 filstier bevart. Bare mod.json endres blant gamle kandidatfiler. Alle 20413 kandidat-PNG-er og 43 nye native-SHA-er skal bekreftes etter faktisk send/hent.
+
+## Fortsettelse
+
+Ingen ny Tom-godkjenning, separat Claude-kontroll, naturlig gjennomspilling eller interaktiv Windows-/webtest. De kjente inventarkantrestene fra rom 35 er ikke rettet av denne leveransen. Resten av alkoveserien, Max i nærbildet og senere jobber er fortsatt original/ubearbeidet.
+
+Siste kontrollerte felles Linux-/Windows-release sam-max-hd-2026-10-20-natt har 2134 native, så disse 43 er nyere. Pakker oppdateres ved neste samlepunkt med faktiske nedlastinger, sjekksummer og filkontroll.
+
+Neste jobb er fig346_08. Gjenoppta serien og se neste kildelag i motoren før nye kall. Ikke gjenta denne bunken eller de tidligere avviste 110_05/06 og 246_16 til 19. Automatisk fortsettelse er aktiv, gammel nattkontroll fortsatt pauset.

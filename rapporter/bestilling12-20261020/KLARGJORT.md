@@ -1,3 +1,7 @@
+# Status etter produksjon
+
+2026-10-20 02:08: alle ti ark laget, native mottatt og visuelt/motor-kontrollert. Seksten bildekall, 43 native. Se RAPPORT.md og mottak-publisert.json. Teksten nedenfor er historisk kildeklargjøring, ikke gjeldende leveringsstatus.
+
 # Bestilling12, kildearbeid pågår
 
 Ti jobber: fig039_01, fig113_01, fig295_01 og fig346_01 til07. 43 spillruter fra40 eksakt ulike hele kildeutsnitt,40 beskyttede SHA-er. Publisert grunnlag bdd4aec8,2134 native, alle20376 fil-SHA-er bevart. Ingen bildekall, resultat.png eller notat.md i denne bunken ennå. Ikke dupliser ferdig193/298/009.
