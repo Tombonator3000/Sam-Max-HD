@@ -1,0 +1,1 @@
+Begge tilsiktede bygg bestod:Linux39469938937,Windows39469944376,kodeb8483dbdeb80ab867194dea7139ee90e74bd828c,hd-modf108392586e1af5816f0b5548a8cbfce975052f3. Linux faktisk hentet og20925runtimefiler SHA-kontrollert,Windows-nedlasting pågår. Motorprøve/kontrollert fellesrelease gjenstår. Native er fortsatt frosset. Ikke dispatch på nytt.

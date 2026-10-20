@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,re,hashlib,shutil,math,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];wanted={t['bilde'] for v in plan for t in v['malruter']};draws={}
+for T in [O/'kilde251-anim6',O/'kilde251-anim7']:
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*251 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',(T/'scummvm.log').read_text()):
+  f,c,x,y,w,h=map(int,m.groups());n=f'costume251_{c}';shot=(f//4+1)*4;p=T/f'frame_{shot:06}_room049.png'
+  if n in wanted and n not in draws and p.exists():draws[n]=dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p),scene=T.name)
+assert set(draws)==wanted
+for page in range(math.ceil(len(draws)/6)):
+ sub=list(draws.items())[page*6:page*6+6];board=Image.new('RGB',(1920,len(sub)*360),'#283a45');d=ImageDraw.Draw(board)
+ for row,(n,v) in enumerate(sub):
+  x,y=v['pos'];w,h=v['maal'];im=Image.open(v['fil']).convert('RGB');crop=im.crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8));crop.thumbnail((950,310));src=Image.open(P/'work/extract/costumes'/(n+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);src.thumbnail((950,310));board.paste(src,(0,row*360+30),src);board.paste(crop,(960,row*360+30));d.text((8,row*360+8),n+' canonical / motor '+v['scene']+' '+str(v['bildeframe']),fill='white')
+ board.save(R/f'kildeposer-motor-side{page+1}.png')
+whole=[]
+for i,(n,v) in enumerate(list(draws.items())[::5]):
+ p=Path(v['fil']);f=R/f'kilde251-hel-{i+1}.png';shutil.copy2(p,f);whole.append(dict(bilde=n,fil=f.name,sha256=sha(f)))
+(R/'motor-kildeobservasjoner.json').write_text(json.dumps(dict(ruter=17,sett=17,tegninger=draws,hele_bilder=whole),indent=2)+'\n')
+with zipfile.ZipFile(R/'kildemotorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for T in [O/'kilde251-anim6',O/'kilde251-anim7']:z.write(T/'scummvm.log',T.name+'/scummvm.log')
+shutil.copy2(__file__,R/'vis-kilder.py.txt');print('17 kildecels og fire hele motorbilder klare for visuell kildekontroll.',flush=True)

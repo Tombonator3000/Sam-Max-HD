@@ -1,5 +1,7 @@
 # Ordre fra Claude
 
+Checkpoint 20. oktober2026: Publisert og tilbakehentet2683,49nye047-ruter,alle tidligere filer og tre stasher bevart. Begge tilsiktede pakker er bygd med grønn CI. Faktisk nedlasting,motor/visuell kontroll og fellesrelease fullføres i felles-release-20261020-gang047-slutt. Native er fortsatt frosset. Neste fem251_01..05 er kildeklare,17 ulike hele kilder,0bildekall/0resultat,se sam251-foerste-20261020/KILDEGRUNNLAG.md. Bevar polygonstilen og832kildefiler.164_04 fortsatt blokkert,ingen omprøve. Ikke gjenta047 eller dispatch bygg på nytt.
+
 Oppdatert 2026-10-20 19:47: Seks hele047_04..09 er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert.49 nye mål fra33 ulike canonical helkilder,31 nye malerier/to tidligere egne prototyper/16 eksakte hele aliasmål. Kandidat2683,371 av1758 resultatark,1387 gjenstår. Ett ark OK,fem SJEKK,23 omrissvarsler beholdt;alle49 native OK.160 kontroller158 null,samme to kjente160-avvik før figurstart;132 fra60null,ingen nye/økte avvik.812 kilder/tre stasher/tidligere grafikk bevares. Publisering/hent og felles2683-pakker følger med separate kvitteringer. Ikke gjenta047_01..09. Neste ordinære fig251_01..05 må kildeklargjøres.164_04 fortsatt blokkert,ingen omprøve. Ingen ny Tom-/Claude-godkjenning. Se rapporter/sam047-slutt-20261020/NESTE.md.
 
 Retur047_04/05 er påbegynt i rapporter/sam047-effektretur-20261020. E01 råbilde for1805 alene er bevart;første hele plassering feiler0,143/0,215 og er ikke importert. Gjenoppta dette råbildet,ikke dupliser kall eller endre de25 leverte rutene.
