@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,re,zipfile,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/alkove-fortsettelse-20261020';O=P/'out/alkove-fortsettelse-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=json.loads((R/'motor-baseline.json').read_text());plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];expected={t['bilde'] for p in plan for t in p['malruter']};seen={f"costume{r['kostyme']:03}_{n}" for r in rows for n in r['tegnede_ruter']};assert len(expected)==22 and expected<=seen;assert not any(r['avvik_fra_figurstart'] for r in rows);lookup={};manifest={}
+with zipfile.ZipFile(R/'motor-grunnlag-logger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for r in rows:
+  source=O/r['scene']/'scummvm.log';rel=source.relative_to(O).as_posix();z.write(source,rel);manifest[rel]=sha(source);log=source.read_text(errors='replace');cams={int(f):(int(x),int(y)) for f,x,y in re.findall(r'whole screen frame (\d+) \(room \d+, screen at (-?\d+),(-?\d+)\)',log)}
+  for m in re.finditer(r'frame (\d+) soft cel (\d+) costume 346 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+   frame,n,x,y,w,h=map(int,m.groups());name=f'costume346_{n}';f=frame+4;p=O/r['scene']/f'frame_{f:06}_room092.png'
+   if name in expected and name not in lookup and p.is_file():
+    camx,camy=cams[f];scene=Image.open(p).convert('RGB');box=[(x-camx-3)*4,(y-camy-3)*4,(x-camx+w+3)*4,(y-camy+h+3)*4];lookup[name]=dict(scene=r['scene'],frame=f,fil=str(p.relative_to(O)),boks=box)
+assert set(lookup)==expected
+items=sorted(lookup.items());cw,ch=450,350
+for page in range((len(items)+11)//12):
+ board=Image.new('RGB',(cw*3,ch*4),'#34414b');d=ImageDraw.Draw(board)
+ for i,(name,detail) in enumerate(items[page*12:page*12+12]):
+  x=i%3*cw;y=i//3*ch;d.text((x+5,y+4),name+' original / grunnlagsmotor',fill='white');source=Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA');scene=Image.open(O/detail['fil']).crop(detail['boks']).convert('RGBA')
+  for j,im in enumerate((source,scene)):
+   f=min((cw//2-12)/im.width,(ch-45)/im.height);im=im.resize((max(1,round(im.width*f)),max(1,round(im.height*f))),Image.Resampling.NEAREST);board.paste(im,(x+j*cw//2+(cw//2-im.width)//2,y+30),im)
+ board.save(R/f'original-og-grunnlagsmotor-{page+1}.png')
+summary=dict(native_grunnlag='5fe0f25fb0b7c66a4ba63281e71c18235ce7316f',native_totalt=2177,kilder_forventet=22,kilder_observert=22,kontroller=sum(len(r['kontroller_med_frame']) for r in rows),fra_figurstart=sum(c['frame']>=40 for r in rows for c in r['kontroller_med_frame']),avvik=[],produksjonsbinar_sha256=rows[0]['binar_sha256'],aktør=6,clip=0,pos='159,101',camx=160,scale=255,naturlig_gjennomspilling=False,merknad='Alle22 nye rutenumre mangler native i2177 og vises her originalt. De tolv tidligere346-lagene erHD.1956 er faktisk tegnet som en1x19 brun loddrett avslutningsrute i motoren, ikke en lilla sugepil. Bevar bare den kildebekreftede smale formen og de brune fargene, ingen oppdiktet pil eller kropp. Eksakt skriptfunksjon er ikke utledet.',ruter=lookup)
+(R/'motor-grunnlag-oppsummering.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(R/'motor-grunnlag-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');shutil.copy2(__file__,R/'kontroller-grunnlag.py.txt');print({k:v for k,v in summary.items() if k!='ruter'})
