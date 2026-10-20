@@ -1,0 +1,21 @@
+from pathlib import Path
+import subprocess,json,re,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/felles-release-20261020-max028';R=P/'work/.gpt-gren/rapporter/felles-release-20261020-max028';state=json.loads((O/'bygg-startet.json').read_text())
+for platform,names in [('linux',['SamMaxHD-x86_64.AppImage','SamMaxHD-x86_64.AppImage.sha256']),('windows',['SamMaxHD-Windows.zip','SamMaxHD-Windows.zip.sha256'])]:
+ row=state['plattform'][platform]
+ if row['status']!='completed':
+  print(platform,'bygg ikke ferdig,ingen nedlasting ennå',flush=True);continue
+ assert row['conclusion']=='success'
+ meta=json.loads(subprocess.check_output(['gh','api',f'repos/Tombonator3000/Sam-Max-HD/releases/tags/{platform}'],cwd=P,text=True));m=re.search(r'Sam-Max-HD:\s*([0-9a-f]{7,40})',meta['body']);assert m and state['kode'].startswith(m[1]) and state['hd_mod'] in meta['body']
+ (O/f'release-{platform}.json').write_text(json.dumps(meta,indent=2)+'\n');target=O/platform;target.mkdir(exist_ok=True)
+ for name in names:
+  asset=next(a for a in meta['assets'] if a['name']==name)
+  if (target/name).exists():
+   assert (target/name).stat().st_size==asset['size'] and asset['digest']=='sha256:'+hashlib.sha256((target/name).read_bytes()).hexdigest()
+   print(platform,name,'allerede faktisk hentet og SHA stemmer',flush=True);continue
+  subprocess.run(['gh','release','download',platform,'--pattern',name,'--dir',str(target)],cwd=P,check=True)
+ print(platform,'faktisk pakke og SHA-fil hentet',flush=True)
+for platform in ['linux','windows']:
+ if (O/f'release-{platform}.json').exists():
+  shutil.copy2(O/f'run-{platform}.json',R/f'run-{platform}.json');shutil.copy2(O/f'release-{platform}.json',R/f'release-{platform}.json')
+shutil.copy2(__file__,R/'hent-pakker.py.txt')

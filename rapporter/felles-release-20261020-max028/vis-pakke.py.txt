@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,re,hashlib,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/max028-foerste-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');MOD=O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt';prod=read(S/'motorobservasjoner.json')['tegninger'];wanted={e['bilde'] for e in read(R/'nye-native88.json')['ruter']};assert len(wanted)==88;obs={}
+for ch in [6,7]:
+ T=O/f'pakke2810-max028-anim{ch}';log=(T/'scummvm.log').read_text()
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*28\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+  f,cel,x,y,w,h=map(int,m.groups());name=f'costume028_{cel}';shot=(f//4+1)*4;p=T/f'frame_{shot:06}_room004.png'
+  if name in wanted and name not in obs and p.exists():obs[name]=dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p),native_sha256=sha(MOD/'costumes'/(name+'_hd.png')),chore=ch)
+assert set(obs)==wanted;rasters=[]
+for name,v in obs.items():
+ old=np.array(Image.open(prod[name]['fil']).convert('RGBA'));new=np.array(Image.open(v['fil']).convert('RGBA'));assert old.shape==new.shape and np.array_equal(old,new),name;rasters.append(dict(bilde=name,produksjon_sha256=sha(Path(prod[name]['fil'])),pakke_sha256=v['sha256'],rasteridentisk=True))
+save(R/'motorobservasjoner88.json',dict(sett=88,mangler=[],tegninger=obs));save(R/'rasterkontroll-mot-visuelt-sett.json',dict(rasteridentiske=88,ruter=rasters))
+shots=[];choices=[('inventory',120,7),('inventory',200,7),('akvarium',80,16),('akvarium',160,16),('cafeteria',80,30),('cafeteria',160,30),('rom92-skript',400,92),('rom92-skript',800,92),('max028-anim6',64,4),('max028-anim6',144,4),('max028-anim7',84,4),('max028-anim7',300,4)]
+for label,f,room in choices:
+ T=O/f'pakke2810-{label}';p=T/f'frame_{f:06}_room{room:03}.png'
+ if not p.exists():
+  allshots=sorted(T.glob('frame_*_room*.png'));p=min(allshots,key=lambda p:abs(int(p.name.split('_')[1])-f));f=int(p.name.split('_')[1])
+ out=R/f'pakke-{label}-{f}.png';shutil.copy2(p,out);shots.append(dict(label=label,frame=f,fil=out.name,sha256=sha(out)))
+save(R/'motorbilder.json',shots)
+for page in [0,1]:
+ sub=shots[page*6:page*6+6];board=Image.new('RGB',(1920,840),'#283943');d=ImageDraw.Draw(board)
+ for i,v in enumerate(sub):
+  im=Image.open(R/v['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*420;board.paste(im,(x,y+20));d.text((x+5,y+4),v['label']+' frame'+str(v['frame']),fill='white')
+ board.save(R/f'pakke-motorbilder-side{page+1}.png')
+diffs=[]
+for name in ['costume028_1920','costume028_1952','costume028_2006']:
+ v=obs[name];ch=v['chore'];f=v['bildeframe'];fn=f'frame_{f:06}_room004.png';old=np.array(Image.open(O/f'grunnlag2722-max028-anim{ch}'/fn).convert('RGB'));new=np.array(Image.open(O/f'pakke2810-max028-anim{ch}'/fn).convert('RGB'));delta=np.any(old!=new,2);outside=delta.copy();x,y=v['pos'];w,h=v['maal'];outside[max(0,y*4-10):min(800,(y+h)*4+10),max(0,x*4-10):min(1280,(x+w)*4+10)]=False;assert not outside.any();diffs.append(dict(bilde=name,chore=ch,frame=f,endrede_piksler=int(delta.sum()),utenfor_nye_cels_og_marg=0));board=Image.new('RGB',(1280,430),'#283943');d=ImageDraw.Draw(board);board.paste(Image.fromarray(old).resize((640,400)),(0,30));board.paste(Image.fromarray(new).resize((640,400)),(640,30));d.text((6,6),f'Faktisk pakke før/etter,ch{ch},frame{f}',fill='white');board.save(R/f'pakke-foer-etter-{name}.png')
+save(R/'pakke-pikselkontroll.json',diffs)
+canon={v['bilde'] for v in read(S/'ruteplan-unik.json')['ruter']};items=[(n,v) for n,v in obs.items() if n in canon];assert len(items)==17;frames=[Image.open(v['fil']).convert('RGB').crop((120,70,650,800)).resize((400,552),Image.Resampling.LANCZOS) for n,v in items];gif=R/'max028-faktisk-pakke.gif';frames[0].save(gif,save_all=True,append_images=frames[1:],duration=220,loop=0,optimize=False);save(R/'animasjonsproveniens.json',dict(fil=gif.name,sha256=sha(gif),inputbilder=17,faktiske_motorbilder=[dict(bilde=n,sha256=v['sha256'],chore=v['chore'],frame=v['bildeframe']) for n,v in items],naturlig_gjennomspilling=False,beskaaret_kun_for_visning=True));shutil.copy2(__file__,R/'vis-pakke.py.txt');print('88 actual package frames rasteridentical,12 whole images,3 before/after and17expression GIF',flush=True)
