@@ -1,0 +1,1 @@
+Nytt samlepunkt med de 23 overtegningsrettingene. Første 2427-pakke bevares. Native fryses ved SHA i bygg-startet.json. Kontroller begge faktiske pakker og begge Sam-forløp før ny fellesrelease. Ingen kodeendring. Ikke dupliser dispatchene.
