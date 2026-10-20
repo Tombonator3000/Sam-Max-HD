@@ -15,3 +15,5 @@ Automatisk native mottak gir alle 22 OK med uendrede terskler. Sluttmottaket har
 Alle 22 er visuelt sett mot original/native/motor og observert ved kildeposisjonen i to tvungne animasjoner i nedlastet Linux-motor e541253b. 160 skjermbufferkontroller, alle null, 142 fra figurstart. De forkastede prøveforløpene er bevart og teller ikke som sluttprøver.
 
 Publisering og faktisk tilbakehenting føres i mottak-publisert.json. Ingen ny Tom-godkjenning, separat Claude-kontroll, naturlig gjennomspilling eller interaktiv Windows-/webtest. Resten av serien og Max-nærbildene gjenstår.
+
+2026-10-20: Overtegningsretur. 3 hele kilde-RGBA-identiske aliaser har fått samme egne sammenhengende klesmaleri og native som de kanoniske hodelagene. M01 fra sam346-klesskjot-retur-20261020 er eneste nye maleri, ingen nye bildekall i denne returen. Uendrede ruter på arket er bytekontrollert. Førbilder er bevart i sam346-overtegning-20261020/foer. Resultat SHA256 f08147a9b53cf3aaa1997323403de0987d849b030c09c06414fd0421681a8dc5. Se fremdrift.json for mottak, motor og publisering.
