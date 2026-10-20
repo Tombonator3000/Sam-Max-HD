@@ -1,0 +1,35 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,subprocess,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;state=json.loads((O/'bygg-startet.json').read_text());tag=state['release_tag'];code=state['kode'];mod=state['hd_mod'];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True))
+meta=api('releases/tags/'+tag);latest=api('releases/latest');assert meta['id']==latest['id'] and not meta['draft'] and not meta['prerelease'];assets=json.loads((O/'assetkontroll.json').read_text());assert len(meta['assets'])==len(assets)==4
+for v in assets:
+ a=next(a for a in meta['assets'] if a['name']==v['fil']);assert a['size']==v['bytes'] and a['digest']=='sha256:'+v['sha256'] and sha(O/v['plattform']/v['fil'])==v['sha256']
+ref=api('git/ref/tags/'+tag)['object']
+if ref['type']=='tag':ref=api('git/tags/'+ref['sha'])['object']
+assert ref['sha']==code and ref['type']=='commit';prior=json.loads((O/'releaser-foer.json').read_text());after=api('releases?per_page=100');assert len(after)==len(prior)+1;aset=lambda v:{(a['id'],a['name'],a['size'],a['digest']) for a in v['assets']}
+for v in prior:assert aset(v)==aset(next(x for x in after if x['id']==v['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+files=json.loads((R/'moddfiler-2478.json').read_text());assert len(files)==20721 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+runtime=json.loads((O/'linux-kontroll.json').read_text());assert runtime['skjermbufferkontroller']==runtime['nullkontroller']==304 and runtime['nye_native_observert']==22 and runtime['hele_sam343_observert']==22;assert len(json.loads((R/'motorbilder.json').read_text()))==10
+runs={k:api('actions/runs/'+str(state['plattform'][k]['run_id'])) for k in ['linux','windows']};assert all(v['conclusion']=='success' and v['run_attempt']==1 for v in runs.values())
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),url=meta['html_url'],release_id=meta['id'],release_tag=tag,Latest_bekreftet=True,kode=code,hd_mod=mod,native=2478,nye_native_siden_felles2456=22,hele_sam343_ark=11,hele_sam343_native=22,figurjobber_med_resultat=333,figurjobber_totalt=1758,gjenstaar_hele_jobber=1425,faktiske_nedlastinger_begge=True,alle20720_runtime_moddfiler_per_pakke_bekreftet=True,fire_assets_digest_og_bytes_verifisert=True,bevarte_tidligere_releaser=len(prior),alle_tidligere_assets_bevart=True,linux_run=state['plattform']['linux']['run_id'],windows_run=state['plattform']['windows']['run_id'],windows_forsoek=1,linux_forsoek=1,linux_binar_sha256=runtime['binar_sha256'],skjermbufferkontroller=304,nullkontroller=304,hele_motorbilder_sett=10,ny_Tom_Claude_godkjenning=False,naturlig_gjennomspilling=False,ny_interaktiv_windows_eller_webtest=False,tidligere_timeout_816_836_og_SDL_feil_ikke_erklaert_rettet=True)
+for d in [O,R]:(d/'publisert.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(d/'release-publisert.json').write_text(json.dumps(meta,indent=2)+'\n')
+state.update(status='fellesrelease_publisert_og_kontrollert',Latest_bekreftet=True,native_frys_kan_frigis=True,release_url=meta['html_url'])
+for d in [O,R]:(d/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+for name in ['sam343-foerste-20261020','sam343-slutt-20261020']:
+ S=A/'rapporter'/name;progress=json.loads((S/'fremdrift.json').read_text())
+ for e in progress['leveranser']:
+  assert sha(A/e['resultat'])==e['sha256'];old=e.get('fellespakke_tag')
+  if old and old!=tag:e.setdefault('tidligere_fellespakker',[]);e['tidligere_fellespakker']=list(dict.fromkeys(e['tidligere_fellespakker']+[old]))
+  e.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=2478)
+ (S/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+ for f in ['bevaringskontroll.json','mottak-publisert.json']:
+  p=S/f
+  if p.exists():
+   v=json.loads(p.read_text());v.update(i_fellespakke=True,fellespakke_tag=tag,pakke_native=2478);p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+ p=S/'RAPPORT.md';p.write_text(p.read_text()+f'\nMed i kontrollert fellesutgave {tag}: {meta["html_url"]}. Begge faktiske pakker og alle 20720 runtime moddfiler per pakke er bekreftet. Hele Sam343 med 22 native er observert; 304 sluttbufferkontroller null. Alle {len(prior)} tidligere releaser og vedlegg er bevart. Ingen ny Tom-/Claude-godkjenning.\n')
+ (S/'NESTE.md').write_text(f'Denne bunken og hele Sam343 er ferdig produsert og med i kontrollert fellespakke {tag}. Native-frysen er frigitt. Neste produksjon er sam-max-kontor041-grunnlag-20261020/NESTE.md; ikke gjenta343 eller disse pakkebyggene.\n')
+(R/'RAPPORT.md').write_text((R/'RAPPORT.md').read_text()+f'\nPublisert og Latest bekreftet: {meta["html_url"]}, releaseID {meta["id"]}. Begge bygg bestod første forsøk;alle {len(prior)} tidligere releaser og deres vedlegg er bevart. Native-frysen er frigitt.\n')
+(R/'PAAGAR.md').write_text(f'Ferdig samlepunkt: {meta["html_url"]}, Latest bekreftet. Alle 2478 native og begge faktiske pakker er kontrollert. Native-frysen er frigitt. Fortsett produksjon av fig041_01 til 05 fra kildegrunnlaget. Ikke gjenta disse byggene.\n')
+shutil.copy2(__file__,R/'bekreft-release.py.txt');print(json.dumps(proof,ensure_ascii=False),flush=True)

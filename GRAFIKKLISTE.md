@@ -1,5 +1,14 @@
 # Grafikkliste
 
+Oppdatert 2026-10-20 13:44: Hele Sam343 er levert og med i fellesutgave sam-max-hd-2026-10-20-sam343: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam343. 11 nye hele ark, 22 native fra 17 brukte nye malerier i ni innebygde bildekall; seks canonical 1935 til 1940-aliaser deler samme bilde. Alle råbilder, faktiske prompter, referansehasher og rutekart er bevart. Egenkontroll og native mottak OK, alle 22 visuelt sett og motorobservert. Begge produksjonsbunker har 285 nullkontroller. Ingen hard originalsilhuettmaske eller originalfragment-fallback, ingen ny Tom-/Claude-godkjenning.
+
+Native 31bfc8708c1035686835dcef3d8f3855155d6fd9, 2478 totalt, publisert, hentet og alle 20721 filer / 20715 PNG-er SHA-bekreftet. Alle tidligere grafikkfiler og stier er bevart, 676 beskyttede kilder og tre stasher uendret. 333 av 1758 figurjobber har resultat, 1425 gjenstår pluss returer, katalogfeil og sluttkontroll.
+
+Begge faktiske Linux-/Windows-pakker og alle 20720 runtime moddfiler per pakke er kontrollert, 18 tidligere releaser og assets bevart, Latest bekreftet. Linux39414709096 og Windows39414714206 bestod første forsøk. Alle 22 nye ruter observert i faktisk Linux, 304 nullkontroller, ti hele motorbilder og to før/etter sett. Native-frysen er frigitt. Ikke gjenta Sam343 eller disse byggene. Se felles-release-20261020-sam343/publisert.json.
+
+Neste fig041_01 til 05 er kildeklargjort: 33 ruter fra 25 ulike hele canonical kilder, alle originalark/motorposer/primærskript/begge ankere sett, ingen bildekall eller resultater ennå. Begge figurer er i samme cel med løse papirark og flygende hatt. Sam har blågrå dress. Kildetesten fikk ett tidlig avvik på 160 skjermpiksler ved frame36, før første41-tegning60; alle66 kontroller fra60 er null. Helprøven bestod ikke og skal ikke kalles80 null. Bevar loggen, sammenlign tilsvarende grunnlag og les sam-max-kontor041-grunnlag-20261020/KILDEGRUNNLAG.md før produksjon. Ingen motor-/pipelineendring. Gamle timeout-/SDL-/inventarkantfunn er fortsatt åpne.
+
+
 Oppdatert 2026-10-20 13:11: Fig343_01 til 05 er publisert og hentet med ti nye native, hd-mod 16bf826c8dab1080fd6da3986e90a42e6d7c428b, 2466 totalt. Grafikkilde 7d7e574c6c1150b77c4989115a0e5f0dcd09d572. Fem hele resultatark, fem innebygde bildekall og ti nye malte poser. Alle ti egenkontroll/native OK, visuelt sett og motorobservert i animasjon 6 og romskript820, 285 nullkontroller mot tilsvarende grunnlag. Alle 20709 filer og 20703 PNG-er er SHA-bekreftet etter hent; alle 20693 tidligere PNG-er er byteidentiske. 632 beskyttede kilder og tre stasher er uendret. Ingen ny Tom-/Claude-godkjenning eller motor-/pipelineendring.
 
 327 av 1758 hele figurjobber har resultat, 1431 gjenstår pluss returer/kildefeil/sluttkontroll. Felles Linux-/Windows-pakker er bekreftet 2456 og har ennå ikke disse ti nye. Neste seks fig343_06 til 11 er kildeklargjort og nå neste produksjon: tolv ruter fra sju ulike canonical RGBA-kilder. Alle originalark og alle tolv kildeposer i motor er sett, ingen bildekall eller resultater der ennå. 1935 til 1940 er eksakte hele aliaser; de øvrige seks kildene er ulike. Les sam343-slutt-20261020/KILDEGRUNNLAG.md og NESTE.md. Ikke gjenta de første fem eller siste fullførte2456-pakker. Nytt pakkesamlepunkt etter resten av343.
@@ -47,7 +56,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 327 ark med resultat; 2466 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 333 ark med resultat; 2478 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
@@ -556,22 +565,22 @@ Figurark for Sam.
 - [ ] `fig250_10` (figurark 10 for Sam (kostyme 250), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_11` (figurark 11 for Sam (kostyme 250), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_12` (figurark 12 for Sam (kostyme 250), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig343_01` (figurark 1 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter))
-- [ ] `fig343_02` (figurark 2 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_01` (figurark 1 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter))
+- [x] `fig343_02` (figurark 2 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 
 ## Bestilling 35
 
 Figurark for Sam, Sam og Max.
 
-- [ ] `fig343_03` (figurark 3 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_04` (figurark 4 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_05` (figurark 5 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_06` (figurark 6 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_07` (figurark 7 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_08` (figurark 8 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_09` (figurark 9 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_10` (figurark 10 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig343_11` (figurark 11 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_03` (figurark 3 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_04` (figurark 4 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_05` (figurark 5 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_06` (figurark 6 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_07` (figurark 7 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_08` (figurark 8 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_09` (figurark 9 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_10` (figurark 10 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
+- [x] `fig343_11` (figurark 11 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 - [ ] `fig041_01` (figurark 1 for Sam og Max (kostyme 41), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 36

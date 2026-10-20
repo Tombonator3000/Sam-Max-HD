@@ -1,0 +1,1 @@
+Ferdig samlepunkt: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam343, Latest bekreftet. Alle 2478 native og begge faktiske pakker er kontrollert. Native-frysen er frigitt. Fortsett produksjon av fig041_01 til 05 fra kildegrunnlaget. Ikke gjenta disse byggene.

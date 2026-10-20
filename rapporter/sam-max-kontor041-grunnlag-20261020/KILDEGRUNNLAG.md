@@ -1,0 +1,15 @@
+# Sam og Max i kontorintroen, kostyme 41
+
+Neste fem er fig041_01 til 05 etter den leverte Sam343-serien i grafikklisten: 33 ruter fra 25 ulike hele canonical RGBA-kilder, 20 beskyttede jobbfiler. Ingen nye bildekall, resultatark eller native er laget her. Alle fem originalark, alle 33 kildeposer i motor og Sam-ankeret er sett. Se også det godkjente Max-ankeret før bildekall.
+
+Dette er begge figurene i samme cel, først bak pulten i kontoret, deretter opp og frem i et hopp. Sam har blågrå dress/fedora, hvit skjorte, svart/blått slips og brune hender/føtter. Max er hvit/krem med rosa ører og bredt tannglis. Begge identiteter og innbyrdes størrelse må bevares. Den brune alkovepaletten fra Sam343 skal ikke brukes her.
+
+De grå/hvite og brune flatene under Max blir til løse, flygende ark under hoppet, synlig særlig i siste originalark og motorbildene 1950 til 1952. Bevar disse kildedelene som papirformer, også når de skjules av pulten. Ikke slett dem som søppel, ikke lag nye rekvisitter av dem. Sams hatt flyr opp og tilbake på hodet i jobb02; det er en egen liten kildebekreftet del som må beholdes. Frittliggende ører, hender, papirdeler og hatt skal ikke mistes ved komponentfiltrering. Første33 er bare delen av den totale49-ruters animasjonen; neste041_06 til10 følger senere.
+
+Primærkilde globalt skript66 i rom7 setter aktør2 til kostyme41, ignoreBoxes, scale255, Zclip2, elevation-2 og chore6. Max-aktør3 er allerede skjult i primærsekvensen. Chore6/raw5 er gyldig i COST41, num_anim28 og offset130. Ingen dekoderadvarsler. Katalogen kaller dette animasjon1/retning1; behold kildegeometrien, ikke legg til speilvendte varianter.
+
+Kildetesten bruker den faktisk nedlastede2456-Linux-binæren27c58fde274620118ff45c16d388187274b533b0e5364339640e28627937b0ce, kontrollert romhopp til7, aktør2 ved237,120, clip2, scale255 og chore6. Testhjellperen setter elevation0, to originalpiksler forskjell fra primærskriptet, og spiller ikke naturlig intro. Den viser alle49 kilder, derav alle33 i de fem jobbene. Helprøven BESTOD IKKE nullavviksassertionen: ett avvik på160 skjermpiksler ved frame36, før første41-tegning ved60. Alle66 kontroller fra60 til320 er null. Bevar feilen og ikke skriv80 nullkontroller. Dette er eksisterende grafikk uten nye041-bilder. Ved videre grafikkprøve må tilsvarende grunnlag sammenlignes og avviket undersøkes; ingen nullgrense skal endres eller feil påstås rettet.
+
+Første kildeoppsett for presentasjonsark hadde et kopiert rom092-filnavn og stoppet på33-bildeassertionen. Bare hjelperens skjermbildesti er korrigert tilrom007; selve motorprøven, kilder, terskler og grafikk er urørt. Én tidligere innlimt forberedelseskommando hadde syntaksfeilen else16 og gjorde ingen endringer. Ingen ny grafikk er produsert av noen av disse oppsettsforsøkene.
+
+Gjenoppta med kilde-/stilkoll og vurdering av tidlig romhoppavvik. Felles2478 er et separat, kontrollert Sam343-samlepunkt og skal ikke bygges eller tegnes på nytt. Ny grafikk skal ha egne råbilder, faktiske prompter, egen alfa og kildefestet rutekart, aldri hard originalsilhuettmaske eller originalfragment-fallback.
