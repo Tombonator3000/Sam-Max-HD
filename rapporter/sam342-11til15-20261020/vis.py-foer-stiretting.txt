@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,re,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-11til15-20261020';O=Path(__file__).resolve().parent;C=O/'mod-sam342-06til10';T=O/'kandidat-romskript820';B=O/'grunnlag-romskript820';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();log=(T/'scummvm.log').read_text();draws={};wanted={f'costume342_{n}' for n in range(1939,1949)}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*342 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,cel,x,y,w,h=map(int,m.groups());name=f'costume342_{cel}';shot=(f//4+1)*4;p=T/f'frame_{shot:06}_room092.png'
+ if name in wanted and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p),native_sha256=sha(C/'costumes'/(name+'_hd.png')))
+assert set(draws)==wanted
+for page in range(5):
+ board=Image.new('RGB',(1440,1080),'#263441');dr=ImageDraw.Draw(board)
+ for row,(name,v) in enumerate(list(draws.items())[page*2:page*2+2]):
+  x,y=v['pos'];w,h=v['maal'];original=Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA').resize((w*4,h*4),Image.Resampling.NEAREST);native=Image.open(C/'costumes'/(name+'_hd.png')).convert('RGBA');motor=Image.open(v['fil']).convert('RGBA').crop((x*4,y*4,(x+w)*4,(y+h)*4))
+  for col,(title,im) in enumerate([('Original',original),('Ny native',native),('Motor '+str(v['bildeframe']),motor)]):
+   im.thumbnail((475,500),Image.Resampling.LANCZOS if col else Image.Resampling.NEAREST);px=col*480;py=row*540;board.paste(im,(px,py+34),im);dr.text((px+5,py+8),f'{name}, {title}',fill='white')
+ board.save(R/f'original-native-motor-{page+1}.png')
+shots=[172,176,180,184,188,204,208];items=[]
+for f in shots:
+ p=T/f'frame_{f:06}_room092.png';out=R/f'sam342-motor-{f}.png';shutil.copy2(p,out);items.append(dict(frame=f,fil=out.name,sha256=sha(out)))
+differences=[]
+for f in [172,208]:
+ name=f'frame_{f:06}_room092.png';b=Image.open(B/name).convert('RGB');a=Image.open(T/name).convert('RGB');delta=np.any(np.array(a)!=np.array(b),2);outside=int(delta[:,700:].sum());assert outside==0,(f,outside);differences.append(dict(frame=f,endrede_piksler=int(delta.sum()),utenfor_sam_x700=outside));board=Image.new('RGB',(1280,430),'#263441');dr=ImageDraw.Draw(board);board.paste(b.resize((640,400)),(0,30));board.paste(a.resize((640,400)),(640,30));dr.text((5,5),f'Foer / etter, frame {f}, samme faktiske pakkebinaer',fill='white');board.save(R/f'foer-etter-{f}.png')
+(R/'motorobservasjoner.json').write_text(json.dumps(dict(ruter=10,sett=10,mangler=[],tegninger=draws),indent=2)+'\n');(R/'hele-motorbilder.json').write_text(json.dumps(items,indent=2)+'\n');(R/'pikselkontroll.json').write_text(json.dumps(differences,indent=2)+'\n');shutil.copy2(__file__,R/'vis.py.txt');print('Fem sider med alle ti original/native/motor, fem hele motorbilder og to foer/etter klare.')

@@ -1,0 +1,7 @@
+# fig342_13
+
+2026-10-20. Innebygd image_gen, modellnavn ikke oppgitt. Tre faktiske smale bildekall S11/S12/S13 i bunken, med egne tidligere S10 som malerianker, eksakte originalposer og godkjent Sam-anker. Råbilder, faktiske prompter, argumenter og referansehasher i rapporter/sam342-11til15-20261020/bildekall.json. Python-rensing/plassering er uttrykkelig tillatt av Tom.
+
+Sam beveger tom hånd foran snuten i rom 92s alkove, aktør 6 ved 159,101, elevation 1, scale 255 og chore 7 i lokalt skript 201. Alle originalark og ti kildefaser er sett. Ingen aubergine eller annen gjenstand i grepet; standardpromptens feil er korrigert separat. Varm brun dress/hatt, oransjebrun hud, kremfarget mansjett og blågrå/svart slips. Samme figur og fingrenes skiftende krumning. Bare egne malte komponentgrenser/ekte alfa, ingen hard originalsilhuettmaske eller originalfragment-fallback. Fast 4x og opprinnelig plassering.
+
+Gjenbruk er dokumentert for eksakte hele RGBA-kilder: 1942 fra publisert 1937, 1943 til 1946 fra publisert 1938, og 1947/1948 fra de nye 1939/1940. Se eksisterende-kildealiaser.json og gjenbrukte-prototyper.json. Dette er fem nye resultatark, tre nye malte poser og ti native mål, ikke ti uavhengige nytegninger. Egenkontroll OK. Resultat SHA256 3d94c8473d11ec2af1a3d50ecab47c7ab2c1a637d114b2ef58ff7769d19db8ab. Native mottatt, visuelt sett, motorobservert, publisert og pakkeimport holdes separat i fremdrift.json. Ingen ny Tom-/Claude-godkjenning.

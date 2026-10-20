@@ -1,0 +1,7 @@
+from pathlib import Path
+import json,subprocess
+S=Path(__file__).with_name('motorproeve.py').read_text();ns={'__file__':str(Path(__file__).with_name('motorproeve.py'))};exec(S.split('cases=[')[0],ns)
+try:
+ r=ns['run'](('grunnlag-romskript820-omprove',ns['BASE'],False,820))
+except subprocess.TimeoutExpired as e:
+ Path(__file__).with_name('omprove-feil.json').write_text(json.dumps({'utfall':'TimeoutExpired','timeout':e.timeout})+'\n');raise

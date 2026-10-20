@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-11til15-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];progress=dict(dato='2026-10-20',nye_jobber=5,native_rutekoblinger=10,hele_rgba_kilder=5,nye_malte_poser=3,eksakte_tidligere_native_maal=5,bildekall=3,leveranser=[])
+for n in range(11,16):
+ job=f'fig342_{n:02}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());assert not(d/'resultat.png').exists();canvas=Image.new('RGBA',(1536,1024));mapping=[]
+ for c in j['ruter']:
+  rep=next(v for v in plan if any(t['bilde']==c['bilde'] for t in v['malruter']));proto=R/(rep['bilde']+'-prototype.png');im=Image.open(proto).convert('RGBA');x,y,w,h=c['rekt'];assert im.size==(w*4,h*4);dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128);mapping.append(dict(bilde=c['bilde'],kostyme=342,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=proto.relative_to(A).as_posix(),prototype_sha256=sha(proto)))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=mapping)},indent=2)+'\n');run=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(run.stdout+run.stderr);assert run.returncode==0,(job,run.stdout,run.stderr)
+ (d/'notat.md').write_text(f'''# {job}
+
+2026-10-20. Innebygd image_gen, modellnavn ikke oppgitt. Tre faktiske smale bildekall S11/S12/S13 i bunken, med egne tidligere S10 som malerianker, eksakte originalposer og godkjent Sam-anker. Råbilder, faktiske prompter, argumenter og referansehasher i rapporter/{R.name}/bildekall.json. Python-rensing/plassering er uttrykkelig tillatt av Tom.
+
+Sam beveger tom hånd foran snuten i rom 92s alkove, aktør 6 ved 159,101, elevation 1, scale 255 og chore 7 i lokalt skript 201. Alle originalark og ti kildefaser er sett. Ingen aubergine eller annen gjenstand i grepet; standardpromptens feil er korrigert separat. Varm brun dress/hatt, oransjebrun hud, kremfarget mansjett og blågrå/svart slips. Samme figur og fingrenes skiftende krumning. Bare egne malte komponentgrenser/ekte alfa, ingen hard originalsilhuettmaske eller originalfragment-fallback. Fast 4x og opprinnelig plassering.
+
+Gjenbruk er dokumentert for eksakte hele RGBA-kilder: 1942 fra publisert 1937, 1943 til 1946 fra publisert 1938, og 1947/1948 fra de nye 1939/1940. Se eksisterende-kildealiaser.json og gjenbrukte-prototyper.json. Dette er fem nye resultatark, tre nye malte poser og ti native mål, ikke ti uavhengige nytegninger. Egenkontroll OK. Resultat SHA256 {digest}. Native mottatt, visuelt sett, motorobservert, publisert og pakkeimport holdes separat i fremdrift.json. Ingen ny Tom-/Claude-godkjenning.
+''')
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll='OK',native_mottatt=False,visuelt_kontrollert=False,motorobservert=False,publisert=False,importert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False));print(job,'OK',flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');p=R/'bildekall.json';v=json.loads(p.read_text());assert len(v['kall'])==3
+for c in v['kall']:assert c['utfoert'];c['brukt']=True
+p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'lever.py.txt')

@@ -1,0 +1,1 @@
+Tom hånd foran snuten i rom 92, kostyme 342, aktør 6, lokalt skript 201, chore 7. Standardpromptens aubergine er feil; faktiske kildepresiserte prompter og originalkontekst ligger i rapporter/sam342-11til15-20261020. Originalark, motorposer og godkjent Sam-stilanker er sett. Bare dokumentert identiske hele RGBA-kilder gjenbrukes. Beskyttede jobbfiler er uendret.
