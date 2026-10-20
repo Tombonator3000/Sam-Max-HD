@@ -1,0 +1,27 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;r=json.loads((R/'mottak-publisert.json').read_text());stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');assert r['native']==2722
+text=f'''Alle ni251-ark er levert som grafikk,39native. Siste fig251_06 til09 gir22 nye native fra19 ulike hele canonical kilder,13 nye malerier,seks tidligere hele egne publiserte malerier ved eksakt kildelikhet og tre ekstra hele aliasmål fra1949. Seks faktiske innebygde image_gen-kall og seks råbilder,fem brukt. V04 med pikseltrinn og egen konturrens er forkastet,ny V04R brukes;V02R bare1815. Tre hele ark OK,ett SJEKK,ett omrissvarsel1814 visuelt vurdert og beholdt. Alle22 automatisk native OK. Egne faste4x-prototyper,ekte alfa/egne kantfarger,ingen originalsilhuettmaske/originalfragment-fallback eller senkede grenser. Ingen motor-/pipelinekode eller ny Tom-/Claude-godkjenning.
+
+Grafikkilde {r['grafikkilde']}. Publisert og hentet hd-mod {r['hd_mod']},2722native. Alle20965filer/20959PNG er SHA-bekreftet. Alle20943tidligere filstier/20937PNG,848beskyttede kilder og tre opprinnelige stasher bevart.380 av1758hele figurjobber har resultat,1378gjenstår pluss returer/katalogfeil og samlet sluttkontroll.164_04/1943/1944fortsatt blokkert,ingen omprøve. All grafikk er ikke ferdig.
+
+Alle22 original/native/motor,fire hele resultatark,åtte hele motorbilder på kontaktark og tre før/etter er sett. Samme faktiske Linux-binær905b82b092856fb416165f8fb8f8a3d0b8a6987c3def01213501ac48ac74e17c prøvde2700grunnlag og2722kandidat.240kontroller237null,samme tre kjente160overgangsavvik ved36 førfigurstart60;198fra60null,ingen nye/økte. Tre bildepar har0endringer utenfor alle aktive nye cels og marg,også de to samtidige nye lagene i chore9. Tvungen aktor2,rom49,chore7/8/9,ikke naturlig gjennomspilling.1953er tom1x1,bakkesverd finnes i rombakgrunnen.
+
+Fellespakker er foreløpig2700 og mangler22. Nytt felles2722-samlepunkt lages for Linux og Windows,én tilsiktet dispatch hver etter grønn CI. Nativefrys til begge faktiske nedlastinger,SHA-filer,20964runtime-moddfiler,motor/visuell kontroll og fellesrelease er bekreftet. Neste fig028_01 må kildeklargjøres og sees i spillkontekst før nye kall. Ikke gjenta251 eller2700-byggene. Det uønskede gamle Windows-taggbygget39479008172 er nå success,ikke ny tilsiktet dispatch. Pushfilterfeilen,tidlige160overgangsrester,Windows SDL,testhopp816/836 og inventarkant rom35 er ikke erklært rettet. Naturlig full gjennomspilling,interaktiv Windows- og ny webtest gjenstår.
+
+Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er fulgt. Grafikk på gpt-arbeid/hd-mod;main får bare fire dokumenter. Automatisk produksjon fortsetter uten gammel nattfrist. Gammel nattkontroll gjenstartes ikke.
+'''
+(R/'RAPPORT.md').write_text('# Hele VR251 som grafikkleveranse\n\n'+text)
+for n in ['memory.md','STATUS.md']:
+ p=P/n;s=p.read_text();i=s.find('\n')+1;p.write_text(s[:i]+f'\n## Hele VR251,2722 native,{stamp}\n\n'+text+'\n'+s[i:])
+p=P/'log.md';p.write_text(p.read_text().rstrip()+f'\n\n## {stamp} (Codex)\n\n'+text)
+p=P/'todo.md';s=p.read_text();i=s.find('\n')+1;block=f'''\n## Neste,{stamp}
+
+- [x] Alle ni251-ark/39native levert. Siste06..09/22nye publisert og hentet2722,alle gamle filer bevart. Tre ark OK,ett SJEKK,ett visuelt vurdert1814-varsel. Alle22 motorobservert,ingen nye/økte avvik. Ingen ny Tom-/Claude-godkjenning.
+- [ ] Fullfør felles2722 for Linux og Windows. Native frosset. Begge faktiske nedlastinger/SHA-filer,20964runtimefiler per pakke,motor/visuell kontroll og fellesrelease må bekreftes. Ikke dupliser dispatch.
+- [ ] Kildeklargjør neste fig028_01,Max-hode i bilintroens rom4. Se originalskript,korrekt palett/utklipp,motorkontekst og godkjent Max-stil før nye kall. Ikke gjenta251.
+- [ ] Bevar848beskyttede kilder,alle tidligere publiserte filer/releaser og tre stasher.380av1758hele figurjobber med resultat,1378gjenstår pluss returer/katalogfeil/sluttkontroll.164_04fortsatt blokkert,ingen omprøve.
+- [ ] Historiske tidlige160overgangsrester,Windows SDL,testhopp816/836,inventarkant rom35 og ekstra Windows-taggbygg står åpne. Naturlig full gjennomspilling/interaktiv Windows/ny webtest gjenstår.
+''';p.write_text(s[:i]+block+'\n'+s[i:]);shutil.copy2(__file__,R/'oppdater-status.py.txt');print(stamp)
