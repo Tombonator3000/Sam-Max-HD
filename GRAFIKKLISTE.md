@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Oppdatert 2026-10-20 03:50:345_21 til25, 5runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle5sett/motorobservert,80nullkontroller. Kandidat2242,253resultatark. Sesam345-gjenbruk-b-20261020/mottak-publisert.json. Neste345_26.346-kildefeilen er fortsatt åpen.
+
 Oppdatert 2026-10-20 03:47:345_11 til20, 10runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle10sett/motorobservert,80nullkontroller. Publisert2237,248resultatark. Sesam345-gjenbruk-a-20261020/mottak-publisert.json. Neste345_21.346-kildefeilen er fortsatt åpen.
 
 Oppdatert2026-10-20 03:41:345_01 til10 er egenkontrollert,native mottatt og visuelt sett/motorobservert.11 nye ruter,publisert2227.238 resultatark. Se sam-sugepil-345-20261020.346_27 til43 har kildefeil og er ikke produsert, se alkove-siste-20261020/KILDEFEIL.md. Neste345_11.
@@ -284,16 +286,16 @@ Figurark for Sam.
 - [x] `fig345_18` (figurark 18 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [x] `fig345_19` (figurark 19 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [x] `fig345_20` (figurark 20 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_21` (figurark 21 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_22` (figurark 22 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_23` (figurark 23 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_24` (figurark 24 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_21` (figurark 21 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_22` (figurark 22 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_23` (figurark 23 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_24` (figurark 24 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 
 ## Bestilling 19
 
 Figurark for Sam.
 
-- [ ] `fig345_25` (figurark 25 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_25` (figurark 25 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_26` (figurark 26 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_27` (figurark 27 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_28` (figurark 28 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)

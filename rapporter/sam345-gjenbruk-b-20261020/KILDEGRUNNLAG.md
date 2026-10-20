@@ -1,0 +1,3 @@
+# Eksakt gjenbruk i Sam345
+
+Fig345_21 til25, 5 runtime fra én eksakt samme hele RGBA-kilde og mål som345_1923. Ingen nytegning eller bildekall. Kildecommit32c0dc4fc2067f7c078f16637ca66176cdc32b16, eksisterende prototype og native-SHA i eksakte-tidligere-kilder.json. Rom92, Sam i varm brun drakt/orange hud, delvise hender og snute rundt forgrunnshjertet. Den første produksjonens kilde-/stilrettelser gjelder: ingen ny aubergine eller utfylte åpninger. Ingen originalmaske. Egne rutekart/egenkontroll/native/motor må bekreftes for de nye rutenumrene. Hovedark og originale kildeposer er sett i første bunke; disse hele kildene er identiske, ikke lignende.

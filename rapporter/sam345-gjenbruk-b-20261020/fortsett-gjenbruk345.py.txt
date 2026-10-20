@@ -1,0 +1,22 @@
+from pathlib import Path
+import json,shutil,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';folder=sys.argv[1];O=P/'out'/folder;R=A/'rapporter'/folder;cfg=json.loads((R/'config.json').read_text());n=cfg['antall'];D=O/'mottak345';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+v=json.loads((D/'myke.json').read_text());assert v['ruter_ok']==n and v['ruter_sjekk']==v['ruter_teknisk']==v['ruter_mangler']==0;shutil.copy2(D/'myke.json',R/'myke345-automatisk.json')
+parents={}
+for sheet in json.loads((A/'rapporter/sam-sugepil-345-20261020/myke345-kvittering.json').read_text())['ark'].values():parents.update(sheet['ruter'])
+matches={c['bilde']:c for c in json.loads((R/'eksakte-tidligere-kilder.json').read_text())['ruter']};rows=[]
+for job,sheet in v['ark'].items():
+ for name,c in sheet['ruter'].items():
+  ref=matches[name];old=parents[ref['eksakt_kildeforgjenger']];src=P/'mods/gpt'/ref['native_fil'];assert sha(src)==ref['native_sha256']==old['sha256'] and old['kilde']=='arket';before=dict(c);shutil.copy2(src,D/c['fil'])
+  for key in ['storrelse','marg','flytt_hd','snitt_union','dekning','tilpasset','skala_xy','tegnet_mot_4x','kilde']:c[key]=old.get(key)
+  c.update(sha256=sha(D/c['fil']),produksjonstilpasning='Eksakt samme hele kilde-RGBA/prototype: byteidentisk tidligere kontrollert native, uendrede mål og marginer. Ingen originalutliggertillegg i slutt.')
+  rows.append(dict(jobb=job,bilde=name,automatisk=before,slutt=dict(c),**{k:x for k,x in ref.items() if k not in['jobb','bilde']}))
+(D/'myke.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');(R/'native-eksakt-gjenbruk.json').write_text(json.dumps(dict(ruter=rows,antall=n,original_pikselmaske_brukt=False,terskler_endret=False),ensure_ascii=False,indent=2)+'\n')
+s=(P/'out/sam-sugepil-345-20261020/kandidat-og-motor.py').read_text().replace('sam-sugepil-345-20261020',folder).replace('[(345,11)]',f'[(345,{n})]').replace('==11',f'=={n}').replace('+=11',f'+={n}').replace('=11',f'={n}').replace("'grunnlag-filer-482f0e52.json'","'grunnlag-filer.json'").replace('20458',str(cfg['gamle_filer'])).replace('==2216',f"=={cfg['native_foer']}").replace('med2216',f"med{cfg['native_foer']}").replace("assert 'costume345' not in meta['costumes'];meta['costumes'].append('costume345')","assert 'costume345' in meta['costumes']").replace('482f0e52',cfg['native_grunnlag'][:8])
+(O/'kandidat-og-motor.py').write_text(s)
+s=(P/'out/sam-sugepil-345-20261020/visuell-sluttkontroll.py').read_text().replace('sam-sugepil-345-20261020',folder).replace('==11',f'=={n}').replace('antall=11',f'antall={n}').replace('Alle11',f'Alle{n}').replace('alle11',f'alle{n}').replace('11 kontrollutsnitt',f'{n} kontrollutsnitt')
+if cfg['start']==11:
+ s=s.replace("',64,92,'sam-345-1920","',108,92,'sam-345-1931").replace("',68,92,'sam-345-1921","',124,92,'sam-345-1935").replace("',76,92,'sam-345-1923","',144,92,'sam-345-1940")
+else:
+ s=s.replace("',64,92,'sam-345-1920","',148,92,'sam-345-1941").replace("',68,92,'sam-345-1921","',156,92,'sam-345-1943").replace("',76,92,'sam-345-1923","',164,92,'sam-345-1945")
+(O/'visuell-sluttkontroll.py').write_text(s);shutil.copy2(__file__,R/'fortsett-gjenbruk345.py.txt');print('Exact native copied:',n,'motor/visual helpers prepared')

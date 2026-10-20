@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,shutil,sys,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';start,end=map(int,sys.argv[1:3]);folder=sys.argv[3];R=A/'rapporter'/folder;O=P/'out'/folder;R.mkdir();O.mkdir();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+histR=A/'rapporter/sam-sugepil-345-20261020';sourcecommit=json.loads((histR/'mottak-publisert.json').read_text())['kildecommit'];hist={(tuple(p['rekt'][2:]),p['rgba_sha256']):p for p in json.loads((histR/'ruteplan-unik.json').read_text())['ruter']};jobs=[f'fig345_{n:02}' for n in range(start,end+1)]
+protected={};rows=[];unics={};matches=[];progress=dict(dato='2026-10-20',verktøy='Eksakt gjenbruk av tidligere innebygd image_gen-produksjon',faktiske_bildekall=[],leveranser=[])
+base_sha=subprocess.check_output(['git','rev-parse','origin/hd-mod'],cwd=P,text=True).strip();base_count=json.loads((P/'mods/gpt/mod.json').read_text())['costume_cels'];old={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in(P/'mods/gpt').rglob('*') if p.is_file()}
+assert base_sha==subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+config=dict(start=start,end=end,jobs=jobs,folder=folder,native_grunnlag=base_sha,native_foer=base_count,native_etter=base_count+len(jobs),gamle_filer=len(old),gamle_png=sum(p.endswith('.png') for p in old),antall=len(jobs),kildecommit_til_gjenbruk=sourcecommit)
+(R/'config.json').write_text(json.dumps(config,indent=2)+'\n');(R/'grunnlag-filer.json').write_text(json.dumps(old,indent=2)+'\n')
+for job in jobs:
+ d=A/'jobber'/job;assert not(d/'resultat.png').exists() and not(d/'retur.md').exists();j=json.loads((d/'jobb.json').read_text());src=Image.open(d/'original_1x.png').convert('RGBA');canvas=Image.new('RGBA',(1536,1024));rt=[]
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:protected[f'jobber/{job}/{f}']=sha(d/f)
+ for c in j['ruter']:
+  x,y,w,h=c['rekt'];source=src.crop((x,y,x+w,y+h));digest=hashlib.sha256(source.tobytes()).hexdigest();key=(source.size,digest);assert key in hist,(job,c['bilde']);p=hist[key];proto=histR/(p['bilde']+'-prototype.png');im=Image.open(proto).convert('RGBA');assert im.size==(w*4,h*4)
+  native=P/'mods/gpt/costumes'/f"{p['bilde']}_hd.png";assert native.is_file()
+  dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>128)
+  rt.append(dict(bilde=c['bilde'],kostyme=345,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=p['bilde'],kilde_rgba_sha256=digest,prototype=str(proto.relative_to(A)),prototype_sha256=sha(proto),kildecommit=sourcecommit))
+  if key not in unics:unics[key]=dict(bilde=c['bilde'],kildejobb=job,rekt=c['rekt'],rgba_sha256=digest,malruter=[])
+  unics[key]['malruter'].append(dict(jobb=job,bilde=c['bilde'],rekt=c['rekt'],animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']))
+  matches.append(dict(jobb=job,bilde=c['bilde'],eksakt_kildeforgjenger=p['bilde'],prototype_fil=str(proto.relative_to(A)),prototype_sha256=sha(proto),kilde_rgba_sha256=digest,kildecommit=sourcecommit,native_fil=str(native.relative_to(P/'mods/gpt')),native_sha256=sha(native)))
+ canvas.save(d/'resultat.png');dig=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=dig,ruter=rt)},indent=2)+'\n')
+ proc=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(proc.stdout+proc.stderr);assert proc.returncode in(0,1);print(job,proc.stdout.strip(),flush=True)
+ rows.append(dict(jobb=job,ruter=len(rt),kostyme=345,rom=92,animasjoner=[1]));progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=dig,ruter=len(rt),rutekart=f'rapporter/{folder}/rutekart-{job}.json',egenkontroll={0:'OK',1:'SJEKK'}[proc.returncode],native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False))
+for f,v in [('beskyttede-kilder.json',protected),('klargjort.json',rows),('ruteplan-unik.json',dict(ruter=list(unics.values()))),('eksakte-tidligere-kilder.json',dict(ruter=matches)),('fremdrift.json',progress)]:(R/f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+assert len(matches)==len(jobs) and len(unics)==1
+for page in range((len(rows)+4)//5):
+ subset=rows[page*5:page*5+5];b=Image.new('RGB',(1560,555*((len(subset)+1)//2)),'#3d454b');d=ImageDraw.Draw(b)
+ for i,row in enumerate(subset):
+  im=Image.open(A/'jobber'/row['jobb']/'original_1x.png').convert('RGB').resize((768,512),Image.Resampling.NEAREST);b.paste(im,(i%2*780+12,i//2*555+35));d.text((i%2*780+12,i//2*555+10),row['jobb'],fill='white')
+ b.save(R/f'originalreferanser345-del{page+1}.png')
+(R/'KILDEGRUNNLAG.md').write_text(f'# Eksakt gjenbruk i Sam345\n\nFig345_{start:02} til{end:02}, {len(matches)} runtime fra én eksakt samme hele RGBA-kilde og mål som345_1923. Ingen nytegning eller bildekall. Kildecommit{sourcecommit}, eksisterende prototype og native-SHA i eksakte-tidligere-kilder.json. Rom92, Sam i varm brun drakt/orange hud, delvise hender og snute rundt forgrunnshjertet. Den første produksjonens kilde-/stilrettelser gjelder: ingen ny aubergine eller utfylte åpninger. Ingen originalmaske. Egne rutekart/egenkontroll/native/motor må bekreftes for de nye rutenumrene. Hovedark og originale kildeposer er sett i første bunke; disse hele kildene er identiske, ikke lignende.\n')
+# Existing baseline runner adjusted to this exact published base.
+s=(P/'out/sam-sugepil-345-20261020/motor-baseline.py').read_text().replace('sam-sugepil-345-20261020',folder).replace('==2216',f'=={base_count}').replace('grunnlag2216',f'grunnlag{base_count}')
+(O/'motor-baseline.py').write_text(s);shutil.copy2(__file__,R/'gjenbruk-og-plasser.py.txt')
+print(json.dumps(config,ensure_ascii=False))
