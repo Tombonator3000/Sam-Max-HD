@@ -1,0 +1,61 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+state=json.loads((O/'bygg-startet.json').read_text());tag=state['release_tag'];code=state['kode'];mod=state['hd_mod'];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True))
+protected={}
+names=['alkove-siste-20261020','alkove-fortsettelse-20261020','alkove-gjenbruk-20261020','sam-sugepil-345-20261020','sam345-gjenbruk-a-20261020','sam345-gjenbruk-b-20261020','sam345-tilbake-20261020','sam345-slutthoder-20261020','sam344-foerste-20261020','sam344-fortsettelse-20261020','aubergine347-grunnlag-20261020','max-alkove341-grunnlag-20261020','sam346-klesskjot-retur-20261020','sam346-overtegning-20261020']+[p.name for p in(A/'rapporter').glob('sam342-*')]+['sam343-foerste-20261020']
+for name in names:
+ for f in ['beskyttede-kilder.json','beskyttede-kildefeil-raw32.json','beskyttede-kilder-utvidet.json']:
+  p=A/'rapporter'/name/f
+  if p.exists():
+   for key,val in json.loads(p.read_text()).items():assert key not in protected or protected[key]==val;protected[key]=val
+assert len(protected)==632 and all(sha(A/f)==h for f,h in protected.items())
+stash=['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c'];assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==stash
+manifest=json.loads((R/'moddfiler-2456.json').read_text());assert len(manifest)==20699 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items())
+old=json.loads((A/'rapporter/felles-release-20261020-samlag/moddfiler-2427.json').read_text());assert set(old)<=set(manifest);assert all(manifest[f]==h for f,h in old.items() if f.endswith('.png'))
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==322
+(R/'bevaringskontroll.json').write_text(json.dumps(dict(beskyttede_kilder_SHA_uendret=632,tre_stasher_uendret=True,tidligere_20670_filstier_bevart=True,alle_tidligere_png_byteidentiske=True,filer2456=20699,figurjobber_med_resultat=322),ensure_ascii=False,indent=2)+'\n')
+motor=json.loads((O/'linux-kontroll.json').read_text());files=json.loads((O/'moddfiler-kontroll.json').read_text());assets=json.loads((O/'assetkontroll.json').read_text())
+assert motor['native']==2456 and motor['nye_native_observert']==29 and motor['hele_sam342_observert']==38 and not motor['mangler_i_avspilling']
+assert motor['runder']==motor['grunnlagsrunder_samme_binar']==6 and motor['skjermbufferkontroller']==motor['nullkontroller']==384 and not motor['nye_eller_oekte_avvik']
+assert files['moddfiler_per_pakke']==20698 and files['begge_faktiske_nedlastinger_verifisert'] and files['begge_modder_byteidentiske'] and files['kode']==code and files['hd_mod']==mod and len(assets)==4
+for v in assets:
+ p=O/v['plattform']/v['fil'];assert p.stat().st_size==v['bytes'] and sha(p)==v['sha256']
+shots=json.loads((R/'motorbilder.json').read_text());assert len(shots)==10 and all(sha(R/v['fil'])==v['sha256'] for v in shots)
+assert all(v['utenfor_sam_x700']==0 for v in json.loads((R/'pakke-pikselkontroll.json').read_text()))
+review=json.loads((R/'visuell-kontroll.json').read_text());assert review['hele_motorbilder_sett']==10 and review['foer_etter_sett']==2 and not review['ny_Tom_Claude_godkjenning']
+logs={}
+with zipfile.ZipFile(R/'linux-motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for p in sorted(O.glob('*/scummvm.log')):
+  rel=p.relative_to(O).as_posix();z.write(p,rel);logs[rel]=sha(p)
+assert len(logs)==12;(R/'linux-motorlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n')
+lr=state['plattform']['linux']['run_id'];wr=state['plattform']['windows']['run_id']
+body=f'''Linux og Windows inneholder **2456 native HD-bildelag**. Hele Sams første nærbildesekvens i alkoven (kostyme342) er tegnet: **20 ark og 38 ruter**, med **29 nye ruter siden forrige fellesutgave**. Tidligere grafikk og klesrettingene er med. Resten av HD-grafikken er fortsatt under arbeid.
+
+Last ned **SamMaxHD-Windows.zip** for Windows eller **SamMaxHD-x86_64.AppImage** for Linux. Spill og tale følger med. Linux: gjør filen kjørbar og start den. Ctrl+H bytter grafikk, F5 åpner originalmenyen.
+
+Begge faktiske nedlastinger og SHA-filer er kontrollert. Alle 20 698 runtime moddfiler per pakke er byteidentiske med publisert modd og mellom plattformene. Den nedlastede Linux-pakken er prøvd med inventar, akvarium, cafeteria, 820 bilder fra alkovens skript og to kildekorrekte Sam342-animasjoner. Alle 38 Sam342-ruter er observert; 384 sluttbufferkontroller uten avvik, med tilsvarende grunnlag i samme nye binær. Ti hele pakkebilder og to før/etter er sett. Full naturlig gjennomspilling, interaktiv Windows-test og ny webtest gjenstår.
+
+Et enkelt grunnlagsforsøk under grafikkproduksjonen stoppet ved frame816; en identisk omprøve bestod. Årsaken og en eldre testhoppstans ved836 er ikke erklært rettet. Den tidligere Windows SDL-startfeilen står også bevart som uavklart; ikke bruk denne grafikkoppdateringen som bevis på at den er rettet.
+
+Kode: {code}
+hd-mod: {mod}
+Grafikkilde, siste fem ark: 3131792a5fbaa71be8cac2161430f21304071f03
+Linux: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{lr}
+Windows: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{wr}
+Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/{R.name}/RAPPORT.md
+
+Spillet og grafikken tilhører Disney/Lucasfilm.
+'''
+(O/'utgivelse-notat.md').write_text(body);shutil.copy2(O/'utgivelse-notat.md',R/'utgivelse-notat.md')
+prior=api('releases?per_page=100');before=json.loads((O/'releaser-foer-bygg.json').read_text());assert not any(v['tag_name']==tag for v in prior) and {v['id'] for v in before}<={v['id'] for v in prior}
+aset=lambda v:{(a['id'],a['name'],a['size'],a['digest']) for a in v['assets']}
+for old in before:
+ if old['tag_name'] not in ['linux','windows']:assert aset(old)==aset(next(v for v in prior if v['id']==old['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+for d in [O,R]:(d/'releaser-foer.json').write_text(json.dumps(prior,indent=2)+'\n')
+(R/'RAPPORT.md').write_text(body+f'\nLinux-binær SHA256 {motor["binar_sha256"]}. Alle {len(prior)} tidligere releaser og deres vedlegg bevares. Klar til publisering; se publisert.json for faktisk Latest-bekreftelse. 322 av 1758 figurjobber har resultat. 632 beskyttede kilder, inkludert neste fem343-ark, og tre stasher er uendret. Ingen motor-/pipelineendring. Ingen ny Tom-/Claude-godkjenning.\n')
+for name in ['hent-status.py','hent-pakker.py','kontroller-pakker.py','kontroller-linux.py','vis-pakke.py','forbered-release.py']:
+ shutil.copy2(O/name,R/(name+'.txt'))
+print('Begge pakker og alle filer, 38 Sam342-ruter, 384 nullkontroller og visuell vurdering bekreftet. Klar til publisering.',flush=True)

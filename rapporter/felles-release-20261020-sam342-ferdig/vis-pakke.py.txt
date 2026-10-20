@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter/felles-release-20261020-sam342-ferdig';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();items=[]
+cases=[('rom92-skript',64,92),('rom92-skript',92,92),('rom92-skript',784,92),('sam342-anim7',64,92),('sam342-anim7',136,92),('sam342-anim7',168,92),('sam342-anim7',176,92),('inventory',120,30),('akvarium',200,16),('cafeteria',200,30)]
+board=Image.new('RGB',(1920,2125),'#263441');draw=ImageDraw.Draw(board)
+for i,(scene,f,room) in enumerate(cases):
+ p=O/f'pakke2456-{scene}/frame_{f:06}_room{room:03}.png';dest=R/f'pakke-{scene}-{f}.png';shutil.copy2(p,dest);items.append(dict(scene=scene,frame=f,rom=room,fil=dest.name,sha256=sha(dest)));im=Image.open(p).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));draw.text((x+5,y+5),f'{scene} {f}, faktisk pakke2456',fill='white')
+board.save(R/'ti-hele-pakkebilder.png');(R/'motorbilder.json').write_text(json.dumps(items,indent=2)+'\n')
+pix=[]
+for scene,f in [('sam342-anim7',136),('sam342-anim7',176)]:
+ b=Image.open(O/f'grunnlag2427-{scene}/frame_{f:06}_room092.png').convert('RGB');a=Image.open(O/f'pakke2456-{scene}/frame_{f:06}_room092.png').convert('RGB');board=Image.new('RGB',(1280,830),'#263441');dr=ImageDraw.Draw(board);dr.text((5,5),'Foer nye Sam342-poser / etter, samme nye pakke-binaer',fill='white');board.paste(b.resize((640,400)),(0,30));board.paste(a.resize((640,400)),(640,30));board.paste(b.crop((0,340,700,600)).resize((640,300)),(0,480));board.paste(a.crop((0,340,700,600)).resize((640,300)),(640,480));board.save(R/f'sam-for-etter-{f}.png');delta=np.any(np.array(a)!=np.array(b),axis=2);outside=int(delta[:,700:].sum());assert outside==0;pix.append(dict(frame=f,endrede_piksler=int(delta.sum()),utenfor_sam_x700=outside))
+(R/'pakke-pikselkontroll.json').write_text(json.dumps(pix,indent=2)+'\n');shutil.copy2(__file__,R/'vis-pakke.py.txt');print('Ti hele pakkebilder og to foer/etter klare til visuell vurdering')
