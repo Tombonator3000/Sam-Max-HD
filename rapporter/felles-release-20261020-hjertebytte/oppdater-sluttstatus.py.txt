@@ -1,0 +1,47 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/felles-release-20261020-hjertebytte';G=A/'rapporter/aubergine347-grunnlag-20261020';M=A/'rapporter/max-alkove341-grunnlag-20261020';O=Path(__file__).resolve().parent;pub=json.loads((R/'publisert.json').read_text());now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert pub['latest'] and pub['native']==2399
+protected={}
+for p in [G/'beskyttede-kilder.json',M/'beskyttede-kilder.json']:protected.update(json.loads(p.read_text()))
+assert len(protected)==64 and all(sha(A/p)==h for p,h in protected.items())
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==296
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+f=json.loads((G/'fremdrift.json').read_text());assert len(f['leveranser'])==10
+for v in f['leveranser']:v.update(i_fellespakke=True,fellesrelease=pub['url'],pakke_native=2399,pakke_hd_mod_sha=pub['hd_mod'])
+(G/'fremdrift.json').write_text(json.dumps(f,ensure_ascii=False,indent=2)+'\n')
+finished=f'''\nFelles samlepunkt avsluttet {now}: {pub['url']} er publisert og bekreftet Latest, releaseID {pub['release_id']}. Begge faktiske nedlastinger, SHA-filer, fire opplastinger og 20641 runtime moddfiler per pakke er kontrollert. Alle 66 i kostyme347 er med og observert; 224 sluttbufferkontroller null. Hjertekonturen er visuelt borte. Ikke gjenta disse byggene. Neste er den dokumenterte Sam346-sømreturen og seks kildeklare Max341-ark, se max-alkove341-grunnlag-20261020/NESTE.md. 296 av 1758 resultatark, ingen nye Max341-bilder ennå.\n'''
+for n in ['RAPPORT.md','NESTE.md']:(G/n).write_text((G/n).read_text()+finished)
+p=M/'NESTE.md';s=p.read_text().replace('Felles2399-pakkene bygges fra kode 4213c162 og native 907a2182. Behold native-frysen til begge har sikret grafikken. Avslutt faktisk pakke-/SHA-/visuell kontroll og ny fellesrelease før neste produksjonsbunkes publisering.','Felles2399-pakkene fra kode 4213c162 og native 907a2182 er faktisk lastet ned og fullt kontrollert. Fellesrelease sam-max-hd-2026-10-20-hjertebytte er publisert og Latest. Native-frysen er sikret og dette samlepunktet skal ikke gjentas.');p.write_text(s)
+p=R/'PAAGAR.md';p.write_text(p.read_text()+'\nEn konkret eksisterende Sam346-søm ved indre laggrense y127 er også dokumentert. Ta denne avgrensede grafikkreturen sammen med Max-bunken; se max-alkove341-grunnlag-20261020/RETUR-SAM346.md. Ikke kall den rettet av 347 eller objektdekningen.\n')
+p=A/'ORDRE.md';s=p.read_text();s=s.replace('## Gjør disse nå\n',f'''## Gjør disse nå
+
+GPT-fremdrift {now}: Felles Linux-/Windows-release {pub['url']} er publisert og bekreftet Latest. Begge faktisk nedlastede pakker har 2399 native, 66 nye siden 2333, samme grafikkfiler og original objektdekning som fjerner hjertekonturen. Alle 20641 runtime moddfiler per pakke og fire opplastinger er kontrollert, alle 66 nye ruter motorobservert, 224 bufferkontroller null. PR 34 er flettet med grønn CI. 13 tidligere releaser og assets er bevart. Ikke gjenta bygg39377609902/39377612089 eller de ti ferdige347-arkene. 296 av 1758 resultatark, 1462 mangler pluss returer/kildefeil. Neste: avgrenset Sam346-sømretur ved laggrense y127, og seks kildeklare Max341-ark (19 koblinger, 13 ulike hele kilder). Alle seks originalark og alle 19 kildefaser i motoren er sett. Ingen nye Max341-bildekall/resultater ennå. Se max-alkove341-grunnlag-20261020/NESTE.md og RETUR-SAM346.md. Det sene romhopp-forløpet blir stående ved836 i både grunnlag og kandidat; 820-prøven dekker alle ønskede grafikkruter, ikke naturlig gjennomspilling. Ingen ny Tom-/Claude-godkjenning.
+''',1);p.write_text(s)
+block=f'''## Felles 2399-pakke publisert og neste kildegrunnlag klart, {now}
+
+{pub['url']} er publisert og bekreftet Latest, releaseID {pub['release_id']}. Kode 4213c1627372ae051aa773a32a26a3e0f4ac97a6, hd-mod 907a218238cfb14481da7fadaaa2736fd70571ec. Linux 39377609902 og Windows 39377612089 ble sendt en gang hver. Begge faktiske nedlastinger, SHA-filer, fire opplastinger og 20641 runtime moddfiler per pakke er kontrollert. Moddene er byteidentiske med publisert modd og hverandre, inklusive objekt901-dekningen. Alle 13 tidligere releaser og assets er bevart. Ikke gjenta dette samlepunktet.
+
+Begge pakker har 2399 native, 66 nye fra hele kostyme347 siden forrige felles2333. Dette rundens fem siste ark ga 36 nye, kildecommit 2b9525c1ec5d1d83ee3bed33257d4fce5014d292. Publisert/hentet og filvis kontrollert, egenkontroll/native OK, visuelt sett og motorobservert. De første fem skal ikke gjøres om igjen. Hjertekonturen er rettet med original objektdekning, og pipeline PR34 er flettet med grønn CI; 66 tester bestått. Ingen C++-endring eller hard originalsilhuettmaske.
+
+Den faktisk nedlastede Linux-binæren har SHA256 {pub['linux_motor']['binar_sha256']}. Fire pakkeprøver og fire 2333-grunnlagsprøver med samme binær: inventar i rom30, akvarium, cafeteria og 820 bilder fra alkovens egne skript uten kostyme-/aktør-/choreoverstyring. Alle66 nye native observert, 224 sluttbufferkontroller null, seks hele pakkemotorbilder og før/etter-sletting visuelt sett. Forsøk til900 blir stående ved836 i både gammel og ny grafikk; to loggpar og testavgrensningen er bevart. Dette senere romhopp-forløpet er ikke avklart som naturlig spillforløp. Ingen naturlig gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Ny konkret retur: en tynn vannrett søm i sene Sam346-nærbilder ved indre laggrense y127. Den er byteidentisk mellom2333 og2399 i dokumentert utsnitt og er ikke laget av347 eller objektdekningen. Native1801 ved0,8/198x119 møter kropp1664 ved0,127/154x73. Native-SHA, kildejobber og bilder er festet i max-alkove341-grunnlag-20261020/RETUR-SAM346.md og sam346-returgrunnlag.json. Sammenlign med klassisk og kontroller hele sammensettingen før retting påstås. Den gamle lille inventarkanten i rom35 er også fortsatt separat, ikke rettet av denne kontrollåpningen i rom30.
+
+Neste produksjonsbunke er seks urørte Max341-ark med19 rutekoblinger fra13 ulike hele kilder. Alle seks originalark, alle19 kildeposer i faktisk pakkemotor og det godkjente Max-ankeret er sett. 24 nye kildehash-er er beskyttet, ingen nye Max341-bildekall/resultater/native ennå. Motivet er Max i varmt kremgult/oransje alkovenærbilde, med ekte separate øye-/kroppslapper og mørkerød kastskygge. Ekstra raw56-oppslag er avvist og gir ingen av de19 jobbrutene. De tidligere raw28/32/36-feilene gjelder bestemte kostymer, ikke en global sperre for gyldige341-animasjoner.
+
+296 av1758 figurjobber har resultat, 1462 gjenstår pluss returer, katalogfeil og samlet kontroll. Alle tidligere grafikkfiler,480 tidligere og24 nye beskyttede kildefiler og tre stasher er bevart. Grafikk og rapporter bare på gpt-arbeid/hd-mod; main får bare denne dokumentasjonen etter PR-flettingen. Se felles-release-20261020-hjertebytte/publisert.json og max-alkove341-grunnlag-20261020/NESTE.md på gpt-arbeid. Automatisk grafikkproduksjon fortsetter; gammel nattkontroll forblir pauset.
+
+'''
+for n in ['memory.md','STATUS.md']:
+ p=P/n;s=p.read_text();i=s.index('\n')+1;p.write_text(s[:i]+'\n'+block+s[i:].lstrip('\n'))
+p=P/'log.md';p.write_text(p.read_text().rstrip()+f'\n\n## {now} (Codex)\n\n'+block.split('\n\n',1)[1].rstrip()+'\n')
+p=P/'todo.md';s=p.read_text();s=s.replace('- [ ] Fullfør felles2399-byggene','- [x] Fullfør felles2399-byggene',1).replace('- [ ] Neste felles Linux-/Windows-samlepakke etter resten av347','- [x] Neste felles Linux-/Windows-samlepakke etter resten av347',1)
+s=s.replace('## Neste\n',f'''## Neste
+
+- [x] {now}: Felles2399-pakke publisert og Latest: sam-max-hd-2026-10-20-hjertebytte. Begge faktiske nedlastinger, SHA-filer, fire opplastinger og20641 runtime-filer per pakke kontrollert. Alle66 nye ruter observert,224 sluttkontroller null, hjertekontur visuelt borte. 13 tidligere releaser og assets bevart. Ikke gjenta39377609902/39377612089.
+- [ ] Undersøk og rett konkret eksisterende Sam346-søm ved y127. Se max-alkove341-grunnlag-20261020/RETUR-SAM346.md med native1801/kropp1664, nøyaktige SHA-er og byteidentisk før/etter-utsnitt. Klassisk sammenligning og lokal grafikkretur før full sammensettingskontroll. Ikke endre alle figurer eller bruk originalsilhuettmaske.
+- [ ] Produser de seks kildeklare Max341-arkene:19 ruter fra13 ulike hele kilder,24 beskyttede filer, alle originalark og19 motorposer sett. Ingen bildekall eller nye resultater der ennå. Se NESTE.md. Kostymets ekstra raw56 skal ikke brukes, gyldige kildeanimasjoner er bevart.
+''',1);p.write_text(s)
+shutil.copy2(__file__,R/'oppdater-sluttstatus.py.txt');print(pub['url'],flush=True)
