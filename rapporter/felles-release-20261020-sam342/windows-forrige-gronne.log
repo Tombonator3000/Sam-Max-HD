@@ -1,0 +1,632 @@
+sjekk	UNKNOWN STEP	﻿2026-10-20T07:24:49.8110520Z Current runner version: '2.337.0'
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8137268Z ##[group]Runner Image Provisioner
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8138135Z Hosted Compute Agent
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8138704Z Version: 20261012.601
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8139444Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8140366Z Build Date: 2026-10-12T17:48:21Z
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8141104Z Worker ID: {e84eab9d-914a-4090-8cfb-7b472b30785f}
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8141856Z Region: westus
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8142383Z Cloud: Azure
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8143027Z ##[endgroup]
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8145047Z ##[group]Operating System
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8145747Z Ubuntu
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8146277Z 24.04.5
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8146773Z LTS
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8147360Z ##[endgroup]
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8147896Z ##[group]Runner Image
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8148469Z Image: ubuntu-24.04
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8149123Z Version: 20261012.334.1
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8150593Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8152290Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8153311Z ##[endgroup]
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8154372Z ##[group]GITHUB_TOKEN Permissions
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8156667Z Contents: write
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8157322Z Metadata: read
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8157867Z ##[endgroup]
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8160261Z Secret source: Actions
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8161240Z Cache mode: write
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8162266Z Prepare workflow directory
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8505930Z Prepare all required actions
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.8788550Z Complete job name: sjekk
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9481757Z ##[group]Run MOD=$(gh api repos/Tombonator3000/Sam-Max-HD/git/ref/heads/hd-mod --jq .object.sha)
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9483185Z ^[[36;1mMOD=$(gh api repos/Tombonator3000/Sam-Max-HD/git/ref/heads/hd-mod --jq .object.sha)^[[0m
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9484526Z ^[[36;1mSIST=$(gh api repos/Tombonator3000/Sam-Max-HD/releases/tags/windows --jq .body 2>/dev/null || true)^[[0m
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9486105Z ^[[36;1mif [ "workflow_dispatch" = schedule ] && echo "$SIST" | grep -q "hd-mod: $MOD"; then^[[0m
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9487186Z ^[[36;1m  echo "HD-modden er den samme som i pakken ($MOD). Ingen ny pakke."^[[0m
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9488186Z ^[[36;1m  echo "bygg=nei" >> "$GITHUB_OUTPUT"^[[0m
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9488857Z ^[[36;1melse^[[0m
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9489505Z ^[[36;1m  echo "bygg=ja" >> "$GITHUB_OUTPUT"^[[0m
+sjekk	UNKNOWN STEP	2026-10-20T07:24:49.9490401Z ^[[36;1mfi^[[0m
+sjekk	UNKNOWN STEP	2026-10-20T07:24:50.0541925Z shell: /usr/bin/bash -e {0}
+sjekk	UNKNOWN STEP	2026-10-20T07:24:50.0543227Z env:
+sjekk	UNKNOWN STEP	2026-10-20T07:24:50.0547619Z   GH_TOKEN: ***
+sjekk	UNKNOWN STEP	2026-10-20T07:24:50.0548425Z ##[endgroup]
+sjekk	UNKNOWN STEP	2026-10-20T07:24:51.0081128Z Evaluate and set job outputs
+sjekk	UNKNOWN STEP	2026-10-20T07:24:51.0088956Z Set output 'bygg'
+sjekk	UNKNOWN STEP	2026-10-20T07:24:51.0091548Z Cleaning up orphan processes
+pakke	Set up job	﻿2026-10-20T07:24:58.0935611Z Current runner version: '2.337.0'
+pakke	Set up job	2026-10-20T07:24:58.0982651Z ##[group]Runner Image Provisioner
+pakke	Set up job	2026-10-20T07:24:58.0983460Z Hosted Compute Agent
+pakke	Set up job	2026-10-20T07:24:58.0984031Z Version: 20261002.596
+pakke	Set up job	2026-10-20T07:24:58.0984632Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+pakke	Set up job	2026-10-20T07:24:58.0985299Z Build Date: 2026-10-02T22:28:27Z
+pakke	Set up job	2026-10-20T07:24:58.0985937Z Worker ID: {981af742-058a-461c-93fd-ed882f53fa7f}
+pakke	Set up job	2026-10-20T07:24:58.0986590Z Region: westus
+pakke	Set up job	2026-10-20T07:24:58.0987080Z Cloud: Azure
+pakke	Set up job	2026-10-20T07:24:58.0987587Z ##[endgroup]
+pakke	Set up job	2026-10-20T07:24:58.0989018Z ##[group]Operating System
+pakke	Set up job	2026-10-20T07:24:58.0989737Z Microsoft Windows Server 2025
+pakke	Set up job	2026-10-20T07:24:58.0990305Z 10.0.26100
+pakke	Set up job	2026-10-20T07:24:58.0990783Z Datacenter
+pakke	Set up job	2026-10-20T07:24:58.0991274Z ##[endgroup]
+pakke	Set up job	2026-10-20T07:24:58.0991784Z ##[group]Runner Image
+pakke	Set up job	2026-10-20T07:24:58.0992335Z Image: windows-2025-vs2026
+pakke	Set up job	2026-10-20T07:24:58.0992900Z Version: 20261007.264.1
+pakke	Set up job	2026-10-20T07:24:58.0993994Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20261007.264/images/windows/Windows2025-VS2026-Readme.md
+pakke	Set up job	2026-10-20T07:24:58.0995881Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20261007.264
+pakke	Set up job	2026-10-20T07:24:58.0996840Z ##[endgroup]
+pakke	Set up job	2026-10-20T07:24:58.0997901Z ##[group]GITHUB_TOKEN Permissions
+pakke	Set up job	2026-10-20T07:24:58.0999671Z Contents: write
+pakke	Set up job	2026-10-20T07:24:58.1000736Z Metadata: read
+pakke	Set up job	2026-10-20T07:24:58.1001268Z ##[endgroup]
+pakke	Set up job	2026-10-20T07:24:58.1003319Z Secret source: Actions
+pakke	Set up job	2026-10-20T07:24:58.1004180Z Cache mode: write
+pakke	Set up job	2026-10-20T07:24:58.1004888Z Prepare workflow directory
+pakke	Set up job	2026-10-20T07:24:58.1443994Z Prepare all required actions
+pakke	Set up job	2026-10-20T07:24:58.1512410Z Getting action download info
+pakke	Set up job	2026-10-20T07:24:58.5021767Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+pakke	Set up job	2026-10-20T07:24:58.6467044Z Download action repository 'msys2/setup-msys2@v2' (SHA:ec48f7c5447b3140e2b088413ae3a55687bccb6e)
+pakke	Set up job	2026-10-20T07:24:58.9495186Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+pakke	Set up job	2026-10-20T07:24:59.2988707Z Complete job name: pakke
+pakke	Ingen CRLF i utsjekken	﻿2026-10-20T07:24:59.4418657Z ##[group]Run git config --global core.autocrlf false
+pakke	Ingen CRLF i utsjekken	2026-10-20T07:24:59.4419989Z ^[[36;1mgit config --global core.autocrlf false^[[0m
+pakke	Ingen CRLF i utsjekken	2026-10-20T07:24:59.5611079Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+pakke	Ingen CRLF i utsjekken	2026-10-20T07:24:59.5612458Z ##[endgroup]
+pakke	Run actions/checkout@v4	﻿2026-10-20T07:25:00.5071895Z ##[group]Run actions/checkout@v4
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5073137Z with:
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5074022Z   repository: Tombonator3000/Sam-Max-HD
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5082649Z   token: ***
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5083912Z   ssh-strict: true
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5084794Z   ssh-user: git
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5085700Z   persist-credentials: true
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5086692Z   clean: true
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5087602Z   sparse-checkout-cone-mode: true
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5088664Z   fetch-depth: 1
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5089538Z   fetch-tags: false
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5090454Z   show-progress: true
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5091343Z   lfs: false
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5092159Z   submodules: false
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5093054Z   set-safe-directory: true
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5094071Z   allow-unsafe-pr-checkout: false
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.5095117Z ##[endgroup]
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.6559751Z Syncing repository: Tombonator3000/Sam-Max-HD
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.6562580Z ##[group]Getting Git version info
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.6563909Z Working directory is 'D:\a\Sam-Max-HD\Sam-Max-HD'
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.7914008Z [command]"C:\Program Files\Git\bin\git.exe" version
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8416604Z git version 2.56.0.windows.2
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8471127Z ##[endgroup]
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8486169Z Copying 'C:\Users\runneradmin\.gitconfig' to 'D:\a\_temp\ee4e7fa0-a72b-4244-acdc-419b70dd6120\.gitconfig'
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8507186Z Temporarily overriding HOME='D:\a\_temp\ee4e7fa0-a72b-4244-acdc-419b70dd6120' before making global git config changes
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8512966Z Adding repository directory to the temporary git global config as a safe directory
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8518965Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Sam-Max-HD\Sam-Max-HD
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8896013Z Deleting the contents of 'D:\a\Sam-Max-HD\Sam-Max-HD'
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8902533Z ##[group]Initializing the repository
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.8910647Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\Sam-Max-HD\Sam-Max-HD
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.9944189Z Initialized empty Git repository in D:/a/Sam-Max-HD/Sam-Max-HD/.git/
+pakke	Run actions/checkout@v4	2026-10-20T07:25:00.9990597Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/Tombonator3000/Sam-Max-HD
+pakke	Run actions/checkout@v4	2026-10-20T07:25:01.0676309Z ##[endgroup]
+pakke	Run actions/checkout@v4	2026-10-20T07:25:01.0678836Z ##[group]Disabling automatic garbage collection
+pakke	Run actions/checkout@v4	2026-10-20T07:25:01.0685376Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+pakke	Run actions/checkout@v4	2026-10-20T07:25:01.1299064Z ##[endgroup]
+pakke	Run actions/checkout@v4	2026-10-20T07:25:01.1301336Z ##[group]Setting up auth
+pakke	Run actions/checkout@v4	2026-10-20T07:25:01.1312498Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+pakke	Run actions/checkout@v4	2026-10-20T07:25:01.1776356Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+pakke	Run actions/checkout@v4	2026-10-20T07:25:02.6676304Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+pakke	Run actions/checkout@v4	2026-10-20T07:25:02.7067073Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+pakke	Run actions/checkout@v4	2026-10-20T07:25:03.2594586Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+pakke	Run actions/checkout@v4	2026-10-20T07:25:03.2977251Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+pakke	Run actions/checkout@v4	2026-10-20T07:25:03.8513138Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+pakke	Run actions/checkout@v4	2026-10-20T07:25:03.8897799Z ##[endgroup]
+pakke	Run actions/checkout@v4	2026-10-20T07:25:03.8898237Z ##[group]Fetching the repository
+pakke	Run actions/checkout@v4	2026-10-20T07:25:03.8910901Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +a283f50c3fffa6485b644eda14dd9162dbee474d:refs/remotes/origin/main
+pakke	Run actions/checkout@v4	2026-10-20T07:25:04.9755137Z From https://github.com/Tombonator3000/Sam-Max-HD
+pakke	Run actions/checkout@v4	2026-10-20T07:25:04.9756121Z  * [new ref]         a283f50c3fffa6485b644eda14dd9162dbee474d -> origin/main
+pakke	Run actions/checkout@v4	2026-10-20T07:25:04.9794803Z ##[endgroup]
+pakke	Run actions/checkout@v4	2026-10-20T07:25:04.9795766Z ##[group]Determining the checkout info
+pakke	Run actions/checkout@v4	2026-10-20T07:25:04.9797557Z ##[endgroup]
+pakke	Run actions/checkout@v4	2026-10-20T07:25:04.9806287Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+pakke	Run actions/checkout@v4	2026-10-20T07:25:05.0313087Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+pakke	Run actions/checkout@v4	2026-10-20T07:25:05.0679629Z ##[group]Checking out the ref
+pakke	Run actions/checkout@v4	2026-10-20T07:25:05.0688044Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
+pakke	Run actions/checkout@v4	2026-10-20T07:25:05.1654468Z Switched to a new branch 'main'
+pakke	Run actions/checkout@v4	2026-10-20T07:25:05.1715426Z branch 'main' set up to track 'origin/main'.
+pakke	Run actions/checkout@v4	2026-10-20T07:25:05.1759485Z ##[endgroup]
+pakke	Run actions/checkout@v4	2026-10-20T07:25:05.2380879Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+pakke	Run actions/checkout@v4	2026-10-20T07:25:05.2729278Z a283f50c3fffa6485b644eda14dd9162dbee474d
+pakke	Run msys2/setup-msys2@v2	﻿2026-10-20T07:25:05.3172897Z ##[group]Run msys2/setup-msys2@v2
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3173252Z with:
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3173470Z   msystem: MINGW64
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3173668Z   update: true
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3174280Z   install: git make zip mingw-w64-x86_64-gcc mingw-w64-x86_64-pkgconf mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libpng mingw-w64-x86_64-zlib mingw-w64-x86_64-freetype
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3175703Z   path-type: minimal
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3175903Z   release: true
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3176133Z   platform-check-severity: fatal
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3176399Z   cache: true
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.3176586Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.4567063Z ##[warning][msystem-mingw64] MINGW64 is deprecated. Migrate to UCRT64 or CLANG64. To acknowledge and suppress this warning, add 'msystem-mingw64' to 'suppress-deprecation-warnings'.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:05.4573994Z ##[group]Downloading MSYS2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.1164923Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.1165553Z ##[group]Extracting MSYS2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.1182642Z [command]C:\hostedtoolcache\windows\msys2-installer\0.0.20260927\x64\base.exe -y
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.2916148Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.2917008Z 7-Zip SFX 26.02 ZS v1.5.7 R1 (x64) : Copyright (c) 1999- Igor Pavlov, 2016- Tino Reichardt, 2022- Sergey G. Brester : 2026-06-27
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.2917940Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.2918470Z Extracting archive: C:\hostedtoolcache\windows\msys2-installer\0.0.20260927\x64\base.exe
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.2920259Z --
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.2921224Z Path = C:\hostedtoolcache\windows\msys2-installer\0.0.20260927\x64\base.exe
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.2922291Z Type = 7z
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.2922531Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.4930157Z   0%
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.4930390Z     
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.6966312Z   0% 655 - msys64\var\lib\pacman\local\libssh2-1.11.1-1
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.6969347Z                                                        
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.8993788Z   1% 1192 - msys64\usr\lib\terminfo\61\att5418-w
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:06.8994299Z                                                 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.1035145Z   1% 1688 - msys64\usr\lib\terminfo\64\dku7102-sna
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.1035799Z                                                   
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.3052981Z   1% 2221 - msys64\usr\lib\terminfo\6d\mlterm
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.3053570Z                                              
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.5093930Z   1% 2561 - msys64\usr\lib\terminfo\70\pccon0
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.5094550Z                                              
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.7129853Z   1% 3080 - msys64\usr\lib\terminfo\74\tvi920b-p-2p
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.7130490Z                                                    
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.9164429Z   2% 3598 - msys64\usr\lib\terminfo\78\xnuppc-200x64
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:07.9165093Z                                                     
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.1177299Z   2% 4100 - msys64\usr\share\bash-completion\completions-core\gpg.bash
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.1178097Z                                                                       
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.3217095Z   3% 4602 - msys64\usr\share\bash-completion\completions-core\wodim.bash
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.3218141Z                                                                         
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.5258841Z   5% 5107 - msys64\usr\share\doc\libunistring\libunistring_8.html
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.5259866Z                                                                  
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.7275291Z  11% 5531 - msys64\usr\share\locale\da\LC_MESSAGES\pacman-scripts.mo
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.7276078Z                                                                     
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.9314376Z  16% 5708 - msys64\usr\share\locale\fr\LC_MESSAGES\libgpg-error.mo
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:08.9315399Z                                                                   
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.1342851Z  26% 6068 - msys64\usr\share\locale\ro\LC_MESSAGES\gnupg2.mo
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.1343582Z                                                             
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.3378152Z  35% 6441 - msys64\usr\share\man\de\man1\lzmadec.1.gz
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.3381472Z                                                      
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.5397403Z  36% 6953 - msys64\usr\share\man\man1\uniq.1.gz
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.5398145Z                                                
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.7428484Z  36% 7448 - msys64\usr\share\man\man3\CURLOPT_SERVER_RESPONSE_TIMEOUT_MS.3.gz
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.7429547Z                                                                              
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.9467480Z  37% 7935 - msys64\usr\share\man\man3\inwstr.3x.gz
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:09.9468619Z                                                   
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.1502525Z  37% 8400 - msys64\usr\share\man\man3\ospeed.3x.gz
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.1503388Z                                                   
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.3532861Z  38% 8616 - msys64\usr\share\man\man3\typeahead_sp.3x.gz
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.3533494Z                                                         
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.5551399Z  44% 9049 - msys64\usr\share\readline\rl-callbacktest.c
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.5552052Z                                                        
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.7588644Z  44% 9536 - msys64\usr\share\terminfo\63\cad68-2
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.7589176Z                                                 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.9634185Z  44% 10027 - msys64\usr\share\terminfo\67\gs5430
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:10.9635701Z                                                 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:11.1652528Z  45% 10505 - msys64\usr\share\terminfo\6e\ncr260vt200pp
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:11.1653375Z                                                        
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:11.4043252Z  45% 11009 - msys64\usr\share\terminfo\73\screwpoint
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:11.4044446Z                                                     
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:11.6030692Z  45% 11389 - msys64\usr\share\terminfo\76\vip7800-H
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:11.6031345Z                                                    
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:11.8068709Z  45% 11892 - msys64\usr\share\terminfo\78\xterm-direct
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:11.8069406Z                                                       
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.0084656Z  46% 12423 - msys64\usr\share\zoneinfo\Europe\Madrid
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.0085302Z                                                     
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.2123964Z  46% 12925 - msys64\usr\share\zoneinfo\posix\Canada\Yukon
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.2124696Z                                                          
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.4159115Z  46% 13411 - msys64\usr\share\zoneinfo\right\Asia\Gaza
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.4159697Z                                                       
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.6178940Z  46% 13905 - msys64\var\lib\pacman\local\libiconv-1.19-1\mtree
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.6179850Z                                                               
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.8226523Z  56% 14233 - msys64\usr\bin\logger.exe
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:12.8227084Z                                       
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:13.0205798Z  70% 14357 - msys64\usr\bin\od.exe
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:13.0206520Z                                   
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:13.0207045Z Everything is Ok
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:13.0229461Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:13.0230392Z ##[group]Disable Key Refresh...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:13.0248222Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:13.0269047Z ##[group]Restoring package cache...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:13.3992084Z Cache hit for restore-key: msys2-pkgs-upd:true-conf:57aa1628-files:7a10b21bd96682fec3ab5d34889e607317d56a3ac04e9f259365141efb030f14
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:14.6990281Z Received 33554432 of 163266142 (20.6%), 31.9 MBs/sec
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:15.7204665Z Received 163266142 of 163266142 (100.0%), 76.9 MBs/sec
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:15.7209819Z Cache Size: ~156 MB (163266142 B)
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:15.7316646Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/9ac7ec17-003b-4d92-ab9b-7b58f2e7ea5d/cache.tzst -P -C D:/a/Sam-Max-HD/Sam-Max-HD --force-local --use-compress-program "zstd -d"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.2091448Z Cache restored successfully
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.2195149Z Cache restore for msys2-pkgs-upd:true-conf:57aa1628, got msys2-pkgs-upd:true-conf:57aa1628-files:7a10b21bd96682fec3ab5d34889e607317d56a3ac04e9f259365141efb030f14
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.2199408Z Cache restore for msys2-pkgs-upd:true-conf:57aa1628, got msys2-pkgs-upd:true-conf:57aa1628-files:7a10b21bd96682fec3ab5d34889e607317d56a3ac04e9f259365141efb030f14
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.2201238Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.2201621Z ##[group]Starting MSYS2 for the first time...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.3102660Z [command]C:\Windows\system32\cmd.exe /D /S /C D:\a\_temp\setup-msys2\msys2.cmd -c "'uname' '-a'"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.3737435Z ^[[1;32mMSYS2 is starting for the first time. Executing the initial setup.^[[1;0m
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.4756739Z Copying skeleton files.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.4757862Z These files are for the users to personalise their msys2 experience.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.4758365Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.4758618Z They will never be overwritten nor automatically updated.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.4759067Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.5342637Z './.bashrc' -> '/home/runneradmin/.bashrc'
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.5532936Z './.bash_profile' -> '/home/runneradmin/.bash_profile'
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.5722315Z './.profile' -> '/home/runneradmin/.profile'
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.6455093Z 'C:\Windows\system32\drivers\etc\hosts' -> '/etc/hosts'
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.7029571Z 'C:\Windows\system32\drivers\etc\protocol' -> '/etc/protocols'
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.7570254Z 'C:\Windows\system32\drivers\etc\services' -> '/etc/services'
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:16.8120105Z 'C:\Windows\system32\drivers\etc\networks' -> '/etc/networks'
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:17.0069886Z gpg: /etc/pacman.d/gnupg/trustdb.gpg: trustdb created
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:17.0157374Z gpg: no ultimately trusted keys found
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:17.3273702Z gpg: starting migration from earlier GnuPG versions
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:17.3943351Z gpg: porting secret keys from '/etc/pacman.d/gnupg/secring.gpg' to gpg-agent
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:17.3947353Z gpg: migration succeeded
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:17.4185681Z ==> Generating pacman master key. This may take some time.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:17.4391798Z gpg: Generating pacman keyring master key...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:18.9545899Z gpg: directory '/etc/pacman.d/gnupg/openpgp-revocs.d' created
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:18.9800899Z gpg: revocation certificate stored as '/etc/pacman.d/gnupg/openpgp-revocs.d/E0FB2429C54C57FF04FCBA9E6D9286BDA06E03A0.rev'
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:18.9802259Z gpg: Done
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:18.9991791Z ==> Updating trust database...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:19.0417431Z gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:19.0418035Z gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:19.1849006Z ==> Appending keys from msys2.gpg...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:19.8142130Z ==> Locally signing trusted keys in keyring...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.3919518Z   -> Locally signed 5 keys.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.4085220Z ==> Importing owner trust values...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.4292227Z gpg: setting ownertrust to 4
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.4292780Z gpg: setting ownertrust to 4
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.4293108Z gpg: setting ownertrust to 4
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.4293385Z gpg: setting ownertrust to 4
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.4293606Z gpg: setting ownertrust to 4
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.4597372Z ==> Disabling revoked keys in keyring...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.7383905Z   -> Disabled 4 keys.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.7549785Z ==> Updating trust database...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.7988810Z gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8020611Z gpg: depth: 0  valid:   1  signed:   5  trust: 0-, 0q, 0n, 0m, 0f, 1u
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8062504Z gpg: depth: 1  valid:   5  signed:   7  trust: 0-, 0q, 0n, 5m, 0f, 0u
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8078027Z gpg: depth: 2  valid:   4  signed:   2  trust: 4-, 0q, 0n, 0m, 0f, 0u
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8081813Z gpg: next trustdb check due at 2027-02-10
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8498528Z pacman-key (pacman) 6.1.0
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8499306Z Copyright (c) 2010-2024 Pacman Development Team <pacman-dev@lists.archlinux.org>.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8499921Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8695358Z This is free software; see the source for copying conditions.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:20.8696732Z There is NO WARRANTY, to the extent permitted by law.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:21.1115117Z ^[[1;32mInitial setup complete. MSYS2 is now ready to use.^[[1;0m
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:21.1302980Z MINGW64_NT-10.0-26100 runnervm0xl3a 3.6.10-c770e1b9.x86_64 2026-09-26 06:38 UTC x86_64 Msys
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:21.1354803Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:21.1355436Z ##[group]Disable CheckSpace...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:21.2194249Z [command]C:\Windows\system32\cmd.exe /D /S /C D:\a\_temp\setup-msys2\msys2.cmd -c "'sed' '-i' 's/^CheckSpace/#CheckSpace/g' '/etc/pacman.conf'"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:21.4427986Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:21.4428419Z ##[group]Updating packages...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:21.5282464Z [command]C:\Windows\system32\cmd.exe /D /S /C D:\a\_temp\setup-msys2\msys2.cmd -c "'pacman' '--noconfirm' '-Syuu' '--overwrite' '*'"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:22.3245111Z :: Synchronizing package databases...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:24.3369145Z  clangarm64 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:24.3369662Z  mingw32 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:24.3370018Z  mingw64 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:24.3370346Z  ucrt64 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:24.3370675Z  clang64 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:24.3371003Z  msys downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:24.8596992Z :: Starting core system upgrade...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0399589Z warning: terminate other MSYS2 programs before proceeding
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0400339Z resolving dependencies...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0400680Z looking for conflicting packages...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0519087Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0519518Z Packages (2) bash-5.3.20-2  msys2-runtime-3.6.11-4
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0520345Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0520453Z Total Installed Size:  18.56 MiB
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0520791Z Net Upgrade Size:       0.01 MiB
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0521027Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0525352Z :: Proceed with installation? [Y/n] 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.0526399Z checking keyring...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.1052250Z checking package integrity...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.4576872Z loading package files...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.4625514Z checking for file conflicts...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.4626074Z :: Processing package changes...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.4626810Z upgrading bash...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.6460541Z upgrading msys2-runtime...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:25.8245433Z :: To complete this update all MSYS2 processes including this terminal will be closed. Confirm to proceed [Y/n] 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:26.1512815Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:26.1513312Z ##[group]Killing remaining tasks...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:26.2362435Z [command]C:\Windows\system32\taskkill.exe /F /FI "MODULES eq msys-2.0.dll"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:26.3417577Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:26.3418120Z INFO: No tasks running with the specified criteria.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:26.3453890Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:26.3455162Z ##[group]Final system upgrade...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:26.4295844Z [command]C:\Windows\system32\cmd.exe /D /S /C D:\a\_temp\setup-msys2\msys2.cmd -c "'pacman' '--noconfirm' '-Syuu' '--overwrite' '*'"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:27.2179587Z :: Synchronizing package databases...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:28.4372503Z  clangarm64 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:28.4373003Z  mingw32 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:28.4373271Z  mingw64 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:28.4373532Z  ucrt64 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:28.4373803Z  clang64 downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:28.4374044Z  msys downloading...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:28.9422080Z :: Starting core system upgrade...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1156481Z  there is nothing to do
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1157066Z :: Starting full system upgrade...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1408076Z resolving dependencies...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1509065Z looking for conflicting packages...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1550022Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1551238Z Packages (10) bsdtar-3.8.10-1  curl-8.23.0-1  dash-0.5.13.5-1  libcurl-8.23.0-1  libexpat-2.9.0-1  libopenssl-3.6.5-1  libpcre2_8-10.49-1  libsqlite-3.54.0-1  openssl-3.6.5-1  tzcode-2026e-1
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1552125Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1552242Z Total Installed Size:  14.07 MiB
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1552912Z Net Upgrade Size:       0.07 MiB
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1553111Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1569509Z :: Proceed with installation? [Y/n] 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.1570008Z checking keyring...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:29.2093582Z checking package integrity...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.4046219Z loading package files...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.4306692Z checking for file conflicts...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.4343579Z :: Processing package changes...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.4344032Z upgrading libexpat...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.4398064Z upgrading libopenssl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.4665868Z upgrading bsdtar...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.4781695Z upgrading openssl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.6126749Z upgrading libpcre2_8...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.6186339Z upgrading libcurl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:30.6260529Z upgrading curl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:31.2103407Z upgrading dash...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:31.3295316Z upgrading libsqlite...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:31.3407299Z upgrading tzcode...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:33.6949958Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:33.6950716Z ##[group]Installing additional packages through pacman...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:33.7783473Z [command]C:\Windows\system32\cmd.exe /D /S /C D:\a\_temp\setup-msys2\msys2.cmd -c "'pacman' '--noconfirm' '-S' '--needed' '--overwrite' '*' 'git' 'make' 'zip' 'mingw-w64-x86_64-gcc' 'mingw-w64-x86_64-pkgconf' 'mingw-w64-x86_64-SDL2' 'mingw-w64-x86_64-libpng' 'mingw-w64-x86_64-zlib' 'mingw-w64-x86_64-freetype'"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7193410Z resolving dependencies...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7334963Z looking for conflicting packages...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7434329Z warning: dependency cycle detected:
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7435186Z warning: mingw-w64-x86_64-harfbuzz will be installed before its mingw-w64-x86_64-freetype dependency
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7440362Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7454147Z Packages (88) db-6.2.32-6  gdbm-1.26-1  heimdal-7.8.0-7  heimdal-libs-7.8.0-7  libcbor-0.14.0-2  libdb-6.2.32-6  libedit-20240808_3.1-1  libfido2-1.17.0-1  libgdbm-1.26-1  mingw-w64-x86_64-binutils-2.47-4  mingw-w64-x86_64-brotli-1.2.0-1  mingw-w64-x86_64-bzip2-1.0.8-4  mingw-w64-x86_64-cc-libs-16.2.0-6  mingw-w64-x86_64-crt-14.0.0.r495.g63ebe6cdb-1  mingw-w64-x86_64-expat-2.9.0-1  mingw-w64-x86_64-gettext-runtime-1.0-1  mingw-w64-x86_64-glib2-2.90.1-1  mingw-w64-x86_64-gmp-6.3.0-2  mingw-w64-x86_64-graphite2-1.3.15-1  mingw-w64-x86_64-harfbuzz-14.6.0-1  mingw-w64-x86_64-headers-14.0.0.r495.g63ebe6cdb-1  mingw-w64-x86_64-isl-0.28-1  mingw-w64-x86_64-libb2-0.98.1-3  mingw-w64-x86_64-libffi-3.8.0-1  mingw-w64-x86_64-libgcc-16.2.0-6  mingw-w64-x86_64-libiconv-1.19-1  mingw-w64-x86_64-libstdc++-16.2.0-6  mingw-w64-x86_64-libsystre-1.0.2-3  mingw-w64-x86_64-libtre-0.9.0-2  mingw-w64-x86_64-libwinpthread-14.0.0.r495.g63ebe6cdb-1  mingw-w64-x86_64-mpc-1.4.1-1  mingw-w64-x86_64-mpdecimal-4.0.1-3  mingw-w64-x86_64-mpfr-4.2.2-3  mingw-w64-x86_64-ncurses-6.6-4  mingw-w64-x86_64-openssl-3.6.5-1  mingw-w64-x86_64-pcre2-10.49-1  mingw-w64-x86_64-python-3.14.8-1  mingw-w64-x86_64-python-packaging-26.3-1  mingw-w64-x86_64-sqlite3-3.54.0-1  mingw-w64-x86_64-tcl-8.6.18-1  mingw-w64-x86_64-tk-8.6.18-1  mingw-w64-x86_64-tzdata-2026e-1  mingw-w64-x86_64-vulkan-loader-1~1.4.363.0-1  mingw-w64-x86_64-windows-default-manifest-20260815-1  mingw-w64-x86_64-wineditline-2.208-1  mingw-w64-x86_64-winpthreads-14.0.0.r495.g63ebe6cdb-1  mingw-w64-x86_64-xz-5.8.4-1  mingw-w64-x86_64-zstd-1.5.7-2  openssh-10.6p1-1  perl-5.42.3-3  perl-authen-sasl-2.2100-2  perl-clone-0.51-1  perl-convert-binhex-1.125-3  perl-encode-locale-1.05-3  perl-error-0.17030-3  perl-file-listing-6.16-2  perl-html-parser-3.86-2  perl-html-tagset-3.24-2  perl-http-cookiejar-0.014-2  perl-http-cookies-6.12-2  perl-http-daemon-6.17-2  perl-http-date-6.08-2  perl-http-message-7.04-2  perl-http-negotiate-6.01-4  perl-io-html-1.004-3  perl-io-socket-ssl-2.099-2  perl-io-stringy-2.113-4  perl-libwww-6.83-3  perl-lwp-mediatypes-6.05-2  perl-mailtools-2.22-2  perl-mime-tools-5.518-2  perl-net-http-6.24-2  perl-net-smtp-ssl-1.04-3  perl-net-ssleay-1.96-2  perl-termreadkey-2.38-9  perl-timedate-2.35-2  perl-try-tiny-0.32-2  perl-uri-5.37-2  perl-www-robotrules-6.03-2  git-2.56.0-1  make-4.4.1-3  mingw-w64-x86_64-SDL2-2.32.10-1  mingw-w64-x86_64-freetype-2.15.0-1  mingw-w64-x86_64-gcc-16.2.0-6  mingw-w64-x86_64-libpng-1.6.59-1  mingw-w64-x86_64-pkgconf-1~3.0.9-1  mingw-w64-x86_64-zlib-1.3.2-2  zip-3.0-5
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7465125Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7465223Z Total Installed Size:  1000.31 MiB
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7465395Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7592019Z :: Proceed with installation? [Y/n] 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.7592607Z checking keyring...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:34.8180326Z checking package integrity...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:46.8572987Z loading package files...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:47.1640481Z checking for file conflicts...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.0263290Z :: Processing package changes...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.0263995Z installing libdb...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.0382169Z installing libedit...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.0797499Z installing heimdal-libs...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.1026266Z installing heimdal...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.9086481Z installing libcbor...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.9123087Z installing libfido2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.9163550Z installing openssh...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.9617754Z installing db...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.9738287Z installing libgdbm...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:49.9780631Z installing gdbm...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:50.0030542Z installing perl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.1673917Z installing perl-error...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.1773081Z installing perl-authen-sasl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.2050249Z installing perl-encode-locale...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.2120911Z installing perl-http-date...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.2200753Z installing perl-file-listing...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.2271815Z installing perl-html-tagset...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.2347513Z installing perl-clone...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.2409255Z installing perl-io-html...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.2482165Z installing perl-lwp-mediatypes...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.2565316Z installing perl-uri...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.3380200Z installing perl-http-message...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.3621760Z installing perl-html-parser...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.3806474Z installing perl-http-cookies...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.3909223Z installing perl-http-daemon...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.3967499Z installing perl-http-cookiejar...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.4054270Z installing perl-http-negotiate...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.4116219Z installing perl-net-http...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.4253100Z installing perl-www-robotrules...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.4370720Z installing perl-try-tiny...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.4479546Z installing perl-libwww...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.4908223Z Optional dependencies for perl-libwww
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.4908928Z     perl-lwp-protocol-https: for https:// url schemes
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.4909535Z installing perl-convert-binhex...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.6328108Z module test... pass.
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.6339816Z installing perl-io-stringy...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.6511977Z installing perl-timedate...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.7325886Z installing perl-mailtools...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.7668495Z installing perl-mime-tools...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.8153148Z installing perl-net-ssleay...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.9115273Z installing perl-io-socket-ssl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.9304314Z installing perl-net-smtp-ssl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.9359657Z installing perl-termreadkey...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:52.9460807Z installing git...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6303766Z Optional dependencies for git
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6304343Z     python: various helper scripts
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6304792Z     subversion: git svn
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6305216Z     aspell: spell checking in git gui
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6305669Z installing make...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6712473Z installing zip...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6822152Z installing mingw-w64-x86_64-libwinpthread...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6878284Z installing mingw-w64-x86_64-libgcc...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:53.6939739Z installing mingw-w64-x86_64-tzdata...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:55.7509233Z installing mingw-w64-x86_64-libstdc++...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:55.7629835Z installing mingw-w64-x86_64-cc-libs...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:55.7655448Z installing mingw-w64-x86_64-libiconv...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:55.7945764Z installing mingw-w64-x86_64-gettext-runtime...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:55.9621176Z installing mingw-w64-x86_64-zlib...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:55.9760201Z installing mingw-w64-x86_64-zstd...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:55.9980801Z installing mingw-w64-x86_64-binutils...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:56.2553692Z installing mingw-w64-x86_64-headers...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:57.7619125Z installing mingw-w64-x86_64-crt...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:58.5204031Z installing mingw-w64-x86_64-gmp...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:58.5376399Z installing mingw-w64-x86_64-isl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:58.6134490Z installing mingw-w64-x86_64-mpfr...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:58.6392976Z installing mingw-w64-x86_64-mpc...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:58.6472715Z installing mingw-w64-x86_64-windows-default-manifest...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:58.6505540Z installing mingw-w64-x86_64-winpthreads...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:25:58.6623380Z installing mingw-w64-x86_64-gcc...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.1957046Z Optional dependencies for mingw-w64-x86_64-gcc
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.1957591Z     mingw-w64-x86_64-libatomic
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.1957926Z     mingw-w64-x86_64-libgomp: OpenMP
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.1958291Z     mingw-w64-x86_64-libquadmath: Quad Math
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.1958689Z installing mingw-w64-x86_64-pkgconf...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.2215373Z installing mingw-w64-x86_64-vulkan-loader...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.2333759Z installing mingw-w64-x86_64-SDL2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.3302411Z installing mingw-w64-x86_64-libpng...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.3561062Z installing mingw-w64-x86_64-brotli...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.3811561Z installing mingw-w64-x86_64-bzip2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.4033967Z installing mingw-w64-x86_64-libffi...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.4158121Z installing mingw-w64-x86_64-wineditline...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.4256702Z installing mingw-w64-x86_64-pcre2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.6429546Z installing mingw-w64-x86_64-expat...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.6612470Z installing mingw-w64-x86_64-mpdecimal...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.6786280Z installing mingw-w64-x86_64-libtre...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.6928400Z installing mingw-w64-x86_64-libsystre...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:00.7034883Z installing mingw-w64-x86_64-ncurses...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:06.2631593Z installing mingw-w64-x86_64-openssl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:12.9289952Z Optional dependencies for mingw-w64-x86_64-openssl
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:12.9290360Z     mingw-w64-x86_64-ca-certificates
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:12.9290671Z installing mingw-w64-x86_64-tcl...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:14.7946758Z installing mingw-w64-x86_64-sqlite3...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:14.9404159Z installing mingw-w64-x86_64-tk...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:15.6129018Z installing mingw-w64-x86_64-libb2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:15.6206630Z installing mingw-w64-x86_64-xz...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:15.7590511Z installing mingw-w64-x86_64-python...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:24.3878254Z installing mingw-w64-x86_64-python-packaging...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:24.4745528Z installing mingw-w64-x86_64-glib2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:25.2460755Z installing mingw-w64-x86_64-graphite2...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:25.2612901Z installing mingw-w64-x86_64-harfbuzz...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:25.3515269Z installing mingw-w64-x86_64-freetype...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:25.5339025Z :: Running post-transaction hooks...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:25.5339765Z (1/1) Updating the info directory file...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:25.9378603Z ##[endgroup]
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:25.9379036Z ##[group]Saving package cache...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:26.0363638Z [command]C:\Windows\system32\cmd.exe /D /S /C D:\a\_temp\setup-msys2\msys2.cmd -c "'paccache' '-r' '-f' '-u' '-k0'"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:27.0618123Z ==> no candidate packages found for pruning
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:27.1494280Z [command]C:\Windows\system32\cmd.exe /D /S /C D:\a\_temp\setup-msys2\msys2.cmd -c "'paccache' '-r' '-f' '-k1'"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:27.4780061Z ==> no candidate packages found for pruning
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:27.9961692Z Cache unchanged, skipping save for msys2-pkgs-upd:true-conf:57aa1628-files:7a10b21bd96682fec3ab5d34889e607317d56a3ac04e9f259365141efb030f14
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.0905355Z [command]C:\Windows\system32\cmd.exe /D /S /C D:\a\_temp\setup-msys2\msys2.cmd -c "'pacman' '--noconfirm' '-Scc'"
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.8676858Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.8677448Z Cache directory: /var/cache/pacman/pkg/
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.8992700Z :: Do you want to remove ALL files from cache? [Y/n] 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.8993361Z removing all files from cache...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.8995192Z 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.8995368Z Database directory: /var/lib/pacman/
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.9015745Z :: Do you want to remove unused repositories? [Y/n] 
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.9016881Z removing unused sync repositories...
+pakke	Run msys2/setup-msys2@v2	2026-10-20T07:26:28.9072363Z ##[endgroup]
+pakke	Bygg ScummVM med HD-patchen	﻿2026-10-20T07:26:29.0608410Z ##[group]Run git config --global --add safe.directory '*'
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:26:29.0608942Z ^[[36;1mgit config --global --add safe.directory '*'^[[0m
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:26:29.0609289Z ^[[36;1mJOBS=$(nproc) engine/build.sh^[[0m
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:26:29.0614255Z shell: D:\a\_temp\setup-msys2\msys2.CMD {0}
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:26:29.0614567Z env:
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:26:29.0614746Z   MSYSTEM: MINGW64
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:26:29.0614951Z ##[endgroup]
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:26:29.4286226Z Henter ScummVM (c9091321060acfc8f037767c18f8279a86305b7e) til /d/a/Sam-Max-HD/Sam-Max-HD/engine/scummvm ...
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:02.2536150Z Legger på patcher ...
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:02.3238040Z   0001-dighd-hd-grafikk.patch
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:02.3245222Z Konfigurerer (bare SCUMM-motoren) ...
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:16.4182215Z ./configure: line 909: cmp: command not found
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:16.5434177Z ./configure: line 909: cmp: command not found
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:16.6057627Z ./configure: line 909: cmp: command not found
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:16.6422582Z ./configure: line 909: cmp: command not found
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:16.6787583Z ./configure: line 909: cmp: command not found
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:27:16.7333978Z Bygger med 4 tråder (første gang tar det noen minutter) ...
+pakke	Bygg ScummVM med HD-patchen	2026-10-20T07:31:07.8078981Z Ferdig: /d/a/Sam-Max-HD/Sam-Max-HD/engine/scummvm/scummvm
+pakke	Spillet og talen (grenen spilldata)	﻿2026-10-20T07:31:07.8309158Z ##[group]Run tools/hent_spilldata.sh
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:07.8309622Z ^[[36;1mtools/hent_spilldata.sh^[[0m
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:07.8312665Z shell: D:\a\_temp\setup-msys2\msys2.CMD {0}
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:07.8313020Z env:
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:07.8313301Z   MSYSTEM: MINGW64
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:07.8313553Z ##[endgroup]
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:08.0973580Z Henter grenen spilldata ...
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:14.8554943Z From https://github.com/Tombonator3000/Sam-Max-HD
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:14.8555519Z  * [new branch]      spilldata  -> origin/spilldata
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:14.8581688Z Pakker ut til game/ ...
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:16.2557109Z Setter sammen MONSTER.SOU ...
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:16.4025303Z Sjekker sjekksummer ...
+pakke	Spillet og talen (grenen spilldata)	2026-10-20T07:31:17.2412119Z Ferdig. Spillfilene og talen ligger i /d/a/Sam-Max-HD/Sam-Max-HD/game
+pakke	HD-modden (grenen hd-mod)	﻿2026-10-20T07:31:17.2669849Z ##[group]Run tools/mod_gren.sh hent
+pakke	HD-modden (grenen hd-mod)	2026-10-20T07:31:17.2670362Z ^[[36;1mtools/mod_gren.sh hent^[[0m
+pakke	HD-modden (grenen hd-mod)	2026-10-20T07:31:17.2672734Z shell: D:\a\_temp\setup-msys2\msys2.CMD {0}
+pakke	HD-modden (grenen hd-mod)	2026-10-20T07:31:17.2673070Z env:
+pakke	HD-modden (grenen hd-mod)	2026-10-20T07:31:17.2673302Z   MSYSTEM: MINGW64
+pakke	HD-modden (grenen hd-mod)	2026-10-20T07:31:17.2673585Z ##[endgroup]
+pakke	HD-modden (grenen hd-mod)	2026-10-20T07:31:38.8965349Z Modden er hentet til /d/a/Sam-Max-HD/Sam-Max-HD/mods/gpt og sjekksummene stemmer. Start med: engine/run.sh gpt
+pakke	Lag zip	﻿2026-10-20T07:31:38.9191165Z ##[group]Run tools/pakke_windows.sh
+pakke	Lag zip	2026-10-20T07:31:38.9191574Z ^[[36;1mtools/pakke_windows.sh^[[0m
+pakke	Lag zip	2026-10-20T07:31:38.9194151Z shell: D:\a\_temp\setup-msys2\msys2.CMD {0}
+pakke	Lag zip	2026-10-20T07:31:38.9194458Z env:
+pakke	Lag zip	2026-10-20T07:31:38.9194629Z   MSYSTEM: MINGW64
+pakke	Lag zip	2026-10-20T07:31:38.9194819Z ##[endgroup]
+pakke	Lag zip	2026-10-20T07:31:39.2041944Z Sjekker spillfilene og HD-modden ...
+pakke	Lag zip	2026-10-20T07:31:44.2240337Z Kopierer motoren og bibliotekene ...
+pakke	Lag zip	2026-10-20T07:31:45.2108482Z Kopierer spillet, talen og HD-modden ...
+pakke	Lag zip	2026-10-20T07:31:53.7647420Z Lager zip ...
+pakke	Lag zip	2026-10-20T07:32:39.6990389Z Ferdig: /d/a/Sam-Max-HD/Sam-Max-HD/out/windows/SamMaxHD-Windows.zip (551M)
+pakke	Test pakken uten skjerm	﻿2026-10-20T07:32:39.7207127Z ##[group]Run cd out/windows/SamMaxHD-Windows
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7207659Z ^[[36;1mcd out/windows/SamMaxHD-Windows^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7208282Z ^[[36;1mexport SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy DIGHD_MOD="$(cygpath -w "$PWD/mod")" DIGHD_QUIT_AT=600^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7209090Z ^[[36;1mset +e^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7209574Z ^[[36;1m# Uten skjerm finner OpenGL ingen grafikkmodus; testen bruker SDL-overflaten (som spill.sh^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7210177Z ^[[36;1m# --programvare) og MT-32-emuleringen, som startfilene^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7211028Z ^[[36;1mtimeout 300 ./scummvm.exe --config="$(cygpath -w "$RUNNER_TEMP")\\test.ini" --path=game \^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7211835Z ^[[36;1m  --savepath="$(cygpath -w "$RUNNER_TEMP")" --themepath=. --extrapath=. --gfx-mode=surfacesdl --music-driver=mt32 \^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7212480Z ^[[36;1m  --debuglevel=1 samnmax > "$RUNNER_TEMP/test.log" 2>&1^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7212864Z ^[[36;1mcode=$?^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7213118Z ^[[36;1mset -e^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7213956Z ^[[36;1m# ScummVM på Windows skriver loggen til %APPDATA%\ScummVM\Logs^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7214530Z ^[[36;1mLOGG="$(cygpath "$APPDATA")/ScummVM/Logs/scummvm.log"^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7215001Z ^[[36;1m[ -f "$LOGG" ] && cat "$LOGG" >> "$RUNNER_TEMP/test.log"^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7215384Z ^[[36;1mecho "Avslutningskode: $code"^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7215897Z ^[[36;1mgrep -E "Using gameid samnmax|Using MD5|DigHD: mod" "$RUNNER_TEMP/test.log" | head -5 || true^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7216816Z ^[[36;1mgrep -q "d917f311a448e3cc7239c31bddb00dd2" "$RUNNER_TEMP/test.log" || { echo "Spillet ble ikke kjent igjen"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7217808Z ^[[36;1mgrep -q "DigHD" "$RUNNER_TEMP/test.log" || { echo "HD-motoren startet ikke"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7218627Z ^[[36;1m[ "$code" = 0 ] || { echo "Spillet avsluttet ikke som ventet (kode $code)"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }^[[0m
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7221274Z shell: D:\a\_temp\setup-msys2\msys2.CMD {0}
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7221613Z env:
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7221857Z   MSYSTEM: MINGW64
+pakke	Test pakken uten skjerm	2026-10-20T07:32:39.7222137Z ##[endgroup]
+pakke	Test pakken uten skjerm	2026-10-20T07:32:49.2513138Z Avslutningskode: 0
+pakke	Test pakken uten skjerm	2026-10-20T07:32:49.2823912Z Using gameid samnmax, variant , extra CD
+pakke	Test pakken uten skjerm	2026-10-20T07:32:49.2916777Z Using MD5 'd917f311a448e3cc7239c31bddb00dd2'
+pakke	Test pakken uten skjerm	2026-10-20T07:32:49.2917779Z DigHD: mod 'D:\a\Sam-Max-HD\Sam-Max-HD\out\windows\SamMaxHD-Windows\mod', scale 4, text xbr
+pakke	Test pakken uten skjerm	2026-10-20T07:32:49.2918760Z [2026-10-20 07:32:40] Using gameid samnmax, variant , extra CD
+pakke	Test pakken uten skjerm	2026-10-20T07:32:49.2920289Z [2026-10-20 07:32:40] Using MD5 'd917f311a448e3cc7239c31bddb00dd2'
+pakke	Publiser som release	﻿2026-10-20T07:32:49.3552911Z ##[group]Run {
+pakke	Publiser som release	2026-10-20T07:32:49.3553476Z ^[[36;1m{^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3553953Z ^[[36;1m  echo "Sam & Max HD for Windows: ScummVM med HD-patchen, spillet, talen og HD-modden i én zip."^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3554952Z ^[[36;1m  echo^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3555436Z ^[[36;1m  echo "Last ned SamMaxHD-Windows.zip, pakk ut hele mappen og start «Sam og Max HD.bat»."^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3556446Z ^[[36;1m  echo "Spillet starter rett, i fullskjerm, med HD-grafikk. F5 gir spillets meny med valget HD Graphics, Ctrl+H bytter mellom HD og originalgrafikk, Alt+Enter bytter vindu og fullskjerm."^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3557228Z ^[[36;1m  echo^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3557651Z ^[[36;1m  echo "HD-grafikken lages fortsatt. Det som ikke er tegnet i HD ennå, vises som originalen."^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3558246Z ^[[36;1m  echo^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3558556Z ^[[36;1m  echo "Spillet og grafikken tilhører Disney/Lucasfilm."^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3558913Z ^[[36;1m  echo^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3559132Z ^[[36;1m  echo '```'^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3559520Z ^[[36;1m  cat out/windows/SamMaxHD-Windows/BYGG.txt | tr -d '\r'^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3559935Z ^[[36;1m  cat out/windows/SamMaxHD-Windows.zip.sha256^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3560292Z ^[[36;1m  echo '```'^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3560540Z ^[[36;1m} > out/windows/notater.md^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3561217Z ^[[36;1mgh release view windows > /dev/null 2>&1 || gh release create windows --title "Sam & Max HD for Windows" --notes "Lages av arbeidsflyten Windows-pakke."^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3562183Z ^[[36;1mgh release upload windows out/windows/SamMaxHD-Windows.zip out/windows/SamMaxHD-Windows.zip.sha256 --clobber^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3562885Z ^[[36;1mgh release edit windows --notes-file out/windows/notater.md --latest^[[0m
+pakke	Publiser som release	2026-10-20T07:32:49.3579874Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+pakke	Publiser som release	2026-10-20T07:32:49.3580344Z env:
+pakke	Publiser som release	2026-10-20T07:32:49.3580567Z   MSYSTEM: MINGW64
+pakke	Publiser som release	2026-10-20T07:32:49.3583354Z   GH_TOKEN: ***
+pakke	Publiser som release	2026-10-20T07:32:49.3583625Z ##[endgroup]
+pakke	Publiser som release	2026-10-20T07:33:42.0904268Z https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/windows
+pakke	Post Run actions/checkout@v4	﻿2026-10-20T07:33:42.1242274Z Post job cleanup.
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:42.3163776Z [command]"C:\Program Files\Git\bin\git.exe" version
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:42.3528116Z git version 2.56.0.windows.2
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:42.3599144Z Copying 'C:\Users\runneradmin\.gitconfig' to 'D:\a\_temp\1df408a6-1e76-4f99-9ce3-6572ba97c424\.gitconfig'
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:42.3621752Z Temporarily overriding HOME='D:\a\_temp\1df408a6-1e76-4f99-9ce3-6572ba97c424' before making global git config changes
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:42.3623218Z Adding repository directory to the temporary git global config as a safe directory
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:42.3637778Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Sam-Max-HD\Sam-Max-HD
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:42.4087958Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:42.4651419Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:43.0271927Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:43.0622931Z http.https://github.com/.extraheader
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:43.0674310Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:43.1081366Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:43.7738998Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+pakke	Post Run actions/checkout@v4	2026-10-20T07:33:43.8124112Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+pakke	Complete job	﻿2026-10-20T07:33:44.4189945Z Cleaning up orphan processes
+pakke	Complete job	2026-10-20T07:33:44.4740398Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
