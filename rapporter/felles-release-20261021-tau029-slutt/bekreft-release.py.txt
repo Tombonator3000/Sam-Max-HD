@@ -1,0 +1,44 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam029-slutt-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+state=read(O/'bygg-startet.json');tag,code,mod=(state[k] for k in ['release_tag','kode','hd_mod'])
+meta=api('releases/tags/'+tag);latest=api('releases/latest');assert meta['id']==latest['id'] and not meta['draft'] and not meta['prerelease']
+assets=read(O/'assetkontroll.json');assert len(meta['assets'])==len(assets)==4
+for v in assets:
+    a=next(a for a in meta['assets'] if a['name']==v['fil']);assert a['size']==v['bytes'] and a['digest']=='sha256:'+v['sha256'] and sha(O/v['plattform']/v['fil'])==v['sha256']
+ref=api('git/ref/tags/'+tag)['object']
+if ref['type']=='tag':ref=api('git/tags/'+ref['sha'])['object']
+assert ref['type']=='commit' and ref['sha']==code
+prior=read(O/'releaser-foer.json');after=api('releases?per_page=100');assert len(after)==len(prior)+1
+aset=lambda v:{(a['id'],a['name'],a['size'],a['digest']) for a in v['assets']}
+for v in prior:assert aset(v)==aset(next(x for x in after if x['id']==v['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+files=read(R/'moddfiler-2958.json');assert len(files)==21201 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+runtime=read(O/'linux-kontroll.json');assert runtime['skjermbufferkontroller']==464 and runtime['nullkontroller']==463 and runtime['nye_native_observert']==40 and runtime['hele029_native']==70 and not runtime['nye_eller_oekte_avvik']
+assert len(read(R/'motorbilder.json'))==12
+runs={k:api('actions/runs/'+str(state['plattform'][k]['run_id'])) for k in ['linux','windows']}
+assert all(v['conclusion']=='success' and v['run_attempt']==1 and v['head_sha']==code for v in runs.values())
+prot=read(S/'beskyttede-samlet.json');assert len(prot)==1000 and all(sha(A/f)==h for f,h in prot.items());base=read(S/'grunnlag-produksjon.json')
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==418
+progress=read(S/'fremdrift.json');middle=read(A/'rapporter/sam029-fortsettelse-20261021/fremdrift.json');assert len(progress['leveranser'])==len(middle['leveranser'])==7 and sum(v['ruter'] for p in [progress,middle] for v in p['leveranser'])==40 and all(sha(A/e['resultat'])==e['sha256'] for p in [progress,middle] for e in p['leveranser'])
+review=read(R/'visuell-kontroll.json');assert not review['ny_Tom_Claude_godkjenning'];raster=read(R/'rasterkontroll-mot-visuelt-sett.json');assert raster['croprasteridentiske']==40
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),url=meta['html_url'],release_id=meta['id'],release_tag=tag,Latest_bekreftet=True,kode=code,hd_mod=mod,native=2958,nye_native_siden_felles2918=40,nye_hele_ark=14,kostyme029_native=70,kostyme029_hele_ark=22,kostyme164_mangler=[1943,1944],figurjobber_med_resultat=418,figurjobber_totalt=1758,gjenstaar_hele_jobber=1340,faktiske_nedlastinger_begge=True,runtime_moddfiler_per_pakke_bekreftet=21200,fire_assets_digest_og_bytes_verifisert=True,bevarte_tidligere_releaser=len(prior),alle_tidligere_assets_bevart=True,linux_run=state['plattform']['linux']['run_id'],windows_run=state['plattform']['windows']['run_id'],windows_forsoek=1,linux_forsoek=1,linux_binar_sha256=runtime['binar_sha256'],skjermbufferkontroller=464,nullkontroller=463,ingen_nye_eller_okte_skjermbufferavvik=True,kjent_overgangsavvik=dict(frame=36,avvik=160),null_fra_figurstart=211,helprove_uten_avvik=False,hele_motorbilder_sett=12,foer_etter_sett=3,figurcropraster_identiske=40,rgb_utenfor_nytt_lag_i_tre_par=[0,0,0],beskyttede_kilder=1000,tre_stasher_bevart=True,ny_Tom_Claude_godkjenning=False,naturlig_gjennomspilling=False,ny_interaktiv_windows_eller_webtest=False,tidligere_timeout_816_836_1384_387_og_SDL_feil_ikke_erklaert_rettet=True)
+for D in [O,R]:save(D/'publisert.json',proof);save(D/'release-publisert.json',meta)
+state.update(status='fellesrelease_publisert_og_kontrollert',Latest_bekreftet=True,native_frys_kan_frigis=True,release_url=meta['html_url'])
+for D in [O,R]:save(D/'bygg-startet.json',state)
+for folder in ['sam029-fortsettelse-20261021','sam029-slutt-20261021']:
+ D=A/'rapporter'/folder;progress=read(D/'fremdrift.json');progress.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=2958)
+ for e in progress['leveranser']:e.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=2958)
+ save(D/'fremdrift.json',progress)
+ for fn in ['sluttkontroll.json','mottak-publisert.json']:
+  d=read(D/fn);d.update(i_fellespakke=True,fellespakke_tag=tag,pakke_native=2958);save(D/fn,d)
+ p=D/'RAPPORT.md';p.write_text(p.read_text().rstrip()+f'\n\nFelles2958og Latest bekreftet: {meta["html_url"]}. Begge faktiske pakker og alle21200runtime-moddfiler per pakke er SHA-bekreftet. Alle40nye fra de to siste bunkene er motorobservert og har identiske figurutsnitt med visuelt kontrollerte produksjonsbilder.464kontroller463null,samme160ved36,211frafigurstart null,ingen nye/økte avvik. Alle {len(prior)} tidligere releaser og vedlegg bevart. Nativefrysen er frigitt. Ingen ny Tom-/Claude-godkjenning.\n')
+ (D/'NESTE.md').write_text(f'Alle22ark/70Sam029-ruter er levert,kontrollert,publisert,hentet og i faktisk kontrollert felles2958: {meta["html_url"]}.418av1758resultatark,1340gjenstår pluss returer/katalogfeil/sluttkontroll. Nativefrys frigitt. Ikke gjenta029eller pakkebyggene. Velg neste uleverte familie fra ORDRE/GRAFIKKLISTE etter motivavklaring. Neste045_01til03er kildeklargjort i rapporter/sam045-kilde-20261021:18mål/16ulike hele kilder. Katalogens Sam-premiss er feil;se KILDEGRUNNLAG.md for mennesket fra glassdøren og eget glasslag. Primærskript,originalark og seks motorbilder er sett;18av18kilder logget med119av120null,samme160ved36før figurstart. Elevasjonskompensasjon er dokumentert. Ingen nye bildekall/resultat/native for045. Gjenoppta dette kildegrunnlaget,ikke gjenta prøve eller tegnSam.1000kilder/tre stasher bevart;blokkerte164_04og øvrige avviste motiver omprøves ikke;ugyldige344/346ruter spilles ikke. Ingen ny Tom-/Claude-godkjenning.\n')
+(R/'RAPPORT.md').write_text((R/'RAPPORT.md').read_text()+f'\nFellesrelease og Latest er bekreftet: {meta["html_url"]}. Nativefrys frigitt.\n')
+(R/'PAAGAR.md').write_text(f'Ferdig samlepunkt: {meta["html_url"]}. Begge faktiske pakker,2958native og Latest bekreftet. Nativefrys frigitt.418resultatark/1340gjenstår. Sam029skal ikke gjentas.\n')
+shutil.copy2(__file__,R/'bekreft-release.py.txt');print(json.dumps({k:proof[k] for k in ['url','release_id','native','nye_native_siden_felles2918','bevarte_tidligere_releaser','Latest_bekreftet']},ensure_ascii=False),flush=True)

@@ -1,0 +1,77 @@
+; Inngangsskriptet til rom 8 (ENCD)
+
+[0000] (5D) if (!bitvar14) {
+[0007] (9B)   resourceRoutines.lockCostume(45)
+[000D] (9B)   resourceRoutines.loadCostume(45)
+[000F] (9B)   resourceRoutines.lockSound(7)
+[0015] (9B)   resourceRoutines.loadSound(7)
+[0017] (**) }
+[0017] (5D) if (!getState(84)) {
+[001F] (9B)   resourceRoutines.lockCostume(47)
+[0025] (9B)   resourceRoutines.loadCostume(47)
+[0027] (**) }
+[0027] (5D) if (!bitvar15) {
+[002E] (9B)   resourceRoutines.lockCostume(46)
+[0034] (9B)   resourceRoutines.loadCostume(46)
+[0036] (**) }
+[0036] (43) VAR_V6_SOUNDMODE = 2
+[003C] (B6) printDebug.begin()
+[003E] (B6) printDebug.msg(sound(0x9E18EA6, 0xA) + " ")
+[0052] (43) VAR_V6_SOUNDMODE = 0
+[0058] (43) VAR_V6_SOUNDMODE = 2
+[005E] (B6) printDebug.begin()
+[0060] (B6) printDebug.msg(sound(0x9DF8101, 0xA) + " ")
+[0074] (43) VAR_V6_SOUNDMODE = 0
+[007A] (43) VAR_V6_SOUNDMODE = 2
+[0080] (B6) printDebug.begin()
+[0082] (B6) printDebug.msg(sound(0x9E403AA, 0xA) + " ")
+[0096] (43) VAR_V6_SOUNDMODE = 0
+[009C] (43) VAR_V6_SOUNDMODE = 2
+[00A2] (B6) printDebug.begin()
+[00A4] (B6) printDebug.msg(sound(0x9E05E5B, 0xA) + " ")
+[00B8] (43) VAR_V6_SOUNDMODE = 0
+[00BE] (43) VAR_V6_SOUNDMODE = 2
+[00C4] (B6) printDebug.begin()
+[00C6] (B6) printDebug.msg(sound(0x9E4F057, 0xA) + " ")
+[00DA] (43) VAR_V6_SOUNDMODE = 0
+[00E0] (43) VAR_V6_SOUNDMODE = 2
+[00E6] (B6) printDebug.begin()
+[00E8] (B6) printDebug.msg(sound(0x9DF528E, 0xA) + " ")
+[00FC] (43) VAR_V6_SOUNDMODE = 0
+[0102] (43) VAR_V6_SOUNDMODE = 2
+[0108] (B6) printDebug.begin()
+[010A] (B6) printDebug.msg(sound(0x9E013AE, 0xA) + " ")
+[011E] (43) VAR_V6_SOUNDMODE = 0
+[0124] (43) VAR_V6_SOUNDMODE = 2
+[012A] (B6) printDebug.begin()
+[012C] (B6) printDebug.msg(sound(0x9E21292, 0xA) + " ")
+[0140] (43) VAR_V6_SOUNDMODE = 0
+[0146] (5E) startScript(1,201,[])
+[0150] (5D) if (var166 == 7) {
+[015A] (AC)   soundKludge([15,3,0,1])
+[016A] (AC)   soundKludge([17,3,2,15,3,0])
+[0180] (5D)   if (!bitvar14) {
+[0187] (5E)     startScript(0,200,[])
+[0191] (**)   }
+[0191] (5D)   if (getState(84) == 0) {
+[019C] (5E)     startScript(0,204,[])
+[01A6] (**)   }
+[01A6] (70)   setState(81,1)
+[01AD] (73) } else {
+[01B0] (5D)   unless (!isSoundRunning(3)) jump 1b8
+[01B8] (AC)   soundKludge([17,3,2,15,3,0])
+[01CE] (**) }
+[01CE] (5D) if ((var166 == 7) && !bitvar67) {
+[01DD] (5D)   if (!bitvar226) {
+[01E4] (61)     drawObject(81,2)
+[01EB] (73)   } else {
+[01EE] (70)     setState(81,1)
+[01F5] (**)   }
+[01F5] (80)   putActorAtObject(3,81,8)
+[01FF] (5E)   startScript(1,29,[])
+[0209] (5D) } else if (!bitvar67) {
+[0213] (80)   putActorAtObject(3,82,8)
+[021D] (5E)   startScript(1,29,[])
+[0227] (**) }
+[0227] (65) stopObjectCodeA()
+END

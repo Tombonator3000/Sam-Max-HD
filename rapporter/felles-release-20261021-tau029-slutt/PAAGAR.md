@@ -1,0 +1,1 @@
+Ferdig samlepunkt: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-tau029-slutt. Begge faktiske pakker,2958native og Latest bekreftet. Nativefrys frigitt.418resultatark/1340gjenstår. Sam029skal ikke gjentas.
