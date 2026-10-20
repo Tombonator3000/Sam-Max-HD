@@ -1,0 +1,13 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/felles-release-20261020-vr251-slutt';R=P/'work/.gpt-gren/rapporter/felles-release-20261020-vr251-slutt'
+state=json.loads((O/'bygg-startet.json').read_text())
+for platform in ['linux','windows']:
+ row=state['plattform'][platform];rid=row['run_id']
+ run=json.loads(subprocess.check_output(['gh','run','view',str(rid),'--json','databaseId,status,conclusion,headSha,url,createdAt,updatedAt'],cwd=P,text=True))
+ assert run['databaseId']==rid and run['headSha']==state['kode']
+ (O/f'run-{platform}.json').write_text(json.dumps(run,indent=2)+'\n');row.update(status=run['status'],conclusion=run['conclusion'],run_url=run['url']);print(platform,rid,run['status'],run['conclusion'],flush=True)
+ if run['status']=='completed':assert run['conclusion']=='success',(platform,run)
+state['siste_status_utc']=datetime.now(timezone.utc).isoformat()
+for p in [O,R]:(p/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')

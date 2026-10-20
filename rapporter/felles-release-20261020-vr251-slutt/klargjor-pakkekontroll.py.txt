@@ -1,0 +1,12 @@
+from pathlib import Path
+import re,shutil
+P=Path('/home/tom/Sam-Max-HD');old=P/'out/felles-release-20261020-vr251-foerste';O=P/'out/felles-release-20261020-vr251-slutt';R=P/'work/.gpt-gren/rapporter'/O.name;assert not O.exists();O.mkdir();R.mkdir();mapping={'2700':'2722','2683':'2700','17':'22','20943':'20965','20942':'20964','376':'380','1382':'1378','384':'544','382':'540','132':'264'}
+for name in ['start.py','hent-status.py','hent-pakker.py','kontroller-pakker.py','klargjor-linux.py','kontroller-linux.py','vis-pakke.py','publiser-release.py']:
+ t=(old/name).read_text();t=t.replace('sam251-foerste','sam251-slutt').replace('vr251-foerste','vr251-slutt');t=re.sub(r'\b(2700|2683|17|20943|20942|376|1382|384|382|132)\b',lambda m:mapping[m[0]],t);t=t.replace('moddfiler-2700','moddfiler-2722').replace('publiserte-moddfiler-2700','publiserte-moddfiler-2722').replace('native17','native22').replace('observasjoner17','observasjoner22').replace('alle17_nye','alle22_nye').replace('pakke2700','pakke2722').replace('grunnlag2683','grunnlag2700');
+ if name=='start.py':t=t.replace('kostyme251_samlet=22','kostyme251_samlet=39')
+ if name=='kontroller-linux.py':
+  t=t.replace("BASE=P/'out/felles-release-20261020-gang047-slutt/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'","BASE=P/'out/felles-release-20261020-vr251-foerste/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'");t=t.replace('for ch in [6,7]:','for ch in [6,7,8,9]:').replace('kjente_tidlige160_avvik=2','kjente_tidlige160_avvik=4').replace('hele251_native=22','hele251_native=39').replace("==6 and info['skjermbufferkontroller']","==8 and info['skjermbufferkontroller']");needle="assert not missing,missing";t=t.replace(needle,needle+"\nall251={p.stem.removesuffix('_hd') for p in (MOD/'costumes').glob('costume251_*_hd.png')};assert len(all251)==39 and all251<=seen")
+ if name=='vis-pakke.py':
+  t=t.replace('for chore in [6,7]:','for chore in [7,8,9]:').replace("['costume251_1920','costume251_1800','costume251_1807']","['costume251_1814','costume251_1944','costume251_1796']");t=t.replace('figurjobber=5','figurjobber=4');t=t.replace("[('sam251-anim6',f,49) for f in [64,72,84]]+[('sam251-anim7',f,49) for f in [64,72,104]]","[('sam251-anim7',f,49) for f in [108,128]]+[('sam251-anim8',f,49) for f in [64,72]]+[('sam251-anim9',f,49) for f in [64,80]]")
+ (O/name).write_text(t)
+shutil.copy2(__file__,R/(Path(__file__).name+'.txt'));print(O)

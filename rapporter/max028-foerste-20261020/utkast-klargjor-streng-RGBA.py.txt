@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from smhd import gamedata,v6grafikk
+import json,hashlib,struct,shutil,subprocess,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;R.mkdir(exist_ok=False);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();jobs=[A/'jobber'/f'fig028_{n:02}'/'jobb.json' for n in range(1,6)];rows=[];unique={};protected={}
+for j in jobs:
+ assert not(j.parent/'resultat.png').exists() and not(j.parent/'retur.md').exists();d=json.loads(j.read_text())
+ for name in ['jobb.json','original_1x.png','referanse.png','prompt.txt']:protected[(j.parent/name).relative_to(A).as_posix()]=sha(j.parent/name)
+ for e in d['ruter']:
+  x,y,w,h=e['rekt'];raw=Image.open(j.parent/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));can=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA');assert can.size==raw.size;assert can.tobytes()==raw.tobytes(),e['bilde'];key=(can.size,hashlib.sha256(can.tobytes()).hexdigest());v=unique.setdefault(key,dict(bilde=e['bilde'],kildejobb=d['id'],rekt=e['rekt'],canonical_rgba_sha256=key[1],canonical_fil_sha256=sha(P/'work/extract/costumes'/(e['bilde']+'.png')),malruter=[]));v['malruter'].append(dict(jobb=d['id'],bilde=e['bilde'],rekt=e['rekt'],animasjon=e['animasjon'],retning=e['retning'],lag=e['lag']));rows.append(e)
+assert len(rows)==len({e['bilde'] for e in rows})==60;assert all(not(P/'mods/gpt/costumes'/(e['bilde']+'_hd.png')).exists() for e in rows)
+data,_=gamedata.load(P/'game/SAMNMAX.001');idx=gamedata.read_index(P/'game/SAMNMAX.000');rooms=gamedata.read_rooms(P/'game/SAMNMAX.001');ids=gamedata.costume_ids(idx,rooms);n=0;found=None
+for room in sorted(rooms.values(),key=lambda r:r.offset):
+ for off in room.cost_offsets:
+  cid=ids[n];n+=1
+  if cid==28:found=room.offset+off
+assert found is not None;size=gamedata.be32(data,found+4);base=data[found+8:found+size];ncol=32 if base[7]&127 in(0x59,0x61) else 16;data_offsets=8+ncol+34;num_anim=base[6];table=[]
+for raw in sorted({r['animasjon']*4+r['retning'] for r in rows}):
+ assert raw<num_anim;off=struct.unpack_from('<H',base,data_offsets+2*raw)[0];assert off>=data_offsets+num_anim*2 and off<len(base);table.append(dict(raw=raw,offset=off))
+c=v6grafikk.decode_costume(data,found);valid={cel for a in c.animations if a['valg']<num_anim for cel in a['ruter']};assert {r['rute'] for r in rows}<=valid
+for e in rows:
+ cel=next(v for v in c.cels if v.cel==e['rute']);assert [cel.width,cel.height]==e['rekt'][2:]
+(R/'COST028-tabellgrenser.json').write_text(json.dumps(dict(COST_offset=found,COST_size=size,num_anim=num_anim,data_offsets=data_offsets,brukte_oppslag=table,alle60_innen_ekte_tabell=True,dekoderadvarsler=c.errors,animasjoner=c.animations),indent=2)+'\n');(R/'beskyttede-kilder.json').write_text(json.dumps(protected,indent=2)+'\n');old=json.loads((A/'rapporter/sam251-slutt-20261020/beskyttede-samlet.json').read_text());assert len(old)==848 and all(sha(A/f)==h for f,h in old.items());old.update(protected);assert len(old)==868;(R/'beskyttede-samlet.json').write_text(json.dumps(old,indent=2)+'\n');(R/'ruteplan-unik.json').write_text(json.dumps(dict(ruter=list(unique.values())),indent=2)+'\n');script=Path('/home/tom/Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/ikon-grunnlag/skript/globale/scrp_065.txt');shutil.copy2(script,R/'kildeskript-scrp_065.txt');(R/'skriptproveniens.json').write_text(json.dumps(dict(kilde=str(script),sha256=sha(script),aktor=3,kostyme=28,pos=[147,93],rom=4,skjuling_elevation=200,synlig_elevation=0,chore=[6,7],skala_ikke_eksplisitt_satt=True,figurjobbkort_urort=True),ensure_ascii=False,indent=2)+'\n')
+for page in range(3):
+ board=Image.new('RGB',(1536,540),'#243340');dd=ImageDraw.Draw(board)
+ for i,j in enumerate(jobs[page*2:page*2+2]):
+  im=Image.open(j.parent/'referanse.png').convert('RGB').resize((768,512),Image.Resampling.NEAREST);board.paste(im,(i*768,28));dd.text((i*768+8,8),j.parent.name+' originalreferanse',fill='white')
+ board.save(R/f'originalreferanser028-side{page+1}.png')
+meta=dict(arbeidsgrein_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),native_sha=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0],jobber=5,ruter=60,ulike_hele_canonical_kilder=len(unique),beskyttede_filer=20,samlet_beskyttet=868,source_table_warning=c.errors,bildekall=0,resultater=0,ny_native=0,originalkontekst='Max-hode med bare korte oerestubber,munn/tunge/tenner og kildeekte moerkeblaa bakgrunnsfelt i bilintroens rom4,scrp065. Se naturlig/motorplassering foer prompt. Ikke helfigur eller hele oeretupper.',motivkontroll_gjenstaar=True,motor_observert=0);(R/'kildegrunnlag.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'klargjor-kilder.py.txt');print(json.dumps(meta,ensure_ascii=False),flush=True)
