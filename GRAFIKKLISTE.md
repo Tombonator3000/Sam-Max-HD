@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Oppdatert 21. oktober2026: fig029_01 til08 er levert og kontrollert, åtte hele ark/30nye native fra11hele malerier. Seks innebygde bildekall bevart, fire brukt i bunken. Alle8ark/30native OK og visuelt sett;30motorobservert.240kontroller239null, samme160 ved36 som grunnlaget,211frafigurstart null, ingen nye eller økte avvik. Kandidat2918;404av1758resultatark,1354gjenstår. Publisering/hent og nye pakker kvitteres separat. Neste029_09 til22, gjenoppta T04råbilde og1950prototype i sam029-tau-20261021. Hele044er allerede publisert og i kontrollert felles2888, ikke gjenta044.1000kilder/3stasher/tidligere filer bevares.164_04fortsatt blokkert. Ingen ny Tom-/Claude-godkjenning.
+
 Fullført samlepunkt 2026-10-20 22:46:Hele028/8ark/88native med i kontrollert felles2810:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-max028. Begge faktiske pakker/21052runtime-filer,alle88 i motor,384/384null,Latest bekreftet. Nativefrys frigitt.388av1758resultatark,1370gjenstår. Neste hele044_01..08/78mål/47helkilder har0kall/0resultat/0native,kilde300/300null/alle78 i originalskript,menvisuell kilde/stilkontroll gjenstår før kall. Lang1800prøve tidsavbrøt ved1384 og er bevart,ikke full gjennomspilling. Les sam-max044-foerste-20261020/NESTE.md. Bevar912kilder/3stasher/alle tidligere filer.164_04fortsatt blokkert,ingen omprøve. Ingen ny Tom-/Claude-godkjenning. Ikke gjenta028 eller2810bygg.
 
 
@@ -450,14 +452,14 @@ Figurark for Sam.
 
 Figurark for Sam.
 
-- [ ] `fig029_01` (figurark 1 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_02` (figurark 2 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_03` (figurark 3 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_04` (figurark 4 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_05` (figurark 5 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_06` (figurark 6 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_07` (figurark 7 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_08` (figurark 8 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_01` (figurark 1 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_02` (figurark 2 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_03` (figurark 3 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_04` (figurark 4 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_05` (figurark 5 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_06` (figurark 6 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_07` (figurark 7 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_08` (figurark 8 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_09` (figurark 9 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_10` (figurark 10 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 
@@ -710,19 +712,19 @@ Figurark for Max, Sam og Max.
 - [x] `fig028_06` (figurark 6 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [x] `fig028_07` (figurark 7 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [x] `fig028_08` (figurark 8 for Max (kostyme 28), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig044_01` (figurark 1 for Sam og Max (kostyme 44), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig044_02` (figurark 2 for Sam og Max (kostyme 44), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig044_03` (figurark 3 for Sam og Max (kostyme 44), 6 ruter: start mot høyre (5 ruter); animasjon 7 mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig044_04` (figurark 4 for Sam og Max (kostyme 44), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig044_05` (figurark 5 for Sam og Max (kostyme 44), 10 ruter: animasjon 8 mot høyre (10 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig044_01` (figurark 1 for Sam og Max (kostyme 44), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig044_02` (figurark 2 for Sam og Max (kostyme 44), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig044_03` (figurark 3 for Sam og Max (kostyme 44), 6 ruter: start mot høyre (5 ruter); animasjon 7 mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig044_04` (figurark 4 for Sam og Max (kostyme 44), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig044_05` (figurark 5 for Sam og Max (kostyme 44), 10 ruter: animasjon 8 mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 42
 
 Figurark for Sam og Max.
 
-- [ ] `fig044_06` (figurark 6 for Sam og Max (kostyme 44), 7 ruter: animasjon 8 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig044_07` (figurark 7 for Sam og Max (kostyme 44), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig044_08` (figurark 8 for Sam og Max (kostyme 44), 6 ruter: animasjon 8 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig044_06` (figurark 6 for Sam og Max (kostyme 44), 7 ruter: animasjon 8 mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig044_07` (figurark 7 for Sam og Max (kostyme 44), 12 ruter: animasjon 8 mot høyre (12 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig044_08` (figurark 8 for Sam og Max (kostyme 44), 6 ruter: animasjon 8 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig088_01` (figurark 1 for Sam og Max (kostyme 88), 14 ruter: start (lag 14, tegnes over kroppen) mot høyre (1 rute); start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig088_02` (figurark 2 for Sam og Max (kostyme 88), 17 ruter: start mot høyre (17 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig088_03` (figurark 3 for Sam og Max (kostyme 88), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)

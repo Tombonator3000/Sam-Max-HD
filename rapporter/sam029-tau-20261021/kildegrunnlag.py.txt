@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from collections import defaultdict
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');read=lambda p:json.loads(p.read_text());g=lambda root,*args:subprocess.check_output(['git',*args],cwd=root,text=True).strip()
+assert not R.exists();assert not g(P,'status','--porcelain') and not g(A,'status','--porcelain');remote=g(P,'ls-remote','origin','refs/heads/hd-mod').split()[0];assert remote=='87a22fdf2897a62334d5f59d27d2e3919215c695';R.mkdir(parents=True)
+old=read(A/'rapporter/sam-max044-foerste-20261020/publiserte-moddfiler-2888.json');old=old.get('filer',old);files={p.relative_to(M).as_posix():sha(p) for p in sorted(M.rglob('*')) if p.is_file()};assert files==old and len(files)==21131
+protected=read(A/'rapporter/sam-max044-foerste-20261020/beskyttede-samlet.json');assert len(protected)==912;groups={};jobs=[];meta=read(P/'work/extract/costumes.json')['29'];cm={x['cel']:x for x in meta['cels']}
+for D in sorted((A/'jobber').glob('fig029_*')):
+ j=read(D/'jobb.json');assert not (D/'resultat.png').exists() and not (D/'retur.md').exists();assert j['kostyme']==29 and j['rom']==5
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:protected[str((D/f).relative_to(A))]=sha(D/f)
+ jobs.append(dict(jobb=j['id'],sha256_jobb=sha(D/'jobb.json'),ruter=[e['bilde'] for e in j['ruter']]))
+ for row in j['ruter']:
+  name=row['bilde'];p=P/'work/extract/costumes'/(name+'.png');idx=p.with_stem(p.stem+'_idx');im=Image.open(p).convert('RGBA');key=(im.size,sha(p),hashlib.sha256(im.tobytes()).hexdigest())
+  # Group exact decoded RGBA, also when PNG containers differ.
+  key=(im.size,hashlib.sha256(im.tobytes()).hexdigest())
+  if key not in groups:groups[key]=dict(bilde=name,canonical_fil_sha256=sha(p),canonical_idx_sha256=sha(idx),rgba_sha256=key[1],maal=list(im.size),synlig=list(im.getbbox()),kildemetadata=cm[int(name.split('_')[-1])],malruter=[])
+  groups[key]['malruter'].append(dict(bilde=name,jobb=j['id'],canonical_fil_sha256=sha(p),canonical_idx_sha256=sha(idx)))
+assert len(jobs)==22 and len(groups)==30 and sum(len(v['malruter']) for v in groups.values())==70;assert len(protected)==1000 and all(sha(A/f)==h for f,h in protected.items());stash=g(P,'stash','list','--format=%H').splitlines();assert stash==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==396
+save(R/'beskyttede-samlet.json',protected);save(R/'ruteplan-unik.json',dict(jobber=jobs,ruter=list(groups.values()),maal=70,ulike_hele_kilder=30));save(R/'grunnlag-produksjon.json',dict(native=2888,native_sha=remote,art_sha=g(A,'rev-parse','HEAD'),main_sha=g(P,'rev-parse','HEAD'),filer=files,stash=stash,hele_figurjobber=396,beskyttede_kilder=1000))
+for page in range(5):
+ b=Image.new('RGB',(1440,960),'#25313d');d=ImageDraw.Draw(b)
+ for i,v in enumerate(list(groups.values())[page*6:page*6+6]):
+  im=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');w,h=im.size;s=min(4,700//w,275//h);x=i%2*720+(720-w*s)//2;y=i//2*320+30+(280-h*s)//2;b.paste(im.resize((w*s,h*s),Image.Resampling.NEAREST),(x,y),im.resize((w*s,h*s),Image.Resampling.NEAREST));d.text((i%2*720+8,i//2*320+5),f'{v["bilde"]}, {w}x{h}, {len(v["malruter"])} hele aliasmaal',fill='white')
+ b.save(R/f'canonical029-kilder-side{page+1}.png')
+for page in range(6):
+ b=Image.new('RGB',(1536,1064),'#25313d');d=ImageDraw.Draw(b)
+ for i,v in enumerate(jobs[page*4:page*4+4]):
+  im=Image.open(A/'jobber'/v['jobb']/'referanse.png').convert('RGB').resize((768,512));x=i%2*768;y=i//2*532;d.text((x+8,y+5),v['jobb'],fill='white');b.paste(im,(x,y+20))
+ b.save(R/f'originalark029-side{page+1}.png')
+root=Path('/home/tom/Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/ikon-grunnlag/skript');source={}
+for rel in ['globale/scrp_065.txt','rom_005/inngang.txt']:
+ p=root/rel;source[rel]=sha(p);shutil.copy2(p,R/('primærkilde-'+p.name))
+save(R/'kildeskript.json',source);shutil.copy2(__file__,R/'kildegrunnlag.py.txt');(R/'NESTE.md').write_text('Kildeklargjøring av hele029,22ark/70mål/30ulikehelkilder. Ingen bildekall eller nye resultat/native ennå. Se alle originalark,unikekilder,godkjenteSamankere og motorkontekst før kall. Sam løsner bindingstau rundt kvinnen i rom5 mens Max tar den falske legen utenfor bildet.029 er bare hånd,erme og tauend.1973 har en kildeekte liten grå flekk høyt over hovedarmen;bevar helekilde og undersøk primærplassering,ikke fullfør den til en ny gjenstand.\n')
+print('Kildegrunnlag:22ark,70mål,30helkilder,1000beskyttede,396resultatark,2888native,3stasher.')

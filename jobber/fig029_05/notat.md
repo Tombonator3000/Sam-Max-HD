@@ -1,0 +1,13 @@
+# fig029_05, 21. oktober 2026
+
+Codex har tegnet fig029_01 til fig029_08 med innebygd image_gen. Bunken har 30 native mål fra 11 hele canonical malerier og 19 ekstra mål med identisk hel RGBA. Seks faktiske bildekall og seks råbilder er bevart. Fire kall brukes i denne leveransen. T01 er returnert, og T04 er bevart for neste bunke. Faktiske prompter og argumenter finnes i rapporten.
+
+Originalscenen og primærskript 65 avklarer motivet: Sams hånd og lange blågrå dressarm møter tauenden ved kvinnen i rom 5. Grep og slipp er synlig. At alle knuter løsnes er ikke dokumentert. Dette er ikke en hel figur eller et nytt verktøy. Kvinnen, bakgrunnen og låsen er ikke lagt inn i håndtegningen. Kildenes palett, grep, antall fingre, ermefolder og små taufragmenter er bevart. Det godkjente Sam-hovedarket og stilankeret styrer identiteten. Egen T01R-prøve brukes bare til kontinuitet, den har ingen ny Tom-godkjenning.
+
+T01 og T01R for 1920 ble returnert for feil forbindelse eller avstand mellom tauflis og tau. T03 for 1932 ble returnert for et gap i en sammenhengende tauende. R02 retter hele begge motivene. 1928 manglet en liten flis som er hentet fra egen nymalt 1950 med samme kildegeometri. 1929 bruker en egen nymalt flis fra 1927 med identisk kilde-RGBA. Kildebelegg, donorhash og plassering er bevart separat. Dette er gjenbruk av eget bilde, ingen originale pikselfragmenter.
+
+Maleriene har ekte egen alfa. Svak generert glød er renset etter egen alfa med to piksler egen kant. Hele motiver og allerede atskilte egne fragmenter er affinplassert i 4x med 8 HD-piksler marg. Originalalfa brukes til måling og komponentenes rektangler, aldri som hard klippemaske. Ingen originalpiksler, originalfragment-fallback eller senket kontrollgrense. CORE er 128, IoU minst 0,6 og dekning minst 0,8.
+
+Resultat SHA256: 430e2e9ddf58c7920bf0b9c98961f25444e8c5c32a9c934790ce7f94c6b637fe. Egenkontroll: OK. Native mottak, visuell sluttkontroll, motorobservasjon, publisering og pakker dokumenteres separat i rapporten. Ingen ny Tom- eller Claude-godkjenning. Beskyttede jobbfiler er urørt. Bibliotekskilder: figurark-fast-storrelse og publisert-mod-er-fasit.
+
+Sluttkontroll: åtte hele ark og30 automatisk native OK. Alle11 ulike original/native/motor, åtte hele resultatark, åtte hele motorbilder og tre før/etter er sett.240 skjermbufferkontroller,239 null og samme160 ved36 som grunnlaget før første figurtegning60. Alle211 fra60 er null. Ingen nye eller økte avvik. Tre før/etter har0endringer utenfor nytt lag og marg. Alle30 nye ruter er motorlogget. Tvungen kildekorrekt avspilling, ikke naturlig gjennomspilling. Ingen ny Tom- eller Claude-godkjenning.

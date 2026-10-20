@@ -1,0 +1,69 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam029-tau'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');prot=read(R/'beskyttede-samlet.json')
+assert len(prot)==1000 and all(sha(A/f)==h for f,h in prot.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+files=read(R/'kandidatfilhash.json');assert {p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()}==files
+assert len(files)==21161 and sum(f.endswith('.png') for f in files)==21155
+assert read(C/'mod.json')['costume_cels']==2918 and (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+assert set(base['filer'])<=set(files) and {f for f,h in base['filer'].items() if files[f]!=h}=={'mod.json'}
+rows=read(R/'native-fast4x-samlet.json')['ruter'];assert len(rows)==30;groups={}
+for v in rows:
+    p=Path(v['prototype']);a=np.array(Image.open(C/v['fil']).convert('RGBA'));q=np.array(Image.open(p).convert('RGBA'))
+    assert sha(p)==v['prototype_sha256'] and sha(C/v['fil'])==v['sha256'] and np.array_equal(a[:,:,3],q[:,:,3])
+    assert not a[a[:,:,3]==0,:3].any()
+    src=np.array(Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA'))
+    assert hashlib.sha256(src.tobytes()).hexdigest()==v['canonical_rgba_sha256']
+    assert a.shape[:2]==(src.shape[0]*4+16,src.shape[1]*4+16)
+    iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1),-8,-8)
+    assert iou>=GOOD_IOU and cov>=GOOD_COVER and not v['hard_originalmaske'] and not v['originalfragment_fallback']
+    groups.setdefault(v['canonical_rgba_sha256'],set()).add(v['sha256'])
+assert len(groups)==11 and all(len(h)==1 for h in groups.values())
+raw=[]
+for d in sorted((R/'kall').iterdir()):
+    if not (d/'raa.png').exists():continue
+    assert sha(d/'raa.png')==read(d/'raabilde.json')['sha256']
+    args=read(d/'argumenter.json');assert args['transparent_background'] and args['prompt']==(d/'prompt-brukt.txt').read_text()
+    save(d/'referanser.json',[dict(fil=p,sha256=sha(Path(p))) for p in args['referenced_image_paths']])
+    raw.append(dict(kall=d.name,sha256=sha(d/'raa.png'),argumenter_sha256=sha(d/'argumenter.json')))
+assert len(raw)==6
+obs=read(R/'motorobservasjoner.json');assert obs['sett']==30 and not obs['mangler']
+assert all(sha(Path(v['fil']))==v['sha256'] and sha(C/'costumes'/(b+'_hd.png'))==v['native_sha256'] for b,v in obs['tegninger'].items())
+motor=read(R/'motor-kandidat.json');old=read(R/'kilde-motor.json')
+assert motor['kontroller']==old['kontroller'] and motor['skjermbufferkontroller']==240 and motor['nullkontroller']==239
+assert [v for v in motor['kontroller'] if v['avvik']]==[dict(frame=36,avvik=160)]
+assert len([v for v in motor['kontroller'] if v['frame']>=60])==211
+assert all(v['avvik']==0 for v in motor['kontroller'] if v['frame']>=60)
+assert all(v['utenfor_nye_cels_og_marg']==0 for v in read(R/'pikselkontroll.json'))
+views=[R/f'original-native-motor-side{i}.png' for i in range(1,4)]+[R/'hele-motorbilder-brett.png']+[R/f'foer-etter-costume029_{n}.png' for n in [1920,1932,1948]]+[A/'jobber'/f'fig029_{i:02}'/'resultat.png' for i in range(1,9)]
+save(R/'visuell-kontroll.json',dict(sett_i_chat=True,filer={str(p.relative_to(A)):sha(p) for p in views},unike_original_native_motor=11,motorobserverte_ruter=30,hele_motorbilder_paa_brett=8,foer_etter=3,hele_resultatark=8,merknad='Hånd og erme med tauende, original antall og forbindelser mellom smådeler. Grep og slipp er synlig; det er ikke bevist at alle knuter løsnes. Egne småfliser fra egne malerier i1928 og1929 er dokumentert. Tvungen kildekorrekt avspilling av actor10, ikke naturlig gjennomspilling.'))
+f=read(R/'fremdrift.json');assert len(f['leveranser'])==8
+for v in f['leveranser']:
+    assert sha(A/v['resultat'])==v['sha256'] and Image.open(A/v['resultat']).size==(1536,1024)
+    assert 'Utfall: OK' in (R/(v['jobb']+'-egenkontroll.txt')).read_text()
+    v.update(visuelt_kontrollert=True,native_mottatt=True,motorobservert=True)
+    p=A/'jobber'/v['jobb']/'notat.md';p.write_text(p.read_text().rstrip()+'\n\nSluttkontroll: åtte hele ark og30 automatisk native OK. Alle11 ulike original/native/motor, åtte hele resultatark, åtte hele motorbilder og tre før/etter er sett.240 skjermbufferkontroller,239 null og samme160 ved36 som grunnlaget før første figurtegning60. Alle211 fra60 er null. Ingen nye eller økte avvik. Tre før/etter har0endringer utenfor nytt lag og marg. Alle30 nye ruter er motorlogget. Tvungen kildekorrekt avspilling, ikke naturlig gjennomspilling. Ingen ny Tom- eller Claude-godkjenning.\n')
+f.update(native_mottatt=30,motorobservert=30,visuelt_kontrollert=True,importert=True,hele_ark_OK=8,hele_ark_SJEKK=0,omrissvarsler=0,retur_tauforbindelser_rettet=True,egne_smaaflisdonorer=2)
+save(R/'fremdrift.json',f);assert len(list((A/'jobber').glob('fig*/resultat.png')))==404
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+    for name in ['kilde2888','motor2918']:
+        for fn in ['scummvm.log','scummvm.ini']:z.write(O/name/fn,name+'/'+fn)
+report=dict(kontroll_utc=datetime.now(timezone.utc).isoformat(),beskyttede=1000,stasher=base['stash'],figurjobber=404,figurjobber_totalt=1758,gjenstar=1354,nye_ark=8,nye_native=30,kostyme029_samlet_native=30,native_totalt=2918,kandidatfiler=21161,kandidat_png=21155,bildekall_med_raa=6,sluttkall_brukt_i_bunken=4,nye_hele_malerier=11,eksakte_hele_aliasmaal=19,egne_smaaflisdonorer=2,hele_ark_OK=8,hele_ark_SJEKK=0,omrissvarsler=0,automatisk_native_OK=30,native_egen_alfa_ingen_originalfragment=True,kontroller=240,null=239,kjent_overgangsavvik=[dict(frame=36,avvik=160)],null_fra_figurstart=211,nye_eller_okte_skjermbufferavvik=0,utenfor_nytt_lag_i_tre_for_etter=[0,0,0],visuelt_sett=True,motorobservert=30,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False,raakall=raw)
+save(R/'sluttkontroll.json',report)
+(R/'NESTE.md').write_text('Første åtte029_01 til08 er levert og kontrollert:30nye native fra11hele malerier,19ekstra hele aliasmål. Kandidat2918.404av1758hele figurjobber har resultat,1354gjenstår pluss returer,katalogfeil og sluttkontroll. Publisering/hent og fellespakker kvitteres separat. Neste bunke029_09 til22 har40mål igjen. T04råbilde er laget og bevart, ikke levert.1950prototype er laget, ikke levert; dens egen lille flis brukes i1928. T04/1955 mangler én kildeekte liten del. Gjenoppta råbildet og protypen, ikke dupliser kall.1973 har kildeekte høy grå flekk og langt gap over armen. Hele029-kildeplanen og alle originale motorposer er sett. Se KILDEGRUNNLAG.md. Ingen ny Tom-/Claude-godkjenning.164_04fortsatt blokkert,ikke omprøv.\n')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;s=p.read_text();heading,rest=s.split('\n',1)
+    msg='Oppdatert 21. oktober2026: fig029_01 til08 er levert og kontrollert, åtte hele ark/30nye native fra11hele malerier. Seks innebygde bildekall bevart, fire brukt i bunken. Alle8ark/30native OK og visuelt sett;30motorobservert.240kontroller239null, samme160 ved36 som grunnlaget,211frafigurstart null, ingen nye eller økte avvik. Kandidat2918;404av1758resultatark,1354gjenstår. Publisering/hent og nye pakker kvitteres separat. Neste029_09 til22, gjenoppta T04råbilde og1950prototype i sam029-tau-20261021. Hele044er allerede publisert og i kontrollert felles2888, ikke gjenta044.1000kilder/3stasher/tidligere filer bevares.164_04fortsatt blokkert. Ingen ny Tom-/Claude-godkjenning.'
+    s=heading+'\n\n'+msg+'\n'+rest
+    if name=='GRAFIKKLISTE.md':
+        for k in [29,44]:
+            for i in range(1,9):s=s.replace(f'- [ ] `fig{k:03}_{i:02}`',f'- [x] `fig{k:03}_{i:02}`')
+    p.write_text(s)
+save(R/'uonsket-windows-tagg39504399685.json',dict(id=39504399685,status='completed',conclusion='success',kode='4a5f3324cad980fcd5f509824078f75e4eee03a1',ekstra_taggjobb=True,tilsiktet_felles2888_windows=39501496632,ingen_ny_dispatch_omprove_eller_kansellering=True))
+shutil.copy2(__file__,R/'kontroller.py.txt');print('PASS8ark/30nye/2918native/404resultat;1000kilder/3stasher;239/240null,samme160ved36',flush=True)

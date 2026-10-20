@@ -1,0 +1,49 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import _iou
+from scipy.optimize import linear_sum_assignment
+import numpy as np,json,hashlib,shutil,sys
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;H=R/'prototyper';H.mkdir(exist_ok=True)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for token in sys.argv[1:]:
+ call,_,selected=token.partition(':')
+ C=R/'kall'/call;a=np.array(Image.open(C/'raa.png').convert('RGBA'));assert a.shape[:2]==(1024,1536);plan=json.loads((C/'plan.json').read_text())
+ for entry in plan['ruter']:
+  b=entry['bilde'];src=np.array(Image.open(P/'work/extract/costumes'/(b+'.png')).convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);x,y,w,h=entry['celle'];region=np.zeros(a.shape[:2],bool);region[y:y+h,x:x+w]=True;core=(a[:,:,3]>=128)&region
+  if selected and b!=selected:continue
+  yy,xx=np.nonzero(core);assert len(xx)>0,(call,b);gx,gy,gw,gh=map(int,(xx.min(),yy.min(),np.ptp(xx)+1,np.ptp(yy)+1));dist,near=nd.distance_transform_edt(~core,return_indices=True);allow=(dist<=2)&region;q=a.copy();q[:,:,3][~allow]=0;q[:,:,3][core]=255;edge=allow&~core;q[edge,:3]=q[near[0][edge],near[1][edge],:3];q[q[:,:,3]==0,:3]=0
+  W,Hh=src.shape[1]*4,src.shape[0]*4;size=(W+16,Hh+16);px,py,pw,ph=entry['proxy_rekt'];sc=entry['referanseskala']/4
+  transforms=[('fast-refanker',[sc,0,px-8*sc,0,sc,py-8*sc]),('hel-boks',[gw/W,0,gx-8*gw/W,0,gh/Hh,gy-8*gh/Hh])];variants=[]
+  for method,aff in transforms:
+   z=np.array(Image.fromarray(q).transform(size,Image.Transform.AFFINE,tuple(aff),Image.Resampling.BICUBIC));iou,cov=_iou(z[:,:,3]>=128,mask,-8,-8);variants.append((iou,cov,method,z,aff))
+  fixed=variants[0];fx=fixed[4];bounds=[(gx-fx[2])/fx[0],(gy-fx[5])/fx[4],(gx+gw-1-fx[2])/fx[0],(gy+gh-1-fx[5])/fx[4]];whole_fixed=bounds[0]>=2 and bounds[1]>=2 and bounds[2]<=size[0]-3 and bounds[3]<=size[1]-3
+  chosen=fixed if whole_fixed and fixed[0]>=.6 and fixed[1]>=.8 else variants[1]
+  iou,cov,method,z,aff=chosen
+  # Place only already detached OWN painted fragments. Original components
+  # provide rectangles, never a clipping silhouette or any output pixels.
+  def components(m):
+   ll,nn=nd.label(m,np.ones((3,3)));out=[]
+   for k,sl in enumerate(nd.find_objects(ll),1):
+    if sl is not None:out.append(dict(label=k,area=int((ll[sl]==k).sum()),box=[sl[1].start,sl[0].start,sl[1].stop,sl[0].stop]))
+   return ll,out
+  src_lab,src_parts=components(src[:,:,3]>0);own_lab,own_parts=components(z[:,:,3]>=128);egne_tillegg=[]
+  donors=R/'egne-fragmentdonorer.json'
+  for donor in (json.loads(donors.read_text()).get(b,[]) if donors.exists() else []):
+   assert len(own_parts)<len(src_parts);p=R/donor['donor'];assert sha(p)==donor['sha256'];part=Image.open(p).convert('RGBA');sx0,sy0,sx1,sy1=donor['kilde_boks_1x'];tx0,ty0,tx1,ty1=[v*4+8 for v in [sx0,sy0,sx1,sy1]];cx,cy,cw,ch=donor['egen_kjerne'];sx=cw/(tx1-tx0);sy=ch/(ty1-ty0);q=part.transform(size,Image.Transform.AFFINE,(sx,0,cx-tx0*sx,0,sy,cy-ty0*sy),Image.Resampling.BICUBIC);z=np.array(Image.alpha_composite(Image.fromarray(z),q));egne_tillegg.append(donor);own_lab,own_parts=components(z[:,:,3]>=128)
+  assert len(src_parts)==len(own_parts),(b,'mangler eller ekstra egen del',len(src_parts),len(own_parts))
+  main_src=max(src_parts,key=lambda v:v['area']);main_own=max(own_parts,key=lambda v:v['area']);sp=[v for v in src_parts if v is not main_src];op=[v for v in own_parts if v is not main_own];fragmenter=[]
+  if sp:
+   cost=np.array([[sum((o['box'][k]-8-s['box'][k]*4)**2 for k in range(4)) for o in op] for s in sp]);ii,jj=linear_sum_assignment(cost);original_z=z.copy();_,nn=nd.distance_transform_edt(own_lab==0,return_indices=True);owners=own_lab[nn[0],nn[1]];remove=np.isin(owners,[v['label'] for v in op])&(z[:,:,3]>0);z[remove]=0
+   for si,oi in zip(ii,jj):
+    s,o=sp[si],op[oi];x0,y0,x1,y1=o['box'];part=original_z.copy();part[owners!=o['label']]=0;part=Image.fromarray(part).crop((x0-2,y0-2,x1+2,y1+2));tx0,ty0,tx1,ty1=[v*4+8 for v in s['box']];sx=(x1-x0)/(tx1-tx0);sy=(y1-y0)/(ty1-ty0);fragment=np.array(part.transform(size,Image.Transform.AFFINE,(sx,0,2-tx0*sx,0,sy,2-ty0*sy),Image.Resampling.BICUBIC));z=np.array(Image.alpha_composite(Image.fromarray(z),Image.fromarray(fragment)));fragmenter.append(dict(kilde_boks_1x=s['box'],egen_foer=o['box'],egen_plassert_rekt=[tx0,ty0,tx1,ty1],egen_del_affin=True,original_klippemaske=False,originalpiksler=False))
+  iou,cov=_iou(z[:,:,3]>=128,mask,-8,-8)
+  # Preserve every generated core component, including distant flying prop ends.
+  # Original alpha is used solely to measure, never to cut the new painting.
+  weak=(z[:,:,3]>0)&(z[:,:,3]<=4);_,near=nd.distance_transform_edt(z[:,:,3]<128,return_indices=True);z[weak,:3]=z[near[0][weak],near[1][weak],:3];z[z[:,:,3]==0,:3]=0
+  out=H/(b+'.png');Image.fromarray(z).save(out);lab,n=nd.label(core);areas=np.bincount(lab.ravel())[1:]
+  rec=dict(bilde=b,kall=call,prototype=str(out.relative_to(R)),sha256=sha(out),raa_sha256=sha(C/'raa.png'),snitt_union=iou,dekning=cov,native_ok=iou>=.6 and cov>=.8,originalmaske=False,originalfragment_fallback=False,egen_alfa=True,alle_egne_kjernekomponenter_bevart=True,egen_komponent_areal=areas.tolist(),kilde_komponenter=len(src_parts),egne_komponenter=len(own_parts),separate_egne_fragmenter_plassert=fragmenter,metode=method,egen_boks=[gx,gy,gw,gh],fast_anker_hel_egen_form=whole_fixed,fast_anker_egen_boks_i_native=bounds,affin=aff,proevde_hele_affine=[dict(metode=v[2],snitt_union=v[0],dekning=v[1]) for v in variants]);(R/(b+'-prototype.json')).write_text(json.dumps(rec,ensure_ascii=False,indent=2)+'\n')
+  rec['egne_smaadeler_gjenbrukt']=egne_tillegg;(R/(b+'-prototype.json')).write_text(json.dumps(rec,ensure_ascii=False,indent=2)+'\n');print(b,method,round(iou,3),round(cov,3),rec['native_ok'],flush=True)
+  board=Image.new('RGB',(1536,max(300,Hh+65)),'#344556');d=ImageDraw.Draw(board);d.text((10,8),b+' original',fill='white');d.text((770,8),f'{call} eget maleri {iou:.3f}/{cov:.3f}',fill='white');sim=Image.fromarray(src).resize((W,Hh),Image.Resampling.NEAREST);board.paste(sim,(10,40),sim);im=Image.fromarray(z);board.paste(im,(762,32),im);board.save(R/(b+'-sammenligning.png'))
+shutil.copy2(__file__,R/'plasser.py.txt')
