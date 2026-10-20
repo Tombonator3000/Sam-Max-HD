@@ -1,0 +1,27 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+v=json.loads((R/'mottak-publisert.json').read_text());assert v['native']==2918 and v['nye_native']==30 and v['alle_filhash_bekreftet']
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');heading='Første Sam029-bunke publisert, '+stamp
+body=f'''Åtte nye hele figurark fig029_01 til08 er laget, egenkontrollert, visuelt sett og native mottatt. 30nye rutekoblinger fra11hele malerier og19ekstra eksakte hele RGBA-aliasmål. Seks faktiske innebygde image_gen-kall med råbilder og faktiske prompter er bevart. Fire kall brukes i denne bunken. Tauforbindelsene i1920 og1932 er rettet ved omtegning. To små egne taufliser fra egne malerier er kildebelagt og gjenbrukt. Ingen originale piksler, hard originalsilhuettmaske eller senkede grenser. Ingen motor-/pipelineendring eller ny Tom-/Claude-godkjenning.
+
+Primærskript65 og originalscenen viser Sams hånd og blågrå erme ved bindingstauet rundt kvinnen i rom5. Synlig grep og slipp, ikke bevis for at alle knuter løsnes. Godkjent Sam-hovedark og stilanker er brukt. Alle8ark og30automatisk native OK. Alle11ulike original/native/motor, åtte hele resultatark, åtte hele motorbilder og tre før/etter er sett. Samme publiserte Linux-binær4440ce2e på grunnlag2888 og kandidat2918:240kontroller,239null og samme160 ved36før første figurtegning60. Alle211fra60null; ingen nye eller økte avvik. Tre før/etter har0endringer utenfor nytt håndlag og marg. Alle30nye er motorlogget. Tvungen kildekorrekt aktor10/kostyme29/pos267109, ikke naturlig gjennomspilling.
+
+Publisert og hentet hd-mod {v['hd_mod']},2918native. Grafikkilde {v['grafikkilde']}. Alle21161filer og21155PNG-er SHA-bekreftet. Alle21131tidligere filstier og21125tidligere PNG-er,1000beskyttede jobbfiler og tre opprinnelige stasher er bevart.404av1758hele figurjobber har resultat;1354gjenstår pluss returer,katalogfeil og sluttkontroll. All grafikk er ikke ferdig.
+
+Siste ferdige fellespakke er fortsatt2888: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-kontor044. Nye Linux-/Windows-pakker for2918 bygges én gang per plattform etter grønn CI. Faktiske nedlastinger,filhash,motor og fellesrelease må bekreftes. Nativefrys på {v['hd_mod']} til da. Ikke gjenta044,029_01til08 eller2888byggene.
+
+Neste er påbegynt029_09til22,40mål. T04råbilde og1950prototype er laget og bevart, ikke levert.1955mangler én liten kildeekte del.1973har en høy grå flekk med langt transparent gap over armen; bevar den og primærplasseringen. Gjenoppta råbildene og prototype fremfor nye duplikatkall. Blokkerte164_04/1943/1944 og øvrige tidligere avvisninger skal ikke omprøves. Ugyldige344/346-katalogruter skal ikke tegnes eller spilles. Rapporter: gpt-arbeid/rapporter/sam029-tau-20261021.
+
+Ekstra uønsket Windows-taggbygg39504399685 avsluttet success på kode4a5f3324. Det er registrert separat fra tilsiktet felles2888-Windows39501496632. Ingen ekstra dispatch, omprøve eller kansellering. Taggfilteret er ikke rettet. Kjent inventarikon-RGB i eksplosjonsbildet fra044 er fortsatt uavklart; de to1000-rammers prøvene stoppet ved387 og er ikke fullført. Full naturlig gjennomspilling,interaktiv Windows-/ny webtest,historiske SDL-/testhoppstans og inventarkant35 står åpne.
+
+Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Aktiv grafikkautomatikk fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke. Main får bare memory,todo,STATUS og log.
+'''
+for name in ['memory.md','todo.md','STATUS.md']:
+    p=P/name;s=p.read_text();first,rest=s.split('\n',1);assert heading not in s
+    p.write_text(first+'\n\n## '+heading+'\n\n'+body+'\n'+rest.lstrip('\n'))
+p=P/'log.md';p.write_text(p.read_text().rstrip()+'\n\n## '+stamp+' (Codex)\n\n'+body+'\n')
+(R/'RAPPORT.md').write_text('# Første Sam029-bunke\n\n'+body)
+shutil.copy2(__file__,R/'oppdater-hoved-publisert.py.txt');print(heading,flush=True)
