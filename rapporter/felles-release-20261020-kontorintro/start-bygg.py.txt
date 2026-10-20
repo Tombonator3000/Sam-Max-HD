@@ -1,0 +1,27 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,subprocess,shutil,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-kontorintro';R=A/'rapporter'/O.name
+O.mkdir(exist_ok=True);R.mkdir(exist_ok=True)
+api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+assert not(O/'bygg-startet.json').exists(),'State exists; resume instead of dispatch again'
+code=api('git/ref/heads/main')['object']['sha'];mod=api('git/ref/heads/hd-mod')['object']['sha'];assert code=='7a439be29a6ef6e7c42c6c1c6be10c201041bb28' and mod=='887aa441386ee48a52c430bc8232f3c235dd5a16'
+assert api('actions/runs/39422700837')['conclusion']=='success'
+prior=api('releases?per_page=100');tag='sam-max-hd-2026-10-20-kontorintro';assert not any(v['tag_name']==tag for v in prior)
+active=[v for v in api('actions/runs?per_page=20')['workflow_runs'] if v['name'] in ['Linux-pakke','Windows-pakke'] and v['status']!='completed'];assert not active,active
+for d in [O,R]:(d/'releaser-foer-bygg.json').write_text(json.dumps(prior,indent=2)+'\n')
+shutil.copy2(A/'rapporter/sam-max-kontor041-slutt-20261020/publiserte-moddfiler-2527.json',R/'moddfiler-2527.json')
+state=dict(start_utc=datetime.now(timezone.utc).isoformat(),kode=code,hd_mod=mod,native=2527,nye_native=49,hele_kontor041_native=49,figurjobber_med_resultat=343,release_tag=tag,status='native_fryst_to_bygg_startes_en_gang_hver',plattform={})
+def save():
+ for d in [O,R]:(d/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+save()
+for platform in ['linux','windows']:
+ assert api('git/ref/heads/hd-mod')['object']['sha']==mod and api('git/ref/heads/main')['object']['sha']==code
+ state['plattform'][platform]=dict(status='dispatch_forsokt',dispatch_utc=datetime.now(timezone.utc).isoformat());save()
+ p=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,text=True,capture_output=True)
+ row=state['plattform'][platform];row.update(dispatch_exit=p.returncode,stdout=p.stdout,stderr=p.stderr);save();assert p.returncode==0,(platform,p.stderr)
+ m=re.search(r'/actions/runs/(\d+)',p.stdout);assert m,('Find run manually,do not dispatch again',p.stdout)
+ row.update(run_id=int(m[1]),status='queued');save();print(platform,row['run_id'],flush=True)
+state['status']='native_fryst_begge_bygg_startet';save()
+(R/'PAAGAR.md').write_text(f'Pakkecheckpoint:49 nye kontorruter,343 hele resultatark,2527 native. Native {mod} fryses til begge bygg har sikret samme grafikk. Kode {code}. Linux {state["plattform"]["linux"]["run_id"]},Windows {state["plattform"]["windows"]["run_id"]}. En dispatch per plattform. Last ned og SHA-kontroller faktiske pakker før felles release. Tidlig160-avvik i romåpningen er kjent,ikke erklært rettet. Kildeklargjør neste164_01 til05 mens bygg går. Ikke gjenta bygg.\n')
+shutil.copy2(__file__,R/'start-bygg.py.txt');print('native frys aktiv;previous releases',len(prior),flush=True)
