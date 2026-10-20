@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image
+import json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam-sugepil-345-20261020';O=P/'out/sam-sugepil-345-20261020'
+q=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];rows=[]
+for letter,v in zip('ABCD',q):
+ name=v['bilde'];j=json.loads((A/'jobber'/v['kildejobb']/'jobb.json').read_text());s=Image.open(A/'jobber'/v['kildejobb']/'original_1x.png').convert('RGBA');x,y,w,h=v['rekt'];im=s.crop((x,y,x+w,y+h)).resize((w*4,h*4),Image.Resampling.NEAREST);canvas=Image.new('RGBA',(1536,1024),(160,160,160,255));xy=((1536-w*4)//2,(1024-h*4)//2);canvas.alpha_composite(im,xy);target=R/f'kilde-{letter}01-{name}.png';canvas.save(target)
+ prompt=(A/'jobber'/v['kildejobb']/'prompt.txt').read_text()
+ correction=f'''
+KILDEBEKREFTET PRODUKSJONSRETTELSE. The generic original prompt above mistakenly says eggplant. The exact source excerpt and actual room92 animation show Sam's partially occluded upper body and hands reaching at the large fixed golden heart pedestal. NO EGGPLANT is present in the drawn source pixels. Do NOT invent it. The magenta gaps are transparent cutout/occluded regions, not a purple object, color or prop. Preserve these empty regions and all partial fragments. Source script room92 local201 uses actor6 at159,101,scale255 and costume345 chore6 then7.
+This call generates ONLY {name}, one source pose from the attached derived source crop. Ignore the original whole-sheet instructions about multiple frames. Output a single transparent 1536x1024 PNG, with the EXACT same visible shape and arrangement as Image1. Source content occupies {w*4}x{h*4} pixels, top-left {xy[0]},{xy[1]}, unchanged proportion, no floor or shadow.
+Image1 determines exact pose, silhouette, occluded cuts, internal transparent gaps, warm orange skin, brown suit and brown fedora, cream shirt and black/slate tie. Image2 is Sam's approved master for identity and smooth linework ONLY, not blue colors. Image3 is already controlled warm Sam production for consistent local palette/line quality.
+Translate pixel contours to smooth hand-drawn cartoon outlines with clear flat colors and restrained shadows. Keep the tall wrinkled fedora with black band, long floppy ear, small narrow black eyes and elongated muzzle. The dark slate oval on his muzzle is his NOSE, not an open mouth. Do not add teeth or tongue. Hands have the exact visible lobes/fingers and pose shown, no extra glove. Preserve the literal missing pieces behind the scene's foreground heart. Do NOT complete them. Detached hand/finger fragments on the right and tiny dark fragment between muzzle and hand are intentional where present. Keep them exactly located and sized. Do not join these disconnected parts with new limbs.
+No magenta or gray pixels or background; every padding/cutout region has real alpha. No new objects, hats, hands, facial features, symbols, framing, grid, text or labels. Do not outline the straight bottom/left crop edges: they continue off the camera. Preserve source count and composition. Four source pixels become sixteen output pixels without changing size.
+'''
+ full=prompt+'\n'+correction
+ args=dict(prompt=full,referenced_image_paths=[str(target),str(A/'hovedark/sam.png'),str(A/'rapporter/bestilling12-20261020/costume346_1793-prototype.png')],transparent_background=True)
+ (R/f'prompt-{letter}01.txt').write_text(full);(R/f'bildekall-{letter}01.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n');rows.append(dict(kall=letter+'01',bilde=name,kildejobb=v['kildejobb'],args=f'bildekall-{letter}01.json',kilde_xy=list(xy),maal=[w*4,h*4],status='klargjort',rettelse='Ingen aubergine, kildebekreftede gjennomsiktige utelatelser og separate hender/fragmenter beholdes.'))
+(R/'bildekall.json').write_text(json.dumps(dict(kall=rows),ensure_ascii=False,indent=2)+'\n')
+(R/'KILDEGRUNNLAG.md').write_text('''# Sam ved hjerteobjektet, kostyme345
+
+Ti ark01 til10 med11 runtime-ruter fra fire eksakt ulike hele kildeutsnitt. Rom92, varm brun/orange Sam, aktør6 ved159,101,scale255,clip0. Lokalt201 spiller345 chore6 og7 før346. Start/chore1 viser samme første sekvens og er grunnlagsprøvd: alle11 aktuelle ruter finnes blant40 tegnet,80 skjermbufferkontroller null. Hovedarket styrer Sams identitet, rommets originalpalett styrer de varme fargene.
+
+Promptens aubergine-beskrivelse er feil for de faktiske tegnede kildene. Det er flere magenta/gjennomsiktige utelatelser i kropp, snute og hender, inkludert adskilte høyre fingre og en liten mørk strek. De fylles ikke med en ny grønnsak eller lemmer. Motorbildet viser hjerteobjektet foran Sam. Fire kildeutsnitt viser samme fragmentering. Ingen palettindeks13 i disse fire uttrekkene; utelatelsene er ikke skygge som skal nytegnes. Behold reell alfa og alle kildebekreftede små deler.
+
+Den nye produksjonsprompten er original jobbprompt etterfulgt av presis, kildebegrunnet rettelse for ett utsnitt. Beskyttede jobb-/promptfiler endres ikke. Nye bildekall er lagret før utførelse. Sam-master og kontrollert346_1793-prototype er stilreferanser, ikke geometri for ny pose.
+''')
+shutil.copy2(__file__,R/'lag-bildekall.py.txt')
+print('4 calls prepared, actual prompts and arguments saved.')

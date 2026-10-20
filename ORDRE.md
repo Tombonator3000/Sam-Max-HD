@@ -16,6 +16,8 @@ Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENT
 
 ## Gjør disse nå
 
+2026-10-20 03:41:345_01 til10 er produsert og kontrollert,11 native,kandidat2227,238resultatark. Egenkontroll/native11OK,alle11sett/motorobservert,80nullkontroller. Seks bildekall,fireråbilder brukt. Se sam-sugepil-345-20261020/RAPPORT.md og mottak-publisert.json for faktiskpublisering.346_27 til43 skal ikke produseres før kildefeil er rettet: ekstra tabelloppslag36 overlapper første ekte lagmaske. Se alkove-siste-20261020/KILDEFEIL.md. Neste345_11 til20,ti eksaktlike kilder til1923. Behold tidligere publiserte PNG-er og stasher. Pakkene2134er93bak kandidat.
+
 Publiseringskvittering: fig346_18 til26 i hd-mod 482f0e52f6a59ed383d84a2ca3e9e0ea1f6fc056,2216 native, kilde 3912fe5dac74fce9ada70e88283ac93d3b8ac959.17 nye runtime-ruter fra eksakt samme hele kilder,ingen nye bildekall.20452 kandidat-PNG-er og20435 tidligere PNG-er bekreftet etter hent.36 nye+40 tidligere kildefiler og tre stasher bevart.17 visuelt sett/motorobservert,80 nullkontroller.228 av1758 resultatark. Neste fig346_27, krev rett animasjon/retning og observasjon av656. Se rapporter/alkove-gjenbruk-20261020/mottak-publisert.json. Pakker2134 er82 bak.
 
 Produksjon 2026-10-20 02:58: fig346_18 til26 kontrollert,17 runtime fra12 eksakt samme hele kilder som tidligere generert grafikk. Ingen nye bildekall.17 native OK,15 egenkontroll OK,to SJEKK,ingen FEIL. Alle17 sett/motorobservert,80 målinger null. Kandidat2216,grunnlag2199.228 av1758 resultatark. Se rapporter/alkove-gjenbruk-20261020/RAPPORT.md og mottak-publisert.json. Neste fig346_27 med egen animasjon9/retning0-observasjon av656. Ikke gjenta08 til26. Pakker2134 blir82 bak.

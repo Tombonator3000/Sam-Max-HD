@@ -11,3 +11,5 @@ Modden har2216, felles Linux-/Windows-pakke2134 er82 bak. Gammel nattkontroll fo
 Faktisk grunnlagsresultat: 21 av44 mål logget i riktig chore9/retning0 fraframe3112, 825 bufferkontroller, 0 avvik. Se grunnlagsproeve-slutt.json. Ikke tell de47 andre rutene fra første fastvalgte9 som dekning. Ingen nye resultatfiler eller bildekall. Motorbilder og logger er grunnlag, ikke nye HD-leveranser.
 
 Kontroll av hele loggen bekrefter fortsatt21 av44 mål, ikke44.95 loggede ruter totalt inneholder74 andre rutenummer og er ikke dekning av målene. Mellomromsparsing er kontrollert uten endring i resultatet.23 mål mangler faktisk i denne prøven; undersøk klipping/andre sekvensfaser med uavhengige prøver før de merkes motorobservert. Ingen nye resultater. Se konkret mangelliste og per-rute-frame/chore/posisjon i grunnlagsproeve-slutt.json.
+
+2026-10-20: KILDEFEIL påvist. Planen over er historisk og skal ikke gjennomføres. Se KILDEFEIL.md og kildefeil-raw36.json. Neste gyldige bunke er sam-sugepil-345-20261020.

@@ -1,0 +1,45 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from smhd.gamedata import read_index,read_rooms,load
+import json,hashlib,struct,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';old=A/'rapporter/alkove-siste-20261020'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+idx=read_index(P/'game/SAMNMAX.000');rooms=read_rooms(P/'game/SAMNMAX.001');data,_=load(P/'game/SAMNMAX.001');rn,rel=idx.costume_dir[346];off=rooms[rn].offset+rel
+b=data[off+8:off+struct.unpack_from('>I',data,off+4)[0]]
+assert b[6]==36 and b[7]==0x61
+p=40;ao=p+34;offsets=[struct.unpack_from('<H',b,ao+2*n)[0] for n in range(37)]
+assert offsets[4]==offsets[24]==146 and offsets[28]==157 and offsets[32]==162 and offsets[36]==7
+assert b[146:148]==b'\x07\x00'
+proof=dict(kostyme=346,rom=92,game_sha256=sha(P/'game/SAMNMAX.001'),cost_offset=off,cost_size=len(b)+8,num_anim_byte=36,ncol=32,data_offsets=74,gyldige_ikke_tomme_valg=[n for n,o in enumerate(offsets[:36]) if o],forste_animasjonsdata=146,siste_ekte_tabellbyte=145,raw36_tabellbyte=[146,147],raw36_offset=7,raw36_lest_fra_forste_lagmaske='07 00',feil='Det siste ekstra tabelloppslaget overlapper første lagmaske, og peker inn i format/palett i stedet for en animasjonsheader.',berorte_jobber=[f'fig346_{n:02}' for n in range(27,44)],berorte_ruter=44,ingen_resultater_laget=True,ingen_kilder_endret=True,ingen_native_endret=True,naturlig_skript='rom92 lokalt201 bruker bare chore6 og7 for346, etter etablering av aktør6 ved159,101.',metode='Dette er en ressursbestemt overlappsfeil. Ikke bytt <= til < globalt: den låste ScummVM-koden tillater selv anim==_numAnim. Riktig retting trenger kontroll av ressursens tabell-/headergrenser og regresjoner.',scummvm_commit=(P/'engine/SCUMMVM_COMMIT').read_text().strip(),primarkilde='https://github.com/scummvm/scummvm/blob/c9091321060acfc8f037767c18f8279a86305b7e/engines/scumm/costume.cpp#L673',pipeline='pipeline/smhd/v6grafikk.py:_anim_frames',testkrok='engine/patches/0001-dighd-hd-grafikk.patch: test classic animations',tidligere_proeve='21 av44 observert bare ved tvunget ugyldig raw36, ikke en naturlig gyldig animasjon eller ferdig HD-leveranse.')
+(old/'kildefeil-raw36.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+(old/'KILDEFEIL.md').write_text('''# Feil premiss i fig346_27 til43
+
+Disse 17 jobbene, 44 ruter, skal ikke produseres som en gyldig animasjon. Kostymetabellen slutter ved byte145. Oppslag36 leser byte146/147, som er lagmasken07 00 til den første ekte animasjonen. Den får dermed offset7 inn i kostymets format/palett. Dette er målt i de faktiske spillfilene, se kildefeil-raw36.json. Motorens eksisterende testkrok følger det samme ekstra oppslaget og lager et feil lag-/ruteforløp. At21 av44 ble tvangstegnet, er ikke et gyldig spillforløp.
+
+Lokalt201 viser346 med chore6 og7, ikke9. De gyldige346-jobbene01 til26 er allerede publisert, og ingen av dem endres. Ikke gjenta den lange raw36-prøven. Ingen nye resultatfiler, bildekall eller native er laget for27 til43. Beskyttede filer er beholdt og jobber står åpne med kildefeil, ikke ferdig eller godkjent.
+
+Koden må senere få ressursgrensekontroll gjennom en testet PR. Ikke endre numAnim-sammenligningen globalt ut fra dette ene funnet; ScummVMs låste kode tillater selv siste indeks. Eksisterende publisert grafikk bevares. Fortsett uavhengig gyldig produksjon med fig345_01, Sam i samme kildebekreftede alkove.
+''')
+(old/'KLARGJORT.md').write_text((old/'KLARGJORT.md').read_text()+'\n2026-10-20: KILDEFEIL påvist. Planen over er historisk og skal ikke gjennomføres. Se KILDEFEIL.md og kildefeil-raw36.json. Neste gyldige bunke er sam-sugepil-345-20261020.\n')
+R=A/'rapporter/sam-sugepil-345-20261020';O=P/'out/sam-sugepil-345-20261020';R.mkdir();O.mkdir()
+rows=[];unics={};protected={}
+for n in range(1,11):
+ job=f'fig345_{n:02}';d=A/'jobber'/job;assert not(d/'resultat.png').exists() and not(d/'retur.md').exists();j=json.loads((d/'jobb.json').read_text());im=Image.open(d/'original_1x.png').convert('RGBA')
+ for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:protected[f'jobber/{job}/{f}']=sha(d/f)
+ for c in j['ruter']:
+  x,y,w,h=c['rekt'];src=im.crop((x,y,x+w,y+h));key=(src.size,hashlib.sha256(src.tobytes()).hexdigest())
+  if key not in unics:unics[key]=dict(bilde=c['bilde'],kildejobb=job,rekt=c['rekt'],rgba_sha256=key[1],malruter=[])
+  unics[key]['malruter'].append(dict(jobb=job,bilde=c['bilde'],rekt=c['rekt'],animasjon=c['animasjon'],retning=c['retning'],lag=c['lag']))
+ rows.append(dict(jobb=job,ruter=len(j['ruter']),kostyme=345,rom=92,animasjon=1))
+for f,v in [('klargjort.json',rows),('ruteplan-unik.json',dict(ruter=list(unics.values()))),('beskyttede-kilder.json',protected)]:(R/f).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+base={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in (P/'mods/gpt').rglob('*') if p.is_file()};(R/'grunnlag-filer-482f0e52.json').write_text(json.dumps(base,indent=2)+'\n')
+for page in range(2):
+ subset=rows[page*5:page*5+5];board=Image.new('RGB',(1560,1665),'#3d454b');draw=ImageDraw.Draw(board)
+ for i,row in enumerate(subset):
+  im=Image.open(A/'jobber'/row['jobb']/'original_1x.png').convert('RGB');im=im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST);board.paste(im,(i%2*780+12,i//2*555+35));draw.text((i%2*780+12,i//2*555+10),row['jobb'],fill='white')
+ board.save(R/f'originalreferanser345-del{page+1}.png')
+for f in ['kildeskript-rom_092-inngang.txt','kildeskript-rom_092-lokal_201.txt']:shutil.copy2(old/f,R/f)
+s=(P/'out/alkove-gjenbruk-20261020/motor-baseline.py').read_text().replace('alkove-gjenbruk-20261020','sam-sugepil-345-20261020').replace('==2199','==2216').replace('grunnlag2199','grunnlag2216').replace('346','345').replace('[(345,7)]','[(345,1)]')
+(O/'motor-baseline.py').write_text(s)
+shutil.copy2(__file__,R/'klargjor.py.txt')
+print('Source issue346 documented;345 prepared:',len(rows),'jobs',len(unics),'unique',len(protected),'protected')
