@@ -22,3 +22,5 @@ Spillet og grafikken tilhører Disney/Lucasfilm.
 Linux-binær SHA256 ea4f35ca22d2c5e09ad8daa22904e9fd6bbd7089321e0ef5cf6c62fe809d190e. Alle 29 tidligere releaser og vedlegg bevares.418av1758hele figurjobber har resultat,1340gjenstår pluss returer,katalogfeil og sluttkontroll.1000beskyttede kilder/tre stasher bevart. Fellespublisering og Latest bekreftes separat.
 
 Fellesrelease og Latest er bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-tau029-slutt. Nativefrys frigitt.
+
+Samlet oversikt over de sju nye innebygde bildeverktøykallene, faktiske prompter, råbilder og de14leverte arkene: [bildekall-og-leveranser.json](bildekall-og-leveranser.json). Tidligere eget bildegrunnlag og kildeidentiske aliaser er oppgitt separat.
