@@ -14,3 +14,5 @@ Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/ra
 Spillet og grafikken tilhører Disney/Lucasfilm.
 
 Linux-binær SHA256 9a7ff473de28d3746a85813595897d7b99a3bd2a1dfdfd5465b43f7e4b2d641e. Alle 15 tidligere releaser og deres vedlegg bevares. Pakken er klar til publisering; se publisert.json for bekreftet Latest-status. 307 av 1758 hele figurjobber har resultat. Fem neste Sam342-ark er kildeklargjort, uten nye bildekall. 572 beskyttede kilder og tre stasher er uendret.
+
+Publisert og Latest bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam342, releaseID 418175304. Alle fire opplastinger og 15 tidligere releaser med assets er kontrollert og bevart. Native-frysen er frigitt.

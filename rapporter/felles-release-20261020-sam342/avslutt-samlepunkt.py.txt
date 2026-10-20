@@ -1,0 +1,32 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/felles-release-20261020-sam342';proof=json.loads((R/'publisert.json').read_text());assert proof['Latest_bekreftet'] and proof['native']==2427 and proof['nullkontroller']==304;now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');url=proof['url'];mod=proof['hd_mod'];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==mod
+N=A/'rapporter/sam342-06til10-20261020';p=N/'KILDEGRUNNLAG.md';t=p.read_text();at=t.index('Native er fryst');t=t[:at]+f'Fellespakken med 2427 er nå kontrollert og publisert: {url}. Alle filer i begge faktiske pakker er verifisert, og native-frysen på {mod} er frigitt. Ikke gjenta disse byggene. Fortsett faktisk produksjon av de fem kildeklare jobbene. Ingen nye bildekall eller resultater er påstått for denne klargjøringen.\n';p.write_text(t)
+for name in ['GRAFIKKLISTE.md','ORDRE.md']:
+ p=A/name;t=p.read_text().replace('Felles 2427 bygger nå; bare 2418-utgaven er ferdig kontrollert foreløpig.',f'Felles 2427 er nå publisert og bekreftet Latest: {url}. Begge faktiske pakker og alle 20669 runtime moddfiler per pakke er kontrollert. 304 sluttbufferkontroller null. Windows besto identisk omprøve; første SDL-startfeil er beholdt som uavklart avvik.').replace('Behold native-frysen til felles-release-20261020-sam342 er kontrollert.','Native-frysen er frigitt etter kontroll av felles-release-20261020-sam342.');p.write_text(t)
+for n in list(range(1,6)):
+ p=A/'jobber'/f'fig342_{n:02}'/'notat.md';p.write_text(p.read_text().replace('1920 og1921','1920 og 1921'))
+for n in range(1,14):
+ p=A/'jobber'/f'fig346_{n:02}'/'notat.md';t=p.read_text()
+ for a,b in [('og13 hele','og 13 hele'),('ogfoer-jobber','og foer-jobber'),(';285','; 285'),('IoU0.74 i1808/1810','IoU 0,74 i 1808/1810'),('(0.721 til0.735 og0.725 til0.745)','(0,721 til 0,735 og 0,725 til 0,745)')]:t=t.replace(a,b)
+ p.write_text(t)
+p=A/'rapporter/sam342-foerste-20261020/kildegrunnlag.json';v=json.loads(p.read_text());v.update(fase='Kildeklargjoering er historisk utgangspunkt; se fremdrift.json for ferdig levering',produksjon_20261020=dict(bildekall=5,resultater=5,native_nye=9,publisert=True,i_fellespakke=True,fellespakke=proof['release_tag']));p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+text=f'''Fellesutgaven er publisert og bekreftet Latest: {url}, releaseID {proof['release_id']}. Begge pakker er fra kode {proof['kode']} og hd-mod {mod}, med 2427 native ruter. Fem nye Sam342-ark gir ni nye ruter; 24 Sam346-kleslag i 13 tidligere ark er rettet med ett sammenhengende maleri. Resultatene er pushet fra grafikkilde eb78cacd893cb982df06397a60ccc22f13cc9c03. Alle nye og rettede ruter er egenkontrollert, native mottatt, visuelt sett og motorobservert. To omrissvarsler er beholdt. Ingen ny Tom-/Claude-godkjenning.
+
+Begge faktiske nedlastinger og SHA-filer, alle 20669 runtime moddfiler per pakke og fire opplastinger er kontrollert mot SHA-digester og størrelser. Grafikkfilene er identiske mellom plattformene og publisert modd. Alle {proof['bevarte_tidligere_releaser']} tidligere releaser og deres vedlegg er bevart. Faktisk Linux-binær SHA256 {proof['linux_binar_sha256']}. Fem pakkeprøver og fem grunnlagsprøver med samme nye binær: inventar, akvarium, cafeteria, 820 bilder fra rom 92s skript og 320 bilder med alle Sam346-klesfasene. Alle ni nye og 24 returer er logget tegnet, 304 sluttbufferkontroller null. Ti hele pakkebilder og to før/etter er visuelt sett. Windows 39392600746 besto startprøven i forsøk 2 med uendret kode og uendrede sjekker. Første SDL_BlitSurface-feil før spillstart er bevart og rotårsaken er ikke fastslått. Linux 39392597428 besto første gang. Én dispatch per plattform, én omprøve av den feilende Windows-jobben. Ikke gjenta dette samlepunktet.
+
+307 av 1758 hele figurjobber har resultat, 1451 gjenstår pluss returer, kildefeil og samlet kontroll. Alle 572 kildefiler kontrollert i denne og neste bunke og de tre opprinnelige stashene er uendret. Neste er fig342_06 til 10, kildeklargjort med ti gyldige ruter fra fem ulike hele RGBA-kilder. Originalark, motorposer, primærskript og godkjent Sam-anker er sett. Ingen nye bildekall eller resultater i denne neste bunken ennå. Native-frysen er frigitt etter kontroll av begge pakker.
+
+Kvittering på gpt-arbeid: rapporter/felles-release-20261020-sam342/publisert.json. Neste kilder: rapporter/sam342-06til10-20261020/NESTE.md. Ingen motor-/pipelineendring, naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Kjent inventarkant i rom 35, tidlig oppstartsfelt og kataloganalysen står fortsatt åpne. Aktiv grafikkproduksjon fortsetter; gammel nattkontroll forblir pauset.'''
+p=P/'STATUS.md';t=p.read_text();p.write_text('# Status\n\n## Felles 2427-pakke bekreftet, '+now+'\n\n'+text+'\n\n'+t.removeprefix('# Status\n').lstrip('\n'))
+p=P/'memory.md';p.write_text(p.read_text()+'\n\n- '+now+': '+text+'\n')
+p=P/'log.md';p.write_text(p.read_text()+f'\n\n## {now} (Codex)\n\n'+text+'\n')
+p=P/'todo.md';t=p.read_text();lines=t.splitlines();out=[]
+for line in lines:
+ if line.startswith('- [ ] Fullfør felles 2427 etter Windows-omprøve'):line=f'- [x] {now}: Felles 2427 publisert og Latest, {url}. Begge faktiske pakker og alle 20669 moddfiler per pakke kontrollert, 304 sluttbufferkontroller null. Windows besto identisk omprøve; første SDL-feil er bevart. Native-frysen er frigitt. Ikke gjenta byggene.'
+ if line.startswith('- [ ] Undersøk den dokumenterte Windows SDL-startfeilen'):line='- [ ] Undersøk årsaken til den første Windows SDL-startfeilen ved anledning. Identisk omprøve besto uten kode-/testendring; første feil er beholdt som uavklart oppstartsavvik. Se felles-release-20261020-sam342/WINDOWS-FEIL.md. Dette er ikke en påstått motorretting.'
+ out.append(line)
+p.write_text('\n'.join(out)+'\n');shutil.copy2(__file__,R/'avslutt-samlepunkt.py.txt');print('Felles2427 bekreftet, fire hoveddokumenter oppdatert. NesteSam342_06til10. Arbeidet er ikke ferdig.',flush=True)

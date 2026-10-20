@@ -1,3 +1,1 @@
-# Fellespakke 2427 bygges
-
-Linux og Windows er sendt én gang hver. Native er fryst ved SHA i bygg-startet.json til begge bygg har sikret riktig innhold. Ni nye Sam342-ruter og 24 rettede Sam346-kleslag skal med. Den ferdige 2418-utgaven bevares og bygges ikke på nytt. Begge faktiske pakker, SHA-filer og alle 20669 runtime moddfiler per pakke skal kontrolleres før fellesutgaven kalles oppdatert. Ingen ny motor-/pipelineendring. Fortsett deretter med fig342_06, etter kilde- og motorkontroll. Gammel nattkontroll forblir pauset.
+Fellespakken er ferdig: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam342. Se publisert.json. Begge faktiske pakker og alle 20669 moddfiler per pakke er kontrollert, 2427 native. Ikke gjenta byggene. Fortsett fra Sam342-jobbene 06 til 10; ingen ny produksjon er påstått for klargjøringen.

@@ -1,1 +1,3 @@
 Fortsett de fem kildeklargjorte Sam342-jobbene 06 til 10. Ti ruter fra fem ulike hele kilder, originaler, motor og anker er sett. Ingen nye bildekall ennå. Les KILDEGRUNNLAG.md og siste retur/fremdrift. Felles 2427 er i bygging og må sikres før ny native publiseres. Ikke gjenta 01 til 05 eller Sam346-klesreturen.
+
+Felles 2427 er nå bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam342. Begge faktiske pakker er kontrollert, og native-frysen er frigitt. Ikke gjenta byggene. Fortsett faktisk image_gen-produksjon av disse fem kildeklare jobbene; de har fortsatt ingen nye bildekall eller resultater.
