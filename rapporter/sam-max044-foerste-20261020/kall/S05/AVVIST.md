@@ -1,0 +1,1 @@
+Egenkontroll avviser rekvisittens mørke hodefelt og røde små ledninger som ikke finnes i kilden. Råfilen bevares. S05R skal tegne samme fire hele ruter med egen kontinuitetsprøve fra S04. Ingen originalmaske eller fragmentbytte.

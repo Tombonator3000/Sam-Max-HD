@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil,subprocess,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam-max044-foerste-20261020';O=Path(__file__).resolve().parent;J=A/'jobber/fig044_05';D=R/'utkast-foer-storrelsesretting';D.mkdir(exist_ok=False)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for p in [J/'resultat.png',R/'costume044_1963-prototype.json',R/'prototyper/costume044_1963.png',R/'fig044_05-egenkontroll.txt']:shutil.copy2(p,D/p.name)
+subprocess.run([str(P/'.venv/bin/python'),str(O/'plasser.py'),'S08'],check=True)
+rows=json.loads((R/'prototyper-endelig.json').read_text());job=json.loads((J/'jobb.json').read_text());canvas=Image.new('RGBA',(1536,1024));mapping=[];v=json.loads((R/'costume044_1963-prototype.json').read_text());assert v['native_ok'] and v['metode']=='hel-boks'
+for c in job['ruter']:
+ row=next(r for r in rows if r['bilde']==c['bilde'])
+ if c['bilde']=='costume044_1963':row['prototype_sha256']=v['sha256']
+ im=Image.open(A/row['prototype']).convert('RGBA');assert sha(A/row['prototype'])==row['prototype_sha256'];x,y,w,h=c['rekt'];dx,dy=(job['plassering'][0]+x)*4-8,(job['plassering'][1]+y)*4-8;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128);row['rect']=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)];mapping.append(row)
+canvas.save(J/'resultat.png');new=sha(J/'resultat.png');t=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True);(R/'fig044_05-egenkontroll.txt').write_text(t.stdout+t.stderr);assert t.returncode==0,t.stdout
+progress=json.loads((R/'fremdrift.json').read_text());e=next(e for e in progress['leveranser'] if e['jobb']=='fig044_05');old=e['sha256'];e['sha256']=new;e['egenkontroll']='OK';(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');(R/'prototyper-endelig.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');(R/'rutekart-fig044_05.json').write_text(json.dumps({'fig044_05':dict(sha256_resultat=new,ruter=mapping)},ensure_ascii=False,indent=2)+'\n');p=J/'notat.md';p.write_text(p.read_text().replace(old,new).replace('Egenkontroll:SJEKK','Egenkontroll:OK')+'\nStørrelsesretting1963:første faste anker ga94%høyde og8%variasjon. Hele eget maleri er plassert med den allerede målte hele-boks-affinen. Ingen del er klippet etter originalen. Alle10ruter og gruppens høyde er nåOK. Første resultat og målinger bevart.\n');shutil.copy2(__file__,R/'replasser-1963.py.txt');print(t.stdout)

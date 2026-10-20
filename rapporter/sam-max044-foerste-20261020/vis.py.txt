@@ -1,0 +1,50 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,re,hashlib,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam-max044-foerste';T=O/'kandidat044-skript066';BT=O/'grunnlag2810-skript066';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(p):return json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+proof=read(R/'motorproeve.json');assert len(proof['sett'])==78 and not proof['mangler'];wanted={v['bilde'] for v in read(R/'native-fast4x-samlet.json')['ruter']};log=(T/'scummvm.log').read_text();obs={};all_draws=[]
+pattern=r'frame (\d+) soft cel\s+(\d+) costume\s*44\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)'
+old_events=re.findall(pattern,(BT/'scummvm.log').read_text());new_events=re.findall(pattern,log);assert len(old_events)==len(new_events)==108 and all(x[1:]==y[1:] for x,y in zip(old_events,new_events));offsets={int(x[0])-int(y[0]) for x,y in zip(old_events,new_events)};assert len(offsets)==1;phase_offset=offsets.pop()
+save(R/'fasefesting.json',dict(identisk_cel_pos_og_maal_i_rekkefolge=True,hendelser=108,grunnlag_minus_kandidat_frame=phase_offset,metode='Sammenlign samme primærskript-cel og geometri etter de loggede hendelsene,ikke bare likt rammenummer.',par=[dict(grunnlag=x,kandidat=y) for x,y in zip(old_events,new_events)]))
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*44\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());name=f'costume044_{n}';shot=(f//4+1)*4;p=T/f'frame_{shot:06}_room007.png';row=dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p) if p.exists() else None,native_sha256=sha(C/'costumes'/(name+'_hd.png')) if name in wanted else None);all_draws.append((name,row))
+ if name in wanted and name not in obs and p.exists():obs[name]=row
+assert set(obs)==wanted,wanted-set(obs);plan=read(R/'ruteplan-unik.json')['ruter'];assert len(plan)==47
+for page in range(math.ceil(len(plan)/4)):
+ sub=plan[page*4:page*4+4];board=Image.new('RGB',(1920,len(sub)*390),'#2c3d47');d=ImageDraw.Draw(board)
+ for i,e in enumerate(sub):
+  name=e['bilde'];v=obs[name];x,y=v['pos'];w,h=v['maal'];original=Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA').resize((w*4,h*4),Image.Resampling.NEAREST);native=Image.open(C/'costumes'/(name+'_hd.png')).convert('RGBA');motor=Image.open(v['fil']).convert('RGBA').crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8))
+  for col,(title,z) in enumerate([('original',original),('ny native',native),('motor '+str(v['bildeframe']),motor)]):
+   z.thumbnail((632,350),Image.Resampling.NEAREST if col==0 else Image.Resampling.LANCZOS);board.paste(z,(col*640,i*390+32),z);d.text((col*640+5,i*390+8),name+' '+title,fill='white')
+ board.save(R/f'original-native-motor-side{page+1}.png')
+whole=[]
+for f in [500,548,612,668,732,796,860,924]:
+ p=T/f'frame_{f:06}_room007.png';out=R/f'sam-max044-motor-{f}.png';shutil.copy2(p,out);whole.append(dict(frame=f,fil=out.name,sha256=sha(out)))
+board=Image.new('RGB',(1920,1260),'#253340');d=ImageDraw.Draw(board)
+for i,v in enumerate(whole):
+ im=Image.open(R/v['fil']).convert('RGB').resize((640,400));board.paste(im,((i%3)*640,(i//3)*420+20));d.text(((i%3)*640+4,(i//3)*420+4),f'originalskript66 frame{v["frame"]}',fill='white')
+board.save(R/'hele-motorbilder-brett.png');save(R/'hele-motorbilder.json',whole)
+diffs=[]
+for f in [548,668,836]:
+ fn=f'frame_{f:06}_room007.png';old_fn=f'frame_{f+phase_offset:06}_room007.png';old=np.array(Image.open(BT/old_fn).convert('RGB'));new=np.array(Image.open(T/fn).convert('RGB'));delta=np.any(old!=new,2);outside=delta.copy();active=[]
+ for name,v in all_draws:
+  if v['bildeframe']==f and name in wanted:
+   x,y=v['pos'];w,h=v['maal'];outside[max(0,y*4-12):min(800,(y+h)*4+12),max(0,x*4-12):min(1280,(x+w)*4+12)]=False;active.append(dict(bilde=name,pos=[x,y],maal=[w,h]))
+ assert not outside.any(),(f,int(outside.sum()),active);diffs.append(dict(frame=f,grunnlag_frame=f+phase_offset,fasefestet=True,aktive_nye_lag=active,endrede_piksler=int(delta.sum()),utenfor_nye_cels_og_marg=0));b=Image.new('RGB',(1280,430),'#253340');dd=ImageDraw.Draw(b);b.paste(Image.fromarray(old).resize((640,400)),(0,30));b.paste(Image.fromarray(new).resize((640,400)),(640,30));dd.text((5,8),f'For {f+phase_offset}/etter {f},samme cel i originalskript66 og samme Linux-binar',fill='white');b.save(R/f'foer-etter-{f}.png')
+save(R/'pikselkontroll.json',diffs);save(R/'motorobservasjoner.json',dict(ruter=78,sett=78,mangler=[],tegninger=obs,originalskript_styrer_animasjonen=True,kostyme_aktor_eller_animasjon_ikke_overstyrt=True))
+frames=[];dur=[];refs=[];last=None
+for f in range(496,937,4):
+ p=T/f'frame_{f:06}_room007.png'
+ if not p.exists():continue
+ z=Image.open(p).convert('RGB').crop((744,128,1280,480));key=hashlib.sha256(z.tobytes()).hexdigest();refs.append(dict(frame=f,fil=str(p),sha256=sha(p)))
+ if key==last:dur[-1]+=67
+ else:frames.append(z);dur.append(67);last=key
+gif=R/'sam-max044-motor.gif';frames[0].save(gif,save_all=True,append_images=frames[1:],duration=dur,loop=0,optimize=False);save(R/'animasjonsproveniens.json',dict(fil=gif.name,sha256=sha(gif),crop=[744,128,1280,480],motorbilder=refs,all78_observert=True,alle47_unike_motorbilder_kontrollark=True,kilde='faktisk Linux-binar med kandidat2888',ikke_full_naturlig_gjennomspilling=True))
+for page in range(2):
+ b=Image.new('RGB',(1536,1064),'#344556');dd=ImageDraw.Draw(b)
+ for i,n in enumerate(range(page*4+1,page*4+5)):
+  p=A/'jobber'/f'fig044_{n:02}'/'resultat.png';z=Image.open(p).convert('RGBA').resize((768,512));x=(i%2)*768;y=(i//2)*532;b.paste(z,(x,y+20),z);dd.text((x+5,y+5),f'fig044_{n:02}',fill='white')
+ b.save(R/f'fire-hele-resultatark-side{page+1}.png')
+shutil.copy2(__file__,R/'vis.py.txt');print('47 unike original/native/motor,78observasjoner,8hele motorbilder,8hele resultatark,3for/etter og faktisk motor-GIF klare.')

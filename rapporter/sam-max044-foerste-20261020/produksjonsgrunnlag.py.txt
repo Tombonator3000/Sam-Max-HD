@@ -1,0 +1,87 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(p):return json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(*args,cwd=P):return subprocess.check_output(['git',*args],cwd=cwd,text=True).strip()
+assert not (R/'grunnlag-produksjon.json').exists()
+assert not git('status','--porcelain') and not git('status','--porcelain',cwd=A)
+remote=git('ls-remote','origin','refs/heads/hd-mod').split()[0];assert remote=='0fb4055dd079779ce22c5cc6535cde17d3ddbe2d'
+files={p.relative_to(M).as_posix():sha(p) for p in sorted(M.rglob('*')) if p.is_file()}
+old=read(A/'rapporter/max028-foerste-20261020/publiserte-moddfiler-2810.json');old=old.get('filer',old)
+assert files==old and len(files)==21053 and sum(f.endswith('.png') for f in files)==21047
+protected=read(R/'beskyttede-samlet.json');assert len(protected)==912 and all(sha(A/f)==h for f,h in protected.items())
+stash=git('stash','list','--format=%H').splitlines();assert stash==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==388
+save(R/'grunnlag-produksjon.json',dict(native=2810,native_sha=remote,art_sha=git('rev-parse','HEAD',cwd=A),main_sha=git('rev-parse','HEAD'),filer=files,stash=stash,hele_figurjobber=388,beskyttede_kilder=912))
+plan=read(R/'ruteplan-unik.json')['ruter'];assert len(plan)==47 and sum(len(x['malruter']) for x in plan)==78
+notes={
+1920:'Both full characters, Sam facing left in three-quarter view with arms relaxed; Max forward with upright ears and closed toothy grin.',
+1921:'Both full characters. Sam begins reaching his right hand toward his open coat, smiling left. Max remains still.',
+1922:'Sam turned slightly left, hands touching at chest inside coat; Max remains still.',
+1923:'Sam bent slightly forward over his hands, left-facing face; Max remains still.',
+1924:'Sam leaning farther over his hands at his chest; preserve bent back and hat tilt, Max remains still.',
+1925:'Sam lower crouching bent over coat, hat tilts down; Max upright and still.',
+1926:'Sam crouching, gaze downward, slightly different coat folds and muzzle; Max still.',
+1928:'Sam crouching lower, chin near coat, hands at left chest; Max still.',
+1930:'Sam bent forward over coat, hands together; Max upright and still.',
+1931:'Sam stretching the peach/orange face-shaped ticking cartoon explosive prop sideways between his hands across chest. Two oval eyes, open mouth and tiny blue wire ends. Max still.',
+1932:'Sam lifting the face-shaped prop by its long orange cord, right arm upward, smiling; small blue wire ends below prop; Max still.',
+1933:'Sam holds prop at the far right by its orange cord, right arm raised sideways. Prop tilted clockwise and mouth open; Max still.',
+1934:'Sam arm raised sideways, prop hangs at the far right below his fist. Keep its exact face tilt and little blue ends. Max still.',
+1935:'Sam raises arm higher, prop still hangs on orange cord with open mouth and oval eyes. Max still.',
+1936:'Sam arm higher, prop closer to his body; head and hat slightly tilted left. Max still.',
+1937:'Sam high raised arm with prop below, slightly different tilted head, blue wire ends. Max still.',
+1938:'Sam raised arm reaches up; prop hangs close under fist, mouth and eyes as source. Max still.',
+1939:'Sam upright and smiling left, prop hangs beneath raised fist. Keep feet and stance. Max still.',
+1940:'Sam mouth closed and stern left, same held prop and raised fist; Max still.',
+1941:'Sam mouth closed, muzzle slightly longer left, raised fist and hanging prop; Max still.',
+1942:'Sam neutral face facing left, raised fist, same hanging prop slightly rotated; Max still.',
+1944:'Sam left-facing long muzzle neutral, hanging prop and raised fist; Max still.',
+1945:'Sam left-facing face, slight mouth/hat difference, raised fist and hanging prop; Max still.',
+1946:'Sam left-facing face, longer muzzle, raised fist and hanging prop; Max still.',
+1950:'HEADLESS OVERLAY BODY ONLY. Both Sam and Max have no head or ears in this source cel because the engine draws their speaking heads separately. Sam raised fist still holds the face-shaped prop. Preserve exactly the flat neck crops and Max torso/arms/tail. Do not add heads, hats or rabbit ears.',
+1951:'Sam full head faces forward, closed mouth, eyes looking forward. Raised fist and hanging prop. Max still forward.',
+1952:'Sam turns head right, his long muzzle points toward the hanging prop. Raised fist. Max forward still.',
+1953:'Sam head right toward prop, drooping ear and slightly changed muzzle. Max forward still.',
+1954:'Sam head right, prop hanging raised, small closed mouth crease. Max forward still.',
+1962:'Sam head forward, one relaxed arm reaches toward Max, raised fist holds prop. Max forward still.',
+1963:'Sam crouches down, forward head low, left hand out near Max, raised fist and prop. Max still.',
+1964:'Sam crouches farther, hat slopes; hanging prop and reaching left arm. Max still.',
+1965:'Sam begins throwing, turns left and swings the stretched face-shaped prop horizontally across chest toward the right. Preserve long orange cord and small blue wire ends. Max still.',
+1966:'Sam turns his broad back to viewer, arm across forehead, swinging long prop low across bottom left in a cartoon stretch pose. Preserve Max behind the swinging cord. Not a new person or scene.',
+1967:'Sam back view, arm stretched left above Max, prop hangs far left; right hand extends right, large back and bent legs. Preserve all contacts.',
+1968:'Sam back view mid throw, the face-shaped prop now arcs over his right shoulder near hat on the right. Max front view still.',
+1969:'Sam back view, the prop is mostly outside the cel at the far right: preserve ONLY the small cropped peach/white/blue prop end shown there, detached from body. Do not complete it.',
+1970:'Sam turned left with hand at chest, Max forward. Far across a large transparent GAP at the right are ONLY the small detached cropped peach/black/white/orange pieces of the prop flying out the window. Preserve exact tiny parts and gap. Do not complete a face or draw a window.',
+1971:'Sam upright left-facing hand near coat, Max forward. Far across a large transparent GAP at right is ONLY a small cropped peach/blue prop edge with blue wire loops. Preserve tiny parts and gap, no complete prop.',
+1976:'Explosion FLASH overlay: Sam and Max at lower left AND TWO TALL white arched window silhouettes behind/right, with thick BLACK curved frames and black crossbars. These white/black windows are intentional opaque art inside this cel, NOT padding. Smooth the arcs and bars faithfully, keep their exact positions, sizes and gaps. Do not draw walls or colored glass. Character colors unchanged.',
+1977:'Explosion SILHOUETTE cel. Both Sam and Max are entirely SOLID BLACK silhouettes in the exact poses shown. Smooth the outer outlines only. No face features, suit lines, colors, shadows or highlights. Transparent outside both silhouettes.',
+1978:'Explosion FLASH overlay: Sam and Max lower left AND TWO TALL white arched window silhouettes behind/right with black arcs and crossbars. White windows must stay OPAQUE. Exact same white/black locations as source, no room background or glass colors. Keep the transparent gaps between characters and windows.',
+1981:'Sam and Max full bodies after flash, Sam facing left and grinning, both arms down. Max ears upright facing forward.',
+1982:'Sam and Max turn forward, Sam head front, Max ears tilt left while face looks forward. Preserve each foot and hand.',
+1983:'Both turn right, Sam muzzle points right, Max in right-facing profile with ears tilted left. Preserve proportions and subtle expression.',
+1988:'Both face right, Sam long muzzle right with neutral mouth, Max right-facing small neutral mouth. Preserve exact profiles.',
+1990:'Both face right, Sam muzzle lifts a little and mouth as source, Max profile stays right. Preserve exact profiles and ears.'}
+base='''Use case: style-transfer. Production animation cel sheet for Sam & Max Hit the Road HD.
+Image 1 is the exact original pixel geometry to redraw on a 1536x1024 transparent canvas. Image 2 is the approved SAM model sheet. Image 3 is the approved MAX model sheet. Images 2 and 3 control identity and clean comic ink style; image 1 ALWAYS controls pose, crop, expression, local colors, positions, sizes and which parts exist.
+Redraw the source cels at EXACTLY their present size and location in each quadrant. Both characters are in the SAME cel. Sam is a big brown dog with a long muzzle, black nose, small oval eyes, drooping ears, blue-gray fedora with black/white band, blue-gray suit, white shirt, blue/black striped tie, brown bare feet and cartoon hands. Max is a small cream rabbit-like creature with two long pink-lined ears, tiny black eyes, little pink nose, broad closed zigzag tooth grin, tiny torso, bare hands and large bare feet. Keep the source proportions; do not enlarge heads, eyes, hands or feet.
+Clean varied dark ink outlines with thin internal lines, flat colors and one restrained cel shade, matching the source blue-gray, warm brown and warm cream palette. Smooth the pixel staircases into natural curves, crisp coat folds and angular source teeth. No dithering, texture, gradients, halo, backdrop, floor, cast shadow, text, labels, panels, grid, watermark or extra props. Preserve every finger that is actually visible and the precise hand/cord contact. Keep all genuine small detached parts. Do not join separate parts across transparent gaps.
+The orange/peach face-shaped object where shown is the game's ticking CARTOON EXPLOSIVE PROP with oval white eyes, a comic open mouth, an orange cord and little blue wire ends, not another body. Follow its exact small shape and its stretching/turning motion, do not invent extra anatomy or details. Paint it ONLY in cels that contain it.
+Some frames deliberately omit heads, or include white window flash patches, or black character silhouettes. Preserve those source distinctions. Do not complete missing heads or cropped flying prop fragments. Bright magenta is padding and must become fully transparent with genuine alpha. Intentional opaque WHITE and BLACK shapes inside the sources must remain opaque.
+Return precisely these separated cels, no others, all in the same positions on the same 1536x1024 canvas. Source-specific instructions:
+'''
+for n in range(12):
+ group=plan[n*4:n*4+4];C=R/'kall'/f'S{n+1:02}';C.mkdir(parents=True,exist_ok=False);canvas=Image.new('RGBA',(1536,1024),(255,0,255,255));rows=[];lines=[]
+ for i,row in enumerate(group):
+  p=P/'work/extract/costumes'/(row['bilde']+'.png');im=Image.open(p).convert('RGBA');assert sha(p)==row['canonical_fil_sha256'];scale=min(7,720//im.width,448//im.height);w,h=im.width*scale,im.height*scale;cx=(i%2)*768;cy=(i//2)*512;x=cx+(768-w)//2;y=cy+(512-h)//2;canvas.alpha_composite(im.resize((w,h),Image.Resampling.NEAREST),(x,y));rows.append(dict(bilde=row['bilde'],celle=[cx,cy,768,512],proxy_rekt=[x,y,w,h],referanseskala=scale,kilde_sha256=sha(p)));pos=['UPPER LEFT','UPPER RIGHT','LOWER LEFT','LOWER RIGHT'][i];lines.append(f'{pos}: visible source {w}x{h} pixels at x={x},y={y}. '+notes[int(row['bilde'].split('_')[-1])])
+ if len(group)<4:lines.append('LOWER RIGHT is empty. Keep it fully transparent.')
+ canvas.save(C/'redigeringsreferanse.png');save(C/'plan.json',dict(ruter=rows,kun_hele_kilder=True));(C/'prompt-brukt.txt').write_text(base+'\n'.join(lines)+'\n')
+ refs=[C/'redigeringsreferanse.png',A/'hovedark/sam.png',A/'hovedark/max.png'];save(C/'referanser.json',[dict(fil=str(p),sha256=sha(p),rolle=['geometri og innhold','Sam-identitet','Max-identitet'][i]) for i,p in enumerate(refs)])
+viewed=[*sorted(R.glob('originalreferanser044-side*.png')),*sorted(R.glob('kildeposer-motor-side*.png')),*sorted(R.glob('kilde044-hel-*.png')),A/'hovedark/sam.png',A/'hovedark/max.png',A/'stil/fig002_01.png',A/'stil/fig003_01.png']
+save(R/'kildevisning.json',dict(sett_i_chat=[dict(fil=str(p),sha256=sha(p)) for p in viewed],semantikk='Sam og Max sammen i kontorintro. Ekte hodeløs overlay1950, tikkende ansiktsformet eksplosiv rekvisitt med små blå ledninger, kast gjennom vinduet, to hvite/svarte vindusglimt og svart silhuett. Primærskript66 styrer alle78; ikke fullfør manglende deler.',tom_godkjenning=False,claude_godkjenning=False))
+shutil.copy2(__file__,R/'produksjonsgrunnlag.py.txt')
+print('2810 publiserte native bevart;388 jobber;912 kilder;3 stasher.12 separate bildekall for47 kilder/78 mål klargjort.')

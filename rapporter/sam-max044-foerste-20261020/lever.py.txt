@@ -1,0 +1,45 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(p):return json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');assert base['native']==2810 and all(sha(P/'mods/gpt'/f)==h for f,h in base['filer'].items())
+prot=read(R/'beskyttede-samlet.json');assert len(prot)==912 and all(sha(A/f)==h for f,h in prot.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==388
+plan=read(R/'ruteplan-unik.json')['ruter'];assert len(plan)==47;protos={}
+for e in plan:
+ v=read(R/(e['bilde']+'-prototype.json'));assert v['native_ok'];v['art']=R/v['prototype'];assert sha(v['art'])==v['sha256'];protos[e['bilde']]=v
+assert protos['costume044_1933']['kall']==protos['costume044_1976']['kall']=='R01'
+assert all(protos[f'costume044_{n}']['kall']=='S05R' for n in [1938,1939,1940,1941])
+progress=dict(leveranser=[],nye_jobber=8,native_rutekoblinger_levert=78,nye_hele_canonical_malerier=47,eksakte_hele_aliasmaal=31,bildekall=14,raabilder=14,brukte_kall=13,grunnlag_native=2810,egen_alpha=True,originalmaske=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False);maps=[]
+for job in [f'fig044_{i:02}' for i in range(1,9)]:
+ J=A/'jobber'/job;j=read(J/'jobb.json');canvas=Image.new('RGBA',(1536,1024));mapping=[]
+ for c in j['ruter']:
+  e=next(p for p in plan if any(t['bilde']==c['bilde'] for t in p['malruter']));v=protos[e['bilde']];src=Image.open(P/'work/extract/costumes'/(c['bilde']+'.png')).convert('RGBA');assert hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256'];im=Image.open(v['art']).convert('RGBA');x,y,w,h=c['rekt'];assert im.size==(w*4+16,h*4+16);dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;assert dx>=0 and dy>=0 and dx+im.width<=1536 and dy+im.height<=1024;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128)
+  mapping.append(dict(bilde=c['bilde'],kostyme=44,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical_rgba_sha256=e['canonical_rgba_sha256'],canonical_fil_sha256=sha(P/'work/extract/costumes'/(c['bilde']+'.png')),prototype=str(v['art'].relative_to(A)),prototype_sha256=sha(v['art']),kall=v['kall'],egen_alpha=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,eksakt_helt_alias=e['bilde'] if e['bilde']!=c['bilde'] else None))
+ assert not (J/'resultat.png').exists();canvas.save(J/'resultat.png');digest=sha(J/'resultat.png');save(R/f'rutekart-{job}.json',{job:dict(sha256_resultat=digest,ruter=mapping)})
+ test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True);(R/f'{job}-egenkontroll.txt').write_text(test.stdout+test.stderr);assert test.returncode in [0,1],(job,'FEIL',test.stdout);state='OK' if test.returncode==0 else 'SJEKK';print(job,state,test.stdout[-220:],flush=True)
+ progress['leveranser'].append(dict(jobb=job,resultat=str((J/'resultat.png').relative_to(A)),sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll=state,egenkontrollert=True,visuelt_kontrollert=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False));maps+=mapping
+ (J/'notat.md').write_text(f'''# {job}, 20. oktober 2026
+
+Codex har tegnet hele044_01..08 med innebygd image_gen.78 native mål fra47 nye hele canonical malerier og31 ekstra mål med identisk hel RGBA.14 faktiske bildekall og råbilder,13 sluttkall brukt. S05 ble returnert for mørkt hodefelt og røde ledninger på rekvisitten. S05R retter hele de fire rutene. R01 retter hele1933og1976, der første maleri lukket Sams kildeekte tannmunn. Første råbilder og faktiske prompter er bevart. Sam- og Max-hovedarkene er godkjente identitetsankere. Egen rekvisittprøve fra S04 styrer bare kontinuitet, den er ikke Tom-godkjent.
+
+Begge figurer er i samme cel under kontorintroen i rom7,primærskript66. Sam tar frem en tikkende ansiktsformet eksplosiv tegneserierekvisitt og kaster den ut vinduet. Primærskriptet skjuler den separate Max-aktoren3 med elevation200 fordi Max allerede finnes i44. Det er ikke en testomgåelse. Originaler,alle47 canonical/motor-motiver,åtte hele motorbilder og begge godkjente stilark er sett før tegning. Kilden låser geometri,uttrykk,palett,grep og små deler. Sam beholder blågrå dress,hatt,svart/blått slips og brune synlige fotstumper. Max er kremfarget,uten klær og med kildeekte korte benutsnitt. Fullførte store føtter fra hovedarket er ikke lagt til.
+
+1950 har begge hoder fjernet fordi separate snakkehoder fra325/326 legges over av motoren.1970og1971 beholder ekte små avkuttede rekvisittdeler langt til høyre,med transparent gap.1976og1978 er to ugjennomsiktige hvite/svarte vindusglimt sammen med figurene.1977 er helt svart silhuett,ikke en ny mørk figurvariant.1990 bevarer Max sitt lukkede profiløye. Ingen personidentitet,gore,ekstra hår eller nye gjenstander er lagt til.
+
+Hvert maleri beholder egen ekte alfa og alle egne kjernekomponenter. Svak generert glød utenfor egen form er fjernet etter egen alfa,med to piksler egen kant. Hvert helt maleri affinplasseres i4x med8HD-marg. Originalalfa brukes bare til måling,aldri som hard klippemaske. Ingen originalpiksler,originalfragment-fallback eller senket kontrollgrense. Gjenbruk bare ved identisk hel canonical RGBA.
+
+Resultat SHA256:{digest}. Egenkontroll:{state}. Native mottak,visuell sluttkontroll,motor,publisering og pakker føres separat. Ingen ny Tom-/Claude-godkjenning. Beskyttede jobb- og kildefiler urørt. Bibliotekskilder:figurark-fast-storrelse og publisert-mod-er-fasit.
+''')
+save(R/'fremdrift.json',progress);save(R/'prototyper-endelig.json',maps)
+for page in range(math.ceil(len(plan)/4)):
+ sub=plan[page*4:page*4+4];board=Image.new('RGB',(1200,len(sub)*420),'#344556');d=ImageDraw.Draw(board)
+ for i,e in enumerate(sub):
+  v=protos[e['bilde']];src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);im=Image.open(v['art']).convert('RGBA');board.paste(src,(16,i*420+50),src);board.paste(im,(610,i*420+42),im);d.text((12,i*420+10),e['bilde']+' original / eget maleri '+v['kall'],fill='white')
+ board.save(R/f'sammenligning-maleri-side{page+1}.png')
+assert len(maps)==78 and len({v['bilde'] for v in maps})==78;assert all(sha(A/f)==h for f,h in prot.items());assert len(list((A/'jobber').glob('fig*/resultat.png')))==396
+shutil.copy2(__file__,R/'lever.py.txt');print('8 hele ark,78 nye mål,47 malerier,396 resultatark',flush=True)
