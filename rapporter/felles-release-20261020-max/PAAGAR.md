@@ -1,5 +1,5 @@
-# Fellespakke 2418 bygges
+# Samlepunktet er ferdig
 
-Linux og Windows er sendt en gang hver. Se bygg-startet.json for eksakte run-id-er og frosne kode-/mod-SHA-er. Ikke send samme samlepunkt på nytt. Ikke publiser mer native før begge bygg har hentet og bekreftet 89a6d754206b096c92dcf2455675a20f80efca00. 19 nye Max341-ruter og Sam346_1801-returen med 581 nye alfapiksler skal med. Kodeendringene siden 4213 er bare dokumentasjon. Siste ferdige fellesrelease er 2399-hjertebytte, ikke bygg den på nytt.
+https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-max er publisert og bekreftet Latest, releaseID 418123708. Se publisert.json. Begge faktiske nedlastinger, SHA-filer, alle 20660 runtime moddfiler per pakke og fire opplastinger er kontrollert. 2418 native, 19 nye Max-ruter og én avgrenset Sam-retur er med. 224 nye pakkebufferkontroller null. Byggene er allerede sendt en gang hver og skal ikke gjentas. Alle tidligere releaser og assets er bevart. Native-frysen på 89a6d754206b096c92dcf2455675a20f80efca00 kan nå frigis for neste kontrollerte bunke.
 
-Hent faktiske pakker og SHA-filer, kontroller alle 20660 runtime moddfiler i begge og ny Linux-avspilling før ny fellesrelease publiseres. Øvrig Sam-retur og neste Sam342-kildearbeid kan undersøkes mens byggene går, uten å endre frossen native. Ingen ny Tom-/Claude-godkjenning, naturlig gjennomspilling eller interaktiv Windows-/webtest er påstått. Aktiv grafikkautomatikk fortsetter; gammel nattkontroll forblir pauset.
+Fortsett grafikkarbeidet fra Sam346-returen og kildegrunnlaget i sam342-foerste-20261020. Ingen ny Tom-/Claude-godkjenning eller naturlig gjennomspilling er påstått. Gammel nattkontroll forblir pauset.

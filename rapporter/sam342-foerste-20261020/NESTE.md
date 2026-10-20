@@ -3,3 +3,5 @@
 Fem hele urørte jobber, ni ruter fra åtte ulike hele kilder. Originaler, skript, gyldig COST-tabell og alle ni faktiske kildeposer er undersøkt. Ingen bildekall eller resultater ennå. Les KILDEGRUNNLAG.md og bruk originalreferanser342-side1..3.png, ni-kildeposer-i-motor.png og stil/fig002_01.png. Fortsett faktisk image_gen-produksjon her etter siste fremdrift/retur, ikke gjenta Max341 eller bygg 2418.
 
 Felles2418-bygg: rapporter/felles-release-20261020-max/bygg-startet.json. Native fryses til begge plattformer har sikret riktig modd. Hent/kontroller faktiske pakker før ny fellesrelease påstås klar. Sams andre klesoverganger er fortsatt en konkret separat retur. Grafikken er ikke ferdig bare fordi antall eller teknisk mottak passer.
+
+Felles 2418-utgave er ferdig kontrollert og publisert: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-max. Native-frysen kan frigis; ikke gjenta disse byggene. Prioriter den gjenværende konkrete Sam346-klesreturen før bredere produksjon. Deretter er disse fem nye Sam342-jobbene klare fra undersøkt kildegrunnlag.

@@ -13,3 +13,5 @@ Kandidat: 2418 native, 20655 PNG-er og 20661 filer. Alle 20642 tidligere filstie
 Siste kantrensing: 11 RGB-piksler med alfa 1 i fire ulike prototyper er renset fra de egne malte kjernefargene. Alfa er byteidentisk. De endelige arkene er tatt inn på nytt og alle 19 ruter er motorprøvd igjen, 205 nullkontroller. Se svakmagenta-rensing.json og myke341-kvittering.json.
 
 2026-10-20 09:22: Publisert og hentet 89a6d754206b096c92dcf2455675a20f80efca00, kilde 64499698496609236927e07ab66648240aa47361. Alle 20655 PNG-er og 20661 filstier er kontrollert. 19 nye native og én avgrenset retur er med. Fellespakken er fortsatt 2399 til nytt samlepunkt er bekreftet.
+
+Fellespakken sam-max-hd-2026-10-20-max er nå publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-max. Begge faktiske pakker og alle 20660 runtime moddfiler per pakke er kontrollert, og alle 19 nye Max-ruter samt Sam-returen er med. Ikke bygg dette samlepunktet på nytt. Neste er konkret Sam346-klesretur og de fem kildeklargjorte Sam342-arkene; det er ingen nye 342-bildekall ennå.
