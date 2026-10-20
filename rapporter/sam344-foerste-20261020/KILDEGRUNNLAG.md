@@ -1,0 +1,9 @@
+# Sam kaster en lilla aubergine mellom hendene
+
+Originalene og faktisk avspilling i rom92 viser en ekte lilla aubergine med grønn stilk. Sam løfter den opp,slipper/kaster den og fanger den med motsatt hånd,mens den roterer. Alle fingre,håndstillinger,grønne stilkblader,fruktens form og retning må følge hver kildepose. Dette er en ny handlingsdel før kostyme345/346 i lokalt201. Her stemmer auberginepremisset i jobbprompten. Ikke overfør345-seriens korrigering om ingen synlig prop til344.
+
+Ti originalark,primærskript ogni kildeposer i motoren er sett. Alle19 aktuelle rutenummer er faktisk observert,80 bufferkontroller null med2283-grunnlaget ogadfdf7fc-binæren.11 ulike hele kilder;åtte andre rutekoblinger er eksakt likeRGBA/størrelse og kan gjenbruke riktig nytegnet kildepose etter kontroll. Dette er kildedekning,ingen ny HD eller nytt bildekall i denne bunken.
+
+Lokal201 ved008A setter344,chore6 og7. Aktør6 ved159,101,scale255,neverZClip;testclip0. Kildeskriptets elevasjon1 mot testkrok0 er dokumentert. Ikke naturlig gjennomspilling. Tyrrkis/cyan i originalarkene er transparent polstring,ikke romfarge eller prop. Den lilla frukten skal bevares;ikke magentakey eller ta bort lillafargen som bakgrunn. Bruk innebygd ektealfa og kontroller RGB med alfa kompositt. Sam-master og tidligere kontrollert varm alkovegrafikk må ses før nye bildekall. Behold brun drakt/hatt,oransje hud,kremgul skjorte oggråsvart slips;ikke bytt til blå standarddrakt.
+
+Det er delvise konturer rundt kroppen fordi hjerteobjektet står foran. Bevar kildens utsparinger og avkuttede deler uten hard originalsilhuettmaske. Ikke lag ny mørk kantstrek ved intern lagdeling. Neste faktiske produksjon er344_01 til10;ingen resultat er laget her ennå. Felles2283-pakkene bygges i felles-release-20261020-sam,hold native uendret til de har sikret grunnlaget.

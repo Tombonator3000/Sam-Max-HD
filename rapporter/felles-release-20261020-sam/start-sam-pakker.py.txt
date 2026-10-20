@@ -1,0 +1,47 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,hashlib,shutil,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-sam';R=A/'rapporter/felles-release-20261020-sam'
+assert not O.exists() and not R.exists()
+def gh(args):return subprocess.check_output(['gh']+args,cwd=P,text=True)
+code=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip()
+assert code==subprocess.check_output(['git','ls-remote','origin','refs/heads/main'],cwd=P,text=True).split()[0]
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True).strip()
+native=subprocess.check_output(['git','rev-parse','origin/hd-mod'],cwd=P,text=True).strip()
+assert native=='9ed54398f31ba742edfc3f724eaa1a1f9df2a085'==subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+assert json.loads((P/'mods/gpt/mod.json').read_text())['costume_cels']==2283
+priorrun={}
+for platform in ['linux','windows']:
+ runs=json.loads(gh(['run','list','--workflow',platform+'.yml','--limit','5','--json','databaseId,status,headSha,event,createdAt']))
+ assert all(v['status']=='completed' for v in runs),(platform,runs)
+ priorrun[platform]=runs
+prior=json.loads(gh(['api','repos/Tombonator3000/Sam-Max-HD/releases?per_page=100']))
+assert not any(r['tag_name']=='sam-max-hd-2026-10-20-sam' for r in prior)
+assert len(prior)==11
+last=json.loads((A/'rapporter/felles-release-20261020-alkove/publisert.json').read_text())
+changed=subprocess.check_output(['git','diff','--name-only',last['kode'],code],cwd=P,text=True).splitlines()
+assert set(changed)<={'memory.md','STATUS.md','todo.md','log.md'}
+O.mkdir();R.mkdir()
+for platform,runs in priorrun.items():(O/('runs-'+platform+'-foer.json')).write_text(json.dumps(runs,indent=2)+'\n')
+for target in [O,R]:(target/'releaser-foer-bygg.json').write_text(json.dumps(prior,indent=2)+'\n')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+manifest={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in(P/'mods/gpt').rglob('*') if p.is_file()};assert len(manifest)==20525
+(R/'moddfiler-2283.json').write_text(json.dumps(manifest,indent=2)+'\n')
+expected=[]
+for folder in ['sam345-tilbake-20261020','sam345-slutthoder-20261020']:expected+=json.loads((A/'rapporter'/folder/'tillegg.json').read_text())['tillegg']
+assert len(expected)==len({e['bilde'] for e in expected})==41 and all(manifest[e['fil']]==e['sha256'] for e in expected)
+(R/'nye-native-41.json').write_text(json.dumps(dict(tillegg=expected),ensure_ascii=False,indent=2)+'\n')
+state=dict(start_utc=datetime.now(timezone.utc).isoformat(),status='startes',kode=code,hd_mod=native,native=2283,nye_native=41,forrige_felles_native=2242,release_tag='sam-max-hd-2026-10-20-sam',main_kun_dokumentasjon_siden_forrige_release=True,plattform={})
+def save():
+ for t in [O,R]:(t/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+save()
+for platform in ['linux','windows']:
+ state['plattform'][platform]=dict(dispatch_forsoek_utc=datetime.now(timezone.utc).isoformat(),status='forespoersel_sendes_ikke_dupliser');save()
+ p=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,text=True,capture_output=True)
+ found=re.search(r'/actions/runs/(\d+)',p.stdout)
+ state['plattform'][platform].update(dispatch_exit=p.returncode,stdout=p.stdout,stderr=p.stderr,status='dispatch_sendt' if p.returncode==0 else 'utfall_maa_undersoekes_ikke_send_igjen')
+ if found:state['plattform'][platform].update(run_id=int(found[1]),run_url=found[0])
+ save();assert p.returncode==0,(platform,p.stderr)
+state['status']='begge_dispatch_sendt_en_gang';save();shutil.copy2(__file__,R/'start-sam-pakker.py.txt')
+(R/'PAAGAR.md').write_text(f'# Samlepunkt2283 startet\n\nBegge plattformbygg er sendt én gang fra main{code},hd-mod{native},41 nye siden2242. Se bygg-startet.json for faktiskrun-ID. Ikke send dem på nytt. Hold hd-mod uendret mens byggene sikrer grunnlaget. Hent ekte nedlastinger,og kontroller begge SHA-filer,alle20524 runtime moddfiler og relevant motor før en fellesrelease publiseres eller kalles oppdatert. Tidligere fellesreleaser bevares;plattformtaggene oppdateres som vanlig. Uavhengig kildearbeid344_01 til10 kan fortsette.\n')
+print(json.dumps(state,ensure_ascii=False),flush=True)

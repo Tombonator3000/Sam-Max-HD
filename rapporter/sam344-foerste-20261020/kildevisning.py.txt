@@ -1,0 +1,19 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image,ImageDraw
+import json,re,hashlib,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam344-foerste-20261020';O=P/'out/sam344-foerste-20261020';h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];expected={v['bilde'] for p in plan for v in p['malruter']};log=(O/'baseline344-anim1/scummvm.log').read_text();draws={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*344 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,hh=map(int,m.groups());name=f'costume344_{n}';p=O/'baseline344-anim1'/f'frame_{f+4:06}_room092.png'
+ if name in expected and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,hh],fil=p.name,sha256=h(p))
+assert set(draws)==expected and len(draws)==19
+row=json.loads((R/'motor-baseline.json').read_text())[0];assert len(row['kontroller_med_frame'])==80 and not any(v['avvik'] for v in row['kontroller_med_frame'])
+selected=[plan[i]['bilde'] for i in [0,1,2,3,4,5,7,9,10]];board=Image.new('RGB',(1920,1275),'#243340');d=ImageDraw.Draw(board);seenframes=set()
+for i,name in enumerate(selected):
+ meta=draws[name];p=O/'baseline344-anim1'/meta['fil'];im=Image.open(p).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));d.text((x+6,y+5),f'{name},frame{meta["bildeframe"]},grunnlag2283',fill='white');seenframes.add(meta['bildeframe'])
+board.save(R/'ni-kildeposer-i-motor.png')
+j=dict(utc=datetime.now(timezone.utc).isoformat(),status='originalark og tidligere seks motorbilder sett;nytt ni-bilders kontaktark må ses',jobber=10,ruter=19,ulike_hele_kilder=11,beskyttede_filer=40,native_grunnlag=2283,hd_mod_sha='9ed54398f31ba742edfc3f724eaa1a1f9df2a085',ruter_motorobservert=19,bufferkontroller=80,nullkontroller=80,binar_sha256=row['binar_sha256'],ny_grafikk_laget=False,bildekall=0,naturlig_gjennomspilling=False,source_representanter=selected,tegnede_ruter=draws)
+(R/'kildevisning.json').write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n')
+with zipfile.ZipFile(R/'grunnlagsmotorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:z.write(O/'baseline344-anim1/scummvm.log','baseline344-anim1/scummvm.log')
+shutil.copy2(__file__,R/'kildevisning.py.txt');print('Alle19 kilder observert;80 nullkontroller. Ni bilder valgt etter faktisk logg f+4.',flush=True)

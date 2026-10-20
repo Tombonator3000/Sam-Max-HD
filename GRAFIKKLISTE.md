@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-20 04:59:269 av1758 figurjobber har resultat. Fig345_36 til41 har27 egenkontrollerte native,kandidat2283,alle27 sett/motorobservert. Publisering bekreftes separat i sam345-slutthoder-20261020/mottak-publisert.json. Neste344_01 til10. Pakken2242 er41bak kandidaten.
+Oppdatert 2026-10-20 04:59:269 av1758 figurjobber har resultat. Fig345_36 til41 har27 egenkontrollerte native,publisert2283,alle27 sett/motorobservert. Publisering bekreftes separat i sam345-slutthoder-20261020/mottak-publisert.json. Neste344_01 til10. Pakken2242 er41bak kandidaten.
 
 263 av 1758 figurjobber har resultat,2256 native er publisert og hentet tilbake. Neste fig345_36 til41 er kildeklargjort (27 ruter,15 ulike kilder),men ikke tegnet. Fellespakken2242 er publisert og kontrollert,14 etterfølgende ruter kommer ved neste samlepunkt. Se sam345-slutthoder-20261020/KLARGJORT.md og sam345-tilbake-20261020/mottak-publisert.json.
 
