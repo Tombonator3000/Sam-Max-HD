@@ -1,0 +1,9 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;state=json.loads((O/'bygg-startet.json').read_text());tag=state['release_tag'];assert not(O/'publisering-forsokt.json').exists();assert subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/ref/heads/hd-mod','--jq','.object.sha'],cwd=P,text=True).strip()==state['hd_mod'];attempt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),tag=tag,kode=state['kode'],hd_mod=state['hd_mod'],utfall='forsokes')
+for D in [O,R]:(D/'publisering-forsokt.json').write_text(json.dumps(attempt,indent=2)+'\n')
+cmd=['gh','release','create',tag,'--target',state['kode'],'--title','Sam & Max HD for Linux og Windows, 2609 HD-lag','--latest','--notes-file',str(O/'utgivelse-notat.md')]+[str(O/p/n) for p,n in [('linux','SamMaxHD-x86_64.AppImage'),('linux','SamMaxHD-x86_64.AppImage.sha256'),('windows','SamMaxHD-Windows.zip'),('windows','SamMaxHD-Windows.zip.sha256')]]
+r=subprocess.run(cmd,cwd=P,text=True,capture_output=True);attempt.update(exit=r.returncode,stdout=r.stdout,stderr=r.stderr,utfall='kommando_avsluttet')
+for D in [O,R]:(D/'publisering-forsokt.json').write_text(json.dumps(attempt,indent=2)+'\n')
+shutil.copy2(__file__,R/'publiser-release.py.txt');print(r.stdout,r.stderr,flush=True);assert r.returncode==0,'Avklar faktisk release,ikke opprett ny'

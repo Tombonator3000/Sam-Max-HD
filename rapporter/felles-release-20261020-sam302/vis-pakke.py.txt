@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,numpy as np,re
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();items=[];T=O/'pakke2609-sam302-anim6';B=O/'grunnlag2559-sam302-anim6';MOD=O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+cases=[('rom92-skript',64,92),('rom92-skript',92,92),('rom92-skript',784,92)]+[('sam302-anim6',f,59) for f in [64,100,148,212,232,260]]+[('inventory',120,30),('akvarium',200,16),('cafeteria',200,30)]
+board=Image.new('RGB',(1920,1700),'#263441');dr=ImageDraw.Draw(board)
+for i,(scene,f,room) in enumerate(cases):
+ p=O/f'pakke2609-{scene}/frame_{f:06}_room{room:03}.png';dest=R/f'pakke-{scene}-{f}.png';shutil.copy2(p,dest);items.append(dict(scene=scene,frame=f,rom=room,fil=dest.name,sha256=sha(dest)));im=Image.open(p).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;board.paste(im,(x,y+25));dr.text((x+5,y+5),f'{scene} {f}, faktisk pakke2609',fill='white')
+board.save(R/'tolv-hele-pakkebilder.png');(R/'motorbilder.json').write_text(json.dumps(items,indent=2)+'\n')
+for page in range(2):board.crop((0,page*850,1920,(page+1)*850)).save(R/f'hele-pakkebilder-side{page+1}.png')
+draws={};wanted={f'costume302_{c}' for c in range(1920,1970)}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*302 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',(T/'scummvm.log').read_text()):
+ f,cel,x,y,w,h=map(int,m.groups());name=f'costume302_{cel}';shot=(f//4+1)*4;p=T/f'frame_{shot:06}_room059.png'
+ if name in wanted and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p),native_sha256=sha(MOD/'costumes'/(name+'_hd.png')))
+assert set(draws)==wanted
+pix=[]
+for f in [64,164,244]:
+ name,v=next((n,v) for n,v in draws.items() if v['bildeframe']==f);p=f'frame_{f:06}_room059.png';old=np.array(Image.open(B/p).convert('RGB'));new=np.array(Image.open(T/p).convert('RGB'));delta=np.any(old!=new,2);x,y=v['pos'];w,h=v['maal'];outside=delta.copy();outside[max(0,y*4-10):min(800,(y+h)*4+10),max(0,x*4-10):min(1280,(x+w)*4+10)]=False
+ assert not outside.any(),(f,int(outside.sum()));pix.append(dict(frame=f,bilde=name,endrede_piksler=int(delta.sum()),utenfor_cel_og_marg=int(outside.sum())))
+ b=Image.new('RGB',(1280,430),'#253340');dd=ImageDraw.Draw(b);b.paste(Image.fromarray(old).resize((640,400)),(0,30));b.paste(Image.fromarray(new).resize((640,400)),(640,30));dd.text((6,6),f'For/etter sam302 frame{f},samme nye faktisk pakkebinaer',fill='white');b.save(R/f'fall-for-etter-{f}.png')
+frames=[Image.open(v['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS) for n,v in draws.items()];gif=R/'sam302-50-nye-poser-faktisk-pakke.gif';frames[0].save(gif,save_all=True,append_images=frames[1:],duration=120,loop=0,optimize=False)
+(R/'pakke-pikselkontroll.json').write_text(json.dumps(pix,indent=2)+'\n');(R/'motorobservasjoner50.json').write_text(json.dumps(dict(ruter=50,sett=50,tegninger=draws),indent=2)+'\n');(R/'animasjonsproveniens.json').write_text(json.dumps(dict(fil=gif.name,sha256=sha(gif),faktiske_motorbilder=[dict(bilde=n,frame=v['bildeframe'],sha256=v['sha256']) for n,v in draws.items()],visning_ms=120,naturlig_gjennomspilling=False),indent=2)+'\n');shutil.copy2(__file__,R/'vis-pakke.py.txt');print('12 whole packageimages,3beforeafter and50pose actual package GIF ready',flush=True)

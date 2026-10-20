@@ -1,0 +1,1 @@
+Ferdig samlepunkt: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam302. Latest og2609 native i begge faktiske pakker bekreftet. Fortsett047_01 til05 etter kildeavklaring,ikke gjenta302 eller byggene.164_04 forblir blokkert.
