@@ -1,5 +1,14 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-20 16:28
+
+- [x] Ni nye164-ark/32 native publisert og i faktisk kontrollert felles2559: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-fall164. Alle tidligere grafikkfiler/releaser og tre stasher bevart. Ikke gjenta164 eller disse byggene.
+- [x] Begge faktiske pakker og20801 runtime moddfiler per pakke kontrollert,alle32nye sett i Linux.304 kontroller,303 null,samme kjente tidlige160-avvik. Ingen nye/økte avvik. Native-frys frigitt.
+- [ ] Fig164_04 og1943/1944 er blokkert av bildeverktøyets sikkerhetsavvisning. Ingen omprøve eller omgåelse. De to originalfallback-rutene er ikke egen HD.
+- [ ] Fortsett faktisk produksjon av kildeklare fig302_01 til05,29 mål fra21 unike kilder. Se Sam-anker og sam302-foerste-20261020/KILDEGRUNNLAG.md før kall. Bevar tynn hyssing,kveil og bevegelsesstreker.756 beskyttede kilder og tre stasher skal bevares.
+- [ ] Øvrige1406 hele figurjobber,returer,katalogfeil og samlet sluttkontroll gjenstår.352 av1758 har resultat. Ingen ny Tom-/Claude-godkjenning. Ikke kall all HD-grafikk ferdig.
+- [ ] Tidlig160-avvik36,Windows SDL-startfeil,ekstra taggbygg,testhopp816/836 og liten inventarkant i rom35 står åpne. Første164-kildeprøves143-avbrudd har fortsatt ukjent årsak.302-kildeprøven har fire tidlige overgangspiksler ved36 og er ikke helavviksfri.
+
 ## Neste, oppdatert 2026-10-20 15:15
 
 - [x] Hele041 produsert: ti resultatark/49 nye native,publisert og med i faktisk kontrollert felles2527: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-kontorintro. Alle19 tidligere releaser/assets og tre stasher bevart. Ikke gjenta041 eller byggene.
