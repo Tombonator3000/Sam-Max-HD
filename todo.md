@@ -1,10 +1,18 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-20 15:15
+
+- [x] Hele041 produsert: ti resultatark/49 nye native,publisert og med i faktisk kontrollert felles2527: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-kontorintro. Alle19 tidligere releaser/assets og tre stasher bevart. Ikke gjenta041 eller byggene.
+- [x] Begge faktiske pakker og20769 runtime moddfiler per pakke kontrollert. Alle49 nye sett i Linux,304 kontroller/303 null/samme kjente tidlige160-avvik. Ingen nye/økte avvik. Native-frysen frigitt.
+- [ ] Fortsett faktisk produksjon av kildeklare fig164_01 til05,26 mål fra20 unike kilder. Se begge stilankere og sam-max-fall164-foerste-20261020/KILDEGRUNNLAG.md før kall.716 beskyttede kildefiler og tre stasher skal bevares.
+- [ ] Øvrige1415 hele figurjobber,returer,katalogfeil og samlet sluttkontroll gjenstår.343 av1758 har resultat. Ingen ny Tom-/Claude-godkjenning. Ikke kall all HD-grafikk ferdig.
+- [ ] Tidlig160-avvik36,Windows SDL-startfeil,uønsket ekstra taggbygg,testhopp816/836 og liten inventarkant i rom35 er fortsatt åpne. Første164-kildeprøve fikk skallkode143,normal identisk omprøve0; begge logger bevart,årsaken ikke fastslått.
+
 ## Neste, oppdatert 2026-10-20 14:59
 
 - [x] Hele041: ti ark/49 native, publisert og hentet2527, alle hasher og tidligere grafikk/stasher bevart.343 av1758 resultatark. Ikke gjenta041.
-- [ ] Fullfør pågående pakkecheckpoint2527: Linux 39426574662, Windows 39426580172. Native frosset. Faktiske pakker og motorprøve må bekreftes før felles release; ikke dispatch på nytt.
-- [ ] Kildeklargjør neste164_01 til05. Se GRAFIKKLISTE på gpt-arbeid.696 beskyttede kilder og tre stasher skal bevares.
+- [x] Fullfør pågående pakkecheckpoint2527: Linux 39426574662, Windows 39426580172. Native frosset. Faktiske pakker og motorprøve må bekreftes før felles release; ikke dispatch på nytt.
+- [x] Kildeklargjør neste164_01 til05. Se GRAFIKKLISTE på gpt-arbeid.696 beskyttede kilder og tre stasher skal bevares.
 - [ ] Tidlig160-avvik36, tre omrissvarsler og øvrige historiske SDL-/testhopp-/inventarkant-/katalogfunn er fortsatt åpne. Ingen ny Tom-/Claude-godkjenning.
 
 ## Neste, oppdatert 2026-10-20 14:29
