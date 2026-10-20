@@ -1,5 +1,8 @@
 # Grafikkliste
 
+Oppdatert 2026-10-20 05:26: fellespakken https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam er publisert og bekreftet Latest med 2283 native. Alle 41 nye ruter siden 2242 er observert i faktisk Linux-pakke; begge pakker og alle moddfiler er kontrollert. 269 av 1758 figurjobber har resultat. Neste er fig344_01 til 10, ferdig kildeklargjort, men 0 bildekall/resultater. Se rapporter/felles-release-20261020-sam/publisert.json og rapporter/sam344-foerste-20261020/NESTE.md. Pakkegrunnlaget er sikret; videre grafikkproduksjon kan fortsette. Ikke gjenta byggene.
+
+
 Oppdatert 2026-10-20 04:59:269 av1758 figurjobber har resultat. Fig345_36 til41 har27 egenkontrollerte native,publisert2283,alle27 sett/motorobservert. Publisering bekreftes separat i sam345-slutthoder-20261020/mottak-publisert.json. Neste344_01 til10. Pakken2242 er41bak kandidaten.
 
 263 av 1758 figurjobber har resultat,2256 native er publisert og hentet tilbake. Neste fig345_36 til41 er kildeklargjort (27 ruter,15 ulike kilder),men ikke tegnet. Fellespakken2242 er publisert og kontrollert,14 etterfølgende ruter kommer ved neste samlepunkt. Se sam345-slutthoder-20261020/KLARGJORT.md og sam345-tilbake-20261020/mottak-publisert.json.
@@ -25,7 +28,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 228 ark med resultat; 2216 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 269 ark med resultat; 2283 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
