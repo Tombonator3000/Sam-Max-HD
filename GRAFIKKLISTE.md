@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert 2026-10-20 02:08. Ti nye ark, 43 native, alle visuelt sett og motorobservert. 37 OK, seks SJEKK, ingen FEIL. Kandidat 2177, publisert 2134 til kvittering. 209 av 1758 resultatark. Se rapporter/bestilling12-20261020/mottak-publisert.json. Ingen ny Tom-/Claude-godkjenning.
+Oppdatert 2026-10-20 02:08. Ti nye ark, 43 native, alle visuelt sett og motorobservert. 37 OK, seks SJEKK, ingen FEIL. Publisert 2177, grunnlag 2134. 209 av 1758 resultatark. Se rapporter/bestilling12-20261020/mottak-publisert.json. Ingen ny Tom-/Claude-godkjenning.
 
 Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. Bestilling 1 er det samme som står i `ORDRE.md`. Hopp over jobber som er krysset av.
 
@@ -13,7 +13,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 209 ark med resultat; kandidat 2177, publisert 2134 til kvittering | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 209 ark med resultat; 2177 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 

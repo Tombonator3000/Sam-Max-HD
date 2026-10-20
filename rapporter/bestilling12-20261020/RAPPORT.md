@@ -37,3 +37,5 @@ Ingen ny Tom-godkjenning, separat Claude-kontroll, naturlig gjennomspilling elle
 Siste kontrollerte felles Linux-/Windows-release sam-max-hd-2026-10-20-natt har 2134 native, så disse 43 er nyere. Pakker oppdateres ved neste samlepunkt med faktiske nedlastinger, sjekksummer og filkontroll.
 
 Neste jobb er fig346_08. Gjenoppta serien og se neste kildelag i motoren før nye kall. Ikke gjenta denne bunken eller de tidligere avviste 110_05/06 og 246_16 til 19. Automatisk fortsettelse er aktiv, gammel nattkontroll fortsatt pauset.
+
+Publisering og tilbakehenting bekreftet: kilde 253f10b7ca1ca9e7f7a0fea20bb92993d3d05db9, hd-mod 5fe0f25fb0b7c66a4ba63281e71c18235ce7316f. Alle 20413 kandidat-PNG-er, alle 20370 tidligere PNG-er og alle 43 nye native-SHA-er stemmer. 2177 native totalt. 40 beskyttede kilder og tre stasher uendret. Se mottak-publisert.json. Fellespakken har fortsatt 2134 og mangler disse 43 til neste samlepunkt.
