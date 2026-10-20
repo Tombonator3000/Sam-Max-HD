@@ -1,5 +1,14 @@
 # todo.md
 
+## Neste,2026-10-20 21:23
+
+- [x] Alle ni251-ark/39native levert. Siste06..09/22nye publisert og hentet2722,alle gamle filer bevart. Tre ark OK,ett SJEKK,ett visuelt vurdert1814-varsel. Alle22 motorobservert,ingen nye/økte avvik. Ingen ny Tom-/Claude-godkjenning.
+- [ ] Fullfør felles2722 for Linux og Windows. Native frosset. Begge faktiske nedlastinger/SHA-filer,20964runtimefiler per pakke,motor/visuell kontroll og fellesrelease må bekreftes. Ikke dupliser dispatch.
+- [ ] Kildeklargjør neste fig028_01,Max-hode i bilintroens rom4. Se originalskript,korrekt palett/utklipp,motorkontekst og godkjent Max-stil før nye kall. Ikke gjenta251.
+- [ ] Bevar848beskyttede kilder,alle tidligere publiserte filer/releaser og tre stasher.380av1758hele figurjobber med resultat,1378gjenstår pluss returer/katalogfeil/sluttkontroll.164_04fortsatt blokkert,ingen omprøve.
+- [ ] Historiske tidlige160overgangsrester,Windows SDL,testhopp816/836,inventarkant rom35 og ekstra Windows-taggbygg står åpne. Naturlig full gjennomspilling/interaktiv Windows/ny webtest gjenstår.
+
+
 ## Neste,2026-10-20 20:57
 
 - [x] Første251_01..05,fem hele ark/17nye native,er publisert/hentet og med i kontrollert felles2700:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-vr251-foerste. Begge faktiske pakker/20942runtime-moddfiler og alle17nye kontrollert. Ikke gjenta disse eller byggene. Nativefrys frigitt.
