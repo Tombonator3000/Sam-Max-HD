@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,re,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-kontor041-foerste';T=O/'kandidat041-anim6';B=O/'grunnlag041-anim6';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+log=(T/'scummvm.log').read_text();draws={};wanted={f'costume041_{n}' for n in range(1920,1953)}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*41 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+    f,cel,x,y,w,h=map(int,m.groups());name=f'costume041_{cel}';shot=(f//4+1)*4;p=T/f'frame_{shot:06}_room007.png'
+    if name in wanted and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p),native_sha256=sha(C/'costumes'/(name+'_hd.png')),scene=T.name)
+assert set(draws)==wanted
+items=list(draws.items())
+for page in range(6):
+    sub=items[page*6:page*6+6];board=Image.new('RGB',(1920,len(sub)*360),'#2c3d47');d=ImageDraw.Draw(board)
+    for row,(name,v) in enumerate(sub):
+        x,y=v['pos'];w,h=v['maal'];original=Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA').resize((w*4,h*4),Image.Resampling.NEAREST);native=Image.open(C/'costumes'/(name+'_hd.png')).convert('RGBA');motor=Image.open(v['fil']).convert('RGBA').crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8))
+        for col,(title,z) in enumerate([('Original',original),('Ny native',native),('Motor '+str(v['bildeframe']),motor)]):
+            z.thumbnail((632,316),Image.Resampling.LANCZOS if col else Image.Resampling.NEAREST);board.paste(z,(col*640,row*360+32),z);d.text((col*640+6,row*360+8),name+' '+title,fill='white')
+    board.save(R/f'original-native-motor-side{page+1}.png')
+whole=[]
+for f in [64,128,144,156,164,180,192,196,260]:
+    p=T/f'frame_{f:06}_room007.png';out=R/f'kontor041-motor-{f}.png';shutil.copy2(p,out);whole.append(dict(scene=T.name,frame=f,fil=out.name,sha256=sha(out)))
+diffs=[]
+for f in [64,144,192]:
+    name,v=next((name,v) for name,v in items if v['bildeframe']==f);p=f'frame_{f:06}_room007.png';old=np.array(Image.open(B/p).convert('RGB'));new=np.array(Image.open(T/p).convert('RGB'));delta=np.any(old!=new,2);x,y=v['pos'];w,h=v['maal'];outside=delta.copy();outside[max(0,y*4-10):min(800,(y+h)*4+10),max(0,x*4-10):min(1280,(x+w)*4+10)]=False
+    assert not outside.any(),(f,int(outside.sum()));diffs.append(dict(frame=f,bilde=name,endrede_piksler=int(delta.sum()),utenfor_cel_og_marg=int(outside.sum())))
+    board=Image.new('RGB',(1280,430),'#253340');d=ImageDraw.Draw(board);board.paste(Image.fromarray(old).resize((640,400)),(0,30));board.paste(Image.fromarray(new).resize((640,400)),(640,30));d.text((6,6),f'For / etter frame {f}, samme nedlastede Linux-binar',fill='white');board.save(R/f'foer-etter-{f}.png')
+frames=[Image.open(v['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS) for name,v in items]
+gif=R/'kontorintro-33-ruter-motor.gif';frames[0].save(gif,save_all=True,append_images=frames[1:],duration=120,loop=0,optimize=False)
+(R/'motorobservasjoner.json').write_text(json.dumps(dict(ruter=33,sett=33,mangler=[],tegninger=draws),indent=2)+'\n');(R/'hele-motorbilder.json').write_text(json.dumps(whole,indent=2)+'\n');(R/'pikselkontroll.json').write_text(json.dumps(diffs,indent=2)+'\n');(R/'animasjonsproveniens.json').write_text(json.dumps(dict(fil=gif.name,sha256=sha(gif),faktiske_motorbilder=[dict(bilde=n,frame=v['bildeframe'],sha256=v['sha256']) for n,v in items],bare_foerste33_av49=True,visning_ms=120,naturlig_gjennomspilling=False),indent=2)+'\n');shutil.copy2(__file__,R/'vis.py.txt');print('Alle33 original/native/motor, ni hele bilder, tre for/etter og faktisk motor-GIF klare.',flush=True)

@@ -1,0 +1,59 @@
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFilter
+from scipy import ndimage as nd
+from smhd.myk import _iou, CORE, GOOD_IOU, GOOD_COVER
+import numpy as np, json, hashlib, shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent
+R=A/'rapporter'/O.name; H=R/'prototype-utkast1'; H.mkdir(exist_ok=True)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+K=R/'kall/S05M'; src=Path('/home/tom/.codex/generated_images/01a13e87-e58d-7480-98ea-be8a83c16f7a/exec-75a86d23-b0b8-40c0-a43a-6844ebe77714.png')
+if not (K/'raa.png').exists():
+    shutil.copy2(src,K/'raa.png')
+    (K/'raabilde.json').write_text(json.dumps(dict(opprinnelig=str(src),fil='raa.png',sha256=sha(src),verktoy='innebygd image_gen',sett=True),indent=2)+'\n')
+# Only our newly painted face is edited. No original/source pixels or masks.
+a=np.array(Image.open(R/'kall/S05/raa.png').convert('RGBA')).astype(float)/255
+face=np.array(Image.open(K/'raa.png').convert('RGBA').resize((215,140),Image.Resampling.LANCZOS)).astype(float)/255
+pm=Image.new('L',(215,140)); ImageDraw.Draw(pm).polygon([(92,76),(158,64),(185,83),(184,137),(108,138),(88,113)],fill=255)
+mask=np.array(pm.filter(ImageFilter.GaussianBlur(1.1)))[:,:,None]/255
+sub=a[755:895,265:480].copy(); al=sub[:,:,3:4]*(1-mask)+face[:,:,3:4]*mask
+rgb=(sub[:,:,:3]*sub[:,:,3:4]*(1-mask)+face[:,:,:3]*face[:,:,3:4]*mask)/np.maximum(al,1e-9)
+a[755:895,265:480]=np.concatenate([rgb,al],axis=2)
+fixed=R/'kall/S05/raa-egen-munnrettet.png'; Image.fromarray(np.uint8(np.clip(a*255+.5,0,255))).save(fixed)
+(R/'munnretting.json').write_text(json.dumps(dict(kilde='kall/S05/raa.png',kilde_sha256=sha(R/'kall/S05/raa.png'),eget_malt_ansikt='kall/S05M/raa.png',ansikt_sha256=sha(K/'raa.png'),utsnitt=[265,755,480,895],egen_feather_mask_polygon=[(92,76),(158,64),(185,83),(184,137),(108,138),(88,113)],radius=1.1,resultat=str(fixed.relative_to(R)),sha256=sha(fixed),originalpiksler_brukt=False,hard_originalmaske=False,S05R_helrute_brukt=False),indent=2)+'\n')
+raw={f'S{n:02d}':np.array(Image.open(R/f'kall/S{n:02d}/raa.png').convert('RGBA')) for n in range(1,6)}
+raw['S05']=np.array(Image.open(fixed).convert('RGBA'))
+boxes={}
+cols=[0,334,624,916,1212,1536]
+for n in range(8):
+    row,col=divmod(n,5); yy=[0,335,660,1024]
+    boxes[1920+n]=('S01',(cols[col],yy[row],cols[col+1],yy[row+1]))
+for n in range(4): boxes[1935+n]=('S02',([0,360,677,1036][n],0,[360,677,1036,1536][n],380))
+for n in range(3): boxes[1939+n]=('S02',([0,455,847][n],380,[455,847,1536][n],716))
+boxes[1942]=('S02',(0,716,680,1024)); boxes[1943]=('S02',(680,716,1536,1024))
+boxes[1944]=('S03',(0,0,756,514)); boxes[1945]=('S03',(756,0,1536,514))
+boxes[1946]=('S03',(0,514,791,1024)); boxes[1947]=('S03',(791,514,1536,1024))
+boxes[1948]=('S04',(0,0,803,546)); boxes[1949]=('S04',(803,0,1536,546)); boxes[1950]=('S04',(0,546,930,1024))
+boxes[1951]=('S05',(0,0,1536,488)); boxes[1952]=('S05',(0,488,1536,1024))
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter']; rec=[]
+def clean(arr):
+    core=arr[:,:,3]>=128
+    dist, near=nd.distance_transform_edt(~core,return_indices=True)
+    out=arr.copy();out[:,:,3][dist>2]=0
+    edge=(dist>0)&(dist<=2)
+    out[edge,:3]=arr[near[0][edge],near[1][edge],:3]
+    out[out[:,:,3]==0,:3]=0
+    return out
+for v in plan:
+    num=int(v['bilde'].split('_')[-1]);call,box=boxes[num]
+    x,y,x1,y1=box; z=clean(raw[call][y:y1,x:x1]);yy,xx=np.nonzero(z[:,:,3]>=128)
+    cx,cy,ww,hh=int(xx.min()),int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)
+    w,h=v['rekt'][2:]; sx,sy=ww/(w*4),hh/(h*4)
+    out=Image.fromarray(z).transform((w*4+16,h*4+16),Image.Transform.AFFINE,(sx,0,cx-8*sx,0,sy,cy-8*sy),Image.Resampling.BICUBIC)
+    b=np.array(out);core=b[:,:,3]>=128;dist,near=nd.distance_transform_edt(~core,return_indices=True);weak=(b[:,:,3]>0)&(b[:,:,3]<=4);b[weak,:3]=b[near[0][weak],near[1][weak],:3];b[b[:,:,3]==0,:3]=0
+    out=Image.fromarray(b);f=H/(v['bilde']+'.png');out.save(f)
+    src=np.array(Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA'));m=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1)
+    iou,cover=_iou(b[:,:,3]>=CORE,m,-8,-8)
+    rec.append(dict(bilde=v['bilde'],kall=call,raa_utsnitt=box,egen_kjerne=[cx,cy,ww,hh],prototype=str(f.relative_to(R)),sha256=sha(f),snitt_union=iou,dekning=cover,native_ok=iou>=GOOD_IOU and cover>=GOOD_COVER))
+    print(v['bilde'],round(iou,3),round(cover,3),'OK' if rec[-1]['native_ok'] else 'SJEKK')
+(R/'prototype-utkast1.json').write_text(json.dumps(rec,indent=2)+'\n')
+shutil.copy2(__file__,R/'klargjor-malerier.py.txt')

@@ -1,0 +1,48 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import json,hashlib,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-kontor041-foerste';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+base=json.loads((R/'grunnlag-produksjon.json').read_text());expected=json.loads((R/'kandidatfilhash.json').read_text());actual={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};assert actual==expected and len(actual)==20754
+assert set(base['filer'])<=set(actual) and {f for f,h in base['filer'].items() if actual[f]!=h}=={'mod.json'}
+native=json.loads((R/'native-fast4x.json').read_text());assert native['tillegg']==33 and native['native_totalt']==2511
+auto=json.loads((R/'myke-automatisk.json').read_text());assert auto['ruter_ok']==33 and all(auto[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk'])
+motor=json.loads((R/'motorproeve.json').read_text());assert motor['alle33_nye_observert'] and motor['ingen_nye_eller_okte_avvik'] and motor['skjermbufferkontroller']==160 and motor['nullkontroller']==158 and motor['kontroller_fra_figurstart']==132 and not motor['helprove_uten_avvik']
+observ=json.loads((R/'motorobservasjoner.json').read_text());assert len(observ['tegninger'])==33
+protected=json.loads((R/'beskyttede-samlet.json').read_text());assert len(protected)==676 and all(sha(A/f)==h for f,h in protected.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+progress=json.loads((R/'fremdrift.json').read_text());assert len(progress['leveranser'])==5 and len(list((A/'jobber').glob('fig*/resultat.png')))==338
+for e in progress['leveranser']:
+    assert sha(A/e['resultat'])==e['sha256']==json.loads((A/e['rutekart']).read_text())[e['jobb']]['sha256_resultat']
+    assert 'Utfall: OK' in (R/(e['jobb']+'-egenkontroll.txt')).read_text()
+    e.update(native_mottatt=True,visuelt_kontrollert=True,motorobservert=True,publisert=False,importert=False,i_fellespakke=False)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+calls=json.loads((R/'bildekall.json').read_text())['kall'];assert len(calls)==7
+for v in calls:
+    assert v['utfoert'] and sha(R/v['raa'])==v['raa_sha256'] and sha(R/v['prompt'])==v['prompt_sha256']
+    for ref in v['referanser']:assert sha(Path(ref['fil']))==ref['sha256']
+assert sum(v['brukt'] for v in calls)==6
+shots=json.loads((R/'hele-motorbilder.json').read_text());assert len(shots)==9 and all(sha(R/v['fil'])==v['sha256'] for v in shots)
+review=dict(tid_utc=datetime.now(timezone.utc).isoformat(),fem_resultatark_sett=True,alle_original_native_motor_sett=33,hele_motorbilder_sett_paa_brett=9,foer_etter_sett=3,begge_figurer_og_innbyrdes_skala_vurdert=True,flygende_hatt_og_lose_orer_og_papir_bevart=True,munn1952_rettet_til_kilde=True,ingen_nye_kantrusk_sett_i_motor=True,radioantennen_har_samme_originale_tegnerekkefolge=True,ny_Tom_Claude_godkjenning=False)
+(R/'visuell-vurdering.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n')
+logs={}
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+    for p in sorted(O.glob('*/scummvm.log')):
+        rel=p.relative_to(O).as_posix();z.write(p,rel);logs[rel]=sha(p)
+assert len(logs)==7
+(R/'motorlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n')
+proof=dict(nye_hele_jobber=5,nye_native=33,native_totalt=2511,figurjobber_med_resultat=338,figurjobber_totalt=1758,egenkontroll_ark_OK=5,automatisk_native_OK=33,visuelt_sett_native=33,motorobservert_native=33,bildekall=7,brukte_malte_helposer=25,egen_malt_munnretting=1,beskyttede_kilder_SHA_uendret=676,tre_stasher_uendret=True,alle_tidligere_filstier_bevart=True,tidligere_png_byteidentiske=20715,kandidat_png=20748,kandidat_filer=20754,kontroller=160,nullkontroller=158,kjente_tidlige160_avvik=2,kontroller_fra_figurstart=132,ingen_nye_eller_okte_avvik=True,helprove_uten_avvik=False,publisert=False,importert=False,i_fellespakke=False,pakken_native=2478,hard_originalmaske=False,originalfragment_fallback=False,naturlig_gjennomspilling=False,ny_Tom_Claude_godkjenning=False)
+(R/'bevaringskontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+(R/'RAPPORT.md').write_text('''# Kontorintro, første fem ark
+
+Fig041_01 til05 er levert som fem hele1536x1024-resultatark med33 nye native fra25 ulike hele canonical RGBA-kilder. Sju innebygde image_gen-kall: fem grunnark, ett forkastet helarkforsøk på munnretting og ett brukt lokalt malt munnutsnitt. 1927 til1935 er eksakte hele kildealiaser og bruker ett maleri. Åtte øvrige rådubletter brukes ikke. Alle råbilder, faktiske prompter, referansehasher, prototyper, SHA-festede rutekart og leveranse-SHA-er er bevart. Originalens hodevinkler, fingre, Max-tenner, hatt, løse øre-/ansiktsdeler og papirark er vurdert. Sam har kontorets blågrå dress, ikke alkovens brune palett.
+
+De fem hele arkene, alle33 original/native/motor-sammenligninger, ni hele motorbilder på brett og tre før/etter er visuelt sett. Fem egenkontroller OK;33 av33 automatisk native OK med uendrede grenser. Egen alfa og kantfarger fjerner generert ytterglorie. Ni komplette maleriposer har sine hele egne sammenhengende deler plassert etter kildens delbokser, uten originalsilhuettklipping eller originalfragment-fallback. Den oppdiktede tungen i1952 er erstattet med et nytt eget malt lukket munnutsnitt; kroppsposen er beholdt. S05R endret kroppsposen og brukes ikke. Åtte HD-pikslers native-marg og fast4x.
+
+Den faktisk nedlastede2478-Linux-binæren8db371698b610d40a5c0d789f777dad34cb5d666b91f305f2be8e062a3427914 kjørte både2478-grunnlaget og2511-kandidaten. To320-bilders forløp per modd: kildebekreftet chore6/raw5 på aktør2 i rom7, og rommets egne skript. Alle33 nye og alle49 kostyme41-kilder ble observert.160 kandidatbufferkontroller:158 null og to gjentakelser av samme160-pikslers avvik vedframe36 under rommets åpningsovergang, før første41-tegning60. Tilsvarende grunnlag gir nøyaktig samme kontrollresultat. Alle132 kontroller frafigurstart60 er null; ingen nye eller økte avvik. Den tidlige feilen er lokalisert tilx160..167/y712..731 i overgangen, ikke erklært motorrettet. Helprøven er derfor ikke en nullavviksprøve. Tre pikselkontroller har ingen endringer utenfor den aktuelle figurens cel/marg. Forgrunnens radioantenne følger uendret tegnerekkefølge.
+
+Dette er kontrollert romhopp, ikke naturlig intro/gjennomspilling. Testen har elevation0 mot primærskriptets-2, og overstyrer ikke aktør3; disse avgrensningene er bevart. Ingen ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning. Alle20721 tidligere filstier og20715 tidligere PNG-er er bevart byteidentisk i kandidaten, baremod.json er endret før publiseringens sjekksummer.676 beskyttede kildefiler og tre opprinnelige stasher er uendret.
+
+Kandidat2511 native,20748 PNG-er og20754 filer.338 av1758 hele figurjobber har resultat,1420 gjenstår pluss returer/katalogfeil/sluttkontroll. Publisering/hent og pakkeinnhold kvitteres separat. Felles Linux-/Windows-pakker har fortsatt2478 og mangler disse33. Ikke bygg2478 på nytt. Neste femark041_06 til10 har16 kilder i samme49-ruters sekvens; klargjør/vis dem før kall og oppdater begge pakker ved et passende samlepunkt. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Ingen motor-/pipelinekode er endret.
+''')
+(R/'NESTE.md').write_text('Første fem041_01 til05 er ferdig produsert og kontrollert med33 native. Se mottak-publisert.json for faktisk publisering. Ikke gjenta dem. Neste041_06 til10 har16 ruter fra samme gyldige49-ruters chore6. Se originalene og alle16 kildeposer før kall, bevar gule komiske støtstjerner og løse papirark. Pakker2478 mangler33 frem til neste samlepunkt. Tidlig160-avvik36 består identisk i grunnlag og kandidat;132 kontroller fra60 null. Ingen ny Tom-/Claude-godkjenning.\n')
+shutil.copy2(__file__,R/'kontroller.py.txt');print(json.dumps(proof,ensure_ascii=False),flush=True)

@@ -1,0 +1,55 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import _iou, CORE, GOOD_IOU, GOOD_COVER
+import numpy as np, json, hashlib, shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent
+R=A/'rapporter'/O.name; H=R/'prototype-endelig';H.mkdir(exist_ok=True)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];old={v['bilde']:v for v in json.loads((R/'prototype-utkast1.json').read_text())}
+# Rectangles place WHOLE newly painted components, never clip with a source mask.
+spec={
+1941:('S02',[(12,[26,0,90,57],'Sam med papir'),(13,[0,6,34,44],'Max')]),
+1943:('S02',[(16,[63,0,132,54],'Sam'),(20,[0,11,7,26],'Max venstre ore'),(19,[15,11,23,23],'Max hoyre ore'),(22,[54,41,76,51],'papir')]),
+1944:('S03',[(1,[72,0,147,53],'Sam'),(3,[7,5,20,30],'Max venstre ore/ansiktsdel'),(5,[24,11,41,21],'Max hoyre ore'),(6,[66,40,88,50],'papir'),(8,[0,46,11,50],'liten lys kildedel')]),
+1945:('S03',[(2,[95,0,171,53],'Sam'),(4,[0,6,45,49],'Max'),(7,[89,40,111,50],'papir')]),
+1946:('S03',[(10,[92,0,172,60],'Sam med papir'),(11,[0,14,48,56],'Max')]),
+1947:('S03',[(9,[74,0,151,74],'Sam med papir'),(12,[0,33,41,78],'Max')]),
+1948:('S04',[(2,[56,0,145,76],'Sam med papir'),(3,[0,40,45,86],'Max')]),
+1949:('S04',[(1,[52,0,150,76],'Sam med papir'),(4,[0,47,48,86],'Max')]),
+1950:('S04',[(5,[40,0,162,59],'Sam med tilknyttet papir'),(6,[0,37,45,82],'Max'),(7,[145,58,164,65],'lost papir')]),
+}
+raw={};labels={}
+for call in ['S02','S03','S04']:
+    raw[call]=np.array(Image.open(R/f'kall/{call}/raa.png').convert('RGBA'))
+    labels[call]=nd.label(raw[call][:,:,3]>=128)[0]
+def piece(call,part,box,size):
+    a=raw[call].copy();l=labels[call];sel=l==part;yy,xx=np.nonzero(sel);gx,gy=int(xx.min()),int(yy.min());gw,gh=int(xx.max()-gx+1),int(yy.max()-gy+1)
+    dist,near=nd.distance_transform_edt(~sel,return_indices=True);allow=(dist<=2)&((l==0)|sel)
+    a[:,:,3][~allow]=0;edge=allow&~sel;a[edge,:3]=a[near[0][edge],near[1][edge],:3];a[a[:,:,3]==0,:3]=0
+    x0,y0,x1,y1=box;sx=gw/((x1-x0)*4);sy=gh/((y1-y0)*4)
+    out=Image.fromarray(a).transform(size,Image.Transform.AFFINE,(sx,0,gx-(x0*4+8)*sx,0,sy,gy-(y0*4+8)*sy),Image.Resampling.BICUBIC)
+    return out,dict(egen_komponent=part,egen_kjerne=[gx,gy,gw,gh],kilde_plasseringsboks=box,sx=sx,sy=sy)
+rec=[]
+for v in plan:
+    num=int(v['bilde'].split('_')[-1]);w,h=v['rekt'][2:];f=H/(v['bilde']+'.png');s=spec.get(num);parts=[]
+    if s:
+        call,items=s;out=Image.new('RGBA',(w*4+16,h*4+16))
+        for part,box,meaning in items:
+            im,trace=piece(call,part,box,out.size);out.alpha_composite(im);trace['betydning']=meaning;parts.append(trace)
+        a=np.array(out);core=a[:,:,3]>=128;_,near=nd.distance_transform_edt(~core,return_indices=True);weak=(a[:,:,3]>0)&(a[:,:,3]<=4);a[weak,:3]=a[near[0][weak],near[1][weak],:3];a[a[:,:,3]==0,:3]=0;out=Image.fromarray(a);out.save(f)
+    else:
+        shutil.copy2(R/old[v['bilde']]['prototype'],f);a=np.array(Image.open(f).convert('RGBA'))
+    src=np.array(Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cover=_iou(a[:,:,3]>=CORE,mask,-8,-8)
+    rec.append(dict(bilde=v['bilde'],prototype=str(f.relative_to(R)),sha256=sha(f),snitt_union=iou,dekning=cover,semantiske_deler=parts,hel_egen_komponent_flyttet=bool(parts),hard_originalmaske=False,originalfragment_fallback=False))
+    print(v['bilde'],round(iou,3),round(cover,3),'OK' if iou>=GOOD_IOU and cover>=GOOD_COVER else 'SJEKK')
+(R/'prototype-endelig.json').write_text(json.dumps(rec,indent=2)+'\n');shutil.copy2(__file__,R/'plasser-deler.py.txt')
+# Review all originals beside new complete cels, with own native margins preserved.
+for start in range(0,len(plan),5):
+    subset=plan[start:start+5];board=Image.new('RGB',(1800,len(subset)*400),'#33434e');d=ImageDraw.Draw(board)
+    for row,v in enumerate(subset):
+        src=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST)
+        im=Image.open(H/(v['bilde']+'.png')).convert('RGBA')
+        for col,(z,label) in enumerate([(src,'Original'),(im,'Nytt maleri')]):
+            board.paste(z,(col*900,row*400+34),z);d.text((col*900+8,row*400+8),v['bilde']+' '+label,fill='white')
+    board.save(R/f'sammenligning-maleri-side{start//5+1}.png')

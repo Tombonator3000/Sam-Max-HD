@@ -1,5 +1,9 @@
 # Grafikkliste
 
+Oppdatert 2026-10-20 14:23: Fig041_01 til05 er fem nye hele ark,33 native fra25 ulike hele canonical kilder. Sju innebygde bildekall, inkludert ett forkastet helruteutkast og én brukt egen malt munnretting. Sam og Max i kontorintroen, med flygende hatt, løse øre-/ansiktsdeler og papirark. Fem egenkontroller OK,33 automatisk native OK, alle33 visuelt sett og motorobservert.160 kandidatkontroller:158 null og de samme to tidlige160-avvikene ved36 som grunnlaget. Alle132 frafigurstart60 null; helprøven er ikke avviksfri. Ingen ny Tom-/Claude-godkjenning eller motor-/pipelinekode.
+
+Kandidat2511 native,20748 PNG-er,20754 filer.676 beskyttede kilder, tre stasher og alle tidligere filer bevart.338 av1758 hele figurjobber har resultat,1420 gjenstår pluss returer/katalogfeil/sluttkontroll. Publisering/hent kvitteres i sam-max-kontor041-grunnlag-20261020/mottak-publisert.json. Fellespakker har2478 og mangler33; ikke gjenta2478-bygget. Neste fem er041_06 til10,16 ruter, klargjør før nye kall. Ikke gjenta første fem.
+
 Oppdatert 2026-10-20 13:44: Hele Sam343 er levert og med i fellesutgave sam-max-hd-2026-10-20-sam343: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam343. 11 nye hele ark, 22 native fra 17 brukte nye malerier i ni innebygde bildekall; seks canonical 1935 til 1940-aliaser deler samme bilde. Alle råbilder, faktiske prompter, referansehasher og rutekart er bevart. Egenkontroll og native mottak OK, alle 22 visuelt sett og motorobservert. Begge produksjonsbunker har 285 nullkontroller. Ingen hard originalsilhuettmaske eller originalfragment-fallback, ingen ny Tom-/Claude-godkjenning.
 
 Native 31bfc8708c1035686835dcef3d8f3855155d6fd9, 2478 totalt, publisert, hentet og alle 20721 filer / 20715 PNG-er SHA-bekreftet. Alle tidligere grafikkfiler og stier er bevart, 676 beskyttede kilder og tre stasher uendret. 333 av 1758 figurjobber har resultat, 1425 gjenstår pluss returer, katalogfeil og sluttkontroll.
@@ -56,7 +60,7 @@ Alt som skal lages til Sam & Max HD Remake, i den rekkefølgen det skal lages. B
 | Store objektbilder (nærbilder, kart og store deler) | 74 | 86 | Nå, sammen med rommene |
 | Små objektbilder i lag (`lagNNN_KK`: dører, brytere, lys, ting) | 677 | 701 | Etter rommene og de store objektbildene (296 lagjobber) |
 | Ikonark (`ikonNN`: pekere, inventar, samtaleikoner og små deler) | 149 | 163 | Etter lagene (9 jobber) |
-| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 333 ark med resultat; 2478 native ruter i publisert modd | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
+| Figurark (`figCCC_KK`: kostymeruter, glatt stil med ekte alfa) | 338 ark med resultat; 2478 publisert, 2511 i kontrollert kandidat | 15661 ruter, 1758 ark | Sam og Max først; levert er skilt fra stilgodkjenning |
 
 ## Bestilling 1 (nå, samme som ORDRE.md)
 
@@ -581,16 +585,16 @@ Figurark for Sam, Sam og Max.
 - [x] `fig343_09` (figurark 9 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 - [x] `fig343_10` (figurark 10 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 - [x] `fig343_11` (figurark 11 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
-- [ ] `fig041_01` (figurark 1 for Sam og Max (kostyme 41), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig041_01` (figurark 1 for Sam og Max (kostyme 41), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 36
 
 Figurark for Sam og Max.
 
-- [ ] `fig041_02` (figurark 2 for Sam og Max (kostyme 41), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig041_03` (figurark 3 for Sam og Max (kostyme 41), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig041_04` (figurark 4 for Sam og Max (kostyme 41), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig041_05` (figurark 5 for Sam og Max (kostyme 41), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig041_02` (figurark 2 for Sam og Max (kostyme 41), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig041_03` (figurark 3 for Sam og Max (kostyme 41), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig041_04` (figurark 4 for Sam og Max (kostyme 41), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig041_05` (figurark 5 for Sam og Max (kostyme 41), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig041_06` (figurark 6 for Sam og Max (kostyme 41), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig041_07` (figurark 7 for Sam og Max (kostyme 41), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig041_08` (figurark 8 for Sam og Max (kostyme 41), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)

@@ -1,0 +1,61 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime, timezone
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+expected=json.loads((A/'rapporter/felles-release-20261020-sam343/moddfiler-2478.json').read_text())
+assert len(expected)==20721 and all(sha(P/'mods/gpt'/f)==h for f,h in expected.items())
+stash=['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==stash
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==333
+names=['alkove-siste-20261020','alkove-fortsettelse-20261020','alkove-gjenbruk-20261020','sam-sugepil-345-20261020','sam345-gjenbruk-a-20261020','sam345-gjenbruk-b-20261020','sam345-tilbake-20261020','sam345-slutthoder-20261020','sam344-foerste-20261020','sam344-fortsettelse-20261020','aubergine347-grunnlag-20261020','max-alkove341-grunnlag-20261020','sam346-klesskjot-retur-20261020','sam346-overtegning-20261020','sam343-foerste-20261020','sam343-slutt-20261020',R.name]
+names += [p.name for p in (A/'rapporter').glob('sam342-*')]
+protected={}
+for name in names:
+    for fn in ['beskyttede-kilder.json','beskyttede-kildefeil-raw32.json','beskyttede-kilder-utvidet.json']:
+        p=A/'rapporter'/name/fn
+        if p.exists():
+            for f,h in json.loads(p.read_text()).items():
+                assert f not in protected or protected[f]==h
+                protected[f]=h
+assert len(protected)==676 and all(sha(A/f)==h for f,h in protected.items())
+(R/'beskyttede-samlet.json').write_text(json.dumps(protected,sort_keys=True,indent=2)+'\n')
+base=dict(native_sha='31bfc8708c1035686835dcef3d8f3855155d6fd9',native=2478,hele_resultatjobber=333,stash=stash,filer=expected)
+(R/'grunnlag-produksjon.json').write_text(json.dumps(base,sort_keys=True,indent=2)+'\n')
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter']; proto={v['bilde']:v for v in json.loads((R/'prototype-endelig.json').read_text())}
+all_sources={}
+for v in plan:
+    src=Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA')
+    assert hashlib.sha256(np.array(src).tobytes()).hexdigest()==v['canonical_rgba_sha256']
+    for t in v['malruter']:
+        other=Image.open(P/'work/extract/costumes'/(t['bilde']+'.png')).convert('RGBA')
+        assert other.size==src.size and np.array_equal(np.array(src),np.array(other)),t['bilde']
+        all_sources[t['bilde']]=v
+progress=dict(tid_utc=datetime.now(timezone.utc).isoformat(),nye_jobber=5,native_rutekoblinger=33,hele_rgba_kilder=25,brukte_malte_helposer=25,bildekall=7,egen_malt_munnretting=1,leveranser=[])
+for n in range(1,6):
+    job=f'fig041_{n:02d}';J=A/'jobber'/job;j=json.loads((J/'jobb.json').read_text());assert not (J/'resultat.png').exists()
+    canvas=Image.new('RGBA',(1536,1024));mapping=[]
+    for c in j['ruter']:
+        rep=all_sources[c['bilde']];f=R/proto[rep['bilde']]['prototype'];im=Image.open(f).convert('RGBA');x,y,w,h=c['rekt'];assert im.size==(w*4+16,h*4+16)
+        dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128)
+        mapping.append(dict(bilde=c['bilde'],kostyme=41,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],canonical_rgba_sha256=rep['canonical_rgba_sha256'],referanseutsnitt_rgba_sha256=rep['rgba_sha256'],prototype=proto[rep['bilde']]['prototype'],prototype_sha256=sha(f),native_marg_hd=8))
+    result=J/'resultat.png';canvas.save(result);digest=sha(result)
+    (R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=mapping)},indent=2)+'\n')
+    check=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True)
+    (R/f'{job}-egenkontroll.txt').write_text(check.stdout+check.stderr);assert check.returncode in [0,1],(job,check.stdout,check.stderr)
+    state='OK' if check.returncode==0 else 'SJEKK'
+    (J/'notat.md').write_text(f'''# {job}
+2026-10-20, Codex. Innebygd image_gen; modellnavn ikke oppgitt. Hele kontorseriens første fem ark bruker fem grunnkall og to munnrettingskall, sju faktiske kall. 25 brukte malte helposer fra 25 ulike canonical RGBA-kilder kobles til 33 native ruter. 1927 til 1935 er eksakte hele kildealiaser og bruker ett eget maleri. Kildemotiv: begge Sam og Max i samme cel, kontorintro rom7, globalt skript66, kostyme41/chore6. Blågrå dress/fedora, hvit skjorte, blått/svart slips og kremhvit Max. Flygende hatt, kildebekreftede små øre-/ansiktsdeler og løse papirark er bevart. Originaler, primærskript, kildeposer i faktisk motor og godkjente hovedark/stilankere er sett.
+Prompt.txt er brukt ordrett med presiseringer i separate faktiske prompter; fire beskyttede jobbfiler er uendret. Alle råbilder, referansehasher, faktiske prompter, egne alfaprototyper, leveranse-SHA-er og rutekart finnes i rapporter/{R.name}. Råarkenes unødige dubletter brukes ikke. S05R endret kroppsposituren og er forkastet; S05M brukes bare som lokalt eget malt munnutsnitt på S05s opprinnelige kropp. Den oppdiktede tungen er fjernet, lukket kildemunn beholdt.
+Tom har tillatt Python-rensing/plassering. Generert ytterglorie er renset med egen alfa og egen kantfarge. Ni helposer fikk egne hele sammenhengende malerideler plassert med kildebekreftede delbokser for korrekt Sam/Max-avstand. Ingen hard originalsilhuettmaske, originalfragment-fallback eller nye mellomruter. Fast 4x og ekte alfa, åtte HD-pikslers native-marg. Automatisk egenkontroll {state}; SJEKK betyr omrissvarsel som vurderes visuelt og i native mottak med uendrede grenser. Resultat SHA256 {digest}.
+Kildegrunnlaget hadde ett tidlig160-pikslers skjermavvik ved36 før første41-tegning60. Dette er gjentatt identisk med2456 og2478 i samme faktisk nedlastede2478-binær; helprøven er ikke en nullavviksprøve. Laget, egenkontrollert, native mottatt, visuelt sett, motorobservert, publisert og i nedlastet pakke skilles i fremdrift.json. Ingen ny Tom-/Claude-godkjenning eller naturlig gjennomspilling.
+''')
+    progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll=state,native_mottatt=False,visuelt_kontrollert=False,motorobservert=False,publisert=False,importert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False))
+    print(job,state,flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+calls=[]
+for call in ['S01','S02','S03','S04','S05','S05R','S05M']:
+    K=R/'kall'/call;calls.append(dict(id=call,utfoert=True,brukt=call!='S05R',bruksavgrensning='Kun rettet munn i eget S05-maleri' if call=='S05M' else 'Avvist endret kroppspositur' if call=='S05R' else 'Unike komplette kilder; eksakte aliaser deler ett maleri',prompt=str((K/'prompt-faktisk.txt').relative_to(R)),prompt_sha256=sha(K/'prompt-faktisk.txt'),argumenter=str((K/'argumenter.json').relative_to(R)),raa=str((K/'raa.png').relative_to(R)),raa_sha256=sha(K/'raa.png'),referanser=json.loads((K/'referansehasher.json').read_text())))
+(R/'bildekall.json').write_text(json.dumps(dict(kall=calls),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'lever.py.txt')
+assert len(all_sources)==33 and all(sha(A/f)==h for f,h in protected.items())
