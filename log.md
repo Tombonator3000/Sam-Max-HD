@@ -1422,4 +1422,3 @@ Grafikkilde aa6d819a4ab72359d07537f8191ab144e03315d2. Publisert og hentet hd-mod
 Fellespakker er foreløpig2634 og mangler49. Nå nytt samlepunkt for både Linux og Windows fra samme2683. Native er frosset til begge faktiske nedlastinger,filhasher,motorprøver og fellesrelease er bekreftet. Forrige uønskede Windows-taggbygg39459876660 er kontrollert completed/success,men er ikke hovedbygget39456993761 som leverte2634. Push-filterfeilen står fortsatt åpen. Ingen ekstra dispatch eller omprøve.
 
 Neste ordinære grafikk er fig251_01..05 etter kildeklargjøring mens pakkebyggene går. Ikke gjenta047_01..09 eller de gamle engangshjelperne. Automatisk grafikkproduksjon fortsetter uten gammel nattfrist;gammel nattkontroll gjenstartes ikke. Bibliotekskilder:figurark-fast-storrelse og publisert-mod-er-fasit. Grafikk bare på gpt-arbeid/hd-mod;main får bare disse fire dokumentene.
-
