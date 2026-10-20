@@ -1,0 +1,63 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-sam';R=A/'rapporter/felles-release-20261020-sam'
+state=json.loads((O/'bygg-startet.json').read_text());tag=state['release_tag'];code=state['kode'];mod=state['hd_mod'];h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True))
+m=json.loads((O/'linux-kontroll.json').read_text());f=json.loads((O/'moddfiler-kontroll.json').read_text());assets=json.loads((O/'assetkontroll.json').read_text())
+assert m['native']==2283 and m['nye_native_observert']==41 and not m['mangler_i_avspilling'] and not m['nye_eller_oekte_avvik']
+assert m['runder']==m['grunnlagsrunder_samme_binar']==5 and m['skjermbufferkontroller']==179
+assert m['kontroller_fra_figurstart']==m['null_fra_figurstart']==161
+assert all(not v['avvik'] for row in m['scenes'] for v in row['kontroller'])
+assert f['moddfiler_per_pakke']==20524 and f['begge_faktiske_nedlastinger_verifisert'] and f['begge_modder_byteidentiske']
+assert f['kode']==code and f['hd_mod']==mod and len(assets)==4
+for row in assets:
+ p=O/row['plattform']/row['fil'];assert p.stat().st_size==row['bytes'] and h(p)==row['sha256']
+images=sorted(R.glob('pakke-motorbilder-*.png'));assert len(images)==1
+(R/'visuell-kontroll.json').write_text(json.dumps(dict(utc=datetime.now(timezone.utc).isoformat(),kontrollert_av='Codex',hele_motorbilder_sett=5,kontaktark={p.name:h(p) for p in images},nye_native_observert=41,begge_faktiske_nedlastinger_verifisert=True,begge_modder_filvis_verifisert=True,konklusjon='Alle41 nye native i faktisk Linux-pakke observert. Samme grafikkfiler i Windows. Ingen nye/økte bufferavvik. Inventar,akvarium,cafeteria og begge nye Sam-forløp visuelt kontrollert.',begrensning='Tvungne motorforløp,ikke naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Kjent inventarkant i rom35 fortsatt dokumentert,ikke rettet av denne grafikkleveransen. Ingen ny Tom-/Claude-godkjenning.'),ensure_ascii=False,indent=2)+'\n')
+logs={}
+with zipfile.ZipFile(R/'linux-motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for p in sorted(O.glob('*/scummvm.log')):
+  rel=p.relative_to(O).as_posix();z.write(p,rel);logs[rel]=h(p)
+assert len(logs)==10
+(R/'linux-motorlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n')
+body=f'''Linux og Windows har nå samme kontrollerte grafikkpakke med **2283 native HD-ruter**,41 flere enn forrige fellesutgave. Sams håndbevegelse og munnsekvens ved hjerteobjektet er med. Alle41 jobbark i dette kostymet er nå levert med67 HD-ruter. Grafikkarbeidet fortsetter med resten av figurene.
+
+Last ned **SamMaxHD-Windows.zip** for Windows eller **SamMaxHD-x86_64.AppImage** for Linux. Spillet og talen følger med. Linux:gjør filen kjørbar og start den. Ctrl+H bytter grafikk,F5 åpner originalmenyen.
+
+Begge faktiske nedlastinger og SHA-filer er kontrollert. Alle20524 runtime moddfiler per pakke er identiske med publisert modd. Linux:fem pakkeprøver og fem sammenlignbare2242-grunnlagsprøver med samme nye binær,alle41 nye ruter observert,179 skjermbufferkontroller uten avvik. Inventar,akvarium og cafeteria er kontrollert. Et kjent lite inventarkantavvik i rom35 står fortsatt dokumentert. Windows har grønt pakkebygg og samme grafikkfiler. Ikke full gjennomspilling eller ny interaktiv Windows-/webtest.
+
+Kilde:{code}
+hd-mod:{mod}
+Linux-bygg:https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39362309325
+Windows-bygg:https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39362311476
+Kontrollrapport:https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/felles-release-20261020-sam/RAPPORT.md
+
+Spillet og grafikken tilhører Disney/Lucasfilm.
+'''
+# Vanlig lesbar avstand rundt tall og lenker i brukerbeskrivelsen.
+body=body.replace('**,41','**, 41').replace('med67','med 67').replace('Alle41','Alle 41').replace('Alle20524','Alle 20 524').replace('Linux:','Linux: ').replace('Kilde:','Kilde: ').replace('hd-mod:','hd-mod: ').replace('Linux-bygg:','Linux-bygg: ').replace('Windows-bygg:','Windows-bygg: ').replace('Kontrollrapport:','Kontrollrapport: ').replace('grafikk,F5','grafikk, F5').replace('binær,alle','binær, alle').replace('ruter observert,179','ruter observert, 179')
+(O/'utgivelse-notat.md').write_text(body);shutil.copy2(O/'utgivelse-notat.md',R/'utgivelse-notat.md')
+prior=api('releases?per_page=100');assert not any(v['tag_name']==tag for v in prior)
+before=json.loads((O/'releaser-foer-bygg.json').read_text());assert len(before)==11 and {v['id'] for v in before}<={v['id'] for v in prior}
+aset=lambda v:{(x['id'],x['name'],x['size'],x['digest']) for x in v['assets']}
+for old in before:
+ if old['tag_name'] not in ['linux','windows']:assert aset(old)==aset(next(v for v in prior if v['id']==old['id']))
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==mod
+(O/'releaser-foer.json').write_text(json.dumps(prior,indent=2)+'\n');shutil.copy2(O/'releaser-foer.json',R/'releaser-foer.json')
+(R/'RAPPORT.md').write_text(f'''# Felles Linux-/Windows-pakke med2283 native
+
+Kontrollert{datetime.now(timezone.utc).isoformat()},Codex. Linux39362309325 og Windows39362311476 er grønne fra main{code} og hd-mod{mod}. Siden forrige pakkekode er bare memory/todo/STATUS/log endret,ingen motor-/pipelineendring. Begge bygg er sendt én gang.41 nye native siden2242:14 fra sam345-tilbake og27 fra sam345-slutthoder. Hele kostyme345 er nå levert i41 ark med67 native,men øvrig grafikk er fortsatt under arbeid.
+
+Begge faktiske nedlastinger og SHA-filer er kontrollert mot alle fire API-digester/størrelser. BYGG.txt og begge Actions-run-ID-er bekrefter korrekt kode-/mod-SHA. Alle20524 runtime moddfiler i hver pakke er byteidentiske med publisert modd og hverandre. BareREADME.md er utelatt av pakkeskriptene.2283 native bekreftet i mod.json og faktisk filantall,alle41 nye SHA-er finnes i begge pakker. Se assetkontroll.json,moddfiler-2283.json og moddfiler-kontroll.json.
+
+Den faktisk nedlastede Linux-binæren har SHA256{m['binar_sha256']}. Fem isolerte pakkeprøver og fem2242-grunnlagsprøver med samme nye binær og egneHOME/XDG/saves. Inventar åpne/lukke,akvarium,cafeteria og kostyme345 chore1/7. Alle41 nye native faktisk tegnet.179 sluttbufferkontroller,alle null.161 er fraframe40;disse feltnavnene betyr ikke faktisk første nye tegningsframe. Ingen nye/økte avvik mot grunnlaget. Kjent inventarkant i rom35 er fortsatt dokumentert,ikke rettet av denne grafikkleveransen.
+
+Fem hele motorbilder på ett ark er sett. Alle41 nye ruter har også individuell visuell kontroll og mottak i produksjonsbunkene. Dette er tvungne tester,ikke naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Ingen ny Tom-/Claude-godkjenning. Windows har grønt pakkebygg,CI-startprøve og identiske grafikkfiler.
+
+Ny fellesrelease{tag} er konkret klargjort med de fire faktisk kontrollerte filene. Alle{len(prior)} tidligere releaser og assets fra etter de nødvendige plattformbyggene skal bevares. Eldre fellesreleaser er også uendret fra før byggene. Publisering ogLatest-status bekreftes i publisert.json etter kontroll av alle fire opplastinger før og etter publisering.
+
+Neste ti figurjobber344_01 til10 er kildeklargjort i sam344-foerste-20261020,19 ruter fra11 ulike hele kilder og40 beskyttede SHA-er. Sam kaster en ekte lilla aubergine mellom hendene. Ingen bildekall eller resultat der ennå;seks prompter er bare planlagt.17 feilutledede jobber346_27 til43 står fortsatt åpne med kildefeil. Ikke gjenta dem eller de ferdige2283-byggene.
+''')
+for name in ['hent-status.py','hent-pakker.py','kontroller-pakker.py','kontroller-linux.py','vis-pakke.py','forbered-release.py']:shutil.copy2(O/name,R/(name+'.txt'))
+print('Faktiske2283-pakker verifisert,fem motorbilder sett,ti motorlogger lagret,konkret fellesrelease klargjort.',flush=True)

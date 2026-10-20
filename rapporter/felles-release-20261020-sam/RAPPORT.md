@@ -1,0 +1,13 @@
+# Felles Linux-/Windows-pakke med2283 native
+
+Kontrollert2026-10-20T03:18:07.076106+00:00,Codex. Linux39362309325 og Windows39362311476 er grønne fra main3c26a5e5e2f2b9e07dc00aca5ef7af17bc406d35 og hd-mod9ed54398f31ba742edfc3f724eaa1a1f9df2a085. Siden forrige pakkekode er bare memory/todo/STATUS/log endret,ingen motor-/pipelineendring. Begge bygg er sendt én gang.41 nye native siden2242:14 fra sam345-tilbake og27 fra sam345-slutthoder. Hele kostyme345 er nå levert i41 ark med67 native,men øvrig grafikk er fortsatt under arbeid.
+
+Begge faktiske nedlastinger og SHA-filer er kontrollert mot alle fire API-digester/størrelser. BYGG.txt og begge Actions-run-ID-er bekrefter korrekt kode-/mod-SHA. Alle20524 runtime moddfiler i hver pakke er byteidentiske med publisert modd og hverandre. BareREADME.md er utelatt av pakkeskriptene.2283 native bekreftet i mod.json og faktisk filantall,alle41 nye SHA-er finnes i begge pakker. Se assetkontroll.json,moddfiler-2283.json og moddfiler-kontroll.json.
+
+Den faktisk nedlastede Linux-binæren har SHA25673b4541703cd80cbe67a030956a5bb6cb750f0fe8df428ffbba56a738c26c333. Fem isolerte pakkeprøver og fem2242-grunnlagsprøver med samme nye binær og egneHOME/XDG/saves. Inventar åpne/lukke,akvarium,cafeteria og kostyme345 chore1/7. Alle41 nye native faktisk tegnet.179 sluttbufferkontroller,alle null.161 er fraframe40;disse feltnavnene betyr ikke faktisk første nye tegningsframe. Ingen nye/økte avvik mot grunnlaget. Kjent inventarkant i rom35 er fortsatt dokumentert,ikke rettet av denne grafikkleveransen.
+
+Fem hele motorbilder på ett ark er sett. Alle41 nye ruter har også individuell visuell kontroll og mottak i produksjonsbunkene. Dette er tvungne tester,ikke naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Ingen ny Tom-/Claude-godkjenning. Windows har grønt pakkebygg,CI-startprøve og identiske grafikkfiler.
+
+Ny fellesreleasesam-max-hd-2026-10-20-sam er konkret klargjort med de fire faktisk kontrollerte filene. Alle11 tidligere releaser og assets fra etter de nødvendige plattformbyggene skal bevares. Eldre fellesreleaser er også uendret fra før byggene. Publisering ogLatest-status bekreftes i publisert.json etter kontroll av alle fire opplastinger før og etter publisering.
+
+Neste ti figurjobber344_01 til10 er kildeklargjort i sam344-foerste-20261020,19 ruter fra11 ulike hele kilder og40 beskyttede SHA-er. Sam kaster en ekte lilla aubergine mellom hendene. Ingen bildekall eller resultat der ennå;seks prompter er bare planlagt.17 feilutledede jobber346_27 til43 står fortsatt åpne med kildefeil. Ikke gjenta dem eller de ferdige2283-byggene.
