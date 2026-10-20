@@ -4,12 +4,16 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 
 ## Neste
 
+- [x] 2026-10-20 11:49: Fig342_06 til 10 publisert og hentet, ti nye native, 2437 totalt. Alle ti sett/motorobservert, 285 nullkontroller.
+- [ ] Fortsett fig342_11 til 15 fra kildeklargjort bunke: ti mål, tre nye motiver og fem eksakt kildeidentiske eksisterende mål. Ingen nye bildekall eller resultater der ennå.
+- [ ] Oppdater begge faktiske pakker ved samlepunkt etter resten av Sam342. De har nå 2427 og mangler de ti nye rutene; ikke kall dem oppdatert fra native-tallet alene.
+
 - [x] 2026-10-20 11:20: Alle 47 Sam346-kleslag er rettet, inkludert 23 eldre overtegningskopier. Native 1481ab600c1a5a6c045b0ae210408b6af0de2068; alle filer hentet og kontrollert.
 - [x] Fellesutgave sam-max-hd-2026-10-20-samlag publisert og Latest, begge faktiske pakker og alle 20669 moddfiler per pakke kontrollert. Begge Sam-forløp viser alle 47 lag; 384 sluttbufferkontroller null. Windows og Linux besto første forsøk. Ikke gjenta byggene.
-- [ ] Fortsett faktisk produksjon av de kildeklare fig342_06 til 10. Ti ruter fra fem hele kilder, ingen nye bildekall eller resultater der ennå. Se sam342-06til10-20261020/NESTE.md.
+- [x] Fortsett faktisk produksjon av de kildeklare fig342_06 til 10. Ti ruter fra fem hele kilder, ingen nye bildekall eller resultater der ennå. Se sam342-06til10-20261020/NESTE.md. Utført i denne runden.
 
 - [x] 2026-10-20 10:47: Felles 2427 publisert og Latest, https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam342. Begge faktiske pakker og alle 20669 moddfiler per pakke kontrollert, 304 sluttbufferkontroller null. Windows besto identisk omprøve; første SDL-feil er bevart. Native-frysen er frigitt. Ikke gjenta byggene.
-- [ ] Fortsett fig342_06 til 10 etter dette samlepunktet. Ti ruter fra fem hele kilder er kildeklare, originaler/motor/anker sett, ingen nye bildekall der. Se sam342-06til10-20261020.
+- [x] Fortsett fig342_06 til 10 etter dette samlepunktet. Ti ruter fra fem hele kilder er kildeklare, originaler/motor/anker sett, ingen nye bildekall der. Se sam342-06til10-20261020. Utført i denne runden.
 - [x] Fem nye Sam342-ark og 24 Sam346-kleslag er publisert og hentet, 2427 native. Alle 33 visuelt sett og motorobservert; 285 sluttbufferkontroller null. To omrissvarsler beholdt. 307 av 1758 hele figurjobber har resultat.
 - [ ] Undersøk årsaken til den første Windows SDL-startfeilen ved anledning. Identisk omprøve besto uten kode-/testendring; første feil er beholdt som uavklart oppstartsavvik. Se felles-release-20261020-sam342/WINDOWS-FEIL.md. Dette er ikke en påstått motorretting.
 
