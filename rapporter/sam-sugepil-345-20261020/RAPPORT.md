@@ -17,3 +17,5 @@ Neste gyldige bunke fig345_11 til20 har ti eksakt like hele kilder som1923 og ka
 Bibliotek: figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelruter, tilpasset eksisterende v6-pipeline og kontrollert med aktuelle native-/motorresultater. Bare grafikk og rapporter her, ingen motor-/pipelineendring.
 
 Sluttkontrollen fant ni rent magentafargede kantpiksler med alfa1 etter skalering, usynlige ved vanlig visning men uønsket i eksport. Bare generert alfa0 til3 er nullstilt etter skalering. Egenkontroll, native-måling og80kontrollers motorprøve er deretter kjørt på sluttfilene;0 synlige magentapiksler og0 bufferavvik. Før-versjonen av mottak/kandidat/motor er bevart i ignorert out/. Ingen originalmaskeklipping.
+
+Publisert og hentet tilbake: kilde 32c0dc4fc2067f7c078f16637ca66176cdc32b16, hd-mod 6a5eff6aaef63412f45b71bb2b51c6feb7c7e046, 2227 native totalt. Alle 20463 kandidat-PNG-er, 20452 gamle PNG-er og 11 nye native-SHA-er stemmer. Alle 20458 gamle stier, 40 nye og 144 tidligere beskyttede kilder og tre stasher bevart. Pakkene2134 er93bak. Neste345_11 til20. Se mottak-publisert.json.

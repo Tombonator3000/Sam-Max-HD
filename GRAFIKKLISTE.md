@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Oppdatert2026-10-20 03:41:345_01 til10 er egenkontrollert,native mottatt og visuelt sett/motorobservert.11 nye ruter,kandidat2227.238 resultatark. Se sam-sugepil-345-20261020.346_27 til43 har kildefeil og er ikke produsert, se alkove-siste-20261020/KILDEFEIL.md. Neste345_11.
+Oppdatert2026-10-20 03:41:345_01 til10 er egenkontrollert,native mottatt og visuelt sett/motorobservert.11 nye ruter,publisert2227.238 resultatark. Se sam-sugepil-345-20261020.346_27 til43 har kildefeil og er ikke produsert, se alkove-siste-20261020/KILDEFEIL.md. Neste345_11.
 
 Oppdatert 2026-10-20 02:58. Ni nye ark,17 runtime-ruter fra12 eksakt like tidligere tegninger.15 OK,to SJEKK,0 FEIL; alle17 visuelt sett og motorobservert. Publisert2216, grunnlag2199.228 av1758 resultatark. Se rapporter/alkove-gjenbruk-20261020/mottak-publisert.json. Ingen ny Tom-/Claude-godkjenning.
 
