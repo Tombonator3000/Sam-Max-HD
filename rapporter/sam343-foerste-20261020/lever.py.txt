@@ -1,0 +1,62 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np, json, hashlib, subprocess, shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter/sam343-foerste-20261020'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+plan = json.loads((R / 'ruteplan-unik.json').read_text())['ruter']
+progress = dict(dato='2026-10-20', nye_jobber=5, native_rutekoblinger=10,
+                hele_rgba_kilder=10, nye_malte_poser=10, bildekall=5, leveranser=[])
+for n in range(1, 6):
+    job = f'fig343_{n:02}'
+    d = A / 'jobber' / job
+    j = json.loads((d / 'jobb.json').read_text())
+    assert not (d / 'resultat.png').exists()
+    canvas = Image.new('RGBA', (1536, 1024))
+    mapping = []
+    for c in j['ruter']:
+        rep = next(v for v in plan if v['bilde'] == c['bilde'])
+        proto = R / (rep['bilde'] + '-prototype.png')
+        im = Image.open(proto).convert('RGBA')
+        x, y, w, h = c['rekt']
+        assert im.size == (w * 4, h * 4)
+        dx, dy = (j['plassering'][0] + x) * 4, (j['plassering'][1] + y) * 4
+        canvas.alpha_composite(im, (dx, dy))
+        yy, xx = np.nonzero(np.array(im)[:, :, 3] >= 128)
+        mapping.append(dict(bilde=c['bilde'], kostyme=343, rute=c['rute'],
+            rect=[dx + int(xx.min()), dy + int(yy.min()), int(xx.max() - xx.min() + 1), int(yy.max() - yy.min() + 1)],
+            representant=rep['bilde'], kilde_rgba_sha256=rep['rgba_sha256'],
+            prototype=proto.relative_to(A).as_posix(), prototype_sha256=sha(proto)))
+    canvas.save(d / 'resultat.png')
+    digest = sha(d / 'resultat.png')
+    assert digest == sha(R / f'{job}-stilark.png')
+    (R / f'rutekart-{job}.json').write_text(json.dumps({job: dict(sha256_resultat=digest, ruter=mapping)}, indent=2) + '\n')
+    run = subprocess.run([str(P / '.venv/bin/python'), 'verktoy/sjekk_leveranse.py', f'jobber/{job}/resultat.png'], cwd=A, capture_output=True, text=True)
+    (R / f'{job}-egenkontroll.txt').write_text(run.stdout + run.stderr)
+    assert run.returncode == 0, (job, run.stdout, run.stderr)
+    phase = ('Begge hender er tomme; ingen aubergine i disse kildeposene.' if n <= 2 else
+             'Auberginen kommer frem nedenfra; grønn stilk er ennå ikke synlig.' if n == 3 else
+             'Auberginen snus fra side til ende; grønn stjerne sitter nederst i første pose og i sentrum i andre.' if n == 4 else
+             'Auberginen holdes loddrett under snuten; den grønne stjernen er øverst.')
+    (d / 'notat.md').write_text(f'''# {job}
+2026-10-20. Innebygd image_gen, fem faktiske kall, to nye malte poser per ark. Modellnavn ikke oppgitt av verktøyet. Sam i varm brun drakt i rom 92, alkoven, aktør 6, lokalt skript 201, gyldig chore 6/raw 5 i COST 343. Katalogen kaller ruter animasjon 1/retning 1. {phase}
+Originalens håndgrep, synlige fingre og tomler, brune hatt, fargepalett og interne flate underkant er fulgt. De første to arkivpromptenes feil om aubergine er presisert separat; beskyttede filer er urørt. Faktiske prompter, råbilder, originale hel-RGBA-hasher og referanser finnes i rapporter/{R.name}.
+Python-rensing og plassering er tillatt av Tom. Svak generert glorie utenfor egen alfa er fjernet med egen generert kjerne, egen kantfarge og fast 4x. Ingen hard originalsilhuettmaske eller originalfragment-fallback. Originalene, alle kildeposene i motor og godkjent Sam-anker er sett. Den lilla auberginen og den kildebekreftede grønne stilken er beholdt.
+Egenkontroll OK. Resultat SHA256 {digest}. Laget, native mottatt, visuelt kontrollert, motorobservert, publisert og faktisk pakkeimport skilles i fremdrift.json. Ingen ny Tom-/Claude-godkjenning.
+''')
+    progress['leveranser'].append(dict(jobb=job, resultat=f'jobber/{job}/resultat.png', sha256=digest,
+        ruter=len(mapping), rutekart=f'rapporter/{R.name}/rutekart-{job}.json', laget=True, egenkontroll='OK',
+        native_mottatt=False, visuelt_kontrollert=False, motorobservert=False, publisert=False,
+        importert=False, i_fellespakke=False, godkjent_av_Tom=False, claude_kontroll=False))
+    print(job, 'OK', flush=True)
+(R / 'fremdrift.json').write_text(json.dumps(progress, ensure_ascii=False, indent=2) + '\n')
+p = R / 'bildekall.json'
+v = json.loads(p.read_text())
+assert len(v['kall']) == 5
+for c in v['kall']:
+    assert c['utfoert']
+    c['brukt'] = True
+p.write_text(json.dumps(v, ensure_ascii=False, indent=2) + '\n')
+shutil.copy2(__file__, R / 'lever.py.txt')

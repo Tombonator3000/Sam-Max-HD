@@ -1,0 +1,1 @@
+Kostyme343 i rom92, aktor6/lokalt201/chore6. Ingen aubergine i1920..1923; der er standardpromptens premiss korrigert separat. Fra1924 hentes ekte lilla aubergine frem; grønn stilk/stjerne blir først synlig i1926. Originalpromptene er uendret. Faktiske prompter og referanser i rapporter/sam343-foerste-20261020. Hele kildegrunnlaget og stilankrene er sett.
