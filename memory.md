@@ -1,5 +1,15 @@
 # memory.md
 
+## Kontorintro publisert, pakkecheckpoint 2026-10-20 14:59
+
+Hele kontorintroens kostyme041 er produsert i ti hele resultatark med49 native fra41 ulike canonical kilder. Siste fem041_06 til10 ga16 nye, med seks innebygde bildekall inkludert1957-retur. Tre siste ark egenkontroll OK, to SJEKK og ingen FEIL; tre omrissvarsler er bevart og visuelt vurdert. Alle49 er automatisk native OK, visuelt sett og motorobservert. Alle råbilder, faktiske prompter, SHA-festede leveranser, rutekart og originalreferanser er bevart. Ingen hard originalsilhuettmaske eller originalfragment-fallback. Ingen motor-/pipelinekode er endret.
+
+Siste grafikkilde50539f6a9ae008568ade7d6008b8f154332eb113. Native 887aa441386ee48a52c430bc8232f3c235dd5a16 er publisert og hentet,2527 totalt, alle20770 filer og20764 PNG-er SHA-bekreftet. Alle tidligere20748 PNG-er og filstier er bevart;696 beskyttede kildefiler og tre opprinnelige stasher er uendret.343 av1758 hele figurjobber har resultat,1415 gjenstår pluss returer/katalogfeil/sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+
+Siste bunke har160 kandidatkontroller i samme faktisk nedlastede2478-binær som2511-grunnlaget:158 null og samme to160-avvik ved36 før første041-tegning60. Alle132 kontroller fra60 null. Ingen nye eller økte avvik; helprøven er ikke avviksfri. Elevation0 mot kilde-2 og aktør3 uendret er fortsatt begrensninger. Ikke naturlig intro eller interaktiv Windows-/webtest.
+
+Begge nye pakker er startet én gang ved samlepunktet: Linux 39426574662, Windows 39426580172, kode 7a439be29a6ef6e7c42c6c1c6be10c201041bb28, native 887aa441386ee48a52c430bc8232f3c235dd5a16. Native fryses til begge bygg har sikret samme grafikk. Fellespakker2478 mangler49 inntil faktisk nedlasting, filhasher, motorprøve og ny felles release er kontrollert. Ikke gjenta byggene. Neste figurserie er164_01 til05 og skal kildeklargjøres mens byggene går. Ikke gjenta041. Automatisk grafikkarbeid fortsetter; gammel nattkontroll gjenstartes ikke.
+
 ## Kontorintro, første fem publisert, 2026-10-20 14:29
 
 Fem nye hele ark fig041_01 til05,33 native fra25 ulike hele canonical RGBA-kilder. Sju innebygde bildekall, inkludert én brukt malt munnretting og ett forkastet helruteutkast. Egenkontroll fem OK, automatisk native33 OK, alle33 visuelt sett og motorobservert. Grafikkilde c32a5e05fd836ef18105a342aa3ecd3977df1424, hd-mod e12660e1d39c515f705613adcb62331ac0ff4aaf,2511 totalt. Alle20754 filer og20748 PNG-er bekreftet etter hent; alle20715 tidligere PNG-er og stier bevart.676 beskyttede kildefiler og tre opprinnelige stasher uendret.338 av1758 hele figurjobber har resultat,1420 gjenstår pluss returer/katalogfeil/sluttkontroll. Ingen hard originalsilhuettmaske, originalfragment-fallback eller motor-/pipelinekode.

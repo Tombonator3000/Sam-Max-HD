@@ -1,9 +1,16 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-20 14:59
+
+- [x] Hele041: ti ark/49 native, publisert og hentet2527, alle hasher og tidligere grafikk/stasher bevart.343 av1758 resultatark. Ikke gjenta041.
+- [ ] Fullfør pågående pakkecheckpoint2527: Linux 39426574662, Windows 39426580172. Native frosset. Faktiske pakker og motorprøve må bekreftes før felles release; ikke dispatch på nytt.
+- [ ] Kildeklargjør neste164_01 til05. Se GRAFIKKLISTE på gpt-arbeid.696 beskyttede kilder og tre stasher skal bevares.
+- [ ] Tidlig160-avvik36, tre omrissvarsler og øvrige historiske SDL-/testhopp-/inventarkant-/katalogfunn er fortsatt åpne. Ingen ny Tom-/Claude-godkjenning.
+
 ## Neste, oppdatert 2026-10-20 14:29
 
 - [x] Første fem041_01 til05: fem hele resultatark og33 native, publisert og hentet e12660e1,2511 totalt; alle filhasher og tidligere grafikk/stasher bevart.338 av1758 hele figurjobber har resultat.
-- [ ] Produser neste fem041_06 til10,16 ulike helkilder. Originaler, grep, kildeposer og ankere er sett,20 nye kildehasher beskyttet. Se sam-max-kontor041-slutt-20261020/KILDEGRUNNLAG.md på gpt-arbeid. Ikke gjenta første fem.
+- [x] Produser neste fem041_06 til10,16 ulike helkilder. Originaler, grep, kildeposer og ankere er sett,20 nye kildehasher beskyttet. Se sam-max-kontor041-slutt-20261020/KILDEGRUNNLAG.md på gpt-arbeid. Ikke gjenta første fem.
 - [ ] Sammenlign videre motorprøver mot samme grunnlag; tidlig160-avvik36 er ikke rettet. Første33 ga132 nullkontroller fra60 og ingen nye/økte avvik. Testavgrensningene elevation/aktør3 står åpne.
 - [ ] Oppdater begge pakker ved neste samlepunkt; siste fellespakke2478 mangler33. Ikke bygg2478 om igjen. Historiske SDL-/testhopp-/inventarkant- og katalogfunn står fortsatt åpne. Ingen ny Tom-/Claude-godkjenning.
 
@@ -12,7 +19,7 @@ Det som gjenstår, viktigst først. Kryss av når noe er gjort, og logg det i `l
 ## Neste
 
 - [x] 2026-10-20 13:44: Hele Sam343 er produsert, 11 ark og 22 nye native, publisert og hentet. Begge faktiske pakker i sam-max-hd-2026-10-20-sam343 er kontrollert med 2478 native og alle 20720 runtime moddfiler per pakke. 304 nullkontroller. Ikke gjenta disse byggene eller arkene.
-- [ ] Gjenoppta de fem kildeklargjorte fig041_01 til 05 etter kilde-/stilkoll. 33 ruter fra 25 hele canonical kilder; ingen bildekall eller resultater ennå. Bevar løse papirark, hatt og smådeler. Se sam-max-kontor041-grunnlag-20261020/NESTE.md.
+- [x] Gjenoppta de fem kildeklargjorte fig041_01 til 05 etter kilde-/stilkoll. 33 ruter fra 25 hele canonical kilder; ingen bildekall eller resultater ennå. Bevar løse papirark, hatt og smådeler. Se sam-max-kontor041-grunnlag-20261020/NESTE.md.
 - [ ] Undersøk og sammenlign kildeprøvens 160-pikslers avvik ved frame 36 i rom 7, før første 041-tegning ved 60. Alle 66 kontroller fra 60 er null, men helprøven bestod ikke. Ikke endre nullgrenser eller påstå retting.
 - [ ] Rett den avgrensede Windows-workflowfeilen med ekstra taggbygg ved anledning, via testet PR. Den tidligere taggkjøringen 39410011861 feilet med kjent SDL-startfeil; ordinære nye2478-bygg bestod første forsøk.
 
