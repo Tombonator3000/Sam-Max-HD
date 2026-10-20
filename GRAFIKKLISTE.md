@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Oppdatert21.oktober2026:029_09til15,sju nye hele ark/23native er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert. To nye innebygde kall,1955tanflis rettet ved hel omtegning;bevarte prototyper og hele sourceRGBA-aliaser gjenbrukt. Alle7ark/23native OK.240kontroller239null,samme160ved36,211frafigurstart null,ingen nye/økte. Kandidat2941;411av1758resultatark,1347gjenstår. Publisering/hent kvitteres separat. Pakker har2918,mangler23;felles samlepunkt etter resterende029_16til22/17mål. Neste gjenopptar T05råbildet for1975/76/1980,ikke kall på nytt.1000kilder/3stasher/tidligere filer bevares.164_04fortsatt blokkert,ingen ny Tom-/Claude-godkjenning.
+
 Ferdig samlepunkt 2026-10-21 00:51: første Sam029_01 til08 er i kontrollert felles2918: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-tau029-foerste. Åtte hele ark/30nye native, alle motorobservert. Begge faktiske pakker/21160runtime-filer per pakke og Latest bekreftet.464kontroller463null, samme160ved36,211frafigurstart null, ingen nye/økte. Nativefrys frigitt.404av1758resultatark,1354gjenstår pluss returer/katalogfeil/sluttkontroll. Neste029_09 til22, gjenoppta T04råbildet og1950prototype i sam029-tau-20261021.1000kilder/3stasher/tidligere filer bevart.164_04fortsatt blokkert. Ingen ny Tom-/Claude-godkjenning. Ikke gjenta044,029_01til08 eller2918byggene.
 
 Oppdatert 21. oktober2026: fig029_01 til08 er levert og kontrollert, åtte hele ark/30nye native fra11hele malerier. Seks innebygde bildekall bevart, fire brukt i bunken. Alle8ark/30native OK og visuelt sett;30motorobservert.240kontroller239null, samme160 ved36 som grunnlaget,211frafigurstart null, ingen nye eller økte avvik. Kandidat2918;404av1758resultatark,1354gjenstår. Publisering/hent og nye pakker kvitteres separat. Neste029_09 til22, gjenoppta T04råbilde og1950prototype i sam029-tau-20261021. Hele044er allerede publisert og i kontrollert felles2888, ikke gjenta044.1000kilder/3stasher/tidligere filer bevares.164_04fortsatt blokkert. Ingen ny Tom-/Claude-godkjenning.
@@ -462,18 +464,18 @@ Figurark for Sam.
 - [x] `fig029_06` (figurark 6 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig029_07` (figurark 7 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig029_08` (figurark 8 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_09` (figurark 9 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_10` (figurark 10 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_09` (figurark 9 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_10` (figurark 10 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 25
 
 Figurark for Sam.
 
-- [ ] `fig029_11` (figurark 11 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_12` (figurark 12 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_13` (figurark 13 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_14` (figurark 14 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig029_15` (figurark 15 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_11` (figurark 11 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_12` (figurark 12 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_13` (figurark 13 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_14` (figurark 14 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig029_15` (figurark 15 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_16` (figurark 16 for Sam (kostyme 29), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_17` (figurark 17 for Sam (kostyme 29), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig029_18` (figurark 18 for Sam (kostyme 29), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)

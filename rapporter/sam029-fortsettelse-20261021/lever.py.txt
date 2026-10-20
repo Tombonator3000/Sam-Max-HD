@@ -1,0 +1,44 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,subprocess,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam029-tau-20261021'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');assert base['native']==2918 and all(sha(P/'mods/gpt'/f)==h for f,h in base['filer'].items())
+prot=read(R/'beskyttede-samlet.json');assert len(prot)==1000 and all(sha(A/f)==h for f,h in prot.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==404
+plan=read(R/'ruteplan-unik.json');jobs=plan['jobber'];assert len(jobs)==7 and plan['maal']==23 and len(plan['ruter'])==11
+protos={}
+for e in plan['ruter']:
+    v=read(R/(e['bilde']+'-prototype.json'));v['art']=R/v['prototype'];assert v['native_ok'] and sha(v['art'])==v['sha256'];protos[e['bilde']]=v
+assert protos['costume029_1955']['kall']=='R03' and protos['costume029_1967']['kall']=='T05'
+assert sum(v.get('tidligere_publisert_hel_canonical',False) for v in protos.values())==5
+progress=dict(leveranser=[],nye_jobber=7,native_rutekoblinger_levert=23,nye_hele_canonical_i_native=6,tidligere_hele_canonical_gjenbrukt=5,ytterligere_hele_aliasmaal=12,nye_bildekall=2,nye_raabilder=2,tidligere_kall_i_bruk=5,grunnlag_native=2918,egen_alpha=True,originalmaske=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False)
+maps=[]
+for job in jobs:
+    J=A/'jobber'/job;j=read(J/'jobb.json');canvas=Image.new('RGBA',(1536,1024));mapping=[]
+    for c in j['ruter']:
+        e=next(e for e in plan['ruter'] if any(t['bilde']==c['bilde'] for t in e['malruter']));v=protos[e['bilde']]
+        src=Image.open(P/'work/extract/costumes'/(c['bilde']+'.png')).convert('RGBA');assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']
+        im=Image.open(v['art']).convert('RGBA');x,y,w,h=c['rekt'];assert im.size==(w*4+16,h*4+16);dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8
+        assert dx>=0 and dy>=0 and dx+im.width<=1536 and dy+im.height<=1024;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128)
+        mapping.append(dict(bilde=c['bilde'],kostyme=29,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical=e['bilde'],canonical_rgba_sha256=e['rgba_sha256'],canonical_fil_sha256=sha(P/'work/extract/costumes'/(c['bilde']+'.png')),prototype=str(v['art'].relative_to(A)),prototype_sha256=sha(v['art']),kall=v['kall'],egen_alpha=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,tidligere_publisert_hel_canonical=v.get('tidligere_publisert_hel_canonical',False),egne_smaadeler_gjenbrukt=v.get('egne_smaadeler_gjenbrukt',[]),eksakt_helt_alias=e['bilde'] if e['bilde']!=c['bilde'] else None))
+    assert not (J/'resultat.png').exists();canvas.save(J/'resultat.png');digest=sha(J/'resultat.png');save(R/f'rutekart-{job}.json',{job:dict(sha256_resultat=digest,ruter=mapping)})
+    test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True);(R/f'{job}-egenkontroll.txt').write_text(test.stdout+test.stderr);assert test.returncode in [0,1],(job,test.stdout);state='OK' if test.returncode==0 else 'SJEKK';print(job,state,test.stdout[-130:],flush=True)
+    progress['leveranser'].append(dict(jobb=job,resultat=str((J/'resultat.png').relative_to(A)),sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll=state,egenkontrollert=True,visuelt_kontrollert=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False));maps+=mapping
+    (J/'notat.md').write_text(f'''# {job}, 21. oktober 2026
+
+Sju hele ark fig029_09 til15 er levert samlet:23nye native mål fra11ulike hele canonical kilder. Seks canonical malerier tas inn første gang, fem tidligere publiserte hele malerier gjenbrukes ved identisk hel source-RGBA, og12ekstra aliasmål har samme hele kilde. Det er ikke23nye malerier.1950 fraT03 og1952/1953/1956 fraT04 er gjenopptatt fra bevarte uleverte prototyper. To nye innebygde image_gen-kall er bevart: T05 for1967og tre fremtidige motiver, R03 for hele1955. Tidligere råbilder og faktiske prompter finnes i sam029-tau-20261021; alle nye finnes i denne rapporten.
+
+Motivet er Sams hånd og lange blågrå erme ved tauenden rundt kvinnen i introens rom5. Primærskript65 og faktisk motor viser grep og slipp. At alle knutene løsnes er ikke dokumentert. Dette er ikke en hel Sam eller et nytt redskap. Godkjent Sam-hovedark og kroppsanker er brukt sammen med originaler og spillkontekst. Egen T01R/T04-prøve styrer bare kontinuitet, uten ny Tom-godkjenning. Fingerstillinger, smal mansjett, ermefolder, kildeekte avskjæring og antall smådeler følger kilden.
+
+T04 for1955 manglet én TAN tauflis ved kildeposisjon9,50. Den er ikke grå. R03 tegner hele motivet om med flisen. Egen ny alpha bevarer tre adskilte grupper og forbindelsen mellom den store tauenden og hånden. R03 ble returnert som1850x850; råbildet er bevart, og eget maleri er tilrettelagt på1536x1024med bevart aspekt før affin plassering. Måling av den nye hele armen gir IoU0,952/dekning0,971. Originalalfa brukes bare til måling og delrektangler, aldri som hard klippemaske. Ingen originale piksler eller originalfragment-fallback.
+
+Bildene har ekte egen alfa. Svak egen generert glød er fjernet etter egen alfa, med to piksler egen kant. Hele egne motiver og allerede adskilte egne fragmenter er affinplassert i4x med8HD-piksler marg. Akseptgrensene er uendret: CORE128, IoU0,6, dekning0,8. R03-flisen kommer fra nymalt bilde, ikke fra originalen. Tidligere hele malerier og deres egne smådeler bevares uendret.
+
+Resultat SHA256:{digest}. Egenkontroll:{state}. Native mottak, visuell sluttkontroll, motorobservasjon, publisering og pakker føres separat. Ingen ny Tom-/Claude-godkjenning.1000beskyttede jobbfiler og tre stasher er urørt. Bibliotekskilder:figurark-fast-storrelse og publisert-mod-er-fasit.
+''')
+save(R/'fremdrift.json',progress);save(R/'prototyper-endelig.json',maps)
+assert len(maps)==23 and len({v['bilde'] for v in maps})==23 and len(list((A/'jobber').glob('fig*/resultat.png')))==411
+assert all(sha(A/f)==h for f,h in prot.items());shutil.copy2(__file__,R/'lever.py.txt');print('7hele ark,23nye mål,6nye hele canonical i native og5gamle,411resultatark',flush=True)

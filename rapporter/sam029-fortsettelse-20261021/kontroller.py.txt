@@ -1,0 +1,57 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam029-tau-20261021';C=O/'mod-sam029-fortsettelse'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');prot=read(R/'beskyttede-samlet.json')
+assert len(prot)==1000 and all(sha(A/f)==h for f,h in prot.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+files=read(R/'kandidatfilhash.json');assert {p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()}==files
+assert len(files)==21184 and sum(f.endswith('.png') for f in files)==21178
+assert read(C/'mod.json')['costume_cels']==2941 and (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+assert set(base['filer'])<=set(files) and {f for f,h in base['filer'].items() if files[f]!=h}=={'mod.json'}
+rows=read(R/'native-fast4x-samlet.json')['ruter'];assert len(rows)==23;groups={}
+for v in rows:
+    p=Path(v['prototype']);a=np.array(Image.open(C/v['fil']).convert('RGBA'));q=np.array(Image.open(p).convert('RGBA'));assert sha(p)==v['prototype_sha256'] and sha(C/v['fil'])==v['sha256'] and np.array_equal(a[:,:,3],q[:,:,3])
+    assert not a[a[:,:,3]==0,:3].any();src=np.array(Image.open(P/'work/extract/costumes'/(v['bilde']+'.png')).convert('RGBA'));assert hashlib.sha256(src.tobytes()).hexdigest()==v['canonical_rgba_sha256'] and a.shape[:2]==(src.shape[0]*4+16,src.shape[1]*4+16)
+    iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER and not v['hard_originalmaske'] and not v['originalfragment_fallback'];groups.setdefault(v['canonical_rgba_sha256'],set()).add(v['sha256'])
+assert len(groups)==11 and all(len(h)==1 for h in groups.values())
+inherited=read(R/'gjenopptatte-prototyper.json');assert len(inherited)==9
+for v in inherited:
+    d=read(R/(v['bilde']+'-prototype.json'));assert sha(Path(d['forrige_prototype']))==v['sha256']==d['sha256'] and sha(S/(v['bilde']+'-prototype.json'))==d['forrige_notat_sha256']
+raw=[]
+for d in sorted((R/'kall').iterdir()):
+    assert sha(d/'raa.png')==read(d/'raabilde.json')['sha256'];args=read(d/'argumenter.json');assert args['transparent_background'] and args['prompt']==(d/'prompt-brukt.txt').read_text()
+    save(d/'referanser.json',[dict(fil=p,sha256=sha(Path(p))) for p in args['referenced_image_paths']]);raw.append(dict(kall=d.name,sha256=sha(d/'raa.png'),argumenter_sha256=sha(d/'argumenter.json')))
+assert len(raw)==2 and {v['kall'] for v in raw}=={'T05','R03'}
+assert Image.open(R/'kall/R03/raa.png').size==(1850,850) and Image.open(R/'kall/R03/raa-til-plassering.png').size==(1536,1024)
+obs=read(R/'motorobservasjoner.json');assert obs['sett']==23 and not obs['mangler'] and all(sha(Path(v['fil']))==v['sha256'] and sha(C/'costumes'/(b+'_hd.png'))==v['native_sha256'] for b,v in obs['tegninger'].items())
+motor=read(R/'motor-kandidat.json');old=read(R/'kilde-motor.json');assert motor['binar_sha256']==old['binar_sha256'] and motor['kontroller']==old['kontroller'] and motor['skjermbufferkontroller']==240 and motor['nullkontroller']==239
+assert [(v['cel'],v['logg_frame'],v['pos'],v['maal']) for v in motor['hendelser']]==[(v['cel'],v['logg_frame'],v['pos'],v['maal']) for v in old['hendelser']]
+assert [v for v in motor['kontroller'] if v['avvik']]==[dict(frame=36,avvik=160)] and len([v for v in motor['kontroller'] if v['frame']>=60])==211
+assert all(v['utenfor_nye_cels_og_marg']==0 for v in read(R/'pikselkontroll.json'))
+views=[R/f'original-native-motor-side{i}.png' for i in range(1,4)]+[R/'hele-motorbilder-brett.png']+[R/f'foer-etter-costume029_{n}.png' for n in [1950,1955,1967]]+[A/'jobber'/f'fig029_{i:02}'/'resultat.png' for i in range(9,16)]
+save(R/'visuell-kontroll.json',dict(sett_i_chat=True,filer={str(p.relative_to(A)):sha(p) for p in views},unike_original_native_motor=11,motorobserverte_ruter=23,hele_motorbilder_paa_brett=7,foer_etter=3,hele_resultatark=7,merknad='Nye aliasmål sammenlignes mot hele kildeidentiske canonical malerier. Kontrollarkene viser faktiske nye mål1950til1972, ikke gamle canonical tegningshendelser.1955har tre egne komponenter med den nye tanflisen. Tvungen kildekorrekt håndanimasjon, ikke naturlig gjennomspilling.'))
+f=read(R/'fremdrift.json');assert len(f['leveranser'])==7 and sum(v['ruter'] for v in f['leveranser'])==23
+for v in f['leveranser']:
+    assert sha(A/v['resultat'])==v['sha256'] and Image.open(A/v['resultat']).size==(1536,1024) and 'Utfall: OK' in (R/(v['jobb']+'-egenkontroll.txt')).read_text();v.update(visuelt_kontrollert=True,native_mottatt=True,motorobservert=True)
+    p=A/'jobber'/v['jobb']/'notat.md';p.write_text(p.read_text().rstrip()+'\n\nSluttkontroll: sju hele ark og23automatisk native OK.11ulike original/native/motor, sju hele resultatark, sju hele motorbilder og tre før/etter er sett.240skjermbufferkontroller,239null og samme160ved36 som grunnlaget før første figurtegning60. Alle211fra60null, ingen nye eller økte avvik. Tre før/etter har null endringer utenfor nytt lag og marg. Alle23nye er motorlogget i samme faktiske Linux-binær som2918-grunnlaget. Ikke naturlig gjennomspilling eller ny Tom-/Claude-godkjenning.\n')
+f.update(native_mottatt=23,motorobservert=23,visuelt_kontrollert=True,importert=True,hele_ark_OK=7,hele_ark_SJEKK=0,omrissvarsler=0,retur_tanflis1955_rettet=True);save(R/'fremdrift.json',f)
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==411
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+    for folder,label in [(Path(old['kilde']),'grunnlag2918-faktisk-pakke'),(O/'motor2941','kandidat2941')]:
+        for fn in ['scummvm.log','scummvm.ini']:z.write(folder/fn,label+'/'+fn)
+report=dict(kontroll_utc=datetime.now(timezone.utc).isoformat(),beskyttede=1000,stasher=base['stash'],figurjobber=411,figurjobber_totalt=1758,gjenstar=1347,nye_ark=7,nye_native=23,kostyme029_samlet_native=53,native_totalt=2941,kandidatfiler=21184,kandidat_png=21178,nye_bildekall_med_raa=2,gjenopptatte_prototyper=9,nye_hele_canonical_i_native=6,tidligere_hele_canonical_gjenbrukt=5,ytterligere_hele_aliasmaal=12,hele_ark_OK=7,hele_ark_SJEKK=0,omrissvarsler=0,automatisk_native_OK=23,native_egen_alfa_ingen_originalfragment=True,kontroller=240,null=239,kjent_overgangsavvik=[dict(frame=36,avvik=160)],null_fra_figurstart=211,nye_eller_okte_skjermbufferavvik=0,utenfor_nytt_lag_i_tre_for_etter=[0,0,0],visuelt_sett=True,motorobservert=23,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False,raakall=raw)
+save(R/'sluttkontroll.json',report)
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;s=p.read_text();head,rest=s.split('\n',1)
+    brief='Oppdatert21.oktober2026:029_09til15,sju nye hele ark/23native er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert. To nye innebygde kall,1955tanflis rettet ved hel omtegning;bevarte prototyper og hele sourceRGBA-aliaser gjenbrukt. Alle7ark/23native OK.240kontroller239null,samme160ved36,211frafigurstart null,ingen nye/økte. Kandidat2941;411av1758resultatark,1347gjenstår. Publisering/hent kvitteres separat. Pakker har2918,mangler23;felles samlepunkt etter resterende029_16til22/17mål. Neste gjenopptar T05råbildet for1975/76/1980,ikke kall på nytt.1000kilder/3stasher/tidligere filer bevares.164_04fortsatt blokkert,ingen ny Tom-/Claude-godkjenning.'
+    s=head+'\n\n'+brief+'\n'+rest
+    if name=='GRAFIKKLISTE.md':
+        for i in range(9,16):s=s.replace(f'- [ ] `fig029_{i:02}`',f'- [x] `fig029_{i:02}`')
+    p.write_text(s)
+(R/'NESTE.md').write_text('029_09til15,sju ark/23nye native er laget og kontrollert. Publisering/hent følger. Kandidat2941,411resultatark. Neste029_16til22,sju ark/17mål,manglerfortsatt. T05råbilde her inneholder1975,1976,1980 som ennå ikke er plassert eller levert. Ikke dupliser kall. T06..T09 er bare forberedte i sam029-tau-20261021.1973har høy grå kildeflekk og rel_y-92,bevar gapet uten å krympe armen.1980..1989hargrå sideflekk;1988har også en liten tanflis som kan kildekontrolleres mot egenR03/1955-flis. Alle originaler og kildebevis er bevart. Pakker er2918 og mangler23,neste samlepunkt etter resten av029.1000kilder og3stasher uendret. Ingen ny Tom-/Claude-godkjenning.\n')
+shutil.copy2(__file__,R/'kontroller.py.txt');print('PASS7ark/23nye/2941native/411resultat;1000kilder/3stasher;239/240null,samme160ved36',flush=True)
