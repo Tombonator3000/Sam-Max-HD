@@ -1,5 +1,22 @@
 # Status
 
+## Gang047 ferdig som grafikkleveranse, 2026-10-20 19:51
+
+Seks hele ark fig047_04 til09 er nå laget, egenkontrollert, native mottatt, visuelt sett, motorobservert, publisert og hentet tilbake. De gir 49 nye native ruter. Hele kostyme047 har 74 native fra ni leverte ark. De 25 rutene fra01..03 er urørt. Direkte telling: 371 av1758 hele figurjobber har resultat, 1387 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+
+Motivet er Sam og Max som reagerer på prosjektiler fra Flint Papers kontor i gangen, rom8/lokalskript204. Max er en del av komposittcelene. Hvite/grå spor, brune splinter og svarte hull er kildebekreftede effektlag.19 faktiske innebygde bildekall og råbilder er bevart,18 nye i denne økten.15 kall brukes;fire utkast er holdt utenfor.31 nye ulike hele malerier,to tidligere egne prototyper og16 eksakte hele aliasmål inngår. Kildegrunnlag, prompter og SHA-festede fremdriftsfiler/rutekart ligger i rapporter/sam047-effektretur-20261020 og sam047-slutt-20261020 på gpt-arbeid.
+
+Ett helt ark OK,fem SJEKK,ingen FEIL;23 omrissvarsler beholdt og visuelt vurdert.1818 er kildeekte grå2x2,egen ny4x-tegning,manuelt/native kontrollert fordi ark-kontrollen hopper over den lille celen. Automatisk native49 OK. Sju automatiske kontrollkopier har originale utliggerpiksler og brukes ikke i publisert modd. Alle49 publiserte ruter bruker egne faste4x-prototyper,ekte alfa,egne kantfarger og8HD-pikslers marg. Ingen hard originalsilhuettmaske,originalfragment-fallback,magenta eller terskelendring. Ingen motor-/pipelinekode er endret.
+
+Alle49 er sett som original/native/motor. Seks hele ark,23 sammenligninger av ulike nye malerier,ti motorboards,tolv hele motorbilder og tre før/etter er sett. Samme faktisk nedlastede Linux-binær443c145b5c41f98fc9ae587dd3087f57d1dc1d5b4232844bba403280e001900d kjørte2634-grunnlag og2683-kandidat.160 kandidatkontroller,158 null,samme to kjente160-avvik ved36 før47-start60. Alle132 fra60 null,ingen nye/økte avvik. Tre bildepar har0 endrede piksler utenfor alle aktive nye cels og kontrollmarg. Helprøven er ikke avviksfri. Normalaktor2/3 er synlig i tvungen aktor4-prøve;ekstra Max er testoppsett,ikke bakt inn i grafikken. Ikke naturlig gjennomspilling eller ny interaktiv Windows-/webtest.
+
+Grafikkilde aa6d819a4ab72359d07537f8191ab144e03315d2. Publisert og hentet hd-mod f108392586e1af5816f0b5548a8cbfce975052f3,2683 native. Alle20926 filer/20920PNG SHA-bekreftet. Alle20877 tidligere stier og20871PNG bevart,812 beskyttede kildefiler og tre opprinnelige stasher uendret.164_04/1943/1944 fortsatt blokkert,ingen omprøve. Se mottak-publisert.json og sluttkontroll.json i sam047-slutt-20261020.
+
+Fellespakker er foreløpig2634 og mangler49. Nå nytt samlepunkt for både Linux og Windows fra samme2683. Native er frosset til begge faktiske nedlastinger,filhasher,motorprøver og fellesrelease er bekreftet. Forrige uønskede Windows-taggbygg39459876660 er kontrollert completed/success,men er ikke hovedbygget39456993761 som leverte2634. Push-filterfeilen står fortsatt åpen. Ingen ekstra dispatch eller omprøve.
+
+Neste ordinære grafikk er fig251_01..05 etter kildeklargjøring mens pakkebyggene går. Ikke gjenta047_01..09 eller de gamle engangshjelperne. Automatisk grafikkproduksjon fortsetter uten gammel nattfrist;gammel nattkontroll gjenstartes ikke. Bibliotekskilder:figurark-fast-storrelse og publisert-mod-er-fasit. Grafikk bare på gpt-arbeid/hd-mod;main får bare disse fire dokumentene.
+
+
 ## Gang047, tre leverte ark og to effektreturer, 2026-10-20 18:47
 
 Fig047_01 til03 er levert med 25 nye native mål fra 12 ulike hele canonical RGBA-kilder og 13 eksakte hele aliasmål.365 av 1758 hele figurjobber har resultat; 1393 gjenstår, inkludert de to effektutkastene047_04/05,pluss øvrige returer, katalogfeil og sluttkontroll. De to utkastene fikk FEIL og ligger bare i rapportens utkast/, ikke som jobber/*/resultat.png. Alle 17 mål fra dem er holdt utenfor native og pakker. Ikke tell dem som levert eller importert.

@@ -1,5 +1,15 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-20 19:51
+
+- [x] Alle ni047-ark er levert. Siste seks04..09 gir49 nye native,publisert og tilbakehentet i f108392586e1af5816f0b5548a8cbfce975052f3. Kostyme047 har74 native;ikke gjenta det.
+- [x] Alle49 er native mottatt,visuelt sett og motorobservert.160 kontroller158 null,samme to kjente160-avvik før figurstart;132 fra60 null,ingen nye/økte avvik. Ett ark OK,fem SJEKK,23 omrissvarsler beholdt. Ingen ny Tom-/Claude-godkjenning.
+- [ ] Fullfør nytt felles Linux-/Windows-samlepunkt2683. De faktiske fellespakkene2634 mangler49. Behold native-frysen til begge faktiske nedlastinger,20925 runtimefiler per pakke,motorprøve og fellesrelease er kontrollert. Bare én dispatch per plattform. Ikke omkjør gamle engangshjelpere.
+- [ ] Kildeklargjør fig251_01..05,originalskript,motorkontekst og stilreferanser før nytegning. Bevar812 beskyttede kilder,alle tidligere grafikkfiler/releaser og tre stasher. Ingen originalsilhuettmasker/fallback eller senkede grenser.
+- [ ] Fortsett resterende1387 hele figurjobber pluss returer/katalogfeil/sluttkontroll.371 av1758 har resultat;all HD-grafikk er ikke ferdig.
+- [ ] 164_04/1943/1944 fortsatt blokkert etter verktøyavslag,ingen omprøve. Historiske overgangsrester,Windows SDL,testhopp816/836,inventarkant rom35 og ekstra taggbygg står åpne. Forrige ekstra39459876660 er success,ikke siste tilsiktede pakkebygg.
+
+
 ## Neste, oppdatert 2026-10-20 18:47
 
 - [x] Tre hele047_01..03/25 native er publisert, hentet og med i kontrollert felles 2634:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-gang047. Ikke gjenta disse arkene eller byggene.
