@@ -1,5 +1,14 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-20 17:30
+
+- [x] Hele302,ti ark/50 native, publisert og i kontrollert felles2609: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-sam302. Alle tidligere grafikkfiler/releaser og tre stasher bevart. Ikke gjenta302 eller byggene.
+- [x] Begge faktiske pakker,20851 runtime moddfiler hver og alle50 nye i Linux kontrollert.304 kontroller,303 null,samme kjente firepikslers rest før figurstart.66 fra60 null,ingen nye/økte avvik. Native-frys frigitt.
+- [ ] Fortsett faktisk produksjon av kildeklare047_01 til05,42 mål/23 ulike hele kilder.047_01 ligger sist i bestilling38. Se sam047-grunnlag-20261020/KILDEGRUNNLAG.md, originaler/kildeposer og begge Sam-/Max-ankere før kall. Bevar hvite skuddspor, grå kule, brune splinter/kulehull og Max i komposittposene. Effektcels skal bare ha kildens effekter.796 beskyttede kilder/tre stasher skal bevares.
+- [ ] Fig164_04 med1943/1944 er fortsatt blokkert etter verktøyavvisning,ingen omprøve/omgåelse. Andre kostymer med samme nummer er egne kilder.
+- [ ] Øvrige1396 hele figurjobber,returer,katalogfeil og samlet sluttkontroll gjenstår.362 av1758 har resultat. Ingen ny Tom-/Claude-godkjenning. Ikke kall hele HD-utgaven ferdig.
+- [ ] Historiske tidlige bufferrester,Windows SDL-startfeil,ekstra taggbygg,testhopp816/836 og inventarkant i rom35 står åpne.047-dekodervarsel36 er utenfor ekte tabell,ikke bruk det oppslaget. Første164-kildeprøves143-avbrudd er fortsatt uforklart.
+
 ## Neste, oppdatert 2026-10-20 16:28
 
 - [x] Ni nye164-ark/32 native publisert og i faktisk kontrollert felles2559: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-fall164. Alle tidligere grafikkfiler/releaser og tre stasher bevart. Ikke gjenta164 eller disse byggene.
