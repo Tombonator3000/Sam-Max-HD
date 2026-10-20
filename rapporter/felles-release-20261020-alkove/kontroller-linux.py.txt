@@ -1,0 +1,33 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import os,subprocess,json,re,hashlib,shutil
+O=Path(__file__).resolve().parent;P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/felles-release-20261020-alkove';PK=O/'linux/squashfs-root';DATA=PK/'usr/share/sam-max-hd';MOD=DATA/'mods/gpt';BINARY=PK/'usr/bin/scummvm';BASE=P/'out/felles-release-20261020-natt/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert json.loads((MOD/'mod.json').read_text())['costume_cels']==2242 and json.loads((BASE/'mod.json').read_text())['costume_cels']==2134
+expected=json.loads((R/'nye-native-108.json').read_text())['tillegg'];assert len(expected)==108 and all(sha(MOD/e['fil'])==e['sha256'] for e in expected)
+cases=[dict(label='inventory',slot=2,extra={'DIGHD_TEST_CLICKS':'80:10/185,160:210/30'},frames=280),dict(label='akvarium',slot=1,extra={'DIGHD_TEST_ROOM':'16','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'320'},frames=240),dict(label='cafeteria',slot=2,extra={'DIGHD_TEST_ROOM':'30','DIGHD_TEST_AT':'10'},frames=240)]
+unique={}
+for folder in ['bestilling12-20261020','alkove-fortsettelse-20261020','sam-sugepil-345-20261020']:
+ for b in json.loads((A/'rapporter'/folder/'motor-runder.json').read_text()):
+  key=(b['kostyme'],b['animasjon']);unique[key]=b
+for (c,anim),b in sorted(unique.items()):
+ extra={'DIGHD_TEST_ROOM':str(b['rom']),'DIGHD_TEST_AT':'10','DIGHD_TEST_COSTUME':str(c),'DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':b['pos'],'DIGHD_TEST_CAMX':str(b['camx']),'DIGHD_TEST_ACTOR':str(b['aktor']),'DIGHD_TEST_CLIP':str(b['clip']),'DIGHD_DUMP_EVERY':'4','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1','DIGHD_TEST_ANIMATION':str(anim)}
+ cases.append(dict(label=f'costume{c}-anim{anim}',slot=2,extra=extra,frames=320))
+assert len(cases)==10
+def run(case,published):
+ label=case['label'];kind='pakke2242' if published else 'grunnlag2134';target=O/(kind+'-'+label);assert not target.exists();target.mkdir();home=target/'home';home.mkdir();saves=target/'saves';saves.mkdir()
+ for p in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+ env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(PK/'usr/lib'),'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(MOD if published else BASE),'DIGHD_VERIFY':'1','DIGHD_QUIT_AT':str(case['frames']),'DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'40','DIGHD_DUMP_FLAT':'1','DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0'});env.update(case['extra'])
+ command=[str(BINARY),'--config='+str(target/'scummvm.ini'),'--path='+str(DATA/'game'),'--savepath='+str(saves),'--save-slot='+str(case['slot']),'--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+ with(target/'scummvm.log').open('wb') as f:code=subprocess.run(command,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120).returncode
+ log=(target/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];drawn=sorted(set((int(c),int(n)) for n,c in re.findall(r'soft cel\s+(\d+) costume\s*(\d+)',log)));assert code==0 and checks and list(target.glob('frame_*_room*.png')),label
+ return dict(label=label,scene=target.name,exit=code,kontroller=checks,tegnede_ruter=[f'costume{c:03}_{n}' for c,n in drawn],binar_sha256=sha(BINARY),dumps=len(list(target.glob('frame_*_room*.png'))),kostyme=case['extra'].get('DIGHD_TEST_COSTUME'),animasjon=case['extra'].get('DIGHD_TEST_ANIMATION'))
+tasks=[(c,b) for c in cases for b in [False,True]]
+with ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(lambda t:run(*t),tasks))
+final=[];baselines=[];changes=[]
+for case in cases:
+ b=next(r for r in rows if r['scene']=='grunnlag2134-'+case['label']);v=next(r for r in rows if r['scene']=='pakke2242-'+case['label']);assert [x['frame'] for x in b['kontroller']]==[x['frame'] for x in v['kontroller']]
+ extra=[dict(frame=y['frame'],grunnlag=x['avvik'],kandidat=y['avvik']) for x,y in zip(b['kontroller'],v['kontroller']) if y['avvik']>x['avvik']];assert not extra,(case['label'],extra);v['nye_eller_oekte_avvik']=extra;final.append(v);baselines.append(b);changes.append(dict(label=case['label'],grunnlagsavvik=[c for c in b['kontroller'] if c['avvik']],sluttavvik=[c for c in v['kontroller'] if c['avvik']],nye_eller_oekte_avvik=extra));print(case['label'],len(v['kontroller']),'checks, deviations',changes[-1]['sluttavvik'],flush=True)
+seen={n for r in final for n in r['tegnede_ruter']};missing=sorted({e['bilde'] for e in expected}-seen);assert not missing,missing
+info=dict(build=(DATA/'BYGG.txt').read_text(),binar_sha256=sha(BINARY),native=2242,nye_native_forventet=108,nye_native_observert=108,mangler_i_avspilling=missing,runder=len(final),grunnlagsrunder_samme_binar=len(baselines),skjermbufferkontroller=sum(len(r['kontroller']) for r in final),kontroller_fra_figurstart=sum(v['frame']>=40 for r in final for v in r['kontroller']),null_fra_figurstart=sum(v['frame']>=40 and v['avvik']==0 for r in final for v in r['kontroller']),nye_eller_oekte_avvik=[],sammenligning=changes,naturlig_gjennomspilling=False,interaktiv_windows_test=False,ny_webtest=False,kjent_inventarikant_rom35_ikke_rettet=True,scenes=final,grunnlag_scenes=baselines)
+for target in [O,R]:(target/'linux-kontroll.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:v for k,v in info.items() if k not in['build','scenes','grunnlag_scenes','sammenligning']},ensure_ascii=False))

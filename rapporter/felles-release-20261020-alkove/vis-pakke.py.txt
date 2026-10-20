@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,re
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/felles-release-20261020-alkove';R=P/'work/.gpt-gren/rapporter/felles-release-20261020-alkove'
+cases=[('inventory',120),('akvarium',200),('cafeteria',200),('costume39-anim1',80),('costume113-anim1',88),('costume295-anim1',80),('costume295-anim7',100),('costume345-anim1',76),('costume346-anim1',88),('costume346-anim7',124)]
+records=[]
+for page in range(2):
+ subset=cases[page*5:page*5+5];b=Image.new('RGB',(1920,850),'#243340');d=ImageDraw.Draw(b)
+ for i,(label,frame) in enumerate(subset):
+  found=list((O/('pakke2242-'+label)).glob(f'frame_{frame:06}_room[0-9][0-9][0-9].png'));assert len(found)==1,(label,frame);p=found[0];room=int(re.search(r'_room(\d+)',p.name)[1]);im=Image.open(p).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*425;b.paste(im,(x,y+25));d.text((x+8,y+6),f'{label},rom{room},frame{frame},faktisk2242-pakke',fill='white');records.append(dict(scene=label,frame=frame,rom=room,kilde_fil=str(p.relative_to(O)),sha256=hashlib.sha256(p.read_bytes()).hexdigest()))
+ b.save(R/f'pakke-motorbilder-{page+1}.png')
+(R/'motorbilder.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
+for f in ['kontroller-pakker.py','kontroller-linux.py','vis-pakke.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('10 actual package screenshots in2reviewboards; inventory actualroom30.')

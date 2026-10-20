@@ -1,0 +1,30 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/felles-release-20261020-alkove';R=A/'rapporter/felles-release-20261020-alkove';assert not O.exists() and not R.exists();O.mkdir();R.mkdir()
+def gh(args):return subprocess.check_output(['gh']+args,cwd=P,text=True)
+code=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip();assert code==subprocess.check_output(['git','ls-remote','origin','refs/heads/main'],cwd=P,text=True).split()[0]
+native=subprocess.check_output(['git','rev-parse','origin/hd-mod'],cwd=P,text=True).strip();assert native=='32b43950364fae71bab3a68e64e81a91c84e3c22'==subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+assert json.loads((P/'mods/gpt/mod.json').read_text())['costume_cels']==2242
+for platform in ['linux','windows']:
+ runs=json.loads(gh(['run','list','--workflow',platform+'.yml','--limit','5','--json','databaseId,status,headSha,event,createdAt']))
+ assert all(r['status']=='completed' for r in runs),(platform,runs);(O/('runs-'+platform+'-foer.json')).write_text(json.dumps(runs,indent=2)+'\n')
+prior=json.loads(gh(['api','repos/Tombonator3000/Sam-Max-HD/releases?per_page=100']));assert not any(r['tag_name']=='sam-max-hd-2026-10-20-alkove' for r in prior)
+for target in [O,R]:(target/'releaser-foer-bygg.json').write_text(json.dumps(prior,indent=2)+'\n')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();manifest={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in(P/'mods/gpt').rglob('*') if p.is_file()};assert len(manifest)==20484
+(R/'moddfiler-2242.json').write_text(json.dumps(manifest,indent=2)+'\n')
+expected=[]
+for folder in ['bestilling12-20261020','alkove-fortsettelse-20261020','alkove-gjenbruk-20261020','sam-sugepil-345-20261020','sam345-gjenbruk-a-20261020','sam345-gjenbruk-b-20261020']:expected+=json.loads((A/'rapporter'/folder/'tillegg.json').read_text())['tillegg']
+assert len(expected)==len({e['bilde'] for e in expected})==108 and all(manifest[e['fil']]==e['sha256'] for e in expected)
+(R/'nye-native-108.json').write_text(json.dumps(dict(tillegg=expected),ensure_ascii=False,indent=2)+'\n')
+state=dict(start_utc=datetime.now(timezone.utc).isoformat(),status='startes',kode=code,hd_mod=native,native=2242,nye_native=108,forrige_felles_native=2134,release_tag='sam-max-hd-2026-10-20-alkove',main_kun_dokumentasjon_siden_forrige_release=True,plattform={})
+def save():
+ for t in [O,R]:(t/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+save()
+for platform in ['linux','windows']:
+ state['plattform'][platform]=dict(dispatch_forsoek_utc=datetime.now(timezone.utc).isoformat(),status='forespoersel_sendes_ikke_dupliser');save()
+ p=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,text=True,capture_output=True);state['plattform'][platform].update(dispatch_exit=p.returncode,stdout=p.stdout,stderr=p.stderr,status='dispatch_sendt' if p.returncode==0 else 'utfall_maa_undersoekes_ikke_send_igjen');save()
+ assert p.returncode==0,(platform,p.stderr)
+state['status']='begge_dispatch_sendt_en_gang_run_id_maa_bekreftes';save();shutil.copy2(__file__,R/'start-alkove-pakker.py.txt')
+(R/'PAAGAR.md').write_text(f'# Samlepunkt2242 startet\n\nBegge plattformbygg er sendt én gang fra main{code},hd-mod{native},108 nye native siden2134-pakken. Se bygg-startet.json for faktisk run-ID. Ikke send dem på nytt. Hold hd-mod uendret til byggene har sikret modden. Hent faktiske pakker og kontroller SHA/digester,alle20483 runtime moddfiler og motorfør fellesrelease publiseres/kalles oppdatert. Tidligere fellesreleaser bevares; plattformtaggene linux/windows oppdateres som vanlig.\n')
+print(json.dumps(state,ensure_ascii=False))
