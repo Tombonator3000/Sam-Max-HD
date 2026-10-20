@@ -1,0 +1,1 @@
+Ferdig samlepunkt: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-tau029-foerste. Begge faktiske pakker,2918native og Latest er bekreftet. Nativefrysen er frigitt. Fortsett påbegynt029_09til22 fra T04råbildet og1950prototype. Ikke gjenta tidligere bygg eller blokkerte motiver.
