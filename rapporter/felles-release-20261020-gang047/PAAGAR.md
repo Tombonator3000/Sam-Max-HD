@@ -1,0 +1,1 @@
+Ferdig samlepunkt:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-gang047. Latest og2634 native i begge faktiske pakker bekreftet. Gjenoppta retur047_04/05;ikke gjenta de leverte047_01..03 eller byggene.164_04forblir blokkert.

@@ -1,0 +1,15 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,re,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;assert not(O/'bygg-startet.json').exists();api=lambda p:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+p],cwd=P,text=True));receipt=json.loads((A/'rapporter/sam047-grunnlag-20261020/mottak-publisert.json').read_text());code=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip();mod=receipt['hd_mod'];assert code==api('git/ref/heads/main')['object']['sha'] and mod==api('git/ref/heads/hd-mod')['object']['sha'];runs=api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs'];assert any(v['head_sha']==code and v['status']=='completed' and v['conclusion']=='success' for v in runs);prior=api('releases?per_page=100');tag='sam-max-hd-2026-10-20-gang047';assert not any(v['tag_name']==tag for v in prior)
+manifest=json.loads((A/'rapporter/sam047-grunnlag-20261020/publiserte-moddfiler-2634.json').read_text());assert len(manifest)==20877 and all(hashlib.sha256((P/'mods/gpt'/f).read_bytes()).hexdigest()==h for f,h in manifest.items())
+for D in [O,R]:(D/'releaser-foer-bygg.json').write_text(json.dumps(prior,indent=2)+'\n')
+shutil.copy2(A/'rapporter/sam047-grunnlag-20261020/publiserte-moddfiler-2634.json',R/'moddfiler-2634.json');shutil.copy2(A/'rapporter/sam047-grunnlag-20261020/native-fast4x-samlet.json',R/'nye-native25.json')
+state=dict(start_utc=datetime.now(timezone.utc).isoformat(),kode=code,hd_mod=mod,native=2634,nye_native=25,kostyme047_nye=25,kostyme164_mangler=[1943,1944],figurjobber_med_resultat=365,release_tag=tag,status='native_frosset_bygg_dispatch',plattform={})
+def save():
+ for D in [O,R]:(D/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+save()
+for platform in ['linux','windows']:
+ assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+ row=state['plattform'][platform]=dict(status='dispatch_forsokes',dispatch_utc=datetime.now(timezone.utc).isoformat());save();res=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,text=True,capture_output=True);row.update(dispatch_exit=res.returncode,stdout=res.stdout,stderr=res.stderr);save();assert res.returncode==0,res.stderr;m=re.search(r'/actions/runs/(\d+)',res.stdout);assert m,'Ikke dispatch igjen: avklar runID';row.update(run_id=int(m[1]),status='dispatched');save();print(platform,row['run_id'],flush=True)
+shutil.copy2(__file__,R/'start.py.txt')

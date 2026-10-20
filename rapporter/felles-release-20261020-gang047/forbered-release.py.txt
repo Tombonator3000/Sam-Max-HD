@@ -1,0 +1,38 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam047-grunnlag-20261020';state=json.loads((O/'bygg-startet.json').read_text());tag,code,mod=(state[k] for k in ['release_tag','kode','hd_mod']);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();api=lambda p:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+p],cwd=P,text=True))
+manifest=json.loads((R/'moddfiler-2634.json').read_text());old=json.loads((A/'rapporter/felles-release-20261020-sam302/moddfiler-2609.json').read_text());assert len(manifest)==20877 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items()) and set(old)<=set(manifest) and all(manifest[f]==h for f,h in old.items() if f.endswith('.png'));assert all(f'costumes/costume164_{n}_hd.png' not in manifest for n in [1943,1944]);protected=json.loads((S/'beskyttede-samlet.json').read_text());assert len(protected)==796 and all(sha(A/f)==h for f,h in protected.items());base=json.loads((S/'grunnlag-produksjon.json').read_text());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==365
+held=json.loads((S/'fremdrift.json').read_text())['returer'];assert len(held)==17 and all('costumes/'+b+'_hd.png' not in manifest for b in held)
+motor=json.loads((R/'linux-kontroll.json').read_text());files=json.loads((O/'moddfiler-kontroll.json').read_text());assets=json.loads((O/'assetkontroll.json').read_text());assert motor['native']==2634 and motor['nye_native_observert']==25 and motor['runder']==motor['grunnlagsrunder_samme_binar']==6 and motor['skjermbufferkontroller']==384 and motor['nullkontroller']==382 and not motor['nye_eller_oekte_avvik'] and motor['kontroller_fra_figurstart']==132 and not motor['helprove_uten_avvik'];assert files['moddfiler_per_pakke']==20876 and files['begge_faktiske_nedlastinger_verifisert'] and files['begge_modder_byteidentiske'] and files['kode']==code and files['hd_mod']==mod and len(assets)==4
+for v in assets:p=O/v['plattform']/v['fil'];assert p.stat().st_size==v['bytes'] and sha(p)==v['sha256']
+shots=json.loads((R/'motorbilder.json').read_text());assert len(shots)==12 and all(sha(R/v['fil'])==v['sha256'] for v in shots);assert all(v['utenfor_nye_cels_og_marg']==0 for v in json.loads((R/'pakke-pikselkontroll.json').read_text()));review=json.loads((R/'visuell-kontroll.json').read_text());assert review['hele_motorbilder_sett']==12 and review['foer_etter_sett']==3 and not review['ny_Tom_Claude_godkjenning'];obs=json.loads((R/'motorobservasjoner25.json').read_text());assert obs['sett']==len(obs['tegninger'])==25 and all(sha(Path(v['fil']))==v['sha256'] and manifest['costumes/'+n+'_hd.png']==v['native_sha256'] for n,v in obs['tegninger'].items());logs={}
+with zipfile.ZipFile(R/'linux-motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+    for p in sorted(O.glob('*/scummvm.log')):rel=p.relative_to(O).as_posix();z.write(p,rel);logs[rel]=sha(p)
+assert len(logs)==12;(R/'linux-motorlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n');(R/'bevaringskontroll.json').write_text(json.dumps(dict(beskyttede_kilder_SHA_uendret=796,tre_stasher_uendret=True,alle_tidligere_filstier_bevart=True,alle_tidligere_png_byteidentiske=True,filer2634=20877,figurjobber_med_resultat=365,utkastark_ikke_importert=2),ensure_ascii=False,indent=2)+'\n');lr,wr=(state['plattform'][p]['run_id'] for p in ['linux','windows']);source=json.loads((S/'mottak-publisert.json').read_text())['kildecommit']
+body=f'''Linux og Windows inneholder **2634 native HD-bildelag**, med **25 nye ruter fra tre hele ark** av Sam og Max i gangen utenfor kontorene. Tidligere grafikk og rettinger er med. Resten av HD-grafikken er fortsatt under arbeid. To nye effektark trenger retting og er holdt utenfor pakkene.
+
+Last ned **SamMaxHD-Windows.zip** for Windows eller **SamMaxHD-x86_64.AppImage** for Linux. Spill og tale følger med. Gjør Linux-filen kjørbar og start den. Ctrl+H bytter grafikk, F5 åpner originalmenyen.
+
+Begge faktiske nedlastinger og SHA-filer er kontrollert. Alle 20 876 runtime moddfiler per pakke stemmer med publisert modd og er like mellom plattformene. Linux-pakken er prøvd med inventar, akvarium, cafeteria,820 bilder fra alkovens skript og begge relevante gangsekvenser. Alle25 nye ruter er observert;tolv hele pakkebilder og tre før/etter er visuelt sett.
+
+384 skjermbufferkontroller ga382 null. Begge tvungne gangprøvene har samme kjente160-pikslers overgangsavvik før figurstart som2609-grunnlaget med samme nye binær. Alle132 kontroller fra figurstart er null;ingen nye eller økte avvik. Helprøven er ikke avviksfri. Tre omrissvarsler er visuelt vurdert og beholdt. Normale aktører2/3 er synlige under den tvungne kontrollen;dette er ikke naturlig gjennomspilling. Fig164_04 med1943/1944 er fortsatt originalfallback etter forrige bildeverktøyavvisning og er ikke telt som egen HD.
+
+Full naturlig gjennomspilling,interaktiv Windows-test og ny webtest gjenstår. Tidligere testhoppstans,liten inventarkant i rom35 og Windows SDL-startfeil er fortsatt åpne. Ingen ny Tom-/Claude-stilgodkjenning eller motor-/pipelineendring i denne grafikkrunden.
+
+Kode: {code}
+hd-mod: {mod}
+Grafikkilde: {source}
+Linux: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{lr}
+Windows: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{wr}
+Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/{R.name}/RAPPORT.md
+
+Spillet og grafikken tilhører Disney/Lucasfilm.
+'''
+(O/'utgivelse-notat.md').write_text(body);shutil.copy2(O/'utgivelse-notat.md',R/'utgivelse-notat.md');prior=api('releases?per_page=100');before=json.loads((O/'releaser-foer-bygg.json').read_text());assert not any(v['tag_name']==tag for v in prior) and {v['id'] for v in before}<={v['id'] for v in prior};aset=lambda v:{(a['id'],a['name'],a['size'],a['digest']) for a in v['assets']}
+for v in before:
+    if v['tag_name'] not in ['linux','windows']:assert aset(v)==aset(next(x for x in prior if x['id']==v['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+for D in [O,R]:(D/'releaser-foer.json').write_text(json.dumps(prior,indent=2)+'\n')
+(R/'RAPPORT.md').write_text(body+f'\nLinux-binær SHA256 {motor["binar_sha256"]}. Alle{len(prior)} tidligere releaser og vedlegg bevares.365 av1758 figurjobber har resultat,1393 gjenstår inkludert to effektutkast,pluss øvrige returer/katalogfeil/sluttkontroll.796 beskyttede kilder og tre stasher er uendret. Gjenoppta retur047_04/05 før videre047_06..09. Faktisk publisering/Latest kvitteres i publisert.json.\n')
+for n in ['start.py','hent-status.py','hent-pakker.py','kontroller-pakker.py','klargjor-linux.py','kontroller-linux.py','vis-pakke.py','forbered-release.py']:shutil.copy2(O/n,R/(n+'.txt'))
+print('Begge faktiske pakker,25 nye,382/384 null og visuell kontroll bekreftet; klar for fellesrelease.',flush=True)

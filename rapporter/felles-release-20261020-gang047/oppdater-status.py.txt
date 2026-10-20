@@ -1,0 +1,50 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam047-grunnlag-20261020';v=json.loads((R/'publisert.json').read_text());source=json.loads((S/'mottak-publisert.json').read_text());stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert v['Latest_bekreftet'] and v['native']==2634 and v['nye_native_siden_felles2609']==25 and v['figurjobber_med_resultat']==365
+def leselig(t):
+    t=re.sub(r'\b(alle|Alle|med|fra|og|Linux|Windows|rom|chore|felles|før|etter)(?=\d)',r'\1 ',t)
+    t=re.sub(r'(?<!\d),(?=\S)',', ',t)
+    return t.replace('av1758','av 1758').replace(';','; ').replace('- [ ]164','- [ ] 164')
+protected=json.loads((S/'beskyttede-samlet.json').read_text());assert len(protected)==796 and all(sha(A/f)==h for f,h in protected.items());assert len(list((A/'jobber').glob('fig*/resultat.png')))==365
+text=f'''## Gang047, tre leverte ark og to effektreturer, {stamp}
+
+Fig047_01 til03 er levert med25 nye native mål fra12 ulike hele canonical RGBA-kilder og13 eksakte hele aliasmål.365 av1758 hele figurjobber har resultat;1393 gjenstår,inkludert de to effektutkastene047_04/05,pluss øvrige returer,katalogfeil og sluttkontroll. De to utkastene fikk FEIL og ligger bare i rapportens utkast/,ikke som jobber/*/resultat.png. Alle17 mål fra dem er holdt utenfor native og pakker. Ikke tell dem som levert eller importert.
+
+Motivet er Sam og Max som reagerer på prosjektiler fra Flint Papers kontor i gangrom8,lokalskript204,kostyme47/chore6/7. Max er en del av komposittcelene. Hvite spor,grå tupper,brune splinter og små kulehull er kildebekreftede effekter.11 innebygde image_gen-kall ga11 råbilder,ni brukt helt eller delvis i sluttprototypene. A03R retter lukket munn;A07R retter palett og oppdiktede tupper i effektutkast. A07 og A06R er ubrukt. Alle faktiske prompter,råbilder,referansehasher,prototyper og SHA-festede rutekart er bevart. Ingen hard originalsilhuettmaske,originalfragment-fallback eller motor-/pipelinekode. Fast4x,ekte alfa og8 HD-pikslers marg. Python-rensing/plassering er tillatt av Tom.
+
+De tre leverte arkene har egenkontroll OK,OK,SJEKK;tre omrissvarsler for1715..1717 er sett og beholdt. Automatisk native mottak25 OK,0 sjekk/mangler/teknisk. Alle25 er sett som original/native/motor,ni hele produksjonsbilder og tre før/etter er sett. Begge produksjonsprøver hadde160 kontroller samlet,158 null og samme to kjente160-pikslers overgangsavvik før figurstart som2609-grunnlaget. Alle132 fra figurstart var null. En første differanseanalyse utelot det separate nye trefflaget1796;kontrollen inkluderer nå alle samtidig aktive nye lag og har0 endringer utenfor dem/margen. Ingen ny Tom-/Claude-godkjenning.
+
+Grafikkilde {source['kildecommit']}. Publisert og hentet hd-mod {v['hd_mod']},2634 native totalt. Alle20877 filer/20871 PNG-er er SHA-bekreftet;alle20852 tidligere stier og20846 tidligere PNG-er er bevart.796 beskyttede kildefiler og tre opprinnelige stasher er uendret.164_04/1943/1944 er fortsatt blokkert og ikke omprøvd.
+
+Felles Linux-/Windows-utgave er publisert og Latest bekreftet:{v['url']},releaseID{v['release_id']}. Kode {v['kode']}. Linux{v['linux_run']} og Windows{v['windows_run']} bestod første forsøk. Begge faktiske nedlastinger,SHA-filer og fire publiserte assets med serverdigest/størrelse er kontrollert. Alle20876 runtime moddfiler per pakke er like og stemmer med publisert modd. Alle{v['bevarte_tidligere_releaser']} tidligere releaser og vedlegg er bevart ved fellespubliseringen. Native-frysen er frigitt;ikke gjenta01..03 eller disse byggene.
+
+Faktisk ny Linux-binær SHA256 {v['linux_binar_sha256']}. Seks pakkeprøver og seks grunnlagsprøver med samme nye binær:inventar,akvarium,cafeteria,820 bilder fra rom92 og047/chore6/7. Alle25 nye er observert.384 kandidatkontroller ga382 null og samme to kjente160-avvik ved36 før047-start60. Alle132 fra60 er null,ingen nye/økte avvik.12 hele pakkebilder og tre før/etter er sett;alle25 nye pakkemotorbilder er rasteridentiske med de sette produksjonsbildene. Helprøven er ikke avviksfri. Normale aktører2/3 er fortsatt synlige i den tvungne testen;primærskriptet skjuler dem i naturlig sekvens. Full naturlig gjennomspilling,interaktiv Windows-/ny webtest og historiske SDL-/testhopp-/inventarkantfeil gjenstår. Feilen med ekstra Windows-taggbygg er ikke rettet.
+
+Neste arbeid er retur047_04/05. Gjenoppta fra sam047-grunnlag-20261020/utkast,faktiske prompter og egenkontroller. Lag en ny rettingsrapport med gjeldende2634-grunnlag;ikke kjør de gamle engangshjelperne som låser2609 eller overskriv de tre leverte arkene. Fem prototyper1805,1809,1811,1992,1993 feiler0,6/0,8;egenkontrollen på effektarkene har også andre avvik. Ingen originalmaske/fallback eller senkede grenser. Etter returene trenger047_06..09 kildeklargjøring og chore8-observasjon.047-varsel36 er utenfor den ekte36-oppføringstabellen og skal ikke brukes. Automatisk produksjon fortsetter;den gamle nattkontrollen gjenstartes ikke. Bibliotekkilder:figurark-fast-storrelse og publisert-mod-er-fasit. Grafikk forblir i gpt-arbeid/hd-mod;main får bare denne dokumentasjonen.
+
+'''
+text=leselig(text)
+for name in ['memory.md','STATUS.md']:
+    p=P/name;s=p.read_text();first,rest=s.split('\n',1);p.write_text(first+'\n\n'+text+rest.lstrip('\n'))
+todo=f'''## Neste, oppdatert {stamp}
+
+- [x] Tre hele047_01..03/25 native er publisert,hentet og med i kontrollert felles2634:{v['url']}. Ikke gjenta disse arkene eller byggene.
+- [x] Begge faktiske pakker,20876 runtime moddfiler hver og alle25 nye i Linux er kontrollert.384 kontroller/382 null,samme to kjente160-avvik før figurstart.132 fra60 null,ingen nye/økte avvik. Native-frys frigitt.
+- [ ] Gjenoppta retur047_04/05,to utkastark/17 mål med FEIL,ikke importert. Les rapporter/sam047-grunnlag-20261020/utkast,retur.md og faktiske kontroller på gpt-arbeid. Ny rettingsrapport på2634-grunnlaget;ikke omkjør gamle engangshjelpere eller overskriv01..03. Bevar796 kilder/tre stasher og alle tidligere grafikkfiler. Ingen originalmasker/fallback eller senkede grenser.
+- [ ] Deretter kildeklargjør047_06..09 og se relevant chore8 før produksjon. Bevar Max i komposittcels og alle kildebekreftede effektlag. Ikke bruk ugyldig47-tabelloppslag36.
+- [ ] Øvrige1393 hele figurjobber,returer,katalogfeil og sluttkontroll gjenstår.365 av1758 har resultat. Ingen ny Tom-/Claude-godkjenning;ikke kall all HD-grafikk ferdig.
+- [ ]164_04/1943/1944 er fortsatt blokkert etter verktøyavvisning,ingen omprøve/omgåelse. Historiske overgangsrester,Windows SDL-startfeil,ekstra taggbygg,testhopp816/836 og inventarkant i rom35 står åpne.
+
+'''
+todo=leselig(todo)
+p=P/'todo.md';s=p.read_text();first,rest=s.split('\n',1);p.write_text(first+'\n\n'+todo+rest.lstrip('\n'))
+with (P/'log.md').open('a') as f:f.write('\n\n'+text.replace('## Gang047, tre leverte ark og to effektreturer, '+stamp,'## '+stamp+' (Codex)')+'\n')
+brief=f'Oppdatert {stamp}: Tre hele047_01..03/25 nye native er levert,egenkontrollert,native mottatt,visuelt sett,motorobservert,publisert og i kontrollert felles2634:{v["url"]}.365 av1758 resultatark,1393 gjenstår inkludert de to effektutkastene047_04/05. Disse har FEIL og17 mål holdes utenfor native/pakker.11 bildekall/11rå,ni brukt,A07/A06R ubrukt. To ark OK,ett SJEKK/tre omrissvarsler. Begge faktiske pakker/20876 runtime-filer per pakke SHA-bekreftet,alle25 sett i faktisk Linux,384 kontroller382 null,samme to tidlige160-avvik;132 fra60 null,ingen nye/økte avvik. Grafikkilde{source["kildecommit"]},hd-mod{v["hd_mod"]},kode{v["kode"]}. Alle tidligere filer/PNG/releaser,796 kilder og tre stasher bevart. Ingen ny Tom-/Claude-godkjenning. Native-frys frigitt. Gjenoppta retur04/05 i ny rettingsrapport på2634;ikke gjenta01..03 eller gamle engangshjelpere. Deretter047_06..09 trenger kildeklargjøring.164_04 fortsatt blokkert,ingen omprøve. Automatisk produksjon fortsetter.'
+brief=leselig(brief).replace('Grafikkilde'+source['kildecommit'],'Grafikkilde '+source['kildecommit']).replace('hd-mod'+v['hd_mod'],'hd-mod '+v['hd_mod']).replace('kode'+v['kode'],'kode '+v['kode'])
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;s=p.read_text();first,rest=s.split('\n',1);p.write_text(first+'\n\n'+brief+'\n\n'+rest.lstrip('\n'))
+p=S/'NESTE.md';p.write_text(p.read_text()+'Rett bare de tilbakeholdte utkastene i ny rettingsrapport på2634. Gamle lever.py/native.py/publiser.py er engangshjelpere på2609 og skal ikke omkjøres. De tre leverte arkene/rutekartene/nativefilene holdes uendret.\n')
+shutil.copy2(__file__,R/'oppdater-status.py.txt');print('Fire hoveddokumenter og grafikkarbeidsbord oppdatert. Ingen motor-/pipelinekode eller ny grafikk i main.')

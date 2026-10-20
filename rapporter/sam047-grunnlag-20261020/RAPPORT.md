@@ -15,3 +15,9 @@ Motorprøve:den faktiske nedlastede Linux-binar1a687f613dc3faa22ce9719d5005b04f1
 Kandidat2634 inneholder20877 filer/20871 PNG-er. Alle20852 tidligere stier og20846 tidligere PNG-er er bevart;bare mod.json er endret før ny sjekksumfil.796 beskyttede kildefiler og tre stasher er uendret.164_04/1943/1944 er fortsatt blokkert og ikke omprøvd. Native publisering/hent og faktisk pakkestatus kvitteres separat. Fellespakker har foreløpig2609.
 
 Bibliotekkilder:figurark-fast-storrelse og publisert-mod-er-fasit. De brukes til fast4x,rutekobling og additiv bevaring. Native mottaksgrenser er uendret. Ingen motor-/pipelinekode er endret.
+
+Publisert og hentet:grafikkilde 46359f97047c942dd8220ead8475a72ad65d5da7,hd-mod 4f10a8a092d1dd645970c9930e904d726285207a. Alle20877 filer/20871 PNG-er stemmer etter hent. Alle20846 tidligere PNG-er/stier/tre stasher bevart. De to effektutkastene er fortsatt holdt utenfor native. Fellespakker har2609 til nytt kontrollert samlepunkt.
+
+Med i kontrollert fellesutgave sam-max-hd-2026-10-20-gang047:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-gang047. Begge faktiske pakker og20876 runtime moddfiler per pakke er bekreftet. Alle25 nye observert i faktisk Linux.384 kontroller,382null og samme to kjente160-overgangsavvik før figurstart som2609-grunnlaget.132 fra60 null,ingen nye/økte avvik. De to effektutkastene/17 mål er fortsatt holdt utenfor. Alle22 tidligere releaser og vedlegg bevart. Ingen ny Tom-/Claude-godkjenning.
+
+Returarbeidet er gjenopptatt i rapporter/sam047-effektretur-20261020. E01 er ett nytt faktisk innebygd bildekall med bevart råbilde for1805 alene i8x. Første hele plassering feiler med snitt/union0,143 og dekning0,215;delplassering/kontroll og resten av arket gjenstår.0 nye hele ark/native fra rettingen,ikke med i felles2634. Gjenoppta E01 fra råbildet og ny rapport,ikke kall på nytt uten vurdering eller overskriv de25 leverte rutene.
