@@ -1,3 +1,7 @@
+# Tillegg etter visuell motorretur
+
+Mur,grå bunnstripe og ørebasefragmenter er statisk rombakgrunn. De første to teknisk grønne utkastene er bevart,men forkastet visuelt på grunn av rektangler og øreskjøt. Sluttresultatet bruker egen ren ansiktskontur;der originalcelen er helt heldekkende ligger uforandret utsnitt av eget publisert HD-rom004 under ansiktet,festet til pos65,94 fra alle88 motorobservasjoner. For fire ekte transparente helkilder brukes bare egen alfa. Ingen originalmaske eller originale fragmenter. Den eldre teksten om å bevare genererte blå hjørner/ørestubber er erstattet av dette tillegget.
+
 # Max028,kildegrunnlag før produksjon
 Åtte sammenhengende figurjobber fig028_01 til08,88 mål fra17 ulike hele canonical RGBA-kilder. De siste tre jobbene tilfører bare ett nytt helt motiv. Gjenbruk bare hele egne malerier ved eksakt RGBA-likhet og størrelse. Ingen nye bildekall,resultatark eller native i denne bunken ennå.
 

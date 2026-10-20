@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Samlepunkt20. oktober: Hele Max028_01 til08 er produsert og kontrollert:8 ark/88 native fra17 hele malerier.11 innebygde kall bevart. To teknisk grønne utkast ble visuelt returnert for scenery-rektangler og ørebasebånd. Sluttresultat:alle8 ark og88 native OK,17 unike original/native/motor sett,alle88 motorlogget,160/160 kontroller null. Egen ansiktsalfa og egen konturrens,ingen originalmaske eller originale fragmenter.13 heldekkende helkilder bruker eget publisert romfelt under;4 transparente helkilder beholder egen alfa. Publisering/hent og nye felles2810 kvitteres separat.388 av1758 resultatark,1370 gjenstår pluss returer og sluttkontroll. Neste fig044_01 til05 må kildeklargjøres. Bevar880kilder,alle tidligere PNG/stier og3 stasher.164_04 fortsatt blokkert,ingen omprøve. Ingen ny Tom-/Claude-godkjenning. Se rapporter/max028-foerste-20261020.
+
 Ferdig samlepunkt2026-10-20 21:41:Hele251/niark/39native levert,siste06..09/22nye med i kontrollert felles2722:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-vr251-slutt. Begge faktiske pakker/20964runtimefiler,544kontroller540null,samme fire160overgangsavvik;264fra60null,ingen nye/økte. Nativefrys frigitt.380av1758resultatark,1378gjenstår. Neste faktiske produksjonMax028_01..08,åtteark/88mål fra17ulikehelkilder,0kall/0resultat. Les max028-foerste-20261020/KILDEGRUNNLAG.md og NESTE.md,se original/motor/stil førkall. Max-hode foran murveggen i introens rom4,ikke bilinteriør/helfigur.880kilder/trestash bevart.164_04fortsatt blokkert,ingen omprøve. Ingen ny Tom-/Claude-godkjenning. Ikke gjenta251 eller2722bygg. Automatisk produksjon fortsetter.
 
 
@@ -692,19 +694,19 @@ Figurark for Sam, Max.
 - [x] `fig251_07` (figurark 7 for Sam (kostyme 251), 6 ruter: animasjon 7 mot høyre (3 ruter); animasjon 8 (lag 15, tegnes over kroppen) mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig251_08` (figurark 8 for Sam (kostyme 251), 4 ruter: animasjon 9 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig251_09` (figurark 9 for Sam (kostyme 251), 8 ruter: animasjon 9 mot høyre (2 ruter); animasjon 9 (lag 15, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig028_01` (figurark 1 for Max (kostyme 28), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig028_02` (figurark 2 for Max (kostyme 28), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig028_03` (figurark 3 for Max (kostyme 28), 12 ruter: start mot høyre (3 ruter); animasjon 7 mot høyre (9 ruter), bilde to `hovedark/max.png`)
+- [x] `fig028_01` (figurark 1 for Max (kostyme 28), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
+- [x] `fig028_02` (figurark 2 for Max (kostyme 28), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
+- [x] `fig028_03` (figurark 3 for Max (kostyme 28), 12 ruter: start mot høyre (3 ruter); animasjon 7 mot høyre (9 ruter), bilde to `hovedark/max.png`)
 
 ## Bestilling 41
 
 Figurark for Max, Sam og Max.
 
-- [ ] `fig028_04` (figurark 4 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig028_05` (figurark 5 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig028_06` (figurark 6 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig028_07` (figurark 7 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig028_08` (figurark 8 for Max (kostyme 28), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `hovedark/max.png`)
+- [x] `fig028_04` (figurark 4 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
+- [x] `fig028_05` (figurark 5 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
+- [x] `fig028_06` (figurark 6 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
+- [x] `fig028_07` (figurark 7 for Max (kostyme 28), 12 ruter: animasjon 7 mot høyre (12 ruter), bilde to `hovedark/max.png`)
+- [x] `fig028_08` (figurark 8 for Max (kostyme 28), 4 ruter: animasjon 7 mot høyre (4 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig044_01` (figurark 1 for Sam og Max (kostyme 44), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig044_02` (figurark 2 for Sam og Max (kostyme 44), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig044_03` (figurark 3 for Sam og Max (kostyme 44), 6 ruter: start mot høyre (5 ruter); animasjon 7 mot høyre (1 rute), bilde to `hovedark/sam.png`)

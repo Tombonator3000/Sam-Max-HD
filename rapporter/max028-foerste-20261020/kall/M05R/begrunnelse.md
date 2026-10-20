@@ -1,0 +1,1 @@
+M05A forkastes:la til en uønsket ørebase og flyttet motivet. Dette er ren alfa-rensing av eget M05-maleri,ikke ny figurtegning;bare eget råbilde brukes som redigeringsgrunnlag. Kilden2006 mangler ører.

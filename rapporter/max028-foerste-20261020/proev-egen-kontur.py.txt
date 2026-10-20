@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/max028-foerste-20261020';T=R/'alfakontroll';T.mkdir(exist_ok=True);rows=[]
+for call in ['M01A','M02A','M03A','M04A','M05R']:
+ C=R/'kall'/call;a=np.array(Image.open(C/'raa.png').convert('RGBA'));plan=json.loads((C/'plan.json').read_text())
+ for e in plan['ruter']:
+  x,y,w,h=e['celle'];region=np.zeros(a.shape[:2],bool);region[y:y+h,x:x+w]=True;support=(a[:,:,3]>=128)&region;walls=(np.max(a[:,:,:3],axis=2)<100)&support;labels,n=nd.label(support&~walls,np.ones((3,3),bool));counts=np.bincount(labels.ravel());counts[0]=0;lid=int(counts.argmax());inside=nd.binary_fill_holes(labels==lid);assert inside.sum()>10000
+  owncore=nd.binary_dilation(inside,iterations=3)&support;dist,near=nd.distance_transform_edt(~owncore,return_indices=True);allow=(dist<=2)&region;q=a.copy();q[:,:,3][~allow]=0;q[:,:,3][owncore]=255;edge=allow&~owncore;q[edge,:3]=q[near[0][edge],near[1][edge],:3];q[q[:,:,3]==0,:3]=0
+  v=json.loads((R/(e['bilde']+'-prototype.json')).read_text());src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png'));im=Image.fromarray(q).transform((src.width*4+16,src.height*4+16),Image.Transform.AFFINE,tuple(v['affin']),Image.Resampling.BICUBIC);out=T/(e['bilde']+'.png');im.save(out);rows.append(dict(bilde=e['bilde'],egen_ikke_svart_innside=int(inside.sum()),egen_kontur_utvidelse_raapiksler=3,egen_aa_kant=2,ingen_originalmaske=True))
+(T/'metode.json').write_text(json.dumps(rows,indent=2)+'\n')
+for page in range(5):
+ sub=rows[page*4:page*4+4]
+ if not sub:continue
+ b=Image.new('RGB',(1000,300*len(sub)),'#344556');d=ImageDraw.Draw(b)
+ for i,row in enumerate(sub):
+  im=Image.open(T/(row['bilde']+'.png')).convert('RGBA');b.paste(im,(20,i*300+35),im);d.text((20,i*300+8),row['bilde']+' bare egen ansiktskontur',fill='white')
+ b.save(T/f'side{page+1}.png')

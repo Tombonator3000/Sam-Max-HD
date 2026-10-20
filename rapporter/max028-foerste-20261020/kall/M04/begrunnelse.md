@@ -1,0 +1,1 @@
+Generisk figurarkprompt beskriver hel Max og12 ruter. Kildekontroll i rom4 og scrp065 viser separate nattbelyste ansiktslag med bakgrunnsfelt. Fire hele unike kilder samles her for trygg plass og kontroll. Faktisk prompt bevarer utsnitt og palett;17 hele malerier gjenbrukes bare ved eksakt hel canonical RGBA-likhet til88 mål. Ingen beskyttet jobbfil er endret.

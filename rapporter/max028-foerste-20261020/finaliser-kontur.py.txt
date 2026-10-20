@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.optimize import least_squares
+from smhd.myk import _iou
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/max028-foerste-20261020';T=R/'sluttprototyper';T.mkdir(exist_ok=False);room=P/'mods/gpt/rooms/room004.png';bg=Image.open(room).convert('RGBA');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=[]
+for call in ['M01A','M02A','M03A','M04A','M05R']:
+ C=R/'kall'/call;a=np.array(Image.open(C/'raa.png').convert('RGBA'));plan=json.loads((C/'plan.json').read_text())
+ for e in plan['ruter']:
+  b=e['bilde'];src=np.array(Image.open(P/'work/extract/costumes'/(b+'.png')).convert('RGBA'));x,y,w,h=e['celle'];region=np.zeros(a.shape[:2],bool);region[y:y+h,x:x+w]=True;labels,n=nd.label((a[:,:,3]>=128)&region,np.ones((3,3),bool));counts=np.bincount(labels.ravel());counts[0]=0;sel=labels==counts.argmax();yy,xx=np.nonzero(sel);gx,gy,gw,gh=xx.min(),yy.min(),np.ptp(xx)+1,np.ptp(yy)+1
+  edge=sel&~nd.binary_erosion(sel);ey,ex=np.nonzero(edge);relx=(ex-gx)/gw;rely=(ey-gy)/gh;keep=(rely>.32)|((relx>.36)&(relx<.58)&(rely<.32));ex=ex[keep][::3];ey=ey[keep][::3]
+  def residual(v):
+   cx,cy,rx,ry,t=v;u=(ex-cx)*np.cos(t)+(ey-cy)*np.sin(t);v=-(ex-cx)*np.sin(t)+(ey-cy)*np.cos(t);return (u/rx)**2+(v/ry)**2-1
+  fit=least_squares(residual,[gx+gw*.5,gy+gh*.52,gw*.5,gh*.48,.03],bounds=([gx+gw*.35,gy+gh*.35,gw*.4,gh*.35,-.3],[gx+gw*.65,gy+gh*.65,gw*.6,gh*.65,.3]),loss='soft_l1',f_scale=.01);cx,cy,rx,ry,t=fit.x;X=np.arange(a.shape[1])-cx;aa=np.sin(t)**2/rx**2+np.cos(t)**2/ry**2;bb=2*X*np.sin(t)*np.cos(t)*(1/rx**2-1/ry**2);cc=X**2*(np.cos(t)**2/rx**2+np.sin(t)**2/ry**2)-1;disc=bb**2-4*aa*cc;top=cy+(-bb-np.sqrt(np.maximum(0,disc)))/(2*aa);own=sel&(np.arange(a.shape[0])[:,None]>=top[None,:]+3);removed=int((sel&~own).sum());dist,near=nd.distance_transform_edt(~own,return_indices=True);allow=(dist<=2)&region;q=a.copy();q[:,:,3][~allow]=0;q[:,:,3][own]=255;ink=own&(np.arange(a.shape[0])[:,None]<top[None,:]+6.5);q[ink,:3]=[18,16,14];fringe=allow&~own;q[fringe,:3]=q[near[0][fringe],near[1][fringe],:3];q[q[:,:,3]==0,:3]=0
+  yy,xx=np.nonzero(own);gx,gy,gw,gh=map(int,[xx.min(),yy.min(),np.ptp(xx)+1,np.ptp(yy)+1]);H,W=src.shape[:2];W*=4;H*=4;aff=[gw/W,0,gx-8*gw/W,0,gh/H,gy-8*gh/H];im=Image.fromarray(q).transform((W+16,H+16),Image.Transform.AFFINE,tuple(aff),Image.Resampling.BICUBIC);im=im.transform(im.size,Image.Transform.AFFINE,(W/(W+4),0,(1-W/(W+4))*(W/2+8),0,H/(H+6),(1-H/(H+6))*(H/2+8)),Image.Resampling.BICUBIC);fore=T/(b+'-ansikt.png');im.save(fore)
+  opaque=bool(np.all(src[:,:,3]==255));out=Image.new('RGBA',im.size)
+  if opaque:out.alpha_composite(bg.crop((65*4,94*4,65*4+W,94*4+H)),(8,8))
+  out.alpha_composite(im);z=np.array(out);z[z[:,:,3]==0,:3]=0;out=Image.fromarray(z);dest=T/(b+'.png');out.save(dest);mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cov=_iou(z[:,:,3]>=128,mask,-8,-8);rec=dict(bilde=b,kall=call,prototype=str(dest.relative_to(R)),sha256=sha(dest),raa_sha256=sha(C/'raa.png'),snitt_union=iou,dekning=cov,native_ok=iou>=.6 and cov>=.8,originalmaske=False,originalfragment_fallback=False,egen_alfa=True,metode='Egen malte ansiktskontur,hel affin4x;statisk eget HD-romfelt bare for opprinnelig heldekkende cel',affin=aff,egen_ellipse=fit.x.tolist(),egen_raapiksler_fjernet_over_panne=removed,egen_inkoverlapp_hd=[2,3],originalkontur_i_rensing=False,forgrunn_fil=str(fore.relative_to(R)),forgrunn_sha256=sha(fore),eget_publisert_romfelt=opaque,romfil=str(room),romfil_sha256=sha(room),rompos_original=[65,94],begrunnelse='Ørebaser,mur og bunnstripe tilhører statisk rom. Bare eget maleri renses;ingen original fragmentfallback. Ekte transparent kilde får bare egen alfa,heldekkende originalcel får utsnitt av eget publisert HD-rom under eget ansikt.');(T/(b+'-prototype.json')).write_text(json.dumps(rec,ensure_ascii=False,indent=2)+'\n');rows.append(rec);print(b,round(iou,3),round(cov,3),'HD-romfelt',opaque,'fjernetegen',removed,flush=True);assert rec['native_ok']
+for page in range(5):
+ sub=rows[page*4:page*4+4]
+ if not sub:continue
+ board=Image.new('RGB',(1100,len(sub)*300),'#344556');d=ImageDraw.Draw(board)
+ for i,row in enumerate(sub):
+  for col,filename in enumerate([row['forgrunn_fil'],row['prototype']]):
+   im=Image.open(R/filename).convert('RGBA');board.paste(im,(20+col*550,i*300+35),im)
+  d.text((20,i*300+8),row['bilde']+' Eget ansikt / samlet native',fill='white')
+ board.save(T/f'side{page+1}.png')
+(T/'grunnlag.json').write_text(json.dumps(dict(ruter=rows,ingen_originalmaske=True,rompos_fra88_motorobservasjoner=True,publisert_rom_bevares_sha256=sha(room)),ensure_ascii=False,indent=2)+'\n')
