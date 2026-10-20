@@ -1,0 +1,1 @@
+Etter kontroll av fellespakke2456: fortsett faktisk produksjon av fig343_01 til05 fra KILDEGRUNNLAG.md. Ti ruter fra ti ulike hele kilder, originaler/motor/anker sett. Ingen343-bildekall/resultater ennå. Begynn med1920 ved hjelp av eget Sam342-anker og originalen; auberginen dukker først opp i1924. Ikke gjenta342 eller tidligere pakker. Native-frys gjelder under pakkebyggene.

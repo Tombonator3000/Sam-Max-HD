@@ -1,0 +1,1 @@
+2456-samlepunkt er startet en gang per plattform: Linux39408189818, Windows39408196932, kode5675a87901c59b93d04681811c95823849abf835 og hd-mod2b5d55bcbc90823aacd3ef5208b0e705a75651a1. Behold native-frysen til faktiske nedlastinger, filhasher, motorprøver og fellesrelease er bekreftet. Ikke dupliser byggene.
