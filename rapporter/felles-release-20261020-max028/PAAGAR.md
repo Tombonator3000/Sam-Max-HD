@@ -1,0 +1,1 @@
+Ferdig samlepunkt:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-max028. Begge faktiske pakker/2810native og Latest bekreftet,nativefrys frigitt. Fortsett kilder og faktisk produksjon av044.164_04fortsatt blokkert.

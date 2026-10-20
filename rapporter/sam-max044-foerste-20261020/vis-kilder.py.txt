@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import re,json,hashlib,shutil,math,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;T=O/'scrp066-1200';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');rec=read(R/'motor-skriptproeve1200.json');assert rec['exit']==0 and len(rec['sett044'])==78 and len(rec['kontroller'])==300;plan=read(R/'ruteplan-unik.json')['ruter'];wanted={v['bilde'] for p in plan for v in p['malruter']};log=(T/'scummvm.log').read_text();obs={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*44\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());name=f'costume044_{n}';shot=(f//4+1)*4;img=T/f'frame_{shot:06}_room007.png'
+ if name in wanted and name not in obs and img.exists():obs[name]=dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(img),sha256=sha(img))
+assert set(obs)==wanted;save(R/'motor-kildeobservasjoner.json',dict(sett=78,mangler=[],tegninger=obs,animasjoner_styrt_av_originalskript=True,ingen_ny_grafikk=True,naeste_dump_etter_logget_rute=True))
+for page in range(math.ceil(len(plan)/4)):
+ sub=plan[page*4:page*4+4];b=Image.new('RGB',(1280,len(sub)*310),'#2b3b47');d=ImageDraw.Draw(b)
+ for i,p in enumerate(sub):
+  name=p['bilde'];v=obs[name];x,y=v['pos'];w,h=v['maal'];src=Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA').resize((w*4,h*4),Image.Resampling.NEAREST);motor=Image.open(v['fil']).convert('RGBA').crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8));b.paste(src,(10,i*310+35),src);b.paste(motor,(648,i*310+27),motor);d.text((10,i*310+7),name+' canonical / originalskript rom7 frame'+str(v['bildeframe']),fill='white')
+ b.save(R/f'kildeposer-motor-side{page+1}.png')
+whole=[]
+for f in [492,548,612,668,732,796,860,924]:
+ p=T/f'frame_{f:06}_room007.png';out=R/f'kilde044-hel-{f}.png';shutil.copy2(p,out);whole.append(dict(fil=out.name,sha256=sha(out),frame=f))
+save(R/'hele-kildebilder.json',whole)
+with zipfile.ZipFile(R/'motor-skriptproeve1200-logg.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for fn in ['scummvm.log','scummvm.ini']:z.write(T/fn,fn)
+meta=read(R/'kildegrunnlag.json');meta.update(motor_observert=78,skriptproeve1200_exit=0,kontroller=300,nullkontroller=sum(v['avvik']==0 for v in rec['kontroller']),sen1800proeve_timeout_1384_bevart=True,motivkontroll_gjenstaar=True,original_8ark_47kilder_motor_og_stil_maa_sees_foer_kall=True);save(R/'kildegrunnlag.json',meta);shutil.copy2(__file__,R/'vis-kilder.py.txt');print('78 source observations,47 unique boards,8 whole context images. Verify',sum(v['avvik']==0 for v in rec['kontroller']),'/300 null.',flush=True)
