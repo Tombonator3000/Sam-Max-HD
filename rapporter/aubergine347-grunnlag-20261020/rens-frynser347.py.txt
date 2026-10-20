@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/aubergine347-grunnlag-20261020';O=P/'out/aubergine347-grunnlag-20261020';backup=R/'foer-frynserensing';assert not backup.exists();backup.mkdir();rows=[];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for p in sorted(R.glob('costume347_*-prototype.png')):
+ a=np.array(Image.open(p).convert('RGBA'));bad=(a[:,:,:3]==[255,0,255]).all(2)&(a[:,:,3]>0);n=int(bad.sum())
+ if not n:continue
+ assert int(a[bad,3].max())<=16;shutil.copy2(p,backup/p.name);oldsha=sha(p);oldalpha=a[:,:,3].copy();near=ndimage.distance_transform_edt(a[:,:,3]<128,return_distances=False,return_indices=True);yy,xx=np.nonzero(bad);cols=a[near[0,yy,xx],near[1,yy,xx],:3].copy();a[yy,xx,:3]=cols;assert np.array_equal(oldalpha,a[:,:,3]);Image.fromarray(a).save(p);im=Image.fromarray(a);bg=Image.new('RGBA',im.size,'#c1d6d3');bg.alpha_composite(im);bg.convert('RGB').save(R/(p.stem.replace('-prototype','')+'-kontroll.png'));rows.append(dict(bilde=p.stem.replace('-prototype',''),piksler=n,maks_berort_alfa=int(oldalpha[bad].max()),foer_sha256=oldsha,etter_sha256=sha(p),alfa_byteidentisk=True,maaling='Bare RGB255,0,255 ved egenalfa5..11. Egen nærmeste kjernefarge erstatter lavalfa RGB,ingen alfa eller originalmaske endres.'))
+assert len(rows)==6 and sum(r['piksler'] for r in rows)==35
+for pattern in ['motor-og-kilde347-final-*.png','seks-hele-motorbilder.png','aubergine-trehjerte-i-motor.gif','fremdrift.json','tillegg.json','visuelle-kontrollbilder.json','myke347-kvittering.json','native-fast-plassering.json']:
+ for p in R.glob(pattern):shutil.copy2(p,backup/p.name)
+(R/'frynserensing.json').write_text(json.dumps(dict(ruter=rows,endrede_piksler=35,berorte_alfaer_bevart=True,originalmaske=False,ingen_kjernefarger_endret=True),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'rens-frynser347.py.txt');print('35 lavealfa RGB-fringepiksler i seks egne prototypebilder renset,alfa byteidentisk.')

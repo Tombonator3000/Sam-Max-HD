@@ -1,0 +1,35 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image
+import json,hashlib,sys,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/aubergine347-grunnlag-20261020'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+key=sys.argv[2];manifest=R/'bildekall.json';m=json.loads(manifest.read_text()) if manifest.exists() else {'kall':[]}
+if sys.argv[1]=='etter':
+ src=Path(sys.argv[3]);dest=R/f'raa-{key}.png';assert not dest.exists();shutil.copy2(src,dest)
+ row=next(v for v in m['kall'] if v['kall']==key);assert not row['utfoert'];row.update(utfoert=True,status='raa_lagret_ikke_kontrollert',raa=dest.name,raa_kilde=str(src),sha256=sha(dest));print(dest)
+else:
+ assert not (R/f'bildekall-{key}.json').exists()
+ if key=='A01':
+  job='fig347_01';nums=[1920,1921,1922,1923];places=[(80,80),(720,80),(80,530),(720,530)]
+  board=Image.new('RGBA',(1536,1024),'#00c8c8');slots=[]
+  for n,(x,y) in zip(nums,places):
+   src=Image.open(P/f'work/extract/costumes/costume347_{n}.png').convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);board.alpha_composite(src,(x,y));slots.append(dict(bilde=f'costume347_{n}',pos=[x,y],maal=list(src.size)))
+  ref=R/'fire-ulike-fruktlag-kilde4x.png';board.convert('RGB').save(ref)
+  (R/'kildebrett-A01.json').write_text(json.dumps(slots,indent=2)+'\n')
+  pre='SOURCE-CORRECTION AND FOUR-POSE PRODUCTION OVERRIDE: Ref1 is a diagnostic source board with precisely FOUR distinct animation layer fragments arranged 2 by 2, not the final eight-slot sheet. Paint only these four shapes, matching their exact visible contours, angles, shading regions and alpha cutouts. Top left cel1920 is276x244 at(80,80); top right1921 is356x220 at(720,80); bottom left1922 is336x284 at(80,530); bottom right1923 is296x312 at(720,530). These are pieces of ONE opaque purple eggplant with a small green calyx, partly occluded by a separate Sam hand layer. The cyan notches on the LEFT are genuine transparent hand/finger occlusion slots, NOT bites, mouths, eyes, fruit flesh, claws or a creature. Preserve their exact outlines and leave them transparent. Do not draw Sam or his hand. Do not fill the missing front side of the fruit. The last pose has two broad rounded left-side cutouts. Ref2 is the already controlled newly painted eggplant/Sam pose and is ONLY a fruit color/line-style reference; no Sam body goes into this output. Ref3 is the approved game inking anchor. Use saturated purple, deep plum shadow, restrained violet highlight on the left, a small crisp green calyx. Preserve the original dark-purple majority shadow in these turned-away poses; do not add a white highlight. Smooth clean hand-inked contours, flat colors with one or two shade shapes, real alpha outside and inside the hand notches. No background, ground, shadow, labels, panels, dots or other objects. We will place each generated layer at fixed4x and copy only exact whole source aliases into the final eight-slot sheets. The protected prompt below is preserved verbatim but its mistaken orange-swirl description, eight-frame layout and final sheet geometry are superseded by this exact four-pose source clarification.\n\n'
+ elif key in ('B01','C01'):
+  job='fig347_04' if key=='B01' else 'fig347_05'
+  j=json.loads((A/'jobber'/job/'jobb.json').read_text());nums=[1946,1947,1948] if key=='B01' else [1949]
+  places=[(60,40),(60,570),(800,570)] if key=='B01' else [(120,160)]
+  board=Image.new('RGBA',(1536,1024),'#00c8c8');slots=[]
+  for n,(x,y) in zip(nums,places):
+   src=Image.open(P/f'work/extract/costumes/costume347_{n}.png').convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);board.alpha_composite(src,(x,y));slots.append(dict(bilde=f'costume347_{n}',pos=[x,y],maal=list(src.size)))
+  ref=R/f'hjertebytte-kilde-{key}.png';board.convert('RGB').save(ref);(R/f'kildebrett-{key}.json').write_text(json.dumps(slots,indent=2)+'\n')
+  pre='SOURCE-CORRECTION AND PART-LAYER PRODUCTION OVERRIDE: Ref1 is the exact source board of '+str(len(nums))+' distinct compound layers from the eggplant-for-wooden-heart swap in room92. Purple pieces are the SAME eggplant as Ref2. Brown/orange shapes are the moving thick carved wooden/golden heart, seen at the EXACT unusual rotation/crop in Ref1, NOT a person, swirl, new prop or part of Sam. The tan connecting pieces belong to this moving heart/swap overlay. Preserve the original fragment contours and all logical cut edges and gaps. Do not complete the heart into an invented symmetric shape. The small calyx stays green, purple fruit opaque. Transparent hand/overlap notches in purple must remain transparent. Ref2 is ONLY the controlled fruit/line/color reference. Ref3 is actual game context to identify the carved heart and palette, not a scene to paint. Paint only the '+str(len(nums))+' source compound layers, same order and placement, no actors, fingers, backdrop or labels. Smooth faithful hand-inked Sam & Max game art, flat colors, crisp dark outlines, real alpha, no pixel stairs or magenta. The protected job prompt below follows verbatim; where its orange-swirl premise or whole-sheet geometry conflicts, this source-confirmed board takes precedence.\n\n'
+ else:raise ValueError(key)
+ refs=[ref,A/'rapporter/sam344-fortsettelse-20261020/sam344-samlet1931-kontroll.png',A/'stil/fig002_01.png'] if key=='A01' else [ref,R/'costume347_1923-kontroll.png',R/'rom92-samspill-med-sam-760.png']
+ for p in refs:assert p.exists(),p
+ args=dict(prompt=pre+(A/'jobber'/job/'prompt.txt').read_text(),referenced_image_paths=list(map(str,refs)),transparent_background=True)
+ (R/f'bildekall-{key}.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n');(R/f'prompt-{key}.txt').write_text(args['prompt']);m['kall'].append(dict(kall=key,jobb=job,utfoert=False,status='argumenter_lagret_foer_kall',utc=datetime.now(timezone.utc).isoformat(),args=f'bildekall-{key}.json',referanse_sha256={str(p):sha(p) for p in refs}));print(ref)
+manifest.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'bildekall347.py.txt')

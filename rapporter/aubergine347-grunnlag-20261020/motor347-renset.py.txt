@@ -1,0 +1,23 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,shutil,re,os,subprocess
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/aubergine347-grunnlag-20261020';R=P/'work/.gpt-gren/rapporter/aubergine347-grunnlag-20261020';pkg=P/'out/felles-release-20261020-alkove/linux/squashfs-root';binary=pkg/'usr/bin/scummvm';data=pkg/'usr/share/sam-max-hd';C=O/'mod-kandidat-2363-renset';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert sha(binary)=='adfdf7fcf54a2547eeaaf37450120f1e2b82d62fc75a59d74f1258e5e0ff94d0';expected={e['bilde'] for e in json.loads((R/'tillegg.json').read_text())['tillegg']}
+def run(kind):
+ forced=kind=='lagprøve';classic=kind=='klassisk';frames=520 if forced else 760;target=O/('slutt347-renset-'+kind);assert not target.exists();target.mkdir();home=target/'home';home.mkdir();saves=target/'saves';saves.mkdir()
+ for p in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+ env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update({'HOME':str(home),'XDG_CONFIG_HOME':str(home/'.config'),'XDG_DATA_HOME':str(home/'.local/share'),'XDG_CACHE_HOME':str(home/'.cache'),'LD_LIBRARY_PATH':str(pkg/'usr/lib'),'SDL_VIDEODRIVER':'dummy','SDL_AUDIODRIVER':'dummy','DIGHD_MOD':str(C),'DIGHD_VERIFY':'1','DIGHD_QUIT_AT':str(frames),'DIGHD_DUMP_DIR':str(target),'DIGHD_DUMP_EVERY':'4','DIGHD_DUMP_FLAT':'1','DIGHD_SHOW_MISSING':'0','DIGHD_MANGLER':'0','DIGHD_TEST_ROOM':'92','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'160','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1'})
+ if forced:env.update({'DIGHD_TEST_COSTUME':'347','DIGHD_TEST_ACTOR':'8','DIGHD_TEST_CLIP':'0','DIGHD_TEST_CHORE_EVERY':'1000','DIGHD_TEST_STATIC_SCENE':'1','DIGHD_TEST_SCALE':'255','DIGHD_TEST_POS':'159,100','DIGHD_TEST_ANIMATION':'1'})
+ if classic:env['DIGHD_CLASSIC']='1'
+ command=[str(binary),'--config='+str(target/'scummvm.ini'),'--path='+str(data/'game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+ with(target/'scummvm.log').open('wb') as f:code=subprocess.run(command,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120).returncode
+ assert code==0;log=(target/'scummvm.log').read_text(errors='replace');checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];draws={};allseen=set()
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*347 .*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+  f,n,x,y,w,h=map(int,m.groups());name=f'costume347_{n}';p=target/f'frame_{f+4:06}_room092.png';allseen.add(name)
+  if name in expected and name not in draws and p.exists():draws[name]=dict(logg_frame=f,bildeframe=f+4,pos=[x,y],maal=[w,h],fil=p.name,sha256=sha(p))
+ extra=[]
+ if not classic:
+  baseline=json.loads((R/('motor-baseline.json' if forced else 'motor-skriptkontekst.json')).read_text());bchecks=baseline[0]['kontroller_med_frame'] if forced else baseline['kontroller'];assert len(checks)==len(bchecks) and [v['frame'] for v in checks]==[v['frame'] for v in bchecks]
+  extra=[dict(frame=v['frame'],kandidat=v['avvik'],grunnlag=b['avvik']) for v,b in zip(checks,bchecks) if v['avvik']>b['avvik']];assert not extra,extra;assert set(draws)==expected,(kind,expected-set(draws))
+ first=min((v['logg_frame'] for v in draws.values()),default=None);row=dict(scene=target.name,modus=kind,exit=code,frames=frames,binar_sha256=sha(binary),kostyme=347,rom=92,nye_native_forventet=len(expected),nye_native_observert=len(draws),alle347_sett=sorted(allseen),kontroller=checks,nullkontroller=sum(v['avvik']==0 for v in checks),nye_eller_oekte_avvik=extra,foerste_nye_draw=first,kontroller_fra_foerste_nye_draw=sum(first is not None and v['frame']>=first for v in checks),tegninger=draws,kun_romhopp_ikke_naturlig_gjennomspilling=not forced,ingen_raw28_32_36=True,dumps=len(list(target.glob('frame_*_room092.png'))));(target/'kvittering.json').write_text(json.dumps(row,ensure_ascii=False,indent=2)+'\n');print(kind,len(draws),'nye native',len(checks),'kontroller',row['nullkontroller'],'null',flush=True);return row
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,['lagprøve','romskript']))
+(R/'motor-sluttrunder-renset.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'motor347-renset.py.txt');print('Sluttmotor og helt klassisk sammenligning kjørt.')

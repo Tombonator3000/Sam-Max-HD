@@ -1,0 +1,7 @@
+# Hjertekonturen er HD-spesifikk og fortsatt åpen
+
+Helt klassisk rom92 ved samme romhopp og frame748 har flat rød bakgrunn uten gammel hjertekontur.2333-grunnlaget og2363-kandidaten har samme tynne kontur langs den fjernede formens topp/venstreside. Alle bufferkontroller er null også med konturen. Dette er derfor ikke bevist løst av full skjermrebygging eller de nye347-fruktlagene.
+
+Den eksisterende kildekontrollerte tomtilstanden fra obj901_01/resultat.png ble prøvd som full512x512 RGBA-native objects/obj901_01_hd.png,uten å endre gamle nativefiler.190 kontroller er null og alle30 nye figurruter sees,men konturen blir igjen. Den varianten er avvist og fjernet fra sluttkandidaten. Ingen ny levering eller godkjenning for obj901. Råbilder,kvittering og motorlogg er bevart.
+
+Native rom092 inneholder det opprinnelige hjertet;obj901s tomtilstand fjerner det i kildeforløpet. En direkte hel rektangelkompositt av eksisterende native er fri for konturen,men motorens kildestyrte visning lar deler av HD-rommets omriss bli igjen ved den klassiske objektgrensen. Dette peker mot objektets kilde-/kantdekning i motoren,en avgrenset hypotese til videre feilsøking. Ikke løs det ved å klippe nytegningen med hard originalmaske,tegne over sceneskjermbilder eller fjerne motiv fra grunnrommet uten riktig tilstandshåndtering. Eventuell motorendring skal gå via testet PR. Ny347-leveranse innfører ikke denne gamle resten.

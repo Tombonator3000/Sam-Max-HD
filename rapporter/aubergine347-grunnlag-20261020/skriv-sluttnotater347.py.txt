@@ -1,0 +1,40 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/aubergine347-grunnlag-20261020';now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');s=json.loads((R/'bevaringskontroll.json').read_text())
+for v in json.loads((R/'fremdrift.json').read_text())['leveranser']:
+ (A/'jobber'/v['jobb']/'notat.md').write_text(f'''# {v['jobb']}
+
+{now}, Codex. {v['ruter']} ruter fra byttet i rom 92 der Sam erstatter trehjertet med den lilla auberginen. Originalark, primærskript, faktiske kildefaser og godkjent strekanker er sett. Utsparingene gir plass til Sams fingre. Brune deler er det bevegelige trehjertet og dets overlag. Promptens feilaktige virvelbeskrivelse er korrigert separat uten endring av beskyttede jobbfiler.
+
+Innebygd image_gen, tre faktiske kall for fem ark, med råbilder, argumenter, prompter og referansehash i rapporter/{R.name}. Verktøyet oppga ikke modellnavn. Toms tillatte Python er brukt til fast 4x-plassering og rensing. Bare eksakt identiske hele kildevarianter kopieres. Ingen hard originalsilhuettmaske eller originalfallback. 35 svake magenta RGB-piksler i seks av bokens åtte malerier er erstattet med nærmeste farge i maleriets egen kjerne. Alfaen er byteidentisk, ingen kjernefarger er endret.
+
+Alle 30 ruter i bunken består egenkontroll og native mottak, og er sett som original/native/motor. De endelig rensede filene er observert i både gyldig chore 1 og rommets egne skript. 320 sluttbufferkontroller er null. Målrettet motorprøve med romhopp, ikke naturlig gjennomspilling eller ny Tom-/Claude-godkjenning. Den eldre hjertekonturen etter objekt 901 er fortsatt åpen og dokumentert separat i HJERTEREST.md.
+
+Resultat SHA256: {v['sha256']}. Rutekart: {v['rutekart']}. Publisering og hent bekreftes i mottak-publisert.json. Linux-/Windows-pakken med 2333 native inneholder ennå ingen av disse 30.
+'''.replace('bokens åtte','bunkens åtte'))
+(R/'RAPPORT.md').write_text(f'''# Auberginen settes på sokkelen
+
+{now}. Fig347_01 til 05 er fem nye hele ark med 30 native ruter fra åtte ulike hele kilder. Tre innebygde image_gen-kall er brukt. Alle faktiske argumenter, prompter, referansehash og råbilder er bevart. Motivet er kontrollert mot originalene, rom 92s skript og faktiske kildefaser med Sam, trehjertet og sokkelen. Utsparingene i frukten gir plass til fingrene. Jobbpromptens feilaktige virvelbeskrivelse er korrigert separat.
+
+Rutene bruker egen generert alfa og fast 4x-plassering. Ingen hard originalsilhuettmaske, originalutliggertillegg eller hel originalfallback. Bare eksakt identiske hele kildevarianter kopieres. Sluttkontrollen fant 35 svake magenta RGB-piksler i seks malerier, med alfa 5 til 11. Fargen er hentet fra maleriets egen nærmeste kjerne; alfaen er beholdt byte for byte. De ferdig rensede filene er tatt inn og motorprøvd på nytt.
+
+Alle 30 består egenkontroll og uendrede native-terskler. IoU er 0,866 til 0,977 og dekning 0,928 til 0,991. Alle er visuelt sett som original/native/motor, inklusive samspillet med Sams hender og det roterte hjertet. Samme nedlastede adfdf7fc-binær er brukt til grunnlag og sluttprøver. Gyldig lagprøve har 130 nullkontroller, og rommets egne skript har 190. Henholdsvis 116 og 70 kontroller er fra første nye tegning. Ingen nye eller økte bufferavvik. Dette er målrettet runtimekontroll, ikke naturlig gjennomspilling, ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Den gamle hjertekonturen i HD-visningen er ikke til stede i helt klassisk kontroll. Et forsøk med den eksisterende tomtilstanden som native objektbilde fjernet den ikke. Forsøket er bevart som avvist og er ikke med i sluttkandidaten. Se HJERTEREST.md. Null bufferavvik beviser ikke at denne strukturelle visningsfeilen er borte. Avgrenset objekt-/motorretting må prioriteres før neste samlepakke.
+
+Kandidaten har 2363 native, 20599 PNG-er og 20605 filer. Alle 20569 gamle PNG-er og 20575 tidligere stier er bevart; bare mod.json endrer metadata. {s['beskyttede_kilder']} beskyttede kildefiler og tre stasher er uendret. 291 av 1758 figurjobber har resultat. 1467 gjenstår, i tillegg til returer, katalogfeil og samlet spill-/stilkontroll. Publisering og hent bekreftes separat i mottak-publisert.json. Felles Linux-/Windows-utgave er fortsatt 2333 og inneholder ikke disse 30.
+
+Bibliotekets PASS-kilder figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelruter er brukt med eksisterende v6-mottak. Neste produksjon er de fem allerede kildeklargjorte arkene fig347_06 til 10. Ikke gjenta 2333-byggene eller de leverte 347-arkene. Ingen raw28, raw32 eller raw36 skal tegnes eller avspilles. Gammel nattkontroll forblir pauset.
+''')
+(R/'NESTE.md').write_text(f'''# Fortsett med fig347_06 til 10
+
+{now}: Fig347_01 til 05 er produsert, egenkontrollert, native mottatt, visuelt sett og motorobservert. 30 nye native fra åtte ulike hele kilder, tre bildekall. De endelig rensede filene har 320 nullkontroller. Ikke bestill dem om igjen. Kildecommit og publisering/hent bekreftes i mottak-publisert.json. 291 av 1758 figurjobber har resultat.
+
+Neste er fig347_06 til 10, 36 native koblinger fra 15 ulike hele kilder. Ingen bildekall eller resultater for disse fem ennå. Se originalreferanser347-side2.png, kildeposer-i-motor-2/3.png, det fulle romskriptgrunnlaget og siste-fem-kildebevegelser.json. Samme stående aubergine, mørke kildebekreftede småformer og oval sokkelbase, mens trehjertet går ut i 1950/1951. De 13 siste ulike helbildene har uendret øvre frukt og små endringer nederst. De er ikke blindt kopierbare hele aliaser. Bevar bevegelsen og smådelene uten hard originalmaske. Bruk de kontrollerte 347-maleriene som stilanker og se originalen før hvert motiv. Ikke kjør A01/B01/C01 eller den første plasseringskoden om igjen, det vil gjenta arbeid eller fjerne den dokumenterte RGB-rensingen.
+
+Den gamle hjertekonturen etter objekt 901 forsvinner i klassisk visning, men står fortsatt i HD. Forsøket med native tomtilstand er avvist og fjernet. Ikke publiser den objektvarianten. Se HJERTEREST.md. Avgrenset objekt-/motorfeilsøking og eventuell testet PR må prioriteres før neste samlepakke. Pakkene 2333 er 30 native bak 2363-kandidaten. Oppdater Linux og Windows samlet ved neste praktiske samlepunkt etter resten av 347. Ikke gjenta de ferdige 2333-byggene.
+
+Bevar alle tidligere native, beskyttede kilder og tre stasher. Ingen raw28/32/36. Gammel nattkontroll er pauset; den aktive grafikkautomatikken fortsetter.
+''');shutil.copy2(__file__,R/'skriv-sluttnotater347.py.txt');print('Sluttnotater skrevet med endelige kontrolltall og tydelig åpen hjerterest.')

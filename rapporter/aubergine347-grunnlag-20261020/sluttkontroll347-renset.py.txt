@@ -1,0 +1,67 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import numpy as np,json,hashlib,subprocess,zipfile,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/aubergine347-grunnlag-20261020';O=P/'out/aubergine347-grunnlag-20261020';C=O/'mod-kandidat-2363-renset';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda n:json.loads((R/n).read_text());now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+old=read('grunnlag-filer-a55db07c.json');actual={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};entries=read('tillegg.json')['tillegg'];by={e['bilde']:e for e in entries}
+assert len(old)==20575 and len(entries)==30 and len(actual)==20605 and sum(f.endswith('.png') for f in actual)==20599;assert set(old)<=set(actual) and set(actual)-set(old)=={e['fil'] for e in entries};assert {f for f in old if old[f]!=actual[f]}=={'mod.json'}
+base=json.loads((P/'mods/gpt/mod.json').read_text());meta=json.loads((C/'mod.json').read_text());assert base['costume_cels']==2333 and meta['costume_cels']==2363;assert {k for k in base if base[k]!=meta[k]}<={'costume_cels','costumes'}
+for e in entries:
+ im=Image.open(C/e['fil']);b=np.array(im);assert sha(C/e['fil'])==e['sha256'];assert im.mode=='RGBA' and im.width%4==im.height%4==0;assert (b[:,:,3]==0).any() and (b[:,:,3]==255).any() and ((b[:,:,3]>0)&(b[:,:,3]<255)).any();assert not b[b[:,:,3]==0,:3].any()
+ assert not (((b[:,:,:3]==[255,0,255]).all(2))&(b[:,:,3]>0)).any();assert not (((b[:,:,:3]==[0,200,200]).all(2))&(b[:,:,3]>0)).any()
+protected={}
+for r in ['alkove-siste-20261020','alkove-fortsettelse-20261020','alkove-gjenbruk-20261020','sam-sugepil-345-20261020','sam345-gjenbruk-a-20261020','sam345-gjenbruk-b-20261020','sam345-tilbake-20261020','sam345-slutthoder-20261020','sam344-foerste-20261020','sam344-fortsettelse-20261020',R.name]:
+ for file in ['beskyttede-kilder.json']+(['beskyttede-kildefeil-raw32.json'] if r=='sam344-fortsettelse-20261020' else [])+(['beskyttede-kilder-utvidet.json'] if r=='sam344-foerste-20261020' else []):
+  path=A/'rapporter'/r/file
+  if path.exists():protected.update(json.loads(path.read_text()))
+for f,h in protected.items():assert sha(A/f)==h,f
+q=read('ruteplan-unik.json')['ruter'];assert len(q)==23 and sum(len(v['malruter']) for v in q)==66
+for v in q:
+ x,y,w,h=v['rekt'];src=Image.open(A/'jobber'/v['kildejobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(src.tobytes()).hexdigest()==v['rgba_sha256']
+ aliases=[a for a in v['malruter'] if a['bilde'] in by]
+ for al in aliases:
+  x,y,w,h=al['rekt'];im=Image.open(A/'jobber'/al['jobb']/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert im.size==src.size and im.tobytes()==src.tobytes()
+ if aliases:assert len({by[al['bilde']]['sha256'] for al in aliases})==1
+progress=read('fremdrift.json');assert len(progress['leveranser'])==5;total=0
+for v in progress['leveranser']:
+ path=A/v['resultat'];assert sha(path)==v['sha256'];im=Image.open(path);assert im.mode=='RGBA' and im.size==(1536,1024);rt=json.loads((A/v['rutekart']).read_text())[v['jobb']];assert rt['sha256_resultat']==v['sha256'] and len(rt['ruter'])==v['ruter'];total+=v['ruter'];assert 'FEIL' not in (R/f"{v['jobb']}-egenkontroll.txt").read_text()
+ v.update(native_mottatt=True,visuelt_kontrollert=True,motorobservert=True,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False)
+assert total==30;native=read('myke347-kvittering.json');assert native['ruter_ok']==30 and all(native[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']);vis=read('visuelle-kontrollbilder.json');assert vis['antall']==30 and {v['bilde'] for v in vis['ruter']}==set(by);motors=read('motor-sluttrunder-renset.json');active=[v for v in motors if v['modus']!='klassisk'];assert len(active)==2 and all(v['nye_native_observert']==30 and not v['nye_eller_oekte_avvik'] for v in active);assert sum(len(v['kontroller']) for v in active)==sum(v['nullkontroller'] for v in active)==320
+calls=read('bildekall.json');assert len(calls['kall'])==3
+for v in calls['kall']:
+ assert v['utfoert'] and sha(R/v['raa'])==v['sha256'];args=read(v['args']);assert (R/f"prompt-{v['kall']}.txt").read_text()==args['prompt'];assert all(sha(Path(p))==h for p,h in v['referanse_sha256'].items());v.update(status='brukt',prompt=f"prompt-{v['kall']}.txt",prompt_sha256=sha(R/f"prompt-{v['kall']}.txt"),args_sha256=sha(R/v['args']))
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stashes==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c'];assert not(C/'objects/obj901_01_hd.png').exists();assert all(not(A/f'jobber/fig347_{n:02}/resultat.png').exists() for n in range(6,11))
+review=dict(dato=now,original_native_motor_sett=30,hele_motorbilder_sett=6,figurkobling='rommets egne tre skript,Sam346,hjertet og sokkelen',kontrollbilder={f.name:sha(f) for pattern in ['motor-og-kilde347-final-*.png','seks-hele-motorbilder.png','hjerterest-klassisk-hd-tomtilstand.png','forste-fem-nytegning.png'] for f in R.glob(pattern)},fingre_og_utsparinger_sett=True,frukt_ugjennomsiktig=True,kildetro_samme_prop=True,kjent_gammel_hjertekontur_fortsatt=True,ingen_ny_Tom_Claude_godkjenning=True);(R/'visuell-vurdering.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n')
+logs={}
+with zipfile.ZipFile(R/'motor-sluttlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for scene in ['slutt347-lagprøve','slutt347-romskript','slutt347-renset-lagprøve','slutt347-renset-romskript','slutt347-klassisk','slutt347-med-tomtilstand-romskript']:
+  f=O/scene/'scummvm.log';z.write(f,scene+'/scummvm.log');logs[scene+'/scummvm.log']=sha(f)
+(R/'motor-sluttlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n');count=len(list((A/'jobber').glob('fig*/resultat.png')));assert count==291
+summary=dict(nye_native=30,native_totalt_kandidat=2363,publisert_native_foer=2333,hele_jobber=5,ulike_kilder_i_bunken=8,figurjobber_med_resultat=count,figurjobber_totalt=1758,gjenstaar_hele_jobber=1758-count,bildekall=3,raa_brukt=3,egenkontroll_ok=30,native_ok=30,visuelt_sett=30,motorobservert=30,sluttbufferkontroller=320,nullkontroller=320,lagprøve_fra_foerste_nye_draw=116,romskript_fra_foerste_nye_draw=70,klassisk_kontroll=190,avvist_objekttilstand_kontroller=190,kjent_gammel_hjertekontur_fortsatt=True,tidligere_filer_bevart=20575,tidligere_png_byteidentiske=20569,png_totalt=20599,filer_totalt=20605,beskyttede_kilder=len(protected),stash_shaer=stashes,hard_originalmaske=False,hel_original_fallback=0,terskler_endret=False,ny_Tom_Claude_godkjenning=False,pakkene_native=2333,nye_ruter_i_pakkene=0,frynserensede_RGB_piksler=35,alfa_bevart_byteidentisk=True)
+(R/'bevaringskontroll.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');(R/'bildekall.json').write_text(json.dumps(calls,ensure_ascii=False,indent=2)+'\n')
+for v in progress['leveranser']:
+ d=A/'jobber'/v['jobb'];s=(d/'notat.md').read_text();s+=f'''\n{now}: Sluttstatus for denne bunken er {v['ruter']} native mottatt,sett med original/native/motor og observert i rommets egne skript.30 nye native totalt fraåtte ulike malerier;320 bufferkontroller null,116 fra første nye draw i lagprøven og70 i skriptforløpet. Ingen nye/økte avvik. Den gamle hjertekonturen i HD-rommet forblir dokumentert i HJERTEREST.md og er ikke rettet av denne leveransen. Publisert/hentet-status og kildecommit står i mottak-publisert.json. Linux-/Windows-pakkene2333 inneholder ennå ingen av disse30.\n''';(d/'notat.md').write_text(s)
+(R/'RAPPORT.md').write_text(f'''# Auberginen settes på sokkelen
+
+{now}. Fem hele ark fig347_01 til05 med30 native ruter er produsert fraåtte ulike hele kilder i tre innebygde image_gen-kall. Alle faktiske argumenter,prompter,referanse-SHA-er og råbilder er bevart. Motivet er kildeavklart fra originalark,rom92s tre skript og originalmotor:Sam setter den samme lilla auberginen på trykksokkelen og fjerner det store utskårne trehjertet. Utsparingene i frukten gir plass til Sams fingre. Den feilaktige promptbeskrivelsen om en oransje virvel er korrigert separat,beskyttede jobbfiler er uendret.
+
+Faste4x-ruter med egen generert ekte alfa,grønn kalott,lilla/plomme skygge og glatte konturer. Ingen hard originalsilhuettmaske,originalutliggertillegg eller hel originalfallback. Bare eksakt hele RGBA-kildealiaser kopieres,ikke vilkårlig lignende poser. Alle30 består egenkontroll og uendrede native-terskler;IoU0,866..0,977,dekning0,928..0,991. Frukt,håndutsparinger og de roterte brune hjertedelene er sett både isolert og samlet i motoren.
+
+Alle30 er observert i gyldig tvungen chore1/6 og i760frames med rommets egne tre skript,kun romhopp uten kostyme-/aktør-/rutekrok. Samme nedlastede adfdf7fc-binær som2333-grunnlaget.130+190 sluttbufferkontroller null,116+70 fra første nye draw i hver prøve. Ingen nye/økte avvik. Dette er målrettet runtimekontroll,ikke naturlig gjennomspilling,ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Hjertekonturen etter byttet er en eldre HD-feil og finnes ikke i helt klassisk kontroll. Native tomtilstand901 alene løste den ikke;forsøket er avvist og er ikke med i kandidaten. Se HJERTEREST.md og før/etter/kildebilder. Alle320 nullkontroller gjelder selv om denne strukturelle,visuelt påviste feilen er der. Ikke kall den løst på grunnlag av bufferkontroll.
+
+Kandidaten har2363 native,20599 PNG-er,20605 filer. Alle20569 tidligere PNG-er og20575 tidligere stier er bevart;bare mod.json endrer metadata. {len(protected)} beskyttede kilder og de tre stashene er uendret.291 av1758 figurjobber har resultat,1467 gjenstår pluss returer,katalogfeil og samlet kontroll. Native publisering og hent skal bekreftes separat før status kalles publisert. Felles Linux-/Windows-pakke er2333 og er30 native bak denne kandidaten. Oppdater ved neste samlepunkt etter de siste fem347-arkene,ikke bygg2333 om igjen.
+
+Bibliotekets PASS-kilder figurark-fast-storrelse og scumm-v6-kostymer-skygge-og-soppelruter er brukt med eksisterende v6-mottak og kontroll av faktiske kildegrenser. Neste produksjon er fig347_06 til10,allerede kildeklargjort. De13 nesten like siste posene er ikke hele aliaser;se siste-fem-kildebevegelser.json og bevar de mørke smådelene. Ingen raw28,raw32 eller raw36 skal tegnes/avspilles. Gammel nattkontroll forblir pauset.
+''')
+(R/'NESTE.md').write_text(f'''# Fortsett med fig347_06 til10
+
+{now}:Fig347_01 til05 er produsert,egenkontrollert,native mottatt,visuelt sett og motorobservert.30 nye native fraåtte ulike hele kilder,tre faktiske bildekall. Ikke bestill disse om igjen. Kildecommit og publisering/hent bekreftes i mottak-publisert.json.291 av1758 figurjobber har resultat. Pakkene2333 skal ikke bygges om igjen;de er30 native bak2363-kandidaten. Oppdater Linux og Windows samlet etter neste femark ved et kontrollert samlepunkt.
+
+Neste er de fem klargjorte arkene fig347_06 til10,36 native med15 ulike hele kilder.0 nye bildekall/resultater der. Motivet er samme stående aubergine med mørke kildebekreftede smådeler og oval sokkelbase,mens det roterte trehjertet går ut i1950/1951. Se originalreferanser347-side2.png,kildeposer-i-motor-2/3.png,fullt romskriptgrunnlag og siste-fem-kildebevegelser.json. Uendret øvre frukt er kildebekreftet,men de13 siste ulike helbildene har små endringer nederst og er ikke blindt kopierbare hele aliaser. Bevar bevegelsen uten hard originalmaske. Bruk den kontrollerte347-fruktstilen som anker,og originalen før hvert motiv.
+
+Hjertekonturen etter objekt901 forsvinner i klassisk visning,men står fortsatt i HD. Forsøket med native tomtilstand er avvist og fjernet,ikke publiser det. Se HJERTEREST.md. Trenger videre avgrenset objekt-/motorfeilsøking og eventuell testet PR;ikke kall den løst av den nye grafikken eller nullkontrollene. Alle tidligere native,beskyttede kilder og tre stasher skal bevares. Gammel nattkontroll er pauset,den aktive grafikkautomatikken fortsetter.
+''')
+shutil.copy2(__file__,R/'sluttkontroll347-renset.py.txt');print(json.dumps(summary,ensure_ascii=False),flush=True)
