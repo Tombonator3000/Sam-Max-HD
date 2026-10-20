@@ -16,6 +16,8 @@ Les denne filen før du starter. Den erstatter tidligere ordre. Les også `AGENT
 
 ## Gjør disse nå
 
+2026-10-20 04:20:345_26 til35 er produsert/kontrollert,14native,kandidat2256,263resultatark. Sju kilder fra ni bildekall,to mansjettrettinger. Alle14sett/motorobservert,80nullkontroller. Se sam345-tilbake-20261020/RAPPORT.md og mottak-publisert.json. Felles2242-pakke er faktisk nedlastet,kontrollert og publisert Latest;denne14-bunken kom etter pakkefrys. Neste345_36.346_27 til43 er fortsattkildefeil,ikkeproduser/importerfra raw36.
+
 Publisert og hentet tilbake: kilde f0826b12a3d951fdbef8de03e99c50804af14632, hd-mod 32b43950364fae71bab3a68e64e81a91c84e3c22, 2242 native totalt. Alle 20478 kandidat-PNG-er, 20473 gamle PNG-er og 5 nye native-SHA-er stemmer. Alle 20479 gamle stier, 20 nye kilder,forrige40kilder og tre stasher bevart. Ingen nye bildekall. Alle5 sett/motorobservert,80nullkontroller. Neste345_26. Se mottak-publisert.json.
 
 2026-10-20 03:50:345_21 til25 er produsert ved eksakt tidligere kilde/prototype/native-gjenbruk. 5runtime,0bildekall,egenkontroll/native5OK,alle5sett/motorobservert,80nullkontroller. Kandidat2242,grunnlag2237. Sesam345-gjenbruk-b-20261020/RAPPORT.md og mottak-publisert.json for faktisk publisering. Neste345_26. Ikke produser346_27 til43 før kildefeil er rettet.

@@ -1,0 +1,45 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam345-tilbake-20261020';O=P/'out/sam345-tilbake-20261020';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def parts(a,core=128,minimum=5):
+ labs,num=ndimage.label(a[:,:,3]>core);rows=[]
+ for l,sl in enumerate(ndimage.find_objects(labs),1):
+  if sl is None:continue
+  m=labs[sl]==l
+  if m.sum()<minimum:continue
+  y,x=sl;rows.append(dict(label=l,box=(x.start,y.start,x.stop,y.stop),pixels=int(m.sum())))
+ return sorted(rows,key=lambda r:-r['pixels']),labs
+q=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];protos={};evidence=[]
+for key,v in zip(['A01','B02','C02','D01','E01','F01','G01'],q):
+ im=np.array(Image.open(R/f'raa-{key}.png').convert('RGBA'));im[:,:,3]=np.clip(im[:,:,3].astype(float)*255/254,0,255).astype(np.uint8);im[im[:,:,3]==0,:3]=0
+ src=np.array(Image.open(A/'jobber'/v['kildejobb']/'original_1x.png').convert('RGBA'));x,y,w,h=v['rekt'];src=src[y:y+h,x:x+w].copy();mag=(src[:,:,0]>235)&(src[:,:,1]<25)&(src[:,:,2]>235);src[mag,3]=0
+ allsp,sl=parts(src,128,1);sp=[p for p in allsp if p['pixels']>1];tiny=[p for p in allsp if p['pixels']==1];gp,gl=parts(im,128,8);
+ if key=='C02':
+  extras=gp[1:];gp=[gp[0],dict(label=0,box=(min(p['box'][0] for p in extras),min(p['box'][1] for p in extras),max(p['box'][2] for p in extras),max(p['box'][3] for p in extras)),pixels=sum(p['pixels'] for p in extras))]
+ print(v['bilde'],'SOURCE',sp,'GEN',gp,flush=True)
+ canvas=Image.new('RGBA',(w*4,h*4));mapping=[]
+ assert len(gp)>=len(sp),(key,len(gp),len(sp))
+ for s,g in zip(sp,gp):
+  x0,y0,x1,y1=g['box'];piece=im[y0:y1,x0:x1].copy();labmask=(gl[y0:y1,x0:x1]>0) if g['label']==0 else gl[y0:y1,x0:x1]==g['label'];# own generated alpha, no original silhouette
+  support=ndimage.binary_dilation(labmask,iterations=2);piece[~support]=0
+  t=s['box'];dest=(t[0]*4,t[1]*4,(t[2]-t[0])*4,(t[3]-t[1])*4)
+  patch=Image.fromarray(piece).resize(dest[2:],Image.Resampling.LANCZOS);canvas.alpha_composite(patch,dest[:2]);mapping.append(dict(source_box=t,generated_box=g['box'],generated_core_pixels=g['pixels'],placement_hd=dest))
+ for t in tiny:
+  tx,ty,_,_=t['box'];colour=tuple(map(int,src[ty,tx,:3]));patch=Image.new('RGBA',(4,4));draw=ImageDraw.Draw(patch);draw.ellipse((0,0,3,3),fill=colour+(255,));canvas.alpha_composite(patch,(tx*4,ty*4));mapping.append(dict(kildebekreftet_enkeltpiksel=[tx,ty],farge=list(colour),mykt_punkt_hd=[4,4],original_maske=False))
+ clean=np.array(canvas);clean[clean[:,:,3]<=3]=0;canvas=Image.fromarray(clean)
+ canvas.save(R/(v['bilde']+'-prototype.png'));protos[v['bilde']]=canvas;evidence.append(dict(bilde=v['bilde'],raa=f'raa-{key}.png',raa_sha256=sha(R/f'raa-{key}.png'),prototype_sha256=sha(R/(v['bilde']+'-prototype.png')),deler=mapping))
+ # compose preview with alpha, don't judge transparent hidden RGB as content
+ bg=Image.new('RGBA',canvas.size,'#d0e0e0');bg.alpha_composite(canvas);bg.convert('RGB').save(R/(v['bilde']+'-kontroll.png'))
+(R/'plassering.json').write_text(json.dumps(dict(ruter=evidence,original_pikselmaske_brukt=False,merknad='Hver kildebekreftet del får riktig boks, men beholder generert egen alfa og omriss. Bare genererte komponenter velges. RGB ved alfa0 nullstilles. Maksimal generert alfa254 normaliseres255.'),ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-20',verktøy='innebygd image_gen og tillatt Python-rensing/plassering',faktiske_bildekall=['A01','B01','C01','D01','E01','F01','G01','B02','C02'],leveranser=[])
+for row in json.loads((R/'klargjort.json').read_text()):
+ job=row['jobb'];d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());canvas=Image.new('RGBA',(1536,1024));rt=[]
+ for c in j['ruter']:
+  rep=next(v for v in q if any(m['bilde']==c['bilde'] for m in v['malruter']));image=protos[rep['bilde']];x,y,w,h=c['rekt'];dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(image,(dx,dy));yy,xx=np.nonzero(np.array(image)[:,:,3]>128);rt.append(dict(bilde=c['bilde'],kostyme=345,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=f"rapporter/sam345-tilbake-20261020/{rep['bilde']}-prototype.png",prototype_sha256=sha(R/(rep['bilde']+'-prototype.png'))))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=rt)},indent=2)+'\n')
+ proc=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(proc.stdout+proc.stderr);print(job,proc.returncode,proc.stdout,flush=True)
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(rt),rutekart=f'rapporter/sam345-tilbake-20261020/rutekart-{job}.json',egenkontroll={0:'OK',1:'SJEKK',2:'FEIL'}.get(proc.returncode,'FEIL'),native_mottatt=False,visuelt_kontrollert=False,motoravspilt=False,importert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False))
+ assert proc.returncode in(0,1)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'plasser.py.txt')

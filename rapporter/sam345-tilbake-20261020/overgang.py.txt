@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/sam345-tilbake-20261020';R=P/'work/.gpt-gren/rapporter/sam345-tilbake-20261020'
+frames=[164,168,172,176,180,184,188,192];board=Image.new('RGB',(1920,1700),'#243340');d=ImageDraw.Draw(board);records=[]
+for i,f in enumerate(frames):
+ p=O/'final345-anim1'/f'frame_{f:06}_room092.png';im=Image.open(p).convert('RGB');im.thumbnail((960,400),Image.Resampling.LANCZOS);x=i%2*960;y=i//2*425;board.paste(im,(x,y+25));d.text((x+6,y+5),f'Rom92 / frame{f} / '+('forrige publiserte1945' if f==164 else f'ny kilde{1946+(f-168)//4}'),fill='white');records.append(dict(frame=f,fil=str(p.relative_to(O)),sha256=hashlib.sha256(p.read_bytes()).hexdigest()))
+board.save(R/'overgang-og-sju-hele-poser.png');(R/'overgang-bilder.json').write_text(json.dumps(records,indent=2)+'\n')

@@ -15,3 +15,5 @@ Ny fellesrelease sam-max-hd-2026-10-20-alkove klargjort med de fire faktisk kont
 Grafikkproduksjonen fortsetter. Neste Sam345-bunke fig345_26 til35 er produsert under pakkekontrollen, men dens14 ruter inngår ikke i dette2242-samlepunktet. Den publiseres separat etter egen sluttkontroll.17 jobber fig346_27 til43 er fortsatt ikke produsert grunnet bekreftet feil i kildetabelloppslaget; se alkove-siste-20261020/KILDEFEIL.md.
 
 Oppsettmerknad: ett pull-kall mot gpt-arbeid ble først kjørt i main-utsjekkingen og avvist av --ff-only. Ingen filer eller commit ble endret. Deretter ble riktig grafikkarbeidsbord kontrollert med pull --ff-only: allerede oppdatert. Main sto fortsatt rent på17db2054. Ingen merge eller omgåelse.
+
+Fellesrelease publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-20-alkove. ReleaseID 417933471, publisert 2026-10-20T02:19:07Z. Alle fire opplastinger kontrollert før og etter publisering. Samtlige ti tidligere releaser og assets bevart. Begge faktiske nedlastinger og20483 runtime moddfiler per pakke stemmer. Se publisert.json.

@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Oppdatert2026-10-20 04:20:345_26 til35 er produsert og kontrollert,14native,kandidat2256,263resultatark. Ni bildekall/sju råbilder brukt. Alle14 sett/motorobservert,80nullkontroller. Fellespakken2242 er publisert,denne14-bunken kom etter pakkefrys. Neste345_36. Se sam345-tilbake-20261020.
+
 Oppdatert 2026-10-20 03:50:345_21 til25, 5runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle5sett/motorobservert,80nullkontroller. Publisert2242,253resultatark. Sesam345-gjenbruk-b-20261020/mottak-publisert.json. Neste345_26.346-kildefeilen er fortsatt åpen.
 
 Oppdatert 2026-10-20 03:47:345_11 til20, 10runtime ved eksakt kildegjenbruk,ingen nye bildekall. Alle10sett/motorobservert,80nullkontroller. Publisert2237,248resultatark. Sesam345-gjenbruk-a-20261020/mottak-publisert.json. Neste345_21.346-kildefeilen er fortsatt åpen.
@@ -296,21 +298,21 @@ Figurark for Sam.
 Figurark for Sam.
 
 - [x] `fig345_25` (figurark 25 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_26` (figurark 26 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_27` (figurark 27 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_28` (figurark 28 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_29` (figurark 29 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_30` (figurark 30 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_31` (figurark 31 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_32` (figurark 32 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_33` (figurark 33 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
-- [ ] `fig345_34` (figurark 34 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_26` (figurark 26 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_27` (figurark 27 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_28` (figurark 28 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_29` (figurark 29 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_30` (figurark 30 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_31` (figurark 31 for Sam (kostyme 345), 1 rute: start mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_32` (figurark 32 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_33` (figurark 33 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_34` (figurark 34 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
 
 ## Bestilling 20
 
 Figurark for Sam.
 
-- [ ] `fig345_35` (figurark 35 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
+- [x] `fig345_35` (figurark 35 for Sam (kostyme 345), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_36` (figurark 36 for Sam (kostyme 345), 1 rute: animasjon 7 (lag 14, tegnes over kroppen) mot høyre (1 rute), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_37` (figurark 37 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
 - [ ] `fig345_38` (figurark 38 for Sam (kostyme 345), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `jobber/fig345_01/resultat.png`)
