@@ -1,0 +1,33 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-06til10-20261020'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];protos={v['bilde']:Image.open(R/(v['bilde']+'-prototype.png')).convert('RGBA') for v in plan if v['bilde']!='costume342_1931'}
+# The sole differing source pixel is coat shading, not a pose or silhouette change.
+# Keep the same new painting in both frames to avoid inventing a hat/head animation.
+protos['costume342_1931']=protos['costume342_1930'].copy();protos['costume342_1931'].save(R/'costume342_1931-prototype.png')
+variants=dict(brukt_maleri=['S06','S07','S09R02','S10'],avviste_hele_varianter={'S08':'Uendret kildehode fikk ny hatteform. Ikke brukt.','S09':'Ansikt/proporsjoner endret, generert glod. Ikke brukt.'},hele_rgba_kilder=5,meningsbaerende_posevarianter=4,naer_variant=dict(fra='costume342_1930',til='costume342_1931',hele_rgba_identisk=False,antall_kildepiksler_som_skiller=1,koordinat=[50,153],foer=[59,31,15,255],etter=[79,39,15,255],betydning='En skyggepiksel i jakken. Samme eget maleri beholder kontinuitet; ikke presentert som eksakt RGBA-alias.'),ekte_hele_rgba_aliaser=['costume342_1931','costume342_1932','costume342_1933','costume342_1934','costume342_1935','costume342_1936'],hard_originalmaske=False)
+(R/'malerigjenbruk.json').write_text(json.dumps(variants,ensure_ascii=False,indent=2)+'\n')
+progress=dict(dato='2026-10-20',nye_jobber=5,native_rutekoblinger=10,hele_rgba_kilder=5,ulike_malte_poser=4,bildekall=6,leveranser=[])
+for n in range(6,11):
+ job=f'fig342_{n:02}';d=A/'jobber'/job;j=json.loads((d/'jobb.json').read_text());assert not(d/'resultat.png').exists(),job;canvas=Image.new('RGBA',(1536,1024));mapping=[]
+ for c in j['ruter']:
+  rep=next(v for v in plan if any(t['bilde']==c['bilde'] for t in v['malruter']));im=protos[rep['bilde']];x,y,w,h=c['rekt'];assert im.size==(w*4,h*4);dx,dy=(j['plassering'][0]+x)*4,(j['plassering'][1]+y)*4;canvas.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128);mapping.append(dict(bilde=c['bilde'],kostyme=342,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],representant=rep['bilde'],kilde_rgba_sha256=rep['rgba_sha256'],prototype=f'rapporter/{R.name}/{rep["bilde"]}-prototype.png',prototype_sha256=sha(R/(rep['bilde']+'-prototype.png'))))
+ canvas.save(d/'resultat.png');digest=sha(d/'resultat.png');(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=digest,ruter=mapping)},indent=2)+'\n');check=subprocess.run([str(P/'.venv/bin/python'),'verktoy/sjekk_leveranse.py',f'jobber/{job}/resultat.png'],cwd=A,capture_output=True,text=True);(R/f'{job}-egenkontroll.txt').write_text(check.stdout+check.stderr);assert check.returncode==0,(job,check.stdout,check.stderr)
+ (d/'notat.md').write_text(f'''# {job}
+
+2026-10-20. Innebygd image_gen, modellnavn er ikke oppgitt av verktøyet. Seks faktiske bildekall i bunken, fire malte poser brukes. Alle råbilder, faktiske prompter, argumenter og referansehasher er bevart i rapporter/{R.name}/bildekall.json. S08 og første S09 er avvist for endret hode og proporsjoner. S09R02 og S10 er smale redigeringer av det egne S07-maleriet. Python-rensing og plassering er uttrykkelig tillatt av Tom.
+
+Motiv: Sam i rom 92s alkove, lokalt skript 201, aktør 6 ved 159,101, elevation 1, scale 255, chore 7. Den tomme hånden går foran snuten. Den generelle standardpromptens aubergine er korrigert i separat notat og faktisk prompt; beskyttet prompt er uendret. Originalark, ti motorposer, godkjent Sam-anker og det foregående egne sceneankeret er sett før produksjon. Varm brun dress og hatt, kremfarget mansjett, blågrå/svart slips, alle tre synlige krummede fingertupper og tommel er beholdt.
+
+Bare egen generert alfa og komponentgrenser brukes i rensing, aldri hard originalsilhuett. Faste 4x-mål og plassering. En skyggepiksel i jakken skiller hele kilden 1930 fra 1931: [50,153], RGB 59,31,15 mot 79,39,15. Samme nye maleri brukes fordi det ikke er en betydningsfull poseendring; det er eksplisitt ikke et eksakt hel-RGBA-alias. 1931 til 1936 er dokumentert eksakte hele RGBA-aliaser. Se malerigjenbruk.json og kildeendring-helruter.json. Ingen originalfragment-fallback eller harde originalmasker.
+
+Egenkontroll OK. Resultat SHA256 {digest}. Laget, native mottatt, visuelt sett, motorobservert, publisert, pakkeimport og Tom-/Claude-godkjenning holdes atskilt i fremdrift.json. Ingen ny Tom-/Claude-godkjenning.
+''')
+ progress['leveranser'].append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,egenkontroll='OK',native_mottatt=False,visuelt_kontrollert=False,motorobservert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False));print(job,'OK',len(mapping),flush=True)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n');p=R/'bildekall.json';v=json.loads(p.read_text())
+for row in v['kall']:
+ assert row['utfoert']
+ row['brukt']=row['kall'] in variants['brukt_maleri']
+ if row['kall'] in variants['avviste_hele_varianter']:row['avvist_grunn']=variants['avviste_hele_varianter'][row['kall']]
+p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'lever.py.txt')

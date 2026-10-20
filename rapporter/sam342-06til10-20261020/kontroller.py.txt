@@ -1,0 +1,42 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-06til10-20261020';O=Path(__file__).resolve().parent;C=O/'mod-sam342-06til10';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();base=json.loads((R/'grunnlag-produksjon.json').read_text());expected=json.loads((R/'kandidatfilhash.json').read_text());actual={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};assert expected==actual and len(actual)==20680;assert set(base['filer'])<=set(actual);assert {f for f,h in base['filer'].items() if actual[f]!=h}=={'mod.json'}
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==312
+auto=json.loads((R/'myke-automatisk.json').read_text());assert auto['ruter_ok']==10 and all(auto[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk'])
+motor=json.loads((R/'motorproeve.json').read_text());assert motor['alle10_nye_observert'] and motor['skjermbufferkontroller']==motor['nullkontroller']==285;assert len(json.loads((R/'motorobservasjoner.json').read_text())['tegninger'])==10
+calls=json.loads((R/'bildekall.json').read_text())['kall'];assert len(calls)==6 and all(v['utfoert'] and sha(R/v['raa'])==v['raa_sha256'] for v in calls) and sum(v['brukt'] for v in calls)==4
+for v in calls:
+ for f,h in v['referanse_sha256'].items():assert sha(Path(f))==h
+progress=json.loads((R/'fremdrift.json').read_text());assert len(progress['leveranser'])==5
+for e in progress['leveranser']:
+ assert sha(A/e['resultat'])==e['sha256'] and json.loads((A/e['rutekart']).read_text())[e['jobb']]['sha256_resultat']==e['sha256'];assert 'Utfall: OK' in(R/(e['jobb']+'-egenkontroll.txt')).read_text();e.update(native_mottatt=True,visuelt_kontrollert=True,motorobservert=True,importert=False,publisert=False,i_fellespakke=False)
+(R/'fremdrift.json').write_text(json.dumps(progress,ensure_ascii=False,indent=2)+'\n')
+protected={};names=['alkove-siste-20261020','alkove-fortsettelse-20261020','alkove-gjenbruk-20261020','sam-sugepil-345-20261020','sam345-gjenbruk-a-20261020','sam345-gjenbruk-b-20261020','sam345-tilbake-20261020','sam345-slutthoder-20261020','sam344-foerste-20261020','sam344-fortsettelse-20261020','aubergine347-grunnlag-20261020','max-alkove341-grunnlag-20261020','sam342-foerste-20261020','sam346-klesskjot-retur-20261020','sam346-overtegning-20261020',R.name]
+for n in names:
+ for fname in ['beskyttede-kilder.json','beskyttede-kildefeil-raw32.json','beskyttede-kilder-utvidet.json']:
+  p=A/'rapporter'/n/fname
+  if p.exists():
+   for f,h in json.loads(p.read_text()).items():assert f not in protected or protected[f]==h;protected[f]=h
+assert len(protected)==572 and all(sha(A/f)==h for f,h in protected.items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+review=dict(tid_utc=datetime.now(timezone.utc).isoformat(),fem_resultatark_sett=True,ti_original_native_motor_sett=True,hele_motorbilder_sett=5,foer_etter_sett=2,ansikt_hatt_og_fingre_vurdert=True,tidligere_klesskjot_ikke_gjeninnfort=True,magenta_eller_halo_ikke_sett=True,ny_Tom_Claude_godkjenning=False)
+(R/'visuell-vurdering.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n')
+logs={}
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for p in sorted(O.glob('*/scummvm.log')):rel=p.relative_to(O).as_posix();z.write(p,rel);logs[rel]=sha(p)
+assert len(logs)==4;(R/'motorlogger-manifest.json').write_text(json.dumps(logs,indent=2)+'\n')
+proof=dict(nye_hele_jobber=5,nye_native=10,native_totalt=2437,figurjobber_med_resultat=312,figurjobber_totalt=1758,gjenstaar=1446,egenkontroll_ark_OK=5,automatisk_native_OK=10,visuelt_sett_native=10,motorobservert_native=10,bildekall=6,brukte_malte_poser=4,avviste_hele_varianter=2,beskyttede_kilder_SHA_uendret=572,tre_stasher_uendret=True,alle_tidligere_filstier_bevart=True,alle20664_tidligere_png_byteidentiske=True,kandidat_png=20674,kandidat_filer=20680,kontroller=285,nullkontroller=285,publisert=False,i_fellespakke=False,hard_originalmaske=False,originalfragment_fallback=False,naturlig_gjennomspilling=False,ny_Tom_Claude_godkjenning=False)
+(R/'bevaringskontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+(R/'RAPPORT.md').write_text('''# Sam foran munnen, ark 06 til 10
+
+Fem nye hele figurark fig342_06 til 10, ti native rutekoblinger. Sam står i alkoven i rom 92 og beveger den tomme hånden foran snuten. Kilden har fem ulike hele RGBA-bilder, men 1930 og 1931 skiller bare én skyggepiksel i jakken. Samme eget maleri brukes i den nærvarianten for å unngå oppdiktet hodebevegelse; den er ikke kalt et eksakt RGBA-alias. 1931 til 1936 er ekte hele aliaser. Se malerigjenbruk.json.
+
+Seks faktiske innebygde image_gen-kall. S06, S07, S09R02 og S10 brukes. S08 er forkastet for endret hatt i en kilde med uendret hode; første S09 er forkastet for endrede proporsjoner og glød. De siste to er smale redigeringer av det egne maleriet, med samme hode og klær og kildebekreftede håndstillinger. Alle råbilder, prompter, argumenter og referansehasher er bevart. Modellnavn er ikke oppgitt. Python-rensing og plassering er tillatt av Tom. Bare egen generert alfa og egne komponentgrenser, aldri hard originalsilhuett eller originalfragment-fallback. Originalens tomme hånd, fingre, varme brune dress, hatt, kremfargede mansjett og blågrå/svarte slips er beholdt. Arkivpromptens feilaktige aubergine er korrigert i separat notat og faktisk prompt; beskyttede filer er uendret.
+
+Alle fem ark består egenkontrollen. Automatisk mottak gir ti av ti OK med uendrede grenser. Slutt-native har fast 4x og åtte HD-pikslers marg på hver side, med dokumentert dekning/IoU. Alle ti er sett som original/native/motor i fem sammenligningssider; fem hele motorbilder og to før/etter er sett. Ingen klesskjøt, magenta eller glød er sett i sluttbildene.
+
+Motorprøven bruker den faktisk nedlastede Linux-binæren fra sam-max-hd-2026-10-20-samlag, SHA256 ddb3714ce16b295bbf5d8fc5bc653c27ef1b78b4ec5a3990c64f4f03961500ed. Samme binær med 2427-grunnlag og 2437-kandidat, 320 bilder i kildekorrekt tvungen animasjon 7 og 820 bilder fra rommets egne skript. Alle ti nye ruter er logget tegnet. 285 sluttbufferkontroller er null, og de tilsvarende grunnlagskontrollene er også null. Før/etter ved 136 og 168 endrer ingen piksler utenfor Sams venstre region (x 700). Dette er diagnostikk og romskript, ikke naturlig gjennomspilling eller ny Tom-/Claude-godkjenning. Tidligere oppstartsfelt, sen romhoppstans og inventarkant i rom 35 er ikke påstått rettet.
+
+Kandidat 2437 native, 20674 PNG-er og 20680 filer. Alle 20670 tidligere stier og 20664 tidligere PNG-er er bevart byteidentisk; bare mod.json endres blant gamle filer før publiseringens sjekksumskriving. Alle 572 beskyttede kilder og tre stasher er uendret. 312 av 1758 hele figurjobber har resultat, 1446 gjenstår pluss returer, kildefeil og samlet kontroll. Ingen motor-/pipelineendring. Bibliotekskilden figurark-fast-storrelse og repoets remake-metode er brukt. Publisering, hent og pakkeinnhold bekreftes separat. Fellespakkene har fortsatt 2427 og mangler disse ti nye; de oppdateres ved neste samlepunkt etter resten av Sam342. Neste fem er fig342_11 til 15, som må kildeklargjøres før produksjon.
+''')
+shutil.copy2(__file__,R/'kontroller.py.txt');print(json.dumps(proof,ensure_ascii=False),flush=True)

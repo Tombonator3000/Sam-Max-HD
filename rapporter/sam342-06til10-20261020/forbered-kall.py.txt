@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam342-06til10-20261020'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+native='1481ab600c1a5a6c045b0ae210408b6af0de2068'
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod','refs/heads/gpt-arbeid'],cwd=P,text=True)
+assert native+'\trefs/heads/hd-mod' in remote
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip()+'\trefs/heads/gpt-arbeid' in remote
+base=dict(native_sha=native,arbeidsgrein_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),filer={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in (P/'mods/gpt').rglob('*') if p.is_file()},stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines(),hele_resultatjobber=307,native=2427)
+assert len(base['filer'])==20670 and len(list((A/'jobber').glob('fig*/resultat.png')))==307
+for f,h in json.loads((R/'beskyttede-kilder.json').read_text()).items():assert sha(A/f)==h
+assert not (R/'grunnlag-produksjon.json').exists();(R/'grunnlag-produksjon.json').write_text(json.dumps(base,sort_keys=True,indent=2)+'\n')
+plan=json.loads((R/'ruteplan-unik.json').read_text())['ruter'];calls=[]
+for i,rep in enumerate(plan,6):
+ job=rep['kildejobb'];d=A/'jobber'/job;x,y,w,h=rep['rekt'];im=Image.open(d/'original_1x.png').convert('RGBA').crop((x,y,x+w,y+h));assert hashlib.sha256(im.tobytes()).hexdigest()==rep['rgba_sha256']
+ p=R/(rep['bilde']+'-kilde4x.png');im.resize((w*4,h*4),Image.Resampling.NEAREST).save(p)
+ refs=[str(p),str(A/'stil/fig002_01.png'),str(A/'rapporter/sam342-foerste-20261020/costume342_1928-prototype.png'),str(R/'ti-kildeposer-i-motor.png'),str(d/'referanse.png')]
+ correction=f'''Use case: identity-preserve. Asset type: one transparent 2D game animation cel, faithful Sam & Max Hit the Road HD remake.
+SOURCE-CORRECTED PRODUCTION BRIEF. This overrides the generic erroneous eggplant text in the protected archival prompt below. Redraw exactly ONE chest-up Sam cutout from image 1, not a scene or a sprite sheet. Image 1 is the exact original pose and warm scene palette; image 2 is the approved Sam identity and linework anchor (ignore its blue suit palette); image 3 is our finished preceding brown scene pose, for consistent rendering, proportions and outline weight only; image 4 is actual room92 context for meaning, no background to copy; image 5 is the full original job sheet for provenance, draw only image 1's specified pose.
+Sam is facing mostly toward us, with drooping ears, long broad orange-tan dog muzzle, huge glossy black oval nose, narrow vertical eyes and a rumpled asymmetric brown fedora with black band. Keep the source pose exactly, with his EMPTY forward hand held under/in front of his mouth, gently curled fingers visible and the thumb connected on the left. Preserve each visible curved fingertip, the pale cream cuff, chestnut-brown suit with broad angular lapels, cream shirt and blue-gray/black diagonal striped tie. No object is in the hand. No eggplant, no heart, no Max, no arrows. No extra hand or fingers. Preserve closed mouth expression unless clearly visible in source.
+One continuous upper-body painting. Exact source silhouette, head/hand/body ratios and projected pose. Do not enlarge the head or hands. Final logical cutout size is {w*4} x {h*4} px at 4x; draw at sufficient resolution for that. Keep the deliberately flat cropped chest/arm at bottom and left edge; do not add a new dark line across the bottom. These are not full-body figures, add no legs. Smooth dark comic outlines and restrained flat painted shadows, no dithering, jagged steps, halos or artificial texture. Match our preceding pose's clean cartoon finish while following the new source hand/head location. Transparent alpha, transparent margins, no ground shadow, no text, no background, no border and no labels.
+
+Protected archival prompt retained verbatim for provenance; the wrong generic eggplant description is superseded by the source-corrected brief above:
+'''
+ prompt=correction+(d/'prompt.txt').read_text();call=f'S{i:02}';args=dict(prompt=prompt,referenced_image_paths=refs,transparent_background=True)
+ assert not (R/f'bildekall-{call}.json').exists();(R/f'prompt-{call}.txt').write_text(prompt);(R/f'bildekall-{call}.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n');calls.append(dict(kall=call,bilde=rep['bilde'],jobb=job,args=f'bildekall-{call}.json',prompt=f'prompt-{call}.txt',referanse_sha256={p:sha(Path(p)) for p in refs},utfoert=False))
+for n in range(6,11):
+ (A/'jobber'/f'fig342_{n:02}'/'kildepresisering-20261020.md').write_text('Sam har tom hånd foran munnen/snuten i rom 92, kostyme 342, lokalt skript 201, aktør 6, chore 7. Standardpromptens aubergine er feil for disse posene og erstattes av separat faktisk kildepresisert prompt i rapporter/sam342-06til10-20261020. Originalark, motorforløp, godkjent Sam-anker og foregående eget sceneanker er sett. Beskyttede kilder og standardprompt er uendret. Bare dokumentert identiske hele RGBA-ruter gjenbrukes.\n')
+(R/'bildekall.json').write_text(json.dumps(dict(kall=calls),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'forbered-kall.py.txt');print('Fem unike hele kildeposer, ti native mål, fem separate kall forberedt. Ingen bildekall utført ennå.')
