@@ -1,1 +1,1 @@
-Disse jobbene er levert, kontrollert, publisert og hentet. Ikke produser dem på nytt. Kostyme342 er nå komplett med20ark/38native. Kontroller pågående2456-fellespakker i felles-release-20261020-sam342-ferdig før native-frysen frigis. Neste produksjon er sam343-foerste-20261020/NESTE.md.
+Denne bunken og hele Sam342 er ferdig produsert og med i kontrollert fellespakke sam-max-hd-2026-10-20-sam342-ferdig. Native-frysen er frigitt. Neste produksjon er sam343-foerste-20261020/NESTE.md; ikke gjenta342 eller disse pakkebyggene.

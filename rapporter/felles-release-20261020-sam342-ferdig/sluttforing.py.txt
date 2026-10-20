@@ -1,0 +1,50 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+proof=json.loads((R/'publisert.json').read_text());assert proof['Latest_bekreftet'] and proof['skjermbufferkontroller']==proof['nullkontroller']==384
+url=proof['url'];mod=proof['hd_mod'];tag=proof['release_tag'];now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==mod
+files=json.loads((R/'moddfiler-2456.json').read_text());assert len(files)==20699 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==322
+stash=['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c'];assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==stash
+body=f'''Fellesutgave med 2456 native HD-bildelag er publisert og bekreftet Latest: {url}. Linux {proof['linux_run']} og Windows {proof['windows_run']} bestod første forsøk. Begge faktiske nedlastinger, SHA-filer, fire opplastinger og alle 20698 runtime moddfiler per pakke er kontrollert. Moddene er byteidentiske med publisert modd og hverandre. Alle {proof['bevarte_tidligere_releaser']} tidligere releaser og deres vedlegg er bevart. Ikke gjenta dette samlepunktet.
+
+Kostyme 342 har nå alle 20 hele resultatark og 38 native ruter. Denne kjøringen leverte fig342_11 til 20 i to femarksbunker, ti nye hele ark og 19 nye native. Kilder 0f9e9024caf06be0d08f4c4f138671bb087869fe og 3131792a5fbaa71be8cac2161430f21304071f03. Native 2b5d55bcbc90823aacd3ef5208b0e705a75651a1, publisert, hentet og alle 20699 filer / 20693 PNG-er SHA-bekreftet. Alle tidligere grafikkfiler er bevart byteidentisk. Siden forrige fellespakke på 2427 er 29 nye Sam342-ruter kommet til, og alle er nå med i begge pakker.
+
+Sju innebygde image_gen-kall i denne kjøringen, fem malte poser brukt og to førsteutkast forkastet visuelt for håndstørrelse og hattehelling. S14R02 og S15R02 retter dette. Seks tidligere native mål i siste bunke og fem i den første bruker eksakt kildeidentiske hele RGBA-malerier; dette er dokumentert gjenbruk, ikke elleve uavhengige nytegninger. Råbilder, faktiske prompter, referansehasher, rutekart og resultat-SHA-er er bevart. Ekte alfa, egen kantbehandling, fast 4x og åtte HD-pikslers marg, uten hard originalsilhuettmaske eller originalfragment-fallback. Egenkontroll og automatisk mottak består med uendrede grenser. Alle 19 nye native er visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning.
+
+Begge endelige grafikkbunker har 285 sluttbufferkontroller null, med tilsvarende grunnlag i samme tidligere nedlastede binær. Første grunnlagsforsøk for den første bunken utløp ved frame 816; én identisk omprøve bestod. Logg og feilkvittering er bevart, årsaken er ikke avklart eller rettet. Den nye faktiske Linux-binæren har SHA256 {proof['linux_binar_sha256']}. Seks pakkeprøver og seks grunnlagsprøver i samme nye binær: inventar, akvarium, cafeteria, rom 92s egne skript til 820 og to kildekorrekte Sam342-animasjoner. Alle 38 Sam342-ruter er observert, 384 sluttbufferkontroller null. Ti hele pakkebilder og to før/etter er sett. Tidligere Sam346-klesrettinger og objekt901-dekningen er med. Ikke full naturlig gjennomspilling, interaktiv Windows-test eller ny webtest. Eldre testhoppstans ved 836, liten inventarkant i rom 35 og tidligere Windows SDL-startfeil er fortsatt separate uavklarte forhold.
+
+322 av 1758 figurjobber har resultat, 1436 gjenstår pluss returer, katalogfeil og samlet kontroll. 632 beskyttede kildefiler og tre opprinnelige stasher er uendret. Neste fem fig343_01 til 05 er kildeklargjort, ti ruter fra ti ulike hele RGBA-kilder. Originalark, alle ti kildeposer i motor, primærskript og godkjent Sam-anker er sett. Sam henter frem en ekte lilla aubergine; ingen frukt er synlig i 1920 til 1923, den dukker opp fra 1924. Alle bruker gyldig raw5 med num_anim28 og offset130, ingen dekoderadvarsler. Kildetesten observerte alle 22 gyldige chore6-ruter med 80 nullkontroller. Ingen nye 343-bildekall eller resultater ennå. Native-frysen er frigitt etter faktisk pakkekontroll. Les rapporter/sam343-foerste-20261020/KILDEGRUNNLAG.md og NESTE.md, og fortsett faktisk produksjon der.
+
+Bevis på gpt-arbeid: rapporter/{R.name}/publisert.json, rapporter/sam342-11til15-20261020 og rapporter/sam342-16til20-20261020. Animasjonsprøven sam342-29-poser-motor.gif viser faktiske motorbilder og er kun en forhåndsvisning. Ingen motor-/pipelinekode er endret. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er fulgt. Grafikkautomatikk fortsetter; gammel nattkontroll forblir pauset. Ny grafikk bare på gpt-arbeid og hd-mod; main får bare memory, todo, STATUS og log.
+'''
+for name in ['memory.md','STATUS.md']:
+ p=P/name;s=p.read_text();i=s.index('\n')+1;p.write_text(s[:i]+f'\n## Sam342 og felles 2456 ferdig, {now}\n\n'+body+'\n'+s[i:])
+p=P/'log.md';p.write_text(p.read_text()+f'\n\n## {now} (Codex)\n\n'+body)
+p=P/'todo.md';s=p.read_text();lines=s.splitlines()
+for i,line in enumerate(lines):
+ if line.startswith('- [ ]') and 'fig342_' in line:lines[i]=line.replace('- [ ]','- [x]',1)
+s='\n'.join(lines)+'\n';needle='## Neste\n';assert needle in s;s=s.replace(needle,f'''## Neste
+
+- [x] {now}: Hele Sam342, 20 ark og 38 native, er levert, kontrollert og med i fellesutgave {tag}. Begge faktiske pakker og alle 20698 runtime moddfiler per pakke er bekreftet. 384 nullkontroller i faktisk Linux-pakke, begge plattformbygg bestod første forsøk. Ikke gjenta byggene.
+- [ ] Fortsett faktisk produksjon av de kildeklare fig343_01 til 05. Ti ruter fra ti hele kilder, originaler/motor/anker sett, ingen nye bildekall eller resultater ennå. Se sam343-foerste-20261020/NESTE.md. Native-frysen er frigitt.
+- [ ] Fullfør øvrige figurjobber og returer, og behold kildefeil og samlet sluttkontroll som egne åpne punkter. Status er 322 av 1758 resultatark, 2456 native. Ikke kall hele HD-grafikken ferdig.
+''',1);p.write_text(s)
+summary=f'''Oppdatert {now}: Kostyme342 er levert med alle 20 hele ark og 38 native ruter. Denne kjøringen ga ti nye hele ark, fig342_11 til 20, og 19 nye native i to femarksbunker. Egenkontroll, native mottak, visuell kontroll og motorobservasjon er gjennomført. Hver endelige bunke har 285 nullkontroller mot tilsvarende grunnlag. S14R02 og S15R02 brukes etter at de første teknisk beståtte utkastene ble visuelt forkastet for håndstørrelse og hattehelling. Råbilder, faktiske prompter, hasher og rutekart er bevart. Ingen hard originalsilhuettmaske eller originalfragment-fallback.
+
+Publisert og hentet native: {mod}, 2456 totalt. Alle 20699 filer og 20693 PNG-er er SHA-bekreftet, tidligere grafikkfiler er byteidentiske, 632 beskyttede kilder og tre stasher er uendret. Felles Linux-/Windows-utgave {tag} er publisert og Latest: {url}. Begge faktiske pakker og alle 20698 runtime moddfiler per pakke er kontrollert. 29 nye Sam342-ruter siden felles2427 er med. Alle 38 Sam342-ruter er observert i faktisk Linux-pakke, 384 nullkontroller. Begge bygg bestod første forsøk. Native-frysen er frigitt. Ikke gjenta disse jobbene eller byggene.
+
+322 av 1758 hele figurjobber har resultat; 1436 gjenstår pluss returer, katalogfeil og sluttkontroll. Ingen ny Tom-/Claude-godkjenning eller motor-/pipelineendring. Tidligere grunnlagsstopp ved 816, eldre testhoppstans ved 836 og Windows SDL-startfeil er ikke erklært rettet. Neste produksjon er fig343_01 til 05, ti kildekorrekte poser fra ti ulike hele RGBA-kilder. Originalark, motorposer, primærskript og godkjent Sam-anker er sett, ingen 343-bildekall eller resultater ennå. Auberginen dukker først opp i 1924 og skal ikke legges til i 1920 til 1923. Les sam343-foerste-20261020/KILDEGRUNNLAG.md og NESTE.md.
+'''
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;s=p.read_text();i=s.index('\n')+1;start=s.index('Oppdatert ',i);end=s.index('\nOppdatert ',start+10)
+ p.write_text(s[:i]+'\n'+summary+'\n'+s[end:])
+# Bevar kildeklargjoringens historiske SHA, men presiser faktisk motiv.
+p=A/'rapporter/sam343-foerste-20261020/kildegrunnlag.json';v=json.loads(p.read_text());v['originalkontekst']='Sam henter frem auberginen, rom92, aktor6, lokalt201, chore6';p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+(A/'rapporter/sam343-foerste-20261020/NESTE.md').write_text(f'Fortsett faktisk produksjon av fig343_01 til 05. Ti ruter fra ti ulike hele kilder, alle originalark/motorposer/anker sett, ingen nye bildekall eller resultater. Les KILDEGRUNNLAG.md. Auberginen dukker først opp i1924; ikke legg den til før. Fellesutgave {tag} er kontrollert og publisert, native-frysen er frigitt. Ikke gjenta Sam342 eller pakkebyggene.\n')
+last=dict(tid_norsk=now,beskyttede_kilder=632,alle_beskyttede_SHA_uendret=True,tre_stasher=stash,figurjobber_med_resultat=322,figurjobber_totalt=1758,native=2456,native_sha=mod,alle20699_moddfiler_SHA_bekreftet=True,release_url=url,neste='fig343_01',nye_bildekall_i_neste_bunke=0,nye_resultater_i_neste_bunke=0)
+(R/'sluttbevaring.json').write_text(json.dumps(last,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'sluttforing.py.txt');print(json.dumps(last,ensure_ascii=False),flush=True)
