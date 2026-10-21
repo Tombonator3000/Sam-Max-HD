@@ -1,5 +1,7 @@
 # Grafikkliste
 
+052 delvis: 37 nye native laget, mottatt, visuelt sett og motorobservert. Fig052_02/03 levert, ark01 fortsatt utkast fordi cat1920 feiler dekning. 423/1758 resultatjobber, kandidat3013. Les rapporter/max052-20261021/NESTE.md. Pakker2958 mangler55, samlepunkt følger. Alle1024kilder/3stasher/tidligere filer bevares. Ingen ny Tom-/Claude-godkjenning.
+
 045 publisert og hentet på513a06ef,2976native og421av1758resultatark. Neste052_01til03har kildegrunnlag klart:38av38cels fra35heleRGBA,retning2,Max/kattekurér/oppdragsark. Ingen052resultat/native. Les max052-kilde-20261021/KILDEGRUNNLAG.md og gang045-20261021/NESTE.md før tegning. Pakker2958mangler18;samlepunkt etter neste praktiske bunke. Alle tidligere filer/3stasher bevares.
 
 Oppdatert21.oktober2026:Hele045_01til03/treark/18nye native er produsert,egenkontrollert,mottatt,visuelt sett og motorobservert. Menneske gjennom knust kontordørglass,ikke Sam.13innebygde kall,125egne komponenter,16hele kilder og2hele aliasmål. Treark SJEKK med visuelle omrissvarsler vurdert og beholdt;alle18automatiske native OK med uendrede grenser. Kandidat2976,421av1758ark,1337gjenstår pluss returer/katalogfeil/sluttkontroll. Samme faktisk nedlastede Linux-binær ea4f35ca i120/120grunnlag og kandidat,119null,samme160ved36,91fra60null,ingen nye/økte. Trefør/etter0utenfornye lag. Pakker har2958 og mangler18;samlepunkt etter neste ordinære bunke. Neste052_01til03 viser Max med en svart katt og en brun rekvisitt,men kildeavspilling/primærskript må avklare hendelsen før tegning. Samtlige1012kilder/3stasher bevares,ingen ny Tom-/Claude-godkjenning.164_04fortsatt blokkert.
@@ -1005,8 +1007,8 @@ Figurark for Max, Sam.
 Figurark for Sam og Max, Sam.
 
 - [ ] `fig052_01` (figurark 1 for Sam og Max (kostyme 52), 21 ruter: start mot høyre (21 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig052_02` (figurark 2 for Sam og Max (kostyme 52), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig052_03` (figurark 3 for Sam og Max (kostyme 52), 5 ruter: animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig052_02` (figurark 2 for Sam og Max (kostyme 52), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig052_03` (figurark 3 for Sam og Max (kostyme 52), 5 ruter: animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig115_01` (figurark 1 for Sam (kostyme 115), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig115_02` (figurark 2 for Sam (kostyme 115), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig115_03` (figurark 3 for Sam (kostyme 115), 64 ruter: start (lag 14, tegnes over kroppen) mot høyre (20 ruter); start (lag 15, tegnes over kroppen) mot høyre (12 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (12 ruter); animasjon 8 (lag 14, tegnes over kroppen) mot høyre (20 ruter), bilde to `hovedark/sam.png`)

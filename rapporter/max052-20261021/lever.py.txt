@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name; M=P/'mods/gpt'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest(); read=lambda p:json.loads(p.read_text())
+def save(p,d): p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json'); assert all(sha(M/f)==h for f,h in base['filer'].items()); prot=read(R/'beskyttede-samlet.json'); assert all(sha(A/f)==h for f,h in prot.items()); assert len(list((A/'jobber').glob('fig*/resultat.png')))==422 and (A/'jobber/fig052_01/resultat.png').exists()
+plan=read(R/'ruteplan-unik.json'); selected={}
+for e in read(R/'prototyper-maalt.json'):
+ if e['kall'] in ['K01','K02','R01','M05R']: continue
+ selected[e['bilde']]=e
+for e in read(R/'prototyper-maalt.json'):
+ if e['kall']=='M05R' or (e['kall']=='R01' and e['bilde']!='costume052_1920'): selected[e['bilde']]=e
+selected['costume052_1920']=next(e for e in read(R/'prototyper-maalt.json') if e['kall']=='K02')
+assert len(selected)==35 and [b for b,e in selected.items() if not e['native_ok']]==['costume052_1920']; progress=dict(leveranser=[],utkast=[],nye_jobber_levert=2,hele_kildeark_i_arbeid=3,nye_native_planlagt=37,tilbakeholdt=['costume052_1920'],bildekall=14,grunnlag_native=2976,egen_alfa=True,originalmaske=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False); maps=[]
+assert len(list((R/'kall').glob('*/raa.png')))==14
+for job in plan['jobber']:
+ J=A/'jobber'/job; j=read(J/'jobb.json'); out=Image.new('RGBA',(1536,1024)); mapping=[]
+ for c in j['ruter']:
+  canonical=next(e for e in plan['ruter'] if any(t['bilde']==c['bilde'] for t in e['malruter']));e=selected[canonical['bilde']]; f=R/e['prototype']; assert sha(f)==e['sha256']; im=Image.open(f).convert('RGBA'); x,y,w,h=c['rekt']; assert im.size==(w*4+16,h*4+16); dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8; out.alpha_composite(im,(dx,dy)); yy,xx=np.nonzero(np.array(im)[:,:,3]>=128); mapping.append(dict(bilde=c['bilde'],kostyme=52,rute=c['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical=canonical['bilde'],canonical_rgba_sha256=e['canonical_rgba_sha256'],prototype=str(f.relative_to(A)),prototype_sha256=sha(f),kall=e['kall'],snitt_union=e['snitt_union'],dekning=e['dekning'],egen_alfa=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,native_ok=e['native_ok'],eksakt_helt_alias=canonical['bilde'] if canonical['bilde']!=c['bilde'] else None))
+ existing=J/'resultat.png'
+ if existing.exists():
+  assert job=='fig052_01' and np.array_equal(np.array(Image.open(existing).convert('RGBA')),np.array(out))
+ else: out.save(existing)
+ digest=sha(existing); save(R/f'rutekart-{job}.json',{job:dict(sha256_resultat=digest,ruter=mapping)}); test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True);(R/f'{job}-egenkontroll.txt').write_text(test.stdout+test.stderr); print(job,test.returncode,test.stdout[-250:],flush=True)
+ delivered=job!='fig052_01'; assert test.returncode in [0,1]; assert delivered or not all(e['native_ok'] for e in mapping)
+ rec=dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,levert=delivered,egenkontroll='OK' if test.returncode==0 else ('SJEKK' if test.returncode==1 else 'FEIL'),egenkontrollert=True,visuelt_kontrollert=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False)
+ (progress['leveranser'] if delivered else progress['utkast']).append(rec); maps+=mapping
+ (J/'notat.md').write_text(f'''# {job}, 21. oktober 2026
+
+Max og den svarte kattekureren i rom 9, kostyme 52, palett 0. Max tar ut det brune oppdragsdokumentet, slenger katten og overleverer arket til Sam. Sam er bare med i rute 1956. Katalogens generelle Sam-og-Max-premiss er korrigert separat, alle beskyttede jobbfiler er urørt. Primærskript 205 med argument 3/35 og gyldige animasjoner 6,7,8 er dokumentert i rapporter/max052-kilde-20261021. Retning 2 følger originalarket. Tvungen kildeavspilling er sett, full naturlig hendelse er ikke bekreftet.
+
+Godkjente hovedark for Max og Sam samt stil/fig003_01 er sett før nytegning. Originalen bestemmer positur, proporsjoner, rekvisitt, små deler og palett. 14 innebygde image_gen-kall med råbilder og faktiske argumenter ligger i rapporter/{R.name}/kall. Ingen CLI/API-fallback. Originalene har bare vært referanse og målegrunnlag. Ny kunst beholder egen alfa, med rensing av egen svak glød etter avstand til egen alfakjerne. Ingen harde kildemasker eller kildefragmenter i nye native. Tre eksakt kildeidentiske hele mål gjenbruker hele egne malerier. M05 er visuelt returnert for nye sinte øyenbryn og feil brystmarkering; M05R erstatter alle fire. R01 erstatter 1929 og 1949. Uttaksgrensen mellom to egne M08-malerier er flyttet i det transparente mellomrommet, slik at ingen fotbit blir med i feil rute.
+
+Første kattepose 1920 holdes tilbake: K02 er nærmest men dekning 0,764 er under fast krav 0,8. M01/R01/K01 og K03-delforsøk retter ikke hele formen. Ingen av disse prøvene tas inn som native. Egen finstørrelse og delt plassering ble prøvd og forkastet. De andre 37 målene har uendrede CORE128, IoU0,6 og dekning0,8. Ark01 er derfor bare et utkast, ikke en levert hel jobb. Ark02/03 leveres, med native/motor/publisering ført separat. Resultat SHA256: {digest}. Egenkontroll: {rec['egenkontroll']}. Ingen ny Tom-/Claude-godkjenning. 1024 beskyttede kilder og tre stasher bevares. Bibliotek: figurark-fast-storrelse og publisert-mod-er-fasit.
+''')
+save(R/'fremdrift.json',progress);save(R/'prototyper-endelig.json',maps);save(R/'valgte-hele-malerier.json',list(selected.values()));shutil.copy2(__file__,R/'lever.py.txt');assert len(maps)==38 and sum(e['native_ok'] for e in maps)==37;assert all(sha(A/f)==h for f,h in prot.items())

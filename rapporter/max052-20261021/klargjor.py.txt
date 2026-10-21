@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name; M=P/'mods/gpt'; Q=A/'rapporter/max052-kilde-20261021'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+read=lambda p:json.loads(p.read_text())
+def save(p,d): p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists(); R.mkdir(); (R/'kall').mkdir(); (R/'prototyper').mkdir()
+files=read(A/'rapporter/gang045-20261021/publiserte-moddfiler-2976.json'); assert len(files)==21219 and all(sha(M/f)==h for f,h in files.items())
+native=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]; assert native=='513a06ef61fa5eb14708b4ee102dcc3e923f1d2e'; assert read(M/'mod.json')['costume_cels']==2976
+prot=read(Q/'beskyttede-samlet1024.json'); assert len(prot)==1024 and all(sha(A/f)==h for f,h in prot.items()); save(R/'beskyttede-samlet.json',prot)
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines(); assert stash==read(A/'rapporter/gang045-20261021/grunnlag-produksjon.json')['stash']; assert len(list((A/'jobber').glob('fig*/resultat.png')))==421
+save(R/'grunnlag-produksjon.json',dict(native=2976,native_sha=native,filer=files,stash=stash,hele_figurjobber=421,beskyttede=1024,art_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),main_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip()))
+plan=read(Q/'ruteplan-kilde.json'); save(R/'ruteplan-unik.json',plan); rows=plan['ruter']; assert len(rows)==35
+for n in range(0,len(rows),4):
+ C=R/'kall'/f'M{n//4+1:02}'; C.mkdir(); ref=Image.new('RGBA',(1536,1024)); records=[]
+ for i,e in enumerate(rows[n:n+4]):
+  f=P/'work/extract/costumes'/(e['bilde']+'.png'); im=Image.open(f).convert('RGBA'); assert hashlib.sha256(im.tobytes()).hexdigest()==e['rgba_sha256']; w,h=im.size; scale=min(12,(768-80)//w,(512-64)//h); x=i%2*768+(768-w*scale)//2; y=i//2*512+(512-h*scale)//2; ref.alpha_composite(im.resize((w*scale,h*scale),Image.Resampling.NEAREST),(x,y)); records.append(dict(bilde=e['bilde'],celle=[i%2*768,i//2*512,768,512],proxy_rekt=[x,y,w*scale,h*scale],referanseskala=scale,kilde_sha256=sha(f),canonical_rgba_sha256=e['rgba_sha256'],maal=list(im.size)))
+ ref.save(C/'referanse-poser.png'); save(C/'plan.json',dict(ruter=records,hele_originaler_bare_referanse=True,ingen_utdatamaske=True))
+shutil.copy2(Q/'KILDEGRUNNLAG.md',R/'KILDEGRUNNLAG.md'); (R/'NESTE.md').write_text('052: ni kallreferanser, 35 hele kilder for 38 mål. Ingen nye råbilder eller resultater ennå. Grunnlag 2976 native, 421 ark. Bevar 1024 kilder og tre stasher.\n'); shutil.copy2(__file__,R/'klargjor.py.txt'); print('35 hele kilder, ni 2x2 referanser, 38 mål, 1024 kilder bevart.')

@@ -1,0 +1,34 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,math,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-max052';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base={};new={};obs={};cases={};wanted={v['bilde'] for v in read(R/'native-fast4x-samlet.json')['ruter']};assert len(wanted)==37
+for an in [6,7,8]:
+ b=read(R/f'motor-grunnlag2976-an{an}.json');n=read(R/f'motor-kandidat3013-an{an}.json');assert b['kontroller']==n['kontroller'];cases[an]=dict(base=b,new=n)
+ for key,v in n['tegninger'].items():
+  if key in wanted and key not in obs:obs[key]=dict(v,animasjon=an,native_sha256=sha(C/'costumes'/(key+'_hd.png')));base[key]=b['tegninger'][key];new[key]=n
+assert set(obs)==wanted;save(R/'motorobservasjoner.json',dict(sett=37,mangler=[],tilbakeholdt=['costume052_1920'],tegninger=obs,tvungen_isolert_avspilling=True,naturlig_gjennomspilling=False))
+canonical=[e for e in read(R/'ruteplan-unik.json')['ruter'] if e['bilde'] in wanted];assert len(canonical)==34
+for page in range(math.ceil(len(canonical)/5)):
+ board=Image.new('RGBA',(2010,1575),'#344556');d=ImageDraw.Draw(board)
+ for i,e in enumerate(canonical[page*5:page*5+5]):
+  b=e['bilde'];v=obs[b];x,y=v['pos'];w,h=v['maal'];src=Image.open(P/'work/extract/costumes'/(b+'.png')).convert('RGBA').resize((w*4,h*4),Image.Resampling.NEAREST);native=Image.open(C/'costumes'/(b+'_hd.png')).convert('RGBA');motor=Image.open(v['fil']).convert('RGBA').crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8))
+  for col,(title,z) in enumerate([('original4x',src),('egen native4x',native),('faktisk Linux',motor)]):board.alpha_composite(z,(col*670+10,i*315+30));d.text((col*670+10,i*315+8),b+' '+title,fill='white')
+ board.convert('RGB').save(R/f'original-native-motor-side{page+1}.png')
+whole=[];board=Image.new('RGB',(1920,840),'#253340');d=ImageDraw.Draw(board)
+for i,b in enumerate(['costume052_1921','costume052_1929','costume052_1940','costume052_1949','costume052_1953','costume052_1956']):
+ v=obs[b];out=R/f'max052-an{v["animasjon"]}-frame{v["bildeframe"]}.png';shutil.copy2(v['fil'],out);whole.append(dict(bilde=b,frame=v['bildeframe'],animasjon=v['animasjon'],fil=out.name,sha256=sha(out)));z=Image.open(out).convert('RGB').resize((640,400));x=i%3*640;y=i//3*420;board.paste(z,(x,y+20));d.text((x+4,y+4),b+' AN'+str(v['animasjon']),fill='white')
+board.save(R/'hele-motorbilder-brett.png');save(R/'hele-motorbilder.json',whole);diffs=[]
+for b in ['costume052_1921','costume052_1929','costume052_1949','costume052_1956']:
+ v=obs[b];bv=base[b];assert v['pos']==bv['pos'] and v['bildeframe']==bv['bildeframe'];old=np.array(Image.open(bv['fil']).convert('RGB'));z=np.array(Image.open(v['fil']).convert('RGB'));delta=np.any(old!=z,2);outside=delta.copy();active={}
+ for e in new[b]['hendelser']:
+  if e['logg_frame']<v['bildeframe']:active[e['cel']//128]=e
+ for e in active.values():
+  x,y=e['pos'];w,h=e['maal'];outside[max(0,y*4-12):min(800,(y+h)*4+12),max(0,x*4-12):min(1280,(x+w)*4+12)]=False
+ diffs.append(dict(bilde=b,frame=v['bildeframe'],endrede_piksler=int(delta.sum()),utenfor_nye_cels_og_marg=int(outside.sum()),aktive=[e['cel'] for e in active.values()]));board=Image.new('RGB',(1280,430),'#253340');d=ImageDraw.Draw(board);board.paste(Image.fromarray(old).resize((640,400)),(0,30));board.paste(Image.fromarray(z).resize((640,400)),(640,30));d.text((5,8),b+' samme frame og binar: grunnlag / ny',fill='white');board.save(R/f'foer-etter-{b}.png')
+save(R/'pikselkontroll.json',diffs);frames=[];refs=[]
+for an,fs in [(6,range(62,126,2)),(7,[62]),(8,[62,64,66,68])]:
+ for f in fs:
+  p=O/f'kandidat3013-an{an}'/f'frame_{f:06}_room009.png';frames.append(Image.open(p).convert('RGB').resize((960,600),Image.Resampling.LANCZOS));refs.append(dict(animasjon=an,frame=f,fil=str(p),sha256=sha(p)))
+gif=R/'max052-faktisk-motor.gif';frames[0].save(gif,save_all=True,append_images=frames[1:],duration=[140]*(len(frames)-1)+[700],loop=0,optimize=False);save(R/'animasjonsproveniens.json',dict(fil=gif.name,sha256=sha(gif),motorbilder=refs,kilde='Faktisk nedlastet Linux-binar ea4f35ca med kandidat3013',visningshastighet_senket_for_kontroll=True,skjermbilder_nedskalert_til=[960,600],ingen_innlagte_nye_spillframes=True,tvungen_isolert_avspilling=True,naturlig_gjennomspilling=False));shutil.copy2(__file__,R/'vis.py.txt');print('37 ruter,34 originale/native/motor,6 hele bilder. Utenfor:',[v['utenfor_nye_cels_og_marg'] for v in diffs],flush=True)
