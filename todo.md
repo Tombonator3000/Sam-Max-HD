@@ -1,5 +1,18 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 16:01
+
+- [x] Levert og additivt publisert fem VR-ark, fig250_01 til 05, med 18 nye native og 3437 totalt. Alle 21680 filhash, tidligere PNG, 1348 kilder og tre stasher bekreftet etter hent.
+- [x] Alle 18 native automatisk OK. To ark OK og tre visuelt vurdert SJEKK med fem omrissvarsler. Fem resultatark, tolv motorvarianter og seks hele par sett. Ingen ny Tom-/Claude-godkjenning.
+- [x] Hel animasjon 6 og primærskript 211 på begge sider, alle 52 kilder logget. Hver side har 1436/1440 null med identiske kjente 416/160-overgangsavvik. Alle 36 originalflater er SHA-identiske; null utenfor loggede nye aktørflater. Hele prøven er ikke avviksfri.
+- [x] Ekstra Windows 39606444011 er grønt på forsøk 2 etter ett kjent SDL-startavvik. Samme kode og innstillinger, fellesvedlegg og Latest uendret. Nativefrysen frigitt. Ingen motorretting eller påstand om at sporadisk feil er løst.
+- [ ] Fortsett fig250_06 til 10 fra rapporter/sam250-foerste-20261021/neste-bunke.json, 22 mål og 19 hele kilder. Originaler og kildekontekst er undersøkt, men ingen nye kall eller resultater. Se kilder og master på nytt før hvert motiv. Behold VR-polygonformer, faktiske kombinerte figurer, sverdfaser og smådeler. Etter dem gjenstår ark 11 og 12 med tolv mål og det virtuelle dragehjertet.
+- [ ] Oppdater begge pakker etter hele 250-familien, forventet 3471, eller tidligere ved blokkering. Fellespakker har 3419 og mangler 18. Bekreft faktiske nedlastinger, sjekksummer og faktisk inkludert grafikk før ny fellesutgave kalles oppdatert.
+- [ ] Fortsett øvrige produserbare jobber og returer. 482 av 1758 hele figurjobber har resultat, 1276 gjenstår pluss returer, katalogfeil og sluttkontroll. Bevar tidligere filer, releaser, 1348 kilder og tre stasher. Ingen omprøve av holdte eller verktøyavviste motiver og aliaser. Ingen ny grafikk i main.
+- [ ] Samlet sluttkontroll, full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Automatikken fortsetter; gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 15:18
 
 - [x] Levert og publisert fig097_09 til 12 med 48 nye native, 3419 totalt. Hele 97-familien har tolv ark og 95 native siden felles 3324. Faste porter uendret, ett visuelt vurdert SJEKK, ingen ny Tom-/Claude-godkjenning.
