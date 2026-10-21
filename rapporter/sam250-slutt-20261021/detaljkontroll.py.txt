@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+by={e['bilde']:e for e in read(R/'egen-native.json')['ruter']};checks=[]
+for n,region in [(1969,[0,40,10,49]),(1970,[65,30,97,50]),(1971,[0,0,57,47])]:
+ src=np.array(Image.open(P/f'work/extract/costumes/costume250_{n}.png').convert('RGBA'));e=by[f'costume250_{n}'];own=np.array(Image.open(A/e['prototype']).convert('RGBA'));x0,y0,x1,y1=region
+ sm=src[y0:y1,x0:x1,3]>0;om=own[y0*4+8:y1*4+8,x0*4+8:x1*4+8,3]>=128
+ def parts(m):
+  lab,n=nd.label(m,structure=np.ones((3,3),dtype=bool));return [int((lab==k).sum()) for k in range(1,n+1) if (lab==k).any()]
+ s,o=parts(sm),parts(om);checks.append(dict(bilde=e['bilde'],kun_diagnostikk=True,originalmaske_brukt_til_klipp=False,region_original=region,kilde_antall=len(s),eget_antall=len(o),kilde_arealer=s,egne_arealer=o,antall_likt=len(s)==len(o)))
+save(R/'smaadeler-diagnostikk.json',checks);shutil.copy2(__file__,R/'detaljkontroll.py.txt');print(json.dumps(checks,ensure_ascii=False))

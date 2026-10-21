@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=read(R/'kildeplan.json');by={e['bilde']:e for e in plan['ruter']};proof=read(A/'rapporter/sam250-midt-20261021/kandidat-r06-primaer211.json')
+nums=[1960,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971]
+for k,n in enumerate(nums,1):
+ C=R/'kall'/f'S{k:02}';C.mkdir();e=by[f'costume250_{n}'];src=Image.open(e['kilde']).convert('RGBA');scale=9;pic=src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST);pos=[(1536-pic.width)//2,(1024-pic.height)//2]
+ assert pic.width<1400 and pic.height<880
+ atlas=Image.new('RGB',(1536,1024),'#596978');atlas.paste(pic,pos,pic);atlas.save(C/'originalatlas.png')
+ context=Path(proof['tegninger'][e['bilde']]['fil']);assert sha(context)==proof['tegninger'][e['bilde']]['sha256'];shutil.copy2(context,C/'spillkontekst.png')
+ refs=[C/'originalatlas.png',A/'hovedark/sam.png',C/'spillkontekst.png'];save(C/'plan.json',dict(kall=C.name,ruter=[dict(bilde=e['bilde'],canonical_rgba_sha256=e['rgba_sha256'],celle=[0,0,1536,1024],kilde_sha256=e['sha256'],kilde_maal=e['maal'],original_plassering_atlas=pos,original_skala_atlas=scale)],ingen_kall_enna=True,kilde_og_kontekst_sett=False,reference_atlas_sett=False,referanser_sha256={str(f):sha(f) for f in refs},kvalitetsretur=k<=5))
+shutil.copy2(__file__,R/'enkelkilder.py.txt')

@@ -714,8 +714,8 @@ Figurark for Sam.
 - [ ] `fig250_08` (figurark 8 for Sam (kostyme 250), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_09` (figurark 9 for Sam (kostyme 250), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig250_10` (figurark 10 for Sam (kostyme 250), 8 ruter: start mot høyre (8 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig250_11` (figurark 11 for Sam (kostyme 250), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig250_12` (figurark 12 for Sam (kostyme 250), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig250_11` (figurark 11 for Sam (kostyme 250), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig250_12` (figurark 12 for Sam (kostyme 250), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig343_01` (figurark 1 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter))
 - [x] `fig343_02` (figurark 2 for Sam (kostyme 343), 2 ruter: start mot høyre (2 ruter), bilde to `jobber/fig343_01/resultat.png`)
 

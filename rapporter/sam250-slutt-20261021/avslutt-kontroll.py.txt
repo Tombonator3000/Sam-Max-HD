@@ -1,0 +1,44 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/'grunnlag-produksjon.json');d=read(R/'fremdrift.json');motor=read(R/'motor-sammenligning.json');vis=read(R/'motor-visuell-plan.json');detail=read(R/'smaadeler-diagnostikk.json')
+assert motor['sett']==12 and motor['kontrollantall']==1440 and motor['nullkontroller']==1436 and motor['alle24_originalflater_SHA_identiske'] and motor['alle24_utenfor_figurflate']==0
+assert all(e['antall_likt'] for e in detail)
+for e in vis['varianter']+vis['hele_motorbilder']+vis['hele_for_etter']:
+ assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+vis.update(visuelt_sett=True,hele_motorbilder_sett=6,hele_for_etter_sett=6);save(R/'motor-visuell-plan.json',vis)
+motor.update(visuelt_sett=True,hele_varianter_sett=12,hele_motorbilder_sett=6,hele_for_etter_sett=6);save(R/'motor-sammenligning.json',motor)
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==489
+for e in d['leveranser']:
+ assert sha(A/e['resultat'])==e['sha256'];e.update(visuelt_kontrollert=True,motorobservert=True)
+d.update(visuelt_sett=True,motorobservert=True,kilde_og_stilanker_sett=True,ark_sjekk=1,ark_ok=1,ark_omrissvarsler=2,native_ok=12,smadeler_diagnostikk_8_nabo=True)
+save(R/'fremdrift.json',d);save(R/'sluttkontroll.json',d)
+p=R/'beskyttede-samlet1348.json';protected=read(p);assert all(sha(A/f)==h for f,h in protected.items()) and subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==b['stash']
+new=read(R/'kandidatfilhash.json');old=read(R/'utkast1/kandidatfilhash.json');changed=[f for f,h in old.items() if new[f]!=h];assert len(changed)==4 and all(f.endswith('_hd.png') for f in changed)
+save(R/'endelig-returkontroll.json',dict(endrede_native_fra_utkast1=changed,ovrige_8_byteidentiske=True,grunnlag_mot_ende=3459,kandidat_native=3471,forste_motoropptak_bevart=True,to_endelige_kandidatopptak=True,ingen_originalmaske=True,beskyttede=1348,stasher=b['stash']))
+text='''To hele figurark, fig250_11 og fig250_12, er laget, egenkontrollert, visuelt sett, native mottatt og motorobservert. Tolv nye native fra tolv ulike hele egne malerier, ingen aliasmål, gir kandidat 3471. Hele VR-familien på tolv ark og 52 native er dermed levert og motorprøvd. 489 av 1758 hele figurjobber har resultat; 1269 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+
+Disse sluttfasene viser den virtuelle dragen som flate oransje/rødbrune polygoner og deretter spredte biter rundt et rødt virtuelt spillhjerte. Ressursbanken bekrefter at hjertet blir en nøkkel. Tilsiktede tomrom og små deler beholdes, uten normal kropp eller nye figurer. Originaler, spillkontekst og relevant godkjent master er sett før hvert motiv. Den generiske Sam-promptens feil premiss er korrigert i separate faktiske prompter. Beskyttede jobbfiler er uendret.
+
+22 innebygde image_gen-kall, ni grunnkall og tretten kvalitetsreturer, er bevart med råbilder, faktiske prompter, argumenter og referansehash. Modellnavn er ikke oppgitt. Ingen verktøyavvisning eller CLI/API-fallback. Parutkastene flyttet spredte biter, og flere enkeltutkast beholdt rastertrapper. Berørte hele kilder er tegnet om fra større referanser. E08 redigerer hele eget S08-utkast for å glatte hjertekanten, og hele det redigerte bildet brukes samlet. Ingen delkomposisjon eller originalfragmenter. Q08s flyttede biter ble forkastet. Første ark og motoropptak er bevart; fire native er endret i siste retur og de øvrige åtte er byteidentiske med første kandidat.
+
+Python renser bare glød rundt egne alfakjerner og plasserer hele egne malerier ved fast 4x med åtte HD-pikslers marg. Ekte egen myk alfa bevares, uten hard originalmaske. Diagnostikk med åtte naboretninger bekrefter tre små venstreprikker i 1969, seks høyremerker i 1970 og tre adskilte hele former i 1971, samme antall som i kilden. Fire naboretninger splittet diagonale rasterdeler og var uegnet til denne telleoppgaven; diagnosen er derfor gjort med samme åtte naboretninger på begge sider. Maskene brukes aldri til å klippe eller tegne.
+
+Fig250_12 har egenkontroll OK. Fig250_11 har SJEKK for omrissene i 1962 og 1964, IoU 0,748 og 0,749, med 100 prosent bredde/høyde og null forskyvning. Varslene er visuelt vurdert mot hele kilder og motorvisning: utfoldede kantete flater og smådeler er beholdt med rene HD-kanter. Alle tolv native er automatisk OK, uten native omrissvarsel. CORE128, IoU 0,6 og dekning 0,8 er uendret. Et arkvarsel skjules ikke ved å endre tersklene.
+
+Den faktisk nedlastede Linux-binæren med SHA256 8d7190620f3039a79ee55fe3630725a3886cb5888fce4f0b11fd04adf044e2d8 er avspilt med grunnlag 3459 og kandidat 3471 i hel animasjon 6 og primærskript 211. Hver prøve har 720 kontroller, med dump ved hver skjermoppdatering. De to endelige kandidatprøvene er kjørt på nytt etter siste fire returer; grunnlagsopptakene er beholdt. Alle 52 familieruter er logget i hver prøve. Hver side har 1436 av 1440 nullkontroller, med samme 416/160-pikslers overgangsavvik ved bilde 24 og 25, eksakte koordinater, begge RGB-verdier og rekkefølge. Alle 24 hele originalflater er SHA-identiske, og alle 24 par har null endringer utenfor de faktisk loggede nye aktørflatene med åtte HD-pikslers målemargin. Andre aktører og romskript er ikke skjult. To resultatark, tolv hele motorvarianter og seks hele før/etter-par er sett. Kontrollerte romhopp, ikke full naturlig gjennomspilling; hele prøven er ikke avviksfri.
+
+Alle 21702 tidligere moddfilstier og 21696 tidligere PNG, 1348 beskyttede kilder og tre opprinnelige stasher bevares. Ingen motor- eller pipelineendring. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt, tilpasset eksisterende Sam-Max-metode. Fellespakkene har fortsatt 3419 og mangler hele VR-familiens 52 ruter etter publisering av denne kandidaten. Additiv kildepush, publisering/hent og begge pakker skal fullføres før fellesutgaven kalles oppdatert.
+
+Full naturlig gjennomspilling, interaktiv Windows, ny webtest og kjente SDL-/inventar-/testhoppbegrensninger gjenstår. Seks bokark og 46 mål er fortsatt holdt, og alle tidligere verktøyavviste kilder og hele aliaser holdes utenfor uten omprøve. Resten av 304 følger siste NESTE. Ugyldige 344/346 og råvalg 28 kjøres ikke. Grafikkautomatikken fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke.
+'''
+for f in ['RAPPORT.md','NESTE.md']:(R/f).write_text(text)
+for job in ['fig250_11','fig250_12']:
+ f=A/'jobber'/job/'notat.md';f.write_text(f.read_text()+'\nEndelig samlet ark- og motorvisning er sett. Alle tolv native er automatisk OK. Fig250_11 har to visuelt vurderte omrissvarsler fra egenkontrollen, 1962 og 1964. Alle 52 familieruter er logget i primærskript 211 og hel animasjon 6. Hver side har 1436/1440 null, identiske kjente overgangsavvik, 24 SHA-like originalflater og null utenfor nye aktørflater. Se full rapport for faktisk avgrensing og returer. Kildepush, publisering og pakker kvitteres separat.\n')
+f=A/'GRAFIKKLISTE.md';s=f.read_text()
+for job in ['fig250_11','fig250_12']:s=s.replace('- [ ] `'+job+'`','- [x] `'+job+'`')
+f.write_text(s)
+shutil.copy2(__file__,R/'avslutt-kontroll.py.txt');print('Visuell kontroll, detaljtelling, 24 originalflater og bevaring bekreftet. Klar for kildepush.')
