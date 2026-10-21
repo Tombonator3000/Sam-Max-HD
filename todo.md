@@ -1,5 +1,17 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 18:20
+
+- [x] Publisert fig250_11 og fig250_12, tolv nye native og 3471 totalt. Hele VR-familien med tolv ark og 52 native levert og motorprøvd. Egenkontroll ett ark OK og ett SJEKK med to visuelt vurderte omrissvarsler; alle native automatisk OK. 489 av 1758 hele resultatark, 1269 gjenstår pluss returer, katalogfeil og sluttkontroll.
+- [x] 22 innebygde bildekall og tretten kvalitetsreturer bevart. Smådelene 3/6/3 er kontrolltelt, egne alfakanaler bevart og tidligere grafikk og tre stasher bekreftet. Ingen ny Tom-/Claude-godkjenning.
+- [x] Felles Linux-/Windows-utgave 3471 med hele VR-familien faktisk lastet ned og kontrollert. Alle 21713 runtimefiler per pakke byteidentiske, SHA-filer og fire vedlegg hentet igjen, alle 52 nye ruter logget i ny Linux-binær. 104 SHA-like originalflater og identiske figurutsnitt; null utenfor nye aktørflater. 1436/1440 null per side, samme kjente bufferavvik. 43 varianter og ni hele par sett. Hele prøven er ikke avviksfri.
+- [x] Nativefrysen er frigitt. Ekstra Windows-taggbygg 39631146616 bestod i andre forsøk etter én avgrenset omprøve. Første SDL-startfeil og logg er bevart; kode og testflagg er uendret. Alle fire fellesvedlegg og hd-mod er kontrollert uendret. Kontroller nativefrysstatus på nytt ved neste pakkebygg.
+- [ ] Fortsett fig088_01 til fig088_05 fra rapporter/sam088-kilde-20261021/neste-bunke.json etter frigitt nativefrys, 50 mål fra 29 hele kilder. Åtte ark i hele familien, 64 mål og 43 hele kilder. Faktisk primærskript 201 og hel animasjon 6 er avspilt med alle 64 logget. Se aktuelle originalark, kilder, kontekst og godkjente Sam- og Max-mastere før hvert motiv. Ingen nye 88-bildekall eller resultater. Ikke fyll mekaniske rammetomrom eller endre de tilsiktede opp/ned- og fallfasene.
+- [ ] Fortsett øvrige produserbare jobber og returer. Bevar alle tidligere filer, releaser og stasher. Ingen omprøve av holdte motiver og aliaser, ingen grafikk i main. Nødvendig kode via testet PR.
+- [ ] Samlet sluttkontroll, naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Automatikken fortsetter; gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 16:52
 
 - [x] Publisert fig250_06 til 10: fem hele ark og 22 nye native, 3459 totalt. Alle fem ark og 22 native OK, null omrissvarsler. Alle 21702 filhash, 21674 tidligere PNG, 1348 kilder og tre stasher bekreftet etter hent.
