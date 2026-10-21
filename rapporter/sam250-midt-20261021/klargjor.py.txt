@@ -1,0 +1,58 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image
+import json, hashlib, subprocess, shutil
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; M=P/'mods/gpt'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+OLD=A/'rapporter/sam250-foerste-20261021'
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists()
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True)
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+assert remote=='db93dd45027022fd3a0b24f03dfb2107f7958e36'
+protected=read(OLD/'beskyttede-samlet1348.json')
+assert len(protected)==1348 and all(sha(A/f)==h for f,h in protected.items())
+files=read(OLD/'publiserte-moddfiler-3437.json')
+assert len(files)==21680 and all(sha(M/f)==h for f,h in files.items())
+assert read(M/'mod.json')['costume_cels']==3437
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()
+assert stash==read(OLD/'mottak-publisert.json')['stasher']
+plan=read(OLD/'neste-bunke.json')
+assert len(plan['jobber'])==5 and plan['maal']==22 and plan['ulike_hele_kilder']==19
+for j in plan['jobber']:
+    J=A/'jobber'/j['jobb']
+    assert not (J/'resultat.png').exists() and not (J/'retur.md').exists()
+R.mkdir()
+save(R/'beskyttede-samlet1348.json',protected)
+save(R/'grondlag-produksjon.json',{}) if False else None
+save(R/'grunnlag-produksjon.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),native=3437,filer=files,stash=stash,fjern_sha=remote,art_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),main_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip(),native_frosset=False))
+save(R/'kildeplan.json',plan)
+family=read(A/'rapporter/sam250-kilde-20261021/forundersokelse.json')
+save(R/'forundersokelse.json',family)
+proof=read(OLD/'kandidat-primaer211.json')
+by={e['bilde']:e for e in plan['ruter']}
+groups=[[1938,1939],[1940,1941],[1942,1943],[1944,1945],[1946,1947],[1948,1949],[1950,1951,1952,1956],[1957,1958,1959]]
+for k,nums in enumerate(groups,1):
+    C=R/'kall'/f'K{k:02}'; C.mkdir(parents=True)
+    canvas=Image.new('RGB',(1536,1024),'#596978'); rows=[]
+    for i,n in enumerate(nums):
+        e=by[f'costume250_{n}']; src=Image.open(e['kilde']).convert('RGBA')
+        assert sha(Path(e['kilde']))==e['sha256']
+        assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']
+        cell=[0,i*512,1536,512] if len(nums)==2 else [i%2*768,i//2*512,768,512]
+        scale=5; pic=src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST)
+        pos=[cell[0]+(cell[2]-pic.width)//2,cell[1]+(cell[3]-pic.height)//2]
+        assert pic.width<cell[2]-32 and pic.height<cell[3]-32
+        canvas.paste(pic,pos,pic)
+        rows.append(dict(bilde=e['bilde'],canonical_rgba_sha256=e['rgba_sha256'],celle=cell,kilde_sha256=e['sha256'],kilde_maal=e['maal'],original_plassering_atlas=pos,original_skala_atlas=scale))
+    canvas.save(C/'originalatlas.png')
+    context=Path(proof['tegninger'][f'costume250_{nums[0]}']['fil'])
+    assert sha(context)==proof['tegninger'][f'costume250_{nums[0]}']['sha256']
+    shutil.copy2(context,C/'spillkontekst.png')
+    refs=[str(C/'originalatlas.png'),str(A/'hovedark/sam.png'),str(C/'spillkontekst.png')]
+    save(C/'plan.json',dict(kall=f'K{k:02}',ruter=rows,ingen_kall_enna=True,kilde_og_kontekst_sett=False,reference_atlas_sett=False,referanser_sha256={f:sha(Path(f)) for f in refs}))
+shutil.copy2(__file__,R/'klargjor.py.txt')
+print('Fem nye ark klargjort, 22 mål, 19 hele kilder i åtte atlasser. Ingen bildekall sendt.')

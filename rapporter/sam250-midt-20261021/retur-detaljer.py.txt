@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text()); save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+items=[('R02','K07',1951),('R03','K05',1947),('R04','K06',1948),('R05','K06',1949)]
+for name,old,n in items:
+    C=R/'kall'/name; assert not C.exists(); C.mkdir()
+    q=read(R/'kall'/old/'plan.json'); e=next(e.copy() for e in q['ruter'] if e['bilde']==f'costume250_{n}')
+    src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA')
+    scale=6; pic=src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST); pos=[(1536-pic.width)//2,(1024-pic.height)//2]
+    canvas=Image.new('RGB',(1536,1024),'#596978');canvas.paste(pic,pos,pic);canvas.save(C/'originalatlas.png')
+    e.update(celle=[0,0,1536,1024],original_plassering_atlas=pos,original_skala_atlas=6)
+    shutil.copy2(R/'kall'/old/'spillkontekst.png',C/'spillkontekst.png')
+    a=np.array(src); details=[]
+    if n==1951:
+        mask=(a[:,:,3]>0)&(a[:,:,:3].max(axis=2)<20)
+    else:
+        mask=(a[:,:,3]>0)&(a[:,:,0]>180)&(a[:,:,1]>170)&(a[:,:,2]<140)
+    labels,_=nd.label(mask)
+    for k,sl in enumerate(nd.find_objects(labels),1):
+        if not sl:continue
+        size=int((labels==k).sum())
+        if n!=1951 and size>15:continue
+        details.append(dict(original_bbox=[sl[1].start,sl[0].start,sl[1].stop,sl[0].stop],antall_originalpiksler=size,atlas_bbox=[pos[0]+sl[1].start*scale,pos[1]+sl[0].start*scale,pos[0]+sl[1].stop*scale,pos[1]+sl[0].stop*scale]))
+    q.update(kall=name,ruter=[e],retur_for=old,ingen_kall_enna=True,kilde_og_kontekst_sett=False,reference_atlas_sett=False,detaljfasit=details)
+    save(C/'plan.json',q)
+    save(C/'detaljgrunnlag.json',dict(bilde=e['bilde'],deler=details,originalmaske=False,kun_diagnostikk_ikke_bildefragmenter=True,grunn='Delvis blink må bevares.' if n==1951 else 'Kildebekreftede små gule deler manglet eller ble slått sammen i utkastet. Hele kilden tegnes om.'))
+shutil.copy2(__file__,R/'retur-detaljer.py.txt')
+print('Fire kvalitetsreturer av hele kilder klargjort. Ingen bildekall sendt.')

@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam2503459'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not (R/'metadataretting-R06.json').exists()
+J=A/'jobber/fig250_10';digest=sha(J/'resultat.png');mapping=read(R/'rutekart-fig250_10.json')['fig250_10'];assert mapping['sha256_resultat']==digest
+native=read(R/'egen-native.json');row=next(x for x in native['ruter'] if x['bilde']=='costume250_1959');assert row['kall']=='R06' and sha(C/row['fil'])==row['sha256']
+f=R/'fremdrift.json';d=read(f);old=next(e['sha256'] for e in d['leveranser'] if e['jobb']=='fig250_10');assert old==read(R/'rutekart-fig250_10-for-R06.json')['fig250_10']['sha256_resultat']
+d.update(innebygde_bildekall=14,vellykkede_bildekall=14,returkall=6)
+for e in d['leveranser']:
+    if e['jobb']=='fig250_10':e.update(sha256=digest,visuelt_kontrollert=False,hele_resultatark_sett=False)
+save(f,d)
+auto=O/'automatisk-mottak-R06-verifisert';subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(auto),'--jobb','fig250_10','--forhandsvisning',''],cwd=P,check=True)
+report=read(auto/'myke.json');assert report['ruter_ok']==8 and all(report[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']);save(R/'automatisk-mottak-fig250_10-R06.json',report)
+for j in d['leveranser']:
+    f=A/'jobber'/j['jobb']/'notat.md';s=f.read_text().replace('fem kvalitetsreturer','seks kvalitetsreturer').replace('alle 13 råbilder','alle 14 råbilder')
+    s+='\nMotorvisning av første kandidat viste et for bredt sverd i 1959. R06 tegner hele kilden på nytt med den riktige tynne, bøyde gule stripen. Gamle utkast og motorbevis er bevart. Bare hele 1959-maleriet og det berørte figurarket er endret; øvrige 21 native er SHA-identiske. Kandidatprøvene må kjøres på nytt etter endringen.\n'
+    if j['jobb']=='fig250_10':s=s.replace(old,digest).replace('K07, K08.','K07, K08, R06.')
+    f.write_text(s)
+files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};prev=read(R/'kandidatfilhash.json');assert {f for f,h in prev.items() if files[f]!=h}=={row['fil']};save(R/'kandidatfilhash.json',files)
+ret=read(R/'returer.json');ret['kvalitetsreturer'].append(dict(kildekall='K08',ruter=[1959],retur='R06',grunn='Motorvisningen viste et bredt blad der kilden har en tynn bøyd stripe. Hele kilde tegnet om.'));save(R/'returer.json',ret)
+save(R/'metadataretting-R06.json',dict(grunn='Fremdriftsfilen ble opprinnelig oppdatert etter mottaket. Mottaket stoppet derfor på gammel resultat-SHA. Rekkefølgen er rettet før vanlig kontroll.',forrige_sha256=old,ny_sha256=digest,vanlig_mottak_8_OK=True,porter_uendret=True,ovrige_native_21_sha_identiske=True,ingen_publisering_for_kontroll=True))
+for name in ['erstatt1959.py','fortsett-R06.py','sett-prompt.py']:shutil.copy2(O/name,R/(name+'.txt'))
+print('Registrering rettet. Ordinært mottak: åtte native OK; øvrige 21 native SHA-identiske.')

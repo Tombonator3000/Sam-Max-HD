@@ -1,0 +1,24 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image
+import json,hashlib,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+C=R/'kall'/sys.argv[1];src=Path(sys.argv[2]);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert src.is_file() and (C/'argumenter-faktisk.json').exists()
+dest=C/'raa.png'
+if dest.exists():assert sha(src)==sha(dest)
+else:shutil.copy2(src,dest)
+args=json.loads((C/'argumenter-faktisk.json').read_text());refs={f:sha(Path(f)) for f in args['referenced_image_paths']}
+im=Image.open(dest)
+d=dict(kopiert_fra=str(src),fil='raa.png',sha256=sha(dest),argumenter_sha256=sha(C/'argumenter-faktisk.json'),referanser=refs,
+       innebygd_image_gen=True,modellnavn_ikke_oppgitt=True,tid_utc=datetime.now(timezone.utc).isoformat(),maal=list(im.size),modus=im.mode,
+       laget=True,egenkontrollert=False,native_mottatt=False,visuelt_sett=False,publisert=False)
+(C/'raa-sporing.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+q=json.loads((C/'plan.json').read_text());q.update(ingen_kall_enna=False,kildescene_og_anker_sett=True,reference_atlas_sett=True);(C/'plan.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+status={p.parent.name:json.loads(p.read_text()) for p in sorted((R/'kall').glob('*/raa-sporing.json'))}
+(R/'kallstatus.json').write_text(json.dumps(status,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'registrer.py.txt');print(C.name,im.size,im.mode,'råbilde og faktiske prompter bevart')
+
+f=C/"forsokt.json"
+if f.exists():
+ q=json.loads(f.read_text());q.update(utfores_na=False,vellykket=True,raa_sha256=sha(dest),kopiert_tid_utc=d["tid_utc"]);f.write_text(json.dumps(q,ensure_ascii=False,indent=2)+"\n")

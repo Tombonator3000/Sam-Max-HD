@@ -1,0 +1,45 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam2503459'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+e=read(R/'kall/R06/prototypekontroll-v1.json')[0];assert e['native_ok'] and e['bilde']=='costume250_1959'
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+assert not (R/'utkast-fig250_10-for-R06.png').exists()
+archive=R/'motor-forsoek1';archive.mkdir()
+for f in R.glob('motor-*.json'):shutil.copy2(f,archive/f.name)
+for f in ['costume250_1959-motor3459.png','costume250_1959-for-etter.png','kandidatfilhash.json']:shutil.copy2(R/f,archive/f)
+shutil.copy2(A/'jobber/fig250_10/resultat.png',R/'utkast-fig250_10-for-R06.png')
+shutil.copy2(R/'rutekart-fig250_10.json',R/'rutekart-fig250_10-for-R06.json')
+e.update(visuelt_sett=True,kilde_og_spillkontekst_sett=True,sam_stilanker_sett=True,visuell_merknad='Hel kilde nytegnet etter motorfunn. Den tynne bøyde sverdstripen og flate utfoldede fasetter er bevart, ingen vanlige ekstra kroppsdeler.')
+chosen=read(R/'prototyper-endelig.json');chosen=[x for x in chosen if x['bilde']!=e['bilde']]+[e];save(R/'prototyper-endelig.json',chosen)
+f=R/'egen-native.json';native=read(f)
+row=next(x for x in native['ruter'] if x['bilde']==e['bilde']);row.update(prototype=e['prototype'],sha256=e['prototype_sha256'],kall='R06',snitt_union=e['snitt_union'],dekning=e['dekning']);save(f,native)
+dest=C/row['fil'];assert sha(dest)==read(R/'kandidatfilhash.json')[row['fil']];shutil.copy2(A/e['prototype'],dest)
+J=A/'jobber/fig250_10';j=read(J/'jobb.json');sheet=Image.new('RGBA',tuple(j['lerret']));oldmap=read(R/'rutekart-fig250_10.json')['fig250_10']['ruter'];by={x['bilde']:x for x in native['ruter']};mapping=[]
+for t in j['ruter']:
+    n=t['bilde'];q=by[n];own=Image.open(A/q['prototype']).convert('RGBA');arr=np.array(own);core=arr[:,:,3]>=CORE
+    src=np.array(Image.open(P/'work/extract/costumes'/(n+'.png')).convert('RGBA'));iou,cov=_iou(core,np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER
+    x,y,_,_=t['rekt'];dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8
+    layer=Image.new('RGBA',sheet.size);layer.alpha_composite(own,(dx,dy));assert not ((np.array(sheet)[:,:,3]>0)&(np.array(layer)[:,:,3]>0)).any();sheet.alpha_composite(layer)
+    m=next(x.copy() for x in oldmap if x['bilde']==n);yy,xx=np.nonzero(core);m.update(rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],prototype=q['prototype'],prototype_sha256=q['sha256'],kall=q['kall'],snitt_union=iou,dekning=cov);mapping.append(m)
+sheet.save(J/'resultat.png');digest=sha(J/'resultat.png');save(R/'rutekart-fig250_10.json',{'fig250_10':dict(sha256_resultat=digest,ruter=mapping)})
+test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,capture_output=True,text=True);(R/'fig250_10-egenkontroll-R06.txt').write_text(test.stdout+test.stderr);assert test.returncode==0
+auto=O/'automatisk-mottak-R06';subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(auto),'--jobb','fig250_10','--forhandsvisning',''],cwd=P,check=True)
+report=read(auto/'myke.json');assert report['ruter_ok']==8 and all(report[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']);save(R/'automatisk-mottak-fig250_10-R06.json',report)
+f=R/'fremdrift.json';d=read(f);d.update(innebygde_bildekall=14,vellykkede_bildekall=14,returkall=6)
+for x in d['leveranser']:
+    if x['jobb']=='fig250_10':x.update(sha256=digest,visuelt_kontrollert=False,hele_resultatark_sett=False)
+save(f,d)
+for j in d['leveranser']:
+    f=A/'jobber'/j['jobb']/'notat.md';s=f.read_text().replace('fem kvalitetsreturer','seks kvalitetsreturer').replace('alle 13 råbilder','alle 14 råbilder')
+    s+='\nMotorvisning av første kandidat viste et for bredt sverd i 1959. R06 tegner hele kilden på nytt med den riktige tynne, bøyde gule stripen. Gamle utkast og motorbevis er bevart. Bare hele 1959-maleriet og det berørte figurarket er endret; øvrige 21 native er SHA-identiske. Kandidatprøvene må kjøres på nytt etter endringen.\n'
+    if j['jobb']=='fig250_10':
+        old=next(x['sha256'] for x in read(R/'motor-forsoek1/kandidatfilhash.json').items()) if False else None
+        s=s.replace(read(R/'rutekart-fig250_10-for-R06.json')['fig250_10']['sha256_resultat'],digest).replace('K07, K08.','K07, K08, R06.')
+    f.write_text(s)
+files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};old=read(R/'kandidatfilhash.json');assert {f for f,h in old.items() if files[f]!=h}=={row['fil']};save(R/'kandidatfilhash.json',files)
+ret=read(R/'returer.json');ret['kvalitetsreturer'].append(dict(kildekall='K08',ruter=[1959],retur='R06',grunn='Motorvisningen viste et bredt vanlig blad der kilden har en tynn bøyd stripe. Hele kilde tegnet om.'));save(R/'returer.json',ret)
+for name in ['erstatt1959.py','sett-prompt.py']:shutil.copy2(O/name,R/(name+'.txt'))
+print('Hel 1959 erstattet med R06, fig250_10 OK, åtte native kontrollert på nytt; øvrige 21 native uendret.')
