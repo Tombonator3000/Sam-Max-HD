@@ -13,3 +13,5 @@ Alle15 native er automatisk OK med uendrede CORE128, IoU0,6 og dekning0,8. To ar
 Den foregående304-bunken stoppet etter sikkerhetsavvisning av hengende Max i K02. Ingen omprøve, omformulering eller delkomposisjon er brukt. K01 er bevart som utkast med avvikende ører, K03/K04 og fortsettelsen K05 er ikke forsøkt. Disse uavhengige Sam303-motivene er ikke del av det blokkerte motivet. Se sam304-midten-20261021/VERKTOYAVVIST.md.
 
 Publisering/hent og fellespakker kvitteres separat. Pakker har3098 og mangler27 (12 tidligere304 og15 nye303). Pakkesamlepunkt følger nå, fordi resten304 er blokkert. Tidligere kjente motor/testhopp/Windows-SDL-begrensninger er ikke erklært rettet.
+
+Publisert og hentet `596201dcce1901db4a7c4a7f853ca591ffb11cbd`,3125native. Alle21368filer SHA-bekreftet,21347 tidligere PNG bevart. Grafikkilde `7dcca52d504c0e9e37c25a35ec1bae9e1963d8fc`. Pakker har3098 og mangler27. Nativefrys for fellespakker starter nå.
