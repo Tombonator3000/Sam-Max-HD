@@ -1,0 +1,70 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib, json, subprocess, shutil, os, gzip
+import numpy as np
+from PIL import Image
+from smhd import eksport_v6, modpack
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+Q = A / 'rapporter/felles-release-20261021-cone'
+M = P / 'mods/gpt'
+R.mkdir(parents=True, exist_ok=True)
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, v: p.write_text(json.dumps(v, ensure_ascii=False, indent=2) + '\n')
+api = lambda path: json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/' + path], text=True))
+
+run = api('actions/runs/39667811055')
+assert run['conclusion'] == 'success' and run['run_attempt'] == 1
+assert run['head_sha'] == '714a31b7fbcb734f322c686b0abc6440a4aba97b'
+save(R / 'ekstra-taggbygg-fullfort.json', run)
+log = subprocess.check_output(['gh','run','view','39667811055','--repo','Tombonator3000/Sam-Max-HD','--log'])
+with gzip.open(R / 'ekstra-taggbygg.log.gz', 'wb') as f: f.write(log)
+active = []
+for workflow in ['linux.yml','windows.yml']:
+    active += [dict(id=r['id'],status=r['status'],url=r['html_url']) for r in api('actions/workflows/' + workflow + '/runs?per_page=20')['workflow_runs'] if r['status'] != 'completed']
+assert not active, active
+native = api('git/ref/heads/hd-mod')['object']['sha']
+assert native == '2ae8fd65e891a2eec57769de602a359e64fa5d97'
+manifest = read(Q / 'moddfiler-3535.json')
+assert len(manifest) == 21778 and all(sha(M/f) == h for f,h in manifest.items())
+release = api('releases/latest')
+assert release['id'] == 420003996 and not release['draft']
+old = read(Q / 'release-publisert.json')
+asset_keys = lambda r: {(a['id'],a['name'],a['size'],a['digest']) for a in r['assets']}
+assert asset_keys(release) == asset_keys(old)
+protected = read(A / 'rapporter/sam088-slutt-20261021/beskyttede-samlet1380.json')
+assert len(protected) == 1380 and all(sha(A/f) == h for f,h in protected.items())
+stashes = subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()
+assert stashes == read(A/'rapporter/sam088-slutt-20261021/grunnlag-produksjon.json')['stash']
+receipt = dict(tid_utc=datetime.now(timezone.utc).isoformat(),ekstra_taggbygg=run['id'],forsok=1,resultat='success',kode=run['head_sha'],hd_mod=native,native=3535,native_frosset=False,aktive_pakkebygg=active,Latest=release['html_url'],fire_publiserte_assets_uendret=True,alle21778_moddfilhash_bekreftet=True,beskyttede_kilder=1380,tre_stasher_bevart=True,ny_omprove=False,SDL_startfeil_ikke_rettet=True)
+save(R / 'nativefrys-frigitt.json', receipt)
+
+assert not (O / 'mod-maskekandidat').exists()
+eksport_v6.export_rooms(P / 'game', O / 'nytt-uttrekk', {17})
+name = 'obj173_01'
+fresh = O / 'nytt-uttrekk/objects'
+original = Image.open(P/'work/extract/objects'/f'{name}.png').convert('RGBA')
+mask = Image.open(fresh/f'{name}_mask.png').convert('L')
+assert mask.size == (64,80) and mask.getextrema() == (255,255)
+assert np.array_equal(np.array(original.getchannel('A')), np.array(mask))
+for suffix in ['.png','_idx.png']:
+    before,after = [Image.open(p) for p in [P/'work/extract/objects'/f'{name}{suffix}',fresh/f'{name}{suffix}']]
+    assert np.array_equal(np.array(before),np.array(after)), suffix
+    if suffix == '_idx.png': assert before.getpalette() == after.getpalette()
+(O/'import-prove/objects').mkdir(parents=True)
+modpack._copy_idx(O/'nytt-uttrekk', None, O/'import-prove', name)
+candidate = O / 'mod-maskekandidat'
+shutil.copytree(M, candidate, copy_function=os.link)
+assert not (candidate/'objects'/f'{name}_mask.png').exists()
+shutil.copy2(O/'import-prove/objects'/f'{name}_mask.png',candidate/'objects'/f'{name}_mask.png')
+shutil.copy2(candidate/'objects'/f'{name}_mask.png',R/f'{name}_mask.png')
+proof = dict(objekt=173,tilstand='01',rom=17,rompos=[96,32],maal=[64,80],faktisk_SMAPI_tegnedekning=[255,255],kilde_RGBA_alfa_identisk=True,indekser_og_palett_identiske=True,mask_sha256=sha(candidate/'objects'/f'{name}_mask.png'),eksisterende_moddfiler_uendret=True,kun_en_ny_metadatafil=True,grafikk_alfa_ikke_klippet=True,ingen_motor_eller_pipelineendring=True,kun_kandidat_ikke_publisert=True,grunnlag_native_sha=native)
+save(R/'tegnedekning-kildebevis.json',proof)
+save(R/'moddfiler-grunnlag.json',manifest)
+shutil.copy2(__file__,R/'forbered.py.txt')
+print(json.dumps(receipt, ensure_ascii=False))
+print(json.dumps(proof, ensure_ascii=False))

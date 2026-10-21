@@ -1,0 +1,65 @@
+from pathlib import Path
+import json,hashlib,re,shutil
+import numpy as np
+from PIL import Image, ImageDraw
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+mode=__import__('sys').argv[1]
+b=read(R/('grunnlag-'+mode+'.json'));c=read(R/('maske-'+mode+'.json'))
+baseline_note='ny samtidig kontroll'
+if mode=='primaer201':
+    # New unchanged-control playback differs from both the candidate and the
+    # earlier unchanged control at 19 late frames. Keep this evidence. The
+    # previous exact same-binary, same-mod control matches all candidate flats.
+    timing=read(R/'originalfaser-ettersom.json')
+    assert len(timing['forskjeller'])==19 and len(timing['uendret_mod_mot_tidligere_kontroll_ulike'])==19
+    assert not timing['maske_mot_tidligere3535_ulike']
+    b=read(A/'rapporter/felles-release-20261021-cone/pakke-primaer201.json')
+    baseline_note='tidligere uendret3535-kontroll, alle720 originalfaser identiske; samtidig kontroll beholdt med19 sene faseforskjeller'
+assert b['exit']==c['exit']==0 and b['binar_sha256']==c['binar_sha256'] and len(b['tegninger'])==len(c['tegninger'])==64
+assert b['kontroller']==c['kontroller'] and len(b['kontroller'])==720
+def root(proof):return Path(next(iter(proof['tegninger'].values()))['fil']).parent
+def errors(proof):
+    T=root(proof);log=(T/'scummvm.log').read_text();out=[]
+    for m in re.finditer(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log):
+        if int(m[2]):
+            f=int(m[1]);screen=np.array(Image.open(T/f'frame_{f:06}_screen.png').convert('RGB'));whole=np.array(Image.open(T/f'frame_{f:06}_room017.png').convert('RGB'))
+            yy,xx=np.where(np.any(screen!=whole,2));assert len(xx)==int(m[2])
+            points=[list(map(int,[x,y,*screen[y,x],*whole[y,x]])) for x,y in zip(xx,yy)]
+            out.append(dict(frame=f,piksler=len(points),punkter=points))
+    return out
+assert errors(b)==errors(c), 'Nytt eller endret bufferavvik'
+rows=[];changed_frames=[]
+for p in sorted(root(b).glob('frame_*_room*.png')):
+    if '_flat' in p.stem:continue
+    q=root(c)/p.name;assert q.exists()
+    flat=p.with_name(p.stem+'_flat.png');qflat=q.with_name(q.stem+'_flat.png')
+    assert flat.exists() and qflat.exists() and sha(flat)==sha(qflat),(p.name,'Ulik originalflate')
+    left,right=[np.array(Image.open(v).convert('RGB')) for v in [p,q]];delta=np.any(left!=right,2)
+    off=delta.copy();off[128:448,384:640]=False
+    assert not off.any(),(p.name,'Endring utenfor objekt173',int(off.sum()))
+    n=int(delta.sum());rows.append(dict(fil=p.name,originalflat_sha256=sha(flat),originalflat_identisk=True,endrede_piksler=n,utenfor_objekt=0))
+    if n:changed_frames.append(p.name)
+boards=[];canonical=read(A/'rapporter/sam088-kilde-20261021/forundersokelse.json')
+names=[]
+for e in canonical['ruter']:
+    n=e['bilde']
+    if n not in names:names.append(n)
+for start in range(0,len(names),8):
+    board=Image.new('RGB',(1280,840),'#304050');draw=ImageDraw.Draw(board)
+    for k,n in enumerate(names[start:start+8]):
+        l,r=b['tegninger'][n],c['tegninger'][n]
+        assert all(l[v]==r[v] for v in ['pos','maal','screen_origin','bildeframe'])
+        x=k%2*640;y=k//2*210
+        draw.text((x+4,y+3),n+': publisert / med kildedekning',fill='white')
+        for z,e in enumerate([l,r]):
+            # Whole object and its immediate surroundings, identical viewport.
+            crop=Image.open(e['fil']).convert('RGB').crop((360,104,656,472))
+            crop.thumbnail((310,190),Image.Resampling.LANCZOS);board.paste(crop,(x+4+z*316,y+20))
+    f=R/f'{mode}-varianter-{start//8+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=names[start:start+8],visuelt_sett=False))
+save(R/(mode+'-pikselkontroll.json'),rows)
+proof=dict(mode=mode,grunnlag=baseline_note,binar_sha256=c['binar_sha256'],alle64_ruter_observert=True,kontroller=720,nullkontroller=c['nullkontroller'],grunnlag_nullkontroller=b['nullkontroller'],eksakte_bufferavvik_identiske=errors(b),hele_originalflater_SHA_identiske=len(rows),alle_bildepar_utenfor_objekt_0=True,objekt_rekt_HD=[384,128,640,448],endrede_bilder=len(changed_frames),hele_for_etter_brett=boards,obj173_logget_i_begge=bool(c['obj173_logget'] and b.get('obj173_logget',True)),negativ_kontroll_uten_obj173=mode=='hel6',ingen_nye_malerier=True,ingen_ny_Tom_Claude_godkjenning=True,gjenværende_grafikkretur='Statisk HD-tupp stikker noen HD-piksler over objektets y32-grense. Uendret av metadatarettingen; originalens topp begynner y32. Ikke visuell sluttgodkjenning.')
+if mode=='hel6': assert not changed_frames, 'Metadata endret bilde uten aktivt objekt173'
+save(R/(mode+'-kontroll.json'),proof)
+shutil.copy2(__file__,R/'analyser.py.txt')
+print(json.dumps({k:v for k,v in proof.items() if k not in ['hele_for_etter_brett','eksakte_bufferavvik_identiske']},ensure_ascii=False))

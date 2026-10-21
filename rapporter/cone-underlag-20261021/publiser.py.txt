@@ -1,0 +1,49 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,tarfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-maskekandidat';T=O/'publisering';F=O/'hentet'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip();api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],text=True));remote=lambda b:api('git/ref/heads/'+b)['object']['sha']
+old=read(R/'moddfiler-grunnlag.json');proof=read(R/'egenkontroll.json');expected='2ae8fd65e891a2eec57769de602a359e64fa5d97'
+assert not (R/'publisering-forsokt.json').exists() and not T.exists() and not F.exists()
+assert git(A,'branch','--show-current')=='gpt-arbeid' and not git(A,'status','--porcelain')
+art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art and remote('hd-mod')==expected
+assert len(old)==21778 and all(sha(M/f)==h for f,h in old.items())
+assert proof['egenkontroll'] and proof['hele_primærvarianter_sett']==64 and proof['brett_sett']==8
+for mode in ['primaer201','hel6']:
+    d=read(R/(mode+'-kontroll.json'));assert d['hele_originalflater_SHA_identiske']==720 and d['alle_bildepar_utenfor_objekt_0'] and d['nullkontroller']==d['grunnlag_nullkontroller']==718
+    if mode=='primaer201':assert all(e['visuelt_sett'] and sha(R/e['fil'])==e['sha256'] for e in d['hele_for_etter_brett'])
+for wf in ['linux.yml','windows.yml']:assert not any(e['status']!='completed' for e in api('actions/workflows/'+wf+'/runs?per_page=20')['workflow_runs'])
+protected=read(A/'rapporter/sam088-slutt-20261021/beskyttede-samlet1380.json');base=read(A/'rapporter/sam088-slutt-20261021/grunnlag-produksjon.json')
+assert len(protected)==1380 and all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==base['stash']
+mask='objects/obj173_01_mask.png';assert sha(C/mask)==read(R/'tegnedekning-kildebevis.json')['mask_sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3535
+meta.setdefault('metadata_rettinger',[]).append(dict(type='original_objektdekning',bilde='obj173_01',rom=17,gpt_kilde=art,mask_sha256=sha(C/mask),rapport='rapporter/'+R.name))
+# Atomic replacement preserves hard-linked control snapshots and the current mod.
+save(C/'mod.json.ny',meta);(C/'mod.json.ny').replace(C/'mod.json')
+assert all(sha(M/f)==h for f,h in old.items())
+shutil.copytree(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+new={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts and p.name!='SHA256SUMS'}
+assert set(new)==(set(old)-{'SHA256SUMS'})|{mask} and all(new[f]==h for f,h in old.items() if f not in ['mod.json','SHA256SUMS'])
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(new.items())))
+subprocess.run(['git','-C',str(T),'add','-A'],check=True);subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod 3535: bevar kildeført bakgrunnsdekning for Cone of Tragedy'],check=True)
+commit=git(T,'rev-parse','HEAD');save(R/'publisering-forsokt.json',dict(grafikkilde=art,grunnlag=expected,forventet_commit=commit,force_with_lease=True,ny_metadatafil=mask,ingen_malerier_endret=True))
+assert remote('hd-mod')==expected
+subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+expected,git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+assert remote('hd-mod')==commit
+subprocess.run(['git','fetch','-q','--depth','1','origin','+refs/heads/hd-mod:refs/remotes/origin/hd-mod'],cwd=P,check=True)
+assert git(P,'rev-parse','refs/remotes/origin/hd-mod')==commit
+F.mkdir();archive=subprocess.Popen(['git','archive',commit],cwd=P,stdout=subprocess.PIPE)
+with tarfile.open(fileobj=archive.stdout,mode='r|') as tar:tar.extractall(F,filter='data')
+assert archive.wait()==0
+expected_files={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts}
+actual={p.relative_to(F).as_posix():sha(p) for p in F.rglob('*') if p.is_file()}
+assert len(actual)==21779 and actual==expected_files
+for f in [mask,'mod.json','SHA256SUMS']:
+    tmp=M/(f+'.ny');shutil.copy2(F/f,tmp);tmp.replace(M/f)
+assert {p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}==actual
+assert all(actual[f]==h for f,h in old.items() if f not in ['mod.json','SHA256SUMS'])
+assert all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==base['stash']
+save(R/'publiserte-moddfiler-3535.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=commit,forrige_hd_mod=expected,native=3535,nye_native=0,nye_ark=0,figurark_med_resultat=497,gjenstaar=1261,ny_metadatafil=mask,mask_sha256=actual[mask],moddfiler=21779,alle_filhash_bekreftet_etter_hent=True,samtlige_tidligere21772_PNG_byteidentiske=True,tidligere_fil_stier_bevart=True,beskyttede_kilder=1380,tre_stasher_bevart=True,force_with_lease=True,visuelt_sett=True,motorobservert=True,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,full_naturlig_gjennomspilling=False,pakker_har_native=3535,pakker_mangler_metadatarettingen=True,native_frosset=True)
+save(R/'mottak-publisert.json',receipt);proof.update(publisert=True,hd_mod=commit,grafikkilde=art);save(R/'egenkontroll.json',proof)
+shutil.copy2(__file__,R/'publiser.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)

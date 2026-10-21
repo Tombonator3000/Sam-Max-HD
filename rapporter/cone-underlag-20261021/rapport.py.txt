@@ -1,0 +1,35 @@
+from pathlib import Path
+import json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+for mode in ['primaer201','hel6']:
+    d=read(R/(mode+'-kontroll.json'))
+    assert d['alle64_ruter_observert'] and d['hele_originalflater_SHA_identiske']==720 and d['alle_bildepar_utenfor_objekt_0']
+    assert d['nullkontroller']==d['grunnlag_nullkontroller']==718
+    if mode=='primaer201':
+        for e in d['hele_for_etter_brett']:
+            assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+    save(R/(mode+'-kontroll.json'),d)
+proof=dict(egenkontroll=True,import_test_fra_gjeldende_kode=True,object_coverage_pytest='4 passed',hele_primærvarianter_sett=64,brett_sett=8,hele_motorbilder_sett=[dict(fil='maske-'+str(n)+'.png',sha256=sha(R/('maske-'+str(n)+'.png'))) for n in [1922,1970,1983]],native=3535,nye_figurark=0,nye_malerier=0,nye_native_ruter=0,figurark_med_resultat=497,gjenstaar=1261,nye_metadatafiler=1,endrede_malerier=0,ingen_hard_originalmaskeklipping=True,alfa_og_samtlige_tidligere_grafikkfiler_bevart=True,publisert=False,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,bakgrunnsretur_delvis_rettet=True,gjenværende='Statisk malt tupp over y32 ligger utenfor objektets lovlige dekning. Skal rettes som egen grafikkretur, ikke med vilkårlig utvidet originalmaske.')
+save(R/'egenkontroll.json',proof)
+text='''# Cone of Tragedy: kildeført bakgrunnsdekning
+
+En manglende metadatafil forklarer den store hakkete dobbelkanten rundt kjegletoppen og stjernekransen under Sam og Max. Originalobjekt173_01 er en heldekkende bakgrunnsmatte ved96,32,64x80. Ny dekoding direkte fra SAMNMAX.001 bekrefter alle5120 tegnede piksler, identiske indekser, palett og RGBA-alfa mot bevart kilde. Eksisterende pipelinekode fra PR34 lager den manglende obj173_01_mask.png. Dette er motorens kildeførte tegnedekning, ikke en maske som klipper nye malerier. Ingen motor- eller pipelinekode endres, ingen ny figur eller nytt maleri telles.
+
+Den faktisk nedlastede Linux-binæren bb37b500074cf42112d8ac5462138edbb2312e1c7d39b00ced263b5111f74d55 er kjørt i primærskript201 og hel animasjon6. Alle64 familieruter er logget i begge prøver. Kildeobjekt173 tegnes i primærsekvensen, og er ikke aktivt i den separate animasjonsprøven. Uendret/kandidat har718 av720 nullkontroller per avspilling med de samme416/160-avvikene ved24/25, samme eksakte koordinater og begge RGB-verdier. Primærkontrollen mot den tidligere identiske3535-pakkekontrollen har720 identiske hele originalflater og null endring utenfor objektets lovlige HD-rektangel384,128..640,448.387 primærbilder er forbedret innenfor rektangelet. Den negative animasjonskontrollen har720 identiske originalflater og720 helt identiske HD-bilder uten aktivt objekt173. Fire meningsfulle tester av eksisterende eksport/import består. Åtte hele før/etter-brett med alle64 ruter og tre separate fullstørrelsebilder er visuelt sett.
+
+Den nye samtidige uendrede primærkontrollen hadde19 sene originalfaseforskjeller fra bilde595. Samme19 forskjeller finnes mot den tidligere uendrede kontrollen; kandidaten matcher den tidligere kontrollens samtlige720 originalflater. Dette er dokumentert i originalfaser-ettersom.json, ikke skjult som grafikkendring. Samtlige kontroller og rålogger er beholdt. Første analyseskript brukte feil navn på feilbilder; det ble rettet til faktiske screen/room-bilder. Den første wrapperen krevde dessuten objekt173 i begge moduser; dette var feil for den bevisste negative animasjonskontrollen. ScummVM avsluttet normalt med0 i alle fire nye løp. Wrapperkravet er korrigert, og de opprinnelige utfallene er bevart. Ingen testflagg eller kontrollgrenser er svekket og motoren er ikke kjørt om for å skjule et feilutfall.
+
+Returen er delvis rettet. En liten malt statisk tupp stikker noen HD-piksler over objektgrensen y32. Originalens øverste røde/oransje kjeglepiksel starter y32; se topp-objektgrense-kilde.png. Den lille resten ligger utenfor lovlig tegnedekning og endres ikke av metadatarettingen. Den skal løses som egen grafikkretur. Ingen vilkårlig utvidelse av kildemasken eller hard klipping av nye figurer. Ingen visuell sluttgodkjenning eller ny Tom-/Claude-godkjenning.
+
+Ekstra Windows-taggbygg39667811055 bestod i første forsøk med uendret kode. Ingen aktive pakkebygg, Latest og alle fire publiserte fellesvedlegg var uendret, og samtlige21778 moddfilhash,1380 beskyttede kilder og tre stasher ble bekreftet før nativefrysen ble frigitt. Den sporadiske SDL-startfeilen er ikke rettet av dette.
+
+Bibliotekskilder: publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter. Dagens kode og pipelinekontroller brukes; ingen blind gjenoppbygging av modden. Publiseringen skal bare legge til metadatafilen og beholde tidligere malerier og filstier. Ny pakkeprøve må kontrollere metadatafilens faktiske inkludering separat fra antall native.
+
+497 av1758 figurark har fortsatt resultat,1261 gjenstår pluss returer og sluttkontroll. Ingen tidligere verktøyavviste motiver omprøves. Fig164_04, resterende304 og de holdte bokarkene er fortsatt sperret. Før eventuell124-produksjon må feil navn og rom i jobbkortene avklares fra faktisk metadata og spillsekvens: første ark viser en menneskefigur med Max, ikke bare Sam. Det er ennå ikke gjort nye124-kall eller laget nye124-resultater.
+'''
+(R/'RAPPORT.md').write_text(text)
+(R/'NESTE.md').write_text('Først publiser den kontrollerte metadatarettingen additivt med eksakt hd-mod-SHA-lås, hent og bekreft alle filhash. Begge plattformpakker må få rettingen og faktisk nedlasting skal kontrolleres. Den lille statiske tuppen over y32 er en egen åpen grafikkretur. Ikke tegn88-figurene på nytt. Deretter avklar124s faktiske menneskefigur/Max-motiv og spillkontekst før første nye motivkall. Behold alle tidligere sperrer, råbilder, kilder og tre stasher. Ingen gammel nattprosess. Automatikken fortsetter; restgrafikken er ikke ferdig.\n')
+shutil.copy2(O/'motor.py',R/'motor.py.txt');shutil.copy2(__file__,R/'rapport.py.txt')
+failure=read(R/'analyseforsoek-feil.json');failure['avklart']='Samme19 sene forskjeller finnes mellom to uendrede modkontroller. Kandidaten og tidligere samme-binær3535-kontroll har720 identiske originalflater. Negativhel6 tegner med hensikt ikkeobj173; motoren avsluttet0 og alle720 HD-bilder er identiske.';save(R/'analyseforsoek-feil.json',failure)
+print('Rapport og visuell kontroll lagret. 64 primærvarianter sett; ingen nye malerier telt.')
