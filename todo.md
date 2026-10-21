@@ -1,5 +1,20 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 11:52
+
+Ekstra automatisk Windows-taggbygg 39580011037 er in_progress ved siste lesing. Den publiserte Windows-pakken er fra separat vellykket dispatch 39575951370, første forsøk. Ikke dupliser eller avbryt taggbygget. Les status og eventuell logg før neste endring av publisert native; dette er ingen bestilling om å bygge 3276 på nytt.
+
+
+- [x] Levert og additivt publisert sju Max-introark med 68 nye native. 3276 native totalt, alle 21519 filhash og tidligere grafikk bekreftet etter hent. R14/R15 er visuelt rettet og avspilt.
+- [x] Oppdatert begge faktiske pakker med alle 126 nye siden 3150. 21518 runtimefiler per pakke, 126 identiske figurutsnitt, 1683/1720 null og identiske kjente avvik. Tolv hele bilder, tolv par og fem dørfaser sett. Fellesutgaven og Latest er bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-max-intro
+- [x] Kildeklargjort fig223, 13 ark/94 mål/25 hele kilder. Første fem originalark og alle 25 kildevarianter i faktisk rom sett. 359/360 null, samme kjente 160 ved 36. Ingen nye 223-kall/resultater/native.
+- [ ] Produser fig223_01 til 05 fra rapporter/sam-max223-kilde-20261021 på gpt-arbeid: 30 mål/11 hele kilder, Sam og Max med den store åpne boken. Se begge godkjente hovedark og aktuelle kilder før hvert motiv. Den ekstra vanlige Max i kontrollavspillingen er ikke del av originalruten. Fortsett deretter 06 til 13 etter kildekontroll.
+- [ ] Fortsett faktisk produksjon, egenkontroll, visuell kontroll, native mottak, relevant motoravspilling og additiv publisering av øvrige produserbare jobber og returer. 458 av 1758 hele figurjobber har resultat, 1300 gjenstår pluss returer/katalogfeil/sluttkontroll. Ikke erklær alt ferdig på grunnlag av antall.
+- [ ] Oppdater begge pakker ved neste samlepunkt og avslutning. Bevar alle tidligere filer og releaser, 1252 kilder og tre stasher. Skil laget, egenkontrollert, visuelt sett, motorobservert, publisert, pakket og Tom-/Claude-godkjent. Ingen avviste motivomprøver eller ugyldige 344/346-avspillinger.
+- [ ] Samlet sluttkontroll, full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Grafikkautomatikken fortsetter, gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 09:10
 
 - [x] Levert, kontrollert og additivt publisert fig010_01..02 og fig012_01..03: 58 nye native, 3208 totalt. Alle 21451 filhash og tidligere grafikk er bekreftet etter hent. 451 av 1758 hele resultatjobber, 1307 gjenstår pluss returer/katalogfeil/sluttkontroll.
