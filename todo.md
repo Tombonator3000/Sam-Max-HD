@@ -1,5 +1,20 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 13:26
+
+- [x] Levert fig223_08 og fig223_09, 18 nye native; 3324 totalt. Begge ark OK. Alle 21567 filhash og tidligere grafikk bekreftet etter hent.
+- [x] Publisert og kontrollert felles Linux/Windows med alle 48 nye bokruter siden 3276. 21566 runtimefiler per pakke, 48 identiske figurutsnitt, 359/360 null i både pakken og grunnlaget. Nitten varianter og åtte hele par sett. Faktiske fellesvedlegg hentet igjen og Latest bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-bok
+- [ ] Nativefrysen beholdes til de registrerte ekstra pakkebyggene er avsluttet. Ikke dupliser eller avbryt byggene; les status og eventuell feil før neste nativepublisering.
+
+Registrerte ekstra pakkebygg: [{"id": 39591712087, "workflow": "windows.yml", "head_branch": "sam-max-hd-2026-10-21-bok", "head_sha": "5a13494b74c29d9974900ef1c0eac80f9c86559c", "event": "push", "status": "in_progress", "url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39591712087"}].
+- [ ] Behold STOPP for siste bokretur og hele aliaser: fig223_06, 07, 10, 11, 12 og 13, totalt 46 mål. Ingen omprøve eller alternativ fremstilling av de verktøyavviste motivene. K04-utkastene er også tilbakeholdt på grunn av feil hodevinkel. Ikke tell delvise ark som levert.
+- [ ] Kildeklargjør fig097_01 og neste praktiske bunke fra kostyme 97. Originalen viser svanebåten i Tunnel of Love, rom 22. Avklar gyldig animasjon, palett og faktiske rombilder før nytegning. Ingen 97-kall eller resultater ennå.
+- [ ] Fortsett faktisk produksjon, egenkontroll, visuell kontroll, native mottak, relevant motoravspilling og additiv publisering av uavhengige produserbare jobber. 465 av 1758 hele figurjobber har resultat; 1293 gjenstår pluss returer, katalogfeil og sluttkontroll.
+- [ ] Oppdater begge pakker ved neste samlepunkt og avslutning. Bevar tidligere grafikk, releaser, 1252 kilder og tre stasher. Skill laget, egenkontrollert, native mottatt, visuelt sett, motorobservert, publisert, pakket og Tom-/Claude-godkjent.
+- [ ] Samlet sluttkontroll, full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Automatikken fortsetter; gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 12:30
 
 - [x] Levert og additivt publisert fig223_01 til fig223_05: fem hele ark, 30 nye native og 3306 totalt. Alle 21549 filhash, 21513 tidligere PNG, 1252 kildehash og tre stasher er bekreftet etter hent.
