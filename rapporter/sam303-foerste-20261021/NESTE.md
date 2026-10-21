@@ -5,3 +5,5 @@ Neste praktiske bunke er fig303_06..10. Kildeplan og 15 originale mål er avspil
 Ikke gjenta fig303_01..05 eller fig304_01..05. 304 K02 er verktøyavvist og omprøves eller rekonstrueres ikke. 304 K01 er bare utkast med avvikende ører; K03/K04/K05 er ikke forsøkt. Se sam304-midten-20261021/NESTE.md. Gamle nattprosesser gjenstartes ikke.
 
 Et automatisk Windows-taggbygg39545730608 går etter fellespublisering. Ikke dupliser eller avbryt det. Kontroller status før neste endring i hd-mod, siden det henter modden etter motorbygget. De faktisk kontrollerte fellespakkene er fra Linux39544164799 og Windows39544167890.
+
+Main 10bbcc698fa881896833581b116810c898463634 har grønn CI39546018722. Bare fire dokumenter er endret i main siden pakkekoden. Begge grener var rene ved sluttkontrollen;alle21368modhash,1136kildefiler og tre stasher er bekreftet etter publisering.
