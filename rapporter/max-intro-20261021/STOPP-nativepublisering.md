@@ -1,0 +1,1 @@
+Visuell kontroll av 17_1954 viser en løs farget bilbit over HD-bilen. Utred om dette er faktisk animasjon, uttrekksfeil eller bakgrunnsrestaurering før publisering. Store bufferavvik ble ikke funnet; tidligere progresjonstallet gjaldt forventet forskjell fra originalgrafikken. Alle råbilder, ark og tidligere native bevares.

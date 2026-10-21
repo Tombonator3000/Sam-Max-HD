@@ -1,0 +1,18 @@
+from pathlib import Path
+import os,json,hashlib,re,subprocess,shutil,gzip
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PK=P/'out/felles-release-20261021-sam303/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+T=O/'kostyme13-grunnlag3208';assert not T.exists();T.mkdir();(T/'home').mkdir();(T/'saves').mkdir()
+for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,T/'saves'/p.name)
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update(HOME=str(T/'home'),XDG_CONFIG_HOME=str(T/'home/.config'),XDG_DATA_HOME=str(T/'home/.local/share'),XDG_CACHE_HOME=str(T/'home/.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(P/'mods/gpt'),DIGHD_VERIFY='1',DIGHD_QUIT_AT='360',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='2',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='2',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_TEST_COSTUME='13',DIGHD_TEST_ACTOR='3',DIGHD_TEST_POS='187,184',DIGHD_TEST_SCALE='255',DIGHD_TEST_PALETTE='0',DIGHD_TEST_CHORE_EVERY='24',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(T/'saves'),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--random-seed=20261021','--debuglevel=1','samnmax']
+with (T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120).returncode
+log=(T/'scummvm.log').read_text();events=[];obs={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*13\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());shot=(f//2+1)*2;p=T/f'frame_{shot:06}_room002.png';row=dict(logg_frame=f,bildeframe=shot,cel=n,kostyme=13,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p) if p.exists() else None);events.append(row)
+ if p.exists():obs.setdefault(f'costume013_{n}',row)
+checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+proof=dict(random_seed=20261021,exit=code,binar=str(B),binar_sha256=sha(B),kommando=args,rom=2,kostyme=13,aktor=3,pos=[187,184],animasjon="alle gyldige animasjoner fra COST-hodet",palett=0,skala=255,rettet_synlighetsprove=True,primaer_spillsekvens=False,andre_aktorer_og_romskript_ikke_skjult_av_testkode=True,tegninger=obs,hendelser=events,kontroller=checks,nullkontroller=sum(c['avvik']==0 for c in checks),logg_sha256=sha(T/'scummvm.log'))
+save(R/'kostyme13-grunnlag3208.json',proof)
+with gzip.open(R/'kostyme13-grunnlag3208.log.gz','wb') as f:f.write((T/'scummvm.log').read_bytes())
+shutil.copy2(__file__,R/'kostyme13-grunnlag3208.py.txt');print(code,'observerte',len(obs),'kontroller',len(checks),'null',proof['nullkontroller']);assert code==0 and len(obs)==5

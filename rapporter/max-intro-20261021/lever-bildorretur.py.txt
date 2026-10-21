@@ -1,0 +1,44 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import json,hashlib,shutil,subprocess,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-intro3276'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+assert all(sha(C/f)==h for f,h in read(R/'kandidatfilhash.json').items())
+for fn in ['prototyper-endelig.json','egen-native.json','kandidatfilhash.json','rutekart-fig017_02.json','fremdrift.json']:
+ dst=R/(Path(fn).stem+'-foer-bildorretur.json');assert not dst.exists();shutil.copy2(R/fn,dst)
+shutil.copy2(A/'jobber/fig017_02/resultat.png',R/'fig017_02-resultat-foer-bildorretur.png')
+sel={e['bilde']:e for e in read(R/'prototyper-endelig.json')};new=read(R/'kall/R15/prototypekontroll-v1.json');assert len(new)==1 and all(e['native_ok'] for e in new)
+for e in new:
+ e.update(visuelt_sett=True,visuell_kontroll='kall/R15/renset-helkontroll-v1.png',visuell_merknad='Bildøra lukkes med politistjerne. Egen venstre silhuett bevart fra K10, ny dør fra R15, egen himmel-RGB tilpasset eksisterende HD-himmel uten alfaendring.');sel[e['bilde']]=e
+save(R/'prototyper-endelig.json',list(sel.values()))
+job='fig017_02';J=A/'jobber'/job;j=read(J/'jobb.json');mapping=read(R/f'rutekart-{job}.json')[job]['ruter'];sheet=Image.new('RGBA',tuple(j['lerret']))
+for t,row in zip(j['ruter'],mapping):
+ assert t['bilde']==row['bilde'];e=sel[row['canonical']];f=A/e['prototype'];assert sha(f)==e['prototype_sha256'];own=Image.open(f).convert('RGBA');src=np.array(Image.open(P/'work/extract/costumes'/(t['bilde']+'.png')).convert('RGBA'))
+ core=np.array(own)[:,:,3]>=CORE;iou,cov=_iou(core,np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER
+ x,y,_,_=t['rekt'];dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;assert dx>=0 and dy>=0 and dx+own.width<=sheet.width and dy+own.height<=sheet.height
+ placed=Image.new('RGBA',sheet.size);placed.alpha_composite(own,(dx,dy));assert not ((np.array(sheet)[:,:,3]>0)&(np.array(placed)[:,:,3]>0)).any();sheet.alpha_composite(placed);yy,xx=np.nonzero(core)
+ row.update(rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],prototype=e['prototype'],prototype_sha256=sha(f),kall=e['valgt_kall'],snitt_union=iou,dekning=cov)
+draft=O/'ark/fig017_02/resultat-arkretur.png';sheet.save(draft)
+test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(draft)],cwd=A,text=True,capture_output=True)
+(R/'fig017_02-egenkontroll-arkretur.txt').write_text(test.stdout+test.stderr);assert test.returncode in [0,1]
+shutil.copy2(draft,J/'resultat.png');digest=sha(J/'resultat.png');save(R/f'rutekart-{job}.json',{job:dict(sha256_resultat=digest,ruter=mapping)})
+native=read(R/'egen-native.json')
+for e in native['ruter']:
+ v=sel[e['canonical']]
+ if e['canonical'] in {n['bilde'] for n in new}:
+  e.update(prototype=v['prototype'],sha256=v['prototype_sha256'],snitt_union=v['snitt_union'],dekning=v['dekning']);shutil.copy2(A/e['prototype'],C/e['fil'])
+save(R/'egen-native.json',native)
+progress=read(R/'fremdrift.json');progress.update(innebygde_bildekall=36,returkall=15,bildorretur_R15=True)
+for e in progress['leveranser']:
+ if e['jobb']==job:e.update(sha256=digest,egenkontroll=['OK','SJEKK'][test.returncode])
+save(R/'fremdrift.json',progress)
+for e in progress['leveranser']:
+ p=A/'jobber'/e['jobb']/'notat.md';t=p.read_text().replace('35 innebygde image_gen-kall, inkludert 14 rettingsforsøk','36 innebygde image_gen-kall, inkludert 15 rettingsforsøk');t+='\nVisuell motorretur R15: 1954 viser bildøra som lukkes, med politistjerne og eksponerte himmelfelt. K10 sin brune håndlignende form er forkastet. R15 er tegnet med faktisk original dørbevegelse og den godkjente HD-bilen som referanser. Egne venstre silhuetter ble beholdt fra K10 da R15 mistet dem. Bare egne komponenter, ingen originalmaske. Egen oransje RGB og en ytterkant er tilpasset den eksisterende HD-himmelen med egen fargeklassifisering; alfa er uendret. Full prøve i motoren gjenstår før publisering.\n';p.write_text(t)
+
+subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(O/'automatisk-mottak'),'--jobb',','.join(e['jobb'] for e in progress['leveranser']),'--forhandsvisning',''],cwd=P,check=True)
+report=read(O/'automatisk-mottak/myke.json');assert report['ruter_ok']==68 and all(report[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']);save(R/'automatisk-mottak68.json',report)
+files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};base=read(R/'grunnlag-produksjon.json')
+assert len(files)==21519 and {f for f,h in base['filer'].items() if files[f]!=h}=={'mod.json'};save(R/'kandidatfilhash.json',files)
+assert all(sha(A/f)==h for f,h in read(R/'beskyttede-samlet.json').items());shutil.copy2(__file__,R/'lever-bildorretur.py.txt');print('R15 innarbeidet. 68 automatisk OK; 36 bildekall inkludert 15 returer.',flush=True)

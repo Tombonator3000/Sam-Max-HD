@@ -1,0 +1,33 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent
+R=A/'rapporter'/O.name;S=A/'rapporter/max-intro-kilde-20261021';M=P/'mods/gpt'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists() and not subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True).strip()
+R.mkdir()
+files={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert files==read(A/'rapporter/sam-max-intro-20261021/publiserte-moddfiler-3208.json')
+assert len(files)==21451 and read(M/'mod.json')['costume_cels']==3208
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+assert remote=='d8f735a567a3f7ac942c04e4e3bab5befc4c0c57'
+protected=read(S/'beskyttede-samlet1200.json')
+assert len(protected)==1200 and all(sha(A/f)==h for f,h in protected.items())
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()
+assert stashes==read(S/'grunnlag.json')['stasher']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==451
+for name in ['ruteplan-unik.json','beskyttede-samlet1200.json']:shutil.copy2(S/name,R/('beskyttede-samlet.json' if name.startswith('beskyttede') else name))
+save(R/'grunnlag-produksjon.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),native=3208,
+     filer=files,fjern_sha=remote,stash=stashes,hele=451,kode_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip(),
+     beskyttede=1200,ingen_nye_kall=True))
+plan=read(R/'ruteplan-unik.json')
+for name in plan['jobber']:
+    assert not (A/'jobber'/name/'resultat.png').exists() and not (A/'jobber'/name/'retur.md').exists()
+shutil.copy2(A/'rapporter/sam-max-intro-20261021/primaer-scrp065.txt',R/'primaer-scrp065.txt')
+shutil.copy2(P/'work/extract/costumes.json',O/'costumes-alle-kilde.json')
+save(R/'kostymer13-17-18.json',{k:read(P/'work/extract/costumes.json')[k] for k in ['13','17','18']})
+shutil.copy2(__file__,R/'forbered.py.txt')
+print('451 hele resultatark,3208 native,21451 filhash,1200 beskyttede og tre stasher bekreftet. Sju nye jobber uten resultat/retur.')

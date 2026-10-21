@@ -1,0 +1,63 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from collections import Counter
+import json,hashlib,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def artifacts(label):
+ p=read(R/(label+'.json'));rows=[];points=set()
+ for e in p['kontroller']:
+  if not e['avvik']:continue
+  f=e['frame'];screen=O/label/f'frame_{f:06}_screen.png';whole=next(z for z in (O/label).glob(f'frame_{f:06}_room*.png') if '_flat' not in z.stem)
+  s=np.array(Image.open(screen).convert('RGB'));w=np.array(Image.open(whole).convert('RGB'));yy,xx=np.where(np.any(s!=w,2));assert len(xx)==e['avvik']
+  sig=hashlib.sha256(np.stack([xx,yy],1).tobytes()+s[yy,xx].tobytes()+w[yy,xx].tobytes()).hexdigest()
+  pairs={tuple([int(x),int(y)]+s[y,x].tolist()+w[y,x].tolist()) for x,y in zip(xx,yy)};points|=pairs
+  rows.append(dict(frame=f,avvik=len(xx),bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],signatur=sig,skjerm_sha256=sha(screen),hel_sha256=sha(whole)))
+ return p,rows,points
+b,ba,bp=artifacts('intro-grunnlag3208');c,ca,cp=artifacts('intro-kandidat3276')
+assert b['exit']==c['exit']==0 and len(b['kontroller'])==len(c['kontroller'])==1300
+assert cp==bp and len(cp)==24 and all(e['avvik']<=12 for e in ba+ca)
+assert all(e['bbox'][0]>=544 and e['bbox'][1]>=620 and e['bbox'][2]<=568 and e['bbox'][3]<=639 for e in ba+ca)
+assert len(ba)==31 and len(ca)==34
+secondary={}
+for k in [13,17]:
+ u,ur,up=artifacts(f'kostyme{k}-grunnlag3208');v,vr,vp=artifacts(f'kostyme{k}-kandidat3276')
+ assert u['exit']==v['exit']==0 and u['kontroller']==v['kontroller'] and up==vp
+ assert [e for e in v['kontroller'] if e['avvik']]==[dict(frame=36,avvik=160)]
+ secondary[k]=(u,v)
+save(R/'motor-bufferdiagnose.json',dict(grunnlag=ba,kandidat=ca,grunnlag_antall=31,kandidat_antall=34,grunnlag_signaturer=dict(Counter(e['signatur'] for e in ba)),kandidat_signaturer=dict(Counter(e['signatur'] for e in ca)),alle24_koordinat_rgb_par_identiske=True,koordinat_rgb_par=sorted(cp),ingen_nye_koordinater_eller_fargepar=True,absolutte_framenumre_identiske=False,antall_avvik_ikke_identisk=True,grunnlag_har_3_og_6_piksel_delmengder=True,forklaring='Bakgrunnens kjente blink har samme eksakte pikselkoordinater og begge RGB-verdier. 31 mot 34 målte avviksframes. Introens tids- og fargeforløp er forskjøvet, og de første 17-øyeblikkene har ulike originale fargesykluser utenfor Max. Derfor gjøres i tillegg en separat 17-prøve med identisk oppstart, aktørposisjon og gyldig hel animasjon. Ingen testterskler eller bakgrunnsskript er endret.',sekundaere13_og17_identiske_bufferkontroller=True))
+native=read(R/'egen-native.json')['ruter'];canonical=[e['bilde'] for e in read(R/'prototyper-endelig.json')];selected={};pairs=[]
+for e in native:
+ n=e['bilde'];k=int(n[7:10]);natural=n in c['tegninger']
+ if k==17:u,v=secondary[17];kind='rettet hel 17-animasjon, også logget naturlig'
+ elif n=='costume013_129':u,v=secondary[13];kind='rettet hel 13-animasjon'
+ else:u,v=b,c;kind='spillets egen intro'
+ old,new=u['tegninger'][n],v['tegninger'][n];op,npth=Path(old['fil']),Path(new['fil']);of,nf=op.with_name(op.stem+'_flat.png'),npth.with_name(npth.stem+'_flat.png')
+ assert old['pos']==new['pos'] and old['maal']==new['maal'] and sha(of)==sha(nf),(n,'Originalflate må undersøkes')
+ x,y=new['pos'];w,h=new['maal'];before=np.array(Image.open(op).convert('RGB'));after=np.array(Image.open(npth).convert('RGB'));delta=np.any(before!=after,2);outside=delta.copy();box=[max(0,x*4-8),max(0,y*4-8),min(after.shape[1],(x+w)*4+8),min(after.shape[0],(y+h)*4+8)];outside[box[1]:box[3],box[0]:box[2]]=False
+ assert not outside.any(),(n,'Endring utenfor ny aktørflate',int(outside.sum()))
+ pairs.append(dict(bilde=n,faktisk_linux=True,naturlig_intro_logget=natural,pargrunnlag=kind,grunnlag_frame=old['bildeframe'],kandidat_frame=new['bildeframe'],original_flat_sha256=sha(nf),grunnlag_sha256=sha(op),kandidat_sha256=sha(npth),native_sha256=sha(O/'mod-intro3276'/e['fil']),rekt_med_8hd_marg=box,endrede_piksler=int(delta.sum()),utenfor_ny_aktorflate=0));selected[n]=(old,new)
+assert len(pairs)==68 and len(canonical)==58
+shots=[];boards=[]
+for start in range(0,len(canonical),6):
+ board=Image.new('RGB',(1320,1050),'#304050');draw=ImageDraw.Draw(board)
+ for j,n in enumerate(canonical[start:start+6]):
+  old,new=selected[n];x,y=new['pos'];w,h=new['maal'];box=(x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8);xx=(j%2)*660;yy=(j//2)*350
+  draw.text((xx+8,yy+8),n+' original / egen HD i faktisk motor',fill='white')
+  for z,row in enumerate([old,new]):
+   im=Image.open(row['fil']).convert('RGB').crop(box);im.thumbnail((320,310),Image.Resampling.LANCZOS);board.paste(im,(xx+8+z*330,yy+30))
+  f=R/(n+'-faktisk-linux.png');shutil.copy2(new['fil'],f);shots.append(dict(bilde=n,fil=f.name,sha256=sha(f),frame=new['bildeframe']))
+ f=R/f'motor-varianter-{start//6+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=canonical[start:start+6]))
+whole_pairs=[]
+for n in ['costume013_000','costume013_001','costume013_002','costume013_129','costume017_1920','costume017_1937','costume017_1954','costume018_1920','costume018_1928','costume018_1930','costume018_1938']:
+ old,new=selected[n];board=Image.new('RGB',(1280,430),'#304050');draw=ImageDraw.Draw(board);draw.text((8,8),n+f': 3208 frame {old["bildeframe"]} / 3276 frame {new["bildeframe"]}, identisk originalflate',fill='white')
+ for i,row in enumerate([old,new]):board.paste(Image.open(row['fil']).convert('RGB').resize((640,400)),(i*640,30))
+ f=R/(n+'-for-etter.png');board.save(f);whole_pairs.append(dict(bilde=n,fil=f.name,sha256=sha(f)))
+natural_shots=[]
+for n in ['costume017_1920','costume017_1937','costume017_1954']:
+ e=c['tegninger'][n];f=R/(n+'-naturlig-intro-linux.png');shutil.copy2(e['fil'],f);natural_shots.append(dict(bilde=n,fil=f.name,sha256=sha(f),frame=e['bildeframe']))
+save(R/'motor-pikselkontroll.json',pairs)
+save(R/'motor-visuell-plan.json',dict(faktisk_linux=True,binar_sha256=c['binar_sha256'],hele_bilder=shots,brett=boards,hele_for_etter=whole_pairs,naturlige17=natural_shots,visuelt_sett=False,alle68_identiske_originalflater=True,alle68_utenfor_ny_aktorflate=0,naturlig_intro_logget=67,siste_129_rettet_prove=True,ekstra17_parprove=41,egne_varianter=58,full_naturlig_gjennomspilling=False))
+save(R/'motor-sammenligning.json',dict(grunnlag_native=3208,kandidat_native=3276,forventet=68,sett=68,mangler=[],alle_nye_kildemal_sett=True,kontroller_identiske=False,avviksrekkefolge_identisk=False,absolutte_framenumre_ikke_sammenlignbare=True,avvikskoordinater_og_rgb_par_identiske=True,ingen_nye_feilpiksler=True,intro_grunnlag_avviksframes=31,intro_kandidat_avviksframes=34,intro_maks_avvik=12,intro_avvik_bbox=[544,620,568,639],kontrollantall=1600,nullkontroller=1564,grunnlag_nullkontroller=1567,sekundaere13_og17_identiske_kontroller=True,sekundaert_kjent_avvik=dict(frame=36,avvik=160),intro_random_seed=20261021,bakgrunnsskript200_201_beholdt=True,alle68_original_flat_sha256_identiske=True,alle68_utenfor_ny_aktorflate=0,naturlig_intro67=True,rettet_hel_animasjon13_5=True,ekstra_rettet_hel_animasjon17_41=True,naturlig_full_gjennomspilling=False,full_visuell_vurdering_gjenstar=True,visuelt_sett=False,binar_sha256=c['binar_sha256']))
+shutil.copy2(__file__,R/'vis-motor.py.txt')
+print('68 identiske originalflater, null utenfor nye aktørflater. Samme 24 bakgrunnsfeilpar, 31/34 avviksframes. 58 varianter og 11 før/etter-par klare til visning.',flush=True)

@@ -1,0 +1,34 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+import json,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+def run(label):
+    if label=='intro-grunnlag3208':
+        text=(P/'out/sam-max-intro-20261021/kildeavspilling.py').read_text()
+        text=text.replace('kildemotor-intro',label).replace('kildeavspilling.py.txt',label+'.py.txt')
+        text=text.replace('(10|12)', '(13|17|18)')
+        text=text.replace("['fig010_01','fig010_02','fig012_01','fig012_02','fig012_03']", "['fig013_01','fig017_01','fig017_02','fig018_01','fig018_02','fig018_03','fig018_04']")
+        text=text.replace('timeout=240','timeout=480')
+    else:
+        text=(P/'out/sam-max-intro-20261021/kilde12-hel.py').read_text()
+        text=text.replace('kildemotor12-hel',label).replace('kilde12-hel.py.txt',label+'.py.txt')
+        text=text.replace("DIGHD_TEST_COSTUME='12'", "DIGHD_TEST_COSTUME='13'")
+        text=text.replace("DIGHD_TEST_POS='104,171'", "DIGHD_TEST_POS='187,184'")
+        text=text.replace("DIGHD_TEST_ANIMATION='6',", '')
+        text=text.replace("DIGHD_TEST_CHORE_EVERY='10000'", "DIGHD_TEST_CHORE_EVERY='24'")
+        text=text.replace("DIGHD_QUIT_AT='240'", "DIGHD_QUIT_AT='360'")
+        text=text.replace(r'costume\s*12',r'costume\s*13').replace('costume012_', 'costume013_')
+        text=text.replace('kostyme=12', 'kostyme=13').replace('pos=[104,171]', 'pos=[187,184]')
+        text=text.replace('animasjon=6', 'animasjon="alle gyldige animasjoner fra COST-hodet"')
+        text=text.replace('len(obs)==20', 'len(obs)==5')
+    text=text.replace("'--debuglevel=1'", "'--random-seed=20261021','--debuglevel=1'")
+    text=text.replace('proof=dict(', 'proof=dict(random_seed=20261021,')
+    f=O/(label+'.py');f.write_text(text)
+    q=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,capture_output=True,text=True,timeout=520)
+    (R/(label+'-utskrift.txt')).write_text(q.stdout+q.stderr)
+    print(label,q.returncode,q.stdout.strip(),flush=True)
+    assert q.returncode==0
+with ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(run,['intro-grunnlag3208','kostyme13-grunnlag3208']))
+shutil.copy2(__file__,R/'kildemotor.py.txt')

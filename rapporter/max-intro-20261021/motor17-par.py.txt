@@ -1,0 +1,16 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+meta=json.loads((P/'work/extract/costumes.json').read_text())['17'];assert not meta['advarsler'] and all(len(a['ruter'])==41 for a in meta['animasjoner'] if a['animasjon']==6)
+def run(label):
+ s=(O/'kostyme13-grunnlag3208.py').read_text().replace('kostyme13-grunnlag3208',label)
+ s=s.replace("DIGHD_TEST_COSTUME='13'","DIGHD_TEST_COSTUME='17'").replace("DIGHD_TEST_POS='187,184'","DIGHD_TEST_POS='160,183'")
+ s=s.replace("DIGHD_TEST_CHORE_EVERY='24'","DIGHD_TEST_CHORE_EVERY='10000',DIGHD_TEST_ANIMATION='6'").replace("DIGHD_QUIT_AT='360'","DIGHD_QUIT_AT='240'")
+ s=s.replace(r'costume\s*13',r'costume\s*17').replace('kostyme=13','kostyme=17').replace('costume013_', 'costume017_').replace('pos=[187,184]','pos=[160,183]')
+ s=s.replace('animasjon="alle gyldige animasjoner fra COST-hodet"','animasjon=6').replace('len(obs)==5','len(obs)==41').replace("f'costume017_{n}'","f'costume017_{n:03}'")
+ if 'kandidat' in label:s=s.replace("str(P/'mods/gpt')","str(O/'mod-intro3276')")
+ f=O/(label+'.py');f.write_text(s)
+ q=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,capture_output=True,text=True,timeout=180);(R/(label+'-utskrift.txt')).write_text(q.stdout+q.stderr);print(label,q.returncode,q.stdout.strip(),flush=True);assert q.returncode==0
+with ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(run,['kostyme17-grunnlag3208','kostyme17-kandidat3276']))
+shutil.copy2(__file__,R/'motor17-par.py.txt')

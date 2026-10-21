@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/max-intro-20261021';C=R/'kall/R15'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+out=Image.new('RGBA',(1536,1024));proof=[]
+for name,ids in [('K10',[2,3,4]),('R15',[1,4,5])]:
+ f=R/f'kall/{name}/raa.png';a=np.array(Image.open(f).convert('RGBA'));lab,n=nd.label(a[:,:,3]>=128,structure=np.ones((3,3),bool))
+ assert n==dict(K10=6,R15=5)[name]
+ dist,ix=nd.distance_transform_edt(lab==0,return_indices=True);labels=lab[tuple(ix)];keep=np.isin(labels,ids)&(dist<=1.5);a[~keep]=0
+ out.alpha_composite(Image.fromarray(a));proof.append(dict(kall=name,raa_sha256=sha(f),egne_komponenter=ids,originalmaske=False))
+f=C/'egen-sammensetting.png';out.save(f);p=C/'plan.json';d=json.loads(p.read_text());d.update(egen_sammensetting=f.name,egen_sammensetting_sha256=sha(f),egen_sammensetting_kilder=proof,egen_sammensetting_grunn='R15 mistet den separate svarte Max-/vindusdelen til venstre. Bevarer den fra eget K10-maleri av samme kilde, med egen alfa. Ny høyre bildør/stjerne fra R15. Ingen originale fragmenter eller maskeklipping.');save(p,d)
+shutil.copy2(__file__,R/'rett-bildor.py.txt');print('Egne venstrefragmenter fra K10 og ny høyre bildør fra R15 satt sammen, ingen originalmaske.')

@@ -1,0 +1,129 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+for name in ['intro-grunnlag3208','kostyme13-grunnlag3208']:
+    p=R/(name+'.json');d=read(p);q=p.with_name(p.stem+'-foer-navneformat.json');assert not q.exists();shutil.copy2(p,q)
+    d['tegninger']={f'costume{e["kostyme"]:03}_{e["cel"]:03}':e for e in d['tegninger'].values()}
+    d.update(korrigert_bare_rutenavn_til_minimum_tre_sifre=True,original_logg_og_bilder_uendret=True)
+    if name.startswith('intro'):
+        want={t['bilde'] for e in read(R/'ruteplan-unik.json')['ruter'] for t in e['malruter']}
+        d.update(sett=len(want&set(d['tegninger'])),mangler=sorted(want-set(d['tegninger'])))
+        assert d['sett']==67 and d['mangler']==['costume013_129']
+    save(p,d)
+intro=read(R/'intro-grunnlag3208.json');part=read(R/'kostyme13-grunnlag3208.json')
+plan=read(R/'ruteplan-unik.json');entries={e['bilde']:e for e in plan['ruter']}
+obs={n:(intro['tegninger'][n] if n in intro['tegninger'] else part['tegninger'][n]) for n in entries}
+save(R/'kilde-motorobservasjoner.json',dict(tegninger=obs,mal=68,egne_varianter=58,
+     naturlig_intro=67,rettet_kostyme13_129=True,visuelt_sett=False,
+     sporingsrettelse='000/001/002 var logget som 0/1/2 i tidligere kontrollister; bare 129 manglet naturlig.'))
+groups=[
+ ['costume013_000','costume013_001','costume013_002'],
+ ['costume013_128','costume013_129'],
+ ['costume017_1920','costume017_1924','costume017_1925','costume017_1926'],
+ ['costume017_1927','costume017_1928','costume017_1929','costume017_1930'],
+ ['costume017_1931','costume017_1932','costume017_1933','costume017_1934'],
+ ['costume017_1935','costume017_1936','costume017_1937','costume017_1938'],
+ ['costume017_1939','costume017_1940','costume017_1941','costume017_1942'],
+ ['costume017_1943','costume017_1944','costume017_1945','costume017_1947'],
+ ['costume017_1948','costume017_1949','costume017_1952','costume017_1953'],
+ ['costume017_1954'],
+ ['costume017_1955','costume017_1956','costume017_1957','costume017_1959'],
+ ['costume018_1920','costume018_1923','costume018_1924','costume018_1925'],
+ ['costume018_1926','costume018_1927'],
+ ['costume018_1928'],['costume018_1929'],['costume018_1930'],
+ ['costume018_1931','costume018_1932'],
+ ['costume018_1934','costume018_1935','costume018_1936','costume018_1937'],
+ ['costume018_1938','costume018_1939','costume018_1940'],
+ ['costume018_1941'],['costume018_1942']]
+assert {n for g in groups for n in g}==set(entries) and sum(map(len,groups))==58
+
+def note(n):
+    k,c=map(int,[n[7:10],n[11:]])
+    if k==13:
+        if c in [0,1,2]:return ('Only the detached BACK of Max\'s head and ears, with no visible eyes, nose, mouth, body or shoulders. '
+            'Keep the exact three distinct ear bends and the cream lower head shadow of this source phase. It is an animation layer, not a complete character.')
+        if c==128:return ('Max\'s complete source BODY layer with the small orange/tan inanimate clockwork prop at the left. '
+            'The separate back-of-head layer is NOT part of this drawing. Preserve all cream body fragments, the long thin arm contacting the prop, '
+            'hands, feet, blue-gray prop rim and loose reddish-brown wire exactly as visible. Do not fill the intentionally missing head area.')
+        return ('Max\'s headless cream BODY layer only, with belly circle, arms and feet in the exact source pose. '
+                'Do not add any head or ears, neck stump, red colors, prop or ground shadow. The head is a separate layer in the game.')
+    if k==17:
+        if c<=1927:return ('Max turns and gathers himself to leap toward the car. Preserve this exact crouch, ear curvature, back/front orientation, '
+                          'cream color and limbs. The back views show no face; front views have the exact source grin.')
+        if c<=1938:return ('Max leaps toward the car, with ears stretching and the increasingly dark source palette. '
+                          'Keep the exact visible grin, red inner ear, bent limbs, detached marks and flattened ear tips that THIS source shows. '
+                          'Do not brighten the dark shadow phases or add missing outlines or body parts.')
+        if c==1954:return ('Only the intentionally cropped colored fragment from the car/Max animation, with angular blue-gray edges, '
+                          'orange/tan areas, black negative spaces and the small pale marks visible in the source. '
+                          'Do not turn this into a full car, face, head or complete Max. Preserve every detached piece and internal transparent gap.')
+        return ('Only the intentionally small dark silhouette or disconnected fragment shown as Max disappears behind the car. '
+                'Preserve this exact black/gray shape and any tiny blue-gray or pale colored mark; no completed character, eyes or extra details. '
+                'Keep the internal holes and separate dots exactly as shown.')
+    if c<=1924:return ('Max stands facing the viewer with his wide toothy grin and changing ear/arm/leg pose. '
+                       'Preserve the exact cream colors, small black eyes, red nose, belly circle and visible teeth. No additional details.')
+    if c<=1927:return ('Max springs toward the laboratory antagonist. He becomes strongly shaded in this source phase, '
+                       'with a very dark face and large white grin. Preserve this exact pose and shadow palette, the long bent ears, '
+                       'fingers and any source green hand fragment. Do not replace the dark lighting with bright master-sheet colors.')
+    if c<=1930:return ('This ONE complete source drawing contains BOTH Max and the green long-snouted laboratory antagonist. '
+                       'Max is the dark rabbit-like character with long ears and large white grin. The green long-snouted character '
+                       'with thin angular hands is a separate antagonist. Match the exact cartoony leap, limb overlaps, contact points, '
+                       'open mouth, white teeth, shadows and intentionally cropped lower boundaries. Keep all visible parts together; '
+                       'no anatomical redesign, no completion of hidden areas and no added props. This is the original stylized slapstick scene.')
+    if c<=1932:return ('Only the intentionally cut and disconnected fragments from the two-character cartoon motion. '
+                       'Preserve the long dark rabbit ears, tiny red inner-ear regions, cream/gray fragments, green hand pieces and orange detail '
+                       'only where THIS source contains them. Never reconnect pieces or reconstruct invisible heads or bodies.')
+    if c==1942:return ('The terminal animation particle: one tiny pale gray/cream square fleck, source visible area exactly one original pixel. '
+                       'Draw that one flat fleck at the same 4x size and location in the atlas, with true alpha around it. '
+                       'No extra particles, glow, outline, dust cloud or character. This is a deliberate one-pixel source detail, not empty padding.')
+    return ('The source\'s stylized gray DUST CLUMPS from the cartoon scuffle. Each source drawing has several disconnected gray forms, '
+            'small flecks, pale highlighted rims and darker flat centers, with intentional transparent gaps. '
+            'Draw each exact gray clump and fleck smoothly; do not turn them into a blurred smoke fog, stones, faces or a solid cloud. '
+            'Keep the original rhythm of the separate pieces and do not add particles.')
+
+allcalls=[]
+for i,names in enumerate(groups,1):
+    C=R/'kall'/f'K{i:02}';C.mkdir(parents=True)
+    atlas=Image.new('RGBA',(1536,1024),(255,0,255,255));records=[]
+    cols=2 if len(names) in [2,4] else len(names);rows=2 if len(names)==4 else 1
+    cw,ch=1536//cols,1024//rows
+    jobs=list(dict.fromkeys(t['jobb'] for n in names for t in entries[n]['malruter']))
+    originals='\n\n'.join((A/'jobber'/j/'prompt.txt').read_text() for j in jobs)
+    (C/'opprinnelige-prompter.txt').write_text(originals)
+    for z,n in enumerate(names):
+        e=entries[n];im=Image.open(P/'work/extract/costumes'/(n+'.png')).convert('RGBA')
+        assert hashlib.sha256(im.tobytes()).hexdigest()==e['rgba_sha256']
+        b=im.getbbox();cut=im.crop(b);s=min(4,(cw-96)/cut.width,(ch-96)/cut.height)
+        # Full source drawings may be shrunk only in the prompt atlas; native target remains 4x.
+        w,h=round(cut.width*s),round(cut.height*s);x=(z%cols)*cw+(cw-w)//2;y=(z//cols)*ch+(ch-h)//2
+        atlas.alpha_composite(cut.resize((w,h),Image.Resampling.NEAREST),(x,y))
+        records.append(dict(bilde=n,canonical_rgba_sha256=e['rgba_sha256'],celle=[(z%cols)*cw,(z//cols)*ch,cw,ch],
+                            reference_pos=[x,y],reference_skala=s,maal=[w,h],kilde_bbox=list(b)))
+    atlas.save(C/'reference-atlas.png')
+    prompt=originals+'''
+
+SELECTED ATLAS PRODUCTION PASS. The text above is the preserved complete-sheet brief. For THIS call, Image 1 is a selected source atlas. Render exactly its separate complete source drawings, in the same cells, size and position, rather than generating the complete job sheets. Image 2 is Max's approved master, used only for identity and clean Purcell drawing style. Image 1 controls every pose, partial layer, proportion, shadow palette, internal hole, separate particle and visible detail. Do not copy a pose or bright color from the master onto a deliberately dark source. Output one 1536 x 1024 RGBA image on genuinely transparent background, no magenta, white, gray, checkerboard, labels, grid, ground shadow or glow. Clean smooth hand-drawn curves and flat original colors, no pixel steps, texture or extra details. Every selected source cell is a single complete painting even when it contains multiple characters or disconnected parts. Leave all unused space transparent and keep paintings inside their own cell with generous separation.
+
+Verified game context: the opening laboratory, room 2, palette 0, primary script 65. Max first confronts the green laboratory antagonist in a stylized cartoon scuffle which becomes separate gray dust clumps. Later Max handles the small fictional orange/tan clockwork prop and goes toward the car. Preserve the literal source drawings and their sequence. Never restore hidden bodies or replace shadow colors with normal colors.
+'''
+    for z,e in enumerate(records):prompt+=f'\nCell {z+1}: {e["bilde"]}, rectangle {e["celle"]}, drawing top-left {e["reference_pos"]}, visible size {e["maal"]}. {note(e["bilde"])}\n'
+    refs=[str(C/'reference-atlas.png'),str(A/'hovedark/max.png')]
+    args=dict(prompt=prompt,referenced_image_paths=refs,transparent_background=True)
+    (C/'prompt-faktisk.txt').write_text(prompt);save(C/'argumenter-planlagt.json',args)
+    save(C/'plan.json',dict(ruter=records,jobber=jobs,referanser={f:sha(Path(f)) for f in refs},
+         originalprompt_ordrett=True,ingen_kall_enna=True,kildescene_og_anker_visning_gjenstar=True))
+    allcalls.append(dict(kall=C.name,ruter=names,argumenter=str(C/'argumenter-planlagt.json')))
+save(R/'kallplan.json',allcalls)
+names=list(entries)
+for start in range(0,len(names),6):
+    board=Image.new('RGB',(1920,860),'#304050');draw=ImageDraw.Draw(board)
+    for j,n in enumerate(names[start:start+6]):
+        e=obs[n];im=Image.open(e['fil']).convert('RGB');assert sha(Path(e['fil']))==e['sha256']
+        x=(j%3)*640;y=(j//3)*430
+        board.paste(im.resize((640,400)),(x,y+25));draw.text((x+8,y+7),f'{n}, faktisk kilde frame {e["bildeframe"]}',fill='white')
+    board.save(R/f'kilde-spillkontekst-{start//6+1}.png')
+shutil.copy2(__file__,R/'atlas-og-prompter.py.txt')
+print('21 valgte atlas,58 hele kilder,10 spillkontekstbrett. Rutenavn rettet:67 naturlige mål,129 fra rettet prøve. Vis før hvert bildekall.')

@@ -1,0 +1,20 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert all(sha(O/'mod-intro3276'/f)==h for f,h in read(R/'kandidatfilhash.json').items())
+def run(label):
+ old='intro-grunnlag3208' if label=='intro-kandidat3276' else 'kostyme13-grunnlag3208'
+ s=(O/(old+'.py')).read_text().replace(old,label)
+ s=s.replace("str(P/'mods/gpt')","str(O/'mod-intro3276')").replace("sha(P/'mods/gpt/mod.json')","sha(O/'mod-intro3276/mod.json')")
+ s=s.replace("f'costume{c:03}_{n}'","f'costume{c:03}_{n:03}'").replace("f'costume013_{n}'","f'costume013_{n:03}'")
+ f=O/(label+'.py');f.write_text(s)
+ q=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,capture_output=True,text=True,timeout=520)
+ (R/(label+'-utskrift.txt')).write_text(q.stdout+q.stderr);print(label,q.returncode,q.stdout.strip(),flush=True);assert q.returncode==0
+ return read(R/(label+'.json'))
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,['intro-kandidat3276','kostyme13-kandidat3276']))
+assert rows[0]['sett']==67 and rows[0]['mangler']==['costume013_129'] and len(rows[1]['tegninger'])==5
+assert rows[0]['binar_sha256']==rows[1]['binar_sha256']=='5d367480767ac23ca13e1a3b07ef8b481ef163b5b1efbf00534fd0b1123a4e29'
+want={e['bilde'] for e in read(R/'egen-native.json')['ruter']};obs={**rows[1]['tegninger'],**rows[0]['tegninger']};assert not want-set(obs)
+shutil.copy2(__file__,R/'motor.py.txt');print('Alle 68 nye mål logget i faktisk Linux. Piksel- og visuell sammenligning gjenstår.',flush=True)
