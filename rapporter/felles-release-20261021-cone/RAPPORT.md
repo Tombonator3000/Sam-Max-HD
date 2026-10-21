@@ -1,3 +1,11 @@
+Felles Linux og Windows med 3535 native er publisert og Latest-bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-cone. Hele Cone of Tragedy-familien på åtte ark og 64 nye native siden forrige fellesutgave er med. Begge faktiske plattformnedlastinger og fellesvedleggene er hentet med SHA-filer og bekreftet byteidentiske. Alle 21777 runtime-moddfiler per pakke er kontrollert. Alle 64 nye native er observert i begge avspillinger i den nye Linux-binæren, og 128 figurutsnitt er identiske med produksjonen. Hver side har 1436 av 1440 nullkontroller med identiske kjente 416/160-avvik ved bilde 24/25, eksakte koordinater og begge RGB-verdier. Alle 128 originalflater er SHA-like, uten endringer utenfor faktisk loggede nye aktørflater. 43 hele varianter og ni hele før/etter-par er sett. Hele prøven er ikke avviksfri.
+
+497 av 1758 figurark har resultat; 1261 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Den siste bunken har tre ark og 14 native fra 14 hele egne malerier, med 24 vellykkede innebygde kall og ti kvalitetsreturer. Sju omrissvarsler er visuelt vurdert; ingen FEIL, alle 14 native automatisk OK med uendrede porter. Alle 21778 publiserte filhash, tidligere PNG, 1380 beskyttede kilder, tre stasher og 38 tidligere releaser er bevart. Ingen ny Tom-/Claude-godkjenning eller visuell sluttgodkjenning. En synlig bakgrunnskant rundt kjegletoppen, også i lukkede faser, er en åpen retur som undersøkes videre. Ingen motor-/pipelineendring. Naturlig gjennomspilling, interaktiv Windows, ny webtest og kjente SDL-/inventar-/testhoppbegrensninger gjenstår.
+
+Neste: følg opp eventuelle ekstra taggbygg før nativefrys frigjøres. Deretter undersøk kantreturen med faktisk kilde/lagsammenheng og behold råbilder/aliaser. Fortsett øvrige produserbare grafikkjobber. Ingen omprøve av tidligere avviste motiver eller eksakte aliaser; ugyldige 344/346 og råvalg 28 kjøres ikke. Automatikken fortsetter, uten gamle nattprosesser.
+
+Nativefrysen beholdes mens de registrerte ekstra pakkebyggene kjører. Ikke start duplikater eller avbryt dem.
+
 Linux og Windows inneholder **3535 native HD-bildelag**, med **64 nye ruter fra Cone of Tragedy** siden forrige fellesutgave. Alle åtte ark i kostyme 88 er levert, fra Sam og Max i mekanismen til fall, svimmelhet og åpnet topp. Familien har 43 hele egne tegninger og 21 kildebekreftede identiske hele bildealiaser. HD-grafikken er fortsatt under arbeid.
 
 Last ned **SamMaxHD-Windows.zip** for Windows eller **SamMaxHD-x86_64.AppImage** for Linux. Ctrl+H bytter grafikk, F5 åpner originalmenyen.
@@ -19,5 +27,3 @@ Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/ra
 Spillet og grafikken tilhører Disney/Lucasfilm.
 
 Windows-kjøringen feilet i første forsøk med SDL_BlitSurface src-invalid før spillet/HD ble lastet. Feilloggen er bevart. Én avgrenset omprøve med samme kode og testflagg bestod; dette retter ikke den sporadiske startfeilen.
-
-Linux-binær SHA256 bb37b500074cf42112d8ac5462138edbb2312e1c7d39b00ced263b5111f74d55. Nativefrys beholdes til bekreftet fellespublisering og kontroll av eventuelle ekstra taggbygg.
