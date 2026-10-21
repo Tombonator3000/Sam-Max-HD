@@ -1,0 +1,51 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-svanebaat3371';T=O/'publisering-hdmod3371'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True))
+remote=lambda branch:api('git/ref/heads/'+branch)['object']['sha']
+b=read(R/'grunnlag-produksjon.json');files=read(R/'kandidatfilhash.json');proof=read(R/'sluttkontroll.json');motor=read(R/'motor-sammenligning.json');protected=read(R/'beskyttede-samlet1300.json')
+assert not T.exists() and not (R/'publisering-forsokt.json').exists()
+assert not git(A,'status','--porcelain');art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art
+assert b['fjern_sha']=='41fe60bc55e1c7dd0ba9a486ffa3f8189093a766' and remote('hd-mod')==b['fjern_sha']
+assert all(sha(M/f)==h for f,h in b['filer'].items()) and len(files)==21614 and all(sha(C/f)==h for f,h in files.items())
+assert len(protected)==1300 and all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert proof['visuelt_sett'] and proof['motorobservert'] and motor['visuelt_sett'] and motor['primaerskript201_kjort']
+assert {e['jobb'] for e in proof['leveranser']}=={f'fig097_{i:02}' for i in range(1,9)}
+assert motor['sett']==47 and motor['kontrollantall']==720 and motor['nullkontroller']==718
+assert motor['avvikskoordinater_og_rgb_par_identiske'] and motor['ingen_nye_feilpiksler'] and motor['kontroller_identiske']
+assert motor['alle190_original_flat_sha256_identiske'] and motor['alle94_utenfor_baatflate']==0
+extra=api('actions/runs/39591712087');assert extra['conclusion']=='success' and extra['run_attempt']==1 and extra['head_sha']=='5a13494b74c29d9974900ef1c0eac80f9c86559c';save(R/'ekstra-taggbygg-gront.json',dict(id=extra['id'],head_sha=extra['head_sha'],conclusion=extra['conclusion'],run_attempt=extra['run_attempt'],url=extra['html_url'],native_frys_frigitt=True))
+for workflow in ['linux.yml','windows.yml']:
+    runs=api('actions/workflows/'+workflow+'/runs?per_page=15')['workflow_runs'];assert not any(e['status']!='completed' for e in runs),'Ikke endre native under aktivt pakkebygg'
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=b['fjern_sha'],forventet_native=3371,force_with_lease=True))
+shutil.copytree(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts and p.name!='SHA256SUMS'}
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(manifest.items())))
+assert all(manifest[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+subprocess.run(['git','-C',str(T),'add','-A'],check=True)
+subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod 3371: svanebåt i åtte kontrollerte ark, 47 nye ruter'],check=True)
+assert remote('hd-mod')==b['fjern_sha']
+subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+b['fjern_sha'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=remote('hd-mod');assert published==git(T,'rev-parse','HEAD')
+subprocess.run(['bash','tools/mod_gren.sh','hent',str(M)],cwd=P,check=True)
+actual={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual)==set(files) and len(actual)==21614 and {f for f,h in files.items() if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)==3371 and read(M/'mod.json')['costume_cels']==3371
+assert git(P,'stash','list','--format=%H').splitlines()==b['stash'] and all(sha(A/f)==h for f,h in protected.items()) and remote('hd-mod')==published
+save(R/'publiserte-moddfiler-3371.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=3371,nye_native=47,nye_hele_ark=8,hele_figurjobber=473,gjenstar=1285,filantall=21614,png=21608,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_png_bevart=21561,beskyttede=1300,stasher=b['stash'],force_with_lease=True,egen_alfa_ingen_originalfragmenter=True,visuelt_sett=True,motorobservert=True,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3324,pakker_mangler_native=47,native_frosset=False,neste_samlepunkt='Etter fig097_09 til fig097_12, eller tidligere ved blokkering.')
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+    d=read(R/name);d.update(publisert=True,hd_mod=published,grafikkilde=art)
+    for e in d.get('leveranser',[]):e.update(publisert=True,hd_mod=published)
+    save(R/name,d)
+line=(f'Codex: publisert og hentet {published}: fig097_01 til fig097_08, 47 nye native og 3371 totalt. 473 av 1758 hele resultatark, 1285 gjenstår pluss returer, katalogfeil og sluttkontroll. Alle 21614 filhash, 21561 tidligere PNG, 1300 kilder og tre stasher bekreftet. Båten er ett helt eget maleri med 46 eksakte hele RGBA- og indeksaliasmål. Alle 47 er avspilt i både primærskript 201 og separat hel animasjon 6. 718 av 720 null på hver side samlet, samme to kjente 160 ved bilde 36. 190 originalflater SHA-identiske og 94 båtpar med null utenfor logget båtflate. Ingen ny Tom-/Claude-godkjenning. Ekstra taggbygg 39591712087 er grønt og gammel nativefrys frigitt. Pakker har 3324 og mangler 47; neste samlepunkt etter resterende fire 97-ark eller ved blokkering. Ingen nye 97_09..12-kall ennå. Se rapporter/{R.name}/NESTE.md.')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;s=p.read_text();i=s.find('\n');p.write_text(s[:i+1]+'\n'+line+'\n'+s[i+1:])
+for name in ['NESTE.md','RAPPORT.md']:
+    with (R/name).open('a') as f:f.write('\n'+line+'\n')
+shutil.copy2(__file__,R/'publiser.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)

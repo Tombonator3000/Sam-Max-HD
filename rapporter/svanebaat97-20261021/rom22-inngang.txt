@@ -1,0 +1,158 @@
+; Inngangsskriptet til rom 22 (ENCD)
+
+[0000] (9B) resourceRoutines.lockCostume(95)
+[0006] (9B) resourceRoutines.loadCostume(95)
+[0008] (9B) resourceRoutines.lockCostume(100)
+[000E] (9B) resourceRoutines.loadCostume(100)
+[0010] (9B) resourceRoutines.lockCostume(92)
+[0016] (9B) resourceRoutines.loadCostume(92)
+[0018] (9B) resourceRoutines.lockCostume(101)
+[001E] (9B) resourceRoutines.loadCostume(101)
+[0020] (9B) resourceRoutines.lockSound(25)
+[0026] (9B) resourceRoutines.loadSound(25)
+[0028] (5D) if (var166 == 21) {
+[0032] (9B)   resourceRoutines.lockCostume(96)
+[0038] (9B)   resourceRoutines.loadCostume(96)
+[003A] (9B)   resourceRoutines.lockCostume(97)
+[0040] (9B)   resourceRoutines.loadCostume(97)
+[0042] (9B)   resourceRoutines.lockCostume(98)
+[0048] (9B)   resourceRoutines.loadCostume(98)
+[004A] (9B)   resourceRoutines.lockCostume(99)
+[0050] (9B)   resourceRoutines.loadCostume(99)
+[0052] (9B)   resourceRoutines.lockSound(26)
+[0058] (9B)   resourceRoutines.loadSound(26)
+[005A] (9B)   resourceRoutines.lockSound(27)
+[0060] (9B)   resourceRoutines.loadSound(27)
+[0062] (9B)   resourceRoutines.lockSound(28)
+[0068] (9B)   resourceRoutines.loadSound(28)
+[006A] (**) }
+[006A] (43) VAR_V6_SOUNDMODE = 2
+[0070] (B6) printDebug.begin()
+[0072] (B6) printDebug.msg(sound(0x9EAE9BB, 0xA) + " ")
+[0086] (43) VAR_V6_SOUNDMODE = 0
+[008C] (43) VAR_V6_SOUNDMODE = 2
+[0092] (B6) printDebug.begin()
+[0094] (B6) printDebug.msg(sound(0x9EE7F8A, 0xA) + " ")
+[00A8] (43) VAR_V6_SOUNDMODE = 0
+[00AE] (43) VAR_V6_SOUNDMODE = 2
+[00B4] (B6) printDebug.begin()
+[00B6] (B6) printDebug.msg(sound(0x9EDDEF4, 0xA) + " ")
+[00CA] (43) VAR_V6_SOUNDMODE = 0
+[00D0] (43) VAR_V6_SOUNDMODE = 2
+[00D6] (B6) printDebug.begin()
+[00D8] (B6) printDebug.msg(sound(0x9F23A2E, 0xA) + " ")
+[00EC] (43) VAR_V6_SOUNDMODE = 0
+[00F2] (43) VAR_V6_SOUNDMODE = 2
+[00F8] (B6) printDebug.begin()
+[00FA] (B6) printDebug.msg(sound(0x9F17541, 0xA) + " ")
+[010E] (43) VAR_V6_SOUNDMODE = 0
+[0114] (43) VAR_V6_SOUNDMODE = 2
+[011A] (B6) printDebug.begin()
+[011C] (B6) printDebug.msg(sound(0x9F2A214, 0xA) + " ")
+[0130] (43) VAR_V6_SOUNDMODE = 0
+[0136] (43) VAR_V6_SOUNDMODE = 2
+[013C] (B6) printDebug.begin()
+[013E] (B6) printDebug.msg(sound(0x9E403AA, 0xA) + " ")
+[0152] (43) VAR_V6_SOUNDMODE = 0
+[0158] (43) VAR_V6_SOUNDMODE = 2
+[015E] (B6) printDebug.begin()
+[0160] (B6) printDebug.msg(sound(0x9EC309E, 0xA) + " ")
+[0174] (43) VAR_V6_SOUNDMODE = 0
+[017A] (43) VAR_V6_SOUNDMODE = 2
+[0180] (B6) printDebug.begin()
+[0182] (B6) printDebug.msg(sound(0x9EF59CB, 0xA) + " ")
+[0196] (43) VAR_V6_SOUNDMODE = 0
+[019C] (43) VAR_V6_SOUNDMODE = 2
+[01A2] (B6) printDebug.begin()
+[01A4] (B6) printDebug.msg(sound(0x9F0F9E7, 0xA) + " ")
+[01B8] (43) VAR_V6_SOUNDMODE = 0
+[01BE] (43) VAR_V6_SOUNDMODE = 2
+[01C4] (B6) printDebug.begin()
+[01C6] (B6) printDebug.msg(sound(0x9FBCCF2, 0xA) + " ")
+[01DA] (43) VAR_V6_SOUNDMODE = 0
+[01E0] (5D) if (!isSoundRunning(25)) {
+[01E8] (74)   startSound(25)
+[01EC] (AC)   soundKludge([14,25,0,1,127,120])
+[0202] (**) }
+[0202] (5D) if (var166 == 23) {
+[020C] (74)   startSound(25)
+[0210] (AC)   soundKludge([14,25,0,1,127,60])
+[0226] (**) }
+[0226] (5E) startScript(1,215,[])
+[0230] (5D) if (var166 != 23) {
+[023A] (43)   var174 = VAR_VERB_SCRIPT
+[0240] (7C)   stopScript(var175)
+[0244] (43)   var176 = var175
+[024A] (43)   VAR_VERB_SCRIPT = 209
+[0250] (43)   var175 = 208
+[0256] (5D)   if (VAR_VERB_SCRIPT != 48) {
+[0260] (43)     bitvar6 = 0
+[0266] (73)   } else {
+[0269] (43)     bitvar6 = 1
+[026F] (**)   }
+[026F] (5E)   startScript(0,var175,[])
+[0279] (73) } else {
+[027C] (9D)   actorOps.setCurActor(2)
+[0281] (9D)   actorOps.setCostume(4)
+[0286] (9D)   actorOps.setCurActor(3)
+[028B] (9D)   actorOps.setCostume(5)
+[0290] (99)   setBoxFlags([1,2,3,4],128)
+[02A3] (**) }
+[02A3] (9B) resourceRoutines.loadFlObject(995,94)
+[02AB] (5F) startScriptQuick(5,[])
+[02B2] (9C) roomOps.darkenPalette(0,102,143)
+[02BD] (9D) actorOps.setCurActor(4)
+[02C2] (9D) actorOps.init()
+[02C4] (9D) actorOps.setCostume(92)
+[02C9] (9D) actorOps.setScale(255)
+[02CE] (47) array184[4] = 211
+[02D7] (43) var151 = 2
+[02DD] (9D) actorOps.setCurActor(4)
+[02E2] (9D) actorOps.init()
+[02E4] (9D) actorOps.setCostume(92)
+[02E9] (5D) if (var166 == 21) {
+[02F3] (9D)   actorOps.setCurActor(4)
+[02F8] (9D)   actorOps.setStandFrame(7)
+[02FD] (9D)   actorOps.setWalkFrame(7)
+[0302] (9D)   actorOps.setInitFrame(7)
+[0307] (9D)   actorOps.setElevation(2)
+[030C] (9D)   actorOps.setCurActor(2)
+[0311] (9D)   actorOps.setCostume(326)
+[0316] (9D)   actorOps.setIgnoreBoxes()
+[0318] (9D)   actorOps.setAlwayZClip(1)
+[031D] (9D)   actorOps.setScale(255)
+[0322] (9D)   actorOps.setElevation(44)
+[0327] (9D)   actorOps.setCurActor(6)
+[032C] (9D)   actorOps.init()
+[032E] (9D)   actorOps.setCostume(325)
+[0333] (9D)   actorOps.setIgnoreBoxes()
+[0335] (9D)   actorOps.setAlwayZClip(1)
+[033A] (9D)   actorOps.setScale(255)
+[033F] (9D)   actorOps.setElevation(34)
+[0344] (7F)   putActorInXY(4,0,160,22)
+[0351] (7F)   putActorInXY(2,(getObjectX(4) - 48),(getObjectY(4) + 1),22)
+[0368] (7F)   putActorInXY(6,(getObjectX(4) - 57),(getObjectY(4) + 1),22)
+[037F] (82)   animateActor(4,249)
+[0386] (82)   animateActor(6,249)
+[038D] (82)   animateActor(2,249)
+[0394] (47)   array184[6] = 212
+[039D] (5D)   if (getState(220) == 0) {
+[03A8] (5E)     startScript(1,200,[])
+[03B2] (**)   }
+[03B2] (5E)   startScript(1,216,[])
+[03BC] (73) } else {
+[03BF] (9D)   actorOps.setCurActor(4)
+[03C4] (9D)   actorOps.setIgnoreBoxes()
+[03C6] (9D)   actorOps.setAlwayZClip(1)
+[03CB] (9D)   actorOps.setScale(255)
+[03D0] (7F)   putActorInXY(4,476,180,22)
+[03DD] (82)   animateActor(4,249)
+[03E4] (82)   animateActor(4,8)
+[03EB] (5E)   startScript(1,217,[])
+[03F5] (**) }
+[03F5] (7A) setCameraAt(160)
+[03F9] (43) var187 = 206
+[03FF] (5E) startScript(1,205,[])
+[0409] (43) var194 = 207
+[040F] (65) stopObjectCodeA()
+END

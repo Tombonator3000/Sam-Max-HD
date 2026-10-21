@@ -1,0 +1,72 @@
+; Lokalt skript 200 i rom 22 (LSCR)
+
+Script# 200
+[0000] (43) localvar0 = 0
+[0006] (43) var152 = 2
+[000C] (5D) while (localvar0 <= 840) {
+[0016] (5D)   if (getObjectX(4) < localvar0) {
+[0021] (43)     localvar0 = getObjectX(4)
+[0028] (**)   }
+[0028] (43)   localvar0 = (localvar0 + var152)
+[0032] (7F)   putActorInXY(4,localvar0,180,255)
+[003F] (5D)   if (getActorCostume(2) != 4) {
+[004A] (7F)     putActorInXY(2,(localvar0 - 48),(getObjectY(4) + 1),255)
+[0060] (**)   }
+[0060] (7F)   putActorInXY(6,(localvar0 - 57),(getObjectY(4) + 1),255)
+[0076] (6C)   breakHere()
+[0077] (5D)   if (localvar0 > (VAR_CAMERA_POS_X + 40)) {
+[0085] (5D)     if (var151 == 2) {
+[008F] (5D)       if (VAR_CAMERA_POS_X < 632) {
+[0099] (A9)         wait.waitForMessage()
+[009B] (6C)         breakHere()
+[009C] (5D)         unless (!(VAR_VERB_SCRIPT == 60)) jump 9b
+[00A7] (78)         panCameraTo((VAR_CAMERA_POS_X + 160))
+[00AF] (5D)         if (var152 < 10) {
+[00B9] (A9)           wait.waitForCamera()
+[00BB] (**)         }
+[00BB] (**)       }
+[00BB] (**)     }
+[00BB] (**)   }
+[00BB] (**) }
+[00BE] (AC) soundKludge([259,25,0,0])
+[00CE] (AC) soundKludge([14,25,0,1,0,180])
+[00E4] (5D) while (localvar0 <= 860) {
+[00EE] (5D)   if (getObjectX(4) < localvar0) {
+[00F9] (43)     localvar0 = getObjectX(4)
+[0100] (**)   }
+[0100] (43)   localvar0 = (localvar0 + var152)
+[010A] (7F)   putActorInXY(4,localvar0,180,255)
+[0117] (5D)   if (getActorCostume(2) != 4) {
+[0122] (7F)     putActorInXY(2,(localvar0 - 48),(getObjectY(4) + 1),255)
+[0138] (**)   }
+[0138] (7F)   putActorInXY(6,(localvar0 - 57),(getObjectY(4) + 1),255)
+[014E] (6C)   breakHere()
+[014F] (5D)   if (localvar0 > (VAR_CAMERA_POS_X + 40)) {
+[015D] (5D)     if (var151 == 2) {
+[0167] (5D)       if (VAR_CAMERA_POS_X < 632) {
+[0171] (78)         panCameraTo((VAR_CAMERA_POS_X + 160))
+[0179] (5D)         if (var152 < 10) {
+[0183] (A9)           wait.waitForCamera()
+[0185] (**)         }
+[0185] (**)       }
+[0185] (**)     }
+[0185] (**)   }
+[0185] (**) }
+[0188] (5D) if (VAR_VERB_SCRIPT == 60) {
+[0192] (6C)   breakHere()
+[0193] (5D)   unless ((VAR_VERB_SCRIPT != 60)) jump 192
+[019D] (**) }
+[019D] (7C) stopScript(208)
+[01A1] (43) VAR_VERB_SCRIPT = 48
+[01A7] (7C) stopScript(61)
+[01AB] (6B) cursorCommand.cursorOff()
+[01AD] (6B) cursorCommand.userPutOff()
+[01AF] (CA) delayFrames(5)
+[01B3] (6B) cursorCommand.cursorOn()
+[01B5] (6B) cursorCommand.userPutOn()
+[01B7] (7C) stopScript(202)
+[01BB] (6E) setClass(220,[160])
+[01C5] (43) bitvar18 = 0
+[01CB] (7B) loadRoom(21)
+[01CF] (66) stopObjectCodeB()
+END

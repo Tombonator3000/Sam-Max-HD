@@ -1,0 +1,124 @@
+; Lokalt skript 201 i rom 22 (LSCR)
+
+Script# 201
+[0000] (68) beginCutscene([])
+[0004] (5D) if (VAR_CAMERA_POS_X < 476) {
+[000E] (78)   panCameraTo(476)
+[0012] (A9)   wait.waitForCamera()
+[0014] (7A)   setCameraAt(476)
+[0018] (**) }
+[0018] (70) setState(220,1)
+[001F] (6C) breakHere()
+[0020] (5D) unless ((getObjectX(4) >= 450)) jump 1f
+[002B] (43) var152 = 1
+[0031] (7F) putActorInXY(2,0,0,0)
+[003E] (7F) putActorInXY(6,0,0,0)
+[004B] (9D) actorOps.setCurActor(4)
+[0050] (9D) actorOps.setCostume(96)
+[0055] (9D) actorOps.setElevation(1)
+[005A] (7F) putActorInXY(4,(getObjectX(4) - 49),getObjectY(4),255)
+[006D] (82) animateActor(4,249)
+[0074] (82) animateActor(4,6)
+[007B] (CA) delayFrames(6)
+[007F] (CA) delayFrames(10)
+[0083] (7C) stopScript(216)
+[0087] (B6) printDebug.begin()
+[0089] (B6) printDebug.msg(sound(0x9EAE9BB, 0xA) + " ")
+[009D] (CA) delayFrames(3)
+[00A1] (CA) delayFrames(7)
+[00A5] (43) var152 = 0
+[00AB] (B6) printDebug.begin()
+[00AD] (B6) printDebug.msg(sound(0x9EE7F8A, 0xA) + " ")
+[00C1] (7F) putActorInXY(8,0,0,0)
+[00CE] (43) var154 = 1
+[00D4] (AC) soundKludge([14,25,0,1,105,120])
+[00EA] (AC) soundKludge([14,25,0,4,2,60])
+[0100] (AC) soundKludge([14,25,0,3,-2400,60])
+[0116] (AC) soundKludge([20,60,14,25,0,4,30,60])
+[0132] (AC) soundKludge([20,60,8,26,0])
+[0145] (AC) soundKludge([261,25,0,9,0])
+[0158] (AC) soundKludge([261,25,0,10,0])
+[016B] (43) localvar1 = 1
+[0171] (5D) while (localvar1 <= 7) {
+[017B] (5D)   if (localvar1 == 2) {
+[0185] (B6)     printDebug.begin()
+[0187] (B6)     printDebug.msg(sound(0x9EDDEF4, 0xA) + " ")
+[019B] (**)   }
+[019B] (9C)   roomOps.darkenPalette(50,50,50,0,255)
+[01AC] (9C)   roomOps.darkenPalette(0,102,143)
+[01B7] (6C)   breakHere()
+[01B8] (9C)   roomOps.darkenPalette(255,255,255,0,255)
+[01C9] (9C)   roomOps.darkenPalette(0,102,143)
+[01D4] (6C)   breakHere()
+[01D5] (4F)   localvar1++
+[01D8] (**) }
+[01DB] (9D) actorOps.setCurActor(4)
+[01E0] (9D) actorOps.setCostume(97)
+[01E5] (82) animateActor(4,6)
+[01EC] (74) startSound(27)
+[01F0] (AC) soundKludge([14,27,0,1,0,60])
+[0206] (CA) delayFrames(12)
+[020A] (B6) printDebug.begin()
+[020C] (B6) printDebug.msg(sound(0x9F23A2E, 0xA) + " ")
+[0220] (CA) delayFrames(10)
+[0224] (B6) printDebug.begin()
+[0226] (B6) printDebug.msg(sound(0x9F17541, 0xA) + " ")
+[023A] (CA) delayFrames(10)
+[023E] (CA) delayFrames(4)
+[0242] (9D) actorOps.setCurActor(2)
+[0247] (9D) actorOps.setCostume(4)
+[024C] (9D) actorOps.setIgnoreBoxes()
+[024E] (9D) actorOps.setAlwayZClip(1)
+[0253] (9D) actorOps.setElevation(0)
+[0258] (9D) actorOps.setScale(255)
+[025D] (7F) putActorInXY(2,440,171,22)
+[026A] (79) actorFollowCamera(2)
+[026E] (82) animateActor(2,251)
+[0275] (7E) walkActorTo(2,640,148)
+[027F] (CA) delayFrames(2)
+[0283] (B6) printDebug.begin()
+[0285] (B6) printDebug.msg(sound(0x9F2A214, 0xA) + " ")
+[0299] (CA) delayFrames(10)
+[029D] (9D) actorOps.setCurActor(4)
+[02A2] (9D) actorOps.setCostume(92)
+[02A7] (9D) actorOps.setElevation(0)
+[02AC] (9D) actorOps.setStandFrame(8)
+[02B1] (9D) actorOps.setWalkFrame(8)
+[02B6] (9D) actorOps.setInitFrame(8)
+[02BB] (7F) putActorInXY(4,(getObjectX(4) + 49),getObjectY(4),255)
+[02CE] (82) animateActor(4,249)
+[02D5] (82) animateActor(4,8)
+[02DC] (9D) actorOps.setCurActor(3)
+[02E1] (9D) actorOps.setCostume(5)
+[02E6] (9D) actorOps.setIgnoreBoxes()
+[02E8] (9D) actorOps.setAlwayZClip(1)
+[02ED] (9D) actorOps.setElevation(0)
+[02F2] (9D) actorOps.setScale(244)
+[02F7] (7F) putActorInXY(3,488,171,22)
+[0304] (82) animateActor(3,251)
+[030B] (7E) walkActorTo(3,620,151)
+[0315] (7C) stopScript(200)
+[0319] (A9) wait.waitForActor(-7,2)
+[0320] (A9) wait.waitForActor(-7,3)
+[0327] (9D) actorOps.setCurActor(2)
+[032C] (9D) actorOps.setFollowBoxes()
+[032E] (9D) actorOps.setCurActor(3)
+[0333] (9D) actorOps.setFollowBoxes()
+[0335] (67) endCutscene()
+[0336] (99) setBoxFlags([1,2,3,4],128)
+[0349] (43) var174 = VAR_VERB_SCRIPT
+[034F] (7C) stopScript(var175)
+[0353] (43) var176 = var175
+[0359] (43) VAR_VERB_SCRIPT = 210
+[035F] (43) var175 = 208
+[0365] (5D) if (VAR_VERB_SCRIPT != 48) {
+[036F] (43)   bitvar6 = 0
+[0375] (73) } else {
+[0378] (43)   bitvar6 = 1
+[037E] (**) }
+[037E] (5E) startScript(0,var175,[])
+[0388] (79) actorFollowCamera(VAR_EGO)
+[038C] (43) var194 = 214
+[0392] (5E) startScript(1,213,[])
+[039C] (66) stopObjectCodeB()
+END

@@ -1,0 +1,28 @@
+from pathlib import Path
+from collections import Counter
+import json,hashlib,sys,importlib.util,shutil
+from smhd.gamedata import load,read_index,read_rooms
+from smhd.v6grafikk import decode_costume
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+R.mkdir(exist_ok=True); assert not (R/'dekompilering22.json').exists()
+pre=read(A/'rapporter/felles-release-20261021-bok/neste97-forundersokelse.json')
+assert all(sha(A/f)==h for f,h in pre['observerte_uendrede_jobbfiler'].items())
+save(R/'forundersokelse.json',pre)
+idx=read_index(P/'game/SAMNMAX.000'); d,_=load(P/'game/SAMNMAX.001'); rooms=read_rooms(P/'game/SAMNMAX.001'); room,off=idx.costume_dir[97]
+assert room==22; c=decode_costume(d,rooms[room].offset+off)
+save(R/'kostyme97-header.json',dict(num_anim=c.num_anim,format=c.format,mirror=c.mirror,rom=room,raw_valg=sorted({a['valg'] for a in c.animations}),advarsler=c.errors,palett=list(c.palette),animasjoner=c.animations))
+save(R/'kostyme97.json',read(P/'work/extract/costumes.json')['97'])
+spec=importlib.util.spec_from_file_location('dekompiler97',P/'tools/dekompiler_skript.py'); m=importlib.util.module_from_spec(spec);sys.modules[spec.name]=m;spec.loader.exec_module(m)
+idata,_=m.load(P/'game/SAMNMAX.000');jobs,info=m.finn_jobber(d,idata); jobs=[j for j in jobs if j.rom==22]
+previous=read(A/'rapporter/sam-max223-kilde-20261021/dekompilering45.json')
+desc=m.finn_descumm(previous['descumm']); assert sha(desc)==previous['descumm_sha256']
+W=P/'work/svanebaat97-kilde-20261021/skript'; assert not W.exists(); W.mkdir(parents=True)
+rows=[]
+for i,j in enumerate(jobs):
+    out=m.kjor(desc,j,W/('tmp-'+str(i)+'.bin'));m.skriv(W,j,out);rows.append(dict(sort=j.sort,filer=j.filer,status=j.status,melding=j.melding,advarsler=j.advarsler))
+save(R/'dekompilering22.json',dict(descumm=str(desc),descumm_sha256=sha(desc),descumm_commit=m.descumm_commit(desc),jobber=rows,status=dict(Counter(j.status for j in jobs))))
+shutil.copy2(__file__,R/'kildegrunnlag.py.txt')
+print('COST97:',c.num_anim,'rawvalg',sorted({a['valg'] for a in c.animations}),'advarsler',c.errors)
+print('Rom22-skript:',dict(Counter(j.status for j in jobs)),W)

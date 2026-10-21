@@ -1,0 +1,52 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+native=read(R/'egen-native.json')['ruter']; assert len(native)==47
+def artifacts(label,proof):
+    rows=[];points=set()
+    for e in proof['kontroller']:
+        if not e['avvik']:continue
+        f=e['frame'];screen=O/label/f'frame_{f:06}_screen.png';room=O/label/f'frame_{f:06}_room022.png';s=np.array(Image.open(screen).convert('RGB'));w=np.array(Image.open(room).convert('RGB'));yy,xx=np.where(np.any(s!=w,2));assert len(xx)==e['avvik'];pairs={tuple([int(x),int(y)]+s[y,x].tolist()+w[y,x].tolist()) for x,y in zip(xx,yy)};points|=pairs
+        rows.append(dict(frame=f,avvik=len(xx),signatur=hashlib.sha256(np.stack([xx,yy],1).tobytes()+s[yy,xx].tobytes()+w[yy,xx].tobytes()).hexdigest(),skjerm_sha256=sha(screen),hel_sha256=sha(room)))
+    return rows,points
+allpixels=[];comparisons=[];pairs=[];shots=[];flatproof=[]
+for mode,oldlabel,newlabel in [('hel6','kilde97','kandidat3371'),('primaer201','primaer201','kandidat-primaer3371')]:
+    b,c=read(R/(oldlabel+'.json')),read(R/(newlabel+'.json'))
+    assert b['exit']==c['exit']==0 and b['binar_sha256']==c['binar_sha256'] and len(b['tegninger'])==len(c['tegninger'])==95
+    assert b['kontroller']==c['kontroller'] and len(c['kontroller'])==360 and c['nullkontroller']==359
+    assert [e for e in c['kontroller'] if e['avvik']]==[dict(frame=36,avvik=160)]
+    ba,bp=artifacts(oldlabel,b);ca,cp=artifacts(newlabel,c);assert ba==ca and bp==cp
+    for n in b['tegninger']:
+        old,new=b['tegninger'][n],c['tegninger'][n]
+        assert all(old[k]==new[k] for k in ['pos','maal','viewport_pos','screen_origin','bildeframe'])
+        of=Path(old['fil']).with_name(Path(old['fil']).stem+'_flat.png');nf=Path(new['fil']).with_name(Path(new['fil']).stem+'_flat.png')
+        assert sha(of)==sha(nf),(mode,n,'Originalflater forskjellige')
+        flatproof.append(dict(mode=mode,bilde=n,originalflat_sha256=sha(nf),identisk=True))
+    for e in native:
+        n=e['bilde'];old,new=b['tegninger'][n],c['tegninger'][n];x,y=new['viewport_pos'];w,h=new['maal'];before=np.array(Image.open(old['fil']).convert('RGB'));after=np.array(Image.open(new['fil']).convert('RGB'));delta=np.any(before!=after,2);outside=delta.copy();box=[max(0,x*4-8),max(0,y*4-8),min(after.shape[1],(x+w)*4+8),min(after.shape[0],(y+h)*4+8)];outside[box[1]:box[3],box[0]:box[2]]=False
+        assert not outside.any(),(mode,n,'Forskjell utenfor logget båtflate',int(outside.sum()))
+        allpixels.append(dict(mode=mode,bilde=n,frame=new['bildeframe'],logget_rompos=new['pos'],screen_origin=new['screen_origin'],viewport_pos=new['viewport_pos'],margin_hd=8,endret=int(delta.sum()),utenfor_baatflate=0,originalflat_identisk=True,grunnlag_sha256=sha(Path(old['fil'])),kandidat_sha256=sha(Path(new['fil']))))
+    comparisons.append(dict(mode=mode,kontrollantall=360,nullkontroller=359,kjent_avvik=ca,eksakte_koordinat_rgb_par=sorted(cp),kontroller_identiske=True,avvikskoordinater_og_rgb_par_identiske=True,ingen_nye_feilpiksler=True,alle95_originalflater_SHA_identiske=True,alle47_utenfor_baatflate=0))
+    selected=['costume097_1841','costume097_1857','costume097_1873','costume097_1887']
+    board=Image.new('RGB',(1440,1050),'#304050');draw=ImageDraw.Draw(board)
+    for i,n in enumerate(selected):
+        old,new=b['tegninger'][n],c['tegninger'][n];x,y=new['viewport_pos'];w,h=new['maal'];box=(max(0,x*4-40),max(0,y*4-300),min(1280,(x+w)*4+40),min(800,(y+h)*4+45));xx=i%2*720;yy=i//2*525;draw.text((xx+8,yy+8),mode+' '+n+' : 3324 / kandidat3371',fill='white')
+        for j,e in enumerate([old,new]):
+            im=Image.open(e['fil']).convert('RGB').crop(box);im.thumbnail((345,480),Image.Resampling.LANCZOS);board.paste(im,(xx+8+j*355,yy+30))
+        if mode=='primaer201':
+            f=R/(n+'-motor3371.png');shutil.copy2(new['fil'],f);shots.append(dict(bilde=n,fil=f.name,sha256=sha(f),sett=False))
+            pair=Image.new('RGB',(1280,430),'#304050');dr=ImageDraw.Draw(pair);dr.text((8,8),n+' i primaer201: 3324 / kandidat3371',fill='white')
+            for j,e in enumerate([old,new]):pair.paste(Image.open(e['fil']).convert('RGB').resize((640,400)),(j*640,30))
+            f=R/(n+'-motor-for-etter.png');pair.save(f);pairs.append(dict(bilde=n,fil=f.name,sha256=sha(f),sett=False))
+    f=R/(mode+'-motor-varianter.png');board.save(f)
+save(R/'motor-pikselkontroll94.json',allpixels);save(R/'motor-originalflater190.json',flatproof)
+proof=dict(sett=47,runder=2,kontrollantall=720,nullkontroller=718,sammenligning=comparisons,kontroller_identiske=True,avvikskoordinater_og_rgb_par_identiske=True,ingen_nye_feilpiksler=True,alle190_original_flat_sha256_identiske=True,alle94_utenfor_baatflate=0,visuelt_sett=False,primaerskript201_kjort=True,full_naturlig_gjennomspilling=False)
+save(R/'motor-sammenligning.json',proof);save(R/'motor-visuell-plan.json',dict(hele_motorbilder=shots,hele_for_etter=pairs,varianter=['hel6-motor-varianter.png','primaer201-motor-varianter.png'],visuelt_sett=False))
+sheet=Image.new('RGB',(1536,1110),'#304050');draw=ImageDraw.Draw(sheet)
+for i,e in enumerate(read(R/'fremdrift.json')['leveranser']):
+    im=Image.open(A/e['resultat']).convert('RGBA');bg=Image.new('RGBA',im.size,'#596978');bg.alpha_composite(im);bg=bg.convert('RGB');bg.thumbnail((506,337),Image.Resampling.LANCZOS);x=i%3*512;y=i//3*370;draw.text((x+6,y+5),e['jobb']+' '+e['egenkontroll'],fill='white');sheet.paste(bg,(x+3,y+25))
+sheet.save(R/'aatte-resultatark.png');shutil.copy2(__file__,R/'sammenlign.py.txt')
+print('47 nye mål i begge prøver, 94 par uten forskjell utenfor båten. 190 originalflater SHA-identiske. 718/720 null, samme to kjente 160-avvik. Visuell kontroll gjenstår.',flush=True)
