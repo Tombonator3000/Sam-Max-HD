@@ -1,0 +1,35 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image
+import json, hashlib, subprocess, shutil
+
+P = Path('/home/tom/Sam-Max-HD'); A = P/'work/.gpt-gren'; M=P/'mods/gpt'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+N=A/'rapporter/sam088-kilde-20261021'; Q=A/'rapporter/felles-release-20261021-vr'
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists() and not subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True)
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+assert remote=='d8a3e56f3511c1663d7da733e392bc5557bdea6d' and read(Q/'publisert.json')['native_frys_kan_frigis']
+protected=read(N/'beskyttede-samlet1380.json'); files=read(Q/'moddfiler-3471.json')
+assert len(protected)==1380 and all(sha(A/f)==h for f,h in protected.items())
+assert len(files)==21714 and all(sha(M/f)==h for f,h in files.items()) and read(M/'mod.json')['costume_cels']==3471
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()
+assert stash==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+plan=read(N/'neste-bunke.json'); assert len(plan['jobber'])==5 and plan['maal']==50 and plan['ulike_hele_kilder']==29
+for e in plan['jobber']:
+    J=A/'jobber'/e['jobb']; assert not (J/'resultat.png').exists() and not (J/'retur.md').exists()
+R.mkdir(); save(R/'kildeplan.json',plan); save(R/'beskyttede-samlet1380.json',protected)
+save(R/'grunnlag-produksjon.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),native=3471,filer=files,stash=stash,fjern_sha=remote,art_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),main_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip(),native_frosset=False,forventet_native=3521,figurark_med_resultat=489))
+proof=read(N/'primaer201.json'); canon=[e for e in plan['ruter'] if e['bilde']==e['canonical']]; assert len(canon)==29
+for i,e in enumerate(canon,1):
+    C=R/'kall'/f'K{i:02d}'; C.mkdir(parents=True)
+    src=Image.open(e['kilde']).convert('RGBA'); assert sha(Path(e['kilde']))==e['sha256'] and hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']
+    atlas=Image.new('RGB',(1024,1024),'#596978'); scale=9; pic=src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST)
+    assert max(pic.size)<=828; pos=[(1024-pic.width)//2,(1024-pic.height)//2]; atlas.paste(pic,pos,pic); atlas.save(C/'originalatlas.png')
+    context=Path(proof['tegninger'][e['bilde']]['fil']); assert sha(context)==proof['tegninger'][e['bilde']]['sha256']; shutil.copy2(context,C/'spillkontekst.png')
+    refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst.png']
+    row=dict(bilde=e['bilde'],canonical_rgba_sha256=e['rgba_sha256'],celle=[0,0,1024,1024],kilde_sha256=e['sha256'],kilde_maal=e['maal'],original_plassering_atlas=pos,original_skala_atlas=scale)
+    save(C/'plan.json',dict(kall=C.name,ruter=[row],ingen_kall_enna=True,kilde_og_kontekst_sett=False,reference_atlas_sett=False,referanser_sha256={str(f):sha(f) for f in refs},hele_kilder=True,ingen_originalmaske=True))
+(R/'NESTE.md').write_text('Påbegynt første bunke av Cone of Tragedy: fig088_01 til fig088_05, 50 mål fra 29 hele kilder. Ingen resultater eller native ennå. Gjenoppta kallplanene i denne mappen. Kildegrunnlaget og aliasene står i kildeplan.json. Kilder og aktuelle godkjente mastere skal sees før hvert motiv. Nativegrunnlag 3471 er kontrollert og frysen frigitt. Bevar alle tidligere filer og tre stasher. Ingen automatiske omprøver av tidligere holdte motiver.\n')
+shutil.copy2(__file__,R/'klargjor.py.txt'); print('Fem ark, 50 mål, 29 hele originaler, 1380 kilder og native 3471 kontrollert.')
