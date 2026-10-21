@@ -1,0 +1,54 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib, json, subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter/sam088-foerste-20261021'
+d = json.loads((R / 'mottak-publisert.json').read_text())
+assert d['native'] == 3521 and d['alle_filhash_bekreftet'] and d['alle_tidligere_stier_bevart']
+assert d['tidligere_png_bevart'] == 21708 and d['beskyttede'] == 1380
+git = lambda *a: subprocess.check_output(['git', *a], cwd=P, text=True).strip()
+assert git('branch', '--show-current') == 'main' and not git('status', '--porcelain')
+subprocess.run(['git', 'fetch', '-q', 'origin', 'main'], cwd=P, check=True)
+assert git('rev-parse', 'HEAD') == git('rev-parse', 'origin/main') == 'd1ce5dfce157bd886b2af29183c108dfa76255ff'
+assert git('stash', 'list', '--format=%H').splitlines() == d['stasher']
+tid = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+text = f'''Fem nye hele figurark, fig088_01 til fig088_05, er levert og additivt publisert på hd-mod: **3521 native HD-bildelag**. 494 av 1758 hele figurjobber har resultat; 1264 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Dette er Sam og Max i Cone of Tragedy i rom 17, med tilsiktet opp/ned, squash, fall, bevegelsesmerker og mekanikken bevart. Kilder, spillkontekst og begge godkjente mastere er sett før hvert motiv. Ingen ny Tom-/Claude-godkjenning.
+
+50 nye mål kommer fra 29 hele egne malerier og 21 kildebekreftede identiske hele RGBA-aliasmål. 42 vellykkede innebygde image_gen-kall, derav 13 kvalitetsreturer, er bevart med råbilder, faktiske prompter, argumenter og referansehash. Ett forsøk ble avbrutt uten fil; samme argumenter lyktes senere. Ingen verktøyavslag eller CLI/API-fallback. Python renser eget RGB og egne kanter og plasserer hele malerier med egen myk alfa. To hele malerier er flyttet høyst én originalpiksel per akse innen margen. Ingen hard originalmaske, originalfragmenter eller delkomposisjon. Første arkbygg stoppet ved FEIL, og den hele kilden er omtegnet; ubrukte utkast og returer er bevart.
+
+Alle fem ark har SJEKK med elleve visuelt vurderte omrissvarsler, ingen FEIL. Alle 50 native er automatisk OK. CORE128, IoU 0,6 og dekning 0,8 er uendret. Fem hele resultatark, 29 hele motorvarianter og ni hele før/etter-par er sett. Tre motorbilder er også åpnet separat i full oppløsning. Den faktisk nedlastede Linux-binæren SHA256 `1754ab80def20fa885817c13a9067ed23c69de6252c83a708e78be8bf87aa708` er kjørt med grunnlag 3471 og kandidat 3521 i primærskript 201 og hel animasjon 6. Hver prøve logget alle 64 familieruter, inkludert de 50 nye. Hver side har 1436/1440 null, med identiske kjente overgangsavvik, 100 SHA-like originalflater og null endringer utenfor de faktisk loggede nye aktørflatene med åtte HD-pikslers målemargin. Andre aktører og romskript er ikke skjult. Kontrollerte romhopp, ikke full naturlig gjennomspilling; hele prøven er ikke avviksfri.
+
+Native `{d['hd_mod']}`, grafikkilde `{d['grafikkilde']}` på gpt-arbeid. Etter publisering med eksakt SHA-lås er modden hentet tilbake og alle 21764 filhash bekreftet. Alle 21714 tidligere stier og 21708 tidligere PNG, 1380 beskyttede kilder og tre opprinnelige stasher er bevart. Ingen motor- eller pipelineendring. Bare disse fire dokumentene endres i main. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt med eksisterende Sam-Max-kontroller. Bevis: rapporter/sam088-foerste-20261021 på gpt-arbeid.
+
+[Felles Linux og Windows med 3471 native](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-vr) er fortsatt siste faktisk nedlastede og kontrollerte fellesutgave og mangler disse 50 rutene. Ingen nye pakkebygg er startet i denne bunken. Neste jobb er fig088_06, deretter fig088_07 og fig088_08: 14 mål fra 14 hele kilder, foreløpig uten bildekall eller resultat. Se aktuelle kilder, kontekst og stilankre på nytt før hvert motiv. Pakkesamlepunkt etter hele 88-familien, forventet 3535 hvis de siste 14 leveres, eller tidligere ved blokkering. Begge faktiske plattformnedlastinger, sjekksummer og inkludert grafikk skal bekreftes før en ny fellesutgave kalles oppdatert.
+
+Full naturlig gjennomspilling, interaktiv Windows, ny webtest, kjente SDL-/inventar-/testhoppbegrensninger og samlet sluttkontroll gjenstår. Seks bokark og 46 mål er holdt; tidligere verktøyavviste motiver og hele aliaser omprøves ikke. Resten av 304 følger siste NESTE. Ugyldige 344/346 og råvalg 28 kjøres ikke. Grafikkautomatikken fortsetter uten gammel nattfrist; gamle nattprosesser gjenstartes ikke.
+'''
+for n, title in [('memory.md', 'Gjeldende grafikkstatus'), ('STATUS.md', 'Sist verifisert grafikk')]:
+    p = P / n
+    s = p.read_text()
+    i = s.index('\n')
+    p.write_text(s[:i+1] + f'\n## {title}, {tid}\n\n' + text + '\nTidligere oppføringer nedenfor er bevart som historikk.\n\n' + s[i+1:].lstrip())
+p = P / 'log.md'
+p.write_text(p.read_text().rstrip() + f'\n\n## {tid} (Codex)\n\n' + text)
+p = P / 'todo.md'
+s = p.read_text()
+i = s.index('\n')
+todo = f'''\n## Neste, oppdatert {tid}
+
+- [x] Fig088_01 til fig088_05 levert, visuelt sett, native mottatt, motorobservert, publisert og hentet. Fem ark, 50 nye native, 3521 totalt. 494 av 1758 hele figurjobber har resultat; 1264 gjenstår pluss returer, katalogfeil og sluttkontroll.
+- [x] 29 hele malerier og 21 identiske hele aliasmål. 42 vellykkede innebygde bildekall med 13 kvalitetsreturer og ett avbrutt forsøk uten fil. Alle fem ark SJEKK med elleve visuelt vurderte omrissvarsler, ingen FEIL; alle 50 native automatisk OK. Ingen ny Tom-/Claude-godkjenning.
+- [x] Primærskript 201 og hel animasjon 6 med samme faktisk nedlastede Linux-binær. Alle 64 familieruter logget i hver prøve, 1436/1440 null per side, identiske kjente avvik, 100 SHA-like originalflater og null utenfor nye aktørflater. 29 varianter og ni hele par sett. Alle 21764 publiserte filhash, 21708 tidligere PNG, 1380 kilder og tre stasher bekreftet.
+- [ ] Fortsett fig088_06, fig088_07 og fig088_08 fra rapporter/sam088-kilde-20261021 og siste retur i rapporter/sam088-foerste-20261021. 14 mål fra 14 hele kilder uten bildekall/resultat. Se aktuelle hele originaler, spillkontekst og godkjente Sam-/Max-mastere før hvert motiv. Bevar mekanikken, mellomrommene og smådelene.
+- [ ] Oppdater begge pakker ved samlepunkt etter hele 88-familien, forventet 3535 native, eller tidligere ved blokkering. Fellespakker har 3471 og mangler nå 50. Kontroller aktive bygg/nativefrys, faktiske nedlastinger, sjekksummer og inkludert grafikk før ny fellesutgave kalles oppdatert.
+- [ ] Fortsett øvrige produserbare jobber og returer. Bevar alle tidligere filer, releaser og tre stasher. Ingen omprøve av holdte motiver og aliaser. Ingen ny grafikk i main; nødvendig kode via testet PR.
+- [ ] Samlet sluttkontroll, naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Automatikken fortsetter; gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
+'''
+p.write_text(s[:i+1] + todo + s[i+1:].lstrip())
+print('Oppdatert bare memory.md, todo.md, STATUS.md og log.md.', flush=True)
