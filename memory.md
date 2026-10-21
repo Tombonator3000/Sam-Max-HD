@@ -1,5 +1,23 @@
 # memory.md
 
+## Mennesket og glassdøren045 publisert, 2026-10-21 02:23
+
+Tre nye hele ark fig045_01 til03 er produsert og publisert med18native animasjonsruter fra16ulike hele kilder. Katalogens Sam-premiss var feil. Originalen,rom8 lokalt200 og faktisk kildeavspilling viser et menneske gjennom høyre kontordørs glass,en komisk lang hals og landing ved trapperekkverket. Det grå glasslaget har en kildeekte opak svart åpning. Den bevares,med egen alfa utenfor. Bare den kildeviste menneskeidentiteten er brukt;Sam- og rom007-ankrene styrer strek/materiale.
+
+13innebygde image_gen-kall med råbilder,faktiske prompter og referansehash er bevart. To råutkast er forkastet helt.125ulike hele egne malte komponenter bevarer alle kildehenviste glassbiter,kroppsslirer og blå/svarte fartsstreker. Eksakt hel RGBA-identitet styrer gjenbruk. Hodeformen i en positur og sammenhengen i tre glassfliser ble rettet. Ingen originalpiksler,hard originalmaske,originalfragment-fallback,CLI/API-bildefallback eller senkede grenser. Tre ark er SJEKK med seks omrissvarsler som er visuelt vurdert og beholdt. Alle18automatiske native er OK etter de faste CORE128/IoU0,6/dekning0,8-kravene. Teknisk mottak og egen visuell kontroll er ikke ny Tom-/Claude-godkjenning.
+
+16ulike original/native/motor,tre hele resultatark,seks hele motorbilder og tre før/etter er sett. Samme faktiske Linux-binær ea4f35ca fra felles2958 er brukt på både2958grunnlaget og2976kandidaten.120skjermbufferkontroller i hver,119null og samme kjente160ved36før figurstart60. Alle91kontroller fra60er null,ingen nye eller økte. Tre før/etter har null endringer utenfor de to aktive nye lagene og margen. Alle18nye er motorlogget og visuelt sett. Avgrenset tvungen kildeprøve,pos135107/elevasjon0 kompenserer primærpos135307/elevasjon200. Øvrige romskript er ikke skjult. Det eldre hodet ved trappen finnes også i grunnlaget og skyldes denne tvungne prøvens tilstand. Dette er ikke naturlig gjennomspilling. Direkte byteidentisk RGB mellom nativePNG og motorbildet er ikke bekreftet.
+
+Publisert og hentet hd-mod 513a06ef61fa5eb14708b4ee102dcc3e923f1d2e,2976native,21219filer/21213PNG. Allefilhash er kontrollert. Grafikkilde 6daf1b096442e6e1846c804b22b6a7b3a2cc3334. Alle21201tidligere filstier/21195PNG,1012beskyttede jobbfiler og tre opprinnelige stasher er bevart.421av1758hele figurjobber har resultat;1337gjenstår pluss returer,katalogfeil og samlet sluttkontroll.
+
+Felles Linux-/Windows-utgave står på2958og mangler disse18. Neste samlepunkt etter den neste ordinære052familien skal bygge én gang per plattform,laste ned,bekrefte serverdigester og alle faktiske grafikkhash før en ny fellesutgave kalles oppdatert. Ingen nativefrys nå. Ny grafikk ligger bare på gpt-arbeid/hd-mod. Motor-/pipelinekode er urørt. Main får bare memory,todo,STATUS og log.
+
+Neste052_01til03 har38mål fra35ulike hele kilder og ingen resultater/native. Originalene er sett;rom9 lokalt205 viser Max,den svarte kattekureren og oppdragsdokumentet. Primærskriptstyrt kildeprøve pågår før motivet klargjøres endelig. Tolv052kilder er SHA-festet separat. Ingen ny052grafikk er telt som levert.
+
+Ekstra Windows-taggbygg39516493921er completed/success,separat fra det tilsiktede felles2958bygget. Ingen omprøve eller kansellering. Taggfilter,historiske SDL-/testhoppstans,inventarkant35,inventarikon-RGB under044-eksplosjonen og de avbrutte1000-rammersprøvene ved387står fortsatt åpne. Full naturlig gjennomspilling,interaktiv Windows- og ny webtest gjenstår.164_04/1943/1944og øvrige avviste motiver er ikke omprøvd. Ugyldige344/346ruter tegnes eller spilles ikke. Ingen gamle nattprosesser startes.
+
+Rapport:gpt-arbeid/rapporter/gang045-20261021. Bibliotek:figurark-fast-storrelse og publisert-mod-er-fasit. Aktiv grafikkautomatikk fortsetter.
+
 ## Kontrollert felles2958, 2026-10-21 01:42
 
 De to siste grafikkbunkene er samlet i nye Linux- og Windows-pakker med 2958 native HD-bildelag. 14 nye hele ark fig029_09 til22 gir 40 nye ruter siden felles2918. Hele Sams hånd-/tauanimasjon i introen er nå levert gjennom 22 ark og 70 ruter. Siste sju ark har 13 nye hele kildeformer; kildeidentiske hele malerier og den helt identiske armkomponenten i de ti siste posene gjenbrukes. Tauets separate bevegelse og kildeekte små tan-/grå deler bevares. Syv nye innebygde bildeverktøykall i denne runden er bevart sammen med faktiske prompter og tidligere uleverte råbilder. Ingen originalpiksler, hard originalmaske, originalfragment-fallback, senkede grenser eller motor-/pipelineendring. Ingen ny Tom-/Claude-godkjenning.
