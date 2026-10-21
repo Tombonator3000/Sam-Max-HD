@@ -1,0 +1,100 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import numpy as np
+import json
+import hashlib
+import re
+import shutil
+import zipfile
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+Q = A / 'rapporter/sam115-kilde-20261021'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+old = read(R / 'motor-grunnlag3013.json')
+new = read(R / 'motor-katt3014.json')
+v = new['tegninger']['costume052_1920']
+b = old['tegninger']['costume052_1920']
+assert v['bildeframe'] == b['bildeframe']
+before = Image.open(b['fil']).convert('RGB')
+after = Image.open(v['fil']).convert('RGB')
+shutil.copy2(v['fil'], R / 'katt1920-i-faktisk-linux.png')
+board = Image.new('RGB', (1280, 430), '#304050')
+draw = ImageDraw.Draw(board)
+board.paste(before.resize((640, 400)), (0, 30))
+board.paste(after.resize((640, 400)), (640, 30))
+draw.text((8, 8), 'Samme Linux-binar og bilde: grunnlag 3013 / egen katt 3014', fill='white')
+board.save(R / 'katt1920-for-etter.png')
+x, y = v['pos']
+w, h = v['maal']
+crop = after.crop((x * 4 - 8, y * 4 - 8, (x + w) * 4 + 8, (y + h) * 4 + 8)).convert('RGBA')
+original = Image.open(P / 'work/extract/costumes/costume052_1920.png').convert('RGBA')
+own = Image.open(R / 'costume052_1920-egenstrek1hd.png').convert('RGBA')
+board = Image.new('RGBA', (960, 370), '#596978')
+draw = ImageDraw.Draw(board)
+for i, (label, im) in enumerate([('Original 4x', original.resize((w * 4, h * 4), Image.Resampling.NEAREST)),
+                               ('Egen native', own), ('Faktisk Linux', crop)]):
+    draw.text((i * 320 + 8, 12), label, fill='white')
+    board.alpha_composite(im.resize((im.width * 2, im.height * 2), Image.Resampling.NEAREST), (i * 320 + 8, 55))
+board.convert('RGB').save(R / 'original-native-motor.png')
+delta = np.any(np.array(before) != np.array(after), 2)
+outside = delta.copy()
+active_rects = []
+for proof in [old, new]:
+    log = Path(proof['logg']).read_text()
+    for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)', log):
+        frame, cel, costume, px, py, pw, ph = map(int, m.groups())
+        if v['bildeframe'] - 4 <= frame < v['bildeframe']:
+            rect = [max(0, px * 4 - 12), max(0, py * 4 - 12),
+                    min(1280, (px + pw) * 4 + 12), min(800, (py + ph) * 4 + 12)]
+            outside[rect[1]:rect[3], rect[0]:rect[2]] = False
+            active_rects.append(dict(frame=frame, kostyme=costume, cel=cel, rekt=rect))
+save(R / 'pikselkontroll.json', dict(bildeframe=v['bildeframe'], endrede_piksler=int(delta.sum()),
+    utenfor_alle_loggede_aktorflater_og_marg=int(outside.sum()), aktorflater=active_rects,
+    andre_aktorer_ikke_skjult=True, fullt_rgb_identisk=False))
+assert not outside.any(), int(outside.sum())
+
+proofs = [read(Q / f'motor-kilde115-an{n}.json') for n in [6, 7, 8, 9]]
+observations = {}
+for p in proofs:
+    for name, row in p['tegninger'].items():
+        observations.setdefault(name, dict(row, animasjon=p['animasjon']))
+selected = ['costume115_1664', 'costume115_1667', 'costume115_1673', 'costume115_1680',
+            'costume115_1682', 'costume115_1973']
+board = Image.new('RGB', (1920, 840), '#304050')
+draw = ImageDraw.Draw(board)
+records = []
+for i, name in enumerate(selected):
+    v = observations[name]
+    out = Q / (name + '-kilde-i-motor.png')
+    shutil.copy2(v['fil'], out)
+    board.paste(Image.open(out).convert('RGB').resize((640, 400)), (i % 3 * 640, i // 3 * 420 + 20))
+    draw.text((i % 3 * 640 + 6, i // 3 * 420 + 4), name + ' AN' + str(v['animasjon']), fill='white')
+    records.append(dict(bilde=name, fil=out.name, sha256=sha(out), animasjon=v['animasjon'], frame=v['bildeframe']))
+board.save(Q / 'kilde-motorbilder-brett.png')
+save(Q / 'visuelle-kildebilder.json', records)
+for name in ['costume115_1682', 'costume115_1872', 'costume115_1944', 'costume115_1973']:
+    v = observations[name]
+    src = Image.open(P / 'work/extract/costumes' / (name + '.png')).convert('RGBA')
+    z = Image.open(v['fil']).convert('RGBA')
+    x, y = v['pos']
+    w, h = v['maal']
+    cut = z.crop((x * 4 - 8, y * 4 - 8, (x + w) * 4 + 8, (y + h) * 4 + 8))
+    board = Image.new('RGBA', (1280, max(640, h * 4 + 80)), '#596978')
+    draw = ImageDraw.Draw(board)
+    draw.text((8, 10), name + ' original 4x / faktisk motor med sammensatte lag', fill='white')
+    board.alpha_composite(src.resize((src.width * 4, src.height * 4), Image.Resampling.NEAREST), (12, 55))
+    board.alpha_composite(cut, (652, 47))
+    board.convert('RGB').save(Q / (name + '-delkontroll.png'))
+with zipfile.ZipFile(R / 'motorlogger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+    for p in [old, new]:
+        z.write(p['logg'], p['label'] + '.log')
+with zipfile.ZipFile(Q / 'kildemotorlogger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+    for p in proofs:
+        z.write(p['logg'], p['label'] + '.log')
+shutil.copy2(__file__, R / 'vis.py.txt')
+print('Katt: original/native/motor og helbilder klare. Kilde115: seks helbilder og fire delkontroller klare.', flush=True)

@@ -1,0 +1,129 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image
+from scipy import ndimage as nd
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+import hashlib
+import json
+import shutil
+import subprocess
+import numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+Q = A / 'rapporter/max052-20261021'
+J = A / 'jobber/fig052_01'
+M = P / 'mods/gpt'
+C = O / 'mod-katt3014'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+assert not R.exists() and not C.exists() and not (J / 'resultat.png').exists()
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=A, text=True).strip()
+base = read(A / 'rapporter/felles-release-20261021-max052-delvis/moddfiler-3013.json')
+assert len(base) == 21256 and all(sha(M / f) == h for f, h in base.items())
+remote = subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/hd-mod'], cwd=P, text=True).split()[0]
+assert remote == '82fcc69f6a21ac80bc4adc8b4b779e50004f1fff'
+protected = read(A / 'rapporter/sam115-kilde-20261021/beskyttede-samlet1036.json')
+assert len(protected) == 1036 and all(sha(A / f) == h for f, h in protected.items())
+stash = subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines()
+assert stash == read(Q / 'grunnlag-produksjon.json')['stash']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 423
+assert (CORE, GOOD_IOU, GOOD_COVER) == (128, .6, .8)
+
+j = read(J / 'jobb.json')
+entry = j['ruter'][0]
+assert entry['bilde'] == 'costume052_1920'
+f = Q / 'kall/K02/costume052_1920-egenstrek1hd.png'
+own = Image.open(f).convert('RGBA')
+src = np.array(Image.open(P / 'work/extract/costumes/costume052_1920.png').convert('RGBA'))
+h, w = src.shape[:2]
+assert own.size == (w * 4 + 16, h * 4 + 16)
+a = np.array(own)
+alpha = a[:, :, 3].copy()
+core = alpha >= CORE
+_, near = nd.distance_transform_edt(~core, return_indices=True)
+weak = (alpha > 0) & (alpha <= 4)
+a[weak, :3] = a[near[0][weak], near[1][weak], :3]
+a[alpha == 0, :3] = 0
+assert np.array_equal(a[:, :, 3], alpha)
+iou, cov = _iou(core, np.repeat(np.repeat(src[:, :, 3] > 0, 4, 0), 4, 1), -8, -8)
+assert iou >= GOOD_IOU and cov >= GOOD_COVER
+old = Image.open(Q / 'fig052_01-utkast.png').convert('RGBA')
+out = old.copy()
+x, y, _, _ = entry['rekt']
+dx, dy = (j['plassering'][0] + x) * 4 - 8, (j['plassering'][1] + y) * 4 - 8
+box = (dx, dy, dx + own.width, dy + own.height)
+out.paste((0, 0, 0, 0), box)
+out.alpha_composite(Image.fromarray(a), (dx, dy))
+oldarr, newarr = np.array(old), np.array(out)
+allowed = np.zeros(oldarr.shape[:2], bool)
+allowed[dy:dy + own.height, dx:dx + own.width] = True
+assert np.array_equal(oldarr[~allowed], newarr[~allowed])
+for e in j['ruter'][1:]:
+    x, y, cw, ch = e['rekt']
+    ox, oy = (j['plassering'][0] + x) * 4 - 8, (j['plassering'][1] + y) * 4 - 8
+    assert np.array_equal(oldarr[oy:oy + ch * 4 + 16, ox:ox + cw * 4 + 16],
+                          newarr[oy:oy + ch * 4 + 16, ox:ox + cw * 4 + 16])
+R.mkdir()
+save(R / 'grunnlag-produksjon.json', dict(tid_utc=datetime.now(timezone.utc).isoformat(),
+    native=3013, native_sha=remote, filer=base, stash=stash, hele_figurjobber=423,
+    beskyttede=1036, art_sha=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=A, text=True).strip(),
+    main_sha=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=P, text=True).strip()))
+save(R / 'beskyttede-samlet.json', protected)
+Image.fromarray(a).save(R / 'costume052_1920-egenstrek1hd.png', optimize=True)
+out.save(J / 'resultat.png')
+digest = sha(J / 'resultat.png')
+mapping = read(Q / 'rutekart-fig052_01.json')['fig052_01']
+mapping['sha256_resultat'] = digest
+yy, xx = np.nonzero(core)
+mapping['ruter'][0].update(rect=[dx + int(xx.min()), dy + int(yy.min()), int(np.ptp(xx) + 1), int(np.ptp(yy) + 1)],
+    prototype=str((R / 'costume052_1920-egenstrek1hd.png').relative_to(A)),
+    prototype_sha256=sha(R / 'costume052_1920-egenstrek1hd.png'),
+    snitt_union=iou, dekning=cov, native_ok=True, egen_strek_HD=1)
+save(R / 'rutekart-fig052_01.json', {'fig052_01': mapping})
+test = subprocess.run([str(P / '.venv/bin/python'), str(A / 'verktoy/sjekk_leveranse.py'),
+    str(J / 'resultat.png')], cwd=A, text=True, capture_output=True)
+(R / 'fig052_01-egenkontroll.txt').write_text(test.stdout + test.stderr)
+assert test.returncode in [0, 1], test.stdout + test.stderr
+save(R / 'fremdrift.json', dict(leveranser=[dict(jobb='fig052_01', resultat='jobber/fig052_01/resultat.png',
+    sha256=digest, ruter=21, rutekart=f'rapporter/{R.name}/rutekart-fig052_01.json', laget=True,
+    levert=True, egenkontroll='OK' if test.returncode == 0 else 'SJEKK', egenkontrollert=True,
+    visuelt_kontrollert=False, native_mottatt=False, motorobservert=False, publisert=False,
+    i_fellespakke=False, godkjent_av_Tom=False, claude_kontroll=False)], nye_jobber_levert=1,
+    nye_native_planlagt=1, eksisterende_native_bevart_i_ark=20, ingen_nye_bildekall=True,
+    gjenbrukt_innebygd_image_gen='max052-20261021/kall/K02', grunnlag_native=3013))
+(J / 'notat.md').write_text((J / 'notat.md').read_text().rstrip() + f'''
+
+## 21. oktober 2026: første kattepose fullført fra bevart K02
+
+K02s eget maleri er gjenopptatt uten nye bildekall. Én HD-piksel tykkere egen alfakontur med egne farger gir IoU {iou:.6f} og dekning {cov:.6f}, over uendrede grenser 0,6 og 0,8. Ingen originalmaske eller originalfragmenter er brukt. Originalen i rom 9, det godkjente Max-arket og kontrastkontrollen er sett igjen. Bare første rute er byttet i det bevarte utkastet; de 20 øvrige er rasteridentiske. Egenkontroll: {'OK' if test.returncode == 0 else 'SJEKK'}. Ny resultat-SHA256 er {digest}. Mottak, visuell helkontroll, motor og publisering kvitteres separat i rapporter/{R.name}. Ingen ny Tom-/Claude-godkjenning.
+''')
+auto = O / 'automatisk-mottak'
+subprocess.run([str(P / '.venv/bin/smhd'), 'myke-figurer', '--gren', str(A), '--extract',
+    str(P / 'work/extract'), '--ut', str(auto), '--jobb', 'fig052_01', '--forhandsvisning', ''], cwd=P, check=True)
+report = read(auto / 'myke.json')
+assert report['ruter_ok'] == 21 and all(report[k] == 0 for k in ['ruter_sjekk', 'ruter_mangler', 'ruter_teknisk'])
+save(R / 'automatisk-mottak21.json', report)
+shutil.copytree(M, C)
+dest = C / 'costumes/costume052_1920_hd.png'
+assert not dest.exists()
+shutil.copy2(R / 'costume052_1920-egenstrek1hd.png', dest)
+meta = read(C / 'mod.json')
+assert meta['costume_cels'] == 3013
+meta['costume_cels'] = 3014
+save(C / 'mod.json', meta)
+files = {p.relative_to(C).as_posix(): sha(p) for p in C.rglob('*') if p.is_file()}
+assert len(files) == 21257 and {f for f, h in base.items() if files[f] != h} == {'mod.json'}
+assert set(files) - set(base) == {'costumes/costume052_1920_hd.png'}
+assert all(sha(A / f) == h for f, h in protected.items())
+save(R / 'kandidatfilhash.json', files)
+save(R / 'egen-native.json', dict(bilde='costume052_1920', fil=dest.relative_to(C).as_posix(),
+    sha256=sha(dest), snitt_union=iou, dekning=cov, fast_4x=True, marg_original=[2, 2],
+    egen_alfa=True, originalmaske=False, originalfragmenter=False, nye_native=1,
+    native_totalt=3014, alle20andre_arkruter_rasteridentiske=True, automatisk21_OK=True,
+    kontrollkopier_ikke_brukt_i_native=True))
+shutil.copy2(__file__, R / 'klargjor.py.txt')
+print('Ark 01 fullført, automatisk 21 OK; én ny egen native, kandidat 3014. Motor/visuell kontroll gjenstår.', flush=True)

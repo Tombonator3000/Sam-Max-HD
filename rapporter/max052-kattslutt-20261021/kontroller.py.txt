@@ -1,0 +1,86 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib
+import json
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+Q = A / 'rapporter/sam115-kilde-20261021'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+base = read(R / 'grunnlag-produksjon.json')
+assert all(sha(P / 'mods/gpt' / f) == h for f, h in base['filer'].items())
+prot = read(R / 'beskyttede-samlet.json')
+assert all(sha(A / f) == h for f, h in prot.items())
+assert subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines() == base['stash']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 424
+own = read(R / 'egen-native.json')
+assert own['automatisk21_OK'] and own['alle20andre_arkruter_rasteridentiske']
+motor = read(R / 'motor-sammenligning.json')
+assert motor['ingen_nye_eller_okte_avvik'] and motor['null_fra60'] == 51
+assert read(R / 'pikselkontroll.json')['utenfor_alle_loggede_aktorflater_og_marg'] == 0
+source = read(Q / 'motor-kilde-samlet.json')
+assert source['sett'] == source['forventet'] == 84 and not source['mangler']
+assert source['kontrollantall'] == source['nullkontroller'] == 480
+progress = read(R / 'fremdrift.json')
+progress.update(native_mottatt=True, motorobservert=True, visuelt_kontrollert=True,
+    nye_native=1, native_totalt=3014, hele_figurjobber_med_resultat=424, gjenstar=1334,
+    andre20_tidligere_native_bevart=True, andre20_tidligere_visuelt_motorobservert=True)
+progress['leveranser'][0].update(native_mottatt=True, motorobservert=True, visuelt_kontrollert=True)
+save(R / 'fremdrift.json', progress)
+save(R / 'visuell-kontroll.json', dict(tid_utc=datetime.now(timezone.utc).isoformat(),
+    original_i_rom9_sett=True, godkjent_Max_hovedark_sett=True, hel_resultat01_sett=True,
+    ny1920_original_native_motor_sett=True, foer_etter_helbilder_sett=True,
+    eksisterende20_urort_og_tidligere_sett=True, omrissvarsler_vurdert_og_beholdt=[1924, 1925, 1926, 1929, 1930, 1932, 1936],
+    ingen_nye_bildekall=True, siste_gjenbrukte_kall='max052-20261021/kall/K02',
+    visuelt_sette_filer={f: sha(R / f) for f in [
+        'original-native-motor.png', 'katt1920-for-etter.png', 'katt1920-i-faktisk-linux.png']},
+    godkjent_av_Tom=False, claude_kontroll=False))
+save(R / 'sluttkontroll.json', dict(nye_native=1, native_totalt=3014, nye_hele_ark=1,
+    hele_figurjobber_med_resultat=424, total_figurjobber=1758, gjenstar=1334,
+    alle21_automatisk_OK=True, egenkontroll='SJEKK', omrissvarsler=7,
+    visuelt_sett=True, motorobservert=True, egen_alfa=True, originalmaske=False,
+    originalfragmenter=False, grenser_uendret=True, CORE=128, IoU=.6, dekning=.8,
+    motor_kontroller=80, motor_null=79, samme160ved36=True, null_fra_figurstart=51,
+    ingen_nye_eller_okte_avvik=True, helprove_uten_avvik=False, naturlig_gjennomspilling=False,
+    publisert=False, i_fellespakke=False, pakker_native=3013, pakker_mangler_native=1,
+    godkjent_av_Tom=False, claude_kontroll=False))
+(R / 'RAPPORT.md').write_text('''# Siste kattepose og hele fig052_01
+
+Costume052_1920 er fullført fra det bevarte K02-maleriet. Én HD-piksel tykkere egen alfakontur med egne farger gir IoU 0,759930 og dekning 0,835387. CORE128, IoU 0,6 og dekning 0,8 er uendret. Ingen nye bildekall, ingen harde originalmasker og ingen originale bildefragmenter er brukt. Råbilde, faktisk prompt og opprinnelige referanser er bevart i max052-20261021/kall/K02.
+
+Fig052_01 er levert som helt resultatark. Bare første rute er byttet; de 20 andre er rasteridentiske med det bevarte utkastet og deres tidligere publiserte native filer. Egenkontrollen gir SJEKK med sju tidligere omrissvarsler, visuelt vurdert og beholdt. Automatisk mottak gir alle 21 OK. Kontrollkopiene fra mottaket brukes ikke som native: den nye native filen er det egne, kontrollerte maleriet med bevart alfa og to originalpikslers marg.
+
+Originalen i rom 9, godkjent Max-hovedark, hele kildearket og hele resultatarket er sett. Den nye katten er sett isolert og i faktisk Linux med hele før/etter-bilder. De 20 urørte rutene er tidligere visuelt sett og motorobservert; alle er fortsatt logget i denne prøven. Den faktiske Linux-binæren e4f3ee9f brukes på både publisert grunnlag 3013 og kandidat 3014. Hver side har 80 kontroller, 79 null og samme kjente avvik på 160 ved bilde 36. Alle 51 kontroller fra figurstart 60 er null. Ingen nye eller økte avvik. Før/etter har null forskjeller utenfor alle loggede aktørflater med margin. Andre aktører er ikke skjult. Dette er tvungen animasjonskontroll, ikke full naturlig gjennomspilling eller interaktiv Windows-/ny webtest.
+
+Kandidaten har 3014 native ruter. 424 av 1758 hele figurjobber har resultat; 1334 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Alle tidligere 21256 filstier, 21250 PNG-filer, 1036 beskyttede kildehash og tre stasher er bevart. Publisering og hent kvitteres separat. Fellespakken har 3013 og mangler den nye katteposen; neste praktiske samlepunkt oppdaterer begge pakker. Ingen ny Tom-/Claude-godkjenning. Ingen motor- eller pipelinekode endret.
+
+En egen visualiseringshjelper stoppet først fordi et RGB-utsnitt ble brukt i RGBA-komposisjon. Hjelperen ble rettet til RGBA og laget kontrollbildene fra de samme motoropptakene. Ingen motorprøve eller bildegenerering ble omprøvd på grunn av dette.
+
+Bibliotekskilder: figurark-fast-storrelse og publisert-mod-er-fasit. Neste ordinære bunke er fig115_01..03. Kilden er nå avspilt med gyldige animasjoner 6, 7, 8 og 9: alle 84 mål logget, 480 nullkontroller. Seks hele kildebilder og utsnitt av små deler er sett; Sam har egen separat slipsdel, hånd-/grepvarianter og tynne blå kurver. 1682 har fire løsrevne blågrå merker høyt over kroppen. Bevar de faktisk synlige merkene uten å gjette en ny gjenstand. Ingen 115-grafikk er laget eller telt ennå.
+''')
+save(Q / 'visuelt-kildegrunnlag.json', dict(alle3_originalark_sett=True,
+    godkjent_Sam_hovedark_sett=True, hele_motorbilder_sett=6,
+    detaljkontroller_sett=['costume115_1682', 'costume115_1872', 'costume115_1973'],
+    separate_slips_hender_tynne_deler_bevares=True, kilde1682_fire_blaagraa_merker_bevares=True,
+    motivering='Sam bruker golfkøllen i rom 25. Samme Sam, blågrå dress, separate bevegelige slips- og håndlag.',
+    motorloggede_kilder=84, kontrollantall=480, nullkontroller=480,
+    naturlig_gjennomspilling=False, ugyldig40_ikke_spilt=True,
+    ingen115_bildekall_eller_resultat=True, godkjent_av_Tom=False, claude_kontroll=False))
+(R / 'NESTE.md').write_text('Katteposen er kontrollert og kandidat 3014 er klar for additiv publisering med eksakt force-with-lease fra 82fcc69f6a21ac80bc4adc8b4b779e50004f1fff. Bevar alle tidligere filer og tre stasher. Deretter gjenoppta fig115_01..03 fra kildegrunnlaget med 84 motorloggede mål. Ingen 115-bildekall er gjort. Fellespakken har 3013, mangler én; nytt praktisk samlepunkt følger etter golfbunken.\n')
+for name in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+    f = A / name
+    s = f.read_text()
+    i = s.find('\n')
+    line = 'Siste kattepose 052_1920 er ferdig, hele fig052_01 levert. Alle 21 automatisk OK; sju omrissvarsler visuelt vurdert. Én ny native, kandidat 3014, 424 av 1758 hele resultatjobber. Motor 80/79 null med samme 160 ved bilde 36; alle 51 fra figurstart null. Publisering/hent kvitteres separat. Neste fig115_01..03 er kildeavspilt: 84 av 84 mål, 480 nullkontroller, ingen bildekall eller nye resultater ennå. Bevar 1036 kilder, alle tidligere filer og tre stasher. Se rapporter/max052-kattslutt-20261021/NESTE.md. Fellespakker har 3013 og mangler én. Ingen ny Tom-/Claude-godkjenning.'
+    s = s[:i + 1] + '\n' + line + '\n' + s[i + 1:]
+    if name == 'GRAFIKKLISTE.md':
+        s = s.replace('- [ ] `fig052_01`', '- [x] `fig052_01`')
+    f.write_text(s)
+shutil.copy2(__file__, R / 'kontroller.py.txt')
+print('Kattepose godkjent i egenkontroll og motor; 424 hele ark, kandidat 3014. Ingen ekstern godkjenning.', flush=True)
