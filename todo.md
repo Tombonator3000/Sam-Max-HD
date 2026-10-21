@@ -1,5 +1,17 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 16:52
+
+- [x] Publisert fig250_06 til 10: fem hele ark og 22 nye native, 3459 totalt. Alle fem ark og 22 native OK, null omrissvarsler. Alle 21702 filhash, 21674 tidligere PNG, 1348 kilder og tre stasher bekreftet etter hent.
+- [x] Delvis blink, 15/11/8 små gule deler og den tynne bøyde sverdstripen i 1959 kontrollert. Fjorten innebygde bildekall og seks kvalitetsreturer, hele tegninger uten originalmasker eller fragmenter. Ingen ny Tom-/Claude-godkjenning.
+- [x] Endelig kandidat sett i primærskript 211 og hel animasjon 6, alle 52 kilder logget. 1436/1440 null per side med identiske kjente 416/160-avvik; 44 SHA-like originalflater og null utenfor nye aktørflater. Fem resultatark, 19 varianter og åtte hele par sett. Hele prøven er ikke avviksfri.
+- [ ] Fortsett fig250_11 og fig250_12 fra rapporter/sam250-midt-20261021/neste-bunke.json, tolv mål fra tolv hele kilder. Ingen nye bildekall eller resultater. Se kilder, kontekst og stilankre før hvert motiv; bevar utfoldede polygoner og spillhjertet.
+- [ ] Oppdater begge pakker etter de to siste 250-arkene, forventet 3471 native, eller tidligere ved blokkering. Fellespakker har 3419 og mangler 40. Bekreft faktiske nedlastinger, sjekksummer og inkludert grafikk før ny fellesutgave kalles oppdatert.
+- [ ] Fortsett øvrige produserbare jobber og returer. 487 av 1758 hele figurjobber har resultat; 1271 gjenstår pluss returer, katalogfeil og sluttkontroll. Bevar tidligere filer, releaser, kilder og tre stasher. Ingen omprøve av holdte eller verktøyavviste motiver og aliaser. Ingen ny grafikk i main.
+- [ ] Samlet sluttkontroll, naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Automatikken fortsetter, gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 16:01
 
 - [x] Levert og additivt publisert fem VR-ark, fig250_01 til 05, med 18 nye native og 3437 totalt. Alle 21680 filhash, tidligere PNG, 1348 kilder og tre stasher bekreftet etter hent.
