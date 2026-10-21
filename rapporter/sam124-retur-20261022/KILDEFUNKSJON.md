@@ -1,0 +1,9 @@
+# Retur ved Sams jakke
+
+Kostyme 124 ruter 1797 til 1804 tegner deler av det eksisterende Sam-objektet 258 på nytt. Alle blågrå piksler ved føttene faller på Sams jakke og bruker dens tre grå indekser. 210 av de tidlige 237 er eksakt samme indeks som underlaget. De øvrige 27 endrer bare underlagets indeks 254 til 253 i romposisjon x80..92, y172..178. Det er mørkere jakkekontakt, ikke egne støveldetaljer. Senere er kontakten ni piksler i 1802/1803 og null i 1804. Indeks 13 er ikke brukt; dette skal ikke behandles som generisk skyggesletting.
+
+Den nye tegningen må vise Lee-Harvey og Max som én hel rute, uten å gjenta Sams allerede malte jakke som nye løse klesfliker. Den lille kontaktdempingen ved den venstre støvelen skal bevares som en avgrenset, myk kontaktskygge over den eksisterende jakken, uten mørk kleskontur eller nye folder. Originalen og hele Sam-underlaget bestemmer funksjonen. Ingen gulv-/plattformfortolkning eller nye props.
+
+Motorens eksisterende myke figurer bygger HD-underlaget under ruten og legger egen RGBA over det, slik remake-skillen og drawSoftCels beskriver. Det muliggjør ekte gjennomsiktighet over Sams jakke uten klipping med originalens harde form. Bare målegrunnlaget for figurens egen helplassering skiller ut det statiske Sam-innholdet. Selve nytegningen skal redigeres hel med innebygd image_gen; ingen hard originalmaske eller delrekonstruksjon. Originalens uendrede CORE128/IoU0,6/dekning0,8 beholdes som teknisk port. Den faktiske motorvisningen avgjør om returen er løst.
+
+De små brune bitene ved føttene bruker indeks 247 til 249 og matcher også objektunderlaget eksakt. I 1797 er dette 21 piksler. De er gjenmaling av eksisterende underlag, ikke en ny plattform. De skal heller ikke males en gang til. Støvlenes indeks 0 og 198 beholdes. Kildefargene bekrefter mørkningen: 254 er RGB127,159,195, 253 er RGB99,123,155.

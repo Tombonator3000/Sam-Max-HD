@@ -1,0 +1,88 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import hashlib,json,numpy as np,sys,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+def box(mask):
+ yy,xx=np.where(mask);return [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+name=sys.argv[1];C=R/'kall'/name;plan=read(C/'plan.json');e=plan['rute']
+raw=np.array(Image.open(C/'raa.png').convert('RGBA'));source=np.array(Image.open(e['source']).convert('RGBA'))
+shadow_rect=plan.get('egen_synlig_skygge_rekt',None)
+def shadow_mask(shape,rect):
+ m=np.zeros(shape[:2],bool)
+ if rect:
+  x0,y0,x1,y1=rect;m[y0:y1,x0:x1]=True
+ return m
+def clean(a,rect):
+ core=a[:,:,3]>=CORE;assert core.any()
+ protected=shadow_mask(a.shape,rect)&~core&(a[:,:,3]>0)
+ original=a.copy();a[(nd.distance_transform_edt(~core)>1.5)&~protected]=0
+ trust=a[:,:,3]>=245;_,ix=nd.distance_transform_edt(~trust,return_indices=True)
+ edge=(a[:,:,3]>0)&(a[:,:,3]<245)&~protected;a[edge,:3]=a[tuple(ix)][edge,:3]
+ a[a[:,:,3]==0,:3]=0
+ assert np.array_equal(a[protected],original[protected])
+ return a
+
+own=clean(raw.copy(),shadow_rect)
+# Kun dokumenterte feil i egne genererte deler. Ingen kildesilhuett brukes.
+removed=[];spot_records=[]
+initial_labels,initial_n=nd.label(own[:,:,3]>=CORE,np.ones((3,3)))
+_,initial_ix=nd.distance_transform_edt(initial_labels==0,return_indices=True)
+initial_grown=initial_labels[tuple(initial_ix)]
+for item in plan.get('egne_feildeler',[]):
+ label=item['egen_core_label'];core_mask=initial_labels==label
+ assert core_mask.any() and box(core_mask)==item['egen_bbox'],(name,'Egen feilregion er endret')
+ assert int(core_mask.sum())==item['egen_core_piksler']
+ mask=(initial_grown==label)&(own[:,:,3]>0)
+ own[mask]=0
+ Image.fromarray((mask*255).astype('uint8')).save(C/f'egen-feildel-{label}-maske.png')
+ removed.append(dict(**item,fjernet_egen_alfa=int(mask.sum()),originalmaske=False))
+for i,item in enumerate(plan.get('egne_rgb_glansflekker',[])):
+ x0,y0,x1,y1=item['egen_rekt'];roi=np.zeros(own.shape[:2],bool);roi[y0:y1,x0:x1]=True
+ rgb=own[:,:,:3].astype(int);seed=roi&(rgb[:,:,0]>18)&(rgb[:,:,1]>30)&(rgb[:,:,2]>50)&(own[:,:,3]>=245)
+ assert seed.any(),(name,'Ingen egen glansflekk',i)
+ mask=roi&(nd.distance_transform_edt(~seed)<=1.5)&(own[:,:,3]>=245)
+ trust=roi&(np.max(rgb,axis=2)<25)&(own[:,:,3]>=245)&~mask
+ assert trust.any()
+ _,ix=nd.distance_transform_edt(~trust,return_indices=True);old_alpha=own[:,:,3].copy();own[mask,:3]=own[tuple(ix)][mask,:3]
+ assert np.array_equal(old_alpha,own[:,:,3])
+ Image.fromarray((mask*255).astype('uint8')).save(C/f'egen-rgb-glans-{i}-maske.png')
+ spot_records.append(dict(**item,egne_rgb_piksler=int(mask.sum()),egen_bbox=box(mask),alfa_uendret=True,originalmaske=False))
+lab,n=nd.label(own[:,:,3]>=CORE,np.ones((3,3)));sizes=np.bincount(lab.ravel());main=1+int(np.argmax(sizes[1:]));_,ix=nd.distance_transform_edt(lab==0,return_indices=True);grown=lab[tuple(ix)]
+marks=[];alpha_before=own[:,:,3].copy();effect_rgb=plan.get('losmerke_kildergb',[255,255,255])
+for label in range(1,n+1):
+ if label==main:continue
+ mask=lab==label;pixels=own[mask,:3].astype(int)
+ assert mask.sum()<5000,(name,'Stor løs kroppsdel skal ikke farges som løsmerke',label)
+ assert np.mean(np.min(pixels,axis=1)>150)>.5,(name,'Uklassifisert løs kjerne',label)
+ region=(grown==label)&(own[:,:,3]>0);own[region,:3]=effect_rgb
+ marks.append(dict(egen_bbox=box(mask),egen_core_piksler=int(mask.sum()),RGB=effect_rgb))
+assert np.array_equal(alpha_before,own[:,:,3])
+Image.fromarray(own).save(C/'egen-renset.png')
+source_full_box=box(source[:,:,3]>0)
+sx0,sy0,sx1,sy1=plan.get('helplassering_kildebbox',source_full_box);ox0,oy0,ox1,oy1=box(own[:,:,3]>=CORE)
+assert 0<=sx0<sx1<=source.shape[1] and 0<=sy0<sy1<=source.shape[0]
+fx,fy=(sx1-sx0)*4/(ox1-ox0),(sy1-sy0)*4/(oy1-oy0);assert .88<=fx/fy<=1.12
+finx,finy=plan.get('egen_hel_finflytt_hd',[0,0]);assert abs(finx)<=2 and abs(finy)<=2
+offx=sx0*4+8-ox0*fx+finx;offy=sy0*4+8-oy0*fy+finy
+out=Image.fromarray(own).transform((source.shape[1]*4+16,source.shape[0]*4+16),Image.Transform.AFFINE,(1/fx,0,-offx/fx,0,1/fy,-offy/fy),Image.Resampling.BICUBIC)
+target_shadow=None
+if shadow_rect:
+ x0,y0,x1,y1=shadow_rect;target_shadow=[max(0,int(np.floor(x0*fx+offx))-1),max(0,int(np.floor(y0*fy+offy))-1),min(out.width,int(np.ceil(x1*fx+offx))+1),min(out.height,int(np.ceil(y1*fy+offy))+1)]
+arr=clean(np.array(out),target_shadow);out=Image.fromarray(arr)
+iou,coverage=_iou(arr[:,:,3]>=CORE,np.repeat(np.repeat(source[:,:,3]>0,4,0),4,1),-8,-8)
+f=C/(e['bilde']+'-prototype.png');out.save(f)
+shadow=shadow_mask(arr.shape,target_shadow)&(arr[:,:,3]>0)&(arr[:,:,3]<CORE)
+record=dict(bilde=e['bilde'],kall=name,prototype=f.relative_to(A).as_posix(),sha256=sha(f),source_sha256=sha(Path(e['source'])),raa_sha256=sha(C/'raa.png'),egen_alfa=True,originalmaske=False,originalfragmenter=False,CORE=CORE,IoU=iou,dekning=coverage,native_ok=iou>=GOOD_IOU and coverage>=GOOD_COVER,egen_hel_affin=[fx,fy,offx,offy],egen_alfa_rens_radius_raw=1.5,egen_synlig_skygge_rekt=shadow_rect,plassert_skygge_rekt=target_shadow,egne_skygge_alpha_piksler=int(shadow.sum()),egne_skygge_alfa_nivaa=sorted(np.unique(arr[shadow,3]).tolist()) if shadow.any() else [],rene_hvite_losmerker=marks,egne_feildeler_fjernet=removed,egne_rgb_glansflekker_renset=spot_records,rgb_rens_endrer_ikke_alfa=True,modell_oppgitt=False)
+save(C/'prototypekontroll.json',record)
+record.update(helplassering_kildebbox=[sx0,sy0,sx1,sy1],kildens_fulle_bbox=source_full_box,kilde_alfa_til_portene_er_urort=True)
+save(C/'prototypekontroll.json',record)
+board=Image.new('RGBA',(1200,580),'#788b9c');d=ImageDraw.Draw(board);d.text((12,8),f'{name} {e["bilde"]}: kilde4x / egen4x IoU{iou:.4f} dekning{coverage:.4f}',fill='white')
+board.alpha_composite(Image.fromarray(source).resize((source.shape[1]*4,source.shape[0]*4),Image.Resampling.NEAREST),(20,40));board.alpha_composite(out,(620,32));board.convert('RGB').save(C/'helkontroll.png')
+shutil.copy2(__file__,R/'prototype.py.txt')
+print(name,'native',record['native_ok'],'IoU',round(iou,4),'dekning',round(coverage,4),'hvite løsmerker',len(marks),'skyggealfa',record['egne_skygge_alpha_piksler'])

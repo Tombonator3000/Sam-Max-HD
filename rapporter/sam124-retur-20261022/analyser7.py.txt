@@ -1,0 +1,55 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import hashlib,json,numpy as np,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/'grunnlag3566.json');c=read(R/'retur3573.json');native=read(R/'egen-native7.json')['ruter'];needed={e['bilde'] for e in native};assert len(needed)==7
+for p in [b,c]:assert p['exit']==0 and len(p['kontroller'])==720 and not p['manglende_nye_maal']
+assert b['binar_sha256']==c['binar_sha256'];assert b['native_antall']==3566 and c['native_antall']==3573
+
+def errors(proof,label):
+ z=[]
+ for e in proof['kontroller']:
+  if not e['avvik']:continue
+  f=e['frame'];p=O/label;s=np.array(Image.open(p/f'frame_{f:06}_screen.png').convert('RGB'));wf=list(p.glob(f'frame_{f:06}_room[0-9][0-9][0-9].png'));assert len(wf)==1;w=np.array(Image.open(wf[0]).convert('RGB'));y,x=np.where(np.any(s!=w,axis=2));assert len(x)==e['avvik'];h=hashlib.sha256(np.stack([x,y],1).tobytes()+s[y,x].tobytes()+w[y,x].tobytes()).hexdigest();z.append(dict(frame=f,avvik=len(x),romfil=wf[0].name,koordinater_og_begge_RGB_sha256=h))
+ return z
+be,ce=errors(b,'grunnlag3566'),errors(c,'retur3573');assert [(e['avvik'],e['koordinater_og_begge_RGB_sha256']) for e in be]==[(e['avvik'],e['koordinater_og_begge_RGB_sha256']) for e in ce]
+assert len(be)==len(ce)==9 and b['nullkontroller']==c['nullkontroller']==711
+buf=dict(grunnlag=be,kandidat=ce,samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge=True,rammeforskyvninger=[ce[i]['frame']-be[i]['frame'] for i in range(9)],ingen_nye_eller_okte_bufferavvik=True,avviksfri_prove=False)
+save(R/'motor7-bufferkontroll.json',buf)
+cache={}
+def phase(e):
+ p=Path(e['fil']);p=p.with_name(p.stem+'_flat.png')
+ if p not in cache:cache[p]=sha(p) if p.exists() else None
+ return cache[p]
+log=(O/'retur3573/scummvm.log').read_text();origins={int(f):[int(x),int(y)] for f,room,x,y in re.findall(r'DigHD: whole screen frame (\d+) \(room (\d+), screen at (-?\d+),(-?\d+)\)',log) if int(room)==25}
+rows=[];selected={}
+for t in native:
+ name=t['bilde'];cel=int(name.split('_')[1]);old={};choices=[]
+ for e in b['hendelser']:
+  if e['cel']==cel and phase(e):old.setdefault((phase(e),tuple(e['pos']),tuple(e['maal'])),[]).append(e)
+ for e in c['hendelser']:
+  if e['cel']!=cel or not phase(e):continue
+  for a in old.get((phase(e),tuple(e['pos']),tuple(e['maal'])),[]):choices.append((e['bildeframe'],abs(e['bildeframe']-a['bildeframe']),a,e))
+ if not choices:save(R/'motor7-STOPPET.json',dict(bilde=name,grunn='Ingen SHA-identisk hel originalflate mellom de to forhåndsbevarte kjøringene. Ingen terskel endres.'))
+ assert choices,(name,'Originalfase mangler')
+ _,_,before,after=min(choices,key=lambda z:z[:2]);origin=origins[after['bildeframe']];oldim=np.array(Image.open(before['fil']).convert('RGB'));newim=np.array(Image.open(after['fil']).convert('RGB'));delta=np.any(oldim!=newim,axis=2);outside=delta.copy();boxes=[]
+ for q in c['hendelser']:
+  if q['logg_frame']!=after['logg_frame'] or f"costume124_{q['cel']:03}" not in needed:continue
+  x,y=[q['pos'][i]-origin[i] for i in range(2)];w,h=q['maal'];box=[max(0,x*4-8),max(0,y*4-8),min(newim.shape[1],(x+w)*4+8),min(newim.shape[0],(y+h)*4+8)];outside[box[1]:box[3],box[0]:box[2]]=False;boxes.append(dict(cel=q['cel'],rompos=q['pos'],rekt_hd=box))
+ assert boxes and delta.any() and not outside.any(),(name,'Uventede endringer utenfor nye aktørflater',int(outside.sum()))
+ assert sha(O/'mod-retur3573'/t['fil'])==t['sha256'];rows.append(dict(bilde=name,grunnlag_fil=before['fil'],kandidat_fil=after['fil'],grunnlag_frame=before['bildeframe'],kandidat_frame=after['bildeframe'],originalflat_identisk=True,originalflat_sha256=phase(after),utenfor_nye_loggede_ruter=0,endrede_piksler=int(delta.sum()),ruter=boxes,native_sha256=t['sha256'],grunnlag_sha256=sha(Path(before['fil'])),kandidat_sha256=sha(Path(after['fil']))));selected[name]=(before,after,origin)
+save(R/'motor7-pikselkontroll.json',rows);boards=[]
+for start in range(0,7,4):
+ names=[e['bilde'] for e in native[start:start+4]];board=Image.new('RGB',(1800,1120),'#304050');dr=ImageDraw.Draw(board)
+ for i,name in enumerate(names):
+  old,new,origin=selected[name];x,y=[new['pos'][k]-origin[k] for k in range(2)];w,h=new['maal'];box=(max(0,x*4-24),max(0,y*4-24),min(1280,(x+w)*4+24),min(800,(y+h)*4+24));xx=i%2*900;yy=i//2*560;dr.text((xx+8,yy+8),name+': 3566 / retur3573',fill='white')
+  for z,e in enumerate([old,new]):
+   im=Image.open(e['fil']).convert('RGB').crop(box);im.thumbnail((435,510),Image.Resampling.LANCZOS);board.paste(im,(xx+8+z*445,yy+30))
+ f=R/f'motor7-varianter-{start//4+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=names,visuelt_sett=False))
+shots=[]
+for name in ['costume124_1797','costume124_1803']:
+ old,new,_=selected[name];f=R/(name+'-motor3573.png');shutil.copy2(new['fil'],f);shots.append(dict(bilde=name,fil=f.name,sha256=sha(f),visuelt_sett=False))
+save(R/'motor7-visuell-plan.json',dict(varianter=boards,hele_motorbilder=shots,visuelt_sett=False))
+save(R/'motor7-sammenligning.json',dict(nye_native=7,navn=sorted(needed),native=3573,kontroller=720,nullkontroller=711,samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge=True,ingen_nye_eller_okte_bufferavvik=True,avviksfri_prove=False,alle_originalflater_SHA_identiske=True,utenfor_nye_loggede_ruter=0,primaerskript217_fra_originalinngang=True,full_naturlig_gjennomspilling=False,visuelt_sett=False,aapne_returruter=1,rute1804_holdes=True))
+shutil.copy2(__file__,R/'analyser7.py.txt');print('Sju hele originalfaser SHA-identiske, null endring utenfor nye ruter,711/720 null, samme ni kjente avvik. Visuell kontroll gjenstår.')

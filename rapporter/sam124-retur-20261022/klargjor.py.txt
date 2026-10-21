@@ -1,0 +1,55 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import hashlib,json,sys,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;F=A/'rapporter/sam124-foerste-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+name,number,oldcall=sys.argv[1:4];cel='costume124_'+number
+row=next(e for e in read(R/'sam-jakke-funksjon.json')['ruter'] if e['bilde']==cel)
+C=R/'kall'/name
+assert not (C/'verktøyresultat.json').exists() and not (C/'verktøyfeil.json').exists()
+C.mkdir(parents=True,exist_ok=True)
+src=Image.open(row['source']).convert('RGBA');assert sha(Path(row['source']))==row['source_sha256']
+atlas=Image.new('RGBA',(1024,1024),'#536576');scale=min(10,830//max(src.size));atlas.alpha_composite(src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST),((1024-src.width*scale)//2,(1024-src.height*scale)//2));atlas.convert('RGB').save(C/'originalatlas.png')
+target=(R/'kall'/oldcall.split(':',1)[1]/'raa.png') if oldcall.startswith('egen:') else F/'kall'/oldcall/'raa.png'
+assert target.exists();shutil.copy2(target,C/'eget-helmaleri-foer-retur.png')
+obs=Path(row['kontekst']);flat=obs.with_name(obs.stem+'_flat.png');shutil.copy2(flat,C/'original-spillkontekst.png')
+shutil.copy2(P/'mods/gpt/objects/obj258_01.png',C/'allerede-publisert-Sam-underlag.png')
+shutil.copy2(R/'kilde-og-funksjon.png',C/'funksjonsforklaring.png')
+masters=[Image.open(A/'hovedark'/n).convert('RGBA') for n in ['sam.png','max.png']]
+mb=Image.new('RGBA',(max(im.width for im in masters),sum(im.height for im in masters)+48),'#536576')
+md=ImageDraw.Draw(mb);my=0
+for label,im in zip(['Godkjent Sam-master','Godkjent Max-master'],masters):
+ md.text((8,my+4),label,fill='white');mb.alpha_composite(im,(0,my+24));my+=im.height+24
+mb.convert('RGB').save(C/'godkjente-mastere.png')
+contact=row['morkere_jakkekontakt']
+effect=('Keep the original very small contact darkening beneath the screen-left raised boot/heel, as a subtle translucent dark-blue contact shadow over the existing Sam jacket. Its source footprint is only '+str(contact)+' low-resolution pixels and it has no fabric outline, lapel, flap or new fold. It is not a general ground shadow. The palette changes from RGB127,159,195 to RGB99,123,155 in that tiny original contact area.' if contact else 'This source phase has no darker contact footprint on Sam. Leave all of the already-painted Sam jacket under and between the boots transparent in this foreground cel.')
+if contact:
+ xs=[p[0]-row['rompos'][0] for p in row['kontakt_rompos']];ys=[p[1]-row['rompos'][1] for p in row['kontakt_rompos']]
+ effect=(f'Preserve the source\'s very small contact darkening over the existing Sam jacket, at local source x{min(xs)}..{max(xs)}, y{min(ys)}..{max(ys)} of the whole {src.width}x{src.height} cel. This phase has {contact} darker source pixels there. Paint that small contact as a soft translucent dark-blue/black shadow with genuine low opacity and no ink contour, not as cloth, a sole or a pedestal. It is not a general ground shadow. The original tonal change is RGB127,159,195 to RGB99,123,155. Keep all other Sam-underlay areas transparent.')
+prompt=f'''Edit the entire existing own cartoon painting in Image 1 for one exact Sam & Max Hit the Road HD animation cel. This is a quality correction of the complete painting, never a collage of separately generated parts.
+Localize the change to the existing background scraps around the boots and the tiny source contact shadow there. Retain the existing whole pose and small gesture marks above the boots; do not reinterpret or multiply the motion marks. Use the source's warm-white RGB255,243,227 for the detached light gesture strokes, with no dark border.
+Keep the existing boots flat dark navy/black with their existing blue edging. Do not add shiny oval spots, extra sole strips, buttons, or new boot highlights. Keep the tiny contact shadow low-opacity, softly translucent, and dark; it must not look like a solid sole or pedestal.
+The removed Sam-underlay scraps must become transparency, not new cream-colored pieces, extra gesture marks, paper, or pale debris beside the boots.
+The production fault is the blue-gray outlined paper-like fabric scraps at Lee-Harvey's feet. Image 2 is the entire actual original cel; Image 4 is its actual original game context. Source analysis proves those foot-level blue-gray areas belong to the already-present fallen Sam jacket, which Image 5 shows as the separately published HD underlay. They restore that existing background. They are not extra clothes worn by Lee-Harvey, boot parts, a platform, or new Sam fragments to draw a second time.
+Remove the newly painted, outlined blue-gray scraps at the feet AND their small orange-brown board-like chips from this foreground painting and leave genuine transparency there so the existing Sam underlay shows through smoothly. Source indices 247..249 prove the orange-brown foot-level chips also exactly restore the existing object underlay. They are not boot parts or a new platform. Preserve the entire original Lee-Harvey and Max pose together, including all dark boots and their dark-blue edging, limbs, cuffs, hands, heads, fingers, expressions, white gesture strokes, attachments, negative spaces and exact relative positions. Lee-Harvey's own blue-gray collar and sleeve cuffs remain intact. Do not change the human quiff, red shirt, dark navy suit and dark boots. Keep Max's approved cream fur and salmon inner ears; add no tail, pads, buttons, or props. The source in Image 2 controls anatomy and count, while Image 1 is only the edit target.
+{effect}
+Image 3 contains both approved Sam and Max identity/style masters, in two labeled complete panels. Retain their clean hand-drawn LucasArts cartoon style, with smooth confident dark outlines and sparse faithful shading. Do not imitate coarse pixel steps. Keep the original proportions and layout at the same framing as Image 1, without cropping, mirroring, zoom, rearrangement or new anatomy. Do not draw the whole Sam underlay or the scenery into this cel. Output one 1024x1024 RGBA PNG on true transparent background, with clean soft antialiasing and transparent margin. No backdrop, checkerboard, text, border or glow. Entire corrected foreground cel: {cel}.'''
+if oldcall.startswith('egen:') and cel=='costume124_1797':
+ prompt+='''
+Specific correction to Image 1: its boot-area fabric scraps have already been correctly removed. Keep that genuine transparency and keep the entire human and Max body painting intact. Correct the effects to the exact source count and size: Image 2 has THREE detached white marks above/right of the raised fist, consisting of one long connected swept curve, one smaller short curve, and one tiny end fleck. Do not split the long curve into several beads. It also has THREE very small detached white dots near Max's lower feet, smaller than the current outlined ovals. These six detached marks are pure white, with NO dark outlines. Preserve the original raised hand itself. The source shows exactly those six detached marks, not nine or a new spray.
+Also retain the source's small translucent contact darkening just below/behind the raised screen-left boot heel, extending slightly into the transparent space toward the standing boot. This is a soft low-opacity blue-black shadow that will darken the already-rendered Sam jacket; do not paint any jacket cloth or opaque gray patch. Its exact source extent is x8..20, y72..78 relative to the complete 96x86 source cel, and only 27 source pixels in two small connected tonal strokes. Preserve genuine fractional alpha for this tiny contact shadow. No general floor shadow, border, detached new clothing or scenery. All corrections must be painted as part of the one entire cel, with no collage, separate-body reconstruction or hard source mask.'''
+refs=[C/'eget-helmaleri-foer-retur.png',C/'originalatlas.png',C/'godkjente-mastere.png',C/'original-spillkontekst.png',C/'allerede-publisert-Sam-underlag.png']
+args=dict(prompt=prompt,referenced_image_paths=[str(p) for p in refs],transparent_background=True)
+(C/'faktisk-prompt.txt').write_text(prompt+'\n');save(C/'faktiske-argumenter.json',args)
+save(C/'plan.json',dict(rute=row,egen_returkilde=oldcall,referanser={str(p):sha(p) for p in refs},mastertavlens_opphav={str(A/'hovedark'/n):sha(A/'hovedark'/n) for n in ['sam.png','max.png']},motiv_og_mastere_sett_foer_kall=False,originalmaske=False,egent_helmaleri_edit=True))
+board=Image.new('RGB',(1800,1450),'#536576');d=ImageDraw.Draw(board);d.text((12,8),cel+': eget helmaleri med retur / hel kilde / faktisk originalscene / Sam-underlag / godkjente mastere',fill='white')
+for i,f in enumerate([refs[0],refs[1]]):
+ im=Image.open(f).convert('RGBA');im.thumbnail((580,620));board.paste(im,(10+i*600,35),im)
+scene=Image.open(refs[3]).convert('RGB');scene.thumbnail((580,390));board.paste(scene,(1210,40))
+under=Image.open(refs[4]).convert('RGBA');under.thumbnail((580,230));board.paste(under,(1210,450),under)
+for i,f in enumerate([A/'hovedark/sam.png',A/'hovedark/max.png']):
+ im=Image.open(f).convert('RGBA');im=im.crop(im.getbbox());im.thumbnail((870,680));board.paste(im,(12+i*890,730),im)
+board.save(C/'kontekst-og-mastere.png');shutil.copy2(__file__,R/'klargjor.py.txt')
+print('Klargjort',name,cel,'kontaktpiksler',contact)

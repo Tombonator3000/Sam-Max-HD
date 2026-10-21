@@ -1,0 +1,17 @@
+from pathlib import Path
+import json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-retur3573'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+start=read(R/'start.json');native=read(R/'egen-native7.json')['ruter'];assert len(native)==7 and not C.exists();rows=[]
+for job in ['fig124_01','fig124_02']:
+ m=read(R/('rutekart-'+job+'.json'))[job];assert sha(A/'jobber'/job/'resultat.png')==m['sha256_resultat'];rows.append(dict(jobb=job,sha256=m['sha256_resultat'],resultat='jobber/'+job+'/resultat.png',rutekart='rapporter/'+R.name+'/rutekart-'+job+'.json',levert=True,nye_ruter=sum(e['jobb']==job for e in native),egenkontroll='SJEKK',egenkontrollert=True,visuelt_kontrollert=False,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+progress=dict(leveranser=rows,laget=8,helmalerier=8,reparerte_figurark=2,nye_figurark=0,hele_figurark=502,totalt=1758,uten_resultat=1256,egenkontrollert=7,prototype_visuelt_sett=8,native_mottatt=0,motorobservert=0,publisert=0,Tom_godkjent=0,Claude_godkjent=0,i_fellespakker=0,native_grunnlag=3566,native_kandidat=3573,holdt1804=True,visuell_sluttgodkjenning=False);save(R/'fremdrift.json',progress)
+shutil.copy2(R/'automatisk-mottak15.json',R/'automatisk-mottak-foer-SHA-registrering.json');auto=O/'automatisk-mottak-2';assert not auto.exists();subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(auto),'--jobb','fig124_01,fig124_02','--forhandsvisning',''],cwd=P,check=True)
+r=read(auto/'myke.json');save(R/'automatisk-mottak15.json',r);assert r['ruter_ok']==15 and all(r[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']),r
+assert len(start['filer'])==21810 and all(sha(M/f)==h for f,h in start['filer'].items());shutil.copytree(M,C)
+for e in native:
+ dest=C/e['fil'];assert not dest.exists();shutil.copy2(A/e['prototype'],dest);assert sha(dest)==e['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3566;meta['costume_cels']=3573;save(C/'mod.json',meta);files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};assert len(files)==21817;assert {f for f,h in start['filer'].items() if files[f]!=h}=={'mod.json'} and set(files)-set(start['filer'])=={e['fil'] for e in native};save(R/'kandidatfilhash.json',files)
+for e in rows:e['native_mottatt']=True
+progress['native_mottatt']=7;save(R/'fremdrift.json',progress);save(R/'mottak-SHA-stopp-avklart.json',dict(feil='Fremdrift ble først skrevet etter mottak, slik at historisk SHA ble valgt. Mottak stoppet uten ruter.',retting='Faktiske leveranse-SHA og rutekart registrert før nytt mottak, uendret kontrollkode og uendrede porter.',avklart=True))
+shutil.copy2(__file__,R/'mottak7.py.txt');print('Kandidat3573: automatisk15 OK, sju nye native,21810 gamle filer bevart.',flush=True)

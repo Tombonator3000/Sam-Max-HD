@@ -1,0 +1,12 @@
+from pathlib import Path
+import json
+R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/sam124-retur-20261022')
+rects={'R04':[85,938,265,965],'R05':[120,1080,235,1115],'R06':[108,1025,192,1065],'R07':[402,1144,464,1183],'R08':[188,1033,292,1084],'R09':[218,1103,357,1171]}
+extra={'R05':[(2,1051,[113,936,153,1002]),(3,1046,[82,976,139,1028])],'R08':[(2,700,[639,191,688,237]),(3,1152,[579,220,658,252])],'R09':[(2,544,[630,761,661,805]),(3,580,[648,788,689,829])]}
+spots={'R04':[[170,916,202,939],[456,1034,485,1054]],'R06':[[150,992,201,1013],[475,1157,559,1177]]}
+for n in ['R04','R05','R06','R07','R08','R09','R10']:
+ p=R/'kall'/n/'plan.json';d=json.loads(p.read_text());d['losmerke_kildergb']=[255,243,227]
+ if n in rects:d.update(egen_synlig_skygge_rekt=rects[n],egen_skygge_visuelt_sett=True,egen_skygge_grunnlag='Egen fotregion sett mot grått og egen alfa. Bevarer generert kontakt og kantutjevning; telling i regionen er ikke et nøyaktig antall skyggepiksler.')
+ d['egne_feildeler']=[dict(egen_core_label=i,egen_core_piksler=s,egen_bbox=b,grunnlag='Løs kremhvit partikkel i egen tegning. Hele originalens alfa har én sammenhengende figur og ingen løs effekt her; kilde og kontekst sett før fjerning.') for i,s,b in extra.get(n,[])]
+ d['egne_rgb_glansflekker']=[dict(egen_rekt=b,grunnlag='Egen lys blå glansflekk inne i støvelen, sett i koordinatutsnitt. Fylles med nærmeste mørke egen støvel-RGB; alfa og helsilhuett er uendret.') for b in spots.get(n,[])]
+ p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')

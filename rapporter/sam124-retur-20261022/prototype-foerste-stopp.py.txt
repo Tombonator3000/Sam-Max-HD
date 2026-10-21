@@ -1,0 +1,58 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import hashlib,json,numpy as np,sys,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+def box(mask):
+ yy,xx=np.where(mask);return [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+name=sys.argv[1];C=R/'kall'/name;plan=read(C/'plan.json');e=plan['rute']
+raw=np.array(Image.open(C/'raa.png').convert('RGBA'));source=np.array(Image.open(e['source']).convert('RGBA'))
+shadow_rect=plan.get('egen_synlig_skygge_rekt',None)
+def shadow_mask(shape,rect):
+ m=np.zeros(shape[:2],bool)
+ if rect:
+  x0,y0,x1,y1=rect;m[y0:y1,x0:x1]=True
+ return m
+def clean(a,rect):
+ core=a[:,:,3]>=CORE;assert core.any()
+ protected=shadow_mask(a.shape,rect)&~core
+ original=a.copy();a[(nd.distance_transform_edt(~core)>1.5)&~protected]=0
+ trust=a[:,:,3]>=245;_,ix=nd.distance_transform_edt(~trust,return_indices=True)
+ edge=(a[:,:,3]>0)&(a[:,:,3]<245)&~protected;a[edge,:3]=a[tuple(ix)][edge,:3]
+ a[a[:,:,3]==0,:3]=0
+ assert np.array_equal(a[protected],original[protected])
+ return a
+
+own=clean(raw.copy(),shadow_rect)
+lab,n=nd.label(own[:,:,3]>=CORE,np.ones((3,3)));sizes=np.bincount(lab.ravel());main=1+int(np.argmax(sizes[1:]));_,ix=nd.distance_transform_edt(lab==0,return_indices=True);grown=lab[tuple(ix)]
+marks=[];alpha_before=own[:,:,3].copy()
+for label in range(1,n+1):
+ if label==main:continue
+ mask=lab==label;pixels=own[mask,:3].astype(int)
+ assert np.mean(np.min(pixels,axis=1)>150)>.5,(name,'Uklassifisert løs kjerne',label)
+ region=(grown==label)&(own[:,:,3]>0);own[region,:3]=[255,255,255]
+ marks.append(dict(egen_bbox=box(mask),egen_core_piksler=int(mask.sum()),RGB=[255,255,255]))
+assert np.array_equal(alpha_before,own[:,:,3])
+Image.fromarray(own).save(C/'egen-renset.png')
+sx0,sy0,sx1,sy1=box(source[:,:,3]>0);ox0,oy0,ox1,oy1=box(own[:,:,3]>=CORE)
+fx,fy=(sx1-sx0)*4/(ox1-ox0),(sy1-sy0)*4/(oy1-oy0);assert .88<=fx/fy<=1.12
+offx=sx0*4+8-ox0*fx;offy=sy0*4+8-oy0*fy
+out=Image.fromarray(own).transform((source.shape[1]*4+16,source.shape[0]*4+16),Image.Transform.AFFINE,(1/fx,0,-offx/fx,0,1/fy,-offy/fy),Image.Resampling.BICUBIC)
+target_shadow=None
+if shadow_rect:
+ x0,y0,x1,y1=shadow_rect;target_shadow=[max(0,int(np.floor(x0*fx+offx))-1),max(0,int(np.floor(y0*fy+offy))-1),min(out.width,int(np.ceil(x1*fx+offx))+1),min(out.height,int(np.ceil(y1*fy+offy))+1)]
+arr=clean(np.array(out),target_shadow);out=Image.fromarray(arr)
+iou,coverage=_iou(arr[:,:,3]>=CORE,np.repeat(np.repeat(source[:,:,3]>0,4,0),4,1),-8,-8)
+f=C/(e['bilde']+'-prototype.png');out.save(f)
+shadow=shadow_mask(arr.shape,target_shadow)&(arr[:,:,3]>0)&(arr[:,:,3]<CORE)
+record=dict(bilde=e['bilde'],kall=name,prototype=f.relative_to(A).as_posix(),sha256=sha(f),source_sha256=sha(Path(e['source'])),raa_sha256=sha(C/'raa.png'),egen_alfa=True,originalmaske=False,originalfragmenter=False,CORE=CORE,IoU=iou,dekning=coverage,native_ok=iou>=GOOD_IOU and coverage>=GOOD_COVER,egen_hel_affin=[fx,fy,offx,offy],egen_alfa_rens_radius_raw=1.5,egen_synlig_skygge_rekt=shadow_rect,plassert_skygge_rekt=target_shadow,egne_skygge_alpha_piksler=int(shadow.sum()),egne_skygge_alfa_nivaa=sorted(np.unique(arr[shadow,3]).tolist()) if shadow.any() else [],rene_hvite_losmerker=marks,rgb_rens_endrer_ikke_alfa=True,modell_oppgitt=False)
+save(C/'prototypekontroll.json',record)
+board=Image.new('RGBA',(1200,580),'#788b9c');d=ImageDraw.Draw(board);d.text((12,8),f'{name} {e["bilde"]}: kilde4x / egen4x IoU{iou:.4f} dekning{coverage:.4f}',fill='white')
+board.alpha_composite(Image.fromarray(source).resize((source.shape[1]*4,source.shape[0]*4),Image.Resampling.NEAREST),(20,40));board.alpha_composite(out,(620,32));board.convert('RGB').save(C/'helkontroll.png')
+shutil.copy2(__file__,R/'prototype.py.txt')
+print(name,'native',record['native_ok'],'IoU',round(iou,4),'dekning',round(coverage,4),'hvite løsmerker',len(marks),'skyggealfa',record['egne_skygge_alpha_piksler'])

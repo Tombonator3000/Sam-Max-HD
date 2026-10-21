@@ -1,0 +1,55 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from collections import Counter
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,numpy as np,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+F=A/'rapporter/sam124-foerste-20261021';N=A/'rapporter/sam124-kilde-20261021';M=P/'mods/gpt'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+assert not R.exists();R.mkdir()
+assert not git(A,'status','--porcelain') and not git(P,'status','--porcelain')
+old=read(F/'publiserte-moddfiler-3566.json');protected=read(F/'beskyttede-samlet1412.json')
+assert len(old)==21810 and all(sha(M/f)==h for f,h in old.items())
+assert len(protected)==1412 and all(sha(A/f)==h for f,h in protected.items())
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==502
+receipt=read(F/'mottak-publisert.json');lease=git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]
+assert lease==receipt['hd_mod']=='b86782c3432d915d241929bf92130f26e152b29a'
+stash=git(P,'stash','list','--format=%H').splitlines();assert stash==receipt['stasher']
+save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),hd_mod=lease,native=3566,filer=old,beskyttede=protected,stash=stash,figurark=502,bibliotek=['losninger/grafikk/scumm-v6-kostymer-skygge-og-soppelruter.md','losninger/grafikk/figurark-fast-storrelse.md'],bibliotek_kompatibilitet='Samme låste ScummVM c9091321 og egne v6-indeksbilder. Bruker indeksmetoden, ikke fjerning av indeks 13 som gråfiksløsning.'))
+obj=np.array(Image.open(P/'work/extract/objects/obj258_01_idx.png'))
+events=read(F/'kandidat.json')['tegninger'];rows=[]
+for n in range(1797,1805):
+    e=events[f'costume124_{n}'];source=P/f'work/extract/costumes/costume124_{n}.png';idx=P/f'work/extract/costumes/costume124_{n}_idx.png'
+    arr=np.array(Image.open(idx));yy,xx=np.where(np.isin(arr,[252,253,254]));wx,wy=xx+e['pos'][0],yy+e['pos'][1];ox,oy=wx-32,wy-160
+    assert ((ox>=0)&(oy>=0)&(ox<obj.shape[1])&(oy<obj.shape[0])).all()
+    bg=obj[oy,ox];fg=arr[yy,xx];different=bg!=fg
+    assert np.isin(bg,[252,253,254]).all()
+    assert all((a,b)==(254,253) for a,b in zip(bg[different],fg[different]))
+    rows.append(dict(bilde=f'costume124_{n}',source=str(source),source_sha256=sha(source),idx_sha256=sha(idx),rompos=e['pos'],maal=e['maal'],graa=len(xx),ren_bakgrunnsgjenmaling=int((~different).sum()),morkere_jakkekontakt=int(different.sum()),indekspar=[dict(fra=int(a),til=int(b),antall=c) for (a,b),c in Counter(zip(bg[different].tolist(),fg[different].tolist())).items()],kontakt_rompos=list(zip(wx[different].tolist(),wy[different].tolist())),kontekst=e['fil']))
+save(R/'sam-jakke-funksjon.json',dict(objekt=258,objektpos=[32,160],objektmaal=[104,40],objekt_idx_sha256=sha(P/'work/extract/objects/obj258_01_idx.png'),source_sam_er_bakgrunn=True,graa_er_ikke_bootdetaljer=True,indeks13_er_ikke_grunnlaget=True,ruter=rows))
+e=rows[0];src=Image.open(e['source']).convert('RGBA');arr=np.array(src);idx=np.array(Image.open(P/'work/extract/costumes/costume124_1797_idx.png'))
+gray=np.isin(idx,[252,253,254]);actor=(arr[:,:,3]>0)&~gray
+yy,xx=np.where(actor);actorbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+mark=arr.copy();mark[gray,:3]=[40,220,255]
+for wx,wy in e['kontakt_rompos']:mark[wy-e['rompos'][1],wx-e['rompos'][0],:3]=[255,90,100]
+board=Image.new('RGBA',(1700,1000),'#536576');dr=ImageDraw.Draw(board)
+dr.text((12,8),'Hele kilde1797 / cyan: eksisterende Sam-jakke / rosa: 254->253 kontakt / hele Sam-objektet',fill='white')
+board.alpha_composite(src.resize((src.width*5,src.height*5),Image.Resampling.NEAREST),(12,45))
+board.alpha_composite(Image.fromarray(mark).resize((src.width*5,src.height*5),Image.Resampling.NEAREST),(530,45))
+ob=Image.open(P/'work/extract/objects/obj258_01.png').convert('RGBA');board.alpha_composite(ob.resize((ob.width*5,ob.height*5),Image.Resampling.NEAREST),(1060,290))
+context=Path(e['kontekst']);flat=context.with_name(context.stem+'_flat.png');im=Image.open(flat).convert('RGB');im.thumbnail((1000,470));board.paste(im,(12,510))
+board.convert('RGB').save(R/'kilde-og-funksjon.png')
+save(R/'maalegrunnlag1797.json',dict(hel_kilde_urort=True,maaleboks_aktor_uten_stasjonar_Sam=actorbox,originalmaske_i_ny_grafikk=False,hele_originalens_CORE_IoU_dekningsport_beholdes=True))
+(R/'KILDEFUNKSJON.md').write_text('''# Retur ved Sams jakke
+
+Kostyme 124 ruter 1797 til 1804 tegner deler av det eksisterende Sam-objektet 258 på nytt. Alle blågrå piksler ved føttene faller på Sams jakke og bruker dens tre grå indekser. 210 av de tidlige 237 er eksakt samme indeks som underlaget. De øvrige 27 endrer bare underlagets indeks 254 til 253 i romposisjon x80..92, y172..178. Det er mørkere jakkekontakt, ikke egne støveldetaljer. Senere er kontakten ni piksler i 1802/1803 og null i 1804. Indeks 13 er ikke brukt; dette skal ikke behandles som generisk skyggesletting.
+
+Den nye tegningen må vise Lee-Harvey og Max som én hel rute, uten å gjenta Sams allerede malte jakke som nye løse klesfliker. Den lille kontaktdempingen ved den venstre støvelen skal bevares som en avgrenset, myk kontaktskygge over den eksisterende jakken, uten mørk kleskontur eller nye folder. Originalen og hele Sam-underlaget bestemmer funksjonen. Ingen gulv-/plattformfortolkning eller nye props.
+
+Motorens eksisterende myke figurer bygger HD-underlaget under ruten og legger egen RGBA over det, slik remake-skillen og drawSoftCels beskriver. Det muliggjør ekte gjennomsiktighet over Sams jakke uten klipping med originalens harde form. Bare målegrunnlaget for figurens egen helplassering skiller ut det statiske Sam-innholdet. Selve nytegningen skal redigeres hel med innebygd image_gen; ingen hard originalmaske eller delrekonstruksjon. Originalens uendrede CORE128/IoU0,6/dekning0,8 beholdes som teknisk port. Den faktiske motorvisningen avgjør om returen er løst.
+''')
+shutil.copy2(__file__,R/'start.py.txt')
+print('Åtte kilder undersøkt. Ren Sam-gjenmaling og kildeført mørkere kontakt er skilt. 27/27 er 254->253 på Sams jakke. Måleboks1797:',actorbox)

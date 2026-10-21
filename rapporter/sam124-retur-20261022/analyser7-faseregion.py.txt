@@ -1,0 +1,39 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import hashlib,json,numpy as np,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+rows=read(R/'motor7-fasediagnose.json');native=read(R/'egen-native7.json')['ruter'];by={e['bilde']:e for e in native};assert len(rows)==len(by)==7;buf=read(R/'motor7-bufferkontroll.json');assert buf['samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge']
+meta=P/'work/extract/rooms.json';idxfile=P/'mods/gpt/rooms/room025_idx.png';idx=np.array(Image.open(idxfile));cycles=read(meta)['rooms']['25']['cycles'];assert cycles==[[117,129,1920,0],[130,141,1920,0],[142,151,1842,0]]
+indices=[k for lo,hi,_,_ in cycles for k in range(lo,hi+1)];cycle_source=nd.maximum_filter(np.isin(idx,indices),size=3);cycle=np.repeat(np.repeat(cycle_source,4,0),4,1);assert cycle.shape==(800,1280)
+for e in rows:
+ assert e['original_aktorverdier_identiske'] and e['opphav']==[0,0]
+ imgs=[]
+ for k in ['grunnlag_fil','kandidat_fil']:
+  p=Path(e[k]);imgs.extend([np.array(Image.open(p).convert('RGB')),np.array(Image.open(p.with_name(p.stem+'_flat.png')).convert('RGB'))])
+ old,origold,new,orignew=imgs;delta=np.any(old!=new,axis=2);origdiff=np.any(origold!=orignew,axis=2);outside=delta.copy();x,y,x1,y1=e['rekt_hd'];outside[y:y1,x:x1]=False
+ # Klassifiser observerte tilstandsforskjeller, ikke en akseptgrense for kunst.
+ # 3x3 originale prøver i composeCycled gir en originalpiksel nabostøtte.
+ state=nd.maximum_filter(origdiff,size=9);unknown=outside&~state&~cycle
+ assert not unknown.any(),(e['bilde'],'Uforklart endring utenfor ruten',int(unknown.sum()))
+ assert sha(O/'mod-retur3573'/by[e['bilde']]['fil'])==by[e['bilde']]['sha256']
+ e.update(native_sha256=by[e['bilde']]['sha256'],grunnlag_sha256=sha(Path(e['grunnlag_fil'])),kandidat_sha256=sha(Path(e['kandidat_fil'])),utenfor_bade_ny_rute_og_kildens_tilstandsomraader=0,sykliske_kildeindekser=indices,kildens_cycle_nabovindu_original=3,kildens_endring_nabovindu_hd=9,utenfor_ny_rute_og_originalendring_men_i_cycle=int((outside&~state&cycle).sum()),utenfor_ny_rute_i_originalendring=int((outside&state).sum()),hele_originalflater_SHA_identiske=False,visuelt_sett=False)
+ e.pop('state_radius_hd',None);e.pop('uforklarte_utenfor_ny_rute',None)
+ # Bevar selve klassifiseringsmaskene som prøvedata; de brukes aldri på kunsten.
+ Image.fromarray((cycle*255).astype('uint8')).save(R/'motor7-kilde-cycleomraade.png')
+ Image.fromarray((state*255).astype('uint8')).save(R/(e['bilde']+'-kildeendring.png'))
+boards=[]
+for start in range(0,7,4):
+ subset=rows[start:start+4];board=Image.new('RGB',(1800,1120),'#304050');dr=ImageDraw.Draw(board)
+ for i,e in enumerate(subset):
+  xx=i%2*900;yy=i//2*560;x,y=e['pos'];w,h=e['maal'];box=(max(0,x*4-24),max(0,y*4-24),min(1280,(x+w)*4+24),min(800,(y+h)*4+24));dr.text((xx+8,yy+8),e['bilde']+': 3566 / retur3573',fill='white')
+  for z,k in enumerate(['grunnlag_fil','kandidat_fil']):
+   im=Image.open(e[k]).convert('RGB').crop(box);im.thumbnail((435,510),Image.Resampling.LANCZOS);board.paste(im,(xx+8+z*445,yy+30))
+ f=R/f'motor7-varianter-{start//4+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=[e['bilde'] for e in subset],visuelt_sett=False))
+shots=[]
+for name in ['costume124_1797','costume124_1803']:
+ e=next(e for e in rows if e['bilde']==name);f=R/(name+'-motor3573.png');shutil.copy2(e['kandidat_fil'],f);shots.append(dict(bilde=name,fil=f.name,sha256=sha(f),visuelt_sett=False))
+save(R/'motor7-pikselkontroll.json',rows);save(R/'motor7-visuell-plan.json',dict(varianter=boards,hele_motorbilder=shots,visuelt_sett=False))
+proof=dict(nye_native=7,native=3573,kontroller=720,nullkontroller=711,samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge=True,ingen_nye_eller_okte_bufferavvik=True,avviksfri_prove=False,alle_hele_originalflater_SHA_identiske=False,alle_originalaktorverdier_identiske=True,utenfor_ny_rute_endrede_kildeomraader_og_cycle=0,source_rooms_sha256=sha(meta),room025_idx_sha256=sha(idxfile),sykler=cycles,kildens_cyklenabovindu_original=3,kildens_endring_nabovindu_hd=9,masker_kun_prøveklassifisering_ikke_klipping_av_egen_kunst=True,primaerskript217_fra_originalinngang=True,full_naturlig_gjennomspilling=False,visuelt_sett=False,aapne_returruter=1,rute1804_holdes=True,begrensning='Hele viewport-originalflaten er ikke SHA-identisk mellom kontrollene. Originale aktørverdier er identiske for samme cel, posisjon og mål. Alle HD-forskjeller utenfor nye ruter ligger i dokumenterte sykliske kildeområder eller områder der faktisk originaltilstand endret seg. Dette er avgrenset kildeklassifisering, ikke et bevis på identisk helskjerm eller full naturlig gjennomspilling.')
+save(R/'motor7-sammenligning.json',proof);shutil.copy2(O/'analyser7.py',R/'analyser7-helflat-STOPPET.py.txt');shutil.copy2(__file__,R/'analyser7-faseregion.py.txt');print('7/7 kildeaktører identiske. Ingen endring utenfor nye ruter og dokumenterte kildeendringer/cycle. Helviewport-begrensning bevart.')

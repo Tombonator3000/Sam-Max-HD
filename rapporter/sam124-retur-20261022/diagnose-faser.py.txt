@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,re,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+b=read(R/'grunnlag3566.json');c=read(R/'retur3573.json');names=[e['bilde'] for e in read(R/'egen-native7.json')['ruter']];log=(O/'retur3573/scummvm.log').read_text();origins={int(f):[int(x),int(y)] for f,r,x,y in re.findall(r'DigHD: whole screen frame (\d+) \(room (\d+), screen at (-?\d+),(-?\d+)\)',log) if int(r)==25}
+def im(e,flat=False):
+ p=Path(e['fil']);return np.array(Image.open(p.with_name(p.stem+'_flat.png') if flat else p).convert('RGB'))
+rows=[]
+for name in names:
+ cel=int(name.split('_')[1]);pairs=[]
+ for ne in c['hendelser']:
+  if ne['cel']!=cel or not Path(ne['fil']).exists():continue
+  for oe in b['hendelser']:
+   if oe['cel']==cel and oe['pos']==ne['pos'] and oe['maal']==ne['maal'] and Path(oe['fil']).exists():pairs.append((abs(ne['bildeframe']-oe['bildeframe']),ne['bildeframe'],oe,ne))
+ _,_,oe,ne=min(pairs,key=lambda p:p[:2]);x,y=[ne['pos'][i]-origins[ne['bildeframe']][i] for i in range(2)];w,h=ne['maal'];box=[max(0,x*4-8),max(0,y*4-8),min(1280,(x+w)*4+8),min(800,(y+h)*4+8)];old,new=im(oe),im(ne);a,z=im(oe,True),im(ne,True);origdiff=np.any(a!=z,axis=2);diff=np.any(old!=new,axis=2);outside=diff.copy();outside[box[1]:box[3],box[0]:box[2]]=False;original_region=origdiff.copy();original_region[box[1]:box[3],box[0]:box[2]]=False
+ # Kildevinduets ni B-spline-prøver ligger i 3x3 originalpiksler. Tolv HD-piksler er en konservativ øvre avstand kun for faseklassifisering.
+ state_support=nd.maximum_filter(origdiff,size=25);unexplained=outside&~state_support
+ source=np.array(Image.open(P/f'work/extract/costumes/{name}.png').convert('RGBA'));mask=np.repeat(np.repeat(source[:,:,3]>0,4,0),4,1);actor1=a[y*4:(y+h)*4,x*4:(x+w)*4];actor2=z[y*4:(y+h)*4,x*4:(x+w)*4];source_equal=np.array_equal(actor1[mask],actor2[mask]);coords=np.stack(np.where(mask),1);hs=hashlib.sha256(coords.tobytes()+actor1[mask].tobytes()).hexdigest()
+ rows.append(dict(bilde=name,grunnlag_fil=oe['fil'],kandidat_fil=ne['fil'],grunnlag_frame=oe['bildeframe'],kandidat_frame=ne['bildeframe'],pos=ne['pos'],maal=ne['maal'],opphav=origins[ne['bildeframe']],rekt_hd=box,original_aktorverdier_identiske=source_equal,original_aktorverdier_sha256=hs,hel_originalflate_identisk=not origdiff.any(),forskjeller_hel_originalflate=int(origdiff.sum()),endrede_HD_piksler=int(diff.sum()),endrede_utenfor_ny_rute=int(outside.sum()),uforklarte_utenfor_ny_rute=int(unexplained.sum()),state_radius_hd=12,egen_alfa_ikke_klippet=True))
+ print(name,'originalaktør',source_equal,'origflatdiff',int(origdiff.sum()),'HDutenfor',int(outside.sum()),'uforklart',int(unexplained.sum()))
+(R/'motor7-fasediagnose.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')

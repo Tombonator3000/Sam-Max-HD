@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,hashlib,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam124-retur-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+v=read(R/'motor7-visuell-plan.json')
+for group in ['varianter','hele_motorbilder']:
+ for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=7,hele_motorbilder_sett=2,kommentar='Lee-Harvey/Max, retning, grep, fingre, kildebekreftede såleputer og lyse effekter kontrollert. Sams eksisterende HD-jakke er sammenhengende, ingen nye papirfliker. Bare egenkontroll, ikke Tom-/Claude-godkjenning.');save(R/'motor7-visuell-plan.json',v)
+p=read(R/'motor7-sammenligning.json');p['visuelt_sett']=True;save(R/'motor7-sammenligning.json',p)
+rows=read(R/'motor7-pikselkontroll.json')
+for e in rows:e['visuelt_sett']=True
+save(R/'motor7-pikselkontroll.json',rows)
+s=read(R/'start.json');assert all(sha(A/f)==h for f,h in s['beskyttede'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==s['stash'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==502
+for f,h in s['filer'].items():assert sha(P/'mods/gpt'/f)==h
+progress=read(R/'fremdrift.json');progress.update(motorobservert=7,motor_visuelt_sett=7,helskjermbilder_sett=2,kontroller=720,nullkontroller=711,ingen_nye_bufferavvik=True,full_naturlig_gjennomspilling=False,hele_bunken_kontrollert=False)
+for e in progress['leveranser']:e.update(motorobservert=True,visuelt_kontrollert=e['jobb']=='fig124_01',native_valgt=e['nye_ruter'],motor_visuelt_sett=True)
+save(R/'fremdrift.json',progress)
+save(R/'sluttkontroll.json',dict(leveranser=progress['leveranser'],valgte_native=7,holdt_native=1,holdt_bilde='costume124_1804',ark_med_resultat=502,totalt_figurark=1758,uten_resultat=1256,prototype_visuelt_sett=8,hele_ark_sett=2,motorobservert=7,motor_visuelt_sett=7,hele_motorbilder_sett=2,visuelt_sett=True,visuell_sluttgodkjenning=False,Tom_godkjent=False,Claude_godkjent=False,native_antall_grunnlag=3566,native_antall_kandidat=3573,native_filer_grunnlag=21810,native_filer_kandidat=21817,alle_tidligere_native_png_bevart=21804,beskyttede=1412,stash=s['stash'],offisielle_mottaksporter_uendret=True,ingen_FEIL_i_valgte_ark=True,rute1804_er_aapen_retur=True))
+print('Sluttkontroll sju OK, én retur holdt, ingen Tom-/Claude-godkjenning.')
