@@ -1,0 +1,58 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+S=A/'rapporter/sam-max223-slutt-20261021'; N=A/'rapporter/sam-max223-kilde-20261021'
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+r=read(R/'publisert.json')
+assert r['native']==3324 and r['Latest_bekreftet'] and r['figurcropraster_identiske']==48
+assert r['faktiske_fellesnedlastinger_hentet_igjen']
+assert not git(P,'status','--porcelain') and git(P,'rev-parse','HEAD')==r['kode']
+protected=read(N/'beskyttede-samlet1252.json')
+assert len(protected)==1252 and all(sha(A/f)==h for f,h in protected.items())
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==465
+assert git(P,'stash','list','--format=%H').splitlines()==read(S/'grunnlag-produksjon.json')['stash']
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+url=r['url']
+freeze='Nativefrysen for det ferdige samlepunktet er frigitt.' if r['native_frys_kan_frigis'] else 'Nativefrysen beholdes til de registrerte ekstra pakkebyggene er avsluttet. Ikke dupliser eller avbryt byggene; les status og eventuell feil før neste nativepublisering.'
+active='\n\nRegistrerte ekstra pakkebygg: '+json.dumps(r['aktive_ekstra_pakkebygg'],ensure_ascii=False)+'.' if r['aktive_ekstra_pakkebygg'] else ''
+text=f'''[Felles Linux og Windows med 3324 native HD-ruter]({url}) er publisert og bekreftet som Latest. Siden felles 3276 er sju hele bokark og 48 native lagt til. Begge faktiske plattformnedlastinger, fire vedleggsdigester og alle 21566 runtime-moddfiler per pakke er kontrollert. De publiserte fellesvedleggene er hentet på nytt med SHA-filer og bekreftet byteidentiske. Hd-mod er `{r['hd_mod']}` og pakkekoden `{r['kode']}`. {freeze}{active}
+
+Denne kjøringen leverer to hele ark, fig223_08 og fig223_09, med 18 nye native fra åtte egne hele malerier og ti hele RGBA-aliasmål. Begge ark er OK, alle 18 automatisk OK og faste porter CORE128, IoU 0,6 og dekning 0,8 er uendret. Første fem bokark er tidligere levert med 30 native; samlet er det sju ark, 48 native, 19 egne hele malerier og 29 hele aliasmål. Ett tidligere SJEKK-varsel i rute 1947 er visuelt vurdert og bevart. Råbilder, faktiske argumenter, notater, SHA-festet fremdrift og rutekart er bevart. Egen alfa og kildebekreftede smådeler er beholdt uten hard originalmaske eller originale pikselfragmenter. Ingen ny Tom-/Claude-godkjenning.
+
+Seks andre hele bokark med 46 mål holdes tilbake: fig223_06, fig223_07, fig223_10, fig223_11, fig223_12 og fig223_13. K01_1951 fikk feil rødt munninnslag og K03_1987 feil hodevinkel. Bildeverktøyet avviste det ene rettingskallet R01 ved output med moderation_blocked, kategori other, forespørsel ec8fbab7-35fb-48c1-a914-96c0a57af924. Ingen råfil kom. Ingen nye bildekall eller alternative formuleringer, grensesnitt eller fragmentrekonstruksjon er forsøkt etter denne avvisningen. To andre K04-tegninger, 1988 og 1997, har for stor sidevinkel i motoren og er heller ikke publisert. Utkastkandidat 3333 og ark 11 er bevart som historikk. Endelig publisert kandidat er 3324. Se STOPP-R01.md, tilbakeholdt.json med avviste hele RGBA-hash og alle 21 aliasmål, samt K04-motorretur.md. Stoppen gjelder bokreturen og aliasene; uavhengige jobber fortsetter.
+
+Motivet er Sam og Max med stor åpen bok i Conroys soverom, rom 45, kostyme 223 og palett 0. Begge figurer og boken inngår i hver hel tegning. Den lille røde munn-/tungefasen i 1980 er kildebekreftet. Ekstra vanlig Max er en separat aktør i kontrollprøven. Originaler, spillkontekst, begge godkjente hovedark og foregående bokmaleri er sett før nytegning. Lokalt primærskript 210 er lest, men full naturlig boksekvens er ikke avspilt.
+
+Den faktiske nye Linux-binæren, SHA256 `{r['linux_binar_sha256']}`, er avspilt med både 3276-grunnlaget og den faktiske pakkemodden 3324 i gyldig hel animasjon 6. Alle 94 kilder, inkludert alle 48 nye mål, er logget. Hver side har 720 bilder, 360 bufferkontroller og 359 null. Samme kjente 160-avvik ved bilde 36 med identiske koordinater, begge RGB-verdier og rekkefølge. Ingen nye eller økte bufferfeil. Alle 48 originalflater er SHA-identiske og alle 48 par har null endringer utenfor logget aktørflate med åtte HD-pikslers målemargin. Alle 48 nativefiler og figurutsnitt er identiske med visuelt kontrollert produksjon. Nitten hele varianter og åtte hele før/etter-par er sett. Andre aktører og romskript er ikke skjult. Hele prøven er ikke avviksfri.
+
+465 av 1758 hele figurjobber har resultat; 1293 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Hd-mod er publisert additivt fra eksakt tidligere fjern-SHA, hentet tilbake og kontrollert med alle 21567 filhash. Alle tidligere filer, 1252 beskyttede kilder, tre opprinnelige stasher og {r['bevarte_tidligere_releaser']} tidligere releaser er bevart. Begge pakkebygg lyktes på første forsøk: Linux {r['linux_run']} og Windows {r['windows_run']}. Full naturlig boksekvens/gjennomspilling, interaktiv Windows og ny webtest gjenstår. De kjente Windows-SDL-startfeilene, inventarkanten i rom 35, tidligere testhopp/tidsavbrudd og inventarikonets RGB under 044-eksplosjonen er fortsatt åpne. Grønt bygg er ingen påstand om at sporadisk SDL-startfeil er rettet.
+
+Neste uavhengige jobb er fig097_01, kostyme 97 fra Tunnel of Love i rom 22. Første originalark og ressursbanken er sett. Rutene viser selve svanebåten; det generiske jobbnavnet Sam og Max er ikke tilstrekkelig motivgrunnlag. Kildeklargjør gyldig animasjon, riktig palett og faktisk romkontekst før nytegning. Ingen 97-bildekall eller resultater er laget. Gjenoppta en eventuell ny kildeplan fremfor å duplisere den. Fortsett med uavhengige produserbare jobber og returer. Tidligere verktøyavviste motiver omprøves ikke, og ugyldige 344/346-ruter spilles ikke.
+
+Grafikkautomatikken fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke. Main får bare memory.md, todo.md, STATUS.md og log.md; grafikk og rapporter ligger på gpt-arbeid. Ingen motor- eller pipelineendring. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Bevis: rapporter/sam-max223-slutt-20261021 og rapporter/felles-release-20261021-bok på gpt-arbeid.
+'''
+for name,title in [('memory.md','Gjeldende grafikkstatus'),('STATUS.md','Sist verifisert grafikk og pakker')]:
+    p=P/name; t=p.read_text(); i=t.find('\n')
+    p.write_text(t[:i+1]+'\n## '+title+', '+now+'\n\n'+text+'\nTidligere oppføringer nedenfor er bevart som historikk.\n'+t[i+1:])
+p=P/'todo.md'; t=p.read_text(); i=t.find('\n')
+p.write_text(t[:i+1]+f'''\n## Neste, oppdatert {now}
+
+- [x] Levert fig223_08 og fig223_09, 18 nye native; 3324 totalt. Begge ark OK. Alle 21567 filhash og tidligere grafikk bekreftet etter hent.
+- [x] Publisert og kontrollert felles Linux/Windows med alle 48 nye bokruter siden 3276. 21566 runtimefiler per pakke, 48 identiske figurutsnitt, 359/360 null i både pakken og grunnlaget. Nitten varianter og åtte hele par sett. Faktiske fellesvedlegg hentet igjen og Latest bekreftet: {url}
+- [ ] {freeze}{active}
+- [ ] Behold STOPP for siste bokretur og hele aliaser: fig223_06, 07, 10, 11, 12 og 13, totalt 46 mål. Ingen omprøve eller alternativ fremstilling av de verktøyavviste motivene. K04-utkastene er også tilbakeholdt på grunn av feil hodevinkel. Ikke tell delvise ark som levert.
+- [ ] Kildeklargjør fig097_01 og neste praktiske bunke fra kostyme 97. Originalen viser svanebåten i Tunnel of Love, rom 22. Avklar gyldig animasjon, palett og faktiske rombilder før nytegning. Ingen 97-kall eller resultater ennå.
+- [ ] Fortsett faktisk produksjon, egenkontroll, visuell kontroll, native mottak, relevant motoravspilling og additiv publisering av uavhengige produserbare jobber. 465 av 1758 hele figurjobber har resultat; 1293 gjenstår pluss returer, katalogfeil og sluttkontroll.
+- [ ] Oppdater begge pakker ved neste samlepunkt og avslutning. Bevar tidligere grafikk, releaser, 1252 kilder og tre stasher. Skill laget, egenkontrollert, native mottatt, visuelt sett, motorobservert, publisert, pakket og Tom-/Claude-godkjent.
+- [ ] Samlet sluttkontroll, full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Automatikken fortsetter; gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+'''+t[i+1:])
+with (P/'log.md').open('a') as f:f.write('\n\n## '+now+' (Codex)\n\n'+text)
+assert set(git(P,'diff','--name-only').splitlines())=={'memory.md','todo.md','STATUS.md','log.md'}
+shutil.copy2(__file__,R/'oppdater-mainrapport.py.txt')
+print('Bare de fire dokumentasjonsfilene er oppdatert med verifisert fellesutgave og avgrenset bokstopp.',flush=True)
