@@ -1,5 +1,16 @@
 # todo.md
 
+## Siste grafikkstatus, 2026-10-21 04:51
+
+427 av 1758 hele figurjobber har resultat. Native 3098 er publisert og hentet. Fellespakkene har 3013 og mangler 85 nye native; nativefrysen gjelder til nytt samlepunkt er ferdig kontrollert.
+
+- [x] Fullfør siste kattepose 052_1920 og hele fig052_01; bevar de 20 andre rutene.
+- [x] Lag, kontroller, motorprøv og publiser fig115_01..03 med 84 nye golf-ruter.
+- [ ] Bygg og hent felles Linux-/Windows-pakker med 3098 native. Kontroller SHA, alle runtimefiler og de 85 nye rutene i faktisk Linux før publisering.
+- [ ] Kildeanalyser neste produserbare familie, foreløpig fig304_01..05. Ingen nye bildekall ennå.
+- [ ] Fullfør øvrige produserbare jobber, returer og sluttkontroll. Automatikken fortsetter.
+
+
 ## Siste verifiserte grafikkstatus, 2026-10-21 03:31
 
 423 av 1758 hele figurjobber har resultat; 1335 gjenstår pluss returer og sluttkontroll. [Felles Linux og Windows med 3013 native ruter](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-max052-delvis) er publisert og kontrollert. Begge pakker har de 55 nye rutene fra 045/052; alle 55 er observert i den faktiske Linux-pakken. Ingen nye eller økte bufferavvik. Se STATUS.md for avgrensninger.
