@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Oppdatert21.oktober2026:Hele045_01til03/treark/18nye native er produsert,egenkontrollert,mottatt,visuelt sett og motorobservert. Menneske gjennom knust kontordørglass,ikke Sam.13innebygde kall,125egne komponenter,16hele kilder og2hele aliasmål. Treark SJEKK med visuelle omrissvarsler vurdert og beholdt;alle18automatiske native OK med uendrede grenser. Kandidat2976,421av1758ark,1337gjenstår pluss returer/katalogfeil/sluttkontroll. Samme faktisk nedlastede Linux-binær ea4f35ca i120/120grunnlag og kandidat,119null,samme160ved36,91fra60null,ingen nye/økte. Trefør/etter0utenfornye lag. Pakker har2958 og mangler18;samlepunkt etter neste ordinære bunke. Neste052_01til03 viser Max med en svart katt og en brun rekvisitt,men kildeavspilling/primærskript må avklare hendelsen før tegning. Samtlige1012kilder/3stasher bevares,ingen ny Tom-/Claude-godkjenning.164_04fortsatt blokkert.
+
 Ferdig samlepunkt 2026-10-21 01:42:14nye ark/40ruter og hele22ark/70Sam029 er i kontrollert felles2958: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-tau029-slutt. Begge faktiske pakker/21200runtime-filer per pakke og Latest bekreftet.464kontroller463null,samme160ved36,211frafigurstart null,ingen nye/økte. Nativefrys frigitt.418av1758resultatark,1340gjenstår pluss returer/katalogfeil/sluttkontroll. Neste045_01til03 er bare kildeklargjort,ingen bildekall/resultat/native. Katalogens Sam-premiss er feil;les sam045-kilde-20261021/KILDEGRUNNLAG.md for mennesket/glasslaget før nytegning. Ikke gjenta Sam029eller dette pakkesamlepunktet.1000kilder/3stasher/tidligere PNG bevart,pluss12SHA-festede045jobbfiler.164_04fortsatt blokkert. Ingen ny Tom-/Claude-godkjenning.
 
 Oppdatert21.oktober2026:029_16til22,sju nye hele ark/17native er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert. Alle22ark/70ruter i029er nå mottatt og sett i motor. Fem nye innebygde kall og bevartT05;1975tanflis og1987tråd bevart;1973høye flekk/gap. Identisk hel kildearm1980til1989bruker samme eget maleri. Kandidat2958,418av1758resultatark,1340gjenstår.240kontroller239null,samme160ved36,211frafigurstart null,ingen nye/økte. Publisering/hent kvitteres separat. Pakker har2918,mangler40fra disse to siste bunkene. Felles samlepunkt følger nå.1000kilder/3stasher/tidligere filer bevares.164_04fortsatt blokkert,ingen ny Tom-/Claude-godkjenning.
@@ -992,9 +994,9 @@ Figurark for Max, Sam.
 - [ ] `fig040_01` (figurark 1 for Sam (kostyme 40), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig040_02` (figurark 2 for Sam (kostyme 40), 10 ruter: start mot høyre (2 ruter); animasjon 7 mot høyre (8 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig040_03` (figurark 3 for Sam (kostyme 40), 6 ruter: animasjon 7 mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig045_01` (figurark 1 for Sam (kostyme 45), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig045_02` (figurark 2 for Sam (kostyme 45), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig045_03` (figurark 3 for Sam (kostyme 45), 5 ruter: start (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig045_01` (figurark 1 for Sam (kostyme 45), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig045_02` (figurark 2 for Sam (kostyme 45), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig045_03` (figurark 3 for Sam (kostyme 45), 5 ruter: start (lag 15, tegnes over kroppen) mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 60
 

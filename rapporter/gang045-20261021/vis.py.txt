@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-gang045';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'motor-grunnlag2958.json');new=read(R/'motor-kandidat2976.json');rows=read(R/'native-fast4x-samlet.json')['ruter'];wanted={v['bilde'] for v in rows};assert len(wanted)==18 and base['kontroller']==new['kontroller'];obs={b:dict(v,native_sha256=sha(C/'costumes'/(b+'_hd.png'))) for b,v in new['tegninger'].items() if b in wanted};assert set(obs)==wanted;save(R/'motorobservasjoner.json',dict(sett=18,mangler=[],tegninger=obs,tvungen_isolert_avspilling=True,naturlig_gjennomspilling=False))
+plan=read(R/'ruteplan-unik.json')['ruter'];assert len(plan)==16;pixel=[]
+for page in range(4):
+ sub=plan[page*4:page*4+4];board=Image.new('RGBA',(3000,1640),'#344556');d=ImageDraw.Draw(board)
+ for i,e in enumerate(sub):
+  b=e['bilde'];v=obs[b];x,y=v['pos'];w,h=v['maal'];src=Image.open(P/'work/extract/costumes'/(b+'.png')).convert('RGBA').resize((w*4,h*4),Image.Resampling.NEAREST);native=Image.open(C/'costumes'/(b+'_hd.png')).convert('RGBA');motor=Image.open(v['fil']).convert('RGBA').crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8))
+  for col,(title,z) in enumerate([('original4x',src),('egen native4x',native),('faktisk Linux '+str(v['bildeframe']),motor)]):board.alpha_composite(z,(col*1000+8,i*410+40));d.text((col*1000+8,i*410+8),b+' '+title,fill='white')
+ board.convert('RGB').save(R/f'original-native-motor-side{page+1}.png')
+for b,v in obs.items():
+ x,y=v['pos'];w,h=v['maal'];src=np.array(Image.open(C/'costumes'/(b+'_hd.png')).convert('RGBA'));motor=np.array(Image.open(v['fil']).convert('RGBA').crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8)));core=src[:,:,3]>=254;xx=np.arange(core.shape[1])+x*4-8;yy=np.arange(core.shape[0])+y*4-8;core&=(xx[None,:]>=0)&(xx[None,:]<1280)&(yy[:,None]>=0)&(yy[:,None]<800);same=(np.abs(src[:,:,:3].astype(int)-motor[:,:,:3].astype(int))<=1).all(axis=2);pixel.append(dict(bilde=b,frame=v['bildeframe'],native_opake_piksler_i_bilde=int(core.sum()),opake_RGB_samsvar_inntil1=int((core&same).sum()),ikke_samsvar_kan_inkludere_zmaske_og_andre_lag=True))
+save(R/'native-motor-rastermaaling.json',pixel)
+whole=[];board=Image.new('RGB',(1920,840),'#253340');d=ImageDraw.Draw(board)
+for i,b in enumerate(['costume045_1792','costume045_1793','costume045_1794','costume045_1800','costume045_1802','costume045_1804']):
+ v=obs[b];p=Path(v['fil']);out=R/f'gang045-motor-{v["bildeframe"]}.png';shutil.copy2(p,out);whole.append(dict(bilde=b,frame=v['bildeframe'],fil=out.name,sha256=sha(out)));z=Image.open(out).convert('RGB').resize((640,400));x=i%3*640;y=i//3*420;board.paste(z,(x,y+20));d.text((x+4,y+4),b+' frame '+str(v['bildeframe']),fill='white')
+board.save(R/'hele-motorbilder-brett.png');save(R/'hele-motorbilder.json',whole);diffs=[]
+for b in ['costume045_1792','costume045_1794','costume045_1802']:
+ v=obs[b];bv=base['tegninger'][b];assert v['pos']==bv['pos'] and v['bildeframe']==bv['bildeframe'];old=np.array(Image.open(bv['fil']).convert('RGB'));z=np.array(Image.open(v['fil']).convert('RGB'));delta=np.any(old!=z,2);outside=delta.copy();active={}
+ for e in new['hendelser']:
+  if e['logg_frame']<v['bildeframe']:active[e['cel']//128]=e
+ for e in active.values():
+  x,y=e['pos'];w,h=e['maal'];outside[max(0,y*4-12):min(800,(y+h)*4+12),max(0,x*4-12):min(1280,(x+w)*4+12)]=False
+ yy,xx=np.nonzero(outside);diffs.append(dict(bilde=b,frame=v['bildeframe'],endrede_piksler=int(delta.sum()),utenfor_nye_cels_og_marg=int(outside.sum()),utenfor_boks=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)] if len(xx) else [],aktive=[e['cel'] for e in active.values()]));board=Image.new('RGB',(1280,430),'#253340');d=ImageDraw.Draw(board);board.paste(Image.fromarray(old).resize((640,400)),(0,30));board.paste(Image.fromarray(z).resize((640,400)),(640,30));d.text((5,8),b+' samme frame/posisjon/ny Linux-binar:grunnlag / ny',fill='white');board.save(R/f'foer-etter-{b}.png')
+save(R/'pikselkontroll.json',diffs);frames=[];refs=[]
+for f in range(60,114,2):
+ p=O/'kandidat2976'/f'frame_{f:06}_room008.png';frames.append(Image.open(p).convert('RGB'));refs.append(dict(frame=f,fil=str(p),sha256=sha(p)))
+gif=R/'gang045-faktisk-motor.gif';frames[0].save(gif,save_all=True,append_images=frames[1:],duration=[100]*26+[500],loop=0,optimize=False);save(R/'animasjonsproveniens.json',dict(fil=gif.name,sha256=sha(gif),motorbilder=refs,kilde='Faktisk nedlastet Linux-binar ea4f35ca med kandidat2976',visningshastighet_senket_for_kontroll=True,ingen_innlagte_nye_spillframes=True,tvungen_isolert_avspilling=True,naturlig_gjennomspilling=False));shutil.copy2(__file__,R/'vis.py.txt');print('18ruter,16original/native/motor,6hele bilder,3før/etter. Utenfor:',[v['utenfor_nye_cels_og_marg'] for v in diffs],flush=True);print('RGBsamsvar',[round(v['opake_RGB_samsvar_inntil1']/max(1,v['native_opake_piksler_i_bilde']),3) for v in pixel],flush=True)

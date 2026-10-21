@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import json,hashlib,numpy as np,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+parts=json.loads((R/'kildedeler.json').read_text());known={(tuple(p['maal_1x']),p['rgba_sha256']):p for p in parts};maps=[];added=[]
+for ident in ['D005','D084']:
+ orig=Image.open(R/'kilder'/(ident+'.png')).convert('RGBA');a=np.array(orig);rgb=a[:,:,:3].astype(int);gray=(np.ptp(rgb,axis=2)<=26)&(a[:,:,3]>0)&(rgb[:,:,0]>50);ll,n=nd.label(gray,np.ones((3,3)));yy,xx=np.nonzero((a[:,:,3]>0)&~gray);humanbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];sub=[]
+ for k,sl in enumerate(nd.find_objects(ll),1):
+  q=a[sl].copy();q[ll[sl]!=k]=0;dg=hashlib.sha256(q.tobytes()).hexdigest();key=((q.shape[1],q.shape[0]),dg)
+  if key not in known:
+   new=f'D{len(parts)+1:03}';f=R/'kilder'/(new+'.png');Image.fromarray(q).save(f);p=dict(id=new,kilde=f.relative_to(R).as_posix(),rgba_sha256=dg,fil_sha256=sha(f),maal_1x=[q.shape[1],q.shape[0]],areal=int((q[:,:,3]>0).sum()),graa=True,maal=[],materialdel=True);known[key]=p;parts.append(p);added.append(p)
+  p=known[key];sub.append(dict(id=p['id'],boks_1x=[sl[1].start,sl[0].start,sl[1].stop,sl[0].stop],kilde_rgba_sha256=dg))
+ maps.append(dict(overordnet=ident,menneske_boks_1x=humanbox,materialdeler=sub,kildemasken_bare_for_delrekt_og_identitetsbevis=True,hard_originalklipp_forbudt=True))
+save(R/'kildedeler.json',parts);save(R/'materialdelkart.json',maps);C=R/'kall/E05';C.mkdir();ref=Image.new('RGBA',(1536,1024));rows=[]
+for i,p in enumerate(added):
+ im=Image.open(R/p['kilde']).convert('RGBA');w,h=im.size;scale=min(24,300//max(w,h));x=i%4*384+(384-w*scale)//2;y=i//4*512+(512-h*scale)//2;ref.alpha_composite(im.resize((w*scale,h*scale),Image.Resampling.NEAREST),(x,y));rows.append(dict(id=p['id'],celle=[i%4*384,i//4*512,384,512],proxy_rekt=[x,y,w*scale,h*scale],referanseskala=scale,kilde_sha256=p['fil_sha256']))
+ref.save(C/'referanse-deler.png');save(C/'plan.json',dict(ruter=rows,kildekomponenter_ikke_utdatamaske=True));print('Nye materialdeler',len(added),[p['id'] for p in added],'alle deler',len(parts),'grå delhenvisninger',sum(len(m['materialdeler']) for m in maps))
+im=Image.open(R/'kall/E03/referanse-deler.png').convert('RGBA');bg=Image.new('RGBA',im.size,'#cdd4d7');bg.alpha_composite(im);bg.convert('RGB').save(R/'kall/E03/referanse-lys.png');shutil.copy2(__file__,R/'materialdeler.py.txt')

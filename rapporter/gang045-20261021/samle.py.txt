@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from smhd.myk import _iou,CORE,GOOD_IOU,GOOD_COVER
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+parts={p['id']:p for p in read(R/'kildedeler.json')};mat={p['overordnet']:p for p in read(R/'materialdelkart.json')};own={}
+for ident,p in parts.items():
+ f=R/'egne-deler'/(ident+'.png');meta=read(f.with_suffix('.json'));assert sha(f)==meta['sha256'];assert meta['kilde_rgba_sha256']==p['rgba_sha256'];im=Image.open(f).convert('RGBA');assert im.size==tuple(v*4+16 for v in p['maal_1x']);own[ident]=(im,meta)
+rows=[]
+for e in read(R/'ruteplan-unik.json')['ruter']:
+ b=e['bilde'];c=next(c for c in read(R/'komponentkart.json') if c['bilde']==b);src=np.array(Image.open(P/'work/extract/costumes'/(b+'.png')).convert('RGBA'));assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256'];h,w=src.shape[:2];out=Image.new('RGBA',(w*4+16,h*4+16));mapping=[]
+ for s in c['deler']:
+  ident=s['id'];im,meta=own[ident];x0,y0,x1,y1=s['boks_1x'];out.alpha_composite(im,(x0*4,y0*4));mapping.append(dict(id=ident,boks_1x=s['boks_1x'],sha256=meta['sha256'],kall=meta['kall'],kilde_rgba_sha256=s['kilde_rgba_sha256']))
+  if ident in mat:
+   for t in mat[ident]['materialdeler']:
+    qim,qmeta=own[t['id']];sx0,sy0,sx1,sy1=t['boks_1x'];assert qmeta['kilde_rgba_sha256']==t['kilde_rgba_sha256'];out.alpha_composite(qim,((x0+sx0)*4,(y0+sy0)*4));mapping.append(dict(id=t['id'],materialdel_i=ident,boks_1x=[x0+sx0,y0+sy0,x0+sx1,y0+sy1],sha256=qmeta['sha256'],kall=qmeta['kall'],kilde_rgba_sha256=t['kilde_rgba_sha256']))
+ a=np.array(out);core=a[:,:,3]>=CORE;_,near=nd.distance_transform_edt(~core,return_indices=True);weak=(a[:,:,3]>0)&(a[:,:,3]<=4);a[weak,:3]=a[near[0][weak],near[1][weak],:3];a[a[:,:,3]==0,:3]=0;mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cov=_iou(core,mask,-8,-8);f=R/'prototyper'/(b+'.png');Image.fromarray(a).save(f)
+ rec=dict(bilde=b,prototype=f.relative_to(R).as_posix(),sha256=sha(f),canonical_rgba_sha256=e['rgba_sha256'],snitt_union=iou,dekning=cov,native_ok=iou>=GOOD_IOU and cov>=GOOD_COVER,deler=mapping,kilde_komponenter=len(c['deler']),malruter=e['malruter'],egen_alfa=True,originalmaske=False,originalfragment_fallback=False,kilde_piksler=False,alle_kildehenviste_smadeler_levert=True)
+ save(R/(b+'-prototype.json'),rec);rows.append(rec);print(b,round(iou,3),round(cov,3),rec['native_ok'],flush=True)
+for page in range(math.ceil(len(rows)/4)):
+ sub=rows[page*4:page*4+4];board=Image.new('RGBA',(2200,1600),'#344556');d=ImageDraw.Draw(board)
+ for i,e in enumerate(sub):
+  src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);im=Image.open(R/e['prototype']).convert('RGBA');board.alpha_composite(src,(20,i*400+48));board.alpha_composite(im,(1112,i*400+40));d.text((20,i*400+12),e['bilde']+' original4x',fill='white');d.text((1112,i*400+12),f"eget4x {e['snitt_union']:.3f}/{e['dekning']:.3f}",fill='white')
+ board.convert('RGB').save(R/f'helkontroll-{page+1}.png')
+save(R/'prototyper-maalt.json',rows);shutil.copy2(__file__,R/'samle.py.txt');assert len(rows)==16;print('PASS',sum(v['native_ok'] for v in rows),'av16heleformer,125egne malte komponenter')

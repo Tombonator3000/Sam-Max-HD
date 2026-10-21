@@ -1,0 +1,6 @@
+from pathlib import Path
+import sys,shutil,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;call=sys.argv[1];p=Path(sys.argv[2]);C=R/'kall'/call;out=C/'raa.png';sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+if out.exists():assert sha(out)==sha(p)
+else:shutil.copy2(p,out)
+(C/'raabilde.json').write_text(json.dumps(dict(kilde=str(p),sha256=sha(out),verktøy='innebygd image_gen',original_bevart=True),ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'bevar-raa.py.txt');print(call,sha(out))

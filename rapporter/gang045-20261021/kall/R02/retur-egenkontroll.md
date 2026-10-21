@@ -1,0 +1,1 @@
+R02forkastes før plassering og import:for bokstavelig kopiert pikselgeometri og synlige rutenettkonturer i stedet for glatt HD-strek. Ingen av R02delene brukes. Råbilde,prompt og argumenter beholdes. Tre svakeste glassdeler tegnes separat iR03.

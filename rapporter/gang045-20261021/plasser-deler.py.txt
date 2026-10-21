@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import _iou
+import numpy as np,json,hashlib,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+parts={p['id']:p for p in json.loads((R/'kildedeler.json').read_text())}
+for call in sys.argv[1:]:
+ C=R/'kall'/call;raw=C/'raa.png';ar=np.array(Image.open(raw).convert('RGBA'));assert ar.shape==(1024,1536,4);plan=json.loads((C/'plan.json').read_text());report=[]
+ for e in plan['ruter']:
+  ident=e['id'];x,y,w,h=e['celle'];h=600 if call=='H01R' and ident=='D023' else h;roi=np.zeros(ar.shape[:2],bool);roi[y:y+h,x:x+w]=1;core=(ar[:,:,3]>=128)&roi
+  if ident=='D005':
+   rgb=ar[:,:,:3].astype(int);own_gray=core&(np.ptp(rgb,axis=2)<=40)&(rgb[:,:,0]>65);own_gray=nd.binary_dilation(own_gray,iterations=2);core&=~own_gray
+  labels,n=nd.label(core,np.ones((3,3)));areas=np.bincount(labels.ravel());areas[0]=0;assert areas.max()>0,ident;winner=int(areas.argmax());selected=labels==winner;yy,xx=np.nonzero(selected);gx,gy,gw,gh=map(int,[xx.min(),yy.min(),np.ptp(xx)+1,np.ptp(yy)+1]);dist,near=nd.distance_transform_edt(~selected,return_indices=True);allow=(dist<=2)&roi;q=ar.copy();q[:,:,3][~allow]=0;q[:,:,3][selected]=255;edge=allow&~selected;q[edge,:3]=q[near[0][edge],near[1][edge],:3];q[q[:,:,3]==0,:3]=0
+  src=np.array(Image.open(R/parts[ident]['kilde']).convert('RGBA'));H,W=src.shape[:2];outsize=(W*4+16,H*4+16);target=[0,0,W,H]
+  mat=R/'materialdelkart.json'
+  if mat.exists():
+   for m in json.loads(mat.read_text()):
+    if m['overordnet']==ident:target=m['menneske_boks_1x']
+  tx0,ty0,tx1,ty1=target;fx=gw/((tx1-tx0)*4);fy=gh/((ty1-ty0)*4);aff=[fx,0,gx-(8+tx0*4)*fx,0,fy,gy-(8+ty0*4)*fy];z=np.array(Image.fromarray(q).transform(outsize,Image.Transform.AFFINE,tuple(aff),Image.Resampling.BICUBIC));z[z[:,:,3]==0,:3]=0;mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);iou,cov=_iou(z[:,:,3]>=128,mask,-8,-8);f=R/'egne-deler'/(ident+'.png');Image.fromarray(z).save(f);rec=dict(id=ident,kall=call,fil=f.relative_to(R).as_posix(),sha256=sha(f),raa_sha256=sha(raw),kilde_rgba_sha256=parts[ident]['rgba_sha256'],egen_alfakjerne_boks=[gx,gy,gw,gh],uvalgte_egne_oykomponenter=[int(v) for i,v in enumerate(areas) if i!=winner and i!=0 and v],egen_core_storste_del=True,snitt_union=iou,dekning=cov,affin=aff,kildeklippemaske=False,kildepiksler=False,egen_alfa=True,material_malrekt_1x=target)
+  (R/'egne-deler'/(ident+'.json')).write_text(json.dumps(rec,ensure_ascii=False,indent=2)+'\n');report.append(rec);print(call,ident,round(iou,3),round(cov,3),'ekstra',rec['uvalgte_egne_oykomponenter'],flush=True)
+  board=Image.new('RGBA',(1000,600),'#4a5560');ss=min(8,450//max(W+4,H+4));s=Image.fromarray(src).resize((W*ss,H*ss),Image.Resampling.NEAREST);board.alpha_composite(s,(10+2*ss,40+2*ss));own=Image.fromarray(z).resize(((W+4)*ss,(H+4)*ss),Image.Resampling.NEAREST);board.alpha_composite(own,(510,40));d=ImageDraw.Draw(board);d.text((10,8),ident+' source',fill='white');d.text((510,8),f'{call} own {iou:.3f}/{cov:.3f}',fill='white');board.convert('RGB').save(R/'egne-deler'/(ident+'-kontroll.png'))
+ (C/'plassering.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'plasser-deler.py.txt')

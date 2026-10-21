@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import _iou
+import json,numpy as np,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+f=R/'egne-deler/D023.png';im=Image.open(f).convert('RGBA');meta=json.loads(f.with_suffix('.json').read_text());assert sha(f)==meta['sha256'];before=R/'egne-deler/D023-foer-finplassering.png';assert not before.exists();shutil.copy2(f,before);save(R/'egne-deler/D023-foer-finplassering.json',meta)
+src=np.array(Image.open(R/'kilder/D023.png').convert('RGBA'));mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);W,H=im.size;cx,cy=W/2,H/2;variants=[]
+for sy in [1,1.01,1.02]:
+ for sx in [1,1.01,1.02]:
+  for dx in [-1,0,1]:
+   for dy in [-1,0,1]:
+    aff=(1/sx,0,cx-(cx+dx)/sx,0,1/sy,cy-(cy+dy)/sy);z=np.array(im.transform(im.size,Image.Transform.AFFINE,aff,Image.Resampling.BICUBIC));iou,cov=_iou(z[:,:,3]>=128,mask,-8,-8)
+    if iou>=.6 and cov>=.805:variants.append((abs(sx-1)+abs(sy-1)+.002*(abs(dx)+abs(dy)),-iou,sx,sy,dx,dy,aff,z,iou,cov))
+assert variants;v=min(variants,key=lambda v:(v[0],v[1]));_,_,sx,sy,dx,dy,aff,z,iou,cov=v;z[z[:,:,3]==0,:3]=0;Image.fromarray(z).save(f);meta.update(sha256=sha(f),snitt_union=iou,dekning=cov,avgrenset_hel_egen_affin=dict(skala=[sx,sy],flytt_hd=[dx,dy],affin=aff,forrige_sha256=sha(before),kildemaske_bare_maling=True,utdatamaske=False,grensene_uendret=True));save(f.with_suffix('.json'),meta);print('D023 egen hel form',sx,sy,dx,dy,'IoU/dekning',iou,cov)
+parts=json.loads((R/'kildedeler.json').read_text());weak=[]
+for p in parts:
+ if p['areal']>200:continue
+ m=json.loads((R/'egne-deler'/(p['id']+'.json')).read_text())
+ if m['snitt_union']<.6 or m['dekning']<.8:weak.append(p)
+C=R/'kall/R02';C.mkdir();ref=Image.new('RGBA',(1536,1024));plan=[];cols=5;rows=4;cw,ch=1536//cols,1024//rows;assert len(weak)<=20
+for i,p in enumerate(weak):
+ im=Image.open(R/p['kilde']).convert('RGBA');w,h=im.size;s=max(1,min((cw-70)//w,(ch-70)//h,40));x=i%cols*cw+(cw-w*s)//2;y=i//cols*ch+(ch-h*s)//2;ref.alpha_composite(im.resize((w*s,h*s),Image.Resampling.NEAREST),(x,y));plan.append(dict(id=p['id'],celle=[i%cols*cw,i//cols*ch,cw,ch],proxy_rekt=[x,y,w*s,h*s],referanseskala=s,kilde_sha256=p['fil_sha256']))
+ref.save(C/'referanse-deler.png');bg=Image.new('RGBA',ref.size,'#cdd4d7');bg.alpha_composite(ref);bg.convert('RGB').save(C/'referanse-lys.png');save(C/'plan.json',dict(ruter=plan,kildekomponenter_ikke_utdatamaske=True));save(R/'smaadeler-til-retting.json',[dict(id=p['id'],forrige=json.loads((R/'egne-deler'/(p['id']+'.json')).read_text())) for p in weak]);print('R02',len(weak),[p['id'] for p in weak]);shutil.copy2(__file__,R/'siste-former.py.txt')

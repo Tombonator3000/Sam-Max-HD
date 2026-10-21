@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,shutil,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+old=O/'forberedelse-foer-rettet';old.mkdir();assert all(not(p/'raa.png').exists() for p in (R/'kall').iterdir())
+for p in list((R/'kall').iterdir()):shutil.move(str(p),old/p.name)
+parts=json.loads((R/'kildedeler.json').read_text());big=[p for p in parts if p['areal']>200];human=[p for p in big if p['id'] not in ['D101','D110','D115']];glass=[p for p in big if p['id'] in ['D101','D110','D115']];small=[p for p in parts if p['areal']<=200];assert len(human)==11 and len(glass)==3 and len(small)==105
+save(R/'delgrupper.json',dict(menneske=[p['id'] for p in human],glass=[p['id'] for p in glass],smadeler=[p['id'] for p in small]))
+def atlas(call,entries,cols,rows):
+ C=R/'kall'/call;C.mkdir();ref=Image.new('RGBA',(1536,1024));record=[];cw,ch=1536//cols,1024//rows
+ for i,p in enumerate(entries):
+  im=Image.open(R/p['kilde']).convert('RGBA');w,h=im.size;scale=max(1,min((cw-60)//w,(ch-60)//h,24));x=(i%cols)*cw+(cw-w*scale)//2;y=(i//cols)*ch+(ch-h*scale)//2;ref.alpha_composite(im.resize((w*scale,h*scale),Image.Resampling.NEAREST),(x,y));record.append(dict(id=p['id'],celle=[i%cols*cw,i//cols*ch,cw,ch],proxy_rekt=[x,y,w*scale,h*scale],referanseskala=scale,kilde_sha256=p['fil_sha256']))
+ ref.save(C/'referanse-deler.png');save(C/'plan.json',dict(ruter=record,kildekomponenter_ikke_utdatamaske=True))
+for page in range(3):atlas(f'H{page+1:02}',human[page*4:page*4+4],2,2)
+atlas('G01',glass,3,1)
+for page in range(4):atlas(f'E{page+1:02}',small[page*32:page*32+32],8,4)
+save(R/'forberedelsesretting.json',dict(feil='Første typeinndeling antok kanalspenn12 for grått. Kilden har lilla gråtoner og brune glasskanter. H04-kollisjon stoppet før noe bildekall.',retting='Store menneskedeler og tre glasshovedkomponenter identifisert fra faktisk kilde,alle105mindre komponenter beholdt uten automatisk mennesketolkning. Åtte nye kildeatlasser forberedt.',bildekall_foer_retting=0))
+(R/'KILDEGRUNNLAG.md').write_text('Kostyme045 i rom8 viser et menneske med kort svart hår,rosa hud,rødbrun overdel/svart vest,mørkblå bukse og brune sko. Det kommer gjennom høyre kontordørs glass,strekkes og lander ved trappen. Komisk deformasjon,kildeekte separate kroppsdeler,fartsstriper,grå biter og opak svart åpning beholdes. Ingen Sam eller hundeidentitet. Primærskript og faktisk kildeavspilling er SHA-festet i rapporter/sam045-kilde-20261021. Alle tre originalark og kildebrettet er sett før tegning. Sam og rom007 styrer bare godkjent tegneseriestrek.119ulike hele kildekomponenter gir separat tegnegrunnlag og identitetsbevis. Ingen kildepikselmasker eller originalfragment-fallback. Bare identiske hele kildekomponenter kan bruke samme hele egne maleri med kilde-SHA-bevis. De105mindre komponentene omfatter grå glassbiter,blå/svarte fartsstreker og små synlige kroppsdeler. Ingen del fjernes på grunn av størrelse. Bare tre naturlige kildeark i045,derfor avsluttes denne komplekse animasjonen før neste ordinære bunke. Bibliotekskilder:figurark-fast-storrelse og publisert-mod-er-fasit. CORE128,IoU0,6 og dekning0,8 beholdes. Ingen ny Tom-/Claude-godkjenning.\n')
+(R/'NESTE.md').write_text('Grunnlag2958native/418ark. Tre045ark/18mål fra16ulike hele kilder,119ulike komponenter. Åtte kallreferanser klare. Ingen råbilder/resultat/native ennå. Bevar1012kilder og tre stasher.\n');shutil.copy2(__file__,R/'planlegg.py.txt')
+print('H01..03:11mennesker,G01:3glass,E01..04:105smadeler. Ingen del utelatt.')
