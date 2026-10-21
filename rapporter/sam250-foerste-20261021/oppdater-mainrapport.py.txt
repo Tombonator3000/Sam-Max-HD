@@ -1,0 +1,46 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();git=lambda p,*a:subprocess.check_output(['git',*a],cwd=p,text=True).strip()
+r=read(R/'mottak-publisert.json');b=read(R/'grunnlag-produksjon.json');assert r['native']==3437 and r['alle_filhash_bekreftet'] and r['motorobservert'] and r['visuelt_sett']
+assert not git(P,'status','--porcelain') and git(P,'rev-parse','HEAD')==b['main_sha'];assert git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==482
+protected=read(R/'beskyttede-samlet1348.json');assert len(protected)==1348 and all(sha(A/f)==h for f,h in protected.items())
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+text=f'''Fem hele figurark, fig250_01 til fig250_05, er laget, egenkontrollert, visuelt sett, native mottatt, motorobservert og publisert. De gir 18 nye native fra tolv egne hele malerier og seks eksakte hele RGBA-aliasmål. Modden har 3437 native. 482 av 1758 hele figurjobber har resultat; 1276 gjenstår pluss returer, katalogfeil og sluttkontroll. Alle 18 native er automatisk OK med uendrede porter CORE128, IoU 0,6 og dekning 0,8. To ark er OK og tre er SJEKK med fem visuelt vurderte omrissvarsler. Fem hele resultatark, tolv hele motorvarianter og seks hele før/etter-par er sett. Ingen ny Tom-/Claude-godkjenning.
+
+Kostyme 250 viser VR-verdenen i rom 49. Ark 01 viser Sam alene med gult sverd; ark 02 til 05 viser Sam og den oransje virtuelle polygondragen samlet i hver hel kilde. Ressursbanken bekrefter dragen og dragehjertet som blir en ekte nøkkel. Tilsiktede polygonformer, flate fargeflater, identitet, grep, sveip, små trekantbiter og animasjonsfaser er bevart. Den vanlige Sam-masteren gir identitets- og fargestøtte, mens VR-originalen bestemmer geometrien. Originaler i faktisk spillkontekst og godkjent Sam-master er sett før hvert motiv. Beskyttede jobbfiler er uendret.
+
+Åtte innebygde image_gen-kall, fem grunnkall og tre kvalitetsreturer, er bevart med råbilder, faktiske prompter, argumenter og referansehash. Modellnavn er ikke oppgitt. Ingen verktøyavvisning eller CLI/API-fallback. K02-utkastene hadde geometriavvik og gikk over radgrensen. R02 hadde avvikende geometri og nye små grønne gripedetaljer. De er ikke valgt. R01 og R03 tegner hver kombinerte kilde hel. Python renser bare egen alfaglød og plasserer hele malerier i fast 4x med åtte HD-pikslers marg. R01_1930 er flyttet hel én HD-piksel til høyre og én opp. K05s hele egne malerier er adskilt ved råbilde-y532 fordi øvre føtter krysset den nominelle radgrensen 512. Ingen hard originalmaske, originale bildefragmenter eller delkomposisjon. Seks aliasmål kopierer bare hele egne malerier fra identiske hele RGBA-kilder.
+
+Nedlastet Linux-binær SHA256 `8d7190620f3039a79ee55fe3630725a3886cb5888fce4f0b11fd04adf044e2d8` er avspilt med både grunnlag 3419 og kandidat 3437. Hel animasjon 6 og primærskript 211 har hver 720 bilder med én dump per skjermoppdatering. Alle 52 familieruter, inkludert de 18 nye, er logget i hver av de fire prøvene. Hver side har samlet 1436 av 1440 nullkontroller, med de samme 416 pikslene ved bilde 24 og 160 ved bilde 25 i begge prøver. Eksakte feilkoordinater, begge RGB-verdier og rekkefølgen er identiske. Ingen nye eller økte bufferavvik. Alle 36 hele originalflater er SHA-identiske. Alle 36 par har null endringer utenfor unionen av de faktisk loggede nye aktørflatene med åtte HD-pikslers målemargin. Faktisk kameraopphav per dump er brukt. Andre aktører og romskript er ikke skjult. Dette er kontrollerte romhopp, ikke full naturlig gjennomspilling. Hele prøven er ikke avviksfri.
+
+Hd-mod `{r['hd_mod']}` er publisert fra eksakt fjern-SHA `{b['fjern_sha']}`, hentet tilbake og kontrollert med alle 21680 filhash. Alle 21656 tidligere PNG, øvrige tidligere filstier, 1348 beskyttede jobbfiler og tre opprinnelige stasher er bevart. Grafikkilde `{r['grafikkilde']}` på gpt-arbeid. Ingen motor- eller pipelineendring. Main får bare de fire dokumentasjonsfilene. Bibliotekskilden figurark-fast-storrelse er brukt. Bevis: `rapporter/sam250-foerste-20261021` på gpt-arbeid.
+
+[Felles Linux og Windows med 3419 native](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-svanebaat) er fortsatt siste faktisk nedlastede og kontrollerte fellesutgave. Den mangler de 18 nye VR-rutene. Ekstra Windows-taggbygg 39606444011 feilet først i kjent SDL_BlitSurface-start før spillinnlasting. Ett avgrenset omkjøringsforsøk av de feilede jobbene med samme kode og innstillinger er grønt på forsøk 2. Dette retter ikke og beviser ikke at den sporadiske SDL-feilen er løst. Fellesutgavens fire vedlegg og Latest er uendret. Nativefrysen er frigitt. Ingen nye pakkebygg er startet i denne grafikkbunken. Neste pakkesamlepunkt er etter hele 250-familien, forventet 3471 hvis alle 52 leveres, eller tidligere ved blokkering. Full naturlig gjennomspilling, interaktiv Windows, ny webtest og kjente SDL-/inventar-/testhoppbegrensninger gjenstår.
+
+Neste praktiske bunke er fig250_06 til fig250_10: 22 mål fra 19 ulike hele kilder. Deretter gjenstår ark 11 og 12 med tolv mål. Hele familien har tolv ark, 52 mål og 43 ulike hele kilder. De resterende originalene og spillkonteksten er kildeundersøkt, men det finnes ingen nye bildekall eller resultater for dem. Se aktuell kilde, spillkontekst og godkjente stilankre før hvert motiv. Bevar små sverd- og trekantbiter, og i de siste arkene de tilsiktede flate polygonfragmentene og det røde virtuelle dragehjertet. Fyll ikke inn nye normale kropper. Ikke gjenta de fem leverte arkene.
+
+Tidligere verktøyavviste motiver og deres hele aliaser omprøves ikke. Seks bokark og 46 mål er fortsatt tilbakeholdt, og resten av 304 følger siste NESTE. Ugyldige 344/346 og råvalg 28 kjøres ikke. Samlet sluttkontroll gjenstår. Grafikkautomatikken fortsetter uten gammel nattfrist; gamle nattprosesser gjenstartes ikke.
+'''
+for name,title in [('memory.md','Gjeldende grafikkstatus'),('STATUS.md','Sist verifisert grafikk')]:
+ p=P/name;t=p.read_text();i=t.find('\n');p.write_text(t[:i+1]+'\n## '+title+', '+now+'\n\n'+text+'\nTidligere oppføringer nedenfor er bevart som historikk.\n'+t[i+1:])
+p=P/'todo.md';t=p.read_text();i=t.find('\n');p.write_text(t[:i+1]+f'''
+## Neste, oppdatert {now}
+
+- [x] Levert og additivt publisert fem VR-ark, fig250_01 til 05, med 18 nye native og 3437 totalt. Alle 21680 filhash, tidligere PNG, 1348 kilder og tre stasher bekreftet etter hent.
+- [x] Alle 18 native automatisk OK. To ark OK og tre visuelt vurdert SJEKK med fem omrissvarsler. Fem resultatark, tolv motorvarianter og seks hele par sett. Ingen ny Tom-/Claude-godkjenning.
+- [x] Hel animasjon 6 og primærskript 211 på begge sider, alle 52 kilder logget. Hver side har 1436/1440 null med identiske kjente 416/160-overgangsavvik. Alle 36 originalflater er SHA-identiske; null utenfor loggede nye aktørflater. Hele prøven er ikke avviksfri.
+- [x] Ekstra Windows 39606444011 er grønt på forsøk 2 etter ett kjent SDL-startavvik. Samme kode og innstillinger, fellesvedlegg og Latest uendret. Nativefrysen frigitt. Ingen motorretting eller påstand om at sporadisk feil er løst.
+- [ ] Fortsett fig250_06 til 10 fra rapporter/sam250-foerste-20261021/neste-bunke.json, 22 mål og 19 hele kilder. Originaler og kildekontekst er undersøkt, men ingen nye kall eller resultater. Se kilder og master på nytt før hvert motiv. Behold VR-polygonformer, faktiske kombinerte figurer, sverdfaser og smådeler. Etter dem gjenstår ark 11 og 12 med tolv mål og det virtuelle dragehjertet.
+- [ ] Oppdater begge pakker etter hele 250-familien, forventet 3471, eller tidligere ved blokkering. Fellespakker har 3419 og mangler 18. Bekreft faktiske nedlastinger, sjekksummer og faktisk inkludert grafikk før ny fellesutgave kalles oppdatert.
+- [ ] Fortsett øvrige produserbare jobber og returer. 482 av 1758 hele figurjobber har resultat, 1276 gjenstår pluss returer, katalogfeil og sluttkontroll. Bevar tidligere filer, releaser, 1348 kilder og tre stasher. Ingen omprøve av holdte eller verktøyavviste motiver og aliaser. Ingen ny grafikk i main.
+- [ ] Samlet sluttkontroll, full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Automatikken fortsetter; gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+'''+t[i+1:])
+with (P/'log.md').open('a') as f:f.write('\n\n## '+now+' (Codex)\n\n'+text)
+assert set(git(P,'diff','--name-only').splitlines())=={'memory.md','todo.md','STATUS.md','log.md'}
+shutil.copy2(__file__,R/'oppdater-mainrapport.py.txt');print('Bare fire main-dokumenter oppdatert med publisert3437 og neste VR-bunke.',flush=True)
