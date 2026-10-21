@@ -13,3 +13,5 @@ Alle25 native er automatisk OK med uendrede CORE128,IoU0,6 og dekning0,8. Hele a
 1152 beskyttede kilder,alle21362 tidligere PNG og tre stasher bevares. Ingen motor-/pipelinekode er endret. Før motorstart fanget en gammel binær-SHA-sikring at den nye nedlastede pakken har ny SHA;den faktiske SHA er bekreftet i pakkekvitteringen før kjøring. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Publisering,hent og fellespakker kvitteres separat. Pakker3125 mangler25nye native og følger som samlepunkt.
 
 Endelig helarkkontroll: {"OK": 8, "SJEKK": 1}. Omrissvarsler er bevart og visuelt vurdert.
+
+Publisert og hentet `dabfc2bc7e09b22fb5a34b2d724e79298d45c2dc`,3150 native. Alle 21393 filer SHA-bekreftet,21362 tidligere PNG bevart. Grafikkilde `cab4a2c9e496abfddf5b91be62ffaf4859041195`. Pakker har3125 og mangler25. Nativefrys for fellespakker starter nå.
