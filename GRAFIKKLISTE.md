@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Fem hele introark fig010_01..02 og fig012_01..03 er laget, egenkontrollert, native mottatt og motorobservert i kandidat 3208. 58 nye ruter fra 46 hele malerier og 12 hele aliasmål, 17 innebygde bildekall inkludert to returer. 451 av 1758 resultatark, 1307 gjenstår pluss returer/katalogfeil/sluttkontroll. Alle 58 automatisk OK, tre ark OK og to SJEKK med to visuelt vurderte varsler. Alle 46 motorvarianter og seks før/etter-par sett; alle 58 originalbilder identiske, null utenfor nye figurflater. 1420 kontroller, 1385 null, samme eksakte avviksmønstre og RGB; absolutte framenumre er forskjøvet. 1172 kilder, tidligere PNG og tre stasher bevart. Publisering/hent gjenstår. Pakker 3150 mangler 58; felles samlepunkt etter neste Max-introbunke. Ingen ny Tom-/Claude-godkjenning.
+
 Fem nye hele introark fig010_01..02 og fig012_01..03 er laget, egenkontrollert og native mottatt i kandidat 3208. 58 nye ruter, 46 hele egne varianter, 12 hele RGBA-aliasmål, 17 innebygde bildekall inkludert to returer. 451 av 1758 hele figurjobber har resultat, 1307 gjenstår pluss returer/katalogfeil/sluttkontroll. Alle 58 automatisk OK, tre hele ark OK og to SJEKK med to visuelt vurderte omrissvarsler. Samlet arkvisning er sett. Faktisk introavspilling og separat hel 12-animasjon pågår; ingen ny native er publisert eller pakket ennå. Ikke dupliser bunken. Se rapporter/sam-max-intro-20261021/NESTE.md. Bevar 1172 kildehash, tidligere filer og tre stasher. Ingen ny Tom-/Claude-godkjenning.
 
 Felles Linux/Windows3150 er publisert og Latest-bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-sam303. Begge faktiske pakker og21392runtimefiler hver SHA-bekreftet,alle25nye motorlogget med identiske figurutsnitt. 467/469 null,samme kjente overgangsavvik,ingen nye eller økte. 446 av1758resultatark,1312gjenstår pluss returer/katalogfeil/sluttkontroll. Sam303 har14leverte ark og40native. Nativefrysen er frigitt. Velg neste uavhengige bunke fra faktisk restliste;se sam303-slutt-20261021/NESTE.md. Blokkert304 omprøves ikke. Bevar1152kilder,tidligere filer og tre stasher. Ingen ny Tom-/Claude-godkjenning.
@@ -1024,9 +1026,9 @@ Figurark for Sam, Sam og Max, Max.
 - [ ] `fig310_02` (figurark 2 for Sam og Max (kostyme 310), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig310_03` (figurark 3 for Sam og Max (kostyme 310), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig310_04` (figurark 4 for Sam og Max (kostyme 310), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig012_01` (figurark 1 for Sam og Max (kostyme 12), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig012_02` (figurark 2 for Sam og Max (kostyme 12), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig012_03` (figurark 3 for Sam og Max (kostyme 12), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig012_01` (figurark 1 for Sam og Max (kostyme 12), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig012_02` (figurark 2 for Sam og Max (kostyme 12), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig012_03` (figurark 3 for Sam og Max (kostyme 12), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig032_01` (figurark 1 for Max (kostyme 32), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig032_02` (figurark 2 for Max (kostyme 32), 16 ruter: start mot høyre (16 ruter), bilde to `hovedark/max.png`)
 
@@ -1080,8 +1082,8 @@ Figurark for Sam og Max, Sam, Max.
 Figurark for Max, Sam.
 
 - [ ] `fig348_03` (figurark 3 for Max (kostyme 348), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig010_01` (figurark 1 for Sam (kostyme 10), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig010_02` (figurark 2 for Sam (kostyme 10), 25 ruter: start mot høyre (25 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig010_01` (figurark 1 for Sam (kostyme 10), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig010_02` (figurark 2 for Sam (kostyme 10), 25 ruter: start mot høyre (25 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig017_01` (figurark 1 for Max (kostyme 17), 34 ruter: start mot høyre (34 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig017_02` (figurark 2 for Max (kostyme 17), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig037_01` (figurark 1 for Max (kostyme 37), 25 ruter: start mot høyre (25 ruter), bilde to `hovedark/max.png`)

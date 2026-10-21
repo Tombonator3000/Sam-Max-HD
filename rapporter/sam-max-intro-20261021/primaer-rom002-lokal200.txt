@@ -1,0 +1,10 @@
+; Lokalt skript 200 i rom 2 (LSCR)
+
+Script# 200
+[0000] (CA) delayFrames(getRandomNumberRange(2,8))
+[0008] (70) setState(992,1)
+[000F] (CA) delayFrames(getRandomNumberRange(2,8))
+[0017] (70) setState(992,0)
+[001E] (73) jump 0
+[0021] (66) stopObjectCodeB()
+END

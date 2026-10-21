@@ -1,0 +1,16 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert all(sha(O/'mod-intro3208'/f)==h for f,h in read(R/'kandidatfilhash.json').items())
+def run(name):
+ src=O/('kildeavspilling.py' if name=='intro' else 'kilde12-hel.py');text=src.read_text();text=text.replace("str(P/'mods/gpt')","str(O/'mod-intro3208')");text=text.replace('kildemotor-intro','motor-intro-kandidat3208').replace('kildemotor12-hel','motor12-kandidat3208').replace('kildeavspilling.py.txt','motor-intro-kandidat.py.txt').replace('kilde12-hel.py.txt','motor12-kandidat.py.txt').replace('timeout=240','timeout=360');f=O/f'motor-{name}-kandidat.py';f.write_text(text)
+ r=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,text=True,capture_output=True,timeout=400);(R/f'motor-{name}-utskrift.txt').write_text(r.stdout+r.stderr);print(name,r.returncode,r.stdout.strip(),flush=True);assert r.returncode==0
+ return read(R/('motor-intro-kandidat3208.json' if name=='intro' else 'motor12-kandidat3208.json'))
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,['intro','12']))
+base=[read(R/'kildemotor-intro.json'),read(R/'kildemotor12-hel.json')]
+for b,c in zip(base,rows):assert b['kontroller']==c['kontroller'],'Ny eller endret skjermbuffer må undersøkes'
+want={e['bilde'] for e in read(R/'egen-native.json')['ruter']};obs={**rows[1]['tegninger'],**rows[0]['tegninger']};assert not want-set(obs)
+save(R/'motor-sammenligning.json',dict(grunnlag_native=3150,kandidat_native=3208,forventet=58,sett=len(want&set(obs)),mangler=sorted(want-set(obs)),alle_nye_kildemal_sett=True,kontroller_identiske=True,ingen_nye_eller_okte_avvik=True,kontrollantall=sum(len(c['kontroller']) for c in rows),nullkontroller=sum(c['nullkontroller'] for c in rows),intro49_egen_spillsekvens=True,rettet_hel_animasjon12_20=True,naturlig_full_gjennomspilling=False,full_visuell_vurdering_gjenstar=True,binar_sha256=rows[0]['binar_sha256']))
+shutil.copy2(__file__,R/'motor.py.txt');print('58 mål logget. Samme bufferkontroller som grunnlaget. Visuell motorvurdering gjenstår.',flush=True)

@@ -1,0 +1,129 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image
+import json, hashlib, subprocess, shutil
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name; C=O/'mod-intro3208'
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json'); protected=read(R/'beskyttede-samlet.json')
+files=read(R/'kandidatfilhash.json'); motor=read(R/'motor-sammenligning.json')
+progress=read(R/'fremdrift.json'); variants=read(R/'prototyper-endelig.json')
+vp=read(R/'motor-visuell-plan.json'); whole=read(R/'helark-visuell-kontroll.json')
+assert len(protected)==1172 and all(sha(A/f)==h for f,h in protected.items())
+assert len(files)==21451 and all(sha(C/f)==h for f,h in files.items())
+assert all(files[f]==h for f,h in base['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert len(list((C/'costumes').glob('*_hd.png')))==3208
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(variants)==46 and all(e['visuelt_sett'] and e['native_ok'] and sha(A/e['prototype'])==e['prototype_sha256'] for e in variants)
+assert len(whole['hele_ark_sett'])==5 and all(sha(A/f)==h for f,h in whole['hele_ark_sett'].items())
+assert len(vp['brett'])==8 and len(vp['hele_for_etter'])==6 and len(vp['hele_bilder'])==46
+assert all(sha(R/e['fil'])==e['sha256'] for k in ['brett','hele_for_etter','hele_bilder'] for e in vp[k])
+assert motor['sett']==58 and motor['nullkontroller']==1385 and motor['kontrollantall']==1420
+assert motor['avvikskoordinater_og_rgb_identiske'] and motor['avviksrekkefolge_identisk']
+assert motor['alle58_original_flat_sha256_identiske'] and motor['alle58_utenfor_ny_aktorflate']==0
+assert all(e['utenfor_ny_aktorflate']==0 for e in read(R/'motor-pikselkontroll.json'))
+assert read(R/'automatisk-mottak58.json')['ruter_ok']==58
+alljobs=sorted((A/'jobber').glob('fig*/jobb.json'))
+rest=[f.parent.name for f in alljobs if not (f.parent/'resultat.png').exists()]
+assert len(alljobs)==1758 and len(rest)==1307
+save(R/'restliste-etter451.json',dict(total=1758,resultater=451,gjenstar=1307,uleverte=rest,
+     telling_er_ikke_ekstern_godkjenning=True,returer_katalogfeil_og_sluttkontroll_kommer_i_tillegg=True))
+seen=dict(tid=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(),alle46_endelige_motorvarianter_sett=True,
+          fem_hele_resultatark_sett=True,atte_motorbrett_sett=True,seks_for_etter_par_sett=True,
+          hode_kropp_hender_hatter_ledninger_blink_morke_fragmenter_vurdert=True,
+          naturlig_full_gjennomspilling=False,godkjent_av_Tom=False,claude_kontroll=False,
+          filer={e['fil']:e['sha256'] for k in ['brett','hele_for_etter','hele_bilder'] for e in vp[k]})
+save(R/'visuelt-bekreftet.json',seen)
+for e in progress['leveranser']:
+    assert e['egenkontroll'] in ['OK','SJEKK'] and sha(A/e['resultat'])==e['sha256']
+    im=Image.open(A/e['resultat']);assert im.size==(1536,1024) and im.mode=='RGBA'
+    e.update(egenkontrollert=True,native_mottatt=True,visuelt_kontrollert=True,
+             motorobservert=True,publisert=False,i_fellespakke=False)
+    with (A/'jobber'/e['jobb']/'notat.md').open('a') as f:
+        f.write('\nEndelig motorvurdering: alle 58 nye mål logget i faktisk Linux-binær '
+                '5d367480767ac23ca13e1a3b07ef8b481ef163b5b1efbf00534fd0b1123a4e29. '
+                '49 fra spillets intro med punktumtastetrykk, ni siste fra rettet hel animasjon 12. '
+                'Alle 46 egne varianter, åtte motorbrett og seks hele før/etter-par er sett. '
+                'Alle 58 originalbilder er SHA-identiske mellom de sammenlignede øyeblikkene, '
+                'med null HD-forskjeller utenfor de nye figurflatene med fast åtte HD-pikslers marg. '
+                '1420 bufferkontroller gir 1385 null i begge prøvene. Introens 34 avvik har '
+                'samme to eksakte 12-pikselmønstre, koordinater og RGB-verdier i samme rekkefølge. '
+                'Absolutte framenumre er tidsforskjøvet; de er ikke påstått identiske. '
+                'Sekundærprøven har samme 160 ved bilde 36. Ingen nye eller økte avvik i denne '
+                'sammenligningen. Andre aktører og tilfeldige bakgrunnsskript er beholdt. '
+                'Publisering og faktiske pakker kvitteres separat. Ingen ny Tom-/Claude-godkjenning.\n')
+progress.update(laget=True,egenkontrollert=True,native_mottatt=True,visuelt_sett=True,motorobservert=True,
+                publisert=False,i_fellespakke=False,pakker_native=3150,pakker_mangler_native=58)
+save(R/'fremdrift.json',progress)
+vp.update(visuelt_sett=True,antall_sette_egne_varianter=46,seks_for_etter_par_sett=True)
+save(R/'motor-visuell-plan.json',vp)
+motor.update(full_visuell_vurdering_gjenstar=False,visuelt_sett=True)
+save(R/'motor-sammenligning.json',motor)
+receipt=dict(tid=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(),laget=True,egenkontrollert=True,
+             native_mottatt=True,visuelt_sett=True,motorobservert=True,publisert=False,i_fellespakke=False,
+             leveranser=progress['leveranser'],nye_hele_ark=5,hele_figurjobber=451,total=1758,gjenstar=1307,
+             native=3208,nye_native=58,nye_malerier=46,hele_rgba_aliasmal=12,bildekall=17,returkall=2,
+             beskyttede=1172,stasher_bevart=True,tidligere_png_bevart=21387,filer=21451,png=21445,
+             kontroller=1420,nullkontroller=1385,avvikssekvens_og_rgb_identiske=True,
+             absolutte_framenumre_identiske=False,ingen_nye_eller_okte_avvik=True,
+             alle58_original_flat_identiske=True,alle58_utenfor_ny_aktorflate=0,
+             godkjent_av_Tom=False,claude_kontroll=False,pakker_native=3150,pakker_mangler_native=58)
+save(R/'sluttkontroll.json',receipt)
+stopp=R/'STOPP-nativepublisering.md'
+assert stopp.exists()
+stopp.rename(R/'STOPP-nativepublisering-avklart.md')
+with (R/'STOPP-nativepublisering-avklart.md').open('a') as f:
+    f.write('\nAvklart etter fast frø 20261021, eksakte avvikssignaturer og originalbilder: '
+            'motor-seed-bufferdiagnose.json og motor-pikselkontroll.json dokumenterer samme 34 '
+            '12-pikselmønstre i samme rekkefølge, samme 160 i sekundærprøven og alle 58 SHA-identiske '
+            'originalbilder. Ingen endring utenfor nye figurer. Visuell kontroll fullført. '
+            'Ingen motor-/pipelinekode, statiske scener eller skjuling av aktører/bakgrunnsskript. '
+            'Det første strengere framenummervilkåret består ikke og er ikke omskrevet til bestått. '
+            'Postkontrollen sammenligner faktisk likt bildeinnhold. Nativepublisering kan nå gjøres '
+            'fra gjeldende fjern-SHA, med hashkontroll og bevaring av tidligere filer.\n')
+for name in ['motor.py','motor-seed.py']:
+    shutil.copy2(O/name,R/(name+'.txt'))
+
+line=('Fem hele introark fig010_01..02 og fig012_01..03 er laget, egenkontrollert, native mottatt '
+      'og motorobservert i kandidat 3208. 58 nye ruter fra 46 hele malerier og 12 hele aliasmål, '
+      '17 innebygde bildekall inkludert to returer. 451 av 1758 resultatark, 1307 gjenstår pluss '
+      'returer/katalogfeil/sluttkontroll. Alle 58 automatisk OK, tre ark OK og to SJEKK med to '
+      'visuelt vurderte varsler. Alle 46 motorvarianter og seks før/etter-par sett; alle 58 '
+      'originalbilder identiske, null utenfor nye figurflater. 1420 kontroller, 1385 null, '
+      'samme eksakte avviksmønstre og RGB; absolutte framenumre er forskjøvet. 1172 kilder, '
+      'tidligere PNG og tre stasher bevart. Publisering/hent gjenstår. Pakker 3150 mangler 58; '
+      'felles samlepunkt etter neste Max-introbunke. Ingen ny Tom-/Claude-godkjenning.')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;s=p.read_text();i=s.find('\n');s=s[:i+1]+'\n'+line+'\n'+s[i+1:]
+    for e in progress['leveranser']:s=s.replace('- [ ] `'+e['jobb']+'`','- [x] `'+e['jobb']+'`',1)
+    p.write_text(s)
+(R/'NESTE.md').write_text('''# Neste arbeid etter fem introark
+
+Denne bunken fig010_01..02 og fig012_01..03 er laget, egenkontrollert, native mottatt, visuelt sett og motorobservert. 58 nye native i kandidat 3208. Ikke gjenta produksjonen eller lever.py. Publiser fra eksakt fjern-SHA i grunnlag-produksjon.json, hent tilbake og bekreft alle 21451 filhash. Nativepublisering-avklart-notatet bevarer den første stoppårsaken og kontrollbevisene.
+
+Neste praktiske produksjon er sju Max-introjobber: fig013_01, fig017_01..02 og fig018_01..04. 68 mål fra 58 hele forskjellige RGBA-kilder. Disse har ingen resultat eller native, og ingen nye bildekall. 64 av 68 mål finnes i den bevarte introavspillingen; fig013_01 har bare ett av sine fem mål naturlig vist og trenger kildebegrunnet hel animasjonsprøve før tegning. De øvrige 67 observasjonsnavnene i loggen er ikke lik 67 mål fra denne jobblisten. Les primærskript 65 og alle originaler i spillkontekst samt Max-stilanker før valg av kall. Kostyme 18 innledes med Max' reaksjon mot den mistenkte i rom 2; ikke baser designet bare på kostymenummer. Ingen godkjenning, bildeproduksjon eller kildevisning av neste bunke er attestert her. Beskytt disse 28 nye jobbkildene før arbeid og kontroller gamle 1172 først.
+
+Felles Linux-/Windows-pakker har fortsatt 3150, altså 58 færre enn kandidaten. De ble faktisk lastet ned og kontrollert ved forrige samlepunkt samme morgen. Neste felles pakkesamlepunkt følger denne sammenhengende introfamilien, eller tidligere hvis produksjonen blokkeres. Frys da aktuell native-SHA og kontroller faktiske nedlastinger, alle filhash og avspilling av alle nye mål før pakken kalles oppdatert. Ikke kall dagens 3150-pakke oppdatert med denne bunken.
+
+451 av 1758 hele figurjobber har resultat, 1307 gjenstår pluss returer, katalogfeil og sluttkontroll. Restliste-etter451.json er telt fra filsystemet. Ny grafikk går aldri til main. Bevar alle tidligere native, tre stasher og alle releaser. Main får bare fire dokumentasjonsfiler. Gamle nattprosesser gjenstartes ikke. Verktøyavviste 304-motiver omprøves ikke. Ingen ny Tom-/Claude-godkjenning, interaktiv Windows, ny webtest eller full naturlig gjennomspilling.
+''')
+(R/'RAPPORT.md').write_text('''# Sam og Max i introen, fem hele ark
+
+Fig010_01..02 og fig012_01..03 gir 58 nye native ruter fra 46 egne hele malerier og 12 mål med identisk hel kilde-RGBA og dimensjon. 451 av 1758 hele figurjobber har resultat, 1307 gjenstår pluss returer, katalogfeil og sluttkontroll. Alle fem ark er egenkontrollert og native mottatt. Alle 58 native er automatisk OK med uendrede CORE128, IoU 0,6 og dekning 0,8. Tre hele ark er OK og to er SJEKK med to omrissvarsler, vurdert visuelt. Dette er ikke ny Tom-/Claude-godkjenning.
+
+15 innebygde image_gen-kall og to rettingskall er bevart med faktiske argumenter, prompter, råbilder, referansehash og utkast. Originalprompter er brukt ordrett med separate atlasutvalg og kildepresiseringer. Kostyme 12-promptene beskriver allerede begge figurer. Primærskript 65 identifiserer den løse hodeformede rekvisitten som en tikkende tidsbombe. Sam, Max, løse hatter, ledninger, bevisst avklipte nedre kropper og de mørke delene bak bilen er kildebekreftet. R01 retter en oppdiktet snute i en bakfra-rute. R02 bevarer et blink som i kilden bare skiller seg med fem øyepiksler fra åpenøyefasen. Ingen tidligere avviste motiver er omprøvd.
+
+Egen glød er renset rundt egen alfakjerne. Egne atlasruteskiller er flyttet i ledig mellomrom for to malerier som krysset sitt opprinnelige skille. Ni sammensatte egne tegninger er plassert som hele Sam- og Max-grupper mot målte kildebokser. En oppdiktet lys mansjett er malt med egen draktfarge. Rene svarte kildesilhuetter får ren svart egen RGB med urørt alfa. Ekte alfa og små kildebekreftede merker er bevart, uten harde originalmasker eller originale bildefragmenter. Python-rensing og plassering er uttrykkelig tillatt av Tom. Kontrollkopiene fra automatisk mottak er ikke forvekslet med de valgte native maleriene.
+
+Den faktiske nedlastede Linux-binæren har SHA256 5d367480767ac23ca13e1a3b07ef8b481ef163b5b1efbf00534fd0b1123a4e29. Spillets egen intro fra ny oppstart med automatiske punktumtastetrykk viser 49 nye mål. En separat rettet hel animasjon 12 viser de siste ni målene som primærskriptet avbryter. Andre aktører og bakgrunnsskript 200/201 er beholdt. Alle 46 egne varianter, åtte motorbrett og seks hele før/etter-par er sett med hode, kropp, hender, hatter, ledninger, blink og små svarte fragmenter i faktisk spillkontekst. For alle 58 sammenlignede øyeblikk er hele originalbildet SHA-identisk mellom grunnlag og kandidat, og HD-forskjeller utenfor den nye aktørflaten med fast åtte HD-pikslers marg er null.
+
+Første kontroll stoppet fordi den krevde identiske avvik på samme absolutte framenummer. Selv samme tilfeldighetsfrø 20261021 gir tidsforskjøvet intro, og dette er ikke påstått bestått. Den etterfølgende kontrollen knytter figurøyeblikk til identiske originalbilder. Alle 34 avvik i hver intro har samme to eksakte 12-pikselmønstre i samme rekkefølge, med identiske koordinater og begge RGB-verdier, i boksen [544,620,568,639]. Ti tidlige tilfeller opptrer før noen av de nye rutene tegnes. Sekundærprøven er også kjørt på nytt med fast frø, med identiske 120 kontroller, 119 null og samme 160 ved bilde 36. Totalt 1420 kontroller og 1385 null i begge versjoner. Ingen nye signaturer, økte avvik eller endringer utenfor nye figurer er funnet. Første prøver, avvik og stoppnotat er bevart. Foreldreprosessen til full seed-prøve ble avsluttet med 143 etter at begge barneprøvene hadde avsluttet med 0 og skrevet fullstendige 1300-kontrollers kvitteringer; disse er kontrollert separat. Ingen motor- eller pipelinekode er endret eller testterskler senket. Full naturlig gjennomspilling gjenstår.
+
+1172 beskyttede kildehash, alle 21387 tidligere PNG og tre opprinnelige stasher er bevart. Kandidaten har 3208 native og 21451 filer. Publisering og hent verifiseres separat med eksakt fjern-SHA og alle filhash. Pakker har fortsatt 3150 og mangler disse 58; neste felles samlepunkt følger resten av den produserbare Max-introfamilien. Det ekstra Windows-taggbygget 39551012593 feilet før spillstart med den kjente sporadiske SDL_BlitSurface-feilen. Det endrer ikke den separat bygde og kontrollerte fellesutgaven 3150. Interaktiv Windows, ny webtest og tidligere inventar-/testhoppbegrensninger er fortsatt åpne. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Se NESTE.md og SHA-festet fremdrift og rutekart før videre arbeid.
+''')
+shutil.copy2(__file__,R/'sluttkontroll.py.txt')
+print('Sluttkontroll klar: fem hele ark,58 native,46 varianter,1420 kontroller/1385 null. Nativepublisering venter på kildecommit og fjern-SHA.')

@@ -1,0 +1,143 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from collections import Counter
+import json, hashlib, shutil, numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+
+def artifacts(name):
+    proof = read(R / (name + '.json'))
+    assert proof['exit'] == 0 and len(proof['kontroller']) == 1300
+    rows = []
+    for e in proof['kontroller']:
+        if not e['avvik']:
+            continue
+        f = e['frame']
+        screen = O / name / f'frame_{f:06}_screen.png'
+        whole = O / name / f'frame_{f:06}_room002.png'
+        x = np.array(Image.open(screen).convert('RGB'))
+        y = np.array(Image.open(whole).convert('RGB'))
+        yy, xx = np.where(np.any(x != y, axis=2))
+        assert len(xx) == e['avvik'] == 12
+        bbox = [int(xx.min()), int(yy.min()), int(xx.max()+1), int(yy.max()+1)]
+        assert bbox == [544, 620, 568, 639]
+        signature = hashlib.sha256(np.stack([xx, yy], 1).tobytes()
+                                   + x[yy, xx].tobytes() + y[yy, xx].tobytes()).hexdigest()
+        rows.append(dict(frame=f, avvik=12, bbox=bbox, signatur=signature,
+                         skjerm_sha256=sha(screen), hel_sha256=sha(whole)))
+    return proof, rows
+
+base, ba = artifacts('motor-intro-seed-grunnlag3150')
+new, ca = artifacts('motor-intro-seed-kandidat3208')
+assert len(ba) == len(ca) == 34
+assert [e['signatur'] for e in ba] == [e['signatur'] for e in ca]
+assert base['random_seed'] == new['random_seed'] == 20261021
+secondary_base = read(R / 'motor12-seed-grunnlag3150.json')
+secondary = read(R / 'motor12-seed-kandidat3208.json')
+assert secondary['kontroller'] == secondary_base['kontroller']
+assert len(secondary['kontroller']) == 120 and secondary['nullkontroller'] == 119
+assert [e for e in secondary['kontroller'] if e['avvik']] == [dict(frame=36, avvik=160)]
+
+save(R / 'motor-seed-bufferdiagnose.json', dict(
+    seed=20261021, kontrollantall_hver=1300, nullkontroller_hver=1266,
+    absolutte_framenumre_identiske=False,
+    samme_avvikssekvens_etter_bildeinnhold=True,
+    signaturer=dict(Counter(e['signatur'] for e in ba)),
+    signatur_definisjon='Eksakte avvikskoordinater samt begge RGB-verdier, i rasterrekkefølge.',
+    grunnlag=ba, kandidat=ca,
+    forklaring='Spilltid og tastetrykk er ikke samme logiske framenummer mellom oppstarter. '
+               'Ingen ny signatur, avviksstørrelse eller plassering; alle 34 er samme to '
+               '12-pikselmønstre i samme rekkefølge. Originale flat-bilder bekreftes separat '
+               'byteidentiske for alle 58 nye figurøyeblikk. Ingen testterskler endret.'))
+
+native = read(R / 'egen-native.json')['ruter']
+names = [v['bilde'] for v in native]
+canonical = [v['bilde'] for v in read(R / 'prototyper-endelig.json')]
+assert len(names) == 58 and len(canonical) == 46
+pairs = []
+selected = {}
+for name in names:
+    natural = name in new['tegninger']
+    c = (new if natural else secondary)['tegninger'][name]
+    b = (base if natural else secondary_base)['tegninger'][name]
+    assert c['pos'] == b['pos'] and c['maal'] == b['maal']
+    cp, bp = Path(c['fil']), Path(b['fil'])
+    cf, bf = cp.with_name(cp.stem+'_flat.png'), bp.with_name(bp.stem+'_flat.png')
+    assert sha(cf) == sha(bf), (name, 'ulikt originalbilde')
+    before = np.array(Image.open(bp).convert('RGB'))
+    after = np.array(Image.open(cp).convert('RGB'))
+    delta = np.any(before != after, 2)
+    outside = delta.copy()
+    x, y = c['pos']; w, h = c['maal']
+    box = [max(0,x*4-8), max(0,y*4-8), min(after.shape[1],(x+w)*4+8), min(after.shape[0],(y+h)*4+8)]
+    outside[box[1]:box[3], box[0]:box[2]] = False
+    assert not outside.any(), (name, int(outside.sum()))
+    row = dict(bilde=name, faktisk_linux=True, naturlig_intro=natural,
+               rettet_hel_animasjon=not natural, grunnlag_frame=b['bildeframe'],
+               kandidat_frame=c['bildeframe'], original_flat_sha256=sha(cf),
+               grunnlag_sha256=sha(bp), kandidat_sha256=sha(cp),
+               native_sha256=sha(O/'mod-intro3208/costumes'/(name+'_hd.png')),
+               rekt_med_8hd_marg=box, endrede_piksler=int(delta.sum()),
+               utenfor_ny_aktorflate=0)
+    pairs.append(row); selected[name] = (b, c)
+
+shots = []
+boards = []
+for start in range(0, len(canonical), 6):
+    board = Image.new('RGB', (1320, 1050), '#304050'); draw = ImageDraw.Draw(board)
+    for j, name in enumerate(canonical[start:start+6]):
+        b, c = selected[name]
+        x, y = c['pos']; w, h = c['maal']
+        box = (x*4-8, y*4-8, (x+w)*4+8, (y+h)*4+8)
+        xx = (j % 2)*660; yy = (j//2)*350
+        draw.text((xx+8, yy+8), name+' original / egen HD i faktisk motor', fill='white')
+        for k, row in enumerate([b,c]):
+            cut = Image.open(row['fil']).convert('RGB').crop(box)
+            cut.thumbnail((320,310), Image.Resampling.LANCZOS)
+            board.paste(cut,(xx+8+k*330,yy+30))
+        f = R/(name+'-faktisk-linux.png')
+        shutil.copy2(c['fil'], f)
+        shots.append(dict(bilde=name, fil=f.name, sha256=sha(f), frame=c['bildeframe']))
+    f = R/f'motor-varianter-{start//6+1}.png'; board.save(f)
+    boards.append(dict(fil=f.name, sha256=sha(f), ruter=canonical[start:start+6]))
+
+whole_pairs=[]
+for name in ['costume012_1920','costume012_1927','costume010_1920',
+             'costume010_1933','costume010_1952','costume012_1935']:
+    b,c=selected[name]
+    board=Image.new('RGB',(1280,430),'#304050');draw=ImageDraw.Draw(board)
+    draw.text((8,8),name+f': grunnlag 3150 frame {b["bildeframe"]} / kandidat 3208 frame {c["bildeframe"]}, identisk originalbilde',fill='white')
+    for i,row in enumerate([b,c]):board.paste(Image.open(row['fil']).convert('RGB').resize((640,400)),(i*640,30))
+    f=R/(name+'-for-etter.png');board.save(f);whole_pairs.append(dict(bilde=name,fil=f.name,sha256=sha(f)))
+
+for label, proof, first, last in [('intro',new,2246,2360),('hel12',secondary,62,102)]:
+    folder=Path(next(iter(proof['tegninger'].values()))['fil']).parent
+    frames=[Image.open(folder/f'frame_{n:06}_room002.png').convert('RGB').resize((640,400),Image.Resampling.LANCZOS) for n in range(first,last,2)]
+    frames[0].save(R/('sam-max-'+label+'-faktisk-linux.gif'),save_all=True,append_images=frames[1:],duration=180,loop=0)
+
+save(R/'motor-pikselkontroll.json',pairs)
+save(R/'motor-visuell-plan.json',dict(faktisk_linux=True,binar_sha256=new['binar_sha256'],
+     hele_bilder=shots,brett=boards,hele_for_etter=whole_pairs,visuelt_sett=False,
+     alle58_identiske_originalbilder=True,alle58_utenfor_ny_aktorflate=0,
+     naturlig_intro_ruter=49,sekundaere_siste_ruter=9,egne_varianter=46,
+     full_naturlig_gjennomspilling=False))
+save(R/'motor-sammenligning.json',dict(grunnlag_native=3150,kandidat_native=3208,
+    forventet=58,sett=58,mangler=[],alle_nye_kildemal_sett=True,
+    kontroller_identiske=False,absolutte_framenumre_ikke_sammenlignbare=True,
+    avvikskoordinater_og_rgb_identiske=True,avviksrekkefolge_identisk=True,
+    ingen_nye_eller_okte_avvik=True,kontrollantall=1420,nullkontroller=1385,
+    intro_random_seed=20261021,bakgrunnsskript200_201_beholdt=True,
+    antall_kjente_introavvik=34,introavvik_piksler_hver=12,
+    sekundaert_kjent_avvik=dict(frame=36,avvik=160),
+    alle58_original_flat_sha256_identiske=True,alle58_utenfor_ny_aktorflate=0,
+    naturlig_intro49=True,rettet_hel_animasjon12_20=True,
+    naturlig_full_gjennomspilling=False,full_visuell_vurdering_gjenstar=True,
+    binar_sha256=new['binar_sha256']))
+shutil.copy2(__file__,R/'vis-motor.py.txt')
+print('58 identiske originalbilder,0 utenfor ny aktørflate. 34 identiske 12-pikselmønstre i samme rekkefølge. 46 varianter/8 brett/6 par klare til visning.')

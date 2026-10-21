@@ -1,0 +1,25 @@
+from pathlib import Path
+import os, json, hashlib, subprocess, re, shutil, gzip
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+PK=P/'out/felles-release-20261021-sam303/linux/squashfs-root'; D=PK/'usr/share/sam-max-hd'; B=PK/'usr/bin/scummvm'
+sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d: p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert sha(B)=='5d367480767ac23ca13e1a3b07ef8b481ef163b5b1efbf00534fd0b1123a4e29'
+T=O/'motor-intro-seed-kandidat3208'; assert not T.exists(); T.mkdir(); (T/'home').mkdir(); (T/'saves').mkdir()
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')}
+env.update(HOME=str(T/'home'), XDG_CONFIG_HOME=str(T/'home/.config'),XDG_CACHE_HOME=str(T/'home/.cache'),XDG_DATA_HOME=str(T/'home/.local/share'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(O/'mod-intro3208'),DIGHD_VERIFY='1',DIGHD_QUIT_AT='2600',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='2',DIGHD_DUMP_FLAT='1',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1',DIGHD_TEST_KEYS=','.join(f'{n}:.' for n in range(80,2600,20)))
+args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(T/'saves'),'--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--random-seed=20261021','--debuglevel=1','samnmax']
+with (T/'scummvm.log').open('wb') as f: code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=480).returncode
+log=(T/'scummvm.log').read_text(); checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+events=[];obs={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(10|12)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,c,x,y,w,h=map(int,m.groups());shot=(f//2+1)*2; images=list(T.glob(f'frame_{shot:06}_room*.png')); images=[p for p in images if '_flat' not in p.name]
+ row=dict(logg_frame=f,bildeframe=shot,cel=n,kostyme=c,pos=[x,y],maal=[w,h],fil=str(images[0]) if images else None,sha256=sha(images[0]) if images else None);events.append(row)
+ if images:obs.setdefault(f'costume{c:03}_{n}',row)
+want={t['bilde'] for name in ['fig010_01','fig010_02','fig012_01','fig012_02','fig012_03'] for t in json.loads((A/'jobber'/name/'jobb.json').read_text())['ruter']}
+proof=dict(random_seed=20261021,binar=str(B),binar_sha256=sha(B),kommando=args,exit=code,kjoring='Spillets egen intro fra nyoppstart med automatiske punktumtastetrykk',ingen_rom_skript_kostyme_eller_aktorkrok=True,mod_json_sha256=sha(O/'mod-intro3208/mod.json'),kontroller=checks,nullkontroller=sum(x['avvik']==0 for x in checks),tegninger=obs,hendelser=events,mal=len(want),sett=len(want&set(obs)),mangler=sorted(want-set(obs)),full_naturlig_gjennomspilling=False,logg_sha256=sha(T/'scummvm.log'))
+save(R/'motor-intro-seed-kandidat3208.json',proof)
+with gzip.open(R/'motor-intro-seed-kandidat3208.log.gz','wb') as f:f.write((T/'scummvm.log').read_bytes())
+shutil.copy2(__file__,R/'motor-intro-seed-kandidat3208.py.txt')
+print(json.dumps({k:proof[k] for k in ['exit','mal','sett','mangler','nullkontroller']},ensure_ascii=False));print('kontroller',len(checks))
+assert code==0

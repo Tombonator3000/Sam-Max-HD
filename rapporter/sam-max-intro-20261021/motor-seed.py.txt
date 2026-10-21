@@ -1,0 +1,17 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');assert all(sha(P/'mods/gpt'/f)==h for f,h in base['filer'].items());assert all(sha(O/'mod-intro3208'/f)==h for f,h in read(R/'kandidatfilhash.json').items())
+def run(label):
+ name='motor-intro-seed-'+label;text=(O/'kildeavspilling.py').read_text().replace('kildemotor-intro',name).replace('kildeavspilling.py.txt',name+'.py.txt').replace('timeout=240','timeout=480').replace("'--debuglevel=1'","'--random-seed=20261021','--debuglevel=1'").replace('proof=dict(','proof=dict(random_seed=20261021,')
+ if label=='kandidat3208':text=text.replace("str(P/'mods/gpt')","str(O/'mod-intro3208')").replace("sha(P/'mods/gpt/mod.json')","sha(O/'mod-intro3208/mod.json')")
+ f=O/(name+'.py');f.write_text(text);q=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,text=True,capture_output=True,timeout=520);(R/(name+'-utskrift.txt')).write_text(q.stdout+q.stderr);print(label,q.returncode,q.stdout.strip(),flush=True);assert q.returncode==0;return read(R/(name+'.json'))
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,['grunnlag3150','kandidat3208']))
+save(R/'motor-seed-bufferdiagnose.json',dict(seed=20261021,grunnlag_null=rows[0]['nullkontroller'],kandidat_null=rows[1]['nullkontroller'],samme_kontroller=rows[0]['kontroller']==rows[1]['kontroller'],endringer=[dict(grunnlag=b,kandidat=c) for b,c in zip(rows[0]['kontroller'],rows[1]['kontroller']) if b!=c]))
+assert rows[0]['kontroller']==rows[1]['kontroller'],'Ulike kontroller også med samme frø krever undersøkelse'
+secondary=read(R/'motor12-kandidat3208.json');oldsecondary=read(R/'kildemotor12-hel.json');assert secondary['kontroller']==oldsecondary['kontroller']
+want={e['bilde'] for e in read(R/'egen-native.json')['ruter']};obs={**secondary['tegninger'],**rows[1]['tegninger']};assert not want-set(obs)
+save(R/'motor-sammenligning.json',dict(grunnlag_native=3150,kandidat_native=3208,forventet=58,sett=len(want&set(obs)),mangler=[],alle_nye_kildemal_sett=True,kontroller_identiske=True,ingen_nye_eller_okte_avvik=True,kontrollantall=len(rows[1]['kontroller'])+len(secondary['kontroller']),nullkontroller=rows[1]['nullkontroller']+secondary['nullkontroller'],intro49_egen_spillsekvens=True,rettet_hel_animasjon12_20=True,intro_random_seed=20261021,bakgrunnsskript200_201_beholdt=True,naturlig_full_gjennomspilling=False,full_visuell_vurdering_gjenstar=True,binar_sha256=rows[1]['binar_sha256'],avklart_forste_kjoringer_uten_fast_fro=True))
+shutil.copy2(__file__,R/'motor-seed.py.txt');print('58 mål observert, like kontroller med samme frø. Visuell motorvurdering gjenstår.',flush=True)
