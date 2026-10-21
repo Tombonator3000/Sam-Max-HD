@@ -1,0 +1,54 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json, hashlib, shutil, sys
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+N = A / 'rapporter/sam124-kilde-20261021'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, x: p.write_text(json.dumps(x, ensure_ascii=False, indent=2) + '\n')
+
+name, cel, detail = sys.argv[1:4]
+row = next(x for x in read(N / 'forste-fem-ruteplan.json')['ruter'] if x['bilde'] == cel)
+C = R / 'kall' / name
+C.mkdir(parents=True, exist_ok=False)
+source = Path(row['kilde'])
+assert sha(source) == row['sha256']
+src = Image.open(source).convert('RGBA')
+assert hashlib.sha256(src.tobytes()).hexdigest() == row['rgba_sha256']
+scale = min(10, 832 // max(src.size))
+atlas = Image.new('RGBA', (1024, 1024), '#536576')
+atlas.alpha_composite(src.resize((src.width * scale, src.height * scale), Image.Resampling.NEAREST), ((1024 - src.width * scale) // 2, (1024 - src.height * scale) // 2))
+atlas.convert('RGB').save(C / 'originalatlas.png')
+src.save(C / 'original-alfa.png')
+obs = row['kildeobservasjon']
+context = Path(obs['fil']).with_name(Path(obs['fil']).stem + '_flat.png')
+assert context.exists()
+shutil.copy2(context, C / 'spillkontekst.png')
+prompt = f'''Use case: illustration-story. Production asset for Sam & Max Hit the Road HD, one entire original animation cel, not a scene or character lineup.
+Image 1 is the complete exact source cel enlarged on a slate inspection background. It controls every pose, silhouette, proportion, component and small mark. Image 2 is the approved Sam identity and style master. Image 3 is the approved Max identity and style master. Image 4 is the actual original game context ONLY, to clarify identity and occlusion. Do not paint its scenery or other characters.
+Redraw the entire single source cel together as one unified smooth cartoon painting on true transparent background. Keep all relative positions and source proportions. Resolve coarse pixel clusters into confident dark outlines, flat faithful colors with one shade and sparse highlights. Match the approved clean cartoon style without changing this source phase. Keep source head, hand and eye sizes, negative spaces and intentional clipping. No texture, dithering, glow, shadows, floor, scenery, labels or grid. Do not complete parts that are intentionally partial. Do not mirror, rotate, rearrange or invent details. Preserve every source-colored little detached fragment and mark. Each component must be painted as part of this single whole cel, never assembled from separately generated body parts.
+Source-specific meaning and invariants: {detail}
+The source palette controls the human: Lee-Harvey is a tall human thug with reddish-brown high quiff, pink skin, red shirt, nearly black/navy jacket and trousers, dark boots, blue-gray jacket edging. He is not Sam and not the blond man in the orange jacket. Max follows his approved cream fur, salmon inner ears, tiny black eyes and pink nose, but his expression, teeth, mouth and anatomy follow THIS source pose, not a generic master smile. Sam fragments, when present in Image 1, are blue-gray suit pieces of fallen Sam, not floor, a platform or boots. Only paint characters and partial pieces actually present in Image 1.
+Output one 1024x1024 PNG with genuine soft antialiased alpha, no painted background. Maintain the whole original cel layout with generous transparent margin around and between all components, approximately the same framing as Image 1. Do not copy pixel stair steps or use a hard source silhouette mask. Frame {cel}, original complete extent {src.width} by {src.height} pixels. Every tiny gesture and attachment point belongs to this exact phase.'''
+args = {'prompt': prompt, 'referenced_image_paths': [str(C / 'originalatlas.png'), str(A / 'hovedark/sam.png'), str(A / 'hovedark/max.png'), str(C / 'spillkontekst.png')], 'transparent_background': True}
+(C / 'faktisk-prompt.txt').write_text(prompt + '\n')
+save(C / 'faktiske-argumenter.json', args)
+save(C / 'plan.json', {'ruter': [dict(row, canonical_rgba_sha256=row['rgba_sha256'])], 'kildereferanser': {p: sha(Path(p)) for p in args['referenced_image_paths']}, 'kontekst': str(context), 'kildepresisering': str(N / 'PRESISERING.md'), 'detaljer': detail, 'kilde_og_mastere_sett_foer_kall': False})
+board = Image.new('RGB', (1800, 1320), '#536576')
+draw = ImageDraw.Draw(board)
+draw.text((12, 10), cel + ': hel original / faktisk originalscene / godkjente Sam- og Max-mastere', fill='white')
+board.paste(Image.open(C / 'originalatlas.png').resize((750, 750)), (0, 32))
+scene = Image.open(C / 'spillkontekst.png').convert('RGB'); scene.thumbnail((1040, 750))
+board.paste(scene, (755, 50))
+for i, master in enumerate(['sam', 'max']):
+    im = Image.open(A / 'hovedark' / (master + '.png')).convert('RGBA')
+    box = im.getbbox(); im = im.crop(box); im.thumbnail((865, 450))
+    board.paste(im, (15 + i * 890, 825), im)
+board.save(C / 'kontekst-og-mastere.png')
+(C / 'premissretting.md').write_text('Beskyttet jobbkort har feil Sam-/rom28-premiss. Faktisk original, rom25-inngang og skript217 viser Lee-Harvey med Max. Se sam124-kilde-20261021/PRESISERING.md. Sam-fragmenter bevares der kilden har dem. Alle beskyttede filer er uendret.\n')
+shutil.copy2(__file__, R / 'klargjor.py.txt')
+print(str(C))
