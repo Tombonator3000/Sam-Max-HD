@@ -1,5 +1,17 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 13:53
+
+- [x] Levert og additivt publisert fig097_01 til fig097_08: 47 nye native, 3371 totalt. Alle 21614 filhash, tidligere grafikk, 1300 kilder og tre stasher bekreftet etter hent.
+- [x] Egenkontroll av alle åtte ark og 47 native er OK. Begge motorprøver viser 47 nye mål, 718/720 null på hver side samlet, samme to kjente 160-avvik. 190 originalflater SHA-identiske; 94 båtpar med null utenfor logget båtflate. Åtte ark, begge variantbrett og fire hele par er sett.
+- [x] Ekstra Windows-taggbygg 39591712087 er grønt på første forsøk; gammel pakkefrys er frigitt. Ingen duplisert bygging eller ny release for 3324.
+- [ ] Fortsett fig097_09 til fig097_12 fra rapporter/svanebaat97-20261021, 48 mål fra 48 ulike hele kilder. Åtte kildebrett og fire originalark er klargjort, ikke visuelt sett. Ingen nye øvre bildekall eller resultater. Se kilder i spillkontekst og begge hovedark før hvert motiv; båten er allerede levert i eget lag.
+- [ ] Oppdater begge faktiske pakker ved familiens samlepunkt, forventet 3419 native, eller tidligere ved blokkering. Fellespakker har 3324 og mangler 47. Bekreft nedlastinger, sjekksummer og faktisk inkludert grafikk før de kalles oppdatert.
+- [ ] Fortsett øvrig produserbar grafikk og returer. 473 av 1758 hele figurjobber har resultat; 1285 gjenstår pluss returer, katalogfeil og sluttkontroll. Skill laget, egenkontrollert, visuelt sett, native mottatt, motorobservert, publisert, pakket og Tom-/Claude-godkjent.
+- [ ] Bevar tidligere filer og releaser, 1300 kilder og tre stasher. Ikke gjenta verktøyavviste motiver, den avgrensede bokreturen eller ugyldige 344/346-avspillinger. Full naturlig gjennomspilling, interaktiv Windows, ny webtest og samlet sluttkontroll gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 13:26
 
 - [x] Levert fig223_08 og fig223_09, 18 nye native; 3324 totalt. Begge ark OK. Alle 21567 filhash og tidligere grafikk bekreftet etter hent.
