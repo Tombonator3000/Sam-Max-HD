@@ -1,0 +1,45 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam2503437';T=O/'publisering-hdmod3437'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True));remote=lambda branch:api('git/ref/heads/'+branch)['object']['sha']
+b=read(R/'grunnlag-produksjon.json');files=read(R/'kandidatfilhash.json');proof=read(R/'sluttkontroll.json');motor=read(R/'motor-sammenligning.json');protected=read(R/'beskyttede-samlet1348.json')
+assert not T.exists() and not (R/'publisering-forsokt.json').exists()
+assert not git(A,'status','--porcelain');art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art
+assert b['fjern_sha']=='0981fae1f32bf3ca108c86aec2118c1805d0d853' and remote('hd-mod')==b['fjern_sha']
+assert all(sha(M/f)==h for f,h in b['filer'].items()) and len(files)==21680 and all(sha(C/f)==h for f,h in files.items())
+assert len(protected)==1348 and all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert proof['visuelt_sett'] and proof['motorobservert'] and motor['visuelt_sett'] and motor['primaerskript211_kjort']
+assert {e['jobb'] for e in proof['leveranser']}=={f'fig250_{i:02}' for i in range(1,6)}
+assert motor['sett']==18 and motor['kontrollantall']==1440 and motor['nullkontroller']==1436
+assert motor['avvikskoordinater_og_rgb_par_identiske'] and motor['ingen_nye_feilpiksler'] and motor['alle36_originalflater_SHA_identiske'] and motor['alle36_utenfor_figurflate']==0
+extra=api('actions/runs/39606444011');assert extra['conclusion']=='success' and extra['run_attempt']==2 and extra['head_sha']=='4f100a8b0a10abc23dfd7d8e8c9f9ecd918e2342'
+for workflow in ['linux.yml','windows.yml']:
+ runs=api('actions/workflows/'+workflow+'/runs?per_page=15')['workflow_runs'];assert not any(e['status']!='completed' for e in runs),'Ikke endre native under aktivt pakkebygg'
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=b['fjern_sha'],forventet_native=3437,force_with_lease=True))
+shutil.copytree(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts and p.name!='SHA256SUMS'}
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(manifest.items())))
+assert all(manifest[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+subprocess.run(['git','-C',str(T),'add','-A'],check=True);subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod 3437: fem kontrollerte VR-ark, 18 nye ruter'],check=True)
+assert remote('hd-mod')==b['fjern_sha'];subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+b['fjern_sha'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=remote('hd-mod');assert published==git(T,'rev-parse','HEAD');subprocess.run(['bash','tools/mod_gren.sh','hent',str(M)],cwd=P,check=True)
+actual={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual)==set(files) and len(actual)==21680 and {f for f,h in files.items() if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)==3437 and read(M/'mod.json')['costume_cels']==3437
+assert git(P,'stash','list','--format=%H').splitlines()==b['stash'] and all(sha(A/f)==h for f,h in protected.items()) and remote('hd-mod')==published
+save(R/'publiserte-moddfiler-3437.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=3437,nye_native=18,nye_hele_ark=5,hele_figurjobber=482,gjenstar=1276,filantall=21680,png=sum(f.endswith('.png') for f in actual),alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_png_bevart=sum(f.endswith('.png') for f in b['filer']),beskyttede=1348,stasher=b['stash'],force_with_lease=True,egen_alfa_ingen_originalfragmenter=True,visuelt_sett=True,motorobservert=True,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3419,pakker_mangler_native=18,native_frosset=False,neste_samlepunkt='Etter hele costume250-familien, forventet3471 hvis alle52leveres, eller tidligere ved blokkering.')
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+ d=read(R/name);d.update(publisert=True,hd_mod=published,grafikkilde=art)
+ for e in d.get('leveranser',[]):e.update(publisert=True,hd_mod=published)
+ save(R/name,d)
+line=f'Publisert og hentet {published}: fig250_01 til fig250_05, 18 nye native og 3437 totalt. 482 av 1758 hele resultatark; 1276 gjenstår pluss returer, katalogfeil og sluttkontroll. Alle 21680 filhash, 21656 tidligere PNG, 1348 kilder og tre stasher er bekreftet. Tolv hele egne malerier, seks identiske hele aliasmål, åtte innebygde bildekall med tre kvalitetsreturer. To ark OK, tre SJEKK med fem visuelt vurderte omrissvarsler, alle 18 native automatisk OK. Alle 18 er observert i primærskript 211 og hel animasjon 6. Hver side har 1436 av 1440 null med identiske 416/160-overgangsavvik. Alle 36 originalflater er SHA-identiske og null endringer utenfor loggede aktørflater. Fem resultatark, tolv motorvarianter og seks hele par er sett. Ingen ny Tom-/Claude-godkjenning. Ekstra Windows 39606444011 er grønt på forsøk 2 etter kjent SDL-startfeil. Nativefrysen er frigitt. Pakker har 3419 og mangler 18. Neste fig250_06 til 10, 22 mål fra 19 hele kilder uten bildekall. Pakkesamlepunkt etter hele 250-familien, forventet 3471 eller tidligere ved blokkering. Se rapporter/{R.name}/NESTE.md.'
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;s=p.read_text();i=s.find('\n');p.write_text(s[:i+1]+'\n'+line+'\n'+s[i+1:])
+for name in ['NESTE.md','RAPPORT.md']:
+ p=R/name;s=p.read_text();s=s.replace('\nKildepush, additiv publisering og hent gjenstår; ikke tell som publisert ennå.\n','\n');p.write_text(line+'\n\n'+s)
+shutil.copy2(__file__,R/'publiser.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)

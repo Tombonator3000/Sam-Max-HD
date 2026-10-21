@@ -1,0 +1,65 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam2503437'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');protected=read(R/'beskyttede-samlet1348.json');plan=read(R/'kildeplan.json')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+assert base['native']==3419 and len(base['filer'])==21662 and len(protected)==1348
+assert all(sha(M/f)==h for f,h in base['filer'].items()) and all(sha(A/f)==h for f,h in protected.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==477 and not C.exists()
+selection={1920:'K01',1921:'K01',1925:'K01',1926:'K01',1930:'R01',1931:'R03',1932:'K03',1933:'K03',1934:'K04',1935:'K04',1936:'K05',1937:'K05'}
+allrows=read(R/'prototyper-forelopig.json');chosen=[]
+for num,call in selection.items():
+ n=f'costume250_{num}';rows=[e for e in allrows if e['bilde']==n and e['valgt_kall']==call];assert len(rows)==1;e=rows[0]
+ assert e['native_ok'] and sha(A/e['prototype'])==e['prototype_sha256']
+ e.update(visuelt_sett=True,kilde_og_spillkontekst_sett=True,sam_stilanker_sett=True,visuell_merknad='Hel egen polygontegning sett mot original og primærkontekst. Begge figurer, faktiske grep, sverdstriper, små trekantbiter og avstander bevart.')
+ chosen.append(e)
+assert len(chosen)==len({e['canonical_rgba_sha256'] for e in chosen})==12
+save(R/'prototyper-endelig.json',chosen);by={e['bilde']:e for e in chosen};sources={e['bilde']:e for e in plan['ruter']};drafts=[];native=[];deliveries=[]
+for jr in plan['jobber']:
+ job=jr['jobb'];J=A/'jobber'/job;j=read(J/'jobb.json');assert not (J/'resultat.png').exists();D=O/'ark'/job;D.mkdir(parents=True)
+ for f in ['jobb.json','original_1x.png','prompt.txt','referanse.png']:shutil.copy2(J/f,D/f)
+ sheet=Image.new('RGBA',tuple(j['lerret']));mapping=[]
+ for t in j['ruter']:
+  n=t['bilde'];s=sources[n];canonical=s['canonical'];e=by[canonical];src=Image.open(s['kilde']).convert('RGBA')
+  assert sha(Path(s['kilde']))==s['sha256'] and hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256']
+  own=Image.open(A/e['prototype']).convert('RGBA');assert own.size==(src.width*4+16,src.height*4+16)
+  arr=np.array(own);core=arr[:,:,3]>=CORE;sm=np.array(src)[:,:,3]>0;iou,cov=_iou(core,np.repeat(np.repeat(sm,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER
+  x,y,_,_=t['rekt'];dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;assert min(dx,dy)>=0 and dx+own.width<=sheet.width and dy+own.height<=sheet.height
+  layer=Image.new('RGBA',sheet.size);layer.alpha_composite(own,(dx,dy));assert not ((np.array(sheet)[:,:,3]>0)&(np.array(layer)[:,:,3]>0)).any();sheet.alpha_composite(layer)
+  yy,xx=np.nonzero(core);mapping.append(dict(bilde=n,kostyme=250,rute=t['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical=canonical,canonical_rgba_sha256=e['canonical_rgba_sha256'],prototype=e['prototype'],prototype_sha256=e['prototype_sha256'],kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_hel_flytt_hd=e.get('egen_hel_flytt_hd',[0,0]),egen_alfa=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,native_ok=True))
+  native.append(dict(bilde=n,canonical=canonical,fil='costumes/'+n+'_hd.png',prototype=e['prototype'],sha256=e['prototype_sha256'],kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragmenter=False))
+ sheet.save(D/'resultat.png');test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(D/'resultat.png')],cwd=A,text=True,capture_output=True)
+ (R/(job+'-egenkontroll.txt')).write_text(test.stdout+test.stderr);print(job,'egenkontroll',test.returncode,flush=True);drafts.append((job,D,mapping,test.returncode))
+assert all(d[3] in [0,1] for d in drafts),'FEIL i utkast. Ingen ark leveres.'
+for job,D,mapping,code in drafts:
+ J=A/'jobber'/job;shutil.copy2(D/'resultat.png',J/'resultat.png');digest=sha(J/'resultat.png');save(R/('rutekart-'+job+'.json'),{job:dict(sha256_resultat=digest,ruter=mapping)})
+ row=dict(jobb=job,resultat='jobber/'+job+'/resultat.png',sha256=digest,ruter=len(mapping),rutekart='rapporter/'+R.name+'/rutekart-'+job+'.json',laget=True,levert=True,egenkontroll=['OK','SJEKK'][code],egenkontrollert=True,visuelt_kontrollert=False,prototype_visuelt_sett=True,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False);deliveries.append(row)
+ calls=sorted({e['kall'] for e in mapping})
+ (J/'notat.md').write_text(f'''# {job}, 21. oktober 2026
+
+Kostyme250 i VR-verdenen, rom49. Ark01 har Sam alene med gult sverd; ark02 til05 har Sam og den oransje virtuelle polygondragen sammen i hver hel kilde. Ressursbanken bekrefter dragen og dragehjertet som blir en ekte nøkkel. Kantete polygonformer, flate fargeflater, Sams blågrå dress/hatt og stripete slips, dragens spisse hode, sverdene og alle små kildebekreftede striper og trekanter beholdes. Vanlig Sam-master er bare identitets-/fargestøtte; den tilsiktede VR-geometrien styrer. Originaler i spillkontekst, hele kilder og godkjent Sam-master er sett før hvert motiv. Primærskript211 og hel animasjon6 er kildeavspilt med alle52 ruter. Uvedkommende andre aktører og ekstra sverd på bakken i opptakene er ikke del av maleriet. Ingen beskyttet jobbfil er endret; korrigerte faktiske prompter er bevart separat.
+
+Innebygd image_gen, modellnavn ikke oppgitt. Bunken bruker fem grunnkall og tre kvalitetsreturer, alle åtte råbilder og faktiske argumenter/referansehash bevart under rapporter/{R.name}/kall. Dette arket velger {', '.join(calls)}. K02-utkastene hadde feil geometri/radoverløp og R02-utkastet hadde avvikende geometri og nye små grønne gripedetaljer. De er holdt ute. R01 og R03 tegner hver kombinerte kilde hel på ett lerret. Ingen verktøyavvisning, alternativ CLI/API eller delkomposisjon.
+
+Python renser glød rundt egne alfakjerner og plasserer hele egne malerier ved fast4x med åtte HD-pikslers marg. Egen myk alfa bevares; ingen hard originalmaske eller originale bildefragmenter. R01_1930 er flyttet hel én HD-piksel til høyre og én opp, uten å endre interne proporsjoner. K05-radskillet er flyttet fra512 til532 i råbildet for å beholde hele egne føtter og unngå at de havner i neste rute; skillet ligger i det faktiske tomrommet mellom maleriene. Ingen deler er rekonstruert fra originalen. De seks aliasmålene bruker bare identiske hele RGBA-kilder og kopierer det samme hele egne maleriet med identisk SHA.
+
+Resultat1536x1024 RGBA, SHA256 {digest}. Egenkontroll {row['egenkontroll']}. Nativeporter CORE128, IoU0,6 og dekning0,8 er uendret. SHA-festet rutekart finnes i rapporten. Laget, egenkontrollert, visuelt sett, native mottatt, motorobservert, publisert og pakket kvitteres separat. Ingen ny Tom-/Claude-godkjenning. 21662 tidligere moddfiler,1348 beskyttede jobbfiler og tre stasher bevares. Bibliotekskilde figurark-fast-storrelse er brukt. Ingen motor- eller pipelineendring.
+''')
+progress=dict(leveranser=deliveries,nye_jobber_levert=5,nye_native_planlagt=18,ulike_hele_egne_malerier=12,hele_rgba_aliasmal=6,innebygde_bildekall=8,vellykkede_bildekall=8,avviste_bildekall=0,returkall=3,grunnlag_native=3419,hele_figurjobber_med_resultat=482,total_figurjobber=1758,gjenstar=1276)
+save(R/'fremdrift.json',progress)
+auto=O/'automatisk-mottak';subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(auto),'--jobb',','.join(j['jobb'] for j in plan['jobber']),'--forhandsvisning',''],cwd=P,check=True)
+report=read(auto/'myke.json');save(R/'automatisk-mottak18.json',report);assert report['ruter_ok']==18 and all(report[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk'])
+shutil.copytree(M,C)
+for row in native:
+ dest=C/row['fil'];assert not dest.exists();shutil.copy2(A/row['prototype'],dest);assert sha(dest)==row['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3419;meta['costume_cels']=3437;save(C/'mod.json',meta)
+files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};assert len(files)==21680 and len(native)==18
+assert {f for f,h in base['filer'].items() if files[f]!=h}=={'mod.json'} and set(files)-set(base['filer'])=={e['fil'] for e in native}
+save(R/'kandidatfilhash.json',files);save(R/'egen-native.json',dict(ruter=native,nye_native=18,native_totalt=3437,fast_4x=True,marg_original=[2,2],egen_alfa=True,originalmaske=False,originalfragmenter=False,automatisk18_OK=True,kontrollkopier_ikke_brukt_i_native=True,tidligere_filer_bevart=21662,filer=21680,png=sum(f.endswith('.png') for f in files)))
+for row in deliveries:row['native_mottatt']=True
+progress.update(nye_native=18,native_totalt=3437);save(R/'fremdrift.json',progress);assert all(sha(A/f)==h for f,h in protected.items());shutil.copy2(__file__,R/'lever.py.txt')
+print('Fem hele ark og18automatisk OK i kandidat3437. Samlet arkvisning og kandidatmotor gjenstår.',flush=True)
