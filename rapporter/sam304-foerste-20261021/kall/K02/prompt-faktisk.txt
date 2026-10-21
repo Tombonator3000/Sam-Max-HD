@@ -1,0 +1,34 @@
+Task: faithful HD remaster of a sheet of animation frames from the 1993 adventure game Sam & Max Hit the Road (LucasArts). This is a production asset. Every frame replaces one original frame in the game, at the same size and position, and the frames are played one after another.
+
+Input: the attached image is the original low-resolution sheet enlarged exactly 4x with hard pixel edges. The frames stand apart on a plain flat magenta background (#FF00FF). Around the sheet is a plain gray (#808080) border. The background and the border are only padding.
+
+What the sheet shows: Sam, the dog detective (a big brown dog in a light blue-gray suit, white shirt, striped dark blue tie and a blue-gray fedora). The description is only a help; the input image decides. On this sheet, row by row from left to right: start pose, facing right (3 frames). The game mirrors the frames facing right when the character faces left, so there are no frames facing left; do not add any.
+
+Size rule (most important): draw every frame at exactly the size it has in the input, with the same height, the same width and the same proportions of head, body, arms, legs and props. One input pixel is 4 output pixels for every frame on this sheet and on every other sheet of this character, so the character never grows, shrinks or changes shape between frames. On this sheet the frames are from 592 to 592 pixels tall and from 364 to 376 pixels wide in the input (the box around each frame's visible pixels); jobb.json lists every frame's box under ruter (synlig, in original pixels: multiply by 4).
+
+Do:
+- Trace every frame at 4x in high resolution, so it looks like the characters of Day of the Tentacle Remastered next to their originals: keep the pose, silhouette and proportions, and turn every cluster of pixels into the shape it shows (glasses, a tie, a shoe). Clean dark anti-aliased outlines with a little variation in weight, flat colors with one shade and a few highlights, the same color for every area as in the input. No dithering, no texture, no gradients, no pixel steps.
+- Keep the original design: the same character, the same colors, light direction, shadows and contrast as in the input.
+- Make all frames look identical apart from the pose: the same face, eyes, hat, clothes, colors and light in every frame. Any difference between frames flickers in the game.
+- Keep the pose and silhouette of every frame, and keep each frame in its place on the sheet, in the same rows and the same order.
+- Glowing effects (light, lightning, sparks, fire) are painted as soft glow that fades into transparency.
+
+Do not:
+- Do not add, remove, merge, split or redesign frames.
+- Do not add anything that is not in the input: no new props, accessories, patterns, logos, text, shadows, floor, numbers, labels, frames or grid lines.
+- Do not change colors, clothes or proportions, and do not make heads, hands or eyes bigger than in the input.
+- Some frames show only part of the character (a body without a head, a head alone, an arm), because the game draws the parts separately. Paint them as they are and do not complete them.
+- Do not let frames touch or overlap each other.
+- No photorealism, no modern 3D look, no film grain, no vignette, no watermark, no signature.
+
+Output: one PNG image, exactly 1536 x 1024 pixels, with a fully transparent background (real alpha: no background color and no gray border) and every frame in the same place as in the input. Before delivering, run python3 verktoy/sjekk_leveranse.py jobber/fig304_02/resultat.png and redo the frames it reports as too big, too small, moved or missing. List the delivery with its sha256 in the fremdrift.json of your report and add a rutekart (the box around each frame's drawing, alpha above 128).
+
+If a second image is attached, it is the approved master sheet (hovedark) of this character, or an already approved HD sheet of the same character, or an approved HD picture from the same game. Paint the character exactly as in that image: the same face, hair, clothes, colors and level of detail. Take every pose, size and position from the first image. If a third image is attached, it is the master sheet of the second character on the sheet.
+
+
+SOURCE-VERIFIED CORRECTION AND SELECTED PRODUCTION ATLAS:
+The generic job title names Sam only. The original actually shows BOTH Sam AND Max together in the Dinosaur Park, room 59. Original local script 208 and object 570 establish that Sam lifts and swings Max tangled in BEIGE TWINE tied to a dinosaur tooth. The beige coils around Max are STRING, not fur, new clothing, a bone or a new character. Image 1 is a derived reference atlas selecting TWO complete source poses, one in each 768 x 1024 cell, on neutral gray padding. This selected atlas replaces the generic frame count and positions above for THIS raw painting only. Do not paint the original magenta sheet or gray backdrop. Output exactly 1536 x 1024 RGBA, real transparent alpha. Keep the two poses exactly in their source locations, widths and heights. Image 2 is approved Sam identity and line style. Image 3 is approved Max identity and line style. The FIRST image exclusively controls each pose and all geometry.
+Each complete sprite includes BOTH characters, the extremely thin beige vertical twine all the way to its little fork at the top, the loose beige twine coil on the ground at bottom left, and any tiny isolated blue-gray or cream source marks. Preserve these, do not erase them as artifacts. The string is only about 4 output pixels wide. Do not thicken it into a pole, add shadows, add black edging to the string, invent fingers, or turn Max into a furry rabbit. Max has the original small black eyes and narrow broad grin, two long ears where visible, cream body and tiny pink nose. Keep the exact source occlusion and flattened ears during the grab; do not complete hidden parts. Sam has his source long brown muzzle, large black nose, blue-gray fedora and suit, white shirt and dark striped tie. Preserve source palette and asymmetry. Flat colors and at most the source shade, clean tapered dark contours. No glossy new highlights or texture. Full bodies and heads must remain together. No floor, cast shadow, labels, guides, gray, checkerboard or magenta in output. The target is faithful smooth cartoon HD with every contact point and tiny component preserved.
+Cell 1 at [202, 216], source box 364 x 592 output pixels: Sam bends forward and reaches across Max, with his hand at the ear tips. Max remains seated.
+Cell 2 at [970, 216], source box 364 x 592 output pixels: Sam is bent forward, one hand holding Max by the compressed ears. Max remains at ground level.
+FINAL SPECIFIC OVERRIDE: There are NO glowing effects here. The cord and all characters are MATTE, with zero halo or aura. Do not apply the generic glow bullet: nothing in this scene emits light. No colored haze. The long twine must stay a single hairline, not a thick double black outline.

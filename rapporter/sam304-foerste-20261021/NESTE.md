@@ -1,0 +1,3 @@
+Fem første 304-ark er levert, teknisk og visuelt kontrollert og motorobservert. Publiser/hent kontrollert kandidat 3110 additivt fra fjern-SHA i grunnlag-produksjon.json før neste produksjon. Ikke generer første fem om igjen.
+
+Neste praktiske bunke er fig304_06..10, deretter 11..15. Kildeplan og alle 34 originale mål avspilt står i rapporter/sam304-kilde-20261021. De ti resterende originalarkene må ses før sine motivkall. Se begge hovedark og faktisk kildekontekst. Alle fire beskyttede filer per jobb beholdes. Native er ikke fryst; fellespakker har 3098 og mangler de 12 nye. Neste felles Linux-/Windows-samlepunkt er etter hele familien 304, eller tidligere om feil krever det. Ingen ny Tom-/Claude-godkjenning.

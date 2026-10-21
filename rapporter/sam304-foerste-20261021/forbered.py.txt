@@ -1,0 +1,44 @@
+from pathlib import Path
+from PIL import Image
+import hashlib, json, subprocess, shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name; Q=A/'rapporter/sam304-kilde-20261021'; M=P/'mods/gpt'
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists(); R.mkdir()
+protected=read(Q/'beskyttede-samlet1096.json'); assert len(protected)==1096 and all(sha(A/f)==h for f,h in protected.items())
+shutil.copy2(Q/'beskyttede-samlet1096.json',R/'beskyttede-samlet.json')
+jobs=[f'fig304_{n:02}' for n in range(1,6)]
+assert not any((A/'jobber'/j/'resultat.png').exists() for j in jobs)
+allplan=read(Q/'ruteplan-kilde.json'); rows=[e for e in allplan['ruter'] if any(t['jobb'] in jobs for t in e['malruter'])]
+assert len(rows)==10 and sum(len(e['malruter']) for e in rows)==12
+save(R/'ruteplan-unik.json',dict(jobber=jobs,ruter=rows,maal=12,ulike_hele=10,kildegrunnlag=str(Q.relative_to(A))))
+files={p.relative_to(M).as_posix():sha(p) for p in sorted(M.rglob('*')) if p.is_file()}
+native=len(list((M/'costumes').glob('*_hd.png'))); assert native==3098 and len(files)==21341
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+assert remote=='f4f0e0bfabfb9b96293aa6c3e62d1e149b909278'
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()
+assert stash==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+save(R/'grunnlag-produksjon.json',dict(native=native,filer=files,stash=stash,fjern_sha=remote,hele=427,bibliotek=['figurark-fast-storrelse','publisert-mod-er-fasit'],ekstra_windows_taggbygg=dict(run=39537469767,status='completed',conclusion='success',publisert_pakke=False)))
+observations=['Max sits beside Sam, both facing left. Sam stands with arms down. Beige twine wraps around Max and coils on the ground.', 'Max sits while Sam begins reaching toward his ears. Both still face left.', 'Sam bends forward and reaches across Max, with his hand at the ear tips. Max remains seated.', 'Sam is bent forward, one hand holding Max by the compressed ears. Max remains at ground level.', 'Sam bends forward holding Max at the top of his head; Max ears folded out of sight as shown, not invented.', 'Sam stands holding Max horizontally across his upper chest; Max feet at right and ears trail diagonally down left.', 'Sam holds Max aloft at right; Max body nearly vertical with the ears dangling down beside Sam shoulder.', 'Sam holds Max upside down at right; Max large feet are uppermost, head lower at right.', 'Sam extends his arm right and holds Max roughly horizontal with feet up and ears swept back right.', 'Sam turns away into right profile holding Max in front of his face; Max head is at left of his body and feet to right.']
+for i in range(5):
+    C=R/'kall'/f'K{i+1:02}'; C.mkdir(parents=True)
+    refs=Image.new('RGBA',(1536,1024),'#7a7f88'); rec=[]
+    for k,e in enumerate(rows[i*2:i*2+2]):
+        src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA')
+        assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']
+        q=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST)
+        pos=(k*768+(768-q.width)//2,(1024-q.height)//2); refs.alpha_composite(q,pos)
+        rec.append(dict(bilde=e['bilde'],canonical_rgba_sha256=e['rgba_sha256'],celle=[k*768,0,768,1024],reference_pos=list(pos),maal=list(q.size),motif=observations[i*2+k]))
+    refs.convert('RGB').save(C/'reference-atlas.png')
+    prompts=[]
+    for job in dict.fromkeys(t['jobb'] for e in rows[i*2:i*2+2] for t in e['malruter']):
+        prompts.append((A/'jobber'/job/'prompt.txt').read_text())
+    correction='''\n\nSOURCE-VERIFIED CORRECTION AND SELECTED PRODUCTION ATLAS:\nThe generic job title names Sam only. The original actually shows BOTH Sam AND Max together in the Dinosaur Park, room 59. Original local script 208 and object 570 establish that Sam lifts and swings Max tangled in BEIGE TWINE tied to a dinosaur tooth. The beige coils around Max are STRING, not fur, new clothing, a bone or a new character. Image 1 is a derived reference atlas selecting TWO complete source poses, one in each 768 x 1024 cell, on neutral gray padding. This selected atlas replaces the generic frame count and positions above for THIS raw painting only. Do not paint the original magenta sheet or gray backdrop. Output exactly 1536 x 1024 RGBA, real transparent alpha. Keep the two poses exactly in their source locations, widths and heights. Image 2 is approved Sam identity and line style. Image 3 is approved Max identity and line style. The FIRST image exclusively controls each pose and all geometry.\nEach complete sprite includes BOTH characters, the extremely thin beige vertical twine all the way to its little fork at the top, the loose beige twine coil on the ground at bottom left, and any tiny isolated blue-gray or cream source marks. Preserve these, do not erase them as artifacts. The string is only about 4 output pixels wide. Do not thicken it into a pole, add shadows, add black edging to the string, invent fingers, or turn Max into a furry rabbit. Max has the original small black eyes and narrow broad grin, two long ears where visible, cream body and tiny pink nose. Keep the exact source occlusion and flattened ears during the grab; do not complete hidden parts. Sam has his source long brown muzzle, large black nose, blue-gray fedora and suit, white shirt and dark striped tie. Preserve source palette and asymmetry. Flat colors and at most the source shade, clean tapered dark contours. No glossy new highlights or texture. Full bodies and heads must remain together. No floor, cast shadow, labels, guides, gray, checkerboard or magenta in output. The target is faithful smooth cartoon HD with every contact point and tiny component preserved.\n'''
+    correction+='\n'.join(f"Cell {n+1} at {e['reference_pos']}, source box {e['maal'][0]} x {e['maal'][1]} output pixels: {e['motif']}" for n,e in enumerate(rec))
+    prompt='\n\n'.join(prompts)+correction
+    (C/'prompt-faktisk.txt').write_text(prompt)
+    args=dict(prompt=prompt,referenced_image_paths=[str(C/'reference-atlas.png'),str(A/'hovedark/sam.png'),str(A/'hovedark/max.png')],transparent_background=True)
+    save(C/'argumenter-planlagt.json',args); save(C/'plan.json',dict(ruter=rec,kilde=rows[i*2:i*2+2],kildekorrigering=True))
+save(R/'kilde-visuelt-sett.json',dict(originaler=jobs,sam_anker=True,max_anker=True,seks_motorbilder=True,motiv='Sam og Max med hyssingen ved dinosaurtannen, rom59',usikker_design=False,ny_ekstern_godkjenning=False))
+shutil.copy2(__file__,R/'forbered.py.txt')
+print('Klar: 5 jobber, 12 mål, 10 hele originaler, 5 planlagte innebygde kall. 1096 kilder og 3 stasher bevart.')

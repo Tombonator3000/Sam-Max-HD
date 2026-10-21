@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Sam og Max med hyssingen: fig304_01..05 er levert og egenkontrollert, 12 nye native i kandidat 3110, 432 av 1758 hele figurjobber med resultat. Alle 12 automatisk OK. Ti egne varianter sett mot original og samlet i faktisk Linux via primærskript 208. Begge 450-kjøringer gir 448 null, samme 4 ved 36 og 160 ved 414, ingen nye eller økte avvik. Fire før/etter-par har 0 endringer utenfor loggede aktørflater. Ark 01 har tre visuelt vurderte SJEKK-varsler. 1096 beskyttede kilder, alle 21335 tidligere PNG og tre stasher bevart. Ni innebygde kall, fire returer. Publisering/hent gjenstår; fellespakker har 3098 og mangler 12. Neste 304_06..10, samlepunkt for pakker etter hele familien 304. Ingen ny Tom-/Claude-godkjenning. Se rapporter/sam304-foerste-20261021/NESTE.md.
+
 Felles Linux/Windows 3098 er publisert og Latest-bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-golf115. Begge faktiske pakker og 21340 runtimefiler hver er SHA-kontrollert. Alle 85 nye native siden 3013 er motorlogget med identiske figurutsnitt til kontrollert produksjon; 578/579 null, samme kjente 160 ved 36, ingen nye eller økte avvik. 427 av 1758 hele figurjobber med resultat. Nativefrysen er frigitt. Neste fig304_01..05 fra kildegrunnlaget med alle 34 originalmål avspilt. Se rapporter/sam304-kilde-20261021/NESTE.md. Ingen 304-bildekall eller resultat ennå. Bevar 1096 kilder, alle tidligere filer og tre stasher. Ingen ny Tom-/Claude-godkjenning.
 
 Publisert og hentet Sam-golf: hd-mod f4f0e0bfabfb9b96293aa6c3e62d1e149b909278, 3098 native, 427 av 1758 hele figurjobber. Alle 84 nye ruter automatisk OK og motorlogget; 480/480 null i både primær- og synlighetsprøve. 1036 kildehash, alle tidligere PNG og tre stasher er bevart. Nativefrys for felles Linux-/Windows-samlepunkt, 85 nye siden 3013. Se rapporter/sam115-golf-20261021/NESTE.md. Ingen ny Tom-/Claude-godkjenning.
@@ -553,11 +555,11 @@ Figurark for Sam.
 
 - [ ] `fig342_19` (figurark 19 for Sam (kostyme 342), 2 ruter: animasjon 7 mot høyre (2 ruter), bilde to `jobber/fig342_01/resultat.png`)
 - [ ] `fig342_20` (figurark 20 for Sam (kostyme 342), 1 rute: animasjon 7 mot høyre (1 rute), bilde to `jobber/fig342_01/resultat.png`)
-- [ ] `fig304_01` (figurark 1 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig304_02` (figurark 2 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig304_03` (figurark 3 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig304_04` (figurark 4 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig304_05` (figurark 5 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig304_01` (figurark 1 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig304_02` (figurark 2 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig304_03` (figurark 3 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig304_04` (figurark 4 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig304_05` (figurark 5 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_06` (figurark 6 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_07` (figurark 7 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_08` (figurark 8 for Sam (kostyme 304), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)

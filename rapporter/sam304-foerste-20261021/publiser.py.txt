@@ -1,0 +1,49 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam3043110';T=O/'publisering-hdmod3110'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*args:subprocess.check_output(['git',*args],cwd=w,text=True).strip()
+remote=lambda b:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/ref/heads/'+b],cwd=P,text=True))['object']['sha']
+base=read(R/'grunnlag-produksjon.json');files=read(R/'kandidatfilhash.json');proof=read(R/'sluttkontroll.json');motor=read(R/'motor-sammenligning.json')
+assert not T.exists() and not (R/'publisering-forsokt.json').exists()
+assert not git(A,'status','--porcelain');art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art
+assert remote('hd-mod')==base['fjern_sha'];assert all(sha(M/f)==h for f,h in base['filer'].items());assert all(sha(C/f)==h for f,h in files.items())
+assert proof['visuelt_sett'] and proof['motorobservert'] and motor['kontroller_identiske'] and motor['nullkontroller']==448 and motor['sett']==12
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=base['fjern_sha'],forventet_native=3110,force_with_lease=True))
+shutil.copytree(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts and p.name!='SHA256SUMS'}
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(manifest.items())))
+assert all(manifest[f]==h for f,h in base['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+subprocess.run(['git','-C',str(T),'add','-A'],check=True);subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod 3110: Sam og Max med hyssingen, 12 kontrollerte ruter'],check=True)
+assert remote('hd-mod')==base['fjern_sha']
+subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+base['fjern_sha'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=remote('hd-mod');assert published==git(T,'rev-parse','HEAD')
+subprocess.run(['bash','tools/mod_gren.sh','hent',str(M)],cwd=P,check=True)
+actual={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual)==set(files) and len(actual)==21353
+assert {f for f,h in files.items() if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in base['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)==3110
+assert read(M/'mod.json')['costume_cels']==3110
+assert git(P,'stash','list','--format=%H').splitlines()==base['stash']
+protected=read(R/'beskyttede-samlet.json');assert len(protected)==1096 and all(sha(A/f)==h for f,h in protected.items());assert remote('hd-mod')==published
+save(R/'publiserte-moddfiler-3110.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=3110,nye_native=12,nye_hele_ark=5,hele_figurjobber=432,filantall=21353,png=21347,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_png_bevart=21335,beskyttede=1096,stasher=base['stash'],force_with_lease=True,egen_alfa_ingen_originalfragmenter=True,visuelt_sett=True,motorobservert=True,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3098,pakker_mangler_native=12)
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+ d=read(R/name);d.update(publisert=True,hd_mod=published,grafikkilde=art)
+ for e in d.get('leveranser',[]):e.update(publisert=True,hd_mod=published)
+ save(R/name,d)
+line=f'Sam og Max med hyssingen er publisert og hentet: hd-mod {published}, 3110 native, 432 av 1758 hele figurjobber. Fem nye ark fig304_01..05 gir 12 nye native. Alle 12 automatisk OK og motorlogget; ti egne varianter sett samlet i Linux. 450 bufferkontroller, 448 null, samme 4 ved 36 og 160 ved 414 i begge sammenlignbare kjøringer. Ingen nye eller økte avvik. Fire før/etter-par har null endringer utenfor loggede aktørflater. Alle 21353 filhash, tidligere 21335 PNG, 1096 beskyttede kilder og tre stasher er bekreftet. Fellespakker har 3098 og mangler 12; neste pakkesamlepunkt etter resten av familien 304. Neste bunke fig304_06..10. Ingen ny Tom-/Claude-godkjenning. Se rapporter/{R.name}/NESTE.md.'
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ f=A/name;s=f.read_text();i=s.find('\n');f.write_text(s[:i+1]+'\n'+line+'\n'+s[i+1:])
+(R/'NESTE.md').write_text(f'''Publisert og hentet hd-mod {published}, 3110 native, 432 av 1758 hele figurjobber. Alle 21353 faktiske filhash og alle tidligere PNG er kontrollert. Ni bildekall, fire returer, fem ferdige ark fig304_01..05, alle 12 native mottatt og sett i Linux. Ikke generer disse på nytt. Publiseringskilde er {art}.
+
+Neste praktiske bunke er fig304_06..10, deretter 11..15. Kildeplanen og alle 34 avspilte originale mål ligger i rapporter/sam304-kilde-20261021. De ti resterende originalarkene må ses før sine motivkall. Se begge godkjente hovedark og faktisk kildekontekst før hvert motiv. Sam og Max er sammen med hyssing, ikke bare Sam. Den lange tynne hyssingen, vridd Max, eventuelle små bekreftede merker og håndgrep krever visuell kontroll. Bruk ekte alfa og egen maling, ingen harde originalmasker eller originalfragmenter. Bevar 1096 kilder og tre stasher. Ikke omprøv avviste kall eller ugyldige 344/346-ruter.
+
+Bruk faktisk nedlastet Linux-binær /home/tom/Sam-Max-HD/out/felles-release-20261021-golf115/linux/squashfs-root/usr/bin/scummvm, SHA256 9e006a38078496f92399b8fe7dd99a4c057761f75c6d613eb4125a64cb62988e. Primærskript 208 med kildebegrunnet aktørstart303 er prøven. Nye 3098/3110-kjøringer har identiske 450 kontroller, 448 null, 4 ved 36 og 160 ved 414. Eldre kildeopptak med forrige binær hadde 160 ved 450; ikke bland disse tidslinjene. Ingen naturlig gjennomspilling er utført. Alle 12 nye mål logges mellom bilde 176 og 198; dumper 178 til 200 viser dem. Resten av familien har fortsatt originalvisning.
+
+Native er ikke fryst. Felles Linux-/Windows-utgave golf115 er fortsatt Latest, kontrollert med 3098 native, og mangler de 12 nye. Neste felles pakkesamlepunkt er etter hele familien 304, eller tidligere ved relevant feil. Oppdater begge og kontroller faktiske nedlastinger, filhash og Linux-avspilling før pakkene kalles oppdatert. Ingen ny Tom-/Claude-godkjenning. Grafikkautomatikken fortsetter, gamle nattprosesser gjenstartes ikke.
+''')
+with (R/'RAPPORT.md').open('a') as f:f.write(f'\nPublisert og hentet `{published}`, 3110 native. Alle 21353 faktiske filhash er bekreftet, 21335 tidligere PNG bevart. Grafikkilde `{art}`. Pakker har fortsatt 3098 og mangler de 12 nye til neste samlepunkt etter familien 304. Ingen nativefrys.\n')
+shutil.copy2(__file__,R/'publiser.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)

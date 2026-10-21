@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,re,zipfile,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+old=read(R/'motor-grunnlag3098.json');new=read(R/'motor-kandidat3110.json');plan=read(R/'ruteplan-unik.json');names=[e['bilde'] for e in plan['ruter']];shots=[]
+for name in names:
+ e=new['tegninger'][name];p=R/(name+'-faktisk-linux.png');shutil.copy2(e['fil'],p);shots.append(dict(bilde=name,frame=e['bildeframe'],fil=p.name,sha256=sha(p),native_sha256=sha(O/'mod-sam3043110/costumes'/(name+'_hd.png'))))
+boards=[]
+for start in range(0,len(names),4):
+ board=Image.new('RGB',(1280,1320),'#304050');draw=ImageDraw.Draw(board)
+ for i,name in enumerate(names[start:start+4]):
+  e=new['tegninger'][name];px,py=e['pos'];w,h=e['maal'];im=Image.open(e['fil']).convert('RGB');cut=im.crop((px*4-8,py*4-8,(px+w)*4+8,(py+h)*4+8));x=(i%2)*640;y=(i//2)*660;board.paste(cut,(x+12,y+35));draw.text((x+12,y+8),f'{name}, faktisk Linux frame {e["bildeframe"]}',fill='white')
+ f=R/f'motor-figurer-{start//4+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=names[start:start+4]))
+pairs=[]
+for name in ['costume304_1920','costume304_1927','costume304_1929','costume304_1931']:
+ v=new['tegninger'][name];b=old['tegninger'][name];assert v['bildeframe']==b['bildeframe'];before=Image.open(b['fil']).convert('RGB');after=Image.open(v['fil']).convert('RGB');delta=np.any(np.array(before)!=np.array(after),2);outside=delta.copy();rects=[]
+ for label in ['grunnlag3098','kandidat3110']:
+  log=(O/f'motor-{label}/scummvm.log').read_text()
+  for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+   f,c,k,x,y,w,h=map(int,m.groups())
+   if v['bildeframe']-4<=f<v['bildeframe']:
+    box=[max(0,x*4-12),max(0,y*4-12),min(after.width,(x+w)*4+12),min(after.height,(y+h)*4+12)];outside[box[1]:box[3],box[0]:box[2]]=False;rects.append(dict(frame=f,kostyme=k,rute=c,rekt=box))
+ board=Image.new('RGB',(1280,430),'#304050');d=ImageDraw.Draw(board);d.text((8,8),f'{name}, frame {v["bildeframe"]}: grunnlag3098 / kandidat3110, samme binar og originalskript208',fill='white');board.paste(before.resize((640,400)),(0,30));board.paste(after.resize((640,400)),(640,30));f=R/(name+'-for-etter.png');board.save(f)
+ pairs.append(dict(bilde=name,bildeframe=v['bildeframe'],fil=f.name,sha256=sha(f),endrede_piksler=int(delta.sum()),utenfor_loggede_aktorflater_med_marg=int(outside.sum()),flater=rects));assert not outside.any()
+frames=[Image.open(O/'motor-kandidat3110'/f'frame_{n:06}_room059.png').convert('RGB').resize((640,400),Image.Resampling.LANCZOS) for n in range(178,202,2)]
+frames[0].save(R/'sam-max-hyssing-faktisk-linux.gif',save_all=True,append_images=frames[1:],duration=140,loop=0)
+with zipfile.ZipFile(R/'motorlogger.zip','w',zipfile.ZIP_DEFLATED) as z:
+ for label in ['grunnlag3098','kandidat3110']:z.write(O/f'motor-{label}/scummvm.log',label+'.log')
+save(R/'motor-visuell-plan.json',dict(faktisk_linux=True,binar_sha256=new['binar_sha256'],alle10_egne_varianter_med_hode_kropp_og_hyssing=True,hele_bilder=shots,brett=boards,scene_regissert_av_primarskript208=True,naturlig_gjennomspilling=False,visuelt_sett=False))
+save(R/'motor-pikselkontroll.json',pairs);shutil.copy2(__file__,R/'vis-motor.py.txt');print('10 hele faktiske motorbilder,3 brett,4 par,0 utenfor alle loggede aktørflater, GIF og logger klare.')

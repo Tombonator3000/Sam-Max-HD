@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import json,hashlib,shutil,numpy as np
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+rows=read(R/'prototyper-endelig.json');old=R/'foer-kantkontroll';assert not old.exists();old.mkdir();controls=[]
+for e in rows:
+ f=A/e['prototype'];shutil.copy2(f,old/f.name);a=np.array(Image.open(f).convert('RGBA'));rgb=a[:,:,:3].astype(int);r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2]
+ bad=((r>210)&(g<110)&(b<80))|((r>230)&(g>210)&(b<90))|((g>180)&(r<120)&(b<140))|((r>180)&(b>180)&(g<120))
+ bad &= a[:,:,3]>0
+ goodcore=(a[:,:,3]>=CORE)&~bad;d=nd.distance_transform_edt(~goodcore);a[d>1.5]=0
+ # Preserve own alpha. Replace low-alpha edge RGB with nearest trusted opaque OWN paint, avoiding color spill.
+ trust=(a[:,:,3]>=245)&~bad;assert trust.any();_,ix=nd.distance_transform_edt(~trust,return_indices=True)
+ edge=((a[:,:,3]<245)|bad)&(a[:,:,3]>0);rgbnearest=a[tuple(ix)][:,:,:3];a[edge,:3]=rgbnearest[edge];a[a[:,:,3]==0,:3]=0
+ Image.fromarray(a).save(f);s=np.array(Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA'));iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(s[:,:,3]>0,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER
+ e.update(prototype_sha256=sha(f),snitt_union=iou,dekning=cov,egen_kantfarger_fra_naermeste_egne_ugjennomsiktige_maling=True,kildebruk_bare_maaling=True)
+ controls.append(dict(bilde=e['bilde'],foer_sha256=sha(old/f.name),etter_sha256=sha(f),neonfarger=int(bad.sum()),egne_kantpiksler=int(edge.sum()),snitt_union=iou,dekning=cov,ny_alfa_klippet_av_original=False));print(e['bilde'],round(iou,4),round(cov,4))
+save(R/'prototyper-endelig.json',rows);save(R/'kantkontroll.json',controls)
+for j in read(R/'ruteplan-unik.json')['jobber']:
+ shutil.copy2(A/'jobber'/j/'resultat.png',old/(j+'-resultat.png'))
+for n in ['fremdrift.json','egen-native.json','kandidatfilhash.json']:
+ shutil.copy2(R/n,old/n)
+(O/'mod-sam3043110').rename(O/'mod-sam3043110-foer-kantkontroll')
+shutil.copy2(__file__,R/'kantkontroll.py.txt')

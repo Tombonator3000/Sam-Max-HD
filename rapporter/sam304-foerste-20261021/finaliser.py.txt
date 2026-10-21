@@ -1,0 +1,43 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+rows=read(R/'prototyper-renset.json');selected={e['bilde']:e for e in rows};assert len(selected)==10
+F=R/'egne-native';F.mkdir(exist_ok=True)
+for n,e in selected.items():shutil.copy2(R/e['prototype'],F/(n+'.png'))
+# Restore the source-confirmed visible gripping hand in 1929 using ONLY a hand from our R03 painting.
+own=np.array(Image.open(R/'kall/R03/costume304_1930-renset.png').convert('RGBA'))
+roi=own[374:433,422:481].copy();r,g,b=roi[:,:,0].astype(float),roi[:,:,1].astype(float),roi[:,:,2].astype(float)
+orange=(r>g*1.4)&(b<g*.7)&(g>55)&(roi[:,:,3]>=CORE)
+dist=nd.distance_transform_edt(~orange);roi[dist>2]=0;yy,xx=np.nonzero(orange);box=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+hand=Image.fromarray(roi).crop((max(0,box[0]-2),max(0,box[1]-2),min(roi.shape[1],box[2]+2),min(roi.shape[0],box[3]+2)))
+# The measured brown source hand box is x104..113, y93..101. Only its box/anchor guides placement.
+hand=hand.resize((40,36),Image.Resampling.LANCZOS);hand.save(R/'egen-haand-fra-R03.png')
+p=F/'costume304_1929.png';im=Image.open(p).convert('RGBA');im.alpha_composite(hand,(104*4+6,93*4+6));im.save(p)
+selected['costume304_1929']['egen_haand_fra']='kall/R03/costume304_1930-renset.png';selected['costume304_1929']['egen_haand_maal']=[40,36];selected['costume304_1929']['egen_haand_pos']=[104*4+6,93*4+6]
+# Four isolated cream marks are confirmed one-pixel source components. Reuse ONLY our generated dot alpha and our own painted cream shade.
+dot=Image.open(R/'egen-blaaprikken.png').convert('RGBA');da=np.array(dot)
+cream=own[own[:,:,3]>=CORE,:3];cream=cream[(cream[:,0]>220)&(cream[:,1]>205)&(cream[:,2]>175)&(cream[:,2]<235)]
+rgb=np.median(cream,axis=0).astype('uint8');da[:,:,:3]=rgb;da[da[:,:,3]==0,:3]=0;cd=Image.fromarray(da);cd.save(R/'egen-lysprikk.png')
+p=F/'costume304_1928.png';im=Image.open(p).convert('RGBA');marks=[(105,80),(108,84),(122,104),(120,110)]
+for x,y in marks:im.alpha_composite(cd,(x*4+8,y*4+8))
+im.save(p);selected['costume304_1928']['egne_lyse_kildemerker']=[list(q) for q in marks]
+out=[]
+for num,(n,e) in enumerate(selected.items()):
+ f=F/(n+'.png');im=Image.open(f).convert('RGBA');a=np.array(im);a[a[:,:,3]==0,:3]=0;im=Image.fromarray(a);im.save(f)
+ src=Image.open(P/'work/extract/costumes'/(n+'.png')).convert('RGBA');s=np.array(src)
+ iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(s[:,:,3]>0,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER,(n,iou,cov)
+ e.update(prototype=f.relative_to(A).as_posix(),prototype_sha256=sha(f),snitt_union=iou,dekning=cov,native_ok=True,valgt_kall=e['kall'],visuelt_sett=False)
+ out.append(e);print(n,e['kall'],round(iou,4),round(cov,4),flush=True)
+ board=Image.new('RGBA',(1536,720),'#596978');d=ImageDraw.Draw(board);d.text((12,10),f'{n} original 4x / egen endelig 4x {iou:.3f}/{cov:.3f}',fill='white');board.alpha_composite(src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST),(16,70));board.alpha_composite(im,(790,62));board.convert('RGB').save(R/(n+'-endelig-kontroll.png'))
+save(R/'prototyper-endelig.json',out)
+calls=[]
+for c in sorted((R/'kall').iterdir()):
+ if not (c/'raa.png').exists():continue
+ args=read(c/'argumenter-faktisk.json');calls.append(dict(kall=c.name,raa_sha256=sha(c/'raa.png'),raa_maal=list(Image.open(c/'raa.png').size),prompt_sha256=sha(c/'prompt-faktisk.txt'),argumenter_sha256=sha(c/'argumenter-faktisk.json'),referanser=[dict(fil=f,sha256=sha(Path(f))) for f in args['referenced_image_paths']],innebygd=True,modellnavn_oppgitt=False))
+save(R/'bildekall.json',calls);assert len(calls)==9
+shutil.copy2(__file__,R/'finaliser.py.txt')

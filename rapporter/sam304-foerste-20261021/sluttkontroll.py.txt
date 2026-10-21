@@ -1,0 +1,54 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image
+import hashlib,json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam3043110'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');progress=read(R/'fremdrift.json');motor=read(R/'motor-sammenligning.json');protected=read(R/'beskyttede-samlet.json');files=read(R/'kandidatfilhash.json');native=read(R/'egen-native.json');variants=read(R/'prototyper-endelig.json')
+assert len(protected)==1096 and all(sha(A/f)==h for f,h in protected.items())
+assert all(sha(C/f)==h for f,h in files.items()) and len(files)==21353
+assert all(files[f]==h for f,h in base['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==432
+assert motor['sett']==12 and motor['kontroller_identiske'] and motor['nullkontroller']==448
+assert [v for v in motor['kontroller'] if v['avvik']] == [dict(frame=36,avvik=4),dict(frame=414,avvik=160)]
+assert all(e['visuelt_sett'] and e['native_ok'] and sha(A/e['prototype'])==e['prototype_sha256'] for e in variants)
+assert all(e['egenkontroll'] in ['OK','SJEKK'] for e in progress['leveranser'])
+for e in progress['leveranser']:
+ assert sha(A/e['resultat'])==e['sha256'] and Image.open(A/e['resultat']).size==(1536,1024)
+ e.update(visuelt_kontrollert=True,egenkontrollert=True,native_mottatt=True,motorobservert=True,publisert=False,i_fellespakke=False)
+ J=A/'jobber'/e['jobb']/'notat.md'
+ with J.open('a') as f:
+  f.write('\nSluttkontroll: alle 12 mål automatisk OK. Ark 01 har tre SJEKK-varsler for omrisslikhet 0,75; mål er 100 prosent i begge akser og flytting 0. Figurenes identitet, kropp/hode, hender og lange hyssing er visuelt sammenlignet og sett samlet i motoren. Øvrige fire ark er OK. Kantfargene er renset ved å bevare egen alfa og hente RGB fra nærmeste ugjennomsiktige del av egen tegning, uten originalmaske. Alle ti egne varianter er logget og sett i faktisk Linux, med fire før/etter-par og null endringer utenfor alle loggede aktørflater med målemargin. Begge kjøringer har 450 bufferkontroller, 448 null, samme 4 ved bilde 36 og 160 ved 414. Ingen nye eller økte avvik. Originalskript 208 regisserer handlingen etter dokumentert initialisering av Sam som 303. Eldre kildeopptak med forrige Linux-binær hadde 160-avviket ved 450; i de to nye sammenlignbare kjøringene er det ved 414. Dette er ikke naturlig gjennomspilling. Publisering og pakking kvitteres separat.\n')
+progress.update(laget=True,egenkontrollert=True,visuelt_sett=True,native_mottatt=True,motorobservert=True,publisert=False,i_fellespakke=False,pakker_native=3098,pakker_mangler_native=12)
+save(R/'fremdrift.json',progress)
+vp=read(R/'motor-visuell-plan.json');vp.update(visuelt_sett=True,antall_sette_egne_varianter=10,sett_faktisk_helscene=True,fire_for_etter_par_sett=True);save(R/'motor-visuell-plan.json',vp)
+motor['full_visuell_vurdering_gjenstar']=False;motor['visuelt_sett']=True;save(R/'motor-sammenligning.json',motor)
+receipt=dict(tid=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(),laget=True,egenkontrollert=True,visuelt_sett=True,native_mottatt=True,motorobservert=True,publisert=False,i_fellespakke=False,leveranser=progress['leveranser'],nye_hele_ark=5,hele_figurjobber=432,total=1758,gjenstar=1326,native=3110,nye_native=12,kildevarianter=10,bildekall=9,returkall=4,beskyttede=1096,stasher_bevart=True,tidligere_png_bevart=21335,filer=21353,kontroller=450,nullkontroller=448,kjente_avvik=[dict(frame=36,avvik=4),dict(frame=414,avvik=160)],ingen_nye_eller_okte_avvik=True,fire_par_utenfor_aktorflater=0,egenkontroll01='SJEKK 3 omrissvarsler, visuelt vurdert',godkjent_av_Tom=False,claude_kontroll=False,pakker_native=3098,pakker_mangler_native=12)
+save(R/'sluttkontroll.json',receipt)
+line='Sam og Max med hyssingen: fig304_01..05 er levert og egenkontrollert, 12 nye native i kandidat3110, 432 av 1758 hele figurjobber med resultat. Alle12 automatisk OK. Ti egne varianter sett mot original og samlet i faktisk Linux via primærskript208. Begge 450-kjøringer gir448 null, samme4 ved36 og160 ved414, ingen nye eller økte avvik. Fire før/etter-par har0 endringer utenfor loggede aktørflater. Ark01 har tre visuelt vurderte SJEKK-varsler. 1096 beskyttede kilder, alle21335 tidligere PNG og tre stasher bevart. Ni innebygde kall, fire returer. Publisering/hent gjenstår; fellespakker har3098 og mangler12. Neste304_06..10, samlepunkt for pakker etter hele familien304. Ingen ny Tom-/Claude-godkjenning. Se rapporter/'+R.name+'/NESTE.md.'
+# Readable Norwegian spacing in all newly written status text.
+line=line.replace('Alle12','Alle 12').replace('kandidat3110','kandidat 3110').replace('primærskript208','primærskript 208').replace('gir448','gir 448').replace('samme4 ved36 og160 ved414','samme 4 ved 36 og 160 ved 414').replace('har0','har 0').replace('Ark01','Ark 01').replace('alle21335','alle 21335').replace('har3098','har 3098').replace('mangler12','mangler 12').replace('Neste304','Neste 304').replace('familien304','familien 304')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ f=A/name;s=f.read_text();i=s.find('\n');s=s[:i+1]+'\n'+line+'\n'+s[i+1:]
+ if name=='GRAFIKKLISTE.md':
+  for e in progress['leveranser']:
+   old='- [ ] `'+e['jobb']+'`';assert old in s;s=s.replace(old,'- [x] `'+e['jobb']+'`',1)
+ f.write_text(s)
+(R/'NESTE.md').write_text('Fem første 304-ark er levert, teknisk og visuelt kontrollert og motorobservert. Publiser/hent kontrollert kandidat 3110 additivt fra fjern-SHA i grunnlag-produksjon.json før neste produksjon. Ikke generer første fem om igjen.\n\nNeste praktiske bunke er fig304_06..10, deretter 11..15. Kildeplan og alle34 originale mål avspilt står i rapporter/sam304-kilde-20261021. De ti resterende originalarkene må ses før sine motivkall. Se begge hovedark og actual kildekontekst. Alle fire beskyttede filer per jobb beholdes. Native er ikke fryst; fellespakker har3098 og mangler de12 nye. Neste felles Linux-/Windows-samlepunkt er etter hele familien304, eller tidligere om feil krever det. Ingen ny Tom-/Claude-godkjenning.\n')
+(R/'RAPPORT.md').write_text('''# Sam og Max med hyssingen, første fem ark
+
+Fem hele ark fig304_01 til fig304_05 gir 12 nye native ruter, 1920 til 1931. Kandidaten har 3110 native og alle 21335 tidligere PNG-filer. 432 av 1758 hele figurjobber har resultat; 1326 gjenstår, i tillegg til returer, katalogfeil og samlet sluttkontroll. Dette fullfører første del av familien 304, ikke hele animasjonen eller spillet.
+
+Originalen viser begge figurene og beige hyssing ved T. rex-tannen i rom 59. Lokal 208 og objekt 570/568 er bevart i kildegrunnlaget. Begge hovedark og de fem originalarkene er brukt. Ni innebygde image_gen-kall er bevart, inkludert fire konkrete returer. Modellnavn ble ikke oppgitt. Python brukes bare på egen maling til rensing, dimensjonering og plassering. Originaler er referanser og målinger, aldri harde utdatamasker. Ett synlig håndgrep og fem små kildebekreftede merker er satt sammen fra egne genererte deler. Blåprikken går igjen i alle mål; de fire lyse merkene finnes bare i 1928. To rektangulære områder holder lang hyssing og figurer på kildeankrene. Kant-RGB kommer fra nærmeste ugjennomsiktige egen maling med egen alfa bevart.
+
+Alle 12 mål er automatisk OK ved uendrede CORE128, IoU 0,6 og dekning 0,8. Ark 01 har tre egenkontrollvarsler om omriss 0,75, visuelt vurdert. Målene er 100 prosent, flytting 0. De andre fire arkene er OK. Resultatene er 1536 x 1024 med ekte alfa, SHA-festet fremdrift og rutekart. Bare egne native prototyper brukes i modden, ikke mottakets mulige kontrollkopier.
+
+Den faktisk nedlastede Linux-binæren fra fellesutgave golf115 har SHA256 9e006a38078496f92399b8fe7dd99a4c057761f75c6d613eb4125a64cb62988e. Kandidat 3110 og publisert grunnlag 3098 kjører samme primærskript 208, 900 bilder hver, etter dokumentert initialisering med Sam303. Alle 34 kildeceller og alle 12 nye native er logget. Begge har 450 bufferkontroller, 448 null, samme 4 ved 36 og 160 ved 414. Ingen nye eller økte avvik. Det eldre kildeopptaket hadde 160 ved 450 med forrige binær; de to gjeldende kjøringene med samme nye binær har det ved 414. Ti ferdige egne varianter er sett samlet med hode, kropp, hender og hyssing i motoropptakene. Fire før/etter-par har null endringer utenfor loggede aktørflater med 12 HD-pikslers målemargin. Andre aktører eller romskript skjules ikke av testen. Originalskriptet flytter selv Max ut av bilde før den sammensatte figuren brukes. Dette er en regissert prøve, ikke full naturlig gjennomspilling.
+
+1096 beskyttede kildehash og tre tidligere stasher er kontrollert. Ingen motor- eller pipelinekode er endret. En lokal klargjøringshjelper stoppet før første resultat ved en feil margkonstant; den ble rettet fra 9 til 16 HD-piksler samlet marg. Den etterfølgende leveransen og mottaket er kontrollert. Før kantkontroll er egne utkast og filhash bevart separat. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt.
+
+Publisering og tilbakehenting kvitteres separat. Felles Linux-/Windows-utgave har fortsatt 3098 native og mangler disse 12 til neste samlepunkt etter resten av familien 304. Det ekstra automatiske Windows-taggbygget 39537469767 ble fullført grønt; den tidligere sporadiske SDL-feilen regnes fortsatt som åpen. Full naturlig gjennomspilling, interaktiv Windows og ny webkontroll er ikke gjort her. Ingen ny Tom-/Claude-godkjenning.
+''')
+shutil.copy2(__file__,R/'sluttkontroll.py.txt');print('Klar til kildecommit og additiv publisering. 5 ark, 12 native, ingen ny/økt motorfeil.')

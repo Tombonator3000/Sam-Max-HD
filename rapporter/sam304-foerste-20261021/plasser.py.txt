@@ -1,0 +1,84 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+import hashlib
+import json
+import numpy as np
+import shutil
+import sys
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter' / Path(__file__).resolve().parent.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+assert (CORE, GOOD_IOU, GOOD_COVER) == (128, .6, .8)
+selected = set(sys.argv[1:])
+allrows = []
+for C in sorted((R / 'kall').iterdir()):
+    if not (C / 'raa.png').exists() or not (C / 'plan.json').exists():
+        continue
+    if selected and C.name not in selected:
+        if (C / 'maalt.json').exists():
+            allrows.extend(read(C / 'maalt.json'))
+        continue
+    raw = Image.open(C / 'raa.png').convert('RGBA')
+    assert raw.size == (1536, 1024)
+    records = read(C / 'plan.json')['ruter']
+    board = Image.new('RGBA', (1280, len(records) * 330), '#596978')
+    draw = ImageDraw.Draw(board)
+    rows = []
+    for i, e in enumerate(records):
+        source = Image.open(P / 'work/extract/costumes' / (e['bilde'] + '.png')).convert('RGBA')
+        src = np.array(source)
+        assert hashlib.sha256(src.tobytes()).hexdigest() == e['canonical_rgba_sha256']
+        x, y, cw, ch = e['celle']
+        q = np.array(raw.crop((x, y, x + cw, y + ch)))
+        core = q[:, :, 3] >= CORE
+        assert core.any(), e['bilde']
+        yy, xx = np.nonzero(core)
+        x0, y0, x1, y1 = int(xx.min()), int(yy.min()), int(xx.max() + 1), int(yy.max() + 1)
+        distance = nd.distance_transform_edt(~core)
+        q[distance > 2] = 0
+        q[q[:, :, 3] == 0, :3] = 0
+        part = Image.fromarray(q).crop((max(0, x0 - 2), max(0, y0 - 2), min(cw, x1 + 2), min(ch, y1 + 2)))
+        sy, sx = np.nonzero(src[:, :, 3] > 0)
+        tx, ty = int(sx.min()), int(sy.min())
+        tw, th = int(np.ptp(sx) + 1) * 4, int(np.ptp(sy) + 1) * 4
+        scale_x, scale_y = tw / (x1 - x0), th / (y1 - y0)
+        resized = part.resize((round(part.width * scale_x), round(part.height * scale_y)), Image.Resampling.LANCZOS)
+        out = Image.new('RGBA', (source.width * 4 + 16, source.height * 4 + 16))
+        out.alpha_composite(resized, (tx * 4 + 8 - round(min(2, x0) * scale_x),
+                                     ty * 4 + 8 - round(min(2, y0) * scale_y)))
+        a = np.array(out)
+        a[a[:, :, 3] == 0, :3] = 0
+        iou, cov = _iou(a[:, :, 3] >= CORE, np.repeat(np.repeat(src[:, :, 3] > 0, 4, 0), 4, 1), -8, -8)
+        f = C / (e['bilde'] + '-prototype.png')
+        Image.fromarray(a).save(f, optimize=True)
+        row = dict(bilde=e['bilde'], kall=C.name, prototype=f.relative_to(R).as_posix(), sha256=sha(f),
+            canonical_rgba_sha256=e['canonical_rgba_sha256'], snitt_union=iou, dekning=cov,
+            native_ok=iou >= GOOD_IOU and cov >= GOOD_COVER, egen_alfa=True, originalmaske=False,
+            egen_kjernegrense=CORE, egen_glodrens_avstand=2, egen_bbox=[x0, y0, x1, y1],
+            maal=list(source.size), akseforhold=scale_x / scale_y,
+            visuell_kontroll_nodvendig=True)
+        rows.append(row)
+        draw.text((12, i * 330 + 6), f"{e['bilde']} original 4x / egen 4x {iou:.3f}/{cov:.3f}", fill='white')
+        first = source.resize((source.width * 4, source.height * 4), Image.Resampling.NEAREST)
+        if first.height > 290:
+            # Only the proof thumbnail is reduced; prototype pixels are unchanged.
+            first.thumbnail((600, 280), Image.Resampling.NEAREST)
+            preview = Image.fromarray(a)
+            preview.thumbnail((600, 280), Image.Resampling.NEAREST)
+        else:
+            preview = Image.fromarray(a)
+        board.alpha_composite(first, (12, i * 330 + 36))
+        board.alpha_composite(preview, (652, i * 330 + 28))
+        print(e['bilde'], f'{iou:.3f}/{cov:.3f}', 'OK' if row['native_ok'] else 'FEIL',
+              f'akseforhold {row["akseforhold"]:.3f}', flush=True)
+    board.convert('RGB').save(C / 'helkontroll.png')
+    save(C / 'maalt.json', rows)
+    allrows.extend(rows)
+save(R / 'prototyper-maalt.json', allrows)
+shutil.copy2(__file__, R / 'plasser.py.txt')
