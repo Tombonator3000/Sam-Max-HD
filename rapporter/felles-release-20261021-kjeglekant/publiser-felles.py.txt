@@ -1,17 +1,21 @@
 from pathlib import Path
 from datetime import datetime,timezone
-import json,hashlib,subprocess,shutil,time
+import json,hashlib,subprocess,shutil,time,sys
 P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/cone-underlag-20261021'
 read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],text=True))
 state=read(O/'bygg-startet.json');tag=state['release_tag'];code=state['kode'];mod=state['hd_mod'];checks=read(O/'assetkontroll.json');proof=read(R/'linux-kontroll.json')
-assert not(O/'publisering-journal.json').exists(),'Undersøk eksisterende publiseringsutfall; ikke opprett en ny kladd.'
+resume='--fortsett-kladd' in sys.argv
+assert (O/'publisering-journal.json').exists()==resume,'Undersøk eksisterende publiseringsutfall; ikke opprett en ny kladd.'
+if resume:assert read(O/'publisering-journal.json')['fase']=='kladd_opprettet'
 assert len(checks)==4 and proof['visuelt_sett'] and proof['originalflater_SHA_identiske']==128 and proof['kjegleutsnitt_RGB_identiske_med_produksjon']==128
 assert proof['skjermbufferkontroller']==1440 and proof['nullkontroller']==1436 and proof['eksakte_feilkoordinater_og_begge_RGB_identiske']
 assert api('git/ref/heads/hd-mod')['object']['sha']==mod
 manifest=read(R/'moddfiler-3535.json');assert len(manifest)==21779 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items())
 for platform in ['linux','windows']:
     run=api('actions/runs/'+str(state['plattform'][platform]['run_id']));assert run['conclusion']=='success' and run['head_sha']==code
-prior=api('releases?per_page=100');assert not any(e['tag_name']==tag for e in prior);save(R/'releaser-foer-fellespublisering.json',prior)
+prior=read(R/'releaser-foer-fellespublisering.json') if resume else api('releases?per_page=100')
+assert not any(e['tag_name']==tag for e in prior)
+if not resume:save(R/'releaser-foer-fellespublisering.json',prior)
 assert not subprocess.check_output(['git','ls-remote','origin','refs/tags/'+tag],cwd=P,text=True).strip()
 source=read(S/'mottak-publisert.json')['grafikkilde']
 body=f'''Felles Linux- og Windows-utgave med **3535 native HD-bildelag**. Begge pakkene inkluderer nå den kildeførte bakgrunnsdekningen for Cone of Tragedy. Den store hakkete dobbelkanten rundt kjegletoppen og stjernekransen er rettet. Ingen nye figurark eller malerier telles i denne metadatarettingen; samtlige tidligere grafikkfiler er bevart byteidentiske.
@@ -29,13 +33,18 @@ Spillet og grafikken tilhører Disney/Lucasfilm. Pakken har spillfiler, tale, HD
 '''
 (R/'utgivelse-notat.md').write_text(body)
 request=dict(tag_name=tag,target_commitish=code,name='Sam & Max HD: Linux og Windows, rettet bakgrunnsdekning',body=body,draft=True,prerelease=False,make_latest='false')
-save(O/'release-create.json',request);journal=dict(tid_utc=datetime.now(timezone.utc).isoformat(),fase='opprettelse_forsokes',tag=tag,kode=code,hd_mod=mod,opplastet=[]);save(O/'publisering-journal.json',journal)
-raw=subprocess.check_output(['gh','api','--method','POST','repos/Tombonator3000/Sam-Max-HD/releases','--input',str(O/'release-create.json')],text=True);draft=json.loads(raw);assert draft['draft'] and draft['tag_name']==tag and not draft['assets']
-journal.update(fase='kladd_opprettet',release_id=draft['id']);save(O/'publisering-journal.json',journal);save(R/'release-kladd.json',draft)
-# Read visibility is allowed to lag; never repeat creation because a list is stale.
+if resume:
+    journal=read(O/'publisering-journal.json');draft=api('releases/'+str(journal['release_id']))
+    assert draft['id']==420049475 and draft['draft'] and draft['tag_name']==tag and draft['target_commitish']==code and draft['body']==body and not draft['assets']
+    save(R/'kladd-oppslag-avklart.json',dict(release_id=draft['id'],arsak='REST-oppslag via tagg gir404 for denne upubliserte kladden uten taggreferanse. CLI finner samme unike kladd, og direkte API-ID bekrefter kropp, kode og ingen vedlegg.',samme_kladd_gjenbrukt=True,ingen_ny_opprettelse=True))
+else:
+    save(O/'release-create.json',request);journal=dict(tid_utc=datetime.now(timezone.utc).isoformat(),fase='opprettelse_forsokes',tag=tag,kode=code,hd_mod=mod,opplastet=[]);save(O/'publisering-journal.json',journal)
+    raw=subprocess.check_output(['gh','api','--method','POST','repos/Tombonator3000/Sam-Max-HD/releases','--input',str(O/'release-create.json')],text=True);draft=json.loads(raw);assert draft['draft'] and draft['tag_name']==tag and not draft['assets']
+    journal.update(fase='kladd_opprettet',release_id=draft['id']);save(O/'publisering-journal.json',journal);save(R/'release-kladd.json',draft)
+# An unpublished draft may have no tag ref; the CLI also checks the draft list.
 for i in range(6):
-    seen=subprocess.run(['gh','api','repos/Tombonator3000/Sam-Max-HD/releases/tags/'+tag],cwd=P,text=True,capture_output=True)
-    if seen.returncode==0 and json.loads(seen.stdout)['id']==draft['id']:break
+    seen=subprocess.run(['gh','release','view',tag,'--json','tagName,isDraft'],cwd=P,text=True,capture_output=True)
+    if seen.returncode==0 and json.loads(seen.stdout)==dict(isDraft=True,tagName=tag):break
     time.sleep(3)
 else:raise RuntimeError('Kladden finnes, men er ikke synlig via tagg ennå. Bevar den og undersøk uten ny opprettelse.')
 for e in sorted(checks,key=lambda e:e['bytes']):

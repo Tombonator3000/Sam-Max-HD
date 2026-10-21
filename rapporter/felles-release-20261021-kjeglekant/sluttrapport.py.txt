@@ -1,0 +1,56 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/cone-underlag-20261021';N=A/'rapporter/sam124-kilde-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip();api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],text=True))
+pub=read(R/'publisert.json');meta=api('releases/'+str(pub['release_id']));latest=api('releases/latest');assert latest['id']==meta['id']==pub['release_id'] and not meta['draft']
+assets=read(O/'assetkontroll.json')
+for e in assets:
+    a=next(v for v in meta['assets'] if v['name']==e['fil']);assert a['digest']=='sha256:'+e['sha256'] and a['size']==e['bytes'] and sha(O/'felles-nedlasting'/e['fil'])==e['sha256']
+tag=api('git/ref/tags/'+pub['tag'])['object']
+if tag['type']=='tag':tag=api('git/tags/'+tag['sha'])['object']
+assert tag['type']=='commit' and tag['sha']==pub['kode']
+assert api('git/ref/heads/hd-mod')['object']['sha']==pub['hd_mod']
+manifest=read(R/'moddfiler-3535.json');assert len(manifest)==21779 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items())
+protected=read(N/'beskyttede-samlet1412.json');assert len(protected)==1412 and all(sha(A/f)==h for f,h in protected.items())
+stash=read(A/'rapporter/sam088-slutt-20261021/grunnlag-produksjon.json')['stash'];assert git(P,'stash','list','--format=%H').splitlines()==stash and len(stash)==3
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==497
+runs={k:api('actions/runs/'+str(pub[k+'_run'])) for k in ['linux','windows']}
+assert all(r['conclusion']=='success' and r['head_sha']==pub['kode'] for r in runs.values())
+save(R/'bygg-forsok.json',{k:dict(id=r['id'],status=r['status'],conclusion=r['conclusion'],forsok=r['run_attempt'],kode=r['head_sha'],url=r['html_url']) for k,r in runs.items()})
+extra=api('actions/runs/39676064846');assert extra['head_sha']==pub['kode'] and extra['head_branch']==pub['tag'];save(R/'ekstra-taggbygg.json',extra)
+if extra['status']=='completed' and extra['conclusion']!='success':
+    log=subprocess.check_output(['gh','run','view',str(extra['id']),'--log-failed'],cwd=P)
+    (R/'STOPP-ekstra-taggbygg.txt').write_bytes(log)
+    raise RuntimeError('Ekstra taggbygg feilet. Feillogg bevart; undersøk før videre nativepublisering.')
+frozen=extra['status']!='completed'
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),fellesrelease=pub['url'],Latest_bekreftet=True,kode=pub['kode'],hd_mod=pub['hd_mod'],native=3535,figurark_med_resultat=497,gjenstaar=1261,nye_malerier=0,nye_figurark=0,begge_faktiske_pakker_og_fellesvedlegg_SHA_bekreftet=True,runtime_moddfiler_per_pakke=21778,alle21779_moddfilhash_bekreftet=True,alle1412_beskyttede_kilder_bekreftet=True,tre_stasher_bevart=True,tidligere39_releaser_og_assets_bevart=True,alle128_originalflater_og_hele_HD_pakkebilder_identiske=True,skjermbufferkontroller=1440,nullkontroller=1436,kjente_avvik_koordinater_og_begge_RGB_identiske=True,helprove_uten_avvik=False,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,ekstra_taggbygg=dict(id=extra['id'],status=extra['status'],conclusion=extra['conclusion'],forsok=extra['run_attempt'],url=extra['html_url']),native_frosset=frozen,neste='Liten statisk kjegletupp som grafikkretur; deretter fig124_01 til05,39 mål fra24 hele kilder. Lee-Harvey, Max og avgrensede Sam-fragmenter, les PRESISERING.md.',automatikk_fortsetter=True)
+save(R/'sluttstatus.json',receipt)
+for folder in [O,R]:
+    s=read(folder/'bygg-startet.json');s.update(native_frosset=frozen,ekstra_taggbygg=receipt['ekstra_taggbygg'],siste_kontroll_utc=receipt['tid_utc']);save(folder/'bygg-startet.json',s)
+s=read(S/'mottak-publisert.json');s.update(native_frosset=frozen,pakker_mangler_metadatarettingen=False,i_fellespakke=True,felles_url=pub['url']);save(S/'mottak-publisert.json',s)
+freeze=('Native er frosset mens ekstra Windows-taggbygg 39676064846 kjører. Ikke start duplikater eller publiser mer native før utfallet er kontrollert.' if frozen else 'Ekstra Windows-taggbygg 39676064846 er bestått og nativefrysen er frigitt etter ny kontroll av uendret mod, Latest og fellesvedlegg.')
+text=f'''[Felles Linux og Windows med 3535 native HD-bildelag]({pub['url']}) er publisert, lastet ned på nytt og SHA-bekreftet. Den store hakkete dobbelkanten rundt Cone of Tragedy er rettet med originalobjekt 173s tegnedekning. Samtlige tidligere malerier, figur-PNG og filstier er bevart byteidentiske. En ny metadatafil, ingen nye malerier eller figurark. 497 av 1758 figurark har resultat; 1261 gjenstår pluss returer og sluttkontroll.
+
+Begge faktiske pakker har alle 21778 runtime-moddfiler, inkludert den nye metadatafilen. Native {pub['hd_mod']}, pakkekode {pub['kode']}. Alle 21779 moddfilhash, 1412 beskyttede jobbfiler, tre stasher og 39 tidligere releaser med vedlegg er bekreftet. Den faktiske nye Linux-binæren er kjørt i primær201 og hel animasjon6. Alle 64 kjegleruter er logget i begge. 128 hele originalflater og 128 hele HD-pakkebilder er identiske med den kontrollerte produksjonen. 1436 av 1440 nullkontroller; identiske kjente 416/160-avvik ved 24/25, inkludert koordinater og begge RGB-verdier. Tre hele faktiske pakkebilder er sett. Hele prøven er ikke avviksfri. Ingen ny naturlig gjennomspilling, interaktiv Windows eller webtest, Tom-/Claude-godkjenning eller visuell sluttgodkjenning.
+
+En liten statisk malt kjegletupp over y32 gjenstår som egen grafikkretur. Ingen utvidelse av originalmasken eller hard klipping av ny grafikk. Den sporadiske SDL-startfeilen er fortsatt ikke rettet; begge nye manuelle bygg bestod i forsøk {runs['linux']['run_attempt']} og {runs['windows']['run_attempt']}. {freeze}
+
+Neste uavhengige bunke er fig124_01 til05: 39 mål fra 24 ulike hele RGBA-kilder. Jobbkortets Sam-/rom28-premiss er korrigert i et separat kildenotat, uten å endre beskyttede filer. Faktisk scene viser Lee-Harvey og Max i rom25, med avgrensede fragmenter av den nedslåtte Sam i noen tidlige ruter. Hele objekt258 bekrefter Sam-fragmentene; en gulv-/lemhypotese er forkastet. Alle fem originalark og 24 hele kilder med faktisk originalkontekst er sett. Korrekt rominngang lot originalt skript217 kjøre: 2400 kontroller, 2391 null, normal avslutning0. 67 av70 mål og47 av49 hele motiver er logget; de tre senere fasene1844..1846 er fortsatt ikke kildeobservert. Ingen124-bildekall, resultater eller native. Les rapporter/sam124-kilde-20261021/PRESISERING.md før neste motiv og se aktuelle originaler og godkjente stilankre på nytt.
+
+Bevis: rapporter/cone-underlag-20261021 og rapporter/felles-release-20261021-kjeglekant på gpt-arbeid. Tidligere wrapper-/oppslagsfeil og korrigert prøveoppsett er bevart. Ingen motor-/pipelineendring; bare fire dokumenter endres i main. Bibliotekskildene publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter er brukt. Tidligere verktøyavviste motiver og aliaser, ugyldige344/346 og råvalg28 omprøves ikke. Grafikkautomatikken fortsetter uten gamle nattprosesser. Alt er ikke ferdig.
+'''
+for folder in [R,S]:
+    for name in ['RAPPORT.md','NESTE.md']:
+        p=folder/name;p.write_text(text+'\nTidligere kontroll nedenfor er historikk.\n\n'+(p.read_text() if p.exists() else ''))
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;s=p.read_text();i=s.index('\n');p.write_text(s[:i+1]+'\n'+text+'\n'+s[i+1:])
+if not frozen:
+    p=N/'NESTE.md';p.write_text(p.read_text().replace('Native er frosset til forventet ekstra Windows-taggbygg er kontrollert.','Nativefrysen er frigitt etter kontrollert grønt ekstra Windows-taggbygg.'))
+assert git(P,'rev-parse','HEAD')=='da2f57196fb66c594cb0c50908ab4ac5a7954551' and not git(P,'status','--porcelain')
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+for name in ['memory.md','todo.md','STATUS.md']:
+    p=P/name;s=p.read_text();i=s.index('\n');p.write_text(s[:i+1]+f'\n## Gjeldende grafikkstatus, {stamp}\n\n'+text+'\nTidligere oppføringer nedenfor er historikk.\n\n'+s[i+1:])
+with(P/'log.md').open('a') as f:f.write(f'\n## {stamp} (Codex)\n\n'+text)
+shutil.copy2(__file__,R/'sluttrapport.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)
