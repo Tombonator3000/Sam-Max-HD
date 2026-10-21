@@ -1,0 +1,89 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import json
+import hashlib
+import subprocess
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+M = P / 'mods/gpt'
+C = O / 'mod-sam1153098'
+T = O / 'publisering-hdmod3098'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+git = lambda where, *args: subprocess.check_output(['git', *args], cwd=where, text=True).strip()
+remote = lambda branch: json.loads(subprocess.check_output([
+    'gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/git/ref/heads/' + branch
+], cwd=P, text=True))['object']['sha']
+base = read(R / 'grunnlag-produksjon.json')
+files = read(R / 'kandidatfilhash.json')
+assert not T.exists() and not (R / 'publisering-forsokt.json').exists()
+assert not git(A, 'status', '--porcelain')
+art = git(A, 'rev-parse', 'HEAD')
+assert remote('gpt-arbeid') == art and remote('hd-mod') == base['native_sha']
+assert all(sha(M / f) == h for f, h in base['filer'].items())
+assert all(sha(C / f) == h for f, h in files.items())
+assert read(R / 'sluttkontroll.json')['visuelt_sett']
+assert read(R / 'motor-sammenligning.json')['nullkontroller'] == 480
+save(R / 'publisering-forsokt.json', dict(tid_utc=datetime.now(timezone.utc).isoformat(),
+    grafikkilde=art, grunnlag=base['native_sha'], forventet_native=3098, force_with_lease=True))
+shutil.copytree(C, T)
+subprocess.run(['git', 'init', '-q', str(T)], check=True)
+subprocess.run(['git', '-C', str(T), 'checkout', '-q', '-b', 'hd-mod'], check=True)
+manifest = {p.relative_to(T).as_posix(): sha(p) for p in T.rglob('*')
+    if p.is_file() and '.git' not in p.relative_to(T).parts and p.name != 'SHA256SUMS'}
+(T / 'SHA256SUMS').write_text(''.join(h + '  ' + f + '\n' for f, h in sorted(manifest.items())))
+assert all(manifest[f] == h for f, h in base['filer'].items() if f not in ['mod.json', 'SHA256SUMS'])
+subprocess.run(['git', '-C', str(T), 'add', '-A'], check=True)
+subprocess.run(['git', '-C', str(T), '-c', 'user.name=Codex', '-c', 'user.email=noreply@openai.com',
+    'commit', '-q', '-m', 'HD-mod 3098: Sam med golfball og fisk, 84 kontrollerte ruter'], check=True)
+assert remote('hd-mod') == base['native_sha']
+subprocess.run(['git', '-C', str(T), 'push', '-q',
+    '--force-with-lease=refs/heads/hd-mod:' + base['native_sha'],
+    git(P, 'remote', 'get-url', 'origin'), 'hd-mod:hd-mod'], check=True)
+published = remote('hd-mod')
+assert published == git(T, 'rev-parse', 'HEAD')
+subprocess.run(['bash', 'tools/mod_gren.sh', 'hent', str(M)], cwd=P, check=True)
+actual = {p.relative_to(M).as_posix(): sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual) == set(files) and len(actual) == 21341
+assert {f for f, h in files.items() if actual[f] != h} == {'SHA256SUMS'}
+assert all(actual[f] == h for f, h in base['filer'].items() if f not in ['mod.json', 'SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual) == 3098
+assert read(M / 'mod.json')['costume_cels'] == 3098
+assert git(P, 'stash', 'list', '--format=%H').splitlines() == base['stash']
+protected = read(R / 'beskyttede-samlet.json')
+assert len(protected) == 1036 and all(sha(A / f) == h for f, h in protected.items())
+assert remote('hd-mod') == published
+save(R / 'publiserte-moddfiler-3098.json', actual)
+receipt = dict(tid_utc=datetime.now(timezone.utc).isoformat(), grafikkilde=art, hd_mod=published,
+    native=3098, nye_native=84, nye_hele_ark=3, filantall=21341, png=21335,
+    alle_filhash_bekreftet=True, alle_tidligere_stier_bevart=True, tidligere_png_bevart=21251,
+    beskyttede=1036, stasher=base['stash'], force_with_lease=True,
+    egen_alfa_ingen_originalfragmenter=True, visuelt_sett=True, motorobservert=True,
+    godkjent_av_Tom=False, claude_kontroll=False, i_fellespakke=False,
+    pakker_native=3013, pakker_mangler_native=85)
+save(R / 'mottak-publisert.json', receipt)
+for name in ['fremdrift.json', 'sluttkontroll.json']:
+    data = read(R / name)
+    data.update(publisert=True, hd_mod=published, grafikkilde=art)
+    for e in data.get('leveranser', []):
+        e.update(publisert=True, hd_mod=published)
+    save(R / name, data)
+(R / 'NESTE.md').write_text(f'''Publisert og hentet {published}: 3098 native ruter. Alle 21341 filhash, 1036 kildehash og tre stasher er bekreftet. Tre hele golfark gir 427 av 1758 figurjobber med resultat. Alle 84 nye native er logget i faktisk Linux; primær og sekundær prøve gir hver 480 nullkontroller. Ingen ny Tom-/Claude-godkjenning.
+
+Neste er felles Linux-/Windows-samlepunkt med 85 nye native siden 3013, én siste kattepose og 84 golf-ruter. Frys native frem til begge faktiske pakker er hentet, sjekksummer/runtimehash og faktisk Linux er kontrollert. Ikke gjenta golfproduksjon eller gamle pakker. Deretter kildeanalyser neste produserbare familie, foreløpig fig304_01..05. Ingen 304-bildekall eller leveranser er gjort. Avviste kall og ugyldige 344/346-ruter skal ikke omprøves.
+''')
+with (R / 'RAPPORT.md').open('a') as f:
+    f.write(f'\nPublisert og hentet hd-mod `{published}`, 3098 native ruter. Alle 21341 filhash er bekreftet, samtlige 21251 tidligere PNG-filer er bevart. Fellespakker har 3013 og mangler 85 nye native. Native fryses nå ved pakkesamlepunktet.\n')
+for name in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+    f = A / name
+    s = f.read_text()
+    i = s.find('\n')
+    line = f'Publisert og hentet Sam-golf: hd-mod {published}, 3098 native, 427 av 1758 hele figurjobber. Alle 84 nye ruter automatisk OK og motorlogget; 480/480 null i både primær- og synlighetsprøve. 1036 kildehash, alle tidligere PNG og tre stasher er bevart. Nativefrys for felles Linux-/Windows-samlepunkt, 85 nye siden 3013. Se rapporter/sam115-golf-20261021/NESTE.md. Ingen ny Tom-/Claude-godkjenning.'
+    f.write_text(s[:i + 1] + '\n' + line + '\n' + s[i + 1:])
+shutil.copy2(__file__, R / 'publiser.py.txt')
+print(json.dumps(receipt, ensure_ascii=False), flush=True)
