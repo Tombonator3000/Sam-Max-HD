@@ -1,0 +1,37 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib, json, shutil, subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+git = lambda *args: subprocess.check_output(['git', *args], cwd=P, text=True).strip()
+api = lambda s: json.loads(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + s], cwd=P, text=True))
+q = read(R / 'publisert.json')
+assert q['native_frys_kan_frigis'] and not q['aktive_ekstra_pakkebygg']
+assert q['ekstra_taggbygg_SDL_feil_og_en_omprove']['status'] == 'omprove_gronn'
+assert not git('status', '--porcelain')
+head = git('rev-parse', 'HEAD')
+assert api('git/ref/heads/main')['object']['sha'] == head
+assert set(git('diff', '--name-only', q['kode'], head).splitlines()) == {'STATUS.md', 'memory.md', 'todo.md', 'log.md'}
+assert api('git/ref/heads/hd-mod')['object']['sha'] == q['hd_mod']
+meta = api('releases/' + str(q['release_id']))
+assert api('releases/latest')['id'] == meta['id']
+aset = lambda m: {(a['id'], a['name'], a['size'], a['digest']) for a in m['assets']}
+assert aset(meta) == aset(read(R / 'release-publisert.json'))
+after = api('releases?per_page=100')
+for old in read(R / 'releaser-foer.json'):
+    assert aset(old) == aset(next(v for v in after if v['id'] == old['id']))
+protected = read(A / 'rapporter/sam088-kilde-20261021/beskyttede-samlet1380.json')
+assert len(protected) == 1380 and all(hashlib.sha256((A / f).read_bytes()).hexdigest() == h for f, h in protected.items())
+assert git('stash', 'list', '--format=%H').splitlines() == ['3bcac2e1c5fc70f077c5845bd1c497503e2242ca', '1672c8981a434e17bed5c142599680f16a238a74', '729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 489
+runs = api('actions/runs?head_sha=' + head + '&per_page=20')['workflow_runs']
+assert runs and all(v['head_sha'] == head and v['status'] == 'completed' and v['conclusion'] == 'success' for v in runs)
+out = dict(tid_utc=datetime.now(timezone.utc).isoformat(), main_dokumentasjon=head, main_endrer_bare_fire_dokumenter=True, main_CI=[dict(id=v['id'], navn=v['name'], konklusjon=v['conclusion'], url=v['html_url']) for v in runs], bygget_kode=q['kode'], hd_mod=q['hd_mod'], native=3471, figurark_med_resultat=489, figurark_totalt=1758, figurark_gjenstaar=1269, alle_fire_fellesvedlegg_og_Latest_uendret=True, alle_tidligere_releaser_og_assets_bevart=True, kildefiler_SHA_uendret=1380, tre_stasher_bevart=True, nativefrys_frigitt=True, ekstra_taggbygg=q['ekstra_taggbygg'], ekstra_SDL_feil_og_en_omprove_bevart=True, ingen_ny_Tom_Claude_godkjenning=True, naturlig_gjennomspilling_og_interaktiv_Windows_og_web_gjenstaar=True, neste='fig088_01 til fig088_05', neste_bunke_maal=50, neste_bunke_ulike_hele_kilder=29, ingen_nye_88_bildekall_eller_resultater=True, grafikkautomatikken_fortsetter=True)
+for D in [O, R]:
+    (D / 'sluttstatus.json').write_text(json.dumps(out, ensure_ascii=False, indent=2) + '\n')
+shutil.copy2(__file__, R / 'sluttstatus.py.txt')
+print(json.dumps(dict(native=3471, figurark=489, main=head, CI=[v['id'] for v in runs], bevaring_OK=True, neste=out['neste']), ensure_ascii=False))

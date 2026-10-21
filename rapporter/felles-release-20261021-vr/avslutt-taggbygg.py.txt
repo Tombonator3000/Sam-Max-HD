@@ -39,12 +39,23 @@ assert all(sha(P / 'mods/gpt' / f) == h for f, h in read(R / 'moddfiler-3471.jso
 proof.update(native_frys_beholdt=False, alle_ekstra_taggbygg_gronne=True, fellesrelease_assets_og_Latest_uendret=True, hd_mod_uendret=mod)
 q.update(native_frys_kan_frigis=True, aktive_ekstra_pakkebygg=[], ekstra_taggbygg=found, nativefrys_frigitt_utc=proof['tid_utc'])
 s.update(native_frys_kan_frigis=True, native_frosset=False, aktive_ekstra_pakkebygg=[])
+retry_note = ''
+if (O / 'ekstra-taggbygg-omprove.json').exists():
+    retry = read(O / 'ekstra-taggbygg-omprove.json')
+    tr = next(v for v in tagruns if v['id'] == retry['run'])
+    assert retry['maks_omprover'] == 1 and tr['attempt'] == 2 and tr['conclusion'] == 'success'
+    retry.update(status='omprove_gronn', konklusjon='success', run_attempt=2, nativefrys_beholdes=False, avsluttet_kontrollert_utc=proof['tid_utc'])
+    q['ekstra_taggbygg_SDL_feil_og_en_omprove'] = retry
+    proof['ekstra_taggbygg_SDL_feil_og_en_omprove'] = retry
+    for D in [O, R]:
+        save(D / 'ekstra-taggbygg-omprove.json', retry)
+    retry_note = f" Ekstra Windows-taggbygg {tr['id']} feilet i første forsøk med SDL_BlitSurface src-invalid før spill og HD-mod var lastet. Én omprøve av samme feilede jobb med identisk kode og uendrede testflagg bestod i forsøk to. Første feillogg er bevart. De publiserte pakkene er fortsatt fra sine separate første grønne bygg, og ingen fellesvedlegg er byttet. Dette retter ikke den sporadiske SDL-startfeilen."
 for D in [O, R]:
     save(D / 'ekstra-taggbygg.json', proof)
     save(D / 'publisert.json', q)
     save(D / 'bygg-startet.json', s)
 old = 'Nativefrysen beholdes til registrerte ekstra pakkebygg er avsluttet. Ikke dupliser eller avbryt dem.'
-new = 'Nativefrysen er frigitt etter grønt ekstra taggbygg og ny kontroll av uendret hd-mod, Latest og alle fire fellesvedlegg.'
+new = 'Nativefrysen er frigitt etter grønt ekstra taggbygg og ny kontroll av uendret hd-mod, Latest og alle fire fellesvedlegg.' + retry_note
 for folder in [R] + [A / 'rapporter' / n for n in ['sam250-foerste-20261021', 'sam250-midt-20261021', 'sam250-slutt-20261021']]:
     for n in ['NESTE.md', 'RAPPORT.md']:
         f = folder / n
@@ -59,4 +70,15 @@ for n in ['NESTE.md', 'KILDEGRUNNLAG.md']:
     text = f.read_text()
     text = text.replace('Modden 3471 er fryst under VR-pakkebygget. Ikke publiser native før frysen er frigitt.', 'VR-pakkebygget er ferdig, fellesutgave 3471 er publisert og ekstra taggbygg er grønt. Nativefrysen er frigitt; se rapporter/felles-release-20261021-vr/publisert.json.')
     f.write_text(text)
+main_old = 'Nativefrysen beholdes til de registrerte ekstra taggbyggene er avsluttet. Ikke publiser mer native mens de kjører.'
+main_new = 'Nativefrysen er frigitt etter grønt ekstra taggbygg og kontroll av uendret hd-mod og alle fellesvedlegg.' + retry_note
+for n in ['memory.md', 'STATUS.md', 'log.md']:
+    f = P / n
+    text = f.read_text()
+    at = text.rfind(main_old) if n == 'log.md' else text.find(main_old)
+    if at >= 0:
+        text = text[:at] + main_new + text[at + len(main_old):]
+        f.write_text(text)
+    else:
+        assert main_new in text
 print(json.dumps(dict(nativefrys='frigitt', gronne_taggbygg=[v['id'] for v in tagruns], native=3471, fire_fellesvedlegg_uendret=True), ensure_ascii=False))

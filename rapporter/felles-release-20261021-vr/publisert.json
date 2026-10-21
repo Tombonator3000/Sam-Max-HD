@@ -161,16 +161,39 @@
   "naturlig_gjennomspilling": false,
   "ny_interaktiv_windows_eller_webtest": false,
   "neste_figurjobb": "fig088_01",
-  "aktive_ekstra_pakkebygg": [
+  "aktive_ekstra_pakkebygg": [],
+  "native_frys_kan_frigis": true,
+  "ekstra_taggbygg": [
     {
       "id": 39631146616,
       "workflow": "windows.yml",
       "head_branch": "sam-max-hd-2026-10-21-vr",
       "head_sha": "f2ded6075473c2b9d78ac553bca6bbdca1d1f026",
       "event": "push",
-      "status": "in_progress",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 2,
       "url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39631146616"
     }
   ],
-  "native_frys_kan_frigis": false
+  "nativefrys_frigitt_utc": "2026-10-21T16:19:42.706712+00:00",
+  "ekstra_taggbygg_SDL_feil_og_en_omprove": {
+    "tid_utc": "2026-10-21T16:10:18.946669+00:00",
+    "run": 39631146616,
+    "tag": "sam-max-hd-2026-10-21-vr",
+    "kode": "f2ded6075473c2b9d78ac553bca6bbdca1d1f026",
+    "hd_mod": "d8a3e56f3511c1663d7da733e392bc5557bdea6d",
+    "forste_forsok": "failure",
+    "forste_feillogg_sha256": "270106b6d9834ed365d8dfc3655f9548028f4064e8a7a817c351c4dccc2d051e",
+    "feil": "SDL_BlitSurface failed: Parameter 'src' is invalid!",
+    "avgrensing": "Oppstart med SDL dummy feiler før spillet og HD-modden er lastet. Samme kjente feil som i forrige ekstra taggbygg. Publiserte Windows-pakkebygg 39627907189 bestod i første forsøk.",
+    "tiltak": "Én avgrenset omprøve av samme feilede jobb. Ingen kode-, testflagg- eller portendring. Ingen ny publisering eller overskriving av fellesvedlegg.",
+    "maks_omprover": 1,
+    "status": "omprove_gronn",
+    "nativefrys_beholdes": false,
+    "run_attempt": 2,
+    "omprove_startet": "2026-10-21T16:10:20Z",
+    "konklusjon": "success",
+    "avsluttet_kontrollert_utc": "2026-10-21T16:19:42.706712+00:00"
+  }
 }

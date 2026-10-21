@@ -4,7 +4,7 @@ Felles Linux og Windows med 3471 native er publisert og Latest-bekreftet: https:
 
 Neste familie er fig088_01 til fig088_08, Sam og Max i Cone of Tragedy i rom 17. 64 mål og 43 ulike hele RGBA-kilder er kartlagt i rapporter/sam088-kilde-20261021. Begge kildeprøver logget alle 64 mål, inkludert faktisk primærskript 201. Bevar hele sammensatte kilder, mekanikk, figurer, små bevegelsesstreker og stjerner. Ingen nye 88-bildekall, resultater eller native. Se aktuelle kilder, spillkontekst og godkjente mastere på nytt før hvert motiv. Grafikkautomatikken fortsetter; gamle nattprosesser gjenstartes ikke.
 
-Nativefrysen beholdes til registrerte ekstra pakkebygg er avsluttet. Ikke dupliser eller avbryt dem.
+Nativefrysen er frigitt etter grønt ekstra taggbygg og ny kontroll av uendret hd-mod, Latest og alle fire fellesvedlegg. Ekstra Windows-taggbygg 39631146616 feilet i første forsøk med SDL_BlitSurface src-invalid før spill og HD-mod var lastet. Én omprøve av samme feilede jobb med identisk kode og uendrede testflagg bestod i forsøk to. Første feillogg er bevart. De publiserte pakkene er fortsatt fra sine separate første grønne bygg, og ingen fellesvedlegg er byttet. Dette retter ikke den sporadiske SDL-startfeilen.
 
 Tidligere produksjonsstatus nedenfor er historikk.
 
