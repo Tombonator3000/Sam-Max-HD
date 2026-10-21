@@ -1,0 +1,5 @@
+# Neste familie: Sam og Max i Cone of Tragedy
+
+Kostyme 88, rom 17 Midway. Ressursbanken beskriver attraksjonen Cone of Tragedy. Første originalark viser Sam og Max opp ned, med festet mot den røde/brune kjegleformen, ikke vanlige stående personer. Ett separat lag er kjegleformen alene, de andre kildene viser begge figurene samlet i rotasjonen. Behold tilsiktet vridning, opp/ned-retning, festepunkt og hele sammensatte motiv. Godkjente Sam- og Max-mastere bestemmer identitet og farger, originalene bestemmer positur og geometri. Det generiske jobbnavnet Sam og Max er utilstrekkelig som fasebeskrivelse, men ikke en ny designbestilling.
+
+Åtte ark og 64 mål er kartlagt med kildehash og hele RGBA-aliaser. 1348 tidligere beskyttede kilder og 32 nye jobbfiler gir 1380 beskyttede filer. Første originalark er sett, resten av originalarkene og alle ulike hele kilder i riktig spillkontekst må sees før bildekall. Gyldig animasjon og faktisk primærskript skal avklares fra råheader og romskript. Ingen nye bildekall, resultater eller native. Modden 3471 er fryst under Linux-/Windows-bygg og endres ikke av kildeundersøkelsen. Tidligere holdte motiver omprøves ikke.

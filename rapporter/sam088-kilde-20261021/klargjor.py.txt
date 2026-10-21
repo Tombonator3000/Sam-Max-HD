@@ -1,0 +1,29 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from PIL import Image
+from smhd.gamedata import load,read_index,read_rooms
+from smhd.v6grafikk import decode_costume
+import json,hashlib,importlib.util,sys,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists();R.mkdir();prior=read(A/'rapporter/sam250-slutt-20261021/beskyttede-samlet1348.json');assert len(prior)==1348 and all(sha(A/f)==h for f,h in prior.items());protected=dict(prior)
+rows=[];jobs=[];groups=defaultdict(list)
+for J in sorted((A/'jobber').glob('fig088_*')):
+ assert not (J/'resultat.png').exists();d=read(J/'jobb.json');jobs.append(dict(jobb=J.name,ruter=len(d['ruter']),originalark_visuelt_sett=J.name=='fig088_01'))
+ for f in ['jobb.json','referanse.png','original_1x.png','prompt.txt']:protected[(J/f).relative_to(A).as_posix()]=sha(J/f)
+ for e in d['ruter']:
+  src=P/'work/extract/costumes'/(e['bilde']+'.png');im=Image.open(src).convert('RGBA');h=hashlib.sha256(im.tobytes()).hexdigest();groups[h].append(e['bilde']);rows.append(dict(jobb=J.name,bilde=e['bilde'],lag=e['lag'],kilde=str(src),sha256=sha(src),rgba_sha256=h,maal=list(im.size)))
+assert len(jobs)==8 and len(rows)==64 and len(protected)==1380
+for e in rows:e['canonical']=groups[e['rgba_sha256']][0]
+save(R/'beskyttede-samlet1380.json',protected);save(R/'forundersokelse.json',dict(jobber=jobs,ruter=rows,maal=64,ulike_hele_rgba=len(groups),beskyttede=1380,ingen_bildekall=True,ingen_nye_resultater=True,native_frosset_i_felles_vr=True))
+idx=read_index(P/'game/SAMNMAX.000');data,_=load(P/'game/SAMNMAX.001');rooms=read_rooms(P/'game/SAMNMAX.001');room,off=idx.costume_dir[88];assert room==17;c=decode_costume(data,rooms[room].offset+off)
+save(R/'kostyme088-header.json',dict(num_anim=c.num_anim,format=c.format,mirror=c.mirror,rom=room,raw_valg=sorted({a['valg'] for a in c.animations}),advarsler=c.errors,palett=list(c.palette),animasjoner=c.animations));save(R/'kostyme088.json',read(P/'work/extract/costumes.json')['88'])
+spec=importlib.util.spec_from_file_location('dekompiler250',P/'tools/dekompiler_skript.py');m=importlib.util.module_from_spec(spec);sys.modules[spec.name]=m;spec.loader.exec_module(m);idata,_=m.load(P/'game/SAMNMAX.000');tasks,info=m.finn_jobber(data,idata);tasks=[j for j in tasks if j.rom==17]
+prev=read(A/'rapporter/sam250-kilde-20261021/dekompilering49.json');desc=m.finn_descumm(prev['descumm']);assert sha(desc)==prev['descumm_sha256'];W=P/'work/sam088-kilde-20261021/skript';assert not W.exists();W.mkdir(parents=True)
+out=[]
+for i,j in enumerate(tasks):
+ result=m.kjor(desc,j,W/('tmp-'+str(i)+'.bin'));m.skriv(W,j,result);out.append(dict(sort=j.sort,filer=j.filer,status=j.status,melding=j.melding,advarsler=j.advarsler))
+save(R/'dekompilering17.json',dict(descumm=str(desc),descumm_sha256=sha(desc),jobber=out,status=dict(Counter(j.status for j in tasks))))
+(R/'KILDEGRUNNLAG.md').write_text('# Neste familie: Sam og Max i Cone of Tragedy\n\nKostyme 88, rom 17 Midway. Ressursbanken beskriver attraksjonen Cone of Tragedy. Første originalark viser Sam og Max opp ned, med festet mot den røde/brune kjegleformen, ikke vanlige stående personer. Ett separat lag er kjegleformen alene, de andre kildene viser begge figurene samlet i rotasjonen. Behold tilsiktet vridning, opp/ned-retning, festepunkt og hele sammensatte motiv. Godkjente Sam- og Max-mastere bestemmer identitet og farger, originalene bestemmer positur og geometri. Det generiske jobbnavnet Sam og Max er utilstrekkelig som fasebeskrivelse, men ikke en ny designbestilling.\n\nÅtte ark og 64 mål er kartlagt med kildehash og hele RGBA-aliaser. 1348 tidligere beskyttede kilder og 32 nye jobbfiler gir 1380 beskyttede filer. Første originalark er sett, resten av originalarkene og alle ulike hele kilder i riktig spillkontekst må sees før bildekall. Gyldig animasjon og faktisk primærskript skal avklares fra råheader og romskript. Ingen nye bildekall, resultater eller native. Modden 3471 er fryst under Linux-/Windows-bygg og endres ikke av kildeundersøkelsen. Tidligere holdte motiver omprøves ikke.\n')
+shutil.copy2(__file__,R/'klargjor.py.txt')
+print('88:',len(rows),'mål,',len(groups),'ulike hele RGBA, råvalg',sorted({a['valg'] for a in c.animations}),'advarsler',c.errors,'skript',dict(Counter(j.status for j in tasks)),flush=True)
