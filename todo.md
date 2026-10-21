@@ -1,5 +1,14 @@
 # todo.md
 
+## Neste, 2026-10-21 05:54
+
+- [x] Fig304_01..05: fem hele ark, 12 native, 10 egne varianter, publisert og hentet `7a3fbcd2ef1a1dd24ae5ef11504cf03980e9b0ed`. 432 av 1758 hele jobber med resultat; 3110 native. Alle 12 automatisk OK, faktisk Linux sammenlignet uten nye eller økte avvik.
+- [ ] Fig304_06..10, deretter 11..15. Se gjeldende NESTE.md i rapporter/sam304-foerste-20261021 på gpt-arbeid. Ikke dupliser første fem.
+- [ ] Oppdater og kontroller felles Linux-/Windows-pakker ved slutten av familien 304. Dagens pakker har 3098 og mangler 12. Ikke kall dem oppdatert før faktiske nedlastinger og grafikk er kontrollert.
+- [ ] Fortsett øvrig grafikk og returer til all produserbar grafikk er kontrollert og importert. 1326 hele figurjobber gjenstår, pluss katalogfeil og sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+
+Alle 1096 beskyttede kilder, tidligere publiserte filer og tre stasher er bevart. Gamle nattprosesser gjenstartes ikke. Ingen ny webtest eller interaktiv Windows-test.
+
 ## Siste verifiserte grafikkstatus, 2026-10-21 05:14
 
 427 av 1758 hele figurjobber har resultat; 1331 gjenstår pluss returer og sluttkontroll. [Felles Linux og Windows med 3098 native ruter](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-golf115) er faktisk kontrollert og Latest-bekreftet. Alle 85 nye ruter er med, uten nye eller økte bufferavvik. Nativefrysen er frigitt.
