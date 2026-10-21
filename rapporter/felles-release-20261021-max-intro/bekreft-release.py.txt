@@ -1,0 +1,52 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,time
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/max-intro-20261021';V=A/'rapporter/sam-max-intro-20261021';N=A/'rapporter/sam-max223-kilde-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+s=read(O/'bygg-startet.json');tag,code,mod=(s[k] for k in ['release_tag','kode','hd_mod']);attempt=read(O/'publisering-forsokt.json');assert attempt['utfall']=='publisert'
+meta=api('releases/'+str(attempt['release_id']))
+for tries in range(5):
+ latest=api('releases/latest')
+ if latest['id']==meta['id']:break
+ time.sleep(3)
+assert latest['id']==meta['id'] and not meta['draft'] and not meta['prerelease']
+assets=read(O/'assetkontroll.json');assert len(assets)==len(meta['assets'])==4
+for v in assets:
+ a=next(e for e in meta['assets'] if e['name']==v['fil']);assert a['size']==v['bytes'] and a['digest']=='sha256:'+v['sha256'] and sha(O/v['plattform']/v['fil'])==v['sha256']
+ref=api('git/ref/tags/'+tag)['object']
+if ref['type']=='tag':ref=api('git/tags/'+ref['sha'])['object']
+assert ref['type']=='commit' and ref['sha']==code
+prior=read(O/'releaser-foer.json');after=api('releases?per_page=100');assert len(after)==len(prior)+1;aset=lambda e:{(a['id'],a['name'],a['size'],a['digest']) for a in e['assets']}
+for v in prior:assert aset(v)==aset(next(e for e in after if e['id']==v['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod;files=read(R/'moddfiler-3276.json');assert len(files)==21519 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+runtime=read(R/'linux-kontroll.json');assert runtime['nye_native_observert']==126 and runtime['skjermbufferkontroller']==1720 and runtime['nullkontroller']==runtime['grunnlag_nullkontroller']==1683 and runtime['alle_eksakte_avvikskoordinater_og_RGB_par_identiske']
+assert all(e['identisk_avviksrekkefolge'] for e in runtime['sammenligning'])
+rasters=read(R/'rasterkontroll-mot-produksjon.json');assert rasters['croprasteridentiske']==126 and rasters['alle_nativefiler_identiske'];assert all(e['originalflat_identisk'] and e['utenfor_alle_loggede_aktorflater']==0 for e in read(R/'pakke-pikselkontroll.json'))
+vis=read(R/'visuell-kontroll.json');assert vis['visuelt_sett'] and vis['hele_motorbilder_sett']==vis['hele_for_etter_sett']==12 and vis['bildor_i_naturlig_intro_sett']
+runs={k:api('actions/runs/'+str(s['plattform'][k]['run_id'])) for k in ['linux','windows']};assert all(v['conclusion']=='success' and v['run_attempt']==1 and v['head_sha']==code for v in runs.values())
+protected=read(N/'beskyttede-samlet1252.json');assert len(protected)==1252 and all(sha(A/f)==h for f,h in protected.items());base=read(S/'grunnlag-produksjon.json');assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==458
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),url=meta['html_url'],release_id=meta['id'],release_tag=tag,Latest_bekreftet=True,kode=code,hd_mod=mod,native=3276,nye_native_siden_felles3150=126,nye_hele_ark_siden_felles3150=12,nye_hele_ark_denne_bunke=7,nye_native_denne_bunke=68,figurjobber_med_resultat=458,figurjobber_totalt=1758,gjenstaar_hele_jobber=1300,faktiske_nedlastinger_begge=True,runtime_moddfiler_per_pakke_bekreftet=21518,fire_assets_digest_og_bytes_verifisert=True,bevarte_tidligere_releaser=len(prior),alle_tidligere_assets_bevart_ved_fellespublisering=True,tidligere_fellesutgaver_med_assets_bevart=True,linux_run=s['plattform']['linux']['run_id'],windows_run=s['plattform']['windows']['run_id'],linux_forsoek=1,windows_forsoek=1,linux_binar_sha256=runtime['binar_sha256'],skjermbufferkontroller=1720,nullkontroller=1683,grunnlag_nullkontroller=1683,ingen_nye_eller_okte_skjermbufferavvik=True,eksakte_avvikskoordinater_og_RGB_par_og_rekkefolge_identiske=True,kjent_intro_34_ganger12=True,kjente_sekundaere3_160_ved36=True,helprove_uten_avvik=False,hele_motorbilder_sett=12,hele_foer_etter_par_sett=12,naturlig_bildorsekvens_sett=True,figurcropraster_identiske=126,alle126_originalflater_identiske=True,rgb_utenfor_loggede_aktorer_126_par=[0]*126,beskyttede_kilder=1252,tre_stasher_bevart=True,ny_Tom_Claude_godkjenning=False,naturlig_gjennomspilling=False,ny_interaktiv_windows_eller_webtest=False,neste_figurjobb='fig223_01',neste_kildeplan='rapporter/sam-max223-kilde-20261021')
+for D in [O,R]:save(D/'publisert.json',receipt);save(D/'release-publisert.json',meta)
+s.update(status='fellesrelease_publisert_og_kontrollert',Latest_bekreftet=True,native_frys_kan_frigis=True,release_url=meta['html_url'])
+for D in [O,R]:save(D/'bygg-startet.json',s)
+text=f'''Felles Linux og Windows med 3276 native er publisert og Latest-bekreftet: {meta['html_url']}. Begge faktiske nedlastinger, fire vedleggsdigester og alle 21518 runtime-moddfiler per pakke er kontrollert. Alle 126 nye native siden felles3150 er motorobservert og har identiske figurutsnitt til produksjonen. 1720 kontroller gir 1683 null i både pakken og3150-grunnlaget med samme nye Linux-binær. Samme eksakte feilkoordinater, begge RGB-verdier og rekkefølge; ingen nye eller økte bufferavvik. Alle126 originalflater er identiske og alle126 par har null endringer utenfor loggede aktørflater med målemargin. Tolv hele pakkebilder, tolv hele par og fem naturlige dørfaser er sett. Hele prøven er ikke avviksfri. Nativefrysen for det ferdige samlepunktet er frigitt.
+
+458 av 1758 hele figurjobber har resultat; 1300 gjenstår pluss returer, katalogfeil og sluttkontroll. Begge introbunkene er levert og pakket: 12 ark,126 native. Ikke gjenta dem eller3276-byggene. Alle21519 moddfilhash,1252 beskyttede jobbkilder,tre stasher og tidligere releaser er bevart. Ingen ny Tom-/Claude-godkjenning, full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+Neste faktiske produksjon er fig223_01 til05, fem ark med30 mål fra11 hele kilder. Familien har13 ark/94 mål/25 ulike hele RGBA-kilder. Se rapporter/sam-max223-kilde-20261021/KILDEGRUNNLAG.md og NESTE.md. Motivet er Sam og Max med den store åpne boken fra Conroys soverom. Alle94 kilder er logget i gyldig hel animasjon6,25 varianter og fem hele kildebilder er sett. 359 av360 kildekontroller er null, samme kjente160 ved36. Primærskript210 er lest, ikke avspilt; andre aktører og romskript er ikke skjult, så den ekstra vanlige Max er ikke del av223-maleriet. De første fem originalarkene er sett; begge hovedark og aktuelle kilder skal ses før hvert motiv. Ingen223-bildekall,resultatark eller native ennå. Beskytt52 nye kilder i tillegg til1200 tidligere,1252 totalt. Behold faste grenser og egen alfa. Avviste motiver og ugyldige344/346-ruter omprøves ikke. Grafikkautomatikken fortsetter uten gammel nattfrist.
+'''
+for before,after in [('felles3150','felles 3150'),('og3150','og 3150'),('Alle126','Alle 126'),('alle126','alle 126'),('ark,126','ark, 126'),('eller3276','eller 3276'),('Alle21519','Alle 21519'),('moddfilhash,1252','moddfilhash, 1252'),('jobbkilder,tre','jobbkilder, tre'),('med30','med 30'),('fra11','fra 11'),('har13','har 13'),('til05','til 05'),('ark/94','ark / 94'),('mål/25','mål / 25'),('Alle94','Alle 94'),('animasjon6','animasjon 6'),('av360','av 360'),('kjente160','kjente 160'),('ved36','ved 36'),('Primærskript210','Primærskript 210'),('del av223','del av 223'),('Ingen223','Ingen 223'),('bildekall,resultatark','bildekall, resultatark'),('Beskytt52','Beskytt 52'),('til1200','til 1200'),('ugyldige344','ugyldige 344')]:text=text.replace(before,after)
+
+# Dette er løpende rapporttekst, tekniske identifikatorer beholdes uendret.
+for folder in [S,V]:
+ for fn in ['fremdrift.json','sluttkontroll.json','mottak-publisert.json']:
+  d=read(folder/fn);d.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=3276,pakker_native=3276,pakker_mangler_native=0)
+  for e in d.get('leveranser',[]):e.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=3276,pakker_native=3276,pakker_mangler_native=0)
+  save(folder/fn,d)
+ with (folder/'RAPPORT.md').open('a') as f:f.write('\n'+text)
+ (folder/'NESTE.md').write_text(text)
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ f=A/name;t=f.read_text();i=t.find('\n');f.write_text(t[:i+1]+'\n'+text+'\n'+t[i+1:])
+with (R/'RAPPORT.md').open('a') as f:f.write('\n'+text+f'\nAlle {len(prior)} tidligere releaser med gjeldende vedlegg er bevart ved fellespublisering.\n')
+(R/'PAAGAR.md').write_text('Ferdig samlepunkt.\n\n'+text)
+shutil.copy2(__file__,R/'bekreft-release.py.txt');print(json.dumps({k:receipt[k] for k in ['url','release_id','native','nye_native_siden_felles3150','bevarte_tidligere_releaser','Latest_bekreftet']},ensure_ascii=False),flush=True)
