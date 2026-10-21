@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,math
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam088-foerste-20261021';V=R/'visuell';V.mkdir(exist_ok=True)
+rows=json.loads((R/'valgte29.json').read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+pages=[]
+for start in range(0,len(rows),6):
+ page=Image.new('RGBA',(1600,1260),'#596978');d=ImageDraw.Draw(page)
+ for i,e in enumerate(rows[start:start+6]):
+  x=(i%2)*800;y=(i//2)*420
+  src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA');own=Image.open(A/e['prototype']).convert('RGBA');assert sha(A/e['prototype'])==e['prototype_sha256']
+  d.text((x+8,y+6),f"{e['bilde']} {e['valgt_kall']} original 4x / egen 4x  IoU {e['snitt_union']:.3f} dekning {e['dekning']:.3f}",fill='white')
+  page.alpha_composite(src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST),(x+8,y+36));page.alpha_composite(own,(x+400,y+28))
+ f=V/f'hele-kilder-{start//6+1:02}.png';page.convert('RGB').save(f);pages.append(dict(fil=f.relative_to(A).as_posix(),sha256=sha(f),hele_kilder=[e['bilde'] for e in rows[start:start+6]],egne_bilder_ikke_skalert=True,originalbare_referanse_4x=True))
+(V/'oversikt.json').write_text(json.dumps(pages,ensure_ascii=False,indent=2)+'\n');print(len(pages),'sider med alle 29 hele kilder, uten egen delklipping')

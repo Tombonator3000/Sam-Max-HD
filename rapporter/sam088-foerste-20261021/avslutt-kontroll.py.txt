@@ -1,0 +1,114 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib, json, re, shutil, subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+C = O / 'mod-sam0883521'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p, d):
+    p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+
+b = read(R / 'grunnlag-produksjon.json')
+d = read(R / 'fremdrift.json')
+motor = read(R / 'motor-sammenligning.json')
+vis = read(R / 'motor-visuell-plan.json')
+assert motor['sett'] == 50 and motor['motorlogget_hele_familien'] == 64
+assert motor['kontrollantall'] == 1440 and motor['nullkontroller'] == motor['grunnlag_nullkontroller'] == 1436
+assert motor['alle100_originalflater_SHA_identiske'] and motor['alle100_utenfor_figurflate'] == 0
+assert all(motor[k] for k in ['primaerskript201_kjort', 'avvikskoordinater_og_rgb_par_identiske', 'ingen_nye_feilpiksler', 'avviksinnhold_og_rekkefolge_identiske'])
+assert motor['binar_sha256'] == '1754ab80def20fa885817c13a9067ed23c69de6252c83a708e78be8bf87aa708'
+# Eksplisitt sett i denne gjennomgangen. De øvrige hele motorbildene er
+# sett i sine hele før/etter-par, men ikke åpnet separat i full oppløsning.
+full_opplosning = {'costume088_1922', 'costume088_1951', 'costume088_1969'}
+for gruppe in ['varianter', 'hele_for_etter', 'hele_motorbilder']:
+    for e in vis[gruppe]:
+        assert sha(R / e['fil']) == e['sha256']
+        e['visuelt_sett'] = gruppe != 'hele_motorbilder' or e['bilde'] in full_opplosning
+        if gruppe == 'hele_motorbilder':
+            e['sett_i_helt_for_etter_par'] = True
+vis.update(visuelt_sett=True, hele_motorbilder_sett_separat=3, hele_for_etter_sett=9,
+           hele_varianter_sett=29, tid_utc=datetime.now(timezone.utc).isoformat(),
+           vurdering='Opp/ned-faser, fall, bevegelsesmerker, svimmelhetsring, kjegletopp og tomme klammer sett mot hele originalen og faktisk rom. Ingen mistet del, ny bakgrunn eller utilsiktet avklipping observert. Andre aktører og romskript er synlige. Egenkontroll er ikke Tom-/Claude-godkjenning.')
+assert len(vis['varianter']) == 8 and len(vis['hele_for_etter']) == 9
+assert sum(len(e['ruter']) for e in vis['varianter']) == 29
+save(R / 'motor-visuell-plan.json', vis)
+motor.update(visuelt_sett=True, hele_varianter_sett=29, hele_motorbilder_sett_separat=3, hele_for_etter_sett=9)
+save(R / 'motor-sammenligning.json', motor)
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 494
+warnings = []
+for e in d['leveranser']:
+    assert sha(A / e['resultat']) == e['sha256']
+    text = (R / (e['jobb'] + '-egenkontroll.txt')).read_text()
+    assert 'FEIL' not in text and 'Utfall: SJEKK' in text
+    warnings += [dict(jobb=e['jobb'], tekst=line) for line in text.splitlines() if line.startswith('SJEKK costume')]
+    e.update(visuelt_kontrollert=True, motorobservert=True)
+assert len(warnings) == 11
+save(R / 'omrissvarsler-vurdert.json', dict(varsler=warnings, visuelt_vurdert=True,
+     begrunnelse='Normalisert arkomriss varierer med hele maleriets myke kanter. Alle elleve er sett mot kilden og mot faktisk motorvisning. De hele motivene, positurene og smådelene er bevart. Native kontroll av hver hele fil bruker uendrede porter; ingen FEIL aksepteres.', CORE=128, IoU=.6, dekning=.8))
+auto = read(R / 'automatisk-mottak50.json')
+assert auto['ruter_ok'] == 50 and all(auto[k] == 0 for k in ['ruter_sjekk', 'ruter_mangler', 'ruter_teknisk'])
+native = read(R / 'egen-native.json')
+assert len(native['ruter']) == 50
+for e in native['ruter']:
+    assert e['egen_alfa'] and not e['originalmaske'] and not e['originalfragmenter']
+    assert sha(A / e['prototype']) == sha(C / e['fil']) == e['sha256']
+protected = read(R / 'beskyttede-samlet1380.json')
+assert len(protected) == 1380 and all(sha(A / f) == h for f, h in protected.items())
+assert subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines() == b['stash']
+files = read(R / 'kandidatfilhash.json')
+assert len(files) == 21764 and all(sha(C / f) == h for f, h in files.items())
+assert {f for f, h in b['filer'].items() if files[f] != h} == {'mod.json'}
+assert len(set(files) - set(b['filer'])) == 50
+calls = list((R / 'kall').glob('*/verktøyresultat.json'))
+assert len(calls) == 42
+for p in calls:
+    cc = p.parent
+    call = read(p)
+    args = read(cc / 'faktiske-argumenter.json')
+    assert sha(cc / 'raa.png') == call['raa_sha256']
+    assert sha(cc / 'faktiske-argumenter.json') == call['argumenter_sha256']
+    assert call['referanser'] == {f: sha(Path(f)) for f in args['referenced_image_paths']}
+d.update(visuelt_sett=True, motorobservert=True, kilde_og_stilanker_sett=True,
+         ark_sjekk=5, ark_ok=0, ark_omrissvarsler=11, native_ok=50,
+         alle1380_beskyttede_SHA_like=True, alle_tidligere_filer_bevart=True)
+save(R / 'fremdrift.json', d)
+save(R / 'sluttkontroll.json', d)
+text = '''# Cone of Tragedy, første fem ark, 21. oktober 2026
+
+Fig088_01 til fig088_05 er laget, egenkontrollert, visuelt sett, native mottatt og motorobservert. Fem hele ark og 50 nye native fra 29 forskjellige hele egne malerier og 21 kildebekreftede identiske hele RGBA-aliasmål gir kandidat 3521. 494 av 1758 hele figurjobber har resultat; 1264 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Ingen ny Tom-/Claude-godkjenning. Publisering og henting kvitteres separat nedenfor.
+
+Kostyme 88 i rom 17 Midway viser Sam og Max i Cone of Tragedy. Kjegleskallet er et eget lag. Figurer, mekanikk og liten topp er ett helt motiv på neste lag. Kilder og faktisk spillsekvens bekrefter opp/ned-faser, tilsiktet squash, fall, støt, bevegelsesflekker, små gule blink, svimmelhetsring, tomme klammer og topp som åpnes. Originaler, spillkontekst og godkjente mastere er sett før hvert motiv. Generisk Sam-prompt har feil premiss for flere faser; faktiske korrigerte prompter er bevart separat. Beskyttede jobbfiler er uendret.
+
+42 vellykkede innebygde image_gen-kall, 29 grunnkall og 13 kvalitetsreturer, er bevart med råbilder, faktiske argumenter, prompter og referansehash. Ett K28-forsøk ble avbrutt uten lagret fil. Samme argumenter lyktes ved neste kjøring. Ingen modereringsavslag eller CLI/API-fallback. Modellnavn ikke oppgitt. Returer retter blant annet ødelagt squashansikt, fasefeil, flyttede deler, Maxs tenner og Sams åpne røde munn. Første arkbygg stoppet ved FEIL på K16. Hele kilden er omtegnet som R12; svak K22 er erstattet av R13. Ingen terskel er senket. Ubrukte utkast og stoppårsaken er bevart.
+
+Python renser bare egne kanter og RGB-felt og plasserer hele egne tegninger ved fast 4x med åtte HD-pikslers marg. Egen myk alfa bevares. Kildens flate farger veileder fargerens, aldri hard formklipping. Ekstra egne navle-/hattemerker er fjernet fra eget RGB med uendret alfa. K09 og R09 flyttes samlet høyst én originalpiksel per akse innen marginen. Ingen enkeltkroppsdel flyttes separat, ingen hard originalmaske klipper nye former, og ingen originalfragmenter settes inn. Hvert alias er den samme hele egenfilen med identisk SHA.
+
+Alle fem ark har SJEKK med i alt elleve normaliserte omrissvarsler, ingen FEIL. Varslene er konkret bevart i omrissvarsler-vurdert.json og er visuelt vurdert mot hele kilder, hele egne malerier og motoren. Alle 50 native er automatisk OK. CORE128, IoU 0,6 og dekning 0,8 er uendret. Kontrollkopiene fra automatisk arkmottak brukes ikke til native; native bruker hele egne prototyper. Fem hele resultatark og 29 hele kildepar er visuelt sett.
+
+Den faktisk nedlastede Linux-binæren med SHA256 1754ab80def20fa885817c13a9067ed23c69de6252c83a708e78be8bf87aa708 er kjørt med grunnlag 3471 og kandidat 3521 i hel animasjon 6 og faktisk primærskript 201. Hver prøve har 720 kontroller og dump ved hver skjermoppdatering. Alle 64 familieruter, inkludert alle 50 nye, er logget i hver prøve. Hver side har 1436 av 1440 nullkontroller med samme kjente overgangsavvik ved bilde 24 og 25, eksakte koordinater, begge RGB-verdier og rekkefølge. Alle 100 hele originalflater er SHA-identiske og alle 100 par har null endringer utenfor de faktisk loggede nye aktørflatene med åtte HD-pikslers målemargin. Andre aktører og romskript er ikke skjult. 29 motorvarianter og ni hele før/etter-par er sett; 1922, 1951 og 1969 er også åpnet separat i full oppløsning. Kontrollerte romhopp, ikke full naturlig gjennomspilling. Hele prøven er ikke avviksfri.
+
+Kandidaten bevarer alle 21714 tidligere moddfilstier og 21708 tidligere PNG. Bare mod.json endres blant tidligere filer før ny SHA256SUMS. Kandidaten har 21764 filer og 21758 PNG. Alle 1380 beskyttede kilder og tre opprinnelige stasher er bekreftet uendret. Ingen motor- eller pipelineendring. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt med eksisterende Sam-Max-metode.
+
+Felles Linux og Windows sam-max-hd-2026-10-21-vr har fortsatt 3471 native og mangler disse 50 etter nativepublisering. Neste pakkesamlepunkt er etter fig088_06 til fig088_08, 14 mål fra 14 hele kilder, forventet 3535 hvis alle leveres, eller tidligere ved blokkering. Faktiske nedlastinger, sjekksummer og inkludert grafikk må kontrolleres på begge plattformer før ny fellesutgave kalles oppdatert.
+
+Neste jobb er fig088_06. De siste tre arkene har ennå ingen bildekall eller resultater. Gjenbruk kildeundersøkelsen i rapporter/sam088-kilde-20261021, men se aktuelle hele originaler, spillkontekst og begge godkjente mastere på nytt før hvert motiv. Bevar mekanikken, de tilsiktede mellomrommene og smådelene. Fortsett deretter øvrige produserbare jobber og returer. Full naturlig gjennomspilling, interaktiv Windows, ny webtest og kjente SDL-/inventar-/testhoppbegrensninger gjenstår. Seks bokark og 46 mål er holdt; tidligere verktøyavviste kilder og deres hele aliaser omprøves ikke. Resten av 304 følger siste NESTE. Ugyldige 344/346 og råvalg 28 kjøres ikke. Grafikkautomatikken fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke.
+'''
+for f in ['RAPPORT.md', 'NESTE.md']:
+    (R / f).write_text(text)
+for e in d['leveranser']:
+    p = A / 'jobber' / e['jobb'] / 'notat.md'
+    suffix = '\nEndelig samlet ark- og motorvisning er sett. Alle 50 native er automatisk OK. Alle fem ark har SJEKK med i alt elleve visuelt vurderte omrissvarsler; ingen FEIL. Begge prøver logget alle 64 familieruter i primærskript 201 og hel animasjon 6. Hver side har 1436/1440 null, identiske kjente overgangsavvik, 100 SHA-like originalflater og null utenfor nye aktørflater. Se SHA-festet fremdrift og full rapport for publisering og pakker.\n'
+    assert suffix not in p.read_text()
+    p.write_text(p.read_text() + suffix)
+p = A / 'GRAFIKKLISTE.md'
+s = p.read_text()
+for e in d['leveranser']:
+    s = s.replace('- [ ] `' + e['jobb'] + '`', '- [x] `' + e['jobb'] + '`')
+p.write_text(s)
+for p in O.glob('*.py'):
+    shutil.copy2(p, R / (p.name + '.txt'))
+print('Fem ark, 50 native, 1380 beskyttede, tre stasher og motorvisning bekreftet. Klar for kildepush.', flush=True)
