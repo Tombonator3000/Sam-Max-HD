@@ -1,0 +1,41 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+r=read(R/'mottak-publisert.json');b=read(R/'grunnlag-produksjon.json');protected=read(R/'beskyttede-samlet1300.json')
+assert r['native']==3419 and r['nye_native']==48 and r['alle_filhash_bekreftet'] and r['motorobservert'] and r['visuelt_sett']
+assert not git(P,'status','--porcelain') and git(P,'rev-parse','HEAD')==b['main_sha']
+assert all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==477
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+text=f'''Fire hele figurark, fig097_09 til fig097_12, er laget, egenkontrollert, visuelt sett, native mottatt, motorobservert og publisert. 48 nye native fra 48 unike hele malerier; 3419 native totalt. 477 av 1758 hele figurjobber har resultat. 1281 gjenstår pluss returer, katalogfeil og sluttkontroll. Tre ark OK og ett SJEKK for foldet øreform 1964. Den er visuelt vurdert mot kilden og i motoren, med fast 100 prosent bredde/høyde, 0 px flytt, IoU 0,7013 og dekning 0,8074. Alle 48 er automatisk OK med uendrede porter CORE128, IoU 0,6 og dekning 0,8. Ingen ny Tom-/Claude-godkjenning.
+
+Motivet er Sam og Max i svanebåten, rom 22, kostyme 97, lag 15. Alle fire originalark, 48 originale varianter i spillkontekst og godkjente hovedark er sett før produksjon. Rute 1920 inneholder hele båten og begge figurer og nytegnes hel med båt; den tidligere generelle instruksen om båt gjelder ikke denne kilden. Resten har de konkrete kombinerte figurene, Max alene eller avskårne deler. Sotgag, risteomriss, grep, bakside og små kildebekreftede sålemerker beholdes. 1964 og 1965 er foldede øretupper når Max dukker bak kanten, avklart fra bevegelse og kildeposisjoner før bildekallet. Beskyttede kilder er uendret.
+
+Ti innebygde image_gen-grunnkall og fire rettingskall, alle med råbilder, faktiske prompter, argumenter og referansehash bevart. Modellnavn ikke oppgitt. Ingen verktøyavvisning i denne bunken. Returene retter såler og feilaktig åpen Sam-munn. Python renser bare egne malerier og plasserer hele tegninger i fast 4x med egen myk alfa og åtte HD-pikslers marg. Ingen hard originalmaske eller originale bildefragmenter. Tre små RGB-returer beholder hele tidligere egne myke alfakanalen; R04 bruker sin egen nye alfa. Avgrenset egen RGB-rens og utsnittsretting i K05 er dokumentert. Tidligere utkast er bevart og ikke valgt i native.
+
+Begge faktiske motorprøver, rommets primærskript 201 og separat hel animasjon 6, observerer alle 95 familieruter inkludert alle 48 nye, i nedlastet Linux-binær SHA256 `0887fa427c7315e4cfd66c92190b60bcbd2b3eeef346407560af56346cfae3e0`. 718 av 720 nullkontroller på hver side samlet. Samme to kjente 160-avvik ved bilde 36 med identiske koordinater, RGB-par og rekkefølge. Ingen nye eller økte bufferfeil. Alle 190 originalflater SHA-identiske, alle 96 par med null endringer utenfor logget ny figurflate med målemargin. Faktisk kameraopphav per dumpframe er brukt. Åtte variantbrett med alle 48, 13 hele før/etter-par og fire hele resultatark er sett. Dette er regisserte prøver etter romhopp, ingen full naturlig gjennomspilling. Andre aktører og romskript er ikke skjult. Hele prøven er ikke avviksfri.
+
+Hd-mod `{r['hd_mod']}` er publisert fra eksakt fjern-SHA `{b['fjern_sha']}`, hentet tilbake og kontrollert med alle 21662 filhash. Alle 21608 tidligere PNG, øvrige tidligere stier, 1300 beskyttede kilder og tre stasher er bevart. Grafikkilde `{r['grafikkilde']}` på gpt-arbeid. Main får bare disse fire dokumentasjonsfilene. Ingen motor- eller pipelineendring. Bibliotekskilder: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Bevis i `rapporter/{R.name}` på gpt-arbeid.
+
+Hele kostyme 97-familien er nå levert: tolv ark og 95 native siden [felles Linux/Windows 3324](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-bok). Native fryses nå til begge nye pakker er bygget, faktisk hentet og sjekket mot hash og produksjonsgrafikken. Ingen nye pakker er kalt oppdatert ennå. Ingen pågående pakkebygg ble duplisert eller avbrutt. Etter samlepunktet fortsetter neste uleverte, uavhengige jobb i GRAFIKKLISTE med kildeavklaring.
+
+Grafikkautomatikken fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke. Tidligere verktøyavviste motiver og deres hele aliaser omprøves ikke, og ugyldige råvalg 28 for kostyme 97 eller tidligere 344/346 kjøres ikke. Full naturlig gjennomspilling, interaktiv Windows, ny webtest og samlet sluttkontroll gjenstår. Kjente SDL-, inventar- og testhoppbegrensninger står åpne.
+'''
+for name,title in [('memory.md','Gjeldende grafikkstatus'),('STATUS.md','Sist verifisert grafikk')]:
+ p=P/name;t=p.read_text();i=t.find('\n');p.write_text(t[:i+1]+'\n## '+title+', '+now+'\n\n'+text+'\nTidligere oppføringer nedenfor er bevart som historikk.\n'+t[i+1:])
+p=P/'todo.md';t=p.read_text();i=t.find('\n');p.write_text(t[:i+1]+f'''\n## Neste, oppdatert {now}
+
+- [x] Fire øvre svanebåtark fig097_09 til 12 levert og additivt publisert: 48 nye native, 3419 totalt. Alle 21662 filhash, 1300 kilder og tre stasher bekreftet etter hent. Hele familien har tolv ark og 95 native.
+- [x] Alle 48 automatisk OK. Tre ark OK, ett visuelt vurdert SJEKK. Alle 48 vist i begge motorprøver; 718/720 null med samme to kjente 160. 190 originalflater SHA-identiske, 96 par med null utenfor ny figurflate. Alle varianter og 13 hele par sett.
+- [ ] Fullfør felles Linux-/Windows-samlepunkt 3419. Native er fryst. Felles 3324 mangler familiens 95 nye. Bekreft faktiske nedlastinger, sjekksummer, alle moddfiler og faktisk inkludert grafikk før pakkene kalles oppdatert.
+- [ ] Fortsett neste uleverte, uavhengige jobb i GRAFIKKLISTE etter kildeavklaring. Ikke gjenta tolv leverte 97-ark eller tidligere avviste motiver. 477 av 1758 hele resultatark, 1281 gjenstår pluss returer, katalogfeil og sluttkontroll.
+- [ ] Bevar tidligere filer, releaser, 1300 kilder og tre stasher. Ingen ny Tom-/Claude-godkjenning. Full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår; kjente SDL-/inventar-/testhoppbegrensninger er åpne. Gamle nattprosesser forblir avsluttet.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+'''+t[i+1:])
+with (P/'log.md').open('a') as f:f.write('\n\n## '+now+' (Codex)\n\n'+text)
+assert set(git(P,'diff','--name-only').splitlines())=={'memory.md','todo.md','STATUS.md','log.md'}
+shutil.copy2(__file__,R/'oppdater-mainrapport.py.txt');print('Fire dokumentasjonsfiler oppdatert. Native 3419; felles pakker 3324, nytt samlepunkt gjenstår.')
