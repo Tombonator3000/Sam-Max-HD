@@ -1,0 +1,6 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;C=P/'work/.gpt-gren/rapporter'/O.name/'kall'/sys.argv[1]
+f=C/'kall-forsokt.json';assert not f.exists()
+f.write_text(json.dumps(dict(tid_utc=datetime.now(timezone.utc).isoformat(),innebygd_image_gen=True),indent=2)+'\n')

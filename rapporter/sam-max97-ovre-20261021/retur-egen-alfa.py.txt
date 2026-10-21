@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+C=R/'kall'/sys.argv[1];read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=read(C/'plan.json');prior=R/'kall'/plan['retur_fra']/'raa.png';old=np.array(Image.open(prior).convert('RGBA'));new=np.array(Image.open(C/'raa.png').convert('RGBA'));assert old.shape==new.shape==(1024,1536,4)
+new[:,:,3]=old[:,:,3];new[new[:,:,3]==0,:3]=0
+dest=C/'retur-med-egen-alfa.png';assert not dest.exists();Image.fromarray(new).save(dest)
+plan['egen_sammensetting']=dest.name
+plan['alfa_gjenbrukt_fra_helt_eget_maleri']=dict(fil=prior.relative_to(A).as_posix(),sha256=sha(prior),hel_egen_alfa=True,myke_kanter_bevart=True,originalmaske=False,originalfragmenter=False,begrunnelse='Returkallet endret kun liten RGB-detalj men gjorde den gjennomsiktige gløden ugjennomsiktig. Hele den tidligere egne myke alfakanalen beholdes; hele nye RGB-tegningen er fra bildekallet. Visuell nykontroll kreves.')
+(C/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+print(C.name,'hele tidligere egne alfa bevart; ingen kildebasert pikselmaske')

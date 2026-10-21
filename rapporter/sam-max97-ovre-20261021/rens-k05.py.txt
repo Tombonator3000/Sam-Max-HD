@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;C=P/'work/.gpt-gren/rapporter'/O.name/'kall/K05'
+read=lambda p:json.loads(p.read_text());plan=read(C/'plan.json');a=np.array(Image.open(C/'raa.png').convert('RGBA'));before=a[:,:,3].copy()
+# Bare fargen i nye, feilaktige sålemerker. Ingen kildebasert alfamaske.
+rgb=a[:,:,:3].astype(int);r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2];yy,xx=np.indices(a.shape[:2])
+pink=(a[:,:,3]>0)&(r>150)&(r-g>45)&(g<185)&(b>g*.65)&(yy%512>=330)&(yy%512<=465)
+cream=(a[:,:,3]>=128)&(r>225)&(g>205)&(b>160)&(r-g<40)
+_,nearest=nd.distance_transform_edt(~cream,return_indices=True);own_near=a[tuple(nearest)][:,:,:3];a[pink,:3]=own_near[pink]
+assert np.array_equal(before,a[:,:,3]);out=C/'renset-egen-rgb.png';assert not out.exists();Image.fromarray(a).save(out)
+plan['egen_sammensetting']=out.name
+for i,e in enumerate(plan['ruter']):
+ row=i//3;col=i%3
+ e['egen_ruteutsnitt']=[[0,row*512,540,512],[550,row*512,490,512],[1050,row*512,486,512]][col]
+plan['egen_rensing_rgb']=dict(fjernet_egne_feilrosa_saale_piksler=int(pink.sum()),fyll_fra_narmeste_egen_kremfarge=True,alfa_uendret=True,originalmaske=False,originalfragmenter=False)
+plan['egen_utsnitt_begrunnelse']='Første egen tegnings brune hånd stikker én råpiksel inn i naboens nominelle celle. Utsnitt følger hele egne adskilte malerier med mellomrom, uten å kutte hånden eller få med nabodel. Alle hele malerier plasseres deretter i fast 4x.'
+(C/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+print('K05 egen RGB-sålerens',int(pink.sum()),'alfa uendret; hele egne tegningsutsnitt korrigert.')

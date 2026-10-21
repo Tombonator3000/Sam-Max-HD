@@ -1,0 +1,89 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image
+import hashlib,json,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;OLD=A/'rapporter/svanebaat97-20261021';M=P/'mods/gpt'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+R.mkdir(parents=True,exist_ok=False)
+assert subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True)==''
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]
+assert remote=='a7e4d8fcd0fe5b13d00db2b05d93da8bed0d548c'
+protected=read(OLD/'beskyttede-samlet1300.json');assert len(protected)==1300 and all(sha(A/f)==h for f,h in protected.items())
+save(R/'beskyttede-samlet1300.json',protected)
+files={p.relative_to(M).as_posix():sha(p) for p in sorted(M.rglob('*')) if p.is_file()}
+assert read(M/'mod.json')['costume_cels']==3371 and len(files)==21614
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()
+assert stash==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+save(R/'grunnlag-produksjon.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),native=3371,filer=files,stash=stash,fjern_sha=remote,art_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),main_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip()))
+plan=read(OLD/'neste-ovre48.json')
+assert plan['maal']==48 and len({r['rgba_sha256'] for r in plan['ruter']})==48
+for e in plan['jobber']:
+ assert not (A/'jobber'/e['jobb']/'resultat.png').exists() and not (A/'jobber'/e['jobb']/'retur.md').exists()
+ e.update(originalark_visuelt_sett=True,kilde_i_spill_visuelt_sett=True)
+plan.update(visuell_kildekontekst_sett=True,fire_originalark_sett=True,sam_max_stilankere_sett=True,originalark_visuelt_sett=True,kildebrett_visuelt_sett=True,alle48_kildevarianter_ikke_visuelt_sett=False,fire_originalark_ikke_visuelt_sett=False,forrige_rapport='rapporter/'+OLD.name,grunnlag_native=3371)
+save(R/'kildeplan.json',plan)
+groups=[[1920],list(range(1921,1927)),list(range(1927,1933)),list(range(1933,1938)),list(range(1938,1943)),list(range(1943,1948)),list(range(1948,1952)),list(range(1952,1956)),list(range(1956,1962)),list(range(1962,1968))]
+phases=[
+ 'One COMPLETE source drawing: BOTH characters AND THE ENTIRE WHITE SWAN BOAT are present in this one initial source frame. Sam is seen in right profile, turned toward Max in his hands. Max has a blackened head with limp wispy black ears and tiny soot flecks, cream torso, dangling legs, arms spread. Preserve the long white swan boat with raised feather tail left, curved neck and black bill right, gray ribbed neck band and tiny gray and tan markings. The fourth input image is the separately redrawn boat used only for matching its visual style and details. Redraw this entire source as one complete image, do not omit its boat.',
+ 'Sam holds Max up to his left while his upper torso turns from right profile to a three-quarter front view. Sam wears the blue gray fedora and suit, white shirt, diagonal dark blue and black striped tie; his raised brown hand wraps around Max at the waist, his other brown hand stays at the lower right. Max has a normal cream torso and limbs but a TEMPORARILY BLACKENED head and crooked black wispy ears, little gray smoke strokes/soot particles, a small pink nose and bright white toothy grin. Keep every differing head tilt, eye/mouth phase and tiny wisp in its source. The black head is intentional, not a palette error. No boat is present in these sources.',
+ 'Sam continues holding Max at his left in near-front view, the blackened head changes tilt and Max raises an arm while Sam changes mouth expression. Retain Max\'s cream torso and dangling legs, soot black head and wispy crooked black ears, small pink nose, white grin and tiny soot/smoke particles. Each source is a different frame; do not copy the same pose across cells. Sam remains blue gray with dark striped tie and brown ears/muzzle/hands. No boat in these sources.',
+ 'This is the recovery sequence, exactly as pictured: first Max still has a black head and limp black ears while spreading his arms; next two frames show his long ears springing upward as the black coating clears unevenly to cream with pink inner ears; last two frames are deliberate HEAD-SHAKING MULTIPLE EXPOSURES: several overlapping outlines of the SAME rabbit head and ears, small black soot specks, a little red mouth/tongue. Keep the exact differing afterimage shape in each of the last two drawings. Sam holds Max at waist level at his left throughout; do not normalize all heads to a clean standing master pose. No boat.',
+ 'Max is now his normal cream white self with pink inner ears, tiny pink nose and broad toothy grin. Sam holds him up at the left, normal front/three-quarter view. The five frames have subtly different eyes, mouth, ear tilt and hand contact. Keep those differences, the tiny residual soot specks in the first frames, Sam\'s blue gray suit/hat and striped tie, brown muzzle/hands. No boat, no new legs below the source\'s cropped torso.',
+ 'Sam lowers Max back into the boat, then turns right. Redraw exactly the FIVE different combined upper-body drawings: Max descending at the left with ears/arms changing and then becoming upright in front of Sam; Sam\'s brown raised hand opens and lowers, his muzzle turns to right profile, and his right arm extends toward the right in the final drawing. Preserve every source overlap and the thin small gray/white lower-edge source marks if present. The boat itself is NOT part of these sources and must not be added. Do not extend bodies beyond their source cut edge.',
+ 'The combined upper-body drawing turns from right profile toward back view. Max is in the foreground: first profile then turning fully away with the blank cream BACK OF HIS HEAD between long upright ears. Sam is behind him, turning away in blue gray jacket and hat with brown ears/hands and changing arm positions. By the last drawings both are viewed from behind. Preserve the exact overlaps and partial torso cutoff. No boat. No eyes or grin on the back of Max\'s head.',
+ 'Both characters are viewed FROM BEHIND, Max in foreground with long cream ears and completely blank back of head, small circular tail, short partial body and arms, Sam behind in blue gray fedora/jacket, brown ears and brown hands. Sam takes steps away so his hat, shoulders, hands and lower torso change position between the four source frames. Preserve actual silhouette, differing arm positions and partial lower edges. No boat; no eyes/grin on backs of heads.',
+ 'ONLY MAX is in these six source frames, viewed from behind, no Sam. First two are upright partial upper bodies with ears up and hands by his sides. Then his floppy ears fall outward as he jumps: third has long dangling feet with pink soles, fourth has sideways ears and legs tucked, fifth and sixth have ears upright again with legs tucked in distinct poses. Keep all six separate poses and the blank backs of heads, small circular tail and cream/soft tan shading. No face, no boat, no floor, no extra body beyond source.',
+ 'ONLY MAX from behind in SIX final jump/duck frames, no Sam or boat. First has ears upright, arms raised and feet dangling; second is only long ears, back of head and little hands above the source cutoff; third and fourth are the little bent feet/legs with pink soles and a narrow cream body edge while he is inverted/ducking below the boat rim, with exact smaller source silhouettes; fifth is back of his head with floppy ears and a tiny neck/shoulder edge; sixth is back of head with ears up and tiny shoulder edge. Do not complete absent body parts, add a face, or turn the bent foot fragments into rabbit faces. Preserve original unusual squash/stretch and motion poses.'
+]
+byname={r['bilde']:r for r in plan['ruter']}
+for k,(nums,phase) in enumerate(zip(groups,phases),1):
+ name=f'K{k:02}';C=R/'kall'/name;C.mkdir(parents=True)
+ canvas=Image.new('RGB',(1536,1024),'#596978');rows=[]
+ for i,num in enumerate(nums):
+  n=f'costume097_{num}';e=byname[n];src=Image.open(e['kilde']).convert('RGBA');assert sha(Path(e['kilde']))==e['sha256']
+  assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']
+  cell=[0,0,1536,1024] if k==1 else [i%3*512,i//3*512,512,512]
+  scale=8 if k==1 else 5
+  draw=src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST)
+  assert draw.width<cell[2]-40 and draw.height<cell[3]-40
+  pos=(cell[0]+(cell[2]-draw.width)//2,cell[1]+(cell[3]-draw.height)//2)
+  canvas.paste(draw,pos,draw)
+  rows.append(dict(bilde=n,canonical_rgba_sha256=e['rgba_sha256'],celle=cell,kilde_sha256=e['sha256'],kilde_maal=e['maal'],original_plassering_atlas=list(pos),original_skala_atlas=scale))
+ canvas.save(C/'originalatlas.png')
+ refs=[str(C/'originalatlas.png'),str(A/'hovedark/sam.png'),str(A/'hovedark/max.png')]
+ if k==1:refs.append(str(OLD/'kall/K01/costume097_1841-prototype-v1.png'))
+ instruction=f'''Use case: identity-preserve. Production asset: faithful HD animation artwork for Sam & Max Hit the Road (1993), costume 97 in room 22, Tunnel of Love.
+
+Image 1 is the exact ORIGINAL POSE ATLAS to redraw. Images 2 and 3 are approved Sam and Max master sheets for the same character design, ink and color treatment ONLY. The original atlas overrides a master's pose, framing and temporary gag colors. Do not render the master sheets. The slate gray background is padding and must become genuine transparent alpha.
+
+Redraw exactly {len(nums)} complete separate source drawings on ONE 1536 x 1024 transparent canvas. {'One centered drawing, same shape and location as the original.' if k==1 else 'Use the same 3 columns by 2 rows of 512 x 512 cells as image 1, left to right then top to bottom. Keep unused cells completely empty. Each original in its same cell and same position; ample transparent gaps between drawings.'} No labels, numbers, cell borders or background. Do not merge/split drawings or repeat a single pose to replace different frames.
+
+SOURCE MEANING AND PHASE: {phase}
+
+Faithfulness: trace the exact silhouette, proportions and internal geometry of every source, keeping head/torso size ratio, hats, muzzles, eyes, hands, grins and all overlaps. Turn each pixel cluster into the smooth drawn shape it represents. Same size and same viewing angle. Preserve partial drawings exactly; do not complete absent bodies. Clean dark continuous anti-aliased ink, flat clean colors with one shade and a few small highlights, same area colors as the original, same identity and line weight as approved masters. No pixel blocks, staircase edges, dithering, grain, texture, blur, gradients, photorealism or 3D. Do not enlarge heads, eyes, ears or hands relative to bodies. Keep the source's visible small disconnected motion marks; do not add decorative debris or glow.
+
+Cell order and eventual source-size at 4x (not a license to fill the cell): '''+', '.join(f"{i+1}: {n}, {byname[f'costume097_{n}']['maal'][0]*4} x {byname[f'costume097_{n}']['maal'][1]*4} HD pixels" for i,n in enumerate(nums))+'''. The atlas is temporarily magnified for painting; final entire drawings will be placed at fixed 4x with their own soft alpha. Do not change relative shape to use empty cell space.
+
+Output ONE 1536 x 1024 RGBA image with real transparent background. No boat unless this source explicitly includes one, no scenery, floor shadows, words, watermark or signature.
+'''
+ (C/'prompt-faktisk.txt').write_text(instruction)
+ save(C/'argumenter-faktisk.json',dict(prompt=instruction,referenced_image_paths=refs,transparent_background=True))
+ save(C/'plan.json',dict(kall=name,ruter=rows,betydning=phase,ingen_kall_enna=True,kilde_og_kontekst_sett=True,reference_atlas_sett=False,referanser_sha256={p:sha(Path(p)) for p in refs}))
+for helper in ['registrer.py','rens-plasser.py']:
+ shutil.copy2(P/'out/svanebaat97-20261021'/helper,O/helper)
+(R/'KILDEGRUNNLAG.md').write_text('''# Sam og Max i svanebåten, øvre lag, 21. oktober 2026
+
+Fire hele jobber fig097_09 til 12, 48 unike hele RGBA-kilder 1920 til 1967. Alle fire originalark og alle 48 kilder med faktisk spillkontekst i åtte brett fra forrige rapport er nå visuelt sett. Begge godkjente hovedark og båten som stilstøtte er sett før første motiv. Kildeprøvene primaer201 og kilde97 i rapporter/svanebaat97-20261021 logger alle 95 familieruter i gyldige hele valg; ny avspilling av samme grunnlag er ikke nødvendig for å fastslå kilden. Originalark og fire beskyttede filer endres ikke.
+
+Viktig presisering etter full kildevisning: rute 1920 er én hel tegning med båten, Sam og Max, selv om den ligger i lag 15. Den skal derfor nytegnes hel med båt. Rute 1921 til 1955 er ulike kombinerte figurtegninger uten hel båt; 1956 til 1967 viser Max alene og flere bevisst avskårne mellomfaser. De små grå/hvite kildedelene langs underkanten beholdes. Dette korrigerer den forrige generelle beskjed om aldri å tegne båt i øvre lag. Den gjaldt ikke 1920. Ingen originalfragmenter kopieres inn i nytegningen.
+
+Sekvensen etter lysblinkene har Max med midlertidig svart hode, slappe svarte ører og små sot-/røykstreker. Han kommer tilbake til normal kremfarge med rosa øreinnsider, rister hodet med faktiske doble/triple bevegelsesomriss, senkes ned av Sam, snur seg og hopper/dykker bak båtkanten. Bakfra skal Max ikke få ansikt eller glis. Sam beholder blågrå dress og hatt, hvit skjorte, mørk blå/svart stripet slips og brunt hode/hender. Hver forskjellig kilde får et eget helt maleri; ingen av de 48 er identiske hele aliaser.
+
+Plan: ti innebygde bildekall med hele varianter i faste celler. Råbilde, faktisk prompt, argumenter, kildehash og referansehash bevares per kall. Python brukes kun til egen alfarenser og hel plassering i fast 4x, uten hard originalmaske eller originale bildefragmenter. Native porter CORE128, IoU 0,6 og dekning 0,8 beholdes. Levering, egenkontroll, visuell kontroll, native mottak, motorobservasjon, publisering og pakker kvitteres separat. Ingen ny Tom-/Claude-godkjenning.
+
+Grunnlaget er publisert native 3371, fjern-SHA a7e4d8fcd0fe5b13d00db2b05d93da8bed0d548c. 21614 tidligere filer, 1300 beskyttede kilder og tre stasher er kontrollert. Eksisterende avviste motiver er utenfor denne uavhengige produksjonen og omprøves ikke. Bibliotekskilder: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter, publisert-mod-er-fasit.
+''')
+shutil.copy2(__file__,R/'klargjor.py.txt')
+print('Fire originalark og 48 kilder sett; 10 kall klargjort uten å sende. 3371/21614/1300/3 bevart.')

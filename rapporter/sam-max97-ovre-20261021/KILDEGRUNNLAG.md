@@ -1,0 +1,13 @@
+# Sam og Max i svanebåten, øvre lag, 21. oktober 2026
+
+Fire hele jobber fig097_09 til 12, 48 unike hele RGBA-kilder 1920 til 1967. Alle fire originalark og alle 48 kilder med faktisk spillkontekst i åtte brett fra forrige rapport er nå visuelt sett. Begge godkjente hovedark og båten som stilstøtte er sett før første motiv. Kildeprøvene primaer201 og kilde97 i rapporter/svanebaat97-20261021 logger alle 95 familieruter i gyldige hele valg; ny avspilling av samme grunnlag er ikke nødvendig for å fastslå kilden. Originalark og fire beskyttede filer endres ikke.
+
+Viktig presisering etter full kildevisning: rute 1920 er én hel tegning med båten, Sam og Max, selv om den ligger i lag 15. Den skal derfor nytegnes hel med båt. Rute 1921 til 1955 er ulike kombinerte figurtegninger uten hel båt; 1956 til 1967 viser Max alene og flere bevisst avskårne mellomfaser. De små grå/hvite kildedelene langs underkanten beholdes. Dette korrigerer den forrige generelle beskjed om aldri å tegne båt i øvre lag. Den gjaldt ikke 1920. Ingen originalfragmenter kopieres inn i nytegningen.
+
+Sekvensen etter lysblinkene har Max med midlertidig svart hode, slappe svarte ører og små sot-/røykstreker. Han kommer tilbake til normal kremfarge med rosa øreinnsider, rister hodet med faktiske doble/triple bevegelsesomriss, senkes ned av Sam, snur seg og hopper/dykker bak båtkanten. Bakfra skal Max ikke få ansikt eller glis. Sam beholder blågrå dress og hatt, hvit skjorte, mørk blå/svart stripet slips og brunt hode/hender. Hver forskjellig kilde får et eget helt maleri; ingen av de 48 er identiske hele aliaser.
+
+Plan: ti innebygde bildekall med hele varianter i faste celler. Råbilde, faktisk prompt, argumenter, kildehash og referansehash bevares per kall. Python brukes kun til egen alfarenser og hel plassering i fast 4x, uten hard originalmaske eller originale bildefragmenter. Native porter CORE128, IoU 0,6 og dekning 0,8 beholdes. Levering, egenkontroll, visuell kontroll, native mottak, motorobservasjon, publisering og pakker kvitteres separat. Ingen ny Tom-/Claude-godkjenning.
+
+Grunnlaget er publisert native 3371, fjern-SHA a7e4d8fcd0fe5b13d00db2b05d93da8bed0d548c. 21614 tidligere filer, 1300 beskyttede kilder og tre stasher er kontrollert. Eksisterende avviste motiver er utenfor denne uavhengige produksjonen og omprøves ikke. Bibliotekskilder: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter, publisert-mod-er-fasit.
+
+Etter bevegelses- og posisjonskontroll før K10:1964 og1965 er foldede øretupper mens hodet dukker bak rim-y153, ikke føtter. Alle1963..67 slutter på rom-y153, og1962..67 har ingen rosa kildepiksler. Den separate faktiske prompten er korrigert før kall; historisk forberedelse beholdes.
