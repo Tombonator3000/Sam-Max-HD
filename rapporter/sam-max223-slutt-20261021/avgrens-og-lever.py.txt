@@ -1,0 +1,33 @@
+from pathlib import Path
+import json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+p=R/'ruteplan-unik.json';d=read(p);shutil.copy2(p,R/'ruteplan-unik-foer-avvisning.json');jobs=['fig223_08','fig223_09','fig223_11'];held=[j for j in d['jobber'] if j not in jobs];entries=[]
+for e in d['ruter']:
+ v=e.copy();v['malruter']=[t for t in v['malruter'] if t['jobb'] in jobs]
+ if v['malruter']:entries.append(v)
+assert len(entries)==10 and sum(len(e['malruter']) for e in entries)==27
+assert not {'costume223_1951','costume223_1987'}&{e['bilde'] for e in entries}
+d.update(jobber=jobs,ruter=entries,mal=27,hele_rgba_varianter=10,ingen_bildekall=False,tilbakeholdte_jobber=held,opprinnelig_mal=64,opprinnelig_hele_varianter=14,grunn='R01 avvist av bildeverktøyets sikkerhetssystem. Fem hele ark avhenger av de to poseringene. Bare tre uavhengige hele ark leveres.');save(p,d);save(R/'tilbakeholdt.json',dict(jobber=held,mal=37,kilder=['costume223_1951','costume223_1987'],ingen_nye_forsok=True,ingen_resultatark=True,tidligere_utkast_urort=True,uenighet_ikke_avklart=True))
+s=(P/'out/sam-max223-foerste-20261021/lever.py').read_text();s=s.replace("C=O/'mod-bok3306'","C=O/'mod-bok3333'").replace("base['native']==3276 and len(base['filer'])==21519","base['native']==3306 and len(base['filer'])==21549")
+i=s.index('choose={');k=s.index('\nfor call,names',i);s=s[:i]+"choose={'K01':['costume223_1965','costume223_1978'],'K02':[f'costume223_{n}' for n in range(1979,1983)],'K03':['costume223_1983','costume223_1984'],'K04':['costume223_1988','costume223_1997']}"+s[k:]
+s=s.replace('len(selected)==11','len(selected)==10').replace("glob('fig*/resultat.png')))==458","glob('fig*/resultat.png')))==463").replace('len(target)==30','len(target)==27')
+i=s.index(" (J/'notat.md').write_text(");k=s.index('\nprogress=dict(',i)
+s=s[:i]+''' (J/'notat.md').write_text(f\'''# {job}, 21. oktober 2026
+
+Sam og Max med den åpne boken i Conroys soverom, rom 45, kostyme 223 og palett 0. Sam sitter på huk, løfter hånden til munnen, senker den over boken og bøyer hodet ned. Max ligger flat under boken med kildens kremfargede lemmer og rosa ørestriper. Begge figurer og boken følger hver hel tegning. Vanlig gående Max i kontrollprøven er en separat aktør og er ikke tegnet inn i disse rutene.
+
+Alle åtte planlagte originalark, de aktuelle kildene i faktisk spillkontekst og begge godkjente hovedark er sett. Det kontrollerte foregående hele bokmaleriet 1949 brukes som fjerde stilreferanse. Originalt premiss om generell startpose er korrigert i separat faktisk prompt. Jobb-, referanse- og promptfiler er uendret. Kilder og primærskript 210 er lest, men selve naturlige boksekvensen er ikke avspilt. Gyldig hel animasjon 6 brukes i kilde- og motorprøven, uten å skjule andre aktører eller romskript.
+
+Planen var åtte ark, 64 mål og 14 hele malerier. Fire innebygde image_gen-kall ga råbilder. K01_1951 fikk feil rødt munninnslag, og K03_1987 vendte hodet for langt fram. Rettingskallet R01 for disse to ble avvist av bildeverktøyets sikkerhetsfilter i utgangskontrollen, moderation_blocked, kategori other, forespørsel ec8fbab7-35fb-48c1-a914-96c0a57af924. Ingen ny råfil ble returnert. Faktiske argumenter og feilen er bevart. Det er ikke gjort nye forsøk med andre formuleringer, andre grensesnitt eller fragmenter. Ingen Python-reparasjon av avviste poseringer. Fem hele ark som avhenger av disse kildene, er holdt tilbake med 37 mål. Gode ubrukte utkast 1950 og 1986 er også bevart uten publisering av delvise ark.
+
+Denne leveransen omfatter bare tre uavhengige hele ark: fig223_08, fig223_09 og fig223_11. De gir 27 native mål fra ti valgte hele egne tegninger og 17 eksakte hele RGBA-aliasmål. Modellbetegnelse ble ikke oppgitt. Fire råbilder, alle fem forsøkenes faktiske prompter, referansehash og avvisningsnotat er bevart i rapporter/{R.name}. Ingen ny godkjenning fra Tom eller Claude.
+
+Python renser glød utenfor egen CORE128-kjerne og plasserer hver egen hel tegning i fast 4x med åtte HD-pikslers marg. Egen myk alfa og egne kantfarger beholdes. Ingen harde originale pikselmasker eller originale bildefragmenter. Ingen rekonstruerte avviste motiver. Den røde kildemunnen i 1980 er bevart; andre valgte munnfaser har ikke rødt. Ingen nye leselige bokord er lagt til.
+
+Resultat 1536 x 1024 RGBA med ekte alfa. SHA256 {digest}. Egenkontroll {deliveries[-1]['egenkontroll']}. SHA-festet rutekart i rapporter/{R.name}. Faste porter CORE128, IoU 0,6 og dekning 0,8 er uendret. Samlet arkvisning, native mottak, motor, publisering og faktisk pakkeinnhold kvitteres separat. Alle 1252 kildehash, 21549 tidligere publiserte filer og tre stasher bevares. Bibliotekskilder: figurark-fast-storrelse og publisert-mod-er-fasit. Ingen motor- eller pipelinekode er endret.
+\''')
+''' + s[k:]
+i=s.index('progress=dict(');k=s.index("\nsave(R/'fremdrift.json'",i);s=s[:i]+"progress=dict(leveranser=deliveries,nye_jobber_levert=3,nye_native_planlagt=27,ulike_hele_egne_malerier=10,nye_malerier=10,hele_rgba_aliasmal=17,innebygde_bildekall=5,vellykkede_bildekall=4,avviste_bildekall=1,returkall=1,grunnlag_native=3306,hele_figurjobber_med_resultat=466,total_figurjobber=1758,gjenstar=1292,tilbakeholdte_jobber=plan['tilbakeholdte_jobber'])"+s[k:]
+s=s.replace('automatisk-mottak30.json','automatisk-mottak27.json').replace("report['ruter_ok']==30","report['ruter_ok']==27").replace("meta['costume_cels']==3276;meta['costume_cels']=3306","meta['costume_cels']==3306;meta['costume_cels']=3333").replace('len(files)==21549','len(files)==21576').replace('nye_native=30,native_totalt=3306','nye_native=27,native_totalt=3333').replace('automatisk30_OK=True','automatisk27_OK=True').replace('tidligere_filer_bevart=21519,tidligere_png_bevart=21513,filer=21549','tidligere_filer_bevart=21549,tidligere_png_bevart=21543,filer=21576').replace('Fem hele ark, 30 automatisk OK, kandidat 3306.','Tre uavhengige hele ark, 27 automatisk OK, kandidat 3333.')
+(O/'lever.py').write_text(s);shutil.copy2(__file__,R/'avgrens-og-lever.py.txt');print('Tre uavhengige hele ark avgrenset. Fem holdes tilbake. Ingen avviste kilder inngår i mottaket.')

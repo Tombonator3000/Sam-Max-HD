@@ -1,0 +1,3 @@
+# Stopp for to avviste rettingsmotiver
+
+Det innebygde bildeverktøyet avviste R01 i utgangskontrollen med moderation_blocked, kategori other, forespørsel ec8fbab7-35fb-48c1-a914-96c0a57af924. Ingen råfil ble returnert. Faktisk prompt og argumenter er bevart. Kildene costume223_1951 og costume223_1987 skal ikke omprøves med ny formulering, andre grensesnitt eller ved å sette sammen fragmenter. Tidligere K01_1951 har feil rødt munninnslag; K03_1987 har for frontal hodevinkel. Disse utkastene skal ikke publiseres eller repareres som en omgåelse. Hele ark som trenger dem holdes tilbake. Uavhengige kildebekreftede tegninger og tidligere publisert grafikk kan brukes videre.

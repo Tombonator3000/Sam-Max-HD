@@ -1,0 +1,28 @@
+from pathlib import Path
+import json,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-bok3324';H=R/'utkast3333'
+read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert not H.exists() and not C.exists();H.mkdir()
+for n in ['ruteplan-unik.json','prototyper-endelig.json','egen-native.json','fremdrift.json','kandidatfilhash.json','automatisk-mottak27.json','motor-sammenligning.json','motor-visuell-plan.json','motor-pikselkontroll.json','motor-bufferdiagnose.json']:
+ shutil.copy2(R/n,H/n)
+for n in ['motor.py','vis-motor.py','lever.py']:shutil.copy2(O/n,H/(n+'.txt'))
+J=A/'jobber/fig223_11';D=H/'fig223_11';D.mkdir();shutil.move(J/'resultat.png',D/'resultat.png');shutil.move(J/'notat.md',D/'notat.md');shutil.move(R/'rutekart-fig223_11.json',D/'rutekart-fig223_11.json')
+plan=read(R/'ruteplan-unik.json');plan['jobber']=['fig223_08','fig223_09'];entries=[]
+for e in plan['ruter']:
+ v=e.copy();v['malruter']=[t for t in v['malruter'] if t['jobb'] in plan['jobber']]
+ if v['malruter']:entries.append(v)
+plan.update(ruter=entries,mal=18,hele_rgba_varianter=8,tilbakeholdte_jobber=['fig223_06','fig223_07','fig223_10','fig223_11','fig223_12','fig223_13'],grunn='R01 er verktøyavvist. K04 har for sterk sidevinkel i1988 og1997 i motorvisning. Seks hele ark med46mål holdes tilbake; bare to uavhengige hele ark leveres.');save(R/'ruteplan-unik.json',plan)
+selected=[e for e in read(R/'prototyper-endelig.json') if e['bilde'] not in ['costume223_1988','costume223_1997']];assert len(selected)==8;save(R/'prototyper-endelig.json',selected)
+native=read(R/'egen-native.json');native['ruter']=[e for e in native['ruter'] if e['canonical'] not in ['costume223_1988','costume223_1997']];assert len(native['ruter'])==18
+native.update(nye_native=18,native_totalt=3324,automatisk18_OK=False,filer=21567,png=21561);native.pop('automatisk27_OK',None);save(R/'egen-native.json',native)
+p=read(R/'fremdrift.json');p['leveranser']=[e for e in p['leveranser'] if e['jobb'] in plan['jobber']];p.update(nye_jobber_levert=2,nye_native_planlagt=18,ulike_hele_egne_malerier=8,nye_malerier=8,hele_rgba_aliasmal=10,hele_figurjobber_med_resultat=465,gjenstar=1293,nye_native=18,native_totalt=3324,tilbakeholdte_jobber=plan['tilbakeholdte_jobber']);save(R/'fremdrift.json',p)
+base=read(R/'grunnlag-produksjon.json');assert all(sha(M/f)==h for f,h in base['filer'].items());shutil.copytree(M,C)
+for e in native['ruter']:
+ assert not (C/e['fil']).exists();shutil.copy2(A/e['prototype'],C/e['fil']);assert sha(C/e['fil'])==e['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3306;meta['costume_cels']=3324;save(C/'mod.json',meta);files={q.relative_to(C).as_posix():sha(q) for q in C.rglob('*') if q.is_file()};assert len(files)==21567 and {f for f,h in base['filer'].items() if files[f]!=h}=={'mod.json'};save(R/'kandidatfilhash.json',files)
+hold=read(R/'tilbakeholdt.json');hold.update(jobber=plan['tilbakeholdte_jobber'],mal=46,visuell_motorretur=['costume223_1988','costume223_1997'],verktøyavvisning_uavklart=True,ingen_nye_bildekall_etter_avvisning=True);hold.pop('uenighet_ikke_avklart',None);save(R/'tilbakeholdt.json',hold)
+(R/'K04-motorretur.md').write_text('# K04 holdes tilbake etter motorvisning\n\nK04_1988 og K04_1997 passerer silhuettportene, men hodene har for mye sidevinkel mot kildens mer frontvendte nese/hatt. Ingen publisering av disse to. Hele fig223_11 er flyttet til utkast3333 sammen med første kandidatkvittering. Ingen tidligere publisert fil fjernes. Det gjøres ikke nye bildekall eller fragmentrettinger etter R01-avvisningen. To uavhengige ark er gjeldende leveranse.\n')
+for e in p['leveranser']:
+ note=A/e['resultat'];note=note.with_name('notat.md');s=note.read_text();s=s.replace('Fem hele ark som avhenger av disse kildene, er holdt tilbake med 37 mål.','Etter motorvisningen er også K04_1988 og K04_1997 holdt tilbake med for stor sidevinkel. Seks hele ark med 46 mål holdes tilbake. Ingen nye bildekall etter avvisningen.');s=s.replace('tre uavhengige hele ark: fig223_08, fig223_09 og fig223_11','to uavhengige hele ark: fig223_08 og fig223_09').replace('27 native mål fra ti valgte hele egne tegninger og 17 eksakte','18 native mål fra åtte valgte hele egne tegninger og ti eksakte');note.write_text(s)
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==465
+shutil.copy2(__file__,R/'motorretur.py.txt');print('Kandidat3333 bevart som utkast. Ny kandidat3324 har18 uavhengige ruter og alle21549 tidligere filer. Seks ark holdes tilbake.')

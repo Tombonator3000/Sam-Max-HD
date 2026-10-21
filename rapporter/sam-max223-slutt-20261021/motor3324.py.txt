@@ -1,0 +1,9 @@
+from pathlib import Path
+import subprocess,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/'bok-grunnlag3306.json');assert b['exit']==0 and len(b['kontroller'])==360 and b['binar_sha256']=='d3b0283d32a563f2fdc22edf6cc53aa8ed0dc492e0fd2e30c8402861097b1a9d';assert all(sha(P/'mods/gpt'/f)==h for f,h in read(R/'grunnlag-produksjon.json')['filer'].items())
+assert all(sha(O/'mod-bok3324'/f)==h for f,h in read(R/'kandidatfilhash.json').items());auto=read(O/'automatisk-mottak18/myke.json');assert auto['ruter_ok']==18 and all(auto[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']);save(R/'automatisk-mottak18.json',auto);d=read(R/'egen-native.json');d['automatisk18_OK']=True;save(R/'egen-native.json',d)
+label='bok-kandidat3324';s=(P/'out/sam-max223-kilde-20261021/kildemotor223.py').read_text().replace('kildemotor223',label).replace('felles-release-20261021-sam303','felles-release-20261021-max-intro').replace("str(P/'mods/gpt')","str(O/'mod-bok3324')");f=O/(label+'.py');f.write_text(s)
+q=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,capture_output=True,text=True,timeout=230);(R/(label+'-utskrift.txt')).write_text(q.stdout+q.stderr);print(q.returncode,q.stdout,flush=True);assert q.returncode==0
+shutil.copy2(__file__,R/'motor3324.py.txt')

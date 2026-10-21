@@ -1,0 +1,17 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert read(O/'mod-bok3333/mod.json')['costume_cels']==3333
+assert all(sha(O/'mod-bok3333'/f)==h for f,h in read(R/'kandidatfilhash.json').items())
+assert sha(P/'out/felles-release-20261021-max-intro/linux/squashfs-root/usr/bin/scummvm')=='d3b0283d32a563f2fdc22edf6cc53aa8ed0dc492e0fd2e30c8402861097b1a9d'
+def run(label):
+ s=(P/'out/sam-max223-kilde-20261021/kildemotor223.py').read_text().replace('kildemotor223',label).replace('felles-release-20261021-sam303','felles-release-20261021-max-intro')
+ if label=='bok-kandidat3333':s=s.replace("str(P/'mods/gpt')","str(O/'mod-bok3333')")
+ f=O/(label+'.py');f.write_text(s);print('Starter faktisk Linux:',label,flush=True)
+ q=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,capture_output=True,text=True,timeout=230);(R/(label+'-utskrift.txt')).write_text(q.stdout+q.stderr);print(label,q.returncode,q.stdout.strip(),flush=True);assert q.returncode==0
+ return read(R/(label+'.json'))
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,['bok-grunnlag3306','bok-kandidat3333']))
+assert all(v['exit']==0 and len(v['tegninger'])==94 for v in rows)
+shutil.copy2(__file__,R/'motor.py.txt');print('To faktiske Linux-avspillinger ferdig. Visuell kontroll og pikseldiagnose gjenstår.',flush=True)

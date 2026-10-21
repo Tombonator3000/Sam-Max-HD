@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=R/'kall/R01'
+read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert not C.exists();C.mkdir();entries=[];atlas=Image.new('RGBA',(1536,1024),(255,0,255,255));old=[]
+for i,(call,name) in enumerate([('K01','costume223_1951'),('K03','costume223_1987')]):
+ d=read(R/'kall'/call/'plan.json');e=next(v.copy() for v in d['ruter'] if v['bilde']==name);im=Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA');cut=im.crop(im.getbbox());w,h=cut.width*6,cut.height*6;x=i*768+(768-w)//2;y=(1024-h)//2;atlas.alpha_composite(cut.resize((w,h),Image.Resampling.NEAREST),(x,y));e.update(celle=[i*768,0,768,1024],reference_pos=[x,y],reference_skala=6,maal=[w,h]);entries.append(e);old.append((R/'kall'/call/'opprinnelige-prompter.txt').read_text())
+atlas.save(C/'reference-atlas.png');(C/'opprinnelige-prompter.txt').write_text('\n\n'.join(old))
+anchor=read(R/'kall/K01/argumenter-faktisk.json')['referenced_image_paths'][3];refs=[str(C/'reference-atlas.png'),str(A/'hovedark/sam.png'),str(A/'hovedark/max.png'),anchor]
+prompt='''Redraw exactly TWO complete Sam and Max game animation paintings in one 1536 x 1024 RGBA PNG with REAL transparent background. Image1 is the exact pose and geometry atlas. Left cell is costume223_1951, right cell is costume223_1987. Image2 is approved Sam identity/style, Image3 approved Max identity/style, Image4 our checked preceding book-scene painting for consistent linework and colors only. The atlas alone controls pose, size, angles and proportions. Copy its whole drawings at their exact locations. Smooth clean anti-aliased hand-drawn varied line weight, flat source colors. No pixel steps, glow, shadow, floor, background, gradients, texture, grid or labels.
+
+BOTH complete paintings: Sam crouches on bent knees, his image-left hand resting at the open book and his other hand low at the bent knee. Both contain the entire open gray two-page BOOK and the entire flattened MAX underneath it, with all source-shaped cream limbs and pale pink ear strips sticking out literally as in the atlas. Do not complete a new rabbit face or grin, extra upright Max, extra limb, blanket or clothes. Preserve the exact overlaps, small cream shapes, source foot contacts and page folds. Only small gray page-mark strokes, no invented readable words.
+
+Critical correction LEFT1951: Sam's mouth is CLOSED with a dark curved mouth line. NO RED anywhere in Sam's muzzle. The source contains zero red mouth pixels. Do not invent a tongue, open mouth interior or grin. His muzzle points three-quarter LEFT, with the large visible ear on image-right. Preserve the source hand and hat pose. The earlier phrase about a mouth difference was too broad and is replaced by the literal atlas.
+
+Critical correction RIGHT1987: the head turns just a LITTLE more toward the viewer but REMAINS THREE-QUARTER LEFT as drawn. Do NOT make a symmetrical frontal face with two equal dangling ears. Keep the nose LEFT of the face center, the large visible ear on image-right, and the exact slight hat angle from the atlas. This is a small rotation relative to the left cell, not a fully frontal pose. Closed dark mouth, no red tongue. The brim covers the source eye area naturally. Keep the whole body, book and flattened Max exactly in the same source positions.
+
+Verified context: costume223, palette0, room45, Conroy's bedroom, local primary script210. No room or separate ordinary walking Max actor belongs in this painting.
+'''
+for i,e in enumerate(entries):prompt+=f'\nCell {i+1}: {e["bilde"]}, rectangle {e["celle"]}, visible top-left {e["reference_pos"]}, size {e["maal"]}. Keep the whole painting here.\n'
+(C/'prompt-faktisk.txt').write_text(prompt);save(C/'argumenter-planlagt.json',dict(prompt=prompt,referenced_image_paths=refs,transparent_background=True));save(C/'plan.json',dict(ruter=entries,jobber=read(R/'ruteplan-unik.json')['jobber'],referanser={f:sha(Path(f)) for f in refs},originalprompt_ordrett=False,originalprompter_bevart_separat=True,retur_for='K01_1951 feil rødt munninnslag og K03_1987 for frontal hodevinkel',kildescene_og_anker_sett=True,ingen_kall_enna=True));shutil.copy2(__file__,R/'retur-plan.py.txt');print('R01: to hele kildeforankrede rettinger, ingen fragmentdeling.')
