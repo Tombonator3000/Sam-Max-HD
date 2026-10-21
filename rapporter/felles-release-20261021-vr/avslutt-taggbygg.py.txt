@@ -1,0 +1,62 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib, json, shutil, subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+api = lambda x: json.loads(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + x], cwd=P, text=True))
+
+s = read(O / 'bygg-startet.json')
+q = read(O / 'publisert.json')
+tag, mod, code = (s[k] for k in ['release_tag', 'hd_mod', 'kode'])
+found = []
+for wf in ['linux.yml', 'windows.yml']:
+    for v in api('actions/workflows/' + wf + '/runs?per_page=30')['workflow_runs']:
+        if v['head_branch'] == tag or v['status'] != 'completed' or v['id'] in [e['id'] for e in q.get('aktive_ekstra_pakkebygg', [])]:
+            found.append(dict(id=v['id'], workflow=wf, head_branch=v['head_branch'], head_sha=v['head_sha'], event=v['event'], status=v['status'], conclusion=v['conclusion'], attempt=v['run_attempt'], url=v['html_url']))
+active = [v for v in found if v['status'] != 'completed']
+tagruns = [v for v in found if v['head_branch'] == tag]
+proof = dict(tid_utc=datetime.now(timezone.utc).isoformat(), bygg=found, aktive=active, native_frys_beholdt=True)
+for D in [O, R]:
+    save(D / 'ekstra-taggbygg.json', proof)
+shutil.copy2(__file__, R / (__file__.split('/')[-1] + '.txt'))
+assert not any(v['status'] == 'completed' and v['conclusion'] != 'success' for v in found), 'Et pakkebygg feilet. Undersøk før nativefrys frigis.'
+if active or not tagruns:
+    print(json.dumps(dict(nativefrys='beholdes', aktive=active, taggbygg_funnet=len(tagruns)), ensure_ascii=False))
+    raise SystemExit(0)
+assert all(v['head_sha'] == code and v['conclusion'] == 'success' for v in tagruns)
+assert api('git/ref/heads/hd-mod')['object']['sha'] == mod
+meta = api('releases/' + str(q['release_id']))
+assert api('releases/latest')['id'] == meta['id'] and not meta['draft']
+aset = lambda m: {(v['id'], v['name'], v['size'], v['digest']) for v in m['assets']}
+assert aset(meta) == aset(read(O / 'release-publisert.json'))
+assert all(sha(P / 'mods/gpt' / f) == h for f, h in read(R / 'moddfiler-3471.json').items())
+proof.update(native_frys_beholdt=False, alle_ekstra_taggbygg_gronne=True, fellesrelease_assets_og_Latest_uendret=True, hd_mod_uendret=mod)
+q.update(native_frys_kan_frigis=True, aktive_ekstra_pakkebygg=[], ekstra_taggbygg=found, nativefrys_frigitt_utc=proof['tid_utc'])
+s.update(native_frys_kan_frigis=True, native_frosset=False, aktive_ekstra_pakkebygg=[])
+for D in [O, R]:
+    save(D / 'ekstra-taggbygg.json', proof)
+    save(D / 'publisert.json', q)
+    save(D / 'bygg-startet.json', s)
+old = 'Nativefrysen beholdes til registrerte ekstra pakkebygg er avsluttet. Ikke dupliser eller avbryt dem.'
+new = 'Nativefrysen er frigitt etter grønt ekstra taggbygg og ny kontroll av uendret hd-mod, Latest og alle fire fellesvedlegg.'
+for folder in [R] + [A / 'rapporter' / n for n in ['sam250-foerste-20261021', 'sam250-midt-20261021', 'sam250-slutt-20261021']]:
+    for n in ['NESTE.md', 'RAPPORT.md']:
+        f = folder / n
+        text = f.read_text()
+        f.write_text(text.replace(old, new, 1))
+for n in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+    f = A / n
+    f.write_text(f.read_text().replace(old, new, 1))
+NR = A / 'rapporter/sam088-kilde-20261021'
+for n in ['NESTE.md', 'KILDEGRUNNLAG.md']:
+    f = NR / n
+    text = f.read_text()
+    text = text.replace('Modden 3471 er fryst under VR-pakkebygget. Ikke publiser native før frysen er frigitt.', 'VR-pakkebygget er ferdig, fellesutgave 3471 er publisert og ekstra taggbygg er grønt. Nativefrysen er frigitt; se rapporter/felles-release-20261021-vr/publisert.json.')
+    f.write_text(text)
+print(json.dumps(dict(nativefrys='frigitt', gronne_taggbygg=[v['id'] for v in tagruns], native=3471, fire_fellesvedlegg_uendret=True), ensure_ascii=False))

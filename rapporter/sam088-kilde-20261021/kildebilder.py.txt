@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+s=read(R/'forundersokelse.json');proof=read(R/'primaer201.json');other=read(R/'kilde88.json');assert len(proof['tegninger'])==len(other['tegninger'])==64
+unique=list(dict.fromkeys(e['canonical'] for e in s['ruter']));by={e['bilde']:e for e in s['ruter']};assert len(unique)==43
+boards=[]
+for start in range(0,43,6):
+ board=Image.new('RGB',(1440,1140),'#596978');dr=ImageDraw.Draw(board)
+ for i,n in enumerate(unique[start:start+6]):
+  e=by[n];q=proof['tegninger'][n];assert sha(Path(e['kilde']))==e['sha256'] and sha(Path(q['fil']))==q['sha256'];x=i%2*720;y=i//2*380;dr.text((x+8,y+8),n+': hel original 4x / faktisk primaersekvens',fill='white')
+  im=Image.open(e['kilde']).convert('RGBA');im=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);im.thumbnail((338,340),Image.Resampling.NEAREST);board.paste(im,(x+8,y+30),im)
+  shot=Image.open(q['fil']).convert('RGB');shot.thumbnail((350,330),Image.Resampling.LANCZOS);board.paste(shot,(x+360,y+35))
+ f=R/f'kilde-kontekst-{start//6+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),kilder=unique[start:start+6],visuelt_sett=False))
+s.update(gyldige_raw_valg=[4,5,6,7,24,25,26,27],raw28_ugyldig_ikke_kjort=True,primaerskript=201,primaer_aktor=9,primaer_pos=[130,104],hel_animasjon=6,begge_kildeprover64_logget=True,kildemotor_nullkontroller=718,kildemotor_kontroller=720,ingen_nye_bildekall=True,alle_kildeark_og_varianter_enna_ikke_sett=True)
+save(R/'kilde-visuell-plan.json',dict(tavler=boards,hele_varianter=43,visuelt_sett=False));save(R/'forundersokelse.json',s);shutil.copy2(__file__,R/'kildebilder.py.txt');print('Åtte kildetavler: 43 hele varianter med faktisk primærkontekst. Begge prøver logget alle 64 mål.')

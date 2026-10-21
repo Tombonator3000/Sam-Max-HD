@@ -1,0 +1,11 @@
+from pathlib import Path
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;S=P/'out/sam250-slutt-20261021'
+s=(S/'motor.py').read_text().replace("PK=P/'out/felles-release-20261021-svanebaat/linux/squashfs-root'","PK=O/'linux/squashfs-root'")
+s=s.replace("label=sys.argv[1]; primary=label.endswith('primaer211');assert label in ['grundlag-hel6','kandidat-hel6','grundlag-primaer211','kandidat-primaer211','kandidat-r06-hel6','kandidat-r06-primaer211','kandidat-endelig-hel6','kandidat-endelig-primaer211']","label=sys.argv[1]; primary=label.endswith('primaer211');assert label in ['grundlag-hel6','pakke-hel6','grundlag-primaer211','pakke-primaer211']")
+s=s.replace("assert sha(B)=='8d7190620f3039a79ee55fe3630725a3886cb5888fce4f0b11fd04adf044e2d8'","assert sha(B)==json.loads((R/'linux-nedlasting-kontroll.json').read_text())['binar_sha256']")
+s=s.replace("str(O/('mod-sam2503471-endelig' if label.startswith('kandidat-endelig') else 'mod-sam2503471')) if label.startswith('kandidat') else str(P/'mods/gpt')","str(D/'mods/gpt') if label.startswith('pakke') else str(P/'out/felles-release-20261021-svanebaat/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt')")
+s=s.replace("json.loads((R/'forundersokelse.json').read_text())['ruter']","json.loads((R/'nye-native52.json').read_text())['ruter']")
+(O/'motor.py').write_text(s)
+s=(S/'motor-fire.py').read_text().replace("labels=['grundlag-hel6','kandidat-hel6','grundlag-primaer211','kandidat-primaer211']","labels=['grundlag-hel6','pakke-hel6','grundlag-primaer211','pakke-primaer211']")
+(O/'motor-fire.py').write_text(s)
+print('Pakkeprøver klargjort: samme nye nedlastede binær, grunnlag 3419 og full pakke 3471, begge avspillinger.')
