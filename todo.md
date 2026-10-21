@@ -1,5 +1,17 @@
 # todo.md
 
+## Siste verifiserte grafikkstatus, 2026-10-21 05:14
+
+427 av 1758 hele figurjobber har resultat; 1331 gjenstår pluss returer og sluttkontroll. [Felles Linux og Windows med 3098 native ruter](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-golf115) er faktisk kontrollert og Latest-bekreftet. Alle 85 nye ruter er med, uten nye eller økte bufferavvik. Nativefrysen er frigitt.
+
+- [x] Fullfør siste kattepose og hele fig052_01.
+- [x] Lag, kontroller, importer og publiser fig115_01..03 med 84 nye golf-ruter.
+- [x] Hent og kontroller begge faktiske pakker med 3098 native, 21340 runtimefiler hver og alle 85 nye i faktisk Linux. Publiser og bekreft fellesutgaven og Latest.
+- [x] Kildeavspill neste familie 304: alle 34 mål fra 29 hele RGBA-originaler. Første fem originalark, begge hovedark og seks romopptak er sett. Ingen nye bildekall/resultater.
+- [ ] Produser fig304_01..05 fra dokumentert kildegrunnlag med Sam OG Max og hyssingen, deretter resten av familien. Bevar 1096 beskyttede kilder og tre stasher.
+- [ ] Fullfør øvrige produserbare jobber, returer og samlet sluttkontroll. Automatikken fortsetter.
+
+
 ## Siste grafikkstatus, 2026-10-21 04:51
 
 427 av 1758 hele figurjobber har resultat. Native 3098 er publisert og hentet. Fellespakkene har 3013 og mangler 85 nye native; nativefrysen gjelder til nytt samlepunkt er ferdig kontrollert.
