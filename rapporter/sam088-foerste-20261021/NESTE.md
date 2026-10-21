@@ -1,7 +1,5 @@
 # Cone of Tragedy, første fem jobber
 
-Produksjon pågår. 26 vellykkede innebygde bildekall, ingen verktøyavslag. Ingen hele jobbark levert, mottatt native, motorobservert eller publisert fra denne bunken ennå. Total fortsatt 489 av 1758 figurjobber og 3471 native ruter.
+40 vellykkede innebygde bildekall og ett avbrutt K28-forsøk uten lagret fil. Samme argumenter lyktes i neste heartbeat. Ingen modereringsavslag eller fallback. 29 hele prototyper er valgt foreløpig for 50 mål i fig088_01–05. Se valgte29.json og kallmappene. Ingen hele jobbark/native/publisering fra bunken ennå; total fortsatt 489/1758 og 3471 native.
 
-Se fremdrift.json for foreløpige hele prototyper. Alle råbilder og faktiske prompter beholdes, også forkastede. K09 trenger hel plassering/kontroll. K12 mistet Maxs tannfelt. K15 har et forenklet tannløst smil. K16 har feil geometri og består ikke teknisk kontroll. K18 mangler Sams røde munn. Disse skal rettes som hele image_gen-bilder, ikke deles opp.
-
-Fortsett K19–K29 etter ny visning av hel kilde og faktisk spillkontekst. Kildens små deler bevares; ingen hard originalmaske. Samlet teknisk/visuell kontroll, hele ark, native og faktisk motoravspilling gjenstår.
+Fire hele tegninger har fått en samlet forskyvning på høyst én originalpiksel innen marginen etter kildeplassering. Ingen del har blitt flyttet separat, skalert eller klippet. RGB-rens er dokumentert med uendret egen alfa. Valgte returer gjenoppretter Maxs tenner og Sams åpne røde munn. Hele ark, samlet visning, native og faktisk motoravspilling gjenstår.

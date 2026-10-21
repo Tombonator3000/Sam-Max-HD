@@ -30,7 +30,10 @@ for name in sys.argv[1:]:
             level=(rr+gg+bb)/3
             own[mask,:3]=np.where((level[mask]>135)[:,None],[123,123,123],[99,99,99])
         elif patch['type']=='rod_spiss_flat':
-            colors=np.unique(src[sm,:3],axis=0).astype(int);sr,sg,sb=colors.T
+            palette_src=src
+            if patch.get('kilde_palett_rekt'):
+                px0,py0,px1,py1=patch['kilde_palett_rekt'];palette_src=src[py0:py1,px0:px1]
+            colors=np.unique(palette_src[palette_src[:,:,3]>0,:3],axis=0).astype(int);sr,sg,sb=colors.T
             palette=colors[(sr>sg*2.6)&(sr>sb*1.5)&(sr>35)];assert len(palette)==2
             mask=region&(own[:,:,3]>0)&(rr>gg*1.7)&(rr>bb*1.2)&(rr>35)
             dist=((rgb[mask,None,:]-palette[None,:,:])**2).sum(axis=2);own[mask,:3]=palette[np.argmin(dist,axis=1)]
@@ -39,6 +42,12 @@ for name in sys.argv[1:]:
             assert white.any();mask=nd.binary_dilation(white,iterations=1)&(own[:,:,3]>0)
             search=np.zeros(own.shape[:2],bool);search[max(0,y0-20):y1+20,max(0,x0-20):x1+20]=True
             trust=search&(own[:,:,3]>=245)&(rr<50)&(gg<60)&(bb<80)
+            assert trust.any();_,ii=nd.distance_transform_edt(~trust,return_indices=True);near=own[tuple(ii)][:,:,:3];own[mask,:3]=near[mask]
+        elif patch['type']=='fjern_egen_navle':
+            mask=region&(own[:,:,3]>0)&((rr<120)|((rr>gg*1.2)&(gg<180)))
+            mask=nd.binary_dilation(mask,iterations=1)&region&(own[:,:,3]>0)
+            search=np.zeros(own.shape[:2],bool);search[max(0,y0-12):y1+12,max(0,x0-12):x1+12]=True
+            trust=search&~region&(own[:,:,3]>=245)&(rr>200)&(gg>180)&(bb>140)
             assert trust.any();_,ii=nd.distance_transform_edt(~trust,return_indices=True);near=own[tuple(ii)][:,:,:3];own[mask,:3]=near[mask]
         else:raise ValueError(patch)
         assert mask.any();rgb_repairs.append(dict(**patch,egne_RGB_piksler=int(mask.sum()),egen_maske_sha256=hashlib.sha256(mask.tobytes()).hexdigest(),originalmaske=False,alfa_uendret=True))
@@ -53,11 +62,17 @@ for name in sys.argv[1:]:
     fx=(sx1-sx0)*4/(ox1-ox0); fy=(sy1-sy0)*4/(oy1-oy0)
     assert .88<=fx/fy<=1.12, (name,'For stor ulik skalering',fx,fy)
     out=Image.fromarray(own).transform((src.shape[1]*4+16,src.shape[0]*4+16),Image.Transform.AFFINE,(1/fx,0,ox0-(sx0*4+8)/fx,0,1/fy,oy0-(sy0*4+8)/fy),Image.Resampling.BICUBIC)
-    a=clean(np.array(out)); out=Image.fromarray(a); iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(sm,4,0),4,1),-8,-8)
+    a=clean(np.array(out)); out=Image.fromarray(a)
+    shift=e.get('egen_hel_etterplassering_hd',[0,0]);assert len(shift)==2 and all(isinstance(v,int) and abs(v)<=4 for v in shift)
+    if shift!=[0,0]:
+        before_alpha=a[:,:,3].copy();placed=Image.new('RGBA',out.size);placed.alpha_composite(out,tuple(shift));out=placed;a=np.array(out)
+        assert int(a[:,:,3].sum())==int(before_alpha.sum()) and int((a[:,:,3]>0).sum())==int((before_alpha>0).sum()),'Hel plassering klippet egen alfa'
+    iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(sm,4,0),4,1),-8,-8)
     f=C/(e['bilde']+'-prototype.png');out.save(f)
     rec=dict(bilde=e['bilde'],valgt_kall=name,prototype=f.relative_to(A).as_posix(),prototype_sha256=sha(f),canonical_rgba_sha256=e['canonical_rgba_sha256'],snitt_union=iou,dekning=cov,native_ok=iou>=GOOD_IOU and cov>=GOOD_COVER,egen_alfa=True,originalmaske=False,originalfragmenter=False,egen_glodrens_hd=1.5,maalt_kilde_bbox=[sx0,sy0,sx1,sy1],egen_bbox=[ox0,oy0,ox1,oy1],egen_ruteutsnitt=[0,0,*raw.size],egen_hel_affin_plassering=[fx,fy],visuelt_sett=False)
     rec['egen_rgb_rens']=palette_note
     rec['egne_rgb_reparasjoner']=rgb_repairs
+    rec['egen_hel_etterplassering_hd']=shift
     rows=[v for v in rows if v['valgt_kall']!=name]+[rec]; save(C/'prototypekontroll.json',[rec])
     board=Image.new('RGBA',(1200,max(440,src.shape[0]*4+62)),'#596978');d=ImageDraw.Draw(board);d.text((12,8),f'{name} {e["bilde"]}  original 4x / egen 4x  IoU {iou:.3f} dekning {cov:.3f}',fill='white')
     board.alpha_composite(Image.fromarray(src).resize((src.shape[1]*4,src.shape[0]*4),Image.Resampling.NEAREST),(24,48));board.alpha_composite(out,(624,40));board.convert('RGB').save(C/'helkontroll.png')

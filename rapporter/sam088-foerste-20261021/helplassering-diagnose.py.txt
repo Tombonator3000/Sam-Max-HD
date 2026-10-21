@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,sys
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam088-foerste-20261021'
+report=[]
+for c in sys.argv[1:] or ['K09','K16','K22']:
+ C=R/'kall'/c;e=json.loads((C/'prototypekontroll.json').read_text())[0]
+ a=np.array(Image.open(P/'work/.gpt-gren'/e['prototype']))[:,:,3]>=CORE
+ o=np.array(Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA'))[:,:,3]>0;o=np.repeat(np.repeat(o,4,0),4,1)
+ trials=[dict(dx=x,dy=y,snitt_union=i,dekning=v) for y in range(-4,5) for x in range(-4,5) for i,v in [_iou(a,o,-8+x,-8+y)]]
+ best=max(trials,key=lambda e:(e['snitt_union'],-abs(e['dx'])-abs(e['dy'])))
+ report.append(dict(kall=c,bilde=e['bilde'],utgangspunkt=[e['snitt_union'],e['dekning']],beste_hel_forskyvning=best,bestar=best['snitt_union']>=GOOD_IOU and best['dekning']>=GOOD_COVER,kun_hel_egen_plassering=True,ingen_formendring=True,originalmaske_ikke_brukt_til_klipping=True))
+ print(c,best,'OK' if report[-1]['bestar'] else 'RETUR')
+(R/('helplassering-diagnose-'+('-'.join(sys.argv[1:]) or 'forste')+'.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
