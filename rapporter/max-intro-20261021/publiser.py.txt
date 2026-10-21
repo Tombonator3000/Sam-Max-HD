@@ -1,0 +1,86 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json, hashlib, subprocess, shutil
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; M=P/'mods/gpt'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+C=O/'mod-intro3276'; T=O/'publisering-hdmod3276'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+read=lambda p:json.loads(p.read_text())
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+git=lambda w,*args:subprocess.check_output(['git',*args],cwd=w,text=True).strip()
+def remote(branch):
+    return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/ref/heads/'+branch],cwd=P,text=True))['object']['sha']
+
+base=read(R/'grunnlag-produksjon.json'); files=read(R/'kandidatfilhash.json')
+proof=read(R/'sluttkontroll.json'); motor=read(R/'motor-sammenligning.json')
+protected=read(R/'beskyttede-samlet.json')
+assert not T.exists() and not (R/'publisering-forsokt.json').exists()
+assert not (R/'STOPP-nativepublisering.md').exists()
+assert not git(A,'status','--porcelain')
+art=git(A,'rev-parse','HEAD'); assert remote('gpt-arbeid')==art
+assert base['fjern_sha']=='d8f735a567a3f7ac942c04e4e3bab5befc4c0c57'
+assert remote('hd-mod')==base['fjern_sha']
+assert all(sha(M/f)==h for f,h in base['filer'].items())
+assert len(files)==21519 and all(sha(C/f)==h for f,h in files.items())
+assert len(protected)==1200 and all(sha(A/f)==h for f,h in protected.items())
+assert git(P,'stash','list','--format=%H').splitlines()==base['stash']
+assert proof['visuelt_sett'] and proof['motorobservert'] and motor['visuelt_sett']
+assert motor['sett']==68 and motor['kontrollantall']==1600 and motor['nullkontroller']==1564
+assert motor['avvikskoordinater_og_rgb_par_identiske'] and motor['ingen_nye_feilpiksler'] and motor['bildorretur_R15_sett']
+assert motor['alle68_original_flat_sha256_identiske'] and motor['alle68_utenfor_ny_aktorflate']==0
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),
+     grafikkilde=art,grunnlag=base['fjern_sha'],forventet_native=3276,force_with_lease=True))
+shutil.copytree(C,T)
+subprocess.run(['git','init','-q',str(T)],check=True)
+subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file()
+          and '.git' not in p.relative_to(T).parts and p.name!='SHA256SUMS'}
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(manifest.items())))
+assert all(manifest[f]==h for f,h in base['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+subprocess.run(['git','-C',str(T),'add','-A'],check=True)
+subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com',
+                'commit','-q','-m','HD-mod 3276: sju Max-introark med 68 kontrollerte figurøyeblikk'],check=True)
+assert remote('hd-mod')==base['fjern_sha']
+subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+base['fjern_sha'],
+                git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=remote('hd-mod'); assert published==git(T,'rev-parse','HEAD')
+subprocess.run(['bash','tools/mod_gren.sh','hent',str(M)],cwd=P,check=True)
+actual={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual)==set(files) and len(actual)==21519
+assert {f for f,h in files.items() if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in base['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)==3276
+assert read(M/'mod.json')['costume_cels']==3276
+assert git(P,'stash','list','--format=%H').splitlines()==base['stash']
+assert all(sha(A/f)==h for f,h in protected.items()) and remote('hd-mod')==published
+save(R/'publiserte-moddfiler-3276.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,
+             native=3276,nye_native=68,nye_hele_ark=7,hele_figurjobber=458,gjenstar=1300,
+             filantall=21519,png=21513,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,
+             tidligere_png_bevart=21445,beskyttede=1200,stasher=base['stash'],force_with_lease=True,
+             egen_alfa_ingen_originalfragmenter=True,visuelt_sett=True,motorobservert=True,
+             godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,
+             pakker_native=3150,pakker_mangler_native=126)
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+    d=read(R/name); d.update(publisert=True,hd_mod=published,grafikkilde=art)
+    for e in d.get('leveranser',[]):e.update(publisert=True,hd_mod=published)
+    save(R/name,d)
+line=(f'Publisert og hentet {published}: sju Max-introark, 68 nye native, 3276 totalt. '
+      f'458 av 1758 resultatark, 1300 gjenstår pluss returer/katalogfeil/sluttkontroll. '
+      f'Alle 21519 filhash, 21445 tidligere PNG, 1200 kilder og tre stasher bekreftet. '
+      f'Alle 68 motorlogget, 58 varianter og 11 par sett; 1600 kontroller/1564 null. '
+      f'Introen har 31/34 kjente avviksframes med samme 24 eksakte koordinat/RGB-par. '
+      f'Alle 68 originalbilder identiske, null utenfor nye aktørflater. '
+      f'Endelig bildør R15 sett naturlig i motoren. Pakker 3150 mangler 126. '
+      f'Native fryses nå til nytt felles Linux-/Windows-samlepunkt er bekreftet. '
+      f'Ingen ny Tom-/Claude-godkjenning. Se rapporter/{R.name}/NESTE.md.')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name; s=p.read_text(); i=s.find('\n'); p.write_text(s[:i+1]+'\n'+line+'\n'+s[i+1:])
+for name in ['NESTE.md','RAPPORT.md']:
+    with (R/name).open('a') as f:f.write(f'\nPublisert og hentet `{published}`. Grafikkilde `{art}`. '
+        'Alle 21519 filer SHA-bekreftet. 3276 native. Alle tidligere filer og tre stasher bevart. '
+        'Pakker har fortsatt 3150 og mangler 126. Native fryses til felles samlepunkt er bekreftet.\n')
+shutil.copy2(__file__,R/'publiser.py.txt')
+print(json.dumps(receipt,ensure_ascii=False),flush=True)

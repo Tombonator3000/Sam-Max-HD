@@ -1,0 +1,11 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert all(sha(O/'mod-intro3276'/f)==h for f,h in json.loads((R/'kandidatfilhash.json').read_text()).items())
+def run(labels):
+ old,new=labels;s=(O/(old+'.py')).read_text().replace(old,new);f=O/(new+'.py');f.write_text(s)
+ q=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,capture_output=True,text=True,timeout=520);(R/(new+'-utskrift.txt')).write_text(q.stdout+q.stderr);print(new,q.returncode,q.stdout.strip(),flush=True);assert q.returncode==0
+with ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(run,[('intro-kandidat3276','intro-bildor3276'),('kostyme17-kandidat3276','kostyme17-bildor3276')]))
+shutil.copy2(__file__,R/'motor-bildor.py.txt')

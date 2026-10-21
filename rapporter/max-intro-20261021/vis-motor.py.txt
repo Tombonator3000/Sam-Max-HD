@@ -14,14 +14,14 @@ def artifacts(label):
   pairs={tuple([int(x),int(y)]+s[y,x].tolist()+w[y,x].tolist()) for x,y in zip(xx,yy)};points|=pairs
   rows.append(dict(frame=f,avvik=len(xx),bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],signatur=sig,skjerm_sha256=sha(screen),hel_sha256=sha(whole)))
  return p,rows,points
-b,ba,bp=artifacts('intro-grunnlag3208');c,ca,cp=artifacts('intro-kandidat3276')
+b,ba,bp=artifacts('intro-grunnlag3208');c,ca,cp=artifacts('intro-bildor3276')
 assert b['exit']==c['exit']==0 and len(b['kontroller'])==len(c['kontroller'])==1300
 assert cp==bp and len(cp)==24 and all(e['avvik']<=12 for e in ba+ca)
 assert all(e['bbox'][0]>=544 and e['bbox'][1]>=620 and e['bbox'][2]<=568 and e['bbox'][3]<=639 for e in ba+ca)
 assert len(ba)==31 and len(ca)==34
 secondary={}
 for k in [13,17]:
- u,ur,up=artifacts(f'kostyme{k}-grunnlag3208');v,vr,vp=artifacts(f'kostyme{k}-kandidat3276')
+ u,ur,up=artifacts(f'kostyme{k}-grunnlag3208');v,vr,vp=artifacts(f'kostyme{k}-bildor3276' if k==17 else f'kostyme{k}-kandidat3276')
  assert u['exit']==v['exit']==0 and u['kontroller']==v['kontroller'] and up==vp
  assert [e for e in v['kontroller'] if e['avvik']]==[dict(frame=36,avvik=160)]
  secondary[k]=(u,v)

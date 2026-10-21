@@ -1,0 +1,49 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+from PIL import Image,ImageDraw
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-intro3276'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+b=read(R/'grunnlag-produksjon.json');files=read(R/'kandidatfilhash.json');old=read(R/'kandidatfilhash-foer-bildorretur.json');prot=read(R/'beskyttede-samlet.json');native=read(R/'egen-native.json');p=read(R/'fremdrift.json');motor=read(R/'motor-sammenligning.json');vis=read(R/'motor-visuell-plan.json');pairs=read(R/'motor-pikselkontroll.json')
+assert len(files)==21519 and all(sha(C/f)==h for f,h in files.items())
+assert {f for f in files if files[f]!=old[f]}=={'costumes/costume017_1954_hd.png'}
+assert len(b['filer'])==21451 and {f for f,h in b['filer'].items() if files[f]!=h}=={'mod.json'}
+assert len(prot)==1200 and all(sha(A/f)==h for f,h in prot.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==458
+assert len(pairs)==68 and all(e['utenfor_ny_aktorflate']==0 and files[next(v['fil'] for v in native['ruter'] if v['bilde']==e['bilde'])]==e['native_sha256'] for e in pairs)
+assert motor['sett']==68 and motor['kontrollantall']==1600 and motor['nullkontroller']==1564 and motor['alle68_original_flat_sha256_identiske'] and motor['ingen_nye_feilpiksler']
+assert read(R/'automatisk-mottak68.json')['ruter_ok']==68
+calls=sorted(q.parent.name for q in (R/'kall').glob('*/raa.png'));assert len(calls)==36 and sum(v.startswith('R') for v in calls)==15
+for d in (R/'kall').iterdir():
+ if not d.is_dir():continue
+ assert (d/'argumenter-faktisk.json').exists() and (d/'raa-sporing.json').exists()
+# Egen visuell vurdering: 57 uendrede native ble sett i første motorpass; R15 er sett på nytt i naturlig intro og i kontrollparet.
+for e in vis['brett']+vis['hele_for_etter']+vis['naturlige17']:
+ assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+vis.update(visuelt_sett=True,visuell_vurdering='58 hele varianter og 11 hele for/etter-par sett. 57 native uendret etter første pass. Endelig R15 er i tillegg sett i siste naturlige intro, hel sekundærprøve og fem faser av dørbevegelsen.',bildorretur_endelig=True,sekvens='bildor-endelig-naturlig-sekvens.png',sekvens_sha256=sha(R/'bildor-endelig-naturlig-sekvens.png'))
+save(R/'motor-visuell-plan.json',vis)
+motor.update(visuelt_sett=True,full_visuell_vurdering_gjenstar=False,bildorretur_R15_sett=True,sluttpass='intro-bildor3276 og kostyme17-bildor3276, pluss uendret kostyme13-kandidat3276')
+save(R/'motor-sammenligning.json',motor)
+ark=read(R/'arkvisning.json')
+for e in ark:
+ job=e['jobb'];fn=A/'jobber'/job/'resultat.png';e.update(sett=True,resultat_sha256=sha(fn),vurdering='Eget helt ark sett; kildedetaljer og native overlegg kontrollert. 017_02 sett på nytt etter R15. Varsler beholdt, se tekstkontroll.')
+ if job=='fig017_02':e.update(endelig_sett_fil='jobber/fig017_02/resultat.png',gammelt_brett_historisk=True)
+save(R/'arkvisning.json',ark)
+for e in p['leveranser']:
+ assert sha(A/e['resultat'])==e['sha256'];e.update(visuelt_kontrollert=True,motorobservert=True)
+ note=A/'jobber'/e['jobb']/'notat.md'
+ with note.open('a') as f:f.write('\nSluttprøve 21. oktober: alle 68 mål avspilt i faktisk Linux-motor, 67 i naturlig intro og siste 013_129 i gyldig hel animasjon. Separat gyldig hel 17-animasjon isolerer bakgrunnens fargesyklus. Alle 68 originalflater SHA-identiske i kontrollpar, null endringer utenfor nye aktørflater. 1600 bufferkontroller, 1564 null. Naturlig intro har 31 mot 34 små avviksframes med samme 24 eksakte koordinat/RGB-par; 13/17 har uendret kjent 160-avvik ved frame 36. Siste R15-bildør sett i naturlig femfaset sekvens. Ingen ny Tom-/Claude-godkjenning, ingen full gjennomspilling.\n')
+save(R/'fremdrift.json',p)
+stop=R/'STOPP-nativepublisering.md';assert stop.exists();shutil.copy2(stop,R/'bildor-stopp-historikk.md');stop.unlink()
+(R/'AVKLART-bildor.md').write_text('# Bildørretur avklart\n\nK10 sin brune håndlignende dørfase ble stanset etter første motorvisning. R15 retter den til bildøra som lukkes, med politistjerne, vindusramme og himmelfelt. Egne venstre komponenter er bevart. Ingen originalmaske eller originalfragmenter. Egen himmel-RGB er tilpasset eksisterende HD-himmel, alfa uendret.\n\nEndelig fase er sett i faktisk naturlig intro: frame 2338, femfaset sekvens `bildor-endelig-naturlig-sekvens.png`. Hele sekundærparet er også sett. Endelig native SHA256 '+files['costumes/costume017_1954_hd.png']+'. Alle 68 originalflater er identiske i kontrollpar og ingen endringer ligger utenfor nye aktørflater. `motor-sammenligning.json` og `motor-bufferdiagnose.json` dokumenterer 31/34 kjente bakgrunnsavviksframes med samme eksakte 24 koordinat/RGB-par. Testterskler og bakgrunnsskript er uendret.\n\nTidligere progresjonslesing forvekslet stor original/HD-bildeforskjell med bufferavvik. Dette er rettet i `progresjonslesing-rettet.json`. Det var ingen slik stor bufferfeil. Stoppnotatet her er historikk, ikke en aktiv STOPP.\n')
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),leveranser=p['leveranser'],nye_ark=7,nye_native=68,native=3276,ulike_hele_varianter=58,hele_rgba_alias=10,innebygde_bildekall=36,returkall=15,modell='ikke oppgitt av verktøy',beskyttede=1200,stashes=b['stash'],tidligere_filer_bevart=21451,tidligere_png_bevart=21445,filer=21519,png=21513,egenkontroll_OK=4,egenkontroll_SJEKK=3,egenkontroll_FEIL=0,rutevarsler=8,hoydevarsel=1,varsler_beholdt=True,automatisk_native68_OK=True,fast_core=128,min_iou=.6,min_dekning=.8,minimum_maalt_iou=min(e['snitt_union'] for e in native['ruter']),minimum_maalt_dekning=min(e['dekning'] for e in native['ruter']),egen_alfa=True,originalmaske=False,originalfragmenter=False,visuelt_sett=True,motorobservert=True,alle68_original_flat_identiske=True,alle68_utenfor_ny_aktorflate=0,bildorretur_R15_motor_sett=True,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False,full_naturlig_gjennomspilling=False)
+save(R/'sluttkontroll.json',proof)
+text='''Sju hele figurark er laget, egenkontrollert og visuelt sett: fig013_01, fig017_01..02 og fig018_01..04. De gir 68 native ruter fra 58 hele egne tegninger og 10 eksakte hele RGBA-alias. 36 innebygde image_gen-kall, inkludert 15 returer. Faktiske prompter, urørte råbilder og hashfestede rutekart er bevart. 458 av 1758 figurjobber har resultat, 1300 gjenstår pluss returer, katalogfeil og sluttkontroll. Dette er ingen samlet stilgodkjenning.\n\nKildemotivene er Max bakfra med adskilte hode-/kroppslag og tidsbomben, spranget inn i bilen med skyggelag og dørlukking, samt Max og den grønne laboratoriefiguren i samme tumlefase før grå støv- og restpartikler. Generiske motivbeskrivelser er korrigert i egne rapporter, kildene er urørt. R14 retter kantete skyggelag. R15 retter den først avviste bildøra til en dør med politistjerne og eksponert himmel. Ingen hard originalmaske eller originale fragmenter.\n\nAlle 68 er teknisk mottatt med faste porter CORE128, IoU0.6, dekning0.8. Fire ark er OK, tre SJEKK med åtte omrissvarsler og ett høydevarsel. Disse er beholdt og visuelt vurdert: høydevarselet gjelder en separat liten hånd med én originalpiksels større spenn, ikke hele Max. Ingen FEIL. Alle 1200 beskyttede kilder og tre stasher er bevart.\n\nFaktisk Linux-motor: 67 mål i spillets egen intro, siste 013_129 i gyldig hel animasjon. Separat gyldig hel 17-animasjon gir identiske originalflater til alle 41 ruter fordi den naturlige introens bakgrunnsfarger hadde ulik timing. Alle 68 SHA-identiske originalflater i kontrollpar, null endringer utenfor nye aktørflater. 58 varianter og 11 hele for/etter-par er sett, endelig R15 også i fem naturlige dørfaser. 1600 bufferkontroller, 1564 null. Introen har 31 mot 34 små avviksframes med samme 24 eksakte koordinat/RGB-par, ingen nye feilkoordinater eller RGB-par. Sekundære 13/17-prøver har uendret kjent 160-avvik ved frame36. Ingen testgrenser, skala, palett eller bakgrunnsskript er omgått. Full gjennomspilling, Windows-avspilling og web er ikke testet i denne bunken. Ingen ny Tom-/Claude-godkjenning.\n\nNeste: push endelig grafikkildespor, publiser kandidat3276 additivt med eksakt fjern-SHA, hent tilbake og bekreft alle 21519 filhash. Så felles Linux-/Windows-samlepunkt fra3150 til3276 med de126 nye rutene fra begge introbunker, faktiske nedlastinger, sjekksummer og motoravspilling. Ingen nye native publiseres under pakkefrysen. Deretter gjenopptas neste uavhengige figurjobb fra fersk restliste.\n'''
+(R/'RAPPORT.md').write_text('# Max i introen, sluttkontroll\n\n'+text)
+(R/'NESTE.md').write_text('# Fortsettelse etter Max i introen\n\n'+text)
+remaining=[]
+for d in (A/'jobber').glob('fig*'):
+ if not (d/'jobb.json').exists() or (d/'resultat.png').exists():continue
+ j=read(d/'jobb.json');remaining.append(dict(jobb=d.name,rom=j.get('rom'),rekkefolge=j.get('rekkefolge'),ruter=len(j.get('ruter',[]))))
+assert len(remaining)==1300;save(R/'restliste458.json',remaining)
+shutil.copy2(__file__,R/'sluttkontroll.py.txt');print('Sluttkontroll OK: 7 ark, 68 native, 58 varianter, R15 motoravklart, 1200 kilder og tre stasher bevart.',flush=True)
