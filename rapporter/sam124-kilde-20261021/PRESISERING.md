@@ -1,0 +1,11 @@
+# Kostyme 124 er Lee-Harvey med Max i Gator Golf
+
+Faktisk originalscene og rom 25s lokale skript 217 bekrefter menneskefiguren som Lee-Harvey. Conroy Bumpus er den lave blonde figuren med svarte briller og oransje jakke ved siden av. Lee-Harvey har høyt brunrødt hår, rosa menneskeansikt, rød skjorte, mørk blå/svart jakke og bukser samt grå støvler. Max beholder lys pels og rosa ører. Lyse dråpe-/bevegelsesmerker skal følge kilden; ikke tegn nye rekvisitter eller farg dem om. Dette er ingen Sam-variant og ikke personer bak glass i rom 28. Jobbkort, originalprompt og andre beskyttede filer er bevart. Bruk denne kildepresiseringen foran det påviste feilpremisset.
+
+Originalarkets første øvre rute1792 er en avgrenset kroppsdel uten menneskehode. Separat kostyme 129 leverer Lee-Harveys hode/tale i deler av primærscenen. Ruter 1921..1924 viser Max og kildeegne hånd-/ermefragmenter. Ikke kompletter hodet eller kroppen og ikke slå sammen separate ruter til en ny figur. Senere124-ruter viser begge samlet i kildeegen håndtering, sving og vridning. Hver hel RGBA-kilde males som den faktisk er. Godkjente Sam-/Max-mastere brukes til strek og Max-identitet; menneskefiguren bestemmes av faktisk original, ikke Sams hundehode.
+
+Den første tvungne217-proben traff en allerede aktiv mellomsekvens ved bilde 60 og ble stoppet. Feil og rådata er bevart. Korrigert separat prøve startet bare rom 25 og lot originalens inngangsskript starte217. ScummVM avsluttet normalt med 0 ved 2400 kontroller,2391 null. Det var et SIGINT-forsøk etter kildeavklaring, men det avsluttet ikke motoren; prøven fortsatte til det opprinnelige2400-maksimumet. Dette er en kontrollert kildeundersøkelse, ikke naturlig gjennomspilling eller en avviksfri grafikkprøve.
+
+67 av 70 jobb-mål og 47 av 49 ulike hele RGBA-motiver er logget. Alle 39 mål i fig124_01 til 05 er observert.1844,1845 og 1846 fra senere ark 06 mangler faktisk primærvisning og skal kontrolleres i en egen kildeført prøve før de produseres eller godkjennes. Headerens varsel om animasjon 48 er beholdt; den kjøres ikke manuelt.
+
+Første originalark og ett helt originalbilde i spillkontekst er sett. De andre originalarkene og individuelle whole-kildeposer må sees før sine bildekall, sammen med relevante godkjente stilankre. Ingen124-bildekall, nye malerier, resultatark eller native er laget i denne undersøkelsen.

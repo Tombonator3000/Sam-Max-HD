@@ -1,0 +1,32 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from PIL import Image
+from smhd.gamedata import load,read_index,read_rooms
+from smhd.v6grafikk import decode_costume
+import json,hashlib,importlib.util,sys,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists();R.mkdir();prior=read(A/'rapporter/sam088-slutt-20261021/beskyttede-samlet1380.json');assert len(prior)==1380 and all(sha(A/f)==h for f,h in prior.items());protected=dict(prior)
+rows=[];jobs=[];groups=defaultdict(list)
+for J in sorted((A/'jobber').glob('fig124_*')):
+    assert not (J/'resultat.png').exists();d=read(J/'jobb.json');jobs.append(dict(jobb=J.name,ruter=len(d['ruter']),originalark_visuelt_sett=J.name=='fig124_01',jobbkort_rom=d['rom'],jobbkort_navn=d['navn']))
+    for f in ['jobb.json','referanse.png','original_1x.png','prompt.txt']:protected[(J/f).relative_to(A).as_posix()]=sha(J/f)
+    for e in d['ruter']:
+        src=P/'work/extract/costumes'/(e['bilde']+'.png');im=Image.open(src).convert('RGBA');h=hashlib.sha256(im.tobytes()).hexdigest();groups[h].append(e['bilde']);rows.append(dict(jobb=J.name,bilde=e['bilde'],lag=e['lag'],animasjon=e['animasjon'],kilde=str(src),sha256=sha(src),rgba_sha256=h,maal=list(im.size)))
+assert len(jobs)==8 and len(rows)==70 and len(protected)==1412
+for e in rows:e['canonical']=groups[e['rgba_sha256']][0]
+save(R/'beskyttede-samlet1412.json',protected)
+save(R/'forundersokelse.json',dict(jobber=jobs,ruter=rows,maal=70,ulike_hele_rgba=len(groups),beskyttede=1412,ingen_bildekall=True,ingen_nye_resultater=True,native_frosset_i_pakke_kjeglekant=True,avgjorende_jobbfelt_avviker=True,motiv_ikke_endelig_avklart=True))
+idx=read_index(P/'game/SAMNMAX.000');data,_=load(P/'game/SAMNMAX.001');rooms=read_rooms(P/'game/SAMNMAX.001');room,off=idx.costume_dir[124];assert room==25;c=decode_costume(data,rooms[room].offset+off)
+save(R/'kostyme124-header.json',dict(num_anim=c.num_anim,format=c.format,mirror=c.mirror,rom=room,raw_valg=sorted({a['valg'] for a in c.animations}),advarsler=c.errors,palett=list(c.palette),animasjoner=c.animations))
+save(R/'kostyme124.json',read(P/'work/extract/costumes.json')['124'])
+spec=importlib.util.spec_from_file_location('dekompiler124',P/'tools/dekompiler_skript.py');m=importlib.util.module_from_spec(spec);sys.modules[spec.name]=m;spec.loader.exec_module(m);idata,_=m.load(P/'game/SAMNMAX.000');tasks,info=m.finn_jobber(data,idata);tasks=[j for j in tasks if j.rom==25]
+prev=read(A/'rapporter/sam088-kilde-20261021/dekompilering17.json');desc=m.finn_descumm(prev['descumm']);assert sha(desc)==prev['descumm_sha256'];W=P/'work/sam124-kilde-20261021/skript';assert not W.exists();W.mkdir(parents=True)
+out=[]
+for i,j in enumerate(tasks):
+    result=m.kjor(desc,j,W/('tmp-'+str(i)+'.bin'));m.skriv(W,j,result);out.append(dict(sort=j.sort,filer=j.filer,status=j.status,melding=j.melding,advarsler=j.advarsler))
+save(R/'dekompilering25.json',dict(descumm=str(desc),descumm_sha256=sha(desc),jobber=out,status=dict(Counter(j.status for j in tasks))))
+(R/'KILDEGRUNNLAG.md').write_text('# Før neste motiv: kostyme124\n\nFørste originalark er sett og viser en menneskefigur med mørk blå bekledning og Max, med kropps-/hodelag og separate bevegelses-/væskemerker. Dette stemmer ikke med det generiske jobbnavnet Sam og Max sett gjennom glass i rom28. Faktisk gameindeks og kostymemetadata plasserer124 i rom25 Gator Golf. Ressursbanken beskriver første møte med Conroy Bumpus og Lee Harvey der. Hvem menneskefiguren er, riktig aktør-/rompalett og primærsekvens skal bekreftes fra skript og faktisk originalvisning før en korrigert prompt brukes. Ingen gjetning eller figurbytte skal bli produksjonsgrunnlag.\n\nÅtte ark,70 mål og kildebekreftede hele RGBA-aliasgrupper er kartlagt. 1412 beskyttede jobbfiler er SHA-festet. Hele fig124_01 er sett, øvrige sju ark og faktiske kildeposer skal sees før bildekall. Ingen124-bildekall, ingen nye124-resultater eller native. Bevar gammel bestilling, jobbkort, prompt og originaler; legg nødvendig presisering her. Tidligere avviste164-,304- og bokmotiver omprøves ikke.\n')
+(R/'NESTE.md').write_text('Avklar først faktisk menneskefigur med Max i kostyme124 fra rom25s skript og originalvisning. Jobbkortets rom28 og Sam-navn er feil premiss. Se alle berørte originalark, kildekontekst og relevante godkjente stilankre før første bilde. Ingen nye bilde- eller produksjonskall ennå. Native er frosset til pågående kjeglekant-pakker er kontrollert.\n')
+shutil.copy2(__file__,R/'klargjor.py.txt')
+print('124:',len(rows),'mål,',len(groups),'ulike hele RGBA, råvalg',sorted({a['valg'] for a in c.animations}),'advarsler',c.errors,'skript',dict(Counter(j.status for j in tasks)),flush=True)

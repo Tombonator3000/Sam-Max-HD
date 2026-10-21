@@ -1,0 +1,32 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,tarfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;T=O/'publisering';F=O/'hentet'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip();api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],text=True))
+attempt=read(R/'publisering-forsokt.json');commit=attempt['forventet_commit'];art=attempt['grafikkilde'];old=read(R/'moddfiler-grunnlag.json');mask=attempt['ny_metadatafil'];base=read(A/'rapporter/sam088-slutt-20261021/grunnlag-produksjon.json');protected=read(A/'rapporter/sam088-slutt-20261021/beskyttede-samlet1380.json')
+assert not F.exists() and commit==git(T,'rev-parse','HEAD')
+remote_git=git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0];remote_api=api('git/ref/heads/hd-mod')['object']['sha']
+assert remote_git==remote_api==commit and all(sha(M/f)==h for f,h in old.items())
+save(R/'publisering-synlighetsforsinkelse.json',dict(push_lyktes=True,umiddelbar_API_SHA_assert_stoppet=True,git_og_API_senere_likt_forventet=commit,ingen_ny_push=True,ingen_endret_commit_eller_malerier=True,handling='Hent og bekreft bare den allerede publiserte eksakte commiten.'))
+subprocess.run(['git','fetch','-q','--depth','1','origin','+refs/heads/hd-mod:refs/remotes/origin/hd-mod'],cwd=P,check=True)
+assert git(P,'rev-parse','refs/remotes/origin/hd-mod')==commit
+F.mkdir();archive=subprocess.Popen(['git','archive',commit],cwd=P,stdout=subprocess.PIPE)
+with tarfile.open(fileobj=archive.stdout,mode='r|') as tar:tar.extractall(F,filter='data')
+assert archive.wait()==0
+expected_files={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts}
+actual={p.relative_to(F).as_posix():sha(p) for p in F.rglob('*') if p.is_file()}
+assert len(actual)==21779 and actual==expected_files
+assert all(actual[f]==h for f,h in old.items() if f not in ['mod.json','SHA256SUMS'])
+for f in [mask,'mod.json','SHA256SUMS']:
+    tmp=M/(f+'.ny');shutil.copy2(F/f,tmp);tmp.replace(M/f)
+assert {p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}==actual
+assert all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==base['stash']
+save(R/'publiserte-moddfiler-3535.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=commit,forrige_hd_mod=attempt['grunnlag'],native=3535,nye_native=0,nye_ark=0,figurark_med_resultat=497,gjenstaar=1261,ny_metadatafil=mask,mask_sha256=actual[mask],moddfiler=21779,alle_filhash_bekreftet_etter_hent=True,samtlige_tidligere21772_PNG_byteidentiske=True,tidligere_fil_stier_bevart=True,beskyttede_kilder=1380,tre_stasher_bevart=True,force_with_lease=True,visuelt_sett=True,motorobservert=True,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,full_naturlig_gjennomspilling=False,pakker_har_native=3535,pakker_mangler_metadatarettingen=True,native_frosset=True)
+save(R/'mottak-publisert.json',receipt);proof=read(R/'egenkontroll.json');proof.update(publisert=True,hd_mod=commit,grafikkilde=art);save(R/'egenkontroll.json',proof)
+line=f'Publisert og hentet {commit}: kildeført bakgrunnsdekning for Cone of Tragedy. En ny metadatafil, ingen ny figur eller nytt maleri. Alle21779 filhash og samtlige tidligere21772 PNG er bekreftet;1380 beskyttede kilder og tre stasher er bevart. Alle64 primærvarianter er visuelt sett. Fasebekreftede kontroller har1440 identiske originalflater og null endringer utenfor objekt173,718/720 null per modus med identiske kjente416/160-avvik. Uten aktivt objekt er alle720 HD-bilder identiske. Den store hakkete dobbelkanten er rettet; en liten statisk tupp over y32 er en egen åpen grafikkretur. Ingen visuell sluttgodkjenning eller ny Tom-/Claude-godkjenning. 497 av1758 figurark har resultat,1261 gjenstår pluss returer og sluttkontroll. Begge pakker har3535, men mangler metadatarettingen. Native fryses til pakkekontrollen er ferdig. Se rapporter/{R.name}/NESTE.md. Ingen omprøve av avviste motiver eller gammel nattprosess.'
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;text=p.read_text();i=text.index('\n');p.write_text(text[:i+1]+'\n'+line+'\n'+text[i+1:])
+for name in ['RAPPORT.md','NESTE.md']:
+    p=R/name;p.write_text(line+'\n\n'+p.read_text())
+shutil.copy2(__file__,R/'bekreft-publisering.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)

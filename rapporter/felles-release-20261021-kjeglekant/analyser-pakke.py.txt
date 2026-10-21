@@ -1,0 +1,35 @@
+from pathlib import Path
+import json,hashlib,shutil
+from PIL import Image,ImageDraw
+import numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/cone-underlag-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+state=read(O/'bygg-startet.json');manifest=read(R/'moddfiler-3535.json');meta=read(R/'moddfiler-kontroll.json')
+assert meta['moddfiler_per_pakke']==21778 and meta['hd_mod']==state['hd_mod'] and meta['begge_modder_byteidentiske']
+mask='objects/obj173_01_mask.png';assert manifest[mask]==read(S/'tegnedekning-kildebevis.json')['mask_sha256']
+rows=[];errors=[];shots=[]
+def error_pixels(p):
+    T=Path(next(iter(p['tegninger'].values()))['fil']).parent;out=[]
+    for e in p['kontroller']:
+        if not e['avvik']:continue
+        f=e['frame'];left,right=[np.array(Image.open(T/f'frame_{f:06}_{kind}.png').convert('RGB')) for kind in ['screen','room017']];yy,xx=np.where(np.any(left!=right,2));assert len(xx)==e['avvik'];out.append(dict(frame=f,punkter=[list(map(int,[x,y,*left[y,x],*right[y,x]])) for x,y in zip(xx,yy)]))
+    return out
+for mode in ['primaer201','hel6']:
+    prod=read(S/('maske-'+mode+'.json'));pack=read(R/('pakke-'+mode+'.json'))
+    assert pack['exit']==prod['exit']==0 and len(pack['tegninger'])==len(prod['tegninger'])==64
+    assert len(pack['kontroller'])==720 and pack['kontroller']==prod['kontroller'] and pack['nullkontroller']==718
+    assert error_pixels(pack)==error_pixels(prod),'Nye eller endrede skjermbufferavvik i faktisk pakke'
+    errors.append(dict(mode=mode,eksakte_bufferavvik_identiske=True,bufferavvik=error_pixels(pack)))
+    for name,new in pack['tegninger'].items():
+        old=prod['tegninger'][name];npth,opth=Path(new['fil']),Path(old['fil'])
+        assert all(old[k]==new[k] for k in ['pos','maal','viewport_pos','screen_origin'])
+        nf,of=[p.with_name(p.stem+'_flat.png') for p in [npth,opth]]
+        assert sha(nf)==sha(of),(mode,name,'Ulik originalfase')
+        n,o=[np.array(Image.open(p).convert('RGB')) for p in [npth,opth]]
+        assert np.array_equal(n[104:472,360:656],o[104:472,360:656]),(mode,name,'Ulikt kjegleraster i faktisk pakke')
+        rows.append(dict(mode=mode,bilde=name,pakke_frame=new['bildeframe'],produksjon_frame=old['bildeframe'],originalflat_sha256=sha(nf),hele_originalflater_identiske=True,kjegle_og_omgivelser_RGB_identisk=True,hele_HD_bildet_identisk=bool(np.array_equal(n,o))))
+        if mode=='primaer201' and name in ['costume088_1922','costume088_1970','costume088_1983']:
+            f=R/(name+'-faktisk-pakke.png');shutil.copy2(npth,f);shots.append(dict(bilde=name,fil=f.name,sha256=sha(f),visuelt_sett=False))
+    assert len(rows)==64 if mode=='primaer201' else len(rows)==128
+proof=dict(kode=state['kode'],hd_mod=state['hd_mod'],native=3535,nye_figurark=0,nye_malerier=0,ny_metadatafil=mask,metadata_SHA_bekreftet=True,ny_Linux_binar_SHA256=pack['binar_sha256'],runder=2,primaer201_og_hel6=True,alle64_ruter_observert_per_runde=True,skjermbufferkontroller=1440,nullkontroller=1436,eksakte_feilkoordinater_og_begge_RGB_identiske=True,originalflater_SHA_identiske=128,kjegleutsnitt_RGB_identiske_med_produksjon=128,hele_HD_bilder_identiske=sum(e['hele_HD_bildet_identisk'] for e in rows),visuelt_sett=False,hele_motorbilder=shots,full_naturlig_gjennomspilling=False,interaktiv_Windows_eller_ny_webtest=False,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,gjenværende='Liten statisk HD-tupp over y32. Uendret og fortsatt åpen grafikkretur.')
+save(R/'pakke-rasterkontroll.json',rows);save(R/'pakke-bufferkontroll.json',errors);save(R/'linux-kontroll.json',proof);shutil.copy2(__file__,R/'analyser-pakke.py.txt');print(json.dumps({k:v for k,v in proof.items() if k!='hele_motorbilder'},ensure_ascii=False))
