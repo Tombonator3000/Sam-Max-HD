@@ -1,5 +1,31 @@
 # todo.md
 
+## Gjeldende grafikkstatus, 2026-10-22 00:39
+
+31 nye native-ruter for Lee-Harvey og Max er publisert og hentet tilbake i hd-mod b86782c3432d915d241929bf92130f26e152b29a, 3566 totalt. Fem nye hele resultatark fig124_01 til fig124_05 er laget og egenkontrollert OK. Tre ark er helt publisert, to delvis. Åtte ruter 1797 til 1804 står i åpen retur fordi blågrå Sam-fragmenter lager nye skjøter over den allerede malte jakken i objekt 258. De åtte er bevart i grafikkgrenen og diagnostisk kandidat, men holdt utenfor publisert mod. 502 av 1758 figurjobber har resultat; 1256 uten resultat pluss returer og sluttkontroll. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+28 innebygde image_gen-kall, fire kvalitetsreturer, ingen verktøyavvisninger eller API/CLI-fallback. 24 hele egne malerier gir 39 mål, hvorav 31 mål fra 16 hele malerier er valgt. Originaler, faktisk spillkontekst og godkjente mastere er sett før hvert motiv. Lee-Harvey er i faktisk rom 25 Gator Golf, ikke Sam i rom 28 slik gamle jobbkort sier. Rute 1792 er kropp uten hode; separat kostyme 129 tegner snakkehodet. Python renser og plasserer hele egne malerier i fast 4x med åtte HD-pikslers marg. Ingen hard originalformmaske, originale bildefragmenter eller delrekonstruksjon. CORE 128, IoU 0,6 og dekning 0,8 er uendret. Fem ark og automatisk 39-ruters arkimport er OK; slutt-native bruker de særskilt målte hele prototypene. Alle 24 hele egne kildepar og fem ark er sett; sluttkandidatens 16 hele motorvarianter og fire hele skjermbilder er sett.
+
+Nedlastet Linux-binær 03b21adba8a0cd63765542bd2a814e827bcfb28265b45567849c73fa1e071022 har avspilt rominngangens originale primærskript 217 med to 3535-grunnlag, første kandidat 3574 og endelig kandidat 3566. Én av de to grunnlagene er en avgrenset kontroll av tidsvariasjon, ikke en ny produksjonsrunde. Hver prøve har normal avslutning 0, 720 bufferkontroller og 711 null. Alle 31 endelige mål er motorlogget. Ni kjente avvik har identiske antall, koordinater, begge RGB-verdier og rekkefølge. Sluttprøven starter avvikssekvensen én bilderute tidligere enn første grunnlag og to tidligere enn kontrollgrunnlaget; ingen nye eller økte avvik. Hele prøven er ikke avviksfri.
+
+Alle de 31 har par med identisk hel originalflate-SHA og null endringer utenfor faktisk loggede nye aktørflater i den første kandidaten. De åtte holdte rutene er ikke aktive i disse 31 kontrollbildene. Sluttkandidatens 31 nativefiler og faktisk viste opake aktørpiksler er identiske med denne kandidaten. Bare sju hele originalflater SHA-matcher direkte i sluttprøven; 24 har annen tids-/vannfargefase. Ingen påstand om 31 SHA-like hele sluttflater. Første stopp, den ene uendrede kontrollen og alle logger er bevart. Ingen endring i spillkode, testflagg eller tekniske porter, ingen nye omprøver etter endelig kandidat. Kontrollerte romhopp, ikke full naturlig gjennomspilling.
+
+Publisering fra eksakt fjern-SHA a8ca23c755fc79bed1f15c4c4f669303ca126930 bruker force-with-lease etter repoets historikkløse hd-mod-konvensjon. Alle 21810 filhash er bekreftet etter henting. Samtlige 21779 tidligere filstier og 21773 tidligere PNG, 1412 beskyttede jobbfiler og tre opprinnelige stasher er bevart. Gammel mod er også fysisk bevart i out/sam124-foerste-20261021/mod-grunnlag3535. Ingen motor-/pipelineendring. Main får bare memory.md, todo.md, STATUS.md og log.md. Bibliotekets figurark-fast-storrelse er brukt. Bevis: rapporter/sam124-foerste-20261021 på gpt-arbeid, særlig RAPPORT.md, retur8.json, motor31-sammenligning.json og mottak-publisert.json. Grafikkilde før nativepublisering er 7408da00bc78da01b0c6877edafda6a14851effa.
+
+[Felles Linux og Windows med 3535 native](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-kjeglekant) er fortsatt siste faktisk nedlastede og kontrollerte fellesutgave. Den mangler de 31 nye rutene. Ingen nye pakkebygg eller vedleggsbytter i denne bunken. Native er ikke frosset. Neste samlepunkt er resten av 124-familien og returer, eller tidligere ved reell produksjonsblokkering. Fellespakker skal bygges og faktisk nedlasting, sjekksummer og inkludert grafikk kontrolleres før ny oppdatert-status.
+
+Neste arbeid: gjenoppta de åtte Sam-jakke-returene og undersøk bakgrunnsrestaurering som kildefunksjon. Ikke slett de 27 ennå uklassifiserte grå pikslene eller gjenskap figuren i separate deler. Uavhengige fig124_06 til 08 gjenstår med 31 mål; tre faser 1844 til 1846 krever gyldig kildeprøve før maling. Ikke tving omstart av lokal 217. Se siste NESTE i grafikkrapporten. Den lille statiske kjegletuppen, sporadisk SDL-start, full naturlig gjennomspilling, interaktiv Windows og ny webtest er fortsatt åpne. Bevar tidligere avvisninger og aliaser, bok-/164-/304-returer, ugyldige 344/346 og råvalg 28. Grafikkautomatikken fortsetter uten den gamle nattfristen; gamle nattprosesser gjenstartes ikke. Alt er ikke ferdig.
+
+## Neste
+
+- [x] Lag fem 124-ark og kontroller/publiser 31 uavhengige native.
+- [ ] Rett de åtte Sam-jakke-returene kildefast.
+- [ ] Kildeavklar og lag fig124_06 til 08.
+- [ ] Oppdater og kontroller fellespakker ved familiesamlepunkt.
+
+Tidligere oppføringer nedenfor er historikk.
+
+
 ## Gjeldende grafikkstatus, 2026-10-21 23:16
 
 [Felles Linux og Windows med 3535 native HD-bildelag](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-kjeglekant) er publisert, lastet ned på nytt og SHA-bekreftet. Den store hakkete dobbelkanten rundt Cone of Tragedy er rettet med originalobjekt 173s tegnedekning. Samtlige tidligere malerier, figur-PNG og filstier er bevart byteidentiske. En ny metadatafil, ingen nye malerier eller figurark. 497 av 1758 figurark har resultat; 1261 gjenstår pluss returer og sluttkontroll.
