@@ -1,0 +1,109 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib
+import json
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+S = A / 'rapporter/max052-20261021'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+git = lambda where, *args: subprocess.check_output(['git', *args], cwd=where, text=True).strip()
+api = lambda x: json.loads(subprocess.check_output([
+    'gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + x
+], cwd=P, text=True))
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+
+q = read(R / 'publisert.json')
+assert not git(P, 'status', '--porcelain')
+assert not git(A, 'status', '--porcelain')
+main = git(P, 'rev-parse', 'HEAD')
+art = git(A, 'rev-parse', 'HEAD')
+assert main == '4175dc4870b411512ee74b580d3be1a8911712e1'
+assert git(P, 'rev-parse', 'HEAD^') == q['kode']
+assert set(git(P, 'diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD').splitlines()) == {
+    'memory.md', 'todo.md', 'STATUS.md', 'log.md'
+}
+for branch, expected in [('main', main), ('gpt-arbeid', art), ('hd-mod', q['hd_mod'])]:
+    assert api('git/ref/heads/' + branch)['object']['sha'] == expected
+ci = api('actions/runs/39527989786')
+assert ci['head_sha'] == main and ci['conclusion'] == 'success' and ci['run_attempt'] == 1
+extra = api('actions/runs/39527380077')
+extra_state = {k: extra[k] for k in ['id', 'head_sha', 'status', 'conclusion', 'event', 'html_url']}
+save(R / 'ekstra-windows-tagbygg.json', extra_state)
+
+latest = api('releases/latest')
+assert latest['id'] == q['release_id'] and latest['tag_name'] == q['release_tag']
+assets = read(R / 'assetkontroll.json')
+for v in assets:
+    a = next(a for a in latest['assets'] if a['name'] == v['fil'])
+    assert a['size'] == v['bytes'] and a['digest'] == 'sha256:' + v['sha256']
+    assert sha(O / v['plattform'] / v['fil']) == v['sha256']
+prior = read(R / 'releaser-foer.json')
+after = api('releases?per_page=100')
+aset = lambda v: {(a['id'], a['name'], a['size'], a['digest']) for a in v['assets']}
+assert len(after) == len(prior) + 1
+for v in prior:
+    assert aset(v) == aset(next(a for a in after if a['id'] == v['id']))
+
+files = read(R / 'moddfiler-3013.json')
+assert len(files) == 21256 and all(sha(P / 'mods/gpt' / f) == h for f, h in files.items())
+old = read(S / 'grunnlag-produksjon.json')
+assert all((P / 'mods/gpt' / f).is_file() for f in old['filer'])
+old_png = {f: h for f, h in old['filer'].items() if f.endswith('.png')}
+assert len(old_png) == 21213 and all(sha(P / 'mods/gpt' / f) == h for f, h in old_png.items())
+assert len(list((P / 'mods/gpt/costumes').glob('*_hd.png'))) == 3013
+assert not (P / 'mods/gpt/costumes/costume052_1920_hd.png').exists()
+protected = read(A / 'rapporter/sam115-kilde-20261021/beskyttede-samlet1036.json')
+assert len(protected) == 1036 and all(sha(A / f) == h for f, h in protected.items())
+assert git(P, 'stash', 'list', '--format=%H').splitlines() == old['stash']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 423
+assert not (A / 'jobber/fig052_01/resultat.png').exists()
+assert all(not (A / 'jobber' / f'fig115_{n:02d}' / 'resultat.png').exists() for n in range(1, 4))
+assert read(R / 'rasterkontroll-mot-visuelt-sett.json')['croprasteridentiske'] == 55
+
+# Preserve the package state at native publication, then record the actual new checkpoint.
+for folder in ['gang045-20261021', 'max052-20261021']:
+    p = A / 'rapporter' / folder / 'mottak-publisert.json'
+    d = read(p)
+    assert d['i_fellespakke'] and d['pakke_native'] == 3013
+    d['pakker_ved_nativepublisering'] = {
+        'native': d['pakker_native'], 'mangler_native': d['pakker_mangler_native']
+    }
+    d.update(pakker_native=3013, pakker_mangler_native=0, pakker_release_url=q['url'])
+    save(p, d)
+
+receipt = dict(
+    tid_utc=datetime.now(timezone.utc).isoformat(),
+    main_sha=main, main_bare_fire_dokumenter=True,
+    main_CI=dict(id=ci['id'], conclusion=ci['conclusion'], forsok=1, url=ci['html_url']),
+    grafikkrapport_sha=art, grafikkrapport_push_bekreftet=True,
+    hd_mod=q['hd_mod'], native=3013, nye_native_i_denne_bunken=37,
+    release_url=q['url'], release_id=q['release_id'], Latest_bekreftet=True,
+    begge_faktiske_pakker_og_fire_assets_bekreftet=True,
+    runtime_filer_per_pakke=21255, native_filer_bekreftet=21256,
+    nye_native_siden_forrige_felles=55, alle55_observert_i_faktisk_Linux=True,
+    alle55_croprasteridentiske_med_visuelt_sett_produksjon=True,
+    skjermbufferkontroller=379, nullkontroller=375, null_fra_figurstart=244,
+    ingen_nye_eller_okte_bufferavvik=True, helprove_uten_avvik=False,
+    hele_figurjobber_med_resultat=423, total_figurjobber=1758, gjenstar=1335,
+    bevarte_tidligere_native_stier=21219, bevarte_tidligere_png=21213,
+    bevarte_tidligere_releaser_med_assets=len(prior), beskyttede_kilder=1036,
+    tre_stasher_bevart=True, kattepose1920_bare_kandidat=True,
+    ingen115_bildekall_resultat_eller_native=True,
+    neste='K02 egenstrek1HD til 052_1920, deretter kildeavspilling og produksjon av fig115_01..03',
+    motor_eller_pipelinekode_endret=False, ny_Tom_Claude_godkjenning=False,
+    naturlig_gjennomspilling=False, ny_interaktiv_Windows_eller_webtest=False,
+    ekstra_windows_tagbygg=extra_state,
+    grafikkautomatikk_skal_fortsette=True, gamle_nattprosesser_ikke_gjenstartet=True
+)
+save(R / 'sluttkvittering.json', receipt)
+shutil.copy2(__file__, R / 'sluttkvittering.py.txt')
+print(json.dumps({k: receipt[k] for k in [
+    'main_sha', 'main_CI', 'grafikkrapport_sha', 'hd_mod', 'native', 'Latest_bekreftet',
+    'nye_native_i_denne_bunken', 'hele_figurjobber_med_resultat', 'gjenstar'
+]}, ensure_ascii=False), flush=True)
