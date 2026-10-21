@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+protected=read(A/'rapporter/max-intro-20261021/beskyttede-samlet.json');assert len(protected)==1200 and all(sha(A/f)==h for f,h in protected.items());source=read(R/'kildemotor223.json');assert source['exit']==0 and len(source['tegninger'])==94 and len(source['kontroller'])==360 and source['nullkontroller']==359
+jobs=sorted((A/'jobber').glob('fig223_*'));routes=[];groups={};newhash={};notes=[]
+for jpath in jobs:
+ j=read(jpath/'jobb.json');assert not (jpath/'resultat.png').exists() and not (jpath/'retur.md').exists();notes.append(dict(jobb=jpath.name,ruter=len(j['ruter']),rom=j['rom']))
+ for n in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+  f=jpath/n;newhash[f.relative_to(A).as_posix()]=sha(f)
+ for t in j['ruter']:
+  n=t['bilde'];im=Image.open(P/'work/extract/costumes'/(n+'.png')).convert('RGBA');k=(im.size,hashlib.sha256(im.tobytes()).hexdigest());groups.setdefault(k,[]).append(n);routes.append(dict(jobb=jpath.name,bilde=n,kilde_rgba_sha256=k[1],kilde_maal=list(im.size)))
+canonical=[v[0] for v in groups.values()];aliases={n:g[0] for g in groups.values() for n in g};assert len(routes)==94 and len(canonical)==25 and len(newhash)==52
+for t in routes:t['canonical']=aliases[t['bilde']]
+protected.update(newhash);assert len(protected)==1252;save(R/'beskyttede-samlet1252.json',protected)
+plan=dict(jobber=notes,mal=94,ulike_hele_rgba=25,ruter=routes,forste_bunke=[v['jobb'] for v in notes[:5]],forste_bunke_mal=30,forste_bunke_hele_varianter=len({t['canonical'] for t in routes if t['jobb'] in {v['jobb'] for v in notes[:5]}}),nye_kildehash=newhash,tidligere_kildehash_bekreftet=1200,beskyttede_totalt=1252,ingen_bildekall=True,ingen_resultatark=True,ingen_nye_native=True,faktisk_kildeavspilling94=True,primaer_skript210_lest=True,naturlig_full_spilltest=False,visuell_kontekst_sett=False,forste_fem_originalark_sett=True,ovrige_atte_originalark_sett=False)
+save(R/'kildeplan.json',plan);save(R/'kostyme223.json',read(P/'work/extract/costumes.json')['223']);shutil.copy2(O/'skript/rom_045/lokal_210.txt',R/'primaer-rom45-lokal210.txt');shutil.copy2(O/'dekompilering45.json',R/'dekompilering45.json')
+boards=[]
+for start in range(0,len(canonical),6):
+ board=Image.new('RGB',(1000,1140),'#304050');draw=ImageDraw.Draw(board)
+ for i,n in enumerate(canonical[start:start+6]):
+  e=source['tegninger'][n];x,y=e['pos'];w,h=e['maal'];im=Image.open(e['fil']).convert('RGB').crop((x*4-10,y*4-10,(x+w)*4+10,(y+h)*4+10));im.thumbnail((480,345),Image.Resampling.LANCZOS);xx=i%2*500;yy=i//2*380;draw.text((xx+8,yy+8),n+' faktisk kilde i rom45',fill='white');board.paste(im,(xx+8,yy+28))
+ f=R/f'kildekontekst-{start//6+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),varianter=canonical[start:start+6],sett=False))
+save(R/'kildekontekst.json',boards)
+shots=[]
+for i in [0,6,12,18,24]:
+ n=canonical[i];e=source['tegninger'][n];f=R/(n+'-hel-kilde.png');shutil.copy2(e['fil'],f);shots.append(dict(bilde=n,fil=f.name,sha256=sha(f),sett=False))
+save(R/'hele-kildebilder.json',shots);shutil.copy2(__file__,R/'klargjor.py.txt');print('223 neste:13ark94mål25helkilder, første5ark30mål/'+str(plan['forste_bunke_hele_varianter'])+'varianter;1252 beskyttede. 0 kall/resultat/native. Vis kildemotorbilder før produksjon.',flush=True)

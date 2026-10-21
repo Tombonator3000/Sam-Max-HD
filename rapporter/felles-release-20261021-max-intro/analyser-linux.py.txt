@@ -1,0 +1,63 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from collections import Counter
+import json,hashlib,shutil,re,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/max-intro-20261021';V=A/'rapporter/sam-max-intro-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def artifacts(label):
+ d=read(R/(label+'.json'));points=set();rows=[];assert d['exit']==0
+ for e in d['kontroller']:
+  if not e['avvik']:continue
+  f=e['frame'];s=O/label/f'frame_{f:06}_screen.png';w=next(p for p in (O/label).glob(f'frame_{f:06}_room*.png') if '_flat' not in p.stem);x=np.array(Image.open(s).convert('RGB'));y=np.array(Image.open(w).convert('RGB'));yy,xx=np.where(np.any(x!=y,2));assert len(xx)==e['avvik'];pts={tuple([int(i),int(j)]+x[j,i].tolist()+y[j,i].tolist()) for i,j in zip(xx,yy)};points|=pts
+  rows.append(dict(frame=f,avvik=len(xx),bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],signatur=hashlib.sha256(np.stack([xx,yy],1).tobytes()+x[yy,xx].tobytes()+y[yy,xx].tobytes()).hexdigest(),screen_sha256=sha(s),whole_sha256=sha(w)))
+ return d,rows,points
+results={};comparisons=[]
+for kind in ['intro','kostyme12','kostyme13','kostyme17']:
+ b,ba,bp=artifacts(kind+'-grunnlag3150');c,ca,cp=artifacts(kind+'-pakke3276');assert len(b['kontroller'])==len(c['kontroller']) and b['binar_sha256']==c['binar_sha256']
+ assert cp==bp,(kind,'Ny avvikskoordinat eller RGB må undersøkes',len(cp-bp),len(bp-cp))
+ if kind=='intro':assert len(cp)==24 and max(e['avvik'] for e in ca+ba)==12
+ else:assert b['kontroller']==c['kontroller'] and [e for e in c['kontroller'] if e['avvik']]==[dict(frame=36,avvik=160)]
+ comparisons.append(dict(label=kind,grunnlag_kontroller=len(b['kontroller']),pakke_kontroller=len(c['kontroller']),grunnlag_null=b['nullkontroller'],pakke_null=c['nullkontroller'],grunnlag_avvik=ba,pakke_avvik=ca,koordinat_og_begge_RGB_par_identiske=True,identisk_avviksrekkefolge=[e['signatur'] for e in ba]==[e['signatur'] for e in ca],absolutte_framenumre_identiske=b['kontroller']==c['kontroller']))
+ results[kind]=(b,c)
+native=read(R/'nye-native126.json')['ruter'];expected=read(R/'moddfiler-3276.json');prod17=read(S/'kostyme17-bildor3276.json');prod13=read(S/'kostyme13-kandidat3276.json');prod12=read(V/'motor12-seed-kandidat3208.json');prodprev=read(V/'motor-intro-seed-kandidat3208.json');prodnow=read(S/'intro-bildor3276.json')
+# Endelig3276-produksjonsopptak har også de uendrede010-rutene. Les dem fra den bevarte råloggen, samme kandidat med alle126 native.
+T=P/'out/max-intro-20261021/intro-bildor3276';log=(T/'scummvm.log').read_text()
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*10\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());shot=(f//2+1)*2;im=T/f'frame_{shot:06}_room002.png';prodnow['tegninger'].setdefault(f'costume010_{n:03}',dict(logg_frame=f,bildeframe=shot,cel=n,kostyme=10,pos=[x,y],maal=[w,h],fil=str(im),sha256=sha(im)))
+save(R/'endelig-produksjon-naturlig010.json',{n:e for n,e in prodnow['tegninger'].items() if n.startswith('costume010_')})
+rasters=[];selected={};pixelpairs=[]
+for n in [v['bilde'] for v in native]:
+ k=int(n[7:10]);kind='kostyme17' if k==17 else 'kostyme12' if k==12 else 'kostyme13' if n=='costume013_129' else 'intro';b,c=results[kind];new=c['tegninger'][n];old=b['tegninger'][n]
+ pr=prod17 if k==17 else prod12 if k==12 else prod13 if n=='costume013_129' else prodnow
+ before=pr['tegninger'][n];assert before['pos']==new['pos'] and before['maal']==new['maal']
+ x,y=new['pos'];w,h=new['maal'];box=(x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8);newim=Image.open(new['fil']).convert('RGB');oldim=Image.open(before['fil']).convert('RGB');nr=np.array(newim.crop(box));br=np.array(oldim.crop(box));equal=np.array_equal(nr,br)
+ rasters.append(dict(bilde=n,native_sha256=expected['costumes/'+n+'_hd.png'],native_SHA_identisk_med_produksjon=sha(P/'out/max-intro-20261021/mod-intro3276/costumes'/(n+'_hd.png'))==expected['costumes/'+n+'_hd.png'],produksjon_fil=before['fil'],pakke_fil=new['fil'],produksjon_frame=before['bildeframe'],pakke_frame=new['bildeframe'],produksjon_pos=before['pos'],pakke_pos=new['pos'],rekt=list(box),produksjon_crop_sha256=hashlib.sha256(br.tobytes()).hexdigest(),pakke_crop_sha256=hashlib.sha256(nr.tobytes()).hexdigest(),croprasteridentisk=equal,endrede_crop_piksler=int(np.any(nr!=br,2).sum())))
+ selected[n]=(old,new)
+ # Pakke og3150 kan ha andre nylig oppdaterte aktørdeler i samme helbilde. Mål bare når originalflaten er identisk; alle andre par dokumenteres, ingen toleranse senkes.
+ op,npth=Path(old['fil']),Path(new['fil']);of,nf=op.with_name(op.stem+'_flat.png'),npth.with_name(npth.stem+'_flat.png');flat=sha(of)==sha(nf)
+ if flat:
+  a=np.array(Image.open(op).convert('RGB'));z=np.array(newim);delta=np.any(a!=z,2);outside=delta.copy();logframe=new['logg_frame'];rects=[]
+  for e in c['hendelser']:
+   if (e['logg_frame']//2+1)*2!=new['bildeframe']:continue
+   ax,ay=e['pos'];aw,ah=e['maal'];r=[max(0,ax*4-8),max(0,ay*4-8),min(z.shape[1],(ax+aw)*4+8),min(z.shape[0],(ay+ah)*4+8)];outside[r[1]:r[3],r[0]:r[2]]=False;rects.append(r)
+  pixelpairs.append(dict(bilde=n,originalflat_identisk=True,grunnlag_frame=old['bildeframe'],pakke_frame=new['bildeframe'],utenfor_alle_loggede_aktorflater=int(outside.sum()),rektangler=rects))
+ else:pixelpairs.append(dict(bilde=n,originalflat_identisk=False,grunnlag_frame=old['bildeframe'],pakke_frame=new['bildeframe'],utenfor_alle_loggede_aktorflater=None,grunn='Ulik bakgrunnsfargesyklus eller timing i naturlig intro, ikke tolket som grafikkfeil eller identisk par.'))
+save(R/'pakke-pikselkontroll.json',pixelpairs);save(R/'rasterdetaljer126.json',rasters)
+assert len(rasters)==126 and all(e['native_SHA_identisk_med_produksjon'] for e in rasters)
+summary=dict(native=3276,nye_native_observert=126,binar_sha256=results['intro'][1]['binar_sha256'],runder=4,grunnlagsrunder_samme_binar=4,skjermbufferkontroller=sum(len(c['kontroller']) for b,c in results.values()),nullkontroller=sum(c['nullkontroller'] for b,c in results.values()),grunnlag_nullkontroller=sum(b['nullkontroller'] for b,c in results.values()),alle_eksakte_avvikskoordinater_og_RGB_par_identiske=True,nye_feilkoordinater_eller_fargepar=False,antall_avviksframes_identisk=all(len(t['grunnlag_avvik'])==len(t['pakke_avvik']) for t in comparisons),sammenligning=comparisons,andre_aktorer_og_romskript_ikke_skjult=True,naturlig_full_gjennomspilling=False)
+save(R/'linux-kontroll.json',summary);save(O/'linux-kontroll.json',summary)
+save(R/'rasterkontroll-mot-produksjon.json',dict(alle_nativefiler_identiske=True,forventet=126,croprasteridentiske=sum(e['croprasteridentisk'] for e in rasters),ikke_rasteridentiske=[e['bilde'] for e in rasters if not e['croprasteridentisk']],merk='Ulike crop krever konkret undersøkelse før rapport eller publisering.'))
+print('126 nativefiler identiske; raster',sum(e['croprasteridentisk'] for e in rasters),'/126. Pixelparidentiske originalflater',sum(e['originalflat_identisk'] for e in pixelpairs),'/126',flush=True)
+print('Buffer',summary['nullkontroller'],'/',summary['skjermbufferkontroller'],'grunnlag',summary['grunnlag_nullkontroller'],'samme eksakte feilpunkt/RGB-sett',flush=True)
+# Bilder til egen visuell vurdering. Hele naturlige bilder fra alle fem familier og separate kontrollpar.
+shots=[];wholes=[]
+for n in ['costume010_1920','costume010_1952','costume012_1920','costume012_1935','costume013_000','costume013_128','costume013_129','costume017_1920','costume017_1937','costume017_1954','costume018_1928','costume018_1938']:
+ old,new=selected[n];f=R/(n+'-pakke-linux.png');shutil.copy2(new['fil'],f);shots.append(dict(bilde=n,fil=f.name,sha256=sha(f),frame=new['bildeframe']))
+ board=Image.new('RGB',(1280,430),'#304050');draw=ImageDraw.Draw(board);draw.text((8,8),n+': faktisk ny Linux-binar, grunnlag3150 / pakke3276',fill='white')
+ for i,e in enumerate([old,new]):board.paste(Image.open(e['fil']).convert('RGB').resize((640,400)),(i*640,30))
+ f=R/(n+'-pakke-for-etter.png');board.save(f);wholes.append(dict(bilde=n,fil=f.name,sha256=sha(f)))
+c=results['intro'][1];e=c['tegninger']['costume017_1954'];T=Path(e['fil']).parent;center=e['bildeframe'];b=Image.new('RGB',(1000,5*265),'#304050');d=ImageDraw.Draw(b)
+for i,f in enumerate([center-16,center-4,center,center+6,center+62]):
+ a=Image.open(T/f'frame_{f:06}_room002.png').convert('RGB');cut=a.crop((640,330,1180,625));cut.thumbnail((550,240));b.paste(cut,(5,i*265+25));a.thumbnail((390,240));b.paste(a,(600,i*265+25));d.text((8,i*265+5),f'Ny Linux-pakke, naturlig dorfase {f}',fill='white')
+f=R/'bildor-i-ny-pakke.png';b.save(f)
+save(R/'pakke-visuell-plan.json',dict(hele_motorbilder=shots,hele_for_etter=wholes,bildorsekvens=dict(fil=f.name,sha256=sha(f)),visuelt_sett=False));shutil.copy2(__file__,R/'analyser-linux.py.txt')

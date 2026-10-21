@@ -1,0 +1,39 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,subprocess,os,re,gzip,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PK=O/'linux/squashfs-root';B=PK/'usr/bin/scummvm';D=PK/'usr/share/sam-max-hd'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+state=read(O/'bygg-startet.json');manifest=read(R/'moddfiler-3276.json');expected={f:h for f,h in manifest.items() if f!='README.md'}
+assert len(expected)==21518 and all(sha(D/'mods/gpt'/f)==h for f,h in expected.items());assert read(R/'linux-nedlasting-kontroll.json')['alle_hash_bekreftet'] and read(R/'linux-nedlasting-kontroll.json')['hd_mod']==state['hd_mod']
+base=P/'out/felles-release-20261021-sam303/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt';bm=read(A/'rapporter/felles-release-20261021-sam303/moddfiler-3150.json');assert all(sha(base/f)==h for f,h in bm.items() if f!='README.md')
+want={v['bilde'] for v in read(R/'nye-native126.json')['ruter']};assert len(want)==126
+settings={'intro':dict(frames=2600),'kostyme12':dict(frames=240,kostyme=12,pos='104,171',animation='6',chore='10000',sett=20),'kostyme13':dict(frames=360,kostyme=13,pos='187,184',chore='24',sett=5),'kostyme17':dict(frames=240,kostyme=17,pos='160,183',animation='6',chore='10000',sett=41)}
+def run(task):
+ kind,version=task;s=settings[kind];label=kind+'-'+version;T=O/label;assert not T.exists();T.mkdir();(T/'home').mkdir();(T/'saves').mkdir()
+ if kind!='intro':
+  for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,T/'saves'/p.name)
+ mod=base if version=='grunnlag3150' else D/'mods/gpt'
+ env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update(HOME=str(T/'home'),XDG_CONFIG_HOME=str(T/'home/.config'),XDG_DATA_HOME=str(T/'home/.local/share'),XDG_CACHE_HOME=str(T/'home/.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(mod),DIGHD_VERIFY='1',DIGHD_QUIT_AT=str(s['frames']),DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='2',DIGHD_DUMP_FLAT='1',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+ if kind=='intro':env['DIGHD_TEST_KEYS']=','.join(f'{n}:.' for n in range(80,2600,20))
+ else:
+  env.update(DIGHD_TEST_ROOM='2',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_TEST_COSTUME=str(s['kostyme']),DIGHD_TEST_ACTOR='3',DIGHD_TEST_POS=s['pos'],DIGHD_TEST_SCALE='255',DIGHD_TEST_PALETTE='0',DIGHD_TEST_CHORE_EVERY=s['chore'])
+  if 'animation' in s:env['DIGHD_TEST_ANIMATION']=s['animation']
+ args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(T/'saves'),'--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--random-seed=20261021','--debuglevel=1','samnmax']
+ if kind!='intro':args.insert(-1,'--save-slot=2')
+ with (T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=540).returncode
+ log=(T/'scummvm.log').read_text();checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];events=[];obs={}
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(10|12|13|17|18)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+  f,n,c,x,y,w,h=map(int,m.groups());shot=(f//2+1)*2;images=[p for p in T.glob(f'frame_{shot:06}_room*.png') if '_flat' not in p.name]
+  row=dict(logg_frame=f,bildeframe=shot,cel=n,kostyme=c,pos=[x,y],maal=[w,h],fil=str(images[0]) if images else None,sha256=sha(images[0]) if images else None);events.append(row)
+  if images:obs.setdefault(f'costume{c:03}_{n:03}',row)
+ proof=dict(label=label,kode=state['kode'],hd_mod=state['hd_mod'] if version=='pakke3276' else '3150 fra forrige faktiske fellespakke',native=3276 if version=='pakke3276' else 3150,exit=code,binar=str(B),binar_sha256=sha(B),kommando=args,testvariabler={k:v for k,v in env.items() if k.startswith('DIGHD_')},random_seed=20261021,kontroller=checks,nullkontroller=sum(x['avvik']==0 for x in checks),tegninger=obs,hendelser=events,sett=len(want&set(obs)),mangler=sorted(want-set(obs)),mod_json_sha256=sha(mod/'mod.json'),andre_aktorer_og_romskript_ikke_skjult=True,naturlig_intro=kind=='intro',full_naturlig_gjennomspilling=False,logg_sha256=sha(T/'scummvm.log'))
+ save(R/(label+'.json'),proof)
+ with gzip.open(R/(label+'.log.gz'),'wb') as f:f.write((T/'scummvm.log').read_bytes())
+ print(label,'exit',code,'mål',len(want&set(obs)),'kontroller',len(checks),'null',proof['nullkontroller'],flush=True)
+ assert code==0 and len(checks)==s['frames']//2,(label,'Ufullstendig eller feilende motorprøve')
+ if kind!='intro':assert len([n for n in obs if n.startswith('costume'+str(s['kostyme']).zfill(3))])==s['sett']
+ return proof
+with ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(run,[(k,v) for k in settings for v in ['grunnlag3150','pakke3276']]))
+obs={n:e for q in results if q['native']==3276 for n,e in q['tegninger'].items()};assert not want-set(obs)
+save(R/'motorobservasjoner126.json',dict(sett=126,mangler=[],ruter={n:obs[n] for n in sorted(want)},binar_sha256=sha(B)))
+shutil.copy2(__file__,R/'kontroller-linux.py.txt');print('8 faktiske motorprøver fullført; 126 nye mål observert. Piksel- og visuell kontroll gjenstår.',flush=True)

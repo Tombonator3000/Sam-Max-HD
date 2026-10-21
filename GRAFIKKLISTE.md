@@ -987,15 +987,15 @@ Figurark for Sam, Max.
 - [ ] `fig317_03` (figurark 3 for Max (kostyme 317), 13 ruter: animasjon 8 mot høyre (11 ruter); animasjon 9 mot høyre (2 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig317_04` (figurark 4 for Max (kostyme 317), 8 ruter: animasjon 9 mot høyre (8 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig317_05` (figurark 5 for Max (kostyme 317), 16 ruter: animasjon 9 mot høyre (16 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig018_01` (figurark 1 for Max (kostyme 18), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig018_02` (figurark 2 for Max (kostyme 18), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig018_03` (figurark 3 for Max (kostyme 18), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
+- [x] `fig018_01` (figurark 1 for Max (kostyme 18), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/max.png`)
+- [x] `fig018_02` (figurark 2 for Max (kostyme 18), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/max.png`)
+- [x] `fig018_03` (figurark 3 for Max (kostyme 18), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
 
 ## Bestilling 56
 
 Figurark for Max, Sam.
 
-- [ ] `fig018_04` (figurark 4 for Max (kostyme 18), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/max.png`)
+- [x] `fig018_04` (figurark 4 for Max (kostyme 18), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig027_01` (figurark 1 for Sam (kostyme 27), 15 ruter: start mot høyre (15 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig027_02` (figurark 2 for Sam (kostyme 27), 16 ruter: animasjon 7 mot høyre (16 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig027_03` (figurark 3 for Sam (kostyme 27), 16 ruter: animasjon 7 mot høyre (16 ruter), bilde to `hovedark/sam.png`)
@@ -1088,8 +1088,8 @@ Figurark for Max, Sam.
 - [ ] `fig348_03` (figurark 3 for Max (kostyme 348), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [x] `fig010_01` (figurark 1 for Sam (kostyme 10), 13 ruter: start mot høyre (13 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig010_02` (figurark 2 for Sam (kostyme 10), 25 ruter: start mot høyre (25 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig017_01` (figurark 1 for Max (kostyme 17), 34 ruter: start mot høyre (34 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig017_02` (figurark 2 for Max (kostyme 17), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
+- [x] `fig017_01` (figurark 1 for Max (kostyme 17), 34 ruter: start mot høyre (34 ruter), bilde to `hovedark/max.png`)
+- [x] `fig017_02` (figurark 2 for Max (kostyme 17), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig037_01` (figurark 1 for Max (kostyme 37), 25 ruter: start mot høyre (25 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig037_02` (figurark 2 for Max (kostyme 37), 20 ruter: start mot høyre (20 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig046_01` (figurark 1 for Max (kostyme 46), 11 ruter: start mot høyre (11 ruter), bilde to `hovedark/max.png`)
@@ -1105,7 +1105,7 @@ Figurark for Sam, Sam og Max, Max.
 - [ ] `fig163_02` (figurark 2 for Sam og Max (kostyme 163), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig217_01` (figurark 1 for Sam og Max (kostyme 217), 34 ruter: start mot høyre (34 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig217_02` (figurark 2 for Sam og Max (kostyme 217), 6 ruter: start (lag 15, tegnes over kroppen) mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig013_01` (figurark 1 for Max (kostyme 13), 5 ruter: stående (lag 0, tegnes over kroppen) bort (1 rute); start (lag 0, tegnes over kroppen) mot høyre (1 rute); stående bort (1 rute); snakking (lag 0, tegnes over kroppen) bort (1 rute); animasjon 6 bort (1 rute), bilde to `hovedark/max.png`)
+- [x] `fig013_01` (figurark 1 for Max (kostyme 13), 5 ruter: stående (lag 0, tegnes over kroppen) bort (1 rute); start (lag 0, tegnes over kroppen) mot høyre (1 rute); stående bort (1 rute); snakking (lag 0, tegnes over kroppen) bort (1 rute); animasjon 6 bort (1 rute), bilde to `hovedark/max.png`)
 - [ ] `fig055_01` (figurark 1 for Sam og Max (kostyme 55), 30 ruter: start mot høyre (20 ruter); start (lag 15, tegnes over kroppen) mot høyre (10 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig058_01` (figurark 1 for Sam (kostyme 58), 7 ruter: start mot høyre (3 ruter); animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig111_01` (figurark 1 for Sam (kostyme 111), 17 ruter: start (lag 14, tegnes over kroppen) mot høyre (1 rute); start mot høyre (16 ruter), bilde to `hovedark/sam.png`)
