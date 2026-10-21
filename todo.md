@@ -1,5 +1,17 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 22:12
+
+- [x] Fig088_06 til fig088_08 levert, visuelt sett, teknisk mottatt, motorobservert, publisert og hentet: tre ark, 14 native, 3535 totalt. Hele familien åtte ark/64 mål. 497/1758 ark har resultat; 1261 gjenstår pluss returer og sluttkontroll.
+- [x] Felles Linux/Windows 3535 faktisk lastet ned, alle 21777 runtimefiler per pakke byteidentiske, fire fellesvedlegg hentet igjen og hashbekreftet. Ny Linux-binær logget alle 64 i primær 201 og hel 6. 128 SHA-like originalflater/figurutsnitt, null utenfor loggede aktørflater, 1436/1440 null per side med identiske kjente avvik. Ingen ny Tom-/Claude-godkjenning.
+- [x] 24 innebygde kall og ti kvalitetsreturer bevart. Sju omrissvarsler visuelt vurdert, ingen FEIL; 14 native automatisk OK. Alle tidligere filer, 1380 kilder, tre stasher og releaser bevart. Windows' første SDL-feil bevart; én uendret omprøve bestod.
+- [ ] Native holdes frosset mens registrerte ekstra taggbygg kjører. Følg opp disse i siste pakkerapport før ny nativepublisering; ikke start duplikater.
+- [ ] Undersøk kantrest ved åpen kjegletopp. Se visuell-retur.json og kantrest-pikselutvalg.json i rapporter/sam088-slutt-20261021. Spor peker på obj173_01 ved 96,32 som underlag. Bevar nativefrysen og ekte alfa. Avklar lagårsaken før eventuell omtegning; kodeendringer går via testet PR.
+- [ ] Fortsett øvrige produserbare grafikkjobber og returer med aktuelle hele kilder, kontekst og stilankre. Ingen omprøve av holdte motiver/aliaser, ingen ny grafikk i main.
+- [ ] Naturlig gjennomspilling, interaktiv Windows, ny webtest, SDL-/inventar-/testhoppbegrensninger og samlet sluttkontroll. Automatikken fortsetter uten gamle nattprosesser.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 20:35
 
 - [x] Fig088_01 til fig088_05 levert, visuelt sett, native mottatt, motorobservert, publisert og hentet. Fem ark, 50 nye native, 3521 totalt. 494 av 1758 hele figurjobber har resultat; 1264 gjenstår pluss returer, katalogfeil og sluttkontroll.
