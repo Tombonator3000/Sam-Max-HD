@@ -1,0 +1,52 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json
+import subprocess
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+q = json.loads((R / 'publisert.json').read_text())
+assert q['native'] == 3098 and q['Latest_bekreftet'] and q['figurjobber_med_resultat'] == 427
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=P, text=True).strip()
+subprocess.run(['git', 'pull', '--ff-only'], cwd=P, check=True)
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=P, text=True).strip() == q['kode']
+now = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+runs = json.loads(subprocess.check_output(['gh', 'api',
+    'repos/Tombonator3000/Sam-Max-HD/actions/workflows/windows.yml/runs?per_page=20'], cwd=P, text=True))['workflow_runs']
+tagruns = [dict(id=v['id'], status=v['status'], conclusion=v['conclusion'], event=v['event'], sha=v['head_sha'])
+    for v in runs if v['head_sha'] == q['kode'] and v['event'] == 'push' and v['id'] > q['windows_run']]
+(R / 'ekstra-windows-tagbygg.json').write_text(json.dumps(tagruns, indent=2) + '\n')
+facts = f'''[Felles Linux-/Windows-utgave med 3098 native ruter]({q['url']}) er publisert og bekreftet som Latest. Begge faktiske nedlastinger, fire SHA-digester og alle 21340 runtime-moddfiler per pakke er kontrollert. HD-mod er `{q['hd_mod']}`, pakkekoden er `{q['kode']}`. Alle {q['bevarte_tidligere_releaser']} tidligere releaser og gjeldende vedlegg ved fellespubliseringen er bevart. Tidligere fellesutgaver med sine nedlastinger er urørt. Nativefrysen er frigitt.
+
+85 nye native siden felles 3013 er inkludert: siste kattepose 052_1920 og 84 golf-ruter fra Sam115. Fire hele ark er fullført siden forrige samlepunkt: fig052_01 og fig115_01..03. 427 av 1758 hele figurjobber har resultat; 1331 gjenstår pluss returer, katalogfeil og sluttkontroll. Alle 85 er logget i den faktiske nye Linux-pakken, og 85 av 85 native PNG-filer og figurutsnitt er identiske med visuelt kontrollert produksjon. 579 skjermbufferkontroller gir 578 null i både pakken og 3013-grunnlaget med samme nye binær. Det samme kjente 160-avviket ved bilde 36 kommer før kattefigurstart. Alle 51 kontroller fra denne figurstarten og alle 480 golfkontroller er null. Ingen nye eller økte avvik. Tolv hele pakkebilder og fire før/etter-par er sett; alle fire par har null forskjeller utenfor loggede aktørflater med målemargin. Andre aktører og romskript er ikke skjult. Ingen nye motor- eller pipelineendringer.
+
+Opplastingsprosessen for den felles utgaven ble avbrutt med kode 143 etter de to SHA-filene. Samme validerte releasekladd ble bevart og bare de to manglende store pakkefilene ble lastet opp. Ingen ny kladd, nye byggforsøk eller overskriving av gamle vedlegg. Kladden ble først publisert etter kontroll av alle fire filstørrelser og serverdigester. Linux-bygg {q['linux_run']} og Windows-bygg {q['windows_run']} passerte i første forsøk. Et eventuelt ekstra automatisk Windows-taggbygg er registrert separat uten omprøve eller kansellering. Den tidligere sporadiske dummy-SDL-feilen er fortsatt åpen; et nytt vellykket pakkebygg beviser ikke at den er rettet.
+
+Neste praktiske bunke er fig304_01..05, deretter resten av familien. Kildegrunnlaget har 15 jobber, 34 mål fra 29 hele RGBA-originaler. Originalen viser Sam OG Max med den beige hyssingen ved dinosaurtannen i rom 59. Primærskript 208, objekt 570 og objekt 568 er bevart. Originalskriptet er avspilt med dokumentert forutgående aktørinitialisering som Sam303; alle 34 mål er logget. Kildeprøven har 450 kontroller og 448 null, 4 ved bilde 36 og 160 ved 450, og er ikke en feilfri naturlig spilltest. Første fem originalark, begge godkjente hovedark og seks faktiske romopptak er sett. Ingen 304-bildekall, resultatark eller native er laget. Bevar de tynne hyssingdelene, viklingen rundt Max og kildebekreftede små merker. Alle 1096 beskyttede kildehash, alle tidligere grafikkfiler og tre stasher er uendret.
+
+Full naturlig gjennomspilling, interaktiv Windows-test og ny webtest gjenstår. Ingen ny Tom-/Claude-godkjenning. Inventarkant 35, eldre testhopp/tidsavbrudd ved 816/836/1384/387 og inventarikonets RGB under 044-eksplosjonen er fortsatt åpne. Avviste bildekall og ugyldige 344/346-ruter omprøves ikke. Rapporter på gpt-arbeid: `rapporter/felles-release-20261021-golf115`, `rapporter/sam115-golf-20261021`, `rapporter/max052-kattslutt-20261021` og `rapporter/sam304-kilde-20261021`. Bibliotek: `figurark-fast-storrelse` og `publisert-mod-er-fasit`. Main får bare memory.md, todo.md, STATUS.md og log.md. Grafikkautomatikken fortsetter uten gammel nattfrist; gamle nattprosesser gjenstartes ikke.
+'''
+for name in ['memory.md', 'STATUS.md', 'todo.md']:
+    f = P / name
+    s = f.read_text()
+    i = s.find('\n')
+    content = facts
+    if name == 'todo.md':
+        content = f'''427 av 1758 hele figurjobber har resultat; 1331 gjenstår pluss returer og sluttkontroll. [Felles Linux og Windows med 3098 native ruter]({q['url']}) er faktisk kontrollert og Latest-bekreftet. Alle 85 nye ruter er med, uten nye eller økte bufferavvik. Nativefrysen er frigitt.
+
+- [x] Fullfør siste kattepose og hele fig052_01.
+- [x] Lag, kontroller, importer og publiser fig115_01..03 med 84 nye golf-ruter.
+- [x] Hent og kontroller begge faktiske pakker med 3098 native, 21340 runtimefiler hver og alle 85 nye i faktisk Linux. Publiser og bekreft fellesutgaven og Latest.
+- [x] Kildeavspill neste familie 304: alle 34 mål fra 29 hele RGBA-originaler. Første fem originalark, begge hovedark og seks romopptak er sett. Ingen nye bildekall/resultater.
+- [ ] Produser fig304_01..05 fra dokumentert kildegrunnlag med Sam OG Max og hyssingen, deretter resten av familien. Bevar 1096 beskyttede kilder og tre stasher.
+- [ ] Fullfør øvrige produserbare jobber, returer og samlet sluttkontroll. Automatikken fortsetter.
+'''
+    f.write_text(s[:i + 1] + f'\n## Siste verifiserte grafikkstatus, {now}\n\n' + content + '\n' + s[i + 1:])
+with (P / 'log.md').open('a') as f:
+    f.write(f'\n## {now} (Codex)\n\n' + facts + '\n')
+shutil.copy2(__file__, R / 'oppdater-hoved.py.txt')
+print('Oppdatert bare de fire hoveddokumentene. Ekstra taggbygg:', tagruns, flush=True)

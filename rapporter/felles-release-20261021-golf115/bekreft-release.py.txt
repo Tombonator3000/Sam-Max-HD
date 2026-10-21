@@ -1,0 +1,102 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import json
+import hashlib
+import subprocess
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+api = lambda x: json.loads(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + x], cwd=P, text=True))
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+state = read(O / 'bygg-startet.json')
+tag, code, mod = (state[k] for k in ['release_tag', 'kode', 'hd_mod'])
+meta, latest = api('releases/tags/' + tag), api('releases/latest')
+assert meta['id'] == latest['id'] and not meta['draft'] and not meta['prerelease']
+assets = read(O / 'assetkontroll.json')
+assert len(meta['assets']) == len(assets) == 4
+for v in assets:
+    asset = next(a for a in meta['assets'] if a['name'] == v['fil'])
+    assert asset['size'] == v['bytes'] and asset['digest'] == 'sha256:' + v['sha256']
+    assert sha(O / v['plattform'] / v['fil']) == v['sha256']
+ref = api('git/ref/tags/' + tag)['object']
+if ref['type'] == 'tag':
+    ref = api('git/tags/' + ref['sha'])['object']
+assert ref['type'] == 'commit' and ref['sha'] == code
+prior, after = read(O / 'releaser-foer.json'), api('releases?per_page=100')
+assert len(after) == len(prior) + 1
+aset = lambda v: {(a['id'], a['name'], a['size'], a['digest']) for a in v['assets']}
+for v in prior:
+    assert aset(v) == aset(next(x for x in after if x['id'] == v['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha'] == mod
+files = read(R / 'moddfiler-3098.json')
+assert len(files) == 21341 and all(sha(P / 'mods/gpt' / f) == h for f, h in files.items())
+runtime = read(O / 'linux-kontroll.json')
+assert runtime['skjermbufferkontroller'] == 579 and runtime['nullkontroller'] == 578
+assert runtime['nye_native_observert'] == 85 and not runtime['nye_eller_oekte_avvik']
+assert len(read(R / 'motorbilder.json')) == 12
+assert read(R / 'rasterkontroll-mot-visuelt-sett.json')['croprasteridentiske'] == 85
+runs = {k: api('actions/runs/' + str(state['plattform'][k]['run_id'])) for k in ['linux', 'windows']}
+assert all(v['conclusion'] == 'success' and v['run_attempt'] == 1 and v['head_sha'] == code for v in runs.values())
+protected = read(A / 'rapporter/sam304-kilde-20261021/beskyttede-samlet1096.json')
+assert len(protected) == 1096 and all(sha(A / f) == h for f, h in protected.items())
+base = read(A / 'rapporter/sam115-golf-20261021/grunnlag-produksjon.json')
+assert subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines() == base['stash']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 427
+proof = dict(tid_utc=datetime.now(timezone.utc).isoformat(), url=meta['html_url'], release_id=meta['id'],
+    release_tag=tag, Latest_bekreftet=True, kode=code, hd_mod=mod, native=3098,
+    nye_native_siden_felles3013=85, nye_hele_ark_siden_felles3013=4, kostyme052_native=1,
+    kostyme115_native=84, figurjobber_med_resultat=427, figurjobber_totalt=1758,
+    gjenstaar_hele_jobber=1331, faktiske_nedlastinger_begge=True,
+    runtime_moddfiler_per_pakke_bekreftet=21340, fire_assets_digest_og_bytes_verifisert=True,
+    bevarte_tidligere_releaser=len(prior), alle_tidligere_assets_bevart_ved_fellespublisering=True,
+    tidligere_fellesutgaver_med_assets_bevart=True,
+    linux_run=state['plattform']['linux']['run_id'], windows_run=state['plattform']['windows']['run_id'],
+    windows_forsoek=1, linux_forsoek=1, linux_binar_sha256=runtime['binar_sha256'],
+    skjermbufferkontroller=579, nullkontroller=578, ingen_nye_eller_okte_skjermbufferavvik=True,
+    kjente_overgangsavvik=[dict(frame=36, avvik=160)], null_fra_kattfigurstart=51,
+    golfkontroller_uten_avvik=480, helprove_uten_avvik=False, hele_motorbilder_sett=12,
+    foer_etter_sett=4, figurcropraster_identiske=85,
+    rgb_utenfor_alle_loggede_aktorer_i_fire_par=[0] * 4,
+    beskyttede_kilder=1096, tre_stasher_bevart=True, ny_Tom_Claude_godkjenning=False,
+    naturlig_gjennomspilling=False, ny_interaktiv_windows_eller_webtest=False)
+for D in [O, R]:
+    save(D / 'publisert.json', proof)
+    save(D / 'release-publisert.json', meta)
+state.update(status='fellesrelease_publisert_og_kontrollert', Latest_bekreftet=True,
+    native_frys_kan_frigis=True, release_url=meta['html_url'])
+for D in [O, R]:
+    save(D / 'bygg-startet.json', state)
+for folder in ['max052-kattslutt-20261021', 'sam115-golf-20261021']:
+    D = A / 'rapporter' / folder
+    for fn in ['fremdrift.json', 'sluttkontroll.json', 'mottak-publisert.json']:
+        data = read(D / fn)
+        data.update(i_fellespakke=True, fellespakke_tag=tag, pakke_hd_mod_sha=mod,
+            pakke_native=3098, pakker_native=3098, pakker_mangler_native=0)
+        for e in data.get('leveranser', []):
+            e.update(i_fellespakke=True, fellespakke_tag=tag, pakke_hd_mod_sha=mod,
+                pakke_native=3098, pakker_native=3098, pakker_mangler_native=0)
+        save(D / fn, data)
+    f = D / 'RAPPORT.md'
+    f.write_text(f.read_text().rstrip() + f'\n\nFelles Linux-/Windows-utgave 3098 og Latest er bekreftet: {meta["html_url"]}. Begge faktiske nedlastinger og alle 21340 runtimefiler per pakke er SHA-bekreftet. Alle 85 nye er motorlogget og har byteidentiske figurutsnitt til kontrollert produksjon. 579 kontroller ga 578 null, samme kjente 160 ved bilde 36; alle 51 fra kattefigurstart og 480 golfkontroller er null. Ingen nye eller økte avvik. Alle {len(prior)} tidligere releaser og gjeldende vedlegg er bevart ved fellespubliseringen. Nativefrysen er frigitt. Ingen ny Tom-/Claude-godkjenning.\n')
+(A / 'rapporter/sam115-golf-20261021/NESTE.md').write_text(f'''Golfbunken er ferdig i faktisk kontrollert fellesutgave: {meta['html_url']}. 3098 native ruter, 427 av 1758 hele figurjobber med resultat. Ingen av de 84 golf-rutene eller den siste katteposen skal gjentas. Nativefrysen er frigitt. Begge pakker er faktisk lastet ned og kontrollert; ingen ny Tom-/Claude-godkjenning.
+
+Neste praktiske bunke er fig304_01..05, deretter resten av familien. Se rapporter/sam304-kilde-20261021/KILDEGRUNNLAG.md og NESTE.md før bildekall. Familien viser Sam OG Max sammen med hyssing, ikke bare Sam som jobbnavnet sier. Primærskript 208 med dokumentert aktørinitialisering har avspilt alle 34 mål fra 29 hele RGBA-originaler. Kildeprøven har to kjente avvik og er ikke en feilfri naturlig spilltest. Ingen 304-bildekall, resultatark eller native er laget. Se begge godkjente hovedark, aktuelle originaler og faktisk kilde i rom 59. Bevar små løse merker, tynn hyssing og begge figuridentiteter. Bevar alle tidligere grafikkfiler, 1096 beskyttede kildehash og tre stasher. Avviste kall og ugyldige 344/346-ruter omprøves ikke.
+''')
+(A / 'rapporter/max052-kattslutt-20261021/NESTE.md').write_text('Siste kattepose og hele fig052_01 er ferdig og inkludert i verifisert fellesutgave 3098: ' + meta['html_url'] + '. Golf115 er også ferdig med 84 nye native. Ikke gjenta disse. 427 av 1758 hele figurjobber med resultat. Neste er kildegrunnlaget for fig304_01..05, se rapporter/sam304-kilde-20261021 og sam115-golf-20261021/NESTE.md. Nativefrysen er frigitt.\n')
+nextfile = A / 'rapporter/sam304-kilde-20261021/NESTE.md'
+nextfile.write_text(nextfile.read_text().rstrip() + '\n\nFellesutgave 3098 er nå publisert og faktisk kontrollert: ' + meta['html_url'] + '. Nativefrysen er frigitt. Produksjonen kan fortsette etter kilde-/stilgjennomgang; ingen 304-bildekall eller resultater ennå.\n')
+for name in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+    f = A / name
+    s = f.read_text()
+    i = s.find('\n')
+    line = f'Felles Linux/Windows 3098 er publisert og Latest-bekreftet: {meta["html_url"]}. Begge faktiske pakker og 21340 runtimefiler hver er SHA-kontrollert. Alle 85 nye native siden 3013 er motorlogget med identiske figurutsnitt til kontrollert produksjon; 578/579 null, samme kjente 160 ved 36, ingen nye eller økte avvik. 427 av 1758 hele figurjobber med resultat. Nativefrysen er frigitt. Neste fig304_01..05 fra kildegrunnlaget med alle 34 originalmål avspilt. Se rapporter/sam304-kilde-20261021/NESTE.md. Ingen 304-bildekall eller resultat ennå. Bevar 1096 kilder, alle tidligere filer og tre stasher. Ingen ny Tom-/Claude-godkjenning.'
+    f.write_text(s[:i + 1] + '\n' + line + '\n' + s[i + 1:])
+(R / 'RAPPORT.md').write_text((R / 'RAPPORT.md').read_text() + f'\nFellesutgave og Latest er bekreftet: {meta["html_url"]}. Nativefrysen er frigitt.\n')
+(R / 'PAAGAR.md').write_text(f'Ferdig samlepunkt: {meta["html_url"]}. Begge faktiske pakker, 3098 native, 85 nye, Latest bekreftet. 578/579 null, samme kjente 160 ved 36, ingen nye eller økte avvik. Nativefrysen er frigitt. 427 hele resultatark, 1331 gjenstår. Neste er fig304_01..05 fra kildegrunnlaget. Ingen nye 304-bildekall/resultater.\n')
+shutil.copy2(__file__, R / 'bekreft-release.py.txt')
+print(json.dumps({k: proof[k] for k in ['url', 'release_id', 'native', 'nye_native_siden_felles3013', 'bevarte_tidligere_releaser', 'Latest_bekreftet']}, ensure_ascii=False), flush=True)

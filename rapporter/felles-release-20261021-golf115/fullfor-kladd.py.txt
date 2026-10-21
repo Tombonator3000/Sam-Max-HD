@@ -1,0 +1,48 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import subprocess
+import json
+import hashlib
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+O = Path(__file__).resolve().parent
+R = P / 'work/.gpt-gren/rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+state = read(O / 'bygg-startet.json')
+recovery = read(O / 'avbrutt-opplasting.json')
+api = lambda p: json.loads(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + p], cwd=P, text=True))
+meta = api('releases/' + str(recovery['release_id']))
+assert meta['id'] == 419101825 and meta['draft'] and meta['tag_name'] == state['release_tag']
+assert meta['target_commitish'] == state['kode']
+assert meta['body'].rstrip() == (O / 'utgivelse-notat.md').read_text().rstrip()
+assets = read(O / 'assetkontroll.json')
+assert len(meta['assets']) == len(assets) == 4
+for v in assets:
+    a = next(a for a in meta['assets'] if a['name'] == v['fil'])
+    assert a['state'] == 'uploaded' and a['size'] == v['bytes'] and a['digest'] == 'sha256:' + v['sha256']
+    assert sha(O / v['plattform'] / v['fil']) == v['sha256']
+old = read(O / 'release-kladd-for-fullforing.json')
+for a in old['assets']:
+    actual = next(v for v in meta['assets'] if v['id'] == a['id'])
+    assert actual['digest'] == a['digest'] and actual['size'] == a['size']
+assert api('git/ref/heads/hd-mod')['object']['sha'] == state['hd_mod']
+for d in [O, R]:
+    save(d / 'release-kladd-fire-filer.json', meta)
+command = ['gh', 'release', 'edit', state['release_tag'], '--draft=false', '--latest']
+result = subprocess.run(command, cwd=P, text=True, capture_output=True)
+recovery.update(fullfort_utc=datetime.now(timezone.utc).isoformat(), alle_fire_filer_verifisert=True,
+    opprinnelige_sha_asset_ider_bevart=True, bare_manglende_binara_filer_opplastet=True,
+    publish_kommando=command, publish_exit=result.returncode, stdout=result.stdout, stderr=result.stderr)
+for d in [O, R]:
+    save(d / 'avbrutt-opplasting.json', recovery)
+    initial = read(d / 'publisering-forsokt.json')
+    initial.update(utfall='opprinnelig_avbrutt_samme_kladd_fullfort', opprinnelig_prosess=143,
+        gjenoppretting_publish_exit=result.returncode, release_id=meta['id'])
+    save(d / 'publisering-forsokt.json', initial)
+shutil.copy2(__file__, R / 'fullfor-kladd.py.txt')
+shutil.copy2(O / 'publiser-release.py', R / 'publiser-release.py.txt')
+assert result.returncode == 0, result.stderr
+print('Samme kladd publisert med alle fire verifiserte filer. Full sluttkvittering gjenstår.', flush=True)
