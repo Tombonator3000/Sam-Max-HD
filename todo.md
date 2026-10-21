@@ -1,5 +1,18 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 09:10
+
+- [x] Levert, kontrollert og additivt publisert fig010_01..02 og fig012_01..03: 58 nye native, 3208 totalt. Alle 21451 filhash og tidligere grafikk er bekreftet etter hent. 451 av 1758 hele resultatjobber, 1307 gjenstår pluss returer/katalogfeil/sluttkontroll.
+- [x] Sett alle 46 egne varianter og seks hele før/etter-par i faktisk Linux. Alle 58 originalbilder SHA-identiske, null HD-endring utenfor nye figurer. 1420 kontroller/1385 null; identiske kjente avviksmønstre og RGB etter bildebasert sammenligning. Framenumrene er ikke identiske mellom oppstarter.
+- [x] Kildeklargjort neste sju Max-introark med 68 mål/58 hele kilder, sju originalark sett, 64 mål loggobservert og 1200 kildehash bekreftet. Ingen nye kall eller resultater der.
+- [ ] Gjenoppta rapporter/max-intro-kilde-20261021 på gpt-arbeid. Spill kildebegrunnet hel 13-animasjon for 000/001/002/129 og se alle kilder i spillkontekst samt Max-hovedark før produksjon. Kostyme 18 har også grønn motstander, fragmenter og støv. Bevar alle små deler og egen alfa. Ikke gjenta 010/012 eller tidligere blokkerte motiver.
+- [ ] Fullfør neste praktiske Max-introbunke med råbilder, faktiske prompter, resultatark, notater, SHA-festet fremdrift/rutekart, visuell kontroll, native mottak og relevant motoravspilling. Publiser additivt med fjern-SHA og hent tilbake med alle hash.
+- [ ] Oppdater felles Linux-/Windows-pakker ved introfamiliens samlepunkt, eller tidligere ved blokkering. Nåværende faktisk kontrollerte pakke har 3150 og mangler 58. Frys native-SHA under bygg, last ned begge faktiske pakker og bekreft innhold, sjekksummer og alle nye motorruter før den kalles oppdatert.
+- [ ] Behold skillet mellom laget, egenkontrollert, native mottatt, visuelt sett, motorobservert, publisert, pakket og Tom-/Claude-godkjent. Full naturlig gjennomspilling, interaktiv Windows, ny webtest og kjente Windows-SDL-/inventar-/testhoppbegrensninger gjenstår. Ikke gjenstart gamle nattprosesser. Bevar alle tidligere filer, 1200 kilder og tre stasher.
+
+Tidligere oppføringer nedenfor er bevart som historikk. Dagens kvitteringer ligger i gpt-arbeid, rapporter/sam-max-intro-20261021 og max-intro-kilde-20261021.
+
+
 ## Neste, 2026-10-21 07:42
 
 - [x] Fig303_06..14: ni nye hele ark og 25 native, laget, egenkontrollert, mottatt, visuelt sett, motorobservert, publisert og inkludert i fellespakker. 446 av 1758 figurjobber har resultat, 1312 gjenstår pluss returer/katalogfeil/sluttkontroll. Alle 14 ark og 40 native i Sam303 er levert.
