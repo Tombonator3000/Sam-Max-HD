@@ -1,5 +1,20 @@
 # todo.md
 
+## Gjeldende grafikkstatus, 2026-10-21 23:16
+
+[Felles Linux og Windows med 3535 native HD-bildelag](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-kjeglekant) er publisert, lastet ned på nytt og SHA-bekreftet. Den store hakkete dobbelkanten rundt Cone of Tragedy er rettet med originalobjekt 173s tegnedekning. Samtlige tidligere malerier, figur-PNG og filstier er bevart byteidentiske. En ny metadatafil, ingen nye malerier eller figurark. 497 av 1758 figurark har resultat; 1261 gjenstår pluss returer og sluttkontroll.
+
+Begge faktiske pakker har alle 21778 runtime-moddfiler, inkludert den nye metadatafilen. Native a8ca23c755fc79bed1f15c4c4f669303ca126930, pakkekode 299c64c61badd8bf2555cef177c8d103d1f3cb04. Alle 21779 moddfilhash, 1412 beskyttede jobbfiler, tre stasher og 39 tidligere releaser med vedlegg er bekreftet. Den faktiske nye Linux-binæren er kjørt i primærskript 201 og hel animasjon 6. Alle 64 kjegleruter er logget i begge. 128 hele originalflater og 128 hele HD-pakkebilder er identiske med den kontrollerte produksjonen. 1436 av 1440 nullkontroller; identiske kjente 416/160-avvik ved 24/25, inkludert koordinater og begge RGB-verdier. Tre hele faktiske pakkebilder er sett. Hele prøven er ikke avviksfri. Ingen ny naturlig gjennomspilling, interaktiv Windows eller webtest, Tom-/Claude-godkjenning eller visuell sluttgodkjenning.
+
+En liten statisk malt kjegletupp over y32 gjenstår som egen grafikkretur. Ingen utvidelse av originalmasken eller hard klipping av ny grafikk. Den sporadiske SDL-startfeilen er fortsatt ikke rettet; begge nye manuelle bygg bestod i forsøk 1 og 1. Ekstra Windows-taggbygg 39676064846 er bestått og nativefrysen er frigitt etter ny kontroll av uendret mod, Latest og fellesvedlegg.
+
+Neste uavhengige bunke er fig124_01 til 05: 39 mål fra 24 ulike hele RGBA-kilder. Jobbkortets omtale av Sam og rom 28 er korrigert i et separat kildenotat, uten å endre beskyttede filer. Faktisk scene viser Lee-Harvey og Max i rom 25, med avgrensede fragmenter av den nedslåtte Sam i noen tidlige ruter. Hele objekt 258 bekrefter Sam-fragmentene; en gulv-/lemhypotese er forkastet. Alle fem originalark og 24 hele kilder med faktisk originalkontekst er sett. Korrekt rominngang lot originalt skript 217 kjøre: 2400 kontroller, 2391 null, normal avslutning 0. 67 av 70 mål og 47 av 49 hele motiver er logget; de tre senere fasene 1844..1846 er fortsatt ikke kildeobservert. Ingen 124-bildekall, resultater eller native. Les rapporter/sam124-kilde-20261021/PRESISERING.md før neste motiv og se aktuelle originaler og godkjente stilankre på nytt.
+
+Bevis: rapporter/cone-underlag-20261021 og rapporter/felles-release-20261021-kjeglekant på gpt-arbeid. Tidligere wrapper-/oppslagsfeil og korrigert prøveoppsett er bevart. Ingen motor-/pipelineendring; bare fire dokumenter endres i main. Bibliotekskildene publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter er brukt. Tidligere verktøyavviste motiver og aliaser, ugyldige 344/346 og råvalg 28 omprøves ikke. Grafikkautomatikken fortsetter uten gamle nattprosesser. Alt er ikke ferdig.
+
+Tidligere oppføringer nedenfor er historikk.
+
+
 ## Gjeldende grafikkstatus, 2026-10-21 22:44
 
 Den store hakkete dobbelkanten rundt Cone of Tragedy er rettet ved å bevare originalobjekt173s tegnedekning. Ny dekoding bekrefter den heldekkende bakgrunnsmatten. Eksisterende PR34-kode lager en ny metadatafil, objects/obj173_01_mask.png. Ingen motor-/pipelineendring, nye malerier, nye figurark eller nye native ruter. Samtlige21772 tidligere PNG og alle tidligere filstier er byteidentiske. Native er fortsatt3535,497 av1758 figurark har resultat og1261 gjenstår pluss returer og sluttkontroll.
