@@ -1,0 +1,34 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import subprocess,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+receipt=read(R/'mottak-publisert.json');assert receipt['alle_filhash_bekreftet'] and receipt['native']==3110
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True).strip()
+assert subprocess.check_output(['git','branch','--show-current'],cwd=P,text=True).strip()=='main'
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');pub=receipt['hd_mod'];art=receipt['grafikkilde']
+body=f'''Fem nye hele ark fig304_01 til fig304_05 med Sam og Max ved dinosaurtannen er levert, egenkontrollert, visuelt sett og motorobservert. De gir 12 nye native ruter fra 10 kildevarianter. 432 av 1758 hele figurjobber har resultat; 1326 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Hd-mod `{pub}` er publisert additivt og hentet tilbake, 3110 native, alle 21353 faktiske filhash bekreftet. Alle tidligere 21335 PNG-filer, 1096 beskyttede kilder og tre stasher er bevart. Grafikkilde er `{art}` på gpt-arbeid. Ingen ny grafikk eller spilldata er lagt i main.
+
+Motivet er begge figurene med beige hyssing i rom 59, bekreftet av primærskript 208 og objektene 570/568. Alle fem originalark, begge godkjente hovedark og kildeopptak er sett før tegning. Ni innebygde image_gen-kall, fire konkrete returer, råbilder, faktiske prompts, kildehash, resultat, notat, rutekart og fremdrift er bevart. Python renser og plasserer egen maling etter Toms tillatelse; ingen harde originalmasker eller originale bildefragmenter. Lang hyssing, liten blå prikk, fire løse lyse merker og synlig håndgrep er bevart med egne genererte deler. Uendrede CORE128, IoU 0,6 og dekning 0,8. Alle 12 automatisk OK. Ark 01 har tre visuelt vurderte egenkontrollvarsler for omriss 0,75 med 100 prosent mål og null flytting; de andre fire arkene er OK.
+
+Den faktisk nedlastede Linux-binæren fra fellesutgave golf115, SHA256 `9e006a38078496f92399b8fe7dd99a4c057761f75c6d613eb4125a64cb62988e`, kjører publisert grunnlag 3098 og kandidat 3110 med samme originalskript 208 etter dokumentert Sam303-initialisering. Begge har 450 bufferkontroller, 448 null, samme 4 ved bilde 36 og 160 ved 414. Det eldre kildeopptaket med forrige binær hadde 160 ved 450; disse tidslinjene blandes ikke. Ingen nye eller økte avvik i den sammenlignbare prøven. Alle 12 nye mål er logget, og alle 10 egne varianter er sett samlet med hode, kropp, hender og hyssing i faktisk motorvisning. Fire før/etter-par har null forskjeller utenfor alle loggede aktørflater med 12 HD-pikslers målemargin. Testkoden skjuler ikke andre aktører eller romskript; originalskriptet løfter selv Max med elevasjon 200 før den sammensatte figuren brukes. Dette er en regissert prøve, ikke naturlig gjennomspilling.
+
+[Felles Linux-/Windows-utgave golf115](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-golf115) er fortsatt faktisk kontrollert og Latest, med 3098 native, og mangler de 12 nye. Neste felles pakkesamlepunkt er etter resten av familien 304; kontroller begge faktiske nedlastinger, sjekksummer og inkludert grafikk før de kalles oppdatert. Ingen nativefrys. Det ekstra Windows-taggbygget 39537469767 ble grønt, men den tidligere sporadiske SDL-feilen regnes fortsatt som åpen. Full naturlig gjennomspilling, interaktiv Windows og ny webkontroll gjenstår. Ingen ny Tom-/Claude-godkjenning.
+
+Neste praktiske bunke er fig304_06..10, deretter 11..15. Se `gpt-arbeid`, rapporter/sam304-foerste-20261021/NESTE.md og kildegrunnlaget rapporter/sam304-kilde-20261021. Se resterende originalark, begge hovedark og kildekontekst før hvert motiv. Ikke omprøv avviste kall eller ugyldige 344/346-ruter. De gamle nattprosessene gjenstartes ikke. Grafikkautomatikken fortsetter. Bibliotek: figurark-fast-storrelse og publisert-mod-er-fasit. Ingen motor- eller pipelinekode er endret. Main får bare memory.md, todo.md, STATUS.md og log.md.
+'''
+for name in ['memory.md','STATUS.md']:
+ f=P/name;s=f.read_text();i=s.find('\n');f.write_text(s[:i+1]+f'\n## Siste verifiserte grafikkstatus, {now}\n\n'+body+'\n'+s[i+1:])
+f=P/'todo.md';s=f.read_text();i=s.find('\n');block=f'''\n## Neste, {now}
+
+- [x] Fig304_01..05: fem hele ark, 12 native, 10 egne varianter, publisert og hentet `{pub}`. 432 av 1758 hele jobber med resultat; 3110 native. Alle 12 automatisk OK, faktisk Linux sammenlignet uten nye eller økte avvik.
+- [ ] Fig304_06..10, deretter 11..15. Se gjeldende NESTE.md i rapporter/sam304-foerste-20261021 på gpt-arbeid. Ikke dupliser første fem.
+- [ ] Oppdater og kontroller felles Linux-/Windows-pakker ved slutten av familien 304. Dagens pakker har 3098 og mangler 12. Ikke kall dem oppdatert før faktiske nedlastinger og grafikk er kontrollert.
+- [ ] Fortsett øvrig grafikk og returer til all produserbar grafikk er kontrollert og importert. 1326 hele figurjobber gjenstår, pluss katalogfeil og sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+
+Alle 1096 beskyttede kilder, tidligere publiserte filer og tre stasher er bevart. Gamle nattprosesser gjenstartes ikke. Ingen ny webtest eller interaktiv Windows-test.\n''';f.write_text(s[:i+1]+block+s[i+1:])
+with (P/'log.md').open('a') as f:f.write(f'\n\n## {now} (Codex)\n\n'+body)
+subprocess.run(['git','diff','--check'],cwd=P,check=True)
+changed=set(subprocess.check_output(['git','diff','--name-only'],cwd=P,text=True).splitlines());assert changed=={'memory.md','todo.md','STATUS.md','log.md'}
+shutil.copy2(__file__,R/'oppdater-hoved.py.txt');print(now,'Fire hoveddokumenter oppdatert. Bare dokumentasjon i main.')
