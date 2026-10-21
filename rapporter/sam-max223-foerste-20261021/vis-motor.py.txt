@@ -1,0 +1,46 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-bok3306'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def artifacts(label):
+ p=read(R/(label+'.json'));rows=[];points=set()
+ for e in p['kontroller']:
+  if not e['avvik']:continue
+  f=e['frame'];screen=O/label/f'frame_{f:06}_screen.png';whole=next(z for z in (O/label).glob(f'frame_{f:06}_room*.png') if '_flat' not in z.stem)
+  s=np.array(Image.open(screen).convert('RGB'));w=np.array(Image.open(whole).convert('RGB'));yy,xx=np.where(np.any(s!=w,2));assert len(xx)==e['avvik']
+  sig=hashlib.sha256(np.stack([xx,yy],1).tobytes()+s[yy,xx].tobytes()+w[yy,xx].tobytes()).hexdigest();pairs={tuple([int(x),int(y)]+s[y,x].tolist()+w[y,x].tolist()) for x,y in zip(xx,yy)};points|=pairs
+  rows.append(dict(frame=f,avvik=len(xx),bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],signatur=sig,skjerm_sha256=sha(screen),hel_sha256=sha(whole)))
+ return p,rows,points
+b,ba,bp=artifacts('bok-grunnlag3276');c,ca,cp=artifacts('bok-kandidat3306')
+assert b['exit']==c['exit']==0 and len(b['kontroller'])==len(c['kontroller'])==360
+assert b['kontroller']==c['kontroller'] and bp==cp
+assert [e for e in c['kontroller'] if e['avvik']]==[dict(frame=36,avvik=160)]
+save(R/'motor-bufferdiagnose.json',dict(grunnlag=ba,kandidat=ca,alle_koordinat_rgb_par_identiske=True,koordinat_rgb_par=sorted(cp),ingen_nye_feilpiksler=True,alle360_kontroller_identiske=True,kjent_avvik=dict(frame=36,avvik=160)))
+native=read(R/'egen-native.json')['ruter'];canonical=[e['bilde'] for e in read(R/'prototyper-endelig.json')];selected={};pairs=[]
+for e in native:
+ n=e['bilde'];old,new=b['tegninger'][n],c['tegninger'][n];op,npth=Path(old['fil']),Path(new['fil']);of,nf=op.with_name(op.stem+'_flat.png'),npth.with_name(npth.stem+'_flat.png')
+ assert old['pos']==new['pos'] and old['maal']==new['maal'] and sha(of)==sha(nf),(n,'Originalflate må undersøkes')
+ x,y=new['pos'];w,h=new['maal'];before=np.array(Image.open(op).convert('RGB'));after=np.array(Image.open(npth).convert('RGB'));delta=np.any(before!=after,2);outside=delta.copy();box=[max(0,x*4-8),max(0,y*4-8),min(after.shape[1],(x+w)*4+8),min(after.shape[0],(y+h)*4+8)];outside[box[1]:box[3],box[0]:box[2]]=False
+ assert not outside.any(),(n,'Endring utenfor ny aktørflate',int(outside.sum()))
+ pairs.append(dict(bilde=n,faktisk_linux=True,rettet_hel_animasjon=True,primaer_spillsekvens=False,grunnlag_frame=old['bildeframe'],kandidat_frame=new['bildeframe'],original_flat_sha256=sha(nf),grunnlag_sha256=sha(op),kandidat_sha256=sha(npth),native_sha256=sha(C/e['fil']),rekt_med_8hd_marg=box,endrede_piksler=int(delta.sum()),utenfor_ny_aktorflate=0));selected[n]=(old,new)
+assert len(pairs)==30 and len(canonical)==11
+shots=[];boards=[]
+for start in range(0,len(canonical),4):
+ board=Image.new('RGB',(1440,900),'#304050');draw=ImageDraw.Draw(board)
+ for j,n in enumerate(canonical[start:start+4]):
+  old,new=selected[n];x,y=new['pos'];w,h=new['maal'];box=(x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8);xx=(j%2)*720;yy=(j//2)*450
+  draw.text((xx+8,yy+8),n+' opprinnelig / ny HD, faktisk Linux',fill='white')
+  for z,row in enumerate([old,new]):
+   im=Image.open(row['fil']).convert('RGB').crop(box);im.thumbnail((345,405),Image.Resampling.LANCZOS);board.paste(im,(xx+8+z*355,yy+30))
+  f=R/(n+'-faktisk-linux.png');shutil.copy2(new['fil'],f);shots.append(dict(bilde=n,fil=f.name,sha256=sha(f),frame=new['bildeframe']))
+ f=R/f'motor-varianter-{start//4+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=canonical[start:start+4],visuelt_sett=False))
+whole_pairs=[]
+for n in ['costume223_1920','costume223_1923','costume223_1942','costume223_1948','costume223_1949']:
+ old,new=selected[n];board=Image.new('RGB',(1280,430),'#304050');draw=ImageDraw.Draw(board);draw.text((8,8),n+f': 3276 frame {old["bildeframe"]} / 3306 frame {new["bildeframe"]}, identisk originalflate',fill='white')
+ for i,row in enumerate([old,new]):board.paste(Image.open(row['fil']).convert('RGB').resize((640,400)),(i*640,30))
+ f=R/(n+'-for-etter.png');board.save(f);whole_pairs.append(dict(bilde=n,fil=f.name,sha256=sha(f),visuelt_sett=False))
+save(R/'motor-pikselkontroll.json',pairs)
+save(R/'motor-visuell-plan.json',dict(faktisk_linux=True,binar_sha256=c['binar_sha256'],hele_bilder=shots,brett=boards,hele_for_etter=whole_pairs,visuelt_sett=False,alle30_identiske_originalflater=True,alle30_utenfor_ny_aktorflate=0,egne_varianter=11,full_naturlig_gjennomspilling=False,primaer_skript210_lest_ikke_kjort=True))
+save(R/'motor-sammenligning.json',dict(grunnlag_native=3276,kandidat_native=3306,forventet=30,sett=30,mangler=[],alle_nye_kildemal_sett=True,alle94_kostymeruter_logget=True,kontroller_identiske=True,avviksrekkefolge_identisk=True,avvikskoordinater_og_rgb_par_identiske=True,ingen_nye_feilpiksler=True,kontrollantall=360,nullkontroller=359,grunnlag_nullkontroller=359,kjent_avvik=dict(frame=36,avvik=160),random_seed=20261021,andre_aktorer_og_romskript_beholdt=True,alle30_original_flat_sha256_identiske=True,alle30_utenfor_ny_aktorflate=0,naturlig_full_gjennomspilling=False,full_visuell_vurdering_gjenstar=True,visuelt_sett=False,binar_sha256=c['binar_sha256']))
+shutil.copy2(__file__,R/'vis-motor.py.txt');print('30 identiske originalflater, null utenfor nye aktørflater, 360/359 og samme kjente 160-avvik. Elleve varianter og fem par klare til visning.',flush=True)

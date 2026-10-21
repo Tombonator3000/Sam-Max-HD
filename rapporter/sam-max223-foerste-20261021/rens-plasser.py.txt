@@ -1,0 +1,96 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,sys,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+def bbox(m):
+ y,x=np.nonzero(m);return [int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)]
+def clean(a):
+ rgb=a[:,:,:3].astype(int);bad=(rgb[:,:,0]>190)&(rgb[:,:,2]>160)&(rgb[:,:,1]<110)
+ core=(a[:,:,3]>=CORE)&~bad;assert core.any()
+ dist=nd.distance_transform_edt(~core);a[dist>1.5]=0
+ trust=(a[:,:,3]>=245)&~bad;assert trust.any()
+ _,ix=nd.distance_transform_edt(~trust,return_indices=True)
+ edge=((a[:,:,3]<245)|bad)&(a[:,:,3]>0);near=a[tuple(ix)][:,:,:3];a[edge,:3]=near[edge];a[a[:,:,3]==0,:3]=0
+ return a
+calls=sys.argv[1:] or [p.name for p in sorted((R/'kall').iterdir()) if (p/'raa.png').exists()]
+allrows=read(R/'prototyper-forelopig.json') if (R/'prototyper-forelopig.json').exists() else []
+for name in calls:
+ C=R/'kall'/name;callplan=read(C/'plan.json');records=callplan['ruter']
+ raw=Image.open(C/callplan.get('egen_sammensetting','raa.png')).convert('RGBA');assert raw.size==(1536,1024)
+ heights=[max(200,min(800,Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).height*4+76)) for e in records]
+ board=Image.new('RGBA',(1600,sum(heights)),'#596978');draw=ImageDraw.Draw(board);rows=[];row_y=0
+ for i,e in enumerate(records):
+  src=np.array(Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA'))
+  assert hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256']
+  sm=src[:,:,3]>0;x,y,w,h=e.get('egen_ruteutsnitt',e['celle'])
+  own=np.array(raw.crop((x,y,x+w,y+h)));retouch=[]
+  for item in e.get('egen_fjern_komponenter',[]):
+   labels,n=nd.label(own[:,:,3]>=CORE);found=[]
+   for k,sl in enumerate(nd.find_objects(labels),1):
+    if sl and [sl[1].start,sl[0].start,sl[1].stop,sl[0].stop]==item['bbox']:
+     assert int((labels==k).sum())==item['areal'];found.append(k)
+   assert len(found)==1,(e['bilde'],item,found)
+   own[nd.binary_dilation(labels==found[0],iterations=3)]=0
+   retouch.append(dict(egen_ekstradel_fjernet=item,originalmaske=False))
+  own=clean(own)
+  if e.get('rens_egen_rod_innerside',False):
+   rgb=own[:,:,:3].astype(int);r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2]
+   pink=(own[:,:,3]>0)&(r>125)&(r-g>45)&(g-b<40)&(b>g*.65)
+   own[pink,:3]=[255,243,227]
+   retouch.append(dict(egen_feil_rod_orefarge_renset=int(pink.sum()),alfa_uendret=True,kilde_har_ingen_rod=True))
+  if e.get('rens_egen_stovpalett',False):
+   lum=own[:,:,:3].mean(axis=2);palette=np.array([[107,99,115],[135,123,123],[199,199,215]])
+   knots=e.get('egen_stov_rgb_knuter',[55,120,215])
+   for ch in range(3):own[:,:,ch]=np.rint(np.interp(lum,knots,palette[:,ch])).astype('uint8')
+   own[own[:,:,3]==0,:3]=0
+   retouch.append(dict(egen_rgb_stovpalett=palette.tolist(),egne_luminansknuter=knots,alfa_uendret=True,originalmaske=False))
+  if e.get('rens_egen_flat_rgb',False):
+   colors=np.unique(src[sm,:3],axis=0);assert len(colors)==1
+   own[:,:,:3]=colors[0];own[own[:,:,3]==0,:3]=0
+   retouch.append(dict(egen_rgb_flat=colors[0].tolist(),alfa_uendret=True,originalmaske=False))
+  if e.get('rens_egen_mork_ryggpalett',False):
+   rgb=own[:,:,:3].astype(int);lum=rgb.mean(axis=2)
+   ink=(rgb[:,:,0]-rgb[:,:,1]>18)&(rgb[:,:,1]-rgb[:,:,2]>8)
+   shade=(lum<161)&~ink;opaque=own[:,:,3]>0
+   own[opaque,:3]=[135,123,123];own[ink&opaque,:3]=[115,91,75];own[shade&opaque,:3]=[107,99,115]
+   retouch.append(dict(egen_ryggpalett_morknet=True,fyll=[135,123,123],strek=[115,91,75],egen_skygge=[107,99,115],alfa_uendret=True,originalmaske=False))
+  if (src[sm,:3]==0).all():own[:,:,:3]=0;retouch.append(dict(egen_rgb_svart=True,alfa_uendret=True))
+  sx0,sy0,sx1,sy1=bbox(sm);ox0,oy0,ox1,oy1=bbox(own[:,:,3]>=CORE)
+  extra=e.get('egen_bbox_ekstra_hd',0);assert 0<=extra<=4
+  fx=((sx1-sx0)*4+2*extra)/(ox1-ox0);fy=((sy1-sy0)*4+2*extra)/(oy1-oy0)
+  out=Image.fromarray(own).transform((src.shape[1]*4+16,src.shape[0]*4+16),Image.Transform.AFFINE,
+       (1/fx,0,ox0-(sx0*4+8-extra)/fx,0,1/fy,oy0-(sy0*4+8-extra)/fy),Image.Resampling.BICUBIC)
+  a=clean(np.array(out))
+  if e.get('rens_egen_himmel_mot_hd',False):
+   bgfile=C/'hd-bil-lukket-spillreferanse.png';bg=np.array(Image.open(bgfile).convert('RGB'));rgb=bg.astype(int)
+   sky=(rgb[:,:,0]>170)&(rgb[:,:,1]>70)&(rgb[:,:,2]<170)&(rgb[:,:,0]-rgb[:,:,1]>40)&(rgb[:,:,1]-rgb[:,:,2]>20)
+   _,nearest=nd.distance_transform_edt(~sky,return_indices=True);sky_rgb=bg[tuple(nearest)]
+   rgb=a[:,:,:3].astype(int);own_sky=(a[:,:,3]>0)&(rgb[:,:,0]>200)&(rgb[:,:,1]>70)&(rgb[:,:,2]<170)&(rgb[:,:,0]-rgb[:,:,1]>55)&(rgb[:,:,1]-rgb[:,:,2]>25)
+   near_sky=nd.distance_transform_edt(~own_sky);near_blank=nd.distance_transform_edt(a[:,:,3]>0)
+   outer_ink=(a[:,:,3]>0)&(rgb.mean(axis=2)<80)&(near_sky<=2.2)&(near_blank<=2.2)
+   mask=own_sky|outer_ink;yy,xx=np.indices(mask.shape);world_x=224*4-8+xx;world_y=102*4-8+yy
+   assert world_x.max()<bg.shape[1] and world_y.max()<bg.shape[0]
+   a[mask,:3]=sky_rgb[world_y[mask],world_x[mask]]
+   retouch.append(dict(egen_himmelfarge_tilpasset_hd=int(mask.sum()),hd_kilde_sha256=sha(bgfile),kun_rgb_alfa_uendret=True,egen_fargeklassifisering=True,originalmaske=False))
+  out=Image.fromarray(a)
+  iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(sm,4,0),4,1),-8,-8)
+  f=C/(e['bilde']+'-prototype-v1.png');out.save(f)
+  row=dict(bilde=e['bilde'],valgt_kall=name,prototype=f.relative_to(A).as_posix(),prototype_sha256=sha(f),
+           canonical_rgba_sha256=e['canonical_rgba_sha256'],snitt_union=iou,dekning=cov,
+           native_ok=iou>=GOOD_IOU and cov>=GOOD_COVER,egen_alfa=True,originalmaske=False,originalfragmenter=False,
+           egen_glodrens_hd=1.5,maalt_kilde_bbox=[sx0,sy0,sx1,sy1],egen_bbox=[ox0,oy0,ox1,oy1],
+           egen_ruteutsnitt=[x,y,w,h],egen_hel_affin_plassering=[fx,fy],egen_bbox_ekstra_hd=extra,egen_retusj=retouch,visuelt_sett=False)
+  rows.append(row)
+  draw.text((12,row_y+8),f'{e["bilde"]} original 4x / egen 4x  IoU {iou:.3f}, dekning {cov:.3f}',fill='white')
+  for j,im in enumerate([Image.fromarray(src).resize((src.shape[1]*4,src.shape[0]*4),Image.Resampling.NEAREST),out]):
+   im.thumbnail((760,heights[i]-48),Image.Resampling.NEAREST if j==0 else Image.Resampling.LANCZOS);board.alpha_composite(im,(16+j*800,row_y+42))
+  row_y+=heights[i]
+  print(e['bilde'],round(iou,4),round(cov,4),'OK' if row['native_ok'] else 'FEIL',flush=True)
+ board.convert('RGB').save(C/'renset-helkontroll-v1.png');save(C/'prototypekontroll-v1.json',rows)
+ allrows=[e for e in allrows if e['valgt_kall']!=name]+rows
+save(R/'prototyper-forelopig.json',allrows);shutil.copy2(__file__,R/'rens-plasser.py.txt')

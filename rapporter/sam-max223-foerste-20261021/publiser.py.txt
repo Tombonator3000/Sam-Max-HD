@@ -1,0 +1,51 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-bok3306';T=O/'publisering-hdmod3306'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+def remote(branch):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/ref/heads/'+branch],cwd=P,text=True))['object']['sha']
+b=read(R/'grunnlag-produksjon.json');files=read(R/'kandidatfilhash.json');proof=read(R/'sluttkontroll.json');motor=read(R/'motor-sammenligning.json');protected=read(R/'beskyttede-samlet.json')
+assert not T.exists() and not (R/'publisering-forsokt.json').exists()
+assert not git(A,'status','--porcelain');art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art
+assert b['fjern_sha']=='0518649f64eecb2be45220ff60f3efd48d23c9c3' and remote('hd-mod')==b['fjern_sha']
+assert all(sha(M/f)==h for f,h in b['filer'].items()) and len(files)==21549 and all(sha(C/f)==h for f,h in files.items())
+assert len(protected)==1252 and all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert proof['visuelt_sett'] and proof['motorobservert'] and motor['visuelt_sett']
+assert motor['sett']==30 and motor['kontrollantall']==360 and motor['nullkontroller']==359
+assert motor['avvikskoordinater_og_rgb_par_identiske'] and motor['ingen_nye_feilpiksler'] and motor['kontroller_identiske']
+assert motor['alle30_original_flat_sha256_identiske'] and motor['alle30_utenfor_ny_aktorflate']==0
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=b['fjern_sha'],forventet_native=3306,force_with_lease=True))
+shutil.copytree(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts and p.name!='SHA256SUMS'}
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(manifest.items())))
+assert all(manifest[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+subprocess.run(['git','-C',str(T),'add','-A'],check=True)
+subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod 3306: fem Sam og Max-bokark med 30 kontrollerte ruter'],check=True)
+assert remote('hd-mod')==b['fjern_sha']
+subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+b['fjern_sha'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=remote('hd-mod');assert published==git(T,'rev-parse','HEAD')
+subprocess.run(['bash','tools/mod_gren.sh','hent',str(M)],cwd=P,check=True)
+actual={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual)==set(files) and len(actual)==21549 and {f for f,h in files.items() if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)==3306 and read(M/'mod.json')['costume_cels']==3306
+assert git(P,'stash','list','--format=%H').splitlines()==b['stash'] and all(sha(A/f)==h for f,h in protected.items()) and remote('hd-mod')==published
+save(R/'publiserte-moddfiler-3306.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=3306,nye_native=30,nye_hele_ark=5,hele_figurjobber=463,gjenstar=1295,filantall=21549,png=21543,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_png_bevart=21513,beskyttede=1252,stasher=b['stash'],force_with_lease=True,egen_alfa_ingen_originalfragmenter=True,visuelt_sett=True,motorobservert=True,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3276,pakker_mangler_native=30)
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+ d=read(R/name);d.update(publisert=True,hd_mod=published,grafikkilde=art)
+ for e in d.get('leveranser',[]):e.update(publisert=True,hd_mod=published)
+ save(R/name,d)
+line=(f'Publisert og hentet {published}: fem bokark fig223_01 til05, 30 nye native og 3306 totalt. '
+      '463 av 1758 hele resultatark, 1295 gjenstår pluss returer, katalogfeil og sluttkontroll. '
+      'Alle 21549 filhash, 21513 tidligere PNG, 1252 kilder og tre stasher bekreftet. '
+      'Alle 30 avspilt, elleve varianter og fem hele par sett, 359 av 360 null med samme kjente overgangsavvik. '
+      'Ingen endringer utenfor nye aktørflater. Pakker har 3276 og mangler 30; neste samlepunkt etter fig223_06 til13, eller ved blokkering. '
+      'Ekstra Windows-taggbygg 39580011037 er grønt. Ingen ny Tom-/Claude-godkjenning. '
+      f'Se rapporter/{R.name}/NESTE.md.')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;s=p.read_text();i=s.find('\n');p.write_text(s[:i+1]+'\n'+line+'\n'+s[i+1:])
+for name in ['NESTE.md','RAPPORT.md']:
+ with (R/name).open('a') as f:f.write(f'\nPublisert og hentet `{published}`. Grafikkilde `{art}`. Alle 21549 filer er SHA-bekreftet. 3306 native. Alle tidligere filer, 1252 kilder og tre stasher er bevart. Pakker har fortsatt 3276 og mangler 30. Native er ikke fryst nå.\n')
+shutil.copy2(__file__,R/'publiser.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)

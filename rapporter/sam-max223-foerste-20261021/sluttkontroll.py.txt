@@ -1,0 +1,39 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-bok3306'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+b=read(R/'grunnlag-produksjon.json');files=read(R/'kandidatfilhash.json');prot=read(R/'beskyttede-samlet.json');native=read(R/'egen-native.json');p=read(R/'fremdrift.json');motor=read(R/'motor-sammenligning.json');vis=read(R/'motor-visuell-plan.json');pairs=read(R/'motor-pikselkontroll.json')
+assert len(files)==21549 and all(sha(C/f)==h for f,h in files.items())
+assert len(b['filer'])==21519 and {f for f,h in b['filer'].items() if files[f]!=h}=={'mod.json'}
+assert len(prot)==1252 and all(sha(A/f)==h for f,h in prot.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==463
+assert len(pairs)==30 and all(e['utenfor_ny_aktorflate']==0 and files[next(v['fil'] for v in native['ruter'] if v['bilde']==e['bilde'])]==e['native_sha256'] for e in pairs)
+assert motor['sett']==30 and motor['kontrollantall']==360 and motor['nullkontroller']==359 and motor['alle30_original_flat_sha256_identiske'] and motor['ingen_nye_feilpiksler']
+assert read(R/'automatisk-mottak30.json')['ruter_ok']==30
+calls=sorted(q.parent.name for q in (R/'kall').glob('*/raa.png'));assert calls==['K01','K02','K03','R01']
+for name in calls:
+ d=R/'kall'/name;v=read(d/'raa-sporing.json');assert (d/'argumenter-faktisk.json').exists() and (d/'raa.png').exists()
+for e in vis['brett']+vis['hele_for_etter']:
+ assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+vis.update(visuelt_sett=True,visuell_vurdering='Alle elleve ulike hele Sam/Max/bok-positurer sett i motorutsnitt mot samme originalbilde. Fem hele før/etter-par er sett. K02 sine to feil tenkeposer er ikke valgt. Senket arm i R01 og knebøy i K03 følger kildefasene. Ekstra vanlig Max og romskript er uendret. Prøven er rettet hel animasjon, ikke primærskript eller full naturlig gjennomspilling.')
+save(R/'motor-visuell-plan.json',vis);motor.update(visuelt_sett=True,full_visuell_vurdering_gjenstar=False);save(R/'motor-sammenligning.json',motor)
+ark=[]
+for e in p['leveranser']:
+ assert sha(A/e['resultat'])==e['sha256'];e.update(visuelt_kontrollert=True,motorobservert=True)
+ ark.append(dict(jobb=e['jobb'],fil=e['resultat'],resultat_sha256=e['sha256'],sett=True,vurdering='Helt resultatark sett. Én beholdt SJEKK i fig223_05, rute1947: IoU0.74, dekning0.89, størrelse100%, plassering0.0px. Egne avrundede former kontrollert i motor. Ingen senket nativeport.'))
+ note=A/'jobber'/e['jobb']/'notat.md'
+ with note.open('a') as f:f.write('\nSluttprøve 21. oktober: hele arket sett og alle30 nye mål avspilt i nedlastet faktisk Linux-binær d3b0283d32a563f2fdc22edf6cc53aa8ed0dc492e0fd2e30c8402861097b1a9d. Alle30 originalflater SHA-identiske i kontrollpar, null endring utenfor de nye aktørflatene. 360 bufferkontroller per versjon,359 null; samme160 ved bilde36 med identiske koordinater og beggeRGB. Elleve varianter og fem hele før/etter-par sett. Fig223_05 har ett beholdt omrissvarsel for1947, ingen FEIL. Kildeskala/palett/romskript og faste porter er uendret. Rettet hel animasjon6, ikke naturlig primærsekvens. Ingen ny Tom-/Claude-godkjenning.\n')
+save(R/'arkvisning.json',ark);save(R/'fremdrift.json',p)
+route=read(R/'ruteplan-unik.json');route.update(ingen_bildekall=False,ingen_resultater=False,ingen_nye_native=False,ferdig_bunke_egenkontroll=True);save(R/'ruteplan-unik.json',route)
+save(R/'avklarte-utkast.json',dict(K02_1941_1942='Teknisk OK, visuelt feil arm under haken. Ikke valgt; rettet med R01.',K03_delingsgrense='Første diagnostiske deling x512 inkluderte en del av neste egne Max-fot i1947 og klippet denne delen i1948. Første1947: IoU0.5433/dekning0.6887. Rektangulær deling flyttet til tomrom x480, begge hele egne tegninger bevart. Etter1947:0.7437/0.8935. Ingen originalmaske brukt.',sammensettingshjelper='Første utkast stanset på KeyError kilde_maal før noe resultatark ble skrevet. Kun hjelpere under out er rettet til gjeldende ruteplanformat. Ingen motor-/pipelinekode endret.',ingen_uavklart_feil=True))
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),leveranser=p['leveranser'],nye_ark=5,nye_native=30,native=3306,ulike_hele_varianter=11,hele_rgba_alias=19,innebygde_bildekall=4,returkall=1,modell='ikke oppgitt av verktøy',beskyttede=1252,stashes=b['stash'],tidligere_filer_bevart=21519,tidligere_png_bevart=21513,filer=21549,png=21543,egenkontroll_OK=4,egenkontroll_SJEKK=1,egenkontroll_FEIL=0,rutevarsler=1,varsler_beholdt=True,automatisk_native30_OK=True,fast_core=128,min_iou=.6,min_dekning=.8,minimum_maalt_iou=min(e['snitt_union'] for e in native['ruter']),minimum_maalt_dekning=min(e['dekning'] for e in native['ruter']),egen_alfa=True,originalmaske=False,originalfragmenter=False,visuelt_sett=True,motorobservert=True,alle30_original_flat_identiske=True,alle30_utenfor_ny_aktorflate=0,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False,full_naturlig_gjennomspilling=False)
+save(R/'sluttkontroll.json',proof)
+# Rapportteksten skrives av den arkiverte rapporttekst.py.
+remaining=[]
+for d in sorted((A/'jobber').glob('fig*')):
+ if not (d/'jobb.json').exists() or (d/'resultat.png').exists():continue
+ j=read(d/'jobb.json');remaining.append(dict(jobb=d.name,rom=j.get('rom'),ruter=len(j.get('ruter',[]))))
+assert len(remaining)==1295;save(R/'restliste463.json',remaining)
+for f in ['sluttkontroll.py','tilpass-lever.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('Sluttkontroll: fem ark,30native,463hele,1252kilder og tre stasher bekreftet. Klar til kildepush og additiv publisering.',flush=True)

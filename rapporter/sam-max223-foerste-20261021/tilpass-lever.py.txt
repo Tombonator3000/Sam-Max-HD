@@ -1,0 +1,31 @@
+from pathlib import Path
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent
+s=(P/'out/max-intro-20261021/lever.py').read_text();s=s.replace("C=O/'mod-intro3276'","C=O/'mod-bok3306'")
+s=s.replace("base['native']==3208 and len(base['filer'])==21451 and len(protected)==1200","base['native']==3276 and len(base['filer'])==21519 and len(protected)==1252")
+i=s.index('choose={');k=s.index('\nfor call,names',i)
+s=s[:i]+"choose={'K01':[f'costume223_{n}' for n in range(1920,1924)],'K02':['costume223_1924','costume223_1929'],'R01':['costume223_1941','costume223_1942'],'K03':[f'costume223_{n}' for n in [1947,1948,1949]]}"+s[k:]
+s=s.replace('og godkjent Max-anker','og godkjente Sam-/Max-ankere');s=s.replace('len(selected)==58','len(selected)==11');s=s.replace("len(read(R/'kallstatus.json'))==34","len(read(R/'kallstatus.json'))==4");s=s.replace("glob('fig*/resultat.png')))==451","glob('fig*/resultat.png')))==458");s=s.replace('len(target)==68','len(target)==30');s=s.replace("canonical['maal']","canonical['kilde_maal']");s=s.replace("canonical['rgba_sha256']","canonical['kilde_rgba_sha256']")
+i=s.index(" (J/'notat.md').write_text(");k=s.index('\nprogress=dict(',i)
+s=s[:i]+''' (J/'notat.md').write_text(f\'''# {job}, 21. oktober 2026
+
+Sam og Max med den åpne boken i Conroys soverom, rom 45, kostyme 223, palett 0, primærskript lokalt 210. Begge figurer og boken inngår i hver hel tegning. Sam står ved boken, gestikulerer, holder hånden under haken, senker armen og bøyer seg på huk. Max ligger flat under boken med kremfargede lemmer og rosa ørestriper på sidene. Ingen normal stående Max eller ny synlig kaninmunn legges til. Vanlig gående Max i kildebildene er en egen aktør og hører ikke til disse rutene.
+
+Originalene er sett i faktisk Linux-spillkontekst og sammen med godkjente hovedark for Sam og Max. Ressursbanken, primærskript 210 og kostymeheader er lest. Kildeprøven kjører gyldig hel animasjon 6 med alle 94 kostymeruter. Andre aktører og romskript er ikke skjult. Dette er ikke full naturlig gjennomspilling av boksekvensen.
+
+Denne bunken har fem ark, 30 native mål og elleve ulike egne hele malerier. Nitten mål gjenbruker en hel tegning bare når kildens hele RGBA og dimensjon er eksakt identisk. Ingen delvis aliasing. Fire innebygde image_gen-kall er bevart med faktisk prompt, argumenter, referansehash og råbilde i rapporter/{R.name}/kall. Modellbetegnelse ble ikke oppgitt. Originale jobbprompter er bevart ordrett separat; atlaspresisering og kildebegrunnelse erstatter det generelle startposepremisset for de valgte rutene.
+
+K02 tegnet hånden under haken i 1941 og 1942 der kilden senker armen. De to utkastene er forkastet selv om silhuettporten gikk gjennom. R01 tegner de to riktige lave armfasene. K03 sin midtre egne fot krysset planlagt atlasgrense x512. Delingen mellom egne hele tegninger er flyttet til det tomme mellomrommet ved x480 uten å fjerne synlig maling. Opprinnelig plan og råbilde er bevart. Ingen originalmaske brukes til slik deling.
+
+Python renser glød utenfor egen CORE128-kjerne og plasserer hver egen hel tegning ved fast 4x med åtte HD-pikslers marg. Egen myk alfa og egne kantfarger beholdes. Ingen nye motiver klippes med originalmasker, og ingen originale pikselfragmenter kopieres inn. Små kremfargede og rosa kildedeler bevares. Bokmerkene er grå tegnstreker uten nye leselige ord.
+
+Resultat 1536 x 1024 RGBA med ekte alfa. SHA256 {digest}. Egenkontroll {deliveries[-1]['egenkontroll']}. SHA-festet rutekart ligger i rapporter/{R.name}. Faste porter CORE128, IoU 0,6 og dekning 0,8 er uendret. Samlet arkvisning, native mottak, motor, publisering og faktisk pakkeinnhold kvitteres separat. Ingen ny godkjenning fra Tom eller Claude. Alle 1252 kildehash, 21519 tidligere publiserte filer og tre stasher bevares. Bibliotekskilder: figurark-fast-storrelse og publisert-mod-er-fasit. Ingen motor- eller pipelinekode er endret.
+\''')
+''' + s[k:]
+i=s.index('progress=dict(');k=s.index("\nsave(R/'fremdrift.json'",i)
+s=s[:i]+"progress=dict(leveranser=deliveries,nye_jobber_levert=5,nye_native_planlagt=30,ulike_hele_egne_malerier=11,nye_malerier=11,hele_rgba_aliasmal=19,innebygde_bildekall=4,returkall=1,grunnlag_native=3276,hele_figurjobber_med_resultat=463,total_figurjobber=1758,gjenstar=1295)"+s[k:]
+s=s.replace("automatisk-mottak68.json","automatisk-mottak30.json").replace("report['ruter_ok']==68","report['ruter_ok']==30")
+s=s.replace("meta['costume_cels']==3208;meta['costume_cels']=3276","meta['costume_cels']==3276;meta['costume_cels']=3306")
+s=s.replace('len(files)==21519','len(files)==21549');s=s.replace('nye_native=68,native_totalt=3276','nye_native=30,native_totalt=3306');s=s.replace('automatisk68_OK=True','automatisk30_OK=True');s=s.replace('tidligere_filer_bevart=21451,tidligere_png_bevart=21445,filer=21519','tidligere_filer_bevart=21519,tidligere_png_bevart=21513,filer=21549')
+s=s.replace("progress.update(nye_native=68,native_totalt=3276)","progress.update(nye_native=30,native_totalt=3306)")
+s=s.replace('Sju hele ark, 68 automatisk OK, kandidat 3276.','Fem hele ark, 30 automatisk OK, kandidat 3306.')
+(O/'lever.py').write_text(s)

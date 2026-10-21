@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Fem hele bokark fig223_01 til fig223_05 er levert, egenkontrollert, native mottatt, visuelt sett og motorobservert. 30 nye native fra elleve egne hele tegninger, kandidat 3306. 463 av 1758 hele resultatark, 1295 gjenstår pluss returer, katalogfeil og sluttkontroll. Fire OK og ett beholdt SJEKK, ingen FEIL. Alle 30 originalflater er identiske i kontrollpar, null endring utenfor nye aktørflater. 359 av 360 null, samme kjente 160 ved bilde 36. Kildepush og additiv publisering gjenstår. Neste er fig223_06 til fig223_13. Se rapporter/sam-max223-foerste-20261021/NESTE.md. Tidligere status nedenfor er historikk.
+
 Felles Linux og Windows med 3276 native er publisert og Latest-bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-max-intro. Begge faktiske nedlastinger, fire vedleggsdigester og alle 21518 runtime-moddfiler per pakke er kontrollert. Alle 126 nye native siden felles 3150 er motorobservert og har identiske figurutsnitt til produksjonen. 1720 kontroller gir 1683 null i både pakken og 3150-grunnlaget med samme nye Linux-binær. Samme eksakte feilkoordinater, begge RGB-verdier og rekkefølge; ingen nye eller økte bufferavvik. Alle 126 originalflater er identiske og alle 126 par har null endringer utenfor loggede aktørflater med målemargin. Tolv hele pakkebilder, tolv hele par og fem naturlige dørfaser er sett. Hele prøven er ikke avviksfri. Nativefrysen for det ferdige samlepunktet er frigitt.
 
 458 av 1758 hele figurjobber har resultat; 1300 gjenstår pluss returer, katalogfeil og sluttkontroll. Begge introbunkene er levert og pakket: 12 ark, 126 native. Ikke gjenta dem eller 3276-byggene. Alle 21519 moddfilhash, 1252 beskyttede jobbkilder, tre stasher og tidligere releaser er bevart. Ingen ny Tom-/Claude-godkjenning, full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
@@ -628,11 +630,11 @@ Figurark for Sam.
 Figurark for Sam, Sam og Max.
 
 - [x] `fig303_14` (figurark 14 for Sam (kostyme 303), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
-- [ ] `fig223_01` (figurark 1 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig223_02` (figurark 2 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig223_03` (figurark 3 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig223_04` (figurark 4 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig223_05` (figurark 5 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig223_01` (figurark 1 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig223_02` (figurark 2 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig223_03` (figurark 3 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig223_04` (figurark 4 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig223_05` (figurark 5 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_06` (figurark 6 for Sam og Max (kostyme 223), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_07` (figurark 7 for Sam og Max (kostyme 223), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_08` (figurark 8 for Sam og Max (kostyme 223), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
