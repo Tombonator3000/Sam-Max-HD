@@ -13,3 +13,5 @@ Den faktisk nedlastede Linux-binæren fra fellesutgave golf115 har SHA256 9e006a
 Publisering og tilbakehenting kvitteres separat. Felles Linux-/Windows-utgave har fortsatt 3098 native og mangler disse 12 til neste samlepunkt etter resten av familien 304. Det ekstra automatiske Windows-taggbygget 39537469767 ble fullført grønt; den tidligere sporadiske SDL-feilen regnes fortsatt som åpen. Full naturlig gjennomspilling, interaktiv Windows og ny webkontroll er ikke gjort her. Ingen ny Tom-/Claude-godkjenning.
 
 Publisert og hentet `7a3fbcd2ef1a1dd24ae5ef11504cf03980e9b0ed`, 3110 native. Alle 21353 faktiske filhash er bekreftet, 21335 tidligere PNG bevart. Grafikkilde `ac1e2f43d67866db7d91d3ecb40c280beefba5c5`. Pakker har fortsatt 3098 og mangler de 12 nye til neste samlepunkt etter familien 304. Ingen nativefrys.
+
+Main-dokumentasjonen ad089fb1f9612f8c9da6e69fea66dac523e308af har grønn CI 39541160662. Kontroll-GIF viser utvalgte faktiske dumper 178 til 200 med 140 ms per bilde for visuell kontroll; den dokumenterer ikke naturlig avspillingstempo.
