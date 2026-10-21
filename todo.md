@@ -1,5 +1,14 @@
 # todo.md
 
+## Neste, 2026-10-21 06:47
+
+- [x] Fig303_01..05: fem nye hele ark og 15 native, laget, egenkontrollert, mottatt, visuelt sett, motorobservert og publisert. 437 av 1758 hele figurjobber har resultat, 1321 gjenstår pluss returer/katalogfeil/sluttkontroll.
+- [x] Felles Linux-/Windows-samlepunkt med 3125 native og 27 nye siden 3098: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-hyssing. Begge faktiske pakker, alle 21367 runtimefiler hver og 27 av 27 identiske figurutsnitt kontrollert. 467/469 null, ingen nye eller økte avvik. Latest bekreftet, nativefrys frigitt.
+- [ ] Fig303_06..10: les rapporter/sam303-andre-kilde-20261021 på gpt-arbeid. 15 kildeavspilte mål, sju hele varianter, seks nye malerier. Ingen bildekall/resultater ennå. Se originalene, kildekontekst og Sam-hovedark før hvert motiv.
+- [ ] Hold verktøyavvist 304 K02 og andre avviste motiver utenfor nye forsøk og delkomposisjoner. K01 er utkast med avvikende ører; K03/K04/K05 ikke forsøkt. Ikke omprøv ugyldige 344/346-ruter.
+- [ ] Bevar 1136 kildehash, tre stasher, alle tidligere PNG og releaser. Ingen ny grafikk i main. Hold Tom-/Claude-godkjenning adskilt fra teknisk mottak og egenkontroll. Samlet sluttkontroll gjenstår.
+
+
 ## Neste, 2026-10-21 06:34
 
 - [x] Fem hele fig303_01..05 og 15 native publisert og hentet i `596201dcce1901db4a7c4a7f853ca591ffb11cbd`. 3125 native, 437 av 1758 resultatark. Endelig motorprøve uten nye eller økte avvik.
