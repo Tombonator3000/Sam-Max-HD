@@ -1,0 +1,48 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,re,hashlib,shutil,numpy as np,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;MOD=O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+prod={b:v for folder in ['gang045-20261021','max052-20261021'] for b,v in read(A/'rapporter'/folder/'motorobservasjoner.json')['tegninger'].items()};expected=read(R/'nye-native55.json')['ruter'];wanted={e['bilde']for e in expected};assert len(wanted)==55;obs={};raws={}
+for label,costume,room in [('gang045',45,8),('max052-an6',52,9),('max052-an7',52,9),('max052-an8',52,9)]:
+ T=O/('pakke3013-'+label)
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*'+str(costume)+r'\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',(T/'scummvm.log').read_text()):
+  f,cel,x,y,w,h=map(int,m.groups());name=f'costume{costume:03}_{cel}';shot=(f//2+1)*2;p=T/f'frame_{shot:06}_room{room:03}.png'
+  if name in wanted and name not in obs and p.exists():obs[name]=dict(label=label,logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p),native_sha256=sha(MOD/'costumes'/(name+'_hd.png')))
+assert set(obs)==wanted;rasters=[]
+def crop(v):
+ x,y=v['pos'];w,h=v['maal'];return np.array(Image.open(v['fil']).convert('RGBA').crop((x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8)))
+for name,v in obs.items():
+ old=crop(prod[name]);new=crop(v);assert old.shape==new.shape;delta=np.any(old!=new,2);rasters.append(dict(bilde=name,produksjon_frame=prod[name]['bildeframe'],pakke_frame=v['bildeframe'],croprasteridentisk=not delta.any(),endrede_crop_piksler=int(delta.sum()),ny_native_sha_identisk=v['native_sha256']==prod[name]['native_sha256']))
+save(R/'motorobservasjoner55.json',dict(sett=55,mangler=[],tegninger=obs));save(R/'rasterkontroll-mot-visuelt-sett.json',dict(croprasteridentiske=sum(v['croprasteridentisk']for v in rasters),sammenlignet=55,alle_nativefiler_identiske=all(v['ny_native_sha_identisk']for v in rasters),ruter=rasters));assert all(v['ny_native_sha_identisk']for v in rasters)
+shots=[]
+for label,f in [('inventory',120),('inventory',200),('akvarium',80),('akvarium',160),('cafeteria',80),('cafeteria',160)]:
+ D=O/f'pakke3013-{label}';matches=[p for p in D.glob(f'frame_{f:06}_room*.png')if '_flat'not in p.name];assert len(matches)==1;p=matches[0];out=R/f'pakke-{label}-{f}.png';shutil.copy2(p,out);shots.append(dict(label=label,frame=f,fil=out.name,sha256=sha(out)))
+for name in ['costume045_1793','costume045_1802','costume052_1921','costume052_1929','costume052_1949','costume052_1956']:
+ v=obs[name];out=R/f'pakke-{name}.png';shutil.copy2(v['fil'],out);shots.append(dict(label=name,frame=v['bildeframe'],fil=out.name,sha256=sha(out)))
+save(R/'motorbilder.json',shots);assert len(shots)==12
+for page in [0,1]:
+ board=Image.new('RGB',(1920,840),'#283943');d=ImageDraw.Draw(board)
+ for i,v in enumerate(shots[page*6:page*6+6]):
+  im=Image.open(R/v['fil']).convert('RGB').resize((640,400),Image.Resampling.LANCZOS);x=i%3*640;y=i//3*420;board.paste(im,(x,y+20));d.text((x+5,y+4),v['label']+' frame '+str(v['frame']),fill='white')
+ board.save(R/f'pakke-motorbilder-side{page+1}.png')
+diffs=[]
+for name in ['costume045_1793','costume052_1929','costume052_1949','costume052_1956']:
+ v=obs[name];T=O/('grunnlag2958-'+v['label']);p=T/Path(v['fil']).name;old=np.array(Image.open(p).convert('RGB'));new=np.array(Image.open(v['fil']).convert('RGB'));delta=np.any(old!=new,2);outside=delta.copy();states=[]
+ for path in [T/'scummvm.log',Path(v['fil']).parent/'scummvm.log']:
+  active={}
+  for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+) slot (\d+) seq (\d+) at (-?\d+),(-?\d+) (\d+)x(\d+)',path.read_text()):
+   f,c,cos,slot,seq,x,y,w,h=map(int,m.groups())
+   if f<v['bildeframe']:active[(slot,cos,c//128)]=dict(cel=c,kostyme=cos,pos=[x,y],maal=[w,h])
+  states.append(dict(fil=str(path),aktive=list(active.values())))
+  for e in active.values():
+   x,y=e['pos'];w,h=e['maal'];outside[max(0,y*4-12):min(800,(y+h)*4+12),max(0,x*4-12):min(1280,(x+w)*4+12)]=False
+ diffs.append(dict(bilde=name,frame=v['bildeframe'],endrede_piksler=int(delta.sum()),utenfor_alle_loggede_aktorer_og_marg=int(outside.sum()),aktortilstander=states));board=Image.new('RGB',(1280,430),'#283943');d=ImageDraw.Draw(board);board.paste(Image.fromarray(old).resize((640,400)),(0,30));board.paste(Image.fromarray(new).resize((640,400)),(640,30));d.text((6,6),'Faktisk pakke '+name+', grunnlag / ny',fill='white');board.save(R/f'pakke-foer-etter-{name}.png')
+save(R/'pakke-pikselkontroll.json',diffs);frames=[];refs=[]
+for an,fs in [(6,range(64,126,2)),(7,[62]),(8,[62,64,66,68])]:
+ for f in fs:
+  p=O/f'pakke3013-max052-an{an}'/f'frame_{f:06}_room009.png';frames.append(Image.open(p).convert('RGB').resize((960,600),Image.Resampling.LANCZOS));refs.append(dict(animasjon=an,frame=f,fil=str(p),sha256=sha(p)))
+gif=R/'max052-faktisk-pakke.gif';frames[0].save(gif,save_all=True,append_images=frames[1:],duration=[140]*(len(frames)-1)+[700],loop=0,optimize=False);save(R/'animasjonsproveniens.json',dict(fil=gif.name,sha256=sha(gif),motorbilder=refs,ingen_innlagte_nye_spillframes=True,visningshastighet_senket_for_kontroll=True,naturlig_gjennomspilling=False));logs={}
+with zipfile.ZipFile(R/'linux-motorlogger.zip','w',zipfile.ZIP_DEFLATED)as z:
+ for p in sorted(O.glob('*/scummvm.log')):rel=p.relative_to(O).as_posix();z.write(p,rel);logs[rel]=sha(p)
+assert len(logs)==14;save(R/'linux-motorlogger-manifest.json',logs);shutil.copy2(__file__,R/'vis-pakke.py.txt');print('55 observerte,',sum(v['croprasteridentisk']for v in rasters),'identiske utsnitt.12hele bilder. Utenforalleaktorer:',[v['utenfor_alle_loggede_aktorer_og_marg']for v in diffs],flush=True)

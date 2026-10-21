@@ -1,0 +1,72 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+S = A / 'rapporter/max052-20261021'
+Q = A / 'rapporter/sam115-kilde-20261021'
+v = json.loads((R / 'publisert.json').read_text())
+assert v['Latest_bekreftet'] and v['native'] == 3013
+now = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+url = v['url']
+state = f'''## Gjeldende grafikkstatus, {now}
+
+[Felles Linux og Windows med 3013 native ruter]({url}) er publisert og bekreftet som Latest. Begge faktiske nedlastinger, de fire vedleggenes SHA-256 og 21255 runtime-moddfiler per pakke er kontrollert. hd-mod er `{v['hd_mod']}`. Alle 30 tidligere releaser med vedlegg og alle tidligere native filer er bevart. Nativefrysen for dette samlepunktet er frigitt.
+
+55 nye ruter siden felles 2958 er med: 18 fra kostyme 045 og 37 fra kostyme 052. Alle 55 er motorobservert i faktisk Linux-pakke med rasteridentiske figurutsnitt mot visuelt sett produksjon. 379 bufferkontroller ga 375 nullavvik; de samme fire avvikene på 160 ved bilde 36 finnes i grunnlaget, og alle 244 kontroller fra figurstart ved bilde 60 er null. Ingen nye eller økte avvik. Tolv hele motorbilder og fire før/etter-par er visuelt sett. Full naturlig gjennomspilling, interaktiv Windows-test, ny webtest og ny Tom-/Claude-godkjenning gjenstår.
+
+423 av 1758 hele figurjobber har resultat; 1335 gjenstår pluss returer, katalogfeil og sluttkontroll. Fig052_02 og fig052_03 er levert, og 20 ruter fra fig052_01-utkastet er mottatt, visuelt sett, motorobservert, publisert og pakket. Fig052_01 er fortsatt ikke levert som hel jobb. Alle 37 native ruter passerer uendrede terskler, med egen alfa og uten hard originalmaske eller kildefragmenter. Tre omrissvarsler i ark 02 er visuelt vurdert og beholdt.
+
+Neste er bare `costume052_1920`: gjenoppta K02-maleriet med én HD-piksel tykkere egen alfakontur fra `rapporter/max052-20261021/kall/K02/costume052_1920-egenstrek1hd.png`. Denne kandidaten er teknisk målt til IoU 0,760 og dekning 0,835 og visuelt sett, men er ikke importert, motorobservert, publisert eller telt som native. Bytt bare denne ruten i det bevarte ark 01-utkastet, behold de 20 øvrige byteidentiske, og fullfør egenkontroll, mottak og motorprøve før additiv publisering. Ikke bruk K03-halsdelene eller gjenta leverte 045/052-ruter og pakkebygg.
+
+Deretter fig115_01..03, kildeklargjort med 84 mål fra 66 hele RGBA-bilder. Sam på Gator Golf med golfkølle, rom 25, aktør 2 ved (125, 177), palett 0. Originalark og primærskript 200 er sett. Faktisk kildeavspilling og godkjente Sam-stilankre skal ses før bildekall. Ugyldig animasjon 40 skal aldri spilles. Ingen nye 115-bildekall, resultatark eller native ruter er telt. Se `rapporter/sam115-kilde-20261021`.
+
+Alle 1036 beskyttede kildehash og tre opprinnelige stasher er uendret. Ingen motor- eller pipelinekode endret. Aktive grafikkoppgaver fortsetter uten gammel nattfrist; gamle nattprosesser gjenstartes ikke. Tidligere avviste motiver omprøves ikke, og ugyldige 344/346-ruter spilles ikke. Bibliotekskilder: figurark-fast-storrelse og publisert-mod-er-fasit. Eldre oppføringer nedenfor er historikk; denne statusen er gjeldende.
+'''
+for name in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+    p = A / name
+    s = p.read_text()
+    i = s.find('\n')
+    p.write_text(s[:i + 1] + '\n' + state + '\n' + s[i + 1:])
+
+(S / 'NESTE.md').write_text('''# Neste grafikkjobb
+
+Gjenoppta først `kall/K02/costume052_1920-egenstrek1hd.png`. Bare egen alfakontur er gjort én HD-piksel tykkere med egne farger; ingen kildemaske er brukt. Målt IoU er 0,759929532351057 og dekning 0,835387323943662, og kandidaten er visuelt sett. Den er ikke importert, motorobservert, publisert eller telt som native.
+
+Sett bare denne første ruten inn i det bevarte `fig052_01-utkast.png`. Behold de 20 øvrige rutene byteidentiske. Fullfør arkets egenkontroll, native mottak og kildekorrekt motorprøve før additiv publisering. Ikke bruk de forkastede K03-halsdelene eller gjenta de 37 leverte rutene.
+
+Alle 37 øvrige ruter fra 052 og 18 fra 045 er publisert, hentet og kontrollert i fellesutgaven med 3013 native ruter. Nativefrysen er frigitt. 423 av 1758 hele figurjobber har resultat; 1335 gjenstår pluss returer, katalogfeil og sluttkontroll.
+
+Neste ordinære bunke er fig115_01..03, foreløpig bare kildeklargjort: 84 mål fra 66 hele RGBA-bilder, Sam med golfkølle på Gator Golf, rom 25, aktør 2 ved (125, 177), palett 0. Originalark og primærskript 200 er sett. Faktisk kildeavspilling og godkjente Sam-stilankre gjenstår før bildekall. Ugyldig animasjon 40 spilles aldri. Ingen nye 115-bildekall, resultatark eller native ruter er telt. Se `../sam115-kilde-20261021`.
+
+Bevar alle 1036 beskyttede kildehash, tre opprinnelige stasher og alle tidligere publiserte filer. Avviste bildekall omprøves ikke. Ugyldige 344/346-ruter spilles ikke. Automatikken fortsetter uten gammel nattfrist.
+\nFellesutgave: ''' + url + '\n')
+(S / 'katt1920-egenstrek1hd-metode.md').write_text('''# Kattekandidat fra egen kontur
+
+Utgangspunktet er K02s hele egenmalte prototype. På egen alfakanal brukes én HD-piksel gråskaladilatasjon med kryssfotavtrykk `[[0,1,0],[1,1,1],[0,1,0]]`. Nye alfapiksler får RGB fra nærmeste egen alfa-128-kjerne. Helt transparente RGB-piksler nullstilles. Ingen originaldata inngår i behandlingen; originalen brukes bare til måling.
+
+Opprinnelig lerret på 144 × 124 beholdes. Ingen delmasker, skalering eller nye bildekall brukes. Målt IoU er 0,759929532351057 og dekning 0,835387323943662, over de uendrede tersklene 0,6 og 0,8. Kandidaten er visuelt sett, men ikke importert, motorobservert, publisert eller telt som native. Fellesutgaven har 3013 native ruter uten denne kandidaten.
+''')
+(Q / 'NESTE.md').write_text('''# Neste bunke: kildeklargjøring av kostyme 115
+
+Dette er bare kildeforberedelse, uten ny grafikk. Sam er på Gator Golf med golfkølle, i rom 25, kostyme 115, aktør 2 ved (125, 177), palett 0. Tre ark har 84 mål fra 66 ulike hele RGBA-bilder. Originalarkene er sett.
+
+Primærskript 200 veksler mellom gyldige animasjoner 6, 7, 8 og 9 etter variablene 152 og 249. Metadata har ugyldig animasjon 40, som aldri skal spilles. Se originalen i faktisk motor og godkjente Sam-stilankre før bildekall. Separat slips, hender, køllegrep og bøyde tynne deler i lag 14/15 skal beholdes. Se `ruteplan-kilde.json` og primærskriptet for detaljer.
+
+Først ferdigstilles 052_1920 fra K02-kandidaten med én HD-piksel tykkere egen kontur. Samlepunktet med 3013 native ruter er publisert og kontrollert; nativefrysen er frigitt. Ingen nye 115-bildekall, resultatark eller native ruter er telt. Alle 1036 beskyttede kildefiler og tre stasher bevares.
+''')
+receipt = f'''Fellesutgaven med 3013 native ruter er publisert og Latest er bekreftet: {url}. Begge faktiske nedlastinger og 21255 runtime-moddfiler per pakke er SHA-bekreftet. Alle 55 nye fra 045/052 er observert i faktisk Linux med rasteridentiske utsnitt mot visuelt sett produksjon. 379 kontroller ga 375 nullavvik, de samme fire overgangsavvikene på 160 ved bilde 36 og alle 244 kontroller fra figurstart uten avvik. Ingen nye eller økte avvik. Alle 30 tidligere releaser med vedlegg er bevart. Nativefrysen er frigitt. Ingen ny Tom-/Claude-godkjenning.'''
+for folder in ['gang045-20261021', 'max052-20261021']:
+    p = A / 'rapporter' / folder / 'RAPPORT.md'
+    s = p.read_text()
+    last = s.rfind('\n\nFelles3013 og Latest bekreftet:')
+    assert last >= 0
+    p.write_text(s[:last] + '\n\n' + receipt + '\n')
+(R / 'PAAGAR.md').write_text('# Samlepunkt fullført\n\n' + receipt + '\n\n423 resultatark; 1335 gjenstår pluss returer og sluttkontroll. Neste er K02-katteposekandidaten til 052_1920, deretter kildeavspilling og produksjon av 115.\n')
+shutil.copy2(__file__, R / 'avslutt-grafikkrapport.py.txt')
+print('Oppdatert gjeldende ordre, grafikkliste og neste arbeidssteg. Samlepunkt 3013 er kvittert.', flush=True)

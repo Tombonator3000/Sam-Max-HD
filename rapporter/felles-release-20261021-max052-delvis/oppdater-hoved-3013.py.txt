@@ -1,0 +1,62 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+q = json.loads((R / 'publisert.json').read_text())
+assert q['native'] == 3013 and q['Latest_bekreftet']
+assert q['figurjobber_med_resultat'] == 423
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=P, text=True).strip()
+subprocess.run(['git', 'pull', '--ff-only'], cwd=P, check=True)
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=P, text=True).strip() == q['kode']
+now = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+url = q['url']
+runs = json.loads(subprocess.check_output([
+    'gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/actions/workflows/windows.yml/runs?per_page=20'
+], cwd=P, text=True))['workflow_runs']
+tagruns = [dict(id=v['id'], status=v['status'], conclusion=v['conclusion'],
+                event=v['event'], sha=v['head_sha']) for v in runs
+           if v['head_sha'] == q['kode'] and v['event'] == 'push' and v['id'] > q['windows_run']]
+(R / 'ekstra-windows-tagbygg.json').write_text(json.dumps(tagruns, indent=2) + '\n')
+
+facts = f'''Siste verifiserte samlepunkt {now}: [felles Linux og Windows med 3013 native ruter]({url}). Begge faktiske nedlastinger og alle 21255 runtime-moddfiler per pakke er SHA-bekreftet. Publisert hd-mod er `{q['hd_mod']}`, og pakkekoden er `{q['kode']}`. Alle {q['bevarte_tidligere_releaser']} tidligere releaser med vedlegg er bevart, sammen med tidligere publiserte PNG-filer og stier. Nativefrysen er frigitt.
+
+Pakkene inneholder 55 nye native ruter siden fellesutgaven med 2958: 18 fra kostyme 045 og 37 fra kostyme 052. Alle 55 er observert i den faktiske Linux-pakken og har byteidentiske figurutsnitt med visuelt kontrollert produksjon. 379 bufferkontroller ga 375 nullavvik. De samme fire avvikene på 160 ved bilde 36 finnes også i grunnlaget; alle 244 kontroller fra figurstart ved bilde 60 er uten avvik. Ingen nye eller økte avvik. Tolv hele pakkebilder og fire før/etter-par er visuelt sett. Forskjeller fra andre romaktørers timing er dokumentert; de fire parene har ingen forskjeller utenfor alle loggede aktørgrenser med målemargin.
+
+423 av 1758 hele figurjobber har resultat; 1335 gjenstår pluss returer, katalogfeil og sluttkontroll. Denne 052-bunken gir to hele ark, fig052_02 og fig052_03, og 20 native ruter fra utkastet til fig052_01: totalt 37 native fra 34 hele malerier og tre eksakte hele aliasmål. Ark 02 har tre visuelt vurderte omrissvarsler, og ark 03 er OK. Alle 37 native passerer uendrede CORE128, IoU 0,6 og dekning 0,8. Råbilder og faktiske prompter fra 14 innebygde bildekall er bevart. Ingen harde originalmasker eller kildefragmenter inngår i nye native.
+
+Neste er bare costume052_1920 fra det bevarte K02-maleriet med én HD-piksel tykkere egen alfakontur. Kandidaten er målt til IoU 0,760 og dekning 0,835 og visuelt sett, men er ikke importert, motorobservert, publisert eller telt som native. Fig052_01 er fortsatt bare utkast. Bytt bare første rute, behold de 20 andre byteidentiske, og gjør egenkontroll, mottak og motorprøve før additiv publisering. Ikke bruk forkastede K03-halsdeler eller gjenta de 37 leverte rutene.
+
+Etterpå er fig115_01..03 kildeklargjort: 84 mål fra 66 hele RGBA-bilder, Sam på Gator Golf med golfkølle, rom 25, aktør 2 ved (125, 177), palett 0. Originalark og primærskript 200 er sett. Faktisk kildeavspilling og godkjente Sam-stilankre skal ses før bildekall. Ugyldig animasjon 40 skal aldri spilles. Ingen nye bildekall, resultatark eller native ruter fra 115 er telt. Alle 1036 beskyttede kildehash og tre opprinnelige stasher er uendret.
+
+Kontrollen dekker tvungne animasjoner. Full naturlig gjennomspilling, interaktiv Windows-test og ny webtest gjenstår. Ingen ny Tom-/Claude-godkjenning. Inventarkant 35, Windows SDL-startfeil, eldre testhopp og tidsavbrudd ved 816/836/1384/387 samt inventarikonets RGB under 044-eksplosjonen er ikke erklært rettet. Avviste bildekall omprøves ikke; ugyldige 344/346-ruter spilles ikke. Windows-taggbygget er registrert separat i pakkerapporten uten ny dispatch, omprøve eller kansellering.
+
+Rapporter på gpt-arbeid: `rapporter/max052-20261021`, `rapporter/felles-release-20261021-max052-delvis` og `rapporter/sam115-kilde-20261021`. Brukte bibliotekskilder: `figurark-fast-storrelse` og `publisert-mod-er-fasit`. Ingen motor- eller pipelinekode er endret; main får bare memory.md, todo.md, STATUS.md og log.md. Aktiv grafikkautomatikk fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke.
+'''
+heading = '\n## Siste verifiserte grafikkstatus, ' + now + '\n\n'
+for name in ['memory.md', 'STATUS.md', 'todo.md']:
+    p = P / name
+    s = p.read_text()
+    idx = s.find('\n')
+    if name == 'todo.md':
+        content = f'''423 av 1758 hele figurjobber har resultat; 1335 gjenstår pluss returer og sluttkontroll. [Felles Linux og Windows med 3013 native ruter]({url}) er publisert og kontrollert. Begge pakker har de 55 nye rutene fra 045/052; alle 55 er observert i den faktiske Linux-pakken. Ingen nye eller økte bufferavvik. Se STATUS.md for avgrensninger.
+
+- [x] Publiser og hent 37 nye native ruter fra 052 uten 1920; bevar tidligere filer og tre stasher.
+- [x] Kontroller begge faktiske pakker og publiser fellesutgaven med 3013 native ruter. Latest er bekreftet.
+- [ ] Fullfør bare 052_1920 fra K02-kandidaten med én HD-piksel tykkere egen kontur. Behold de 20 øvrige rutene i ark 01, kontroller og motorprøv før additiv publisering.
+- [ ] Fortsett fig115_01..03 etter kildeavspilling og Sam-stilkontroll. 84 mål fra 66 hele RGBA-bilder; ingen nye 115-ruter er levert. Ugyldig animasjon 40 skal ikke spilles.
+- [ ] Fortsett øvrige produserbare jobber og returer til grafikken er fullført. Automatikken fortsetter.
+'''
+    else:
+        content = facts
+    p.write_text(s[:idx + 1] + heading + content + '\n' + s[idx + 1:])
+with (P / 'log.md').open('a') as f:
+    f.write('\n## ' + now + ' (Codex)\n\n' + facts + '\n')
+shutil.copy2(__file__, R / 'oppdater-hoved-3013.py.txt')
+print('Oppdaterte bare memory.md, todo.md, STATUS.md og log.md. Ekstra Windows-taggbygg:', tagruns, flush=True)

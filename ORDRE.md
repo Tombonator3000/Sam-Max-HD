@@ -1,5 +1,20 @@
 # Ordre fra Claude
 
+## Gjeldende grafikkstatus, 2026-10-21 03:32
+
+[Felles Linux og Windows med 3013 native ruter](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-max052-delvis) er publisert og bekreftet som Latest. Begge faktiske nedlastinger, de fire vedleggenes SHA-256 og 21255 runtime-moddfiler per pakke er kontrollert. hd-mod er `82fcc69f6a21ac80bc4adc8b4b779e50004f1fff`. Alle 30 tidligere releaser med vedlegg og alle tidligere native filer er bevart. Nativefrysen for dette samlepunktet er frigitt.
+
+55 nye ruter siden felles 2958 er med: 18 fra kostyme 045 og 37 fra kostyme 052. Alle 55 er motorobservert i faktisk Linux-pakke med rasteridentiske figurutsnitt mot visuelt sett produksjon. 379 bufferkontroller ga 375 nullavvik; de samme fire avvikene på 160 ved bilde 36 finnes i grunnlaget, og alle 244 kontroller fra figurstart ved bilde 60 er null. Ingen nye eller økte avvik. Tolv hele motorbilder og fire før/etter-par er visuelt sett. Full naturlig gjennomspilling, interaktiv Windows-test, ny webtest og ny Tom-/Claude-godkjenning gjenstår.
+
+423 av 1758 hele figurjobber har resultat; 1335 gjenstår pluss returer, katalogfeil og sluttkontroll. Fig052_02 og fig052_03 er levert, og 20 ruter fra fig052_01-utkastet er mottatt, visuelt sett, motorobservert, publisert og pakket. Fig052_01 er fortsatt ikke levert som hel jobb. Alle 37 native ruter passerer uendrede terskler, med egen alfa og uten hard originalmaske eller kildefragmenter. Tre omrissvarsler i ark 02 er visuelt vurdert og beholdt.
+
+Neste er bare `costume052_1920`: gjenoppta K02-maleriet med én HD-piksel tykkere egen alfakontur fra `rapporter/max052-20261021/kall/K02/costume052_1920-egenstrek1hd.png`. Denne kandidaten er teknisk målt til IoU 0,760 og dekning 0,835 og visuelt sett, men er ikke importert, motorobservert, publisert eller telt som native. Bytt bare denne ruten i det bevarte ark 01-utkastet, behold de 20 øvrige byteidentiske, og fullfør egenkontroll, mottak og motorprøve før additiv publisering. Ikke bruk K03-halsdelene eller gjenta leverte 045/052-ruter og pakkebygg.
+
+Deretter fig115_01..03, kildeklargjort med 84 mål fra 66 hele RGBA-bilder. Sam på Gator Golf med golfkølle, rom 25, aktør 2 ved (125, 177), palett 0. Originalark og primærskript 200 er sett. Faktisk kildeavspilling og godkjente Sam-stilankre skal ses før bildekall. Ugyldig animasjon 40 skal aldri spilles. Ingen nye 115-bildekall, resultatark eller native ruter er telt. Se `rapporter/sam115-kilde-20261021`.
+
+Alle 1036 beskyttede kildehash og tre opprinnelige stasher er uendret. Ingen motor- eller pipelinekode endret. Aktive grafikkoppgaver fortsetter uten gammel nattfrist; gamle nattprosesser gjenstartes ikke. Tidligere avviste motiver omprøves ikke, og ugyldige 344/346-ruter spilles ikke. Bibliotekskilder: figurark-fast-storrelse og publisert-mod-er-fasit. Eldre oppføringer nedenfor er historikk; denne statusen er gjeldende.
+
+
 Publisert og hentet 82fcc69f6a21ac80bc4adc8b4b779e50004f1fff:3013 native,21256 filer/21250 PNG,alle hash bekreftet. Fellesbygg startet én gang per plattform på kode bb769709d4bc889b18763caf96bf2fd035265bd2,Linux39526033511,Windows39526036828. Denne native-SHAen er frosset til kontroll og publisering av pakkene. Nåværende fellespakke2958mangler55.
 
 052 delvis: 37 nye native laget, mottatt, visuelt sett og motorobservert. Fig052_02/03 levert, ark01 fortsatt utkast fordi cat1920 feiler dekning. 423/1758 resultatjobber, kandidat3013. Les rapporter/max052-20261021/NESTE.md. Pakker2958 mangler55, samlepunkt følger. Alle1024kilder/3stasher/tidligere filer bevares. Ingen ny Tom-/Claude-godkjenning.
