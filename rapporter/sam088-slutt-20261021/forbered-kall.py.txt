@@ -1,0 +1,8 @@
+import json,hashlib,sys
+from pathlib import Path
+R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/sam088-slutt-20261021')
+for c in sys.argv[1:]:
+ C=R/'kall'/c;p=C/'plan.json';d=json.loads(p.read_text());args=json.loads((C/'faktiske-argumenter.json').read_text())
+ for path in args['referenced_image_paths']:
+  assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==d['referanser_sha256'][path]
+ assert not (C/'raa.png').exists();d.update(kilde_og_kontekst_sett=True,reference_atlas_sett=True,mastere_sett=True);p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')

@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+import json, hashlib, re, shutil, sys, datetime
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+for c in sys.argv[1:]:
+ C=R/'kall'/c;hint=json.loads((C/'verktøyhint.json').read_text())['output_hint'];p=Path(re.search(r'as (/\S+\.png) by default',hint)[1])
+ if not (C/'raa.png').exists():shutil.copy2(p,C/'raa.png')
+ assert sha(p)==sha(C/'raa.png')
+ args=json.loads((C/'faktiske-argumenter.json').read_text())
+ save(C/'verktøyresultat.json',dict(tool='innebygd image_gen',modell_oppgitt=False,original_output=str(p),output_hint=hint,raa_sha256=sha(C/'raa.png'),faktisk_storrelse=list(Image.open(C/'raa.png').size),registrert_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),argumenter_sha256=sha(C/'faktiske-argumenter.json'),prompt_sha256=sha(C/'faktisk-prompt.txt'),referanser={f:sha(Path(f)) for f in args['referenced_image_paths']}))
+ d=json.loads((C/'plan.json').read_text());d.update(ingen_kall_enna=False,kall_gjort=True,raa_sha256=sha(C/'raa.png'));save(C/'plan.json',d)
+ print(c,Image.open(C/'raa.png').size,sha(C/'raa.png')[:12])
+shutil.copy2(__file__,R/'registrer-kall.py.txt')
