@@ -1,5 +1,16 @@
 # todo.md
 
+## Siste verifiserte grafikkstatus, 2026-10-21 03:31
+
+423 av 1758 hele figurjobber har resultat; 1335 gjenstår pluss returer og sluttkontroll. [Felles Linux og Windows med 3013 native ruter](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-max052-delvis) er publisert og kontrollert. Begge pakker har de 55 nye rutene fra 045/052; alle 55 er observert i den faktiske Linux-pakken. Ingen nye eller økte bufferavvik. Se STATUS.md for avgrensninger.
+
+- [x] Publiser og hent 37 nye native ruter fra 052 uten 1920; bevar tidligere filer og tre stasher.
+- [x] Kontroller begge faktiske pakker og publiser fellesutgaven med 3013 native ruter. Latest er bekreftet.
+- [ ] Fullfør bare 052_1920 fra K02-kandidaten med én HD-piksel tykkere egen kontur. Behold de 20 øvrige rutene i ark 01, kontroller og motorprøv før additiv publisering.
+- [ ] Fortsett fig115_01..03 etter kildeavspilling og Sam-stilkontroll. 84 mål fra 66 hele RGBA-bilder; ingen nye 115-ruter er levert. Ugyldig animasjon 40 skal ikke spilles.
+- [ ] Fortsett øvrige produserbare jobber og returer til grafikken er fullført. Automatikken fortsetter.
+
+
 ## Mennesket og glassdøren045 publisert, 2026-10-21 02:23
 
 Tre hele ark,  fig045_01 til03,  er publisert med 18nye native animasjonsruter fra 16 ulike hele kilder. Katalogens Sam-premiss var feil. Originalen og rom 8 lokalt 200 viser et menneske som fyker gjennom glasset i kontordøren, strekkes komisk og lander ved trapperekkverket. Den svarte åpningen i glasslaget er fortsatt ugjennomsiktig.

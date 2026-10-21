@@ -1,5 +1,22 @@
 # Status
 
+## Siste verifiserte grafikkstatus, 2026-10-21 03:31
+
+Siste verifiserte samlepunkt 2026-10-21 03:31: [felles Linux og Windows med 3013 native ruter](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-max052-delvis). Begge faktiske nedlastinger og alle 21255 runtime-moddfiler per pakke er SHA-bekreftet. Publisert hd-mod er `82fcc69f6a21ac80bc4adc8b4b779e50004f1fff`, og pakkekoden er `bb769709d4bc889b18763caf96bf2fd035265bd2`. Alle 30 tidligere releaser med vedlegg er bevart, sammen med tidligere publiserte PNG-filer og stier. Nativefrysen er frigitt.
+
+Pakkene inneholder 55 nye native ruter siden fellesutgaven med 2958: 18 fra kostyme 045 og 37 fra kostyme 052. Alle 55 er observert i den faktiske Linux-pakken og har byteidentiske figurutsnitt med visuelt kontrollert produksjon. 379 bufferkontroller ga 375 nullavvik. De samme fire avvikene på 160 ved bilde 36 finnes også i grunnlaget; alle 244 kontroller fra figurstart ved bilde 60 er uten avvik. Ingen nye eller økte avvik. Tolv hele pakkebilder og fire før/etter-par er visuelt sett. Forskjeller fra andre romaktørers timing er dokumentert; de fire parene har ingen forskjeller utenfor alle loggede aktørgrenser med målemargin.
+
+423 av 1758 hele figurjobber har resultat; 1335 gjenstår pluss returer, katalogfeil og sluttkontroll. Denne 052-bunken gir to hele ark, fig052_02 og fig052_03, og 20 native ruter fra utkastet til fig052_01: totalt 37 native fra 34 hele malerier og tre eksakte hele aliasmål. Ark 02 har tre visuelt vurderte omrissvarsler, og ark 03 er OK. Alle 37 native passerer uendrede CORE128, IoU 0,6 og dekning 0,8. Råbilder og faktiske prompter fra 14 innebygde bildekall er bevart. Ingen harde originalmasker eller kildefragmenter inngår i nye native.
+
+Neste er bare costume052_1920 fra det bevarte K02-maleriet med én HD-piksel tykkere egen alfakontur. Kandidaten er målt til IoU 0,760 og dekning 0,835 og visuelt sett, men er ikke importert, motorobservert, publisert eller telt som native. Fig052_01 er fortsatt bare utkast. Bytt bare første rute, behold de 20 andre byteidentiske, og gjør egenkontroll, mottak og motorprøve før additiv publisering. Ikke bruk forkastede K03-halsdeler eller gjenta de 37 leverte rutene.
+
+Etterpå er fig115_01..03 kildeklargjort: 84 mål fra 66 hele RGBA-bilder, Sam på Gator Golf med golfkølle, rom 25, aktør 2 ved (125, 177), palett 0. Originalark og primærskript 200 er sett. Faktisk kildeavspilling og godkjente Sam-stilankre skal ses før bildekall. Ugyldig animasjon 40 skal aldri spilles. Ingen nye bildekall, resultatark eller native ruter fra 115 er telt. Alle 1036 beskyttede kildehash og tre opprinnelige stasher er uendret.
+
+Kontrollen dekker tvungne animasjoner. Full naturlig gjennomspilling, interaktiv Windows-test og ny webtest gjenstår. Ingen ny Tom-/Claude-godkjenning. Inventarkant 35, Windows SDL-startfeil, eldre testhopp og tidsavbrudd ved 816/836/1384/387 samt inventarikonets RGB under 044-eksplosjonen er ikke erklært rettet. Avviste bildekall omprøves ikke; ugyldige 344/346-ruter spilles ikke. Windows-taggbygget er registrert separat i pakkerapporten uten ny dispatch, omprøve eller kansellering.
+
+Rapporter på gpt-arbeid: `rapporter/max052-20261021`, `rapporter/felles-release-20261021-max052-delvis` og `rapporter/sam115-kilde-20261021`. Brukte bibliotekskilder: `figurark-fast-storrelse` og `publisert-mod-er-fasit`. Ingen motor- eller pipelinekode er endret; main får bare memory.md, todo.md, STATUS.md og log.md. Aktiv grafikkautomatikk fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke.
+
+
 ## Mennesket og glassdøren045 publisert, 2026-10-21 02:23
 
 Tre hele ark,  fig045_01 til03,  er publisert med 18nye native animasjonsruter fra 16 ulike hele kilder. Katalogens Sam-premiss var feil. Originalen og rom 8 lokalt 200 viser et menneske som fyker gjennom glasset i kontordøren, strekkes komisk og lander ved trapperekkverket. Den svarte åpningen i glasslaget er fortsatt ugjennomsiktig.
