@@ -11,3 +11,5 @@ Alle 21567 moddfilhash, 1252 beskyttede kilder, tre stasher og 35 tidligere rele
 Nativefrysen beholdes til de registrerte ekstra pakkebyggene er avsluttet. Ikke dupliser eller avbryt dem.
 
 Forundersøkelse for neste bunke er bevart i neste97-forundersokelse.json. Kostyme 97 har 12 ark og 95 mål fra 49 hele RGBA-varianter. De første åtte arkene har 47 mål som alle er eksakte hele RGBA-alias av én svanebåttegning. Ett helt eget båtbilde kan derfor brukes i alle 47 etter kildeavklaring og kontroll. De siste fire arkene har andre lag og må ses og kildeavklares særskilt. Dette er kun en forundersøkelse, ingen 97-bildekall, resultater eller native. Gyldig animasjon, palett og faktisk spillkontekst er ikke motorbekreftet. Metadataadvarselen om rawvalg 28 er bevart; det ugyldige valget skal ikke kjøres.
+
+Oppfølging: ekstra Windows-taggbygg 39591712087 er nå bekreftet grønt på første forsøk, og pakkefrysen for 3324 er frigitt. Videre grafikkproduksjon fortsetter i rapporter/svanebaat97-20261021. Denne fellesutgaven er fortsatt 3324, mens den nye modden har 3371.

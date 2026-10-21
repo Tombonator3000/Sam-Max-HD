@@ -1,0 +1,46 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+r=read(R/'mottak-publisert.json');b=read(R/'grunnlag-produksjon.json');protected=read(R/'beskyttede-samlet1300.json')
+assert r['native']==3371 and r['nye_native']==47 and r['alle_filhash_bekreftet'] and r['motorobservert'] and r['visuelt_sett']
+assert not git(P,'status','--porcelain') and git(P,'rev-parse','HEAD')==b['kode_sha']
+assert len(protected)==1300 and all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==473
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+text=f'''Åtte nye hele båtark, fig097_01 til fig097_08, er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert. De gir 47 nye native ruter fra ett helt eget båtmaleri og 46 eksakte hele RGBA- og indeksbildealiasmål. Modden har 3371 native. 473 av 1758 hele figurjobber har resultat; 1285 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Alle åtte ark og alle 47 native er OK. Faste porter CORE128, IoU 0,6 og dekning 0,8 er uendret. Ingen ny Tom-/Claude-godkjenning.
+
+Motivet er den hvite svanebåten i Tunnel of Love, rom 22, kostyme 97 og lag 14. Fjærformet akter, lav sittekant, bøyd hals, lite øye, svart nebb, riflet grått bånd og små grå og varme merker følger originalen. Sam og Max animeres i lag 15 og er ikke malt inn i båtlaget. Det generiske jobbnavnet Sam og Max er korrigert i separat faktisk prompt; de fire beskyttede jobbfilene er uendret. Alle åtte originalark, faktiske kildefaser, godkjente hovedark og ferdige resultatark er sett. Ett innebygd image_gen-kall med råfil, faktiske argumenter og SHA-festet rutekart er bevart. Modellnavn ble ikke oppgitt. Ingen retur eller verktøyavvisning i denne bunken. Python renser glød rundt egen alfakjerne og plasserer hele eget maleri i fast 4x med åtte HD-pikslers marg. Egen alfa bevares uten hard originalmaske eller originale bildefragmenter.
+
+Rom 22 har 29 skript dekompilert uten feil med samme SHA-bekreftede lokale descumm som i forrige bunke. Standardbanen fant ikke verktøyet; tidligere kjent binær ble brukt uten installasjon. COST-headeren bekrefter gyldige råvalg 4 til 7 og 24 til 27. Ugyldig råvalg 28 er dokumentert og ikke kjørt. Primærskript 201 bruker aktør 4, kostyme 97 og hel animasjon 6 etter lysblink. Både dette skriptet etter romhopp og separat hel 6-animasjon er avspilt med grunnlag 3324 og kandidat 3371 i faktisk nedlastet Linux-binær, SHA256 `0887fa427c7315e4cfd66c92190b60bcbd2b3eeef346407560af56346cfae3e0`. Alle 95 familieruter, inkludert alle 47 nye båtlag, er logget i hver prøve. Dette er regisserte prøver, ingen full naturlig gjennomspilling. Andre aktører og romskript er ikke skjult.
+
+Hver side har samlet 720 bufferkontroller og 718 null fra to prøver. Begge har det samme kjente 160-avviket ved bilde 36 i hver prøve, med identiske koordinater, begge RGB-verdier og rekkefølge. Alle 190 originalflater er SHA-identiske. Alle 94 båtpar har null endringer utenfor logget båtflate med åtte HD-pikslers målemargin. Kameraforskyvningen er lest fra hver faktisk dumpframe. Første visningshjelper brukte romkoordinater uten kamera og feilet før visning; kun utsnittshjelperen ble rettet. Ingen motorendring eller ny avspilling var nødvendig. Begge variantbrett, alle åtte resultatark og fire hele før/etter-par er sett. Båt og figurer beholder lagdelingen. Ingen nye eller økte bufferavvik. Hele prøven er ikke avviksfri.
+
+Hd-mod `{r['hd_mod']}` er publisert additivt fra eksakt fjern-SHA `41fe60bc55e1c7dd0ba9a486ffa3f8189093a766`, hentet tilbake og kontrollert med alle 21614 filhash. Alle 21561 tidligere PNG og øvrige tidligere stier er bevart. 1300 beskyttede kilder og tre opprinnelige stasher er urørt. Grafikkilde `{r['grafikkilde']}` på gpt-arbeid. Main får bare disse fire dokumentasjonsfilene, ingen ny grafikk. Ingen motor- eller pipelineendring. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Bevis: `rapporter/svanebaat97-20261021` på gpt-arbeid.
+
+[Felles Linux/Windows 3324](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-bok) er fortsatt siste faktisk nedlastede og kontrollerte fellesutgave. Den mangler de 47 nye båtlagene. Ekstra Windows-taggbygg 39591712087 er bekreftet grønt på første forsøk før ny nativepublisering, og den gamle nativefrysen er frigitt. Native er ikke fryst nå. Ingen nye pakkebygg eller release er startet i denne bunken. Neste pakkesamlepunkt er etter de fire resterende 97-arkene, forventet 3419 native hvis alle 48 nye mål leveres, eller tidligere ved blokkering. Grønt taggbygg er ingen påstand om at den tidligere sporadiske SDL-startfeilen er rettet.
+
+Neste er fig097_09 til fig097_12, de fire øvre figurarkene med 48 unike hele RGBA-kilder. Alle 48 er logget i primærskript 201 og hel animasjon 6. Åtte faktiske original-/spillkontekstbrett og fire originalark er klargjort i samme rapport; disse nye brettene er ikke visuelt sett ennå. Ingen nye bildekall, resultatark eller native for de fire. Se `neste-ovre48.json`, `ovre48-kildekontekst.json`, aktuelle kilder, begge godkjente hovedark og båten som kontakt-/stilreferanse før hvert motiv. Bevar fase, identitet, grep, plassering og små effekter. Ikke tegn båten inn i det øvre laget. Ikke dupliser de åtte leverte arkene eller avspillingene. Alle 1300 beskyttede kilder dekker også de neste fire jobbene.
+
+Grafikkautomatikken fortsetter uten gammel nattfrist. Gamle nattprosesser gjenstartes ikke. Tidligere verktøyavviste motiver, inkludert den avgrensede bokreturen og dens hele aliaser, omprøves ikke. Ugyldige 344/346-ruter spilles ikke. Full naturlig gjennomspilling, interaktiv Windows, ny webtest og samlet sluttkontroll gjenstår. Kjente SDL-, inventar- og testhoppbegrensninger er fortsatt åpne.
+'''
+for name,title in [('memory.md','Gjeldende grafikkstatus'),('STATUS.md','Sist verifisert grafikk')]:
+    p=P/name;t=p.read_text();i=t.find('\n');p.write_text(t[:i+1]+'\n## '+title+', '+now+'\n\n'+text+'\nTidligere oppføringer nedenfor er bevart som historikk.\n'+t[i+1:])
+p=P/'todo.md';t=p.read_text();i=t.find('\n');p.write_text(t[:i+1]+f'''\n## Neste, oppdatert {now}
+
+- [x] Levert og additivt publisert fig097_01 til fig097_08: 47 nye native, 3371 totalt. Alle 21614 filhash, tidligere grafikk, 1300 kilder og tre stasher bekreftet etter hent.
+- [x] Egenkontroll av alle åtte ark og 47 native er OK. Begge motorprøver viser 47 nye mål, 718/720 null på hver side samlet, samme to kjente 160-avvik. 190 originalflater SHA-identiske; 94 båtpar med null utenfor logget båtflate. Åtte ark, begge variantbrett og fire hele par er sett.
+- [x] Ekstra Windows-taggbygg 39591712087 er grønt på første forsøk; gammel pakkefrys er frigitt. Ingen duplisert bygging eller ny release for 3324.
+- [ ] Fortsett fig097_09 til fig097_12 fra rapporter/svanebaat97-20261021, 48 mål fra 48 ulike hele kilder. Åtte kildebrett og fire originalark er klargjort, ikke visuelt sett. Ingen nye øvre bildekall eller resultater. Se kilder i spillkontekst og begge hovedark før hvert motiv; båten er allerede levert i eget lag.
+- [ ] Oppdater begge faktiske pakker ved familiens samlepunkt, forventet 3419 native, eller tidligere ved blokkering. Fellespakker har 3324 og mangler 47. Bekreft nedlastinger, sjekksummer og faktisk inkludert grafikk før de kalles oppdatert.
+- [ ] Fortsett øvrig produserbar grafikk og returer. 473 av 1758 hele figurjobber har resultat; 1285 gjenstår pluss returer, katalogfeil og sluttkontroll. Skill laget, egenkontrollert, visuelt sett, native mottatt, motorobservert, publisert, pakket og Tom-/Claude-godkjent.
+- [ ] Bevar tidligere filer og releaser, 1300 kilder og tre stasher. Ikke gjenta verktøyavviste motiver, den avgrensede bokreturen eller ugyldige 344/346-avspillinger. Full naturlig gjennomspilling, interaktiv Windows, ny webtest og samlet sluttkontroll gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+'''+t[i+1:])
+with (P/'log.md').open('a') as f:f.write('\n\n## '+now+' (Codex)\n\n'+text)
+assert set(git(P,'diff','--name-only').splitlines())=={'memory.md','todo.md','STATUS.md','log.md'}
+shutil.copy2(__file__,R/'oppdater-mainrapport.py.txt');print('Bare memory, todo, STATUS og log oppdatert: 3371 native, pakker fortsatt 3324 og neste øvre figurark.')

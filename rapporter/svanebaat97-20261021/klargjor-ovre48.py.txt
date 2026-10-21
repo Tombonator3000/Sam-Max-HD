@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+plan=read(R/'neste-ovre48.json');source=read(R/'primaer201.json');assert len(plan['ruter'])==48 and len({e['canonical'] for e in plan['ruter']})==48
+assert not any((A/'jobber'/e['jobb']/'resultat.png').exists() for e in plan['jobber'])
+boards=[]
+for start in range(0,48,6):
+    board=Image.new('RGB',(1440,1200),'#304050');draw=ImageDraw.Draw(board)
+    for i,e in enumerate(plan['ruter'][start:start+6]):
+        n=e['bilde'];q=source['tegninger'][n];src=Image.open(P/'work/extract/costumes'/(n+'.png')).convert('RGBA');assert sha(P/'work/extract/costumes'/(n+'.png'))==e['sha256'];assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']
+        x,y=q['viewport_pos'];w,h=q['maal'];im=Image.open(q['fil']).convert('RGB');context=im.crop((max(0,x*4-80),max(0,y*4-45),min(1280,(x+w)*4+80),min(800,(y+h)*4+180)))
+        xx=i%2*720;yy=i//2*400;draw.text((xx+8,yy+8),n+' original / primaer201 frame '+str(q['bildeframe']),fill='white')
+        bg=Image.new('RGBA',(src.width*4,src.height*4),'#596978');bg.alpha_composite(src.resize(bg.size,Image.Resampling.NEAREST));bg=bg.convert('RGB');bg.thumbnail((330,355),Image.Resampling.NEAREST);context.thumbnail((355,355),Image.Resampling.LANCZOS);board.paste(bg,(xx+8,yy+30));board.paste(context,(xx+355,yy+30))
+    f=R/f'ovre48-kildekontekst-{start//6+1}.png';assert not f.exists();board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=[e['bilde'] for e in plan['ruter'][start:start+6]],visuelt_sett=False))
+save(R/'ovre48-kildekontekst.json',boards)
+originals=Image.new('RGB',(1536,1060),'#304050');draw=ImageDraw.Draw(originals)
+for i,e in enumerate(plan['jobber']):
+    p=A/'jobber'/e['jobb']/'referanse.png';im=Image.open(p).convert('RGB');im.thumbnail((758,505),Image.Resampling.LANCZOS);x=i%2*768;y=i//2*530;draw.text((x+8,y+6),e['jobb'],fill='white');originals.paste(im,(x+5,y+25))
+originals.save(R/'ovre48-originalark.png');plan.update(kildebrett_klargjort=8,kildebrett_visuelt_sett=False,originalark_klargjort=4,originalark_visuelt_sett=False,ingen_bildekall=True);save(R/'neste-ovre48.json',plan)
+with (R/'NESTE.md').open('a') as f:f.write('\nNeste 48 øvre kilder har åtte ferdige original-/spillkontekstbrett: ovre48-kildekontekst-1.png til 8.png, og de fire originalarkene i ovre48-originalark.png. Disse nye brettene er klargjort, ikke visuelt sett. Bruk hvert primærbilde og kilde-RGBA samlet med godkjente hovedark før nytt motiv. Kameraets faktiske screen_origin er allerede tatt med. Båtens nye native 1841 kan brukes som kontrollert stil-/kontaktreferanse, ikke som erstatning for de øvre kildene.\n')
+shutil.copy2(__file__,R/'klargjor-ovre48.py.txt');print('Neste: fire hele øvre figurark, 48 ulike kilder, åtte faktiske kildebrett klare. Ingen nye øvre bildekall.')
