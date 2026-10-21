@@ -1,0 +1,19 @@
+; Objekt 568 "dinosaur-desoto" i rom 59 (OBCD/VERB)
+; Verbtabell (verb: offset fra starten av VERB-blokken): 3: 0x0055, 4: 0x0012
+; Mellom verbtabellen og første inngang: 1 x (01, uint16) = 130. Ingen inngang peker dit, og descumm hopper over dem. Satt som klasser gir de samme bitene som DOBJ har for objektet.
+
+Events:
+   3 - 0055
+   4 - 0012
+[0012] (BB) talkEgo(sound(0x1F147FC, 0xA) + "I'd say our DeSoto is about 90 or so yards away.")
+[0054] (65) stopObjectCodeA()
+[0055] (0C) dup[1] = localvar0
+[0059] (5D) if (dup[1] == 570) {
+[0060] (5E)   startScript(0,208,[])
+[006B] (7C)   stopScript(0)
+[006F] (73) } else {
+[0072] (5E)   startScript(0,63,[3,var7,localvar0])
+[0086] (7C)   stopScript(0)
+[008A] (**) }
+[008A] (65) stopObjectCodeA()
+END

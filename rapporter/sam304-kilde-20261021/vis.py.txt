@@ -1,0 +1,50 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json
+import hashlib
+import zipfile
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda f: json.loads(f.read_text())
+sha = lambda f: hashlib.sha256(f.read_bytes()).hexdigest()
+save = lambda f, d: f.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+proof = read(R / 'motor-kilde-aktorstart.json')
+names = ['costume304_1920', 'costume304_1927', 'costume304_1931', 'costume304_1938', 'costume304_1946', 'costume304_1953']
+board = Image.new('RGB', (1920, 840), '#304050')
+d = ImageDraw.Draw(board)
+rows = []
+for i, name in enumerate(names):
+    v = proof['tegninger'][name]
+    out = R / (name + '-kilde-i-rom.png')
+    shutil.copy2(v['fil'], out)
+    x, y = i % 3 * 640, i // 3 * 420
+    board.paste(Image.open(out).convert('RGB').resize((640, 400)), (x, y + 20))
+    d.text((x + 6, y + 4), name + ' frame ' + str(v['bildeframe']), fill='white')
+    rows.append(dict(v, bilde=name, fil=out.name, sha256=sha(out)))
+board.save(R / 'kilde-motorbilder-brett.png')
+save(R / 'visuelle-kildebilder.json', rows)
+with zipfile.ZipFile(R / 'kildemotorlogger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+    for name, folder in [('motor-kilde.json', 'rom59-skript208'), ('motor-kilde-aktorstart.json', 'rom59-skript208-aktorstart')]:
+        z.write(O / folder / 'scummvm.log', folder + '.log')
+base = read(R / 'grunnlag.json')
+base.update(kildeavspilling_34_av34=True, primar_skript208_med_aktorinitialisering=True,
+    source_kontroller=450, source_null=448, source_avvik=[v for v in proof['kontroller'] if v['avvik']],
+    ingen304_bildekall_eller_resultat=True)
+save(R / 'grunnlag.json', base)
+(R / 'KILDEGRUNNLAG.md').write_text('''# Neste familie: Sam og Max med hyssingen, kostyme 304
+
+15 hele jobber fig304_01..15 har 34 mål fra 29 forskjellige hele RGBA-originaler. Jobbnavnet sier Sam, men originalen viser Sam OG Max sammen med hyssing. Bruk begge godkjente hovedark som stilankere, uten å endre jobb.json eller andre beskyttede filer. Lokal 208 i rom 59, objekt 570 dinosaur-string og objekt 568 dinosaur-desoto er bevart med kildehash. Objekt 570 omtaler 91 yards hyssing festet til dinosaurens tann. Lokal 208 bruker først Sam 303 og deretter 304 med animasjon 6. Rommet er Dinosaurparken ved T. rex/mammuten. Animasjon 6 er bekreftet i primærskriptet, ikke bare katalogen. Katalogen har 34 ruter og ingen dekoderadvarsler. Første tre er kildeidentiske hele mål. Smale hyssingdeler, knuten øverst og kildebekreftede små løse merker skal bevares bokstavelig uten oppfunnet betydning. Ingen ny figuridentitet, fingerantall eller nye rekvisitter.
+
+Første forsøk startet originalskript 208 etter romhopp uten aktørinitialisering. Sam var ikke synlig i rommet og ingen 304-rute ble logget, selv om skriptet avsluttet i rom 58. Opptaket og loggen er bevart som ufullstendig kildeprøve. Korreksjonen initialiserer bare Sam som aktør 2 med primærskriptets foregående kostyme 303, animasjon 6, posisjon 224,177, palett 0 og skala 255 før originalskript 208 overtar. Dette gir alle 34 av 34 mål. Ingen animasjonsgrenser er endret, ingen ugyldige animasjoner er prøvd og andre aktører er ikke skjult av testkode. Originalskriptet flytter selv Max med elevasjon 200 som del av scenen. Dette er en regissert kildeprøve med testinitialisering, ikke full naturlig gjennomspilling.
+
+Begge kildeprøvene har 450 skjermbufferkontroller og 448 null, avvik 4 ved bilde 36 og 160 ved 450. Dette er kildeprøver, ikke en ny feilfri leveranse eller en kontroll mot 3098-grunnlag med samme scene. Ingen 304-grafikk er generert, importert, publisert eller telt. Før produksjon må resten av originalarkene, begge godkjente stilankre og disse faktiske kildebildene ses. Pakkegrunnlaget 3098 er frosset for felles Linux-/Windows-kontroll; ikke publiser nye native før frysen er frigitt. 427 av 1758 hele figurjobber har resultat. Alle 1096 beskyttede kildehash, inkludert de tidligere 1036, er bevart. Tre stasher bevares.
+
+En visualiseringshjelper stoppet først med et duplisert fil-felt i sin egen oppføring. Hjelperen er rettet; kontrollbildene bruker samme bevarte motoropptak. Ingen kildeprøve er kjørt om på grunn av dette.
+''')
+(R / 'NESTE.md').write_text('Kilde 304 er klar for visuell gjennomgang før bildekall: alle 34 mål avspilt via originalskript 208 med dokumentert aktørinitialisering. Les KILDEGRUNNLAG.md, se alle aktuelle originaler, begge hovedark og seks faktiske rombilder. Neste praktiske bunke fig304_01..05, deretter resten av familien, uten å duplisere identiske hele kilder. Ingen 304-bildekall, resultat eller native ennå. Kildeprøven har to avvik og er ikke en feilfri spilltest. Nativefrys 3098 gjelder til felles-release-20261021-golf115 er kvittert. Ikke omprøv avviste bildekall eller ugyldige 344/346.\n')
+shutil.copy2(__file__, R / 'vis.py.txt')
+print('Seks faktiske kildeopptak bevart; ingen produksjon telt.', flush=True)

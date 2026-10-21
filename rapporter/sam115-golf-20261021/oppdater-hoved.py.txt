@@ -1,0 +1,45 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter/sam115-golf-20261021'
+q = json.loads((R / 'mottak-publisert.json').read_text())
+assert q['native'] == 3098 and q['alle_filhash_bekreftet']
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=P, text=True).strip()
+subprocess.run(['git', 'pull', '--ff-only'], cwd=P, check=True)
+now = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+facts = f'''Publisert og hentet HD-mod `{q['hd_mod']}` med 3098 native ruter. 427 av 1758 hele figurjobber har resultat; 1331 gjenstår pluss returer, katalogfeil og sluttkontroll. Hele fig052_01 er fullført med siste kattepose 1920, og fig115_01..03 er levert med Sam, golfball og fisk i rom 25. Siden siste fellespakke er 85 nye native publisert, én kattepose og 84 golf-ruter. Alle 21341 filhash er bekreftet etter hent, samtlige 21251 tidligere PNG-filer og alle tidligere stier er bevart. 1036 beskyttede kildehash og tre opprinnelige stasher er uendret.
+
+Golfbunken har 18 innebygde image_gen-kall med råbilder, faktiske prompter og argumenter. Originalens objekt 244 og lokale skript 200 bekrefter golfball i animasjon 6/8 og fisk i 7/9. Ugyldig animasjon 40 er ikke spilt. Separate krage-, slips- og håndlag, fire små blågrå merker i 1682 og løs svart prikk i 1852 er bevart. Den siste prikken bruker en hel egen generert alfakomponent fra TR2 sammen med tidligere flatt T01-slips; nytt blankt TR2-hovedslips og FR2-kurve er ikke tatt inn. Ingen harde originalmasker, originalfragmenter, nye mansjetter eller ballgroper. Egen alfa er renset og plassert med Python innen Toms tillatelse. CORE 128, IoU 0,6 og dekning 0,8 er uendret.
+
+Alle 84 golf-ruter er automatisk OK og motorlogget. Hele ark 01 og 02 er OK; ark 03 har visuelt vurderte SJEKK-varsler for små omriss og størrelse, ingen FEIL. Alle 66 motivvarianter, tre hele kilde-/resultatark og sammensatte lag i 42 faktiske Linux-opptak er sett. Faktisk Linux-binær fra den nedlastede fellespakken gir 480 av 480 nullkontroller ved primærposisjon 125,177. En ekstra synlighetsprøve ved 80,177, fordi Conroy dekker deler av hånden, gir også 480 av 480 nullkontroller. Ingen aktører eller skript er skjult. Fire før/etter-par har null forskjeller utenfor loggede aktørflater med målemargin. Den siste katteposen har samme kjente 160-avvik ved bilde 36 som grunnlaget; alle 51 kontroller fra figurstart er null.
+
+Siste faktisk kontrollerte [felles Linux-/Windows-pakke har fortsatt 3013 native ruter](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-max052-delvis). Den mangler de 85 nye. Native er frosset på 3098 frem til et nytt felles samlepunkt er bygget, begge faktiske nedlastinger og runtimehash er kontrollert og den nye Linux-binæren er avspilt. Ikke kall den felles utgaven oppdatert før dette er kvittert. Ingen nye 304-bildekall eller leveranser er gjort. Neste ordinære kildeanalyse er foreløpig fig304_01..05 fra gjenværende liste.
+
+Tvungne animasjoner er kontrollert. Full naturlig gjennomspilling, interaktiv Windows-test og ny webtest gjenstår. Ingen ny Tom-/Claude-godkjenning. Ekstra Windows-taggbygg 39527380077 for forrige utgave feilet i dummy-SDL-starten med SDL_BlitSurface, mens den publiserte Windows-pakken kom fra vellykket dispatch 39526036828. Taggbygget er ikke omprøvd eller kansellert. Den kjente Windows-begrensningen, inventarkant 35, eldre testhopp og tidsavbrudd ved 816/836/1384/387 samt inventarikonets RGB under 044-eksplosjonen er fortsatt åpne. Avviste bildekall og ugyldige 344/346-ruter omprøves ikke.
+
+Rapporter på gpt-arbeid: `rapporter/max052-kattslutt-20261021` og `rapporter/sam115-golf-20261021`. Bibliotek: `figurark-fast-storrelse` og `publisert-mod-er-fasit`. Ingen motor- eller pipelinekode er endret. Main får bare memory.md, todo.md, STATUS.md og log.md. Aktiv grafikkautomatikk fortsetter; de gamle nattprosessene gjenstartes ikke.
+'''
+for name in ['memory.md', 'STATUS.md', 'todo.md']:
+    f = P / name
+    s = f.read_text()
+    i = s.find('\n')
+    content = facts
+    if name == 'todo.md':
+        content = '''427 av 1758 hele figurjobber har resultat. Native 3098 er publisert og hentet. Fellespakkene har 3013 og mangler 85 nye native; nativefrysen gjelder til nytt samlepunkt er ferdig kontrollert.
+
+- [x] Fullfør siste kattepose 052_1920 og hele fig052_01; bevar de 20 andre rutene.
+- [x] Lag, kontroller, motorprøv og publiser fig115_01..03 med 84 nye golf-ruter.
+- [ ] Bygg og hent felles Linux-/Windows-pakker med 3098 native. Kontroller SHA, alle runtimefiler og de 85 nye rutene i faktisk Linux før publisering.
+- [ ] Kildeanalyser neste produserbare familie, foreløpig fig304_01..05. Ingen nye bildekall ennå.
+- [ ] Fullfør øvrige produserbare jobber, returer og sluttkontroll. Automatikken fortsetter.
+'''
+    f.write_text(s[:i + 1] + f'\n## Siste grafikkstatus, {now}\n\n' + content + '\n' + s[i + 1:])
+with (P / 'log.md').open('a') as f:
+    f.write(f'\n## {now} (Codex)\n\n' + facts + '\n')
+(R / 'oppdater-hoved.py.txt').write_text(Path(__file__).read_text())
+print('Bare de fire hoveddokumentene er oppdatert til publisert 3098, pakker 3013.', flush=True)

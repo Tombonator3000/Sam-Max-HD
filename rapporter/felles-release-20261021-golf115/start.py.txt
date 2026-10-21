@@ -1,0 +1,64 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import subprocess
+import json
+import re
+import hashlib
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+S = A / 'rapporter/sam115-golf-20261021'
+api = lambda p: json.loads(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + p], cwd=P, text=True))
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+assert not (O / 'bygg-startet.json').exists()
+receipt = json.loads((S / 'mottak-publisert.json').read_text())
+code = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=P, text=True).strip()
+mod = receipt['hd_mod']
+assert receipt['native'] == 3098
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=P, text=True).strip()
+assert code == api('git/ref/heads/main')['object']['sha']
+assert mod == api('git/ref/heads/hd-mod')['object']['sha']
+runs = api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs']
+assert any(v['head_sha'] == code and v['status'] == 'completed' and v['conclusion'] == 'success' for v in runs)
+for platform in ['linux', 'windows']:
+    active = api(f'actions/workflows/{platform}.yml/runs?per_page=15')['workflow_runs']
+    assert not any(v['status'] != 'completed' and v['head_branch'] == 'main' for v in active), 'Ikke avbryt eller dupliser pågående bygg'
+prior = api('releases?per_page=100')
+tag = 'sam-max-hd-2026-10-21-golf115'
+assert not any(v['tag_name'] == tag for v in prior)
+manifest = json.loads((S / 'publiserte-moddfiler-3098.json').read_text())
+assert len(manifest) == 21341 and all(sha(P / 'mods/gpt' / f) == h for f, h in manifest.items())
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 427
+R.mkdir()
+for D in [O, R]:
+    (D / 'releaser-foer-bygg.json').write_text(json.dumps(prior, indent=2) + '\n')
+shutil.copy2(S / 'publiserte-moddfiler-3098.json', R / 'moddfiler-3098.json')
+new = json.loads((S / 'egen-native.json').read_text())['ruter']
+cat = json.loads((A / 'rapporter/max052-kattslutt-20261021/egen-native.json').read_text())
+combined = [dict(bilde=cat['bilde'], fil=cat['fil'], sha256=cat['sha256'])] + new
+assert len(combined) == len({e['bilde'] for e in combined}) == 85
+(R / 'nye-native85.json').write_text(json.dumps(dict(ruter=combined), ensure_ascii=False, indent=2) + '\n')
+state = dict(start_utc=datetime.now(timezone.utc).isoformat(), kode=code, hd_mod=mod,
+    native=3098, nye_native=85, kostyme052=1, kostyme115=84, grunnlag_felles_native=3013,
+    figurjobber_med_resultat=427, release_tag=tag, status='native_frosset_bygg_dispatch', plattform={})
+def save():
+    for D in [O, R]:
+        (D / 'bygg-startet.json').write_text(json.dumps(state, ensure_ascii=False, indent=2) + '\n')
+save()
+for platform in ['linux', 'windows']:
+    assert api('git/ref/heads/hd-mod')['object']['sha'] == mod
+    row = state['plattform'][platform] = dict(status='dispatch_forsokes', dispatch_utc=datetime.now(timezone.utc).isoformat())
+    save()
+    res = subprocess.run(['gh', 'workflow', 'run', platform + '.yml', '--ref', 'main'], cwd=P, text=True, capture_output=True)
+    row.update(dispatch_exit=res.returncode, stdout=res.stdout, stderr=res.stderr)
+    save()
+    assert res.returncode == 0, res.stderr
+    match = re.search(r'/actions/runs/(\d+)', res.stdout)
+    assert match, 'Ikke dispatch igjen, avklar faktisk runID'
+    row.update(run_id=int(match[1]), status='dispatched')
+    save()
+    print(platform, row['run_id'], flush=True)
+shutil.copy2(__file__, R / 'start.py.txt')

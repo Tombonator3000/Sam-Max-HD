@@ -1,0 +1,92 @@
+; Inngangsskriptet til rom 59 (ENCD)
+
+[0000] (9B) resourceRoutines.lockScript(116)
+[0006] (9B) resourceRoutines.loadScript(116)
+[0008] (9B) resourceRoutines.lockSound(81)
+[000E] (9B) resourceRoutines.loadSound(81)
+[0010] (9B) resourceRoutines.lockSound(82)
+[0016] (9B) resourceRoutines.loadSound(82)
+[0018] (9B) resourceRoutines.lockSound(83)
+[001E] (9B) resourceRoutines.loadSound(83)
+[0020] (9B) resourceRoutines.lockCostume(301)
+[0026] (9B) resourceRoutines.loadCostume(301)
+[0028] (9B) resourceRoutines.lockCostume(302)
+[002E] (9B) resourceRoutines.loadCostume(302)
+[0030] (9B) resourceRoutines.lockCostume(303)
+[0036] (9B) resourceRoutines.loadCostume(303)
+[0038] (9B) resourceRoutines.lockCostume(304)
+[003E] (9B) resourceRoutines.loadCostume(304)
+[0040] (43) VAR_V6_SOUNDMODE = 2
+[0046] (B6) printDebug.begin()
+[0048] (B6) printDebug.msg(sound(0x9F9738A, 0xA) + " ")
+[005C] (43) VAR_V6_SOUNDMODE = 0
+[0062] (43) VAR_V6_SOUNDMODE = 2
+[0068] (B6) printDebug.begin()
+[006A] (B6) printDebug.msg(sound(0x9F9B4A1, 0xA) + " ")
+[007E] (43) VAR_V6_SOUNDMODE = 0
+[0084] (43) VAR_V6_SOUNDMODE = 2
+[008A] (B6) printDebug.begin()
+[008C] (B6) printDebug.msg(sound(0x9F9C600, 0xA) + " ")
+[00A0] (43) VAR_V6_SOUNDMODE = 0
+[00A6] (43) VAR_V6_SOUNDMODE = 2
+[00AC] (B6) printDebug.begin()
+[00AE] (B6) printDebug.msg(sound(0x9ED246F, 0xA) + " ")
+[00C2] (43) VAR_V6_SOUNDMODE = 0
+[00C8] (43) VAR_V6_SOUNDMODE = 2
+[00CE] (B6) printDebug.begin()
+[00D0] (B6) printDebug.msg(sound(0x9FD1064, 0xA) + " ")
+[00E4] (43) VAR_V6_SOUNDMODE = 0
+[00EA] (43) VAR_V6_SOUNDMODE = 2
+[00F0] (B6) printDebug.begin()
+[00F2] (B6) printDebug.msg(sound(0x9FD484F, 0xA) + " ")
+[0106] (43) VAR_V6_SOUNDMODE = 0
+[010C] (43) VAR_V6_SOUNDMODE = 2
+[0112] (B6) printDebug.begin()
+[0114] (B6) printDebug.msg(sound(0x9E3226A, 0xA) + " ")
+[0128] (43) VAR_V6_SOUNDMODE = 0
+[012E] (43) VAR_V6_SOUNDMODE = 2
+[0134] (B6) printDebug.begin()
+[0136] (B6) printDebug.msg(sound(0x9FFE58C, 0xA) + " ")
+[014A] (43) VAR_V6_SOUNDMODE = 0
+[0150] (43) VAR_V6_SOUNDMODE = 2
+[0156] (B6) printDebug.begin()
+[0158] (B6) printDebug.msg(sound(0x9FEEC5F, 0xA) + " ")
+[016C] (43) VAR_V6_SOUNDMODE = 0
+[0172] (43) VAR_V6_SOUNDMODE = 2
+[0178] (B6) printDebug.begin()
+[017A] (B6) printDebug.msg(sound(0x9FE8BD2, 0xA) + " ")
+[018E] (43) VAR_V6_SOUNDMODE = 0
+[0194] (43) VAR_V6_SOUNDMODE = 2
+[019A] (B6) printDebug.begin()
+[019C] (B6) printDebug.msg(sound(0x9EDA99C, 0xA) + " ")
+[01B0] (43) VAR_V6_SOUNDMODE = 0
+[01B6] (43) VAR_V6_SOUNDMODE = 2
+[01BC] (B6) printDebug.begin()
+[01BE] (B6) printDebug.msg(sound(0x9FA0068, 0xA) + " ")
+[01D2] (43) VAR_V6_SOUNDMODE = 0
+[01D8] (43) VAR_V6_SOUNDMODE = 2
+[01DE] (B6) printDebug.begin()
+[01E0] (B6) printDebug.msg(sound(0x9EDC2C7, 0xA) + " ")
+[01F4] (43) VAR_V6_SOUNDMODE = 0
+[01FA] (43) VAR_V6_SOUNDMODE = 2
+[0200] (B6) printDebug.begin()
+[0202] (B6) printDebug.msg(sound(0x9F79483, 0xA) + " ")
+[0216] (43) VAR_V6_SOUNDMODE = 0
+[021C] (9B) resourceRoutines.lockSound(82)
+[0222] (9B) resourceRoutines.loadSound(82)
+[0224] (5E) startScript(1,209,[])
+[022E] (5D) if (!bitvar67) {
+[0235] (9D)   actorOps.setCurActor(3)
+[023A] (9D)   actorOps.setCostume(5)
+[023F] (5E)   startScript(3,47,[564,35,16])
+[0252] (5E)   startScript(3,47,[565,35,16])
+[0265] (5E)   startScript(0,200,[])
+[026F] (**) }
+[026F] (5D) if (!isSoundRunning(81)) {
+[0277] (74)   startSound(81)
+[027B] (AC)   soundKludge([14,80,0,1,1,60])
+[0291] (AC)   soundKludge([17,81,0,1,14,80,0,1,127,60])
+[02B3] (**) }
+[02B3] (43) var151 = 0
+[02B9] (65) stopObjectCodeA()
+END

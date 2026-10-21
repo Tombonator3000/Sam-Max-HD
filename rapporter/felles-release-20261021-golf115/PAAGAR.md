@@ -1,0 +1,1 @@
+Begge faktiske pakker er kontrollert: 3098 native, 85 nye, alle 21340 runtimefiler per pakke og fire nedlastingsdigester bekreftet. 578/579 null, samme kjente 160 ved 36, ingen nye eller økte. 85 av 85 figurutsnitt er identiske med visuelt sett produksjon. Publisering av fellesrelease og Latest gjenstår. Nativefrysen gjelder fortsatt.

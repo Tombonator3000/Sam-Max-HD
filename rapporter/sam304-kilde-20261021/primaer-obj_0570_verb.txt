@@ -1,0 +1,31 @@
+; Objekt 570 "dinosaur-string" i rom 59 (OBCD/VERB)
+; Verbtabell (verb: offset fra starten av VERB-blokken): 3: 0x0069, 4: 0x0022, 5: 0x00FC, 91: 0x001B
+; Mellom verbtabellen og første inngang: 2 x (01, uint16) = 160, 130. Ingen inngang peker dit, og descumm hopper over dem. Satt som klasser gir de samme bitene som DOBJ har for objektet.
+
+Events:
+   3 - 0069
+   4 - 0022
+   5 - 00FC
+  5B - 001B
+[001B] (43) var182 = 1030
+[0021] (65) stopObjectCodeA()
+[0022] (BB) talkEgo(sound(0x1F4C113, 0xA) + "It's 91 yards of string, tied to a dinosaur's tooth.")
+[0068] (65) stopObjectCodeA()
+[0069] (0C) dup[1] = localvar0
+[006D] (5D) if (dup[1] == 0) {
+[0074] (BA)   talkActor(sound(0x1F5DD7E, 0xA) + "I haven't got enough leverage from here to pull out a tooth.",2)
+[00C6] (5D) } else if (dup[1] == 35) {
+[00D1] (5E)   startScript(0,208,[])
+[00DC] (7C)   stopScript(0)
+[00E0] (73) } else {
+[00E3] (5E)   startScript(0,63,[3,var7,localvar0])
+[00F7] (7C)   stopScript(0)
+[00FB] (**) }
+[00FB] (65) stopObjectCodeA()
+[00FC] (5D) if (getState(var7) == 0) {
+[0107] (5F)   startScriptQuick(54,[var7])
+[0111] (73) } else {
+[0114] (BB)   talkEgo(sound(0x1F6CF69, 0xA) + "I can't take it anywhere.")
+[013F] (**) }
+[013F] (65) stopObjectCodeA()
+END
