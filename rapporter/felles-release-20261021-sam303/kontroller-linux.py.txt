@@ -1,0 +1,108 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import os
+import subprocess
+import json
+import re
+import hashlib
+import shutil
+
+O = Path(__file__).resolve().parent
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter' / O.name
+PK = O / 'linux/squashfs-root'
+DATA = PK / 'usr/share/sam-max-hd'
+MOD = DATA / 'mods/gpt'
+BINARY = PK / 'usr/bin/scummvm'
+BASE = P / 'out/felles-release-20261021-hyssing/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+assert json.loads((MOD / 'mod.json').read_text())['costume_cels'] == 3150
+assert json.loads((BASE / 'mod.json').read_text())['costume_cels'] == 3125
+expected = json.loads((R / 'nye-native25.json').read_text())['ruter']
+assert len(expected) == 25 and all(sha(MOD / e['fil']) == e['sha256'] for e in expected)
+mask = 'objects/obj901_01_mask.png'
+assert sha(MOD / mask) == sha(BASE / mask) == 'fa5eddfac222d794224653a3daa20eb50c97c7aaa09667ea3c36f39a589cb234'
+cases = [
+    dict(label='inventory', slot=2, extra={'DIGHD_TEST_CLICKS': '80:10/185,160:210/30'}, frames=280),
+    dict(label='akvarium', slot=1, extra={'DIGHD_TEST_ROOM': '16', 'DIGHD_TEST_AT': '10', 'DIGHD_TEST_CAMX': '320'}, frames=240),
+    dict(label='cafeteria', slot=2, extra={'DIGHD_TEST_ROOM': '30', 'DIGHD_TEST_AT': '10'}, frames=240),
+]
+cases.append(dict(label='hyssing',slot=2,frames=900,extra={
+    'DIGHD_TEST_ROOM':'59','DIGHD_TEST_AT':'10','DIGHD_TEST_CAMX':'160',
+    'DIGHD_TEST_COSTUME':'303','DIGHD_TEST_ACTOR':'2','DIGHD_TEST_POS':'224,177',
+    'DIGHD_TEST_SCALE':'255','DIGHD_TEST_PALETTE':'0','DIGHD_TEST_ANIMATION':'6',
+    'DIGHD_TEST_SCRIPT':'80:208','DIGHD_TEST_CHORE_EVERY':'10000',
+    'DIGHD_TEST_KEYS':','.join(f'{n}:.' for n in range(100,900,30)),
+    'DIGHD_DUMP_EVERY':'2','DIGHD_DEBUG_SOFT':'1','DIGHD_DEBUG_COSTUME':'1'}))
+
+def run(case, published):
+    kind = 'pakke3150' if published else 'grunnlag3125'
+    T = O / (kind + '-' + case['label'])
+    mod = MOD if published else BASE
+    assert not T.exists(), 'Avklar eksisterende opptak, ikke omprøv blindt'
+    T.mkdir()
+    home, saves = T / 'home', T / 'saves'
+    home.mkdir()
+    saves.mkdir()
+    for p in (P / 'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):
+        shutil.copy2(p, saves / p.name)
+    env = {k: v for k, v in os.environ.items() if not k.startswith('DIGHD_')}
+    env.update(HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
+        XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache'),
+        LD_LIBRARY_PATH=str(PK / 'usr/lib'), SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy',
+        DIGHD_MOD=str(mod), DIGHD_VERIFY='1', DIGHD_QUIT_AT=str(case['frames']),
+        DIGHD_DUMP_DIR=str(T), DIGHD_DUMP_EVERY='40', DIGHD_DUMP_FLAT='1',
+        DIGHD_SHOW_MISSING='0', DIGHD_MANGLER='0')
+    env.update(case['extra'])
+    cmd = [str(BINARY), '--config=' + str(T / 'scummvm.ini'), '--path=' + str(DATA / 'game'),
+        '--savepath=' + str(saves), '--save-slot=' + str(case['slot']), '--gfx-mode=normal',
+        '--no-fullscreen', '--gui-theme=builtin', '--music-driver=null', '--debuglevel=1', 'samnmax']
+    with (T / 'scummvm.log').open('wb') as f:
+        code = subprocess.run(cmd, env=env, stdout=f, stderr=subprocess.STDOUT, timeout=240).returncode
+    log = (T / 'scummvm.log').read_text(errors='replace')
+    checks = [dict(frame=int(f), avvik=int(n)) for f, n in re.findall(
+        r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again', log)]
+    drawn = sorted(set((int(c), int(n)) for n, c in re.findall(r'soft cel\s+(\d+) costume\s*(\d+)', log)))
+    assert code == 0 and checks and list(T.glob('frame_*_room*.png')), (case['label'], code)
+    row = dict(label=case['label'], scene=T.name, exit=code, kontroller=checks,
+        tegnede_ruter=[f'costume{c:03}_{n}' for c, n in drawn], binar_sha256=sha(BINARY),
+        mod_json_sha256=sha(mod / 'mod.json'), dumps=len(list(T.glob('frame_*_room*.png'))),
+        kostyme_chore_aktor_ikke_overstyrt=case['label'] in ['inventory', 'akvarium', 'cafeteria'])
+    save(T / 'kvittering.json', row)
+    print(kind, case['label'], len(checks), 'kontroller', flush=True)
+    return row
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    rows = list(pool.map(lambda t: run(*t), [(c, b) for c in cases for b in [False, True]]))
+final, baselines, changes = [], [], []
+for case in cases:
+    b = next(r for r in rows if r['scene'] == 'grunnlag3125-' + case['label'])
+    v = next(r for r in rows if r['scene'] == 'pakke3150-' + case['label'])
+    assert b['kontroller'] == v['kontroller']
+    nonzero = [x for x in v['kontroller'] if x['avvik']]
+    if case['label']=='hyssing':
+        assert len(nonzero)==2 and [e['avvik'] for e in nonzero]==[4,160] and nonzero[0]['frame']==36
+    else:
+        assert nonzero==[]
+    v['nye_eller_oekte_avvik'] = []
+    final.append(v)
+    baselines.append(b)
+    changes.append(dict(label=case['label'], grunnlagsavvik=nonzero, sluttavvik=nonzero, nye_eller_oekte_avvik=[]))
+seen = {n for r in final for n in r['tegnede_ruter']}
+missing = sorted({e['bilde'] for e in expected} - seen)
+assert not missing
+info = dict(build=(DATA / 'BYGG.txt').read_text(), binar_sha256=sha(BINARY), native=3150,
+    nye_native_forventet=25, nye_native_observert=25, mangler_i_avspilling=missing,
+    runder=4, grunnlagsrunder_samme_binar=4,
+    skjermbufferkontroller=sum(len(r['kontroller']) for r in final),
+    nullkontroller=sum(v['avvik'] == 0 for r in final for v in r['kontroller']),
+    nye_eller_oekte_avvik=[], sammenligning=changes, objektdekning_sha256=sha(MOD / mask),
+    helprove_uten_avvik=False, naturlig_gjennomspilling=False, interaktiv_windows_test=False,
+    ny_webtest=False, scenes=final, grunnlag_scenes=baselines)
+assert info['skjermbufferkontroller']-info['nullkontroller']==2 and len(final)==4
+for target in [O, R]:
+    save(target / 'linux-kontroll.json', info)
+shutil.copy2(__file__, R / 'kontroller-linux.py.txt')
+print('Fire pakkeprøver og fire grunnlag:',info['nullkontroller'],'av',info['skjermbufferkontroller'],'null. Alle25nye observert,ingen nye/økte avvik.',flush=True)

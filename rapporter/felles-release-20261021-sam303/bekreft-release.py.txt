@@ -1,0 +1,45 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam303-slutt-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+state=read(O/'bygg-startet.json');tag,code,mod=(state[k] for k in ['release_tag','kode','hd_mod']);meta=api('releases/tags/'+tag);latest=api('releases/latest')
+assert meta['id']==latest['id'] and not meta['draft'] and not meta['prerelease'];assets=read(O/'assetkontroll.json');assert len(meta['assets'])==len(assets)==4
+for v in assets:
+ asset=next(a for a in meta['assets'] if a['name']==v['fil']);assert asset['size']==v['bytes'] and asset['digest']=='sha256:'+v['sha256'];assert sha(O/v['plattform']/v['fil'])==v['sha256']
+ref=api('git/ref/tags/'+tag)['object']
+if ref['type']=='tag':ref=api('git/tags/'+ref['sha'])['object']
+assert ref['type']=='commit' and ref['sha']==code
+prior=read(O/'releaser-foer.json');after=api('releases?per_page=100');assert len(after)==len(prior)+1;aset=lambda v:{(a['id'],a['name'],a['size'],a['digest']) for a in v['assets']}
+for v in prior:assert aset(v)==aset(next(x for x in after if x['id']==v['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod;files=read(R/'moddfiler-3150.json');assert len(files)==21393 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+runtime=read(O/'linux-kontroll.json');assert runtime['skjermbufferkontroller']-runtime['nullkontroller']==2 and runtime['nye_native_observert']==25 and not runtime['nye_eller_oekte_avvik']
+assert len(read(R/'motorbilder.json'))==12 and read(R/'rasterkontroll-mot-visuelt-sett.json')['croprasteridentiske']==25
+runs={k:api('actions/runs/'+str(state['plattform'][k]['run_id'])) for k in ['linux','windows']}
+assert all(v['conclusion']=='success' and v['run_attempt']==1 and v['head_sha']==code for v in runs.values())
+protected=read(S/'beskyttede-samlet.json');assert len(protected)==1152 and all(sha(A/f)==h for f,h in protected.items())
+base=read(S/'grunnlag-produksjon.json');assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==446
+intro=read(A/'rapporter/sam-max-intro-kilde-20261021/kildeplan.json');assert len(intro['nye_kildehash'])==20 and all(sha(A/f)==h for f,h in intro['nye_kildehash'].items())
+known=next(e['sluttavvik'] for e in runtime['sammenligning'] if e['label']=='hyssing')
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),url=meta['html_url'],release_id=meta['id'],release_tag=tag,Latest_bekreftet=True,kode=code,hd_mod=mod,native=3150,nye_native_siden_felles3125=25,nye_hele_ark_siden_felles3125=9,kostyme303_native_totalt=40,figurjobber_med_resultat=446,figurjobber_totalt=1758,gjenstaar_hele_jobber=1312,faktiske_nedlastinger_begge=True,runtime_moddfiler_per_pakke_bekreftet=21392,fire_assets_digest_og_bytes_verifisert=True,bevarte_tidligere_releaser=len(prior),alle_tidligere_assets_bevart_ved_fellespublisering=True,tidligere_fellesutgaver_med_assets_bevart=True,linux_run=state['plattform']['linux']['run_id'],windows_run=state['plattform']['windows']['run_id'],windows_forsoek=1,linux_forsoek=1,linux_binar_sha256=runtime['binar_sha256'],skjermbufferkontroller=runtime['skjermbufferkontroller'],nullkontroller=runtime['nullkontroller'],ingen_nye_eller_okte_skjermbufferavvik=True,kjente_overgangsavvik=known,helprove_uten_avvik=False,hele_motorbilder_sett=12,foer_etter_sett=4,figurcropraster_identiske=25,rgb_utenfor_alle_loggede_aktorer_i_fire_par=[0]*4,beskyttede_kilder=1152,tre_stasher_bevart=True,ny_Tom_Claude_godkjenning=False,naturlig_gjennomspilling=False,ny_interaktiv_windows_eller_webtest=False)
+for D in [O,R]:save(D/'publisert.json',proof);save(D/'release-publisert.json',meta)
+state.update(status='fellesrelease_publisert_og_kontrollert',Latest_bekreftet=True,native_frys_kan_frigis=True,release_url=meta['html_url'])
+for D in [O,R]:save(D/'bygg-startet.json',state)
+for fn in ['fremdrift.json','sluttkontroll.json','mottak-publisert.json']:
+ data=read(S/fn);data.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=3150,pakker_native=3150,pakker_mangler_native=0)
+ for e in data.get('leveranser',[]):e.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=3150,pakker_native=3150,pakker_mangler_native=0)
+ save(S/fn,data)
+with (S/'RAPPORT.md').open('a') as f:f.write(f'\nFelles Linux-/Windows-utgave3150 og Latest er bekreftet: {meta["html_url"]}. Begge faktiske nedlastinger og alle21392 runtimefiler per pakke er SHA-bekreftet. Alle25 nye er motorlogget og har byteidentiske figurutsnitt til visuelt kontrollert produksjon. {runtime["nullkontroller"]} av {runtime["skjermbufferkontroller"]} kontroller er null,de to kjente overgangsavvikene er identiske i pakken og grunnlaget. Ingen nye eller økte avvik. Nativefrysen er frigitt. Ingen ny Tom-/Claude-godkjenning.\n')
+nexttext=f'''Fellesutgave3150 er faktisk kontrollert og Latest: {meta['html_url']}. Begge pakker og alle21392 runtimefiler hver er SHA-bekreftet. Alle25 nye native har identiske figurutsnitt til visuelt kontrollert produksjon. {runtime['nullkontroller']} av {runtime['skjermbufferkontroller']} null,samme kjente overgangsavvik i sammenlignbare kjøringer. Nativefrysen er frigitt. 446 av1758 hele figurjobber har resultat;1312gjenstår pluss returer,katalogfeil og sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+
+Alle14ark og40native i303 er levert. Ikke gjenta303 eller304førstefem. Neste kildebunke er fem introark fig010_01..02 og fig012_01..03,58 mål. Se rapporter/sam-max-intro-kilde-20261021/NESTE.md. Alle fem originalark og primærskript65 er sett. Rekvisitten er kildebekreftet som tidsbombe med hodeform,ikke kamera. Kostyme12 inneholder Sam,Max og rekvisitt sammen. Faktisk spillkontekst med alle lag og godkjente hovedark må kontrolleres før bildekall. Ingen kall,resultater eller native er laget til disse fem. De20 nye kildehashene er bekreftet i tillegg til1152 tidligere. Bevar1152kildehash,tre stasher,alle tidligere PNG og releaser.
+
+304 K02 er verktøyavvist og omprøves eller rekonstrueres ikke. K01 er bare utkast med avvikende ører,K03/K04/K05 er ikke forsøkt. Se sam304-midten-20261021/NESTE.md. Gamle nattprosesser gjenstartes ikke.
+'''
+(S/'NESTE.md').write_text(nexttext);(A/'rapporter/sam303-andre-kilde-20261021/NESTE.md').write_text('Denne kildebunken er fullført i sam303-slutt-20261021. '+nexttext)
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ f=A/name;s=f.read_text();i=s.find('\n');line=f'Felles Linux/Windows3150 er publisert og Latest-bekreftet: {meta["html_url"]}. Begge faktiske pakker og21392runtimefiler hver SHA-bekreftet,alle25nye motorlogget med identiske figurutsnitt. {runtime["nullkontroller"]}/{runtime["skjermbufferkontroller"]} null,samme kjente overgangsavvik,ingen nye eller økte. 446 av1758resultatark,1312gjenstår pluss returer/katalogfeil/sluttkontroll. Sam303 har14leverte ark og40native. Nativefrysen er frigitt. Velg neste uavhengige bunke fra faktisk restliste;se sam303-slutt-20261021/NESTE.md. Blokkert304 omprøves ikke. Bevar1152kilder,tidligere filer og tre stasher. Ingen ny Tom-/Claude-godkjenning.';f.write_text(s[:i+1]+'\n'+line+'\n'+s[i+1:])
+with (R/'RAPPORT.md').open('a') as f:f.write(f'\nFellesutgave og Latest er bekreftet: {meta["html_url"]}. Nativefrysen er frigitt. Alle{len(prior)} tidligere releaser og gjeldende vedlegg er bevart ved publiseringen.\n')
+(R/'PAAGAR.md').write_text('Ferdig samlepunkt. '+nexttext);shutil.copy2(__file__,R/'bekreft-release.py.txt')
+print(json.dumps({k:proof[k] for k in ['url','release_id','native','nye_native_siden_felles3125','bevarte_tidligere_releaser','Latest_bekreftet']},ensure_ascii=False),flush=True)
