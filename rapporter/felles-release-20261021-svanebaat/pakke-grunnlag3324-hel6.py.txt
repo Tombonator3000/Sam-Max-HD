@@ -1,0 +1,33 @@
+from pathlib import Path
+import os,json,hashlib,re,subprocess,shutil,gzip,sys
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+PK=P/'out/felles-release-20261021-svanebaat/linux/squashfs-root'; D=PK/'usr/share/sam-max-hd'; B=PK/'usr/bin/scummvm'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+label=sys.argv[1]; primary=label.endswith("primaer201");assert label in ['pakke-grunnlag3324-hel6', 'pakke3419-hel6', 'pakke-grunnlag3324-primaer201', 'pakke3419-primaer201']
+T=O/label;assert not T.exists();T.mkdir();(T/'home').mkdir();(T/'saves').mkdir()
+assert sha(B)=='8d7190620f3039a79ee55fe3630725a3886cb5888fce4f0b11fd04adf044e2d8'
+for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,T/'saves'/p.name)
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')}
+env.update(HOME=str(T/'home'),XDG_CONFIG_HOME=str(T/'home/.config'),XDG_DATA_HOME=str(T/'home/.local/share'),XDG_CACHE_HOME=str(T/'home/.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(Path('/home/tom/Sam-Max-HD/out/felles-release-20261021-bok/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt')),DIGHD_VERIFY='1',DIGHD_QUIT_AT='720',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='2',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='22',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='476',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+if primary:env.update(DIGHD_TEST_SCRIPT='60:201')
+else:env.update(DIGHD_TEST_COSTUME='97',DIGHD_TEST_ACTOR='29',DIGHD_TEST_POS='427,180',DIGHD_TEST_SCALE='255',DIGHD_TEST_PALETTE='0',DIGHD_TEST_CHORE_EVERY='10000',DIGHD_TEST_ANIMATION='6')
+args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(T/'saves'),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--random-seed=20261021','--debuglevel=1','samnmax']
+with (T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=210).returncode
+log=(T/'scummvm.log').read_text();events=[];obs={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*97\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+    f,n,x,y,w,h=map(int,m.groups());shot=(f//2+1)*2;p=T/f'frame_{shot:06}_room022.png';row=dict(logg_frame=f,bildeframe=shot,cel=n,kostyme=97,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p) if p.exists() else None);events.append(row)
+    if p.exists():obs.setdefault(f'costume097_{n:03}',row)
+checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+origins={int(f):[int(x),int(y)] for f,room,x,y in re.findall(r'DigHD: whole screen frame (\d+) \(room (\d+), screen at (-?\d+),(-?\d+)\)',log) if int(room)==22}
+for row in events:
+    if row['sha256']:
+        origin=origins[row['bildeframe']];row.update(screen_origin=origin,viewport_pos=[row['pos'][0]-origin[0],row['pos'][1]-origin[1]])
+needed={e['bilde'] for e in json.loads((R/'forundersokelse.json').read_text())['ruter']}
+proof=dict(random_seed=20261021,exit=code,binar=str(B),binar_sha256=sha(B),kommando=args,rom=22,kostyme=97,aktor=4 if primary else 29,pos='fra romskriptet' if primary else [427,180],animasjon=6,palett='fra romskriptet' if primary else 0,skala=255,rettet_synlighetsprove=not primary,primaer_spillsekvens=primary,primaer_skript=201 if primary else None,full_naturlig_gjennomspilling=False,andre_aktorer_og_romskript_ikke_skjult_av_testkode=True,tegninger=obs,hendelser=events,kontroller=checks,nullkontroller=sum(c['avvik']==0 for c in checks),manglende_maal=sorted(needed-set(obs)),logg_sha256=sha(T/'scummvm.log'))
+save(R/(label+'.json'),proof)
+with gzip.open(R/(label+'.log.gz'),'wb') as f:f.write((T/'scummvm.log').read_bytes())
+shutil.copy2(__file__,R/(label+'.py.txt'))
+print(label,code,'observerte',len(obs),'av95',len(needed&set(obs)),'kontroller',len(checks),'null',proof['nullkontroller'],flush=True)
+assert code==0 and obs
+if not primary:assert needed<=set(obs)

@@ -1,0 +1,57 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,time
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam-max97-ovre-20261021';V=A/'rapporter/svanebaat97-20261021';N=A/'rapporter/sam250-kilde-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+s=read(O/'bygg-startet.json');tag,code,mod=(s[k] for k in ['release_tag','kode','hd_mod']);attempt=read(O/'publisering-forsokt.json');assert attempt['utfall']=='publisert';meta=api('releases/'+str(attempt['release_id']))
+for tries in range(5):
+ latest=api('releases/latest')
+ if latest['id']==meta['id']:break
+ time.sleep(3)
+assert latest['id']==meta['id'] and not meta['draft'] and not meta['prerelease']
+assets=read(O/'assetkontroll.json');assert len(assets)==len(meta['assets'])==4;D=O/'felles-nedlasting';D.mkdir(exist_ok=True)
+for v in sorted(assets,key=lambda v:v['bytes']):
+ a=next(e for e in meta['assets'] if e['name']==v['fil']);assert a['size']==v['bytes'] and a['digest']=='sha256:'+v['sha256'];p=D/v['fil']
+ if not p.exists():
+  print('Henter publisert fellesvedlegg',v['fil'],flush=True);subprocess.run(['gh','release','download',tag,'--pattern',v['fil'],'--dir',str(D)],cwd=P,check=True)
+ assert p.stat().st_size==v['bytes'] and sha(p)==v['sha256']
+for name in ['SamMaxHD-Windows.zip','SamMaxHD-x86_64.AppImage']:assert (D/(name+'.sha256')).read_text().split()[0]==sha(D/name)
+ref=api('git/ref/tags/'+tag)['object']
+if ref['type']=='tag':ref=api('git/tags/'+ref['sha'])['object']
+assert ref['type']=='commit' and ref['sha']==code
+prior=read(O/'releaser-foer.json');after=api('releases?per_page=100');assert len(after)==len(prior)+1
+aset=lambda e:{(a['id'],a['name'],a['size'],a['digest']) for a in e['assets']}
+for v in prior:assert aset(v)==aset(next(e for e in after if e['id']==v['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+files=read(R/'moddfiler-3419.json');assert len(files)==21662 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+runtime=read(R/'linux-kontroll.json');assert runtime['nye_native_observert']==95 and runtime['skjermbufferkontroller']==720 and runtime['nullkontroller']==runtime['grunnlag_nullkontroller']==718 and runtime['alle_eksakte_avvikskoordinater_og_RGB_par_identiske'] and runtime['avviksstorrelser_og_pikselinnhold_identiske']
+rasters=read(R/'rasterkontroll-mot-produksjon.json');assert rasters['croprasteridentiske']==190 and rasters['alle_nativefiler_identiske'];assert all(e['originalflat_identisk'] and e['utenfor_nye_loggede_aktorflater']==0 for e in read(R/'pakke-pikselkontroll.json'))
+vis=read(R/'visuell-kontroll.json');assert vis['visuelt_sett'] and vis['egne_hele_varianter']==49 and vis['hele_motorbilder_sett']==vis['hele_for_etter_sett']==9
+runs={k:api('actions/runs/'+str(s['plattform'][k]['run_id'])) for k in ['linux','windows']};assert all(v['conclusion']=='success' and v['run_attempt']==1 and v['head_sha']==code for v in runs.values())
+protected=read(N/'beskyttede-samlet1348.json');assert len(protected)==1348 and all(sha(A/f)==h for f,h in protected.items());base=read(S/'grunnlag-produksjon.json');assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==477
+active=[]
+for workflow in ['linux.yml','windows.yml']:
+ found=api('actions/workflows/'+workflow+'/runs?per_page=15')['workflow_runs'];active.extend(dict(id=v['id'],workflow=workflow,head_branch=v['head_branch'],head_sha=v['head_sha'],event=v['event'],status=v['status'],url=v['html_url']) for v in found if v['status']!='completed')
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),url=meta['html_url'],release_id=meta['id'],release_tag=tag,Latest_bekreftet=True,kode=code,hd_mod=mod,native=3419,nye_native_siden_felles3324=95,nye_hele_ark_siden_felles3324=12,nye_hele_ark_denne_bunke=4,nye_native_denne_bunke=48,figurjobber_med_resultat=477,figurjobber_totalt=1758,gjenstaar_hele_jobber=1281,bokark_tilbakeholdt=6,bokruter_tilbakeholdt=46,faktiske_nedlastinger_begge=True,faktiske_fellesnedlastinger_hentet_igjen=True,runtime_moddfiler_per_pakke_bekreftet=21661,fire_assets_digest_og_bytes_verifisert=True,bevarte_tidligere_releaser=len(prior),alle_tidligere_assets_bevart_ved_fellespublisering=True,linux_run=s['plattform']['linux']['run_id'],windows_run=s['plattform']['windows']['run_id'],linux_forsoek=1,windows_forsoek=1,linux_binar_sha256=runtime['binar_sha256'],skjermbufferkontroller=720,nullkontroller=718,grunnlag_nullkontroller=718,ingen_nye_eller_okte_skjermbufferavvik=True,eksakte_avvikskoordinater_og_RGB_par_identiske=True,absolutte_bildenummer_ikke_identiske=True,kjent_avvik_per_runde=dict(frame_varierer_mellom=[34,36],piksler=160),tette_kontroller_per_side=720,tette_grunnlag_null=runtime['tette_grunnlag_null'],tette_pakke_null=runtime['tette_pakke_null'],tette_feilpiksler_identiske=True,foerste_originalpar_SHA_identiske=188,to_korte_faser_fra_ekstra_opptak=True,helprove_uten_avvik=False,hele_motorbilder_sett=9,hele_foer_etter_par_sett=9,ulike_hele_varianter_sett=49,figurcropraster_identiske=190,alle190_originalflater_identiske=True,rgb_utenfor_loggede_nye_aktorflater_190_par=[0]*190,beskyttede_kilder=1348,tre_stasher_bevart=True,ny_Tom_Claude_godkjenning=False,naturlig_gjennomspilling=False,ny_interaktiv_windows_eller_webtest=False,neste_figurjobb='fig250_01',aktive_ekstra_pakkebygg=active,native_frys_kan_frigis=not active)
+for folder in [O,R]:save(folder/'publisert.json',receipt);save(folder/'release-publisert.json',meta)
+s.update(status='fellesrelease_publisert_og_kontrollert',Latest_bekreftet=True,native_frys_kan_frigis=not active,release_url=meta['html_url'],aktive_ekstra_pakkebygg=active)
+for folder in [O,R]:save(folder/'bygg-startet.json',s)
+text=f'''Felles Linux og Windows med 3419 native er publisert og Latest-bekreftet: {meta['html_url']}. Hele svanebåtfamilien med tolv ark og 95 nye ruter siden felles 3324 er med. Begge faktiske plattformnedlastinger og de publiserte fellesvedleggene er hentet med SHA-filer og bekreftet byteidentiske. Alle 21661 runtime-moddfiler per pakke er kontrollert. Alle 95 nye native er observert i begge avspillinger med den nye Linux-binæren og har identiske filhash og 190 figurutsnitt til produksjonen. Begge sider har samlet 718 av 720 nullkontroller med det samme 160-avviket i hver prøve, ved bilde 34 eller 36. Globale bildenummer varierer, mens eksakte feilkoordinater og begge RGB-verdier er identiske. Et ekstra tett opptak av primærsekvensen på begge sider har 720 kontroller per side og de samme 416- og 160-pikslers overgangsavvikene før den nye animasjonen. Første utvalg hadde 188 av 190 SHA-like originalflater; to svært korte faser ble kontrollert i det ekstra faktiske opptaket. Alle 190 endelige originalflater er SHA-like og alle 190 par har null utenfor unionen av de faktisk loggede nye figur-/båtflatene med målemargin. 49 hele varianter og ni hele før/etter-par er sett. Hele prøven er ikke avviksfri.
+
+477 av 1758 hele figurjobber har resultat; 1281 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Egen alfa og tidligere grafikk er bevart, inkludert alle 21662 moddfilhash, 1348 beskyttede kilder, tre stasher og {len(prior)} tidligere releaser. Ett visuelt vurdert arkvarsel gjelder foldet øreform 1964. Ingen ny Tom-/Claude-godkjenning. Tidligere avviste motiver omprøves ikke; ugyldige 344/346 og råvalg 28 kjøres ikke. Ingen motor- eller pipelineendring. Full naturlig gjennomspilling, interaktiv Windows, ny webtest og kjente SDL-/inventar-/testhoppbegrensninger gjenstår.
+
+Neste uavhengige familie er fig250_01 og videre, Sam i VR-verdenen med gult sverd. De tilsiktede polygonformene og flate fargene skal beholdes. Tolv ark, 52 mål og 43 ulike hele RGBA-kilder er kartlagt i rapporter/sam250-kilde-20261021. Alle tolv originalark og 43 ulike hele kilder med primærkontekst er visuelt sett, og begge kildeavspillinger logget alle 52 ruter. Ark 02 til 09 har Sam og en oransje polygonmotstander sammen. De siste arkene viser motstanderen som flate trekanter og et rødt spillhjerte. Kontroller korte faser og riktig motivinnhold før hvert bildekall. Ingen nye 250-bilder, resultater eller native ennå. Grafikkautomatikken fortsetter uten gammel nattfrist; gamle nattprosesser gjenstartes ikke.
+'''
+text+='\nNativefrysen er frigitt.\n' if not active else '\nNativefrysen beholdes til de registrerte ekstra pakkebyggene er avsluttet. Ikke dupliser eller avbryt dem.\n'
+for folder in [S,V]:
+ for fn in ['fremdrift.json','sluttkontroll.json','mottak-publisert.json']:
+  d=read(folder/fn);d.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=3419,pakker_native=3419,pakker_mangler_native=0)
+  for e in d.get('leveranser',[]):e.update(i_fellespakke=True,fellespakke_tag=tag,pakke_hd_mod_sha=mod,pakke_native=3419,pakker_native=3419,pakker_mangler_native=0)
+  save(folder/fn,d)
+ with (folder/'RAPPORT.md').open('a') as f:f.write('\n'+text)
+ (folder/'NESTE.md').write_text(text)
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;t=p.read_text();i=t.find('\n');p.write_text(t[:i+1]+'\n'+text+'\n'+t[i+1:])
+with (R/'RAPPORT.md').open('a') as f:f.write('\n'+text)
+(R/'PAAGAR.md').write_text('Ferdig pakkesamlepunkt.\n\n'+text);shutil.copy2(__file__,R/'bekreft-release.py.txt')
+print(json.dumps({k:receipt[k] for k in ['url','release_id','native','nye_native_siden_felles3324','bevarte_tidligere_releaser','Latest_bekreftet','native_frys_kan_frigis','aktive_ekstra_pakkebygg']},ensure_ascii=False),flush=True)

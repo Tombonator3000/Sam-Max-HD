@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,hashlib,subprocess,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+s=read(O/'bygg-startet.json');run=read(O/'run-linux.json');meta=read(O/'release-linux.json');assert run['status']=='completed' and run['conclusion']=='success' and run['headSha']==s['kode'];m=re.search(r'Sam-Max-HD:\s*([0-9a-f]{7,40})',meta['body']);assert m and s['kode'].startswith(m[1]) and s['hd_mod'] in meta['body'];assets=[]
+for name in ['SamMaxHD-x86_64.AppImage','SamMaxHD-x86_64.AppImage.sha256']:
+ p=O/'linux'/name;a=next(v for v in meta['assets'] if v['name']==name);assert a['size']==p.stat().st_size and a['digest']=='sha256:'+sha(p);assets.append(dict(fil=name,sha256=sha(p),bytes=p.stat().st_size))
+app=O/'linux/SamMaxHD-x86_64.AppImage';assert (O/'linux/SamMaxHD-x86_64.AppImage.sha256').read_text().split()[0]==sha(app);app.chmod(0o755)
+if not (O/'linux/squashfs-root').exists():
+ with (O/'linux/extract.log').open('wb') as f:subprocess.run([str(app),'--appimage-extract'],cwd=O/'linux',stdout=f,stderr=subprocess.STDOUT,check=True)
+L=O/'linux/squashfs-root/usr/share/sam-max-hd';expected={f:h for f,h in read(R/'moddfiler-3419.json').items() if f!='README.md'};actual={p.relative_to(L/'mods/gpt').as_posix():sha(p) for p in (L/'mods/gpt').rglob('*') if p.is_file()};assert actual==expected and len(actual)==21661 and read(L/'mods/gpt/mod.json')['costume_cels']==3419
+body=(L/'BYGG.txt').read_text();assert s['hd_mod'] in body;proof=dict(kode=s['kode'],hd_mod=s['hd_mod'],runtimefiler=21661,alle_hash_bekreftet=True,faktisk_nedlasting=True,assets=assets,binar_sha256=sha(O/'linux/squashfs-root/usr/bin/scummvm'))
+save(R/'linux-nedlasting-kontroll.json',proof);shutil.copy2(__file__,R/'kontroller-linux-nedlasting.py.txt');print(json.dumps(proof,ensure_ascii=False),flush=True)

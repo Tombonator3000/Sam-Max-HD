@@ -1,0 +1,22 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam-max97-ovre-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+s=read(O/'bygg-startet.json');assert read(R/'linux-nedlasting-kontroll.json')['alle_hash_bekreftet'];B=O/'linux/squashfs-root/usr/bin/scummvm';binary=sha(B)
+assert s['native']==3419 and len(read(R/'nye-native95.json')['ruter'])==95
+old=P/'out/felles-release-20261021-bok/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt';new=O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+mods={'pakke-grunnlag3324-hel6':old,'pakke3419-hel6':new,'pakke-grunnlag3324-primaer201':old,'pakke3419-primaer201':new}
+shutil.copy2(S/'forundersokelse.json',R/'forundersokelse.json')
+template=(P/'out/sam-max97-ovre-20261021/motor3419.py').read_text()
+template=template.replace('felles-release-20261021-bok','felles-release-20261021-svanebaat').replace("label=sys.argv[1]; primary=label=='kandidat-primaer3419';assert label in ['kandidat3419','kandidat-primaer3419']",'label=sys.argv[1]; primary=label.endswith("primaer201");assert label in '+repr(list(mods)))
+template=template.replace('0887fa427c7315e4cfd66c92190b60bcbd2b3eeef346407560af56346cfae3e0',binary)
+def run(label):
+ if (R/(label+'.json')).exists():
+  proof=read(R/(label+'.json'));assert proof['exit']==0 and len(proof['tegninger'])==95 and proof['binar_sha256']==binary;return proof
+ t=template.replace("str(O/'mod-sam-max3419')",'str(Path('+repr(str(mods[label]))+'))').replace("R/'motor3419.py.txt'","R/(label+'.py.txt')")
+ f=O/(label+'.py');f.write_text(t);print('Starter faktisk pakket Linux:',label,flush=True)
+ q=subprocess.run([str(P/'.venv/bin/python'),str(f),label],cwd=P,capture_output=True,text=True,timeout=240);(R/(label+'-utskrift.txt')).write_text(q.stdout+q.stderr);print(label,q.returncode,q.stdout.strip(),flush=True);assert q.returncode==0;return read(R/(label+'.json'))
+with ThreadPoolExecutor(max_workers=2) as pool:proofs=list(pool.map(run,list(mods)))
+assert all(q['exit']==0 and len(q['tegninger'])==95 and q['binar_sha256']==binary for q in proofs)
+shutil.copy2(__file__,R/'kontroller-linux.py.txt');print('Fire pakkeavspillinger ferdig. Sammenligning og visning gjenstår.')

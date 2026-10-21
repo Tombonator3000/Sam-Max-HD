@@ -1,0 +1,34 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from PIL import Image
+from smhd.gamedata import load,read_index,read_rooms
+from smhd.v6grafikk import decode_costume
+import json,hashlib,importlib.util,sys,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists();R.mkdir();prior=read(A/'rapporter/sam-max97-ovre-20261021/beskyttede-samlet1300.json');assert len(prior)==1300 and all(sha(A/f)==h for f,h in prior.items());protected=dict(prior)
+rows=[];jobs=[];groups=defaultdict(list)
+for J in sorted((A/'jobber').glob('fig250_*')):
+ assert not (J/'resultat.png').exists();d=read(J/'jobb.json');jobs.append(dict(jobb=J.name,ruter=len(d['ruter']),originalark_visuelt_sett=J.name=='fig250_01'))
+ for f in ['jobb.json','referanse.png','original_1x.png','prompt.txt']:protected[(J/f).relative_to(A).as_posix()]=sha(J/f)
+ for e in d['ruter']:
+  src=P/'work/extract/costumes'/(e['bilde']+'.png');im=Image.open(src).convert('RGBA');h=hashlib.sha256(im.tobytes()).hexdigest();groups[h].append(e['bilde']);rows.append(dict(jobb=J.name,bilde=e['bilde'],lag=e['lag'],kilde=str(src),sha256=sha(src),rgba_sha256=h,maal=list(im.size)))
+assert len(jobs)==12 and len(rows)==52 and len(protected)==1348
+for e in rows:e['canonical']=groups[e['rgba_sha256']][0]
+save(R/'beskyttede-samlet1348.json',protected);save(R/'forundersokelse.json',dict(jobber=jobs,ruter=rows,maal=52,ulike_hele_rgba=len(groups),beskyttede=1348,ingen_bildekall=True,ingen_nye_resultater=True,native_frosset_i_felles_svanebaat=True))
+idx=read_index(P/'game/SAMNMAX.000');data,_=load(P/'game/SAMNMAX.001');rooms=read_rooms(P/'game/SAMNMAX.001');room,off=idx.costume_dir[250];assert room==49;c=decode_costume(data,rooms[room].offset+off)
+save(R/'kostyme250-header.json',dict(num_anim=c.num_anim,format=c.format,mirror=c.mirror,rom=room,raw_valg=sorted({a['valg'] for a in c.animations}),advarsler=c.errors,palett=list(c.palette),animasjoner=c.animations));save(R/'kostyme250.json',read(P/'work/extract/costumes.json')['250'])
+spec=importlib.util.spec_from_file_location('dekompiler250',P/'tools/dekompiler_skript.py');m=importlib.util.module_from_spec(spec);sys.modules[spec.name]=m;spec.loader.exec_module(m);idata,_=m.load(P/'game/SAMNMAX.000');tasks,info=m.finn_jobber(data,idata);tasks=[j for j in tasks if j.rom==49]
+prev=read(A/'rapporter/svanebaat97-20261021/dekompilering22.json');desc=m.finn_descumm(prev['descumm']);assert sha(desc)==prev['descumm_sha256'];W=P/'work/sam250-kilde-20261021/skript';assert not W.exists();W.mkdir(parents=True)
+out=[]
+for i,j in enumerate(tasks):
+ result=m.kjor(desc,j,W/('tmp-'+str(i)+'.bin'));m.skriv(W,j,result);out.append(dict(sort=j.sort,filer=j.filer,status=j.status,melding=j.melding,advarsler=j.advarsler))
+save(R/'dekompilering49.json',dict(descumm=str(desc),descumm_sha256=sha(desc),jobber=out,status=dict(Counter(j.status for j in tasks))))
+(R/'KILDEGRUNNLAG.md').write_text('''# Neste familie: Sam i VR-verdenen
+
+Kostyme 250, rom 49. Ressursbanken og figurer.csv beskriver Sam i kamp mot en oransje polygonfigur i den virtuelle verdenen. Første originalark viser Sam med et gult sverd, flate kantete klær, kantete hatt og munn. Dette er tilsiktet VR-polygongrafikk. Sam skal ikke få vanlige avrundede klær/hode fra hovedarket. Vanlig master er identitetsstøtte, mens VR-kilden bestemmer geometri, flat farge, sverd, grepet og animasjonsfasen.
+
+Tolv uleverte ark med 52 mål er kartlagt, kildehash festet. 1300 tidligere beskyttede kilder og 48 nye jobbfiler gir 1348 beskyttede. Første originalark er sett; de elleve andre, alle forskjellige varianter i riktig spillkontekst, gyldig hel animasjon og faktisk primærskript må avklares før bildekall. Dekompilerte romskript og rå COST-header er bevart. Ingen bildeproduksjon, resultater eller native her ennå. Native 3419 er fryst under felles Linux-/Windows-samlepunktet; kildeundersøkelsen endrer ingen moddfiler. Ikke gjenta ferdige 97-ark eller verktøyavviste motiver. Resterende 304 holdes utenfor etter gjeldende NESTE fra sam304-foerste-20261021.
+''')
+shutil.copy2(__file__,R/'klargjor.py.txt')
+print('250:',len(rows),'mål,',len(groups),'ulike hele RGBA, råvalg',sorted({a['valg'] for a in c.animations}),'advarsler',c.errors,'skript',dict(Counter(j.status for j in tasks)),flush=True)
