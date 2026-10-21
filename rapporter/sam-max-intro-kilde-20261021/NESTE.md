@@ -7,3 +7,5 @@ Primærskript65 avklarer at den løse rekvisitten er en tikkende tidsbombe med h
 Kilder i10/12 inneholder avklipte nedre kropper,separate hatter,tynne ledninger og ruter som mørkner til svart. Ikke fullfør avklipte deler eller lysne tilsiktede svarte faser uten palett-/spillbevis. Bevar eksakte proporsjoner,rekvisitt og håndkontakter. De20 jobbkildehashene er festet i kildeplan.json,i tillegg til de1152 tidligere. Bevar alle urørt. Kildemotor,hele RGBA-aliaser,nyeste returstatus og eventuell påbegynt bunke må kontrolleres før neste bildekall.
 
 Dette er en ny uavhengig introbunke. Ingen blokkerte304-motiver omprøves eller konstrueres. Gamle nattprosesser gjenstartes ikke. Ingen ny Tom-/Claude-godkjenning.
+
+Samlet beskyttelsesfil er beskyttede-samlet1172.json,med 1172 uendrede SHA. Bruk denne ved neste produksjon. Felles3150 er kontrollert og publisert. Ekstra Windows-taggbygg39551012593 skal kontrolleres før ny nativepublisering.
