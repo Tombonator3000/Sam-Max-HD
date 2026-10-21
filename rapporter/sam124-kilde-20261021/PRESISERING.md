@@ -13,3 +13,7 @@ Den første tvungne 217-proben traff en allerede aktiv mellomsekvens ved bilde 6
 67 av 70 jobb-mål og 47 av 49 ulike hele RGBA-motiver er logget. Alle 39 mål i fig124_01 til 05 er observert. 1844, 1845 og 1846 fra senere ark 06 mangler faktisk primærvisning og krever egen kildeført prøve før produksjon/godkjenning. Headerens varsel om animasjon 48 er beholdt; den kjøres ikke manuelt.
 
 Alle fem første originalark og 24 ulike hele kilder med faktisk originalkontekst er visuelt sett. Se aktuell kilde, kontekst og godkjente stilankre på nytt før hvert bildekall. Ingen 124-bildekall, nye malerier, resultatark eller native er laget i undersøkelsen.
+
+## Motorretur 22. oktober 2026
+
+Kildens blågrå innhold i 1797 til 1804 er Sam, men den grafiske funksjonen er ennå ikke tilstrekkelig avklart. Hele nytegninger med avgrensede kleskanter lager synlige ekstra fliker over HD-objekt 258. Disse åtte holdes tilbake. Identitetskonklusjonen Sam står, mens bakgrunnsrestaurering må undersøkes som funksjon. Ingen gulvfortolkning gjeninnføres, ingen grå deler slettes blindt, og de 27 uklassifiserte pikslene beholdes. Se ../sam124-foerste-20261021/retur8.json.

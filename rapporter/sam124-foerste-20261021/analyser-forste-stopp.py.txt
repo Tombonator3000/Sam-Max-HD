@@ -1,0 +1,127 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import hashlib, json, numpy as np, re, shutil, sys
+
+P = Path('/home/tom/Sam-Max-HD'); A = P/'work/.gpt-gren'
+O = Path(__file__).resolve().parent; R = A/'rapporter'/O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p, d):
+    p.write_text(json.dumps(d, ensure_ascii=False, indent=2)+'\n')
+
+mode = sys.argv[1]; assert mode in ['39', '31']
+label = 'kandidat' if mode == '39' else 'kandidat31'
+native = read(R/('egen-native.json' if mode == '39' else 'valgt-native31.json'))['ruter']
+needed = {e['bilde'] for e in native}; assert len(needed) == int(mode)
+canonical = list(dict.fromkeys(e['canonical'] for e in native))
+proof = read(R/(label+'.json'))
+bases = {n:read(R/(n+'.json')) for n in ['baseline','baseline-kontroll']}
+assert proof['exit'] == 0 and len(proof['kontroller']) == 720
+assert not proof['manglende_nye_maal']
+assert all(b['exit'] == 0 and b['binar_sha256'] == proof['binar_sha256'] for b in bases.values())
+def errors(p, directory):
+    rows = []
+    for e in p['kontroller']:
+        if not e['avvik']: continue
+        n = e['frame']; t = O/directory
+        s = np.array(Image.open(t/f'frame_{n:06}_screen.png').convert('RGB'))
+        wfiles = list(t.glob(f'frame_{n:06}_room[0-9][0-9][0-9].png'))
+        assert len(wfiles) == 1
+        w = np.array(Image.open(wfiles[0]).convert('RGB'))
+        yy, xx = np.where(np.any(s != w, axis=2)); assert len(xx) == e['avvik']
+        h = hashlib.sha256(np.stack([xx,yy],1).tobytes()+s[yy,xx].tobytes()+w[yy,xx].tobytes()).hexdigest()
+        rows.append(dict(frame=n, avvik=len(xx), koordinat_og_begge_RGB_sha256=h))
+    return rows
+
+err = errors(proof, label)
+base_err = {n:errors(b,n) for n,b in bases.items()}
+assert all(proof['kontroller'] == b['kontroller'] for b in bases.values()), 'Nye eller flyttede bufferavvik'
+assert all(v == err for v in base_err.values()), 'Avvikspiksler eller RGB er endret'
+save(R/f'motor{mode}-bufferkontroll.json', dict(kandidat=err, grunnlag=base_err,
+    alle720_kontroller_og_feilpiksler_identiske=True, ingen_nye_bufferavvik=True,
+    avviksfri_prove=False))
+cache = {}
+def phase(e):
+    p = Path(e['fil']); p = p.with_name(p.stem+'_flat.png')
+    if not p.exists(): return None
+    if p not in cache: cache[p] = sha(p)
+    return cache[p]
+
+log = (O/label/'scummvm.log').read_text()
+origins = {int(f):[int(x),int(y)] for f,room,x,y in re.findall(
+    r'DigHD: whole screen frame (\d+) \(room (\d+), screen at (-?\d+),(-?\d+)\)',log) if int(room) == 25}
+rows = []; selected = {}; counts = {}
+for target in native:
+    name = target['bilde']; cel = int(name.split('_')[1]); choices = []
+    candidates = [e for e in proof['hendelser'] if e['cel'] == cel and phase(e)]
+    for bn, b in bases.items():
+        old = {}
+        for e in b['hendelser']:
+            if e['cel'] == cel and phase(e):
+                old.setdefault((phase(e),tuple(e['pos']),tuple(e['maal'])),[]).append(e)
+        for e in candidates:
+            for x in old.get((phase(e),tuple(e['pos']),tuple(e['maal'])),[]):
+                choices.append((e['bildeframe'],abs(e['bildeframe']-x['bildeframe']),bn,x,e))
+    if not choices:
+        save(R/f'motor{mode}-STOPPET.json', dict(bilde=name,grunn='Ingen hel SHA-identisk originalfase i de to bevarte grunnlagene. Ingen terskel endret.'))
+    assert choices, (name,'Originalfase mangler')
+    _, _, bn, old, new = min(choices, key=lambda e:e[:3])
+    origin = origins[new['bildeframe']]
+    before = np.array(Image.open(old['fil']).convert('RGB'))
+    after = np.array(Image.open(new['fil']).convert('RGB'))
+    delta = np.any(before != after,axis=2); outside = delta.copy(); boxes = []
+    relevant = [q for q in proof['hendelser'] if q['logg_frame'] == new['logg_frame']
+                and f"costume124_{q['cel']:03}" in needed]
+    assert relevant
+    for q in relevant:
+        x,y = [q['pos'][i]-origin[i] for i in range(2)]; w,h = q['maal']
+        box = [max(0,x*4-8),max(0,y*4-8),min(after.shape[1],(x+w)*4+8),min(after.shape[0],(y+h)*4+8)]
+        outside[box[1]:box[3],box[0]:box[2]] = False
+        boxes.append(dict(cel=q['cel'],rompos=q['pos'],viewport_pos=[x,y],rekt_hd=box))
+    assert not outside.any(), (name,'Endring utenfor loggede nye aktørflater',int(outside.sum()))
+    assert delta.any(), (name,'Ingen HD-endring')
+    assert sha(O/('mod-sam1243574' if mode == '39' else 'mod-sam1243566')/target['fil']) == target['sha256']
+    row = dict(bilde=name,canonical=target['canonical'],grunnlag=bn,
+        grunnlag_frame=old['bildeframe'],kandidat_frame=new['bildeframe'],
+        grunnlag_fil=old['fil'],kandidat_fil=new['fil'],
+        originalflat_identisk=True,originalflat_sha256=phase(new),
+        utenfor_nye_loggede_aktorflater=0,endrede_piksler=int(delta.sum()),
+        loggede_ruterektangler=boxes,native_sha256=target['sha256'],
+        kandidat_sha256=sha(Path(new['fil'])),grunnlag_sha256=sha(Path(old['fil'])))
+    rows.append(row); selected[name] = (old,new,origin); counts[bn] = counts.get(bn,0)+1
+save(R/f'motor{mode}-pikselkontroll.json',rows)
+boards = []
+for start in range(0,len(canonical),4):
+    board = Image.new('RGB',(1800,1120),'#304050'); dr = ImageDraw.Draw(board)
+    for i,name in enumerate(canonical[start:start+4]):
+        old,new,origin = selected[name]
+        x,y = [new['pos'][k]-origin[k] for k in range(2)]; w,h = new['maal']
+        box = (max(0,x*4-24),max(0,y*4-24),min(1280,(x+w)*4+24),min(800,(y+h)*4+24))
+        xx = i%2*900; yy = i//2*560
+        dr.text((xx+8,yy+8),name+f': 3535 / kandidat {proof["native_antall"]}',fill='white')
+        for z,e in enumerate([old,new]):
+            im = Image.open(e['fil']).convert('RGB').crop(box)
+            im.thumbnail((435,510),Image.Resampling.LANCZOS)
+            board.paste(im,(xx+8+z*445,yy+30))
+    f = R/f'motor{mode}-varianter-{start//4+1}.png'; board.save(f)
+    boards.append(dict(fil=f.name,sha256=sha(f),ruter=canonical[start:start+4],visuelt_sett=False))
+shots = []
+shot_names = ['costume124_1792','costume124_1924','costume124_1816','costume124_1830']
+for name in shot_names:
+    old,new,_ = selected[name]; f = R/f'{name}-motor{mode}.png'
+    shutil.copy2(new['fil'],f)
+    shots.append(dict(bilde=name,fil=f.name,sha256=sha(f),visuelt_sett=False))
+save(R/f'motor{mode}-visuell-plan.json',dict(varianter=boards,hele_motorbilder=shots,
+    ulike_hele_egne_varianter=len(canonical),visuelt_sett=False))
+save(R/f'motor{mode}-sammenligning.json',dict(nye_native=len(native),
+    motorlogget=len(needed),kandidat=proof['native_antall'],
+    kontroller=720,nullkontroller=proof['nullkontroller'],
+    valgte_grunnlag=counts,alle_originalflater_SHA_identiske=True,
+    utenfor_nye_loggede_aktorflater=0,bufferavvik_identiske=True,
+    avviksfri_prove=False,ingen_testterskel_endret=True,
+    faktisk_kameraopphav=True,primaerskript217_fra_originalinngang=True,
+    full_naturlig_gjennomspilling=False,visuelt_sett=False,
+    aapne_returer=8 if mode == '39' else 0,
+    sammenligningsregel='Samme kildecel, posisjon og mål samt SHA256 av hele faktiske originalflaten. To forhåndsbevarte 3535-grunnlag; ingen nye omprøver.'))
+shutil.copy2(__file__,R/'analyser.py.txt')
+print(f'{mode}: alle hele originalfaser SHA-identiske, null endringer utenfor nye aktørflater, {proof["nullkontroller"]}/720 null, samme bufferavvik. Grunnlag: {counts}.')

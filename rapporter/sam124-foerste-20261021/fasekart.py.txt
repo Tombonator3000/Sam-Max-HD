@@ -1,0 +1,33 @@
+from pathlib import Path
+import json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+b=read(R/'baseline.json');c=read(R/'kandidat.json');native=read(R/'egen-native.json')['ruter'];cache={};rows=[]
+def phase(e):
+ f=Path(e['fil']);p=f.with_name(f.stem+'_flat.png')
+ if not p.exists():return None
+ if p not in cache:cache[p]=sha(p)
+ return cache[p]
+for t in native:
+ cel=int(t['bilde'].split('_')[1]);bm={};cm={}
+ for source,target in [(b,bm),(c,cm)]:
+  for e in source['hendelser']:
+   if e['cel']!=cel:continue
+   h=phase(e)
+   if h:target.setdefault(h,[]).append(e)
+ pairs=[]
+ for h in sorted(set(bm)&set(cm)):
+  for x in bm[h]:
+   for y in cm[h]:
+    if x['pos']==y['pos'] and x['maal']==y['maal']:pairs.append((x,y,h))
+ pairs.sort(key=lambda z:(max(z[0]['bildeframe'],z[1]['bildeframe']),abs(z[0]['bildeframe']-z[1]['bildeframe'])))
+ old,new=b['tegninger'][t['bilde']],c['tegninger'][t['bilde']]
+ row=dict(bilde=t['bilde'],forste_frames=[old['bildeframe'],new['bildeframe']],forste_originalflate_SHA_lik=phase(old)==phase(new),grunnlag_faser=len(bm),kandidat_faser=len(cm),eksakte_par=len(pairs),matchet=bool(pairs))
+ if pairs:row.update(grunnlag=pairs[0][0],kandidat=pairs[0][1],originalflat_sha256=pairs[0][2])
+ rows.append(row)
+result=dict(regel='Samme kildecel, posisjon, mål og SHA256 av hele faktiske originalflaten. Ingen originalpikselmaske eller bildeendring, alle39 mål må dekkes.',ruter=rows,matchet=sum(x['matchet'] for x in rows),antall=len(rows),forste_identiske=sum(x['forste_originalflate_SHA_lik'] for x in rows),nye_motorprover=0)
+(R/'fasekart.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+shutil_copy=R/'fasekart.py.txt';shutil_copy.write_text(Path(__file__).read_text())
+print('Fasekart',result['matchet'],'av',len(rows),'første fase-SHA like',result['forste_identiske'])
+for e in rows:
+ if not e['forste_originalflate_SHA_lik'] or not e['matchet']:print(e['bilde'],'første',e['forste_frames'],'like',e['forste_originalflate_SHA_lik'],'matchet',e['matchet'],'par',e['eksakte_par'])

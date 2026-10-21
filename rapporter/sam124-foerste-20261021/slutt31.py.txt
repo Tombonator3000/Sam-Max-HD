@@ -1,0 +1,86 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import hashlib, json, shutil
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d): p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+
+native=read(R/'valgt-native31.json')['ruter']
+canonical=list(dict.fromkeys(e['canonical'] for e in native))
+original=read(R/'motor39-pikselkontroll.json')
+original={e['bilde']:e for e in original}
+actual=read(R/'motor31-opak-diagnose.json')
+actual={e['bilde']:e for e in actual}
+assert len(native)==len(actual)==31 and len(canonical)==16
+assert all(original[e['bilde']]['originalflat_identisk'] and
+    original[e['bilde']]['utenfor_nye_loggede_aktorflater']==0 for e in native)
+assert all(e['avvik_opake']==0 and e['opake_piksler']>0 and
+    not e['aktive_holdte8'] for e in actual.values())
+for e in native:
+    assert sha(O/'mod-sam1243566'/e['fil']) == sha(O/'mod-sam1243574'/e['fil']) == e['sha256']
+    assert sha(A/e['prototype'])==e['sha256']
+errors=read(R/'buffer-sekvensdiagnose.json')
+baseline=errors['baseline']; final=errors['kandidat31']
+assert len(baseline)==len(final)==9
+assert [(e['avvik'],e['sha256']) for e in baseline] == [(e['avvik'],e['sha256']) for e in final]
+offsets={n['frame']-b['frame'] for b,n in zip(baseline,final)}
+assert offsets=={-1},offsets
+proof=read(R/'kandidat31.json')
+assert proof['exit']==0 and proof['nye_maal_observert']==31
+assert len(proof['kontroller'])==720 and proof['nullkontroller']==711
+assert not proof['manglende_nye_maal']
+phase=read(R/'kandidat31-fase-diagnose.json')
+assert phase['matchet']==7 and len(phase['uten_hel_flat_SHA'])==24
+boards=[]
+for start in range(0,len(canonical),4):
+    board=Image.new('RGB',(1800,1120),'#304050');dr=ImageDraw.Draw(board)
+    for i,name in enumerate(canonical[start:start+4]):
+        e=actual[name]; old=original[name]; xx=i%2*900;yy=i//2*560
+        # Det gamle bildet og kandidat 39 har SHA-identiske originalfaser.
+        # Høyre side er den faktisk avspilte, endelige kandidaten 3566.
+        dr.text((xx+8,yy+8),name+': 3535 / endelig kandidat 3566',fill='white')
+        w,h=e['maal']; x,y=e['pos'];box=(max(0,x*4-24),max(0,y*4-24),min(1280,(x+w)*4+24),min(800,(y+h)*4+24))
+        for z,f in enumerate([old['grunnlag_fil'],e['ny_fil']]):
+            im=Image.open(f).convert('RGB').crop(box)
+            im.thumbnail((435,510),Image.Resampling.LANCZOS)
+            board.paste(im,(xx+8+z*445,yy+30))
+    f=R/f'motor31-varianter-{start//4+1}.png';board.save(f)
+    boards.append(dict(fil=f.name,sha256=sha(f),ruter=canonical[start:start+4],visuelt_sett=False))
+shots=[]
+for name in ['costume124_1792','costume124_1924','costume124_1816','costume124_1830']:
+    f=R/f'{name}-motor31.png';shutil.copy2(actual[name]['ny_fil'],f)
+    shots.append(dict(bilde=name,fil=f.name,sha256=sha(f),visuelt_sett=False))
+save(R/'motor31-visuell-plan.json',dict(varianter=boards,hele_motorbilder=shots,
+    ulike_hele_egne_varianter=16,visuelt_sett=False,faktisk_endelig_kandidat=3566))
+save(R/'motor31-sammenligning.json',dict(nye_native=31,kandidat=3566,
+    ruter_i_faktisk_motor=31,ulike_hele_varianter=16,
+    kontroller=720,nullkontroller=711,avviksfri_prove=False,
+    ni_kjente_avvik_eksakte_koordinater_og_begge_RGB_og_rekkefolge=True,
+    konstant_bildeforskyvning_mot_foerste_grunnlag=-1,
+    ingen_nye_eller_okte_bufferavvik=True,
+    alle31_native_SHA_identiske_med_foerste_kandidat=True,
+    alle31_opake_faktiske_aktorpiksler_identiske=True,
+    ingen_holdte_ruter_aktive_i_de31_kontrollerte_foerste_kandidatfasene=True,
+    kildefasebevis='motor39-pikselkontroll.json: alle 31 har hele SHA-identiske originalflater og null endringer utenfor nye aktørflater i første kandidat 3574.',
+    endelig_prove_hele_originalflater_SHA_matchet=7,
+    endelig_prove_uten_fullflate_SHA=phase['uten_hel_flat_SHA'],
+    begrensning='Den endelige avspillingen har annen tids- og vannfargefase for 24 mål. Disse har kildefasebevis fra kandidat 3574, byteidentisk native og identiske opake aktørpiksler i faktisk kandidat 3566. Ingen påstand om 31 SHA-like hele originalflater i den endelige prøven.',
+    ingen_nye_testomproever=True,ingen_testflagg_eller_CORE_IoU_dekning_endret=True,
+    primaerskript217_fra_originalinngang=True,
+    full_naturlig_gjennomspilling=False,visuelt_sett=False,aapne_returer_i_kandidat=0))
+for name in ['motor-fase-STOPPET.json','analyser-forste-stopp.json']:
+    p=R/name;d=read(p)
+    d.update(avklart=True,videre_bevis='motor39-sammenligning.json og motor31-sammenligning.json',
+        forklaring='Absolutte bildetall er ikke en pålitelig fase-ID. Én uendret kontroll viste tidsforskyvning. Originalfaser er sammenlignet med hele flat-SHA når de finnes. Endelig kandidat har dessuten samme native og opake aktørpiksler. Alle tidligere stopp og logger er bevart.')
+    save(p,d)
+save(R/'analyser-andre-stopp.json',dict(avklart=True,
+    grunn='Den endelige kandidatens buffersekvens starter én bilderute tidligere enn første grunnlag og to tidligere enn kontrollgrunnlaget.',
+    bevis='buffer-sekvensdiagnose.json',
+    alle_nipikselsett_med_begge_RGB_eksakt_identiske=True,
+    avviksfri_prove=False,omproever_utover_den_ene_kontrollen=False,
+    ingen_spillkode_bilder_eller_testflagg_endret=True))
+shutil.copy2(__file__,R/'slutt31.py.txt')
+print('31: faktisk motorlogg, identiske native og opake aktørpiksler. 711/720 null, ni eksakt like avvik med fast -1 forskyvning. 24 hele sluttflater er ikke SHA-matchet; eget kildefasebevis er bevart.')

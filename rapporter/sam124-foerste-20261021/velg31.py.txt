@@ -1,0 +1,90 @@
+from pathlib import Path
+import hashlib, json, shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+M = P / 'mods/gpt'
+C = O / 'mod-sam1243566'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p, d):
+    p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+
+held = {f'costume124_{n}' for n in range(1797, 1805)}
+all_new = read(R / 'egen-native.json')['ruter']
+chosen = [e for e in all_new if e['bilde'] not in held]
+assert len(chosen) == 31 and len(held) == 8 and not C.exists()
+old = read(A / 'rapporter/cone-underlag-20261021/publiserte-moddfiler-3535.json')
+assert len(old) == 21779 and all(sha(M/f) == h for f, h in old.items())
+proofs = []
+for cel, frame in [(1797, 436), (1804, 443)]:
+    source = O / 'kandidat' / f'frame_{frame:06}_room025.png'
+    dest = R / f'retur-costume124_{cel}-motor3574.png'
+    shutil.copy2(source, dest)
+    proofs.append(dict(fil=dest.name, sha256=sha(dest), sett=True, kandidat=3574))
+reason = ('Åtte hele HD-ruter lager nye mørke skjøter og papiraktige blågrå fliker '
+          'over den allerede malte Sam-jakken i objekt 258. Kildens blågrå innhold '
+          'er Sam, men funksjonen kan være bakgrunnsrestaurering. Ikke tegn dette '
+          'som nye løse klesplagg. 1804 matcher objektet helt, mens 27 grå piksler '
+          'i tidlige kilder ennå kan være støveldetaljer. Ny kildefunksjon og '
+          'helmaleri må avklares før disse åtte publiseres. Ingen sletting, '
+          'hard originalmaske eller delrekonstruksjon er utført.')
+save(R/'retur8.json', dict(ruter=sorted(held), antall=8, status='åpen grafikkretur',
+    grunn=reason, faktisk_motorvisning=proofs, publisering_tillatt=False,
+    teknisk_mottak_OK_er_ikke_visuell_godkjenning=True))
+for job in ['fig124_01', 'fig124_02']:
+    p = A/'jobber'/job/'retur.md'
+    assert not p.exists(), 'Bevar eksisterende retur før ny oppføring'
+    cells = read(R/('rutekart-'+job+'.json'))[job]['ruter']
+    ids = [e['bilde'] for e in cells if e['bilde'] in held]
+    p.write_text('# Åpen retur etter motorvisning, 22. oktober 2026\n\n'
+        + ', '.join(ids) + '\n\n' + reason + '\n\n'
+        + 'Råbilder, resultater og første kandidat 3574 er bevart. De øvrige '
+          'rutene kontrolleres separat som kandidat 3566. Se '
+          'rapporter/sam124-foerste-20261021/retur8.json.\n')
+    with (p.parent/'notat.md').open('a') as f:
+        f.write('\nMotorretur 22. oktober: '+str(len(ids))+' ruter i dette arket '
+                'holdes tilbake på grunn av skjøter over Sams jakke. '
+                'Se retur.md. Teknisk OK og visuelt sett betyr ikke '
+                'visuelt godkjent eller publisert.\n')
+progress = read(R/'fremdrift.json')
+for e in progress['leveranser']:
+    cells = read(R/('rutekart-'+e['jobb']+'.json'))[e['jobb']]['ruter']
+    h = [c['bilde'] for c in cells if c['bilde'] in held]
+    e.update(motorobservert=True, aapne_returer=h,
+             visuelt_egenkontroll_godkjent=not h,
+             native_valgt_for_publisering=len(cells)-len(h),
+             publisert=False)
+    for cell in cells:
+        cell.update(motorobservert=True, visuelt_motor_sett=False,
+                    aapen_retur=cell['bilde'] in held,
+                    publisering_valgt=cell['bilde'] not in held,
+                    publisert=False)
+    save(R/('rutekart-'+e['jobb']+'.json'),
+         {e['jobb']:dict(sha256_resultat=e['sha256'], ruter=cells)})
+progress.update(native_valgt_for_publisering=31, native_holdt_retur=8,
+                publisert_native_naa=3535, kandidat_native=3566,
+                kandidat3574_kun_diagnostikk=True)
+save(R/'fremdrift.json', progress)
+shutil.copytree(M, C)
+for e in chosen:
+    dest = C/e['fil']
+    assert not dest.exists()
+    shutil.copy2(A/e['prototype'], dest)
+    assert sha(dest) == e['sha256']
+meta = read(C/'mod.json')
+assert meta['costume_cels'] == 3535
+meta['costume_cels'] = 3566
+save(C/'mod.json', meta)
+files = {p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()}
+assert len(files) == 21810
+assert set(files)-set(old) == {e['fil'] for e in chosen}
+assert {f for f, h in old.items() if files[f] != h} == {'mod.json'}
+assert not any((C/f'costumes/{n}_hd.png').exists() for n in held)
+save(R/'valgt-native31.json', dict(ruter=chosen, antall=31, native_totalt=3566,
+    holdt_retur=sorted(held), kandidat=str(C), tidligere_filer_bevart=21779))
+save(R/'kandidat31-filhash.json', files)
+shutil.copy2(__file__, R/'velg31.py.txt')
+print('Kandidat 3566: 31 valgt, åtte i åpen retur, alle 21779 tidligere filstier bevart.')

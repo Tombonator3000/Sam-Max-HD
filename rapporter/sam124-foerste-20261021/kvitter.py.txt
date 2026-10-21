@@ -1,0 +1,109 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib,json,shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+
+v=read(R/'motor31-visuell-plan.json')
+assert len(v['varianter'])==4 and len(v['hele_motorbilder'])==4
+for group in ['varianter','hele_motorbilder']:
+    for e in v[group]:
+        assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=16,hele_motorbilder_sett=4)
+save(R/'motor31-visuell-plan.json',v)
+m=read(R/'motor31-sammenligning.json');m['visuelt_sett']=True
+save(R/'motor31-sammenligning.json',m)
+selected={e['bilde'] for e in read(R/'valgt-native31.json')['ruter']}
+progress=read(R/'fremdrift.json')
+for e in progress['leveranser']:
+    p=R/('rutekart-'+e['jobb']+'.json');d=read(p)
+    cells=d[e['jobb']]['ruter']
+    for cell in cells:
+        cell.update(visuelt_motor_sett=cell['bilde'] in selected,
+            visuelt_motor_egenkontroll_OK=cell['bilde'] in selected)
+    save(p,d)
+    e.update(motorobservert=True,visuelt_motor_sett_ruter=sum(c['bilde'] in selected for c in cells),
+             publiserte_ruter=0,ark_helt_publisert=False)
+progress.update(nye_native_generert=39,nye_native_valgt=31,nye_native_holdt=8,
+    ulike_hele_varianter_valgt=16,hele_RGBA_aliasmaal_valgt=15,
+    native_totalt=3566,diagnostikk_native=3574,publisert_native_naa=3535,
+    ark_med_apen_retur=2,ark_valgt_helt=3,ark_valgt_delvis=2,
+    motor31_visuelt_sett=True,nye_native=31)
+save(R/'fremdrift.json',progress)
+protected=read(R/'beskyttede-samlet1412.json')
+assert len(protected)==1412 and all(sha(A/f)==h for f,h in protected.items())
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==502
+save(R/'sluttkontroll.json',dict(tid=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(),
+    leveranser=progress['leveranser'],laget_ark=5,helt_valgt_ark=3,delvis_valgt_ark=2,
+    genererte_ruter=39,valgte_native=31,aapne_returruter=8,
+    figurark_med_resultat=502,gjenstar_uten_resultat=1256,
+    egenkontroll_fem_ark_OK=True,automatisk_arkmottak39_OK=True,
+    native31_egne_CORE128_IoU06_dekning08_OK=True,
+    automatisk_replassering_ikke_brukt_som_native=True,
+    samme_egne_hele_prototyper_i_begge_kandidater=True,
+    motorobservert=True,visuelt_sett=True,hele_motorvarianter_sett=16,
+    native=3566,publisert=False,publisert_native_naa=3535,
+    i_fellespakke=False,pakker_native=3535,pakker_mangler_valgte=31,
+    beskyttede=1412,godkjent_av_Tom=False,claude_kontroll=False,
+    ingen_motor_eller_pipelineendring=True,
+    begrensning=m['begrensning'],avviksfri_prove=False))
+report='''# Fem Lee-Harvey/Max-ark, kontroll 22. oktober 2026
+
+Fem hele ark, fig124_01 til fig124_05, er laget og egenkontrollert OK. 39 mål kommer fra 24 ulike hele egne malerier og 15 identiske hele RGBA-kildealiaser. Det er nå 502 av 1758 figurjobber med resultat, 1256 uten resultat pluss returer og sluttkontroll. Dette er ikke en ferdigmelding for all grafikk.
+
+31 ruter fra 16 ulike egne malerier er valgt for additiv nativepublisering. Åtte ruter, 1797 til 1804, holdes tilbake. To ark har åpne returer og bare delvis valgt native; tre ark er helt valgt. Ny native er foreløpig kandidat 3566, mens fjernmod og faktisk kontrollerte fellespakker fortsatt har 3535. Publisering og henting kvitteres i mottak-publisert.json når det er gjort.
+
+## Motiv og produksjon
+
+Lee-Harvey håndterer Max i rom 25 Gator Golf, ikke Sam i rom 28 slik gamle jobbkort sier. Originalt rominngangsskript starter lokal 217. Kostyme 124 rute 1792 er kropp uten hode; separat kostyme 129 tegner det gamle snakkehodet. Conroy til høyre er en separat figur. Kildenes gule slagstjerner og hvite streker er bevart, med én stjerne i 1819 og to i 1811, 1816 og 1822. Original, faktisk spillkontekst og godkjente Sam-/Max-mastere ble sett før hvert motiv. Beskyttede jobbfiler er uendret.
+
+28 innebygde image_gen-kall er vellykket, med fire bevarte kvalitetsreturer. Ingen verktøyavvisning, kvotefeil eller CLI/API-fallback. Modellnavn vises ikke. Alle faktiske prompter, argumenter, referansehash, råbilder og returårsaker ligger i kall/. Python renser egen kantalfa, utfører kildeførte RGB-rettelser uten å endre alfa i fargesteget og plasserer hele egne malerier i fast 4x med åtte HD-pikslers marg. Ingen hard originalformmaske, originale bildefragmenter eller delrekonstruksjon. CORE 128, IoU 0,6 og dekning 0,8 er uendret. Automatisk arkimport gir 39 OK; slutt-native bruker de særskilt målte hele prototypene, ikke den automatiske omplasseringens andre filhash.
+
+Alle 24 hele egne kildepar og fem hele ark er sett. I den faktisk avspilte sluttkandidaten er 16 ulike hele motorvarianter og fire hele skjermbilder sett. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+## Åtte åpne returer
+
+I 1797 til 1804 gir de tegnede blågrå fragmentene nye mørke skjøter over den allerede malte Sam-jakken i objekt 258. Originalens innhold er Sam, men bakgrunnsrestaurering kan være funksjonen. De skal ikke tolkes som nye løse stofflapper. I 1804 matcher alle 228 grå piksler objektet; i tidlige ruter er 27 grå piksler ennå ikke avklart og kan være støveldetaljer. Råbilder, hele resultater og diagnostisk kandidat 3574 beholdes. Ingenting er klippet bort, og disse åtte skal ikke publiseres før kildefunksjon og en korrekt hel løsning er kontrollert. Se retur8.json og retur.md i ark 01 og 02.
+
+## Motorbevis og praktisk begrensning
+
+Faktisk nedlastet Linux-binær 03b21adba8a0cd63765542bd2a814e827bcfb28265b45567849c73fa1e071022 er avspilt med 3535-grunnlag, første kandidat 3574, én ekstra uendret 3535-kontroll og endelig kandidat 3566. Hver har normal avslutning 0, 720 bufferkontroller og 711 null. Originalt inngangsskript og primær 217 brukes; ingen aktører skjules eller konstrueres, ingen tvunget omstart av 217, kildekodeendring eller endrede testflagg. Dette er kontrollerte romhopp, ikke en full naturlig gjennomspilling.
+
+Første faseanalyse stoppet på ulike absolutte bildetall og vannets fargefase. En forhåndslogget, avgrenset uendret kontroll bekreftet tidsvariasjon. Alle 39 mål i første kandidat har deretter par med identisk SHA256 av hele originalflaten, samme cel, posisjon og mål, og null endringer utenfor de faktisk loggede nye aktørflatene med uendret åtte HD-pikslers målemargin. Det dekker alle de 31 senere valgte rutene. Ingen av de åtte holdte rutene er aktive i disse 31 valgte bildene.
+
+Den endelige prøven logger alle 31. Alle 31 nativefiler og alle faktisk viste opake aktørpiksler er identiske med den første, kildefasekontrollerte kandidaten. Bare sju hele originalflater kan SHA-matches direkte i sluttkjøringen; 24 har en annen vannfarge-/tidsfase. Vi påstår derfor ikke 31 SHA-like hele originalflater i sluttkjøringen. Det egne kildefasebeviset, de uendrede nativefilene og den faktiske pikselkontrollen bevares hver for seg.
+
+De ni kjente bufferavvikene har samme antall, eksakte koordinater, begge RGB-verdier og rekkefølge i alle fire prøver. Sluttprøvens sekvens er én bilderute tidligere enn første grunnlag og to tidligere enn kontrollgrunnlaget. Ingen nye eller økte avvik; hele prøven er ikke avviksfri. Alle første stopp, kontrollplaner og logger er bevart. Ingen omprøver ut over den ene uendrede kontrollen, og ingen nye motorprøver etter den faktisk endrede kandidaten.
+
+## Videre arbeid
+
+Se NESTE.md. Det gamle nattløpet skal ikke gjenstartes. Grafikkautomatikken fortsetter. Bibliotekets figurark-fast-storrelse er brukt. Main får bare de fire etablerte dokumentasjonsfilene. Ingen ny grafikk eller spilldata går til main. Fellespakker oppdateres ved neste familiesamlepunkt eller reell produksjonsblokkering; siste faktiske pakker har 3535 og mangler de 31 nye valgte rutene.
+'''
+(R/'RAPPORT.md').write_text(report)
+(R/'NESTE.md').write_text('''# Gjenoppta her
+
+Fem fig124_01 til 05 er laget. Ikke lag dem på nytt. 31 mål er kontrollert og valgt for kandidat 3566; se mottak-publisert.json for faktisk publisering, ikke anta at kandidaten er publisert. Åtte mål 1797 til 1804 står i retur8.json og de to første arkenes retur.md. 502 av 1758 ark har resultat, 1256 uten resultat pluss returer. Ingen ny Tom-/Claude-godkjenning. Grafikkautomatikken er fortsatt aktiv.
+
+1. Gjenoppta kildefunksjonen for blågrå Sam-fragmenter i de åtte returene. De matcher objekt 258, men skal ikke males som nye løse stofflapper. Bevar de 27 ennå uklassifiserte grå pikslene til de er kildeavklart. Se faktiske retur-motorbilder, original, objektets HD-underlag og godkjente mastere før en hel grafikkretting. Ikke klipp etter hard originalmaske, lim inn originalfragmenter eller rekonstruer separate kroppsdeler. Nødvendig motor-/pipelineendring krever avgrenset testet PR.
+2. Fortsett uavhengige fig124_06 til 08, 31 mål, fra eksisterende kildeplan. Ark 06 har tre faser 1844 til 1846 uten faktisk primærkontekst. Avklar dem med en gyldig kildeprøve før maling; ingen tvunget omstart av lokal 217. Ta allerede kildeobserverte motiver først når det ikke dupliserer en retur. Les siste fremdrift, aktuelle kilder, kontekst og mastere på nytt før hvert motiv.
+3. Ved ferdig kontrollert 124-familie er det familiesamlepunkt for ny felles Linux-/Windows-release. Ved reell blokkering kan delvis kontrollert native pakkes tidligere. Siste faktiske pakker er sam-max-hd-2026-10-21-kjeglekant med 3535; native og pakker skal telles separat. Native må fryses under begge bygg og faktisk nedlasting/hash-/innholdskontroll. Ikke kall pakker oppdatert før det er bekreftet.
+
+Bevar alle tidligere moddfiler og tre stasher. 1412 beskyttede kilder er SHA-festet i denne rapporten. Andre agenters arbeid skal ikke flettes bort. Native publiseres additivt med fersk eksakt fjern-SHA og force-with-lease, og hentes tilbake med filhashkontroll. Ingen grafikk i main. Ingen API/CLI-bildefallback eller omprøve av tidligere verktøyavviste motiver og aliaser. Bevar tidligere bok-/164-/304-sperrer, ugyldige 344/346 og råvalg 28. Den lille statiske kjegletuppen, sporadisk SDL-start, naturlig gjennomspilling, interaktiv Windows og ny webtest er fortsatt åpne. Ikke gjenstart gamle nattprosesser eller gammel nattkontroll.
+''')
+line=('Fem fig124_01 til 05 er laget og egenkontrollert OK, 39 mål fra 24 hele egne malerier. '
+      '31 ruter fra 16 hele malerier er motorobservert og visuelt sett; åtte 1797 til 1804 er åpen retur '
+      'på grunn av skjøter over Sams jakke. Kandidat 3566 er kontrollert, publisering kvitteres separat. '
+      '502 av 1758 ark har resultat, 1256 uten resultat pluss returer. Fellespakker har fortsatt 3535. '
+      'Se rapporter/sam124-foerste-20261021/NESTE.md. Ingen ny Tom-/Claude-godkjenning.')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;s=p.read_text();i=s.find('\n');p.write_text(s[:i+1]+'\n'+line+'\n\nTidligere status nedenfor er historikk.\n'+s[i+1:])
+p=A/'rapporter/sam124-kilde-20261021/PRESISERING.md'
+with p.open('a') as f:
+    f.write('\n## Motorretur 22. oktober 2026\n\nKildens blågrå innhold i 1797 til 1804 er Sam, men den grafiske funksjonen er ennå ikke tilstrekkelig avklart. Hele nytegninger med avgrensede kleskanter lager synlige ekstra fliker over HD-objekt 258. Disse åtte holdes tilbake. Identitetskonklusjonen Sam står, mens bakgrunnsrestaurering må undersøkes som funksjon. Ingen gulvfortolkning gjeninnføres, ingen grå deler slettes blindt, og de 27 uklassifiserte pikslene beholdes. Se ../sam124-foerste-20261021/retur8.json.\n')
+shutil.copy2(__file__,R/'kvitter.py.txt')
+print('Kvittert: fire motoroversikter, 16 hele varianter og fire hele skjermbilder sett. 31 valgt, åtte åpne returer. Rapport og neste steg lagret.')

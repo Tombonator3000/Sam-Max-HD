@@ -1,0 +1,93 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,shutil,subprocess,tarfile
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt'
+O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+C=O/'mod-sam1243566';T=O/'publisering-hdmod3566';H=O/'hentet-hdmod3566'
+BACKUP=O/'mod-grunnlag3535'
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*args):return subprocess.check_output(['git',*args],cwd=w,text=True).strip()
+def api(s):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True))
+def remote(branch):
+    lines=git(P,'ls-remote','origin','refs/heads/'+branch).splitlines()
+    assert len(lines)==1
+    return lines[0].split()[0]
+def inventory(folder):return {p.relative_to(folder).as_posix():sha(p) for p in folder.rglob('*') if p.is_file() and '.git' not in p.relative_to(folder).parts}
+
+b=read(R/'grunnlag-produksjon.json');files=read(R/'kandidat31-filhash.json')
+s=read(R/'sluttkontroll.json');m=read(R/'motor31-sammenligning.json')
+v=read(R/'motor31-visuell-plan.json');selected=read(R/'valgt-native31.json')
+protected=read(R/'beskyttede-samlet1412.json')
+assert not any(p.exists() for p in [T,H,BACKUP,R/'publisering-forsokt.json'])
+assert git(A,'branch','--show-current')=='gpt-arbeid' and not git(A,'status','--porcelain')
+art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art
+assert remote('hd-mod')==b['hd_mod_sha']=='a8ca23c755fc79bed1f15c4c4f669303ca126930'
+assert len(b['filer'])==21779 and inventory(M)==b['filer']
+assert len(files)==21810 and inventory(C)==files
+assert len(protected)==1412 and all(sha(A/f)==h for f,h in protected.items())
+assert git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert s['visuelt_sett'] and s['motorobservert'] and s['valgte_native']==31 and s['aapne_returruter']==8
+assert m['visuelt_sett'] and m['kontroller']==720 and m['nullkontroller']==711
+assert m['alle31_native_SHA_identiske_med_foerste_kandidat'] and m['alle31_opake_faktiske_aktorpiksler_identiske']
+assert m['ni_kjente_avvik_eksakte_koordinater_og_begge_RGB_og_rekkefolge']
+assert m['ingen_nye_eller_okte_bufferavvik'] and not m['avviksfri_prove']
+assert v['visuelt_sett'] and v['hele_varianter_sett']==16 and v['hele_motorbilder_sett']==4
+assert all(e['visuelt_sett'] and sha(R/e['fil'])==e['sha256'] for g in ['varianter','hele_motorbilder'] for e in v[g])
+assert all(sha(A/e['resultat'])==e['sha256'] for e in s['leveranser'])
+assert len(selected['ruter'])==31 and len(selected['holdt_retur'])==8
+assert all(not (C/f'costumes/{n}_hd.png').exists() for n in selected['holdt_retur'])
+assert all(files[f]==h for f,h in b['filer'].items() if f!='mod.json')
+tag=api('releases/latest')['tag_name'];assert tag=='sam-max-hd-2026-10-21-kjeglekant'
+extra=read(A/'rapporter/felles-release-20261021-kjeglekant/ekstra-taggbygg.json')
+assert extra['status']=='completed' and extra['conclusion']=='success'
+builds={}
+for workflow in ['linux.yml','windows.yml']:
+    runs=api('actions/workflows/'+workflow+'/runs?per_page=30')['workflow_runs']
+    assert not any(e['status']!='completed' for e in runs),'Aktivt pakkebygg, behold nativefrys'
+    builds[workflow]=[dict(id=e['id'],status=e['status'],conclusion=e['conclusion']) for e in runs]
+save(R/'pakkebygg-for-publisering.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),aktive_bygg=[],siste_bygg=builds,siste_fellesrelease=tag,native_frosset=False))
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=b['hd_mod_sha'],native=3566,nye_native=31,holdt_retur=selected['holdt_retur'],force_with_lease=True))
+shutil.copytree(C,T)
+subprocess.run(['git','init','-q',str(T)],check=True)
+subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest=inventory(T);manifest.pop('SHA256SUMS')
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(manifest.items())))
+subprocess.run(['git','-C',str(T),'add','-A'],check=True)
+subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod 3566: 31 kontrollerte Lee-Harvey/Max-ruter, åtte returer holdt'],check=True)
+assert remote('hd-mod')==b['hd_mod_sha']
+subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+b['hd_mod_sha'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=git(T,'rev-parse','HEAD');assert remote('hd-mod')==published
+subprocess.run(['git','fetch','-q','--no-tags','--depth','1','origin','+refs/heads/hd-mod:refs/remotes/origin/hd-mod'],cwd=P,check=True)
+assert git(P,'rev-parse','refs/remotes/origin/hd-mod')==published
+archive=O/'hentet-hdmod3566.tar'
+with archive.open('wb') as f:subprocess.run(['git','archive','--format=tar',published],cwd=P,stdout=f,check=True)
+H.mkdir()
+with tarfile.open(archive) as tar:tar.extractall(H,filter='data')
+actual=inventory(H);expected=inventory(T)
+assert actual==expected and len(actual)==21810
+assert set(actual)==set(files) and {f for f,h in files.items() if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.endswith('.png') for f in b['filer'])==21773
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)==read(H/'mod.json')['costume_cels']==3566
+subprocess.run(['sha256sum','--quiet','-c','SHA256SUMS'],cwd=H,check=True)
+assert inventory(M)==b['filer'] and remote('hd-mod')==published
+shutil.move(str(M),BACKUP);shutil.copytree(H,M)
+assert inventory(M)==actual and inventory(BACKUP)==b['filer']
+assert all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+save(R/'publiserte-moddfiler-3566.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=3566,nye_native=31,holdt_retur=8,nye_resultatark=5,nye_helt_publiserte_ark=3,nye_delvis_publiserte_ark=2,figurark_med_resultat=502,gjenstar=1256,filantall=21810,png=21804,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_png_bevart=21773,beskyttede=1412,stasher=b['stash'],force_with_lease=True,gammel_mod_bevart=str(BACKUP),motorobservert=True,visuelt_sett=True,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3535,pakker_mangler_native=31,native_frosset=False,neste_samlepunkt='Kontrollert resten av 124-familien og returer, eller tidligere ved reell produksjonsblokkering.',begrensning=m['begrensning'])
+save(R/'mottak-publisert.json',receipt)
+allowed={e['bilde'] for e in selected['ruter']}
+for name in ['fremdrift.json','sluttkontroll.json']:
+    d=read(R/name);d.update(hd_mod=published,grafikkilde=art,native=3566,publisert_native_naa=3566,nye_native_publisert=31,hele_bunken_publisert=False,native_frosset=False)
+    for e in d['leveranser']:
+        p=R/('rutekart-'+e['jobb']+'.json');r=read(p);cells=r[e['jobb']]['ruter']
+        for cell in cells:cell.update(publisert=cell['bilde'] in allowed,hd_mod=published if cell['bilde'] in allowed else None)
+        count=sum(c['bilde'] in allowed for c in cells)
+        e.update(publisert=count==len(cells),ark_helt_publisert=count==len(cells),publiserte_ruter=count,hd_mod=published)
+        save(p,r)
+    save(R/name,d)
+print(json.dumps({k:receipt[k] for k in ['hd_mod','native','nye_native','holdt_retur','filantall','png','alle_filhash_bekreftet']},ensure_ascii=False),flush=True)

@@ -1,5 +1,9 @@
 # Grafikkliste
 
+Fem fig124_01 til 05 er laget og egenkontrollert OK, 39 mål fra 24 hele egne malerier. 31 ruter fra 16 hele malerier er motorobservert og visuelt sett; åtte 1797 til 1804 er åpen retur på grunn av skjøter over Sams jakke. Kandidat 3566 er kontrollert, publisering kvitteres separat. 502 av 1758 ark har resultat, 1256 uten resultat pluss returer. Fellespakker har fortsatt 3535. Se rapporter/sam124-foerste-20261021/NESTE.md. Ingen ny Tom-/Claude-godkjenning.
+
+Tidligere status nedenfor er historikk.
+
 [Felles Linux og Windows med 3535 native HD-bildelag](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-kjeglekant) er publisert, lastet ned på nytt og SHA-bekreftet. Den store hakkete dobbelkanten rundt Cone of Tragedy er rettet med originalobjekt 173s tegnedekning. Samtlige tidligere malerier, figur-PNG og filstier er bevart byteidentiske. En ny metadatafil, ingen nye malerier eller figurark. 497 av 1758 figurark har resultat; 1261 gjenstår pluss returer og sluttkontroll.
 
 Begge faktiske pakker har alle 21778 runtime-moddfiler, inkludert den nye metadatafilen. Native a8ca23c755fc79bed1f15c4c4f669303ca126930, pakkekode 299c64c61badd8bf2555cef177c8d103d1f3cb04. Alle 21779 moddfilhash, 1412 beskyttede jobbfiler, tre stasher og 39 tidligere releaser med vedlegg er bekreftet. Den faktiske nye Linux-binæren er kjørt i primærskript 201 og hel animasjon 6. Alle 64 kjegleruter er logget i begge. 128 hele originalflater og 128 hele HD-pakkebilder er identiske med den kontrollerte produksjonen. 1436 av 1440 nullkontroller; identiske kjente 416/160-avvik ved 24/25, inkludert koordinater og begge RGB-verdier. Tre hele faktiske pakkebilder er sett. Hele prøven er ikke avviksfri. Ingen ny naturlig gjennomspilling, interaktiv Windows eller webtest, Tom-/Claude-godkjenning eller visuell sluttgodkjenning.

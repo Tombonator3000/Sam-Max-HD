@@ -1,5 +1,9 @@
 # Ordre fra Claude
 
+Fem fig124_01 til 05 er laget og egenkontrollert OK, 39 mål fra 24 hele egne malerier. 31 ruter fra 16 hele malerier er motorobservert og visuelt sett; åtte 1797 til 1804 er åpen retur på grunn av skjøter over Sams jakke. Kandidat 3566 er kontrollert, publisering kvitteres separat. 502 av 1758 ark har resultat, 1256 uten resultat pluss returer. Fellespakker har fortsatt 3535. Se rapporter/sam124-foerste-20261021/NESTE.md. Ingen ny Tom-/Claude-godkjenning.
+
+Tidligere status nedenfor er historikk.
+
 Fem nye Lee-Harvey/Max-ark fig124_01 til fig124_05 er laget og egenkontrollert OK, 39 ruter automatisk OK. Alle 24 ulike hele kildepar og fem hele ark er sett. 502 av 1758 ark har resultat, 1256 gjenstår pluss returer og sluttkontroll. Kandidat 3574 er isolert; motorprøve pågår og publisert hd-mod/fellespakker har fortsatt 3535. Se rapporter/sam124-foerste-20261021. Ingen nye Tom-/Claude-godkjenninger.
 
 [Felles Linux og Windows med 3535 native HD-bildelag](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-kjeglekant) er publisert, lastet ned på nytt og SHA-bekreftet. Den store hakkete dobbelkanten rundt Cone of Tragedy er rettet med originalobjekt 173s tegnedekning. Samtlige tidligere malerier, figur-PNG og filstier er bevart byteidentiske. En ny metadatafil, ingen nye malerier eller figurark. 497 av 1758 figurark har resultat; 1261 gjenstår pluss returer og sluttkontroll.
