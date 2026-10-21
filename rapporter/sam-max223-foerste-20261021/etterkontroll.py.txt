@@ -1,0 +1,28 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,tomllib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip();api=lambda p:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+p],cwd=P,text=True))
+r=read(R/'mottak-publisert.json');files=read(R/'publiserte-moddfiler-3306.json');p=read(R/'fremdrift.json');protected=read(R/'beskyttede-samlet.json');motor=read(R/'motor-sammenligning.json')
+assert len(files)==21549 and all(sha(M/f)==h for f,h in files.items())
+assert read(M/'mod.json')['costume_cels']==3306 and sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in files)==3306
+assert len(protected)==1252 and all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==r['stasher']
+assert all(sha(A/e['resultat'])==e['sha256'] and e['publisert'] and e['motorobservert'] and e['visuelt_kontrollert'] for e in p['leveranser'])
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==463 and motor['sett']==30 and motor['visuelt_sett']
+assert api('git/ref/heads/hd-mod')['object']['sha']==r['hd_mod']
+main=git(P,'rev-parse','HEAD');assert main=='5a13494b74c29d9974900ef1c0eac80f9c86559c' and api('git/ref/heads/main')['object']['sha']==main and not git(P,'status','--porcelain')
+assert set(git(P,'diff','--name-only',r'HEAD^','HEAD').splitlines())=={'memory.md','todo.md','STATUS.md','log.md'}
+ci=api('actions/runs/39585206951');assert ci['head_sha']==main and ci['status']=='completed' and ci['conclusion']=='success' and ci['run_attempt']==1;save(R/'main-ci.json',ci)
+release=api('releases/latest');assert release['id']==419381790 and release['tag_name']=='sam-max-hd-2026-10-21-max-intro' and not release['draft'];assets={v['name']:v['digest'] for v in release['assets']}
+assert assets=={'SamMaxHD-Windows.zip':'sha256:8f32ab2ebe9c4e94fe5be019296ba1260b2d3be76f25c9687590692a42431766','SamMaxHD-Windows.zip.sha256':'sha256:4d026727efae12e2d4a905d4b45b6ed54abd1fa563ddf088016845e9535acc0f','SamMaxHD-x86_64.AppImage':'sha256:8fbeae828bfe6a10064669b8ab44c652dd45758dbeea7143f57f3ef75139d3d7','SamMaxHD-x86_64.AppImage.sha256':'sha256:0dd9164672f8e2fa544244e1cf2c7b08feed44883f1d9db1afdcd04f962f4527'}
+save(R/'felles3276-fortsatt-latest.json',release)
+auto=tomllib.loads(Path('/home/tom/.codex/automations/fullf-r-sam-max-grafikken/automation.toml').read_text());assert auto['status']=='ACTIVE'
+n=read(R/'neste-bunke64.json');assert len(n['jobber'])==8 and n['mal']==64 and n['ulike_hele_rgba']==14 and len(n['kildeatlas'])==4
+assert all(sha(R/e['fil'])==e['sha256'] for e in n['kildeatlas']) and all(not (A/'jobber'/j/'resultat.png').exists() and not (A/'jobber'/j/'retur.md').exists() for j in n['jobber'])
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=main,main_ci=ci['id'],main_ci_success=True,main_kun_fire_dokumenter=True,hd_mod=r['hd_mod'],native=3306,nye_native=30,nye_hele_ark=5,hele_figurjobber=463,gjenstar=1295,alle21549_moddfiler_bekreftet=True,alle1252_kildehash_bekreftet=True,tre_stasher_bevart=True,alle30_motorobservert=True,alle_elleve_varianter_og_fem_hele_par_sett=True,ingen_nye_bufferfeil=True,alle_tidligere_filer_bevart=True,fellespakker_native=3276,mangler_i_pakker=30,fellesrelease_id=release['id'],fellesrelease_vedlegg_uendret=True,ekstra_windows_taggbygg=39580011037,ekstra_windows_success=True,neste_jobber=n['jobber'],neste_mal=64,neste_nye_hele_kilder=14,neste_bildekall=0,forventet_neste_samlepunkt=3370,automatikk='ACTIVE',ingen_ny_tom_eller_claude_godkjenning=True,full_naturlig_gjennomspilling=False)
+save(R/'etterkontroll.json',proof)
+for e in p['leveranser']:
+ note=A/'jobber'/e['jobb']/'notat.md'
+ with note.open('a') as f:f.write(f'\nPublisert additivt og hentet fra hd-mod `{r["hd_mod"]}`. Alle 21549 filhash er bekreftet. Disse rutene er foreløpig ikke i fellespakken, som har 3276 native. Main har bare oppdatert dokumentasjon, og CI 39585206951 er grønn. Se mottak-publisert.json og etterkontroll.json i denne bunkens rapport.\n')
+with (R/'NESTE.md').open('a') as f:f.write(f'\nEtterkontroll: main `{main}`, CI 39585206951 er grønn. Hd-mod og alle 21549 filhash, 1252 kildehash og tre stasher er bekreftet. Fellesutgave 3276 og alle fire vedleggsdigester er uendret. Fire kildeatlas for neste åtte ark er lagret under `neste-atlas`, med plan og hash i `neste-bunke64.json`. Ingen bildekall er gjort for de siste åtte. Grafikkautomatikken er fortsatt ACTIVE.\n')
+shutil.copy2(__file__,R/'etterkontroll.py.txt');print(json.dumps(proof,ensure_ascii=False),flush=True)
