@@ -1,0 +1,42 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam3033125';T=O/'publisering-hdmod3125'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');git=lambda w,*args:subprocess.check_output(['git',*args],cwd=w,text=True).strip()
+remote=lambda b:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/ref/heads/'+b],cwd=P,text=True))['object']['sha']
+base=read(R/'grunnlag-produksjon.json');files=read(R/'kandidatfilhash.json');proof=read(R/'sluttkontroll.json');motor=read(R/'motor-sammenligning.json')
+assert not T.exists() and not (R/'publisering-forsokt.json').exists()
+assert not git(A,'status','--porcelain');art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art
+assert remote('hd-mod')==base['fjern_sha'];assert all(sha(M/f)==h for f,h in base['filer'].items());assert all(sha(C/f)==h for f,h in files.items())
+assert proof['visuelt_sett'] and proof['motorobservert'] and motor['kontroller_identiske'] and motor['nullkontroller']==448 and motor['sett']==15
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=base['fjern_sha'],forventet_native=3125,force_with_lease=True))
+shutil.copytree(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts and p.name!='SHA256SUMS'}
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(manifest.items())))
+assert all(manifest[f]==h for f,h in base['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+subprocess.run(['git','-C',str(T),'add','-A'],check=True);subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod 3125: Sam alene med løs hyssing, 15 kontrollerte ruter'],check=True)
+assert remote('hd-mod')==base['fjern_sha']
+subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+base['fjern_sha'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=remote('hd-mod');assert published==git(T,'rev-parse','HEAD')
+subprocess.run(['bash','tools/mod_gren.sh','hent',str(M)],cwd=P,check=True)
+actual={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual)==set(files) and len(actual)==21368
+assert {f for f,h in files.items() if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in base['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)==3125
+assert read(M/'mod.json')['costume_cels']==3125
+assert git(P,'stash','list','--format=%H').splitlines()==base['stash']
+protected=read(R/'beskyttede-samlet.json');assert len(protected)==1116 and all(sha(A/f)==h for f,h in protected.items());assert remote('hd-mod')==published
+save(R/'publiserte-moddfiler-3125.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=3125,nye_native=15,nye_hele_ark=5,hele_figurjobber=437,filantall=21368,png=21362,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_png_bevart=21347,beskyttede=1116,stasher=base['stash'],force_with_lease=True,egen_alfa_ingen_originalfragmenter=True,visuelt_sett=True,motorobservert=True,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3098,pakker_mangler_native=27)
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+ d=read(R/name);d.update(publisert=True,hd_mod=published,grafikkilde=art)
+ for e in d.get('leveranser',[]):e.update(publisert=True,hd_mod=published)
+ save(R/name,d)
+line=f'Sam303_01..05 publisert og hentet i {published},3125 native,437 av1758 resultatark,1321 gjenstår. Alle15 nye automatisk OK,ni egne varianter sett i faktisk Linux;450kontroller448null,samme4ved36/160ved414. Ingen nye/økte avvik,fire par0 utenfor aktørflater. Alle21368 filhash/21347 tidligere PNG/1116 kildehash/tre stasher bekreftet. Fellespakker3098 mangler27 og pakkefrys starter nå. 304 K02 verktøyavvist,ingen omprøve,K01 bare utkast. Neste fellespakker,deretter303_06..kildeklargjøring. Ingen ny Tom-/Claude-godkjenning. Se rapporter/{R.name}/NESTE.md.'
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ f=A/name;s=f.read_text();i=s.find('\n');f.write_text(s[:i+1]+'\n'+line+'\n'+s[i+1:])
+with (R/'NESTE.md').open('a') as f:f.write(f'\nPublisert og hentet {published}. Grafikkilde {art}. Alle21368filer SHA-verifisert. Nativefrys til felles3125-pakker er kontrollert. Ikke gjenta produksjon av første fem303 eller første fem304.\n')
+with (R/'RAPPORT.md').open('a') as f:f.write(f'\nPublisert og hentet `{published}`,3125native. Alle21368filer SHA-bekreftet,21347 tidligere PNG bevart. Grafikkilde `{art}`. Pakker har3098 og mangler27. Nativefrys for fellespakker starter nå.\n')
+shutil.copy2(__file__,R/'publiser.py.txt');print(json.dumps(receipt,ensure_ascii=False),flush=True)

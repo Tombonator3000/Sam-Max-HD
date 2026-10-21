@@ -1,0 +1,45 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import hashlib,json,numpy as np,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam3033125'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base=read(R/'grunnlag-produksjon.json');assert base['native']==3110 and len(base['filer'])==21353
+assert all(sha(M/f)==h for f,h in base['filer'].items())
+protected=read(R/'beskyttede-samlet.json');assert len(protected)==1116 and all(sha(A/f)==h for f,h in protected.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+plan=read(R/'ruteplan-unik.json');selected={e['bilde']:e for e in read(R/'prototyper-endelig.json')};assert len(selected)==9 and all(e['native_ok'] and e['visuelt_sett'] for e in selected.values())
+target={t['bilde']:(e,t) for e in plan['ruter'] for t in e['malruter']};assert len(target)==15;jobs=plan['jobber'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==432;assert not C.exists();deliveries=[];native=[]
+for job in jobs:
+ J=A/'jobber'/job;j=read(J/'jobb.json');assert not (J/'resultat.png').exists();sheet=Image.new('RGBA',tuple(j['lerret']));mapping=[]
+ for t in j['ruter']:
+  canonical,_=target[t['bilde']];e=selected[canonical['bilde']];f=A/e['prototype'];assert sha(f)==e['prototype_sha256'];own=Image.open(f).convert('RGBA');src=Image.open(P/'work/extract/costumes'/(t['bilde']+'.png')).convert('RGBA');assert src.size==tuple(canonical['maal']) and hashlib.sha256(src.tobytes()).hexdigest()==canonical['rgba_sha256'];assert own.size==(src.width*4+16,src.height*4+16)
+  a=np.array(own);core=a[:,:,3]>=CORE;iou,cov=_iou(core,np.repeat(np.repeat(np.array(src)[:,:,3]>0,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER
+  x,y,_,_=t['rekt'];dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;assert dx>=0 and dy>=0 and dx+own.width<=sheet.width and dy+own.height<=sheet.height;assert not np.array(sheet.crop((dx,dy,dx+own.width,dy+own.height)))[:,:,3].any();sheet.alpha_composite(own,(dx,dy));yy,xx=np.nonzero(core)
+  mapping.append(dict(bilde=t['bilde'],kostyme=303,rute=t['rute'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical=canonical['bilde'],canonical_rgba_sha256=canonical['rgba_sha256'],prototype=e['prototype'],prototype_sha256=sha(f),kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,native_ok=True,eksakt_helt_alias=canonical['bilde'] if canonical['bilde']!=t['bilde'] else None))
+  native.append(dict(bilde=t['bilde'],canonical=canonical['bilde'],fil=f'costumes/{t["bilde"]}_hd.png',prototype=e['prototype'],sha256=sha(f),snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragmenter=False))
+ sheet.save(J/'resultat.png');digest=sha(J/'resultat.png');save(R/f'rutekart-{job}.json',{job:dict(sha256_resultat=digest,ruter=mapping)})
+ test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True);(R/f'{job}-egenkontroll.txt').write_text(test.stdout+test.stderr);assert test.returncode in [0,1,2]
+ deliveries.append(dict(jobb=job,resultat=f'jobber/{job}/resultat.png',sha256=digest,ruter=len(mapping),rutekart=f'rapporter/{R.name}/rutekart-{job}.json',laget=True,levert=True,egenkontroll=['OK','SJEKK','FEIL'][test.returncode],egenkontrollert=test.returncode!=2,visuelt_kontrollert=True,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False));print(job,'egenkontroll',test.returncode,flush=True)
+ (J/'notat.md').write_text(f'''# {job}, 21. oktober 2026
+
+Sam alene tar opp løs beige hyssing og snakker i Dinosaurparken, rom 59. Kostyme 303, palett 0, lokal primærskript 208, animasjon 6. Kildemotiv, ni ulike hele RGBA-varianter, alle 15 originale mål i faktisk Linux, fem originalark og godkjent Sam-hovedark er sett før produksjon. Ingen Max er del av disse spritekildene. Dette er uavhengig av den verktøyavviste 304-sekvensen, som ikke gjenskapes eller omprøves her.
+
+Fem faktiske innebygde image_gen-kall med råbilder, faktiske argumenter, prompter og referansehash er bevart i rapporter/{R.name}. Originalpromptene er brukt ordrett, med et separat tillegg for det utvalgte atlaset og den kildebekreftede løse hyssingen. Modellnavn ble ikke oppgitt. Ingen CLI/API-fallback. De fire beskyttede jobbfilene er urørt. Seks eksakte hele aliasmål bruker samme hele egne maleri, bekreftet ved dimensjon og hele kildens RGBA-SHA.
+
+Python-rensing og plassering følger Toms tillatelse. Egen svak glød og neonfarger er fjernet etter avstand til egen CORE128-kjerne; kanten bruker nærmeste egne ugjennomsiktige maling. To rektangulære områder av egen maling tilpasses kildeboks og anker: øvre lange hyssing og hele nedre Sam med løs kveil. Øvre hyssing har flat egen beige maling med bevart egen alfa. Originalsilhuetten klipper aldri utdata. En tidligere helt egen generert blå prikk er SHA-sporet og plassert ved kildebekreftet anker; ingen originalfragmenter. Hender, lukket/åpen munn, hatt og hyssinggrep er sammenlignet med originalen. CORE128, IoU0,6 og dekning0,8 er uendret. Native har to originalpikslers marg på alle sider.
+
+Resultatet er 1536 x 1024 RGBA med ekte alfa. SHA256 {digest}. Egenkontroll {deliveries[-1]['egenkontroll']}. SHA-festet rutekart og fremdrift ligger i rapporten. Native mottak, faktisk motoravspilling, publisering og pakker kvitteres separat. Ingen ny Tom-/Claude-godkjenning. Bibliotekkilder: figurark-fast-storrelse og publisert-mod-er-fasit. 1116 kildefiler, alle tidligere publiserte grafikkfiler og tre stasher bevares.
+''')
+save(R/'fremdrift.json',dict(leveranser=deliveries,nye_jobber_levert=5,nye_native_planlagt=15,ulike_hele_egne_malerier=9,innebygde_bildekall=5,grunnlag_native=3110,hele_figurjobber_med_resultat=437,total_figurjobber=1758,gjenstar=1321))
+assert all(e['egenkontrollert'] for e in deliveries),'Rett FEIL før native mottak'
+auto=O/'automatisk-mottak';subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(auto),'--jobb',','.join(jobs),'--forhandsvisning',''],cwd=P,check=True);report=read(auto/'myke.json');assert report['ruter_ok']==15 and all(report[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk']);save(R/'automatisk-mottak15.json',report)
+shutil.copytree(M,C)
+for e in native:
+ dest=C/e['fil'];assert not dest.exists();shutil.copy2(A/e['prototype'],dest);assert sha(dest)==e['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3110;meta['costume_cels']=3125;save(C/'mod.json',meta)
+files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};assert len(files)==21368 and {f for f,h in base['filer'].items() if files[f]!=h}=={'mod.json'};assert set(files)-set(base['filer'])=={e['fil'] for e in native};assert len([f for f in files if f.endswith('.png')])==21362;assert all(sha(A/f)==h for f,h in protected.items());save(R/'kandidatfilhash.json',files)
+save(R/'egen-native.json',dict(ruter=native,nye_native=15,native_totalt=3125,fast_4x=True,marg_original=[2,2],egen_alfa=True,originalmaske=False,originalfragmenter=False,automatisk15_OK=True,kontrollkopier_ikke_brukt_i_native=True,tidligere_filer_bevart=21353,tidligere_png_bevart=21347,filer=21368,png=21362))
+for e in deliveries:e['native_mottatt']=True
+save(R/'fremdrift.json',dict(leveranser=deliveries,nye_jobber_levert=5,nye_native=15,native_totalt=3125,ulike_hele_egne_malerier=9,innebygde_bildekall=5,grunnlag_native=3110,hele_figurjobber_med_resultat=437,total_figurjobber=1758,gjenstar=1321));shutil.copy2(__file__,R/'lever.py.txt');print('Fem hele ark, 15 automatisk OK, kandidat3125. Motor og publisering gjenstår.',flush=True)

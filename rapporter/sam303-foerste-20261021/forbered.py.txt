@@ -1,0 +1,40 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+jobs=[f'fig303_{i:02}' for i in range(1,6)];protected=read(R/'beskyttede-samlet.json');unique={}
+for job in jobs:
+ J=A/'jobber'/job;j=read(J/'jobb.json')
+ for n in ['jobb.json','original_1x.png','prompt.txt','referanse.png']:protected[(J/n).relative_to(A).as_posix()]=sha(J/n)
+ for t in j['ruter']:
+  f=P/'work/extract/costumes'/(t['bilde']+'.png');im=Image.open(f).convert('RGBA');h=hashlib.sha256(im.tobytes()).hexdigest();key=(im.size,h)
+  if key not in unique:unique[key]=dict(bilde=t['bilde'],rgba_sha256=h,kilde_sha256=sha(f),maal=list(im.size),malruter=[])
+  unique[key]['malruter'].append(dict(jobb=job,**t))
+entries=list(unique.values());plan=dict(jobber=jobs,ruter=entries,maal=15,ulike_hele=len(entries));save(R/'ruteplan-unik.json',plan)
+assert len(protected)==1116 and all(sha(A/f)==h for f,h in protected.items());save(R/'beskyttede-samlet.json',protected)
+# Only the independent Sam-only source poses are selected here.
+lookup={e['bilde']:e for e in entries};names=list(lookup);groups=[names[i:i+2] for i in range(0,len(names),2)]
+descs={1920:'Standing in three-quarter view facing LEFT as in the source, closed relaxed mouth. Both hands are down beside his coat. Narrow thin twine rises at left from the loose coil.',1921:'Bending forward toward the loose coil, hat lowered with his head, near hand reaching DOWN with visible fingers, far hand open behind his back at right. Preserve the head tilt and dangling striped tie.',1922:'Bending even lower with the near hand touching the twine at ground level. Far hand opens behind the back. Preserve the low muzzle, knees and feet.',1923:'Bent forward, beginning to lift the loose string. Trace the original hand contact point and raised coat folds.',1924:'Back upright with thin loose string descending from the near hand to the ground coil. Closed mouth, both hands down.',1925:'Standing and speaking with an OPEN narrow white-toothed mouth. Hands down and thin string descending to the loose coil.',1929:'Standing speaking, reproduce this exact lip/teeth opening. Hands down, no invented gesture.',1931:'Standing speaking while the near hand is raised across his belly and the far hand stays down holding loose twine. Preserve the exact pointing/hand silhouette.',1932:'Standing speaking with near hand across belly, thin twine visible beneath the other hand. Preserve this precise mouth shape.',1933:'Standing speaking with near hand across belly and the source distinct mouth shape.',1934:'Standing speaking with near hand across belly and the source distinct mouth shape.'}
+for i,group in enumerate(groups,1):
+ C=R/'kall'/f'K{i:02}';C.mkdir(parents=True,exist_ok=True);size=(1536,1024) if len(group)==2 else (1024,1024);cw=size[0]//len(group);ref=Image.new('RGBA',size,'#7a7f88');recs=[]
+ for k,name in enumerate(group):
+  e=lookup[name];im=Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA');q=im.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);pos=[k*cw+(cw-q.width)//2,(size[1]-q.height)//2];ref.alpha_composite(q,tuple(pos));recs.append(dict(bilde=name,canonical_rgba_sha256=e['rgba_sha256'],celle=[k*cw,0,cw,size[1]],reference_pos=pos,maal=list(q.size),motif=descs[int(name.split('_')[1])]))
+ ref.convert('RGB').save(C/'reference-atlas.png')
+ prompts=[]
+ for j in dict.fromkeys(lookup[n]['malruter'][0]['jobb'] for n in group):prompts.append((A/'jobber'/j/'prompt.txt').read_text())
+ prompt='\n\n'.join(prompts)+f'''\n\nSELECTED-ATLAS PRODUCTION SPEC, which replaces only the original full-sheet count/layout: Image 1 is a newly arranged source atlas of exactly {len(group)} complete poses, not the complete original job sheet. Output exactly {size[0]}x{size[1]} with real alpha, no backdrop. Each full source drawing belongs in its {cw}x1024 cell at the source anchors. Image 2 is the APPROVED SAM design/line style. Draw Sam alone, with only the loose beige twine prop shown in image 1. He picks up a loose coil and talks. All geometry, mouth shape and hand contact come from image 1. Preserve the extra-long VERY THIN beige vertical twine with tiny Y-shaped tip, ground coil, trailing loose string curves and tiny isolated blue source mark. The twine is ordinary matte beige string: no glowing objects, halo, lighting effects or aura. Keep empty areas transparent. The reference pixels describe shapes; output must be freshly drawn smooth HD curves and clean anti-aliased cartoon edges, no replicated pixel stairs. Match original local colors and modest flat shading. Do not enlarge Sam to fill the full sprite box: much of that box is empty space beside the long string. No labels, floor, backdrop, texture or extra accessories. The protected original prompts and references are unchanged.\n'''
+ prompt+='\n'.join(f"Cell {k+1}: full source drawing starts {e['reference_pos']} with size {e['maal']}. {e['motif']}" for k,e in enumerate(recs))
+ (C/'prompt-faktisk.txt').write_text(prompt);save(C/'argumenter-planlagt.json',dict(prompt=prompt,referenced_image_paths=[str(C/'reference-atlas.png'),str(A/'hovedark/sam.png')],transparent_background=True));save(C/'plan.json',dict(ruter=recs,oprindelig_prompt_bevaret=True,kun_udvalgt_layout_tillaeg=True))
+T=P/'out/sam304-foerste-20261021/motor-kandidat3110';log=(T/'scummvm.log').read_text();obs={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*303\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());shot=(f//2+1)*2;p=T/f'frame_{shot:06}_room059.png'
+ if p.exists():obs.setdefault(f'costume303_{n}',dict(logg_frame=f,bildeframe=shot,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p)))
+want={t['bilde'] for e in entries for t in e['malruter']};assert not want-set(obs)
+save(R/'kilde-motorobservasjoner.json',dict(rom=59,kostyme=303,primaer_skript=208,primaer_animasjon=6,binar_sha256='9e006a38078496f92399b8fe7dd99a4c057761f75c6d613eb4125a64cb62988e',alle15maal_logget=True,tegninger={n:obs[n] for n in sorted(want)},visuelt_sett=False,originalark_sett=jobs,sam_hovedark_sett=True))
+board=Image.new('RGB',(1440,(((len(entries)+1)//2))*470),'#344354');d=ImageDraw.Draw(board)
+for i,e in enumerate(entries):
+ ob=obs[e['bilde']];im=Image.open(ob['fil']).convert('RGB');im.thumbnail((710,440));x=(i%2)*720;y=(i//2)*470;board.paste(im,(x,y+25));d.text((x+8,y+5),f"{e['bilde']} source frame{ob['bildeframe']}",fill='white')
+board.save(R/'kilde-alle-varianter.png')
+(R/'KILDEGRUNNLAG.md').write_text('Sam alene plukker opp løs hyssing og snakker i Dinosaurparken, rom 59. Kostyme 303 er en selvstendig fase før kostyme 304. Spillets lokale primærskript 208 og faktisk Linux-kildeavspilling bekrefter rekvisitten. Ingen Max er del av disse spritekildene. Fem originalark og godkjent Sam-hovedark er sett. Lang vertikal hyssing med Y-tupp, løs kveil, tynne løse kurver og en blå kildeprikk må bevares. Hele RGBA-identiske aliaser kan bruke samme egen maling; ingen originalfragmenter skal brukes. Motivene er uavhengige av verktøyavvisningen i 304 og brukes ikke til å konstruere den blokkerte sekvensen.\n')
+shutil.copy2(__file__,R/'forbered.py.txt');print(len(entries),'ulike hele,',len(groups),'kall,15 mål,1116 kilder. Kildenes motorbilder må ses.')

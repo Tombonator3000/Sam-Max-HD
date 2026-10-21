@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,numpy as np,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam3033125';old=R/'foer-blaaprikk';assert not old.exists();old.mkdir()
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+for f in ['prototyper-endelig.json','fremdrift.json','egen-native.json','kandidatfilhash.json','motor-grunnlag3110.json','motor-kandidat3125.json','motor-sammenligning.json']:shutil.copy2(R/f,old/f)
+variants=read(R/'prototyper-endelig.json');dot=Image.open(R/'egen-blaaprikken.png').convert('RGBA');assert dot.size==(4,4)
+for e in variants:
+ f=A/e['prototype'];shutil.copy2(f,old/f.name);im=Image.open(f).convert('RGBA');src=np.array(Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA'));y,x=np.nonzero((src[:,:,:3]==[115,167,223]).all(2)&(src[:,:,3]>0));assert len(x)==1;dx,dy=int(x[0])*4+8,int(y[0])*4+8;im.paste((0,0,0,0),(dx,dy,dx+4,dy+4));im.alpha_composite(dot,(dx,dy));im.save(f);e.update(prototype_sha256=sha(f),blaaprikk_gjeninnsatt_etter_flatfarge=True,egen_oevre_flatfarge_unntar_egen_blaaprikk=True)
+save(R/'prototyper-endelig.json',variants);selected={e['bilde']:e for e in variants};plan=read(R/'ruteplan-unik.json');target={t['bilde']:e for e in plan['ruter'] for t in e['malruter']};progress=read(R/'fremdrift.json');native=read(R/'egen-native.json')
+for e in native['ruter']:
+ e['sha256']=sha(A/e['prototype']);shutil.copy2(A/e['prototype'],C/e['fil'])
+save(R/'egen-native.json',native)
+for e in progress['leveranser']:
+ J=A/'jobber'/e['jobb'];shutil.copy2(J/'resultat.png',old/(e['jobb']+'-resultat.png'));j=read(J/'jobb.json');sheet=Image.new('RGBA',tuple(j['lerret']));maps=read(R/f'rutekart-{e["jobb"]}.json');m=maps[e['jobb']]
+ for t in j['ruter']:
+  v=selected[target[t['bilde']]['bilde']];x,y,_,_=t['rekt'];sheet.alpha_composite(Image.open(A/v['prototype']).convert('RGBA'),((j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8))
+  q=next(q for q in m['ruter'] if q['bilde']==t['bilde']);q['prototype_sha256']=v['prototype_sha256']
+ sheet.save(J/'resultat.png');e['sha256']=sha(J/'resultat.png');m['sha256_resultat']=e['sha256'];save(R/f'rutekart-{e["jobb"]}.json',maps);e['motorobservert']=False
+ test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True);assert test.returncode in [0,1];(R/f'{e["jobb"]}-egenkontroll.txt').write_text(test.stdout+test.stderr)
+ with (J/'notat.md').open('a') as f:f.write('\nVisuell kontroll fant at flatfarging av øvre hyssing også hadde farget den egne blåprikken beige. Den egne SHA-sporede blåprikken er gjeninnsatt på kildeankeret før siste motoropptak. Originalfragmenter er ikke brukt. Før-versjonen, resultater, SHA-festet metadata og motorprøve er bevart separat.\n')
+save(R/'fremdrift.json',progress);files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};save(R/'kandidatfilhash.json',files)
+subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(O/'automatisk-mottak-endelig'),'--jobb',','.join(plan['jobber']),'--forhandsvisning',''],cwd=P,check=True);auto=read(O/'automatisk-mottak-endelig/myke.json');assert auto['ruter_ok']==15 and auto['ruter_sjekk']==auto['ruter_mangler']==auto['ruter_teknisk']==0;save(R/'automatisk-mottak15.json',auto);shutil.copy2(__file__,R/'rett-blaaprikk.py.txt');print('Egen blåprikk rettet,15 native/alle SHA og mottak oppdatert. Siste motoropptak gjenstår.')

@@ -1,0 +1,8 @@
+# Kjørt med repoets .venv før lever.py. Målingen brukte egen øvre maling.
+from PIL import Image
+import numpy as np
+# For hver valgt egen prototype: y = kropp_start_kilde * 4 + 8
+# col = median(egen RGBA[:y, :, :3] der egen alfa >= 245)
+# RGB i øvre område med egen alfa > 0 fikk col; egen alfa uendret.
+# Første versjon farget også egen blåprikk beige. rett-blaaprikk.py.txt
+# gjeninnsetter egen SHA-sporet blåprikk før endelig mottak og motorprøve.

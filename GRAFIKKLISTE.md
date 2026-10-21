@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Sam alene med løs hyssing: fem hele ark fig303_01..05,15 nye native i kontrollert kandidat3125. 437 av1758 resultatark,1321 gjenstår pluss returer/katalogfeil/sluttkontroll. Alle15 automatisk OK;ni ulike egne tegninger sett samlet i faktisk Linux. To ark OK,tre SJEKK med seks omrissvarsler. Begge 450-kjøringer gir448 null,samme4 ved36 og160 ved414. Ingen nye/økte avvik;fire par0 utenfor aktørflater. 1116 kilder/tre stasher og alle tidligere PNG bevart. Publisering/hent gjenstår. Fellespakker3098 mangler27 og følger nå. 304 K02 verktøyavvist,ingen omprøve,K01 bare utkast. Ingen ny Tom-/Claude-godkjenning. Se rapporter/sam303-foerste-20261021/NESTE.md.
+
 Sam og Max med hyssingen er publisert og hentet: hd-mod 7a3fbcd2ef1a1dd24ae5ef11504cf03980e9b0ed, 3110 native, 432 av 1758 hele figurjobber. Fem nye ark fig304_01..05 gir 12 nye native. Alle 12 automatisk OK og motorlogget; ti egne varianter sett samlet i Linux. 450 bufferkontroller, 448 null, samme 4 ved 36 og 160 ved 414 i begge sammenlignbare kjøringer. Ingen nye eller økte avvik. Fire før/etter-par har null endringer utenfor loggede aktørflater. Alle 21353 filhash, tidligere 21335 PNG, 1096 beskyttede kilder og tre stasher er bekreftet. Fellespakker har 3098 og mangler 12; neste pakkesamlepunkt etter resten av familien 304. Neste bunke fig304_06..10. Ingen ny Tom-/Claude-godkjenning. Se rapporter/sam304-foerste-20261021/NESTE.md.
 
 Sam og Max med hyssingen: fig304_01..05 er levert og egenkontrollert, 12 nye native i kandidat 3110, 432 av 1758 hele figurjobber med resultat. Alle 12 automatisk OK. Ti egne varianter sett mot original og samlet i faktisk Linux via primærskript 208. Begge 450-kjøringer gir 448 null, samme 4 ved 36 og 160 ved 414, ingen nye eller økte avvik. Fire før/etter-par har 0 endringer utenfor loggede aktørflater. Ark 01 har tre visuelt vurderte SJEKK-varsler. 1096 beskyttede kilder, alle 21335 tidligere PNG og tre stasher bevart. Ni innebygde kall, fire returer. Publisering/hent gjenstår; fellespakker har 3098 og mangler 12. Neste 304_06..10, samlepunkt for pakker etter hele familien 304. Ingen ny Tom-/Claude-godkjenning. Se rapporter/sam304-foerste-20261021/NESTE.md.
@@ -577,16 +579,16 @@ Figurark for Sam.
 - [ ] `fig304_13` (figurark 13 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_14` (figurark 14 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig304_15` (figurark 15 for Sam (kostyme 304), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_01` (figurark 1 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_02` (figurark 2 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_03` (figurark 3 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_01` (figurark 1 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_02` (figurark 2 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_03` (figurark 3 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 30
 
 Figurark for Sam.
 
-- [ ] `fig303_04` (figurark 4 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_05` (figurark 5 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_04` (figurark 4 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_05` (figurark 5 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_06` (figurark 6 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_07` (figurark 7 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig303_08` (figurark 8 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
