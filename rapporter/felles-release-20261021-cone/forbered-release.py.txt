@@ -1,0 +1,48 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam088-slutt-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+s=read(O/'bygg-startet.json');tag,code,mod=(s[k] for k in ['release_tag','kode','hd_mod']);manifest=read(R/'moddfiler-3535.json');old=read(A/'rapporter/felles-release-20261021-vr/moddfiler-3471.json')
+assert len(manifest)==21778 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items()) and set(old)<=set(manifest) and all(manifest[f]==h for f,h in old.items() if f.endswith('.png'))
+protected=read(S/'beskyttede-samlet1380.json');base=read(S/'grunnlag-produksjon.json');assert len(protected)==1380 and all(sha(A/f)==h for f,h in protected.items()) and subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==base['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==497
+motor=read(R/'linux-kontroll.json');files=read(R/'moddfiler-kontroll.json');assets=read(O/'assetkontroll.json');raster=read(R/'rasterkontroll-mot-produksjon.json');pixels=read(R/'pakke-pikselkontroll.json');vis=read(R/'visuell-kontroll.json')
+assert motor['native']==3535 and motor['nye_native_observert']==64 and motor['runder']==motor['grunnlagsrunder_samme_binar']==2 and motor['primaer_skript201_kjort']
+assert motor['skjermbufferkontroller']==1440 and motor['nullkontroller']==motor['grunnlag_nullkontroller']==1436 and motor['alle_eksakte_avvikskoordinater_og_RGB_par_identiske'] and motor['avviksstorrelser_og_pikselinnhold_identiske']
+assert files['moddfiler_per_pakke']==21777 and files['begge_modder_byteidentiske'] and files['begge_faktiske_nedlastinger_verifisert'] and files['hd_mod']==mod and files['kode']==code
+assert len(assets)==4 and all(sha(O/e['plattform']/e['fil'])==e['sha256'] for e in assets)
+assert raster['alle_nativefiler_identiske'] and raster['croprasteridentiske']==128 and not raster['ikke_rasteridentiske'] and len(pixels)==128 and all(e['originalflat_identisk'] and e['utenfor_loggede_aktorflater']==0 for e in pixels)
+assert vis['visuelt_sett'] and vis['egne_hele_varianter']==43 and len(vis['hele_motorbilder'])==len(vis['hele_for_etter'])==9 and all(e['visuelt_sett'] and sha(R/e['fil'])==e['sha256'] for g in ['varianter','hele_motorbilder','hele_for_etter'] for e in vis[g])
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+lr,wr=(s['plattform'][p]['run_id'] for p in ['linux','windows'])
+body=f'''Linux og Windows inneholder **3535 native HD-bildelag**, med **64 nye ruter fra Cone of Tragedy** siden forrige fellesutgave. Alle åtte ark i kostyme 88 er levert, fra Sam og Max i mekanismen til fall, svimmelhet og åpnet topp. Familien har 43 hele egne tegninger og 21 kildebekreftede identiske hele bildealiaser. HD-grafikken er fortsatt under arbeid.
+
+Last ned **SamMaxHD-Windows.zip** for Windows eller **SamMaxHD-x86_64.AppImage** for Linux. Ctrl+H bytter grafikk, F5 åpner originalmenyen.
+
+Begge faktiske plattformnedlastinger, fire vedleggsdigester, SHA-filer og alle **21777 runtime-moddfiler per pakke** er kontrollert. Moddene er byteidentiske med publisert hd-mod. Alle 64 nye native er logget i den nye Linux-binæren i faktisk primærskript 201 og hel animasjon 6. Alle 128 originalflater og figurutsnitt er identiske med produksjonsopptakene. 43 hele varianter og ni hele før/etter-par er visuelt sett.
+
+Begge avspillinger er også kjørt med tidligere 3471-grunnlag i samme nye Linux-binær. Hver side har **1436 av 1440 nullkontroller**, med identiske kjente avvik på 416/160 piksler ved bilde 24/25, eksakte koordinater, begge RGB-verdier og rekkefølge. Alle 128 par har null endringer utenfor de faktisk loggede nye aktørflatene med åtte HD-pikslers målemargin. Andre aktører og romskript er ikke skjult. Regisserte romhopp, ikke full naturlig gjennomspilling; hele prøven er ikke avviksfri.
+
+497 av 1758 figurark har resultat; 1261 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Arkene har dokumenterte, visuelt vurderte omrissvarsler. Alle 64 native er automatisk OK med uendrede porter. Råbilder, faktiske prompter, rutekart og egne alfakanaler er bevart uten hard originalmaske eller kildefragmenter. Ingen ny Tom-/Claude-godkjenning. En synlig bakgrunnskant rundt kjegletoppen, også i lukkede faser, er en åpen visuell retur. Leveransen er ikke visuell sluttgodkjenning.
+
+Tidligere tilbakeholdte motiver er fortsatt utenfor modden og omprøves ikke. Ingen motor-/pipelineendring. Full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-, inventar- og testhoppbegrensninger er åpne; grønt bygg beviser ikke at en sporadisk SDL-startfeil er rettet. Grafikkautomatikken fortsetter.
+
+Kode: {code}
+hd-mod: {mod}
+Linux: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{lr}
+Windows: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/{wr}
+Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/{R.name}/RAPPORT.md
+
+Spillet og grafikken tilhører Disney/Lucasfilm.
+'''
+body+='\nWindows-kjøringen feilet i første forsøk med SDL_BlitSurface src-invalid før spillet/HD ble lastet. Feilloggen er bevart. Én avgrenset omprøve med samme kode og testflagg bestod; dette retter ikke den sporadiske startfeilen.\n'
+(O/'utgivelse-notat.md').write_text(body);shutil.copy2(O/'utgivelse-notat.md',R/'utgivelse-notat.md')
+prior=api('releases?per_page=100');before=read(O/'releaser-foer-bygg.json');assert not any(e['tag_name']==tag for e in prior) and {e['id'] for e in before}<={e['id'] for e in prior}
+aset=lambda e:{(v['id'],v['name'],v['size'],v['digest']) for v in e['assets']}
+for e in before:
+ if e['tag_name'] not in ['linux','windows']:assert aset(e)==aset(next(v for v in prior if v['id']==e['id']))
+for D in [O,R]:save(D/'releaser-foer.json',prior)
+save(R/'bevaringskontroll.json',dict(beskyttede_kilder_SHA_uendret=1380,tre_stasher_uendret=True,alle_tidligere_filstier_bevart=True,alle_tidligere_png_byteidentiske=True,filer3535=21778,figurjobber_med_resultat=497,tidligere_fellesutgaver_og_assets_bevart=True,rullerende_linux_windows_oppdatert_med_autoriserte_bygg=True))
+(R/'RAPPORT.md').write_text(body+'\nLinux-binær SHA256 '+motor['binar_sha256']+'. Nativefrys beholdes til bekreftet fellespublisering og kontroll av eventuelle ekstra taggbygg.\n')
+for p in O.glob('*.py'):shutil.copy2(p,R/(p.name+'.txt'))
+print('Begge faktiske pakker, 21777 runtimefiler, 128 raster/flater og visuell kontroll bekreftet. Fellesutgave klar.')
