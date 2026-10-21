@@ -1,5 +1,18 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 15:18
+
+- [x] Levert og publisert fig097_09 til 12 med 48 nye native, 3419 totalt. Hele 97-familien har tolv ark og 95 native siden felles 3324. Faste porter uendret, ett visuelt vurdert SJEKK, ingen ny Tom-/Claude-godkjenning.
+- [x] Publisert og bekreftet felles Linux/Windows 3419: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-svanebaat. Begge faktiske nedlastinger og fellesvedlegg hentet på nytt, alle 21661 runtimefiler per pakke kontrollert. Alle 95 nye mål og 190 figurutsnitt bekreftet. 49 varianter og ni hele par sett. Sammenlignbare prøver har samme bufferavvik; fasejusteringen og de ekstra tette opptakene er dokumentert.
+- [ ] Nativefrysen beholdes til de registrerte ekstra pakkebyggene er avsluttet. Ikke dupliser eller avbryt byggene; les status og eventuell feil før neste nativepublisering. Registrerte bygg: [{"id": 39606444011, "workflow": "windows.yml", "head_branch": "sam-max-hd-2026-10-21-svanebaat", "head_sha": "4f100a8b0a10abc23dfd7d8e8c9f9ecd918e2342", "event": "push", "status": "in_progress", "url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39606444011"}].
+- [x] Kildeklargjort de tolv 250-arkene: 52 mål, 43 unike RGBA, 18 skript dekompilert, gyldig animasjon 6 og primærskript 211 kjørt, originaler og kontekst sett. Ingen nye 250-bilder eller resultater ennå.
+- [ ] Fortsett første fem 250-ark fra rapporter/sam250-kilde-20261021. Behold tilsiktet VR-polygonform, flate farger, hele kombinerte Sam-/motstanderruter og kildebekreftede smådeler. Se kilder og godkjente mastere ved hvert motiv. Korte faser må kontrolleres fasevis. Ikke tegn uvedkommende aktører fra spillopptaket inn i rutene.
+- [ ] Fortsett produserbar grafikk og returer. 477 av 1758 hele figurjobber har resultat, 1281 gjenstår pluss returer, katalogfeil og sluttkontroll. Skill laget, egenkontrollert, native mottatt, visuelt sett, motorobservert, publisert, pakket og Tom-/Claude-godkjent.
+- [ ] Bevar tidligere grafikk, releaser, 1348 beskyttede kilder og tre stasher. Behold hold for seks bokark/46 mål og tidligere avviste motiver/aliaser, samt rest 304 etter siste NESTE. Ingen omprøve eller omgåelse. Ugyldige 344/346 og råvalg 28 kjøres ikke.
+- [ ] Samlet sluttkontroll, full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Oppdater begge pakker ved neste samlepunkt og avslutning. Automatikken fortsetter; gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 14:43
 
 - [x] Fire øvre svanebåtark fig097_09 til 12 levert og additivt publisert: 48 nye native, 3419 totalt. Alle 21662 filhash, 1300 kilder og tre stasher bekreftet etter hent. Hele familien har tolv ark og 95 native.
