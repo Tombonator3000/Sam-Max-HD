@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image
+import json, hashlib, subprocess, shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name; M=P/'mods/gpt'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+git=lambda p,*a:subprocess.check_output(['git',*a],cwd=p,text=True).strip()
+assert git(P,'branch','--show-current')=='main' and git(A,'branch','--show-current')=='gpt-arbeid'
+assert not git(P,'status','--porcelain')
+files={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert files==read(A/'rapporter/felles-release-20261021-sam303/moddfiler-3150.json')
+remote=git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]; assert remote=='dabfc2bc7e09b22fb5a34b2d724e79298d45c2dc'
+stashes=git(P,'stash','list','--format=%H').splitlines(); assert stashes==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==446 and read(M/'mod.json')['costume_cels']==3150
+save(R/'grunnlag-produksjon.json',dict(native=3150,filer=files,fjern_sha=remote,stash=stashes,hele=446))
+protected=read(A/'rapporter/sam-max-intro-kilde-20261021/beskyttede-samlet1172.json'); assert len(protected)==1172 and all(sha(A/f)==h for f,h in protected.items()); save(R/'beskyttede-samlet.json',protected)
+jobs=['fig010_01','fig010_02','fig012_01','fig012_02','fig012_03'];unique={}
+for job in jobs:
+ J=A/'jobber'/job; assert not (J/'resultat.png').exists() and not (J/'retur.md').exists();j=read(J/'jobb.json')
+ for t in j['ruter']:
+  f=P/'work/extract/costumes'/(t['bilde']+'.png'); im=Image.open(f).convert('RGBA');h=hashlib.sha256(im.tobytes()).hexdigest();k=(im.size,h)
+  assert not (M/'costumes'/(t['bilde']+'_hd.png')).exists()
+  if k not in unique:unique[k]=dict(bilde=t['bilde'],rgba_sha256=h,kilde_sha256=sha(f),maal=list(im.size),malruter=[])
+  unique[k]['malruter'].append(dict(jobb=job,**t))
+entries=list(unique.values()); assert len(entries)==46 and sum(len(e['malruter']) for e in entries)==58
+save(R/'ruteplan-unik.json',dict(jobber=jobs,ruter=entries,maal=58,ulike_hele=46,nye_malerier=46,hele_rgba_aliasmaal=12))
+groups=[[f'costume010_{n}' for n in g] for g in [[1920,1921,1922],[1924,1925,1926],[1927,1928,1929],[1930,1931,1932],[1933,1934,1935],[1936,1937,1938],[1939,1940,1941],[1942,1943,1944],[1945,1946,1947],[1948,1949,1950],[1951,1952,1953,1956]]]
+groups += [[f'costume012_{n}' for n in g] for g in [[1920,1923,1924],[1925,1926,1927],[1928,1929,1930],[1931,1932,1935]]]
+lookup={e['bilde']:e for e in entries}
+for i,names in enumerate(groups,1):
+ C=R/'kall'/f'K{i:02}';C.mkdir(parents=True,exist_ok=False);cw=1536//len(names);ref=Image.new('RGBA',(1536,1024),'#7a7f88');records=[]
+ for k,n in enumerate(names):
+  e=lookup[n];im=Image.open(P/'work/extract/costumes'/(n+'.png')).convert('RGBA');scale=4 if im.height>=20 else min(16,(cw-90)//im.width,600//im.height);q=im.resize((im.width*scale,im.height*scale),Image.Resampling.NEAREST);pos=[k*cw+(cw-q.width)//2,(1024-q.height)//2];ref.alpha_composite(q,tuple(pos));records.append(dict(bilde=n,canonical_rgba_sha256=e['rgba_sha256'],celle=[k*cw,0,cw,1024],reference_pos=pos,reference_skala=scale,maal=list(q.size)))
+ ref.convert('RGB').save(C/'reference-atlas.png')
+ original_prompts=list(dict.fromkeys((A/'jobber'/lookup[n]['malruter'][0]['jobb']/'prompt.txt').read_text() for n in names));(C/'opprinnelige-prompter.txt').write_text('\n\n'.join(original_prompts))
+ save(C/'plan.json',dict(ruter=records,opprinnelig_prompt_bevares_ordrett=True,korrigert_motivpremiss=False,kildescene_ma_ses_for_kall=True))
+shutil.copy2(A/'rapporter/sam-max-intro-kilde-20261021/scrp_065.txt',R/'primaer-scrp065.txt');shutil.copy2(A/'rapporter/sam-max-intro-kilde-20261021/inngang.txt',R/'primaer-rom002-inngang.txt');shutil.copy2(__file__,R/'forbered.py.txt')
+print('3150 native, 446 hele, 1172 kildehash og tre stasher bekreftet. 58 mål fra 46 hele RGBA-varianter, 15 valgte atlas. Ingen bildekall ennå.')

@@ -1,0 +1,51 @@
+pakke	Test pakken uten skjerm	﻿2026-10-21T05:49:58.3925080Z ##[group]Run cd out/windows/SamMaxHD-Windows
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3925704Z ^[[36;1mcd out/windows/SamMaxHD-Windows^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3926642Z ^[[36;1mexport SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy DIGHD_MOD="$(cygpath -w "$PWD/mod")" DIGHD_QUIT_AT=600^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3927326Z ^[[36;1mset +e^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3927876Z ^[[36;1m# Uten skjerm finner OpenGL ingen grafikkmodus; testen bruker SDL-overflaten (som spill.sh^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3928561Z ^[[36;1m# --programvare) og MT-32-emuleringen, som startfilene^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3929216Z ^[[36;1mtimeout 300 ./scummvm.exe --config="$(cygpath -w "$RUNNER_TEMP")\\test.ini" --path=game \^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3930130Z ^[[36;1m  --savepath="$(cygpath -w "$RUNNER_TEMP")" --themepath=. --extrapath=. --gfx-mode=surfacesdl --music-driver=mt32 \^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3930886Z ^[[36;1m  --debuglevel=1 samnmax > "$RUNNER_TEMP/test.log" 2>&1^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3931313Z ^[[36;1mcode=$?^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3931593Z ^[[36;1mset -e^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3932113Z ^[[36;1m# ScummVM på Windows skriver loggen til %APPDATA%\ScummVM\Logs^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3932701Z ^[[36;1mLOGG="$(cygpath "$APPDATA")/ScummVM/Logs/scummvm.log"^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3933237Z ^[[36;1m[ -f "$LOGG" ] && cat "$LOGG" >> "$RUNNER_TEMP/test.log"^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3933675Z ^[[36;1mecho "Avslutningskode: $code"^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3934257Z ^[[36;1mgrep -E "Using gameid samnmax|Using MD5|DigHD: mod" "$RUNNER_TEMP/test.log" | head -5 || true^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3935299Z ^[[36;1mgrep -q "d917f311a448e3cc7239c31bddb00dd2" "$RUNNER_TEMP/test.log" || { echo "Spillet ble ikke kjent igjen"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3936458Z ^[[36;1mgrep -q "DigHD" "$RUNNER_TEMP/test.log" || { echo "HD-motoren startet ikke"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3937639Z ^[[36;1m[ "$code" = 0 ] || { echo "Spillet avsluttet ikke som ventet (kode $code)"; tail -60 "$RUNNER_TEMP/test.log"; exit 1; }^[[0m
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3940673Z shell: D:\a\_temp\setup-msys2\msys2.CMD {0}
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3941042Z env:
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3941378Z   MSYSTEM: MINGW64
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.3941642Z ##[endgroup]
+pakke	Test pakken uten skjerm	2026-10-21T05:49:58.9985596Z Avslutningskode: 1
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0580335Z Spillet ble ikke kjent igjen
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0836015Z WARNING: File::open: node does not exist!
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0836779Z Creating configuration file: D:\a\_temp\test.ini
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0837336Z Debuglevel (from command line): 1
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0837809Z Using SDL Video Driver "dummy"
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0838285Z creating SurfaceSDL graphics manager
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0838832Z creating OpenGL graphics manager
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0839318Z creating SurfaceSDL graphics manager
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0839809Z Using SDL Audio Driver "dummy"
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0840274Z Output sample rate: 44100 Hz
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0840760Z Output buffer size: 1024 samples
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0841247Z Output channels: 2
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0841753Z SDL_BlitSurface failed: Parameter 'src' is invalid!
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0842458Z [2026-10-21 05:49:58] ScummVM 2026.3.1gitdirty (Oct 21 2026 05:48:10)
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0843652Z [2026-10-21 05:49:58] RGB zLib FreeType2 PNG taskbar SDL2 OpenGL (with shaders) 
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0844407Z [2026-10-21 05:49:58] --- Log opened.
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0844910Z [2026-10-21 05:49:58] Using SDL Video Driver "dummy"
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0845540Z [2026-10-21 05:49:58] creating SurfaceSDL graphics manager
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0846216Z [2026-10-21 05:49:58] creating OpenGL graphics manager
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0846894Z [2026-10-21 05:49:58] creating SurfaceSDL graphics manager
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0847495Z [2026-10-21 05:49:58] Using SDL Audio Driver "dummy"
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0848041Z [2026-10-21 05:49:58] Output sample rate: 44100 Hz
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0849265Z [2026-10-21 05:49:58] Output buffer size: 1024 samples
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0850177Z [2026-10-21 05:49:58] Output channels: 2
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0854872Z [2026-10-21 05:49:58] SDL_BlitSurface failed: Parameter 'src' is invalid!
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0855681Z [2026-10-21 05:49:58] --- Log closed successfully.
+pakke	Test pakken uten skjerm	2026-10-21T05:49:59.0905847Z ##[error]Process completed with exit code 1.

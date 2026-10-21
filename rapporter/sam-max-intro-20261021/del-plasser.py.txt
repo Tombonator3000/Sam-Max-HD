@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+def bbox(m):
+ y,x=np.nonzero(m);return [int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)]
+def groups(m):
+ lab,count=nd.label(m,structure=np.ones((3,3)));areas=np.bincount(lab.ravel());ids=sorted(range(1,count+1),key=lambda n:areas[n],reverse=True)[:2];assert len(ids)==2
+ ids.sort(key=lambda n:bbox(lab==n)[0]);main=[lab==n for n in ids];dist=[nd.distance_transform_edt(~g) for g in main];out=[g.copy() for g in main]
+ for n in range(1,count+1):
+  if n in ids:continue
+  this=lab==n;which=int(np.argmin([d[this].min() for d in dist]));out[which]|=this
+ return out
+def own_part_images(a):
+ gs=groups(a[:,:,3]>=CORE);ds=np.stack([nd.distance_transform_edt(~g) for g in gs]);owner=ds.argmin(0);ps=[]
+ for n in range(2):
+  q=a.copy();q[owner!=n]=0;ps.append(q)
+ return ps
+selected={e['bilde']:e for e in read(R/'prototyper-forelopig.json')};assert len(selected)==46 and all(e['native_ok'] for e in selected.values())
+split={f'costume012_{n}' for n in [1920,1923,1924,1925,1926,1928,1929,1930,1931]}
+for name in sorted(split):
+ row=selected[name];a=np.array(Image.open(A/row['prototype']).convert('RGBA'));src=np.array(Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA'));gs=groups(src[:,:,3]>0);ps=own_part_images(a);out=Image.new('RGBA',(a.shape[1],a.shape[0]));steps=[]
+ for label,sp,own in zip(['Sam med rekvisitt og eventuell løs hatt','Max med eventuell rekvisitt'],gs,ps):
+  sx0,sy0,sx1,sy1=bbox(sp);ox0,oy0,ox1,oy1=bbox(own[:,:,3]>=CORE);fx=(sx1-sx0)*4/(ox1-ox0);fy=(sy1-sy0)*4/(oy1-oy0);q=Image.fromarray(own).transform(out.size,Image.Transform.AFFINE,(1/fx,0,ox0-(sx0*4+8)/fx,0,1/fy,oy0-(sy0*4+8)/fy),Image.Resampling.BICUBIC);out.alpha_composite(q);steps.append(dict(egen_gruppe=label,kilde_bbox_kun_maling=[sx0,sy0,sx1,sy1],egen_bbox=[ox0,oy0,ox1,oy1],egen_skala=[fx,fy],egen_alfamaske=True,original_alfamaske_ikke_brukt=True))
+ a=np.array(out);a[a[:,:,3]==0,:3]=0;out=Image.fromarray(a);iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1),-8,-8);f=(A/row['prototype']).with_name(name+'-prototype-v3.png');out.save(f);row.update(prototype=f.relative_to(A).as_posix(),prototype_sha256=sha(f),snitt_union=iou,dekning=cov,native_ok=iou>=GOOD_IOU and cov>=GOOD_COVER,egne_motivgrupper=steps,bevarer_hver_egen_hel_figurgruppe=True,delvis_aliasing=False);print(name,round(iou,4),round(cov,4),'OK' if row['native_ok'] else 'FEIL')
+rows=list(selected.values());save(R/'prototyper-endelig.json',rows);assert all(e['native_ok'] for e in rows)
+for start in range(0,len(rows),6):
+ board=Image.new('RGBA',(1920,900),'#596978');draw=ImageDraw.Draw(board)
+ for k,e in enumerate(rows[start:start+6]):
+  src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA');own=Image.open(A/e['prototype']).convert('RGBA');ref=Image.new('RGBA',own.size);ref.alpha_composite(src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST),(8,8));scale=min(1,290/own.width,385/own.height);size=tuple(round(v*scale) for v in own.size);x=(k%3)*640;y=(k//3)*450;draw.text((x+8,y+7),f"{e['bilde']} original / egen {e['snitt_union']:.3f}/{e['dekning']:.3f}",fill='white');board.alpha_composite(ref.resize(size,Image.Resampling.NEAREST),(x+8,y+45));board.alpha_composite(own.resize(size,Image.Resampling.LANCZOS),(x+330,y+45))
+ board.convert('RGB').save(R/f'endelig-helkontroll-{start//6+1}.png')
+shutil.copy2(__file__,R/'del-plasser.py.txt');print('46 valgte hele varianter, alle faste porter bestått. Se alle åtte sluttark før levering.')

@@ -1,0 +1,42 @@
+from pathlib import Path
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+source=read(R/'kildemotor-intro.json');secondary=read(R/'kildemotor12-hel.json');obs={**secondary['tegninger'],**source['tegninger']};plan=read(R/'ruteplan-unik.json');want={t['bilde'] for e in plan['ruter'] for t in e['malruter']};assert not want-set(obs)
+visuals={f.name:sha(f) for f in R.glob('kilde-spillkontekst*.png')};assert len(visuals)==6
+save(R/'kilde-visuell-kontroll.json',dict(originalark_sett=plan['jobber'],godkjente_hovedark_sett=['hovedark/sam.png','hovedark/max.png'],spillkontekst_sett=visuals,alle58_kildeavspilt=True,naturlig_intro49=True,rettet_hel_animasjon12_20=True,primarskript65_sett=True,rom002_inngang_sett=True,palett0_kildebekreftet=True,visuelt_sett=True))
+for C in sorted((R/'kall').iterdir()):
+ q=read(C/'plan.json');rs=q['ruter'];prompt=(C/'opprinnelige-prompter.txt').read_text();prompt+='''
+
+SELECTED ATLAS PRODUCTION PASS. The text above is the preserved complete-sheet brief. For THIS call only, Image 1 is the selected source atlas: render exactly its separate drawings in the same cells and positions, rather than generating the complete job sheet. Image 2 is Sam's approved master design. Image 3, when supplied, is Max's approved master design. The master sheets control identity and clean drawing style; Image 1 controls every pose, proportion, partial body, prop, internal negative space, color and visible detail. Output exactly 1536 x 1024 RGBA with genuine transparent background, no gray, no white, no checkerboard, no ground shadow, glow or labels. Render smooth clean hand-drawn curves, not enlarged pixel steps. Maintain the original's flat colored regions and single shadow shade, with no extra objects or details. Each atlas cell contains one complete source drawing, sometimes including both Sam and Max or detached parts; keep every part together at its original relative position.
+
+Scene verified in the actual game's opening laboratory and primary script 65. Sam and Max handle the small inanimate clockwork prop shown in the source, then leave for their car. Preserve the prop's exact orange/tan casing, blue-gray rim, dark round recess or drawn face as visible, and the few loose red-brown wire strands. No added blood, gore, glowing fuse, display, new text or mechanical details. It is a fictional cartoon prop. Source Sam drawings often end partway down the legs with a tiny L-shaped orange strip: this intentional cropped lower boundary must stay exactly as drawn, with no completed legs or feet. Detached hats and wires stay separate. Later retreating frames are intentionally dark, shrinking and partly hidden: do not brighten, recolor or reconstruct invisible parts. Black silhouettes remain solid black; preserve any tiny source blue-gray marks.
+'''
+ for i,e in enumerate(rs):
+  n=e['bilde'];num=int(n.split('_')[1]);note=''
+  if n.startswith('costume010'):
+   if num<=1922:note='Sam at three-quarter right profile holding the small prop against his belly. Match the exact hand and arm positions, tie, closed mouth and deliberately partial lower legs. The prop turns to show its round dark recess in the later cells.'
+   elif num<=1928:note='Sam turns from right profile to back view and begins moving away carrying the same prop. Preserve the exact changing hand contacts, hat rotation, partial legs and dangling red-brown wire.'
+   elif num<=1933:note='Sam seen from the back, taking this exact retreating step. Match each raised or trailing foot, his two extended hands and the hat angle without changing his back width.'
+   elif num<=1941:note='Sam retreats into shadow beside the car. Preserve this source-specific increasingly dark palette and exact partial walking silhouette. Do not restore the bright master-sheet colors.'
+   else:note='A deliberately small, dark silhouette or fragment of Sam as he disappears behind the car. Reproduce exactly this shape only, with smooth edges and no newly completed body or details. Source black stays black and the small muted blue-gray patches stay where shown.'
+  else:
+   if num<=1926:note='This complete source drawing includes standing Sam on the LEFT and Max at the RIGHT with the small orange/tan inanimate prop. Preserve Max\'s exact crouch, curved ears, arms, legs, facial direction and the prop contact; Sam has intentionally cropped lower legs.'
+   elif num==1927:note='Both Sam LEFT and Max RIGHT in one source drawing. Sam bends toward Max and receives the prop; his hat is separately floating directly above his head. Keep the exact stretched hand contacts, tilted dog ears, Max\'s backward lean and the thin wire loops. Do not reconnect or lower the hat.'
+   elif num<=1931:note='Both characters in one drawing: Sam LEFT now holds the prop against his belly, while Max RIGHT leans or moves away with his back toward the viewer. Match the distinct floating or settling hat position, Sam\'s ears and mouth, and Max\'s exact ear and foot positions.'
+   else:note='Sam alone holding the same small prop against his belly. Preserve the deliberately cropped lower boundary, hand contacts, tiny orange bottom strip and dangling brown wire. Match this exact closed or subtly different mouth; do not add Max or complete hidden legs.'
+  prompt+=f"\nCell {i+1}: {n}. Cell rectangle {e['celle']}, drawing top-left {e['reference_pos']}, visible size {e['maal']}, source enlargement {e['reference_skala']}x. {note}\n"
+ refs=[str(C/'reference-atlas.png'),str(A/'hovedark/sam.png')]
+ if rs[0]['bilde'].startswith('costume012'):refs.append(str(A/'hovedark/max.png'))
+ (C/'prompt-faktisk.txt').write_text(prompt);save(C/'argumenter-planlagt.json',dict(prompt=prompt,referenced_image_paths=refs,transparent_background=True));q.update(referanser={f:sha(Path(f)) for f in refs},kildescene_sett=True,opprinnelig_prompt_bevart_ordrett=True);save(C/'plan.json',q)
+(R/'KILDEGRUNNLAG.md').write_text('''# Sam og Max i introen
+
+Fem hele jobber har 58 mål, 46 hele RGBA-varianter og 12 aliasmål. Alle fem originalark og godkjente Sam-/Max-hovedark er sett. Introen er kjørt fra ny oppstart i den faktisk nedlastede Linux-pakken med 3150 native, uten rom-, skript- eller aktøroverstyring. Automatiske punktumtastetrykk forkorter dialogene. 49 mål blir tegnet i den naturlige introsekvensen. En separat rettet prøve setter kostyme 12, aktør 3, posisjon 104,171, palett 0, skala 255 og hele originalanimasjon 6 i rom 2 for å kontrollere de ni siste rutene som introens skript avbryter. Alle 58 kilder er dermed sett i spillkontekst. Andre aktører eller romskript skjules ikke av testkode. Dette er ikke full naturlig gjennomspilling.
+
+Primærskript 65 identifiserer rekvisitten som en tikkende tidsbombe med hodeform og sier at den ikke er et virkelig menneske. Max overleverer den lille tegnede rekvisitten til Sam; Sam går mot bilen. Den orange/tan overflaten, gråblå kanten, mørke åpningen eller det tegnede ansiktet og løse rødbrune ledninger beholdes. Sam står delvis bak forgrunnssteinen og har tilsiktet avklipt nedre kropp i mange originalruter. Hatten flyter adskilt i overleveringen. Senere ruter blir bevisst mørke og svarte bak bilen. Disse delene skal ikke fullføres eller lysnes.
+
+De beskyttede promptene til kostyme 12 beskriver allerede Sam og Max sammen. De bevares og brukes ordrett, med separat atlasutvalg og kildepresisering. Det eldre kildeplan-notatet om et Sam-alene-premiss gjelder en generell katalogbeskrivelse, ikke disse faktiske jobbpromptene. Ingen ny designbeslutning eller Tom-/Claude-godkjenning er lagt til.
+
+Python brukes bare til rensing og plassering av egen maling etter Toms tillatelse. Ingen harde originalmasker eller originale bildefragmenter i leveransene. Faste porter CORE128, IoU 0,6 og dekning 0,8. Bibliotek: figurark-fast-storrelse og publisert-mod-er-fasit, tilpasset prosjektets native 4x og gjeldende publiserte mod. Alle tidligere grafikkfiler, 1172 beskyttede jobbkilder og tre stasher bevares. Det ekstra Windows-taggbygget 39551012593 feilet med kjent SDL_BlitSurface-feil før spilloppstart; den separat bygde og verifiserte fellespakken 3150 er urørt. Ingen omprøve av blokkerte 304-motiver.
+''')
+shutil.copy2(__file__,R/'prompter.py.txt');print('15 faktiske prompter klare. Originaltekst bevart. Alle kilder sett. Se hvert valgt atlas før kall.')

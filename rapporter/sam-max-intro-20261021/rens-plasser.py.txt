@@ -1,0 +1,40 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+def bbox(m):
+ y,x=np.nonzero(m);return [int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)]
+def clean(a):
+ rgb=a[:,:,:3].astype(int);bad=(rgb[:,:,0]>190)&(rgb[:,:,2]>160)&(rgb[:,:,1]<110)
+ core=(a[:,:,3]>=CORE)&~bad;assert core.any();dist=nd.distance_transform_edt(~core);a[dist>1.5]=0
+ trust=(a[:,:,3]>=245)&~bad;assert trust.any();_,ix=nd.distance_transform_edt(~trust,return_indices=True);edge=((a[:,:,3]<245)|bad)&(a[:,:,3]>0);nearest=a[tuple(ix)][:,:,:3];a[edge,:3]=nearest[edge];a[a[:,:,3]==0,:3]=0;return a
+rows=[]
+for C in sorted((R/'kall').iterdir()):
+ if not (C/'raa.png').exists():continue
+ records=read(C/'plan.json')['ruter'];rawimage=Image.open(C/'raa.png').convert('RGBA');raw=np.array(rawimage);assert rawimage.size==(1536,1024)
+ board=Image.new('RGBA',(1024,440*len(records)),'#596978');draw=ImageDraw.Draw(board)
+ for i,e in enumerate(records):
+  src=np.array(Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA'));assert hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256'];sm=src[:,:,3]>0;x,y,w,h=e['celle']
+  if C.name=='K05' and e['bilde']=='costume010_1933':x,y,w,h=0,0,540,1024
+  if C.name=='K05' and e['bilde']=='costume010_1934':x,y,w,h=540,0,484,1024
+  if C.name=='K15' and e['bilde']=='costume012_1931':x,y,w,h=0,0,650,1024
+  if C.name=='K15' and e['bilde']=='costume012_1932':x,y,w,h=650,0,374,1024
+  own=clean(raw[y:y+h,x:x+w].copy());retouch=[]
+  if (src[sm,:3]==0).all():
+   own[:,:,:3]=0;retouch.append(dict(egen_rgb_svart=True,grunn='Kilden er en ren svart silhuett, ingen lyse hatte- eller kragemerker',alfa_uendret=True))
+  if e['bilde'] in ['costume010_1927','costume010_1928']:
+   rgb=own[:,:,:3].astype(int);yy=np.indices(own.shape[:2])[0];white=(rgb.min(2)>190)&(own[:,:,3]>0)&(yy>own.shape[0]*.45);blue=(rgb[:,:,2]>rgb[:,:,0]+20)&(rgb[:,:,1]>rgb[:,:,0]+10)&(own[:,:,3]>=245)
+   if white.any():
+    color=np.median(own[blue,:3],axis=0).astype(np.uint8);own[white,:3]=color;retouch.append(dict(egen_hvit_mansjett_overmalt=True,grunn='Kilden har bare hvitt på hattebåndet, ikke ved bakfra-hånden',egen_rgb=color.tolist(),alfa_uendret=True))
+  sx0,sy0,sx1,sy1=bbox(sm);ox0,oy0,ox1,oy1=bbox(own[:,:,3]>=CORE);fx=(sx1-sx0)*4/(ox1-ox0);fy=(sy1-sy0)*4/(oy1-oy0)
+  out=Image.fromarray(own).transform((src.shape[1]*4+16,src.shape[0]*4+16),Image.Transform.AFFINE,(1/fx,0,ox0-(sx0*4+8)/fx,0,1/fy,oy0-(sy0*4+8)/fy),Image.Resampling.BICUBIC);a=clean(np.array(out));out=Image.fromarray(a)
+  iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(sm,4,0),4,1),-8,-8);f=C/(e['bilde']+'-prototype-v2.png');out.save(f)
+  row=dict(bilde=e['bilde'],valgt_kall=C.name,prototype=f.relative_to(A).as_posix(),prototype_sha256=sha(f),canonical_rgba_sha256=e['canonical_rgba_sha256'],snitt_union=iou,dekning=cov,native_ok=iou>=GOOD_IOU and cov>=GOOD_COVER,egen_alfa=True,originalmaske=False,originalfragmenter=False,egen_glodrens_hd=1.5,maalt_kilde_bbox=[sx0,sy0,sx1,sy1],egen_bbox=[ox0,oy0,ox1,oy1],egen_ruteutsnitt=[x,y,w,h],egen_hel_affin_plassering=[fx,fy],egen_retusj=retouch,visuelt_sett=False);rows.append(row)
+  draw.text((12,i*440+8),f"{e['bilde']} original 4x / egen 4x  IoU {iou:.3f}, dekning {cov:.3f}",fill='white');board.alpha_composite(Image.fromarray(src).resize((src.shape[1]*4,src.shape[0]*4),Image.Resampling.NEAREST),(16,i*440+50));board.alpha_composite(out,(550,i*440+42));print(e['bilde'],round(iou,4),round(cov,4),'OK' if row['native_ok'] else 'FEIL',flush=True)
+ board.convert('RGB').save(C/'renset-helkontroll-v2.png')
+ save(C/'raa-sporing.json',dict(fil='raa.png',sha256=sha(C/'raa.png'),argumenter_sha256=sha(C/'argumenter-faktisk.json'),referanser=read(C/'plan.json')['referanser'],innebygd_image_gen=True,modellnavn_ikke_oppgitt=True))
+save(R/'prototyper-forelopig.json',rows);shutil.copy2(__file__,R/'rens-plasser.py.txt')
