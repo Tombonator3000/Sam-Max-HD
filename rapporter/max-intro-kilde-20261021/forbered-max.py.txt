@@ -1,0 +1,83 @@
+from pathlib import Path
+from PIL import Image
+import json, hashlib, re, shutil, subprocess
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent
+R=A/'rapporter/max-intro-kilde-20261021'; S=A/'rapporter/sam-max-intro-20261021'
+M=P/'mods/gpt'; read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists(); R.mkdir()
+receipt=read(S/'mottak-publisert.json'); assert receipt['native']==3208
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==receipt['hd_mod']
+assert all(sha(M/f)==h for f,h in read(S/'publiserte-moddfiler-3208.json').items())
+protected=read(S/'beskyttede-samlet.json')
+assert len(protected)==1172 and all(sha(A/f)==h for f,h in protected.items())
+jobs=['fig013_01','fig017_01','fig017_02','fig018_01','fig018_02','fig018_03','fig018_04']
+groups={}; original_sheets={}; targets=[]
+for name in jobs:
+    J=A/'jobber'/name; j=read(J/'jobb.json')
+    assert not (J/'resultat.png').exists() and not (A/'retur'/name).exists()
+    for n in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+        f=J/n; protected[f.relative_to(A).as_posix()]=sha(f)
+    original_sheets[f'jobber/{name}/referanse.png']=sha(J/'referanse.png')
+    for t in j['ruter']:
+        name=t['bilde']; assert not (M/'costumes'/(name+'_hd.png')).exists()
+        f=P/'work/extract/costumes'/(name+'.png'); im=Image.open(f).convert('RGBA')
+        rh=hashlib.sha256(im.tobytes()).hexdigest(); key=(im.size,rh)
+        groups.setdefault(key,dict(bilde=name,maal=list(im.size),rgba_sha256=rh,
+            kilde_sha256=sha(f),malruter=[]))['malruter'].append(t|{'jobb':J.name})
+        targets.append(name)
+assert len(targets)==68 and len(groups)==58 and len(protected)==1200
+save(R/'beskyttede-samlet1200.json',protected)
+save(R/'ruteplan-unik.json',dict(jobber=jobs,ruter=list(groups.values()),mal=68,
+     hele_rgba_varianter=58,ingen_bildekall=True,ingen_resultater=True,ingen_nye_native=True))
+logfile=P/'out/sam-max-intro-20261021/motor-intro-seed-grunnlag3150/scummvm.log'
+log=logfile.read_text(); observed={}
+for f,c,k,x,y,w,h in re.findall(r'frame (\d+) soft cel\s+(\d+) costume\s*(13|17|18)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+    name=f'costume{int(k):03}_{c}'
+    if name not in targets:continue
+    frame=(int(f)//2+1)*2; p=logfile.parent/f'frame_{frame:06}_room002.png'
+    assert p.exists()
+    observed.setdefault(name,dict(kostyme=int(k),rute=int(c),logg_frame=int(f),bildeframe=frame,
+        pos=[int(x),int(y)],maal=[int(w),int(h)],fil=str(p),sha256=sha(p)))
+assert len(observed)==64
+save(R/'kildeobservasjoner64.json',dict(kilde_logg=str(logfile),logg_sha256=sha(logfile),
+    kildeproof='rapporter/sam-max-intro-20261021/motor-intro-seed-grunnlag3150.json',
+    random_seed=20261021,primaer_intro=True,automatisk_dialoghopp=True,tegninger=observed,
+    sett_i_logg=64,mal=68,mangler=sorted(set(targets)-set(observed)),visuelt_spillkontekst_sett=False))
+by_hash={}
+for f in sorted((M/'costumes').glob('*_hd.png')):
+    name=f.stem[:-3]; src=P/'work/extract/costumes'/(name+'.png')
+    if not src.exists():continue
+    im=Image.open(src).convert('RGBA'); key=(im.size,hashlib.sha256(im.tobytes()).hexdigest())
+    if key in groups:by_hash.setdefault(key,[]).append(dict(bilde=name,kilde_sha256=sha(src),native_sha256=sha(f)))
+alias=[dict(bilde=groups[key]['bilde'],maal=groups[key]['maal'],rgba_sha256=groups[key]['rgba_sha256'],
+            mulige_hele_tidligere=rows,brukt=False,proveniens_og_visuell_kontroll_gjenstar=True)
+       for key,rows in by_hash.items()]
+save(R/'mulige-hele-aliaser.json',alias)
+save(R/'originalark-sett.json',dict(alle_sju_originalark_sett=True,ark=original_sheets,
+     faktisk_spillkontekst_for_alle_mal_gjenstar=True,stilanker_ma_ses_for_hvert_kall=True,
+     godkjent_av_Tom=False,claude_kontroll=False))
+save(R/'grunnlag.json',dict(native=3208,hd_mod=receipt['hd_mod'],hele_resultatjobber=451,
+     total=1758,gjenstar=1307,beskyttede=1200,forrige_beskyttede=1172,mal=68,hele_rgba=58,
+     sett_i_intro_logg=64,stasher=receipt['stasher'],bildekall=0,resultater=0,nye_native=0))
+(R/'KILDEGRUNNLAG.md').write_text('''# Neste Max-introfamilie, bare kildeklargjøring
+
+Sju hele jobber: fig013_01, fig017_01..02 og fig018_01..04. 68 mål fra 58 forskjellige hele RGBA-kilder, ingen nye bildekall, resultatark eller native. Alle sju originalark er sett. 64 mål er dokumentert i den bevarte faktiske introavspillingen fra 3150-grunnlaget, uten rom-, skript- eller aktørkrok. Fire mål fra fig013_01 mangler og trenger kildebegrunnet hel animasjonsprøve før tegning. Hele kildene i spillkontekst og godkjent Max-hovedark skal ses før produksjon. Primærskript 65, hashfestet i forrige rapport, er kilde for aktør, palett, sekvens og funksjon.
+
+Kostyme 13 er Max med den hodeformede tegnede tidsbomben før overleveringen, samt løse hode-/kroppslag. Primærskript 65 ved 0FC2 setter kostyme 13 på aktør 3, posisjon 187,184, talkframes 4/5 og retning 251. Ikke gjør de separate hodene om til hele figurer. Kostyme 17 viser Max' bevegelse mot bilen, og blir bevisst mørkere og bare fragmenter bak bilen. Primærskriptet ved 123C setter kostyme 17, aktør 3 ved 160,183, retning 249 og animasjon 6. De små svarte delene og den fargede bilfragmentruten i ark 02 er bevisst kildeinnhold.
+
+Kostyme 18 er ikke bare Max i vanlig ståstilling. Primærskriptet ved 0D4C setter kostyme 18, aktør 3 ved 134,173, retning 249 og animasjon 6 etter dialogen om å konfrontere den mistenkte. Originalarkene viser først lyse Max, så mørk eller svart Max med store hvite tenner, deretter samme sammensatte rute med Max og den grønne, langsnutede laboratoriemotstanderen, og til slutt overlappende fragmenter og grå støvskyer. Ikke tegn den grønne figuren som en del av Max eller fullfør avklipte kropper. Originalpromptenes generelle Max-beskrivelse er utilstrekkelig for de sammensatte rutene; beskyttede prompter beholdes ordrett og faktapresisering må legges separat til eventuelle kall. Ansikt, farger, de grå støvdelene og de små lyse flekkene skal avklares fra kildeavspillingen før tegning, uten designgjetting.
+
+1200 jobbkilder er SHA-beskyttet, hvorav alle 1172 tidligere er bekreftet urørt. Publisert mod d8f735a567a3f7ac942c04e4e3bab5befc4c0c57 har 3208 native; 451 av 1758 hele resultatjobber, 1307 gjenstår pluss returer, katalogfeil og sluttkontroll. Mulige-hele-aliaser.json har bare eksakte hele kilde-RGBA- og dimensjonstreff mot publiserte ruter. Disse er ikke valgt eller brukt. Bekreft tidligere maleris proveniens, alfa og visuelle kvalitet før gjenbruk. Ingen deler, fragmentmasker eller delvis aliasing.
+
+Felles Linux-/Windows-pakker har 3150 og mangler 58. Neste felles samlepunkt følger denne sammenhengende introfamilien, eller tidligere ved blokkering. Ikke gjenta den publiserte 010/012-bunken. Bevar tidligere native og tre stasher. Ingen ny Tom-/Claude-godkjenning. Gamle nattprosesser gjenstartes ikke, og verktøyavviste 304-motiver omprøves ikke. Bibliotek: figurark-fast-storrelse og publisert-mod-er-fasit.
+''')
+shutil.copy2(__file__,R/'forbered-max.py.txt')
+with (S/'NESTE.md').open('a') as f:f.write('\nNeste bunke er nå kildeklargjort i rapporter/max-intro-kilde-20261021: '
+    'sju originalark sett, 68 mål/58 hele kilder, 64 loggobserverte, fire fig013_01-mål mangler. '
+    '1200 samlede kildehash bekreftet. Faktisk kildevisning og Max-stilanker før hvert motiv gjenstår. '
+    'Ingen nye bildekall/resultater/native. Kostyme 18 har også grønn motstander, fragmenter og støv, '
+    'så den generelle Max-katalogteksten skal ikke tolkes alene.\n')
+print('Neste bunke:7 jobber,68 mål,58 hele RGBA,64 kildeobserverte,1200 beskyttede,0 nye kall. Mulige hele aliasgrupper:',len(alias))
