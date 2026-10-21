@@ -1,3 +1,7 @@
+Gjeldende etter felles3125: Første fem304-ark og første fem303-ark er kontrollert i begge faktiske pakker og publisert som Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-hyssing. De gjentas ikke. Resten av304 er verktøyavvist eller ikke forsøkt;ingen omprøve eller delkomposisjon. K01 i sam304-midten-20261021 er bare utkast med avvikende ører. Neste praktiske bunke er303_06..10 fra sam303-andre-kilde-20261021 etter visuell kilde-/stilkontroll. Bevar1136kilder og tre stasher. Ingen ny Tom-/Claude-godkjenning.
+
+## Historikk fra forrige bunke
+
 Publisert og hentet hd-mod 7a3fbcd2ef1a1dd24ae5ef11504cf03980e9b0ed, 3110 native, 432 av 1758 hele figurjobber. Alle 21353 faktiske filhash og alle tidligere PNG er kontrollert. Ni bildekall, fire returer, fem ferdige ark fig304_01..05, alle 12 native mottatt og sett i Linux. Ikke generer disse på nytt. Publiseringskilde er ac1e2f43d67866db7d91d3ecb40c280beefba5c5.
 
 Neste praktiske bunke er fig304_06..10, deretter 11..15. Kildeplanen og alle 34 avspilte originale mål ligger i rapporter/sam304-kilde-20261021. De ti resterende originalarkene må ses før sine motivkall. Se begge godkjente hovedark og faktisk kildekontekst før hvert motiv. Sam og Max er sammen med hyssing, ikke bare Sam. Den lange tynne hyssingen, vridd Max, eventuelle små bekreftede merker og håndgrep krever visuell kontroll. Bruk ekte alfa og egen maling, ingen harde originalmasker eller originalfragmenter. Bevar 1096 kilder og tre stasher. Ikke omprøv avviste kall eller ugyldige 344/346-ruter.

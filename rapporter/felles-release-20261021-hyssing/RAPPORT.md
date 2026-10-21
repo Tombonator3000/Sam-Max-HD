@@ -19,3 +19,7 @@ Kontrollrapport: https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/ra
 Spillet og grafikken tilhører Disney/Lucasfilm.
 
 Linux-binær SHA256 a34f9ca223d61fa5c9eac09d823a46542aeb6af88b17a8a9177e77f21dcc1281. Nativefrys frigjøres etter bekreftet fellespublisering.
+
+Fellesutgave og Latest er bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-hyssing. Nativefrysen er frigitt. Alle 32 tidligere releaser og gjeldende vedlegg er bevart ved publiseringen.
+
+REST-oppslag via tag returnerte404 for ny kladd. Samme kladd419166426 ble funnet via release-ID,verifisert og fullført med alle fire SHA-kontrollerte vedlegg. Ingen duplikat. Et ekstra Windows-taggbygg39545730608 ble startet automatisk;det er ikke en av de to faktisk kontrollerte og publiserte pakkene,og er ikke avbrutt eller startet på nytt.

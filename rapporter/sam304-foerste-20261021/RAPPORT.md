@@ -15,3 +15,6 @@ Publisering og tilbakehenting kvitteres separat. Felles Linux-/Windows-utgave ha
 Publisert og hentet `7a3fbcd2ef1a1dd24ae5ef11504cf03980e9b0ed`, 3110 native. Alle 21353 faktiske filhash er bekreftet, 21335 tidligere PNG bevart. Grafikkilde `ac1e2f43d67866db7d91d3ecb40c280beefba5c5`. Pakker har fortsatt 3098 og mangler de 12 nye til neste samlepunkt etter familien 304. Ingen nativefrys.
 
 Main-dokumentasjonen ad089fb1f9612f8c9da6e69fea66dac523e308af har grønn CI 39541160662. Kontroll-GIF viser utvalgte faktiske dumper 178 til 200 med 140 ms per bilde for visuell kontroll; den dokumenterer ikke naturlig avspillingstempo.
+
+
+Felles Linux-/Windows-utgave 3125 og Latest er bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-hyssing. Begge faktiske nedlastinger og alle 21367 runtimefiler per pakke er SHA-bekreftet. Alle 27 nye er motorlogget og har byteidentiske figurutsnitt til visuelt kontrollert produksjon. 467 av 469 kontroller er null, de to kjente overgangsavvikene er identiske i pakken og grunnlaget. Ingen nye eller økte avvik. Nativefrysen er frigitt. Ingen ny Tom-/Claude-godkjenning.

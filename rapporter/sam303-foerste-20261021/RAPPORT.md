@@ -15,3 +15,6 @@ Den foregående304-bunken stoppet etter sikkerhetsavvisning av hengende Max i K0
 Publisering/hent og fellespakker kvitteres separat. Pakker har3098 og mangler27 (12 tidligere304 og15 nye303). Pakkesamlepunkt følger nå, fordi resten304 er blokkert. Tidligere kjente motor/testhopp/Windows-SDL-begrensninger er ikke erklært rettet.
 
 Publisert og hentet `596201dcce1901db4a7c4a7f853ca591ffb11cbd`,3125native. Alle21368filer SHA-bekreftet,21347 tidligere PNG bevart. Grafikkilde `7dcca52d504c0e9e37c25a35ec1bae9e1963d8fc`. Pakker har3098 og mangler27. Nativefrys for fellespakker starter nå.
+
+
+Felles Linux-/Windows-utgave 3125 og Latest er bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-hyssing. Begge faktiske nedlastinger og alle 21367 runtimefiler per pakke er SHA-bekreftet. Alle 27 nye er motorlogget og har byteidentiske figurutsnitt til visuelt kontrollert produksjon. 467 av 469 kontroller er null, de to kjente overgangsavvikene er identiske i pakken og grunnlaget. Ingen nye eller økte avvik. Nativefrysen er frigitt. Ingen ny Tom-/Claude-godkjenning.
