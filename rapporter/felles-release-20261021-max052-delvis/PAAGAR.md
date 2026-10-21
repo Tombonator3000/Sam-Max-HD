@@ -1,0 +1,1 @@
+Felles samlepunkt3013: native82fcc69f er frosset mens Linux/Windows bygges. Pakker kalles ikke oppdatert før faktisk nedlasting,hash og motor.55 nye siden felles2958:045/18 og052/37.1920 fortsatt holdt. Ingen nye native under frys.

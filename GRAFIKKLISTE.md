@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Publisert og hentet 82fcc69f6a21ac80bc4adc8b4b779e50004f1fff:3013 native,21256 filer/21250 PNG,alle hash bekreftet. Fellesbygg startet én gang per plattform på kode bb769709d4bc889b18763caf96bf2fd035265bd2,Linux39526033511,Windows39526036828. Denne native-SHAen er frosset til kontroll og publisering av pakkene. Nåværende fellespakke2958mangler55.
+
 052 delvis: 37 nye native laget, mottatt, visuelt sett og motorobservert. Fig052_02/03 levert, ark01 fortsatt utkast fordi cat1920 feiler dekning. 423/1758 resultatjobber, kandidat3013. Les rapporter/max052-20261021/NESTE.md. Pakker2958 mangler55, samlepunkt følger. Alle1024kilder/3stasher/tidligere filer bevares. Ingen ny Tom-/Claude-godkjenning.
 
 045 publisert og hentet på513a06ef,2976native og421av1758resultatark. Neste052_01til03har kildegrunnlag klart:38av38cels fra35heleRGBA,retning2,Max/kattekurér/oppdragsark. Ingen052resultat/native. Les max052-kilde-20261021/KILDEGRUNNLAG.md og gang045-20261021/NESTE.md før tegning. Pakker2958mangler18;samlepunkt etter neste praktiske bunke. Alle tidligere filer/3stasher bevares.
