@@ -1,5 +1,15 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 14:43
+
+- [x] Fire øvre svanebåtark fig097_09 til 12 levert og additivt publisert: 48 nye native, 3419 totalt. Alle 21662 filhash, 1300 kilder og tre stasher bekreftet etter hent. Hele familien har tolv ark og 95 native.
+- [x] Alle 48 automatisk OK. Tre ark OK, ett visuelt vurdert SJEKK. Alle 48 vist i begge motorprøver; 718/720 null med samme to kjente 160. 190 originalflater SHA-identiske, 96 par med null utenfor ny figurflate. Alle varianter og 13 hele par sett.
+- [ ] Fullfør felles Linux-/Windows-samlepunkt 3419. Native er fryst. Felles 3324 mangler familiens 95 nye. Bekreft faktiske nedlastinger, sjekksummer, alle moddfiler og faktisk inkludert grafikk før pakkene kalles oppdatert.
+- [ ] Fortsett neste uleverte, uavhengige jobb i GRAFIKKLISTE etter kildeavklaring. Ikke gjenta tolv leverte 97-ark eller tidligere avviste motiver. 477 av 1758 hele resultatark, 1281 gjenstår pluss returer, katalogfeil og sluttkontroll.
+- [ ] Bevar tidligere filer, releaser, 1300 kilder og tre stasher. Ingen ny Tom-/Claude-godkjenning. Full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår; kjente SDL-/inventar-/testhoppbegrensninger er åpne. Gamle nattprosesser forblir avsluttet.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 13:53
 
 - [x] Levert og additivt publisert fig097_01 til fig097_08: 47 nye native, 3371 totalt. Alle 21614 filhash, tidligere grafikk, 1300 kilder og tre stasher bekreftet etter hent.
