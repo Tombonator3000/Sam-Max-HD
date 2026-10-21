@@ -1,0 +1,11 @@
+# fig088_06, 21. oktober 2026
+
+Siste faser av Cone of Tragedy, kostyme 88 i rom 17 Midway. Sam ligger på ryggen, Max står ved siden av de tomme klammene, den lille toppen har åpnet seg. Hele kilden bestemmer mekanikkens timing, nivåer og små mellomrom. Det store kjegleskallet er et annet lag. Original, faktisk primærsekvens 201, separat animasjon 6 og begge godkjente hovedark er sett før hvert motiv. Generisk jobbprompt har feil fasepremiss. Korrigerte faktiske prompter er bevart separat. Ingen beskyttet jobbfil er endret.
+
+Hele bunken har 24 vellykkede innebygde image_gen-kall: 14 grunnkall og ti kvalitetsreturer. Modellnavn ikke oppgitt. Ingen avbrutte bildeverktøykall, modereringsavslag eller CLI/API-fallback. Alle råbilder, faktiske argumenter, prompter og referansehash er bevart i rapporter/sam088-slutt-20261021/kall. Svake utkast er bevart og ikke importert. R08 retter øreoverlapp og R10 retter høyrebåndets atskillelse. Kilder og Max-detalj bekrefter den lille lyse tannkanten; bredt glis er rettet.
+
+Python renser egne kanter, fjerner egne ekstra hatteflekker/navler fra eget RGB med uendret alfa, og plasserer hver hel egen tegning ved fast 4x med åtte HD-pikslers marg. Ingen originalformmaske brukes til klipping, ingen kildefragmenter settes inn og ingen kroppsdel flyttes separat. 14 forskjellige hele egne malerier gir 14 mål, uten aliaser. Hele egne kildepar er visuelt sett. Ingen motor-/pipelineendring.
+
+Resultat 1536x1024 RGBA, SHA256 52c592a3b72404da0b3eee68977ab8bb3bd8ac247bac09cdbe3799bed7698083. Egenkontroll SJEKK, ingen FEIL. CORE128, IoU 0,6 og dekning 0,8 er uendret. SHA-festet fremdrift, rutekart, teknisk mottak og motorbevis kvitteres hver for seg i rapporten. Ingen ny Tom-/Claude-godkjenning. Alle tidligere filer, 1380 beskyttede kilder og tre stasher bevares. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt.
+
+Hele arket og endelig motorvisning er sett. Alle 14 native er automatisk OK. De tre arkene har sju visuelt vurderte omrissvarsler, ingen FEIL. Motoren logget alle 64 familieruter i både primær201 og hel6, med 1436/1440 null per side, identiske kjente avvik, 28 SHA-like originalflater og null utenfor ny aktørflate. Publisering og pakker kvitteres separat.

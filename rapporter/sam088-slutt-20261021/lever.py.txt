@@ -1,0 +1,69 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam0883535'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/'grunnlag-produksjon.json');protected=read(R/'beskyttede-samlet1380.json');plan=read(R/'kildeplan.json');chosen=read(R/'valgte14.json')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+assert b['native']==3521 and len(b['filer'])==21764 and all(sha(M/f)==h for f,h in b['filer'].items())
+assert len(protected)==1380 and all(sha(A/f)==h for f,h in protected.items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==b['stash']
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==494 and not C.exists()
+assert not any((A/'jobber'/j['jobb']/'resultat.png').exists() for j in plan['jobber'])
+assert len(chosen)==len({e['canonical_rgba_sha256'] for e in chosen})==14
+for e in chosen:
+ assert e['native_ok'] and sha(A/e['prototype'])==e['prototype_sha256']
+ e.update(visuelt_sett=True,kilde_og_spillkontekst_sett=True,sam_og_max_stilankere_sett=True,visuell_merknad='Hel kilde og hel egen tegning sett etter siste rens på sju SHA-festede sider. Figurenes ryggleie/stående fase, tannkant, liten orbit, åpnet topp, mekanisme og små kildebekreftede åpninger bevart. Høyrebåndet i 1976 er synlig atskilt; 1978 har atskilt venstrebånd. Ingen Tom-/Claude-godkjenning.')
+vis=read(R/'visuell/oversikt-endelig.json');assert len(vis)==7
+for e in vis:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+save(R/'visuell/oversikt-endelig.json',vis);save(R/'prototyper-endelig.json',chosen)
+by={e['bilde']:e for e in chosen};sources={e['bilde']:e for e in plan['ruter']};deliveries=[];native=[]
+calls=list((R/'kall').glob('*/verktøyresultat.json'));assert len(calls)==24
+for p in calls:
+ d=read(p);cc=p.parent;args=read(cc/'faktiske-argumenter.json');assert d['raa_sha256']==sha(cc/'raa.png') and d['argumenter_sha256']==sha(cc/'faktiske-argumenter.json') and d['prompt_sha256']==sha(cc/'faktisk-prompt.txt')
+ assert d['referanser']=={f:sha(Path(f)) for f in args['referenced_image_paths']}
+for jr in plan['jobber']:
+ job=jr['jobb'];J=A/'jobber'/job;j=read(J/'jobb.json');D=O/'ark'/job;D.mkdir(parents=True,exist_ok=True)
+ for f in ['jobb.json','original_1x.png','prompt.txt','referanse.png']:shutil.copy2(J/f,D/f)
+ sheet=Image.new('RGBA',tuple(j['lerret']));mapping=[]
+ for t in j['ruter']:
+  n=t['bilde'];s=sources[n];e=by[s['canonical']];src=Image.open(s['kilde']).convert('RGBA');assert sha(Path(s['kilde']))==s['sha256'] and hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256']
+  own=Image.open(A/e['prototype']).convert('RGBA');assert own.size==(src.width*4+16,src.height*4+16);arr=np.array(own);core=arr[:,:,3]>=CORE;sm=np.array(src)[:,:,3]>0;iou,cov=_iou(core,np.repeat(np.repeat(sm,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER
+  x,y,_,_=t['rekt'];dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8;assert min(dx,dy)>=0 and dx+own.width<=sheet.width and dy+own.height<=sheet.height
+  layer=Image.new('RGBA',sheet.size);layer.alpha_composite(own,(dx,dy));assert not ((np.array(sheet)[:,:,3]>0)&(np.array(layer)[:,:,3]>0)).any();sheet.alpha_composite(layer)
+  yy,xx=np.nonzero(core);mapping.append(dict(bilde=n,kostyme=88,rute=t['rute'],lag=t['lag'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical=s['canonical'],canonical_rgba_sha256=e['canonical_rgba_sha256'],prototype=e['prototype'],prototype_sha256=e['prototype_sha256'],kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,native_ok=True))
+  native.append(dict(bilde=n,canonical=s['canonical'],fil='costumes/'+n+'_hd.png',prototype=e['prototype'],sha256=e['prototype_sha256'],kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragmenter=False))
+ sheet.save(D/'resultat.png');test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(D/'resultat.png')],cwd=A,text=True,capture_output=True);(R/(job+'-egenkontroll.txt')).write_text(test.stdout+test.stderr);assert test.returncode in [0,1] and 'FEIL' not in test.stdout+test.stderr,test.stdout+test.stderr
+ digest=sha(D/'resultat.png');save(R/('rutekart-'+job+'.json'),{job:dict(sha256_resultat=digest,ruter=mapping)})
+ row=dict(jobb=job,resultat='jobber/'+job+'/resultat.png',sha256=digest,ruter=len(mapping),rutekart='rapporter/'+R.name+'/rutekart-'+job+'.json',laget=True,levert=False,egenkontroll=['OK','SJEKK'][test.returncode],egenkontrollert=True,visuelt_kontrollert=False,prototype_visuelt_sett=True,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False);deliveries.append(row)
+ print(job,row['egenkontroll'],len(mapping),'ruter',flush=True)
+assert sum(d['ruter'] for d in deliveries)==14 and len(native)==14
+for row in deliveries:
+ J=A/'jobber'/row['jobb'];D=O/'ark'/row['jobb'];shutil.copy2(D/'resultat.png',J/'resultat.png');row['levert']=True
+ (J/'notat.md').write_text(f'''# {row['jobb']}, 21. oktober 2026
+
+Siste faser av Cone of Tragedy, kostyme 88 i rom 17 Midway. Sam ligger på ryggen, Max står ved siden av de tomme klammene, den lille toppen har åpnet seg. Hele kilden bestemmer mekanikkens timing, nivåer og små mellomrom. Det store kjegleskallet er et annet lag. Original, faktisk primærsekvens 201, separat animasjon 6 og begge godkjente hovedark er sett før hvert motiv. Generisk jobbprompt har feil fasepremiss. Korrigerte faktiske prompter er bevart separat. Ingen beskyttet jobbfil er endret.
+
+Hele bunken har 24 vellykkede innebygde image_gen-kall: 14 grunnkall og ti kvalitetsreturer. Modellnavn ikke oppgitt. Ingen avbrutte bildeverktøykall, modereringsavslag eller CLI/API-fallback. Alle råbilder, faktiske argumenter, prompter og referansehash er bevart i rapporter/{R.name}/kall. Svake utkast er bevart og ikke importert. R08 retter øreoverlapp og R10 retter høyrebåndets atskillelse. Kilder og Max-detalj bekrefter den lille lyse tannkanten; bredt glis er rettet.
+
+Python renser egne kanter, fjerner egne ekstra hatteflekker/navler fra eget RGB med uendret alfa, og plasserer hver hel egen tegning ved fast 4x med åtte HD-pikslers marg. Ingen originalformmaske brukes til klipping, ingen kildefragmenter settes inn og ingen kroppsdel flyttes separat. 14 forskjellige hele egne malerier gir 14 mål, uten aliaser. Hele egne kildepar er visuelt sett. Ingen motor-/pipelineendring.
+
+Resultat 1536x1024 RGBA, SHA256 {row['sha256']}. Egenkontroll {row['egenkontroll']}, ingen FEIL. CORE128, IoU 0,6 og dekning 0,8 er uendret. SHA-festet fremdrift, rutekart, teknisk mottak og motorbevis kvitteres hver for seg i rapporten. Ingen ny Tom-/Claude-godkjenning. Alle tidligere filer, 1380 beskyttede kilder og tre stasher bevares. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt.
+''')
+progress=dict(leveranser=deliveries,nye_jobber_levert=3,nye_native_planlagt=14,ulike_hele_egne_malerier=14,hele_rgba_aliasmal=0,innebygde_bildekall=24,vellykkede_bildekall=24,avbrutte_forsok=0,avviste_bildekall=0,returkall=10,grunnlag_native=3521,hele_figurjobber_med_resultat=497,total_figurjobber=1758,gjenstar=1261)
+save(R/'fremdrift.json',progress)
+auto=O/'automatisk-mottak';subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(auto),'--jobb',','.join(j['jobb'] for j in plan['jobber']),'--forhandsvisning',''],cwd=P,check=True)
+report=read(auto/'myke.json');save(R/'automatisk-mottak14.json',report);assert report['ruter_ok']==14 and all(report[k]==0 for k in ['ruter_sjekk','ruter_mangler','ruter_teknisk'])
+shutil.copytree(M,C)
+for e in native:
+ dest=C/e['fil'];assert not dest.exists();shutil.copy2(A/e['prototype'],dest);assert sha(dest)==e['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3521;meta['costume_cels']=3535;save(C/'mod.json',meta)
+files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()};assert len(files)==21778
+assert {f for f,h in b['filer'].items() if files[f]!=h}=={'mod.json'} and set(files)-set(b['filer'])=={e['fil'] for e in native}
+save(R/'kandidatfilhash.json',files);save(R/'egen-native.json',dict(ruter=native,nye_native=14,native_totalt=3535,fast_4x=True,marg_original=[2,2],egen_alfa=True,originalmaske=False,originalfragmenter=False,automatisk14_OK=True,kontrollkopier_ikke_brukt_i_native=True,tidligere_filer_bevart=21764,filer=21778,png=sum(f.endswith('.png') for f in files)))
+for row in deliveries:row['native_mottatt']=True
+progress.update(nye_native=14,native_totalt=3535);save(R/'fremdrift.json',progress)
+assert all(sha(A/f)==h for f,h in protected.items())
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+print('Tre ark og fjorten automatisk OK. Kandidat 3535. Hele ark og motorprøve gjenstår.',flush=True)

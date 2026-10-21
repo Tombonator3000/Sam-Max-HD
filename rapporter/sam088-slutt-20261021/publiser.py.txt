@@ -1,0 +1,49 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam0883535';T=O/'publisering-hdmod3535'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip();api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True));remote=lambda branch:api('git/ref/heads/'+branch)['object']['sha']
+b=read(R/'grunnlag-produksjon.json');files=read(R/'kandidatfilhash.json');proof=read(R/'sluttkontroll.json');m=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json');protected=read(R/'beskyttede-samlet1380.json')
+assert not T.exists() and not (R/'publisering-forsokt.json').exists()
+assert git(A,'branch','--show-current')=='gpt-arbeid' and not git(A,'status','--porcelain');art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art
+assert remote('hd-mod')==b['fjern_sha']=='d9d4c444ef28c5fa8279df512f2db1841c574d26'
+assert len(b['filer'])==21764 and all(sha(M/f)==h for f,h in b['filer'].items())
+assert len(files)==21778 and all(sha(C/f)==h for f,h in files.items())
+assert len(protected)==1380 and all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert proof['visuelt_sett'] and proof['motorobservert'] and m['visuelt_sett'] and m['primaerskript201_kjort']
+assert {e['jobb'] for e in proof['leveranser']}=={'fig088_06','fig088_07','fig088_08'} and all(sha(A/e['resultat'])==e['sha256'] for e in proof['leveranser'])
+assert m['sett']==14 and m['kontrollantall']==1440 and m['nullkontroller']==1436 and m['avvikskoordinater_og_rgb_par_identiske'] and m['ingen_nye_feilpiksler'] and m['alle28_originalflater_SHA_identiske'] and m['alle28_utenfor_figurflate']==0
+assert v['hele_varianter_sett']==14 and v['hele_for_etter_sett']==3 and all(e['visuelt_sett'] and sha(R/e['fil'])==e['sha256'] for g in ['varianter','hele_for_etter','hele_motorbilder'] for e in v[g])
+builds={}
+for wf in ['linux.yml','windows.yml']:
+ runs=api('actions/workflows/'+wf+'/runs?per_page=15')['workflow_runs'];assert not any(e['status']!='completed' for e in runs),'Native holdes frosset ved aktive pakkebygg';builds[wf]=[dict(id=e['id'],status=e['status'],conclusion=e['conclusion']) for e in runs]
+release=api('releases/latest');assert release['tag_name']=='sam-max-hd-2026-10-21-vr' and read(A/'rapporter/felles-release-20261021-vr/publisert.json')['native_frys_kan_frigis']
+save(R/'pakkebygg-for-publisering.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),aktive_bygg=[],siste_bygg=builds,siste_fellesrelease=release['tag_name']))
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=b['fjern_sha'],forventet_native=3535,force_with_lease=True,grenmetode='Ny historikkløs commit etter repoets hd-mod-konvensjon, samtlige tidligere filer beholdes.'))
+shutil.copytree(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest={p.relative_to(T).as_posix():sha(p) for p in T.rglob('*') if p.is_file() and '.git' not in p.relative_to(T).parts and p.name!='SHA256SUMS'}
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(manifest.items())))
+assert all(manifest[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+subprocess.run(['git','-C',str(T),'add','-A'],check=True);subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod 3535: full Cone of Tragedy-familie med siste 14 ruter'],check=True)
+assert remote('hd-mod')==b['fjern_sha'];subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+b['fjern_sha'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=remote('hd-mod');assert published==git(T,'rev-parse','HEAD')
+subprocess.run(['bash','tools/mod_gren.sh','hent',str(M)],cwd=P,check=True)
+actual={p.relative_to(M).as_posix():sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual)==set(files) and len(actual)==21778 and {f for f,h in files.items() if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in b['filer'].items() if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)==read(M/'mod.json')['costume_cels']==3535
+assert git(P,'stash','list','--format=%H').splitlines()==b['stash'] and all(sha(A/f)==h for f,h in protected.items()) and remote('hd-mod')==published
+save(R/'publiserte-moddfiler-3535.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=3535,nye_native=14,nye_hele_ark=3,hele_figurjobber=497,gjenstar=1261,filantall=21778,png=21772,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_png_bevart=21758,beskyttede=1380,stasher=b['stash'],force_with_lease=True,egen_alfa_ingen_originalfragmenter=True,visuelt_sett=True,motorobservert=True,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3471,pakker_mangler_native=64,native_frosset=True,neste_samlepunkt='Nå. Hele kostyme88 er levert; felles Linux-/Windows-bygg med hele familien på 64 mål.',egenkontroll_ark_ok=0,egenkontroll_ark_sjekk=3,egenkontroll_omrissvarsler=7,alle14_native_OK=True,innebygde_bildekall=24,vellykkede_bildekall=24,avbrutte_forsok=0,returkall=10)
+save(R/'mottak-publisert.json',receipt)
+for n in ['fremdrift.json','sluttkontroll.json']:
+ d=read(R/n);d.update(publisert=True,hd_mod=published,grafikkilde=art,native_frosset=True)
+ for e in d['leveranser']:e.update(publisert=True,hd_mod=published)
+ save(R/n,d)
+line=f'Publisert og hentet {published}: siste tre Cone of Tragedy-ark fig088_06 til fig088_08 og 14 nye native, 3535 totalt. Hele familien har åtte ark og 64 mål fra 43 hele kilder. 497 av 1758 ark har resultat; 1261 gjenstår pluss returer, katalogfeil og sluttkontroll. 24 vellykkede innebygde bildekall, ti kvalitetsreturer, ingen avslag. Tre ark har sju visuelt vurderte omrissvarsler, ingen FEIL; alle 14 native automatisk OK. Alle 64 familieruter logget i primær201 og hel6. 1436/1440 null per side, identiske kjente overgangsavvik, 28 SHA-like originalflater og null utenfor nye aktørflater. Alle 21778 filhash, alle tidligere PNG, 1380 beskyttede kilder og tre stasher bekreftet etter hent. Ingen ny Tom-/Claude-godkjenning. Fellespakkene har ennå 3471 og mangler familiens 64. Native holdes nå frosset mens begge pakkene bygges og faktisk nedlasting kontrolleres. Se rapporter/{R.name}/NESTE.md.'
+for n in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/n;s=p.read_text();i=s.find('\n');p.write_text(s[:i+1]+'\n'+line+'\n'+s[i+1:])
+for n in ['NESTE.md','RAPPORT.md']:
+ p=R/n;p.write_text(line+'\n\n'+p.read_text())
+print(json.dumps(receipt,ensure_ascii=False),flush=True)

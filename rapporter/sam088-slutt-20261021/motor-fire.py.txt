@@ -1,0 +1,9 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent
+def run(label):
+ print('Starter',label,flush=True)
+ q=subprocess.run([str(P/'.venv/bin/python'),str(O/'motor.py'),label],cwd=P,capture_output=True,text=True,timeout=240)
+ print(label,q.returncode,q.stdout,q.stderr,flush=True);assert q.returncode==0
+with ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(run,['grunnlag-hel6','kandidat-hel6','grunnlag-primaer201','kandidat-primaer201']))

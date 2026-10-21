@@ -1,0 +1,19 @@
+from pathlib import Path
+import json, hashlib, shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; R=A/'rapporter/sam088-slutt-20261021'
+read=lambda p:json.loads(p.read_text())
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+items=[('R08','K03',"Change ONLY the overlap between the rightmost thin gray upright and Max's slanted left ear. The gray metal MUST be behind the cream/pink ear: the visible rod ends at the upper/back edge of that ear, and NO gray line crosses the pink interior or white ear. Preserve the complete ear's outline, face, small neutral mouth/tooth edge, body and pose. Keep every rod/clamp position and all other objects unchanged."),('R09','K07',"Change ONLY the connection at the bottom of the right descending diagonal arm, just to the left of Max's lower body. The original has a tiny transparent separation: the diagonal gray rod ends ABOVE the upper edge of the right open ankle-clamp band, leaving a small visible clear gap, about 2 to 3 source pixels. Keep the existing clamp band in its exact place beside/partly behind Max's hip. Do not add a connector. Preserve the entire rest of this cel unchanged, including Max's small neutral mouth/tooth edge, Sam, cap, all other rods and levels and white orbit.")]
+for new,old,edit in items:
+ C=R/'kall'/new; B=R/'kall'/old; assert not C.exists();C.mkdir()
+ p=read(B/'plan.json');e=p['ruter'][0]
+ refs=[str(B/'raa.png'),str(B/'original-alfa.png'),str(A/'hovedark/sam.png'),str(A/'hovedark/max.png'),str(B/'spillkontekst.png')]
+ prompt="Use case: precise-object-edit. Image1 is the complete transparent cel to edit; image2 is its exact original source and controls all timing and overlap. "+edit+" Image3/4 are approved identity masters only and image5 is game context only. Return the WHOLE cel on the same full square canvas with true soft alpha, flat color fields, clean dark ink contours. Do not add new objects, fills, glows or backgrounds."
+ args=dict(prompt=prompt,referenced_image_paths=refs,transparent_background=True)
+ save(C/'faktiske-argumenter.json',args);(C/'faktisk-prompt.txt').write_text(prompt+'\n')
+ save(C/'plan.json',dict(kall=new,ruter=[e],ingen_kall_enna=True,kilde_og_kontekst_sett=False,reference_atlas_sett=False,mastere_sett=False,referanser_sha256={f:sha(Path(f)) for f in refs},hele_kilder=True,ingen_originalmaske=True,kvalitetsretur_for=old,hel_redigering_av_egen_raa=(B/'raa.png').relative_to(A).as_posix()))
+ for name in ['originalatlas.png','original-alfa.png','spillkontekst.png','kontekst-og-mastere.png']:shutil.copy2(B/name,C/name)
+ save(B/'kvalitetsretur.json',dict(aarsak=edit,neste_helredigering=new,bevart_raa=True,ikke_levert=True))
+f=read(R/'fremdrift.json');f.update(vellykkede_bildekall=21,neste_kall=['R08','R09'],visuell_retur=['K03','K07'],publisert=False,motorobservert=False);save(R/'fremdrift.json',f)
+(R/'NESTE.md').write_text('Påbegynt fig088_06 til fig088_08. 21 vellykkede innebygde kall bevart, 14 hele kandidater. Alle sju hele sammenligningssider og original Max-detalj sett. Max har en liten lys tannkant i originalen. R05 hattmerke og egne ekstra navler/hattflekker gjenstår som ren egen RGB-rens med uendret alfa. K03 har metall feil foran øre og K07 har en uønsket sammenkobling; hele redigeringsreturer R08/R09 er klargjort, ikke kjørt. Ingen hele ark eller import ennå. Native 3521, ark 494/1758. Ingen kvote-/modererings-/bildeverktøyfeil.\n')

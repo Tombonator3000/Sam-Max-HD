@@ -1,0 +1,28 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+names=['R03','R05','R08','K04','K05','K06','R10','K08','K09','K10','K11','R06','K13','R07']
+rows=[read(R/'kall'/n/'prototypekontroll.json')[0] for n in names];assert len({e['bilde'] for e in rows})==14 and all(e['native_ok'] for e in rows)
+save(R/'valgte14.json',rows);overview=[]
+for start in range(0,14,2):
+ board=Image.new('RGBA',(780,850),'#596978');draw=ImageDraw.Draw(board)
+ for off,e in enumerate(rows[start:start+2]):
+  src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA');own=Image.open(A/e['prototype']).convert('RGBA');assert sha(A/e['prototype'])==e['prototype_sha256']
+  y=off*425;draw.text((8,y+7),f"{e['valgt_kall']} {e['bilde']} kilde4x / hel egen4x IoU {e['snitt_union']:.3f} dekning {e['dekning']:.3f}",fill='white')
+  board.alpha_composite(src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST),(16,y+36));board.alpha_composite(own,(398,y+28))
+ f=R/'visuell'/f'hele-kilder-endelig-{start//2+1:02}.png';board.convert('RGB').save(f);overview.append(dict(fil=f.relative_to(R).as_posix(),sha256=sha(f),kilder=[e['bilde'] for e in rows[start:start+2]],visuelt_sett=False))
+save(R/'visuell/oversikt-endelig.json',overview)
+protected=read(R/'beskyttede-samlet1380.json');assert len(protected)==1380 and all(sha(A/f)==h for f,h in protected.items())
+b=read(R/'grunnlag-produksjon.json');assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==b['stash']
+calls=list((R/'kall').glob('*/verktøyresultat.json'));assert len(calls)==24
+for p in calls:
+ d=read(p);C=p.parent;args=read(C/'faktiske-argumenter.json')
+ assert sha(C/'raa.png')==d['raa_sha256'] and sha(C/'faktiske-argumenter.json')==d['argumenter_sha256'] and sha(C/'faktisk-prompt.txt')==d['prompt_sha256']
+ assert d['referanser']=={f:sha(Path(f)) for f in args['referenced_image_paths']}
+progress=dict(leveranser=[],nye_hele_ark=0,nativegrunnlag=3521,nye_native_importert=0,resultatark=494,total_figurjobber=1758,vellykkede_bildekall=24,grunnkall=14,returkall=10,planlagte_hele_kilder=14,tekniske_kandidater=14,naa_valgt=names,publisert=False,motorobservert=False,alle1380_beskyttede_SHA_like=True,tre_stasher_bevart=True,verktøyfeil=0,modereringsavslag=0)
+save(R/'fremdrift.json',progress)
+(R/'NESTE.md').write_text('Påbegynt fig088_06 til fig088_08. 24 vellykkede innebygde kall: 14 grunnkall og ti kvalitetsreturer. 14 hele kandidater består nativeporter. Hele originaler, faktisk primærsekvens og begge mastere er sett før hvert kall. K03 øreoverlapp er rettet som R08 og K07 båndåpning som ny hel R10; R09 hadde fortsatt sammenkobling og mistet orbitmerker og brukes ikke. Egen RGB-rens fjerner ekstra egne hatteflekker/navler uten alfaendring. Endelige sju hele 4x-par er klargjort, skal sees. Ingen hele ark, import, motorprøve eller publisering ennå. Native fortsatt 3521, ark 494/1758. Deretter bygg tre ark, teknisk mottak, 3535-kandidat, motorprøve i primær201 og hel6, publisering/hent og felles Linux-/Windows-pakker. Alle råbilder, faktiske prompter, 1380 beskyttede filer og tre stasher er bevart. Ingen bildeverktøyfeil eller avslag.\n')
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+print('24 råbilder/argumenter/referanser, 1380 kilder og tre stasher SHA-kontrollert. Sju endelige hele kildepar klargjort.')
