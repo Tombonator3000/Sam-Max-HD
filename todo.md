@@ -1,5 +1,17 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 20:35
+
+- [x] Fig088_01 til fig088_05 levert, visuelt sett, native mottatt, motorobservert, publisert og hentet. Fem ark, 50 nye native, 3521 totalt. 494 av 1758 hele figurjobber har resultat; 1264 gjenstår pluss returer, katalogfeil og sluttkontroll.
+- [x] 29 hele malerier og 21 identiske hele aliasmål. 42 vellykkede innebygde bildekall med 13 kvalitetsreturer og ett avbrutt forsøk uten fil. Alle fem ark SJEKK med elleve visuelt vurderte omrissvarsler, ingen FEIL; alle 50 native automatisk OK. Ingen ny Tom-/Claude-godkjenning.
+- [x] Primærskript 201 og hel animasjon 6 med samme faktisk nedlastede Linux-binær. Alle 64 familieruter logget i hver prøve, 1436/1440 null per side, identiske kjente avvik, 100 SHA-like originalflater og null utenfor nye aktørflater. 29 varianter og ni hele par sett. Alle 21764 publiserte filhash, 21708 tidligere PNG, 1380 kilder og tre stasher bekreftet.
+- [ ] Fortsett fig088_06, fig088_07 og fig088_08 fra rapporter/sam088-kilde-20261021 og siste retur i rapporter/sam088-foerste-20261021. 14 mål fra 14 hele kilder uten bildekall/resultat. Se aktuelle hele originaler, spillkontekst og godkjente Sam-/Max-mastere før hvert motiv. Bevar mekanikken, mellomrommene og smådelene.
+- [ ] Oppdater begge pakker ved samlepunkt etter hele 88-familien, forventet 3535 native, eller tidligere ved blokkering. Fellespakker har 3471 og mangler nå 50. Kontroller aktive bygg/nativefrys, faktiske nedlastinger, sjekksummer og inkludert grafikk før ny fellesutgave kalles oppdatert.
+- [ ] Fortsett øvrige produserbare jobber og returer. Bevar alle tidligere filer, releaser og tre stasher. Ingen omprøve av holdte motiver og aliaser. Ingen ny grafikk i main; nødvendig kode via testet PR.
+- [ ] Samlet sluttkontroll, naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente SDL-/inventar-/testhoppbegrensninger er åpne. Automatikken fortsetter; gamle nattprosesser gjenstartes ikke.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 18:20
 
 - [x] Publisert fig250_11 og fig250_12, tolv nye native og 3471 totalt. Hele VR-familien med tolv ark og 52 native levert og motorprøvd. Egenkontroll ett ark OK og ett SJEKK med to visuelt vurderte omrissvarsler; alle native automatisk OK. 489 av 1758 hele resultatark, 1269 gjenstår pluss returer, katalogfeil og sluttkontroll.
