@@ -1,0 +1,168 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+import hashlib
+import json
+import numpy as np
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter' / Path(__file__).resolve().parent.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+assert (CORE, GOOD_IOU, GOOD_COVER) == (128, .6, .8)
+order = ['B01', 'B02', 'B03', 'B04', 'T01', 'T02', 'T03', 'H01', 'H02', 'H03', 'F01', 'F02',
+         'BR1', 'TR1', 'HR1', 'FR1']
+selected = {}
+for name in order:
+    for e in read(R / 'kall' / name / 'maalt.json'):
+        selected[e['bilde']] = dict(e)
+assert len(selected) == 66
+assert all(e['native_ok'] or e['kall'] == 'FR1' for e in selected.values())
+save(R / 'valgte-for-rens.json', list(selected.values()))
+(R / 'prototyper').mkdir(exist_ok=True)
+cross = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]], bool)
+
+# These are manually selected regions of the OWN paintings, not source silhouettes.
+# Remove generated background fill in the collar from the own color component.
+collars = {
+    1664: ([80, 100, 104, 127], [90, 110], 'dark'),
+    1665: ([76, 100, 101, 128], [86, 110], 'dark'),
+    1681: ([76, 100, 102, 128], [86, 110], 'gray'),
+    1682: ([126, 364, 154, 391], [138, 374], 'gray'),
+    1683: ([88, 100, 115, 128], [98, 110], 'gray'),
+}
+
+def remove_own_collar_fill(a, box, seed, kind):
+    x0, y0, x1, y1 = box
+    rgb = a[:, :, :3].astype(int)
+    roi = np.zeros(a.shape[:2], bool)
+    roi[y0:y1, x0:x1] = True
+    if kind == 'dark':
+        key = rgb.max(2) < 90
+    else:
+        key = ((rgb.min(2) > 50) & (rgb.max(2) < 205)
+               & (rgb[:, :, 1] >= rgb[:, :, 0]) & (rgb[:, :, 2] >= rgb[:, :, 1]))
+    key &= roi & (a[:, :, 3] >= CORE)
+    eroded = nd.binary_erosion(key, structure=np.ones((3, 3), bool))
+    lab, count = nd.label(eroded)
+    yy, xx = np.nonzero(eroded)
+    assert count and len(xx), ('collar color component missing', seed)
+    pick = int(np.argmin((xx - seed[0]) ** 2 + (yy - seed[1]) ** 2))
+    component = lab == lab[yy[pick], xx[pick]]
+    assert int(component.sum()) >= 3
+    erase = nd.gaussian_filter(nd.binary_dilation(component, structure=cross).astype(float), .45)
+    erase[component] = 1
+    before = a[:, :, 3].copy()
+    a[:, :, 3] = np.round(a[:, :, 3] * (1 - erase)).astype(np.uint8)
+    assert np.array_equal(before[~roi], a[:, :, 3][~roi])
+    a[a[:, :, 3] == 0, :3] = 0
+    return dict(egen_ROI=box, egen_farge=kind, egen_frø=seed,
+                fjernede_egne_kjernepiksler=int(((before >= CORE) & (a[:, :, 3] < CORE)).sum()),
+                metode='egen fargekomponent, erodering for å skille strek, myk alfakant',
+                originalmaske_brukt=False)
+
+def size_own_flecks(a):
+    core = a[:, :, 3] >= CORE
+    lab, n = nd.label(core, structure=np.ones((3, 3), bool))
+    parts = []
+    for k in range(1, n + 1):
+        yy, xx = np.nonzero(lab == k)
+        if len(xx) < 400 and int(yy.max()) < 282:
+            parts.append((int(yy.min()), int(xx.min()), k, int(xx.max()) + 1, int(yy.max()) + 1))
+    parts.sort()
+    assert len(parts) == 4, parts
+    _, near = nd.distance_transform_edt(~core, return_indices=True)
+    owner = lab[near[0], near[1]]
+    layers = []
+    original = a.copy()
+    # Source-confirmed anchor coordinates are placement measurements, never an output mask.
+    anchors = [(38, 0), (25, 8), (0, 51), (0, 66)]
+    receipt = []
+    for (y0, x0, k, x1, y1), (tx, ty) in zip(parts, anchors):
+        mask = owner == k
+        own = original.copy()
+        own[~mask] = 0
+        crop = Image.fromarray(own).crop((max(0, x0 - 2), max(0, y0 - 2), x1 + 2, y1 + 2))
+        sx, sy = 4 / (x1 - x0), 4 / (y1 - y0)
+        crop = crop.resize((round(crop.width * sx), round(crop.height * sy)), Image.Resampling.LANCZOS)
+        dest = (tx * 4 + 8 - round(min(2, x0) * sx), ty * 4 + 8 - round(min(2, y0) * sy))
+        layers.append((crop, dest))
+        a[mask] = 0
+        receipt.append(dict(egen_bbox=[x0, y0, x1, y1], maal_egen_kjerne_HD=[4, 4],
+                            kildebekreftet_anker=[tx, ty], ny_egen_plassering=list(dest)))
+    out = Image.fromarray(a)
+    for im, dest in layers:
+        out.alpha_composite(im, dest)
+    return np.array(out), receipt
+
+final = []
+cleanup = []
+for b, e in selected.items():
+    f = R / e['prototype']
+    assert sha(f) == e['sha256']
+    a = np.array(Image.open(f).convert('RGBA'))
+    n = int(b.split('_')[-1])
+    changes = []
+    if e['kall'] == 'FR1':
+        before = a[:, :, 3].copy()
+        _, near = nd.distance_transform_edt(~(before >= CORE), return_indices=True)
+        a[:, :, 3] = nd.grey_dilation(before, footprint=cross)
+        newly = a[:, :, 3] > before
+        a[newly, :3] = a[near[0][newly], near[1][newly], :3]
+        changes.append(dict(metode='én HD-piksel tykkere egen kurvekontur', originalmaske_brukt=False))
+    if n in collars:
+        changes.append(remove_own_collar_fill(a, *collars[n]))
+    if n == 1682:
+        a, particles = size_own_flecks(a)
+        changes.append(dict(metode='fire hele egenmalte merker skalert og plassert enkeltvis',
+                            merker=particles, originalmaske_brukt=False, kilde_RGB_brukt=False))
+    # Remove dark RGB contamination in only the weakest OWN antialias pixels.
+    alpha = a[:, :, 3].copy()
+    _, near = nd.distance_transform_edt(~(alpha >= CORE), return_indices=True)
+    weak = (alpha > 0) & (alpha <= 4)
+    a[weak, :3] = a[near[0][weak], near[1][weak], :3]
+    a[alpha == 0, :3] = 0
+    assert np.array_equal(alpha, a[:, :, 3])
+    # The source is read only after cleanup, for fixed-size and unchanged-gate verification.
+    src = np.array(Image.open(P / 'work/extract/costumes' / (b + '.png')).convert('RGBA'))
+    h, w = src.shape[:2]
+    assert a.shape == (h * 4 + 16, w * 4 + 16, 4)
+    assert hashlib.sha256(src.tobytes()).hexdigest() == e['canonical_rgba_sha256']
+    iou, cov = _iou(a[:, :, 3] >= CORE, np.repeat(np.repeat(src[:, :, 3] > 0, 4, 0), 4, 1), -8, -8)
+    dest = R / 'prototyper' / (b + '.png')
+    Image.fromarray(a).save(dest, optimize=True)
+    row = dict(e, prototype=dest.relative_to(A).as_posix(), prototype_sha256=sha(dest),
+               valgt_kall=e['kall'], snitt_union=iou, dekning=cov,
+               native_ok=iou >= GOOD_IOU and cov >= GOOD_COVER,
+               egen_rens=changes, ingen_originalfragmenter=True, fast4x=True)
+    final.append(row)
+    if changes:
+        cleanup.append(dict(bilde=b, endringer=changes, snitt_union=iou, dekning=cov))
+    print(b, f'{iou:.3f}/{cov:.3f}', 'OK' if row['native_ok'] else 'FEIL', flush=True)
+save(R / 'prototyper-endelig.json', final)
+save(R / 'egen-rens.json', dict(endringer=cleanup, kilde_alpha_ikke_i_rensefunksjoner=True,
+    harde_originalmasker=False, kilde_RGB_fallback=False, kjerne=CORE, IoU_krav=GOOD_IOU, dekning_krav=GOOD_COVER))
+proofs = [1664, 1665, 1681, 1682, 1683, 1882, 1887, 1888]
+for page, subset in enumerate([proofs[:5], proofs[5:]], 1):
+    board = Image.new('RGBA', (1280, len(subset) * 330), '#596978')
+    draw = ImageDraw.Draw(board)
+    for i, n in enumerate(subset):
+        b = f'costume115_{n}'
+        e = selected[b]
+        old = Image.open(R / e['prototype']).convert('RGBA')
+        new = Image.open(R / 'prototyper' / (b + '.png')).convert('RGBA')
+        if old.height > 290:
+            old.thumbnail((600, 280), Image.Resampling.NEAREST)
+            new.thumbnail((600, 280), Image.Resampling.NEAREST)
+        board.alpha_composite(old, (12, i * 330 + 34))
+        board.alpha_composite(new, (652, i * 330 + 34))
+        draw.text((12, i * 330 + 8), b + ' egen for / egen etter rens', fill='white')
+    board.convert('RGB').save(R / f'egen-rens-kontroll{page}.png')
+shutil.copy2(__file__, R / 'rens.py.txt')
+bad = [e['bilde'] for e in final if not e['native_ok']]
+print('Uendrede terskler; 66 prototyper. Feil:', bad, flush=True)
+assert not bad, bad

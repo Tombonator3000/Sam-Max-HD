@@ -1,0 +1,52 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+import numpy as np
+import hashlib
+import json
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter/sam115-golf-20261021'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+f = R / 'prototyper/costume115_1882.png'
+beforefile = R / 'prototyper/costume115_1882-for-egen-fyllstrek.png'
+assert not beforefile.exists()
+shutil.copy2(f, beforefile)
+a = np.array(Image.open(f).convert('RGBA'))
+alpha = a[:, :, 3].copy()
+core = alpha >= CORE
+yy, xx = np.nonzero(core)
+# Add a single own vertical fill stroke INSIDE the existing OWN drawing bounds.
+# No source pixels or source mask take part in this operation. Existing outer alpha is retained.
+region = np.zeros(core.shape, bool)
+region[yy.min():yy.max() + 1, xx.min():xx.max() + 1] = True
+grown = nd.grey_dilation(alpha, footprint=np.ones((3, 1), bool))
+grown[~region] = alpha[~region]
+_, near = nd.distance_transform_edt(~core, return_indices=True)
+added = grown > alpha
+a[added, :3] = a[near[0][added], near[1][added], :3]
+a[:, :, 3] = grown
+a[a[:, :, 3] == 0, :3] = 0
+Image.fromarray(a).save(f)
+src = np.array(Image.open(P / 'work/extract/costumes/costume115_1882.png').convert('RGBA'))
+iou, cov = _iou(a[:, :, 3] >= CORE, np.repeat(np.repeat(src[:, :, 3] > 0, 4, 0), 4, 1), -8, -8)
+rows = json.loads((R / 'prototyper-endelig.json').read_text())
+receipt = dict(metode='én HD-piksel egen loddrett fyllstrek innenfor egen eksisterende tegningsboks',
+    egen_kjerneboks=[int(xx.min()), int(yy.min()), int(xx.max() + 1), int(yy.max() + 1)],
+    ytre_egen_alfa_uendret=True, egen_for_sha256=sha(beforefile), originalmaske_brukt=False,
+    kildefragmenter_brukt=False, snitt_union=iou, dekning=cov,
+    FR2_returnert='Egen nytegning ble for smal i venstre del, native 0,525/0,647. Råbildet er bevart, ikke brukt.')
+for e in rows:
+    if e['bilde'] == 'costume115_1882':
+        e.update(prototype_sha256=sha(f), snitt_union=iou, dekning=cov,
+            native_ok=bool(iou >= GOOD_IOU and cov >= GOOD_COVER))
+        e['egen_rens'].append(receipt)
+save(R / 'kurve1882-egenstrek.json', receipt)
+save(R / 'prototyper-endelig.json', rows)
+shutil.copy2(__file__, R / 'kurve1882-egenstrek.py.txt')
+print(iou, cov, flush=True)
+assert iou >= GOOD_IOU and cov >= GOOD_COVER

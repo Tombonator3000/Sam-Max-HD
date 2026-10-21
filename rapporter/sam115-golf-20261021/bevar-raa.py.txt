@@ -1,0 +1,27 @@
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import sys
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter' / Path(__file__).resolve().parent.name
+call, source = sys.argv[1], Path(sys.argv[2])
+C = R / 'kall' / call
+dest = C / 'raa.png'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+assert C.is_dir() and source.is_file()
+if dest.exists():
+    assert sha(dest) == sha(source)
+else:
+    shutil.copy2(source, dest)
+(C / 'raabilde.json').write_text(json.dumps(dict(kilde=str(source), sha256=sha(dest),
+    verktøy='innebygd image_gen', original_bevart=True), ensure_ascii=False, indent=2) + '\n')
+plan = json.loads((R / 'kallplan.json').read_text())
+for row in plan['kall']:
+    if row['kall'] == call:
+        row.update(status='raa_bevart', sha256_raa=sha(dest))
+(R / 'kallplan.json').write_text(json.dumps(plan, ensure_ascii=False, indent=2) + '\n')
+shutil.copy2(__file__, R / 'bevar-raa.py.txt')
+print(call, sha(dest), flush=True)

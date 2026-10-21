@@ -1,0 +1,60 @@
+; Lokalt skript 200 i rom 25 (LSCR)
+
+Script# 200
+[0000] (68) beginCutscene([2])
+[0007] (70) setState(267,2)
+[000E] (B6) printDebug.begin()
+[0010] (B6) printDebug.msg(sound(0x9EF52FE, 0xA) + " ")
+[0024] (CA) delayFrames(2)
+[0028] (B6) printDebug.begin()
+[002A] (B6) printDebug.msg(sound(0x9EF52FE, 0xA) + " ")
+[003E] (70) setState(267,1)
+[0045] (9D) actorOps.setCurActor(2)
+[004A] (9D) actorOps.setCostume(115)
+[004F] (7F) putActorInXY(2,125,177,255)
+[005C] (5D) if (var152) {
+[0062] (5D)   if (var249 == 2) {
+[006C] (82)     animateActor(2,9)
+[0073] (73)   } else {
+[0076] (82)     animateActor(2,8)
+[007D] (**)   }
+[007D] (5D) } else if (var249 == 2) {
+[008A] (82)   animateActor(2,7)
+[0091] (73) } else {
+[0094] (82)   animateActor(2,6)
+[009B] (**) }
+[009B] (CA) delayFrames(13)
+[009F] (9D) actorOps.setCurActor(7)
+[00A4] (9D) actorOps.setScale(255)
+[00A9] (9D) actorOps.setElevation(0)
+[00AE] (7F) putActorInXY(7,158,170,25)
+[00BB] (CA) delayFrames(7)
+[00BF] (82) animateActor(7,1)
+[00C6] (9D) actorOps.setCurActor(2)
+[00CB] (9D) actorOps.setCostume(110)
+[00D0] (7F) putActorInXY(2,125,177,25)
+[00DD] (5D) if (!var152) {
+[00E4] (43)   var152 = 1
+[00EA] (82)   animateActor(2,6)
+[00F1] (CA)   delayFrames(23)
+[00F5] (73) } else {
+[00F8] (82)   animateActor(2,9)
+[00FF] (CA)   delayFrames(6)
+[0103] (**) }
+[0103] (82) animateActor(2,7)
+[010A] (CA) delayFrames(30)
+[010E] (82) animateActor(2,8)
+[0115] (CA) delayFrames(10)
+[0119] (B6) printDebug.begin()
+[011B] (B6) printDebug.msg(sound(0x9E35B18, 0xA) + " ")
+[012F] (6C) breakHere()
+[0130] (5E) startScript(0,79,[])
+[013A] (6C) breakHere()
+[013B] (6C) breakHere()
+[013C] (5D) unless (!isScriptRunning(79)) jump 13b
+[0144] (67) endCutscene()
+[0145] (5D) if (bitvar67) {
+[014B] (5E)   startScript(0,205,[])
+[0155] (**) }
+[0155] (66) stopObjectCodeB()
+END

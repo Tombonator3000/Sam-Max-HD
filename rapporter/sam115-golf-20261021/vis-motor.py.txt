@@ -1,0 +1,95 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import numpy as np
+import json
+import hashlib
+import re
+import shutil
+import zipfile
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+proofs = [read(R / f'motor-golf3098-frilagt-an{an}.json') for an in [6, 7, 8, 9]]
+observed = {}
+for proof in proofs:
+    for name, v in proof['tegninger'].items():
+        observed.setdefault(name, dict(v, animasjon=proof['animasjon']))
+canonical = [e['bilde'] for e in read(R / 'ruteplan-unik.json')['ruter']]
+assert not set(canonical) - set(observed)
+shots = {}
+for name in canonical:
+    v = observed[name]
+    shots.setdefault((v['animasjon'], v['bildeframe']), dict(v, ruter=[]))['ruter'].append(name)
+shots = sorted(shots.values(), key=lambda v: (v['animasjon'], v['bildeframe']))
+boards = []
+for offset in range(0, len(shots), 6):
+    subset = shots[offset:offset + 6]
+    board = Image.new('RGB', (1320, 770), '#304050')
+    d = ImageDraw.Draw(board)
+    for k, v in enumerate(subset):
+        x, y = k % 3 * 440, k // 3 * 385
+        shot = Image.open(v['fil']).convert('RGB')
+        cut = shot.crop((40 * 4, 97 * 4, 150 * 4, 184 * 4))
+        board.paste(cut, (x, y + 30))
+        d.text((x + 5, y + 4), 'AN' + str(v['animasjon']) + ' F' + str(v['bildeframe']) + ' ' + ','.join(n.split('_')[-1] for n in v['ruter']), fill='white')
+    out = R / f'motor-sammensatte-lag-{offset // 6 + 1:02}.png'
+    board.save(out)
+    boards.append(dict(fil=out.name, sha256=sha(out), opptak=subset))
+save(R / 'motor-visuell-plan.json', dict(alle66_kildevarianter_representert=True,
+    faktisk_linux=True, sekundaer_aktorpos='80,177', original_aktorpos='125,177',
+    andre_aktorer_ikke_skjult=True, naturlig_gjennomspilling=False, brett=boards))
+whole = []
+for an, name in [(6, 'costume115_1664'), (7, 'costume115_1973'),
+                 (8, 'costume115_1683'), (9, 'costume115_1682')]:
+    proof = read(R / f'motor-golf3098-endelig-an{an}.json')
+    v = proof['tegninger'][name]
+    out = R / f'faktisk-linux-an{an}.png'
+    shutil.copy2(v['fil'], out)
+    whole.append(dict(animasjon=an, bilde=name, bildeframe=v['bildeframe'], fil=out.name, sha256=sha(out)))
+save(R / 'hele-motorbilder.json', whole)
+pairs = []
+for an in [6, 7, 8, 9]:
+    old = read(R / f'motor-grunnlag3014-frilagt-an{an}.json')
+    new = read(R / f'motor-golf3098-frilagt-an{an}.json')
+    name = 'costume115_1969' if an in [7, 9] else 'costume115_1948'
+    v, b = new['tegninger'][name], old['tegninger'][name]
+    assert v['bildeframe'] == b['bildeframe']
+    before, after = Image.open(b['fil']).convert('RGB'), Image.open(v['fil']).convert('RGB')
+    board = Image.new('RGB', (1280, 430), '#304050')
+    d = ImageDraw.Draw(board)
+    d.text((8, 8), f'AN{an} kilde3014 / native3098. Sam flyttet til80,177 bare for synlighet; ingen aktorer skjult.', fill='white')
+    board.paste(before.resize((640, 400)), (0, 30))
+    board.paste(after.resize((640, 400)), (640, 30))
+    out = R / f'motor-for-etter-an{an}.png'
+    board.save(out)
+    delta = np.any(np.array(before) != np.array(after), 2)
+    outside = delta.copy()
+    rects = []
+    for proof in [old, new]:
+        log = Path(proof['logg']).read_text()
+        for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)', log):
+            frame, cel, costume, px, py, pw, ph = map(int, m.groups())
+            if v['bildeframe'] - 4 <= frame < v['bildeframe']:
+                rect = [max(0, px * 4 - 12), max(0, py * 4 - 12), min(1280, (px + pw) * 4 + 12), min(800, (py + ph) * 4 + 12)]
+                outside[rect[1]:rect[3], rect[0]:rect[2]] = False
+                rects.append(dict(frame=frame, cel=cel, kostyme=costume, rekt=rect))
+    pairs.append(dict(animasjon=an, bilde=name, bildeframe=v['bildeframe'], fil=out.name,
+        sha256=sha(out), endrede_piksler=int(delta.sum()), utenfor_alle_loggede_aktorflater_og_marg=int(outside.sum()), flater=rects))
+    assert not outside.any(), (an, int(outside.sum()))
+save(R / 'motor-pikselkontroll.json', pairs)
+for an in [6, 7, 8, 9]:
+    folder = O / f'golf3098-frilagt-an{an}'
+    frames = [Image.open(folder / f'frame_{n:06}_room025.png').convert('RGB').crop((40 * 4, 97 * 4, 150 * 4, 184 * 4)) for n in range(60, 161, 2)]
+    frames[0].save(R / f'golf-an{an}-faktisk-linux.gif', save_all=True, append_images=frames[1:], duration=80, loop=0)
+with zipfile.ZipFile(R / 'motorlogger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+    for f in sorted(R.glob('motor-*.json')):
+        data = read(f)
+        if isinstance(data, dict) and data.get('logg'):
+            z.write(data['logg'], data['label'] + '.log')
+shutil.copy2(__file__, R / 'vis-motor.py.txt')
+print(len(boards), 'motorbrett,', len(shots), 'ulike opptak, fire helbilder, fire par og fire GIF klare.', flush=True)

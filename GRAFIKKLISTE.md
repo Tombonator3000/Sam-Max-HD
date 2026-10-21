@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Sam-golf115_01..03 er levert og egenkontrollert:84 nye native, kandidat3098, 427 av1758 hele figurjobber. Alle84 automatisk OK; ark03 har visuelt vurderte SJEKK-varsler. Endelige480/480 null i både primær og sekundær synlighetsprøve. Alle66 varianter sett mot original og samlet i motor. 18 innebygde kall er bevart; sparse merker, fisk/ball og løs svart prikk er kildebekreftet. Publisering/hent kvitteres separat. Pakkene har3013 og mangler85, nytt felles samlepunkt følger. Ingen ny Tom-/Claude-godkjenning. Se rapporter/sam115-golf-20261021/NESTE.md.
+
 Publisert og hentet 6609fb4ccf3e31c77c7b7ac678e27a8255414008: siste kattepose 052_1920, 3014 native totalt. Alle 21257 filhash, 1036 beskyttede kilder og tre stasher bekreftet. Hele fig052_01 levert; 424 av 1758 resultatark. Felles Linux/Windows har 3013 og mangler én. Neste faktiske produksjon er fig115_01..03 fra kildeavspilte 84 mål og 480 nullkontroller. Ingen 115-bildekall eller resultater ennå. Les rapporter/max052-kattslutt-20261021/NESTE.md. Ingen ny Tom-/Claude-godkjenning.
 
 ## Gjeldende grafikkstatus, 2026-10-21 03:32
@@ -1028,9 +1030,9 @@ Figurark for Sam og Max, Sam.
 - [x] `fig052_01` (figurark 1 for Sam og Max (kostyme 52), 21 ruter: start mot høyre (21 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig052_02` (figurark 2 for Sam og Max (kostyme 52), 12 ruter: start mot høyre (12 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig052_03` (figurark 3 for Sam og Max (kostyme 52), 5 ruter: animasjon 7 mot høyre (1 rute); animasjon 8 mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig115_01` (figurark 1 for Sam (kostyme 115), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig115_02` (figurark 2 for Sam (kostyme 115), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig115_03` (figurark 3 for Sam (kostyme 115), 64 ruter: start (lag 14, tegnes over kroppen) mot høyre (20 ruter); start (lag 15, tegnes over kroppen) mot høyre (12 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (12 ruter); animasjon 8 (lag 14, tegnes over kroppen) mot høyre (20 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig115_01` (figurark 1 for Sam (kostyme 115), 14 ruter: start mot høyre (14 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig115_02` (figurark 2 for Sam (kostyme 115), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig115_03` (figurark 3 for Sam (kostyme 115), 64 ruter: start (lag 14, tegnes over kroppen) mot høyre (20 ruter); start (lag 15, tegnes over kroppen) mot høyre (12 ruter); animasjon 7 (lag 15, tegnes over kroppen) mot høyre (12 ruter); animasjon 8 (lag 14, tegnes over kroppen) mot høyre (20 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig123_01` (figurark 1 for Sam og Max (kostyme 123), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig123_02` (figurark 2 for Sam og Max (kostyme 123), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig123_03` (figurark 3 for Sam og Max (kostyme 123), 17 ruter: start mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (16 ruter), bilde to `hovedark/sam.png`)

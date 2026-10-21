@@ -1,0 +1,89 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib
+import json
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+base = read(R / 'grunnlag-produksjon.json')
+assert all(sha(P / 'mods/gpt' / f) == h for f, h in base['filer'].items())
+assert all(sha(A / f) == h for f, h in read(R / 'beskyttede-samlet.json').items())
+assert subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines() == base['stash']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 427
+rows = read(R / 'prototyper-endelig.json')
+assert len(rows) == 66 and all(e['native_ok'] and sha(A / e['prototype']) == e['prototype_sha256'] for e in rows)
+assert read(R / 'automatisk-mottak84.json')['ruter_ok'] == 84
+motor = read(R / 'motor-sammenligning.json')
+secondary = read(R / 'motor-frilagt-sammenligning.json')
+assert all(v['sett'] == v['forventet'] == 84 and not v['mangler'] and v['nullkontroller'] == v['kontrollantall'] == 480
+           and v['ingen_nye_eller_okte_avvik'] for v in [motor, secondary])
+assert not any(v['utenfor_alle_loggede_aktorflater_og_marg'] for v in read(R / 'motor-pikselkontroll.json'))
+progress = read(R / 'fremdrift.json')
+for e in progress['leveranser']:
+    assert sha(A / e['resultat']) == e['sha256']
+    e.update(egenkontrollert=True, native_mottatt=True, visuelt_kontrollert=True, motorobservert=True,
+        publisert=False, i_fellespakke=False, godkjent_av_Tom=False, claude_kontroll=False)
+progress.update(native_mottatt=True, motorobservert=True, visuelt_kontrollert=True,
+    nye_native=84, native_totalt=3098, hele_figurjobber_med_resultat=427, gjenstar=1331)
+save(R / 'fremdrift.json', progress)
+visualfiles = [e['fil'] for e in read(R / 'visuell-helkontroll-plan.json')]
+visualfiles += [e['fil'] for e in read(R / 'motor-visuell-plan.json')['brett']]
+visualfiles += [f'faktisk-linux-an{n}.png' for n in [6, 7, 8, 9]]
+visualfiles += [f'motor-for-etter-an{n}.png' for n in [6, 7, 8, 9]]
+save(R / 'visuell-kontroll.json', dict(tid_utc=datetime.now(timezone.utc).isoformat(),
+    original_i_rom25_sett=True, godkjent_Sam_hovedark_sett=True, alle3_original_og_resultatark_sett=True,
+    alle66_ulike_motiver_sett_mot_original=True, sammensatte_lag_sett_i42_faktiske_linuxopptak=True,
+    motorbrett=7, hele_primaropptak_sett=4, for_etter_par_sett=4,
+    egenkontroll_fig01='OK', egenkontroll_fig02='OK', egenkontroll_fig03='SJEKK',
+    fig03_sma_omriss_og_1HD_storrelsesvarsler_vurdert=True,
+    egen_svart_kildebekreftet_prikk1852_bevart=True, fire_kildebekreftede_merker1682_bevart=True,
+    grep_golfball_og_fisk_primarskriptbekreftet=True, ingen_nye_mansjetter_eller_ballgroper=True,
+    faktisk_primarpos='125,177', faktisk_sekundaerpos='80,177', andre_aktorer_ikke_skjult=True,
+    ikke_naturlig_gjennomspilling=True, visuelt_sette_filer={f: sha(R / f) for f in visualfiles},
+    godkjent_av_Tom=False, claude_kontroll=False))
+save(R / 'sluttkontroll.json', dict(nye_native=84, native_totalt=3098, nye_hele_ark=3,
+    hele_figurjobber_med_resultat=427, total_figurjobber=1758, gjenstar=1331,
+    alle84_automatisk_OK=True, egenkontroll=['OK', 'OK', 'SJEKK'], ingen_FEIL=True,
+    visuelt_sett=True, motorobservert=True, egen_alfa=True, originalmaske=False,
+    originalfragmenter=False, grenser_uendret=True, CORE=128, IoU=.6, dekning=.8,
+    innebygde_bildekall=18, returkall=6, ulike_ferdige_motiver=66,
+    motor_kontroller_primar=480, motor_null_primar=480, motor_kontroller_sekundaer=480,
+    motor_null_sekundaer=480, ingen_nye_eller_okte_avvik=True, helprove_uten_avvik=True,
+    naturlig_gjennomspilling=False, interaktiv_windows_test=False, ny_webtest=False,
+    publisert=False, i_fellespakke=False, pakker_native=3013, pakker_mangler_native=85,
+    godkjent_av_Tom=False, claude_kontroll=False))
+(R / 'RAPPORT.md').write_text('''# Sam med golfball og fisk, fig115_01..03
+
+Tre hele figurark er laget og kontrollert. 84 nye native ruter fra 66 forskjellige komplette kildeformer gir kandidat3098. 427 av 1758 hele figurjobber har resultat; 1331 gjenstår pluss returer, katalogfeil og sluttkontroll. Sam er i rom25, Gator Golf. Primærskript objekt244 og lokal200 bekrefter at grå/lyse grep er golfball, grønne er fisk. Animasjon6/8 bruker ball og7/9 fisk. Katalogens ugyldige40 er aldri spilt. Originalene og godkjent Sam-hovedark er sett før hver referansegruppe. Åpne krager, separate slips-/håndlag, fire små blågrå merker i1682 og én løs svart prikk i1852 er bevart. Ingen ny mansjett, ballgroper eller annen oppfunnet identitet.
+
+18 innebygde image_gen-kall med råbilder, faktiske prompter og argumenter er bevart. Seks returkall håndterer knapper/merker, slips, feil mansjettpremiss/balltekstur, konturstil, størrelse og løs kildeprikk. FR2 besto ikke native form og er ikke brukt. TR2s nye hovedslips fikk for mye glans og er ikke brukt; bare den hele egne genererte svarte flekken er tatt ut via egen alfakomponent, dimensjonert og plassert ved den kildebekreftede koordinaten. T01-slipset er ellers rasteridentisk. Det ene ferdige motivet1852 består derfor av to egne malerideler fra to kall. De øvrige kildeidentiske aliasmålene gjenbruker hele egne motiver. Ingen originalfarger, originalfragmenter eller harde originalmasker inngår i native. Ingen CLI/API-bildefallback.
+
+Python har renset egen svak glød etter avstand til egen alfakjerne, fjernet eget generert fyll i fem krageåpninger med egne fargekomponenter og myk alfa, dimensjonert fire hele egne merker og gitt fem egne kurver én HD-piksel tykkere egen kontur. Første samlearkkontroll fanget for høye1882/1883. Hele egne kurver ble normalisert til faste mål;1882 fikk én egen fyllstrek innenfor egen eksisterende tegningsboks. Ingen originalmasker eller senkede krav. CORE128, IoU0,6 og dekning0,8 er uendret. Minste endelige IoU er0,610 og minste dekning0,8125. Den visuelle kontrollen går utover tallene: tre hele kilde-/resultatark, 13 sammenligningsbrett med alle66 motiver, sju motorbrett med42 sammensatte opptak, fire hele primærbilder og fire før/etter-par er sett. Farger, grep, hoder/kropper, små deler og kontakt mellom lag er kontrollert samlet.
+
+Egenkontrollen er OK for ark01 og02, SJEKK for03 med17 små omriss-/størrelsesvarsler og to gruppevarsler, visuelt vurdert og beholdt. Det generelle arkskriptet hopper over svært små kilder under20 piksler; alle84 mål er i tillegg målt mot sine hele RGBA-originaler med de faste native grensene. Automatisk mottak gir84 OK, ingen til gjennomsyn, ingen manglende eller teknisk feil. Mottakets kontrollkopier brukes ikke som native. De faktiske native filene er de egne kontrollerte maleriene med ekte alfa og to originalpikslers marg.
+
+Faktisk Linux-binær e4f3ee9f fra siste nedlastede fellespakke bruker både grunnlag3014 og kandidat3098. Gyldige6/7/8/9 ved primærpos125,177 logger alle84 mål og gir480 av480 nullkontroller på begge sider. Rettet1852 er avspilt på nytt, ikke bare kvittert fra eldre opptak. Conroy dekker deler av hånden i primærposisjonen. En sekundær synlighetsprøve flytter bare Sam til80,177, beholder andre aktører og skript, og gir480 av480 nullkontroller på begge sider. Alle66 kildevarianter er representert i42 aktuelle synlighetsopptak. Fire par har null RGB-forskjeller utenfor alle loggede aktørflater med målemargin. Ingen aktører er skjult. Fire GIF-filer er laget fra faktisk Linux-avspilling. Dette er tvungen animasjonskontroll, ikke full naturlig gjennomspilling, interaktiv Windows-test eller ny webtest.
+
+Alle21257 tidligere filstier/21251 PNG, 1036 beskyttede kildehash og tre stasher er bevart. Additiv publisering med eksakt force-with-lease og hent kvitteres separat. Pakkene har fortsatt3013 og mangler85 native siden siste samlepunkt, én kattepose pluss disse84. Et nytt felles Linux-/Windows-samlepunkt følger etter publisering og nativefrys. Ingen ny Tom-/Claude-godkjenning. Ingen motor- eller pipelinekode endret. Bibliotek: figurark-fast-storrelse og publisert-mod-er-fasit.
+''')
+nextline = 'Neste: publiser og hent kandidat3098 additivt fra6609fb4ccf3e31c77c7b7ac678e27a8255414008 med eksakt force-with-lease. Bevar alle tidligere filer, 1036 kildehash og tre stasher. Frys deretter native og bygg/kontroller felles Linux/Windows med85 nye ruter siden3013. 427 av1758 hele figurjobber har resultat. Etter pakker: kildeanalyser neste produserbare familie, foreløpig fig304_01..05 i gjenværende liste. Avviste246_16..19/110_05..06 og ugyldige344/346 skal ikke omprøves. Ingen304-bildekall eller leveranser er gjort.\n'
+(R / 'NESTE.md').write_text(nextline)
+for name in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+    f = A / name
+    s = f.read_text()
+    i = s.find('\n')
+    text = 'Sam-golf115_01..03 er levert og egenkontrollert:84 nye native, kandidat3098, 427 av1758 hele figurjobber. Alle84 automatisk OK; ark03 har visuelt vurderte SJEKK-varsler. Endelige480/480 null i både primær og sekundær synlighetsprøve. Alle66 varianter sett mot original og samlet i motor. 18 innebygde kall er bevart; sparse merker, fisk/ball og løs svart prikk er kildebekreftet. Publisering/hent kvitteres separat. Pakkene har3013 og mangler85, nytt felles samlepunkt følger. Ingen ny Tom-/Claude-godkjenning. Se rapporter/sam115-golf-20261021/NESTE.md.'
+    s = s[:i + 1] + '\n' + text + '\n' + s[i + 1:]
+    if name == 'GRAFIKKLISTE.md':
+        for j in ['fig115_01', 'fig115_02', 'fig115_03']:
+            s = s.replace('- [ ] `' + j + '`', '- [x] `' + j + '`')
+    f.write_text(s)
+shutil.copy2(__file__, R / 'kontroller.py.txt')
+print('Sluttkontrollert golf: 84 nye, kandidat 3098, 427 hele ark, ingen ekstern godkjenning.', flush=True)

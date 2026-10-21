@@ -1,0 +1,94 @@
+from pathlib import Path
+from PIL import Image
+import json
+import hashlib
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter' / Path(__file__).resolve().parent.name
+Q = A / 'rapporter/sam115-kilde-20261021'
+S = Path('/home/tom/Documents/Codex/2026-10-15-sjekk-sam-max-repo-vi-var/ikon-grunnlag/skript/rom_025')
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+primary = {}
+for f in ['obj_0244_verb.txt', 'lokal_200.txt']:
+    shutil.copy2(S / f, R / ('primaer-' + f))
+    primary[f] = dict(kilde=str(S / f), sha256=sha(S / f))
+save(R / 'identitet-ball-fisk.json', dict(primaerskript=primary,
+    var249_2='bucket of fish', var249_3='bucket of golf balls',
+    an6_an8='gråhvit golfball', an7_an9='grønn fisk',
+    graahvite_haandfragmenter_ikke_mansjetter=True, groen_ikke_haandtak=True,
+    kildebelegg='Objekt 244s dialog og objekter 322/259, koblet til kostyme 115 i LSCR200.'))
+with (R / 'KILDEGRUNNLAG.md').open('a') as f:
+    f.write('''
+## Presisering fra primærskriptene før videre håndproduksjon
+
+Objekt 244s originale verbtekst sier eksplisitt at var249=2 er en bøtte med fisk og var249=3 en bøtte med golfballer. LSCR200 velger animasjon 7/9 når var249=2 og 6/8 ellers. De hvitgrå delene i håndsekvensen er derfor golfballer, ikke mansjetter. De grønne delene i alternativet er den synlige fisken, ikke et skaft. H01s fem motiver med grå gjenstand returneres for feil materialtolkning; de tre bare hendene beholdes. De fem grådelene males om som de kildebekreftede synlige delene av en golfball i grepet. Grønne fiskefragmenter må ikke fullføres til en oppdiktet hel fisk der hånden skjuler resten. Se identitet-ball-fisk.json og de kopierte primærskriptene.
+''')
+plan = read(R / 'ruteplan-unik.json')
+lookup = {e['bilde']: e for e in plan['ruter']}
+calls = read(R / 'kallplan.json')
+returns = [
+    ('BR1', 'wholebody', [1681, 1682, 1683], 2, 'B04 har for mange skjorteknapper og for store glinsende merker.'),
+    ('TR1', 'tie', [1862, 1865, 1866, 1868], 2, '1862 mangler kildekroken, 1865/1866 feiler dekning, 1868 feiler IoU.'),
+    ('HR1', 'hand', [1948, 1949, 1950, 1951, 1952], 3, 'Grå golfball ble tolket som hvit mansjett i H01.')]
+for name, kind, ids, cols, why in returns:
+    C = R / 'kall' / name
+    assert not C.exists()
+    C.mkdir()
+    ref = Image.new('RGBA', (1536, 1024), '#7a7f88')
+    cellw, cellh = 1536 // cols, 512
+    records = []
+    for i, n in enumerate(ids):
+        e = lookup[f'costume115_{n}']
+        src = Image.open(P / 'work/extract/costumes' / (e['bilde'] + '.png')).convert('RGBA')
+        w, h = src.size
+        scale = min(6 if kind == 'wholebody' else 32, (cellw - 64) // w, (cellh - 64) // h)
+        x, y = i % cols * cellw + (cellw - w * scale) // 2, i // cols * cellh + (cellh - h * scale) // 2
+        ref.alpha_composite(src.resize((w * scale, h * scale), Image.Resampling.NEAREST), (x, y))
+        records.append(dict(bilde=e['bilde'], celle=[i % cols * cellw, i // cols * cellh, cellw, cellh],
+            proxy_rekt=[x, y, w * scale, h * scale], referanseskala=scale,
+            kilde_sha256=sha(P / 'work/extract/costumes' / (e['bilde'] + '.png')),
+            canonical_rgba_sha256=e['rgba_sha256'], maal=[w, h]))
+    ref.convert('RGB').save(C / 'referanse-poser.png')
+    save(C / 'plan.json', dict(type=kind, kolonner=cols, ruter=records,
+        hele_originaler_bare_referanse=True, ingen_utdatamaske=True, retur_grunn=why))
+    base_prompt = (A / 'jobber' / ('fig115_02' if kind == 'wholebody' else 'fig115_03') / 'prompt.txt').read_text()
+    if name == 'BR1':
+        detail = '''Only THREE body sprites in the exact panels of image 1. They are Sam with a putter, white shirt WITHOUT the separate animated necktie. Each shirt has exactly THREE small plain blue-gray button dots, not five buttons, not rings, not bright white eyelets. Preserve original body/hat/hand/club pose and dimensions. The top-right sprite has FOUR tiny flat blue-gray flecks far above the body. These four flecks are each only about 3 pixels across in this raw atlas, at approximately (1168,52), (1129,76), (1054,205), (1054,250). Keep them flat and tiny, without shine, bubble shading, halos, faces, or any other object. Do not enlarge the four specks or move them closer to the head. Bottom-right panel stays empty.'''
+    elif name == 'TR1':
+        detail = '''Only FOUR clipped dark-blue/black FABRIC FRAGMENTS in image 1. These are NOT four complete ties. Copy the exact slender curves, hooked ends, narrow stems, broken shapes, tips and cutoffs. Top-left source has a sideways bottom HOOK that must not be turned into a triangular pointed tie. Other three are very thin short fragments; do not inflate them into oval ties, add knots or complete silhouettes. Preserve exact source blue patches and black patches and detached bits, with clean small cartoon edges, not generic repeated diagonal stripes.'''
+    else:
+        detail = '''Only FIVE orange dog HAND sprites, in image 1's positions. Each small WHITE/GRAY PIECE is the exposed part of a GOLF BALL in the grip, as proven by original game scripts. It is NOT A SHIRT CUFF OR WRIST BAND. Do not draw a sleeve, a cuff, or a ring around the ball. Paint only the exact exposed rounded/slightly flat ball sliver and gray shadow shown in each reference; the hand hides the rest, so do not enlarge or complete the ball. Preserve every finger, thumb, contact point, silhouette and hand color. No extra fingers, fingernails, paws, whole arms or characters.'''
+    prompt = base_prompt.rstrip() + f'''
+
+CORRECTED INTERMEDIATE PRODUCTION REFERENCE, overriding generic whole-sheet text above:
+Image 1 is a {cols}-column by 2-row atlas on FLAT GRAY reference padding. Paint ONLY {len(ids)} selected sprites, in left-to-right/top-to-bottom order, at exactly their shown visible size and position. Image 2 is the approved Sam identity/style, not additional content. Final protected job placement is assembled separately at exact 4x. Output one 1536 x 1024 PNG on REAL TRANSPARENT ALPHA. No gray background, no glow, halo, shadow, texture, labels, panel borders or watermark. Smooth clean outlines, flat source colors and one source shade only. Do not enlarge heads or hands.
+{detail}
+Selected: {', '.join('costume115_' + str(n) for n in ids)}.
+'''
+    (C / 'faktisk-prompt.txt').write_text(prompt)
+    save(C / 'faktiske-argumenter.json', dict(prompt=prompt,
+        referenced_image_paths=[str(C / 'referanse-poser.png'), str(A / 'hovedark/sam.png')],
+        transparent_background=True))
+    calls['kall'].append(dict(kall=name, type=kind, motiver=['costume115_' + str(n) for n in ids],
+        status='planlagt', retur_grunn=why))
+calls['antall'] = len(calls['kall'])
+save(R / 'kallplan.json', calls)
+for name in ['H02', 'H03']:
+    C = R / 'kall' / name
+    assert not (C / 'raa.png').exists()
+    args = read(C / 'faktiske-argumenter.json')
+    args['prompt'] += '''
+PRIMARY-SCRIPT IDENTIFICATION CORRECTION: the small WHITE/GRAY item is the exposed part of a GOLF BALL, never a cuff or wrist band. The small GREEN item is the visible part of a FISH held in the hand, not a green handle, stick, cloth or tool. Preserve just the source-visible fragments, grip and overlap; do not invent an entire ball or fish where the fingers conceal it. Do not add a cuff unless the reference actually has a real cuff independent of these held objects. Bare hands stay bare where neither item is shown.
+'''
+    save(C / 'faktiske-argumenter.json', args)
+    (C / 'faktisk-prompt.txt').write_text(args['prompt'])
+save(R / 'returer.json', dict(tilbakeholdt=[dict(kall='B04', motiver=[1681, 1682, 1683], grunn=returns[0][4]),
+    dict(kall='T02/T03', motiver=[1862, 1865, 1866, 1868], grunn=returns[1][4]),
+    dict(kall='H01', motiver=[1948, 1949, 1950, 1951, 1952], grunn=returns[2][4])],
+    ikke_brukt_som_stilankre=True, kilder_og_raw_bevart=True))
+shutil.copy2(__file__, R / 'lag-returer.py.txt')
+print('Returer BR1/TR1/HR1 planlagt. Golfball/fisk er primærkildebekreftet før neste håndkall.', flush=True)

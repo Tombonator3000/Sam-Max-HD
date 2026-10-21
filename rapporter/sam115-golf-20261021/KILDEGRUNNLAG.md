@@ -1,0 +1,13 @@
+# Sam med golfkøllen, kostyme 115
+
+Rom 25, Gator Golf. Sam, aktør 2 ved (125, 177), palett 0 og skala 255. Primærskript 200 skifter mellom gyldige animasjoner 6, 7, 8 og 9 etter variablene 152 og 249. Alle 84 mål er avspilt og logget med 480 nullkontroller i den faktiske Linux-binæren e4f3ee9f. Ugyldig animasjon 40 skal aldri spilles. Dette er tvungen kildeavspilling, ikke en full naturlig gjennomspilling; Conroy og Lee Harvey står også i scenen og kan dekke noen av Sams deler.
+
+Tre originalark, seks hele kildebilder, relevante delkontroller, primærskript og godkjent Sam-hovedark er sett før produksjon. Sam beholder oransjebrun pels, blågrå dress og hatt, hvit skjorte, samme ansikt og skala. Lag 13 har kropp og innebygd grå kølle der originalen viser den. Slips, håndgrep og tynne blå deler tegnes separat. Den generelle promptens komplette slips skal ikke legges inn i kroppsrutene. De tynne fragmentene skal ikke fullføres til nye hele gjenstander. Små grønne deler ved hånden beholdes bokstavelig fra kilden uten å gjette inn en annen gjenstand. 1682 har fire små blågrå merker høyt over kroppen; de beholdes på samme plass uten å gis en oppdiktet funksjon.
+
+66 ulike hele RGBA-kilder gir 84 mål. Eksakte hele aliaser deler et eget helt maleri; ingen hard originalmaske eller originalfragment-fallback. Råmaleriene lages i mindre grupper fra de beskyttede originalene, med beskyttet prompt bevart ordrett og en separat produksjonspresisering. Sluttarkenes nøyaktige plassering følger beskyttet jobb.json. Egen alfa beholdes, med eventuell rensing mot egen kjerne. Faste terskler er CORE128, IoU 0,6 og dekning 0,8. Native mottak, visuell kontroll, motor, publisering, pakker og ekstern godkjenning føres hver for seg.
+
+Grunnlag er publisert og hentet 3014 native, inkludert den siste katteposen. Bevar alle tidligere filer, 1036 beskyttede kildehash og tre opprinnelige stasher. Bibliotek: figurark-fast-storrelse og publisert-mod-er-fasit. Ingen motor- eller pipelinekode endres.
+
+## Presisering fra primærskriptene før videre håndproduksjon
+
+Objekt 244s originale verbtekst sier eksplisitt at var249=2 er en bøtte med fisk og var249=3 en bøtte med golfballer. LSCR200 velger animasjon 7/9 når var249=2 og 6/8 ellers. De hvitgrå delene i håndsekvensen er derfor golfballer, ikke mansjetter. De grønne delene i alternativet er den synlige fisken, ikke et skaft. H01s fem motiver med grå gjenstand returneres for feil materialtolkning; de tre bare hendene beholdes. De fem grådelene males om som de kildebekreftede synlige delene av en golfball i grepet. Grønne fiskefragmenter må ikke fullføres til en oppdiktet hel fisk der hånden skjuler resten. Se identitet-ball-fisk.json og de kopierte primærskriptene.

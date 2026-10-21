@@ -1,0 +1,110 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime, timezone
+import hashlib
+import json
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+Q = A / 'rapporter/sam115-kilde-20261021'
+M = P / 'mods/gpt'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+assert not R.exists()
+source = read(Q / 'motor-kilde-samlet.json')
+assert source['sett'] == 84 and source['nullkontroller'] == source['kontrollantall'] == 480
+assert not source['mangler'] and source['ugyldig40_ikke_spilt']
+files = read(A / 'rapporter/max052-kattslutt-20261021/publiserte-moddfiler-3014.json')
+assert len(files) == 21257 and all(sha(M / f) == h for f, h in files.items())
+native = subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/hd-mod'], cwd=P, text=True).split()[0]
+assert native == '6609fb4ccf3e31c77c7b7ac678e27a8255414008'
+protected = read(Q / 'beskyttede-samlet1036.json')
+assert len(protected) == 1036 and all(sha(A / f) == h for f, h in protected.items())
+stash = subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines()
+assert stash == read(A / 'rapporter/max052-kattslutt-20261021/grunnlag-produksjon.json')['stash']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 424
+plan = read(Q / 'ruteplan-kilde.json')
+assert plan['maal'] == 84 and len(plan['ruter']) == 66
+assert all(not (A / 'jobber' / j / 'resultat.png').exists() for j in plan['jobber'])
+assert not list((M / 'costumes').glob('costume115*_hd.png'))
+R.mkdir()
+(R / 'kall').mkdir()
+save(R / 'grunnlag-produksjon.json', dict(tid_utc=datetime.now(timezone.utc).isoformat(), native=3014,
+    native_sha=native, filer=files, stash=stash, hele_figurjobber=424, beskyttede=1036,
+    art_sha=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=A, text=True).strip(),
+    main_sha=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=P, text=True).strip()))
+save(R / 'beskyttede-samlet.json', protected)
+save(R / 'ruteplan-unik.json', plan)
+rows = plan['ruter']
+groups = [('B', 'wholebody', [e for e in rows if e['malruter'][0]['lag'] == 13], 4, 2),
+          ('T', 'tie', [e for e in rows if 1852 <= int(e['bilde'].split('_')[-1]) <= 1871], 8, 4),
+          ('H', 'hand', [e for e in rows if e['malruter'][0]['lag'] == 15], 8, 4),
+          ('F', 'thin', [e for e in rows if 1872 <= int(e['bilde'].split('_')[-1]) <= 1891], 6, 3)]
+calls = []
+for prefix, kind, entries, count, cols in groups:
+    for start in range(0, len(entries), count):
+        chunk = entries[start:start + count]
+        name = prefix + f'{start // count + 1:02}'
+        C = R / 'kall' / name
+        C.mkdir()
+        ref = Image.new('RGBA', (1536, 1024))
+        records = []
+        cellw, cellh = 1536 // cols, 512
+        for i, e in enumerate(chunk):
+            f = P / 'work/extract/costumes' / (e['bilde'] + '.png')
+            im = Image.open(f).convert('RGBA')
+            assert hashlib.sha256(im.tobytes()).hexdigest() == e['rgba_sha256']
+            w, h = im.size
+            scale = min(16 if kind != 'wholebody' else 6, (cellw - 64) // w, (cellh - 64) // h)
+            x = i % cols * cellw + (cellw - w * scale) // 2
+            y = i // cols * cellh + (cellh - h * scale) // 2
+            ref.alpha_composite(im.resize((w * scale, h * scale), Image.Resampling.NEAREST), (x, y))
+            records.append(dict(bilde=e['bilde'], celle=[i % cols * cellw, i // cols * cellh, cellw, cellh],
+                proxy_rekt=[x, y, w * scale, h * scale], referanseskala=scale,
+                kilde_sha256=sha(f), canonical_rgba_sha256=e['rgba_sha256'], maal=[w, h]))
+        ref.save(C / 'referanse-poser.png')
+        save(C / 'plan.json', dict(type=kind, kolonner=cols, ruter=records,
+            hele_originaler_bare_referanse=True, ingen_utdatamaske=True))
+        jobs = sorted({e['malruter'][0]['jobb'] for e in chunk})
+        protected_prompt = (A / 'jobber' / ('fig115_03' if kind != 'wholebody' else jobs[0]) / 'prompt.txt').read_text()
+        if kind == 'wholebody':
+            detail = '''Paint only the exact dog body sprites in image 1, in their shown golf-swing poses. The white shirt is intentionally missing the tie: the game adds a SEPARATE animated tie layer. Do NOT put a necktie onto these body sprites. Preserve the gray putter shaft/head wherever embedded in the body sprite. Keep the exact source face, hat tilt, hands, rear view, belly, crouch, and body proportions. Any detached blue-gray dots in the original must also be separately painted in their exact relative positions; they must not disappear. No guessed new object for these marks.'''
+        elif kind == 'tie':
+            detail = '''These are ONLY separately animated pieces of Sam's necktie, not heads or bodies. Paint the exact dark navy/black fabric silhouette with the source's blue diagonal bands. Preserve every short, bent, folded, and almost edge-on tie piece. Do not complete a fragment into an entire necktie, add a torso, collar, face, knot, or extra stripes. The source, not the full tie in the style reference, controls each piece.'''
+        elif kind == 'hand':
+            detail = '''These are ONLY isolated orange-brown hand and grip sprites from Sam, with source white cuff or little dark-green/gray piece only where actually present. Match every finger, thumb, knuckle, cuff, orientation and bend literally. Keep each small green piece exactly as shown; do not extend it into a new complete prop or guess a different object. Do not add an arm, whole person, background, or new equipment. No fingernails or fur texture.'''
+        else:
+            detail = '''These are ONLY the very thin curved dark-blue fabric fragments from Sam's animated layer. Paint the same one narrow, bent/tapered blue strip in each panel, including its source black tip only where shown. Keep it thin and open, never complete it into a whole tie, shirt, person, mouth or shoe. Follow the exact curve and thickness from image 1. No invented neighboring objects or extra fabric.'''
+        correction = f'''
+
+PRODUCTION CORRECTION AND SELECTED REFERENCE GROUP, overriding generic descriptions above:
+This intermediate raw painting is a {cols}-column by 2-row reference atlas, containing ONLY {len(chunk)} selected original sprites, read left-to-right then top-to-bottom. Its final protected job layout will be assembled separately at exact 4x. Image 1 is the geometry/pose/palette reference atlas; image 2 is Sam's approved identity and clean line style only. Paint each sprite at exactly its location and visible size in image 1 on a 1536 x 1024 fully transparent canvas. Leave unoccupied panels empty. Do not add labels, grids, shadows, outlines around panels, text, or a background.
+{detail}
+The generic prompt's mention of full characters or a complete tie must not add missing layers. Do not enlarge the head, eyes, hands, or feet. Preserve original visible silhouette and object contact points. Smooth dark cartoon contour, flat local colors and one restrained source shadow. No airbrush glow, soft ambient shadow, extra highlights or texture. True alpha background and softly antialiased edges. Keep every requested part detached from every other panel.
+Selected sprites: {', '.join(e['bilde'] for e in chunk)}.
+'''
+        prompt = protected_prompt.rstrip() + correction
+        (C / 'faktisk-prompt.txt').write_text(prompt)
+        args = dict(prompt=prompt, referenced_image_paths=[str(C / 'referanse-poser.png'), str(A / 'hovedark/sam.png')],
+                    transparent_background=True)
+        save(C / 'faktiske-argumenter.json', args)
+        calls.append(dict(kall=name, type=kind, motiver=[e['bilde'] for e in chunk], status='planlagt'))
+save(R / 'kallplan.json', dict(kall=calls, antall=len(calls), hele_originaler=66, maal=84))
+(R / 'KILDEGRUNNLAG.md').write_text('''# Sam med golfkøllen, kostyme 115
+
+Rom 25, Gator Golf. Sam, aktør 2 ved (125, 177), palett 0 og skala 255. Primærskript 200 skifter mellom gyldige animasjoner 6, 7, 8 og 9 etter variablene 152 og 249. Alle 84 mål er avspilt og logget med 480 nullkontroller i den faktiske Linux-binæren e4f3ee9f. Ugyldig animasjon 40 skal aldri spilles. Dette er tvungen kildeavspilling, ikke en full naturlig gjennomspilling; Conroy og Lee Harvey står også i scenen og kan dekke noen av Sams deler.
+
+Tre originalark, seks hele kildebilder, relevante delkontroller, primærskript og godkjent Sam-hovedark er sett før produksjon. Sam beholder oransjebrun pels, blågrå dress og hatt, hvit skjorte, samme ansikt og skala. Lag 13 har kropp og innebygd grå kølle der originalen viser den. Slips, håndgrep og tynne blå deler tegnes separat. Den generelle promptens komplette slips skal ikke legges inn i kroppsrutene. De tynne fragmentene skal ikke fullføres til nye hele gjenstander. Små grønne deler ved hånden beholdes bokstavelig fra kilden uten å gjette inn en annen gjenstand. 1682 har fire små blågrå merker høyt over kroppen; de beholdes på samme plass uten å gis en oppdiktet funksjon.
+
+66 ulike hele RGBA-kilder gir 84 mål. Eksakte hele aliaser deler et eget helt maleri; ingen hard originalmaske eller originalfragment-fallback. Råmaleriene lages i mindre grupper fra de beskyttede originalene, med beskyttet prompt bevart ordrett og en separat produksjonspresisering. Sluttarkenes nøyaktige plassering følger beskyttet jobb.json. Egen alfa beholdes, med eventuell rensing mot egen kjerne. Faste terskler er CORE128, IoU 0,6 og dekning 0,8. Native mottak, visuell kontroll, motor, publisering, pakker og ekstern godkjenning føres hver for seg.
+
+Grunnlag er publisert og hentet 3014 native, inkludert den siste katteposen. Bevar alle tidligere filer, 1036 beskyttede kildehash og tre opprinnelige stasher. Bibliotek: figurark-fast-storrelse og publisert-mod-er-fasit. Ingen motor- eller pipelinekode endres.
+''')
+(R / 'NESTE.md').write_text('Gjenoppta første planlagte bildekall uten raa.png i kallplan.json. Ingen nye 115-resultater eller native er telt før levering og kontroll. 66 hele motiver/84 mål/tre ark. Se kilden og godkjent Sam-anker før hvert kall. Kilden er avspilt 84/84 med 480 nullkontroller. Bevar små deler, egen alfa, 1036 kildehash og tre stasher. Ingen ugyldig animasjon 40.\n')
+shutil.copy2(__file__, R / 'klargjor.py.txt')
+print('Sam115: 12 planlagte bildekall, 66 hele malerier for 84 mål; ingen nye resultater ennå.', flush=True)

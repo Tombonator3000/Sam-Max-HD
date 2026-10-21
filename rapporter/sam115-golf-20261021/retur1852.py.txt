@@ -1,0 +1,124 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+import numpy as np
+import hashlib
+import json
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+C = O / 'mod-sam1153098'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+f = R / 'prototyper/costume115_1852.png'
+before = R / 'prototyper/costume115_1852-for-los-prikk.png'
+assert not before.exists()
+shutil.copy2(f, before)
+own = Image.open(f).convert('RGBA')
+a = np.array(Image.open(R / 'kall/TR2/raa.png').convert('RGBA'))
+core = a[:, :, 3] >= CORE
+lab, count = nd.label(core, structure=np.ones((3, 3), bool))
+parts = []
+for k in range(1, count + 1):
+    y, x = np.nonzero(lab == k)
+    if 500 < len(x) < 3000 and 620 < int(x.min()) < 700 and 560 < int(y.min()) < 630:
+        parts.append((k, int(x.min()), int(y.min()), int(x.max() + 1), int(y.max() + 1)))
+assert len(parts) == 1, parts
+k, x0, y0, x1, y1 = parts[0]
+_, near = nd.distance_transform_edt(~core, return_indices=True)
+owner = lab[near[0], near[1]]
+a[(owner != k) | (nd.distance_transform_edt(~core) > 2)] = 0
+part = Image.fromarray(a).crop((x0 - 2, y0 - 2, x1 + 2, y1 + 2))
+wx, hy = (x1 - x0) / 4, (y1 - y0) / 4
+# Whole generated OWN black fleck, source coordinate used only for scalar placement.
+fleck = part.transform((own.width, own.height), Image.Transform.AFFINE,
+    (wx, 0, 2 - 20 * wx, 0, hy, 2 - 76 * hy), Image.Resampling.BICUBIC)
+after = Image.alpha_composite(own, fleck)
+aa = np.array(after)
+yy, xx = np.nonzero(aa[:, :, 3] >= CORE)
+cc, nn = nd.label(aa[:, :, 3] >= CORE, structure=np.ones((3, 3), bool))
+assert nn == 2
+aa[aa[:, :, 3] == 0, :3] = 0
+src = np.array(Image.open(P / 'work/extract/costumes/costume115_1852.png').convert('RGBA'))
+iou, cov = _iou(aa[:, :, 3] >= CORE, np.repeat(np.repeat(src[:, :, 3] > 0, 4, 0), 4, 1), -8, -8)
+assert iou >= GOOD_IOU and cov >= GOOD_COVER
+Image.fromarray(aa).save(f)
+receipt = dict(bilde='costume115_1852', hele_egne_slipset='T01', los_egen_svart_flekk='TR2',
+    metode='hel generert egen flekk skilt med egen alfakomponent, dimensjonert og plassert etter kildeanker',
+    kildeanker=[3, 17], maal_egen_kjerne_HD=[4, 4], egen_flekk_bbox=[x0, y0, x1, y1],
+    hele_egne_slipset_rasteridentisk_utenfor_flekken=True, komponenter=2,
+    egen_for_sha256=sha(before), originalmaske_brukt=False, kildefragmenter_brukt=False,
+    TR2_hovedslips_ikke_brukt='For mye glans i nytt hovedslips. Tidligere flate T01 beholdes.',
+    sha256=sha(f), snitt_union=iou, dekning=cov)
+save(R / 'retur1852.json', receipt)
+rows = read(R / 'prototyper-endelig.json')
+for e in rows:
+    if e['bilde'] == 'costume115_1852':
+        assert e['prototype_sha256'] == sha(before)
+        e.update(prototype_sha256=sha(f), snitt_union=iou, dekning=cov, native_ok=True)
+        e['egen_rens'].append(receipt)
+save(R / 'prototyper-endelig.json', rows)
+J = A / 'jobber/fig115_03'
+job = read(J / 'jobb.json')
+e = next(e for e in job['ruter'] if e['bilde'] == 'costume115_1852')
+x, y, w, h = e['rekt']
+dx, dy = (job['plassering'][0] + x) * 4 - 8, (job['plassering'][1] + y) * 4 - 8
+sheet = Image.open(J / 'resultat.png').convert('RGBA')
+old = np.array(sheet)
+box = (dx, dy, dx + own.width, dy + own.height)
+sheet.paste((0, 0, 0, 0), box)
+sheet.alpha_composite(Image.fromarray(aa), (dx, dy))
+allowed = np.zeros(old.shape[:2], bool)
+allowed[dy:dy + own.height, dx:dx + own.width] = True
+assert np.array_equal(old[~allowed], np.array(sheet)[~allowed])
+shutil.copy2(J / 'resultat.png', R / 'fig115_03-for-los-prikk.png')
+sheet.save(J / 'resultat.png')
+mapping = read(R / 'rutekart-fig115_03.json')
+mapping['fig115_03']['sha256_resultat'] = sha(J / 'resultat.png')
+for e in mapping['fig115_03']['ruter']:
+    if e['bilde'] == 'costume115_1852':
+        e.update(rect=[dx + int(xx.min()), dy + int(yy.min()), int(np.ptp(xx) + 1), int(np.ptp(yy) + 1)],
+            prototype_sha256=sha(f), snitt_union=iou, dekning=cov, kall='T01+TR2',
+            los_kildebekreftet_prikk_bevart=True)
+save(R / 'rutekart-fig115_03.json', mapping)
+test = subprocess.run([str(P / '.venv/bin/python'), str(A / 'verktoy/sjekk_leveranse.py'),
+    str(J / 'resultat.png')], cwd=A, text=True, capture_output=True)
+(R / 'fig115_03-egenkontroll.txt').write_text(test.stdout + test.stderr)
+assert test.returncode in [0, 1], test.stdout
+native = read(R / 'egen-native.json')
+for e in native['ruter']:
+    if e['bilde'] == 'costume115_1852':
+        assert sha(C / e['fil']) == sha(before)
+        shutil.copy2(f, C / e['fil'])
+        e.update(sha256=sha(f), snitt_union=iou, dekning=cov)
+save(R / 'egen-native.json', native)
+files = {p.relative_to(C).as_posix(): sha(p) for p in C.rglob('*') if p.is_file()}
+save(R / 'kandidatfilhash.json', files)
+progress = read(R / 'fremdrift.json')
+progress['innebygde_bildekall'] = 18
+for e in progress['leveranser']:
+    if e['jobb'] == 'fig115_03':
+        e['sha256'] = sha(J / 'resultat.png')
+save(R / 'fremdrift.json', progress)
+for n in ['fig115_01', 'fig115_02', 'fig115_03']:
+    nf = A / 'jobber' / n / 'notat.md'
+    text = nf.read_text().replace('16 innebygde image_gen-kall', '18 innebygde image_gen-kall')
+    text += '\nFørste samlearkkontroll fanget for høye 1882/1883 etter egen strektykning. Fem hele egne kurver er normalisert tilbake til faste mål; 1882 har en ekstra én HD-piksel egen fyllstrek innenfor egen eksisterende tegningsboks. Et nytt FR2-maleri besto ikke formen og er bevart som retur. Ingen grenser senket. Visuell kontroll oppdaget den løse svarte kildeprikken i 1852. TR2 tegnet prikk og slips på nytt; det nye hovedslipset fikk for mye glans og brukes ikke. Den hele egne TR2-prikken er skilt med egen alfakomponent og plassert ved den kildebekreftede koordinaten, mens hele flate T01-slipset er bevart. Ingen kildemaske, kildefarger eller kildefragmenter er brukt som utdata. To egne bildekall inngår derfor i akkurat dette ene ferdige motivet. Oppdaterte SHAs og kvitteringer er fasit i rapporten.\n'
+    if n == 'fig115_03':
+        text += f'\nEndelig resultat SHA256 etter prikkrettingen: {sha(J / "resultat.png")}. Egenkontroll: SJEKK.\n'
+    nf.write_text(text)
+auto = O / 'automatisk-mottak-endelig'
+subprocess.run([str(P / '.venv/bin/smhd'), 'myke-figurer', '--gren', str(A), '--extract',
+    str(P / 'work/extract'), '--ut', str(auto), '--jobb', 'fig115_01,fig115_02,fig115_03',
+    '--forhandsvisning', ''], cwd=P, check=True)
+rep = read(auto / 'myke.json')
+assert rep['ruter_ok'] == 84 and not any(rep[k] for k in ['ruter_sjekk', 'ruter_mangler', 'ruter_teknisk'])
+save(R / 'automatisk-mottak84.json', rep)
+shutil.copy2(__file__, R / 'retur1852.py.txt')
+print('1852: to egne komponenter,', iou, cov, '84 OK. Oppdatert motorbevis kreves.', flush=True)

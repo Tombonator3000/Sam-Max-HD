@@ -1,0 +1,48 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import hashlib
+import json
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+rows = read(R / 'prototyper-endelig.json')
+body = [e for e in rows if int(e['bilde'].split('_')[-1]) < 1800]
+other = [e for e in rows if e not in body]
+boards = []
+for group, entries, size in [('kropp', body, 4), ('deler', other, 6)]:
+    for offset in range(0, len(entries), size):
+        subset = entries[offset:offset + size]
+        pairs, labels = [], []
+        for e in subset:
+            src = Image.open(P / 'work/extract/costumes' / (e['bilde'] + '.png')).convert('RGBA')
+            src = src.resize((src.width * 4, src.height * 4), Image.Resampling.NEAREST)
+            padded = Image.new('RGBA', (src.width + 16, src.height + 16))
+            padded.alpha_composite(src, (8, 8))
+            own = Image.open(A / e['prototype']).convert('RGBA')
+            factor = 1 if group == 'kropp' else 2
+            if factor != 1:
+                padded = padded.resize((padded.width * factor, padded.height * factor), Image.Resampling.NEAREST)
+                own = own.resize((own.width * factor, own.height * factor), Image.Resampling.NEAREST)
+            pairs.append((padded, own))
+            labels.append(f"{e['bilde']} kilde / egen native, visning {factor}x, {e['snitt_union']:.3f}/{e['dekning']:.3f}")
+        heights = [max(a.height, b.height) + 40 for a, b in pairs]
+        board = Image.new('RGBA', (1100, sum(heights)), '#7a7f88')
+        d = ImageDraw.Draw(board)
+        y = 0
+        for label, (src, own), h in zip(labels, pairs, heights):
+            d.text((10, y + 5), label, fill='white')
+            board.alpha_composite(src, (10, y + 30))
+            board.alpha_composite(own, (560, y + 30))
+            y += h
+        dest = R / f'helkontroll-{group}-{offset // size + 1:02}.png'
+        board.convert('RGB').save(dest)
+        boards.append(dict(fil=dest.name, sha256=sha(dest), malerier=[e['bilde'] for e in subset]))
+save(R / 'visuell-helkontroll-plan.json', boards)
+shutil.copy2(__file__, R / 'vis-egen.py.txt')
+print(len(boards), 'bilder,', sum(len(e['malerier']) for e in boards), 'hele egne malerier', flush=True)

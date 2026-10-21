@@ -1,0 +1,179 @@
+; Objekt 244 "golf-tee" i rom 25 (OBCD/VERB)
+; Verbtabell (verb: offset fra starten av VERB-blokken): 3: 0x019E, 4: 0x0015, 5: 0x00B6
+; Mellom verbtabellen og første inngang: 1 x (01, uint16) = 130. Ingen inngang peker dit, og descumm hopper over dem. Satt som klasser gir de samme bitene som DOBJ har for objektet.
+
+Events:
+   3 - 019E
+   4 - 0015
+   5 - 00B6
+[0015] (0C) dup[1] = var249
+[0019] (5D) if (dup[1] == 2) {
+[0020] (BB)   talkEgo(sound(0x8F3354D, 0xA) + "It's a bucket of fish.")
+[0049] (5D) } else if (dup[1] == 1) {
+[0054] (BB)   talkEgo(sound(0x8F3A638, 0xA) + "It's a golf tee.")
+[0077] (5D) } else if (dup[1] == 3) {
+[0082] (BB)   talkEgo(sound(0x8F40FA3, 0xA) + "It's a bucket of golf balls.")
+[00B1] (73)   /* jump b5; */
+[00B4] (**) }
+[00B4] (65) stopObjectCodeA()
+[00B6] (0C) dup[4] = var249
+[00BA] (5D) if (dup[4] == 2) {
+[00C1] (68)   beginCutscene([2])
+[00C9] (82)   animateActor(2,249)
+[00D0] (6C)   breakHere()
+[00D1] (9D)   actorOps.setCurActor(2)
+[00D6] (9D)   actorOps.setCostume(114)
+[00DB] (82)   animateActor(2,9)
+[00E2] (9D)   actorOps.setCurActor(8)
+[00E7] (9D)   actorOps.setElevation(200)
+[00EC] (CA)   delayFrames(19)
+[00F0] (71)   setOwner(322,15)
+[00F7] (5F)   startScriptQuick(55,[322,35])
+[0104] (43)   var249 = 1
+[010A] (9D)   actorOps.setCurActor(2)
+[010F] (9D)   actorOps.setCostume(2)
+[0114] (9D)   actorOps.setCurActor(7)
+[0119] (9D)   actorOps.setCostume(0)
+[011E] (67)   endCutscene()
+[011F] (5D) } else if (dup[4] == 3) {
+[012A] (68)   beginCutscene([2])
+[0132] (82)   animateActor(2,249)
+[0139] (6C)   breakHere()
+[013A] (9D)   actorOps.setCurActor(2)
+[013F] (9D)   actorOps.setCostume(114)
+[0144] (82)   animateActor(2,10)
+[014B] (9D)   actorOps.setCurActor(8)
+[0150] (9D)   actorOps.setElevation(200)
+[0155] (CA)   delayFrames(19)
+[0159] (71)   setOwner(259,15)
+[0160] (5F)   startScriptQuick(54,[259])
+[016A] (43)   var249 = 1
+[0170] (9D)   actorOps.setCurActor(2)
+[0175] (9D)   actorOps.setCostume(2)
+[017A] (9D)   actorOps.setCurActor(7)
+[017F] (9D)   actorOps.setCostume(0)
+[0184] (67)   endCutscene()
+[0185] (73) } else {
+[0188] (5E)   startScript(0,63,[5,var7])
+[0199] (7C)   stopScript(0)
+[019D] (**) }
+[019D] (65) stopObjectCodeA()
+[019E] (5D) if (localvar0) {
+[01A4] (0C)   dup[6] = localvar0
+[01A8] (5D)   if (dup[6] == 259) {
+[01AF] (68)     beginCutscene([2])
+[01B7] (0C)     dup[7] = var249
+[01BB] (5D)     if (dup[7] == 2) {
+[01C2] (82)       animateActor(2,249)
+[01CA] (6C)       breakHere()
+[01CB] (9D)       actorOps.setCurActor(2)
+[01D0] (9D)       actorOps.setCostume(114)
+[01D5] (82)       animateActor(2,11)
+[01DC] (9D)       actorOps.setCurActor(8)
+[01E1] (9D)       actorOps.setElevation(200)
+[01E6] (CA)       delayFrames(38)
+[01EA] (43)       var249 = 3
+[01F0] (9D)       actorOps.setCurActor(8)
+[01F5] (9D)       actorOps.setElevation(0)
+[01FA] (82)       animateActor(8,6)
+[0201] (71)       setOwner(322,2)
+[0208] (43)       var180 = 0
+[020E] (43)       var181 = 0
+[0214] (43)       var177 = 889
+[021A] (6B)       cursorCommand.setCursorImg(var177,93)
+[0222] (5F)       startScriptQuick(56,[259])
+[022C] (71)       setOwner(259,5)
+[0233] (5F)       startScriptQuick(52,[])
+[023A] (5D)     } else if (dup[7] == 3) {
+[0245] (5D)     } else if (dup[7] == 1) {
+[0251] (82)       animateActor(2,249)
+[0259] (6C)       breakHere()
+[025A] (9D)       actorOps.setCurActor(2)
+[025F] (9D)       actorOps.setCostume(114)
+[0264] (82)       animateActor(2,8)
+[026B] (9D)       actorOps.setCurActor(8)
+[0270] (9D)       actorOps.setElevation(200)
+[0275] (CA)       delayFrames(32)
+[0279] (43)       var249 = 3
+[027F] (9D)       actorOps.setCurActor(8)
+[0284] (9D)       actorOps.setElevation(0)
+[0289] (82)       animateActor(8,6)
+[0290] (43)       var180 = 0
+[0296] (43)       var181 = 0
+[029C] (43)       var177 = 889
+[02A2] (6B)       cursorCommand.setCursorImg(var177,93)
+[02AA] (5F)       startScriptQuick(56,[259])
+[02B4] (71)       setOwner(259,5)
+[02BB] (5F)       startScriptQuick(52,[])
+[02C2] (73)       /* jump 2c6; */
+[02C5] (**)     }
+[02C5] (9D)     actorOps.setCurActor(2)
+[02CB] (9D)     actorOps.setCostume(2)
+[02D0] (9D)     actorOps.setCurActor(7)
+[02D5] (9D)     actorOps.setCostume(118)
+[02DA] (67)     endCutscene()
+[02DB] (5D)   } else if (dup[7] == 322) {
+[02E6] (68)     beginCutscene([2])
+[02EE] (0C)     dup[11] = var249
+[02F2] (5D)     if (dup[11] == 2) {
+[02F9] (5D)     } else if (dup[11] == 3) {
+[0305] (82)       animateActor(2,249)
+[030D] (6C)       breakHere()
+[030E] (9D)       actorOps.setCurActor(2)
+[0313] (9D)       actorOps.setCostume(114)
+[0318] (82)       animateActor(2,12)
+[031F] (9D)       actorOps.setCurActor(8)
+[0324] (9D)       actorOps.setElevation(200)
+[0329] (CA)       delayFrames(38)
+[032D] (43)       var249 = 2
+[0333] (9D)       actorOps.setCurActor(8)
+[0338] (9D)       actorOps.setElevation(0)
+[033D] (82)       animateActor(8,7)
+[0344] (5F)       startScriptQuick(56,[322])
+[034E] (71)       setOwner(322,5)
+[0355] (71)       setOwner(259,2)
+[035C] (43)       var180 = 0
+[0362] (43)       var181 = 0
+[0368] (43)       var177 = 889
+[036E] (6B)       cursorCommand.setCursorImg(var177,93)
+[0376] (6B)       cursorCommand.makeCursorColorTransparent(176)
+[037B] (6B)       cursorCommand.makeCursorColorTransparent(178)
+[0380] (6B)       cursorCommand.makeCursorColorTransparent(0)
+[0385] (6B)       cursorCommand.makeCursorColorTransparent(6)
+[038A] (5F)       startScriptQuick(52,[])
+[0391] (5D)     } else if (dup[11] == 1) {
+[039C] (82)       animateActor(2,249)
+[03A4] (6C)       breakHere()
+[03A5] (9D)       actorOps.setCurActor(2)
+[03AA] (9D)       actorOps.setCostume(114)
+[03AF] (9D)       actorOps.setCurActor(8)
+[03B4] (9D)       actorOps.setElevation(200)
+[03B9] (82)       animateActor(2,7)
+[03C0] (CA)       delayFrames(11)
+[03C4] (CA)       delayFrames(20)
+[03C8] (43)       var249 = 2
+[03CE] (9D)       actorOps.setCurActor(8)
+[03D3] (9D)       actorOps.setElevation(0)
+[03D8] (82)       animateActor(8,7)
+[03DF] (43)       var180 = 0
+[03E5] (43)       var181 = 0
+[03EB] (43)       var177 = 889
+[03F1] (6B)       cursorCommand.setCursorImg(var177,93)
+[03F9] (5F)       startScriptQuick(56,[322])
+[0403] (71)       setOwner(322,5)
+[040A] (5F)       startScriptQuick(52,[])
+[0411] (73)       /* jump 415; */
+[0414] (**)     }
+[0414] (9D)     actorOps.setCurActor(2)
+[041A] (9D)     actorOps.setCostume(2)
+[041F] (9D)     actorOps.setCurActor(7)
+[0424] (9D)     actorOps.setCostume(119)
+[0429] (67)     endCutscene()
+[042A] (73)   } else {
+[042D] (BA)     talkActor(sound(0x8F4A6CE, 0xA) + "I don't want to golf that!",2)
+[045D] (**)   }
+[045D] (73) } else {
+[0460] (5E)   startScript(0,213,[])
+[046A] (**) }
+[046A] (65) stopObjectCodeA()
+END

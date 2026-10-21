@@ -1,0 +1,60 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+from scipy import ndimage as nd
+import numpy as np
+import hashlib
+import json
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter/sam115-golf-20261021'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+rows = json.loads((R / 'prototyper-endelig.json').read_text())
+receipt = []
+for e in rows:
+    if e['valgt_kall'] != 'FR1':
+        continue
+    f = A / e['prototype']
+    assert sha(f) == e['prototype_sha256']
+    before = R / 'prototyper' / (e['bilde'] + '-for-fast-storrelse.png')
+    assert not before.exists()
+    shutil.copy2(f, before)
+    own = Image.open(f).convert('RGBA')
+    a = np.array(own)
+    yy, xx = np.nonzero(a[:, :, 3] >= CORE)
+    src = np.array(Image.open(P / 'work/extract/costumes' / (e['bilde'] + '.png')).convert('RGBA'))
+    sy, sx = np.nonzero(src[:, :, 3] > 0)
+    # Only scalar source bounds measure fixed size. Transform the WHOLE OWN RGBA curve.
+    cw, ch = int(np.ptp(xx) + 1), int(np.ptp(yy) + 1)
+    tw, th = int(np.ptp(sx) + 1) * 4, int(np.ptp(sy) + 1) * 4
+    center = ((float(xx.min()) + float(xx.max()) + 1) / 2,
+              (float(yy.min()) + float(yy.max()) + 1) / 2)
+    dest = ((float(sx.min()) + float(sx.max()) + 1) * 2 + 8,
+            (float(sy.min()) + float(sy.max()) + 1) * 2 + 8)
+    wx, hy = cw / tw, ch / th
+    fixed = own.transform(own.size, Image.Transform.AFFINE,
+        (wx, 0, center[0] - dest[0] * wx, 0, hy, center[1] - dest[1] * hy),
+        Image.Resampling.BICUBIC)
+    a = np.array(fixed)
+    core = a[:, :, 3] >= CORE
+    _, near = nd.distance_transform_edt(~core, return_indices=True)
+    weak = (a[:, :, 3] > 0) & (a[:, :, 3] <= 4)
+    a[weak, :3] = a[near[0][weak], near[1][weak], :3]
+    a[a[:, :, 3] == 0, :3] = 0
+    iou, cov = _iou(core, np.repeat(np.repeat(src[:, :, 3] > 0, 4, 0), 4, 1), -8, -8)
+    Image.fromarray(a).save(f)
+    e.update(prototype_sha256=sha(f), snitt_union=iou, dekning=cov,
+        native_ok=bool(iou >= GOOD_IOU and cov >= GOOD_COVER))
+    fix = dict(metode='hel egen RGBA-kurve tilbake til fast kildemålt bredde og høyde etter egen strektykning',
+        egen_kjerne_for=[cw, ch], maal_HD=[tw, th], transform=[wx, hy],
+        originalmaske_brukt=False, kildefragmenter_brukt=False, egen_for_sha256=sha(before))
+    e['egen_rens'].append(fix)
+    receipt.append(dict(bilde=e['bilde'], **fix, snitt_union=iou, dekning=cov, native_ok=e['native_ok']))
+    print(e['bilde'], iou, cov, 'OK' if e['native_ok'] else 'FEIL', flush=True)
+save(R / 'kurver-fast-storrelse.json', receipt)
+save(R / 'prototyper-endelig.json', rows)
+shutil.copy2(__file__, R / 'kurvehoyde.py.txt')
+assert all(e['native_ok'] for e in receipt)

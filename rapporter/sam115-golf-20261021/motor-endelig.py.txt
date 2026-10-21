@@ -1,0 +1,91 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import os
+import re
+import json
+import hashlib
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+PK = P / 'out/felles-release-20261021-max052-delvis/linux/squashfs-root'
+D = PK / 'usr/share/sam-max-hd'
+B = PK / 'usr/bin/scummvm'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+assert sha(B) == 'e4f3ee9faa9afa50985029ac595558cad25d1300547e8f0b47a87af4f9995573'
+cases = [dict(label=f'golf3098-endelig-an{an}', mod=O / 'mod-sam1153098', anim=an) for an in [6, 7, 8, 9]]
+
+def run(c):
+    T = O / c['label']
+    assert not T.exists()
+    T.mkdir()
+    home, saves = T / 'home', T / 'saves'
+    home.mkdir()
+    saves.mkdir()
+    for f in (P / 'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):
+        shutil.copy2(f, saves / f.name)
+    env = {k: v for k, v in os.environ.items() if not k.startswith('DIGHD_')}
+    env.update(HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
+        XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache'),
+        LD_LIBRARY_PATH=str(PK / 'usr/lib'), SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy',
+        DIGHD_MOD=str(c['mod']), DIGHD_VERIFY='1', DIGHD_QUIT_AT='240',
+        DIGHD_DUMP_DIR=str(T), DIGHD_DUMP_EVERY='2', DIGHD_DUMP_FLAT='1',
+        DIGHD_TEST_ROOM='25', DIGHD_TEST_AT='10', DIGHD_TEST_CAMX='160',
+        DIGHD_TEST_COSTUME='115', DIGHD_TEST_ACTOR='2', DIGHD_TEST_POS='125,177',
+        DIGHD_TEST_SCALE='255', DIGHD_TEST_PALETTE='0', DIGHD_TEST_ANIMATION=str(c['anim']),
+        DIGHD_TEST_CHORE_EVERY='10000', DIGHD_MANGLER='0', DIGHD_SHOW_MISSING='0',
+        DIGHD_DEBUG_SOFT='1', DIGHD_DEBUG_COSTUME='1')
+    cmd = [str(B), '--config=' + str(T / 'scummvm.ini'), '--path=' + str(D / 'game'),
+        '--savepath=' + str(saves), '--save-slot=2', '--gfx-mode=normal', '--no-fullscreen',
+        '--gui-theme=builtin', '--music-driver=null', '--debuglevel=1', 'samnmax']
+    with (T / 'scummvm.log').open('wb') as f:
+        code = subprocess.run(cmd, env=env, stdout=f, stderr=subprocess.STDOUT, timeout=180).returncode
+    log = (T / 'scummvm.log').read_text(errors='replace')
+    checks = [dict(frame=int(f), avvik=int(n)) for f, n in re.findall(
+        r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again', log)]
+    seen, events = {}, []
+    for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*115\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)', log):
+        f, n, x, y, w, h = map(int, m.groups())
+        shot = (f // 2 + 1) * 2
+        png = T / f'frame_{shot:06}_room025.png'
+        row = dict(logg_frame=f, bildeframe=shot, cel=n, pos=[x, y], maal=[w, h], fil=str(png))
+        if png.exists():
+            row['sha256'] = sha(png)
+            seen.setdefault(f'costume115_{n}', row)
+        events.append(row)
+    proof = dict(label=c['label'], binar_sha256=sha(B), rom=25, aktor=2, kostyme=115,
+        pos='125,177', palett=0, skala=255, animasjon=c['anim'], retning=2,
+        tvungen_avspilling=True, naturlig_gjennomspilling=False,
+        andre_aktorer_og_skript_ikke_skjult=True, ugyldig40_ikke_spilt=True, kommando=cmd,
+        mod_json_sha256=sha(c['mod'] / 'mod.json'), exit=code,
+        skjermbufferkontroller=len(checks), nullkontroller=sum(v['avvik'] == 0 for v in checks),
+        kontroller=checks, sett=len(seen), tegninger=seen, hendelser=events,
+        logg_sha256=sha(T / 'scummvm.log'), logg=str(T / 'scummvm.log'))
+    save(R / ('motor-' + c['label'] + '.json'), proof)
+    print(c['label'], 'exit', code, 'sett', len(seen), 'kontroller', len(checks), 'null', proof['nullkontroller'], flush=True)
+    assert code == 0 and len(checks) == 120
+    return proof
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    rows = list(pool.map(run, cases))
+rows = [json.loads((R / f'motor-grunnlag3014-an{an}.json').read_text()) for an in [6, 7, 8, 9]] + rows
+for n in range(4):
+    assert rows[n]['kontroller'] == rows[n + 4]['kontroller']
+expected = {r['bilde'] for j in ['fig115_01', 'fig115_02', 'fig115_03']
+    for r in json.loads((A / 'jobber' / j / 'jobb.json').read_text())['ruter']}
+seen = {name for r in rows[4:] for name in r['tegninger']}
+save(R / 'motor-sammenligning.json', dict(kilder=4, kandidater=4, gyldige_animasjoner=[6, 7, 8, 9],
+    ugyldig40_ikke_spilt=True, forventet=len(expected), sett=len(expected & seen),
+    mangler=sorted(expected - seen), ekstra=sorted(seen - expected),
+    grunnlag_native=3014, kandidat_native=3098, kontroller_identiske=True,
+    ingen_nye_eller_okte_avvik=True, kontrollantall=sum(r['skjermbufferkontroller'] for r in rows[4:]),
+    nullkontroller=sum(r['nullkontroller'] for r in rows[4:]),
+    naturlig_gjennomspilling=False, andre_aktorer_ikke_skjult=True))
+assert not expected - seen
+assert all(r['nullkontroller'] == 120 for r in rows)
+shutil.copy2(__file__, R / 'motor-endelig.py.txt')
+print('Alle84 native logget,480/480 null, identisk grunnlag, ingen skjulte aktører.', flush=True)
