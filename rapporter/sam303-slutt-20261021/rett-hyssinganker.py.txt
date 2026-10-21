@@ -1,0 +1,64 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+import numpy as np, json, hashlib, shutil, subprocess
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name; C=O/'mod-sam3033150'
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest(); save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+old=R/'foer-hyssinganker'; old.mkdir(exist_ok=False)
+for f in ['prototyper-endelig.json','fremdrift.json','egen-native.json','kandidatfilhash.json','motor-kandidat3150.json','motor-sammenligning.json','motor-visuell-plan.json','motor-pikselkontroll.json']:
+    shutil.copy2(R/f,old/f)
+variants=read(R/'prototyper-endelig.json'); dot=Image.open(R/'egen-blaaprikken.png').convert('RGBA'); fixes=[]
+for e in variants:
+    f=A/e['prototype']; src=np.array(Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA')); a=np.array(Image.open(f).convert('RGBA'))
+    sy=40; yy=sy*4+8; sx=np.nonzero(src[sy,:,3]>0)[0]; ox=np.nonzero(a[yy,:,3]>=CORE)[0]
+    assert len(sx)==1 and len(ox)>0
+    target=float(sx.mean()*4+9.5); anchor=float(ox.mean()); delta=anchor-target
+    if abs(delta)<=2:
+        fixes.append(dict(bilde=e['bilde'],ankerdelta_hd=delta,endring=False)); continue
+    assert str(R.relative_to(A)) in e['prototype'], 'Tidligere publiserte malerier skal aldri endres'
+    shutil.copy2(f,old/f.name)
+    blue=(src[:,:,:3]==[115,167,223]).all(2)&(src[:,:,3]>0); by,bx=np.nonzero(blue); dx,dy=int(bx[0])*4+8,int(by[0])*4+8
+    a[dy:dy+4,dx:dx+4]=0
+    left,_,right,_=e['maalt_kilde_bbox']; L=left*4+8; U=right*4+8
+    assert L<target<U and L<anchor<U
+    yp,xp=np.indices(a.shape[:2],dtype=float); xp[:]=np.interp(xp[0],[L,target,U],[L,anchor,U])
+    warped=np.stack([nd.map_coordinates(a[:,:,ch].astype(float),[yp,xp],order=1,mode='constant',cval=0,prefilter=False) for ch in range(4)],axis=2).round().clip(0,255).astype(np.uint8)
+    warped[warped[:,:,3]==0,:3]=0
+    out=Image.fromarray(warped); out.alpha_composite(dot,(dx,dy)); out.save(f); a=np.array(out)
+    iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1),-8,-8)
+    assert iou>=GOOD_IOU and cov>=GOOD_COVER
+    now=np.nonzero(a[yy,:,3]>=CORE)[0]; after=float(now.mean()-target); assert abs(after)<=1
+    e.update(prototype_sha256=sha(f),snitt_union=iou,dekning=cov,native_ok=True,hyssinganker_rettet=True,hyssinganker_delta_hd_for=delta,hyssinganker_delta_hd_etter=after)
+    fixes.append(dict(bilde=e['bilde'],endring=True,malerisk_heltegnings_xplassering=True,egen_todelt_kontinuerlig_xtransform=dict(egen_anker=anchor,kilde_anker=target,venstre=L,hoyre=U),originalmaskering=False,delta_for=delta,delta_etter=after,snitt_union=iou,dekning=cov))
+    print(e['bilde'],round(delta,1),'->',round(after,1),'IoU/dekning',round(iou,3),round(cov,3),flush=True)
+save(R/'prototyper-endelig.json',variants); save(R/'hyssinganker-kontroll.json',fixes)
+plan=read(R/'ruteplan-unik.json'); selected={e['bilde']:e for e in variants}; target={t['bilde']:e for e in plan['ruter'] for t in e['malruter']}
+progress=read(R/'fremdrift.json'); native=read(R/'egen-native.json')
+for e in native['ruter']:
+    e.update(sha256=sha(A/e['prototype']),snitt_union=selected[e['canonical']]['snitt_union'],dekning=selected[e['canonical']]['dekning'])
+    shutil.copy2(A/e['prototype'],C/e['fil'])
+save(R/'egen-native.json',native)
+for e in progress['leveranser']:
+    J=A/'jobber'/e['jobb']; shutil.copy2(J/'resultat.png',old/(e['jobb']+'-resultat.png')); j=read(J/'jobb.json'); sheet=Image.new('RGBA',tuple(j['lerret']))
+    maps=read(R/f'rutekart-{e["jobb"]}.json'); m=maps[e['jobb']]
+    for t in j['ruter']:
+        v=selected[target[t['bilde']]['bilde']]; x,y,_,_=t['rekt']; own=Image.open(A/v['prototype']).convert('RGBA'); dx,dy=(j['plassering'][0]+x)*4-8,(j['plassering'][1]+y)*4-8
+        sheet.alpha_composite(own,(dx,dy)); q=next(q for q in m['ruter'] if q['bilde']==t['bilde']); a=np.array(own); yy,xx=np.nonzero(a[:,:,3]>=CORE)
+        q.update(prototype_sha256=v['prototype_sha256'],snitt_union=v['snitt_union'],dekning=v['dekning'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)])
+    sheet.save(J/'resultat.png'); e['sha256']=sha(J/'resultat.png'); m['sha256_resultat']=e['sha256']; save(R/f'rutekart-{e["jobb"]}.json',maps)
+    test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(J/'resultat.png')],cwd=A,text=True,capture_output=True); assert test.returncode in [0,1]
+    (R/f'{e["jobb"]}-egenkontroll.txt').write_text(test.stdout+test.stderr); e['egenkontroll']=['OK','SJEKK'][test.returncode]
+    with (J/'notat.md').open('a') as f:f.write('\nVisuell motorvurdering fant at øvre hyssing skiftet horisontalt i enkelte malerier. Den hele egne tegningen har fått en kontinuerlig, todelt horisontal plassering rundt det målte kildeankeret. Ingen hard kildeform klipper malingen. Den egne blå prikken settes tilbake på sitt anker. Tidligere malerier er urørt. Resultat, rutekart, native og mottak er oppdatert; første motorprøve og før-verdier er bevart. Endelig korrigert motorprøve kreves før publisering.\n')
+save(R/'fremdrift.json',progress); save(R/'kandidatfilhash.json',{p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()})
+subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(A),'--extract',str(P/'work/extract'),'--ut',str(O/'automatisk-mottak-endelig'),'--jobb',','.join(plan['jobber']),'--forhandsvisning',''],cwd=P,check=True)
+auto=read(O/'automatisk-mottak-endelig/myke.json'); assert auto['ruter_ok']==25 and auto['ruter_sjekk']==auto['ruter_mangler']==auto['ruter_teknisk']==0; save(R/'automatisk-mottak25.json',auto)
+for start in range(0,len(variants),4):
+    b=Image.new('RGBA',(1536,1440),'#596978');d=ImageDraw.Draw(b)
+    for k,e in enumerate(variants[start:start+4]):
+        src=Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA'); x,y=(k%2)*768,(k//2)*720
+        b.alpha_composite(src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST),(x+8,y+40)); b.alpha_composite(Image.open(A/e['prototype']).convert('RGBA'),(x+390,y+32)); d.text((x+8,y+5),e['bilde']+' original / endelig eget maleri',fill='white')
+    b.convert('RGB').save(R/f'endelige-varianter-{start//4+1}.png')
+shutil.copy2(__file__,R/'rett-hyssinganker.py.txt')
+print('Alle25 mottak OK. Sluttprøve i motor gjenstår.')

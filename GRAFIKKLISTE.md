@@ -1,5 +1,7 @@
 # Grafikkliste
 
+Resterende Sam303: ni hele ark fig303_06..14,25 nye native i kontrollert kandidat3150. 446 av1758 resultatark,1312 gjenstår pluss returer/katalogfeil/sluttkontroll. Alle25 automatisk OK og motorlogget;13 egne varianter sett samlet i faktisk Linux. Øvre hyssinganker rettet uten originalmaske.450kontroller448null,samme4ved36 og160ved414,ingen nye/økte avvik;fire par0utenfor aktørflater.1152kilder,tre stasher og tidligere PNG bevart. Publisering/hent og fellespakker3150 gjenstår. Ingen ny Tom-/Claude-godkjenning.
+
 Felles Linux/Windows 3125 er publisert og Latest-bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-hyssing. Begge faktiske pakker og 21367 runtimefiler hver SHA-bekreftet, alle 27 nye motorlogget med identiske figurutsnitt. 467/469 null, samme kjente overgangsavvik, ingen nye eller økte. 437 av 1758 resultatark, 1321 gjenstår pluss returer/katalogfeil/sluttkontroll. Nativefrysen er frigitt. Neste fig303_06..10 fra sam303-andre-kilde-20261021, 15 mål/sju helkilder/seks nye malerier/0 kall. Se alle originaler, kildekontekst og Sam-hovedark før tegning. 304 K02 er verktøyavvist, ingen omprøve. Bevar 1136 kilder, alle tidligere filer og tre stasher. Ingen ny Tom-/Claude-godkjenning.
 
 Sam303_01..05 publisert og hentet i 596201dcce1901db4a7c4a7f853ca591ffb11cbd,3125 native,437 av1758 resultatark,1321 gjenstår. Alle15 nye automatisk OK,ni egne varianter sett i faktisk Linux;450kontroller448null,samme4ved36/160ved414. Ingen nye/økte avvik,fire par0 utenfor aktørflater. Alle21368 filhash/21347 tidligere PNG/1116 kildehash/tre stasher bekreftet. Fellespakker3098 mangler27 og pakkefrys starter nå. 304 K02 verktøyavvist,ingen omprøve,K01 bare utkast. Neste fellespakker,deretter303_06..kildeklargjøring. Ingen ny Tom-/Claude-godkjenning. Se rapporter/sam303-foerste-20261021/NESTE.md.
@@ -593,20 +595,20 @@ Figurark for Sam.
 
 - [x] `fig303_04` (figurark 4 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 - [x] `fig303_05` (figurark 5 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_06` (figurark 6 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_07` (figurark 7 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_08` (figurark 8 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_09` (figurark 9 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_10` (figurark 10 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_11` (figurark 11 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_12` (figurark 12 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig303_13` (figurark 13 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_06` (figurark 6 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_07` (figurark 7 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_08` (figurark 8 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_09` (figurark 9 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_10` (figurark 10 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_11` (figurark 11 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_12` (figurark 12 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig303_13` (figurark 13 for Sam (kostyme 303), 3 ruter: start mot høyre (3 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 31
 
 Figurark for Sam, Sam og Max.
 
-- [ ] `fig303_14` (figurark 14 for Sam (kostyme 303), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
+- [x] `fig303_14` (figurark 14 for Sam (kostyme 303), 1 rute: start mot høyre (1 rute), bilde to `hovedark/sam.png`)
 - [ ] `fig223_01` (figurark 1 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_02` (figurark 2 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig223_03` (figurark 3 for Sam og Max (kostyme 223), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)

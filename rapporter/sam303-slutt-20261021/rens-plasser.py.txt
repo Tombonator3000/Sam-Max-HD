@@ -1,0 +1,47 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert (CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+def bbox(m):
+ y,x=np.nonzero(m);return [int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)]
+def clean(a):
+ rgb=a[:,:,:3].astype(int);r,g,b=rgb[:,:,0],rgb[:,:,1],rgb[:,:,2];bad=((r>210)&(g<110)&(b<80))|((r>230)&(g>210)&(b<90))|((g>180)&(r<120)&(b<140))|((r>180)&(b>180)&(g<120))
+ core=(a[:,:,3]>=CORE)&~bad;dist=nd.distance_transform_edt(~core);a[dist>1.5]=0
+ trust=(a[:,:,3]>=245)&~bad;assert trust.any();_,ix=nd.distance_transform_edt(~trust,return_indices=True);edge=((a[:,:,3]<245)|bad)&(a[:,:,3]>0);nearest=a[tuple(ix)][:,:,:3];a[edge,:3]=nearest[edge];a[a[:,:,3]==0,:3]=0;return a
+def bodytop(a,source=False):
+ rgb=a[:,:,:3].astype(float);b,g,r=rgb[:,:,2],rgb[:,:,1],rgb[:,:,0];col=((b>r+10)&(b>g+8))|((r>240)&(g>220)&(b>190));col &= a[:,:,3]>(0 if source else CORE);col[:int(a.shape[0]*.4)]=False;return int(np.nonzero(col)[0].min())
+dotfrom=A/'rapporter/sam304-foerste-20261021/egen-blaaprikken.png';dot=Image.open(dotfrom).convert('RGBA');assert dot.size==(4,4);dot.save(R/'egen-blaaprikken.png');save(R/'blaaprikk-proveniens.json',dict(kilde_egen=str(dotfrom.relative_to(A)),sha256=sha(dotfrom),originalfragment=False,egen_generert_prikk=True))
+rows=[]
+for e in read(R/'ruteplan-unik.json')['ruter']:
+ if e['tidligere_egen'] is not None:
+  v=e['tidligere_egen'].copy();v['bilde']=e['bilde'];v['gjenbruk_helt_eget_med_identisk_rgba']=True;rows.append(v)
+for C in sorted((R/'kall').iterdir()):
+ if not (C/'raa.png').exists() or not (C/'plan.json').exists() or C.name=='K06':continue
+ rawimage=Image.open(C/'raa.png').convert('RGBA');records=read(C/'plan.json')['ruter'];expected=Image.open(C/'reference-atlas.png').size
+ if rawimage.size!=expected:rawimage=rawimage.resize(expected,Image.Resampling.LANCZOS)
+ raw=np.array(rawimage);board=Image.new('RGBA',(1536,len(records)*720),'#596978');draw=ImageDraw.Draw(board)
+ for i,e in enumerate(records):
+  src=np.array(Image.open(P/'work/extract/costumes'/(e['bilde']+'.png')).convert('RGBA'));assert hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256'];x,y,cw,ch=e['celle'];own=raw[y:y+ch,x:x+cw].copy();raw_blue=(np.indices(own.shape[:2])[0]<ch*.4)&(own[:,:,2].astype(int)>own[:,:,0].astype(int)+15);own[raw_blue]=0;own=clean(own);labs,_=nd.label(own[:,:,3]>=CORE);removed=[]
+  for label,sl in enumerate(nd.find_objects(labs),1):
+   if sl is None:continue
+   area=int((labs[sl]==label).sum());xb=[sl[1].start,sl[0].start,sl[1].stop,sl[0].stop];color=own[sl][:,:,:3][labs[sl]==label].mean(0)
+   if area<250 and xb[1]<500 and color[2]>color[0]+15:
+    dist,ix=nd.distance_transform_edt(labs==0,return_indices=True);owner=labs[tuple(ix)];own[(owner==label)&((labs==label)|(dist<=2))]=0;removed.append(dict(bbox=xb,areal=area,grunn='egen blå prikk gjeninnsettes på kildeanker'))
+  ot0=bodytop(own); upper_blue=(np.indices(own.shape[:2])[0]<ot0)&(own[:,:,2].astype(int)>own[:,:,0].astype(int)+15); own[upper_blue]=0;own=clean(own);sm=src[:,:,3]>0;blue=(src[:,:,:3]==[115,167,223]).all(2)&sm;assert blue.sum()==1;measure=sm&~blue;sx0,sy0,sx1,sy1=bbox(measure);ox0,oy0,ox1,oy1=bbox(own[:,:,3]>=CORE);st=bodytop(src,True);ot=bodytop(own);out=Image.new('RGBA',(src.shape[1]*4+16,src.shape[0]*4+16))
+  for a0,a1,b0,b1 in [(oy0,ot,sy0,st),(ot,oy1,st,sy1)]:
+   q=Image.fromarray(own).crop((ox0,a0,ox1,a1));q=q.resize(((sx1-sx0)*4,(b1-b0)*4),Image.Resampling.LANCZOS);out.alpha_composite(q,(sx0*4+8,b0*4+8))
+  a=np.array(out);upper=(np.indices(a.shape[:2])[0] < st*4+8)&(a[:,:,3]>0);colors=a[upper,:3];beige=colors[(colors[:,0]>colors[:,2]+30)&(colors[:,1]>colors[:,2]+10)];assert len(beige)>0;flat=np.array([210,173,113],dtype=np.uint8);a[upper,:3]=flat;out=Image.fromarray(a);yy,xx=np.nonzero(blue);out.alpha_composite(dot,(int(xx[0])*4+8,int(yy[0])*4+8));a=clean(np.array(out));retouch=[]
+  if e['bilde'] in ['costume303_1951','costume303_1956']:
+   circles,sample=([(187,533,3.4),(193,531,3.6)],(190,521)) if e['bilde'].endswith('1951') else ([(246,528,3.5),(253,526,3.5)],(249,517))
+   rgb=a[sample[1],sample[0],:3].copy();yy0,xx0=np.indices(a.shape[:2])
+   for cx,cy,rad in circles:
+    mask=(xx0-cx)**2+(yy0-cy)**2<=rad**2;assert (a[mask,3]>200).all();a[mask,:3]=rgb;retouch.append(dict(egen_fjernet='oppdiktet mansjettknapp',egen_sirkel=[cx,cy,rad],egen_farge_rgb=rgb.tolist(),alfa_uendret=True))
+  out=Image.fromarray(a);iou,cov=_iou(a[:,:,3]>=CORE,np.repeat(np.repeat(sm,4,0),4,1),-8,-8);f=C/(e['bilde']+'-prototype.png');out.save(f)
+  row=dict(bilde=e['bilde'],valgt_kall=C.name,prototype=f.relative_to(A).as_posix(),prototype_sha256=sha(f),canonical_rgba_sha256=e['canonical_rgba_sha256'],snitt_union=iou,dekning=cov,native_ok=iou>=GOOD_IOU and cov>=GOOD_COVER,egen_alfa=True,originalmaske=False,originalfragmenter=False,egen_glodrens_hd=1.5,egen_fjernet=removed,maalt_kilde_bbox=[sx0,sy0,sx1,sy1],egen_bbox=[ox0,oy0,ox1,oy1],kropp_start_kilde=st,kropp_start_egen=ot,visuelt_sett=False)
+  row['egen_retusj']=retouch;row['egen_oevre_hyssing_flate_farger']=flat.tolist();row['egen_oevre_flatfarge_unntar_egen_blaaprikk']=True;rows.append(row);draw.text((10,i*720+8),f"{e['bilde']} original 4x / egen 4x {iou:.3f}/{cov:.3f}",fill='white');board.alpha_composite(Image.fromarray(src).resize((src.shape[1]*4,src.shape[0]*4),Image.Resampling.NEAREST),(16,i*720+70));board.alpha_composite(out,(790,i*720+62));print(e['bilde'],round(iou,4),round(cov,4),'OK' if row['native_ok'] else 'FEIL',flush=True)
+ board.convert('RGB').save(C/'renset-helkontroll.png')
+save(R/'prototyper-endelig.json',rows);shutil.copy2(__file__,R/'rens-plasser.py.txt')

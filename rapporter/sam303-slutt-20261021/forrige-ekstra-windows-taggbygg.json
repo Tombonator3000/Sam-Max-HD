@@ -1,0 +1,157 @@
+{
+  "conclusion": "success",
+  "headSha": "ad089fb1f9612f8c9da6e69fea66dac523e308af",
+  "jobs": [
+    {
+      "completedAt": "2026-10-21T04:45:02Z",
+      "conclusion": "success",
+      "databaseId": 119043362573,
+      "name": "sjekk",
+      "startedAt": "2026-10-21T04:44:58Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-21T04:44:59Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-21T04:44:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:45:00Z",
+          "conclusion": "success",
+          "name": "Run MOD=$(gh api repos/Tombonator3000/Sam-Max-HD/git/ref/heads/hd-mod --jq .object.sha)",
+          "number": 2,
+          "startedAt": "2026-10-21T04:44:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:45:00Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 3,
+          "startedAt": "2026-10-21T04:45:00Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39545730608/job/119043362573"
+    },
+    {
+      "completedAt": "2026-10-21T04:53:41Z",
+      "conclusion": "success",
+      "databaseId": 119043389238,
+      "name": "pakke",
+      "startedAt": "2026-10-21T04:45:04Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-21T04:45:06Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-21T04:45:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:45:07Z",
+          "conclusion": "success",
+          "name": "Ingen CRLF i utsjekken",
+          "number": 2,
+          "startedAt": "2026-10-21T04:45:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:45:12Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 3,
+          "startedAt": "2026-10-21T04:45:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:46:34Z",
+          "conclusion": "success",
+          "name": "Run msys2/setup-msys2@v2",
+          "number": 4,
+          "startedAt": "2026-10-21T04:45:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:51:31Z",
+          "conclusion": "success",
+          "name": "Bygg ScummVM med HD-patchen",
+          "number": 5,
+          "startedAt": "2026-10-21T04:46:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:51:40Z",
+          "conclusion": "success",
+          "name": "Spillet og talen (grenen spilldata)",
+          "number": 6,
+          "startedAt": "2026-10-21T04:51:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:51:59Z",
+          "conclusion": "success",
+          "name": "HD-modden (grenen hd-mod)",
+          "number": 7,
+          "startedAt": "2026-10-21T04:51:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:53:03Z",
+          "conclusion": "success",
+          "name": "Lag zip",
+          "number": 8,
+          "startedAt": "2026-10-21T04:51:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:53:13Z",
+          "conclusion": "success",
+          "name": "Test pakken uten skjerm",
+          "number": 9,
+          "startedAt": "2026-10-21T04:53:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:53:13Z",
+          "conclusion": "skipped",
+          "name": "Publiser som release",
+          "number": 10,
+          "startedAt": "2026-10-21T04:53:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:53:33Z",
+          "conclusion": "success",
+          "name": "Pakken som artefakt (grener utenom main)",
+          "number": 11,
+          "startedAt": "2026-10-21T04:53:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:53:35Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 22,
+          "startedAt": "2026-10-21T04:53:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-21T04:53:35Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 23,
+          "startedAt": "2026-10-21T04:53:35Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39545730608/job/119043389238"
+    }
+  ],
+  "status": "completed"
+}

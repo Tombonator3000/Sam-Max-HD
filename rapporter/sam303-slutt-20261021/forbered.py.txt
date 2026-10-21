@@ -1,0 +1,140 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from datetime import datetime, timezone
+import json, hashlib, shutil, re, subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+R.mkdir(parents=True, exist_ok=False)
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+git = lambda w, *args: subprocess.check_output(['git', *args], cwd=w, text=True).strip()
+assert not git(P, 'status', '--porcelain') and not git(A, 'status', '--porcelain')
+assert git(P, 'branch', '--show-current') == 'main'
+assert git(A, 'branch', '--show-current') == 'gpt-arbeid'
+M = P / 'mods/gpt'
+files = {p.relative_to(M).as_posix(): sha(p) for p in M.rglob('*') if p.is_file()}
+assert files == read(A / 'rapporter/sam303-foerste-20261021/publiserte-moddfiler-3125.json')
+remote = json.loads(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/git/ref/heads/hd-mod'], text=True))['object']['sha']
+assert remote == '596201dcce1901db4a7c4a7f853ca591ffb11cbd'
+assert read(M / 'mod.json')['costume_cels'] == 3125
+assert len(files) == 21368
+stashes = git(P, 'stash', 'list', '--format=%H').splitlines()
+assert stashes == ['3bcac2e1c5fc70f077c5845bd1c497503e2242ca', '1672c8981a434e17bed5c142599680f16a238a74', '729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+assert len(list((A / 'jobber').glob('fig*/resultat.png'))) == 437
+save(R / 'grunnlag-produksjon.json', dict(native=3125, filer=files, fjern_sha=remote, stash=stashes, hele=437))
+extra = json.loads(subprocess.check_output(['gh', 'run', 'view', '39545730608', '--repo', 'Tombonator3000/Sam-Max-HD', '--json', 'status,conclusion,headSha,jobs'], text=True))
+assert extra['status'] == 'completed' and extra['conclusion'] == 'success'
+save(R / 'forrige-ekstra-windows-taggbygg.json', extra)
+
+jobs = [f'fig303_{i:02}' for i in range(6, 15)]
+protected = read(A / 'rapporter/sam303-andre-kilde-20261021/beskyttede-samlet1136.json')
+unique = {}
+for job in jobs:
+    J = A / 'jobber' / job
+    assert not (J / 'resultat.png').exists()
+    for name in ['jobb.json', 'original_1x.png', 'prompt.txt', 'referanse.png']:
+        protected[(J / name).relative_to(A).as_posix()] = sha(J / name)
+    j = read(J / 'jobb.json')
+    for t in j['ruter']:
+        f = P / 'work/extract/costumes' / (t['bilde'] + '.png')
+        im = Image.open(f).convert('RGBA')
+        h = hashlib.sha256(im.tobytes()).hexdigest()
+        key = (im.size, h)
+        if key not in unique:
+            unique[key] = dict(bilde=t['bilde'], rgba_sha256=h, kilde_sha256=sha(f), maal=list(im.size), malruter=[], tidligere_egen=None)
+        unique[key]['malruter'].append(dict(jobb=job, **t))
+assert len(protected) == 1152 and all(sha(A / f) == h for f, h in protected.items())
+save(R / 'beskyttede-samlet.json', protected)
+prior = read(A / 'rapporter/sam303-foerste-20261021/prototyper-endelig.json')
+entries = list(unique.values())
+for e in entries:
+    matches = [v for v in prior if v['canonical_rgba_sha256'] == e['rgba_sha256']]
+    if matches:
+        assert len(matches) == 1
+        e['tidligere_egen'] = matches[0]
+        assert sha(A / matches[0]['prototype']) == matches[0]['prototype_sha256']
+plan = dict(jobber=jobs, ruter=entries, maal=25, ulike_hele=len(entries), nye_malerier=sum(e['tidligere_egen'] is None for e in entries))
+assert len(entries) == 13 and plan['nye_malerier'] == 12
+save(R / 'ruteplan-unik.json', plan)
+source = P / 'out/sam303-foerste-20261021/motor-kandidat3125'
+log = (source / 'scummvm.log').read_text()
+obs = {}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*303\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)', log):
+    f, n, x, y, w, h = map(int, m.groups())
+    shot = (f // 2 + 1) * 2
+    p = source / f'frame_{shot:06}_room059.png'
+    if p.exists():
+        obs.setdefault(f'costume303_{n}', dict(logg_frame=f, bildeframe=shot, pos=[x,y], maal=[w,h], fil=str(p), sha256=sha(p)))
+want = {t['bilde'] for e in entries for t in e['malruter']}
+assert not want - set(obs)
+save(R / 'kilde-motorobservasjoner.json', dict(rom=59, kostyme=303, primaer_skript=208, primaer_animasjon=6, tegninger={n:obs[n] for n in sorted(want)}, originalark_sett=jobs, sam_og_max_hovedark_sett=True, visuelt_sett=False))
+for start in range(0, len(entries), 6):
+    group = entries[start:start+6]
+    board = Image.new('RGB', (1920, 1290), '#344354')
+    d = ImageDraw.Draw(board)
+    for k,e in enumerate(group):
+        v = obs[e['bilde']]
+        im = Image.open(v['fil']).convert('RGB').resize((640,400))
+        x,y = (k%3)*640, (k//3)*430
+        board.paste(im,(x,y+25)); d.text((x+8,y+5),f"{e['bilde']} frame {v['bildeframe']}", fill='white')
+    board.save(R / f'kilde-spillkontekst-{start//6+1}.png')
+shutil.copy2(A / 'rapporter/sam303-andre-kilde-20261021/primaer-lokal_208.txt', R / 'primaer-lokal_208.txt')
+
+descs = {
+1936: 'Sam stands alone, speaking, near hand bends upward across his belly. Reproduce this exact thin open mouth and exact hand fingers. Other hand stays low holding the loose string.',
+1937: 'Sam stands alone, speaking, near hand across his belly with this distinct upright finger/hand outline and this precise mouth shape. Other hand stays low holding twine.',
+1945: 'Sam stands alone speaking, near hand horizontally across his belly as in this source. Preserve the exact lip and white tooth shape.',
+1947: 'Sam alone stops speaking: closed mouth and near hand moves down toward lower belly. Other hand stays low holding twine.',
+1948: 'Sam alone, mouth closed, both hands come together in front of the belly. The long vertical strand now ends near mid-height and a short separate piece is near his hand, exactly as in the source. Preserve the small ground coil.',
+1949: 'Both characters in one complete source drawing. Max stands on both feet LEFT of Sam, grinning, long ears bent outward horizontally. Sam bends forward from the RIGHT, his lowered hat and muzzle near Max, both brown hands manipulating the ordinary beige twine around Max\'s torso. Max\'s neck and face remain clear. Preserve the exact arm contacts, feet, coat and dangling tie from the source.',
+1950: 'Both characters: grounded Max on the LEFT grins, ears flattened outward. Sam bends from the RIGHT and manipulates the beige twine around Max\'s torso. Match the distinct hand position and forearm overlap in this exact source. Keep Max\'s feet on the same bottom baseline and neck clear.',
+1951: 'Both characters: Max stands on both feet at LEFT, ears bent sideways, smiling. Bent Sam on RIGHT changes the exact brown hand position at the beige torso twine. Preserve visible fingers, the cream belly, foot contact, dangling tie and low hat. Neck and face are clear.',
+1956: 'Both characters: Sam is still bent beside grounded smiling Max on the LEFT with sideways ears. Sam finishes handling the torso twine, preserve this precise last bent pose, hand contacts and coat silhouette.',
+1957: 'Both characters: Sam stands upright on the RIGHT with arms reaching forward toward Max. Max stands on both feet at LEFT and grins, his ears bent outward. Beige string around torso and ground coil remain as the source shows.',
+1958: 'Both characters standing relaxed: Sam upright RIGHT, closed mouth, arms lowering at his sides. Max LEFT, both feet grounded, tall ears now rising vertically. Preserve the exact hand, ear and string geometry.',
+1959: 'Both characters standing relaxed: Sam upright RIGHT, hands down beside his coat, closed smile. Max upright LEFT with tall upright ears, grinning, both feet grounded and beige twine around his torso. Preserve the tiny coil and loose string at the ground.'
+}
+groups = [[1936,1937],[1945,1947],[1948],[1949,1950],[1951,1956],[1957,1958],[1959]]
+lookup = {int(e['bilde'].split('_')[1]):e for e in entries}
+for i, nums in enumerate(groups,1):
+    C = R / 'kall' / f'K{i:02}'
+    C.mkdir(parents=True)
+    size = (1536,1024) if len(nums)==2 else (1024,1024)
+    cw = size[0]//len(nums)
+    ref = Image.new('RGBA', size, '#7a7f88'); records=[]
+    for k,n in enumerate(nums):
+        e = lookup[n]; im=Image.open(P / 'work/extract/costumes' / (e['bilde']+'.png')).convert('RGBA')
+        q=im.resize((im.width*4, im.height*4), Image.Resampling.NEAREST)
+        pos=[k*cw+(cw-q.width)//2,(size[1]-q.height)//2]
+        ref.alpha_composite(q,tuple(pos))
+        records.append(dict(bilde=e['bilde'], canonical_rgba_sha256=e['rgba_sha256'], celle=[k*cw,0,cw,size[1]], reference_pos=pos, maal=list(q.size), motif=descs[n], begge_figurer=n>=1949))
+    ref.convert('RGB').save(C/'reference-atlas.png')
+    original_prompts=list(dict.fromkeys((A/'jobber'/lookup[n]['malruter'][0]['jobb']/'prompt.txt').read_text() for n in nums))
+    composite=nums[0]>=1949
+    # The source image controls the meaning. Correct the misleading Sam-only catalog prose separately.
+    if composite:
+        prompt='''Use case: style-transfer. Faithful HD remaster of the attached original animation sprite atlas from Sam & Max Hit the Road. Image 1 is the exact original SOURCE GEOMETRY, image 2 the APPROVED SAM master and image 3 the APPROVED MAX master. Each cell is ONE complete two-character drawing; preserve both characters together and all the exact hand contacts, relative sizes, ears, faces, poses, feet, beige string and palette. This is the grounded preparation animation in Dinosaur Park, costume303. Sam handles beige string around standing Max's torso. Max's feet touch the ground baseline in every drawing; reproduce the visible source action exactly. Freshly draw smooth HD cartoon linework with flat local colors and one shade as in the approved masters. No pixel stairs, dithering, textures, gradients, glow or added details. Never redesign or complete shapes not present in the source. No labels, floor, shadows, backdrop, numbers, boxes or extra objects. The later costume304 animation is not the target. The protected catalog prompt wrongly calls these Sam alone; this corrected factual prompt follows the original image and primary script208 instead.\n'''
+    else:
+        prompt='\n\n'.join(original_prompts)+'\n\nSELECTED-ATLAS PRODUCTION SPEC, replacing only the full-sheet layout: Image 1 is the selected original geometry; image 2 is the APPROVED SAM design. Sam alone stands and handles loose beige twine. Keep his exact muzzle, mouth opening, hat, hand fingers and tie as in each source, with smooth fresh cartoon lines, flat original colors and one shade. No pixel stairs, texture, gradients, glow or added scenery.\n'
+    prompt+=f'''Output exactly {size[0]}x{size[1]} PNG with TRUE TRANSPARENT ALPHA. Exactly {len(nums)} complete drawings, one in each {cw}x1024 cell. Maintain the source size, anchor positions and relative proportions. The extra-long thin vertical twine, tiny forked tip, loose ground coil, thin trailing curves and isolated small blue mark must be preserved exactly where shown; the large empty spaces are intentional. Twine is matte beige, no glow, no halo, no yellow lighting. Keep all empty space transparent. Draw clean antialiased curves, not enlarged pixel steps. Do not stretch characters to fill the whole source box: much of that box is just thin string.\n'''
+    prompt+='\n'.join(f"Cell {k+1}: full source drawing at {e['reference_pos']}, size {e['maal']}. {e['motif']}" for k,e in enumerate(records))
+    (C/'prompt-faktisk.txt').write_text(prompt)
+    (C/'oprindelige-prompter.txt').write_text('\n\n'.join(original_prompts))
+    refs=[str(C/'reference-atlas.png'),str(A/'hovedark/sam.png')]
+    if composite: refs.append(str(A/'hovedark/max.png'))
+    save(C/'argumenter-planlagt.json',dict(prompt=prompt,referenced_image_paths=refs,transparent_background=True))
+    save(C/'plan.json',dict(ruter=records,oprindelig_prompt_bevaret=True,korrigeret_motivpraemis=composite,referencer={f:sha(Path(f)) for f in refs}))
+(R/'KILDEGRUNNLAG.md').write_text('''# Resterende kostyme 303
+
+Ni originalark fig303_06 til 14 giver 25 mål og 13 forskellige hele RGBA-varianter. Fire mål er identiske med tidligere eget 1932-maleri. Tolv nye hele tegninger kræves. Originaler, Sam-/Max-hovedark og primærskript 208 er kilden. Alle 25 mål er allerede kildeafspillet i faktisk Linux, og de fulde kildebilleder kontrolleres før kald.
+
+Sam håndterer først alene løs beige hyssing fra T. rex-kæben, rom 59. Fra rute 1949 indeholder samme sprite både Sam og Max. Max står på begge fødder. Sam bøjer sig og håndterer hyssingen omkring Max' torso, derefter rejser Sam sig. Max' ører går fra udadbøjede til oprette. Denne kildebekræftede ændring skal bevares; katalogets generelle Sam-alene-tekst er forkert for disse sidste ruter. Den korrigerede prompt er separat, mens alle beskyttede jobfiler er uændrede. Max' hovede og hals er fri i disse kilder. Dette er ikke det senere hængende 304-motiv, og 304-afvisningen omprøves eller konstrueres ikke fra dele.
+
+Bevar matte beige hyssingstrenge, Y-spids, løs kveil, små kurver og den ene kildebekræftede blå prik. Brug egen maling og alfa uden originale billedfragmenter eller hårde originale masker. Faste porte CORE128, IoU0,6 og dækning0,8. Bibliotekkilder figurark-fast-storrelse og publisert-mod-er-fasit; begge anvendes til denne native4x-pipeline.
+''')
+shutil.copy2(__file__,R/'forbered.py.txt')
+print('9 jobs,25 mål,13 unikke hele,12 nye malerier,7 planlagte kald,1152 beskyttede kilder. Se alle atlas og kildebilleder før kald.')

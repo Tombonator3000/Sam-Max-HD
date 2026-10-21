@@ -1,0 +1,24 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import os,json,hashlib,shutil,re,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PK=P/'out/felles-release-20261021-hyssing/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert sha(B)=='a34f9ca223d61fa5c9eac09d823a46542aeb6af88b17a8a9177e77f21dcc1281'
+assert all(sha(O/'mod-sam3033150'/f)==h for f,h in read(R/'kandidatfilhash.json').items())
+cases=[dict(label='grunnlag3125',mod=P/'mods/gpt'),dict(label='kandidat3150',mod=O/'mod-sam3033150')]
+def run(c):
+ T=O/('motor-'+c['label']);assert not T.exists();T.mkdir();home=T/'home';home.mkdir();saves=T/'saves';saves.mkdir()
+ for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,saves/p.name)
+ env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')};env.update(HOME=str(home),XDG_CONFIG_HOME=str(home/'.config'),XDG_DATA_HOME=str(home/'.local/share'),XDG_CACHE_HOME=str(home/'.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(c['mod']),DIGHD_VERIFY='1',DIGHD_QUIT_AT='900',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='2',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='59',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_TEST_SCRIPT='80:208',DIGHD_TEST_COSTUME='303',DIGHD_TEST_ACTOR='2',DIGHD_TEST_POS='224,177',DIGHD_TEST_SCALE='255',DIGHD_TEST_PALETTE='0',DIGHD_TEST_ANIMATION='6',DIGHD_TEST_CHORE_EVERY='10000',DIGHD_TEST_KEYS=','.join(f'{n}:.' for n in range(100,900,30)),DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+ args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(saves),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--debuglevel=1','samnmax']
+ with (T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=180).returncode
+ log=(T/'scummvm.log').read_text();checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];events=[];obs={}
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*303\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+  f,n,x,y,w,h=map(int,m.groups());shot=(f//2+1)*2;p=T/f'frame_{shot:06}_room059.png';row=dict(logg_frame=f,bildeframe=shot,cel=n,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p) if p.exists() else None);events.append(row)
+  if p.exists():obs.setdefault(f'costume303_{n}',row)
+ proof=dict(label=c['label'],binar=str(B),binar_sha256=sha(B),kommando=args,exit=code,rom=59,primaer_skript=208,primaer_animasjon=6,aktorstart=dict(aktor=2,kostyme=303,pos=[224,177],palett=0,skala=255),testkrok_bare_initialiserer_for_skript208=True,kildeskript_regisserer_selve_handlingen=True,naturlig_gjennomspilling=False,andre_aktorer_ikke_skjult_av_testkode=True,originalskript_flytter_Max_med_elevasjon200=True,punktum_avslutter_undertekst=True,skjermbufferkontroller=len(checks),nullkontroller=sum(v['avvik']==0 for v in checks),kontroller=checks,tegninger=obs,hendelser=events,logg_sha256=sha(T/'scummvm.log'),mod_json_sha256=sha(c['mod']/'mod.json'));save(R/('motor-'+c['label']+'.json'),proof);print(c['label'],code,len(obs),'observasjoner',len(checks),'kontroller',proof['nullkontroller'],'null',flush=True);assert code==0 and len(checks)==450;return proof
+with ThreadPoolExecutor(max_workers=2) as pool:rows=list(pool.map(run,cases))
+assert rows[0]['kontroller']==rows[1]['kontroller'],'Ulik skjermbuffer krever undersøkelse'
+want={e['bilde'] for e in read(R/'egen-native.json')['ruter']};obs=rows[1]['tegninger'];missing=sorted(want-set(obs));assert not missing
+save(R/'motor-sammenligning.json',dict(grunnlag_native=3125,kandidat_native=3150,forventet=25,sett=len(want&set(obs)),mangler=missing,alle_nye_kildemal_sett=not missing,kontroller_identiske=True,ingen_nye_eller_okte_avvik=True,kontroller=rows[1]['kontroller'],kontrollantall=450,nullkontroller=rows[1]['nullkontroller'],binar_sha256=sha(B),naturlig_gjennomspilling=False,full_visuell_vurdering_gjenstar=True))
+shutil.copy2(__file__,R/'motor.py.txt')
