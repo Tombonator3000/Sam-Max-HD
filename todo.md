@@ -1,5 +1,17 @@
 # todo.md
 
+## Neste, oppdatert 2026-10-21 12:30
+
+- [x] Levert og additivt publisert fig223_01 til fig223_05: fem hele ark, 30 nye native og 3306 totalt. Alle 21549 filhash, 21513 tidligere PNG, 1252 kildehash og tre stasher er bekreftet etter hent.
+- [x] Sett alle fem ark, elleve varianter og fem hele før/etter-par i faktisk Linux. Alle 30 originalflater SHA-identiske og null endring utenfor nye figurer. 359 av 360 null, samme kjente 160 ved bilde 36. Fire ark OK, ett beholdt SJEKK, ingen FEIL.
+- [x] Ekstra Windows-taggbygg 39580011037 er grønt på første forsøk. Ingen duplisert bygging eller ny release for 3276. Tidligere sporadisk SDL-feil er fortsatt åpen.
+- [ ] Fortsett fig223_06 til fig223_13 fra rapporter/sam-max223-foerste-20261021 på gpt-arbeid: åtte ark, 64 mål og 14 nye hele kilder. Alle åtte originalark er sett; ingen bildekall eller resultater. Se aktuelle kilder i spillkontekst og begge hovedark før hvert motiv. Bevar små røde munnmerker og faktiske hånd-/hodefaser. Første fem skal ikke gjentas.
+- [ ] Oppdater og kontroller begge faktiske pakker ved bokfamiliens samlepunkt, forventet 3370 native, eller tidligere ved blokkering. Dagens fellespakker har 3276 og mangler 30. Bekreft nedlastinger, sjekksummer og faktisk grafikkinnhold før de kalles oppdatert.
+- [ ] Fortsett øvrig produserbar grafikk og returer. 463 av 1758 hele resultatjobber, 1295 gjenstår pluss katalogfeil og sluttkontroll. Skil laget, egenkontrollert, visuelt sett, native mottatt, motorobservert, publisert, pakket og Tom-/Claude-godkjent.
+- [ ] Samlet sluttkontroll, full naturlig gjennomspilling, interaktiv Windows og ny webtest gjenstår. Kjente inventar-/SDL-/testhoppbegrensninger er åpne. Bevar alle tidligere filer, releaser, kilder og tre stasher. Ingen avviste motivomprøver eller ugyldige 344/346-avspillinger. Ikke gjenstart gamle nattprosesser.
+
+Tidligere oppføringer nedenfor er bevart som historikk.
+
 ## Neste, oppdatert 2026-10-21 11:52
 
 Ekstra automatisk Windows-taggbygg 39580011037 er in_progress ved siste lesing. Den publiserte Windows-pakken er fra separat vellykket dispatch 39575951370, første forsøk. Ikke dupliser eller avbryt taggbygget. Les status og eventuell logg før neste endring av publisert native; dette er ingen bestilling om å bygge 3276 på nytt.
