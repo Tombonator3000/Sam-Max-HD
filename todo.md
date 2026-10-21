@@ -1,5 +1,14 @@
 # todo.md
 
+## Neste, 2026-10-21 06:34
+
+- [x] Fem hele fig303_01..05 og 15 native publisert og hentet i `596201dcce1901db4a7c4a7f853ca591ffb11cbd`. 3125 native, 437 av 1758 resultatark. Endelig motorprøve uten nye eller økte avvik.
+- [ ] Fullfør pågående felles Linux-/Windows-samlepunkt med 27 nye siden 3098. Linux 39544164799, Windows 39544167890. Behold nativefrysen til faktiske nedlastinger, alle filhash, motorvisning og fellespublisering er kontrollert. Ikke dupliser byggene.
+- [ ] Etter pakkekontroll: fig303_06..10 fra rapporter/sam303-andre-kilde-20261021. 15 avspilte mål, sju hele kildevarianter, seks nye malerier. Se alle originaler, kildekontekst og Sam-hovedark før hvert motiv. Ingen kall eller resultater ennå.
+- [ ] Ikke omprøv verktøyavvist 304 K02 eller bygg avvist motiv fra deler. K01 er utkast med avvikende ører; K03/K04/K05 ikke forsøkt. Tidligere avvisninger og ugyldige 344/346-ruter står også ved lag.
+- [ ] Bevar alle tidligere filer, 1136 kildehash og tre stasher. Ingen ny grafikk i main. Ingen ny Tom-/Claude-godkjenning; returer, katalogfeil og samlet sluttkontroll gjenstår.
+
+
 ## Neste, 2026-10-21 05:54
 
 - [x] Fig304_01..05: fem hele ark, 12 native, 10 egne varianter, publisert og hentet `7a3fbcd2ef1a1dd24ae5ef11504cf03980e9b0ed`. 432 av 1758 hele jobber med resultat; 3110 native. Alle 12 automatisk OK, faktisk Linux sammenlignet uten nye eller økte avvik.

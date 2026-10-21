@@ -1,5 +1,16 @@
 # Status
 
+## Grafikk og pakkesamlepunkt, 2026-10-21 06:34
+
+Fem nye hele ark fig303_01 til fig303_05 viser Sam alene som plukker opp løs hyssing og snakker i rom 59. De gir 15 nye native fra ni egne malerier og seks hele RGBA-identiske aliasmål. 437 av 1758 hele figurjobber har resultat; 1321 gjenstår pluss returer, katalogfeil og sluttkontroll. Hd-mod `596201dcce1901db4a7c4a7f853ca591ffb11cbd` er publisert additivt og hentet tilbake. Alle 21368 filhash, 21347 tidligere PNG og tre stasher er bekreftet. Grafikkilde `7dcca52d504c0e9e37c25a35ec1bae9e1963d8fc` på gpt-arbeid. Ingen ny grafikk i main.
+
+Fem innebygde image_gen-kall med råbilder, faktiske prompter og referansehash er bevart. Python renser og plasserer egen maling etter Toms tillatelse. Ingen hard originalmaske, originale bildefragmenter eller senkede grenser. Alle 15 native automatisk OK; to ark OK og tre SJEKK med seks visuelt vurderte omrissvarsler. Kontrollen fanget og rettet en feilfarget egen blå prikk før siste mottak og motoropptak. Endelig kandidat 3125 og grunnlag 3110 har identiske 450 bufferkontroller, 448 null, samme 4 ved bilde 36 og 160 ved 414. Alle 15 nye mål er logget; ni egne varianter sett samlet i faktisk Linux; fire før/etter-par har null endringer utenfor loggede aktørflater. Dette er en regissert prøve med primærskript 208, ikke naturlig gjennomspilling. Ingen ny Tom-/Claude-godkjenning.
+
+Bildeverktøyet avviste hengende Max i 304 K02 med moderation_blocked. Ingen omprøve, omformulering eller delkomposisjon. K01 er bare utkast med avvikende ører; K03/K04 og fortsettelsen K05 er ikke forsøkt. Ingen nye 304_06..10 er telt levert. Se rapporter/sam304-midten-20261021/NESTE.md på gpt-arbeid. Neste produserbare bunke er 303_06..10. Femten mål er kildeavspilt fra sju hele varianter; seks nye malerier og ett tidligere helt eget maleri trengs. Ingen nye kall eller resultater der. Visuell kilde-/stilkontroll gjenstår. 1136 kildefiler er nå SHA-beskyttet, inkludert neste kildebunke.
+
+Native er fryst ved 3125 til felles Linux-/Windows-pakker er faktisk lastet ned, kontrollert og publisert. Siste bekreftede fellesutgave golf115 har 3098 og mangler 27. Byggene Linux 39544164799 og Windows 39544167890 kjører fra kode ad089fb1f9612f8c9da6e69fea66dac523e308af og hd-mod ovenfor. Dette er ikke bekreftede nye pakker ennå. Følg rapporter/felles-release-20261021-hyssing før ny nativeproduksjon. Gamle nattprosesser gjenstartes ikke. Ingen motor-/pipelineendring, ny webtest eller interaktiv Windows-test. Kjente Windows-SDL-, testhopp- og inventarbegrensninger er fortsatt åpne. Bibliotek: figurark-fast-storrelse og publisert-mod-er-fasit.
+
+
 ## Siste verifiserte grafikkstatus, 2026-10-21 05:54
 
 Fem nye hele ark fig304_01 til fig304_05 med Sam og Max ved dinosaurtannen er levert, egenkontrollert, visuelt sett og motorobservert. De gir 12 nye native ruter fra 10 kildevarianter. 432 av 1758 hele figurjobber har resultat; 1326 gjenstår pluss returer, katalogfeil og samlet sluttkontroll. Hd-mod `7a3fbcd2ef1a1dd24ae5ef11504cf03980e9b0ed` er publisert additivt og hentet tilbake, 3110 native, alle 21353 faktiske filhash bekreftet. Alle tidligere 21335 PNG-filer, 1096 beskyttede kilder og tre stasher er bevart. Grafikkilde er `ac1e2f43d67866db7d91d3ecb40c280beefba5c5` på gpt-arbeid. Ingen ny grafikk eller spilldata er lagt i main.
