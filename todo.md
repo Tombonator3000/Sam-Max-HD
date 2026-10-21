@@ -1,5 +1,14 @@
 # todo.md
 
+## Neste, 2026-10-21 07:42
+
+- [x] Fig303_06..14: ni nye hele ark og 25 native, laget, egenkontrollert, mottatt, visuelt sett, motorobservert, publisert og inkludert i fellespakker. 446 av 1758 figurjobber har resultat, 1312 gjenstår pluss returer/katalogfeil/sluttkontroll. Alle 14 ark og 40 native i Sam303 er levert.
+- [x] Felles Linux/Windows 3150: begge faktiske nedlastinger, fire digester, alle 21392 runtimefiler per pakke, 25 observerte nye native med identiske figurutsnitt og Latest kontrollert. Tolv hele bilder og fire før/etter-par sett. 467/469 null, samme kjente overgangsavvik. Nativefrysen er frigitt. https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-21-sam303
+- [x] Første forsøk Linux 39549426972 og Windows 39549430408 er grønne. Ikke dupliser eller avbryt eventuelt automatisk taggbygg; kontroller det før neste endring i hd-mod.
+- [ ] Fortsett neste uavhengige grafikkbunke fra rapporter/sam303-slutt-20261021/restliste-etter446.json. Ikke gjenta303 eller304førstefem. Se siste NESTE.md, aktuelle originaler, spillkontekst og godkjent figuranker før kall. Neste kildebunke er fig010_01..02 og fig012_01..03,58 mål;se sam-max-intro-kilde-20261021/NESTE.md. Ingen kall/resultater/native ennå. Faktisk kildekontekst og alle lag må ses før produksjon. De20 nye kildehashene er bevart i tillegg til1152 tidligere.
+- [ ] Ikke omprøv verktøyavvist304 K02 eller rekonstruer avvist motiv fra deler. K01 er utkast; K03/K04/K05 ikke forsøkt. Tidligere avvisninger og ugyldige344/346-ruter står ved lag.
+- [ ] Bevar alle tidligere filer,1152 kildehash og tre stasher. Ingen ny grafikk i main. Ingen ny Tom-/Claude-godkjenning; returer,katalogfeil,full naturlig gjennomspilling,interaktiv Windows,ny webtest og samlet sluttkontroll gjenstår.
+
 ## Neste, 2026-10-21 06:47
 
 - [x] Fig303_01..05: fem nye hele ark og 15 native, laget, egenkontrollert, mottatt, visuelt sett, motorobservert og publisert. 437 av 1758 hele figurjobber har resultat, 1321 gjenstår pluss returer/katalogfeil/sluttkontroll.
