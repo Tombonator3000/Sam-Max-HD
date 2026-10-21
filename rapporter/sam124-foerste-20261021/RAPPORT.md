@@ -1,8 +1,11 @@
 # Fem Lee-Harvey/Max-ark, kontroll 22. oktober 2026
 
+Publisert og hentet hd-mod b86782c3432d915d241929bf92130f26e152b29a: 31 nye Lee-Harvey/Max-ruter, 3566 native totalt. Fem nye resultatark fig124_01 til 05, tre helt og to delvis publisert. Åtte ruter 1797 til 1804 holdes i retur for skjøter over Sams jakke. 502 av 1758 figurark har resultat, 1256 uten resultat pluss returer og sluttkontroll. Alle 21810 filhash, 21773 tidligere PNG, 1412 beskyttede kilder og tre stasher er bevart. 16 hele motorvarianter og fire hele skjermbilder er sett. 711 av 720 null i sluttprøven; ni kjente avvik har identiske koordinater, begge RGB-verdier og rekkefølge med fast -1 bildeforskyvning mot første grunnlag. Sluttprøven er ikke avviksfri. De 31 har hele SHA-like originalfasepar fra første kandidat, uendrede native og identiske faktiske opake aktørpiksler i sluttkandidaten. Bare sju hele originalflater SHA-matcher direkte i sluttprøven, 24 har annen vannfarge-/tidsfase. Ingen ny Tom-/Claude-godkjenning. Fellespakker har 3535 og mangler de 31 nye; neste pakkesamlepunkt er resten av 124-familien og returer, eller tidligere ved reell produksjonsblokkering. Se rapporter/sam124-foerste-20261021/NESTE.md.
+
+
 Fem hele ark, fig124_01 til fig124_05, er laget og egenkontrollert OK. 39 mål kommer fra 24 ulike hele egne malerier og 15 identiske hele RGBA-kildealiaser. Det er nå 502 av 1758 figurjobber med resultat, 1256 uten resultat pluss returer og sluttkontroll. Dette er ikke en ferdigmelding for all grafikk.
 
-31 ruter fra 16 ulike egne malerier er valgt for additiv nativepublisering. Åtte ruter, 1797 til 1804, holdes tilbake. To ark har åpne returer og bare delvis valgt native; tre ark er helt valgt. Ny native er foreløpig kandidat 3566, mens fjernmod og faktisk kontrollerte fellespakker fortsatt har 3535. Publisering og henting kvitteres i mottak-publisert.json når det er gjort.
+31 ruter fra 16 ulike egne malerier er valgt for additiv nativepublisering. Åtte ruter, 1797 til 1804, holdes tilbake. To ark har åpne returer og bare delvis valgt native; tre ark er helt valgt. Native b86782c3432d915d241929bf92130f26e152b29a med 3566 er publisert og hentet tilbake. Alle 21810 filhash, 21779 tidligere stier, 21773 tidligere PNG, 1412 beskyttede kilder og tre stasher er bekreftet. Faktisk kontrollerte fellespakker har fortsatt 3535 og mangler de 31 nye. Kvittering: mottak-publisert.json.
 
 ## Motiv og produksjon
 

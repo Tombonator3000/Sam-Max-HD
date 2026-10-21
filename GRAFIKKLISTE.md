@@ -1,5 +1,9 @@
 # Grafikkliste
 
+Publisert og hentet hd-mod b86782c3432d915d241929bf92130f26e152b29a: 31 nye Lee-Harvey/Max-ruter, 3566 native totalt. Fem nye resultatark fig124_01 til 05, tre helt og to delvis publisert. Åtte ruter 1797 til 1804 holdes i retur for skjøter over Sams jakke. 502 av 1758 figurark har resultat, 1256 uten resultat pluss returer og sluttkontroll. Alle 21810 filhash, 21773 tidligere PNG, 1412 beskyttede kilder og tre stasher er bevart. 16 hele motorvarianter og fire hele skjermbilder er sett. 711 av 720 null i sluttprøven; ni kjente avvik har identiske koordinater, begge RGB-verdier og rekkefølge med fast -1 bildeforskyvning mot første grunnlag. Sluttprøven er ikke avviksfri. De 31 har hele SHA-like originalfasepar fra første kandidat, uendrede native og identiske faktiske opake aktørpiksler i sluttkandidaten. Bare sju hele originalflater SHA-matcher direkte i sluttprøven, 24 har annen vannfarge-/tidsfase. Ingen ny Tom-/Claude-godkjenning. Fellespakker har 3535 og mangler de 31 nye; neste pakkesamlepunkt er resten av 124-familien og returer, eller tidligere ved reell produksjonsblokkering. Se rapporter/sam124-foerste-20261021/NESTE.md.
+
+Tidligere status nedenfor er historikk.
+
 Fem fig124_01 til 05 er laget og egenkontrollert OK, 39 mål fra 24 hele egne malerier. 31 ruter fra 16 hele malerier er motorobservert og visuelt sett; åtte 1797 til 1804 er åpen retur på grunn av skjøter over Sams jakke. Kandidat 3566 er kontrollert, publisering kvitteres separat. 502 av 1758 ark har resultat, 1256 uten resultat pluss returer. Fellespakker har fortsatt 3535. Se rapporter/sam124-foerste-20261021/NESTE.md. Ingen ny Tom-/Claude-godkjenning.
 
 Tidligere status nedenfor er historikk.
@@ -885,11 +889,11 @@ Figurark for Sam og Max.
 Figurark for Sam og Max, Max, Sam.
 
 - [x] `fig088_08` (figurark 8 for Sam og Max (kostyme 88), 2 ruter: start mot høyre (2 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig124_01` (figurark 1 for Max (kostyme 124), 8 ruter: start mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (4 ruter); animasjon 7 mot høyre (3 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig124_02` (figurark 2 for Max (kostyme 124), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig124_03` (figurark 3 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig124_04` (figurark 4 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig124_05` (figurark 5 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
+- [ ] `fig124_01` (figurark 1 for Max (kostyme 124), 8 ruter: start mot høyre (1 rute); start (lag 15, tegnes over kroppen) mot høyre (4 ruter); animasjon 7 mot høyre (3 ruter), bilde to `hovedark/max.png`) Delvis: resultat levert, 5/8 native publisert; resten er åpen retur.
+- [ ] `fig124_02` (figurark 2 for Max (kostyme 124), 7 ruter: animasjon 7 mot høyre (7 ruter), bilde to `hovedark/max.png`) Delvis: resultat levert, 2/7 native publisert; resten er åpen retur.
+- [x] `fig124_03` (figurark 3 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
+- [x] `fig124_04` (figurark 4 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
+- [x] `fig124_05` (figurark 5 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_06` (figurark 6 for Max (kostyme 124), 16 ruter: animasjon 7 mot høyre (4 ruter); animasjon 8 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_07` (figurark 7 for Max (kostyme 124), 12 ruter: animasjon 9 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_08` (figurark 8 for Max (kostyme 124), 3 ruter: animasjon 10 mot høyre (1 rute); animasjon 11 mot høyre (2 ruter), bilde to `hovedark/max.png`)

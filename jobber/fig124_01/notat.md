@@ -9,3 +9,5 @@ Python renser egne kanter og korrigerer egne RGB-flekker/effektfarger med bitide
 Original, faktisk spillkontekst og godkjente Sam-/Max-hovedark er sett før hvert motiv. Alle24 hele kildepar er sett etter siste rens. Resultat 1536x1024 RGBA, SHA256 48df4cff2f991be3962d3f5d4c7ede3422866eaa7693e69390a429f6486900e2. Egenkontroll OK, ingen FEIL. CORE 128, IoU 0,6 og dekning 0,8 er uendret. Hele ark, native mottak, motorprøve og publisering kvitteres separat i rapporten. Ingen Tom-/Claude-godkjenning eller visuell sluttgodkjenning. Alle tidligere moddfiler, 1412 beskyttede jobbfiler og tre stasher bevares.
 
 Motorretur 22. oktober: 3 ruter i dette arket holdes tilbake på grunn av skjøter over Sams jakke. Se retur.md. Teknisk OK og visuelt sett betyr ikke visuelt godkjent eller publisert.
+
+Mottak 2026-10-22 00:39: 5 av 8 ruter publisert i hd-mod b86782c3432d915d241929bf92130f26e152b29a, hentet tilbake og SHA-bekreftet. Samlet native 3566. Sluttkandidatens 31 viste opake aktørpiksler er identiske med den tidligere kildefasekontrollerte kandidaten. Ingen ny Tom-/Claude-godkjenning. Fellespakker har fortsatt 3535.
