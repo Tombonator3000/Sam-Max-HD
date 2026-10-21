@@ -1,5 +1,17 @@
 # todo.md
 
+## Gjeldende grafikkstatus, 2026-10-22 01:48
+
+Sju nye Lee-Harvey/Max-ruter1797 til1803 er publisert og hentet tilbake i hd-mod 3987eb60e13514e28b53bb965785e0236a78bddb,3573 native totalt. To eksisterende ark er rettet, ingen nye ark i denne returen.502 av1758 figurark har resultat,1256 er uten resultat pluss åpne returer og sluttkontroll. Rute1804 er nytegnet, men stoppet med FEIL i arkkontrollen fordi Sams originale bakgrunnsgjenmaling regnes som Lee-Harveys bredde. Den er holdt utenfor native. Sju andre er teknisk mottatt, motorobservert og visuelt sett. Ingen Tom-/Claude-godkjenning eller visuell sluttgodkjenning.
+
+Neste uavhengige produksjon er fig124_06 til08,31 mål fra25 hele RGBA-kilder. Alle kilder har nå gyldig kontekst.1844 til1846 ble sett i hele originalanimasjon8 med uttrykkelig konstruert testaktør29,12 av12 ruter og320 av320 null; dette er kildekontroll, ikke naturlig primærsekvens. Ruteplan og ennå usette kildeoversikter er bevart, produksjon ikke startet.1804 krever kildetro retting som består arkkontrollen eller en avgrenset testet pipeline-PR, uten terskelsenkning eller oppdiktet bakgrunn. Fortsett øvrige mål uavhengig.
+
+Felles Linux-/Windows-utgave sam-max-hd-2026-10-21-kjeglekant har fortsatt3535 native og mangler38 publiserte ruter. Ingen nye pakkebygg i denne økten, ingen nativefrys. Neste samlepunkt er resten av124-familien og returer, eller tidligere ved reell produksjonsblokkering. Frys under bygg og bekreft faktisk nedlasting, sjekksummer og inkludert grafikk før oppdatert-status. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
+
+Behold tidligere oppgaver om statisk Cone-tupp, naturlig gjennomspilling, interaktiv Windows, web, SDL-startfeil og øvrige kilde-/verktøyhold. Ingen omprøve av avviste motiver eller eksakte aliaser. Se rapporter/sam124-retur-20261022/NESTE.md.
+
+Tidligere oppføringer nedenfor er historikk.
+
 ## Gjeldende grafikkstatus, 2026-10-22 00:39
 
 31 nye native-ruter for Lee-Harvey og Max er publisert og hentet tilbake i hd-mod b86782c3432d915d241929bf92130f26e152b29a, 3566 totalt. Fem nye hele resultatark fig124_01 til fig124_05 er laget og egenkontrollert OK. Tre ark er helt publisert, to delvis. Åtte ruter 1797 til 1804 står i åpen retur fordi blågrå Sam-fragmenter lager nye skjøter over den allerede malte jakken i objekt 258. De åtte er bevart i grafikkgrenen og diagnostisk kandidat, men holdt utenfor publisert mod. 502 av 1758 figurjobber har resultat; 1256 uten resultat pluss returer og sluttkontroll. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
