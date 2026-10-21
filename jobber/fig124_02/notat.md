@@ -19,3 +19,5 @@ Original, faktisk spillkontekst og godkjente Sam-/Max-hovedark er sett før hver
 Motorretur 22. oktober: 5 ruter i dette arket holdes tilbake på grunn av skjøter over Sams jakke. Se retur.md. Teknisk OK og visuelt sett betyr ikke visuelt godkjent eller publisert.
 
 Mottak 2026-10-22 00:39: 2 av 7 ruter publisert i hd-mod b86782c3432d915d241929bf92130f26e152b29a, hentet tilbake og SHA-bekreftet. Samlet native 3566. Sluttkandidatens 31 viste opake aktørpiksler er identiske med den tidligere kildefasekontrollerte kandidaten. Ingen ny Tom-/Claude-godkjenning. Fellespakker har fortsatt 3535.
+
+Publiseringskvittering22. oktober: nye ruter i dette arket er gjenhentet og hashbekreftet fra hd-mod 3987eb60e13514e28b53bb965785e0236a78bddb. Se rapporter/sam124-retur-20261022/mottak-publisert.json.1804 er fortsatt utelatt.

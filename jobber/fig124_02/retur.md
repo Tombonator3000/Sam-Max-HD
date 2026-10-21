@@ -1,3 +1,7 @@
+## Returkontroll22. oktober2026
+
+costume124_1800, costume124_1801, costume124_1802, costume124_1803 er nytegnet, egenkontrollert, motorobservert og visuelt sett, publisert i 3987eb60e13514e28b53bb965785e0236a78bddb. costume124_1804 står fortsatt åpen. R10 er bevart som prototype, men arkkontrollen får FEIL. Ikke importer den gamle rutens papirfliker gjennom et generelt15-rutersmottak. Ingen Tom-/Claude-godkjenning. Rapport: rapporter/sam124-retur-20261022/RAPPORT.md. Tidligere returtekst beholdes som historikk.
+
 # Åpen retur etter motorvisning, 22. oktober 2026
 
 costume124_1800, costume124_1801, costume124_1802, costume124_1803, costume124_1804

@@ -1,3 +1,7 @@
+## Returkontroll22. oktober2026
+
+costume124_1797, costume124_1798, costume124_1799 er nytegnet, egenkontrollert, motorobservert og visuelt sett, publisert i 3987eb60e13514e28b53bb965785e0236a78bddb. Ingen av de tre tidligere returrutene på dette arket står igjen. Ingen Tom-/Claude-godkjenning. Rapport: rapporter/sam124-retur-20261022/RAPPORT.md. Tidligere returtekst beholdes som historikk.
+
 # Åpen retur etter motorvisning, 22. oktober 2026
 
 costume124_1797, costume124_1798, costume124_1799
