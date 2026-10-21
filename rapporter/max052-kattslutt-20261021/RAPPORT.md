@@ -11,3 +11,5 @@ Kandidaten har 3014 native ruter. 424 av 1758 hele figurjobber har resultat; 133
 En egen visualiseringshjelper stoppet først fordi et RGB-utsnitt ble brukt i RGBA-komposisjon. Hjelperen ble rettet til RGBA og laget kontrollbildene fra de samme motoropptakene. Ingen motorprøve eller bildegenerering ble omprøvd på grunn av dette.
 
 Bibliotekskilder: figurark-fast-storrelse og publisert-mod-er-fasit. Neste ordinære bunke er fig115_01..03. Kilden er nå avspilt med gyldige animasjoner 6, 7, 8 og 9: alle 84 mål logget, 480 nullkontroller. Seks hele kildebilder og utsnitt av små deler er sett; Sam har egen separat slipsdel, hånd-/grepvarianter og tynne blå kurver. 1682 har fire løsrevne blågrå merker høyt over kroppen. Bevar de faktisk synlige merkene uten å gjette en ny gjenstand. Ingen 115-grafikk er laget eller telt ennå.
+
+Publisert og hentet hd-mod `6609fb4ccf3e31c77c7b7ac678e27a8255414008`, 3014 native ruter. Alle 21257 filhash er bekreftet, samtlige 21250 tidligere PNG-filer er bevart. Fellespakker har 3013 og mangler den siste katteposen.

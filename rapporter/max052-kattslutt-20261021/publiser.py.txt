@@ -1,0 +1,80 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import json
+import hashlib
+import subprocess
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+M = P / 'mods/gpt'
+C = O / 'mod-katt3014'
+T = O / 'publisering-hdmod3014'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+save = lambda p, d: p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+git = lambda where, *args: subprocess.check_output(['git', *args], cwd=where, text=True).strip()
+remote = lambda branch: json.loads(subprocess.check_output([
+    'gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/git/ref/heads/' + branch
+], cwd=P, text=True))['object']['sha']
+base = read(R / 'grunnlag-produksjon.json')
+files = read(R / 'kandidatfilhash.json')
+assert not T.exists() and not (R / 'publisering-forsokt.json').exists()
+assert not git(A, 'status', '--porcelain')
+art = git(A, 'rev-parse', 'HEAD')
+assert remote('gpt-arbeid') == art and remote('hd-mod') == base['native_sha']
+assert all(sha(M / f) == h for f, h in base['filer'].items())
+assert all(sha(C / f) == h for f, h in files.items())
+assert read(R / 'sluttkontroll.json')['visuelt_sett']
+save(R / 'publisering-forsokt.json', dict(tid_utc=datetime.now(timezone.utc).isoformat(),
+    grafikkilde=art, grunnlag=base['native_sha'], forventet_native=3014, force_with_lease=True))
+shutil.copytree(C, T)
+subprocess.run(['git', 'init', '-q', str(T)], check=True)
+subprocess.run(['git', '-C', str(T), 'checkout', '-q', '-b', 'hd-mod'], check=True)
+(T / 'README.md').write_text('# hd-mod\n\nSiste HD-mod for Sam & Max HD Remake. Hentes med tools/mod_gren.sh hent. Spillet og grafikken tilhører Disney/Lucasfilm.\n')
+manifest = {p.relative_to(T).as_posix(): sha(p) for p in T.rglob('*')
+    if p.is_file() and '.git' not in p.relative_to(T).parts and p.name != 'SHA256SUMS'}
+(T / 'SHA256SUMS').write_text(''.join(h + '  ' + f + '\n' for f, h in sorted(manifest.items())))
+assert all(manifest[f] == h for f, h in base['filer'].items() if f not in ['mod.json', 'SHA256SUMS'])
+subprocess.run(['git', '-C', str(T), 'add', '-A'], check=True)
+subprocess.run(['git', '-C', str(T), '-c', 'user.name=Codex', '-c', 'user.email=noreply@openai.com',
+    'commit', '-q', '-m', 'HD-mod 3014: siste kontrollerte kattepose 052_1920'], check=True)
+assert remote('hd-mod') == base['native_sha']
+subprocess.run(['git', '-C', str(T), 'push', '-q',
+    '--force-with-lease=refs/heads/hd-mod:' + base['native_sha'],
+    git(P, 'remote', 'get-url', 'origin'), 'hd-mod:hd-mod'], check=True)
+published = remote('hd-mod')
+assert published == git(T, 'rev-parse', 'HEAD')
+subprocess.run(['bash', 'tools/mod_gren.sh', 'hent', str(M)], cwd=P, check=True)
+actual = {p.relative_to(M).as_posix(): sha(p) for p in M.rglob('*') if p.is_file()}
+assert set(actual) == set(files) and len(actual) == 21257
+assert {f for f, h in files.items() if actual[f] != h} <= {'README.md', 'SHA256SUMS'}
+assert all(actual[f] == h for f, h in base['filer'].items() if f not in ['mod.json', 'SHA256SUMS'])
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual) == 3014
+assert read(M / 'mod.json')['costume_cels'] == 3014
+assert git(P, 'stash', 'list', '--format=%H').splitlines() == base['stash']
+protected = read(R / 'beskyttede-samlet.json')
+assert len(protected) == 1036 and all(sha(A / f) == h for f, h in protected.items())
+assert remote('hd-mod') == published
+save(R / 'publiserte-moddfiler-3014.json', actual)
+receipt = dict(tid_utc=datetime.now(timezone.utc).isoformat(), grafikkilde=art, hd_mod=published,
+    native=3014, nye_native=1, nye_hele_ark=1, filantall=21257, png=21251,
+    alle_filhash_bekreftet=True, alle_tidligere_stier_bevart=True, tidligere_png_bevart=21250,
+    beskyttede=1036, stasher=base['stash'], force_with_lease=True,
+    egen_alfa_ingen_originalfragmenter=True, visuelt_sett=True, motorobservert=True,
+    godkjent_av_Tom=False, claude_kontroll=False, i_fellespakke=False,
+    pakker_native=3013, pakker_mangler_native=1)
+save(R / 'mottak-publisert.json', receipt)
+for name in ['fremdrift.json', 'sluttkontroll.json']:
+    d = read(R / name)
+    d.update(publisert=True, hd_mod=published, grafikkilde=art)
+    for v in d.get('leveranser', []):
+        v.update(publisert=True, hd_mod=published)
+    save(R / name, d)
+(R / 'NESTE.md').write_text(f'Publisert og hentet {published}: 3014 native ruter, én ny kattepose. Alle 21257 filhash, 1036 kildehash og tre stasher er bekreftet. Hele fig052_01 er levert, 424 av 1758 figurjobber har resultat. Gå videre med fig115_01..03 fra sam115-kilde-20261021: 84 mål er kildeavspilt, 480 nullkontroller, ingen bildekall ennå. Fellespakker har 3013 og mangler én. Nytt praktisk samlepunkt etter golfbunken. Ikke gjenta katteposen eller gamle pakker.\n')
+with (R / 'RAPPORT.md').open('a') as f:
+    f.write(f'\nPublisert og hentet hd-mod `{published}`, 3014 native ruter. Alle 21257 filhash er bekreftet, samtlige 21250 tidligere PNG-filer er bevart. Fellespakker har 3013 og mangler den siste katteposen.\n')
+shutil.copy2(__file__, R / 'publiser.py.txt')
+print(json.dumps(receipt, ensure_ascii=False), flush=True)

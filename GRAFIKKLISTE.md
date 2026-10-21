@@ -1,6 +1,6 @@
 # Grafikkliste
 
-Siste kattepose 052_1920 er ferdig, hele fig052_01 levert. Alle 21 automatisk OK; sju omrissvarsler visuelt vurdert. Én ny native, kandidat 3014, 424 av 1758 hele resultatjobber. Motor 80/79 null med samme 160 ved bilde 36; alle 51 fra figurstart null. Publisering/hent kvitteres separat. Neste fig115_01..03 er kildeavspilt: 84 av 84 mål, 480 nullkontroller, ingen bildekall eller nye resultater ennå. Bevar 1036 kilder, alle tidligere filer og tre stasher. Se rapporter/max052-kattslutt-20261021/NESTE.md. Fellespakker har 3013 og mangler én. Ingen ny Tom-/Claude-godkjenning.
+Publisert og hentet 6609fb4ccf3e31c77c7b7ac678e27a8255414008: siste kattepose 052_1920, 3014 native totalt. Alle 21257 filhash, 1036 beskyttede kilder og tre stasher bekreftet. Hele fig052_01 levert; 424 av 1758 resultatark. Felles Linux/Windows har 3013 og mangler én. Neste faktiske produksjon er fig115_01..03 fra kildeavspilte 84 mål og 480 nullkontroller. Ingen 115-bildekall eller resultater ennå. Les rapporter/max052-kattslutt-20261021/NESTE.md. Ingen ny Tom-/Claude-godkjenning.
 
 ## Gjeldende grafikkstatus, 2026-10-21 03:32
 
