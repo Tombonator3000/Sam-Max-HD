@@ -1,0 +1,21 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,re,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam-max223-slutt-20261021';V=A/'rapporter/sam-max223-foerste-20261021'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True));git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+assert not (O/'bygg-startet.json').exists() and not R.exists()
+receipt=read(S/'mottak-publisert.json');code=git(P,'rev-parse','HEAD');mod=receipt['hd_mod'];assert receipt['native']==3324 and code=='5a13494b74c29d9974900ef1c0eac80f9c86559c';assert not git(P,'status','--porcelain');assert code==api('git/ref/heads/main')['object']['sha'] and mod==api('git/ref/heads/hd-mod')['object']['sha']
+runs=api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs'];assert any(v['head_sha']==code and v['status']=='completed' and v['conclusion']=='success' for v in runs)
+for platform in ['linux','windows']:
+ active=api(f'actions/workflows/{platform}.yml/runs?per_page=15')['workflow_runs'];assert not any(v['status']!='completed' and v['head_branch']=='main' for v in active),'Ikke dupliser eller avbryt pågående bygg'
+prior=api('releases?per_page=100');tag='sam-max-hd-2026-10-21-bok';assert not any(v['tag_name']==tag for v in prior)
+manifest=read(S/'publiserte-moddfiler-3324.json');assert len(manifest)==21567 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items());assert len(list((A/'jobber').glob('fig*/resultat.png')))==465
+R.mkdir();save(R/'moddfiler-3324.json',manifest);combined=read(V/'egen-native.json')['ruter']+read(S/'egen-native.json')['ruter'];assert len(combined)==len({e['bilde'] for e in combined})==48;save(R/'nye-native48.json',dict(ruter=combined));save(R/'releaser-foer-bygg.json',prior);save(O/'releaser-foer-bygg.json',prior)
+state=dict(start_utc=datetime.now(timezone.utc).isoformat(),kode=code,hd_mod=mod,native=3324,nye_native=48,kostymer=[223],grunnlag_felles_native=3276,figurjobber_med_resultat=465,tilbakeholdte_bokark=6,release_tag=tag,status='native_frosset_bygg_dispatch',plattform={})
+def persist():
+ for D in [O,R]:save(D/'bygg-startet.json',state)
+persist()
+for platform in ['linux','windows']:
+ assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+ row=state['plattform'][platform]=dict(status='dispatch_forsokes',dispatch_utc=datetime.now(timezone.utc).isoformat());persist();res=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,text=True,capture_output=True);row.update(dispatch_exit=res.returncode,stdout=res.stdout,stderr=res.stderr);persist();assert res.returncode==0,res.stderr;match=re.search(r'/actions/runs/(\d+)',res.stdout);assert match,'Ukjent dispatchutfall, ikke start igjen';row.update(run_id=int(match[1]),status='dispatched');persist();print(platform,row['run_id'],flush=True)
+shutil.copy2(__file__,R/'start.py.txt')

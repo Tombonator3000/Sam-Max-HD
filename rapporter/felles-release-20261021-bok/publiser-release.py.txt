@@ -1,0 +1,35 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,subprocess,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+state=read(O/'bygg-startet.json');tag=state['release_tag'];assert (R/'visuell-kontroll.json').exists() and (O/'releaser-foer.json').exists();assert api('git/ref/heads/hd-mod')['object']['sha']==state['hd_mod']
+attemptfile=O/'publisering-forsokt.json'
+if not attemptfile.exists():
+ attempt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),tag=tag,kode=state['kode'],hd_mod=state['hd_mod'],utfall='opprett_kladd_forsokes')
+ for D in [O,R]:save(D/'publisering-forsokt.json',attempt)
+ subprocess.run(['gh','release','create',tag,'--draft','--target',state['kode'],'--title','Sam & Max HD for Linux og Windows, 3324 HD-lag','--notes-file',str(O/'utgivelse-notat.md')],cwd=P,check=True)
+else:
+ attempt=read(attemptfile);assert attempt['tag']==tag and attempt['hd_mod']==state['hd_mod']
+
+if 'release_id' not in attempt:
+ matches=[v for v in api('releases?per_page=100') if v['tag_name']==tag and v['draft']]
+ assert len(matches)==1,'Avklar kladdutfallet før nytt forsøk'
+ attempt['release_id']=matches[0]['id']
+ for D in [O,R]:save(D/'publisering-forsokt.json',attempt)
+meta=api('releases/'+str(attempt['release_id']));assert meta['draft'],'Avklar allerede publisert utfall før mer mutasjon'
+attempt.update(release_id=meta['id'],utfall='kladd_finnes')
+for D in [O,R]:save(D/'publisering-forsokt.json',attempt)
+for v in sorted(read(O/'assetkontroll.json'),key=lambda v:v['bytes']):
+ p=O/v['plattform']/v['fil'];assert sha(p)==v['sha256'];meta=api('releases/'+str(attempt['release_id']));assets=[a for a in meta['assets'] if a['name']==v['fil']]
+ if assets:
+  assert len(assets)==1 and assets[0]['digest']=='sha256:'+v['sha256'] and assets[0]['size']==v['bytes'];print('Allerede bekreftet',v['fil'],flush=True);continue
+ attempt.update(utfall='vedlegg_forsokes',vedlegg=v['fil'])
+ for D in [O,R]:save(D/'publisering-forsokt.json',attempt)
+ print('Laster opp',v['fil'],flush=True);subprocess.run(['gh','release','upload',tag,str(p)],cwd=P,check=True)
+ asset=next(a for a in api('releases/'+str(attempt['release_id']))['assets'] if a['name']==v['fil']);assert asset['digest']=='sha256:'+v['sha256'] and asset['size']==v['bytes']
+meta=api('releases/'+str(attempt['release_id']));assert len(meta['assets'])==4 and api('git/ref/heads/hd-mod')['object']['sha']==state['hd_mod'];attempt['utfall']='fire_vedlegg_bekreftet_publisering_forsokes'
+for D in [O,R]:save(D/'publisering-forsokt.json',attempt)
+subprocess.run(['gh','release','edit',tag,'--draft=false','--latest'],cwd=P,check=True);meta=api('releases/'+str(attempt['release_id']));assert not meta['draft'];attempt.update(utfall='publisert',url=meta['html_url'])
+for D in [O,R]:save(D/'publisering-forsokt.json',attempt)
+shutil.copy2(__file__,R/'publiser-release.py.txt');print(meta['html_url'],flush=True)

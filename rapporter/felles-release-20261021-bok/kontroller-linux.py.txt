@@ -1,0 +1,17 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+s=read(O/'bygg-startet.json');assert read(R/'linux-nedlasting-kontroll.json')['alle_hash_bekreftet'];B=O/'linux/squashfs-root/usr/bin/scummvm';binary=sha(B)
+assert s['native']==3324 and len(read(R/'nye-native48.json')['ruter'])==48
+mods={'pakke-grunnlag3276':P/'out/felles-release-20261021-max-intro/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt','pakke-bok3324':O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'}
+def run(label):
+ if (R/(label+'.json')).exists():
+  proof=read(R/(label+'.json'));assert proof['exit']==0 and len(proof['tegninger'])==94 and proof['binar_sha256']==binary;return proof
+ t=(P/'out/sam-max223-kilde-20261021/kildemotor223.py').read_text().replace('kildemotor223',label).replace('felles-release-20261021-sam303','felles-release-20261021-bok').replace("str(P/'mods/gpt')",'str(Path('+repr(str(mods[label]))+'))')
+ f=O/(label+'.py');f.write_text(t);print('Starter faktisk pakket Linux:',label,flush=True)
+ q=subprocess.run([str(P/'.venv/bin/python'),str(f)],cwd=P,capture_output=True,text=True,timeout=230);(R/(label+'-utskrift.txt')).write_text(q.stdout+q.stderr);print(label,q.returncode,q.stdout.strip(),flush=True);assert q.returncode==0;return read(R/(label+'.json'))
+with ThreadPoolExecutor(max_workers=2) as pool:proofs=list(pool.map(run,list(mods)))
+assert all(q['exit']==0 and q['binar_sha256']==binary for q in proofs)
+shutil.copy2(__file__,R/'kontroller-linux.py.txt');print('Begge pakkeavspillinger ferdig. Sammenligning og visning gjenstår.')

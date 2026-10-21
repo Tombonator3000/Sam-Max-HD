@@ -1,0 +1,40 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;V=A/'rapporter/sam-max223-foerste-20261021';S=A/'rapporter/sam-max223-slutt-20261021';M=O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def artifacts(label):
+ p=read(R/(label+'.json'));rows=[];points=set()
+ for e in p['kontroller']:
+  if not e['avvik']:continue
+  f=e['frame'];screen=O/label/f'frame_{f:06}_screen.png';whole=O/label/f'frame_{f:06}_room045.png';s=np.array(Image.open(screen).convert('RGB'));w=np.array(Image.open(whole).convert('RGB'));yy,xx=np.where(np.any(s!=w,2));assert len(xx)==e['avvik'];pairs={tuple([int(x),int(y)]+s[y,x].tolist()+w[y,x].tolist()) for x,y in zip(xx,yy)};points|=pairs
+  rows.append(dict(frame=f,avvik=len(xx),signatur=hashlib.sha256(np.stack([xx,yy],1).tobytes()+s[yy,xx].tobytes()+w[yy,xx].tobytes()).hexdigest(),skjerm_sha256=sha(screen),hel_sha256=sha(whole)))
+ return p,rows,points
+b,ba,bp=artifacts('pakke-grunnlag3276');c,ca,cp=artifacts('pakke-bok3324');assert b['exit']==c['exit']==0 and b['kontroller']==c['kontroller'] and len(c['kontroller'])==360 and [q for q in c['kontroller'] if q['avvik']]==[dict(frame=36,avvik=160)] and ba==ca and bp==cp
+save(R/'motor-bufferdiagnose.json',dict(grunnlag=ba,pakke=ca,kontroller_identiske=True,eksakte_koordinat_rgb_par=sorted(cp),ingen_nye_feilpiksler=True))
+native=read(R/'nye-native48.json')['ruter']; first={e['bilde'] for e in read(V/'egen-native.json')['ruter']}; pv=read(V/'bok-kandidat3306.json')['tegninger']; ps=read(S/'bok-kandidat3324.json')['tegninger']; prod={e['bilde']:(pv if e['bilde'] in first else ps)[e['bilde']] for e in native}; prod_source={e['bilde']:str((V/'bok-kandidat3306.json') if e['bilde'] in first else (S/'bok-kandidat3324.json')) for e in native};canonical=list(dict.fromkeys(e['canonical'] for e in native));selected={};pixels=[];raster=[]
+for e in native:
+ n=e['bilde'];old,new=b['tegninger'][n],c['tegninger'][n];op,npth=Path(old['fil']),Path(new['fil']);of,nf=op.with_name(op.stem+'_flat.png'),npth.with_name(npth.stem+'_flat.png');assert old['pos']==new['pos'] and old['maal']==new['maal'] and sha(of)==sha(nf),(n,'Originalflater skiller seg')
+ x,y=new['pos'];w,h=new['maal'];before=np.array(Image.open(op).convert('RGB'));after=np.array(Image.open(npth).convert('RGB'));delta=np.any(before!=after,2);outside=delta.copy();box=[max(0,x*4-8),max(0,y*4-8),min(after.shape[1],(x+w)*4+8),min(after.shape[0],(y+h)*4+8)];outside[box[1]:box[3],box[0]:box[2]]=False;assert not outside.any(),(n,'Endring utenfor ny aktørflate',int(outside.sum()))
+ assert sha(M/e['fil'])==e['sha256'];pr=prod[n];pp=Path(pr['fil']);pf=pp.with_name(pp.stem+'_flat.png');assert pr['pos']==new['pos'] and pr['maal']==new['maal'] and sha(pf)==sha(nf),(n,'Produksjonsforløp forskjellig')
+ a=Image.open(npth).convert('RGB').crop(box);d=Image.open(pp).convert('RGB').crop(box);identisk=a.tobytes()==d.tobytes();assert identisk,(n,'Raster mot produksjon forskjellig')
+ pixels.append(dict(bilde=n,canonical=e['canonical'],grunnlag_frame=old['bildeframe'],pakke_frame=new['bildeframe'],originalflat_identisk=True,originalflat_sha256=sha(nf),utenfor_ny_aktorflate=0,endrede_piksler=int(delta.sum()),native_sha256=sha(M/e['fil']),kildepakke_sha256=sha(npth),grunnlag_sha256=sha(op)));raster.append(dict(bilde=n,produksjon_rapport=prod_source[n],produksjon_frame=pr['bildeframe'],pakke_frame=new['bildeframe'],native_identisk=True,cropraster_identisk=True,cropraster_sha256=hashlib.sha256(a.tobytes()).hexdigest()));selected[n]=(old,new)
+assert len(pixels)==48 and len(canonical)==19
+samples={n:next(e['bilde'] for e in native if e['canonical']==n) for n in canonical}
+boards=[]
+for start in range(0,len(canonical),4):
+ board=Image.new('RGB',(1440,900),'#304050');draw=ImageDraw.Draw(board)
+ for j,n in enumerate(canonical[start:start+4]):
+  actual=samples[n];old,new=selected[actual];x,y=new['pos'];w,h=new['maal'];box=(x*4-8,y*4-8,(x+w)*4+8,(y+h)*4+8);xx=j%2*720;yy=j//2*450;draw.text((xx+8,yy+8),n+' via '+actual+' : 3276 / ny pakke3324',fill='white')
+  for z,row in enumerate([old,new]):
+   im=Image.open(row['fil']).convert('RGB').crop(box);im.thumbnail((345,405),Image.Resampling.LANCZOS);board.paste(im,(xx+8+z*355,yy+30))
+ f=R/f'pakke-varianter-{start//4+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=canonical[start:start+4],visuelt_sett=False))
+shots=[];pairs=[]
+for n in ['costume223_1920','costume223_1923','costume223_1942','costume223_1948','costume223_1965','costume223_1979','costume223_1980','costume223_1984']:
+ actual=samples[n];old,new=selected[actual];f=R/(n+'-pakke-linux.png');shutil.copy2(new['fil'],f);shots.append(dict(bilde=n,motor_bilde=actual,fil=f.name,sha256=sha(f)))
+ board=Image.new('RGB',(1280,430),'#304050');draw=ImageDraw.Draw(board);draw.text((8,8),n+' (via '+actual+'): 3276 / ny pakke3324, identisk originalflate',fill='white')
+ for k,row in enumerate([old,new]):board.paste(Image.open(row['fil']).convert('RGB').resize((640,400)),(k*640,30))
+ f=R/(n+'-pakke-for-etter.png');board.save(f);pairs.append(dict(bilde=n,fil=f.name,sha256=sha(f),visuelt_sett=False))
+save(R/'pakke-pikselkontroll.json',pixels);save(R/'rasterkontroll-mot-produksjon.json',dict(alle_nativefiler_identiske=True,croprasteridentiske=48,ikke_rasteridentiske=[],ruter=raster));save(R/'pakke-visuell-plan.json',dict(varianter=boards,egne_hele_varianter=19,hele_motorbilder=shots,hele_for_etter=pairs,visuelt_sett=False,ingen_ny_tom_claude_godkjenning=True))
+save(R/'linux-kontroll.json',dict(native=3324,nye_native_observert=48,runder=1,grunnlagsrunder_samme_binar=1,skjermbufferkontroller=360,nullkontroller=359,grunnlag_nullkontroller=359,kjent_avvik=dict(frame=36,avvik=160),alle_eksakte_avvikskoordinater_og_RGB_par_identiske=True,avviksrekkefolge_identisk=True,alle48_originalflater_SHA_identiske=True,alle48_utenfor_ny_aktorflate=0,alle48_native_og_cropraster_identiske=True,binar_sha256=c['binar_sha256'],primaer_skript210_ikke_kjort=True,full_naturlig_gjennomspilling=False))
+shutil.copy2(__file__,R/'analyser-linux.py.txt');print('Pakken: alle48 native og raster identiske med produksjon. Ingen nye bufferfeil. 19 varianter og åtte hele par klare til visning.')
