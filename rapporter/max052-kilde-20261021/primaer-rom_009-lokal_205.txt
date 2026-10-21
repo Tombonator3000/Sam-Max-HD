@@ -1,0 +1,126 @@
+; Lokalt skript 205 i rom 9 (LSCR)
+
+Script# 205
+[0000] (0C) dup[1] = localvar0
+[0004] (5D) if (dup[1] == 7) {
+[000B] (5D) } else if (dup[1] == 4) {
+[0017] (68)   beginCutscene([2])
+[001F] (BB)   talkEgo(sound(0x55AD510, 0xA) + "Aw, it's a cute little hypercephalic kitten.")
+[005D] (A9)   wait.waitForMessage()
+[005F] (5D)   if (!bitvar67) {
+[0066] (43)     bitvar2 = 1
+[006C] (6C)     breakHere()
+[006D] (5D)     unless (bitvar3) jump 6c
+[0073] (81)     faceActor(3,4)
+[007A] (0C)     dup[3] = getRandomNumber(2)
+[007F] (5D)     if (dup[3] == 0) {
+[0086] (BA)       talkActor(sound(0x55BBEFB, 0xA) + "I am repulsed by his bulging eyes.",3)
+[00BE] (5D)     } else if (dup[3] == 1) {
+[00C9] (BA)       talkActor(sound(0x55C8366, 0xA) + "I'll call him `Mittens`, because I think he'd make a fine pair of them.",3)
+[0126] (5D)     } else if (dup[3] == 2) {
+[0131] (BA)       talkActor(sound(0x55D7BB1, 0xA) + "He's adorable.  Let's take him home and put tape on his feet.",3)
+[0184] (73)       /* jump 188; */
+[0187] (**)     }
+[0187] (A9)     wait.waitForMessage()
+[018A] (43)     bitvar2 = 0
+[0190] (**)   }
+[0190] (67)   endCutscene()
+[0191] (5D) } else if (dup[3] == 3) {
+[019C] (0C)   dup[7] = localvar1
+[01A1] (5D)   if (dup[7] == 35) {
+[01A8] (68)     beginCutscene([2])
+[01B0] (43)     bitvar2 = 1
+[01B6] (6C)     breakHere()
+[01B7] (5D)     unless (bitvar3) jump 1b6
+[01BD] (BB)     talkEgo(sound(0x55E9DFC, 0xA) + "I'd just love to turn this guy inside-out!")
+[01F9] (A9)     wait.waitForMessage()
+[01FB] (BA)     talkActor(sound(0x55F7067, 0xA) + "Ooh, that gives me an idea!",3)
+[022B] (A9)     wait.waitForMessage()
+[022D] (7E)     walkActorTo(3,84,163)
+[0237] (7E)     walkActorTo(2,137,165)
+[0241] (A9)     wait.waitForActor(-7,3)
+[0248] (A9)     wait.waitForActor(-7,2)
+[024F] (82)     animateActor(3,248)
+[0256] (82)     animateActor(2,248)
+[025D] (6C)     breakHere()
+[025E] (9D)     actorOps.setCurActor(4)
+[0263] (9D)     actorOps.setCostume(52)
+[0268] (82)     animateActor(4,6)
+[026F] (6C)     breakHere()
+[0270] (9D)     actorOps.setCurActor(3)
+[0275] (9D)     actorOps.setElevation(255)
+[027A] (9D)     actorOps.setCostume(0)
+[027F] (CA)     delayFrames(3)
+[0283] (B6)     printDebug.begin()
+[0285] (B6)     printDebug.msg(sound(0x9EB744E, 0xA) + " ")
+[0299] (CA)     delayFrames(6)
+[029D] (B6)     printDebug.begin()
+[029F] (B6)     printDebug.msg(sound(0x9F0F9E7, 0xA) + " ")
+[02B3] (CA)     delayFrames(5)
+[02B7] (B6)     printDebug.begin()
+[02B9] (B6)     printDebug.msg(sound(0x9EAE9BB, 0xA) + " ")
+[02CD] (CA)     delayFrames(5)
+[02D1] (B6)     printDebug.begin()
+[02D3] (B6)     printDebug.msg(sound(0x9E3DEFD, 0xA) + " ")
+[02E7] (CA)     delayFrames(8)
+[02EB] (B6)     printDebug.begin()
+[02ED] (B6)     printDebug.msg(sound(0x9EDC2C7, 0xA) + " ")
+[0301] (CA)     delayFrames(5)
+[0305] (B6)     printDebug.begin()
+[0307] (B6)     printDebug.msg(sound(0x9E1F687, 0xA) + " ")
+[031B] (82)     animateActor(4,7)
+[0322] (CA)     delayFrames(3)
+[0326] (82)     animateActor(4,8)
+[032D] (CA)     delayFrames(2)
+[0331] (9D)     actorOps.setCurActor(2)
+[0336] (9D)     actorOps.setElevation(255)
+[033B] (6C)     breakHere()
+[033C] (9D)     actorOps.setCurActor(2)
+[0341] (9D)     actorOps.setCostume(58)
+[0346] (9D)     actorOps.setElevation(0)
+[034B] (7F)     putActorInXY(2,134,165,9)
+[0358] (82)     animateActor(2,249)
+[035F] (82)     animateActor(2,6)
+[0366] (CA)     delayFrames(3)
+[036A] (82)     animateActor(2,249)
+[0371] (82)     animateActor(2,7)
+[0378] (CA)     delayFrames(20)
+[037C] (82)     animateActor(2,249)
+[0383] (82)     animateActor(2,8)
+[038A] (CA)     delayFrames(3)
+[038E] (9D)     actorOps.setCurActor(2)
+[0393] (9D)     actorOps.setCostume(2)
+[0398] (82)     animateActor(2,248)
+[039F] (7F)     putActorInXY(2,137,165,9)
+[03AC] (82)     animateActor(2,8)
+[03B3] (CA)     delayFrames(4)
+[03B7] (82)     animateActor(2,3)
+[03BE] (6C)     breakHere()
+[03BF] (5F)     startScriptQuick(54,[95])
+[03C9] (6E)     setClass(95,[6])
+[03D3] (9D)     actorOps.setCurActor(3)
+[03D8] (9D)     actorOps.setElevation(0)
+[03DD] (9D)     actorOps.setCostume(3)
+[03E2] (7F)     putActorInXY(4,0,0,0)
+[03EF] (BA)     talkActor(sound(0x55FE492, 0xA) + "According to these orders, something bizarre is happening at the carnival.",2)
+[044E] (82)     animateActor(3,249)
+[0455] (A9)     wait.waitForMessage()
+[0457] (BA)     talkActor(sound(0x560FF7D, 0xA) + "I thought that was the whole point.",3)
+[048F] (A9)     wait.waitForMessage()
+[0491] (BA)     talkActor(sound(0x5618168, 0xA) + "Maybe we should check it out when we've got nothing better to do.  Like anytime.",2)
+[04F6] (A9)     wait.waitForMessage()
+[04F8] (47)     array184[4] = 0
+[0501] (43)     var198 = 1
+[0507] (43)     bitvar2 = 0
+[050D] (67)     endCutscene()
+[050E] (73)   } else {
+[0511] (73)     jump 575
+[0515] (**)   }
+[0515] (5D) } else if (dup[7] == 5) {
+[0520] (BA)   talkActor(sound(0x562B213, 0xA) + "I won't pick that kitten up.  I don't know where he's been.",2)
+[0571] (73) } else {
+[0574] (5E)   startScript(0,63,[localvar0,4,localvar1])
+[0588] (7C)   stopScript(0)
+[058C] (**) }
+[058C] (66) stopObjectCodeB()
+END
