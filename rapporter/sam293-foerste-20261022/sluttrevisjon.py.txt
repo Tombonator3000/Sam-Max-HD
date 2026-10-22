@@ -1,0 +1,159 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import gzip, hashlib, json, shutil, subprocess, tomllib
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+
+def git(w, *args):
+    return subprocess.check_output(['git', *args], cwd=w, text=True).strip()
+
+def api(path):
+    return json.loads(subprocess.check_output(
+        ['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + path], cwd=P, text=True))
+
+def inventory(root):
+    return {p.relative_to(root).as_posix(): sha(p)
+            for p in root.rglob('*') if p.is_file() and '.git' not in p.relative_to(root).parts}
+
+assert not git(P, 'status', '--porcelain') and not git(A, 'status', '--porcelain')
+assert git(P, 'branch', '--show-current') == 'main'
+assert git(A, 'branch', '--show-current') == 'gpt-arbeid'
+main, gpt = git(P, 'rev-parse', 'HEAD'), git(A, 'rev-parse', 'HEAD')
+assert main == '616344c38f901cfc49aaaab39a21991164937535'
+assert gpt == '0454bbbae363a7155a7bddb4ff286c39d6d1d74d'
+start, receipt = read(R / 'start.json'), read(R / 'mottak-publisert.json')
+published = read(R / 'publiserte-moddfiler-3648.json')
+assert receipt['hd_mod'] == 'b576c43b9971ec5263dad066a3648446cb6f1338'
+assert receipt['grafikkilde'] == '133e063611ca276ac2b2f9c59a4d6ff54bb3ed04'
+for branch, expected in [('main', main), ('gpt-arbeid', gpt), ('hd-mod', receipt['hd_mod'])]:
+    assert api('git/ref/heads/' + branch)['object']['sha'] == expected
+
+actual = inventory(P / 'mods/gpt')
+assert actual == published == inventory(O / 'hentet-hdmod3648')
+assert len(actual) == 21892
+assert sum(p.endswith('.png') for p in actual) == 21886
+assert sum(p.startswith('costumes/') and p.endswith('_hd.png') for p in actual) == 3648
+assert read(P / 'mods/gpt/mod.json')['costume_cels'] == 3648
+assert set(start['filer']) <= set(actual) and len(start['filer']) == 21885
+assert all(actual[f] == h for f, h in start['filer'].items()
+           if f not in ['mod.json', 'SHA256SUMS'])
+assert inventory(O / 'mod-grunnlag3641') == start['filer']
+subprocess.run(['sha256sum', '--quiet', '-c', 'SHA256SUMS'], cwd=P / 'mods/gpt', check=True)
+assert len(start['beskyttede']) == 1432
+assert all(sha(A / f) == h for f, h in start['beskyttede'].items())
+assert git(P, 'stash', 'list', '--format=%H').splitlines() == start['stash']
+assert len(start['stash']) == 3
+assert len(list(A.glob('jobber/fig*/resultat.png'))) == 504
+assert len(list(A.glob('jobber/fig*/jobb.json'))) == 1758
+assert not any((A / f'jobber/fig293_{n:02}/resultat.png').exists() for n in [1, 2, 3])
+
+selected = read(R / 'egen-native.json')['ruter']
+assert {e['bilde'] for e in selected} == {
+    f'costume293_{n}' for n in [1920, 1923, 1924, 1925, 1926, 1928, 1929]}
+assert set(actual) - set(start['filer']) == {e['fil'] for e in selected}
+assert all(actual[e['fil']] == e['sha256'] == sha(A / e['prototype']) for e in selected)
+for costume, numbers in [(293, [1921, 1922, 1927]), (129, [641, 642]),
+                          (124, [1804, 1861, *range(1848, 1855)])]:
+    assert not any((P / f'mods/gpt/costumes/costume{costume}_{n}_hd.png').exists()
+                   for n in numbers)
+progress = read(R / 'fremdrift.json')
+assert progress['native_totalt'] == 3648 and progress['publisert'] == 7
+assert progress['nye_jobber_levert'] == 0 and progress['egenkontrollert'] == 7
+assert progress['produserbare_gjenstar_i_293_familien'] == 47
+assert progress['Tom_godkjent'] == progress['Claude_godkjent'] == 0
+assert len(list((R / 'kall').glob('*/verktøyresultat.json'))) == 16
+assert len(list((R / 'kall').glob('*/verktøyfeil.json'))) == 1
+assert len(read(R / 'kvalitetsreturer.json')) == 9
+assert not (R / 'kall/V03RRRR/verktøyresultat.json').exists()
+held = read(R / 'holdte-maal.json')
+assert len(held) == 1 and not held[0]['omprovd'] and not held[0]['fallback']
+assert held[0]['request_id'] == '79f82b0c-3996-41a9-933d-83126f6f9aca'
+partial = progress['delvise_leveranser'][0]
+assert sha(A / partial['resultat']) == partial['sha256']
+assert partial['delvis'] and partial['publisert'] and not partial['levert']
+
+motor = read(R / 'motor-sammenligning.json')
+assert motor['alle7_observert'] and motor['alle23_kildefaser_observert']
+assert motor['alle_originalaktorverdier_identiske'] and motor['uforklarte_HD_endringer'] == 0
+assert (motor['kontroller_pr_side'], motor['grunnlag_null'], motor['kandidat_null'],
+        motor['nullkontroller_etter_testaktorstart_pr_side']) == (120, 118, 118, 80)
+assert motor['ingen_nye_eller_okte_bufferavvik']
+assert not motor['full_naturlig_gjennomspilling'] and not motor['ny_interaktiv_Windows']
+assert not motor['ny_webtest']
+buffer = read(R / 'motor-bufferkontroll.json')
+assert buffer['grunnlag'] == buffer['kandidat']
+assert [(e['frame'], e['avvik']) for e in buffer['grunnlag']] == [(24, 416), (25, 160)]
+assert all(e['fil'].endswith('room056.png') and e['foer_testaktor293']
+           for e in buffer['grunnlag'])
+assert buffer['testaktor_fra_frame'] == 40 and not buffer['helprove_avviksfri']
+for mode in ['grunnlag3641-start1final', 'kandidat3648v2-start1final']:
+    e = read(R / (mode + '.json'))
+    assert e['exit'] == 0 and len(e['kontroller']) == 120 and e['nullkontroller'] == 118
+    assert sha(O / mode / 'scummvm.log') == e['logg_sha256']
+    assert hashlib.sha256(gzip.decompress((R / (mode + '.log.gz')).read_bytes())).hexdigest() == e['logg_sha256']
+    assert sha(Path(e['binar'])) == e['binar_sha256']
+    assert not e['full_naturlig_gjennomspilling'] and e['ny_kjoring_utfort']
+v = read(R / 'motor-visuell-plan.json')
+assert v['visuelt_sett'] and v['hele_varianter_sett'] == 7 and v['hele_motorbilder_sett'] == 4
+assert len(v['hele_startanimasjon']['faser']) == 23 and v['hele_startanimasjon']['visuelt_sett']
+assert all(e['visuelt_sett'] and sha(R / e['fil']) == e['sha256']
+           for k in ['varianter', 'hele_motorbilder'] for e in v[k])
+assert sha(R / v['hele_startanimasjon']['fil']) == v['hele_startanimasjon']['sha256']
+assert read(R / 'indre-feste-kontroll.json')['alle7_innen3HD']
+interrupted = read(R / 'avbrutt-motor3650.json')
+assert interrupted['shell_exit'] == 143 and interrupted['brukes_ikke_som_bestatt']
+assert interrupted['arsak_ikke_bekreftet']
+
+package = read(A / 'rapporter/felles-release-20261022-lee-harvey/publisert.json')
+delta = git(P, 'diff', '--name-only', package['kode'] + '..' + main).splitlines()
+assert set(delta) == {'memory.md', 'todo.md', 'STATUS.md', 'log.md'}
+ci = [e for e in api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs']
+      if e['head_sha'] == main]
+assert ci and ci[0]['status'] == 'completed' and ci[0]['conclusion'] == 'success', ci
+release = api('releases/latest')
+assert release['id'] == package['release_id'] and release['tag_name'] == package['tag']
+assert package['native'] == 3641 and package['taggbygg_success']
+assert package['begge_faktiske_nedlastinger_og_SHA_bekreftet']
+assets = read(A / 'rapporter/felles-release-20261022-lee-harvey/assetkontroll.json')
+for e in assets:
+    asset = next(a for a in release['assets'] if a['name'] == e['fil'])
+    assert asset['digest'] == 'sha256:' + e['sha256'] and asset['size'] == e['bytes']
+for workflow in ['linux.yml', 'windows.yml']:
+    assert not any(e['status'] != 'completed' for e in
+                   api('actions/workflows/' + workflow + '/runs?per_page=30')['workflow_runs'])
+autos = {}
+for name, expected in [('nattkontroll-sam-max', 'PAUSED'), ('fullf-r-sam-max-grafikken', 'ACTIVE')]:
+    d = tomllib.loads((Path('/home/tom/.codex/automations') / name / 'automation.toml').read_text())
+    assert d['status'] == expected
+    autos[name] = expected
+
+audit = dict(tid_utc=datetime.now(timezone.utc).isoformat(), main=main, gpt_for_audit=gpt,
+             grafikkilde=receipt['grafikkilde'], hd_mod=receipt['hd_mod'], CI=ci[0]['id'],
+             CI_success=True, native=3648, nye_native=7, filer=21892, png=21886,
+             alle_moddfiler_SHA=True, alle_tidligere_stier_og_PNG_bevart=True,
+             alle_1432_beskyttede_SHA=True, stasher=start['stash'], hele_figurjobber=504,
+             total_figurjobber=1758, nye_hele_ark=0, delark='fig293_01: 7/10',
+             laget_ulike_motiver=9, egenkontrollert=7, visuelt_ok=7, native_mottatt=7,
+             motorobservert=7, publisert=7, Tom_godkjent=0, Claude_godkjent=0,
+             kvalitetsreturer=['costume293_1921', 'costume293_1922'],
+             verktøyholdt_uten_omproving='costume293_1927',
+             bildekall=17, rabilder=16, forkastede_kvalitetskandidater=9,
+             motor_endelige_exit0=True, bufferavvik_identiske_foer_testaktor=True,
+             motor_nullkontroller_etter_testaktorstart_pr_side=80,
+             helprove_uten_bufferavvik=False, naturlig_gjennomspilling=False,
+             uavklart_tidligere_shell143_bevart=True, pakker_native=3641,
+             nye_native_utenfor_fellespakke=7, pakker_ikke_oppdatert_i_denne_bunken=True,
+             release_url=release['html_url'], assetdigester_fortsatt_identiske=True,
+             bare_dokumentasjon_i_main=delta, automasjoner=autos,
+             neste=['293_1921/1922 kvalitetsreturer', 'fig293_02', 'fig293_03 kontekst'],
+             alt_grafikkarbeid_ferdig=False)
+(R / 'sluttrevisjon.json').write_text(json.dumps(audit, ensure_ascii=False, indent=2) + '\n')
+shutil.copy2(__file__, R / 'sluttrevisjon.py.txt')
+print(json.dumps({k: audit[k] for k in ['main', 'CI', 'CI_success', 'hd_mod', 'native',
+                                      'nye_native', 'alle_moddfiler_SHA', 'hele_figurjobber',
+                                      'pakker_native', 'nye_native_utenfor_fellespakke']}, ensure_ascii=False))
