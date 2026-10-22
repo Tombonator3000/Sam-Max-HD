@@ -1,0 +1,69 @@
+from pathlib import Path
+import json,hashlib,shutil
+
+P=Path('/home/tom/Sam-Max-HD')
+A,O=P/'work/.gpt-gren',Path(__file__).resolve().parent
+R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+m=read(R/'motor-sammenligning.json')
+published=(R/'mottak-publisert.json').exists()
+r=read(R/'mottak-publisert.json')if published else None
+state=('Publisert og hentet tilbake i hd-mod '+r['hd_mod']+'. Alle 21877 filhash er bekreftet. Grafikkilde '+r['grafikkilde']+'.')if published else'Sluttkandidat3633 er ferdig kontrollert. Publisering og henting gjenstår; vent på mottak-publisert.json før publisert-status.'
+body=f'''Åtte nye frontale Lee-Harvey-snakkehoder, costume129_391 til398, er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert og visuelt sett. {state}
+
+fig129_02 er delvis med14 av23 mål, seks tidligere og åtte nye. Ingen resultat.png legges i jobbmappen og ingen ny hel jobb telles:504 av1758 figurjobber har resultat,1254 er uten resultat pluss returer og sluttkontroll. Familien har37 produserte mål av47 etter denne bunken. Ti gjenstår, åtte produserbare og to holdt. Ingen Tom-/Claude-godkjenning eller samlet sluttgodkjenning.
+
+Ni innebygde bildeverktøykall ga ni råbilder og én hel kvalitetsretur. T04 fikk for smalt/langt hode og en ekstra halsende. Forholdet mellom helskaleringene var1.12096, over den eksisterende1.12-grensen. T04 er bevart og erstattet av den nye hele tegningen T04R. Ingen lokal delklipping eller terskelsenkning. Valgte kall er T01,T02,T03,T04R,T05,T06,T07,T08. Råbilder, faktiske prompter, argumenter og referansehash ligger i kall/. Modellnavn ble ikke oppgitt. Ingen verktøyavslag eller API-/CLI-bildefallback.
+
+Dette er åtte separate hodelag til Lee-Harvey i rom25, med ulike munnfaser og hodehøyder.391 har faktisk17x26-laglerret; de sju andre har51x82-laglerret med bare hodet synlig. Native391 er84x120 med margin, de andre220x344. Originalens kropps-/lagfeste beholdes. Hele originalen, faktisk scene og komplette godkjente Sam-/Max-mastere er sett før hvert kall, også returen. Ingen tidligere avvist tegning brukes som stilanker.
+
+391 har skjeve hvite/grå tannflater og svarte ender;392/395 har liten svart/rød munn uten tenner;393 har skjev, liten høyreforskjøvet munn med en svart spalte;394/398 har åpen munn med øvre/nedre tannbånd og grå aksenter;396 har lukket rød munn;397 har øvre tannbånd og åpning under.398 har hevede bryn med en rosa mellomrad over øynene. En feil nedarvet brynrad i den ukjørte398-briefen er kildeavklart og rettet før generering, uten ekstra bildeverktøykall.
+
+Python renser egen alfa og plasserer hele egne malerier i fast4x med2 originalpikslers margin. Kremfargen RGB255,199,135 er låst i de to egne øyefeltene. All alfa, geometri, tenner og øvrige egne farger er bevart ved RGB-rensingen. Egen glød fjernes med samme allerede brukte alfakjernerens. Ingen plasseringstranslasjon, flytting av enkelttrekk, hard originalpikselmaske eller originalfragmenter i ny kunst. Alle målte øyesenteravvik er innen den eksisterende3 HD-grensen, høyst3.0. CORE128, IoU0.6 og dekning0.8 er uendret.
+
+Arkkontrollen bruker uendret full jobb.json. Alle14 produserte ruter har ingen FEIL. Hele delarket får seks forventede FEIL for de ennå tomme store målene399,400,401,422,153,154. Tre små mål hoppes over. Diagnostisk mottak gir14 egne ark-OK og tre automatisk foreslåtte originalfragmenter642,512,768. Alle tre er utelatt fra native. Arket er ufullført og leveres ikke som helt.
+
+Ny kandidat3633 er kjørt i faktisk nedlastet Linux-binær2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 med hel frontanimasjon4 på konstruert aktør29, gyldig rawvalg18. Normal avslutning0,320 av320 nullkontroller og alle åtte nye observert.3625-grunnlaget gjenbrukes fra forrige faktiske avspilling etter kontroll av identiske filer utenom SHA256SUMS, uendret mod.json, binær og kommando. Det er ikke kjørt en ny grunnlagsavspilling. Opprinnelige logg-, bilde- og kommandostier er bevart i beviset.
+
+Alle åtte sammensatte originale hode-/torsoverdier er identiske. {m['hele_originalflater_SHA_identiske_antall']} hele originalflater er SHA-identiske; øvrige forskjeller er dokumenterte kildetilstander og vannfargesykling. Eget17x26-hodelag391 projiseres etter sitt faktiske feste, mens torso128 kontrolleres etter torsoens eget51x82-feste. HD-torsoen er uendret utenfor det synlige hodefeltet. Ingen uforklarte HD-endringer utenfor hodene og dokumenterte kildetilstander. Målemasker brukes bare til kontroll.
+
+Åtte hele før/etter-varianter, fire hele motorbilder, hele17-fasers sekvens med kropp, de åtte original-/nativehodeparene og delarket er visuelt sett. De seks tidligere nativefasene står uendret;399 til401 er fortsatt originalfallback. Ingen ny naturlig primærsekvens, full naturlig gjennomspilling, interaktiv Windows eller webtest. De ni tidligere kjente primærbufferavvikene er ikke omprøvd her. Ingen tvunget lokalskript, skjulte andre aktører eller stanset romskript.
+
+Kandidaten har3633 native,21877 filer og21871 PNG. Samtlige21869 tidligere stier og21863 tidligere PNG bevares, bortsett fra mod.json og sjekksummanifestet ved publisering.1420 beskyttede jobbfiler og tre stasher er uendret. Tidligere jobbnotat bevares med et tillegg. Bare dokumentasjon går til main, ingen ny motor-/pipelinekode.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt3596 og mangler37 native etter denne bunken. Neste samlepunkt er de siste åtte produserbare129-målene eller reell produksjonsblokkering:399,400,401,422,153,154,512,768. Deretter pakkebygg med nativefrys, faktisk nedlasting, sjekksummer og hver inkludert fil kontrollert.641/642 og tidligere124_1804/1861 holdes fortsatt. Automatikken fortsetter, gamle nattprosesser startes ikke, og all grafikk er ikke ferdig.
+
+Bibliotekskilder: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. PASS i opphavet, kontrollert mot samme SCUMM v6-pin og faktisk mottak/motor her. Bevis: valgte8.json, indre-feste-kontroll.json, palettrens-kontroll.json, fragmentvern.json, gjenbrukt-grunnlag.json, motor-sammenligning.json, sluttkontroll.json og SHA-festet fremdrift/rutekart.
+'''
+(R/'RAPPORT.md').write_text('# Åtte frontale Lee-Harvey-snakkehoder\n\n'+body)
+(R/'NESTE.md').write_text(f'''# Neste produksjon
+
+Åtte nye hoder391 til398 er ferdig kontrollert. {state} fig129_02 er delvis14 av23, fig129_01 er23 av24. Ingen nye hele resultatark,504 av1758 uendret. Ikke legg delark som resultat.png.
+
+Neste praktiske bunke er de siste åtte produserbare129-målene:399,400,401,422,153,154,512,768. Se hvert helt motiv med faktisk lag-/spillkontekst og godkjente mastere før tegning.391 er et eget17x26-lag og andre51x82-lerret kan være bare hoder. Kontroller hode og kropp samlet etter egne lagfester. Små512/768 må produseres faktisk, ikke importeres som automatisk originalfragment.
+
+641 fikk tidligere outputavslag180ea1c4-4d0c-4424-a124-bf49b48a2c21 og omprøves ikke.642 er identisk hel alias uten individuelt forsøk og holdes også. Ikke bruk alternativ metode for samme avviste motiv. Behold124_1804/1861 og tidligere returer. T04 er kvalitetsretur og erstattet av T04R; alle råbilder og faktiske prompter er bevart.398-bryn er rettet før første kall, ingen omprøving der.
+
+Fellespakker har3596 og mangler37 native. Etter de åtte produserbare129-målene kommer pakkesamlepunkt, også om641/642 fortsatt holdes. Frys native under bygg, last ned begge faktiske pakker og kontroller sjekksummer og inkludert grafikk før oppdatert-status. De øvrige1254 jobbene uten resultat, returer og samlet sluttkontroll gjenstår. Ingen ny naturlig primærprøve, Windows-interaksjon, webtest eller Tom-/Claude-godkjenning i denne bunken. Automatikken er fortsatt nyttig og skal fortsette. Ikke start det gamle nattløpet.
+''')
+(R/'KILDEGRUNNLAG.md').write_text('''# Kildegrunnlag
+
+Samme Lee-Harvey i rom25, rødt skjortelag og mørk jakke, med uavhengig torso128.391 til398 er hele separate frontale hodelag.391 har17x26-kilde og eget feste.392 til398 har51x82-kilde med synlig17x26 til17x29. Beskyttede jobbfiler endres ikke. Korrigerte faktiske prompter og hver original i faktisk kontekst med komplette mastere er lagret i kall/.
+
+Hår, rosa ansikt, røde skyggeflater, brun brynlinje, små kremaperturer og hver munnfase er låst til originalen.398 har hevede bryn på synlig rad12, rosa mellomrad13 og aperturer14. Øvrige bryn ligger rett over aperturene. Derfor er ikke et felles ansiktsrutenett uten kildekontroll nok. Den første ukjørte398-briefen er bevart og rettet før faktisk kall.
+
+T04 fikk for lang/smal hel figur og ekstra halsende. Hel nytegning T04R erstatter den, med samme original, farger og mastere. Ingen avvist kunst som stilanker, ingen lokal flytting av øyne eller hard originalmaskeklipping. Se råbilder og rensekontroll-stopp.json i T04. Ekte alfa bevares etter egen glødrens, og RGB-rensing gjelder bare to egne øyefelt.
+
+Hode391 og torso128 har forskjellige posisjoner og mål i motorloggen. Originalprojeksjon og visuell kontroll bruker hvert lags faktiske feste, med hele kroppen synlig. Ingen maskering av kroppsendringer med det store transparente hodelerretet. Hele17-fasers frontanimasjon er sett; tre faser399 til401 er fortsatt fallback.641/642 omprøves ikke.
+''')
+note=A/'jobber/fig129_02/notat.md'
+marker='<!-- sam129-front2-20261022 -->'
+if marker not in note.read_text():
+    assert sha(note)==read(R/'start.json')['tidligere_notat_sha256']
+    shutil.copy2(note,R/'tidligere-jobbnotat.md')
+    with note.open('a')as f:f.write('\n\n'+marker+'\n## Fortsettelse22. oktober2026\n\nÅtte nye hoder391 til398 gir et delark på14 av23, seks tidligere og åtte nye. Resultat.png leveres fortsatt ikke som helt ark. Ni innebygde image_gen-kall, ni råbilder og én hel kvalitetsreturT04 tilT04R. Modell ikke oppgitt. Kilder og komplette godkjente mastere er sett før hvert kall.391 har17x26-kilde og eget lagfeste;398 har særskilt hevede bryn. Ingen beskyttede jobbfiler er endret.\n\nFast4x, ekte alfa og2 originalpikslers margin. Egen palett-/glødrens og hel plassering, ingen originalfragmenter eller hard originalmaske. Alle14 produserte ruter har ingen FEIL; seks FEIL er ennå tomme store mål. De tre diagnostiske originalfragmentene642,512,768 er utelatt. Åtte nye er teknisk mottatt, motorobservert og visuelt sett i hel frontanimasjon4 med aktør29,320 av320 null.3625-grunnlaget er gjenbrukt etter eksakt filkontroll; ny kandidat3633 er kjørt. Ingen ny naturlig primærprøve eller Tom-/Claude-godkjenning. Se rapporter/sam129-front2-20261022/RAPPORT.md, fremdrift.json, rutekart-fig129_02.json og mottak-publisert.json for publisering.\n')
+    assert note.read_bytes().startswith((R/'tidligere-jobbnotat.md').read_bytes())
+    (R/'jobbnotat-kontroll.json').write_text(json.dumps(dict(tidligere_sha256=sha(R/'tidligere-jobbnotat.md'),ny_sha256=sha(note),gammelt_notat_uavkortet_bevart=True,kun_tillegg=True),ensure_ascii=False,indent=2)+'\n')
+for name in ['rapport.py','publiser.py']:shutil.copy2(O/name,R/(name+'.txt'))
+print('Rapport, kildegrunnlag, nestejobb og bevart jobbnotat. Publisert:',published)

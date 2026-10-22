@@ -1,0 +1,67 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib,json,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD')
+A,O=P/'work/.gpt-gren',Path(__file__).resolve().parent
+R,C=A/'rapporter'/O.name,O/'mod-sam1293633'
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/'start.json')
+assert len(list(A.glob('jobber/fig*/resultat.png')))==504
+assert not(A/'jobber/fig129_02/resultat.png').exists()
+assert all(sha(A/f)==h for f,h in b['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==b['stash']
+selected=read(R/'valgte8.json')
+assert len(selected)==8
+for e in selected:
+    assert sha(A/e['prototype'])==e['prototype_sha256']==sha(C/'costumes'/(e['bilde']+'_hd.png'))
+    e.update(visuelt_sett=True,motorobservert=True,godkjent_av_Tom=False,claude_kontroll=False)
+save(R/'valgte8.json',selected)
+route=read(R/'rutekart-fig129_02.json')
+assert len(route['fig129_02']['ruter'])==14
+for e in route['fig129_02']['ruter']:e.update(prototype_visuelt_sett=True,motorobservert=True)
+save(R/'rutekart-fig129_02.json',route)
+v=read(R/'motor-visuell-plan.json')
+for group in ['varianter','hele_motorbilder']:
+    for e in v[group]:
+        assert sha(R/e['fil'])==e['sha256']
+        e['visuelt_sett']=True
+phase=v['hele_frontanimasjon']
+assert len(phase['faser'])==17 and sha(R/phase['fil'])==phase['sha256']
+proof=read(R/'kandidat3633-front4.json')
+for f in phase['faser']:
+    ev=next(e for e in proof['hendelser']if e['cel']==f['cel']and e['kontrollert_testaktor29']and e['fil']==f['fil'])
+    body=next(e for e in proof['hendelser']if e['logg_frame']==ev['logg_frame']and e['cel']==128 and e['kontrollert_testaktor29'])
+    f.update(hele_torso128_med=True,torso_pos=body['pos'],torso_maal=body['maal'])
+phase.update(visuelt_sett=True,alle17_hele_hode_og_kropp=True)
+v.update(visuelt_sett=True,hele_varianter_sett=8,hele_motorbilder_sett=4,hele_frontfaser_med_kropp_sett=17)
+v['andre_sette_bilder']=[dict(fil=f,sha256=sha(R/f),visuelt_sett=True)for f in ['atte-slutthoder-original-native.png','fig129_02-delresultat.png']]
+save(R/'motor-visuell-plan.json',v)
+m=read(R/'motor-sammenligning.json')
+assert(m['grunnlag_null'],m['kandidat_null'],m['kontroller_pr_side'])==(320,320,320)
+assert m['alle8_observert']and m['alle_originalaktorverdier_identiske']and m['torso_utenfor_hoder_uendret']
+assert m['gjenbrukt_grunnlagsavspilling']and not m['ny_primaerprove']
+m.update(visuelt_sett=True,indre_feste_kontrollert=True,palett_kontrollert=True)
+save(R/'motor-sammenligning.json',m)
+rows=read(R/'motor-pikselkontroll.json')
+for e in rows:
+    assert sha(Path(e['kandidat_fil']))==e['kandidat_sha256']
+    assert e['native_sha256']==sha(C/'costumes'/(e['bilde']+'_hd.png'))
+    e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',rows)
+inner=read(R/'indre-feste-kontroll.json')
+assert inner['alle_innen_eksisterende3_HD']and len(inner['maalinger'])==8
+inner['visuelt_sett']=True
+save(R/'indre-feste-kontroll.json',inner)
+colors=read(R/'palettrens-kontroll.json')
+assert len(colors)==8 and all(e['egne_oyefargekomponenter']==2 for e in colors)
+progress=read(R/'fremdrift.json')
+progress.update(visuelt_sett=8,motorobservert=8)
+for e in progress['delvise_leveranser']:e.update(visuelt_kontrollert=True,motorobservert=True)
+save(R/'fremdrift.json',progress)
+save(R/'sluttkontroll.json',dict(tid_norsk=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(),valgte_native=8,holdt_native=0,laget=8,egenkontrollert=8,native_mottatt=8,visuelt_sett=True,motorobservert=8,publisert=0,delvise_leveranser=progress['delvise_leveranser'],hele_ark_levert=0,figurark_med_resultat=504,total_figurark=1758,gjenstar_uten_resultat=1254,delark_egne_14_av23=True,alle_produserte_uten_FEIL=True,hele_arkkontroll_har_FEIL_for6_tomme_ikke_leverte_maal=True,diagnostiske_originalfragmenter_utelatt=['costume129_512','costume129_642','costume129_768'],ingen_beskyttede_endret=True,beskyttede=1420,stasher_bevart=b['stash'],native_totalt=3633,pakker_native=3596,pakker_mangler_native=37,Tom_godkjent=0,Claude_godkjent=0,gjenbrukt_grunnlagsavspilling=True,ny_kandidatavspilling=True))
+shutil.copy2(__file__,R/'sluttkontroll.py.txt')
+print('Åtte nye laget/egenkontrollert/native/visuelt/motor. Publisert0. Delark14/23. Hele jobber504 uendret.')

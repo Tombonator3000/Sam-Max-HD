@@ -1,0 +1,44 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json, hashlib, shutil, subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A, O = P/'work/.gpt-gren', Path(__file__).resolve().parent
+R, PREV = A/'rapporter'/O.name, A/'rapporter/sam129-front1-20261022'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p, data):
+    p.write_text(json.dumps(data, ensure_ascii=False, indent=2)+'\n')
+def git(w, *args):
+    return subprocess.check_output(['git',*args],cwd=w,text=True).strip()
+assert not R.exists() and not git(P,'status','--porcelain') and not git(A,'status','--porcelain')
+old, receipt = read(PREV/'start.json'), read(PREV/'mottak-publisert.json')
+files = read(PREV/'publiserte-moddfiler-3625.json')
+assert len(files) == 21869 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+assert len(old['beskyttede']) == 1420 and all(sha(A/f)==h for f,h in old['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines() == old['stash']
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0] == receipt['hd_mod'] == '796299f673d001ed86a6c2eac695dd01ec746733'
+assert read(P/'mods/gpt/mod.json')['costume_cels'] == 3625
+assert git(P,'ls-remote','origin','refs/heads/main').split()[0] == git(P,'rev-parse','HEAD') == '816a206f8d9d5c9f0354f13b22a193edcf0c745e'
+assert git(A,'ls-remote','origin','refs/heads/gpt-arbeid').split()[0] == git(A,'rev-parse','HEAD') == '781fee04c8a7ea3964ad982973b7c3052f503bea'
+assert len(list(A.glob('jobber/fig*/resultat.png'))) == 504 and not(A/'jobber/fig129_02/resultat.png').exists()
+plan = read(A/'rapporter/sam129-kilde-20261022/kildeplan.json')
+assert plan['bildekall'] == 38 and len(plan['levert_og_publisert']) == 29
+nums = list(range(391,399))
+assert all(not(P/f'mods/gpt/costumes/costume129_{n}_hd.png').exists() for n in nums)
+R.mkdir(parents=True)
+save(R/'start.json',dict(main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),hd_mod=receipt['hd_mod'],native=3625,filer=files,beskyttede=old['beskyttede'],stash=old['stash'],figurark=504,nye_maal=8,ulike_hele=8,nye_numre=nums,tidligere_maal=plan['levert_og_publisert'],tidligere_notat_fantes=True,tidligere_notat_sha256=sha(A/'jobber/fig129_02/notat.md'),tidligere_delark=read(PREV/'fremdrift.json')['delvise_leveranser'][0],bibliotek=['figurark-fast-storrelse','scumm-v6-kostymer-skygge-og-soppelruter','publisert-mod-er-fasit'],bibliotek_kompatibilitet='Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e og Python/Pillow. Uendrede CORE128, IoU0.6, dekning0.8,4x og2 originalpikslers margin. Hele egne hoder med ekte alfa.391 har eget17x26-laglerret.'))
+save(R/'kildeplan.json',plan)
+shutil.copy2(O/'atte-originalhoder.png',R/'atte-synlige-originalhoder.png')
+board = Image.new('RGBA',(1600,1000),'#536576')
+draw = ImageDraw.Draw(board)
+for i,n in enumerate(nums):
+    e = next(e for e in plan['ruter'] if e['bilde']==f'costume129_{n}')
+    src = Image.open(e['kilde']).convert('RGBA')
+    assert sha(Path(e['kilde'])) == e['sha256'] and src.getbbox() == tuple(e['synlig_bbox'])
+    x,y = i%4*400,i//4*500
+    draw.text((x+10,y+10),f'{n}: hele {src.size}, synlig {src.getbbox()}',fill='white')
+    board.alpha_composite(src.resize((src.width*5,src.height*5),Image.Resampling.NEAREST),(x+10,y+50))
+board.convert('RGB').save(R/'atte-hele-originaler.png')
+shutil.copy2(__file__,R/'start.py.txt')
+print('Start3625:8 nye mål391 til398.1420 kilder,3 stasher og21869 filer kontrollert.')

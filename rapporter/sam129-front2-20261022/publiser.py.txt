@@ -1,0 +1,112 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,shutil,subprocess,tarfile
+
+P=Path('/home/tom/Sam-Max-HD')
+A,M=P/'work/.gpt-gren',P/'mods/gpt'
+O=Path(__file__).resolve().parent
+R=A/'rapporter'/O.name
+C,T=O/'mod-sam1293633',O/'publisering-hdmod3633'
+H,BACKUP=O/'hentet-hdmod3633',O/'mod-grunnlag3625'
+N,BASE,TOTAL=8,3625,3633
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*args):return subprocess.check_output(['git',*args],cwd=w,text=True).strip()
+def api(s):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True))
+def remote(branch):
+    rows=git(P,'ls-remote','origin','refs/heads/'+branch).splitlines()
+    assert len(rows)==1
+    return rows[0].split()[0]
+def inv(d):return{p.relative_to(d).as_posix():sha(p)for p in d.rglob('*')if p.is_file()and'.git'not in p.relative_to(d).parts}
+b,files=read(R/'start.json'),read(R/'kandidatfilhash.json')
+s,m,v=[read(R/f)for f in ['sluttkontroll.json','motor-sammenligning.json','motor-visuell-plan.json']]
+selected=read(R/'egen-native.json')['ruter']
+assert not any(p.exists()for p in [T,H,BACKUP,R/'publisering-forsokt.json'])
+assert git(A,'branch','--show-current')=='gpt-arbeid'and not git(A,'status','--porcelain')
+art=git(A,'rev-parse','HEAD')
+assert remote('gpt-arbeid')==art
+assert remote('hd-mod')==b['hd_mod']=='796299f673d001ed86a6c2eac695dd01ec746733'
+assert len(b['filer'])==21869 and inv(M)==b['filer']
+assert len(files)==21877 and inv(C)==files
+assert len(b['beskyttede'])==1420 and all(sha(A/f)==h for f,h in b['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert s['visuelt_sett']and s['motorobservert']==s['valgte_native']==N and s['holdt_native']==0
+assert m['visuelt_sett']and m['alle8_observert']and m['alle17_frontfaser_observert']
+assert m['alle_originalaktorverdier_identiske']and m['torso_utenfor_hoder_uendret']
+assert(m['kontroller_pr_side'],m['grunnlag_null'],m['kandidat_null'])==(320,320,320)
+assert m['ingen_nye_eller_okte_bufferavvik_i_denne_proven']and m['utenfor_nye_hoder_og_dokumenterte_kildetilstander']==0
+assert m['konstruert_helanimasjon4']and not m['ny_primaerprove']and m['gjenbrukt_grunnlagsavspilling']
+assert v['visuelt_sett']and v['hele_varianter_sett']==N and v['hele_motorbilder_sett']==4
+phase=v['hele_frontanimasjon']
+assert phase['visuelt_sett']and phase['alle17_hele_hode_og_kropp']and len(phase['faser'])==17
+assert sha(R/phase['fil'])==phase['sha256']
+assert all(e['visuelt_sett']and sha(R/e['fil'])==e['sha256']for g in ['varianter','hele_motorbilder']for e in v[g])
+assert all(sha(A/e['resultat'])==e['sha256']for e in s['delvise_leveranser'])
+assert len(selected)==N and{e['bilde']for e in selected}=={f'costume129_{n}'for n in range(391,399)}
+assert read(R/'indre-feste-kontroll.json')['visuelt_sett']and len(read(R/'palettrens-kontroll.json'))==N
+assert read(R/'fragmentvern.json')['diagnostiske_originalfragmenter']==['costume129_512','costume129_642','costume129_768']
+assert not any((C/f'costumes/costume124_{n}_hd.png').exists()for n in [1804,1861,*range(1848,1855)])
+assert not any((C/f'costumes/costume129_{n}_hd.png').exists()for n in [641,642,512,768])
+assert all(files[f]==h for f,h in b['filer'].items()if f!='mod.json')
+assert set(files)-set(b['filer'])=={e['fil']for e in selected}
+assert all(files[e['fil']]==e['sha256']for e in selected)
+builds={}
+for workflow in ['linux.yml','windows.yml']:
+    runs=api('actions/workflows/'+workflow+'/runs?per_page=30')['workflow_runs']
+    assert not any(e['status']!='completed'for e in runs),'Aktivt pakkebygg, behold nativefrys'
+    builds[workflow]=[dict(id=e['id'],status=e['status'],conclusion=e['conclusion'])for e in runs]
+tag=api('releases/latest')['tag_name']
+assert tag=='sam-max-hd-2026-10-22-gatorgolf'
+save(R/'pakkebygg-for-publisering.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),aktive_bygg=[],siste_bygg=builds,siste_fellesrelease=tag,native_frosset=False))
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=b['hd_mod'],native=TOTAL,nye_native=N,force_with_lease=True))
+shutil.copytree(C,T)
+subprocess.run(['git','init','-q',str(T)],check=True)
+subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
+manifest=inv(T)
+manifest.pop('SHA256SUMS')
+(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n'for f,h in sorted(manifest.items())))
+subprocess.run(['git','-C',str(T),'add','-A'],check=True)
+subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod3633: åtte kontrollerte frontale Lee-Harvey-snakkehoder'],check=True)
+assert remote('hd-mod')==b['hd_mod']
+subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+b['hd_mod'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True)
+published=git(T,'rev-parse','HEAD')
+assert remote('hd-mod')==published
+subprocess.run(['git','fetch','-q','--no-tags','--depth','1','origin','+refs/heads/hd-mod:refs/remotes/origin/hd-mod'],cwd=P,check=True)
+assert git(P,'rev-parse','refs/remotes/origin/hd-mod')==published
+archive=O/'hentet-hdmod3633.tar'
+with archive.open('wb')as f:subprocess.run(['git','archive','--format=tar',published],cwd=P,stdout=f,check=True)
+H.mkdir()
+with tarfile.open(archive)as tar:tar.extractall(H,filter='data')
+actual=inv(H)
+assert actual==inv(T)and len(actual)==21877 and set(actual)==set(files)
+assert{f for f,h in files.items()if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in b['filer'].items()if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.endswith('.png')for f in b['filer'])==21863
+assert sum(f.endswith('.png')for f in actual)==21871
+assert sum(f.startswith('costumes/')and f.endswith('_hd.png')for f in actual)==read(H/'mod.json')['costume_cels']==TOTAL
+subprocess.run(['sha256sum','--quiet','-c','SHA256SUMS'],cwd=H,check=True)
+assert inv(M)==b['filer']and remote('hd-mod')==published
+shutil.move(str(M),BACKUP)
+shutil.copytree(H,M)
+assert inv(M)==actual and inv(BACKUP)==b['filer']
+assert all(sha(A/f)==h for f,h in b['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==b['stash']
+save(R/'publiserte-moddfiler-3633.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=TOTAL,nye_native=N,laget_nye_ruter=N,egenkontrollert=N,native_egne_OK=N,diagnostiske_originalfragmenter_utelatt=3,holdt_native_i_den_nye_bunken=0,holdt_produksjonsmal=['costume129_641'],holdt_ekte_alias=['costume129_642'],nye_ark=0,delark=1,delark_egne_native=14,delark_antall_maal=23,figurark_med_resultat=504,gjenstar=1254,filantall=21877,png=21871,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_filer_bevart=21869,tidligere_png_bevart=21863,beskyttede=1420,stasher=b['stash'],force_with_lease=True,gammel_mod_bevart=str(BACKUP),motorobservert=N,visuelt_sett=N,godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3596,pakker_mangler_native=37,native_frosset=False,neste_samlepunkt='De siste8 produserbare129-målene eller reell produksjonsblokkering.',begrensning=m['begrensning'])
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+    d=read(R/name)
+    d.update(hd_mod=published,grafikkilde=art,native=TOTAL,publisert_native_naa=TOTAL,nye_native_publisert=N,publisert=N,native_frosset=False)
+    for e in d['delvise_leveranser']:e.update(publisert=True,publiserte_ruter=14,publiserte_nye_ruter=N,hd_mod=published)
+    save(R/name,d)
+f=R/'rutekart-fig129_02.json'
+d=read(f)
+for e in d['fig129_02']['ruter']:e.update(publisert=True,hd_mod=published)
+save(f,d)
+f=R/'valgte8.json'
+d=read(f)
+for e in d:e.update(publisert=True,hd_mod=published,grafikkilde=art)
+save(f,d)
+shutil.copy2(__file__,R/'publiser.py.txt')
+print(json.dumps({k:receipt[k]for k in ['hd_mod','native','nye_native','filantall','png','alle_filhash_bekreftet']},ensure_ascii=False),flush=True)

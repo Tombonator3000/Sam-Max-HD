@@ -1,0 +1,41 @@
+from pathlib import Path
+import hashlib,json,shutil,re
+
+P=Path('/home/tom/Sam-Max-HD')
+A,O=P/'work/.gpt-gren',Path(__file__).resolve().parent
+R=A/'rapporter'/O.name
+PREV=A/'rapporter/sam129-front1-20261022'
+OLD=P/'out/sam129-front1-20261022'
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+oldfiles=read(PREV/'kandidatfilhash.json')
+assert len(oldfiles)==21869
+assert all(sha(OLD/'mod-sam1293625'/f)==h for f,h in oldfiles.items())
+current=read(R/'start.json')['filer']
+assert set(current)==set(oldfiles)
+assert {f for f,h in oldfiles.items()if current[f]!=h}=={'SHA256SUMS'}
+assert all(sha(P/'mods/gpt'/f)==h for f,h in current.items())
+proof=read(PREV/'kandidat3625-front4.json')
+assert proof['native_antall']==3625 and proof['exit']==0 and proof['nullkontroller']==len(proof['kontroller'])==320
+assert sha(Path(proof['binar']))==proof['binar_sha256']=='2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110'
+assert proof['logg_sha256']==sha(OLD/'kandidat3625-front4/scummvm.log')
+assert proof['miljo']['DIGHD_TEST_ANIMATION']=='4' and proof['valgte_raw']==[18]
+needed={f'costume129_{n}'for n in range(391,399)}
+assert needed<=set(proof['tegninger'])
+assert all(sha(Path(proof['tegninger'][n]['fil']))==proof['tegninger'][n]['sha256']for n in needed)
+proof.update(nye_maal_observert=8,manglende_nye_maal=[],avspilling_gjenbrukt=True,opprinnelig_bevis=str(PREV/'kandidat3625-front4.json'),opprinnelig_bevis_sha256=sha(PREV/'kandidat3625-front4.json'),alle_renderingsfiler_og_mod_json_identiske=True,bare_sjekksummanifest_endret=True,ny_kjoring_utfort=False)
+save(R/'grunnlag3625-front4.json',proof)
+save(R/'grunnlag3625-front4-exit.json',read(PREV/'kandidat3625-front4-exit.json'))
+shutil.copy2(PREV/'kandidat3625-front4.log.gz',R/'grunnlag3625-front4.log.gz')
+target=O/'grunnlag3625-front4'
+assert not target.exists()
+target.symlink_to(OLD/'kandidat3625-front4',target_is_directory=True)
+save(R/'gjenbrukt-grunnlag.json',dict(bevis=proof['opprinnelig_bevis'],bevis_sha256=proof['opprinnelig_bevis_sha256'],native=3625,renderingsfiler_identiske=21868,bare_SHA256SUMS_endret=True,kontroller=320,nullkontroller=320,alle8_originalfaser_i_loggen=True,ny_grunnlagsavspilling=False,originale_kommandoer_og_bildestier_bevart=True))
+motor=(OLD/'motor.py').read_text()
+motor=re.sub('3619|3625',lambda m:{'3619':'3625','3625':'3633'}[m.group()],motor)
+assert 'range(385,391)' in motor
+motor=motor.replace('range(385,391)','range(391,399)')
+(O/'motor.py').write_text(motor)
+shutil.copy2(__file__,R/'gjenbruk-grunnlag.py.txt')
+print('3625-grunnlag gjenbrukt:21868 identiske renderingsfiler,320/320null. Ny kandidat kjøres separat.')
