@@ -1,0 +1,10 @@
+from pathlib import Path
+import subprocess,json,hashlib,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+cid=sys.argv[1];raw=Path(sys.argv[2]);assert raw.is_file()
+for root in [O,R]:
+ p=root/f'kall/{cid}/plan.json';d=json.loads(p.read_text());assert not d['utfoert'];d.update(utfoert=True,raw_path=str(raw),raa_sha256=hashlib.sha256(raw.read_bytes()).hexdigest(),original_kontekst_og_stil_visuelt_sett=True);p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(raw,R/f'kall/{cid}/raa.png')
+for script,args in [('kontroller-rute.py',[cid,str(raw)]),('fester-halv.py',[cid]),('fester-tett.py',[cid])]:subprocess.run([str(P/'.venv/bin/python'),str(O/script),*args],cwd=P,check=True)
+k=O/'kall'/cid;q=json.loads((k/'sluttkandidat-kontroll-tett.json').read_text());v=json.loads((k/'verktøyresultat.json').read_text());v.update(valgt=False,status='EGENKONTROLL_VENTER_VISUELL' if q['teknisk_og_fester_bestatt'] else 'KVALITETSRETUR',sluttkontroll='sluttkandidat-kontroll-tett.json',feil={'hud':q['farger']['hud'],'blaa':q['farger']['blaa'],'morke_fester_over3HD':[a['navn'] for a in q['morke_fester'] if a['avvik_HD']>3]},visuell_native_kontroll=False);(k/'verktøyresultat.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+shutil.copytree(k,R/'kall'/cid,dirs_exist_ok=True)

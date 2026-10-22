@@ -1,3 +1,7 @@
+# Siste fremdrift etter S036
+
+S030-S036 er nå faktisk utført og kontrollert som returer. Les rapporter/sam296-detaljretur-20261022/NESTE.md og RETUR.md. Neste296-kall er S037, ikke reservert. Uavhengig taubane137 er kildeklargjort i rapporter/taubane137-kilde-20261022. Mod/pakker er fortsatt3701. Resten nedenfor er historikk fra før disse kallene.
+
 # Neste grafikkarbeid etter pakkesamlepunkt3701
 
 Felles Linux/Windows er publisert,hentet og kontrollert: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-isblokk. Begge plattformpakker har alle21944 riktige runtime-modfiler. Seks296-ruter er med. Windows-taggbygg 39839069893 er grønt og nativefrys er opphevet. Se rapporter/felles-release-20261022-isblokk/publisert.json og bygg-startet.json. Linux-kjøring 39833114209 er nå også samlet completed/success, bekreftet i sluttrevisjonen. Det tidligere metadataavviket er bevart som historikk. Ingen CI-status er endret. Pakke-samlepunktet er ferdig; fortsett grafikkproduksjonen uten nye duplikatbygg.
