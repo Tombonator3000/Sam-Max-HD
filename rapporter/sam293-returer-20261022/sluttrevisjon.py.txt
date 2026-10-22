@@ -1,0 +1,39 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+def api(s):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True))
+b=read(R/'start.json');pub=read(R/'mottak-publisert.json');files=read(R/'publiserte-moddfiler-3694.json');current={p.relative_to(M).as_posix():sha(p)for p in M.rglob('*')if p.is_file()};assert current==files and len(files)==21938
+assert sum(f.endswith('.png')for f in files)==21932 and sum(f.startswith('costumes/')and f.endswith('_hd.png')for f in files)==read(M/'mod.json')['costume_cels']==3694
+assert all(files[f]==h for f,h in b['filer'].items()if f not in ['mod.json','SHA256SUMS'])
+for f,h in b['beskyttede'].items():assert sha(A/f)==h
+assert len(b['beskyttede'])==1432 and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert not git(P,'status','--porcelain')
+assert not git(A,'status','--porcelain')
+main=git(P,'rev-parse','HEAD');gpt=git(A,'rev-parse','HEAD');remote={br:git(P,'ls-remote','origin','refs/heads/'+br).split()[0]for br in ['main','gpt-arbeid','hd-mod']};assert remote=={'main':main,'gpt-arbeid':gpt,'hd-mod':pub['hd_mod']}
+assert git(A,'merge-base',pub['grafikkilde'],gpt)==pub['grafikkilde']
+changed=git(P,'diff','--name-only',b['remote']['main'],main).splitlines();assert set(changed)=={'memory.md','STATUS.md','todo.md','log.md'}
+gptchanged=[f for f in git(A,'diff','--name-only','-z',b['remote']['gpt-arbeid'],gpt).split('\0')if f];assert all(f in ['ORDRE.md','GRAFIKKLISTE.md','jobber/fig293_01/notat.md','jobber/fig293_03/notat.md']or f.startswith('rapporter/'+R.name+'/')for f in gptchanged)
+whole=len(list(A.glob('jobber/fig*/resultat.png')));total=len(list(A.glob('jobber/fig*/jobb.json')));assert(whole,total)==(505,1758)and not(A/'jobber/fig293_03/resultat.png').exists()
+routes=read(R/'rutekart-fig293_03.json')['fig293_03'];assert len(routes['ruter'])==31 and sha(R/'fig293_03-delresultat.png')==routes['sha256_resultat']
+routes1=read(R/'rutekart-fig293_01.json')['fig293_01'];assert len(routes1['ruter'])==9 and sha(R/'fig293_01-delresultat.png')==routes1['sha256_resultat']
+family=[e['bilde']for j in A.glob('jobber/fig293_*/jobb.json')for e in read(j)['ruter']];assert len(family)==55 and sum(('costumes/'+f+'_hd.png')in files for f in family)==53
+sel=read(R/'egen-native.json')['ruter'];assert len(sel)==5 and all(files[e['fil']]==e['sha256']for e in sel)
+for k,nums in[(293,[1927,1943]),(129,[641,642]),(124,[1804,1861,*range(1848,1855)])]:assert not any((M/f'costumes/costume{k}_{n}_hd.png').exists()for n in nums)
+assert len(list((R/'kall').glob('*/verktøyresultat.json')))==9 and len(read(R/'kvalitetsreturer.json'))==4
+m=read(R/'motor-sammenligning.json');assert m['visuelt_sett']and m['alle5_observert_i_relevante_kontrollprover_og_skript']and m['alle32_kildefaser_observert']and m['uforklarte_HD_endringer']==0 and m['bufferavvik_koordinater_og_begge_RGB_eksakt_identiske'];assert(m['kontroller_pr_side'],m['null_pr_side'],m['null_etter_testaktorstart_pr_side'])==(560,554,440)
+v=read(R/'motor-visuell-plan.json');assert v['visuelt_sett']and v['hele_varianter_sett']==5 and v['hele_motorbilder_sett']==5 and v['hele_fryseranimasjon']['visuelt_sett']and v['hele_startanimasjon']['visuelt_sett']
+for group in ['varianter','hele_motorbilder']:
+ for e in v[group]:assert e['visuelt_sett']and sha(R/e['fil'])==e['sha256']
+assert sha(R/v['hele_fryseranimasjon']['fil'])==v['hele_fryseranimasjon']['sha256']
+alpha=read(R/'ekte-alfa0-kontroll.json');assert len(alpha['maalinger'])==3 and sum(e['kildepunkter']for e in alpha['maalinger'])==136 and all(e['maks_avstand_til_eksakt_alfa0_HD']<=1 for e in alpha['maalinger']);assert not alpha['originalmaske']and not alpha['alpha_endret']
+fragment=read(R/'fragmentvern.json');assert fragment['diagnostisk_eksport_ikke_importert']and not fragment['originalfragmenter_i_kandidat']
+release=api('releases/latest');assert release['tag_name']=='sam-max-hd-2026-10-22-fryservindu';RP=A/'rapporter/felles-release-20261022-fryservindu';old=read(RP/'sluttrevisjon.json');assert old['native']==3684 and old['begge_faktiske_pakker_hashbekreftet']and old['felles_vedlegg_hentet_igjen']
+for wf in ['linux.yml','windows.yml']:assert not any(e['status']!='completed'for e in api('actions/workflows/'+wf+'/runs?per_page=30')['workflow_runs'])
+runs=api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs'];ci=next(v for v in runs if v['head_sha']==main and v['status']=='completed'and v['conclusion']=='success')
+config=Path('/home/tom/.codex/automations/fullf-r-sam-max-grafikken/automation.toml').read_text();assert 'status = "ACTIVE"'in config
+result=dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=main,gpt_for_revisjonscommit=gpt,grafikkilde=pub['grafikkilde'],hd_mod=pub['hd_mod'],main_CI=dict(id=ci['id'],sha=main,konklusjon='success'),native=3694,nye_native=5,nye_egne_tegninger=5,hele_rgba_aliasmal=0,modfiler=21938,PNG=21932,alle_filhash_bekreftet=True,alle_tidligere_modfiler_bevart=True,alle_tidligere_PNG_bevart=True,beskyttede_jobbfiler=1432,stash=b['stash'],delark_fig293_01=9,delark01_total=10,delark_fig293_03=31,delark_total=32,familie293_native=53,familie293_total=55,familie293_produserbare_igjen=1,holdt1927=True,hele_figurjobber=whole,total_figurjobber=total,gjenstar_hele_figurjobber=total-whole,råbilder=9,kvalitetsreturer=4,lokal_inputvalideringsfeil=1,ekte_alfa0_kildepunkter=136,ekte_alfa0_maks_HD=1,egenkontrollert=5,native_mottatt=5,visuelt_sett=5,motorobservert=5,publisert=5,Tom_godkjent=0,Claude_godkjent=0,kontroller_pr_side=560,null_pr_side=554,null_etter_figurstart_pr_side=440,diagnostisk_eksport_ikke_importert=True,ny_webtest=False,ny_interaktiv_Windows=False,full_naturlig_gjennomspilling=False,release_url=release['html_url'],pakker_native=3684,pakker_mangler_native=10,ny_pakkeoppdatering_utfort=False,Git_UTF8_stier_kontrollert_med_NUL=True,pakkeoppdatering_ved_neste_samlepunkt=True,main_endringer=changed,native_frosset=False,automatisering='ACTIVE',all_grafikk_ferdig=False)
+save(R/'sluttrevisjon.json',result);shutil.copy2(__file__,R/'sluttrevisjon.py.txt');print(json.dumps({k:result[k]for k in ['main','gpt_for_revisjonscommit','native','nye_native','delark_fig293_03','pakker_native','main_CI','automatisering']},ensure_ascii=False))
