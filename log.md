@@ -2055,3 +2055,19 @@ Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 
 Bevis: rapporter/sam129-hoder1-20261022/mottak-publisert.json, motor-sammenligning.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
 
 Bare memory.md, todo.md, STATUS.md og log.md endres i main. Ingen ny motor-, pipeline- eller webkode.
+
+## 2026-10-22 05:13 (Codex)
+
+Ni nye Lee-Harvey-snakkehoder, costume129_414 til 420, 404 og 405, er laget med innebygd image_gen, egenkontrollert, teknisk mottatt, motorobservert, visuelt sett og publisert. Native er 45845080b4b4a5eb381a19fcc7213bfc2749aa67, 3613 HD-bildelag totalt. Grafikkilde 1e1a7d35b550d0e6df62a7d13af56d745f10bbbc på gpt-arbeid. Alle 21857 filhash er bekreftet etter henting. Samtlige 21848 tidligere stier og 21842 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+fig129_01 har 17 av 24 mål, åtte tidligere og ni nye. Sju mål er fortsatt tomme; ingen resultat.png i jobbmappen og ingen ny hel figurjobb. 504 av 1758 har resultat, 1254 er uten pluss returer og sluttkontroll. To automatisk foreslåtte originalfragmenter er uttrykkelig utelatt fra native og levering. Mottaksporter, motor og pipeline er uendret.
+
+Primærprøven med faktisk nedlastet Linux-binær 2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 viser alle 17 hoder fra original rominngang/lokal 217 med faktisk aktør 10, uten testaktør eller tvunget skript. Normal avslutning 0, 711 av 720 nullkontroller. Samme ni kjente bufferavvik har identiske koordinater og begge RGB-verdier; ingen nye eller økte avvik. Alle ni nye originale aktørverdier er byteidentiske ved samme torsofase. Hele originalflater har ulik vannfase. 405-måleflaten er kildebekreftet speilvendt ved +1 originalpiksel; kunstens plassering og alfa er uendret. Ni hele motorvarianter, fire hele motorbilder og delarket er sett. Prøven er ikke avviksfri. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+Separat kildeprøve med kontrollert aktør 29 har 320 av 320 null og viser de åtte tidligere manglende kildene. Original COST og festet motor bekrefter to gyldige tomkommandoer som bildeoversikten utelater; samme spor er ferdigbehandlet uten ny avspilling. Alle 47 familiemål har nå tilgjengelig kontekst. 17 er produsert og publisert, 30 gjenstår. Neste bunke er første arks sju resterende kropps-, hode- og smådelsmål. Se hele kilder, faktisk kontekst og godkjente mastere før hvert motiv.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 og mangler 17 native. Ingen nye pakkebygg eller nativefrys. Neste samlepunkt er resten av 129-familien eller reell produksjonsblokkering. 1804 og 1861 står i retur. Tidligere verktøyavviste motiver omprøves ikke. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
+
+Bevis: rapporter/sam129-hoder2-20261022/mottak-publisert.json, motor-sammenligning.json, gyldige-faser-kontroll.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Main får bare fire dokumenter.
+
+Ni innebygde bildeverktøykall, ingen avslag eller returkall. Råbilder, faktiske prompter, referansehash og SHA-festet rutekart er bevart. Python renser egen alfa/RGB og plasserer hele malerier i fast 4x. H15-tannfarge er justert uten geometri-/alfaendring. Ingen hard originalmaske, originalfragmentfallback eller API/CLI-bildefallback. Første 405-faseparstopp, en avgrenset RGB565-hjelperformelstopp og kildeprøvens bildeoversiktstopp er bevart og kildeavklart uten ny motoravspilling eller endrede tekniske porter. Feil nedarvet aktøretikett er korrigert til faktisk aktør 10; tidligere spor står urørt. Bare memory.md, todo.md, STATUS.md og log.md endres i main.

@@ -1,5 +1,31 @@
 # todo.md
 
+## Gjeldende grafikkstatus, 2026-10-22 05:13
+
+Ni nye Lee-Harvey-snakkehoder, costume129_414 til 420, 404 og 405, er laget med innebygd image_gen, egenkontrollert, teknisk mottatt, motorobservert, visuelt sett og publisert. Native er 45845080b4b4a5eb381a19fcc7213bfc2749aa67, 3613 HD-bildelag totalt. Grafikkilde 1e1a7d35b550d0e6df62a7d13af56d745f10bbbc på gpt-arbeid. Alle 21857 filhash er bekreftet etter henting. Samtlige 21848 tidligere stier og 21842 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+fig129_01 har 17 av 24 mål, åtte tidligere og ni nye. Sju mål er fortsatt tomme; ingen resultat.png i jobbmappen og ingen ny hel figurjobb. 504 av 1758 har resultat, 1254 er uten pluss returer og sluttkontroll. To automatisk foreslåtte originalfragmenter er uttrykkelig utelatt fra native og levering. Mottaksporter, motor og pipeline er uendret.
+
+Primærprøven med faktisk nedlastet Linux-binær 2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 viser alle 17 hoder fra original rominngang/lokal 217 med faktisk aktør 10, uten testaktør eller tvunget skript. Normal avslutning 0, 711 av 720 nullkontroller. Samme ni kjente bufferavvik har identiske koordinater og begge RGB-verdier; ingen nye eller økte avvik. Alle ni nye originale aktørverdier er byteidentiske ved samme torsofase. Hele originalflater har ulik vannfase. 405-måleflaten er kildebekreftet speilvendt ved +1 originalpiksel; kunstens plassering og alfa er uendret. Ni hele motorvarianter, fire hele motorbilder og delarket er sett. Prøven er ikke avviksfri. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+Separat kildeprøve med kontrollert aktør 29 har 320 av 320 null og viser de åtte tidligere manglende kildene. Original COST og festet motor bekrefter to gyldige tomkommandoer som bildeoversikten utelater; samme spor er ferdigbehandlet uten ny avspilling. Alle 47 familiemål har nå tilgjengelig kontekst. 17 er produsert og publisert, 30 gjenstår. Neste bunke er første arks sju resterende kropps-, hode- og smådelsmål. Se hele kilder, faktisk kontekst og godkjente mastere før hvert motiv.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 og mangler 17 native. Ingen nye pakkebygg eller nativefrys. Neste samlepunkt er resten av 129-familien eller reell produksjonsblokkering. 1804 og 1861 står i retur. Tidligere verktøyavviste motiver omprøves ikke. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
+
+Bevis: rapporter/sam129-hoder2-20261022/mottak-publisert.json, motor-sammenligning.json, gyldige-faser-kontroll.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Main får bare fire dokumenter.
+
+## Neste
+
+- [x] Publiser ni nye sidehoder 414 til 420, 404 og 405, native 3613, uten originalfragmentfallback.
+- [x] Avklar de åtte manglende 129-kildekontekstene. Alle 47 mål har tilgjengelig kontekst.
+- [ ] Gjenoppta fig129_01 med de sju resterende målene 129, 128, 130, 403, 384, 641 og 640, med kilde- og stilkontroll før hvert motiv.
+- [ ] Fortsett fig129_02 og de øvrige 30 uproduserte familiemålene uten å duplisere de 17 publiserte hodene.
+- [ ] Følg opp 1861/uttoning og 1804/kildefunksjon avgrenset. Bevar tidligere verktøyavslag uten retry.
+- [ ] Oppdater felles Linux-/Windows ved 129-samlepunkt eller reell blokkering. Pakker har 3596, native har 3613.
+- [ ] Fullfør øvrige figurark, returer og samlet visuell sluttkontroll, med separat Tom-/Claude-godkjenning.
+
+Tidligere status nedenfor er historikk.
+
 ## Gjeldende grafikkstatus, 2026-10-22 04:27
 
 Åtte nye Lee-Harvey-snakkehoder, costume129_406 til 413, er tegnet med innebygd image_gen, egenkontrollert, teknisk mottatt, motorobservert, visuelt sett og publisert. Native er 299a785b6c2ec9c63acbf1c5ff97b20f1e40b1e7, 3604 HD-bildelag totalt. Grafikkilden er acf3aec77e2d5089639538e44e0005e49931ecd9 på gpt-arbeid. Alle 21848 publiserte filhash er bekreftet etter henting; samtlige 21840 tidligere stier og 21834 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
