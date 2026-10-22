@@ -1,7 +1,9 @@
-# Fellespakke3695 er kontrollert,sluttrevisjon gjenstår
+# Samlepunkt3695 er avsluttet
 
-Begge faktiske pakker,alle21938 runtime-modfiler,fire vedlegg med sjekksummer og ny nedlasting fra fellesrelease er kontrollert. Taggbygg39791777486 er grønt. Nativefrys er opphevet etter ny fjern-SHA og alle21939 filhash. Fellesrelease: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark
+Felles Linux-/Windows-release er publisert,alle fire vedlegg er hentet igjen og kontrollert,og alle21938 runtime-modfiler er byteidentiske i begge pakker. Alle11 nye pakkelag er motorobservert og visuelt sett. Taggbygg39791777486 er grønt,og nativefrys er opphevet etter fjern-SHA og hele filkartet. Main46663bf46ce6d8eabcd0c76db9b582d882e86c44 har grønn eksakt CI39794232846. Sluttrevisjon.json bekrefter bevaring av tidligere modfiler,1432 beskyttede jobbfiler og tre stasher. Ingen ny pakke-dispatch eller publisering trengs for3695.
 
-Commit/push oppdaterte rapporter på gpt-arbeid og de fire dokumentasjonsfilene på main. Vent på eksakt grønn main-CI,og kjør sluttrevisjon.py før revisjonscommit/push. Ikke kjør publiser-felles.py,bygg-etter-sdl.py eller start.py på nytt. Native3695 er fortsatt siste publiserte mod;alle tidligere PNG og tre stasher bevares.
+Utgave:https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark
 
-Neste grafikk er fig296_01. Kildekontekst er forberedt i out/sam296-kilde-20261022,og første bildeforsøk finnes i out/sam296-isblokk-20261022/kall/S001. Det er en kvalitetsretur,ikke levert eller importert. Bevar råbildet og prompten. Fortsett med én kilderute om gangen,helfiguren costume296_1926 først som identitetsanker. 1927/28 i kostyme296 er eksakte RGBA-alias av1926;det gjelder ikke verktøyholdt1927 i kostyme293. Ingen ny jobb296-resultatfil er laget. Etter pakkerevisjon kan kildeplan,råbilde,returgrunn og kontekstbevis føres til egen296-rapport på gpt-arbeid. All grafikk er ikke ferdig.
+Neste påbegynte grafikk er fig296_01. Råbilde og faktisk prompt fra S001 ligger foreløpig i out/sam296-isblokk-20261022. Det er kvalitetsretur,ingen ny296-rute er levert eller importert. Kostyme2961927/28 er kildebekreftede eksakte RGBA-alias av1926,helt uavhengig av verktøyholdt2931927. Bruk enkeltmotiver,og ikke bruk S001 som stilanker. Original fig296_02 avklarer den store blonde hårformen over brilleansiktet. Den rosa formen øverst til høyre er hånd/fingre,ikke sløyfe. Grå is-/hårfelt skal ikke bli et tredje menneskeansikt.
+
+Fortsett grafikk uten ny godkjenning,men behold visuell og teknisk kontroll,faktiske prompter,kilder,returgrunner og native SHA. All grafikk er ikke ferdig. Automasjonen forblir ACTIVE.
