@@ -1,0 +1,89 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json, subprocess, shutil
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+N=A/'rapporter/sam129-kilde-20261022'
+read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*args):return subprocess.check_output(['git',*args],cwd=w,text=True).strip()
+b=read(R/'start.json'); receipt=read(R/'mottak-publisert.json')
+assert receipt['alle_filhash_bekreftet'] and receipt['native']==3613 and receipt['nye_native']==9
+assert git(P,'branch','--show-current')=='main' and not git(P,'status','--porcelain')
+assert git(P,'rev-parse','HEAD')==b['main']
+assert git(P,'ls-remote','origin','refs/heads/main').split()[0]==b['main']
+hd=receipt['hd_mod'];art=receipt['grafikkilde']
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]==hd
+plan=read(N/'kildeplan.json')
+new=[e['bilde'] for e in read(R/'egen-native.json')['ruter']]
+published=plan['levert_og_publisert']+new
+assert len(published)==len(set(published))==17
+plan.update(bildekall=17,nye_native=17,resultatark=0,publisert_hd_mod=hd,
+    publisert_grafikkilde=art,levert_og_publisert=published,gjenstar_maal=30,
+    siste_produksjonsrapport='rapporter/'+O.name)
+save(N/'kildeplan.json',plan)
+with (N/'KILDEGRUNNLAG.md').open('a') as f:
+    f.write('\n## Oppfølging 22. oktober: alle kildekontekster tilgjengelige\n\n'
+        'De åtte tidligere manglende målene 130, 640, 422, 642, 153, 154, 512 og 768 er sett som hele originalkilder i faktisk originalmotorbilde med kontrollert aktør 29. Prøven har 320 av 320 nullkontroller, normal avslutning 0. Ingen tvunget enkeltanimasjon eller motorendring. Gyldige tomkommandoer 19 og 23 er bekreftet i original COST og motorpin c9091321; første etterbehandlingsstopp og rettet tolkning er bevart. Kildeprøven ble ikke kjørt om igjen. Alle 47 mål har nå tilgjengelig kontekst, 20 naturlig og 27 kontrollert. Dette er kildeobservasjon, ingen naturlig gjennomspilling eller ny Tom-/Claude-godkjenning. Før hvert nytt motiv skal kilde, faktisk kontekst og godkjente hele mastere ses på nytt. Se rapporter/'+O.name+'/gyldige-faser-kontroll.json.\n\n'
+        '17 separate snakkehoder er nå publisert, 30 familiemål gjenstår. Første ark er fortsatt delvis med 17 av 24 mål; ingen resultat.png eller ny hel figurjobb. Native '+hd+', 3613 totalt.\n')
+next_text='''# Neste produksjon
+
+Ni nye hele hoder 414 til 420, 404 og 405 er publisert og hentet tilbake. Native har 3613; fig129_01 har 17 av 24 mål og er fortsatt delvis. Ikke gjenta H09 til H17, motorprøven eller denne nativepubliseringen. mottak-publisert.json og publiserte-moddfiler-3613.json er gjeldende bevis. Alle 21857 filhash er bekreftet. Bevar alle tidligere filer og 21851 PNG, 1420 beskyttede jobbinndata og tre opprinnelige stasher.
+
+Gjenoppta samme påbegynte fig129_01 med de sju resterende målene: costume129_129, 128, 130, 403, 384, 641 og 640. Tre hele kropps-/startposer, to egne hodefaser og to små kildedeler. Se hele originaler, tilhørende faktisk kontekst og hele godkjente Sam-/Max-mastere før hvert motiv. Kontroller smådelenes funksjon fra de samtidige hele lagene og originalanimasjonen før maling; kildeobservasjon alene er ikke motivforståelse. Ikke lever automatiske originalfragmenter eller klipp deler fra en annen generert figur. Ikke endre de beskyttede jobbfilene. Bruk innebygd image_gen og egen alfa med hel plassering i fast 4x. Ny grafikk bare på gpt-arbeid og hd-mod.
+
+De åtte manglende familiekontekstene er nå sett. Alle 47 mål har tilgjengelig kontekst, 30 er fortsatt uten ny produksjon. Kontrollert kildeprøve 320/320 null, aktør 29, motorens automatiske ikke-nulltabellvalg uten DIGHD_TEST_ANIMATION. Raw 19 og 23 er kildebekreftede tomkommandoer, ikke ugyldige animasjoner. Se gyldige-faser-kontroll.json, tomme-tabellkommandoer.json og kildeplanen i rapporter/sam129-kilde-20261022. Per-motiv stil- og kildekontroll gjelder fortsatt. Etter første ark gjenstår fig129_02 med frontanimasjon og øvrige spesialposer.
+
+Primærmotorprøven viser alle 17 sidehoder fra original rominngang/lokal 217, faktisk aktør 10. Ingen tvunget skript, testaktør eller skjult aktør i primærprøven. Kandidat 3613 har 711/720 null og de samme ni kjente avvikene med identiske koordinater og begge RGB-verdier som grunnlag 3604. Ingen nye eller økte avvik, men prøven er ikke avviksfri. Alle ni nye kildeaktørverdier er byteidentiske ved samme torsofase. 405 krever kildens faktisk speilvendte plassering +1 originalpiksel i målingen; egen HD-kunst er ikke flyttet eller klippet. Ingen ny toleranse. Se fase405-kildetolkning.md. Ikke kjør måleforventningsstopp som nye kunstreturer.
+
+1861/uttoning og 1804/kildefunksjon står fortsatt i retur. Ingen bekreftet ny motorretting. Eventuell motor- eller pipelineendring skal avgrenses og gå gjennom testet PR. Ingen alfaendring for å skjule bufferavvik. 1848 og tidligere andre verktøyavviste motiver og eksakte aliaser omprøves ikke. 1849 til 1854 er ikke individuelt avvist i denne bunken. Andre returer, ugyldige 344/346 og kostyme 88s råvalg 28 bevares.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 og mangler 17 nye native. Ingen nye pakkebygg eller nativefrys. Neste pakkesamlepunkt er resten av 129-familien eller reell produksjonsblokkering. Frys native under bygg og kontroller faktiske nedlastinger, sjekksummer, alle inkluderte grafikkfiler og relevant motorvisning før oppdatert-status. Gamle nattprosesser eller gammel nattkontroll gjenstartes ikke.
+
+504 av 1758 hele figurjobber har resultat, 1254 er uten pluss returer og samlet sluttkontroll. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning. Grafikkautomatikken fortsetter. Ikke pause som om alt var ferdig.
+'''
+(R/'NESTE.md').write_text(next_text)
+with (R/'RAPPORT.md').open('a') as f:
+    f.write('\nPublisert og hentet tilbake: hd-mod '+hd+', grafikkilde '+art+'. Alle 21857 filhash, 21842 tidligere PNG, 1420 beskyttede inndata og tre stasher er bekreftet. Bare de ni nye egne nativefilene er lagt til; mod.json og SHA256SUMS er oppdatert. 3613 native, 21851 PNG totalt. Pakker forblir på 3596 og mangler 17.\n')
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+status=f'''Ni nye Lee-Harvey-snakkehoder, costume129_414 til 420, 404 og 405, er laget med innebygd image_gen, egenkontrollert, teknisk mottatt, motorobservert, visuelt sett og publisert. Native er {hd}, 3613 HD-bildelag totalt. Grafikkilde {art} på gpt-arbeid. Alle 21857 filhash er bekreftet etter henting. Samtlige 21848 tidligere stier og 21842 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+fig129_01 har 17 av 24 mål, åtte tidligere og ni nye. Sju mål er fortsatt tomme; ingen resultat.png i jobbmappen og ingen ny hel figurjobb. 504 av 1758 har resultat, 1254 er uten pluss returer og sluttkontroll. To automatisk foreslåtte originalfragmenter er uttrykkelig utelatt fra native og levering. Mottaksporter, motor og pipeline er uendret.
+
+Primærprøven med faktisk nedlastet Linux-binær 2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 viser alle 17 hoder fra original rominngang/lokal 217 med faktisk aktør 10, uten testaktør eller tvunget skript. Normal avslutning 0, 711 av 720 nullkontroller. Samme ni kjente bufferavvik har identiske koordinater og begge RGB-verdier; ingen nye eller økte avvik. Alle ni nye originale aktørverdier er byteidentiske ved samme torsofase. Hele originalflater har ulik vannfase. 405-måleflaten er kildebekreftet speilvendt ved +1 originalpiksel; kunstens plassering og alfa er uendret. Ni hele motorvarianter, fire hele motorbilder og delarket er sett. Prøven er ikke avviksfri. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+Separat kildeprøve med kontrollert aktør 29 har 320 av 320 null og viser de åtte tidligere manglende kildene. Original COST og festet motor bekrefter to gyldige tomkommandoer som bildeoversikten utelater; samme spor er ferdigbehandlet uten ny avspilling. Alle 47 familietarget har nå tilgjengelig kontekst. 17 er produsert og publisert, 30 gjenstår. Neste bunke er første arks sju resterende kropps-, hode- og smådelsmål. Se hele kilder, faktisk kontekst og godkjente mastere før hvert motiv.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 og mangler 17 native. Ingen nye pakkebygg eller nativefrys. Neste samlepunkt er resten av 129-familien eller reell produksjonsblokkering. 1804 og 1861 står i retur. Tidligere verktøyavviste motiver omprøves ikke. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
+
+Bevis: rapporter/{O.name}/mottak-publisert.json, motor-sammenligning.json, gyldige-faser-kontroll.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Main får bare fire dokumenter.
+'''
+todo='''## Neste
+
+- [x] Publiser ni nye sidehoder 414 til 420, 404 og 405, native 3613, uten originalfragmentfallback.
+- [x] Avklar de åtte manglende 129-kildekontekstene. Alle 47 mål har tilgjengelig kontekst.
+- [ ] Gjenoppta fig129_01 med de sju resterende målene 129, 128, 130, 403, 384, 641 og 640, med kilde- og stilkontroll før hvert motiv.
+- [ ] Fortsett fig129_02 og de øvrige 30 uproduserte familiemålene uten å duplisere de 17 publiserte hodene.
+- [ ] Følg opp 1861/uttoning og 1804/kildefunksjon avgrenset. Bevar tidligere verktøyavslag uten retry.
+- [ ] Oppdater felles Linux-/Windows ved 129-samlepunkt eller reell blokkering. Pakker har 3596, native har 3613.
+- [ ] Fullfør øvrige figurark, returer og samlet visuell sluttkontroll, med separat Tom-/Claude-godkjenning.
+
+'''
+for name in ['memory.md','todo.md','STATUS.md']:
+    p=P/name;old=p.read_text();head,rest=old.split('\n',1)
+    p.write_text(head+'\n\n## Gjeldende grafikkstatus, '+stamp+'\n\n'+status+'\n'+
+                 (todo if name=='todo.md' else '')+'Tidligere status nedenfor er historikk.\n'+rest)
+with (P/'log.md').open('a') as f:
+    f.write('\n## '+stamp+' (Codex)\n\n'+status+
+            '\nNi innebygde bildeverktøykall, ingen avslag eller returkall. Råbilder, faktiske prompter, referansehash og SHA-festet rutekart er bevart. Python renser egen alfa/RGB og plasserer hele malerier i fast 4x. H15-tannfarge er justert uten geometri-/alfaendring. Ingen hard originalmaske, originalfragmentfallback eller API/CLI-bildefallback. Første 405-faseparstopp, en avgrenset RGB565-hjelperformelstopp og kildeprøvens bildeoversiktstopp er bevart og kildeavklart uten ny motoravspilling eller endrede tekniske porter. Feil nedarvet aktøretikett er korrigert til faktisk aktør 10; tidligere spor står urørt. Bare memory.md, todo.md, STATUS.md og log.md endres i main.\n')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;old=p.read_text();head,rest=old.split('\n',1)
+    p.write_text(head+'\n\n<!-- sam129-hoder2-status:start -->\n'+status+
+        '<!-- sam129-hoder2-status:slutt -->\n\nTidligere status nedenfor er historikk.\n'+rest)
+shutil.copy2(__file__,R/(Path(__file__).name+'.txt'))
+save(R/'dokumentasjon.json',dict(tid_oslo=stamp,main_grunnlag=b['main'],native=hd,grafikkilde=art,
+    bare_main_dokumenter=['memory.md','todo.md','STATUS.md','log.md'],pakker_native=3596,
+    pakker_mangler=17,automatisering_fortsetter=True))
+print('Rapporter og fire hoveddokumenter oppdatert, native',hd)
