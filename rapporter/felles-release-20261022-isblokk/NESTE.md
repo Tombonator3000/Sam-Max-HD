@@ -1,0 +1,3 @@
+# Neste pakkesteg
+
+Les bygg-startet.json og eventuelle journaler. Linux39833114209 og Windows39833120392 er allerede startet;ikke dispatch på nytt. Hent status med hent-status.py. Ved grønt på begge:hent faktiske plattformpakker og SHA-filer,kontroller alle modfiler med kontroller-pakker.py. Nye faktiske Linux-avspillinger sammenlignes med produksjon for alle seks296-ruter i anim1 oganim8. Publiser én ny fellesrelease med begge pakker,hent vedleggene igjen og kontroller. Behold nativefrys til forventet taggbygg er grønt. Grafikkproduksjonen fortsetter etter at denne frysen er opphevet. Ingen gammel nattkontroll.
