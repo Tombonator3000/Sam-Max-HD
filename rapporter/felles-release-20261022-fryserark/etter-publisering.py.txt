@@ -1,0 +1,37 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,re,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-siste-fryserrute-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+pub=read(R/'publisert.json');assert pub['Latest_bekreftet']and pub['taggbygg_success']and not pub['native_frosset']and pub['native']==3695
+b=read(S/'start.json');assert all(sha(A/f)==h for f,h in b['beskyttede'].items())and subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==b['stash']
+body=(R/'status-blokk.md').read_text();assert pub['url']in body and 'opphevet etter grønt taggbygg'in body
+for name in ['sam293-kuldeflekker-20261022','sam293-returer-20261022','sam293-siste-fryserrute-20261022']:
+ T=A/'rapporter'/name;receipt=read(T/'mottak-publisert.json');receipt.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3695,pakker_mangler_native=0,native_frosset=False,pakker_status='begge_faktiske_nedlastinger_fellesvedlegg_og_taggbygg_kontrollert');save(T/'mottak-publisert.json',receipt)
+ for file in ['fremdrift.json','sluttkontroll.json']:
+  d=read(T/file);d.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3695,pakker_mangler_native=0,native_frosset=False)
+  for g in ['leveranser','delvise_leveranser']:
+   for e in d.get(g,[]):e.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3695)
+  save(T/file,d)
+ for route in T.glob('rutekart-fig293_*.json'):
+  d=read(route)
+  for job in d.values():
+   for e in job['ruter']:e.update(i_fellespakke=True,felles_url=pub['url'])
+  save(route,d)
+ (T/'PAKKER.md').write_text('# Kontrollert fellespakke3695\n\n'+body)
+ update='Felles Linux-/Windows-pakke er publisert,hentet og kontrollert med3695 native: '+pub['url']+'. Alle11 nye ruter fra fig293_01/03 er med. Fig293_03 er helt32/32,fig293_01 delvis9/10. Nativefrys er opphevet etter grønt taggbygg. Neste figurark etter familien er fig296_01,etter retur- og kildekontroll;verktøyholdt1927 omprøves ikke. Se PAKKER.md. Ingen ny Tom-/Claude-godkjenning.\n'
+ for filename in ['NESTE.md','RAPPORT.md']:
+  f=T/filename;t=f.read_text();start='<!-- pakke3695:start -->';end='<!-- pakke3695:slutt -->';block=start+'\n'+update+end
+  if start in t:t=re.sub(re.escape(start)+'.*?'+re.escape(end),lambda m:block,t,flags=re.S)
+  else:first,rest=t.split('\n',1);t=first+'\n\n'+block+'\n\nProduksjonsopplysningene nedenfor bevarer også historisk status før dette samlepunktet.\n'+rest
+  f.write_text(t)
+marker='felles-fryserark-status';block='<!-- '+marker+':start -->\n'+body+'<!-- '+marker+':slutt -->'
+for f in [A/'ORDRE.md',A/'GRAFIKKLISTE.md',A/'jobber/fig293_01/notat.md',A/'jobber/fig293_03/notat.md',P/'memory.md',P/'STATUS.md',P/'todo.md']:
+ t=f.read_text()
+ if '<!-- '+marker+':start -->'in t:t=re.sub(r'<!-- '+marker+r':start -->.*?<!-- '+marker+r':slutt -->',lambda m:block,t,flags=re.S)
+ else:first,rest=t.split('\n',1);t=first+'\n\n'+block+'\n\nTidligere status nedenfor er historikk.\n'+rest
+ f.write_text(t)
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');f=P/'log.md';f.write_text(f.read_text()+'\n## '+stamp+' (Codex)\n\n'+body+'\nBevis: rapporter/felles-release-20261022-fryserark på gpt-arbeid. Bare dokumentasjon endres i main.\n')
+shutil.copy2(__file__,R/'etter-publisering.py.txt');print('3695-pakker bekreftet i alle tre kildebunker,11 nye ruter medfølger,fullt fryserark32/32,nativefrys opphevet.')

@@ -1,5 +1,11 @@
 # Neste produksjon: fig293_03,31/32
 
+<!-- pakke3695:start -->
+Felles Linux-/Windows-pakke er publisert,hentet og kontrollert med3695 native: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark. Alle11 nye ruter fra fig293_01/03 er med. Fig293_03 er helt32/32,fig293_01 delvis9/10. Nativefrys er opphevet etter grønt taggbygg. Neste figurark etter familien er fig296_01,etter retur- og kildekontroll;verktøyholdt1927 omprøves ikke. Se PAKKER.md. Ingen ny Tom-/Claude-godkjenning.
+<!-- pakke3695:slutt -->
+
+Produksjonsopplysningene nedenfor bevarer også historisk status før dette samlepunktet.
+
 Gjenoppta costume293_1943. Behold alle31 native posisjoner og fig293_01s9/10. Ikke omprøv verktøyholdt1927. Kostyme293 har53/55 native,en produserbar retur og ett verktøyholdt mål. Ikke start en ny bunke som dupliserer disse.
 
 1943 har åtte hvite/grå sammenhengende grupper og en beskåret Conroy-hodebit. Noen hvite grupper har to lobber som skal være forbundet,men de åtte gruppene skal være atskilt. R1943R har riktig antall men toppfestene4,17/5,34HD for langt til høyre. R1943RR flyttet også andre grupper og slo de to nederste sammen ved CORE128. De må ikke brukes som stilankere. Bruk eksakt kilde,spillkontekst,komplette godkjente Sam/Max-mastere og nye verktøytegninger;bevar egne alfaformer. Ingen lokal Python-flytting eller kildeklipping. Alle fester maks3HD.

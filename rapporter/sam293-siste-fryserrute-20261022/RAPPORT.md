@@ -1,5 +1,11 @@
 # Fryserarket er helt levert
 
+<!-- pakke3695:start -->
+Felles Linux-/Windows-pakke er publisert,hentet og kontrollert med3695 native: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark. Alle11 nye ruter fra fig293_01/03 er med. Fig293_03 er helt32/32,fig293_01 delvis9/10. Nativefrys er opphevet etter grønt taggbygg. Neste figurark etter familien er fig296_01,etter retur- og kildekontroll;verktøyholdt1927 omprøves ikke. Se PAKKER.md. Ingen ny Tom-/Claude-godkjenning.
+<!-- pakke3695:slutt -->
+
+Produksjonsopplysningene nedenfor bevarer også historisk status før dette samlepunktet.
+
 2026-10-22 14:50 (Codex)
 
 fig293_03 er helt levert med 32/32 ruter i1536x1024 RGBA, resultat.png og SHA-festet rutekart. Siste rute1943 er nytegnet med innebygd image_gen og har eget råbilde, faktisk prompt, notat og egen eksport. Alle 31 tidligere arkposisjoner og 21938 tidligere modfiler er bevart. Én ny egen tegning gir én ny native, ingen alias. Publisert additivt som hd-mod f0f7b641177cec8661d7c0cbf68c5faef9eb31f6, grafikkilde a87548f883874329ff4a5c9c0322acd86df1f2db. Alle 21939 filhash er hentet tilbake og bekreftet. Hele figurjobber med resultat er 506/1758,1252 er uten i tillegg til returer og samlet sluttkontroll. Kostyme293 har 54/55 native;bare tidligere verktøyholdt1927 gjenstår i familien og omprøves ikke.

@@ -1,5 +1,11 @@
 # Øyefester og frostreturer i kostyme 293
 
+<!-- pakke3695:start -->
+Felles Linux-/Windows-pakke er publisert,hentet og kontrollert med3695 native: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark. Alle11 nye ruter fra fig293_01/03 er med. Fig293_03 er helt32/32,fig293_01 delvis9/10. Nativefrys er opphevet etter grønt taggbygg. Neste figurark etter familien er fig296_01,etter retur- og kildekontroll;verktøyholdt1927 omprøves ikke. Se PAKKER.md. Ingen ny Tom-/Claude-godkjenning.
+<!-- pakke3695:slutt -->
+
+Produksjonsopplysningene nedenfor bevarer også historisk status før dette samlepunktet.
+
 2026-10-22 14:30 (Codex)
 
 Fem nye egne tegninger er laget, egenkontrollert, native mottatt, visuelt sett og motorobservert: costume293_1921, 1922, 1970, 1971 og 1972. Publisert additivt som hd-mod d0d8aa4304aa8acbca393c1d1ac5a742c405aff7, grafikkilde e026697e2f6d8a86eb4a22fe5d403375af65a14e. Alle 21938 filhash er hentet tilbake og bekreftet. fig293_01 er delvis 9/10 og fig293_03 delvis 31/32. Alle 35 tidligere arkposisjoner er bevart. Kostyme 293 har 53/55 native ruter. Bare 1943 er produserbar retur i denne familien; 1927 er fortsatt verktøyholdt og omprøves ikke. 505/1758 hele figurjobber har resultat, 1253 er uten i tillegg til returer og samlet sluttkontroll.

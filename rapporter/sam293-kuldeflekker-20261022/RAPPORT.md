@@ -1,5 +1,11 @@
 # Conroy, Lee-Harvey og kuldeflekker, fig293_03
 
+<!-- pakke3695:start -->
+Felles Linux-/Windows-pakke er publisert,hentet og kontrollert med3695 native: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark. Alle11 nye ruter fra fig293_01/03 er med. Fig293_03 er helt32/32,fig293_01 delvis9/10. Nativefrys er opphevet etter grønt taggbygg. Neste figurark etter familien er fig296_01,etter retur- og kildekontroll;verktøyholdt1927 omprøves ikke. Se PAKKER.md. Ingen ny Tom-/Claude-godkjenning.
+<!-- pakke3695:slutt -->
+
+Produksjonsopplysningene nedenfor bevarer også historisk status før dette samlepunktet.
+
 2026-10-22 13:47 (Codex)
 
 Fem nye egne tegninger og native ruter er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett: costume293_1944 til 1948. Ingen nye aliaser. Publisert additivt som hd-mod 000c7686725ee8796cac3bd4ce170d59cdecc074, grafikkilde c88182bb57213f70b716432d726858648f659ff2. Alle 21933 filhash er hentet tilbake og bekreftet. fig293_03 er nå delvis 28/32. Alle 23 tidligere arkposisjoner er bevart, og ingen hel resultatfil legges i jobbflaten. Kostyme 293 har 48/55 native, med seks produserbare mål og verktøyholdt1927 igjen. 505 av 1758 hele figurjobber har resultat,1253 er uten i tillegg til returer og samlet sluttkontroll.
