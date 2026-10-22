@@ -1,8 +1,8 @@
 # Øyefester og frostreturer i kostyme 293
 
-2026-10-22 14:27 (Codex)
+2026-10-22 14:30 (Codex)
 
-Fem nye egne tegninger er laget, egenkontrollert, native mottatt, visuelt sett og motorobservert: costume293_1921, 1922, 1970, 1971 og 1972. Kandidat 3694 er kontrollert. Publisering og tilbakehenting er ennå ikke bekreftet. fig293_01 er delvis 9/10 og fig293_03 delvis 31/32. Alle 35 tidligere arkposisjoner er bevart. Kostyme 293 har 53/55 native ruter. Bare 1943 er produserbar retur i denne familien; 1927 er fortsatt verktøyholdt og omprøves ikke. 505/1758 hele figurjobber har resultat, 1253 er uten i tillegg til returer og samlet sluttkontroll.
+Fem nye egne tegninger er laget, egenkontrollert, native mottatt, visuelt sett og motorobservert: costume293_1921, 1922, 1970, 1971 og 1972. Publisert additivt som hd-mod d0d8aa4304aa8acbca393c1d1ac5a742c405aff7, grafikkilde e026697e2f6d8a86eb4a22fe5d403375af65a14e. Alle 21938 filhash er hentet tilbake og bekreftet. fig293_01 er delvis 9/10 og fig293_03 delvis 31/32. Alle 35 tidligere arkposisjoner er bevart. Kostyme 293 har 53/55 native ruter. Bare 1943 er produserbar retur i denne familien; 1927 er fortsatt verktøyholdt og omprøves ikke. 505/1758 hele figurjobber har resultat, 1253 er uten i tillegg til returer og samlet sluttkontroll.
 
 Ni faktiske innebygde image_gen-kall ga ni råbilder for seks kildemotiver. Fem er valgt; fire forsøk er kvalitetsreturer. Én lokal inputvalidering avviste seks referanser før generering og ble rettet til fem uten alternativ bildeverktøy. Ingen ny kvotegrense eller innholdsavvisning. Øyefeltene og de innovervendte svarte pupillene i 1921/22 er innen 3 HD. Alle 136 åpne kildepunkter og alle opake frostfargepunkter er innen 3 HD til egen tilsvarende alfa/farge. Kildepunkt er ikke det samme som antall hullgrupper. 1970s lille grå del ved 14,12 er bevart. 1972s mørkebrune smådel ved 12,8 var først lysbrun og ble rettet med image_gen. 1943 forblir retur: første forsøk har seks hvite grupper, neste åtte med feil feste, siste syv ved CORE128 etter at nederste grupper møttes. Ingen av disse importeres.
 

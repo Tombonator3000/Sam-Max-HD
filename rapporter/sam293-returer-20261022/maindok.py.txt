@@ -1,0 +1,18 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib,json,re,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/'start.json');pub=read(R/'mottak-publisert.json');assert pub['alle_filhash_bekreftet']and pub['native']==3694 and pub['nye_native']==5
+assert subprocess.check_output(['git','branch','--show-current'],cwd=P,text=True).strip()=='main'
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip()==b['remote']['main']
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True)
+brief=(R/'status-blokk.md').read_text();marker='sam293-returer-status';block='<!-- '+marker+':start -->\n'+brief+'<!-- '+marker+':slutt -->'
+for name in ['memory.md','todo.md','STATUS.md']:
+ f=P/name;t=f.read_text();assert '<!-- '+marker+':start -->'not in t;first,rest=t.split('\n',1);f.write_text(first+'\n\n'+block+'\n\nTidligere status nedenfor er historikk.\n'+rest)
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');f=P/'log.md';t=f.read_text();assert f'rapporter/{R.name} på gpt-arbeid'not in t;f.write_text(t.rstrip()+f'\n\n## {now} (Codex)\n\n'+brief+f'\nBevis: rapporter/{R.name} på gpt-arbeid. Bare dokumentasjon endres i main.\n')
+for f,h in b['beskyttede'].items():assert sha(A/f)==h
+changed=subprocess.check_output(['git','diff','--name-only'],cwd=P,text=True).splitlines();assert set(changed)=={'memory.md','todo.md','STATUS.md','log.md'}
+save(R/'maindok-kontroll.json',dict(filer=changed,kun_dokumentasjon=True,grunnlag=b['remote']['main'],native=3694,hd_mod=pub['hd_mod'],beskyttede=1432,ingen_motor_eller_pipelineendring=True));shutil.copy2(__file__,R/'maindok.py.txt');print('Bare memory/status/todo/log oppdatert. Ingen grafikk i main.')
