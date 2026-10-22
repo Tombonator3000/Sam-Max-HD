@@ -1,0 +1,48 @@
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime,timezone
+from pathlib import Path
+from ci_jobber import linux_jobber
+import hashlib,json,subprocess,tomllib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam296-vendefaser-20261022';M=P/'mods/gpt'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def git(p,*a):return subprocess.check_output(['git',*a],cwd=p,text=True).strip()
+def api(p):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+p],cwd=P,text=True))
+def save(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+start=read(S/'start.json');expected=read(S/'publiserte-moddfiler-3701.json');paths=[p for p in M.rglob('*') if p.is_file()]
+with ThreadPoolExecutor(max_workers=8) as pool:actual=dict(pool.map(lambda p:(p.relative_to(M).as_posix(),sha(p)),paths))
+assert actual==expected and len(actual)==21945
+assert sum(n.endswith('.png') for n in actual)==21939
+assert sum(n.startswith('costumes/') and n.endswith('_hd.png') for n in actual)==read(M/'mod.json')['costume_cels']==3701
+assert set(start['filer'])<=set(actual)
+assert {n for n,h in start['filer'].items() if actual[n]!=h}=={'mod.json','SHA256SUMS'}
+assert all(actual[n]==h for n,h in start['filer'].items() if n.endswith('.png'))
+assert len(start['beskyttede'])==1448 and all(sha(A/n)==h for n,h in start['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==start['stash'] and len(start['stash'])==3
+assert len(list(A.glob('jobber/fig*/jobb.json')))==1758 and len(list(A.glob('jobber/fig*/resultat.png')))==507
+assert len(list((M/'costumes').glob('costume296_*_hd.png')))==6
+assert {int(p.name.split('_')[1]) for p in (M/'costumes').glob('costume296_*_hd.png')}=={1920,1921,1922,1940,1941,1942}
+for costume,ids in [(293,[1927]),(129,[641,642]),(124,[1804,1861,*range(1848,1855)])]:assert not any((M/f'costumes/costume{costume}_{n}_hd.png').exists() for n in ids)
+receipt=read(S/'mottak-publisert.json');pub=read(R/'publisert.json');assert receipt['hd_mod']==pub['hd_mod'] and pub['native']==3701 and pub['Latest_bekreftet'] and pub['taggbygg_success'] and not pub['native_frosset']
+assert not read(R/'bygg-startet.json')['native_frosset'] and receipt['i_fellespakke']
+for e in read(R/'assetkontroll.json'):
+ for p in [O/e['plattform']/e['fil'],O/'felles-nedlasting'/e['fil']]:assert p.stat().st_size==e['bytes'] and sha(p)==e['sha256']
+latest=api('releases/latest');assert latest['id']==pub['release_id']==421105749 and latest['tag_name']==pub['tag']
+for e in read(R/'assetkontroll.json'):
+ a=next(v for v in latest['assets'] if v['name']==e['fil']);assert a['size']==e['bytes'] and a['digest']=='sha256:'+e['sha256']
+assert api('git/ref/heads/hd-mod')['object']['sha']==pub['hd_mod']
+assert api('actions/runs/'+str(pub['windows_run']))['conclusion']=='success' and api('actions/runs/'+str(pub['taggbygg_id']))['conclusion']=='success'
+linux=linux_jobber(read(R/'bygg-startet.json'));save(R/'linux-jobber-sluttrevisjon.json',linux)
+code=git(P,'rev-parse','HEAD');main_runs=api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs'];run=next(v for v in main_runs if v['head_sha']==code)
+assert run['status']=='completed' and run['conclusion']=='success'
+save(R/'main-ci.json',run)
+assert set(git(P,'diff','--name-only',start['remote']['main'],'HEAD').splitlines())=={'memory.md','todo.md','STATUS.md','log.md'}
+assert not git(P,'status','--porcelain')
+allowed={str((R/n).relative_to(A)) for n in ['linux-jobber-sluttrevisjon.json','main-ci.json','sluttaudit.json','sluttrevisjon.py.txt']}
+dirty=set(git(A,'diff','--name-only').splitlines()) | set(git(A,'diff','--cached','--name-only').splitlines()) | set(git(A,'ls-files','--others','--exclude-standard').splitlines())
+assert dirty <= allowed, dirty-allowed
+heads={line.split()[1].split('/')[-1]:line.split()[0] for line in git(P,'ls-remote','origin','refs/heads/main','refs/heads/gpt-arbeid','refs/heads/hd-mod').splitlines()}
+assert heads['main']==code and heads['gpt-arbeid']==git(A,'rev-parse','HEAD') and heads['hd-mod']==pub['hd_mod']
+auto=tomllib.loads(Path('/home/tom/.codex/automations/fullf-r-sam-max-grafikken/automation.toml').read_text());assert auto['status']=='ACTIVE'
+value=dict(tid_utc=datetime.now(timezone.utc).isoformat(),hd_mod=pub['hd_mod'],native=3701,filhash_bekreftet=21945,png=21939,tidligere_filstier_bevart=21941,tidligere_png_hash_bevart=21935,beskyttede=1448,stasher=start['stash'],hele_figurjobber=507,total_figurjobber=1758,uten_resultat=1251,returer_og_sluttkontroll_i_tillegg=True,nye_native=4,nye_egne_tegninger=1,hele_RGBA_alias=3,familie296_native=6,familie296_maal=23,bildekall_denne_runden=6,kvalitetsreturer=5,Tom_godkjent=0,Claude_godkjent=0,ny_fellesrelease=pub['url'],begge_faktiske_nedlastinger_og_fellesvedlegg_SHA_bekreftet=True,runtime_moddfiler_per_pakke=21944,taggbygg=pub['taggbygg_id'],taggbygg_success=True,native_frosset=False,linux_run_samlet_status=linux['run']['status'],linux_run_samlet_conclusion=linux['run']['conclusion'],linux_faktiske_jobber_alle_completed_success=True,linux_metadataavvik_dokumentert=True,ingen_CI_status_endret=True,main=code,main_CI=run['id'],main_CI_success=True,gpt_for_auditcommit=heads['gpt-arbeid'],kun_egne_nye_auditfiler_i_grafikkarbeidstre=True,main_arbeidstre_rent=True,auditvakt_retting="Første vakt så sine egne nyopprettede kontrollfiler. Nå tillates bare de fire eksplisitte auditfilene;alle andre avvik stopper.",automation_status=auto['status'],gammel_nattkontroll_startet=False,alt_ferdig=False,neste_faktiske_bildekall='S030',S030_utfort=False,S030_forberedelse='rapporter/sam296-vendefaser-20261022/forberedelse-S030/notat.md')
+save(R/'sluttaudit.json',value);shutil.copy2(__file__,R/'sluttrevisjon.py.txt')
+print(json.dumps({k:value[k] for k in ['native','filhash_bekreftet','beskyttede','hele_figurjobber','uten_resultat','taggbygg_success','native_frosset','main_CI_success','automation_status','alt_ferdig']},ensure_ascii=False),flush=True)
