@@ -1,4 +1,4 @@
-Felles Linux-/Windows-samlepunkt med 3684 native HD-lag er kontrollert. Begge pakker er bygget og kontrollert. Felles publisering og ny nedlasting av fellesvedlegg er ennå ikke bekreftet.
+Felles Linux-/Windows-samlepunkt med 3684 native HD-lag er kontrollert. Publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryservindu. Fellesvedleggene er lastet ned på nytt og har samme SHA256. Nativefrys er fortsatt aktiv til taggbygget er kontrollert.
 
 Pakkene har 23 nye native fra fig293_03 siden forrige fellesutgave med 3661. Dette omfatter de 17 tidligere publiserte rutene fra sam293-fryser-20261022 og seks nye fra sam293-frost-20261022. Den siste grafikkbunken har fem nye tegninger og ett bekreftet helt RGBA-alias. Ingen tidligere publisert PNG er endret. 505 av 1758 hele figurjobber har resultat, 1253 er uten i tillegg til returer og sluttkontroll. fig293_03 er delvis 23/32, uten hel resultatfil. 1943..1948 og 1970..1972 gjenstår i arket. 293-familien har 43/55 native, med 11 produserbare mål igjen og det tidligere verktøyholdte 1927. De øvrige kjente returene holdes utenfor modden.
 
