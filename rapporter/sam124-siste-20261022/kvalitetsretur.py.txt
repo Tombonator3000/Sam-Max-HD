@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,sys,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+name,old,detail=sys.argv[1:4];C=R/'kall'/name;D=R/'kall'/old;assert not C.exists();C.mkdir();plan=read(D/'plan.json');row=plan['ruter'][0]
+for src,dest in [(D/'raa.png',C/'eget-helmaleri-foer-retur.png'),(D/'originalatlas.png',C/'originalatlas.png'),(D/'spillkontekst.png',C/'spillkontekst.png')]:shutil.copy2(src,dest)
+master=Image.new('RGBA',(1600,600),'#536576');md=ImageDraw.Draw(master)
+for i,n in enumerate(['sam','max']):
+ im=Image.open(A/'hovedark'/f'{n}.png').convert('RGBA');im.thumbnail((780,550));master.alpha_composite(im,(10+i*800,25));md.text((10+i*800,5),n+' godkjent komplett hovedark',fill='white')
+master.convert('RGB').save(C/'godkjente-mastere.png');refs=[C/'eget-helmaleri-foer-retur.png',C/'originalatlas.png',C/'godkjente-mastere.png',C/'spillkontekst.png']
+if old in ['C11','C12']:
+ ctx=R/'kall/C08/spillkontekst.png';shutil.copy2(ctx,C/'primaer-nabofase-bakfra.png');refs.append(C/'primaer-nabofase-bakfra.png')
+prompt=f'''Use case: precise-object-edit. One complete production animation cel for Sam & Max Hit the Road HD.
+Image1 is our earlier whole painting, the edit target only, not an identity or anatomy authority. Image2 is the full enlarged ORIGINAL source cel and controls exact pose, head size, outline, component count, colors and occlusions. Image3 contains the complete approved Sam and Max style masters. Image4 is actual original room25 context, not a pose template. In controlled source contexts the prominent front-facing Lee-Harvey belongs to a different overlapping actor: DO NOT copy that face or head turn. If Image5 is present it shows the natural neighboring rear-view phase to clarify that this human is viewed FROM THE BACK.
+Correct the whole painting as a unified cel based on Image2. {detail}
+This original source contains ZERO human pink skin pixels. The low brown rear quiff and dark collar occlude all skin in this phase. No visible human ears, face, neck ring or hands. Preserve source shoulder tilt, arm bends, negative spaces, boot stance and any black motion strokes. Gray shoulder yoke is source dark gray; clothes are nearly black/navy with source blue edging. No white glints or toe shine, no added cuff panels or garment features. Match original proportions and per-area colors. Clean dark outlines, flat colors with one shade, no texture, gradients, extra shadows, ground or scenery. Do not complete Max, who is entirely hidden in front of the human in this phase. No source shape mask, no reconstruction from separate parts. All changes are made to the entire painting together. Output one1024x1024 PNG on true transparent background with generous transparent margin. Exact full original source extent is{row['maal'][0]}x{row['maal'][1]} pixels, including any motion marks. Preserve the aspect and framing of Image2.'''
+args=dict(prompt=prompt,referenced_image_paths=[str(p) for p in refs],transparent_background=True);(C/'faktisk-prompt.txt').write_text(prompt+'\n');save(C/'faktiske-argumenter.json',args);save(C/'plan.json',dict(ruter=[row],retur_av=old,grunn=detail,kildereferanser={str(p):sha(p) for p in refs},mastertavlens_opphav={str(A/'hovedark'/f'{n}.png'):sha(A/'hovedark'/f'{n}.png') for n in ['sam','max']},kilde_og_mastere_sett_foer_kall=False,originalmaske=False,delrekonstruksjon=False))
+board=Image.new('RGB',(1600,1400),'#536576');dr=ImageDraw.Draw(board);dr.text((8,6),f'{name} retur av{old}: eget feilforsok / original / faktisk kontekst / komplette stilankere',fill='white')
+for i,f in enumerate(['eget-helmaleri-foer-retur.png','originalatlas.png']):
+ im=Image.open(C/f).convert('RGBA');im.thumbnail((780,650));bg=Image.new('RGBA',im.size,'#8397a7');bg.alpha_composite(im);board.paste(bg.convert('RGB'),(10+i*800,35))
+im=Image.open(C/'spillkontekst.png').convert('RGB');im.thumbnail((790,650));board.paste(im,(5,735));im=Image.open(C/'godkjente-mastere.png');im.thumbnail((790,650));board.paste(im,(805,735))
+if len(refs)==5:
+ im=Image.open(refs[4]);im.thumbnail((780,330));board.paste(im,(810,1040))
+board.save(C/'kontekst-og-mastere.png');save(D/'kvalitetsretur.json',dict(status='kvalitetsretur, ikke valgt',nytt_forsok=name,grunn=detail,originalmaske=False));shutil.copy2(__file__,R/'kvalitetsretur.py.txt');print(name,'klar,',len(refs),'referanser')

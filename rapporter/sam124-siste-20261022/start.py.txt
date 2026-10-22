@@ -1,0 +1,24 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/sam124-siste-20261022';R=A/'rapporter'/O.name;OLD=A/'rapporter/sam124-retur-20261022'
+assert not O.exists() and not R.exists();O.mkdir();R.mkdir();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+old=read(OLD/'start.json');pub=read(OLD/'mottak-publisert.json');assert pub['native']==3573
+for w in [P,A]:assert not subprocess.check_output(['git','status','--porcelain'],cwd=w,text=True).strip() if w==P else True
+files={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in (P/'mods/gpt').rglob('*') if p.is_file()};assert files==read(OLD/'publiserte-moddfiler-3573.json') and len(files)==21817;assert all(sha(A/f)==h for f,h in old['beskyttede'].items());stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==old['stash'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==502
+plan=read(OLD/'siste-tre-ruteplan.json');assert len(plan['ruter'])==31 and plan['ulike_hele']==25
+for e in plan['ruter']:
+ assert sha(Path(e['kilde']))==e['sha256'] and sha(Path(e['kontekst']))==e['kontekst_sha256']
+ assert not (A/'jobber'/e['jobb']/'resultat.png').exists()
+shutil.copy2(OLD/'siste-tre-ruteplan.json',R/'kildeplan.json');save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip(),gpt=subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip(),hd_mod=pub['hd_mod'],native=3573,filer=files,beskyttede=old['beskyttede'],stash=stash,figurark=502,nye_maal=31,ulike_hele=25,bibliotek='losninger/grafikk/figurark-fast-storrelse.md',bibliotek_kompatibilitet='PASS-metode kontrollert mot gjeldende ScummVM c9091321 og smhd.myk CORE128, IoU0.6, cover0.8. Samme format4x, RGBA og1536x1024.'))
+(R/'KILDEGRUNNLAG.md').write_text('''# Siste tre ark i kostyme124
+
+Originaler, fem hele kildeoversikter og faktiske kontekster er sett. Lee-Harvey bakfra i avslutningen av Max-håndteringen, rolige og rystende skulderfaser, deretter bøying ned og løft tilbake til stående mens Max blir liggende sammenvridd og kompakt på dekket. De hvite formene tilhører Max. Ikke gjør dem til tau, bandasje, sekk eller tilfeldig støv. Nøyaktig anatomisk overlapp følger originalen, og skjulte deler kompletteres ikke.1859 er en uttrykkelig hodeløs kropp; separat kostyme129 tegner snakkehodet i faktisk spillbilde.
+
+Rom25s faktiske lokale skript217 velger7 ved0B04,8 ved0BC3,9 ved0C1F,10 ved0C2A og11 ved0C81.1859s kropp bruker dette talelaget, ikke et nytt fravær av hode i handlingen. Sourcekontekst1844 til1846 kommer fra den tidligere dokumenterte hele8-prøven med konstruert aktør29. Ingen påstand om naturlig nådde sistefaser.28 andre mål har primærinngangskontekst.25 hele RGBA-kilder gir31 mål; aliaser krever både samme mål og samme hele RGBA-bytehash.
+
+Det lokale originalskriptets dialog og bildesekvens er primærgrunnlaget. Offisiell1993-hintbok, speilet på https://manuals.plus/m/0a77e7dd5fb4e9f94a7878a1ec529ab1a8f4322a2a1ed48585731beb4ad3af6c, bekrefter Lee-Harvey som Conroys livvakt og at slagsmålet ender med Max i tanken. Den fastslår ikke detaljen i den sammenvridde kroppen. Ingen tau- eller bandasjetolkning hentes fra boka; formen følger faktiske originale ruter. Det er vår synlige tolkning av overlappende Max-deler, ikke en ny rekvisitt eller et nytt design.
+
+Sam-bakgrunn ved føttene i senere faser skal avklares fra kildeindeks/objekt258 før maling. Rute1804 er en separat åpen retur fra forrige bunke og skal ikke dupliseres eller importeres. Behold alle tidligere hold. Ingen ny Tom-/Claude-godkjenning.
+''')
+shutil.copy2(__file__,R/'start.py.txt');print('Start3573,31 mål/25 varianter, beskyttede1412 og tre stasher OK.')

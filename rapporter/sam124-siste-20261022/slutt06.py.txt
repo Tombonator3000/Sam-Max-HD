@@ -1,0 +1,64 @@
+from pathlib import Path
+import json, hashlib, subprocess, shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+start=read(R/'start.json'); progress=read(R/'fremdrift.json'); m=read(R/'motor06-sammenligning.json'); v=read(R/'motor06-visuell-plan.json')
+assert m['alle16_observert'] and m['alle_originalaktorverdier_identiske']
+assert m['samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge'] and m['ingen_nye_eller_okte_bufferavvik']
+assert m['utenfor_nye_ruter_kildeendringer_cycle_og_endrede126_faser']==0
+assert (m['primaer_kontroller'],m['primaer_null'],m['kontrollert8_kontroller'],m['kontrollert8_null'])==(720,711,320,320)
+assert all(sha(A/f)==h for f,h in start['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==start['stash']
+for group in ['varianter','hele_motorbilder']:
+    for e in v[group]:assert sha(R/e['fil'])==e['sha256']; e['visuelt_sett']=True
+assert len(v['varianter'])==4 and len(v['hele_motorbilder'])==3
+assert sha(R/v['hele_skulderanimasjonen']['fil'])==v['hele_skulderanimasjonen']['sha256']
+v['hele_skulderanimasjonen']['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=16,hele_motorbilder_sett=3,alle12_skulderfaser_sett=True,
+    kommentar='Alle hele Lee-Harvey/Max-kildepar og motorvarianter er sett. Hår/krage, grå kildebekreftede mansjetter, små Max-deler, støvelplassering og svarte bevegelsesstreker fulgt. Egenkontroll, ingen Tom-/Claude-godkjenning.')
+save(R/'motor06-visuell-plan.json',v); m['visuelt_sett']=True; save(R/'motor06-sammenligning.json',m)
+rows=read(R/'motor06-pikselkontroll.json')
+for e in rows:e['visuelt_sett']=True
+save(R/'motor06-pikselkontroll.json',rows)
+for e in progress['leveranser']:
+    assert sha(A/e['resultat'])==e['sha256']
+    e.update(visuelt_kontrollert=True,visuelt_egenkontroll_godkjent=True,motorobservert=True,motorvisuelt_sett=True,
+        motorobserverte_ruter=16,native_valgt_for_publisering=16,publisert=False)
+    p=R/('rutekart-'+e['jobb']+'.json'); d=read(p)
+    for q in d[e['jobb']]['ruter']:
+        actual=next(z for z in rows if z['bilde']==q['bilde'])
+        q.update(motorobservert=True,visuelt_motor_sett=True,motorbevis=actual['kandidat_sha256'],kontrollert_testaktor29=actual['kontrollert_testaktor29'],publisering_valgt=True,publisert=False)
+    save(p,d)
+    with (A/'jobber'/e['jobb']/'notat.md').open('a') as f:
+        f.write('\nHele arket og alle 16 motorvarianter er nå visuelt sett. Primærprøven fullførte 720 bilder med 711 nullkontroller og de samme ni kjente bufferavvikene, bekreftet med koordinater og begge RGB-verdier i samme rekkefølge. Kontrollert hel animasjon 8 fullførte 320 av 320 nullkontroller i både grunnlag og kandidat. 13 mål vises i originalforløpet, tre tilleggsmål på testaktør 29. Ingen skjulte aktører eller stoppede romskript. Vannsykler og faktiske faseforskjeller i de uendrede alligatorene i kostyme 126 er dokumentert separat. Ingen endrede nativeporter. To eksterne SIGTERM-avbrudd er bevart; samme prøve fullførte med exit 0 i aktiv terminal. Modpublisering og faktisk pakkeinnhold kvitteres separat.\n')
+progress.update(native_valgt_for_publisering=16,native_holdt_i_denne_bunken=0,tidligere_retur1804_fortsatt_aapen=True,
+    motorobservert=16,visuelt_motor_sett=16,visuelt_egenkontrollert=True,publisert_native_naa=3573,kandidat_native=3589,
+    pakker_native=3535,pakker_mangler_etter_publisering=54,native_frosset=False)
+save(R/'fremdrift.json',progress)
+save(R/'sluttkontroll.json',dict(leveranser=progress['leveranser'],visuelt_sett=True,valgte_native=16,holdt_native=0,
+    tidligere_aapen_retur1804=True,motorobservert=16,hele_figurjobber_med_resultat=503,gjenstar=1255,
+    beskyttede_filer=1412,stasher=start['stash'],pakker_native=3535,pakker_mangler_etter_publisering=54,godkjent_av_Tom=False,claude_kontroll=False))
+(R/'RAPPORT.md').write_text('''# Lee-Harvey og Max, figurark 124 del 6
+
+16 nye native ruter, 1831 til 1846, er produsert og valgt for publisering. Ett nytt figurark gir 503 av 1758 ark med resultat. 1255 er fortsatt uten resultat, i tillegg til returer og sluttkontroll. Denne bunken fullfører ikke all grafikk. fig124_07 og fig124_08 gjenstår med 15 mål og 13 ulike hele kilder. Retur 1804 fra forrige bunke er fortsatt holdt utenfor native.
+
+18 vellykkede innebygde image_gen-kall ga 12 valgte hele malerier og fire hele kildealiaser. Seks kvalitetsreturer er bevart: C06, C07, C11, C12, C14 og C16. Feilene var ekstra menneskehud, støvelglans, for smal helfigur eller gjengitte pikseltrapper. Modellnavn ble ikke oppgitt. Ingen avvisning, kvotefeil eller CLI/API-bildefallback. Råbilder, faktiske prompter og argumenter, referansehash og kildeplan er bevart. Original, faktisk spillkontekst og godkjente hele Sam-/Max-hovedark er sett før hvert kall.
+
+Faktisk motiv er Lee-Harvey sett bakfra mens Max er skjult foran ham. Bare kildebekreftede ører, poter og arm stikker ut. Grå mansjetter i 1837/1843 er ekte kildedetaljer. 1839, 1840, 1845 og 1846 har ikke rosa menneskehud. Svarte bevegelsesstreker beholdes svarte. Jobbkortets misvisende navn er presisert separat; beskyttede jobbkort og originaler er uendret.
+
+Python renser egne kanter og egen RGB, og plasserer hver hel tegning i fast 4x med åtte HD-pikslers marg. For lys blå kant normaliseres mot kildepalettens indeks 198 i eget RGB, med bitidentisk alfa i fargesteget. Ingen harde originalformmasker, originalfragment-fallback eller sammensetting av kroppsdeler. Bibliotekskilden losninger/grafikk/figurark-fast-storrelse.md er brukt i samme ScummVM/Python-pipeline. Hele arket er 1536 x 1024 RGBA. Egenkontroll er OK, alle 16 av 16 ruter. Automatisk mottak er 16 OK, null SJEKK, manglende eller teknisk feil. CORE 128, IoU 0,6, dekning 0,8 og grensen for ulik helskalering er uendret.
+
+Motoren er den kontrollerte Linux-binæren med SHA256 03b21adba8a0cd63765542bd2a814e827bcfb28265b45567849c73fa1e071022, motorpin c9091321060acfc8f037767c18f8279a86305b7e. Primærforløpet starter fra original rominngang/lokal 217 uten tvunget lokalskript og viser 13 nye mål. Det fullførte 720 bilder med 711 nullkontroller. De samme ni tidligere kjente bufferavvikene har identiske koordinater og begge RGB-verdier i samme rekkefølge. Dette er ikke en avviksfri prøve. Referansen er den tidligere SHA-kvitterte 3573-prøven. To nye primærforsøk ble avbrutt med ytre SIGTERM og er bevart; presis avsender er ukjent. En aktiv PTY-terminal med løpende oppfølging fullførte uendrede motorinnstillinger med exit 0. Ingen stoppsignaler ble ignorert.
+
+Kontrollert hel animasjon 8 på konstruert testaktør 29 viser alle 12 skulderfaser, inkludert de tre ekstra målene 1844 til 1846. Grunnlag 3573 og kandidat 3589 ga begge 320 av 320 nullkontroller. Testfiguren står på 270,185 for å kunne sees samlet. Ingen andre aktører er skjult og ingen romskript stoppes. Dette er ikke naturlig gjennomspilling. Alle 16 hele motorvarianter, tre hele motorbilder og de 12 skulderfasene er visuelt sett.
+
+Kildens Lee-Harvey-verdier er identiske for samme cel, posisjon og mål. Hele originalflater har forskjellig vannfase. En første bildesammenligning stoppet også på små endringer i andre bevegelige kanter. Den er bevart i motor06-STOPPET-diagnose.json. Loggene viser faktisk endrede alligatorfaser i kostyme 126. Deres eksisterende idx-filer er identiske i grunnlag og kandidat. Motorens smoothCel bygger disse med nøyaktig én originalpiksel marg. Alle resterende forskjeller utenfor nye ruter ligger i dokumenterte kildeendringer, sykliske kildeområder eller disse faktiske faseendringene. Ingen kunst- eller avviksterskel er senket. Dette er avgrenset tilstandsklassifisering, ikke bevis på identisk helskjerm. Se motor06-sammenligning.json og pikselkontrollen.
+
+Kandidat 3589 bevarer alle 21817 tidligere filstier og 21811 tidligere PNG. Bare mod.json endres før publisering; SHA256SUMS bygges på nytt ved publisering. Alle 1412 beskyttede jobbfiler og tre eksisterende stasher er bevart. Native skal publiseres additivt fra eksakt fjern-SHA, med force-with-lease, og hentes tilbake med kontroll av samtlige filhash. Publiseringskvitteringen føres i mottak-publisert.json. Ingen ny grafikk eller motorendring går til main.
+
+Siste faktisk kontrollerte felles Linux-/Windows-release er sam-max-hd-2026-10-21-kjeglekant med 3535 native. Den mangler 54 etter denne planlagte publiseringen. Ingen ny pakke eller webutgave er erklært oppdatert. Neste pakkesamlepunkt er de siste to 124-arkene og åpne returer, eller tidligere ved en reell produksjonsblokkering. Full naturlig gjennomspilling, interaktiv Windows-kontroll og samlet sluttgodkjenning gjenstår. Ingen Tom-/Claude-godkjenning i denne bunken. Automatisk produksjon skal fortsette.
+''')
+(R/'NESTE.md').write_text('''Fortsett med fig124_07, så fig124_08. Ikke dupliser fig124_06, som er produsert, mottatt og motorobservert med 16 valgte native. Se mottak-publisert.json for faktisk publiseringsstatus og ny fjern-SHA før neste arbeid. 15 mål og 13 ulike hele kilder gjenstår i de to siste arkene. Les NESTE-KILDEFUNKSJON.md og siste15-underlag-indekser.json, og se hver original i faktisk spillkontekst med godkjente mastere før bildeproduksjon. 1847 til 1854 har ingen Sam-gjenmaling. I 1855 til 1861 er alle grå/brune underlagsbiter eksakt eksisterende Sam-jakke og sko, uten mørkere jakkekontakt. 1859 er hodeløs kropp med separat talende hodelag. Bevar fri ekte alfa over underlaget, ikke gjenta Sam som papirfliker. Ingen originalmaskeklipping eller nye skygger. Alle kontrollporter gjelder fortsatt. Tidligere retur 1804 er åpen. Les gjeldende mottak og returer før valg av jobb. Kjør langvarige motorprøver i aktiv terminal med løpende oppfølging; to tidligere pipeøkter fikk ytre SIGTERM, men samme prøve fullførte i PTY. Ingen nattprosesser fra 15. oktober skal startes. Fellespakker er fortsatt på 3535 native og må oppdateres og faktisk kontrolleres ved samlepunktet. Automatiseringen fortsetter.\n''')
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+print('Ett ark og 16 native klare for kontrollert publisering; ingen Tom-/Claude-godkjenning.',flush=True)

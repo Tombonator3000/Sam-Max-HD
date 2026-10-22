@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import hashlib, json, shutil
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+names=['C01','C02','C03','C04','C05','C18','C15','C08','C09','C10','C13','C17']
+overview=[]
+for n in range(2):
+    board=Image.new('RGB',(1500,1170),'#536576'); d=ImageDraw.Draw(board)
+    for j,name in enumerate(names[n*6:(n+1)*6]):
+        c=R/'kall'/name; plan=read(c/'plan.json'); rec=read(c/'prototypekontroll.json')[0]; e=plan['ruter'][0]
+        x=(j%2)*750; y=(j//2)*390
+        d.text((x+10,y+5),f'{name} {e["bilde"]}: original / eget HD, IoU {rec["snitt_union"]:.3f}, dekning {rec["dekning"]:.3f}',fill='white')
+        src=Image.open(e['kilde']).convert('RGBA'); src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST)
+        own=Image.open(A/rec['prototype']).convert('RGBA')
+        board.paste(src,(x+20,y+40),src); board.paste(own,(x+380,y+32),own)
+    f=R/f'helpar-{n+1}.png'; board.save(f)
+    overview.append(dict(fil=f.name,sha256=sha(f),kall=names[n*6:(n+1)*6],visuelt_sett=False))
+(R/'helpar-oversikt.json').write_text(json.dumps(overview,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/(Path(__file__).name+'.txt'))

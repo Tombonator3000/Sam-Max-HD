@@ -1,5 +1,15 @@
 # Grafikkliste
 
+<!-- sam124-06-status:start -->
+22. oktober 2026: fig124_06 er produsert og kontrollert, med 16 nye Lee-Harvey/Max-ruter fra 12 hele malerier. 503 av 1758 figurark har resultat, 1255 uten resultat pluss returer og sluttkontroll. Native-kandidat er 3589, mens publisert mod ennå er 3573. Alle 16 er teknisk mottatt, motorobservert og visuelt sett. Ingen Tom-/Claude-godkjenning. Publiseringskvittering kommer i rapporter/sam124-siste-20261022/mottak-publisert.json.
+
+Neste er fig124_07 og fig124_08, 15 mål og 13 ulike hele kilder. Kildens grå/brune underlagsbiter i 1855 til 1861 er eksakt gjenmaling av Sams jakke og sko, uten mørkere kontakt. 1859 er hodeløs kropp med separat hodelag. Se rapportens NESTE.md og NESTE-KILDEFUNKSJON.md. Rute 1804 fra forrige bunke er fortsatt holdt. Gamle nattprosesser startes ikke; automatisk produksjon fortsetter.
+
+Felles Linux-/Windows-utgave har fortsatt 3535 native, og vil mangle 54 etter planlagt publisering av denne bunken. Neste pakkesamlepunkt er de siste to 124-arkene og åpne returer, eller tidligere ved reell produksjonsblokkering. Ikke kall pakker eller web oppdatert før faktisk innhold er kontrollert.
+<!-- sam124-06-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 Sju nye Lee-Harvey/Max-ruter1797 til1803 er publisert og hentet tilbake i hd-mod 3987eb60e13514e28b53bb965785e0236a78bddb,3573 native totalt. To eksisterende ark er rettet, ingen nye ark i denne returen.502 av1758 figurark har resultat,1256 er uten resultat pluss åpne returer og sluttkontroll. Rute1804 er nytegnet, men stoppet med FEIL i arkkontrollen fordi Sams originale bakgrunnsgjenmaling regnes som Lee-Harveys bredde. Den er holdt utenfor native. Sju andre er teknisk mottatt, motorobservert og visuelt sett. Ingen Tom-/Claude-godkjenning eller visuell sluttgodkjenning.
 
 Neste uavhengige produksjon er fig124_06 til08,31 mål fra25 hele RGBA-kilder. Alle kilder har nå gyldig kontekst.1844 til1846 ble sett i hele originalanimasjon8 med uttrykkelig konstruert testaktør29,12 av12 ruter og320 av320 null; dette er kildekontroll, ikke naturlig primærsekvens. Ruteplan og ennå usette kildeoversikter er bevart, produksjon ikke startet.1804 krever kildetro retting som består arkkontrollen eller en avgrenset testet pipeline-PR, uten terskelsenkning eller oppdiktet bakgrunn. Fortsett øvrige mål uavhengig.
@@ -902,7 +912,7 @@ Figurark for Sam og Max, Max, Sam.
 - [x] `fig124_03` (figurark 3 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
 - [x] `fig124_04` (figurark 4 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
 - [x] `fig124_05` (figurark 5 for Max (kostyme 124), 8 ruter: animasjon 7 mot høyre (8 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig124_06` (figurark 6 for Max (kostyme 124), 16 ruter: animasjon 7 mot høyre (4 ruter); animasjon 8 mot høyre (12 ruter), bilde to `hovedark/max.png`)
+- [x] `fig124_06` (figurark 6 for Max (kostyme 124), 16 ruter: animasjon 7 mot høyre (4 ruter); animasjon 8 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_07` (figurark 7 for Max (kostyme 124), 12 ruter: animasjon 9 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_08` (figurark 8 for Max (kostyme 124), 3 ruter: animasjon 10 mot høyre (1 rute); animasjon 11 mot høyre (2 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig291_01` (figurark 1 for Sam (kostyme 291), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)

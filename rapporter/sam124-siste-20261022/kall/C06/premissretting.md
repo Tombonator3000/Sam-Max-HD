@@ -1,0 +1,1 @@
+Beskyttet jobbkort har feil Sam-/rom28-premiss. Faktisk original, rom25-inngang og skript217 viser Lee-Harvey med Max. Se sam124-kilde-20261021/PRESISERING.md. Bakgrunnsgjenmaling behandles etter faktisk kildefunksjon; ingen tidligere feilfigur brukes som stilanker. Alle beskyttede filer er uendret.
