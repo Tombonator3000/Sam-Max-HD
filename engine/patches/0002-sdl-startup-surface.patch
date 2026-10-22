@@ -1,0 +1,15 @@
+diff --git a/backends/graphics/surfacesdl/surfacesdl-graphics.cpp b/backends/graphics/surfacesdl/surfacesdl-graphics.cpp
+index ad7bc1a8..e1680e11 100644
+--- a/backends/graphics/surfacesdl/surfacesdl-graphics.cpp
++++ b/backends/graphics/surfacesdl/surfacesdl-graphics.cpp
+@@ -1204,6 +1204,10 @@ void SurfaceSdlGraphicsManager::updateScreen(SDL_Rect *dirtyRectList, int actual
+ }
+ 
+ void SurfaceSdlGraphicsManager::internUpdateScreen() {
++	// Graphics settings may be applied before the first video surfaces exist.
++	if (!_videoMode.setup)
++		return;
++
+ 	SDL_Surface *srcSurf, *origSurf;
+ 	int height, width;
+ 	int scale1;
