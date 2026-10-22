@@ -1,0 +1,66 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;N=A/'rapporter/sam129-kilde-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+q=read(R/'mottak-publisert.json');s=read(R/'start.json');nativefiles=read(R/'publiserte-moddfiler-3604.json')
+assert q['native']==3604 and q['nye_native']==8 and q['alle_filhash_bekreftet']
+assert all(sha(P/'mods/gpt'/f)==h for f,h in nativefiles.items())and all(sha(A/f)==h for f,h in s['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==s['stash']
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+status=f'''Åtte nye Lee-Harvey-snakkehoder, costume129_406 til 413, er tegnet med innebygd image_gen, egenkontrollert, teknisk mottatt, motorobservert, visuelt sett og publisert. Native er {q['hd_mod']}, 3604 HD-bildelag totalt. Grafikkilden er {q['grafikkilde']} på gpt-arbeid. Alle 21848 publiserte filhash er bekreftet etter henting; samtlige 21840 tidligere stier og 21834 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+fig129_01 er delvis med åtte hoder og 16 tomme mål. Ingen ny hel figurjobb telles levert: 504 av 1758 har resultat, 1254 er uten pluss returer og sluttkontroll. To små automatisk foreslåtte originalfragmenter er eksplisitt utelatt fra native og levering. Ingen mottaksporter, motor- eller pipelinekode er endret.
+
+Faktisk nedlastet Linux-binær 2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 viser alle åtte fra original rominngang/lokal217 uten testaktør eller tvunget skript. Normal avslutning 0, 711 av 720 nullkontroller, med de samme ni kjente bufferavvikene, identiske koordinater og begge RGB-verdier. Alle åtte sammenlignede originalaktørverdier er identiske ved samme torsofase. Fire hele originalflater er SHA-like; øvrige forskjeller ligger bare i dokumenterte kildetilstander og kildefargesykling. Åtte hele motorvarianter, fire hele motorbilder og delarket er sett. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest; prøven er ikke avviksfri.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 og mangler de åtte nye. Nativefrys er frigitt, ingen nye pakkebygg startet. Neste samlepunkt er resten av 129-familien eller reell produksjonsblokkering. Neste bunke er de ni sidehodene 414 til 420, 404 og 405. Familien har 39 mål igjen etter denne leveransen; åtte av disse mangler fortsatt spillkontekst. 1804 og 1861 står i retur, og tidligere verktøyavviste motiver omprøves ikke. 1861 er undersøkt avgrenset uten bekreftet motorårsak eller ny retting.
+
+Bevis: rapporter/{R.name}/mottak-publisert.json, motor-sammenligning.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.'''
+save(R/'dokumentasjonsgrunnlag.json',dict(tid_norsk=stamp,native=q['hd_mod'],grafikkilde=q['grafikkilde'],status=status,bare_dokumentasjon_i_main=True))
+(R/'NESTE.md').write_text('''# Neste produksjon
+
+Denne bunken er ferdig publisert og hentet tilbake: åtte hele nye hoder406 til413, native3604. Ikke gjenta disse bildekallene eller publiseringen. Kvittering:mottak-publisert.json. fig129_01 er fortsatt et delark; resultat.png i jobbmappen finnes ikke, og arket er ikke telt helt levert.
+
+Gjenoppta samme 129-familie med neste ni sidehoder: costume129_414 til420, costume129_404 og costume129_405. Alle har tidligere naturlig kontekst i kildeplanen. Se hver hel kilde, faktisk spillkontekst og hele godkjente Sam-/Max-mastere før hvert nytt motiv. Les jobbkilder og beskyttede SHA-er på nytt. Ikke gjenbruk én munnfase til en annen, ikke klipp hodet fra en annen hel figur. Bruk innebygd image_gen, egen alfa og hel plassering i fast4x. Tom-/Claude-godkjenning er fortsatt separat.
+
+Deretter gjenstår blant annet de naturlig eller kontrollert kildebekreftede kropps-/startfasene og frontanimasjonen i fig129_02. Familien har39 mål igjen, hvorav åtte ennå mangler spillkontekst. Følgende er ikke klare for maling før konteksten er avklart:130,640,422,642,153,154,512,768. De små delene skal nytegnes etter kilden, ikke telles levert fra automatisk originalfragmentfallback. Kildeplan:rapporter/sam129-kilde-20261022/kildeplan.json.
+
+1861 og1804 er fortsatt holdt. Avgrenset1861-leseundersøkelse har ikke bekreftet rotårsaken. Ingen alfaendring for å skjule en motorfeil; eventuell motor-/pipelineendring via testet PR.1848 og tidligere andre verktøyavviste motiver og hele identiske aliaser omprøves ikke. Seks øvrige uferdige124_07-faser er ikke individuelt verktøyavvist.
+
+Siste felles Linux-/Windows-pakke har3596 og mangler åtte nye. Ikke kall den oppdatert til3604. Neste pakkesamlepunkt er resten av129-familien eller reell blokkering. Frys native under bygg og kontroller faktiske nedlastinger, sjekksummer, alle inkluderte filer og relevant motorvisning. Ikke start duplikate bygg. Gamle nattprosesser og gammel nattkontroll gjenstartes ikke.
+
+Publiseringsgrunnlag ved avslutning er mottak-publisert.json og publiserte-moddfiler-3604.json. Bevar alle21848 filer,21842 PNG,1420 beskyttede jobb-inndata og tre stasher.504 av1758 hele figurjobber har resultat,1254 uten pluss returer og sluttkontroll. Automatikken er fortsatt aktiv. Ikke pause som om alt var ferdig.
+''')
+for f in [R/'NESTE.md']:
+    t=f.read_text()
+    for old,new in [('hoder406 til413','hoder 406 til 413'),('native3604','native 3604'),('Kvittering:mottak','Kvittering: mottak'),('til420','til 420'),('fast4x','fast 4x'),('har39','har 39'),('kildeplan:rapporter','kildeplan: rapporter'),('Kildeplan:rapporter','Kildeplan: rapporter'),('1861 og1804','1861 og 1804'),('Avgrenset1861','Avgrenset 1861'),('PR.1848','PR. 1848'),('uferdige124','uferdige 124'),('har3596','har 3596'),('til3604','til 3604'),('av129','av 129'),('alle21848','alle 21848'),('filer,21842','filer, 21842'),('PNG,1420','PNG, 1420'),('stasher.504 av1758','stasher. 504 av 1758'),('resultat,1254','resultat, 1254')]:t=t.replace(old,new)
+    f.write_text(t)
+plan=read(N/'kildeplan.json');plan.update(bildekall=8,resultatark=0,nye_native=8,publisert_hd_mod=q['hd_mod'],publisert_grafikkilde=q['grafikkilde'],levert_og_publisert=[f'costume129_{n}'for n in range(406,414)],gjenstar_maal=39,siste_produksjonsrapport='rapporter/'+R.name)
+for row in plan['ruter']:
+    if row['bilde']in plan['levert_og_publisert']:row.update(laget=True,egenkontrollert=True,native_mottatt=True,motorobservert=True,publisert=True,visuelt_sett=True,Tom_godkjent=False,Claude_godkjent=False)
+save(N/'kildeplan.json',plan)
+text=(N/'KILDEGRUNNLAG.md').read_text();first,rest=text.split('\n',1);(N/'KILDEGRUNNLAG.md').write_text(first+'\n\nSiste produksjon: åtte hoder406 til413 er publisert og motorprøvd i3604, se rapporter/'+R.name+'/mottak-publisert.json.39 mål gjenstår, hvorav åtte fortsatt mangler kontekst. Kildebeskrivelsen nedenfor er historisk forberedelse, ikke gjeldende leveringstall.\n'+rest)
+for f in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/f;text=p.read_text();first,rest=text.split('\n',1);p.write_text(first+'\n\n<!-- sam129-hoder1-status:start -->\nCodex-status '+stamp+'\n\n'+status+'\n<!-- sam129-hoder1-status:slutt -->\n\nTidligere status nedenfor er historikk.\n'+rest)
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip()==s['main']and not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True).strip()
+for f in ['memory.md','STATUS.md']:
+    p=P/f;text=p.read_text();first,rest=text.split('\n',1);p.write_text(first+'\n\n## Gjeldende grafikkstatus, '+stamp+'\n\n'+status+'\n\nTidligere status nedenfor er historikk.\n'+rest)
+p=P/'todo.md';text=p.read_text();first,rest=text.split('\n',1);start=rest.index('## Neste');end=rest.index('Tidligere status nedenfor er historikk.',start)
+nexttext='''## Neste
+
+- [x] Publiser og kontroller åtte nye Lee-Harvey-hoder406 til413, native3604, uten originalfragmentfallback.
+- [ ] Gjenoppta fig129_01 med neste ni sidehoder414 til420,404 og405. Se original/kontekst/mastere før hvert motiv.
+- [ ] Avklar spillkontekst for de åtte resterende uobserverte129-målene før deres maling.
+- [ ] Følg opp1861/uttoning og1804/kildefunksjon avgrenset. Bevar tidligere verktøyavslag uten retry.
+- [ ] Oppdater felles Linux-/Windows ved129-samlepunkt eller reell blokkering. Pakken har3596, native3604.
+- [ ] Fullfør øvrige1254 figurark, returer og samlet visuell sluttkontroll, med separat Tom-/Claude-godkjenning.
+
+'''
+for old,new in [('hoder406 til413','hoder 406 til 413'),('native3604','native 3604'),('sidehoder414 til420,404 og405','sidehoder 414 til 420, 404 og 405'),('uobserverte129','uobserverte 129'),('opp1861','opp 1861'),('og1804','og 1804'),('ved129','ved 129'),('har3596','har 3596'),('øvrige1254','øvrige 1254')]:nexttext=nexttext.replace(old,new)
+rest=rest[:start]+nexttext+rest[end:];p.write_text(first+'\n\n## Gjeldende grafikkstatus, '+stamp+'\n\n'+status+'\n'+rest)
+with (P/'log.md').open('a')as f:f.write('\n## '+stamp+' (Codex)\n\n'+status+'\n\nBare memory.md, todo.md, STATUS.md og log.md endres i main. Ingen ny motor-, pipeline- eller webkode.\n')
+for f in ['memory.md','todo.md','STATUS.md','log.md']:
+    assert (P/f).exists()
+shutil.copy2(__file__,R/'kvitter.py.txt');print(stamp,'status og neste ni mål skrevet, bare fire main-dokumenter.',flush=True)

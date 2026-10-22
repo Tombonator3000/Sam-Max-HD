@@ -1,5 +1,7 @@
 # Kostyme129, kildeklargjøring
 
+Siste produksjon: åtte hoder 406 til 413 er publisert og motorprøvd i 3604, se rapporter/sam129-hoder1-20261022/mottak-publisert.json. 39 mål gjenstår, hvorav åtte fortsatt mangler kontekst. Kildebeskrivelsen nedenfor er historisk forberedelse, ikke gjeldende leveringstall.
+
 Dette er Lee-Harvey, samme menneske som i124, ikke Sam, Max eller Conroy. De to hele originalarkene er visuelt sett22. oktober. Her finnes hele kropper/torsoer, separate hoder, munn-/blikkfaser og små kildebekreftede deler. Kropp129 kan ikke lages ved å klippe vekk Max fra124. Bare hele dimensjons- og byteidentiske RGBA-kilder kan dele et eget helt maleri.
 
 47 mål er inventert, med originalfilhash, full RGBA-hash og eksakte hele aliaser. Noen snakkehoder er naturlig sett i original rom25-inngang/lokal217 sammen med torso124_1859. Øvrige mål mangler fortsatt spillkontekst. Les kildeplan.json. Ingen bildekall, resultater eller native er laget. Ikke erklær kildegrunnlaget ferdig før alle nødvendige kontekster/funksjoner er avklart og sett.
