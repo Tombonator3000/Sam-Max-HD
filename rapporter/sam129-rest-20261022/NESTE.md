@@ -1,7 +1,7 @@
-# Neste arbeid
+# Neste produksjon
 
-Publisert hd-mod d4b182a532ae139f4bb663cc835fabdffcc8cab6, grafikkilde 5c45ab4ff61ae951c265f681fc8225239626a558, alle21885 filhash bekreftet etter henting.
+Fellespakker med 3641 HD-lag er faktisk hentet, innholdskontrollert, publisert og Latest. Windows-taggbygget er grønt, og nativefrysen er opphevet. Ikke gjenta byggene.
 
-129-familien har45/47. Kun641/642 holdes og omprøves ikke. Delark01 er23/24 og02 er22/23, ingen av dem leveres som helt resultatark. Neste samlepunkt er NÅ: begge pakker med3641, faktisk nedlasting, SHA og hver inkludert grafikkfil kontrollert. Hold native frosset under bygg og etterfølgende taggbygg. Se egen felles-release-20261022-lee-harvey-rapport for pakkeutfall.
+Neste uavhengige produksjon er fig293_01, deretter fig293_02 og fig293_03 fra Bestilling 70/71, før fig245_01. Ingen av disse har resultat, native, råbildebunke eller tidligere rapport med kildeklargjøring ved denne kontrollen. Kostyme 293 har 55 mål i tre jobber og brukes i kjøkkenet, rom 56. Bekreft originalens motiv, funksjon, palett, lag og gyldige animasjoner i faktisk spillkontekst før hvert motiv. Tidligere returer, blant annet 124_1804 og 124_1861, står fortsatt åpne. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter. All grafikk er ikke ferdig.
 
-Deretter fortsett neste uavhengige figurjobb i gjeldende rekkefølge etter kildekontroll.504 av1758 hele figurjobber har resultat. Se returer før valg; ikke dupliser eldre råbildebunke.124_1804/1861 og øvrige hold beholdes. Ingen samlet sluttgodkjenning, full naturlig gjennomspilling, ny Windows-interaksjon, webtest eller Tom-/Claude-godkjenning. Grafikkautomatikken fortsetter uten gammel nattfrist.
+Bevis for produksjon: rapporter/sam129-rest-20261022/RAPPORT.md, mottak-publisert.json, motor-bufferkontroll.json og SHA-festet rutekart/fremdrift. Pakkebevis: rapporter/felles-release-20261022-lee-harvey/publisert.json, moddfiler-kontroll.json, linux-kontroll.json og utgivelse-notat.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Ingen motor-/pipelineendring. Bare fire dokumenter endres i main.

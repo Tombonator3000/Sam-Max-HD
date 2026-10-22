@@ -41,3 +41,9 @@ Kandidaten har3641 native,21885 filer og21879 PNG. Alle21877 tidligere stier og2
 Pakkesamlepunktet er nå. Før oppdatering har felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf3596 og mangler45 native. Bygg med nativefrys, last ned begge faktiske pakker, sjekk sjekksummer og hver grafikkfil, og test faktisk Linux-binær før ny fellesrelease kalles oppdatert. Egen pakkerapport følger. Tidligere124_1804/1861 og øvrige returer står åpne. Gamle nattprosesser startes ikke; grafikkautomatikken fortsetter.
 
 Bibliotek: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Kontrollert mot samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e, faktisk mottak og motor her. Bare dokumentasjon endres i main.
+
+
+<!-- felles-lee-harvey-20261022 -->
+## Publisering og pakkekvittering, 2026-10-22 08:36
+
+Publisering og henting er fullført. Native d4b182a532ae139f4bb663cc835fabdffcc8cab6 har 3641 HD-lag. Delarket har fortsatt 22 av 23, og 642 holdes. Begge faktiske Linux-/Windows-pakker er kontrollert og publisert sammen: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-lee-harvey. Alle 21884 runtime-modfiler per pakke stemmer. Taggbygget er grønt, og nativefrysen er opphevet. Ingen ny Tom-/Claude-godkjenning. Se rapporter/felles-release-20261022-lee-harvey/RAPPORT.md. Eldre kandidat-/ventestatus over er historikk.

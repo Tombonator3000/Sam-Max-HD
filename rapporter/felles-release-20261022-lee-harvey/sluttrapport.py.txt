@@ -24,8 +24,8 @@ Neste uavhengige produksjon er fig293_01, deretter fig293_02 og fig293_03 fra Be
 Bevis for produksjon: rapporter/sam129-rest-20261022/RAPPORT.md, mottak-publisert.json, motor-bufferkontroll.json og SHA-festet rutekart/fremdrift. Pakkebevis: rapporter/{R.name}/publisert.json, moddfiler-kontroll.json, linux-kontroll.json og utgivelse-notat.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Ingen motor-/pipelineendring. Bare fire dokumenter endres i main.
 '''
 
-(R/'RAPPORT.md').write_text('# Felles Linux og Windows med3641 native\n\n'+body)
-nexttext='# Neste produksjon\n\nFellespakker3641 er faktisk hentet,innholdskontrollert,publisert og Latest. Windows-taggbygget er grønt,nativefrys opphevet. Ikke gjenta byggene.\n\n'+'Neste uavhengige produksjon er'+body.split('Neste uavhengige produksjon er',1)[1].split('\n\nBevis:',1)[0]
+(R/'RAPPORT.md').write_text('# Felles Linux og Windows med 3641 HD-lag\n\n'+body)
+nexttext='# Neste produksjon\n\nFellespakker med 3641 HD-lag er faktisk hentet, innholdskontrollert, publisert og Latest. Windows-taggbygget er grønt, og nativefrysen er opphevet. Ikke gjenta byggene.\n\n'+'Neste uavhengige produksjon er'+body.split('Neste uavhengige produksjon er',1)[1].split('\n\nBevis:',1)[0]
 (R/'NESTE.md').write_text(nexttext);(S/'NESTE.md').write_text(nexttext)
 for name in ['sam129-hoder1-20261022','sam129-hoder2-20261022','sam129-ark01-slutt-20261022','sam129-front1-20261022','sam129-front2-20261022','sam129-rest-20261022']:
  folder=A/'rapporter'/name;f=folder/'mottak-publisert.json';d=read(f);d.update(i_fellespakke=True,felles_url=r['url'],pakker_native=3641,pakker_mangler_native=0,native_frosset=False,pakker_status='begge_faktiske_nedlastinger_og_innhold_kontrollert_taggbygg_success');save(f,d)
@@ -33,17 +33,23 @@ for name in ['sam129-hoder1-20261022','sam129-hoder2-20261022','sam129-ark01-slu
   f=folder/'fremdrift.json';d=read(f);d.update(i_fellespakke=True,felles_url=r['url'],pakker_native=3641,native_frosset=False)
   for e in d.get('delvise_leveranser',[]):e.update(i_fellespakke=True,felles_url=r['url'])
   save(f,d)
+note=A/'jobber/fig129_02/notat.md';note_marker='<!-- felles-lee-harvey-20261022 -->'
+if note_marker not in note.read_text():
+ oldnote=note.read_bytes();shutil.copy2(note,R/'jobbnotat-foer-pakkekvittering.md')
+ with note.open('a')as f:f.write('\n\n'+note_marker+'\n## Publisering og pakkekvittering, '+now+'\n\nPublisering og henting er fullført. Native '+r['hd_mod']+' har 3641 HD-lag. Delarket har fortsatt 22 av 23, og 642 holdes. Begge faktiske Linux-/Windows-pakker er kontrollert og publisert sammen: '+r['url']+'. Alle 21884 runtime-modfiler per pakke stemmer. Taggbygget er grønt, og nativefrysen er opphevet. Ingen ny Tom-/Claude-godkjenning. Se rapporter/'+R.name+'/RAPPORT.md. Eldre kandidat-/ventestatus over er historikk.\n')
+ assert note.read_bytes().startswith(oldnote)
+ save(R/'jobbnotat-pakkekvittering.json',dict(tidligere_sha256=hashlib.sha256(oldnote).hexdigest(),ny_sha256=sha(note),kun_tillegg=True,gammelt_notat_uavkortet_bevart=True))
 for name in ['ORDRE.md','GRAFIKKLISTE.md']:
  p=A/name;title,rest=p.read_text().split('\n',1);marker='<!-- felles-lee-harvey-status:start -->';assert marker not in rest;p.write_text(title+'\n\n'+marker+'\n'+body+'<!-- felles-lee-harvey-status:slutt -->\n\nTidligere status nedenfor er historikk.\n'+rest)
 assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True).strip()
 for name in ['memory.md','STATUS.md','todo.md']:
  p=P/name;title,rest=p.read_text().split('\n',1);extra='''\n## Neste
 
-- [x] Lag,kontroller og publiser siste8produserbare129-lag,3641native.
-- [x] Felles Linux/Windows3641,last ned begge,kontroller alle filer,test faktisk Linux,publiser Latest og vent på grønt taggbygg.
-- [ ] Kildeklargjør fig293_01,02/03 i rom56,før faktisk produksjon. Ingen påbegynt293-bildebunke å duplisere.
-- [ ] Behold641/642,124_1804/1861 og øvrige hold/returer. Ingen omprøving eller originalfragmentimport.
-- [ ] Fortsett øvrige produserbare jobber og samlet sluttkontroll.504/1758 hele resultatark,egenkontroll/native er ikke Tom-/Claude-godkjenning.
+- [x] Lag, kontroller og publiser de siste åtte produserbare 129-lagene, 3641 native.
+- [x] Felles Linux/Windows med 3641 HD-lag: hent begge, kontroller alle filer, test faktisk Linux, publiser Latest og vent på grønt taggbygg.
+- [ ] Kildeklargjør fig293_01, 02 og 03 i rom 56 før faktisk produksjon. Ingen påbegynt 293-bildebunke å duplisere.
+- [ ] Behold 641/642, 124_1804/1861 og øvrige hold/returer. Ingen omprøving eller originalfragmentimport.
+- [ ] Fortsett øvrige produserbare jobber og samlet sluttkontroll.504 av 1758 hele resultatark. Egenkontroll/native er ikke Tom-/Claude-godkjenning.
 '''if name=='todo.md'else'';p.write_text(title+'\n\n## Gjeldende grafikkstatus,'+now+'\n\n'+body+extra+'\nTidligere status nedenfor er historikk.\n'+rest)
 with(P/'log.md').open('a')as f:f.write('\n\n## '+now+' (Codex)\n\n'+body)
 (R/'status-blokk.md').write_text(body);save(R/'sluttdokumentasjon.json',dict(tid_norsk=now,beskyttede=1420,stasher=b['stash'],hele_jobber=504,native=3641,pakker_native=3641,main_dokumenter=['memory.md','todo.md','STATUS.md','log.md'],neste_jobber=['fig293_01','fig293_02','fig293_03'],ingen_293_bildebunke_fra_for=True));shutil.copy2(__file__,R/'sluttrapport.py.txt');print('Rapporter,kildemottak,ordre og fire main-dokumenter oppdatert etter faktisk fellesrelease.')
