@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np
+import sys,json,hashlib,shutil,math,datetime
+O=Path(__file__).resolve().parent;K=O/'kall'/sys.argv[1];p=Path(sys.argv[2]);assert not(K/'raa.png').exists();shutil.copy2(p,K/'raa.png');im=Image.open(p).convert('RGBA');a=np.array(im);maximum=int(a[:,:,3].max());a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/maximum).astype('uint8');lab,num=nd.label(a[:,:,3]>=128);sizes=np.bincount(lab.ravel());sizes[0]=0;body=lab==np.argmax(sizes);yy,xx=np.where(body);x0,y0,x1,y1=int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1);a[:,:,3][~nd.binary_dilation(body,iterations=3)]=0;own=Image.fromarray(a);pad=4;crop=own.crop((x0-pad,y0-pad,x1+pad,y1+pad));sx,sy=336/(x1-x0),332/(y1-y0);mean=(sx+sy)/2;affine_ok=.88<=sx/mean<=1.12 and .88<=sy/mean<=1.12
+patch=crop.resize((round(crop.width*sx),round(crop.height*sy)),Image.Resampling.LANCZOS);proto=Image.new('RGBA',(352,348));proto.alpha_composite(patch,(8-round(pad*sx),8-round(pad*sy)));proto.save(K/'prototype-under-kontroll.png');src=np.array(Image.open(O/'original1926-1x.png').convert('RGBA'));src[:,:,3]=np.where(np.all(src[:,:,:3]==[255,0,255],2),0,255);ref=Image.new('RGBA',(352,348));ref.alpha_composite(Image.fromarray(src).resize((336,332),Image.Resampling.NEAREST),(8,8));ref.save(K/'original-native-kontroll.png');c=np.array(proto)[:,:,3]>=128;b=np.array(ref)[:,:,3]>=128;iou=float((b&c).sum()/(b|c).sum());coverage=float((b&c).sum()/b.sum());parts={}
+for name,v in [('original',ref),('kandidat',proto)]:
+ z=np.array(v);mask=np.all(z[:,:,:3]<65,2)&(z[:,:,3]>128);roi=np.zeros_like(mask);roi[52:114,72:148]=True;labels,n=nd.label(mask&roi);groups=[]
+ for i in range(1,n+1):
+  y,x=np.where(labels==i)
+  if len(x)>=12:groups.append(dict(piksler=len(x),midt=[float(x.mean()),float(y.mean())],bbox=[int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)]))
+ parts[name]=sorted(groups,key=lambda q:-q['piksler'])
+u=parts['original'][0]['midt'];v=parts['kandidat'][0]['midt']if parts['kandidat']else None;dist=math.dist(u,v)if v else None;board=Image.new('RGB',(1450,740),'#304050');draw=ImageDraw.Draw(board)
+for i,(v,label)in enumerate([(ref,'Original 4x (kun kontroll)'),(proto,sys.argv[1]+' egen alfa, under kontroll')]):
+ bg=Image.new('RGBA',v.size,'#87959e');bg.alpha_composite(v);board.paste(bg.convert('RGB').resize((704,696),Image.Resampling.NEAREST),(10+i*720,30));draw.text((10+i*720,8),label,fill='white')
+board.save(K/'sammenligning.png');passed=affine_ok and iou>=.6 and coverage>=.8 and dist is not None and dist<=3;j=dict(kall=sys.argv[1],tool='innebygd image_gen',raw_path=str(p),raw_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),raw_maal=list(im.size),raw_alfa_maks=maximum,egen_core_bbox=[x0,y0,x1,y1],skala=[sx,sy],hel_affin_port=affine_ok,native_maal=list(proto.size),native_sha256=hashlib.sha256((K/'prototype-under-kontroll.png').read_bytes()).hexdigest(),IoU=iou,dekning=coverage,briller_kontroll=parts,briller_avvik_HD=dist,briller_port_HD=3,tekniske_porter_bestatt=passed,originalmaske_brukt_til_klipp=False,lokal_flytting_av_trekk=False,egen_alfa_storste_komponent_og_AA_bevart=True,visuelt_sett_raa=True,visuell_native_kontroll=False,levert=False,native_mottatt=False,publisert=False,status='UNDER_KONTROLL'if passed else'KVALITETSRETUR',tid_utc=datetime.datetime.now(datetime.timezone.utc).isoformat());(K/'verktøyresultat.json').write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n');print(json.dumps(j,ensure_ascii=False))

@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np,json,sys,hashlib,shutil,datetime
+O=Path(__file__).resolve().parent;A=O.parents[1]/'work/.gpt-gren';K=O/'kall'/sys.argv[1];p=Path(sys.argv[2]);n=json.loads((K/'plan.json').read_text())['rute']
+assert not(K/'raa.png').exists();shutil.copy2(p,K/'raa.png')
+raw=Image.open(p).convert('RGBA');a=np.array(raw);maximum=int(a[:,:,3].max());assert maximum>0;a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/maximum).astype('uint8')
+labels,num=nd.label(a[:,:,3]>=128);sizes=np.bincount(labels.ravel());sizes[0]=0;body=labels==np.argmax(sizes);yy,xx=np.nonzero(body);x0,y0,x1,y1=int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)
+a[:,:,3][~nd.binary_dilation(body,iterations=3)]=0
+# Egen kantfarge renses fra egne betrodde innsidepiksler. Ingen originalmaske.
+trust=a[:,:,3]>=245;_,ix=nd.distance_transform_edt(~trust,return_indices=True);m=(a[:,:,3]>0)&(a[:,:,3]<245);near=a[tuple(ix)][:,:,:3];a[m,:3]=near[m]
+src=np.array(Image.open(O/f'kilder/{n}/original-1x.png').convert('RGBA'));src[:,:,3]=np.where(np.all(src[:,:,:3]==[255,0,255],2),0,255);h,w=src.shape[:2]
+colors=np.unique(src[src[:,:,3]>0,:3],axis=0);before=a[:,:,3].copy();opaque=a[:,:,3]>0;_,choice=cKDTree(colors).query(a[opaque,:3]);a[opaque,:3]=colors[choice];assert np.array_equal(before,a[:,:,3]);a[a[:,:,3]==0,:3]=0
+own=Image.fromarray(a);own.save(K/'egen-renset.png');fx,fy=w*4/(x1-x0),h*4/(y1-y0);affine=.88<=fx/fy<=1.12
+proto=own.transform((w*4+16,h*4+16),Image.Transform.AFFINE,(1/fx,0,x0-8/fx,0,1/fy,y0-8/fy),Image.Resampling.BICUBIC);b=np.array(proto);core=b[:,:,3]>=128;b[nd.distance_transform_edt(~core)>1.5]=0;proto=Image.fromarray(b);proto.save(K/'prototype-under-kontroll.png')
+ref=Image.new('RGBA',proto.size);ref.alpha_composite(Image.fromarray(src).resize((w*4,h*4),Image.Resampling.NEAREST),(8,8));ref.save(K/'original-native-kontroll.png');sm=np.array(ref)[:,:,3]>=128;cm=b[:,:,3]>=128;iou=float((sm&cm).sum()/(sm|cm).sum());cov=float((sm&cm).sum()/sm.sum())
+board=Image.new('RGB',(max(800,(proto.width*2+40)*2),max(660,proto.height*2+45)),'#304050');d=ImageDraw.Draw(board)
+for i,(v,label)in enumerate([(ref,'Original 4x, kun kontroll'),(proto,sys.argv[1]+' egen 4x, under kontroll')]):
+ bg=Image.new('RGBA',v.size,'#87959e');bg.alpha_composite(v);board.paste(bg.convert('RGB').resize((v.width*2,v.height*2),Image.Resampling.NEAREST),(12+i*(board.width//2),34));d.text((12+i*(board.width//2),10),label,fill='white')
+board.save(K/'sammenligning.png')
+j=dict(kall=sys.argv[1],rute=n,tool='innebygd image_gen',raw_path=str(p),raw_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),raw_maal=list(raw.size),raw_alfa_maks=maximum,egen_core_bbox=[x0,y0,x1,y1],skala=[fx,fy],hel_affin_port=affine,egen_RGB_til_kildepalett=True,kildepalett=colors.tolist(),alfa_uendret_ved_RGB_rens=True,native_maal=list(proto.size),native_sha256=hashlib.sha256((K/'prototype-under-kontroll.png').read_bytes()).hexdigest(),IoU=iou,dekning=cov,tekniske_porter_bestatt=affine and iou>=.6 and cov>=.8,originalmaske_brukt_til_klipp=False,lokal_flytting_av_trekk=False,egen_alfa=True,visuelt_sett_raa=True,visuell_native_kontroll=False,levert=False,native_mottatt=False,publisert=False,status='UNDER_KONTROLL',tid_utc=datetime.datetime.now(datetime.timezone.utc).isoformat());(K/'verktøyresultat.json').write_text(json.dumps(j,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:j[k]for k in ['kall','rute','skala','hel_affin_port','IoU','dekning','native_sha256']},ensure_ascii=False))

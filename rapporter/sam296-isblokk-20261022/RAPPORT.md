@@ -1,0 +1,19 @@
+# Isblokken, første kontrollerte delrute
+
+Status 2026-10-22 19:03 (Codex): én egen rute er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert. Additiv publisering gjenstår. Dette er costume296_1920 fra fig296_01. Delarket har1/9 ruter,hele296-familien har23 mål i fire jobber. Ingen hel resultat.png leveres ennå. 506/1758 hele figurjobber har resultat,1252 mangler i tillegg til returer og sluttkontroll.
+
+Originalen viser Conroy og Lee Harvey i isblokken i kjøkkenet,rom56. Førstefasene er tilsiktet beskåret i venstre kant. Originaler,spillkontekst og komplette godkjente Sam-/Max-mastere er sett. Jobbens generelle entallsbeskrivelse er presisert separat;beskyttede jobbdata er urørt. CSV-kolonnen kostyme=296 brukes,ikke rekkefølge194 eller et uvedkommende c-cel296-bilde.
+
+Femten innebygde image_gen-kall har egne råbilder,faktiske prompter og argumenter. Én tegning er valgt,14 kandidater holdes som kvalitetsretur. Ingen ny verktøyavvisning eller kvotegrense. S013 bestod omriss og rosa/mørke fester,men en senere blåkontroll fant manglende kildedetaljer. Den ble tatt ut før publisering. S015 bevarer flere blå felt,men alle56 blå kildepunkter består ikke3HD-porten. S014s beste globale hudavstand er6,062HD. Ingen av disse importeres. Se RETUR.md.
+
+ValgtS006 har fast4x,64x304 RGBA med8HD marg. Bare egen alfa/RGB renses. Egen RGB får kildens palett og ModeFilter5 før helskala;alfa er uendret ved RGB-rensing. Hele tegningen flyttes1HD ned,ingen lokale trekk flyttes med Python. Fire fester har største avvik2,718HD. IoU0,92195 og dekning0,93372 består uendrede porter0,6/0,8. Originalen har ingen hud- eller marineblå smådeler i denne fasen. Ingen originalmaske eller originale fragmenter brukes i native.
+
+Delarkets kontroll gir1/9 OK og åtte tomme mål. Hele arket har derfor FEIL og er ikke levert som ferdig. Alle produserte ruter har null FEIL. Automatisk diagnostisk mottak gir1 OK,0 til gjennomsyn og8 mangler. Modden får bare den SHA-festede egne prototypen,aldri diagnostikkens eventuelle originalrester.
+
+Fersk motorprøve i faktisk nedlastet Linux-binær caa4d726 viser den nye ruten og alle11 kildefaser,inkludert alle ni arkfaser. Kontrollert aktør29,animasjon1/raw6,zclip1,rom56. Hver side har160 bufferkontroller,158 null og120/120 null etter figurstart. To kjente inngangsavvik har identiske koordinater og begge RGB-verdier. Originalens ruterektangel med8HD naboområde er identisk,og ingen uforklarte HD-endringer finnes. Ett helt før/etter-par,ett helt motorbilde og alle11 faser er visuelt sett. Dette er ikke naturlig primærhandling,full gjennomspilling,ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Forrige kjøring ble avbrutt under kopiering og motorprøve. Den ufullstendige modkopien og PNG/tmp-filer er bevart. Skrivevarsler i den avbrutte prøven har ikke dokumentert rotårsak og regnes ikke bestått. En fersk fem-bilders prøve og begge senere hele avspillinger har vellykket atomisk lagring,med rename-spor bevart. Ingen motor- eller pipelinekode er endret. Reflink-kopien er kontrollert med samtlige filhash. En lokal hjelpers syntaksfeil er rettet før kontroll og er ikke regnet som bestått.
+
+Alle21939 tidligere modfiler,1440 beskyttede jobbfiler og tre opprinnelige stasher bevares. Pakker er fortsatt den kontrollerte fellesutgaven med3695 native. Kandidat3696 er ikke med der. Neste pakkesamlepunkt følger ved videre familieproduksjon eller avslutning,med faktiske nedlastinger og sjekksummer.
+
+Bibliotekskilder: losninger/grafikk/figurark-fast-storrelse.md og losninger/bygg/publisert-mod-er-fasit.md. Samme SCUMM-v6-pin og testede pipeline brukes;publisert mod er fasit. Det avgrensede søket etter avbrutt PNG-lagring ga ingen relevant løsning,så feilen ble undersøkt med lokal kildekode og en fersk sporbar prøve. Ingen ny motorretting tilskrives dette.

@@ -1,0 +1,144 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib
+import json
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P/'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A/'rapporter'/O.name
+
+def read(path):
+    return json.loads(path.read_text())
+
+def save(path, value):
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+selected = read(R/'egen-native.json')['ruter']
+assert len(selected)==1 and selected[0]['bilde']=='costume296_1920'
+assert sha(A/selected[0]['prototype'])==selected[0]['sha256']
+own = read(R/'kall/S006/sluttkandidat-kontroll.json')
+assert own['teknisk_og_fester_bestatt'] and own['visuelt_sett']
+assert max(e['avvik_HD']for e in own['fester'])<=3
+visual = read(R/'motor-visuell-plan.json')
+for group in ['varianter','hele_motorbilder']:
+    for entry in visual[group]:
+        assert sha(R/entry['fil'])==entry['sha256']
+        entry['visuelt_sett']=True
+phase = visual['hele_startanimasjon']
+assert len(phase['faser'])==11 and sha(R/phase['fil'])==phase['sha256']
+phase['visuelt_sett']=True
+visual.update(visuelt_sett=True,hele_varianter_sett=1,hele_motorbilder_sett=1)
+save(R/'motor-visuell-plan.json',visual)
+motor = read(R/'motor-sammenligning.json')
+assert motor['alle1_observert'] and motor['uforklarte_HD_endringer']==0
+motor['visuelt_sett']=True
+save(R/'motor-sammenligning.json',motor)
+rows = read(R/'motor-pikselkontroll.json')
+assert len(rows)==1
+rows[0]['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',rows)
+own_visual = read(R/'egen-visuell-plan.json')
+assert sha(R/own_visual['ark'][0]['fil'])==own_visual['ark'][0]['sha256']
+own_visual['ark'][0]['visuelt_sett']=True
+own_visual['visuelt_sett']=True
+save(R/'egen-visuell-plan.json',own_visual)
+progress = read(R/'fremdrift.json')
+progress.update(motorobservert=1,publisert=0)
+for entry in progress['delvise_leveranser']:
+    entry['motorobservert']=True
+save(R/'fremdrift.json',progress)
+mapping = read(R/'rutekart-fig296_01.json')
+mapping['fig296_01']['ruter'][0]['motorobservert']=True
+save(R/'rutekart-fig296_01.json',mapping)
+snapshot = read(R/'start.json')
+save(R/'indre-feste-kontroll.json',dict(terskel_HD=3,
+    alle_kontrollerte_smaadeler_innen3HD=True,maalinger=own['fester'],
+    source_hudpunkter=0,source_blaapunkter=0,visuelt_sett=True,
+    originalmaske=False,originalfragmenter=False,lokal_Python_flytting=False))
+save(R/'sluttkontroll.json',dict(klar_for_additiv_publisering=True,
+    valgte_native=1,egne_nye_malerier=1,hele_rgba_aliasmal=0,hele_ark_levert=0,
+    figurark_med_resultat=506,gjenstar=1252,egenkontrollert=1,native_mottatt=1,
+    visuelt_sett=True,motorobservert=1,publisert=0,innebygde_bildekall=15,
+    kvalitetsreturer=14,native=3696,beskyttede=len(snapshot['beskyttede']),
+    stasher=snapshot['stash'],pakker_native=3695,pakker_mangler_native=1,
+    Tom_godkjent=False,Claude_godkjent=False,
+    retur_S013='Blåkontroll underkjent etter tidligere geometrisk kontroll. Ikke importert.',
+    retur_S015='56 kildeblå prober,maks9,5HD mot port3. Ikke importert.'))
+
+time = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+report = f'''# Isblokken, første kontrollerte delrute
+
+Status {time} (Codex): én egen rute er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert. Additiv publisering gjenstår. Dette er costume296_1920 fra fig296_01. Delarket har1/9 ruter,hele296-familien har23 mål i fire jobber. Ingen hel resultat.png leveres ennå. 506/1758 hele figurjobber har resultat,1252 mangler i tillegg til returer og sluttkontroll.
+
+Originalen viser Conroy og Lee Harvey i isblokken i kjøkkenet,rom56. Førstefasene er tilsiktet beskåret i venstre kant. Originaler,spillkontekst og komplette godkjente Sam-/Max-mastere er sett. Jobbens generelle entallsbeskrivelse er presisert separat;beskyttede jobbdata er urørt. CSV-kolonnen kostyme=296 brukes,ikke rekkefølge194 eller et uvedkommende c-cel296-bilde.
+
+Femten innebygde image_gen-kall har egne råbilder,faktiske prompter og argumenter. Én tegning er valgt,14 kandidater holdes som kvalitetsretur. Ingen ny verktøyavvisning eller kvotegrense. S013 bestod omriss og rosa/mørke fester,men en senere blåkontroll fant manglende kildedetaljer. Den ble tatt ut før publisering. S015 bevarer flere blå felt,men alle56 blå kildepunkter består ikke3HD-porten. S014s beste globale hudavstand er6,062HD. Ingen av disse importeres. Se RETUR.md.
+
+ValgtS006 har fast4x,64x304 RGBA med8HD marg. Bare egen alfa/RGB renses. Egen RGB får kildens palett og ModeFilter5 før helskala;alfa er uendret ved RGB-rensing. Hele tegningen flyttes1HD ned,ingen lokale trekk flyttes med Python. Fire fester har største avvik2,718HD. IoU0,92195 og dekning0,93031 består uendrede porter0,6/0,8. Originalen har ingen hud- eller marineblå smådeler i denne fasen. Ingen originalmaske eller originale fragmenter brukes i native.
+
+Delarkets kontroll gir1/9 OK og åtte tomme mål. Hele arket har derfor FEIL og er ikke levert som ferdig. Alle produserte ruter har null FEIL. Automatisk diagnostisk mottak gir1 OK,0 til gjennomsyn og8 mangler. Modden får bare den SHA-festede egne prototypen,aldri diagnostikkens eventuelle originalrester.
+
+Fersk motorprøve i faktisk nedlastet Linux-binær caa4d726 viser den nye ruten og alle11 kildefaser,inkludert alle ni arkfaser. Kontrollert aktør29,animasjon1/raw6,zclip1,rom56. Hver side har160 bufferkontroller,158 null og120/120 null etter figurstart. To kjente inngangsavvik har identiske koordinater og begge RGB-verdier. Originalens ruterektangel med8HD naboområde er identisk,og ingen uforklarte HD-endringer finnes. Ett helt før/etter-par,ett helt motorbilde og alle11 faser er visuelt sett. Dette er ikke naturlig primærhandling,full gjennomspilling,ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Forrige kjøring ble avbrutt under kopiering og motorprøve. Den ufullstendige modkopien og PNG/tmp-filer er bevart. Skrivevarsler i den avbrutte prøven har ikke dokumentert rotårsak og regnes ikke bestått. En fersk fem-bilders prøve og begge senere hele avspillinger har vellykket atomisk lagring,med rename-spor bevart. Ingen motor- eller pipelinekode er endret. Reflink-kopien er kontrollert med samtlige filhash. En lokal hjelpers syntaksfeil er rettet før kontroll og er ikke regnet som bestått.
+
+Alle21939 tidligere modfiler,1440 beskyttede jobbfiler og tre opprinnelige stasher bevares. Pakker er fortsatt den kontrollerte fellesutgaven med3695 native. Kandidat3696 er ikke med der. Neste pakkesamlepunkt følger ved videre familieproduksjon eller avslutning,med faktiske nedlastinger og sjekksummer.
+
+Bibliotekskilder: losninger/grafikk/figurark-fast-storrelse.md og losninger/bygg/publisert-mod-er-fasit.md. Samme SCUMM-v6-pin og testede pipeline brukes;publisert mod er fasit. Det avgrensede søket etter avbrutt PNG-lagring ga ingen relevant løsning,så feilen ble undersøkt med lokal kildekode og en fersk sporbar prøve. Ingen ny motorretting tilskrives dette.
+'''
+report = report.replace('dekning0,93031',f"dekning{own['dekning']:.5f}".replace('.',','))
+(R/'RAPPORT.md').write_text(report)
+(R/'RETUR.md').write_text('''# Returer og resterende arbeid
+
+BareS006/costume296_1920 velges. De øvrige kandidatene er bevart og ikke publisert.
+
+1921:S007 har for ulik helskala og mangler en liten kildebekreftet huddetalj. Kontroller også de blå smådelene før nytt forsøk.
+
+1922:S008/S012/S013 flytter eller mister detaljer. S013 fikk korrekte rosa/mørke fester etter bildeverktøy og egen grå sålefarge,men kildeblå felt mangler.56 blå kildepunkter har største avstand56,575HD. Dette underkjenner importen selv om automatisk mottak og motorprøven bestod. S015 er nytt fra originalen med Max-master som stilanker. De små blå feltene er nærmere,men maksimal blåavstand er9,5HD,og lyse firkanter i rosa felt må rettes mot originalen. Ingen terskel senkes.
+
+1923:S009 består ikke den strenge helskaleringsporten og er ikke sluttkontrollert for alle smådeler.1924:S010 har forskjøvede mørke felt og bein i foreløpig kontroll.1925 har bare vært med i det forkastede hele-ark-forsøketS001;ingen individuell tegning er valgt.
+
+1926:S002/S003 har feil brillefeste,S004/S005/S011/S014 mister eller flytter kildebekreftede hudfelt. S011 retter den nye runde svarte nesetolkningen til et sammenhengende mørkt felt,men hudpunktene består ikke. S014s beste av49 globale plasseringer har6,062HD maksimal hudavstand og12 punkter over3HD. Den lille peachfargede glimten ved69,5/77,5 må bevares uten å lage et nytt stort øre. Behold også alle blå kildeglimt.
+
+1927/1928 er hele originale RGBA-aliaser av296_1926,men ingen uferdig kandidat kopieres til disse målene. Dette er andre ressurs-ID-er enn den verktøyholdte293_1927,som fortsatt ikke omprøves.
+
+Fortsett også uavhengige produserbare ruter og nye familiefaser etter kildekontroll. Ikke bruk noen kvalitetsretur som stil- eller identitetsanker. Ingen nødvendig designavklaring med Tom er identifisert nå;returene er avvik fra lesbare originaldata.
+''')
+(R/'NESTE.md').write_text('''# Neste arbeid
+
+Én rute er klar for additiv publisering:costume296_1920. Fullfør publikasjon med fersk fjern-SHA,hent tilbake og bekreft alle filhash før den kalles publisert. Les mottak-publisert.json hvis den finnes,og ikke dupliser et påbegynt push.
+
+Gjenoppta fig296_01,der1921/1922 og1923..1928 mangler. Les RETUR.md og siste faktiske råbilder/porter først. Nyeste bildekall erS015,ikke bare en plan. S013 ogS015 er underkjent i blåkontrollen. Ikke importer dem eller tidligere to-rutekandidat3697. Historikken er bevart under historikk-to-kandidater.
+
+Hele296-familien er23 mål:9 i ark01,3 i02,10 i03 og1 i04. Neste uavhengige fase kan velges etter original- og kontekstkontroll. Samtlige tidligere native og tre stasher bevares. Ingen grafikk til main,ingen gamle nattprosesser.
+
+Felles Linux/Windows har3695 og mangler den ene nye native ved publisering. Oppdater pakkene ved neste samlepunkt,med faktisk nedlasting,SHA256 og filkontroll. Automatikken er fortsatt ACTIVE;all grafikk er ikke ferdig.
+''')
+(R/'PAKKER.md').write_text('''# Pakker
+
+Siste kontrollerte fellesutgave er sam-max-hd-2026-10-22-fryserark med3695 native. Begge faktiske pakker og alle runtime-filhash er kontrollert i rapporter/felles-release-20261022-fryserark. Kandidat3696 er ikke inkludert. Ingen nye pakkebygg startes i denne delruten,og nativefrys er false. Neste samlepunkt følger videre produksjon i296-familien eller avslutning.
+
+https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark
+''')
+note = A/'jobber/fig296_01/notat.md'
+assert not note.exists()
+note.write_text(f'''# fig296_01,delvis1/9
+
+{time},Codex. Motivet er isblokken med Conroy og Lee Harvey i kjøkkenet,rom56. Første faser er tilsiktet beskåret i venstre kant. Beskyttede jobbfiler er urørt.
+
+Femten faktiske innebygde image_gen-kall har råbilder og prompter i rapporter/{R.name}/kall. BareS006/costume296_1920 er valgt. Den har egen alfa,fast4x,64x304 med8HD marg,egen RGB-rens og helplassering0,+1HD. Største kildefesteavvik er2,718HD. Originaler i spillkontekst og komplette godkjente stilankere er sett. Modellnavn er ikke vist av verktøyet.
+
+Én rute er egenkontrollert,native mottatt,visuelt sett og motorobservert. Additiv publisering gjenstår. Delarket ligger i rapporter/{R.name}/fig296_01-delresultat.png med SHA-festet rutekart. Ingen hel resultat.png før alle ni er klare. Automatisk mottak gir1OK/8mangler.
+
+S013 ble tatt ut etter at utvidet blåkontroll fant manglende kildedetaljer. S015 består heller ikke alle blå porter. S014 har feil hudfeste. Se RETUR.md. Ingen avviste motiver omdefineres til stilanker,ingen originalmaske brukes til klipp,og ingen lokale trekk flyttes med Python.
+
+Motorprøven er kontrollert aktør29,anim1/raw6,zclip1 i rom56,ikke naturlig full gjennomspilling.160 kontroller pr side,158null og120/120null etter figurstart. Ingen nye/økte avvik eller uforklarte HD-endringer. Ingen ny Tom-/Claude-godkjenning. Fellespakker har fortsatt3695 native.
+''')
+shutil.copy2(__file__,R/'rapport.py.txt')
+print('Sluttkontroll1,15 råbilder,14 kvalitetsreturer. Notat og neste arbeid dokumentert.')

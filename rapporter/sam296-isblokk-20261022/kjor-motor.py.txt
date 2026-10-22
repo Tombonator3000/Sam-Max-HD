@@ -1,0 +1,6 @@
+from pathlib import Path
+import subprocess,json
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+assert json.loads((R/'egen-native.json').read_text())['native_totalt']==3697
+for side,mod in [('grunnlag3695-start1-r2',P/'mods/gpt'),('kandidat3697-start1-r2',O/'mod-sam2963697')]:
+ subprocess.run([str(P/'.venv/bin/python'),str(O/'motor.py'),side,str(mod)],check=True)

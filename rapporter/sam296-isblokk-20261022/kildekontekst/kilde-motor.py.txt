@@ -1,0 +1,27 @@
+from pathlib import Path
+import gzip,hashlib,json,os,re,shutil,subprocess,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=O/'bevis';PK=P/'out/felles-release-20261022-fryserark/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+mode=sys.argv[1];MOD=Path(sys.argv[2])if len(sys.argv)>2 else P/'mods/gpt'
+scripted='skript204'in mode;setup='skript204-med-aktor10'in mode;controlled=not scripted;count=240 if setup else 400 if scripted else 160
+T=O/mode;assert not T.exists();T.mkdir();(T/'home').mkdir();(T/'saves').mkdir()
+assert sha(B)=='caa4d7261d6071b824c2f15c345b3d5f53a454182308357a1b862cede2ae7b83'
+native=read(MOD/'mod.json')['costume_cels'];assert native==3695
+for p in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,T/'saves'/p.name)
+env={k:v for k,v in os.environ.items()if not k.startswith('DIGHD_')};env.update(HOME=str(T/'home'),XDG_CONFIG_HOME=str(T/'home/.config'),XDG_DATA_HOME=str(T/'home/.local/share'),XDG_CACHE_HOME=str(T/'home/.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(MOD),DIGHD_VERIFY='1',DIGHD_QUIT_AT=str(count),DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='1',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='56',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+if controlled:env.update(DIGHD_TEST_COSTUME='296',DIGHD_TEST_ACTOR='29',DIGHD_TEST_CHORE_EVERY='500',DIGHD_TEST_POS='178,144',DIGHD_TEST_SCALE='255',DIGHD_TEST_ANIMATION='1'if'start1'in mode else'7',DIGHD_TEST_CLIP='1')
+else:env.update(DIGHD_TEST_SCRIPT='60:204')
+if setup:env.update(DIGHD_TEST_COSTUME='296',DIGHD_TEST_ACTOR='10',DIGHD_TEST_CHORE_EVERY='500',DIGHD_TEST_POS='178,144',DIGHD_TEST_SCALE='255',DIGHD_TEST_ANIMATION='1',DIGHD_TEST_CLIP='1')
+args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(T/'saves'),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--random-seed=20261021','--debuglevel=1','samnmax']
+with(T/'scummvm.log').open('wb')as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=600).returncode
+log=(T/'scummvm.log').read_text();events=[];obs={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*296\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());p=T/f'frame_{f+1:06}_room056.png';e=dict(logg_frame=f,bildeframe=f+1,cel=n,kostyme=296,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p)if p.exists()else None,kontrollert_testaktor29=controlled);events.append(e)
+ if p.exists():obs.setdefault(f'costume296_{n:03}',e)
+checks=[dict(frame=int(f),avvik=int(n))for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+proof=dict(exit=code,binar=str(B),binar_sha256=sha(B),kommando=args,miljo={k:v for k,v in env.items()if k.startswith('DIGHD_')},rom=56,kostyme=296,testaktor29_konstruert_for_helanimasjon=controlled,zclip1=controlled or setup,lokalskript204_tvunget=scripted,aktor10_fortilstand_konstruert=setup,andre_aktorer_skjult=False,romskript_stoppet=False,kontrollert_ikke_naturlig_sekvens=True,full_naturlig_gjennomspilling=False,ingen_kildekode_eller_skript_endret=True,tegninger=obs,hendelser=events,kontroller=checks,nullkontroller=sum(e['avvik']==0 for e in checks),logg_sha256=sha(T/'scummvm.log'),native_antall=native,ny_kjoring_utfort=True,avspilling_gjenbrukt=False)
+save(R/(mode+'.json'),proof)
+with gzip.open(R/(mode+'.log.gz'),'wb')as f:f.write((T/'scummvm.log').read_bytes())
+shutil.copy2(__file__,R/'motor.py.txt');print(mode,'exit',code,'296 kilder logget',len(obs),'kontroller',len(checks),'null',proof['nullkontroller'],flush=True)
+assert code==0 and len(checks)==count
