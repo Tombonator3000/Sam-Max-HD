@@ -1,0 +1,155 @@
+from pathlib import Path
+import gzip, hashlib, json, re, shutil, subprocess, sys
+from PIL import Image, ImageDraw
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P/'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A/'rapporter'/O.name
+T = O/'kontrollert-gyldige-faser'
+PK = P/'out/felles-release-20261022-gatorgolf/linux/squashfs-root'
+D = PK/'usr/share/sam-max-hd'
+B = PK/'usr/bin/scummvm'
+sys.path.insert(0, str(P/'pipeline'))
+from smhd import gamedata as g, v6grafikk as v
+
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p, data):
+    p.write_text(json.dumps(data, ensure_ascii=False, indent=2)+'\n')
+
+# Den avsluttede motorprosessen returnerte 0. Den gamle etterbehandlingen
+# stoppet etterpå fordi bildeoversikten utelater tomme kontrollkommandoer.
+# Dette leser bare eksisterende spor og originaldata. Ingen ny avspilling.
+log = (T/'scummvm.log').read_text()
+assert 'actor 29 with costume 129 at 270,185' in log
+assert 'actor 10 costume 129' in log
+shutil.copy2(O/'kildekontroll.py', R/'kildekontroll-stoppet-bildeliste.py.txt')
+d, _ = g.load(D/'game/SAMNMAX.001')
+index = g.read_index(D/'game/SAMNMAX.000')
+rooms = g.read_rooms(D/'game/SAMNMAX.001')
+ids = g.costume_ids(index, rooms)
+n = 0
+cost = None
+for room in sorted(rooms, key=lambda k: rooms[k].offset):
+    r = rooms[room]
+    for off in r.cost_offsets:
+        cid = ids[n]
+        n += 1
+        if cid == 129:
+            cost = r.offset+off
+assert cost is not None
+base = d[cost+8:cost+g.be32(d, cost+4)]
+fmt = base[7]&127
+p = 8+(32 if fmt in (59, 61) else 16)
+cmds = g.le16(base, p)
+offsets = p+34
+valid = {a for a in range(base[6]+1) if g.le16(base, offsets+a*2)}
+image_choices = {e['valg'] for e in json.loads((P/'work/extract/costumes.json').read_text())['129']['animasjoner']}
+actual = {int(a) for a in re.findall(r'actor 29 animation (\d+) \(chore', log)}
+assert actual and actual <= valid
+assert actual-image_choices == {19, 23}
+empty_rows = []
+for anim in sorted(actual-image_choices):
+    rel = g.le16(base, offsets+anim*2)
+    q = rel
+    mask = g.le16(base, q)
+    q += 2
+    limb = 0
+    entries = []
+    while mask&0xffff:
+        if mask&0x8000:
+            j = g.le16(base, q)
+            q += 2
+            row = dict(lag=limb, j=j)
+            if j != 0xffff:
+                extra = base[q]
+                q += 1
+                raw = list(base[cmds+j:cmds+j+(extra&127)+1])
+                assert raw == [0x7b]
+                row.update(extra=extra, raw=raw, tegner_ikke=True)
+            else:
+                row['lag_deaktivert'] = True
+            entries.append(row)
+        limb += 1
+        mask = (mask<<1)&0xffff
+    assert rel >= offsets+(base[6]+1)*2 and q <= cmds
+    empty_rows.append(dict(valg=anim, offset=rel, slutt=q, lag=entries))
+assert not v.decode_costume(d, cost).errors
+engine_source = subprocess.check_output([
+    'git', 'show', 'c9091321060acfc8f037767c18f8279a86305b7e:engines/scumm/costume.cpp'
+], cwd=P/'work/.codex-object-erase/engine/scummvm', text=True)
+assert 'Code 0x7B indicates a limb for which there is nothing to draw' in engine_source
+save(R/'tomme-tabellkommandoer.json', dict(
+    kilde_md5=index.md5, kostyme=129, cost_offset=cost, lengde=len(base),
+    antall_animasjonsindeks=base[6], anim_cmds=cmds, data_offsets=offsets,
+    gyldige_rawvalg=sorted(valid), bildevalg=sorted(image_choices),
+    valgte_raw=sorted(actual), tomme_kontrollvalg=empty_rows,
+    dekoderadvarsler=[], ingen_ugyldig_animasjon=True,
+    motorpin='c9091321060acfc8f037767c18f8279a86305b7e',
+    original_costume_cpp_sha256=hashlib.sha256(engine_source.encode()).hexdigest(),
+    bibliotek='scumm-v6-kostymer-skygge-og-soppelruter',
+    forklaring='19 deaktiverer lag med 0xffff. 23 har bare ikke-tegnende 0x7b og et deaktivert lag. Begge er gyldige ikke-nulltabellvalg, utelatt av bildeoversikten. Ingen endring av motor, porter eller kunst.'))
+obs = {}
+events = []
+for t in re.findall(r'frame (\d+) soft cel\s+(\d+) costume\s*129\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)', log):
+    f, cel, x, y, w, h = map(int, t)
+    shot = T/f'frame_{f+1:06}_room025_flat.png'
+    row = dict(logg_frame=f, bildeframe=f+1, cel=cel, pos=[x,y], maal=[w,h],
+               fil=str(shot), sha256=sha(shot) if shot.exists() else None,
+               kontrollert_testaktor29=x>=220)
+    events.append(row)
+    if shot.exists() and x>=220:
+        obs.setdefault(f'costume129_{cel:03}', row)
+checks = [dict(frame=int(f), avvik=int(n)) for f,n in re.findall(
+    r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again', log)]
+assert len(checks) == 320 and all(e['avvik']==0 for e in checks)
+assert 'whole screen frame 320 (room 25' in log
+needed = ['costume129_'+s for s in ['130','640','422','642','153','154','512','768']]
+assert set(needed) <= set(obs)
+args = [str(B), '--config='+str(T/'scummvm.ini'), '--path='+str(D/'game'),
+        '--savepath='+str(T/'saves'), '--save-slot=2', '--gfx-mode=normal',
+        '--no-fullscreen', '--gui-theme=builtin', '--music-driver=null',
+        '--random-seed=20261021', '--debuglevel=1', 'samnmax']
+env = dict(DIGHD_MOD=str(D/'mods/gpt'), DIGHD_VERIFY='1', DIGHD_QUIT_AT='320',
+           DIGHD_DUMP_DIR=str(T), DIGHD_DUMP_EVERY='1', DIGHD_DUMP_FLAT='1',
+           DIGHD_TEST_ROOM='25', DIGHD_TEST_AT='10', DIGHD_TEST_CAMX='160',
+           DIGHD_MANGLER='0', DIGHD_DEBUG_SOFT='1', DIGHD_DEBUG_COSTUME='1',
+           DIGHD_TEST_COSTUME='129', DIGHD_TEST_ACTOR='29',
+           DIGHD_TEST_CHORE_EVERY='10', DIGHD_TEST_POS='270,185', DIGHD_TEST_SCALE='255')
+proof = dict(exit=0, exit_kilde='Faktisk subprocess-retur i avsluttet kildekontroll.py før etterbehandlingsstopp.',
+             etterbehandling_gjenopptatt_uten_ny_avspilling=True,
+             binar_sha256=sha(B), kommando=args, miljo=env,
+             kontrollert_testaktor29=True, naturlig_kostyme129_aktor=10,
+             kun_gyldige_tabellvalg=True, gyldige_kildevalg=sorted(valid),
+             valgte_raw=sorted(actual), hel_kostymevariasjon=True,
+             ikke_naturlig_gjennomspilling=True, ingen_kildekode_eller_skript_endret=True,
+             rom=25, tegninger=obs, hendelser=events, kontroller=checks,
+             nullkontroller=320, native_endret=False, nye_kontekster=needed,
+             logg_sha256=sha(T/'scummvm.log'), visuelt_sett=False)
+save(R/'gyldige-faser-kontroll.json', proof)
+with gzip.open(R/'gyldige-faser-kontroll.log.gz', 'wb') as f:
+    f.write((T/'scummvm.log').read_bytes())
+boards = []
+for start in range(0, len(needed), 4):
+    canvas = Image.new('RGB', (1800, 1340), '#253546')
+    draw = ImageDraw.Draw(canvas)
+    selected = needed[start:start+4]
+    for i, name in enumerate(selected):
+        x = i%2*900
+        y = i//2*670
+        source = Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA')
+        scale = min(8, 210/source.width, 540/source.height)
+        size = tuple(max(1, round(v*scale)) for v in source.size)
+        source = source.resize(size, Image.Resampling.NEAREST)
+        canvas.paste(source, (x+10,y+50), source)
+        context = Image.open(obs[name]['fil']).convert('RGB')
+        context.thumbnail((650,600), Image.Resampling.LANCZOS)
+        canvas.paste(context, (x+240,y+50))
+        draw.text((x+10,y+12), name+' original hel kilde / hel originalmotor, testaktor29', fill='white')
+        draw.text((x+10,y+620), str(obs[name]['pos'])+' '+str(obs[name]['maal'])+' frame '+str(obs[name]['bildeframe']), fill='white')
+    file = R/f'gyldige-faser-hele-kilder-{start//4+1}.png'
+    canvas.save(file)
+    boards.append(dict(fil=file.name, sha256=sha(file), kilder=selected, visuelt_sett=False))
+save(R/'gyldige-faser-visuell.json', boards)
+shutil.copy2(__file__, R/(Path(__file__).name+'.txt'))
+print('Eksisterende motorløp: 320/320 null. Åtte manglende kilder funnet. 19/23 er kildebekreftede tomkommandoer.')

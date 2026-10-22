@@ -1,0 +1,24 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+s=read(R/'start.json');m=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json');progress=read(R/'fremdrift.json');rows=read(R/'motor-pikselkontroll.json')
+assert m['alle9_observert'] and m['alle_originalaktorverdier_identiske'] and m['ingen_nye_eller_okte_bufferavvik'] and m['utenfor_nye_ruter_kildeendringer_cycle_og_endrede126_faser']==0
+assert all(sha(A/f)==h for f,h in s['beskyttede'].items()) and all(sha(P/'mods/gpt'/f)==h for f,h in s['filer'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==s['stash']
+for group in ['varianter','hele_motorbilder']:
+    for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=9,hele_motorbilder_sett=4,hode_torso_sammen_sett=True,ingen_ny_visuell_sluttgodkjenning=True);save(R/'motor-visuell-plan.json',v)
+m.update(visuelt_sett=True,egen_visuell_kontroll=True,claude_kontroll=False,godkjent_av_Tom=False);save(R/'motor-sammenligning.json',m)
+for e in rows:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',rows)
+for e in progress['delvise_leveranser']:e.update(visuelt_kontrollert=True,native_mottatt=True,motorobservert=True,publisert=False)
+progress.update(laget=9,egenkontrollert=9,native_mottatt=9,visuelt_sett=9,motorobservert=9,publisert=0,Tom_godkjent=0,Claude_godkjent=0,heldekkende_129_ferdig=False)
+save(R/'fremdrift.json',progress)
+maps=read(R/'rutekart-fig129_01.json')
+for e in maps['fig129_01']['ruter']:e.update(motorobservert=True,motor_visuelt_sett=True)
+save(R/'rutekart-fig129_01.json',maps)
+save(R/'sluttkontroll.json',dict(leveranser=[],delvise_leveranser=progress['delvise_leveranser'],laget=9,egenkontrollert=9,valgte_native=9,holdt_native=0,native_mottatt=9,visuelt_sett=True,hele_kildepar_sett=9,hele_delark_sett=True,hele_motorvarianter_sett=9,hele_motorbilder_sett=4,motorobservert=9,publisert=0,figurark_med_resultat=504,beskyttede=1420,stasher=3,alle_tidligere_filer_bevart=True,ingen_originalfragmenter_i_kandidat=True,ingen_Tom_eller_Claude_godkjenning=True))
+# Endelig rapport skrives i ferdigstill.py etter kilde- og etikettavklaring.
+with (R/'motor-kvittering.txt').open('a')as f:f.write('\nMotorprøve fullført:ni av ni logget,711/720 null og identiske ni kjente avvik. Ni hele varianter og fire hele motorbilder visuelt sett. Ingen nye uavklarte forskjeller utenfor dokumenterte kildetilstander. Publisering i rapportens separate kvittering.\n')
+shutil.copy2(__file__,R/'slutt.py.txt');print('Ni komplette kildepar og motorvarianter sett, fire hele bilder; klar for additiv nativepublisering.',flush=True)

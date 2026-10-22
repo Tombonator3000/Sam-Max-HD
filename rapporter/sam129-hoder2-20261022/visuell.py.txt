@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+rows=read(R/'prototyper-forelopig.json');plan=read(R/'kildeplan.json');assert len(rows)==9
+for first in [0,4,8]:
+    board=Image.new('RGBA',(1500,1000),'#536576');d=ImageDraw.Draw(board)
+    for i,e in enumerate(rows[first:first+4]):
+        row=next(t for t in plan['ruter']if t['bilde']==e['bilde']);src=Image.open(row['kilde']).convert('RGBA');own=Image.open(A/e['prototype']).convert('RGBA')
+        x=(i%2)*750;y=(i//2)*500;d.text((x+8,y+8),f"{e['bilde']} hel original / hel egen native, IoU {e['snitt_union']:.3f}, dekning {e['dekning']:.3f}",fill='white')
+        board.alpha_composite(src.resize((src.width*11,src.height*11),Image.Resampling.NEAREST),(x+25,y+70))
+        board.alpha_composite(own.resize((own.width*3,own.height*3),Image.Resampling.NEAREST),(x+390,y+46))
+        board.alpha_composite(own,(x+640,y+360))
+    board.convert('RGB').save(R/f'helkontroll-{first//4+1}.png')
+shutil.copy2(__file__,R/'visuell.py.txt')

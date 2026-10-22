@@ -1,0 +1,117 @@
+from pathlib import Path
+import hashlib, json, shutil
+import numpy as np
+from PIL import Image
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+N=A/'rapporter/sam129-kilde-20261022'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+
+proof=read(R/'gyldige-faser-kontroll.json')
+boards=read(R/'gyldige-faser-visuell.json')
+for e in boards:
+    assert sha(R/e['fil'])==e['sha256']
+    e['visuelt_sett']=True
+proof.update(visuelt_sett=True,hele_nye_kilder_og_originalkontekster_sett=8)
+save(R/'gyldige-faser-visuell.json',boards)
+save(R/'gyldige-faser-kontroll.json',proof)
+plan=read(N/'kildeplan.json')
+for e in plan['ruter']:
+    if e['bilde'] in proof['nye_kontekster']:
+        q=proof['tegninger'][e['bilde']]
+        e['kontrollert_kontekst']=dict(q,testaktor=29,originalinngang217=False,
+            ikke_naturlig_gjennomspilling=True,visuelt_sett=True,
+            bevis='rapporter/'+O.name+'/gyldige-faser-kontroll.json')
+        e['kontekst_tilgjengelig']=True
+assert all(e['kontekst_tilgjengelig'] for e in plan['ruter'])
+plan.update(kontekst_tilgjengelig=47,kontrollert_observert=27,
+            kontekst_fortsatt_mangler=[],kontroller_ekstra=640,
+            kontroller_ekstra_null=640,ny_kildeprove='rapporter/'+O.name+'/gyldige-faser-kontroll.json',
+            nye_kontekster_visuelt_sett=8)
+save(N/'kildeplan.json',plan)
+
+# Korriger bare vår nye etikett. Kommando, spor, bilder og motorutfall er uendret.
+f=R/'kandidat3613.json';d=read(f)
+assert d.pop('actor2_fra_originalskript') is True
+d['actor10_fra_originalskript']=True
+trace=O/'kandidat3613/scummvm.log'
+line=next(s for s in trace.read_text().splitlines() if 'actor 10 costume 129' in s)
+save(R/'aktor-etikett-rettet.json',dict(
+    tidligere_felt='actor2_fra_originalskript',korrekt_felt='actor10_fra_originalskript',
+    spor_sha256=sha(trace),sporlinje=line,
+    forklaring='Gammelt hjelpeskript hadde en nedarvet feil etikett. Originalforløpet bruker aktør 10 med kostyme 129; kontrollert kildeprøve bruker aktør 29. Verken motor, prøveargumenter eller resultater er endret. Eldre publiserte kvitteringer står urørt; dette er en uttrykkelig rettelse av etiketten.'))
+save(f,d)
+shutil.copy2(O/'motor.py',R/'motor.py.txt')
+
+row=next(e for e in read(R/'motor-pikselkontroll.json') if e['bilde']=='costume129_405')
+src=np.array(Image.open(P/'work/extract/costumes/costume129_405.png').convert('RGBA'))[:,::-1]
+expect=src[:,:,:3].astype(np.uint16)
+expect[:,:,0]=(expect[:,:,0]>>3)*255//31
+expect[:,:,1]=(expect[:,:,1]>>2)*255//63
+expect[:,:,2]=(expect[:,:,2]>>3)*255//31
+expect=expect.astype(np.uint8)
+x,y=row['pos'];w,h=row['maal']
+files=[]
+for key in ['grunnlag_fil','kandidat_fil']:
+    p=Path(row[key]);p=p.with_name(p.stem+'_flat.png');im=np.array(Image.open(p).convert('RGB'))
+    crop=im[y*4:(y+h)*4,(x+1)*4:(x+w+1)*4]
+    mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1)
+    expected=np.repeat(np.repeat(expect,4,0),4,1)
+    wrong=mask&np.any(crop!=expected,axis=2)
+    yy,xx=np.where(wrong)
+    coords=sorted(set((int(a)//4,int(b)//4)for a,b in zip(xx,yy)))
+    assert len(xx)==48 and coords==[(6,27),(7,27),(8,26)]
+    details=[]
+    for sx,sy in coords:
+        values=np.unique(crop[sy*4:(sy+1)*4,sx*4:(sx+1)*4].reshape(-1,3),axis=0)
+        assert values.tolist()==[[198,101,0]]
+        details.append(dict(speilvendt_kildepiksel=[sx,sy],kilde_RGB=src[sy,sx,:3].tolist(),
+                            forventet_RGB565=expect[sy,sx].tolist(),faktisk_RGB=values.tolist()))
+    files.append(dict(fil=str(p),sha256=sha(p),synlige_hd_kildepiksler=int(mask.sum()),
+                      eksakt_kildefargematch=int(mask.sum())-48,okklusjon_hd_piksler=48,
+                      okkluderte_originalpiksler=details))
+save(R/'fase405-okklusjon.json',dict(projeksjon_speilvendt=True,dx_original=1,dy_original=0,
+    sammenligninger=files,originalaktor_byteidentisk=True,kilde_maaleavklaring=True,
+    hd_kunst_endret=False,ny_toleranse=False))
+
+report='''# Lee-Harveys neste ni snakkehoder
+
+22. oktober 2026. Ni nye hele malerier gir costume129_414 til 420, 404 og 405. Alle er laget, egenkontrollert, teknisk mottatt, visuelt sett og motorobservert. Publisering kvitteres separat i mottak-publisert.json. Ingen ny godkjenning fra Tom eller Claude, eller samlet visuell sluttgodkjenning.
+
+Originaler, faktisk spillkontekst og hele godkjente Sam-/Max-mastere er sett før hvert motiv. Tidligere eget hele H03-hode brukes bare til kontinuitet. Ni vellykkede innebygde image_gen-kall, ingen avslag, kvotefeil, returkall eller CLI/API-fallback. Råbilder, faktiske prompter og argumenter med referansehash er bevart. Python renser egen alfa og RGB og plasserer hele malerier i fast 4x med lik åtte HD-pikslers marg. H15/420 har en avgrenset egen grå tannblokk fylt med nøytral tannfarge; alfa og geometri er uendret. Ingen hard originalmaske, originalfragment eller delkomposisjon. CORE 128, IoU 0,6 og dekning 0,8 er uendret.
+
+fig129_01 har et delresultat med 17 hoder, åtte tidligere og ni nye. Sju mål er fortsatt tomme. Ingen resultat.png i jobbmappen og ingen ny hel figurjobb telles levert: 504 av 1758 har resultat, 1254 er uten pluss returer og sluttkontroll. Arkkontrollen har 17 OK og fem FEIL som bare er upåbegynte store mål. To små kilder under 20 originalpiksler hoppes over av kontrollen og er også fortsatt manglende. Diagnostisk mottak har 19 OK: 17 egne og to automatiske originalfragmenter. De to fragmentene er eksplisitt utelatt fra native og levering. Se fragmentvern.json. Nativekandidaten har bare ni nye egne hele hoder, 3613 totalt.
+
+Den faktiske nedlastede Linux-binæren fra felles 3596, SHA256 2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110, er kjørt med original rominngang/lokal 217. Kandidat 3613 avslutter normalt med kode 0 og viser alle ni nye og alle 17 hoder. 711 av 720 bufferkontroller er null. De ni kjente bufferavvikene har nøyaktig samme koordinater og begge RGB-verdier som 3604-grunnlaget, i samme rekkefølge. Ingen nye eller økte avvik. Prøven er ikke avviksfri.
+
+Alle ni før/etter-par har byteidentiske originale aktørverdier ved samme torsofase. Hele originalflater har ulik vannfase, så ingen av de ni valgte parene har identisk hel originalflate-SHA. Øvrige forskjeller ligger bare i dokumenterte originalendringer, kildefargesykling eller faktisk endrede alligatorfaser med identiske tidligere idx-filer og eksisterende én originalpiksels fallbackmarg. Ingen uforklarte endringer utenfor de nye hodene og dokumenterte kildetilstander. Alle ni hele motorvarianter, fire hele motorbilder og delarket er visuelt sett, også hode mot kropp. Ingen testaktør, tvunget lokalskript, skjulte aktører eller stansede romskript i denne primærprøven. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+405-målingen ble først stoppet av vann ved kanten av den tenkte måleflaten. Hele originalen er uavhengig projisert i begge retninger og heltallige forskyvninger. Entydig speilvendt ved +1 originalpiksel i x gir 5056 av 5104 eksakte HD-kildefargepiksler etter RGB565. De siste 48 er tre nakkepiksler dekket av Conroys hår. Alle 5104 faktiske originalverdier er identiske mellom 3604 og 3613. Kunstens plassering og alfa er uendret; ingen ny toleranse. Se fase405-kildetolkning.md og de bevarte stoppbevisene. Den nye kvitteringens nedarvede feil etikett actor2 er korrigert til faktisk aktør 10, med sporbevis i aktor-etikett-rettet.json. Eldre publiserte spor og kvitteringer er urørt.
+
+En separat kildeprøve bruker uttrykkelig kontrollert aktør 29, kostyme 129 og motorens automatiske ikke-nulltabellvalg, uten DIGHD_TEST_ANIMATION. Den avslutter normalt 0 og har 320 av 320 nullkontroller. Alle åtte tidligere manglende kilder 130, 640, 422, 642, 153, 154, 512 og 768 er sett som hele originaler i faktisk originalmotorbilde. Etterbehandlingen stoppet først fordi den sammenlignet tabellvalg med en bildeoversikt som utelater tomme kontrollkommandoer. Original COST og motorpin c9091321 bekrefter at 19 bare deaktiverer lag og 23 har ikke-tegnende 0x7b. Begge er gyldige. Samme eksisterende spor ble ferdigbehandlet uten ny avspilling eller motorendring. Se tomme-tabellkommandoer.json. Dette er kildekontroll og ingen naturlig gjennomspilling. Alle 47 familietarget har nå tilgjengelig kildekontekst; per-motiv kilde- og stilkontroll gjelder fortsatt før ny produksjon.
+
+Alle tidligere nativefiler, 1420 beskyttede inndata og tre stasher er bevart før publisering. 1861-uttoning og 1804-kildefunksjonsretur står fortsatt åpne. Tidligere verktøyavviste motiver omprøves ikke. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt med samme SCUMM v6-motorpin og Python-pipeline. Ingen motor- eller pipelineendring.
+
+Siste kontrollerte Linux-/Windows-release har fortsatt 3596 og vil mangle 17 native etter denne publiseringen. Neste pakkesamlepunkt er resten av 129-familien eller en reell produksjonsblokkering. Ingen nye pakkebygg i denne bunken. Gamle nattprosesser startes ikke. Automatisk grafikkproduksjon fortsetter; alt er ikke ferdig.
+'''
+(R/'RAPPORT.md').write_text(report)
+draft=R/'RAPPORT-utkast-fra-forrige-mal.md'
+if draft.exists():draft.unlink()
+# Fjern feil maltekst fra vårt lokale sluttverktøy; ikke kjør kontrollen om igjen.
+f=O/'slutt.py';s=f.read_text();start=s.index("(R/'RAPPORT-utkast-fra-forrige-mal.md').write_text(");end=s.index("with (R/'motor-kvittering.txt')",start)
+f.write_text(s[:start]+"# Endelig rapport skrives i ferdigstill.py etter kilde- og etikettavklaring.\n"+s[end:])
+shutil.copy2(f,R/'slutt.py.txt')
+note=A/'jobber/fig129_01/notat.md';s=note.read_text();before=s[:s.index('## Neste ni sidehoder')]
+note.write_text(before+'''## Neste ni sidehoder, 22. oktober 2026
+
+costume129_414 til 420, 404 og 405 er nytegnet fra hele separate kilder. Faktisk originalkontekst og hele godkjente Sam-/Max-mastere er sett før hvert kall. Tidligere eget H03-hode brukes bare til kontinuitet. Ni innebygde image_gen-kall ga ni hele nye malerier, ingen returkall, avslag eller API/CLI-fallback. Modellnavn er ikke oppgitt. Faktiske prompter og argumenter, råbilder, referansehash, prototyper og rutekart finnes i rapporter/sam129-hoder2-20261022.
+
+Det samlede delarket har 17 hoder, åtte tidligere og ni nye. Sju mål er fortsatt tomme; ingen resultat.png i jobbmappen og ingen ny hel arklevering. Egenkontroll gir 17 OK og fem upåbegynte store mål med FEIL; de to minste kildene under 20 originalpiksler hoppes over av kontrollen og er også manglende. Diagnostisk mottak har 17 egne OK og to automatiske originalfragmenter som er eksplisitt utelatt fra native og levering. Ni nye egne ruter består CORE 128, IoU 0,6 og dekning 0,8 med uendrede porter.
+
+Python renser egen alfa og RGB og plasserer hele malerier i fast 4x med åtte HD-pikslers lik marg. Egne grå tannblokker i 420 er fylt med én nøytral tannfarge uten endring i alfa eller geometri. Ingen original formmaske, originalfragment eller delkollasj. Alle ni hele rensede kildepar, ni motorvarianter, fire hele motorbilder og hele delarket er visuelt sett. Primærprøven viser alle 17 hoder, 711/720 null med de samme ni kjente bufferavvikene og ingen nye eller økte avvik. Ingen ny Tom-/Claude-godkjenning. Nativepublisering kvitteres separat. Delarkets SHA256 er c84b66d05f95f309d3af12d5abfb51a3c6ec251bdae7a37485c63a8fd38f7ad2.
+''')
+shutil.copy2(__file__,R/(Path(__file__).name+'.txt'))
+print('Kildekontekst 47/47 tilgjengelig, ni egne mål ferdig kontrollert. Klar til grafikkcommit.')

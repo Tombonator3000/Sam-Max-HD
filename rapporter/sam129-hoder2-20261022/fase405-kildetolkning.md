@@ -1,0 +1,7 @@
+# Originalmåling av siste snakkehode 405
+
+Første analyse ble stoppet fordi ingen originalfasepar var byteidentiske i unionen av begge tenkte retninger. De 32 avvikspikslene ligger i vannet ved venstre side av målerektangelet. Ren speilvending uten plasskorrigering tar fortsatt med 16 vannpiksler. Måleflaten traff dermed vann utenfor den faktiske originalaktøren.
+
+Hele originalrute 405 er projisert mot faktisk originaldump med begge retninger og små heltallige plassforskyvninger, uavhengig av ny HD-kunst og før/etter-avviket. Faktisk profil er visuelt bekreftet speilvendt. Eksakt kildefargeprøve etter skjermens RGB565-kvantisering finner entydig speilvendt rute ved +1 originalpiksel i x: 5056 av 5104 synlige HD-kildepiksler matcher. De øvrige 48 er tre originale røde nakkepiksler, hver forstørret til 4 x 4, som er dekket av Conroys oransje hår i originalen. Neste beste plassering har 2064 fargeavvik. Se fase405-kildeplassering.json, fase405-okklusjon.json og originaldumpene.
+
+Målingen bruker derfor rutens faktisk tegnede, speilvendte originalalfa med denne kildebekreftede plasseringen. Alle 5104 faktiske originalverdier, også de tre samme okkluderte områdene, er byteidentiske mellom grunnlag 3604 og kandidat 3613. Ingen pikselfargetoleranse, svekket IoU-/dekningsport, ny alfaklipping av kunst eller motorendring. Rutens egen HD-PNG er uendret. De øvrige hodene beholder den strengere opprinnelige unionsmålingen der like fasepar finnes.

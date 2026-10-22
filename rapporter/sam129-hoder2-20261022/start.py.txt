@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PREV=A/'rapporter/sam129-hoder1-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+git=lambda cwd,*args:subprocess.check_output(['git','-C',str(cwd),*args],text=True).strip()
+assert not R.exists()and not git(P,'status','--porcelain')and not git(A,'status','--porcelain');R.mkdir(parents=True)
+prev=read(PREV/'start.json');files=read(PREV/'publiserte-moddfiler-3604.json');plan=read(A/'rapporter/sam129-kilde-20261022/kildeplan.json');protected=prev['beskyttede'];stash=git(P,'stash','list','--format=%H').splitlines()
+assert len(files)==21848 and len(protected)==1420 and stash==prev['stash'];assert all(sha(P/'mods/gpt'/f)==h for f,h in files.items())and all(sha(A/f)==h for f,h in protected.items())
+assert read(P/'mods/gpt/mod.json')['costume_cels']==3604
+numbers=[*range(414,421),404,405];assert len(numbers)==9
+save(R/'start.json',dict(main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),hd_mod=git(P,'ls-remote','origin','hd-mod').split()[0],native=3604,filer=files,beskyttede=protected,stash=stash,figurark=sum(1 for f in(A/'jobber').glob('fig*/resultat.png')),nye_maal=9,ulike_hele=9,bibliotek=['figurark-fast-storrelse','publisert-mod-er-fasit'],bibliotek_kompatibilitet='Samme ScummVM/Python/Pillow, uendret CORE128 IoU0.6 dekning0.8, egne hele malerier, tidligere native er fasit.',nye_numre=numbers,tidligere_maal=[e['bilde']for e in read(PREV/'egen-native.json')['ruter']],tidligere_notat_sha256=sha(A/'jobber/fig129_01/notat.md')))
+save(R/'kildeplan.json',plan)
+board=Image.new('RGBA',(1500,1200),'#536576');d=ImageDraw.Draw(board)
+for i,n in enumerate(numbers):
+ e=next(e for e in plan['ruter']if e['bilde']==f'costume129_{n}');im=Image.open(e['kilde']).convert('RGBA');x=i%3*500;y=i//3*400;d.text((x+10,y+8),f'{n}: hel kilde {im.width}x{im.height}',fill='white');board.alpha_composite(im.resize((im.width*11,im.height*11),Image.Resampling.NEAREST),(x+100,y+50))
+board.convert('RGB').save(R/'ni-hele-originaler.png');shutil.copy2(__file__,R/'start.py.txt');print('Start native3604, ni nye mål,21848 filer,1420 kilder, tre stasher.')
