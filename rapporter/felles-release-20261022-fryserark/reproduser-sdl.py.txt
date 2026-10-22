@@ -1,0 +1,9 @@
+from pathlib import Path
+import os,subprocess,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name;PK=P/'out/felles-release-20261022-fryservindu/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm';T=O/'sdl-oppstart';assert not T.exists();T.mkdir();rows=[]
+for name,gfx,extra in [('surfacesdl','surfacesdl',[]),('normal','normal',[]),('surfacesdl-builtin','surfacesdl',['--gui-theme=builtin'])]:
+ d=T/name;d.mkdir();(d/'home').mkdir();(d/'saves').mkdir();env={k:v for k,v in os.environ.items()if not k.startswith('DIGHD_')};env.update(HOME=str(d/'home'),XDG_CONFIG_HOME=str(d/'home/.config'),XDG_DATA_HOME=str(d/'home/.local/share'),XDG_CACHE_HOME=str(d/'home/.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(P/'mods/gpt'),DIGHD_QUIT_AT='60')
+ args=[str(B),'--config='+str(d/'test.ini'),'--path='+str(D/'game'),'--savepath='+str(d/'saves'),'--themepath='+str(D),'--extrapath='+str(D),'--gfx-mode='+gfx,'--music-driver=mt32','--debuglevel=1',*extra,'samnmax']
+ with(d/'log.txt').open('wb')as f:code=subprocess.run(args,cwd=D,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=180).returncode
+ log=(d/'log.txt').read_text();q=dict(navn=name,exit=code,args=args,SDL_BlitSurface_feil='SDL_BlitSurface failed'in log,spill_gjenkjent='d917f311a448e3cc7239c31bddb00dd2'in log,DigHD='DigHD'in log,logg_sha256=hashlib.sha256((d/'log.txt').read_bytes()).hexdigest());rows.append(q);print(json.dumps(q,ensure_ascii=False),flush=True)
+(R/'sdl-oppstart-lokal.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')

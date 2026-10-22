@@ -1,0 +1,29 @@
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.ubuntu.com>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+Breakpoint 1 at 0x6fe740
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+WARNING: File::open: node does not exist!
+Creating configuration file: /home/tom/Sam-Max-HD/out/felles-release-20261022-fryserark/sdl-gdb/test.ini
+Debuglevel (from command line): 1
+Using SDL Video Driver "dummy"
+creating SurfaceSDL graphics manager
+creating OpenGL graphics manager
+creating SurfaceSDL graphics manager
+Using SDL Audio Driver "dummy"
+[New Thread 0x7ffff6c376c0 (LWP 1595807)]
+Output sample rate: 44100 Hz
+Output buffer size: 1024 samples
+Output channels: 2
+[New Thread 0x7ffff64366c0 (LWP 1595808)]
+
+Thread 1 "scummvm" hit Breakpoint 1, 0x0000555555c52740 in error(char const*, ...) ()
+#0  0x0000555555c52740 in error(char const*, ...) ()
+#1  0x00005555559b625f in SurfaceSdlGraphicsManager::internUpdateScreen() ()
+#2  0x00005555559b71b0 in SurfaceSdlGraphicsManager::endGFXTransaction() ()
+#3  0x0000555555651285 in scummvm_main ()
+#4  0x000055555563fdfe in main ()

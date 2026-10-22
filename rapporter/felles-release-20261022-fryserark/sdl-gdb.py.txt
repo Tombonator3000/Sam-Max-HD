@@ -1,0 +1,7 @@
+from pathlib import Path
+import subprocess,os
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/felles-release-20261022-fryserark';PK=P/'out/felles-release-20261022-fryservindu/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=P/'work/.codex-object-erase/engine/scummvm/scummvm';T=O/'sdl-gdb';assert not T.exists();T.mkdir();(T/'home').mkdir();(T/'saves').mkdir()
+env={k:v for k,v in os.environ.items()if not k.startswith('DIGHD_')};env.update(HOME=str(T/'home'),XDG_CONFIG_HOME=str(T/'home/.config'),XDG_DATA_HOME=str(T/'home/.local/share'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(P/'mods/gpt'),DIGHD_QUIT_AT='60')
+args=['gdb','--batch','-ex','set breakpoint pending on','-ex','break _Z5errorPKcz','-ex','run','-ex','bt 20','--args',str(B),'--config='+str(T/'test.ini'),'--path='+str(D/'game'),'--savepath='+str(T/'saves'),'--themepath='+str(D),'--extrapath='+str(D),'--gfx-mode=surfacesdl','--music-driver=null','--gui-theme=builtin','--debuglevel=1','samnmax']
+with(T/'trace.log').open('wb')as f:result=subprocess.run(args,cwd=D,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120)
+print('gdb exit',result.returncode);print((T/'trace.log').read_text()[-12000:])

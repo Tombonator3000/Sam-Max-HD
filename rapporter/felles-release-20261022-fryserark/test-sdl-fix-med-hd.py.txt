@@ -1,0 +1,12 @@
+from pathlib import Path
+import os,json,subprocess,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name;PK=P/'out/felles-release-20261022-fryservindu/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';T=O/'sdl-regresjon-med-hd';assert not T.exists();T.mkdir();rows=[]
+for side,B in [('foer',P/'work/.codex-object-erase/engine/scummvm/scummvm'),('etter',P/'work/.codex-windows-sdl-start/engine/scummvm/scummvm')]:
+ for gfx,theme in [('normal',None),('normal','builtin'),('surfacesdl',None),('surfacesdl','builtin')]:
+  name=side+'-'+gfx+'-'+(theme or'default');d=T/name;d.mkdir();(d/'home').mkdir();(d/'saves').mkdir();env={k:v for k,v in os.environ.items()if not k.startswith('DIGHD_')};env.update(HOME=str(d/'home'),XDG_CONFIG_HOME=str(d/'home/.config'),XDG_DATA_HOME=str(d/'home/.local/share'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(P/'mods/gpt'),DIGHD_QUIT_AT='60')
+  args=[str(B),'--config='+str(d/'test.ini'),'--path='+str(D/'game'),'--savepath='+str(d/'saves'),'--themepath='+str(D),'--extrapath='+str(D),'--gfx-mode='+gfx,'--music-driver=null','--debuglevel=1']+(['--gui-theme='+theme]if theme else[])+['samnmax']
+  with(d/'log.txt').open('wb')as f:
+   try:code=subprocess.run(args,cwd=D,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=120).returncode
+   except subprocess.TimeoutExpired:code=124
+  log=(d/'log.txt').read_text();q=dict(side=side,gfx=gfx,theme=theme or'default',exit=code,binar_sha256=hashlib.sha256(B.read_bytes()).hexdigest(),args=args,SDL_BlitSurface_feil='SDL_BlitSurface failed'in log,spill_gjenkjent='d917f311a448e3cc7239c31bddb00dd2'in log,DigHD='DigHD'in log,logg_sha256=hashlib.sha256((d/'log.txt').read_bytes()).hexdigest());rows.append(q);(R/'sdl-regresjon-med-hd.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');shutil.copy2(d/'log.txt',R/('sdl-med-hd-'+name+'.log'));print(name,code,q['SDL_BlitSurface_feil'],q['spill_gjenkjent'],q['DigHD'],flush=True)
+(R/'sdl-regresjon-med-hd.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');assert any(e['side']=='foer'and e['SDL_BlitSurface_feil']for e in rows);assert all(e['exit']==0 and e['spill_gjenkjent']and e['DigHD']and not e['SDL_BlitSurface_feil']for e in rows if e['side']=='etter');print('REGRESJON BESTÅTT:førfeil gjenskapt,alle fire ettertilfeller starter spill og HD.')

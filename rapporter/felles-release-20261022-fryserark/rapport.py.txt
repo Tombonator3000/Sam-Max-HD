@@ -1,0 +1,34 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+s=read(O/'bygg-startet.json');c=read(R/'moddfiler-kontroll.json');v=read(R/'motor-visuell-plan.json');m=read(R/'motor-sammenligning.json');proof=read(R/'linux-kontroll.json')
+assert c['begge_faktiske_nedlastinger_verifisert']and c['begge_modder_byteidentiske']and c['moddfiler_per_pakke']==21938;assert m['alle11_observert_i_relevante_kontrollprover_og_skript']and m['alle32_kildefaser_observert']and m['alle_originale_rektangler_med8HD_identiske']and m['uforklarte_HD_endringer']==0 and m['bufferavvik_koordinater_og_begge_RGB_eksakt_identiske'];assert(m['kontroller_pr_side'],m['null_pr_side'],m['null_etter_testaktorstart_pr_side'])==(560,554,440)
+assert len(v['varianter'])==3 and len(v['hele_motorbilder'])==4
+for group in ['varianter','hele_motorbilder']:
+ for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+for group,count in [('hele_fryseranimasjon',32),('hele_startanimasjon',10)]:assert len(v[group]['faser'])==count and sha(R/v[group]['fil'])==v[group]['sha256'];v[group]['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=11,hele_motorbilder_sett=4);save(R/'motor-visuell-plan.json',v);m['visuelt_sett']=True;save(R/'motor-sammenligning.json',m);rows=read(R/'motor-pikselkontroll.json');assert len(rows)==22
+for e in rows:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',rows);proof.update(visuelt_sett=True,hele_varianter_sett=11,hele_motorbilder_sett=4,varianter=v['varianter'],hele_motorbilder=v['hele_motorbilder']);save(R/'linux-kontroll.json',proof)
+pub=read(O/'publisert.json')if(O/'publisert.json').exists()else None
+published=f"Publisert og bekreftet Latest: {pub['url']}. Fellesvedleggene er lastet ned på nytt og har samme SHA256. Nativefrys er {'fortsatt aktiv til taggbygget er kontrollert'if pub['native_frosset']else'opphevet etter grønt taggbygg og kontroll av fjern-SHA og alle filhash'}."if pub else 'Begge pakker er bygget og kontrollert. Felles publisering og ny nedlasting av fellesvedlegg er ennå ikke bekreftet.'
+body=f'''Felles Linux-/Windows-samlepunkt med 3695 native HD-lag er kontrollert. {published}
+
+Begge pakkene inneholder 11 nye native siden forrige fellesutgave fryservindu med 3684. Dette er 1921, 1922, 1943..1948 og 1970..1972 fra kostyme 293. Fryserarket fig293_03 er helt levert med 32/32 ruter, og de 31 tidligere arkposisjonene er bevart. Siste 1943-tegning har åtte atskilte hvite grupper med største festeavvik 2,741 HD og ett blåglimt med 2,270 HD. Det krevde én ny innebygd bildegenerering og en liten flytting av hele tegningen, ingen lokal flytting eller originalmaske. Kostyme 293 har 54/55 native, bare verktøyholdt 1927 gjenstår og omprøves ikke. fig293_01 er fortsatt delvis 9/10. 506 av 1758 hele figurjobber har resultat, 1252 er uten i tillegg til øvrige returer og samlet sluttkontroll. Ingen tidligere publisert PNG er endret.
+
+Begge faktiske nedlastinger, fire vedleggsdigester og sjekksumfilene er kontrollert. Alle 21938 runtime-modfiler per pakke er byteidentiske med publisert filkart på 21939 filer. README.md er eneste utelatte dokumentasjon. Pakkekoden er {s['kode']}, native er {s['hd_mod']}. Linux-bygg {s['plattform']['linux']['run_id']} og Windows-bygg {s['plattform']['windows']['run_id']} er grønne. Windows-byggets oppstartstest uten skjerm er bestått. Tidligere versjonsreleaser og grafikk er bevart.
+
+Ny faktisk nedlastet Linux-binær med medfølgende mod er sammenlignet med ny produksjonsavspilling i tre prøver per side: kontrollert aktør29 med animasjon1/raw6, animasjon7/raw30 og zclip1, samt originalt lokalskript204 etter konstruert aktør10-fortilstand. Alle 11 nye pakkelag er sett i relevant kontrollert animasjon og skriptprøven. Originale ruterektangler med åtte HD-pikslers naboområde og HD-pikslene i aktørfeltet er identiske med produksjonen. Hver side har 560 bufferkontroller, 554 uten avvik og 440/440 uten avvik etter figurstart. To kjente inngangsavvik per prøve har identiske koordinater og begge RGB-verdier. Ingen nye/økte bufferavvik eller uforklarte HD-endringer. Elleve hele før/etter-varianter, fire hele motorbilder, ti startfaser og 32 fryserfaser er visuelt sett. Dette er ikke naturlig full gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+To lokale kontrollstarter stoppet før sluttkontrollen:kopiert eksisterende utgivelsestagg og for tidlig motorstart uten rapportmappe. Unik tagg og eksplisitt journalvakt retter oppsettet. Forsøkene og råloggen er bevart i lokal-kontrollstart.json og ikke-bestatt-start1.log.gz,og regnes ikke bestått. Alle senere produksjons- og pakkeprøver er ferske avspillinger. De lokale SDL-teststarterne og utvidelsen av nearest-grunnlaget er bevart separat; ingen ufullstendig kontroll regnes bestått.
+
+Alle 1432 beskyttede jobbfiler og tre opprinnelige stasher bevares. En avgrenset SDL-motorretting går gjennom testet PR før de nye pakkebyggene. Windows-forsøk39782182412 kompilerte og pakket, men feilet skjermoppdatering før spillstart. Rotårsaken og lokal før/etter-kontroll er dokumentert i sdl-regresjon-med-hd.json og sdl-nearest-3000.json; se sdl-retting.json for PR og flettet kode. ScummVM-pin og HD-patch0001 er uendret. Gamle nattprosesser startes ikke. Etter at nativefrysen er opphevet fortsetter grafikkautomatikken med neste bestilling, fig296_01 etter retur- og kildekontroll. All grafikk er ikke ferdig.
+'''
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');(R/'RAPPORT.md').write_text('# Felles Linux- og Windows-pakke med komplett fryserark\n\n'+stamp+' (Codex)\n\n'+body);(R/'status-blokk.md').write_text(body)
+save(R/'fremdrift.json',dict(native=3695,nye_pakkelag=11,laget_i_siste_grafikkbunke=1,egenkontrollert_siste=1,native_mottatt_siste=1,motorobservert_siste=1,visuelt_sett_siste=1,publisert_siste=1,pakkelag_motorobservert=11,pakkelag_visuelt_sett=11,hele_figurer_med_resultat=506,figurer_total=1758,helt_fig293_03=32,helt_ark_total=32,familie_native=54,familie_total=55,begge_pakker_hashbekreftet=True,felles_publisert=bool(pub),native_frosset=s['native_frosset'],fullfort_grafikk=False,Tom_godkjent=False,Claude_godkjent=False))
+for f in ['rapport.py','analyser-pakke.py','motor-pakke.py','kontroller-pakker.py','publiser-felles.py','hent-status.py','taggkontroll.py','klargjor-motor.py','kjor-motor.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('11 pakkelag visuelt sett,motorobservert,begge faktiske pakker hashkontrollert. Felles publisert:',bool(pub))

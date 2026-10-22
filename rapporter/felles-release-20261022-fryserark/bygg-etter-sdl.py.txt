@@ -1,0 +1,28 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,hashlib,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def api(p):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+p],cwd=P,text=True))
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+s=read(O/'bygg-startet.json');fix=read(R/'sdl-retting.json');assert s['native_frosset']and s['status']=='byggfeil_undersokes_native_frosset'and not(O/'byggforsok1.json').exists()
+assert not git(P,'status','--porcelain')and not git(A,'status','--porcelain')
+code=git(P,'rev-parse','HEAD');assert code==api('git/ref/heads/main')['object']['sha']==fix['main_etter_fletting'];assert api('pulls/'+str(fix['pr']))['merged']
+assert any(v['head_sha']==code and v['status']=='completed'and v['conclusion']=='success'for v in api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs'])
+assert s['hd_mod']==api('git/ref/heads/hd-mod')['object']['sha'];files=read(R/'moddfiler-3695.json');assert len(files)==21939 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+for plat in ['linux','windows']:
+ assert not any(v['status']!='completed'for v in api('actions/workflows/'+plat+'.yml/runs?per_page=20')['workflow_runs'])
+for d in [O,R]:
+ save(d/'byggforsok1.json',s)
+ for plat in ['linux','windows']:
+  q=d/('run-'+plat+'.json')
+  if q.exists():shutil.copy2(q,d/('run-'+plat+'-forsok1.json'))
+s.update(kode=code,status='native_frosset_nybygg_etter_sdl',plattform={},forrige_kode=s['kode'],forrige_bygg='byggforsok1.json',sdl_pr=fix['pr'],nybygg_utc=datetime.now(timezone.utc).isoformat(),feil_forsok1=s.pop('feil',[]))
+def persist():
+ for d in [O,R]:save(d/'bygg-startet.json',s)
+persist()
+for plat in ['linux','windows']:
+ assert s['hd_mod']==api('git/ref/heads/hd-mod')['object']['sha'];row=s['plattform'][plat]=dict(status='dispatch_forsokes',dispatch_utc=datetime.now(timezone.utc).isoformat());persist()
+ q=subprocess.run(['gh','workflow','run',plat+'.yml','--ref','main'],cwd=P,text=True,capture_output=True);row.update(dispatch_exit=q.returncode,stdout=q.stdout,stderr=q.stderr);persist();assert q.returncode==0,q.stderr;m=re.search(r'/actions/runs/(\d+)',q.stdout);assert m,'Ukjent utfall,ikke gjenta';row.update(status='dispatched',run_id=int(m[1]));persist();print(plat,row['run_id'],flush=True)
+shutil.copy2(__file__,R/'bygg-etter-sdl.py.txt')
