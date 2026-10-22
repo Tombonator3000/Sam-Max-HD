@@ -9,3 +9,5 @@ Femten faktiske innebygde image_gen-kall har råbilder og prompter i rapporter/s
 S013 ble tatt ut etter at utvidet blåkontroll fant manglende kildedetaljer. S015 består heller ikke alle blå porter. S014 har feil hudfeste. Se RETUR.md. Ingen avviste motiver omdefineres til stilanker,ingen originalmaske brukes til klipp,og ingen lokale trekk flyttes med Python.
 
 Motorprøven er kontrollert aktør29,anim1/raw6,zclip1 i rom56,ikke naturlig full gjennomspilling.160 kontroller pr side,158null og120/120null etter figurstart. Ingen nye/økte avvik eller uforklarte HD-endringer. Ingen ny Tom-/Claude-godkjenning. Fellespakker har fortsatt3695 native.
+
+Publisering 2026-10-22 19:12 (Codex): costume296_1920 er publisert additivt som hd-mod f32e9f7b64a8ac0434b5e0ba3a312ba8aeb25ca9, grafikkilde 596dd441ac146026600dabbb3848a48c29f33a9a. Alle 21940 filhash er hentet tilbake og bekreftet. Alle 21939 tidligere filstier og 21933 tidligere PNG-hash er bevart, med ny mod.json og nytt sjekksummanifest. Status er fortsatt delvis1/9, ingen hel resultat.png. Felles Linux/Windows3695 mangler den ene nye ruten. Ingen ny Tom-/Claude-godkjenning.

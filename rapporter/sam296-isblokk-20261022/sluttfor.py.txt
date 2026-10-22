@@ -1,0 +1,95 @@
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+import json
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def save(path, data):
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+
+receipt = read(R / 'mottak-publisert.json')
+assert receipt['native'] == 3696 and receipt['alle_filhash_bekreftet']
+native = receipt['hd_mod']
+art = receipt['grafikkilde']
+assert native == 'f32e9f7b64a8ac0434b5e0ba3a312ba8aeb25ca9'
+now = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+
+report = R / 'RAPPORT.md'
+text = report.read_text()
+old = 'Additiv publisering gjenstår.'
+assert old in text
+text = text.replace(old, f'Publisert additivt som hd-mod {native}, med grafikkilde {art}. Alle 21940 filhash er hentet tilbake og bekreftet. Lokal mod er mottatt fra den kontrollerte nedlastingen; forrige mod er bevart separat.', 1)
+text = text.replace('Kandidat3696 er ikke med der.', 'Publisert native3696 er ikke med der; fellespakkene mangler den ene nye ruten.')
+text = text.replace('Alle21939 tidligere modfiler,1440 beskyttede jobbfiler og tre opprinnelige stasher bevares.', 'Alle 21939 tidligere modfilstier og samtlige 21933 tidligere PNG-filer er bevart. Bare mod.json og sjekksummanifestet er oppdatert. Alle 1440 beskyttede jobbfiler og tre opprinnelige stasher er uendret.')
+report.write_text(text)
+
+(R / 'NESTE.md').write_text(f'''# Neste arbeid
+
+costume296_1920 er publisert som hd-mod {native}. Alle 21940 filhash er hentet tilbake og bekreftet. Kildecommit er {art}. Les mottak-publisert.json og publisering-forsokt.json; ikke gjenta publisering eller eldre hjelpere som bygger den ferdige engangsleveransen på nytt.
+
+Gjenoppta samme bunke, fig296_01, der 1921/1922 og 1923..1928 mangler. Delarket har 1/9 kontrollerte og publiserte ruter. Les RETUR.md og siste faktiske råbilder og porter før nytt motiv. Nyeste bildekall er S015. S013 og S015 er underkjent i blåkontrollen; ingen av disse eller den historiske to-rutekandidaten3697 skal importeres. Historikken er bevart under historikk-to-kandidater.
+
+Hele 296-familien har 23 mål: 9 i ark01, 3 i02, 10 i03 og 1 i04. Neste uavhengige fase kan velges etter original- og kontekstkontroll. Aliasene 296_1927/1928 venter på en kontrollert egen 296_1926. Den tidligere verktøyholdte 293_1927 er en annen ressurs og omprøves ikke. Ingen nødvendig designavklaring med Tom er identifisert.
+
+Felles Linux/Windows har 3695 og mangler den ene nye native. Oppdater pakkene ved neste familiesamlepunkt eller avslutning, med faktisk nedlasting, SHA256 og filkontroll. Automatikken er fortsatt ACTIVE. Hele figurjobber med resultat er 506/1758;1252 er uten, i tillegg til returer og sluttkontroll. Bevar alle tidligere native, 1440 beskyttede inputfiler og tre opprinnelige stasher. Ingen grafikk til main og ingen gamle nattprosesser. All grafikk er ikke ferdig.
+''')
+
+(R / 'PAKKER.md').write_text(f'''# Pakker
+
+Siste kontrollerte fellesutgave er sam-max-hd-2026-10-22-fryserark med 3695 native. Begge faktiske pakker og alle runtime-filhash er kontrollert i rapporter/felles-release-20261022-fryserark. Publisert hd-mod {native} har 3696 og én ny rute, costume296_1920, som ennå ikke er inkludert i pakkene. Ingen nye pakkebygg er startet for denne delruten. Nativefrys er false. Neste samlepunkt følger videre produksjon i 296-familien eller avslutning.
+
+https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark
+''')
+
+note = A / 'jobber/fig296_01/notat.md'
+text = note.read_text()
+text += f'\nPublisering {now} (Codex): costume296_1920 er publisert additivt som hd-mod {native}, grafikkilde {art}. Alle 21940 filhash er hentet tilbake og bekreftet. Alle 21939 tidligere filstier og 21933 tidligere PNG-hash er bevart, med ny mod.json og nytt sjekksummanifest. Status er fortsatt delvis1/9, ingen hel resultat.png. Felles Linux/Windows3695 mangler den ene nye ruten. Ingen ny Tom-/Claude-godkjenning.\n'
+note.write_text(text)
+
+block = f'''<!-- sam296-isblokk-status:start -->
+Én ny egen sidefase fra isblokken er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert: costume296_1920. Publisert hd-mod er {native}, grafikkilde {art}. Alle 21940 filhash er hentet tilbake og bekreftet. Modden har 3696 native. Alle 21939 tidligere filstier og 21933 tidligere PNG-filer er bevart. Bare mod.json og sjekksummanifestet er oppdatert. Forrige mod er bevart separat.
+
+fig296_01 er delvis 1/9, og hele 296-familien har 1/23 native fordelt på fire jobber. Ingen hel resultat.png leveres ennå. Hele figurjobber med resultat er fortsatt 506/1758; 1252 er uten, i tillegg til returer og sluttkontroll. Femten faktiske innebygde bildekall har råbilder, prompter og argumenter. Én tegning er valgt, 14 er kvalitetsreturer. S013 ble tatt ut før publisering da ekstra fargekontroll fant manglende blå kildedetaljer. S015 består heller ikke blåkontrollen. Ingen terskel senkes og ingen retur importeres.
+
+Originalen og kjøkkenkonteksten i rom56 samt godkjente Sam-/Max-mastere er sett. Førstefasen er tilsiktet venstrebeskåret. Valgt S006 har fast4x og egen alfa, uten originalmaske eller originalfragmenter. Hele tegningen er flyttet 1HD ned, uten lokal Python-flytting av trekk. Fire kontrollerte fester er innen3HD, største avvik2,718HD. IoU0,92195 og dekning0,93372 består uendrede porter0,6/0,8. Automatisk mottak gir1 OK,0 til gjennomsyn og8 mangler. Hele arket er derfor ikke godkjent som ferdig.
+
+Ferske kontrollerte motorprøver med faktisk nedlastet Linux-binær caa4d726 viser den nye ruten og alle11 kildefaser. Hver side har160 bufferkontroller,158 uten avvik og120/120 uten avvik etter figurstart. De to kjente inngangsavvikene har identiske koordinater og begge RGB-verdier. Originalrektangelet med8HD naboområde er identisk. Ingen nye/økte bufferavvik eller uforklarte HD-endringer. Ett helt før/etter-par,ett helt motorbilde og alle11 faser er visuelt sett. Dette er kontrollert animasjon, ingen naturlig full gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Avbrutt modkopi og motorprøve med lagringsvarsler er bevart og regnes ikke bestått. En fersk lagringsprøve og begge senere hele avspillinger består atomisk filskriving med spor bevart. Ingen motor-/pipelinekode er endret. Alle1440 beskyttede inputfiler og tre opprinnelige stasher er uendret.
+
+Felles Linux/Windows fryserark har fortsatt3695 og mangler den ene nye ruten. Begge faktiske pakker er tidligere lastet ned og kontrollert; de kalles ikke oppdatert til3696. Neste pakkesamlepunkt følger videre familieproduksjon eller avslutning. Gjenoppta fig296_01 fra RETUR.md/NESTE.md i rapporter/sam296-isblokk-20261022 på gpt-arbeid. 1921..1928 mangler; aliasene296_1927/1928 venter på kontrollert egen1926. Tidligere verktøyholdt293_1927 omprøves ikke. Automatikken er ACTIVE; all grafikk er ikke ferdig. Ingen grafikk til main og ingen gamle nattprosesser.
+<!-- sam296-isblokk-status:slutt -->'''
+
+for base, names in [(A, ['ORDRE.md', 'GRAFIKKLISTE.md']),
+                    (P, ['memory.md', 'todo.md', 'STATUS.md'])]:
+    for name in names:
+        path = base / name
+        text = path.read_text()
+        assert '<!-- sam296-isblokk-status:start -->' not in text
+        title, rest = text.split('\n', 1)
+        path.write_text(title + '\n\n' + block + '\n\nTidligere status nedenfor er historikk.\n' + rest)
+
+log = P / 'log.md'
+with log.open('a') as out:
+    out.write(f'\n## {now} (Codex)\n\n' + block + '\n\nBevis: rapporter/sam296-isblokk-20261022 på gpt-arbeid. Bare dokumentasjon endres i main.\n')
+
+save(R / 'dokumentasjonsstatus.json', dict(
+    tid_lokal=now, hd_mod=native, grafikkilde=art, native=3696,
+    gpt_dokumenter=['ORDRE.md', 'GRAFIKKLISTE.md', 'jobber/fig296_01/notat.md'],
+    main_dokumenter=['memory.md', 'todo.md', 'STATUS.md', 'log.md'],
+    bare_dokumentasjon_main=True, automasjon='ACTIVE',
+    pakker_native=3695, pakker_mangler_native=1))
+shutil.copy2(__file__, R / 'sluttfor.py.txt')
+print('Kvittering og dokumentasjon oppdatert etter bekreftet publisering. Ingen ny hel figurjobb.')

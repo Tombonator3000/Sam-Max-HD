@@ -1,6 +1,6 @@
 # Isblokken, første kontrollerte delrute
 
-Status 2026-10-22 19:03 (Codex): én egen rute er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert. Additiv publisering gjenstår. Dette er costume296_1920 fra fig296_01. Delarket har1/9 ruter,hele296-familien har23 mål i fire jobber. Ingen hel resultat.png leveres ennå. 506/1758 hele figurjobber har resultat,1252 mangler i tillegg til returer og sluttkontroll.
+Status 2026-10-22 19:03 (Codex): én egen rute er laget,egenkontrollert,native mottatt,visuelt sett og motorobservert. Publisert additivt som hd-mod f32e9f7b64a8ac0434b5e0ba3a312ba8aeb25ca9, med grafikkilde 596dd441ac146026600dabbb3848a48c29f33a9a. Alle 21940 filhash er hentet tilbake og bekreftet. Lokal mod er mottatt fra den kontrollerte nedlastingen; forrige mod er bevart separat. Dette er costume296_1920 fra fig296_01. Delarket har1/9 ruter,hele296-familien har23 mål i fire jobber. Ingen hel resultat.png leveres ennå. 506/1758 hele figurjobber har resultat,1252 mangler i tillegg til returer og sluttkontroll.
 
 Originalen viser Conroy og Lee Harvey i isblokken i kjøkkenet,rom56. Førstefasene er tilsiktet beskåret i venstre kant. Originaler,spillkontekst og komplette godkjente Sam-/Max-mastere er sett. Jobbens generelle entallsbeskrivelse er presisert separat;beskyttede jobbdata er urørt. CSV-kolonnen kostyme=296 brukes,ikke rekkefølge194 eller et uvedkommende c-cel296-bilde.
 
@@ -14,6 +14,6 @@ Fersk motorprøve i faktisk nedlastet Linux-binær caa4d726 viser den nye ruten 
 
 Forrige kjøring ble avbrutt under kopiering og motorprøve. Den ufullstendige modkopien og PNG/tmp-filer er bevart. Skrivevarsler i den avbrutte prøven har ikke dokumentert rotårsak og regnes ikke bestått. En fersk fem-bilders prøve og begge senere hele avspillinger har vellykket atomisk lagring,med rename-spor bevart. Ingen motor- eller pipelinekode er endret. Reflink-kopien er kontrollert med samtlige filhash. En lokal hjelpers syntaksfeil er rettet før kontroll og er ikke regnet som bestått.
 
-Alle21939 tidligere modfiler,1440 beskyttede jobbfiler og tre opprinnelige stasher bevares. Pakker er fortsatt den kontrollerte fellesutgaven med3695 native. Kandidat3696 er ikke med der. Neste pakkesamlepunkt følger ved videre familieproduksjon eller avslutning,med faktiske nedlastinger og sjekksummer.
+Alle 21939 tidligere modfilstier og samtlige 21933 tidligere PNG-filer er bevart. Bare mod.json og sjekksummanifestet er oppdatert. Alle 1440 beskyttede jobbfiler og tre opprinnelige stasher er uendret. Pakker er fortsatt den kontrollerte fellesutgaven med3695 native. Publisert native3696 er ikke med der; fellespakkene mangler den ene nye ruten. Neste pakkesamlepunkt følger ved videre familieproduksjon eller avslutning,med faktiske nedlastinger og sjekksummer.
 
 Bibliotekskilder: losninger/grafikk/figurark-fast-storrelse.md og losninger/bygg/publisert-mod-er-fasit.md. Samme SCUMM-v6-pin og testede pipeline brukes;publisert mod er fasit. Det avgrensede søket etter avbrutt PNG-lagring ga ingen relevant løsning,så feilen ble undersøkt med lokal kildekode og en fersk sporbar prøve. Ingen ny motorretting tilskrives dette.
