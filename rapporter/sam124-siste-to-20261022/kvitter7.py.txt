@@ -1,0 +1,23 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,re,shutil,tomllib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;W=P/'out/felles-release-20261022-gatorgolf';read=lambda p:json.loads(p.read_text());save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+c=read(R/'mottak-publisert.json');b=read(W/'bygg-startet.json');assert c['native']==3596 and c['nye_native']==7 and c['alle_filhash_bekreftet'] and b['native_frosset'] and c['hd_mod']==b['hd_mod']
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');auto=tomllib.loads(Path('/home/tom/.codex/automations/fullf-r-sam-max-grafikken/automation.toml').read_text());assert auto['status']=='ACTIVE'
+save(R/'automatisering-status.json',dict(id='fullf-r-sam-max-grafikken',status=auto['status'],kontrolltid=now,oppgaven_ikke_ferdig=True,ingen_endring_i_automatiseringen=True))
+lead=f'''Sju nye Lee-Harvey/Max-ruter er publisert og hentet tilbake i hd-mod {c['hd_mod']},3596 native totalt. Åtte mål er tegnet og teknisk mottatt fra sju hele egne malerier.1861 er holdt etter flere feilpiksler under uttoning i3597-diagnosen; resten av modden økes bare med de sju kontrollerte rutene. fig124_08 er helt levert med tre mål, to native publisert og én holdt. fig124_07 er delvis med fem tegnede/publiserte mål og sju tomme plasser og telles ikke som helt levert.504 av1758 figurark har resultat,1254 er uten resultat pluss returer og sluttkontroll. Ingen Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+Alle21840 publiserte filhash er bekreftet. Samtlige21833 tidligere stier og21827 tidligere PNG,1412 beskyttede kilder og tre stasher er bevart. Hele prototyper, ark/delark, sju motorvarianter og fire hele motorbilder er sett. Både3589 og3596 har711 av720 nullkontroller og de samme ni kjente avvikene, nøyaktige koordinater og begge RGB-verdier i samme rekkefølge. Originalaktørverdier er identiske; ingen uforklarte endringer utenfor nye ruter etter sammenligning ved samme separate129-hodefase. Ingen tvunget lokalskript, testaktør eller skjult aktør, men heller ikke full naturlig gjennomspilling.
+
+B02/1848 fikk outputavslag i bildeverktøyet, request b9827304-d41b-48c6-a1da-8f27f3b0665d. Ingen retry eller bildefallback.1849 til1854 er ikke prøvd denne gangen og er ikke individuelt registrert avvist.1804 står fortsatt åpen fra forrige retur.1861 trenger avgrenset motorundersøkelse og testet PR ved kodeendring; ikke endre alfa eller mottaksporter for å skjule feilen.
+
+Felles Linux-/Windows-pakker bygges nå fra kode {b['kode']} med native3596 frosset på {b['hd_mod']}. Linux{b['plattform']['linux']['run_id']} og Windows{b['plattform']['windows']['run_id']}. Forrige fellesutgave har3535 og mangler61 publiserte native. Ikke kall ny utgave oppdatert før faktiske nedlastinger, sjekksummer, hver inkludert grafikkfil og relevant Linux-avspilling er kontrollert. Se rapporter/felles-release-20261022-gatorgolf. Ingen ny webtest eller interaktiv Windows-prøve. Automatisk produksjon er ACTIVE; ikke gjenstart gamle nattprosesser. Alt er ikke ferdig.'''
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;t=p.read_text();t,n=re.subn(r'<!-- sam124-06-status:start -->.*?<!-- sam124-06-status:slutt -->',lambda _: '<!-- sam124-06-status:start -->\n'+lead+'\n<!-- sam124-06-status:slutt -->',t,count=1,flags=re.S);assert n==1;p.write_text(t)
+(R/'PUBLISERT.md').write_text('# Publisert og hentet tilbake\n\n'+lead+'\n')
+with (R/'RAPPORT.md').open('a')as f:f.write(f'\nPubliseringskvittering {now}: sju nye native er hentet og alle21840 filhash er bekreftet fra {c["hd_mod"]}. Grafikkilde {c["grafikkilde"]}. Gammelt3589-underlag er fysisk bevart i out/{R.name}/mod-grunnlag3589. Fellespakkebyggene er startet med nativefrys.1861 er fortsatt utelatt.\n')
+for job in ['fig124_07','fig124_08']:
+ with (A/'jobber'/job/'notat.md').open('a')as f:f.write(f'\nPublisert/hentet {now}: native {c["hd_mod"]},3596 totalt. Dette arket har {5 if job=="fig124_07" else 2} publiserte ruter. Alle21840 filhash er bekreftet.1861 er fortsatt holdt; ingen Tom-/Claude-godkjenning.\n')
+c.update(native_frosset=True,pakker_status='begge_bygg_startet',pakker_rapport='rapporter/felles-release-20261022-gatorgolf');save(R/'mottak-publisert.json',c)
+save(R/'dokumentasjonsgrunnlag.json',dict(tid=now,tekst=lead,native=c['hd_mod'],grafikkilde=c['grafikkilde'],tillatte_main_filer=['memory.md','todo.md','STATUS.md','log.md']));shutil.copy2(__file__,R/'kvitter7.py.txt');print(now,'native3596,byggefrys,automatikkACTIVE',flush=True)

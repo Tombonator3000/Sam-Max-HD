@@ -23,3 +23,5 @@ Alle sju valgte native er vist i den faktiske rom25-inngangen/lokal217, ingen tv
 ## Bevaring og publisering
 
 Kandidat3596 har21840 filer og21834 PNG. Alle21833 tidligere stier og21827 tidligere PNG,1412 beskyttede jobbfiler og tre eksisterende stasher er bevart. Ingen spillgrafikk, motor- eller pipelineendring i main. Publisering skal skje fra fersk fjern-SHA med eksakt force-with-lease og tilbakehenting av alle filhash. Kvitteringen kommer i mottak-publisert.json. Tidligere mod bevares fysisk. Fellespakkene oppdateres ved dette samlepunktet og kalles først oppdatert etter faktisk nedlasting og innholdskontroll på begge plattformer.
+
+Publiseringskvittering 2026-10-22 03:24: sju nye native er hentet og alle21840 filhash er bekreftet fra 9270b2603f730106f7db14ff03511426bb3a1f08. Grafikkilde 7c26ac94e4359b4b1c235788d3a6da738b4b70b8. Gammelt3589-underlag er fysisk bevart i out/sam124-siste-to-20261022/mod-grunnlag3589. Fellespakkebyggene er startet med nativefrys.1861 er fortsatt utelatt.

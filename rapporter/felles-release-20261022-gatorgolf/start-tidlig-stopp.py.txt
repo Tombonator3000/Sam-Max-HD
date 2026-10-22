@@ -1,0 +1,28 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,re,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam124-siste-to-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda path:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True));git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+assert not (O/'bygg-startet.json').exists() and not R.exists()
+receipt=read(S/'mottak-publisert.json');code=git(P,'rev-parse','HEAD');mod=receipt['hd_mod'];assert receipt['native']==3596 and receipt['alle_filhash_bekreftet'];assert not git(P,'status','--porcelain')
+assert code==api('git/ref/heads/main')['object']['sha'] and mod==api('git/ref/heads/hd-mod')['object']['sha']
+runs=api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs'];assert any(v['head_sha']==code and v['status']=='completed' and v['conclusion']=='success'for v in runs)
+for platform in ['linux','windows']:
+ active=api(f'actions/workflows/{platform}.yml/runs?per_page=20')['workflow_runs'];assert not any(v['status']!='completed'for v in active),'Ikke dupliser eller avbryt pågående bygg'
+prior=api('releases?per_page=100');tag='sam-max-hd-2026-10-22-gatorgolf';assert not any(v['tag_name']==tag for v in prior)
+manifest=read(S/'publiserte-moddfiler-3596.json');assert len(manifest)==21840 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items());assert len(list((A/'jobber').glob('fig*/resultat.png')))==504
+R.mkdir();save(R/'moddfiler-3596.json',manifest)
+combined=[]
+for n in range(1792,1862):
+ f=f'costumes/costume124_{n}_hd.png'
+ if f in manifest:combined.append(dict(bilde=f'costume124_{n}',fil=f,sha256=manifest[f]))
+assert len(combined)==61 and not any(e['bilde'] in ['costume124_1804','costume124_1861']for e in combined)
+save(R/'familie-native61.json',dict(ruter=combined));save(R/'releaser-foer-bygg.json',prior);save(O/'releaser-foer-bygg.json',prior)
+state=dict(start_utc=datetime.now(timezone.utc).isoformat(),kode=code,hd_mod=mod,native=3596,nye_native=61,kostymer=[124],grunnlag_felles_native=3535,figurjobber_med_resultat=504,holdte_ruter=['costume124_1804','costume124_1861'],release_tag=tag,status='native_frosset_bygg_dispatch',native_frosset=True,plattform={},bibliotek='losninger/bygg/publisert-mod-er-fasit.md',bibliotek_teststatus='PASS, samme ScummVM/publisert-mod-pipeline; alle gamle filer SHA-verifisert',grafikkrapport='rapporter/sam124-siste-to-20261022')
+def persist():
+ for D in [O,R]:save(D/'bygg-startet.json',state)
+persist()
+for platform in ['linux','windows']:
+ assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+ row=state['plattform'][platform]=dict(status='dispatch_forsokes',dispatch_utc=datetime.now(timezone.utc).isoformat());persist();res=subprocess.run(['gh','workflow','run',platform+'.yml','--ref','main'],cwd=P,text=True,capture_output=True);row.update(dispatch_exit=res.returncode,stdout=res.stdout,stderr=res.stderr);persist();assert res.returncode==0,res.stderr;match=re.search(r'/actions/runs/(\d+)',res.stdout);assert match,'Ukjent dispatchutfall, ikke start igjen';row.update(run_id=int(match[1]),status='dispatched');persist();print(platform,row['run_id'],flush=True)
+shutil.copy2(__file__,R/'start.py.txt')
