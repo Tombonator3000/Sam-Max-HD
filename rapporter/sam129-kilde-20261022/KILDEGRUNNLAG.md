@@ -1,0 +1,7 @@
+# Kostyme129, kildeklargjøring
+
+Dette er Lee-Harvey, samme menneske som i124, ikke Sam, Max eller Conroy. De to hele originalarkene er visuelt sett22. oktober. Her finnes hele kropper/torsoer, separate hoder, munn-/blikkfaser og små kildebekreftede deler. Kropp129 kan ikke lages ved å klippe vekk Max fra124. Bare hele dimensjons- og byteidentiske RGBA-kilder kan dele et eget helt maleri.
+
+47 mål er inventert, med originalfilhash, full RGBA-hash og eksakte hele aliaser. Noen snakkehoder er naturlig sett i original rom25-inngang/lokal217 sammen med torso124_1859. Øvrige mål mangler fortsatt spillkontekst. Les kildeplan.json. Ingen bildekall, resultater eller native er laget. Ikke erklær kildegrunnlaget ferdig før alle nødvendige kontekster/funksjoner er avklart og sett.
+
+Før produksjon: gjenoppta uttoningsreturen1861 avgrenset, og respekter pågående pakkefrys. Fortsett deretter uavhengige129-motiver etter remake-skillen. Se hver hel original i faktisk spillkontekst og hele Sam-/Max-stilankre før hvert kall. Bevar faktisk hud, små deler og hode-/øyestørrelse. Kopier ikke en generell Max-positur fra generisk jobbkort. Ekte alfa og hele malerier, ingen original formklipping eller delkollasj. Avslag1848 eller tidligere andre motiver skal ikke omprøves. Denne planen er forberedelse, ikke en ny leveranse.

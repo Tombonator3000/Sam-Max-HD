@@ -1,0 +1,57 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from functools import lru_cache
+import numpy as np,json,re,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam124-siste-to-20261022';V=A/'rapporter/sam124-siste-20261022';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+state=read(O/'bygg-startet.json');L=O/'linux/squashfs-root/usr/share/sam-max-hd';family={e['bilde']for e in read(R/'familie-native61.json')['ruter']};selected={e['bilde']for e in read(S/'egen-native.json')['ruter']};assert len(family)==61 and len(selected)==7
+modes=[('primaer217',read(S/'kandidat3596.json'),read(R/'pakke-primaer217.json'),selected),('hel8',read(V/'kandidat8.json'),read(R/'pakke-hel8.json'),{f'costume124_{n}'for n in range(1835,1847)})]
+@lru_cache(maxsize=80)
+def pixels(f):return np.array(Image.open(f).convert('RGB'))
+def error_pixels(p):
+ T=Path(next(iter(p['tegninger'].values()))['fil']).parent;out=[]
+ for e in p['kontroller']:
+  if not e['avvik']:continue
+  f=e['frame'];s=pixels(str(T/f'frame_{f:06}_screen.png'));wf=list(T.glob(f'frame_{f:06}_room[0-9][0-9][0-9].png'));assert len(wf)==1;w=pixels(str(wf[0]));y,x=np.where(np.any(s!=w,axis=2));assert len(x)==e['avvik'];out.append(dict(frame=f,avvik=e['avvik'],koordinater_og_begge_RGB_sha256=hashlib.sha256(np.stack([x,y],1).tobytes()+s[y,x].tobytes()+w[y,x].tobytes()).hexdigest()))
+ return out
+def heads(proof):
+ log=(Path(next(iter(proof['tegninger'].values()))['fil']).parent/'scummvm.log').read_text();out={}
+ for m in re.findall(r'frame (\d+) soft cel\s+(\d+) costume\s*129\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+  f,n,x,y,w,h=map(int,m);out.setdefault(f,set()).add((n,x,y,w,h))
+ return out
+rows=[];buffers=[];shots=[]
+for mode,old,new,needed in modes:
+ assert old['exit']==new['exit']==0 and new['native_antall']==3596 and new['binar_sha256']==read(R/'linux-nedlasting-kontroll.json')['binar_sha256']
+ count=720 if mode=='primaer217' else 320;assert len(new['kontroller'])==len(old['kontroller'])==count and new['nullkontroller']==old['nullkontroller']==count-(9 if mode=='primaer217'else 0)
+ oe,ne=error_pixels(old),error_pixels(new);assert [(e['avvik'],e['koordinater_og_begge_RGB_sha256'])for e in oe]==[(e['avvik'],e['koordinater_og_begge_RGB_sha256'])for e in ne],('Nye bufferavvik',mode)
+ buffers.append(dict(mode=mode,grunnlag=oe,pakke=ne,eksakte_bufferavvik_identiske=True));oh,nh=heads(old),heads(new)
+ log=(Path(next(iter(new['tegninger'].values()))['fil']).parent/'scummvm.log').read_text();assert "d917f311a448e3cc7239c31bddb00dd2" in log
+ for name in sorted(needed):
+  cel=int(name.split('_')[1]);src=np.array(Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA'));sm=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);native=L/'mods/gpt/costumes'/(name+'_hd.png');na=np.array(Image.open(native).convert('RGBA'));assert sha(native)==read(R/'moddfiler-3596.json')['costumes/'+name+'_hd.png']
+  mask=na[:,:,3]==255;assert mask.any();pairs=[]
+  for n in new['hendelser']:
+   if n['cel']!=cel or not Path(n['fil']).exists():continue
+   for o in old['hendelser']:
+    if o['cel']==cel and o['pos']==n['pos'] and o['maal']==n['maal'] and Path(o['fil']).exists() and oh.get(o['logg_frame'],set())==nh.get(n['logg_frame'],set()):pairs.append((abs(n['bildeframe']-o['bildeframe']),n['bildeframe'],o,n))
+  assert pairs,(mode,name);found=None
+  for _,_,o,n in sorted(pairs,key=lambda p:p[:2]):
+   x,y=n['pos'];w,h=n['maal'];of=Path(o['fil']);nf=Path(n['fil']);a=pixels(str(of.with_name(of.stem+'_flat.png')));z=pixels(str(nf.with_name(nf.stem+'_flat.png')))
+   if not np.array_equal(a[y*4:(y+h)*4,x*4:(x+w)*4][sm],z[y*4:(y+h)*4,x*4:(x+w)*4][sm]):continue
+   before,after=pixels(o['fil']),pixels(n['fil']);x0,y0=x*4-8,y*4-8;ww,hh=na.shape[1],na.shape[0];assert min(x0,y0)>=0 and x0+ww<=1280 and y0+hh<=800
+   b=before[y0:y0+hh,x0:x0+ww];c=after[y0:y0+hh,x0:x0+ww]
+   if not np.array_equal(b[mask],c[mask]):continue
+   found=(o,n,b,c);break
+  assert found,(mode,name,'Ingen samme originale aktør-/hodefase med identisk opak HD-raster')
+  o,n,b,c=found;rows.append(dict(mode=mode,bilde=name,grunnlag_fil=o['fil'],pakke_fil=n['fil'],grunnlag_frame=o['bildeframe'],pakke_frame=n['bildeframe'],pos=n['pos'],maal=n['maal'],original_aktorverdier_identiske=True,separat129fase_identisk=True,opak_native_RGB_identisk=True,opake_native_piksler=int(mask.sum()),hel_nativeflate_RGB_identisk=bool(np.array_equal(b,c)),native_sha256=sha(native),visuelt_sett=False))
+  if (mode=='primaer217'and name in ['costume124_1847','costume124_1855','costume124_1859'])or(mode=='hel8'and name=='costume124_1845'):
+   f=R/(name+'-faktisk-pakke.png');shutil.copy2(n['fil'],f);shots.append(dict(bilde=name,fil=f.name,sha256=sha(f),kontrollert_testaktor29=mode=='hel8',visuelt_sett=False))
+assert len(rows)==19 and family <= set(modes[0][2]['tegninger'])|set(modes[1][2]['tegninger'])
+boards=[]
+for first in range(0,len(rows),4):
+ subset=rows[first:first+4];board=Image.new('RGB',(1800,1120),'#304050');dr=ImageDraw.Draw(board)
+ for i,e in enumerate(subset):
+  xx=i%2*900;yy=i//2*560;x,y=e['pos'];w,h=e['maal'];box=(max(0,x*4-24),max(0,y*4-24),min(1280,(x+w)*4+24),min(800,(y+h)*4+24));dr.text((xx+8,yy+8),e['bilde']+': kontrollert produksjon / faktisk pakke, '+e['mode'],fill='white')
+  for j,key in enumerate(['grunnlag_fil','pakke_fil']):
+   im=Image.open(e[key]).convert('RGB').crop(box);im.thumbnail((435,510),Image.Resampling.LANCZOS);board.paste(im,(xx+8+j*445,yy+30))
+ f=R/f'pakke-varianter-{first//4+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=[e['bilde']for e in subset],visuelt_sett=False))
+proof=dict(kode=state['kode'],hd_mod=state['hd_mod'],native=3596,publiserte124_ruter_i_begge_pakker=61,alle61_observert_i_ny_Linux_pakke=True,primaer_observert=58,kontrollert_hel8_observert=12,skjermbufferkontroller=1040,nullkontroller=1031,eksakte_feilkoordinater_og_begge_RGB_identiske=True,ingen_nye_eller_okte_bufferavvik=True,helprove_uten_avvik=False,kontrollert_hel8_null=320,primaer_naturinngang217_uten_tvunget_skript=True,kontrollert8_testaktor29=True,full_naturlig_gjennomspilling=False,ny_Linux_binar_SHA256=read(R/'linux-nedlasting-kontroll.json')['binar_sha256'],rasterkontroller=19,opake_native_RGB_identiske_med_produksjon=19,originalaktorverdier_identiske=19,hele_nativeflater_RGB_identiske=sum(e['hel_nativeflate_RGB_identisk']for e in rows),raster_avgrensning='Opak del av native, ingen påstand om SHA-like hele skjermer. Hele alfa/flater vises i før/etter-board og hele motorbilder.',visuelt_sett=False,hele_motorbilder=shots,varianter=boards,interaktiv_Windows_eller_ny_webtest=False,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,gjenværende='1804 og1861 holdt, sju fig124_07-mål mangler. Uttoningsfeil og kjent liten Cone-tupp består.')
+save(R/'pakke-rasterkontroll.json',rows);save(R/'pakke-bufferkontroll.json',buffers);save(R/'linux-kontroll.json',proof);shutil.copy2(__file__,R/'analyser-pakke.py.txt');print('61 observert,19 originale aktørverdier/opake HD-raster identiske,1031/1040 null og identiske ni kjente bufferavvik.',flush=True)
