@@ -1,0 +1,76 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,re,tomllib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam124-siste-to-20261022';N=A/'rapporter/sam129-kilde-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda s:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True));git=lambda w,*a:subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+state=read(O/'bygg-startet.json');rec=read(R/'publisert.json');tag=state['release_tag'];code=state['kode'];mod=state['hd_mod'];stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+run=api('actions/runs/39707299348');assert run['head_branch']==tag and run['head_sha']==code and run['status']=='completed' and run['conclusion']=='success'
+active=[]
+for wf in ['linux.yml','windows.yml']:
+ active += [dict(id=r['id'],status=r['status'],gren=r['head_branch'])for r in api('actions/workflows/'+wf+'/runs?per_page=30')['workflow_runs']if r['status']!='completed']
+assert not active,active
+latest=api('releases/latest');assert latest['id']==rec['release_id'] and latest['tag_name']==tag and api('git/ref/heads/hd-mod')['object']['sha']==mod
+for e in read(O/'assetkontroll.json'):
+ a=next(a for a in latest['assets']if a['name']==e['fil']);assert a['digest']=='sha256:'+e['sha256'] and a['size']==e['bytes'];assert sha(O/'felles-nedlasting'/e['fil'])==e['sha256']
+manifest=read(R/'moddfiler-3596.json');assert len(manifest)==21840 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items())
+b=read(S/'start.json');protected=b['beskyttede']|read(N/'kildeplan.json')['beskyttede'];assert len(protected)==1420 and all(sha(A/f)==h for f,h in protected.items()) and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert all(manifest[f]==h for f,h in b['filer'].items()if f.endswith('.png'))
+assert all(sha(Path(e['kilde']))==e['sha256']for e in read(N/'kildeplan.json')['ruter'])
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==504 and not (A/'jobber/fig124_07/resultat.png').exists()
+auto=tomllib.loads(Path('/home/tom/.codex/automations/fullf-r-sam-max-grafikken/automation.toml').read_text());assert auto['status']=='ACTIVE'
+save(R/'taggbygg-kontroll.json',dict(id=run['id'],status=run['status'],conclusion=run['conclusion'],kode=code,tag=tag,aktive_bygg=[],felles_vedleggsdigester_uendret=True,native_frosset=False,tid=stamp))
+save(R/'bevaring-slutt.json',dict(native=3596,hd_mod=mod,alle21840filhash_bekreftet=True,tidligere21827PNG_bevart=True,tidligere1412beskyttede_bevart=True,nye129kilder_beskyttede=8,alle1420beskyttede_bekreftet=True,stasher=b['stash'],kilde129_filer=47,automatisering=auto['status'],ingen_motor_pipeline_eller_webkode_endret=True))
+state.update(status='felles_publisert_hentet_kontrollert_og_taggbygg_bestatt',native_frosset=False,taggbygg_forventes=False,taggbygg_id=run['id'],sluttkontroll_tid=stamp)
+rec.update(native_frosset=False,taggbygg_forventes=False,taggbygg_id=run['id'],taggbygg_success=True,aktive_ekstra_bygg=[],sluttkontroll_tid=stamp,beskyttede=1420,stasher_bevart=True)
+for folder in [O,R]:save(folder/'bygg-startet.json',state);save(folder/'publisert.json',rec)
+c=read(S/'mottak-publisert.json');c.update(native_frosset=False,pakker_status='felles_publisert_hentet_kontrollert_og_taggbygg_bestatt',felles_tag=tag,alle_publiserte_ruter_i_pakker=True);save(S/'mottak-publisert.json',c)
+for name in ['fremdrift.json','sluttkontroll.json']:
+ d=read(S/name);d.update(native_frosset=False,felles_url=rec['url'],pakker_native=3596,alle_publiserte_ruter_i_pakke=True)
+ for e in d['leveranser']+d['delvise_leveranser']:
+  count=5 if e['jobb']=='fig124_07'else 2;e.update(pakkede_publiserte_ruter=count,alle_publiserte_ruter_i_pakke=True,i_fellespakke=count==e['ruter'])
+ save(S/name,d)
+lead=f'''Felles Linux- og Windows-utgave er publisert, lastet ned igjen og kontrollert: {rec['url']}. Begge har 3596 native HD-bildelag, inkludert alle 61 publiserte Lee-Harvey/Max-ruter siden forrige fellesutgave. Alle 21839 runtime-modfiler per pakke, fire vedleggsdigester og sjekksumfiler er bekreftet. De 40 tidligere utgivelsene er bevart. Linux-bygg {rec['linux_run']}, Windows-bygg {rec['windows_run']} og automatisk Windows-taggbygg {run['id']} er bestått. Nativefrysen er frigitt.
+
+Denne bunken ga åtte tegnede og teknisk mottatte ruter fra sju hele malerier. Sju nye ruter er publisert og motorprøvd. Rute1861 er holdt etter flere feilpiksler under uttoning i3597-diagnosen. fig124_08 har komplett resultatark med tre mål, men bare to er publisert. fig124_07 har fem publiserte mål og sju tomme plasser; arket er ufullført og telles ikke levert.504 av1758 figurark har resultat,1254 er uten resultat pluss returer og sluttkontroll. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+Den nye faktiske Linux-pakken viser alle61 publiserte familieruter i primærsekvensen og separat helanimasjon8.1040 kontroller gir1031 null og samme ni kjente bufferavvik, med identiske koordinater og begge RGB-verdier.19 kontrollerte originale aktørverdier og opake HD-raster matcher produksjonen.19 før/etter-varianter og fire hele motorbilder er visuelt sett. Primærsekvensen bruker original rominngang/lokal217; hel8 bruker konstruert testaktør29. Ingen full naturlig gjennomspilling, interaktiv Windows-prøve eller ny webtest. Den kjente SDL-startfeilen og lille statiske Cone-tuppen står fortsatt åpne.
+
+B02/1848 fikk outputavslag fra bildeverktøyet, request b9827304-d41b-48c6-a1da-8f27f3b0665d. Ingen retry.1849 til1854 er ikke prøvd denne gangen.1804 og1861 står i retur. Uttoningsfeilen krever avgrenset motorundersøkelse og testet PR ved kodeendring, uten å endre kunstens alfa eller mottaksporter. Kostyme129 er kildeklargjort:47 mål fra46 ulike hele kilder,39 har spillkontekst,20 naturlig og19 kontrollert. De siste åtte mangler fortsatt kontekst. Ingen129-bildekall eller leveranser ennå. Alle kilder/kontekster og hele mastere skal ses før hvert motiv.
+
+Native er {mod}, pakkekode {code}. Alle21840 publiserte filhash,21827 tidligere PNG,1412 tidligere beskyttede jobbfiler pluss åtte nye129-inndata og tre stasher er bekreftet. Bare dokumentasjon endres i main. Se rapporter/sam124-siste-to-20261022, rapporter/felles-release-20261022-gatorgolf og rapporter/sam129-kilde-20261022 på gpt-arbeid. Grafikkautomatikken er fortsatt ACTIVE. Fortsett avgrensede returer og uavhengig grafikk; alt er ikke ferdig.'''
+# Hold menneskelesbare setninger adskilt fra maskinidentifikatorer.
+for word in ['Rute','rute','Alle','alle','Samtlige','Linux','Windows','Ingen','ingen','kostyme','Kostyme','fra','av','gir','og','pluss','naturlig','kontrollert','helanimasjon']:
+ lead=re.sub(r'\b('+word+r')(?=\d)',r'\1 ',lead)
+lead=lead.replace('ruter;','ruter; ').replace('.504 ','. 504 ').replace('.1040 ','. 1040 ').replace('.19 ','. 19 ').replace('.1849 ','. 1849 ').replace('.1804 ','. 1804 ').replace(':47 ',': 47 ').replace(',39 ',', 39 ').replace(',20 ',', 20 ').replace('forrige fellesutgave. Alle','forrige fellesutgave. Alle')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;t=p.read_text();t,n=re.subn(r'<!-- sam124-06-status:start -->.*?<!-- sam124-06-status:slutt -->',lambda _: '<!-- sam124-06-status:start -->\n'+lead+'\n<!-- sam124-06-status:slutt -->',t,count=1,flags=re.S);assert n==1;p.write_text(t)
+(R/'SLUTTSTATUS.md').write_text('# Publisert fellesutgave og videre arbeid\n\n'+lead+'\n');(S/'PUBLISERT.md').write_text('# Publisert og pakket\n\n'+lead+'\n')
+with (R/'RAPPORT.md').open('a')as f:f.write(f'\nFellesutgaven {rec["url"]} er publisert, Latest og faktisk hentet igjen. Alle fire vedleggsdigester og begge SHA-filer er bekreftet.40 tidligere utgivelser er bevart. Taggbygg {run["id"]} er bestått; ingen aktive pakkebygg, nativefrys frigitt {stamp}.\n')
+(S/'NESTE.md').write_text('''# Neste arbeid etter fellesutgaven
+
+Felles Linux-/Windows3596 er publisert, faktisk hentet og kontrollert, inkludert automatisk taggbygg. Nativefrysen er frigitt. Ikke gjenta disse byggene eller de sju publiserte rutene. Kvittering: rapporter/felles-release-20261022-gatorgolf/publisert.json.
+
+Undersøk1861/uttoning avgrenset fra bevart3597-diagnose og3589/3596-kontroller. Se retur1861.json og uttoning-leseundersokelse.json. Ingen motorårsak er bekreftet. Bevar tegning og alfa; eventuell retting via testet PR.1804 står fortsatt i kildefunksjonsretur i arkkontrollen, uten terskelsenkning eller oppdiktet Sam-underlag.
+
+fig124_07 mangler1848 til1854.1848 har outputavslag request b9827304-d41b-48c6-a1da-8f27f3b0665d, ingen retry. De øvrige seks er ikke prøvd denne gangen, ikke individuelt verktøyavvist. Ikke gjenta avvist motiv eller hele identiske aliaser.
+
+Fortsett annen uavhengig produksjon. Nærmeste sammenhengende kildeplan er rapporter/sam129-kilde-20261022/kildeplan.json:47 mål,46 hele kilder,39 med naturlig eller kontrollert kontekst og åtte fortsatt uten. Begge originalark er sett, men alle kontekster og mastere skal fortsatt ses per motiv før generering. Ingen129-bildekall/resultater/native er laget. Lag praktiske bunker og hold laget, egenkontrollert, mottatt, visuelt sett, motorobservert, publisert og Tom-/Claude-godkjent atskilt.
+
+504 av1758 figurark har resultat.1254 gjenstår pluss returer, kildemangler og samlet sluttkontroll. AutomatikkACTIVE. Ikke gjenstart gamle nattprosesser eller pause automatikken som om alt var ferdig.
+''')
+for job,count in [('fig124_07',5),('fig124_08',2)]:
+ with (A/'jobber'/job/'notat.md').open('a')as f:f.write(f'\nFellespakke-kvittering {stamp}: {count} publiserte ruter i arket er inkludert i begge faktisk nedlastede og hashkontrollerte3596-pakker. {rec["url"]}.1861 er fortsatt holdt. Ingen ny Tom-/Claude-godkjenning.\n')
+save(S/'automatisering-status.json',dict(id='fullf-r-sam-max-grafikken',status=auto['status'],kontrolltid=stamp,oppgaven_ikke_ferdig=True,ingen_endring_i_automatiseringen=True))
+save(R/'dokumentasjonsgrunnlag.json',dict(tid=stamp,tekst=lead,native=mod,pakkekode=code,url=rec['url'],tillatte_main_filer=['memory.md','todo.md','STATUS.md','log.md']))
+assert git(P,'branch','--show-current')=='main' and not git(P,'status','--porcelain') and api('git/ref/heads/main')['object']['sha']==git(P,'rev-parse','HEAD')
+changed=git(P,'diff','--name-only',code,'HEAD').splitlines();allowed=['memory.md','todo.md','STATUS.md','log.md'];assert set(changed)<=set(allowed)
+for name in ['memory.md','todo.md','STATUS.md']:
+ p=P/name;first,rest=p.read_text().split('\n',1);extra=''
+ if name=='todo.md':extra='## Neste\n\n- [x] Publiser, last ned og kontroller felles Linux-/Windows3596. Taggbygg bestått, nativefrys frigitt.\n- [ ] Undersøk1861/uttoning avgrenset og bruk testet PR ved kodeendring. Behold1804-returen.\n- [ ] Fortsett uavhengig grafikk. Kostyme129 har47 mål og39 kontekster klargjort, ingen bildekall ennå.\n- [ ] Behold1848-outputavslag uten retry. De øvrige seks uferdige124_07-fasene er ikke forsøkt i denne bunken.\n- [ ] Fullfør øvrige1254 figurark, returer og samlet sluttkontroll, med egen Tom-/Claude-godkjenning.\n\n'
+ p.write_text(first+'\n\n## Gjeldende grafikkstatus, '+stamp+'\n\n'+lead+'\n\n'+extra+'Tidligere status nedenfor er historikk.\n'+rest)
+with (P/'log.md').open('a')as f:f.write('\n## '+stamp+' (Codex)\n\n'+lead+'\n\nBare memory.md, todo.md, STATUS.md og log.md endres i main. Ingen ny motor-, pipeline- eller webkode.\n')
+changed=subprocess.check_output(['git','diff','--name-only','-z'],cwd=P).decode().split('\0');assert set(filter(None,changed))==set(allowed),changed
+subprocess.run(['git','diff','--check'],cwd=P,check=True);subprocess.run(['git','add','--',*allowed],cwd=P,check=True);subprocess.run(['git','commit','-q','-m','Dokumenter kontrollert felles3596 og videre grafikkarbeid'],cwd=P,check=True);subprocess.run(['git','push','-q','origin','main'],cwd=P,check=True)
+save(R/'main-dokumentasjon.json',dict(commit=git(P,'rev-parse','HEAD'),bare_filer=allowed,ny_kode=False,CI='avventes'))
+shutil.copy2(__file__,R/'sluttrapport.py.txt');print('Felles3596 ferdig kontrollert,taggbygg grønt,nativefrys frigitt,automatikkACTIVE. Main',git(P,'rev-parse','HEAD'),flush=True)

@@ -1,9 +1,11 @@
-# Neste arbeid
+# Neste arbeid etter fellesutgaven
 
-Fullfør publisering av bare sju ruter fra egen-native.json.3597 er diagnostisk og skal ikke publiseres. Bevar1861-retur og B02-avslag uten retry.
+Felles Linux-/Windows3596 er publisert, faktisk hentet og kontrollert, inkludert automatisk taggbygg. Nativefrysen er frigitt. Ikke gjenta disse byggene eller de sju publiserte rutene. Kvittering: rapporter/felles-release-20261022-gatorgolf/publisert.json.
 
-Neste samlepunkt: bygg felles Linux-/Windows fra samme kode og frosset publisert3596. Last ned begge pakker, sjekk sjekksummer, hver inkludert grafikkfil og relevant faktisk Linux-motor før oppdatert-status. Web og interaktiv Windows er ikke testet her.
+Undersøk1861/uttoning avgrenset fra bevart3597-diagnose og3589/3596-kontroller. Se retur1861.json og uttoning-leseundersokelse.json. Ingen motorårsak er bekreftet. Bevar tegning og alfa; eventuell retting via testet PR.1804 står fortsatt i kildefunksjonsretur i arkkontrollen, uten terskelsenkning eller oppdiktet Sam-underlag.
 
-Deretter undersøk den konkrete uttoningsfeilen med3597/1861 og gammel3573/3589/3596 som kontroll. Bevar råfiler og offisielle porter; rett eventuell motorfeil bare i testet PR.1804 trenger fortsatt kildefunksjonsavklaring i arkkontrollen via testet PR eller kildetro heltegning som består uendrede porter. Ikke mal falske Sam-fragmenter.
+fig124_07 mangler1848 til1854.1848 har outputavslag request b9827304-d41b-48c6-a1da-8f27f3b0665d, ingen retry. De øvrige seks er ikke prøvd denne gangen, ikke individuelt verktøyavvist. Ikke gjenta avvist motiv eller hele identiske aliaser.
 
-fig124_07 mangler1848 til1854.1848 har outputavslag request b9827304-d41b-48c6-a1da-8f27f3b0665d.1849 til1854 er ikke prøvd, ikke merk dem individuelt avvist. Ikke gjenta samme avviste motiv eller hele RGBA-aliaset. Fortsett andre uavhengige produserbare figurer fra siste kildeplan, etter å ha lest kilder/kontekst/mastere og returer. Det er1254 ark uten resultat pluss returer. Ingen ny Tom-/Claude-godkjenning.
+Fortsett annen uavhengig produksjon. Nærmeste sammenhengende kildeplan er rapporter/sam129-kilde-20261022/kildeplan.json:47 mål,46 hele kilder,39 med naturlig eller kontrollert kontekst og åtte fortsatt uten. Begge originalark er sett, men alle kontekster og mastere skal fortsatt ses per motiv før generering. Ingen129-bildekall/resultater/native er laget. Lag praktiske bunker og hold laget, egenkontrollert, mottatt, visuelt sett, motorobservert, publisert og Tom-/Claude-godkjent atskilt.
+
+504 av1758 figurark har resultat.1254 gjenstår pluss returer, kildemangler og samlet sluttkontroll. AutomatikkACTIVE. Ikke gjenstart gamle nattprosesser eller pause automatikken som om alt var ferdig.
