@@ -1,0 +1,9 @@
+from pathlib import Path
+import json,hashlib,datetime,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+cid,n=sys.argv[1],int(sys.argv[2]);prompt=Path(sys.argv[3]).read_text();K=R/'kall'/cid;assert not K.exists();K.mkdir(parents=True)
+refs=[str(A/f'rapporter/helikopter178-kilde-20261022/kilder/{n}/referanse40x.png'),str(A/'hovedark/sam.png')]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+args=dict(prompt=prompt,referenced_image_paths=refs,transparent_background=True)
+(K/'prompt-brukt.txt').write_text(prompt);(K/'argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n');(K/'plan.json').write_text(json.dumps(dict(kall=cid,rute=n,jobb='fig178_03',utfort=False,planlagt_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),referanser=[dict(fil=s,sha256=sha(Path(s)))for s in refs],kilde_sha256=sha(P/f'work/extract/costumes/costume178_{n}.png'),original_kontekst_og_stil_visuelt_sett=True,prompt_korrigering='Enkeltrute fra beskyttet helark, kildebekreftet faktisk restfragment.4x og ekte alfa beholdt.'),ensure_ascii=False,indent=2)+'\n')
+print(K/'argumenter.json')

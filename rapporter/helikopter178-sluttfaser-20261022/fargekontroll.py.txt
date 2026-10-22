@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,hashlib
+from PIL import Image,ImageDraw
+import numpy as np
+from scipy.spatial import cKDTree
+from scipy import ndimage as nd
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+C=['H003','H005','H006','H007','H008'];board=Image.new('RGB',(1000,5*160),'#304050');d=ImageDraw.Draw(board);rows=[]
+for i,c in enumerate(C):
+ K=R/'kall'/c;q=json.loads((K/'kontroll.json').read_text());n=q['rute'];src=np.array(Image.open(P/f'work/extract/costumes/costume178_{n}.png').convert('RGBA'));a=np.array(Image.open(K/'prototype-under-kontroll.png'))
+ # Fargekontroll er måling, ikke endring eller lokal plassering.
+ colors=np.unique(src[src[:,:,3]>0,:3],axis=0);coords=np.argwhere(a[:,:,3]>=128);rgb=a[a[:,:,3]>=128,:3];_,idx=cKDTree(colors).query(rgb);points=[]
+ for col in colors:
+  cy,cx=np.nonzero(np.all(src[:,:,:3]==col,axis=2)&(src[:,:,3]>0));desired=np.stack([cy*4+q['margy']*4+2,cx*4+q['margx']*4+2],axis=1)
+  have=coords[np.all(colors[idx]==col,axis=1)];vals=cKDTree(have).query(desired)[0]if len(have)else np.full(len(desired),999.)
+  points.append(dict(RGB=col.tolist(),kildepunkter=len(desired),maks_HD=float(max(vals)),over3HD=int((vals>3).sum())))
+ proof=dict(kall=c,rute=n,fargepunkter=points,alle_eksakte_kildefarger_finnes=all(p['maks_HD']<999 for p in points),alle_fargefester_innen3HD=all(p['over3HD']==0 for p in points),native_sha256=hashlib.sha256((K/'prototype-under-kontroll.png').read_bytes()).hexdigest(),kun_maaling_ingen_endring=True)
+ (K/'fargekontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');rows.append(proof)
+ for j,name in enumerate(['original-native-kontroll.png','prototype-under-kontroll.png']):
+  im=Image.open(K/name);bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);bg=bg.resize((im.width*4,im.height*4),Image.Resampling.NEAREST);board.paste(bg.convert('RGB'),(10+j*490,i*160+40))
+ d.text((10,i*160+10),f'{c} / {n}: original venstre, egen hoyre, 4x visningszoom',fill='white')
+ print(c,n,'color',[(p['RGB'],p['over3HD'],round(p['maks_HD'],2))for p in points])
+board.save(R/'fem-kandidater-kontroll4x.png');(R/'fargekontroll-fem.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')

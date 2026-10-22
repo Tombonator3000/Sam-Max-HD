@@ -1,0 +1,59 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,shutil,subprocess,re,datetime
+from PIL import Image
+import numpy as np
+from smhd.myk import import_sheet
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-helikopter3703'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def inventory(root):
+ with ThreadPoolExecutor(max_workers=8)as pool:return dict(pool.map(lambda p:(p.relative_to(root).as_posix(),sha(p)),[p for p in root.rglob('*')if p.is_file()]))
+start=read(A/'rapporter/taubane137-korrigering-20261022/start.json');start['beskyttede']=read(R/'grunnlag.json')['beskyttede'];start['tid_kandidat_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+assert len(start['beskyttede'])==1472
+assert inventory(M)==start['filer']
+assert all(sha(A/f)==h for f,h in start['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==start['stash']
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0];assert remote==start['remote']['hd-mod']
+save(R/'start.json',start)
+selected={'H003':2021,'H008':2020};entries=[];calls=[]
+for K in sorted((R/'kall').iterdir()):
+ q=read(K/'kontroll.json');plan=read(K/'plan.json');assert plan['utfort'] and sha(K/'raa.png')==plan['raa_sha256']==q['raa_sha256']
+ good=K.name in selected;q['visuell_native_kontroll']=True;q['levert']=good;q['valgt']=good;q['status']='VALGT_EGENKONTROLLERT'if good else'KVALITETSRETUR'
+ if good:
+  color=read(K/'fargekontroll.json');assert q['tekniske_porter_bestatt']and q['alle_alfa_fester_innen3HD']and color['alle_fargefester_innen3HD']
+  q['visuell_begrunnelse']='Kildebekreftet én sammenhengende sluttstrek, ingen fullført helikopter eller individuelt innrammede pikselfirkanter. Kildens fargefelt og hele form bevart med egen ny alfa. Små 1/2-piksel-høye originalspor tåler ingen ekstra detaljer.'
+  native=R/'native'/f'costume178_{q["rute"]}_hd.png';native.parent.mkdir(exist_ok=True);shutil.copy2(K/'prototype-under-kontroll.png',native)
+  e=dict(bilde=f'costume178_{q["rute"]}',jobb='fig178_03',kostyme=178,rute=q['rute'],kall=K.name,fil=f'costumes/costume178_{q["rute"]}_hd.png',prototype=native.relative_to(A).as_posix(),sha256=sha(native),kilde_sha256=plan['kilde_sha256'],egen_alfa=True,originalmaske=False,originalfragmenter=False,lokal_flytting=False,snitt_union=q['snitt_union'],dekning=q['dekning'],marg_HD=[q['margx']*4,q['margy']*4],prototype_visuelt_sett=True,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False);entries.append(e)
+ else:
+  q['retur']='Bredde/høyde og/eller dekning består ikke uendrede porter.'if not q['tekniske_porter_bestatt']else'Avvik i små fargefester, selv om alfaomriss består. Ingen import.'
+ save(K/'kontroll.json',q);calls.append(dict(kall=K.name,rute=q['rute'],raa_sha256=sha(K/'raa.png'),prompt_sha256=sha(K/'prompt-brukt.txt'),argumenter_sha256=sha(K/'argumenter.json'),valgt=good,status=q['status'],native_sha256=q['native_sha256']))
+save(R/'alle-kall.json',calls);save(R/'kvalitetsreturer.json',[e for e in calls if not e['valgt']])
+job=read(A/'jobber/fig178_03/jobb.json');board=Image.new('RGBA',tuple(job['lerret']));routes=[]
+for e in sorted(entries,key=lambda x:x['rute']):
+ rt=next(q for q in job['ruter']if q['rute']==e['rute']);x,y,_,_=rt['rekt'];mx,my=e['marg_HD'];dx=(job['plassering'][0]+x)*4-mx;dy=(job['plassering'][1]+y)*4-my
+ im=Image.open(A/e['prototype']).convert('RGBA');layer=Image.new('RGBA',board.size);layer.alpha_composite(im,(dx,dy));assert not((np.array(board)[:,:,3]>0)&(np.array(layer)[:,:,3]>0)).any();board.alpha_composite(layer)
+ yy,xx=np.nonzero(np.array(im)[:,:,3]>=128);routes.append(dict(**e,rect=[dx+int(xx.min()),dy+int(yy.min()),int(xx.max()-xx.min()+1),int(yy.max()-yy.min()+1)],native_ok=True,native_marg_hd=8))
+partial=R/'fig178_03-delresultat.png';board.save(partial);mapping={'fig178_03':dict(sha256_resultat=sha(partial),ruter=routes)};save(R/'rutekart-fig178_03.json',mapping);save(R/'rutekart-samlet.json',mapping)
+D=O/'ark/fig178_03';D.mkdir(parents=True,exist_ok=True)
+for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:shutil.copy2(A/'jobber/fig178_03'/f,D/f)
+shutil.copy2(partial,D/'resultat.png')
+p=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(D/'resultat.png')],cwd=A,capture_output=True,text=True);log=p.stdout+p.stderr;(R/'fig178_03-egenkontroll.txt').write_text(log)
+errors=re.findall(r'^FEIL\s+(costume\d+_\d+):',log,re.M);missing=[e['bilde']for e in job['ruter']if e['rute']not in selected.values()];assert not set(errors)&{e['bilde']for e in entries};assert set(errors)<=set(missing)
+save(R/'delark-kontroll.json',dict(exit=p.returncode,produserte_FEIL=0,feil_kun_tomme_maal=errors,hele_arket_ferdig=False,begrensning='Delark2/12, ikke hel resultat.png. Ingen beskyttet jobbfil endret.'))
+# Isolert teknisk kontroll av bare de to bestilte rutene. Jobb.json endres ikke.
+rep=import_sheet(np.array(board),[e for e in job['ruter']if e['rute']in selected.values()],{e['bilde']:e['rect']for e in routes},P/'work/extract',O/'automatisk-mottak')
+save(R/'automatisk-mottak.json',rep)
+assert set(rep['ruter'])=={e['bilde']for e in entries}
+assert all(e['kilde']=='arket' and e['i_modden'] and e['snitt_union']>=.6 and e['dekning']>=.8 for e in rep['ruter'].values()),rep
+assert all(e['status']=='ok' or (e['status']=='sjekk' and e['grunn'].startswith('tegnet ')) for e in rep['ruter'].values()),rep
+save(R/'automatisk-storrelsesmerknad.json',dict(OK=0,SJEKK=2,FEIL=0,native_egen_porter_bestatt=2,ekte_alfa=True,grunn='CORE128-høyde blir5HD for1x-kilde og7HD for2x-kilde. To små ruter gir17,6prosent gruppespredning. Ingen omrisshold, ingen originalfragmenter. Faste nativeflater44x20 og60x24 med8HD marg beholdes; rå alfa og helplassering er uendret. Mottaket merkes fortsatt SJEKK; det kalles ikke2 automatiske OK.',forste_assert='For streng antakelse om status OK stoppet før moddkopi eller import. Uendret mottaksrapport bevart. Ingen pipeline-terskel endret.',motor_vurdering_gjenstar=True))
+# Diagnostisk mottak kan gjøre ny tilpasning. Bare SHA-festet egen prototype blir kandidat.
+assert not C.exists();subprocess.run(['cp','-a','--reflink=always',str(M),str(C)],check=True);assert inventory(C)==start['filer']
+for e in entries:assert not(C/e['fil']).exists();shutil.copy2(A/e['prototype'],C/e['fil']);e['native_mottatt']=True
+meta=read(C/'mod.json');assert meta['costume_cels']==3701;meta['costume_cels']=3703;save(C/'mod.json',meta);files=inventory(C);assert set(files)-set(start['filer'])=={e['fil']for e in entries};assert {f for f,h in start['filer'].items()if files[f]!=h}=={'mod.json'}
+save(R/'kandidatfilhash.json',files);save(R/'egen-native.json',dict(ruter=entries,nye_native=2,native_totalt=3703,kandidat=str(C),alle_tidligere_filer_bevart=True,tidligere_filer=len(start['filer']),filer=len(files),diagnostisk_eksport_ikke_importert=True))
+record=dict(jobb='fig178_03',resultat=partial.relative_to(A).as_posix(),sha256=sha(partial),ruter=2,ruter_totalt=12,delvis=True,levert=False,mangler=missing,egenkontrollert=True,native_mottatt=True,visuelt_kontrollert=True,motorobservert=False,publisert=False,rutekart=(R/'rutekart-fig178_03.json').relative_to(A).as_posix(),godkjent_av_Tom=False,claude_kontroll=False)
+save(R/'fremdrift.json',dict(leveranser=[],delvise_leveranser=[record],nye_hele_jobber_levert=0,nye_egne_rutetegninger=2,nye_native=2,native_totalt=3703,grunnlag_native=3701,innebygde_bildekall=8,kvalitetsreturer=6,laget_valgte_ruter=2,egenkontrollert=2,native_mottatt=2,visuelt_sett=2,motorobservert=0,publisert=0,Tom_godkjent=0,Claude_godkjent=0,hele_figurjobber_med_resultat=507,total_figurjobber=1758,gjenstar=1251,familie178_native=2,familie178_totalt=102,pakker_native=3701,pakker_mangler_native=2,native_frosset=False))
+for f in ['bygg.py','fargekontroll.py','planlegg.py','planlegg-kvadrat.py','vurder.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('To egne ruter2020/2021 kontrollert. Delark2/12, kandidat3703. Ingen hel figurjobb ferdig.',flush=True)
