@@ -1,0 +1,28 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-returer-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(S/'start.json');files=read(S/'publiserte-moddfiler-3694.json');assert not R.exists();assert files=={p.relative_to(P/'mods/gpt').as_posix():sha(p)for p in(P/'mods/gpt').rglob('*')if p.is_file()}and len(files)==21938
+assert all(sha(A/f)==h for f,h in b['beskyttede'].items());stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==b['stash']
+remote={x.split()[1].removeprefix('refs/heads/'):x.split()[0]for x in subprocess.check_output(['git','ls-remote','origin','refs/heads/main','refs/heads/gpt-arbeid','refs/heads/hd-mod'],cwd=P,text=True).splitlines()};assert remote=={'main':'3fe3177a100e1348b1a71ba58726e623f151cd1c','gpt-arbeid':'171931fec7683cb411fd52305be7445d249357cd','hd-mod':'d0d8aa4304aa8acbca393c1d1ac5a742c405aff7'}
+for wd in[P,A]:assert not subprocess.check_output(['git','status','--porcelain'],cwd=wd,text=True)
+R.mkdir();(R/'kall').mkdir();save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),remote=remote,filer=files,beskyttede=b['beskyttede'],stash=stash,native=3694,hele_figurjobber=505,total_figurjobber=1758,pakker_native=3684,forrige_rapport=str(S),valgte_maal=[1943],ingen_pagaende_motor_observert=True))
+old=S/'kall/R1943';C=R/'kall/S1943';C.mkdir();d=read(old/'plan.json');e=d['ruter'][0];e['egne_lose_merker']='hvit';src=np.array(Image.open(e['kilde']).convert('RGBA'));assert sha(Path(e['kilde']))==e['sha256']and hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256']
+for f in ['original-alfa.png','originalatlas-alfa.png','originalatlas-blaagraa.png','spillkontekst.png','kontekst-og-mastere.png']:shutil.copy2(old/f,C/f)
+refs=[C/'originalatlas-alfa.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst.png'];d['referanser']={str(p):sha(p)for p in refs};d['kilde_og_mastere_sett_foer_kall']=True;d['sett_foer_kall_utc']=datetime.now(timezone.utc).isoformat();d['detaljer']='Original67x90,åtte atskilte hvite/grå grupper,én beskåret Conroy-hodebit. Hver gruppe har eget kildefeste;ingen lokal Python-flytting.'
+white=(src[:,:,3]>0)&(src[:,:,:3].min(2)>180);lab,n=nd.label(white,np.ones((3,3)));assert n==8;parts=[]
+for k in range(1,n+1):
+ yy,xx=np.nonzero(lab==k);parts.append(dict(id=k,areal=len(xx),xy=[float(xx.mean()),float(yy.mean())],atlas_xy=[177+(float(xx.mean())+.5)*10,62+(float(yy.mean())+.5)*10]))
+d['hvite_kildegrupper']=parts;save(C/'plan.json',d);full=read(A/'rapporter/sam293-frost-20261022/kildeplan.json');save(R/'kildeplan.json',full)
+prompt='''Use case: game-asset. Faithful HD redraw of image1, ONE complete sparse animation cel with genuine transparent background. Preserve image1 exact full square canvas layout, all scale and relative positions. Images2 and3 are approved COMPLETE Sam and Max line/color style masters. Image4 is original game context; do not paint the room. This is costume293 cel1943 in the freezer scene.
+The artwork contains EXACTLY NINE disconnected pieces: one clipped CONROY BUMPUS head fragment at far left-middle,and EIGHT separate white/light-gray cold groups. The head is golden blond quiff with curl,pink face and ear,black sunglasses and tiny dark blue glint. Deliberate straight vertical cut at the RIGHT of that head fragment,exactly as original;no complete head,body,hand or mask.
+White groups are plain smooth white/lightgray,with NO BLACK OUTLINE. Preserve every group's original silhouette,size and center. Do not enlarge or round them into generic cartoon clouds. Some groups have two lobes connected by a narrow pale neck. Keep those two lobes CONNECTED within that group,but keep all EIGHT groups DISCONNECTED from each other. In particular keep a real transparent gap between the highest left group and the narrow vertical double-lobed group just below/left,and between the two BOTTOM RIGHT groups. No added particles.
+On image1's1024square coordinate system,the EIGHT group CENTERS are: 1(586,101),2(752,107),3(535,195),4(534,373),5(543,498),6(532,718),7(744,925),8(818,917). The clipped head occupies x177..327,y342..552. These are image1's guide coordinates,scale the ENTIRE canvas uniformly if output resolution differs. The upper left group1 must stay left at586,not moved right toward610. Keep all groups1..8 at these centers. Preserve full cel transparent space.
+Flat original palette,smooth own anti-aliased edges,sharp shapes without gradients,lighting,text,watermark or extra marks. Draw new HD shapes,do not clip with the original hard pixel mask. Return one transparent square image containing the entire layout,without labels or guide coordinates.'''
+args=dict(prompt=prompt,referenced_image_paths=[str(x)for x in refs],transparent_background=True);save(C/'faktiske-argumenter.json',args);(C/'faktisk-prompt.txt').write_text(prompt+'\n')
+for f in ['bevar.py','rens-plasser.py']:shutil.copy2(P/'out/sam293-returer-20261022'/f,O/f)
+shutil.copy2(__file__,R/'start.py.txt');print('3694 native,21938 filer,1432 beskyttede og stash3 verifisert. Åtte kildefester,full kontekst og mastere sett. S1943 klar.')

@@ -1,0 +1,41 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,shutil,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+m=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json');p=read(R/'fremdrift.json');assert m['alle1_observert_i_begge_prover']and m['uforklarte_HD_endringer']==0 and m['alle32_kildefaser_observert'];assert(m['kontroller_pr_side'],m['null_pr_side'],m['null_etter_testaktorstart_pr_side'])==(400,396,320)
+for k in ['varianter','hele_motorbilder']:
+ assert len(v[k])==1
+ for e in v[k]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+assert len(v['hele_fryseranimasjon']['faser'])==32 and sha(R/v['hele_fryseranimasjon']['fil'])==v['hele_fryseranimasjon']['sha256'];v['hele_fryseranimasjon']['visuelt_sett']=True;v.update(visuelt_sett=True,hele_varianter_sett=1,hele_motorbilder_sett=1);save(R/'motor-visuell-plan.json',v);m['visuelt_sett']=True;save(R/'motor-sammenligning.json',m)
+rows=read(R/'motor-pikselkontroll.json');assert len(rows)==2
+for e in rows:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',rows);p['motorobservert']=1;p['leveranser'][0]['motorobservert']=True;save(R/'fremdrift.json',p);d=read(R/'rutekart-fig293_03.json')
+for e in d['fig293_03']['ruter']:
+ if e['rute']==1943:e['motorobservert']=True
+save(R/'rutekart-fig293_03.json',d)
+assert sha(A/'jobber/fig293_03/resultat.png')==p['leveranser'][0]['sha256'];save(R/'egen-visuell-plan.json',dict(visuelt_sett=True,ark=[dict(fil='kall/S1943/helkontroll.png',sha256=sha(R/'kall/S1943/helkontroll.png'),visuelt_sett=True),dict(fil='leveranser/fig293_03/resultat.png',sha256=sha(R/'leveranser/fig293_03/resultat.png'),visuelt_sett=True)],komplette_tegninger_uten_beskjaering=True))
+pub=read(R/'mottak-publisert.json')if(R/'mottak-publisert.json').exists()else None
+publication=f"Publisert additivt som hd-mod {pub['hd_mod']},grafikkilde {pub['grafikkilde']}. Alle21939 filhash er hentet tilbake og bekreftet."if pub else 'Kandidat3695 er kontrollert;publisering er ennå ikke bekreftet.'
+body=f'''fig293_03 er helt levert med32/32 ruter i1536x1024 RGBA,resultat.png og SHA-festet rutekart. Siste rute1943 er nytegnet med innebygd image_gen og har eget råbilde,faktisk prompt,notat og egen eksport. Alle31 tidligere arkposisjoner og21938 tidligere modfiler er bevart. Én ny egen tegning gir én ny native,ingen alias. {publication} Hele figurjobber med resultat er506/1758,1252 er uten i tillegg til returer og samlet sluttkontroll. Kostyme293 har54/55 native;bare tidligere verktøyholdt1927 gjenstår i familien og omprøves ikke.
+
+Original1943 i kjøkkenrom56/palett0 og godkjente komplette Sam-/Max-mastere er sett før nytegning. Motivet er én beskåret Conroy-hodebit med blondt hår,rosa ansikt/svart solbrille og blåglimt,samt åtte atskilte hvite/grå kuldegrupper. Én faktisk vellykket bildegenerering,ingen verktøyavslag eller kvotefeil. Første globale plassering hadde et samlet høyreavvik. Hele tegningen ble flyttet3HD venstre og1HD ned med eksisterende helplasseringsport. Ingen del ble flyttet separat og ingen alfa ble klippet. Alle åtte hvite grupper er atskilt ved CORE128,alle fester maks2,741HD og blåglimtet2,270HD fra kildefestet. IoU0,8246 og dekning0,8728 består uendrede porter0,6/0,8. Bare egen alfa/RGB er renset;ingen originalmaske eller originalfragmenter. Dette er samme nye tegning før/etter helplassering,ikke to bildekall eller en ekstra kvalitetsretur.
+
+Egenkontrollen gir0 FEIL for hele arket,og automatisk diagnostikk32 OK,0 til gjennomsyn og0 mangler. Mottaket bruker den komplette egne1943-prototypen med fast SHA;ingen diagnostisk originaltillegg brukes. Begge nye motorprøver per side avslutter normalt i faktisk tidligere nedlastet Linux-binær bad93067a55dcbdf09c8001a50ea45dc8b888a044dd2860e8aa7d3ce2f79450a. Kontrollert aktør29,animasjon7/raw30,zclip1 og originalt lokalskript204 etter konstruert aktør10-fortilstand viser1943. Hele32-fasesekvensen,ett helt motorbilde og før/etter-varianten er visuelt sett. Originale ruterektangler med8HD-naboområde er identiske. Hver side har400 bufferkontroller,396 uten avvik og320/320 uten avvik etter figurstart. To kjente inngangsavvik per prøve har identiske koordinater og begge RGB-verdier. Ingen nye/økte bufferavvik eller uforklarte HD-endringer. Ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+1432 beskyttede jobbfiler og tre opprinnelige stasher er bevart. Ingen motor-/pipelinekode er endret og gamle nattprosesser startes ikke. Fellespakker fryservindu har foreløpig3684 native,mens produksjonen har3695. Fullført fryserark er avtalt samlepunkt;begge plattformer skal nå bygges med frosset fjern-SHA,lastes ned og kontrolleres før ny fellesrelease kalles oppdatert. Se pakkekontrollen når den finnes. All grafikk er ikke ferdig. Neste produserbare figurark etter denne familien er fig296_01,etter kontroll av siste retur og originalkontekst.
+'''
+body=re.sub(r',(?=[^\s\d/])',', ',body);body=re.sub(r'\b(Alle|alle|med|har|er|maks|og|innen|foreløpig|dekning|IoU|porter|hele|Hele|prototypen)(?=\d)',r'\1 ',body);body=re.sub(r'(?<=\d)(?=HD\b)',' ',body)
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');(R/'RAPPORT.md').write_text('# Fryserarket er helt levert\n\n'+now+' (Codex)\n\n'+body+'\nBibliotek: figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og bygg/publisert-mod-er-fasit,samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e.\n');(R/'status-blokk.md').write_text(body);(R/'leveranser/fig293_03/notat.md').write_text('# fig293_03,32/32\n\n'+body);(R/'kall/S1943/notat.md').write_text('# S1943\n\n'+body)
+marker='sam293-siste-status';block='<!-- '+marker+':start -->\n'+body+'<!-- '+marker+':slutt -->'
+for name in ['ORDRE.md','GRAFIKKLISTE.md','jobber/fig293_03/notat.md']:
+ f=A/name;t=f.read_text()
+ if '<!-- '+marker+':start -->'in t:t=re.sub(r'<!-- '+marker+r':start -->.*?<!-- '+marker+r':slutt -->',lambda m:block,t,flags=re.S)
+ else:first,rest=t.split('\n',1);t=first+'\n\n'+block+'\n\nTidligere status nedenfor er historikk.\n'+rest
+ f.write_text(t)
+save(R/'sluttkontroll.json',dict(valgte_native=1,egne_nye_malerier=1,hele_rgba_aliasmal=0,visuelt_sett=True,motorobservert=1,hele_varianter=1,hele_motorbilder=1,hele_kildefaser=32,hele_figurjobber=506,native_kandidat=3695,delark=32,maal_i_delark=32,ny_hel_jobb=True,alle_kontrollerte_smaadeler_innen3HD=True,opprinnelige21938_moddfiler_bevart=True,beskyttede=1432,stasher=read(R/'start.json')['stash'],Tom_godkjent=0,Claude_godkjent=0,publisert=1 if pub else 0,kontroller_pr_side=400,null_pr_side=396,null_etter_figurstart_pr_side=320,ingen_nye_eller_okte_bufferavvik=True,diagnostisk_originaltillegg_ikke_brukt=True))
+(R/'NESTE.md').write_text('''# Neste: fullfør felles pakkesamlepunkt\n\nFig293_03 er helt levert32/32 og kostyme293 har54/55 native. Ikke omprøv verktøyholdt1927. Ingen produserbar retur gjenstår i familien. Alle31 tidligere arkposisjoner er bevart.\n\nFør mer native publiseres: kontroller rapporter/felles-release-20261022-fryserark/bygg-startet.json og eventuell publiseringsjournal. Hvis native_frosset er true,fullfør Linux-/Windows-bygg,nedlasting,alle filhash,motorvisning,fellesrelease,ny nedlasting og forventet Windows-taggbygg først. Ikke dupliser dispatch eller opprettelse ved ukjent utfall.\n\nEtter pakkekontroll er neste bestilling etter293 fig296_01. Les jobb,retur,originaler i spillkontekst og godkjente stilankere først. Behold alle publiserte filer og tre stasher. All grafikk er ikke ferdig;1252 hele figurjobber mangler,resultat er ikke Tom-/Claude-godkjenning.\n''')
+for f in ['rapport.py','publiser.py','kjor-motor.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('Heljobb506,32/32,én ny egen native. Publisert='+str(bool(pub)))
