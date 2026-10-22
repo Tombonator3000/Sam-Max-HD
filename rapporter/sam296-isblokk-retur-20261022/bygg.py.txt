@@ -1,0 +1,209 @@
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+import hashlib
+import json
+import numpy as np
+import re
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+M = P / 'mods/gpt'
+C = O / 'mod-sam2963697'
+J = A / 'jobber/fig296_01'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def save(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def inv(root):
+    paths = [path for path in root.rglob('*') if path.is_file()]
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return dict(pool.map(lambda path: (path.relative_to(root).as_posix(), sha(path)), paths))
+
+
+start = read(R / 'start.json')
+files = start['filer']
+assert inv(M) == files and len(files) == 21940
+assert all(sha(A / name) == digest for name, digest in start['beskyttede'].items())
+assert subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines() == start['stash']
+assert subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/hd-mod'], cwd=P, text=True).split()[0] == start['remote']['hd-mod']
+assert not C.exists() and not (J / 'resultat.png').exists()
+assert len(list(A.glob('jobber/fig*/resultat.png'))) == 506
+
+K = O / 'kall/S017'
+control = read(K / 'sluttkandidat-kontroll-halv.json')
+assert control['teknisk_og_fester_bestatt'] and control['maks_avvik_HD'] <= 3
+assert control['farger']['hud']['kildepunkter'] == 24
+assert control['farger']['blaa']['kildepunkter'] == 20
+assert all(v['punkter_over3HD'] == 0 for v in control['farger'].values())
+control['visuelt_sett'] = True
+save(K / 'sluttkandidat-kontroll-halv.json', control)
+call = read(K / 'verktøyresultat.json')
+call.update(status='VALGT_EGENKONTROLLERT', valgt=True, visuell_native_kontroll=True,
+            sluttkontroll='sluttkandidat-kontroll-halv.json')
+save(K / 'verktøyresultat.json', call)
+for name in ['S016', 'S018', 'S019', 'S020', 'S021', 'S022', 'S023']:
+    path = O / 'kall' / name / 'verktøyresultat.json'
+    value = read(path)
+    value.update(status='KVALITETSRETUR', valgt=False, native_mottatt=False, publisert=False)
+    save(path, value)
+for directory in sorted((O / 'kall').iterdir()):
+    if not (directory / 'verktøyresultat.json').exists():
+        continue
+    value = read(directory / 'plan.json')
+    value.update(start=True, utfoert=True, raa_sha256=sha(directory / 'raa.png'))
+    save(directory / 'plan.json', value)
+    shutil.copytree(directory, R / 'kall' / directory.name, dirs_exist_ok=True)
+for name in ['fester.py', 'fester-halv.py', 'rgb-rens.py', 'kontroller-rute.py']:
+    shutil.copy2(O / name, R / (name + '.txt'))
+shutil.copy2(O / 'blaafarger-presisering.json', R / 'blaafarger-presisering.json')
+
+K = R / 'kall/S017'
+control = read(K / 'sluttkandidat-kontroll-halv.json')
+sprite = Image.open(K / control['native_fil']).convert('RGBA')
+assert sha(K / control['native_fil']) == control['native_sha256']
+job = read(J / 'jobb.json')
+route = next(e for e in job['ruter'] if e['rute'] == 1921)
+x, y, width, height = route['rekt']
+assert sprite.size == (width * 4 + 16, height * 4 + 16) == (96, 316)
+source = np.array(Image.open(P / 'work/extract/costumes/costume296_1921.png').convert('RGBA'))
+iou, coverage = _iou(np.array(sprite)[:, :, 3] >= CORE,
+                     np.repeat(np.repeat(source[:, :, 3] > 0, 4, 0), 4, 1), -8, -8)
+assert iou >= GOOD_IOU and coverage >= GOOD_COVER
+entry = dict(bilde='costume296_1921', jobb='fig296_01', canonical='costume296_1921',
+             kostyme=296, rute=1921, lag=route['lag'], fil='costumes/costume296_1921_hd.png',
+             prototype=(K / control['native_fil']).relative_to(A).as_posix(),
+             sha256=control['native_sha256'], prototype_sha256=control['native_sha256'],
+             kontroll=(K / 'sluttkandidat-kontroll-halv.json').relative_to(A).as_posix(),
+             kall='S017', snitt_union=iou, dekning=coverage,
+             native_hel_plassering_HD=control['hel_plassering_HD'],
+             egen_alfa=True, originalmaske=False, originalfragmenter=False,
+             prototype_visuelt_sett=True, motorobservert=False, publisert=False,
+             Tom_godkjent=False, Claude_godkjent=False)
+
+old_report = A / 'rapporter/sam296-isblokk-20261022'
+old_map = read(old_report / 'rutekart-fig296_01.json')['fig296_01']['ruter']
+assert len(old_map) == 1 and old_map[0]['bilde'] == 'costume296_1920'
+assert files[old_map[0]['fil']] == old_map[0]['sha256']
+board = Image.open(old_report / 'fig296_01-delresultat.png').convert('RGBA')
+before = np.array(board)
+dx, dy = (job['plassering'][0] + x) * 4 - 8, (job['plassering'][1] + y) * 4 - 8
+layer = Image.new('RGBA', board.size)
+layer.alpha_composite(sprite, (dx, dy))
+assert not ((before[:, :, 3] > 0) & (np.array(layer)[:, :, 3] > 0)).any()
+board.alpha_composite(layer)
+assert np.array_equal(np.array(board)[before[:, :, 3] > 0], before[before[:, :, 3] > 0])
+board.save(R / 'fig296_01-delresultat.png')
+ys, xs = np.where(np.array(sprite)[:, :, 3] >= CORE)
+mapping = [*old_map, dict(**entry, rect=[dx + int(xs.min()), dy + int(ys.min()),
+               int(np.ptp(xs) + 1), int(np.ptp(ys) + 1)], native_ok=True, native_marg_hd=8)]
+digest = sha(R / 'fig296_01-delresultat.png')
+save(R / 'rutekart-fig296_01.json', {'fig296_01': dict(sha256_resultat=digest, ruter=mapping)})
+missing = [e['bilde'] for e in job['ruter'] if e['rute'] not in [1920, 1921]]
+assert len(missing) == 7
+
+D = O / 'ark/fig296_01'
+D.mkdir(parents=True)
+for name in ['referanse.png', 'original_1x.png', 'prompt.txt', 'jobb.json']:
+    shutil.copy2(J / name, D / name)
+board.save(D / 'resultat.png')
+test = subprocess.run([str(P / '.venv/bin/python'), str(A / 'verktoy/sjekk_leveranse.py'),
+                       str(D / 'resultat.png')], cwd=A, text=True, capture_output=True)
+log = test.stdout + test.stderr
+(R / 'fig296_01-egenkontroll.txt').write_text(log)
+errors = re.findall(r'^FEIL\s+(costume\d+_\d+):', log, re.M)
+assert not set(errors) & {'costume296_1920', 'costume296_1921'} and set(errors) <= set(missing), log
+partial = dict(jobb='fig296_01', resultat='rapporter/' + R.name + '/fig296_01-delresultat.png',
+               sha256=digest, ruter=2, nye_ruter=1, tidligere_ruter=1,
+               rutekart='rapporter/' + R.name + '/rutekart-fig296_01.json',
+               laget=True, levert=False, delvis=True, mangler=missing,
+               egenkontrollert=True, visuelt_kontrollert=False, native_mottatt=False,
+               motorobservert=False, publisert=False, publiserte_ruter=1,
+               i_fellespakke=False, godkjent_av_Tom=False, claude_kontroll=False)
+G = O / 'diagnostisk-gren'
+shutil.copytree(D, G / 'jobber/fig296_01')
+GR = G / 'rapporter' / R.name
+GR.mkdir(parents=True)
+for name in ['rutekart-fig296_01.json', 'fig296_01-delresultat.png']:
+    shutil.copy2(R / name, GR / name)
+save(GR / 'fremdrift.json', dict(leveranser=[partial], diagnostisk_delark_ikke_levert=True))
+auto = O / 'automatisk-mottak'
+subprocess.run([str(P / '.venv/bin/smhd'), 'myke-figurer', '--gren', str(G),
+                '--extract', str(P / 'work/extract'), '--ut', str(auto), '--jobb',
+                'fig296_01', '--forhandsvisning', ''], cwd=P, check=True)
+auto_report = read(auto / 'myke.json')
+assert auto_report['ruter_ok'] == 2 and auto_report['ruter_sjekk'] == 0
+assert auto_report['ruter_mangler'] == 7
+save(R / 'automatisk-mottak.json', auto_report)
+
+subprocess.run(['cp', '-a', '--reflink=always', str(M), str(C)], check=True)
+assert inv(C) == files and not (C / entry['fil']).exists()
+shutil.copy2(A / entry['prototype'], C / entry['fil'])
+assert sha(C / entry['fil']) == entry['sha256']
+meta = read(C / 'mod.json')
+assert meta['costume_cels'] == 3696
+meta['costume_cels'] = 3697
+save(C / 'mod.json', meta)
+new_files = inv(C)
+assert len(new_files) == 21941 and set(new_files) - set(files) == {entry['fil']}
+assert {name for name, value in files.items() if new_files[name] != value} == {'mod.json'}
+save(R / 'kandidatfilhash.json', new_files)
+save(R / 'egen-native.json', dict(ruter=[entry], nye_native=1, native_totalt=3697,
+     kandidat=str(C), fast_4x=True, marg_original=[2, 2], egen_alfa=True,
+     originalmaske=False, originalfragmenter=False, diagnostisk_eksport_ikke_importert=True,
+     tidligere_filer_bevart=21940, filer=21941, png=21935))
+partial['native_mottatt'] = True
+calls = []
+for directory in sorted((R / 'kall').iterdir()):
+    value = read(directory / 'verktøyresultat.json')
+    args = read(directory / 'args.json')
+    selected = directory.name == 'S017'
+    calls.append(dict(kall=directory.name, rute=value['rute'], raa_sha256=sha(directory / 'raa.png'),
+                      prompt_sha256=sha(directory / 'prompt-faktisk.txt'),
+                      faktiske_argumenter_sha256=sha(directory / 'args.json'),
+                      referanser=[dict(fil=f, sha256=sha(Path(f))) for f in args['referenced_image_paths']],
+                      valgt=selected, status='VALGT_DELLEVERANSE' if selected else 'KVALITETSRETUR'))
+    value.update(native_mottatt=selected, publisert=False, valgt=selected)
+    save(directory / 'verktøyresultat.json', value)
+assert len(calls) == 8
+save(R / 'alle-kall.json', calls)
+save(R / 'kvalitetsreturer.json', [e for e in calls if not e['valgt']])
+save(R / 'delark-kontroll.json', dict(hele_arkets_egenkontroll=test.returncode,
+     hele_arket_ferdig=False, produserte_FEIL=0, ruter=2,
+     manglende_ikke_leverte_maal=missing, FEIL_kun_tomme_maal=errors,
+     tidligere_arkposisjon_og_alle_RGBA_bevart=True, original_jobb_json_bevart=True,
+     terskler_uendret=True))
+save(R / 'fragmentvern.json', dict(nye_egne_hele_rutetegninger=1,
+     originalfragmenter_i_kandidat=False, diagnostisk_eksport_ikke_importert=True,
+     native_fra_egen_prototype_sha=True,
+     porter=dict(CORE=128, IoU=.6, dekning=.8, affin_min=.88, affin_maks=1.12),
+     hel_ark_levert=False, tidligere_native_og_arkposisjon_bevart=True))
+save(R / 'fremdrift.json', dict(leveranser=[], delvise_leveranser=[partial],
+     nye_jobber_levert=0, nye_native=1, native_totalt=3697, grunnlag_native=3696,
+     innebygde_bildekall=8, vellykkede_bildekall=8, avviste_bildekall=0, kvalitetsreturer=7,
+     ulike_hele_egne_malerier_valgt=1, hele_rgba_aliasmal=0,
+     hele_figurjobber_med_resultat=506, total_figurjobber=1758, gjenstar=1252,
+     laget_valgte_ruter=1, egenkontrollert=1, native_mottatt=1, visuelt_sett=0,
+     motorobservert=0, publisert=0, Tom_godkjent=0, Claude_godkjent=0,
+     pakker_native=3695, pakker_mangler_native=2, native_frosset=False))
+save(R / 'egen-visuell-plan.json', dict(visuelt_sett=False,
+     ark=[dict(fil='fig296_01-delresultat.png', sha256=digest, visuelt_sett=False)],
+     ruter=[dict(kall='S017', fil='kall/S017/sluttkandidat-visuell-halv.png',
+                 sha256=sha(K / 'sluttkandidat-visuell-halv.png'), visuelt_sett=True)]))
+shutil.copy2(__file__, R / 'bygg.py.txt')
+print('Kandidat3697: én ny egen native,delark2/9,2 automatiskOK/7 mangler,8 råbilder/7 returer.', flush=True)

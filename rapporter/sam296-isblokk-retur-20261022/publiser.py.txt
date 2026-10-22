@@ -1,0 +1,240 @@
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import subprocess
+import tarfile
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+M = P / 'mods/gpt'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+C = O / 'mod-sam2963697'
+T = O / 'publisering-hdmod3697'
+H = O / 'hentet-hdmod3697'
+STAGING = P / 'mods/.gpt-adopsjon-3697'
+BACKUP = O / 'mod-grunnlag3696'
+PARENT = 'f32e9f7b64a8ac0434b5e0ba3a312ba8aeb25ca9'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def save(path, data):
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def git(where, *args):
+    return subprocess.check_output(['git', *args], cwd=where, text=True).strip()
+
+
+def api(endpoint):
+    return json.loads(subprocess.check_output(
+        ['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + endpoint],
+        cwd=P, text=True))
+
+
+def remote(branch):
+    return git(P, 'ls-remote', 'origin', 'refs/heads/' + branch).split()[0]
+
+
+def inventory(root):
+    paths = [p for p in root.rglob('*')
+             if p.is_file() and '.git' not in p.relative_to(root).parts]
+    def entry(path):
+        return path.relative_to(root).as_posix(), sha(path)
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return dict(pool.map(entry, paths))
+
+
+def copy_reflink(source, target):
+    assert not target.exists(), str(target)
+    subprocess.run(['cp', '-a', '--reflink=always', str(source), str(target)], check=True)
+
+
+def check_protected(start):
+    assert len(start['beskyttede']) == 1440
+    assert all(sha(A / name) == digest for name, digest in start['beskyttede'].items())
+    assert git(P, 'stash', 'list', '--format=%H').splitlines() == start['stash']
+
+
+def main():
+    start = read(R / 'start.json')
+    files = read(R / 'kandidatfilhash.json')
+    final = read(R / 'sluttkontroll.json')
+    motor = read(R / 'motor-sammenligning.json')
+    visual = read(R / 'motor-visuell-plan.json')
+    selected = read(R / 'egen-native.json')['ruter']
+    assert not any(path.exists() for path in [
+        T, H, STAGING, BACKUP, R / 'publisering-forsokt.json'])
+    assert git(A, 'branch', '--show-current') == 'gpt-arbeid'
+    assert not git(A, 'status', '--porcelain'), 'Grafikkilden må være committet og ren'
+    art = git(A, 'rev-parse', 'HEAD')
+    assert remote('gpt-arbeid') == art
+    assert remote('hd-mod') == start['remote']['hd-mod'] == PARENT
+    assert len(start['filer']) == 21940 and inventory(M) == start['filer']
+    assert len(files) == 21941 and inventory(C) == files
+    check_protected(start)
+    assert final['klar_for_additiv_publisering'] and final['visuelt_sett']
+    assert final['valgte_native'] == final['egne_nye_malerier'] == final['motorobservert'] == 1
+    assert final['hele_rgba_aliasmal'] == final['hele_ark_levert'] == 0
+    assert final['native'] == 3697 and final['publisert'] == 0
+    assert motor['visuelt_sett'] and motor['alle1_observert']
+    assert motor['alle11_kildefaser_observert'] and motor['alle9_arkfaser_observert']
+    assert motor['alle_originale_rektangler_med8HD_identiske']
+    assert (motor['kontroller_pr_side'], motor['null_pr_side'],
+            motor['null_etter_testaktorstart_pr_side']) == (160, 158, 120)
+    assert motor['uforklarte_HD_endringer'] == 0
+    assert motor['ingen_nye_eller_okte_bufferavvik']
+    assert motor['bufferavvik_koordinater_og_begge_RGB_eksakt_identiske']
+    assert motor['atomiske_skrivinger_bestatt']
+    assert visual['visuelt_sett'] and visual['hele_varianter_sett'] == 1
+    assert visual['hele_motorbilder_sett'] == 1
+    assert visual['hele_startanimasjon']['visuelt_sett']
+    assert len(visual['hele_startanimasjon']['faser']) == 11
+    for group in ['varianter', 'hele_motorbilder']:
+        assert all(e['visuelt_sett'] and sha(R / e['fil']) == e['sha256'] for e in visual[group])
+    board = visual['hele_startanimasjon']
+    assert sha(R / board['fil']) == board['sha256']
+    anchors = read(R / 'indre-feste-kontroll.json')
+    assert anchors['alle_kontrollerte_smaadeler_innen3HD']
+    assert anchors['source_hudpunkter'] == 24 and anchors['source_blaapunkter'] == 20
+    assert read(R / 'egen-visuell-plan.json')['visuelt_sett']
+    assert len(selected) == 1 and selected[0]['bilde'] == 'costume296_1921'
+    assert selected[0]['kall'] == 'S017' and selected[0]['motorobservert']
+    calls = list((R / 'kall').glob('*/verktøyresultat.json'))
+    assert len(calls) == 8 and len(read(R / 'kvalitetsreturer.json')) == 7
+    for call in calls:
+        data = read(call)
+        assert sha(call.parent / 'raa.png') == data['raw_sha256']
+        assert (call.parent / 'prompt-faktisk.txt').exists()
+        assert (call.parent / 'args.json').exists()
+    assert all(files[f] == digest for f, digest in start['filer'].items() if f != 'mod.json')
+    assert set(files) - set(start['filer']) == {e['fil'] for e in selected}
+    assert all(files[e['fil']] == e['sha256'] == sha(A / e['prototype']) for e in selected)
+    assert not (C / 'costumes/costume296_1922_hd.png').exists()
+    for costume, numbers in [(293, [1927]), (129, [641, 642]),
+                             (124, [1804, 1861, *range(1848, 1855)])]:
+        assert not any((C / f'costumes/costume{costume}_{n}_hd.png').exists() for n in numbers)
+    assert len(list(A.glob('jobber/fig*/resultat.png'))) == 506
+    assert not (A / 'jobber/fig296_01/resultat.png').exists()
+    freeze = read(A / 'rapporter/felles-release-20261022-fryserark/bygg-startet.json')
+    assert freeze['native_frosset'] is False
+    builds = {}
+    for workflow in ['linux.yml', 'windows.yml']:
+        runs = api('actions/workflows/' + workflow + '/runs?per_page=30')['workflow_runs']
+        assert not any(e['status'] != 'completed' for e in runs), 'Aktivt pakkebygg, publisering utsettes'
+        builds[workflow] = [dict(id=e['id'], status=e['status'], conclusion=e['conclusion']) for e in runs]
+    tag = api('releases/latest')['tag_name']
+    assert tag == 'sam-max-hd-2026-10-22-fryserark'
+    save(R / 'pakkebygg-for-publisering.json', dict(
+        tid_utc=datetime.now(timezone.utc).isoformat(), aktive_bygg=[],
+        siste_bygg=builds, siste_fellesrelease=tag, native_frosset=False))
+    journal = dict(tid_utc=datetime.now(timezone.utc).isoformat(), grafikkilde=art,
+                   grunnlag=PARENT, native=3697, nye_native=1, force_with_lease=True,
+                   fase='forbereder')
+    save(R / 'publisering-forsokt.json', journal)
+    print('Førkontroll bestått. Forbereder publisering av én ny native.', flush=True)
+    copy_reflink(C, T)
+    subprocess.run(['git', 'init', '-q', str(T)], check=True)
+    subprocess.run(['git', '-C', str(T), 'checkout', '-q', '-b', 'hd-mod'], check=True)
+    manifest = inventory(T)
+    manifest.pop('SHA256SUMS')
+    (T / 'SHA256SUMS').write_text(''.join(h + '  ' + f + '\n' for f, h in sorted(manifest.items())))
+    subprocess.run(['git', '-C', str(T), 'add', '-A'], check=True)
+    subprocess.run(['git', '-C', str(T), '-c', 'user.name=Codex',
+                    '-c', 'user.email=noreply@openai.com', 'commit', '-q', '-m',
+                    'HD-mod3697: kontrollert isblokk-sidefase296_1921'], check=True)
+    published = git(T, 'rev-parse', 'HEAD')
+    assert remote('hd-mod') == PARENT
+    journal.update(fase='push_startes', kandidat_sha=published)
+    save(R / 'publisering-forsokt.json', journal)
+    subprocess.run(['git', '-C', str(T), 'push', '-q',
+                    '--force-with-lease=refs/heads/hd-mod:' + PARENT,
+                    git(P, 'remote', 'get-url', 'origin'), 'hd-mod:hd-mod'], check=True)
+    assert remote('hd-mod') == published
+    journal.update(fase='push_bekreftet', hd_mod=published)
+    save(R / 'publisering-forsokt.json', journal)
+    print('Push bekreftet. Henter publisert mod tilbake for full filkontroll.', flush=True)
+    subprocess.run(['git', 'fetch', '-q', '--no-tags', '--depth', '1', 'origin',
+                    '+refs/heads/hd-mod:refs/remotes/origin/hd-mod'], cwd=P, check=True)
+    assert git(P, 'rev-parse', 'refs/remotes/origin/hd-mod') == published
+    archive = O / 'hentet-hdmod3697.tar'
+    with archive.open('wb') as out:
+        subprocess.run(['git', 'archive', '--format=tar', published], cwd=P, stdout=out, check=True)
+    H.mkdir()
+    with tarfile.open(archive) as tar:
+        tar.extractall(H, filter='data')
+    actual = inventory(H)
+    assert actual == inventory(T) and len(actual) == 21941 and set(actual) == set(files)
+    assert {f for f, digest in files.items() if actual[f] != digest} == {'SHA256SUMS'}
+    assert all(actual[f] == digest for f, digest in start['filer'].items()
+               if f not in ['mod.json', 'SHA256SUMS'])
+    assert sum(f.endswith('.png') for f in actual) == 21935
+    native_count = sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual)
+    assert native_count == read(H / 'mod.json')['costume_cels'] == 3697
+    subprocess.run(['sha256sum', '--quiet', '-c', 'SHA256SUMS'], cwd=H, check=True)
+    assert inventory(M) == start['filer'] and remote('hd-mod') == published
+    copy_reflink(H, STAGING)
+    assert inventory(STAGING) == actual
+    M.rename(BACKUP)
+    STAGING.rename(M)
+    assert inventory(M) == actual and inventory(BACKUP) == start['filer']
+    check_protected(start)
+    save(R / 'publiserte-moddfiler-3697.json', actual)
+    receipt = dict(
+        tid_utc=datetime.now(timezone.utc).isoformat(), grafikkilde=art, hd_mod=published,
+        native=3697, nye_native=1, egne_nye_malerier=1, hele_rgba_aliasmal=0,
+        egenkontrollert=1, native_egne_OK=1, visuelt_sett=1, motorobservert=1,
+        publisert=1, nye_hele_ark=0, figurark_med_resultat=506, gjenstar=1252,
+        delark=2, maal_i_delark=9, familie_native=2, familie_maal=23,
+        bildekall=8, vellykkede_bildekall=8, kvalitetsreturer=7,
+        kvalitetsreturer_ikke_importert=['S016', 'S018', 'S019', 'S020', 'S021', 'S022', 'S023'],
+        filantall=21941, png=21935, alle_filhash_bekreftet=True,
+        alle_tidligere_stier_bevart=True, tidligere_filer_bevart=21940,
+        tidligere_png_bevart=21934, beskyttede=1440, stasher=start['stash'],
+        force_with_lease=True, gammel_mod_bevart=str(BACKUP),
+        godkjent_av_Tom=False, claude_kontroll=False, i_fellespakke=False,
+        pakker_native=3695, pakker_mangler_native=2, native_frosset=False,
+        begrensning=motor['begrensning'])
+    save(R / 'mottak-publisert.json', receipt)
+    for name in ['fremdrift.json', 'sluttkontroll.json']:
+        data = read(R / name)
+        data.update(hd_mod=published, grafikkilde=art, native=3697,
+                    publisert_native_naa=3697, nye_native_publisert=1, publisert=1,
+                    native_frosset=False)
+        for entry in data.get('delvise_leveranser', []):
+            entry.update(publisert=True, publiserte_ruter=2, hd_mod=published)
+        save(R / name, data)
+    route_map = R / 'rutekart-fig296_01.json'
+    data = read(route_map)
+    for entry in data['fig296_01']['ruter']:
+        entry.update(publisert=True, hd_mod=published)
+    save(route_map, data)
+    data = read(R / 'egen-native.json')
+    data.update(publisert=True, hd_mod=published)
+    for entry in data['ruter']:
+        entry.update(publisert=True, hd_mod=published)
+    save(R / 'egen-native.json', data)
+    data = read(R / 'kall/S017/sluttkandidat-kontroll-halv.json')
+    data.update(publisert=True, hd_mod=published, native_mottatt=True, motorobservert=True)
+    save(R / 'kall/S017/sluttkandidat-kontroll-halv.json', data)
+    journal.update(fase='publisert_hentet_bekreftet_lokalt_mottatt', hd_mod=published,
+                   alle_filhash_bekreftet=True)
+    save(R / 'publisering-forsokt.json', journal)
+    shutil.copy2(__file__, R / 'publiser.py.txt')
+    print(json.dumps({k: receipt[k] for k in [
+        'hd_mod', 'native', 'nye_native', 'filantall', 'png', 'alle_filhash_bekreftet']},
+        ensure_ascii=False), flush=True)
+
+
+if __name__ == '__main__':
+    main()

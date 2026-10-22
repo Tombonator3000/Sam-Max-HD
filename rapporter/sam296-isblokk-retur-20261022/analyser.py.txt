@@ -1,0 +1,187 @@
+from pathlib import Path
+from functools import lru_cache
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+import numpy as np
+import gzip
+import hashlib
+import json
+import re
+import shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+C = O / 'mod-sam2963697'
+M = P / 'mods/gpt'
+
+def read(path):
+    return json.loads(path.read_text())
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def save(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+@lru_cache(maxsize=16)
+def picture(path, flat=False):
+    path = Path(path)
+    if flat:
+        path = path.with_name(path.stem + '_flat.png')
+    return np.array(Image.open(path).convert('RGB'))
+
+def rectangle(event, padding=8):
+    x, y = event['pos']
+    width, height = event['maal']
+    return [max(0, x*4-padding), max(0, y*4-padding),
+            min(1280, (x+width)*4+padding), min(800, (y+height)*4+padding)]
+
+def buffer_details(proof, directory):
+    result = []
+    for check in proof['kontroller']:
+        if not check['avvik']:
+            continue
+        frame = check['frame']
+        screen = np.array(Image.open(directory / f'frame_{frame:06}_screen.png').convert('RGB'))
+        files = [f for f in directory.glob(f'frame_{frame:06}_room*.png')
+                 if not f.stem.endswith('_flat')]
+        assert len(files) == 1
+        whole = np.array(Image.open(files[0]).convert('RGB'))
+        y, x = np.where(np.any(screen != whole, axis=2))
+        assert len(x) == check['avvik']
+        digest = hashlib.sha256(np.stack([x,y],1).tobytes()
+                                +screen[y,x].tobytes()+whole[y,x].tobytes()).hexdigest()
+        result.append(dict(frame=frame, avvik=len(x), fil=files[0].name,
+                           koordinater_og_begge_RGB_sha256=digest,
+                           foer_testaktor296=frame<40))
+    return result
+
+selected = read(R / 'egen-native.json')['ruter']
+assert len(selected) == 1
+assert all(sha(C/e['fil']) == e['sha256'] for e in selected)
+old_name, new_name = 'grunnlag3696-start1', 'kandidat3697-start1'
+old_proof, new_proof = read(R/(old_name+'.json')), read(R/(new_name+'.json'))
+for label, proof, count in [(old_name, old_proof, 3696), (new_name, new_proof, 3697)]:
+    assert proof['exit'] == 0 and proof['native_antall'] == count
+    assert len(proof['kontroller']) == 160 and proof['nullkontroller'] == 158
+    assert proof['binar_sha256'] == 'caa4d7261d6071b824c2f15c345b3d5f53a454182308357a1b862cede2ae7b83'
+    assert proof['zclip1'] and proof['testaktor29_konstruert_for_helanimasjon']
+    assert not proof['lokalskript204_tvunget'] and not proof['full_naturlig_gjennomspilling']
+    assert sum(q['avvik']==0 and q['frame']>40 for q in proof['kontroller']) == 120
+    log = (O/label/'scummvm.log').read_text()
+    assert "Couldn't save file" not in log and not list((O/label).glob('*.tmp'))
+    actual = set(map(int,re.findall(r'actor 29 animation (\d+) \(chore',log)))
+    assert actual == {6}, actual
+    trace = (O/label/'filoperasjoner.strace').read_text()
+    operations = [line for line in trace.splitlines() if ' rename(' in line]
+    assert len(operations) >= 160 and all(line.endswith('= 0') for line in operations)
+    with gzip.open(R/(label+'-rename.strace.gz'),'wb') as stream:
+        stream.write(trace.encode())
+    assert set(proof['tegninger']) == {f'costume296_{n}' for n in range(1920,1931)}
+
+old_buffer = buffer_details(old_proof,O/old_name)
+new_buffer = buffer_details(new_proof,O/new_name)
+assert len(old_buffer) == 2 and old_buffer == new_buffer
+assert all(q['foer_testaktor296'] for q in old_buffer)
+save(R/'motor-bufferkontroll.json',dict(grunnlag=old_buffer,kandidat=new_buffer,
+     ingen_nye_eller_okte=True,eksakte_koordinater_og_begge_RGB=True))
+
+cycles = read(P/'work/extract/rooms.json')['rooms']['56']['cycles']
+indices = [i for low, high, _, _ in cycles for i in range(low, high+1)]
+room_idx = np.array(Image.open(M/'rooms/room056_idx.png'))
+cycle_mask = np.repeat(np.repeat(nd.maximum_filter(np.isin(room_idx,indices),size=3),4,0),4,1)
+rows = []
+for entry in selected:
+    cel = entry['rute']
+    found = None
+    for new_event in [e for e in new_proof['hendelser'] if e['cel']==cel]:
+        box = rectangle(new_event)
+        x0,y0,x1,y1 = box
+        new_original = picture(new_event['fil'],True)
+        compatible = [e for e in old_proof['hendelser']
+                      if e['cel']==cel and e['pos']==new_event['pos'] and e['maal']==new_event['maal']]
+        for old_event in sorted(compatible,key=lambda e:abs(e['bildeframe']-new_event['bildeframe'])):
+            old_original = picture(old_event['fil'],True)
+            if np.array_equal(old_original[y0:y1,x0:x1],new_original[y0:y1,x0:x1]):
+                found = old_event,new_event,box
+                break
+        if found:
+            break
+    assert found, (cel,'Mangler identisk originalrektangel med8HD naboområde')
+    old_event,new_event,box = found
+    x0,y0,x1,y1 = box
+    old,new = picture(old_event['fil']),picture(new_event['fil'])
+    flat_old,flat_new = picture(old_event['fil'],True),picture(new_event['fil'],True)
+    delta = np.any(old!=new,2)
+    original_delta = np.any(flat_old!=flat_new,2)
+    allowed = np.zeros_like(delta)
+    allowed[y0:y1,x0:x1] = True
+    unknown = delta & ~allowed & ~nd.maximum_filter(original_delta,size=9) & ~cycle_mask
+    assert not unknown.any(), (cel,'Uforklarte HD-endringer',int(unknown.sum()))
+    assert delta[allowed].any(), (cel,'Ingen synlig ny HD')
+    rows.append(dict(bilde=entry['bilde'],grunnlag_fil=old_event['fil'],kandidat_fil=new_event['fil'],
+                     grunnlag_frame=old_event['bildeframe'],kandidat_frame=new_event['bildeframe'],
+                     grunnlag_sha256=sha(Path(old_event['fil'])),kandidat_sha256=sha(Path(new_event['fil'])),
+                     original_rekt_med8HD_SHA=hashlib.sha256(flat_old[y0:y1,x0:x1].tobytes()).hexdigest(),
+                     originale_verdier_med_naboomrade_identiske=True,zclip1=True,
+                     uforklarte_HD_endringer=0,endrede_HD_piksler=int(delta.sum()),
+                     endrede_originalpiksler=int(original_delta.sum()),aktor_rekt=box,
+                     native_sha256=entry['sha256'],visuelt_sett=False))
+    print(entry['bilde'],'sett i motor,originalrekt identisk,0 uforklarte HD-endringer',flush=True)
+save(R/'motor-pikselkontroll.json',rows)
+
+board = Image.new('RGB',(700,760),'#304050')
+draw = ImageDraw.Draw(board)
+for index,row in enumerate(rows):
+    draw.text((index*700+8,8),row['bilde']+' grunnlag3696 / kandidat3697',fill='white')
+    for side,key in enumerate(['grunnlag_fil','kandidat_fil']):
+        view = Image.open(row[key]).convert('RGB').crop(row['aktor_rekt'])
+        view = view.resize((view.width*3,view.height*3),Image.Resampling.NEAREST)
+        view.thumbnail((330,705))
+        board.paste(view,(index*700+8+side*345,38))
+board_path = R/'motor-varianter-1.png'
+board.save(board_path)
+variants = [dict(fil=board_path.name,sha256=sha(board_path),ruter=[e['bilde']for e in selected],visuelt_sett=False)]
+shots = []
+for row in rows:
+    path = R/(row['bilde']+'-motor3697.png')
+    shutil.copy2(row['kandidat_fil'],path)
+    shots.append(dict(bilde=row['bilde'],fil=path.name,sha256=sha(path),visuelt_sett=False))
+
+phases = []
+board = Image.new('RGB',(2220,1000),'#304050')
+draw = ImageDraw.Draw(board)
+selected_ids = {e['bilde']for e in selected}
+for index,cel in enumerate(range(1920,1931)):
+    name = f'costume296_{cel}'
+    event = new_proof['tegninger'][name]
+    view = Image.open(event['fil']).convert('RGB').crop(rectangle(event))
+    view = view.resize((view.width*2,view.height*2),Image.Resampling.NEAREST)
+    view.thumbnail((355,455))
+    x,y = (index%6)*370,(index//6)*500
+    board.paste(view,(x+6,y+34))
+    prior_native = (M / 'costumes' / (name + '_hd.png')).exists()
+    label = ' ny egen native' if name in selected_ids else (' tidligere native' if prior_native else ' uendret fallback')
+    draw.text((x+6,y+10),str(cel)+label,fill='white')
+    phases.append(dict(cel=cel,fil=event['fil'],sha256=event['sha256'],ny_egen_native=name in selected_ids,tidligere_native=prior_native))
+phase_path = R/'hele-startanimasjon11.png'
+board.save(phase_path)
+phase_record = dict(fil=phase_path.name,sha256=sha(phase_path),faser=phases,visuelt_sett=False)
+save(R/'motor-visuell-plan.json',dict(varianter=variants,hele_motorbilder=shots,
+                                   hele_startanimasjon=phase_record,visuelt_sett=False))
+save(R/'motor-sammenligning.json',dict(nye_native=1,native=3697,
+     kontroller_pr_side=160,null_pr_side=158,null_etter_testaktorstart_pr_side=120,
+     alle1_observert=True,alle11_kildefaser_observert=True,alle9_arkfaser_observert=True,
+     alle_originale_rektangler_med8HD_identiske=True,uforklarte_HD_endringer=0,
+     ingen_nye_eller_okte_bufferavvik=True,bufferavvik_koordinater_og_begge_RGB_eksakt_identiske=True,
+     atomiske_skrivinger_bestatt=True,visuelt_sett=False,full_naturlig_gjennomspilling=False,
+     ny_interaktiv_Windows=False,ny_webtest=False,Tom_godkjent=False,Claude_godkjent=False,
+     begrensning='To ferske kontrollerte avspillinger med aktør29,kostyme296,anim1/raw6,zclip1 i rom56. '
+     'Alle ni arkfaser og to etterfølgende er logget. Andre aktører og romskript kjører. '
+     'Ingen naturlig primærhandling eller full gjennomspilling. To kjente inngangsavvik per side '
+     'er identiske i koordinater og begge RGB-verdier. Ingen ny Tom-/Claude-godkjenning.'))
+for name in ['motor.py','kjor-motor.py','analyser.py']:
+    shutil.copy2(O/name,R/(name+'.txt'))
+print('Én native observert.160 kontroller/158null per side,120/120null etter figurstart.',flush=True)
