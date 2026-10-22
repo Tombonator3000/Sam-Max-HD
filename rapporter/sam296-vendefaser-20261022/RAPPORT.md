@@ -1,0 +1,11 @@
+# Isblokkens vendefaser
+
+Kandidat3701 har fire nye native ruter:1922,1940,1941,1942. Dette er én ny egen tegning,S025,og tre hele kildedubletter.1940 er eksakt RGBA- og indeksalias til1922;1941 til1921/S017 og1942 til1920/S006. Ingen originalfragmenter kopieres inn. Ingen publisert grafikk fjernes eller endres. Publisering og pakker gjenstår før kvittering.
+
+fig296_04 er ferdig1/1 med resultat.png. fig296_01 er3/9 ogfig296_03 er2/10,levert som SHA-festede delark i rapporten. Hele figurjobber med resultat er507/1758,1251 uten i tillegg til returer/sluttkontroll.296-familien er6/23 native etter publisering. Seks nye innebygde bildekall har råbilder,faktiske prompter og argumenter;én velges,fem er kvalitetsreturer. Hele familiens29 kall har tre valgte egne tegninger og26 returer.
+
+Alle fire nye native,tre leverte lerreter,fire hele motorbilder,fire før/etter-par og22 faser i to animasjoner er visuelt sett. Fire ferske motoravspillinger av anim1/raw6 oganim8/raw34 har160 bufferkontroller hver,158 uten avvik og120/120 uten avvik etter figurstart. De to kjente inngangsavvikene per avspilling er identiske i koordinater og begge RGB-verdier. Originalrektangler med8HD naboområde er identiske,ingen uforklarte HD-endringer og alle atomiske lagringer består. Det er kontrollert animasjon,ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Kilde og rom56-kontekst er sett før hver nytegning. Stilen følger de godkjente Sam-/Max-masterne. Lokal bibliotekkontroll bruker figurark-fast-storrelse og publisert-mod-er-fasit;opphavets PASS erstatter ikke kontrollen her. Fast4x,egen alfa,ingen originalmaskeklipp og ingen originale fragmenter. Alle1448 beskyttede jobbfiler og tre opprinnelige stasher skal bevares. Lokale kontrolloppsett er rettet og dokumentert i egne JSON-filer;ingen motor-/pipelinekode endres.
+
+Felles Linux/Windows fryserark har3695 og mangler seks296-ruter etter denne publiseringen. Neste pakkesamlepunkt skal bygges med fast native-SHA,deretter lastes ned med sjekksummer og faktisk filkontroll før release kalles oppdatert. Ingen grafikk til main og ingen gamle nattprosesser. Automatikken fortsetter;all grafikk er ikke ferdig.

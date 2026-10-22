@@ -1,0 +1,12 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent
+plans=[('grunnlag3697-start1',P/'mods/gpt'),('kandidat3701-start1',O/'mod-sam2963701'),('kandidat3701-start8',O/'mod-sam2963701')]
+assert all(not(O/name).exists() for name,_ in plans)
+def run(plan):
+ name,mod=plan
+ subprocess.run([str(P/'.venv/bin/python'),str(O/'motor.py'),name,str(mod)],check=True)
+ return name
+with ThreadPoolExecutor(max_workers=2) as pool:
+ for name in pool.map(run,plans):print('Fullført:',name,flush=True)

@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image, ImageFilter
+from scipy import ndimage as nd
+import hashlib
+import json
+import numpy as np
+import sys
+
+O = Path(__file__).resolve().parent
+K = O / 'kall' / sys.argv[1]
+q = json.loads((K / 'verktøyresultat.json').read_text())
+own = Image.open(K / 'egen-renset.png').convert('RGBA')
+data = np.array(own)
+before = data[:, :, 3].copy()
+data[:, :, :3] = np.array(own.convert('RGB').filter(ImageFilter.ModeFilter(5)))
+data[data[:, :, 3] == 0, :3] = 0
+assert np.array_equal(before, data[:, :, 3])
+clean = Image.fromarray(data)
+clean.save(K / 'egen-RGB-modus5.png')
+x0, y0, _, _ = q['egen_core_bbox']
+fx, fy = q['skala']
+native = clean.transform(tuple(q['native_maal']), Image.Transform.AFFINE,
+                         (1/fx, 0, x0-8/fx, 0, 1/fy, y0-8/fy), Image.Resampling.BICUBIC)
+data = np.array(native)
+core = data[:, :, 3] >= 128
+data[nd.distance_transform_edt(~core) > 1.5] = 0
+native = Image.fromarray(data)
+old_native = np.array(Image.open(K / 'prototype-under-kontroll.png').convert('RGBA'))
+assert np.array_equal(old_native[:, :, 3], data[:, :, 3])
+native.save(K / 'prototype-rgbmodus5.png')
+(K / 'RGB-modus5-kontroll.json').write_text(json.dumps(dict(
+    metode='ModeFilter5 på egen RGB før samme hele affine skala. Ingen andre endringer.',
+    raw_alfa_identisk=True, native_alfa_identisk=True, originalmaske=False,
+    originalfragmenter=False, lokal_flytting=False,
+    egen_native_sha256=hashlib.sha256((K / 'prototype-rgbmodus5.png').read_bytes()).hexdigest()),
+    ensure_ascii=False, indent=2) + '\n')
+print('Kun egen RGB renset. Både rå og native alfa er identisk.')

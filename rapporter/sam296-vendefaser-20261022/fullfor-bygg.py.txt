@@ -1,0 +1,99 @@
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from PIL import Image, ImageDraw
+from smhd.myk import CORE, GOOD_IOU, GOOD_COVER, _iou
+import datetime
+import hashlib
+import json
+import numpy as np
+import re
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+M = P / 'mods/gpt'
+C = O / 'mod-sam2963701'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+
+def save(p, value):
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+def inventory(root):
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return dict(pool.map(lambda p: (p.relative_to(root).as_posix(), sha(p)),
+                             [p for p in root.rglob('*') if p.is_file()]))
+
+
+start = read(R / 'start.json')
+assert inventory(M) == start['filer'] and not C.exists()
+assert all(sha(A / f) == h for f,h in start['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==start['stash']
+G=O/'diagnostisk-gren'
+records=read(G/'rapporter'/R.name/'fremdrift.json')['leveranser']
+leveranser=[v for v in records if v['levert']]
+partials=[v for v in records if not v['levert']]
+mapping_all=read(R/'rutekart-samlet.json')
+targets={1922,1940,1941,1942}
+entries=[v for m in mapping_all.values() for v in m['ruter'] if v['rute'] in targets]
+assert len(entries)==4 and {v['rute'] for v in entries}==targets
+assert all(sha(A/v['prototype'])==v['sha256'] for v in entries)
+selected=read(R/'kall/S025/sluttkandidat-kontroll-fin.json')
+tests=[]
+for record in records:
+    log=(R/(record['jobb']+'-egenkontroll.txt')).read_text()
+    errors=re.findall(r'^FEIL\s+(costume\d+_\d+):',log,re.M)
+    assert set(errors)<=set(record['mangler'])
+    tests.append(dict(jobb=record['jobb'],produserte_FEIL=0,feil_kun_tomme_maal=errors,hele_arket_ferdig=record['levert']))
+automatic = []
+for record in leveranser + partials:
+    auto = O / 'automatisk-mottak' / record['jobb']
+    subprocess.run([str(P / '.venv/bin/smhd'), 'myke-figurer', '--gren', str(G),
+                    '--extract', str(P / 'work/extract'), '--ut', str(auto), '--jobb',
+                    record['jobb'], '--forhandsvisning', ''], cwd=P, check=True)
+    value = read(auto / 'myke.json')
+    assert value['ruter_ok'] == record['ruter'] and value['ruter_sjekk'] == 0
+    assert value['ruter_mangler'] == len(record['mangler'])
+    automatic.append(dict(jobb=record['jobb'], **value))
+save(R / 'automatisk-mottak.json', automatic)
+save(R / 'delark-kontroll.json', tests)
+
+subprocess.run(['cp', '-a', '--reflink=always', str(M), str(C)], check=True)
+assert inventory(C) == start['filer']
+for entry in entries:
+    assert not (C / entry['fil']).exists()
+    shutil.copy2(A / entry['prototype'], C / entry['fil'])
+    assert sha(C / entry['fil']) == entry['sha256']
+meta = read(C / 'mod.json')
+assert meta['costume_cels'] == 3697
+meta['costume_cels'] = 3701
+save(C / 'mod.json', meta)
+now = inventory(C)
+assert set(now) - set(start['filer']) == {e['fil'] for e in entries}
+assert {name for name, digest in start['filer'].items() if now[name] != digest} == {'mod.json'}
+save(R / 'kandidatfilhash.json', now)
+save(R / 'egen-native.json', dict(ruter=entries, nye_native=4, native_totalt=3701,
+     kandidat=str(C), nye_egne_hele_tegninger=1, hele_rgba_aliasmal=3,
+     tidligere_filer_bevart=len(start['filer']), filer=len(now),
+     fast_4x=True, egen_alfa=True, originalmaske=False, originalfragmenter=False,
+     diagnostisk_eksport_ikke_importert=True))
+save(R / 'fremdrift.json', dict(leveranser=leveranser, delvise_leveranser=partials,
+     nye_jobber_levert=1, nye_native=4, native_totalt=3701, grunnlag_native=3697,
+     innebygde_bildekall=6, kvalitetsreturer=5, ulike_hele_egne_malerier_valgt=1,
+     hele_rgba_aliasmal=3, hele_figurjobber_med_resultat=507, total_figurjobber=1758,
+     gjenstar=1251, familie296_native=6, familie296_totalt=23,
+     laget_valgte_ruter=4, egenkontrollert=4, native_mottatt=4, visuelt_sett=0,
+     motorobservert=0, publisert=0, Tom_godkjent=0, Claude_godkjent=0,
+     pakker_native=3695, pakker_mangler_native=6, native_frosset=False))
+save(R / 'fragmentvern.json', dict(nye_egne_hele_rutetegninger=1, hele_kildebekreftede_alias=3,
+     originalfragmenter_i_kandidat=False, originalmaske=False, lokal_flytting=False,
+     egen_tegning_tett_helplassering_HD=selected['hel_plassering_HD'],
+     port_HD=3, CORE=128, IoU=.6, dekning=.8, affin_min=.88, affin_maks=1.12,
+     tidligere_native_og_arkposisjon_bevart=True, diagnostisk_eksport_ikke_importert=True))
+shutil.copy2(O / 'bygg.py', R / 'bygg.py.txt')
+shutil.copy2(__file__, R / 'fullfor-bygg.py.txt')
+print('Kandidat3701:4 nye native,1 ny tegning+3 hele alias.01=3/9,03=2/10,04=1/1.', flush=True)

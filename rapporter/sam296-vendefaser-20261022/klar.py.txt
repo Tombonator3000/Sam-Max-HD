@@ -1,0 +1,83 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+v=read(R/'motor-visuell-plan.json')
+for name in ['varianter','hele_motorbilder','hele_animasjoner']:
+ for e in v[name]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=4,hele_motorbilder_sett=4,hele_animasjoner_sett=2)
+save(R/'motor-visuell-plan.json',v)
+m=read(R/'motor-sammenligning.json');assert m['alle4_observert'] and m['alle22_kildefaser_observert'];m['visuelt_sett']=True;save(R/'motor-sammenligning.json',m)
+rows=read(R/'motor-pikselkontroll.json')
+for e in rows:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',rows)
+native=read(R/'egen-native.json')
+for e in native['ruter']:
+ assert sha(A/e['prototype'])==e['sha256'];e.update(prototype_visuelt_sett=True,native_mottatt=True,motorobservert=True)
+save(R/'egen-native.json',native)
+f=read(R/'fremdrift.json');f.update(visuelt_sett=4,motorobservert=4)
+for e in f['leveranser']+f['delvise_leveranser']:e.update(native_mottatt=True,visuelt_kontrollert=True,motorobservert=True)
+save(R/'fremdrift.json',f)
+for file in [*R.glob('rutekart-fig*.json'),R/'rutekart-samlet.json']:
+ value=read(file)
+ for mapp in value.values():
+  for e in mapp['ruter']:e.update(prototype_visuelt_sett=True,native_mottatt=True,motorobservert=True)
+ save(file,value)
+ark=[]
+for e in f['leveranser']+f['delvise_leveranser']:
+ assert sha(A/e['resultat'])==e['sha256'];ark.append(dict(fil=e['resultat'],sha256=e['sha256'],visuelt_sett=True,hele_arket_ferdig=e['levert']))
+save(R/'egen-visuell-plan.json',dict(visuelt_sett=True,ark=ark,egen_native_tavle=dict(fil='egen-native-alle4.png',sha256=sha(R/'egen-native-alle4.png'),visuelt_sett=True),godkjente_stilankere=[dict(fil='hovedark/'+n+'.png',sha256=sha(A/'hovedark'/(n+'.png')),visuelt_sett=True) for n in ['sam','max']],Tom_godkjent=False,Claude_godkjent=False))
+c=read(R/'kall/S025/sluttkandidat-kontroll-fin.json');assert c['teknisk_og_fester_bestatt'] and c['maks_avvik_HD']<=3
+save(R/'indre-feste-kontroll.json',dict(alle_kontrollerte_smaadeler_innen3HD=True,source_hudpunkter=134,source_blaapunkter=56,morke_fester=14,maks_HD=c['maks_avvik_HD'],hel_plassering_HD=c['hel_plassering_HD'],port_HD=3,ingen_lokal_flytting=True,originalfragmenter=False,originalmaske=False,egen_alfa=True,finere_helplassering_er_ikke_senket_port=True))
+save(R/'sluttkontroll.json',dict(klar_for_additiv_publisering=True,visuelt_sett=True,valgte_native=4,egne_nye_malerier=1,hele_rgba_aliasmal=3,hele_ark_levert=1,motorobservert=4,native=3701,publisert=0,Tom_godkjent=False,Claude_godkjent=False,pakker_native=3695,pakker_mangler_native=6,beskyttede=1448,stasher=3))
+(R/'RETUR.md').write_text('''# Returer etter S029
+
+S025/1922 er valgt. Sluttkandidat-kontroll-fin.json er autoritativ: alle134 hudpunkter,56 blåpunkter og14 mørke fester under uendret3HD-port,største2,977921HD. Hele tegningen flyttes[1,375,+0,25]HD med BICUBIC. Ingen lokale trekk flyttes. Finere helplassering gir presisjon,ingen endret toleranse. Tidligere halv-HD-kontroll3,194HD består ikke og er bevart. Egen alfa og fast4x,ingen originalmaske eller originalfragmenter.
+
+S024/1930:16 hudpunkter og60 blåpunkter over3HD,maks hud12,600HD/blå22,556HD og manglende mørke fester. Ikke valgt.999 er manglermarkør,ikke fysisk avstand. Ingen alias til1931/1932.
+
+S026/1923:alle141 hudpunkter og116 blåpunkter består,men18 mørke fester har største4,121868HD ved fin helplassering. Rensing av egen RGB med ModeFilter3/5 fjerner en liten blå del og består heller ikke;variantene er bevart separat. Ingen import eller alias1939.
+
+S027/1924:åtte hudpunkter og33 blåpunkter over3HD,maks7,5HD. Ingen import/alias1938.
+
+S028/1926:ett hudpunkt ogni blåpunkter over3HD,maks blå9,937HD,samt manglende mørkt feste. Ingen import eller alias1927/1928/1935/1936.1934 har ulike kildepiksler og er uansett ikke alias. Verktøyholdt293_1927 er en annen ressurs og omprøves ikke.
+
+S029/1925:225 hudpunkter består,men sju av212 blåpunkter over3HD,maks6,538HD,samt manglende mørkt feste. Ingen import/alias1937.
+
+Lokal kontrollkopi forventet først magenta og mistet RGBA-kildealfa. Begge feilkontroller er bevart i historikk-feil-kildealfa,og nye kontroller bruker ekte kildealfa. Tidligere publisert S017 er kontrollert mot faktisk kildealfa og var riktig. Isolert mottak manglet først PNG på rapportstien;samme delark-SHA ble kopiert til riktig sted,før ferskt mottak. Analysehjelperens antakelse om raw8 ble rettet til logget raw34 for logisk animasjon8. Ingen motor-/pipelinekode ble endret,ingen ufullstendig kontroll regnes bestått.
+
+Neste nye bildekall er S030. Fortsett fra de konkrete måle- og bildebevisene,med original og godkjente stilankere før motivet. Ingen nødvendig designavklaring med Tom er identifisert.
+''')
+(R/'RAPPORT.md').write_text('''# Isblokkens vendefaser
+
+Kandidat3701 har fire nye native ruter:1922,1940,1941,1942. Dette er én ny egen tegning,S025,og tre hele kildedubletter.1940 er eksakt RGBA- og indeksalias til1922;1941 til1921/S017 og1942 til1920/S006. Ingen originalfragmenter kopieres inn. Ingen publisert grafikk fjernes eller endres. Publisering og pakker gjenstår før kvittering.
+
+fig296_04 er ferdig1/1 med resultat.png. fig296_01 er3/9 ogfig296_03 er2/10,levert som SHA-festede delark i rapporten. Hele figurjobber med resultat er507/1758,1251 uten i tillegg til returer/sluttkontroll.296-familien er6/23 native etter publisering. Seks nye innebygde bildekall har råbilder,faktiske prompter og argumenter;én velges,fem er kvalitetsreturer. Hele familiens29 kall har tre valgte egne tegninger og26 returer.
+
+Alle fire nye native,tre leverte lerreter,fire hele motorbilder,fire før/etter-par og22 faser i to animasjoner er visuelt sett. Fire ferske motoravspillinger av anim1/raw6 oganim8/raw34 har160 bufferkontroller hver,158 uten avvik og120/120 uten avvik etter figurstart. De to kjente inngangsavvikene per avspilling er identiske i koordinater og begge RGB-verdier. Originalrektangler med8HD naboområde er identiske,ingen uforklarte HD-endringer og alle atomiske lagringer består. Det er kontrollert animasjon,ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Kilde og rom56-kontekst er sett før hver nytegning. Stilen følger de godkjente Sam-/Max-masterne. Lokal bibliotekkontroll bruker figurark-fast-storrelse og publisert-mod-er-fasit;opphavets PASS erstatter ikke kontrollen her. Fast4x,egen alfa,ingen originalmaskeklipp og ingen originale fragmenter. Alle1448 beskyttede jobbfiler og tre opprinnelige stasher skal bevares. Lokale kontrolloppsett er rettet og dokumentert i egne JSON-filer;ingen motor-/pipelinekode endres.
+
+Felles Linux/Windows fryserark har3695 og mangler seks296-ruter etter denne publiseringen. Neste pakkesamlepunkt skal bygges med fast native-SHA,deretter lastes ned med sjekksummer og faktisk filkontroll før release kalles oppdatert. Ingen grafikk til main og ingen gamle nattprosesser. Automatikken fortsetter;all grafikk er ikke ferdig.
+''')
+(R/'NESTE.md').write_text('''# Neste arbeid
+
+Les mottak-publisert.json og publisering-forsokt.json før videre arbeid. Ikke gjenta denne rundens engangshjelpere. Kandidat3701 venter på additiv publisering før disse filene finnes.
+
+Gjenoppta fig296_01 fra1923/S026 og RETUR.md.1920/1921 er tidligere publisert;1922/S025 er ny og kan være publisert med1940/1941/1942 ved kvittering. fig296_01 er3/9,fig296_03 er2/10,fig296_04 er1/1. Familien har6/23 etter denne runden. Neste nye bildekall er S030. Alle tidligere returer gjelder. Ingen alias fra en underkjent kanonisk rute.1934 er en unik kilde,ikke dublett til1926.
+
+Kildealias.json og alias-indekskontroll.json viser alle fulle RGBA- og indekslikheter. Godkjent1922 kan brukes i1940,1921 i1941 og1920 i1942. Disse er allerede med i denne runden og skal ikke dupliseres.296_1927/1928 venter på egen1926,og verktøyholdt293_1927 er en annen ressurs som ikke omprøves.
+
+Samlepunktet med ferdigfig296_04 skal oppdatere begge pakker til3701 før de kalles oppdatert. Pakkene har foreløpig3695. Følg eventuell bygg-startet.json/nativefrys og pågående bygg. Bevar alle tidligere native,1448 beskyttede jobbfiler og de tre opprinnelige stasher. Bare de fire sentrale dokumentene kan oppdateres direkte i main. Hele figurjobber507/1758,1251 uten i tillegg til returer og sluttkontroll. Ingen nødvendig designavklaring med Tom er identifisert. Automatikken forblir ACTIVE.
+''')
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+for name,info in [('fig296_01','Delark3/9 med ny1922/S025. Tidligere1920/1921 er bevart byte for byte og på samme arkposisjon.'),('fig296_03','Delark2/10 med1940 fra1922/S025 og1941 fra1921/S017. Begge har eksakt samme fulle originalRGBA og palettindeks som sin kanoniske rute.'),('fig296_04','Helt ark1/1 med1942,eksakt hel kildealias til1920/S006. Både alle originalRGBA- og palettindeksbytes er kontrollert. Det er ikke en ny egen maleritegning.')]:
+ path=A/'jobber'/name/'notat.md';old=path.read_text() if path.exists() else '# Jobbnotat\n'
+ assert 'sam296-vendefaser-20261022' not in old
+ text=f'\n## {now} (Codex)\n\n{info} Kilde296,rom56,palett0:Conroy og Lee Harvey i isblokk og brun drakt. Opprinnelig klipp bevares. Innebygd image_gen,modell ikke oppgitt. Én ny valgt tegning fra seks bildekall i denne runden,fem kvalitetsreturer. Råbilder,faktiske prompter,SHA-fremdrift og rutekart ligger i rapporter/sam296-vendefaser-20261022. Fast4x,egen alfa,ingen originalmaske eller originale fragmenter. Teknisk mottak,visuell egenkontroll og relevant motoravspilling er utført på kandidat3701;fjernpublisering og fellespakker venter på kvittering. Ingen ny Tom-/Claude-godkjenning eller naturlig full gjennomspilling. Beskyttede jobbfiler er uendret.\n'
+ path.write_text(old+text)
+shutil.copy2(__file__,R/'klar.py.txt')
+print('Fire ruter visuelt og motorobservert. Ett helt ark. Klar for additiv publisering.',flush=True)
