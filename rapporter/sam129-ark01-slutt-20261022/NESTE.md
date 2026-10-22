@@ -7,3 +7,7 @@ Fortsett i fig129_02 med en praktisk bunke på5 til10 av385 til390 først, deret
 641 fikk verktøyavslag180ea1c4-4d0c-4424-a124-bf49b48a2c21 og omprøves ikke.642 er den identiske hele aliasen og ikke individuelt prøvd. Ikke forsøk samme motiv gjennom en annen teknikk. S04/S05 er erstattet som egne kvalitetsreturer av de hele hvilende hodeneS04R/S05R; publiser bare de seks valgte i valgte6.json.
 
 Fellespakker har3596. Oppdater ved resten av129-familien eller reell produksjonsblokkering, med nativefrys under bygg, faktisk nedlasting, sjekksummer og samtlige inkluderte grafikkfiler kontrollert. Automatikken fortsetter fordi22 familiemål og øvrige jobber gjenstår. Ikke gjenstart nattløpet fra15. oktober. Tidligere returer, særlig124_1804/1861, og tidligere avviste motiver beholdes. Kodeendringer krever avgrenset testet PR, ingen skjuling med alfa eller svakere porter.
+
+## Endelig etterkontroll
+
+Main ec666ef6446fc8a3ca6481c77c54c0528e673b80 er pushet med bare memory.md, todo.md, STATUS.md og log.md. CI 39721230953 er bestått: https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/39721230953. Sluttkontrollen bekrefter alle21863 nativefilhash,1420 beskyttede jobbfiler og de samme tre stashene. Grafikkautomatikken er ACTIVE, gammel nattkontroll PAUSED. Fortsett de22 uavhengige129-målene fra NESTE.md. Ingen ny Tom-/Claude-godkjenning og ingen fullført-status for all grafikk.
