@@ -1,0 +1,23 @@
+from pathlib import Path
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;old=P/'out/felles-release-20261022-fryservindu'
+s=(old/'motor-pakke.py').read_text().replace("PK=O/'linux/squashfs-root'", "PK=P/'out/felles-release-20261022-fryservindu/linux/squashfs-root'if sys.argv[1].startswith('grunnlag3695')else O/'linux/squashfs-root'")
+s=s.replace("assert sha(B)==read(R/'linux-nedlasting-kontroll.json')['binar_sha256']", "assert sha(B)==('bad93067a55dcbdf09c8001a50ea45dc8b888a044dd2860e8aa7d3ce2f79450a'if mode.startswith('grunnlag3695')else read(R/'linux-nedlasting-kontroll.json')['binar_sha256'])").replace("native=read(MOD/'mod.json')['costume_cels']", "native=read(MOD/'mod.json')['costume_cels'];assert native==3695")
+s=s.replace("DIGHD_TEST_ANIMATION='7'", "DIGHD_TEST_ANIMATION='1'if'start1'in mode else'7'");compile(s,str(O/'motor-pakke.py'),'exec');(O/'motor-pakke.py').write_text(s)
+s=(P/'out/sam293-returer-20261022/analyser.py').read_text();s=s.replace("C=O/'mod-sam2933694'", "C=O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'").replace("native=read(R/'egen-native.json')['ruter']", "native=read(R/'familie-native11.json')['ruter']").replace('len(native)==5','len(native)==11').replace('grunnlag3689','grunnlag3695').replace('kandidat3694','pakke3695').replace('(b,3689),(c,3694)','(b,3695),(c,3695)').replace("d['binar_sha256']=='bad93067a55dcbdf09c8001a50ea45dc8b888a044dd2860e8aa7d3ce2f79450a'", "d['binar_sha256']==sha(Path(d['binar']))")
+s=s.replace("assert delta[allowed].any(),(case,name,'Ingen synlig ny HD ved zclip1')", "assert not delta[allowed].any(),(case,name,'HD i aktørfelt skiller seg fra kontrollert produksjon')").replace("e['bilde']+' 3689/3694, skript204+zclip1'", "e['bilde']+' produksjon/pakke3695,skript204+zclip1'")
+s=s.replace("observerte_nye=2 if case=='start1' else 3 if case=='clip1' else 5", "observerte_nye=2 if case=='start1' else 9 if case=='clip1' else 11").replace('for cel in [1921,1922,1970,1971,1972]:','for cel in [1921,1943,1947,1972]:').replace('-motor3694.png','-motor3695.png').replace('nye_native=5,native=3694','nye_native=11,native=3695').replace('alle5_observert','alle11_observert')
+s=s.replace("print('5 nye native observert i relevante kontrollerte animasjoner og skript204.560 kontroller pr side,554 null,440/440 null etter figurstart.')", "print('11 pakkelag samsvarer med produksjonen i relevante kontroller og skript204.560 kontroller per side,554 null,440/440 null etter figurstart.')")
+s=s.replace("Alle prøver bruker faktisk tidligere nedlastet Linux-binær fra fellespakken;den endres ikke i denne bunken.", "Ny faktisk nedlastet Linux-binær og medfølgende mod sammenlignes mot ny produksjonsavspilling med samme publiserte3695-mod og tidligere kontrollert binær.")
+s+='''\nproof=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json')
+proof.update(alle11_observert_i_ny_Linux_pakke=True,alle_native_hash_identiske=True,skjermbufferkontroller=560,nullkontroller=554,kjente_bufferavvik=6,eksakte_feilkoordinater_og_begge_RGB_identiske=True,varianter=v['varianter'],hele_motorbilder=v['hele_motorbilder'],hele_varianter_sett=0,hele_motorbilder_sett=0,ruter=rows,ny_Tom_Claude_godkjenning=False)
+save(R/'linux-kontroll.json',proof)
+'''
+compile(s,str(O/'analyser-pakke.py'),'exec');(O/'analyser-pakke.py').write_text(s)
+run='''from pathlib import Path
+import subprocess,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent
+side=sys.argv[1];assert side in ['grunnlag3695','pakke3695'];mod=P/'mods/gpt'if side=='grunnlag3695'else O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+for case in ['start1','clip1','skript204-med-aktor10']:
+ subprocess.run([str(P/'.venv/bin/python'),str(O/'motor-pakke.py'),side+'-'+case,str(mod)],check=True)
+''';(O/'kjor-motor.py').write_text(run)
+print('Motorhjelpere3695:frisk produksjon og faktisk pakke,3 prøver per side,11 lag.')

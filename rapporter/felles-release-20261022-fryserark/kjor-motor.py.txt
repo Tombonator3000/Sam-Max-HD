@@ -1,0 +1,7 @@
+from pathlib import Path
+import subprocess,sys,json
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent
+R=P/'work/.gpt-gren/rapporter'/O.name;assert R.is_dir();state=json.loads((O/'bygg-startet.json').read_text());assert state['native_frosset']and all('run_id'in state['plattform'].get(k,{})for k in ['linux','windows'])
+side=sys.argv[1];assert side in ['grunnlag3695','pakke3695'];mod=P/'mods/gpt'if side=='grunnlag3695'else O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+for case in ['start1','clip1','skript204-med-aktor10']:
+ subprocess.run([str(P/'.venv/bin/python'),str(O/'motor-pakke.py'),side+'-'+case,str(mod)],check=True)
