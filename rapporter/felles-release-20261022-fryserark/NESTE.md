@@ -1,5 +1,7 @@
-# Gjenoppta pakkefeil,frys native3695
+# Gjenoppta fellespakke3695 etter SDL-retting
 
-Ikke publiser mer native eller kall fellespakken oppdatert. Linux39782177395 er grønt,Windows39782182412 feilet oppstart. Følg kodearbeidsflaten /home/tom/Sam-Max-HD/work/.codex-windows-sdl-start på codex/windows-sdl-start. Test minimal SDL-oppstartsretting,opprett testet PR,og oppdater begge pakker til samme kontrollerte kode etter eventuell fletting.
+PR35 er flettet og hentet. Lokal kontroll består fire oppstarter med HD og3000 nearest-bilder med12 buffer- og12 originalkontroller uten avvik. Endelig kode d738f535b685ea627e82f0dcf1c83ee9b0bea170. Vent på eksakt grønn main-CI. Før neste dispatch må gpt-arbeid være rent og pushet,og begge plattformbygg være avsluttet.
 
-Bevar alle data,32/32-arket,tre stasher og publisert hd-mod f0f7b641177cec8661d7c0cbf68c5faef9eb31f6. Sjekk eksisterende CI-run/journal før ny dispatch,ikke dupliser. Motorprøver/fellesrelease/gjenhenting og taggbygg må bestå før nativefrys oppheves. Deretter fortsett fig296_01 etter kilde- og returkontroll.
+Kjør bygg-etter-sdl.py én gang hvis bygg-startet.json fortsatt viser byggfeil_undersokes_native_frosset og byggforsok1.json ikke finnes. Den arkiverer første forsøk og journalfører nye runID før oppfølging. Ikke kjør start.py eller dupliser en dispatch med kjent ID. Følg deretter hent-status.py,vent på begge grønne bygg,fullfør faktisk nedlasting og filhashkontroll,tre nye motorprøver og visuell kontroll før rapport.py og publiser-felles.py. Les forrige journal ved ukjent utfall. Alle fellesvedlegg skal hentes tilbake,og taggkontroll.py må bekrefte nytt Windows-taggbygg før nativefrys oppheves.
+
+Native f0f7b641177cec8661d7c0cbf68c5faef9eb31f6 er fortsatt frosset. Bevar alle21939 modfiler,32/32-arket,1432 beskyttede kilder og tre stasher. Oppdater alle tre kildebunker med etter-publisering.py,main-dokumentasjon og sluttrevisjon etter fellesrelease. Alle helperfiler ligger i out/felles-release-20261022-fryserark. Gamle nattprosesser startes ikke. Deretter fortsett fig296_01 etter kilde- og returkontroll. All grafikk er ikke ferdig.

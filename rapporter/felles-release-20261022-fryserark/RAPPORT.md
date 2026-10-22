@@ -9,3 +9,5 @@ Samme feil er gjenskapt lokalt med SurfaceSDL og innebygd tema. GDB plasserer fe
 Se windows-bygg39782182412-feil.log/.json,sdl-oppstart-lokal.json,bygg-startet.json og lokal-kontrollstart.json. Ingen feilprøve regnes bestått.
 
 Lokal retting består nå fire ferske oppstarter med HD-motoren og3000-bilders nearest-kontroll med alle kostymer:12 bufferkontroller og12 originale sammenligninger uten avvik. Standardtestens1..20 manglet introens21/22/23/26 og ga glatt fallback; den komplette nearest-modden retter bare testgrunnlaget. Første lokale rebuild manglet HD-kilder og ble avbrutt,og ett scriptforsøk hadde blandet runtime. Ingen slike forsøk regnes bestått. ScummVM-pin og HD-patch0001 er urørt. Kode-PR klargjøres; ingen fellesrelease er oppdatert ennå.
+
+PR35 er flettet etter grønn CI og hentet med ff-only. Kode d738f535b685ea627e82f0dcf1c83ee9b0bea170. Begge pakker skal bygges på nytt fra denne committen etter grønn eksakt main-CI. Første byggeforsøk bevares. Nativefrys beholdes,og fellesrelease kalles fortsatt ikke oppdatert.
