@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,sys,hashlib,shutil
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+K=R/'kall'/sys.argv[1];q=json.loads((K/'kontroll.json').read_text());n=q['rute'];s=np.array(Image.open(P/f'work/extract/costumes/costume137_{n}.png').convert('RGBA'));b=np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA'));px,py=q['margx']*4,q['margy']*4
+src8,n8=nd.label(s[:,:,3]>0,np.ones((3,3),bool));own8,k8=nd.label(b[:,:,3]>=128,np.ones((3,3),bool));seen={};colorrows=[]
+for color in np.unique(s[s[:,:,3]>0,:3],axis=0):
+ oy,ox=np.nonzero((s[:,:,3]>0)&np.all(s[:,:,:3]==color,axis=2));mask=(b[:,:,3]>=128)&np.all(b[:,:,:3]==color,axis=2)
+ if mask.any():d=nd.distance_transform_edt(~mask)[py+oy*4+2,px+ox*4+2]
+ else:d=np.full(len(ox),999.)
+ colorrows.append({'kilde_RGB':[int(x)for x in color],'kildepunkter':len(ox),'maks_til_egen_farge_HD':float(d.max()),'punkt_over3HD':int((d>3).sum())})
+for i in range(1,n8+1):
+ sy,sx=np.nonzero(src8==i);labels=sorted(set(int(x) for x in own8[py+sy*4+2,px+sx*4+2] if x));seen[i]=labels
+struct={'kilde4':q['kilde_komponenter'],'kilde8':n8,'egen4':q['egne_core128_komponenter'],'egen8':k8,'kilde8_til_egne8':seen,'tolkning':'Fire naboer skiller også diagonale kontaktpunkter. Det er ikke alltid egne atskilte deler. Pipeline smhd.myk.parts bruker åtte naboer. Begge tellinger oppgis; faktisk motiv, opake og åpne fester og farger kontrolleres uten å endre alfa.'}
+report={'kall':sys.argv[1],'rute':n,'komponenttolkning':struct,'fargepunkter':colorrows,'fargefester_innen3HD':all(x['punkt_over3HD']==0 for x in colorrows),'egen_alfa_urort':True,'native_SHA256':hashlib.sha256((K/'prototype-under-kontroll.png').read_bytes()).hexdigest()}
+(K/'farge-og-deler.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+w,h=Image.open(K/'prototype-under-kontroll.png').size;board=Image.new('RGB',(820,max(260,h*5+70)),'#304050');dr=ImageDraw.Draw(board)
+for i,(f,label)in enumerate([('original-native-kontroll.png','Original 4x, bare kontroll'),('prototype-under-kontroll.png',sys.argv[1]+' ny egen 4x')]):
+ im=Image.open(K/f).convert('RGBA');bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);board.paste(bg.convert('RGB').resize((w*5,h*5),Image.Resampling.NEAREST),(20+i*410,45));dr.text((20+i*410,15),label,fill='white')
+board.save(K/'native-visuell.png');shutil.copytree(K,O/'kall'/sys.argv[1],dirs_exist_ok=True);print(struct);print('colors',report['fargefester_innen3HD'],[(x['kilde_RGB'],x['punkt_over3HD'],round(x['maks_til_egen_farge_HD'],3))for x in colorrows if x['punkt_over3HD']])

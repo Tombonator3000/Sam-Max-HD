@@ -1,0 +1,102 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil,datetime
+from zoneinfo import ZoneInfo
+import numpy as np
+from PIL import Image
+from scipy import ndimage as nd
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+start=read(R/'start.json');topology=[];maps=[];calls=[]
+for k in sorted((R/'kall').iterdir()):
+ plan=read(k/'plan.json');q=read(k/'kontroll.json');assert plan['utfort'];assert sha(k/'raa.png')==plan['raa_sha256'];args=read(k/'args.json');assert args['transparent_background'] and args['prompt']+'\n'==(k/'prompt-faktisk.txt').read_text();assert all(sha(A/x)==v for x,v in plan['referanser_sha256'].items())
+ if k.name in ['V004','V006','V007']:
+  q.update(status='KVALITETSRETUR',visuell_native_kontroll=True,visuell_vurdering='Alfa- og størrelsesmålingene består, men tegningen gjengir kildepikslene som en mosaikk av fargede firkanter med avrunding. Dette er ikke en brukbar nytegning av tre og metall i den godkjente glatte tegnestilen. Ingen import. Geometrisk likhet er ikke stilgodkjenning.')
+ if k.name=='V009':q.update(status='KVALITETSRETUR',visuell_native_kontroll=True,visuell_vurdering='Den grå midtstolpen er lagt til også oppå den opake takhimlingen, der originalen ikke har en slik synlig strek. Flere smale stolper står fortsatt feil,32 opake og16 åpne punkter utenfor3HD. Ingen import.')
+ if k.name in ['V001','V002']:
+  q['komponent_presisering']='Fire-nabo-telling10 mot9 beviser ikke en slettet selvstendig del. Kilden har9 komponenter med åtte naboer; x38,59 har diagonal kontakt med den neste brune delen. Den reelt atskilte flekken ved85,51 er bevart i begge forsøkene. Disse kandidatene er fortsatt retur på grunn av geometrifester og visuell form, ikke telling alene.'
+ for flag in ['levert','native_mottatt','motorobservert','publisert','tom_claude_godkjent']:q[flag]=False
+ assert q['status']=='KVALITETSRETUR';save(k/'kontroll.json',q)
+ if 'rute'in q:
+  n=q['rute'];s=np.array(Image.open(P/f'work/extract/costumes/costume137_{n}.png').convert('RGBA'));b=np.array(Image.open(k/'prototype-under-kontroll.png').convert('RGBA'));ys,xs=np.nonzero(b[:,:,3]>=128)
+  info={'kall':k.name,'rute':n,'kilde4':int(nd.label(s[:,:,3]>0)[1]),'kilde8':int(nd.label(s[:,:,3]>0,np.ones((3,3),bool))[1]),'egen4':int(nd.label(b[:,:,3]>=128)[1]),'egen8':int(nd.label(b[:,:,3]>=128,np.ones((3,3),bool))[1])};topology.append(info)
+  maps.append({'kall':k.name,'bilde':f'costume137_{n}','jobb':plan['jobb'],'raa':str((k/'raa.png').relative_to(A)),'raa_sha256':sha(k/'raa.png'),'prototype':str((k/'prototype-under-kontroll.png').relative_to(A)),'prototype_sha256':sha(k/'prototype-under-kontroll.png'),'prototype_maal':list(Image.open(k/'prototype-under-kontroll.png').size),'diagnostisk_rekt_alfa128':[int(xs.min()),int(ys.min()),int(xs.max()-xs.min()+1),int(ys.max()-ys.min()+1)],'marg_originalpiksler':[q['margx'],q['margy']],'raw_core_rekt':q['egen_core_bbox'],'status':'KVALITETSRETUR','levert':False,'native_mottatt':False})
+  geom=q['alle_alfa_fester_innen3HD'];op=sum(x['punkt_over3HD']for x in q['alfa_fester']);bg=q['apninger']['punkt_over3HD']
+ else:geom=False;op=None;bg=None
+ for name in ['farge-og-deler.json']:
+  f=k/name
+  if f.exists():d=read(f);d.update(kun_diagnostikk_ikke_godkjenningsport=True,presisering='Eksakt RGB-identitet er ikke egnet som krav etter premultiplisert interpolering. Dette diagnostiske forsøket gir derfor ikke stil- eller fargegodkjenning. Kandidatene avvises visuelt som mosaikk.');save(f,d)
+ calls.append({'kall':k.name,'ruter':plan.get('ruter',[plan.get('rute')]),'jobb':plan['jobb'],'args_sha256':sha(k/'args.json'),'prompt_sha256':sha(k/'prompt-faktisk.txt'),'raw_sha256':sha(k/'raa.png'),'status':'KVALITETSRETUR','visuelt_sett':True,'hele_alfafester_innen3HD':geom,'opake_punkt_over3HD':op,'apne_punkt_over3HD':bg})
+assert len(calls)==10
+save(R/'kallregister.json',{'faktiske_innebygde_kall':calls,'antall':10,'nye_kvote_eller_verktøyavslag':0,'valgte':0,'ikke_utfort_eller_reservert':'V011'})
+save(R/'rutekart-kandidater.json',{'ruter':maps,'kun_kontroll_ikke_leveranse':True,'helark_V010':{'jobb':'fig137_03','raa_sha256':sha(R/'kall/V010/raa.png'),'ruter':[2000,2001,2002,2003,2004],'lerret':[1536,1024],'offisiell_egenkontroll':'kall/V010/egenkontroll.log','offisiell_exit':2,'OK':0,'FEIL':5,'utenfor_rutene':130548,'ikke_native_mottatt':True}})
+save(R/'komponenttolkning.json',{'bakgrunn':'Kildeklargjøringen brukte fire naboer, som også deler diagonale kontakter. Pipeline smhd.myk.parts bruker åtte naboer. Begge beholdes som fakta; fire-nabo-telling alene er ikke antallet egne fysiske smådeler.','funn':topology,'2004_x38_y59':'Diagonal forbindelse til den neste brune delen, ikke et eget frittliggende motiv. Skal fortsatt nytegnes og bevares som del av originalformen.','2004_x85_y51':'Faktisk atskilt liten flekk, bekreftet i V001/V002.','ingen_alfa_eller_kilde_endret_for_telling':True,'ingen_returer_godkjent_pa_denne_avklaringen':True})
+frem={'leveranser':[],'delvise_leveranser':[],'innebygde_bildekall':10,'kvalitetsreturer':10,'valgte_egne_malerier':0,'egenkontrollerte_kandidater':10,'visuelt_sett_raa':10,'visuelt_sett_native_prototyper':9,'offisiell_egenkontroll_helark':{'jobb':'fig137_03','OK':0,'FEIL':5,'exit':2},'laget_valgte_ruter':0,'levert':0,'nye_native':0,'native_mottatt':0,'visuelt_sett_leveranser':0,'motorobservert_ny_grafikk':0,'publisert':0,'Tom_godkjent':0,'Claude_godkjent':0,'native_totalt':3701,'familie137_native':0,'familie137_totalt':85,'hele_figurjobber_med_resultat':start['hele_figurjobber'],'total_figurjobber':start['total_figurjobber'],'gjenstar_uten_resultat':start['total_figurjobber']-start['hele_figurjobber'],'pakker_native':3701,'pakker_mangler_nye_native':0,'ny_pakkebygging_utfort':False,'ny_motoravspilling_utfort':False,'hd_mod':start['remote']['hd-mod'],'automation':'ACTIVE','neste_kall':'V011, ikke utfort eller reservert','sam296_neste':'S037, ikke utfort eller reservert','alt_ferdig':False}
+save(R/'fremdrift.json',frem)
+(R/'RETUR.md').write_text('''# Retur etter ti faktiske bildekall
+
+Alle ti råbilder og de faktiske argumentene er bevart. Ingen velges eller importeres. Ingen ny kvotegrense, verktøyavvisning eller alternativ bildeproduksjon.
+
+| Kall | Kilde | Resultat |
+| --- | --- | --- |
+| V001 | 2004 | 48 opake og7 åpne punkter utenfor3HD. For regelmessige panelbiter og ekstra konturer. |
+| V002 | 2004 | 24 opake og2 åpne punkter utenfor3HD. Hele affinplassering gir fortsatt13 avvik, maks4,242641HD. |
+| V003 | 2000 | 68 opake og12 åpne punkter utenfor3HD. Form og flatefordeling er forenklet. |
+| V004 | 1920 | Geometri består, men avvises visuelt som firkantmosaikk. |
+| V005 | 1921 | Nedre kildeåpning er feilaktig blåfylt, ett åpent punkt4,242641HD. |
+| V006 | 1921 | Åpningen er rettet av image_gen og geometri består. Avvises fortsatt som firkantmosaikk. |
+| V007 | 1922 | Geometri består. Avvises visuelt som firkantmosaikk. |
+| V008 | 1987 | Smale bakstolper mangler eller står feil. 36 opake og13 åpne punkter utenfor3HD. |
+| V009 | 1987 | Grå strek tegnes også over takhimlingen. 32 opake og16 åpne punkter utenfor3HD. |
+| V010 | 2000..2004 | Helt ark med feil skala/plassering, ekstra toppknaster og regulariserte deler. Offisiell kontroll0/5 OK og exit2. |
+
+Fire-nabo-telling10 mot9 i2004 var en misvisende selvstendig feilindikator. Kilden har9 åtte-nabo-komponenter; pikselen38,59 har diagonal kontakt med nabodelen. Den virkelige frie flekken85,51 er bevart i V001/V002. Ingen kandidat godkjennes på grunnlag av denne avklaringen. Se komponenttolkning.json. Ingen alfa eller kilde er endret.
+
+Eksakt RGB-likhet etter premultiplisert Lanczos ble prøvd som diagnostikk for småfasene og er ikke en egnet godkjenningsport for nytegning med interpolering. Dette betyr ikke at mosaikkene godkjennes. Ingen teknisk kontroll erstatter visuell stilkontroll.
+''')
+(R/'NESTE.md').write_text('''# Gjenoppta taubane137 fra bevart produksjon
+
+Ti faktiske innebygde kall V001-V010 er bevart, kontrollert og avvist. Ingen aktiv bildegenerering og ingen halvferdig nativeimport. Neste nye137-kall er V011, ikke utført eller reservert. Familien har0/85 native, fig137_01/02/03 er fortsatt uten resultat.png. Hele figurjobber507/1758,1251 uten i tillegg til returer og sluttkontroll. Mod og kontrollerte fellespakker er3701. Automatikken fortsetter.
+
+Les RETUR.md og kallregister.json først. Mest presise større selvstendige kilde er V002/2004 med IoU0,919 og dekning0,935. Alle nedre smådelers opake fester er innen3HD; hoveddelen har24 og åpningene2 punkter utenfor. Bare hel affinplassering er også prøvd, men består ikke. Den uendrede prototypen er i kall/V002/prototype-under-kontroll.png, og helplassert variant har fortsatt13 avvik og maks4,242641HD. Dette er returer, aldri stil- eller identitetsankere. Bruk original2004 i spillkontekst og godkjente Sam-/Max-mastere på nytt før målrettet korreksjon av de grå toppkonturene, takets høyre kant og nedre venstre omriss. Ikke flytt interne deler i Python.
+
+Ikke gjenta mosaikktilnærmingen V004-V007. Den får gode alfamål, men tegner kildepiksler som firkanter. Den skal ikke bli native. V009/1987 gjeninnfører en grå stolpe også over den opake takhimlingen. V010s hele ark har0/5 OK i originalkontrollen og må ikke klippes opp til levering eller brukes som stilanker.
+
+Presisering av smådelene: kilde2004 har10 fire-nabo-komponenter, men9 med åtte naboer. Pikselen38,59 har diagonal kontakt med nabodelen;85,51 er faktisk fri. Kilde2000 har7/6 og1920..1922 har3/1 ved fire/åtte naboer. Telling alene avgjør ikke om en liten form mangler. Se originale åpninger, fester og egen nye alfa. Bevar alle kildebekreftede deler. Ingen største-komponent-rensing, originalmaskeklipp, originale fragmenter eller lokale trekkflyttinger er tillatt.
+
+Alle85 originalfaser er allerede kildebekreftet med faktisk nedlastet Linux-binær i rapporter/taubane137-kilde-20261022. Ikke gjenta de tre kildeavspillingene uten nytt behov. Ingen ny grafikk er mottatt, derfor er heller ingen ny HD-motorprøve eller pakke kjørt. Fellesrelease-isblokk3701 er fortsatt siste kontrollerte Linux-/Windows-samlepunkt. Native skal publiseres additivt etter fersk fjern-SHA, faktisk motorprøve og etterfølgende full filhashkontroll. Alle21945 publiserte filer,1460 beskyttede input og tre opprinnelige stasher skal bevares.
+
+Familie296 er fortsatt6/23, nesteS037 ikke utført. Ingen ny nødvendig designavklaring med Tom er funnet. Verktøytilgangen fungerte i alle ti kall, og ingen CLI/API-fallback er brukt. Gammel nattevakt skal ikke startes. All grafikk er ikke ferdig.
+''')
+(R/'RAPPORT.md').write_text('''# Taubane137, produksjon og kvalitetsretur
+
+Ti faktiske innebygde image_gen-kall ga ti råbilder. Seks ulike enkeltmotiver ble forsøkt, og siste kall forsøkte hele femrutersarket2000..2004. De samlede kilde-ID-ene er1920,1921,1922,1987 og2000..2004. Ni nativeprototyper og hele råarket er visuelt sett. Ingen velges, leveres, mottas native, motorobserveres eller publiseres. Ingen ny Tom-/Claude-godkjenning. Mod og de kontrollerte plattformpakkene står på3701.
+
+Arbeidet gjenopptok det eksisterende kildegrunnlaget i rapporter/taubane137-kilde-20261022. Originalene i rom27 og komplette godkjente Sam-/Max-mastere er sett før tegning. Jobbens beskyttede premiss er den ufullstendige trevogndelen, ikke en hel nykonstruert vogn. Motivet er tydelig; dette er kvalitetsreturer, ikke et uavklart nytt designvalg for Tom.
+
+V001-V003 forsøkte store faser. V004-V007 forsøkte små avstandsfaser. Den feilaktig blåfylte åpningen i V005 ble rettet med et nytt innebygd kall V006; ingen originalmaske ble brukt. De små tegningene består enkelte geometrimål, men er visuelt en firkantmosaikk og holdes ute. V008-V009 forsøkte en tydelig mellomstor fase med feilplasserte stolper. V010 forsøkte den beskyttede hele bestillingen ordrett før en kildepresisering. Originalkontrollen gir FEIL for alle fem ruter, skala/plassering er feil og130548 piksler er utenfor rutene. Ingen teknisk kontroll overstyrer den visuelle avvisningen.
+
+Kun egne RGB-kantfarger og kildepalett er renset, alle egne alfakomponenter er beholdt. Prototypene bruker eksisterende smhd.myk.place og premultiplisert skalering. V002 er også prøvd med små hele affintransformasjoner; beste faktiske kandidat har fortsatt13 punkter utenfor3HD, maks4,242641. Ingen intern del er flyttet separat og ingen originale fragmenter eller harde silhuettmasker er brukt. Hjelperne er bevart som rapporttekst, ikke ny motor- eller pipelinekode.
+
+Kildens fire-nabo-telling ble presisert mot åtte naboer, som mottakets parts bruker. De diagonale kontaktpunktene er ikke automatisk selvstendige frittliggende deler. Se komponenttolkning.json og RETUR.md. Ingen kilde eller alfa endres for å påvirke tellingen. V001/V002 er fortsatt retur på geometrifester og visuell form. En eksakt RGB-test etter interpolering er bevart som diagnostikk, ikke som en egnet godkjenningsport. Ingen av disse avklaringene godkjenner en kandidat.
+
+Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md er lest etter lokalt søk. PASS gjelder opphavet. Fast4x, ekte alfa, uendrede tekniske porter og bevaring av publisert mod er brukt her. Modden er ikke endret. Kallregister og rutekart fester råbilder, faktiske prompter og nativeprototyper til SHA256. Hele figurjobber med resultat er fortsatt507/1758,1251 uten i tillegg til returer og samlet sluttkontroll. NesteV011 er ikke utført eller reservert. Automatikken forblir ACTIVE.
+''')
+# Notater føyes til uten å erstatte tidligere arbeid.
+for job,cids in {'fig137_01':'V004,V005,V006,V007','fig137_02':'V008,V009','fig137_03':'V001,V002,V003,V010'}.items():
+ f=A/'jobber'/job/'notat.md';text=f.read_text()if f.exists()else f'# {job}, produksjonsnotat\n';text+='\n## 2026-10-22, produksjonsretur (Codex)\n\nInnebygd image_gen er brukt i '+cids+'. Faktiske prompter, råbilder, kontroll og SHA-rutekart ligger i rapporter/taubane137-produksjon-20261022. Alle forsøk er kvalitetsretur. Ingen resultat.png leveres og ingen native importeres. Originalkontekst og godkjente Sam-/Max-mastere er sett. Ingen beskyttet jobbfil, originalmaske eller originalfragment er endret eller brukt som ny tegning. Se rapportens RETUR.md og NESTE.md. Ingen ny Tom-/Claude-godkjenning.\n';f.write_text(text)
+# Kildehistorikken bevares, men siste retur skal finnes først.
+f=A/'rapporter/taubane137-kilde-20261022/NESTE.md';f.write_text('''# Oppdatert etter faktisk produksjon
+
+Ti137-kall V001-V010 er utført og avvist som kvalitetsreturer. Ingen native eller hele ark er levert. Fortsett fra rapporter/taubane137-produksjon-20261022/NESTE.md, nesteV011 ikke utført eller reservert. Merk presiseringen av fire kontra åtte naboer i komponenttolkning.json: 2004 har10/9, og38,59 har diagonal kontakt med nabodelen. Bare tellingen nedenfor skal ikke forstås som ti fysisk atskilte motiver. Ingen kilde eller alfa er endret.
+
+Kildeklargjøringen nedenfor er bevart historikk.
+
+'''+f.read_text())
+# Kopier hjelpefiler som dokumentasjon i grafikkrapporten.
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+for k in (R/'kall').iterdir():shutil.copytree(k,O/'kall'/k.name,dirs_exist_ok=True)
+mod={str(p.relative_to(P/'mods/gpt')):sha(p)for p in sorted((P/'mods/gpt').rglob('*'))if p.is_file()};assert mod==start['filer'];assert all(sha(A/k)==v for k,v in start['beskyttede'].items());stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==start['stash'];assert not any((A/f'jobber/fig137_{i:02}/resultat.png').exists()for i in [1,2,3]);assert len(list((P/'mods/gpt/costumes').glob('*_hd.png')))==3701
+save(R/'sluttrevisjon.json',{'tid_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'innebygde_kall':10,'raw_prompt_args_SHA_bekreftet':True,'valgte':0,'levert':0,'native_mottatt':0,'motorobservert_ny_grafikk':0,'publisert':0,'native':3701,'moddfiler_uendret':len(mod),'tidligere_png_uendret':sum(k.endswith('.png')for k in mod),'beskyttede_input_uendret':len(start['beskyttede']),'stasher_uendret':len(stash),'hele_figurjobber':start['hele_figurjobber'],'total_figurjobber':start['total_figurjobber'],'ingen_motor_pipelinekodeendringer':True,'ingen_nye_motorprover_uten_valgt_grafikk':True,'ingen_nye_pakkebygg':True,'pakker_native':3701,'hd_mod':start['remote']['hd-mod'],'automation':'ACTIVE','gammel_nattevakt_startet':False,'alt_ferdig':False,'neste137':'V011, ikke utfort eller reservert','neste296':'S037, ikke utfort eller reservert'})
+print('Completed reports:10 quality returns,0 selected,3701 native preserved,1460 protected,3 stashes.')

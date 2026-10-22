@@ -1,0 +1,26 @@
+from pathlib import Path
+import json,sys,shutil
+import numpy as np
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;K=R/'kall'/sys.argv[1];q=json.loads((K/'kontroll.json').read_text());n=q['rute'];im=Image.open(K/'egen-renset.png').convert('RGBA');a=np.array(im);s=np.array(Image.open(P/f'work/extract/costumes/costume137_{n}.png').convert('RGBA'));h,w=s.shape[:2];yy,xx=np.mgrid[:h,:w];X=(xx.ravel()*4+2).astype(float);Y=(yy.ravel()*4+2).astype(float);op=s[:,:,3].ravel()>0
+Sx,Sy=q['hel_skala'];tx0,ty0=q['flytt'];rawdt=nd.distance_transform_edt(a[:,:,3]<128);rawbg=nd.distance_transform_edt(a[:,:,3]>=128);rawx=(X-tx0)/Sx;rawy=(Y-ty0)/Sy
+# Grov sortering i egen tegning. Endelig port må beregnes på faktisk ferdig transformert PNG.
+candidates=[]
+for fx in [.99,.995,1.,1.005,1.01]:
+ for fy in [.99,.995,1.,1.005,1.01]:
+  sx,sy=Sx*fx,Sy*fy
+  for dy in np.arange(-3,3.01,.5):
+   for dx in np.arange(-3,3.01,.5):
+    tx=tx0+dx+(w*2)*(1-fx);ty=ty0+dy+(h*2)*(1-fy);xs=(X-tx)/sx;ys=(Y-ty)/sy
+    c=nd.map_coordinates(rawdt,[ys,xs],order=1,mode='constant',cval=999)*max(sx,sy);b=nd.map_coordinates(rawbg,[ys,xs],order=1,mode='constant',cval=0)*max(sx,sy)
+    vals=np.where(op,c,b);score=(float(vals.max()),int((vals>2.7).sum()),float(np.square(np.maximum(vals-2,0)).sum()));candidates.append((score,sx,sy,tx,ty))
+candidates.sort(key=lambda x:x[0]);padded=8;W,H=w*4+16,h*4+16;ref=Image.new('RGBA',(W,H));ref.alpha_composite(Image.fromarray(s).resize((w*4,h*4),Image.Resampling.NEAREST),(8,8));rm=np.array(ref)[:,:,3]>=128
+best=None;allrows=[]
+for _,sx,sy,tx,ty in candidates[:180]:
+ out=im.convert('RGBa').transform((W,H),Image.Transform.AFFINE,(1/sx,0,-(tx+8)/sx,0,1/sy,-(ty+8)/sy),Image.Resampling.BICUBIC).convert('RGBA');z=np.array(out);core=z[:,:,3]>=128;D=nd.distance_transform_edt(~core);B=nd.distance_transform_edt(core);vals=np.where(op,D[(Y+8).astype(int),(X+8).astype(int)],B[(Y+8).astype(int),(X+8).astype(int)]);score=(float(vals.max()),int((vals>3).sum()),float(np.maximum(vals-2,0).sum()));row={'skala':[sx,sy],'flytt':[tx,ty],'maks_HD':score[0],'over3HD':score[1]};allrows.append(row)
+ if best is None or score<best[0]:best=(score,out,row)
+best[1].save(K/'prototype-helplassert.png');(K/'helplassering-kontroll.json').write_text(json.dumps({'kun_hel_affin_plassering':True,'ingen_originalmaske_eller_lokalflytting':True,'start':q['flytt'],'best':best[2],'bestatt_3HD':best[0][0]<=3,'provd_faktiske_transformasjoner':len(allrows),'transformasjoner':allrows},ensure_ascii=False,indent=2)+'\n');board=Image.new('RGB',(W*2+60,H+70),'#304050');dr=ImageDraw.Draw(board)
+for i,(z,label)in enumerate([(ref,'Original 4x, bare kontroll'),(best[1],sys.argv[1]+' kun helplassering')]):
+ bg=Image.new('RGBA',z.size,'#87959e');bg.alpha_composite(z);board.paste(bg.convert('RGB'),(20+i*(W+20),45));dr.text((20+i*(W+20),16),label,fill='white')
+board.resize((board.width*2,board.height*2),Image.Resampling.NEAREST).save(K/'helplassering-visuell.png');shutil.copytree(K,O/'kall'/sys.argv[1],dirs_exist_ok=True);print('best',best[2])

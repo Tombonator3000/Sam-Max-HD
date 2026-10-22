@@ -1,0 +1,13 @@
+# Gjenoppta taubane137 fra bevart produksjon
+
+Ti faktiske innebygde kall V001-V010 er bevart, kontrollert og avvist. Ingen aktiv bildegenerering og ingen halvferdig nativeimport. Neste nye137-kall er V011, ikke utført eller reservert. Familien har0/85 native, fig137_01/02/03 er fortsatt uten resultat.png. Hele figurjobber507/1758,1251 uten i tillegg til returer og sluttkontroll. Mod og kontrollerte fellespakker er3701. Automatikken fortsetter.
+
+Les RETUR.md og kallregister.json først. Mest presise større selvstendige kilde er V002/2004 med IoU0,919 og dekning0,935. Alle nedre smådelers opake fester er innen3HD; hoveddelen har24 og åpningene2 punkter utenfor. Bare hel affinplassering er også prøvd, men består ikke. Den uendrede prototypen er i kall/V002/prototype-under-kontroll.png, og helplassert variant har fortsatt13 avvik og maks4,242641HD. Dette er returer, aldri stil- eller identitetsankere. Bruk original2004 i spillkontekst og godkjente Sam-/Max-mastere på nytt før målrettet korreksjon av de grå toppkonturene, takets høyre kant og nedre venstre omriss. Ikke flytt interne deler i Python.
+
+Ikke gjenta mosaikktilnærmingen V004-V007. Den får gode alfamål, men tegner kildepiksler som firkanter. Den skal ikke bli native. V009/1987 gjeninnfører en grå stolpe også over den opake takhimlingen. V010s hele ark har0/5 OK i originalkontrollen og må ikke klippes opp til levering eller brukes som stilanker.
+
+Presisering av smådelene: kilde2004 har10 fire-nabo-komponenter, men9 med åtte naboer. Pikselen38,59 har diagonal kontakt med nabodelen;85,51 er faktisk fri. Kilde2000 har7/6 og1920..1922 har3/1 ved fire/åtte naboer. Telling alene avgjør ikke om en liten form mangler. Se originale åpninger, fester og egen nye alfa. Bevar alle kildebekreftede deler. Ingen største-komponent-rensing, originalmaskeklipp, originale fragmenter eller lokale trekkflyttinger er tillatt.
+
+Alle85 originalfaser er allerede kildebekreftet med faktisk nedlastet Linux-binær i rapporter/taubane137-kilde-20261022. Ikke gjenta de tre kildeavspillingene uten nytt behov. Ingen ny grafikk er mottatt, derfor er heller ingen ny HD-motorprøve eller pakke kjørt. Fellesrelease-isblokk3701 er fortsatt siste kontrollerte Linux-/Windows-samlepunkt. Native skal publiseres additivt etter fersk fjern-SHA, faktisk motorprøve og etterfølgende full filhashkontroll. Alle21945 publiserte filer,1460 beskyttede input og tre opprinnelige stasher skal bevares.
+
+Familie296 er fortsatt6/23, nesteS037 ikke utført. Ingen ny nødvendig designavklaring med Tom er funnet. Verktøytilgangen fungerte i alle ti kall, og ingen CLI/API-fallback er brukt. Gammel nattevakt skal ikke startes. All grafikk er ikke ferdig.

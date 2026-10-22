@@ -1,3 +1,9 @@
+# Oppdatert etter faktisk produksjon
+
+Ti137-kall V001-V010 er utført og avvist som kvalitetsreturer. Ingen native eller hele ark er levert. Fortsett fra rapporter/taubane137-produksjon-20261022/NESTE.md, nesteV011 ikke utført eller reservert. Merk presiseringen av fire kontra åtte naboer i komponenttolkning.json: 2004 har10/9, og38,59 har diagonal kontakt med nabodelen. Bare tellingen nedenfor skal ikke forstås som ti fysisk atskilte motiver. Ingen kilde eller alfa er endret.
+
+Kildeklargjøringen nedenfor er bevart historikk.
+
 # Taubane137 er kildeklargjort, ingen ny tegning ennå
 
 Motivet er de separate delene av den brune taubanevognen ved nøstet og restauranten i rom27. Kostyme137 har85 originale ruter i tre ark, og er neste uavhengige familie etter296 i bestilling92. Ingen137-resultat eller native er levert. De fem store originalfasene2000..2004 er klargjort som referanser, ikke som nye HD-bilder.
