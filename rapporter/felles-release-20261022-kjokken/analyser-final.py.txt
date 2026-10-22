@@ -1,0 +1,76 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from functools import lru_cache
+import numpy as np,json,hashlib,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+native=read(R/'familie-native20.json')['ruter'];by={e['bilde']:e for e in native};b=read(A/'rapporter/sam293-fortsettelse-20261022/kandidat3661v2-start1final.json');c=read(R/'pakke-start1final.json')
+assert len(native)==20 and all(sha(C/e['fil'])==e['sha256']for e in native)
+for proof,n in [(b,3661),(c,3661)]:
+ assert proof['exit']==0 and proof['native_antall']==n and len(proof['kontroller'])==120 and proof['nullkontroller']==118 and proof['valgte_raw']==[6]
+ assert proof['binar_sha256']==sha(Path(proof['binar']))and proof['kontrollert_ikke_naturlig_sekvens']
+@lru_cache(maxsize=20)
+def img(p,flat=False):
+ p=Path(p)
+ if flat:p=p.with_name(p.stem+'_flat.png')
+ return np.array(Image.open(p).convert('RGB'))
+def projection(src,e,flat):
+ x,y=e['pos'];w,h=e['maal'];opts=[]
+ for mirror in [False,True]:
+  a=src[:,::-1]if mirror else src;rgb=a[:,:,:3].astype(np.uint16);rr=rgb[:,:,0]>>3;gg=rgb[:,:,1]>>2;bb=rgb[:,:,2]>>3;rgb=np.stack([(rr<<3)|(rr>>2),(gg<<2)|(gg>>4),(bb<<3)|(bb>>2)],2).astype(np.uint8);expected=np.repeat(np.repeat(rgb,4,0),4,1);mask=np.repeat(np.repeat(a[:,:,3]>0,4,0),4,1)
+  for dx in [-1,0,1]:
+   for dy in [-1,0,1]:
+    xx,yy=(x+dx)*4,(y+dy)*4
+    if min(xx,yy)<0 or xx+w*4>1280 or yy+h*4>800:continue
+    wrong=int((mask&np.any(flat[yy:yy+h*4,xx:xx+w*4]!=expected,2)).sum());opts.append((wrong,abs(dx)+abs(dy),mirror,dx,dy,mask))
+ opts.sort(key=lambda q:q[:5]);q=opts[0];assert q[0]==0,(e['cel'],q[:5]);out=np.zeros((800,1280),bool);xx,yy=(x+q[3])*4,(y+q[4])*4;out[yy:yy+h*4,xx:xx+w*4]=q[5];return out,dict(speilvendt=q[2],dx_original=q[3],dy_original=q[4],kildefargeavvik=q[0],synlige_kildepiksler=int(q[5].sum()),uavhengig_av_HD=True)
+cycles=read(P/'work/extract/rooms.json')['rooms']['56']['cycles'];codes=[i for lo,hi,_,_ in cycles for i in range(lo,hi+1)]
+idx=np.array(Image.open(M/'rooms/room056_idx.png'));cycle=np.repeat(np.repeat(nd.maximum_filter(np.isin(idx,codes),size=3),4,0),4,1)
+rows=[]
+for name,e in by.items():
+ cel=int(name.split('_')[1]);found=None
+ for ne in[q for q in c['hendelser']if q['cel']==cel]:
+  z=img(ne['fil'],True);src=np.array(Image.open(P/'work/extract/costumes'/(name+'.png')).convert('RGBA'));act,pr=projection(src,ne,z);same=nd.maximum_filter(act,size=17)
+  for oe in sorted([q for q in b['hendelser']if q['cel']==cel and q['pos']==ne['pos']and q['maal']==ne['maal']],key=lambda q:abs(q['bildeframe']-ne['bildeframe'])):
+   a=img(oe['fil'],True)
+   if np.array_equal(a[same],z[same]):found=oe,ne,act,pr;break
+  if found:break
+ assert found,(name,'Mangler identiske originale aktorverdier med8HD nabo')
+ oe,ne,act,pr=found;old,new=img(oe['fil']),img(ne['fil']);a,z=img(oe['fil'],True),img(ne['fil'],True);delta=np.any(old!=new,2);origdiff=np.any(a!=z,2);yy,xx=np.where(act);box=[max(0,int(xx.min())-8),max(0,int(yy.min())-8),min(1280,int(xx.max())+9),min(800,int(yy.max())+9)];allowed=np.zeros_like(act);allowed[box[1]:box[3],box[0]:box[2]]=True;unknown=delta&~allowed&~nd.maximum_filter(origdiff,size=9)&~cycle
+ assert not unknown.any(),(name,'Uforklarte endringer',int(unknown.sum()))
+ assert np.array_equal(a[act],z[act])and not delta[nd.maximum_filter(act,size=17)].any()
+ rows.append(dict(bilde=name,grunnlag_fil=oe['fil'],kandidat_fil=ne['fil'],grunnlag_frame=oe['bildeframe'],kandidat_frame=ne['bildeframe'],grunnlag_sha256=sha(Path(oe['fil'])),kandidat_sha256=sha(Path(ne['fil'])),original_aktorverdier_sha256=hashlib.sha256(np.stack(np.where(act),1).tobytes()+a[act].tobytes()).hexdigest(),alle_originalaktorverdier_identiske=True,hele_originalflater_SHA_identiske=not origdiff.any(),endrede_originalpiksler=int(origdiff.sum()),endrede_HD_piksler=int(delta.sum()),uforklarte_HD_endringer=0,HD_utenfor_nytt_omrade_og_dokumenterte_kildetilstander=0,lagprojeksjon=pr,native_sha256=e['sha256'],aktor_rekt=box,visuelt_sett=False))
+ print(name,'originalaktor identisk,0 uforklarte HD-endringer',flush=True)
+def buffer(proof,T):
+ out=[]
+ for e in proof['kontroller']:
+  if not e['avvik']:continue
+  f=e['frame'];screen=np.array(Image.open(T/f'frame_{f:06}_screen.png').convert('RGB'));whole=[q for q in T.glob(f'frame_{f:06}_room*.png')if not q.stem.endswith('_flat')];assert len(whole)==1;view=np.array(Image.open(whole[0]).convert('RGB'));y,x=np.where(np.any(screen!=view,2));assert len(x)==e['avvik'];out.append(dict(frame=f,avvik=len(x),koordinater_og_begge_RGB_sha256=hashlib.sha256(np.stack([x,y],1).tobytes()+screen[y,x].tobytes()+view[y,x].tobytes()).hexdigest(),fil=whole[0].name,foer_testaktor293=f<40))
+ return out
+bo=buffer(b,P/'out/sam293-fortsettelse-20261022/kandidat3661v2-start1final');bn=buffer(c,O/'pakke-start1final');assert len(bo)==len(bn)==2 and bo==bn and all(e['foer_testaktor293']for e in bo)
+assert min(q['logg_frame']for q in c['hendelser'])==min(q['logg_frame']for q in b['hendelser'])==40
+save(R/'motor-bufferkontroll.json',dict(grunnlag=bo,kandidat=bn,samme_to_feil_koordinater_og_begge_RGB=True,alle_avvik_foer_testaktor=True,testaktor_fra_frame=40,nullkontroller_etter_testaktorstart_pr_side=80,helprove_avviksfri=False))
+boards=[]
+for start in range(0,len(rows),4):
+ subset=rows[start:start+4];im=Image.new('RGB',(2000,460),'#304050');dr=ImageDraw.Draw(im)
+ for i,e in enumerate(subset):
+  dr.text((i*500+5,8),e['bilde']+' produksjon /nedlastet3661, actor29',fill='white')
+  for k,key in enumerate(['grunnlag_fil','kandidat_fil']):
+   view=Image.open(e[key]).convert('RGB').crop(e['aktor_rekt']);view.thumbnail((242,420));im.paste(view,(i*500+5+k*248,30))
+ p=R/f'motor-varianter-{start//4+1}.png';im.save(p);boards.append(dict(fil=p.name,sha256=sha(p),ruter=[e['bilde']for e in subset],visuelt_sett=False))
+shots=[]
+for cel in [1920,1930,1935,1942]:
+ e=next(e for e in rows if e['bilde']==f'costume293_{cel}');p=R/f'costume293_{cel}-motor3661.png';shutil.copy2(e['kandidat_fil'],p);shots.append(dict(bilde=e['bilde'],fil=p.name,sha256=sha(p),visuelt_sett=False))
+phases=[];im=Image.new('RGB',(2100,1200),'#304050');dr=ImageDraw.Draw(im)
+for i,cel in enumerate(range(1920,1943)):
+ q=next(q for q in c['hendelser']if q['cel']==cel);x,y=q['pos'];w,h=q['maal'];box=[max(0,x*4-8),max(0,y*4-8),min(1280,(x+w)*4+8),min(800,(y+h)*4+8)];view=Image.open(q['fil']).convert('RGB').crop(box);view.thumbnail((330,300));xx=i%6*350;yy=i//6*300;im.paste(view,(xx+10,yy+35));dr.text((xx+5,yy+8),f'{cel} '+('own native'if f'costume293_{cel}'in by else('tidligere native'if(M/'costumes'/f'costume293_{cel}_hd.png').exists()else'unchanged source fallback')),fill='white');phases.append(dict(cel=cel,fil=q['fil'],sha256=q['sha256'],ny_egen_native=f'costume293_{cel}'in by))
+p=R/'hele-startanimasjon23.png';im.save(p);phase=dict(fil=p.name,sha256=sha(p),faser=phases,visuelt_sett=False)
+save(R/'motor-pikselkontroll.json',rows);save(R/'motor-visuell-plan.json',dict(varianter=boards,hele_motorbilder=shots,hele_startanimasjon=phase,visuelt_sett=False))
+save(R/'motor-sammenligning.json',dict(nye_native=20,native=3661,kontroller_pr_side=120,grunnlag_null=118,kandidat_null=118,nullkontroller_etter_testaktorstart_pr_side=80,alle20_observert=True,alle23_kildefaser_observert=True,alle_originalaktorverdier_identiske=True,uforklarte_HD_endringer=0,ingen_nye_eller_okte_bufferavvik=True,buffer_to_foer_testaktor_eksakt_identiske=True,visuelt_sett=False,full_naturlig_gjennomspilling=False,ny_interaktiv_Windows=False,ny_webtest=False,begrensning='Konstruert aktor29 med full gyldig animasjon1/raw6 i faktisk kjokkenrom56. Ikke naturlig gjennomspilling.2 eksisterende bufferavvik ved kjokkeninngang foer testaktor er identiske.1921/1922 holdes som kvalitetsreturer;1927 er toolavvist uten omproving. Syv nye egne malerier og seks hele RGBA-aliaser. To forsok paa tidligere kvalitetsreturer er fortsatt holdt. Ingen ny Tom-/Claude-godkjenning.'))
+shutil.copy2(__file__,R/'analyser-final.py.txt');print('To tidligere bufferavvik ved kjokkeninngang er eksakt identiske. Etter testaktorstart80/80 null pr side. Tjue293-native kontrollert i ny Linux-pakke.')
+
+proof=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json')
+proof.update(alle20_observert_i_ny_Linux_pakke=True,alle_native_hash_identiske=True,skjermbufferkontroller=120,nullkontroller=118,kjente_bufferavvik=2,eksakte_feilkoordinater_og_begge_RGB_identiske=True,varianter=v['varianter'],hele_motorbilder=v['hele_motorbilder'],hele_varianter_sett=0,hele_motorbilder_sett=0,ruter=rows,ny_Tom_Claude_godkjenning=False,begrensning='Konstruert aktor29,gyldig animasjon1/raw6 i rom56.20 native og3 tidligere holdte originalfallbacks.118/120 null,samme2inngangsavvik. Ikke naturlig gjennomspilling eller interaktiv Windows/web. Ingen ny Tom/Claude-godkjenning.')
+save(R/'linux-kontroll.json',proof)

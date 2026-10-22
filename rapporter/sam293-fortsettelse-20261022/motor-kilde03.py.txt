@@ -1,0 +1,30 @@
+from pathlib import Path
+import gzip,hashlib,json,os,re,shutil,subprocess,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PK=P/'out/felles-release-20261022-lee-harvey/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+mode='kilde293_03-anim7';side='kandidat3661';case='start1final'
+controlled=case=='start1final';baseline=side.startswith('grunnlag3648');count=200
+MOD=P/'mods/gpt';expected=3661
+T=O/mode;assert not T.exists();T.mkdir();(T/'home').mkdir();(T/'saves').mkdir();assert sha(B)=='5abfeae205d9e2c415e503c76a332bd92d638b81937c6403ce40c69d2c98e676';assert read(MOD/'mod.json')['costume_cels']==expected
+for p in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,T/'saves'/p.name)
+env={k:v for k,v in os.environ.items()if not k.startswith('DIGHD_')};env.update(HOME=str(T/'home'),XDG_CONFIG_HOME=str(T/'home/.config'),XDG_DATA_HOME=str(T/'home/.local/share'),XDG_CACHE_HOME=str(T/'home/.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(MOD),DIGHD_VERIFY='1',DIGHD_QUIT_AT=str(count),DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='1',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='56',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+if controlled:
+ env.update(DIGHD_TEST_COSTUME='293',DIGHD_TEST_ACTOR='29',DIGHD_TEST_CHORE_EVERY='500'if case=='start1final'else'70',DIGHD_TEST_POS='178,144',DIGHD_TEST_SCALE='255')
+ if case=='start1final':env['DIGHD_TEST_ANIMATION']='7'
+if case=='skript204':env.update(DIGHD_TEST_SCRIPT='60:204')
+args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(T/'saves'),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--random-seed=20261021','--debuglevel=1','samnmax']
+with(T/'scummvm.log').open('wb')as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=600).returncode
+log=(T/'scummvm.log').read_text();events=[];obs={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*293\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+ f,n,x,y,w,h=map(int,m.groups());p=T/f'frame_{f+1:06}_room056.png';e=dict(logg_frame=f,bildeframe=f+1,cel=n,kostyme=293,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p)if p.exists()else None,kontrollert_testaktor29=controlled);events.append(e)
+ if p.exists():obs.setdefault(f'costume293_{n:03}',e)
+checks=[dict(frame=int(f),avvik=int(n))for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+actual={int(n)for n in re.findall(r'actor 29 animation (\d+) \(chore',log)};valid=set(read(R/'kostyme293-header.json')['raw_valg'])
+if controlled:assert actual and actual<=valid and 'actor 29 with costume 293 at 178,144'in log
+if case=='start1final':assert actual=={30}
+proof=dict(exit=code,binar=str(B),binar_sha256=sha(B),kommando=args,miljo={k:v for k,v in env.items()if k.startswith('DIGHD_')},rom=56,kostyme=293,testaktor29_konstruert_for_helanimasjon=controlled,vanlig_rominngang=case=='primaer',lokalskript204_tvunget=case=='skript204',andre_aktorer_skjult=False,romskript_stoppet=False,kontrollert_ikke_naturlig_sekvens=case!='primaer',full_naturlig_gjennomspilling=False,ingen_kildekode_eller_skript_endret=True,tegninger=obs,hendelser=events,kontroller=checks,nullkontroller=sum(e['avvik']==0 for e in checks),logg_sha256=sha(T/'scummvm.log'),native_antall=expected,valgte_raw=sorted(actual),ny_kjoring_utfort=True,avspilling_gjenbrukt=False)
+save(R/(mode+'.json'),proof)
+with gzip.open(R/(mode+'.log.gz'),'wb')as f:f.write((T/'scummvm.log').read_bytes())
+shutil.copy2(__file__,R/'motor-kilde03.py.txt');print(mode,code,'kostyme293 kilder logget',len(obs),'kontroller',len(checks),'null',proof['nullkontroller'],flush=True)
+assert code==0 and len(checks)==count

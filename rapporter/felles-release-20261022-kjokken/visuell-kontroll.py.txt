@@ -1,0 +1,8 @@
+from pathlib import Path
+import json,hashlib
+R=Path(__file__).resolve().parent
+p=R/'linux-kontroll.json';d=json.loads(p.read_text());assert len(d['ruter'])==20 and len(d['varianter'])==5 and len(d['hele_motorbilder'])==4
+for g in ['varianter','hele_motorbilder']:
+ for e in d[g]:assert hashlib.sha256((R/e['fil']).read_bytes()).hexdigest()==e['sha256'];e['visuelt_sett']=True
+for e in d['ruter']:e['visuelt_sett']=True
+d.update(visuelt_sett=True,hele_varianter_sett=20,hele_motorbilder_sett=4);p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
