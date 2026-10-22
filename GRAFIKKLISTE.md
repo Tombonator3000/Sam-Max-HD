@@ -1,5 +1,23 @@
 # Grafikkliste
 
+<!-- sam129-ark01-slutt-status:start -->
+Seks nye Lee-Harvey-lag er laget, egenkontrollert, native mottatt, motorobservert, visuelt sett og publisert: costume129_128,129,130,384,403 og 640. Native er 2aa8e71e342c7992256cd7600e71050220f64a2b, 3619 HD-bildelag totalt. Grafikkilde a5095d409782999925d905bc83a4ee52c355f66c på gpt-arbeid. Alle 21863 filhash er bekreftet etter henting. Samtlige 21857 tidligere stier og 21851 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+fig129_01 har 23 av 24 mål, 17 tidligere og 6 nye. Sideblink 641 er holdt etter outputavslag 180ea1c4-4d0c-4424-a124-bf49b48a2c21 og omprøves ikke. Identisk hel RGBA-alias 642 holdes også, uten å være individuelt prøvd. Ingen resultat.png i jobbmappen og ingen ny hel figurjobb: 504 av 1758 har resultat, 1254 er uten pluss returer og sluttkontroll. 129-familien har 23 av 47 publisert; 24 gjenstår, 22 produserbare og 2 holdt.
+
+11 innebygde kall ga 10 bilder, 1 avslag og 4 kvalitetsreturer. Faktisk blink avdekket feil øyefeste i to første hoder. De er erstattet med nye hele hvilende hoder S04R/S05R. Hele profiltegningen er flyttet 1 HD-piksel i x, ingen enkelttrekk er flyttet eller klippet. Ekte alfa, fast 4x, 2 originalpikslers margin og uendrede størrelsesporter. Diagnostisk mottak foreslo ett originalfragment 641 som uttrykkelig er utelatt fra native.
+
+Sluttprøven i faktisk nedlastet Linux-binær 2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 har normal avslutning 0, 711 av 720 null fra original rominngang/lokal 217 med faktisk aktør 10. To nye mål er sett i denne sekvensen. De samme ni kjente bufferavvikene har identiske koordinater og begge RGB-verdier i rekkefølge. Ingen nye eller økte avvik; primærprøven er ikke avviksfri. Kontrollert aktør 29 viser alle 6 nye med 320 av 320 null både i 3613-grunnlag og sluttkandidat. Ingen tvunget enkeltanimasjon eller lokalskript, skjulte andre aktører eller stanset romskript.
+
+Alle 6 sammenlignede originale aktørverdier er identiske; 2 hele originalflater er SHA-like. Øvrige forskjeller er kildefaser og vannfargesykling, inkludert et annet kostyme 68-hode med uendret originalfallback. En først uforklart piksel er kildeavklart og dokumentert uten nye toleranser. Seks hele motorvarianter, fire hele motorbilder, delarket og begge hodenes før/under/etter-blink er sett. Varmt øyelys er 21/0/21 for profil og 24/0/24 for front. Den vide fargetelleren beholder én interpolert profilpiksel i rapporten. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 og mangler 23 native. Ingen nye pakkebygg eller nativefrys. Neste samlepunkt er resten av 129-familien eller reell produksjonsblokkering. Neste produksjon er fig129_02, først 385 til 390, deretter øvrige uavhengige mål. 1804/1861 og tidligere returer står åpne. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
+
+Bevis: rapporter/sam129-ark01-slutt-20261022/mottak-publisert.json, RAPPORT.md, motor-sammenligning.json, blink-sluttkontroll.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Bare fire dokumenter endres i main; ingen motor-/pipelineendringer.
+<!-- sam129-ark01-slutt-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- sam129-hoder2-status:start -->
 Ni nye Lee-Harvey-snakkehoder, costume129_414 til 420, 404 og 405, er laget med innebygd image_gen, egenkontrollert, teknisk mottatt, motorobservert, visuelt sett og publisert. Native er 45845080b4b4a5eb381a19fcc7213bfc2749aa67, 3613 HD-bildelag totalt. Grafikkilde 1e1a7d35b550d0e6df62a7d13af56d745f10bbbc på gpt-arbeid. Alle 21857 filhash er bekreftet etter henting. Samtlige 21848 tidligere stier og 21842 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
 

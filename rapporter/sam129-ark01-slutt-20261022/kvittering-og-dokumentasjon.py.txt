@@ -1,0 +1,66 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;N=A/'rapporter/sam129-kilde-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+r=read(R/'mottak-publisert.json');s=read(R/'start.json');m=read(R/'motor-sammenligning.json')
+assert r['native']==3619 and r['nye_native']==6 and r['alle_filhash_bekreftet']
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip()==s['main']
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True).strip()
+assert all(sha(A/f)==h for f,h in s['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==s['stash']
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');hd=r['hd_mod'];art=r['grafikkilde']
+status=f'''Seks nye Lee-Harvey-lag er laget, egenkontrollert, native mottatt, motorobservert, visuelt sett og publisert: costume129_128,129,130,384,403 og640. Native er {hd}, 3619 HD-bildelag totalt. Grafikkilde {art} på gpt-arbeid. Alle 21863 filhash er bekreftet etter henting. Samtlige 21857 tidligere stier og 21851 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+fig129_01 har23 av24 mål,17 tidligere og6 nye. Sideblink641 er holdt etter outputavslag180ea1c4-4d0c-4424-a124-bf49b48a2c21 og omprøves ikke. Identisk hel RGBA-alias642 holdes også, uten å være individuelt prøvd. Ingen resultat.png i jobbmappen og ingen ny hel figurjobb:504 av1758 har resultat,1254 er uten pluss returer og sluttkontroll.129-familien har23 av47 publisert;24 gjenstår,22 produserbare og2 holdt.
+
+11 innebygde kall ga10 bilder,1 avslag og4 kvalitetsreturer. Faktisk blink avdekket feil øyefeste i to første hoder. De er erstattet med nye hele hvilende hoderS04R/S05R. Hele profiltegningen er flyttet1 HD-piksel i x, ingen enkelttrekk er flyttet eller klippet. Ekte alfa, fast4x,2 originalpikslers margin og uendrede størrelsesporter. Diagnostisk mottak foreslo ett originalfragment641 som uttrykkelig er utelatt fra native.
+
+Sluttprøven i faktisk nedlastet Linux-binær2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 har normal avslutning0,711 av720 null fra original rominngang/lokal217 med faktisk aktør10. To nye mål er sett i denne sekvensen. De samme ni kjente bufferavvikene har identiske koordinater og begge RGB-verdier i rekkefølge. Ingen nye eller økte avvik; primærprøven er ikke avviksfri. Kontrollert aktør29 viser alle6 nye med320 av320 null både i3613-grunnlag og sluttkandidat. Ingen tvunget enkeltanimasjon eller lokalskript, skjulte andre aktører eller stanset romskript.
+
+Alle6 sammenlignede originale aktørverdier er identiske;2 hele originalflater er SHA-like. Øvrige forskjeller er kildefaser og vannfargesykling, inkludert et annet kostyme68-hode med uendret originalfallback. En først uforklart piksel er kildeavklart og dokumentert uten nye toleranser. Seks hele motorvarianter, fire hele motorbilder, delarket og begge hodenes før/under/etter-blink er sett. Varmt øyelys er21/0/21 for profil og24/0/24 for front. Den vide fargetelleren beholder én interpolert profilpiksel i rapporten. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt3596 og mangler23 native. Ingen nye pakkebygg eller nativefrys. Neste samlepunkt er resten av129-familien eller reell produksjonsblokkering. Neste produksjon er fig129_02, først385 til390, deretter øvrige uavhengige mål.1804/1861 og tidligere returer står åpne. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
+
+Bevis: rapporter/{R.name}/mottak-publisert.json, RAPPORT.md, motor-sammenligning.json, blink-sluttkontroll.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Bare fire dokumenter endres i main; ingen motor-/pipelineendringer.
+'''
+# Bevar SHA-er og filnavn ordrett, men bruk lesbar avstand rundt tall i prosaen.
+for old,new in [('har23','har 23'),('av24','av 24'),('mål,17','mål, 17'),('og6','og 6'),('Sideblink641','Sideblink 641'),('outputavslag180','outputavslag 180'),('RGBA-alias642','RGBA-alias 642'),('figurjobb:504','figurjobb: 504'),('av1758','av 1758'),('resultat,1254','resultat, 1254'),('sluttkontroll.129','sluttkontroll. 129'),('av47','av 47'),('publisert;24','publisert; 24'),('gjenstår,22','gjenstår, 22'),('og2','og 2'),('ga10','ga 10'),('bilder,1','bilder, 1'),('og4','og 4'),('hoderS04R','hoder S04R'),('flyttet1','flyttet 1'),('fast4x,2','fast 4x, 2'),('originalfragment641','originalfragment 641'),('Linux-binær2733','Linux-binær 2733'),('avslutning0,711','avslutning 0, 711'),('av720','av 720'),('lokal217','lokal 217'),('aktør10','aktør 10'),('aktør29','aktør 29'),('alle6','alle 6'),('med320','med 320'),('av320','av 320'),('i3613','i 3613'),('Alle6','Alle 6'),('identiske;2','identiske; 2'),('kostyme68','kostyme 68'),('er21/0/21','er 21/0/21'),('er24/0/24','er 24/0/24'),('fortsatt3596','fortsatt 3596'),('mangler23','mangler 23'),('av129','av 129'),('først385','først 385'),('mål.1804','mål. 1804')]:status=status.replace(old,new)
+report=R/'RAPPORT.md';text=report.read_text();old='Kandidat3619 er kontrollert og klar for additiv publisering fra3613. Publisering er ennå ikke kvittert i denne versjonen.'
+assert old in text;text=text.replace(old,f'Native3619 er publisert og hentet tilbake: {hd}. Grafikkilde {art}. Alle21863 filhash er bekreftet; alle tidligere stier og PNG er bevart. Se mottak-publisert.json.',1)
+text+='\n## Publiseringskvittering\n\n'+status
+report.write_text(text.rstrip()+'\n')
+with (A/'jobber/fig129_01/notat.md').open('a')as f:f.write(f'\n\n## {now} (Codex), publisering bekreftet\n\n'+status.rstrip()+'\n')
+nextfile=R/'NESTE.md';text=nextfile.read_text().replace('Seks mål i fig129_01 er ferdig kontrollert i kandidat3619. Publiser og bekreft mottak-publisert.json før ny nativeendring.',f'Seks mål i fig129_01 er kontrollert, publisert og hentet tilbake i native3619, {hd}. Alle filhash er bekreftet i mottak-publisert.json.')
+nextfile.write_text(text)
+# Oppdater familiens kildeplan uten å endre beskyttede jobb-/referansefiler.
+n=read(N/'kildeplan.json');b=read(R/'kildeplan.json');rb={e['bilde']:e for e in b['ruter']}
+selected={e['bilde']for e in read(R/'egen-native.json')['ruter']};published=set(n['levert_og_publisert'])|selected
+assert len(published)==23
+for d in [n,b]:
+    d.update(publisert_hd_mod=hd,publisert_grafikkilde=art,levert_og_publisert=sorted(published),gjenstar_maal=24,
+        produserbare_gjenstar=22,holdte_maal=['costume129_641','costume129_642'],nye_native=23,bildekall=28,
+        vellykkede_bildekall=27,avviste_bildekall=1,kvalitetsreturer=4,siste_produksjonsrapport='rapporter/'+R.name)
+    for e in d['ruter']:
+        name=e['bilde']
+        if name in ['costume129_128','costume129_129','costume129_384','costume129_403']:
+            for k in ['naturlig_kontekst','kontrollert_kontekst']:e[k]=rb[name][k]
+            e['kontekst_presisering']='rapporter/'+R.name+'/kontekst-presisering.json'
+        if name in selected:e.update(laget=True,egenkontrollert=True,native_mottatt=True,motorobservert=True,visuelt_sett=True,publisert=True,hd_mod=hd,grafikkilde=art,Tom_godkjent=False,Claude_godkjent=False)
+        if name in ['costume129_641','costume129_642']:
+            e.update(verktøyblokkert=name.endswith('_641'),holdt=True,holdt_som_ekte_alias=name.endswith('_642'),
+                individuelt_provd=name.endswith('_641'),blokkeringskall='S06R2',blokkerings_request_id='180ea1c4-4d0c-4424-a124-bf49b48a2c21',ikke_omprove=True,ingen_native=True,publisert=False)
+save(N/'kildeplan.json',n);save(R/'kildeplan.json',b)
+with (N/'KILDEGRUNNLAG.md').open('a')as f:f.write(f'\n\n## {now}, korrigert synlig kontekst og videre produksjon\n\nFire førstearkskontekster er rettet fra svart overgang/feil valgt fase til faktisk synlig original. Se rapporter/{R.name}/kontekst-presisering.json. Ingen beskyttet original er endret.23 av47 familiemål er produsert og publisert i{hd};22 produserbare mål og holdt641/642 gjenstår.28 innebygde kall totalt,27 vellykkede,1 avslag og4 kvalitetsreturer.642 er holdt som identisk hel RGBA-alias, ikke individuelt prøvd. Les NESTE.md i den nye rapporten før neste bunke.\n')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;text=p.read_text();head,sep,body=text.partition('\n\n');assert sep
+    p.write_text(head+'\n\n<!-- sam129-ark01-slutt-status:start -->\n'+status+'<!-- sam129-ark01-slutt-status:slutt -->\n\nTidligere status nedenfor er historikk.\n\n'+body)
+for name in ['memory.md','todo.md','STATUS.md']:
+    p=P/name;text=p.read_text();head,sep,body=text.partition('\n\n');assert sep
+    p.write_text(head+f'\n\n## Gjeldende grafikkstatus, {now}\n\n'+status+'\nTidligere status nedenfor er historikk.\n\n'+body)
+with (P/'log.md').open('a')as f:f.write(f'\n\n## {now} (Codex)\n\n'+status.rstrip()+'\n')
+save(R/'dokumentasjonsgrunnlag.json',dict(tid=now,main_grunnlag=s['main'],grafikkilde=art,hd_mod=hd,main_dokumenter=['memory.md','todo.md','STATUS.md','log.md'],fortsett_automatisk=True))
+shutil.copy2(__file__,R/'kvittering-og-dokumentasjon.py.txt')
+print('Kvitteringer, familiens kildeplan og fire hoveddokumenter oppdatert.',flush=True)

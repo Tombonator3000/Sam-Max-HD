@@ -15,3 +15,8 @@ Kontrollert hel frontanimasjon4 med testaktør29 ved270,185 er nå observert i d
 De åtte tidligere manglende målene 130, 640, 422, 642, 153, 154, 512 og 768 er sett som hele originalkilder i faktisk originalmotorbilde med kontrollert aktør 29. Prøven har 320 av 320 nullkontroller, normal avslutning 0. Ingen tvunget enkeltanimasjon eller motorendring. Gyldige tomkommandoer 19 og 23 er bekreftet i original COST og motorpin c9091321; første etterbehandlingsstopp og rettet tolkning er bevart. Kildeprøven ble ikke kjørt om igjen. Alle 47 mål har nå tilgjengelig kontekst, 20 naturlig og 27 kontrollert. Dette er kildeobservasjon, ingen naturlig gjennomspilling eller ny Tom-/Claude-godkjenning. Før hvert nytt motiv skal kilde, faktisk kontekst og godkjente hele mastere ses på nytt. Se rapporter/sam129-hoder2-20261022/gyldige-faser-kontroll.json.
 
 17 separate snakkehoder er nå publisert, 30 familiemål gjenstår. Første ark er fortsatt delvis med 17 av 24 mål; ingen resultat.png eller ny hel figurjobb. Native 45845080b4b4a5eb381a19fcc7213bfc2749aa67, 3613 totalt.
+
+
+## 2026-10-22 06:12, korrigert synlig kontekst og videre produksjon
+
+Fire førstearkskontekster er rettet fra svart overgang/feil valgt fase til faktisk synlig original. Se rapporter/sam129-ark01-slutt-20261022/kontekst-presisering.json. Ingen beskyttet original er endret.23 av47 familiemål er produsert og publisert i2aa8e71e342c7992256cd7600e71050220f64a2b;22 produserbare mål og holdt641/642 gjenstår.28 innebygde kall totalt,27 vellykkede,1 avslag og4 kvalitetsreturer.642 er holdt som identisk hel RGBA-alias, ikke individuelt prøvd. Les NESTE.md i den nye rapporten før neste bunke.
