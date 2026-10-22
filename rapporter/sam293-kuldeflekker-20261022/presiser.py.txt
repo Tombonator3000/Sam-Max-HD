@@ -1,0 +1,5 @@
+from pathlib import Path
+import json,sys
+P=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/sam293-kuldeflekker-20261022')
+for name in sys.argv[1:]:
+ p=P/'kall'/name;a=json.loads((p/'faktiske-argumenter.json').read_text());old=a['prompt'];assert not(p/'raa.png').exists();(p/'prompt-for-komposisjons-presisering.txt').write_text(old+'\n');a['prompt']=old.replace('Place this complete cel, same aspect ratio, large and centered on a genuine transparent PNG with generous empty padding.','EDIT image1 while keeping its EXACT composition on a 1024x1024 square canvas. Keep every part at EXACTLY the same coordinates and scale as image1; replace ONLY the blue-gray backdrop with real transparency and smooth the stepped contours of the original drawn forms. Do not recenter, enlarge or recompose any part. Do not produce a portrait canvas. Do not reinterpret the curls or face. No gradients anywhere, solid color fills only.');(p/'faktisk-prompt.txt').write_text(a['prompt']+'\n');(p/'faktiske-argumenter.json').write_text(json.dumps(a,ensure_ascii=False,indent=2)+'\n')

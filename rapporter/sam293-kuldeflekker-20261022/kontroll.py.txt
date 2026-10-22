@@ -1,0 +1,49 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.optimize import linear_sum_assignment
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+selected=['F1944R','F1945','F1946','F1947','F1948RR'];chosen=[];returns=[];details=[]
+def components(m):
+ labels,num=nd.label(m,np.ones((3,3)));out=[]
+ for k in range(1,num+1):
+  yy,xx=np.nonzero(labels==k);out.append(dict(xy=np.array(nd.center_of_mass(labels==k)[::-1]),area=int(len(xx)),bbox=[int(xx.min()),int(yy.min()),int(xx.max()),int(yy.max())]))
+ return out
+for C in sorted((R/'kall').iterdir()):
+ if not(C/'raa.png').exists():continue
+ d=read(C/'plan.json');e=d['ruter'][0];tool=read(C/'verktøyresultat.json');args=read(C/'faktiske-argumenter.json');assert tool['raa_sha256']==sha(C/'raa.png')and tool['argumenter_sha256']==sha(C/'faktiske-argumenter.json')and tool['prompt_sha256']==sha(C/'faktisk-prompt.txt')
+ assert tool['referanser']==d['referanser']=={f:sha(Path(f))for f in args['referenced_image_paths']}and d['kilde_og_mastere_sett_foer_kall']
+ q=read(C/'prototypekontroll.json')[0]
+ if C.name not in selected:
+  reason='IoU/dekning under portene og feil relativ kulde-/hodegeometri' if C.name in ['F1943','F1944'] else 'Ett øye5,5HD for lavt' if C.name=='F1948' else 'Nedre svarte jakkekant for kort' if C.name=='F1948R' else 'Kildehvite sammenhengende grupper splittes og har feil feste; åtte kildegrupper blir'+str(11 if C.name=='F1943R' else 10)
+  rr=dict(kall=C.name,bilde=e['bilde'],raa_sha256=sha(C/'raa.png'),grunn=reason,kvalitetsretur=True,verktøyavslag=False,snitt_union=q['snitt_union'],dekning=q['dekning'],native_mottatt=False,publisert=False,ikke_stilanker=True);save(C/'kvalitetsretur.json',rr);returns.append(rr);continue
+ assert q['native_ok']and q['egen_alfa']and not q['originalmaske']and not q['originalfragmenter']and sha(A/q['prototype'])==q['prototype_sha256'];chosen.append(q)
+ s=np.array(Image.open(e['kilde']).convert('RGBA'));a=np.array(Image.open(A/q['prototype']).convert('RGBA'));tests=[]
+ if e['rute']<=1946:tests.append(('alle_kildeflekker',(s[:,:,3]>0)&(s[:,:,:3].min(2)>180),(a[:,:,3]>=128)&(a[:,:,:3].min(2)>180)))
+ else:
+  sm=(s[:,:,3]>0)&(s[:,:,0]==255)&(s[:,:,1]==199)&(s[:,:,2]==135);sm[12:]=False;om=(a[:,:,3]>=128)&(a[:,:,0]>220)&(a[:,:,1]>170)&(a[:,:,2]>90)&(a[:,:,2]<170);om[57:]=False;tests.append(('sma_oyne',sm,om))
+ if e['rute']<1948:tests.append(('Conroy_blaa_solbrilleglint',(s[:,:,3]>0)&(s[:,:,2]>80)&(s[:,:,0]<40),(a[:,:,3]>=128)&(a[:,:,2]>80)&(a[:,:,0]<40)))
+ for tag,sm,om in tests:
+  source=components(sm);own=components(om)
+  # En enkelt AA-fargepiksel ved klippekanten er ikke en ny kildebekreftet markering.
+  tiny=[p for p in own if p['area']<3];own=[p for p in own if p['area']>=3]
+  assert len(source)==len(own),(C.name,tag,len(source),len(own))
+  src=np.array([p['xy']for p in source])*4+9.5;dst=np.array([p['xy']for p in own]);ds=np.linalg.norm(src[:,None,:]-dst[None,:,:],axis=2);i,j=linear_sum_assignment(ds);assert max(ds[i,j])<=3,(C.name,tag,ds[i,j])
+  details.append(dict(kall=C.name,type=tag,kilde_antall=len(source),egne_antall=len(own),avstander_HD=ds[i,j].tolist(),maks_HD=float(max(ds[i,j])),innen3HD=True,ingen_lokal_flytting=True,egne_AA_fargepiksler_under3=[p['area']for p in tiny]))
+ if e['rute']==1948:
+  assert not ((a[120:,:,3]>=128)&(a[120:,:,2]>80)&(a[120:,:,0]<40)).any()
+  assert a[9+28*4,9+1*4,3]>=128, 'Mangler kildebekreftet nedre svart jakke'
+  assert a[9+29*4,9+1*4,3]>=128, 'Mangler kildebekreftet nedre svart jakkekant'
+assert len(chosen)==5 and len(returns)==6 and len(list((R/'kall').glob('*/verktøyresultat.json')))==11
+chosen.sort(key=lambda e:selected.index(e['valgt_kall']));save(R/'valgte5.json',chosen);save(R/'kvalitetsreturer.json',returns);save(R/'indre-feste-kontroll.json',dict(terskel_HD=3,maalinger=details,alle_kontrollerte_smaadeler_innen3HD=True,ingen_lokal_Python_flytting=True,visuelt_sett=False))
+boards=[]
+for k,q in enumerate(chosen):
+ e=read(R/'kall'/q['valgt_kall']/'plan.json')['ruter'][0];src=Image.open(e['kilde']).convert('RGBA');own=Image.open(A/q['prototype']).convert('RGBA');s4=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);mix=Image.blend(s4,own.crop((8,8,8+s4.width,8+s4.height)),.5);scale=2 if src.width>20 else 4
+ board=Image.new('RGB',(2100,1000),'#536576');draw=ImageDraw.Draw(board);draw.text((10,8),q['valgt_kall']+f" original / egen / 50% overlay, IoU {q['snitt_union']:.3f}, dekning {q['dekning']:.3f}",fill='white')
+ for j,im in enumerate([s4,own,mix]):
+  im=im.resize((im.width*scale,im.height*scale),Image.Resampling.NEAREST);assert im.width<680 and im.height<940;board.paste(im,(j*700+18,45),im)
+ f=R/f'egen-visuell-{k+1}.png';board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),ruter=[q['bilde']],visuelt_sett=False))
+save(R/'egen-visuell-plan.json',dict(ark=boards,visuelt_sett=False,komplette_tegninger_uten_beskjaering=True));shutil.copy2(__file__,R/'kontroll.py.txt');print('5 kandidater med alle26 hvite grupper,3 øyne og4 solbrilleglinter innen3HD.6 returer fra11 faktiske kall. Klar til visuell kontroll.')

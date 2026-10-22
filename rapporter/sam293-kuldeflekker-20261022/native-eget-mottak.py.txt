@@ -1,0 +1,25 @@
+from pathlib import Path
+import hashlib,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam2933689'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+s=read(R/'start.json');rows=read(R/'valgte5.json');assert len(rows)==5 and all(e['visuelt_sett']and e['native_ok']for e in rows)
+rep=read(R/'automatisk-mottak.json');rr=rep['ark']['fig293_03']['ruter'];mapping=read(R/'rutekart-fig293_03.json')['fig293_03']['ruter'];assert len(mapping)==28 and rep['ruter_ok']==28 and rep['ruter_sjekk']==0 and rep['ruter_mangler']==4
+pure={n for n,e in rr.items()if e['status']=='ok'and e.get('kilde')=='arket'};assert pure=={e['bilde']for e in mapping}-{'costume293_1944'}
+assert rr['costume293_1944']['kilde']=='arket og 8 utliggerpiksler fra originalen'
+assert not C.exists();current={p.relative_to(M).as_posix():sha(p)for p in M.rglob('*')if p.is_file()};assert current==s['filer']
+native=[]
+for q in rows:
+ assert q['egen_alfa']and not q['originalmaske']and not q['originalfragmenter'];assert sha(A/q['prototype'])==q['prototype_sha256']
+ assert q['snitt_union']>=.6 and q['dekning']>=.8 and .88<=q['egen_hel_affin_plassering'][0]/q['egen_hel_affin_plassering'][1]<=1.12
+ native.append(dict(bilde=q['bilde'],jobb='fig293_03',canonical=q['bilde'],fil='costumes/'+q['bilde']+'_hd.png',prototype=q['prototype'],sha256=q['prototype_sha256'],kall=q['valgt_kall'],snitt_union=q['snitt_union'],dekning=q['dekning'],egen_alfa=True,originalmaske=False,originalfragmenter=False))
+shutil.copytree(M,C)
+for e in native:
+ target=C/e['fil'];assert not target.exists();shutil.copy2(A/e['prototype'],target);assert sha(target)==e['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3684;meta['costume_cels']=3689;save(C/'mod.json',meta);files={p.relative_to(C).as_posix():sha(p)for p in C.rglob('*')if p.is_file()};assert len(files)==21933 and set(files)-set(s['filer'])=={e['fil']for e in native};assert{f for f,h in s['filer'].items()if files[f]!=h}=={'mod.json'}
+save(R/'fragmentvern.json',dict(nye_egne_hele=5,diagnostiske_ark_OK=28,diagnostiske_egne_uten_originaltillegg=27,diagnostiske_med_originaltillegg={'costume293_1944':8},diagnostisk_1944_automatisk_eksport_ikke_brukt=True,originalfragmenter_i_kandidat=False,native_fra_egen_prototype_sha=True,ingen_pipelineendring=True,hele_ark_levert=False,porter=dict(CORE=128,IoU=.6,dekning=.8,affin_min=.88,affin_maks=1.12),avklaring='Automatisk diagnostikk vil legge til åtte ytterpiksler fra originalen i1944. Den filen importeres ikke. Den egetegnede hele prototypen består uendrede native porter,26 kildeflekkgrupper er bevart innen3HD og komplett visuell kontroll er utført. Kandidaten har bare egen tegning med dokumentert SHA.'))
+save(R/'kandidatfilhash.json',files);save(R/'egen-native.json',dict(ruter=native,nye_native=5,native_totalt=3689,kandidat=str(C),fast_4x=True,marg_original=[2,2],egen_alfa=True,originalmaske=False,originalfragmenter=False,automatisk_mottak_27_rene_og1_med_originaltillegg=True,automatisk_1944_originaltillegg_utelatt=True,native_egne_prototyper5_OK=True,mangler_paa_delark=4,tidligere_filer_bevart=21928,filer=21933,png=sum(f.endswith('.png')for f in files)))
+p=read(R/'fremdrift.json');p.update(native_mottatt=5,nye_native=5,native_totalt=3689)
+for e in p['delvise_leveranser']:e['native_mottatt']=True
+save(R/'fremdrift.json',p);save(R/'kontrollstarter.json',dict(ikke_bestatte_starter=[dict(hjelper='kontroll.py',grunn='Egen blåfargevakt omfattet nedre jakke ved y100,feil region. Rettet til selve solbrilleområdet fra y120 etter undersøkelse. Ingen kilde,alfa eller testport endret.'),dict(hjelper='lever.py',grunn='Strengt krav om kilde arket stoppet ved1944,diagnostikken legger til åtte kildepiksler. Diagnostisk fil utelatt;egen komplett prototype mottatt separat med uendrede porter og synlig fragmentvern.')],feil_starter_ikke_regnet_bestatt=True,ingen_motor_eller_pipelineendring=True))
+shutil.copy2(__file__,R/'native-eget-mottak.py.txt');print('5 egne native i kandidat3689,28/32. Diagnostisk1944 med8 kildeytterpiksler er utelatt. Alle21928 tidligere filer bevart.')

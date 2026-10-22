@@ -1,0 +1,61 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib,json,shutil,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');p=read(R/'fremdrift.json');m=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json');native=read(R/'egen-native.json')
+assert m['alle5_observert_i_begge_prover']and m['alle32_kildefaser_observert']and m['alle_originale_rektangler_med8HD_identiske']and m['uforklarte_HD_endringer']==0 and m['bufferavvik_koordinater_og_begge_RGB_eksakt_identiske'];assert(m['kontroller_pr_side'],m['null_pr_side'],m['null_etter_testaktorstart_pr_side'])==(400,396,320)
+assert len(v['varianter'])==2 and len(v['hele_motorbilder'])==4 and len(v['hele_fryseranimasjon']['faser'])==32
+for group in ['varianter','hele_motorbilder']:
+ for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+assert sha(R/v['hele_fryseranimasjon']['fil'])==v['hele_fryseranimasjon']['sha256'];v['hele_fryseranimasjon']['visuelt_sett']=True;v.update(visuelt_sett=True,hele_varianter_sett=5,hele_motorbilder_sett=4);save(R/'motor-visuell-plan.json',v);m['visuelt_sett']=True;save(R/'motor-sammenligning.json',m)
+pix=read(R/'motor-pikselkontroll.json');assert len(pix)==10
+for e in pix:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',pix)
+for e in p['delvise_leveranser']:e.update(visuelt_kontrollert=True,motorobservert=True)
+p.update(visuelt_sett=5,visuelt_ok=5,motorobservert=5);save(R/'fremdrift.json',p);route=read(R/'rutekart-fig293_03.json')
+for e in route['fig293_03']['ruter']:
+ if e['bilde']in{e['bilde']for e in native['ruter']}:e.update(prototype_visuelt_sett=True,motorobservert=True)
+save(R/'rutekart-fig293_03.json',route)
+receipt=read(R/'mottak-publisert.json')if(R/'mottak-publisert.json').exists()else None
+publication=f"Publisert additivt som hd-mod {receipt['hd_mod']}, grafikkilde {receipt['grafikkilde']}. Alle 21933 filhash er hentet tilbake og bekreftet."if receipt else 'Kandidat 3689 er kontrollert. Publisering og tilbakehenting er ennå ikke bekreftet.'
+body=f'''Fem nye egne tegninger og native ruter er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett: costume293_1944 til1948. Ingen nye aliaser. {publication} fig293_03 er nå delvis28/32. Alle23 tidligere arkposisjoner er bevart, og ingen hel resultatfil legges i jobbflaten. Kostyme293 har48/55 native, med seks produserbare mål og verktøyholdt1927 igjen. 505 av1758 hele figurjobber har resultat,1253 er uten i tillegg til returer og samlet sluttkontroll.
+
+Elleve faktiske innebygde image_gen-kall ga elleve råbilder for seks kildemotiver. Fem tegninger er valgt og seks kandidater forkastet. Ingen nytt verktøyavslag eller kvotefeil.1943 er fortsatt i retur: åtte kildehvite grupper splittes til elleve eller ti, med feil feste, selv når hel silhuett består.1944s første forsøk feilet IoU/dekning.1948s første øye var5,5HD for lavt; neste forsøk rettet øyet, men mistet nederste svarte jakkekant. F1948RR retter begge. Komplette sammenligninger med original,egen tegning og50prosent overlegg er visuelt sett. Alle26 kildehvite grupper i1944/45/46,tre små øyne i1947/48 og fire Conroy-glinter i1944..47 er koblet innen3HD. Uønsket blå glint i1948s nedre svarte solbrillekant er korrigert bare i egen RGB,uten endret alfa eller geometri.
+
+Motivpremisset for1943..48 er rettet. I disse fasene er den gylne formen Conroys blonde hår med rosa ansikt og svarte solbriller,foran Lee-Harvey bak fryservinduet.1947 har to små øyne øverst,1948 ett. Det er ikke en gul Bigfoot-maske eller en hånd. Originalene i kjøkkenrom56,palett0,animasjon7/raw30 og originalskript204 er grunnlaget. Beskyttede jobbfiler er urørt,og faktiske tidligere feilprompter er bevart som bevis. En for vid beskrivelse av ekstra referanse1930 i de nye promptene er også merket:1930s tidligere gangfase viser den løse forkledningen,ikke den nye vindusposen. Den må ikke brukes som ansiktsdesign. Seks tidligere publiserte motiver er visuelt gjennomgått i tidligere-motivkontroll.png; gangfase1930/31/33 skal fortsatt ha forkledning i hendene. Ingen tidligere PNG er endret eller avvist alene på grunn av denne tekstfeilen. Originalen for hver aktuell fase bestemmer innholdet.
+
+Fast4x,to originalpikslers marg,CORE128,IoU0,6,dekning0,8 og hel affin forskjell0,88..1,12 er beholdt. Rensingen bruker bare egen alfa og egen RGB. Ingen originalmaske,originalfragmenter eller lokal Python-flytting av trekk. Automatisk diagnostisk mottak gir28 OK,0 til gjennomsyn og4 tomme mål.27 ruter er rent fra arket;1944s automatiske eksport legger til åtte ytterpiksler fra originalen. Den filen er ikke brukt. Kandidaten mottar de fem komplette egne prototypene med SHA,uendrede porter,smådelskontroll og visuell kontroll. Se fragmentvern.json og native-eget-mottak.py.txt for det separate mottaket.
+
+Ny avspilling av grunnlag3684 og kandidat3689 bruker den faktisk nedlastede Linux-binæren bad93067a55dcbdf09c8001a50ea45dc8b888a044dd2860e8aa7d3ce2f79450a fra siste fellespakke. Kontrollert aktør29 med animasjon7/raw30,zclip1 og originalt lokalskript204 etter konstruert aktør10-fortilstand er kjørt på begge sider,alle med normal exit. Hver side har400 bufferkontroller,396 uten avvik. Etter figurstart er320/320 uten avvik. To kjente inngangsavvik per prøve har identiske koordinater og begge RGB-verdier. Alle fem nye native er sett i begge prøver,med identiske originale ruterektangler og8HD-naboområde. Ingen uforklarte HD-endringer eller nye/økte bufferavvik. Fem før/etter-varianter,fire hele motorbilder og alle32 faser er visuelt sett. Dette er ikke naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Alle21928 tidligere modfiler,inkludert21922 PNG,bevares med bare mod.json/manifest oppdatert.1432 beskyttede jobbfiler og tre opprinnelige stasher er kontrollert. To lokale kontrollstarter var ikke bestått;se kontrollstarter.json. Kontrollvakten fant det dokumenterte automatiske originaltillegget og hindret den filen i mottaket. Ingen motor-/pipelinekode er endret. Gamle nattprosesser startes ikke. Felles Linux-/Windows-release sam-max-hd-2026-10-22-fryservindu er fortsatt kontrollert med3684 native og mangler de fem nye rutene. Ny pakkeoppdatering venter til neste samlepunkt,planlagt ved fullført fryserark/familie. Ingen pakke kalles oppdatert til3689 nå. Grafikkautomatikken fortsetter.
+
+Neste produksjon gjenopptar fig293_03 med1943 og1970..1972. Behold alle28 ferdige posisjoner. Bruk originalens åtte sammenhengende hvite grupper for1943;egen alfa må bevare disse.1970 mangler grå smådel vedx14,y12;1971/72 har fortsatt ekte alfahull feilaktig fylt. Eldre1921/1922,129-/124-returer og verktøyholdt1927 bevares,og verktøyavslag omprøves ikke. Se NESTE.md,kall/,fremdrift.json,rutekart og mottak-publisert.json. Bibliotekskilder:figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit,samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e.
+'''
+def lesbar(t):
+ t=re.sub(r'\b(av|til|har|med|alle|Alle|fra|innen|grunnlag|kandidat|delvis|Kostyme|kostyme|behold|Behold|bare|før|etter|hvert|Hvert|samt|og|overlegg|CORE|IoU|dekning)(?=\d)',r'\1 ',t)
+ t=re.sub(r'(?<=\d)(?=HD\b)',' ',t)
+ t=re.sub(r',(?=[^\s\d/])',', ',t)
+ return t
+body=lesbar(body)
+(R/'RAPPORT.md').write_text('# Conroy, Lee-Harvey og kuldeflekker, fig293_03\n\n'+now+' (Codex)\n\n'+body)
+brief=f'''Fem nye native ruter1944..1948 fra fig293_03 er laget,egenkontrollert,native mottatt,motorobservert og visuelt sett. {publication} Delarket er28/32,kostyme293 har48/55 native og seks produserbare mål pluss verktøyholdt1927 igjen. 505/1758 hele figurjobber har resultat,1253 er uten pluss returer og sluttkontroll. Fem egne malerier fra elleve faktiske bildekall,seks kvalitetsreturer,ingen nye verktøyavslag. Alle26 kuldeflekkgrupper,tre øyne og fire solbrilleglinter i de valgte tegningene er innen3HD.1943s splittede hvite grupper og1970..72s smådels-/alfareturer er utelatt.
+
+Motivet i1943..48 er Conroys blonde hår,ansikt og solbriller foran Lee-Harvey,ikke Bigfoot-maske eller hånd. Tidligere gangfase1930 viser fortsatt løs forkledning. Faktiske feilprompter og kildegrunnlag er bevart. Automatisk diagnostikk gir28 OK,0 til gjennomsyn og4 tomme mål;1944s automatiske fil med åtte kildeytterpiksler er utelatt. Modden bruker fem komplette egne prototyper med egen alfa,uendrede porter og dokumentert SHA. Ingen originalmaske,originalfragmenter eller lokal Python-flytting av trekk.
+
+To nye motorprøver per side bruker siste faktisk nedlastede Linux-binær. Alle fem nye ruter og32 kildefaser er observert.400 kontroller per side,396 uten avvik,320/320 uten avvik etter figurstart. De kjente inngangsavvikene har identiske koordinater og begge RGB-verdier. Ingen uforklarte HD-endringer eller nye/økte bufferavvik. Hele motorbilder og varianter er visuelt sett. Ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning. Alle21928 tidligere modfiler,1432 beskyttede kilder og tre stasher bevares. Fellespakker fryservindu har3684 native og mangler de fem nye;de oppdateres ved neste samlepunkt. Neste1943 og1970..72. Se rapporter/{R.name}/RAPPORT.md og NESTE.md. All grafikk er ikke ferdig.
+'''
+brief=lesbar(brief)
+(R/'status-blokk.md').write_text(brief);marker='sam293-kuldeflekker-status';block='<!-- '+marker+':start -->\n'+brief+'<!-- '+marker+':slutt -->'
+for name in ['ORDRE.md','GRAFIKKLISTE.md','jobber/fig293_03/notat.md']:
+ f=A/name;t=f.read_text()
+ if '<!-- '+marker+':start -->'in t:t=re.sub(r'<!-- '+marker+r':start -->.*?<!-- '+marker+r':slutt -->',lambda m:block,t,flags=re.S)
+ else:first,rest=t.split('\n',1);t=first+'\n\n'+block+'\n\nTidligere status nedenfor er historikk.\n'+rest
+ f.write_text(t)
+save(R/'sluttkontroll.json',dict(tid_norsk=now,valgte_native=5,egne_nye_malerier=5,hele_rgba_aliasmal=0,visuelt_sett=True,motorobservert=5,hele_varianter=5,hele_motorbilder=4,hele_kildefaser=32,alle_kontrollerte_smaadeler_innen3HD=True,opprinnelige_21928_moddfiler_bevart=True,beskyttede=1432,stasher=read(R/'start.json')['stash'],kvalitetsreturer_utelatt=True,toolholdt1927_ikke_omprovd=True,Tom_godkjent=0,Claude_godkjent=0,hele_figurjobber=505,native_kandidat=3689,delark=28,maal_i_delark=32,publisert=5 if receipt else 0,kontroller_pr_side=400,null_pr_side=396,null_etter_figurstart_pr_side=320,ingen_nye_eller_okte_bufferavvik=True,diagnostisk_originaltillegg_1944_ikke_brukt=True))
+(R/'NESTE.md').write_text('# Gjenoppta fig293_03,28/32\n\n'+body)
+for f in ['rapport.py','publiser.py','prompt-korrigert.py','presiser.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('Sluttkontroll:5 nye,28/32,alle tidligere bevart. Publisert='+str(bool(receipt)))

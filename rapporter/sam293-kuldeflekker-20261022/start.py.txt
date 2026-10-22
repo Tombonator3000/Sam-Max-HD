@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from datetime import datetime,timezone
+import hashlib,json,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-frost-20261022';V=A/'rapporter/sam293-fryser-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists()
+old=read(S/'start.json');published=read(S/'publiserte-moddfiler-3684.json')
+current={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in sorted((P/'mods/gpt').rglob('*')) if p.is_file()}
+assert current==published and len(current)==21928
+for name,h in old['beskyttede'].items():assert sha(A/name)==h,name
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==old['stash']
+remote={x.split()[1].removeprefix('refs/heads/'):x.split()[0] for x in subprocess.check_output(['git','ls-remote','origin','refs/heads/main','refs/heads/gpt-arbeid','refs/heads/hd-mod'],cwd=P,text=True).splitlines()}
+assert remote=={'main':'f44665150304e897ac0368e79b779dd32040ab92','gpt-arbeid':'8f616a79203c1e7f3bc246efb3bcf147bd936444','hd-mod':'04fa6b8bd404b2320395d88c51f2479f902e33d2'}
+for wd in [P,A]:assert not subprocess.check_output(['git','status','--porcelain'],cwd=wd,text=True)
+R.mkdir();(R/'kall').mkdir()
+save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),remote=remote,filer=current,beskyttede=old['beskyttede'],stash=stash,native=3684,hele_figurjobber=505,total_figurjobber=1758,forrige_rapport=str(S),pakker_native=3684,neste='fig293_03',ingen_pagaende_grafikkmotor_observert=True))
+plan=read(S/'kildeplan.json');save(R/'kildeplan.json',plan)
+for n in range(1943,1949):
+ e=next(v for v in plan['ruter'] if v['rute']==n);src=Image.open(e['kilde']).convert('RGBA');assert sha(Path(e['kilde']))==e['sha256'];assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']
+ ctx=Path(e['kilde_helanimasjon_clip1']['fil']);assert sha(ctx)==e['kilde_helanimasjon_clip1']['sha256']
+ C=R/'kall'/('F'+str(n));C.mkdir()
+ for f in ['original-alfa.png','originalatlas.png','spillkontekst-clip1.png','kontekst-og-mastere.png']:shutil.copy2(V/'kall'/C.name/f,C/f)
+ d=read(V/'kall'/C.name/'plan.json');refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst-clip1.png'];d.update(ruter=[e],referanser={str(p):sha(p) for p in refs},kilde_og_mastere_sett_foer_kall=False)
+ d.pop('sett_foer_kall_utc',None);save(C/'plan.json',d)
+ print(n,e['maal'],len(d['kildekomponenter']),'hele kildedeler')
+for f in ['bevar.py','rens-plasser.py']:shutil.copy2(P/'out/sam293-frost-20261022'/f,O/f)
+shutil.copy2(P/'out/sam293-fryser-20261022/prompt.py',O/'prompt.py')
+shutil.copy2(__file__,R/'start.py.txt');print('3684 native, 21928 modfiler, beskyttede kilder og tre stasher bekreftet.')

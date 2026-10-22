@@ -1,0 +1,16 @@
+from pathlib import Path
+import re,shutil
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;S=P/'out/sam293-frost-20261022'
+def count(s,n,k):return re.sub(r'(?<![\d.])'+str(n)+r'(?!\d)',str(k),s)
+s=(S/'lever.py').read_text().replace("S=A/'rapporter/sam293-fryser-20261022'","S=A/'rapporter/sam293-frost-20261022'")
+s=s.replace('3684','3689').replace('3678','3684');s=count(s,23,28);s=count(s,17,23);s=count(s,6,5);s=count(s,9,4);s=s.replace("len(v['ark'])==3","len(v['ark'])==5").replace('21928','21933').replace('21922','21928')
+s=s.replace('hele_rgba_aliasmal=1','hele_rgba_aliasmal=0').replace('innebygde_bildekall=13','innebygde_bildekall=11').replace('vellykkede_bildekall=13','vellykkede_bildekall=11').replace('kvalitetsreturer=8','kvalitetsreturer=6').replace('laget=8','laget=6').replace('produserbare_gjenstar_i_293_familien=11','produserbare_gjenstar_i_293_familien=6')
+s=s.replace("nye_kvalitetsretur_maal=['costume293_1970','costume293_1971','costume293_1972']","nye_kvalitetsretur_maal=['costume293_1943']")
+assert '(128,.6,.8)'in s and "len(mapping)==23"in s and "len(native)==5"in s and "len(missing)==4"in s
+(O/'lever.py').write_text(s)
+s=(S/'motor.py').read_text().replace('felles-release-20261022-kjokken','felles-release-20261022-fryservindu').replace('647756fb21fae643bc31d1e74b7afbfedae8a481995a34d5861f2affb9ea23af','bad93067a55dcbdf09c8001a50ea45dc8b888a044dd2860e8aa7d3ce2f79450a');(O/'motor.py').write_text(s)
+s=(S/'analyser.py').read_text().replace('3684','3689').replace('3678','3684');s=count(s,6,5);s=s.replace('647756fb21fae643bc31d1e74b7afbfedae8a481995a34d5861f2affb9ea23af','bad93067a55dcbdf09c8001a50ea45dc8b888a044dd2860e8aa7d3ce2f79450a').replace('[1956,1959,1973,1974]','[1944,1946,1947,1948]').replace("A/'rapporter/sam293-fryser-20261022/rutekart-fig293_03.json'","A/'rapporter/sam293-frost-20261022/rutekart-fig293_03.json'")
+(O/'analyser.py').write_text(s)
+for f in ['lever.py','motor.py','analyser.py']:compile((O/f).read_text(),str(O/f),'exec')
+shutil.copy2(__file__,P/'work/.gpt-gren/rapporter'/O.name/'tilpass-kontrollhjelpere.py.txt')
+print('Kontrollhjelpere tilpasset eksakt:3684+5=3689,23+5=28/32,21928+5=21933. Samme porter.')
