@@ -2361,3 +2361,15 @@ Den nye faktiske Linux-binæren er128c9c11755ee03ec88517e9a338a34bc808a6b7a01153
 Seks nye innebygde bildekall ga én valgt tegning og fem kvalitetsreturer. Alle råbilder, faktiske prompter, argumenter, returer og SHA-rutekart er bevart i rapporter/sam296-vendefaser-20261022. Alle1448 beskyttede inputfiler og tre opprinnelige stasher er uendret. Ingen grafikk til main, ingen motor-/pipelinekode endret og ingen gamle nattprosesser. Gjenoppta fra denne rapportens NESTE.md og RETUR.md, neste nye bildekall S030. Ingen nødvendig designavklaring er identifisert. Automatikken er ACTIVE;all grafikk er ikke ferdig.
 
 Bevis: rapporter/sam296-vendefaser-20261022 og rapporter/felles-release-20261022-isblokk på gpt-arbeid. Bare dokumentasjon endres i main.
+
+## 2026-10-22 22:29 (Codex)
+
+<!-- sam296-detaljretur-status:start -->
+Sju nye innebygde bildekall S030-S036 er laget, kontrollert og visuelt sett som kandidater. Ingen består hele den uendrede3HD-porten, og ingen er levert, importert eller publisert. Alle råbilder, faktiske prompter, argumenter, SHA-rutekart og returer er bevart i rapporter/sam296-detaljretur-20261022. S036/1925 er nærmest med3,936109HD;225 hudpunkter består, men to blåpunkter og sju mørke fester gjør ikke det. Det lyse munnfeltet er kildebekreftet og skal beholdes. Lanczos-helplassering med eksisterende pipeline består heller ikke. Ingen originalmaskeklipp, originalfragmenter eller lokale trekkflyttinger.
+
+Mod og kontrollerte Linux-/Windows-fellespakker er fortsatt3701, hd-mod dea35eec5e71766043b58b514f263318b75d712e. Alle21945 moddfiler,1460 kontrollerte beskyttede kildefiler og tre stasher er uendret. Hele figurark med resultat507/1758,1251 uten i tillegg til returer og sluttkontroll. Familien296 har fortsatt6/23 native. Neste296-kall er S037, ikke utført eller reservert.
+
+Den neste uavhengige familien, taubane137, er kildeklargjort i rom27. Alle85 originalfaser er visuelt sett og bekreftet mot motorpiksler med eksplisitt RGB565-rundtur. Ett nederste punkt skjules av originalens z1 og er avklart med z0. Utsparinger og atskilte smådeler skal beholdes; største-komponent-rensingen fra isblokken må ikke brukes. Ingen ny137-tegning ennå. Les rapporter/taubane137-kilde-20261022/NESTE.md før neste produksjon. Ingen ny nødvendig designavklaring er identifisert. Automatikken er ACTIVE; all grafikk er ikke ferdig.
+<!-- sam296-detaljretur-status:slutt -->
+
+Kildeprøvene har240 bufferkontroller hver,238 uten avvik. De samme416/160-inngangsavvikene ved24/25 er før testaktorens første tegning ved40. Alle201 kontroller fra første testaktor er null. Helprøven er ikke avviksfri og er kontrollert kildeanalyse, ikke naturlig full gjennomspilling eller ny HD-leveranse. Ingen ny Tom-/Claude-godkjenning. Ingen motor- eller pipelinekode endres, ingen ny pakke bygges fra disse returene, ingen grafikk går til main og gammel nattevakt er ikke startet.
