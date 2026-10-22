@@ -1,6 +1,6 @@
 # Åtte frontale Lee-Harvey-snakkehoder
 
-Åtte nye frontale Lee-Harvey-snakkehoder, costume129_391 til398, er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert og visuelt sett. Sluttkandidat3633 er ferdig kontrollert. Publisering og henting gjenstår; vent på mottak-publisert.json før publisert-status.
+Åtte nye frontale Lee-Harvey-snakkehoder, costume129_391 til398, er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert og visuelt sett. Publisert og hentet tilbake i hd-mod 1d4764f4f769f0be89da7501dca996562aa3e99d. Alle 21877 filhash er bekreftet. Grafikkilde e73cde0efcd69fbf55708f1d070b8581a03e6aea.
 
 fig129_02 er delvis med14 av23 mål, seks tidligere og åtte nye. Ingen resultat.png legges i jobbmappen og ingen ny hel jobb telles:504 av1758 figurjobber har resultat,1254 er uten resultat pluss returer og sluttkontroll. Familien har37 produserte mål av47 etter denne bunken. Ti gjenstår, åtte produserbare og to holdt. Ingen Tom-/Claude-godkjenning eller samlet sluttgodkjenning.
 

@@ -1,0 +1,63 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,subprocess,shutil
+
+P=Path('/home/tom/Sam-Max-HD')
+A,O=P/'work/.gpt-gren',Path(__file__).resolve().parent
+R,N=A/'rapporter'/O.name,A/'rapporter/sam129-kilde-20261022'
+read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+r,b=read(R/'mottak-publisert.json'),read(R/'start.json')
+assert r['alle_filhash_bekreftet']and r['native']==3633
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=P,text=True).strip()==b['main']
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True).strip()
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/main'],cwd=P,text=True).split()[0]==b['main']
+needed={e['bilde']for e in read(R/'valgte8.json')}
+for f in [N/'kildeplan.json',R/'kildeplan.json']:
+    d=read(f)
+    assert d['bildekall']==38 and d['gjenstar_maal']==18
+    for e in d['ruter']:
+        if e['bilde']in needed:e.update(laget=True,egenkontrollert=True,native_mottatt=True,motorobservert=True,visuelt_sett=True,publisert=True,hd_mod=r['hd_mod'],grafikkilde=r['grafikkilde'],Tom_godkjent=False,Claude_godkjent=False,produksjonsrapport='rapporter/'+R.name)
+    delivered=sorted(set(d['levert_og_publisert'])|needed)
+    assert len(delivered)==37
+    d.update(bildekall=47,vellykkede_bildekall=46,avviste_bildekall=1,kvalitetsreturer=9,nye_native=37,publisert_hd_mod=r['hd_mod'],publisert_grafikkilde=r['grafikkilde'],levert_og_publisert=delivered,gjenstar_maal=10,produserbare_gjenstar=8,siste_produksjonsrapport='rapporter/'+R.name)
+    save(f,d)
+subprocess.run([str(P/'.venv/bin/python'),str(O/'rapport.py')],cwd=P,check=True)
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+body=f'''Åtte nye frontale Lee-Harvey-snakkehoder, costume129_391 til398, er laget, egenkontrollert, native mottatt, motorobservert, visuelt sett og publisert. Native er {r['hd_mod']}, 3633 HD-bildelag totalt. Grafikkilde {r['grafikkilde']} på gpt-arbeid. Alle 21877 filhash er bekreftet etter henting. Samtlige 21869 tidligere stier og 21863 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet sluttgodkjenning.
+
+fig129_02 er delvis med 14 av23 mål, seks tidligere og åtte nye. fig129_01 har 23 av24. Ingen nye hele resultatark: 504 av1758 figurjobber har resultat, 1254 er uten pluss returer og sluttkontroll. Familien har 37 av47 publisert, ti gjenstår: åtte produserbare og641/642 holdt. De holdte motivene omprøves ikke.
+
+Ni innebygde image_gen-kall ga ni råbilder og én hel kvalitetsreturT04 tilT04R. Første hode hadde ekstra halsende og for store proporsjonsavvik. Samme porter beholdes. 398-bryn ble kildeavklart og rettet før første kall. 391 har eget17x26-laglerret og eget feste; de øvrige har51x82 med bare hodet synlig. Ekte alfa, fast4x og2 originalpikslers margin. Ingen originalfragmenter eller hard originalmaskeklipping. Alle14 produserte ruter har ingen FEIL; seks FEIL gjelder ennå tomme store mål. Tre diagnostiske originalfragmenter642,512,768 er utelatt fra native.
+
+Ny kandidat3633 har normal avslutning0 og320 av320 nullkontroller i faktisk nedlastet Linux-binær2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110. Dette er hel frontanimasjon4 på konstruert aktør29, rawvalg18. 3625-grunnlaget gjenbrukes fra forrige faktiske avspilling etter kontroll av identiske filer utenom SHA256SUMS; ingen ny grunnlagskjøring. Åtte sammensatte originalaktørverdier og fire hele originalflater er identiske. Torsoen er uendret utenfor hodefeltene, og ingen uforklarte HD-endringer gjenstår. Åtte før/etter-varianter, fire hele motorbilder og alle17 faser med kropp er visuelt sett. Ingen ny naturlig primærsekvens, full gjennomspilling, Windows-interaksjon eller webtest. De ni kjente primærbufferavvikene er ikke omprøvd her.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt3596 og mangler37 native. Neste bunke er de siste åtte produserbare129-målene:399,400,401,422,153,154,512,768. Deretter pakkesamlepunkt med nativefrys, faktisk nedlasting, sjekksummer og innholdskontroll, også om641/642 fortsatt holdes.124_1804/1861 og andre returer står åpne. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
+
+Bevis på gpt-arbeid: rapporter/{R.name}/RAPPORT.md, mottak-publisert.json, motor-sammenligning.json, indre-feste-kontroll.json, gjenbrukt-grunnlag.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Bare fire dokumenter endres i main. Ingen motor-/pipelineendring.
+'''
+marker='<!-- sam129-front2-status:start -->'
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name
+    text=p.read_text()
+    assert marker not in text
+    title,rest=text.split('\n',1)
+    p.write_text(title+'\n\n'+marker+'\n'+body+'<!-- sam129-front2-status:slutt -->\n\nTidligere status nedenfor er historikk.\n'+rest)
+for name in ['memory.md','STATUS.md','todo.md']:
+    p=P/name
+    title,rest=p.read_text().split('\n',1)
+    next_text='''\n## Neste
+
+- [x] Lag, kontroller og publiser åtte frontale hoder391 til398,3633 native.
+- [ ] Fortsett de siste åtte produserbare129-målene:399,400,401,422,153,154,512,768. Se original, faktisk lagkontekst og godkjente mastere før hvert motiv.
+- [ ] Behold641/642 holdt og øvrige returer åpne. Ingen omgåelse eller automatisk originalfragmentimport.
+- [ ] Gjennomfør pakkesamlepunkt etter disse åtte. Fellespakker har3596 og mangler37 native; last ned og kontroller faktisk innhold før oppdatert-status.
+- [ ] Fortsett øvrige produserbare jobber og samlet sluttkontroll.504 av1758 hele jobber har resultat; egenkontroll og native mottak er ikke Tom-/Claude-godkjenning.
+'''if name=='todo.md'else''
+    p.write_text(title+'\n\n## Gjeldende grafikkstatus, '+now+'\n\n'+body+next_text+'\nTidligere status nedenfor er historikk.\n'+rest)
+with(P/'log.md').open('a')as f:f.write('\n\n## '+now+' (Codex)\n\n'+body+'\nT04-rensekontrollstopp er bevart i kall/T04/rensekontroll-stopp.json. Hele T04R erstatter tegningen uten svakere porter. Ukjørt398-brief er bevart før brynrettingen. Tidligere jobbnotat er bevart ordrett med tillegg; begge notat-hash er dokumentert.\n')
+(R/'status-blokk.md').write_text(body)
+save(R/'etterpublisering.json',dict(tid_norsk=now,hd_mod=r['hd_mod'],grafikkilde=r['grafikkilde'],main_for=b['main'],main_dokumenter=['memory.md','todo.md','STATUS.md','log.md'],familie_publisert=37,familie_gjenstar=10,familie_produserbare_gjenstar=8,hele_jobber=504))
+shutil.copy2(__file__,R/'etterpublisering.py.txt')
+print('Familie37/47, åtte produserbare igjen. Bare fire dokumenter i main.')

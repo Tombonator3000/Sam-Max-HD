@@ -1,6 +1,6 @@
 # Neste produksjon
 
-Åtte nye hoder391 til398 er ferdig kontrollert. Sluttkandidat3633 er ferdig kontrollert. Publisering og henting gjenstår; vent på mottak-publisert.json før publisert-status. fig129_02 er delvis14 av23, fig129_01 er23 av24. Ingen nye hele resultatark,504 av1758 uendret. Ikke legg delark som resultat.png.
+Åtte nye hoder391 til398 er ferdig kontrollert. Publisert og hentet tilbake i hd-mod 1d4764f4f769f0be89da7501dca996562aa3e99d. Alle 21877 filhash er bekreftet. Grafikkilde e73cde0efcd69fbf55708f1d070b8581a03e6aea. fig129_02 er delvis14 av23, fig129_01 er23 av24. Ingen nye hele resultatark,504 av1758 uendret. Ikke legg delark som resultat.png.
 
 Neste praktiske bunke er de siste åtte produserbare129-målene:399,400,401,422,153,154,512,768. Se hvert helt motiv med faktisk lag-/spillkontekst og godkjente mastere før tegning.391 er et eget17x26-lag og andre51x82-lerret kan være bare hoder. Kontroller hode og kropp samlet etter egne lagfester. Små512/768 må produseres faktisk, ikke importeres som automatisk originalfragment.
 
