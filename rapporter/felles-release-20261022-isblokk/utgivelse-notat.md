@@ -12,4 +12,4 @@ hd-mod: dea35eec5e71766043b58b514f263318b75d712e
 
 Spillet og grafikken tilhører Disney/Lucasfilm. Pakkene inneholder spillfiler, tale, HD-grafikk og den patchede ScummVM-motoren for Toms avtalte testing.
 
-Linux: begge faktiske jobber,  inkludert oppstartstest,  Debian-test og publisering,  er completed/success. Overordnet run/check-suite står foreløpig in_progress uten conclusion. Fellesutgaven bygger på de avsluttede jobbene og den uavhengige fil- og motorkontrollen; GitHub-statusen endres ikke.
+Linux-kjøringen er completed/success, inkludert oppstartstest, Debian-test og publisering. Den tidligere forsinkede samlede statusregistreringen er nå løst og bevart i kontrollrapporten. Windows-main og Windows-taggbygget er også bestått. Begge pakkene er lastet ned på nytt og kontrollert.
