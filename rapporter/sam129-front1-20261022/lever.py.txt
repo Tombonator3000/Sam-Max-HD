@@ -1,0 +1,63 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil,subprocess,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam1293625'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+s=read(R/'start.json');plan=read(R/'kildeplan.json');assert(CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+assert all(sha(M/f)==h for f,h in s['filer'].items())and all(sha(A/f)==h for f,h in s['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==s['stash']
+selected=['F01','F02','F03R','F04R','F05R','F06R'];chosen=[]
+for name in selected:
+    CC=R/'kall'/name;e=read(CC/'prototypekontroll.json')[0];args=read(CC/'faktiske-argumenter.json');tool=read(CC/'verktøyresultat.json')
+    assert e['native_ok']and e['egen_alfa']and not e['originalmaske']and not e['originalfragmenter']
+    assert sha(A/e['prototype'])==e['prototype_sha256']and sha(CC/'raa.png')==tool['raa_sha256']
+    assert tool['argumenter_sha256']==sha(CC/'faktiske-argumenter.json')and tool['prompt_sha256']==sha(CC/'faktisk-prompt.txt')
+    assert tool['referanser']=={p:sha(Path(p))for p in args['referenced_image_paths']}
+    assert read(CC/'plan.json')['kilde_og_mastere_sett_foer_kall']
+    e.update(visuelt_sett=False,kilde_og_spillkontekst_sett=True,sam_og_max_stilankere_sett=True)
+    chosen.append(e)
+assert len(list((R/'kall').glob('*/verktøyresultat.json')))==10 and not list((R/'kall').glob('*/verktøyfeil.json'))
+by={e['bilde']:e for e in chosen};needed=set(by);save(R/'valgte6.json',chosen)
+J=A/'jobber/fig129_02';job=read(J/'jobb.json');D=O/'ark/fig129_02';assert not D.exists()and not(J/'resultat.png').exists();D.mkdir(parents=True)
+for f in ['jobb.json','referanse.png','prompt.txt','original_1x.png']:shutil.copy2(J/f,D/f)
+board=Image.new('RGBA',tuple(job['lerret']));mapping=[];missing=[];native=[]
+for t in job['ruter']:
+    name=t['bilde']
+    if name not in by:missing.append(name);continue
+    e=by[name];sr=next(e for e in plan['ruter']if e['bilde']==name);src=Image.open(sr['kilde']).convert('RGBA');own=Image.open(A/e['prototype']).convert('RGBA')
+    assert sha(Path(sr['kilde']))==sr['sha256']and hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256']
+    assert own.size==(src.width*4+16,src.height*4+16)
+    core=np.array(own)[:,:,3]>=CORE;sm=np.array(src)[:,:,3]>0;iou,cov=_iou(core,np.repeat(np.repeat(sm,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER
+    x,y,_,_=t['rekt'];dx,dy=(job['plassering'][0]+x)*4-8,(job['plassering'][1]+y)*4-8
+    layer=Image.new('RGBA',board.size);layer.alpha_composite(own,(dx,dy));assert not((np.array(board)[:,:,3]>0)&(np.array(layer)[:,:,3]>0)).any();board.alpha_composite(layer)
+    yy,xx=np.nonzero(core);mapping.append(dict(bilde=name,kostyme=129,rute=t['rute'],lag=t['lag'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical=name,canonical_rgba_sha256=e['canonical_rgba_sha256'],prototype=e['prototype'],prototype_sha256=e['prototype_sha256'],kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,native_ok=True,prototype_visuelt_sett=False,motorobservert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False))
+    native.append(dict(bilde=name,jobb='fig129_02',canonical=name,fil='costumes/'+name+'_hd.png',prototype=e['prototype'],sha256=e['prototype_sha256'],kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragmenter=False))
+assert len(mapping)==6 and len(missing)==17
+board.save(D/'resultat.png');shutil.copy2(D/'resultat.png',R/'fig129_02-delresultat.png');digest=sha(R/'fig129_02-delresultat.png')
+save(R/'rutekart-fig129_02.json',{'fig129_02':dict(sha256_resultat=digest,ruter=mapping)})
+test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(D/'resultat.png')],cwd=A,text=True,capture_output=True);log=test.stdout+test.stderr;(R/'fig129_02-egenkontroll.txt').write_text(log)
+errors=[n for n in re.findall(r'^FEIL\s+(costume\d+_\d+):',log,re.M)];assert not(set(errors)&needed),log
+assert set(errors)<=set(missing),log
+save(R/'delark-kontroll.json',dict(hele_arkets_egenkontroll=test.returncode,hele_arket_ferdig=False,valgte6_FEIL=0,manglende_ikke_leverte_maal=missing,FEIL_kun_tomme_maal=errors,original_jobb_json_bevart=sha(D/'jobb.json')==sha(J/'jobb.json'),terskler_uendret=True))
+partial=dict(jobb='fig129_02',resultat='rapporter/'+R.name+'/fig129_02-delresultat.png',sha256=digest,ruter=6,nye_ruter=6,tidligere_ruter=0,rutekart='rapporter/'+R.name+'/rutekart-fig129_02.json',laget=True,levert=False,delvis=True,mangler=missing,egenkontrollert=True,egenkontroll='De seks produserte rutene har ingen FEIL. Full arkkontroll har forventet FEIL for tomme, ennå ikke leverte store mål; ingen hel jobb leveres.',visuelt_kontrollert=False,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False)
+progress=dict(leveranser=[],delvise_leveranser=[partial],nye_jobber_levert=0,nye_native_planlagt=6,ulike_hele_egne_malerier=6,hele_rgba_aliasmal=0,innebygde_bildekall=10,vellykkede_bildekall=10,avviste_bildekall=0,kvalitetsreturer=4,grunnlag_native=3619,hele_figurjobber_med_resultat=504,total_figurjobber=1758,gjenstar=1254,laget=6,egenkontrollert=6,native_mottatt=0,visuelt_sett=0,motorobservert=0,publisert=0,Tom_godkjent=0,Claude_godkjent=0,gjenstar_i_129_kildeplan=18,produserbare_gjenstar_i_129_familien=16,holdte_maal_i_129_familien=['costume129_641','costume129_642'])
+save(R/'fremdrift.json',progress)
+G=O/'diagnostisk-gren';assert not G.exists()and not C.exists();shutil.copytree(D,G/'jobber/fig129_02');GR=G/'rapporter'/R.name;GR.mkdir(parents=True)
+shutil.copy2(R/'rutekart-fig129_02.json',GR/'rutekart-fig129_02.json');shutil.copy2(R/'fig129_02-delresultat.png',G/partial['resultat']);save(GR/'fremdrift.json',dict(leveranser=[partial],diagnostisk_delark_ikke_levert=True))
+auto=O/'automatisk-mottak';subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(G),'--extract',str(P/'work/extract'),'--ut',str(auto),'--jobb','fig129_02','--forhandsvisning',''],cwd=P,check=True)
+rep=read(auto/'myke.json');save(R/'automatisk-mottak.json',rep)
+own={n for ar in rep['ark'].values()for n,e in ar['ruter'].items()if e['status']=='ok'and e.get('kilde')=='arket'};fragments={n for ar in rep['ark'].values()for n,e in ar['ruter'].items()if e.get('kilde')=='originalen (fragment)'}
+assert own==needed and fragments=={f'costume129_{n}'for n in [642,512,768]},(own,fragments)
+save(R/'fragmentvern.json',dict(nye_egne_hele=6,diagnostiske_egne_ark_OK=6,diagnostiske_originalfragmenter=sorted(fragments),originalfragmenter_i_kandidat=False,holdt642_ikke_tatt_inn=True,ingen_pipelineendring=True,hele_ark_levert=False))
+shutil.copytree(M,C)
+for e in native:
+    p=C/e['fil'];assert not p.exists();shutil.copy2(A/e['prototype'],p);assert sha(p)==e['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3619;meta['costume_cels']=3625;save(C/'mod.json',meta)
+files={p.relative_to(C).as_posix():sha(p)for p in C.rglob('*')if p.is_file()};assert len(files)==21869 and set(files)-set(s['filer'])=={e['fil']for e in native}
+assert {f for f,h in s['filer'].items()if files[f]!=h}=={'mod.json'}
+assert not any((C/f'costumes/costume129_{n}_hd.png').exists()for n in [641,642,512,768])
+save(R/'kandidatfilhash.json',files);save(R/'egen-native.json',dict(ruter=native,nye_native=6,native_totalt=3625,kandidat=str(C),fast_4x=True,marg_original=[2,2],egen_alfa=True,originalmaske=False,originalfragmenter=False,automatisk6_nye_ark_OK=True,mangler_paa_delark=17,tidligere_filer_bevart=21863,filer=21869,png=sum(f.endswith('.png')for f in files)))
+partial['native_mottatt']=True;progress.update(native_mottatt=6,nye_native=6,native_totalt=3625);save(R/'fremdrift.json',progress)
+shutil.copy2(__file__,R/'lever.py.txt');print('Seks egne frontale hoder i kandidat3625, alle tidligere filer bevart.6/23 delark, ingen hel jobb levert.',flush=True)

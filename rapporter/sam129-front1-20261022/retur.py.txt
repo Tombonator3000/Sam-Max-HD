@@ -1,0 +1,34 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+returns=[]
+for number in [3,4,5,6]:
+    old=R/'kall'/f'F{number:02}';name=f'F{number:02}R';C=R/'kall'/name;assert not C.exists();C.mkdir()
+    plan=read(old/'plan.json');e=plan['ruter'][0];src=Image.open(e['kilde']).convert('RGBA');box=src.getbbox();visible=src.crop(box);w,h=visible.size;closed=number==4
+    atlas=Image.new('RGBA',(1024,1024),'#536576');factor=min(35,900//w,900//h);im=visible.resize((w*factor,h*factor),Image.Resampling.NEAREST);atlas.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));atlas.convert('RGB').save(C/'originalatlas.png')
+    shutil.copy2(old/'original-alfa.png',C/'original-alfa.png');shutil.copy2(old/'spillkontekst.png',C/'spillkontekst.png')
+    refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst.png']
+    eye='Both eyes CLOSED. Eyelid skin replaces the two cream highlights on local row12. NO cream, black pupils or white eye highlights in this exact cel.'if closed else'Both tiny warm cream eye apertures are ONE1x1 source pixel: x6 and x11, local y12. Cream RGB(255,199,135), not white. Keep black pupils immediately beside them as in source.'
+    prompt=f'''Use case: illustration-story.
+Asset: ONE complete frontal speaking HEAD animation cel{e['bilde']}, Lee-Harvey from Sam & Max Hit the Road.
+Image1 is the ENTIRE visible original head, exactly{w}x{h} source pixels, enlarged WITHOUT changing its aspect ratio. Every original opaque pixel is included. Image2 and Image3 are COMPLETE approved Sam and Max STYLE masters only. Image4 is the actual original game context, showing this head on its independent torso. Use NO previous head painting as a design reference. SOURCE1 controls every feature and this expression.
+Redraw the complete one head and short neck join, in straight FRONTAL view. Orange-brown tall asymmetrical quiff, pink long face, original ears and sideburns, long angular nose. No shoulders, body, clothes or background. Exact visible width/height ratio{w}:{h}; the head should have the SAME relative proportions as Image1, including forehead height.
+CRITICAL FEATURE REGISTRATION, zero-based coordinates INSIDE this complete{w}x{h} visible HEAD, not the old empty51x82 source canvas: top of head/hair is y0; BROW BARS occupy row11 (x4..7 and x9..12). Eye apertures/fills occupy row12. This means the TOP of the eyes is at EXACTLY12/{h} of the FULL visible head height. Do NOT push the eyes toward the middle or lower half, do NOT lengthen the forehead. Hair and face placement must match the source. Each original pixel corresponds to4px in the eventual native image.
+{eye}
+Exact mouth phase: {plan['detaljer']} Preserve every mouth, nose, eye, ear, hair and chin landmark at its location in Image1. No invented tooth divisions, eyebrows, highlights, nose shape or lips. Preserve the source small red and gray mouth clusters as shown. No generic handsome caricature, no Sam/Max features and no enlarged eyes or head.
+Trace the source at4x, making each source cluster its intended smooth shape. Clean dark continuous cartoon contours, flat exact source colors with one shade. No pixel stairs, texture, dithering, gradients, glow or 3D. Genuine own antialiased alpha, never hard original-pixel masking. Do not outline the bottom neck join with a heavy black line. No mirroring or rotation.
+Output one COMPLETE head centered on a1024x1024 genuinely transparent PNG, with clear transparent padding on all sides. No labels, text, boxes, checkerboard, backdrop or watermark. The visible native extent will be{w*4}x{h*4} HD pixels. Paint the whole head anew with the eye/brow band at the specified source-relative height.'''
+    args=dict(prompt=prompt,referenced_image_paths=[str(p)for p in refs],transparent_background=True)
+    save(C/'faktiske-argumenter.json',args);(C/'faktisk-prompt.txt').write_text(prompt+'\n')
+    plan.update(kilde_og_mastere_sett_foer_kall=False,referanser={str(p):sha(p)for p in refs},kvalitetsretur_fra=old.name,returgrunn='Indre ansiktsfeste er for lavt til tross for godkjent ytre omriss. Ny hel hoderute, ingen lokal flytting, overmaling eller originalmaskeklipping.',alle_originale_opake_piksler_i_forstorret_referanse=True,hel_kilde_51x82_bevart=True,ingen_tidligere_tegning_som_stilanker=True)
+    save(C/'plan.json',plan)
+    board=Image.new('RGB',(1900,1600),'#536576');db=ImageDraw.Draw(board);db.text((10,8),name+' complete source head / actual original scene / complete masters',fill='white')
+    im=Image.open(C/'originalatlas.png');im.thumbnail((760,760));board.paste(im,(10,35));im=Image.open(C/'spillkontekst.png');im.thumbnail((1100,740));board.paste(im,(790,35))
+    for k,master in enumerate(['sam','max']):
+        im=Image.open(A/'hovedark'/f'{master}.png').convert('RGBA');im.thumbnail((910,720));board.paste(im,(10+k*950,840),im)
+    board.save(C/'kontekst-og-mastere.png')
+    returns.append(dict(kall=old.name,bilde=e['bilde'],grunn=plan['returgrunn'],nytt_kall=name,porter_uendret=True,foerste_raw_bevart=True))
+save(R/'kvalitetsretur.json',returns);shutil.copy2(__file__,R/'retur.py.txt');print('Fire hele hoder i kvalitetsretur. Alle originaler og første råbilder bevart.',flush=True)

@@ -1,0 +1,25 @@
+{
+  "beskrivelse": "Avgrensede lokale rapport-/analysefeil, ingen bildeverktøyfeil eller motorfeil. Rettet før publisering.",
+  "stopp": [
+    {
+      "type": "SyntaxError",
+      "arsak": "Manglende mellomrom i else 2 og et tidligere hjelpeuttrykk. Ingen kjøring før retting."
+    },
+    {
+      "type": "palettaudit",
+      "arsak": "Vid RGB-velger traff to store øyefelt og enkelte egne små fargepiksler utenfor. Bare de to egne sammenhengende øyefeltene korrigeres nå; øvrige råfarger og all alfa beholdes."
+    },
+    {
+      "type": "for_tidlig_filavlesning",
+      "arsak": "Konteksthjelper lest før kandidatmotorens nye bilder fantes. Motor ble fullført før ny analyse og endelig audit."
+    },
+    {
+      "type": "git_stivern",
+      "arsak": "Gits standard sitering av UTF-8-stier stoppet tillatt-stivern før commit. Stiene er kontrollert på nytt med NUL-separert UTF-8, ingen filer fjernet eller indeks nullstilt."
+    }
+  ],
+  "ingen_motorkodeendring": true,
+  "ingen_terskelsenkning": true,
+  "omprove_endelige_native_320_null": true,
+  "tidligere_filer_bevart_i": "/home/tom/Sam-Max-HD/out/sam129-front1-20261022/foerste-palettrens"
+}

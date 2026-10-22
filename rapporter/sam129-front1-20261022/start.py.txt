@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PREV=A/'rapporter/sam129-ark01-slutt-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(d,*a):return subprocess.check_output(['git',*a],cwd=d,text=True).strip()
+assert not R.exists()and not git(P,'status','--porcelain')and not git(A,'status','--porcelain')
+old=read(PREV/'start.json');files=read(PREV/'publiserte-moddfiler-3619.json');receipt=read(PREV/'mottak-publisert.json')
+assert len(files)==21863 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+assert len(old['beskyttede'])==1420 and all(sha(A/f)==h for f,h in old['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==old['stash']
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]==receipt['hd_mod']=='2aa8e71e342c7992256cd7600e71050220f64a2b'
+assert read(P/'mods/gpt/mod.json')['costume_cels']==3619
+assert git(P,'ls-remote','origin','refs/heads/main').split()[0]==git(P,'rev-parse','HEAD')=='ec666ef6446fc8a3ca6481c77c54c0528e673b80'
+assert git(A,'ls-remote','origin','refs/heads/gpt-arbeid').split()[0]==git(A,'rev-parse','HEAD')=='29850c1d6ba0f686981cf28300aef06dcff143b6'
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==504 and not(A/'jobber/fig129_02/resultat.png').exists()
+assert not(A/'jobber/fig129_02/notat.md').exists()
+R.mkdir(parents=True);plan=read(A/'rapporter/sam129-kilde-20261022/kildeplan.json')
+nums=list(range(385,391));assert all(not(P/f'mods/gpt/costumes/costume129_{n}_hd.png').exists()for n in nums)
+save(R/'start.json',dict(main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),hd_mod=receipt['hd_mod'],native=3619,filer=files,beskyttede=old['beskyttede'],stash=old['stash'],figurark=504,nye_maal=6,ulike_hele=6,nye_numre=nums,tidligere_maal=plan['levert_og_publisert'],tidligere_notat_fantes=False,bibliotek=['figurark-fast-storrelse','scumm-v6-kostymer-skygge-og-soppelruter','publisert-mod-er-fasit'],bibliotek_kompatibilitet='Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e og Python/Pillow. Uendrede CORE128, IoU0.6, dekning0.8,4x og2 originalpikslers margin. Egne hele malerier, ekte alfa.'))
+save(R/'kildeplan.json',plan)
+board=Image.new('RGBA',(1500,1100),'#536576');dr=ImageDraw.Draw(board)
+zoom=Image.new('RGBA',(1500,550),'#536576');dz=ImageDraw.Draw(zoom)
+for i,n in enumerate(nums):
+    e=next(e for e in plan['ruter']if e['bilde']==f'costume129_{n}');src=Image.open(e['kilde']).convert('RGBA');assert sha(Path(e['kilde']))==e['sha256']
+    assert src.size==(51,82)and src.getbbox()==tuple(e['synlig_bbox'])
+    x=i%3*500;y=i//3*550;dr.text((x+12,y+12),f'{n}, hele51x82, synlig{e["synlig_bbox"]}',fill='white');board.alpha_composite(src.resize((255,410),Image.Resampling.NEAREST),(x+20,y+45))
+    crop=src.crop(src.getbbox());scale=12;zoom.alpha_composite(crop.resize((crop.width*scale,crop.height*scale),Image.Resampling.NEAREST),(i*250+12,40));dz.text((i*250+12,12),str(n)+' hel synlig hoderute',fill='white')
+board.convert('RGB').save(R/'seks-hele-originaler.png');zoom.convert('RGB').save(R/'seks-synlige-hoder.png')
+shutil.copy2(__file__,R/'start.py.txt');print('Start3619, seks frontale hoder, hele51x82-kilder,1420 beskyttede og3 stasher bevart.',flush=True)

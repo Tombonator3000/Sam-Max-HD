@@ -1,0 +1,95 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from functools import lru_cache
+import numpy as np,json,hashlib,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam1293625'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/'grunnlag3619-front4.json');c=read(R/'kandidat3625-front4.json');s=read(R/'start.json');native=read(R/'egen-native.json')['ruter'];by={e['bilde']:e for e in native};needed=set(by)
+for proof,n in [(b,3619),(c,3625)]:
+    assert proof['exit']==0 and proof['native_antall']==n and len(proof['kontroller'])==320 and proof['nullkontroller']==320
+    assert proof['nye_maal_observert']==6 and proof['binar_sha256']=='2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110'
+    assert proof['valgte_raw']==[18]and proof['miljo']['DIGHD_TEST_ANIMATION']=='4'
+event_pattern=r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)'
+def events(d):
+    out={}
+    for m in re.findall(event_pattern,(d/'scummvm.log').read_text()):
+        f,n,k,x,y,w,h=map(int,m);out.setdefault(f,set()).add((n,k,x,y,w,h))
+    return out
+es=[events(O/'grunnlag3619-front4'),events(O/'kandidat3625-front4')]
+def state(side,f):return tuple(sorted(e for e in es[side].get(f,set())if e[1]in[124,129]))
+@lru_cache(maxsize=20)
+def img(p,flat=False):
+    p=Path(p)
+    if flat:p=p.with_name(p.stem+'_flat.png')
+    return np.array(Image.open(p).convert('RGB'))
+def project(source,e,flat):
+    x,y=e['pos'];w,h=e['maal'];opts=[]
+    for mirror in [False,True]:
+        src=source[:,::-1]if mirror else source;rgb=src[:,:,:3].astype(np.uint16);rr=rgb[:,:,0]>>3;gg=rgb[:,:,1]>>2;bb=rgb[:,:,2]>>3
+        rgb=np.stack([(rr<<3)|(rr>>2),(gg<<2)|(gg>>4),(bb<<3)|(bb>>2)],2).astype(np.uint8);expected=np.repeat(np.repeat(rgb,4,0),4,1);mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1)
+        for dx in[-1,0,1]:
+            for dy in[-1,0,1]:
+                xx,yy=(x+dx)*4,(y+dy)*4
+                if min(xx,yy)<0 or xx+w*4>1280 or yy+h*4>800:continue
+                wrong=int((mask&np.any(flat[yy:yy+h*4,xx:xx+w*4]!=expected,2)).sum());opts.append((wrong,abs(dx)+abs(dy),mirror,dx,dy,mask))
+    opts.sort(key=lambda e:e[:5]);best=opts[0];out=np.zeros((800,1280),bool);xx,yy=(x+best[3])*4,(y+best[4])*4;out[yy:yy+h*4,xx:xx+w*4]=best[5]
+    return out,dict(speilvendt=best[2],dx_original=best[3],dy_original=best[4],kildefargeavvik=best[0],synlige_kildepiksler=int(best[5].sum()),uavhengig_av_HD=True)
+idxfile=M/'rooms/room025_idx.png';idx=np.array(Image.open(idxfile));metafile=P/'work/extract/rooms.json';cycles=read(metafile)['rooms']['25']['cycles'];codes=[k for lo,hi,_,_ in cycles for k in range(lo,hi+1)]
+cycle=np.repeat(np.repeat(nd.maximum_filter(np.isin(idx,codes),size=3),4,0),4,1)
+patch=P/'engine/patches/0001-dighd-hd-grafikk.patch';assert 'const int pad = 1, W4'in patch.read_text()
+def fallback(oldf,newf):
+    support=np.zeros((800,1280),bool);records=[]
+    for n,k,x,y,w,h in es[0].get(oldf,set())^es[1].get(newf,set()):
+        if k in [124,129]:continue
+        rel=f'costumes/costume{k:03}_{n:03}_idx.png';assert sha(M/rel)==s['filer'][rel]==sha(C/rel)
+        assert not any((M/f'costumes/costume{k:03}_{n:03}{tail}').exists()for tail in['.png','_hd.png'])
+        box=[max(0,(x-1)*4),max(0,(y-1)*4),min(1280,(x+w+1)*4),min(800,(y+h+1)*4)]
+        if box[2]>box[0]and box[3]>box[1]:support[box[1]:box[3],box[0]:box[2]]=True
+        records.append(dict(cel=n,kostyme=k,pos=[x,y],maal=[w,h],original_marg=1,rekt_HD=box,idx_sha256=s['filer'][rel]))
+    return support,records
+body=np.array(Image.open(P/'work/extract/costumes/costume129_128.png').convert('RGBA'));assert sha(M/'costumes/costume129_128_hd.png')==s['filer']['costumes/costume129_128_hd.png']==sha(C/'costumes/costume129_128_hd.png')
+rows=[]
+for name in sorted(needed):
+    cel=int(name.split('_')[1]);src=np.array(Image.open(P/f'work/extract/costumes/{name}.png').convert('RGBA'));found=None
+    for ne in[e for e in c['hendelser']if e['cel']==cel and e['kontrollert_testaktor29']and e['bildeframe']>=40]:
+        z=img(ne['fil'],True);mask,proj=project(src,ne,z);bm,bproj=project(body,ne,z);wholeactor=mask|bm;pairs=[]
+        for oe in sorted([e for e in b['hendelser']if e['cel']==cel and e['kontrollert_testaktor29']],key=lambda e:abs(e['bildeframe']-ne['bildeframe'])):
+            if oe['pos']!=ne['pos']or oe['maal']!=ne['maal']or state(0,oe['logg_frame'])!=state(1,ne['logg_frame']):continue
+            oldflat=img(oe['fil'],True)
+            if np.array_equal(oldflat[wholeactor],z[wholeactor]):pairs.append((not np.array_equal(oldflat,z),abs(oe['bildeframe']-ne['bildeframe']),oe))
+            if pairs and not pairs[-1][0]:break
+        if pairs:found=(min(pairs,key=lambda e:e[:2])[2],ne,mask,bm,wholeactor,proj,bproj);break
+    assert found,(name,'Ingen like sammensatte originale aktørverdier')
+    oe,ne,mask,bm,act,proj,bproj=found;old,new=img(oe['fil']),img(ne['fil']);a,z=img(oe['fil'],True),img(ne['fil'],True)
+    delta=np.any(old!=new,2);origdiff=np.any(a!=z,2);outside=delta.copy();yy,xx=np.where(mask);box=[max(0,int(xx.min())-8),max(0,int(yy.min())-8),min(1280,int(xx.max())+9),min(800,int(yy.max())+9)]
+    outside[box[1]:box[3],box[0]:box[2]]=False;sourcechange=nd.maximum_filter(origdiff,size=9);fb,fbproof=fallback(oe['logg_frame'],ne['logg_frame']);unknown=outside&~sourcechange&~cycle&~fb
+    if unknown.any():
+        uy,ux=np.where(unknown);save(R/'ukjent-endring.json',dict(bilde=name,grunnlag=oe,kandidat=ne,piksler=[[int(x),int(y)]for y,x in zip(uy,ux)]))
+    assert not unknown.any(),(name,'Uforklart endring',int(unknown.sum()))
+    body_outside=bm.copy();body_outside[box[1]:box[3],box[0]:box[2]]=False
+    assert not(delta&body_outside).any(),(name,'Endring av uendret torso utenfor hodefelt')
+    assert delta.any()and np.array_equal(a[act],z[act])and sha(C/by[name]['fil'])==by[name]['sha256']
+    coords=np.stack(np.where(act),1);digest=hashlib.sha256(coords.tobytes()+a[act].tobytes()).hexdigest()
+    rows.append(dict(bilde=name,grunnlag_fil=oe['fil'],kandidat_fil=ne['fil'],grunnlag_frame=oe['bildeframe'],kandidat_frame=ne['bildeframe'],grunnlag_sha256=sha(Path(oe['fil'])),kandidat_sha256=sha(Path(ne['fil'])),pos=ne['pos'],maal=ne['maal'],samlet_hode_torso_originalverdier_identiske=True,original_aktorverdier_sha256=digest,kildeprojeksjon_hode=proj,kildeprojeksjon_torso=bproj,hele_originalflater_SHA_identiske=not origdiff.any(),endrede_originalpiksler=int(origdiff.sum()),endrede_HD_piksler=int(delta.sum()),utenfor_nye_hoder_og_dokumenterte_kildetilstander=0,torso_utenfor_hode_endringer=0,HD_hodefelt=box,kilde_fallbackfaser=fbproof,native_sha256=by[name]['sha256'],kontrollert_testaktor29=True,full_naturlig_gjennomspilling=False,visuelt_sett=False))
+    print(name,'samlet originalaktor lik, uendret torso,0 uforklarte endringer',flush=True)
+# Seks før/etter-varianter med hele aktørens kropp med, og fire hele bilder.
+boards=[]
+for start in [0,3]:
+    subset=rows[start:start+3];im=Image.new('RGB',(1500,500),'#304050');dr=ImageDraw.Draw(im)
+    for i,e in enumerate(subset):
+        x,y=e['pos'];w,h=e['maal'];box=(max(0,x*4-8),max(0,y*4-16),min(1280,(x+w)*4+8),min(800,(y+h)*4+8));dr.text((i*500+5,8),e['bilde']+' 3619 /3625, actor29',fill='white')
+        for k,key in enumerate(['grunnlag_fil','kandidat_fil']):
+            view=Image.open(e[key]).convert('RGB').crop(box);view.thumbnail((242,450));im.paste(view,(i*500+5+k*248,30))
+    p=R/f'motor-varianter-{start//3+1}.png';im.save(p);boards.append(dict(fil=p.name,sha256=sha(p),ruter=[e['bilde']for e in subset],visuelt_sett=False))
+shots=[]
+for cel in[385,387,388,390]:
+    e=next(e for e in rows if e['bilde']==f'costume129_{cel}');p=R/f'costume129_{cel}-motor3625.png';shutil.copy2(e['kandidat_fil'],p);shots.append(dict(bilde=e['bilde'],fil=p.name,sha256=sha(p),visuelt_sett=False,kontrollert_testaktor29=True))
+phase=[];im=Image.new('RGB',(1500,1200),'#304050');dr=ImageDraw.Draw(im)
+for i,cel in enumerate(range(385,402)):
+    e=next(e for e in c['hendelser']if e['cel']==cel and e['kontrollert_testaktor29']);bodyevent=next(q for q in c['hendelser']if q['logg_frame']==e['logg_frame']and q['cel']==128 and q['kontrollert_testaktor29']);x,y=bodyevent['pos'];w,h=bodyevent['maal'];image=Image.open(e['fil']).convert('RGB').crop((x*4-8,y*4-16,(x+w)*4+8,min(800,(y+h)*4+8)));image.thumbnail((238,350));xx=i%6*250;yy=i//6*400;im.paste(image,(xx+5,yy+35));dr.text((xx+5,yy+8),f'{cel}, frame{e["bildeframe"]}, '+('ny'if f'costume129_{cel}'in needed else'tidligere fallback'),fill='white');phase.append(dict(cel=cel,fil=e['fil'],sha256=e['sha256'],ny=f'costume129_{cel}'in needed))
+p=R/'hele-frontanimasjon17.png';im.save(p)
+save(R/'motor-pikselkontroll.json',rows);save(R/'motor-visuell-plan.json',dict(varianter=boards,hele_motorbilder=shots,hele_frontanimasjon=dict(fil=p.name,sha256=sha(p),faser=phase,visuelt_sett=False),visuelt_sett=False))
+save(R/'motor-sammenligning.json',dict(nye_native=6,native=3625,exit_grunnlag=0,exit_kandidat=0,kontroller_pr_side=320,grunnlag_null=320,kandidat_null=320,alle6_observert=True,alle17_frontfaser_observert=True,alle_originalaktorverdier_identiske=True,torso_utenfor_hoder_uendret=True,hele_originalflater_SHA_identiske_antall=sum(e['hele_originalflater_SHA_identiske']for e in rows),utenfor_nye_hoder_og_dokumenterte_kildetilstander=0,ingen_nye_eller_okte_bufferavvik_i_denne_proven=True,kontrollert_testaktor29=True,konstruert_helanimasjon4=True,rawvalg=18,tvunget_lokalskript=False,andre_aktorer_skjult=False,romskript_stoppet=False,ny_primaerprove=False,full_naturlig_gjennomspilling=False,ny_interaktiv_Windows=False,ny_webtest=False,source_rooms_sha256=sha(metafile),room025_idx_sha256=sha(idxfile),sykler=cycles,kildens_cycle_nabovindu_original=3,kildens_endring_nabovindu_HD=9,originalfallback_marg_original=1,patch_sha256=sha(patch),visuelt_sett=False,maalinger_klipper_ikke_kunsten=True,begrensning='Uttrykkelig konstruert hel frontanimasjon4 på aktør29.320 av320 null per side; alle17 faser er logget,6 er nye egne native. Ingen ny vanlig primærsekvens eller full naturlig gjennomspilling, interaktiv Windows, ny webtest eller Tom-/Claude-godkjenning. De tidligere kjente ni primærbufferavvikene er ikke omprøvd i denne bunken.641/642 og andre tidligere returer er fortsatt holdt. Hele figurarket er ufullført.'))
+shutil.copy2(__file__,R/'analyser.py.txt');print('Seks nye hoder,320/320null per side,17 faser,0 uforklarte endringer.',flush=True)

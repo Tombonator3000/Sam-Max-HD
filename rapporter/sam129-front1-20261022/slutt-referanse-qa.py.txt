@@ -1,0 +1,66 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+import hashlib, json, shutil
+import numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+R = A / 'rapporter/sam129-front1-20261022'
+O = P / 'out' / R.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p, data):
+    p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+p = R / 'hele-frontanimasjon17.png'
+backup = R / 'hele-frontanimasjon17-forste-hodeutsnitt.png'
+if not backup.exists():
+    shutil.copy2(p, backup)
+c = read(R / 'kandidat3625-front4.json')
+im = Image.new('RGB', (1500, 1200), '#304050')
+dr = ImageDraw.Draw(im)
+phase = []
+needed = {e['bilde'] for e in read(R / 'valgte6.json')}
+for i, cel in enumerate(range(385, 402)):
+    e = next(e for e in c['hendelser'] if e['cel'] == cel and e['kontrollert_testaktor29'])
+    body = next(q for q in c['hendelser'] if q['logg_frame'] == e['logg_frame'] and q['cel'] == 128 and q['kontrollert_testaktor29'])
+    x, y = body['pos']
+    w, h = body['maal']
+    view = Image.open(e['fil']).convert('RGB').crop((x*4-8, y*4-16, (x+w)*4+8, min(800, (y+h)*4+8)))
+    view.thumbnail((238, 350))
+    xx, yy = i % 6 * 250, i // 6 * 400
+    im.paste(view, (xx+5, yy+35))
+    dr.text((xx+5, yy+8), f'{cel}, frame{e["bildeframe"]}, ' + ('ny' if f'costume129_{cel}' in needed else 'originalfallback'), fill='white')
+    phase.append(dict(cel=cel, fil=e['fil'], sha256=e['sha256'], ny=f'costume129_{cel}' in needed, hele_torso128_med=True))
+im.save(p)
+v = read(R / 'motor-visuell-plan.json')
+v['hele_frontanimasjon'].update(sha256=sha(p), faser=phase, alle17_hele_hode_og_kropp=True)
+save(R / 'motor-visuell-plan.json', v)
+
+s = (O / 'analyser.py').read_text()
+old = "e=next(e for e in c['hendelser']if e['cel']==cel and e['kontrollert_testaktor29']);x,y=e['pos'];w,h=e['maal'];image="
+new = "e=next(e for e in c['hendelser']if e['cel']==cel and e['kontrollert_testaktor29']);bodyevent=next(q for q in c['hendelser']if q['logg_frame']==e['logg_frame']and q['cel']==128 and q['kontrollert_testaktor29']);x,y=bodyevent['pos'];w,h=bodyevent['maal'];image="
+assert old in s or new in s
+(O / 'analyser.py').write_text(s.replace(old, new))
+shutil.copy2(O / 'analyser.py', R / 'analyser.py.txt')
+
+colors = []
+for e in read(R / 'valgte6.json'):
+    C = R / 'kall' / e['valgt_kall']
+    arr = np.array(Image.open(C / 'egen-renset.png'))
+    mask = (arr[:, :, 3] >= 128) & np.all(arr[:, :, :3] == [255, 199, 135], 2)
+    labels, n = nd.label(mask)
+    boxes = []
+    for lab in range(1, n+1):
+        y, x = np.where(labels == lab)
+        boxes.append(dict(bbox=[int(x.min()), int(y.min()), int(x.max()+1), int(y.max()+1)], piksler=len(y)))
+    expect = 0 if e['bilde'] == 'costume129_388' else 2
+    assert n == expect, (e['valgt_kall'], n)
+    colors.append(dict(kall=e['valgt_kall'], bilde=e['bilde'], egne_oyefargekomponenter=n, egne_komponenter=boxes, RGB=[255, 199, 135], egen_alfa_uendret=True, geometri_endret=False, originalmaske=False))
+save(R / 'palettrens-kontroll.json', colors)
+features = read(R / 'indre-feste-etter-fargerens.json')
+assert all(max(abs(q) for q in e.get('forskyvning_senter_HD', [0, 0])) <= 3 for e in features)
+save(R / 'indre-feste-sluttkontroll.json', dict(hele_hoder_nytegnet_for_fire_returer=True, egne_RGB_korrigert_til_kildepalett=True, ingen_lokal_featureflytting=True, ingen_hel_plassering_endret=True, alle_maalte_senteravvik_HD_hoyst3=True, hodet388_lukkede_oyer=True, maalinger=features, visuelt_sett=False, merking='3 HD-piksler er 0.75 originalpiksel, samme tidligere registreringsgrense. Målinger og palettarbeid klipper ikke ny kunst med originalens pikselmaske.'))
+shutil.copy2(__file__, R / 'slutt-referanse-qa.py.txt')
+print('17 hele aktører, to egne kremfargefelt per åpent øyepar, alfa uendret.')

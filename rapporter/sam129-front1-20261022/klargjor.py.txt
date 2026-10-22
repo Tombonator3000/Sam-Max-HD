@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil,sys,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+nums=list(range(385,391));details={385:'Small narrow open mouth, black upper opening and dark red lower tongue/lip band. No white teeth in this phase.',386:'A sideways-offset shallow open mouth, black upper gap, ONE narrow white horizontal tooth band and dark red lower lip. Preserve its asymmetry.',387:'Tall fully open rectangular mouth, black interior, slim white upper edge on the right, ONE white lower tooth band, dark red inner tongue near the bottom. Do not add separate teeth or a generic smile.',388:'Small tight puckered mouth offset toward image right, short dark opening and red lip tips. No white teeth.',389:'Closed small pursed red mouth, no black opening and no white teeth. Keep the red flat shape exactly as shown.',390:'Medium open horizontal rectangular mouth, black upper opening, ONE white lower tooth band and dark red lower lip. Keep the exact source width and height.'}
+for i,n in enumerate(nums,1):
+    name=f'F{i:02}';C=R/'kall'/name;assert not C.exists();C.mkdir(parents=True)
+    e=next(e for e in read(R/'kildeplan.json')['ruter']if e['bilde']==f'costume129_{n}');src=Image.open(e['kilde']).convert('RGBA');assert sha(Path(e['kilde']))==e['sha256']
+    box=src.getbbox();crop=src.crop(box);ctx=e['kontrollert_kontekst'];assert ctx and sha(Path(ctx['fil']))==ctx['sha256']
+    atlas=Image.new('RGBA',(1100,1000),'#536576');dr=ImageDraw.Draw(atlas)
+    atlas.alpha_composite(src.resize((510,820),Image.Resampling.NEAREST),(10,60));dr.text((10,20),'Complete original51x82, transparent padding shown on slate',fill='white')
+    factor=min(28,540//crop.width,860//crop.height);atlas.alpha_composite(crop.resize((crop.width*factor,crop.height*factor),Image.Resampling.NEAREST),(555,60));dr.text((555,20),'Same ENTIRE visible head, enlarged',fill='white')
+    atlas.convert('RGB').save(C/'originalatlas.png');src.save(C/'original-alfa.png');shutil.copy2(ctx['fil'],C/'spillkontekst.png')
+    continuity=A/'rapporter/sam129-ark01-slutt-20261022/kall/S05R/raa.png'
+    refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst.png',continuity]
+    rgb=np.array(src);eyes=np.argwhere((rgb[:,:,3]>0)&np.all(rgb[:,:,:3]==[255,199,135],axis=2)).tolist()
+    prompt=f'''Use case: illustration-story.
+Asset: ONE COMPLETE separate frontal speaking-head animation cel, costume129_{n}, Sam & Max Hit the Road HD.
+Input roles: Image1 has the COMPLETE original51x82 cel on the left and the SAME entire visible head enlarged on the right. It controls the pose, head contour, all feature positions, exact mouth phase and colors. Image2 and Image3 are COMPLETE approved Sam and Max STYLE masters, style only. Image4 is the actual original game scene with this head above its independently drawn torso, CONTEXT only. Image5 is our earlier entire Lee-Harvey resting-head painting for continuity, NOT a Tom-approved design master. Never copy its resting mouth instead of the source mouth.
+Draw ONLY the whole single head and short skin neck join shown in Image1, in STRAIGHT FRONTAL view. No body, shoulders, clothes, props, other actors or background. The51x82 canvas has transparent padding; the visible head is{crop.width}x{crop.height}, located at{box} in the full original. Output a centered standalone painting of the ENTIRE visible head, not its large mostly empty source canvas. Keep the exact visible width/height ratio{crop.width}:{crop.height}.
+Character: Lee-Harvey, Conroy Bumpus's human henchman, orange-brown asymmetric high quiff curling toward image left, pink skin, long narrow angular face, small ears with brown sideburns, long nose and short neck. Not Conroy himself, not Sam, Max or a generic handsome man. Copy this exact source face, hairstyle, ears, chin and pose. No new hair streaks, eyebrows, beard, stubble, glasses, teeth, lips or nose highlights. Keep the source's small half-lidded suspicious eyes. Tiny eye highlights stay warm cream RGB(255,199,135), not enlarged white eyes. Source eye-highlight coordinates are{eyes} as [row,column] in the full51x82 source. Preserve their exact positions relative to the whole head, never enlarge them.
+Exact mouth phase: {details[n]} Take all details and asymmetry from Image1. Keep the nose, mouth, chin and head tilt at the exact source positions.
+Trace the original at4x: same silhouette, size and proportions; turn each source cluster into its intended smooth shape. Clean continuous dark hand-drawn contours, flat original colors with one shade. Smooth genuinely antialiased alpha edges, no hard pixel-mask clipping, stair steps, dithering, texture, gradients, glow or shadow. The flat bottom neck join is an ordinary separate animation-layer join; do not add a heavy black outline there. No rotation or mirroring and no enlarged eyes, nose, mouth or head.
+Output one centered COMPLETE head on a1024x1024 genuinely transparent PNG, large and clear with transparent padding around every edge. No slate backdrop, checkerboard, labels, numbers, text, frame or watermark. Final visible native extent will be{crop.width*4}x{crop.height*4} HD pixels, inside a220x344 native transparent canvas with equal margin.'''
+    args=dict(prompt=prompt,referenced_image_paths=[str(p)for p in refs],transparent_background=True)
+    save(C/'faktiske-argumenter.json',args);(C/'faktisk-prompt.txt').write_text(prompt+'\n')
+    save(C/'plan.json',dict(ruter=[dict(e,canonical_rgba_sha256=e['rgba_sha256'])],detaljer=details[n],underlag_piksler=0,referanser={str(p):sha(p)for p in refs},kilde_og_mastere_sett_foer_kall=False,originalmaske=False,originalfragmenter=False,selvstendig_hel_hoderute=True,hele_kildelerret_sett=True))
+    board=Image.new('RGB',(1900,1800),'#536576');db=ImageDraw.Draw(board);db.text((10,8),f'{name}, {n}: full source / actual original scene / complete Sam and Max masters / own whole head for continuity only',fill='white')
+    im=Image.open(C/'originalatlas.png');im.thumbnail((800,750));board.paste(im,(10,30))
+    im=Image.open(C/'spillkontekst.png').convert('RGB');im.thumbnail((1080,730));board.paste(im,(810,30))
+    for k,master in enumerate(['sam','max']):
+        im=Image.open(A/'hovedark'/f'{master}.png').convert('RGBA');im.thumbnail((900,540));board.paste(im,(10+k*950,800),im)
+    im=Image.open(continuity).convert('RGBA');im.thumbnail((600,420));board.paste(im,(10,1350),im);db.text((650,1450),'Own resting head, continuity only; SOURCE decides speaking phase.',fill='white')
+    board.save(C/'kontekst-og-mastere.png')
+shutil.copy2(__file__,R/'klargjor.py.txt');print('Seks selvstendige frontale hoder klargjort. Se hver kilde med mastere før kall.',flush=True)
