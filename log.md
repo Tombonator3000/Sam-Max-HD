@@ -2088,3 +2088,20 @@ Alle 6 sammenlignede originale aktørverdier er identiske; 2 hele originalflater
 Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 og mangler 23 native. Ingen nye pakkebygg eller nativefrys. Neste samlepunkt er resten av 129-familien eller reell produksjonsblokkering. Neste produksjon er fig129_02, først 385 til 390, deretter øvrige uavhengige mål. 1804/1861 og tidligere returer står åpne. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
 
 Bevis: rapporter/sam129-ark01-slutt-20261022/mottak-publisert.json, RAPPORT.md, motor-sammenligning.json, blink-sluttkontroll.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Bare fire dokumenter endres i main; ingen motor-/pipelineendringer.
+
+
+## 2026-10-22 06:57 (Codex)
+
+Seks nye frontale Lee-Harvey-snakkehoder385 til390 er laget, egenkontrollert, native mottatt, motorobservert, visuelt sett og publisert. Native er 796299f673d001ed86a6c2eac695dd01ec746733,3625 HD-bildelag totalt. Grafikkilde fc85ce63013b3b94df6e038f73ba08048db07c7b på gpt-arbeid. Alle21869 filhash er bekreftet etter henting.21863 tidligere stier og21857 tidligere PNG,1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet sluttgodkjenning.
+
+fig129_02 er delvis6 av23, fig129_01 er23 av24. Ingen nytt helt resultatark:504 av1758 figurjobber har resultat,1254 er uten pluss returer og sluttkontroll.129-familien har29 av47 publisert;18 gjenstår,16 produserbare og641/642 holdt.641-avslaget omprøves ikke;642 er identisk hel alias uten individuelt forsøk.
+
+Ti innebygde image_gen-kall ga ti bilder og fire hele kvalitetsreturer for øyefeste. Kildekontekst og godkjente mastere er sett før hvert motiv. Python korrigerer kremfargen i egne øyefelt uten endring av alfa eller geometri. Fast4x, samme porter og ekte alfa. Tre diagnostiske originalfragmenter642,512,768 er utelatt. Hele arkkontrollen har14 FEIL for tomme, ennå ikke leverte mål; ingen FEIL på de seks produserte. Ingen motor-/pipelineendring.
+
+Endelig kandidat og3619-grunnlag har320 av320 nullkontroller hver og exit0 med faktisk nedlastet Linux-binær2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110. Dette er hel frontanimasjon4 på konstruert aktør29, rawvalg18. Alle17 faser med kropp og alle seks nye hoder er sett, sammen med fire hele motorbilder. Seks originale hode-/torsoverdier og seks hele originalflater er identiske. Ingen uforklarte endringer utenfor hodene og dokumenterte kildetilstander; torso er uendret utenfor hodefeltet. De tidligere ni primærbufferavvikene er ikke omprøvd her. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt3596 og mangler29 native. Neste samlepunkt er resten av129-familien eller reell produksjonsblokkering. Fortsett391 til401,422,153,154,512 og768, med originalkontekst og mastere før hver tegning.124_1804/1861 og andre tidligere returer står åpne. Gamle nattprosesser startes ikke; grafikkautomatikken fortsetter. Alt er ikke ferdig.
+
+Bevis på gpt-arbeid: rapporter/sam129-front1-20261022/RAPPORT.md, mottak-publisert.json, motor-sammenligning.json, indre-feste-sluttkontroll.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Bare fire dokumenter endres i main.
+
+Lokale hjelpeuttrykk, UTF-8-stivern og for tidlig filavlesning er rettet før publisering. Første vide fargevelger og alle tidligere mellomresultater er bevart; etter innskrenking til egne øyefelt er endelige nativefiler motorprøvd på nytt. Se hjelperstopp.json.
