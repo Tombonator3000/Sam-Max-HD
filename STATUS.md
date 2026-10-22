@@ -1,5 +1,19 @@
 # Status
 
+## Gjeldende grafikkstatus, 2026-10-22 03:53
+
+Felles Linux- og Windows-utgave er publisert, lastet ned igjen og kontrollert: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-gatorgolf. Begge har 3596 native HD-bildelag, inkludert alle 61 publiserte Lee-Harvey/Max-ruter siden forrige fellesutgave. Alle 21839 runtime-modfiler per pakke, fire vedleggsdigester og sjekksumfiler er bekreftet. De 40 tidligere utgivelsene er bevart. Linux-bygg 39705416172, Windows-bygg 39705419577 og automatisk Windows-taggbygg 39707299348 er bestått. Nativefrysen er frigitt.
+
+Denne bunken ga åtte tegnede og teknisk mottatte ruter fra sju hele malerier. Sju nye ruter er publisert og motorprøvd. Rute 1861 er holdt etter flere feilpiksler under uttoning i3597-diagnosen. fig124_08 har komplett resultatark med tre mål, men bare to er publisert. fig124_07 har fem publiserte mål og sju tomme plasser; arket er ufullført og telles ikke levert. 504 av 1758 figurark har resultat,1254 er uten resultat pluss returer og sluttkontroll. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+Den nye faktiske Linux-pakken viser alle 61 publiserte familieruter i primærsekvensen og separat helanimasjon 8. 1040 kontroller gir 1031 null og samme ni kjente bufferavvik, med identiske koordinater og begge RGB-verdier. 19 kontrollerte originale aktørverdier og opake HD-raster matcher produksjonen. 19 før/etter-varianter og fire hele motorbilder er visuelt sett. Primærsekvensen bruker original rominngang/lokal217; hel8 bruker konstruert testaktør29. Ingen full naturlig gjennomspilling, interaktiv Windows-prøve eller ny webtest. Den kjente SDL-startfeilen og lille statiske Cone-tuppen står fortsatt åpne.
+
+B02/1848 fikk outputavslag fra bildeverktøyet, request b9827304-d41b-48c6-a1da-8f27f3b0665d. Ingen retry. 1849 til1854 er ikke prøvd denne gangen. 1804 og 1861 står i retur. Uttoningsfeilen krever avgrenset motorundersøkelse og testet PR ved kodeendring, uten å endre kunstens alfa eller mottaksporter. Kostyme 129 er kildeklargjort: 47 mål fra 46 ulike hele kilder, 39 har spillkontekst, 20 naturlig og 19 kontrollert. De siste åtte mangler fortsatt kontekst. Ingen 129-bildekall eller leveranser ennå. Alle kilder/kontekster og hele mastere skal ses før hvert motiv.
+
+Native er 9270b2603f730106f7db14ff03511426bb3a1f08, pakkekode 95abbda7807ed5cb5f634088613927208f998b30. Alle 21840 publiserte filhash,21827 tidligere PNG,1412 tidligere beskyttede jobbfiler pluss åtte nye129-inndata og tre stasher er bekreftet. Bare dokumentasjon endres i main. Se rapporter/sam124-siste-to-20261022, rapporter/felles-release-20261022-gatorgolf og rapporter/sam129-kilde-20261022 på gpt-arbeid. Grafikkautomatikken er fortsatt ACTIVE. Fortsett avgrensede returer og uavhengig grafikk; alt er ikke ferdig.
+
+Tidligere status nedenfor er historikk.
+
 ## Gjeldende grafikkstatus, 2026-10-22 03:24
 
 Sju nye Lee-Harvey/Max-ruter er publisert og hentet tilbake i hd-mod 9270b2603f730106f7db14ff03511426bb3a1f08,3596 native totalt. Åtte mål er tegnet og teknisk mottatt fra sju hele egne malerier.1861 er holdt etter flere feilpiksler under uttoning i3597-diagnosen; resten av modden økes bare med de sju kontrollerte rutene. fig124_08 er helt levert med tre mål, to native publisert og én holdt. fig124_07 er delvis med fem tegnede/publiserte mål og sju tomme plasser og telles ikke som helt levert.504 av1758 figurark har resultat,1254 er uten resultat pluss returer og sluttkontroll. Ingen Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
