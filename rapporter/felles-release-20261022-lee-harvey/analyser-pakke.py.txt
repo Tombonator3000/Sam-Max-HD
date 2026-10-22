@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,numpy as np,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam129-rest-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+proofs={case:read(R/f'pakke-{case}.json')for case in ['front4','gyldige','primaer']}
+for case,d in proofs.items():assert d['exit']==0 and len(d['kontroller'])==(720 if case=='primaer'else 320)and d['nullkontroller']==(711 if case=='primaer'else 320)
+T=O/'pakke-primaer';errors=[]
+for e in proofs['primaer']['kontroller']:
+ if not e['avvik']:continue
+ f=e['frame'];screen=np.array(Image.open(T/f'frame_{f:06}_screen.png').convert('RGB'));whole=list(T.glob(f'frame_{f:06}_room[0-9][0-9][0-9].png'));assert len(whole)==1;im=np.array(Image.open(whole[0]).convert('RGB'));y,x=np.where(np.any(screen!=im,2));assert len(x)==e['avvik'];errors.append(dict(frame=f,avvik=len(x),koordinater_og_begge_RGB_sha256=hashlib.sha256(np.stack([x,y],1).tobytes()+screen[y,x].tobytes()+im[y,x].tobytes()).hexdigest()))
+old=read(S/'motor-bufferkontroll.json')['kandidat'];assert len(old)==len(errors)==9;assert[(e['avvik'],e['koordinater_og_begge_RGB_sha256'])for e in old]==[(e['avvik'],e['koordinater_og_begge_RGB_sha256'])for e in errors]
+wanted={e['bilde']:e for e in read(R/'familie-native45.json')['ruter']};observed={};rows=[];D=O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+for case in ['primaer','front4','gyldige']:
+ for e in proofs[case]['hendelser']:
+  name=f'costume129_{e["cel"]:03}'
+  if e['bildeframe']<40 or not Path(e['fil']).is_file() or (case!='primaer'and not e['kontrollert_testaktor29']):continue
+  if name in wanted:observed.setdefault(name,(case,e))
+assert set(observed)==set(wanted)and len(wanted)==45
+for name in sorted(wanted):
+ case,e=observed[name];assert sha(Path(e['fil']))==e['sha256']and sha(D/wanted[name]['fil'])==wanted[name]['sha256'];active=[q for q in proofs[case]['hendelser']if q['logg_frame']==e['logg_frame']and(q['kontrollert_testaktor29']if case!='primaer'else abs(q['pos'][0]-e['pos'][0])<70)]
+ assert active;x0=min(q['pos'][0]for q in active);y0=min(q['pos'][1]for q in active);x1=max(q['pos'][0]+q['maal'][0]for q in active);y1=max(q['pos'][1]+q['maal'][1]for q in active)
+ rows.append(dict(bilde=name,case=case,fil=e['fil'],sha256=e['sha256'],native_sha256=wanted[name]['sha256'],aktor_rekt=[max(0,x0*4-8),max(0,y0*4-16),min(1280,x1*4+8),min(800,y1*4+8)],visuelt_sett=False))
+boards=[]
+for start in [0,15,30]:
+ subset=rows[start:start+15];im=Image.new('RGB',(1500,1200),'#304050');dr=ImageDraw.Draw(im)
+ for i,e in enumerate(subset):
+  view=Image.open(e['fil']).convert('RGB').crop(e['aktor_rekt']);view.thumbnail((285,355));x=i%5*300;y=i//5*400;im.paste(view,(x+5,y+35));dr.text((x+5,y+8),e['bilde']+' '+e['case'],fill='white')
+ p=R/f'pakke-familie45-{start//15+1}.png';im.save(p);boards.append(dict(fil=p.name,sha256=sha(p),ruter=[e['bilde']for e in subset],visuelt_sett=False))
+shots=[]
+for cel in [399,401,153,154]:
+ e=next(e for e in rows if e['bilde']==f'costume129_{cel}');p=R/f'costume129_{cel}-faktisk-Linux.png';shutil.copy2(e['fil'],p);shots.append(dict(fil=p.name,sha256=sha(p),bilde=e['bilde'],visuelt_sett=False))
+save(R/'linux-kontroll.json',dict(visuelt_sett=False,alle45_observert_i_ny_Linux_pakke=True,alle_native_hash_identiske=True,skjermbufferkontroller=1360,nullkontroller=1351,kjente_bufferavvik=9,eksakte_feilkoordinater_og_begge_RGB_identiske=True,bufferfeil=errors,ingen_nye_eller_okte_bufferavvik=True,full_naturlig_gjennomspilling=False,ny_Windows_interaksjon=False,ny_webtest=False,varianter=boards,hele_motorbilder=shots,hele_varianter_sett=0,hele_motorbilder_sett=0,ruter=rows,native=3641,ny_Tom_Claude_godkjenning=False))
+shutil.copy2(__file__,R/'analyser-pakke.py.txt');print('Alle45 i faktisk Linux,1360kontroller/1351null,samme9bufferfeil. Visuell kontroll gjenstår.')

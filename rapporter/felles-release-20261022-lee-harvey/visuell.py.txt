@@ -1,0 +1,9 @@
+from pathlib import Path
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+x=read(R/'linux-kontroll.json');assert x['alle45_observert_i_ny_Linux_pakke'] and x['alle_native_hash_identiske']and(x['skjermbufferkontroller'],x['nullkontroller'])==(1360,1351)
+for g in ['varianter','hele_motorbilder']:
+ for e in x[g]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+for e in x['ruter']:assert sha(Path(e['fil']))==e['sha256'];e['visuelt_sett']=True
+x.update(visuelt_sett=True,hele_varianter_sett=45,hele_motorbilder_sett=4);(R/'linux-kontroll.json').write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'visuell.py.txt');print('Faktisk Linux:45helevarianter og4helebilder visuelt sett.')
