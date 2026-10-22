@@ -1,0 +1,65 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,shutil,time
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-frost-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+state=read(O/'bygg-startet.json');tag=state['release_tag'];code=state['kode'];mod=state['hd_mod'];checks=read(O/'assetkontroll.json');proof=read(R/'linux-kontroll.json');content=read(R/'moddfiler-kontroll.json')
+assert not (O/'publisering-journal.json').exists(),'Undersøk eksisterende utfall, ikke opprett en ny kladd.'
+assert len(checks)==4 and content['begge_faktiske_nedlastinger_verifisert'] and content['begge_modder_byteidentiske'] and content['moddfiler_per_pakke']==21927
+assert proof['visuelt_sett'] and proof['hele_varianter_sett']==23 and proof['hele_motorbilder_sett']==4 and proof['alle23_observert_i_ny_Linux_pakke']
+assert proof['skjermbufferkontroller']==400 and proof['nullkontroller']==396 and proof['eksakte_feilkoordinater_og_begge_RGB_identiske'] and proof['ingen_nye_eller_okte_bufferavvik']
+assert all(e['visuelt_sett'] and sha(R/e['fil'])==e['sha256'] for k in ['varianter','hele_motorbilder']for e in proof[k])
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod
+manifest=read(R/'moddfiler-3684.json');assert len(manifest)==21928 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items())
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True)
+for platform in ['linux','windows']:
+ run=api('actions/runs/'+str(state['plattform'][platform]['run_id']));assert run['conclusion']=='success' and run['head_sha']==code
+prior=api('releases?per_page=100');assert not any(e['tag_name']==tag for e in prior);save(R/'releaser-foer-fellespublisering.json',prior)
+assert not subprocess.check_output(['git','ls-remote','origin','refs/tags/'+tag],cwd=P,text=True).strip()
+body=f'''Felles testutgave for **Linux og Windows med 3684 native HD-bildelag**. Pakkene har 23 nye Lee-Harvey-ruter fra kjøkkenet sammenlignet med forrige fellesutgave. Tidligere grafikk er bevart.
+
+Begge faktiske nedlastinger er kontrollert med sjekksumfiler, fire vedleggsdigester og alle 21927 runtime-modfiler per pakke. Den nye Linux-pakken viser alle 23 rutene fra kostyme 293 i to kontrollerte prøver med animasjon7/raw30 og lokalskript204 etter konstruert fortilstand i rom 56. Motorprøven avslutter normalt med 400 kontroller, 396 uten avvik. De to kjente bufferavvikene per prøve ved rominngang har identiske koordinater og begge fargeverdier som produksjonskontrollen. Etter testaktørstart er alle 320 kontroller uten avvik. Alle 23 figurvarianter og fire hele motorbilder er visuelt sett; alle inkluderte grafikkfiler er byteidentiske med kontrollert produksjon.
+
+Grafikken er fortsatt under arbeid: 505 av 1758 figurark har resultat. fig293_02 er helt levert, mens fig293_01 er delvis 7/10. Rute 1921/1922 har kvalitetsretur, og 1927 holdes etter tidligere verktøyavslag. fig293_03 har23 av32 ruter.1943..1948 og1970..1972 og øvrig grafikk gjenstår. Ingen ny Tom-/Claude-godkjenning, naturlig full gjennomspilling, interaktiv Windows-prøve eller ny webtest. Windows-byggets oppstartstest uten skjerm er bestått.
+
+Linux: last ned AppImage-filen, gjør den kjørbar og start den. Windows: pakk ut hele zip-filen og start «Sam og Max HD.bat». Ctrl+H bytter mellom HD og originalgrafikk; Alt+Enter bytter vindu og fullskjerm.
+
+Pakkekode: {code}
+hd-mod: {mod}
+Kontrollrapport: rapporter/felles-release-20261022-fryservindu på gpt-arbeid.
+
+Spillet og grafikken tilhører Disney/Lucasfilm. Pakkene inneholder spillfiler, tale, HD-grafikk og den patchede ScummVM-motoren for Toms avtalte testing.
+'''
+(R/'utgivelse-notat.md').write_text(body);req=dict(tag_name=tag,target_commitish=code,name='Sam & Max HD: Linux og Windows med nye fryservinduruter',body=body,draft=True,prerelease=False,make_latest='false');save(O/'release-create.json',req)
+journal=dict(tid_utc=datetime.now(timezone.utc).isoformat(),fase='opprettelse_forsokes',tag=tag,kode=code,hd_mod=mod,opplastet=[]);save(O/'publisering-journal.json',journal)
+draft=json.loads(subprocess.check_output(['gh','api','--method','POST','repos/Tombonator3000/Sam-Max-HD/releases','--input',str(O/'release-create.json')],cwd=P,text=True));assert draft['draft'] and draft['tag_name']==tag and not draft['assets'];journal.update(fase='kladd_opprettet',release_id=draft['id']);save(O/'publisering-journal.json',journal);save(R/'release-kladd.json',draft)
+# Bruk kladdens faktiske ID for status; et taggoppslag kan være404 før publisering.
+for e in sorted(checks,key=lambda e:e['bytes']):
+ path=O/e['plattform']/e['fil'];assert sha(path)==e['sha256'];now=api('releases/'+str(draft['id']));assert not any(a['name']==e['fil']for a in now['assets']);journal.update(fase='opplasting_forsokes',fil=e['fil']);save(O/'publisering-journal.json',journal)
+ subprocess.run(['gh','release','upload',tag,str(path)],cwd=P,check=True);journal['opplastet'].append(e['fil']);save(O/'publisering-journal.json',journal)
+now=api('releases/'+str(draft['id']));assert len(now['assets'])==4
+for e in checks:
+ a=next(a for a in now['assets']if a['name']==e['fil']);assert a['digest']=='sha256:'+e['sha256'] and a['size']==e['bytes']
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod;save(O/'release-publish.json',dict(draft=False,make_latest='true'));journal['fase']='publisering_forsokes';save(O/'publisering-journal.json',journal)
+pub=json.loads(subprocess.check_output(['gh','api','--method','PATCH','repos/Tombonator3000/Sam-Max-HD/releases/'+str(draft['id']),'--input',str(O/'release-publish.json')],cwd=P,text=True));assert not pub['draft'] and pub['id']==draft['id'];journal.update(fase='publisert',url=pub['html_url']);save(O/'publisering-journal.json',journal)
+for i in range(6):
+ latest=api('releases/latest')
+ if latest['id']==pub['id']:break
+ time.sleep(3)
+assert latest['id']==pub['id'];downloads=O/'felles-nedlasting';downloads.mkdir()
+for e in sorted(checks,key=lambda e:e['bytes']):
+ subprocess.run(['gh','release','download',tag,'--pattern',e['fil'],'--dir',str(downloads)],cwd=P,check=True);p=downloads/e['fil'];assert p.stat().st_size==e['bytes'] and sha(p)==e['sha256']
+for name in ['SamMaxHD-x86_64.AppImage','SamMaxHD-Windows.zip']:assert (downloads/(name+'.sha256')).read_text().split()[0]==sha(downloads/name)
+after=api('releases?per_page=100');assert len(after)==len(prior)+1
+aset=lambda e:{(a['id'],a['name'],a['size'],a['digest'])for a in e['assets']}
+for e in prior:assert aset(e)==aset(next(v for v in after if v['id']==e['id']))
+assert api('git/ref/heads/hd-mod')['object']['sha']==mod and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items())
+active=[]
+for wf in ['linux.yml','windows.yml']:
+ active.extend(dict(id=r['id'],status=r['status'],gren=r['head_branch'],url=r['html_url'])for r in api('actions/workflows/'+wf+'/runs?per_page=23')['workflow_runs']if r['status']!='completed')
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),url=pub['html_url'],release_id=pub['id'],tag=tag,Latest_bekreftet=True,kode=code,hd_mod=mod,native=3684,nye_native_siden_forrige_felles=23,figurark_med_resultat=505,gjenstaar=1253,begge_faktiske_nedlastinger_og_SHA_bekreftet=True,felles_vedlegg_faktisk_hentet_igjen=True,runtime_moddfiler_per_pakke=21927,publiserte_moddfiler_bekreftet=21928,fire_publiserte_digester_bekreftet=True,tidligere_releaser_bevart=len(prior),tidligere_assets_uendret_etter_bygg=True,linux_run=state['plattform']['linux']['run_id'],windows_run=state['plattform']['windows']['run_id'],motor_observerte_ruter=23,motor_varianter=23,motor_nullkontroller=396,motor_kontroller=400,kjente_bufferavvik_identiske=True,helprove_uten_avvik=False,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,aktive_ekstra_bygg=active,taggbygg_forventes=True,native_frosset=True,merknad_nativefrys='Behold frys til forventet taggbygg er registrert og avsluttet, også ved forsinket registrering.')
+for folder in [O,R]:save(folder/'publisert.json',receipt);save(folder/'release-publisert.json',pub)
+state.update(status='felles_publisert_hentet_og_kontrollert',felles_url=pub['html_url'],native_frosset=True,taggbygg_forventes=True)
+for folder in [O,R]:save(folder/'bygg-startet.json',state)
+c=read(S/'mottak-publisert.json');c.update(i_fellespakke=True,felles_url=pub['html_url'],pakker_native=3684,pakker_mangler_native=0,native_frosset=True,pakker_status='publisert_hentet_kontrollert_taggbygg_avventes');save(S/'mottak-publisert.json',c)
+shutil.copy2(__file__,R/'publiser-felles.py.txt');save(R/'publisering-journal.json',journal);print(json.dumps({k:receipt[k]for k in ['url','native','nye_native_siden_forrige_felles','tidligere_releaser_bevart','aktive_ekstra_bygg']},ensure_ascii=False),flush=True)
