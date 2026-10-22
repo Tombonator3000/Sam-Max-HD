@@ -1,5 +1,9 @@
 # Kontrollerte plattformpakker3701, fellespublisering venter
 
+Nyeste beslutning:Den autoriserte fellespubliseringen bruker alle utførte jobbtester og den uavhengige fullfil-/motorkontrollen. Se CI-jobbgrunnlag.md og ci-jobber-publiseringsgrunnlag.json. Linux sin overordnede status er fortsatt uavklart og beholdes som rådata. Etter publisering beholdes nativefrys gjennom forventet Windows-taggbygg. Les eventuell publisering-journal.json før gjenopptakelse.
+
+Tidligere ventebeslutning nedenfor er historikk.
+
 Fire nye native ruter er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert hver for seg: costume296_1922,1940,1941,1942. Det er én ny egen tegning, S025, og tre hele RGBA-/indeksalias. fig296_04 er helt1/1, fig296_01 delvis3/9 og fig296_03 delvis2/10. Hele figurjobber med resultat er 507/1758; 1251 er uten i tillegg til returer og sluttkontroll. Kostyme 296 har 6/23 native. Ingen ny Tom-/Claude-godkjenning.
 
 Publisert hd-mod er dea35eec5e71766043b58b514f263318b75d712e, grafikkilde f73bc7a47e50fa6128cab573779f75900fbda5e8. Alle 21945 filhash er hentet tilbake og bekreftet. Modden har 3701 native. Alle 21941 tidligere filstier og21935 tidligere PNG-hash er bevart. Seks nye innebygde bildekall ga én valgt tegning og fem kvalitetsreturer. Alle råbilder, faktiske prompter, argumenter og SHA-rutekart er bevart. S025 består uendret3HD-port for134 hudpunkter,56 blåpunkter og14 mørke fester, største2,977921HD. Bare hele tegningen flyttes[1,375,+0,25]HD. Fast4x, egen alfa, ingen originalmaske eller originalfragmenter. Lokale kontrolloppsett er rettet og dokumentert, uten motor-/pipelineendringer.

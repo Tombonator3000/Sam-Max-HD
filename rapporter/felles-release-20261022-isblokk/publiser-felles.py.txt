@@ -1,3 +1,4 @@
+from ci_jobber import linux_jobber
 from pathlib import Path
 from datetime import datetime,timezone
 import json,hashlib,subprocess,shutil,time
@@ -14,7 +15,9 @@ manifest=read(R/'moddfiler-3701.json');assert len(manifest)==21945 and all(sha(P
 source_start=read(S/'start.json');assert all(sha(A/f)==h for f,h in source_start['beskyttede'].items()) and subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==source_start['stash']
 assert not subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True)
 for platform in ['linux','windows']:
- run=api('actions/runs/'+str(state['plattform'][platform]['run_id']));assert run['conclusion']=='success' and run['head_sha']==code
+ run=api('actions/runs/'+str(state['plattform'][platform]['run_id']));assert run['head_sha']==code
+ if platform=='linux':linux_jobber(state)
+ else:assert run['status']=='completed' and run['conclusion']=='success'
 prior=api('releases?per_page=100');assert not any(e['tag_name']==tag for e in prior);save(R/'releaser-foer-fellespublisering.json',prior)
 assert not subprocess.check_output(['git','ls-remote','origin','refs/tags/'+tag],cwd=P,text=True).strip()
 body=f'''Felles testutgave for **Linux og Windows med 3701 native HD-ruter**. Seks isblokkfaser er nye siden forrige fellesutgave 3695. Tidligere grafikk er bevart. Ett nytt helt figurark, fig296_04, er levert og kontrollert; kostyme 296 har 6/23 native ruter.
@@ -31,6 +34,7 @@ hd-mod: {mod}
 
 Spillet og grafikken tilhører Disney/Lucasfilm. Pakkene inneholder spillfiler,tale,HD-grafikk og den patchede ScummVM-motoren for Toms avtalte testing.
 '''
+body+='\nLinux: begge faktiske jobber, inkludert oppstartstest, Debian-test og publisering, er completed/success. Overordnet run/check-suite står foreløpig in_progress uten conclusion. Fellesutgaven bygger på de avsluttede jobbene og den uavhengige fil- og motorkontrollen; GitHub-statusen endres ikke.\n'
 body=body.replace(',',', ').replace('arbeid:506','arbeid: 506').replace('Kostyme293','Kostyme 293').replace(';1927','; 1927')
 (R/'utgivelse-notat.md').write_text(body);req=dict(tag_name=tag,target_commitish=code,name='Sam & Max HD: Linux og Windows med isblokkfaser',body=body,draft=True,prerelease=False,make_latest='false');save(O/'release-create.json',req)
 journal=dict(tid_utc=datetime.now(timezone.utc).isoformat(),fase='opprettelse_forsokes',tag=tag,kode=code,hd_mod=mod,opplastet=[]);save(O/'publisering-journal.json',journal)
@@ -59,7 +63,7 @@ assert api('git/ref/heads/hd-mod')['object']['sha']==mod and all(sha(P/'mods/gpt
 active=[]
 for wf in ['linux.yml','windows.yml']:
  active.extend(dict(id=r['id'],status=r['status'],gren=r['head_branch'],url=r['html_url'])for r in api('actions/workflows/'+wf+'/runs?per_page=11')['workflow_runs']if r['status']!='completed')
-receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),url=pub['html_url'],release_id=pub['id'],tag=tag,Latest_bekreftet=True,kode=code,hd_mod=mod,native=3701,nye_native_siden_forrige_felles=6,figurark_med_resultat=507,gjenstaar=1251,begge_faktiske_nedlastinger_og_SHA_bekreftet=True,felles_vedlegg_faktisk_hentet_igjen=True,runtime_moddfiler_per_pakke=21944,publiserte_moddfiler_bekreftet=21945,fire_publiserte_digester_bekreftet=True,tidligere_releaser_bevart=len(prior),tidligere_assets_uendret_etter_bygg=True,linux_run=state['plattform']['linux']['run_id'],windows_run=state['plattform']['windows']['run_id'],motor_observerte_ruter=6,motor_varianter=6,motor_nullkontroller=316,motor_kontroller=320,kjente_bufferavvik_identiske=True,helprove_uten_avvik=False,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,aktive_ekstra_bygg=active,taggbygg_forventes=True,native_frosset=True,merknad_nativefrys='Behold frys til forventet taggbygg er registrert og avsluttet, også ved forsinket registrering.')
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),url=pub['html_url'],release_id=pub['id'],tag=tag,Latest_bekreftet=True,kode=code,hd_mod=mod,native=3701,linux_ci_metadata_pending=linux_jobber(state)['overordnet_status_uavklart'],nye_native_siden_forrige_felles=6,figurark_med_resultat=507,gjenstaar=1251,begge_faktiske_nedlastinger_og_SHA_bekreftet=True,felles_vedlegg_faktisk_hentet_igjen=True,runtime_moddfiler_per_pakke=21944,publiserte_moddfiler_bekreftet=21945,fire_publiserte_digester_bekreftet=True,tidligere_releaser_bevart=len(prior),tidligere_assets_uendret_etter_bygg=True,linux_run=state['plattform']['linux']['run_id'],windows_run=state['plattform']['windows']['run_id'],motor_observerte_ruter=6,motor_varianter=6,motor_nullkontroller=316,motor_kontroller=320,kjente_bufferavvik_identiske=True,helprove_uten_avvik=False,visuell_sluttgodkjenning=False,ny_Tom_Claude_godkjenning=False,aktive_ekstra_bygg=active,taggbygg_forventes=True,native_frosset=True,merknad_nativefrys='Behold frys til forventet taggbygg er registrert og avsluttet, også ved forsinket registrering.')
 for folder in [O,R]:save(folder/'publisert.json',receipt);save(folder/'release-publisert.json',pub)
 state.update(status='felles_publisert_hentet_og_kontrollert',felles_url=pub['html_url'],native_frosset=True,taggbygg_forventes=True)
 for folder in [O,R]:save(folder/'bygg-startet.json',state)

@@ -1,5 +1,9 @@
 # Gjenoppta ferdig kontrollert pakkesamlepunkt3701
 
+Nyeste beslutning:Den autoriserte fellespubliseringen bruker alle utførte jobbtester og den uavhengige fullfil-/motorkontrollen. Se CI-jobbgrunnlag.md og ci-jobber-publiseringsgrunnlag.json. Linux sin overordnede status er fortsatt uavklart og beholdes som rådata. Etter publisering beholdes nativefrys gjennom forventet Windows-taggbygg. Les eventuell publisering-journal.json før gjenopptakelse.
+
+Tidligere ventebeslutning nedenfor er historikk.
+
 Les bygg-startet.json og ci-sluttregistrering-venter.json først. Linux39833114209 og Windows39833120392 er allerede startet og plattformpakkene publisert, hentet og kontrollert. Ikke dispatch, kanseller eller bygg på nytt for å omgå uavklart status. Native3701 er frosset.
 
 Begge Linux-jobber er completed/success, men overordnet run og check-suite var fortsatt in_progress uten conclusion. Windows er completed/success. Se de lagrede primærdataene. Hent ny status med hent-status.py. Ved fortsatt pending:bevar frys, resultater og arbeid. Ingen brukeravklaring er nødvendig identifisert, men sluttstatus må bli entydig før fellespublisering. Ikke krev ny Tom-godkjenning for allerede autorisert publisering.
