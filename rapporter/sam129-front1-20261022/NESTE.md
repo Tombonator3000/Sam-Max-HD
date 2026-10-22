@@ -1,6 +1,6 @@
 # Neste produksjon
 
-Denne bunken har seks ferdige frontale snakkehoder385 til390. Sluttkandidat 3625 er ferdig kontrollert. Publisering og henting er neste steg; ingen publiseringsstatus gis før mottak-publisert.json finnes. fig129_02 er delvis6 av23, fig129_01 er23 av24. Ikke legg delark som resultat.png og ikke øk antall hele jobber504 av1758.
+Denne bunken har seks ferdige frontale snakkehoder385 til390. Publisert og hentet tilbake i hd-mod 796299f673d001ed86a6c2eac695dd01ec746733. Alle 21869 filhash er bekreftet. Grafikkilde fc85ce63013b3b94df6e038f73ba08048db07c7b. fig129_02 er delvis6 av23, fig129_01 er23 av24. Ikke legg delark som resultat.png og ikke øk antall hele jobber504 av1758.
 
 Fortsett med391 til401 i praktiske bunker på5 til10, deretter422,153,154,512 og768. Det er16 uavhengige produserbare mål igjen i129-familien. Se hele originaler, faktisk spillkontekst og godkjente mastere før hvert motiv. Flere51x82-lag inneholder bare hoder; små lag må også ses kildebekreftet i scenen. Ikke gjenbruk en hard originalmaske for å klippe ny kunst.
 
