@@ -1,0 +1,9 @@
+# Fortsettelse etter første293-bunke
+
+Gjenoppta1921/1922-returene uten å duplisere de syv ferdige. Alle tidligere råbilder og faktiske prompter ligger i kall/. Forberedt V03RRRR er IKKE kjørt. Kildepikslene viser innadrettede pupiller i de to hukeposene:1921 har krem(62,14)/svart(63,14) og svart(67,14)/krem(68,14);1922 tilsvarende krem58/svart59 og svart63/krem64. Alle koordinater er nullbasert i hele kildelerretet. Tidligere hodeforsøk flyttet hode/øye for mye. Ingen Python-featureflytting eller lavere måleporter. Maskefjeset i de siste utkastene er korrekt og skal ikke bli to ovale hull igjen. Ny retting må fortsatt se hele originalen,motorflate og godkjente mastere før kall.
+
+1927 er toolavvist uten råbilde og holdes uten omprøving eller API/CLI-fallback. Ingen andre hele RGBA-kilder er identiske med1927.
+
+Neste uavhengige bunke er fig293_02,1930..1942. Tretten mål,aktuelle ekte aliaser må bekreftes mot hele RGBA og lerretstørrelse. Hele startsekvensen23 er sett i motoren,og faktiske kontrollflater finnes i siste kandidat3648v2-start1final. Rebruk de opprinnelige kontekstfilene etter hashkontroll,ikke tidligere forkastede figurer som identitet. Behold kildebekreftet avkapping når figuren går ut ved venstre kant. Deretter293_03 med32 mål i fryseren. Motivet og alle overgangsfaser i animasjon7 må avklares før produksjon. Råvalg30 er tilgjengelig i headeren,men ny motoravspilling må bekrefte faktisk animasjon før kall. Ikke hopp til245 før uavhengige293-jobber er vurdert.
+
+Fellespakker har3641,med syv nye utenfor pakkene etter publisering av denne bunken. Lag pakkesamlepunkt etter neste praktiske293-bunker/familieavslutning. Ingen ny web- eller interaktiv Windows-prøve her.504/1758 hele figurark,1254 uten pluss returer/sluttkontroll. Bevar1432 beskyttede kilder,alle tidligere publiserte filer og tre stasher. Bare dokumentasjon direkte i main. Automasjonen fortsetter uten gammel nattfrist.

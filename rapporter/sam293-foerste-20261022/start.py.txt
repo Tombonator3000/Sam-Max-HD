@@ -1,0 +1,41 @@
+from pathlib import Path
+from collections import Counter,defaultdict
+from PIL import Image
+from smhd.gamedata import load,read_index,read_rooms
+from smhd.v6grafikk import decode_costume
+import json,hashlib,subprocess,shutil,importlib.util,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+assert not R.exists() and not git(P,'status','--porcelain') and not git(A,'status','--porcelain')
+old=read(A/'rapporter/sam129-rest-20261022/start.json');files=read(A/'rapporter/felles-release-20261022-lee-harvey/moddfiler-3641.json')
+assert len(files)==21885 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+assert len(old['beskyttede'])==1420 and all(sha(A/f)==h for f,h in old['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==old['stash']
+for w,branch,h in [(P,'main','4f5b21df77953d3e19cb8ca9f10cb38022e6a5dc'),(A,'gpt-arbeid','5a18996360ba7589edfd403e443ed400e2206def')]:
+ assert git(w,'rev-parse','HEAD')==git(w,'ls-remote','origin','refs/heads/'+branch).split()[0]==h
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]=='d4b182a532ae139f4bb663cc835fabdffcc8cab6'
+assert read(P/'mods/gpt/mod.json')['costume_cels']==3641
+assert len(list(A.glob('jobber/fig*/resultat.png')))==504
+protected=dict(old['beskyttede']);rows=[];jobs=[];groups=defaultdict(list)
+for J in sorted((A/'jobber').glob('fig293_*')):
+ assert not (J/'resultat.png').exists() and not (J/'retur.md').exists();d=read(J/'jobb.json');jobs.append(dict(jobb=J.name,ruter=len(d['ruter'])))
+ for f in ['jobb.json','referanse.png','original_1x.png','prompt.txt']:protected[(J/f).relative_to(A).as_posix()]=sha(J/f)
+ for e in d['ruter']:
+  src=P/'work/extract/costumes'/(e['bilde']+'.png');im=Image.open(src).convert('RGBA');h=hashlib.sha256(im.tobytes()).hexdigest();groups[(im.size,h)].append(e['bilde']);rows.append(dict(jobb=J.name,bilde=e['bilde'],rute=int(e['bilde'].split('_')[1]),lag=e['lag'],animasjon=e['animasjon'],retning=e['retning'],kilde=str(src),sha256=sha(src),rgba_sha256=h,maal=list(im.size),synlig_bbox=list(im.getbbox())))
+assert len(jobs)==3 and len(rows)==55 and len(protected)==1432
+for e in rows:e['canonical']=groups[(tuple(e['maal']),e['rgba_sha256'])][0]
+assert all(not(P/'mods/gpt/costumes'/(e['bilde']+'_hd.png')).exists()for e in rows)
+R.mkdir(parents=True)
+save(R/'start.json',dict(main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),hd_mod='d4b182a532ae139f4bb663cc835fabdffcc8cab6',native=3641,filer=files,beskyttede=protected,stash=old['stash'],figurark=504,nye_numre=list(range(1920,1930)),bibliotek=['figurark-fast-storrelse','scumm-v6-kostymer-skygge-og-soppelruter','publisert-mod-er-fasit'],bibliotek_kompatibilitet='Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e. Python/Pillow/scipy. CORE128, IoU0.6, dekning0.8,4x,2 originalpikslers margin. Ingen originalmaskeklipping.'))
+save(R/'kildeplan.json',dict(jobber=jobs,ruter=rows,maal=55,ulike_hele_rgba=len(groups),bildekall=0,levert_og_publisert=[],hele_originalark_sett=['fig293_01','fig293_02','fig293_03'],neste='fig293_01',beskyttede=len(protected)))
+idx=read_index(P/'game/SAMNMAX.000');data,_=load(P/'game/SAMNMAX.001');rooms=read_rooms(P/'game/SAMNMAX.001');room,off=idx.costume_dir[293];assert room==56;c=decode_costume(data,rooms[room].offset+off)
+save(R/'kostyme293-header.json',dict(num_anim=c.num_anim,format=c.format,mirror=c.mirror,rom=room,raw_valg=sorted({a['valg']for a in c.animations}),advarsler=c.errors,palett=list(c.palette),animasjoner=c.animations));save(R/'kostyme293.json',read(P/'work/extract/costumes.json')['293'])
+spec=importlib.util.spec_from_file_location('dekompiler293',P/'tools/dekompiler_skript.py');m=importlib.util.module_from_spec(spec);sys.modules[spec.name]=m;spec.loader.exec_module(m);idata,_=m.load(P/'game/SAMNMAX.000');tasks,info=m.finn_jobber(data,idata);tasks=[j for j in tasks if j.rom==56]
+prev=read(A/'rapporter/sam250-kilde-20261021/dekompilering49.json');desc=m.finn_descumm(prev['descumm']);assert sha(desc)==prev['descumm_sha256'];W=P/'work/sam293-kilde-20261022/skript';assert not W.exists();W.mkdir(parents=True)
+out=[]
+for i,j in enumerate(tasks):
+ result=m.kjor(desc,j,W/('tmp-'+str(i)+'.bin'));m.skriv(W,j,result);out.append(dict(sort=j.sort,filer=j.filer,status=j.status,melding=j.melding,advarsler=j.advarsler))
+save(R/'dekompilering56.json',dict(descumm=str(desc),descumm_sha256=sha(desc),jobber=out,status=dict(Counter(j.status for j in tasks))))
+shutil.copy2(__file__,R/'start.py.txt');print('55 mål,',len(groups),'ulike hele RGBA,',len(protected),'beskyttede. Råvalg',sorted({a['valg']for a in c.animations}),'numAnim',c.num_anim,'skript',dict(Counter(j.status for j in tasks)),flush=True)
