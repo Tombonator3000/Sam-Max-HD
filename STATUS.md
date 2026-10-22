@@ -1,5 +1,19 @@
 # Status
 
+## Gjeldende grafikkstatus, 2026-10-22 03:24
+
+Sju nye Lee-Harvey/Max-ruter er publisert og hentet tilbake i hd-mod 9270b2603f730106f7db14ff03511426bb3a1f08,3596 native totalt. Åtte mål er tegnet og teknisk mottatt fra sju hele egne malerier.1861 er holdt etter flere feilpiksler under uttoning i3597-diagnosen; resten av modden økes bare med de sju kontrollerte rutene. fig124_08 er helt levert med tre mål, to native publisert og én holdt. fig124_07 er delvis med fem tegnede/publiserte mål og sju tomme plasser og telles ikke som helt levert.504 av1758 figurark har resultat,1254 er uten resultat pluss returer og sluttkontroll. Ingen Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+Alle21840 publiserte filhash er bekreftet. Samtlige21833 tidligere stier og21827 tidligere PNG,1412 beskyttede kilder og tre stasher er bevart. Hele prototyper, ark/delark, sju motorvarianter og fire hele motorbilder er sett. Både3589 og3596 har711 av720 nullkontroller og de samme ni kjente avvikene, nøyaktige koordinater og begge RGB-verdier i samme rekkefølge. Originalaktørverdier er identiske; ingen uforklarte endringer utenfor nye ruter etter sammenligning ved samme separate129-hodefase. Ingen tvunget lokalskript, testaktør eller skjult aktør, men heller ikke full naturlig gjennomspilling.
+
+B02/1848 fikk outputavslag i bildeverktøyet, request b9827304-d41b-48c6-a1da-8f27f3b0665d. Ingen retry eller bildefallback.1849 til1854 er ikke prøvd denne gangen og er ikke individuelt registrert avvist.1804 står fortsatt åpen fra forrige retur.1861 trenger avgrenset motorundersøkelse og testet PR ved kodeendring; ikke endre alfa eller mottaksporter for å skjule feilen.
+
+Felles Linux-/Windows-pakker bygges nå fra kode 95abbda7807ed5cb5f634088613927208f998b30 med native3596 frosset på 9270b2603f730106f7db14ff03511426bb3a1f08. Linux39705416172 og Windows39705419577. Forrige fellesutgave har3535 og mangler61 publiserte native. Ikke kall ny utgave oppdatert før faktiske nedlastinger, sjekksummer, hver inkludert grafikkfil og relevant Linux-avspilling er kontrollert. Se rapporter/felles-release-20261022-gatorgolf. Ingen ny webtest eller interaktiv Windows-prøve. Automatisk produksjon er ACTIVE; ikke gjenstart gamle nattprosesser. Alt er ikke ferdig.
+
+Grafikkilde 7c26ac94e4359b4b1c235788d3a6da738b4b70b8, kvittering e4111d9511b8f55f6c843b67aaf3c091accd03bf. Bevis: rapporter/sam124-siste-to-20261022 på gpt-arbeid, særlig mottak-publisert.json, motor07-sammenligning.json, retur1861.json og NESTE.md. Bare fire dokumenter endres i main. Ingen ny motor-, pipeline- eller nettstedskode.
+
+Tidligere status nedenfor er historikk.
+
 ## Gjeldende grafikkstatus, 2026-10-22 02:47
 
 22. oktober 2026: fig124_06 er publisert og hentet tilbake med 16 nye Lee-Harvey/Max-ruter, 3589 native totalt. Ett nytt ark gir 503 av 1758 figurark med resultat, 1255 uten resultat pluss returer og sluttkontroll. Alle 16 er laget, egenkontrollert OK, native mottatt, motorobservert og visuelt sett. Ingen Tom-/Claude-godkjenning eller visuell sluttgodkjenning. Native er e7d3b25a6601a006d0b014ce79768cfd3d753316, grafikkilde 8c12addf849d9c39ddedafd5132c051fdfa6e9bc. Se rapporter/sam124-siste-20261022/mottak-publisert.json.
