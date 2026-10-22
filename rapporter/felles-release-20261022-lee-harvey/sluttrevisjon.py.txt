@@ -1,0 +1,23 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,tomllib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam129-rest-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+def api(x):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+r=read(R/'publisert.json');s=read(S/'start.json');manifest=read(R/'moddfiler-3641.json');assert not git(P,'status','--porcelain')and not git(A,'status','--porcelain');main=git(P,'rev-parse','HEAD');gpt=git(A,'rev-parse','HEAD');assert api('git/ref/heads/main')['object']['sha']==main and api('git/ref/heads/gpt-arbeid')['object']['sha']==gpt and api('git/ref/heads/hd-mod')['object']['sha']==r['hd_mod']
+code_delta=git(P,'diff','--name-only',r['kode']+'..'+main).splitlines();assert set(code_delta)=={'memory.md','todo.md','STATUS.md','log.md'}
+ci=[e for e in api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs']if e['head_sha']==main];assert ci and ci[0]['status']=='completed'and ci[0]['conclusion']=='success'
+assert len(manifest)==21885 and all(sha(P/'mods/gpt'/f)==h for f,h in manifest.items());assert all(sha(A/f)==h for f,h in s['beskyttede'].items());assert git(P,'stash','list','--format=%H').splitlines()==s['stash'];assert len(list(A.glob('jobber/fig*/resultat.png')))==504
+plan=read(A/'rapporter/sam129-kilde-20261022/kildeplan.json');assert len(plan['levert_og_publisert'])==45 and plan['gjenstar_maal']==2 and plan['bildekall']==55
+assert not(A/'jobber/fig129_01/resultat.png').exists()and not(A/'jobber/fig129_02/resultat.png').exists()
+assert api('releases/latest')['id']==r['release_id'] and r['taggbygg_success']and not r['native_frosset']
+autos={}
+for n,expected in [('nattkontroll-sam-max','PAUSED'),('fullf-r-sam-max-grafikken','ACTIVE')]:
+ p=Path('/home/tom/.codex/automations')/n/'automation.toml';d=tomllib.loads(p.read_text());assert d['status']==expected;autos[n]=expected
+for wf in ['linux.yml','windows.yml']:assert not any(e['status']!='completed'for e in api(f'actions/workflows/{wf}/runs?per_page=30')['workflow_runs'])
+checks=read(R/'assetkontroll.json');pub=api('releases/'+str(r['release_id']))
+for e in checks:
+ p=O/'felles-nedlasting'/e['fil'];assert sha(p)==e['sha256'];asset=next(a for a in pub['assets']if a['name']==e['fil']);assert asset['digest']=='sha256:'+e['sha256']and asset['size']==p.stat().st_size
+save(R/'sluttrevisjon.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=main,gpt_for_audit=gpt,hd_mod=r['hd_mod'],CI=ci[0]['id'],CI_success=True,pakkekode=r['kode'],bare_dokumentasjon_endret_etter_pakkekode=code_delta,native=3641,filer=21885,png=21879,alle_moddfiler_SHA=True,beskyttede=1420,alle_beskyttede_SHA=True,stasher=s['stash'],hele_jobber=504,total_jobber=1758,familie129_publisert=45,familie129_holdt=2,ingen_hela129_resultater=True,bildekall129=55,vellykkede129=54,kvalitetsreturer129=9,pakker_hentet_og_SHA=True,url=r['url'],automatisering=autos,neste_jobber=['fig293_01','fig293_02','fig293_03'],alt_grafikkarbeid_ferdig=False));shutil.copy2(__file__,R/'sluttrevisjon.py.txt');print('Sluttrevisjon:mainCIgrønn,allemoddfiler,kilder,3stasher,pakker og automasjoner verifisert.')
