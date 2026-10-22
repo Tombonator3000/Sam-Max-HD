@@ -1,0 +1,9 @@
+# Siste to ark med Lee-Harvey og Max
+
+Fig124_07 og fig124_08 har 15 mål fra 13 ulike hele RGBA-kilder. Alle 15 er sett i det originale rominngangsforløpet i rom 25, lokal 217. Konteksten er nå SHA-festet til de faktiske originalflatene fra den ferdig kontrollerte 3589-prøven i forrige bunke, uten tvunget lokalskript, skjulte aktører eller konstruert aktør. Kildens posisjon og mål er identiske med den tidligere kildeundersøkelsen.
+
+Lee-Harvey er mennesket med brun oppstående lugg, rosa hud, rød trøye og nesten svart marineblå drakt. Han bøyer seg frem over Max og reiser seg igjen. I flere faser er hodet skjult av ryggen; et nytt ansikt skal ikke tegnes inn. Max blir en kompakt vridd kremhvit figur med kildens løkker, ører og utstikkende deler. Ingen tau, sekker, bandasjer eller nye rekvisitter. Behold originalens presise overganger, klesmansjetter, håndbevegelser, klipping og antall synlige deler. Siste talefase 1859 er en kropp uten hode; et separat hodelag gjør den hel i motoren.
+
+Indekssammenligningen i siste15-underlag-indekser.json viser at alle kildens fotnivåfarger 247, 248, 249, 252, 253 og 254 i 1855 til 1861 er eksakt eksisterende Sam-objekt 258. Det finnes ingen mørkere kontakt i disse fasene. Ny forgrunn males samlet med ekte fri alfa over dette underlaget. Ingen hard originalformmaske, nye løse klesfliker eller oppdiktet skygge. Originaler og jobbkort er uendret.
+
+Godkjente Sam-/Max-hovedark gir stilen. Hele originalen bestemmer anatomi og farge per flate. Bibliotekets figurark-fast-storrelse brukes i samme ScummVM/Python-pipeline med uendrede porter: CORE 128, IoU 0,6, dekning 0,8, fast 4x, begrenset helskalering og ekte alfa. Se hver hel kilde, faktisk originalkontekst og mastere før bildekall. Tidligere kildefunksjonsfeil 1804 er fortsatt åpen og omprøves ikke ved å senke terskler.

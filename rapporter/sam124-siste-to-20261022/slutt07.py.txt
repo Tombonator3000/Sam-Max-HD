@@ -1,0 +1,69 @@
+from pathlib import Path
+import json,hashlib,re,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+s=read(R/'start.json');m=read(R/'motor07-sammenligning.json');v=read(R/'motor07-visuell-plan.json');native=read(R/'egen-native.json');chosen={e['bilde'] for e in native['ruter']}
+assert len(chosen)==7 and m['alle7_observert'] and m['ingen_nye_eller_okte_bufferavvik']
+assert (m['primaer_kontroller'],m['primaer_null'])==(720,711)
+for group in ['varianter','hele_motorbilder']:
+ for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=7,hele_motorbilder_sett=4);save(R/'motor07-visuell-plan.json',v)
+m['visuelt_sett']=True;m.update(separat_hode129_samme_faktiske_fase_i_sammenlignede_rammer=True,holdt1861_fordi3597_har_flere_bufferavvik=True);save(R/'motor07-sammenligning.json',m)
+rows=read(R/'motor07-pikselkontroll.json')
+for e in rows:e['visuelt_sett']=True
+save(R/'motor07-pikselkontroll.json',rows)
+f=read(R/'fremdrift.json')
+for e in f['leveranser']+f['delvise_leveranser']:
+ e.update(visuelt_kontrollert=True,hele_arket_sett=True,motorobservert=True,motor_observerte_ruter=e['ruter'],motor_kontrollerte_native_ruter=2 if e['jobb']=='fig124_08' else 5,holdt_native=['costume124_1861'] if e['jobb']=='fig124_08' else [])
+ path=R/('rutekart-'+e['jobb']+'.json');d=read(path)
+ for q in d[e['jobb']]['ruter']:
+  q.update(motorobservert=True,motor_visuelt_sett=q['bilde'] in chosen,native_valgt_for_publisering=q['bilde'] in chosen)
+  if q['bilde'] not in chosen:q['holdt']='Flere bufferavvik i uttoning, se retur1861.json'
+ save(path,d)
+ note=A/'jobber'/e['jobb']/'notat.md'
+ with note.open('a') as out:out.write(f'\nKontrollkvittering: helt ark/delark og alle sju valgte native-varianter er visuelt sett i faktisk motor. Primær720 har711 null og de samme ni gamle avvikene, eksakte koordinater og begge RGB-verdier i samme rekkefølge. Torso1859 er sammenlignet med samme separate hode129-fase. Ingen uforklarte endringer utenfor nye ruter.1861 er holdt etter3597-prøven med flere bufferpiksler under uttoning, selv om tegningen består teknisk mottak. Ingen Tom-/Claude-godkjenning.\n')
+f.update(laget_nye_ruter=8,egenkontrollert_nye_ruter=8,automatisk_native_OK=8,motorobservert_nye_ruter=8,motor_kontrollerte_valgte=7,visuelt_sett_valgte=7,hele_nye_ark=1,delark=1,holdt_native=1);save(R/'fremdrift.json',f)
+assert all(sha(A/p)==h for p,h in s['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==s['stash']
+proof=dict(leveranser=f['leveranser'],delvise_leveranser=f['delvise_leveranser'],valgte_native=7,holdt_native=1,holdt_bilde='costume124_1861',ark_med_resultat=504,totalt_figurark=1758,uten_resultat=1254,prototype_visuelt_sett=7,hele_ark_sett=1,hele_delark_sett=1,motorobservert=7,motor_visuelt_sett=7,hele_motorbilder_sett=4,visuelt_sett=True,visuell_sluttgodkjenning=False,Tom_godkjent=False,Claude_godkjent=False,native_antall_grunnlag=3589,native_antall_kandidat=3596,native_filer_grunnlag=21833,native_filer_kandidat=21840,alle_tidligere_native_png_bevart=21827,beskyttede=1412,stash=s['stash'],offisielle_mottaksporter_uendret=True,ingen_FEIL_i_valgte_ruter=True,hele_fig124_07_er_ikke_levert=True,rute1804_er_aapen_retur=True)
+save(R/'sluttkontroll.json',proof)
+lead=f'''22. oktober2026: åtte nye Lee-Harvey/Max-ruter er tegnet og teknisk mottatt, sju er valgt for additiv publisering i kandidat3596. fig124_08 er helt levert med tre mål, fig124_07 har fem tegnede mål og sju tomme plasser og telles ikke levert.504 av1758 figurark har resultat,1254 uten resultat pluss returer og sluttkontroll. Sju valgte ruter er motorobservert og visuelt sett, uten nye/økte bufferavvik.1861 holdes:3597-prøven viste flere feilpiksler under uttoning. Alle råbilder, feil og kandidater er bevart. Ingen Tom-/Claude-godkjenning. Se rapporter/{R.name}/RAPPORT.md.
+
+B02/1848 ble avvist av verktøyets outputkontroll, request b9827304-d41b-48c6-a1da-8f27f3b0665d. Ingen retry.1849 til1854 er ikke prøvd denne gangen og står fortsatt åpne. Gammel1804-retur er også åpen. Ikke gjenta avvist motiv, ikke senk porter eller legg tilbake originalfragmenter. Neste samlepunkt er nå Linux-/Windows-pakker, som fortsatt har3535 og vil mangle61 publiserte ruter etter denne bunken. Deretter avgrenset motorundersøkelse av1861/uttoning og uavhengig videre grafikk. Automatikken fortsetter, alt er ikke ferdig.'''
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;t=p.read_text();t,n=re.subn(r'<!-- sam124-06-status:start -->.*?<!-- sam124-06-status:slutt -->',lambda _: '<!-- sam124-06-status:start -->\n'+lead+'\n<!-- sam124-06-status:slutt -->',t,count=1,flags=re.S);assert n==1;p.write_text(t)
+(R/'RAPPORT.md').write_text('''# Lee-Harvey/Max, siste to ark, 22. oktober2026
+
+'''+lead+'''
+
+## Kilde, produksjon og alfa
+
+Bibliotekskilden figurark-fast-storrelse er brukt i samme testede ScummVM/Python/Pillow/numpy-pipeline. Hele kilder, faktisk spillkontekst og godkjente hele Sam-/Max-hovedark er sett før hvert motiv. Sju vellykkede innebygde image_gen-kall gir sju hele malerier og ett dimensjons- og byteidentisk helt kildealias1860 fra1857. Åtte kall totalt, ett outputavslag på1848; ingen nytt forsøk på dette motivet eller CLI/API-fallback.1849 til1854 er ikke forsøkt. Modellnavn ble ikke oppgitt. Faktiske prompter, argumenter, råbilder og referansehash er bevart i kall/.
+
+Python renser bare egen alfa og egen RGB-kant og plasserer hele malerier i fast4x. Blåkant følger kildeindeks198; alfa er bitidentisk i RGB-steget. Alle kildebekreftede deler beholdes, unntatt dokumentert statisk gjenmaling av Sams allerede tegnede underlag, som er ekte gjennomsiktig. Ingen original formmaske, kroppsdelskollasj eller originalfragmenter. Full originalalfa brukes i uendrede nativeporter CORE128, IoU0,6, dekning0,8. Dokumentert aktørboks styrer helplassering, ikke en hard klippemaske.
+
+## Kontroller og returer
+
+fig124_08 har egenkontroll3/3 OK. fig124_07-delskissen har fem valgte ruter uten FEIL og sju forventede tomme ruter med FEIL; hele arket er ufullført, ingen resultat.png i jobbmappen. Automatisk mottak bruker eksakt uendrede jobb.json i diagnostisk gren:8 OK,7 mangler,0 sjekk,0 teknisk. Diagnostikk er ikke fullarkgodkjenning. Kandidaten velger bare sju mottatte native, ikke1861.
+
+Alle sju valgte native er vist i den faktiske rom25-inngangen/lokal217, ingen tvunget lokalskript, testaktør eller skjult aktør. Hele prototyper, helt ark/delark, sju motorvarianter og fire hele motorbilder er visuelt sett. Torso1859 har separat hode129; bildepikslene ble først sammenlignet ved ulik munnfase, noe som ga én uforklart piksel. Diagnosen er bevart. Endelig sammenligning krever samme faktiske hodefase og beholder alle porter.
+
+3589 og3596 fullfører720 kontroller hver,711 null og samme ni kjente bufferavvik med nøyaktig samme koordinater og begge RGB-verdier i samme rekkefølge. Ingen nye/økte avvik. Alle originale aktørverdier er identiske. Forskjeller utenfor nye ruter klassifiseres bare ved faktiske kildeendringer, dokumenterte vannsykler og faktisk endrede alligator126-faser med identiske eksisterende idx-filer. Ingen uforklarte restpiksler. Ikke full naturlig gjennomspilling og ikke avviksfri motor.
+
+3597-diagnosen med alle åtte nye native ga flere feilpiksler i ni uttoningsrammer; hele gjenoppbygde flaten var svart mens skjermbufferen hadde kantverdier.1861 er derfor bevart som teknisk OK tegning, men holdt utenfor native3596. Selve motorårsaken er ennå uavklart, og krever en avgrenset undersøkelse og testet PR ved retting. Ingen alfaendring eller terskelsenkning brukes til å skjule feilen. Gammel1804-retur er uendret og fortsatt holdt.
+
+## Bevaring og publisering
+
+Kandidat3596 har21840 filer og21834 PNG. Alle21833 tidligere stier og21827 tidligere PNG,1412 beskyttede jobbfiler og tre eksisterende stasher er bevart. Ingen spillgrafikk, motor- eller pipelineendring i main. Publisering skal skje fra fersk fjern-SHA med eksakt force-with-lease og tilbakehenting av alle filhash. Kvitteringen kommer i mottak-publisert.json. Tidligere mod bevares fysisk. Fellespakkene oppdateres ved dette samlepunktet og kalles først oppdatert etter faktisk nedlasting og innholdskontroll på begge plattformer.
+''')
+(R/'NESTE.md').write_text('''# Neste arbeid
+
+Fullfør publisering av bare sju ruter fra egen-native.json.3597 er diagnostisk og skal ikke publiseres. Bevar1861-retur og B02-avslag uten retry.
+
+Neste samlepunkt: bygg felles Linux-/Windows fra samme kode og frosset publisert3596. Last ned begge pakker, sjekk sjekksummer, hver inkludert grafikkfil og relevant faktisk Linux-motor før oppdatert-status. Web og interaktiv Windows er ikke testet her.
+
+Deretter undersøk den konkrete uttoningsfeilen med3597/1861 og gammel3573/3589/3596 som kontroll. Bevar råfiler og offisielle porter; rett eventuell motorfeil bare i testet PR.1804 trenger fortsatt kildefunksjonsavklaring i arkkontrollen via testet PR eller kildetro heltegning som består uendrede porter. Ikke mal falske Sam-fragmenter.
+
+fig124_07 mangler1848 til1854.1848 har outputavslag request b9827304-d41b-48c6-a1da-8f27f3b0665d.1849 til1854 er ikke prøvd, ikke merk dem individuelt avvist. Ikke gjenta samme avviste motiv eller hele RGBA-aliaset. Fortsett andre uavhengige produserbare figurer fra siste kildeplan, etter å ha lest kilder/kontekst/mastere og returer. Det er1254 ark uten resultat pluss returer. Ingen ny Tom-/Claude-godkjenning.
+''')
+shutil.copy2(__file__,R/(Path(__file__).name+'.txt'));print('Sju valgte native visuelt kontrollert; åtte laget/tekniskOK, én motorretur, ett nytt helt ark.',flush=True)

@@ -1,0 +1,57 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json, hashlib, shutil, sys, numpy as np
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+name,number,detail=sys.argv[1:4]; cel='costume124_'+number
+row=next(e for e in read(R/'kildeplan.json')['ruter'] if e['bilde']==cel); C=R/'kall'/name
+assert not C.exists(); C.mkdir(parents=True)
+src=Image.open(row['kilde']).convert('RGBA'); assert sha(Path(row['kilde']))==row['sha256']
+assert hashlib.sha256(src.tobytes()).hexdigest()==row['rgba_sha256']
+idxfile=P/'work/extract/costumes'/(cel+'_idx.png'); idx=np.array(Image.open(idxfile)); arr=np.array(src)
+static=(arr[:,:,3]>0)&np.isin(idx,[247,248,249,252,253,254]); count=int(static.sum())
+proof=next(e for e in read(R/'siste15-underlag-indekser.json')['ruter'] if e['bilde']==cel)
+assert count==proof['bakgrunnsgjenmaling'] and proof['all_gjenmaling_eksakt_objekt258']
+scale=min(10,832//max(src.size)); atlas=Image.new('RGBA',(1024,1024),'#536576')
+atlas.alpha_composite(src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST),((1024-src.width*scale)//2,(1024-src.height*scale)//2))
+atlas.convert('RGB').save(C/'originalatlas.png'); src.save(C/'original-alfa.png')
+assert sha(Path(row['kontekst']))==row['kontekst_sha256']; shutil.copy2(row['kontekst'],C/'spillkontekst.png')
+refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst.png']
+background='This source has no static Sam-underlay scraps. Preserve every actual component in the entire original cel.'
+if count:
+    function=Image.new('RGBA',(1500,900),'#536576'); dr=ImageDraw.Draw(function)
+    marked=arr.copy(); marked[static,:3]=[40,220,255]
+    im=Image.fromarray(marked).resize((src.width*5,src.height*5),Image.Resampling.NEAREST); function.alpha_composite(im,(10,45))
+    dr.text((10,8),'Whole source; cyan = existing Sam underlay, NOT new clothes',fill='white')
+    for i,f in enumerate([P/'work/extract/objects/obj258_01.png',P/'mods/gpt/objects/obj258_01.png']):
+        im=Image.open(f).convert('RGBA'); im.thumbnail((720,380)); function.alpha_composite(im,(750,40+i*420))
+        dr.text((750,15+i*420),['Whole original Sam object258','Whole already published Sam HD underlay'][i],fill='white')
+    function.convert('RGB').save(C/'underlagsfunksjon.png'); refs.append(C/'underlagsfunksjon.png')
+    background=f'''Image5 is a FUNCTION DIAGRAM, never an edit target or anatomy/style authority. Its cyan marking identifies {count} source pixels at foot level that exactly restore the already-present fallen Sam jacket and brown shoes, shown separately in the complete original and published HD object258. Those blue-gray and orange-brown scraps are NOT Lee-Harvey's clothes, boot parts, a floor, a pedestal or new props. Leave that existing underlay genuinely transparent in the new foreground cel so the separately painted Sam shows through. This phase has ZERO darker contact footprint on Sam: do not add a ground/contact shadow. Preserve all of Lee-Harvey's own dark boots, blue edging, own gray collar and cuffs, and all real cream Max parts. Paint the entire foreground together with smooth free alpha, never clip it to a hard original mask or assemble separate body parts.'''
+pink=int(np.isin(idx,[203,205]).sum())
+skin_rule=('There are ZERO visible human skin pixels. The rear hair and dark collar cover the head/neck, and the hands are occluded. No pink ears, neck ring, face or hands may be invented.' if pink==0 else 'Only the source-confirmed pink hand/face areas may be shown. No additional face or ears in an occluded head phase.')
+prompt=f'''Use case: illustration-story.
+Asset: one complete exact animation cel for Sam & Max Hit the Road HD.
+Input roles: Image1 is the entire actual source cel enlarged on a slate inspection background. It controls pose, whole silhouette, proportions, per-area colors, component count, occlusion and deliberate clipping. Image2 is the complete approved Sam style/identity master. Image3 is the complete approved Max style/identity master. Image4 is the actual ORIGINAL game scene for context only. Do not copy scenery or other actors from it.
+Redraw this entire single source cel as ONE unified smooth cartoon painting on true transparent background. Keep its original full layout and framing, exact relative head/body/hand sizes, negative spaces and attachment points. Every part belongs to this one whole painting, never a collage. The source pixel clusters specify shapes and measurements; turn them into clean continuous dark hand-drawn outlines with flat faithful colors and one shade. No enlarged pixels, stair-step edges, dithering, texture, gradients, extra shiny highlights, glow, outlines around shadows, floor, labels, grid, scenery or props. Do not mirror, rotate, rearrange or complete hidden anatomy. Do not enlarge heads, hands or eyes.
+Exact phase meaning: {detail}
+Identity: Lee-Harvey is the tall HUMAN thug with the source's brown quiff, pink skin, red shirt, nearly black/navy jacket and trousers, source dark gray yoke/collar/cuffs and dark boots with blue edging RGB0,43,103. He is not Sam, not a blond man and not Conroy in orange. Keep each garment area the original color. No belt buckle, buttons, new pockets, toe glints or invented panels. Only show the hair, face or skin actually visible in THIS phase. The source has {pink} pink human source pixels across the whole cel; copy their actual placements, never invent ears or a face from the context.
+{skin_rule}
+Max is the cream rabbit-like character, in this exact compressed/occluded original phase. Follow the source's cream silhouettes and fine tan fold/loop strokes. Do not turn Max into rope, a sack, bandages or smoke. Do not add a generic grin, eyes, pink nose, salmon ear interiors, tail or paw pads where this original phase does not show them. The master specifies style, not a substitute pose or expression.
+{background}
+Output one 1024x1024 PNG with genuine antialiased alpha and generous transparent margin, no painted backdrop or checkerboard. Full original source extent is {src.width}x{src.height} pixels. Whole-cel identity: {cel}.'''
+args=dict(prompt=prompt,referenced_image_paths=[str(f)for f in refs],transparent_background=True)
+(C/'faktisk-prompt.txt').write_text(prompt+'\n'); save(C/'faktiske-argumenter.json',args)
+save(C/'plan.json',dict(ruter=[dict(row,canonical_rgba_sha256=row['rgba_sha256'],egen_bla_kantrens=True,maalegrundlag_aktor_bbox=proof['maaleboks_uten_bekreftet_underlag'])],detaljer=detail,underlag_piksler=count,underlag_idx_sha256=sha(idxfile),referanser={str(f):sha(f) for f in refs},kilde_og_mastere_sett_foer_kall=False,originalmaske=False,originalfragmenter=False))
+board=Image.new('RGB',(1800,1800 if count else 1400),'#536576'); dr=ImageDraw.Draw(board)
+dr.text((10,8),cel+': complete original / actual original context / approved complete Sam and Max masters',fill='white')
+board.paste(Image.open(C/'originalatlas.png').resize((720,720)),(0,35))
+im=Image.open(C/'spillkontekst.png').convert('RGB'); im.thumbnail((1040,700)); board.paste(im,(750,40))
+for i,n in enumerate(['sam','max']):
+    im=Image.open(A/'hovedark'/f'{n}.png').convert('RGBA'); im.thumbnail((870,480)); board.paste(im,(10+i*890,1250 if count else 800),im)
+if count:
+    im=Image.open(C/'underlagsfunksjon.png'); im.thumbnail((720,430)); board.paste(im,(0,760))
+board.save(C/'kontekst-og-mastere.png'); shutil.copy2(__file__,R/'klargjor.py.txt')
+print(name,cel,'kilde',src.size,'statisk Sam',count,'rosa',pink,flush=True)

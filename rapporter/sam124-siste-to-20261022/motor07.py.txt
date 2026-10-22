@@ -1,0 +1,37 @@
+from pathlib import Path
+import os, json, hashlib, re, subprocess, shutil, gzip, sys
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+PK=P/'out/felles-release-20261021-kjeglekant/linux/squashfs-root'; D=PK/'usr/share/sam-max-hd'; B=PK/'usr/bin/scummvm'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest(); save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+mode=sys.argv[1]; assert mode=='kandidat3596'
+controlled=False; baseline=False; count=720
+MOD=O/'mod-sam1243596'; expected=3596
+label=sys.argv[2] if len(sys.argv)>2 else mode
+assert re.fullmatch(r'[a-z0-9-]+',label); T=O/label
+assert not T.exists(); T.mkdir(); (T/'home').mkdir(); (T/'saves').mkdir()
+assert sha(B)=='03b21adba8a0cd63765542bd2a814e827bcfb28265b45567849c73fa1e071022'
+assert json.loads((MOD/'mod.json').read_text())['costume_cels']==expected
+for p in (P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,T/'saves'/p.name)
+env={k:v for k,v in os.environ.items() if not k.startswith('DIGHD_')}
+env.update(HOME=str(T/'home'),XDG_CONFIG_HOME=str(T/'home/.config'),XDG_DATA_HOME=str(T/'home/.local/share'),XDG_CACHE_HOME=str(T/'home/.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(MOD),DIGHD_VERIFY='1',DIGHD_QUIT_AT=str(count),DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='1',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='25',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')
+if controlled:
+    env.update(DIGHD_TEST_COSTUME='124',DIGHD_TEST_ACTOR='29',DIGHD_TEST_ANIMATION='8',DIGHD_TEST_CHORE_EVERY='400',DIGHD_TEST_POS='270,185',DIGHD_TEST_SCALE='255')
+args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(D/'game'),'--savepath='+str(T/'saves'),'--save-slot=2','--gfx-mode=normal','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--random-seed=20261021','--debuglevel=1','samnmax']
+with (T/'scummvm.log').open('wb') as f:code=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=600).returncode
+log=(T/'scummvm.log').read_text(); events=[]; obs={}
+for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*124\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log):
+    f,n,x,y,w,h=map(int,m.groups()); shot=f+1; p=T/f'frame_{shot:06}_room025.png'
+    row=dict(logg_frame=f,bildeframe=shot,cel=n,kostyme=124,pos=[x,y],maal=[w,h],fil=str(p),sha256=sha(p) if p.exists() else None); events.append(row)
+    if p.exists():obs.setdefault(f'costume124_{n:03}',row)
+checks=[dict(frame=int(f),avvik=int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)]
+needed={e['bilde'] for e in json.loads((R/'egen-native.json').read_text())['ruter']}
+proof=dict(exit=code,binar=str(B),binar_sha256=sha(B),kommando=args,miljo={k:v for k,v in env.items() if k.startswith('DIGHD_')},
+    primaer_skript217_fra_originalinngang=True,tvunget_lokalskript=False,rom=25,kostyme=124,actor2_fra_originalskript=True,
+    testaktor29_konstruert_for_helanimasjon=controlled,testaktor_pos=[270,185] if controlled else None,andre_aktorer_skjult=False,romskript_stoppet=False,
+    kontrollert_ikke_naturlig_sekvens=controlled,full_naturlig_gjennomspilling=False,ingen_kildekode_eller_skript_endret=True,
+    tegninger=obs,hendelser=events,kontroller=checks,nullkontroller=sum(e['avvik']==0 for e in checks),manglende_nye_maal=sorted(needed-set(obs)),nye_maal_observert=len(needed&set(obs)),logg_sha256=sha(T/'scummvm.log'),native_antall=expected)
+save(R/(label+'.json'),proof)
+with gzip.open(R/(label+'.log.gz'),'wb') as f:f.write((T/'scummvm.log').read_bytes())
+shutil.copy2(__file__,R/'motor07.py.txt')
+print(mode,code,'nye',proof['nye_maal_observert'],'av',len(needed),'kontroller',len(checks),'null',proof['nullkontroller'],flush=True)
+assert code==0 and not proof['manglende_nye_maal'] and len(checks)==count

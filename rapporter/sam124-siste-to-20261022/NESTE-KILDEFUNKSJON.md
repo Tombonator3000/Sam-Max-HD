@@ -1,0 +1,7 @@
+# Siste to ark, før produksjon
+
+fig124_07 og fig124_08 er ikke nytegnet i denne bunken. 15 mål gjenstår, med 13 ulike hele RGBA-kilder. 1847 til 1854 har ikke gjenmaling av Sam-objektet. I 1855 til 1861 ligger kildeindeksene 247, 248, 249, 252, 253 og 254 på Sams allerede tegnede sko og jakke i objekt 258, romposisjon 32,160 og mål 104 x 40. Hver eneste slik kildepiksel er eksakt lik underlaget. Her er ingen mørkere jakkekontakt. De brune bitene ved føttene er derfor ikke Lee-Harveys sko eller nye rekvisitter.
+
+Bevar originalfilene. Ny heltegning skal bruke ekte alfa over den eksisterende Sam-grafikken, uten gjentatte klesfliker. Målegrunnlaget kan skilles fra statisk gjenmaling, men originalens uendrede nativeporter skal fortsatt kontrolleres. Arkkontrollen må også bestås. Rute 1804 fra forrige bunke er fortsatt holdt på grunn av dette kildefunksjonsproblemet. Ingen terskel senkes og ingen falsk skygge legges til. Alle masker i underlagsdiagnosen gjelder kildemåling og fargeforklaring, aldri klipping av ny grafikk.
+
+Lee-Harvey bøyer seg ned og reiser seg igjen mens Max blir en kompakt vridd kremhvit figur på bryggen, med kildens løkker og utstikkende ører. Dette er ikke tau, sekk, bandasjer eller støv. Se hver hel originalfase med faktisk naboforløp og godkjente mastere før bildeproduksjon. 1859 er hodeløs kropp fordi et separat hodelag tegner Lee-Harveys hode i talefasen. De to arkene, den åpne 1804-returen og etterfølgende pakkesamlepunkt gjenstår.
