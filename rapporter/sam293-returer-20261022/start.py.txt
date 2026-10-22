@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from datetime import datetime,timezone
+import numpy as np,hashlib,json,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-kuldeflekker-20261022';V=A/'rapporter/sam293-frost-20261022';Q=A/'rapporter/sam293-fortsettelse-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists();b=read(S/'start.json');files=read(S/'publiserte-moddfiler-3689.json');actual={p.relative_to(P/'mods/gpt').as_posix():sha(p)for p in (P/'mods/gpt').rglob('*')if p.is_file()};assert actual==files and len(files)==21933
+for f,h in b['beskyttede'].items():assert sha(A/f)==h
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==b['stash']
+remote={x.split()[1].removeprefix('refs/heads/'):x.split()[0]for x in subprocess.check_output(['git','ls-remote','origin','refs/heads/main','refs/heads/gpt-arbeid','refs/heads/hd-mod'],cwd=P,text=True).splitlines()};assert remote=={'main':'4c8836bbc6e0e53d8d639b5d94f70c32e1dbdf10','gpt-arbeid':'9eac1db9795099a4c0617a55cb3d28708de52f9d','hd-mod':'000c7686725ee8796cac3bd4ce170d59cdecc074'}
+for wd in [P,A]:assert not subprocess.check_output(['git','status','--porcelain'],cwd=wd,text=True)
+R.mkdir();(R/'kall').mkdir();save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),remote=remote,filer=files,beskyttede=b['beskyttede'],stash=stash,native=3689,hele_figurjobber=505,total_figurjobber=1758,pakker_native=3684,forrige_rapport=str(S),valgte_maal=[1921,1922,1943,1970,1971,1972],ingen_pagaende_motor_observert=True))
+full=read(V/'kildeplan.json');plan=[]
+for n in [1943,1970,1971,1972,1921,1922]:
+ if n<1943:
+  old=read(Q/'kall'/('R'+str(n))/'plan.json');e=old['ruter'][0];ctx=e['kontrollert_kontekst'];cp=Path(ctx['fil']);ch=ctx['sha256']
+ else:e=next(v for v in full['ruter']if v['rute']==n);ctx=e['kilde_helanimasjon_clip1'];cp=Path(ctx['fil']);ch=ctx['sha256']
+ src=Image.open(e['kilde']).convert('RGBA');assert sha(Path(e['kilde']))==e['sha256']and hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256']and sha(cp)==ch;e['canonical_rgba_sha256']=e['rgba_sha256'];e['egen_kildepalett_RGB']=True;plan.append(e)
+ C=R/'kall'/('R'+str(n));C.mkdir();src.save(C/'original-alfa.png');k=min(24,900//src.width,900//src.height);large=src.resize((src.width*k,src.height*k),Image.Resampling.NEAREST);atlas=Image.new('RGBA',(1024,1024));xy=((1024-large.width)//2,(1024-large.height)//2);atlas.alpha_composite(large,xy);atlas.save(C/'originalatlas-alfa.png')
+ for name,col in [('blaagraa','#536576'),('cyan','#00ffff')]:
+  view=Image.new('RGBA',atlas.size,col);view.alpha_composite(atlas);view.convert('RGB').save(C/f'originalatlas-{name}.png')
+ shutil.copy2(cp,C/'spillkontekst.png');refs=[C/'originalatlas-alfa.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst.png']
+ if n in [1970,1971,1972]:refs.append(C/'originalatlas-cyan.png')
+ arr=np.array(src);labels,nc=nd.label(arr[:,:,3]>0,np.ones((3,3)));parts=[]
+ for i in range(1,nc+1):
+  yy,xx=np.nonzero(labels==i);parts.append(dict(areal=len(xx),bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],xy=list(map(float,nd.center_of_mass(labels==i)[::-1]))))
+ save(C/'plan.json',dict(ruter=[e],underlag_piksler=0,referanser={str(p):sha(p)for p in refs},kilde_og_mastere_sett_foer_kall=False,originalmaske=False,originalfragmenter=False,kildekomponenter=parts,originalatlas_scale=k,originalatlas_xy=xy,primar_original_referanse_har_ekte_alfa=True,hele_kildelerret_sett=True,alle_originale_opake_piksler_i_forstorret_referanse=True))
+ board=Image.new('RGB',(1900,1600),'#536576');dr=ImageDraw.Draw(board);dr.text((10,8),str(n)+' komplett original / original spillkontekst / komplette godkjente mastere',fill='white');im=Image.open(C/'originalatlas-blaagraa.png');im.thumbnail((720,760));board.paste(im,(10,35));im=Image.open(cp).convert('RGB');im.thumbnail((1120,750));board.paste(im,(770,35))
+ for i,m in enumerate(['sam','max']):
+  im=Image.open(A/'hovedark'/f'{m}.png').convert('RGBA');im.thumbnail((910,720));board.paste(im,(10+i*950,840),im)
+ board.save(C/'kontekst-og-mastere.png');print(n,src.size,'hele kildedeler',len(parts))
+save(R/'kildeplan.json',dict(ruter=plan,kostyme=293,rom=56,palett=0,kildegrunnlag=str(V),tidligere_kroppskilder=str(Q)))
+for f in ['bevar.py','rens-plasser.py']:shutil.copy2(P/'out/sam293-kuldeflekker-20261022'/f,O/f)
+shutil.copy2(__file__,R/'start.py.txt');print('3689 native,21933 modfiler,1432 beskyttede og tre stasher bekreftet.')

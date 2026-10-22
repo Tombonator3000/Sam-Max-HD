@@ -1,0 +1,49 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.optimize import linear_sum_assignment
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def comps(m,minarea=1):
+ l,n=nd.label(m,np.ones((3,3)));out=[]
+ for k in range(1,n+1):
+  z=l==k;area=int(z.sum())
+  if area<minarea:continue
+  y,x=np.nonzero(z);out.append(dict(area=area,xy=[float(x.mean()),float(y.mean())],bbox=[int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)]))
+ return out
+def match(tag,src,own,maxd=3):
+ assert len(src)==len(own)>0,(tag,len(src),len(own));s=np.array([p['xy']for p in src])*4+9.5;o=np.array([p['xy']for p in own]);ds=np.linalg.norm(s[:,None,:]-o[None,:,:],axis=2);i,j=linear_sum_assignment(ds);assert ds[i,j].max()<=maxd,(tag,ds[i,j].tolist());return dict(type=tag,kilde_antall=len(src),egne_antall=len(own),kilde=src,egne=[own[k]for k in j],avstander_HD=ds[i,j].tolist(),maks_HD=float(ds[i,j].max()),innen3HD=True)
+selected=['R1921','R1922','R1970','R1971','R1972R'];allrows=read(R/'prototyper-forelopig.json');chosen=[];details=[];returns=[];boards=[]
+for C in sorted((R/'kall').iterdir()):
+ if not(C/'verktøyresultat.json').exists():continue
+ q=next(z for z in allrows if z['valgt_kall']==C.name);plan=read(C/'plan.json');e=plan['ruter'][0];v=read(C/'verktøyresultat.json');assert sha(C/'raa.png')==v['raa_sha256']and sha(C/'faktiske-argumenter.json')==v['argumenter_sha256']and sha(C/'faktisk-prompt.txt')==v['prompt_sha256'];assert all(sha(Path(p))==h for p,h in plan['referanser'].items());assert plan['kilde_og_mastere_sett_foer_kall']
+ if C.name not in selected:
+  reason={'R1972':'Alle hull besto,men den lille mørkebrune delen ved12,8 var lysbrun,7HD fra riktig mørk farge.','R1943':'Åtte hvite kildegrupper blir seks.','R1943R':'Åtte grupper bevart,men de to høyeste festene avviker5,34 og4,17HD.','R1943RR':'Etter ny tegning blir to nederste grupper sammenhengende ved native CORE128,syv hvite grupper. Flere fester over3HD.'}[C.name]
+  rr=dict(kall=C.name,bilde=e['bilde'],raa_sha256=sha(C/'raa.png'),grunn=reason,kvalitetsretur=True,verktøyavslag=False,snitt_union=q['snitt_union'],dekning=q['dekning'],native_mottatt=False,publisert=False,ikke_stilanker=True);save(C/'kvalitetsretur.json',rr);returns.append(rr);continue
+ assert q['native_ok']and q['snitt_union']>=.6 and q['dekning']>=.8 and .88<=q['egen_hel_affin_plassering'][0]/q['egen_hel_affin_plassering'][1]<=1.12
+ a=np.array(Image.open(A/q['prototype']).convert('RGBA'));s=np.array(Image.open(e['kilde']).convert('RGBA'));assert hashlib.sha256(s.tobytes()).hexdigest()==e['canonical_rgba_sha256'];assert sha(A/q['prototype'])==q['prototype_sha256'];assert not q['originalmaske']and not q['originalfragmenter']
+ if e['rute']<1930:
+  sm=(s[:,:,3]>0)&np.all(s[:,:,:3]==[255,199,135],2);sm[24:]=False;om=(a[:,:,3]>=128)&(a[:,:,0]>220)&(a[:,:,1]>170)&(a[:,:,2]>90)&(a[:,:,2]<170);om[110:]=False;small=comps(om);eye=match(C.name+' to varme øyefelt',comps(sm),[z for z in small if z['area']>=3]);eye['egne_AA_fargepiksler_under3']=[z for z in small if z['area']<3];details.append(eye)
+  pupil_sources=[(63,14),(67,14)]if e['rute']==1921 else[(59,14),(63,14)];black=(a[:,:,3]>=128)&(a[:,:,:3].max(2)<25);dd=nd.distance_transform_edt(~black);dist=[float(dd[round(y*4+9.5),round(x*4+9.5)])for x,y in pupil_sources];assert max(dist)<=3;details.append(dict(type=C.name+' to innovervendte svarte pupiller',kilde_xy=pupil_sources,avstand_til_eget_svart_HD=dist,innen3HD=True,egen_del_flyttet=False))
+ else:
+  hole=(s[:,:,3]==0);hole[31:]=False;yy,xx=np.nonzero(hole);dd=nd.distance_transform_edt(a[:,:,3]>=128);ds=dd[np.rint(yy*4+9.5).astype(int),np.rint(xx*4+9.5).astype(int)];assert len(ds)=={1970:78,1971:41,1972:17}[e['rute']]and max(ds)<=3;details.append(dict(type=C.name+' kildebekreftede åpne alfa-punkter',kildepunkter=len(ds),ikke_antall_sammenhengende_hullgrupper=True,maks_avstand_til_egen_transparens_HD=float(ds.max()),alle_innen3HD=True,originalmaske=False,egen_malt_cyan_fjernet=True))
+  # Test hver opake fargegruppe separat,også kildebekreftede små grå deler.
+  for color in np.unique(s[s[:,:,3]>0,:3],axis=0):
+   sm=(s[:,:,3]>0)&np.all(s[:,:,:3]==color,2);om=(a[:,:,3]>=128)&(np.linalg.norm(a[:,:,:3].astype(float)-color,axis=2)<25);assert om.any();dd=nd.distance_transform_edt(~om);cent=comps(sm);yyc,xxc=np.nonzero(sm);ds=dd[np.rint(yyc*4+9.5).astype(int),np.rint(xxc*4+9.5).astype(int)].tolist();assert max(ds)<=3,(C.name,color.tolist(),max(ds));details.append(dict(type=C.name+' opake kildefargepunkter',RGB=color.tolist(),kildegrupper=len(cent),kildefargepunkter=len(ds),prober_paa_faktiske_kildefarger_ikke_geometrisk_senter_i_hull=True,avstand_til_egen_farge_HD=ds,maks_HD=float(max(ds)),alle_innen3HD=True))
+  if e['rute']==1970:
+   assert s[12,14,3]>0 and np.array_equal(s[12,14,:3],[151,151,183]);details.append(dict(type='1970 liten grå del ved14,12',kilde_RGBA=s[12,14].tolist(),egen_avstand_HD=float(nd.distance_transform_edt(~((a[:,:,3]>=128)&np.all(a[:,:,:3]==[151,151,183],2)))[58,66]),originaldel_bevart=True))
+ q['visuelt_sett']=False;chosen.append(q)
+ board=Image.new('RGB',(2600,1000),'#536576');draw=ImageDraw.Draw(board);draw.text((10,8),C.name+f" original / egen / 50% overlay. IoU {q['snitt_union']:.3f}, dekning {q['dekning']:.3f}",fill='white')
+ src=Image.fromarray(s).resize((s.shape[1]*8,s.shape[0]*8),Image.Resampling.NEAREST);own=Image.fromarray(a).resize((a.shape[1]*2,a.shape[0]*2),Image.Resampling.NEAREST)
+ # Whole canvases,never cropped at body/loose pieces.
+ board.paste(src,(25+16,60+16),src);
+ if e['rute']<1970:board.paste(own,(880,60),own)
+ base=Image.new('RGBA',own.size);base.alpha_composite(src,(16,16));own50=own.copy();own50.putalpha(own.getchannel('A').point(lambda v:v//2));base.alpha_composite(own50);board.paste(base,(1720,60),base)
+ if e['rute']>=1970:
+  # Enlarged complete tiny phase on black and blue-gray to inspect holes.
+  big=Image.fromarray(a).resize((a.shape[1]*5,a.shape[0]*5),Image.Resampling.NEAREST);board.paste(big,(880,60),big)
+ f=R/(C.name+'-egenkontroll.png');board.save(f);boards.append(dict(fil=f.name,sha256=sha(f),visuelt_sett=False))
+assert len(chosen)==5 and len(returns)==4 and len(list((R/'kall').glob('*/verktøyresultat.json')))==9
+chosen.sort(key=lambda z:selected.index(z['valgt_kall']));save(R/'valgte5.json',chosen);save(R/'kvalitetsreturer.json',returns);save(R/'indre-feste-kontroll.json',dict(terskel_HD=3,maalinger=details,alle_kontrollerte_smaadeler_innen3HD=True,ingen_lokal_Python_flytting=True,visuelt_sett=False));save(R/'egen-visuell-plan.json',dict(ark=boards,visuelt_sett=False,komplette_tegninger_uten_beskjaering=True));shutil.copy2(__file__,R/'kontroll.py.txt');print('5 kandidater: øyne,pupiller,136 åpne kildepunkter og alle frostfargegrupper innen3HD. 4 kvalitetsreturer,9 faktiske kall.')

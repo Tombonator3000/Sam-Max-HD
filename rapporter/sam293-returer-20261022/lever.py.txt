@@ -1,0 +1,55 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import CORE,GOOD_IOU,GOOD_COVER,_iou
+import numpy as np,json,hashlib,shutil,subprocess,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam2933694'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+s=read(R/'start.json');plan=read(R/'kildeplan.json');assert(CORE,GOOD_IOU,GOOD_COVER)==(128,.6,.8)
+assert all(sha(M/f)==h for f,h in s['filer'].items())and all(sha(A/f)==h for f,h in s['beskyttede'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==s['stash']
+v=read(R/'egen-visuell-plan.json');assert len(v['ark'])==5
+for e in v['ark']:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+v['visuelt_sett']=True;save(R/'egen-visuell-plan.json',v);q=read(R/'indre-feste-kontroll.json');assert q['alle_kontrollerte_smaadeler_innen3HD'];q['visuelt_sett']=True;save(R/'indre-feste-kontroll.json',q)
+chosen=read(R/'valgte5.json');assert len(chosen)==5
+for e in chosen:e.update(visuelt_sett=True,kilde_og_spillkontekst_sett=True,sam_og_max_stilankere_sett=True)
+save(R/'valgte5.json',chosen);by={e['bilde']:e for e in chosen};native=[];partials=[];diags={};gates=[]
+for jobid,oldname,expected_old,expected_new in [('fig293_01','sam293-foerste-20261022',7,2),('fig293_03','sam293-kuldeflekker-20261022',28,3)]:
+ S=A/'rapporter'/oldname;J=A/'jobber'/jobid;job=read(J/'jobb.json');D=O/'ark'/jobid;assert not(J/'resultat.png').exists();assert not D.exists()or set(x.name for x in D.iterdir())=={'jobb.json','referanse.png','prompt.txt','original_1x.png'};D.mkdir(parents=True,exist_ok=True)
+ for f in ['jobb.json','referanse.png','prompt.txt','original_1x.png']:shutil.copy2(J/f,D/f)
+ oldmap=read(S/('rutekart-'+jobid+'.json'))[jobid];assert sha(S/(jobid+'-delresultat.png'))==oldmap['sha256_resultat'];board=Image.open(S/(jobid+'-delresultat.png')).convert('RGBA');oldpixels=np.array(board);mapping=oldmap['ruter'];assert len(mapping)==expected_old;oldnames={e['bilde']for e in mapping};missing=[];newmap=[]
+ for t in job['ruter']:
+  if t['bilde']in oldnames:
+   assert sha(M/('costumes/'+t['bilde']+'_hd.png'))==next(e['prototype_sha256']for e in mapping if e['bilde']==t['bilde']);continue
+  source=next((e for e in plan['ruter']if e['bilde']==t['bilde']),None)
+  if source is None:missing.append(t['bilde']);continue
+  canon=source['canonical']
+  if canon not in by:missing.append(t['bilde']);continue
+  e=by[canon];src=Image.open(source['kilde']).convert('RGBA');own=Image.open(A/e['prototype']).convert('RGBA');assert sha(Path(source['kilde']))==source['sha256']and hashlib.sha256(src.tobytes()).hexdigest()==e['canonical_rgba_sha256'];assert own.size==(src.width*4+16,src.height*4+16)
+  core=np.array(own)[:,:,3]>=CORE;sm=np.array(src)[:,:,3]>0;iou,cov=_iou(core,np.repeat(np.repeat(sm,4,0),4,1),-8,-8);assert iou>=GOOD_IOU and cov>=GOOD_COVER
+  x,y,_,_=t['rekt'];dx,dy=(job['plassering'][0]+x)*4-8,(job['plassering'][1]+y)*4-8;layer=Image.new('RGBA',board.size);layer.alpha_composite(own,(dx,dy));assert not((np.array(board)[:,:,3]>0)&(np.array(layer)[:,:,3]>0)).any();board.alpha_composite(layer);yy,xx=np.nonzero(core)
+  newmap.append(dict(bilde=t['bilde'],kostyme=293,rute=t['rute'],lag=t['lag'],rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],canonical=canon,canonical_rgba_sha256=e['canonical_rgba_sha256'],prototype=e['prototype'],prototype_sha256=e['prototype_sha256'],kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragment_fallback=False,native_marg_hd=8,native_ok=True,prototype_visuelt_sett=True,motorobservert=False,publisert=False,godkjent_av_Tom=False,claude_kontroll=False))
+  native.append(dict(bilde=t['bilde'],jobb=jobid,canonical=canon,fil='costumes/'+t['bilde']+'_hd.png',prototype=e['prototype'],sha256=e['prototype_sha256'],kall=e['valgt_kall'],snitt_union=iou,dekning=cov,egen_alfa=True,originalmaske=False,originalfragmenter=False))
+ assert len(newmap)==expected_new and len(missing)==1;assert np.array_equal(np.array(board)[oldpixels[:,:,3]>0],oldpixels[oldpixels[:,:,3]>0]);mapping+=newmap;board.save(D/'resultat.png');shutil.copy2(D/'resultat.png',R/(jobid+'-delresultat.png'));digest=sha(R/(jobid+'-delresultat.png'));save(R/('rutekart-'+jobid+'.json'),{jobid:dict(sha256_resultat=digest,ruter=mapping)})
+ test=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(D/'resultat.png')],cwd=A,text=True,capture_output=True);log=test.stdout+test.stderr;(R/(jobid+'-egenkontroll.txt')).write_text(log);errors=re.findall(r'^FEIL\s+(costume\d+_\d+):',log,re.M);assert not set(errors)&{e['bilde']for e in mapping}and set(errors)<=set(missing),log
+ gates.append(dict(jobb=jobid,hele_arkets_egenkontroll=test.returncode,hele_arket_ferdig=False,produserte_FEIL=0,ruter=len(mapping),manglende_ikke_leverte_maal=missing,FEIL_kun_tomme_maal=errors,tidligere_arkpiksler_identiske=True,original_jobb_json_bevart=sha(D/'jobb.json')==sha(J/'jobb.json'),terskler_uendret=True))
+ partial=dict(jobb=jobid,resultat='rapporter/'+R.name+'/'+jobid+'-delresultat.png',sha256=digest,ruter=len(mapping),nye_ruter=expected_new,tidligere_ruter=expected_old,rutekart='rapporter/'+R.name+'/rutekart-'+jobid+'.json',laget=True,levert=False,delvis=True,mangler=missing,egenkontrollert=True,egenkontroll='Alle produserte ruter har null FEIL,bare manglende mål utelates.',visuelt_kontrollert=True,native_mottatt=False,motorobservert=False,publisert=False,i_fellespakke=False,godkjent_av_Tom=False,claude_kontroll=False);partials.append(partial)
+ G=O/('diagnostisk-gren-'+jobid);shutil.copytree(D,G/'jobber'/jobid);GR=G/'rapporter'/R.name;GR.mkdir(parents=True);shutil.copy2(R/('rutekart-'+jobid+'.json'),GR/('rutekart-'+jobid+'.json'));shutil.copy2(R/(jobid+'-delresultat.png'),GR/(jobid+'-delresultat.png'));save(GR/'fremdrift.json',dict(leveranser=[partial],diagnostisk_delark_ikke_levert=True));auto=O/('automatisk-mottak-'+jobid)
+ subprocess.run([str(P/'.venv/bin/smhd'),'myke-figurer','--gren',str(G),'--extract',str(P/'work/extract'),'--ut',str(auto),'--jobb',jobid,'--forhandsvisning',''],cwd=P,check=True);rep=read(auto/'myke.json');save(R/('automatisk-mottak-'+jobid+'.json'),rep);diags[jobid]=rep
+assert len(native)==5 and not C.exists();assert {e['bilde']for e in native}==set(by)
+# The diagnostic exporter can add original outliers. Import only complete own prototypes with fixed SHA.
+notes={}
+for jid,rep in diags.items():
+ notes[jid]={n:dict(status=e['status'],kilde=e.get('kilde'))for n,e in rep['ark'][jid]['ruter'].items()if e['status']!='mangler'}
+ for q in native:
+  if q['jobb']!=jid:continue
+  assert rep['ark'][jid]['ruter'][q['bilde']]['status']=='ok',(q,notes[jid])
+shutil.copytree(M,C)
+for e in native:
+ t=C/e['fil'];assert not t.exists();shutil.copy2(A/e['prototype'],t);assert sha(t)==e['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3689;meta['costume_cels']=3694;save(C/'mod.json',meta);files={p.relative_to(C).as_posix():sha(p)for p in C.rglob('*')if p.is_file()};assert len(files)==21938 and set(files)-set(s['filer'])=={e['fil']for e in native};assert{f for f,h in s['filer'].items()if files[f]!=h}=={'mod.json'}
+save(R/'delark-kontroll.json',gates);save(R/'fragmentvern.json',dict(nye_egne_hele=5,native_fra_egen_prototype_sha=True,originalfragmenter_i_kandidat=False,diagnostisk_eksport_ikke_importert=True,diagnostiske_kilder=notes,ingen_pipelineendring=True,hele_ark_levert=False,porter=dict(CORE=128,IoU=.6,dekning=.8,affin_min=.88,affin_maks=1.12)))
+save(R/'kandidatfilhash.json',files);save(R/'egen-native.json',dict(ruter=native,nye_native=5,native_totalt=3694,kandidat=str(C),fast_4x=True,marg_original=[2,2],egen_alfa=True,originalmaske=False,originalfragmenter=False,automatisk5_nye_OK=True,native_egne_prototyper5_OK=True,tidligere_filer_bevart=21933,filer=21938,png=sum(f.endswith('.png')for f in files)))
+for e in partials:e['native_mottatt']=True
+save(R/'fremdrift.json',dict(leveranser=[],delvise_leveranser=partials,nye_jobber_levert=0,nye_native_planlagt=5,nye_native=5,native_totalt=3694,ulike_hele_egne_malerier=5,hele_rgba_aliasmal=0,innebygde_bildekall=9,vellykkede_bildekall=9,lokal_inputvalideringsfeil=1,avviste_bildekall=0,kvalitetsreturer=4,grunnlag_native=3689,hele_figurjobber_med_resultat=505,total_figurjobber=1758,gjenstar=1253,laget=6,egenkontrollert=5,native_mottatt=5,visuelt_sett=5,motorobservert=0,publisert=0,Tom_godkjent=0,Claude_godkjent=0,produserbare_gjenstar_i_293_familien=1,holdte_maal_i_293_familien=['costume293_1927'],nye_kvalitetsretur_maal=['costume293_1943']))
+save(R/'kontrollstarter.json',dict(ikke_bestatte_starter=[dict(hjelper='lever.py',grunn='Kildeplan har bare seks produserbare mål;holdt1927 ga StopIteration. Manglende mål utelates før kildeoppslag;fire verifiserte referansekopier gjenbrukt.'),dict(hjelper='kontroll.py',grunn='Nøyaktig krem-RGB-søk ga ingen øyefelt etter BICUBIC. Samme varme kildefargeintervall som tidligere kontroller brukt;fester fortsatt maks3HD.'),dict(hjelper='kontroll.py',grunn='Fargegruppens geometriske senter lå i en annen kildefarge. Prober rettet til ALLE faktiske kildefargepiksler med samme3HD-port.1972s feil ved12,8 fortsatt underkjent.'),dict(hjelper='kontroll.py',grunn='Første sammenligningsbilde hadde overlappende paneler. Lerret utvidet til2600x1000 og alle hele tegninger sett på nytt.')],kvalitetsretur1972_rettet_med_bildeverktoy=True,inputvalideringsfeil_i_R1972R=True,feil_starter_ikke_regnet_bestatt=True,ingen_motor_eller_pipelineendring=True))
+shutil.copy2(__file__,R/'lever.py.txt');print('5 egne nye i kandidat3694. Fig01:9/10,fig03:31/32. Alle35 tidligere arkruter og21933 native filer bevart. Ingen hel jobb levert.')

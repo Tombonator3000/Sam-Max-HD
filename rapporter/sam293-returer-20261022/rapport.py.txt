@@ -1,0 +1,58 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');p=read(R/'fremdrift.json');m=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json');native=read(R/'egen-native.json')
+assert m['alle5_observert_i_relevante_kontrollprover_og_skript']and m['alle32_kildefaser_observert']and m['alle_originale_rektangler_med8HD_identiske']and m['uforklarte_HD_endringer']==0 and m['bufferavvik_koordinater_og_begge_RGB_eksakt_identiske'];assert(m['kontroller_pr_side'],m['null_pr_side'],m['null_etter_testaktorstart_pr_side'])==(560,554,440)
+assert len(v['varianter'])==2 and len(v['hele_motorbilder'])==5 and len(v['hele_fryseranimasjon']['faser'])==32 and len(v['hele_startanimasjon']['faser'])==10
+for group in ['varianter','hele_motorbilder']:
+ for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+for group in ['hele_fryseranimasjon','hele_startanimasjon']:
+ assert sha(R/v[group]['fil'])==v[group]['sha256'];v[group]['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=5,hele_motorbilder_sett=5);save(R/'motor-visuell-plan.json',v);m['visuelt_sett']=True;save(R/'motor-sammenligning.json',m)
+pix=read(R/'motor-pikselkontroll.json');assert len(pix)==10
+for e in pix:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',pix)
+for e in p['delvise_leveranser']:e.update(visuelt_kontrollert=True,motorobservert=True)
+p.update(visuelt_sett=5,visuelt_ok=5,motorobservert=5);save(R/'fremdrift.json',p)
+for jid in ['fig293_01','fig293_03']:
+ route=read(R/('rutekart-'+jid+'.json'))
+ for e in route[jid]['ruter']:
+  if e['bilde']in{e['bilde']for e in native['ruter']}:e.update(prototype_visuelt_sett=True,motorobservert=True)
+ save(R/('rutekart-'+jid+'.json'),route)
+receipt=read(R/'mottak-publisert.json')if(R/'mottak-publisert.json').exists()else None
+publication=f"Publisert additivt som hd-mod {receipt['hd_mod']}, grafikkilde {receipt['grafikkilde']}. Alle 21938 filhash er hentet tilbake og bekreftet."if receipt else 'Kandidat 3694 er kontrollert. Publisering og tilbakehenting er ennå ikke bekreftet.'
+brief=f'''Fem nye egne tegninger er laget, egenkontrollert, native mottatt, visuelt sett og motorobservert: costume293_1921, 1922, 1970, 1971 og 1972. {publication} fig293_01 er delvis 9/10 og fig293_03 delvis 31/32. Alle 35 tidligere arkposisjoner er bevart. Kostyme 293 har 53/55 native ruter. Bare 1943 er produserbar retur i denne familien; 1927 er fortsatt verktøyholdt og omprøves ikke. 505/1758 hele figurjobber har resultat, 1253 er uten i tillegg til returer og samlet sluttkontroll.
+
+Ni faktiske innebygde image_gen-kall ga ni råbilder for seks kildemotiver. Fem er valgt; fire forsøk er kvalitetsreturer. Én lokal inputvalidering avviste seks referanser før generering og ble rettet til fem uten alternativ bildeverktøy. Ingen ny kvotegrense eller innholdsavvisning. Øyefeltene og de innovervendte svarte pupillene i 1921/22 er innen 3 HD. Alle 136 åpne kildepunkter og alle opake frostfargepunkter er innen 3 HD til egen tilsvarende alfa/farge. Kildepunkt er ikke det samme som antall hullgrupper.1970s lille grå del ved 14,12 er bevart.1972s mørkebrune smådel ved 12,8 var først lysbrun og ble rettet med image_gen.1943 forblir retur: første forsøk har seks hvite grupper, neste åtte med feil feste, siste syv ved CORE128 etter at nederste grupper møttes. Ingen av disse importeres.
+
+Frosthullene er malt som egen cyan teknisk matte i råbildet og gjort til ekte alfa med egen RGB. Kildens geometri brukes ikke til klipping. Opaque grå indeks 74 beholdes. Egen uønsket mørk kontur og egen palett korrigeres bare i RGB. Fast 4x, to originalpikslers marg, CORE128, IoU0,6, dekning0,8 og hel affin forskjell 0,88..1,12 er uendret. Ingen originalmaske, originale fragmenter eller lokal Python-flytting av trekk. Originalkontekst og komplette godkjente Sam-/Max-mastere er sett før hvert motiv. Alle egne tegninger og sammenligninger er sett i sin helhet. Automatisk diagnostisk mottak gir 9 OK/1 tom og 31 OK/1 tom, ingen til gjennomsyn. Modden bruker bare de fem komplette egne prototypene med dokumentert SHA, også når diagnostikken foreslår originale ytterpiksler. Se fragmentvern.json.
+
+Tre nye motorprøver per side sammenligner native grunnlag 3689 med kandidat 3694 i faktisk Linux-binær bad93067a55dcbdf09c8001a50ea45dc8b888a044dd2860e8aa7d3ce2f79450a fra siste nedlastede fellespakke. Kontrollert aktør29 animasjon1/raw6 og animasjon7/raw30 med zclip1 samt originalt lokalskript204 etter konstruert aktør10-fortilstand avslutter normalt. Alle fem nye ses i relevant kontrollert animasjon og skriptprøven, med identiske originale ruterektangler og 8 HD-naboområde. Hver side har 560 bufferkontroller, 554 uten avvik og 440/440 uten avvik etter figurstart. To kjente inngangsavvik per prøve er bevart med identiske koordinater og begge RGB-verdier. Ingen uforklarte HD-endringer eller nye/økte bufferavvik. Fem før/etter-varianter, fem hele motorbilder, ti startfaser og alle 32 fryserfaser er visuelt sett. Dette er ikke naturlig full gjennomspilling, ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Alle 21933 tidligere modfiler og 21927 PNG bevares. Bare mod.json og manifest oppdateres.1432 beskyttede jobbfiler og tre opprinnelige stasher er kontrollert. Lokale kontrollstarter som stoppet er dokumentert i kontrollstarter.json; ingen uavklart feil passeres. Ingen motor-/pipelinekode er endret og gamle nattprosesser startes ikke. Felles Linux-/Windows-release sam-max-hd-2026-10-22-fryservindu har 3684 native og mangler ti ruter etter denne bunken. Pakkene kalles ikke oppdatert til 3694. Neste samlepunkt er planlagt ved fullført fryserark/familie. Automatikken fortsetter; all grafikk er ikke ferdig.
+'''
+# Readable spacing in the compact evidence numbers.
+brief=re.sub(r'(?<=[.!?])(?=\d)', ' ',brief)
+(R/'status-blokk.md').write_text(brief);(R/'RAPPORT.md').write_text('# Øyefester og frostreturer i kostyme 293\n\n'+now+' (Codex)\n\n'+brief+'\nBibliotekskilder: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e.\n')
+marker='sam293-returer-status';block='<!-- '+marker+':start -->\n'+brief+'<!-- '+marker+':slutt -->'
+for name in ['ORDRE.md','GRAFIKKLISTE.md','jobber/fig293_01/notat.md','jobber/fig293_03/notat.md']:
+ f=A/name;t=f.read_text()
+ if '<!-- '+marker+':start -->'in t:t=re.sub(r'<!-- '+marker+r':start -->.*?<!-- '+marker+r':slutt -->',lambda m:block,t,flags=re.S)
+ else:first,rest=t.split('\n',1);t=first+'\n\n'+block+'\n\nTidligere status nedenfor er historikk.\n'+rest
+ f.write_text(t)
+for partial in p['delvise_leveranser']:
+ jid=partial['jobb'];d=R/'leveranser'/jid;d.mkdir(parents=True,exist_ok=True);shutil.copy2(R/(jid+'-delresultat.png'),d/'resultat.png');(d/'notat.md').write_text('# Delresultat '+jid+'\n\n'+str(partial['ruter'])+' av '+str(partial['ruter']+1)+' ruter. Ingen hel jobb levert. Mangler '+', '.join(partial['mangler'])+'.\n\n'+brief)
+selected={e['kall']:e for e in native['ruter']}
+for c in (R/'kall').iterdir():
+ if not(c/'verktøyresultat.json').exists():continue
+ raw=read(c/'verktøyresultat.json');ret=read(c/'kvalitetsretur.json')if(c/'kvalitetsretur.json').exists()else None
+ status='Kvalitetsretur,ikke native mottatt eller publisert: '+ret['grunn']if ret else 'Valgt egen tegning,teknisk og visuelt kontrollert,native mottatt og motorobservert. '+publication
+ (c/'notat.md').write_text('# '+c.name+'\n\n'+status+'\n\nFaktisk prompt i faktisk-prompt.txt,argumenter i faktiske-argumenter.json,råbilde i raa.png. Rå SHA256 '+raw['raa_sha256']+'.\nIngen originalmaske eller originalfragmenter. Ingen ny Tom-/Claude-godkjenning.\n')
+save(R/'sluttkontroll.json',dict(tid_norsk=now,valgte_native=5,egne_nye_malerier=5,hele_rgba_aliasmal=0,visuelt_sett=True,motorobservert=5,hele_varianter=5,hele_motorbilder=5,hele_startfaser=10,hele_fryserfaser=32,alle_kontrollerte_smaadeler_innen3HD=True,opprinnelige_21933_moddfiler_bevart=True,beskyttede=1432,stasher=read(R/'start.json')['stash'],kvalitetsreturer_utelatt=True,toolholdt1927_ikke_omprovd=True,Tom_godkjent=0,Claude_godkjent=0,hele_figurjobber=505,native_kandidat=3694,delark01=9,maal_i_delark01=10,delark03=31,maal_i_delark03=32,publisert=5 if receipt else 0,kontroller_pr_side=560,null_pr_side=554,null_etter_figurstart_pr_side=440,ingen_nye_eller_okte_bufferavvik=True,diagnostisk_originaltillegg_ikke_brukt=True))
+(R/'NESTE.md').write_text('''# Neste produksjon: fig293_03,31/32\n\nGjenoppta costume293_1943. Behold alle31 native posisjoner og fig293_01s9/10. Ikke omprøv verktøyholdt1927. Kostyme293 har53/55 native,en produserbar retur og ett verktøyholdt mål. Ikke start en ny bunke som dupliserer disse.\n\n1943 har åtte hvite/grå sammenhengende grupper og en beskåret Conroy-hodebit. Noen hvite grupper har to lobber som skal være forbundet,men de åtte gruppene skal være atskilt. R1943R har riktig antall men toppfestene4,17/5,34HD for langt til høyre. R1943RR flyttet også andre grupper og slo de to nederste sammen ved CORE128. De må ikke brukes som stilankere. Bruk eksakt kilde,spillkontekst,komplette godkjente Sam/Max-mastere og nye verktøytegninger;bevar egne alfaformer. Ingen lokal Python-flytting eller kildeklipping. Alle fester maks3HD.\n\n1970..72 er nå mottatt med ekte hull og kildebekreftede små farger. Den egne cyanmatten i faktiske råbilder kan renses til ekte alfa med egen RGB,aldri kildegeometri. Opaque grå74 er nødvendig.1921/22 er mottatt etter øyekontroll. De tidligere gulformene er løs Bigfoot-forkledning på gulvet,i fryserfasene er blondformen Conroys hode. Aktuell original bestemmer alltid identitet.\n\nNeste pakkeoppdatering ved fullført fryserark/familie. Fellespakker fryservindu står på3684 og mangler10 native. Gjeldende publisert SHA og alle filhash finnes i mottak-publisert.json/publiserte-moddfiler-3694.json etter publisering. Oppdater begge plattformer ved neste samlepunkt og kontroller faktiske nedlastede filer før oppdatert påstand.\n\nDeretter fortsett øvrige1253 hele figurjobber,129-/124-returer og samlet visuell/motorisk sluttkontroll. Ingen ny Tom-/Claude-godkjenning foreligger. Se fremdrift,rutekart,egen-native,motorbevis og rapport.\n''')
+for f in ['rapport.py','publiser.py','kontroll.py','rens-plasser.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('Sluttkontroll5 egne,delark9/10 og31/32. Publisert='+str(bool(receipt)))

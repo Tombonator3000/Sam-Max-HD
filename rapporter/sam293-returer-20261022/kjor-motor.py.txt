@@ -1,0 +1,6 @@
+from pathlib import Path
+import subprocess
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent
+for side,mod in [('grunnlag3689',P/'mods/gpt'),('kandidat3694',O/'mod-sam2933694')]:
+ for case in ['start1','clip1','skript204-med-aktor10']:
+  subprocess.run([str(P/'.venv/bin/python'),str(O/'motor.py'),side+'-'+case,str(mod)],check=True)

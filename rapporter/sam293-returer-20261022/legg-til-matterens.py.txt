@@ -1,0 +1,19 @@
+from pathlib import Path
+import shutil
+O=Path(__file__).resolve().parent;p=O/'rens-plasser.py';s=p.read_text();needle='    alpha_before=own[:,:,3].copy(); rgb_notes=[]';assert needle in s
+s=s.replace(needle,'''    matte_note=[]
+    if e.get('egen_cyan_hullmatte'):
+        # Hullmatten er malt i råbildet av image_gen. Kun egen RGB, ingen originalmaske.
+        rgb=own[:,:,:3].astype(np.float64);rr,gg,bb=rgb.transpose(2,0,1)
+        cyan=(own[:,:,3]>0)&(gg>165)&(bb>165)&(gg>rr+30)&(bb>rr+30)
+        assert cyan.any(),(name,'Ingen egen cyan hullmatte')
+        colors=np.unique(src[src[:,:,3]>0,:3],axis=0).astype(np.float64)
+        pixels=rgb[cyan];Cyan=np.array([0.,255.,255.]);best=np.full(len(pixels),1e30);which=np.zeros(len(pixels),np.int16);fractions=np.zeros(len(pixels))
+        for k,col in enumerate(colors):
+            delta=Cyan-col;frac=np.clip(((pixels-col)*delta).sum(1)/(delta*delta).sum(),0,1)
+            residual=np.square(pixels-(col+frac[:,None]*delta)).sum(1);pick=residual<best;best[pick]=residual[pick];which[pick]=k;fractions[pick]=frac[pick]
+        before=own[:,:,3].copy();own[cyan,3]=np.rint(own[cyan,3]*(1-fractions)).astype(np.uint8);own[cyan,:3]=colors[which].astype(np.uint8)
+        matte_note.append(dict(type='egen_cyan_hullmatte_til_ekte_alfa',egen_RGB=[0,255,255],egen_matte_SHA256=hashlib.sha256(cyan.tobytes()).hexdigest(),egne_mattepiksler=int(cyan.sum()),egne_helt_transparente_nye_piksler=int(((before>0)&(own[:,:,3]==0)).sum()),kildepalett_kun_RGB=True,originalmaske=False,ingen_original_geometri_til_klipping=True,kun_imagegen_malte_matteformer=True))
+        own=clean(own)
+    alpha_before=own[:,:,3].copy(); rgb_notes=matte_note
+''');p.write_text(s);shutil.copy2(__file__,Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name/'legg-til-matterens.py.txt')
