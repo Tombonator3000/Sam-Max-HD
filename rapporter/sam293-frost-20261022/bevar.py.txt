@@ -1,0 +1,18 @@
+from pathlib import Path
+import hashlib,json,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+name,source,hint=sys.argv[1:4];C=R/'kall'/name;src=Path(source)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert src.is_file() and src.is_relative_to(Path('/home/tom/.codex/generated_images'))
+assert not (C/'raa.png').exists()
+args=json.loads((C/'faktiske-argumenter.json').read_text())
+plan=json.loads((C/'plan.json').read_text());assert plan['kilde_og_mastere_sett_foer_kall']
+assert {p:sha(Path(p)) for p in args['referenced_image_paths']}==plan['referanser']
+shutil.copy2(src,C/'raa.png')
+d=dict(tool='innebygd image_gen',modell_oppgitt=False,original_output=source,output_hint=hint,
+       raa_sha256=sha(C/'raa.png'),argumenter_sha256=sha(C/'faktiske-argumenter.json'),
+       prompt_sha256=sha(C/'faktisk-prompt.txt'),referanser=plan['referanser'])
+(C/'verktøyresultat.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'bevar.py.txt')
+print(name,'råbilde, faktisk prompt, referansehash og verktøykvittering bevart.',flush=True)

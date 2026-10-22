@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+q=json.loads((R/'prototyper-forelopig.json').read_text())
+for k in range(0,len(q),2):
+ b=Image.new('RGB',(1500,620),'#536576');dr=ImageDraw.Draw(b)
+ for i,e in enumerate(q[k:k+2]):
+  C=R/'kall'/e['valgt_kall'];p=json.loads((C/'plan.json').read_text())['ruter'][0];s=Image.open(p['kilde']).convert('RGBA');o=Image.open(A/e['prototype']).convert('RGBA');s4=s.resize((s.width*4,s.height*4),Image.Resampling.NEAREST);cut=o.crop((8,8,8+s4.width,8+s4.height));mix=Image.blend(s4,cut,.5)
+  dr.text((i*750+10,8),e['valgt_kall']+' original / egen / overlay50',fill='white')
+  for j,im in enumerate([s4,o,mix]):
+   im=im.resize((im.width*3,im.height*3),Image.Resampling.NEAREST);b.paste(im,(i*750+j*240+12,45),im)
+ b.save(R/f'forste-visuell-{k//2+1}.png')
+ for e in q[k:k+2]:
+  C=R/'kall'/e['valgt_kall'];p=json.loads((C/'plan.json').read_text())['ruter'][0];s=np.array(Image.open(p['kilde']));o=np.array(Image.open(A/e['prototype']));S=s[:,:,3]>0;M=o[:,:,3]>=128
+  def props(a,m):
+   gray=(a[:,:,0]>135)&(abs(a[:,:,0].astype(int)-a[:,:,1])<10)&(a[:,:,2]>a[:,:,0].astype(int)+12)&m
+   return dict(gray=int(gray.sum()),opaque=int(m.sum()),gray_fraction=round(float(gray.sum()/m.sum()),3))
+  print(e['valgt_kall'],round(e['snitt_union'],3),round(e['dekning'],3),props(s,S),props(o,M))
+for n in [1971,1972,1973,1974]:
+ a=np.array(Image.open(P/f'work/extract/costumes/costume293_{n}.png').convert('RGBA'));print(n,'grid')
+ for row in a:print(''.join('.'if c[3]==0 else 'G'if c[0]==151 else 'b'if c[0]==131 else 'B' for c in row))
+shutil.copy2(__file__,R/'visuell.py.txt')

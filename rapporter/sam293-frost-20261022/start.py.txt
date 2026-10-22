@@ -1,0 +1,32 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from datetime import datetime,timezone
+import hashlib,json,shutil,subprocess,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-fryser-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not R.exists();R.mkdir();(R/'kall').mkdir()
+old=read(S/'start.json');published=read(S/'publiserte-moddfiler-3678.json')
+current={p.relative_to(P/'mods/gpt').as_posix():sha(p) for p in sorted((P/'mods/gpt').rglob('*')) if p.is_file()}
+assert current==published
+for name,h in old['beskyttede'].items():assert sha(A/name)==h,name
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==old['stash']
+remote={x.split()[1].removeprefix('refs/heads/'):x.split()[0]for x in subprocess.check_output(['git','ls-remote','origin','refs/heads/main','refs/heads/gpt-arbeid','refs/heads/hd-mod'],cwd=P,text=True).splitlines()}
+assert remote=={'main':'84e7ea2b8bda71ea7a02c8abdbc6012a3b3c1a69','gpt-arbeid':'8605ef0d53313e24a501c21f1d16bc7194c04f58','hd-mod':'930e0e29bcc6a281510720a3615a2778e2c8b4fe'}
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True)
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=A,text=True).replace('?? rapporter/'+O.name+'/','').strip()
+save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),remote=remote,filer=current,beskyttede=old['beskyttede'],stash=stash,native=3678,hele_figurjobber=505,total_figurjobber=1758,forrige_rapport=str(S),pakker_native=3661,neste='fig293_03',ingen_pagaende_grafikkmotor_observert=True))
+plan=read(S/'kildeplan.json');save(R/'kildeplan.json',plan)
+for n in [1956,1959,1969,1970,1971,1972,1973,1974]:
+ e=next(v for v in plan['ruter']if v['rute']==n);src=Image.open(e['kilde']).convert('RGBA');assert sha(Path(e['kilde']))==e['sha256'];assert hashlib.sha256(src.tobytes()).hexdigest()==e['rgba_sha256'];ctx=Path(e['kilde_helanimasjon_clip1']['fil']);assert sha(ctx)==e['kilde_helanimasjon_clip1']['sha256']
+ C=R/'kall'/('F'+str(n));C.mkdir();src.save(C/'original-alfa.png');visible=src.crop(src.getbbox());scale=min(24,900//visible.width,900//visible.height);big=visible.resize((visible.width*scale,visible.height*scale),Image.Resampling.NEAREST);atlas=Image.new('RGBA',(1024,1024),'#536576');atlas.alpha_composite(big,((1024-big.width)//2,(1024-big.height)//2));atlas.convert('RGB').save(C/'originalatlas.png');shutil.copy2(ctx,C/'spillkontekst-clip1.png')
+ refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst-clip1.png']
+ save(C/'plan.json',dict(ruter=[e],underlag_piksler=0,referanser={str(p):sha(p)for p in refs},kilde_og_mastere_sett_foer_kall=False,originalmaske=False,originalfragmenter=False,hele_kildelerret_sett=True,alle_originale_opake_piksler_i_forstorret_referanse=True,kildetype='kildeavklart_pels_eller_opakt_fryservindu'))
+ board=Image.new('RGB',(1900,1600),'#536576');dr=ImageDraw.Draw(board);dr.text((10,8),str(n)+' komplett original / original motor zclip1 / komplette godkjente mastere',fill='white');im=Image.open(C/'originalatlas.png');im.thumbnail((720,760));board.paste(im,(10,35));im=Image.open(ctx).convert('RGB');im.thumbnail((1120,750));board.paste(im,(770,35))
+ for k,m in enumerate(['sam','max']):
+  im=Image.open(A/'hovedark'/f'{m}.png').convert('RGBA');im.thumbnail((910,720));board.paste(im,(10+k*950,840),im)
+ board.save(C/'kontekst-og-mastere.png')
+ arr=np.array(src);colors,counts=np.unique(arr[arr[:,:,3]>0,:3],axis=0,return_counts=True);print(n,'size',src.size,'RGBA',[(c.tolist(),int(z))for c,z in zip(colors,counts)])
+for f in ['bevar.py','rens-plasser.py']:shutil.copy2(P/'out/sam293-fryser-20261022'/f,O/f)
+shutil.copy2(__file__,R/'start.py.txt')
+print('3678 native og alle tidligere filer, 1432 beskyttede og tre stasher bekreftet.')

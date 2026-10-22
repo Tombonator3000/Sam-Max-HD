@@ -1,0 +1,5 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=R/'kall'/sys.argv[1]
+d=json.loads((C/'plan.json').read_text());assert not(C/'faktiske-argumenter.json').exists();prompt=(C/'prompt-preparert.txt').read_text().strip();args=dict(prompt=prompt,referenced_image_paths=list(d['referanser']),transparent_background=True);(C/'faktisk-prompt.txt').write_text(prompt+'\n');(C/'faktiske-argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n');d.update(kilde_og_mastere_sett_foer_kall=True,sett_foer_kall_utc=datetime.now(timezone.utc).isoformat());(C/'plan.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');print(C.name,'forseglet')

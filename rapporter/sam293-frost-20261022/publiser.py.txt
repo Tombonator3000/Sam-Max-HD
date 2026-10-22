@@ -1,0 +1,57 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,shutil,subprocess,tarfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam2933684';T=O/'publisering-hdmod3684';H=O/'hentet-hdmod3684';BACKUP=O/'mod-grunnlag3678'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+def api(s):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True))
+def remote(br):return git(P,'ls-remote','origin','refs/heads/'+br).split()[0]
+def inv(d):return{p.relative_to(d).as_posix():sha(p)for p in d.rglob('*')if p.is_file()and'.git'not in p.relative_to(d).parts}
+b,files=read(R/'start.json'),read(R/'kandidatfilhash.json');s=read(R/'sluttkontroll.json');m=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json');selected=read(R/'egen-native.json')['ruter']
+assert not any(p.exists()for p in[T,H,BACKUP,R/'publisering-forsokt.json'])
+assert git(A,'branch','--show-current')=='gpt-arbeid'and not git(A,'status','--porcelain');art=git(A,'rev-parse','HEAD');assert remote('gpt-arbeid')==art
+assert remote('hd-mod')==b['remote']['hd-mod']=='930e0e29bcc6a281510720a3615a2778e2c8b4fe'
+assert len(b['filer'])==21922 and inv(M)==b['filer']and len(files)==21928 and inv(C)==files
+assert len(b['beskyttede'])==1432 and all(sha(A/f)==h for f,h in b['beskyttede'].items())and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+assert s['visuelt_sett']and s['motorobservert']==s['valgte_native']==6 and s['egne_nye_malerier']==5 and s['hele_rgba_aliasmal']==1
+assert m['visuelt_sett']and m['alle6_observert_i_begge_prover']and m['alle32_kildefaser_observert']and m['alle_originale_rektangler_med8HD_identiske']
+assert(m['kontroller_pr_side'],m['null_pr_side'],m['null_etter_testaktorstart_pr_side'])==(400,396,320)
+assert m['uforklarte_HD_endringer']==0 and m['ingen_nye_eller_okte_bufferavvik']and m['bufferavvik_koordinater_og_begge_RGB_eksakt_identiske']
+assert v['visuelt_sett']and v['hele_varianter_sett']==6 and v['hele_motorbilder_sett']==4 and v['hele_fryseranimasjon']['visuelt_sett']and len(v['hele_fryseranimasjon']['faser'])==32
+assert all(e['visuelt_sett']and sha(R/e['fil'])==e['sha256']for g in ['varianter','hele_motorbilder']for e in v[g]);assert sha(R/v['hele_fryseranimasjon']['fil'])==v['hele_fryseranimasjon']['sha256']
+assert read(R/'indre-feste-kontroll.json')['alle_kontrollerte_smaadeler_innen3HD']and read(R/'egen-visuell-plan.json')['visuelt_sett']
+assert len(selected)==6 and len(list((R/'kall').glob('*/verktøyresultat.json')))==13 and len(read(R/'kvalitetsreturer.json'))==8
+assert all(files[f]==h for f,h in b['filer'].items()if f!='mod.json')and set(files)-set(b['filer'])=={e['fil']for e in selected}
+assert all(files[e['fil']]==e['sha256']for e in selected)
+for k,nums in[(293,[1921,1922,1927,*range(1943,1949),1970,1971,1972]),(129,[641,642]),(124,[1804,1861,*range(1848,1855)])]:assert not any((C/f'costumes/costume{k}_{n}_hd.png').exists()for n in nums)
+assert len(list(A.glob('jobber/fig*/resultat.png')))==505 and not(A/'jobber/fig293_03/resultat.png').exists()
+builds={}
+for workflow in ['linux.yml','windows.yml']:
+ runs=api('actions/workflows/'+workflow+'/runs?per_page=30')['workflow_runs'];assert not any(e['status']!='completed'for e in runs),'Aktivt pakkebygg, publisering utsettes';builds[workflow]=[dict(id=e['id'],status=e['status'],conclusion=e['conclusion'])for e in runs]
+tag=api('releases/latest')['tag_name'];assert tag=='sam-max-hd-2026-10-22-kjokken'
+save(R/'pakkebygg-for-publisering.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),aktive_bygg=[],siste_bygg=builds,siste_fellesrelease=tag,native_frosset=False))
+save(R/'publisering-forsokt.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=b['remote']['hd-mod'],native=3684,nye_native=6,force_with_lease=True))
+shutil.copytree(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True);manifest=inv(T);manifest.pop('SHA256SUMS');(T/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n'for f,h in sorted(manifest.items())))
+subprocess.run(['git','-C',str(T),'add','-A'],check=True);subprocess.run(['git','-C',str(T),'-c','user.name=Codex','-c','user.email=noreply@openai.com','commit','-q','-m','HD-mod3684: seks kontrollerte pels- og fryservinduruter'],check=True)
+assert remote('hd-mod')==b['remote']['hd-mod'];subprocess.run(['git','-C',str(T),'push','-q','--force-with-lease=refs/heads/hd-mod:'+b['remote']['hd-mod'],git(P,'remote','get-url','origin'),'hd-mod:hd-mod'],check=True);published=git(T,'rev-parse','HEAD');assert remote('hd-mod')==published
+subprocess.run(['git','fetch','-q','--no-tags','--depth','1','origin','+refs/heads/hd-mod:refs/remotes/origin/hd-mod'],cwd=P,check=True);assert git(P,'rev-parse','refs/remotes/origin/hd-mod')==published
+archive=O/'hentet-hdmod3684.tar'
+with archive.open('wb')as f:subprocess.run(['git','archive','--format=tar',published],cwd=P,stdout=f,check=True)
+H.mkdir()
+with tarfile.open(archive)as tar:tar.extractall(H,filter='data')
+actual=inv(H);assert actual==inv(T)and len(actual)==21928 and set(actual)==set(files)and{f for f,h in files.items()if actual[f]!=h}=={'SHA256SUMS'}
+assert all(actual[f]==h for f,h in b['filer'].items()if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.endswith('.png')for f in actual)==21922 and sum(f.startswith('costumes/')and f.endswith('_hd.png')for f in actual)==read(H/'mod.json')['costume_cels']==3684
+subprocess.run(['sha256sum','--quiet','-c','SHA256SUMS'],cwd=H,check=True);assert inv(M)==b['filer']and remote('hd-mod')==published;shutil.move(str(M),BACKUP);shutil.copytree(H,M);assert inv(M)==actual and inv(BACKUP)==b['filer']
+assert all(sha(A/f)==h for f,h in b['beskyttede'].items())and git(P,'stash','list','--format=%H').splitlines()==b['stash']
+save(R/'publiserte-moddfiler-3684.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,hd_mod=published,native=3684,nye_native=6,egne_nye_malerier=5,hele_rgba_aliasmal=1,egenkontrollert=6,native_egne_OK=6,visuelt_sett=6,motorobservert=6,holdte_kvalitetsreturer=['costume293_1921','costume293_1922','costume293_1943','costume293_1947','costume293_1948','costume293_1970','costume293_1971','costume293_1972'],holdt_forrige_verktøyavslag=['costume293_1927'],verktøyavslag_ikke_omprovd=True,bildekall=13,vellykkede_bildekall=13,kvalitetsreturer=8,nye_hele_ark=0,figurark_med_resultat=505,gjenstar=1253,delark=23,maal_i_delark=32,filantall=21928,png=21922,alle_filhash_bekreftet=True,alle_tidligere_stier_bevart=True,tidligere_filer_bevart=21922,tidligere_png_bevart=21916,beskyttede=1432,stasher=b['stash'],force_with_lease=True,gammel_mod_bevart=str(BACKUP),godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3661,pakker_mangler_native=23,native_frosset=False,begrensning=m['begrensning'])
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+ d=read(R/name);d.update(hd_mod=published,grafikkilde=art,native=3684,publisert_native_naa=3684,nye_native_publisert=6,publisert=6,native_frosset=False)
+ for e in d.get('delvise_leveranser',[]):e.update(publisert=True,publiserte_ruter=23,hd_mod=published)
+ save(R/name,d)
+f=R/'rutekart-fig293_03.json';d=read(f)
+for e in d['fig293_03']['ruter']:e.update(publisert=True,hd_mod=published)
+save(f,d);shutil.copy2(__file__,R/'publiser.py.txt');print(json.dumps({k:receipt[k]for k in ['hd_mod','native','nye_native','filantall','png','alle_filhash_bekreftet']},ensure_ascii=False),flush=True)
