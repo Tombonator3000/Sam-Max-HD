@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json, hashlib, subprocess, shutil
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+R.mkdir(parents=True,exist_ok=False)
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest(); save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+git=lambda cwd,*args:subprocess.check_output(['git','-C',str(cwd),*args],text=True).strip()
+assert not git(A,'status','--porcelain'); assert not git(P,'status','--porcelain')
+prev=read(A/'rapporter/sam124-siste-to-20261022/start.json'); plan=read(A/'rapporter/sam129-kilde-20261022/kildeplan.json')
+protected={**prev['beskyttede'],**plan['beskyttede']}
+for f,h in protected.items(): assert sha(A/f)==h,(f,'endret kilde')
+files=read(A/'rapporter/felles-release-20261022-gatorgolf/moddfiler-3596.json')
+for f,h in files.items():assert sha(P/'mods/gpt'/f)==h,(f,'endret native')
+stash=git(P,'stash','list','--format=%H').splitlines();assert stash==prev['stash']
+save(R/'start.json',dict(main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),hd_mod=git(P,'ls-remote','origin','hd-mod').split()[0],native=3596,filer=files,beskyttede=protected,stash=stash,figurark=sum(1 for f in (A/'jobber').glob('fig*/resultat.png')),nye_maal=8,ulike_hele=8,bibliotek=['figurark-fast-storrelse'],bibliotek_kompatibilitet='PASS-kort for samme ScummVM/Python/Pillow-pipeline. CORE128, IoU0.6, dekning0.8 og helt maleri beholdes.'))
+save(R/'kildeplan.json',plan)
+shutil.copy2(__file__,R/'start.py.txt')
+board=Image.new('RGBA',(1600,850),'#536576'); dr=ImageDraw.Draw(board)
+for i,n in enumerate(range(406,414)):
+    row=next(e for e in plan['ruter']if e['bilde']==f'costume129_{n}'); src=Image.open(row['kilde']).convert('RGBA')
+    x=(i%4)*400; y=(i//4)*420
+    dr.text((x+12,y+8),f'{n}: complete source {src.width}x{src.height}',fill='white')
+    board.alpha_composite(src.resize((src.width*11,src.height*11),Image.Resampling.NEAREST),(x+65,y+55))
+board.convert('RGB').save(R/'otte-hele-originaler.png')
+print('Start',len(files),'nativefiler',len(protected),'beskyttede',len(stash),'stasher')

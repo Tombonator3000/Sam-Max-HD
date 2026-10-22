@@ -1,0 +1,33 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json, hashlib, shutil, sys
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest(); save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+name,number,detail=sys.argv[1:4]; cel='costume129_'+number
+row=next(e for e in read(R/'kildeplan.json')['ruter']if e['bilde']==cel); C=R/'kall'/name
+assert not C.exists(); C.mkdir(parents=True)
+src=Image.open(row['kilde']).convert('RGBA'); assert sha(Path(row['kilde']))==row['sha256'] and hashlib.sha256(src.tobytes()).hexdigest()==row['rgba_sha256']
+scale=26; atlas=Image.new('RGBA',(1024,1024),'#536576'); atlas.alpha_composite(src.resize((src.width*scale,src.height*scale),Image.Resampling.NEAREST),((1024-src.width*scale)//2,(1024-src.height*scale)//2))
+atlas.convert('RGB').save(C/'originalatlas.png'); src.save(C/'original-alfa.png')
+ctx=row['naturlig_kontekst']; assert ctx and sha(Path(ctx['originalkontekst']))==ctx['sha256'];shutil.copy2(ctx['originalkontekst'],C/'spillkontekst.png')
+continuity=A/'rapporter/sam124-siste-to-20261022/kall/B10/raa.png'
+refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst.png',continuity]
+prompt=f'''Use case: illustration-story.
+Asset: ONE complete separate speaking-head animation cel, Sam & Max Hit the Road HD, {cel}.
+Input roles: Image1 is the entire actual source cel enlarged on a slate inspection backdrop. It controls this exact pose, head contour, facial feature positions and dimensions, mouth phase, colors and source clipping. Image2 and Image3 are the COMPLETE approved Sam and Max style masters, STYLE ONLY. Image4 is the actual original game scene, CONTEXT ONLY, showing this head above the independently rendered torso. Image5 is our earlier entire Lee-Harvey painting for continuity of brown/orange hair, pink skin and clean line style. It is NOT an approved master and must not replace the actual head pose in Image1.
+Redraw the entire single head as ONE unified smooth cartoon painting on genuine transparent alpha. Only the head and short skin neck stump in Image1, no shoulders, clothing, torso, severing effects, ground, objects, other actors or background. The lower flat source cutoff is an ordinary animation-layer join: do not add a black border there. Preserve the exact source orientation facing right, narrow elongated facial proportions, small half-lidded eyes where shown, swept high angular brown/orange quiff and sideburn, pink face/ear/neck areas, prominent long nose, asymmetrical expression and the actual mouth phase.
+Exact phase: {detail}
+This is Lee-Harvey, Conroy's human henchman, not Sam, Max, a blonde man, Conroy himself or a generic handsome caricature. Keep the brown/orange source hair color and source pink skin. No invented eyebrow style, eyelashes, hair streaks, stubble, beard, glasses, nose highlight, extra teeth or lips. Source light gray/white tooth clusters are teeth and black mouth clusters are mouth. Empty skin areas stay flat skin. Preserve the actual shape and count of tooth bands from Image1, never a generic smile.
+Trace the original at 4x: same whole contour, pose and proportions; turn each source pixel cluster into its intended smooth shape. Clean continuous dark hand-drawn contours with a little line-weight variation, flat faithful colors with one shade. No enlarged pixels, block edges, dithering, texture, gradients, 3D, glow, ground shadow or outline around the transparent neck join. Do not mirror or rotate. Do not enlarge the eyes, nose, hair or head; preserve the original head width/height ratio exactly.
+Output one centered complete head on a 1024x1024 transparent PNG, large enough for smooth rendering with transparent margin all around. Original full cel is {src.width}x{src.height} pixels; final native whole visible extent is {src.width*4}x{src.height*4} HD pixels before equal margin. No labels, text, checkerboard or slate backdrop in the output.'''
+args=dict(prompt=prompt,referenced_image_paths=[str(f)for f in refs],transparent_background=True)
+(C/'faktisk-prompt.txt').write_text(prompt+'\n');save(C/'faktiske-argumenter.json',args)
+save(C/'plan.json',dict(ruter=[dict(row,canonical_rgba_sha256=row['rgba_sha256'])],detaljer=detail,underlag_piksler=0,referanser={str(f):sha(f)for f in refs},kilde_og_mastere_sett_foer_kall=False,originalmaske=False,originalfragmenter=False,selvstendig_hel_hoderute=True))
+board=Image.new('RGB',(1800,1750),'#536576');dr=ImageDraw.Draw(board);dr.text((10,8),f'{name}: {cel}, hel original / faktisk originalscene / komplette Sam- og Max-mastere / tidligere hel egen tegning',fill='white')
+board.paste(Image.open(C/'originalatlas.png').resize((680,680)),(10,35))
+im=Image.open(C/'spillkontekst.png').convert('RGB');im.thumbnail((1080,720));board.paste(im,(710,35))
+for i,n in enumerate(['sam','max']):
+    im=Image.open(A/'hovedark'/f'{n}.png').convert('RGBA'); im.thumbnail((850,500));board.paste(im,(10+900*i,800),im)
+im=Image.open(continuity).convert('RGBA');im.thumbnail((600,430));board.paste(im,(10,1310),im);dr.text((650,1400),'Kun kontinuitet, ikke Tom-/Claude-godkjent master',fill='white')
+board.save(C/'kontekst-og-mastere.png');shutil.copy2(__file__,R/'klargjor.py.txt')
+print(name,cel,src.size,'naturlig originalinngang217',ctx['bildeframe'],flush=True)
