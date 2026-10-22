@@ -1,0 +1,53 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from PIL import Image,ImageDraw
+import hashlib,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');native=read(R/'egen-native.json');p=read(R/'fremdrift.json');m=read(R/'motor-sammenligning.json');v=read(R/'motor-visuell-plan.json')
+assert m['alle13_observert'] and m['alle23_kildefaser_observert'] and m['alle_originalaktorverdier_identiske'] and m['uforklarte_HD_endringer']==0 and m['buffer_to_foer_testaktor_eksakt_identiske']
+assert len(v['varianter'])==4 and len(v['hele_motorbilder'])==4
+for group in ['varianter','hele_motorbilder']:
+ for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+v['hele_startanimasjon']['visuelt_sett']=True;v.update(visuelt_sett=True,hele_varianter_sett=13,hele_motorbilder_sett=4);save(R/'motor-visuell-plan.json',v)
+m['visuelt_sett']=True;save(R/'motor-sammenligning.json',m)
+q=read(R/'indre-feste-kontroll.json');selected=read(R/'valgte7.json');names={e['valgt_kall']for e in selected};assert len(names)==7 and all(e['innen3HD']for e in q['maalinger']if e['kall']in names);q.update(alle_valgte7_innen3HD=True,visuelt_sett=True);save(R/'indre-feste-kontroll.json',q)
+q=read(R/'smaadel-kontroll.json');assert q['innen3HD'] and q['to_ekte_komponenter_bevart'];q['visuelt_sett']=True;save(R/'smaadel-kontroll.json',q)
+for e in selected:e.update(visuelt_sett=True,motorobservert=True)
+save(R/'valgte7.json',selected)
+for e in p['leveranser']:e.update(visuelt_kontrollert=True,motorobservert=True)
+p.update(visuelt_sett=13,visuelt_ok=13,motorobservert=13,nye_native=13,native_totalt=3661);save(R/'fremdrift.json',p)
+route=read(R/'rutekart-fig293_02.json')
+for e in route['fig293_02']['ruter']:e.update(prototype_visuelt_sett=True,motorobservert=True)
+save(R/'rutekart-fig293_02.json',route)
+pix=read(R/'motor-pikselkontroll.json')
+for e in pix:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',pix)
+receipt=read(R/'mottak-publisert.json')if(R/'mottak-publisert.json').exists()else None
+publication=f"Publisert additivt som hd-mod {receipt['hd_mod']}, grafikkilde {receipt['grafikkilde']}. Alle21905 filhash er hentet tilbake og bekreftet."if receipt else 'Kandidat3661 er kontrollert. Publisering og tilbakehenting er ikke bekreftet ennå.'
+body=f'''Ett helt figurark,fig293_02,er laget med innebygd image_gen,egenkontrollert,native mottatt,motorobservert og visuelt sett. Det inneholder13 nye native ruter1930..1942 fra kostyme293:syv egne nye tegninger og seks hele RGBA-aliaser. {publication}505 av1758 figurark har resultat,1253 er uten pluss returer og sluttkontroll.293-familien har20/55 native i kandidaten,34 produserbare mål gjenstår inkludert to returer,og1927 holdes uten omprøving.
+
+Elleve faktiske bildekall ga11 råbilder,ingen nye verktøyavslag og fire forkastede kvalitetskandidater. De to gjenopptatte returene1921/1922 har fortsatt feil hode-/øyefeste og er ikke levert. Første1935-utkast hadde et oppdiktet øye i avkappet bakhode og er erstattet av N1935R. Første1936-utkast var for smalt og er erstattet av N1936R. Ingen avviste utkast brukes som stil-/identitetsanker. Forrige1927-avslag holdes uten nytt kall.
+
+Komplette originaler og godkjente Sam-/Max-mastere er sett før hvert motiv. Alle13 originalflater er bekreftet med0 RGB565-avvik i faktisk kjøkkenrom56,palett0. Originalen styrer Lee-Harveys identitet,okerhår,rosa hud,svart jakke med mørkeblå kanter,grå mansjetter og den løse Bigfoot-forkledningen. Maskefjesets brune linjer er tegninger,ikke åpne hull. Avkappingen ved venstre kant og den lille separate skodelen er kildebekreftet og bevart. Aliaser er bekreftet med lik størrelse og alle hele RGBA-verdier.
+
+Ekte egen alfa,fast4x og to originalpikslers marg. CORE128,IoU0,6,dekning0,8 og tillatt hel affin forskjell0,88..1,12 er beholdt. Bare hele tegninger er plassert,med høyst3HD-pikslers flytting. Alle kildefestede øyemarkeringer og den separate skodelen er innen3HD-piksler. Ingen lokal Python-flytting av trekk,originalfragmenter eller hard originalmaskeklipping. Faktisk egenkontroll og myke-figurer-mottak gir13 OK,0 til gjennomsyn og0 originalfragmenter.
+
+Endelige rene baseline-/kandidatprøver avslutter med exit0 og118/120 nullkontroller hver. De to eksisterende bufferavvikene i frame24/25 ved rominngang,før testaktøren i frame40,har identiske koordinater og begge RGB-verdier. Etter testaktørstart80/80 null per side. Alle13 originale aktørflater og8HD-naboområder er like,med0 uforklarte HD-endringer. Tretten før/etter-varianter,fire hele motorbilder og alle23 faser er faktisk visuelt sett. Konstruert aktør29,animasjon1/raw6,med faktisk nedlastet Linux-binær5abfeae205d9e2c415e503c76a332bd92d638b81937c6403ce40c69d2c98e676. Ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Første baseline og kandidat ble rendret,men rapporthjelperen feilet før kvittering fordi en lokal kopi av kostymeheaderen manglet. Begge første prøver er bevart og regnes ikke bestått. Hashbekreftet header er gjenbrukt,og begge endelige v2-prøver har normale exitkvitteringer. Ingen motor-/pipelinekode er endret. Tidligere uavklart shell143 fra forrige rapport er fortsatt bevart,som historikk.
+
+Alle21892 tidligere moddfiler og21886 PNG bevares unntatt oppdatert mod.json/manifest.1432 beskyttede jobbfiler og tre stasher står urørt. Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt3641 native og mangler20 fra293-familien. Den kalles ikke oppdatert med3661. Videre arbeid:fig293_03 med frysersekvensens faktiske kildekontekst,deretter gjenværende returer. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter,all grafikk er ikke ferdig.
+
+Bibliotekskilder:figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e. Bevis:fremdrift.json,rutekart-fig293_02.json,indre-feste-kontroll.json,smaadel-kontroll.json,automatisk-mottak.json,motor-sammenligning.json,motor-bufferkontroll.json og mottak-publisert.json når publiseringen er bekreftet.
+'''
+(R/'RAPPORT.md').write_text('# Lee-Harveys gangsekvens og avkapping ved fryseren\n\n'+now+' (Codex)\n\n'+body+'\n![Syv nye tegninger](syv-egne-native.png)\n');(R/'status-blokk.md').write_text(body)
+(A/'jobber/fig293_02/notat.md').write_text('# Levering av fig293_02\n\n'+now+' (Codex)\n\n'+body+'\nVerktøy:innebygd image_gen,modellnavn ikke oppgitt. Faktiske prompter,referansehash,råbilder og valgte eksportfiler finnes under rapporter/'+R.name+'/kall/.\n')
+board=Image.new('RGBA',(1750,450),'#536576');draw=ImageDraw.Draw(board)
+for i,e in enumerate(selected):
+ im=Image.open(A/e['prototype']).convert('RGBA');draw.text((i*250+6,8),e['bilde']+' native4x',fill='white');board.alpha_composite(im,(i*250+12,42))
+board.convert('RGB').save(R/'syv-egne-native.png')
+save(R/'sluttkontroll.json',dict(tid_norsk=now,valgte_native=13,egne_nye_malerier=7,hele_rgba_aliasmal=6,visuelt_sett=True,motorobservert=13,hele_varianter=13,hele_motorbilder=4,hele_kildefaser=23,alle_valgte_fester_innen3HD=True,opprinnelige_21892_moddfiler_bevart=True,beskyttede=1432,stasher=read(R/'start.json')['stash'],kvalitetsreturer_1921_1922_utelatt=True,toolholdt1927_ikke_omprovd=True,Tom_godkjent=0,Claude_godkjent=0,hele_figurjobber=505,native_kandidat=3661,rapportfeil_rettet_og_forste_prover_ikke_bestatt=True,endelige120_prover_exit0=True,ingen_nye_eller_okte_bufferavvik=True,publisert=bool(receipt)))
+shutil.copy2(__file__,R/'rapport.py.txt');print('Visuelt sett13 varianter,4 hele motorbilder,23 kildefaser. Rapport og jobbnotat skrevet.')

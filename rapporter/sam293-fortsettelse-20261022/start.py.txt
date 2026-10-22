@@ -1,0 +1,51 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image, ImageDraw
+import hashlib, json, re, shutil, subprocess, numpy as np
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name; S=A/'rapporter/sam293-foerste-20261022'
+read=lambda p:json.loads(p.read_text()); sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+assert not R.exists() and not git(P,'status','--porcelain') and not git(A,'status','--porcelain')
+old=read(S/'start.json'); files=read(S/'publiserte-moddfiler-3648.json')
+assert len(files)==21892 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+assert len(old['beskyttede'])==1432 and all(sha(A/f)==h for f,h in old['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==old['stash']
+for w,b,h in [(P,'main','616344c38f901cfc49aaaab39a21991164937535'),(A,'gpt-arbeid','307242e40a0c58be2fda4cd2ccf35a87e0ac2e31')]:
+ assert git(w,'rev-parse','HEAD')==git(w,'ls-remote','origin','refs/heads/'+b).split()[0]==h
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]=='b576c43b9971ec5263dad066a3648446cb6f1338'
+assert read(P/'mods/gpt/mod.json')['costume_cels']==3648
+assert len(list(A.glob('jobber/fig*/resultat.png')))==504
+R.mkdir(parents=True); (R/'kall').mkdir()
+save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),hd_mod='b576c43b9971ec5263dad066a3648446cb6f1338',native=3648,filer=files,beskyttede=old['beskyttede'],stash=old['stash'],figurark=504,forrige_rapport=S.relative_to(A).as_posix(),bibliotek=old['bibliotek'],bibliotek_kompatibilitet=old['bibliotek_kompatibilitet']))
+plan=read(S/'kildeplan.json'); save(R/'kildeplan.json',plan)
+T=P/'out/sam293-foerste-20261022/grunnlag3641-start1'; log=(T/'scummvm.log').read_text(); contexts=[]
+for n in range(1930,1943):
+ e=next(e for e in plan['ruter']if e['rute']==n); src=Image.open(e['kilde']).convert('RGBA'); arr=np.array(src)
+ assert sha(Path(e['kilde']))==e['sha256'] and hashlib.sha256(arr.tobytes()).hexdigest()==e['rgba_sha256']
+ canon=next(x for x in plan['ruter']if x['bilde']==e['canonical']); cim=Image.open(canon['kilde']).convert('RGBA')
+ assert src.size==cim.size and src.tobytes()==cim.tobytes()
+ event=next(tuple(map(int,m))for m in re.findall(r'frame (\d+) soft cel\s+(\d+) costume\s*293\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',log)if int(m[1])==n)
+ f,_,x,y,w,h=event;ctx=T/f'frame_{f+1:06}_room056_flat.png';flat=np.array(Image.open(ctx).convert('RGB')); opts=[]
+ for mirror in [False,True]:
+  a=arr[:,::-1]if mirror else arr;rgb=a[:,:,:3].astype(np.uint16);rr=rgb[:,:,0]>>3;gg=rgb[:,:,1]>>2;bb=rgb[:,:,2]>>3;rgb=np.stack([(rr<<3)|(rr>>2),(gg<<2)|(gg>>4),(bb<<3)|(bb>>2)],2).astype(np.uint8);ex=np.repeat(np.repeat(rgb,4,0),4,1);mask=np.repeat(np.repeat(a[:,:,3]>0,4,0),4,1)
+  for dx in [-1,0,1]:
+   for dy in [-1,0,1]:
+    xx,yy=(x+dx)*4,(y+dy)*4;wrong=int((mask&np.any(flat[yy:yy+h*4,xx:xx+w*4]!=ex,2)).sum());opts.append((wrong,abs(dx)+abs(dy),mirror,dx,dy))
+ best=min(opts);assert best[0]==0,(n,best)
+ context=dict(fil=str(ctx),sha256=sha(ctx),logg_frame=f,bildeframe=f+1,cel=n,pos=[x,y],maal=[w,h],speilvendt=best[2],dx_original=best[3],dy_original=best[4],RGB565_avvik=0,kontrollert_testaktor29=True,naturlig_handling=False)
+ e['kontrollert_kontekst']=context;contexts.append(context)
+ if n>1936:continue
+ C=R/'kall'/('N'+str(n));C.mkdir();visible=src.crop(src.getbbox());vw,vh=visible.size;atlas=Image.new('RGBA',(1024,1024),'#536576');scale=min(24,900//vw,900//vh);large=visible.resize((vw*scale,vh*scale),Image.Resampling.NEAREST);atlas.alpha_composite(large,((1024-large.width)//2,(1024-large.height)//2));atlas.convert('RGB').save(C/'originalatlas.png');src.save(C/'original-alfa.png');shutil.copy2(ctx,C/'spillkontekst.png')
+ refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst.png']
+ save(C/'plan.json',dict(ruter=[dict(e,canonical_rgba_sha256=e['rgba_sha256'],egen_kildepalett_RGB=True)],underlag_piksler=0,referanser={str(p):sha(p)for p in refs},kilde_og_mastere_sett_foer_kall=False,originalmaske=False,originalfragmenter=False,hele_kildelerret_sett=True,alle_originale_opake_piksler_i_forstorret_referanse=True,kildetype='hel_rute_med_kildeavkapping'))
+ board=Image.new('RGB',(1900,1600),'#536576');d=ImageDraw.Draw(board);d.text((10,8),f'{n}: full source, original context, COMPLETE approved STYLE masters',fill='white');im=Image.open(C/'originalatlas.png');im.thumbnail((720,760));board.paste(im,(10,35));im=Image.open(ctx).convert('RGB');im.thumbnail((1120,750));board.paste(im,(770,35))
+ for k,m in enumerate(['sam','max']):
+  im=Image.open(A/'hovedark'/f'{m}.png').convert('RGBA');im.thumbnail((910,720));board.paste(im,(10+k*950,840),im)
+ board.save(C/'kontekst-og-mastere.png')
+# Resume a prepared but never executed correction. The old raw is ONLY an edit target.
+C=R/'kall/R1922';shutil.copytree(S/'kall/V03RRRR',C)
+d=read(C/'plan.json');d['kilde_og_mastere_sett_foer_kall']=False;d['gjenopptatt_ikke_tidligere_kjort_plan']='sam293-foerste-20261022/kall/V03RRRR';save(C/'plan.json',d)
+save(R/'kildeplan.json',plan);save(R/'kildekontekst13.json',contexts)
+for f in ['bevar.py','rens-plasser.py']:shutil.copy2(P/'out/sam293-foerste-20261022'/f,O/f)
+shutil.copy2(__file__,R/'start.py.txt'); print('3648 verifisert. 13 originalflater:0 RGB565-avvik;7 ulike hele RGBA. R1922 gjenopptar ukjort retting.',flush=True)

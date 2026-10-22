@@ -19,3 +19,7 @@ Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt 3641
 Bevis: rapporter/sam293-foerste-20261022/fremdrift.json,rutekart-fig293_01.json,indre-feste-kontroll.json,motor-sammenligning.json,motor-bufferkontroll.json og mottak-publisert.json når publiseringen er bekreftet. Bibliotekskildene figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt med samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e.
 
 Resultatet er delresultat i rapportmappen,ikke et helt resultat.png i denne jobbens mappe. Verktøy:innebygd image_gen,modellnavn ikke oppgitt. Alle faktiske argumenter/promptsett finnes under rapportens kall/.
+
+## 2026-10-22 10:37 (Codex)
+
+To nye innebygde kvalitetsforsok er bevart i rapporter/sam293-fortsettelse-20261022/kall/R1921 og R1922. Begge er visuelt sett,men hode-/oyefeste eller ekstra kremstriper feiler fortsatt. De tas ikke inn. Syv publiserte ruter er bevart,1927 holdes uten nytt kall,og jobben er fortsatt7/10 uten hel resultatfil.

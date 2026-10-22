@@ -1,0 +1,27 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,shutil,sys
+from PIL import Image,ImageDraw
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-foerste-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+name=sys.argv[1]
+if name=='R1921':
+ old=S/'kall/V02RR';d=read(old/'plan.json');target=old/'raa.png';source=old/'originalatlas.png';context=old/'spillkontekst.png'
+ text='''Redraw the complete HEAD ONLY against the original, correcting whole head registration and exact eye asymmetry. In original whole-visible coordinates the source cream slivers are(62,14) and(68,14); BLACK pupils are(63,14) and(67,14). Thus eyes look inward and cream appears only at the OUTER edges of the two narrow apertures, ONE cream sliver per eye. Do not center pupils or add cream on both sides. Keep exact head width/height and its position relative to shoulder, hair, nose, mouth and ears. Use the original, not a new character design. Keep every other part unchanged, including the FLAT lower pink palm, crouched boots, spread other hand, long limp horizontal disguise and correct rotated golden mask strokes. Mask is fabric with brown drawn facial strokes, not open holes. Original visible ratio95:77.'''
+elif name=='N1935R':
+ old=R/'kall/N1935';d=read(old/'plan.json');target=old/'raa.png';source=old/'originalatlas.png';context=old/'spillkontekst.png'
+ text='''Correct ONLY the small HEAD REMNANT at TOP LEFT. The original is a clipped view of the BACK OF THE HEAD and EAR, not a face. REMOVE the invented cream eyeball and its oval eye outline completely. There is NO EYE, eyebrow, nose or mouth in this source. Draw only the source small ochre rear hair slice and tiny pink/red ear/neck strip in exactly their source location and width. Keep the rest of this whole cel: gray shoulder wedge, black/navy back, extremely narrow partial trouser and bent trailing boot, all source clipping, transparent alpha and14:65 visible ratio. Do not complete hidden anatomy or add opaque parts.'''
+elif name=='N1936R':
+ old=R/'kall/N1936';d=read(old/'plan.json');target=old/'raa.png';source=old/'originalatlas.png';context=old/'spillkontekst.png'
+ text='''Redraw this COMPLETE extremely narrow partial cel to the exact source visible aspect ratio13:71. The previous drawing is too NARROW relative to height by about17percent. This is a complete drawing correction, preserving all proportions from the ORIGINAL source2, NOT independently resizing any facial feature. Keep the exact vertical distribution of the small rear ochre hair/pink ear strip at top-left, broad gray collar patch, BLACK/navy curved back sleeve, tiny gray cuff, extremely narrow straight black trouser remnant and ONE detached black boot at bottom with source transparent gap. Straight LEFT cut boundary is intentional. No face, eye, nose, hand, mask or reconstructed left half. The detached boot is a genuine source component and must keep exact source-relative size/position. No extra boot or new colored detail. Output enough width for13:71 visible ratio with padding, no clipped output.'''
+else:raise ValueError(name)
+C=R/'kall'/name;assert not C.exists();C.mkdir()
+src=Image.open(d['ruter'][0]['kilde']).convert('RGBA');head=src.crop((0,0,src.width,min(28,src.height)));head.resize((head.width*20,head.height*20),Image.Resampling.NEAREST).save(C/'originalhode-detalj.png')
+refs=[target,source,C/'originalhode-detalj.png',A/'hovedark/sam.png',A/'hovedark/max.png']
+prompt='Use case: precise-object-edit. Image1 is ONLY the complete edit TARGET, never an identity/style anchor. Image2 is the COMPLETE ORIGINAL cel and image3 its original upper detail; images4/5 are COMPLETE approved Sam/Max STYLE masters only. Original controls identity,geometry and local colors. '+text+' Smooth continuous cartoon contours, flat exact source colors and no pixel stairs, gradients, glow, texture, labels, ground shadow or watermark. Return ONE COMPLETE cel alone with all source-visible parts and genuinely transparent background, preserving its alpha and generous padding.'
+d.update(retur_av=str(old),returgrunn=text,referanser={str(p):sha(p)for p in refs},kilde_og_mastere_sett_foer_kall=False)
+d['ruter'][0].pop('hel_plassering_HD',None)
+(C/'plan.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');(C/'faktisk-prompt.txt').write_text(prompt+'\n');(C/'faktiske-argumenter.json').write_text(json.dumps(dict(prompt=prompt,referenced_image_paths=[str(p)for p in refs],transparent_background=True),ensure_ascii=False,indent=2)+'\n')
+for f in ['originalatlas.png','original-alfa.png','spillkontekst.png','kontekst-og-mastere.png']:
+ if(old/f).exists():shutil.copy2(old/f,C/f)
+shutil.copy2(__file__,R/'retur.py.txt');print(name,'korreksjon klargjort, ikke kalt')

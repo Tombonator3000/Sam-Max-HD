@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+rows=[];board=Image.new('RGB',(1600,1250),'#536576');draw=ImageDraw.Draw(board)
+for j,C in enumerate(sorted((R/'kall').iterdir())):
+ d=read(C/'plan.json');e=d['ruter'][0];f=C/(e['bilde']+'-prototype.png')
+ if not f.exists():continue
+ points={};arrays={}
+ for key,path in [('src',Path(e['kilde'])),('own',f)]:
+  a=np.array(Image.open(path).convert('RGBA'));arrays[key]=a;rgb=a[:,:,:3];m=(a[:,:,3]>=128)&(rgb[:,:,0]>235)&(rgb[:,:,1]>175)&(rgb[:,:,1]<220)&(rgb[:,:,2]>105)&(rgb[:,:,2]<170);m[int(a.shape[0]*.35):]=False
+  lab,n=nd.label(m,np.ones((3,3)));points[key]=[dict(xy=list(map(float,nd.center_of_mass(lab==i)[::-1])),area=int((lab==i).sum()))for i in range(1,n+1)]
+ significant=[v for v in points['own']if v['area']>=4]; significant.sort(key=lambda v:v['xy'][0]);source=sorted(points['src'],key=lambda v:v['xy'][0]);dist=[]
+ if len(significant)==len(source):
+  for s,o in zip(source,significant):dist.append(float(np.linalg.norm(np.array(o['xy'])-(np.array(s['xy'])*4+9.5))))
+ okay=len(significant)==len(source)and all(v<=3 for v in dist)
+ row=dict(kall=C.name,bilde=e['bilde'],kilde_kremoyeceller=source,egne_kremoyefelt=points['own'],egne_sammenhengende_felt_minst4HD=significant,avstander_HD=dist,innen3HD=okay,ingen_synlig_kildeoye=not bool(source),native_sha256=sha(f),originalmaske=False)
+ rows.append(row);print(C.name,'oye',okay,[round(v,2)for v in dist],len(source),len(significant))
+ # Actual complete 4x source and processed native; no changes to delivered images.
+ x,y=(j%4)*400,(j//4)*410;draw.text((x+8,y+6),C.name+' '+str(okay),fill='white')
+ im=Image.fromarray(arrays['src']).resize((arrays['src'].shape[1]*4,arrays['src'].shape[0]*4),Image.Resampling.NEAREST);board.paste(im,(x+8,y+32),im)
+ im=Image.open(f).convert('RGBA');board.paste(im,(x+205,y+24),im)
+(R/'indre-feste-kontroll.json').write_text(json.dumps(dict(maalinger=rows,terskel_HD=3,smakomponent_grense_HD=4,ingen_featureflytting=True,visuelt_sett=False),ensure_ascii=False,indent=2)+'\n');board.save(R/'prototypeoversikt.png');shutil.copy2(__file__,R/'feste.py.txt')
