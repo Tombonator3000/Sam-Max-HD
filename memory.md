@@ -1,5 +1,19 @@
 # memory.md
 
+<!-- felles-fryserark-status:start -->
+Fryserarket fig293_03 er helt levert med 32/32 ruter etter én ny egen tegning av costume293_1943. Råbilde og faktisk prompt er bevart. De 31 tidligere arkposisjonene er uendret. 506 av 1758 hele figurjobber har resultat, 1252 mangler i tillegg til returer og samlet sluttkontroll. Kostyme 293 har 54/55 native. Bare verktøyholdt 1927 gjenstår i familien og omprøves ikke. fig293_01 er fortsatt delvis 9/10.
+
+Den nye tegningen er egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert additivt på hd-mod f0f7b641177cec8661d7c0cbf68c5faef9eb31f6. Grafikkilde a87548f883874329ff4a5c9c0322acd86df1f2db. Alle 21939 publiserte filhash er hentet tilbake og bekreftet, inkludert 21933 PNG og 3695 native ruter. Åtte atskilte hvite grupper og blåglimtet er kildebekreftet innen 3 HD. En liten plassering av hele tegningen er dokumentert, uten lokal flytting av trekk eller originalmaske.
+
+To ferske motorprøver per side viser den nye ruten og alle 32 fryserfaser i faktisk tidligere nedlastet Linux-binær. 400 bufferkontroller per side, 396 uten avvik og 320/320 uten avvik etter figurstart. Kjente inngangsavvik har identiske koordinater og begge RGB-verdier. Hele bilder og varianter er visuelt sett. Ingen ny Tom-/Claude-godkjenning, interaktiv Windows-/webtest eller naturlig full gjennomspilling.
+
+Fellespakkene fryservindu har fortsatt 3684 native og mangler 11 nyere ruter. Første nye Windows-bygg 39782182412 kompilerte og pakket, men stoppet før spillgjenkjenning på SDL_BlitSurface med ugyldig kilde. Feilen er lokalisert og rettet gjennom PR35, flettet og hentet som d738f535b685ea627e82f0dcf1c83ee9b0bea170 etter grønn PR-CI. ScummVM-pin og HD-patch 0001 er urørt. Fire ferske oppstarter med HD og 3000 nearest-bilder består lokalt, med 12 bufferkontroller og 12 originale sammenligninger uten avvik. Nearest-testgrunnlaget inkluderer alle kostymer fordi introen bruker flere enn standardtestens 1..20.
+
+Eksakt main-CI 39788627834 er grønn. Linux 39789036179 og Windows 39789041441 bygger nå fra samme kontrollerte kode og native3695. Fellesrelease er ikke oppdatert eller opprettet. Nativefrys beholdes til begge faktiske pakker, filhash, motoravspilling, fellesvedlegg og taggbygg er kontrollert. Ikke dupliser dispatch eller publisering; les journalen i rapporter/felles-release-20261022-fryserark. Alle tidligere modfiler, 1432 beskyttede jobbfiler og tre opprinnelige stasher bevares. Gamle nattprosesser startes ikke. Etter pakkekontroll fortsetter fig296_01 etter retur- og kildekontroll. All grafikk er ikke ferdig.
+<!-- felles-fryserark-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- sam293-returer-status:start -->
 Fem nye egne tegninger er laget, egenkontrollert, native mottatt, visuelt sett og motorobservert: costume293_1921, 1922, 1970, 1971 og 1972. Publisert additivt som hd-mod d0d8aa4304aa8acbca393c1d1ac5a742c405aff7, grafikkilde e026697e2f6d8a86eb4a22fe5d403375af65a14e. Alle 21938 filhash er hentet tilbake og bekreftet. fig293_01 er delvis 9/10 og fig293_03 delvis 31/32. Alle 35 tidligere arkposisjoner er bevart. Kostyme 293 har 53/55 native ruter. Bare 1943 er produserbar retur i denne familien; 1927 er fortsatt verktøyholdt og omprøves ikke. 505/1758 hele figurjobber har resultat, 1253 er uten i tillegg til returer og samlet sluttkontroll.
 
