@@ -1,0 +1,36 @@
+from pathlib import Path
+P=Path('/home/tom/Sam-Max-HD');old=P/'out/felles-release-20261022-fryservindu';new=P/'out/felles-release-20261022-fryserark';assert not new.exists();new.mkdir()
+for name in ['start.py','hent-status.py','hent-pakker.py','kontroller-pakker.py','kontroller-linux-nedlasting.py','publiser-felles.py','taggkontroll.py','etter-publisering.py']:
+ s=(old/name).read_text().replace('felles-release-20261022-fryservindu','felles-release-20261022-fryserark').replace('sam293-frost-20261022','sam293-siste-fryserrute-20261022')
+ s=s.replace("rapporter/felles-release-20261022-kjokken/moddfiler-3661.json",'__OLDBASE__').replace('3684','3695').replace('3661','3684').replace('__OLDBASE__','rapporter/felles-release-20261022-fryservindu/moddfiler-3684.json')
+ s=s.replace('21928','21939').replace('21927','21938').replace('native23','native11').replace('==23','==11').replace('=23','=11').replace('23 nye','11 nye').replace('alle23','alle11').replace('Alle23','Alle11').replace('23 ruter','11 ruter').replace('23 figurvarianter','11 figurvarianter').replace('505','506').replace('1253','1252').replace("['costume293_1921','costume293_1922','costume293_1927'", "['costume293_1927'")
+ if name=='start.py':
+  s=s.replace("for label in ['clip1','skript204-med-aktor10']:\n shutil.copy2(S/('kandidat3695-'+label+'.json'),R/('grunnlag3695-'+label+'.json'))", "# Fresh production playback is run independently for all11 checkpoint additions.")
+ if name=='publiser-felles.py':
+  start=s.index("body=f'''" );end=s.index("\n(R/'utgivelse-notat.md')",start)
+  body="""body=f'''Felles testutgave for **Linux og Windows med3695 native HD-bildelag**. Begge pakkene inkluderer11 nye ruter siden forrige fellesutgave,fryservindu:1921,1922,1943..1948 og1970..1972. Tidligere grafikk er bevart. Fryserarket fig293_03 er helt levert32/32.
+
+Begge faktiske nedlastinger er kontrollert med sjekksumfiler,fire vedleggsdigester og alle21938 runtime-modfiler per pakke. Ny Linux-binær med medfølgende mod er kontrollert mot produksjonen i tre prøver:animasjon1/raw6,animasjon7/raw30 og originalt lokalskript204 etter konstruert fortilstand i rom56. Alle11 nye ruter er observert i relevant kontrollert animasjon og skriptprøven. HD-pikslene i aktørfeltet og originalrektangelet med8HD nabo er identiske med produksjonen.560 bufferkontroller per side,554 uten avvik og440/440 uten avvik etter figurstart. Kjente inngangsavvik er bevart med identiske koordinater og begge RGB-verdier. Ingen nye/økte bufferavvik eller uforklarte HD-endringer.11 hele figurvarianter,fire hele motorbilder og sekvensene med10 startfaser og32 fryserfaser er visuelt sett.
+
+Grafikken er fortsatt under arbeid.506 av1758 figurark har resultat. Fig293_01 er delvis9/10;1927 holdes etter tidligere verktøyavslag. Kostyme293 har54/55 native,uten flere produserbare returer i familien. Øvrige1252 hele figurjobber,returer og samlet sluttkontroll gjenstår. Ingen ny Tom-/Claude-godkjenning,naturlig full gjennomspilling,interaktiv Windows-prøve eller ny webtest. Windows-byggets oppstartstest uten skjerm er bestått.
+
+Linux:last ned AppImage-filen,gjør den kjørbar og start den. Windows:pakk ut hele zip-filen og start «Sam og Max HD.bat». Ctrl+H bytter mellom HD og originalgrafikk;Alt+Enter bytter vindu og fullskjerm.
+
+Pakkekode: {code}
+hd-mod: {mod}
+Kontrollrapport: rapporter/felles-release-20261022-fryserark på gpt-arbeid.
+
+Spillet og grafikken tilhører Disney/Lucasfilm. Pakkene inneholder spillfiler,tale,HD-grafikk og den patchede ScummVM-motoren for Toms avtalte testing.
+'''
+body=body.replace(',',', ').replace('med3695','med 3695').replace('alle21938','alle 21938').replace('Alle11','Alle 11').replace('560 buffer','560 buffer').replace('506 av1758','506 av 1758').replace('Øvrige1252','Øvrige 1252')"""
+  s=s[:start]+body+s[end:]
+  s=s.replace("Sam & Max HD: Linux og Windows med nye fryservinduruter", "Sam & Max HD: Linux og Windows med komplett fryserark")
+  s=s.replace("proof['skjermbufferkontroller']==400 and proof['nullkontroller']==396", "proof['skjermbufferkontroller']==560 and proof['nullkontroller']==554").replace('motor_nullkontroller=396,motor_kontroller=400','motor_nullkontroller=554,motor_kontroller=560')
+ if name=='etter-publisering.py':
+  s=s.replace("d.get('delvise_leveranser',[])", "d.get('leveranser',[])")
+  s=s.replace("Neste produksjon er fortsatt1943..1948 og1970..1972,med bevarte returer og originale referanser.", "Fryserarket er helt32/32. Neste figurark etter familien er296_01,etter retur- og kildesjekk. Verktøyholdt1927 omprøves ikke.")
+  s=s.replace("Alle11 leverte posisjoner i fig293_03 er med.", "Alle11 nye posisjoner i fig293_01/03 er med.")
+  s=s.replace("marker='felles-fryservindu-status'", "marker='felles-fryserark-status'")
+  s=s.replace("print('Fellespakke bekreftet i status og fremdrift. Alle11 ruter merket medfølgende,ingen jobb markert hel,automatikken fortsetter.')", "print('Fellespakke3695 bekreftet,11 tillegg,fig293_03 komplett32/32,automatikken fortsetter.')")
+ compile(s,str(new/name),'exec');(new/name).write_text(s)
+print('Pakkehjelpere for3695,11 nye ruter,21938 runtimefiler klargjort. Ingen bygg dispatch ennå.')
