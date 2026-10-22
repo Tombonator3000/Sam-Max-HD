@@ -1,0 +1,31 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,subprocess,shutil,zipfile
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-frost-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+def api(x):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+b=read(S/'start.json');pub=read(R/'publisert.json');state=read(R/'bygg-startet.json');art=read(S/'mottak-publisert.json');expected=read(S/'publiserte-moddfiler-3684.json');content=read(R/'moddfiler-kontroll.json')
+assert not git(P,'status','--porcelain')and not git(A,'status','--porcelain')
+assert not pub['native_frosset']and not state['native_frosset']and not art['native_frosset']and pub['taggbygg_success']and pub['Latest_bekreftet']
+main=git(P,'rev-parse','HEAD');gpt=git(A,'rev-parse','HEAD');remote={br:git(P,'ls-remote','origin','refs/heads/'+br).split()[0]for br in ['main','gpt-arbeid','hd-mod']};assert remote=={'main':main,'gpt-arbeid':gpt,'hd-mod':pub['hd_mod']}
+runs=api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs'];ci=next(v for v in runs if v['head_sha']==main and v['status']=='completed'and v['conclusion']=='success')
+actual={p.relative_to(P/'mods/gpt').as_posix():sha(p)for p in(P/'mods/gpt').rglob('*')if p.is_file()};assert actual==expected and len(actual)==21928 and sum(f.endswith('.png')for f in actual)==21922
+assert all(actual[f]==h for f,h in b['filer'].items()if f not in ['mod.json','SHA256SUMS']);assert all(sha(A/f)==h for f,h in b['beskyttede'].items());assert git(P,'stash','list','--format=%H').splitlines()==b['stash'];assert len(list(A.glob('jobber/fig*/resultat.png')))==505 and not(A/'jobber/fig293_03/resultat.png').exists()
+latest=api('releases/latest');assert latest['id']==pub['release_id']and latest['tag_name']==state['release_tag'];assert content['begge_faktiske_nedlastinger_verifisert']and content['moddfiler_per_pakke']==21927
+checks=read(R/'assetkontroll.json')
+for e in checks:
+ p=O/'felles-nedlasting'/e['fil'];assert sha(p)==e['sha256']and p.stat().st_size==e['bytes'];a=next(a for a in latest['assets']if a['name']==e['fil']);assert a['digest']=='sha256:'+e['sha256']and a['size']==e['bytes']
+for f in ['linux','windows']:
+ run=api('actions/runs/'+str(state['plattform'][f]['run_id']));assert run['head_sha']==state['kode']and run['conclusion']=='success'
+for wf in ['linux.yml','windows.yml']:assert not any(v['status']!='completed'for v in api('actions/workflows/'+wf+'/runs?per_page=30')['workflow_runs'])
+after=api('releases?per_page=100');before=read(R/'releaser-foer-fellespublisering.json');assert len(after)==len(before)+1
+aset=lambda e:{(a['id'],a['name'],a['size'],a['digest'])for a in e['assets']}
+for e in before:
+ if e['tag_name']in ['linux','windows']:continue
+ assert aset(e)==aset(next(v for v in after if v['id']==e['id']))
+changed=git(P,'diff','--name-only',b['remote']['main'],main).splitlines();assert set(changed)<={'memory.md','STATUS.md','todo.md','log.md'}
+result=dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=main,gpt=gpt,hd_mod=pub['hd_mod'],pakker_kode=state['kode'],main_CI=dict(id=ci['id'],sha=main,konklusjon='success'),native=3684,nye_native_denne_bunken=6,nye_egne_tegninger=5,nye_pakkelag=23,delark_fig293_03=23,delark_total=32,hele_figurjobber=505,total_figurjobber=1758,gjenstar_hele_figurjobber=1253,moddfiler=21928,PNG=21922,alle_filhash_bekreftet=True,alle_tidligere_moddfiler_bevart=True,alle_tidligere_PNG_bevart=True,beskyttede_jobbfiler=1432,stash=b['stash'],begge_faktiske_pakker_hashbekreftet=True,felles_vedlegg_hentet_igjen=True,release_url=pub['url'],Latest=True,taggbygg=pub['taggbygg_id'],taggbygg_success=True,native_frosset=False,motorobservasjoner_nye=6,pakkeobservasjoner=23,kontroller_pr_side=400,null_pr_side=396,null_etter_figurstart_pr_side=320,kjente_inngangsavvik_identiske=True,visuelt_sett=True,ny_Tom_Claude_godkjenning=False,ny_webtest=False,ny_interaktiv_Windows=False,full_naturlig_gjennomspilling=False,main_endringer=changed,automatisering_fortsetter=True,all_grafikk_ferdig=False)
+for target in [R,S]:save(target/'sluttrevisjon.json',result)
+shutil.copy2(__file__,R/'sluttrevisjon.py.txt');print(json.dumps({k:result[k]for k in ['main','gpt','native','nye_native_denne_bunken','nye_pakkelag','Latest','native_frosset','main_CI']},ensure_ascii=False))
