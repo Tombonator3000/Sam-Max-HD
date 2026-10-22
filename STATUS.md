@@ -1,5 +1,19 @@
 # Status
 
+## Gjeldende grafikkstatus, 2026-10-22 04:27
+
+Åtte nye Lee-Harvey-snakkehoder, costume129_406 til 413, er tegnet med innebygd image_gen, egenkontrollert, teknisk mottatt, motorobservert, visuelt sett og publisert. Native er 299a785b6c2ec9c63acbf1c5ff97b20f1e40b1e7, 3604 HD-bildelag totalt. Grafikkilden er acf3aec77e2d5089639538e44e0005e49931ecd9 på gpt-arbeid. Alle 21848 publiserte filhash er bekreftet etter henting; samtlige 21840 tidligere stier og 21834 tidligere PNG, 1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+fig129_01 er delvis med åtte hoder og 16 tomme mål. Ingen ny hel figurjobb telles levert: 504 av 1758 har resultat, 1254 er uten pluss returer og sluttkontroll. To små automatisk foreslåtte originalfragmenter er eksplisitt utelatt fra native og levering. Ingen mottaksporter, motor- eller pipelinekode er endret.
+
+Faktisk nedlastet Linux-binær 2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 viser alle åtte fra original rominngang/lokal217 uten testaktør eller tvunget skript. Normal avslutning 0, 711 av 720 nullkontroller, med de samme ni kjente bufferavvikene, identiske koordinater og begge RGB-verdier. Alle åtte sammenlignede originalaktørverdier er identiske ved samme torsofase. Fire hele originalflater er SHA-like; øvrige forskjeller ligger bare i dokumenterte kildetilstander og kildefargesykling. Åtte hele motorvarianter, fire hele motorbilder og delarket er sett. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest; prøven er ikke avviksfri.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har fortsatt 3596 og mangler de åtte nye. Nativefrys er frigitt, ingen nye pakkebygg startet. Neste samlepunkt er resten av 129-familien eller reell produksjonsblokkering. Neste bunke er de ni sidehodene 414 til 420, 404 og 405. Familien har 39 mål igjen etter denne leveransen; åtte av disse mangler fortsatt spillkontekst. 1804 og 1861 står i retur, og tidligere verktøyavviste motiver omprøves ikke. 1861 er undersøkt avgrenset uten bekreftet motorårsak eller ny retting.
+
+Bevis: rapporter/sam129-hoder1-20261022/mottak-publisert.json, motor-sammenligning.json og NESTE.md. Bibliotekskildene figurark-fast-storrelse og publisert-mod-er-fasit er brukt. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
+
+Tidligere status nedenfor er historikk.
+
 ## Gjeldende grafikkstatus, 2026-10-22 03:53
 
 Felles Linux- og Windows-utgave er publisert, lastet ned igjen og kontrollert: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-gatorgolf. Begge har 3596 native HD-bildelag, inkludert alle 61 publiserte Lee-Harvey/Max-ruter siden forrige fellesutgave. Alle 21839 runtime-modfiler per pakke, fire vedleggsdigester og sjekksumfiler er bekreftet. De 40 tidligere utgivelsene er bevart. Linux-bygg 39705416172, Windows-bygg 39705419577 og automatisk Windows-taggbygg 39707299348 er bestått. Nativefrysen er frigitt.
