@@ -2002,3 +2002,16 @@ Neste uavhengige produksjon er fig124_06 til08,31 mål fra25 hele RGBA-kilder. A
 Felles Linux-/Windows-utgave sam-max-hd-2026-10-21-kjeglekant har fortsatt3535 native og mangler38 publiserte ruter. Ingen nye pakkebygg i denne økten, ingen nativefrys. Neste samlepunkt er resten av124-familien og returer, eller tidligere ved reell produksjonsblokkering. Frys under bygg og bekreft faktisk nedlasting, sjekksummer og inkludert grafikk før oppdatert-status. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; alt er ikke ferdig.
 
 Bibliotekskilden scumm-v6-kostymer-skygge-og-soppelruter er brukt etter kompatibilitetskontroll mot samme ScummVM-kilde, sammen med tidligere fast figurarkmetode og publisert mod som fasit. Bare fire hoveddokumenter endres i main.
+
+
+## fig124_06: 16 nye native, 3589 totalt, 2026-10-22 02:47
+
+22. oktober 2026: fig124_06 er publisert og hentet tilbake med 16 nye Lee-Harvey/Max-ruter, 3589 native totalt. Ett nytt ark gir 503 av 1758 figurark med resultat, 1255 uten resultat pluss returer og sluttkontroll. Alle 16 er laget, egenkontrollert OK, native mottatt, motorobservert og visuelt sett. Ingen Tom-/Claude-godkjenning eller visuell sluttgodkjenning. Native er e7d3b25a6601a006d0b014ce79768cfd3d753316, grafikkilde 8c12addf849d9c39ddedafd5132c051fdfa6e9bc. Se rapporter/sam124-siste-20261022/mottak-publisert.json.
+
+Alle 21833 publiserte filhash er bekreftet. Samtlige 21817 tidligere filstier og 21811 tidligere PNG, 1412 beskyttede jobbfiler og tre stasher er bevart. Primærprøven har 711 av 720 nullkontroller med de samme ni kjente bufferavvikene, eksakte koordinater og begge RGB-verdier. Kontrollert hel animasjon 8 har 320 av 320 nullkontroller i både grunnlag og kandidat. 13 mål vises i originalforløpet, tre tilleggsmål på testaktør 29. Faktiske faseforskjeller i vann og uendrede alligatorer er dokumentert. Ingen full naturlig gjennomspilling eller motorendring. To ytre SIGTERM-avbrudd er bevart; uendret prøve fullførte med exit 0 i aktiv terminal.
+
+Neste er fig124_07, så fig124_08: 15 mål og 13 ulike hele kilder. Grå/brune biter i 1855 til 1861 er identisk gjenmaling av Sams eksisterende jakke og sko, uten mørkere kontakt. 1859 er hodeløs kropp med separat hodelag. Se NESTE.md og NESTE-KILDEFUNKSJON.md i rapporten før nytegning. Rute 1804 fra forrige bunke er fortsatt holdt. Fortsett øvrige produserbare jobber etter samlet kontroll av familien.
+
+Felles Linux-/Windows-utgave sam-max-hd-2026-10-21-kjeglekant har fortsatt 3535 native og mangler 54 publiserte ruter. Ingen ny pakke- eller webkontroll. Neste pakkesamlepunkt er de siste to 124-arkene og åpne returer, eller tidligere ved reell produksjonsblokkering. Frys native under bygg, last ned begge faktiske pakker og kontroller sjekksummer og innhold før oppdatert-status. Automatisk produksjon fortsetter, uten gamle nattprosesser. Alt er ikke ferdig.
+
+Grafikkilde 8c12addf849d9c39ddedafd5132c051fdfa6e9bc, publiseringsrapport 9159ab8acec567b6ec7355b7ee820c3fe775d9f6. Bevis finnes i rapporter/sam124-siste-20261022 på gpt-arbeid, særlig mottak-publisert.json, RAPPORT.md, motor06-sammenligning.json og NESTE.md. Bare disse fire dokumentene endres i main. Ingen ny motor-, pipeline- eller nettstedskode.
