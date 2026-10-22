@@ -1,12 +1,12 @@
 from pathlib import Path
 import gzip,hashlib,json,os,re,shutil,subprocess,sys
-P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PK=P/'out/felles-release-20261022-fryserark/linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm'
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PK=O/'linux/squashfs-root';D=PK/'usr/share/sam-max-hd';B=PK/'usr/bin/scummvm'
 read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
 def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
 mode=sys.argv[1];MOD=Path(sys.argv[2])if len(sys.argv)>2 else P/'mods/gpt'
 scripted=False;setup=False;controlled=True;count=160;assert 'start1' in mode or 'start8' in mode or 'start7' in mode
 T=O/mode;assert not T.exists();T.mkdir();(T/'home').mkdir();(T/'saves').mkdir()
-assert sha(B)=='caa4d7261d6071b824c2f15c345b3d5f53a454182308357a1b862cede2ae7b83'
+assert sha(B)==read(R/'linux-nedlasting-kontroll.json')['binar_sha256']
 native=read(MOD/'mod.json')['costume_cels'];assert 3697 <= native <= 3720
 for p in(P/'out/inventoryknapp-20261016/saves').glob('samnmax.s*'):shutil.copy2(p,T/'saves'/p.name)
 env={k:v for k,v in os.environ.items()if not k.startswith('DIGHD_')};env.update(HOME=str(T/'home'),XDG_CONFIG_HOME=str(T/'home/.config'),XDG_DATA_HOME=str(T/'home/.local/share'),XDG_CACHE_HOME=str(T/'home/.cache'),LD_LIBRARY_PATH=str(PK/'usr/lib'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(MOD),DIGHD_VERIFY='1',DIGHD_QUIT_AT=str(count),DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='1',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='56',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_MANGLER='0',DIGHD_DEBUG_SOFT='1',DIGHD_DEBUG_COSTUME='1')

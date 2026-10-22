@@ -1,0 +1,21 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,subprocess,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def api(x):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+s=read(O/'bygg-startet.json');r=read(O/'publisert.json');tag=s['release_tag'];runs=api('actions/workflows/windows.yml/runs?per_page=30')['workflow_runs'];matched=[v for v in runs if v['head_branch']==tag and v['head_sha']==s['kode']and v['event']=='push'];
+if not matched:
+ print('Forventet taggbygg er ennå ikke registrert;nativefrys beholdes,ingen ny dispatch.');raise SystemExit(0)
+assert len(matched)==1,'Flere taggbygg funnet,hold nativefrys og undersøk';run=matched[0];save(R/'taggbygg.json',run)
+if run['status']!='completed':
+ print('Taggbygg',run['id'],run['status'],'nativefrys beholdes');raise SystemExit(0)
+assert run['conclusion']=='success';assert api('git/ref/heads/hd-mod')['object']['sha']==s['hd_mod'];assert all(sha(P/'mods/gpt'/f)==h for f,h in read(R/'moddfiler-3701.json').items())
+assert api('releases/latest')['id']==r['release_id'];active=[]
+for wf in ['linux.yml','windows.yml']:
+ active.extend(v['id']for v in api(f'actions/workflows/{wf}/runs?per_page=30')['workflow_runs']if v['status']!='completed')
+assert not active,'Aktivt pakkebygg,hold nativefrys'
+r.update(taggbygg_id=run['id'],taggbygg_success=True,taggbygg_forventes=False,native_frosset=False,aktive_ekstra_bygg=[],sluttkontroll_utc=datetime.now(timezone.utc).isoformat());s.update(taggbygg_forventes=False,native_frosset=False,status='felles_publisert_hentet_kontrollert_taggbygg_success')
+for D in[O,R]:save(D/'publisert.json',r);save(D/'bygg-startet.json',s)
+shutil.copy2(__file__,R/'taggkontroll.py.txt');print('Taggbygg',run['id'],'success;frysen opphevet etter fjern-SHA og hele filkartet.')

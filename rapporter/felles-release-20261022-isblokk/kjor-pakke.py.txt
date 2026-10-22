@@ -1,0 +1,9 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent
+modes=['pakke3701-start1','pakke3701-start8']
+assert all(not(O/m).exists() for m in modes)
+def run(mode):
+ subprocess.run([str(P/'.venv/bin/python'),str(O/'motor-pakke.py'),mode,str(O/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt')],check=True)
+with ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(run,modes))

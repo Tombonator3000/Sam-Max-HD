@@ -1,0 +1,48 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,re,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam296-vendefaser-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+pub=read(R/'publisert.json');assert pub['Latest_bekreftet'] and pub['taggbygg_success'] and not pub['native_frosset'] and pub['native']==3701
+start=read(S/'start.json');assert all(sha(A/f)==h for f,h in start['beskyttede'].items()) and subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==start['stash']
+body=f'''Fire nye native ruter er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert hver for seg:costume296_1922/1940/1941/1942. Dette er én ny egen tegning,S025,og tre hele kildebekreftede RGBA-/indeksalias. fig296_04 er helt1/1,fig296_01 delvis3/9,fig296_03 delvis2/10. Hele figurjobber med resultat507/1758;1251 er uten i tillegg til returer og sluttkontroll. Familien296 har6/23 native. Ingen ny Tom-/Claude-godkjenning.
+
+Publisert hd-mod er {pub['hd_mod']},med3701 native. Alle21945 filhash er hentet tilbake og kontrollert. Alle21941 tidligere filstier og21935 tidligere PNG-hash er bevart. Begge faktiske plattformpakker og alle21944 runtime-modfiler er kontrollert,deretter er alle fire vedlegg i den nye fellesutgaven lastet ned på nytt og SHA-bekreftet. Seks296-ruter er nye siden forrige fellesutgave3695. Felles Linux/Windows er {pub['url']}. Begge plattformbygg og forventet Windows-taggbygg er grønt. Nativefrys er opphevet etter grønt taggbygg og full filkontroll.
+
+Den nye faktiske Linux-binæren er128c9c11755ee03ec88517e9a338a34bc808a6b7a01153ecc68cc2238d5f01d9. Seks før/etter-par,to hele motorbilder og22 faser er visuelt sett. Produksjon og pakke har320 bufferkontroller hver,316 uten avvik og240/240 uten avvik etter figurstart. De fire kjente inngangsavvikene per variant er identiske i koordinater og begge RGB-verdier. Ingen uforklarte HD-endringer. Windows har bestått oppstartstest i CI,men ny interaktiv Windows-/webtest,naturlig full gjennomspilling og samlet visuell sluttgodkjenning gjenstår.
+
+Seks nye innebygde bildekall ga én valgt tegning og fem kvalitetsreturer. Alle råbilder,faktiske prompter,argumenter,returer og SHA-rutekart er bevart i rapporter/sam296-vendefaser-20261022. Alle1448 beskyttede inputfiler og tre opprinnelige stasher er uendret. Ingen grafikk til main,ingen motor-/pipelinekode endret og ingen gamle nattprosesser. Gjenoppta fra denne rapportens NESTE.md og RETUR.md,neste nye bildekall S030. Ingen nødvendig designavklaring er identifisert. Automatikken er ACTIVE;all grafikk er ikke ferdig.
+'''
+body=body.replace(',',', ').replace(';1251','; 1251').replace('seg:costume','seg: costume')
+(R/'status-blokk.md').write_text(body)
+marker='sam296-vendefaser-status';block='<!-- '+marker+':start -->\n'+body+'<!-- '+marker+':slutt -->'
+freeze=re.compile(r'<!-- pakke3701-bygg:start -->.*?<!-- pakke3701-bygg:slutt -->',re.S)
+for name in ['sam296-isblokk-20261022','sam296-isblokk-retur-20261022','sam296-vendefaser-20261022']:
+ T=A/'rapporter'/name;q=read(T/'mottak-publisert.json');q.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3701,pakker_mangler_native=0,native_frosset=False,pakker_status='begge_nedlastinger_modfiler_motor_fellesvedlegg_og_taggbygg_kontrollert');save(T/'mottak-publisert.json',q)
+ for filename in ['fremdrift.json','sluttkontroll.json']:
+  p=T/filename;q=read(p);q.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3701,pakker_mangler_native=0,native_frosset=False)
+  for group in ['leveranser','delvise_leveranser']:
+   for e in q.get(group,[]):e.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3701)
+  save(p,q)
+ maps=list(T.glob('rutekart-fig296_*.json'))
+ if(T/'rutekart-samlet.json').exists():maps.append(T/'rutekart-samlet.json')
+ for p in maps:
+  q=read(p)
+  for group in q.values():
+   for e in group['ruter']:e.update(i_fellespakke=True,felles_url=pub['url'])
+  save(p,q)
+ (T/'PAKKER.md').write_text('# Kontrollert fellespakke3701\n\n'+body)
+ for filename in ['NESTE.md','RAPPORT.md']:
+  p=T/filename;t=freeze.sub('Nativefrys3701 er opphevet. Se PAKKER.md og siste kvittering.',p.read_text());first,rest=t.split('\n',1);p.write_text(first+'\n\n<!-- pakke3701:start -->\n'+body+'<!-- pakke3701:slutt -->\n\nTidligere opplysninger nedenfor er historikk.\n'+rest)
+for p in [A/'ORDRE.md',A/'GRAFIKKLISTE.md',P/'memory.md',P/'STATUS.md',P/'todo.md']:
+ t=freeze.sub('Nativefrys3701 er opphevet etter kontrollert fellesrelease.',p.read_text())
+ if '<!-- '+marker+':start -->' in t:t=re.sub(r'<!-- '+marker+r':start -->.*?<!-- '+marker+r':slutt -->',lambda _:block,t,flags=re.S)
+ else:first,rest=t.split('\n',1);t=first+'\n\n'+block+'\n\nTidligere status nedenfor er historikk.\n'+rest
+ p.write_text(t)
+for name in ['fig296_01','fig296_03','fig296_04']:
+ p=A/'jobber'/name/'notat.md';p.write_text(p.read_text()+'\nFelles Linux-/Windows-pakke3701 er publisert,hentet og kontrollert: '+pub['url']+'. Alle seks296-ruter er med. Nativefrys er opphevet. Se rapporter/felles-release-20261022-isblokk.\n')
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');p=P/'log.md';p.write_text(p.read_text()+'\n## '+stamp+' (Codex)\n\n'+body+'\nBevis: rapporter/sam296-vendefaser-20261022 og rapporter/felles-release-20261022-isblokk på gpt-arbeid. Bare dokumentasjon endres i main.\n')
+(R/'NESTE.md').write_text('# Samlepunkt3701 er ferdig\n\n'+body+'\nIkke gjenta ferdige engangshjelpere. Fortsett fra rapporter/sam296-vendefaser-20261022/NESTE.md og RETUR.md.\n')
+shutil.copy2(__file__,R/'etter-publisering.py.txt');print('Pakker3701 og taggbygg bekreftet,nativefrys opphevet i statuskildene.',flush=True)

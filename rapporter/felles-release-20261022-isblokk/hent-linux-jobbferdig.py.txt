@@ -1,0 +1,25 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import hashlib,json,subprocess,shutil,re,zipfile
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+def api(x):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+s=read(O/'bygg-startet.json');rid=s['plattform']['linux']['run_id'];jobs=api(f'actions/runs/{rid}/jobs');run=api(f'actions/runs/{rid}')
+assert run['head_sha']==s['kode'] and len(jobs['jobs'])==2 and all(e['status']=='completed' and e['conclusion']=='success' for e in jobs['jobs'])
+save(R/'linux-jobber-ferdige.json',dict(run=run,jobs=jobs,merknad='Alle faktiske jobber er completed/success. Overordnet run/check-suite var fortsatt in_progress. Dette gir bare nedlasting og undersøkelse;fellespublisering og nativefrys venter på entydig sluttstatus.'))
+meta=api('releases/tags/linux');assert s['hd_mod'] in meta['body'];m=re.search(r'Sam-Max-HD:\s*([0-9a-f]{7,40})',meta['body']);assert m and s['kode'].startswith(m[1]);save(O/'release-linux.json',meta);save(R/'release-linux.json',meta)
+D=O/'linux';D.mkdir(exist_ok=True);assets=[]
+for name in ['SamMaxHD-x86_64.AppImage','SamMaxHD-x86_64.AppImage.sha256']:
+ p=D/name;a=next(e for e in meta['assets'] if e['name']==name)
+ if not p.exists():subprocess.run(['gh','release','download','linux','--pattern',name,'--dir',str(D)],cwd=P,check=True)
+ assert p.stat().st_size==a['size'] and a['digest']=='sha256:'+sha(p);assets.append(dict(fil=name,sha256=sha(p),bytes=p.stat().st_size))
+app=D/'SamMaxHD-x86_64.AppImage';assert (D/'SamMaxHD-x86_64.AppImage.sha256').read_text().split()[0]==sha(app);app.chmod(0o755)
+if not(D/'squashfs-root').exists():
+ with(D/'extract.log').open('wb') as out:subprocess.run([str(app),'--appimage-extract'],cwd=D,stdout=out,stderr=subprocess.STDOUT,check=True)
+L=D/'squashfs-root/usr/share/sam-max-hd';expected={f:h for f,h in read(R/'moddfiler-3701.json').items() if f!='README.md'};assert len(expected)==21944
+paths=[p for p in (L/'mods/gpt').rglob('*') if p.is_file()]
+with ThreadPoolExecutor(max_workers=8) as pool:actual=dict(pool.map(lambda p:(p.relative_to(L/'mods/gpt').as_posix(),sha(p)),paths))
+assert actual==expected and read(L/'mods/gpt/mod.json')['costume_cels']==3701 and s['hd_mod'] in (L/'BYGG.txt').read_text()
+proof=dict(kode=s['kode'],hd_mod=s['hd_mod'],runtimefiler=21944,alle_hash_bekreftet=True,faktisk_nedlasting=True,assets=assets,binar_sha256=sha(D/'squashfs-root/usr/bin/scummvm'),CI_sluttstatus_bekreftet=run['status']=='completed' and run['conclusion']=='success',overordnet_run_status=run['status'],alle_faktiske_jobber_success=True,publisering_tillatt_av_denne_kontrollen=False)
+save(R/'linux-nedlasting-kontroll.json',proof);save(R/'linux-nedlasting-forundersokelse.json',proof);shutil.copy2(__file__,R/'hent-linux-jobbferdig.py.txt');print(json.dumps(proof,ensure_ascii=False),flush=True)
