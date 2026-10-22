@@ -2156,3 +2156,20 @@ En tidligere midlertidig 3650-prøve ble avbrutt med shell 143 etter 420 rendert
 Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt 3641 native og mangler disse syv. Den er ikke oppdatert med 3648. Neste pakkesamlepunkt følger etter neste praktiske 293-bunker/familieavslutning, med faktiske nedlastinger og hashkontroll. Gjenoppta to kvalitetsreturer og fortsett uavhengig med fig293_02, deretter 03, før 245. Bevar tidligere holdte 129-/124-motiver. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter, all grafikk er ikke ferdig.
 
 Bevis: [kilde-, mottaks- og motorrapport](https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/sam293-foerste-20261022/RAPPORT.md). Bibliotekskilder: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Bare fire dokumenter endres direkte i main.
+
+
+## 2026-10-22 10:41 (Codex)
+
+Ett helt nytt ark,fig293_02,er laget,egenkontrollert,native mottatt,motorobservert,visuelt sett og publisert. Det dekker13 ruter1930..1942 fra kostyme293 med syv nye egne tegninger og seks kildebekreftede hele RGBA-aliaser. Native er c157c3373d6ac0e1c609c55ad09a9b8a7d329167,3661 totalt. Grafikkilde:fb82eaf89da47ed329237ce4508ba8c6af0e0b93. Alle21905 filhash er hentet tilbake og bekreftet. Alle21892 tidligere stier og21886 PNG,1432 beskyttede jobbfiler og tre stasher er bevart.505/1758 hele figurark,1253 uten pluss returer/sluttkontroll.
+
+Elleve innebygde bildekall ga11 råbilder og fire forkastede kvalitetskandidater. Ingen nye verktøyavslag. Begge gjenopptatte returer1921/1922 feiler fortsatt hode-/øyefeste. fig293_01 er fortsatt7/10 uten hel resultatfil,og1927 holdes uten omprøving. Hele293-familien har20/55 native,34 produserbare mål gjenstår inkludert to returer. Neste uavhengige jobb er fig293_03,frysersekvensen,etter faktisk kontroll av animasjon7/raw30 i rom56. Tidligere129-/124-returer bevares.
+
+Alle13 nye ruter er OK i faktisk myke-figurer-mottak,ingen til gjennomsyn og ingen originalfragmenter. Ekte alfa,fast4x og to originalpikslers marg. Omriss-,deknings-,sideforholds- og3HD-festegrenser er beholdt. Bare hele tegninger er plassert;ingen lokal flytting av trekk eller hard originalmaskeklipping. Kildebekreftet avkapping og den separate lille skodelen er bevart.
+
+Endelige baseline/kandidat-prøver avslutter med exit0 og118/120 nullkontroller hver. De to kjente bufferavvikene ved rominngang har identiske koordinater og begge RGB-verdier. Etter testaktørstart80/80 null per side. Alle13 originale aktørflater og8HD-naboområder er like,med0 uforklarte HD-endringer. Tretten før/etter-varianter,fire hele motorbilder og alle23 faser er visuelt sett. Faktisk nedlastet Linux-binær5abfeae er brukt. Kontrollert aktør29,animasjon1/raw6;ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Første to motorprøver fikk rapportfeil etter rendering fordi en lokal kopi av kildeheaderen manglet. De regnes ikke bestått og bevares. Headerkopien er hashbekreftet,og endelige rene v2-prøver har normale exitkvitteringer. Ingen motor-/pipelinekode er endret. Tidligere shell143 er fortsatt historikk med ubekreftet årsak.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt3641 native og mangler20. Neste steg er et felles pakkesamlepunkt for3661,med nativefrys,grønne bygg,faktiske nedlastinger,sjekksummer og innholdskontroll før ny felles release kalles oppdatert. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter;all grafikk er ikke ferdig.
+
+Bevis:[grafikk- og motorrapport](https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/sam293-fortsettelse-20261022/RAPPORT.md). Bibliotekskilder:figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Bare fire dokumenter endres direkte i main.
