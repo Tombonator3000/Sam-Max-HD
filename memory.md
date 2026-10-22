@@ -1,5 +1,15 @@
 # memory.md
 
+<!-- taubane137-produksjonsretur-status:start -->
+Ti nye faktiske innebygde image_gen-kall V001-V010 er bevart og avvist som kvalitetsreturer i rapporter/taubane137-produksjon-20261022 på gpt-arbeid. Ingen ny valgt tegning, hel leveranse, nativeimport, motorobservert grafikk eller publisering. Ni selvstendige nativeprototyper og hele råarket er visuelt sett. Småfasene1920..1922 kan få gode alfamål, men er avvist som firkantmosaikk. Mellomfase1987 mangler eller feilplasserer stolper. Helarkforsøket fig137_03 får0/5 OK og exit2 i original egenkontroll. V002/2004 er nærmest blant større selvstendige tegninger; bare hel affinplassering er også prøvd og består fortsatt ikke. Ingen originalmaskeklipp, originalfragmenter eller lokale trekkflyttinger.
+
+Komponenttolkningen er presisert:2004 har10 komponenter med fire naboer, men9 med åtte naboer. Pikselen38,59 har diagonal kontakt med nabodelen;85,51 er faktisk fri og bevart. Fire-nabo-telling alene beviser ikke manglende selvstendige deler. Ingen kandidat godkjennes på denne avklaringen. Eksakt RGB-test etter premultiplisert interpolering er bevart som diagnostikk, ikke som en egnet godkjenningsport. Visuell stilkontroll avgjør fortsatt om en nytegning er brukbar.
+
+Mod og kontrollerte Linux-/Windows-fellespakker står fortsatt på3701 native, hd-mod dea35eec5e71766043b58b514f263318b75d712e. Alle21945 moddfiler,21939 PNG,1460 kontrollerte beskyttede input og tre stasher er uendret. Hele figurjobber med resultat507/1758,1251 uten i tillegg til returer og sluttkontroll. Ingen nye motor- eller pakkekjøringer uten valgt grafikk. Ingen ny Tom-/Claude-godkjenning, ingen motor-/pipelinekodeendring og ingen gammel nattevakt startet. Ingen ny nødvendig designavklaring er funnet. Neste137-kall V011 og296-kall S037 er ikke utført eller reservert. Les siste NESTE.md før ny produksjon. Automatikken er ACTIVE og all grafikk er ikke ferdig.
+<!-- taubane137-produksjonsretur-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- sam296-detaljretur-status:start -->
 Sju nye innebygde bildekall S030-S036 er laget, kontrollert og visuelt sett som kandidater. Ingen består hele den uendrede3HD-porten, og ingen er levert, importert eller publisert. Alle råbilder, faktiske prompter, argumenter, SHA-rutekart og returer er bevart i rapporter/sam296-detaljretur-20261022. S036/1925 er nærmest med3,936109HD;225 hudpunkter består, men to blåpunkter og sju mørke fester gjør ikke det. Det lyse munnfeltet er kildebekreftet og skal beholdes. Lanczos-helplassering med eksisterende pipeline består heller ikke. Ingen originalmaskeklipp, originalfragmenter eller lokale trekkflyttinger.
 
