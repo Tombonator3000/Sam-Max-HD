@@ -1,5 +1,21 @@
 # memory.md
 
+<!-- sam296-isblokk-status:start -->
+Én ny egen sidefase fra isblokken er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert: costume296_1920. Publisert hd-mod er f32e9f7b64a8ac0434b5e0ba3a312ba8aeb25ca9, grafikkilde 596dd441ac146026600dabbb3848a48c29f33a9a. Alle 21940 filhash er hentet tilbake og bekreftet. Modden har 3696 native. Alle 21939 tidligere filstier og 21933 tidligere PNG-filer er bevart. Bare mod.json og sjekksummanifestet er oppdatert. Forrige mod er bevart separat.
+
+fig296_01 er delvis 1/9, og hele 296-familien har 1/23 native fordelt på fire jobber. Ingen hel resultat.png leveres ennå. Hele figurjobber med resultat er fortsatt 506/1758; 1252 er uten, i tillegg til returer og sluttkontroll. Femten faktiske innebygde bildekall har råbilder, prompter og argumenter. Én tegning er valgt, 14 er kvalitetsreturer. S013 ble tatt ut før publisering da ekstra fargekontroll fant manglende blå kildedetaljer. S015 består heller ikke blåkontrollen. Ingen terskel senkes og ingen retur importeres.
+
+Originalen og kjøkkenkonteksten i rom56 samt godkjente Sam-/Max-mastere er sett. Førstefasen er tilsiktet venstrebeskåret. Valgt S006 har fast4x og egen alfa, uten originalmaske eller originalfragmenter. Hele tegningen er flyttet 1HD ned, uten lokal Python-flytting av trekk. Fire kontrollerte fester er innen3HD, største avvik2,718HD. IoU0,92195 og dekning0,93372 består uendrede porter0,6/0,8. Automatisk mottak gir1 OK,0 til gjennomsyn og8 mangler. Hele arket er derfor ikke godkjent som ferdig.
+
+Ferske kontrollerte motorprøver med faktisk nedlastet Linux-binær caa4d726 viser den nye ruten og alle11 kildefaser. Hver side har160 bufferkontroller,158 uten avvik og120/120 uten avvik etter figurstart. De to kjente inngangsavvikene har identiske koordinater og begge RGB-verdier. Originalrektangelet med8HD naboområde er identisk. Ingen nye/økte bufferavvik eller uforklarte HD-endringer. Ett helt før/etter-par,ett helt motorbilde og alle11 faser er visuelt sett. Dette er kontrollert animasjon, ingen naturlig full gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Avbrutt modkopi og motorprøve med lagringsvarsler er bevart og regnes ikke bestått. En fersk lagringsprøve og begge senere hele avspillinger består atomisk filskriving med spor bevart. Ingen motor-/pipelinekode er endret. Alle1440 beskyttede inputfiler og tre opprinnelige stasher er uendret.
+
+Felles Linux/Windows fryserark har fortsatt3695 og mangler den ene nye ruten. Begge faktiske pakker er tidligere lastet ned og kontrollert; de kalles ikke oppdatert til3696. Neste pakkesamlepunkt følger videre familieproduksjon eller avslutning. Gjenoppta fig296_01 fra RETUR.md/NESTE.md i rapporter/sam296-isblokk-20261022 på gpt-arbeid. 1921..1928 mangler; aliasene296_1927/1928 venter på kontrollert egen1926. Tidligere verktøyholdt293_1927 omprøves ikke. Automatikken er ACTIVE; all grafikk er ikke ferdig. Ingen grafikk til main og ingen gamle nattprosesser.
+<!-- sam296-isblokk-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- felles-fryserark-status:start -->
 Felles Linux-/Windows-samlepunkt med 3695 native HD-lag er kontrollert. Publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark. Fellesvedleggene er lastet ned på nytt og har samme SHA256. Nativefrys er opphevet etter grønt taggbygg og kontroll av fjern-SHA og alle filhash.
 
