@@ -1,0 +1,43 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+selected=['F1949','F1950','F1951R','F1952','F1953','F1954','F1955'];chosen=[];points=[];returns=[]
+for C in sorted((R/'kall').iterdir()):
+ if not(C/'raa.png').exists():continue
+ d=read(C/'plan.json');e=d['ruter'][0];tool=read(C/'verktøyresultat.json');args=read(C/'faktiske-argumenter.json')
+ assert tool['raa_sha256']==sha(C/'raa.png')and tool['argumenter_sha256']==sha(C/'faktiske-argumenter.json')and tool['prompt_sha256']==sha(C/'faktisk-prompt.txt')
+ assert tool['referanser']==d['referanser']=={f:sha(Path(f))for f in args['referenced_image_paths']}and d['kilde_og_mastere_sett_foer_kall']
+ if C.name not in selected:
+  src=np.array(Image.open(e['kilde']).convert('RGBA'));own=np.array(Image.open(C/'egen-renset.png').convert('RGBA'));yy,xx=np.nonzero(own[:,:,3]>=128);sy,sx=np.nonzero(src[:,:,3]>0);ratio=((np.ptp(sx)+1)*4/(np.ptp(xx)+1))/((np.ptp(sy)+1)*4/(np.ptp(yy)+1));q=read(C/'prototypekontroll.json')[0]if(C/'prototypekontroll.json').exists()else{}
+  assert not q.get('native_ok',False)
+  rr=dict(kall=C.name,bilde=e['bilde'],raa_sha256=sha(C/'raa.png'),kvalitetsretur=True,verktøyavslag=False,grunn='Motiv/hånd og plassering av kuldeflekker feiler IoU/dekning'if C.name=='F1943'else'For smal hel tegning; krever mer ulik skalering enn tillatt',krevde_hel_affin_sideforhold=float(ratio),uendret_tillatt=[.88,1.12],snitt_union=q.get('snitt_union'),dekning=q.get('dekning'),native_mottatt=False,publisert=False)
+  save(C/'kvalitetsretur.json',rr);returns.append(rr);continue
+ q=read(C/'prototypekontroll.json')[0];assert q['native_ok']and q['egen_alfa']and not q['originalmaske']and not q['originalfragmenter'];assert sha(A/q['prototype'])==q['prototype_sha256']
+ chosen.append(q)
+ source=Image.open(e['kilde']).convert('RGBA');own=Image.open(A/q['prototype']).convert('RGBA');sa=np.array(source);oa=np.array(own)
+ # Samme fargevindu på kilde og egen tegning tåler 1 RGB-nivå fra Pillow RGBA-resampling.
+ if C.name in ['F1949','F1950','F1951R']:
+  pp=[]
+  for arr in [sa,oa]:
+   rr,gg,bb=arr[:,:,:3].transpose(2,0,1);m=(arr[:,:,3]>=128)&(rr>=220)&(110<=gg)&(gg<=165)&(80<=bb)&(bb<=145);m[int(arr.shape[0]*.6):]=False;assert m.any();pp.append(np.array(nd.center_of_mass(m)[::-1]))
+  distance=float(np.linalg.norm(pp[1]-(pp[0]*4+9.5)));assert distance<=3
+  points.append(dict(kall=C.name,kilde_rosa_hodefelt_xy=pp[0].tolist(),egen_rosa_hodefelt_xy=pp[1].tolist(),avstand_HD=distance,innen3HD=True,native_sha256=sha(A/q['prototype']),ingen_lokal_flytting=True))
+ # Alle valgte poser viser bakhode eller pels, ingen kildeøyemarkeringer skal oppfinnes.
+ for arr in [sa,oa]:
+  rr,gg,bb=arr[:,:,:3].transpose(2,0,1);eye=(arr[:,:,3]>=128)&(rr>235)&(175<gg)&(gg<220)&(105<bb)&(bb<170);eye[int(arr.shape[0]*.35):]=False;assert not eye.any()
+assert len(chosen)==7 and len(returns)==7 and len(list((R/'kall').glob('*/verktøyresultat.json')))==14
+chosen.sort(key=lambda e:selected.index(e['valgt_kall']));save(R/'valgte7.json',chosen);save(R/'kvalitetsreturer.json',returns);save(R/'indre-feste-kontroll.json',dict(terskel_HD=3,maalinger=points,alle3_rosa_hodefester_innen3HD=True,ingen_synlig_eller_oppdiktet_oyemarkering_i_alle7=True,ingen_lokal_flytting=True,visuelt_sett=False))
+boards=[]
+for k in range(0,len(chosen),2):
+ board=Image.new('RGB',(1400,600),'#536576');draw=ImageDraw.Draw(board)
+ for i,q in enumerate(chosen[k:k+2]):
+  e=read(R/'kall'/q['valgt_kall']/'plan.json')['ruter'][0];src=Image.open(e['kilde']).convert('RGBA');own=Image.open(A/q['prototype']).convert('RGBA');s4=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);crop=own.crop((8,8,8+s4.width,8+s4.height));mix=Image.blend(s4,crop,.5)
+  draw.text((i*700+8,8),q['valgt_kall']+f" kilde / egen / 50% overlay, IoU {q['snitt_union']:.3f}",fill='white')
+  for j,im in enumerate([s4,own,mix]):
+   im=im.resize((im.width*3,im.height*3),Image.Resampling.NEAREST);board.paste(im,(i*700+10+j*220,42 if j!=1 else 18),im)
+ p=R/f'egen-visuell-{k//2+1}.png';board.save(p);boards.append(dict(fil=p.name,sha256=sha(p),ruter=[q['bilde']for q in chosen[k:k+2]],visuelt_sett=False))
+save(R/'egen-visuell-plan.json',dict(ark=boards,visuelt_sett=False,komplette_tegninger_uten_beskjaering=True));shutil.copy2(__file__,R/'kontroll.py.txt');print('7 valgte tegninger, 7 kvalitetsreturer, 14 råbilder. Tre rosa hodefester innen3HD; ingen nye øyne.')

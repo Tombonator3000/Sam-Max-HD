@@ -1,0 +1,33 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import hashlib,json,shutil,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-fortsettelse-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+old=read(S/'kildeplan.json');source03=read(S/'kilde293_03-plan.json');proof=read(R/'kilde-clip1.json');assert proof['exit']==0 and len(proof['tegninger'])==32 and proof['zclip1']
+(R/'kall').mkdir(exist_ok=True);plan=[]
+for n in range(1943,1975):
+ e=next(v for v in old['ruter']if v['rute']==n);src=Image.open(e['kilde']).convert('RGBA');arr=np.array(src);meta=next(v for v in source03['ruter']if v['bilde']==e['bilde'])
+ assert sha(Path(e['kilde']))==e['sha256']==meta['kilde_sha256']
+ assert hashlib.sha256(arr.tobytes()).hexdigest()==e['rgba_sha256']==meta['source_RGBA_sha256']
+ canon=next(v for v in old['ruter']if v['bilde']==e['canonical']);canonical=Image.open(canon['kilde']).convert('RGBA');assert src.size==canonical.size and src.tobytes()==canonical.tobytes()
+ ev=proof['tegninger'][e['bilde']];ctx=O/'kilde-clip1'/f"frame_{ev['bildeframe']:06}_room056_flat.png";assert ctx.exists()
+ e.update(kilde_helanimasjon_clip1=dict(fil=str(ctx),sha256=sha(ctx),event=ev,naturlig_handling=False),canonical_rgba_sha256=e['rgba_sha256'],egen_kildepalett_RGB=True)
+ plan.append(e)
+ if not 1943<=n<=1956:continue
+ C=R/'kall'/('F'+str(n))
+ if C.exists():continue
+ C.mkdir();visible=src.crop(src.getbbox());vw,vh=visible.size;atlas=Image.new('RGBA',(1024,1024),'#536576');scale=min(24,900//vw,900//vh);large=visible.resize((vw*scale,vh*scale),Image.Resampling.NEAREST);atlas.alpha_composite(large,((1024-large.width)//2,(1024-large.height)//2));atlas.convert('RGB').save(C/'originalatlas.png');src.save(C/'original-alfa.png');shutil.copy2(ctx,C/'spillkontekst-clip1.png')
+ refs=[C/'originalatlas.png',A/'hovedark/sam.png',A/'hovedark/max.png',C/'spillkontekst-clip1.png']
+ labels,nc=nd.label(arr[:,:,3]>0,np.ones((3,3)));parts=[]
+ for i in range(1,nc+1):
+  yy,xx=np.nonzero(labels==i);parts.append(dict(areal=int((labels==i).sum()),bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)],xy=list(map(float,nd.center_of_mass(labels==i)[::-1]))))
+ save(C/'plan.json',dict(ruter=[e],underlag_piksler=0,referanser={str(p):sha(p)for p in refs},kilde_og_mastere_sett_foer_kall=False,originalmaske=False,originalfragmenter=False,hele_kildelerret_sett=True,alle_originale_opake_piksler_i_forstorret_referanse=True,kildekomponenter=parts,kildetype='hel_rute_med_kildeavkapping_og_kuldeeffekter'))
+ board=Image.new('RGB',(1900,1600),'#536576');d=ImageDraw.Draw(board);d.text((10,8),f'{n}: hele originalen / original motor zclip1 / komplette godkjente stilmastere',fill='white');im=Image.open(C/'originalatlas.png');im.thumbnail((720,760));board.paste(im,(10,35));im=Image.open(ctx).convert('RGB');im.thumbnail((1120,750));board.paste(im,(770,35))
+ for k,m in enumerate(['sam','max']):
+  im=Image.open(A/'hovedark'/f'{m}.png').convert('RGBA');im.thumbnail((910,720));board.paste(im,(10+k*950,840),im)
+ board.save(C/'kontekst-og-mastere.png')
+save(R/'kildeplan.json',dict(ruter=plan,kostyme=293,rom=56,palett=0,raw=30,hele_aliaskrav='samme dimensjoner og samtlige RGBA-byte',forste_genereringsbunke=list(range(1943,1951)),videre_uavhengig_bunke=list(range(1949,1957)),F1943_kvalitetsretur=True))
+for f in ['bevar.py','rens-plasser.py']:shutil.copy2(P/'out/sam293-fortsettelse-20261022'/f,O/f)
+shutil.copy2(__file__,R/'forbered.py.txt');print('Kilder til F1943..F1956 klargjort uten å overskrive kall. Alle 32 hel-RGBA-likheter bekreftet.')

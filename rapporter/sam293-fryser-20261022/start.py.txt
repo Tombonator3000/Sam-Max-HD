@@ -1,0 +1,20 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib,json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S0=A/'rapporter/sam293-fortsettelse-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(p,*a):return subprocess.check_output(['git',*a],cwd=p,text=True).strip()
+assert not R.exists();R.mkdir(parents=True)
+assert git(A,'branch','--show-current')=='gpt-arbeid'and not git(A,'status','--porcelain')
+assert git(P,'branch','--show-current')=='main'and not git(P,'status','--porcelain')
+remote=dict((b.split('/')[-1],h)for h,b in(v.split()for v in git(P,'ls-remote','origin','refs/heads/main','refs/heads/gpt-arbeid','refs/heads/hd-mod').splitlines()))
+assert remote==dict(main=git(P,'rev-parse','HEAD'),**{'gpt-arbeid':git(A,'rev-parse','HEAD'),'hd-mod':'c157c3373d6ac0e1c609c55ad09a9b8a7d329167'})
+files={p.relative_to(P/'mods/gpt').as_posix():sha(p)for p in(P/'mods/gpt').rglob('*')if p.is_file()}
+assert files==read(S0/'publiserte-moddfiler-3661.json')and len(files)==21905
+protected=read(S0/'start.json')['beskyttede'];assert len(protected)==1432 and all(sha(A/f)==h for f,h in protected.items())
+stashes=git(P,'stash','list','--format=%H').splitlines();assert stashes==read(S0/'start.json')['stash']and len(stashes)==3
+assert len(list(A.glob('jobber/fig*/resultat.png')))==505 and len(list(A.glob('jobber/fig*/jobb.json')))==1758
+assert not(A/'jobber/fig293_03/resultat.png').exists()
+save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),remote=remote,filer=files,beskyttede=protected,stash=stashes,native=3661,hele_figurjobber=505,total_figurjobber=1758,forrige_rapport=str(S0),pakker_native=3661,neste='fig293_03',ingen_pagaende_grafikkmotor_observert=True))
+shutil.copy2(__file__,R/'start.py.txt');print('Start: 3661 native, 21905 filer, 505/1758 hele ark, 1432 kilder og 3 stasher bekreftet.')
