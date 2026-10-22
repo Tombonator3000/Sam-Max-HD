@@ -1,0 +1,46 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-fortsettelse-20261022';S0=A/'rapporter/sam293-foerste-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def api(s):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True))
+r=read(R/'publisert.json');assert r['native']==3661 and r['taggbygg_success']and not r['native_frosset'];assert api('releases/latest')['id']==r['release_id']and api('git/ref/heads/hd-mod')['object']['sha']==r['hd_mod']
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=P,text=True)
+assert all(sha(P/'mods/gpt'/f)==h for f,h in read(R/'moddfiler-3661.json').items())
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');marker='felles-kjokken-status'
+body=f'''Felles Linux-/Windows-utgave er oppdatert, publisert og bekreftet Latest: {r['url']}. Begge pakkene har 3661 native HD-lag, 20 flere enn forrige fellesutgave. De faktiske nedlastningene, fire vedleggsdigester, sjekksumfilene og alle 21904 runtime-modfiler per pakke er kontrollert. Vedleggene på fellesutgivelsen er lastet ned igjen og matcher. Alle 21905 publiserte moddfiler er bevart; README.md er eneste utelatte dokumentasjon i pakkene.
+
+Alle 20 Lee-Harvey-rutene fra kostyme 293 er observert i den faktiske nye Linux-pakken. 20 hele figurvarianter og fire hele motorbilder er visuelt sett. Prøven avslutter normalt med 118 av 120 bufferkontroller uten avvik. De to kjente inngangsavvikene har identiske koordinater og begge RGB-verdier. Etter testaktørstart er 80 av 80 uten avvik. Dette er en kontrollert hel animasjon, ikke naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning. Windows-byggets oppstartstest uten skjerm er bestått.
+
+Produksjonen i denne bunken leverte hele fig293_02 med 13 native ruter: syv nye tegninger og seks bekreftede hele RGBA-aliaser. 11 innebygde bildekall ga 11 råbilder og fire forkastede kvalitetskandidater. Ingen nytt verktøyavslag. Egenkontroll og faktisk myke-figurer-mottak gir 13 OK og ingen originalfragmenter. Fast 4x, ekte alfa, to originalpikslers marg og uendrede geometrigrenser er brukt. Kildebekreftet avkapping og den lille separate skodelen er bevart.
+
+505 av 1758 hele figurark har resultat. 1253 er uten, i tillegg kommer returer og samlet sluttkontroll. fig293_01 er fortsatt 7/10: 1921/1922 har kvalitetsretur, 1927 holdes uten omprøving av tidligere verktøyavslag. 293-familien har 20 av 55 native. 34 produserbare mål gjenstår inkludert to returer, pluss det ene verktøyholdte målet. Tidligere 129-/124-returer er bevart.
+
+De 32 originalfasene i fig293_03 er nå avspilt og visuelt sett i kontrollert animasjon 7/raw 30. Kilde293_03-plan.json har konkrete hele motorflater og metadata. Prøven er ikke naturlig lokalskript 204 med zclip 1. Før tegning må de hvite effektdelene, fryservinduets grålilla felt og oppløsningsfasene forklares fra kildedata og skript. Ikke fjern slike felt som antatt padding. Neste produksjon gjenopptar denne kildeklargjøringen før 245.
+
+Pakkekode: {r['kode']}. Native: {r['hd_mod']}. Linux-bygg {r['linux_run']} og Windows-bygg {r['windows_run']} er grønne. Taggbygg {r['taggbygg_id']} er avsluttet grønt. Nativefrysen er opphevet etter ny kontroll av fjern-SHA og filhash. Alle tidligere releaser og deres vedlegg er bevart. Alle 1432 beskyttede jobbfiler og tre eksisterende stasher står urørt.
+
+En lokal rapportfeil etter de første motorprøvene er rettet ved å gjenbruke den hashbekreftede kildeheaderen. Første prøver er bevart og regnes ikke bestått. Endelige rene v2-prøver avslutter normalt. Ingen motor-/pipelinekode er endret; bare dokumentasjon skrives direkte i main. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter. All grafikk er ikke ferdig.
+
+Bevis: rapporter/sam293-fortsettelse-20261022 og rapporter/{R.name} på gpt-arbeid. Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt med samme SCUMM v6-pin.
+'''
+for folder,count in [(S0,7),(S,13)]:
+ p=folder/'mottak-publisert.json';d=read(p);d.update(i_fellespakke=True,felles_url=r['url'],pakker_native=3661,pakker_mangler_native=0,native_frosset=False,pakker_status='felles_publisert_hentet_kontrollert_taggbygg_success',pakke_hd_mod=r['hd_mod']);save(p,d)
+ p=folder/'fremdrift.json';d=read(p);d.update(i_fellespakke=count,native_frosset=False,felles_url=r['url'],pakker_native=3661)
+ for group in ['leveranser','delvise_leveranser']:
+  for e in d.get(group,[]):e.update(i_fellespakke=True,felles_url=r['url'])
+ save(p,d)
+ p=folder/'RAPPORT.md';t=p.read_text();assert r['url']not in t;t+='\n## Felles pakke bekreftet '+now+'\n\nAlle '+str(count)+' native ruter fra denne bunken er med i begge faktisk nedlastede og kontrollerte pakker med3661 native. '+r['url']+'. Se rapporter/'+R.name+'/publisert.json og moddfiler-kontroll.json. Historikken ovenfor gjelder produksjonskontrollen før dette pakkesamlepunktet.\n';p.write_text(t)
+(R/'RAPPORT.md').write_text('# Felles Linux- og Windows-pakke med kjøkkengrafikk\n\n'+now+' (Codex)\n\n'+body)
+for root,files in [(A,['ORDRE.md','GRAFIKKLISTE.md']),(P,['memory.md','STATUS.md','todo.md'])]:
+ for f in files:
+  p=root/f;t=p.read_text();assert '<!-- '+marker+':start -->'not in t;first,rest=t.split('\n',1);p.write_text(first+'\n\n<!-- '+marker+':start -->\n'+body+'<!-- '+marker+':slutt -->\n\nTidligere status nedenfor er historikk.\n'+rest)
+p=P/'todo.md';t=p.read_text();steps='''
+- [x] Publiser og hent felles Linux-/Windows-pakke med 3661 native. Kontroller begge pakker, fire digester, 21904 runtimefiler per pakke og faktisk Linux-avspilling. Vent på grønt taggbygg før nativefrys oppheves.
+- [ ] Gjenoppta fig293_03 fra kilde293_03-plan.json. 32 originalfaser er sett; forklar hvite effektdeler, grålilla vindusfelt og oppløsning før nye kall.
+- [ ] Rett 1921/1922 uten å duplisere 20 publiserte 293-ruter. Hold 1927 uten omprøving. Bevar tidligere returer.
+''';t=t.replace('## Neste\n','## Neste\n'+steps,1);t=t.replace('- [ ] Lag felles Linux-/Windows-samlepunkt med3661 etter nativefrys,grønne bygg,nedlasting og hash-/innholdskontroll.','- [x] Lag felles Linux-/Windows-samlepunkt med3661 etter nativefrys,grønne bygg,nedlasting og hash-/innholdskontroll.');p.write_text(t)
+p=P/'log.md';p.write_text(p.read_text()+'\n\n## '+now+' (Codex)\n\n'+body)
+shutil.copy2(__file__,R/'sluttrapport.py.txt');print('Felles3661 dokumentert, produksjonskvitteringer oppdatert og nativefrys opphevet.')

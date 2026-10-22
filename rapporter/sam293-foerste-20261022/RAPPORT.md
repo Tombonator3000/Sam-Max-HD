@@ -19,3 +19,7 @@ Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt 3641
 Bevis: rapporter/sam293-foerste-20261022/fremdrift.json,rutekart-fig293_01.json,indre-feste-kontroll.json,motor-sammenligning.json,motor-bufferkontroll.json og mottak-publisert.json. Bibliotekskildene figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt med samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e.
 
 ![Syv leverte native](syv-egne-native.png)
+
+## Felles pakke bekreftet 2026-10-22 11:09
+
+Alle 7 native ruter fra denne bunken er med i begge faktisk nedlastede og kontrollerte pakker med 3661 native ruter. https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-kjokken. Se rapporter/felles-release-20261022-kjokken/publisert.json og moddfiler-kontroll.json. Historikken ovenfor gjelder produksjonskontrollen før dette pakkesamlepunktet.

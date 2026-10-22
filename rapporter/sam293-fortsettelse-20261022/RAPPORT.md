@@ -19,3 +19,7 @@ Alle21892 tidligere moddfiler og21886 PNG bevares unntatt oppdatert mod.json/man
 Bibliotekskilder:figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e. Bevis:fremdrift.json,rutekart-fig293_02.json,indre-feste-kontroll.json,smaadel-kontroll.json,automatisk-mottak.json,motor-sammenligning.json,motor-bufferkontroll.json og mottak-publisert.json.
 
 ![Syv nye tegninger](syv-egne-native.png)
+
+## Felles pakke bekreftet 2026-10-22 11:09
+
+Alle 13 native ruter fra denne bunken er med i begge faktisk nedlastede og kontrollerte pakker med 3661 native ruter. https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-kjokken. Se rapporter/felles-release-20261022-kjokken/publisert.json og moddfiler-kontroll.json. Historikken ovenfor gjelder produksjonskontrollen før dette pakkesamlepunktet.
