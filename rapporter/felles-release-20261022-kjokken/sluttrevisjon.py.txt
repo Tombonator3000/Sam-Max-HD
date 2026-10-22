@@ -1,0 +1,48 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,subprocess,shutil,tomllib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-fortsettelse-20261022';S0=A/'rapporter/sam293-foerste-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+def api(s):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True))
+assert not git(P,'status','--porcelain')and not git(A,'status','--porcelain');main=git(P,'rev-parse','HEAD');gpt=git(A,'rev-parse','HEAD');pack=read(R/'publisert.json');start=read(S/'start.json');manifest=read(R/'moddfiler-3661.json');receipt=read(S/'mottak-publisert.json')
+assert git(P,'branch','--show-current')=='main'and git(A,'branch','--show-current')=='gpt-arbeid'
+assert pack['native']==receipt['native']==3661 and pack['hd_mod']==receipt['hd_mod']=='c157c3373d6ac0e1c609c55ad09a9b8a7d329167'
+for branch,h in [('main',main),('gpt-arbeid',gpt),('hd-mod',pack['hd_mod'])]:assert api('git/ref/heads/'+branch)['object']['sha']==h
+ci=[e for e in api('actions/workflows/test.yml/runs?branch=main&per_page=10')['workflow_runs']if e['head_sha']==main];assert ci and ci[0]['status']=='completed'and ci[0]['conclusion']=='success'
+delta=git(P,'diff','--name-only',pack['kode']+'..'+main).splitlines();assert set(delta)=={'memory.md','todo.md','STATUS.md','log.md'}
+actual={p.relative_to(P/'mods/gpt').as_posix():sha(p)for p in(P/'mods/gpt').rglob('*')if p.is_file()};assert actual==manifest==read(S/'publiserte-moddfiler-3661.json')and len(actual)==21905
+assert sum(f.endswith('.png')for f in actual)==21899 and sum(f.startswith('costumes/')and f.endswith('_hd.png')for f in actual)==read(P/'mods/gpt/mod.json')['costume_cels']==3661
+assert set(start['filer'])<=set(actual)and len(start['filer'])==21892
+assert all(actual[f]==h for f,h in start['filer'].items()if f not in ['mod.json','SHA256SUMS'])
+subprocess.run(['sha256sum','--quiet','-c','SHA256SUMS'],cwd=P/'mods/gpt',check=True)
+assert len(start['beskyttede'])==1432 and all(sha(A/f)==h for f,h in start['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==start['stash']and len(start['stash'])==3
+assert len(list(A.glob('jobber/fig*/resultat.png')))==505 and len(list(A.glob('jobber/fig*/jobb.json')))==1758
+assert not(A/'jobber/fig293_01/resultat.png').exists()and not(A/'jobber/fig293_03/resultat.png').exists()
+progress=read(S/'fremdrift.json');full=progress['leveranser'][0];assert sha(A/full['resultat'])==full['sha256']and full['i_fellespakke']and full['publisert']and full['ruter']==13
+assert progress['nye_jobber_levert']==1 and progress['ulike_hele_egne_malerier']==7 and progress['hele_rgba_aliasmal']==6 and progress['Tom_godkjent']==progress['Claude_godkjent']==0
+assert len(list((S/'kall').glob('*/verktøyresultat.json')))==11 and len(read(S/'kvalitetsreturer.json'))==4
+assert read(S/'indre-feste-kontroll.json')['alle_valgte7_innen3HD']and read(S/'smaadel-kontroll.json')['innen3HD']
+for n,nums in [(293,[1921,1922,1927]),(129,[641,642]),(124,[1804,1861,*range(1848,1855)])]:assert not any((P/f'mods/gpt/costumes/costume{n}_{i}_hd.png').exists()for i in nums)
+family=read(R/'familie-native20.json')['ruter'];assert len(family)==20 and all(actual[e['fil']]==e['sha256']for e in family)
+for folder,n in [(S0,7),(S,13)]:
+ d=read(folder/'mottak-publisert.json');assert d['i_fellespakke']and d['pakker_native']==3661 and d['pakker_mangler_native']==0 and not d['native_frosset'];assert read(folder/'fremdrift.json')['i_fellespakke']==n
+native=read(S/'egen-native.json')['ruter'];assert len(native)==13 and all(actual[e['fil']]==sha(A/e['prototype'])==e['sha256']for e in native)
+content=read(R/'moddfiler-kontroll.json');assert content['begge_faktiske_nedlastinger_verifisert']and content['begge_modder_byteidentiske']and content['moddfiler_per_pakke']==21904
+linux=read(R/'linux-kontroll.json');assert linux['visuelt_sett']and linux['hele_varianter_sett']==20 and linux['hele_motorbilder_sett']==4 and linux['alle20_observert_i_ny_Linux_pakke']and linux['eksakte_feilkoordinater_og_begge_RGB_identiske']
+assert(linux['skjermbufferkontroller'],linux['nullkontroller'])==(120,118)
+assert all(e['visuelt_sett']and sha(R/e['fil'])==e['sha256']for g in ['varianter','hele_motorbilder']for e in linux[g])
+proof=read(R/'pakke-start1final.json');assert proof['exit']==0 and proof['nullkontroller']==118 and len(proof['kontroller'])==120 and sha(Path(proof['binar']))==proof['binar_sha256']
+assert pack['begge_faktiske_nedlastinger_og_SHA_bekreftet']and pack['felles_vedlegg_faktisk_hentet_igjen']and pack['taggbygg_success']and not pack['native_frosset']
+release=api('releases/latest');assert release['id']==pack['release_id']and release['tag_name']==pack['tag']
+assets=read(R/'assetkontroll.json');assert len(assets)==4
+for e in assets:
+ f=O/'felles-nedlasting'/e['fil'];assert f.stat().st_size==e['bytes']and sha(f)==e['sha256'];a=next(v for v in release['assets']if v['name']==e['fil']);assert a['digest']=='sha256:'+e['sha256']and a['size']==e['bytes']
+for w in ['linux.yml','windows.yml']:assert not any(e['status']!='completed'for e in api('actions/workflows/'+w+'/runs?per_page=30')['workflow_runs'])
+autos={}
+for name,expected in [('nattkontroll-sam-max','PAUSED'),('fullf-r-sam-max-grafikken','ACTIVE')]:
+ d=tomllib.loads((Path('/home/tom/.codex/automations')/name/'automation.toml').read_text());assert d['status']==expected;autos[name]=expected
+source03=read(S/'kilde293_03-plan.json');assert source03['exit']==0 and source03['maal']==32 and source03['raw']==30 and source03['visuelt_sett']and not source03['produksjon_startet']
+audit=dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=main,gpt_for_audit=gpt,hd_mod=pack['hd_mod'],CI=ci[0]['id'],CI_success=True,pakkekode=pack['kode'],bare_dokumentasjon_endret_etter_pakkekode=delta,native=3661,filer=21905,png=21899,alle_moddfiler_SHA=True,alle21892_tidligere_stier_og21886_PNG_bevart=True,alle1432_beskyttede_SHA=True,stasher=start['stash'],hele_figurjobber=505,total_figurjobber=1758,nye_native=13,egne_nye_malerier=7,hele_rgba_aliasmal=6,egenkontrollert=13,visuelt_ok=13,motorobservert=13,publisert=13,ny_Tom_Claude_godkjenning=False,nye_native_siden_forrige_felles=20,alle20_i_ny_Linux_motor=True,begge_pakker_hentet_og_SHA=True,alle21904_runtimefiler_per_pakke_SHA=True,fellesvedlegg_hentet_igjen=True,taggbygg_success=True,native_frosset=False,url=pack['url'],automatisering=autos,kilde293_03_faser_sett=32,kilde293_03_ingen_nye_leveranser=True,neste='fig293_03 etter kildeavklaring av effekter,vindusfelt og zclip1;deretter returer',alt_grafikkarbeid_ferdig=False)
+(R/'sluttrevisjon.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n');shutil.copy2(__file__,R/'sluttrevisjon.py.txt');print('Sluttrevisjon OK:',main,ci[0]['id'],'native3661,pakker3661,505heleark,3stasher,1432kilder og aktivegrafikkautomasjon.')
