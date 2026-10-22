@@ -1,0 +1,30 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,re,subprocess,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/sam293-frost-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+pub=read(R/'publisert.json');assert pub['Latest_bekreftet']and pub['taggbygg_success']and not pub['native_frosset'];assert pub['native']==3684
+s=read(S/'start.json');assert all(sha(A/f)==h for f,h in s['beskyttede'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==s['stash']
+receipt=read(S/'mottak-publisert.json');receipt.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3684,pakker_mangler_native=0,native_frosset=False,pakker_status='begge_faktiske_nedlastinger_og_fellesvedlegg_kontrollert_taggbygg_success');save(S/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+ d=read(S/name);d.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3684,pakker_mangler_native=0,native_frosset=False)
+ for e in d.get('delvise_leveranser',[]):e.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3684)
+ save(S/name,d)
+d=read(S/'rutekart-fig293_03.json')
+for e in d['fig293_03']['ruter']:e.update(i_fellespakke=True,felles_url=pub['url'])
+save(S/'rutekart-fig293_03.json',d)
+body=(R/'status-blokk.md').read_text();marker='felles-fryservindu-status';block='<!-- '+marker+':start -->\n'+body+'<!-- '+marker+':slutt -->'
+for f in [A/'ORDRE.md',A/'GRAFIKKLISTE.md',A/'jobber/fig293_03/notat.md',P/'memory.md',P/'STATUS.md',P/'todo.md']:
+ t=f.read_text()
+ if '<!-- '+marker+':start -->'in t:t=re.sub(r'<!-- '+marker+r':start -->.*?<!-- '+marker+r':slutt -->',lambda m:block,t,flags=re.S)
+ else:first,rest=t.split('\n',1);t=first+'\n\n'+block+'\n\nTidligere status nedenfor er historikk.\n'+rest
+ f.write_text(t)
+(S/'PAKKER.md').write_text('# Oppdatert fellespakke\n\n'+body)
+for name in ['NESTE.md','RAPPORT.md']:
+ f=S/name;t=f.read_text();first,rest=t.split('\n',1)
+ if '<!-- pakkeoppdatert:start -->'not in t:t=first+'\n\n<!-- pakkeoppdatert:start -->\nFelles Linux-/Windows-pakke er nå publisert,hentet og kontrollert med3684 native: '+pub['url']+'. Alle23 leverte posisjoner i fig293_03 er med. Nativefrysen er opphevet etter grønt taggbygg. Se PAKKER.md. Neste produksjon er fortsatt1943..1948 og1970..1972,med bevarte returer og originale referanser. Ingen ny Tom-/Claude-godkjenning.\n<!-- pakkeoppdatert:slutt -->\n\nProduksjonsrapporten nedenfor beskriver også pakkestatusen før dette samlepunktet.\n'+rest
+ f.write_text(t)
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');f=P/'log.md';f.write_text(f.read_text()+'\n## '+stamp+' (Codex)\n\n'+body+'\nBevis: rapporter/felles-release-20261022-fryservindu på gpt-arbeid. Bare dokumentasjon endres i main.\n')
+print('Fellespakke bekreftet i status og fremdrift. Alle23 ruter merket medfølgende,ingen jobb markert hel,automatikken fortsetter.')

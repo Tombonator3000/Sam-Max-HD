@@ -1,5 +1,11 @@
 # Pels og opakt fryservindu, fig293_03
 
+<!-- pakkeoppdatert:start -->
+Felles Linux-/Windows-pakke er nå publisert,hentet og kontrollert med3684 native: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryservindu. Alle23 leverte posisjoner i fig293_03 er med. Nativefrysen er opphevet etter grønt taggbygg. Se PAKKER.md. Neste produksjon er fortsatt1943..1948 og1970..1972,med bevarte returer og originale referanser. Ingen ny Tom-/Claude-godkjenning.
+<!-- pakkeoppdatert:slutt -->
+
+Produksjonsrapporten nedenfor beskriver også pakkestatusen før dette samlepunktet.
+
 2026-10-22 12:45 (Codex)
 
 Seks nye native ruter fra fig293_03 er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett:1956,1959,1960,1969,1973,1974. Fem nye tegninger dekker dem;1960 er bekreftet identisk med1956 i dimensjoner og samtlige RGBA-byte. Publisert additivt som hd-mod 04fa6b8bd404b2320395d88c51f2479f902e33d2, grafikkilde 2b3a2d4729af92eb80904c067a07b3e3936903bf. Alle21928 filhash er hentet tilbake og bekreftet. Delarket har nå23/32 med alle17 tidligere rutepiksler bevart. Ingen hel resultat.png opprettes i jobbflaten.505/1758 hele figurjobber har resultat,1253 er uten pluss returer og samlet sluttkontroll.293-familien har43/55 native;11 produserbare mål og det tidligere verktøyholdte1927 gjenstår.

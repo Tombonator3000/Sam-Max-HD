@@ -1,5 +1,11 @@
 # Gjenoppta fig293_03,23/32
 
+<!-- pakkeoppdatert:start -->
+Felles Linux-/Windows-pakke er nå publisert,hentet og kontrollert med3684 native: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryservindu. Alle23 leverte posisjoner i fig293_03 er med. Nativefrysen er opphevet etter grønt taggbygg. Se PAKKER.md. Neste produksjon er fortsatt1943..1948 og1970..1972,med bevarte returer og originale referanser. Ingen ny Tom-/Claude-godkjenning.
+<!-- pakkeoppdatert:slutt -->
+
+Produksjonsrapporten nedenfor beskriver også pakkestatusen før dette samlepunktet.
+
 Seks nye native ruter fra fig293_03 er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett:1956,1959,1960,1969,1973,1974. Fem nye tegninger dekker dem;1960 er bekreftet identisk med1956 i dimensjoner og samtlige RGBA-byte. Publisert additivt som hd-mod 04fa6b8bd404b2320395d88c51f2479f902e33d2, grafikkilde 2b3a2d4729af92eb80904c067a07b3e3936903bf. Alle21928 filhash er hentet tilbake og bekreftet. Delarket har nå23/32 med alle17 tidligere rutepiksler bevart. Ingen hel resultat.png opprettes i jobbflaten.505/1758 hele figurjobber har resultat,1253 er uten pluss returer og samlet sluttkontroll.293-familien har43/55 native;11 produserbare mål og det tidligere verktøyholdte1927 gjenstår.
 
 Tretten faktiske innebygde image_gen-kall ga13 råbilder for åtte ulike kildemotiver. Fem tegninger er valgt;åtte kvalitetskandidater er forkastet. Ingen nye verktøyavslag eller kvotefeil.1956s tidligere størrelsesretur er løst.1973R bevarer15 brune rester og seks ekte alfahull med største festeavvik henholdsvis2 og1 HD-piksler. Alle12 kildegrå grupper i1969 har koblet eget felt innen3HD.1970 holdes fordi den lille grå markeringen ved kilde x14/y12 er borte fra riktig feste.1971/1972 holdes fordi transparente kildehull blir ekstra brune eller grå opake felt.1971RR har dessuten store feilaktige opake rester utenfor motivet og feiler sideforholdsgrensen. Ingen avviste kandidater importeres eller brukes som stil-/identitetsankere.

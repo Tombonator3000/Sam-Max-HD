@@ -1,5 +1,21 @@
 # Delvis fig293_03, 23 av 32
 
+<!-- felles-fryservindu-status:start -->
+Felles Linux-/Windows-samlepunkt med 3684 native HD-lag er kontrollert. Publisert og bekreftet Latest: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryservindu. Fellesvedleggene er lastet ned på nytt og har samme SHA256. Nativefrys er opphevet etter grønt taggbygg og kontroll av fjern-SHA og alle filhash.
+
+Pakkene har 23 nye native fra fig293_03 siden forrige fellesutgave med 3661. Dette omfatter de 17 tidligere publiserte rutene fra sam293-fryser-20261022 og seks nye fra sam293-frost-20261022. Den siste grafikkbunken har fem nye tegninger og ett bekreftet helt RGBA-alias. Ingen tidligere publisert PNG er endret. 505 av 1758 hele figurjobber har resultat, 1253 er uten i tillegg til returer og sluttkontroll. fig293_03 er delvis 23/32, uten hel resultatfil. 1943..1948 og 1970..1972 gjenstår i arket. 293-familien har 43/55 native, med 11 produserbare mål igjen og det tidligere verktøyholdte 1927. De øvrige kjente returene holdes utenfor modden.
+
+Begge faktiske nedlastinger, fire vedleggsdigester og sjekksumfilene er kontrollert. Alle 21927 runtime-modfiler per pakke er byteidentiske med det publiserte filkartet på 21928 filer. README.md er eneste utelatte dokumentasjon. Kode i pakkene er d445aaf29b791f5118238eb5582d0e08f8f7c7f1, native er 04fa6b8bd404b2320395d88c51f2479f902e33d2. Linux-bygg 39765829628 og Windows-bygg 39765834102 er grønne. Windows-byggets oppstartstest uten skjerm er bestått. Tidligere versjonsreleaser og grafikk er bevart.
+
+Den faktisk nedlastede Linux-binæren og dens medfølgende mod er avspilt i to nye prøver: kontrollert aktør 29 med animasjon 7/raw30 og zclip1, og originalt lokalskript 204 etter konstruert aktør 10-fortilstand. Alle 23 nye pakkelag er observert i begge prøver, med identiske originale ruterektangler og åtte HD-pikslers naboområde. HD-pikslene i aktørfeltet er også identiske med kontrollert produksjon. Hver side har 400 bufferkontroller, 396 uten avvik. Etter testaktørstart er 320/320 uten avvik. De samme to inngangsavvikene per prøve har identiske koordinater og begge RGB-verdier. Ingen nye eller økte avvik og ingen uforklarte HD-endringer. 23 hele før/etter-varianter, fire hele motorbilder og hele sekvensen med 32 faser er visuelt sett. Dette er ikke naturlig full gjennomspilling eller ny interaktiv Windows-/webtest, og ingen ny Tom-/Claude-godkjenning er gitt.
+
+Den første filkontrollen startet før Windows-nedlastingen var avsluttet og ble stoppet av SHA-/størrelsesporten. Den regnes ikke bestått. Nedlastingen avsluttet deretter normalt, og ny full kontroll av begge nedlastinger, fire digester og samtlige modfiler består uten endrede porter. Se kontrollstart-feil.json.
+
+Alle 1432 beskyttede jobbfiler og tre opprinnelige stasher bevares. Ingen motor- eller pipelinekode er endret. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter fra den påbegynte fig293_03-bunken. Neste produksjon bruker råbilder, faktiske prompter, returgrunner og kildeplan fra sam293-frost-20261022. All grafikk er ikke ferdig.
+<!-- felles-fryservindu-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- sam293-frost-status:start -->
 Seks nye native ruter fra fig293_03 er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett:1956,1959,1960,1969,1973,1974. Fem nye tegninger dekker dem;1960 er bekreftet identisk med1956 i dimensjoner og samtlige RGBA-byte. Publisert additivt som hd-mod 04fa6b8bd404b2320395d88c51f2479f902e33d2, grafikkilde 2b3a2d4729af92eb80904c067a07b3e3936903bf. Alle21928 filhash er hentet tilbake og bekreftet. Delarket har nå23/32 med alle17 tidligere rutepiksler bevart. Ingen hel resultat.png opprettes i jobbflaten.505/1758 hele figurjobber har resultat,1253 er uten pluss returer og samlet sluttkontroll.293-familien har43/55 native;11 produserbare mål og det tidligere verktøyholdte1927 gjenstår.
 
