@@ -1,0 +1,76 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import hashlib, json, re, shutil, subprocess
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+PREV=A/'rapporter/sam129-hoder2-20261022'
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*args):return subprocess.check_output(['git',*args],cwd=w,text=True).strip()
+
+assert not R.exists() and not git(P,'status','--porcelain') and not git(A,'status','--porcelain')
+R.mkdir(parents=True)
+old=read(PREV/'start.json'); files=read(PREV/'publiserte-moddfiler-3613.json')
+plan=read(A/'rapporter/sam129-kilde-20261022/kildeplan.json')
+assert len(files)==21857 and len(old['beskyttede'])==1420
+assert all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+assert all(sha(A/f)==h for f,h in old['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==old['stash']
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]=='45845080b4b4a5eb381a19fcc7213bfc2749aa67'
+assert read(P/'mods/gpt/mod.json')['costume_cels']==3613
+numbers=[129,128,130,403,384,641,640]
+assert len(list((A/'jobber').glob('fig*/resultat.png')))==504
+assert not (A/'jobber/fig129_01/resultat.png').exists()
+save(R/'start.json',dict(main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),
+    hd_mod='45845080b4b4a5eb381a19fcc7213bfc2749aa67',native=3613,filer=files,
+    beskyttede=old['beskyttede'],stash=old['stash'],figurark=504,nye_maal=7,ulike_hele=7,
+    nye_numre=numbers,tidligere_maal=plan['levert_og_publisert'],
+    tidligere_notat_sha256=sha(A/'jobber/fig129_01/notat.md'),
+    bibliotek=['figurark-fast-storrelse','scumm-v6-kostymer-skygge-og-soppelruter','publisert-mod-er-fasit'],
+    bibliotek_kompatibilitet='Samme SCUMM v6-motorpin og Python/Pillow; uendrede porter CORE128, IoU0.6, dekning0.8; egen alfa, hele nye malerier og kildebegrunnede smådeler.'))
+save(R/'kildeplan.json',plan)
+board=Image.new('RGBA',(1600,1100),'#536576'); dr=ImageDraw.Draw(board)
+for i,n in enumerate(numbers):
+    row=next(e for e in plan['ruter'] if e['bilde']==f'costume129_{n}')
+    im=Image.open(row['kilde']).convert('RGBA'); assert sha(Path(row['kilde']))==row['sha256']
+    x=i%4*400; y=i//4*550
+    scale=min(16,330/im.width,450/im.height)
+    im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.NEAREST)
+    dr.text((x+10,y+10),f"{n}: hel kilde {row['maal']}, lag {row['lag']}",fill='white')
+    board.alpha_composite(im,(x+25,y+50))
+board.convert('RGB').save(R/'sju-hele-originaler.png')
+
+# Bevar eksisterende, faktiske originalrammer ved blinklagets første tegning.
+blink=[]
+for number in [641,640]:
+    row=next(e for e in plan['ruter'] if e['bilde']==f'costume129_{number}')
+    ctx=row['naturlig_kontekst'] or row['kontrollert_kontekst']
+    file=Path(ctx.get('originalkontekst',ctx.get('fil')))
+    assert sha(file)==ctx['sha256']
+    frame=ctx['bildeframe']; folder=file.parent
+    frames=[]
+    for offset in [-1,0,1]:
+        p=folder/f'frame_{frame+offset:06}_room025_flat.png'
+        assert p.exists()
+        frames.append(dict(fil=str(p),sha256=sha(p),frame=frame+offset))
+    lines=[]
+    for text in (folder/'scummvm.log').read_text().splitlines():
+        m=re.search(r'frame (\d+) soft cel\s+(\d+) costume\s*129\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',text)
+        if m and abs(int(m[1])-ctx['logg_frame'])<=1:lines.append(text)
+    blink.append(dict(bilde=row['bilde'],kontekst=ctx,rammer=frames,lagspor=lines))
+    canvas=Image.new('RGB',(1600,1250),'#536576'); d=ImageDraw.Draw(canvas)
+    d.text((10,10),f'{number}: hele originalbilder foer/under/etter, uendret spillgrafikk',fill='white')
+    for i,rec in enumerate(frames):
+        im=Image.open(rec['fil']).convert('RGB'); small=im.copy();small.thumbnail((520,340))
+        canvas.paste(small,(i*530+5,40))
+        x,y=ctx['pos']; crop=im.crop(((x-12)*4,(y-18)*4,(x+22)*4,(y+18)*4))
+        crop=crop.resize((408,432),Image.Resampling.NEAREST)
+        canvas.paste(crop,(i*530+20,400));d.text((i*530+10,850),str(rec['frame']),fill='white')
+    src=Image.open(row['kilde']).convert('RGBA'); src=src.resize((src.width*40,src.height*40),Image.Resampling.NEAREST)
+    canvas.paste(src,(20,930),src)
+    canvas.save(R/f'{number}-originalblink.png')
+save(R/'blink-kildekontroll.json',blink)
+shutil.copy2(__file__,R/'start.py.txt')
+print('Start native3613, sju resterende mål, 21857 filer, 1420 kilder og tre stasher kontrollert.',flush=True)

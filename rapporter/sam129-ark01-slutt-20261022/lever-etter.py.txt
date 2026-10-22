@@ -1,0 +1,31 @@
+from pathlib import Path
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-sam1293619'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+s=read(R/'start.json');progress=read(R/'fremdrift.json');partial=progress['delvise_leveranser'][0]
+rows=read(R/'rutekart-fig129_01.json')['fig129_01']['ruter'];assert len(rows)==23
+native=[dict(bilde=e['bilde'],jobb='fig129_01',canonical=e['bilde'],fil='costumes/'+e['bilde']+'_hd.png',prototype=e['prototype'],sha256=e['prototype_sha256'],kall=e['kall'],snitt_union=e['snitt_union'],dekning=e['dekning'],egen_alfa=True,originalmaske=False,originalfragmenter=False)for e in rows if e['ny_i_bunken']]
+assert len(native)==6 and all(sha(A/e['prototype'])==e['sha256']for e in native)
+report=read(R/'automatisk-mottak.json');own_auto={n for rep in report['ark'].values()for n,e in rep['ruter'].items()if e['status']=='ok'and e.get('kilde')=='arket'};fragments={n for rep in report['ark'].values()for n,e in rep['ruter'].items()if e.get('kilde')=='originalen (fragment)'}
+assert own_auto=={e['bilde']for e in rows}and fragments=={'costume129_641'}
+assert report['ruter_ok']==24 and report['ruter_mangler']==report['ruter_sjekk']==report['ruter_teknisk']==0
+save(R/'fragmentvern.json',dict(egne_hele=23,nye_egne_hele=6,tidligere_egne_hele=17,diagnostiske_egne_ark_OK=23,diagnostiske_originalfragmenter=sorted(fragments),originalfragmenter_i_kandidat=False,egen_hel_640_prototype_brukt_i_native=True,ingen_native_641=True,oppskalering_er_ikke_nytegning=True,ingen_pipelineendring=True,maaleavklaring='Forventningsstopp i hjelpeskript: mottaket bruker faktisk egen640-rute fra arket. Bare manglende641 kommer automatisk fra originalen, og utelates fra kandidat. Eksisterende diagnostisk mottak gjenbrukt, ikke kjørt om igjen.'))
+assert not C.exists()
+shutil.copytree(M,C)
+for e in native:
+    target=C/e['fil'];assert not target.exists();shutil.copy2(A/e['prototype'],target);assert sha(target)==e['sha256']
+meta=read(C/'mod.json');assert meta['costume_cels']==3613;meta['costume_cels']=3619;save(C/'mod.json',meta)
+files={p.relative_to(C).as_posix():sha(p) for p in C.rglob('*') if p.is_file()}
+assert len(files)==21863 and set(files)-set(s['filer'])=={e['fil'] for e in native}
+assert {f for f,h in s['filer'].items() if files[f]!=h}=={'mod.json'}
+assert not (C/'costumes/costume129_641_hd.png').exists() and not (C/'costumes/costume129_642_hd.png').exists()
+save(R/'kandidatfilhash.json',files)
+save(R/'egen-native.json',dict(ruter=native,nye_native=6,native_totalt=3619,kandidat=str(C),fast_4x=True,marg_original=[2,2],
+    egen_alfa=True,originalmaske=False,originalfragmenter=False,automatisk6_nye_ark_OK=True,
+    egen_640_prototype_OK=True,mangler_paa_delark=1,tidligere_filer_bevart=21857,filer=21863,
+    png=sum(f.endswith('.png') for f in files)))
+partial['native_mottatt']=True;progress.update(native_mottatt=6,nye_native=6,native_totalt=3619)
+save(R/'fremdrift.json',progress)
+shutil.copy2(__file__,R/'lever-etter.py.txt')
+print('23 egne mål på delark, 641 holdt. Seks nye native i kandidat3619. Tidligere filer uendret.',flush=True)

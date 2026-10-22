@@ -1,0 +1,99 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+start=read(R/'start.json');native=read(R/'egen-native.json');chosen=read(R/'valgte6.json');progress=read(R/'fremdrift.json')
+assert len(chosen)==6 and {e['valgt_kall']for e in chosen}=={'S01','S02','S03','S04R','S05R','S07'}
+assert len(list((R/'kall').glob('*/verktøyresultat.json')))==10 and len(list((R/'kall').glob('*/verktøyfeil.json')))==1
+assert len(read(R/'kvalitetsretur.json'))==4
+assert all(sha(A/f)==h for f,h in start['beskyttede'].items())
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==start['stash']
+assert all(sha(Path(native['kandidat'])/e['fil'])==e['sha256']==sha(A/e['prototype'])for e in native['ruter'])
+visual=read(R/'motor-visuell-plan.json')
+for group in ['varianter','hele_motorbilder']:
+    for e in visual[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+visual.update(visuelt_sett=True,hele_varianter_sett=6,hele_motorbilder_sett=4,
+    vurdering='Seks hele kildevarianter, hode og kropp samlet, før og etter samt fire hele motorbilder sett. Kildens tre kroppsvinkler og separate hoder beholdt. Ikke Tom-/Claude-godkjenning.')
+save(R/'motor-visuell-plan.json',visual)
+blink=read(R/'blink-sluttkontroll.json')
+for e in blink['ruter']:
+    assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+    for g in e['grupper']:assert [q['varm_oyefarge_piksler']for q in g['faser']][1]==0
+blink.update(visuelt_sett=True,begge_hoder_aapen_lukket_aapen=True,
+    vurdering='Begge hele hoder sett før, under og etter blink, mot samme originale faser. Varmt øyelys er21/0/21 på profil og24/0/24 på front. Profilens vide RGB170-måling har én interpolert mellomfarge under blink; den er rapportert og er ikke åpent varmt øyelys. En tidlig bred fargeteller traff også bakgrunn utenfor grunnlagets hode; stopp og målegrunnlag er bevart. Ingen bildemodifisering som følge av målingen.')
+save(R/'blink-sluttkontroll.json',blink)
+rows=read(R/'motor-pikselkontroll.json')
+for e in rows:assert e['utenfor_nye_ruter_og_dokumenterte_kildetilstander']==0;e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',rows)
+m=read(R/'motor-sammenligning.json');m.update(visuelt_sett=True,blinkkontroll_OK=True,
+    hele_originalflater_SHA_identiske_antall=sum(e['hele_originalflater_SHA_identiske']for e in rows),
+    kildefasepresisering='Den første paringen fanget én kostyme68-fallbackpiksel fra ulike originalfaser409/410. Uendrede idx-hash og fravær av egne PNG er bekreftet mot begge modder. Samme eksisterende1-originalpikselmarg som for126-fallback er brukt til kildeklassifisering. Ingen nye toleranser eller motor-/pipelineendringer.',
+    kvalitetshoder_rettet=['S04R','S05R'],første_kandidat_ikke_publisert=True)
+save(R/'motor-sammenligning.json',m)
+for e in chosen:e.update(visuelt_sett=True,motorobservert=True,Tom_godkjent=False,Claude_godkjent=False)
+save(R/'valgte6.json',chosen)
+native.update(visuelt_sett=True,motorobservert=6)
+save(R/'egen-native.json',native)
+for e in progress['delvise_leveranser']:e.update(visuelt_kontrollert=True,native_mottatt=True,motorobservert=True)
+progress.update(laget=6,egenkontrollert=6,native_mottatt=6,visuelt_sett=6,motorobservert=6,publisert=0,
+    innebygde_bildekall=11,vellykkede_bildekall=10,avviste_bildekall=1,kvalitetsreturer=4,
+    nytt_resultatark_i_jobbmappe=False,delark_egne=23,delark_maal=24,produserbare_gjenstar_i_129_familien=22,
+    holdte_maal_i_129_familien=['costume129_641','costume129_642'])
+save(R/'fremdrift.json',progress)
+route=read(R/'rutekart-fig129_01.json')
+for e in route['fig129_01']['ruter']:e.update(motorobservert=True,prototype_visuelt_sett=True)
+save(R/'rutekart-fig129_01.json',route)
+s=dict(progress);s.update(visuelt_sett=True,valgte_native=6,holdt_native=0,holdt_produksjonsmal=1,
+    ikke_individuelt_provd_holdt_alias=1,faste_4x_og_margin_2=True,ekte_egen_alfa=True,originalmasker=False,
+    originalfragmenter_i_native=False,beskyttede=1420,stasher_bevart=True,tidligere_native_filer_bevart=21857,
+    automatisk6_egne_OK=True,arkkontroll_store22_OK=True,liten640_kontrollert_separat=True,
+    blinkkontroll_OK=True,godkjent_av_Tom=False,claude_kontroll=False,native_frosset=False,
+    full_naturlig_gjennomspilling=False,ny_windows_interaktiv_prove=False,ny_webtest=False,
+    pakkebygg_startet=False,pakker_native=3596,pakker_mangler_native_etter_planlagt_publisering=23,
+    bibliotek=start['bibliotek'],ingen_motor_pipeline_eller_mottaksporter_endret=True)
+save(R/'sluttkontroll.json',s)
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+report=f'''# fig129_01, seks nye mål og kontroll av hvilende hoder
+
+{now}, Codex. Kandidat3619 er kontrollert og klar for additiv publisering fra3613. Publisering er ennå ikke kvittert i denne versjonen.
+
+Seks nye mål er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett: costume129_128,129,130,384,403 og640. Ingen ny hel figurjobb er levert. Delarket har23 av24 mål,17 tidligere og6 nye.641 står tom etter verktøyavslag. Ingen resultat.png legges i jobbmappen, og504 av1758 figurjobber har fortsatt resultat.1254 mangler resultat, i tillegg til returer og sluttkontroll. I129-familien er23 av47 nå produsert,24 gjenstår, hvorav22 kan produseres videre og2 er holdt. Ingen ny Tom-/Claude-godkjenning eller samlet visuell sluttgodkjenning.
+
+Hele originaler, faktisk synlig spillkontekst og komplette godkjente Sam-/Max-mastere er sett før hvert motiv. Første foreslåtte129/403-kontekst viste en svart romovergang. Fire kontekster er rettet i separat kildeplan, uten å endre originaler.128/129 er kropper uten hode,130 inkluderer bakhodet.640/641 er kildebekreftede små blinkfyll, ikke tilfeldige streker. Referansefiler, faktiske prompter, argumenter, råbilder og SHA finnes under kall/. Bildemodellnavn ble ikke oppgitt av verktøyet.
+
+11 innebygde bildekall:10 vellykkede,1 avvist og4 kvalitetsreturer. S06/S06R hadde feil forhold; S04/S05 bestod ytre mål, men faktisk motorblink avslørte feil øyefeste. Hele hvilende hoder er tegnet om som S04R/S05R. Profilhodet er plassert ved å flytte hele den egne tegningen1 HD-piksel i x,0 i y. Ingen lokale trekk er flyttet eller malt over. Hele alfaen er bevart, og ytre porter er uendret.640s egne RGB er renset til kildens flate rosa farge uten geometriendring. Python er brukt innen Toms uttrykkelige autorisasjon til rensing og plassering. Ingen original pikselmaske klipper ny kunst.
+
+S06R2 fikk outputavslag, request180ea1c4-4d0c-4424-a124-bf49b48a2c21.641 omprøves ikke.642 er en byteidentisk hel RGBA-alias og holdes også; den er ikke prøvd individuelt. De senere to hodekallene gjelder hele åpne hvilehoder, med original og mastere som grunnlag, og produserer ikke det avviste blinklaget. Avslaget og alle tidligere kvalitetsreturer er bevart.
+
+Arkkontrollen gir22 av22 store mål OK. Den hopper over småkildene;640 er kontrollert separat. Diagnostisk myke-figurer gir24 OK,23 fra eget ark og ett automatisk originalfragment641. Fragmentet er uttrykkelig utelatt fra native. De6 nye native bruker de egne komplette prototypene med ekte alfa, fast4x og2 originalpikslers margin. CORE128, IoU0.6 og dekning0.8 er uendret.
+
+Faktisk nedlastet Linux-binær2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110 er brukt. Sluttkandidatens vanlige rominngang/lokal217 viser2 av6 nye med faktisk aktør10,720 kontroller,711 null og normal avslutning0. De samme9 kjente bufferavvikene har identiske koordinater og begge RGB-verdier i rekkefølge, sammenlignet med3613. Ingen nye eller økte avvik; prøven er ikke avviksfri. Kontrollert aktør29 viser alle6 nye og gir320 av320 null både på3613-grunnlag og sluttkandidat. Dette er en uttrykkelig konstruert aktørprøve. Ingen tvunget enkeltanimasjon eller lokalskript, skjulte andre aktører eller stanset romskript.
+
+Alle6 sammenlignede originale aktørverdier er identiske ved samme hele129/124-lagtilstand. To hele originalflater er SHA-like. Øvrige flater har andre kildefaser og vannfargesykling. Én først uforklart piksel kom fra andre originalfaser409/410 i kostyme68. Uendrede idx-filer uten egne PNG er bekreftet mot begge modder; eksisterende originalfallback og dens1-originalpikselmarg forklarer avviket. Ingen uforklarte endringer står igjen. De endrede kildefasene og samme gamle9 bufferavvik er dokumentert, ikke skjult med økte toleranser.
+
+Seks hele motorvarianter, fire hele motorbilder, hele delarket og begge hodenes før/under/etter-blink er visuelt sett. Varmt øyelys i sluttkandidaten er21/0/21 for profil og24/0/24 for front. Profilen har én interpolert mellomfarge i den vide RGB170-telleren under blink; alle farger er rapportert. En første for bred fargeteller traff også bakgrunnen ved det opprinnelige hodet. Det er korrigert som måling, uten å endre noen grafikkfil eller tekniske porter.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-gatorgolf har3596 og vil mangle23 publiserte native etter denne bunken. Ingen nye pakkebygg er startet. Neste samlepunkt er resten av129-familien eller reell produksjonsblokkering.1804/1861 og tidligere returer står fortsatt åpne. Ingen full naturlig gjennomspilling, interaktiv Windows-prøve eller ny webtest.
+
+Bibliotekskildene figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt. Samme SCUMM v6-pin og Python/Pillow er kompatible. Alle21857 tidligere nativefiler,1420 beskyttede jobbfiler og tre stasher er bevart i kandidaten. Publisering krever ny fjern-SHA-kontroll, inaktive pakkebygg, henting tilbake og kontroll av samtlige filhash.
+
+Se fremdrift.json, rutekart-fig129_01.json, egen-native.json, motor-sammenligning.json, motor-bufferkontroll.json, blink-sluttkontroll.json, sluttkontroll.json og NESTE.md. Første kandidat med feil øyefeste er arkivert i foerste-kandidat/ og ikke publisert. Sluttprøvene har egne navn med final.
+'''
+(R/'RAPPORT.md').write_text(report)
+(R/'NESTE.md').write_text('''# Neste produksjon
+
+Seks mål i fig129_01 er ferdig kontrollert i kandidat3619. Publiser og bekreft mottak-publisert.json før ny nativeendring. Det er ikke et komplett levert ark:23 av24 mål,641 holdt. Ikke legg delarket som jobbens resultat.png.
+
+Fortsett i fig129_02 med en praktisk bunke på5 til10 av385 til390 først, deretter391 til401,422,153,154,512 og768. Det er22 uavhengige produserbare mål. Se hvert helt originalmotiv og godkjente mastere i faktisk lagkontekst før tegning. Flere51x82-kilder er egne animasjonslag, ikke nødvendigvis hele figurer. Sammenlign hele hode/kropp-animasjonen; ikke utled motiv av rutenummer eller transparent lerret alene.
+
+641 fikk verktøyavslag180ea1c4-4d0c-4424-a124-bf49b48a2c21 og omprøves ikke.642 er den identiske hele aliasen og ikke individuelt prøvd. Ikke forsøk samme motiv gjennom en annen teknikk. S04/S05 er erstattet som egne kvalitetsreturer av de hele hvilende hodeneS04R/S05R; publiser bare de seks valgte i valgte6.json.
+
+Fellespakker har3596. Oppdater ved resten av129-familien eller reell produksjonsblokkering, med nativefrys under bygg, faktisk nedlasting, sjekksummer og samtlige inkluderte grafikkfiler kontrollert. Automatikken fortsetter fordi22 familiemål og øvrige jobber gjenstår. Ikke gjenstart nattløpet fra15. oktober. Tidligere returer, særlig124_1804/1861, og tidligere avviste motiver beholdes. Kodeendringer krever avgrenset testet PR, ingen skjuling med alfa eller svakere porter.
+''')
+J=A/'jobber/fig129_01/notat.md';assert sha(J)==start['tidligere_notat_sha256']
+with J.open('a')as f:f.write(f'\n\n## {now} (Codex), seks nye kropps-, hode- og blinklag\n\n'+report.split('\n\n',2)[2]+'\n')
+for p in O.glob('*.py'):shutil.copy2(p,R/(p.name+'.txt'))
+print('Sluttkontroll dokumentert, seks valgt,23/24 delark,641/642 holdt, klar for artcommit.',flush=True)

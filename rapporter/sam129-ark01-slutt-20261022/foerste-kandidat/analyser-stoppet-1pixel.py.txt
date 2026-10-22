@@ -1,0 +1,158 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+from functools import lru_cache
+import hashlib,json,re,shutil
+import numpy as np
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+PREV=A/'rapporter/sam129-hoder2-20261022';PREVO=P/'out/sam129-hoder2-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+pb=read(PREV/'kandidat3613.json');pc=read(R/'kandidat3619.json')
+cb=read(R/'grunnlag3613-kontrollert.json');cc=read(R/'kandidat3619-kontrollert.json')
+for proof,n,count,null in [(pb,3613,720,711),(pc,3619,720,711),(cb,3613,320,320),(cc,3619,320,320)]:
+    assert proof['exit']==0 and proof['native_antall']==n and len(proof['kontroller'])==count and proof['nullkontroller']==null
+    assert proof['binar_sha256']=='2733e25f7e4be49503a194119f5b60ff64e172f973da2181f866d48a9d042110'
+assert cc['nye_maal_observert']==6 and not cc['manglende_nye_maal']
+def errors(proof,folder):
+    result=[]
+    for e in proof['kontroller']:
+        if not e['avvik']:continue
+        f=e['frame'];screen=np.array(Image.open(folder/f'frame_{f:06}_screen.png').convert('RGB'))
+        whole=list(folder.glob(f'frame_{f:06}_room[0-9][0-9][0-9].png'));assert len(whole)==1
+        image=np.array(Image.open(whole[0]).convert('RGB'));y,x=np.where(np.any(screen!=image,axis=2));assert len(x)==e['avvik']
+        h=hashlib.sha256(np.stack([x,y],1).tobytes()+screen[y,x].tobytes()+image[y,x].tobytes()).hexdigest()
+        result.append(dict(frame=f,avvik=len(x),koordinater_og_begge_RGB_sha256=h))
+    return result
+before=errors(pb,PREVO/'kandidat3613');after=errors(pc,O/'kandidat3619')
+assert len(before)==len(after)==9
+assert [(e['avvik'],e['koordinater_og_begge_RGB_sha256']) for e in before]==[(e['avvik'],e['koordinater_og_begge_RGB_sha256']) for e in after]
+save(R/'motor-bufferkontroll.json',dict(grunnlag=before,kandidat=after,samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge=True,
+    rammeforskyvninger=[after[i]['frame']-before[i]['frame'] for i in range(9)],ingen_nye_eller_okte_bufferavvik=True,
+    kontrollert_grunnlag_null=320,kontrollert_kandidat_null=320,avviksfri_primaerprove=False))
+native=read(R/'egen-native.json')['ruter'];by={e['bilde']:e for e in native};needed=set(by);assert len(needed)==6
+event_pattern=r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)'
+def all_events(folder):
+    result={}
+    for match in re.findall(event_pattern,(folder/'scummvm.log').read_text()):
+        f,n,k,x,y,w,h=map(int,match);result.setdefault(f,set()).add((n,k,x,y,w,h))
+    return result
+events=[all_events(O/'grunnlag3613-kontrollert'),all_events(O/'kandidat3619-kontrollert')]
+def state(side,f):return tuple(sorted(q for q in events[side].get(f,set()) if q[1] in [124,129]))
+@lru_cache(maxsize=32)
+def image(file,flat=False):
+    p=Path(file);p=p.with_name(p.stem+'_flat.png') if flat else p
+    return np.array(Image.open(p).convert('RGB'))
+def project(source,e,flat):
+    # Velg fra kildens egen RGB565-projeksjon, uavhengig av ny HD-tegning.
+    # Dette er bare måleflaten. Ingen bildeklipping eller ny toleranse.
+    x,y=e['pos'];w,h=e['maal'];candidates=[]
+    for mirror in [False,True]:
+        src=source[:,::-1] if mirror else source
+        rgb=src[:,:,:3].astype(np.uint16);r=rgb[:,:,0]>>3;g=rgb[:,:,1]>>2;b=rgb[:,:,2]>>3
+        rgb=np.stack([(r<<3)|(r>>2),(g<<2)|(g>>4),(b<<3)|(b>>2)],2).astype(np.uint8)
+        expected=np.repeat(np.repeat(rgb,4,0),4,1);mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1)
+        for dx in [-1,0,1]:
+            for dy in [-1,0,1]:
+                xx,yy=(x+dx)*4,(y+dy)*4
+                if min(xx,yy)<0 or xx+w*4>1280 or yy+h*4>800:continue
+                crop=flat[yy:yy+h*4,xx:xx+w*4]
+                wrong=int((mask&np.any(crop!=expected,axis=2)).sum())
+                candidates.append((wrong,abs(dx)+abs(dy),mirror,dx,dy,mask))
+    candidates.sort(key=lambda e:e[:5]);best=candidates[0]
+    mask=np.zeros((800,1280),bool);xx,yy=(x+best[3])*4,(y+best[4])*4
+    mask[yy:yy+h*4,xx:xx+w*4]=best[5]
+    proof=dict(speilvendt=best[2],dx_original=best[3],dy_original=best[4],kildefargeavvik=best[0],
+        synlige_kildepiksler=int(best[5].sum()),neste_kandidater=[dict(avvik=t[0],speil=t[2],dx=t[3],dy=t[4]) for t in candidates[1:5]],
+        kildeprojeksjon_uavhengig_av_HD=True)
+    return mask,proof
+idxfile=P/'mods/gpt/rooms/room025_idx.png';idx=np.array(Image.open(idxfile));meta=P/'work/extract/rooms.json'
+cycles=read(meta)['rooms']['25']['cycles'];indices=[k for lo,hi,_,_ in cycles for k in range(lo,hi+1)]
+cycle=np.repeat(np.repeat(nd.maximum_filter(np.isin(idx,indices),size=3),4,0),4,1)
+prior=read(R/'start.json')['filer'];patch=P/'engine/patches/0001-dighd-hd-grafikk.patch'
+assert 'const int pad = 1, W4' in patch.read_text()
+def fallback(oldf,newf):
+    support=np.zeros((800,1280),bool);proof=[]
+    for n,k,x,y,w,h in events[0].get(oldf,set()) ^ events[1].get(newf,set()):
+        if k!=126:continue
+        rel=f'costumes/costume{k:03}_{n:03}_idx.png';f=P/'mods/gpt'/rel
+        assert sha(f)==prior[rel]==sha(O/'mod-sam1293619'/rel)
+        assert not any((P/'mods/gpt'/f'costumes/costume{k:03}_{n:03}{suffix}').exists() for suffix in ['.png','_hd.png'])
+        box=[max(0,(x-1)*4),max(0,(y-1)*4),min(1280,(x+w+1)*4),min(800,(y+h+1)*4)]
+        if box[2]>box[0] and box[3]>box[1]:support[box[1]:box[3],box[0]:box[2]]=True
+        proof.append(dict(cel=n,pos=[x,y],maal=[w,h],original_marg=1,rekt_hd=box,idx_fil=rel,idx_sha256=prior[rel]))
+    return support,proof
+rows=[]
+for name in sorted(needed):
+    cel=int(name.split('_')[1]);src=np.array(Image.open(P/f'work/extract/costumes/{name}.png').convert('RGBA'))
+    found=None
+    news=[e for e in cc['hendelser'] if e['cel']==cel and e['kontrollert_testaktor29'] and e['bildeframe']>=40]
+    olds=[e for e in cb['hendelser'] if e['cel']==cel and e['kontrollert_testaktor29']]
+    for ne in news:
+        z=image(ne['fil'],True);mask,projection=project(src,ne,z)
+        pairs=[]
+        for oe in sorted(olds,key=lambda e:abs(e['bildeframe']-ne['bildeframe'])):
+            if oe['pos']!=ne['pos'] or oe['maal']!=ne['maal'] or state(0,oe['logg_frame'])!=state(1,ne['logg_frame']):continue
+            a=image(oe['fil'],True)
+            if np.array_equal(a[mask],z[mask]):pairs.append((not np.array_equal(a,z),abs(oe['bildeframe']-ne['bildeframe']),oe))
+            if pairs and not pairs[-1][0]:break
+        if pairs:
+            oe=min(pairs,key=lambda e:e[:2])[2];found=(oe,ne,mask,projection);break
+    assert found,(name,'Ingen like originale aktørverdier ved samme hele129/124-lagtilstand')
+    oe,ne,mask,projection=found;old,new=image(oe['fil']),image(ne['fil']);a,z=image(oe['fil'],True),image(ne['fil'],True)
+    delta=np.any(old!=new,axis=2);origdiff=np.any(a!=z,axis=2);outside=delta.copy();boxes=[]
+    for q in cc['hendelser']:
+        if q['logg_frame']!=ne['logg_frame'] or f"costume129_{q['cel']:03}" not in needed:continue
+        x,y=q['pos'];w,h=q['maal'];box=[max(0,x*4-8),max(0,y*4-8),min(1280,(x+w)*4+8),min(800,(y+h)*4+8)]
+        outside[box[1]:box[3],box[0]:box[2]]=False;boxes.append(box)
+    assert delta.any() and boxes
+    source_change=nd.maximum_filter(origdiff,size=9);fb,fbproof=fallback(oe['logg_frame'],ne['logg_frame'])
+    unknown=outside&~source_change&~cycle&~fb
+    if unknown.any():
+        uy,ux=np.where(unknown)
+        save(R/'analyse-ukjent-piksel.json',dict(bilde=name,grunnlag=oe,kandidat=ne,
+            piksler=[dict(x=int(x),y=int(y),gammelt_HD=old[y,x].tolist(),nytt_HD=new[y,x].tolist(),
+            gammel_original=a[y,x].tolist(),ny_original=z[y,x].tolist()) for x,y in zip(ux,uy)],
+            endrede126_faser=fbproof,koordinater_129=boxes))
+    assert not unknown.any(),(name,'Uforklart HD-endring',int(unknown.sum()))
+    assert np.array_equal(a[mask],z[mask]) and sha(O/'mod-sam1293619'/by[name]['fil'])==by[name]['sha256']
+    coords=np.stack(np.where(mask),1);ah=hashlib.sha256(coords.tobytes()+a[mask].tobytes()).hexdigest()
+    rows.append(dict(bilde=name,grunnlag_fil=oe['fil'],kandidat_fil=ne['fil'],grunnlag_frame=oe['bildeframe'],kandidat_frame=ne['bildeframe'],
+        grunnlag_sha256=sha(Path(oe['fil'])),kandidat_sha256=sha(Path(ne['fil'])),pos=ne['pos'],maal=ne['maal'],
+        original_aktorverdier_identiske=True,original_aktorverdier_sha256=ah,kildeprojeksjon=projection,
+        hele_originalflater_SHA_identiske=not origdiff.any(),forskjeller_hel_originalflate=int(origdiff.sum()),endrede_HD_piksler=int(delta.sum()),
+        utenfor_nye_ruter_og_dokumenterte_kildetilstander=int(unknown.sum()),endrede126_faser=fbproof,
+        native_sha256=by[name]['sha256'],kontrollert_testaktor29=True,full_naturlig_gjennomspilling=False,visuelt_sett=False))
+    print(name,'originalaktør identisk, utenfor dokumenterte flater 0',flush=True)
+boards=[]
+for start in [0,4]:
+    subset=rows[start:start+4];board=Image.new('RGB',(1800,1120),'#304050');dr=ImageDraw.Draw(board)
+    for i,e in enumerate(subset):
+        xx=i%2*900;yy=i//2*560;x,y=e['pos'];w,h=e['maal']
+        # Behold hode/kropp samlet også ved små blinklag.
+        box=(max(0,x*4-32),max(0,y*4-100),min(1280,(x+w)*4+32),min(800,(y+h)*4+48))
+        dr.text((xx+8,yy+8),e['bilde']+' 3613 / 3619, kontrollert aktor29',fill='white')
+        for k,key in enumerate(['grunnlag_fil','kandidat_fil']):
+            im=Image.open(e[key]).convert('RGB').crop(box);im.thumbnail((435,510));board.paste(im,(xx+8+k*445,yy+30))
+    f=R/f'motor-varianter-{start//4+1}.png';board.save(f)
+    boards.append(dict(fil=f.name,sha256=sha(f),ruter=[e['bilde'] for e in subset],visuelt_sett=False))
+shots=[]
+for name in ['costume129_129','costume129_128','costume129_130','costume129_640']:
+    e=next(e for e in rows if e['bilde']==name);f=R/(name+'-motor3619.png');shutil.copy2(e['kandidat_fil'],f)
+    shots.append(dict(bilde=name,fil=f.name,sha256=sha(f),kontrollert_testaktor29=True,visuelt_sett=False))
+save(R/'motor-pikselkontroll.json',rows)
+save(R/'motor-visuell-plan.json',dict(varianter=boards,hele_motorbilder=shots,visuelt_sett=False))
+proof=dict(nye_native=6,native=3619,primaer_kontroller=720,primaer_null=711,
+    samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge=True,ingen_nye_eller_okte_bufferavvik=True,avviksfri_primaerprove=False,
+    kontrollert_grunnlag_null=320,kontrollert_kandidat_null=320,alle6_observert=True,alle_originalaktorverdier_identiske=True,
+    alle_hele_originalflater_SHA_identiske=all(e['hele_originalflater_SHA_identiske'] for e in rows),
+    utenfor_nye_ruter_kildeendringer_cycle_og_endrede126_faser=0,primaer_maal_observert=pc['nye_maal_observert'],
+    seks_sammenlignet_paa_kontrollert_testaktor29=True,actor10_fra_originalskript=True,tvunget_lokalskript=False,
+    andre_aktorer_skjult=False,romskript_stoppet=False,full_naturlig_gjennomspilling=False,
+    source_rooms_sha256=sha(meta),room025_idx_sha256=sha(idxfile),sykler=cycles,kildens_cycle_nabovindu_original=3,
+    kildens_endring_nabovindu_hd=9,fallback126_marg_original=1,patch_sha256=sha(patch),visuelt_sett=False,
+    masker_kun_proveklassifisering_ikke_klipping_av_egen_kunst=True,
+    begrensning='Primærprøven har samme ni kjente bufferavvik, identiske koordinater og begge RGB-verdier. Ikke avviksfri. Seks nye ruter er sammenlignet på uttrykkelig kontrollert aktør29; vanlig sekvens bruker original rominngang/lokal217 med aktør10. Originalaktørverdier er identiske ved samme hele129/124-lagtilstand. Ingen nye toleranser, skript- eller motorendringer. Ingen full naturlig gjennomspilling, interaktiv Windows, ny webtest eller Tom-/Claude-godkjenning. 641 og alias642 er holdt etter verktøyavslag. Andre tidligere returer gjenstår.')
+save(R/'motor-sammenligning.json',proof);shutil.copy2(__file__,R/'analyser.py.txt')
+print('Seks kildeaktører identiske; 0 uforklarte endringer; primær samme9avvik, kontrollert320/320null.',flush=True)

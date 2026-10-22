@@ -1,0 +1,34 @@
+from pathlib import Path
+import json,shutil,hashlib
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/sam129-ark01-slutt-20261022'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for name,oldname,n,xs in [('S04R','S04',403,[9,13]),('S05R','S05',384,[6,11])]:
+    C=R/'kall'/name;assert not C.exists();C.mkdir();old=R/'kall'/oldname
+    for f in ['originalatlas.png','original-alfa.png','spillkontekst.png','kontekst-og-mastere.png']:shutil.copy2(old/f,C/f)
+    plan=json.loads((old/'plan.json').read_text());plan.update(kilde_og_mastere_sett_foer_kall=False,
+        kvalitetsretur_fra=oldname,returgrunn='Hele hodets øyeåpninger avviker fra kildens registrerte øyerad, selv om ytre størrelse er OK. Ny hel hoderute skal følge originalens indre feste. Ingen ny blinklag-produksjon.')
+    a=json.loads((old/'faktiske-argumenter.json').read_text())
+    a['referenced_image_paths']=[str(C/'originalatlas.png'),*a['referenced_image_paths'][1:3],str(C/'spillkontekst.png')]
+    direction='right-facing three-quarter' if n==403 else 'straight frontal'
+    prompt=f'''Use case: illustration-story.
+Asset: ONE entire separate resting HEAD animation cel, costume129_{n}, from Sam & Max Hit the Road. This is Lee-Harvey, Conroy Bumpus's human henchman, {direction} view, with brown/orange quiff, pink skin, narrow small eyes, long face, original nose and small closed resting mouth. Include the whole head and short neck join. No body, clothes or other parts.
+Image1 is the COMPLETE original17x27 cel enlarged with hard source pixels on slate. Image2 and Image3 are COMPLETE approved Sam and Max STYLE masters. Image4 is the actual original scene, CONTEXT only. Copy the whole exact head design and geometry from Image1, redraw every source color cluster as its intended smooth shape.
+CRITICAL: register all eye features to the exact SOURCE positions inside the WHOLE head. Source canvas17x27, zero-based coordinates. Both tiny light eye patches occupy ONLY original row14 and each light patch is ONE original pixel wide and ONE original pixel tall. Their positions are x={xs[0]} and x={xs[1]}, y=14. The color is warm cream RGB(255,199,135), not white. These exceptionally tiny1x1 light apertures sit adjacent to dark pupils. Do not draw broad white eyeballs. Do not move the tiny light patches higher, lower or farther apart. The top of this one-row light band is at14/27 of the FULL head height. In fixed4x it is exactly4px high and each cream patch is4px wide. Brow and dark eyelid shading remain as in the source, but no light eye area extends into a second original row or appears on both sides of a pupil. Keep the source's narrow suspicious half-lidded eye expression, no enlarged eye opening.
+Keep the original neutral mouth, quiff silhouette, ears, sideburns, nose, chin and lower cutoff. Full head17:27 width/height ratio and all other feature positions unchanged. Same adult human identity as Image1; no Sam/Max features. Smooth dark contours and flat original colors with one shade; no texture, gradients or pixel stairs, no enlarged eyes, hair, nose or head. This requests ONLY the complete OPEN-EYE resting head from Image1, no blinking shapes or new overlay assets.
+Output one centered COMPLETE head on a1024x1024 genuinely transparent PNG with clear transparent padding. No background, checkerboard, labels, numbers or text. Paint the whole head with the exact small source eye registration.'''
+    a['prompt']=prompt;plan['referanser']={f:sha(Path(f)) for f in a['referenced_image_paths']}
+    for f,d in [('plan.json',plan),('faktiske-argumenter.json',a)]:
+        (C/f).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+    (C/'faktisk-prompt.txt').write_text(prompt+'\n')
+q=json.loads((R/'kvalitetsretur.json').read_text())
+q.extend([dict(kall='S04',bilde='costume129_403',grunn='Øyebåndet for høyt og større enn kildens ene rad. Påvist i vanlig motorsekvens.',nytt_kall='S04R',porter_uendret=True),
+    dict(kall='S05',bilde='costume129_384',grunn='Øyebåndet ligger to HD-piksler for lavt. Påvist i kontrollert motorsekvens.',nytt_kall='S05R',porter_uendret=True)])
+(R/'kvalitetsretur.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+d={'costume129_403':dict(grunnlag_lyse_oyepiksler=[22,0,22],foerste_kandidat_lyse_oyepiksler=[50,46,50],
+    HD_oyerader=[505,506,507,508],original_oyerader=[508,509,510,511]),
+    'costume129_384':dict(grunnlag_lyse_oyepiksler=[22,0,22],foerste_kandidat_lyse_oyepiksler=[32,16,32],
+    HD_oyerader=[494,495,496,497],original_oyerader=[492,493,494,495]),
+    'ingen_blinkmotiver_genereres_paa_nytt':True}
+(R/'hoder-kvalitetsretur.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(__file__,R/'hoder-retur.py.txt')
+print('To selvstendige hele hvilehoder i kvalitetsretur. Holdt641/642 forblir urørt.')

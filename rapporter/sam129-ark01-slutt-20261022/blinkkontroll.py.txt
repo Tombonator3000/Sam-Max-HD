@@ -1,0 +1,43 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil
+import numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;OLD=A/'rapporter/sam129-hoder2-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+rows=[]
+for blink,head,basefile,newfile,controlled in [(641,403,OLD/'kandidat3613.json',R/'kandidat3619-final.json',False),(640,384,R/'grunnlag3613-kontrollert.json',R/'kandidat3619-final-kontrollert.json',True)]:
+    proofs=[read(basefile),read(newfile)];groups=[];pic=Image.new('RGB',(1200,1350),'#304050');dr=ImageDraw.Draw(pic)
+    for side,proof in enumerate(proofs):
+        assert proof['exit']==0
+        ev=proof['hendelser'];target=next(e for e in ev if e['cel']==blink and (not controlled or e['kontrollert_testaktor29']))
+        phases=[];open_colors=None
+        for col,df in enumerate([-1,0,1]):
+            f=target['logg_frame']+df
+            opts=[e for e in ev if e['logg_frame']==f and e['cel']==head and (not controlled or e['kontrollert_testaktor29'])]
+            h=min(opts,key=lambda e:abs(e['pos'][0]-target['pos'][0]));x,y=h['pos'];w,hh=h['maal']
+            im=np.array(Image.open(h['fil']).convert('RGB'));ey=im[(y+11)*4:(y+18)*4,x*4:(x+w)*4]
+            light=(ey[:,:,0]>=220)&(ey[:,:,1]>=170)&(ey[:,:,2]>=110)
+            colors={tuple(q)for q in ey[light].tolist()}
+            warm=light&(ey[:,:,0]>=245)&(ey[:,:,1]>=185)&(ey[:,:,2]<=170)
+            aperture={tuple(q)for q in ey[warm].tolist()}
+            if df==-1:open_colors=aperture;assert len(open_colors)>0
+            eye_same=sum(tuple(q)in open_colors for q in ey.reshape(-1,3).tolist())
+            p=dict(fil=h['fil'],sha256=sha(Path(h['fil'])),bildeframe=h['bildeframe'],hode=head,pos=h['pos'],maal=h['maal'],blinkfase=df,lyse_RGB170_piksler=int(light.sum()),lyse_RGB170_farger=sorted(colors),varm_oyefarge_piksler=int(warm.sum()),samme_RGB_som_aapent_oyelys=eye_same)
+            phases.append(p)
+            crop=(max(0,(x-5)*4),max(0,(y-3)*4),min(1280,(x+w+5)*4),min(800,(y+hh+3)*4))
+            imc=Image.fromarray(im).crop(crop);imc.thumbnail((380,410));imc=imc.resize((imc.width*min(3,380//imc.width),imc.height*min(3,380//imc.width)),Image.Resampling.NEAREST)
+            xx=col*400;yy=side*450
+            pic.paste(imc,(xx+10,yy+30));dr.text((xx+10,yy+8),f'{3613 if side==0 else 3619} frame{h["bildeframe"]} fase{df:+}',fill='white')
+            if side==1:
+                fpath=Path(h['fil']);orig=Image.open(fpath.with_name(fpath.stem+'_flat.png')).convert('RGB').crop(crop)
+                factor=min(3,380//orig.width);orig=orig.resize((orig.width*factor,orig.height*factor),Image.Resampling.NEAREST)
+                pic.paste(orig,(xx+10,930));dr.text((xx+10,908),'Original samme kandidatframe',fill='white')
+        print('blink',blink,'native',3613 if side==0 else 3619,'varmt oyelys',[p['varm_oyefarge_piksler']for p in phases],flush=True)
+        save(R/f'blink{blink}-{3613 if side==0 else 3619}-maaling.json',phases)
+        assert phases[0]['samme_RGB_som_aapent_oyelys']>0 and phases[1]['samme_RGB_som_aapent_oyelys']==0 and phases[2]['samme_RGB_som_aapent_oyelys']>0
+        groups.append(dict(native=3613 if side==0 else 3619,faser=phases,apen_lukket_apen=True))
+    p=R/f'blink{blink}-sluttkontroll.png';pic.save(p)
+    rows.append(dict(blink=blink,hode=head,kontrollert_testaktor29=controlled,grupper=groups,fil=p.name,sha256=sha(p),visuelt_sett=False,skiller_RGB170_mellomfarge_fra_faktisk_apent_oyelys=True,RGB170_terskel=[220,170,110],varm_oyefarge_RGB_min=[245,185,110],varm_oyefarge_B_max=170,kriterium='Ingen av det faktiske åpne varme øyelysets RGB-verdier finnes i lukket fase. Den vide RGB170-målingen, som også fanger bakgrunn og interpolerte mellomfarger, og samtlige farger rapporteres også, uten å skjule interpolerte mellomfarger.',blink_native_ny=blink==640,blink_fallback_uendret=blink==641,ingen_endring_av_641_642=True))
+save(R/'blink-sluttkontroll.json',dict(ruter=rows,alle_teknisk_apen_lukket_apen=True,visuelt_sett=False,masker_kun_maaling_ingen_klipping=True))
+shutil.copy2(__file__,R/'blinkkontroll.py.txt');print([(e['blink'],[[p['lyse_RGB170_piksler']for p in g['faser']]for g in e['grupper']])for e in rows],flush=True)
