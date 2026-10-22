@@ -1,8 +1,8 @@
 # Lee-Harveys gangsekvens og avkapping ved fryseren
 
-2026-10-22 10:37 (Codex)
+2026-10-22 10:41 (Codex)
 
-Ett helt figurark,fig293_02,er laget med innebygd image_gen,egenkontrollert,native mottatt,motorobservert og visuelt sett. Det inneholder13 nye native ruter1930..1942 fra kostyme293:syv egne nye tegninger og seks hele RGBA-aliaser. Kandidat3661 er kontrollert. Publisering og tilbakehenting er ikke bekreftet ennå.505 av1758 figurark har resultat,1253 er uten pluss returer og sluttkontroll.293-familien har20/55 native i kandidaten,34 produserbare mål gjenstår inkludert to returer,og1927 holdes uten omprøving.
+Ett helt figurark,fig293_02,er laget med innebygd image_gen,egenkontrollert,native mottatt,motorobservert og visuelt sett. Det inneholder13 nye native ruter1930..1942 fra kostyme293:syv egne nye tegninger og seks hele RGBA-aliaser. Publisert additivt som hd-mod c157c3373d6ac0e1c609c55ad09a9b8a7d329167, grafikkilde fb82eaf89da47ed329237ce4508ba8c6af0e0b93. Alle21905 filhash er hentet tilbake og bekreftet.505 av1758 figurark har resultat,1253 er uten pluss returer og sluttkontroll.293-familien har20/55 kontrollerte native ruter,34 produserbare mål gjenstår inkludert to returer,og1927 holdes uten omprøving.
 
 Elleve faktiske bildekall ga11 råbilder,ingen nye verktøyavslag og fire forkastede kvalitetskandidater. De to gjenopptatte returene1921/1922 har fortsatt feil hode-/øyefeste og er ikke levert. Første1935-utkast hadde et oppdiktet øye i avkappet bakhode og er erstattet av N1935R. Første1936-utkast var for smalt og er erstattet av N1936R. Ingen avviste utkast brukes som stil-/identitetsanker. Forrige1927-avslag holdes uten nytt kall.
 
@@ -16,6 +16,6 @@ Første baseline og kandidat ble rendret,men rapporthjelperen feilet før kvitte
 
 Alle21892 tidligere moddfiler og21886 PNG bevares unntatt oppdatert mod.json/manifest.1432 beskyttede jobbfiler og tre stasher står urørt. Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt3641 native og mangler20 fra293-familien. Den kalles ikke oppdatert med3661. Videre arbeid:fig293_03 med frysersekvensens faktiske kildekontekst,deretter gjenværende returer. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter,all grafikk er ikke ferdig.
 
-Bibliotekskilder:figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e. Bevis:fremdrift.json,rutekart-fig293_02.json,indre-feste-kontroll.json,smaadel-kontroll.json,automatisk-mottak.json,motor-sammenligning.json,motor-bufferkontroll.json og mottak-publisert.json når publiseringen er bekreftet.
+Bibliotekskilder:figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e. Bevis:fremdrift.json,rutekart-fig293_02.json,indre-feste-kontroll.json,smaadel-kontroll.json,automatisk-mottak.json,motor-sammenligning.json,motor-bufferkontroll.json og mottak-publisert.json.
 
 ![Syv nye tegninger](syv-egne-native.png)

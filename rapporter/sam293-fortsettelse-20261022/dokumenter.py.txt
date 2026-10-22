@@ -1,0 +1,37 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+assert git(P,'branch','--show-current')=='main'and not git(P,'status','--porcelain')
+r=read(R/'mottak-publisert.json');assert r['native']==3661 and r['nye_native']==13 and r['alle_filhash_bekreftet']
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]==r['hd_mod']
+subprocess.run([str(P/'.venv/bin/python'),str(O/'rapport.py')],cwd=P,check=True)
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');marker='sam293-fortsettelse-status'
+body=f'''Ett helt nytt ark,fig293_02,er laget,egenkontrollert,native mottatt,motorobservert,visuelt sett og publisert. Det dekker13 ruter1930..1942 fra kostyme293 med syv nye egne tegninger og seks kildebekreftede hele RGBA-aliaser. Native er {r['hd_mod']},3661 totalt. Grafikkilde:{r['grafikkilde']}. Alle21905 filhash er hentet tilbake og bekreftet. Alle21892 tidligere stier og21886 PNG,1432 beskyttede jobbfiler og tre stasher er bevart.505/1758 hele figurark,1253 uten pluss returer/sluttkontroll.
+
+Elleve innebygde bildekall ga11 råbilder og fire forkastede kvalitetskandidater. Ingen nye verktøyavslag. Begge gjenopptatte returer1921/1922 feiler fortsatt hode-/øyefeste. fig293_01 er fortsatt7/10 uten hel resultatfil,og1927 holdes uten omprøving. Hele293-familien har20/55 native,34 produserbare mål gjenstår inkludert to returer. Neste uavhengige jobb er fig293_03,frysersekvensen,etter faktisk kontroll av animasjon7/raw30 i rom56. Tidligere129-/124-returer bevares.
+
+Alle13 nye ruter er OK i faktisk myke-figurer-mottak,ingen til gjennomsyn og ingen originalfragmenter. Ekte alfa,fast4x og to originalpikslers marg. Omriss-,deknings-,sideforholds- og3HD-festegrenser er beholdt. Bare hele tegninger er plassert;ingen lokal flytting av trekk eller hard originalmaskeklipping. Kildebekreftet avkapping og den separate lille skodelen er bevart.
+
+Endelige baseline/kandidat-prøver avslutter med exit0 og118/120 nullkontroller hver. De to kjente bufferavvikene ved rominngang har identiske koordinater og begge RGB-verdier. Etter testaktørstart80/80 null per side. Alle13 originale aktørflater og8HD-naboområder er like,med0 uforklarte HD-endringer. Tretten før/etter-varianter,fire hele motorbilder og alle23 faser er visuelt sett. Faktisk nedlastet Linux-binær5abfeae er brukt. Kontrollert aktør29,animasjon1/raw6;ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Første to motorprøver fikk rapportfeil etter rendering fordi en lokal kopi av kildeheaderen manglet. De regnes ikke bestått og bevares. Headerkopien er hashbekreftet,og endelige rene v2-prøver har normale exitkvitteringer. Ingen motor-/pipelinekode er endret. Tidligere shell143 er fortsatt historikk med ubekreftet årsak.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt3641 native og mangler20. Neste steg er et felles pakkesamlepunkt for3661,med nativefrys,grønne bygg,faktiske nedlastinger,sjekksummer og innholdskontroll før ny felles release kalles oppdatert. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter;all grafikk er ikke ferdig.
+
+Bevis:[grafikk- og motorrapport](https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/{R.name}/RAPPORT.md). Bibliotekskilder:figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Bare fire dokumenter endres direkte i main.
+'''
+for root,fs in [(A,['ORDRE.md','GRAFIKKLISTE.md']),(P,['memory.md','STATUS.md','todo.md'])]:
+ for f in fs:
+  p=root/f;t=p.read_text();assert '<!-- '+marker+':start -->'not in t;first,rest=t.split('\n',1);p.write_text(first+'\n\n<!-- '+marker+':start -->\n'+body+'<!-- '+marker+':slutt -->\n\nTidligere status nedenfor er historikk.\n'+rest)
+p=P/'todo.md';t=p.read_text();steps='''
+- [x] Lever fig293_02 med13 nye native ruter,syv egne tegninger og seks hele RGBA-aliaser. Native3661,505 hele ark.
+- [ ] Lag felles Linux-/Windows-samlepunkt med3661 etter nativefrys,grønne bygg,nedlasting og hash-/innholdskontroll.
+- [ ] Bekreft frysersekvensen i fig293_03 med animasjon7/raw30 i faktisk motor før neste bildebunke.
+- [ ] Gjenoppta1921/1922 etter rapportens konkrete festeavvik;behold20 publiserte293-ruter og hold1927 uten omprøving.
+''';t=t.replace('## Neste\n','## Neste\n'+steps,1);p.write_text(t)
+p=P/'log.md';p.write_text(p.read_text()+'\n\n## '+now+' (Codex)\n\n'+body)
+shutil.copy2(__file__,R/'dokumenter.py.txt');print('Kvittering og neste pakkesamlepunkt dokumentert i grafikkgrenen og fire main-dokumenter.')
