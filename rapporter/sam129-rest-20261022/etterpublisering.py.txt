@@ -1,0 +1,27 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;N=A/'rapporter/sam129-kilde-20261022'
+read=lambda p:json.loads(p.read_text())
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+r=read(R/'mottak-publisert.json');assert r['alle_filhash_bekreftet']and r['native']==3641;needed={e['bilde']for e in read(R/'valgte8.json')}
+for f in [N/'kildeplan.json',R/'kildeplan.json']:
+ d=read(f);assert d['bildekall']==47 and d['gjenstar_maal']==10
+ for e in d['ruter']:
+  if e['bilde']in needed:e.update(laget=True,egenkontrollert=True,native_mottatt=True,motorobservert=True,visuelt_sett=True,publisert=True,hd_mod=r['hd_mod'],grafikkilde=r['grafikkilde'],Tom_godkjent=False,Claude_godkjent=False,produksjonsrapport='rapporter/'+R.name)
+ delivered=sorted(set(d['levert_og_publisert'])|needed);assert len(delivered)==45;d.update(bildekall=55,vellykkede_bildekall=54,avviste_bildekall=1,kvalitetsreturer=9,nye_native=45,publisert_hd_mod=r['hd_mod'],publisert_grafikkilde=r['grafikkilde'],levert_og_publisert=delivered,gjenstar_maal=2,produserbare_gjenstar=0,siste_produksjonsrapport='rapporter/'+R.name);save(f,d)
+subprocess.run([str(P/'.venv/bin/python'),str(O/'rapport.py')],cwd=P,check=True)
+body=f'''Åtte nye Lee-Harvey-lag399,400,401,422,153,154,512,768 er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert, visuelt sett og publisert. Native {r['hd_mod']},3641 totalt. Grafikkilde {r['grafikkilde']}. Alle21885 filhash er bekreftet etter henting.21877 tidligere stier,21871 tidligere PNG,1420 beskyttede jobbfiler og tre stasher er bevart. Ingen ny Tom-/Claude-godkjenning.
+
+129-familien har45/47, ingen produserbare igjen her;641/642 holdes uten omprøving. Delark01 er23/24 og02 er22/23. Ingen nye hele resultatark:504 av1758 med resultat,1254 uten pluss returer og sluttkontroll. Åtte faktiske kall og åtte råbilder. Fire hoder, én helfigur, separat kropp, øyemarkering512 og kragekant768. Smådelene er faktisk nytegnet, ikke originalfragmenter. Kilder, lagkontekst og komplette mastere er sett per kall. Ekte alfa, fast4x og2 originalpikslers margin. Ingen originalmaske eller lokal featureflytting. Samme mottaks- og festeporter. Én varm håndpiksel utløste øyerensvakt; egen hodeavgrensning beholder pikselen og samme vakt. Alle22 tegnede delarkruter er uten FEIL; holdt642 er fortsatt utelatt selv om hel sjekk gir0.
+
+To kontrollerte hele animasjoner gir640/640 null per side. Frontgrunnlaget er gjenbrukt etter hashkontroll; kostymegrunnlaget og begge kandidatprøver er nye. Åtte originale sammensatte aktørverdier er identiske; uendrede aktørdeler og uforklarte endringer har0 avvik.17 frontfaser, åtte bilder rundt kroppsovergangen, åtte før/etter-varianter og fire hele motorbilder er visuelt sett. Ny vanlig rominngang/lokal217 gir711/720 null, samme ni kjente feil med identiske koordinater og begge RGB-verdier. Ingen nye eller økte feil; ikke avviksfri primærprøve. Ingen full naturlig gjennomspilling, interaktiv Windows eller ny webtest.
+
+Pakkesamlepunktet følger nå i egen rapport felles-release-20261022-lee-harvey. Før bygg har fellespakker3596 og mangler45 native. Native fryses under bygg, faktisk nedlasting og filhash kontrolleres før oppdatert-status.124_1804/1861 og øvrige returer står åpne. Neste uavhengige figurjobb velges etter gjeldende ordre og retur. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter; all grafikk er ikke ferdig.
+
+Bevis: rapporter/{R.name}/RAPPORT.md, mottak-publisert.json, motor-sammenligning.json, motor-bufferkontroll.json, fremdrift.json og rutekart-fig129_02.json. Bibliotekskilder figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter, publisert-mod-er-fasit. Ingen motor-/pipelineendring.
+'''
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;text=p.read_text();marker='<!-- sam129-rest-status:start -->';assert marker not in text;title,rest=text.split('\n',1);p.write_text(title+'\n\n'+marker+'\n'+body+'<!-- sam129-rest-status:slutt -->\n\nTidligere status nedenfor er historikk.\n'+rest)
+(R/'status-blokk.md').write_text(body);shutil.copy2(__file__,R/'etterpublisering.py.txt');print('Familie45/47,kun2holdt. Pakkesamlepunkt nå.')

@@ -1,6 +1,6 @@
 # Siste åtte produserbare Lee-Harvey-lag i129
 
-Åtte nye egne malerier:399,400,401,422,153,154,512,768. Laget med innebygd image_gen, teknisk egenkontrollert, native mottatt, visuelt sett og motorobservert. Kontrollert kandidat3641. Publisering og henting gjenstår. Ingen ny Tom-/Claude-godkjenning eller samlet sluttgodkjenning.
+Åtte nye egne malerier:399,400,401,422,153,154,512,768. Laget med innebygd image_gen, teknisk egenkontrollert, native mottatt, visuelt sett og motorobservert. Publisert hd-mod d4b182a532ae139f4bb663cc835fabdffcc8cab6, grafikkilde 5c45ab4ff61ae951c265f681fc8225239626a558, alle21885 filhash bekreftet etter henting. Ingen ny Tom-/Claude-godkjenning eller samlet sluttgodkjenning.
 
 Fire hoder, én hel figur, én separat kropp, et øyemarkeringlag512 og en smal kragekant768 bak halsen. Hele originale motiv, faktisk spillkontekst og komplette godkjente Sam-/Max-mastere er sett før hvert kall.401 har17x27-kildelerret og eget feste;422 har17x28. De store51x82-lerretene399/400 inneholder bare synlig17x26/27-hode. Alle originale deler beholdes.153 og154 brukes ved overgangen i hel animasjon7, ikke som samme figurarkrute.512 består av svart pupil og varm kremmarkering,768 av fire blå rader og svart nederste rad. Logg, kildepalett og lagposisjon avklarer dette uten designgjetning.
 

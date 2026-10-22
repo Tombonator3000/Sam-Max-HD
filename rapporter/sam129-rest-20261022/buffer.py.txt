@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;read=lambda p:json.loads(p.read_text())
+old=read(A/'rapporter/sam129-ark01-slutt-20261022/motor-bufferkontroll.json')
+proof=read(R/'kandidat3641-primaer.json');T=O/'kandidat3641-primaer';out=[]
+for e in proof['kontroller']:
+ if not e['avvik']:continue
+ f=e['frame'];screen=np.array(Image.open(T/f'frame_{f:06}_screen.png').convert('RGB'));whole=list(T.glob(f'frame_{f:06}_room*.png'));whole=[p for p in whole if not p.stem.endswith('_flat')];assert len(whole)==1;image=np.array(Image.open(whole[0]).convert('RGB'));y,x=np.where(np.any(screen!=image,axis=2));assert len(x)==e['avvik'];h=hashlib.sha256(np.stack([x,y],axis=1).tobytes()+screen[y,x].tobytes()+image[y,x].tobytes()).hexdigest();out.append(dict(frame=f,avvik=len(x),koordinater_og_begge_RGB_sha256=h))
+prev=old['kandidat'];assert len(prev)==len(out)==9
+assert [(e['avvik'],e['koordinater_og_begge_RGB_sha256'])for e in prev]==[(e['avvik'],e['koordinater_og_begge_RGB_sha256'])for e in out]
+(R/'motor-bufferkontroll.json').write_text(json.dumps(dict(grunnlag=prev,kandidat=out,samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge=True),indent=2)+'\n');print('Ni bufferfeil med identiske koordinater og begge RGB-verdier.')
