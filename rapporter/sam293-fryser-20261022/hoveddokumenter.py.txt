@@ -1,0 +1,22 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import subprocess,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+s=read(R/'start.json');rec=read(R/'mottak-publisert.json');body=(R/'status-blokk.md').read_text();assert rec['native']==3678 and rec['nye_native']==17 and rec['alle_filhash_bekreftet']and rec['hd_mod']in body
+assert git(P,'branch','--show-current')=='main'and not git(P,'status','--porcelain')and git(P,'rev-parse','HEAD')==s['remote']['main']and git(P,'ls-remote','origin','refs/heads/main').split()[0]==s['remote']['main']
+marker='sam293-fryser-status'
+for name in ['memory.md','STATUS.md','todo.md']:
+ f=P/name;t=f.read_text();assert '<!-- '+marker+':start -->'not in t;first,rest=t.split('\n',1);f.write_text(first+'\n\n<!-- '+marker+':start -->\n'+body+'<!-- '+marker+':slutt -->\n\nTidligere status nedenfor er historikk.\n'+rest)
+f=P/'todo.md';t=f.read_text();steps='''
+- [x] Publiser 17 nye native fra fig293_03 med syv tegninger og ti hele RGBA-aliaser. 17 OK i mottak og sett i begge motorprøver med zclip 1. Native 3678, delark 17/32.
+- [ ] Fullfør fig293_03: 1943..1948, 1956/1959/1960 og 1969..1974. Les rapporter/sam293-fryser-20261022/NESTE.md. Behold 17 publiserte ruter, ekte smådeler og det opake grålilla vindusfeltet.
+- [ ] Oppdater begge faktiske Linux-/Windows-pakker ved neste samlepunkt etter videre 293-produksjon. Utgaven med 3661 mangler nå 17 native; ikke kall den oppdatert med 3678.
+''';t=t.replace('## Neste\n','## Neste\n'+steps,1)
+t=t.replace('- [ ] Gjenoppta fig293_03 fra kilde293_03-plan.json. 32 originalfaser er sett; forklar hvite effektdeler, grålilla vindusfelt og oppløsning før nye kall.','- [x] Gjenoppta fig293_03 og avklar hvite deler, opakt grålilla vindusfelt og original zclip 1 før nye kall. Delarket er nå 17/32; resten står i ny liste over.')
+t=t.replace('- [ ] Bekreft frysersekvensens naturlige klipping med zclip 1 før neste bildebunke. Kontrollert animasjon 7/raw 30 med alle 32 originalfaser er avspilt og visuelt sett.','- [x] Bekreft original zclip 1 i frysersekvensen med animasjon 7/raw 30 og originalt skript 204 etter konstruert aktør 10-fortilstand. Alle 32 originalfaser er sett. Ingen naturlig full gjennomspilling påstås.')
+f.write_text(t)
+f=P/'log.md';now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');f.write_text(f.read_text()+'\n\n## '+now+' (Codex)\n\n'+body)
+shutil.copy2(__file__,R/'hoveddokumenter.py.txt');print('Bare fire main-dokumenter oppdatert med faktisk publiseringskvittering.')

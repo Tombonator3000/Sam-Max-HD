@@ -1,8 +1,8 @@
 # Lee-Harvey bak fryservinduet
 
-2026-10-22 11:56 (Codex)
+2026-10-22 12:03 (Codex)
 
-Sytten nye native ruter fra fig293_03 er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett. De kommer fra syv nye egne tegninger og ti bekreftede hele RGBA-aliaser. Kandidat 3678 er kontrollert. Publisering og tilbakehenting er ikke bekreftet ennå. Delarket er 17/32. Hele jobben er ikke levert, og jobber/fig293_03/resultat.png opprettes ikke. 505 av 1758 hele figurark har resultat, 1253 er uten pluss returer og samlet sluttkontroll. Kostyme 293 har nå 37/55 native. 17 produserbare mål og det tidligere verktøyholdte 1927 gjenstår i familien.
+Sytten nye native ruter fra fig293_03 er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett. De kommer fra syv nye egne tegninger og ti bekreftede hele RGBA-aliaser. Publisert additivt som hd-mod 930e0e29bcc6a281510720a3615a2778e2c8b4fe, grafikkilde 975ad3ad7567368720648faa9086dd441d2187a1. Alle 21922 filhash er hentet tilbake og bekreftet. Delarket er 17/32. Hele jobben er ikke levert, og jobber/fig293_03/resultat.png opprettes ikke. 505 av 1758 hele figurark har resultat, 1253 er uten pluss returer og samlet sluttkontroll. Kostyme 293 har nå 37/55 native. 17 produserbare mål og det tidligere verktøyholdte 1927 gjenstår i familien.
 
 Fjorten faktiske innebygde bildekall ga 14 råbilder. Syv kandidater er forkastet i kvalitetskontrollen. Ingen nytt verktøyavslag eller kvotefeil. 1943 har feil hånd-/maskemotiv og feil plassering/størrelse av kuldeflekker. 1947, 1948 og 1956 står fortsatt i retur for sideforhold; de to forsøkene på 1947 og begge på 1956 er bevart. Første 1951 var for smal; 1951R består. 1944/1945/1946 er bare klargjort, ikke bestilt. Ingen forkastede utkast blir identitets- eller stilankere. Tidligere 1921/1922, 129-/124-returer og verktøyholdt 1927 er bevart uten omprøving av verktøyavslag.
 
