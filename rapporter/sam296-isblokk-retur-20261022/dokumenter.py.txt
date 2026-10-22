@@ -1,0 +1,87 @@
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+import json
+import shutil
+import subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def save(path, data):
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+
+receipt = read(R / 'mottak-publisert.json')
+assert receipt['alle_filhash_bekreftet'] and receipt['native'] == 3697
+assert receipt['filantall'] == 21941 and receipt['png'] == 21935
+assert receipt['delark'] == 2 and receipt['nye_native'] == 1
+assert subprocess.check_output(['git', 'branch', '--show-current'], cwd=P, text=True).strip() == 'main'
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=P, text=True).strip()
+assert subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/main'], cwd=P, text=True).split()[0] == subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=P, text=True).strip()
+native, art = receipt['hd_mod'], receipt['grafikkilde']
+now = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+
+path = R / 'RAPPORT.md'
+text = path.read_text()
+assert 'Additiv publisering gjenstår.' in text
+text = text.replace('Additiv publisering gjenstår.',
+    f'Publisert additivt som hd-mod {native},med grafikkilde {art}. Alle21941 filhash er hentet tilbake og bekreftet. Lokal mod er mottatt fra den kontrollerte nedlastingen,og forrige mod er bevart separat.', 1)
+text = text.replace('Kandidaten har3697 native', 'Publisert mod har3697 native')
+text = text.replace('og vil mangle de to første296-rutene ved publisering.', 'og mangler de to første296-rutene etter denne publiseringen.')
+path.write_text(text)
+
+(R / 'NESTE.md').write_text(f'''# Neste arbeid
+
+costume296_1921/S017 er publisert additivt som hd-mod {native},grafikkilde {art}. Alle21941 filhash er hentet tilbake og bekreftet. Modden har3697. Les mottak-publisert.json og publisering-forsokt.json;ikke gjenta denne publiseringen eller eldre engangshjelpere.
+
+Gjenoppta fig296_01. Delarket er2/9 med publisert1920 og1921.1922..1928 mangler. Familien har23 mål i fire jobber. Nyeste faktisk utførte bildekall er S023,neste nye id er S024. S016..S023 ga åtte råbilder og sju kvalitetsreturer. Bare S017 ble valgt. Les RETUR.md,råbildene og full blåkontroll før neste motiv. Originalen skal ses i spillkontekst med godkjente stilankere hver gang.
+
+Autoritativ1921-kontroll er sluttkandidat-kontroll-halv.json:24 hudpunkter,20 blåpunkter og seks mørke fester under3HD. Hele tegningen flyttes[-0,5,+1]HD,ingen lokale trekk flyttes. De tre kildeblå fargene er0/43/103,15/67/159 og107/115/159. Kontroller som utelater den siste er historikk. Andre fasers komplette kildepalett må kontrolleres før de velges. S018/S022/S023 og øvrige returer importeres ikke.1926 er ikke akseptert,så ingen alias til1927/1928. Tidligere verktøyholdt293_1927 er en annen ressurs og omprøves ikke.
+
+Fortsett også uavhengige produserbare296-faser etter original- og kontekstkontroll. Ingen nødvendig designavklaring med Tom er identifisert. Hele figurjobber er506/1758,1252 uten resultat i tillegg til returer og samlet sluttkontroll. Pakker har3695 og mangler to ruter. Oppdater begge ved neste familiesamlepunkt eller avslutning,med faktiske nedlastinger,SHA256 og innholdskontroll.
+
+Bevar samtlige tidligere native,1440 beskyttede inputfiler og tre opprinnelige stasher. Ingen grafikk til main,ingen gamle nattprosesser. Automatikken er ACTIVE;all grafikk er ikke ferdig.
+''')
+(R / 'PAKKER.md').write_text(f'''# Pakker
+
+Felles Linux/Windows sam-max-hd-2026-10-22-fryserark har3695 native. Begge faktiske pakker er kontrollert ved forrige pakkesamlepunkt. Publisert native3697/{native} er ikke med der;de to første296-rutene1920 og1921 mangler i pakkene. Neste oppdatering skjer ved videre familiesamlepunkt eller avslutning,med faktiske nedlastinger,sjekksummer og innholdskontroll. Ingen nye pakkebygg er startet for denne delruten og nativefrys er false.
+
+https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-22-fryserark
+''')
+with (A / 'jobber/fig296_01/notat.md').open('a') as out:
+    out.write(f'\n{now} (Codex):1921 er publisert additivt som hd-mod {native},grafikkilde {art}. Alle21941 filhash er hentet tilbake og bekreftet.21940 tidligere filstier og21934 tidligere PNG-hash er bevart. Delarket er2/9,familien2/23. Pakker3695 mangler1920/1921. Ingen ny Tom-/Claude-godkjenning.\n')
+
+block = f'''<!-- sam296-isblokk-retur-status:start -->
+Isblokken har fått én ny egen sidefase, costume296_1921. Den er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert additivt som hd-mod {native},grafikkilde {art}. Alle21941 filhash er hentet tilbake og bekreftet. Modden har3697 native. Alle21940 tidligere filstier og21934 tidligere PNG-hash er bevart;bare mod.json og sjekksummanifestet er oppdatert. Forrige mod er bevart separat.
+
+fig296_01 er delvis2/9,og familien har2/23 native i fire jobber. Ingen hel resultat.png leveres. Hele figurjobber med resultat er fortsatt506/1758;1252 er uten i tillegg til returer og sluttkontroll. Åtte nye innebygde bildekall gir én valgt tegning og sju kvalitetsreturer. Alle råbilder,faktiske prompter og argumenter er bevart. Første blåkontroll utelot dempet blå107/115/159;den er korrigert før import og ikke brukt som sluttgodkjenning. Alle20 blå og24 hudpunkter samt seks mørke fester består uendret3HD-port. Største avvik2,949HD. Hele tegningen flyttes0,5HD venstre og1HD ned,ingen lokale trekk flyttes. Fast4x,egen alfa,ingen originalmaske eller originale fragmenter. Tidligere arkposisjon og alle dens RGBA-piksler er bevart. Automatisk mottak2 OK,0 til gjennomsyn og7 mangler.
+
+To ferske kontrollerte motorprøver med faktisk nedlastet Linux-binær caa4d726 viser1921 og alle11 kildefaser i rom56. Hver side har160 bufferkontroller,158 uten avvik og120/120 uten avvik etter figurstart. To kjente inngangsavvik har identiske koordinater og begge RGB-verdier. Originalrektangelet med8HD naboområde er identisk;ingen nye/økte bufferavvik eller uforklarte HD-endringer. Ett helt før/etter-par,ett helt motorbilde og alle11 faser er visuelt sett. Naturlig full gjennomspilling,ny interaktiv Windows-/webkontroll og ny Tom-/Claude-godkjenning gjenstår. En kontrollstart med system-Python stoppet under import før filskriving;prosjektets eksisterende .venv retter oppsettet uten installasjon. Ingen motor-/pipelinekode er endret.
+
+Felles Linux/Windows fryserark har3695 og mangler de to første296-rutene. Begge faktiske pakker er kontrollert,men er ikke oppdatert til3697. Neste familiesamlepunkt eller avslutning skal oppdatere begge med faktiske nedlastinger,sjekksummer og filkontroll. Alle1440 beskyttede inputfiler og tre opprinnelige stasher er uendret. Gjenoppta fig296_01 fra rapporter/sam296-isblokk-retur-20261022/NESTE.md og RETUR.md på gpt-arbeid. Neste bildekall er S024;1922..1928 og andre296-faser gjenstår. Ingen alias før egen1926 består. Verktøyholdt293_1927 omprøves ikke. Automatikken er ACTIVE. All grafikk er ikke ferdig.
+<!-- sam296-isblokk-retur-status:slutt -->'''
+for base, names in [(A, ['ORDRE.md', 'GRAFIKKLISTE.md']),
+                    (P, ['memory.md', 'todo.md', 'STATUS.md'])]:
+    for name in names:
+        path = base / name
+        text = path.read_text()
+        assert '<!-- sam296-isblokk-retur-status:start -->' not in text
+        title, rest = text.split('\n', 1)
+        path.write_text(title + '\n\n' + block + '\n\nTidligere status nedenfor er historikk.\n' + rest)
+with (P / 'log.md').open('a') as out:
+    out.write(f'\n## {now} (Codex)\n\n' + block + '\n\nBevis: rapporter/sam296-isblokk-retur-20261022 på gpt-arbeid. Bare dokumentasjon endres i main.\n')
+save(R / 'dokumentasjonsstatus.json', dict(tid_lokal=now, hd_mod=native,
+    grafikkilde=art, native=3697, delark=2, delark_maal=9, familie=2, familie_maal=23,
+    main_dokumenter=['memory.md', 'todo.md', 'STATUS.md', 'log.md'],
+    kun_dokumentasjon_main=True, automasjon='ACTIVE', pakker_native=3695,
+    pakker_mangler_native=2))
+shutil.copy2(__file__, R / 'dokumenter.py.txt')
+print('Publisering bekreftet i rapporter og prosjektstatus. Bare dokumentasjon endret i main.')
