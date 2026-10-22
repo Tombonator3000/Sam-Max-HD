@@ -1,8 +1,8 @@
 # Conroy, Lee-Harvey og kuldeflekker, fig293_03
 
-2026-10-22 13:44 (Codex)
+2026-10-22 13:47 (Codex)
 
-Fem nye egne tegninger og native ruter er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett: costume293_1944 til 1948. Ingen nye aliaser. Kandidat 3689 er kontrollert. Publisering og tilbakehenting er ennå ikke bekreftet. fig293_03 er nå delvis 28/32. Alle 23 tidligere arkposisjoner er bevart, og ingen hel resultatfil legges i jobbflaten. Kostyme 293 har 48/55 native, med seks produserbare mål og verktøyholdt1927 igjen. 505 av 1758 hele figurjobber har resultat,1253 er uten i tillegg til returer og samlet sluttkontroll.
+Fem nye egne tegninger og native ruter er laget, egenkontrollert, native mottatt, motorobservert og visuelt sett: costume293_1944 til 1948. Ingen nye aliaser. Publisert additivt som hd-mod 000c7686725ee8796cac3bd4ce170d59cdecc074, grafikkilde c88182bb57213f70b716432d726858648f659ff2. Alle 21933 filhash er hentet tilbake og bekreftet. fig293_03 er nå delvis 28/32. Alle 23 tidligere arkposisjoner er bevart, og ingen hel resultatfil legges i jobbflaten. Kostyme 293 har 48/55 native, med seks produserbare mål og verktøyholdt1927 igjen. 505 av 1758 hele figurjobber har resultat,1253 er uten i tillegg til returer og samlet sluttkontroll.
 
 Elleve faktiske innebygde image_gen-kall ga elleve råbilder for seks kildemotiver. Fem tegninger er valgt og seks kandidater forkastet. Ingen nytt verktøyavslag eller kvotefeil.1943 er fortsatt i retur: åtte kildehvite grupper splittes til elleve eller ti, med feil feste, selv når hel silhuett består.1944s første forsøk feilet IoU/dekning.1948s første øye var5,5 HD for lavt; neste forsøk rettet øyet, men mistet nederste svarte jakkekant. F1948RR retter begge. Komplette sammenligninger med original, egen tegning og 50prosent overlegg er visuelt sett. Alle 26 kildehvite grupper i1944/45/46, tre små øyne i1947/48 og fire Conroy-glinter i1944..47 er koblet innen 3 HD. Uønsket blå glint i1948s nedre svarte solbrillekant er korrigert bare i egen RGB, uten endret alfa eller geometri.
 
