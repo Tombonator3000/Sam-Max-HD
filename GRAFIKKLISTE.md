@@ -1,11 +1,13 @@
 # Grafikkliste
 
 <!-- sam124-06-status:start -->
-22. oktober 2026: fig124_06 er produsert og kontrollert, med 16 nye Lee-Harvey/Max-ruter fra 12 hele malerier. 503 av 1758 figurark har resultat, 1255 uten resultat pluss returer og sluttkontroll. Native-kandidat er 3589, mens publisert mod ennå er 3573. Alle 16 er teknisk mottatt, motorobservert og visuelt sett. Ingen Tom-/Claude-godkjenning. Publiseringskvittering kommer i rapporter/sam124-siste-20261022/mottak-publisert.json.
+22. oktober 2026: fig124_06 er publisert og hentet tilbake med 16 nye Lee-Harvey/Max-ruter, 3589 native totalt. Ett nytt ark gir 503 av 1758 figurark med resultat, 1255 uten resultat pluss returer og sluttkontroll. Alle 16 er laget, egenkontrollert OK, native mottatt, motorobservert og visuelt sett. Ingen Tom-/Claude-godkjenning eller visuell sluttgodkjenning. Native er e7d3b25a6601a006d0b014ce79768cfd3d753316, grafikkilde 8c12addf849d9c39ddedafd5132c051fdfa6e9bc. Se rapporter/sam124-siste-20261022/mottak-publisert.json.
 
-Neste er fig124_07 og fig124_08, 15 mål og 13 ulike hele kilder. Kildens grå/brune underlagsbiter i 1855 til 1861 er eksakt gjenmaling av Sams jakke og sko, uten mørkere kontakt. 1859 er hodeløs kropp med separat hodelag. Se rapportens NESTE.md og NESTE-KILDEFUNKSJON.md. Rute 1804 fra forrige bunke er fortsatt holdt. Gamle nattprosesser startes ikke; automatisk produksjon fortsetter.
+Alle 21833 publiserte filhash er bekreftet. Samtlige 21817 tidligere filstier og 21811 tidligere PNG, 1412 beskyttede jobbfiler og tre stasher er bevart. Primærprøven har 711 av 720 nullkontroller med de samme ni kjente bufferavvikene, eksakte koordinater og begge RGB-verdier. Kontrollert hel animasjon 8 har 320 av 320 nullkontroller i både grunnlag og kandidat. 13 mål vises i originalforløpet, tre tilleggsmål på testaktør 29. Faktiske faseforskjeller i vann og uendrede alligatorer er dokumentert. Ingen full naturlig gjennomspilling eller motorendring. To ytre SIGTERM-avbrudd er bevart; uendret prøve fullførte med exit 0 i aktiv terminal.
 
-Felles Linux-/Windows-utgave har fortsatt 3535 native, og vil mangle 54 etter planlagt publisering av denne bunken. Neste pakkesamlepunkt er de siste to 124-arkene og åpne returer, eller tidligere ved reell produksjonsblokkering. Ikke kall pakker eller web oppdatert før faktisk innhold er kontrollert.
+Neste er fig124_07, så fig124_08: 15 mål og 13 ulike hele kilder. Grå/brune biter i 1855 til 1861 er identisk gjenmaling av Sams eksisterende jakke og sko, uten mørkere kontakt. 1859 er hodeløs kropp med separat hodelag. Se NESTE.md og NESTE-KILDEFUNKSJON.md i rapporten før nytegning. Rute 1804 fra forrige bunke er fortsatt holdt. Fortsett øvrige produserbare jobber etter samlet kontroll av familien.
+
+Felles Linux-/Windows-utgave sam-max-hd-2026-10-21-kjeglekant har fortsatt 3535 native og mangler 54 publiserte ruter. Ingen ny pakke- eller webkontroll. Neste pakkesamlepunkt er de siste to 124-arkene og åpne returer, eller tidligere ved reell produksjonsblokkering. Frys native under bygg, last ned begge faktiske pakker og kontroller sjekksummer og innhold før oppdatert-status. Automatisk produksjon fortsetter, uten gamle nattprosesser. Alt er ikke ferdig.
 <!-- sam124-06-status:slutt -->
 
 Tidligere status nedenfor er historikk.
