@@ -2321,3 +2321,17 @@ Felles Linux/Windows fryserark har fortsatt3695 og mangler den ene nye ruten. Be
 <!-- sam296-isblokk-status:slutt -->
 
 Bevis: rapporter/sam296-isblokk-20261022 på gpt-arbeid. Bare dokumentasjon endres i main.
+
+## 2026-10-22 19:57 (Codex)
+
+<!-- sam296-isblokk-retur-status:start -->
+Isblokken har fått én ny egen sidefase, costume296_1921. Den er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert additivt som hd-mod 9f5638bfed7841185a40c7d50362078f2b268aff,grafikkilde 6b3f04ae23bdf4f1bf13ba83f722d1ed828cd5a9. Alle21941 filhash er hentet tilbake og bekreftet. Modden har3697 native. Alle21940 tidligere filstier og21934 tidligere PNG-hash er bevart;bare mod.json og sjekksummanifestet er oppdatert. Forrige mod er bevart separat.
+
+fig296_01 er delvis2/9,og familien har2/23 native i fire jobber. Ingen hel resultat.png leveres. Hele figurjobber med resultat er fortsatt506/1758;1252 er uten i tillegg til returer og sluttkontroll. Åtte nye innebygde bildekall gir én valgt tegning og sju kvalitetsreturer. Alle råbilder,faktiske prompter og argumenter er bevart. Første blåkontroll utelot dempet blå107/115/159;den er korrigert før import og ikke brukt som sluttgodkjenning. Alle20 blå og24 hudpunkter samt seks mørke fester består uendret3HD-port. Største avvik2,949HD. Hele tegningen flyttes0,5HD venstre og1HD ned,ingen lokale trekk flyttes. Fast4x,egen alfa,ingen originalmaske eller originale fragmenter. Tidligere arkposisjon og alle dens RGBA-piksler er bevart. Automatisk mottak2 OK,0 til gjennomsyn og7 mangler.
+
+To ferske kontrollerte motorprøver med faktisk nedlastet Linux-binær caa4d726 viser1921 og alle11 kildefaser i rom56. Hver side har160 bufferkontroller,158 uten avvik og120/120 uten avvik etter figurstart. To kjente inngangsavvik har identiske koordinater og begge RGB-verdier. Originalrektangelet med8HD naboområde er identisk;ingen nye/økte bufferavvik eller uforklarte HD-endringer. Ett helt før/etter-par,ett helt motorbilde og alle11 faser er visuelt sett. Naturlig full gjennomspilling,ny interaktiv Windows-/webkontroll og ny Tom-/Claude-godkjenning gjenstår. En kontrollstart med system-Python stoppet under import før filskriving;prosjektets eksisterende .venv retter oppsettet uten installasjon. Ingen motor-/pipelinekode er endret.
+
+Felles Linux/Windows fryserark har3695 og mangler de to første296-rutene. Begge faktiske pakker er kontrollert,men er ikke oppdatert til3697. Neste familiesamlepunkt eller avslutning skal oppdatere begge med faktiske nedlastinger,sjekksummer og filkontroll. Alle1440 beskyttede inputfiler og tre opprinnelige stasher er uendret. Gjenoppta fig296_01 fra rapporter/sam296-isblokk-retur-20261022/NESTE.md og RETUR.md på gpt-arbeid. Neste bildekall er S024;1922..1928 og andre296-faser gjenstår. Ingen alias før egen1926 består. Verktøyholdt293_1927 omprøves ikke. Automatikken er ACTIVE. All grafikk er ikke ferdig.
+<!-- sam296-isblokk-retur-status:slutt -->
+
+Bevis: rapporter/sam296-isblokk-retur-20261022 på gpt-arbeid. Bare dokumentasjon endres i main.
