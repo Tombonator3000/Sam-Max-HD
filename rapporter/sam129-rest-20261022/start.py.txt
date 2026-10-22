@@ -1,0 +1,32 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PREV=A/'rapporter/sam129-front2-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(w,*a):return subprocess.check_output(['git',*a],cwd=w,text=True).strip()
+assert not R.exists() and not git(P,'status','--porcelain') and not git(A,'status','--porcelain')
+old=read(PREV/'start.json');receipt=read(PREV/'mottak-publisert.json');files=read(PREV/'publiserte-moddfiler-3633.json')
+assert len(files)==21877 and all(sha(P/'mods/gpt'/f)==h for f,h in files.items())
+assert len(old['beskyttede'])==1420 and all(sha(A/f)==h for f,h in old['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==old['stash']
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]==receipt['hd_mod']=='1d4764f4f769f0be89da7501dca996562aa3e99d'
+assert read(P/'mods/gpt/mod.json')['costume_cels']==3633
+for w,branch,expected in [(P,'main','4a3aae70ffec60d42296f93bae362673957edf56'),(A,'gpt-arbeid','42468c5213445debfe9dfa3e9492772d1091fbd3')]:
+ assert git(w,'ls-remote','origin','refs/heads/'+branch).split()[0]==git(w,'rev-parse','HEAD')==expected
+plan=read(A/'rapporter/sam129-kilde-20261022/kildeplan.json');nums=[399,400,401,422,153,154,512,768]
+assert plan['bildekall']==47 and len(plan['levert_og_publisert'])==37
+assert len(list(A.glob('jobber/fig*/resultat.png')))==504 and not(A/'jobber/fig129_02/resultat.png').exists()
+assert all(not(P/f'mods/gpt/costumes/costume129_{n}_hd.png').exists() for n in nums)
+R.mkdir(parents=True)
+save(R/'start.json',dict(main=git(P,'rev-parse','HEAD'),gpt=git(A,'rev-parse','HEAD'),hd_mod=receipt['hd_mod'],native=3633,filer=files,beskyttede=old['beskyttede'],stash=old['stash'],figurark=504,nye_maal=8,ulike_hele=8,nye_numre=nums,tidligere_maal=plan['levert_og_publisert'],tidligere_notat_fantes=True,tidligere_notat_sha256=sha(A/'jobber/fig129_02/notat.md'),tidligere_delark=read(PREV/'fremdrift.json')['delvise_leveranser'][0],bibliotek=['figurark-fast-storrelse','scumm-v6-kostymer-skygge-og-soppelruter','publisert-mod-er-fasit'],bibliotek_kompatibilitet='Samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e. Python/Pillow/scipy, CORE128, IoU0.6, dekning0.8,4x,2 originalpikslers margin. Ingen originalmaskeklipping.'))
+save(R/'kildeplan.json',plan)
+board=Image.new('RGBA',(1800,1100),'#536576');d=ImageDraw.Draw(board)
+for i,n in enumerate(nums):
+ e=next(e for e in plan['ruter'] if e['bilde']==f'costume129_{n}');src=Image.open(e['kilde']).convert('RGBA');assert sha(Path(e['kilde']))==e['sha256'];ctx=e['kontrollert_kontekst'];assert sha(Path(ctx['fil']))==ctx['sha256']
+ x,y=i%4*450,i//4*550;d.text((x+8,y+8),f'{n}, canvas{src.size}, bbox{src.getbbox()}',fill='white')
+ im=src.crop(src.getbbox());s=min(12,360//im.width,470//im.height);im=im.resize((im.width*s,im.height*s),Image.Resampling.NEAREST);board.alpha_composite(im,(x+12,y+40))
+board.convert('RGB').save(R/'atte-originaler.png')
+for n in [422,153,154,512,768]:
+ e=next(e for e in plan['ruter'] if e['bilde']==f'costume129_{n}');ctx=e['kontrollert_kontekst'];im=Image.open(ctx['fil']);im.save(R/f'kontekst{n}.png')
+print(str(R/'atte-originaler.png'));shutil.copy2(__file__,R/'start.py.txt')

@@ -1,0 +1,39 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib,json,subprocess,shutil,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'mod-sam1293641'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/'start.json');assert len(list(A.glob('jobber/fig*/resultat.png')))==504 and not(A/'jobber/fig129_02/resultat.png').exists();assert all(sha(A/f)==h for f,h in b['beskyttede'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==b['stash']
+selected=read(R/'valgte8.json');assert len(selected)==8
+for e in selected:
+ assert sha(A/e['prototype'])==e['prototype_sha256']==sha(C/'costumes'/(e['bilde']+'_hd.png'));e.update(visuelt_sett=True,motorobservert=True,godkjent_av_Tom=False,claude_kontroll=False)
+save(R/'valgte8.json',selected)
+route=read(R/'rutekart-fig129_02.json');assert len(route['fig129_02']['ruter'])==22
+for e in route['fig129_02']['ruter']:e.update(prototype_visuelt_sett=True,motorobservert=True)
+save(R/'rutekart-fig129_02.json',route)
+v=read(R/'motor-visuell-plan.json')
+for group in ['varianter','hele_motorbilder']:
+ for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+for key,n in [('hele_frontanimasjon',17),('kropp_overgang',8)]:
+ e=v[key];assert len(e['faser'])==n and sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+v.update(visuelt_sett=True,hele_varianter_sett=8,hele_motorbilder_sett=4);save(R/'motor-visuell-plan.json',v)
+m=read(R/'motor-sammenligning.json');assert(m['grunnlag_null'],m['kandidat_null'],m['kontroller_pr_side'])==(640,640,640);assert m['alle8_observert']and m['alle_originalaktorverdier_identiske']and m['uendrede_aktordeler_bevart'];m.update(visuelt_sett=True,indre_feste_kontrollert=True,palett_kontrollert=True)
+np=read(R/'kandidat3641-primaer.json');assert np['exit']==0 and len(np['kontroller'])==720 and np['nullkontroller']==711
+log=(O/'kandidat3641-primaer/scummvm.log').read_text();old=P/'out/sam129-ark01-slutt-20261022/kandidat3619-final/scummvm.log'
+if not old.exists():
+ opts=list((P/'out/sam129-ark01-slutt-20261022').glob('*primaer*/scummvm.log'));assert len(opts)==1,opts;old=opts[0]
+# Ta med eksakte linjer med feilkoordinater og begge RGB-verdier; ingen avrundede tellinger.
+pat=r'^.*(?:first difference|first.*differ|pixel.*(?:expected|got)|verify frame \d+: [1-9]\d* screen pixels differ).*$'
+a=re.findall(pat,old.read_text(),re.M);z=re.findall(pat,log,re.M);buf=read(R/'motor-bufferkontroll.json');assert buf['samme_ni_feil_koordinater_og_begge_RGB_i_rekkefolge'] and len(buf['kandidat'])==9
+rec=dict(kilde_for_kjent_prove=str(old),kilde_sha256=sha(old),ny_prove='kandidat3641-primaer.json',kontroller=720,nullkontroller=711,avvikskontroller=9,kjente9_eksakt_identiske=True,eksakte_feillinjer=z,full_naturlig_gjennomspilling=False,nye_bunkemal_observert=np['nye_maal_observert'])
+save(R/'primaer-sammenligning.json',rec);m['naturlig_primaer']=rec;save(R/'motor-sammenligning.json',m)
+rows=read(R/'motor-pikselkontroll.json')
+for e in rows:assert sha(Path(e['kandidat_fil']))==e['kandidat_sha256'];e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',rows)
+inner=read(R/'indre-feste-kontroll.json');assert all(e.get('innen_eksisterende3_HD',True)for e in inner['maalinger']);inner['visuelt_sett']=True;save(R/'indre-feste-kontroll.json',inner)
+p=read(R/'fremdrift.json');p.update(visuelt_sett=8,motorobservert=8)
+for e in p['delvise_leveranser']:e.update(visuelt_kontrollert=True,motorobservert=True,egenkontroll='Alle22 produserte uten FEIL.642 holdes og regnes ikke levert selv om hel sjekk gir0.')
+save(R/'fremdrift.json',p);save(R/'sluttkontroll.json',dict(tid_norsk=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(),valgte_native=8,holdt_native=0,laget=8,egenkontrollert=8,native_mottatt=8,visuelt_sett=True,motorobservert=8,publisert=0,delvise_leveranser=p['delvise_leveranser'],hele_ark_levert=0,figurark_med_resultat=504,total_figurark=1758,gjenstar_uten_resultat=1254,delark_egne_22_av23=True,alle_produserte_uten_FEIL=True,diagnostiske_originalfragmenter_utelatt=['costume129_642'],ingen_beskyttede_endret=True,beskyttede=1420,stasher_bevart=b['stash'],native_totalt=3641,pakker_native=3596,pakker_mangler_native=45,Tom_godkjent=0,Claude_godkjent=0,ny_primaerprove=True))
+shutil.copy2(__file__,R/'sluttkontroll.py.txt');print('8 nye QA/native/visuell/motor. Delark22/23. Primær711/720, samme9.')

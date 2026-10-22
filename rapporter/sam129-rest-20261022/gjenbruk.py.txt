@@ -1,0 +1,11 @@
+from pathlib import Path
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;PREV=A/'rapporter/sam129-front2-20261022'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+f=read(R/'start.json')['filer'];candidate=P/'out/sam129-front2-20261022/mod-sam1293633'
+assert all(sha(candidate/n)==h for n,h in f.items()if n!='SHA256SUMS')
+b=read(PREV/'kandidat3633-front4.json');assert b['native_antall']==3633 and b['exit']==0 and b['nullkontroller']==320
+assert all(sha(Path(e['fil']))==e['sha256']for e in b['tegninger'].values())
+needed={f'costume129_{n}'for n in [399,400,401]};assert needed<=set(b['tegninger'])
+b.update(avspilling_gjenbrukt=True,ny_kjoring_utfort=False,nye_maal_observert=3,manglende_nye_maal=[],opprinnelig_bevis=str(PREV/'kandidat3633-front4.json'),opprinnelig_bevis_sha256=sha(PREV/'kandidat3633-front4.json'),alle_renderingsfiler_identiske=True)
+(R/'grunnlag3633-front4.json').write_text(json.dumps(b,ensure_ascii=False,indent=2)+'\n');(O/'grunnlag3633-front4').symlink_to(P/'out/sam129-front2-20261022/kandidat3633-front4',target_is_directory=True);shutil.copy2(__file__,R/'gjenbruk.py.txt');print('Faktisk3633-frontavspilling gjenbrukt med filhash; ingen ny grunnlagskjøring.')
