@@ -1,8 +1,8 @@
 # Lee-Harvey i kjøkkenet, første kontrollerte bunke
 
-2026-10-22 09:53 (Codex)
+2026-10-22 09:58 (Codex)
 
-Syv hele Lee-Harvey-ruter fra kostyme 293 i kjøkkenet er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert og visuelt sett:1920,1923,1924,1925,1926,1928,1929. Klar for additiv publisering. Nativekandidat3648 er kontrollert, men ennå ikke publisert. 1432 beskyttede jobbfiler og tre opprinnelige stasher er bevart. Ingen ny Tom-/Claude-godkjenning.
+Syv hele Lee-Harvey-ruter fra kostyme 293 i kjøkkenet er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert og visuelt sett:1920,1923,1924,1925,1926,1928,1929. Publisert additivt som hd-mod b576c43b9971ec5263dad066a3648446cb6f1338, grafikkilde 133e063611ca276ac2b2f9c59a4d6ff54bb3ed04. Alle 21892 filhash er hentet tilbake og bekreftet. Alle 21885 tidligere stier og 21879 tidligere PNG er bevart. Native 3648,21886 PNG. 1432 beskyttede jobbfiler og tre opprinnelige stasher er bevart. Ingen ny Tom-/Claude-godkjenning.
 
 fig293_01 er delvis 7/10.1921 og1922 holdes som kvalitetsreturer for hode-/øyefeste og de små asymmetriske kremstripene.1927 fikk outputavslag79f82b0c-3996-41a9-933d-83126f6f9aca, uten råbilde eller omprøving. Ingen hel resultat.png leveres. Ni ulike motiver fikk kandidater gjennom 17 faktiske bildekall:16 råbilder,ett outputavslag og ni forkastede kvalitetskandidater. ForberedtV03RRRR er ikke kjørt og teller ikke som kall. 504 av 1758 hele figurjobber har resultat,1254 er uten pluss returer og sluttkontroll.293-familien har 7/55 native,47 produserbare mål gjenstår og ett holdt verktøymål.
 
@@ -16,6 +16,6 @@ Første midlertidige 3650-prøve ble avbrutt med shell 143 etter 420 renderte fr
 
 Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt 3641 native og mangler disse syv. Den kalles ikke oppdatert med 3648. Neste pakkesamlepunkt følger etter neste praktiske 293-bunker eller familieavslutning,med faktisk nedlasting og filhash. Tidligere129_641/642,124_1804/1861 og øvrige returer står åpne. Gamle nattprosesser startes ikke. Grafikkarbeidet fortsetter,all grafikk er ikke ferdig.
 
-Bevis: rapporter/sam293-foerste-20261022/fremdrift.json,rutekart-fig293_01.json,indre-feste-kontroll.json,motor-sammenligning.json,motor-bufferkontroll.json og mottak-publisert.json når publiseringen er bekreftet. Bibliotekskildene figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt med samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e.
+Bevis: rapporter/sam293-foerste-20261022/fremdrift.json,rutekart-fig293_01.json,indre-feste-kontroll.json,motor-sammenligning.json,motor-bufferkontroll.json og mottak-publisert.json. Bibliotekskildene figurark-fast-storrelse,scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit er brukt med samme SCUMM v6-pin c9091321060acfc8f037767c18f8279a86305b7e.
 
 ![Syv leverte native](syv-egne-native.png)

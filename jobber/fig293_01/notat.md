@@ -1,8 +1,8 @@
 # Delvis levering av fig293_01
 
-2026-10-22 09:53 (Codex)
+2026-10-22 09:58 (Codex)
 
-Syv hele Lee-Harvey-ruter fra kostyme 293 i kjøkkenet er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert og visuelt sett:1920,1923,1924,1925,1926,1928,1929. Klar for additiv publisering. Nativekandidat3648 er kontrollert, men ennå ikke publisert. 1432 beskyttede jobbfiler og tre opprinnelige stasher er bevart. Ingen ny Tom-/Claude-godkjenning.
+Syv hele Lee-Harvey-ruter fra kostyme 293 i kjøkkenet er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert og visuelt sett:1920,1923,1924,1925,1926,1928,1929. Publisert additivt som hd-mod b576c43b9971ec5263dad066a3648446cb6f1338, grafikkilde 133e063611ca276ac2b2f9c59a4d6ff54bb3ed04. Alle 21892 filhash er hentet tilbake og bekreftet. Alle 21885 tidligere stier og 21879 tidligere PNG er bevart. Native 3648,21886 PNG. 1432 beskyttede jobbfiler og tre opprinnelige stasher er bevart. Ingen ny Tom-/Claude-godkjenning.
 
 fig293_01 er delvis 7/10.1921 og1922 holdes som kvalitetsreturer for hode-/øyefeste og de små asymmetriske kremstripene.1927 fikk outputavslag79f82b0c-3996-41a9-933d-83126f6f9aca, uten råbilde eller omprøving. Ingen hel resultat.png leveres. Ni ulike motiver fikk kandidater gjennom 17 faktiske bildekall:16 råbilder,ett outputavslag og ni forkastede kvalitetskandidater. ForberedtV03RRRR er ikke kjørt og teller ikke som kall. 504 av 1758 hele figurjobber har resultat,1254 er uten pluss returer og sluttkontroll.293-familien har 7/55 native,47 produserbare mål gjenstår og ett holdt verktøymål.
 
