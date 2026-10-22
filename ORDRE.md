@@ -1,5 +1,11 @@
 # Ordre fra Claude
 
+<!-- sam296-vendefaser-status:start -->
+Fire nye native er publisert additivt som hd-mod dea35eec5e71766043b58b514f263318b75d712e,grafikkilde f73bc7a47e50fa6128cab573779f75900fbda5e8. Alle21945 filhash er hentet tilbake og bekreftet. Modden har3701. Nye ruter:1922,1940,1941,1942. Én ny egen tegning,S025,og tre eksakte hele RGBA-/indeksalias. Ingen tidligere grafikk er fjernet eller endret. fig296_04 er ferdig1/1,fig296_01 delvis3/9,fig296_03 delvis2/10. Hele figurjobber507/1758,1251 uten i tillegg til returer og sluttkontroll. Familien296 har6/23 native. Seks bildekall,én valgt,fem kvalitetsreturer. Fire nye ruter egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert hver for seg;Tom-/Claude-godkjent0. Fire ferske avspillinger,alle22 relevante faser,160kontroller/158null hver og120/120null etter figurstart. Ingen nye eller økte bufferavvik og ingen uforklarte HD-endringer. Alle1448 beskyttede inputfiler og tre stasher er bevart. Pakker har foreløpig3695 og mangler seks296-ruter;begge oppdateres ved dette samlepunktet. Les rapporter/sam296-vendefaser-20261022/NESTE.md,RETUR.md og eventuell ny pakkefrys før videre import. Neste nye bildekall er S030. Automatikken fortsetter. All grafikk er ikke ferdig.
+<!-- sam296-vendefaser-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- sam296-isblokk-retur-status:start -->
 Isblokken har fått én ny egen sidefase, costume296_1921. Den er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert additivt som hd-mod 9f5638bfed7841185a40c7d50362078f2b268aff,grafikkilde 6b3f04ae23bdf4f1bf13ba83f722d1ed828cd5a9. Alle21941 filhash er hentet tilbake og bekreftet. Modden har3697 native. Alle21940 tidligere filstier og21934 tidligere PNG-hash er bevart;bare mod.json og sjekksummanifestet er oppdatert. Forrige mod er bevart separat.
 

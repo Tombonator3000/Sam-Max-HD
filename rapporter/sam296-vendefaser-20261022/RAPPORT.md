@@ -1,6 +1,6 @@
 # Isblokkens vendefaser
 
-Kandidat3701 har fire nye native ruter:1922,1940,1941,1942. Dette er én ny egen tegning,S025,og tre hele kildedubletter.1940 er eksakt RGBA- og indeksalias til1922;1941 til1921/S017 og1942 til1920/S006. Ingen originalfragmenter kopieres inn. Ingen publisert grafikk fjernes eller endres. Publisering og pakker gjenstår før kvittering.
+Kandidat3701 har fire nye native ruter:1922,1940,1941,1942. Dette er én ny egen tegning,S025,og tre hele kildedubletter.1940 er eksakt RGBA- og indeksalias til1922;1941 til1921/S017 og1942 til1920/S006. Ingen originalfragmenter kopieres inn. Ingen publisert grafikk fjernes eller endres. Publisert additivt som hd-mod dea35eec5e71766043b58b514f263318b75d712e,grafikkilde f73bc7a47e50fa6128cab573779f75900fbda5e8. Alle21945 filhash er hentet tilbake og bekreftet. Pakkeoppdatering gjenstår.
 
 fig296_04 er ferdig1/1 med resultat.png. fig296_01 er3/9 ogfig296_03 er2/10,levert som SHA-festede delark i rapporten. Hele figurjobber med resultat er507/1758,1251 uten i tillegg til returer/sluttkontroll.296-familien er6/23 native etter publisering. Seks nye innebygde bildekall har råbilder,faktiske prompter og argumenter;én velges,fem er kvalitetsreturer. Hele familiens29 kall har tre valgte egne tegninger og26 returer.
 
