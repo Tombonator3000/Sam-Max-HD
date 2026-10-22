@@ -1,5 +1,23 @@
 # memory.md
 
+<!-- sam293-foerste-status:start -->
+Syv nye Lee-Harvey-ruter fra kjøkkenet er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert, visuelt sett og publisert: 1920, 1923, 1924, 1925, 1926, 1928 og 1929 i kostyme 293. Native er b576c43b9971ec5263dad066a3648446cb6f1338, 3648 totalt. Grafikkilde er 133e063611ca276ac2b2f9c59a4d6ff54bb3ed04. Alle 21892 filhash er hentet tilbake og bekreftet. Samtlige 21885 tidligere stier, 21879 tidligere PNG, 1432 beskyttede jobbfiler og tre stasher er bevart.
+
+fig293_01 er delvis 7/10. 1921/1922 holdes som kvalitetsreturer for hode-/øyefeste; 1927 fikk outputavslag uten råbilde og omprøves ikke. 17 faktiske bildekall ga 16 råbilder og ni forkastede kvalitetskandidater. Ni ulike kildemotiver er tegnet, syv levert og publisert. Forberedt V03RRRR er ikke kjørt. Ingen ny hel resultatfil: fortsatt 504/1758 figurark, 1254 uten resultat pluss returer og sluttkontroll. Familien har 7/55 native, 47 produserbare mål gjenstår inkludert to returer, og ett verktøymål holdes.
+
+Ekte egen alfa, fast 4x, to originalpikslers margin og de samme omriss-, deknings- og 3 HD-pikslers øyefesteporter er brukt. Ingen originalmaskeklipping eller pixel-fragmenter. Fargefeilen i 1928s fjerne øyemarkering er renset til kildebekreftet svart uten flytting eller alfaendring. Hele originalkonteksten og komplette godkjente mastere er sett. Originalens forkledning har tegnede ansiktslinjer, ikke to åpne hull.
+
+Endelige baseline-/kandidatprøver avslutter normalt med exit 0 og 118/120 nullkontroller hver. De to bufferavvikene på 416 og 160 piksler ved rominngang, før testaktøren starter i frame 40, har identiske koordinater og begge RGB-verdier. Etter figurstart er 80/80 null per side. Alle syv originale aktørflater er identiske; ingen uforklarte HD-endringer. Syv før/etter-varianter, fire hele motorbilder og alle 23 kildefaser er visuelt sett i faktisk nedlastet Linux-binær 5abfeae. Dette er kontrollert aktør 29 og animasjon 1/raw 6, et kildealias til sekvensen globalt skript 113 bruker. Ingen naturlig full gjennomspilling, ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+En tidligere midlertidig 3650-prøve ble avbrutt med shell 143 etter 420 renderte frames og mangler exitkvittering. Årsaken er ubekreftet, prøven regnes ikke bestått, og bevisene er bevart. Senere rene 120-prøver avslutter normalt. Ingen motor-/pipelinekode er endret.
+
+Felles Linux-/Windows-release sam-max-hd-2026-10-22-lee-harvey har fortsatt 3641 native og mangler disse syv. Den er ikke oppdatert med 3648. Neste pakkesamlepunkt følger etter neste praktiske 293-bunker/familieavslutning, med faktiske nedlastinger og hashkontroll. Gjenoppta to kvalitetsreturer og fortsett uavhengig med fig293_02, deretter 03, før 245. Bevar tidligere holdte 129-/124-motiver. Gamle nattprosesser startes ikke. Grafikkautomatikken fortsetter, all grafikk er ikke ferdig.
+
+Bevis: [kilde-, mottaks- og motorrapport](https://github.com/Tombonator3000/Sam-Max-HD/blob/gpt-arbeid/rapporter/sam293-foerste-20261022/RAPPORT.md). Bibliotekskilder: figurark-fast-storrelse, scumm-v6-kostymer-skygge-og-soppelruter og publisert-mod-er-fasit. Bare fire dokumenter endres direkte i main.
+<!-- sam293-foerste-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 ## Gjeldende grafikkstatus, 2026-10-22 08:36
 
 Åtte nye Lee-Harvey-lag er laget med innebygd image_gen, egenkontrollert, native mottatt, motorobservert, visuelt sett og publisert: 399, 400, 401, 422, 153, 154, 512 og 768. Native er d4b182a532ae139f4bb663cc835fabdffcc8cab6, med 3641 HD-lag, 21885 filer og 21879 PNG. Alle filhash er bekreftet etter henting. De 21877 tidligere stiene og 21871 tidligere PNG er bevart, med oppdatert mod.json og manifest. Alle 1420 beskyttede jobbfiler og tre stasher er uendret. Grafikkilde: 5c45ab4ff61ae951c265f681fc8225239626a558.
