@@ -1,15 +1,15 @@
 # todo.md
 
 <!-- helikopter178-forfaser1995-1999:start -->
-## Neste i påbegynt grafikkbunke
+## Neste i grafikkproduksjonen
 
-- [ ] Gjenoppta rapporter/helikopter178-forfaser1995til1999-20261023/NESTE.md, RETUR.md og VIDERE-H131-H136.md fra gpt-arbeid 4dea6ce890e690bc125cfb5eabf86e6b93c2ca9a. Seks nye kall H131..H136, totalt 11, ingen ny native. Neste H137 er ikke utført eller reservert.
-- [ ] Rett konkrete småfelt-/åpnings-/formfeil før mottak. Alle fem kilder er nå visuelt sett i spillkontekst ved Sam. H135 er i ekte palett; ikke dekod som kodefarger. H136s egen karosserimodul gir glattere kurver, men flere feltavvik. Globale støyrens-, kurverens- og mint/lime-varianter er returer. Ikke gjenta de samme hele feilpromptene uten en konkret retting.
-- [ ] Behold uendret 3 HD-port og separat stilvurdering. Ingen originalmaske, kildefragmenter eller lokal kildebasert påmaling. Returer er aldri stilankere. Fortsett også annet uavhengig autorisert grafikkarbeid uten å duplisere påbegynte bunker.
-- [ ] Behold WebP-mod 15835538/3723 og eksisterende grunnlagsavspilling som basis. Ingen ny kandidat, full modkopi, avspilling eller pakke er opprettet her. Felles verifiserte Linux-/Windows-pakker har samme 3723. Originaljobber og tre stasher er uendret.
-- [ ] Fortsett til alle produserbare jobber og returer er levert, kontrollert og importert, og gjør samlet sluttkontroll før automasjonen pauses. Fersk opptelling 508/1758, fig178_02 10/24, familie178 22/102. Ingen nødvendig Tom-avklaring. 1990 trenger hel kilde, 137/V013 og296/S037 er uendret. Automatikken er ACTIVE, ingen gammel nattprosess.
+- [x] Utbedret og publisert helikopterfase 1999 i WebP-mod 219fcfa1acd53590155638623f48c7acccde3e0f, 3724 native. Hele 21969-filers publiseringen er faktisk hentet tilbake og alle hash bekreftet. Grafikk/rapport er på gpt-arbeid d6abaa03f93a86322cec581c2d92c2ca13ed0ce0. Ingen ny hel figurjobb eller bildekjøring i rettingen.
+- [ ] Gjenoppta rapporter/helikopter178-forfaser1995til1999-20261023/NESTE.md, RETUR.md og mottak-publisert1999.json. Rett eksisterende returer 1998/H127,H135, 1997/H132, 1996/H133, 1995/H134. H137 er ikke utført eller reservert. Ikke tegn 1999..2021 igjen.
+- [ ] Bruk egen RGB-fringe før fremtidige bytter av egen alfa eller RGB-moduler. Rettelsen løste 30 svarte ekstra piksler uten originalmaske. Behold uendret 3 HD-port og separat stilvurdering. Ny global kontur-/kodekantrens er dokumentert i ALFA-RGB-RETTELSE.md. Gamle ubehandlede returer er aldri stilankere.
+- [ ] Oppdater begge faktiske Linux-/Windows-pakker ved neste komplette ark-/familiesamlepunkt eller avslutning. Felles WebP-utgave har fortsatt 3723 og mangler én. Kall den ikke oppdatert før nedlasting, sjekksummer og faktisk inkludert grafikk er kontrollert.
+- [ ] Fortsett til alle produserbare jobber og returer er levert, kontrollert og importert, og gjør samlet sluttkontroll før pause. Fersk opptelling 508/1758 hele figurjobber, fig178_02 11/24, familie178 23/102. 1990 trenger hel originalkilde; 137/V013 og 296/S037 er uendret. Ingen nødvendig Tom-avklaring. Automatikken er ACTIVE, ingen gammel nattprosess.
 
-Alle 137 nye/endrede grafikk- og rapportfiler er faktisk hentet fra publisert gpt-commit og SHA256-/Gitblob-kontrollert som strømmer. Ingen ny stilgodkjenning eller nativeleveranse.
+Behold relevante avspillinger fra denne bunken; siste kandidat3724-start1-y60 er et komplett faktisk 3724-grunnlag for neste sammenligning. Den gamle fullmodkopien er verifisert og fjernet. Bare byteidentiske flatedumper er ryddet; råbilder, unike kilder, kontrollbevis og tre stasher er beholdt. Motoren ser den nye fasen, men full naturlig gjennomspilling og ny Tom-/Claude-godkjenning gjenstår.
 <!-- helikopter178-forfaser1995-1999:slutt -->
 
 <!-- webp-og-rydding-20261023:start -->
