@@ -1,6 +1,6 @@
 # Gjeldende returstatus
 
-1999 har nå en egenkontrollert og motorobservert kandidat etter retting av egne alfa/RGB-kanter, global egen konturrens og global plassering. Se ALFA-RGB-RETTELSE.md og egen-native.json. Ingen originalmaske eller ny bildefallback. Alle sterke3HD-porter består. Ny fase er ikke Tom-/Claude-godkjent. Nativepublisering gjenstår ved denne kildecommitten.
+Fase1999 er nå egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert i hd-mod219fcfa1acd53590155638623f48c7acccde3e0f. Hele publiseringen er hentet tilbake og alle21969 filhash bekreftet. Se mottak-publisert1999.json og ALFA-RGB-RETTELSE.md. Ingen ny Tom-/Claude-godkjenning. Ikke tegn1999 på nytt.
 
 H126..H136s opprinnelige rå-/helprototyper er fortsatt returer; tre av råbildene gir piksler til den nye bearbeidede1999-varianten. Ikke tegn1999 på nytt dersom publisering er bekreftet i mottak-publisert1999.json.
 

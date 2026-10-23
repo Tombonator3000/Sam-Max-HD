@@ -1,0 +1,63 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image
+import numpy as np,json,hashlib,shutil,gzip,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+r=json.loads((R/'mottak-publisert1999.json').read_text());assert r['hd_mod']=='219fcfa1acd53590155638623f48c7acccde3e0f'and r['alle_filhash_bekreftet']and r['lokalt_mottatt'];assert r['forelder']=='15835538ca4b4e70e95a0f227e7d41bea830400e'and not r['force_push'];assert not(O/'kandidat3724').exists()and not(O/'verifisert-gammelmod3723').exists()
+B=O/'grunnlag3723-start1-y60';C=O/'kandidat3724-start1-y60';base=json.loads((R/(B.name+'.json')).read_text());rows=[]
+for e in base['kontroller']:
+ if e['avvik']==0:continue
+ n=e['frame'];records=[];hashes=[]
+ for root in[B,C]:
+  fs=[f for f in root.glob(f'frame_{n:06}_room*.png')if not f.stem.endswith('_flat')];assert len(fs)==1;screenfile=root/f'frame_{n:06}_screen.png';screen=np.array(Image.open(screenfile).convert('RGBA'));rebuilt=np.array(Image.open(fs[0]).convert('RGBA'));mask=np.any(screen!=rebuilt,2);yy,xx=np.nonzero(mask);assert len(xx)==e['avvik'];records.append(np.column_stack([yy,xx,screen[mask],rebuilt[mask]]));hashes.append({'screen_sha256':sha(screenfile),'rebuilt_sha256':sha(fs[0])})
+ assert np.array_equal(*records)
+ rows.append({'frame':n,'avvik':e['avvik'],'kolonner':['y','x','screenR','screenG','screenB','screenA','rebuiltR','rebuiltG','rebuiltB','rebuiltA'],'begge_like_posisjoner_og_RGBA':records[0].tolist(),'kildehash':hashes})
+put(R/'bufferavvik-beggeRGBA3723-3724.json',{'12_kjente_tidlige_avvik':rows,'alle_koordinater_og_begge_RGBA_identiske':True,'null_etter_frame40':120})
+# Fjern kun dokumenterte identiske flate arbeidsdumper, ikke unike kilder.
+deleted=[]
+for T in[B,C]:
+ for f in sorted(T.glob('frame_*_flat.png')):
+  if '_room'in f.stem:continue
+  n=f.name.split('_')[1];copies=list(T.glob(f'frame_{n}_room*_flat.png'));match=next((g for g in copies if sha(g)==sha(f)),None)
+  if match:
+   deleted.append({'slettet':str(f),'SHA256':sha(f),'byteidentisk_beholdt':str(match)});f.unlink()
+put(R/'rydding-identiske-flatedumper.json',{'antall':len(deleted),'bare_eksakte_SHA_duplikater':True,'unike_kilder_og_relevante_bevis_bevart':True,'filer':deleted})
+rr=json.loads((R/'rutekart-returer.json').read_text());rr['valgt_avledet_variant'].update(status='PUBLISERT_EGENKONTROLLERT_MOTOROBSERVERT',publisert=True,hd_mod=r['hd_mod']);put(R/'rutekart-returer.json',rr)
+c=json.loads((R/'kandidatstatus.json').read_text());c.update(avventer_motor=False,publisert=True,lokalt_mottatt=True,hd_mod=r['hd_mod'],kandidat_aktivert_og_gammelkopi_fjernet=True);put(R/'kandidatstatus.json',c)
+s=json.loads((R/'sluttkontroll.json').read_text());s.update(alle21969_publiserte_filhash_hentet_bekreftet=True,vanlig_git_barn_av_gjeldende_SHA=True,forelder=r['forelder'],force_push=False,gammel_arbeidskopi_verifisert_slettet=True,identiske_flatedumper_fjernet=len(deleted),fellespakker_native=3723,fellespakker_mangler=1,automation='ACTIVE');put(R/'sluttkontroll.json',s)
+(R/'NESTE.md').write_text('''# Gjenoppta eksisterende bunke
+
+Fase1999 er publisert og lokalt mottatt i WebP-mod219fcfa1acd53590155638623f48c7acccde3e0f, vanlig Git-barn av15835538ca4b4e70e95a0f227e7d41bea830400e uten force-push. Alle21969 filer er hentet tilbake som strøm og SHA256-bekreftet. Alle gamle grafikkfiler og17089 tekniskePNG er uendret. Grafikkilden er02b43dbcf8b644b67caff2587d304e18df198977; kvittering og siste status ligger i denne rapporten. Ikke tegn1999 eller2000..2021 igjen.
+
+Neste er de eksisterende returene1998/H127,H135;1997/H132;1996/H133;1995/H134. Alle fem hele originaler er sett i spillkontekst og ved godkjent Sam. H135 er i ekte palett, ikke tekniske kodefarger. H137 er ikke utført eller reservert. Ikke gjenta samme hele mislykkede kodeprompt uten en konkret feilretting.1990 trenger fortsatt hel originalkilde;137/V013 og296/S037 er uendret. Fortsett også annet uavhengig autorisert grafikkarbeid når en retur trenger flere forsøk, uten å duplisere påbegynte bunker.
+
+1999 er utbedret fra egne H128/H129/H130. Bunken har11 faktiske innebygde kall, ingen ny bildekjøring i rettingen.30 svarte ekstra kodepiksler kom fra null-RGB under egen alfa0 ved bytte til egen H129-alfa. Forleng egen RGB-fringe før alle fremtidige egne alfabyttinger og RGB-modulinnsettinger. Se ALFA-RGB-RETTELSE.md. Global egen konturrens og kodekantrens, helskala0,995 og helflytt1HD høyre/opp gir null feil i alle uendrede3HD-porter. Ingen originalmaske, originalfragmenter eller lokal kildepåmaling/flytting. Gamle ubehandlede H128/H130-varianter er fortsatt returer som hele bilder og skal aldri være stilankere. Godkjent Sam er stilankeret.
+
+Gjeldende mod har3724 native. Delark fig178_02 er11/24, familien178 er23/102, hele figurjobber er fortsatt508/1758. Ingen ny hel resultat.png. Alle10 tidligere delruter er RGBA-bytebevart. Standard delarkkontroll11OK/13tomme mål, automatisk mottaksprøve1OK. Ferdig nativeWebP har alleRGBA-byte identiske med PNG, også under alfa0. Bare mod.json/SHA256SUMS er endret som metadata; historisk webp-migration.json er uendret.
+
+Motor og visuell kontroll: installert WebP-binær651aa78c,160 kontroller/148null,120/120null etterframe40. Alle12 gamle bufferavvik har byteidentiske koordinater og beggeRGBA. Fase1999 originalrekt+8HD er identisk med7059 endredeHD-piksler.50 hele originaltilstander er strengt paret utenHD-endring.110 ulike hele tilstander er ikke kontrollpar; fase120s30472HD-avvik utenfor rektangelet ligger innen5HD fra endredeoriginalpiksler. Det er kontrollert aktør29 i rom35 og53 kildefaser, ikke full naturlig gjennomspilling. Native, delark, hele motorbildet, før/etter og24sekvensfaser er visuelt sett. Ingen ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Felles Linux-/Windows-pakker sam-max-hd-2026-10-23-webp er tidligere faktisk hentet/verifisert og har fortsatt3723, mangler én ny fase. Oppdater ved neste komplette ark-/familiesamlepunkt eller avslutning med faktisk nedlasting og full innholdskontroll. Den eneste kandidaten er aktivert som mods/gpt. Den verifiserte gamle fullkopien er fjernet. Bare byteidentiske generiske flatedumper er ryddet; unike motorbilder, råbilder, kilder og relevante bevis er beholdt. Behold grunnlag3723-start1-y60 og kandidat3724-start1-y60 til denne bunken er ferdig kontrollert; den siste er gyldig3724-grunnlag for neste sammenligning. Ikke bruk historiske dedupliserte out-modmapper som komplett mod. Originaljobber og tre stasher er uendret. Automatikken er ACTIVE, ingen nødvendig Tom-avklaring eller gammel nattprosess.
+''')
+p=R/'RETUR.md';t=p.read_text();i=t.index('H126..H136s');p.write_text('''# Gjeldende returstatus
+
+Fase1999 er nå egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert i hd-mod219fcfa1acd53590155638623f48c7acccde3e0f. Hele publiseringen er hentet tilbake og alle21969 filhash bekreftet. Se mottak-publisert1999.json og ALFA-RGB-RETTELSE.md. Ingen ny Tom-/Claude-godkjenning. Ikke tegn1999 på nytt.
+
+'''+t[i:])
+p=R/'notat.md';t=p.read_text().replace('Nativepublisering gjenstår ved denne kildecommitten.','Publisert som vanlig Git-barn219fcfa1acd53590155638623f48c7acccde3e0f av15835538 uten force-push. Hele21969-filers fjernarkiv er hentet som strøm og alle filhash er bekreftet før lokal aktivering. Den verifiserte gamle arbeidskopien er fjernet.');p.write_text(t)
+status='''Publisert WebP-mod219fcfa1acd53590155638623f48c7acccde3e0f har3724 native. Vanlig Git-barn av15835538 uten force-push. Én ny helikopterfase1999 er egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert. Alle21969 filer er faktisk hentet tilbake som strøm og SHA256-bekreftet. Alle tidligere grafikkfiler og17089 tekniskePNG er bytebevart; bare mod.json/SHA256SUMS endres som metadata. Kandidaten er aktivert og gammel verifisert fullkopi er fjernet. Grafikkilden er02b43dbcf8b644b67caff2587d304e18df198977, med kvitteringer i rapporter/helikopter178-forfaser1995til1999-20261023.
+
+1999 bruker egne H128/H129/H130. Bunken har fortsatt11 faktiske bildekall, ingen ny kjøring i rettingen.30 svarte ekstra kodepiksler skyldtes null-RGB under egen alfa0 ved bytte til egen H129-alfa. Egen RGB-fringe forlenges nå før alfabyttet. Global egen konturrens, liten heltilpasning og global kodekantrens gir null feil i alle uendrede3HD-porter. Ingen originalmaske, originalfragmenter eller lokal kildepåmaling/flytting. NativeWebP er RGBA-byteidentisk med PNG, også under alfa0. Kildeløs native-replay er byteeksakt.
+
+Delark11/24, familie178 23/102 og3724 native; hele figurjobber508/1758 uendret. Alle10 tidligere delruter er RGBA-bytebevart. Standard delarkprøve11OK/13tomme mål, automatisk mottak1OK. Native, delark, hele motorbilde, før/etter og24faser er visuelt sett. Motor160 kontroller/148null,120/120null etterframe40; alle12 gamle feilkoordinater og beggeRGBA er byteidentiske. Berørt originalrekt+8HD er identisk med7059 endredeHD-piksler.50 hele originaltilstander er strengt paret;110 ulike NPC-tilstander er ikke kontrollpar. Ikke full naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Ingen ny Tom-/Claude-godkjenning.
+
+Gjenoppta NESTE.md med returer1998..1995. H137 er ikke utført eller reservert.1999..2021 skal ikke tegnes igjen.1990 trenger hel kilde;137/V013 og296/S037 er uendret. Felles verifiserte WebP-pakker har3723 og mangler én; oppdater ved neste ark-/familiesamlepunkt eller avslutning med faktisk nedlasting/innholdskontroll. Behold råbilder og relevante kontrollbevis; bare eksakte flateduplikater er fjernet. Originale jobber og tre stasher er uendret. Automatikken er ACTIVE, ingen nødvendig Tom-avklaring eller gammel nattprosess.'''
+for fn in['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/fn;t=p.read_text();start='<!-- helikopter178-forfaser1995-1999:start -->';end='<!-- helikopter178-forfaser1995-1999:slutt -->';i=t.index(start)+len(start);j=t.index(end,i);p.write_text(t[:i]+'\n'+status+'\n'+t[j:])
+for name in['publiser-3724.py','hent-3724-kilde.py','sluttstatus-1999.py']:
+ shutil.copyfile(O/name,R/(name+'.txt'))
+shutil.copyfile(O/'grafikkilde3724-hentet.json',R/'grafikkilde3724-hentet.json')
+assert subprocess.check_output(['git','diff','--name-only','HEAD','--','jobber','hovedark','stil'],cwd=A)==b'';assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==r['stasher'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==508;assert len([f for f in(P/'mods/gpt/costumes').iterdir()if f.name.endswith(('_hd.webp','_hd.png'))])==3724
+fs=sorted(p for p in R.rglob('*')if p.is_file()and p.name!='SHA256SUMS');(R/'SHA256SUMS').write_text(''.join(f'{sha(p)}  {p.relative_to(R)}\n'for p in fs));print('Publisert3724/11av24,',len(fs),'rapportfiler. Ryddet',len(deleted),'eksakte flatedumper. Råbilder, unike kilder og tre stasher bevart.')
