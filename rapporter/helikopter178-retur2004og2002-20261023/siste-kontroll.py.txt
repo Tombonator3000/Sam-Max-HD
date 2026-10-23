@@ -1,0 +1,104 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+from zipfile import ZipFile
+import hashlib, json, subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda b: hashlib.sha256(b).hexdigest()
+def git(p, *args):
+    return subprocess.check_output(['git', *args], cwd=p, text=True).strip()
+def inventory(root):
+    files = [p for p in root.rglob('*') if p.is_file()]
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return dict(pool.map(lambda p: (str(p.relative_to(root)), sha(p.read_bytes())), files))
+
+st = read(R / 'start.json')
+r = read(R / 'mottak-publisert.json')
+revision = read(R / 'sluttrevisjon.json')
+source = read(O / 'grafikk-hentet-kontrollert.json')
+metadata = read(O / 'sluttkvittering-hentet-kontrollert.json')
+combined = read(O / 'siste-samlede-grafikk-kontrollert.json')
+head_a = git(A, 'rev-parse', 'HEAD')
+head_main = git(P, 'rev-parse', 'HEAD')
+assert git(A, 'branch', '--show-current') == 'gpt-arbeid'
+assert git(P, 'branch', '--show-current') == 'main'
+assert not git(A, 'status', '--porcelain') and not git(P, 'status', '--porcelain')
+refs = {line.split()[1].split('/')[-1]: line.split()[0] for line in git(P, 'ls-remote', 'origin',
+    'refs/heads/main', 'refs/heads/gpt-arbeid', 'refs/heads/hd-mod').splitlines()}
+assert refs == dict(main=head_main, **{'gpt-arbeid': head_a, 'hd-mod': r['hd_mod']})
+assert head_a == metadata['grafikk_commit'] == combined['grafikk_commit']
+assert source['grafikk_commit'] == metadata['forrige_commit'] == r['grafikkilde']
+assert combined['forrige_commit'] == st['remote']['gpt-arbeid']
+assert all(q['alle_filhash_bekreftet'] and q['filer'] == len(q['filhash']) > 0 for q in [source, metadata, combined])
+changed = subprocess.check_output(['git', 'diff', '--name-only', '-z', combined['forrige_commit'], head_a], cwd=A).decode().strip('\0').split('\0')
+assert set(changed) == {e['fil'] for e in combined['filhash']}
+assert all(sha((A / e['fil']).read_bytes()) == e['sha256'] for e in combined['filhash'])
+assert git(P, 'diff', '--name-only', st['remote']['main'], head_main).splitlines() == ['STATUS.md', 'log.md', 'memory.md', 'todo.md']
+ci = read(R / 'main-ci.json')
+fresh_ci = json.loads(subprocess.check_output(['gh', 'run', 'view', str(ci['databaseId']), '--json',
+    'databaseId,headSha,status,conclusion,jobs'], cwd=P, text=True))
+assert fresh_ci['headSha'] == ci['headSha'] == head_main
+assert fresh_ci['status'] == 'completed' and fresh_ci['conclusion'] == 'success'
+assert {'pipeline', 'nettleser'} <= {e['name'] for e in fresh_ci['jobs']}
+assert all(e['status'] == 'completed' and e['conclusion'] == 'success' for e in fresh_ci['jobs'])
+assert revision['main_CI_suksess'] and revision['main_CI'] == ci['databaseId']
+assert all(e['faktisk_hentet_fra_GitHub'] and sha((P / e['fil']).read_bytes()) == e['sha256'] for e in revision['main_filer'])
+
+published = read(R / 'publiserte-moddfiler-3721.json')
+assert inventory(P / 'mods/gpt') == published == inventory(O / 'hentet-hdmod3721')
+assert len(published) == 21965 and sum(f.endswith('.png') for f in published) == 21959
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in published) == read(P / 'mods/gpt/mod.json')['costume_cels'] == 3721
+assert set(st['filer']) <= set(published)
+assert len(st['filer']) == 21963 and sum(f.endswith('.png') for f in st['filer']) == 21957
+assert all(published[f] == h for f, h in st['filer'].items() if f not in ['mod.json', 'SHA256SUMS'])
+assert inventory(O / 'mod-grunnlag3719') == st['filer']
+assert len(st['beskyttede']) == 1472 and all(sha((A / f).read_bytes()) == h for f, h in st['beskyttede'].items())
+assert git(P, 'stash', 'list', '--format=%H').splitlines() == st['stash'] and len(st['stash']) == 3
+assert not (A / 'jobber/fig178_02/resultat.png').exists()
+assert len(list(A.glob('jobber/fig*/jobb.json'))) == 1758 and len(list(A.glob('jobber/fig*/resultat.png'))) == 508
+assert sha((A / st['partial_rapport'] / 'fig178_02-delresultat.png').read_bytes()) == st['partial_sha256']
+routes = read(R / 'rutekart-fig178_02.json')['fig178_02']
+assert sha((R / 'fig178_02-delresultat.png').read_bytes()) == routes['sha256_resultat']
+assert {e['rute'] for e in routes['ruter']} == set(range(2002, 2010))
+assert all(e['motorobservert'] and e['native_mottatt'] and e['publisert'] and published[e['fil']] == e['sha256'] for e in routes['ruter'])
+assert read(R / 'delark-kontroll.json')['tidligere6_delruter_RGBA_bytebevart']
+assert len(read(R / 'alle-kall.json')) == 8
+assert len(read(R / 'kildelos-replay.json')) == 2
+assert all(e['begge_PNG_hash_eksakt_gjenlaget'] and not e['originalfil_aapnet'] for e in read(R / 'kildelos-replay.json'))
+assert read(R / 'motor-sammenligning.json')['visuelt_sett']
+assert r['nye_native'] == r['visuelt_sett'] == r['motorobservert'] == r['publisert'] == 2
+assert not r['godkjent_av_Tom'] and not r['claude_kontroll']
+
+packages = P / 'out/felles-release-20261023-helikopter'
+linux = packages / 'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt'
+assert read(linux / 'mod.json')['costume_cels'] == 3713
+assert len(list((linux / 'costumes').glob('*_hd.png'))) == 3713
+missing = ['costume178_' + str(n) + '_hd.png' for n in range(2002, 2010)]
+assert not any((linux / 'costumes' / f).exists() for f in missing)
+with ZipFile(packages / 'windows/SamMaxHD-Windows.zip') as z:
+    meta = 'SamMaxHD-Windows/mod/mod.json'
+    assert json.loads(z.read(meta))['costume_cels'] == 3713
+    assert sum(n.startswith('SamMaxHD-Windows/mod/costumes/') and n.endswith('_hd.png') for n in z.namelist()) == 3713
+    assert not any(n.rsplit('/', 1)[-1] in missing for n in z.namelist())
+release = read(R / 'release-etter-publisering.json')
+assert release['releaser_bevart'] == 47 and release['alle_release_kropper_og_vedlegg_bevart']
+assert release['aktive_pakkebygg'] == [] and release['manglende_native_i_begge'] == missing
+proof = dict(tid_utc=datetime.now(timezone.utc).isoformat(), remote=refs, grafikkilde=r['grafikkilde'],
+    sluttkvittering=head_a, alle_current_grafikk_filhash_faktisk_hentet=combined['filer'],
+    unike_current_blobs_faktisk_hentet=combined['unike_faktisk_nedlastede_blobs'],
+    kildefiler=source['filer'], kvitteringsfiler=metadata['filer'], main_bare4dokumenter=True,
+    main_ci=ci['databaseId'], main_ci_suksess=True, native=3721, nye_native=2,
+    publiserte_filhash_bekreftet=21965, tidligere_stier_bevart=21963, tidligere_PNG_bevart=21957,
+    beskyttede_input_bevart=1472, opprinnelige_stasher_bevart=3,
+    delark178_02=8, delark178_02_totalt=24, familie178_native=20, familie178_totalt=102,
+    delark_sha256=routes['sha256_resultat'], hele_figurjobber=508, totale_figurjobber=1758,
+    kildelos_byteeksakt_replay=2, motorobservert=2, visuelt_sett=2, publisert=2,
+    Tom_godkjent=False, Claude_godkjent=False, fellespakker_native=3713, fellespakker_mangler_native=8,
+    automatikk='ACTIVE', alle_grafikkjobber_ferdige=False, neste_faser=[2001, 2000], neste_kall='H111 ikke utført eller reservert')
+(O / 'siste-revisjon.json').write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps(proof, ensure_ascii=False), flush=True)

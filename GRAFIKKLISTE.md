@@ -1,7 +1,7 @@
 # Grafikkliste
 
 <!-- helikopter178-retur2004-2002-status:start -->
-Klar for additiv publisering av to nye native fra 3719 til 3721. Endelig fjern-SHA og hentet publiseringsbevis følger i mottak-publisert.json.
+Publisert hd-mod 790479259111acc86aa79669751d44a3ccde2527 har 3721 native. Grafikkilde er gpt-arbeid 7b2b56258d0d6ec3efa77960f46a72c461008a1e. Alle 21965 publiserte filhash er hentet tilbake og kontrollert. Alle 21963 tidligere stier og 21957 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3719-grunnlaget er bevart under out. Bare to nye native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 
 Åtte faktiske innebygde image_gen-kall H103..H110 har gitt to valgte hele sprites, 2004/H103 og 2002/H110. De er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning. Fig178_02 er 8/24 med 2002..2009, familien 178 er 20/102. Hele figurjobber er fortsatt 508/1758, 1250 uten resultat, pluss returer og sluttkontroll. Åtte bildekall er ikke åtte leverte figurjobber.
 
@@ -15,6 +15,8 @@ Gjenoppta rapporter/helikopter178-retur2004og2002-20261023/NESTE.md og RETUR.md.
 
 Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes med lokal kontroll av delark, motor og publiserte filhash. Felles Linux/Windows helikopter-utgave har fortsatt 3713 og mangler åtte etter publisering. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning med nedlasting, sjekksummer og grafikkinnhold kontrollert. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE, all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattprosess.
 <!-- helikopter178-retur2004-2002-status:slutt -->
+
+Tidligere status nedenfor er historikk.
 
 Tidligere status nedenfor er historikk.
 
