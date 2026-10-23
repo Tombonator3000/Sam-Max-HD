@@ -1,9 +1,5 @@
-# Påbegynt returarbeid og lagringskontroll
+# Neste produksjon
 
-Grunnlag: hd-mod 790479259111acc86aa79669751d44a3ccde2527, 3721 native. Fig178_02 har fortsatt 8/24 publiserte ruter, 2002..2009. Ingen ny native er mottatt eller publisert i denne bunken ennå.
+Les mottak-publisert.json, sluttrevisjon.json og RETUR.md. Fig178_02 er10/24 med2000..2009. Disse og komplett fig178_03/2010..2021 skal ikke tegnes om. Hele figurjobber508/1758 uendret. Familien178 er22/102. Resterende14 i fig178_02 er1986..1999. Fortsett med1999..1995 etter kildebekreftelse og kontroll av eksisterende returer, ikke gjenta gamle genereringer blindt. Fersk motorprøve i denne rapporten logger53 kildefaser og viser hele1998/1999, men avklar og se kilder/stil før nytt motiv.1990 trenger fortsatt en ny hel kilde fordi den gamle referansen er venstreklipt.
 
-Seks faktiske innebygde image_gen-kall H111..H116 er utført for fase 2001. Alle råbilder, prompter og argumenter er bevart. H113-venstre retter halen og kan beholdes. H112-høyre er nærmest geometrisk, men mangler ett sjeldent felt på kildecelle 56,1. H114 og H115 er kvalitetsreturer. H116 gjenoppretter feltet med en tydeligere global kremkode, men har fortsatt ett manglende grønt felt og noen ekstra kodepiksler; ingen sterke kontrollgrenser er endret. Ingen helflytt er anvendt.
-
-2000/H078 er ikke nytegnet her. Egen H078-basis og hele kildekontekst er bevart under basis og kilder. Original og Sam må sees før hvert nytt motiv. 1990 trenger fortsatt ny hel kilde. Neste bildekall H117 er ikke utført eller reservert.
-
-Tom spør nå om ca. 300 GB diskbruk. Lagringskontroll viser out 331 GiB av prosjektets 350 GiB, mods/gpt 527 MiB og arbeidsbordet 7,3 GiB. Bare lesing og PNG-benchmark på egne kopier er utført. Ingen originaler, tidligere PNG, arbeidskopier eller stasher er slettet. Bevar dette påbegynte arbeidet og fortsett herfra.
+Neste178-bildekall H126 er ikke utført eller reservert. H120/karosseri-understell er en sammenstilling, ikke et ekstra bildekall. Alle15 faktiske H111..H125 er utført og råbilder bevart.137/V013 og296/S037 er uendret og ikke utført. Ingen nødvendig Tom-designavklaring. Alle publiserte filer,1472 beskyttede input og tre stasher bevares. Fellespakker3713 oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning. Automatikken fortsetter.

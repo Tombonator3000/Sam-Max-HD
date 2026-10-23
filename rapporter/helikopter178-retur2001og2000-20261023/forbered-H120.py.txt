@@ -1,0 +1,54 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json, shutil, subprocess
+import numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P/'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A/'rapporter'/O.name
+B = R/'kall/H119'
+K = R/'kall/H120'
+assert not K.exists()
+K.mkdir()
+read = lambda p: json.loads(p.read_text())
+for name in ('kodepalett.json', 'delplassering-plan.json', 'modul-kodeguide.png'):
+    shutil.copy2(B/name, K/name)
+
+# Kildekoordinater lokaliserer bare ringene i en bildeforklaring til image_gen.
+# De brukes aldri til sluttpiksler eller modulplassering.
+q = read(B/'kontroll.json')
+row = next(r for r in read(B/'egen-del-montering.json')['egne_moduler'] if r['kall'] == 'H119')
+def guide_point(x, y):
+    return tuple(((v*4+2-q['flytt'][i])/q['hel_skala'][i]-row['egen_del_hel_flytt'][i])/row['egen_del_hel_skala'][i] for i,v in enumerate((x,y)))
+marked = Image.open(B/'raa.png').convert('RGBA')
+d = ImageDraw.Draw(marked)
+for label, cell, radius in [('C',(56,1),28)]:
+    x,y = guide_point(*cell)
+    d.ellipse((x-radius,y-radius,x+radius,y+radius), outline='white', width=5)
+    d.text((x-radius,y-radius-23),label,fill='white',stroke_width=1)
+marked.save(K/'egen-to-ringer-guide.png')
+
+src = np.array(Image.open(R/'kilder/2001/original-1x.png').convert('RGBA'))
+code = src.copy()
+for e in read(K/'kodepalett.json')['tabell']:
+    code[np.all(src[:,:,:3] == e['ekte'],2) & (src[:,:,3]>0),:3] = e['kode']
+sheet = Image.new('RGB',(1000,450),'#808080')
+ds = ImageDraw.Draw(sheet)
+for x0, rect, label in [(0,(32,11,40,18),'A: two cells below the small bridge'),(500,(53,0,60,6),'B: cream square only in the top row below teal')]:
+    im = Image.fromarray(code).crop(rect)
+    bg = Image.new('RGBA',im.size,'#808080'); bg.alpha_composite(im)
+    size = (im.width*55,im.height*55)
+    sheet.paste(bg.resize(size,Image.Resampling.NEAREST).convert('RGB'),(x0+25,45))
+    ds.text((x0+15,15),label,fill='white')
+sheet.save(K/'to-kildedetaljer-guide.png')
+
+prompt = '''Use case: precise-object-edit.
+Image1 is my own isolated right module of animation phase 2001. Recolor only one small vertical strip around C in image2. Keep all other geometry, colors, canvas and alpha exactly as image1. Image3 RIGHT detail is the desired source field arrangement, image4 is full source code reference, image5 approved edge finish only.
+The pale cream-yellow square RGB(255,255,128) marked C is directly BELOW the teal top square and directly RIGHT of the bright green square. This pale square must be only ONE tile high, matching the height of that green neighbor. Its current lower edge extends slightly too far down. Restore the saturated YELLOW RGB(255,255,0) band immediately below it, making the entire long yellow band perfectly horizontal and uniform from left to right. Immediately below that yellow band, restore MAGENTA RGB(255,0,255) to match the main body. The cream square must not extend into either of those two rows.
+Keep the cream square at its existing position and width. Do not enlarge the yellow area beyond its existing single-row horizontal band. Do not change any other tile including the white nose area and the small red/lavender/mint/olive block at lower left. Flat false code colors, no blending, gradients or new outlines. Remove C and its circle. Keep genuine transparency and fine exterior alpha. Return the complete isolated module as transparent PNG.
+'''
+(K/'prompt-brukt.txt').write_text(prompt)
+(K/'guide-metode.json').write_text(json.dumps(dict(egen_redigeringskilde=str(B/'raa.png'),kildekoordinater_bare_i_guide=True,kildekoordinater_til_sluttpiksler=False,kildekoordinater_til_modulplassering=False,originalfragmenter=False),ensure_ascii=False,indent=2)+'\n')
+refs = [B/'raa.png',K/'egen-to-ringer-guide.png',K/'to-kildedetaljer-guide.png',K/'modul-kodeguide.png',A/'hovedark/sam.png']
+subprocess.run(['python3',str(O/'plan.py'),'H120','2001',*map(str,refs)],check=True)

@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import json,numpy as np,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+for cid in sys.argv[1:]:
+ K=R/'kall'/cid;q=json.loads((K/'kontroll.json').read_text());src=np.array(Image.open(R/'kilder'/str(q['rute'])/'original-1x.png').convert('RGBA'));ref=np.array(Image.open(K/'original-native-kontroll.png'));a=Image.open(K/'egen-renset.png').convert('RGBA');sx,sy=q['hel_skala'];scaled=np.array(a.resize((round(a.width*sx),round(a.height*sy)),Image.Resampling.NEAREST));can=np.zeros_like(ref);x,y=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];h,w=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,can.shape[1]),min(y+h,can.shape[0]);can[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x]
+ cm={tuple(e['ekte']):e['kode'] for e in json.loads((K/'kodepalett.json').read_text())['tabell']};rows=[]
+ for e in json.loads((K/'kodeflate-kontroll.json').read_text())['farger']:
+  if not(e['fester_over3HD'] or e['egne_kodepiksler_over3HD_fra_kilde']):continue
+  col=e['RGB'];have=np.all(can[:,:,:3]==col,2)&(can[:,:,3]>=128);re=np.all(ref[:,:,:3]==col,2)&(ref[:,:,3]>=128);yy,xx=np.nonzero(np.all(src[:,:,:3]==col,2)&(src[:,:,3]>0));dd=nd.distance_transform_edt(~have) if have.any() else np.full(have.shape,999.);pos=dd[yy*4+q['margy']*4+2,xx*4+q['margx']*4+2];bad=list(zip(xx[pos>3].tolist(),yy[pos>3].tolist()));neg=have&(nd.distance_transform_edt(~re)>3);ny,nx=np.where(neg);cells=sorted(set(zip(((nx-q['margx']*4)//4).tolist(),((ny-q['margy']*4)//4).tolist())))
+  desired=[]
+  for cx,cy in cells:
+   if 0<=cx<src.shape[1] and 0<=cy<src.shape[0]:desired.append(dict(celle=[cx,cy],kilde_RGBA=src[cy,cx].tolist(),guidekode=cm.get(tuple(src[cy,cx,:3])) if src[cy,cx,3] else None))
+  row=dict(RGB=col,kode=cm[tuple(col)],mangler=bad,ekstra_celler=cells,riktig_i_ekstra_celler=desired);rows.append(row);print(cid,json.dumps(row,ensure_ascii=False))
+ (K/'fargepunkt-diagnose.json').write_text(json.dumps(dict(bare_maaling=True,ingen_sluttpiksler_endret=True,punkter=rows),ensure_ascii=False,indent=2)+'\n')

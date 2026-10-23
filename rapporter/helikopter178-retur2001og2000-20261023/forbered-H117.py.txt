@@ -1,0 +1,57 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+import json, shutil, subprocess
+import numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P/'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A/'rapporter'/O.name
+B = R/'kall/H116'
+K = R/'kall/H117'
+assert not K.exists()
+K.mkdir()
+read = lambda p: json.loads(p.read_text())
+for name in ('kodepalett.json', 'delplassering-plan.json', 'modul-kodeguide.png'):
+    shutil.copy2(B/name, K/name)
+
+# Kildekoordinater lokaliserer bare ringene i en bildeforklaring til image_gen.
+# De brukes aldri til sluttpiksler eller modulplassering.
+q = read(B/'kontroll.json')
+row = next(r for r in read(B/'egen-del-montering.json')['egne_moduler'] if r['kall'] == 'H116')
+def guide_point(x, y):
+    return tuple(((v*4+2-q['flytt'][i])/q['hel_skala'][i]-row['egen_del_hel_flytt'][i])/row['egen_del_hel_skala'][i] for i,v in enumerate((x,y)))
+marked = Image.open(B/'raa.png').convert('RGBA')
+d = ImageDraw.Draw(marked)
+for label, cell, radius in [('A',(35.5,14),51), ('B',(56,2),52)]:
+    x,y = guide_point(*cell)
+    d.ellipse((x-radius,y-radius,x+radius,y+radius), outline='white', width=5)
+    d.text((x-radius,y-radius-23),label,fill='white',stroke_width=1)
+marked.save(K/'egen-to-ringer-guide.png')
+
+src = np.array(Image.open(R/'kilder/2001/original-1x.png').convert('RGBA'))
+code = src.copy()
+for e in read(K/'kodepalett.json')['tabell']:
+    code[np.all(src[:,:,:3] == e['ekte'],2) & (src[:,:,3]>0),:3] = e['kode']
+sheet = Image.new('RGB',(1000,450),'#808080')
+ds = ImageDraw.Draw(sheet)
+for x0, rect, label in [(0,(32,11,40,18),'A: two cells below the small bridge'),(500,(53,0,60,6),'B: cream square only in the top row below teal')]:
+    im = Image.fromarray(code).crop(rect)
+    bg = Image.new('RGBA',im.size,'#808080'); bg.alpha_composite(im)
+    size = (im.width*55,im.height*55)
+    sheet.paste(bg.resize(size,Image.Resampling.NEAREST).convert('RGB'),(x0+25,45))
+    ds.text((x0+15,15),label,fill='white')
+sheet.save(K/'to-kildedetaljer-guide.png')
+
+prompt = '''Use case: precise-object-edit.
+Edit image1, my own isolated right module of helicopter-animation phase 2001. Retain its exact canvas, overall shape, tile sizes, positions, all other flat code-color fields, internal transparent openings and genuine exterior alpha.
+Image1: edit target. Image2: the same target with two WHITE locating circles A and B, guides only. Image3: exact source code-color details for A and B on gray. Image4: full source code-color module layout. Image5: approved Sam edge-finish reference only.
+Make these two tiny corrections, matching the two details in image3:
+A, lower-left bridge: replace the TWO CYAN squares just beneath the little crossbar. The LEFT of these two squares must be MINT GREEN RGB(0,255,128); its immediate RIGHT neighbor must be OLIVE RGB(128,128,0). Use their existing exact tile footprints. The other cyan squares elsewhere stay cyan.
+B, upper-right: the PALE CREAM RGB(255,255,128) belongs in ONE single square only, directly under the teal top square, between the bright green square on its left and the purple field on its right. Trim the cream out of the two squares directly below it: the first is saturated YELLOW RGB(255,255,0), continuing the long horizontal yellow band; the next is MAGENTA RGB(255,0,255), continuing the magenta body. Preserve the cream square itself.
+This is an intermediate FALSE-COLOR image. Keep flat precise code colors. Preserve every other region, geometry and color. Remove all circles, labels and guide marks. No new texture, outlines, shading, detached dust or extra parts. Delicate antialiasing only on the existing exterior. Output the WHOLE isolated right module as a transparent PNG.
+'''
+(K/'prompt-brukt.txt').write_text(prompt)
+(K/'guide-metode.json').write_text(json.dumps(dict(egen_redigeringskilde=str(B/'raa.png'),kildekoordinater_bare_i_guide=True,kildekoordinater_til_sluttpiksler=False,kildekoordinater_til_modulplassering=False,originalfragmenter=False),ensure_ascii=False,indent=2)+'\n')
+refs = [B/'raa.png',K/'egen-to-ringer-guide.png',K/'to-kildedetaljer-guide.png',K/'modul-kodeguide.png',A/'hovedark/sam.png']
+subprocess.run(['python3',str(O/'plan.py'),'H117','2001',*map(str,refs)],check=True)

@@ -1,1 +1,1 @@
-Innebygd image_gen, modell ikke oppgitt. Ett faktisk kall H116. Eget råbilde, faktiske argumenter og referansehash bevart. Råbildet er visuelt sett. Ingen native levert, mottatt, motorobservert eller publisert fra dette kallet. Se kontrollfiler og rapportens RETUR.md.
+Faktisk innebygd image_gen-kall H116. Rolle: bevart kvalitetsretur, ingen direkte sluttpiksler. Faktisk prompt i prompt-brukt.txt, verktøyargumenter i argumenter.json, råbilde og inputhash i plan.json. Modellnavn ikke oppgitt av verktøyet. Beskyttede jobbfiler urørt. Se RAPPORT.md og individuelle kontroller.

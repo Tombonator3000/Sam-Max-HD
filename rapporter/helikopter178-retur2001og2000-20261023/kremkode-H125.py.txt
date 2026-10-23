@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib
+import numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+B=R/'kall/H122';K=R/'kall/H125';read=lambda p:json.loads(p.read_text())
+pal=read(K/'kodepalett.json')
+for e in pal['tabell']:
+    if e['ekte']==[43,51,19]: e['kode']=[255,255,128]
+assert len({tuple(e['kode'])for e in pal['tabell']})==len(pal['tabell'])
+(K/'kodepalett.json').write_text(json.dumps(pal,ensure_ascii=False,indent=2)+'\n')
+own=np.array(Image.open(B/'egen-del-renset.png').convert('RGBA'));code=own.copy()
+for e in pal['tabell']:code[np.all(own[:,:,:3]==e['ekte'],2)&(own[:,:,3]>0),:3]=e['kode']
+assert np.array_equal(own[:,:,3],code[:,:,3])
+target=K/'egen-global-kodeomlegging.png';Image.fromarray(code).save(target)
+marked=Image.fromarray(code);d=ImageDraw.Draw(marked);cx,cy=761.8310981755353,864.9191176470589;d.ellipse((cx-30,cy-30,cx+30,cy+30),outline='white',width=5);marked.save(K/'egen-punktring-guide.png')
+src=np.array(Image.open(R/'kilder/2000/original-1x.png').convert('RGBA'));sc=src.copy()
+for e in pal['tabell']:sc[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode']
+for filename,rect,factor in [('kildedetalj-guide.png',(41,18,48,24),80),('modul-kodeguide.png',(17,0,61,24),22)]:
+    im=Image.fromarray(sc).crop(rect);bg=Image.new('RGBA',im.size,'#808080');bg.alpha_composite(im);bg.resize((im.width*factor,im.height*factor),Image.Resampling.NEAREST).convert('RGB').save(K/filename)
+args=read(K/'argumenter.json');args['referenced_image_paths'][0]=str(target)
+(K/'argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n')
+plan=read(K/'plan.json');plan['referanser']=[dict(fil=p,sha256=hashlib.sha256(Path(p).read_bytes()).hexdigest())for p in args['referenced_image_paths']]
+(K/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+(K/'global-kodeomlegging.json').write_text(json.dumps(dict(egen_rgba=str(B/'egen-del-renset.png'),egen_alfa_bytebevart=True,global_klasse=dict(ekte=[43,51,19],kode=[255,255,128]),kildekoordinater_bare_i_guide=True,kildekoordinater_til_sluttgrafikk=False,kildekoordinater_til_modulplassering=False,lokal_fargepaamaling=False),ensure_ascii=False,indent=2)+'\n')
+print('H125 global cream code prepared, alpha unchanged')

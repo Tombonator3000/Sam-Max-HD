@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,shutil,subprocess,sys
+import numpy as np
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+qid,edit,cid=sys.argv[1:4];x,y=map(int,sys.argv[4:6]); correction=sys.argv[6]
+Q=R/'kall'/qid;B=R/'kall'/edit;K=R/'kall'/cid;assert not K.exists();K.mkdir()
+q=read(Q/'kontroll.json');n=q['rute'];row=next(e for e in read(Q/'egen-del-montering.json')['egne_moduler']if e['kall']==edit)
+pos=[((v*4+2-q['flytt'][i])/q['hel_skala'][i]-row['egen_del_hel_flytt'][i])/row['egen_del_hel_skala'][i]for i,v in enumerate((x,y))]
+im=Image.open(B/'raa.png').convert('RGBA');d=ImageDraw.Draw(im);cx,cy=pos;d.ellipse((cx-32,cy-32,cx+32,cy+32),outline='white',width=5);im.save(K/'egen-punktring-guide.png')
+for f in ['kodepalett.json','delplassering-plan.json','modul-kodeguide.png']:shutil.copy2(B/f,K/f)
+src=np.array(Image.open(R/f'kilder/{n}/original-1x.png').convert('RGBA'));code=src.copy()
+for e in read(K/'kodepalett.json')['tabell']:code[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode']
+rect=(max(0,x-3),max(0,y-3),min(src.shape[1],x+4),min(src.shape[0],y+4));detail=Image.fromarray(code).crop(rect);bg=Image.new('RGBA',detail.size,'#808080');bg.alpha_composite(detail);bg.resize((detail.width*80,detail.height*80),Image.Resampling.NEAREST).convert('RGB').save(K/'kildedetalj-guide.png')
+prompt=f'''Use case: precise-object-edit. Correct only the single tiny marked field in image1, my own isolated module of helicopter phase {n}.
+Image1 is my own edit target; image2 the same with a WHITE locating ring; image3 the exact source color layout enlarged on a gray background; image4 full module code reference; image5 approved Sam edge finish only.
+{correction}
+Preserve every other existing field and color, all proportions, thin parts, holes, neck endpoint and overall canvas. This is a FALSE-COLOR intermediate: retain the exact flat code colors. Gray in the guide represents transparent holes and exterior. No new colors, highlights, outlines, shading or texture. Remove the white ring. No other module or full helicopter, no detached dust. Return the WHOLE isolated module as genuine transparent PNG.\n'''
+(K/'prompt-brukt.txt').write_text(prompt)
+(K/'guide-metode.json').write_text(json.dumps(dict(kildekoordinater_bare_i_guide=True,kildekoordinater_til_sluttgrafikk=False,kildekoordinater_til_modulplassering=False,originalfragmenter=False),ensure_ascii=False,indent=2)+'\n')
+refs=[B/'raa.png',K/'egen-punktring-guide.png',K/'kildedetalj-guide.png',K/'modul-kodeguide.png',A/'hovedark/sam.png']
+subprocess.run([str(P/'.venv/bin/python'),str(O/'plan.py'),cid,str(n),*map(str,refs)],check=True)
+print('Guide-only mark center',pos,'source guide rectangle',rect)

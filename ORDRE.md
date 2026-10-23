@@ -1,5 +1,25 @@
 # Ordre fra Claude
 
+<!-- helikopter178-retur2001-2000-status:start -->
+Klar for additiv publisering av to nye native fra 3721 til 3723. Endelig fjern-SHA og mottak følger i mottak-publisert.json.
+
+Den påbegynte bunken med H111..H116 er fullført med ni nye faktiske innebygde image_gen-kall H117..H125, totalt 15. To hele spritebilder for fase 2001 og 2000 er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning. Fig178_02 er 10/24 med 2000..2009, familien 178 er 22/102. Hele figurjobber er fortsatt 508/1758, 1250 uten resultat, pluss returer og sluttkontroll. Ingen hel jobb/resultat.png leveres.
+
+2001 bruker hele egne H113-venstre, H120-karosseri og H119-understell, med smale egne skjøter. Den vannrette skjøten velges fra egne alfalinjer, linje 657, bånd 655..659 fra H119. H077 bidrar bare et smalt halsbånd. H119 og H120 er fortsatt returer som hele prototyper. 2000 bruker hele egne H123/H125-moduler og halsbånd fra H078. H123 åpner det lille hullet 7,13; H125 gjenoppretter olivenfeltet 44,21 gjennom en tydeligere global kremkode for hele fargeklassen, med uendret egen alfa. Hele 2000 flyttes samlet én HD-piksel mot venstre. Fem nye råbilder og to eldre egne halsbånd bidrar sluttpiksler. Alle 15 faktiske råbilder, prompter og argumenter er bevart.
+
+Begge hele riktige originaler er sett i spillkontekst og godkjent Sam før hvert motiv. Ingen kildekoordinater til delplassering, originalmasker, kildefragmenter, lokal fargepåmaling eller flytting av enkeltrekk. Alle sterke alfa-, åpnings-, nativefarge- og kodefester består uendret 3 HD, med null ekstra kodepiksler over 3 HD. IoU/dekning er 0,942/0,972 og 0,953/0,975. Kildeløs replay gjenlager begge egne RGBA/native PNG byteeksakt uten originalfiler. Original egenkontroll har 10 OK og 14 tomme mål, forventet exit 2; ingen produsert FEIL. Automatisk mottak har 2 OK og 0 SJEKK. Alle åtte tidligere delruters RGBA og nativehash er bevart. Ingen motor-/pipelinekodeendring.
+
+To ferske kontrollerte motoravspillinger med faktisk nedlastet Linux-binær 4e32ae90 sammenligner 3721/3723 i rom 35, aktør 29, kostyme 178, animasjon 1, posisjon 160,60, zclip0. Begge har 160 kontroller/148 null, 120/120 null etter frame 40. Tolv kjente inngangsavvik er identiske i koordinater og begge RGB. Originalrektangler med 8 HD naboområde er identiske; 8675 og 8040 synlige HD-piksler endres i de nye rutene. Ingen uforklarte HD-endringer, atomisk lagring består. Begge native, delark, gråtavle, hele motorbilder, før/etter-par og 24 faser 1998..2021 er visuelt sett. 53 kildefaser logget, ikke alle 102 eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+Gjenoppta rapporter/helikopter178-retur2001og2000-20261023/NESTE.md og RETUR.md. Resterende 14 i fig178_02 er 1986..1999. Fortsett med 1999..1995 etter kildebekreftelse og gjennomgang av tidligere returer. 1990 trenger ny hel originalkilde. 2000..2009 og komplett fig178_03/2010..2021 skal ikke tegnes om. Neste bildekall H126 er ikke utført eller reservert. Sammenstillingen H120/karosseri-understell er ikke et ekstra bildekall. 137/V013 og 296/S037 er uendret.
+
+Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes med lokale kontroller. Felles Linux/Windows helikopter-utgave har fortsatt 3713 og mangler ti etter publisering. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning med nedlasting, sjekksummer og grafikkinnhold kontrollert. Ingen ny pakkedispatch her. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE, all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattprosess.
+
+For å begrense videre diskvekst brukes én reflink-kandidat, eksisterende Git-objekter gjennom separat indeks og strømmet fjernarkiv med full SHA256-kontroll. Ingen ekstra full klon, lagret TAR eller kontrollkopi for publisering. Eksisterende arbeidskopier og filer er ikke slettet. WebP-/AVIF-testen er fortsatt bare separate kopier; spillets bildeformat er uendret.
+<!-- helikopter178-retur2001-2000-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 ## Påbegynt 23. oktober: H111..H116 og diskplass
 
 Seks nye faktiske bildekall for 2001 er bevart, men ingen ny native er mottatt. H113-venstre kan beholdes; H116 har fortsatt fargeavvik. 2000 er ikke nytegnet. Neste kall H117 er ikke utført eller reservert. Grunnlaget er fortsatt hd-mod 790479259111acc86aa79669751d44a3ccde2527 med 3721 native og delark 8/24. Gjenoppta rapporter/helikopter178-retur2001og2000-20261023/NESTE.md og RETUR.md før nye kall.

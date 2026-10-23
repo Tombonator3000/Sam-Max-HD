@@ -1,0 +1,48 @@
+from pathlib import Path
+from PIL import Image
+from own_parts import decode, component_on_canvas
+import hashlib, json, shutil
+import numpy as np
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+save=lambda p,q:p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+H=R/'kall/H120'; U=R/'kall/H119'; L=R/'kall/H113'
+K=H/'karosseri-understell'; assert not K.exists(); K.mkdir()
+meta=read(H/'delplassering-plan.json'); basis=Path(meta['egen_basis'])
+assert sha(basis)==meta['egen_basis_sha256']
+base=np.array(Image.open(basis).convert('RGBA')); size=(base.shape[1],base.shape[0])
+parts={}; rows=[]
+for name,C in [('venstre',L),('karosseri',H),('understell',U)]:
+    m=read(C/'delplassering-plan.json')
+    assert m['egen_basis_sha256']==meta['egen_basis_sha256']
+    raw,clean=decode(C/'raa.png',read(C/'kodepalett.json')['tabell'])
+    placed,position=component_on_canvas(raw,m['egen_basis_core_bbox'],size)
+    parts[name]=placed
+    rows.append(dict(rolle=name,kall=C.name,raa_sha256=sha(C/'raa.png'),**clean,**position))
+
+# Rette redigeringsvinduer i våre egne hele moduler. Skjøten bestemmes av
+# egen alfa mellom karosseriet og understellet. Ingen kildefiler åpnes.
+core=parts['understell'][:,:,3]>=128
+ys,xs=np.where(core); y0,y1=int(ys.min()),int(ys.max()+1)
+lo=y0+round((y1-y0)*.5); hi=y0+round((y1-y0)*.6)
+counts=core.sum(1); candidates=np.where(counts[lo:hi]==counts[lo:hi].min())[0]+lo
+seam=int(np.median(candidates)); band=[seam-2,seam+2]
+upper=np.zeros_like(base); upper[:band[0]]=parts['karosseri'][:band[0]]
+lower=np.zeros_like(base); lower[band[1]:]=parts['understell'][band[1]:]
+middle=np.zeros_like(base); middle[band[0]:band[1]]=parts['understell'][band[0]:band[1]]
+right=upper.copy(); right[band[0]:band[1]]=middle[band[0]:band[1]];right[band[1]:]=lower[band[1]:]
+whole=Image.alpha_composite(Image.fromarray(parts['venstre']),Image.fromarray(right))
+neck=np.zeros_like(base); xb=meta['egen_skjoet_baand'];neck[:,xb[0]:xb[1]]=base[:,xb[0]:xb[1]]
+whole=Image.alpha_composite(whole,Image.fromarray(neck))
+for name,arr in [('egen-karosseri.png',upper),('egen-understell.png',lower),('egen-horisontal-skjoet.png',middle),('egen-skjoet.png',neck)]:
+    Image.fromarray(arr).save(K/name)
+whole.save(K/'egen-sammensatt.png')
+for name in ['raa.png','kodepalett.json','delplassering-plan.json','prompt-brukt.txt','argumenter.json']:
+    shutil.copy2(H/name,K/name)
+plan=read(H/'plan.json');plan.update(kall='H120/karosseri-understell',sammensetting_ikke_nytt_bildekall=True,omfang='H113 hel venstre, H120 helt karosseri, H119 helt understell, egne smale skjøter')
+save(K/'plan.json',plan)
+save(K/'egen-del-montering.json',dict(egne_moduler=rows,egen_basis=str(basis),egen_basis_sha256=sha(basis),egen_lerret_maal=list(size),egen_horisontal_skjoet_baand=band,egen_horisontal_skjoet_sok=[lo,hi],egen_horisontal_skjoet_valg='Median av tynneste egne alfalinjer innen50..60prosent av egen høyremoduls høyde.',egen_vertikal_skjoet_baand=xb,egen_vertikal_skjoet_sha256=sha(K/'egen-skjoet.png'),egen_horisontal_skjoet_sha256=sha(K/'egen-horisontal-skjoet.png'),hele_moduler_foer_rektangulaere_redigeringsvinduer=True,kildekoordinater_til_vinduer_eller_plassering=False,originalfil_apnet=False,originalmaske=False,originalfragmenter=False,lokal_fargepaamaling=False,enkeltrekk_ikke_flyttet=True,sammensatt_sha256=sha(K/'egen-sammensatt.png')))
+print('Egne hele karosseri/understell montert ved egen alfalinje',seam,'bånd',band)

@@ -1,0 +1,66 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from PIL import Image,ImageDraw
+from smhd.myk import import_sheet
+import hashlib,json,numpy as np,re,shutil,subprocess
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-helikopter3723'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,q):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+def inventory(root):
+    with ThreadPoolExecutor(max_workers=8)as ex:return dict(ex.map(lambda p:(str(p.relative_to(root)),sha(p)),[p for p in root.rglob('*')if p.is_file()]))
+st=read(R/'start.json');assert inventory(M)==st['filer'];assert len(st['filer'])==21965
+assert all(sha(A/f)==h for f,h in st['beskyttede'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==st['stash']
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==st['remote']['hd-mod'];assert not(A/'jobber/fig178_02/resultat.png').exists()
+selected={'H120/karosseri-understell':2001,'H125':2000};entries=[]
+for cid,n in selected.items():
+    K=R/'kall'/cid;plan=read(K/'plan.json');q=read(K/'kontroll.json');f=read(K/'fargekontroll.json');code=read(K/'kodeflate-kontroll.json')
+    assert plan['utfort']and q['tekniske_porter_bestatt']and q['alle_alfa_fester_innen3HD']and f['alle_fargefester_innen3HD']
+    assert code['alle_kodefester_innen3HD']and all(e['egne_kodepiksler_over3HD_fra_kilde']==0 for e in code['farger'])
+    assert sha(K/'prototype-under-kontroll.png')==q['native_sha256']
+    q.update(valgt=True,visuell_native_kontroll=True,egenkontrollert=True,status='VALGT_EGENKONTROLLERT');save(K/'kontroll.json',q)
+    dest=R/'native'/f'costume178_{n}_hd.png';dest.parent.mkdir(exist_ok=True);assert not dest.exists();shutil.copy2(K/'prototype-under-kontroll.png',dest)
+    entries.append(dict(bilde=f'costume178_{n}',jobb='fig178_02',kostyme=178,rute=n,kall=cid,fil=f'costumes/costume178_{n}_hd.png',prototype=str(dest.relative_to(A)),sha256=sha(dest),kilde_sha256=plan['kilde_sha256'],egen_alfa=True,originalmaske=False,originalfragmenter=False,lokal_flytting_av_trekk=False,egne_redigeringsmoduler=True,egen_skjoet=True,snitt_union=q['snitt_union'],dekning=q['dekning'],marg_HD=[q['margx']*4,q['margy']*4],prototype_visuelt_sett=True,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+used={'H113':'hel egen venstremodul i2001','H119':'helt eget understell og horisontal skjøt i2001','H120':'helt eget karosseri i2001','H123':'hel egen venstremodul i2000','H125':'hel egen høyremodul og valgt hel2000'}
+calls=[]
+for K in sorted((R/'kall').iterdir()):
+    if not K.is_dir():continue
+    plan=read(K/'plan.json');assert plan['utfort']and sha(K/'raa.png')==plan['raa_sha256']
+    calls.append(dict(kall=K.name,rute=plan['rute'],raa_sha256=sha(K/'raa.png'),prompt_sha256=sha(K/'prompt-brukt.txt'),argumenter_sha256=sha(K/'argumenter.json'),piksler_brukt_i_sluttgrafikk=K.name in used,rolle=used.get(K.name,'bevart kvalitetsretur, ingen direkte sluttpiksler')))
+    if (K/'kontroll.json').exists()and K.name!='H125':
+        q=read(K/'kontroll.json');q.update(valgt=False,status='KVALITETSRETUR_HELPROTOTYPE',egen_modul_brukt=K.name in used);save(K/'kontroll.json',q)
+assert len(calls)==15;save(R/'alle-kall.json',calls)
+job=read(A/'jobber/fig178_02/jobb.json');prior=A/st['partial_rapport'];partialold=prior/'fig178_02-delresultat.png';assert sha(partialold)==st['partial_sha256']
+board=Image.open(partialold).convert('RGBA');before=np.array(board);routes=read(prior/'rutekart-fig178_02.json')['fig178_02']['ruter'];assert {e['rute']for e in routes}==set(range(2002,2010));oldroutes=list(routes)
+for e in oldroutes:e.update(tidligere_leveranse=True)
+for e in entries:
+    rt=next(v for v in job['ruter']if v['rute']==e['rute']);x,y,_,_=rt['rekt'];mx,my=e['marg_HD'];dx=(job['plassering'][0]+x)*4-mx;dy=(job['plassering'][1]+y)*4-my;im=Image.open(A/e['prototype']).convert('RGBA');board.alpha_composite(im,(dx,dy));yy,xx=np.nonzero(np.array(im)[:,:,3]>=128)
+    routes.append(dict(**e,rect=[dx+int(xx.min()),dy+int(yy.min()),int(np.ptp(xx)+1),int(np.ptp(yy)+1)],native_ok=True,native_marg_hd=e['marg_HD']))
+after=np.array(board);assert np.array_equal(after[before[:,:,3]>0],before[before[:,:,3]>0])
+for old in oldroutes:
+    x,y,w,h=old['rect'];assert np.array_equal(after[y:y+h,x:x+w],before[y:y+h,x:x+w]);assert sha(M/old['fil'])==old['sha256']
+partial=R/'fig178_02-delresultat.png';board.save(partial);mapping={'fig178_02':dict(sha256_resultat=sha(partial),delvis=True,ruter=routes)}
+save(R/'rutekart-fig178_02.json',mapping);save(R/'rutekart-samlet.json',mapping)
+D=O/'ark/fig178_02';D.mkdir(parents=True,exist_ok=True)
+for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:shutil.copy2(A/'jobber/fig178_02'/f,D/f)
+shutil.copy2(partial,D/'resultat.png');p=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(D/'resultat.png')],cwd=A,capture_output=True,text=True);log=p.stdout+p.stderr;(R/'fig178_02-egenkontroll.txt').write_text(log)
+errors=re.findall(r'^FEIL\s+(costume\d+_\d+):',log,re.M);missing=[v['bilde']for v in job['ruter']if v['bilde']not in{e['bilde']for e in routes}]
+assert set(errors)==set(missing)and len(missing)==14,log
+save(R/'delark-kontroll.json',dict(exit=p.returncode,produserte_FEIL=0,feil_kun_tomme_maal=errors,hele_arket_ferdig=False,delvis=10,ruter_totalt=24,tidligere8_delruter_RGBA_bytebevart=True,begrensning='10/24 delark.14 tomme mål gir forventet exit2. Ingen hel resultat.png leveres.'))
+rep=import_sheet(np.array(board),[v for v in job['ruter']if v['rute']in selected.values()],{e['bilde']:e['rect']for e in routes},P/'work/extract',O/'automatisk-mottak');save(R/'automatisk-mottak.json',rep)
+assert set(rep['ruter'])=={e['bilde']for e in entries};assert all(e['kilde']=='arket'and e['i_modden']and e['status']=='ok'and e['snitt_union']>=.6 and e['dekning']>=.8 for e in rep['ruter'].values()),rep
+assert not C.exists();subprocess.run(['cp','-a','--reflink=always',str(M),str(C)],check=True)
+for e in entries:
+    assert not(C/e['fil']).exists();shutil.copy2(A/e['prototype'],C/e['fil']);e['native_mottatt']=True
+meta=read(C/'mod.json');assert meta['costume_cels']==3721;meta['costume_cels']=3723;save(C/'mod.json',meta);files=inventory(C)
+assert set(files)-set(st['filer'])=={e['fil']for e in entries};assert {f for f,v in st['filer'].items()if files[f]!=v}=={'mod.json'}
+save(R/'kandidatfilhash.json',files);save(R/'egen-native.json',dict(ruter=entries,nye_native=2,native_totalt=3723,kandidat=str(C),alle_tidligere_filer_bevart=True,tidligere_filer=21965,filer=21967,diagnostisk_eksport_ikke_importert=True))
+rec=dict(jobb='fig178_02',delresultat=str(partial.relative_to(A)),sha256=sha(partial),ruter=10,ruter_totalt=24,delvis=True,levert=False,mangler=missing,egenkontrollert=True,native_mottatt=True,visuelt_kontrollert=True,motorobservert=False,publisert=False,rutekart=str((R/'rutekart-fig178_02.json').relative_to(A)),godkjent_av_Tom=False,claude_kontroll=False)
+save(R/'fremdrift.json',dict(leveranser=[],delvise_leveranser=[rec],nye_hele_jobber_levert=0,nye_egne_rutetegninger=2,nye_native=2,native_totalt=3723,grunnlag_native=3721,innebygde_bildekall=15,nye_bildekall_denne_gjenopptakingen=9,nye_raadbilder_med_direkte_sluttpiksler=5,gjenbrukte_eldre_raadbilder_med_skjotepiksler=2,laget_valgte_ruter=2,egenkontrollert=2,native_mottatt=2,visuelt_sett=2,motorobservert=0,publisert=0,Tom_godkjent=0,Claude_godkjent=0,hele_figurjobber_med_resultat=508,total_figurjobber=1758,gjenstar=1250,familie178_native=22,familie178_totalt=102,pakker_native=3713,pakker_mangler_native=10,native_frosset=False,behandlede_ruter=[2001,2000]))
+proof=Image.new('RGB',(1500,540),'#53616d');d=ImageDraw.Draw(proof)
+for row,e in enumerate(entries):
+    n=e['rute'];original=Image.open(R/f'kilder/{n}/original-1x.png').convert('RGBA');original=original.resize((original.width*4,original.height*4),Image.Resampling.NEAREST)
+    for col,im in enumerate([original,Image.open(A/e['prototype']).convert('RGBA')]):
+        x,y=10+col*750,45+row*270;d.text((x,y-30),f'{n}: '+('original4x,visning2x'if col==0 else'egen native,ekte alfa,visning2x'),fill='white');im=im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST);proof.paste(im,(x,y),im)
+proof.save(R/'to-valgte-native-kontroll2x.png')
+print('To valgte ruter. Delark10/24, alle8 tidligereRGBA bevart. Automatisk mottak2OK. Reflink-kandidat3723.')

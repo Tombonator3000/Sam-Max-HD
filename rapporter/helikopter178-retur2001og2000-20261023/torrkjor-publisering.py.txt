@@ -1,0 +1,23 @@
+from pathlib import Path
+import hashlib,json,os,subprocess
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name;C=O/'mod-helikopter3723'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def git(*args,env=None,data=None):return subprocess.check_output(['git',*args],cwd=P,env=env,input=data).decode().strip()
+def treefiles(tree):
+    out={}
+    for row in subprocess.check_output(['git','ls-tree','-rz','--full-tree',tree],cwd=P).split(b'\0'):
+        if not row:continue
+        left,name=row.split(b'\t',1);mode,kind,oid=left.split();assert kind==b'blob';out[name.decode()]=(mode.decode(),oid.decode())
+    return out
+st=read(R/'start.json');files=read(R/'kandidatfilhash.json');parent=st['remote']['hd-mod'];old=treefiles(parent);assert len(old)==21965
+index=O/'torrkjoring3723.index';assert not index.exists();env=dict(os.environ,GIT_INDEX_FILE=str(index));head=git('rev-parse','HEAD');mainindex=sha(P/'.git/index')
+git('read-tree',parent,env=env);expected=dict(old)
+manifest=dict(files);manifest.pop('SHA256SUMS');sums=''.join(h+'  '+f+'\n'for f,h in sorted(manifest.items())).encode()
+changed=set(files)-set(st['filer'])|{f for f in st['filer']if files[f]!=st['filer'][f]}|{'SHA256SUMS'}
+assert changed=={'mod.json','SHA256SUMS','costumes/costume178_2000_hd.png','costumes/costume178_2001_hd.png'}
+for f in sorted(changed):
+    data=sums if f=='SHA256SUMS'else(C/f).read_bytes();oid=git('hash-object','-w','--stdin',data=data);expected[f]=('100644',oid);git('update-index','--add','--cacheinfo','100644,'+oid+','+f,env=env)
+tree=git('write-tree',env=env);assert treefiles(tree)==expected and len(expected)==21967
+assert git('rev-parse','HEAD')==head and sha(P/'.git/index')==mainindex and not git('status','--porcelain')
+(R/'publisering-torrkjoring.json').write_text(json.dumps(dict(ingen_fjernendring=True,egen_indeks=True,hele_treet_eksakt_verifisert=True,filer=21967,endrede_eller_nye_stier=sorted(changed),alle_tidligere_stier_bevart=True,hovedindeks_og_HEAD_uendret=True,ingen_ekstra_klon_TAR_eller_modkopi=True,tree=tree),ensure_ascii=False,indent=2)+'\n')
+print('Tørrkjøring består:21967 stier, bare2 nye native og2 metadata endres. Hovedindeks/HEAD uendret. Ingen push.')

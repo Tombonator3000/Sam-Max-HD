@@ -1,0 +1,115 @@
+from pathlib import Path,PurePosixPath
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime,timezone
+import hashlib,json,os,subprocess,tarfile
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';M=P/'mods/gpt';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+C=O/'mod-helikopter3723';B=O/'mod-grunnlag3721';INDEX=O/'publisering3723.index'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,q):p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+def git(*args,env=None):return subprocess.check_output(['git',*args],cwd=P,text=True,env=env).strip()
+def gita(*args):return subprocess.check_output(['git',*args],cwd=A,text=True).strip()
+def remote(n):return git('ls-remote','origin','refs/heads/'+n).split()[0]
+def api(s):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True))
+def inventory(root):
+    with ThreadPoolExecutor(max_workers=8)as ex:return dict(ex.map(lambda p:(str(p.relative_to(root)),sha(p)),[p for p in root.rglob('*')if p.is_file()]))
+def protected(st):
+    assert len(st['beskyttede'])==1472 and all(sha(A/f)==h for f,h in st['beskyttede'].items())
+    assert git('stash','list','--format=%H').splitlines()==st['stash'] and len(st['stash'])==3
+def signature(e):return (e['id'],e['tag_name'],e['body'],sorted((a['id'],a['name'],a['size'],a['digest'])for a in e['assets']))
+
+st=read(R/'start.json');files=read(R/'kandidatfilhash.json');fin=read(R/'sluttkontroll.json');motor=read(R/'motor-sammenligning.json');entries=read(R/'egen-native.json')['ruter']
+assert not any(p.exists()for p in [B,INDEX,R/'publisering-forsokt.json'])
+assert gita('branch','--show-current')=='gpt-arbeid'and not gita('status','--porcelain')
+artifact=gita('rev-parse','HEAD');assert remote('gpt-arbeid')==artifact
+download=read(O/'grafikk-hentet-kontrollert.json');assert download['grafikk_commit']==artifact and download['alle_filhash_bekreftet']
+parent=st['remote']['hd-mod'];assert parent=='790479259111acc86aa79669751d44a3ccde2527'and remote('hd-mod')==parent
+assert inventory(M)==st['filer']and len(st['filer'])==21965
+assert inventory(C)==files and len(files)==21967;protected(st)
+assert fin['klar_for_additiv_publisering']and fin['visuelt_sett']and fin['valgte_native']==fin['motorobservert']==2 and fin['native']==3723 and fin['publisert']==0
+assert(fin['automatiske_OK'],fin['automatiske_SJEKK'])==(2,0)
+assert motor['visuelt_sett']and motor['alle2_observert']and motor['alle24_faser1998til2021_logget']and motor['originale_rektangler_med8HD_identiske']and motor['uforklarte_HD_endringer']==0
+assert motor['ingen_nye_eller_okte_bufferavvik']and motor['eksakte_bufferavvik_med_begge_RGB']and motor['atomisk_skriving_bestatt']
+assert(motor['avspillinger'],motor['kontroller_pr_side'],motor['null_pr_side'],motor['null_etter_frame40_pr_side'])==(2,160,148,120)
+visual=read(R/'motor-visuell-plan.json');assert visual['visuelt_sett']and visual['animasjonstavel']['visuelt_sett']
+for group in ['varianter','hele_motorbilder']:
+    assert len(visual[group])==2 and all(e['visuelt_sett']and sha(R/e['fil'])==e['sha256']for e in visual[group])
+assert sha(R/visual['animasjonstavel']['fil'])==visual['animasjonstavel']['sha256']
+assert{e['rute']for e in entries}=={2000,2001}and all(e['motorobservert']and e['native_mottatt']for e in entries)
+assert set(files)-set(st['filer'])=={e['fil']for e in entries}
+assert all(files[f]==h for f,h in st['filer'].items()if f!='mod.json')
+for e in entries:
+    assert files[e['fil']]==e['sha256']==sha(A/e['prototype']);K=R/'kall'/e['kall'];q=read(K/'kontroll.json');f=read(K/'fargekontroll.json');co=read(K/'kodeflate-kontroll.json')
+    assert q['tekniske_porter_bestatt']and q['alle_alfa_fester_innen3HD']and q['visuell_native_kontroll']and f['alle_fargefester_innen3HD']and co['alle_kodefester_innen3HD']and all(v['egne_kodepiksler_over3HD_fra_kilde']==0 for v in co['farger'])
+replay=read(R/'kildelos-replay.json');assert len(replay)==2 and all(e['begge_PNG_hash_eksakt_gjenlaget']and not e['originalfil_aapnet']for e in replay)
+assert len(read(R/'alle-kall.json'))==15 and len(list(A.glob('jobber/fig*/resultat.png')))==508 and not(A/'jobber/fig178_02/resultat.png').exists()
+builds={}
+for wf in ['linux.yml','windows.yml']:
+    runs=api('actions/workflows/'+wf+'/runs?per_page=30')['workflow_runs'];assert not any(e['status']!='completed'for e in runs),'Aktivt pakkebygg'
+    builds[wf]=[dict(id=e['id'],status=e['status'],conclusion=e['conclusion'])for e in runs]
+release=read(R/'release-for-publisering.json');now=api('releases?per_page=100');assert len(now)==47
+assert{e['id']:signature(e)for e in now}=={e['id']:signature(e)for e in release['alle_releaser']}
+save(R/'pakkebygg-for-publisering.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),aktive_bygg=[],siste_bygg=builds,native_frosset=False,releaser_bevart=47,pakker_native=3713))
+
+# Ett separat indeks gjenbruker eksisterende Git-objekter. Ingen full klon,
+# ekstra modkopi eller TAR-fil opprettes for publisering.
+main=git('rev-parse','HEAD');mainindex=P/'.git/index';mainindexsha=sha(mainindex)
+manifest=dict(files);manifest.pop('SHA256SUMS');(C/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n'for f,h in sorted(manifest.items())))
+publishedfiles=inventory(C);assert{f for f in files if files[f]!=publishedfiles[f]}=={'SHA256SUMS'}
+env=dict(os.environ,GIT_INDEX_FILE=str(INDEX));git('read-tree',parent,env=env)
+for f in sorted(set(publishedfiles)-set(st['filer'])|{f for f in st['filer']if publishedfiles[f]!=st['filer'][f]}):
+    oid=git('hash-object','-w',str(C/f));git('update-index','--add','--cacheinfo','100644,'+oid+','+f,env=env)
+tree=git('write-tree',env=env)
+published=git('-c','user.name=Codex','-c','user.email=noreply@openai.com','commit-tree',tree,'-m','HD-mod3723: helikopter178 fase2001 og2000, delark10 av24')
+assert git('rev-parse','HEAD')==main and sha(mainindex)==mainindexsha and not git('status','--porcelain')
+assert remote('hd-mod')==parent;protected(st)
+attempt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=artifact,grunnlag=parent,hd_mod=published,native=3723,nye_native=2,fase='push_startes',force_with_lease=True,egen_gitindeks=True,hovedindeks_bytebevart=True)
+save(R/'publisering-forsokt.json',attempt)
+subprocess.run(['git','push','-q','--force-with-lease=refs/heads/hd-mod:'+parent,'origin',published+':refs/heads/hd-mod'],cwd=P,check=True)
+assert remote('hd-mod')==published;attempt['fase']='push_bekreftet';save(R/'publisering-forsokt.json',attempt)
+print('To native pushet. Laster ned og SHA256-kontrollerer hele fjernarkivet uten å lagre TAR eller kopitre.',flush=True)
+subprocess.run(['git','fetch','-q','--no-tags','--depth','1','origin','+refs/heads/hd-mod:refs/remotes/origin/hd-mod'],cwd=P,check=True)
+assert git('rev-parse','refs/remotes/origin/hd-mod')==published
+class Reader:
+    def __init__(self,stream):self.stream=stream;self.digest=hashlib.sha256();self.size=0
+    def read(self,n=-1):
+        b=self.stream.read(n);self.digest.update(b);self.size+=len(b);return b
+actual={}
+with(O/'fjernarkiv-nedlasting.log').open('wb')as err:
+    proc=subprocess.Popen(['gh','api','repos/Tombonator3000/Sam-Max-HD/tarball/'+published],cwd=P,stdout=subprocess.PIPE,stderr=err)
+    reader=Reader(proc.stdout)
+    with tarfile.open(fileobj=reader,mode='r|*')as tar:
+        for member in tar:
+            if not member.isfile():continue
+            parts=PurePosixPath(member.name).parts;assert len(parts)>1 and '..'not in parts
+            rel='/'.join(parts[1:]);assert rel not in actual;stream=tar.extractfile(member);digest=hashlib.sha256()
+            while block:=stream.read(1024*1024):digest.update(block)
+            actual[rel]=digest.hexdigest()
+    while reader.read(1024*1024):pass
+    assert proc.wait(timeout=30)==0
+assert actual==publishedfiles and len(actual)==21967
+assert sum(f.endswith('.png')for f in actual)==21961
+assert all(actual[f]==h for f,h in st['filer'].items()if f not in ['mod.json','SHA256SUMS'])
+assert sum(f.startswith('costumes/')and f.endswith('_hd.png')for f in actual)==3723
+subprocess.run(['sha256sum','--quiet','-c','SHA256SUMS'],cwd=C,check=True)
+assert inventory(M)==st['filer']and inventory(C)==actual and remote('hd-mod')==published
+assert sha(mainindex)==mainindexsha and git('rev-parse','HEAD')==main
+attempt.update(fase='hele_fjernarkivet_nedlastet_og_hashbekreftet',filer=len(actual),nedlastet_bytes=reader.size,fjernarkiv_sha256=reader.digest.hexdigest(),TAR_lagret=False,ekstra_klon_eller_modkopi=False);save(R/'publisering-forsokt.json',attempt)
+M.rename(B);C.rename(M)
+assert inventory(M)==actual and inventory(B)==st['filer'];protected(st)
+save(R/'publiserte-moddfiler-3723.json',actual)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=artifact,hd_mod=published,native=3723,nye_native=2,egne_nye_malerier=2,nye_hele_ark=0,egenkontrollert=2,native_mottatt=2,automatiske_OK=2,automatiske_SJEKK=0,visuelt_sett=2,motorobservert=2,publisert=2,bildekall=15,nye_bildekall_denne_gjenopptakingen=9,nye_raadbilder_med_direkte_sluttpiksler=5,gjenbrukte_eldre_raadbilder_med_skjotepiksler=2,hele_figurjobber_med_resultat=508,gjenstar=1250,delark178_02=10,delark178_02_totalt=24,familie178_native=22,familie178_totalt=102,filantall=21967,png=21961,alle_filhash_bekreftet=True,hele_fjernarkivet_faktisk_nedlastet=True,nedlastet_bytes=reader.size,fjernarkiv_sha256=reader.digest.hexdigest(),TAR_lagret=False,ekstra_klon_eller_modkopi=False,alle_tidligere_stier_bevart=True,tidligere_filer_bevart=21965,tidligere_png_bevart=21959,beskyttede=1472,stasher=st['stash'],force_with_lease=True,gammel_mod_bevart=str(B),godkjent_av_Tom=False,claude_kontroll=False,i_fellespakke=False,pakker_native=3713,pakker_mangler_native=10,native_frosset=False,begrensning=motor['begrensning'])
+save(R/'mottak-publisert.json',receipt)
+for name in ['fremdrift.json','sluttkontroll.json']:
+    q=read(R/name);q.update(hd_mod=published,grafikkilde=artifact,native=3723,publisert=2,publisert_native_naa=3723,nye_native_publisert=2)
+    for e in q.get('delvise_leveranser',[]):e.update(publisert=True,publiserte_ruter=e['ruter'],hd_mod=published)
+    save(R/name,q)
+for name in ['rutekart-fig178_02.json','rutekart-samlet.json']:
+    q=read(R/name)
+    for e in q['fig178_02']['ruter']:e.update(publisert=True,hd_mod=published)
+    save(R/name,q)
+q=read(R/'egen-native.json');q.update(publisert=True,hd_mod=published)
+for e in q['ruter']:
+    e.update(publisert=True,hd_mod=published);K=R/'kall'/e['kall'];qq=read(K/'kontroll.json');qq.update(publisert=True,hd_mod=published);save(K/'kontroll.json',qq)
+save(R/'egen-native.json',q);attempt.update(fase='publisert_hentet_bekreftet_lokalt_mottatt',alle_filhash_bekreftet=True);save(R/'publisering-forsokt.json',attempt)
+print(json.dumps({k:receipt[k]for k in ['hd_mod','native','nye_native','filantall','png','alle_filhash_bekreftet','nedlastet_bytes']}),flush=True)

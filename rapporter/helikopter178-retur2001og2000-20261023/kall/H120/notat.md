@@ -1,0 +1,1 @@
+Faktisk innebygd image_gen-kall H120. Rolle: helt eget karosseri i2001. Faktisk prompt i prompt-brukt.txt, verktøyargumenter i argumenter.json, råbilde og inputhash i plan.json. Modellnavn ikke oppgitt av verktøyet. Beskyttede jobbfiler urørt. Se RAPPORT.md og individuelle kontroller.

@@ -1,9 +1,7 @@
-# Returer for 2001 og neste 2000
+# Løste returer og neste arbeid
 
-Seks innebygde bildekall H111..H116 er utført for 2001. Ingen ny native er godkjent for mottak. 2000 er ikke nytegnet.
+2001 og2000 er nå valgt, egenkontrollert, native mottatt, visuelt sett og motorobservert.2001 er H120/karosseri-understell med hele egne H113/H120/H119-moduler og H077-halsbånd.2000 er H125 med hele H123/H125-moduler og H078-halsbånd. Ingen ny Tom-/Claude-godkjenning. Publiseringskvitteringen kommer i mottak-publisert.json.
 
-H111-venstre og H112-høyre ble samlet som H112. Alfa og åpninger består; to fargeområder feiler. H113-venstre retter mørkegrønn/mørkerød/mørkegrønn nederst på halen og kan gjenbrukes som hel venstremodul. H113 kombinert med H112-høyre mangler bare det sjeldne feltet på kildecelle 56,1. H114 flytter felt og mister andre fester. H115 beholder mer geometri, men får ikke med det sjeldne feltet. Begge er kvalitetsreturer som hele prototyper.
+H111..H124 er ikke valgt som hele prototyper. Bare hele H113-venstre, H119-understell, H120-karosseri og H123-venstre bidrar direkte i valgte sluttbilder; H125 bidrar høyre. Alle faktiske prompter og15 råbilder bevares. Globale kodeomlegginger og hele egne redigeringsvinduer er dokumentert. Ingen originalmasker eller lokale trekkflyttinger.
 
-H116 bruker en tydeligere kremkode for hele kildefargeklassen RGB(195,103,7), med global kodeomlegging av hele egne tegningen og uendret alfa. Det sjeldne feltet er nå til stede. Ett annet grønt fargefeste mangler og cyan/krem har noen ekstra kodepiksler. Helplassering er målt; beste helflytt har fortsatt avvik og er ikke anvendt. Ingen kontrollgrense er lempet og ingen kildemaske, kildefragment, lokal fargepåmaling eller flytting av enkeltrekk er brukt.
-
-Neste bildekall H117 er ikke utført eller reservert. Se NESTE.md. Publiserte 2002..2009 og fig178_03 skal ikke tegnes om.
+Neste rest i dette arket er1986..1999.1990 krever ny hel originalkilde. Se NESTE.md.2000..2009 og komplett fig178_03 skal ikke gjentas.

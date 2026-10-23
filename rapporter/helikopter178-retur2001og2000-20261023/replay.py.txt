@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+from own_parts import decode,component_on_canvas
+from smhd.myk import _premul_resize
+import hashlib,json,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=[]
+for cid,bid,ids in [('H120/karosseri-understell','H077',['H113','H120','H119']),('H125','H078',['H123','H125'])]:
+    K=R/'kall'/cid;B=R/'basis'/bid;m=read(K/'delplassering-plan.json');base,_=decode(B/'raa.png',read(B/'egen-basis-kodepalett.json')['tabell'])
+    assert np.array_equal(base,np.array(Image.open(m['egen_basis']).convert('RGBA')));size=(base.shape[1],base.shape[0]);parts=[];raws=[B/'raa.png']
+    for name in ids:
+        C=R/'kall'/name;part,_=decode(C/'raa.png',read(C/'kodepalett.json')['tabell']);placed,_=component_on_canvas(part,read(C/'delplassering-plan.json')['egen_basis_core_bbox'],size);parts.append(placed);raws.append(C/'raa.png')
+    if len(parts)==3:
+        mm=read(K/'egen-del-montering.json');core=parts[2][:,:,3]>=128;ys,xs=np.where(core);y0,y1=int(ys.min()),int(ys.max()+1);lo=y0+round((y1-y0)*.5);hi=y0+round((y1-y0)*.6);counts=core.sum(1);cs=np.where(counts[lo:hi]==counts[lo:hi].min())[0]+lo;seam=int(np.median(cs));band=[seam-2,seam+2]
+        assert band==mm['egen_horisontal_skjoet_baand'];right=parts[2].copy();right[:band[0]]=parts[1][:band[0]];whole=Image.alpha_composite(Image.fromarray(parts[0]),Image.fromarray(right))
+    else:whole=Image.alpha_composite(Image.fromarray(parts[0]),Image.fromarray(parts[1]))
+    xb=m['egen_skjoet_baand'];neck=np.zeros_like(base);neck[:,xb[0]:xb[1]]=base[:,xb[0]:xb[1]];assert np.array_equal(neck,np.array(Image.open(K/'egen-skjoet.png')))
+    whole=np.array(Image.alpha_composite(whole,Image.fromarray(neck)));assert np.array_equal(whole,np.array(Image.open(K/'egen-renset.png')))
+    q=read(K/'kontroll.json');sx,sy=q['hel_skala'];scaled=_premul_resize(whole,(round(whole.shape[1]*sx),round(whole.shape[0]*sy)));native=np.zeros((q['native_maal'][1],q['native_maal'][0],4),np.uint8);x,y=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];h,w=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,native.shape[1]),min(y+h,native.shape[0]);native[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x];assert np.array_equal(native,np.array(Image.open(K/'prototype-under-kontroll.png')))
+    D=O/'kildelos-replay'/str(q['rute']);D.mkdir(parents=True,exist_ok=True);Image.fromarray(whole).save(D/'egen-renset.png');Image.fromarray(native).save(D/'native.png');assert sha(D/'egen-renset.png')==sha(K/'egen-renset.png')and sha(D/'native.png')==sha(K/'prototype-under-kontroll.png')
+    rows.append(dict(kall=cid,rute=q['rute'],raws=[dict(fil=str(p),sha256=sha(p))for p in raws],egen_RGBA_sha256=sha(D/'egen-renset.png'),native_sha256=sha(D/'native.png'),begge_PNG_hash_eksakt_gjenlaget=True,originalfil_aapnet=False,originalmaske=False,kildekoordinater_til_plassering=False,egne_rektangulaere_redigeringsmoduler=True,smale_skjoeter_fra_egne_tegninger=True,enkeltrekk_ikke_flyttet=True))
+(R/'kildelos-replay.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');print('Begge egne RGBA/native PNG gjenlaget byteeksakt fra egne råbilder. Ingen originalfiler åpnet.')
