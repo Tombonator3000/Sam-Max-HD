@@ -1,5 +1,19 @@
 # Grafikkliste
 
+<!-- helikopter178-fargefaser-status:start -->
+To nye egne helikopterfaser er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert:costume178_2014/H026 og2015/H024. fig178_03 er delvis8/12,familien8/102. Alle tidligere2016..2021 og deres delarkpiksler er bevart. Ti nye faktiske innebygde bildekall gir to valgte og åtte kvalitetsreturer. Original egenkontroll gir6/10 OK på delarket,fire mål er tomme;tidligere2020/2021 hoppes over som masker under20 kildepiksler. Automatisk mottak av bare de to nye gir2 OK,0 SJEKK. Ingen ny Tom-/Claude-godkjenning.
+
+Publisert hd-mod 9075cd8188ba88f50536fae463a9f833821c0025,grafikkilde 536c8b263518aaec434dc8dc31b7ee0dde6ffb12,har3709 native. Alle21953 filhash er hentet tilbake og kontrollert. Alle21951 tidligere filstier og21945 tidligere PNG-hash er bevart. Alle1472 beskyttede input og tre opprinnelige stasher er uendret. Alle valgte farge-,alfa- og åpningfester er innen3HD,maks3HD. Begge har to egne atskilte deler,som originalen. H023 hadde tre tydelig atskilte egne brune RGB-klynger som ble kalibrert globalt uten kildekoordinater;den rensede egne tegningen var redigeringsmål forH024. Egen alfa,ingen originalmaskeklipp,originalfragmenter,lokale trekkflyttinger,største-komponent-rensing eller CLI/API-bildefallback.
+
+To ferske kontrollerte Linux-avspillinger med nedlastet128c9c11 er kjørt ved pos160,60,zclip0,rom35,kostyme178,anim1 og aktør29. Denne posisjonen holder sluttfasene helt synlige. Begge har160 bufferkontroller/148 null og120/120 null etter frame40. De12 kjente inngangsavvikene er identiske i koordinater og begge RGB-verdier. Originalrektangler med8HD naboområde er identiske,ingen uforklarte HD-endringer,atomisk lagring består. To hele motorbilder,to komplette før/etter-par,alle12 sluttfaser,valgte native og delark er visuelt sett.53 faser logget,ikke alle102;andre aktører og romskript kjører. Ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller samlet sluttgodkjenning.
+
+2013 gjenstår som fargeretur. H028 beskrev første strek feil som55,115,151;kilden er71,71,151. Separat H029 korrigerer premisset,men har fortsatt kuttet=True og fargefeil. Mørkebrun83 hører til den korte mellomstreken,ikke en ny skyggeflate på hovedposten. Ingen2013-kandidat importeres. Neste nye178-kallH030 er ikke utført eller reservert.2010..2012 er ikke laget og skal ses enkeltvis mot kontekst og Sam-master før nytegning. Ingen ny nødvendig designavklaring.
+
+Felles Linux/Windows isblokk er fortsatt3701 og mangler åtte ruter. Begge faktiske pakker er tidligere kontrollert;de kalles ikke oppdatert. Ved neste fulle ark-/familiesamlepunkt eller avslutning skal begge oppdateres med nedlasting,sjekksummer og full filkontroll. Hele figurjobber507/1758,1251 uten pluss returer/sluttkontroll. Les rapporter/helikopter178-fargefaser-20261023/NESTE.md og RETUR.md før neste produksjon. Neste137-kallV013 og296-kallS037 er uendret og ikke utført. Automatikken er ACTIVE;all grafikk er ikke ferdig. Ingen grafikk til main,motor-/pipelinekodeendring eller gammel nattevakt.
+<!-- helikopter178-fargefaser-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-mellomfaser-status:start -->
 To nye egne helikopterfaser er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert:costume178_2016/H017 og2017/H014. fig178_03 er delvis6/12,familien6/102. Alle2018..2021 og deres delarkpiksler er bevart. Seks nye innebygde bildekall gir to valgte og fire kvalitetsreturer. Originalkontroll gir4/10 OK på delarket,seks mål er fortsatt tomme;tidligere2020/2021 hoppes over som masker under20 kildemaskepiksler. Automatisk mottak av bare de to nye gir2 OK,0 SJEKK. Ingen ny Tom-/Claude-godkjenning.
 
