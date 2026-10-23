@@ -1,0 +1,1 @@
+Faktisk innebygd image_gen-kall H103. Rolle: valgt ny høyremodul og hel2004. Se plan.json, argumenter.json, prompt-brukt.txt, individuelle kontroller og rapportens RETUR.md. Beskyttede jobbfiler er urørt.

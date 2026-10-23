@@ -1,0 +1,1 @@
+Faktisk innebygd image_gen-kall H110. Rolle: valgt ny venstremodul og hel2002. Se plan.json, argumenter.json, prompt-brukt.txt, individuelle kontroller og rapportens RETUR.md. Beskyttede jobbfiler er urørt.

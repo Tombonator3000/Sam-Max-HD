@@ -1,0 +1,58 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json, re, shutil, sys
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+marker = 'helikopter178-retur2004-2002-status'
+base = f'''Åtte faktiske innebygde image_gen-kall H103..H110 har gitt to valgte hele sprites, 2004/H103 og 2002/H110. De er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning. Fig178_02 er 8/24 med 2002..2009, familien 178 er 20/102. Hele figurjobber er fortsatt 508/1758, 1250 uten resultat, pluss returer og sluttkontroll. Åtte bildekall er ikke åtte leverte figurjobber.
+
+2004 bruker ny H103-høyremodul, egen tidligere H094-venstre og et smalt skjøtebånd fra egen H093. Den manglende gjennomsiktige cellen 33,11 er gjenopprettet av image_gen. 2002 bruker ny H110-venstre, egen H109-høyre og smalt skjøtebånd fra egen H076. Tre små åpninger og kildebestemte hvite, lilla, grå, røde og brune felt er rettet før mottak. Tre nye råbilder og tre eldre egne råbilder bidrar sluttpiksler. H105, H107 og H109 er returer som hele prototyper; H109 bidrar bare sin hele høyremodul. H104, H106 og H108 er avviste venstremoduler uten sluttpiksler.
+
+Begge originaler er sett hele i spillkontekst, og godkjent Sam-hovedark er sett før hvert motiv. Modulplasseringen bruker bare egne mål og alfakolonner. Markerte rettingsguider er bare bildeforklaringer til image_gen. Ingen originalmasker, kildefragmenter, kildekoordinater til delplassering, lokal fargepåmaling eller flytting av enkeltrekk. Begge består alle sterke alfa-, åpnings-, nativefarge- og kodefester innen uendret 3 HD, med null ekstra rene kodepiksler over 3 HD. IoU/dekning er 0,990/0,996 og 0,953/0,974. Kildeløs replay gjenlager begge egne RGBA og native PNG byteeksakt. Original egenkontroll gir 8 OK og 16 tomme mål, forventet exit 2. Automatisk mottak gir 2 OK og 0 SJEKK. Alle seks tidligere delruters RGBA og nativehash er bevart. Ingen hel jobb/resultat.png leveres. Ingen motor-/pipelinekodeendring.
+
+To ferske kontrollerte avspillinger med faktisk nedlastet Linux-binær 4e32ae90 sammenligner 3719/3721 i rom 35, aktør 29, kostyme 178, animasjon 1, posisjon 160,60, zclip0. Begge har 160 kontroller/148 null, 120/120 null etter frame 40. Tolv kjente inngangsavvik er identiske i koordinater og begge RGB. Originalrektangler med 8 HD naboområde er identiske. De to nye rutene endrer 6590 og 7399 synlige HD-piksler. Ingen uforklarte HD-endringer, atomisk lagring består. Begge hele motorbilder, før/etter-par, native, delark, gråtavle og 24 sekvensfaser 1998..2021 er visuelt sett. 53 kilder er logget. Ikke alle 102 familieruter eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+Gjenoppta rapporter/{O.name}/NESTE.md og RETUR.md. Neste returer er 2001/H077 og 2000/H078 fra returforfaserapporten. De er ikke nytegnet her. 1990 trenger ny hel originalkilde. 2002..2009 og komplett fig178_03/2010..2021 skal ikke gjentas. Neste 178-kall H111 er ikke utført eller reservert. 137/V013 og 296/S037 er uendret.
+
+Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes med lokal kontroll av delark, motor og publiserte filhash. Felles Linux/Windows helikopter-utgave har fortsatt 3713 og mangler åtte etter publisering. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning med nedlasting, sjekksummer og grafikkinnhold kontrollert. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE, all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattprosess.'''
+
+def prepend(path, text):
+    s = path.read_text()
+    s = re.sub(r'<!-- ' + marker + r':start -->.*?<!-- ' + marker + r':slutt -->\n*', '', s, flags=re.S)
+    lines = s.splitlines(keepends=True)
+    path.write_text(lines[0].rstrip() + '\n\n<!-- ' + marker + ':start -->\n' + text + '\n<!-- ' + marker + ':slutt -->\n\nTidligere status nedenfor er historikk.\n\n' + ''.join(lines[1:]).lstrip().rstrip() + '\n')
+
+mode = sys.argv[1]
+assert mode in ['grafikk', 'etter']
+note = A / 'jobber/fig178_02/notat.md'
+if mode == 'grafikk':
+    text = 'Klar for additiv publisering av to nye native fra 3719 til 3721. Endelig fjern-SHA og hentet publiseringsbevis følger i mottak-publisert.json.\n\n' + base
+    for f in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+        prepend(A / f, text)
+    key = '## 2026-10-23: H103..H110, rettet fase 2004 og 2002'
+    assert key not in note.read_text()
+    note.write_text(note.read_text().rstrip() + '\n\n' + key + '\n\n' + text + '\n')
+else:
+    r = read(R / 'mottak-publisert.json')
+    assert r['alle_filhash_bekreftet'] and r['native'] == 3721 and r['nye_native'] == 2
+    proof = f'''Publisert hd-mod {r['hd_mod']} har 3721 native. Grafikkilde er gpt-arbeid {r['grafikkilde']}. Alle 21965 publiserte filhash er hentet tilbake og kontrollert. Alle 21963 tidligere stier og 21957 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3719-grunnlaget er bevart under out. Bare to nye native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.'''
+    text = proof + '\n\n' + base
+    for f in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+        prepend(A / f, text)
+    for f in ['memory.md', 'todo.md', 'STATUS.md']:
+        prepend(P / f, text)
+    stamp = datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+    log = P / 'log.md'
+    log.write_text(log.read_text().rstrip() + '\n\n## ' + stamp + ' (Codex)\n\n' + text + '\n')
+    report = R / 'RAPPORT.md'
+    report.write_text(report.read_text().rstrip() + '\n\n' + proof + '\n')
+    note.write_text(note.read_text().rstrip() + '\n\nPubliseringskvittering: ' + proof + '\n')
+    shutil.copy2(O / 'grafikk-hentet-kontrollert.json', R / 'grafikk-kilde-hentet-kontrollert.json')
+for f in O.glob('*.py'):
+    shutil.copy2(f, R / (f.name + '.txt'))
+print('Notater oppdatert:', mode)

@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+from own_parts import decode,component_on_canvas
+from smhd.myk import _premul_resize
+import hashlib,json,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=[]
+configs=[('H103',R/'basis/H093','kodepalett.json',R/'gjenbruk/H094',R/'kall/H103'),('H110',R/'basis/H076','egen-basis-kodepalett.json',R/'kall/H110',R/'kall/H109')]
+for cid,B,palette,L,H in configs:
+ K=R/'kall'/cid;m=read(K/'delplassering-plan.json');base,_=decode(B/'raa.png',read(B/palette)['tabell']);assert np.array_equal(base,np.array(Image.open(m['egen_basis']).convert('RGBA')));whole=Image.new('RGBA',(base.shape[1],base.shape[0]));raws=[B/'raa.png']
+ for C in [L,H]:
+  meta=read(C/'delplassering-plan.json');part,_=decode(C/'raa.png',read(C/'kodepalett.json')['tabell']);placed,_=component_on_canvas(part,meta['egen_basis_core_bbox'],whole.size);whole=Image.alpha_composite(whole,Image.fromarray(placed));raws.append(C/'raa.png')
+ band=m['egen_skjoet_baand'];join=np.zeros_like(base);join[:,band[0]:band[1]]=base[:,band[0]:band[1]];assert np.array_equal(join,np.array(Image.open(K/'egen-skjoet.png')));whole=np.array(Image.alpha_composite(whole,Image.fromarray(join)));assert np.array_equal(whole,np.array(Image.open(K/'egen-renset.png')))
+ q=read(K/'kontroll.json');sx,sy=q['hel_skala'];scaled=_premul_resize(whole,(round(whole.shape[1]*sx),round(whole.shape[0]*sy)));native=np.zeros((q['native_maal'][1],q['native_maal'][0],4),np.uint8);x,y=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];h,w=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,native.shape[1]),min(y+h,native.shape[0]);native[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x];assert np.array_equal(native,np.array(Image.open(K/'prototype-under-kontroll.png')))
+ D=O/'kildelos-replay'/cid;D.mkdir(parents=True,exist_ok=True);Image.fromarray(whole).save(D/'egen-renset.png');Image.fromarray(native).save(D/'native.png');assert sha(D/'egen-renset.png')==sha(K/'egen-renset.png')and sha(D/'native.png')==sha(K/'prototype-under-kontroll.png');rows.append(dict(kall=cid,rute=q['rute'],raws=[dict(fil=str(p),sha256=sha(p))for p in raws],egen_RGBA_sha256=sha(D/'egen-renset.png'),native_sha256=sha(D/'native.png'),begge_PNG_hash_eksakt_gjenlaget=True,originalfil_aapnet=False,originalmaske=False,kildekoordinater_til_plassering=False,egne_rektangulaere_redigeringsmoduler=True,smal_skjoet_fra_egen_eldre_tegning=True,enkeltrekk_ikke_flyttet=True))
+(R/'kildelos-replay.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');print('Begge egne RGBA/native PNG gjenlaget byteeksakt fra egne råbilder. Ingen originaler åpnet.')

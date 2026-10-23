@@ -1,0 +1,58 @@
+from pathlib import Path
+from functools import lru_cache
+import json,hashlib,re,gzip,shutil
+from PIL import Image,ImageDraw
+import numpy as np
+from scipy import ndimage as nd
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+@lru_cache(maxsize=8)
+def pic(s,flat=False):
+ p=Path(s);p=p.with_name(p.stem+'_flat.png')if flat else p;return np.array(Image.open(p).convert('RGB'))
+def box(e):
+ x,y=e['pos'];w,h=e['maal'];return [max(0,x*4-8),max(0,y*4-8),min(1280,(x+w)*4+8),min(800,(y+h)*4+8)]
+def buffers(proof,directory):
+ out=[]
+ for e in proof['kontroller']:
+  if not e['avvik']:continue
+  f=e['frame'];s=np.array(Image.open(directory/f'frame_{f:06}_screen.png').convert('RGB'));paths=[p for p in directory.glob(f'frame_{f:06}_room*.png')if not p.stem.endswith('_flat')];assert len(paths)==1;b=np.array(Image.open(paths[0]).convert('RGB'));y,x=np.where(np.any(s!=b,2));assert len(x)==e['avvik'];out.append(dict(frame=f,avvik=len(x),koordinater_og_begge_RGB_sha256=hashlib.sha256(np.stack([x,y],1).tobytes()+s[y,x].tobytes()+b[y,x].tobytes()).hexdigest()))
+ return out
+bn,cn='grunnlag3719-start1-y60','kandidat3721-start1-y60';old,new=read(R/(bn+'.json')),read(R/(cn+'.json'))
+for name,pr,nat in [(bn,old,3719),(cn,new,3721)]:
+ assert pr['exit']==0 and pr['native_antall']==nat and len(pr['kontroller'])==160 and pr['nullkontroller']==148
+ assert sum(e['frame']>40 and e['avvik']==0 for e in pr['kontroller'])==120
+ assert pr['binar_sha256']=='4e32ae906ee610e1383b98143301b9aa17b01b726cd61efdf7ac441de36165bf'
+ assert pr['miljo']['DIGHD_TEST_POS']=='160,60'
+ assert pr['zclip0'] and pr['testaktor29_konstruert_for_helanimasjon'] and not pr['full_naturlig_gjennomspilling']
+ assert {f'costume178_{n}'for n in range(1998,2022)}<=set(pr['tegninger'])
+ log=(O/name/'scummvm.log').read_text();assert "Couldn't save file"not in log and not list((O/name).glob('*.tmp'))
+ trace=(O/name/'filoperasjoner.strace').read_text();ops=[s for s in trace.splitlines()if ' rename('in s];assert len(ops)>=160 and all(s.endswith('= 0')for s in ops)
+ with gzip.open(R/(name+'-rename.strace.gz'),'wb')as f:f.write(trace.encode())
+bo,bnew=buffers(old,O/bn),buffers(new,O/cn);assert bo==bnew and len(bo)==12 and all(e['frame']<40 for e in bo)
+save(R/'motor-bufferkontroll.json',dict(grunnlag=bo,kandidat=bnew,ingen_nye_eller_okte=True,eksakte_koordinater_og_begge_RGB=True))
+cycles=read(P/'work/extract/rooms.json')['rooms']['35']['cycles'];indices=[i for l,h,*rest in cycles for i in range(l,h+1)];room_idx=np.array(Image.open(P/'mods/gpt/rooms/room035_idx.png'));assert old['miljo']['DIGHD_TEST_CAMX']==new['miljo']['DIGHD_TEST_CAMX']=='160';cycle_mask=np.repeat(np.repeat(nd.maximum_filter(np.isin(room_idx,indices),size=3),4,0),4,1)[:800,:1280]
+entries=read(R/'egen-native.json')['ruter'];rows=[];visual=dict(varianter=[],hele_motorbilder=[],animasjon=[],visuelt_sett=False)
+for e in entries:
+ name=e['bilde'];found=None
+ for ne in[q for q in new['hendelser']if q['cel']==e['rute']]:
+  rect=box(ne);x0,y0,x1,y1=rect;nf=pic(ne['fil'],True)
+  for oe in sorted([q for q in old['hendelser']if q['cel']==e['rute']and q['pos']==ne['pos']and q['maal']==ne['maal']],key=lambda q:abs(q['bildeframe']-ne['bildeframe'])):
+   of=pic(oe['fil'],True)
+   if np.array_equal(of[y0:y1,x0:x1],nf[y0:y1,x0:x1]):found=oe,ne,rect;break
+  if found:break
+ assert found,(name,'Ingen identisk original med naboområde')
+ oe,ne,rect=found;x0,y0,x1,y1=rect;ob,nb=pic(oe['fil']),pic(ne['fil']);of,nf=pic(oe['fil'],True),pic(ne['fil'],True);delta=np.any(ob!=nb,2);origdelta=np.any(of!=nf,2);allowed=np.zeros(delta.shape,bool);allowed[y0:y1,x0:x1]=True;unknown=delta&~allowed&~nd.maximum_filter(origdelta,size=9)&~cycle_mask
+ assert not unknown.any(),(name,'uforklarte HD-piksler',int(unknown.sum()));assert delta[allowed].any(),(name,'Ingen synlig HD')
+ q=dict(bilde=name,native_sha256=e['sha256'],grunnlag_fil=oe['fil'],kandidat_fil=ne['fil'],grunnlag_frame=oe['bildeframe'],kandidat_frame=ne['bildeframe'],original_rekt_med8HD_identisk=True,original_rekt_sha256=hashlib.sha256(of[y0:y1,x0:x1].tobytes()).hexdigest(),aktor_rekt=rect,endrede_HD_piksler_i_rekt=int(delta[allowed].sum()),uforklarte_HD_endringer=0,visuelt_sett=False);rows.append(q)
+ cellw=(x1-x0)*4+30;cellh=(y1-y0)*4+70;board=Image.new('RGB',(cellw*2,cellh),'#304050');d=ImageDraw.Draw(board);d.text((10,10),name+' / grunnlag3719 venstre, kandidat3721 hoyre / 4x visningszoom',fill='white')
+ for j,p in enumerate([oe['fil'],ne['fil']]):
+  v=Image.open(p).convert('RGB').crop(rect);v=v.resize((v.width*4,v.height*4),Image.Resampling.NEAREST);board.paste(v,(10+j*cellw,50))
+ p=R/(name+'-motor-for-etter.png');board.save(p);visual['varianter'].append(dict(fil=p.name,sha256=sha(p),bilde=name,visuelt_sett=False));p=R/(name+'-motor3721.png');shutil.copy2(ne['fil'],p);visual['hele_motorbilder'].append(dict(fil=p.name,sha256=sha(p),bilde=name,visuelt_sett=False));print(name,'motorobservert',q['endrede_HD_piksler_i_rekt'],'nye synligeHD-piksler',flush=True)
+board=Image.new('RGB',(1600,1800),'#304050');d=ImageDraw.Draw(board)
+for i,n in enumerate(range(1998,2022)):
+ ev=new['tegninger'][f'costume178_{n}'];b=box(ev);v=Image.open(ev['fil']).convert('RGB').crop(b);v=v.resize((v.width*3,v.height*3),Image.Resampling.NEAREST);v.thumbnail((385,240));x,y=i%4*400,i//4*300;board.paste(v,(x+6,y+45));d.text((x+6,y+10),str(n)+(' ny egen HD'if n in [2002,2004]else(' tidligere egen HD'if n in [2003,2005,2006,2007,2008,2009]+list(range(2010,2022))else' uendret original/fallback')),fill='white');visual['animasjon'].append(dict(rute=n,fil=ev['fil'],sha256=ev['sha256'],ny_native=n in [2002,2004]))
+p=R/'fig178_02-motor-24faser.png';board.save(p);visual['animasjonstavel']=dict(fil=p.name,sha256=sha(p),visuelt_sett=False)
+save(R/'motor-pikselkontroll.json',rows);save(R/'motor-visuell-plan.json',visual)
+save(R/'motor-sammenligning.json',dict(nye_native=2,native=3721,avspillinger=2,kontroller_pr_side=160,null_pr_side=148,null_etter_frame40_pr_side=120,alle2_observert=True,alle24_faser1998til2021_logget=True,kildefaser_logget=53,hele102_familien_observert=False,originale_rektangler_med8HD_identiske=True,uforklarte_HD_endringer=0,ingen_nye_eller_okte_bufferavvik=True,eksakte_bufferavvik_med_begge_RGB=True,atomisk_skriving_bestatt=True,visuelt_sett=False,ny_interaktiv_Windows=False,ny_webtest=False,full_naturlig_gjennomspilling=False,Tom_godkjent=False,Claude_godkjent=False,begrensning='To ferske kontrollerte avspillinger i rom35 med aktør29,kostyme178,anim1,zclip0 og pos160,60.53 kildefaser logget,alle24 i sekvensutvalg sett etter separat visuell gjennomgang.12 kjente inngangsavvik før frame40 må være helt identiske. Ikke naturlig full gjennomspilling eller alle102 familieruter.'))
+shutil.copy2(O/'motor.py',R/'motor.py.txt');shutil.copy2(__file__,R/'analyser.py.txt')

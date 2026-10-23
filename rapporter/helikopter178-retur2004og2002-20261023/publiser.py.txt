@@ -1,0 +1,171 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+import hashlib, json, subprocess, tarfile
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+M = P / 'mods/gpt'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+C = O / 'mod-helikopter3721'
+T = O / 'publisering-hdmod3721'
+H = O / 'hentet-hdmod3721'
+B = O / 'mod-grunnlag3719'
+S = P / 'mods/.gpt-adopsjon-3721'
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p, q): p.write_text(json.dumps(q, ensure_ascii=False, indent=2) + '\n')
+def git(p, *args): return subprocess.check_output(['git', *args], cwd=p, text=True).strip()
+def remote(branch): return git(P, 'ls-remote', 'origin', 'refs/heads/' + branch).split()[0]
+def api(s): return json.loads(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/' + s], cwd=P, text=True))
+def inventory(root):
+    files = [p for p in root.rglob('*') if p.is_file() and '.git' not in p.relative_to(root).parts]
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return dict(pool.map(lambda p: (p.relative_to(root).as_posix(), sha(p)), files))
+def copy(src, dst):
+    assert not dst.exists()
+    subprocess.run(['cp', '-a', '--reflink=always', str(src), str(dst)], check=True)
+def protected(st):
+    assert len(st['beskyttede']) == 1472
+    assert all(sha(A / f) == h for f, h in st['beskyttede'].items())
+    assert git(P, 'stash', 'list', '--format=%H').splitlines() == st['stash']
+def release_signature(e):
+    return (e['id'], e['tag_name'], e['body'], sorted((a['id'], a['name'], a['size'], a['digest']) for a in e['assets']))
+
+st = read(R / 'start.json')
+files = read(R / 'kandidatfilhash.json')
+fin = read(R / 'sluttkontroll.json')
+motor = read(R / 'motor-sammenligning.json')
+entries = read(R / 'egen-native.json')['ruter']
+assert not any(p.exists() for p in [T, H, B, S, R / 'publisering-forsokt.json'])
+assert git(A, 'branch', '--show-current') == 'gpt-arbeid' and not git(A, 'status', '--porcelain')
+artifact = git(A, 'rev-parse', 'HEAD')
+assert remote('gpt-arbeid') == artifact
+download = read(O / 'grafikk-hentet-kontrollert.json')
+assert download['grafikk_commit'] == artifact and download['alle_filhash_bekreftet']
+parent = st['remote']['hd-mod']
+assert parent == '2228e137de73ca178318a7d3657dd7b4aeddc805' and remote('hd-mod') == parent
+assert inventory(M) == st['filer'] and len(st['filer']) == 21963
+assert inventory(C) == files and len(files) == 21965
+protected(st)
+assert fin['klar_for_additiv_publisering'] and fin['visuelt_sett']
+assert fin['valgte_native'] == fin['motorobservert'] == 2 and fin['native'] == 3721 and fin['publisert'] == 0
+assert (fin['automatiske_OK'], fin['automatiske_SJEKK']) == (2, 0)
+assert motor['visuelt_sett'] and motor['alle2_observert'] and motor['alle24_faser1998til2021_logget']
+assert motor['originale_rektangler_med8HD_identiske'] and motor['uforklarte_HD_endringer'] == 0
+assert motor['ingen_nye_eller_okte_bufferavvik'] and motor['eksakte_bufferavvik_med_begge_RGB'] and motor['atomisk_skriving_bestatt']
+assert (motor['avspillinger'], motor['kontroller_pr_side'], motor['null_pr_side'], motor['null_etter_frame40_pr_side']) == (2, 160, 148, 120)
+visual = read(R / 'motor-visuell-plan.json')
+assert visual['visuelt_sett'] and visual['animasjonstavel']['visuelt_sett']
+assert sha(R / visual['animasjonstavel']['fil']) == visual['animasjonstavel']['sha256']
+for group in ['varianter', 'hele_motorbilder']:
+    assert len(visual[group]) == 2
+    assert all(e['visuelt_sett'] and sha(R / e['fil']) == e['sha256'] for e in visual[group])
+assert {e['rute'] for e in entries} == {2002, 2004}
+assert all(e['motorobservert'] and e['native_mottatt'] for e in entries)
+assert set(files) - set(st['filer']) == {e['fil'] for e in entries}
+assert all(files[f] == h for f, h in st['filer'].items() if f != 'mod.json')
+assert all(files[e['fil']] == e['sha256'] == sha(A / e['prototype']) for e in entries)
+for c in ['H103', 'H110']:
+    K = R / 'kall' / c
+    q, f, code = read(K / 'kontroll.json'), read(K / 'fargekontroll.json'), read(K / 'kodeflate-kontroll.json')
+    assert q['tekniske_porter_bestatt'] and q['alle_alfa_fester_innen3HD'] and q['visuell_native_kontroll'] and f['alle_fargefester_innen3HD']
+    assert code['alle_kodefester_innen3HD'] and all(e['egne_kodepiksler_over3HD_fra_kilde'] == 0 for e in code['farger'])
+replay = read(R / 'kildelos-replay.json')
+assert len(replay) == 2 and all(e['begge_PNG_hash_eksakt_gjenlaget'] and not e['originalfil_aapnet'] for e in replay)
+assert len(read(R / 'alle-kall.json')) == 8 and len(read(R / 'kvalitetsreturer.json')) == 3
+assert len(list(A.glob('jobber/fig*/resultat.png'))) == 508 and not (A / 'jobber/fig178_02/resultat.png').exists()
+
+builds = {}
+for wf in ['linux.yml', 'windows.yml']:
+    runs = api('actions/workflows/' + wf + '/runs?per_page=30')['workflow_runs']
+    assert not any(e['status'] != 'completed' for e in runs), 'Aktivt pakkebygg, ikke publiser'
+    builds[wf] = [dict(id=e['id'], status=e['status'], conclusion=e['conclusion']) for e in runs]
+releasecheck = read(R / 'release-for-publisering.json')
+assert release_signature(api('releases/latest')) == release_signature(releasecheck['siste'])
+assert release_signature(api('releases/tags/sam-max-hd-2026-10-23-helikopter')) == release_signature(releasecheck['tidligere_felles'])
+all_releases = api('releases?per_page=100')
+assert {e['id']: release_signature(e) for e in all_releases} == {e['id']: release_signature(e) for e in releasecheck['alle_releaser']}
+assert len(all_releases) == 47
+save(R / 'pakkebygg-for-publisering.json', dict(tid_utc=datetime.now(timezone.utc).isoformat(), aktive_bygg=[], siste_bygg=builds,
+    native_frosset=False, siste_fellesrelease='sam-max-hd-2026-10-23-helikopter', pakker_native=3713, releaser_bevart=47))
+attempt = dict(tid_utc=datetime.now(timezone.utc).isoformat(), grafikkilde=artifact, grunnlag=parent,
+    native=3721, nye_native=2, force_with_lease=True, fase='forbereder')
+save(R / 'publisering-forsokt.json', attempt)
+copy(C, T)
+subprocess.run(['git', 'init', '-q', str(T)], check=True)
+subprocess.run(['git', '-C', str(T), 'checkout', '-q', '-b', 'hd-mod'], check=True)
+manifest = inventory(T)
+manifest.pop('SHA256SUMS')
+(T / 'SHA256SUMS').write_text(''.join(h + '  ' + f + '\n' for f, h in sorted(manifest.items())))
+subprocess.run(['git', '-C', str(T), 'add', '-A'], check=True)
+subprocess.run(['git', '-C', str(T), '-c', 'user.name=Codex', '-c', 'user.email=noreply@openai.com', 'commit', '-q', '-m',
+    'HD-mod 3721: helikopter 178 fase 2004 og 2002, delark 8 av 24'], check=True)
+published = git(T, 'rev-parse', 'HEAD')
+assert remote('hd-mod') == parent
+protected(st)
+attempt.update(fase='push_startes', kandidat_sha=published)
+save(R / 'publisering-forsokt.json', attempt)
+subprocess.run(['git', '-C', str(T), 'push', '-q', '--force-with-lease=refs/heads/hd-mod:' + parent,
+    git(P, 'remote', 'get-url', 'origin'), 'hd-mod:hd-mod'], check=True)
+assert remote('hd-mod') == published
+attempt.update(fase='push_bekreftet', hd_mod=published)
+save(R / 'publisering-forsokt.json', attempt)
+print('To native pushet. Henter alle 21965 publiserte filer tilbake.', flush=True)
+subprocess.run(['git', 'fetch', '-q', '--no-tags', '--depth', '1', 'origin', '+refs/heads/hd-mod:refs/remotes/origin/hd-mod'], cwd=P, check=True)
+assert git(P, 'rev-parse', 'refs/remotes/origin/hd-mod') == published
+archive = O / 'hentet-hdmod3721.tar'
+with archive.open('wb') as stream:
+    subprocess.run(['git', 'archive', '--format=tar', published], cwd=P, stdout=stream, check=True)
+H.mkdir()
+with tarfile.open(archive) as tar: tar.extractall(H, filter='data')
+actual = inventory(H)
+assert actual == inventory(T) and len(actual) == 21965 and set(actual) == set(files)
+assert {f for f, h in files.items() if actual[f] != h} == {'SHA256SUMS'}
+assert all(actual[f] == h for f, h in st['filer'].items() if f not in ['mod.json', 'SHA256SUMS'])
+assert sum(f.endswith('.png') for f in actual) == 21959
+assert sum(f.startswith('costumes/') and f.endswith('_hd.png') for f in actual) == read(H / 'mod.json')['costume_cels'] == 3721
+subprocess.run(['sha256sum', '--quiet', '-c', 'SHA256SUMS'], cwd=H, check=True)
+assert inventory(M) == st['filer'] and remote('hd-mod') == published
+copy(H, S)
+assert inventory(S) == actual
+M.rename(B)
+S.rename(M)
+assert inventory(M) == actual and inventory(B) == st['filer']
+protected(st)
+save(R / 'publiserte-moddfiler-3721.json', actual)
+receipt = dict(tid_utc=datetime.now(timezone.utc).isoformat(), grafikkilde=artifact, hd_mod=published,
+    native=3721, nye_native=2, egne_nye_malerier=2, nye_raadeler_direkte_brukt=3, egne_skjoeter_fra_eldre_raadbilder=2, nye_raadbilder_med_piksler_i_sluttgrafikk=3,gjenbrukte_eldre_raadbilder_med_piksler_i_sluttgrafikk=3, nye_hele_ark=0,
+    egenkontrollert=2, native_mottatt=2, automatiske_OK=2, automatiske_SJEKK=0, visuelt_sett=2,
+    motorobservert=2, publisert=2, bildekall=8, avviste_mellomresultater=read(R / 'kvalitetsreturer.json'),
+    hele_figurjobber_med_resultat=508, gjenstar=1250, delark178_02=8, delark178_02_totalt=24,
+    familie178_native=20, familie178_totalt=102, filantall=21965, png=21959,
+    alle_filhash_bekreftet=True, alle_tidligere_stier_bevart=True, tidligere_filer_bevart=21963,
+    tidligere_png_bevart=21957, beskyttede=1472, stasher=st['stash'], force_with_lease=True,
+    gammel_mod_bevart=str(B), godkjent_av_Tom=False, claude_kontroll=False, i_fellespakke=False,
+    pakker_native=3713, pakker_mangler_native=8, native_frosset=False, begrensning=motor['begrensning'])
+save(R / 'mottak-publisert.json', receipt)
+for name in ['fremdrift.json', 'sluttkontroll.json']:
+    q = read(R / name)
+    q.update(hd_mod=published, grafikkilde=artifact, native=3721, publisert=2, publisert_native_naa=3721, nye_native_publisert=2)
+    for e in q.get('leveranser', []) + q.get('delvise_leveranser', []):
+        e.update(publisert=True, publiserte_ruter=e['ruter'], hd_mod=published)
+    save(R / name, q)
+for name in ['rutekart-fig178_02.json', 'rutekart-samlet.json']:
+    q = read(R / name)
+    for group in q.values():
+        for e in group['ruter']: e.update(publisert=True, hd_mod=published)
+    save(R / name, q)
+q = read(R / 'egen-native.json')
+q.update(publisert=True, hd_mod=published)
+for e in q['ruter']: e.update(publisert=True, hd_mod=published)
+save(R / 'egen-native.json', q)
+for c in ['H103', 'H110']:
+    p = R / 'kall' / c / 'kontroll.json'
+    q = read(p)
+    q.update(publisert=True, hd_mod=published)
+    save(p, q)
+attempt.update(fase='publisert_hentet_bekreftet_lokalt_mottatt', hd_mod=published, alle_filhash_bekreftet=True)
+save(R / 'publisering-forsokt.json', attempt)
+print(json.dumps({k: receipt[k] for k in ['hd_mod', 'native', 'nye_native', 'filantall', 'png', 'alle_filhash_bekreftet']}), flush=True)

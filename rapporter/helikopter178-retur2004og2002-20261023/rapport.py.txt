@@ -1,0 +1,88 @@
+from pathlib import Path
+import hashlib,json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,q):p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+# Kjøres etter faktisk visning av begge native,delark,gråtavle,
+# begge hele motorbilder,begge før/etter-par og24 sekvensfaser.
+v=read(R/'motor-visuell-plan.json')
+for group in ['varianter','hele_motorbilder']:
+ assert len(v[group])==2
+ for e in v[group]:assert sha(R/e['fil'])==e['sha256'];e['visuelt_sett']=True
+assert sha(R/v['animasjonstavel']['fil'])==v['animasjonstavel']['sha256'];v['animasjonstavel']['visuelt_sett']=v['visuelt_sett']=True;save(R/'motor-visuell-plan.json',v)
+m=read(R/'motor-sammenligning.json');assert m['alle2_observert']and m['uforklarte_HD_endringer']==0 and m['ingen_nye_eller_okte_bufferavvik']and m['atomisk_skriving_bestatt'];m['visuelt_sett']=True;save(R/'motor-sammenligning.json',m)
+pixels=read(R/'motor-pikselkontroll.json')
+for e in pixels:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',pixels)
+native=read(R/'egen-native.json')
+for e in native['ruter']:e.update(motorobservert=True,native_visuelt_sett=True)
+save(R/'egen-native.json',native)
+for name in ['rutekart-fig178_02.json','rutekart-samlet.json']:
+ q=read(R/name);assert len(q['fig178_02']['ruter'])==8
+ for e in q['fig178_02']['ruter']:
+  if e['rute']in[2002,2004]:e.update(native_mottatt=True,motorobservert=True,native_visuelt_sett=True)
+ save(R/name,q)
+colors=[];codes=[]
+for cid in ['H103','H105','H107','H109','H110']:
+ K=R/'kall'/cid;q=read(K/'kontroll.json');f=read(K/'fargekontroll.json');co=read(K/'kodeflate-kontroll.json');colors.append(f);codes.append(co)
+ if cid in ['H103','H110']:
+  assert q['tekniske_porter_bestatt']and q['alle_alfa_fester_innen3HD']and f['alle_fargefester_innen3HD']and co['alle_kodefester_innen3HD']and all(e['egne_kodepiksler_over3HD_fra_kilde']==0 for e in co['farger']);q.update(egenkontrollert=True,native_mottatt=True,motorobservert=True,visuell_native_kontroll=True,status='EGENKONTROLLERT_NATIVE_MOTOROBSERVERT');save(K/'kontroll.json',q)
+save(R/'fargekontroll-alle.json',colors);save(R/'kodeflate-kontroll-samlet.json',codes)
+save(R/'kvalitetsreturer.json',[dict(kall=c,rute=2002,helprototype_brukt=False,egen_hoyremodul_brukt=c=='H109',grunn='Mellomresultat med feil i åpninger eller fargefelt. Bare hele egne H109-høyre er brukt i valgt H110.')for c in ['H105','H107','H109']])
+save(R/'modulreturer.json',[dict(kall=c,rute=2002,piksler_brukt_i_sluttgrafikk=False,grunn='Venstremodul med fylte hull eller bortfalte fargefelt,erstattet av H110.')for c in ['H104','H106','H108']])
+q=read(R/'fremdrift.json');q['motorobservert']=2
+for e in q['delvise_leveranser']:e['motorobservert']=True
+save(R/'fremdrift.json',q)
+assert len(read(R/'kildelos-replay.json'))==2 and all(e['begge_PNG_hash_eksakt_gjenlaget']and not e['originalfil_aapnet']for e in read(R/'kildelos-replay.json'))
+save(R/'sluttkontroll.json',dict(klar_for_additiv_publisering=True,visuelt_sett=True,valgte_native=2,motorobservert=2,native=3721,publisert=0,egne_nye_malerier=2,nye_raadeler_direkte_brukt=3,egne_skjoeter_fra_eldre_raadbilder=2,hele_ark_levert=0,automatiske_OK=2,automatiske_SJEKK=0,egen_native_port_bestatt=2,farge_og_alfafester_bestatt=2,beskyttede=1472,stasher=3,Tom_godkjent=False,Claude_godkjent=False,pakker_native=3713,pakker_mangler_native=8))
+save(R/'visuell-valgt-native.json',dict(valgte=['H103','H110'],kompositt='to-valgte-native-kontroll2x.png',sha256=sha(R/'to-valgte-native-kontroll2x.png'),visuelt_sett=True,ekte_alfa_kompositt_pa_graabakgrunn=True,hele_native_og_delark_sett=True,begge_hele_motorbilder_sett=True,begge_for_etter_par_sett=True,sekvensfaser1998til2021_sett=True))
+text='''# Returene for helikopterfase 2004 og 2002
+
+To nye hele sprites i fig178_02 er laget, egenkontrollert, native mottatt i lokal 3721-kandidat, visuelt sett og motorobservert. Valgt er 2004/H103 og 2002/H110. Publiseringskvitteringen følger i mottak-publisert.json. Tom og Claude har ikke gitt ny godkjenning. Åtte faktiske innebygde image_gen-kall H103..H110 er bevart med råbilder, eksakte prompter, verktøyargumenter og inputhash. Verktøyet oppgir ikke modellnavn. Ingen CLI/API-bildefallback er brukt.
+
+Delarket er nå 8/24, fortsatt på 1536 x 1024 med ekte alfa. Alle seks tidligere delruter 2003 og 2005..2009, deres RGBA og nativehash er bevart. Ingen hel jobb/resultat.png leveres. Hele figurjobber er fortsatt 508/1758, 1250 uten resultat, pluss returer og sluttkontroll. Familien 178 har 20/102 native i 3721-kandidaten. Åtte bildekall er ikke åtte leverte figurjobber.
+
+Begge riktige hele originaler er sett i spillkontekst med den faktisk nedlastede Linux-binæren 4e32ae90. Kildene er tidligere RGB565-bekreftet med null avvik og null opake indeks13. Godkjent Sam-hovedark er sett før hvert motiv. Motivet er de kildebestemte delene av helikopteranimasjonen. Avskjæringene og alle små fargefelt/åpninger beholdes. Gamle egne returer er bare redigeringsmål, aldri stilankere.
+
+2004/H103 bruker ny H103-høyre og den tidligere egne H094-venstre, med et åtte råpikslers smalt skjøtebånd fra egen H093. Den manglende gjennomsiktige cellen 33,11 er nå gjenopprettet av image_gen. Den er et eget lite hull under og til venstre for det store vinduet. Forrige prototype hadde fylt hele cellen, og feilen var større enn en avrundet kant. En markert bildeforklaring gjorde det mulig å rette riktig hull. Alle eksisterende farger og den store åpningen er beholdt.
+
+2002/H110 bruker ny H110-venstre og egen H109-høyre, med et åtte råpikslers skjøtebånd fra egen H076. Tre små åpninger i venstre skjøt og røde/brune felt i den utstrakte armen er rettet av image_gen. Mellomrettingene mistet enkelte hvite, lilla og grå felt; disse er gjenopprettet før mottak. H105, H107 og H109 er returer som hele prototyper. H109 bidrar bare den hele egne høyremodulen. H104, H106 og H108 er avviste venstremoduler og bidrar ingen sluttpiksler.
+
+Begge kilder er én sammenhengende alfagruppe. Redigeringsmodulene er rektangulære deler av egne tegninger. Skjøten bestemmes fra egne alfakolonner, og hele nye moduler plasseres etter egne tidligere grenser. Originalen brukes til bildeguiding, samlet helplassering og kontroll. Ringer og inverse koordinater i rettingsguidene er bare referanser til image_gen. Ingen kildekoordinater brukes til delplassering eller ferdige piksler. Ingen originalmasker klipper ny grafikk, ingen kildefragmenter, lokal fargepåmaling eller flytting av enkeltrekk er brukt. Ringene finnes ikke i sluttgrafikken.
+
+Global egen RGB-koderens og svak egen alfa under 8 er brukt. Egne alfa128-kjernepiksler bevares før plassering. ModulRGB skaleres kategorisk, og egen alfa premultiplisert. Ingen ekstra lokal fargekalibrering eller helflytt er anvendt. Begge ruter består alle alfa-, åpnings-, nativefarge- og rene kodefester innen uendret 3 HD, med null egne kodepiksler over 3 HD utenfor riktig kildeflate. Kildeløs replay gjenlager begge egne RGBA-PNG og native-PNG byteeksakt fra egne råbilder uten å åpne originaler. Tre nye råbilder og tre tidligere egne råbilder bidrar sluttpiksler; tre nye moduler og to gamle smale skjøter.
+
+Original egenkontroll gir 8 OK og 16 tomme mål, forventet exit 2. Ingen produsert rute har FEIL. Automatisk mottak gir 2 OK og 0 SJEKK. Automatisk eksport er diagnostikk og importeres ikke. Bare de to SHA-festede egne nativefilene legges til 3719-grunnlaget. Alle 21963 tidligere filer og alle seks tidligere delruters RGBA er kontrollert før bygging.
+
+To ferske kontrollerte motoravspillinger med den faktisk nedlastede Linux-binæren 4e32ae906ee610e1383b98143301b9aa17b01b726cd61efdf7ac441de36165bf sammenligner 3719 og 3721 i rom 35, aktør 29, kostyme 178, animasjon 1, posisjon 160,60 og zclip0. Begge har 160 kontroller/148 null og 120/120 null etter frame 40. Tolv kjente inngangsavvik er identiske i koordinater og begge RGB-verdier. Originalrektangler med 8 HD naboområde er identiske. Ingen uforklarte HD-endringer, og atomisk lagring består. Andre aktører og romskript kjører.
+
+Begge native, hele delarket, gråbakgrunnstavlen, begge hele motorbilder, begge komplette før/etter-par og 24 sekvensfaser 1998..2021 er faktisk visuelt sett. 53 kildefaser er logget. Dette er ikke alle 102 familieruter eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest. Ingen motor-/pipelinekodeendring; lokale hjelpefiler er arkivert som py.txt i grafikkrapporten.
+
+Bibliotekskilder: losninger/grafikk/figurark-fast-storrelse.md og losninger/bygg/publisert-mod-er-fasit.md. Eksisterende helplassering og additiv publisering gjenbrukes med fersk fjern-SHA og full filhashkontroll. PASS gjelder opphavets tester; rutene er kontrollert lokalt. Alle 1472 beskyttede input og tre opprinnelige stasher skal bevares ved publisering.
+
+Felles Linux/Windows helikopter-utgave har fortsatt 3713 og vil mangle åtte etter publisering. Ingen pakkedispatch ved dette 8/24-delarket. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning med nedlasting, sjekksummer og faktisk grafikkinnhold kontrollert. Ingen nødvendig Tom-designavklaring er identifisert. Automatikken er ACTIVE og all grafikk er ikke ferdig.
+'''
+text+='\nDelark SHA256: '+sha(R/'fig178_02-delresultat.png')+'\n\n'
+for e in native['ruter']:
+ q=read(R/'kall'/e['kall']/'kontroll.json');p=next(v for v in pixels if v['bilde']==e['bilde']);text+=e['bilde']+' native SHA256 '+e['sha256']+', IoU/dekning '+str(q['snitt_union'])+'/'+str(q['dekning'])+', '+str(p['endrede_HD_piksler_i_rekt'])+' endrede synlige HD-piksler i motorrektangelet.\n\n'
+(R/'RAPPORT.md').write_text(text.rstrip()+'\n')
+(R/'NESTE.md').write_text('''# Neste produksjon
+
+Les mottak-publisert.json, sluttrevisjon.json og RETUR.md. Fig178_02 er 8/24 med 2002..2009. Disse og komplett fig178_03/2010..2021 skal ikke gjentas. Hele figurjobber 508/1758 er uendret.
+
+Gjenoppta 2001/H077 og 2000/H078 fra rapporter/helikopter178-returforfaser-20261023. Begge er returer som hele prototyper. Se hele riktige original i spillkontekst og godkjent Sam før hvert motiv. Nye moduler kan plasseres etter egne gamle mål; tydelige markerte bildeforklaringer til image_gen hjalp ved små isolerte hull. Ingen originalmasker, kildekoordinater til delplassering eller lokale fargeflyttinger. 1990 trenger fortsatt ny hel originalkilde fordi tidligere kilde er venstreklipt.
+
+Neste 178-kall H111 er ikke utført eller reservert. 137/V013 og 296/S037 er uendret og ikke utført. Ingen nødvendig Tom-designavklaring. Alle publiserte filer, 1472 beskyttede input og tre opprinnelige stasher bevares. Fellespakker 3713 oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning. Automatikken fortsetter.
+''')
+(R/'RETUR.md').write_text('''# Valgte ruter og bevarte returer
+
+2004/H103 og 2002/H110 er valgt. Begge sterke kontroller, kildeløs replay og motorprøve består. Ingen ny Tom-/Claude-godkjenning. De tidligere returene for 2004 og 2002 er løst med disse nye tegningene.
+
+2004 bruker ny H103-høyre, tidligere egen H094-venstre og egen H093-skjøt. 2002 bruker ny H110-venstre, H109-høyre og egen H076-skjøt. H105/H107/H109 er returer som hele prototyper. H109 bidrar bare den hele egne høyremodulen. H104/H106/H108 er mellommoduler uten sluttpiksler. Alle åtte faktiske nye råbilder og prompter er bevart.
+
+Neste motiver er 2001/H077 og 2000/H078 fra returforfaserapporten. 1990 trenger ny hel kilde. 2002..2009 og fig178_03 skal ikke tegnes om. Se NESTE.md.
+''')
+roles={v['kall']:v['rolle']for v in read(R/'alle-kall.json')}
+for K in (R/'kall').iterdir():(K/'notat.md').write_text('Faktisk innebygd image_gen-kall '+K.name+'. Rolle: '+roles[K.name]+'. Se plan.json, argumenter.json, prompt-brukt.txt, individuelle kontroller og rapportens RETUR.md. Beskyttede jobbfiler er urørt.\n')
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+print('To native visuelt sett og motorobservert. Åtte kall,tre helreturer,tre mellommoduler. Delark8/24 klart for additiv3721-publisering.')

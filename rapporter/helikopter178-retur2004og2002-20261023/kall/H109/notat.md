@@ -1,0 +1,1 @@
+Faktisk innebygd image_gen-kall H109. Rolle: egen høyremodul brukt,helprototype retur. Se plan.json, argumenter.json, prompt-brukt.txt, individuelle kontroller og rapportens RETUR.md. Beskyttede jobbfiler er urørt.

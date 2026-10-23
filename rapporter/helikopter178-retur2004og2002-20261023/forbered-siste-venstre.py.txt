@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import hashlib,json,numpy as np,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+Q=R/'kall/H109';q=read(Q/'kontroll.json');rows=read(Q/'egen-del-montering.json')['egne_moduler']
+requests=[('H108','H110',[(7,3),(11,4)],(4,1,16,8),"""Restore exactly TWO missing code tiles in the upper junction while retaining ALL other colors and transparent gaps. Circle1 at(global7,row3) marks the missing DARK TEAL tile RGB(0,128,128),directly ABOVE the correct white tile at(global7,row4). Restore only that teal square. Keep the white square directly BELOW it at(row4),the transparent square below that at(row5),and the teal square below that at(row6). This vertical stack is TEAL,WHITE,TRANSPARENT,TEAL. Circle2 at(global11,row4) marks a missing WHITE tile RGB(255,255,255) at the TOP LEFT CORNER of the separate right-hand small gap. Restore that one white square. Its direct lower neighbor(global11,row5) stays transparent,its two right neighbors(global12..13,row4) stay transparent,and the PURPLE square(global12,row5) stays opaque purple. These exact tiles and holes are visible in image3 and enlarged image4. Preserve all other squares,especially white7,4,purple12,5,and every existing gap. Do not move any tile or fill any other empty square.""")]
+
+for oldid,newid,points,crop,request in requests:
+ B=R/'kall'/oldid;K=R/'kall'/newid;assert not K.exists();K.mkdir();m=next(e for e in rows if e['kall']==oldid)
+ for f in ['modul-kodeguide.png','kodefarge-referanse.png','kodepalett.json','delplassering-plan.json','egen-modul-redigeringsmaal.png']:shutil.copy2(B/f,K/f)
+ im=Image.open(B/'raa.png').convert('RGBA');bg=Image.new('RGBA',im.size,'#808080');bg.alpha_composite(im);bg=bg.convert('RGB');d=ImageDraw.Draw(bg);pointsout=[]
+ for xx,yy in points:
+  nat=[q['margx']*4+xx*4+2,q['margy']*4+yy*4+2];bas=[(nat[i]-[q['margx']*4,q['margy']*4][i]-q['flytt'][i])/q['hel_skala'][i]for i in range(2)];raw=[(bas[i]-m['egen_del_hel_flytt'][i])/m['egen_del_hel_skala'][i]for i in range(2)];x,y=raw;d.ellipse((x-17,y-17,x+17,y+17),outline='white',width=4);pointsout.append(dict(kildepunkt_bare_til_guide=[xx,yy],egen_rawpunkt_bare_til_guide=raw))
+ bg.save(K/'egen-punkt-ringguide.png');pal=read(K/'kodepalett.json');src=np.array(Image.open(pal['kilde']).convert('RGBA'));a=src.copy()
+ for e in pal['tabell']:a[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode']
+ g=Image.fromarray(a).crop(crop);gb=Image.new('RGBA',g.size,'#808080');gb.alpha_composite(g);fac=min(900/g.width,800/g.height);gb.resize((round(g.width*fac),round(g.height*fac)),Image.Resampling.NEAREST).convert('RGB').save(K/'retting-detaljguide.png')
+ (K/'ringguide-grunnlag.json').write_text(json.dumps(dict(kun_referanse_ikke_sluttgrafikk=True,egen_raa_sha256=sha(B/'raa.png'),punkter=pointsout,detaljguide_utklipp_bare_til_referanse=crop,kildekoordinater_bare_til_bildeguide=True,ingen_resultatpiksler_endret=True),ensure_ascii=False,indent=2)+'\n')
+ prompt='''Use case: precise-object-edit. Precisely repair this ONE isolated editing module from my own helicopter phase2002 drawing.
+Image1 is my own module annotated with WHITE CIRCLES ONLY TO IDENTIFY THE REPAIRS. Do not draw any circles or markers. Image2 is my untouched module,so preserve all other shapes and code colors exactly. Image3 is the authoritative false-code module layout. Image4 enlarges only the repair region in the source,with gray meaning genuinely transparent background. Image5 is the approved Sam cartoon edge-finish reference only;do not draw Sam or use his actual colors.
+'''+request+'''
+Copy exact false-code RGB colors with flat interiors. All gray outside and inside holes becomes genuinely transparent alpha,never gray paint. Navy is opaque ink,not a hole. Keep other fields,whole-module proportions,all thin parts and the straight join endpoint unchanged. No new shades,texture,highlights,outlines,rounding,labels,scenery,other module or a complete helicopter. Only delicate antialiasing at real contour edges. One square true-alpha PNG,complete module,no dust or annotation.
+''';(K/'prompt-brukt.txt').write_text(prompt);print(newid,'prepared reference-only markers',pointsout)

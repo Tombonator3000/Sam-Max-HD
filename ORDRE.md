@@ -1,5 +1,23 @@
 # Ordre fra Claude
 
+<!-- helikopter178-retur2004-2002-status:start -->
+Klar for additiv publisering av to nye native fra 3719 til 3721. Endelig fjern-SHA og hentet publiseringsbevis følger i mottak-publisert.json.
+
+Åtte faktiske innebygde image_gen-kall H103..H110 har gitt to valgte hele sprites, 2004/H103 og 2002/H110. De er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning. Fig178_02 er 8/24 med 2002..2009, familien 178 er 20/102. Hele figurjobber er fortsatt 508/1758, 1250 uten resultat, pluss returer og sluttkontroll. Åtte bildekall er ikke åtte leverte figurjobber.
+
+2004 bruker ny H103-høyremodul, egen tidligere H094-venstre og et smalt skjøtebånd fra egen H093. Den manglende gjennomsiktige cellen 33,11 er gjenopprettet av image_gen. 2002 bruker ny H110-venstre, egen H109-høyre og smalt skjøtebånd fra egen H076. Tre små åpninger og kildebestemte hvite, lilla, grå, røde og brune felt er rettet før mottak. Tre nye råbilder og tre eldre egne råbilder bidrar sluttpiksler. H105, H107 og H109 er returer som hele prototyper; H109 bidrar bare sin hele høyremodul. H104, H106 og H108 er avviste venstremoduler uten sluttpiksler.
+
+Begge originaler er sett hele i spillkontekst, og godkjent Sam-hovedark er sett før hvert motiv. Modulplasseringen bruker bare egne mål og alfakolonner. Markerte rettingsguider er bare bildeforklaringer til image_gen. Ingen originalmasker, kildefragmenter, kildekoordinater til delplassering, lokal fargepåmaling eller flytting av enkeltrekk. Begge består alle sterke alfa-, åpnings-, nativefarge- og kodefester innen uendret 3 HD, med null ekstra rene kodepiksler over 3 HD. IoU/dekning er 0,990/0,996 og 0,953/0,974. Kildeløs replay gjenlager begge egne RGBA og native PNG byteeksakt. Original egenkontroll gir 8 OK og 16 tomme mål, forventet exit 2. Automatisk mottak gir 2 OK og 0 SJEKK. Alle seks tidligere delruters RGBA og nativehash er bevart. Ingen hel jobb/resultat.png leveres. Ingen motor-/pipelinekodeendring.
+
+To ferske kontrollerte avspillinger med faktisk nedlastet Linux-binær 4e32ae90 sammenligner 3719/3721 i rom 35, aktør 29, kostyme 178, animasjon 1, posisjon 160,60, zclip0. Begge har 160 kontroller/148 null, 120/120 null etter frame 40. Tolv kjente inngangsavvik er identiske i koordinater og begge RGB. Originalrektangler med 8 HD naboområde er identiske. De to nye rutene endrer 6590 og 7399 synlige HD-piksler. Ingen uforklarte HD-endringer, atomisk lagring består. Begge hele motorbilder, før/etter-par, native, delark, gråtavle og 24 sekvensfaser 1998..2021 er visuelt sett. 53 kilder er logget. Ikke alle 102 familieruter eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+Gjenoppta rapporter/helikopter178-retur2004og2002-20261023/NESTE.md og RETUR.md. Neste returer er 2001/H077 og 2000/H078 fra returforfaserapporten. De er ikke nytegnet her. 1990 trenger ny hel originalkilde. 2002..2009 og komplett fig178_03/2010..2021 skal ikke gjentas. Neste 178-kall H111 er ikke utført eller reservert. 137/V013 og 296/S037 er uendret.
+
+Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes med lokal kontroll av delark, motor og publiserte filhash. Felles Linux/Windows helikopter-utgave har fortsatt 3713 og mangler åtte etter publisering. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning med nedlasting, sjekksummer og grafikkinnhold kontrollert. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE, all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattprosess.
+<!-- helikopter178-retur2004-2002-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-fase2003-status:start -->
 Publisert hd-mod 2228e137de73ca178318a7d3657dd7b4aeddc805 har 3719 native. Grafikkilde er gpt-arbeid 9e40966b4a9b4c3eee552ddce902cf6625acf0fd. Alle 21963 publiserte filhash er hentet tilbake og kontrollert. Alle 21962 tidligere stier og 21956 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3718-grunnlaget er bevart under out. Bare én ny native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 
