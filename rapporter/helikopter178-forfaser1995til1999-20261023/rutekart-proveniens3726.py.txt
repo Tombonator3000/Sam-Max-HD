@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+for name in ['rutekart-fig178_02.json','rutekart-samlet.json']:
+    d=read(R/name)
+    for e in d['fig178_02']['ruter']:
+        if e['rute'] not in [1999,1997,1996]:continue
+        r=read(R/f"mottak-publisert{e['rute']}.json")
+        assert r['alle_filhash_bekreftet']
+        payload=subprocess.check_output(['git','show',r['hd_mod']+':'+e['fil']],cwd=P)
+        assert hashlib.sha256(payload).hexdigest()==e['sha256']
+        e.update(grafikkilde=r['grafikkilde'],forst_publisert_hd_mod=r['hd_mod'])
+    (R/name).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+(R/'rutekart-proveniens3726.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Første kilde og publisering SHA-festet fra faktiske kvitteringer og Git-blobs for 1999,1997,1996.')
