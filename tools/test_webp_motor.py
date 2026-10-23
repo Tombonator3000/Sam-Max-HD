@@ -55,6 +55,7 @@ def main() -> None:
     migration = convert_mod(source, target, workers=min(4, os.cpu_count() or 2))
     scenes = [(7, 1), (9, 1), (35, 178)]
     comparisons = []
+    unmatched_states = []
     for room, costume in scenes:
         images = []
         for kind, mod in (("png", source), ("webp", target)):
@@ -66,7 +67,7 @@ def main() -> None:
             env.update(HOME=str(work), XDG_CONFIG_HOME=str(work / ".config"), XDG_DATA_HOME=str(work / ".local/share"),
                        SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy", DIGHD_MOD=str(mod),
                        DIGHD_VERIFY="1", DIGHD_SKIP_VIDEO="1", DIGHD_QUIT_AT="200",
-                       DIGHD_DUMP_DIR=str(work), DIGHD_DUMP_EVERY="20", DIGHD_DUMP_FLAT="1",
+                       DIGHD_DUMP_DIR=str(work), DIGHD_DUMP_EVERY="5", DIGHD_DUMP_FLAT="1",
                        DIGHD_TEST_ROOM=str(room), DIGHD_TEST_AT="10", DIGHD_TEST_CAMX="160",
                        DIGHD_TEST_COSTUME=str(costume), DIGHD_TEST_ACTOR="29", DIGHD_TEST_STATIC_SCENE="1",
                        DIGHD_TEST_CHORE_EVERY="500", DIGHD_TEST_ANIMATION="1", DIGHD_TEST_POS="160,120",
@@ -84,18 +85,37 @@ def main() -> None:
             if "invalid WebP" in log or "Couldn't save file" in log:
                 raise RuntimeError(f"Dekoding eller lagring feilet: {work}")
             images.append({p.name: p for p in work.glob(f"frame_*_room{room:03}.png") if int(p.name[6:12]) >= 100})
-        shared = sorted(images[0].keys() & images[1].keys())
-        if len(shared) < 4:
-            raise RuntimeError(f"For få sammenlignbare bilder i rom {room}")
-        for name in shared:
-            with Image.open(images[0][name]) as a, Image.open(images[1][name]) as b:
+        # SCUMM advances animations using elapsed time. Decoding PNG and WebP
+        # takes different time, so a render counter is not a game-state key.
+        # Match the actual original picture first; never choose by HD pixels.
+        def original_state(path):
+            with Image.open(path.with_name(path.stem + "_flat.png")) as image:
+                return image.size, hashlib.sha256(image.convert("RGBA").tobytes()).hexdigest()
+
+        webp_states = {}
+        for path in images[1].values():
+            webp_states.setdefault(original_state(path), []).append(path)
+        room_pairs = 0
+        for name, png in sorted(images[0].items()):
+            state = original_state(png)
+            candidates = webp_states.get(state, [])
+            if not candidates:
+                unmatched_states.append({"room": room, "png_frame": name, "original_rgba_sha256": state[1]})
+                continue
+            webp = next((p for p in candidates if p.name == name), candidates[0])
+            with Image.open(png) as a, Image.open(webp) as b:
                 same = a.size == b.size and a.convert("RGBA").tobytes() == b.convert("RGBA").tobytes()
-                comparisons.append({"room": room, "frame": name, "rgba_equal": same,
-                                    "png_sha256": hashlib.sha256(images[0][name].read_bytes()).hexdigest(),
-                                    "webp_sha256": hashlib.sha256(images[1][name].read_bytes()).hexdigest()})
+                comparisons.append({"room": room, "png_frame": name, "webp_frame": webp.name,
+                                    "original_rgba_sha256": state[1], "rgba_equal": same,
+                                    "png_sha256": hashlib.sha256(png.read_bytes()).hexdigest(),
+                                    "webp_sha256": hashlib.sha256(webp.read_bytes()).hexdigest()})
+                room_pairs += 1
+        if room_pairs < 4:
+            raise RuntimeError(f"For få bilder med samme spilltilstand i rom {room}: {room_pairs}")
     report = {"fixture_subset_of_published_mod": True,
               "colour_images_exact": sum(row.get("rgba_exact", False) for row in migration["files"]),
               "converted": migration["converted"], "comparisons": comparisons,
+              "unmatched_original_states": unmatched_states,
               "all_frames_equal": all(row["rgba_equal"] for row in comparisons)}
     (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     if not report["all_frames_equal"]:
