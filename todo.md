@@ -1,5 +1,23 @@
 # todo.md
 
+<!-- helikopter178-delgrupper-status:start -->
+Publisert hd-mod 42d9d9c1044f493a8f972126329bf1832814ca5b har 3716 native. Grafikkilde er gpt-arbeid 56f31cea06ee81430d4c957a2a014aea7be31cae. Alle 21960 publiserte filhash er hentet tilbake og kontrollert. Alle 21958 tidligere stier og 21952 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra det verifiserte arkivet; 3714-grunnlaget er bevart under out. Bare to nye SHA-festede native er lagt til, og tidligere 2008 er bytebevart. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
+
+Fire faktiske innebygde image_gen-kall H082..H085 har gitt to nye komplette spritebilder i fig178_02: 2009/H082 og 2007/H085. Begge er laget, egenkontrollert, native mottatt og visuelt sett i to nye kontrollerte motoravspillinger. Tre nye råbilde-deler er direkte brukt. Ingen ny Tom-/Claude-godkjenning. Delarket er nå 3/24 med tidligere 2008/H065 uendret. Ingen ny hel figurjobb: 508/1758 har resultat, 1250 uten, i tillegg til returer og sluttkontroll. Familien er 15/102 i 3716-modden.
+
+Ny arbeidsmåte: image_gen tegner hele uavhengige atskilte grupper. 2009 bruker H082-venstre og egen H080-høyre; 2007 bruker H084-venstre og H085-høyre. Hele egne grupper plasseres etter tidligere egne grenser, uten kildekoordinater. H055 bidrar bare egne lerretsmål og gruppegrenser i 2007, ingen gamle piksler. H083 er et avvist høyre-mellomresultat. H084s tidlige helprototype er retur, men venstregruppen er brukt i valgt H085. H080 er fortsatt en retur som helsprite. Ingen originalfragmenter, hard originalmaskeklipp, lokal påmaling eller flytting av enkeltrekk. Egen ekte alfa og global egen RGB-rens beholdes. Hele 2007 er til slutt flyttet [0,-1] HD, begge grupper likt. Ingen motor-/pipelinekodeendring.
+
+Begge ruter består alle alfa-, åpnings-, nativefarge- og rene kodefester innen uendret 3 HD, og har null egne kodepiksler mer enn 3 HD utenfor tilsvarende kildeflate. Endelig IoU/dekning er 0,965/0,984 i 2009 og 0,851/0,923 i 2007. Kildeløs replay gjenlager begge egne RGBA og native PNG med eksakt SHA256 uten originalfiler. Original egenkontroll har 3 OK og 21 tomme mål, forventet exit 2, ingen produsert FEIL. Automatisk mottak av nye ruter har 2 OK og 0 SJEKK. Bare egne SHA-festede native brukes; diagnostisk automatisk eksport importeres ikke.
+
+To ferske avspillinger med faktisk nedlastet Linux-binær 4e32ae90 sammenligner 3714 og 3716 i rom 35, aktør 29, kostyme 178, animasjon 1, posisjon 160,60, zclip0. Begge har 160 kontroller/148 null og 120/120 null etter frame 40. Tolv kjente inngangsavvik har identiske koordinater og begge RGB. Originalrektangler med 8 HD naboområde er identiske; ingen uforklarte HD-endringer. Atomiske lagringer består. Begge hele motorbilder, begge komplette før/etter-par, begge native, hele delarket, gråbakgrunnstavlen og 24 utvalgte sekvensfaser 1998..2021 er visuelt sett. 53 kilder logget. Ikke alle 102 eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+Felles Linux/Windows helikopter-utgave har fortsatt 3713 native og mangler tre etter denne publiseringen. Forrige samlepunkt er faktisk nedlastet og kontrollert. Ingen ny pakkedispatch for dette 3/24-delarket. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning, med nedlasting, sjekksummer og inkludert grafikk kontrollert.
+
+Gjenoppta rapporter/helikopter178-delgrupper-20261023/NESTE.md og RETUR.md. 2007, 2008 og 2009 skal ikke gjentas; fig178_03 er allerede 12/12. Prioriter 2006/H056 og 2005/H057 i forrige leveringsrapport, deretter 2000..2004 i returforfaserapporten. De sammenhengende motivene skal ikke deles ved hjelp av originalmasker. 1990 trenger fortsatt ny hel kilde fordi den gamle er venstreklipt. Neste 178-kall H086 er ikke utført eller reservert. 137/V013 og 296/S037 er uendret og ikke utført. Ingen ny nødvendig Tom-designavklaring. Automatikken er ACTIVE og all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattevakt.
+<!-- helikopter178-delgrupper-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-returforfase-status:start -->
 Elleve nye faktiske innebygde image_gen-kall H071..H081 over seks helikoptermotiver 2000..2004 og 2009 er laget, egenkontrollert og visuelt sett som returer. Ingen ny valgt grafikk, hel leveranse, endring i delark, nativeimport eller motorobservert nygrafikk. Ingen ny Tom-/Claude-godkjenning. Råbilder, faktiske prompter, argumenter, SHA-rutekart og alle returer ligger i rapporter/helikopter178-returforfaser-20261023.
 
