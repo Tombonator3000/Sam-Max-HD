@@ -1,0 +1,13 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image
+import hashlib,json,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+c,raw=sys.argv[1],Path(sys.argv[2]);K=R/'kall'/c;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert raw.exists() and not (K/'raa.png').exists()
+im=Image.open(raw);assert im.mode=='RGBA' and im.getextrema()[3][0]==0
+shutil.copy2(raw,K/'raa.png');plan=json.loads((K/'plan.json').read_text())
+assert not plan['utfort']
+plan.update(utfort=True,raw_path=str(raw),raa_sha256=sha(raw),utfort_utc=datetime.now(timezone.utc).isoformat(),verktøy='innebygd image_gen',modell_ikke_oppgitt_av_verktøy=True,visuelt_sett_raa=True)
+(K/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+print(c,'råbilde bevart:',im.size,sha(raw))

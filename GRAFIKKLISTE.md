@@ -1,5 +1,11 @@
 # Grafikkliste
 
+## Påbegynt 23. oktober: H111..H116 og diskplass
+
+Seks nye faktiske bildekall for 2001 er bevart, men ingen ny native er mottatt. H113-venstre kan beholdes; H116 har fortsatt fargeavvik. 2000 er ikke nytegnet. Neste kall H117 er ikke utført eller reservert. Grunnlaget er fortsatt hd-mod 790479259111acc86aa79669751d44a3ccde2527 med 3721 native og delark 8/24. Gjenoppta rapporter/helikopter178-retur2001og2000-20261023/NESTE.md og RETUR.md før nye kall.
+
+Tom spør om ca. 300 GB diskbruk. Out viser 331 GiB; selve modden 527 MiB. PLASS.md har målinger og rydderekkefølge. Bare lesekontroll og tapsfri PNG-test på kopier er utført, ingen sletting. Automatikken er ACTIVE; all grafikk er ikke ferdig.
+
 <!-- helikopter178-retur2004-2002-status:start -->
 Publisert hd-mod 790479259111acc86aa79669751d44a3ccde2527 har 3721 native. Grafikkilde er gpt-arbeid 7b2b56258d0d6ec3efa77960f46a72c461008a1e. Alle 21965 publiserte filhash er hentet tilbake og kontrollert. Alle 21963 tidligere stier og 21957 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3719-grunnlaget er bevart under out. Bare to nye native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 

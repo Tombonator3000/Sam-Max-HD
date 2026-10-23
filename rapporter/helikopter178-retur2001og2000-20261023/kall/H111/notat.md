@@ -1,0 +1,1 @@
+Innebygd image_gen, modell ikke oppgitt. Ett faktisk kall H111. Eget råbilde, faktiske argumenter og referansehash bevart. Råbildet er visuelt sett. Ingen native levert, mottatt, motorobservert eller publisert fra dette kallet. Se kontrollfiler og rapportens RETUR.md.

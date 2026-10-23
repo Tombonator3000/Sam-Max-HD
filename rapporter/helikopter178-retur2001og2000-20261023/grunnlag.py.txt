@@ -1,0 +1,27 @@
+from pathlib import Path
+from PIL import Image
+from own_parts import decode
+import hashlib, json, numpy as np, shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,q):p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+st=read(R/'start.json');st.update(grunnlag_native=3721,ruter=[2001,2000]);save(R/'start.json',st)
+palette=read(A/'rapporter/helikopter178-delgrupper-20261023/kall/H085/kodepalett.json')
+mapping={tuple(e['ekte']):e['kode'] for e in palette['tabell']}
+mapping.update({(19,59,31):[128,128,255],(239,135,39):[255,128,255],(43,79,35):[0,255,128],(195,103,7):[192,0,255],(43,91,43):[192,255,0],(255,179,67):[255,192,0]})
+for c,n in [('H077',2001),('H078',2000)]:
+ B=R/'basis'/c;assert not(B/'egen-basis-kodepalett.json').exists()
+ old=read(B/'kodepalett.json');shutil.copy2(B/'kodepalett.json',B/'egen-basis-kodepalett.json')
+ own,clean=decode(B/'raa.png',old['tabell']);before=np.array(Image.open(B/'egen-renset.png').convert('RGBA'))
+ shutil.copy2(B/'egen-renset.png',B/'forrige-egen-renset.png');Image.fromarray(own).save(B/'egen-renset.png')
+ S=R/'kilder'/str(n);q=read(S/'kilde.json');assert q['hel_synlig'] and q['originalmotor_rgb565_avvik']==0 and q['indeks13_piksler']==0
+ src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));assert sha(S/'original-1x.png')==q['RGBA_sha256']
+ h,w=src.shape[:2];table=[dict(ekte=t.tolist(),kode=mapping[tuple(t)]) for t in np.unique(src[src[:,:,3]>0,:3],axis=0)]
+ assert len({tuple(e['kode']) for e in table})==len(table)
+ code=src.copy()
+ for e in table:code[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode']
+ scale=min(24,936//w);pos=((1024-w*scale)//2,(1024-h*scale)//2);bg=Image.new('RGBA',(1024,1024),'#808080')
+ bg.alpha_composite(Image.fromarray(code).resize((w*scale,h*scale),Image.Resampling.NEAREST),pos);bg.convert('RGB').save(B/'kodefarge-referanse.png')
+ save(B/'kodepalett.json',dict(tabell=table,kilde=str(S/'original-1x.png'),kilde_sha256=sha(S/'original-1x.png'),kodet_hjelper_sha256=sha(B/'kodefarge-referanse.png'),skalering=scale,plass=pos))
+ save(B/'egen-basis-rens.json',dict(**clean,raw_palette_sha256=sha(B/'egen-basis-kodepalett.json'),ren_egen_RGBA_sha256=sha(B/'egen-renset.png'),identisk_med_forrige_egen_rens=bool(np.array_equal(before,own)),originalfil_aapnet_for_rens=False,kildekoordinater_til_endring=False))
+ print(c,n,'egen rådekoding lik tidligere:',np.array_equal(before,own),'palett',len(table),flush=True)

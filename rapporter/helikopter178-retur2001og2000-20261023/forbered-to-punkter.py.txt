@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+whole=R/'kall/H112';q=read(whole/'kontroll.json');mount=read(whole/'egen-del-montering.json')
+targets=[('H113','H111',[(4,16),(5,16)],'At the far lower-left end, the bottom row has three tiles: DARK GREEN, MAROON, DARK GREEN, left to right. The tile immediately above its middle is also DARK GREEN. Remove the wrong cyan from that entire three-tile bottom row. Use RGB(0,128,0) for dark green and RGB(128,0,0) for maroon. Keep the bright green and cyan steps ABOVE this cluster unchanged.'),
+ ('H114','H112',[(56,1)],'At the marked spot in the thin top edge of the right body, replace the single wrong MAGENTA tile with BLUE-VIOLET RGB(192,0,255). This is a small deliberate one-cell insert, more blue and darker than the surrounding bright magenta RGB(255,0,255). Keep all its neighboring top-edge color cells unchanged, and do not place this blue-violet color anywhere else.')]
+src=Image.open(R/'kilder/2001/original-1x.png').convert('RGBA')
+for cid,old,points,fix in targets:
+ B=R/'kall'/old;K=R/'kall'/cid;assert not K.exists();K.mkdir()
+ for f in ['kodepalett.json','kodefarge-referanse.png','modul-kodeguide.png','delplassering-plan.json']:shutil.copy2(B/f,K/f)
+ row=next(e for e in mount['egne_moduler'] if e['kall']==old);im=Image.open(B/'raa.png').convert('RGBA');annot=im.copy();d=ImageDraw.Draw(annot);marks=[]
+ for x,y in points:
+  bx=(x*4+2-q['flytt'][0])/q['hel_skala'][0];by=(y*4+2-q['flytt'][1])/q['hel_skala'][1]
+  rx=(bx-row['egen_del_hel_flytt'][0])/row['egen_del_hel_skala'][0];ry=(by-row['egen_del_hel_flytt'][1])/row['egen_del_hel_skala'][1]
+  d.ellipse((rx-38,ry-38,rx+38,ry+38),outline='white',width=5)
+  marks.append(dict(kildecelle_kun_guide=[x,y],egen_raaposisjon_kun_guide=[rx,ry]))
+ annot.save(K/'egen-punkt-ringguide.png')
+ # Kildestyrte koordinater brukes bare i referansebilder, aldri i sluttpiksler eller plassering.
+ pal=read(K/'kodepalett.json');import numpy as np
+ a=np.array(src)
+ for e in pal['tabell']:a[np.all(np.array(src)[:,:,:3]==e['ekte'],2)&(np.array(src)[:,:,3]>0),:3]=e['kode']
+ x,y=points[-1];box=(max(0,x-3),max(0,y-3),min(src.width,x+4),min(src.height,y+4));detail=Image.fromarray(a).crop(box);bg=Image.new('RGBA',detail.size,'#808080');bg.alpha_composite(detail);bg.resize((bg.width*100,bg.height*100),Image.Resampling.NEAREST).convert('RGB').save(K/'punkt-kildeguide.png')
+ prompt=f'''Use case: precise-object-edit. Correct a tiny color error in my own isolated editing module of helicopter-animation phase 2001.
+Image1 is my own existing module to edit. Image2 is the SAME own module with white rings showing only the repair location; remove the rings from the output. Image3 is the authoritative source module code-color layout. Image4 is a zoom of the source around the marked area, for exact code colors and cell sizes. Image5 is the approved Sam anchor for clean delicate antialiased exterior edges only; do not draw Sam.
+{fix}
+Change only this marked color error. Preserve every other part of image1: every exact code color, each thin projection, tile boundary, opaque navy field, straight-cut neck endpoint, internal opening, overall proportions and genuine transparent alpha. This is an isolated module, not a whole helicopter. Do not add outlines, highlight bands, texture, shadows, labels, guide marks, detached dust or the other module. Keep opaque flat interiors and delicate exterior antialiasing. One complete true-alpha PNG.\n'''
+ (K/'prompt-brukt.txt').write_text(prompt)
+ (K/'ringguide-grunnlag.json').write_text(json.dumps(dict(egen_raw=str(B/'raa.png'),egen_raw_sha256=sha(B/'raa.png'),punkter=marks,kildeboks_bare_guide=box,kildekoordinater_til_sluttpiksler=False,kildekoordinater_til_modulplassering=False),ensure_ascii=False,indent=2)+'\n')
+ print(cid,old,'guidepunkter',marks)

@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import hashlib,json,numpy as np,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+K=R/'kall/H116';B=R/'kall/H112';assert not K.exists();K.mkdir()
+pal=read(B/'kodepalett.json')
+for e in pal['tabell']:
+ if e['ekte']==[195,103,7]:e['kode']=[255,255,128]
+assert len({tuple(e['kode']) for e in pal['tabell']})==len(pal['tabell'])
+(K/'kodepalett.json').write_text(json.dumps(pal,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(B/'delplassering-plan.json',K/'delplassering-plan.json')
+# Global fargekodeomlegging av hele vår egen rensede tegning, uendret egen alfa.
+own=np.array(Image.open(B/'egen-del-renset.png').convert('RGBA'));a=own.copy()
+for e in pal['tabell']:a[np.all(own[:,:,:3]==e['ekte'],2)&(own[:,:,3]>0),:3]=e['kode']
+assert np.array_equal(a[:,:,3],own[:,:,3])
+target=K/'egen-global-kodeomlegging.png';Image.fromarray(a).save(target)
+marked=Image.fromarray(a);d=ImageDraw.Draw(marked);d.ellipse((812,379,888,455),outline='white',width=5);marked.save(K/'egen-punkt-ringguide.png')
+src=np.array(Image.open(R/'kilder/2001/original-1x.png').convert('RGBA'));code=src.copy()
+for e in pal['tabell']:code[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode']
+guide=Image.fromarray(code).crop((20,0,72,23));bg=Image.new('RGBA',guide.size,'#808080');bg.alpha_composite(guide);bg.resize((1040,460),Image.Resampling.NEAREST).convert('RGB').save(K/'modul-kodeguide.png')
+detail=Image.fromarray(code).crop((53,0,60,5));bg=Image.new('RGBA',detail.size,'#808080');bg.alpha_composite(detail);bg.resize((700,500),Image.Resampling.NEAREST).convert('RGB').save(K/'punkt-kildeguide.png')
+(K/'global-kodeomlegging.json').write_text(json.dumps(dict(egen_rgba=str(B/'egen-del-renset.png'),egen_rgba_sha256=sha(B/'egen-del-renset.png'),ny_guidekode_for_hele_fargeklassen=dict(ekte=[195,103,7],fra=[192,0,255],til=[255,255,128]),egen_alfa_bytebevart=True,kildekoordinater_bare_i_guide=True,kildekoordinater_til_sluttgrafikk=False,kildekoordinater_til_modulplassering=False,originalfragmenter=False),ensure_ascii=False,indent=2)+'\n')
+prompt='''Use case: precise-object-edit. Make ONE tiny color correction in image1, my own isolated right module of helicopter-animation phase 2001. Preserve its entire canvas layout, tile geometry, proportions, all other flat color fields and true alpha.
+Image1 is my own existing edit target. Image2 is the SAME target with a WHITE RING locating the tiny error. Image3 is the source detail showing the desired PALE CREAM-YELLOW tile. Image4 is the exact source module code-color layout. Image5 is the approved Sam edge-finish reference only, not a subject to draw.
+Within the ring, change the one small MAGENTA square between the bright green square on its left and the purple field on its right to PALE CREAM-YELLOW, RGB(255,255,128). It is directly BELOW the teal square and ABOVE the long yellow horizontal band. Its pale creamy yellow color is distinct from both pure white and saturated yellow, exactly like the single pale square in image3. Fill that entire existing square, keeping its exact size and position. Do not add this cream color anywhere else. Remove the ring.
+This is an intermediate FALSE-COLOR image, so copy the code colors without converting to brown or gray. Do not shift, enlarge, round or redraw any other existing region. No other module, complete helicopter, new outlines, texture, shading, labels, guide marks or detached dust. Preserve the genuine transparent exterior and internal openings. Delicate exterior antialiasing only. Output the whole isolated module as a transparent PNG.\n'''
+(K/'prompt-brukt.txt').write_text(prompt)
+refs=[target,K/'egen-punkt-ringguide.png',K/'punkt-kildeguide.png',K/'modul-kodeguide.png',A/'hovedark/sam.png']
+subprocess.run(['python3',str(O/'plan.py'),'H116','2001',*map(str,refs)],cwd=O,check=True)
