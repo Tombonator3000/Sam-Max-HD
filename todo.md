@@ -1,5 +1,20 @@
 # todo.md
 
+<!-- helikopter178-forfaser1990-1994:start -->
+## Neste i grafikkproduksjonen
+
+- [x] Publisert fem nye tekniske helikoptervarianter 1990..1994 fra 47 faktiske innebygde bildekall H176..H222. hd-mod c80099158b30fb08fa0cb670acb112bf14fd58f4 har 3733 native. Alle 21978 fjernhash faktisk hentet og bekreftet. Delark 20/24, familie178 32/102, hele jobber 508/1758. Ingen ny Tom-/Claude-godkjenning.
+- [x] Alle uendrede sterke 3HD-porter, kildeløs rå-til-native replay, exact WebP og to ferske nativeavspillinger kontrollert. Alle fem nye faser er hele i viewport. 49 eksakte originalpar og 111 andre tilstander kontrollert uten uforklarte HD-endringer. Ingen full naturlig gjennomspilling.
+- [x] Begge faktiske Linux-/Windows-pakker og alle inkluderte modhash kontrollert. Fellesutgaven sam-max-hd-2026-10-24-helikopter-forfaser publisert og alle fire vedlegg hentet tilbake og bekreftet. Linux-pakkens motor testet, Windows-oppstart i Actions bestått. Ingen pakke-etterslep.
+- [x] Verifiserte gamle arbeids-/pakkekopier fjernet, eksakte motorbilder hardlenket, unike råbilder/kilder/ankre og alle tre stasher beholdt. Neste fire kilders indekser og originale RGBA bekreftet mot aktiv mod.
+- [ ] Gjenoppta rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og RETUR.md. Les STILRETUR.md og prioriter ny hel stilpilot 1990, deretter 1991..1994. 1989..1986 er uproduserte uavhengige jobber. H223 er ikke forberedt, utført eller reservert. Se originalkontekst og godkjent stilanker på nytt før hvert motiv; ekstra grønnfarge RGB 7,95,51 finnes i 1986/1987. Ikke tegn 1990..2021 på nytt uten dokumentert retur.
+- [ ] Lever faktisk komplett fig178_02/resultat.png først når alle 24 er klare. 1990..1994 krever stilretur på grunn av for mye trappepreg, og regnes ikke som ferdig grafikk. Teknisk mottak er ikke Tom-/Claude-godkjenning.
+- [ ] Fortsett alle produserbare jobber og returer, fortsatt 1250 figurjobber uten resultat pluss returer/sluttkontroll. 137/V013 og 296/S037 er uendret. Automatikken er ACTIVE; ingen nødvendig Tom-avklaring nå.
+- [ ] Bruk gjeldende komplette WebP-mod, én kandidat per bunke, additiv publisering fra fersk fjern-SHA og tilbakehenting av alle hash. Oppdater begge faktiske pakker ved neste samlepunkt eller avslutning. Bevar råbilder, små deler, kilder, stilankre og tre stasher; fjern bare verifiserte arbeidskopier.
+
+Grafikkilde 7a26e3506903f5081e95ec94a9bada3d6d63253d, rapport 9456020a98aa6db31186f698d26de315ab8caaac. Ingen motor-/pipelinekode eller ny interaktiv Windows-/webtest. Ingen gammel nattprosess.
+<!-- helikopter178-forfaser1990-1994:slutt -->
+
 <!-- helikopter178-forfaser1995-1999:start -->
 ## Neste i grafikkproduksjonen
 
