@@ -40,7 +40,8 @@ assert len(list(A.glob('jobber/fig*/resultat.png')))==508 and (A/'jobber/fig178_
 builds={}
 for wf in ['linux.yml','windows.yml']:
  runs=api('actions/workflows/'+wf+'/runs?per_page=30')['workflow_runs'];assert not any(e['status']!='completed'for e in runs),'Aktivt pakkebygg,ikke publiser';builds[wf]=[dict(id=e['id'],status=e['status'],conclusion=e['conclusion'])for e in runs]
-assert api('releases/latest')['tag_name']=='sam-max-hd-2026-10-22-isblokk'
+releasecheck=read(R/'latest-planlagt-Windows-avklart.json');latest=api('releases/latest');assert latest['id']==releasecheck['siste']['id'] and latest['body']==releasecheck['siste']['body']
+common=api('releases/tags/sam-max-hd-2026-10-22-isblokk');assert common['id']==releasecheck['tidligere_felles']['id'] and {(e['id'],e['name'],e['size'],e['digest'])for e in common['assets']}=={(e['id'],e['name'],e['size'],e['digest'])for e in releasecheck['tidligere_felles']['assets']}
 save(R/'pakkebygg-for-publisering.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),aktive_bygg=[],siste_bygg=builds,native_frosset=False,siste_fellesrelease='sam-max-hd-2026-10-22-isblokk',pakker_native=3701))
 j=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=art,grunnlag=parent,native=3713,nye_native=1,force_with_lease=True,fase='forbereder');save(R/'publisering-forsokt.json',j)
 copy(C,T);subprocess.run(['git','init','-q',str(T)],check=True);subprocess.run(['git','-C',str(T),'checkout','-q','-b','hd-mod'],check=True)
