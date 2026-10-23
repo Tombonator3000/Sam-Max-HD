@@ -1,0 +1,11 @@
+from pathlib import Path
+import subprocess,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent
+run=lambda *args:subprocess.check_output(['git',*args],cwd=A);sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+assert not run('status','--porcelain');head=run('rev-parse','HEAD').decode().strip();subprocess.run(['git','fetch','-q','origin','gpt-arbeid:refs/remotes/origin/gpt-arbeid'],cwd=A,check=True);assert run('rev-parse','origin/gpt-arbeid').decode().strip()==head
+base='d9aa434a4eff3cd7feb2e3186a5661a8ea3330ed';names=[n.decode()for n in run('diff','--name-only','-z',base,head).split(b'\0')if n];assert not any(Path(n).name in ['referanse.png','original_1x.png','prompt.txt','jobb.json']for n in names)
+p=subprocess.Popen(['git','cat-file','--batch'],cwd=A,stdin=subprocess.PIPE,stdout=subprocess.PIPE);files={}
+for name in names:
+ p.stdin.write((head+':'+name+'\n').encode());p.stdin.flush();h=p.stdout.readline().decode().strip().split();assert len(h)==3 and h[1]=='blob';b=p.stdout.read(int(h[2]));assert p.stdout.read(1)==b'\n';digest=hashlib.sha256(b).hexdigest();assert digest==sha(A/name),name;files[name]=digest
+p.stdin.close();assert p.wait()==0
+q=dict(grafikkilde=head,hentet_fra='origin/gpt-arbeid',grunnlag=base,filer=len(files),alle_SHA256_stemmer=True,ingen_beskyttede_jobbfiler_endret_i_git=True,filhash=files);(O/'grafikk-hentet-kontrollert.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n');print('Alle',len(files),'endrede grafikk-/rapportblobs verifisert etter fetch.',flush=True)

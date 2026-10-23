@@ -1,0 +1,30 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime,timezone
+import subprocess,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/helikopter178-siste2010-20261023'
+read=lambda f:json.loads(f.read_text());sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest();api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True));git=lambda root,*args:subprocess.check_output(['git',*args],cwd=root,text=True).strip()
+state=read(R/'bygg-startet.json');pub=read(R/'publisert.json');source=read(S/'start.json');meta=read(O/'grafikk-hentet-kontrollert.json')
+assert pub['taggbygg_success']and not pub['native_frosset']and state['native_frosset']==False and pub['native']==3713 and pub['begge_faktiske_nedlastinger_og_SHA_bekreftet']and pub['felles_vedlegg_faktisk_hentet_igjen']
+assert not git(P,'status','--porcelain')and not git(A,'status','--porcelain');assert git(A,'rev-parse','HEAD')==meta['grafikkilde']==git(A,'ls-remote','origin','refs/heads/gpt-arbeid').split()[0]
+assert git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0]==pub['hd_mod']
+paths=[f for f in(P/'mods/gpt').rglob('*')if f.is_file()]
+with ThreadPoolExecutor(max_workers=8)as pool:files=dict(pool.map(lambda f:(f.relative_to(P/'mods/gpt').as_posix(),sha(f)),paths))
+assert files==read(R/'moddfiler-3713.json')==read(S/'publiserte-moddfiler-3713.json')and len(files)==21957
+assert sum(f.endswith('.png')for f in files)==21951 and sum(f.startswith('costumes/')and f.endswith('_hd.png')for f in files)==3713
+assert all(files[f]==h for f,h in source['filer'].items()if f not in ['mod.json','SHA256SUMS'])and all(sha(A/f)==h for f,h in source['beskyttede'].items())and git(P,'stash','list','--format=%H').splitlines()==source['stash']
+assert len(list(A.glob('jobber/fig*/resultat.png')))==508 and len(list(A.glob('jobber/fig*/jobb.json')))==1758
+assert sha(A/'jobber/fig178_03/resultat.png')==read(S/'fremdrift.json')['leveranser'][0]['sha256']
+for k in ['H050','H051','H052']:
+ d=S/'kall'/k;plan=read(d/'plan.json');assert sha(d/'raa.png')==plan['raa_sha256']
+ for e in plan['referanser']:assert sha(Path(e['fil']))==e['sha256']
+latest=api('releases/latest');assert latest['id']==pub['release_id'];checks=read(R/'assetkontroll.json')
+for e in checks:
+ asset=next(v for v in latest['assets']if v['name']==e['fil']);assert asset['digest']=='sha256:'+e['sha256']and asset['size']==e['bytes'];assert sha(O/e['plattform']/e['fil'])==sha(O/'felles-nedlasting'/e['fil'])==e['sha256']
+for plat in ['linux','windows']:
+ run=api('actions/runs/'+str(state['plattform'][plat]['run_id']));assert run['status']=='completed'and run['conclusion']=='success'and run['head_sha']==state['kode']
+tag=api('actions/runs/'+str(pub['taggbygg_id']));assert tag['status']=='completed'and tag['conclusion']=='success'and tag['head_branch']==state['release_tag']and tag['head_sha']==state['kode']
+main=git(P,'rev-parse','HEAD');assert main==git(P,'ls-remote','origin','refs/heads/main').split()[0];assert set(git(P,'diff','--name-only',source['remote']['main'],'HEAD').splitlines())=={'memory.md','todo.md','STATUS.md','log.md'}
+ci=api('actions/runs?head_sha='+main+'&per_page=10')['workflow_runs'];assert len(ci)==1 and ci[0]['status']=='completed'and ci[0]['conclusion']=='success';jobs=api('actions/runs/'+str(ci[0]['id'])+'/jobs')['jobs'];assert jobs and all(e['conclusion']=='success'for e in jobs)
+q=dict(tid_utc=datetime.now(timezone.utc).isoformat(),main=main,bare_fire_sentrale_dokumenter_i_main=True,CI=dict(id=ci[0]['id'],status=ci[0]['status'],conclusion=ci[0]['conclusion'],url=ci[0]['html_url']),CI_jobber=[dict(navn=e['name'],conclusion=e['conclusion'])for e in jobs],grafikkilde=read(S/'mottak-publisert.json')['grafikkilde'],grafikk_kvittering=meta['grafikkilde'],endrede_grafikkblobs_bekreftet=meta['filer'],alle_grafikkhash_stemmer=True,hd_mod=pub['hd_mod'],native=3713,moddfiler_bekreftet=21957,png_bekreftet=21951,tidligere_filhash_bevart=True,beskyttede=1472,stasher=source['stash'],hele_figurjobber=508,total_figurjobber=1758,delark='fig178_03',ark_ruter=12,ark_totalt=12,Tom_Claude_godkjenning=False,felles_url=pub['url'],pakker_native=3713,begge_faktiske_pakker_og_fellesvedlegg_SHA_bekreftet=True,runtime_moddfiler_per_pakke=21956,linux_run=pub['linux_run'],windows_run=pub['windows_run'],taggbygg=pub['taggbygg_id'],taggbygg_success=True,native_frosset=False,neste178_kall='H053',neste137_kall='V013',neste296_kall='S037',neste_kall_ikke_utfort_eller_reservert=True,automatikken_fortsetter=True,alle_grafikkjobber_ferdig=False)
+(R/'CI-og-sluttrevisjon.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n');print('Samlepunkt3713 sluttkontrollert,508 hele ark,21957modfiler,begge pakker og grønt taggbygg. CI',ci[0]['id'],'success.',flush=True)
