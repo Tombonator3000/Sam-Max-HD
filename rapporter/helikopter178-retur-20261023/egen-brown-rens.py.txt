@@ -1,0 +1,20 @@
+from pathlib import Path
+import json,shutil,sys,hashlib
+import numpy as np
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+from scipy.cluster.vq import kmeans2
+from PIL import Image
+from smhd.myk import place
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;c=sys.argv[1];K=R/'kall'/c;old=json.loads((K/'kontroll.json').read_text());n=old['rute']
+a=np.array(Image.open(K/'raa.png').convert('RGBA'));mx=int(a[:,:,3].max());a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/mx).astype('uint8');alpha=a[:,:,3].copy();trust=a[:,:,3]>=245;_,ix=nd.distance_transform_edt(~trust,return_indices=True);edge=(a[:,:,3]>0)&~trust;a[edge,:3]=a[tuple(ix)][edge,:3]
+rgb=a[:,:,:3].astype(float);hue=(rgb[:,:,0]>rgb[:,:,1]*1.3)&(rgb[:,:,1]>rgb[:,:,2]*1.8)&(rgb[:,:,0]>50)&(a[:,:,3]>0);train=rgb[hue&(a[:,:,3]>=245)];assert len(train)>1000
+lum=train.mean(1);init=np.array([train[np.argmin(abs(lum-np.quantile(lum,v)))]for v in [.15,.5,.85]]);centres,label=kmeans2(train,init,minit='matrix',iter=40);order=np.argsort(centres.mean(1));centres=centres[order];assert min(np.linalg.norm(centres[i]-centres[j])for i in range(3)for j in range(i))>15
+src=np.array(Image.open(P/f'work/extract/costumes/costume178_{n}.png').convert('RGBA'));colors=np.unique(src[src[:,:,3]>0,:3],axis=0);browns=colors[(colors[:,0]>colors[:,1]*1.3)&(colors[:,1]>colors[:,2]*1.8)&(colors[:,0]>50)];assert len(browns)==3;browns=browns[np.argsort(browns.mean(1))];_,ii=cKDTree(centres).query(rgb[hue]);a[hue,:3]=browns[ii]
+# Andre egne farger renses med samme ikke-romlige nærmeste-palett-metode som før.
+other=(a[:,:,3]>0)&~hue;_,ii=cKDTree(colors).query(a[other,:3]);a[other,:3]=colors[ii];a[a[:,:,3]==0,:3]=0;assert np.array_equal(alpha,a[:,:,3]);Image.fromarray(a).save(K/'egen-brunpalett-renset.png')
+y,x=np.nonzero(a[:,:,3]>=128);h,w=src.shape[:2];sx,sy=4*w/(x.max()-x.min()+1),4*h/(y.max()-y.min()+1);placed=place(a,src,sx,sy);Image.fromarray(placed['bilde']).save(K/'prototype-brunpalett.png')
+proof=dict(kall=c,rute=n,raa_sha256=hashlib.sha256((K/'raa.png').read_bytes()).hexdigest(),egne_brune_RGB_klynger=centres.tolist(),kilde_brunpalett_sortert=browns.tolist(),metode='Tre klart atskilte brune RGB-klynger i egen råtegning sorteres på lyshet og matches til kildens tre brune palettverdier. Ingen originalkoordinater, maskeklipp eller originale fragmenter brukes. Andre egne RGB-farger bruker nærmeste kildepalett.',egen_brunmaske_fra_RGB_ikke_original=True,kildekoordinater_brukt_til_RGB_rens=False,alfa_uendret=True,hel_skala=[float(sx),float(sy)],plassering={k:v for k,v in placed.items()if k!='bilde'},originalmaske=False,lokal_flytting=False,til_kontroll=True)
+(K/'brunpalett-kontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');shutil.copy2(K/'kontroll.json',K/'kontroll-for-brunpalett.json');shutil.copy2(K/'prototype-under-kontroll.png',K/'prototype-for-brunpalett.png');shutil.copy2(K/'prototype-brunpalett.png',K/'prototype-under-kontroll.png')
+q=old;q['native_sha256']=hashlib.sha256((K/'prototype-under-kontroll.png').read_bytes()).hexdigest();q['brunpalett_rens']='brunpalett-kontroll.json';q['visuell_native_kontroll']=False;(K/'kontroll.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+print('Egne brune RGB-klynger',centres.tolist(),'til',browns.tolist(),flush=True)
