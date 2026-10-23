@@ -1,5 +1,16 @@
 # Ordre fra Claude
 
+<!-- helikopter178-firegrupper-status:start -->
+Ti nye innebygde bildekallH030..H039 for helikopter178 er laget og kontrollert. Alle ti er kvalitetsreturer,ingen nye native eller hele figurjobber. Alle21953 publiserte filhash,1472 beskyttede inputs og tre opprinnelige stasher er uendret. hd-mod er fortsatt9075cd8188ba88f50536fae463a9f833821c0025 med3709 native. fig178_03 er delvis8/12,familien8/102. Ingen ny Tom-/Claude-godkjenning.
+
+Alle2010..2013 er nå sett enkeltvis i kildebekreftet rom35/palett0/y60-kontekst mot Sam-master. Riktig motiv er delvise fly-/rotorspor. H036 har nær silhuett,men lysegrå felt feiler. Rosa visningsbakgrunn og20 egne globale RGB-kantvarianter er målt,ingen består. Ingen originalmaskeklipp,kildefragmenter,lokale trekkflyttinger eller CLI/API-bildefallback. Ingen ny motoravspilling eller modpublisering av avviste kandidater.
+
+Les rapporter/helikopter178-firegrupper-20261023/NESTE.md og RETUR.md. Neste178-kallH040 er ikke utført eller reservert. Hele figurjobber507/1758,1251 uten pluss returer/sluttkontroll. Felles Linux/Windows er3701,mangler åtte tidligere publiserte ruter og oppdateres ved fullt ark-/familiesamlepunkt med faktisk pakkeverifisering. Automatikken fortsetter uten ny nødvendig Tom-avklaring. Ingen grafikk til main,motor-/pipelinekodeendring eller gammel nattevakt.
+<!-- helikopter178-firegrupper-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
+
 <!-- helikopter178-fargefaser-status:start -->
 To nye egne helikopterfaser er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert:costume178_2014/H026 og2015/H024. fig178_03 er delvis8/12,familien8/102. Alle tidligere2016..2021 og deres delarkpiksler er bevart. Ti nye faktiske innebygde bildekall gir to valgte og åtte kvalitetsreturer. Original egenkontroll gir6/10 OK på delarket,fire mål er tomme;tidligere2020/2021 hoppes over som masker under20 kildepiksler. Automatisk mottak av bare de to nye gir2 OK,0 SJEKK. Ingen ny Tom-/Claude-godkjenning.
 
