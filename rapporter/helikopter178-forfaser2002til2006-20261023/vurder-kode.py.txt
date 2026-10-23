@@ -1,0 +1,49 @@
+from pathlib import Path
+import json,hashlib,shutil,sys,datetime
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np
+import os
+kernel=int(os.environ.get("SMHD_EGEN_RGB_KJERNE","3"));assert kernel in [3,7]
+from smhd.myk import place
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+cid=sys.argv[1];K=R/'kall'/cid;plan=json.loads((K/'plan.json').read_text());n=plan['rute'];raw=Path(sys.argv[2])
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+assert raw.is_file()
+assert not (K/'raa.png').exists() or sha(K/'raa.png')==sha(raw)
+shutil.copy2(raw,K/'raa.png');plan.update(utfort=True,raw_path=str(raw),raa_sha256=sha(raw),original_kontekst_og_stil_visuelt_sett=True);(K/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+a=np.array(Image.open(raw).convert('RGBA'));mx=int(a[:,:,3].max());assert mx>0;a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/mx).astype('uint8')
+beforealpha=a[:,:,3].copy();weak=(a[:,:,3]>0)&(a[:,:,3]<8);a[weak]=0;assert np.array_equal(beforealpha>=128,a[:,:,3]>=128);(K/'egen-svakalfarens.json').write_text(json.dumps(dict(terskel=8,svake_piksler_tatt_bort=int(weak.sum()),alfa_sum_for=int(beforealpha.sum()),alfa_sum_etter=int(a[:,:,3].sum()),fjernet_alfa_sum=int(beforealpha[weak].sum()),alle_egne_core128_eksakt_bevart=True,egen_alpha_brukt=True,kildemaske=False,kildekoordinater=False,lokal_flytting=False),ensure_ascii=False,indent=2)+'\n')
+# Svak egen alfa under8 er renset globalt;alle egne core128 beholdes.
+trust=a[:,:,3]>=128;_,ix=nd.distance_transform_edt(~trust,return_indices=True);edge=(a[:,:,3]>0)&(a[:,:,3]<32);a[edge,:3]=a[tuple(ix)][edge,:3]
+src=np.array(Image.open(P/f'work/extract/costumes/costume178_{n}.png').convert('RGBA'));src[np.all(src[:,:,:3]==[255,0,255],axis=2)]=0;h,w=src.shape[:2]
+colors=np.unique(src[src[:,:,3]>0,:3],axis=0);pal=json.loads((K/'kodepalett.json').read_text());owncal=json.loads((K/'egen-kodekalibrering.json').read_text())if(K/'egen-kodekalibrering.json').exists()else dict(tabell=[]);combined=pal['tabell']+owncal['tabell'];codes=np.array([v['kode']for v in combined],dtype='uint8');real=np.array([v['ekte']for v in combined],dtype='uint8');assert sorted(set(map(tuple,real)))==sorted(map(tuple,colors));opaque=a[:,:,3]>0;oldalpha=a[:,:,3].copy();vals,indices=cKDTree(codes).query(a[opaque,:3]);idxcanvas=np.zeros(a.shape[:2],int);idxcanvas[opaque]=indices;confident=np.zeros(a.shape[:2],bool)
+for ci in range(len(codes)):confident|=nd.binary_erosion((idxcanvas==ci)&(a[:,:,3]>=128),structure=np.ones((kernel,kernel)),border_value=0)
+assert confident.any();_,nearestown=nd.distance_transform_edt(~confident,return_indices=True);ambiguous=opaque&~confident;beforeidx=idxcanvas.copy();idxcanvas[ambiguous]=idxcanvas[tuple(nearestown)][ambiguous];indices=idxcanvas[opaque];(K/'egen-kodekantrens.json').write_text(json.dumps(dict(egen_kodeklasse_kjerne_erosjon_raw=kernel,egne_RGB_markorer_alpha_minst=128,egne_ambigue_RGB_piksler=int(ambiguous.sum()),endrede_egne_RGB_klasser=int((beforeidx[opaque]!=indices).sum()),alfakanal_uendret=True,kildemaske=False,kildekoordinater=False,storste_komponent_rensing=False,bruk='Alle egne kodeklasseinteriorer etter valgt global egen RGB-kjerneerosjon er RGB-markorer. Egne kant-/blandingspiksler fylles fra naermeste egne klasseinterior;egen alfa og geometri uendret.'),ensure_ascii=False,indent=2)+'\n');a[opaque,:3]=real[indices];a[~opaque,:3]=0;assert np.array_equal(oldalpha,a[:,:,3]);(K/'kode-dekoding.json').write_text(json.dumps(dict(raa_sha256=sha(K/'raa.png'),tabell=combined,egen_RGB_kalibrering=owncal,egen_alfamaks_normalisert=mx,egen_alfa_uendret_ved_RGB_dekoding=True,brukte_kildekoordinater=False,brukte_kildemaske=False,tiltak='Global naermeste RGB-kode til ekte RGB. Bare egne RGB-kantpiksler under32 alfa fylles fra egne core128-piksler.',kode_histogram=[int((indices==i).sum())for i in range(len(codes))],maks_egen_RGB_avstand_til_kode=float(vals.max()),median_egen_RGB_avstand_til_kode=float(np.median(vals))),ensure_ascii=False,indent=2)+'\n')
+Image.fromarray(a).save(K/'egen-renset.png')
+yy,xx=np.nonzero(a[:,:,3]>=128);x0,y0,x1,y1=map(int,(xx.min(),yy.min(),xx.max()+1,yy.max()+1));sx,sy=4*w/(x1-x0),4*h/(y1-y0)
+placed=place(a,src,sx,sy);proto=Image.fromarray(placed['bilde']);proto.save(K/'prototype-under-kontroll.png');b=np.array(proto);core=b[:,:,3]>=128
+ref=Image.new('RGBA',proto.size);ref.alpha_composite(Image.fromarray(src).resize((w*4,h*4),Image.Resampling.NEAREST),(placed['margx']*4,placed['margy']*4));ref.save(K/'original-native-kontroll.png');s=np.array(ref);sm=s[:,:,3]>=128
+lab,count=nd.label(src[:,:,3]>0);drawlab,drawcount=nd.label(core);areas=np.bincount(drawlab.ravel());drawparts=[]
+for i,sl in enumerate(nd.find_objects(drawlab),1):
+ if sl is None:continue
+ ys,xs=np.nonzero(drawlab==i);drawparts.append({'nr':i,'areal_HD':int(areas[i]),'rekt_HD':[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)],'midt_HD':[float(xs.mean()),float(ys.mean())]})
+dist=nd.distance_transform_edt(~core);bgdist=nd.distance_transform_edt(core);px,py=placed['margx']*4,placed['margy']*4
+anchors=[]
+# Hele opake kildedeler og transparente kildepunkt kontrolleres bare som målinger.
+for i,sl in enumerate(nd.find_objects(lab),1):
+ ys,xs=np.nonzero(lab==i);cy=py+ys*4+2;cx=px+xs*4+2;vals=dist[cy,cx]
+ anchors.append({'komponent':i,'areal_1x':len(xs),'midt_HD':[float(cx.mean()),float(cy.mean())],'maks_til_egen_alfa_HD':float(vals.max()),'punkt_over3HD':int((vals>3).sum()),'berorte_egne_komponenter':sorted(set(int(x) for x in drawlab[cy,cx] if x))})
+ys,xs=np.nonzero(src[:,:,3]==0);bg=bgdist[py+ys*4+2,px+xs*4+2];neg={'kildepunkter':len(xs),'maks_til_egen_apning_HD':float(bg.max()) if len(bg) else 0.,'punkt_over3HD':int((bg>3).sum())}
+board=Image.new('RGB',(proto.width*2+60,proto.height+70),'#304050');d=ImageDraw.Draw(board)
+for i,(im,label) in enumerate([(ref,'Original 4x, bare kontroll'),(proto,cid+' egen tegning, under kontroll')]):
+ bgim=Image.new('RGBA',im.size,'#87959e');bgim.alpha_composite(im);board.paste(bgim.convert('RGB'),(20+i*(proto.width+20),45));d.text((20+i*(proto.width+20),16),label,fill='white')
+board.save(K/'sammenligning.png')
+# Kontaktark i 2x visningszoom.
+board.resize((board.width*2,board.height*2),Image.Resampling.NEAREST).save(K/'sammenligning2x.png')
+r={k:v for k,v in placed.items() if k!='bilde'};r.update(kall=cid,rute=n,verktøy='innebygd image_gen',raa_sha256=sha(K/'raa.png'),raa_maal=list(Image.open(raw).size),raa_alfa_maks=mx,egen_core_bbox=[x0,y0,x1,y1],hel_skala=[sx,sy],hel_affin_port=.88<=sx/sy<=1.12,egen_RGB_til_kildepalett=True,egen_RGB_kodedekoding=True,alle_egne_alfakomponenter_bevart=False,svak_egen_alfa_under8_renset=True,alle_egne_core128_bevart=True,alfa_uendret_ved_RGB_rens=True,native_maal=list(proto.size),native_sha256=sha(K/'prototype-under-kontroll.png'),kilde_komponenter=count,egne_core128_komponenter=drawcount,egne_komponenter=drawparts,alfa_fester=anchors,apninger=neg,originalmaske_brukt_til_klipp=False,originalfragmenter=False,lokal_flytting_av_trekk=False,egen_alfa=True,visuelt_sett_raa=True,visuell_native_kontroll=False,levert=False,native_mottatt=False,motorobservert=False,publisert=False,tom_claude_godkjent=False,status='UNDER_KONTROLL',tid_utc=datetime.datetime.now(datetime.timezone.utc).isoformat())
+r['tekniske_porter_bestatt']=r['hel_affin_port'] and r['snitt_union']>=.6 and r['dekning']>=.8 and not r['kuttet'];r['alle_alfa_fester_innen3HD']=all(x['punkt_over3HD']==0 for x in anchors) and neg['punkt_over3HD']==0
+(K/'kontroll.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
+shutil.copytree(K,O/'kall'/cid,dirs_exist_ok=True)
+print(json.dumps({k:r[k] for k in ['kall','rute','snitt_union','dekning','hel_skala','flytt','margx','margy','kilde_komponenter','egne_core128_komponenter','tekniske_porter_bestatt','alle_alfa_fester_innen3HD']},ensure_ascii=False));print('opaque',[(q['komponent'],q['punkt_over3HD'],q['maks_til_egen_alfa_HD']) for q in anchors]);print('transparent',neg)
