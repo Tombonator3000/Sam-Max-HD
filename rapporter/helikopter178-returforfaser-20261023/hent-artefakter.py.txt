@@ -1,0 +1,20 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor,as_completed
+import subprocess,json,hashlib,datetime
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C='8026259880ef37ba2ba917022ec78c3c8d251842';old='bb461e2fa805eb709527f390caab13509227add3';sha=lambda b:hashlib.sha256(b).hexdigest()
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/gpt-arbeid'],cwd=A,text=True).split()[0];assert remote==C
+changed=subprocess.check_output(['git','diff','--name-only','-z',old,C],cwd=A).decode().strip('\x00').split('\x00');want={};B=O/'hentet-grafikk-blobs';B.mkdir(exist_ok=True)
+for path in changed:
+ data=(A/path).read_bytes();oid=subprocess.check_output(['git','rev-parse',C+':'+path],cwd=A,text=True).strip();want.setdefault(oid,[]).append(dict(fil=path,sha256=sha(data)))
+def get(oid):
+ path=B/oid
+ if not path.exists():path.write_bytes(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/blobs/'+oid,'-H','Accept: application/vnd.github.raw'],cwd=P))
+ data=path.read_bytes();assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==oid
+ for q in want[oid]:assert sha(data)==q['sha256'],q['fil']
+ return len(want[oid])
+count=0
+with ThreadPoolExecutor(max_workers=6)as ex:
+ fs=[ex.submit(get,oid)for oid in want]
+ for f in as_completed(fs):count+=f.result()
+assert count==len(changed)==294
+proof=dict(grafikk_commit=C,fjern_ref_bekreftet=remote,filer=count,unike_faktisk_nedlastede_blobs=len(want),alle_filhash_bekreftet=True,metode='Faktisk GitHub git/blobs RAW-nedlasting per unik blob. GitblobSHA1 og hver SHA256 kontrollert.',tid_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),filhash=[q for rows in want.values()for q in rows]);(O/'grafikk-hentet-kontrollert.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:v for k,v in proof.items()if k!='filhash'},ensure_ascii=False),flush=True)
