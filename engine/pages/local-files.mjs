@@ -27,7 +27,7 @@ export function selectFiles(files, kind) {
       // Sam & Max CD: index, data (with the music), speech, and the optional MT-32 ROMs
       if (!/^(SAMNMAX\.(000|001)|MONSTER\.SOU|MT32_(CONTROL|PCM)\.ROM)$/.test(relative)) continue;
     } else {
-      if (!/^(mod\.json|rooms\/room\d+(_idx)?\.png|objects\/obj\d+_[0-9a-fA-F]{2}(_idx|_hd)?\.png|costumes\/costume\d+_\d+(_idx|_hd)?\.png|fonts\/[a-z0-9-]+\.(txt|png))$/.test(relative)) continue;
+      if (!/^(mod\.json|rooms\/room\d+(?:\.(?:png|webp)|_(?:idx|mask)\.png)|objects\/obj\d+_[0-9a-fA-F]{2}(?:(?:_hd)?\.(?:png|webp)|_(?:idx|mask)\.png)|costumes\/costume\d+_\d+(?:(?:_hd)?\.(?:png|webp)|_(?:idx|mask)\.png)|fonts\/[a-z0-9-]+\.(txt|png|webp))$/.test(relative)) continue;
     }
     const path = root + relative;
     if (selected.has(path)) throw new Error('To filer har samme navn: ' + relative);
@@ -36,7 +36,7 @@ export function selectFiles(files, kind) {
   if (kind === 'game' && (!selected.has(root + 'SAMNMAX.000') || !selected.has(root + 'SAMNMAX.001'))) {
     throw new Error('Velg mappen som inneholder SAMNMAX.000 og SAMNMAX.001.');
   }
-  if (kind !== 'game' && (!selected.has(root + 'mod.json') || ![...selected.keys()].some(p => /\/rooms\/room\d+\.png$/.test(p)))) {
+  if (kind !== 'game' && (!selected.has(root + 'mod.json') || ![...selected.keys()].some(p => /\/rooms\/room\d+\.(?:png|webp)$/.test(p)))) {
     throw new Error('Velg HD-mappen som inneholder mod.json og rooms.');
   }
   return [...selected.values()];
@@ -50,9 +50,9 @@ export function summarize(rows, created = null) {
   return {
     files: rows.map(({path, size}) => ({path, size})),
     bytes: rows.reduce((sum, row) => sum + row.size, 0),
-    rooms: count(/\/rooms\/room\d+\.png$/),
-    objects: new Set(rows.map(row => row.path.match(/\/objects\/(obj\d+_[0-9a-fA-F]{2})(_hd)?\.png$/)?.[1]).filter(Boolean)).size,
-    cels: new Set(rows.map(row => row.path.match(/\/costumes\/(costume\d+_\d+)(_hd)?\.png$/)?.[1]).filter(Boolean)).size,
+    rooms: new Set(rows.map(row => row.path.match(/\/rooms\/(room\d+)\.(?:png|webp)$/)?.[1]).filter(Boolean)).size,
+    objects: new Set(rows.map(row => row.path.match(/\/objects\/(obj\d+_[0-9a-fA-F]{2})(_hd)?\.(?:png|webp)$/)?.[1]).filter(Boolean)).size,
+    cels: new Set(rows.map(row => row.path.match(/\/costumes\/(costume\d+_\d+)(_hd)?\.(?:png|webp)$/)?.[1]).filter(Boolean)).size,
     created
   };
 }
@@ -272,7 +272,7 @@ export async function prefetch(source, rows, {workers = 2, stop = () => false, p
   // many and small: last, the game fetches them itself when it needs them.
   const paths = new Set(rows.map(row => row.path));
   const indexOnly = path => /\/costumes\/.*_idx\.png$/.test(path) &&
-    !paths.has(path.replace(/_idx\.png$/, '_hd.png')) && !paths.has(path.replace(/_idx\.png$/, '.png'));
+    !['_hd.png', '_hd.webp', '.png', '.webp'].some(suffix => paths.has(path.replace(/_idx\.png$/, suffix)));
   const rank = path => indexOnly(path) ? 4 : /\/costumes\//.test(path) ? 0 : /\/objects\//.test(path) ? 1 : /\/rooms\//.test(path) ? 2 : 3;
   const queue = rows.filter(row => row.path.startsWith(MOD_ROOT))
     .sort((a, b) => rank(a.path) - rank(b.path) || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));

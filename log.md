@@ -2637,3 +2637,8 @@ Gjenoppta rapporter/helikopter178-retur2001og2000-20261023/NESTE.md og RETUR.md.
 Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes med lokale kontroller. Felles Linux/Windows helikopter-utgave har fortsatt 3713 og mangler ti etter publisering. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning med nedlasting, sjekksummer og grafikkinnhold kontrollert. Ingen ny pakkedispatch her. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE, all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattprosess.
 
 For å begrense videre diskvekst brukes én reflink-kandidat, eksisterende Git-objekter gjennom separat indeks og strømmet fjernarkiv med full SHA256-kontroll. Ingen ekstra full klon, lagret TAR eller kontrollkopi for publisering. Eksisterende arbeidskopier og filer er ikke slettet. WebP-/AVIF-testen er fortsatt bare separate kopier; spillets bildeformat er uendret.
+
+## 2026-10-23 16:37 (Codex)
+
+- Tom ba om WebP-motor, tapsfri konvertering og sletting av gamle kopier og erstattede PNG-filer etter verifisering. Implementert felles WebP/PNG-leser, libwebp-bygg for Linux, Windows og nettleser, samt tapsfri konverterer med full RGBA-kontroll. Indeks- og maskebilder beholdes som PNG. Ingen originalgrafikk endres i kodegrenen.
+- Lokal kontroll: 69 pipeline-tester bestått, 3 spilltester utelatt. Native bygg, reell PNG/WebP-avspilling og nettleserbygg skal kontrolleres i Actions før fletting. Se docs/WEBP.md.

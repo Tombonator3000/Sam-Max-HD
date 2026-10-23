@@ -10,6 +10,7 @@ finnes ennå.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -62,6 +63,8 @@ def pack(src: Path, out: Path) -> dict:
     shutil.copy2(src / 'COPYING', out / 'COPYING.txt')
     shutil.copy2(src / 'COPYRIGHT', out / 'COPYRIGHT.txt')
     shutil.copytree(dist / 'doc', out / 'licenses')
+    webp_license = Path(os.environ.get('EMSDK_DIR', str(HERE / 'emsdk'))) / 'sam-max-webp/COPYING.libwebp'
+    shutil.copy2(webp_license, out / 'licenses/COPYING.libwebp')
     (out / '.nojekyll').touch()
 
     # GPL corresponding source: actual patched tracked sources + new HD files,
@@ -72,7 +75,7 @@ def pack(src: Path, out: Path) -> dict:
         for name in sorted(set(tracked + ['engines/scumm/dighd.cpp', 'engines/scumm/dighd.h'])):
             if name and (src / name).is_file():
                 archive.add(src / name, arcname='sam-max-hd-source/scummvm/' + name, recursive=False)
-        for name in ('SCUMMVM_COMMIT', 'build-web.sh', 'build-pages.py', 'patches/0001-dighd-hd-grafikk.patch'):
+        for name in ('SCUMMVM_COMMIT', 'build-web.sh', 'build-webp.sh', 'build-pages.py', 'patches/0001-dighd-hd-grafikk.patch'):
             archive.add(HERE / name, arcname='sam-max-hd-source/engine/' + name)
         for name in UI:
             archive.add(HERE / 'pages' / name, arcname='sam-max-hd-source/engine/pages/' + name)

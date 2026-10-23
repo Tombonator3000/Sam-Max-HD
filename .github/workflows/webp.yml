@@ -1,0 +1,69 @@
+name: WebP-motor
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'engine/**'
+      - 'pipeline/smhd/webp.py'
+      - 'pipeline/tests/test_webp.py'
+      - 'tools/test_webp_motor.py'
+      - '.github/workflows/webp.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Byggepakker
+        run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libsdl2-dev libpng-dev libwebp-dev zlib1g-dev
+      - name: Pipeline og pikseltester
+        run: |
+          pip install -e 'pipeline[dev]'
+          pytest pipeline/tests/test_webp.py -q
+      - name: Bygg motoren
+        run: JOBS=$(nproc) engine/build.sh
+      - name: Spill og publisert mod
+        run: |
+          tools/hent_spilldata.sh
+          tools/mod_gren.sh hent
+      - name: Kontroller tapsfri mod og avspilling
+        run: python tools/test_webp_motor.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: WebP-motor-Linux
+          path: |
+            engine/scummvm/scummvm
+            out/webp-test/*.json
+            out/webp-test/*/*.log
+          retention-days: 3
+
+  nettleserbygg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Byggepakker
+        run: sudo apt-get update && sudo apt-get install -y pkg-config zip xz-utils
+      - uses: actions/cache@v4
+        with:
+          path: engine/emsdk
+          key: emsdk-webp-${{ hashFiles('engine/SCUMMVM_COMMIT', 'engine/build-webp.sh') }}
+      - name: Bygg nettlesermotoren og Pages-pakken
+        run: |
+          JOBS=$(nproc) engine/build-web.sh
+          python3 engine/build-pages.py --out out/webp-pages
+          node --test engine/pages/tests/*.test.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WebP-motor-nettleser
+          path: out/webp-pages
+          retention-days: 3

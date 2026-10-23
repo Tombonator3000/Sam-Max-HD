@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Bygger ScummVM med HD-patchen (samme patch som The Dig HD, se docs/HD-MOTOR.md).
 #
-# Krever: git, make, g++ (eller clang++), SDL2 og libpng med utviklingsfiler.
-#   Ubuntu/Debian: sudo apt install build-essential git libsdl2-dev libpng-dev zlib1g-dev
+# Krever: git, make, g++ (eller clang++), SDL2, libpng og libwebp med utviklingsfiler.
+#   Ubuntu/Debian: sudo apt install build-essential git libsdl2-dev libpng-dev libwebp-dev zlib1g-dev
 #
 # Bruk:  engine/build.sh            (kildekoden havner i engine/scummvm)
 #        SCUMMVM_SRC=/annen/mappe engine/build.sh
@@ -36,6 +36,7 @@ cd "$SRC"
 VALG="--disable-all-engines --enable-engine=scumm,scumm-7-8 --disable-engine=he,rebel2-psx --disable-detection-full \
 --disable-debug --enable-optimizations --enable-mt32emu --disable-fluidsynth --disable-cloud --disable-libcurl \
 --disable-sdlnet --disable-tts --disable-eventrecorder"
+VALG="$VALG --enable-png --enable-webp"
 if [ ! -f config.mk ] || [ "${RECONFIGURE:-0}" = "1" ] || [ "$(cat .dighd-valg 2>/dev/null)" != "$VALG" ]; then
 	echo "Konfigurerer (bare SCUMM-motoren) ..."
 	# shellcheck disable=SC2086

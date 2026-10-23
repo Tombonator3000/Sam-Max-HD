@@ -57,9 +57,14 @@ fi
 # shellcheck disable=SC1091
 EMSDK_QUIET=1 source "$EMSDK_DIR/emsdk_env.sh"
 
+# Den låste Emscripten-utgaven har ingen innebygd WebP-port.
+WEBP_PREFIX="$EMSDK_DIR/sam-max-webp"
+"$HERE/build-webp.sh" "$WEBP_PREFIX" > "$EMSDK_DIR/webp.log" 2>&1 \
+  || { tail -30 "$EMSDK_DIR/webp.log"; exit 1; }
+
 # 3. Konfigurer og bygg
 cd "$SRC"
-if [ ! -f config.mk ] || [ "${RECONFIGURE:-0}" = "1" ]; then
+if [ ! -f config.mk ] || [ "${RECONFIGURE:-0}" = "1" ] || [ ! -f .dighd-webp ]; then
 	echo "Konfigurerer for nettleseren (bare SCUMM-motoren) ..."
 	# Emscripten slår av valgfrie biblioteker som ikke er slått på; DigHD trenger PNG og zlib.
 	# Sam & Max (SCUMM v6) trenger ikke scumm-7-8, men dighd.cpp bruker ScummEngine_v7 uten
@@ -70,16 +75,18 @@ if [ ! -f config.mk ] || [ "${RECONFIGURE:-0}" = "1" ]; then
 	# -msimd128: WebAssembly SIMD, så kompilatoren kan regne på flere piksler om gangen i DigHD
 	# (bildebyggingen og fargetoningen). Alle nyere nettlesere har det (Chrome 91, Firefox 89,
 	# Safari 16.4). Lagt til 15. oktober etter Toms melding om hakking.
+	WEBP_CFLAGS="-I$WEBP_PREFIX/include" WEBP_LIBS="$WEBP_PREFIX/lib/libwebp.a" \
 	CXXFLAGS="${CXXFLAGS:-} -msimd128" CFLAGS="${CFLAGS:-} -msimd128" \
 	emconfigure ./configure --host=wasm32-unknown-emscripten --build=wasm32-unknown-emscripten \
 		--disable-all-engines --enable-engine=scumm,scumm-7-8 \
 		--disable-engine=he,rebel2-psx --disable-detection-full \
 		--disable-debug --enable-optimizations \
-		--enable-png --enable-zlib \
+		--enable-png --enable-zlib --enable-webp \
 		--enable-mt32emu --disable-fluidsynth --disable-cloud --disable-libcurl \
 		--disable-sdlnet --disable-tts --disable-eventrecorder > configure.log 2>&1 \
 		|| { tail -30 configure.log; echo "Konfigureringen feilet, se $SRC/configure.log"; exit 1; }
 	rm -f scummvm-conf.*
+	touch .dighd-webp
 fi
 
 echo "Bygger med $JOBS tråder (første gang tar det noen minutter) ..."
