@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H163';BF=R/'kall/H149/egen-renset.png';base=np.array(Image.open(BF).convert('RGBA'))
+spec=[('H138/egen-renset.png',[[55,55,55],[115,115,115],[251,251,251],[83,43,0],[115,59,11]]),('H163/hele-egne-enkeltplan/RGB-71-71-71/egen-robust-registrert-modul/egen-helmodul.png',None),('H163/hele-egne-enkeltplan/RGB-151-151-151/egen-registrert-modul/egen-helmodul.png',None),('H162/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',None),('H160/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',[[0,0,0],[35,35,19],[43,67,27],[123,115,203],[123,175,207]]),('H159/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',None),('H161/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',[[195,103,7],[239,135,39]])]
+rgb=np.zeros_like(base);have=np.zeros(base.shape[:2],bool);alpha=np.zeros(base.shape[:2],np.uint8)
+for name,cols in spec:
+    p=np.array(Image.open(R/'kall'/name).convert('RGBA'))
+    if cols is not None:
+        keep=np.zeros(p.shape[:2],bool)
+        for col in cols:keep|=np.all(p[:,:,:3]==col,2)
+        p[~keep]=0
+    paint=p[:,:,3]>=128;rgb[paint,:3]=p[paint,:3];have|=paint;alpha=np.maximum(alpha,p[:,:,3])
+_,ix=nd.distance_transform_edt(~have,return_indices=True);rgb[~have,:3]=rgb[tuple(ix)][~have,:3]
+for mode in ['flettet-71-151-egen-alfa','flettet-71-151-alfa-union']:
+    a=rgb.copy();a[:,:,3]=base[:,:,3]if mode.endswith('egen-alfa')else np.maximum(base[:,:,3],alpha);a[a[:,:,3]==0,:3]=0;D=K/mode;D.mkdir(exist_ok=False);Image.fromarray(a).save(D/'egen-sammensatt.png');info=json.loads((R/'kall/H149/plan.json').read_text());info.update(nytt_bildekall=False,hele_egne_fargeklasser={'regel':'Hele egne fargeklasser fra tidligere H138 og nye H162/H160/H159/H161-materialplan, med egen H149-alfa. Frigjøring av tidligere fargeklasser skjer for hele klassen. RGB-fringe og umalte mellomrom fylles bare fra nærmeste nye/eldre egne malte kjerne. Ingen originalfil, kildepiksler, lokal fargepåmaling eller kildekoordinat brukes.','modus':mode,'lag':[dict(egen_fil=n,hele_egne_klasser=c,sha256=hashlib.sha256((R/'kall'/n).read_bytes()).hexdigest())for n,c in spec],'egen_alfa_fil':str(BF.relative_to(R)),'egen_alfa_SHA256':hashlib.sha256(BF.read_bytes()).hexdigest(),'egen_alfa_bytebevart':mode.endswith('egen-alfa')});(D/'plan.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n');print(D.relative_to(R/'kall'))
+(R/'samle-robuste-egne-plan1998.py.txt').write_bytes(Path(__file__).read_bytes())

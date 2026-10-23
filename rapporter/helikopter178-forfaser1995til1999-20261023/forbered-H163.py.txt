@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H163';K.mkdir(exist_ok=False);S=R/'kilder/1998'
+cols=[[71,71,71],[83,43,0],[151,151,151]];codes=[[255,0,0],[0,0,255],[255,235,175]]
+tab=[dict(ekte=a,kode=b)for a,b in zip(cols,codes)];src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));b=src.copy();b[:,:,:3]=[96,96,96];b[:,:,3]=0
+for e in tab:b[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode'];b[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),3]=255
+im=Image.fromarray(b).resize((src.shape[1]*11,src.shape[0]*11),Image.Resampling.NEAREST);can=Image.new('RGBA',(1024,1024),'#606060');can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));can.convert('RGB').save(K/'kilde-materialplan.png')
+p='''Use case: precise-object-edit. Redraw exactly the three coloured technical stencil planes in image1. These are separate mechanical material regions, not a picture to reinterpret or complete. Image1 defines every red, blue and pale cream region's full shape, size, location and count. Image2 supplies only the approved smooth antialiased cartoon edge finish. All grey background becomes true alpha transparency.
+Keep the large thin cream areas on the two upper triangular contours, their jagged inner boundaries and all their small detached fragments. Retain every red region, including all disconnected red bands and the peaked central red shape with its hollow space. Keep every blue strip and tiny blue patch throughout the stencil, including the isolated small lower-left pieces. Do not turn hollow regions into filled panels, add a stem, runner, outline or complete object. Copy all tiny opaque pieces as actual painted pieces in the same locations, not decorative dots or transparent holes. Preserve separation across all grey gaps. Only gently smooth diagonal outside contours into clean continuous cartoon curves, keeping all corners, notches and small inserts. Flat exact red255,0,0, blue0,0,255 and pale cream255,235,175. No other colours, shading, gradient, glow, texture, labels or black outlines. Keep image1 square canvas, central placement and scale. One transparent1024x1024 PNG containing only these same three planes.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'kilde-materialplan.png'),str(A/'hovedark/sam.png')],transparent_background=True);sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();BF=R/'kall/H162/nye-treplan-egen-alfa/egen-sammensatt.png';REF=BF
+plan=dict(kall='H163',rute=1998,utfort=False,modul='tre-hele-materialplan-uten-silhuettguide',tabell=tab,egen_basis=str(BF.relative_to(R)),egen_basis_sha256=sha(BF),egen_registreringsbasis=str(REF.relative_to(R)),egen_registreringsbasis_sha256=sha(REF),original_kontekst_og_stil_sett=True,originalmaske=False,kildekoordinater_til_plassering=False,referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(p+'\n')
+for name,d in [('argumenter.json',args),('plan.json',plan)]:(K/name).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-H163.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+from own_parts import decode
+import numpy as np,json,subprocess,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H158';p=json.loads((K/'plan.json').read_text());raw,clean=decode(K/'raa.png',p['tabell']);BF=R/'kall/H164/smalle-plan-robust-egen-alfa/egen-sammensatt.png';old=np.array(Image.open(BF).convert('RGBA'));parent=K/'hele-egne-enkeltplan';parent.mkdir(exist_ok=False)
+for e in p['tabell']:
+    if e['ekte'] not in [[55,55,55],[115,115,115],[251,251,251]]:continue
+    col=e['ekte'];name='RGB-'+'-'.join(map(str,col));D=parent/name;D.mkdir();part=raw.copy();part[~np.all(part[:,:,:3]==col,2)]=0;Image.fromarray(part).save(D/'egen-modul-renset.png');ref=old.copy();ref[~np.all(ref[:,:,:3]==col,2)]=0;F=D/'forrige-eget-plan';F.mkdir();Image.fromarray(ref).save(F/'egen-renset.png');yy,xx=np.nonzero(ref[:,:,3]>=128);rect=[max(0,int(xx.min())-15),max(0,int(yy.min())-15),min(old.shape[1],int(xx.max())+16),min(old.shape[0],int(yy.max())+16)]
+    pp=dict(p);pp.update(nytt_bildekall=False,hele_materialplanet_alene=col,egen_basis=str(F.relative_to(R/'kall')),egen_rect=rect,regel='Hele ene fargeplanet fra samme faktiske H158-raabilde registreres som ett stykke bare mot hele tidligere egne tilsvarende fargeplan. Ingen originalfiler, kildekoordinater eller lokal trekkflytting.',egen_raa_SHA256=hashlib.sha256((K/'raa.png').read_bytes()).hexdigest(),egen_planrens=clean);(D/'plan.json').write_text(json.dumps(pp,ensure_ascii=False,indent=2)+'\n');subprocess.run(['/home/tom/Sam-Max-HD/.venv/bin/python',str(O/'registrer-egen-modul-v2.py'),str(D.relative_to(R/'kall')),str(BF.parent.relative_to(R/'kall'))],check=True)
+(R/'registrer-graa-enkeltplan1998.py.txt').write_bytes(Path(__file__).read_bytes())

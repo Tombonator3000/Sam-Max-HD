@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H159';K.mkdir(exist_ok=False);S=R/'kilder/1998'
+cols=[[7,95,51],[19,59,31],[43,79,35],[43,91,43],[55,83,39]];codes=[[255,0,0],[0,0,255],[0,255,255],[255,235,175],[255,0,255]]
+tab=[dict(ekte=a,kode=b)for a,b in zip(cols,codes)];src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));b=src.copy();b[:,:,:3]=[170,170,170]
+for e in tab:b[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode']
+im=Image.fromarray(b).resize((src.shape[1]*11,src.shape[0]*11),Image.Resampling.NEAREST);can=Image.new('RGBA',(1024,1024),'#606060');can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));can.convert('RGB').save(K/'kilde-materialplan.png')
+p='''Use case: precise-object-edit. Draw ONLY the FIVE coloured planes in image1, phase1998. The aircraft shape in grey is only a placement guide and must disappear. Image2 gives the approved smooth antialiased cartoon edge finish only. Copy every red, blue, cyan, pale cream and magenta region from image1 with its full original shape, location, area and count. These are disconnected mechanical material patches, never a new aircraft design.
+Retain the extremely small red piece near the left hanging fin. Keep all small blue/cyan patches below the body and the thin lower runners, every cream portion on the left hanging fin and near the left end of each sloping runner, and every magenta block on the lower struts and fin. Do not merge neighbouring patches, sprinkle or redistribute colour, extend them through grey areas, shrink them to dots or turn cream into yellow. Keep tiny opaque pieces opaque. Copy the precise pattern of separate pieces, without adding any strips, outlines or details. Grey gaps and grey aircraft/background become genuine alpha transparency. Flat exact RGB red255,0,0; blue0,0,255; cyan0,255,255; cream255,235,175; magenta255,0,255. No shading, gradients, glow, texture, labels, grey or black outlines. Smooth only the sloped external edges into clean continuous cartoon contours, preserving all small inserts and geometry. Keep image1 square canvas, central scale and placement. One transparent1024x1024 PNG with only those five planes.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'kilde-materialplan.png'),str(A/'hovedark/sam.png')],transparent_background=True);sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();BF=R/'kall/H158/frigjorte-egne-plan/egen-sammensatt.png';REF=R/'kall/H138/egen-renset.png'
+plan=dict(kall='H159',rute=1998,utfort=False,modul='fem-hele-gronnmaterialplan',tabell=tab,egen_basis=str(BF.relative_to(R)),egen_basis_sha256=sha(BF),egen_registreringsbasis=str(REF.relative_to(R)),egen_registreringsbasis_sha256=sha(REF),original_kontekst_og_stil_sett=True,originalmaske=False,kildekoordinater_til_plassering=False,referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(p+'\n')
+for name,d in [('argumenter.json',args),('plan.json',plan)]:(K/name).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-H159.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H165';K.mkdir(exist_ok=False);S=R/'kilder/1998'
+cols=[[35,35,19],[115,115,115]];codes=[[255,0,0],[0,0,255]]
+tab=[dict(ekte=a,kode=b)for a,b in zip(cols,codes)];src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));b=src.copy();b[:,:,:3]=[96,96,96];b[:,:,3]=0
+for e in tab:b[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode'];b[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),3]=255
+im=Image.fromarray(b).resize((src.shape[1]*11,src.shape[0]*11),Image.Resampling.NEAREST);can=Image.new('RGBA',(1024,1024),'#606060');can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));can.convert('RGB').save(K/'kilde-materialplan.png')
+p='''Use case: precise-object-edit. Draw ONLY the TWO technical stencil planes in image1: pure red and pure blue. This is a literal map of disconnected mechanical material regions, not an aircraft to complete. Image1 defines every piece, full area, boundary, thickness, location and count. Image2 supplies only the clean antialiased cartoon edge finish.
+Retain every separate red rectangular upper insert and the two narrow sloping red lower strips, with exactly their thin widths, gaps, interruptions and deliberately cut ends. Do not add a curled tip or extend a red strip into its neighbour. Keep every blue horizontal upper band, each thin separated blue fragment on the left structure and the isolated tiny blue lower piece. There is no blue patch below the middle body: do not invent any extra patch or fill empty space. Do not join pieces across grey, broaden a band, round a rectangle into a dot or drop tiny pieces as noise. Only gently smooth sloping outer edges into continuous cartoon contours, preserving all corners and small inserts. Every grey area and enclosed grey gap becomes genuine alpha transparency. Flat exact red255,0,0 and blue0,0,255 only, no other colours, shading, gradient, texture, glow, black outline, labels or new parts. Keep image1 square canvas, central scale and placement. One transparent1024x1024 PNG containing only the same two planes.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'kilde-materialplan.png'),str(A/'hovedark/sam.png')],transparent_background=True);sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();BF=R/'kall/H164/alfamin-egne-materialplan-r1/egen-sammensatt.png';REF=BF
+plan=dict(kall='H165',rute=1998,utfort=False,modul='tre-hele-materialplan-uten-silhuettguide',tabell=tab,egen_basis=str(BF.relative_to(R)),egen_basis_sha256=sha(BF),egen_registreringsbasis=str(REF.relative_to(R)),egen_registreringsbasis_sha256=sha(REF),original_kontekst_og_stil_sett=True,originalmaske=False,kildekoordinater_til_plassering=False,referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(p+'\n')
+for name,d in [('argumenter.json',args),('plan.json',plan)]:(K/name).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-H165.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

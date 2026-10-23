@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H156';K.mkdir(exist_ok=False);S=R/'kilder/1998'
+BF=R/'kall/H149/egen-renset.png';rect=[40,415,600,780];guide=[0,0,38,24]
+pal=json.loads((R/'kall/H149/kodepalett.json').read_text());src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));own=np.array(Image.open(BF).convert('RGBA'));code=own.copy()
+for e in pal['tabell']:
+    src[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode'];code[np.all(own[:,:,:3]==e['ekte'],2)&(own[:,:,3]>0),:3]=e['kode']
+im=Image.fromarray(src).crop(guide);sc=min(896/im.width,896/im.height);im=im.resize((round(im.width*sc),round(im.height*sc)),Image.Resampling.NEAREST);can=Image.new('RGBA',(1024,1024),'#808080');can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));can.convert('RGB').save(K/'forstorret-kildeguide.png');Image.fromarray(code).crop(rect).save(K/'egen-forrige-modul-kode.png');(K/'kodepalett.json').write_text(json.dumps(pal,ensure_ascii=False,indent=2)+'\n')
+D=K/'egen-grunnlag';D.mkdir();(D/'egen-sammensatt.png').write_bytes(BF.read_bytes())
+p='''Use case: precise-object-edit. Redraw ONLY the entire enlarged left mechanical section in image1, phase1998. It is a cropped game animation cel: a broad triangular upper rotor surface, thin supporting angled stem, short tail beam and small hanging lower fin assembly, with the cut beginning of the fuselage at the right. Do not complete these cropped parts. Image1 is the exact layout and flat colour-ID map. Image2 supplies only the approved smooth cartoon edge finish. Image3 is our previous faulty own module, only a geometry/error reference, never a design or colour authority.
+Faithfully keep EVERY separate flat colour region of image1 in the same area, with the same full extent, thickness and contacts. Keep all the tiny blue, teal, navy, white, olive, salmon, mint, dark green, lavender and cream inserts. Do not sprinkle or redistribute colour blocks. Do not round a patch into a dot, extend it into its neighbour, change cream into yellow, merge greens or turn navy inserts into holes. Copy the blue/teal/purple band pattern on the upper triangular surface and all the tiny inserts on the hanging lower part literally. The irregular cut right edge is intentional.
+Make diagonal outer edges and stems continuous smooth antialiased cartoon contours as in image2, while preserving the exact shapes and small details. Keep the flat internal regions, no new outline separating them. Grey background and grey gaps become genuine alpha transparency. No visible grey backdrop, labels, new details, shading, texture, gradients or black outline. Keep image1 square canvas, central placement and scale. One transparent1024x1024 PNG.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'forstorret-kildeguide.png'),str(A/'hovedark/sam.png'),str(K/'egen-forrige-modul-kode.png')],transparent_background=True);sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+plan=dict(kall='H156',rute=1998,utfort=False,original_kontekst_og_stil_sett=True,modul='hel-venstredel-med-rotor-og-fin',egen_basis='H156/egen-grunnlag',egen_basis_fra='H149',egen_rect=rect,kildeutsnitt_kun_guide=guide,kildekoordinater_til_plassering=False,originalmaske=False,egen_fullgrunnlag_sha256=sha(BF),referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(p+'\n')
+for name,d in [('argumenter.json',args),('plan.json',plan)]:(K/name).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-H156.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

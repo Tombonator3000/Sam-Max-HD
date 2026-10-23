@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H164';B=K/'slutt-hel151-eldre-hvit';p=json.loads((B/'plan.json').read_text());base=np.array(Image.open(B/'egen-sammensatt.png').convert('RGBA'));union=np.zeros(base.shape[:2],np.uint8)
+for e in p['hele_egne_klasseplan']['lag']:
+    a=np.array(Image.open(R/'kall'/e['egen_fil']).convert('RGBA'));cols=e['hele_egne_klasser']
+    if cols is not None:
+        keep=np.zeros(a.shape[:2],bool)
+        for col in cols:keep|=np.all(a[:,:,:3]==col,2)
+        a[~keep]=0
+    union=np.maximum(union,a[:,:,3])
+for radius in [0,1,3]:
+    a=base.copy();support=union if radius==0 else nd.maximum_filter(union,size=2*radius+1);a[:,:,3]=np.minimum(base[:,:,3],support);a[a[:,:,3]==0,:3]=0;D=K/f'alfamin-egne-materialplan-r{radius}';D.mkdir();Image.fromarray(a).save(D/'egen-sammensatt.png');pp=json.loads(json.dumps(p));pp.update(nytt_bildekall=False,egen_alfa_minimum={'regel':'Minimum av hele egne H149-matte og unionen av faktisk malte egne materialplan. RGB og definert egen fringe beholdes. Eventuelt ensartet maksfilter av hele egen materialunion lukker små egne sømmer. Ingen originalfiler eller kildekoordinater, ingen kildemaske, ingen lokal trekkflytting.','egne_materialplan_fra':str((B/'plan.json').relative_to(R)),'base_SHA256':hashlib.sha256((B/'egen-sammensatt.png').read_bytes()).hexdigest(),'maksfilter_raw':radius,'endrede_egne_alfapiksler':int((a[:,:,3]!=base[:,:,3]).sum())});(D/'plan.json').write_text(json.dumps(pp,ensure_ascii=False,indent=2)+'\n');print(D.relative_to(R/'kall'))
+(R/'alfamin-egne-materialplan1998.py.txt').write_bytes(Path(__file__).read_bytes())

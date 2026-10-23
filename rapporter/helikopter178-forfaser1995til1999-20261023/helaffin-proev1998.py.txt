@@ -1,0 +1,8 @@
+from pathlib import Path
+import json,hashlib,subprocess
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;B=R/'kall/H165/alfamin-egne-materialplan-r1';cases=[(.995,1.005,0,0),(1,1.005,0,0),(1.005,1,0,0),(.995,1,1,0),(1,1,0,-1)]
+for i,(fx,fy,dx,dy)in enumerate(cases,1):
+    D=B/f'heltilpasning{i:02}';D.mkdir();(D/'egen-sammensatt.png').write_bytes((B/'egen-sammensatt.png').read_bytes());p=json.loads((B/'plan.json').read_text());p.update(nytt_bildekall=False,egen_heltilpasning=dict(skala_faktorer=[fx,fy],flytt_HD=[dx,dy],regel='Én hel affin for hele eget spritebilde, ingen lokal trekkflytting eller originalmaske. Alle sterke 3HD-porter og nearest-native-fargekontroll uendret.',egen_kilde_sha256=hashlib.sha256((B/'egen-sammensatt.png').read_bytes()).hexdigest()));(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');cid=str(D.relative_to(R/'kall'));subprocess.run(['/home/tom/Sam-Max-HD/.venv/bin/python',str(O/'kontroller-heltilpasning-med-palett.py'),cid],check=True)
+    q=json.loads((D/'kontroll.json').read_text())
+    if q['teknisk_ok']:print('ALLE_PORTER_BESTATT',cid,flush=True);break
+(R/'helaffin-proev1998.py.txt').write_bytes(Path(__file__).read_bytes())

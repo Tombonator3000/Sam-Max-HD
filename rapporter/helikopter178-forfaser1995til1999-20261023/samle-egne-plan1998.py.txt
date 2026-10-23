@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H161';BF=R/'kall/H149/egen-renset.png';base=np.array(Image.open(BF).convert('RGBA'));files=[R/f'kall/{n}/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png'for n in ['H161','H158','H160','H159']]
+rgb=np.zeros_like(base);have=np.zeros(base.shape[:2],bool);alpha=np.zeros(base.shape[:2],np.uint8)
+for f in files:
+    p=np.array(Image.open(f).convert('RGBA'));paint=p[:,:,3]>=128;rgb[paint,:3]=p[paint,:3];have|=paint;alpha=np.maximum(alpha,p[:,:,3])
+assert have.any();_,ix=nd.distance_transform_edt(~have,return_indices=True);rgb[~have,:3]=rgb[tuple(ix)][~have,:3]
+for mode in ['alle-egne-plan-egen-alfa','alle-egne-plan-alfa-union']:
+    a=rgb.copy();a[:,:,3]=base[:,:,3] if mode=='alle-egne-plan-egen-alfa'else np.maximum(base[:,:,3],alpha);a[a[:,:,3]==0,:3]=0;D=K/mode;D.mkdir(exist_ok=False);Image.fromarray(a).save(D/'egen-sammensatt.png')
+    info=json.loads((R/'kall/H149/plan.json').read_text());info.update(nytt_bildekall=False,egne_materialplan_samlet={'regel':'Fire hele egne nye materialgrupper, 22 fargeklasser, i rekkefølgen kropp, grå rotorflater, svarte/oliven småplan, øvrige grønne småplan. Hele egen H149-alfa beholdes eller unionskombineres med egne nye antialiaserte plan. Umalt RGB fylles globalt fra nærmeste egen malte kjerne; ingen originalfil, kildekoordinater eller kildemaske åpnes.','modus':mode,'egne_filer':{str(f.relative_to(R)):hashlib.sha256(f.read_bytes()).hexdigest()for f in[BF,*files]},'alfa_bytebevart':mode=='alle-egne-plan-egen-alfa','egen_RGB_fringe_definert=True':True});(D/'plan.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n');print(D.relative_to(R/'kall'))
+(R/'samle-egne-plan1998.py.txt').write_bytes(Path(__file__).read_bytes())

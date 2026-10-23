@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H160';K.mkdir(exist_ok=False);S=R/'kilder/1998'
+cols=[[0,0,0],[35,35,19],[43,51,19],[43,67,27],[123,115,203],[123,175,207]];codes=[[0,0,255],[255,0,0],[0,255,255],[255,235,175],[255,0,255],[255,128,0]]
+tab=[dict(ekte=a,kode=b)for a,b in zip(cols,codes)];src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));b=src.copy();b[:,:,:3]=[170,170,170]
+for e in tab:b[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode']
+im=Image.fromarray(b).resize((src.shape[1]*11,src.shape[0]*11),Image.Resampling.NEAREST);can=Image.new('RGBA',(1024,1024),'#606060');can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));can.convert('RGB').save(K/'kilde-materialplan.png')
+p='''Use case: precise-object-edit. Draw ONLY the SIX coloured planes in image1, phase1998. The grey mechanical aircraft is a placement guide that must disappear. Image2 supplies only the smooth antialiased cartoon edge finish, never its character or colours. Keep the six flat technical colour planes red, blue, cyan, pale cream, magenta and orange in exactly the same places with the same entire shapes and areas as image1.
+The red narrow sloped strips on the two lower runners and the left mechanism remain continuous with their interruptions and cut ends. Preserve every dark-blue insert on those strips. Keep all the tiny cyan and cream inserts below the body and on both thin sloping runner assemblies. There are also very tiny isolated magenta and orange inserts at the upper rotor rim: retain them at the same locations; do not omit them as noise. Do not expand tiny patches into blobs, move them, join separate pieces across grey or redistribute their sequence. All six colours are painted material, not holes. Only grey backdrop, grey guide silhouette and grey gaps become genuine alpha transparency. No extra shapes, outline, gradient, shading, glow, texture or labels. Smooth the long sloping outer edges into continuous cartoon contours without erasing corners or small inserts. Keep image1 square canvas, central placement and scale. One transparent1024x1024 PNG with only those same six planes.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'kilde-materialplan.png'),str(A/'hovedark/sam.png')],transparent_background=True);sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();BF=R/'kall/H159/frigjorte-egne-plan/egen-sammensatt.png';REF=R/'kall/H138/egen-renset.png'
+plan=dict(kall='H160',rute=1998,utfort=False,modul='seks-hele-underside-og-smaaplan',tabell=tab,egen_basis=str(BF.relative_to(R)),egen_basis_sha256=sha(BF),egen_registreringsbasis=str(REF.relative_to(R)),egen_registreringsbasis_sha256=sha(REF),original_kontekst_og_stil_sett=True,originalmaske=False,kildekoordinater_til_plassering=False,referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(p+'\n')
+for name,d in [('argumenter.json',args),('plan.json',plan)]:(K/name).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-H160.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

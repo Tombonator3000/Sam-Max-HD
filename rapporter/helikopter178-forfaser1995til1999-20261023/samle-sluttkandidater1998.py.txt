@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H164';BF=R/'kall/H149/egen-renset.png';base=np.array(Image.open(BF).convert('RGBA'));old=np.array(Image.open(R/'kall/H138/egen-renset.png').convert('RGBA'))
+ref151=old.copy();ref151[~np.all(ref151[:,:,:3]==[151,151,151],2)]=0
+part151=R/'kall/H163/hele-egne-enkeltplan/RGB-151-151-151/egen-robust-registrert-modul/egen-helmodul.png';new151=np.array(Image.open(part151).convert('RGBA'));min151=new151.copy();min151[:,:,3]=np.minimum(new151[:,:,3],nd.maximum_filter(ref151[:,:,3],size=7));min151[min151[:,:,3]==0,:3]=0;D=K/'egne-hele-151plan-min';D.mkdir();Image.fromarray(min151).save(D/'egen-helmodul.png');(D/'plan.json').write_text(json.dumps(dict(nytt_bildekall=False,regel='Minimum av to hele egne 151-materialplan, etter 3raw maksfilter på eldre eget plan. Ingen originalfil eller kildekoordinater. Hele det nyere antialiaserte planet avgrenses bare av eldre egen maling.',eldre='H138/egen-renset.png',nyere=str(part151.relative_to(R)),nyere_SHA256=hashlib.sha256(part151.read_bytes()).hexdigest(),maksfilter_raw=3),ensure_ascii=False,indent=2)+'\n')
+for planmode in ['hel151','min151']:
+ for whitemode in ['eldre-hvit','ny-hvit']:
+    name='slutt-'+planmode+'-'+whitemode;Z=K/name;Z.mkdir();spec=[('H138/egen-renset.png',[[115,59,11]]),('H163/hele-egne-enkeltplan/RGB-83-43-0/egen-robust-registrert-modul/egen-helmodul.png',None),('H163/hele-egne-enkeltplan/RGB-71-71-71/egen-robust-registrert-modul/egen-helmodul.png',None),('H164/egne-hele-151plan-min/egen-helmodul.png'if planmode=='min151'else str(part151.relative_to(R/'kall')),None),('H158/hele-egne-enkeltplan/RGB-55-55-55/egen-robust-registrert-modul/egen-helmodul.png',None),('H158/hele-egne-enkeltplan/RGB-115-115-115/egen-robust-registrert-modul/egen-helmodul.png',None),('H138/egen-renset.png'if whitemode=='eldre-hvit'else'H158/hele-egne-enkeltplan/RGB-251-251-251/egen-registrert-modul/egen-helmodul.png',[[251,251,251]]),('H162/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',None),('H160/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',[[0,0,0],[35,35,19],[123,115,203],[123,175,207]]),('H159/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',[[19,59,31],[43,79,35],[43,91,43]]),('H164/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',None),('H161/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png',[[195,103,7],[239,135,39]])]
+    rgb=np.zeros_like(base);have=np.zeros(base.shape[:2],bool)
+    for filename,cols in spec:
+        a=np.array(Image.open(R/'kall'/filename).convert('RGBA'))
+        if cols is not None:
+            keep=np.zeros(a.shape[:2],bool)
+            for col in cols:keep|=np.all(a[:,:,:3]==col,2)
+            a[~keep]=0
+        paint=a[:,:,3]>=128;rgb[paint,:3]=a[paint,:3];have|=paint
+    _,ix=nd.distance_transform_edt(~have,return_indices=True);rgb[~have,:3]=rgb[tuple(ix)][~have,:3];rgb[:,:,3]=base[:,:,3];rgb[rgb[:,:,3]==0,:3]=0;Image.fromarray(rgb).save(Z/'egen-sammensatt.png');pp=json.loads((R/'kall/H149/plan.json').read_text());pp.update(nytt_bildekall=False,hele_egne_klasseplan={'regel':'Hele egne materialplan, registrert bare mot egne tidligere tilsvarende plan. RGB i umalte mellomrom/fringe fra nærmeste egen malte kjerne. H149s egen antialiaserte alfa er bytebevart. Ingen originalfil, kildepiksler, kildemaske, kildekoordinater eller lokal trekkflytting.','151modus':planmode,'hvitmodus':whitemode,'alfa_SHA256':hashlib.sha256(BF.read_bytes()).hexdigest(),'lag':[dict(egen_fil=f,hele_egne_klasser=c,sha256=hashlib.sha256((R/'kall'/f).read_bytes()).hexdigest())for f,c in spec]});(Z/'plan.json').write_text(json.dumps(pp,ensure_ascii=False,indent=2)+'\n');print(Z.relative_to(R/'kall'))
+(R/'samle-sluttkandidater1998.py.txt').write_bytes(Path(__file__).read_bytes())
