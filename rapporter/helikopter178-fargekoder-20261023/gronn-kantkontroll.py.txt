@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+from scipy.spatial import cKDTree
+from scipy import ndimage as nd
+import numpy as np,json
+R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/helikopter178-fargekoder-20261023');rows=[]
+for c in ['H045','H046']:
+ K=R/'kall'/c;ref=np.array(Image.open(K/'original-native-kontroll.png'));colors=np.unique(ref[ref[:,:,3]>0,:3],axis=0);want=np.all(ref[:,:,:3]==[7,95,51],axis=2)&(ref[:,:,3]>0);dist=nd.distance_transform_edt(~want);reports={}
+ for label,p in [('for',K/'for-kodekantrens/prototype-under-kontroll.png'),('etter',K/'prototype-under-kontroll.png')]:
+  a=np.array(Image.open(p));assert a.shape==ref.shape;on=a[:,:,3]>=128;coords=np.argwhere(on);_,idx=cKDTree(colors).query(a[on,:3]);y,x=coords[np.all(colors[idx]==[7,95,51],axis=1)].T;v=dist[y,x];reports[label]=dict(gronne_egne_core_piksler=len(x),langt_fra_original_gronn_over4HD=int((v>4).sum()),maks_HD=float(v.max())if len(v)else 0)
+ assert reports['etter']['langt_fra_original_gronn_over4HD']==0;rows.append(dict(kall=c,maaling_kun_ingen_endring=True,gronn_kantfeil=reports));print(c,reports)
+(R/'gronn-kantfeil-korrigert.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')

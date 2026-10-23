@@ -1,0 +1,26 @@
+from pathlib import Path
+import json,sys,hashlib,shutil
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np
+from smhd.myk import _iou
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;K=R/'kall'/sys.argv[1];q=json.loads((K/'kontroll.json').read_text());n=q['rute'];a=np.array(Image.open(K/'prototype-under-kontroll.png'));src=np.array(Image.open(P/f'work/extract/costumes/costume178_{n}.png'));colors=np.unique(src[src[:,:,3]>0,:3],axis=0);h,w=a.shape[:2];pad=4;b=np.pad(a,((pad,pad),(pad,pad),(0,0)));px=q['margx']*4+pad;py=q['margy']*4+pad
+mask=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);ref=np.zeros(b.shape[:2],bool);ref[py:py+mask.shape[0],px:px+mask.shape[1]]=mask
+ys,xs=np.nonzero(src[:,:,3]>0);positive=np.stack([py+ys*4+2,px+xs*4+2],1);ys,xs=np.nonzero(src[:,:,3]==0);negative=np.stack([py+ys*4+2,px+xs*4+2],1);palette_desired=[]
+for col in colors:
+ ys,xs=np.where(np.all(src[:,:,:3]==col,2)&(src[:,:,3]>0));palette_desired.append(np.stack([py+ys*4+2,px+xs*4+2],1))
+trials=[];best=None
+for dy in range(-2,3):
+ for dx in range(-2,3):
+  v=np.zeros_like(b);v[pad+dy:pad+dy+h,pad+dx:pad+dx+w]=a;assert int(v[:,:,3].sum())==int(a[:,:,3].sum());core=v[:,:,3]>=128;coords=np.argwhere(core);_,ii=cKDTree(colors).query(v[core,:3]);color=[]
+  for col,desired in zip(colors,palette_desired):
+   have=coords[np.all(colors[ii]==col,1)];d=cKDTree(have).query(desired)[0]if len(have)else np.full(len(desired),999.);color.extend(d.tolist())
+  ad=nd.distance_transform_edt(~core)[tuple(positive.T)];ng=nd.distance_transform_edt(core)[tuple(negative.T)]if len(negative)else np.zeros(0);dist=np.r_[color,ad,ng];iou,cov=_iou(core,mask,-px,-py);score=(int((dist>3).sum()),float(dist.max()),-cov,-iou);row=dict(hel_flytt_HD=[dx,dy],punkter_over3HD=score[0],maks_HD=score[1],snitt_union=iou,dekning=cov);trials.append(row)
+  if best is None or score<best[0]:best=(score,row,v)
+passed=best[1]['punkter_over3HD']==0 and best[1]['snitt_union']>=.6 and best[1]['dekning']>=.8
+proof=dict(kall=K.name,rute=n,antall_provde=25,bare_hel_flytting=True,lokal_flytting=False,originalmaske=False,alfa_sum_bevart=True,best=best[1],bestatt=passed,provde=trials)
+(K/'helplassering-fargekontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print('Beste',best[1],'bestatt',passed)
+if passed:
+ shutil.copy2(K/'kontroll.json',K/'kontroll-for-helplassering.json');shutil.copy2(K/'prototype-under-kontroll.png',K/'prototype-for-helplassering.png');Image.fromarray(best[2]).save(K/'prototype-under-kontroll.png');q.update(margx=q['margx']+1,margy=q['margy']+1,hel_flytting_fargefester_HD=best[1]['hel_flytt_HD'],snitt_union=best[1]['snitt_union'],dekning=best[1]['dekning'],alle_alfa_fester_innen3HD=True,egen_alfa_bevart=True,visuell_native_kontroll=False,native_sha256=hashlib.sha256((K/'prototype-under-kontroll.png').read_bytes()).hexdigest(),native_maal=[best[2].shape[1],best[2].shape[0]])
+ (K/'kontroll.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n');im=Image.new('RGBA',(best[2].shape[1],best[2].shape[0]));im.alpha_composite(Image.fromarray(src).resize((src.shape[1]*4,src.shape[0]*4),Image.Resampling.NEAREST),(px,py));im.save(K/'original-native-kontroll.png')

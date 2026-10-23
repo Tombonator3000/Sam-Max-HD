@@ -1,0 +1,11 @@
+# Gjenoppta2010
+
+Les mottak-publisert.json og siste retur først. Ti faktiske innebygde kallH040..H049 er utført og bevart. H042/2013,H045/2012 ogH046/2011 er valgte. Neste178-kallH050 er ikke utført eller reservert.
+
+Fortsett2010. H047 er nærmest og har riktig venstre grønne detalj og tre egne grupper,men191-grå kildepunkter(42,1) og(39,3) ligger7.21 og6HD fra riktig egen farge. H048 løser ikke dette og mister grønt. H049 prøver asurkode for191,men har fire fargefeil,også151 ved(47,4),(47,5). Ikke flytt eller mal kildepiksler lokalt med Python. Behold egne deler og bruk innebygd image_gen for ny retting. Bruk de faktiske individuelle kodepalettene,ikke en antatt felles tabell. H047 bruker191=teal og7grønn=salmon;H049 bruker191=asur. Ingen av2010-returene skal importeres.
+
+Den nye fargekodeteknikken er testet og virker for tre ruter. Global dekoding bruker bare egneRGB/alfakjerner,ikke kildemasker. Kildeløs replay gjenskaper valgte egneRGBA og native eksakt. Egen alfa1..7 er fjernet som støv,alle egne core128 og kildebekreftede deler beholdt. En tidlig visuell mistanke om grønne felt på hovedposten ble avkreftet ved måling,både før og etter RGB-rens. Se gronn-kantmistanke-avkreftet.json. Ikke viderefør den feilaktige påstanden om innført grønt.
+
+Se original2010,motorbildet og godkjent Sam-master på nytt før neste motiv. Kildene ligger i helikopter178-mellomfaser-20261023/kilder/2010. Original2010 har78x12,226 opake piksler,tre grupper og én grønn piksel ved(2,3). Alle2010..2016 er helt synlige og RGB565-bekreftet ved pos160,60,rom35,palett0,zclip0.53 av102 kildefaser er logget.1990 er fortsatt venstreklipt og trenger ny hel kilde.
+
+Etter faktisk kvittering er delarket11/12,familien11/102 og modden3712. Alle tidligere21947PNG og åtte delarkruter er bevart. Hele figurjobber507/1758,1251 uten resultat,pluss returer/sluttkontroll. Bare2010 mangler på dette arket. Felles Linux/Windows isblokk er fortsatt3701 og mangler11ruter. Ved fullført ark/familiesamlepunkt eller avslutning:oppdater begge,med faktiske nedlastinger,sjekksummer og full kontroll av inkludert grafikk. Neste137-kallV013 og296-kallS037 er fortsatt ikke utført. Ingen nødvendig ny Tom-designavklaring. Ingen grafikk til main,ingen motor-/pipelineendring og ingen gammel nattevakt. Fortsett automatisk.
