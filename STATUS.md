@@ -1,5 +1,13 @@
 # Status
 
+<!-- lagringskontroll-og-H111-H116:start -->
+Seks nye innebygde bildekall H111..H116 for helikopterfase 2001 er bevart med råbilder, faktiske prompter og kontroller. Ingen ny native består alle porter ennå. H113-venstre kan beholdes; H116 har fortsatt fargeavvik. 2000 er ikke nytegnet. Neste kall H117 er ikke utført eller reservert. Gjenoppta work/.gpt-gren/rapporter/helikopter178-retur2001og2000-20261023/NESTE.md og RETUR.md. Grafikk og rapporter er pushet til gpt-arbeid 29e480fd6c8cfccd1dd004efd8e86240273e1e91. Native mod er fortsatt 790479259111acc86aa79669751d44a3ccde2527, 3721 native og fig178_02 8/24. Hele figurjobber er fortsatt 508/1758.
+
+Tom spør om ca. 300 GB diskbruk. Prosjektet viser 350 GiB, hvorav out viser 331 GiB; selve mods/gpt er 527 MiB. Out har 6 829 701 PNG i arbeidskopier og tester, logisk 215,19 GiB, ZIP/AppImage 57,74 GiB, lokale publiseringsrepoer 17,23 GiB og TAR 14,90 GiB. Btrfs-kopier kan dele blokker; dette er ikke et løfte om fysisk frigjørbar plass. Syv separate PNG-kopier er tapsfritt optimalisert og kontrollert med eksakte RGBA-piksler. To nativefiler sparer 2,2 og 2,9 prosent, råbilder 17,9 og 21,0 prosent. Ingen ryddejobb eller sletting er utført. Målinger og anbefalt rydderekkefølge finnes i rapportens PLASS.md.
+
+Ingen nye motor-/pipelineendringer eller motoravspillinger. Alle tidligere publiserte PNG, 1472 beskyttede input og tre stasher er bevart. Fellespakker er fortsatt 3713. Automatikken er ACTIVE, ingen nødvendig Tom-designavklaring, all grafikk er ikke ferdig.
+<!-- lagringskontroll-og-H111-H116:slutt -->
+
 <!-- helikopter178-retur2004-2002-status:start -->
 Publisert hd-mod 790479259111acc86aa79669751d44a3ccde2527 har 3721 native. Grafikkilde er gpt-arbeid 7b2b56258d0d6ec3efa77960f46a72c461008a1e. Alle 21965 publiserte filhash er hentet tilbake og kontrollert. Alle 21963 tidligere stier og 21957 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3719-grunnlaget er bevart under out. Bare to nye native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 
