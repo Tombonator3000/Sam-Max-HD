@@ -55,7 +55,6 @@ cp "$ROOT/game/SAMNMAX.000" "$ROOT/game/SAMNMAX.001" "$ROOT/game/MONSTER.SOU" "$
 # Roland MT-32-ROM-ene til musikken (MT-32-emulering)
 cp "$ROOT/game/MT32_CONTROL.ROM" "$ROOT/game/MT32_PCM.ROM" "$DIR/game/"
 cp -r "$ROOT/mods/gpt"/. "$DIR/mod/"
-rm -f "$DIR/mod/README.md"
 
 # Startfilene må ha CRLF på Windows
 for f in "Sam og Max HD.bat" "Sam og Max HD - utvikler.bat"; do

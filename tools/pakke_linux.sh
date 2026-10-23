@@ -46,7 +46,6 @@ cp "$ROOT/game/SAMNMAX.000" "$ROOT/game/SAMNMAX.001" "$ROOT/game/MONSTER.SOU" "$
 cp "$ROOT/game/MT32_CONTROL.ROM" "$ROOT/game/MT32_PCM.ROM" "$DATA/game/" 2>/dev/null || echo "Merk: MT-32-ROM-ene mangler; musikken blir AdLib."
 if [ "$MED_MOD" = 1 ]; then
 	cp -r "$ROOT/mods/gpt" "$DATA/mods/gpt"
-	rm -f "$DATA/mods/gpt/README.md"
 fi
 # ScummVM sine temaer og hjelpefiler (menyene i ScummVM selv), samme liste som engine/build-pages.py
 for name in achievements.dat classicmacfonts.dat encoding.dat gui-icons.dat helpdialog.zip macgui.dat \
