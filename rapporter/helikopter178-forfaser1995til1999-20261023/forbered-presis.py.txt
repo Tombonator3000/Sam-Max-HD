@@ -1,0 +1,21 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,sys
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name
+cid,n=sys.argv[1],int(sys.argv[2]);K=R/'kall'/cid;K.mkdir(exist_ok=False);S=R/'kilder'/str(n)
+pal=json.loads((S/'kodepalett.json').read_text())
+from PIL import Image
+w,h=Image.open(S/'original-1x.png').size
+notes={1998:'The two upper rotor sections really have perfectly flat horizontally cut top edges. Preserve these exact straight cut edges, their existing lower curves and both diagonal braces. Keep the small purple insert in the upper left section. Preserve every separate alternating narrow coloured segment along both skids and the vertical left assembly. Do not cap, round out or complete either cut top.',1997:'Retain the small detached horizontal pale rotor fragment above and left of the main assembly. Never join it to the rest.',1996:'The long upper rotor extending to the right must remain its full length.',1995:'Keep both broad rotor blades in full, the narrow supports and the separated runner parts.'}[n]
+prompt=f'''Use case: precise-object-edit. Asset: one transparent Sam & Max animation cel, phase {n}.
+Image 1 is the EDIT TARGET, an exact technical flat-colour tracing reference. Each distinct bright RGB patch is a locked material ID. Image 2 is only the approved clean cartoon edge finish reference; do not draw Sam or use his colours.
+Preserve every interior patch of Image 1 in its exact colour, extent and position, even single-cell inserts. Treat the abstract patches literally, without inventing aircraft features. Navy is opaque ink, never transparency. The motif is {w} columns by {h} rows at scale {pal['skalering']}; all boundaries and holes are deliberate. Keep the complete motif at precisely the same scale and central position on the same square canvas.
+{notes}
+Make the flat grey background and all grey enclosed openings genuinely transparent. Delicately smooth the actual external steps into tiny antialiased curves without shifting a corner by more than a small fraction of one source cell. Keep all interior colours flat, hard and exact. Thin struts, projecting pieces, small transparent openings and every isolated colour patch must survive. The approved clean finish applies to edges only. Add no outlines, fields, windows, lighting, gradients, texture, symbols or text. Do not reinterpret or simplify the geometry. Do not complete this partial cel into a whole vehicle. Return one transparent 1024x1024 PNG.'''
+args={'prompt':prompt,'referenced_image_paths':[str(S/'kodefarge-referanse.png'),str(A/'hovedark/sam.png')],'transparent_background':True}
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+(K/'prompt-brukt.txt').write_text(prompt+'\n');(K/'argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n')
+plan=dict(kall=cid,rute=n,utfort=False,original_kontekst_og_stil_sett=True,kilde_SHA256=sha(S/'original-1x.png'),referanser_SHA256={str(p):sha(Path(p)) for p in args['referenced_image_paths']},endring_i_metode='Presis flatesporing. Ekte palettreferanse er utelatt etter H135s kodeoverstyring. Kildebekreftede småfelt og rette rotoravskjæringer er eksplisitt bevart. Egen konturrens vurderes etter nytegning, uten originalmaske.',planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-presis.py.txt').write_bytes(Path(__file__).read_bytes())
+print(K)

@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall'/sys.argv[1];rad=int(sys.argv[2]);F=K/'egen-sammensatt.png';a=np.array(Image.open(F).convert('RGBA'));core=a[:,:,3]>=128;cols=np.unique(a[core,:3],axis=0);yy,xx=np.mgrid[-rad:rad+1,-rad:rad+1];disk=xx*xx+yy*yy<=rad*rad;best=np.full(core.shape,np.inf);ids=np.zeros(core.shape,int);rows=[]
+for i,c in enumerate(cols):
+ m=core&np.all(a[:,:,:3]==c,2);s=nd.binary_erosion(m,structure=disk)
+ if not s.any():s=m.copy()
+ d=nd.distance_transform_edt(~s);pick=d<best;best[pick]=d[pick];ids[pick]=i;rows.append({'RGB':c.tolist(),'egen_flate':int(m.sum()),'egen_kjerne':int(s.sum())})
+b=a.copy();b[:,:,:3]=cols[ids];b[b[:,:,3]==0,:3]=0;assert np.array_equal(a[:,:,3],b[:,:,3]);D=K/f'egen-kjernefrorens-r{rad}';D.mkdir(exist_ok=False);Image.fromarray(b).save(D/'egen-sammensatt.png');p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,egen_kjernefrorens={'radius_raw':rad,'regel':'Alle egne RGB-klasser eroderes likt for å finne sikre egne kjernefrø. RGB-klasse over hele egen flate bestemmes av nærmeste eget frø. En hel klasse uten erodert kjerne beholdes. Alfa byteidentisk. Ingen originalfil, originalmaske, kildekoordinat eller lokal kildefargepåmaling.','stat':rows,'inn_sha256':hashlib.sha256(F.read_bytes()).hexdigest()});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');(R/'rens-egne-fro.py.txt').write_bytes(Path(__file__).read_bytes());print(D)

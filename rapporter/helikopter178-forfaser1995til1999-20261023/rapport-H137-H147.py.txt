@@ -1,0 +1,106 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from zoneinfo import ZoneInfo
+from PIL import Image,ImageDraw
+from concurrent.futures import ThreadPoolExecutor
+import hashlib,json,subprocess,gzip,re
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(p):return json.loads(p.read_text())
+def put(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+old_manifest={n:h for h,n in(line.split('  ',1)for line in(R/'SHA256SUMS').read_text().splitlines())};assert all(sha(R/n)==h for n,h in old_manifest.items()),'Tidligere rapportfiler endret før øktstatus'
+assert subprocess.check_output(['git','diff','--name-only','HEAD','--','jobber','hovedark','stil'],cwd=A)==b''
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+remote=dict((v.split()[1].rsplit('/',1)[-1],v.split()[0])for v in subprocess.check_output(['git','ls-remote','origin','refs/heads/main','refs/heads/hd-mod','refs/heads/gpt-arbeid'],cwd=P,text=True).splitlines());assert remote['hd-mod']=='219fcfa1acd53590155638623f48c7acccde3e0f'and remote['gpt-arbeid']=='d6abaa03f93a86322cec581c2d92c2ca13ed0ce0'
+expected=json.loads(gzip.decompress((R/'kandidat3724-filhash.json.gz').read_bytes()));fs=[p for p in(P/'mods/gpt').rglob('*')if p.is_file()]
+with ThreadPoolExecutor(max_workers=6)as ex:actual=dict(ex.map(lambda f:(str(f.relative_to(P/'mods/gpt')),sha(f)),fs))
+assert actual==expected and len(actual)==21969
+whole=len(list((A/'jobber').glob('fig*/resultat.png')));assert whole==508
+now=datetime.now(ZoneInfo('Europe/Oslo')).isoformat();best='H146/registreringsgrunnlag/egen-registrert-modul/egen-RGB-H142/egen-konturrens-e8-r3/heltilpasning/egne-smaafelt/uten-nye-egne-hull/hel-egen-RGB8-fringe0';technical=['H143/egen-registrert-modul/egen-rotorH132/egen-konturrens-e6-r3/heltilpasning','H143/egen-registrert-modul/egen-rotorH132/egen-konturrens-e8-r3/heltilpasning'];last='H147/egne-felt-sammenstilling/egen-kjerne-viderefort/egen-felt-AA'
+seen=set(technical+['H137','H138','H139/egen-global-kodestrek','H143/egen-registrert-modul/egen-rotorH132/egen-konturrens-e12-r5','H143/egen-registrert-modul/egen-rotorH132/egen-konturrens-e8-r3/heltilpasning/egen-alfa-e12','H143/egen-registrert-modul/egen-rotorH132/egen-konturrens-e10-r3/heltilpasning','H146/registreringsgrunnlag/egen-registrert-modul/egen-RGB-H142/egen-konturrens-e8-r3/heltilpasning/egne-smaafelt','H147/egne-felt-sammenstilling/egen-kjerne-viderefort'])
+for c in technical:
+ K=R/'kall'/c;q=read(K/'kontroll.json');assert q['teknisk_ok'];q.update(visuelt_sett=True,egen_stilkontroll=False,valgt_kandidat=False,status='TEKNISK_BESTATT_STILRETUR',stilretur='Fortsatt trappede løpere. Den tekniske beståttstatusen er ikke en visuell godkjenning eller leveranse.');put(K/'kontroll.json',q)
+for c in seen-set(technical):
+ F=R/'kall'/c/'kontroll.json'
+ if F.exists():q=read(F);q['visuelt_sett']=True;put(F,q)
+f=read(R/'fremdrift.json');priorcalls=f['bildekall'];assert len(priorcalls)==11;new=[]
+for i in range(137,148):
+ cid=f'H{i}';K=R/'kall'/cid;p=read(K/'plan.json');args=read(K/'argumenter.json');assert p['utfort']and p['innebygd_image_gen']and sha(K/'raa.png')==p['raa_sha256'];assert(K/'prompt-brukt.txt').read_text()==args['prompt']+'\n';q=read(K/'kontroll.json')if(K/'kontroll.json').exists()else None
+ new.append(dict(kall=cid,rute=p['rute'],utfort=True,raa=str((K/'raa.png').relative_to(A)),raa_sha256=sha(K/'raa.png'),prompt_sha256=sha(K/'prompt-brukt.txt'),argumenter_sha256=sha(K/'argumenter.json'),plan_sha256=sha(K/'plan.json'),modul=p.get('modul',False),verktøy='innebygd image_gen',modell_ikke_oppgitt=True,teknisk_ok=bool(q and q['teknisk_ok']),valgt=False,egenkontrollert=True,kontroll_type='hel prototype'if q else'egen modul og hel sammenstilling',visuelt_sett_raa=True,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+variants=[]
+for F in sorted((R/'kall').glob('H1*/**/kontroll.json')):
+ cid=str(F.parent.relative_to(R/'kall'))
+ if not re.match(r'^H(13[7-9]|14[0-7])(?:/|$)',cid):continue
+ q=read(F);im=F.parent/'prototype-under-kontroll.png';rows=q['farger'];ys,xs=__import__('numpy').nonzero(__import__('numpy').array(Image.open(im).convert('RGBA'))[:,:,3]>=128)
+ variants.append(dict(variant=cid,rute=q['rute'],jobb='fig178_02',nytt_bildekall=False,prototype=str(im.relative_to(A)),prototype_sha256=sha(im),kontroll=str(F.relative_to(A)),kontroll_sha256=sha(F),egen_bilde_sha256=sha(F.parent/('egen-sammensatt.png'if(F.parent/'egen-sammensatt.png').exists()else'egen-renset.png')),maal=list(Image.open(im).size),rect=[int(xs.min()),int(ys.min()),int(xs.max()-xs.min()+1),int(ys.max()-ys.min()+1)],hel_skala=q['hel_skala'],hel_flytt=q['flytt'],marg_HD=[q['margx']*4,q['margy']*4],teknisk_ok=q['teknisk_ok'],IoU=q['snitt_union'],dekning=q['dekning'],alfa_fester=q['alfa_fester_over3HD'],apninger=q['apninger_over3HD'],kode_fester=sum(e['kode_fester_over3HD']for e in rows),ekstra_kodepiksler=sum(e['egne_kodepiksler_over3HD_fra_kilde']for e in rows),native_fester=sum(e['native_fester_over3HD']for e in rows),egen_alfa=True,originalmaske=False,originalfragmenter=False,kildekoordinater_til_plassering=False,visuelt_sett=q.get('visuelt_sett',False),valgt=False,status='TEKNISK_BESTATT_STILRETUR'if cid in technical else'RETUR',levert=False,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+f.update(bildekall=priorcalls+new,innebygde_bildekall=22,laget_raa=22,egenkontrollert_raa=22,nye_innebygde_bildekall_i_okten=11,nye_native_i_okten=0,nye_motorobserverte_native_i_okten=0,nye_publiserte_native_i_okten=0,status='DELVIS_PUBLISERT_1999_RETURER_H137_H147',oppdatert_oslo=now,bunke_ferdig=False,siste_kall='H147',neste_kall='H148',neste_kall_utfort=False,neste_kall_reservert=False,siste_retur1997=best,nyeste_tofelts_retur1997=last,teknisk_bestatte_men_stilreturnerte1997=technical)
+f['egne_avledede_varianter']+=variants;put(R/'fremdrift.json',f);put(R/'alle-kall.json',f['bildekall']);put(R/'rutekart-returH137-H147.json',dict(leveranser=[],kontrollvarianter=variants,grunnlag_hd_mod=remote['hd-mod'],nye_native=0,nye_hele_figurjobber=0,ny_motoravspilling=False,ny_publisering=False))
+rt=read(R/'rutekart-returer.json');rt['egne_varianter']+=variants;rt['nye_ruter_i_modden_i_okten']=0;put(R/'rutekart-returer.json',rt)
+qbest=next(e for e in variants if e['variant']==best);qlast=next(e for e in variants if e['variant']==last)
+proof=dict(tid_oslo=now,forrige_grafikkcommit=remote['gpt-arbeid'],hd_mod_uaendret=remote['hd-mod'],alle_tidligere344_rapporthash_bekreftet_foer_statusoppdatering=True,tidligere_rapportfiler=len(old_manifest),alle21969_lokale_modhash_lik_faktisk_hentet_publisering=True,modfiler=len(actual),native=3724,figurjobber=whole,figurjobber_totalt=1758,fig178_02_native=11,fig178_02_totalt=24,familie178_native=23,familie178_totalt=102,nye_bildekall=11,bunke_bildekall_totalt=22,nye_valgte_sluttruter=0,nye_native_mottatt=0,nye_visuelt_godkjente_native=0,ny_motoravspilling=False,nye_motorobserverte=0,nye_publiserte_native=0,ny_kandidat=False,ny_pakkebygging=False,fellespakker_native=3723,fellespakker_mangler_native=1,jobber_hovedark_stil_uten_endring=True,tre_stasher_bevart=stash,teknisk_bestatt_stilretur=technical,beste_flytende1997=qbest,nyeste_tofelt1997=qlast,Tom_avklaring_noedvendig=False,automation='ACTIVE',bunke_ferdig=False,neste_kall='H148',neste_kall_utfort=False,neste_kall_reservert=False,ny_full_modkopi=False,ingen_originalfiler_brukt_i_utdata=True)
+put(R/'videre-H137-H147-kontroll.json',proof)
+text='''# Videre produksjon H137 til H147
+
+11 nye faktiske innebygde image_gen-kall, 22 i den påbegynte bunken. Ingen ny sluttrute er valgt, mottatt, motorobservert eller publisert i denne økten. Dette er arbeid på returer, ikke nye leverte figurjobber. Modden er fortsatt219fcfa1acd53590155638623f48c7acccde3e0f med3724 native, delark11/24 og508/1758 hele figurjobber. Publisert1999 skal ikke tegnes på nytt.
+
+Originalene1998,1997,1996,1995 er sett i faktisk spillkontekst sammen med godkjent Sam før motivene ble tegnet. Referansene er tegnings-/målegrunnlag, aldri utdata-masker. Sam er eneste stilanker her; avviste egne bilder brukes bare som egne redigeringsgrunnlag eller feilreferanser. Alle råbilder, faktiske prompter, argumenter og SHA-er er bevart. Modellnavn er ikke oppgitt av verktøyet.
+
+H137/H138 prøver1998 mer presist. H137 la til en mørk kontur og feil småfelt. En global egen lavkromarens fjerner mye oppdiktet strek, men løser ikke feltene. H138 fjerner mye av konturen og bevarer alfa/åpninger, men har fortsatt mange feil materialfelt. Ingen av dem er ny native.
+
+H139/H140 er1997. En global kremkode i tegneguiden erstatter den tekniske limekoden fordi nytegningene ofte gjorde lime til gult. Kildepaletten og originale kildefiler er uendret. H141 tegner hele venstremodulen, H142 hele understellmodulen og H143 takmodulen. Hele egne moduler settes på egne tidligere mål. En hel modulregistrering måler bare mot tidligere egen RGB/alfa, aldri originalkoordinater. Den løsrevne rotoren videreføres som hel egen del fra H132. To varianter med egen konturrens6/3 og8/3 samt liten heltilpasning består alle uendrede3HD-porter, men har fortsatt trappede løpere. De er stilreturer, ikke leveranser.
+
+H146 retter nettopp dette med nye flytende diagonale løpere. De små egne materialplanene og RGB-kjernene videreføres. Et oppdiktet lite rundt hull og nye egne skjøtehull lukkes helt fra tidligere egen RGBA når minst95 prosent av samme hele egne hull var opaque før. Egen RGB under alfa0 forlenges før alfabytting. Ingen originalfil brukes som klipp, ingen originalfragmenter legges inn, og ingen enkelte kildefester flyttes eller påmales. En av de glattere1997-variantene har alle positive alfa-, åpnings-, kode- og nativefester innen3HD, men fortsatt2 ekstra kodepiksler, én i RGB55,83,39 og én i139,75,15. Den skal fortsatt ikke importeres.
+
+H147 er en faktisk nytegning av akkurat de to hele materialplanene som egne røde/blå tekniske lag. Disse to fargenes porter består etter montering. Når gamle felt frigis til nærmeste andre egne kjerne, gir undermalingen imidlertid6 ekstra svarte kodepiksler og1 ekstra brun kodepiksel. Også denne sammenstillingen er retur. Ikke forklar dem som støy i råbildet; de kommer ved egen sammenstilling/undermaling. Vanlig alpha-over av lagets ekte alfa løser ikke disse7. Ingen av de glattere H146/H147-variantene består alle porter samtidig. Ikke velg de trappede tekniske variantene som en snarvei.
+
+H144 er et nytt1996-forsøk med kremkode. Den lange øvre rotoren er beholdt, alfa og åpninger består, men flere små materialfelt avviker. H145 er1995 med begge brede rotorblad. Den har16 alfafester over3HD og flere feltfeil. De forblir returer.
+
+Ingen ny full modkopi, kandidat, pakke, nedlastet TAR eller motoravspilling er startet. Alle21969 installerte modfiler er kontrollert mot SHA-kartet fra faktisk hentet3724-publisering, og fersk fjern-SHA er uendret. Alle344 tidligere rapportfiler var byteidentiske før denne statusoppdateringen. Beskyttede jobbfiler, stilankere, tidligere native og tre stasher er uendret. Linux/Windows-pakkene har fortsatt3723 og mangler publisert1999. Oppdater ved neste komplette ark-/familiesamlepunkt eller ved oppgavens avslutning, med faktisk nedlasting og innholdskontroll.
+
+Fortsett de eksisterende returene. Nærmeste konkrete1997-feil er undermalingen ved to egne nye materialplan og den glatte understellvarianten med2 ekstra kodepiksler. Ingen porter skal svekkes. H148 er ikke utført eller reservert.1998,1996,1995 har sine bevarte råforsøk og egne rettede tekniske guider.1990 trenger fortsatt hel kilde;137/V013 og296/S037 er uendret. Ingen nødvendig Tom-avklaring. Automatikken forblir ACTIVE.
+
+Bibliotekskilden figurark-fast-storrelse.md er brukt for hele, begrensede tilpasninger og separat kontroll av proporsjoner. Publisert-mod-er-fasit.md ligger til grunn for kontrollen av den uendrede komplette modden. Det er ingen motor- eller pipelineendring.
+'''
+(R/'VIDERE-H137-H147.md').write_text(text)
+nexttext='''# Gjenoppta eksisterende bunke
+
+Publisert WebP-mod219fcfa1acd53590155638623f48c7acccde3e0f er uendret med3724 native, fig178_02 11/24 og familien178 23/102. Hele figurjobber508/1758. Fase1999 og2000..2021 skal ikke tegnes igjen. Alle21969 installerte filhash og fjern-SHA er kontrollert på nytt. Den faktiske publiseringskvitteringen er mottak-publisert1999.json.
+
+Les VIDERE-H137-H147.md, videre-H137-H147-kontroll.json og nyeste RETUR.md. Bunken har nå22 faktiske innebygde kall, H126..H147.11 nye i siste økt gir ingen ny sluttrute/import eller motoravspilling. H148 er ikke utført eller reservert.
+
+1997 har nye egne venstre-, understell-, tak- og fargelagsbilder. De teknisk beståtte H143-konturrens6/3 og8/3 er stilreturer med trappede løpere og skal ikke importeres. H146 gir flytende løpere. Den glattere bevarte varianten som slutter med hel-egen-RGB8-fringe0 har alle positive porter innen3HD, men2 ekstra kodepiksler. H147s to hele materialplan består de to egne fargeportene, men friging av gamle felt til nærmeste annen egen kjerne etterlater7 ekstra kodepiksler i undermalingen. Ikke hev at disse kommer fra råbildestøy. Rutekart-returH137-H147.json peker til alle prototyper, faktiske SHA-er og uendrede målinger. Begge aktuelle varianter er registrert i videre-H137-H147-kontroll.json.
+
+Fortsett1997 med faktisk tegningsretting av de siste material-/undermalingsfeilene, og fortsett de uavhengige påbegynte1998/H137,H138,1996/H144 og1995/H145. Ikke gjenta brede hele mislykkede kodeprompter uten konkret retting. Den nye kremkoden ligger bare i de respektive kallmappene. H135 er ekte palett og skal ikke falskkodedekodes. Sam er godkjent stilanker; gamle returer er bare egne redigerings-/feilreferanser. Bevar kildebekreftede smådeler, ekte alfa og all allerede definert egen RGB-fringe. Ingen originalmaske, kildefragment eller lokal kildepåmaling/flytting.
+
+Ingen ny kandidat eller full modkopi er laget. Bruk bare gjeldende komplette mods/gpt eller hent gjeldende hd-mod ved neste mottak. Behold kandidat3724-start1-y60 som faktisk3724-grunnlag til denne bunken er ferdig. Felles Linux-/Windows-pakker har3723, mangler én. Oppdater ved neste komplette ark-/familiesamlepunkt eller oppgavens avslutning med faktisk nedlasting/sjekksummer/innhold. Ingen gammel nattprosess, ny pakke eller Tom-avklaring. Automatikken er ACTIVE.1990/137/V013/296/S037 står som før.
+'''
+(R/'NESTE.md').write_text(nexttext)
+oldret=(R/'RETUR.md').read_text();(R/'RETUR.md').write_text('''# Gjeldende retur etter H147
+
+Siste økt:11 nye faktiske bildekall, ingen ny sluttrute eller import. Alle aktuelle varianter er returer. Se VIDERE-H137-H147.md og videre-H137-H147-kontroll.json for konkrete SHA-er og rutekart-returH137-H147.json for alle uendrede porter.
+
+1997: H143s6/3- og8/3-konturrens består teknisk, men har fortsatt trappede løpere og er stilreturer. H146s nye flytende løpere er bedre visuelt. Nærmeste bevarte variant hel-egen-RGB8-fringe0 har2 ekstra kodepiksler, ingen positive alfa-/åpnings-/kode-/nativefester over3HD. H147 tegner to hele materialplan; begge deres fargeporter består, men undermalingen i egen sammenstilling gir6 ekstra svarte og1 brun kodepiksel. Vanlig egen alpha-over løser ikke dette. Disse7 må ikke feilforklares som råbildestøy. Ingen av disse glattere variantene er importklare. Ikke svekk3HD-portene eller velg trappede varianter bare for å få et importtall.
+
+1998: H137/H138 beholder motivet bedre, men små felt mangler/flyttes. H137 har også ny mørk strek og én åpning.1996/H144 beholder full øvre rotor og består alfa/åpninger, men har flere feltfeil.1995/H145 har16 alfafester over3HD og feltfeil. Alle råbilder, faktiske prompter og kontrollvarianter er beholdt.
+
+H148 er ikke utført eller reservert.1999 og2000..2021 er allerede publisert og skal ikke tegnes igjen. Ingen ny motoravspilling, kandidat, pakke, Tom-/Claude-godkjenning eller nativepublisering i siste økt. All publisert grafikk og tre stasher er uendret.
+
+## Historisk status før H137
+
+'''+oldret)
+(R/'notat.md').write_text((R/'notat.md').read_text()+'\n\n## Videre H137 til H147, '+now+'\n\n11 nye faktiske innebygde image_gen-kall er bevart og kontrollert i egne moduler/helprototyper. Ingen ny sluttrute er valgt. Native3724, delark11/24 og508 hele figurjobber er uendret. H1436/3 og8/3 består teknisk, men er stilreturer. H146 har bedre flyt, men siste glattere variant har2 ekstra kodepiksler. H147 retter to hele fargeplan, men egen undermaling har7 ekstra kodepiksler. Se VIDERE-H137-H147.md. Ingen import, motorprøve eller publisering av disse returene. Eksakte råbilder/prompter/SHA-er er bevart. H148 er ikke utført eller reservert.\n')
+s=read(R/'sluttkontroll.json');s.update(raa_sha_kontrollert=22,ekte_innebygde_bildekall=22,nye_i_okten=11,ny_kandidat=False,ny_pakkebygging=False,ny_motoravspilling=False,dato_oslo=now,nye_native_i_okten=0,nye_native_motorobservert_i_okten=0,nye_native_publisert_i_okten=0,siste_okt='videre-H137-H147-kontroll.json',bunke_ferdig=False);put(R/'sluttkontroll.json',s)
+order=A/'ORDRE.md';v=order.read_text();b='<!-- helikopter178-forfaser1995-1999:start -->';e='<!-- helikopter178-forfaser1995-1999:slutt -->';i,j=v.index(b),v.index(e)+len(e);ordertext='''Publisert WebP-mod219fcfa1acd53590155638623f48c7acccde3e0f har fortsatt3724 native. Fase1999 er tidligere publisert og faktisk hentet/hashkontrollert. Alle21969 installerte filer og gjeldende fjern-SHA er bekreftet uendret. Delark11/24, familie178 23/102, hele figurjobber508/1758.1999 og2000..2021 skal ikke tegnes igjen.
+
+Gjenoppta rapporter/helikopter178-forfaser1995til1999-20261023/NESTE.md, VIDERE-H137-H147.md og RETUR.md.11 nye faktiske innebygde kall H137..H147 gir22 i bunken, men ingen ny sluttrute/import/motorprøve. De teknisk beståtte H1436/3- og8/3-variantene er stilreturer med trappede løpere. H146 gir flytende løpere og en glattere variant med2 ekstra kodepiksler. H147s to egne materialplan består sine fargeporter, men undermalingen etterlater7 ekstra kodepiksler. Ikke forklar disse som råbildestøy, ikke svekk porter, og ikke importer en stilretur. Viderefør også de påbegynte1998/H137,H138,1996/H144 og1995/H145. H148 er ikke utført eller reservert.
+
+Alle råbilder, eksakte prompter, egenkontroller og SHA-festede returkart er beholdt. Egne hele moduler og materialplan er behandlet med ekte egen alfa; ingen originalmaske, kildefragmenter eller lokal kildepåmaling/flytting. Beskyttede jobbfiler, stilankere, publisert grafikk og tre stasher er uendret. Ingen ny fullmodkopi, kandidat, pakke eller gammel nattprosess. Fellespakker har3723 og mangler én; oppdater ved neste komplette ark-/familiesamlepunkt eller oppgavens avslutning med faktisk nedlasting og innholdskontroll. Ingen nødvendig Tom-avklaring. Automatikken er ACTIVE.1990 trenger fortsatt hel kilde,137/V013 og296/S037 står som før.''';order.write_text(v[:i]+b+'\n'+ordertext+'\n'+e+v[j:])
+# Sammenligningstavle er kun kontrollbevis, aldri en produksjonsmaske.
+board=Image.new('RGB',(1280,1200),'#304050');d=ImageDraw.Draw(board)
+for row,(n,c)in enumerate([(1998,'H138'),(1997,'H147/egne-felt-sammenstilling/egen-kjerne-viderefort'),(1996,'H144'),(1995,'H145')]):
+ y=row*300;d.text((18,y+12),f'{n}: original / egen retur, ikke importert',fill='white')
+ for col,F in enumerate([R/f'kilder/{n}/original-1x.png',R/'kall'/c/'prototype-under-kontroll.png']):
+  im=Image.open(F).convert('RGBA');sc=8 if col==0 else 2;im=im.resize((im.width*sc,im.height*sc),Image.Resampling.NEAREST);bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);board.paste(bg.convert('RGB'),(18+col*630,y+45))
+board.save(R/'videre-H137-H147-kontroll.png')
+(R/'rapport-H137-H147.py.txt').write_bytes(Path(__file__).read_bytes())
+files=sorted(p for p in R.rglob('*')if p.is_file()and p.name!='SHA256SUMS');(R/'SHA256SUMS').write_text(''.join(sha(p)+'  '+str(p.relative_to(R))+'\n'for p in files));assert all(sha(R/n)==h for h,n in(line.split('  ',1)for line in(R/'SHA256SUMS').read_text().splitlines()));print(json.dumps({'bildekall_total':22,'nye_bildekall':11,'kontrollvarianter_nye':len(variants),'nye_native':0,'native':3724,'rapportfiler_med_SHA':len(files),'whole_jobs':whole,'stashes_3':True},ensure_ascii=False))

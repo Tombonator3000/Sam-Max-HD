@@ -1,0 +1,14 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from own_parts import component_on_canvas
+import numpy as np,json,hashlib,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall'/sys.argv[1];BF=K/'egen-sammensatt.png';b=np.array(Image.open(BF).convert('RGBA'));F=R/'kall/H132/egen-renset.png';a=np.array(Image.open(F).convert('RGBA'))
+def box(im):
+ lab,n=nd.label(im[:,:,3]>=128);choices=[]
+ for i in range(1,n+1):
+  yy,xx=np.nonzero(lab==i)
+  if len(xx)>100 and xx.max()<500 and yy.max()-yy.min()<100:choices.append([int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)])
+ assert len(choices)==1,choices
+ return choices[0]
+sbox=box(a);target=box(b);x0,y0,x1,y1=sbox;part=a[y0:y1,x0:x1].copy();can,fit=component_on_canvas(part,target,(b.shape[1],b.shape[0]));xx0,yy0,xx1,yy1=target;pad=5;b[max(0,yy0-pad):yy1+pad,max(0,xx0-pad):xx1+pad]=can[max(0,yy0-pad):yy1+pad,max(0,xx0-pad):xx1+pad];D=K/'egen-rotorH132';D.mkdir(exist_ok=False);Image.fromarray(b).save(D/'egen-sammensatt.png');p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,egen_rotor={'kilde':str(F.relative_to(R)),'sha256':hashlib.sha256(F.read_bytes()).hexdigest(),'egen_kilde_bbox':sbox,'egen_maal_bbox':target,'tilpasning':fit,'regel':'Hele løsrevne øvre venstre egen rotor fra H132, valgt i eget bilde og lagt på bbox for samme egen del. Ingen originalfil, maske eller kildekoordinat. H132 er ikke stilanker.'});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');(R/'monter-egen-rotor.py.txt').write_bytes(Path(__file__).read_bytes());print(D)

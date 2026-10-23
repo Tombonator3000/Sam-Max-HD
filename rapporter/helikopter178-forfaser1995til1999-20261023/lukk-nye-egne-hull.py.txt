@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H146/registreringsgrunnlag/egen-registrert-modul/egen-RGB-H142/egen-konturrens-e8-r3/heltilpasning/egne-smaafelt';F=K/'egen-sammensatt.png';BF=R/'kall/H143/egen-registrert-modul/egen-rotorH132/egen-konturrens-e8-r3/egen-sammensatt.png';a=np.array(Image.open(F).convert('RGBA'));old=np.array(Image.open(BF).convert('RGBA'));on=a[:,:,3]>=128;holes=nd.binary_fill_holes(on)&~on;lab,n=nd.label(holes);rows=[]
+for i in range(1,n+1):
+ m=lab==i;ratio=float((old[:,:,3][m]>=128).mean())
+ if ratio>=.95:
+  yy,xx=np.nonzero(m);a[m]=old[m];rows.append({'egen_hull_ID':i,'egen_hull_piksler':int(m.sum()),'forrige_egen_opaque_andel':ratio,'egen_bbox':[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]})
+D=K/'uten-nye-egne-hull';D.mkdir(exist_ok=False);Image.fromarray(a).save(D/'egen-sammensatt.png');p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,egen_hullretting={'regel':'Nye lukkede hull i egen H146 lukkes helt med tidligere egen RGBA når minst95 prosent av det samme hele hullet var opaque i tidligere eget bilde. Kun egne bilder og egne hull brukes. Et oppdiktet lite rundt hull var visuelt sett i den nye struten. Ingen originalfiler eller originalmaske åpnes. Eksisterende store egne åpninger beholdes.','hull':rows,'inn_fil':str(F.relative_to(R)),'inn_sha256':hashlib.sha256(F.read_bytes()).hexdigest(),'forrige_egen_fil':str(BF.relative_to(R)),'forrige_egen_sha256':hashlib.sha256(BF.read_bytes()).hexdigest()});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');(R/'lukk-nye-egne-hull.py.txt').write_bytes(Path(__file__).read_bytes());print(D,rows)

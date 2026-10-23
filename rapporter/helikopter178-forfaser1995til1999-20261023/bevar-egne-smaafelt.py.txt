@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H146/registreringsgrunnlag/egen-registrert-modul/egen-RGB-H142/egen-konturrens-e8-r3/heltilpasning';F=K/'egen-sammensatt.png';BF=R/'kall/H143/egen-registrert-modul/egen-rotorH132/egen-konturrens-e8-r3/egen-sammensatt.png';a=np.array(Image.open(F).convert('RGBA'));b=np.array(Image.open(BF).convert('RGBA'));core=b[:,:,3]>=128;cols,ct=np.unique(b[core,:3],axis=0,return_counts=True);keep=np.zeros(core.shape,bool);rows=[]
+for col,count in zip(cols,ct):
+ if count/core.sum()<=.04:
+  m=np.all(b[:,:,:3]==col,2)&(b[:,:,3]>0);keep|=m;rows.append({'RGB':col.tolist(),'egne_corepiksler':int(count),'egen_andel':float(count/core.sum())})
+a[keep,:3]=b[keep,:3];a[keep,3]=np.maximum(a[keep,3],b[keep,3]);a[a[:,:,3]==0,:3]=0;D=K/'egne-smaafelt';D.mkdir(exist_ok=False);Image.fromarray(a).save(D/'egen-sammensatt.png');p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,egne_smaafelt={'regel':'Alle hele egne materialfargeplan med høyst4 prosent av egen coreflate videreføres fra tidligere egen konturrens. Store flater beholder H146s nye flytende kontur. Egen alfa utvides med maks av de to egne alfaene på hele egne småplan. Ingen originalfil, kildekoordinater, originalmaske eller enkeltfeste-påmaling.','egne_plan':rows,'grense_egen_arealandel':.04,'ny_fil':str(F.relative_to(R)),'ny_sha256':hashlib.sha256(F.read_bytes()).hexdigest(),'tidligere_egen_fil':str(BF.relative_to(R)),'tidligere_egen_sha256':hashlib.sha256(BF.read_bytes()).hexdigest()});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');(R/'bevar-egne-smaafelt.py.txt').write_bytes(Path(__file__).read_bytes());print(D)

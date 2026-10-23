@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import hashlib,json
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+board=Image.new('RGB',(1460,1400),'#304050');d=ImageDraw.Draw(board)
+for row,(n,c)in enumerate([(1998,'H138'),(1997,'H147/egne-felt-sammenstilling/egen-kjerne-viderefort'),(1996,'H144'),(1995,'H145')]):
+ y=row*350;d.text((18,y+12),f'{n}: original / egen retur, ikke importert',fill='white')
+ for col,F in enumerate([R/f'kilder/{n}/original-1x.png',R/'kall'/c/'prototype-under-kontroll.png']):
+  im=Image.open(F).convert('RGBA');sc=8 if col==0 else 2;im=im.resize((im.width*sc,im.height*sc),Image.Resampling.NEAREST);x=18+col*730;assert x+im.width<=board.width and y+45+im.height<=y+350;bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);board.paste(bg.convert('RGB'),(x,y+45))
+board.save(R/'videre-H137-H147-kontroll.png');(R/'korrekt-kontrolltavle.py.txt').write_bytes(Path(__file__).read_bytes())
+files=sorted(p for p in R.rglob('*')if p.is_file()and p.name!='SHA256SUMS');(R/'SHA256SUMS').write_text(''.join(sha(p)+'  '+str(p.relative_to(R))+'\n'for p in files));print('Hele rutene og begge rotorer er med i alle åtte paneler. Bare kontrolltavlen er endret.')

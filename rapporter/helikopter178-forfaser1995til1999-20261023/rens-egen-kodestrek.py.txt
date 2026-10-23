@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall'/sys.argv[1]
+a=np.array(Image.open(K/'raa.png').convert('RGBA'));b=a.copy();rgb=a[:,:,:3].astype(int);r,g,v=[rgb[:,:,i]for i in range(3)];on=a[:,:,3]>0
+mint=on&(r<24)&(g>230)&(v>170)&(v<230);lime=on&(r>210)&(r<247)&(g>235)&(g-r>=8)&(v<30)
+b[mint,:3]=[0,255,128];b[lime,:3]=[192,255,0]
+noise=on&(rgb.max(2)<64)&(np.ptp(rgb,axis=2)<28)
+trust=(a[:,:,3]>=128)&~noise;trust=nd.binary_erosion(trust,iterations=2)
+assert trust.any();_,ix=nd.distance_transform_edt(~trust,return_indices=True);b[noise,:3]=b[tuple(ix)][noise,:3];assert np.array_equal(a[:,:,3],b[:,:,3])
+D=K/'egen-global-kodestrek';D.mkdir(exist_ok=False);Image.fromarray(b).save(D/'egen-global-kodekalibrert.png');p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,egen_global_RGB_rens={'mint_egne_piksler':int(mint.sum()),'lime_egne_piksler':int(lime.sum()),'nytegnet_svart_lavkroma_strek':int(noise.sum()),'regel':'Alle egne RGB-piksler med maxRGB<64 og kanalspenn<28 fylles fra nærmeste eget core128-frø uten samme lavkroma, erodert 2 raw. Kodepaletten har ingen mørke lavkromafarger; navy er høy kroma og bevares. Samme mint/lime-klasser som dokumentert. Ingen XY-regler, originalfiler eller kildemaske. Alfa byteidentisk.','raw_sha256':hashlib.sha256((K/'raa.png').read_bytes()).hexdigest()});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');(R/'rens-egen-kodestrek.py.txt').write_bytes(Path(__file__).read_bytes());print(D)

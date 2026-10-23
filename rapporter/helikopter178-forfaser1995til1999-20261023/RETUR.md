@@ -1,3 +1,15 @@
+# Gjeldende retur etter H147
+
+Siste økt:11 nye faktiske bildekall, ingen ny sluttrute eller import. Alle aktuelle varianter er returer. Se VIDERE-H137-H147.md og videre-H137-H147-kontroll.json for konkrete SHA-er og rutekart-returH137-H147.json for alle uendrede porter.
+
+1997: H143s6/3- og8/3-konturrens består teknisk, men har fortsatt trappede løpere og er stilreturer. H146s nye flytende løpere er bedre visuelt. Nærmeste bevarte variant hel-egen-RGB8-fringe0 har2 ekstra kodepiksler, ingen positive alfa-/åpnings-/kode-/nativefester over3HD. H147 tegner to hele materialplan; begge deres fargeporter består, men undermalingen i egen sammenstilling gir6 ekstra svarte og1 brun kodepiksel. Vanlig egen alpha-over løser ikke dette. Disse7 må ikke feilforklares som råbildestøy. Ingen av disse glattere variantene er importklare. Ikke svekk3HD-portene eller velg trappede varianter bare for å få et importtall.
+
+1998: H137/H138 beholder motivet bedre, men små felt mangler/flyttes. H137 har også ny mørk strek og én åpning.1996/H144 beholder full øvre rotor og består alfa/åpninger, men har flere feltfeil.1995/H145 har16 alfafester over3HD og feltfeil. Alle råbilder, faktiske prompter og kontrollvarianter er beholdt.
+
+H148 er ikke utført eller reservert.1999 og2000..2021 er allerede publisert og skal ikke tegnes igjen. Ingen ny motoravspilling, kandidat, pakke, Tom-/Claude-godkjenning eller nativepublisering i siste økt. All publisert grafikk og tre stasher er uendret.
+
+## Historisk status før H137
+
 # Gjeldende returstatus
 
 Fase1999 er nå egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert i hd-mod219fcfa1acd53590155638623f48c7acccde3e0f. Hele publiseringen er hentet tilbake og alle21969 filhash bekreftet. Se mottak-publisert1999.json og ALFA-RGB-RETTELSE.md. Ingen ny Tom-/Claude-godkjenning. Ikke tegn1999 på nytt.
