@@ -3,14 +3,16 @@
 <!-- helikopter178-forfaser1995-1999:start -->
 ## Neste i grafikkproduksjonen
 
-- [x] Fase 1998 er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert som tapsfri WebP. Mod 2246c749d34c37ab56e5aedc2f06b589b09bb186, grafikkilde 506b63826a171c638a1f802fccf5d80d256851a2, rapport 27b6aa3861de7933287e443bcc2aed9fba912e3d. Alle 21972 publiserte filhash, 500 endrede kildefiler og 24 endrede rapportfiler er faktisk hentet og bekreftet. Tidligere grafikk og tre stasher er bevart.
-- [x] Ti faktiske innebygde kall H156..H165 er bevart, 40 i bunken. Valgt variant består alle 3HD-porter, kildeløs replay og tapsfri WebP. Delark 14/24 gir 14 OK/10 tomme mål. To nye motoravspillinger gir 160 strenge hele originalpar, ingen uparede tilstander. Bare 10832 HD-piksler innen ny fase endres. Ingen ny Tom-/Claude-godkjenning.
-- [ ] Gjenoppta rapporter/helikopter178-forfaser1995til1999-20261023/NESTE.md, notat1998.md og RETUR.md. Fortsett 1995/H145. H166 er ikke utført, forberedt eller reservert. Ikke tegn 1996..2021 igjen. Se originalkontekst og godkjent Sam før hvert motiv, bruk kallokal kodepalett.
-- [ ] Bruk gjeldende komplette mods/gpt eller fersk hd-mod, én kandidat per bunke. Alle kontroller og relevant motor før vanlig additiv publisering fra fersk fjern-SHA. Hent tilbake og kontroller alle filhash. Fjern verifiserte duplikater, behold unike kilder, råbilder og relevante kontrollbevis. Gamle out-modmapper kan være ufullstendige.
-- [ ] Oppdater faktiske Linux-/Windows-pakker ved neste komplette ark-/familiesamlepunkt eller avslutning. Pakkene har 3723 og mangler fire publiserte faser. Faktisk nedlasting, sjekksummer og inkludert grafikk må kontrolleres før de kalles oppdatert.
-- [ ] Fortsett til alle produserbare jobber og returer er levert, kontrollert og importert. Samlet sluttkontroll før pause. Nå 3727 native, 508/1758 hele jobber, fig178_02 14/24, familie178 26/102. 1990 trenger hel kilde, 137/V013 og 296/S037 står som før. Ingen nødvendig Tom-avklaring; automatikken er ACTIVE.
+- [x] Publisert fase 1995 og fullført femfasebunken 1995..1999. hd-mod 83337cd20e34377b5ba1be386fa66d36ea6921a9 har 3728 native. Alle 21973 fjernhash er faktisk hentet og bekreftet. Delark 15/24, familie178 27/102, hele jobber 508/1758. Ingen ny Tom-/Claude-godkjenning.
+- [x] Ti nye faktiske innebygde kall H166..H175 er bevart, 50 i bunken. Alle strenge porter, kildeløs replay, WebP og to faktiske nativeavspillinger består. 160 strenge originalpar, 12858 nye HD-piksler bare i berørt fase. Råbilder, tidligere grafikk og tre stasher er bevart.
+- [x] Oppdatert faktiske Linux-/Windows-pakker og publisert fellesutgaven sam-max-hd-2026-10-24-helikopter. Begge nedlastinger, sjekksummer og alle 21973 inkluderte modfiler er kontrollert. Alle fire fellesvedlegg er hentet tilbake og bekreftet. Linux-pakkens egen motor og Windows-oppstart i Actions er testet.
+- [x] Hentet hele kilder1986..1994 med aktørposisjon220,60. Tidligere avklippede1990 er løst. Kanonisk palett er bevart, RGB565-motorverdier bekreftet, ni originaler visuelt sett. Ingen jobbgrunnlag eller ny grafikk er endret i kildekontrollen.
+- [ ] Gjenoppta rapporter/helikopter178-forfaser1995til1999-20261023/NESTE.md, notat1995.md, KILDESAK-1990.md og RETUR.md. Neste bunke1994..1990, deretter1989..1986. H176 er ikke forberedt, utført eller reservert. Ikke tegn1995..2021 igjen. Se originalkontekst og godkjent Sam før hvert motiv.
+- [ ] Bruk gjeldende komplette mods/gpt eller fersk hd-mod, én kandidat per bunke. Bevar tidligere grafikk og stasher. Alle kontroller og relevant motor før vanlig additiv publisering fra fersk fjern-SHA, deretter faktisk tilbakehenting og alle filhash. Behold råbilder, unike kilder og relevante kontrollbevis; fjern verifiserte arbeidskopier.
+- [ ] Oppdater faktiske Linux-/Windows-pakker ved neste samlepunkt eller avslutning med nedlasting, sjekksummer og grafikkinnhold kontrollert. Nå3728 i både mod og fellespakker, ingen etterslep.
+- [ ] Fortsett til alle produserbare jobber og returer er levert, kontrollert og importert. Samlet sluttkontroll før pause. 137/V013 og296/S037 er uendret. Ingen nødvendig Tom-avklaring; automatikken er ACTIVE.
 
-Kontrollert aktøravspilling er ikke full naturlig gjennomspilling. Ingen ny interaktiv Windows-/webtest, motor-/pipelinekode, ny pakke eller gammel nattprosess. Beskyttede jobbfiler, tidligere modgrafikk og tre stasher er uendret.
+Kontrollert avspilling er ikke full naturlig gjennomspilling. Ingen ny interaktiv Windows-/webtest eller motor-/pipelinekode. Grafikkilde c2cbb2ba506871513e05e75a7afacecab0ade89b, rapport 9d1398075cde268db59ace37f591b714586eada8.
 
 <!-- helikopter178-forfaser1995-1999:slutt -->
 
