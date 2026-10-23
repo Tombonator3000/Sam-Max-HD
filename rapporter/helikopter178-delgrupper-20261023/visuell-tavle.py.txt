@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image, ImageDraw
+P = Path('/home/tom/Sam-Max-HD')
+R = P / 'work/.gpt-gren/rapporter/helikopter178-delgrupper-20261023'
+S = P / 'work/.gpt-gren/rapporter/helikopter178-2005til2009-kilder-20261023/kilder'
+board = Image.new('RGB', (1500, 540), '#53616d')
+d = ImageDraw.Draw(board)
+for row, phase in enumerate([2007, 2009]):
+    original = Image.open(S / str(phase) / 'original-1x.png').convert('RGBA')
+    original = original.resize((original.width*4, original.height*4), Image.Resampling.NEAREST)
+    native = Image.open(R / 'native' / f'costume178_{phase}_hd.png').convert('RGBA')
+    for col, im in enumerate([original, native]):
+        x, y = 10 + col*750, 45 + row*270
+        d.text((x, y-30), f'{phase}: ' + ('original 4x, visningszoom 2x' if col == 0 else 'egen native med ekte alfa, visningszoom 2x'), fill='white')
+        im = im.resize((im.width*2, im.height*2), Image.Resampling.NEAREST)
+        board.paste(im, (x, y), im)
+board.save(R / 'to-valgte-native-kontroll2x.png')

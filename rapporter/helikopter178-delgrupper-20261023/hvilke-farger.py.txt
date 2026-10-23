@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,sys
+from scipy.spatial import cKDTree
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;K=P/'work/.gpt-gren/rapporter'/O.name/'kall'/sys.argv[1];q=json.loads((K/'kontroll.json').read_text());s=np.array(Image.open(P/f'work/extract/costumes/costume178_{q["rute"]}.png'));a=np.array(Image.open(K/'prototype-under-kontroll.png'));colors=np.unique(s[s[:,:,3]>0,:3],axis=0);coords=np.argwhere(a[:,:,3]>=128);_,ii=cKDTree(colors).query(a[a[:,:,3]>=128,:3])
+for col in colors:
+ cy,cx=np.nonzero(np.all(s[:,:,:3]==col,2)&(s[:,:,3]>0));want=np.stack([cy*4+q['margy']*4+2,cx*4+q['margx']*4+2],1);have=coords[np.all(colors[ii]==col,1)];ds=cKDTree(have).query(want)[0]if len(have)else np.full(len(want),999.);bad=[(int(x),int(y),round(float(d),2))for x,y,d in zip(cx,cy,ds)if d>3]
+ if bad:print(col.tolist(),bad)

@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+from smhd.myk import _premul_resize
+import numpy as np
+
+def decode(raw,table):
+ a=np.array(Image.open(raw).convert('RGBA'));mx=int(a[:,:,3].max());a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/mx).astype('uint8');before=a[:,:,3].copy();weak=(a[:,:,3]>0)&(a[:,:,3]<8);a[weak]=0;assert np.array_equal(a[:,:,3]>=128,before>=128);alpha=a[:,:,3].copy();trust=alpha>=128;_,ix=nd.distance_transform_edt(~trust,return_indices=True);fringe=(alpha>0)&(alpha<32);a[fringe,:3]=a[tuple(ix)][fringe,:3]
+ codes=np.array([e['kode']for e in table],dtype='uint8');real=np.array([e['ekte']for e in table],dtype='uint8');on=alpha>0;_,ids=cKDTree(codes).query(a[on,:3]);classes=np.zeros(alpha.shape,int);classes[on]=ids;seeds=np.zeros(alpha.shape,bool)
+ for ci in range(len(codes)):seeds|=nd.binary_erosion((classes==ci)&(alpha>=128),structure=np.ones((3,3)),border_value=0)
+ assert seeds.any();_,near=nd.distance_transform_edt(~seeds,return_indices=True);classes[on&~seeds]=classes[tuple(near)][on&~seeds];a[on,:3]=real[classes[on]];a[~on,:3]=0;assert np.array_equal(a[:,:,3],alpha)
+ return a,dict(egen_alfamaks_normalisert=mx,egen_svak_alfa_under8_fjernet=int(weak.sum()),egne_core128_bevart_foer_plassering=True,egen_alfa_uendret_ved_RGB_rens=True)
+
+def component_on_canvas(part,target,canvas_size):
+ yy,xx=np.nonzero(part[:,:,3]>=128);bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];sx,sy=(target[2]-target[0])/(bbox[2]-bbox[0]),(target[3]-target[1])/(bbox[3]-bbox[1]);scaled=_premul_resize(part,(round(part.shape[1]*sx),round(part.shape[0]*sy))).copy();nn=np.array(Image.fromarray(part).resize((scaled.shape[1],scaled.shape[0]),Image.Resampling.NEAREST));core=nn[:,:,3]>=128;_,nearest=nd.distance_transform_edt(~core,return_indices=True);scaled[:,:,:3]=nn[:,:,:3];fringe=(scaled[:,:,3]>0)&~core;scaled[fringe,:3]=nn[tuple(nearest)][fringe,:3];scaled[scaled[:,:,3]==0,:3]=0;x,y=target[0]-round(bbox[0]*sx),target[1]-round(bbox[1]*sy);can=np.zeros((canvas_size[1],canvas_size[0],4),dtype='uint8');h,w=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,can.shape[1]),min(y+h,can.shape[0]);can[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x];assert int(can[:,:,3].sum())==int(scaled[:,:,3].sum())
+ return can,dict(egen_del_core_bbox=bbox,maal_egen_tidligere_del_bbox=target,egen_del_hel_skala=[sx,sy],egen_del_hel_flytt=[x,y],egen_del_RGB_skalert_nearest_egen_kodeklasse=True,egen_del_alfa_skalert_premultiplisert=True,egen_fringe_RGB_fra_naermeste_egen_core=True)

@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np,json,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+for cid in sys.argv[1:]:
+ K=R/'kall'/cid;q=json.loads((K/'kontroll.json').read_text());src=np.array(Image.open(P/f'work/extract/costumes/costume178_{q["rute"]}.png').convert('RGBA'));ref=np.array(Image.open(K/'original-native-kontroll.png'));native=np.array(Image.open(K/'prototype-under-kontroll.png'));own=Image.open(K/'egen-renset.png').convert('RGBA');sx,sy=q['hel_skala'];scaled=np.array(own.resize((round(own.width*sx),round(own.height*sy)),Image.Resampling.NEAREST));can=np.zeros_like(ref);x,y=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];h,w=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,can.shape[1]),min(y+h,can.shape[0]);can[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x]
+ colors=np.unique(src[src[:,:,3]>0,:3],axis=0);core=native[:,:,3]>=128;nativeclass=np.zeros(core.shape,int);nativeclass[core]=cKDTree(colors).query(native[core,:3])[1];actualalpha=src[:,:,3]>0;coords=np.argwhere(actualalpha);opaque=(coords[:,0]*4+q['margy']*4+2,coords[:,1]*4+q['margx']*4+2);coords=np.argwhere(~actualalpha);empty=(coords[:,0]*4+q['margy']*4+2,coords[:,1]*4+q['margx']*4+2);need=[]
+ for i,c in enumerate(colors):
+  yy,xx=np.nonzero(np.all(src[:,:,:3]==c,2)&actualalpha);re=np.all(ref[:,:,:3]==c,2)&(ref[:,:,3]>=128);need.append((i,c,(yy*4+q['margy']*4+2,xx*4+q['margx']*4+2),nd.distance_transform_edt(~re)))
+ def shift(a,dx,dy):
+  b=np.zeros_like(a);hh,ww=a.shape[:2];ax0,ay0=max(0,dx),max(0,dy);ax1,ay1=min(ww,ww+dx),min(hh,hh+dy);b[ay0:ay1,ax0:ax1]=a[ay0-dy:ay1-dy,ax0-dx:ax1-dx];return b
+ rows=[]
+ for dy in range(-3,4):
+  for dx in range(-3,4):
+   a=shift(can,dx,dy);nn=shift(native,dx,dy);cc=shift(nativeclass,dx,dy);co=nn[:,:,3]>=128;alpha_pos=nd.distance_transform_edt(~co)[opaque];alpha_neg=nd.distance_transform_edt(co)[empty];f=[]
+   for i,c,pos,negdist in need:
+    have=np.all(a[:,:,:3]==c,2)&(a[:,:,3]>=128);nv=(cc==i)&co;pd=nd.distance_transform_edt(~have)[pos]if have.any()else np.full(len(pos[0]),999.);npd=nd.distance_transform_edt(~nv)[pos]if nv.any()else np.full(len(pos[0]),999.);neg=negdist[have]
+    f.append(dict(RGB=c.tolist(),kode_fester_over3=int((pd>3).sum()),native_fester_over3=int((npd>3).sum()),egen_kode_utenfor3=int((neg>3).sum()),maks_kode=float(max(pd))))
+   count=int((alpha_pos>3).sum()+(alpha_neg>3).sum())+sum(e['kode_fester_over3']+e['native_fester_over3']+e['egen_kode_utenfor3']for e in f);rows.append(dict(helflytt=[dx,dy],samlet_avvik=count,alfa_fester_over3=int((alpha_pos>3).sum()),aapninger_over3=int((alpha_neg>3).sum()),farger=[e for e in f if e['kode_fester_over3']or e['native_fester_over3']or e['egen_kode_utenfor3']]))
+ rows.sort(key=lambda e:(e['samlet_avvik'],sum(abs(k)for k in e['helflytt'])));proof=dict(kall=cid,bare_global_helflytt_maalt=True,tegningen_endret=False,topp=rows[:7],alle=rows);(K/'helflytt-diagnose.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print(cid,json.dumps(rows[0],ensure_ascii=False))

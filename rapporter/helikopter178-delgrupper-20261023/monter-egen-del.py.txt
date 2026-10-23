@@ -1,0 +1,45 @@
+from pathlib import Path
+import json,hashlib,shutil,sys,datetime
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np
+from smhd.myk import place,_premul_resize
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+cid=sys.argv[1];K=R/'kall'/cid;plan=json.loads((K/'plan.json').read_text());n=plan['rute'];raw=Path(sys.argv[2]);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert not(K/'raa.png').exists()or sha(K/'raa.png')==sha(raw);shutil.copy2(raw,K/'raa.png');plan.update(utfort=True,raw_path=str(raw),raa_sha256=sha(raw),original_kontekst_og_stil_visuelt_sett=True);(K/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
+# Global opprydding og RGB-dekoding av bare den nye egne genererte delgruppen.
+a=np.array(Image.open(raw).convert('RGBA'));mx=int(a[:,:,3].max());a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/mx).astype('uint8');before=a[:,:,3].copy();weak=(a[:,:,3]>0)&(a[:,:,3]<8);a[weak]=0;assert np.array_equal(a[:,:,3]>=128,before>=128);alpha=a[:,:,3].copy();trust=alpha>=128;_,ix=nd.distance_transform_edt(~trust,return_indices=True);fringe=(alpha>0)&(alpha<32);a[fringe,:3]=a[tuple(ix)][fringe,:3]
+pal=json.loads((K/'kodepalett.json').read_text());codes=np.array([e['kode']for e in pal['tabell']],dtype='uint8');real=np.array([e['ekte']for e in pal['tabell']],dtype='uint8');on=alpha>0;_,indices=cKDTree(codes).query(a[on,:3]);ids=np.zeros(alpha.shape,int);ids[on]=indices;seeds=np.zeros(alpha.shape,bool)
+for ci in range(len(codes)):seeds|=nd.binary_erosion((ids==ci)&(alpha>=128),structure=np.ones((3,3)),border_value=0)
+assert seeds.any();_,near=nd.distance_transform_edt(~seeds,return_indices=True);ambiguous=on&~seeds;ids[ambiguous]=ids[tuple(near)][ambiguous];a[on,:3]=real[ids[on]];a[~on,:3]=0;assert np.array_equal(a[:,:,3],alpha);Image.fromarray(a).save(K/'egen-del-renset.png')
+m=json.loads((K/'delplassering-plan.json').read_text());basis=Path(m['egen_basis']);assert sha(basis)==m['egen_basis_sha256'];base=np.array(Image.open(basis));split=m['egen_split_x'];assert not(base[:,split:490,3]>0).any();yy,xx=np.nonzero(a[:,:,3]>=128);cb=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];tb=m['egen_basis_core_bbox_venstre'];gx,gy=(tb[2]-tb[0])/(cb[2]-cb[0]),(tb[3]-tb[1])/(cb[3]-cb[1]);scaled=_premul_resize(a,(round(a.shape[1]*gx),round(a.shape[0]*gy))).copy();nn=np.array(Image.fromarray(a).resize((scaled.shape[1],scaled.shape[0]),Image.Resampling.NEAREST));owncore=nn[:,:,3]>=128;_,nearestcore=nd.distance_transform_edt(~owncore,return_indices=True);scaled[:,:,:3]=nn[:,:,:3];ownfringe=(scaled[:,:,3]>0)&~owncore;scaled[ownfringe,:3]=nn[tuple(nearestcore)][ownfringe,:3];scaled[scaled[:,:,3]==0,:3]=0;px,py=tb[0]-round(cb[0]*gx),tb[1]-round(cb[1]*gy);placed=np.zeros_like(base);hh,ww=scaled.shape[:2];x0,y0=max(px,0),max(py,0);x1,y1=min(px+ww,placed.shape[1]),min(py+hh,placed.shape[0]);placed[y0:y1,x0:x1]=scaled[y0-py:y1-py,x0-px:x1-px];assert int(placed[:,:,3].sum())==int(scaled[:,:,3].sum()),'Egen del kuttes';assert not(placed[:,split:,3]>0).any(),'Egen del overlapper annen egen gruppe';a=base.copy();a[:,:split]=0;a=np.array(Image.alpha_composite(Image.fromarray(a),Image.fromarray(placed)));assert np.array_equal(a[:,split:],base[:,split:]);Image.fromarray(a).save(K/'egen-sammensatt.png');q=dict(kall=cid,egen_basis=str(basis),egen_basis_sha256=sha(basis),ny_egen_del_raa_sha256=sha(K/'raa.png'),egen_del_renset_sha256=sha(K/'egen-del-renset.png'),egen_del_core_bbox=cb,maal_egen_tidligere_del_bbox=tb,egen_del_hel_skala=[gx,gy],egen_del_hel_flytt=[px,py],egen_split_x=split,egen_hoeyregruppe_RGBA_bytebevart=True,egen_del_RGB_skalert_nearest_egen_kodeklasse=True,egen_del_alfa_skalert_premultiplisert=True,egen_fringe_RGB_fra_naermeste_egen_core=True,egne_kildegrupper=2,svak_egen_alfa_under8_fjernet=int(weak.sum()),alle_egne_core128_bevart_foer_plassering=True,egen_alfa_uendret_ved_RGB_rens=True,kilde_original_apnet_for_sammensetting=False,kildekoordinater_til_plassering=False,originalmaske=False,originalfragmenter=False,enkeltrekk_ikke_flyttet=True,sammensatt_sha256=sha(K/'egen-sammensatt.png'))
+(K/'egen-del-montering.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+# Bare etter egen montering aapnes originalen for helplassering og maaling.
+src=np.array(Image.open(P/f'work/extract/costumes/costume178_{n}.png').convert('RGBA'));src[np.all(src[:,:,:3]==[255,0,255],axis=2)]=0;h,w=src.shape[:2]
+Image.fromarray(a).save(K/'egen-renset.png')
+yy,xx=np.nonzero(a[:,:,3]>=128);x0,y0,x1,y1=map(int,(xx.min(),yy.min(),xx.max()+1,yy.max()+1));sx,sy=4*w/(x1-x0),4*h/(y1-y0)
+placed=place(a,src,sx,sy);proto=Image.fromarray(placed['bilde']);proto.save(K/'prototype-under-kontroll.png');b=np.array(proto);core=b[:,:,3]>=128
+ref=Image.new('RGBA',proto.size);ref.alpha_composite(Image.fromarray(src).resize((w*4,h*4),Image.Resampling.NEAREST),(placed['margx']*4,placed['margy']*4));ref.save(K/'original-native-kontroll.png');s=np.array(ref);sm=s[:,:,3]>=128
+lab,count=nd.label(src[:,:,3]>0);drawlab,drawcount=nd.label(core);areas=np.bincount(drawlab.ravel());drawparts=[]
+for i,sl in enumerate(nd.find_objects(drawlab),1):
+ if sl is None:continue
+ ys,xs=np.nonzero(drawlab==i);drawparts.append({'nr':i,'areal_HD':int(areas[i]),'rekt_HD':[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)],'midt_HD':[float(xs.mean()),float(ys.mean())]})
+dist=nd.distance_transform_edt(~core);bgdist=nd.distance_transform_edt(core);px,py=placed['margx']*4,placed['margy']*4
+anchors=[]
+# Hele opake kildedeler og transparente kildepunkt kontrolleres bare som målinger.
+for i,sl in enumerate(nd.find_objects(lab),1):
+ ys,xs=np.nonzero(lab==i);cy=py+ys*4+2;cx=px+xs*4+2;vals=dist[cy,cx]
+ anchors.append({'komponent':i,'areal_1x':len(xs),'midt_HD':[float(cx.mean()),float(cy.mean())],'maks_til_egen_alfa_HD':float(vals.max()),'punkt_over3HD':int((vals>3).sum()),'berorte_egne_komponenter':sorted(set(int(x) for x in drawlab[cy,cx] if x))})
+ys,xs=np.nonzero(src[:,:,3]==0);bg=bgdist[py+ys*4+2,px+xs*4+2];neg={'kildepunkter':len(xs),'maks_til_egen_apning_HD':float(bg.max()) if len(bg) else 0.,'punkt_over3HD':int((bg>3).sum())}
+board=Image.new('RGB',(proto.width*2+60,proto.height+70),'#304050');d=ImageDraw.Draw(board)
+for i,(im,label) in enumerate([(ref,'Original 4x, bare kontroll'),(proto,cid+' egen tegning, under kontroll')]):
+ bgim=Image.new('RGBA',im.size,'#87959e');bgim.alpha_composite(im);board.paste(bgim.convert('RGB'),(20+i*(proto.width+20),45));d.text((20+i*(proto.width+20),16),label,fill='white')
+board.save(K/'sammenligning.png')
+# Kontaktark i 2x visningszoom.
+board.resize((board.width*2,board.height*2),Image.Resampling.NEAREST).save(K/'sammenligning2x.png')
+r={k:v for k,v in placed.items() if k!='bilde'};r.update(egne_delgrupper_sammensatt=True,egen_hoeyregruppe_H080_bytebevart=True,delmontering_sha256=sha(K/'egen-del-montering.json'),kall=cid,rute=n,verktøy='innebygd image_gen',raa_sha256=sha(K/'raa.png'),raa_maal=list(Image.open(raw).size),raa_alfa_maks=mx,egen_core_bbox=[x0,y0,x1,y1],hel_skala=[sx,sy],hel_affin_port=.88<=sx/sy<=1.12,egen_RGB_til_kildepalett=True,egen_RGB_kodedekoding=True,alle_egne_alfakomponenter_bevart=False,svak_egen_alfa_under8_renset=True,alle_egne_core128_bevart=True,alfa_uendret_ved_RGB_rens=True,native_maal=list(proto.size),native_sha256=sha(K/'prototype-under-kontroll.png'),kilde_komponenter=count,egne_core128_komponenter=drawcount,egne_komponenter=drawparts,alfa_fester=anchors,apninger=neg,originalmaske_brukt_til_klipp=False,originalfragmenter=False,lokal_flytting_av_trekk=False,egen_alfa=True,visuelt_sett_raa=True,visuell_native_kontroll=False,levert=False,native_mottatt=False,motorobservert=False,publisert=False,tom_claude_godkjent=False,status='UNDER_KONTROLL',tid_utc=datetime.datetime.now(datetime.timezone.utc).isoformat())
+r['tekniske_porter_bestatt']=r['hel_affin_port'] and r['snitt_union']>=.6 and r['dekning']>=.8 and not r['kuttet'];r['alle_alfa_fester_innen3HD']=all(x['punkt_over3HD']==0 for x in anchors) and neg['punkt_over3HD']==0
+(K/'kontroll.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
+shutil.copytree(K,O/'kall'/cid,dirs_exist_ok=True)
+print(json.dumps({k:r[k] for k in ['kall','rute','snitt_union','dekning','hel_skala','flytt','margx','margy','kilde_komponenter','egne_core128_komponenter','tekniske_porter_bestatt','alle_alfa_fester_innen3HD']},ensure_ascii=False));print('opaque',[(q['komponent'],q['punkt_over3HD'],q['maks_til_egen_alfa_HD']) for q in anchors]);print('transparent',neg)

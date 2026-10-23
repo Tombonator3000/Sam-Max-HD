@@ -1,0 +1,27 @@
+from pathlib import Path
+from PIL import Image
+from own_parts import decode,component_on_canvas
+from smhd.myk import _premul_resize
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=[]
+# Bare egne raakilder,globale tabeller og registrerte egne bbox/helplasseringer aapnes.
+B=A/'rapporter/helikopter178-returforfaser-20261023/kall/H080'
+table=read(B/'kodepalett.json')['tabell']+read(B/'egen-kodekalibrering.json')['tabell']
+base,_=decode(B/'raa.png',table)
+assert np.array_equal(base,np.array(Image.open(B/'egen-renset.png')))
+for cid in ['H082','H085']:
+ K=R/'kall'/cid
+ if cid=='H082':
+  m=read(K/'delplassering-plan.json');part,_=decode(K/'raa.png',read(K/'kodepalett.json')['tabell']);assert np.array_equal(part,np.array(Image.open(K/'egen-del-renset.png')))
+  placed,_=component_on_canvas(part,m['egen_basis_core_bbox_venstre'],(base.shape[1],base.shape[0]));b=base.copy();b[:,:m['egen_split_x']]=0;whole=np.array(Image.alpha_composite(Image.fromarray(b),Image.fromarray(placed)));assert np.array_equal(whole[:,m['egen_split_x']:],base[:,m['egen_split_x']:]);raws=[str(B/'raa.png'),str(K/'raa.png')]
+ else:
+  whole=Image.new('RGBA',tuple(read(K/'delplassering-plan.json')['egen_basis_maal']));raws=[]
+  for partcid in ['H085','H084']:
+   C=R/'kall'/partcid;m=read(C/'delplassering-plan.json');part,_=decode(C/'raa.png',read(C/'kodepalett.json')['tabell']);assert np.array_equal(part,np.array(Image.open(C/'egen-del-renset.png')));placed,_=component_on_canvas(part,m['egen_basis_core_bbox'],whole.size);whole=Image.alpha_composite(whole,Image.fromarray(placed));raws.append(str(C/'raa.png'))
+  whole=np.array(whole)
+ expected=np.array(Image.open(K/'egen-renset.png'));print(cid,'egenRGBAavvik',int(np.any(whole!=expected,2).sum()),flush=True);assert np.array_equal(whole,expected)
+ q=read(K/'kontroll.json');sx,sy=q['hel_skala'];scaled=_premul_resize(whole,(round(whole.shape[1]*sx),round(whole.shape[0]*sy)));native=np.zeros((q['native_maal'][1],q['native_maal'][0],4),dtype='uint8');x,y=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];h,w=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,native.shape[1]),min(y+h,native.shape[0]);native[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x];assert np.array_equal(native,np.array(Image.open(K/'prototype-under-kontroll.png')))
+ dest=O/'kildelos-replay'/cid;dest.mkdir(parents=True,exist_ok=True);Image.fromarray(whole).save(dest/'egen-renset.png');Image.fromarray(native).save(dest/'native.png');assert sha(dest/'egen-renset.png')==sha(K/'egen-renset.png');assert sha(dest/'native.png')==sha(K/'prototype-under-kontroll.png')
+ rows.append(dict(kall=cid,rute=q['rute'],raws=[dict(fil=f,sha256=sha(Path(f)))for f in raws],egen_RGBA_sha256=sha(dest/'egen-renset.png'),native_sha256=sha(dest/'native.png'),begge_PNG_hash_eksakt_gjenlaget=True,originalfil_aapnet=False,originalmaske=False,kildekoordinater_til_plassering=False,egne_uavhengige_delgrupper=True,enkeltrekk_ikke_flyttet=True))
+(R/'kildelos-replay.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');print('Begge valgte hele sprites gjenskapt byteeksakt fra egne raa-deler og registrert plassering,uten originalbilder.')

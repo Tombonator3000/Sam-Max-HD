@@ -1,0 +1,20 @@
+from pathlib import Path
+from PIL import Image
+from own_parts import decode,component_on_canvas
+import numpy as np,json,hashlib,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+right,left=sys.argv[1:3];K=R/'kall'/right;raw=Path(sys.argv[3]);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+shutil.copy2(raw,K/'raa.png')
+p=json.loads((K/'plan.json').read_text());p.update(utfort=True,raw_path=str(raw),raa_sha256=sha(raw));(K/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+m=json.loads((K/'delplassering-plan.json').read_text());basis=Path(m['egen_basis']);assert sha(basis)==m['egen_basis_sha256'];base=np.array(Image.open(basis));canvas=Image.new('RGBA',(base.shape[1],base.shape[0]));rows=[]
+for cid in [right,left]:
+ C=R/'kall'/cid;pal=json.loads((C/'kodepalett.json').read_text());meta=json.loads((C/'delplassering-plan.json').read_text())
+ part,d=decode(C/'raa.png',pal['tabell']);Image.fromarray(part).save(C/'egen-del-renset.png')
+ placed,mp=component_on_canvas(part,meta['egen_basis_core_bbox'],(base.shape[1],base.shape[0]));split=meta['egen_split_x']
+ if cid==right:assert not(placed[:,:split,3]>0).any()
+ else:assert not(placed[:,split:,3]>0).any()
+ canvas=Image.alpha_composite(canvas,Image.fromarray(placed));rows.append(dict(kall=cid,raa_sha256=sha(C/'raa.png'),egen_del_renset_sha256=sha(C/'egen-del-renset.png'),**d,**mp))
+canvas.save(K/'egen-sammensatt.png')
+proof=dict(egne_delgrupper=rows,egen_basis_bare_for_maal=str(basis),egen_basis_sha256=sha(basis),egen_split_x=m['egen_split_x'],gamle_basisRGBA_ikke_brukt_i_ny_tegning=True,originalfil_apnet_for_sammensetting=False,kildekoordinater_til_plassering=False,originalmaske=False,originalfragmenter=False,enkeltrekk_ikke_flyttet=True,sammensatt_sha256=sha(K/'egen-sammensatt.png'))
+(K/'egen-del-montering.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+print('To egne grupper',right,left,'samlet uten kildeRGBA;tidligere egen H055 gir bare plassmaal.')

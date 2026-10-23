@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;B=A/'rapporter/helikopter178-forfase2005til2009-20261023';src=np.array(Image.open(P/'work/extract/costumes/costume178_2007.png'));rows=[]
+for K in sorted((B/'kall').iterdir()):
+ if not(K/'kontroll.json').exists():continue
+ q=json.loads((K/'kontroll.json').read_text())
+ if q['rute']!=2007:continue
+ own=Image.open(K/'egen-renset.png');sx,sy=q['hel_skala'];a=np.array(own.resize((round(own.width*sx),round(own.height*sy)),Image.Resampling.NEAREST));ref=np.array(Image.open(K/'original-native-kontroll.png'));can=np.zeros_like(ref);x,y=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];h,w=a.shape[:2];x0,y0=max(x,0),max(y,0);x1,y1=min(x+w,can.shape[1]),min(y+h,can.shape[0]);can[y0:y1,x0:x1]=a[y0-y:y1-y,x0-x:x1-x];ownright=np.zeros(can.shape[:2],bool);ownright[:,q['margx']*4+25*4:]=True;bad=[]
+ for c in np.unique(src[src[:,:,3]>0,:3],axis=0):
+  yy,xx=np.nonzero(np.all(src[:,:,:3]==c,2)&(src[:,:,3]>0));yy,xx=yy[xx>=27],xx[xx>=27];have=np.all(can[:,:,:3]==c,2)&(can[:,:,3]>=128);want=np.all(ref[:,:,:3]==c,2)&(ref[:,:,3]>=128);pos=nd.distance_transform_edt(~have)[yy*4+q['margy']*4+2,xx*4+q['margx']*4+2]if have.any()else np.full(len(xx),999.);neg=nd.distance_transform_edt(~want)[have&ownright]if want.any()else np.full(int((have&ownright).sum()),999.);count=int((pos>3).sum()+(neg>3).sum())
+  if count:bad.append(dict(RGB=c.tolist(),pos_over3=int((pos>3).sum()),neg_over3=int((neg>3).sum())))
+ row=dict(kall=K.name,hoeyre_kodeavvik=sum(v['pos_over3']+v['neg_over3']for v in bad),avvik=bad);rows.append(row)
+print(json.dumps(rows,ensure_ascii=False));(R/'hoeyre2007-kodevalg.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');a=src[:,:22];print('Venstre kildetoner',np.unique(a[a[:,:,3]>0,:3],axis=0).tolist())

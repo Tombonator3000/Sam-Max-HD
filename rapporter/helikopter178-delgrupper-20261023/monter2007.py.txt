@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,shutil
+from own_parts import decode,component_on_canvas
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;K=R/'kall/H084';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();raw=Path('/home/tom/.codex/generated_images/01a13e87-e58d-7480-98ea-be8a83c16f7a/exec-f3ea841a-3f58-4370-b719-91de771476e8.png');shutil.copy2(raw,K/'raa.png');p=json.loads((K/'plan.json').read_text());p.update(utfort=True,raw_path=str(raw),raa_sha256=sha(raw));(K/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');m=json.loads((K/'delplassering-plan.json').read_text());basis=Path(m['egen_basis']);assert sha(basis)==m['egen_basis_sha256'];base=np.array(Image.open(basis));canvas=Image.new('RGBA',(base.shape[1],base.shape[0]));rows=[]
+for cid in ['H083','H084']:
+ C=R/'kall'/cid;pal=json.loads((C/'kodepalett.json').read_text());meta=json.loads((C/'delplassering-plan.json').read_text());part,d=decode(C/'raa.png',pal['tabell']);Image.fromarray(part).save(C/'egen-del-renset.png');placed,mp=component_on_canvas(part,meta['egen_basis_core_bbox'],(base.shape[1],base.shape[0]));split=meta['egen_split_x'];assert not(placed[:,:split if cid=='H083'else 0,3]>0).any()
+ if cid=='H084':assert not(placed[:,split:,3]>0).any()
+ canvas=Image.alpha_composite(canvas,Image.fromarray(placed));rows.append(dict(kall=cid,raa_sha256=sha(C/'raa.png'),egen_del_renset_sha256=sha(C/'egen-del-renset.png'),**d,**mp))
+canvas.save(K/'egen-sammensatt.png');proof=dict(egne_delgrupper=rows,egen_basis=str(basis),egen_basis_sha256=sha(basis),egen_split_x=m['egen_split_x'],originalfil_apnet_for_sammensetting=False,kildekoordinater_til_plassering=False,originalmaske=False,originalfragmenter=False,enkeltrekk_ikke_flyttet=True,sammensatt_sha256=sha(K/'egen-sammensatt.png'));(K/'egen-del-montering.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print('To helt egne grupper H083,H084 montert uten kildeRGBA.')
