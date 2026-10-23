@@ -1,0 +1,31 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,time
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def api(path):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True))
+def git(*args):return subprocess.check_output(['git',*args],cwd=P,text=True).strip()
+assert not(O/'pakkestart3733.json').exists()
+receipt=read(R/'mottak-publisert1990til1994.json');native=receipt['hd_mod'];code=git('rev-parse','HEAD')
+assert receipt['alle_filhash_bekreftet']and receipt['lokalt_mottatt']and receipt['native']==3733
+assert git('ls-remote','origin','refs/heads/main').split()[0]==code and git('status','--porcelain')==''
+assert git('ls-remote','origin','refs/heads/hd-mod').split()[0]==native
+workflows=['linux.yml','windows.yml'];old={}
+for wf in workflows:
+ rows=api('actions/workflows/'+wf+'/runs?per_page=15')['workflow_runs'];assert all(x['status']=='completed'for x in rows);old[wf]={x['id']for x in rows}
+releases=api('releases?per_page=100');assert len(releases)==49
+put(O/'releaser-foer-pakker3733.json',releases)
+start=dict(tid_utc=datetime.now(timezone.utc).isoformat(),kode_main=code,native_sha=native,native=3733,workflows=[],fellesutgave_foer='sam-max-hd-2026-10-24-helikopter',tidligere_releaser=len(releases),native_frys_mens_pakkebygg=True)
+put(O/'pakkestart3733.json',start)
+for wf in workflows:
+ subprocess.run(['gh','workflow','run',wf,'--ref','main'],cwd=P,check=True)
+ found=[]
+ for attempt in range(15):
+  rows=api('actions/workflows/'+wf+'/runs?per_page=15')['workflow_runs'];found=[x for x in rows if x['id']not in old[wf] and x['event']=='workflow_dispatch'and x['head_sha']==code]
+  if found:break
+  time.sleep(2)
+ assert len(found)==1
+ q=found[0];start['workflows'].append(dict(workflow=wf,run_id=q['id'],url=q['html_url'],status=q['status']))
+ put(O/'pakkestart3733.json',start);put(R/'pakkestart3733.json',start);print(wf,q['id'],q['html_url'],flush=True)
+(R/'start-pakker3733.py.txt').write_bytes(Path(__file__).read_bytes())

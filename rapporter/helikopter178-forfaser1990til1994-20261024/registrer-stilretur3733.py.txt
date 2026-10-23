@@ -1,0 +1,33 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;A=P/'work/.gpt-gren';R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+reason='For mye trappepreg i interne fargegrenser og flere konturer, og svak stiloverensstemmelse med det godkjente Sam-ankeret. Teknisk form/farge/alfa og motor er kontrollert, men grafikken må nytegnes før endelig stilgodkjenning.'
+for name in ['egen-native1990til1994.json','rutekart-fig178_02.json','rutekart-samlet.json']:
+ d=read(R/name);rows=d['ruter']if 'ruter'in d else d['fig178_02']['ruter']
+ for e in rows:
+  if 1990<=e['rute']<=1994:e.update(stilretur=True,visuell_stil_godkjent=False,stilretur_grunn=reason)
+ put(R/name,d)
+for k in read(R/'valgte-ruter.json').values():
+ p=R/'kall'/k/'kontroll.json';q=read(p);q['tidligere_teknisk_egen_vurdering']=q['vurdering'];q.update(vurdering=reason,status='PUBLISERT_TEKNISK_MOTOROBSERVERT_STILRETUR',egen_stilkontroll_bestatt=False,visuell_stil_godkjent=False,stilretur=True);put(p,q)
+for name in ['fremdrift.json','klar-for-publisering3733.json','mottak-publisert1990til1994.json']:
+ d=read(R/name);d.update(stilreturer_ruter=list(range(1990,1995)),visuell_stil_godkjent=False,stilretur_grunn=reason,bunke_ferdig=False,teknisk_bunke_publisert=True,naeste_prioritet='Stilretur1990 som pilot, deretter øvrige1991..1994; fortsett uavhengige1989..1986 ved behov.');put(R/name,d)
+put(R/'stilkontroll3733.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),ruter=list(range(1990,1995)),tekniske_porter_bestatt=True,motorobservert=True,faktisk_Linux_pakke_ROI_bytebekreftet=True,visuelt_sett=True,stil_bestatt=False,Tom_godkjent=False,Claude_godkjent=False,grunn=reason,bevis=['stiltavle-femfaser3733.png','faktisk-pakke3733-fem-faser.png','costume178_1990-faktisk-pakke3733.png'],teknisk_egenkontroll_er_ikke_stilgodkjenning=True,ingen_nodvendig_Tom_avklaring_for_retur=True))
+(R/'STILRETUR.md').write_text('''# Stilretur etter faktisk pakkenærvisning
+
+1990..1994 er publiserte tekniske nativevarianter, ikke ferdig stilgodkjent grafikk. Sammenlign stiltavle-femfaser3733.png og faktisk-pakke3733-fem-faser.png med godkjent hovedark/sam.png. Interne fargegrenser og flere konturer har for mye trappepreg. Den hele pakkenærvisningen av fase1990 viser tydelig forskjellen mot de glatte tegnede omgivelsene. Alle fem står derfor som stilretur. Teknisk nullfeil, filhash og motorbevis overstyrer ikke dette.
+
+Neste prioritet er en ny hel fase1990 som stilpilot med godkjent Sam-anker og riktig original som motivreferanse. Bruk innebygd image_gen til selve nytegningen. Kontroller først faktisk tegnestil, sammenhengende glatte konturer og de små mekaniske delene ved native størrelse. Deretter de uendrede tekniske farge-/form-/alfaportene. Ikke velg en bokstavelig trappet fargestensil bare fordi målingene blir gode. Bevar ekte generert alfa; ingen harde originalmasker, kildefragmenter eller lokal kildebasert trekkflytting. Sammenlign hele motivet i motoren før ny mottaksstatus.
+
+Når piloten passer stilankeret, fortsett stilretur1991..1994 med samme praksis. Råbilder og korrekte kilde-/palettbevis beholdes, men 42 tekniske materialplan med sluttpiksler er ikke stilgodkjenning. De fire uproduserte fasene1989..1986 er uavhengige jobber om et motiv trenger avklaring. H223 er fortsatt ikke forberedt, utført eller reservert.
+
+Publisert WebP beholdes inntil en faktisk kontrollert retur finnes. Bruk gjeldende komplette publiserte mod som grunnlag. Bytt bare tilsvarende foreldede WebP i kandidaten ved kontrollert PNG-retur, og publiser normalt fra fersk fjern-SHA. Gamle versjoner beholdes gjennom Git-foreldre og SHA-mapping. Ingen force-push eller sletting av gamle versjoner fra historikken.
+
+Ingen nødvendig ny designavklaring fra Tom: stilankeret og motivet er kjent. Automatikken skal arbeide videre med returen. Hele oppgaven og denne femfasersbunke er ikke markert ferdig. Tom-/Claude-godkjenning står åpen.
+''')
+p=R/'RETUR.md';p.write_text(p.read_text()+'\n## Overstyrende stilretur etter pakkenærvisning\n\n'+reason+' Se STILRETUR.md. Alle fem1990..1994 står som stilretur. Teknisk publisering består; bunken er ikke ferdig stilgodkjent.\n')
+p=R/'NESTE.md';p.write_text('# Prioritet: stilretur før ferdigmelding\n\nLes STILRETUR.md og stilkontroll3733.json først. De fem1990..1994 er teknisk mottatt/publisert, men for pikselpreget ved pakkenærvisning. Begynn med1990 som ny hel stilpilot, deretter1991..1994. H223 er ikke laget eller reservert.1989..1986 er fortsatt uproduserte uavhengige faser. Ingen nødvendig Tom-avklaring.\n\n'+p.read_text())
+(R/'registrer-stilretur3733.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Alle fem registrert som stilretur, tekniske bevis og publisering bevart',flush=True)

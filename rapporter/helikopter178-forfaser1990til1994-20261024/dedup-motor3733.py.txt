@@ -1,0 +1,18 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import os,hashlib,json
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+files=sorted(p for p in O.glob('*/frame_*.png')if p.is_file()and not p.is_symlink())+sorted(R.glob('costume178_*-motor3733.png'))+sorted(R.glob('costume178_*-originalmotor3733.png'))+sorted(R.glob('costume178_*-faktisk-pakke3733.png'))
+assert len(files)>500
+pool={};rows=[];before=os.statvfs(O).f_bavail*os.statvfs(O).f_frsize
+for p in files:
+ h=sha(p);key=(p.stat().st_size,h)
+ if key not in pool:pool[key]=p;continue
+ src=pool[key]
+ if os.path.samefile(src,p):continue
+ assert p.read_bytes()==src.read_bytes() and p.stat().st_dev==src.stat().st_dev
+ tmp=p.with_name(p.name+'.hardlink-tmp');assert not tmp.exists();os.link(src,tmp);os.replace(tmp,p);assert os.path.samefile(src,p)and sha(p)==h
+ rows.append(dict(fil=str(p),beholdt=str(src),sha256=h,bytes=key[0]))
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),metode='Bare eksakte SHA256- og byteverifiserte PNG-duplikater hardlenkes. Alle stier og filbytes bevares.',kontrollerte_motorbilder=len(files),hardlenket=len(rows),logiske_duplikatbytes=sum(x['bytes']for x in rows),unike_motorbilder_beholdt=len(pool),alle_stier_og_hash_bevart=True,ingen_raa_kilder_stilanker_eller_stash_endret=True,filsystem_fri_foer=before,filsystem_fri_etter=os.statvfs(O).f_bavail*os.statvfs(O).f_frsize,logiske_byte_er_ikke_fysisk_gevinstrapport=True,filer=rows)
+(R/'motor-dedup3733.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'dedup-motor3733.py.txt').write_bytes(Path(__file__).read_bytes());print('Hardlenket',len(rows),'eksakte kopier med alle stier og hash bevart',flush=True)

@@ -1,0 +1,91 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,subprocess,hashlib,sys,zipfile,re,gzip,os
+
+P=Path('/home/tom/Sam-Max-HD')
+O=Path(__file__).resolve().parent
+R=P/'work/.gpt-gren/rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def sha(p):
+    with p.open('rb')as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def api(endpoint):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+endpoint],cwd=P,text=True))
+
+platform=sys.argv[1]
+assert platform in ['linux','windows']
+start=read(O/'pakkestart3733.json')
+workflow=next(x for x in start['workflows']if x['workflow']==platform+'.yml')
+run=api('actions/runs/'+str(workflow['run_id']))
+assert run['status']=='completed' and run['conclusion']=='success' and run['head_sha']==start['kode_main']
+jobs=api('actions/runs/'+str(run['id'])+'/jobs')['jobs']
+job=next(x for x in jobs if x['name']=='pakke');assert job['conclusion']=='success'
+steps={x['name']:x for x in job['steps']}
+required=['Bygg ScummVM med HD-patchen','Test pakken uten skjerm','Publiser som release']
+if platform=='linux':required+=['Test pakken på Debian 12 uten byggepakker']
+assert all(steps[n]['conclusion']=='success' for n in required)
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==start['native_sha']
+release=api('releases/tags/'+platform)
+assert start['native_sha'] in release['body']
+name='SamMaxHD-x86_64.AppImage'if platform=='linux'else'SamMaxHD-Windows.zip'
+root=O/'pakker3733'/platform
+root.mkdir(parents=True,exist_ok=True)
+assets={x['name']:x for x in release['assets']}
+downloaded=[]
+for filename in [name,name+'.sha256']:
+    a=assets[filename];p=root/filename
+    if not p.exists():
+        tmp=p.with_name(p.name+'.uferdig')
+        assert not tmp.exists()
+        with tmp.open('wb')as stream:
+            subprocess.run(['gh','api','repos/Tombonator3000/Sam-Max-HD/releases/assets/'+str(a['id']),'-H','Accept: application/octet-stream'],cwd=P,stdout=stream,check=True)
+        tmp.rename(p)
+    digest=sha(p)
+    assert p.stat().st_size==a['size'] and a.get('digest') in [None,'sha256:'+digest]
+    downloaded.append(dict(fil=filename,id=a['id'],bytes=p.stat().st_size,sha256=digest,GitHub_digest=a.get('digest'),faktisk_lastet_ned=True,en_lokal_arkivkopi=True))
+assert (root/(name+'.sha256')).read_text().split()[0]==downloaded[0]['sha256']
+expected=json.loads(gzip.decompress((R/'kandidat3733-filhash.json.gz').read_bytes()))
+assert len(expected)==21978
+archive=root/name
+if platform=='linux':
+    tree=root/'squashfs-root'
+    if not tree.exists():
+        os.chmod(archive,0o755)
+        with(root/'utpakking.log').open('wb')as log:
+            subprocess.run([str(archive),'--appimage-extract'],cwd=root,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=300)
+    data=tree/'usr/share/sam-max-hd'
+    native=data/'mods/gpt'
+    files={str(p.relative_to(native)):p for p in native.rglob('*')if p.is_file()}
+    assert set(files)==set(expected)
+    for f,p in files.items():assert sha(p)==expected[f],f
+    build=(data/'BYGG.txt').read_text()
+    libs=[str(p.relative_to(tree))for p in (tree/'usr/lib').glob('*webp*')]
+    assert libs and (data/'COPYING-libwebp.txt').is_file()
+    native_count=read(native/'mod.json')['costume_cels']
+    binary_sha=sha(tree/'usr/bin/scummvm')
+else:
+    with zipfile.ZipFile(archive)as z:
+        prefix='SamMaxHD-Windows/mod/'
+        files={n[len(prefix):]:n for n in z.namelist()if n.startswith(prefix)and not n.endswith('/')}
+        assert set(files)==set(expected)
+        for rel,n in files.items():
+            with z.open(n)as stream:assert hashlib.file_digest(stream,'sha256').hexdigest()==expected[rel],rel
+        build=z.read('SamMaxHD-Windows/BYGG.txt').decode()
+        libs=[n for n in z.namelist()if re.search(r'/libwebp[^/]*\.dll$',n,re.I)]
+        assert libs and 'SamMaxHD-Windows/COPYING-libwebp.txt'in z.namelist()
+        native_count=json.loads(z.read(prefix+'mod.json'))['costume_cels']
+        binary_sha=hashlib.sha256(z.read('SamMaxHD-Windows/scummvm.exe')).hexdigest()
+assert native_count==3733 and start['native_sha']in build
+declared=re.search(r'Sam-Max-HD: ([0-9a-f]+)',build).group(1)
+assert subprocess.check_output(['git','rev-parse',declared],cwd=P,text=True).strip()==start['kode_main']
+again=api('releases/tags/'+platform)
+assert next(x for x in again['assets']if x['name']==name)['id']==assets[name]['id']
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),plattform=platform,workflow_run=run['id'],workflow_url=run['html_url'],workflow_success=True,
+    kode_main=start['kode_main'],hd_mod=start['native_sha'],native=3733,alle_modfiler_SHA_bekreftet=21978,
+    WebP=4882,PNG=17089,idx_mask_og_alle_tidligere_filer_bekreftet=True,build=build,
+    nedlastet=downloaded,binar_sha256=binary_sha,WebP_bibliotek=libs,WebP_lisens_med=True,
+    lokal_pakkeoppstart_utfort=False,Windows_oppstart_i_Actions=platform=='windows',interaktiv_test=False,
+    en_arkivkopi_pr_plattform=True,Actions_testtrinn=[{k:steps[n].get(k)for k in ['name','conclusion','started_at','completed_at']}for n in required])
+put(R/('pakke-'+platform+'3733.json'),proof)
+put(O/(platform+'-release3733.json'),release)
+(R/'pakke-verifiser3733.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps({k:proof[k]for k in ['plattform','workflow_run','native','alle_modfiler_SHA_bekreftet','binar_sha256']},ensure_ascii=False),flush=True)

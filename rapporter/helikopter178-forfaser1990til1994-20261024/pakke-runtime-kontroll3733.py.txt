@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+c=read(R/'kandidat3733-start1-pos220.json');p=read(R/'pakke3733-start1-pos220.json');m=read(R/'motor-sammenligning3733.json');pk=read(R/'pakke-linux3733.json')
+assert p['binar_sha256']==pk['binar_sha256'] and p['native_antall']==3733 and p['exit']==0
+assert p['nullkontroller']==148 and len(p['kontroller'])==160 and p['kontroller']==c['kontroller']
+assert sum(x['avvik']==0 and x['frame']>40 for x in p['kontroller'])==120
+rows=[];board=Image.new('RGB',(1000,1000),'#304050');dr=ImageDraw.Draw(board)
+for i,n in enumerate(range(1990,1995)):
+ a=c['tegninger'][f'costume178_{n}'];b=p['tegninger'][f'costume178_{n}'];assert a['pos']==b['pos'] and a['maal']==b['maal'] and a['bildeframe']==b['bildeframe']
+ box=next(x['rect_med8HD']for x in m['nye_faser']if x['rute']==n and x['frame']==a['bildeframe']);fa=Path(a['fil']);fb=Path(b['fil']);diffs={}
+ for suffix,key in [('', 'HD'),('_flat','original')]:
+  ia=Image.open(fa.with_name(fa.stem+suffix+'.png')).convert('RGBA').crop(box);ib=Image.open(fb.with_name(fb.stem+suffix+'.png')).convert('RGBA').crop(box);diffs[key]=int(np.any(np.array(ia)!=np.array(ib),2).sum());assert diffs[key]==0,(n,key,diffs[key])
+ dest=R/f'costume178_{n}-faktisk-pakke3733.png';shutil.copyfile(fb,dest)
+ crop=Image.open(fb).convert('RGB').crop(box);crop.thumbnail((940,175));board.paste(crop,(40,i*200+22));dr.text((8,i*200+3),str(n)+' faktisk Linux-pakke3733',fill='white')
+ rows.append(dict(rute=n,frame=b['bildeframe'],rect_med8HD=box,original_ROI_ulik=diffs['original'],HD_ROI_ulik=diffs['HD'],pakke_bilde=str(fb),pakke_bilde_SHA256=sha(fb)))
+board.save(R/'faktisk-pakke3733-fem-faser.png')
+proof=dict(pakkens_faktiske_motor=True,pakkens_faktiske_spill_og_mod=True,native=3733,ruter=rows,alle_fem_ROI_original_og_HD_identiske=True,pakke_bin_SHA256=p['binar_sha256'],referanse_bin_SHA256=c['binar_sha256'],kontroller=160,nullkontroller=148,null_etter_frame40=120,visuelt_sett=False,full_naturlig_gjennomspilling=False)
+(R/'pakke-runtime3733-sammenligning.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'pakke-runtime-kontroll3733.py.txt').write_bytes(Path(__file__).read_bytes());print('Alle fem faktiske pakke-ROI original og HD byteidentiske',flush=True)

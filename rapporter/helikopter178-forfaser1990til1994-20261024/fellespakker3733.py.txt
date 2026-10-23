@@ -1,0 +1,108 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,json,hashlib,sys,time
+
+P=Path('/home/tom/Sam-Max-HD')
+O=Path(__file__).resolve().parent
+R=P/'work/.gpt-gren/rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def api(endpoint):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+endpoint],cwd=P,text=True))
+def sha(p):
+    with p.open('rb')as f:return hashlib.file_digest(f,'sha256').hexdigest()
+
+start=read(O/'pakkestart3733.json')
+native=start['native_sha']
+tag='sam-max-hd-2026-10-24-helikopter-forfaser'
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==native
+pk={p:read(R/('pakke-'+p+'3733.json'))for p in ['linux','windows']}
+motor=read(R/'pakke3733-start1-pos220.json')
+assert motor['exit']==0 and motor['native_antall']==3733 and motor['binar_sha256']==pk['linux']['binar_sha256']
+assert motor['nullkontroller']==148 and len(motor['kontroller'])==160
+assert all('costume178_'+str(n)in motor['tegninger']for n in range(1990,1995))
+runtime=read(R/'pakke-runtime3733-sammenligning.json')
+assert runtime['alle_fem_ROI_original_og_HD_identiske'] and runtime['visuelt_sett']
+expected={}
+for platform,q in pk.items():
+    assert q['native']==3733 and q['hd_mod']==native and q['alle_modfiler_SHA_bekreftet']==21978
+    assert q['workflow_success'] and q['kode_main']==start['kode_main']
+    for a in q['nedlastet']:
+        p=O/'pakker3733'/platform/a['fil']
+        assert p.stat().st_size==a['bytes'] and sha(p)==a['sha256']
+        expected[a['fil']]=dict(path=str(p),sha256=a['sha256'],bytes=a['bytes'])
+assert len(expected)==4
+body=f'''Sam & Max HD for Linux og Windows med samme kontrollerte HD-grafikk.
+
+Begge pakker inneholder tapsfri WebP, ekte alfa og 3733 native ruter. Helikopterfasene 1990 til 1994 er med. Grafikkproduksjonen fortsetter; delark fig178_02 er 20 av 24, hele figurjobber 508 av 1758. Dette er ikke en ferdig HD-utgave av hele spillet. Ny grafikk er teknisk egenkontrollert og motorobservert. De fem nye fasene står som stilretur på grunn av for mye pikselpreg og er ikke ferdig Tom-/Claude-godkjent.
+
+Begge faktiske pakker er lastet ned. Pakkesjekksummer og alle 21978 inkluderte modfiler er kontrollert mot publisert hd-mod. 4882 WebP, 17089 tekniske PNG. Linux-pakkens egen motor er kjørt i 160 kontrollerte bilder med alle fem nye helikopterfaser. Windows-pakken består faktisk oppstart i Actions. Dette er ikke full naturlig gjennomspilling eller ny interaktiv Windows-test.
+
+Last ned AppImage for Linux eller ZIP for Windows, samt den tilhørende sha256-filen. Windows: pakk ut hele mappen og start Sam og Max HD.bat. Linux: gjør AppImage kjørbar og start den.
+
+Kode: {start['kode_main']}
+hd-mod: {native}
+Grafikkilde: 7a26e3506903f5081e95ec94a9bada3d6d63253d
+'''
+notes=O/'fellespakker3733-notater.md'
+notes.write_text(body)
+attemptfile=O/'fellespakker3733-forsok.json'
+if not attemptfile.exists():
+    before=api('releases?per_page=100')
+    assert all(x['tag_name']!=tag for x in before)
+    put(attemptfile,dict(tid_utc=datetime.now(timezone.utc).isoformat(),tag=tag,native=native,kode_main=start['kode_main'],fase='opprett_utkast'))
+    subprocess.run(['gh','release','create',tag,'--target',start['kode_main'],'--draft','--title','Sam & Max HD: helikopter og tapsfri WebP','--notes-file',str(notes),'--latest=false'],cwd=P,check=True)
+matches=[]
+for attempt in range(4):
+    matches=[x for x in api('releases?per_page=100')if x['tag_name']==tag]
+    if len(matches)==1:break
+    time.sleep(2)
+assert len(matches)==1
+release=matches[0]
+release_id=release['id']
+assert native in release['body'] and release['target_commitish']==start['kode_main']
+put(attemptfile,dict(tag=tag,native=native,release_id=release_id,fase='utkast_fra_autentisert_liste'))
+existing={a['name']:a for a in release['assets']}
+for name,e in expected.items():
+    if name in existing:
+        assert existing[name]['digest']=='sha256:'+e['sha256'] and existing[name]['size']==e['bytes']
+    else:
+        subprocess.run(['gh','release','upload',tag,e['path']],cwd=P,check=True)
+release=api('releases/'+str(release_id))
+assert {a['name']for a in release['assets']}==set(expected)
+rows=[]
+for a in release['assets']:
+    h=hashlib.sha256();count=0
+    proc=subprocess.Popen(['gh','api','repos/Tombonator3000/Sam-Max-HD/releases/assets/'+str(a['id']),'-H','Accept: application/octet-stream'],cwd=P,stdout=subprocess.PIPE)
+    while data:=proc.stdout.read(1024*1024):h.update(data);count+=len(data)
+    assert proc.wait()==0
+    e=expected[a['name']]
+    assert (h.hexdigest(),count)==(e['sha256'],e['bytes']) and a['digest']=='sha256:'+h.hexdigest()
+    rows.append(dict(name=a['name'],id=a['id'],bytes=count,sha256=h.hexdigest(),faktisk_hentet_som_strom=True,ingen_dobbeltlagret_nedlasting=True))
+    print('Fellesvedlegg hentet og bekreftet',a['name'],count,flush=True)
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==native
+if release['draft']:
+    patch=O/'fellespakker3733-publiser.json'
+    put(patch,dict(draft=False,make_latest='true'))
+    subprocess.run(['gh','api','--method','PATCH','repos/Tombonator3000/Sam-Max-HD/releases/'+str(release_id),'--input',str(patch)],cwd=P,check=True,stdout=subprocess.DEVNULL)
+release=api('releases/'+str(release_id))
+assert not release['draft'] and not release['prerelease']
+allreleases=api('releases?per_page=100')
+before=read(O/'releaser-foer-pakker3733.json')
+ids={x['id']for x in allreleases}
+assert all(x['id']in ids for x in before)
+byid={x['id']:x for x in allreleases}
+for old in before:
+    if old['tag_name']in ['linux','windows']:continue
+    fields=lambda r:sorted((a['id'],a['name'],a['size'],a.get('digest'))for a in r['assets'])
+    assert fields(old)==fields(byid[old['id']]),old['tag_name']
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),tag=tag,url=release['html_url'],release_id=release['id'],
+    kode_main=start['kode_main'],hd_mod=native,native=3733,alle21978_modfiler_i_begge_pakker_bekreftet=True,
+    alle_fire_fellesvedlegg_faktisk_hentet_bekreftet=True,payload_ikke_dobbeltlagret=True,assets=rows,
+    Linux_pakkemotor_kjort=True,Windows_oppstart_i_Actions=True,ny_interaktiv_Windows=False,full_naturlig_gjennomspilling=False,
+    alle_tidligere_release_ids_bevart=len(before),tidligere_ikke_rullende_vedlegg_bevart=True,
+    tidligere_felles_WebP_utgave_bevart='sam-max-hd-2026-10-24-helikopter',published=True)
+put(R/'fellespakker3733.json',proof)
+put(attemptfile,dict(tag=tag,native=native,release_id=release['id'],fase='publisert_alle_fire_vedlegg_hentet_bekreftet'))
+(R/'fellespakker3733.py.txt').write_bytes(Path(__file__).read_bytes())
+(R/'fellespakker3733-notater.md').write_text(body)
+print(json.dumps({k:proof[k]for k in ['tag','url','native','alle21978_modfiler_i_begge_pakker_bekreftet','published']},ensure_ascii=False),flush=True)
