@@ -726,7 +726,7 @@ index 21938706..17d0c967 100644
  	width *= 8;
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..57d7e80a
+index 00000000..953a86ac
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
 @@ -0,0 +1,5508 @@
@@ -1261,7 +1261,7 @@ index 00000000..57d7e80a
 +static Graphics::Surface *readHDImage(const Common::Path &png, const Graphics::PixelFormat &format) {
 +#ifdef USE_WEBP
 +	const Common::FSNode node(webpPath(png));
-+	if (Common::SeekableReadStream *stream = node.createReadStream()) {
++	if (Common::SeekableReadStream *stream = node.exists() ? node.createReadStream() : nullptr) {
 +		const int64 size = stream->size();
 +		Common::Array<byte> data;
 +		bool valid = size >= 12 && size <= 128 * 1024 * 1024;
@@ -1294,7 +1294,7 @@ index 00000000..57d7e80a
 +	}
 +#endif
 +	const Common::FSNode nodePNG(png);
-+	Common::SeekableReadStream *stream = nodePNG.createReadStream();
++	Common::SeekableReadStream *stream = nodePNG.exists() ? nodePNG.createReadStream() : nullptr;
 +	::Image::PNGDecoder decoder;
 +	const bool ok = stream && decoder.loadStream(*stream);
 +	delete stream;

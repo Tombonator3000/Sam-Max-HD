@@ -15,6 +15,7 @@ import shutil
 import subprocess
 
 from PIL import Image
+from smhd import gamedata
 from smhd.webp import convert_mod
 
 
@@ -28,13 +29,17 @@ def main() -> None:
     # Keep the real scene assets, without spending every CI run encoding the
     # entire production library. A full migration is verified separately.
     published = source
+    rooms = gamedata.read_rooms(game / "SAMNMAX.001")
+    object_ids = {obj.obj_id for room in (7, 9, 35) for obj in rooms[room].objects}
     source = out / "png-input"
     source.mkdir()
     for path in sorted(published.rglob("*")):
         if not path.is_file():
             continue
         relative = path.relative_to(published).as_posix()
-        if not (relative == "mod.json" or relative.startswith(("objects/", "fonts/")) or
+        object_match = re.match(r"objects/obj(\d+)_", relative)
+        if not (relative == "mod.json" or relative.startswith("fonts/") or
+                (object_match and int(object_match[1]) in object_ids) or
                 re.fullmatch(r"rooms/room(?:007|009|035)(?:_idx|_mask)?\.(?:png|webp)", relative) or
                 re.fullmatch(r"costumes/costume(?:001|178)_\d+(?:_hd|_idx|_mask)?\.(?:png|webp)", relative)):
             continue
@@ -46,12 +51,14 @@ def main() -> None:
         else:
             shutil.copy2(path, dest)
     target = out / "mod-webp"
-    migration = convert_mod(source, target, workers=2)
+    print("Konverterer formatprøven", flush=True)
+    migration = convert_mod(source, target, workers=min(4, os.cpu_count() or 2))
     scenes = [(7, 1), (9, 1), (35, 178)]
     comparisons = []
     for room, costume in scenes:
         images = []
         for kind, mod in (("png", source), ("webp", target)):
+            print(f"Avspilling rom {room}, {kind}", flush=True)
             work = out / f"room{room}-{kind}"
             work.mkdir()
             (work / "saves").mkdir()
