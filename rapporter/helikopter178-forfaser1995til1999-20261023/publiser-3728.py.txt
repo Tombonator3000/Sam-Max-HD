@@ -1,0 +1,76 @@
+from pathlib import Path,PurePosixPath
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime,timezone
+import subprocess,os,hashlib,json,tarfile,shutil,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'kandidat3728';B=O/'verifisert-gammelmod3727';INDEX=O/'publisering3728.index'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(*args,env=None):return subprocess.check_output(['git',*args],cwd=P,text=True,env=env).strip()
+def remote(b):return git('ls-remote','origin','refs/heads/'+b).split()[0]
+def inventory(root):
+ fs=[p for p in root.rglob('*')if p.is_file()]
+ with ThreadPoolExecutor(max_workers=6)as ex:return dict(ex.map(lambda p:(str(p.relative_to(root)),sha(p)),fs))
+parent='2246c749d34c37ab56e5aedc2f06b589b09bb186';artifact=sys.argv[1];base=read(O/'baseline3727-filhash.json');expected=read(O/'kandidat3728-filhash.json');ready=read(R/'klar-for-publisering1995.json');download=read(O/'grafikkilde3728-hentet.json')
+stashes=['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c'];target='costumes/costume178_1995_hd.webp'
+assert ready['klar_for_additiv_publisering']and ready['sterke_3HD_porter_bestatt']and ready['motorobservert']and ready['visuelt_sett']and ready['ekstra_kodepiksler']==0
+assert download['commit']==artifact and download['SHA256_og_Gitblob_SHA1_bekreftet']and download['faktisk_hentet_filer']==download['forventede_filer']>0
+assert remote('hd-mod')==parent and remote('gpt-arbeid')==artifact
+assert subprocess.check_output(['git','status','--porcelain'],cwd=A)==b'' and git('status','--porcelain')==''
+assert git('stash','list','--format=%H').splitlines()==stashes
+assert inventory(M)==base and len(base)==21972 and inventory(C)==expected and len(expected)==21973
+assert set(expected)-set(base)=={target} and {n for n in base if base[n]!=expected[n]}=={'mod.json','SHA256SUMS'}
+assert all(expected[n]==h for n,h in base.items()if n not in['mod.json','SHA256SUMS'])
+assert not B.exists()and not INDEX.exists()and not(R/'publisering3728-forsokt.json').exists()
+for wf in['linux.yml','windows.yml']:
+ runs=json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/actions/workflows/'+wf+'/runs?per_page=10'],cwd=P,text=True))['workflow_runs'];assert all(x['status']=='completed'for x in runs),'Aktivt pakkebygg'
+main=git('rev-parse','HEAD');mainindex=P/'.git/index';mainindexsha=sha(mainindex);env=dict(os.environ,GIT_INDEX_FILE=str(INDEX));git('read-tree',parent,env=env)
+for f in[target,'mod.json','SHA256SUMS']:
+ oid=git('hash-object','-w',str(C/f));git('update-index','--add','--cacheinfo','100644,'+oid+','+f,env=env)
+tree=git('write-tree',env=env);diff=git('diff-tree','--no-commit-id','--name-status','-r',parent,tree).splitlines();assert set(diff)=={'A\t'+target,'M\tmod.json','M\tSHA256SUMS'}
+published=git('-c','user.name=Codex','-c','user.email=noreply@openai.com','commit-tree',tree,'-p',parent,'-m','HD-mod3728: helikopterfase1995, delark15 av24','-m','Grafikkilde gpt-arbeid '+artifact+'. Tapsfri WebP, alle tidligere grafikkfiler bevart.')
+assert git('rev-parse',published+'^')==parent and git('rev-parse','HEAD')==main and sha(mainindex)==mainindexsha and remote('hd-mod')==parent
+attempt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=artifact,forelder=parent,hd_mod=published,native=3728,nye_native=1,force_push=False,vanlig_Git_barn_av_fjern_SHA=True,fase='push_startes');put(R/'publisering3728-forsokt.json',attempt)
+subprocess.run(['git','push','-q','origin',published+':refs/heads/hd-mod'],cwd=P,check=True);assert remote('hd-mod')==published;attempt['fase']='push_bekreftet';put(R/'publisering3728-forsokt.json',attempt);print('3728 pushet additivt. Henter hele fjernarkivet som strøm.',flush=True)
+subprocess.run(['git','fetch','-q','--no-tags','origin','refs/heads/hd-mod:refs/remotes/origin/hd-mod'],cwd=P,check=True);assert git('rev-parse','refs/remotes/origin/hd-mod')==published
+class Reader:
+ def __init__(self,s):self.s=s;self.n=0;self.h=hashlib.sha256()
+ def read(self,n=-1):
+  b=self.s.read(n);self.n+=len(b);self.h.update(b);return b
+actual={}
+with(O/'fjern3728-nedlasting.log').open('wb')as err:
+ proc=subprocess.Popen(['gh','api','repos/Tombonator3000/Sam-Max-HD/tarball/'+published],cwd=P,stdout=subprocess.PIPE,stderr=err);reader=Reader(proc.stdout)
+ with tarfile.open(fileobj=reader,mode='r|*')as tar:
+  for member in tar:
+   if not member.isfile():continue
+   parts=PurePosixPath(member.name).parts;assert len(parts)>1 and '..'not in parts;name='/'.join(parts[1:]);assert name not in actual;stream=tar.extractfile(member);h=hashlib.sha256()
+   while chunk:=stream.read(1024*1024):h.update(chunk)
+   actual[name]=h.hexdigest()
+ while reader.read(1024*1024):pass
+ assert proc.wait(timeout=30)==0
+assert actual==expected and len(actual)==21973
+assert all(actual[n]==h for n,h in base.items()if n not in['mod.json','SHA256SUMS'])
+assert sum(n.startswith('costumes/')and n.endswith(('_hd.webp','_hd.png'))for n in actual)==3728
+assert sum(n.endswith('.webp')for n in actual)==4877 and sum(n.endswith('.png')for n in actual)==17089
+assert inventory(C)==actual and inventory(M)==base and remote('hd-mod')==published
+assert sha(mainindex)==mainindexsha and git('rev-parse','HEAD')==main and git('stash','list','--format=%H').splitlines()==stashes
+M.rename(B);C.rename(M);assert inventory(M)==actual and inventory(B)==base
+for n in['mod.json','SHA256SUMS']:assert hashlib.sha256(subprocess.check_output(['git','show',parent+':'+n],cwd=P)).hexdigest()==base[n]
+cleanup=dict(mappe=str(B),filer=len(base),logiske_bytes=sum((B/n).stat().st_size for n in base),verifisert_mot_aktiv_publisert=published,metadata_gjenopprettes_fra=parent,grafikkfiler_SHA_bytebevart_i_barnet=True,alle_gamle_filhash=True,slettet=False)
+assert B.parent==O and B.name=='verifisert-gammelmod3727'and not B.is_symlink();shutil.rmtree(B);cleanup['slettet']=True;put(R/'rydding-etter3728.json',cleanup)
+receipt=dict(tid_utc=datetime.now(timezone.utc).isoformat(),grafikkilde=artifact,hd_mod=published,forelder=parent,force_push=False,vanlig_Git_barn_av_fjern_SHA=True,native=3728,nye_native=1,fase=[1995],figurjobber=508,figurjobber_totalt=1758,fig178_02_native=15,fig178_02_totalt=24,familie178_native=27,familie178_totalt=102,filantall=len(actual),WebP=4877,PNG=17089,alle_filhash_bekreftet=True,hele_fjernarkivet_faktisk_hentet=True,nedlastede_bytes=reader.n,fjernarkiv_SHA256=reader.h.hexdigest(),TAR_eller_nedlastet_modkopi_lagret=False,alle_tidligere_grafikkfiler_SHA_bevart=True,idx_mask_bytebevart=True,metadata_endret=['mod.json','SHA256SUMS'],lokalt_mottatt=True,motorobservert=True,visuelt_sett=True,ny_natural_full_gjennomspilling=False,Tom_godkjent=False,Claude_godkjent=False,pakker_native=3723,pakker_mangler_native=5,gamle_arbeidskopi_verifisert_og_slettet=True,stasher=stashes,alle_filhash_ref='kandidat3728-filhash.json.gz',alle_filhash_ref_sha256=sha(R/'kandidat3728-filhash.json.gz'));put(R/'mottak-publisert1995.json',receipt)
+attempt.update(fase='hentet_bekreftet_lokalt_mottatt',alle_filhash_bekreftet=True,filantall=len(actual));put(R/'publisering3728-forsokt.json',attempt)
+q=read(R/'egen-native1995.json');q.update(publisert=True,hd_mod=published,lokalt_mottatt=True,i_modden_lokalt_publisert=True,aktiv_mod=str(M),grafikkilde=artifact)
+for e in q['ruter']:e.update(publisert=True,hd_mod=published,native_mottatt=True,motorobservert=True,grafikkilde=artifact)
+put(R/'egen-native1995.json',q);K=R/'kall'/q['ruter'][0]['kall'];qc=read(K/'kontroll.json');qc.update(publisert=True,hd_mod=published,grafikkilde=artifact,status='PUBLISERT_EGENKONTROLLERT_MOTOROBSERVERT');put(K/'kontroll.json',qc)
+for name in['rutekart-fig178_02.json','rutekart-samlet.json']:
+ d=read(R/name)
+ d['fig178_02']['aktiv_hd_mod']=published
+ for e in d['fig178_02']['ruter']:
+  if e['rute']==1995:e.update(publisert=True,hd_mod=published,grafikkilde=artifact)
+ put(R/name,d)
+f=read(R/'fremdrift.json');f.update(native=3728,nye_native=5,native_kandidat=3728,hd_mod=published,grafikkilde=artifact,grafikkilder_per_rute={**f.get('grafikkilder_per_rute',{}),'1995':artifact},fig178_02_native=15,familie178_native=27,status='BUNKE_1995_1999_PUBLISERT',bunke_ferdig=True,publisert_nye_native=5,nye_publiserte_native_i_okten=1,pakker_native=3723,pakker_mangler_native=5)
+for e in f['delvise_leveranser']:e.update(publisert=True,hd_mod=published,publiserte_ruter=15,kandidat_ruter=15)
+for e in f['egne_avledede_varianter']:
+ if e.get('variant')==qc['kall']or e.get('variant')=='H175/registrerte-smaaplan/egen-alfasoem-r5-s3':e.update(publisert=True,hd_mod=published,grafikkilde=artifact,status='PUBLISERT_EGENKONTROLLERT_MOTOROBSERVERT')
+put(R/'fremdrift.json',f)
+assert sha(mainindex)==mainindexsha and git('rev-parse','HEAD')==main;INDEX.unlink();print(json.dumps({k:receipt[k]for k in['hd_mod','forelder','native','nye_native','filantall','WebP','PNG','alle_filhash_bekreftet','lokalt_mottatt','pakker_native']},ensure_ascii=False),flush=True)

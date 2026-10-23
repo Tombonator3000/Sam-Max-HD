@@ -1,0 +1,55 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+from zoneinfo import ZoneInfo
+import json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;cid='H175/registrerte-smaaplan/egen-alfasoem-r5-s3';now=datetime.now(ZoneInfo('Europe/Oslo')).isoformat();read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+q=read(R/'kall'/cid/'kontroll.json');m=read(R/'motor-sammenligning1995.json');assert q['teknisk_ok'] and m['sammenlignede_eksakte_originaltilstander']==160 and not m['utelatte_tilstander'] and m['ingen_uforklarte_HD_avvik_utenfor_ny_native'] and m['buffer12_beggeRGBA_byteidentiske']
+m.update(visuelt_sett=True,hele_motorbilder_sett=True,for_etter_sammenligning_sett=True,delark_sett=True,sekvens27faser_sett=True);put(R/'motor-sammenligning1995.json',m)
+q.update(egen_stilkontroll=True,visuelt_sett=True,native_mottatt=True,motorobservert=True,publisert=False,valgt=True,status='EGENKONTROLLERT_MOTOROBSERVERT_KANDIDAT_1995');put(R/'kall'/cid/'kontroll.json',q)
+n=read(R/'egen-native1995.json');n.update(motorobservert=True,visuelt_sett=True);n['vurdering']=n['vurdering'].replace('Native og stiltavle sett; delark og motor gjenstår.', 'Native, stiltavle, delark, hele motorbildet, før/etter og 27 sekvensfaser er visuelt sett. To faktiske motoravspillinger består.')
+for e in n['ruter']:e.update(motorobservert=True,visuelt_sett_native=True)
+put(R/'egen-native1995.json',n)
+for name in ['rutekart-fig178_02.json','rutekart-samlet.json']:
+    d=read(R/name)
+    for e in d['fig178_02']['ruter']:
+        if e['rute']==1995:e.update(motorobservert=True,visuelt_sett_native=True)
+    put(R/name,d)
+st=read(R/'kandidatstatus1995.json');st.update(avventer_motor=False,motorobservert=True,visuelt_sett=True,klar_for_publisering=True);put(R/'kandidatstatus1995.json',st)
+newcalls=[f'H{i}'for i in range(166,176)];used=[f'H{i}'for i in range(166,176)if i!=172];calls=read(R/'alle-kall.json');assert len(calls)==40 and calls[-1]['kall']=='H165'
+for name in newcalls:
+    K=R/'kall'/name;p=read(K/'plan.json');assert p['utfort'] and sha(K/'raa.png')==p['raa_sha256'];calls.append(dict(kall=name,rute=1995,utfort=True,raa=str((K/'raa.png').relative_to(A)),raa_sha256=sha(K/'raa.png'),prompt_sha256=sha(K/'prompt-brukt.txt'),argumenter_sha256=sha(K/'argumenter.json'),modul=True,verktøy='innebygd image_gen',teknisk_ok=False,valgt=False,egenkontrollert=True,visuelt_sett_raa=True,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False,delpiksler_brukt_i_valgt1995=name in used,hele_raa_bildet_er_ikke_valgt_native=True))
+for e in calls:e['piksler_brukt_i_kandidat1995']=e['kall']in used
+put(R/'alle-kall.json',calls);variants=[]
+for k in sorted((R/'kall').rglob('kontroll.json')):
+    v=str(k.parent.relative_to(R/'kall'))
+    if v.split('/')[0]not in newcalls:continue
+    z=read(k);selected=v==cid;z.update(valgt=selected,visuelt_sett=selected,egen_stilkontroll=selected);put(k,z);own=k.parent/'egen-sammensatt.png';assert own.exists()
+    errors=dict(alfa_fester=z['alfa_fester_over3HD'],apninger=z['apninger_over3HD'],kode_fester=sum(e['kode_fester_over3HD']for e in z['farger']),ekstra_kodepiksler=sum(e['egne_kodepiksler_over3HD_fra_kilde']for e in z['farger']),native_fargefester=sum(e['native_fester_over3HD']for e in z['farger']))
+    variants.append(dict(variant=v,rute=1995,nytt_bildekall=False,teknisk_ok=z['teknisk_ok'],prototype=str((k.parent/'prototype-under-kontroll.png').relative_to(A)),prototype_sha256=sha(k.parent/'prototype-under-kontroll.png'),kontroll=str(k.relative_to(A)),kontroll_sha256=sha(k),egen_bilde_sha256=sha(own),maal=list(Image.open(k.parent/'prototype-under-kontroll.png').size),hel_skala=z['hel_skala'],flytt=z['flytt'],egen_heltilpasning=z.get('egen_heltilpasning'),feil=errors,valgt=selected,egenkontrollert=True,visuelt_sett=selected,egen_stilkontroll=selected,native_mottatt=selected,motorobservert=selected,publisert=False,status='KANDIDAT_1995_MOTOROBSERVERT'if selected else'RETUR',originalmaske=False,originalfragmenter=False,lokal_flytting_av_trekk=False))
+assert sum(e['valgt']for e in variants)==1
+put(R/'rutekart-videreH166-H175-1995.json',dict(egenkontrollerte_varianter=variants,valgt_variant=cid,nye_ruter_i_kandidat=1,nye_publiserte_ruter=0))
+f=read(R/'fremdrift.json');assert f['innebygde_bildekall']==40 and f['native']==3727;f.update(bildekall=calls,innebygde_bildekall=50,laget_raa=50,egenkontrollert_raa=50,nye_innebygde_bildekall_i_okten=10,nye_native_i_okten=1,nye_motorobserverte_native_i_okten=1,nye_publiserte_native_i_okten=0,native_kandidat=3728,fig178_02_kandidat=15,familie178_kandidat=27,lagede_valgte_sluttruter=5,native_mottatt=5,visuelt_sett_valgte_sluttruter=5,motorobservert_valgte_sluttruter=5,siste_kall='H175',neste_kall='H176',neste_kall_utfort=False,neste_kall_reservert=False,oppdatert_oslo=now,status='KANDIDAT_1995_MOTOROBSERVERT',bunke_ferdig=False,behandlede_ruter=[1995,1996,1997,1998,1999],valgt_variant1995=cid,siste_okt='videre-1995-H166-H175.json');f['egne_avledede_varianter']+=variants;assert cid not in f['valgte_varianter'];f['valgte_varianter'].append(cid)
+for e in f['delvise_leveranser']:e.update(sha256=sha(R/'fig178_02-delresultat.png'),ruter=15,publisert=False,publiserte_ruter=14,kandidat_ruter=15,native_mottatt=True,motorobservert=True)
+put(R/'fremdrift.json',f)
+r=read(R/'rutekart-returer.json');assert {e['rute']for e in r['valgte_avledede_varianter']}=={1999,1997,1996,1998};r['egne_varianter']+=variants;r['valgte_avledede_varianter'].append(dict(kall=cid,rute=1995,native_png_sha256=q['native_sha256'],status='KANDIDAT_1995_MOTOROBSERVERT',publisert=False));r.update(nye_ruter_i_kandidat_i_okten=1,nye_ruter_i_modden_i_okten=0);put(R/'rutekart-returer.json',r)
+ready=dict(valgt_variant=cid,nye_valgte_native=1,native_grunnlag=3727,native_kandidat=3728,sterke_3HD_porter_bestatt=True,ekstra_kodepiksler=0,ekte_alfa=True,originalmaske=False,sourcefri_native_replay_byteeksakt=True,native_WebP_RGBA_byteeksakt=True,delark15_av24=True,tidligere14_ruter_RGBA_bevart=True,automatisk_mottak_OK=1,visuelt_sett=True,motorobservert=True,buffer12_avvik_beggeRGBA_identisk=True,lokalt_originalrekt_med8HD_identisk=True,hele_originaltilstander_strengt_paret=160,hele_originaltilstander_uparet=0,endrede_HD_piksler=sum(e['endrede_HD_piksler']for e in m['fase1995']),HD_endring_utenfor_berort_native=0,naturlig_full_spilltest=False,Tom_godkjent=False,Claude_godkjent=False,klar_for_additiv_publisering=True,tid_utc=datetime.now(timezone.utc).isoformat());put(R/'klar-for-publisering1995.json',ready)
+
+# Notatets gjeldende tilstand er kandidat, ikke publisert native.
+status=f"""Fase 1995 er laget og egenkontrollert, native mottatt i kandidat3728, visuelt sett og motorobservert. Ikke publisert ennå. Valgt {cid}, IoU {q['snitt_union']}, dekning {q['dekning']}; alle uendrede 3HD-porter består med null feil. Kildeløs replay og WebP er RGBA-byteeksakte, også under alfa 0. Delark15/24, alle14 tidligere ruter bytebevart. Standard15OK/9tomme, automatisk mottak1OK. Kandidaten har21973 filer; alle21972 gamle filer bevares, bare to metadatafiler endres. Hele jobber508/1758, familie27/102 i kandidaten.
+
+Ti nye faktiske innebygde image_gen-kall H166..H175 er bevart med råbilder, faktiske prompter, argumenter og SHA;50 i bunken. Sluttgrafikken bruker ni nye egne råbilder H166..H171/H173..H175. H172 er en retur uten sluttpiksler. Hele materialplan velges per klasse og plasseres ved identitet på hele egne lerreter. Hele H174-firfeltsmodulen er registrert bare mot tidligere egne småfarger, aldri originalkoordinater. Bare egne RGB-/alfaflater kombineres. Egen unionsalfa er ensartet lukket med radius5 og Gauss sigma3 i råstørrelsen for å fylle egne skjøter. Ingen originalmaske, kildefragmenter, lokal kildepåmaling eller lokal trekkflytting.
+
+To nye kontrollerte motoravspillinger i rom35/aktør29 er bestått med faktisk WebP-binær651aa78c. {m['sammenlignede_eksakte_originaltilstander']} strenge hele originalpar, {len(m['utelatte_tilstander'])} uparede. {sum(e['endrede_HD_piksler']for e in m['fase1995'])} HD-piksler endres i ny fase, ingen uforklarte utenfor. Begge160kontroller har148null,120/120null etterframe40;12 gamle tidlige avvik har identiske koordinater og beggeRGBA. Native, delark, motorbilde, før/etter og27faser er visuelt sett. Kontrollert sekvens er ikke full naturlig gjennomspilling. Ingen ny interaktiv Windows-/webtest, Tom-/Claude-godkjenning eller motor-/pipelinekode.
+
+Publiser additivt fra fersk2246c749d34c37ab56e5aedc2f06b589b09bb186 etter kildecommit og faktisk tilbakehenting. Hent alle21973 fjernhash før aktivering/rydding. Bevar tidligere grafikk og tre stasher. Ingen ekstra fullmod- eller arkivkopi. Deretter er femfasersbunken1995..1999 levert; fig178_02 er fortsatt delvis. Neste ruter er1994..1991 og1989;1990 trenger hel kilde. H176 er ikke forberedt, utført eller reservert. Fellespakker3723 mangler fire nå og fem etter1995. Pakkeoppdatering vurderes ved dette samlepunktet. AutomatikkenACTIVE, hele prosjektet ikke ferdig, ingen nødvendig Tom-avklaring. Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokale kontroller.
+"""
+(R/'notat1995.md').write_text('# Helikopterfase 1995\n\nDen hele 80 x31 originalen er sett i World of Fish rom35, kostyme178, aktør29, sammen med godkjent Sam før motivet. Begge brede rotorflater, lang halebom, liten venstre hengende fin, kropp og to tynne diagonale løpere er kildebekreftet. Alle21 kildefarger og småinnslag beholdes. Sam er bare strek-/kantanker. Jobbgrunnlag er uendret.\n\n'+status)
+(R/'NESTE.md').write_text('# Gjenoppta kandidat1995\n\n'+status)
+with (R/'RETUR.md').open('a')as o:o.write('\n\n## Fase1995 etter H166..H175\n\n'+status)
+start='<!-- helikopter178-forfaser1995-1999:start -->';end='<!-- helikopter178-forfaser1995-1999:slutt -->'
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;t=p.read_text();i=t.index(start)+len(start);j=t.index(end,i);p.write_text(t[:i]+'\n'+status+'\n'+t[j:])
+put(R/'videre-1995-H166-H175.json',dict(tid_oslo=now,nye_bildekall=newcalls,bildekall_i_bunken=50,nye_valgte_native=[1995],valgt_variant=cid,native_kandidat=3728,publisert_native_naa=3727,nye_publiserte_native_i_okten=0,nye_motoravspillinger=2,hele_originaltilstander_strengt_paret=len(m['bildepar']),hele_originaltilstander_uparet=len(m['utelatte_tilstander']),kontrollvariant_antall=len(variants),rapport='notat1995.md',neste_kall='H176',Tom_avklaring_noedvendig=False,automation='ACTIVE'))
+(R/'klargjor-1995.py.txt').write_bytes(Path(__file__).read_bytes());print(dict(kall=len(calls),nye=10,varianter=len(variants),native_kandidat=3728,valgt=cid))

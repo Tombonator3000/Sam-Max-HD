@@ -1,0 +1,64 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import json,hashlib,shutil,re,numpy as np
+from collections import Counter,defaultdict
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+B=O/'grunnlag3727-start1-y60';C=O/'kandidat3728-start1-y60';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/(B.name+'.json'));c=read(R/(C.name+'.json'));assert b['kontroller']==c['kontroller'];assert c['nullkontroller']==148 and sum(e['frame']>40 and e['avvik']==0 for e in c['kontroller'])==120
+be=b['tegninger']['costume178_1995'];ce=c['tegninger']['costume178_1995'];assert be['pos']==ce['pos']and be['maal']==ce['maal']and be['bildeframe']==ce['bildeframe'];phaseframe=ce['bildeframe'];phasefile=f'frame_{phaseframe:06}_room035.png'
+records=[]
+for e in b['kontroller']:
+ if not e['avvik']:continue
+ rows=[];n=e['frame'];sources=[]
+ for root in[B,C]:
+  fs=[p for p in root.glob(f'frame_{n:06}_room*.png')if not p.stem.endswith('_flat')];assert len(fs)==1
+  sf=root/f'frame_{n:06}_screen.png';v=np.array(Image.open(sf).convert('RGBA'));w=np.array(Image.open(fs[0]).convert('RGBA'));mask=np.any(v!=w,2);yy,xx=np.nonzero(mask);assert len(xx)==e['avvik'];rows.append(np.column_stack([yy,xx,v[mask],w[mask]]));sources.append(dict(screen=sha(sf),rebuilt=sha(fs[0])))
+ assert np.array_equal(*rows);records.append(dict(frame=n,avvik=e['avvik'],kolonner=['y','x','screenR','screenG','screenB','screenA','rebuiltR','rebuiltG','rebuiltB','rebuiltA'],begge_like_posisjoner_og_RGBA=rows[0].tolist(),kildehash=sources))
+assert len(records)==12;put(R/'bufferavvik-beggeRGBA3727-3728.json',dict(kjente_tidlige_avvik=records,alle_koordinater_og_begge_RGBA_identiske=True,null_etter_frame40=120))
+def calls(root):
+ d=defaultdict(list)
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',(root/'scummvm.log').read_text()):
+  f,n,costume,x,y,w,h=map(int,m.groups());d[f+1].append((costume,n,x,y,w,h))
+ return d
+bcalls,ccalls=calls(B),calls(C);assetcache={}
+def changed_cel_boxes(frame,shape):
+ changed=(Counter(bcalls[frame])-Counter(ccalls[frame]))+(Counter(ccalls[frame])-Counter(bcalls[frame]));mask=np.zeros(shape,bool);detail=[]
+ for (costume,n,x,y,w,h),count in changed.items():
+  stem=f'costumes/costume{costume:03}_{n:03}';suffixes=['_hd.webp','_hd.png','.webp','.png'];files=[P/'mods/gpt'/(stem+suffix)for suffix in suffixes];f=next((z for z in files if z.exists()),None)
+  if f is None:
+   assert not any((O/'kandidat3728'/(stem+suffix)).exists()for suffix in suffixes)
+   box=[max(0,x*4),max(0,y*4),min(shape[1],(x+w)*4),min(shape[0],(y+h)*4)];mask[box[1]:box[3],box[0]:box[2]]=True;detail.append(dict(kostyme=costume,rute=n,originalpos=[x,y],originalmaal=[w,h],native_mangler_i_begge_modder=True,original_rekt=box,kopier=count));continue
+  key=str(f)
+  if key not in assetcache:
+   wh=Image.open(f).size;relative=str(f.relative_to(P/'mods/gpt'));other=O/'kandidat3728'/relative;assert other.exists()and sha(f)==sha(other),relative;assetcache[key]=(wh,relative,sha(f))
+  (ww,hh),relative,digest=assetcache[key];mx=max(0,(ww-w*4)/2);my=max(0,(hh-h*4)/2);box=[max(0,int(np.floor(x*4-mx))),max(0,int(np.floor(y*4-my))),min(shape[1],int(np.ceil((x+w)*4+mx))),min(shape[0],int(np.ceil((y+h)*4+my)))];mask[box[1]:box[3],box[0]:box[2]]=True;detail.append(dict(kostyme=costume,rute=n,originalpos=[x,y],originalmaal=[w,h],native_fil=relative,native_fil_sha256=digest,native_maal=[ww,hh],faktisk_native_rekt=box,kopier=count,fil_byteidentisk_i_begge_modder=True))
+ return mask,detail
+pairs=[];unpaired=[];checks=[];phase=[]
+for f in sorted(B.glob('frame_*_room*.png')):
+ if f.stem.endswith('_flat'):continue
+ g=C/f.name;ff=f.with_name(f.stem+'_flat.png');gg=g.with_name(g.stem+'_flat.png');assert g.exists()and ff.exists()and gg.exists()
+ frame=int(f.name.split('_')[1]);v=np.array(Image.open(f).convert('RGBA'));w=np.array(Image.open(g).convert('RGBA'));orig1=np.array(Image.open(ff).convert('RGBA'));orig2=np.array(Image.open(gg).convert('RGBA'));diff=np.any(v!=w,2);od=np.any(orig1!=orig2,2);allowed=np.zeros(diff.shape,bool)
+ es=[e for e in c['hendelser']if e['cel']==1995 and e['bildeframe']==frame]
+ for e in es:
+  old=[z for z in b['hendelser']if z['cel']==1995 and z['bildeframe']==frame and z['pos']==e['pos']and z['maal']==e['maal']];assert old
+  x,y=e['pos'];ww,hh=e['maal'];box=[max(0,x*4-8),max(0,y*4-8),min(1280,(x+ww)*4+8),min(800,(y+hh)*4+8)];allowed[box[1]:box[3],box[0]:box[2]]=True;assert not (od&allowed).any()
+  phase.append(dict(frame=frame,rute=1995,rect_med8HD=box,original_RGBA_byteidentisk=True,endrede_HD_piksler=int((diff&allowed).sum())))
+ outside=diff&~allowed
+ if not od.any() and bcalls[frame]==ccalls[frame]:
+  assert not outside.any(),(frame,int(outside.sum()));pairs.append(dict(frame=frame,fil=f.name,flat_sha256=sha(ff),endrede_HD_piksler=int(diff.sum()),utenfor_ny_native=0))
+ else:
+  dist=nd.distance_transform_edt(~od)if od.any()else np.full(od.shape,np.inf);statebox,stateinfo=changed_cel_boxes(frame,diff.shape);far=outside&(dist>16);unexplained=far&~statebox;assert not unexplained.any(),(frame,int(unexplained.sum()));unpaired.append(f.name);checks.append(dict(frame=frame,original_HD_rekonstruksjon_ulik=int(od.sum()),HD_avvik_utenfor_ny_native=int(outside.sum()),avstand_HD_maks=float(dist[outside].max())if outside.any()else 0,HD_avvik_over16HD_fra_endret_original=int(far.sum()),disse_innen_faktisk_native_rekt_av_endret_cel=int((far&statebox).sum()),uforklarte_HD_avvik=0,kildeceltilstander_endrede=stateinfo,for_tegnekall=bcalls[frame],etter_tegnekall=ccalls[frame]))
+assert phase and any(e['endrede_HD_piksler']>0 for e in phase)
+shutil.copyfile(C/phasefile,R/'costume178_1995-motor3728.png');shutil.copyfile(C/(phasefile.removesuffix('.png')+'_flat.png'),R/'costume178_1995-originalmotor3728.png')
+box=next(e['rect_med8HD']for e in phase if e['frame']==phaseframe);pw=(box[2]-box[0])*2;ph=(box[3]-box[1])*2;board=Image.new('RGB',(2*pw+30,ph+55),'#304050');d=ImageDraw.Draw(board)
+for i,(root,label)in enumerate([(B,'3727, originalfase1995'),(C,'3728, egen ny HD-fase1995')]):
+ im=Image.open(root/phasefile).crop(box).resize((pw,ph),Image.Resampling.NEAREST).convert('RGB');board.paste(im,(10+i*(pw+10),45));d.text((10+i*(pw+10),15),label,fill='white')
+board.save(R/'costume178_1995-motor-for-etter.png')
+seq=Image.new('RGB',(1800,1400),'#304050');d=ImageDraw.Draw(seq);phases=[]
+for i,n in enumerate(range(1995,2022)):
+ e=c['tegninger'][f'costume178_{n}'];f=Path(e['fil']);x,y=e['pos'];ww,hh=e['maal'];bb=[max(0,x*4-8),max(0,y*4-8),min(1280,(x+ww)*4+8),min(800,(y+hh)*4+8)];im=Image.open(f).crop(bb).convert('RGB');im.thumbnail((430,170),Image.Resampling.LANCZOS);xx,yy=10+(i%4)*450,30+(i//4)*200;seq.paste(im,(xx,yy));d.text((xx,yy-20),str(n),fill='white');phases.append(dict(rute=n,frame=e['bildeframe'],originalpos=e['pos'],maal=e['maal'],motorfil_sha256=sha(f)))
+seq.save(R/'fig178_02-motor27faser3728.png')
+proof=dict(avspillinger=2,begge_nye_avspillinger=True,grunnlag_gjenbrukt=False,motor_sha256=c['binar_sha256'],native_grunnlag=3727,native_kandidat=3728,nye_native_observert=1,ruter=[1995],kontroller_pr_side=160,null_pr_side=148,null_etter_frame40_pr_side=120,bufferkontroll_lister_identiske=True,buffer12_beggeRGBA_byteidentiske=True,parvalg_bare_original_flat_RGBA=True,parvalg_krever_identiske_originale_tegnekall=True,ingen_HD_data_brukt_i_parvalg=True,heuristikk16HD_erstattet_av_tilleggsbevis_fra_faktiske_endrede_kildeceltilstander=True,sammenlignede_eksakte_originaltilstander=len(pairs),utelatte_tilstander=unpaired,original_rektangel_med8HD_RGBA_byteidentisk=True,fase1995=phase,ulik_heltilstand_utenfor_ROI_diagnose=checks,ingen_uforklarte_HD_avvik_utenfor_ny_native=True,ingen_mislykket_eller_ufullstendig_PNG_skriving=True,kontrollert_aktor29=True,full_naturlig_gjennomspilling=False,interaktiv_Windows_og_web_ikke_nytestet=True,visuelt_sett=False,bildepar=pairs,sekvensfaser=phases)
+put(R/'motor-sammenligning1995.json',proof);(R/'motor-kontroll1995.py.txt').write_bytes(Path(__file__).read_bytes());print(dict(pairs=len(pairs),unpaired=len(unpaired),buffer=148,late_zero=120,phase=phase,uforklarte_HD=0))
