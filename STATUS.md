@@ -1,17 +1,17 @@
 # Status
 
 <!-- helikopter178-forfaser1995-1999:start -->
-## Påbegynt helikopterbunke, 2026-10-23 19:05
+## Påbegynt helikopterbunke, 2026-10-23 19:36
 
-Fem nye faktiske innebygde image_gen-kall H126..H130 er pushet til gpt-arbeid 7292a28ef3113b2a43b2b02728fbc3f3cd373d33, rapporter/helikopter178-forfaser1995til1999-20261023. Råbilder, eksakte prompter, argumenter, rutekart over returer og kontrollbevis er bevart. Ingen ny native består alle porter. Ingen ny resultat.png, import, nativepublisering eller stilgodkjenning. Bunken er ikke ferdig.
+Seks nye faktiske innebygde image_gen-kall H131..H136 er pushet til gpt-arbeid 4dea6ce890e690bc125cfb5eabf86e6b93c2ca9a i rapporter/helikopter178-forfaser1995til1999-20261023. Bunken har totalt 11 faktiske kall H126..H136, med råbilder, eksakte prompter, argumenter, kontroll og SHA-festet rutekart over returer. Alle 137 nye/endrede grafikk- og rapportfiler er faktisk hentet tilbake som strømmer, med kontroll av hver SHA256 og Gitblob SHA1. Ingen nedlastet fullkopi eller arkiv er lagret. Ingen ny native eller resultat.png er godkjent, mottatt eller publisert.
 
-Fem hele kilder 1995..1999 er ferskt bekreftet RGB565-identiske i installert WebP-motor. 1999 og 1998 er visuelt sett i spillkontekst med Sam-anker før nytegning. Grunnlagsavspillingen har 160 kontroller/148 null, 120/120 null etter frame40 og 53 loggede kildefaser. Kontrollert aktør29 i rom35, ikke full naturlig gjennomspilling. Ingen ny kandidatavspilling.
+Alle fem hele originaler 1995..1999 er nå visuelt sett i spillkontekst sammen med godkjent Sam før nytegning. Den beholdte grunnlagsavspillingen har 160 kontroller/148 null, 120/120 null etter frame 40 og 53 kildefaser. Ingen ny motoravspilling etter returene. Kontrollert aktør 29 i rom 35, ikke full naturlig gjennomspilling.
 
-H126 har finere kontur men fargeavvik; H127 er retur for 1998. H128/H129 er mer presise, men har små feltfeil og stilretur for pikseltrapper. H130 er en egen redigeringsmodul for runnerenden. Sammensatt H130 har alle positive alfa-/åpnings-/farge-/kodefester innen uendret 3 HD, men ekstra kodepiksler består, særlig mørk støy fra egen modul. Rene og sammensatte kontroller er bevart. Ingen originalmasker, originalfragmenter eller kildestyrt lokal trekkflytting er brukt. Ikke importer en nesten-bestått retur.
+H131/1999 har glattere kurver, men én åpning og flere felt/bredder feiler. H132/1997, H133/1996 og H134/1995 er første tegninger med felt-/formreturer. H135/1998 kom fra bildeverktøyet i ekte kildepalett, og er derfor korrekt behandlet som ekte RGB, ikke tekniske kodefarger. H136 er en ny hel egen karosserimodul for 1999, med glattere kurver, men flere feil felt. Global støyrens av H130 løser ikke de 30 svarte ekstra kodepikslene; den tidligere støyforklaringen er ikke bevist. Egen kurverens og mint/lime-varianter er også returer. Ingen originalmaske, originalfragmenter eller kildestyrt lokal påmaling/flytting. Alle sterke porter er fortsatt 3 HD, med separat stilkontroll.
 
-Gjenoppta NESTE.md og RETUR.md i den nye rapporten. Neste H131 er ikke utført eller reservert. 1997..1995 er ikke tegnet eller visuelt sett ennå. 1990 trenger fortsatt hel originalkilde. Tidligere native 2000..2009 og komplett 2010..2021 skal ikke gjentas. Publisert WebP-mod er fortsatt 15835538ca4b4e70e95a0f227e7d41bea830400e, 3723 native. Figurjobber 508/1758, fig178_02 10/24 og familie178 22/102 er uendret. Fellespakker sam-max-hd-2026-10-23-webp har samme 3723; de faktiske pakkene er tidligere hentet og filkontrollert, og faste releasehash er uendret. Ingen unødvendig ny pakkebygging eller full modkopi.
+Gjenoppta NESTE.md, RETUR.md og VIDERE-H131-H136.md. Neste H137 er ikke utført eller reservert. Ikke gjenta hele mislykkede kodeprompter uten konkret feilretting. Tidligere native 2000..2009 og komplett 2010..2021 skal ikke gjentas. 1990 trenger ny hel originalkilde. 137/V013 og 296/S037 er uendret. Ingen nødvendig Tom-designavklaring.
 
-Originale jobber og tre stasher er uendret. Automatikken er ACTIVE, ingen nødvendig Tom-avklaring og ingen gammel nattprosess. WebP- og ryddeinstruksene nedenfor gjelder fortsatt.
+Fersk opptelling: 508/1758 figurjobber, 3723 native, fig178_02 10/24 og familie178 22/102. WebP-mod er fortsatt 15835538ca4b4e70e95a0f227e7d41bea830400e. Felles Linux-/Windows-pakker sam-max-hd-2026-10-23-webp har samme 3723 og er tidligere faktisk lastet ned og filkontrollert. Ingen ny kandidat, modkopi, import, nativepublisering eller pakkebygging. Originale jobber og alle tre stasher er uendret. Automatikken er ACTIVE; all grafikk er ikke ferdig. Ingen gammel nattprosess.
 <!-- helikopter178-forfaser1995-1999:slutt -->
 
 <!-- webp-og-rydding-20261023:start -->
