@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,subprocess
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+for cid in ['H131','H132','H133','H134']:
+ K=R/'kall'/cid;D=K/'global-kalibrering';D.mkdir(exist_ok=False);a=np.array(Image.open(K/'raa.png').convert('RGBA'));b=a.copy();r,g,v=[a[:,:,i].astype(int)for i in range(3)];on=a[:,:,3]>0
+ mint=on&(r<24)&(g>230)&(v>170)&(v<230);lime=on&(r>210)&(r<247)&(g>235)&(g-r>=8)&(v<30);b[mint,:3]=[0,255,128];b[lime,:3]=[192,255,0];assert np.array_equal(a[:,:,3],b[:,:,3]);Image.fromarray(b).save(D/'egen-global-kodekalibrert.png')
+ plan=json.loads((K/'plan.json').read_text());plan.update(nytt_bildekall=False,avledet_fra=str((K/'raa.png').relative_to(R)),egen_global_RGB_kalibrering={'mint':int(mint.sum()),'lime':int(lime.sum()),'regel':'Hele egen RGB-klasser, uten XY-betingelser. Samme dokumenterte globale mint/lime-regler som H128, ingen original åpnet i rens. Alfa byteidentisk.','raw_SHA256':hashlib.sha256((K/'raa.png').read_bytes()).hexdigest()});(D/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n');subprocess.run([str(P/'.venv/bin/python'),str(O/'kontroller.py'),cid+'/global-kalibrering'],check=True)

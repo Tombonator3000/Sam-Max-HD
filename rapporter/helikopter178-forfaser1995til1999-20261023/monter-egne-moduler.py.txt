@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,sys
+from own_parts import decode,component_on_canvas
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+cids=sys.argv[1:];K=R/'kall'/cids[-1];src=R/'kall/H130/egen-sammensatt.png';a=np.array(Image.open(src).convert('RGBA'));tab=json.loads((R/'kilder/1999/kodepalett.json').read_text())['tabell'];rows=[]
+for cid in cids:
+ C=R/'kall'/cid;p=json.loads((C/'plan.json').read_text());rect=p['egen_rect'];bbox=p['egen_core_bbox_i_rect'];target=[rect[i%2]+bbox[i]for i in range(4)];part,clean=decode(C/'raa.png',tab);can,fit=component_on_canvas(part,target,(a.shape[1],a.shape[0]));x0,y0,x1,y1=rect;a[y0:y1,x0:x1]=can[y0:y1,x0:x1];Image.fromarray(part).save(C/'egen-modul-renset.png');rows.append({'cid':cid,'raa_sha256':p['raa_sha256'],'hele_egne_rect':rect,'egne_maal_bbox':target,'rens':clean,'fit':fit})
+Image.fromarray(a).save(K/'egen-sammensatt.png');(K/'egen-del-montering.json').write_text(json.dumps({'hel_egen_base':str(src.relative_to(R)),'base_sha256':hashlib.sha256(src.read_bytes()).hexdigest(),'moduler':rows,'originalmaske':False,'originalfragmenter':False,'kildestyrt_lokal_trekkflytting':False,'rekonstruksjon':'Hele egne rektangulaere redigeringsmoduler med egen alfa, global registrering mot egne tidligere modulextenter. Ingen kildekoordinater brukes til montering.'},ensure_ascii=False,indent=2)+'\n');print(K)

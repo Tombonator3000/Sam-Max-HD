@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+cid=sys.argv[1];sigma=float(sys.argv[2]);K=R/'kall'/cid;F=K/'egen-sammensatt.png';a=np.array(Image.open(F).convert('RGBA'));on=a[:,:,3]>=128
+colors=np.unique(a[on,:3],axis=0);best=np.full(on.shape,-1e6,dtype=np.float32);cls=np.zeros(on.shape,np.int16)
+for ci,col in enumerate(colors):
+ m=on&np.all(a[:,:,:3]==col,axis=2)
+ sdf=nd.distance_transform_edt(m)-nd.distance_transform_edt(~m)
+ smooth=nd.gaussian_filter(sdf.astype(np.float32),sigma)
+ take=smooth>best;best[take]=smooth[take];cls[take]=ci
+sdf=nd.distance_transform_edt(on)-nd.distance_transform_edt(~on);edge=nd.gaussian_filter(sdf.astype(np.float32),sigma)
+b=np.zeros_like(a);b[:,:,:3]=colors[cls];b[:,:,3]=np.rint(np.clip(edge+.5,0,1)*255).astype(np.uint8);b[b[:,:,3]==0,:3]=0
+D=K/f'egen-kurverens-s{sigma:g}';D.mkdir(exist_ok=False);Image.fromarray(b).save(D/'egen-sammensatt.png')
+p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,avledet_fra=str(F.relative_to(R)),avledet_kilde_sha256=hashlib.sha256(F.read_bytes()).hexdigest(),global_kurverens={'sigma_egen_raw_piksler':sigma,'regel':'Gaussian signed-distance smoothing av hver egen RGB-kode og egen alfa. Ingen original lastet for rens eller per-piksel beslutning. Hele flater konkurrerer globalt, ingen lokal fargepåmaling.','farger':colors.tolist()});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+print(D)

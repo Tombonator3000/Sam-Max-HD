@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+ids=['H130/rensV2','H130/egen-kurverens-s8','H131/global-kalibrering','H132/global-kalibrering','H133/global-kalibrering','H134/global-kalibrering']
+b=Image.new('RGB',(1500,1020),'#304050');d=ImageDraw.Draw(b)
+for i,cid in enumerate(ids):
+ K=R/'kall'/cid;q=json.loads((K/'kontroll.json').read_text());im=Image.open(K/'prototype-under-kontroll.png').convert('RGBA');bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);s=min(2,720/im.width,275/im.height);bg=bg.resize((round(im.width*s),round(im.height*s)),Image.Resampling.NEAREST);x=15+(i%2)*750;y=15+(i//2)*340;d.text((x,y),cid,fill='white');b.paste(bg.convert('RGB'),(x,y+25));d.text((x,y+305),f"RETUR IoU {q['snitt_union']} alfa {q['alfa_fester_over3HD']} hull {q['apninger_over3HD']}",fill='white')
+b.save(R/'videre-egne-varianter-kontroll.png')

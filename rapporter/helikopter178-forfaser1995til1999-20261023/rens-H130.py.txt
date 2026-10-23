@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/helikopter178-forfaser1995til1999-20261023';B=R/'kall/H130';K=B/'rensV2';K.mkdir(exist_ok=False)
+a=np.array(Image.open(B/'raa.png').convert('RGBA'));alpha=a[:,:,3].copy();rgb=a[:,:,:3].astype(int)
+noise=(rgb[:,:,0]<48)&(rgb[:,:,1]<48)&(rgb[:,:,2]<80)&(alpha>0)
+trusted=(alpha>=128)&(np.max(rgb,2)>=96)
+_,near=nd.distance_transform_edt(~trusted,return_indices=True);a[noise,:3]=a[tuple(near)][noise,:3]
+assert np.array_equal(a[:,:,3],alpha);Image.fromarray(a).save(K/'egen-kodestoyrenset.png')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();(K/'kodestoyrens.json').write_text(json.dumps(dict(raa=str(B/'raa.png'),raa_sha256=sha(B/'raa.png'),global_egen_RGB_regel='R<48,G<48,B<80,alpha>0 erstattes med naermeste egen alpha>=128 og max(RGB)>=96',egne_RGB_piksler_renset=int(noise.sum()),egen_alfa_byteidentisk=True,ingen_kildefiler_aapnet=True,ingen_originalmaske=True,kildekoordinater_til_endring=False),ensure_ascii=False,indent=2)+'\n')
+(K/'plan.json').write_text(json.dumps(dict(kall='H130/rensV2',rute=1999,nytt_bildekall=False,avledet_av=['H128','H129','H130']),ensure_ascii=False,indent=2)+'\n')
+p=(P/'out/helikopter178-forfaser1995til1999-20261023/monter-H130.py').read_text();p=p.replace("K=R/'kall/H130';B=", "K=R/'kall/H130/rensV2';B=").replace("pl=json.loads((K/'plan.json').read_text())","pl=json.loads((R/'kall/H130/plan.json').read_text())").replace("decode(K/'raa.png',table)","decode(K/'egen-kodestoyrenset.png',table)").replace("K/'raa.png'","R/'kall/H130/raa.png'")
+(P/'out/helikopter178-forfaser1995til1999-20261023/monter-H130-rens.py').write_text(p)
+print('Own non-code dark noise recolored, alpha preserved',int(noise.sum()))
