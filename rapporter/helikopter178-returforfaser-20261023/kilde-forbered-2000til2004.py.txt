@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,hashlib,shutil
+import numpy as np
+from PIL import Image
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text());proof=read(A/'rapporter/felles-release-20261023-helikopter/pakke3713-start1-y60.json');rows=[];covered=[]
+for n in range(2000,2005):
+ K=R/'kilder'/str(n);K.mkdir(parents=True,exist_ok=True);path=P/f'work/extract/costumes/costume178_{n}.png';idx=P/f'work/extract/costumes/costume178_{n}_idx.png';a=np.array(Image.open(path).convert('RGBA'));h,w=a.shape[:2];e=proof['tegninger'][f'costume178_{n}'];x,y=e['pos'];assert e['maal']==[w,h]and x>=0 and x+w<=320 and y+h<=200
+ flat=Path(e['fil']).with_name(Path(e['fil']).stem+'_flat.png');b=np.array(Image.open(flat).convert('RGB'))[y*4+2:(y+h)*4:4,x*4+2:(x+w)*4:4]
+ rgb=a[:,:,:3].astype('uint16');v=np.empty_like(rgb);v[:,:,0]=(rgb[:,:,0]>>3)<<3;v[:,:,0]|=v[:,:,0]>>5;v[:,:,1]=(rgb[:,:,1]>>2)<<2;v[:,:,1]|=v[:,:,1]>>6;v[:,:,2]=(rgb[:,:,2]>>3)<<3;v[:,:,2]|=v[:,:,2]>>5
+ opaque=a[:,:,3]>0;bad=np.any(v!=b,2)&opaque;
+ if bad.any():
+  covered.append(dict(rute=n,avvik=int(bad.sum()),kildepunkter=np.argwhere(bad).tolist(),RGB_motor=b[bad].tolist(),tatt_fra_motor=e['fil']));continue
+ ix=np.array(Image.open(idx));assert not((ix==13)&opaque).any()
+ shutil.copy2(path,K/'original-1x.png');shutil.copy2(idx,K/'original-indeks.png');shutil.copy2(e['fil'],K/'hel-originalmotor.png')
+ bg=Image.new('RGBA',(w,h),'#87959e');bg.alpha_composite(Image.fromarray(a));bg.resize((w*24,h*24),Image.Resampling.NEAREST).save(K/'referanse24x.png');scale=min(24,936//w);sq=Image.new('RGB',(1024,1024),'#87959e');sq.paste(bg.resize((w*scale,h*scale),Image.Resampling.NEAREST).convert('RGB'),((1024-w*scale)//2,(1024-h*scale)//2));sq.save(K/'referanse-kvadrat.png')
+ colors,cnt=np.unique(a[opaque,:3],axis=0,return_counts=True);q=dict(rute=n,maal_1x=[w,h],opaque=int(opaque.sum()),frame=e['bildeframe'],pos=[x,y],RGBA_sha256=sha(path),indeks_sha256=sha(idx),hel_motor_sha256=sha(K/'hel-originalmotor.png'),originalmotor_rgb565_avvik=int(bad.sum()),indeks13_piksler=0,hel_synlig=True,source_only=True,farger=[[c.tolist(),int(z)]for c,z in zip(colors,cnt)])
+ (K/'kilde.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n');rows.append(q)
+(R/'kildekontroll-fem-eldre.json').write_text(json.dumps(dict(ruter=rows,alle_fem_hele_synlige=len(rows)==5,alle_RGB565_bekreftet=len(rows)==5,ingen_original_grafikk_brukt_i_ny_tegning=True,kontrollert_ikke_naturlig_spillsekvens=True),ensure_ascii=False,indent=2)+'\n');(R/'delvis-skjulte-kilder-y60.json').write_text(json.dumps(covered,ensure_ascii=False,indent=2)+'\n');print('Klarert',[(q['rute'],q['maal_1x'],q['opaque'])for q in rows]);print('Ikke helt synlige',[(q['rute'],q['avvik'])for q in covered])

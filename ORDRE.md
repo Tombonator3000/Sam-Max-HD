@@ -1,5 +1,19 @@
 # Ordre fra Claude
 
+<!-- helikopter178-returforfase-status:start -->
+Elleve nye faktiske innebygde image_gen-kall H071..H081 over seks helikoptermotiver 2000..2004 og 2009 er laget, egenkontrollert og visuelt sett som returer. Ingen ny valgt grafikk, hel leveranse, endring i delark, nativeimport eller motorobservert nygrafikk. Ingen ny Tom-/Claude-godkjenning. Råbilder, faktiske prompter, argumenter, SHA-rutekart og alle returer ligger i rapporter/helikopter178-returforfaser-20261023.
+
+H080 løser toppkappen i 2009 med lime for 151grå og navy for opakt svart. Global egen blåkalibrering får den vanlige nativefargekontrollen til å bestå, men ren egen kodeflate har fortsatt ett manglende 71grå-feste ved (1,6), 18 HD unna, og 13 svarte kodepiksler på feil kildeflate. H081 retter blått, men endrer 55grå/191grå og gir ekstra 151grå. Begge er returer. H071s toppkappe består heller ikke. Globale helflyttinger er bare målt, ingen består alle porter og ingen er tatt i bruk.
+
+Fem uavhengige kilder 2000..2004 er bekreftet hele i tidligere faktisk motoravspilling med nedlastet 4e32ae90-binær, alle med 0 RGB565-avvik og 0 opake indeks13. Hele motorbilder, riktige originaler og godkjent Sam-anker er sett før motivene. Dette er gjenbruk av dokumentert kontrollert avspilling, ingen ny motor- eller pakkekjøring. Kildeløs replay gjenskaper alle elleve egne RGBA og nativeprototyper eksakt. Bare egen ekte alfa, global egen RGB-rens og helplassering. Egen svak alfa under 8 er renset, alle egne core128 beholdt. Ingen hard originalmaskeklipp, kildefragmenter, lokal fargepåmaling eller lokale trekkflyttinger. Ingen motor-/pipelinekodeendring.
+
+Publisert hd-mod er uendret ca814520dedc7595aa661b760b8baa0e35fddc41 med 3714 native. Alle 21958 lokale publiserte filhash og 21952 PNG er eksakt bevart, sammen med 1472 festede beskyttede input, alle tre opprinnelige stasher og forrige delark. fig178_02 er fortsatt 1/24, familien 13/102. 508/1758 hele figurjobber har resultat, 1250 er uten, i tillegg til returer og sluttkontroll. Felles Linux/Windows helikopter-utgaven har fortsatt 3713 og mangler én native. Ingen ny pakkedispatch; oppdater begge ved neste komplette ark-/familiesamlepunkt eller avslutning med faktisk nedlasting, sjekksummer og inkludert grafikk kontrollert.
+
+Gjenoppta fra NESTE.md og RETUR.md i den nye rapporten, særlig H080s rene kodeflatekontroll. 2008/H065 er allerede publisert og skal ikke gjentas. Returene 2005..2007 finnes fortsatt i forrige rapport. 1990 trenger fortsatt en ny hel kilde fordi den gamle er venstreklipt. Neste 178-kall H082 er ikke utført eller reservert. 137 V013 og 296 S037 er uendret og ikke utført. Ingen ny nødvendig Tom-designavklaring. Automatikken er ACTIVE og all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattevakt.
+<!-- helikopter178-returforfase-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-forfase-status:start -->
 En ny egen helikopterfase2008/H065 i fig178_02 er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert.18 faktiske innebygde image_gen-kallH053..H070 for fem kilder2005..2009 gir én valgt og17 kvalitetsreturer. fig178_02 er delvis1/24,familien13/102. Ingen ny hel figurjobb:508/1758 har resultat,1250 uten,pluss returer og sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
 
