@@ -1,5 +1,19 @@
 # todo.md
 
+<!-- helikopter178-forfaser1995-1999:start -->
+## Påbegynt helikopterbunke, 2026-10-23 19:05
+
+Fem nye faktiske innebygde image_gen-kall H126..H130 er pushet til gpt-arbeid 7292a28ef3113b2a43b2b02728fbc3f3cd373d33, rapporter/helikopter178-forfaser1995til1999-20261023. Råbilder, eksakte prompter, argumenter, rutekart over returer og kontrollbevis er bevart. Ingen ny native består alle porter. Ingen ny resultat.png, import, nativepublisering eller stilgodkjenning. Bunken er ikke ferdig.
+
+Fem hele kilder 1995..1999 er ferskt bekreftet RGB565-identiske i installert WebP-motor. 1999 og 1998 er visuelt sett i spillkontekst med Sam-anker før nytegning. Grunnlagsavspillingen har 160 kontroller/148 null, 120/120 null etter frame40 og 53 loggede kildefaser. Kontrollert aktør29 i rom35, ikke full naturlig gjennomspilling. Ingen ny kandidatavspilling.
+
+H126 har finere kontur men fargeavvik; H127 er retur for 1998. H128/H129 er mer presise, men har små feltfeil og stilretur for pikseltrapper. H130 er en egen redigeringsmodul for runnerenden. Sammensatt H130 har alle positive alfa-/åpnings-/farge-/kodefester innen uendret 3 HD, men ekstra kodepiksler består, særlig mørk støy fra egen modul. Rene og sammensatte kontroller er bevart. Ingen originalmasker, originalfragmenter eller kildestyrt lokal trekkflytting er brukt. Ikke importer en nesten-bestått retur.
+
+Gjenoppta NESTE.md og RETUR.md i den nye rapporten. Neste H131 er ikke utført eller reservert. 1997..1995 er ikke tegnet eller visuelt sett ennå. 1990 trenger fortsatt hel originalkilde. Tidligere native 2000..2009 og komplett 2010..2021 skal ikke gjentas. Publisert WebP-mod er fortsatt 15835538ca4b4e70e95a0f227e7d41bea830400e, 3723 native. Figurjobber 508/1758, fig178_02 10/24 og familie178 22/102 er uendret. Fellespakker sam-max-hd-2026-10-23-webp har samme 3723; de faktiske pakkene er tidligere hentet og filkontrollert, og faste releasehash er uendret. Ingen unødvendig ny pakkebygging eller full modkopi.
+
+Originale jobber og tre stasher er uendret. Automatikken er ACTIVE, ingen nødvendig Tom-avklaring og ingen gammel nattprosess. WebP- og ryddeinstruksene nedenfor gjelder fortsatt.
+<!-- helikopter178-forfaser1995-1999:slutt -->
+
 <!-- webp-og-rydding-20261023:start -->
 ## WebP og lagringsrydding, 2026-10-23 18:30
 
