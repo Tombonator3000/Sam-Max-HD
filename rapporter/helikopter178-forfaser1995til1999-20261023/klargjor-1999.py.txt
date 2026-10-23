@@ -1,0 +1,78 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,gzip,shutil,re,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;cid='H130/egen-alfa-RGB-korrigert/egen-konturrens-e12-r5/heltilpasning/egen-kodekantrens-r3';K=R/'kall'/cid
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+q=json.loads((K/'kontroll.json').read_text());assert q['teknisk_ok'];q.update(visuelt_sett=True,egen_stilkontroll=True,native_mottatt=True,motorobservert=True,publisert=False,status='KANDIDAT_KONTROLLERT_MOTOROBSERVERTEGENSTIL');put(K/'kontroll.json',q)
+m=json.loads((R/'motor-sammenligning1999.json').read_text());m.update(visuelt_sett=True,hele_motorbilder_sett=True,for_etter_sammenligning_sett=True,delark_sett=True,sekvens24faser_sett=True,buffer12_beggeRGBA_byteidentiske=True);put(R/'motor-sammenligning1999.json',m)
+st=json.loads((R/'egen-native.json').read_text());st.update(motorobservert=True,klar_for_publisering=True)
+for e in st['ruter']:e.update(motorobservert=True,visuelt_sett_native=True)
+put(R/'egen-native.json',st)
+for name in['rutekart-fig178_02.json','rutekart-samlet.json']:
+ d=json.loads((R/name).read_text());e=next(e for e in d['fig178_02']['ruter']if e['rute']==1999);e.update(st['ruter'][0]);put(R/name,d)
+rr=json.loads((R/'rutekart-returer.json').read_text());rr['valgt_avledet_variant']={'kall':cid,'rute':1999,'native_png_sha256':st['ruter'][0]['native_png_sha256'],'status':'KANDIDAT, MOTTATT OG MOTOROBSERVERT','separat_fra_H130_raa_returen':True,'publisert':False};put(R/'rutekart-returer.json',rr)
+f=json.loads((R/'fremdrift.json').read_text());partial=R/'fig178_02-delresultat.png';rec={'jobb':'fig178_02','delresultat':str(partial.relative_to(A)),'sha256':sha(partial),'ruter':11,'ruter_totalt':24,'delvis':True,'levert':False,'native_mottatt':True,'egenkontrollert':True,'visuelt_kontrollert':True,'motorobservert':True,'publisert':False,'rutekart':str((R/'rutekart-fig178_02.json').relative_to(A)),'godkjent_av_Tom':False,'claude_kontroll':False};f.update(delvise_leveranser=[rec],nye_native=1,native=3723,native_kandidat=3724,fig178_02_native=10,fig178_02_kandidat=11,familie178_native=22,familie178_kandidat=23,status='KANDIDAT1999_KONTROLLERT',nye_innebygde_bildekall_i_okten=0,egen_utbedret_sluttrute=1,lagede_valgte_sluttruter=1,native_mottatt=1,visuelt_sett_valgte_sluttruter=1,motorobservert_valgte_sluttruter=1,publisert_nye_native=0,behandlede_ruter=[1999],valgt_variant=cid,bunke_ferdig=False)
+for e in f['bildekall']:e['piksler_brukt_i_kandidat1999']=e['kall']in['H128','H129','H130']
+put(R/'fremdrift.json',f)
+# Alle de nye produksjons-/renseskriptene lagres som lesbare kontrollkilder.
+for name in['konturrens-egen.py','rett-egne-alfa-RGB.py','diagnose-hel-affin.py','kontroller-heltilpasning.py','rens-egne-kodekanter.py','bygg-3724.py','motor-kontroll1999.py','klargjor-1999.py']:
+ shutil.copyfile(O/name,R/(name+'.txt'))
+(R/'kandidat3724-filhash.json.gz').write_bytes(gzip.compress((O/'kandidat3724-filhash.json').read_bytes(),mtime=0))
+(R/'ALFA-RGB-RETTELSE.md').write_text('''# Årsak og retting av svarte kanter i egen sammenstilling
+
+H130 brukte RGB fra egen H128 og alfa fra egen H129. 7356 råpiksler som hadde vært helt gjennomsiktige i H128 fikk alfa fra H129. RGB under H128s alfa0 var null. Det ga nye svarte felt. Den tidligere globale mørk-RGB-rensen av H130s råmodul endret ikke denne grunnårsaken.
+
+Før bytte av egen alfa forlenges RGB fra nærmeste egen ugjennomsiktige kjerne. Samme regel brukes for hele egne H130-modulen før RGB-legging under H129-alfa. Alfa endres ikke av denne rettingen. Ingen originalfil, originalmaske eller lokal kildepåmaling brukes. Alle30 ekstra svarte kodepiksler forsvinner. Først gjenstår13 små ekstra fargepiksler, mens alle positive fester består.
+
+Deretter forenkles alle egne fargekonturer og egen alfa globalt med RDP,epsilon12råpiksler begrenset til0,15 av egen minste komponentutstrekning, hjørneradius5 og2x kantutjevning. Hele bildet får skala0,995 i begge akser og flyttes samlet1HD til høyre og1HD opp. Til slutt samme globale morfologiske åpning med radius3 på alle egne RGB-klassefrø, med nærmeste egne frø langs kantene. Alfa er byteidentisk i dette siste trinnet. Ingen originaldata brukes som pikselmaske i noen rensing. De globale plasseringstallene er dokumentert og hele ferdige native gjenskapes byteeksakt uten originalfiler.
+
+Ferdig1999 består alle uendrede3HD-porter, inklusive alle ekstra kodepiksler. IoU0,915 og dekning0,953. Bildet har glattere store konturer, myk ekte alfa og de små kildebestemte feltene og delene. Det er sett isolert, i delarket, ved godkjent Sam, i faktisk motorbilde og24faser1998..2021. Dette er egenkontroll, ikke ny Tom-/Claude-godkjenning. H128 og den gamle H130-sammenstillingen er fortsatt returer som hele ubehandlede bilder.
+
+Ingen ny image_gen-kjøring er nødvendig for denne rettingen. Sluttpiksler kommer fra de tre bevarte faktiske kallene H128,H129,H130. Rensinger og plasseringer teller ikke som nye bildekall eller hele figurjobber.
+''')
+ret=(R/'RETUR.md').read_text();(R/'RETUR.md').write_text('''# Gjeldende returstatus
+
+1999 har nå en egenkontrollert og motorobservert kandidat etter retting av egne alfa/RGB-kanter, global egen konturrens og global plassering. Se ALFA-RGB-RETTELSE.md og egen-native.json. Ingen originalmaske eller ny bildefallback. Alle sterke3HD-porter består. Ny fase er ikke Tom-/Claude-godkjent. Nativepublisering gjenstår ved denne kildecommitten.
+
+H126..H136s opprinnelige rå-/helprototyper er fortsatt returer; tre av råbildene gir piksler til den nye bearbeidede1999-varianten. Ikke tegn1999 på nytt dersom publisering er bekreftet i mottak-publisert1999.json.
+
+'''+ret.replace('# Aktive returer\n\n','Tidligere vurderinger av de opprinnelige variantene:\n\n',1))
+(R/'NESTE.md').write_text('''# Gjenoppta denne bunken
+
+Først les mottak-publisert1999.json hvis den finnes. Ved denne kildecommitten er1999 teknisk godkjent, native mottatt i eneste kandidat3724, visuelt sett og motorobservert, men ikke publisert ennå. Fullfør additiv publisering fra gjeldende hd-mod15835538 etter fersk fjern-SHA-kontroll, hent hele publiseringen tilbake og bekreft hver filhash. Ikke tegn1999 igjen.
+
+Bunken har fortsatt11 faktiske bildekall H126..H136. Ingen ny kjøring er gjort i alfa/RGB-rettingen. Egne H128/H129/H130 gir sluttpiksler; andre råbilder beholdes som returer. H130s30 ekstra svarte piksler kom fra null-RGB under tidligere egen alfa0 som fikk ny H129-alfa. Global egen fringe-rens løser årsaken. Se ALFA-RGB-RETTELSE.md for resten av kildeløs egen rensing og globale tall. Alle sterke3HD-porter består uten kildepåmaling eller originalmaske.
+
+Neste grafikk er de eksisterende returene1998/H127,H135;1997/H132;1996/H133;1995/H134. Alle fem hele originaler er sett i spillkontekst og ved godkjent Sam. H135 er i ekte palett. Ikke gjenta gamle hele kodefargeprompter uten konkret retting. H137 er ikke utført eller reservert.1990 trenger fortsatt hel original.137/V013 og296/S037 er uendret.
+
+Kandidaten gir delark11/24 i fig178_02, familie178 23/102 og3724 native. Hele figurjobber er fortsatt508/1758. Ingen hel resultat.png leveres. Alle10 tidligere delruter og alle tidligere nativefiler er SHA-/RGBA-bevart. WebP er tapsfri, også under alfa0. Indeks-/maskefiler er uendret. Bare mod.json/SHA256SUMS er endret som metadata i kandidaten.
+
+Motor:160 kontroller/148null og120/120null etterframe40. De12 gamle bufferavvikene er byteidentiske i koordinater og beggeRGBA. Berørt1999-rektangel med8HD har eksakt lik original og7059 endredeHD-piksler.50 hele byteidentiske originaltilstander gir ingenHD-endring.110 øvrige hele tilstander er ikke direkte sammenlignbare fordi andre figurer er i ulike originaltilstander. I fase120 ligger alle30472HD-avvik utenfor rektangelet innen5HD fra endredeoriginalpiksler. Ikke påstå160 identiske hele kontrollpar eller full naturlig gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+Felles WebP-pakker har fortsatt3723. Oppdater ved neste samlepunkt/avslutning med faktisk nedlasting og innholdskontroll. Etter verifisert publisering: aktiver kandidaten, fjern den verifiserte gamle arbeidskopien og unødvendige motor-dumper. Behold råbilder, kilder, relevante kontrollbevis og tre stasher. Bruk aldri historiske dedupliserte out-modmapper som fullt modgrunnlag. Automatikken er ACTIVE; ingen nødvendig Tom-avklaring eller gammel nattprosess.
+''')
+(R/'notat.md').write_text('''# Produksjonsnotat
+
+Én eksisterende tegning for helikopterfase1999 er utbedret fra egne faktiske image_gen-kall H128,H129,H130. Totalt11 faktiske kall i bunken, ingen ny bildekjøring i denne rettingen. Eksakte prompter, råbilder, argumenter og alle returvarianter er bevart. Sam er eneste godkjente stilanker. Hele riktige originaler og spillkontekst er sett før motivene.
+
+Årsaken til30 svarte ekstra kodepiksler var null-RGB under egen alfa0 ved sammenstilling med ny egen alfa. RGB forlenges nå fra egen kjerne før alfabyttet. Global egen vektorkonturrens, liten heltilpasning og global kodekantrens gir null feil i alle uendrede3HD-porter. Ekte alfa, små deler,21 kildefarger og åpninger består. Ingen originalmaske, kildefragmenter eller lokal kildebasert påmaling/flytting. Se ALFA-RGB-RETTELSE.md og kildeløs native-replay.
+
+Delark11/24 bevarer alle10 tidligere ruter byteeksakt. Standard egenkontroll gir11OK og13 tomme mål, forventet exit2. Automatisk mottaksprøve gir1OK. Ferdig native kopieres uten ny omtegning inn i eneste kandidat. Tapsfri WebP har alleRGBA-byte identiske med nativePNG, også RGB under alfa0. Alle tidligere grafikkfiler og tekniskePNG er uendret. Hele figurjobber fortsatt508/1758.
+
+Ferdig native, delark, hele motorbildet, før/etter-utsnitt og24sekvensfaser er visuelt sett. Relevant kontrollert motoravspilling ser den nye fasen. Bufferkontroller er som før, også alle12 tidlige feilkoordinater og beggeRGBA. Berørt originalrektangel med8HD er byteidentisk, med7059 nyeHD-piksler.50 identiske hele originaltilstander sammenlignes;110 andre hele tilstander er ulike og regnes ikke som strenge kontrollpar. Ingen full naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Egenkontroll er ikke Tom-/Claude-godkjenning.
+
+Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes for liten heltilpasning og bevaring av gjeldende mod. Publiser som vanlig Git-barn av gjeldende fjern-SHA, uten force-push. Nativepublisering gjenstår ved denne kildecommitten. Fellespakker er fortsatt3723. Automatikken fortsetter med de fire gjenværende fase-returene.
+''')
+ready={'valgt_variant':cid,'nye_valgte_native':1,'native_grunnlag':3723,'native_kandidat':3724,'sterke_3HD_porter_bestatt':True,'ekstra_kodepiksler':0,'ekte_alfa':True,'egen_RGB_under_alfabytte_rettet':True,'originalmaske':False,'sourcefri_native_replay_byteeksakt':True,'native_WebP_RGBA_byteeksakt':True,'delark11_av24':True,'tidligere10_ruter_RGBA_bevart':True,'automatisk_mottak_OK':1,'visuelt_sett':True,'motorobservert':True,'buffer12_avvik_beggeRGBA_identisk':True,'lokalt_originalrekt_med8HD_identisk':True,'hele_originaltilstander_strengt_paret':50,'hele_originaltilstander_uparet':110,'naturlig_full_spilltest':False,'Tom_godkjent':False,'Claude_godkjent':False,'klar_for_additiv_publisering':True,'tid_utc':datetime.now(timezone.utc).isoformat()};put(R/'klar-for-publisering1999.json',ready)
+state=json.loads((R/'sluttkontroll.json').read_text());state.update(nye_godkjente_egenkontrollert_native=1,nye_mottatte_native=1,motorobservert_native=1,native_kandidat=3724,ny_kandidat=True,ny_motoravspilling=True,publisert_native_uaendret=3723,nye_godkjente_native=1,publisert=0,Tom_godkjent=False,Claude_godkjent=False,bunke_ferdig=False);put(R/'sluttkontroll.json',state)
+status='''Fase1999 er nå egenkontrollert, native mottatt i eneste kandidat3724, visuelt sett og motorobservert. Publisering gjenstår ved denne kildecommitten. Se rapporter/helikopter178-forfaser1995til1999-20261023/klar-for-publisering1999.json og mottak-publisert1999.json når den foreligger. Ikke tegn1999 igjen etter bekreftet publisering.
+
+Tre egne bevarte bildekall H128/H129/H130 gir sluttpiksler. Ingen ny bildekjøring i denne rettingen; bunken har fortsatt11 faktiske kall.30 svarte ekstra kodepiksler skyldtes null-RGB under gammel egen alfa0 ved bytte til egen H129-alfa. Egen RGB-fringe forlenges før alfabyttet. Etter global egen konturrens, helskala0,995, helflytt1HD høyre/opp og global kodekantrens består alle uendrede3HD-porter. Ingen originalmasker, kildefragmenter eller lokal kildepåmaling/flytting. Ny nativeWebP er RGBA-byteidentisk, også under alfa0.
+
+Delark11/24, familie178 23/102 og3724 native i kandidaten; hele figurjobber508/1758. Alle10 tidligere delruter og alle tidligere modgrafikkfiler er bevart. Standard delarkprøve11OK/13tomme mål, automatisk mottaksprøve1OK. Native, delark, hele motorbildet, før/etter og24faser er visuelt sett.160 bufferkontroller/148null,120/120null etterframe40; alle12 gamle feilkoordinater og beggeRGBA er byteidentiske. Berørt originalrekt+8HD er identisk og7059HD-piksler endres.50 hele originaltilstander er strengt paret;110 ulike NPC-tilstander er ikke strenge kontrollpar. Ikke full naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Ingen Tom-/Claude-godkjenning.
+
+Gjenoppta NESTE.md med returer1998..1995. H137 er ikke utført eller reservert.1990 trenger hel kilde;137/V013 og296/S037 er uendret. Felles verifiserte WebP-pakker har3723 og oppdateres ved neste samlepunkt/avslutning. Publiser additivt med gjeldende fjern-SHA som forelder uten force-push, og hent alle filhash tilbake. Originale jobber og tre stasher bevares. Automatikken er ACTIVE, ingen nødvendig Tom-avklaring eller gammel nattprosess.'''
+for fn in['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/fn;s=p.read_text();stt='<!-- helikopter178-forfaser1995-1999:start -->';end='<!-- helikopter178-forfaser1995-1999:slutt -->';i=s.index(stt)+len(stt);j=s.index(end,i);p.write_text(s[:i]+'\n'+status+'\n'+s[j:])
+fs=sorted(p for p in R.rglob('*')if p.is_file()and p.name!='SHA256SUMS');(R/'SHA256SUMS').write_text(''.join(f'{sha(p)}  {p.relative_to(R)}\n'for p in fs));print('Kandidat1999 klar,',len(fs),'rapportfiler SHA-festet. Ingen ny hel figurjobb eller bildekjøring.')

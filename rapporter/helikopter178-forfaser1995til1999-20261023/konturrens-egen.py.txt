@@ -1,0 +1,59 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from collections import defaultdict
+import numpy as np,json,hashlib,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+
+def loops(mask):
+ z=np.pad(mask,1);ed=defaultdict(list)
+ specs=[(mask&~z[:-2,1:-1],(0,0),(1,0)),(mask&~z[1:-1,2:],(1,0),(1,1)),(mask&~z[2:,1:-1],(1,1),(0,1)),(mask&~z[1:-1,:-2],(0,1),(0,0))]
+ for m,u,v in specs:
+  yy,xx=np.nonzero(m)
+  for y,x in zip(yy.tolist(),xx.tolist()):ed[(x+u[0],y+u[1])].append((x+v[0],y+v[1]))
+ result=[]
+ while ed:
+  start=next(iter(ed));p=start;poly=[p];prev=None
+  while True:
+   opts=ed[p]
+   if len(opts)==1 or prev is None:q=opts.pop()
+   else:
+    dirs={(1,0):0,(0,1):1,(-1,0):2,(0,-1):3};d=dirs[(p[0]-prev[0],p[1]-prev[1])];rank={1:0,0:1,3:2,2:3};j=min(range(len(opts)),key=lambda j:rank[(dirs[(opts[j][0]-p[0],opts[j][1]-p[1])]-d)%4]);q=opts.pop(j)
+   if not opts:del ed[p]
+   prev,p=p,q
+   if p==start:break
+   poly.append(p)
+  if len(poly)>=3:result.append(np.array(poly,dtype=float))
+ return result
+
+def rdp(p,epsilon):
+ keep={0,len(p)-1};stack=[(0,len(p)-1)]
+ while stack:
+  lo,hi=stack.pop()
+  if hi-lo<=1:continue
+  a,b=p[lo],p[hi];v=b-a;den=float(v@v)
+  if den: t=np.clip(((p[lo+1:hi]-a)@v)/den,0,1);d=np.linalg.norm(p[lo+1:hi]-a-t[:,None]*v,axis=1)
+  else:d=np.linalg.norm(p[lo+1:hi]-a,axis=1)
+  j=int(np.argmax(d))+lo+1
+  if d[j-lo-1]>epsilon:keep.add(j);stack.extend([(lo,j),(j,hi)])
+ return p[sorted(keep)]
+
+def simplify(p,epsilon,radius):
+ size=np.ptp(p,axis=0);e=min(epsilon,.15*float(size.min()));j=int(np.argmax(np.linalg.norm(p-p[0],axis=1)));a=rdp(p[:j+1],e);b=rdp(np.concatenate([p[j:],p[:1]]),e);q=np.concatenate([a[:-1],b[:-1]])
+ if len(q)<3:q=p
+ out=[]
+ for i,v in enumerate(q):
+  prev=q[i-1];nxt=q[(i+1)%len(q)];u=prev-v;w=nxt-v;lu,lw=np.linalg.norm(u),np.linalg.norm(w);r=min(radius,lu*.25,lw*.25);p0=v+u/lu*r;p2=v+w/lw*r
+  for t in np.linspace(0,1,6,endpoint=False):out.append((1-t)**2*p0+2*t*(1-t)*v+t*t*p2)
+ return np.array(out)
+
+def cleanmask(mask,epsilon,radius):
+ polys=loops(mask);area=lambda p:float(np.sum(p[:,0]*np.roll(p[:,1],-1)-np.roll(p[:,0],-1)*p[:,1]));im=Image.new('L',(mask.shape[1]*2,mask.shape[0]*2));d=ImageDraw.Draw(im)
+ for p in sorted(polys,key=lambda p:-abs(area(p))):
+  q=simplify(p,epsilon,radius);d.polygon([tuple(x)for x in q*2],fill=255 if area(p)>0 else 0)
+ return np.array(im.resize((mask.shape[1],mask.shape[0]),Image.Resampling.LANCZOS)),len(polys)
+
+cid=sys.argv[1];epsilon=float(sys.argv[2]);radius=float(sys.argv[3])if len(sys.argv)>3 else 3.;K=R/'kall'/cid;F=K/'egen-sammensatt.png';a=np.array(Image.open(F).convert('RGBA'));on=a[:,:,3]>=128;colors=np.unique(a[on,:3],axis=0);best=np.full(on.shape,-1e6);cls=np.zeros(on.shape,int);stat=[]
+for ci,col in enumerate(colors):
+ m=on&np.all(a[:,:,:3]==col,2);v,n=cleanmask(m,epsilon,radius);inside=v>=128;phi=nd.distance_transform_edt(inside)-nd.distance_transform_edt(~inside);take=phi>best;best[take]=phi[take];cls[take]=ci;stat.append({'RGB':col.tolist(),'egne_loekker':n,'egen_areal_for':int(m.sum()),'egen_areal_etter':int(inside.sum())})
+alpha,n=cleanmask(on,epsilon,radius);b=np.zeros_like(a);b[:,:,:3]=colors[cls];b[:,:,3]=alpha;b[alpha==0,:3]=0;D=K/f'egen-konturrens-e{epsilon:g}-r{radius:g}';D.mkdir(exist_ok=False);Image.fromarray(b).save(D/'egen-sammensatt.png');p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,avledet_fra=str(F.relative_to(R)),avledet_kilde_sha256=hashlib.sha256(F.read_bytes()).hexdigest(),egen_global_konturrens={'epsilon_raw':epsilon,'radius_raw':radius,'antialias':2,'regel':'Alle konturer i egne globale RGB-klasser og egen alfa forenkles likt med RDP, begrenset av egen minste bboxside. Alle hjørner rundes inntil egen radius. Ny RGB-klasse bestemmes ved nærmeste vektoriserte egen region, ny alfa fra eget vektoromriss. Ingen originalfiler lastes. Ingen pixelmaske brukes til klipp.','stat':stat});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');print(D)

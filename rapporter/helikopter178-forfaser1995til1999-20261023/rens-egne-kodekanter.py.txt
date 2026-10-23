@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall'/sys.argv[1];radius=int(sys.argv[2]);a=np.array(Image.open(K/'egen-sammensatt.png').convert('RGBA'));core=a[:,:,3]>=128;colors=np.unique(a[core,:3],axis=0);best=np.full(core.shape,np.inf);ids=np.zeros(core.shape,int);yy,xx=np.mgrid[-radius:radius+1,-radius:radius+1];disk=xx**2+yy**2<=radius**2;rows=[]
+for i,col in enumerate(colors):
+ m=core&np.all(a[:,:,:3]==col,2);seeds=nd.binary_opening(m,structure=disk)
+ if not seeds.any():seeds=m.copy()
+ dist=nd.distance_transform_edt(~seeds);pick=dist<best;best[pick]=dist[pick];ids[pick]=i;rows.append({'RGB':col.tolist(),'egne_piksler_for':int(m.sum()),'egne_seedpiksler':int(seeds.sum())})
+b=a.copy();b[:,:,:3]=colors[ids];b[b[:,:,3]==0,:3]=0;assert np.array_equal(a[:,:,3],b[:,:,3]);D=K/f'egen-kodekantrens-r{radius}';D.mkdir(exist_ok=False);Image.fromarray(b).save(D/'egen-sammensatt.png');p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,egen_kodekantrens={'radius_raw':radius,'regel':'Samme morfologiske åpning av alle egne RGB-klassefrø, nærmeste egne frø fyller klassekantene. Egen alfa byteidentisk. Ingen originalfiler eller XY-regler. En hel klasse uten frø beholdes.','inn_SHA256':hashlib.sha256((K/'egen-sammensatt.png').read_bytes()).hexdigest(),'endrede_egne_RGB_piksler':int((np.any(a[:,:,:3]!=b[:,:,:3],2)&(b[:,:,3]>0)).sum()),'stat':rows});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');print(D)

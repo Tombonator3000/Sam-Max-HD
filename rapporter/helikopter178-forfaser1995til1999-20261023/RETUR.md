@@ -1,4 +1,10 @@
-# Aktive returer
+# Gjeldende returstatus
+
+1999 har nå en egenkontrollert og motorobservert kandidat etter retting av egne alfa/RGB-kanter, global egen konturrens og global plassering. Se ALFA-RGB-RETTELSE.md og egen-native.json. Ingen originalmaske eller ny bildefallback. Alle sterke3HD-porter består. Ny fase er ikke Tom-/Claude-godkjent. Nativepublisering gjenstår ved denne kildecommitten.
+
+H126..H136s opprinnelige rå-/helprototyper er fortsatt returer; tre av råbildene gir piksler til den nye bearbeidede1999-varianten. Ikke tegn1999 på nytt dersom publisering er bekreftet i mottak-publisert1999.json.
+
+Tidligere vurderinger av de opprinnelige variantene:
 
 Alle H126..H136 er reelle innebygde bildekall, med 11 råbilder og eksakte prompter. Ingen er valgt til ny native. Varianter i undermapper er ikke nye bildekall.
 

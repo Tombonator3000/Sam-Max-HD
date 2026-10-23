@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from own_parts import decode,component_on_canvas
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H130';B=R/'kall/H128';C=R/'kall/H129';D=K/'egen-alfa-RGB-korrigert';D.mkdir(exist_ok=False);p=json.loads((K/'plan.json').read_text());table=json.loads((R/'kilder/1999/kodepalett.json').read_text())['tabell'];a=np.array(Image.open(B/'egen-renset.png').convert('RGBA'));b=np.array(Image.open(C/'egen-renset.png').convert('RGBA'));yy,xx=np.nonzero(a[:,:,3]>=128);target=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];aligned,registration=component_on_canvas(b,target,(a.shape[1],a.shape[0]));out=a.copy()
+def extended_rgb(im):
+ core=im[:,:,3]>=128;_,near=nd.distance_transform_edt(~core,return_indices=True);rgb=im[:,:,:3].copy();rgb[~core]=im[tuple(near)][~core,:3];return rgb
+out[:,:,:3]=extended_rgb(a);out[:,:,3]=aligned[:,:,3];made_opaque=(a[:,:,3]==0)&(out[:,:,3]>0);made_core=(a[:,:,3]<128)&(out[:,:,3]>=128)
+x0,y0,x1,y1=p['egen_basis_vindu'];old=a[y0:y1,x0:x1];yy,xx=np.nonzero(old[:,:,3]>=128);t=[x0+int(xx.min()),y0+int(yy.min()),x0+int(xx.max()+1),y0+int(yy.max()+1)];module,clean=decode(K/'raa.png',table);part,reg=component_on_canvas(module,t,(a.shape[1],a.shape[0]));out[y0:y1,x0:x1,:3]=extended_rgb(part)[y0:y1,x0:x1];out[out[:,:,3]==0,:3]=0;Image.fromarray(out).save(D/'egen-sammensatt.png')
+p.update(nytt_bildekall=False,avledet_fra='H130',egen_alfa_RGB_rettelse={'regel':'Når egen alfa skiftes fra egen H128 til egen H129, forlenges egne RGB fra nærmeste egen core først. Samme regel for hel egen H130-modul før dens RGB legges under H129-alfa. Ingen kildefiler lest for RGB-avgjørelser, ingen endring av ny alfa.','egne_transparente_basepiksler_som_fikk_alfa':int(made_opaque.sum()),'egne_piksler_som_fikk_core':int(made_core.sum()),'registrering_alfa':registration,'registrering_modul':reg,'modulrens':clean,'inn_sha256':{str(f.relative_to(R)):hashlib.sha256(f.read_bytes()).hexdigest()for f in[B/'egen-renset.png',C/'egen-renset.png',K/'raa.png']}});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');print(json.dumps(p['egen_alfa_RGB_rettelse'],ensure_ascii=False)[:500])

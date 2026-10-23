@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from smhd.myk import place
+import numpy as np,json,sys
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1995til1999-20261023';K=R/'kall'/sys.argv[1];a=np.array(Image.open(K/'egen-sammensatt.png').convert('RGBA'));q=json.loads((K/'kontroll.json').read_text());src=np.array(Image.open(R/f"kilder/{q['rute']}/original-1x.png").convert('RGBA'));ref=np.array(Image.open(K/'original-native-kontroll.png').convert('RGBA'));px,py=q['margx']*4,q['margy']*4;oy,ox=np.where(src[:,:,3]>0);by,bx=np.where(src[:,:,3]==0);cols=np.unique(src[src[:,:,3]>0,:3],axis=0);pred=[]
+for col in cols:
+ tar=np.all(ref[:,:,:3]==col,2)&(ref[:,:,3]>0);sy,sx=np.nonzero(np.all(src[:,:,:3]==col,2)&(src[:,:,3]>0));pred.append((col,nd.distance_transform_edt(~tar),py+sy*4+2,px+sx*4+2))
+def shift(a,dx,dy):
+ o=np.zeros_like(a);h,w=a.shape[:2];x0,y0=max(0,dx),max(0,dy);x1,y1=min(w,w+dx),min(h,h+dy);o[y0:y1,x0:x1]=a[y0-dy:y1-dy,x0-dx:x1-dx];return o
+rows=[];best=None
+for fx in [.985,.99,.995,1.,1.005,1.01,1.015]:
+ for fy in [.985,.99,.995,1.,1.005,1.01,1.015]:
+  sx,sy=q['hel_skala'][0]*fx,q['hel_skala'][1]*fy;placed=place(a,src,sx,sy);b=placed['bilde'];px,py=placed['margx']*4,placed['margy']*4;ref=np.zeros_like(b);ref[py:py+src.shape[0]*4,px:px+src.shape[1]*4]=np.repeat(np.repeat(src,4,0),4,1);pred=[]
+  for col in cols:
+   tar=np.all(ref[:,:,:3]==col,2)&(ref[:,:,3]>0);cy,cx=np.nonzero(np.all(src[:,:,:3]==col,2)&(src[:,:,3]>0));pred.append((col,nd.distance_transform_edt(~tar),py+cy*4+2,px+cx*4+2))
+  bb=np.array(Image.fromarray(a).resize((round(a.shape[1]*sx),round(a.shape[0]*sy)),Image.Resampling.NEAREST));xx,yy=px+placed['flytt'][0],py+placed['flytt'][1];can=np.zeros_like(b);hh,ww=bb.shape[:2];x0,y0=max(0,xx),max(0,yy);x1,y1=min(xx+ww,can.shape[1]),min(yy+hh,can.shape[0]);can[y0:y1,x0:x1]=bb[y0-yy:y1-yy,x0-xx:x1-xx]
+  for dy in range(-2,3):
+   for dx in range(-2,3):
+    v=shift(can,dx,dy);nv=shift(b,dx,dy);core=nv[:,:,3]>=128;pos=nd.distance_transform_edt(~core);neg=nd.distance_transform_edt(core);bad=int((pos[py+oy*4+2,px+ox*4+2]>3).sum());holes=int((neg[py+by*4+2,px+bx*4+2]>3).sum());extra=0
+    for col,tar,syy,sxx in pred:
+     have=np.all(v[:,:,:3]==col,2)&(v[:,:,3]>=128);dist=nd.distance_transform_edt(~have)[syy,sxx]if have.any()else np.full(len(syy),999.);bad+=int((dist>3).sum());extra+=int((tar[have]>3).sum())
+    row={'fx':fx,'fy':fy,'dx':dx,'dy':dy,'bad':bad,'extra':extra,'holes':holes};rows.append(row)
+rows.sort(key=lambda z:(z['bad']+z['extra']+z['holes'],abs(z['fx']-1)+abs(z['fy']-1),abs(z['dx'])+abs(z['dy'])));(K/'hel-affin-diagnose.json').write_text(json.dumps({'ingen_lokale_trekkflytt':True,'maks_hel_skala_avvik_prosent':1.5,'applied':False,'rows':rows},indent=2)+'\n');print(rows[:6]);print('all zero',sum(z['bad']==z['extra']==z['holes']==0 for z in rows))
