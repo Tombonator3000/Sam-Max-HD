@@ -1,0 +1,5 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;cid=sys.argv[1];n=int(sys.argv[2]);refs=[Path(f)for f in sys.argv[3:]];K=R/'kall'/cid;K.mkdir(parents=True,exist_ok=True);assert not(K/'plan.json').exists();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();prompt=(K/'prompt-brukt.txt').read_text().strip()
+args=dict(prompt=prompt,referenced_image_paths=list(map(str,refs)),transparent_background=True);(K/'argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n');(K/'plan.json').write_text(json.dumps(dict(kall=cid,rute=n,jobb='fig178_03',utfort=False,planlagt_utc=datetime.now(timezone.utc).isoformat(),referanser=[dict(fil=str(p),sha256=sha(p))for p in refs],kilde_sha256=sha(P/f'work/extract/costumes/costume178_{n}.png'),original_kontekst_og_stil_visuelt_sett=True,prompt_korrigering='Faktisk enkeltruteprompt og eventuelt målrettet returretting. Beskyttede jobbfiler urørt. Retur er bare redigeringsmål,aldri stilanker.'),ensure_ascii=False,indent=2)+'\n');print('Plan',cid,n)

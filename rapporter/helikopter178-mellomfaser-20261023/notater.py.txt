@@ -1,0 +1,48 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+why={'H014':'Valgt2017 etter målrettet innebygd nytegning av egne grå og brune fargefelter. Alle farge-,alfa- og åpningfester består3HD.','H015':'Fire fargepunkter utenfor3HD. To grå55,ett grå71 ogett grå151. Ingen import.','H016':'Grå felter er rettet,men ett svart kildefelt ved brunbasen er feil,maks15,30HD. Ingen import.','H017':'Valgt2016 etter innebygd retting av ett svart kildefelt. Egen isolert venstre strek og hoveddel er bevart,ingen største-komponent-rensing. Alle fester består3HD,maks3HD.','H018':'Helformforholdet0,819 er utenfor0,88..1,12. Ett opakt feste og flere fargefelt feiler. Ingen import.','H019':'Helform og alfa består,men mørkegrå,lysegrå og lysgrå felter feiler,maks19,42HD. Ny flisramme er også visuelt uønsket. Ingen import og aldri stilanker.'}
+for c,msg in why.items():
+ K=R/'kall'/c;q=read(K/'kontroll.json');f=read(K/'fargekontroll.json');(K/'notat.md').write_text(f'''# {c},costume178_{q['rute']}
+
+Innebygd image_gen, faktisk råfil,prompt og argumenter er bevart med SHA. Ingen CLI/API-bildefallback. Godkjent Sam-master gjelder bare flat tegneseriefinish; returer brukes bare som redigeringsmål. Beskyttede jobbfiler er uendret.
+
+{msg}
+
+Snitt/union {q['snitt_union']},dekning {q['dekning']}. Teknisk port {q['tekniske_porter_bestatt']},alfa/åpninger3HD {q['alle_alfa_fester_innen3HD']},fargefester3HD {f['alle_fargefester_innen3HD']}. RGB-matte renses fra egen tegning og matches globalt til kildepaletten. Egen alfa beholdes,hele motivet plasseres samlet i4x. Ingen originalmaskeklipp,originalfragmenter eller lokale trekkflyttinger. Ingen ny Tom-/Claude-godkjenning.
+''')
+(R/'RETUR.md').write_text('''# Fire kvalitetsreturer,ingen import
+
+H015/2016 har fire feilplasserte grå fargepunkter. H016 retter disse,men bytter også ett svart felt ved brunbasen. H017 er den nye valgte rettingen. Begge tidligere forsøk er bevart som retur.
+
+H018/2015 består ikke helskalaforholdet eller alle farge-/alfafester. H019 er bedre i form,men har fortsatt to mørkegrå,syv lysegrå og ett lyst gråpunkt utenfor3HD,og en uønsket flisramme. Ingen2015-kandidat skal importeres eller brukes som stilanker. Bruk originalen og Sam-masteren på nytt ved neste forsøk.
+
+H014/2017 ogH017/2016 er valgte egne tegninger. Ingen kilde-/kvalitetsport er endret eller senket. Ingen avviste fragmenter brukes som erstatning for manglende tegning.
+''')
+(R/'NESTE.md').write_text('''# Gjenoppta neste mellomfase
+
+Les mottak-publisert.json først. H014/2017 ogH017/2016 er nye valgte tegninger; ikke gjenta H014..H019. Neste nye178-kallH020 er ikke utført eller reservert.
+
+Fortsett2015. H019 er bare retur og ikke stilanker. Fargen55 er feil ved to kildepunkter,151 ved syv og191 ved ett. Se kilder/2015/referanse-kvadrat.png,hele motorbildet og godkjent Sam-master. Det lysegrå feltet til høyre langs brunposten og små gråfester må bestå. Unngå den nye flisrammen. H018 har også feil helforhold0,819 og skal ikke importeres. Ingen lokal flytting av trekk eller klipping mot originalmaske.
+
+2010..2016 har nå helt synlige motorbekreftede kilder ved kontrollert aktørpos160,60,rom35,palett0,zclip0 og eksplisitt RGB565-rundtur. Første y100-probe skjulte2..9 kildepunkter i2010..2015;den er bevart som utilstrekkelig grunnlag. Bare2016 var helt synlig der. De nye kvadratiske hjelpereferansene viser hele motivet med marg;tidligere for brede hjelpebilder ble rettet før noe2015-kall. 53 av102 familiekilder logget,ikke alle.1990 er fortsatt venstreklipt og må få en hel synlig kilde før produksjon.
+
+Etter kvittering er fig178_03 delvis6/12,familien6/102 ogmodden3707. Tidligere2018..2021 og alle deres delarkpiksler skal bevares.2010..2014 er ikke laget,2015 er retur. Ingen hel resultat.png ennå. Felles Linux/Windows isblokk er fortsatt3701 og mangler seks ruter. Oppdater begge ved neste familie-/ark-samlepunkt eller avslutning med nedlasting,sjekksummer og faktisk filkontroll. Hele figurjobber507/1758,1251 uten pluss returer/sluttkontroll. Ingen ny nødvendig Tom-designavklaring;fortsett automatisk. Neste137-kallV013 og296-kallS037 er uendret og ikke utført. Ingen grafikk til main og ingen gammel nattevakt.
+''')
+(R/'RAPPORT.md').write_text('''# To nye mellomfaser fra helikopter178
+
+Seks faktiske innebygde image_gen-kall H014..H019 gir to valgte egne tegninger og fire kvalitetsreturer. H014 retter2017 fra en gammel kvalitetsretur. H017 retter2016 og beholder både den isolerte venstre streken og hoveddelen. Ingen ny hel figurjobb:fig178_03 er delvis6/12,familien6/102. Alle tidligere delarkpiksler er bytebevart. Faktiske prompter,argumenter,råfiler,notater,alfamål,fargefester og SHA-rutekart ligger i rapporten.
+
+Alle valgte farge-,alfa- og åpningfester er innen3HD,maks3HD. Egen RGB-matte og global nærmeste kildepalett renses uten romlige kildemasker. Hele tegningen plasseres i4x. Ingen originalmaskeklipp,originalfragmenter,lokale trekkflyttinger,største-komponent-rensing eller CLI/API-bildefallback. Selvstendige svært svake alfapunkter er målt som diagnostikk og er ikke klippet;alfa1 betyr1/255 dekning. Kompositt mot faktisk bakgrunn er visuell fasit,ikke råRGB i transparente PNG-piksler.
+
+Original egenkontroll gir4/10 OK på delarket,seks tomme mål gir exit2.2016..2019 er med;tidligere2020/2021 hopper kontrollen over som masker under20 kildemaskepiksler. Automatisk mottak av bare de to nye gir2 OK,0 SJEKK. Den diagnostiske automatiske eksporten brukes ikke som erstatning for de SHA-festede egne prototypene. Tidligere dokumenterte SJEKK for2020/2021 er fortsatt historisk uavklart.
+
+Sju kilder2010..2016 er nå bekreftet helt synlige mot originalaktøren i en fersk kontrollert rom35-avspilling ved pos160,60,zclip0,palett0 og RGB565-rundtur. Alle har0 avvik og0 indeks13-piksler. Første eksisterende pos160,100 skjulte2..9 opake punkter i2010..2015 og var ikke tilstrekkelig kildegrunnlag for dem. Den feilen er bevart og avklart før nytegning. De kvadratiske hjelpereferansene for brede kilder ble tilpasset til hele motiver før bruk;ingen klipt2015-referanse er brukt i et bildekall. Ingen kildeskript eller motorkode er endret. Dette er ikke naturlig gjennomspilling.
+
+Prosjektbibliotekets figurark-fast-storrelse og publisert-mod-er-fasit brukes med opphavets PASS-begrensning. Metoden kontrolleres lokalt mot gjeldende smhd.myk,numpy/Pillow og faktisk ScummVM128c9c11. Tilpasningen her er utelukkende egne bildekandidater,kontrollbevis og additiv publisering. Ingen annen bildegenereringstjeneste er brukt.
+
+Nativekandidaten3707 bevarer alle21949 tidligere filstier og alle21943 tidligere PNG-hash. Alle1472 beskyttede input og tre opprinnelige stasher skal være uendret før og etter publisering. Hele figurjobber507/1758,1251 uten i tillegg til returer/sluttkontroll. Ingen ny Tom-/Claude-godkjenning,ingen ny interaktiv Windows-/webtest eller samlet sluttgodkjenning. Fellespakker er fortsatt3701,mangler seks. Oppdater begge ved neste familie-/ark-samlepunkt eller avslutning,med reelle nedlastinger og full filkontroll. All grafikk er ikke ferdig og automatikken forblir ACTIVE.
+''')
+for p in O.glob('*.py'):shutil.copy2(p,R/(p.name+'.txt'))
+print('Notater for seks faktiske kall og nesteH020 lagret.')
