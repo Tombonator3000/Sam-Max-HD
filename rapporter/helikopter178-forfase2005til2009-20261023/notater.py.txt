@@ -1,0 +1,27 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,re,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;receipt=json.loads((R/'mottak-publisert.json').read_text());assert receipt['alle_filhash_bekreftet']and receipt['native']==3714
+native=receipt['hd_mod'];art=receipt['grafikkilde'];text=f'''En ny egen helikopterfase2008/H065 i fig178_02 er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert.18 faktiske innebygde image_gen-kallH053..H070 for fem kilder2005..2009 gir én valgt og17 kvalitetsreturer. fig178_02 er delvis1/24,familien13/102. Ingen ny hel figurjobb:508/1758 har resultat,1250 uten,pluss returer og sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+
+hd-mod {native},grafikkilde {art},har3714 native. Alle21958 filhash er faktisk hentet tilbake og kontrollert.21957 tidligere stier og21951 tidligere PNG-hash er bevart.1472 festede beskyttede input og alle tre opprinnelige stasher er uendret. Bare den SHA-festede egne native2008 er lagt til;diagnostisk automatisk eksport er ikke importert. Delark1536x1024 og rutekart er SHA-festet,ingen hel resultat.png leveres. Original egenkontroll1OK+23 tomme mål gir forventet exit2;automatisk mottak1OK0SJEKK.
+
+Fargen og åpningene i valgt2008 består uendret3HD,IoU0,944,dekning0,967,to egne atskilte grupper. Ny ren egenkodekontroll viser alle kildefester innen3HD og ingen egne kodepiksler mer enn3HD utenfor tilsvarende kildeflater. Den vanlige nativepalettmålingen overså først små kodefelt iH055/H058;ekstrakontrollen tok begge tilbake før mottak. H055s mintkalibrering er bevart,men kandidaten er ikke valgt. Ingen hard originalmaskeklipp,kildefragmenter,lokal påmaling eller lokale trekkflyttinger. Egen ekte alfa,global egenRGB-rens og helplassering. Kildeløs replay gjenlager valgt egenRGBA og native eksakt. Ingen motor-/pipelinekodeendring;lokale hjelpefiler er bare arkivert som py.txt i grafikkrapporten.
+
+To ferske kontrollerte avspillinger med den faktiske nye nedlastede4e32ae90-Linux-binæren sammenligner3713 mot3714 ved rom35,pos160,60,zclip0,kostyme178,anim1 og aktør29.160 kontroller/148null per side,120/120null etterframe40. Tolv kjente inngangsavvik har identiske koordinater og beggeRGB. Originalrektangel med8HD naboområde er identisk;ingen uforklarteHD-endringer.4718 synligeHD-piksler endres i aktørrektangelet. Atomiske lagringer består. Hele motorbildet,komplett før/etter-par,valgt native,delark og24 sekvensfaser1998..2021 er faktisk visuelt sett.53 kilder logget,ikke alle102 eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+Felles Linux/Windows helikopter-utgaven er fortsatt3713 og mangler én native. Forrige samlepunkt er ferdig nedlastet og kontrollert;ingen ny pakkedispatch i denne bunken. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning. Nåværende fellesrelease og alle47 eksisterende releaser ble lest før publisering;ingen release eller vedlegg er endret. Ingen aktiv pakkejobb/nativefrys ved nativepubliseringen.
+
+Gjenoppta fire returer2009,2007,2006,2005 fra rapporter/helikopter178-forfase2005til2009-20261023.2008 skal ikke gjentas. Les RETUR.md,NESTE.md og kodeflate-kontroll-samlet.json først. Neste178-kallH071 er ikke utført eller reservert.1990 krever fortsatt ny hel kilde fordi tidligere kilde er venstreklipt.137V013 og296S037 er uendret og ikke utført. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE;all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattevakt.'''
+marker='helikopter178-forfase-status';block=f'<!-- {marker}:start -->\n'+text+'\n<!-- '+marker+':slutt -->\n'
+def prepend(path):
+ s=path.read_text();s=re.sub(r'<!-- '+marker+r':start -->.*?<!-- '+marker+r':slutt -->\n*','',s,flags=re.S);lines=s.splitlines(keepends=True);first=lines[0].rstrip();rest=''.join(lines[1:]).lstrip();path.write_text(first+'\n\n'+block+'\nTidligere status nedenfor er historikk.\n\n'+rest.rstrip()+'\n')
+for f in ['ORDRE.md','GRAFIKKLISTE.md']:prepend(A/f)
+for f in ['memory.md','todo.md','STATUS.md']:prepend(P/f)
+log=P/'log.md';time=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');log.write_text(log.read_text().rstrip()+'\n\n## '+time+' (Codex)\n\n'+text+'\n')
+(R/'RAPPORT.md').write_text((R/'RAPPORT.md').read_text().rstrip()+f'\n\nPublisert hd-mod {native},grafikkilde {art}. Alle21958 publiserte filhash er hentet tilbake og kontrollert. Alle tidligere21957 stier og21951 PNG,1472 beskyttede input og tre stasher er bevart. Lokal mods/gpt er atomisk erstattet med eksakt verifisert arkiv;3713-grunnlaget er bevart under out. Fellespakker3713 mangler én native.\n')
+q=json.loads((R/'gronne-flater-egenkontroll.json').read_text());q['begrensning']='H055 ogH058 er returer. BareH065 er valgt;dens rene kodeflatekontroll består uten manglende eller ekstra felt.';(R/'gronne-flater-egenkontroll.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+shutil.copy2(O/'grafikk-hentet-kontrollert.json',R/'grafikk-kvittering-hentet-kontrollert.json')
+for p in O.glob('*.py'):shutil.copy2(p,R/(p.name+'.txt'))
+print('Oppdatert ordre,liste,minne,todo,status,logg og publiseringsnotater. Ingen protected inputs endret.')
