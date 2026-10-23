@@ -2406,3 +2406,20 @@ Tidligere status nedenfor er historikk.
 
 
 Prosjektbibliotekets figurark-fast-storrelse,publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter er brukt med opphavets PASS-begrensning. Originalkontekst,palett og godkjent Sam-master ble sett før produksjon. Kontrollhjelpernes avbrutte oppsett er dokumentert, ingen avbrutt kjøring regnes bestått. Bare disse fire sentrale dokumentene legges direkte i main.
+
+## 2026-10-23 07:32 (Codex)
+
+<!-- helikopter178-retur-status:start -->
+To nye egne helikopterfaser er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert: costume178_2018/H013 og costume178_2019/H010. fig178_03 er delvis4/12, familien4/102. Tidligere2020/2021 og alle deres delarkpiksler er bevart. Fem nye innebygde bildekall gir to valgte og tre kvalitetsreturer. Originalkontroll2/10 OK for de to nye,åtte ruter mangler;tidligere2020/2021 hoppes over under20 kildemaskepiksler. Automatisk mottak2 OK,0 SJEKK for de nye. Ingen ny Tom-/Claude-godkjenning.
+
+Publisert hd-mod ed04de00e7e49789462f7fb8c93621428abb764f, grafikkilde 441bd6286149cabcda95c3c27288201859b29a83, har3705 native. Alle21949 filhash er hentet tilbake og kontrollert. Alle21947 tidligere filstier og21941 tidligere PNG-hash er bevart. Alle1472 beskyttede input og tre opprinnelige stasher er uendret. H010 bruker global,ikke-romlig rensing av tre tydelig atskilte egne brune RGB-klynger. H013 er flyttet2HD som hel tegning. Alle farge-,alfa- og åpningfester er innen3HD,maks2,828427HD. Egen alfa,ingen originalmaskeklipp,originalfragmenter,lokale trekkflyttinger eller CLI/API-bildefallback.
+
+To ferske kontrollerte Linux-avspillinger med faktisk nedlastet128c9c11 har160 bufferkontroller/148 null per side og120/120 null etter frame40. De12 kjente inngangsavvikene er identiske i koordinater og begge RGB-verdier. Originalrektangler med8HD naboområde er identiske,ingen uforklarte HD-endringer,atomisk lagring består. To hele motorbilder,to komplette før/etter-par og alle12 sluttfaser er visuelt sett.53 faser logget,ikke alle102;ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller samlet sluttgodkjenning.
+
+Felles Linux/Windows isblokk er fortsatt3701 og mangler fire ruter. Begge faktiske pakker er tidligere kontrollert;de kalles ikke oppdatert. Neste familie-/ark-samlepunkt eller avslutning skal oppdatere begge med nedlasting,sjekksummer og filkontroll. Hele figurjobber507/1758,1251 uten i tillegg til returer/sluttkontroll. Fortsett2017 fra rapporter/helikopter178-retur-20261023/NESTE.md og RETUR.md. Neste178-kallH014,137-kallV013 og296-kallS037 er ikke utført eller reservert. Ingen ny nødvendig designavklaring. Automatikken er ACTIVE;all grafikk er ikke ferdig. Ingen grafikk til main,motor-/pipelinekodeendring eller gammel nattevakt.
+<!-- helikopter178-retur-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
+
+Prosjektbibliotekets figurark-fast-storrelse,publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter er brukt med opphavets PASS-begrensning. Beskyttede kilder,originalkontekst og Sam-master er sett før bildekall. Kvalitetsreturer importeres ikke. Bare de fire sentrale dokumentene committes direkte i main.
