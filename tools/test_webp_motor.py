@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 
 from PIL import Image
@@ -24,6 +25,26 @@ def main() -> None:
     binary = Path(os.environ.get("WEBP_TEST_BINARY", root / "engine/scummvm/scummvm")).resolve()
     out = Path(os.environ.get("WEBP_TEST_OUT", root / "out/webp-test")).resolve()
     out.mkdir(parents=True, exist_ok=True)
+    # Keep the real scene assets, without spending every CI run encoding the
+    # entire production library. A full migration is verified separately.
+    published = source
+    source = out / "png-input"
+    source.mkdir()
+    for path in sorted(published.rglob("*")):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(published).as_posix()
+        if not (relative == "mod.json" or relative.startswith(("objects/", "fonts/")) or
+                re.fullmatch(r"rooms/room(?:007|009|035)(?:_idx|_mask)?\.(?:png|webp)", relative) or
+                re.fullmatch(r"costumes/costume(?:001|178)_\d+(?:_hd|_idx|_mask)?\.(?:png|webp)", relative)):
+            continue
+        dest = source / relative
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if path.suffix == ".webp":
+            with Image.open(path) as image:
+                image.convert("RGBA").save(dest.with_suffix(".png"))
+        else:
+            shutil.copy2(path, dest)
     target = out / "mod-webp"
     migration = convert_mod(source, target, workers=2)
     scenes = [(7, 1), (9, 1), (35, 178)]
@@ -65,7 +86,8 @@ def main() -> None:
                 comparisons.append({"room": room, "frame": name, "rgba_equal": same,
                                     "png_sha256": hashlib.sha256(images[0][name].read_bytes()).hexdigest(),
                                     "webp_sha256": hashlib.sha256(images[1][name].read_bytes()).hexdigest()})
-    report = {"colour_images_exact": sum(row.get("rgba_exact", False) for row in migration["files"]),
+    report = {"fixture_subset_of_published_mod": True,
+              "colour_images_exact": sum(row.get("rgba_exact", False) for row in migration["files"]),
               "converted": migration["converted"], "comparisons": comparisons,
               "all_frames_equal": all(row["rgba_equal"] for row in comparisons)}
     (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")

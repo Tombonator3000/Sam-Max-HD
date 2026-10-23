@@ -57,6 +57,7 @@ for name in achievements.dat classicmacfonts.dat encoding.dat gui-icons.dat help
 done
 cp "$SRC/COPYING" "$DATA/COPYING-ScummVM.txt"
 cp "$SRC/COPYRIGHT" "$DATA/COPYRIGHT-ScummVM.txt"
+cp /usr/share/doc/libwebp7/copyright "$DATA/COPYING-libwebp.txt"
 
 # Hva pakken er bygget av
 {

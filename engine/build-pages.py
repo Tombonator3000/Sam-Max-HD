@@ -79,6 +79,8 @@ def pack(src: Path, out: Path) -> dict:
             archive.add(HERE / name, arcname='sam-max-hd-source/engine/' + name)
         for name in UI:
             archive.add(HERE / 'pages' / name, arcname='sam-max-hd-source/engine/pages/' + name)
+        archive.add(webp_license.with_name('libwebp-source.tar.gz'),
+                    arcname='sam-max-hd-source/vendor/libwebp-1.6.0.tar.gz')
         archive.add(HERE.parent / 'docs/PAGES.md', arcname='sam-max-hd-source/BUILD.md')
 
     hashes = {str(file.relative_to(out)): hashlib.sha256(file.read_bytes()).hexdigest()

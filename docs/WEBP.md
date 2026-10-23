@@ -42,7 +42,7 @@ bruker libwebp 1.6.0 bygget fra kilde med låst SHA-256, sammen med den eksister
 låste Emscripten-versjonen. Lisensen følger Pages-pakken.
 
 `WebP-motor` i Actions bygger Linux og nettleseren. Linux-prøven konverterer
-publisert mod og sammenligner faktisk avspilling mot PNG i tre kontrollerte
+et utvalg fra publisert mod og sammenligner faktisk avspilling mot PNG i tre kontrollerte
 scener med samme motor og tilfeldighetsfrø. Bildenes rå RGBA sammenlignes.
 Dette er formatkontroll, ikke en ny visuell stilgodkjenning. Pipeline- og
 nettsidetestene dekker også alfa, dupliserte palettfarger og blandede modmapper.

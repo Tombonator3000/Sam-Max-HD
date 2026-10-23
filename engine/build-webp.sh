@@ -6,7 +6,7 @@ DEST="${1:?Bruk: engine/build-webp.sh installasjonsmappe}"
 WEBP_VERSION=1.6.0
 WEBP_SHA=e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564
 STAMP="$WEBP_VERSION $(emcc --version | head -1)"
-if [ -f "$DEST/lib/libwebp.a" ] && [ "$(cat "$DEST/.bygget" 2>/dev/null || true)" = "$STAMP" ]; then
+if [ -f "$DEST/lib/libwebp.a" ] && [ -f "$DEST/libwebp-source.tar.gz" ] && [ "$(cat "$DEST/.bygget" 2>/dev/null || true)" = "$STAMP" ]; then
   exit 0
 fi
 mkdir -p "$DEST"
@@ -22,4 +22,5 @@ emconfigure ./configure --prefix="$DEST" --disable-shared --enable-static \
 emmake make -j"${JOBS:-2}"
 emmake make install
 cp COPYING "$DEST/COPYING.libwebp"
+cp "$BUILD/source.tar.gz" "$DEST/libwebp-source.tar.gz"
 printf '%s\n' "$STAMP" > "$DEST/.bygget"

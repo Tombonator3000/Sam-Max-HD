@@ -48,6 +48,7 @@ for name in achievements.dat classicmacfonts.dat encoding.dat gui-icons.dat help
 done
 cp "$SRC/COPYING" "$DIR/COPYING-ScummVM.txt"
 cp "$SRC/COPYRIGHT" "$DIR/COPYRIGHT-ScummVM.txt"
+cp /mingw64/share/licenses/libwebp/COPYING "$DIR/COPYING-libwebp.txt"
 
 echo "Kopierer spillet, talen og HD-modden ..."
 cp "$ROOT/game/SAMNMAX.000" "$ROOT/game/SAMNMAX.001" "$ROOT/game/MONSTER.SOU" "$DIR/game/"

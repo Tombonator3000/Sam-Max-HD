@@ -29,6 +29,12 @@ def sha256(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def write_report(path: Path, report: dict) -> None:
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+    temporary.replace(path)
+
+
 def convert_image(source: Path, target: Path) -> dict:
     """Encode a colour PNG, verify pixels, and keep the smaller representation."""
     original_hash = sha256(source)
@@ -108,13 +114,13 @@ def convert_mod(source: Path, destination: Path, workers: int = 2) -> dict:
             for row in pool.map(one, [p for p in files if p.name not in {"SHA256SUMS", "webp-migration.json"}]):
                 report["files"].append(row)
                 if len(report["files"]) % 100 == 0:
-                    manifest.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+                    write_report(manifest, report)
         report["source_bytes"] = sum(row["source_bytes"] for row in report["files"])
         report["target_bytes"] = sum(row["target_bytes"] for row in report["files"])
         report["converted"] = sum(row["target"].endswith(".webp") and row["source"].endswith(".png") for row in report["files"])
         report["complete"] = True
     finally:
-        manifest.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+        write_report(manifest, report)
     checksums = []
     for path in sorted(destination.rglob("*")):
         if path.is_file() and path.name != "SHA256SUMS":
