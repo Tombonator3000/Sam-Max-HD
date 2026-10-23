@@ -2495,3 +2495,11 @@ Tidligere status nedenfor er historikk.
 
 
 Prosjektbibliotekets figurark-fast-storrelse og publisert-mod-er-fasit er brukt med faktisk lokal verifisering. Bare de fire sentrale dokumentene committes direkte i main.
+
+## 2026-10-23 10:09 (Codex)
+
+Komplett fig178_03 er publisert med12/12 ruter. Ny2010/H052 er egenkontrollert,native mottatt,visuelt sett og motorobservert.508/1758 hele figurjobber har resultat,1250 er uten pluss returer/sluttkontroll. Familien178 er12/102. hd-mod ed8ab7673806be10466ad975058e1f390cb94568 har3713 native. Alle21957 filhash er hentet tilbake og bekreftet,alle21956 tidligere stier og21950 tidligerePNG er bevart.1472 beskyttede input og tre stasher er uendret. Ingen ny Tom-/Claude-godkjenning.
+
+NATIVE3713 ER FROSSET under pakkesamlepunktet. Linux39922327114 og Windows39922332546 er sendt én gang hver fra kodec46862b0853811f67cc4e62884b923c94ad0a0d3. Begge kjører;ingen nye dispatches. Tidligere fellespakke er3701 og mangler alle12 helikopterfasene. Rullerende Linux-/Windows-utgaver fra planlagte jobber er separate,og Windows flyttet Latest. Tidligere fellesrelease isblokk og alle fire vedlegg er bevart. Ny fellesrelease skal først kalles oppdatert etter faktisk nedlasting,sjekksummer,full kontroll av21956runtime-modfiler per pakke og motorprøve. Behold frysen også gjennom forventet automatisk taggbygg.
+
+Les rapporter/felles-release-20261023-helikopter/bygg-startet.json og journalene før videre handling. Hele arket og råbilder,prompter,rutekart,returer og motorbevis finnes i rapporter/helikopter178-siste2010-20261023. Originalkontroll10/10OK,to små hoppes over;helarkmottak10OK+to beholdte størrelses-SJEKK. Bare ny egen2010 er lagt til,ingen gamle native er re-eksportert. Neste178-kallH053,137V013 og296S037 er ikke utført eller reservert. Etter pakkekontroll velges neste hele kilde2009 i fig178_02 og ses i kontekst før nytegning. Ingen ny nødvendig designavklaring. All grafikk er ikke ferdig og automatikken fortsetter. Ingen grafikk til main eller gammel nattevakt.
