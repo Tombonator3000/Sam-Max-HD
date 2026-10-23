@@ -1,0 +1,18 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def git(*a):return subprocess.check_output(['git',*a],cwd=A)
+commit=git('rev-parse','HEAD').decode().strip();subprocess.run(['git','fetch','-q','origin','gpt-arbeid:refs/remotes/origin/gpt-arbeid'],cwd=A,check=True);assert git('rev-parse','origin/gpt-arbeid').decode().strip()==commit
+base='ec59bb4be0275daa30d9deedd7259095d1e61bc8';names=[s.decode()for s in git('diff','--name-only','-z',base,commit).split(b'\0')if s]
+dirty={s.decode() for s in git('diff','--name-only','-z').split(b'\0') if s}
+allowed={'rapporter/helikopter178-mellomfaser-20261023/'+f for f in ['egen-native.json','fremdrift.json','rutekart-fig178_03.json','rutekart-samlet.json','sluttkontroll.json','kall/H014/kontroll.json','kall/H017/kontroll.json']}
+assert dirty<=allowed,dirty
+objects={}
+p=subprocess.Popen(['git','cat-file','--batch'],cwd=A,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+for name in names:
+ p.stdin.write((commit+':'+name+'\n').encode());p.stdin.flush();head=p.stdout.readline().decode().strip().split();assert len(head)==3 and head[1]=='blob';size=int(head[2]);blob=p.stdout.read(size);assert p.stdout.read(1)==b'\n';digest=hashlib.sha256(blob).hexdigest();assert name in dirty or digest==sha(A/name),name;objects[name]=digest
+p.stdin.close();assert p.wait()==0
+start=json.loads((R/'start.json').read_text());assert all(sha(A/f)==h for f,h in start['beskyttede'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==start['stash']
+q=dict(grafikkilde=commit,hentet_fra='origin/gpt-arbeid',filer=len(objects),alle_uendrede_SHA256_stemmer=True,etterfolgende_publiseringsmetadata=sorted(dirty),beskyttede=1472,stasher=3,filhash=objects)
+(O/'grafikk-hentet-kontrollert.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n');print('Grafikkilde',commit,len(objects),'blobhash verifisert etter fetch.',flush=True)
