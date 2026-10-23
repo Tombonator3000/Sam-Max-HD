@@ -1,0 +1,27 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;r=json.loads((R/'mottak-publisert.json').read_text());assert r['alle_filhash_bekreftet']and r['native']==3712
+now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M');mod=r['hd_mod'];art=r['grafikkilde']
+info=f'''Tre nye egne helikopterfaser er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert: costume178_2013/H042, 2012/H045 og 2011/H046. fig178_03 er delvis 11/12, familien 11/102. Alle åtte tidligere delarkruters RGBA er bevart. Ti faktiske innebygde image_gen-kall H040..H049 gir tre valgte og sju kvalitetsreturer. Automatisk mottak av bare de tre nye gir 3 OK, 0 SJEKK. Original egenkontroll gir 9/10 OK og exit2 bare for manglende2010. Små2020/2021 hoppes over; tidligere SJEKK for dem er fortsatt åpne. Ingen ny hel figurjobb eller Tom-/Claude-godkjenning.
+
+Publisert hd-mod {mod}, grafikkilde {art}, har 3712 native. Alle 21956 filhash er hentet tilbake og kontrollert. Alle 21953 tidligere filstier og 21947 tidligere PNG-hash er bevart. Alle 1472 beskyttede input og tre opprinnelige stasher er uendret. Valgte farge-, alfa- og åpningsfester består uendret3HD. Egen core har 4,2 og3 grupper, som kilden.
+
+Tydelig merket falskfarget hjelpereferanse med virkelig original, spillkontekst og godkjent Sam-master gir bedre skille mellom gråfargene. Global kodefargedekoding og RGB-kantbehandling bruker bare egne kodeklasser, egen alfa og egne indre markører. Kildeløs replay gjenskaper alle tre egne RGBA og native eksakt fra råfil, kodetabell og helplassering. Bare egen svak alfa1..7 fjernes globalt som støv, alle egne core128 og kildebekreftede smådeler er bevart. Ingen originalmaskeklipp, kildefragmenter, lokal fargepåmaling, lokal trekkflytting eller CLI/API-bildefallback. Den tidlige visuelle mistanken om innført grønt på stolpen ble avkreftet ved måling, både før og etter rens. Se gronn-kantmistanke-avkreftet.json.
+
+To ferske kontrollerte Linux-avspillinger med faktisk nedlastet128c9c11 sammenligner3709 mot3712 ved pos160,60, zclip0, rom35, kostyme178, anim1 og aktør29. Begge har160 kontroller,148 null og120/120 null etter frame40. Tolv kjente inngangsavvik er identiske i koordinater og begge RGB-verdier. Originalrektangler med8HD naboområde er identiske; ingen uforklarte HD-endringer. Atomisk lagring består. Alle tre nye ruter er observert, tre hele motorbilder, tre komplette før/etter-par, alle12 sluttfaser, native og delark er visuelt sett.53 kildefaser logget, ikke alle102 eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+2010 er fortsatt fargeretur. H047 er nærmest, med to191-grå punkter utenfor3HD ved(42,1) og(39,3). H048 mister grønt, H049 har fire gråfargefeil. Ingen retur importeres. Neste178-kall H050 er ikke utført eller reservert. Se original2010 i kontekst og Sam-master på nytt før nytegning. Kilde1990 trenger fortsatt ny hel visning. Ingen ny nødvendig Tom-designavklaring.
+
+Felles Linux/Windows isblokk er fortsatt3701 og mangler11 ruter. Begge pakker oppdateres ved fullført ark-/familiesamlepunkt eller avslutning, med faktiske nedlastinger, sjekksummer og full kontroll av inkludert grafikk. Hele figurjobber507/1758,1251 uten resultat, pluss returer og sluttkontroll. Les rapporter/helikopter178-fargekoder-20261023/NESTE.md og RETUR.md først. Neste137-kall V013 og296-kall S037 er uendret og ikke utført. Automatikken er ACTIVE; all grafikk er ikke ferdig. Ingen grafikk til main, motor-/pipelinekodeendring eller gammel nattevakt.'''
+block='<!-- helikopter178-fargekoder-status:start -->\n'+info+'\n<!-- helikopter178-fargekoder-status:slutt -->\n\nTidligere status nedenfor er historikk.\n\n'
+for root,names in [(A,['ORDRE.md','GRAFIKKLISTE.md']),(P,['memory.md','STATUS.md','todo.md'])]:
+ for name in names:
+  p=root/name;s=p.read_text();assert '<!-- helikopter178-fargekoder-status:start -->'not in s;first,rest=s.split('\n',1);p.write_text(first+'\n\n'+block+rest.lstrip('\n'))
+p=P/'log.md';p.write_text(p.read_text()+'\n## '+now+' (Codex)\n\n'+block+'\nProsjektbibliotekets figurark-fast-storrelse og publisert-mod-er-fasit er brukt med faktisk lokal verifisering. Bare de fire sentrale dokumentene committes direkte i main.\n')
+p=A/'jobber/fig178_03/notat.md';s=p.read_text();assert '<!-- helikopter178-fargekoder-status:start -->'not in s;first,rest=s.split('\n',1);p.write_text(first+'\n\n'+block+rest.lstrip('\n'))
+p=R/'RAPPORT.md';p.write_text(p.read_text()+f'\nPubliseringskvittering {now}: hd-mod {mod}, grafikkilde {art},3712 native. Alle21956 filhash er hentet tilbake og bekreftet. Alle tidligere filstier og PNG-hash,1472 beskyttede input og tre stasher er bevart. Fellespakker fortsatt3701. Ingen ny Tom-/Claude-godkjenning.\n')
+shutil.copy2(O/'grafikk-hentet-kontrollert.json',R/'grafikkilde-hentet-kontrollert.json')
+for f in ['revider-grafikk.py','status-etter.py']:shutil.copy2(O/f,R/(f+'.txt'))
+print('3712 dokumentert,tre valgte,sju returer,nesteH050.')
