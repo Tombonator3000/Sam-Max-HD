@@ -1,5 +1,25 @@
 # Status
 
+<!-- webp-og-rydding-20261023:start -->
+## WebP og lagringsrydding, 2026-10-23 18:30
+
+Toms bestilling om WebP-motor og tapsfri konvertering er fullført via PR 36. Motorkode er main 4d9f1e46b85cd431e6e03571ecda319755ea8151. Rapport, rutekart og slettejournal er publisert på gpt-arbeid 5d23128962f65fbd2ffd7596c162bb5859e7acff, under rapporter/webp-migrering-20261023/. Ingen nye motiver eller stilgodkjenninger er laget i denne omleggingen.
+
+Gjeldende hd-mod er 15835538ca4b4e70e95a0f227e7d41bea830400e, med PNG-grunnlag 2ba07d9cb94c99053fd0e97b0dfab903f3b01aff som Git-forelder. Alle 4872 fargebilder er tapsfri WebP. Alle RGBA-byte i 530782192 piksler er identiske, også RGB under alfa 0. 17089 indeks-/maske-PNG er uendret byte for byte. 3723 native er bevart. Modden går fra 499900803 til 368373643 byte inkludert nytt manifest. Hele publiserte modden er hentet tilbake som strøm og alle 21968 filer SHA256-kontrollert før lokal aktivering i mods/gpt. Den installerte engine/scummvm/scummvm er WebP-motoren. Originale jobbfiler, råbilder og resultat.png er bevart.
+
+69 pipeline-tester og 20 nettsidetester består. Faktisk PNG-/WebP-avspilling med hele modden gir 18 identiske bildepar i rom 7, 9 og 35. Endelig lokal prøve og CI gir 63 eksakte par ved lik original RGBA-tilstand, ingen utelatte tilstander. Den første CI-prøvens fire rom35-avvik er dokumentert; årsaken kan ikke bevises i ettertid fordi flatbildene ikke fulgte artefakten. Ingen HD-likhet brukes til parvalg. Den installerte motoren har seks sene skjermkontroller med null avvik. Motorbilder er visuelt sett. Dette er kontrollerte scener, ikke full naturlig gjennomspilling.
+
+Fellesutgivelsen [sam-max-hd-2026-10-23-webp](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-23-webp) er publisert med nye Linux-/Windows-pakker. Begge er faktisk lastet ned, pakkesjekksummer og alle 21968 medfølgende modfiler er kontrollert, og har 4872 WebP og 3723 native. Linux-pakken kjørte 160 bilder og lastet 21 WebP. Windows besto faktisk oppstart i Actions. Alle fire fellesvedlegg er deretter hentet tilbake og kontrollert. Nettmotor, WASM/JavaScript og kildearkiv er publisert og hashkontrollert; faktisk nettlesermotor når bilde 200 med WebP-rom. Nettleserskjermbilde kunne ikke hentes, så nettleseren er ikke merket visuelt sett.
+
+Tom godkjente sletting av både gamle out-kopier og erstattede PNG i modden etter verifisering. Fjernet 6240044 eksakte filer fra 293 gamle modkopier, 145 gamle arkivkopier, 257507 identiske motorbildekopier og den gamle aktive PNG-kopien. 53461 unike gamle motorbilder og 2340 avvikende modfiler er beholdt. Slettejournal og faste gjenopprettingskilder er i rapporten. Observert tilgjengelig filsystemplass økte fra 117413019648 til 298308096000 byte, omtrent 180.9 GB. Logiske filsummer er større enn fysisk gevinst på btrfs. Ingen Git-historikk er skrevet om. De tre opprinnelige stashene er uendret. Egne midlertidige testservere er stoppet og kodearbeidstreet er fjernet; installert motor er beholdt.
+
+Videre produksjon: Bruk gjeldende hd-mod, ikke gamle out-modkopier som nå er ufullstendige. Les docs/WEBP.md. Native fargebilder kan ligge som .webp; _idx.png og _mask.png forblir PNG. Nye grafikkreturer kan fortsatt leveres som PNG, men den tilsvarende gamle WebP-filen må erstattes i kandidaten før kontrollert konvertering. Ingen tvetydige PNG/WebP-par. Behold én kandidat per bunke, strøm fjernkontroll uten lagret TAR, og fjern verifiserte duplikater etterpå. Publiser med gjeldende mod som forelder og kontroller fjern-SHA på nytt. Ikke bruk force-push fra eldre tools/mod_gren.sh send.
+
+Figurstatus er fortsatt 508/1758, fig178_02 10/24 og familie178 22/102. Gjenoppta rapporter/helikopter178-retur2001og2000-20261023/NESTE.md og RETUR.md, med 1999..1995 som neste kildebekreftede bunke. Neste bildekall H126 er ikke utført. Automatikken er fortsatt ACTIVE med samme 20-minutters intervall og oppdaterte WebP-/ryddeinstrukser. All grafikk er ikke ferdig. Ingen gammel nattprosess er startet.
+<!-- webp-og-rydding-20261023:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-retur2001-2000-status:start -->
 Publisert hd-mod 2ba07d9cb94c99053fd0e97b0dfab903f3b01aff har 3723 native. Grafikkilde er gpt-arbeid 2f92cd2c06ca1d7b50441cfc3e62f817ad299ae7. Hele fjernarkivet er faktisk lastet ned som strøm, og alle 21967 filhash er kontrollert. Alle 21965 tidligere stier og 21959 tidligere PNG er bevart; bare mod.json og SHA256SUMS oppdateres som metadata. 1472 beskyttede input og tre opprinnelige stasher er uendret. Kandidaten er lokalt mottatt ved katalognavnbytte etter kontroll. 3721-grunnlaget er bevart under out. Ingen ekstra klon, lagret TAR eller kontrollkopi er opprettet. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 

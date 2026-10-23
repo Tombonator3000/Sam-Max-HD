@@ -65,7 +65,10 @@ python3 tools/indeks_info.py game/SAMNMAX.000
 
 ## Arbeid med motoren
 
-- Patchen ligger i `engine/patches/` og er foreløpig den samme som i The Dig. Gjør endringer i `engine/scummvm`, og lag patchen på nytt med
+- Fargebilder i den publiserte modden er tapsfri WebP fra 23. oktober 2026. Les `docs/WEBP.md` før motor-, mod- eller pakkeendringer. Originale grafikkjobber og råbilder beholder formatet sitt. Indeks- og maskebilder beholdes som PNG.
+- Bruk gjeldende `hd-mod` som grunnlag. Gamle `out/`-modkopier er ryddet for verifiserte duplikater og kan være ufullstendige. Ikke bruk `tools/mod_gren.sh send`, som force-pusher; bevar tidligere publiserte filer i Git-historikken og verifiser ny faktisk nedlasting.
+
+- Patchen ligger i `engine/patches/`. Gjør endringer i `engine/scummvm`, og lag patchen på nytt med
   `git -C engine/scummvm add -N engines/scumm/dighd.cpp engines/scumm/dighd.h && git -C engine/scummvm diff > engine/patches/0001-dighd-hd-grafikk.patch`.
 - ScummVM-versjonen er låst i `engine/SCUMMVM_COMMIT`. Bytt den bare sammen med en test av patchen.
 - Hva som må portes for v6: `docs/HD-MOTOR.md`.
@@ -77,4 +80,4 @@ python3 tools/indeks_info.py game/SAMNMAX.000
 | `main` | Kode og dokumentasjon |
 | `spilldata` | Spillfilene med sjekksummer, uten felles historikk med `main` |
 | `gpt-arbeid` | Arbeidsbordet med ChatGPT/Codex. Ingen jobber før stilpiloten er godkjent |
-| `hd-mod` | Siste ferdige HD-mod, én commit som erstattes. Tom til den første modden finnes |
+| `hd-mod` | Gjeldende ferdige HD-mod. Publiser additivt med tidligere mod som Git-forelder og kontroller fjern-SHA før push |
