@@ -1,0 +1,43 @@
+from pathlib import Path
+import json,hashlib,shutil
+from PIL import Image,ImageDraw
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+why={'H020':'Flere grå fargefester feiler. Ingen import.','H021':'To151-fester feiler,og flere nye gråtupper er visuelt for lyse. Ingen import.','H022':'Gråfarger er bedre,men mørkebrun base mangler,og tre andre fargegrupper feiler. Ingen import.','H023':'Tre tydelig atskilte egne brune RGB-klynger er kalibrert globalt mot kildepaletten,uten kildekoordinater. Brunfester består etter dette,men ett55 og to151-fester feiler fortsatt. Ingen import.','H024':'Valgt2015. Egen H023-tegning med global brunpalett ble brukt som redigeringsmål på grå hjelpebakgrunn. Innebygd image_gen rettet bare den feilaktige venstre gråtuppen. Alle egne farge-,alfa- og åpningfester består3HD,maks3HD.','H025':'Ett svart,ett151 og ett191-feste feiler. Ingen import.','H026':'Valgt2014 etter tre innebygde feltrettinger. Alle farge-,alfa- og åpningfester består3HD,maks2HD.','H027':'Form/alfa består,men mange grå og brune felt feiler. Egen core har fem deler mot fire kildegrupper. Ingen import.','H028':'Form og farge feiler,og prompten beskrev første gråstrek feil. Kilden er71,71,151;prompten sa55,115,151. Feilen er korrigert i det separate H029-kallet. Ingen import.','H029':'Korrigert kildetolkning og fire egne deler. Alfafester består,men kuttet=True og flere fargegrupper feiler. Ingen import.'}
+for c,msg in why.items():
+ K=R/'kall'/c;q=read(K/'kontroll.json');f=read(K/'fargekontroll.json');(K/'notat.md').write_text(f'''# {c},costume178_{q['rute']}
+
+Innebygd image_gen. Faktisk prompt,argumenter,råfil og referanser er SHA-festet. Beskyttede jobbfiler urørt. Ingen CLI/API-bildefallback.
+
+{msg}
+
+Snitt/union{q['snitt_union']},dekning{q['dekning']},kuttet{q['kuttet']}. Teknikk{q['tekniske_porter_bestatt']},alfa/åpninger3HD{q['alle_alfa_fester_innen3HD']},farger3HD{f['alle_fargefester_innen3HD']}. Egen alfa og hele deler er bevart. Bare egen global RGB-rens og hel4x-plassering. Ingen originalmaskeklipp,originalfragmenter,lokale trekkflyttinger eller største-komponent-rensing. Ingen ny Tom-/Claude-godkjenning.
+''')
+(R/'RETUR.md').write_text('# Åtte kvalitetsreturer\n\n'+'\n\n'.join(c+':'+why[c]for c in why if c not in ['H024','H026'])+'\n\nRetur er ikke stilanker. Fortsett2013 fra kildebekreftede farger og plasseringer,ikke fra en feil prompt eller en tidligere kandidats utseende.\n')
+(R/'NESTE.md').write_text('''# Gjenoppta2013
+
+Les mottak-publisert.json først. Ti faktiske kallH020..H029 er bevart;H024/2015 ogH026/2014 er valgte. Ikke gjenta dem. Neste nye178-kallH030 er ikke utført eller reservert.
+
+Fortsett2013. Kilden har fire atskilte grupper og første gråstrek er71,71,151. H028 beskrev denne feil;H029 korrigerer premisset,men er fortsatt retur. H029 har kuttet=True og fargefeil;H027 har godkjent alfa,men mange fargefeil og fem egne core-deler;H028 er klart feil i form. Ingen2013-kandidat skal importeres. Mørkebrun83 finnes ved(41,1),(39,2) i den separate korte streken,ikke som en ny flate i hovedposten. Hovedposten har115/59/11 og139/75/15 med grå sidefelt. Unngå nye flisrammer. Les kilder/2013 i helikopter178-mellomfaser-20261023 og se originalen i spillkontekst og Sam-master på nytt.
+
+Etter kvittering er fig178_03 delvis8/12,familien8/102,modden3709. Alle2016..2021 og deres gamle delarkpiksler er bevart.2010..2012 er ikke laget. Kilder2010..2016 er helt synlige og RGB565-bekreftet ved kontrollert pos160,60,rom35,palett0,zclip0.2013..2016 er nå sett i denne sammenhengen;2010..2012 må ses enkeltvis før nytegning.53 av102 kilder logget,ikke hele familien.1990 er venstreklipt og trenger ny hel kilde.
+
+Felles Linux/Windows isblokk er fortsatt3701 og mangler åtte ruter. Ved neste fulle ark-/familiesamlepunkt eller avslutning skal begge oppdateres med faktiske nedlastinger,sjekksummer og full filkontroll. Ingen ny nødvendig designavklaring. Hele figurjobber507/1758,1251 uten pluss returer/sluttkontroll. Neste137-kallV013 og296-kallS037 er fortsatt ikke utført. Ingen grafikk til main,motor-/pipelinekodeendring eller gammel nattevakt. Fortsett automatisk.
+''')
+(R/'RAPPORT.md').write_text('''# To nye helikopterfaser og bevart fargeretur
+
+Ti faktiske innebygde image_gen-kall H020..H029 gir to valgte egne tegninger:H024/costume178_2015 ogH026/costume178_2014. Åtte kandidater er kvalitetsreturer. Ingen ny hel figurjobb. fig178_03 er delvis8/12,familien8/102. Alle tidligere2016..2021 og deres delarkpiksler er bytebevart. Faktiske prompter,argumenter,råbilder,notat.md,kontroller og SHA-rutekart er bevart.
+
+Alle valgte farge-,alfa- og åpningfester består uendret3HD-port,maks3HD. Begge har to egne atskilte deler,som originalen. Egen alfa er beholdt. Bare egen global RGB-rens og hel4x-plassering;ingen originalmaskeklipp,originalfragmenter,lokale trekkflyttinger,største-komponent-rensing eller CLI/API-bildefallback. H023 har tre målte klart atskilte egne brune RGB-klynger,sortert globalt til tre kildebrunfarger. Den rensede egne tegningen ble redigeringsmål forH024,ikke stilanker eller originalfragment. Ingen kildemasker eller kildekoordinater ble brukt i RGB-rensingen.
+
+Original egenkontroll gir6/10 OK på delarket,fire tomme mål gir exit2. Tidligere2020/2021 hoppes over som masker under20 kildepiksler. Automatisk mottak av bare de to nye gir2 OK,0 SJEKK. Den automatiske eksporten er diagnostikk;bare SHA-festede egne prototyper tas inn i kandidaten3709. Tidligere dokumenterte SJEKK for2020/2021 oppheves ikke.
+
+2013 gjenstår. Fire sourcegrupper er bekreftet. H028 beskrev første gråstrek feil som55,115,151;faktisk kilde er71,71,151. H029 korrigerer denne feilen i separat prompt. Mørkebrun83 hører til den korte mellomstreken,ikke en ny skygge på hovedposten. Ingen2013-kandidat består hele kvalitetskontrollen eller importeres. Kilden er kontrollert ved pos160,60 og RGB565-rundtur i forrige rapport;det er ingen ny nødvendig Tom-avklaring.
+
+Denne motorprøven bruker to nye kontrollerte avspillinger ved pos160,60,zclip0,rom35,palett0,kostyme178,animasjon1 og aktør29. Denne posisjonen holder alle berørte sluttfaser helt synlige. Andre aktører og romskript kjører. Dette er ikke naturlig gjennomspilling. Kode og kildeskript er uendret. Begge sider bruker den faktiske nedlastede Linux-binæren128c9c11.
+
+Prosjektbibliotekets figurark-fast-storrelse og publisert-mod-er-fasit er brukt med opphavets PASS-begrensning og faktisk lokal kontroll. Modden bygges additivt fra gjeldende publiserte3707. Alle21951 tidligere filstier,21945 tidligere PNG-hash,1472 beskyttede input og tre stasher skal bevares. Felles Linux/Windows er fortsatt3701 og mangler åtte nye ruter;oppdater begge ved neste fulle ark-/familiesamlepunkt eller avslutning,med nedlasting og full filkontroll. Hele figurjobber507/1758,1251 uten pluss returer/sluttkontroll. Ingen ny Tom-/Claude-godkjenning,interaktiv Windows-/webtest eller samlet sluttgodkjenning. All grafikk er ikke ferdig og automatikken forblir ACTIVE.
+''')
+(R/'notat.md').write_text('To nye rutetegninger2014/2015 fra ti innebygde bildekall. Delresultat8/12 og SHA-rutekart er lagret. Ingen hel resultat.png. Åtte kvalitetsreturer importeres ikke. Se RAPPORT.md og faktisk mottak-publisert.json for mottaks-,motor- og publiseringsstatus. Ingen ny Tom-/Claude-godkjenning.\n')
+(R/'fargekontroll-alle10.json').write_text(json.dumps([read(R/'kall'/c/'fargekontroll.json')for c in why],ensure_ascii=False,indent=2)+'\n')
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+print('Ti kall,to valgte,åtte returer,nesteH030.')

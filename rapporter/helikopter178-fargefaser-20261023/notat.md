@@ -1,0 +1,1 @@
+To nye rutetegninger2014/2015 fra ti innebygde bildekall. Delresultat8/12 og SHA-rutekart er lagret. Ingen hel resultat.png. Åtte kvalitetsreturer importeres ikke. Se RAPPORT.md og faktisk mottak-publisert.json for mottaks-,motor- og publiseringsstatus. Ingen ny Tom-/Claude-godkjenning.
