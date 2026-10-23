@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+from smhd.myk import place
+import numpy as np,json,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+cid=sys.argv[1];K=R/'kall'/cid;q=json.loads((K/'kontroll.json').read_text());src=np.array(Image.open(P/f'work/extract/costumes/costume178_{q["rute"]}.png').convert('RGBA'));own=Image.open(K/'egen-renset.png').convert('RGBA');whole=np.array(own);sx,sy=q['hel_skala'];colors=np.unique(src[src[:,:,3]>0,:3],axis=0);rows=[]
+def shift(a,dx,dy):
+ b=np.zeros_like(a);h,w=a.shape[:2];x0,y0=max(0,dx),max(0,dy);x1,y1=min(w,w+dx),min(h,h+dy);b[y0:y1,x0:x1]=a[y0-dy:y1-dy,x0-dx:x1-dx];return b
+for fy in [.985,.99,.995,1.,1.005,1.01,1.015]:
+ for fx in [.985,.99,.995,1.,1.005,1.01,1.015]:
+  pl=place(whole,src,sx*fx,sy*fy);native=pl['bilde'];h,w=native.shape[:2];mx,my=pl['margx']*4,pl['margy']*4;actual=src[:,:,3]>0;yy,xx=np.where(actual);opaque=(yy*4+my+2,xx*4+mx+2);yy,xx=np.where(~actual);empty=(yy*4+my+2,xx*4+mx+2)
+  scaled=np.array(own.resize((round(own.width*sx*fx),round(own.height*sy*fy)),Image.Resampling.NEAREST));can=np.zeros_like(native);x,y=mx+pl['flytt'][0],my+pl['flytt'][1];sh,sw=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+sw,w),min(y+sh,h);can[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x];ref=np.zeros_like(native);ref[my:my+src.shape[0]*4,mx:mx+src.shape[1]*4]=np.repeat(np.repeat(src,4,0),4,1);need=[]
+  for col in colors:
+   yy,xx=np.where(np.all(src[:,:,:3]==col,2)&actual);pos=(yy*4+my+2,xx*4+mx+2);rr=np.all(ref[:,:,:3]==col,2)&(ref[:,:,3]>0);need.append((col,pos,nd.distance_transform_edt(~rr)))
+  for dy in range(-2,3):
+   for dx in range(-2,3):
+    nn=shift(native,dx,dy);co=nn[:,:,3]>=128;ap=int((nd.distance_transform_edt(~co)[opaque]>3).sum());an=int((nd.distance_transform_edt(co)[empty]>3).sum());aa=shift(can,dx,dy);codefail=0;nativefail=0
+    for col,pos,negdist in need:
+     have=np.all(aa[:,:,:3]==col,2)&(aa[:,:,3]>=128);codefail+=int((nd.distance_transform_edt(~have)[pos]>3).sum()) if have.any()else len(pos[0]);codefail+=int((negdist[have]>3).sum())
+    count=ap+an+codefail
+    row=dict(skala_faktorer=[fx,fy],delta_HD=[dx,dy],samlet_avvik=count,alfa_positive=ap,aapninger=an,kode_avvik=codefail,snitt_union=pl['snitt_union'],dekning=pl['dekning']);rows.append(row)
+    if count==0:
+     cls=np.zeros(co.shape,int);cls[co]=cKDTree(colors).query(nn[co,:3])[1]
+     for i,(col,pos,_)in enumerate(need):
+      have=(cls==i)&co;nativefail+=int((nd.distance_transform_edt(~have)[pos]>3).sum()) if have.any()else len(pos[0])
+     row['native_fargeavvik']=nativefail;row['samlet_avvik']+=nativefail
+rows.sort(key=lambda e:(e['samlet_avvik'],abs(e['skala_faktorer'][0]-1)+abs(e['skala_faktorer'][1]-1),sum(abs(k)for k in e['delta_HD'])));(K/'helaffin-diagnose.json').write_text(json.dumps(dict(kall=cid,bare_hel_affin_maalt=True,lokale_endringer=False,tegning_endret=False,topp=rows[:10],alle=rows),ensure_ascii=False,indent=2)+'\n');print(cid,rows[0])

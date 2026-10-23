@@ -1,0 +1,45 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
+import hashlib, json, subprocess, sys
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+def git(*args): return subprocess.check_output(['git', *args], cwd=A, text=True).strip()
+sha = lambda b: hashlib.sha256(b).hexdigest()
+previous = sys.argv[1]
+proof_name = sys.argv[2] if len(sys.argv) > 2 else 'grafikk-hentet-kontrollert.json'
+commit = git('rev-parse', 'HEAD')
+remote = git('ls-remote', 'origin', 'refs/heads/gpt-arbeid').split()[0]
+assert remote == commit
+changed = subprocess.check_output(['git', 'diff', '--name-only', '-z', previous, commit], cwd=A).decode().strip('\0').split('\0')
+assert changed and all(f in ['GRAFIKKLISTE.md', 'ORDRE.md', 'jobber/fig178_02/notat.md'] or f.startswith('rapporter/' + O.name + '/') for f in changed)
+want = {}
+B = O / 'hentet-grafikk-blobs'
+B.mkdir(exist_ok=True)
+for path in changed:
+    data = (A / path).read_bytes()
+    oid = git('rev-parse', commit + ':' + path)
+    want.setdefault(oid, []).append(dict(fil=path, sha256=sha(data)))
+def get(oid):
+    path = B / oid
+    if not path.exists():
+        path.write_bytes(subprocess.check_output(['gh', 'api', 'repos/Tombonator3000/Sam-Max-HD/git/blobs/' + oid,
+            '-H', 'Accept: application/vnd.github.raw'], cwd=P))
+    data = path.read_bytes()
+    assert hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == oid
+    for q in want[oid]: assert sha(data) == q['sha256'], q['fil']
+    return len(want[oid])
+count = 0
+with ThreadPoolExecutor(max_workers=6) as pool:
+    futures = [pool.submit(get, oid) for oid in want]
+    for future in as_completed(futures): count += future.result()
+assert count == len(changed)
+proof = dict(grafikk_commit=commit, forrige_commit=previous, fjern_ref_bekreftet=remote, filer=count,
+    unike_faktisk_nedlastede_blobs=len(want), alle_filhash_bekreftet=True,
+    metode='Faktisk GitHub git/blobs RAW-nedlasting per unik blob. Gitblob SHA1 og hver SHA256 kontrollert.',
+    tid_utc=datetime.now(timezone.utc).isoformat(), filhash=[q for rows in want.values() for q in rows])
+(O / proof_name).write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps({k: v for k, v in proof.items() if k != 'filhash'}, ensure_ascii=False), flush=True)
