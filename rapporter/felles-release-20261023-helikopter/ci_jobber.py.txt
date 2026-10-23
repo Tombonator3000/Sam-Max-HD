@@ -1,0 +1,17 @@
+"""Kildebundet kontroll av faktisk avsluttede jobber for denne ene Linux-kjøringen."""
+from pathlib import Path
+import json,subprocess,datetime
+P=Path('/home/tom/Sam-Max-HD')
+def api(path):
+ return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+path],cwd=P,text=True))
+def linux_jobber(state):
+ rid=state['plattform']['linux']['run_id'];assert isinstance(rid,int)
+ run=api('actions/runs/'+str(rid));assert run['head_sha']==state['kode'] and run['run_attempt']==1
+ jobs=api('actions/runs/'+str(rid)+'/jobs');assert jobs['total_count']==len(jobs['jobs'])==2 and {j['name'] for j in jobs['jobs']}=={'sjekk','pakke'}
+ assert all(j['status']=='completed' and j['conclusion']=='success' and j['head_sha']==state['kode'] for j in jobs['jobs'])
+ package=next(j for j in jobs['jobs'] if j['name']=='pakke')
+ for name in ['Test pakken uten skjerm','Test pakken på Debian 12 uten byggepakker','Publiser som release']:
+  step=next(s for s in package['steps'] if s['name']==name);assert step['status']=='completed' and step['conclusion']=='success'
+ if run['status']=='completed':assert run['conclusion']=='success'
+ else:assert run['status']=='in_progress' and run['conclusion'] is None
+ return dict(observert_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),run=run,jobs=jobs,alle_faktiske_jobber_avsluttet_success=True,ingen_aktive_jobber=True,overordnet_status_uavklart=run['status']!='completed',ingen_status_endret=True,ingen_ny_dispatch_eller_kansellering=True)

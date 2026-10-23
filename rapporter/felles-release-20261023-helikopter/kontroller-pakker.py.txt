@@ -1,0 +1,32 @@
+from ci_jobber import linux_jobber
+from pathlib import Path
+import json,hashlib,zipfile,subprocess,re
+O=Path(__file__).resolve().parent;P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/felles-release-20261023-helikopter';state=json.loads((O/'bygg-startet.json').read_text());code=state['kode'];native=state['hd_mod'];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();checks=[]
+def version(body):
+ m=re.search(r'Sam-Max-HD:\s*([0-9a-f]{7,40})',body);assert m and code.startswith(m[1]) and native in body,body[:300]
+for platform,names in [('linux',['SamMaxHD-x86_64.AppImage','SamMaxHD-x86_64.AppImage.sha256']),('windows',['SamMaxHD-Windows.zip','SamMaxHD-Windows.zip.sha256'])]:
+ run=json.loads((O/f'run-{platform}.json').read_text());assert run['headSha']==code and run['databaseId']==state['plattform'][platform]['run_id']
+ if platform=='linux':linux_jobber(state)
+ else:assert run['status']=='completed' and run['conclusion']=='success'
+ meta=json.loads((O/f'release-{platform}.json').read_text());version(meta['body'])
+ for name in names:
+  p=O/platform/name;a=next(a for a in meta['assets'] if a['name']==name);dig=sha(p);assert p.stat().st_size==a['size'] and a['digest']=='sha256:'+dig;checks.append(dict(plattform=platform,fil=name,sha256=dig,bytes=p.stat().st_size,asset_id=a['id']))
+ assert (O/platform/names[1]).read_text().split()[0]==sha(O/platform/names[0])
+for target in [O,R]:(target/'assetkontroll.json').write_text(json.dumps(checks,indent=2)+'\n')
+app=O/'linux/SamMaxHD-x86_64.AppImage';app.chmod(0o755)
+if not(O/'linux/squashfs-root').exists():
+ with(O/'linux/extract.log').open('wb') as f:subprocess.run([str(app),'--appimage-extract'],cwd=O/'linux',stdout=f,stderr=subprocess.STDOUT,check=True)
+print('Both downloads,4assets and digests verified; Linux extracted')
+expected={p:h for p,h in json.loads((R/'moddfiler-3713.json').read_text()).items() if p!='README.md'};assert len(expected)==21956
+L=O/'linux/squashfs-root/usr/share/sam-max-hd';actual={p.relative_to(L/'mods/gpt').as_posix():sha(p) for p in(L/'mods/gpt').rglob('*') if p.is_file()};assert actual==expected;lb=(L/'BYGG.txt').read_text();version(lb)
+with zipfile.ZipFile(O/'windows/SamMaxHD-Windows.zip') as z:
+ names=z.namelist();assert len(names)==len(set(names));wb=z.read(next(p for p in names if p.endswith('/BYGG.txt'))).decode().replace('\r\n','\n');version(wb);prefix=next(n for n in names if n.endswith('/mod/mod.json'))[:-len('mod.json')];wf={n[len(prefix):]:hashlib.sha256(z.read(n)).hexdigest() for n in names if n.startswith(prefix) and not n.endswith('/')};assert wf==expected
+ assert json.loads(z.read(prefix+'mod.json'))['costume_cels']==3713 and sum(n.startswith('costumes/') and n.endswith('_hd.png') for n in wf)==3713
+assert json.loads((L/'mods/gpt/mod.json').read_text())['costume_cels']==len(list((L/'mods/gpt/costumes').glob('*_hd.png')))==3713
+proof=dict(kode=code,hd_mod=native,native=3713,nye_native=12,tidligere_klesretur_bevart=True,begge_faktiske_nedlastinger_verifisert=True,begge_modder_byteidentiske=True,moddfiler_per_pakke=21956,utelatt_dokumentasjon=['README.md'],filmanifest_sha256=hashlib.sha256('\n'.join(k+' '+v for k,v in sorted(expected.items())).encode()).hexdigest(),kontroll=[dict(plattform='linux',build=lb,alle_moddfiler_verifisert=True),dict(plattform='windows',build=wb,alle_moddfiler_verifisert=True)])
+for target in [O,R]:(target/'moddfiler-kontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+for platform in ['linux','windows']:
+ run=json.loads((O/f'run-{platform}.json').read_text());state['plattform'][platform].update(status=run['status'],conclusion=run['conclusion'],faktiske_jobber_success=True)
+state.update(status='begge_bygg_faktiske_nedlastinger_og_moddfiler_kontrollert_motor_og_fellesrelease_gjenstaar',faktiske_nedlastinger_kontrollert=True)
+for target in [O,R]:(target/'bygg-startet.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(proof,ensure_ascii=False))

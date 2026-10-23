@@ -1,5 +1,15 @@
 # Grafikkliste
 
+<!-- helikopter178-pakkesamlepunkt:start -->
+Komplett fig178_03 er publisert med12/12 ruter. Ny2010/H052 er egenkontrollert,native mottatt,visuelt sett og motorobservert.508/1758 hele figurjobber har resultat,1250 er uten pluss returer/sluttkontroll. Familien178 er12/102. hd-mod ed8ab7673806be10466ad975058e1f390cb94568 har3713 native. Alle21957 filhash er hentet tilbake og bekreftet,alle21956 tidligere stier og21950 tidligerePNG er bevart.1472 beskyttede input og tre stasher er uendret. Ingen ny Tom-/Claude-godkjenning.
+
+NATIVE3713 ER FROSSET under pakkesamlepunktet. Linux39922327114 og Windows39922332546 er sendt én gang hver fra kodec46862b0853811f67cc4e62884b923c94ad0a0d3. Begge kjører;ingen nye dispatches. Tidligere fellespakke er3701 og mangler alle12 helikopterfasene. Rullerende Linux-/Windows-utgaver fra planlagte jobber er separate,og Windows flyttet Latest. Tidligere fellesrelease isblokk og alle fire vedlegg er bevart. Ny fellesrelease skal først kalles oppdatert etter faktisk nedlasting,sjekksummer,full kontroll av21956runtime-modfiler per pakke og motorprøve. Behold frysen også gjennom forventet automatisk taggbygg.
+
+Les rapporter/felles-release-20261023-helikopter/bygg-startet.json og journalene før videre handling. Hele arket og råbilder,prompter,rutekart,returer og motorbevis finnes i rapporter/helikopter178-siste2010-20261023. Originalkontroll10/10OK,to små hoppes over;helarkmottak10OK+to beholdte størrelses-SJEKK. Bare ny egen2010 er lagt til,ingen gamle native er re-eksportert. Neste178-kallH053,137V013 og296S037 er ikke utført eller reservert. Etter pakkekontroll velges neste hele kilde2009 i fig178_02 og ses i kontekst før nytegning. Ingen ny nødvendig designavklaring. All grafikk er ikke ferdig og automatikken fortsetter. Ingen grafikk til main eller gammel nattevakt.
+<!-- helikopter178-pakkesamlepunkt:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-fargekoder-status:start -->
 Tre nye egne helikopterfaser er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert: costume178_2013/H042, 2012/H045 og 2011/H046. fig178_03 er delvis 11/12, familien 11/102. Alle åtte tidligere delarkruters RGBA er bevart. Ti faktiske innebygde image_gen-kall H040..H049 gir tre valgte og sju kvalitetsreturer. Automatisk mottak av bare de tre nye gir 3 OK, 0 SJEKK. Original egenkontroll gir 9/10 OK og exit2 bare for manglende2010. Små2020/2021 hoppes over; tidligere SJEKK for dem er fortsatt åpne. Ingen ny hel figurjobb eller Tom-/Claude-godkjenning.
 
