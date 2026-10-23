@@ -1,0 +1,392 @@
+[
+  {
+    "workflow": "linux.yml",
+    "run_id": 40032929823,
+    "url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/40032929823",
+    "jobber": [
+      {
+        "id": 120685371128,
+        "run_id": 40032929823,
+        "workflow_name": "Linux-pakke",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/actions/runs/40032929823",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVC8GZM8AAAAcGWie-A",
+        "head_sha": "2cf3a04ae0243a93f462211e048da6893a334a87",
+        "url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/actions/jobs/120685371128",
+        "html_url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/40032929823/job/120685371128",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-23T22:20:13Z",
+        "started_at": "2026-10-23T22:20:16Z",
+        "completed_at": "2026-10-23T22:20:20Z",
+        "name": "sjekk",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-23T22:20:16Z",
+            "completed_at": "2026-10-23T22:20:17Z"
+          },
+          {
+            "name": "Run MOD=$(gh api repos/Tombonator3000/Sam-Max-HD/git/ref/heads/hd-mod --jq .object.sha)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-23T22:20:17Z",
+            "completed_at": "2026-10-23T22:20:18Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-23T22:20:18Z",
+            "completed_at": "2026-10-23T22:20:18Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/check-runs/120685371128",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000014028,
+        "runner_name": "GitHub Actions 1000014028",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 120685415989,
+        "run_id": 40032929823,
+        "workflow_name": "Linux-pakke",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/actions/runs/40032929823",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVC8GZM8AAAAcGWlONQ",
+        "head_sha": "2cf3a04ae0243a93f462211e048da6893a334a87",
+        "url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/actions/jobs/120685415989",
+        "html_url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/40032929823/job/120685415989",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-23T22:20:20Z",
+        "started_at": "2026-10-23T22:20:23Z",
+        "completed_at": "2026-10-23T22:27:26Z",
+        "name": "pakke",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-23T22:20:24Z",
+            "completed_at": "2026-10-23T22:20:25Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-23T22:20:25Z",
+            "completed_at": "2026-10-23T22:20:26Z"
+          },
+          {
+            "name": "Byggepakker",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-23T22:20:26Z",
+            "completed_at": "2026-10-23T22:21:52Z"
+          },
+          {
+            "name": "Bygg ScummVM med HD-patchen",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-23T22:21:52Z",
+            "completed_at": "2026-10-23T22:24:26Z"
+          },
+          {
+            "name": "Spillet og talen (grenen spilldata)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-23T22:24:26Z",
+            "completed_at": "2026-10-23T22:24:36Z"
+          },
+          {
+            "name": "HD-modden (grenen hd-mod, tom til den første modden finnes)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-23T22:24:36Z",
+            "completed_at": "2026-10-23T22:24:44Z"
+          },
+          {
+            "name": "linuxdeploy og appimagetool",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-23T22:24:44Z",
+            "completed_at": "2026-10-23T22:24:45Z"
+          },
+          {
+            "name": "Lag AppImage",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-23T22:24:45Z",
+            "completed_at": "2026-10-23T22:25:14Z"
+          },
+          {
+            "name": "Test pakken uten skjerm",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-23T22:25:14Z",
+            "completed_at": "2026-10-23T22:26:14Z"
+          },
+          {
+            "name": "Test pakken på Debian 12 uten byggepakker",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-23T22:26:14Z",
+            "completed_at": "2026-10-23T22:27:08Z"
+          },
+          {
+            "name": "Publiser som release",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-10-23T22:27:08Z",
+            "completed_at": "2026-10-23T22:27:23Z"
+          },
+          {
+            "name": "Pakken som artefakt (grener utenom main)",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 12,
+            "started_at": "2026-10-23T22:27:23Z",
+            "completed_at": "2026-10-23T22:27:23Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 24,
+            "started_at": "2026-10-23T22:27:23Z",
+            "completed_at": "2026-10-23T22:27:24Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25,
+            "started_at": "2026-10-23T22:27:24Z",
+            "completed_at": "2026-10-23T22:27:24Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/check-runs/120685415989",
+        "labels": [
+          "ubuntu-22.04"
+        ],
+        "runner_id": 1000014031,
+        "runner_name": "GitHub Actions 1000014031",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ]
+  },
+  {
+    "workflow": "windows.yml",
+    "run_id": 40032932873,
+    "url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/40032932873",
+    "jobber": [
+      {
+        "id": 120685372348,
+        "run_id": 40032932873,
+        "workflow_name": "Windows-pakke",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/actions/runs/40032932873",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVC8GZM8AAAAcGWijvA",
+        "head_sha": "2cf3a04ae0243a93f462211e048da6893a334a87",
+        "url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/actions/jobs/120685372348",
+        "html_url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/40032932873/job/120685372348",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-23T22:20:14Z",
+        "started_at": "2026-10-23T22:20:16Z",
+        "completed_at": "2026-10-23T22:20:20Z",
+        "name": "sjekk",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-23T22:20:17Z",
+            "completed_at": "2026-10-23T22:20:17Z"
+          },
+          {
+            "name": "Run MOD=$(gh api repos/Tombonator3000/Sam-Max-HD/git/ref/heads/hd-mod --jq .object.sha)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-23T22:20:17Z",
+            "completed_at": "2026-10-23T22:20:18Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-23T22:20:18Z",
+            "completed_at": "2026-10-23T22:20:18Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/check-runs/120685372348",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000014029,
+        "runner_name": "GitHub Actions 1000014029",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 120685412891,
+        "run_id": 40032932873,
+        "workflow_name": "Windows-pakke",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/actions/runs/40032932873",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVC8GZM8AAAAcGWlCGw",
+        "head_sha": "2cf3a04ae0243a93f462211e048da6893a334a87",
+        "url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/actions/jobs/120685412891",
+        "html_url": "https://github.com/Tombonator3000/Sam-Max-HD/actions/runs/40032932873/job/120685412891",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-23T22:20:20Z",
+        "started_at": "2026-10-23T22:20:22Z",
+        "completed_at": "2026-10-23T22:28:42Z",
+        "name": "pakke",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-23T22:20:22Z",
+            "completed_at": "2026-10-23T22:20:23Z"
+          },
+          {
+            "name": "Ingen CRLF i utsjekken",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-23T22:20:23Z",
+            "completed_at": "2026-10-23T22:20:24Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-23T22:20:24Z",
+            "completed_at": "2026-10-23T22:20:29Z"
+          },
+          {
+            "name": "Run msys2/setup-msys2@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-23T22:20:29Z",
+            "completed_at": "2026-10-23T22:21:56Z"
+          },
+          {
+            "name": "Bygg ScummVM med HD-patchen",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-23T22:21:56Z",
+            "completed_at": "2026-10-23T22:26:33Z"
+          },
+          {
+            "name": "Spillet og talen (grenen spilldata)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-23T22:26:33Z",
+            "completed_at": "2026-10-23T22:26:42Z"
+          },
+          {
+            "name": "HD-modden (grenen hd-mod)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-23T22:26:42Z",
+            "completed_at": "2026-10-23T22:26:58Z"
+          },
+          {
+            "name": "Lag zip",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-23T22:26:58Z",
+            "completed_at": "2026-10-23T22:28:00Z"
+          },
+          {
+            "name": "Test pakken uten skjerm",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-23T22:28:00Z",
+            "completed_at": "2026-10-23T22:28:09Z"
+          },
+          {
+            "name": "Publiser som release",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-23T22:28:09Z",
+            "completed_at": "2026-10-23T22:28:34Z"
+          },
+          {
+            "name": "Pakken som artefakt (grener utenom main)",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 11,
+            "started_at": "2026-10-23T22:28:34Z",
+            "completed_at": "2026-10-23T22:28:34Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 22,
+            "started_at": "2026-10-23T22:28:34Z",
+            "completed_at": "2026-10-23T22:28:37Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 23,
+            "started_at": "2026-10-23T22:28:37Z",
+            "completed_at": "2026-10-23T22:28:37Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/Tombonator3000/Sam-Max-HD/check-runs/120685412891",
+        "labels": [
+          "windows-latest"
+        ],
+        "runner_id": 1000014030,
+        "runner_name": "GitHub Actions 1000014030",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ]
+  }
+]

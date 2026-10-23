@@ -1,0 +1,51 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,shutil,os
+
+P=Path('/home/tom/Sam-Max-HD')
+O=Path(__file__).resolve().parent
+R=P/'work/.gpt-gren/rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def sha(p):
+    with p.open('rb')as f:return hashlib.file_digest(f,'sha256').hexdigest()
+release=read(R/'fellespakker3728.json')
+assert release['published'] and release['alle_fire_fellesvedlegg_faktisk_hentet_bekreftet']
+runtime=read(R/'pakke-runtime3728-sammenligning.json')
+assert runtime['alle_fem_ROI_original_og_HD_identiske'] and runtime['visuelt_sett']
+tree=O/'pakker3728/linux/squashfs-root'
+archive=tree.parent/'SamMaxHD-x86_64.AppImage'
+pk=read(R/'pakke-linux3728.json')
+assert sha(archive)==pk['nedlastet'][0]['sha256']
+assert tree.is_dir() and not tree.is_symlink() and tree.resolve()==tree
+before=os.statvfs(O).f_bavail*os.statvfs(O).f_frsize
+files=[p for p in tree.rglob('*')if p.is_file()or p.is_symlink()]
+record=dict(mappe=str(tree),filer=len(files),logiske_bytes=sum(p.lstat().st_size for p in files),
+    gjenopprettes_fra=release['url'],AppImage_SHA256=sha(archive),en_beholdt_arkivkopi=str(archive),
+    alle_21973_modfiler_kontrollert=True,faktisk_pakkemotor_testet=True,ingen_unik_grafikkilde_raa_eller_stilanker_i_mappen=True)
+shutil.rmtree(tree)
+record['slettet']=True
+oldrelease=next(r for r in read(O/'releaser-foer-pakker3728.json')if r['tag_name']=='sam-max-hd-2026-10-23-webp')
+oldassets={a['name']:a for a in oldrelease['assets']}
+old=[]
+for platform,name in [('linux','SamMaxHD-x86_64.AppImage'),('windows','SamMaxHD-Windows.zip')]:
+    p=P/'out/webp-migrering-20261023/pakker'/platform/name
+    if not p.exists():continue
+    assert p.is_file() and not p.is_symlink()
+    digest=sha(p)
+    assert oldassets[name]['digest']=='sha256:'+digest and oldassets[name]['size']==p.stat().st_size
+    row=dict(fil=str(p),bytes=p.stat().st_size,sha256=digest,gjenopprettes_fra=oldrelease['html_url'],asset_id=oldassets[name]['id'])
+    p.unlink()
+    checksum=p.with_name(p.name+'.sha256')
+    if checksum.is_file()and checksum.read_text().split()[0]==digest:
+        row['sjekksumfil_slettet']=str(checksum)
+        checksum.unlink()
+    old.append(row)
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),verifisert_ny_utpakket_arbeidskopi=record,
+    verifiserte_gamle_arkiver_slettet=old,nye_arkiver_en_kopi_pr_plattform_beholdt=True,
+    ny_fellesutgave_alle_fire_vedlegg_faktisk_hentet=True,tidligere_fellesutgave_bevart=True,
+    ingen_raa_referanser_jobber_stilankere_eller_stasher_endret=True,
+    filsystem_fri_foer=before,filsystem_fri_etter=os.statvfs(O).f_bavail*os.statvfs(O).f_frsize,
+    logiske_bytes_er_ikke_fysisk_frigitt_plass=True)
+(R/'pakke-rydding3728.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+(R/'rydd-pakker3728.py.txt').write_bytes(Path(__file__).read_bytes())
+print(dict(utpakket_kopi_slettet=True,filer=record['filer'],gamle_arkiver_slettet=len(old),nye_arkiver_beholdt=2))

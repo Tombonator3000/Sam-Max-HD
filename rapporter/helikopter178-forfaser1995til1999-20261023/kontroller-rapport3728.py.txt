@@ -1,0 +1,84 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import json, hashlib, subprocess, gzip
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+base = '27b6aa3861de7933287e443bcc2aed9fba912e3d'
+prior = subprocess.check_output(['git', 'show', base + ':rapporter/' + R.name + '/SHA256SUMS'], cwd=A, text=True)
+mutable = {'NESTE.md', 'RETUR.md', 'alle-kall.json', 'fig178_02-delresultat.png', 'fremdrift.json',
+           'rutekart-fig178_02.json', 'rutekart-returer.json', 'rutekart-samlet.json', 'sluttkontroll.json'}
+changed = []
+old_count = 0
+for line in prior.splitlines():
+    h, n = line.split('  ', 1)
+    assert (R / n).is_file(), n
+    old_count += 1
+    if sha(R / n) != h:
+        changed.append(n)
+assert set(changed) == mutable, changed
+
+calls = read(R / 'alle-kall.json')
+assert len(calls) == 50 and len({c['kall'] for c in calls}) == 50
+for c in calls:
+    d = R / 'kall' / c['kall']
+    for name, key in [('raa.png', 'raa_sha256'), ('prompt-brukt.txt', 'prompt_sha256'), ('argumenter.json', 'argumenter_sha256')]:
+        assert sha(d / name) == c[key], (c['kall'], key)
+variants = read(R / 'rutekart-videreH166-H175-1995.json')['egenkontrollerte_varianter']
+assert len(variants) == 7 and sum(bool(e['valgt']) for e in variants) == 1
+for e in variants:
+    for k in ['prototype', 'kontroll']:
+        assert sha(A / e[k]) == e[k + '_sha256'], (e['variant'], k)
+f = read(R / 'fremdrift.json')
+assert f['native'] == 3728 and f['publisert_nye_native'] == 5 and f['innebygde_bildekall'] == 50
+assert f['neste_kall'] == 'H176' and not f['neste_kall_utfort'] and not f['neste_kall_reservert']
+assert not (R / 'kall/H176').exists()
+for e in f['egne_avledede_varianter']:
+    for k in ['prototype', 'kontroll']:
+        if k in e:
+            assert sha(A / e[k]) == e[k + '_sha256'], (e.get('variant'), k)
+maps = read(R / 'rutekart-fig178_02.json')['fig178_02']['ruter']
+old_maps = json.loads(subprocess.check_output(['git', 'show', base + ':rapporter/' + R.name + '/rutekart-fig178_02.json'], cwd=A, text=True))['fig178_02']['ruter']
+assert len(maps) == 15 and len(old_maps) == 14
+for e in old_maps:
+    assert next(x for x in maps if x['rute'] == e['rute']) == e, e['rute']
+assert subprocess.check_output(['git', 'diff', '--name-only', base, '--', 'jobber', 'hovedark', 'stil', 'BESTILLING.md'], cwd=A) == b''
+jobs = list((A / 'jobber').glob('fig*/jobb.json'))
+assert len(jobs) == 1758 and sum((p.parent / 'resultat.png').is_file() for p in jobs) == 508
+assert not (A / 'jobber/fig178_02/resultat.png').exists()
+receipt = read(R / 'mottak-publisert1995.json')
+assert receipt['alle_filhash_bekreftet'] and receipt['filantall'] == 21973 and receipt['lokalt_mottatt']
+assert subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/hd-mod'], cwd=P, text=True).split()[0] == receipt['hd_mod']
+stashes = subprocess.check_output(['git', 'stash', 'list', '--format=%H'], cwd=P, text=True).splitlines()
+assert stashes == receipt['stasher']
+expected = json.loads(gzip.decompress((R / 'kandidat3728-filhash.json.gz').read_bytes()))
+assert len(expected) == 21973
+assert sha(P / 'mods/gpt/costumes/costume178_1995_hd.webp') == expected['costumes/costume178_1995_hd.webp']
+assert not (O / 'kandidat3728').exists() and not (O / 'verifisert-gammelmod3727').exists()
+proof = dict(tid_utc=datetime.now(timezone.utc).isoformat(), historisk_grunnlag=base,
+             tidligere_rapportfiler=old_count, alle_tidligere_filer_tilstede=True,
+             bytebevarte_tidligere_rapportfiler=old_count - len(changed), tilsiktede_statusendringer=changed,
+             tidligere_raa_kilder_native_kontrollbevis_bytebevart=True,
+             faktiske_kall_raa_prompt_argument_SHA=50, nye_variant_prototype_kontroll_SHA=7,
+             alle_variantkart_SHA_bekreftet=True, gamle14_rutekart_inklusive_forst_publisert_bytebevart=True,
+             jobber_hovedark_stil_bestilling_uendret=True, stashes_uendret=stashes,
+             figurjobber=dict(resultat=508, total=1758), publisert_native=3728,
+             lokal_publisert1995_SHA=expected['costumes/costume178_1995_hd.webp'],
+             hele_fjernarkivet_allerede_faktisk_hentet_bekreftet=receipt['filantall'],
+             ingen_ekstra_fullmodkopi=True, neste_kall_ikke_forberedt_utfort_reservert='H176',
+             neste_retur='1994..1990', automation='ACTIVE', hele_prosjektet_ferdig=False)
+(R / 'samlet-kontroll1995.json').write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
+(R / 'kontroller-rapport3728.py.txt').write_bytes(Path(__file__).read_bytes())
+manifest = R / 'SHA256SUMS'
+files = sorted(p for p in R.rglob('*') if p.is_file() and p != manifest)
+manifest.write_text(''.join(sha(p) + '  ' + str(p.relative_to(R)) + '\n' for p in files))
+for line in manifest.read_text().splitlines():
+    h, n = line.split('  ', 1)
+    assert sha(R / n) == h, n
+subprocess.run(['git', 'diff', '--check'], cwd=A, check=True)
+print(json.dumps(dict(rapportfiler=len(files), gamle_bytebevarte=old_count - len(changed), nye_varianter=7,
+                      faktiske_kall=50, modfiler_faktisk_hentet=21973), ensure_ascii=False))

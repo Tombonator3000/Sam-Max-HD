@@ -1,0 +1,62 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib
+
+P=Path('/home/tom/Sam-Max-HD')
+A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent
+R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+receipt=read(R/'mottak-publisert1995.json')
+pk=read(R/'fellespakker3728.json')
+assert pk['published'] and pk['alle21973_modfiler_i_begge_pakker_bekreftet']
+assert pk['hd_mod']==receipt['hd_mod']
+cleanup=read(R/'pakke-rydding3728.json')
+assert cleanup['verifisert_ny_utpakket_arbeidskopi']['slettet']
+cid='H175/registrerte-smaaplan/egen-alfasoem-r5-s3'
+status=f'''Femfasersbunken 1995 til 1999 er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert. Siste fase er 1995 fra ti nye faktiske innebygde image_gen-kall H166..H175. Bunken har 50 faktiske bildekall, fem valgte native ruter og ingen ny hel figurjobb. Hele figurjobber er fortsatt 508/1758. Delark fig178_02 er 15/24 og familie178 er 27/102. Ingen ny Tom-/Claude-godkjenning.
+
+Gjeldende hd-mod er {receipt['hd_mod']}, vanlig Git-barn av {receipt['forelder']}, uten force-push. Grafikkilde for 1995 er {receipt['grafikkilde']}; alle 166 endrede kildefiler er faktisk hentet med SHA256 og Gitblob SHA1 bekreftet. Alle 21973 modfiler er faktisk hentet som strøm og kontrollert før lokal aktivering. 3728 native, 4877 WebP og 17089 tekniske PNG. Alle tidligere grafikkfiler er bytebevart; bare mod.json og SHA256SUMS endres som metadata. Alle 14 gamle delruter er RGBA-bytebevart. Standard delarkprøve gir 15 OK/9 tomme mål, ingen produsert FEIL; automatisk mottak gir 1 OK.
+
+Valgt {cid} bruker ni nye råbilder med sluttpiksler. H172 bidrar som eget registreringsanker uten sluttpiksler. Hele materialplan velges per fargeklasse på egne genererte lerreter. H174s hele firefeltsmodul registreres bare mot tidligere egne småfarger. Hele egen unionsalfa er lukket ensartet med radius 5 og Gauss sigma 3 i råstørrelsen for å fylle egne skjøter. Nye RGB-fringe kommer fra nærmeste egne malte kjerner. Alle 21 kildefarger og små deler beholdes. Ingen originalmaske, kildefragmenter, kildebasert lokal fargepåmaling eller trekkflytting. Alle sterke 3HD-porter består uendret med null feil. IoU 0,987, dekning 0,992. Kildeløs replay er PNG-/RGBA-byteeksakt. Tapsfri WebP er RGBA-byteidentisk, også under alfa 0. Se oppskrift1995.json og notat1995.md.
+
+To nye motoravspillinger med faktisk WebP-binær 651aa78c har 160 av160 identiske hele original-RGBA-tilstander og komplette originale celtegnekall-lister. Ingen uparede tilstander. Bare fase 1995/bilde-frame 116 endres, 12858 HD-piksler innen berørt originalrektangel med 8HD naboområde, null utenfor. Begge sider har 160 bufferkontroller/148 null, etter frame 40 er 120/120 null. Tolv gamle tidlige avvik har identiske koordinater og begge RGBA. Native, delark, stiltavle, motorbildet, før/etter og 27 sekvensfaser er visuelt sett. Kontrollert aktøravspilling er ikke full naturlig gjennomspilling.
+
+Felles Linux-/Windows-pakker er nå oppdatert til 3728 ved dette samlepunktet: {pk['url']}. Begge faktiske pakker, pakkesjekksummer og alle 21973 inkluderte modfiler er kontrollert. Alle fire fellesvedlegg er deretter hentet tilbake som strømmer og hashkontrollert. Linux-pakkens egen binær d7c208ef er kjørt i 160 bilder; alle fem nye helikopterfaser har byteidentisk original- og HD-rektangel mot den kontrollerte lokale modden. Pakkens motorbilde er visuelt sett. Windows-pakken består faktisk oppstart i Actions. Ingen ny interaktiv Windows-/webtest eller full naturlig gjennomspilling. Kodegrunnlaget i pakkene er 2cf3a04ae0243a93f462211e048da6893a334a87. Alle 48 tidligere utgivelses-ID-er og alle tidligere ikke-rullende vedlegg er bevart.
+
+Gammel aktiv modkopi og ny utpakket pakkearbeidskopi er fjernet først etter verifisering. Én nedlastet AppImage og én ZIP beholdes. Eventuelle slettede gamle pakkevedlegg har fast gjenopprettingskilde og SHA i pakke-rydding3728.json. 1123 identiske motorbildekopier fra nativeprøven deler innhold via harde lenker, alle stier/hash bevart. Logiske duplikatbyte er ikke et mål på fysisk frigitt plass. Råbilder, unike grafikkilder, stilankere, beskyttede jobbfiler og tre stasher er bevart. Ingen ekstra fullmodkopi utover aktiv mods/gpt.
+
+Ni hele originaler for 1986 til 1994 er kontrollert i ny separat motoravspilling med aktør29 på220,60. 97 kildefaser logges. Kanonisk indekspalett er bevart, RGB565-ekspansjonen stemmer med alle opake motorpiksler, og tidligere kilde1995 er gjenfunnet RGBA-byteeksakt. De ni hele originalene er visuelt sett; 1990 er også sett i rom35. Den gamle avklippingen av1990 er dermed løst uten å endre jobbgrunnlag. Se KILDESAK-1990.md, helkilder1986til1994.json og kilder-neste/.
+
+Neste bunke er 1994..1990, deretter 1989..1986. H176 er ikke forberedt, utført eller reservert. Ikke tegn 1995..2021 igjen. Se riktig original i spillkontekst og godkjent Sam før hvert motiv. 137/V013 og296/S037 står uendret. Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokal kontroll. Ingen nødvendig Tom-avklaring. Automatikken er ACTIVE, hele grafikkoppgaven er ikke ferdig. Ingen gammel nattprosess eller motor-/pipelinekode er startet eller endret.
+'''
+(R/'NESTE.md').write_text('# Neste grafikkbunke\n\n'+status)
+(R/'LEVERANSE-1995.md').write_text('# Fase 1995 og fellespakker publisert\n\n'+status)
+(R/'notat1995.md').write_text('# Helikopterfase 1995\n\nOriginalen er 80 x31 og er sett hel i World of Fish, rom35, sammen med godkjent Sam før nytegning. Begge rotorflater, de tilsiktede kuttene, halebom, hengende venstre fin, kropp og to tynne løpere er kildebekreftet. Sam er bare strek-/kantanker.\n\n'+status)
+with(R/'RETUR.md').open('a')as f:f.write('\n\n## Gjeldende etter fase1995 og oppdaterte pakker\n\n'+status)
+start='<!-- helikopter178-forfaser1995-1999:start -->'
+end='<!-- helikopter178-forfaser1995-1999:slutt -->'
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;t=p.read_text();a=t.index(start)+len(start);b=t.index(end,a);p.write_text(t[:a]+'\n'+status+t[b:])
+f=read(R/'fremdrift.json')
+f.update(pakker_native=3728,pakker_mangler_native=0,fellespakker_tag=pk['tag'],fellespakker_url=pk['url'],
+    fellespakker_faktisk_hentet_og_innhold_bekreftet=True,bunke_ferdig=True,hele_grafikkoppgaven_ferdig=False,
+    neste_ruter=[1994,1993,1992,1991,1990],nye_hele_kilder1986til1994=True,fase1990_hel_kilde_tilgjengelig=True,
+    nye_motoravspillinger_i_okten=4,oppdatert_oslo=datetime.now(ZoneInfo('Europe/Oslo')).isoformat())
+put(R/'fremdrift.json',f)
+s=read(R/'sluttkontroll.json')
+s.update(fellespakker_native=3728,fellespakker_mangler=0,ny_pakkebygging=True,
+    antall_nye_motoravspillinger=4,native_sammenligningsavspillinger=2,ny_kildeavspilling=1,ny_faktisk_pakkemotoravspilling=1,
+    begge_pakker_lastet_ned_alle_modhash=True,fellesutgave_fire_vedlegg_faktisk_hentet=True,
+    Linux_pakkemotor_kjort=True,Windows_oppstart_Actions=True,bunke_ferdig=True,samlet_sluttkontroll_av_hele_prosjektet=False,
+    neste_ruter=[1994,1993,1992,1991,1990],fase1990_kildeproblem_lost=True,alle97_kildefaser_er_ikke_alle102=True)
+put(R/'sluttkontroll.json',s)
+v=read(R/'videre-1995-H166-H175.json')
+v.update(nye_motoravspillinger=4,native_sammenligningsavspillinger=2,fellespakker_native=3728,
+    fellespakker_tag=pk['tag'],begge_pakker_faktisk_hentet_kontrollert=True,nye_hele_kilder1986til1994=True,
+    neste_ruter=[1994,1993,1992,1991,1990],bunke_ferdig=True,hele_grafikkoppgaven_ferdig=False)
+put(R/'videre-1995-H166-H175.json',v)
+(R/'sluttfoering1995.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Ferdig femfasebunke og kontrollerte fellespakker3728. Neste1994..1990, H176 ikke utført.')
