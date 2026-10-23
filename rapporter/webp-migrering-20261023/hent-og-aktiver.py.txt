@@ -1,0 +1,24 @@
+from pathlib import Path
+import hashlib,json,subprocess,tarfile,os
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/webp-migrering-20261023';D=O/'mod'
+rec=json.loads((O/'native-publisering.json').read_text());assert rec['published'];sha=rec['commit'];expected={}
+for p in D.rglob('*'):
+ if p.is_file():
+  with p.open('rb')as f:expected[p.relative_to(D).as_posix()]=(hashlib.file_digest(f,'sha256').hexdigest(),p.stat().st_size)
+proc=subprocess.Popen(['gh','api',f'repos/Tombonator3000/Sam-Max-HD/tarball/{sha}'],stdout=subprocess.PIPE);seen=set();downloaded=0
+with tarfile.open(fileobj=proc.stdout,mode='r|gz')as archive:
+ for member in archive:
+  if member.isdir():continue
+  assert member.isfile()
+  rel='/'.join(member.name.split('/')[1:]);assert rel in expected and rel not in seen
+  h=hashlib.sha256();n=0
+  with archive.extractfile(member)as f:
+   while block:=f.read(1024*1024):h.update(block);n+=len(block)
+  assert (h.hexdigest(),n)==expected[rel],rel
+  seen.add(rel);downloaded+=n
+assert proc.wait()==0 and seen==set(expected)
+remote=subprocess.check_output(['git','-C',str(P),'ls-remote','origin','refs/heads/hd-mod'],text=True).split()[0];assert remote==sha
+proof={'native_sha':sha,'downloaded_via_github_tarball':True,'files_downloaded_and_sha256_verified':len(seen),'file_bytes_downloaded':downloaded,'tar_saved_to_disk':False,'all_file_hashes_match':True,'native_cels':3723,'old_png_parent_preserved':rec['parent']}
+(O/'native-hentet-kontrollert.json').write_text(json.dumps(proof,indent=2)+'\n')
+old=O/'mod-png-for-bytte';assert not old.exists();(P/'mods/gpt').rename(old);D.rename(P/'mods/gpt')
+proof['active_mod_path']=str(P/'mods/gpt');proof['activated']=True;(O/'native-hentet-kontrollert.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof,indent=2),flush=True)

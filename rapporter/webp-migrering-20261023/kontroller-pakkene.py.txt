@@ -1,0 +1,29 @@
+from pathlib import Path
+import json,hashlib,zipfile,re,subprocess
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/webp-migrering-20261023';M=P/'mods/gpt'
+def sha(p):
+ with p.open('rb')as f:return hashlib.file_digest(f,'sha256').hexdigest()
+expected={p.relative_to(M).as_posix():(sha(p),p.stat().st_size)for p in M.rglob('*')if p.is_file()};out={}
+for platform,name in [('linux','SamMaxHD-x86_64.AppImage'),('windows','SamMaxHD-Windows.zip')]:
+ root=O/'pakker'/platform;p=root/name;sums=root/(name+'.sha256');h=sha(p);assert sums.read_text().split()[0]==h
+ meta=json.loads((O/(platform+'-release.json')).read_text());a=next(a for a in meta['assets']if a['name']==name)
+ assert a['digest']=='sha256:'+h and a['size']==p.stat().st_size
+ assert '15835538ca4b4e70e95a0f227e7d41bea830400e'in meta['body']
+ if platform=='linux':
+  tree=root/'squashfs-root/usr/share/sam-max-hd';native=tree/'mods/gpt';files={x.relative_to(native).as_posix():x for x in native.rglob('*')if x.is_file()};assert set(files)==set(expected)
+  for rel,x in files.items():assert(sha(x),x.stat().st_size)==expected[rel],rel
+  build=(tree/'BYGG.txt').read_text();libfiles=list((root/'squashfs-root/usr/lib').glob('*webp*'));assert libfiles
+  assert (tree/'COPYING-libwebp.txt').is_file()
+ else:
+  with zipfile.ZipFile(p)as z:
+   prefix='SamMaxHD-Windows/mod/';files={n[len(prefix):]:n for n in z.namelist()if n.startswith(prefix)and not n.endswith('/')};assert set(files)==set(expected)
+   for rel,n in files.items():
+    with z.open(n)as f:digest=hashlib.file_digest(f,'sha256').hexdigest()
+    assert(digest,z.getinfo(n).file_size)==expected[rel],rel
+   build=z.read('SamMaxHD-Windows/BYGG.txt').decode();libfiles=[n for n in z.namelist()if re.search(r'/libwebp[^/]*\.dll$',n,re.I)];assert libfiles
+   assert 'SamMaxHD-Windows/COPYING-libwebp.txt'in z.namelist()
+ declared=re.search(r'Sam-Max-HD: ([0-9a-f]+)',build).group(1)
+ assert subprocess.check_output(['git','-C',str(P),'rev-parse',declared],text=True).strip()=='4d9f1e46b85cd431e6e03571ecda319755ea8151'
+ assert '15835538ca4b4e70e95a0f227e7d41bea830400e'in build
+ out[platform]={'file':name,'bytes':p.stat().st_size,'sha256':h,'checksum_file_sha256':sha(sums),'native_files_sha256_verified':len(expected),'webp_files':sum(n.endswith('.webp')for n in expected),'native_cels':3723,'mod_json_and_all_graphics_match_published_native':True,'webp_library_included':[str(x)for x in libfiles],'code_main_sha':'4d9f1e46b85cd431e6e03571ecda319755ea8151','native_sha':'15835538ca4b4e70e95a0f227e7d41bea830400e','build':build}
+(O/'pakker-nedlastet-kontrollert.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps({k:{x:v[x]for x in ['bytes','sha256','native_files_sha256_verified','webp_files','native_cels']}for k,v in out.items()},indent=2),flush=True)

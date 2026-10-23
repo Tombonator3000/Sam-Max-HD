@@ -1,0 +1,23 @@
+from pathlib import Path
+import os,json,hashlib,subprocess,re
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/webp-migrering-20261023';T=O/'aktiv-motorproeve';T.mkdir();(T/'saves').mkdir()
+env={k:v for k,v in os.environ.items()if not k.startswith('DIGHD_')};env.update(HOME=str(T),XDG_CONFIG_HOME=str(T/'.config'),XDG_DATA_HOME=str(T/'.local/share'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_VERIFY='1',DIGHD_SKIP_VIDEO='1',DIGHD_QUIT_AT='160',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='20',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM='7',DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_TEST_COSTUME='1',DIGHD_TEST_ACTOR='29',DIGHD_TEST_STATIC_SCENE='1',DIGHD_TEST_CHORE_EVERY='500',DIGHD_TEST_ANIMATION='1',DIGHD_TEST_POS='160,120',DIGHD_TEST_SCALE='255',DIGHD_MANGLER='0')
+args=[str(P/'engine/run.sh'),'gpt','--config='+str(T/'scummvm.ini'),'--savepath='+str(T/'saves'),'--gfx-mode=surfacesdl','--music-driver=null','--gui-theme=builtin','--no-fullscreen','--debuglevel=3','--random-seed=20261023']
+with(T/'scummvm.log').open('wb')as f:result=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=300)
+s=(T/'scummvm.log').read_text(errors='replace');loads=re.findall('DigHD: WebP (.+)',s);checks=[(int(a),int(b))for a,b in re.findall(r'verify frame (\d+): (\d+) screen pixels differ',s)]
+assert result.returncode==0 and loads and 'invalid WebP'not in s
+late=[x for x in checks if x[0]>=60];assert late and all(n==0 for _,n in late)
+proof={'exit':result.returncode,'launcher':str(P/'engine/run.sh'),'active_mod':str(P/'mods/gpt'),'webp_files_loaded':loads,'screen_checks_after_frame60':late,'all_late_screen_checks_zero':True,'binary_sha256':hashlib.sha256((P/'engine/scummvm/scummvm').read_bytes()).hexdigest(),'log_sha256':hashlib.sha256((T/'scummvm.log').read_bytes()).hexdigest(),'frames':160}
+(O/'aktiv-motor-kontroll.json').write_text(json.dumps(proof,indent=2)+'\n');print('Active engine passed with',len(loads),'WebP loads and',len(late),'late zero-difference checks',flush=True)
+old=O/'mod-png-for-bytte';tree=subprocess.check_output(['git','-C',str(P),'ls-tree','-r','--full-tree','2ba07d9cb94c99053fd0e97b0dfab903f3b01aff'],text=True);expected={}
+for line in tree.splitlines():
+ info,path=line.split('\t');expected[path]=info.split()[2]
+files={p.relative_to(old).as_posix():p for p in old.rglob('*')if p.is_file()};assert set(files)==set(expected)
+size=0
+for rel,p in files.items():
+ data=p.read_bytes();assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==expected[rel];size+=len(data)
+parents=subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/commits/15835538ca4b4e70e95a0f227e7d41bea830400e','--jq','.parents[].sha'],text=True).splitlines();assert '2ba07d9cb94c99053fd0e97b0dfab903f3b01aff'in parents
+import shutil
+shutil.rmtree(old)
+receipt={'removed_directory':str(old),'files_verified_before_removal':len(files),'bytes_logical':size,'all_files_match_published_parent':True,'parent_sha':'2ba07d9cb94c99053fd0e97b0dfab903f3b01aff','parent_reachable_from_current_native':True,'replacement_rgba_exact':True,'active_motor_test_passed':True}
+(O/'gamle-mod-png-fjernet.json').write_text(json.dumps(receipt,indent=2)+'\n');print('Removed verified old PNG mod copy',len(files),'files',size,'bytes',flush=True)

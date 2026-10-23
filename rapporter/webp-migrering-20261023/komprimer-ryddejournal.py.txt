@@ -1,0 +1,24 @@
+from pathlib import Path
+import gzip,json,hashlib,base64
+O=Path('/home/tom/Sam-Max-HD/out/webp-migrering-20261023')
+base=O/'beholdt-png-grunnlag.json';meta=json.loads(base.read_text());files=sorted(meta['files']);n=len(files);lookup={p:i for i,p in enumerate(files)};names={}
+for p in files:names.setdefault(Path(p).name,[]).append(p)
+roots={};count=0;size=0
+old=O/'slettede-duplikater.jsonl.gz';oldsha=hashlib.sha256(old.read_bytes()).hexdigest()
+with gzip.open(old,'rt')as f:
+ for line in f:
+  p,h,b=json.loads(line)
+  rel=next(r for r in names[Path(p).name]if p.endswith('/'+r));i=lookup[rel];root=p[:-len(rel)-1]
+  assert meta['files'][rel]['sha256']==h and meta['files'][rel]['size']==b
+  bitmap=roots.setdefault(root,bytearray((n+7)//8));assert not(bitmap[i//8]&(1<<(i%8)));bitmap[i//8]|=1<<(i%8)
+  count+=1;size+=b
+summary=json.loads((O/'rydding-status.json').read_text());assert count==summary['removed'] and size==summary['bytes_logical']
+proof={'format':'sam-max-duplicate-audit-bitset-v1','encoding':'sorted baseline file paths, zero-based index, least significant bit first; 1 means removed','baseline':base.name,'baseline_sha256':hashlib.sha256(base.read_bytes()).hexdigest(),'baseline_commit':meta['remote_sha'],'roots':{r:base64.b64encode(b).decode()for r,b in roots.items()},'removed':count,'bytes_logical':size,'original_audit_sha256':oldsha}
+new=O/'slettede-duplikater-bitkart.json.gz'
+with gzip.open(new,'wt',compresslevel=9)as f:json.dump(proof,f,separators=(',',':'))
+with gzip.open(new,'rt')as f:check=json.load(f)
+assert sum(sum(b.bit_count()for b in base64.b64decode(v))for v in check['roots'].values())==count
+summary.update(compact_manifest=new.name,compact_manifest_sha256=hashlib.sha256(new.read_bytes()).hexdigest(),compact_baseline=base.name)
+(O/'rydding-status.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(count,'removals represented exactly in',new.stat().st_size,'bytes; prior audit',old.stat().st_size,'bytes',flush=True)
+old.unlink()

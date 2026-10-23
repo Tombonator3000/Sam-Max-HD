@@ -1,0 +1,38 @@
+from pathlib import Path
+import hashlib,json,os,subprocess,sys
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/webp-migrering-20261023';D=O/'mod';OLD='2ba07d9cb94c99053fd0e97b0dfab903f3b01aff';REF='refs/heads/hd-mod'
+def git(*args,input=None,env=None):return subprocess.check_output(['git','-C',str(P),*args],input=input,env=env).decode().strip()
+def sha(p):
+ with p.open('rb')as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def save(p,d):p.write_text(json.dumps(d,indent=2)+'\n')
+mode=sys.argv[1]
+if mode=='prepare':
+ proof=json.loads((O/'full-mod-kontroll.json').read_text());assert proof['complete'] and proof['all_rgba_bytes_equal'] and proof['native_before']==proof['native_after']==3723
+ remote=git('ls-remote','origin',REF).split()[0];assert remote==OLD
+ subprocess.run(['git','-C',str(P),'fetch','-q','--depth','1','origin','+refs/heads/hd-mod:refs/remotes/origin/hd-mod'],check=True)
+ manifest=json.loads((D/'webp-migration.json').read_text());rows={r['source']:r for r in manifest['files']}
+ old=git('ls-tree','-r','--full-tree',OLD).splitlines()
+ for line in old:
+  info,rel=line.split('\t');mode0,kind,h=info.split();assert kind=='blob'
+  if rel=='SHA256SUMS':continue
+  assert rel in rows,rel
+  row=rows[rel];src=P/'mods/gpt'/rel;assert sha(src)==row['source_sha256']
+  data=src.read_bytes();assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==h
+  assert sha(D/row['target'])==row['target_sha256']
+ index=O/'hdmod-webp.index';env={**os.environ,'GIT_INDEX_FILE':str(index)}
+ git('read-tree','--empty',env=env)
+ files=sorted(p for p in D.rglob('*')if p.is_file());assert all('\n'not in str(p)for p in files)
+ hashes=git('hash-object','-w','--no-filters','--stdin-paths',input=('\n'.join(str(p)for p in files)+'\n').encode()).splitlines();assert len(files)==len(hashes)
+ entries=''.join('100644 '+h+'\t'+p.relative_to(D).as_posix()+'\n'for p,h in zip(files,hashes))
+ git('update-index','--index-info',input=entries.encode(),env=env)
+ tree=git('write-tree',env=env)
+ new=git('-c','user.name=Codex','-c','user.email=codex@openai.com','commit-tree',tree,'-p',OLD,input='Tapsfri WebP: 4872 fargebilder, 3723 native ruter bevart\n'.encode())
+ save(O/'native-publisering.json',{'parent':OLD,'commit':new,'tree':tree,'files':len(files),'all_prior_images_represented':True,'pixel_equivalence':'full-mod-kontroll.json','checksum_manifest':sha(D/'SHA256SUMS'),'prepared':True,'published':False})
+ print('Prepared native commit',new,'with',len(files),'files; parent',OLD,flush=True)
+elif mode=='push':
+ rec=json.loads((O/'native-publisering.json').read_text());assert rec['prepared'] and rec['parent']==OLD
+ assert git('ls-remote','origin',REF).split()[0]==OLD,'Remote changed; do not overwrite other work'
+ subprocess.run(['git','-C',str(P),'push','-q','origin',rec['commit']+':'+REF],check=True)
+ assert git('ls-remote','origin',REF).split()[0]==rec['commit']
+ rec['published']=True;save(O/'native-publisering.json',rec);print('Published',rec['commit'],flush=True)
+else:raise SystemExit('prepare or push')

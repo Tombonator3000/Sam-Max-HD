@@ -1,0 +1,26 @@
+from pathlib import Path
+import hashlib, json,os,subprocess,re
+from PIL import Image
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/webp-migrering-20261023';B=O/'native-forproeve/engine/scummvm/scummvm';sources={'png':P/'mods/gpt','webp':O/'mod'};results=[]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+for room,costume in [(7,1),(9,1),(35,178)]:
+ for kind,mod in sources.items():
+  T=O/f'fullmotor-rom{room}-{kind}';T.mkdir();(T/'saves').mkdir()
+  env={k:v for k,v in os.environ.items()if not k.startswith('DIGHD_')};env.update(HOME=str(T),XDG_CONFIG_HOME=str(T/'.config'),XDG_DATA_HOME=str(T/'.local/share'),SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy',DIGHD_MOD=str(mod),DIGHD_VERIFY='1',DIGHD_SKIP_VIDEO='1',DIGHD_QUIT_AT='200',DIGHD_DUMP_DIR=str(T),DIGHD_DUMP_EVERY='20',DIGHD_DUMP_FLAT='1',DIGHD_TEST_ROOM=str(room),DIGHD_TEST_AT='10',DIGHD_TEST_CAMX='160',DIGHD_TEST_COSTUME=str(costume),DIGHD_TEST_ACTOR='29',DIGHD_TEST_STATIC_SCENE='1',DIGHD_TEST_CHORE_EVERY='500',DIGHD_TEST_ANIMATION='1',DIGHD_TEST_POS='160,120',DIGHD_TEST_SCALE='255',DIGHD_TEST_CLIP='0',DIGHD_MANGLER='0')
+  args=[str(B),'--config='+str(T/'scummvm.ini'),'--path='+str(P/'game'),'--savepath='+str(T/'saves'),'--gfx-mode=surfacesdl','--no-fullscreen','--gui-theme=builtin','--music-driver=null','--random-seed=20261023','--debuglevel=3','samnmax']
+  with(T/'scummvm.log').open('wb')as f:ret=subprocess.run(args,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=300).returncode
+  log=(T/'scummvm.log').read_text(errors='replace');assert ret==0 and f'actor 29 with costume {costume}'in log
+  assert 'invalid WebP'not in log and "Couldn't save file"not in log
+  if kind=='webp':assert 'DigHD: WebP 'in log
+  result={'room':room,'mode':kind,'exit':ret,'binary_sha256':sha(B),'log_sha256':sha(T/'scummvm.log'),'webp_loads':len(re.findall('DigHD: WebP ',log)),'full_published_mod_input':True}
+  results.append(result);print(result,flush=True)
+pairs=[]
+for room in [7,9,35]:
+ for p in sorted((O/f'fullmotor-rom{room}-png').glob(f'frame_*_room{room:03}.png')):
+  if int(p.name[6:12])<100:continue
+  q=O/f'fullmotor-rom{room}-webp'/p.name
+  with Image.open(p)as a, Image.open(q)as b:equal=a.size==b.size and a.convert('RGBA').tobytes()==b.convert('RGBA').tobytes()
+  pairs.append({'room':room,'frame':p.name,'rgba_equal':equal,'png_sha256':sha(p),'webp_sha256':sha(q)})
+proof={'runs':results,'comparisons':pairs,'all_equal':all(p['rgba_equal']for p in pairs),'full_mod_png_and_webp':True,'style_approval_not_changed':True}
+(O/'full-motor-kontroll.json').write_text(json.dumps(proof,indent=2)+'\n');print('DONE',len(pairs),'frame pairs, all equal:',proof['all_equal'],flush=True)
+assert len(pairs)>=12 and proof['all_equal']

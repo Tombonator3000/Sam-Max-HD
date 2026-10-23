@@ -1,0 +1,18 @@
+from pathlib import Path
+import hashlib,json,subprocess
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/webp-migrering-20261023';r=json.loads((O/'felles-release-utkast.json').read_text());pk=json.loads((O/'pakker-nedlastet-kontrollert.json').read_text());expected={}
+for kind in ['linux','windows']:
+ for n in [pk[kind]['file'],pk[kind]['file']+'.sha256']:
+  p=O/'pakker'/kind/n
+  with p.open('rb')as f:expected[n]=(hashlib.file_digest(f,'sha256').hexdigest(),p.stat().st_size)
+assert set(a['name']for a in r['assets'])==set(expected)
+rows=[]
+for a in r['assets']:
+ h=hashlib.sha256();n=0
+ proc=subprocess.Popen(['gh','api',f'repos/Tombonator3000/Sam-Max-HD/releases/assets/{a["id"]}','-H','Accept: application/octet-stream'],stdout=subprocess.PIPE)
+ while block:=proc.stdout.read(1024*1024):h.update(block);n+=len(block)
+ assert proc.wait()==0
+ assert (h.hexdigest(),n)==expected[a['name']]and a['digest']=='sha256:'+h.hexdigest()
+ row={'name':a['name'],'id':a['id'],'bytes_downloaded':n,'sha256':h.hexdigest(),'matches_inspected_rolling_package':True,'download_streamed_without_duplicate_archive':True};rows.append(row);print('Verified',a['name'],n,flush=True)
+proof={'tag':r['tag_name'],'release_id':r['id'],'source_code_sha':'4d9f1e46b85cd431e6e03571ecda319755ea8151','native_sha':'15835538ca4b4e70e95a0f227e7d41bea830400e','assets':rows,'all_four_files_downloaded_and_verified':True,'both_native_contents_verified':True,'ready_to_publish':True}
+(O/'felles-release-hentet-kontrollert.json').write_text(json.dumps(proof,indent=2)+'\n')

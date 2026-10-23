@@ -1,0 +1,60 @@
+from pathlib import Path
+import os,json,hashlib,tarfile,gzip,time
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/webp-migrering-20261023';M=P/'mods/gpt'
+KEEP={'webp-migrering-20261023','helikopter178-retur2001og2000-20261023','felles-release-20261023-helikopter','formatproeve-webp-avif-20261023'}
+refs=json.loads((O/'releaser-for-rydding.json').read_text());assets={a['digest'].removeprefix('sha256:'):{**a,'tag':r['tag_name']} for r in refs for a in r['assets'] if (a.get('digest')or'').startswith('sha256:')}
+expected=json.loads((O/'beholdt-png-grunnlag.json').read_text())['files']
+def sha(p):
+ with p.open('rb')as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def free():s=os.statvfs(P);return s.f_bavail*s.f_frsize
+rows=[];candidates=[]
+for base,ds,fs in os.walk(P/'out',followlinks=False):
+ path=Path(base)
+ ds[:]=[d for d in ds if d not in {'.git','costumes','objects','rooms','fonts','node_modules','__pycache__'} and not(path==P/'out' and d in KEEP)]
+ for name in fs:
+  p=path/name
+  if p.is_symlink():continue
+  if name in {'SamMaxHD-Windows.zip','SamMaxHD-x86_64.AppImage'} or name.endswith(('.tar','.tar.gz','.tgz')):candidates.append(p)
+summary={'start':time.time(),'free_before':free(),'candidates':len(candidates),'removed':0,'bytes_logical':0}
+with gzip.open(O/'slettede-arkivmedlemmer.jsonl.gz','wt')as tarlog:
+ for i,p in enumerate(candidates,1):
+  size=p.stat().st_size; digest=sha(p); row={'path':str(p.relative_to(P)),'sha256':digest,'bytes':size,'removed':False}
+  if digest in assets and assets[digest]['size']==size:
+   row.update(restore=assets[digest]['browser_download_url'],release=assets[digest]['tag'],verification='local SHA-256 equals published GitHub asset digest')
+   p.unlink();row['removed']=True
+  elif p.name.endswith(('.tar','.tar.gz','.tgz')):
+   stem=p.name
+   for suffix in ['.tar.gz','.tar','.tgz']:
+    if stem.endswith(suffix):stem=stem[:-len(suffix)];break
+   extracted=p.with_name(stem)
+   if extracted.is_dir() and (extracted/'mod.json').is_file():
+    verified=[];valid=True
+    try:
+     with tarfile.open(p,'r:*')as archive:
+      for member in archive:
+       if member.isdir():continue
+       if not member.isfile():valid=False;break
+       relative=Path(member.name)
+       if relative.is_absolute() or '..' in relative.parts:valid=False;break
+       with archive.extractfile(member)as f: member_hash=hashlib.file_digest(f,'sha256').hexdigest()
+       rel=relative.as_posix().removeprefix('./');dest=extracted/rel
+       if rel in expected and expected[rel]['sha256']==member_hash:
+        restore='mods/gpt/'+rel+' @ 2ba07d9cb94c99053fd0e97b0dfab903f3b01aff'
+       elif dest.is_file() and sha(dest)==member_hash:
+        restore=str(dest.relative_to(P))
+       else:valid=False;break
+       verified.append([rel,member_hash,restore])
+    except (OSError,tarfile.TarError):valid=False
+    if valid and verified:
+     row.update(restore=str(extracted.relative_to(P))+' + retained PNG baseline',verified_members=len(verified),verification='every archived file hashed against retained local data')
+     for member in verified:tarlog.write(json.dumps([str(p.relative_to(P)),*member],separators=(',',':'))+'\n')
+     p.unlink();row['removed']=True
+  rows.append(row)
+  if row['removed']:
+   summary['removed']+=1;summary['bytes_logical']+=size
+   print(i,'/',len(candidates),'removed',p,'GiB',round(summary['bytes_logical']/2**30,2),flush=True)
+  summary['rows']=rows;summary['free_now']=free()
+  (O/'arkivrydding-status.json').write_text(json.dumps(summary,indent=2)+'\n')
+summary.update(end=time.time(),free_after=free())
+(O/'arkivrydding-status.json').write_text(json.dumps(summary,indent=2)+'\n')
+print('DONE',summary['removed'],'archives removed',summary['bytes_logical'],'bytes',flush=True)

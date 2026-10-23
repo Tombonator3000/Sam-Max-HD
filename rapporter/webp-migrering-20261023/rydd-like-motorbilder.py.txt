@@ -1,0 +1,41 @@
+from pathlib import Path
+import os,json,hashlib,gzip,re,time,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/webp-migrering-20261023'
+KEEP={'webp-migrering-20261023','helikopter178-retur2001og2000-20261023','felles-release-20261023-helikopter','formatproeve-webp-avif-20261023'}
+def sha(p):
+ with p.open('rb')as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def free():s=os.statvfs(P);return s.f_bavail*s.f_frsize
+refs={};by_size=set();candidates=[]
+tracked=subprocess.check_output(['git','-C',str(A),'ls-files','-z','rapporter']).decode().split('\0')
+for rel in tracked:
+ if rel.endswith('.png'):
+  p=A/rel
+  if p.is_file():
+   h=sha(p);refs.setdefault(h,str(p));by_size.add(p.stat().st_size)
+print('Retained tracked graphics/report PNGs',len(refs),flush=True)
+for base,ds,fs in os.walk(P/'out',followlinks=False):
+ p=Path(base)
+ ds[:]=[d for d in ds if d not in {'.git','costumes','objects','rooms','fonts','node_modules','__pycache__'} and not(p==P/'out' and d in KEEP)]
+ if 'scummvm.log' in fs:
+  for name in fs:
+   if re.fullmatch(r'frame_\d{6}_room\d{3}(?:_flat|_screen)?\.png',name):candidates.append(p/name)
+summary={'start':time.time(),'free_before':free(),'candidates':len(candidates),'removed':0,'bytes_logical':0,'unique_render_images_retained':0}
+with gzip.open(O/'slettede-motorbildekopier.jsonl.gz','wt')as log:
+ for i,p in enumerate(sorted(candidates),1):
+  if p.is_symlink():continue
+  size=p.stat().st_size
+  h=sha(p)
+  if h in refs:
+   # The retained copy was read and hashed first, and never enters the deletion set again.
+   p.unlink();summary['removed']+=1;summary['bytes_logical']+=size
+   log.write(json.dumps([str(p.relative_to(P)),h,size,refs[h]],separators=(',',':'))+'\n')
+  else:
+   refs[h]=str(p);summary['unique_render_images_retained']+=1
+  if i%5000==0:
+   summary['files_done']=i;summary['free_now']=free()
+   (O/'motorbildrydding-status.json').write_text(json.dumps(summary,indent=2)+'\n')
+   print(i,'/',len(candidates),'removed',summary['removed'],'GiB',round(summary['bytes_logical']/2**30,2),flush=True)
+summary.update(end=time.time(),free_after=free(),manifest_sha256=sha(O/'slettede-motorbildekopier.jsonl.gz'))
+(O/'beholdte-unike-bildehasher.json').write_text(json.dumps(refs,indent=2)+'\n')
+(O/'motorbildrydding-status.json').write_text(json.dumps(summary,indent=2)+'\n')
+print('DONE',json.dumps(summary),flush=True)

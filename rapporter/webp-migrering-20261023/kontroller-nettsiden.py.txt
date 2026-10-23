@@ -1,0 +1,28 @@
+from pathlib import Path
+import urllib.request,json,hashlib,tarfile,time
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/webp-migrering-20261023';base='https://tombonator3000.github.io/Sam-Max-HD-Web/';suffix='?webpcheck='+str(int(time.time()))
+def get(name):return urllib.request.urlopen(urllib.request.Request(base+name+suffix,headers={'Cache-Control':'no-cache','User-Agent':'SamMaxHD-verification'}),timeout=120)
+with get('build.json')as r:info=json.load(r)
+assert info['scummvm_commit']=='c9091321060acfc8f037767c18f8279a86305b7e'and not info['includes_game_data']and not info['includes_hd_images']
+seen={}
+for name in ['scummvm.js','scummvm.wasm','local-files.mjs']:
+ with get(name)as r:data=r.read()
+ h=hashlib.sha256(data).hexdigest();assert info['sha256'][name]==h;seen[name]={'sha256':h,'bytes':len(data)}
+ if name=='local-files.mjs':assert "'_hd.webp'"in data.decode()
+patch=(P/'engine/patches/0001-dighd-hd-grafikk.patch').read_bytes();expected=hashlib.sha256(patch).hexdigest();found=None;lib=False;source_hash=hashlib.sha256()
+class HashReader:
+ def __init__(self,stream):self.stream=stream
+ def read(self,n=-1):
+  data=self.stream.read(n);source_hash.update(data);return data
+with get('source.tar.gz')as response:
+ reader=HashReader(response)
+ with tarfile.open(fileobj=reader,mode='r|gz')as archive:
+  for member in archive:
+   if member.name.endswith('/engine/patches/0001-dighd-hd-grafikk.patch'):
+    found=hashlib.sha256(archive.extractfile(member).read()).hexdigest()
+   if member.name.endswith('/vendor/libwebp-1.6.0.tar.gz'):lib=True
+ while reader.read(1024*1024):pass
+assert found==expected and lib
+assert source_hash.hexdigest()==info['sha256']['source.tar.gz']
+proof={'url':base,'code_main_sha':'4d9f1e46b85cd431e6e03571ecda319755ea8151','downloaded_files':seen,'source_archive_sha256':source_hash.hexdigest(),'source_patch_sha256':found,'source_patch_matches_main':True,'libwebp_source_included':lib,'webp_file_selection_verified':True,'includes_game_data':False,'includes_hd_images':False}
+(O/'nettside-publisert-kontroll.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof,indent=2),flush=True)
