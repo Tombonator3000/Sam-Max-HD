@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;rows=[]
+for cid in sys.argv[1:]:
+ K=R/'kall'/cid;q=json.loads((K/'kontroll.json').read_text());src=np.array(Image.open(P/f'work/extract/costumes/costume178_{q["rute"]}.png'));ref=np.array(Image.open(K/'original-native-kontroll.png'));a=Image.open(K/'egen-renset.png').convert('RGBA');sx,sy=q['hel_skala'];scaled=np.array(a.resize((round(a.width*sx),round(a.height*sy)),Image.Resampling.NEAREST));can=np.zeros_like(ref);x,y=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];h,w=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,can.shape[1]),min(y+h,can.shape[0]);can[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x];sub=[]
+ for col in np.unique(src[src[:,:,3]>0,:3],axis=0):
+  have=np.all(can[:,:,:3]==col,2)&(can[:,:,3]>=128);re=np.all(ref[:,:,:3]==col,2)&(ref[:,:,3]>=128);yy,xx=np.nonzero(np.all(src[:,:,:3]==col,2)&(src[:,:,3]>0));yy,xx=yy*4+q['margy']*4+2,xx*4+q['margx']*4+2
+  pos=nd.distance_transform_edt(~have)[yy,xx]if have.any()else np.full(len(yy),999.);neg=nd.distance_transform_edt(~re)[have]if have.any()else[]
+  sub.append(dict(RGB=col.tolist(),kildepunkter=len(yy),egne_kodepiksler=int(have.sum()),fester_over3HD=int((pos>3).sum()),maks_feste_HD=float(max(pos)),egne_kodepiksler_over3HD_fra_kilde=int((neg>3).sum())if len(neg)else 0,maks_eget_felt_utenfor_kilde_HD=float(max(neg))if len(neg)else 0.))
+ proof=dict(kall=cid,rute=q['rute'],metode='Ren egen kodeRGB projisert nearest med registrert helaffin. Bare maaling. Klassifiserer ikke blandet nativeRGB pa nytt.',alle_kodefester_innen3HD=all(e['fester_over3HD']==0 for e in sub),farger=sub,originalmaske_til_endring=False,kildekoordinater_til_endring=False);(K/'kodeflate-kontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');rows.append(proof);print(cid,'alle kodefester',proof['alle_kodefester_innen3HD'],[(e['RGB'],e['fester_over3HD'],e['egne_kodepiksler_over3HD_fra_kilde'])for e in sub if e['fester_over3HD']or e['egne_kodepiksler_over3HD_fra_kilde']])
+(R/'kodeflate-kontroll-samlet.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')

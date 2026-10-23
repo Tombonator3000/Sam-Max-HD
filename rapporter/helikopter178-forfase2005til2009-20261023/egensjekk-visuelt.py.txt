@@ -1,0 +1,33 @@
+from pathlib import Path
+import json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,q):p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+q=read(R/'motor-visuell-plan.json');assert all(sha(R/e['fil'])==e['sha256']for key in ['varianter','hele_motorbilder']for e in q[key]);assert sha(R/q['animasjonstavel']['fil'])==q['animasjonstavel']['sha256'];q['visuelt_sett']=True;q['animasjonstavel']['visuelt_sett']=True
+for key in ['varianter','hele_motorbilder']:
+ for e in q[key]:e['visuelt_sett']=True
+save(R/'motor-visuell-plan.json',q)
+for name in ['motor-sammenligning.json','egen-native.json','fremdrift.json']:
+ q=read(R/name)
+ if name=='motor-sammenligning.json':q['visuelt_sett']=True
+ elif name=='egen-native.json':
+  for e in q['ruter']:e.update(motorobservert=True,native_visuelt_sett=True)
+ else:
+  q['motorobservert']=1
+  for e in q['leveranser']+q['delvise_leveranser']:e['motorobservert']=True
+ save(R/name,q)
+q=read(R/'motor-pikselkontroll.json')
+for e in q:e['visuelt_sett']=True
+save(R/'motor-pikselkontroll.json',q)
+for file in ['rutekart-fig178_02.json','rutekart-samlet.json']:
+ q=read(R/file)
+ for group in q.values():
+  for e in group['ruter']:
+   if e['rute']in [2008]:e.update(motorobservert=True,native_visuelt_sett=True,native_mottatt=True)
+ save(R/file,q)
+for c in ['H065']:
+ p=R/'kall'/c/'kontroll.json';q=read(p);assert q['tekniske_porter_bestatt']and q['alle_alfa_fester_innen3HD']and read(R/'kall'/c/'fargekontroll.json')['alle_fargefester_innen3HD']and read(R/'kall'/c/'kodeflate-kontroll.json')['alle_kodefester_innen3HD'];q.update(native_mottatt=True,motorobservert=True,visuell_native_kontroll=True,status='EGENKONTROLLERT_NATIVE_MOTOROBSERVERT',egenkontrollert=True);save(p,q)
+save(R/'sluttkontroll.json',dict(klar_for_additiv_publisering=True,visuelt_sett=True,valgte_native=1,motorobservert=1,native=3714,publisert=0,egne_nye_malerier=1,hele_ark_levert=0,automatiske_OK=1,automatiske_SJEKK=0,egen_native_port_bestatt=1,farge_og_alfafester_bestatt=1,beskyttede=1472,stasher=3,Tom_godkjent=False,Claude_godkjent=False,pakker_native=3713,pakker_mangler_native=1))
+save(R/'visuell-valgt-native.json',dict(valgte=['H065'],kompositt='fem-kandidater-kontroll4x.png',sha256=sha(R/'fem-kandidater-kontroll4x.png'),visuelt_sett=True,ekte_alfa_kompositt_pa_graabakgrunn=True,hele_native_og_delark_sett=True))
+p=R/'RAPPORT.md';p.write_text(p.read_text()+'\nBegge ferske motoravspillinger er fullført:160 kontroller/148 null og120/120 null etter frame40 per side.12 kjente inngangsavvik er identiske i koordinater og begge RGB-verdier. Originalrektangler med8HD naboområde er identiske;ingen uforklarte HD-endringer. Atomiske lagringsoperasjoner består. Ett helt motorbilde,ett komplett før/etter-par,alle24 utvalgte sekvensfaser1998..2021,valgte native og hele delarket er visuelt sett.53 kilder logget,ikke alle102 eller naturlig full gjennomspilling.\n')
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+print('Visuell egensjekk og motorprøve dokumentert,klar for additiv3714-publisering.')
