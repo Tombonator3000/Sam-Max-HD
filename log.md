@@ -2387,3 +2387,22 @@ Mod og kontrollerte Linux-/Windows-fellespakker står fortsatt på3701 native, h
 Tidligere status nedenfor er historikk.
 
 Originalkontekst, beskyttede jobbfiler, godkjente mastere og siste retur er lest før nye kall. Prosjektbibliotekets figurark-fast-storrelse og publisert-mod-er-fasit er brukt med opphavets PASS-begrensning. Hele kildeavspillinger fra forrige kontroll er ikke gjentatt. Rapportens sluttrevisjon bekrefter null nativeendring og alle inngangsverner. Grafikk og råbilder holdes i gpt-arbeid;bare disse fire sentrale dokumentene går til main.
+
+## 2026-10-23 07:10 (Codex)
+
+<!-- helikopter178-sluttfaser-status:start -->
+To små egne sluttfaser fra helikopter178 er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert: costume178_2020/H008 og costume178_2021/H003. fig178_03 er delvis 2/12, familien 2/102. Ingen ny hel resultat.png eller Tom-/Claude-godkjenning. Åtte innebygde bildekall gir to valgte og seks kvalitetsreturer. To nye taubane137-kall V011/V012 er også bevart som returer, ingen import. Neste178-kall er H009,137 er V013,296 er S037, ingen utført eller reservert.
+
+Publisert hd-mod er f419af59c42b277cd27e88e1b7ecbccad3781690, grafikkilde c18bedfc9455d1c1e6e642153ff72aa909cd7502. Modden har 3703 native. Alle 21947 filhash er hentet tilbake og bekreftet; alle 21945 tidligere filstier og 21939 tidligere PNG-hash er bevart. Alle 1472 kontrollerte beskyttede input og tre opprinnelige stasher er uendret. Ingen grafikk til main og ingen motor-/pipelinekodeendring.
+
+Automatisk mottak gir 0 OK og 2 dokumenterte størrelses-SJEKK. Ingen omrisshold; egen native-, farge- og alfakontroll består uendrede porter. Helarkkontrollen hopper over masker under 20 originalpiksler og gir 0/10 OK for de ti manglende rutene; den kalles ikke to OK. De små 1/2-piksel-høye kildesporene er vurdert separat i native og motor. Ingen originalmaskeklipp, originale fragmenter, lokale trekkflyttinger eller CLI/API-bildefallback.
+
+To ferske kontrollerte Linux-avspillinger med faktisk nedlastet binær 128c9c11 viser begge nye ruter og alle 12 sluttfaser. Hver har 160 bufferkontroller,148 null og 120/120 null etter frame40. De 12 kjente inngangsavvikene er identiske i koordinater og begge RGB-verdier. Originalrektangler med 8HD naboområde er identiske; ingen uforklarte HD-endringer. Hele motorbilder,før/etter-par og sluttfaser er visuelt sett.53 kilder logget,ikke alle102; ingen naturlig full gjennomspilling eller ny interaktiv Windows-/webtest.
+
+Felles Linux/Windows isblokk er fortsatt 3701 og mangler de to nye rutene. Begge faktiske pakker er tidligere kontrollert; de kalles ikke oppdatert. Neste familie-/ark-samlepunkt eller avslutning oppdaterer begge med nedlasting,sjekksummer og filkontroll. Hele figurjobber med resultat 507/1758,1251 uten i tillegg til returer/sluttkontroll. Fortsett fra rapporter/helikopter178-sluttfaser-20261022/NESTE.md og RETUR.md. Ingen ny nødvendig designavklaring; automatikken er ACTIVE og all grafikk er ikke ferdig. Ingen gammel nattevakt startet.
+<!-- helikopter178-sluttfaser-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
+
+Prosjektbibliotekets figurark-fast-storrelse,publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter er brukt med opphavets PASS-begrensning. Originalkontekst,palett og godkjent Sam-master ble sett før produksjon. Kontrollhjelpernes avbrutte oppsett er dokumentert, ingen avbrutt kjøring regnes bestått. Bare disse fire sentrale dokumentene legges direkte i main.
