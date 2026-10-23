@@ -19,3 +19,5 @@ Ingen ny full modkopi, kandidat, pakke, nedlastet TAR eller motoravspilling er s
 Fortsett de eksisterende returene. Nærmeste konkrete1997-feil er undermalingen ved to egne nye materialplan og den glatte understellvarianten med2 ekstra kodepiksler. Ingen porter skal svekkes. H148 er ikke utført eller reservert.1998,1996,1995 har sine bevarte råforsøk og egne rettede tekniske guider.1990 trenger fortsatt hel kilde;137/V013 og296/S037 er uendret. Ingen nødvendig Tom-avklaring. Automatikken forblir ACTIVE.
 
 Bibliotekskilden figurark-fast-storrelse.md er brukt for hele, begrensede tilpasninger og separat kontroll av proporsjoner. Publisert-mod-er-fasit.md ligger til grunn for kontrollen av den uendrede komplette modden. Det er ingen motor- eller pipelineendring.
+
+Råforsøk og rapportkilde f880b44342a458dbf9c2878909c823ff6c411fdb er faktisk hentet tilbake som strøm: alle529 endrede filer,30527592 byte, SHA256 og Gitblob-SHA1 stemmer. Ingen nedlastet payload eller TAR er lagret. Se rapport-H137-H147-hentet.json. Dette er kilde-/rapportverifisering, ikke ny nativeleveranse.
