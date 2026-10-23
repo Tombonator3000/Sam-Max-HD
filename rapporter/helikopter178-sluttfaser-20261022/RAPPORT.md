@@ -17,3 +17,5 @@ Kontrollhjelpere fikk tre avgrensede oppsettrettelser før godkjenning: statusas
 Prosjektbibliotek-skillen og remake-/imagegen-skillene er brukt. Bibliotekskildene figurark-fast-storrelse,publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter gir metodegrunnlag;opphavets PASS erstatter ikke kontroll her. Alle1472 beskyttede input og tre opprinnelige stasher skal være uendret. Ingen grafikk til main,ingen gamle nattprosesser.
 
 Felles Linux/Windows isblokk har3701. Begge faktiske pakker er tidligere kontrollert,men de inneholder ikke disse to nye rutene. Neste familie-/ark-samlepunkt eller avslutning skal oppdatere begge med fast native-SHA,nedlasting,sjekksummer og faktisk filkontroll. Automatikken fortsetter;all grafikk er ikke ferdig.
+
+Publiseringskvittering 2026-10-23 07:10: hd-mod f419af59c42b277cd27e88e1b7ecbccad3781690, grafikkilde c18bedfc9455d1c1e6e642153ff72aa909cd7502, 3703 native. Alle 21947 filhash er hentet tilbake og bekreftet; alle tidligere filer og PNG-hash er bevart. To nye egenkontrollerte ruter er publisert,ingen ny hel figurjobb. Fellespakker fortsatt3701.

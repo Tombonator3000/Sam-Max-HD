@@ -1,0 +1,25 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());r=read(R/'mottak-publisert.json');assert r['alle_filhash_bekreftet']and r['native']==3703
+mod=r['hd_mod'];art=r['grafikkilde'];now=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+info=f'''To små egne sluttfaser fra helikopter178 er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert: costume178_2020/H008 og costume178_2021/H003. fig178_03 er delvis 2/12, familien 2/102. Ingen ny hel resultat.png eller Tom-/Claude-godkjenning. Åtte innebygde bildekall gir to valgte og seks kvalitetsreturer. To nye taubane137-kall V011/V012 er også bevart som returer, ingen import. Neste178-kall er H009,137 er V013,296 er S037, ingen utført eller reservert.
+
+Publisert hd-mod er {mod}, grafikkilde {art}. Modden har 3703 native. Alle 21947 filhash er hentet tilbake og bekreftet; alle 21945 tidligere filstier og 21939 tidligere PNG-hash er bevart. Alle 1472 kontrollerte beskyttede input og tre opprinnelige stasher er uendret. Ingen grafikk til main og ingen motor-/pipelinekodeendring.
+
+Automatisk mottak gir 0 OK og 2 dokumenterte størrelses-SJEKK. Ingen omrisshold; egen native-, farge- og alfakontroll består uendrede porter. Helarkkontrollen hopper over masker under 20 originalpiksler og gir 0/10 OK for de ti manglende rutene; den kalles ikke to OK. De små 1/2-piksel-høye kildesporene er vurdert separat i native og motor. Ingen originalmaskeklipp, originale fragmenter, lokale trekkflyttinger eller CLI/API-bildefallback.
+
+To ferske kontrollerte Linux-avspillinger med faktisk nedlastet binær 128c9c11 viser begge nye ruter og alle 12 sluttfaser. Hver har 160 bufferkontroller,148 null og 120/120 null etter frame40. De 12 kjente inngangsavvikene er identiske i koordinater og begge RGB-verdier. Originalrektangler med 8HD naboområde er identiske; ingen uforklarte HD-endringer. Hele motorbilder,før/etter-par og sluttfaser er visuelt sett.53 kilder logget,ikke alle102; ingen naturlig full gjennomspilling eller ny interaktiv Windows-/webtest.
+
+Felles Linux/Windows isblokk er fortsatt 3701 og mangler de to nye rutene. Begge faktiske pakker er tidligere kontrollert; de kalles ikke oppdatert. Neste familie-/ark-samlepunkt eller avslutning oppdaterer begge med nedlasting,sjekksummer og filkontroll. Hele figurjobber med resultat 507/1758,1251 uten i tillegg til returer/sluttkontroll. Fortsett fra rapporter/helikopter178-sluttfaser-20261022/NESTE.md og RETUR.md. Ingen ny nødvendig designavklaring; automatikken er ACTIVE og all grafikk er ikke ferdig. Ingen gammel nattevakt startet.'''
+block='<!-- helikopter178-sluttfaser-status:start -->\n'+info+'\n<!-- helikopter178-sluttfaser-status:slutt -->\n\nTidligere status nedenfor er historikk.\n\n'
+for root,names in [(A,['ORDRE.md','GRAFIKKLISTE.md']),(P,['memory.md','STATUS.md','todo.md'])]:
+ for name in names:
+  p=root/name;s=p.read_text();assert '<!-- helikopter178-sluttfaser-status:start -->'not in s;first,rest=s.split('\n',1);p.write_text(first+'\n\n'+block+rest.lstrip('\n'))
+p=P/'log.md';s=p.read_text();p.write_text(s+'\n## '+now+' (Codex)\n\n'+block+'\nProsjektbibliotekets figurark-fast-storrelse,publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter er brukt med opphavets PASS-begrensning. Originalkontekst,palett og godkjent Sam-master ble sett før produksjon. Kontrollhjelpernes avbrutte oppsett er dokumentert, ingen avbrutt kjøring regnes bestått. Bare disse fire sentrale dokumentene legges direkte i main.\n')
+p=R/'RAPPORT.md';s=p.read_text();p.write_text(s+f'\nPubliseringskvittering {now}: hd-mod {mod}, grafikkilde {art}, 3703 native. Alle 21947 filhash er hentet tilbake og bekreftet; alle tidligere filer og PNG-hash er bevart. To nye egenkontrollerte ruter er publisert,ingen ny hel figurjobb. Fellespakker fortsatt3701.\n')
+shutil.copy2(O/'grafikk-hentet-kontrollert.json',R/'grafikkilde-hentet-kontrollert.json')
+shutil.copy2(__file__,R/'oppdater-status.py.txt')
+print('Status og kvitteringer oppdatert. Gjenstår commit/push og siste fjernrevisjon.',flush=True)
