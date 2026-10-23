@@ -1,0 +1,69 @@
+from pathlib import Path
+from PIL import Image, ImageFilter
+from scipy import ndimage as nd
+from smhd.myk import _premul_resize
+from own_parts import decode
+import hashlib, json, numpy as np
+
+O=Path(__file__).resolve().parent
+R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+receipts=[]
+for sn,cid in read(R/'valgte-ruter.json').items():
+ K=R/'kall'/cid
+ p=read(K/'plan.json')
+ info=p['egen_alfasoem']
+ U=R/info['kilde']
+ assert sha(U)==info['kilde_sha256']
+ up=read(U.parent/'plan.json')
+ sources=up['egne_hele_materialplan']
+ owners={}
+ for s in sources:
+  for e in s['tabell']:owners[tuple(e['ekte'])]=s['kall']
+ first=R/'kall'/sources[0]['kall']/'raa.png'
+ shape=np.array(Image.open(first).convert('RGBA')).shape
+ can=np.zeros(shape,dtype='uint8')
+ alpha=np.zeros(shape[:2],dtype='uint8')
+ painted=np.zeros(shape[:2],bool)
+ parts=[]
+ for s in sources:
+  D=R/'kall'/s['kall'];sp=read(D/'plan.json')
+  layer,clean=decode(D/'raa.png',sp['tabell'])
+  assert np.array_equal(layer,np.array(Image.open(R/s['fil']).convert('RGBA')))
+  chosen=np.zeros(shape[:2],bool)
+  owned=[e['ekte']for e in sp['tabell']if owners[tuple(e['ekte'])]==s['kall']]
+  for col in owned:chosen|=np.all(layer[:,:,:3]==col,2)
+  use=layer.copy();use[~chosen]=0
+  core=use[:,:,3]>=128
+  can[core,:3]=layer[core,:3]
+  alpha=np.maximum(alpha,use[:,:,3]);painted|=core
+  parts.append(dict(kall=s['kall'],raa_sha256=sha(D/'raa.png'),prompt_sha256=sha(D/'prompt-brukt.txt'),argumenter_sha256=sha(D/'argumenter.json'),sluttfarger=owned,sluttpiksler=int(core.sum()),hel_transformasjon='Identitet på hele eget genererte lerret'))
+ _,ix=nd.distance_transform_edt(~painted,return_indices=True)
+ can[~painted,:3]=can[tuple(ix)][~painted,:3]
+ can[:,:,3]=alpha;can[alpha==0,:3]=0
+ assert np.array_equal(can,np.array(Image.open(U).convert('RGBA')))
+ radius=info['lukking_radius_raw'];sigma=info['Gauss_sigma_raw']
+ smooth=np.array(Image.fromarray(can[:,:,3]).filter(ImageFilter.MaxFilter(2*radius+1)).filter(ImageFilter.MinFilter(2*radius+1)).filter(ImageFilter.GaussianBlur(sigma)))
+ own=can.copy();own[:,:,3]=smooth;core=can[:,:,3]>=128
+ _,ix=nd.distance_transform_edt(~core,return_indices=True)
+ fresh=(own[:,:,3]>0)&~core
+ own[fresh,:3]=can[tuple(ix)][fresh,:3];own[own[:,:,3]==0,:3]=0
+ assert np.array_equal(own,np.array(Image.open(K/'egen-sammensatt.png').convert('RGBA')))
+ q=read(K/'kontroll.json');sx,sy=q['hel_skala']
+ scaled=_premul_resize(own,(round(own.shape[1]*sx),round(own.shape[0]*sy)))
+ native=np.zeros_like(np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA')))
+ x=q['margx']*4+q['flytt'][0];y=q['margy']*4+q['flytt'][1];h,w=scaled.shape[:2]
+ x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,native.shape[1]),min(y+h,native.shape[0])
+ native[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x]
+ target=R/f'native/costume178_{sn}_hd.png'
+ assert np.array_equal(native,np.array(Image.open(target).convert('RGBA')))
+ from io import BytesIO
+ b=BytesIO();Image.fromarray(native).save(b,format='PNG')
+ assert hashlib.sha256(b.getvalue()).hexdigest()==sha(target)
+ receipt=dict(rute=int(sn),valgt=cid,materialplan=parts,egen_alpha=info,egen_RGBA_sha256=hashlib.sha256(own.tobytes()).hexdigest(),native_png_sha256=sha(target),native_RGBA_sha256=hashlib.sha256(native.tobytes()).hexdigest(),hel_skala=[sx,sy],hel_flytt=q['flytt'],marg=[q['margx'],q['margy']],union_og_egen_alpha_RGBA_byteeksakt=True,native_PNG_og_RGBA_byteeksakt=True,originalfiler_aapnet=False,ingen_originalmaske=True,ingen_lokal_kildeplassering_eller_pamaling=True)
+ (R/f'oppskrift{sn}.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+ receipts.append(receipt)
+(R/'kildelos-raa-til-native-replay.json').write_text(json.dumps(receipts,ensure_ascii=False,indent=2)+'\n')
+(R/'replay-egne.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Fem rå-til-native replay PNG/RGBA-byteeksakte. Ingen originalbilder åpnet.')

@@ -118,3 +118,14 @@ Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes
 For å begrense videre diskvekst brukes én reflink-kandidat, eksisterende Git-objekter gjennom separat indeks og strømmet fjernarkiv med full SHA256-kontroll. Ingen ekstra full klon, lagret TAR eller kontrollkopi for publisering. Eksisterende arbeidskopier og filer er ikke slettet. WebP-/AVIF-testen er fortsatt bare separate kopier; spillets bildeformat er uendret.
 
 Publiseringskvittering: Publisert hd-mod 2ba07d9cb94c99053fd0e97b0dfab903f3b01aff har 3723 native. Grafikkilde er gpt-arbeid 2f92cd2c06ca1d7b50441cfc3e62f817ad299ae7. Hele fjernarkivet er faktisk lastet ned som strøm, og alle 21967 filhash er kontrollert. Alle 21965 tidligere stier og 21959 tidligere PNG er bevart; bare mod.json og SHA256SUMS oppdateres som metadata. 1472 beskyttede input og tre opprinnelige stasher er uendret. Kandidaten er lokalt mottatt ved katalognavnbytte etter kontroll. 3721-grunnlaget er bevart under out. Ingen ekstra klon, lagret TAR eller kontrollkopi er opprettet. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
+
+
+## 24. oktober: fem nye faser 1990..1994
+
+<!-- helikopter178-forfaser1990-1994:start -->
+Fem nye helikopterfaser 1990..1994 fra 47 faktiske innebygde bildekall H176..H222 er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Kandidaten har 3733 native, fig178_02 20/24 og familie178 32/102. Hele figurjobber fortsatt 508/1758; ingen ny hel resultat.png. Publisering og fellespakker følges i rapporter/helikopter178-forfaser1990til1994-20261024. Ingen ny Tom-/Claude-godkjenning; små interne fargegrenser har fortsatt trappepreg til samlet stilgjennomgang.
+
+Alle fem består uendrede sterke 3HD-porter med null feil, kildeløs rå-til-native replay og tapsfri exact WebP. To ferske motorprøver har hver 160 kontroller/148 null og 120/120 null etter oppstart. Alle fem nye faser er hele i viewport. 49 hele originaltilstander er eksakte par, 111 andre tilstander er kontrollert mot faktiske andre aktørers endringer uten uforklarte HD-avvik. Dette er ikke full naturlig gjennomspilling. Alle 15 gamle mappingoppføringer og tidligere grafikkbytes er bevart. Ingen motor-/pipelinekodeendring.
+
+Neste uproduserte faser er 1989..1986; H223 er ikke forberedt, utført eller reservert. Gjenoppta rapportens NESTE.md og RETUR.md. Begge pakker oppdateres ved dette samlepunktet med faktiske nedlastinger og alle filhash kontrollert før fellesrelease kalles oppdatert. Tre stasher beholdes, ingen grafikk i main. Automatikken er ACTIVE, all grafikk er ikke ferdig.
+<!-- helikopter178-forfaser1990-1994:slutt -->

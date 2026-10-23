@@ -1,5 +1,13 @@
 # Grafikkliste
 
+<!-- helikopter178-forfaser1990-1994:start -->
+Fem nye helikopterfaser 1990..1994 fra 47 faktiske innebygde bildekall H176..H222 er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Kandidaten har 3733 native, fig178_02 20/24 og familie178 32/102. Hele figurjobber fortsatt 508/1758; ingen ny hel resultat.png. Publisering og fellespakker følges i rapporter/helikopter178-forfaser1990til1994-20261024. Ingen ny Tom-/Claude-godkjenning; små interne fargegrenser har fortsatt trappepreg til samlet stilgjennomgang.
+
+Alle fem består uendrede sterke 3HD-porter med null feil, kildeløs rå-til-native replay og tapsfri exact WebP. To ferske motorprøver har hver 160 kontroller/148 null og 120/120 null etter oppstart. Alle fem nye faser er hele i viewport. 49 hele originaltilstander er eksakte par, 111 andre tilstander er kontrollert mot faktiske andre aktørers endringer uten uforklarte HD-avvik. Dette er ikke full naturlig gjennomspilling. Alle 15 gamle mappingoppføringer og tidligere grafikkbytes er bevart. Ingen motor-/pipelinekodeendring.
+
+Neste uproduserte faser er 1989..1986; H223 er ikke forberedt, utført eller reservert. Gjenoppta rapportens NESTE.md og RETUR.md. Begge pakker oppdateres ved dette samlepunktet med faktiske nedlastinger og alle filhash kontrollert før fellesrelease kalles oppdatert. Tre stasher beholdes, ingen grafikk i main. Automatikken er ACTIVE, all grafikk er ikke ferdig.
+<!-- helikopter178-forfaser1990-1994:slutt -->
+
 <!-- helikopter178-forfaser1995-1999:start -->
 Femfasersbunken 1995 til 1999 er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert. Siste fase er 1995 fra ti nye faktiske innebygde image_gen-kall H166..H175. Bunken har 50 faktiske bildekall, fem valgte native ruter og ingen ny hel figurjobb. Hele figurjobber er fortsatt 508/1758. Delark fig178_02 er 15/24 og familie178 er 27/102. Ingen ny Tom-/Claude-godkjenning.
 

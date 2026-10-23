@@ -1,0 +1,6 @@
+from pathlib import Path
+import json,sys,hashlib,datetime,shutil
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+cid,raw=sys.argv[1:3];K=R/'kall'/cid;dst=K/'raa.png';assert not dst.exists();shutil.copyfile(raw,dst)
+p=json.loads((K/'plan.json').read_text());assert not p['utfort'];p.update(utfort=True,utfort_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),raa_sha256=hashlib.sha256(dst.read_bytes()).hexdigest(),innebygd_image_gen=True);(K/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+(K/'verktøyretur.json').write_text(json.dumps({'kall':cid,'output_hint':f'Generated images are saved to {raw} by default.','lagret_raw':str(dst),'SHA256':p['raa_sha256'],'innebygd_image_gen':True},ensure_ascii=False,indent=2)+'\n')

@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+from scipy import ndimage as nd
+import json,hashlib,numpy as np
+
+O=Path(__file__).resolve().parent
+R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+base=R/'kall/H186/union1994'
+F=base/'egen-sammensatt.png'
+a=np.array(Image.open(F).convert('RGBA'))
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+for radius,sigma in [(3,2),(5,3)]:
+    K=base/f'egen-alfasoem-r{radius}-s{sigma}'
+    K.mkdir(exist_ok=False)
+    alpha=Image.fromarray(a[:,:,3]).filter(ImageFilter.MaxFilter(2*radius+1)).filter(ImageFilter.MinFilter(2*radius+1)).filter(ImageFilter.GaussianBlur(sigma))
+    b=a.copy()
+    b[:,:,3]=np.array(alpha)
+    core=a[:,:,3]>=128
+    _,near=nd.distance_transform_edt(~core,return_indices=True)
+    fresh=(b[:,:,3]>0)&~core
+    b[fresh,:3]=a[tuple(near)][fresh,:3]
+    b[b[:,:,3]==0,:3]=0
+    Image.fromarray(b).save(K/'egen-sammensatt.png')
+    p=json.loads((base/'plan.json').read_text())
+    p.update(kall=str(K.relative_to(R/'kall')),nytt_bildekall=False,
+        egen_alfasoem=dict(regel='Ensartet grayscale-lukking av hele egne unionsalfaen, deretter svak Gauss-utjevning. Bare egne alfa/RGB-kjerner brukes. Ingen originalfiler eller lokalt avgrensede felt.',
+            kilde=str(F.relative_to(R)),kilde_sha256=sha(F),lukking_radius_raw=radius,Gauss_sigma_raw=sigma,RGB_nye_fringe_fra_naermeste_egen_core=True),
+        egen_bilde_sha256=sha(K/'egen-sammensatt.png'))
+    (K/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+(R/'glatt-egen-union1994-v4.py.txt').write_bytes(Path(__file__).read_bytes())

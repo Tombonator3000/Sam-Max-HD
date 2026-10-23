@@ -1,0 +1,65 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime, timezone
+import numpy as np, json, hashlib, sys
+
+O = Path(__file__).resolve().parent
+A = Path('/home/tom/Sam-Max-HD/work/.gpt-gren')
+R = A / 'rapporter' / O.name
+cid, group, phase = sys.argv[1:4]
+phase = int(phase)
+groups = {
+    'siste1990': [[35,35,19], [43,67,27], [115,59,11]],
+    'groenn-retur1991': [[43,67,27], [43,79,35], [55,83,39]],
+    'lysegraa': [[115,115,115], [151,151,151], [191,191,191]],
+    'siste1993': [[35,35,19], [191,191,191]],
+    'retur1993': [[35,35,19], [55,55,55], [71,71,71], [115,115,115]],
+    'gull1993': [[195,103,7], [239,135,39], [255,179,67]],
+    'hvitt1994': [[251,251,251]],
+    'positive1994': [[35,35,19], [115,115,115], [151,151,151]],
+    'main1994': [[251,251,251], [115,59,11]],
+    'hovedflater': [[251,251,251], [115,59,11], [35,35,19]],
+    'graaflater': [[55,55,55], [71,71,71], [115,115,115], [151,151,151], [191,191,191]],
+    'groenne1': [[19,59,31], [43,79,35], [43,91,43]],
+    'groenne2': [[43,51,19], [43,67,27], [55,83,39]],
+    'brune': [[83,43,0], [139,75,15]],
+    'smaafarger': [[0,0,0], [123,115,203], [123,175,207]],
+    'gull': [[195,103,7], [239,135,39], [255,179,67]],
+    'positive-returer': [[35,35,19], [115,115,115], [43,67,27]],
+    'smaa-returer': [[123,115,203], [123,175,207], [195,103,7], [239,135,39]],
+    'graa-returer': [[55,55,55], [151,151,151], [191,191,191]],
+}
+codes = [[255,0,0], [0,0,255], [0,255,255], [255,0,255], [255,235,175]]
+from PIL import Image as _Img
+src = np.array(_Img.open(R / "kilder" / str(phase) / "original-1x.png").convert("RGBA"))
+actual = {tuple(c) for c in src[src[:,:,3]>0,:3]}
+cols = [c for c in groups[group] if tuple(c) in actual]
+assert cols
+tab = [dict(ekte=a, kode=b) for a,b in zip(cols,codes)]
+K = R / 'kall' / cid
+K.mkdir(exist_ok=False)
+src = np.array(Image.open(R / 'kilder' / str(phase) / 'original-1x.png').convert('RGBA'))
+b = src.copy()
+b[:,:,:3], b[:,:,3] = [96,96,96], 0
+for e in tab:
+    on = np.all(src[:,:,:3] == e['ekte'],2) & (src[:,:,3] > 0)
+    b[on,:3], b[on,3] = e['kode'], 255
+im = Image.fromarray(b).resize((src.shape[1]*11, src.shape[0]*11), Image.Resampling.NEAREST)
+can = Image.new('RGBA',(1024,1024),'#606060')
+can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2))
+can.convert('RGB').save(K / 'kilde-materialplan.png')
+labels = ['red RGB255,0,0', 'blue RGB0,0,255', 'cyan RGB0,255,255', 'magenta RGB255,0,255', 'pale cream RGB255,235,175'][:len(cols)]
+p = f'''Use case: precise-object-edit. Draw ONLY the {len(cols)} separated technical material planes in image1, with these exact flat colours: {', '.join(labels)}. Image1 is the full spatial stencil reference, defining every piece, full area, boundary, thickness and location. Image2 supplies only the clean antialiased cartoon edge finish; never draw Sam.
+Keep the ENTIRE 1024x1024 square image1 canvas, exactly the same central scale, placement and empty margins. Do not crop, recenter, enlarge or move the small islands to fill space. Each disconnected part stays in place. This is a literal mechanical label map, not an aircraft to complete. Keep all tiny coloured inserts, cut upper ends, narrow bands and narrow diagonal strips. A long coloured region stays a filled region with its original thickness; a thin strip stays thin. Preserve deliberately stepped mechanical corners, but redraw sloping outer edges as smooth antialiased cartoon contours. Do not pixelate or add surface texture. Do not connect pieces across grey, fill enclosed gaps, extend ends, broaden strips, add outline, shade or new parts. Every grey area becomes genuine transparent alpha, including grey enclosed by colour. No other colours, gradients, glow, black outlines, labels, shadows or added pieces. Return one transparent PNG containing only these same full planes in their original positions.'''
+args = dict(prompt=p, referenced_image_paths=[str(K/'kilde-materialplan.png'), str(A/'hovedark/sam.png')], transparent_background=True)
+sha = lambda f: hashlib.sha256(Path(f).read_bytes()).hexdigest()
+plan = dict(kall=cid, rute=phase, utfort=False, modul='hele-egne-materialplan', gruppe=group,
+            tabell=tab, original_kontekst_og_stil_sett=True, originalmaske=False,
+            kildekoordinater_til_lokal_plassering=False,
+            hensikt='Nye hele materialplan på samme genererte lerret. Første sammenstilling bruker bare egne genererte lerreter, uten kildebasert lokal registrering.',
+            referanser_SHA256={f:sha(f) for f in args['referenced_image_paths']}, planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(p+'\n')
+for name,d in [('argumenter.json',args),('plan.json',plan)]:
+    (K/name).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-plan.py.txt').write_bytes(Path(__file__).read_bytes())
+print(K)

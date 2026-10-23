@@ -1,0 +1,88 @@
+from pathlib import Path
+from PIL import Image, ImageFilter
+from scipy import ndimage as nd
+from own_parts import decode
+import numpy as np, json, hashlib, sys
+
+O=Path(__file__).resolve().parent
+R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+dest, mode, *calls=sys.argv[1:]
+K=R/'kall'/dest
+K.mkdir(exist_ok=False)
+basefile=R/'kall'/calls[0]/'raa.png'
+phase=json.loads((R/'kall'/calls[0]/'plan.json').read_text())['rute']
+old=np.array(Image.open(basefile).convert('RGBA'))
+canvas=np.zeros_like(old)
+alpha=np.zeros(old.shape[:2],dtype='uint8')
+painted=np.zeros(old.shape[:2],dtype=bool)
+parts=[]
+allcols=[]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+last_owner={}
+for cid in calls:
+    p=json.loads((R/'kall'/cid/'plan.json').read_text())
+    for e in p['tabell']:
+        last_owner[tuple(e['ekte'])]=cid
+for cid in calls:
+    D=R/'kall'/cid
+    p=json.loads((D/'plan.json').read_text())
+    assert p['utfort'] and p['rute']==phase
+    if (D/'egen-helmodul.png').exists():
+        layer=np.array(Image.open(D/'egen-helmodul.png').convert('RGBA'))
+        clean=dict(helregistrert_egen_modul=True,registrering=p['egen_helregistrering'])
+    else:
+        layer,clean=decode(D/'raa.png',p['tabell'])
+    assert layer.shape==old.shape, (cid,layer.shape,old.shape)
+    LF=D/'egen-materialplan.png'
+    if LF.exists():
+        assert np.array_equal(np.array(Image.open(LF).convert('RGBA')),layer)
+    else:
+        Image.fromarray(layer).save(LF)
+    chosen=np.zeros(layer.shape[:2],bool)
+    for e in p['tabell']:
+        if last_owner[tuple(e['ekte'])]==cid:
+            chosen|=np.all(layer[:,:,:3]==e['ekte'],2)
+    # Velg hele egne fargeplan fra siste avtalte kilde per klasse.
+    # Dette bruker bare det egne materialplanet, aldri originalkoordinater.
+    use=layer.copy()
+    use[~chosen]=0
+    core=use[:,:,3]>=128
+    canvas[core,:3]=layer[core,:3]
+    alpha=np.maximum(alpha,use[:,:,3])
+    painted|=core
+    allcols.extend(e['ekte']for e in p['tabell'])
+    parts.append(dict(kall=cid,fil=str(LF.relative_to(R)),sha256=sha(LF),rens=clean,
+        transformasjon='Identitet på hele eget generert lerret. Ingen lokal plassering eller kildekoordinater.',
+        tabell=p['tabell']))
+assert painted.any()
+if mode=='topp-eldre':
+    remove=np.zeros(old.shape[:2],bool)
+    for col in allcols:
+        remove|=np.all(old[:,:,:3]==col,2)
+    donors=(old[:,:,3]>=128)&~remove
+    assert donors.any()
+    _,ix=nd.distance_transform_edt(~donors,return_indices=True)
+    a=old.copy()
+    a[remove,:3]=a[tuple(ix)][remove,:3]
+    a[painted,:3]=canvas[painted,:3]
+    alpha=np.maximum(alpha,old[:,:,3])
+    allcore=painted|donors
+elif mode in ['bare-nye-plan','min-eldre']:
+    a=canvas.copy()
+    allcore=painted
+    if mode=='min-eldre':
+        expanded=np.array(Image.fromarray(alpha).filter(ImageFilter.MaxFilter(3)))
+        alpha=np.minimum(old[:,:,3],expanded)
+else:
+    raise ValueError(mode)
+_,ix=nd.distance_transform_edt(~allcore,return_indices=True)
+a[~allcore,:3]=a[tuple(ix)][~allcore,:3]
+a[:,:,3]=alpha
+a[alpha==0,:3]=0
+Image.fromarray(a).save(K/'egen-sammensatt.png')
+p=dict(kall=dest,rute=phase,nytt_bildekall=False,egen_basis=str(basefile.relative_to(R)),egen_basis_sha256=sha(basefile),
+    egne_hele_materialplan=parts,modus=mode,regel='Bare egne nytegnede materialplan på hele uendrede egne lerreter. Identitet, ingen registrering mot original. RGB-fringe fra nærmeste egen malt kjerne; alfaflate er union av egne plan, eventuelt minimum mot eldre egen alfa. Ingen originalfil åpnes.',
+    originalmaske=False,originalfragmenter=False,lokal_flytting_av_trekk=False,egen_bilde_sha256=sha(K/'egen-sammensatt.png'))
+(K/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+(R/'samle-materialplan.py.txt').write_bytes(Path(__file__).read_bytes())
+print(dest,mode,'egne plan',len(calls))

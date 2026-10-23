@@ -1,0 +1,148 @@
+from pathlib import Path
+from PIL import Image, ImageFilter, ImageDraw
+from concurrent.futures import ThreadPoolExecutor
+from scipy import ndimage as nd
+from smhd.myk import import_sheet, _premul_resize
+from own_parts import decode
+import gzip, hashlib, json, numpy as np, re, shutil, subprocess
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+M = P / 'mods/gpt'
+C = O / 'kandidat3733'
+parent = '83337cd20e34377b5ba1be386fa66d36ea6921a9'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+def put(p, d):
+    p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+def inventory(root):
+    fs = [f for f in root.rglob('*') if f.is_file()]
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        return dict(ex.map(lambda f: (str(f.relative_to(root)), sha(f)), fs))
+
+assert subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/hd-mod'], cwd=P, text=True).split()[0] == parent
+assert not C.exists() and not (A/'jobber/fig178_02/resultat.png').exists()
+assert subprocess.check_output(['git', 'diff', '--name-only', 'HEAD', '--', 'jobber', 'hovedark', 'stil'], cwd=A) == b''
+base = inventory(M)
+assert base == json.loads(gzip.decompress((R/'kandidat3728-filhash.json.gz').read_bytes()))
+assert len(base) == 21973 and read(M/'mod.json')['costume_cels'] == 3728
+for line in (M/'SHA256SUMS').read_text().splitlines():
+    h, name = line.split('  ', 1)
+    assert base[name] == h, name
+put(O/'baseline3728-filhash.json', base)
+selected = read(R/'valgte-ruter.json')
+assert set(selected) == {'1990', '1991', '1992', '1993', '1994'}
+mapping = read(R/'rutekart-fig178_02.json')
+oldmapping = json.loads(json.dumps(mapping))
+routes = mapping['fig178_02']['ruter']
+assert len(routes) == 15
+board = Image.open(R/'fig178_02-delresultat.png').convert('RGBA')
+before = np.array(board)
+shutil.copyfile(R/'fig178_02-delresultat.png', O/'delark15-foer.png')
+put(O/'rutekart15-foer.json', oldmapping)
+job = read(A/'jobber/fig178_02/jobb.json')
+entries, sheets = [], []
+replays = []
+for sn, cid in sorted(selected.items()):
+    n = int(sn)
+    K = R/'kall'/cid
+    q = read(K/'kontroll.json')
+    assert q['teknisk_ok'] and q['visuelt_sett'] and q['egen_stilkontroll']
+    assert q['alfa_fester_over3HD'] == q['apninger_over3HD'] == 0
+    assert all(e['kode_fester_over3HD'] == e['egne_kodepiksler_over3HD_fra_kilde'] == e['native_fester_over3HD'] == 0 for e in q['farger'])
+    assert sha(K/'prototype-under-kontroll.png') == q['native_sha256']
+    idx = M/f'costumes/costume178_{n}_idx.png'
+    assert np.array_equal(np.array(Image.open(idx)), np.array(Image.open(R/f'kilder/{n}/original-indeks.png')))
+    own = np.array(Image.open(K/'egen-sammensatt.png').convert('RGBA'))
+    sx, sy = q['hel_skala']
+    scaled = _premul_resize(own, (round(own.shape[1]*sx), round(own.shape[0]*sy)))
+    native = np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA'))
+    can = np.zeros_like(native)
+    x, y = q['margx']*4 + q['flytt'][0], q['margy']*4 + q['flytt'][1]
+    h, w = scaled.shape[:2]
+    x0, y0 = max(0,x), max(0,y)
+    x1, y1 = min(x+w,can.shape[1]), min(y+h,can.shape[0])
+    can[y0:y1,x0:x1] = scaled[y0-y:y1-y,x0-x:x1-x]
+    assert np.array_equal(can, native)
+    png = R/f'native/costume178_{n}_hd.png'
+    assert not png.exists()
+    Image.fromarray(can).save(png)
+    assert sha(png) == q['native_sha256']
+    replays.append(dict(rute=n, kall=cid, egen_RGBA_sha256=hashlib.sha256(own.tobytes()).hexdigest(), egen_fil_sha256=sha(K/'egen-sammensatt.png'), native_png_sha256=sha(png), native_RGBA_sha256=hashlib.sha256(can.tobytes()).hexdigest(), PNG_og_RGBA_byteeksakt=True, originalfil_aapnet_for_replay=False, hel_skala=[sx,sy], hel_flytt=q['flytt'], marg=[q['margx'],q['margy']]))
+    rt = next(v for v in job['ruter'] if v['rute'] == n)
+    rx, ry, _, _ = rt['rekt']
+    dx = (job['plassering'][0]+rx)*4-q['margx']*4
+    dy = (job['plassering'][1]+ry)*4-q['margy']*4
+    board.alpha_composite(Image.fromarray(native), (dx,dy))
+    ys, xs = np.nonzero(native[:,:,3] >= 128)
+    target = f'costumes/costume178_{n}_hd.webp'
+    assert target not in base and target.replace('.webp','.png') not in base
+    entry = dict(bilde=f'costume178_{n}', jobb='fig178_02', kostyme=178, rute=n, kall=cid, fil=target, native_png=str(png.relative_to(A)), native_png_sha256=sha(png), kilde_sha256=sha(R/f'kilder/{n}/original-1x.png'), rect=[dx+int(xs.min()),dy+int(ys.min()),int(np.ptp(xs)+1),int(np.ptp(ys)+1)], marg_HD=[q['margx']*4,q['margy']*4], egen_alfa=True, originalmaske=False, originalfragmenter=False, lokal_kildeflytting=False, teknisk_ok=True, visuelt_sett_native=True, native_mottatt=False, motorobservert=False, publisert=False, Tom_godkjent=False, Claude_godkjent=False)
+    routes.append(entry)
+    entries.append(entry)
+    sheets.append(rt)
+after = np.array(board)
+for e in oldmapping['fig178_02']['ruter']:
+    x,y,w,h = e['rect']
+    assert np.array_equal(after[y:y+h,x:x+w], before[y:y+h,x:x+w])
+    assert base[e['fil']] == e['sha256']
+assert np.array_equal(after[before[:,:,3]>0], before[before[:,:,3]>0])
+partial = R/'fig178_02-delresultat.png'
+board.save(partial)
+mapping['fig178_02'].update(sha256_resultat=sha(partial), delvis=True)
+D = O/'ark3733/fig178_02'
+D.mkdir(parents=True, exist_ok=False)
+for f in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+    shutil.copyfile(A/'jobber/fig178_02'/f, D/f)
+shutil.copyfile(partial,D/'resultat.png')
+run = subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(D/'resultat.png')],cwd=A,capture_output=True,text=True)
+log = run.stdout+run.stderr
+(R/'fig178_02-egenkontroll3733.txt').write_text(log)
+errors = re.findall(r'^FEIL\s+(costume\d+_\d+):', log, re.M)
+missing = [v['bilde'] for v in job['ruter'] if v['bilde'] not in {e['bilde'] for e in routes}]
+assert set(errors)==set(missing) and len(missing)==4, log
+put(R/'delark-kontroll3733.json', dict(exit=run.returncode, produserte_FEIL=0, tomme_maal=missing, delvis=20, totalt=24, femten_tidligere_ruter_RGBA_bytebevart=True, helt_resultat_levert=False))
+rep = import_sheet(np.array(board), sheets, {e['bilde']:e['rect'] for e in entries}, P/'work/extract', O/'automatisk-mottak1990til1994')
+assert set(rep['ruter']) == {e['bilde'] for e in entries}
+assert all(v['status']=='ok' and v['i_modden'] for v in rep['ruter'].values()), rep
+put(R/'automatisk-mottak1990til1994.json',rep)
+subprocess.run(['cp','-a','--reflink=always',str(M),str(C)],check=True)
+webps=[]
+for e in entries:
+    png=A/e['native_png']
+    out=C/e['fil']
+    Image.open(png).save(out,format='WEBP',lossless=True,exact=True,quality=100,method=6)
+    assert np.array_equal(np.array(Image.open(png).convert('RGBA')),np.array(Image.open(out).convert('RGBA')))
+    e.update(sha256=sha(out), native_mottatt=True)
+    q=read(R/'kall'/e['kall']/'kontroll.json')
+    e.update(snitt_union=q['snitt_union'],dekning=q['dekning'])
+    shutil.copyfile(out,R/'native'/out.name)
+    webps.append(dict(rute=e['rute'],source_png=e['native_png'],source_sha256=sha(png),target=e['fil'],target_sha256=sha(out),source_bytes=png.stat().st_size,target_bytes=out.stat().st_size,lossless=True,exact=True,alle_RGBA_byte_identiske=True,RGB_under_alfa0_identiske=True))
+meta=read(C/'mod.json')
+meta['costume_cels']=3733
+put(C/'mod.json',meta)
+files=inventory(C)
+files.pop('SHA256SUMS')
+(C/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n' for f,h in sorted(files.items())))
+files=inventory(C)
+assert len(files)==21978 and set(files)-set(base)=={e['fil'] for e in entries}
+assert {f for f in base if files[f]!=base[f]}=={'mod.json','SHA256SUMS'}
+assert all(files[f]==base[f] for f in base if f.endswith(('_idx.png','_mask.png')))
+for name in ['rutekart-fig178_02.json','rutekart-samlet.json']:
+    put(R/name,mapping)
+put(R/'kildelos-native-replay.json',replays)
+put(R/'webp-tillegg1990til1994.json',webps)
+put(R/'egen-native1990til1994.json',dict(ruter=entries,nye_native=5,native_grunnlag=3728,native_kandidat=3733,kandidat=str(C),i_modden_lokalt_publisert=False))
+put(O/'kandidat3733-filhash.json',files)
+with gzip.open(R/'kandidat3733-filhash.json.gz','wb') as f:
+    f.write(json.dumps(files,sort_keys=True).encode())
+put(R/'kandidatstatus.json',dict(grunnlag_hd_mod=parent,filantall_grunnlag=len(base),filantall_kandidat=len(files),tidligere_grafikkfiler_SHA_bevart=True,en_kandidat=True,metadataendringer=['mod.json','SHA256SUMS'],native_kandidat=3733,nye_native=5,stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines(),avventer_motor=True))
+for e in entries:
+    K=R/'kall'/e['kall']
+    q=read(K/'kontroll.json')
+    q.update(valgt_kandidat=True,native_mottatt=True,motorobservert=False,publisert=False,status='KANDIDAT_AVVENTER_MOTOR')
+    put(K/'kontroll.json',q)
+(R/'bygg-bunke.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Kandidat3733: 5 nye native, delark20/24, 15 gamle ruter og all tidligere grafikk bytebevart. Automatisk mottak5OK. Motor gjenstår.')

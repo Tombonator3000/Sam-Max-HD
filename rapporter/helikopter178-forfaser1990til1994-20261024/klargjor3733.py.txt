@@ -1,0 +1,93 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,subprocess,gzip
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+selected=read(R/'valgte-ruter.json');calls=read(R/'faktiske-bildekall.json');assert len(calls)==47 and [x['kall']for x in calls]==[f'H{n}'for n in range(176,223)]
+for c in calls:
+ K=R/'kall'/c['kall'];pl=read(K/'plan.json');args=read(K/'argumenter.json')
+ assert sha(K/'raa.png')==c['raa_sha256']==pl['raa_sha256'] and sha(K/'prompt-brukt.txt')==c['prompt_sha256'] and sha(K/'argumenter.json')==c['argumenter_sha256']
+ assert (K/'prompt-brukt.txt').read_text()==args['prompt']+'\n' and pl['utfort'] and pl['innebygd_image_gen'] and c['raa_visuelt_sett']
+ for p,h in pl['referanser_SHA256'].items():assert sha(Path(p))==h
+for n,k in selected.items():
+ q=read(R/'kall'/k/'kontroll.json')
+ assert q['teknisk_ok'] and q['visuelt_sett'] and q['native_mottatt'] and q['alfa_fester_over3HD']==q['apninger_over3HD']==0 and not q['kuttet']
+ for f in q['farger']:assert f['kode_fester_over3HD']==f['egne_kodepiksler_over3HD_fra_kilde']==f['native_fester_over3HD']==0
+ q.update(motorobservert=True,status='EGENKONTROLLERT_NATIVE_MOTOROBSERVERT_AVVENTER_PUBLISERING',visuelt_sett_motor=True,Tom_godkjent=False,Claude_godkjent=False)
+ put(R/'kall'/k/'kontroll.json',q)
+replay=read(R/'kildelos-raa-til-native-replay.json');assert len(replay)==5 and all(x['native_PNG_og_RGBA_byteeksakt']and x['union_og_egen_alpha_RGBA_byteeksakt']and not x['originalfiler_aapnet']for x in replay)
+used={c['kall']for q in replay for c in q['materialplan'] if c['sluttpiksler']>0};assert len(used)==42
+m=read(R/'motor-sammenligning3733.json');assert m['null_etter_frame40_pr_side']==120 and m['nye_native_observert']==5 and m['ingen_uforklarte_HD_avvik_utenfor_ny_native']
+m.update(visuelt_sett=True,alle_fem_nye_faser_hele_i_viewport=True,senere_gamle_faser_delvis_utenfor_viewport=True,ny_Tom_eller_Claude_godkjenning=False);put(R/'motor-sammenligning3733.json',m)
+s=read(R/'kandidatstatus.json');s.update(avventer_motor=False,motorobservert=True,visuelt_sett=True,publisert=False);put(R/'kandidatstatus.json',s)
+for name in ['egen-native1990til1994.json','rutekart-fig178_02.json','rutekart-samlet.json']:
+ d=read(R/name);rows=d['ruter']if 'ruter'in d else d['fig178_02']['ruter']
+ for e in rows:
+  if 1990<=e['rute']<=1994:e.update(motorobservert=True,visuelt_sett_motor=True)
+ put(R/name,d)
+old=read(O/'rutekart15-foer.json')['fig178_02']['ruter'];new=read(R/'rutekart-fig178_02.json')['fig178_02']['ruter'];assert len(old)==15 and len(new)==20
+for e in old:assert e==next(x for x in new if x['rute']==e['rute'])
+protected=[]
+for name in subprocess.check_output(['git','ls-files','-z'],cwd=A).decode().split('\0'):
+ if name and Path(name).name in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+  data=subprocess.check_output(['git','show','HEAD:'+name],cwd=A);assert hashlib.sha256(data).hexdigest()==sha(A/name);protected.append(name)
+whole=[p for p in (A/'jobber').glob('fig*/jobb.json')];delivered=[p.parent.name for p in whole if (p.parent/'resultat.png').is_file()];assert len(whole)==1758 and len(delivered)==508
+put(R/'revisjon-for-publisering3733.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),faktiske_bildekall=47,alle_raw_prompt_argumenter_og_referanser_SHA_bekreftet=True,raa_med_sluttpiksler=42,raa_uten_sluttpiksler=sorted({x['kall']for x in calls}-used),beskyttede_input=len(protected),alle_beskyttede_input_SHA_uendret=True,tidligere15_mappingoppforinger_uendret=True,hele_figurjobber_med_resultat=len(delivered),figurjobber_totalt=len(whole),ny_hel_resultat_png=False))
+g=read(R/'grunnlag.json');g['faktiske_nye_kall']=[c['kall']for c in calls];put(R/'grunnlag.json',g)
+ready=dict(tid_utc=datetime.now(timezone.utc).isoformat(),klar_for_additiv_publisering=True,native_grunnlag=3728,native_kandidat=3733,nye_native=5,ruter=list(range(1990,1995)),sterke_3HD_porter_bestatt=True,ekstra_kodepiksler=0,motorobservert=True,visuelt_sett=True,kildelos_replay_byteeksakt=True,hele_fem_nye_faser_sett=True,Tom_godkjent=False,Claude_godkjent=False,stil_merknad='Små interne fargegrenser beholder mye av originalens trappepreg. Teknisk godkjent og egenvurdert, endelig familiestil er ikke Tom-/Claude-godkjent.',full_gjennomspilling=False)
+put(R/'klar-for-publisering3733.json',ready)
+f=dict(status='FEMFASER_MOTOROBSERVERT_AVVENTER_PUBLISERING',bunke_ferdig=False,native=3728,native_kandidat=3733,nye_native=5,publisert_nye_native=0,hd_mod=g['hd-mod'],figurjobber=508,figurjobber_totalt=1758,figurjobber_uten_resultat=1250,fig178_02_native=15,fig178_02_kandidat=20,fig178_02_totalt=24,familie178_native=27,familie178_kandidat=32,familie178_totalt=102,faktiske_bildekall=47,kall=[x['kall']for x in calls],raa_med_sluttpiksler=42,valgte_ruter=selected,laget=True,egenkontrollert=True,native_mottatt_i_kandidat=True,visuelt_sett=True,motorobservert=True,publisert=False,Tom_godkjent=False,Claude_godkjent=False,hele_jobber_nye=0,pakker_native=3728,pakker_mangler_native_etter_publisering=5,automatikk='ACTIVE',neste_faser=[1989,1988,1987,1986],neste_kall='H223',neste_kall_utfort_eller_reservert=False,fullt_ferdig=False)
+put(R/'fremdrift.json',f)
+notes='''# Fem nye helikopterfaser 1990 til 1994
+
+47 faktiske innebygde image_gen-kall H176..H222 gir fem valgte native ruter. Alle råbilder, faktiske prompter, argumenter og referansehash er bevart. 42 råbilder bidrar sluttpiksler. H176, H183, H193, H214 og H217 bidrar ingen sluttpiksler. Dette er ingen ny hel figurjobb: 508/1758 har resultat.png; 1250 mangler, i tillegg kommer returer og sluttkontroll. Delarket er 20/24 i kandidaten, familien 32/102. Ingen Tom-/Claude-godkjenning.
+
+Før hvert motiv er den hele riktige originalen sett i rom 35 og godkjent Sam-hovedark sett. 1990s kilde er nå hel ved testposisjon 220,60. Fargene følger den indekserte originalpaletten, bekreftet mot faktisk flat motorbuffer. Gamle 565-renderpaletter brukes ikke. Faser har henholdsvis 21,22,20,22,21 fargeklasser i rekkefølgen 1990..1994. Faseavhengig lyst gull og fravær av lilla i 1990 er kontrollert. Se KILDEGRUNNLAG.md.
+
+Hele egne materialplan velges per fargeklasse, uten lokal flytting, på uendrede egne lerreter. En ensartet lukking med radius 5 og Gauss sigma 3 i råstørrelsen tetter egne alfa-skjøter. Nye RGB-fringer kommer bare fra nærmeste egne malte kjerner. Bare hele sluttfiguren skaleres og flyttes til nativeformat. Ingen originalmasker, kildefragmenter, kildebasert lokal plassering, fargepåmaling eller trekkflytting. Kildeløs replay fra alle råbilder gjenlager union, egen alfa, native PNG og RGBA byteeksakt. WebP er tapsfri og exact, RGBA-byteidentisk også under alfa 0.
+
+Alle fem består uendrede sterke 3HD-porter: alfa, åpninger, hver nativefarge, positive kodefester og samtlige ekstra egne rene kodepiksler. Alle feiltall er null. IoU/dekning 1990..1994: 0,989/0,993; 0,985/0,995; 0,970/0,987; 0,987/0,991; 0,979/0,988. Standard delarkprøve har 20 OK og fire forventede tomme mål; ingen produsert FEIL. Automatisk mottak har 5 OK og 0 SJEKK. Alle 15 gamle mappingoppføringer, gamle delruters RGBA og alle tidligere nativefiler er uendret. Originale jobbfiler er bevart. Ingen hel resultat.png leveres ennå.
+
+Native, delark, stiltavle, fem hele motorbilder, før/etter-par og montasjen med 32 observerte sekvensfaser er visuelt sett. Små interne fargegrenser beholder mye av originalens trappepreg. Det er et uavklart stilpunkt til samlet familiegjennomgang, ikke en ny Tom-/Claude-godkjenning. De fem nye fasene er hele i motorens viewport. Noen senere gamle faser går delvis ut av bildet ved den kontrollerte posisjonen 220,60; dette er ikke bevis for at alle 32 er sett hele i denne kjøringen.
+
+To ferske kontrollerte avspillinger med binær 651aa78c84411784671f600085147bbbdce5dc6281e77bd113eb7db7f1c0ed27 sammenligner 3728/3733. Begge har 160 bufferkontroller, 148 null og 120/120 null etter frame 40. Tolv kjente inngangsavvik er identiske i koordinater og begge RGBA. Hele originale flat-RGBA-tilstander og originale celtegnekall samsvarer i 49 strengt valgte bildepar. I de andre 111 tilstandene varierer andre aktørers timing. Alle endringer der er kontrollert mot faktisk endrede originalcel-rektangler og uendrede nativehash; ingen uforklarte HD-endringer. Ikke påstå at alle 160 hele originalbilder er identiske. For hver ny fase er original-ROI med 8HD naboområde byteidentisk. 1990..1994 endrer henholdsvis 12066,13234,14097,12779,12828 HD-piksler. 97 familiekildefaser logges, ikke alle 102. Ingen naturlig full gjennomspilling eller ny interaktiv Windows-/webtest. Ingen motor-/pipelinekodeendring.
+
+Publiseringen skal være en vanlig commit med fersk fjern-hd-mod som forelder. Fullt fjernarkiv hentes som strøm og alle 21978 filhash kontrolleres før lokal aktivering. Kandidaten legger bare til fem WebP; 21973 gamle stier og alle gamle grafikkbytes bevares. Bare mod.json og SHA256SUMS endres som metadata. Begge faktiske pakker oppdateres ved dette femfasers samlepunktet og er ikke kalt oppdatert før innhold, sjekksummer og nedlastinger er kontrollert. Kvitteringer følger i denne rapporten.
+
+Bibliotek: figurark-fast-storrelse.md og publisert-mod-er-fasit.md, kontrollert mot prosjektets nåværende WebP-støtte og additive publisering. Én komplett kandidat brukes. Unike råbilder, kilder, ankre og relevante kontrollbevis beholdes. Tre stasher er urørt. Ingen grafikk til main eller gammel nattprosess. Automatikken er ACTIVE; all grafikk er ikke ferdig.
+'''
+(R/'notat.md').write_text(notes)
+(R/'RETUR.md').write_text('''# Returer og stilkontroll
+
+Valgte native: 1990 H222/union1990/egen-alfasoem-r5-s3, 1991 H212/union1991/egen-alfasoem-r5-s3, 1992 H204/union1992/egen-alfasoem-r5-s3, 1993 H196/union1993/egen-alfasoem-r5-s3, 1994 H186/union1994/egen-alfasoem-r5-s3. Alle fem er egenkontrollert, visuelt sett og motorobservert. Publiseringskvittering avgjør aktiv status.
+
+H176 og H183s hovedflater i 1994, H193s utilstrekkelige gullgruppe i 1993, H214s bølgete gråfelt og H217s feilplasserte brune felt i 1990 har ingen sluttpiksler. Alle råbilder og mislykkede/eldre sammenstillinger er bevart med faktisk kontroll. Andre kall bidrar bare de hele egne fargeklassene som oppskrift1990..1994.json angir. Ikke tell hver sammenstilling som et bildekall eller en jobb.
+
+1990..1994 har ingen gjenstående teknisk retur i valgt versjon. Internfargegrensene har fortsatt trappepreg ved nærvisning; endelig glatt tegnestil må gjennomgås samlet i familien. Ingen Tom-/Claude-godkjenning. Dette er ikke fullføringsstatus for hele grafikken.
+
+Gjenstående delarkfaser 1989..1986 er ikke startet her. H223 er ikke forberedt, utført eller reservert. Se nyeste NESTE.md. Uavklarte 137/V013 og 296/S037 er uendret, ingen ny Tom-designavklaring er nødvendig for uavhengige faser.
+''')
+(R/'NESTE.md').write_text('''# Gjenoppta her
+
+Bunken 1990..1994 har fem valgte faser fra 47 faktiske kall H176..H222. Se fremdrift.json og mottak-publisert1990til1994.json når denne finnes for endelig fjern-SHA, lokal aktivering og pakkestatus. Per klargjøring er motor/visuell kontroll ferdig og publisering/pakker gjenstår. Ikke dupliser fasene.
+
+Etter publisering: gjenoppta fig178_02, nå 20/24, med 1989,1988,1987,1986. H223 er ikke forberedt, utført eller reservert. Les RETUR.md og siste fremdrift før valg. Hent hele riktige originaler fra gjeldende publiserte mod, se spillkontekst og godkjent stilanker før hvert motiv. Bruk samme kanoniske indekspalett, ikke 565-renderpalett. Ikke anta at den forskjøvede motorposisjonen passer alle faser. Bevar eksisterende 1990..2009 og komplette fig178_03.
+
+Når arket er fullt: lever faktisk resultat.png med full 24-ruters egenkontroll, mapping, native mottak og relevant motoravspilling. Hele figurjobber er fortsatt 508/1758. 137/V013 og 296/S037 er uendret. Samlet familiestil er ikke Tom-/Claude-godkjent. Automatikken forblir ACTIVE. Ikke gjenstart gammel nattprosess.
+
+Les docs/WEBP.md før neste native mottak. Bruk gjeldende komplette publiserte mod som grunnlag, bare én kandidat per bunke. Historiske out-modmapper kan være dedupliserte. Fargebilder WebP, indeks/masker uendrede PNG; jobbgrunnlag, råbilder og resultat.png beholdes. Publiser normalt uten force og hent alle filhash tilbake før lokal aktivering. Unngå nye fulle modkopier eller dobbeltlagrede pakker.
+''')
+block='''<!-- helikopter178-forfaser1990-1994:start -->
+Fem nye helikopterfaser 1990..1994 fra 47 faktiske innebygde bildekall H176..H222 er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Kandidaten har 3733 native, fig178_02 20/24 og familie178 32/102. Hele figurjobber fortsatt 508/1758; ingen ny hel resultat.png. Publisering og fellespakker følges i rapporter/helikopter178-forfaser1990til1994-20261024. Ingen ny Tom-/Claude-godkjenning; små interne fargegrenser har fortsatt trappepreg til samlet stilgjennomgang.
+
+Alle fem består uendrede sterke 3HD-porter med null feil, kildeløs rå-til-native replay og tapsfri exact WebP. To ferske motorprøver har hver 160 kontroller/148 null og 120/120 null etter oppstart. Alle fem nye faser er hele i viewport. 49 hele originaltilstander er eksakte par, 111 andre tilstander er kontrollert mot faktiske andre aktørers endringer uten uforklarte HD-avvik. Dette er ikke full naturlig gjennomspilling. Alle 15 gamle mappingoppføringer og tidligere grafikkbytes er bevart. Ingen motor-/pipelinekodeendring.
+
+Neste uproduserte faser er 1989..1986; H223 er ikke forberedt, utført eller reservert. Gjenoppta rapportens NESTE.md og RETUR.md. Begge pakker oppdateres ved dette samlepunktet med faktiske nedlastinger og alle filhash kontrollert før fellesrelease kalles oppdatert. Tre stasher beholdes, ingen grafikk i main. Automatikken er ACTIVE, all grafikk er ikke ferdig.
+<!-- helikopter178-forfaser1990-1994:slutt -->
+'''
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;s=p.read_text();head,tail=s.split('\n',1);assert '<!-- helikopter178-forfaser1990-1994:start -->'not in s;p.write_text(head+'\n\n'+block+'\n'+tail.lstrip('\n'))
+p=A/'jobber/fig178_02/notat.md';p.write_text(p.read_text()+'\n\n## 24. oktober: fem nye faser 1990..1994\n\n'+block)
+(R/'klargjor3733.py.txt').write_bytes(Path(__file__).read_bytes())
+print('KLAR',len(calls),'kall,',len(used),'raw med sluttpiksler,',len(protected),'beskyttede input, 508/1758 jobber',flush=True)
