@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+from smhd.myk import _premul_resize
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();rows=[]
+for cid in ['H052']:
+ K=R/'kall'/cid;q=json.loads((K/'kontroll.json').read_text());pal=json.loads((K/'kodepalett.json').read_text());a=np.array(Image.open(K/'raa.png').convert('RGBA'));a[:,:,3]=np.rint(a[:,:,3].astype(float)*255/a[:,:,3].max()).astype('uint8');a[(a[:,:,3]>0)&(a[:,:,3]<8)]=0;oldalpha=a[:,:,3].copy();trust=a[:,:,3]>=128;_,ix=nd.distance_transform_edt(~trust,return_indices=True);edge=(a[:,:,3]>0)&(a[:,:,3]<32);a[edge,:3]=a[tuple(ix)][edge,:3];codes=np.array([e['kode']for e in pal['tabell']]);real=np.array([e['ekte']for e in pal['tabell']]);on=a[:,:,3]>0;_,idx=cKDTree(codes).query(a[on,:3]);ids=np.zeros(a.shape[:2],int);ids[on]=idx;seeds=np.zeros(a.shape[:2],bool)
+ for ci in range(len(codes)):seeds|=nd.binary_erosion((ids==ci)&(a[:,:,3]>=128),structure=np.ones((3,3)),border_value=0)
+ _,nearest=nd.distance_transform_edt(~seeds,return_indices=True);ambiguous=on&~seeds;ids[ambiguous]=ids[tuple(nearest)][ambiguous];idx=ids[on];a[on,:3]=real[idx];a[~on,:3]=0;assert np.array_equal(oldalpha,a[:,:,3]);assert np.array_equal(a,np.array(Image.open(K/'egen-renset.png')))
+ sx,sy=q['hel_skala'];scaled=_premul_resize(a,(round(a.shape[1]*sx),round(a.shape[0]*sy)));canvas=np.zeros((q['native_maal'][1],q['native_maal'][0],4),dtype='uint8');px,py=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];nh,nw=scaled.shape[:2];x0,y0=max(px,0),max(py,0);x1,y1=min(px+nw,canvas.shape[1]),min(py+nh,canvas.shape[0]);canvas[y0:y1,x0:x1]=scaled[y0-py:y1-py,x0-px:x1-px];assert np.array_equal(canvas,np.array(Image.open(K/'prototype-under-kontroll.png')));rows.append(dict(kall=cid,raw_sha256=sha(K/'raa.png'),kodepalett_sha256=sha(K/'kodepalett.json'),egen_renset_sha256=sha(K/'egen-renset.png'),native_sha256=sha(K/'prototype-under-kontroll.png'),egen_RGB_og_native_RGBA_eksakt_reprodusert=True,originalfil_apnet=False,kildemaske=False,kildekoordinater_til_endring=False,originalfragmenter=False,kun_egen_drawing_pluss_global_RGB_tabell_og_maalt_helplassering=True))
+(R/'kildelos-replay.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n');print('En egen RGB/native RGBA gjenlaget eksakt uten å åpne originalfiler eller bruke kildemasker.')
