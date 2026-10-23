@@ -1,0 +1,1 @@
+Kildeklargjøring,ikke grafikkleveranse. Fem hele kilder2005..2009 fra faktisk ny pakkemotor og eksisterende ekstrakt. Ingen nye bildekall eller resultater. Kildebilder ogindeks/motor/metadata er SHA-festet. Helkildesynlighet er målt,visuell motiv-/stilsammenligning må gjentas før nytegning.
