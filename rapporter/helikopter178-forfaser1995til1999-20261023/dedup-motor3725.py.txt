@@ -1,0 +1,21 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import os,hashlib,json
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();old=O/'kandidat3724-start1-y60';roots=[O/'grunnlag3724-start1-y60',O/'kandidat3725-start1-y60'];assert old.is_dir()and all(p.is_dir()for p in roots)
+canon={}
+for p in sorted(old.glob('*.png')):
+ assert not p.is_symlink();canon.setdefault(sha(p),p)
+rows=[];all_before={};before=os.statvfs(O).f_bavail*os.statvfs(O).f_frsize
+for root in roots:
+ for p in sorted(root.glob('*.png')):
+  assert not p.is_symlink();h=sha(p);all_before[str(p)]=h
+  if h not in canon:canon[h]=p;continue
+  src=canon[h]
+  if p.stat().st_ino==src.stat().st_ino:continue
+  assert sha(src)==h and p.stat().st_size==src.stat().st_size
+  tmp=p.with_name(p.name+'.identisk-lenke');assert not tmp.exists();os.link(src,tmp);os.replace(tmp,p);assert sha(p)==h and p.stat().st_ino==src.stat().st_ino
+  rows.append(dict(fil=str(p),beholdt_identisk_innhold=str(src),sha256=h,bytes=p.stat().st_size,hardlenke=True,stier_bevart=True))
+for f,h in all_before.items():assert sha(Path(f))==h
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),kun_de_to_nye_motoravspillingene=True,ingen_unike_filer_fjernet=True,alle_kontrollstier_og_filhash_bevart=True,identiske_kopier_erstattet_av_harde_lenker=len(rows),logiske_duplikatbytes=sum(e['bytes']for e in rows),filsystem_fri_foer=before,filsystem_fri_etter=os.statvfs(O).f_bavail*os.statvfs(O).f_frsize,ikke_bland_logiske_bytes_med_fysisk_frigitt=True,bevis=rows)
+(R/'motor3725-identiske-kopier.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'dedup-motor3725.py.txt').write_bytes(Path(__file__).read_bytes());print({k:v for k,v in proof.items()if k!='bevis'})
