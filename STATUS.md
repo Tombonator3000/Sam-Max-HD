@@ -1,5 +1,21 @@
 # Status
 
+<!-- helikopter178-forfase-status:start -->
+En ny egen helikopterfase2008/H065 i fig178_02 er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert.18 faktiske innebygde image_gen-kallH053..H070 for fem kilder2005..2009 gir én valgt og17 kvalitetsreturer. fig178_02 er delvis1/24,familien13/102. Ingen ny hel figurjobb:508/1758 har resultat,1250 uten,pluss returer og sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+
+hd-mod ca814520dedc7595aa661b760b8baa0e35fddc41,grafikkilde 2190f265461704701142b083daddc7b39a34df02,har3714 native. Alle21958 filhash er faktisk hentet tilbake og kontrollert.21957 tidligere stier og21951 tidligere PNG-hash er bevart.1472 festede beskyttede input og alle tre opprinnelige stasher er uendret. Bare den SHA-festede egne native2008 er lagt til;diagnostisk automatisk eksport er ikke importert. Delark1536x1024 og rutekart er SHA-festet,ingen hel resultat.png leveres. Original egenkontroll1OK+23 tomme mål gir forventet exit2;automatisk mottak1OK0SJEKK.
+
+Fargen og åpningene i valgt2008 består uendret3HD,IoU0,944,dekning0,967,to egne atskilte grupper. Ny ren egenkodekontroll viser alle kildefester innen3HD og ingen egne kodepiksler mer enn3HD utenfor tilsvarende kildeflater. Den vanlige nativepalettmålingen overså først små kodefelt iH055/H058;ekstrakontrollen tok begge tilbake før mottak. H055s mintkalibrering er bevart,men kandidaten er ikke valgt. Ingen hard originalmaskeklipp,kildefragmenter,lokal påmaling eller lokale trekkflyttinger. Egen ekte alfa,global egenRGB-rens og helplassering. Kildeløs replay gjenlager valgt egenRGBA og native eksakt. Ingen motor-/pipelinekodeendring;lokale hjelpefiler er bare arkivert som py.txt i grafikkrapporten.
+
+To ferske kontrollerte avspillinger med den faktiske nye nedlastede4e32ae90-Linux-binæren sammenligner3713 mot3714 ved rom35,pos160,60,zclip0,kostyme178,anim1 og aktør29.160 kontroller/148null per side,120/120null etterframe40. Tolv kjente inngangsavvik har identiske koordinater og beggeRGB. Originalrektangel med8HD naboområde er identisk;ingen uforklarteHD-endringer.4718 synligeHD-piksler endres i aktørrektangelet. Atomiske lagringer består. Hele motorbildet,komplett før/etter-par,valgt native,delark og24 sekvensfaser1998..2021 er faktisk visuelt sett.53 kilder logget,ikke alle102 eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+Felles Linux/Windows helikopter-utgaven er fortsatt3713 og mangler én native. Forrige samlepunkt er ferdig nedlastet og kontrollert;ingen ny pakkedispatch i denne bunken. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning. Nåværende fellesrelease og alle47 eksisterende releaser ble lest før publisering;ingen release eller vedlegg er endret. Ingen aktiv pakkejobb/nativefrys ved nativepubliseringen.
+
+Gjenoppta fire returer2009,2007,2006,2005 fra rapporter/helikopter178-forfase2005til2009-20261023.2008 skal ikke gjentas. Les RETUR.md,NESTE.md og kodeflate-kontroll-samlet.json først. Neste178-kallH071 er ikke utført eller reservert.1990 krever fortsatt ny hel kilde fordi tidligere kilde er venstreklipt.137V013 og296S037 er uendret og ikke utført. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE;all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattevakt.
+<!-- helikopter178-forfase-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-pakkesamlepunkt:start -->
 Komplett fig178_03 er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert med12/12 ruter2010..2021. Ny2010/H052 fra tre faktiske innebygde bildekall fullfører arket. To kvalitetsreturer og én avvist referansevalidering uten generering er bevart.508/1758 hele figurjobber har resultat,1250 er uten pluss returer og sluttkontroll. Familien178 er12/102. Original egenkontroll10/10OK med to små kilder hoppet over;automatisk helark10OK+to beholdte størrelses-SJEKK. Ingen ny Tom-/Claude-godkjenning.
 
