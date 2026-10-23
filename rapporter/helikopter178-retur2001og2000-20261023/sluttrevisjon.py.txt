@@ -1,0 +1,55 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime,timezone
+from zipfile import ZipFile
+import hashlib,json,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,q):p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+def git(p,*args):return subprocess.check_output(['git',*args],cwd=p,text=True).strip()
+def api(s):return json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+s],cwd=P,text=True))
+def inventory(root):
+    with ThreadPoolExecutor(max_workers=8)as ex:return dict(ex.map(lambda p:(str(p.relative_to(root)),sha(p)),[p for p in root.rglob('*')if p.is_file()]))
+def signature(e):return(e['id'],e['tag_name'],e['body'],sorted((a['id'],a['name'],a['size'],a['digest'])for a in e['assets']))
+st=read(R/'start.json');rec=read(R/'mottak-publisert.json');source=read(O/'grafikk-hentet-kontrollert.json');main=git(P,'rev-parse','HEAD');previous='f3c45cd9be26afa53b6f8c309b4ea12303df4b90'
+assert rec['alle_filhash_bekreftet']and rec['hele_fjernarkivet_faktisk_nedlastet']and rec['native']==3723 and rec['nye_native']==2 and not rec['TAR_lagret']and not rec['ekstra_klon_eller_modkopi']
+assert source['grafikk_commit']==rec['grafikkilde']==git(A,'rev-parse','HEAD')and source['alle_filhash_bekreftet']and source['filer']==299
+refs={l.split()[1].rsplit('/',1)[-1]:l.split()[0]for l in git(P,'ls-remote','origin','refs/heads/main','refs/heads/gpt-arbeid','refs/heads/hd-mod').splitlines()}
+assert refs=={'main':main,'gpt-arbeid':rec['grafikkilde'],'hd-mod':rec['hd_mod']}
+assert git(P,'diff','--name-only',previous,main).splitlines()==['STATUS.md','log.md','memory.md','todo.md']and not git(P,'status','--porcelain')
+ci=read(R/'main-ci.json');assert ci['headSha']==main and ci['status']=='completed'and ci['conclusion']=='success'
+assert{'pipeline','nettleser'}<={e['name']for e in ci['jobs']}and all(e['status']=='completed'and e['conclusion']=='success'for e in ci['jobs'])
+def getmain(name):
+    oid=git(P,'rev-parse',main+':'+name);b=subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/git/blobs/'+oid,'-H','Accept: application/vnd.github.raw'],cwd=P);assert b==(P/name).read_bytes()
+    return dict(fil=name,sha256=hashlib.sha256(b).hexdigest(),gitblob=oid,faktisk_hentet_fra_GitHub=True)
+with ThreadPoolExecutor(max_workers=4)as pool:mainfiles=list(pool.map(getmain,['STATUS.md','log.md','memory.md','todo.md']))
+published=read(R/'publiserte-moddfiler-3723.json');assert inventory(P/'mods/gpt')==published and len(published)==21967 and sum(f.endswith('.png')for f in published)==21961
+assert sum(f.startswith('costumes/')and f.endswith('_hd.png')for f in published)==3723
+assert set(published)-set(st['filer'])=={'costumes/costume178_2000_hd.png','costumes/costume178_2001_hd.png'}
+assert all(published[f]==h for f,h in st['filer'].items()if f not in['mod.json','SHA256SUMS'])
+assert inventory(O/'mod-grunnlag3721')==st['filer']
+assert len(st['beskyttede'])==1472 and all(sha(A/f)==h for f,h in st['beskyttede'].items())
+assert git(P,'stash','list','--format=%H').splitlines()==st['stash']and len(st['stash'])==3
+assert sha(A/st['partial_rapport']/'fig178_02-delresultat.png')==st['partial_sha256']
+assert not(A/'jobber/fig178_02/resultat.png').exists()and len(list(A.glob('jobber/fig*/jobb.json')))==1758 and len(list(A.glob('jobber/fig*/resultat.png')))==508
+routes=read(R/'rutekart-fig178_02.json')['fig178_02'];assert sha(R/'fig178_02-delresultat.png')==routes['sha256_resultat']and{e['rute']for e in routes['ruter']}==set(range(2000,2010))
+assert all(e['native_mottatt']and e['motorobservert']and e['publisert']and published[e['fil']]==e['sha256']for e in routes['ruter'])
+assert read(R/'delark-kontroll.json')['tidligere8_delruter_RGBA_bytebevart']and read(R/'motor-sammenligning.json')['visuelt_sett']
+assert all(e['begge_PNG_hash_eksakt_gjenlaget']and not e['originalfil_aapnet']for e in read(R/'kildelos-replay.json'))
+release=read(R/'release-for-publisering.json');now=api('releases?per_page=100');assert len(now)==47 and{e['id']:signature(e)for e in now}=={e['id']:signature(e)for e in release['alle_releaser']}
+builds={}
+for wf in['linux.yml','windows.yml']:
+    runs=api('actions/workflows/'+wf+'/runs?per_page=30')['workflow_runs'];assert not any(e['status']!='completed'for e in runs)
+    builds[wf]=[dict(id=e['id'],status=e['status'],conclusion=e['conclusion'])for e in runs]
+packages=P/'out/felles-release-20261023-helikopter';linux=packages/'linux/squashfs-root/usr/share/sam-max-hd/mods/gpt';assert read(linux/'mod.json')['costume_cels']==3713
+missing=[f'costume178_{n}_hd.png'for n in range(2000,2010)];assert not any((linux/'costumes'/f).exists()for f in missing)
+with ZipFile(packages/'windows/SamMaxHD-Windows.zip')as z:
+    meta='SamMaxHD-Windows/mod/mod.json';assert json.loads(z.read(meta))['costume_cels']==3713;prefix='SamMaxHD-Windows/mod/costumes/'
+    assert sum(n.startswith(prefix)and n.endswith('_hd.png')for n in z.namelist())==3713 and not any(n.rsplit('/',1)[-1]in missing for n in z.namelist())
+save(R/'release-etter-publisering.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),releaser_bevart=47,alle_release_kropper_og_vedlegg_bevart=True,aktive_pakkebygg=[],siste_bygg=builds,fellesrelease='sam-max-hd-2026-10-23-helikopter',faktisk_tidligere_nedlastet_Linux_og_Windows_native=3713,manglende_native_i_begge=missing,ny_pakkedispatch=False,native_frosset=False))
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),remote=refs,grafikkilde=rec['grafikkilde'],grafikk_filhash_faktisk_hentet=source['filer'],grafikk_unike_blobs_faktisk_hentet=source['unike_faktisk_nedlastede_blobs'],main_bare4dokumenter_endret=True,main_filer=mainfiles,main_CI=ci['databaseId'],main_CI_suksess=True,native=3723,nye_native=2,fig178_02_delruter=10,fig178_02_totalt=24,hele_fjernarkivet_faktisk_nedlastet=True,nedlastet_bytes=rec['nedlastet_bytes'],fjernarkiv_sha256=rec['fjernarkiv_sha256'],alle21967_publiserte_filhash_bekreftet=True,alle21965_tidligere_stier_bevart=True,alle21959_tidligere_PNG_bevart=True,alle1472_beskyttede_input_bevart=True,tre_stasher_bevart=True,tidligere8_delruter_eksakt_bevart=True,gammel3721_mod_eksakt_bevart=True,ingen_ekstra_klon_TAR_eller_modkopi=True,kildelos_egen_RGBA_native_replay=2,motorobservert=2,visuelt_sett=2,godkjent_av_Tom=False,Claude_godkjent=False,bildekall=15,nye_bildekall_denne_gjenopptakingen=9,figurjobber_med_resultat=508,figurjobber_totalt=1758,figurjobber_uten_resultat=1250,fellespakker_native=3713,fellespakker_mangler_native=10,Tom_designavklaring_noedvendig=False,automatikk='ACTIVE',alle_grafikkjobber_ferdige=False,neste_kall='H126 ikke utført eller reservert',begrensning='To kontrollerte motoravspillinger, ikke naturlig full gjennomspilling eller hele102-familien. Ingen ny interaktiv Windows- eller webtest. Ingen pakkeoppdatering i dette delarket.')
+save(R/'sluttrevisjon.json',proof)
+old=R/'mottak-rapport.json';history=R/'mottak-rapport-H111-H116-historisk.json';assert not history.exists();shutil.copy2(old,history)
+save(old,dict(grafikkilde=rec['grafikkilde'],main=main,main_ci=ci['databaseId'],main_ci_suksess=True,native=rec['hd_mod'],native_naa=3723,nye_native=2,nye_hele_jobber=0,bildekall=15,nye_bildekall_denne_gjenopptakingen=9,status='To kontrollerte, motorobserverte og publiserte nativefaser',originale_input_bevart=1472,stasher_bevart=3,hele_figurjobber=508,totale_figurjobber=1758,delark178_02=10,delark178_02_totalt=24,automatikk='ACTIVE',neste_kall='H126 ikke utført eller reservert',alle_publiserte_filhash_bekreftet=True,hele_fjernarkivet_faktisk_nedlastet=True,ingen_ekstra_klon_TAR_eller_modkopi=True,slettede_filer=0,frigjort_plass_ved_rydding=0))
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+print('Sluttrevisjon består:3723 native, to nye faser, alle tidligere PNG og3 stasher bevart. Fire hoveddokumenter hentet og CI grønn.')

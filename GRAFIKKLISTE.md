@@ -1,7 +1,7 @@
 # Grafikkliste
 
 <!-- helikopter178-retur2001-2000-status:start -->
-Klar for additiv publisering av to nye native fra 3721 til 3723. Endelig fjern-SHA og mottak følger i mottak-publisert.json.
+Publisert hd-mod 2ba07d9cb94c99053fd0e97b0dfab903f3b01aff har 3723 native. Grafikkilde er gpt-arbeid 2f92cd2c06ca1d7b50441cfc3e62f817ad299ae7. Hele fjernarkivet er faktisk lastet ned som strøm, og alle 21967 filhash er kontrollert. Alle 21965 tidligere stier og 21959 tidligere PNG er bevart; bare mod.json og SHA256SUMS oppdateres som metadata. 1472 beskyttede input og tre opprinnelige stasher er uendret. Kandidaten er lokalt mottatt ved katalognavnbytte etter kontroll. 3721-grunnlaget er bevart under out. Ingen ekstra klon, lagret TAR eller kontrollkopi er opprettet. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 
 Den påbegynte bunken med H111..H116 er fullført med ni nye faktiske innebygde image_gen-kall H117..H125, totalt 15. To hele spritebilder for fase 2001 og 2000 er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning. Fig178_02 er 10/24 med 2000..2009, familien 178 er 22/102. Hele figurjobber er fortsatt 508/1758, 1250 uten resultat, pluss returer og sluttkontroll. Ingen hel jobb/resultat.png leveres.
 
@@ -17,6 +17,8 @@ Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes
 
 For å begrense videre diskvekst brukes én reflink-kandidat, eksisterende Git-objekter gjennom separat indeks og strømmet fjernarkiv med full SHA256-kontroll. Ingen ekstra full klon, lagret TAR eller kontrollkopi for publisering. Eksisterende arbeidskopier og filer er ikke slettet. WebP-/AVIF-testen er fortsatt bare separate kopier; spillets bildeformat er uendret.
 <!-- helikopter178-retur2001-2000-status:slutt -->
+
+Tidligere status nedenfor er historikk.
 
 Tidligere status nedenfor er historikk.
 
