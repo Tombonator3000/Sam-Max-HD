@@ -1,0 +1,8 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name
+cid,mode=sys.argv[1:3];K=R/'kall'/cid;F=K/'egen-sammensatt.png';a=np.array(Image.open(F).convert('RGBA'));rgb=[0,0,0];mask=np.all(a[:,:,:3]==rgb,2)&(a[:,:,3]>0);radius=3 if mode=='erosjon3' else 1;structure=np.ones((2*radius+1,2*radius+1),bool)
+keep=nd.binary_opening(mask,structure=structure) if mode=='aapning1' else nd.binary_erosion(mask,structure=structure)
+change=mask&~keep;other=(a[:,:,3]>=128)&~mask;_,near=nd.distance_transform_edt(~other,return_indices=True);a[change,:3]=a[tuple(near)][change,:3];D=K/('egen-helt-svart-materialplan-'+mode);D.mkdir(exist_ok=False);Image.fromarray(a).save(D/'egen-sammensatt.png');p=json.loads((K/'plan.json').read_text());p.update(nytt_bildekall=False,egen_materialplan_rens={'regel':'Global behandling av hele egen svarte RGB-materialklasse med eget morfologisk element. Frigjort egen maling får nærmeste annen egen core-RGB. Egen alfa er byteidentisk. Ingen originalfiler, lokale kildekoordinater eller kildemasker.', 'modus':mode,'radius_raw':radius,'egen_RGB':rgb,'egne_endret':int(change.sum()),'grunnlag':str(F.relative_to(R)),'grunnlag_sha256':hashlib.sha256(F.read_bytes()).hexdigest()});(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');(R/'egen-materialplan-rens.py.txt').write_bytes(Path(__file__).read_bytes());print(D.relative_to(R/'kall'))

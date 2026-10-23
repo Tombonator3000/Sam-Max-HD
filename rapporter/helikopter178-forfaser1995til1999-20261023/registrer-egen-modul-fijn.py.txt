@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from own_parts import component_on_canvas
+from smhd.myk import _premul_resize
+import numpy as np,json,hashlib,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall'/sys.argv[1];p=json.loads((K/'plan.json').read_text());partfile=K/'egen-modul-renset.png';part=np.array(Image.open(partfile).convert('RGBA'));refbase=R/'kall'/p['egen_basis'];refp=refbase/('egen-sammensatt.png'if(refbase/'egen-sammensatt.png').exists()else'egen-renset.png');ref=np.array(Image.open(refp).convert('RGBA'));BF=R/'kall'/sys.argv[2]/'egen-sammensatt.png';base=np.array(Image.open(BF).convert('RGBA'));x0,y0,x1,y1=p['egen_rect'];old=ref[y0:y1,x0:x1];yy,xx=np.nonzero(old[:,:,3]>=128);ob=[x0+int(xx.min()),y0+int(yy.min()),x0+int(xx.max()+1),y0+int(yy.max()+1)];yy,xx=np.nonzero(part[:,:,3]>=128);nb=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];sx0,sy0=(ob[2]-ob[0])/(nb[2]-nb[0]),(ob[3]-ob[1])/(nb[3]-nb[1])
+# Register whole generated module only against our previous own drawing, never original pixels.
+gy,gx=np.mgrid[y0:y1:2,x0:x1:2];target=ref[gy,gx];ton=target[:,:,3]>=128;tpacked=target[:,:,0].astype('uint32')*65536+target[:,:,1].astype('uint32')*256+target[:,:,2];packed=part[:,:,0].astype('uint32')*65536+part[:,:,1].astype('uint32')*256+part[:,:,2];best=None
+for fx in np.linspace(.99,1.01,9):
+ for fy in np.linspace(.97,.99,9):
+  sx,sy=sx0*fx,sy0*fy
+  if not .88<=sx/sy/(sx0/sy0)<=1.12:continue
+  for dy in range(-9,-2):
+   iy=np.floor((gy-ob[1]-dy)/sy+nb[1]+.5).astype(int)
+   for dx in range(3,10):
+    ix=np.floor((gx-ob[0]-dx)/sx+nb[0]+.5).astype(int);valid=(ix>=0)&(ix<part.shape[1])&(iy>=0)&(iy<part.shape[0]);cx=np.clip(ix,0,part.shape[1]-1);cy=np.clip(iy,0,part.shape[0]-1);on=valid&(part[cy,cx,3]>=128);un=on|ton;score=int((on&ton&(packed[cy,cx]==tpacked)).sum())/max(1,int(un.sum()));alpha=int((on&ton).sum())/max(1,int(un.sum()));key=(score,alpha,-abs(dx)-abs(dy),-abs(fx-1)-abs(fy-1))
+    if best is None or key>best[0]:best=(key,float(sx),float(sy),dx,dy,float(fx),float(fy))
+key,sx,sy,dx,dy,fx,fy=best;scaled=_premul_resize(part,(round(part.shape[1]*sx),round(part.shape[0]*sy))).copy();nn=np.array(Image.fromarray(part).resize((scaled.shape[1],scaled.shape[0]),Image.Resampling.NEAREST));core=nn[:,:,3]>=128;_,near=nd.distance_transform_edt(~core,return_indices=True);scaled[:,:,:3]=nn[:,:,:3];fringe=(scaled[:,:,3]>0)&~core;scaled[fringe,:3]=nn[tuple(near)][fringe,:3];scaled[scaled[:,:,3]==0,:3]=0;tx,ty=round(ob[0]-nb[0]*sx+dx),round(ob[1]-nb[1]*sy+dy);can=np.zeros_like(base);cx0,cy0=max(0,tx),max(0,ty);cx1,cy1=min(can.shape[1],tx+scaled.shape[1]),min(can.shape[0],ty+scaled.shape[0]);can[cy0:cy1,cx0:cx1]=scaled[cy0-ty:cy1-ty,cx0-tx:cx1-tx]
+D=K/'egen-registrert-modul';D.mkdir(exist_ok=False);Image.fromarray(can).save(D/'egen-helmodul.png');b=base.copy();b[y0:y1,x0:x1]=can[y0:y1,x0:x1];Image.fromarray(b).save(D/'egen-sammensatt.png')
+info=dict(regel='Én hel affin for egen modul, målt bare mot eget tidligere RGB/alfabilde. Ingen originalfiler, kildekoordinater, kildemaske eller lokal trekkflytting. Hele eget rektangulære vindu erstattes.',egen_referanse=str(refp.relative_to(R)),egen_referanse_sha256=hashlib.sha256(refp.read_bytes()).hexdigest(),egen_grunnlag=str(BF.relative_to(R)),egen_grunnlag_sha256=hashlib.sha256(BF.read_bytes()).hexdigest(),egen_modul_sha256=hashlib.sha256(partfile.read_bytes()).hexdigest(),egen_maal_bbox=ob,egen_modul_bbox=nb,skala=[sx,sy],faktorer=[fx,fy],flytt_raw=[tx,ty],delta_raw=[dx,dy],RGB_enighet=key[0],alfa_IoU=key[1],egen_maleavstand_raw=2)
+p.update(nytt_bildekall=False,egen_helregistrering=info);(D/'plan.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n');(R/'registrer-egen-modul-fijn.py.txt').write_bytes(Path(__file__).read_bytes());print(D,info['faktorer'],info['delta_raw'],key)

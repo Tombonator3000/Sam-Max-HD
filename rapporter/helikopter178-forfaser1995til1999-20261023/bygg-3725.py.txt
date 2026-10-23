@@ -1,0 +1,54 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import import_sheet,_premul_resize
+from concurrent.futures import ThreadPoolExecutor
+import json,hashlib,subprocess,shutil,numpy as np,re,gzip
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'kandidat3725'
+cid='H146/egne-hele-alfaflater-min';K=R/'kall'/cid;n=1997;parent='219fcfa1acd53590155638623f48c7acccde3e0f'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def inventory(p):
+ fs=[f for f in p.rglob('*')if f.is_file()]
+ with ThreadPoolExecutor(max_workers=6)as ex:return dict(ex.map(lambda f:(str(f.relative_to(p)),sha(f)),fs))
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==parent
+assert not C.exists() and not(A/'jobber/fig178_02/resultat.png').exists()
+assert subprocess.check_output(['git','diff','--name-only','HEAD','--','jobber','hovedark','stil'],cwd=A)==b''
+q=json.loads((K/'kontroll.json').read_text());assert q['teknisk_ok'] and q['alfa_fester_over3HD']==q['apninger_over3HD']==0
+assert all(e['kode_fester_over3HD']==e['egne_kodepiksler_over3HD_fra_kilde']==e['native_fester_over3HD']==0 for e in q['farger'])
+assert sha(K/'prototype-under-kontroll.png')==q['native_sha256']
+base=inventory(M);assert len(base)==21969 and json.loads((M/'mod.json').read_text())['costume_cels']==3724
+for line in(M/'SHA256SUMS').read_text().splitlines():h,name=line.split('  ',1);assert base[name]==h,name
+previous=json.loads(gzip.decompress((R/'kandidat3724-filhash.json.gz').read_bytes()));assert base==previous
+idx=M/f'costumes/costume178_{n}_idx.png';assert np.array_equal(np.array(Image.open(idx)),np.array(Image.open(R/f'kilder/{n}/original-indeks.png')))
+# Source-independent replay: only our own RGBA and its recorded whole transform.
+a=np.array(Image.open(K/'egen-sammensatt.png').convert('RGBA'));sx,sy=q['hel_skala'];scaled=_premul_resize(a,(round(a.shape[1]*sx),round(a.shape[0]*sy)));native=np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA'));can=np.zeros_like(native)
+x,y=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];h,w=scaled.shape[:2];x0,y0=max(0,x),max(0,y);x1,y1=min(x+w,can.shape[1]),min(y+h,can.shape[0]);can[y0:y1,x0:x1]=scaled[y0-y:y1-y,x0-x:x1-x];assert np.array_equal(can,native)
+N=R/'native';png=N/f'costume178_{n}_hd.png';assert not png.exists();Image.fromarray(native).save(png);assert sha(png)==q['native_sha256']
+put(R/'kildelos-native-replay1997.json',dict(kall=cid,egen_bilde_sha256=sha(K/'egen-sammensatt.png'),native_png_sha256=sha(png),RGBA_byteeksakt=True,PNG_byteeksakt=True,originalfil_aapnet_for_replay=False,global_skala=q['hel_skala'],global_flytt=q['flytt'],marg=[q['margx'],q['margy']]))
+partial=R/'fig178_02-delresultat.png';board=Image.open(partial).convert('RGBA');before=np.array(board);mapping=json.loads((R/'rutekart-fig178_02.json').read_text());routes=mapping['fig178_02']['ruter'];assert len(routes)==11
+put(O/'rutekart-11av24-foer3725.json',mapping);shutil.copyfile(partial,O/'delark-11av24-foer3725.png')
+job=json.loads((A/'jobber/fig178_02/jobb.json').read_text());rt=next(v for v in job['ruter']if v['rute']==n);rx,ry,_,_=rt['rekt'];dx=(job['plassering'][0]+rx)*4-q['margx']*4;dy=(job['plassering'][1]+ry)*4-q['margy']*4;board.alpha_composite(Image.fromarray(native),(dx,dy));after=np.array(board);assert np.array_equal(after[before[:,:,3]>0],before[before[:,:,3]>0])
+ys,xs=np.nonzero(native[:,:,3]>=128);target=f'costumes/costume178_{n}_hd.webp'
+entry=dict(bilde=f'costume178_{n}',jobb='fig178_02',kostyme=178,rute=n,kall=cid,fil=target,native_png=str(png.relative_to(A)),native_png_sha256=sha(png),kilde_sha256=sha(R/f'kilder/{n}/original-1x.png'),rect=[dx+int(xs.min()),dy+int(ys.min()),int(np.ptp(xs)+1),int(np.ptp(ys)+1)],marg_HD=[q['margx']*4,q['margy']*4],egen_alfa=True,originalmaske=False,originalfragmenter=False,lokal_kildeflytting=False,teknisk_ok=True,visuelt_sett_native=True,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False)
+for e in routes:
+ xx,yy,ww,hh=e['rect'];assert np.array_equal(after[yy:yy+hh,xx:xx+ww],before[yy:yy+hh,xx:xx+ww]);assert(M/e['fil']).exists() and base[e['fil']]==e['sha256']
+routes.append(entry);board.save(partial);mapping['fig178_02'].update(sha256_resultat=sha(partial),delvis=True)
+D=O/'ark3725/fig178_02';D.mkdir(parents=True,exist_ok=False)
+for f in['referanse.png','original_1x.png','prompt.txt','jobb.json']:shutil.copyfile(A/'jobber/fig178_02'/f,D/f)
+shutil.copyfile(partial,D/'resultat.png');run=subprocess.run([str(P/'.venv/bin/python'),str(A/'verktoy/sjekk_leveranse.py'),str(D/'resultat.png')],cwd=A,capture_output=True,text=True);log=run.stdout+run.stderr;(R/'fig178_02-egenkontroll3725.txt').write_text(log)
+errors=re.findall(r'^FEIL\s+(costume\d+_\d+):',log,re.M);missing=[v['bilde']for v in job['ruter']if v['bilde']not in{e['bilde']for e in routes}];assert set(errors)==set(missing)and len(missing)==12,log
+put(R/'delark-kontroll3725.json',dict(exit=run.returncode,produserte_FEIL=0,tomme_maal=missing,delvis=12,totalt=24,elleve_tidligere_ruter_RGBA_bytebevart=True,helt_resultat_levert=False))
+rep=import_sheet(np.array(board),[rt],{entry['bilde']:entry['rect']},P/'work/extract',O/'automatisk-mottak1997');put(R/'automatisk-mottak1997.json',rep);assert set(rep['ruter'])=={entry['bilde']}and rep['ruter'][entry['bilde']]['status']=='ok'and rep['ruter'][entry['bilde']]['i_modden'],rep
+subprocess.run(['cp','-a','--reflink=always',str(M),str(C)],check=True);out=C/target;assert not out.exists()and not out.with_suffix('.png').exists();Image.open(png).save(out,format='WEBP',lossless=True,exact=True,quality=100,method=6);assert np.array_equal(np.array(Image.open(out).convert('RGBA')),native)
+entry.update(sha256=sha(out),native_mottatt=True,snitt_union=q['snitt_union'],dekning=q['dekning']);shutil.copyfile(out,N/out.name)
+meta=json.loads((C/'mod.json').read_text());meta['costume_cels']=3725;put(C/'mod.json',meta)
+put(R/'webp-tillegg1997.json',dict(source_png=str(png.relative_to(A)),source_sha256=sha(png),target=target,target_sha256=sha(out),source_bytes=png.stat().st_size,target_bytes=out.stat().st_size,lossless=True,exact=True,quality=100,method=6,alle_RGBA_byte_identiske=True,RGB_under_alfa0_identiske=True,maal=list(Image.open(out).size),tidligere_webp_migration_bevart=True))
+files=inventory(C);files.pop('SHA256SUMS');(C/'SHA256SUMS').write_text(''.join(h+'  '+f+'\n'for f,h in sorted(files.items())));files=inventory(C);assert len(files)==21970 and set(files)-set(base)=={target}
+assert{f for f in base if files[f]!=base[f]}=={'mod.json','SHA256SUMS'};assert sha(idx)==sha(C/idx.relative_to(M))
+for name in['rutekart-fig178_02.json','rutekart-samlet.json']:put(R/name,mapping)
+put(R/'egen-native1997.json',dict(ruter=[entry],nye_native=1,native_grunnlag=3724,native_kandidat=3725,kandidat=str(C),valgt_egen_stilkontroll=True,vurdering='H146 tegner løperne som flytende smale linjer. Minimum av hele egne myke alfaflater hindrer nysynlig umalt RGB uten originalmaske. Små kildedeler og egen fringe bevares; proporsjoner og motiv er sammenlignet med original, godkjent Sam og tidligere native1999. Den gamle H143-stilreturen velges ikke. Ny fase er ikke Tom-/Claude-godkjent.',i_modden_lokalt_publisert=False))
+put(O/'baseline3724-filhash.json',base);put(O/'kandidat3725-filhash.json',files)
+with gzip.open(R/'kandidat3725-filhash.json.gz','wb')as f:f.write(json.dumps(files,sort_keys=True).encode())
+put(R/'kandidatstatus1997.json',dict(grunnlag_hd_mod=parent,filantall_grunnlag=len(base),filantall_kandidat=len(files),tidligere_grafikkfiler_SHA_bevart=True,en_kandidat=True,ingen_ekstra_modkopi=True,metadataendringer=['mod.json','SHA256SUMS'],native_kandidat=3725,nye_native=1,stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines(),avventer_motor=True))
+q.update(valgt_kandidat=True,visuelt_sett=True,egen_stilkontroll=True,native_mottatt=True,motorobservert=False,publisert=False,status='KANDIDAT_1997_AVVENTER_MOTOR');put(K/'kontroll.json',q)
+(R/'bygg-3725.py.txt').write_bytes(Path(__file__).read_bytes());print('Kandidat3725, delark12/24, automatisk mottak1OK, 11 gamle ruter RGBA-bevart. Alle21969 tidligere modfiler bevart, bare to metadatafiler endret. Motor gjenstår.')

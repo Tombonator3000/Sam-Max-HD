@@ -1,3 +1,17 @@
+# Nyeste retur og kandidat1997
+
+Gjeldende publiserte WebP-mod219fcfa1acd53590155638623f48c7acccde3e0f har3724 native. Én ny fase1997 er nå egenkontrollert, native mottatt i kandidat3725, visuelt sett og motorobservert, men ennå ikke publisert. Delark12/24 i kandidaten,11/24 publisert; familie178 24/102 i kandidaten. Hele figurjobber508/1758.1999 og2000..2021 skal ikke tegnes igjen.
+
+Les rapporter/helikopter178-forfaser1995til1999-20261023/notat1997.md, klar-for-publisering1997.json og rutekart-videreH148-H149-1997.json. Valgt variant er H146/egne-hele-alfaflater-min. Den bruker minimum av to hele egne antialiaserte alfaflater, aldri originalmasken, og beholder egen tidligere RGB og fringe. H146s flytende løpere er bevart. Alle uendrede3HD-porter består, IoU0,885/dekning0,928, null ekstra kodepiksler. Kildeløs replay og tapsfri WebP er RGBA-byteeksakte. Standard delark12OK/12tomme mål og automatisk mottak1OK.11 tidligere delruter og alle21969 tidligere modfiler er bevart.
+
+To nye motoravspillinger gir160 av160 byteidentiske hele originaltilstander. Kun fase1997/frame118 endres,7753HD-piksler, alle innen originalrektangel med8HD. Begge160bufferkontroller har148null,120/120null etterframe40.12 gamle avvik har like koordinater og beggeRGBA. Native, delark, fullbilde, før/etter og27faser er visuelt sett. Ikke full naturlig gjennomspilling eller ny interaktiv Windows-/webtest. Ingen ny Tom-/Claude-godkjenning.
+
+To nye faktiske innebygde kall H148/H149 er bevart,24 i bunken. De er returer, ingen piksler fra dem i valgt1997. H148s beste egen nyflate har ett ekstra svart kodepunkt; H149/1998 har bedre løpere men mange fargefeltavvik. Fortsett1998/H138,H149,1996/H144 og1995/H145 etter publisering og mottak av1997. H150 er ikke utført eller reservert.1990 trenger hel kilde;137/V013 og296/S037 er uendret.
+
+Én kandidat, ingen ekstra fullmodkopi per jobb. Publiser3725 som vanlig barn av fersk hd-mod-SHA, hent hele fjernarkivet og bekreft alle hash før lokal aktivering og rydding. Bevar råbilder, unike kilder, stilankere, beskyttede jobbfiler og tre stasher. Felles Linux/Windows-pakker har3723 og mangler én publisert fase nå, to etter denne publiseringen. Oppdater ved komplett ark-/familiesamlepunkt eller oppgavens avslutning med faktisk nedlasting/innholdskontroll. Automatikken er ACTIVE. Ingen nødvendig Tom-avklaring, gammel nattprosess eller motor-/pipelineendring.
+
+Tidligere returhistorikk følger.
+
 # Gjeldende retur etter H147
 
 Siste økt:11 nye faktiske bildekall, ingen ny sluttrute eller import. Alle aktuelle varianter er returer. Se VIDERE-H137-H147.md og videre-H137-H147-kontroll.json for konkrete SHA-er og rutekart-returH137-H147.json for alle uendrede porter.

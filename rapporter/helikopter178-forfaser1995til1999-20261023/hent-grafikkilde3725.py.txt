@@ -1,0 +1,28 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor,as_completed
+from urllib.request import urlopen
+from urllib.parse import quote
+from datetime import datetime,timezone
+import hashlib,json,subprocess,sys
+A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');O=Path(__file__).resolve().parent;commit=sys.argv[1];parent=sys.argv[2];receipt=sys.argv[3]
+def git(*args):return subprocess.check_output(['git',*args],cwd=A)
+assert git('rev-parse','HEAD').decode().strip()==commit and not git('status','--porcelain')
+assert git('ls-remote','origin','refs/heads/gpt-arbeid').decode().split()[0]==commit
+names=[s.decode()for s in git('diff','--name-only','-z',parent,commit).split(b'\0')if s];tree={}
+for line in git('ls-tree','-r','-z',commit).split(b'\0'):
+ if line:
+  meta,n=line.split(b'\t',1);tree[n.decode()]=meta.split()[2].decode()
+def fetch(name):
+ p=A/name;size=p.stat().st_size;local=hashlib.sha256(p.read_bytes()).hexdigest();h=hashlib.sha256();b=hashlib.sha1(b'blob '+str(size).encode()+b'\0');n=0
+ with urlopen('https://raw.githubusercontent.com/Tombonator3000/Sam-Max-HD/'+commit+'/'+quote(name,safe='/'),timeout=60)as stream:
+  while chunk:=stream.read(1024*1024):h.update(chunk);b.update(chunk);n+=len(chunk)
+ assert n==size and h.hexdigest()==local and b.hexdigest()==tree[name],name
+ return dict(fil=name,sha256=local,Git_blob_SHA1=b.hexdigest(),bytes=n)
+rows=[];errors=[]
+with ThreadPoolExecutor(max_workers=4)as ex:
+ fs={ex.submit(fetch,n):n for n in names}
+ for f in as_completed(fs):
+  try:rows.append(f.result())
+  except Exception as e:errors.append(dict(fil=fs[f],feil=str(e)))
+proof=dict(tid_utc=datetime.now(timezone.utc).isoformat(),commit=commit,forelder=parent,faktisk_hentet_filer=len(rows),forventede_filer=len(names),SHA256_og_Gitblob_SHA1_bekreftet=not errors and len(rows)==len(names),lagret_nedlastet_payload=False,bytes=sum(r['bytes']for r in rows),feil=errors,filer=sorted(rows,key=lambda v:v['fil']))
+(O/receipt).write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:v for k,v in proof.items()if k!='filer'},ensure_ascii=False),flush=True);assert not errors

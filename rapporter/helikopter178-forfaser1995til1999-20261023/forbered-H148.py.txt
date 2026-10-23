@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+from datetime import datetime,timezone
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H148';K.mkdir(exist_ok=False)
+bcid='H146/registreringsgrunnlag/egen-registrert-modul/egen-RGB-H142/egen-konturrens-e8-r3/heltilpasning/egne-smaafelt/uten-nye-egne-hull/hel-egen-RGB8-fringe0'
+base=R/'kall'/bcid/'egen-sammensatt.png';rect=[535,650,920,825];guide=[28,15,53,26]
+pal=json.loads((R/'kall/H140/kodepalett.json').read_text());a=np.array(Image.open(R/'kilder/1997/original-1x.png').convert('RGBA'))
+for e in pal['tabell']:a[np.all(a[:,:,:3]==e['ekte'],2)&(a[:,:,3]>0),:3]=e['kode']
+im=Image.fromarray(a).crop(guide);sc=min(896/im.width,896/im.height);im=im.resize((round(im.width*sc),round(im.height*sc)),Image.Resampling.NEAREST);c=Image.new('RGBA',(1024,1024),'#808080');c.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));c.convert('RGB').save(K/'forstorret-kildeguide.png')
+cut=np.array(Image.open(base).convert('RGBA').crop(rect));code=cut.copy()
+for e in pal['tabell']:code[np.all(cut[:,:,:3]==e['ekte'],2)&(cut[:,:,3]>0),:3]=e['kode']
+Image.fromarray(code).save(K/'egen-forrige-modul-kode.png');Image.fromarray(cut).save(K/'egen-forrige-modul.png');(K/'kodepalett.json').write_text(json.dumps(pal,ensure_ascii=False,indent=2)+'\n')
+p='''Use case: precise-object-edit. Redraw the entire enlarged partial underside module in image 1. Image 1 is the exact technical colour-ID drawing guide for one animation cel; image 2 is the approved cartoon edge finish only; image 3 is our existing faulty module, an error reference only. Use the exact literal technical colours from image 1, not any natural helicopter colours. Preserve every single narrow strip, small coloured insert and adjacency in image 1. Most critically preserve the small black, salmon, mint, cream and blue junctions under the main body and where the left diagonal skid joins its strut. Fill each material with its assigned colour continuously, without adding any black outline or rounding an internal colour boundary across a small neighbouring field. Keep the diagonal runners as flowing narrow straight strips, never a staircase of rounded beads. The grey areas in image 1 are holes or background and must become genuine transparency. Keep both broad cut edges of this partial module; do not complete any cropped piece and do not draw a whole aircraft. Minimal smoothing of diagonal pixel steps to continuous curves, the same silhouette, colour field lengths and proportions. Flat exact colours, no shading, gradients, textures, new holes, added objects, labels or characters. Return one transparent 1024x1024 PNG centred at the same scale as image 1.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'forstorret-kildeguide.png'),str(A/'hovedark/sam.png'),str(K/'egen-forrige-modul-kode.png')],transparent_background=True)
+sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();plan=dict(kall='H148',rute=1997,utfort=False,original_kontekst_og_stil_sett=True,modul='hel-underside-med-to-skjoter',egen_basis=bcid,egen_rect=rect,kildeutsnitt_kun_guide=guide,kildekoordinater_til_plassering=False,originalmaske=False,referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+for name,data in [('argumenter.json',args),('plan.json',plan)]: (K/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+(K/'prompt-brukt.txt').write_text(p+'\n');(R/'forbered-H148.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

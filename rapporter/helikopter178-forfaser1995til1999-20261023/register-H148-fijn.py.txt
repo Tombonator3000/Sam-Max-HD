@@ -1,0 +1,7 @@
+from pathlib import Path
+import json,numpy as np
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H148';D=K/'fijn-eigen-registratie';D.mkdir(exist_ok=False)
+# Same actual generated module; refine the whole affine against our own previous module only.
+(D/'egen-modul-renset.png').write_bytes((K/'egen-modul-renset.png').read_bytes());(D/'plan.json').write_bytes((K/'plan.json').read_bytes())
+s=(O/'registrer-egen-modul-v2.py').read_text().replace('np.mgrid[y0:y1:4,x0:x1:4]','np.mgrid[y0:y1:2,x0:x1:2]').replace('for fx in np.linspace(.92,1.08,9):','for fx in np.linspace(.99,1.01,9):').replace('for fy in np.linspace(.92,1.08,9):','for fy in np.linspace(.97,.99,9):').replace('for dy in range(-12,13,3):','for dy in range(-9,-2):').replace('for dx in range(-12,13,3):','for dx in range(3,10):').replace('egen_maleavstand_raw=4','egen_maleavstand_raw=2').replace("(R/'registrer-egen-modul-v2.py.txt')","(R/'registrer-egen-modul-fijn.py.txt')")
+(O/'registrer-egen-modul-fijn.py').write_text(s);(R/'register-H148-fijn.py.txt').write_bytes(Path(__file__).read_bytes());print(D.relative_to(R/'kall'))

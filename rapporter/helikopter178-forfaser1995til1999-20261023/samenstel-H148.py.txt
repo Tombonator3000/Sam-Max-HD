@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H148/egen-registrert-modul';p=json.loads((K/'plan.json').read_text());base=R/'kall'/p['egen_basis']/'egen-sammensatt.png';b=np.array(Image.open(base).convert('RGBA'));a=np.array(Image.open(K/'egen-helmodul.png').convert('RGBA'));x0,y0,x1,y1=p['egen_rect'];part=a[y0:y1,x0:x1];old=b[y0:y1,x0:x1];core=part[:,:,3]>=128;_,ii=nd.distance_transform_edt(~core,return_indices=True);ext=part[tuple(ii)][:,:,:3]
+for mode in ['heel-RGB-eigen-alfa','zachte-RGB-eigen-alfa']:
+ D=K/mode;D.mkdir(exist_ok=False);out=b.copy();c=old.copy()
+ if mode=='heel-RGB-eigen-alfa':c[:,:,:3]=ext;c[core,:3]=part[core,:3]
+ else:
+  al=part[:,:,3:4].astype(float)/255;c[:,:,:3]=np.rint(part[:,:,:3]*al+old[:,:,:3]*(1-al)).astype('uint8')
+ out[y0:y1,x0:x1]=c;assert np.array_equal(out[:,:,3],b[:,:,3]);Image.fromarray(out).save(D/'egen-sammensatt.png');q=json.loads((R/'kall'/p['egen_basis']/'plan.json').read_text());q.update(kall=str(D.relative_to(R/'kall')),nytt_bildekall=False,egen_RGB_module=dict(kilde=str((K/'egen-helmodul.png').relative_to(R)),modus=mode,egen_rect=p['egen_rect'],regel='Hele eget modulvindu RGB; eksisterende egen alfa bytebevart; bare egen maling forlenges der tegningens egen alfa er null. Ingen originalfiler eller kildeplassering.',base_sha256=hashlib.sha256(base.read_bytes()).hexdigest()));(D/'plan.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n');print(D.relative_to(R/'kall'))
+(R/'samenstel-H148.py.txt').write_bytes(Path(__file__).read_bytes())
