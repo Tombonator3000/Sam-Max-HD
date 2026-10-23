@@ -154,6 +154,97 @@ index 75bf8738..3b018481 100644
  	Common::String _displayName;
  	Common::String _path;
  	Common::String _url;
+diff --git a/configure b/configure
+index ff45575d..c857fa32 100755
+--- a/configure
++++ b/configure
+@@ -172,6 +172,7 @@ _sparkle=auto
+ _osxdockplugin=auto
+ _jpeg=auto
+ _png=auto
++_webp=auto
+ _gif=auto
+ _theoradec=auto
+ _vpx=auto
+@@ -336,6 +337,7 @@ add_feature mad "MAD" "_mad"
+ add_feature opengl_game_classic "OpenGL (classic)" "_opengl_game_classic"
+ add_feature opengl_game_shaders "OpenGL with shaders" "_opengl_game_shaders"
+ add_feature png "PNG" "_png"
++add_feature webp "WebP" "_webp"
+ add_feature vorbis "Vorbis file support" "_vorbis _tremor"
+ add_feature zlib "zlib" "_zlib"
+ add_feature test_cxx11 "Test C++11" "_test_cxx11"
+@@ -1153,6 +1155,9 @@ Optional Libraries:
+   --with-png-prefix=DIR    prefix where libpng is installed (optional)
+   --disable-png            disable PNG decoder [autodetect]
+ 
++  --enable-webp            enable WebP HD images (requires libwebp)
++  --disable-webp           disable WebP HD images [autodetect]
++
+   --with-gif-prefix=DIR    prefix where giflib is installed (optional)
+   --disable-gif            disable GIF decoder [autodetect]
+ 
+@@ -1357,6 +1362,8 @@ for ac_option in $@; do
+ 	--enable-jpeg)                _jpeg=yes              ;;
+ 	--disable-png)                _png=no                ;;
+ 	--enable-png)                 _png=yes               ;;
++	--disable-webp)               _webp=no               ;;
++	--enable-webp)                _webp=yes              ;;
+ 	--disable-gif)                _gif=no                ;;
+ 	--enable-gif)                 _gif=yes               ;;
+ 	--disable-theoradec)          _theoradec=no          ;;
+@@ -3445,6 +3452,10 @@ EOF
+ 		else
+ 			_png=no
+ 		fi
++		# Supplied by build-web.sh as a pinned static WebP library.
++		if test "$_webp" != yes; then
++			_webp=no
++		fi
+ 		if test "$_vorbis" = yes; then
+ 			append_var LDFLAGS "-s USE_VORBIS=1"
+ 		else
+@@ -5830,6 +5841,40 @@ fi
+ define_in_config_if_yes "$_png" 'USE_PNG'
+ echo "$_png"
+ 
++#
++# WebP for DigHD colour images. Index/mask images still use PNG.
++#
++echocheck "WebP"
++if test "$_webp" != no; then
++	if test -z "$WEBP_LIBS"; then
++		if test "$_pkg_config" = yes && $_pkgconfig --exists libwebp; then
++			WEBP_LIBS="`$_pkgconfig --libs libwebp`"
++			WEBP_CFLAGS="`$_pkgconfig --cflags libwebp`"
++		else
++			WEBP_LIBS="-lwebp"
++		fi
++	fi
++	cat > $TMPC << EOF
++#include <webp/decode.h>
++int main(void) { return WebPGetDecoderVersion() == 0; }
++EOF
++	if cc_check $WEBP_CFLAGS $WEBP_LIBS; then
++		_webp=yes
++	else
++		if test "$_webp" = yes; then
++			echo "requested WebP decoder is missing (install libwebp development files)"
++			exit 1
++		fi
++		_webp=no
++	fi
++fi
++if test "$_webp" = yes; then
++	append_var LIBS "$WEBP_LIBS"
++	append_var INCLUDES "$WEBP_CFLAGS"
++fi
++define_in_config_if_yes "$_webp" 'USE_WEBP'
++echo "$_webp"
++
+ #
+ # Check for GIF
+ #
 diff --git a/engines/scumm/akos.cpp b/engines/scumm/akos.cpp
 index 8333a7ed..a16913b5 100644
 --- a/engines/scumm/akos.cpp
@@ -635,10 +726,10 @@ index 21938706..17d0c967 100644
  	width *= 8;
 diff --git a/engines/scumm/dighd.cpp b/engines/scumm/dighd.cpp
 new file mode 100644
-index 00000000..cb4b5803
+index 00000000..953a86ac
 --- /dev/null
 +++ b/engines/scumm/dighd.cpp
-@@ -0,0 +1,5447 @@
+@@ -0,0 +1,5508 @@
 +/* ScummVM - Graphic Adventure Engine
 + *
 + * ScummVM is the legal property of its developers, whose names
@@ -677,7 +768,12 @@ index 00000000..cb4b5803
 +#include "engines/engine.h"
 +#include "engines/util.h"
 +#include "graphics/cursorman.h"
++#include "graphics/managed_surface.h"
 +#include "image/png.h"
++
++#ifdef USE_WEBP
++#include <webp/decode.h>
++#endif
 +
 +#include "scumm/actor.h"
 +#include "scumm/dighd.h"
@@ -1145,10 +1241,73 @@ index 00000000..cb4b5803
 +	return new Common::MemoryReadStream(data, out, DisposeAfterUse::YES);
 +}
 +
++// A colour image can be lossless WebP or PNG. Keep the caller's soft/flat
++// ordering: _hd.webp, _hd.png, then the flat image. Never decode _idx through
++// WebP: its palette indices, including duplicate colours, are meaningful.
++static Common::Path webpPath(const Common::Path &png) {
++	const Common::String name = png.toString();
++	return Common::Path(name.substr(0, name.size() - 4) + ".webp");
++}
++
++static bool hasHDImage(const Common::Path &png) {
++#ifdef USE_WEBP
++	if (Common::FSNode(webpPath(png)).exists())
++		return true;
++#endif
++	return Common::FSNode(png).exists();
++}
++
++// The returned surface owns its pixels. The caller must free() and delete it.
++static Graphics::Surface *readHDImage(const Common::Path &png, const Graphics::PixelFormat &format) {
++#ifdef USE_WEBP
++	const Common::FSNode node(webpPath(png));
++	if (Common::SeekableReadStream *stream = node.exists() ? node.createReadStream() : nullptr) {
++		const int64 size = stream->size();
++		Common::Array<byte> data;
++		bool valid = size >= 12 && size <= 128 * 1024 * 1024;
++		if (valid) {
++			data.resize((uint)size);
++			valid = stream->read(data.data(), data.size()) == data.size() && !stream->err();
++		}
++		delete stream;
++		WebPBitstreamFeatures info;
++		valid = valid && WebPGetFeatures(data.data(), data.size(), &info) == VP8_STATUS_OK;
++		// DigHD images are still images; do not silently use one animation frame.
++		valid = valid && !info.has_animation && info.width > 0 && info.height > 0 &&
++		        (uint64)info.width * info.height <= 64 * 1024 * 1024;
++		if (valid) {
++			Graphics::Surface *rgba = new Graphics::Surface();
++			rgba->create(info.width, info.height, Graphics::PixelFormat::createFormatRGBA32());
++			valid = WebPDecodeRGBAInto(data.data(), data.size(), (byte *)rgba->getPixels(),
++			                          (size_t)rgba->pitch * rgba->h, rgba->pitch) != nullptr;
++			if (valid) {
++				Graphics::Surface *converted = rgba->convertTo(format);
++				rgba->free();
++				delete rgba;
++				debug(3, "DigHD: WebP %s", node.getPath().toString().c_str());
++				return converted;
++			}
++			rgba->free();
++			delete rgba;
++		}
++		warning("DigHD: invalid WebP %s; trying PNG", node.getPath().toString().c_str());
++	}
++#endif
++	const Common::FSNode nodePNG(png);
++	Common::SeekableReadStream *stream = nodePNG.exists() ? nodePNG.createReadStream() : nullptr;
++	::Image::PNGDecoder decoder;
++	const bool ok = stream && decoder.loadStream(*stream);
++	delete stream;
++	if (!ok)
++		return nullptr;
++	const Graphics::Palette &palette = decoder.getPalette();
++	return decoder.getSurface()->convertTo(format, palette.size() ? palette.data() : nullptr, palette.size());
++}
++
 +bool DigHD::loadImage(const Common::Path &hdFile, const Common::Path &idxFile, int origW, int origH, Image &out, bool pad) {
-+	Common::FSNode hdNode(_modPath.join(hdFile));
++	const Common::Path hdPath = _modPath.join(hdFile);
 +	Common::FSNode idxNode(_modPath.join(idxFile));
-+	if (!hdNode.exists() || !idxNode.exists())
++	if (!hasHDImage(hdPath) || !idxNode.exists())
 +		return false;
 +
 +	::Image::PNGDecoder idxDec;
@@ -1168,13 +1327,15 @@ index 00000000..cb4b5803
 +		return false;
 +	}
 +
-+	::Image::PNGDecoder hdDec;
-+	s = hdNode.createReadStream();
-+	ok = s && hdDec.loadStream(*s);
-+	delete s;
-+	if (!ok)
++	Graphics::Surface *decoded = readHDImage(hdPath, _rgba);
++	if (!decoded)
 +		return false;
-+	const Graphics::Surface *hs = hdDec.getSurface();
++	// ManagedSurface releases the pixels on every dimension-validation exit.
++	Graphics::ManagedSurface hd(decoded->w, decoded->h, decoded->format);
++	hd.copyFrom(*decoded);
++	decoded->free();
++	delete decoded;
++	const Graphics::Surface *hs = &hd.rawSurface();
 +	int padX = 0, padY = 0;
 +	if (pad) {
 +		// The same margin on both sides, in whole original pixels: the image is
@@ -1227,11 +1388,7 @@ index 00000000..cb4b5803
 +	out.padX = padX;
 +	out.padY = padY;
 +
-+	const Graphics::Palette &hpal = hdDec.getPalette();
-+	Graphics::Surface *conv = hs->convertTo(_rgba, hpal.size() ? hpal.data() : nullptr, hpal.size());
-+	out.hd.copyFrom(*conv);
-+	conv->free();
-+	delete conv;
++	out.hd.copyFrom(*hs);
 +	if (!pad) {
 +		// Soft alpha values (not only 0 and 255): the edge is drawn soft over the HD room
 +		for (int yy = 0; yy < out.hd.h && !out.softEdge; yy++) {
@@ -2873,8 +3030,8 @@ index 00000000..cb4b5803
 +	// picture on screen is frame - 1 in the numbering used by the extractor
 +	// (verified against thedig-textures output with DIGHD_VERIFY).
 +	_smushFrameNo = frame - 1;
-+	Common::FSNode node(_modPath.join(Common::String::format("san/%s/%05d.png", name.c_str(), frame - 1)));
-+	const bool haveFrame = node.exists();
++	const Common::Path framePath = _modPath.join(Common::String::format("san/%s/%05d.png", name.c_str(), frame - 1));
++	const bool haveFrame = hasHDImage(framePath);
 +
 +	// Text drawn into this frame by SmushPlayer (see smushTextEnd). The mask
 +	// has the layout of SmushPlayer's frame buffer, src may start inside it.
@@ -2888,17 +3045,17 @@ index 00000000..cb4b5803
 +	// The HD frame is only read in HD mode; classic mode shows the original anyway
 +	_smushLoaded = false;
 +	if (haveFrame && !_classic) {
-+		::Image::PNGDecoder dec;
-+		Common::SeekableReadStream *s = node.createReadStream();
-+		if (s && dec.loadStream(*s) && dec.getSurface()->w == _w * _scale && dec.getSurface()->h == _h * _scale) {
-+			const Graphics::Palette &fpal = dec.getPalette();
-+			Graphics::Surface *conv = dec.getSurface()->convertTo(_fmt, fpal.size() ? fpal.data() : nullptr, fpal.size());
-+			_smushFrame.free();
-+			_smushFrame = *conv;  // takes over the pixels
-+			delete conv;
-+			_smushLoaded = true;
++		Graphics::Surface *decoded = readHDImage(framePath, _fmt);
++		if (decoded) {
++			if (decoded->w == _w * _scale && decoded->h == _h * _scale) {
++				_smushFrame.free();
++				_smushFrame = *decoded;  // takes over the pixels
++				_smushLoaded = true;
++			} else {
++				decoded->free();
++			}
++			delete decoded;
 +		}
-+		delete s;
 +	}
 +
 +	if (_smushLoaded && _verify) {
@@ -3825,18 +3982,13 @@ index 00000000..cb4b5803
 +		// alpha. fonts/<folder>.txt has a line "<chr> <x> <y> <w> <h>" for each.
 +		// One file per typeface, so the web page fetches two files, not one per letter.
 +		_faceLoaded[folder] = true;
-+		Common::FSNode pngNode(_modPath.join(Common::String::format("fonts/%s.png", folder.c_str())));
++		const Common::Path facePath = _modPath.join(Common::String::format("fonts/%s.png", folder.c_str()));
 +		Common::FSNode txtNode(_modPath.join(Common::String::format("fonts/%s.txt", folder.c_str())));
-+		if (!pngNode.exists() || !txtNode.exists())
++		if (!hasHDImage(facePath) || !txtNode.exists())
 +			return -1;
-+		::Image::PNGDecoder dec;
-+		Common::SeekableReadStream *ps = pngNode.createReadStream();
-+		const bool ok = ps && dec.loadStream(*ps);
-+		delete ps;
-+		if (!ok)
++		Graphics::Surface *conv = readHDImage(facePath, _rgba);
++		if (!conv)
 +			return -1;
-+		const Graphics::Palette &pal = dec.getPalette();
-+		Graphics::Surface *conv = dec.getSurface()->convertTo(_rgba, pal.size() ? pal.data() : nullptr, pal.size());
 +		int count = 0;
 +		if (Common::SeekableReadStream *in = txtNode.createReadStream()) {
 +			while (!in->eos() && !in->err()) {

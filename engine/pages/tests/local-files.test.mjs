@@ -4,6 +4,22 @@ import {selectFiles, makeIndexes, privateFetch, summarize, treeRows, blobIds, Re
 
 const file = (name, content = 'sample') => ({name: name.split('/').at(-1), webkitRelativePath: name, size: content.length});
 
+test('lossless WebP colour images and PNG index/mask files survive import and refresh', () => {
+  const files = [
+    'mod.json', 'rooms/room007.webp', 'rooms/room007.png', 'rooms/room007_idx.png',
+    'objects/obj1008_01_hd.webp', 'objects/obj1008_01_mask.png',
+    'costumes/costume178_2000_hd.webp', 'costumes/costume178_2000_idx.png',
+    'fonts/exo2.webp', 'fonts/exo2.txt',
+    'costumes/costume178_2000_idx.webp', 'objects/obj1008_01_mask.webp', 'prompt.webp',
+  ];
+  const rows = selectFiles(files.map(path => file('gpt/' + path)), 'mod');
+  assert.equal(rows.length, 10);
+  assert.deepEqual([summarize(rows).rooms, summarize(rows).objects, summarize(rows).cels], [1, 1, 1]);
+  const remote = treeRows(files.map((path, n) => ({path, size: 7, sha: String(n), type: 'blob'})), '', 'mod');
+  assert.deepEqual(remote.map(row => row.path), rows.map(row => row.path));
+  assert.ok(makeIndexes(remote).get(MOD_ROOT + 'rooms/index.json')['room007.webp']);
+});
+
 test('imports game files from a directory without importing unrelated files', () => {
   const rows = selectFiles([file('game/samnmax.000'), file('game/samnmax.001'), file('game/monster.sou'), file('game/token.txt'), file('game/SHA256SUMS')], 'game');
   assert.deepEqual(rows.map(row => row.path), [GAME_ROOT + 'SAMNMAX.000', GAME_ROOT + 'SAMNMAX.001', GAME_ROOT + 'MONSTER.SOU']);
