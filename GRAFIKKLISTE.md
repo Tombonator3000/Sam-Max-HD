@@ -1,7 +1,7 @@
 # Grafikkliste
 
 <!-- helikopter178-fase2003-status:start -->
-Klar for additiv publisering av én ny native fra 3718 til 3719. Endelig fjern-SHA og hentet publiseringsbevis følger i mottak-publisert.json.
+Publisert hd-mod 2228e137de73ca178318a7d3657dd7b4aeddc805 har 3719 native. Grafikkilde er gpt-arbeid 9e40966b4a9b4c3eee552ddce902cf6625acf0fd. Alle 21963 publiserte filhash er hentet tilbake og kontrollert. Alle 21962 tidligere stier og 21956 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3718-grunnlaget er bevart under out. Bare én ny native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 
 Ti faktiske innebygde image_gen-kall H093..H102 har gitt én valgt ny helikopterfase, 2003/H100. Den er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning. Fig178_02 er 6/24, familien 178 er 18/102. Hele figurjobber er fortsatt 508/1758, 1250 uten resultat, pluss returer og sluttkontroll. Ti bildekall er ikke ti leverte jobber.
 
@@ -13,6 +13,8 @@ Gjenoppta rapporter/helikopter178-forfaser2000til2004-20261023/NESTE.md og RETUR
 
 Felles Linux/Windows helikopter-utgave har fortsatt 3713 og mangler seks etter publisering. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning med nedlasting, sjekksummer og grafikkinnhold kontrollert. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE, all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattprosess.
 <!-- helikopter178-fase2003-status:slutt -->
+
+Tidligere status nedenfor er historikk.
 
 Tidligere status nedenfor er historikk.
 

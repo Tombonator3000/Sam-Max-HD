@@ -29,3 +29,5 @@ Felles Linux/Windows helikopter-utgave har fortsatt 3713 og vil mangle seks ette
 Delark SHA256: 66fb1f32e126fdaf11b0880eca2c2784f0ea60f10f8811e466b45c638be80163
 
 Native SHA256: 31345a95cefb468017cfeabaa178893fcd6d123c1eacd7ea8b468c9c6d7b243a
+
+Publisert hd-mod 2228e137de73ca178318a7d3657dd7b4aeddc805 har 3719 native. Grafikkilde er gpt-arbeid 9e40966b4a9b4c3eee552ddce902cf6625acf0fd. Alle 21963 publiserte filhash er hentet tilbake og kontrollert. Alle 21962 tidligere stier og 21956 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3718-grunnlaget er bevart under out. Bare én ny native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
