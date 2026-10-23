@@ -1,7 +1,7 @@
 # Grafikkliste
 
 <!-- helikopter178-forfaser2005-2006-status:start -->
-Klar for additiv publisering av to nye native fra 3716 til 3718. Endelig fjern-SHA og faktisk hentet publiseringsbevis kommer i mottak-publisert.json.
+Publisert hd-mod c2ef7ebebedd515ae3a60a5e2591ab7ff34c10a5 har 3718 native. Grafikkilde er gpt-arbeid ae6c8fe9340db326f28a8d900779b27908364115. Alle 21962 publiserte filhash er hentet tilbake og kontrollert. Alle 21960 tidligere stier og 21954 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3716-grunnlaget er bevart under out. Bare to nye native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 
 Sju faktiske innebygde image_gen-kall H086..H092 gir to nye valgte helikopterfaser: 2005/H090 og 2006/H092. Begge er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning. Delarket er nå 5/24, tidligere 2007/2008/2009 og deres nativehash er bytebevart. Familien er 17/102 i 3718-modden. Ingen ny hel figurjobb: 508/1758 har resultat, 1250 uten, i tillegg til returer og sluttkontroll.
 
@@ -15,6 +15,8 @@ Felles Linux/Windows helikopter-utgave har fortsatt 3713 native og mangler fem e
 
 Gjenoppta rapporter/helikopter178-forfaser2002til2006-20261023/NESTE.md og RETUR.md. Fase 2005..2009 skal ikke gjentas, fig178_03 er allerede 12/12. Neste motiver er 2004/H074, 2003/H075, 2002/H076, 2001/H077 og 2000/H078 i returforfaserapporten. 1990 trenger fortsatt ny hel kilde fordi den gamle er venstreklipt. Neste 178-kall H093 er ikke utført eller reservert. 137/V013 og 296/S037 er uendret og ikke utført. Ingen nødvendig ny Tom-designavklaring. Automatikken er ACTIVE og all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattevakt.
 <!-- helikopter178-forfaser2005-2006-status:slutt -->
+
+Tidligere status nedenfor er historikk.
 
 Tidligere status nedenfor er historikk.
 
