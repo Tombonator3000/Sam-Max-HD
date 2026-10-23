@@ -3,13 +3,15 @@
 <!-- helikopter178-forfaser1995-1999:start -->
 ## Neste i grafikkproduksjonen
 
-- [x] Utbedret og publisert helikopterfase 1999 i WebP-mod 219fcfa1acd53590155638623f48c7acccde3e0f, 3724 native. Hele 21969-filers publiseringen er faktisk hentet tilbake og alle hash bekreftet. Grafikk/rapport er på gpt-arbeid d6abaa03f93a86322cec581c2d92c2ca13ed0ce0. Ingen ny hel figurjobb eller bildekjøring i rettingen.
-- [ ] Gjenoppta rapporter/helikopter178-forfaser1995til1999-20261023/NESTE.md, RETUR.md og mottak-publisert1999.json. Rett eksisterende returer 1998/H127,H135, 1997/H132, 1996/H133, 1995/H134. H137 er ikke utført eller reservert. Ikke tegn 1999..2021 igjen.
-- [ ] Bruk egen RGB-fringe før fremtidige bytter av egen alfa eller RGB-moduler. Rettelsen løste 30 svarte ekstra piksler uten originalmaske. Behold uendret 3 HD-port og separat stilvurdering. Ny global kontur-/kodekantrens er dokumentert i ALFA-RGB-RETTELSE.md. Gamle ubehandlede returer er aldri stilankere.
-- [ ] Oppdater begge faktiske Linux-/Windows-pakker ved neste komplette ark-/familiesamlepunkt eller avslutning. Felles WebP-utgave har fortsatt 3723 og mangler én. Kall den ikke oppdatert før nedlasting, sjekksummer og faktisk inkludert grafikk er kontrollert.
-- [ ] Fortsett til alle produserbare jobber og returer er levert, kontrollert og importert, og gjør samlet sluttkontroll før pause. Fersk opptelling 508/1758 hele figurjobber, fig178_02 11/24, familie178 23/102. 1990 trenger hel originalkilde; 137/V013 og 296/S037 er uendret. Ingen nødvendig Tom-avklaring. Automatikken er ACTIVE, ingen gammel nattprosess.
+- [x] Produsert og bevart11 nye faktiske innebygde bildekall H137..H147. Grafikk/rapport er pushet på gpt-arbeid f880b44342a458dbf9c2878909c823ff6c411fdb. Disse er returforsøk, ingen ny sluttrute eller import.
+- [ ] Gjenoppta rapporter/helikopter178-forfaser1995til1999-20261023/NESTE.md, VIDERE-H137-H147.md og RETUR.md.1997/H146 har flytende løpere, men beste bevarte variant har2 ekstra kodepiksler. H147s to nye hele materialplan består sine porter, men egen undermaling har7 ekstra kodepiksler. Ikke forklar dem som råstøy eller svekk3HD-portene. Teknisk beståtte H1436/3 og8/3 er fortsatt stilreturer med trappede løpere.
+- [ ] Fortsett også påbegynte1998/H137,H138,1996/H144 og1995/H145. Bruk kallokal kremkodepalett ved dekoding av H140/H144/H145, aldri feil felles kodepalett. H148 er ikke utført eller reservert. Ikke tegn publisert1999 eller2000..2021 igjen.
+- [ ] Ved neste godkjente sluttrute: egenkontroll, ett komplett gjeldende modgrunnlag, én kandidat, native mottak, visuell kontroll og relevant motoravspilling før vanlig additiv publisering fra fersk fjern-SHA. Hent tilbake og kontroller alle hash. Behold kandidat3724-start1-y60 som faktisk3724-grunnlag for denne bunken.
+- [ ] Oppdater begge faktiske Linux-/Windows-pakker ved neste komplette ark-/familiesamlepunkt eller oppgavens avslutning. Pakkene har3723 og mangler publisert1999. Ikke kall dem oppdatert før faktisk nedlasting, sjekksummer og inkludert grafikk er kontrollert.
+- [ ] Fortsett til alle produserbare jobber/returer er levert, kontrollert og importert, med samlet sluttkontroll før pause. Fersk status3724 native,508/1758 hele jobber, fig178_02 11/24, familie178 23/102.1990 trenger hel kilde,137/V013 og296/S037 står som før. Ingen nødvendig Tom-avklaring. Automatikken er ACTIVE.
 
-Behold relevante avspillinger fra denne bunken; siste kandidat3724-start1-y60 er et komplett faktisk 3724-grunnlag for neste sammenligning. Den gamle fullmodkopien er verifisert og fjernet. Bare byteidentiske flatedumper er ryddet; råbilder, unike kilder, kontrollbevis og tre stasher er beholdt. Motoren ser den nye fasen, men full naturlig gjennomspilling og ny Tom-/Claude-godkjenning gjenstår.
+Alle21969 installerte modhash, publisert fjern-SHA, beskyttede jobbfiler og tre stasher er kontrollert uendret. Ingen ny fullmodkopi, kandidat, motorprøve eller pakke i siste økt. Unike råbilder og kontrollbevis er bevart. Ingen gammel nattprosess.
+
 <!-- helikopter178-forfaser1995-1999:slutt -->
 
 <!-- webp-og-rydding-20261023:start -->
