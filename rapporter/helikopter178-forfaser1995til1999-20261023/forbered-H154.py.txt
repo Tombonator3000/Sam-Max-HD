@@ -1,0 +1,17 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import json,numpy as np,hashlib
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H154';K.mkdir(exist_ok=False);S=R/'kilder/1996';bcid='H153/egen-alfa-bevart';BF=R/'kall'/bcid/'egen-sammensatt.png';rect=[280,610,970,875];guide=[13,14,56,29]
+for name,F,cut in [('kilde-matte.png',S/'original-1x.png',guide),('egen-forrige-matte.png',BF,rect)]:
+ a=np.array(Image.open(F).convert('RGBA'));a[a[:,:,3]>0,:3]=255;a[a[:,:,3]==0,:3]=0;im=Image.fromarray(a).crop(cut)
+ if name.startswith('kilde'):
+  sc=min(896/im.width,896/im.height);im=im.resize((round(im.width*sc),round(im.height*sc)),Image.Resampling.NEAREST);can=Image.new('RGBA',(1024,1024),'#808080');can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));can.convert('RGB').save(K/name)
+ else:im.save(K/name)
+p='''Use case: precise-object-edit. Draw the SAME enlarged partial undercarriage silhouette shown in image1, as a white alpha-matte drawing. Image2 is only the approved clean antialiased cartoon contour finish. Image3 is our existing own undercarriage silhouette, for edit geometry only, not style.
+The two narrow diagonal lower runners must each be a single continuous thin sloping strip, with their original bends and separate struts preserved. Replace the repeated diagonal pixel steps with flowing straight or gently curved lines at the same thickness. Do not turn the runners into beads, round stairs or a row of individual blocks. Keep every original tiny attached end piece and every original open grey gap exactly where shown. The partial body top is deliberately cut flat by the crop; do not complete it. Preserve the number of connected and detached pieces and the exact proportions, without adding holes or details.
+Return ONLY opaque white artwork with delicate antialiased edges on genuine transparency. All grey spaces in image1, including enclosed gaps, must be genuinely transparent. Do not draw any black outlines, material colours, gradients, shadows, textures, labels, other parts or a whole aircraft. Keep image1 square canvas, central scale and location. One transparent1024x1024 PNG.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'kilde-matte.png'),str(A/'hovedark/sam.png'),str(K/'egen-forrige-matte.png')],transparent_background=True);sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest();plan=dict(kall='H154',rute=1996,utfort=False,modul='egen-understell-alfa',egen_basis=bcid,egen_rect=rect,kildeutsnitt_kun_guide=guide,original_kontekst_og_stil_sett=True,originalmaske=False,kildekoordinater_til_plassering=False,egen_basis_sha256=sha(BF),referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(p+'\n')
+for name,d in [('argumenter.json',args),('plan.json',plan)]:(K/name).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-H154.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

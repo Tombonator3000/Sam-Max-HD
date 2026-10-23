@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+from own_parts import decode
+import numpy as np,json,hashlib,subprocess,sys
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;cid=sys.argv[1];K=R/'kall'/cid;p=json.loads((K/'plan.json').read_text());part,clean=decode(K/'raa.png',p['tabell']);cols=np.array([e['ekte']for e in p['tabell']],dtype='uint8');D=K/'registreringsgrunnlag';D.mkdir(exist_ok=False);Image.fromarray(part).save(D/'egen-modul-renset.png');BF=R/p['egen_basis'];old=np.array(Image.open(BF).convert('RGBA'));mask=np.zeros(old.shape[:2],bool)
+for col in cols:mask|=np.all(old[:,:,:3]==col,2)
+mask&=old[:,:,3]>0;ref=old.copy();ref[~mask]=0;F=K/'forrige-egne-felt';F.mkdir(exist_ok=False);Image.fromarray(ref).save(F/'egen-renset.png');yy,xx=np.nonzero(ref[:,:,3]>=128);rect=[max(0,int(xx.min())-15),max(0,int(yy.min())-15),min(old.shape[1],int(xx.max())+16),min(old.shape[0],int(yy.max())+16)];pp=dict(p);pp.update(nytt_bildekall=False,egen_basis=cid+'/forrige-egne-felt',egen_rect=rect);(D/'plan.json').write_text(json.dumps(pp,ensure_ascii=False,indent=2)+'\n');bcid=str(BF.parent.relative_to(R/'kall'));subprocess.run(['/home/tom/Sam-Max-HD/.venv/bin/python',str(O/'registrer-egen-modul-v2.py'),str(D.relative_to(R/'kall')),bcid],check=True);LF=D/'egen-registrert-modul/egen-helmodul.png';layer=np.array(Image.open(LF).convert('RGBA'))
+for mode in ['egen-alfa-bevart','egne-alfa-union']:
+ a=old.copy();paint=(layer[:,:,3]>=128)&((a[:,:,3]>0)if mode=='egen-alfa-bevart'else True);a[paint,:3]=layer[paint,:3]
+ if mode=='egne-alfa-union':
+  more=layer[:,:,3]>a[:,:,3];a[more,:3]=layer[more,:3];a[:,:,3]=np.maximum(a[:,:,3],layer[:,:,3])
+ a[a[:,:,3]==0,:3]=0;Z=K/mode;Z.mkdir(exist_ok=False);Image.fromarray(a).save(Z/'egen-sammensatt.png');info=json.loads((BF.parent/'plan.json').read_text());info.update(nytt_bildekall=False,egne_hele_materialplan={'regel':'Hele faktisk nytegnede materialplan legges på tidligere egen RGB. Eldre egen kjerne og øvrig egen maling beholdes. Helregistrering bare mot de tidligere egne tilsvarende feltene. Ingen originalfil, kildekoordinater eller originalmaske.','modus':mode,'grunnlag':str(BF.relative_to(R)),'grunnlag_sha256':hashlib.sha256(BF.read_bytes()).hexdigest(),'nye_egne_plan':str(LF.relative_to(R)),'nye_sha256':hashlib.sha256(LF.read_bytes()).hexdigest(),'tabell':p['tabell'],'egen_alfa_bytebevart':mode=='egen-alfa-bevart','egen_rens':clean,'helregistrering':json.loads((D/'egen-registrert-modul/plan.json').read_text())['egen_helregistrering']});(Z/'plan.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n');print(Z.relative_to(R/'kall'))
+(R/'monter-egne-hele-plan.py.txt').write_bytes(Path(__file__).read_bytes())

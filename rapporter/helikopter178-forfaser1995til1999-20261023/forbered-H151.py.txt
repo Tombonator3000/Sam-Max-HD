@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H151';K.mkdir(exist_ok=False);S=R/'kilder/1996';bcid='H150/egen-registrert-modul/bare-hel-venstredel';BF=R/'kall'/bcid/'egen-sammensatt.png';rect=[340,380,830,620];guide=[17,0,47,13]
+pal=json.loads((R/'kall/H144/kodepalett.json').read_text())
+for e in pal['tabell']:
+ if e['ekte']==[255,179,67]:e['kode']=[255,175,220]
+src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));own=np.array(Image.open(BF).convert('RGBA'));code=own.copy()
+for e in pal['tabell']:
+ src[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode'];code[np.all(own[:,:,:3]==e['ekte'],2)&(own[:,:,3]>0),:3]=e['kode']
+im=Image.fromarray(src).crop(guide);sc=min(896/im.width,896/im.height);im=im.resize((round(im.width*sc),round(im.height*sc)),Image.Resampling.NEAREST);can=Image.new('RGBA',(1024,1024),'#808080');can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));can.convert('RGB').save(K/'forstorret-kildeguide.png');Image.fromarray(code).crop(rect).save(K/'egen-forrige-modul-kode.png');(K/'kodepalett.json').write_text(json.dumps(pal,ensure_ascii=False,indent=2)+'\n')
+p='''Use case: precise-object-edit. Draw ONLY the enlarged partial top module in image 1. This is a literal colour-ID map for animation phase1996. Image 2 provides only the approved clean cartoon edge finish. Image 3 is the faulty own module for comparison only, not style.
+Copy every flat technical colour field from image 1 without changing its position, size or adjacency. Crucially retain the tiny PALE PINK block near the upper hub, RGB(255,175,220), distinct from yellow, white and magenta. Keep the violet blocks under that pink insert and at the far right end, RGB(192,0,255), distinct from the large dark-purple band. Keep the blue, cyan, teal and all white fields, even one-cell inserts. The grey regions are gaps and must be genuinely transparent, not new white or coloured triangles. Preserve the exact cut ends of the partial horizontal strip at the top and the cropped right and bottom edges; do not complete them or draw any full aircraft.
+Use continuous softly antialiased cartoon contours, keeping the same geometry and thin widths. Do not make diagonal steps into beads. Keep all colour boundaries and small mechanical inserts precise. Flat colours without black outline, gradients, texture, shading, text or extra objects. Keep image1 square canvas, location and scale. Return one transparent1024x1024 PNG.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'forstorret-kildeguide.png'),str(A/'hovedark/sam.png'),str(K/'egen-forrige-modul-kode.png')],transparent_background=True);sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();plan=dict(kall='H151',rute=1996,utfort=False,original_kontekst_og_stil_sett=True,modul='helt-takparti',egen_basis=bcid,egen_rect=rect,kildeutsnitt_kun_guide=guide,kildekoordinater_til_plassering=False,originalmaske=False,egen_fullgrunnlag_sha256=sha(BF),global_guidekode_endret={'ekte':[255,179,67],'forrige_kode':[255,192,0],'ny_kode':[255,175,220]},referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+for name,data in [('argumenter.json',args),('plan.json',plan)]:(K/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+(K/'prompt-brukt.txt').write_text(p+'\n');(R/'forbered-H151.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

@@ -1,0 +1,10 @@
+from pathlib import Path
+from PIL import Image
+import json,numpy as np,hashlib
+O=Path(__file__).resolve().parent;R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter')/O.name;K=R/'kall/H155';p=json.loads((K/'plan.json').read_text());BF=R/'kall/H154/egne-matte-min/egen-myke-vindussoem/egen-kodekantrens-r3/egen-sammensatt.png';LF=K/'egen-registrert-modul/egen-helmodul.png';PF=R/'kall/H153/registreringsgrunnlag/egen-registrert-modul/egen-helmodul.png';base=np.array(Image.open(BF).convert('RGBA'));layer=np.array(Image.open(LF).convert('RGBA'));planes=np.array(Image.open(PF).convert('RGBA'));x0,y0,x1,y1=p['egen_rect'];win=np.zeros(base.shape[:2],bool);win[y0:y1,x0:x1]=True;a=base.copy();paint=win&(layer[:,:,3]>=128)&(a[:,:,3]>0);a[paint,:3]=layer[paint,:3]
+for mode in ['samlet-egen-RGB','samlet-egne-smaaplan-union']:
+ out=a.copy()
+ if mode.endswith('union'):
+  paint=planes[:,:,3]>=128;out[paint,:3]=planes[paint,:3];more=planes[:,:,3]>out[:,:,3];out[more,:3]=planes[more,:3];out[:,:,3]=np.maximum(out[:,:,3],planes[:,:,3])
+ out[out[:,:,3]==0,:3]=0;D=K/mode;D.mkdir(exist_ok=False);Image.fromarray(out).save(D/'egen-sammensatt.png');info=json.loads((BF.parent/'plan.json').read_text());info.update(nytt_bildekall=False,hele_egne_moduler_samlet={'regel':'H155s hele eget fargelag innen eget vindu på globalt renset egen RGB og egen myk matte. Eventuelt hele egne H153-materialplan videreføres med egne antialiaserte alfaflater for kildebekreftede små deler. Bare egne tegninger og tidligere egne globale registreringer. Ingen originalfil, kildekoordinat, originalmaske eller lokal trekkflytting.','modus':mode,'egen_vindu':p['egen_rect'],'egne_filer':{str(f.relative_to(R)):hashlib.sha256(f.read_bytes()).hexdigest()for f in[BF,LF,PF]}});(D/'plan.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n');print(D.relative_to(R/'kall'))
+(R/'H155-egne-moduler-samlet.py.txt').write_bytes(Path(__file__).read_bytes())

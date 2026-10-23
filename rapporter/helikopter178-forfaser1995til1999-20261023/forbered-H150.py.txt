@@ -1,0 +1,18 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+O=Path(__file__).resolve().parent;A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter'/O.name;K=R/'kall/H150';K.mkdir(exist_ok=False);n=1996;S=R/f'kilder/{n}';BF=R/'kall/H144/egen-renset.png';rect=[50,475,435,795];guide=[0,5,24,25]
+pal=json.loads((R/'kall/H144/kodepalett.json').read_text());src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));own=np.array(Image.open(BF).convert('RGBA'));code=own.copy()
+for e in pal['tabell']:
+ src[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode'];code[np.all(own[:,:,:3]==e['ekte'],2)&(own[:,:,3]>0),:3]=e['kode']
+im=Image.fromarray(src).crop(guide);sc=min(896/im.width,896/im.height);im=im.resize((round(im.width*sc),round(im.height*sc)),Image.Resampling.NEAREST);can=Image.new('RGBA',(1024,1024),'#808080');can.alpha_composite(im,((1024-im.width)//2,(1024-im.height)//2));can.convert('RGB').save(K/'forstorret-kildeguide.png');Image.fromarray(code).crop(rect).save(K/'egen-forrige-modul-kode.png');(K/'kodepalett.json').write_text(json.dumps(pal,ensure_ascii=False,indent=2)+'\n')
+D=K/'egen-grunnlag';D.mkdir();(D/'egen-sammensatt.png').write_bytes(BF.read_bytes())
+p='''Use case: precise-object-edit. Draw ONLY the entire enlarged left mechanical module shown in image 1, from animation phase1996. It includes a partial sloping rotor/roof edge above, the left tail and its tiny multicoloured bottom assembly, and the cut beginning of the arm to the right. This is a literal colour-ID map. Image 2 is the approved clean antialiased cartoon edge finish only. Image 3 is our previous faulty module in the same technical colours, for geometry/error comparison only, not style.
+Copy every separate colour patch of image 1 in its exact position, extent and thickness. The tiny MINT-green, PALE CREAM, lavender, salmon and grey blocks in the left bottom assembly must all remain distinct; do not replace a mint block with green, cream with yellow, or navy with transparency. Retain the opaque navy inserts and every small teal/blue/purple roof strip. Keep the same number of pieces and grey gaps. Grey background and holes become genuinely transparent. Keep every cut edge and do not finish the cropped mechanical pieces or draw any other aircraft parts.
+Use smooth continuous external contours and thin antialiasing as in image 2, preserving the exact silhouette and all small features. Diagonal lines are continuous, not rounded pixel steps or chains of beads. Flat exact technical colours, no black outline, gradient, shading, texture, labels or new details. Keep the square canvas, central location and scale of image 1. Return one transparent 1024x1024 PNG.'''
+args=dict(prompt=p,referenced_image_paths=[str(K/'forstorret-kildeguide.png'),str(A/'hovedark/sam.png'),str(K/'egen-forrige-modul-kode.png')],transparent_background=True);sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+plan=dict(kall='H150',rute=n,utfort=False,original_kontekst_og_stil_sett=True,modul='hele-venstre-modul',egen_basis='H144',egen_rect=rect,kildeutsnitt_kun_guide=guide,kildekoordinater_til_plassering=False,originalmaske=False,egen_fullgrunnlag_sha256=sha(BF),egen_fullgrunnlag_kilde=str(BF.relative_to(R)),referanser_SHA256={f:sha(f)for f in args['referenced_image_paths']},planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(p+'\n')
+for name,data in [('argumenter.json',args),('plan.json',plan)]: (K/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-H150.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

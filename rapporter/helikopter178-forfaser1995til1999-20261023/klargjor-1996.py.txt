@@ -1,0 +1,99 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+import json, hashlib, subprocess
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+cid='H155/samlet-egne-smaaplan-union/heltilpasning03'
+now=datetime.now(ZoneInfo('Europe/Oslo')).isoformat()
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+q=read(R/'kall'/cid/'kontroll.json'); m=read(R/'motor-sammenligning1996.json')
+assert q['teknisk_ok'] and q['egen_alfa'] and not q['originalmaske']
+assert m['sammenlignede_eksakte_originaltilstander']==49 and len(m['utelatte_tilstander'])==111
+assert m['ingen_uforklarte_HD_avvik_utenfor_ny_native'] and m['buffer12_beggeRGBA_byteidentiske']
+assert m['parvalg_krever_identiske_originale_tegnekall'] and m['ingen_HD_data_brukt_i_parvalg']
+ds=m['ulik_heltilstand_utenfor_ROI_diagnose']
+assert sum(e['HD_avvik_over16HD_fra_endret_original'] for e in ds)==421
+assert sum(e['disse_innen_faktisk_native_rekt_av_endret_cel'] for e in ds)==421
+assert sum(e['uforklarte_HD_avvik'] for e in ds)==0
+m.update(visuelt_sett=True,hele_motorbilder_sett=True,for_etter_sammenligning_sett=True,delark_sett=True,sekvens27faser_sett=True)
+put(R/'motor-sammenligning1996.json',m)
+q.update(egen_stilkontroll=True,visuelt_sett=True,native_mottatt=True,motorobservert=True,publisert=False,valgt=True,status='EGENKONTROLLERT_MOTOROBSERVERT_KANDIDAT_1996')
+put(R/'kall'/cid/'kontroll.json',q)
+n=read(R/'egen-native1996.json'); n.update(motorobservert=True,visuelt_sett=True)
+for e in n['ruter']:e.update(motorobservert=True,visuelt_sett_native=True)
+put(R/'egen-native1996.json',n)
+for name in ['rutekart-fig178_02.json','rutekart-samlet.json']:
+    d=read(R/name)
+    for e in d['fig178_02']['ruter']:
+        if e['rute']==1996:e.update(motorobservert=True,visuelt_sett_native=True)
+    put(R/name,d)
+st=read(R/'kandidatstatus1996.json'); st.update(avventer_motor=False,motorobservert=True,visuelt_sett=True,klar_for_publisering=True);put(R/'kandidatstatus1996.json',st)
+calls=read(R/'alle-kall.json');assert len(calls)==24 and calls[-1]['kall']=='H149'
+newcalls=['H150','H151','H152','H153','H154','H155']
+for name in newcalls:
+    K=R/'kall'/name;p=read(K/'plan.json');assert p['utfort'] and sha(K/'raa.png')==p['raa_sha256']
+    calls.append(dict(kall=name,rute=1996,utfort=True,raa=str((K/'raa.png').relative_to(A)),raa_sha256=sha(K/'raa.png'),prompt_sha256=sha(K/'prompt-brukt.txt'),argumenter_sha256=sha(K/'argumenter.json'),modul=True,verktøy='innebygd image_gen',teknisk_ok=False,valgt=False,egenkontrollert=True,visuelt_sett_raa=True,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False,delpiksler_brukt_i_valgt1996=True,hele_raa_bildet_er_ikke_valgt_native=True))
+for e in calls:e['piksler_brukt_i_kandidat1996']=e['kall'] in ['H144',*newcalls]
+put(R/'alle-kall.json',calls)
+variants=[]
+for k in sorted((R/'kall').rglob('kontroll.json')):
+    v=str(k.parent.relative_to(R/'kall'))
+    if v.split('/')[0] not in newcalls:continue
+    z=read(k);selected=v==cid
+    errors={'alfa_fester':z['alfa_fester_over3HD'],'apninger':z['apninger_over3HD'],'kode_fester':sum(e['kode_fester_over3HD'] for e in z['farger']),'ekstra_kodepiksler':sum(e['egne_kodepiksler_over3HD_fra_kilde'] for e in z['farger']),'native_fargefester':sum(e['native_fester_over3HD'] for e in z['farger'])}
+    # Technical affine candidates are not automatically declared visually approved.
+    z.update(valgt=selected,visuelt_sett=selected,egen_stilkontroll=selected)
+    put(k,z)
+    own=k.parent/'egen-sammensatt.png'
+    if not own.exists():own=k.parent/'egen-renset.png'
+    variants.append(dict(variant=v,rute=1996,nytt_bildekall=False,teknisk_ok=z['teknisk_ok'],prototype=str((k.parent/'prototype-under-kontroll.png').relative_to(A)),prototype_sha256=sha(k.parent/'prototype-under-kontroll.png'),kontroll=str(k.relative_to(A)),kontroll_sha256=sha(k),egen_bilde_sha256=sha(own) if own.exists() else None,maal=list(Image.open(k.parent/'prototype-under-kontroll.png').size),hel_skala=z['hel_skala'],flytt=z['flytt'],egen_heltilpasning=z.get('egen_heltilpasning'),feil=errors,valgt=selected,egenkontrollert=True,visuelt_sett=selected,egen_stilkontroll=selected,native_mottatt=selected,motorobservert=selected,publisert=False,status='KANDIDAT_1996_MOTOROBSERVERT' if selected else 'TEKNISK_KANDIDAT_IKKE_VALGT' if z['teknisk_ok'] else 'RETUR',originalmaske=False,originalfragmenter=False,lokal_flytting_av_trekk=False))
+assert len(variants)==23 and sum(e['valgt'] for e in variants)==1
+put(R/'rutekart-videreH150-H155-1996.json',dict(egenkontrollerte_varianter=variants,valgt_variant=cid,nye_ruter_i_kandidat=1,nye_publiserte_ruter=0))
+f=read(R/'fremdrift.json');assert f['innebygde_bildekall']==24 and f['native']==3725
+f.update(bildekall=calls,innebygde_bildekall=30,laget_raa=30,egenkontrollert_raa=30,nye_innebygde_bildekall_i_okten=6,nye_native_i_okten=1,nye_motorobserverte_native_i_okten=1,nye_publiserte_native_i_okten=0,native_kandidat=3726,fig178_02_kandidat=13,familie178_kandidat=25,lagede_valgte_sluttruter=3,native_mottatt=3,visuelt_sett_valgte_sluttruter=3,motorobservert_valgte_sluttruter=3,siste_kall='H155',neste_kall='H156',neste_kall_utfort=False,neste_kall_reservert=False,oppdatert_oslo=now,status='KANDIDAT_1996_MOTOROBSERVERT',bunke_ferdig=False,behandlede_ruter=[1996,1997,1999],valgt_variant1996=cid,siste_okt='videre-1996-H150-H155.json')
+f['egne_avledede_varianter']+=variants
+assert cid not in f['valgte_varianter'];f['valgte_varianter'].append(cid)
+for e in f['delvise_leveranser']:e.update(sha256=sha(R/'fig178_02-delresultat.png'),ruter=13,publisert=False,publiserte_ruter=12,kandidat_ruter=13,native_mottatt=True,motorobservert=True)
+put(R/'fremdrift.json',f)
+r=read(R/'rutekart-returer.json');assert {e['rute'] for e in r['valgte_avledede_varianter']}=={1997,1999}
+r['egne_varianter']+=variants;r['valgte_avledede_varianter'].append(dict(kall=cid,rute=1996,native_png_sha256=q['native_sha256'],status='KANDIDAT_1996_MOTOROBSERVERT',publisert=False));r['nye_ruter_i_kandidat_i_okten']=1;r['nye_ruter_i_modden_i_okten']=0;put(R/'rutekart-returer.json',r)
+ready=dict(valgt_variant=cid,nye_valgte_native=1,native_grunnlag=3725,native_kandidat=3726,sterke_3HD_porter_bestatt=True,ekstra_kodepiksler=0,ekte_alfa=True,originalmaske=False,sourcefri_native_replay_byteeksakt=True,native_WebP_RGBA_byteeksakt=True,delark13_av24=True,tidligere12_ruter_RGBA_bevart=True,automatisk_mottak_OK=1,visuelt_sett=True,motorobservert=True,buffer12_avvik_beggeRGBA_identisk=True,lokalt_originalrekt_med8HD_identisk=True,hele_originaltilstander_strengt_paret=49,hele_originaltilstander_uparet=111,endrede_HD_piksler=9299,uforklarte_HD_endringer_utenfor_berort_native=0,HD_avvik_i_ulik_kildetilstand_over16HD=421,disse_innen_reelle_endrede_kildecelrekt=421,naturlig_full_spilltest=False,Tom_godkjent=False,Claude_godkjent=False,klar_for_additiv_publisering=True,tid_utc=datetime.now(timezone.utc).isoformat());put(R/'klar-for-publisering1996.json',ready)
+note='''# Helikopterfase 1996
+
+Originalen er den hele 70 x 29 kilden i kilder/1996, sett i faktisk World of Fish, rom 35, kostyme 178, aktør 29. Den lange øvre rotoren mot høyre, den lille grå navdelen og grønne felt hører til og beholdes. Godkjent hovedark/sam.png er kant-/strekanker. Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokale kontroller.
+
+Valgt variant er H155/samlet-egne-smaaplan-union/heltilpasning03. Den bygger på sju faktiske innebygde råbilder: tidligere H144 grunnform og seks nye H150..H155. Alle råbilder, faktiske prompter, argumenter, planer og SHA-er beholdes. Hele nye egne moduler registreres bare mot tidligere egne bilder. H150 gir venstredelen; kontekst til høyre tas ikke inn som en ny løper. H151 gir fire hele egne materialplan, med kallokal rosa teknisk kode for kildens lyse gull. H152 gir hele det grå 191-planet, også den lille kildebekreftede navdelen, med egen alfa-union. H153 gir tre hele egne grønne plan. H154 gir en faktisk ny antialiasert hvit undermatte; svake strå langt fra egen kjerne fjernes, hele kjernen bevares. Minimum mot den gamle egne alfaflaten beholder flytende løpere. En 16 råpikslers myk vindussøm på alle fire egne vindussider bevarer fringe. Kodekantrens virker globalt på egne felt og endrer ikke alfa. H155 gir nye RGB i hele eget understellvindu; union med hele egne H153-plan beholder små grønne deler. Ingen kildeformmaske, kildefragmenter, lokal trekkflytting eller kildekoordinater til plassering brukes. Kildeutsnitt er bare referanser.
+
+Sluttbehandlingen er én hel affin transformasjon: faktor 0,995 x 1,005 og HD-flytt 0,0. Alle uendrede 3HD-porter består: alfa, hull, positive kode- og native-fargefester og samtlige ekstra egne kodepiksler. Alle fem feiltall er null. IoU 0,931 og dekning 0,938. Diagnostikkens andre teknisk beståtte hele affine varianter er ikke valgt og erklæres ikke visuelt godkjent. Kildeløs replay er både PNG- og RGBA-byteeksakt. Tapsfri WebP er RGBA-byteidentisk, også RGB under alfa 0. Automatisk mottak gir 1 OK. Delark 13/24 gir 13 OK og 11 tomme mål, ingen produsert FEIL. Alle 12 tidligere delruter er RGBA-bytebevart. Kandidaten har 3726 native, med alle 21970 gamle modfiler bevart utenom metadata i mod.json og SHA256SUMS. Ny rute er costume178_1996_hd.webp.
+
+Native, delark, helt motorbilde, før/etter og alle 27 viste sekvensfaser er visuelt sett. To nye kontrollerte motoravspillinger bruker den publiserte WebP-motoren med SHA 651aa78c84411784671f600085147bbbdce5dc6281e77bd113eb7db7f1c0ed27. 49 hele originaltilstander har både byteidentisk original-RGBA og identisk full liste over originale celtegnekall. 111 andre heltilstander pares ikke. Ny fase 1996 vises i bilde-frame 117, utledet fra faktisk motorlogg, ikke den første feilantakelsen frame 116. Original-RGBA i den berørte lokale ruten er byteidentisk. 9299 HD-piksler endres i dens rektangel med 8HD naboområde.
+
+Den gamle analyseheuristikken om 16HD avstand til endrede originalpiksler var utilstrekkelig for allerede publiserte fiskerfaser. I 111 uparede heltilstander forklares alle 421 punkter utenfor denne avstanden av rektanglene til faktiske endrede kildeceller fra motorloggen. Native mål, plassering og identiske gamle filhash kontrolleres i begge modder. Celler uten native har bekreftet originalfallback i begge. Ingen HD-data brukes til parvalg, og ingen 3HD-grafikkport endres. Ingen uforklarte avvik gjenstår. Begge 160 bufferkontroller har 148 null; etter frame 40 er alle 120 null. Tolv tidlige gamle bufferavvik har identiske koordinater og begge RGBA. Dette er kontrollert aktøravspilling, ikke full naturlig gjennomspilling. Ingen ny interaktiv Windows-/webtest eller Tom-/Claude-godkjenning.
+
+Publisering følger først etter kildecommit og faktisk tilbakehenting. Bare én komplett kandidat beholdes. Fellespakkene har fortsatt 3723 native og oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning. Neste arbeid er de eksisterende returene 1998/H138/H149 og 1995/H145. H156 er ikke utført eller reservert. Ikke tegn 1996, 1997, 1999 eller 2000..2021 på nytt. Ingen nødvendig Tom-avklaring; automatikken fortsetter ACTIVE.
+'''
+(R/'notat1996.md').write_text(note)
+put(R/'videre-1996-H150-H155.json',dict(tid_oslo=now,nye_bildekall=newcalls,bildekall_i_bunken=30,nye_valgte_native=[1996],valgt_variant=cid,native_kandidat=3726,publisert_native_naa=3725,nye_publiserte_native_i_okten=0,nye_motoravspillinger=2,hele_originaltilstander_strengt_paret=49,hele_originaltilstander_uparet=111,kontrollvariant_antall=len(variants),rapport='notat1996.md',neste_kall='H156',Tom_avklaring_noedvendig=False,automation='ACTIVE'))
+nexttext='''# Gjenoppta eksisterende bunke
+
+Fase 1996 er klar for additiv publisering fra gjeldende hd-mod95ff09bb0ec474aaa6e5305ba065e019d393fab4. Kandidat3726 har 21971 filer, 4875 WebP og 17089 tekniske PNG. Alle tidligere grafikkfiler bevares; bare mod.json og SHA256SUMS endres som metadata. Publisering, faktisk tilbakehenting av samtlige filhash og lokal aktivering gjenstår. Les klar-for-publisering1996.json og notat1996.md før publisering. Ikke opprett en ny full modkopi.
+
+Valgt H155/samlet-egne-smaaplan-union/heltilpasning03 bygger på H144 og de seks nye faktiske innebygde kallene H150..H155. Alle sterke 3HD-porter består med null feil. IoU 0,931, dekning 0,938. Små grå og grønne deler og egen antialiasert alfa beholdes. Ingen originalmaske, kildefragmenter eller lokal trekkflytting. Kildeløs replay og tapsfri WebP er RGBA-byteeksakte. Delark13/24 har 13OK/11tomme mål, alle 12 tidligere ruter bevart. Hele figurjobber508/1758 er uendret. Ingen hel resultat.png leveres.
+
+Native, delark, full motor, før/etter og 27 sekvensfaser er sett. To nye avspillinger gir 49 strenge hele originalpar og 111 uparede tilstander. I fase1996/frame117 er lokal original-RGBA identisk og 9299HD-piksler endres i berørt rektangel med8HD. 421 punkter i andre kildefaser utenfor den utilstrekkelige gamle 16HD-heuristikken dekkes av faktiske endrede kildecelrekt med byteidentiske gamle nativefiler. Ingen uforklarte avvik; grafikkens3HD-porter er uendret. Bufferkontroll160/148null per side, etterframe40 120/120null; 12gamle avvik har beggeRGBA identisk. Ingen ny full naturlig gjennomspilling, interaktiv Windows/web eller Tom-/Claude-godkjenning.
+
+30 faktiske råkall i bunken. H156 er ikke utført, forberedt eller reservert. Etter publisering fortsettes eksisterende1998/H138/H149 og1995/H145. Ikke tegn1996,1997,1999 eller2000..2021 igjen.1990 trenger hel kilde;137/V013 og296/S037 er uendret. Godkjent Sam og faktisk originalkontekst sees før hvert nytt motiv. Kallokale kodepaletter gjelder.
+
+Felles Linux-/Windows-pakker har3723 og vil mangle tre publiserte faser etter1996. Oppdater ved neste komplette ark-/familiesamlepunkt eller oppgavens avslutning med faktisk nedlasting og filhashkontroll. Behold nødvendige råbilder, kilder og kontrollbevis, unngå doble mod-/arkivkopier. Ingen nødvendig designavklaring. Automatikken er ACTIVE, oppgaven er ikke ferdig.
+'''
+(R/'NESTE.md').write_text(nexttext)
+with (R/'RETUR.md').open('a') as out:out.write('\n\n## Fase 1996 etter H150..H155\n\n'+note.split('\n\n',1)[1])
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+    p=A/name;t=p.read_text();start='<!-- helikopter178-forfaser1995-1999:start -->';end='<!-- helikopter178-forfaser1995-1999:slutt -->';a=t.index(start)+len(start);b=t.index(end,a);p.write_text(t[:a]+'\n'+nexttext.split('\n\n',1)[1]+'\n'+t[b:])
+put(R/'sluttkontroll1996-kandidat.json',dict(native=3725,native_kandidat=3726,bildekall=30,nye_kall=6,ny_rute=1996,motorobservert=True,visuelt_sett=True,publisert=False,Tom_godkjent=False,Claude_godkjent=False,hele_figjobber=508,total=1758,delark_kandidat=[13,24],familie_kandidat=[25,102],pakker_native=3723,klar_for_publisering=True,automation='ACTIVE',bunke_ferdig=False))
+(R/'klargjor-1996.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps(dict(kall=len(calls),nye=len(newcalls),varianter=len(variants),native_kandidat=3726,valgt=cid),ensure_ascii=False))
