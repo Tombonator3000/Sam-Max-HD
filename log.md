@@ -2423,3 +2423,22 @@ Tidligere status nedenfor er historikk.
 
 
 Prosjektbibliotekets figurark-fast-storrelse,publisert-mod-er-fasit og scumm-v6-kostymer-skygge-og-soppelruter er brukt med opphavets PASS-begrensning. Beskyttede kilder,originalkontekst og Sam-master er sett før bildekall. Kvalitetsreturer importeres ikke. Bare de fire sentrale dokumentene committes direkte i main.
+
+## 2026-10-23 07:58 (Codex)
+
+<!-- helikopter178-mellomfaser-status:start -->
+To nye egne helikopterfaser er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert:costume178_2016/H017 og2017/H014. fig178_03 er delvis6/12,familien6/102. Alle2018..2021 og deres delarkpiksler er bevart. Seks nye innebygde bildekall gir to valgte og fire kvalitetsreturer. Originalkontroll gir4/10 OK på delarket,seks mål er fortsatt tomme;tidligere2020/2021 hoppes over som masker under20 kildemaskepiksler. Automatisk mottak av bare de to nye gir2 OK,0 SJEKK. Ingen ny Tom-/Claude-godkjenning.
+
+Publisert hd-mod 60686177740e85910832023cd78df6e71dd7c6d4,grafikkilde 084e761a3de43975d5085ed98a8cf85bc1d3e871,har3707 native. Alle21951 filhash er hentet tilbake og kontrollert. Alle21949 tidligere filstier og21943 tidligere PNG-hash er bevart. Alle1472 beskyttede input og tre opprinnelige stasher er uendret. Alle valgte farge-,alfa- og åpningfester er innen3HD,maks3HD.2016 beholder egen isolert venstre strek og hoveddel. Egen alfa og global RGB-rens,ingen originalmaskeklipp,originalfragmenter,lokale trekkflyttinger,største-komponent-rensing eller CLI/API-bildefallback.
+
+To ferske kontrollerte Linux-avspillinger med nedlastet128c9c11 har160 bufferkontroller/148 null per side og120/120 null etter frame40. De12 kjente inngangsavvikene er identiske i koordinater og begge RGB-verdier. Originalrektangler med8HD naboområde er identiske,ingen uforklarte HD-endringer,atomisk lagring består. To hele motorbilder,to komplette før/etter-par og alle12 sluttfaser er visuelt sett.53 faser logget,ikke alle102;ingen naturlig full gjennomspilling,ny interaktiv Windows-/webtest eller samlet sluttgodkjenning.
+
+Sju originalkilder2010..2016 er nå helt synlige og RGB565-bekreftet i en fersk kontrollert rom35-probe ved aktørpos160,60,zclip0,palett0. Alle har0 avvik og0 indeks13-piksler. Den første pos160,100 skjulte2..9 punkter i2010..2015;bare2016 var helt synlig der. Kildegrunnlaget er rettet før nytegning av de berørte rutene. Brede kvadratiske hjelpereferanser er rettet før bruk. Beskyttede jobbfiler er urørt.
+
+Felles Linux/Windows isblokk er fortsatt3701 og mangler seks ruter. Begge faktiske pakker er tidligere kontrollert;de kalles ikke oppdatert. Neste familie-/ark-samlepunkt eller avslutning skal oppdatere begge med nedlasting,sjekksummer og filkontroll. Hele figurjobber507/1758,1251 uten i tillegg til returer/sluttkontroll. Fortsett2015 fra rapporter/helikopter178-mellomfaser-20261023/NESTE.md og RETUR.md. Neste178-kallH020,137-kallV013 og296-kallS037 er ikke utført eller reservert. Ingen ny nødvendig designavklaring. Automatikken er ACTIVE;all grafikk er ikke ferdig. Ingen grafikk til main,motor-/pipelinekodeendring eller gammel nattevakt.
+<!-- helikopter178-mellomfaser-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
+
+Prosjektbibliotekets figurark-fast-storrelse og publisert-mod-er-fasit er brukt med opphavets PASS-begrensning og faktisk lokal kontroll. Innebygd image_gen lager alle nye tegninger. Kvalitetsreturer importeres ikke. Bare de fire sentrale dokumentene committes direkte i main.
