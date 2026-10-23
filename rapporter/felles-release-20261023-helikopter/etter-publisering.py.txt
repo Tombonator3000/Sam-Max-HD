@@ -1,0 +1,46 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,re,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/helikopter178-siste2010-20261023'
+read=lambda f:json.loads(f.read_text());save=lambda f,v:f.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+pub=read(R/'publisert.json');assert pub['Latest_bekreftet']and pub['taggbygg_success']and not pub['native_frosset']and pub['native']==3713
+st=read(S/'start.json');assert all(sha(A/f)==h for f,h in st['beskyttede'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==st['stash']
+bin=read(R/'pakke-binar.json');assets=read(R/'assetkontroll.json');full=read(R/'moddfiler-kontroll.json')
+body=f'''Komplett fig178_03 er laget,egenkontrollert,native mottatt,visuelt sett,motorobservert og publisert med12/12 ruter2010..2021. Ny2010/H052 fra tre faktiske innebygde bildekall fullfører arket. To kvalitetsreturer og én avvist referansevalidering uten generering er bevart.508/1758 hele figurjobber har resultat,1250 er uten pluss returer og sluttkontroll. Familien178 er12/102. Original egenkontroll10/10OK med to små kilder hoppet over;automatisk helark10OK+to beholdte størrelses-SJEKK. Ingen ny Tom-/Claude-godkjenning.
+
+hd-mod {pub['hd_mod']} har3713 native. Alle21957 filhash er hentet tilbake og kontrollert. Alle21956 tidligere filstier og21950 tidligerePNG er bevart,og alle elleve tidligere delarkrutersRGBA er bytebevart.1472 beskyttede input og tre opprinnelige stasher er uendret. Bare egen generertRGB/alfarens og helplassering,ingen originalmaskeklipp,kildefragmenter,lokal fargepåmaling eller lokale trekkflyttinger. Kildeløs replay gjenskaper siste egenRGBA og native eksakt.
+
+Felles Linux/Windows er nå {pub['url']},bekreftet Latest. Begge faktiske pakker ogSHA-filer er lastet ned,fire digester og21956runtime-modfiler per pakke er kontrollert. Alle fire fellesvedlegg er deretter faktisk lastet ned igjen og SHA-bekreftet. Alle{pub['tidligere_releaser_bevart']} tidligere releaser og vedlegg er bevart. Tolv helikopterruter er nye siden felles3701. Én Windows-nedlasting fikk HTTP2 PROTOCOL_ERROR;ufullstendig fil er bevart,og ny nedlasting av samme vedlegg består eksakt størrelse ogSHA. Ingen ny dispatch eller fallback.
+
+Pakkekode{pub['kode']},native{pub['hd_mod']}. Linux{pub['linux_run']} og Windows{pub['windows_run']} er fullført. Forventet automatisk Windows-taggbygg{pub['taggbygg_id']} er grønt. Nativefrys3713 er opphevet etter full filkontroll og fravær av aktive pakkearbeidere. Ingen nye pakker skal dispatches for dette samlepunktet. Ny faktisk Linux-binær er{bin['sha256']}.
+
+To ferske avspillinger med den nye nedlastede Linux-binæren sammenligner pakken3713 med felles3701-grunnlaget ved rom35,pos160,60,zclip0,kostyme178,anim1 og aktør29. Alle tolv nye faser er logget og visuelt sett i tolv hele motorbilder,tolv før/etter-par og hele sluttsekvensen. Begge løp160kontroller,148null og120/120null etterframe40. Tolv kjente inngangsavvik er identiske i koordinater og begge RGB-verdier. Ingen uforklarteHD-endringer;atomisk lagring består. Andre aktører og romskript kjører.53 kilder logget,ikke alle102 eller naturlig full gjennomspilling. Windows har bestått CI-oppstart uten skjerm;ny interaktiv Windows-/webtest er ikke utført.
+
+Les rapporter/helikopter178-siste2010-20261023 og rapporter/felles-release-20261023-helikopter. Neste178-kallH053 er ikke utført eller reservert. Velg neste manglende fase2009 i fig178_02,bekreft hele kilden i motor,palett,idx og Sam-anker før nytegning.1990 er fortsatt kjent venstreklipt og krever ny hel kilde.137V013 og296S037 er fortsatt ikke utført. Ingen nødvendig ny Tom-designavklaring. All grafikk er ikke ferdig og automatikken fortsetter. Ingen grafikk til main,motor-/pipelinekodeendring eller gammel nattevakt.'''
+if pub.get('linux_ci_metadata_pending'):body+='\nOverordnet Linux-status er fortsatt in_progress,men alle faktiske jobber og test-/publiseringssteg er completed/success. Råstatus er bevart;ingen GitHub-status er endret.\n'
+else:body+='\nBegge overordnede pakkekjøringer er completed/success.\n'
+marker='helikopter178-pakkesamlepunkt';block='<!-- '+marker+':start -->\n'+body+'\n<!-- '+marker+':slutt -->'
+for f in [A/'ORDRE.md',A/'GRAFIKKLISTE.md',P/'memory.md',P/'todo.md',P/'STATUS.md']:
+ s=f.read_text();assert '<!-- '+marker+':start -->'in s;f.write_text(re.sub(r'<!-- '+marker+r':start -->.*?<!-- '+marker+r':slutt -->',lambda _:block,s,flags=re.S))
+reports=['helikopter178-sluttfaser-20261022','helikopter178-retur-20261023','helikopter178-mellomfaser-20261023','helikopter178-fargefaser-20261023','helikopter178-fargekoder-20261023','helikopter178-siste2010-20261023']
+for name in reports:
+ t=A/'rapporter'/name
+ for n in ['mottak-publisert.json','fremdrift.json','sluttkontroll.json']:
+  f=t/n;q=read(f);q.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3713,pakker_mangler_native=0,native_frosset=False,pakker_status='begge_nedlastinger_modfiler_motor_fellesvedlegg_og_taggbygg_kontrollert')
+  for key in ['leveranser','delvise_leveranser']:
+   for e in q.get(key,[]):e.update(i_fellespakke=True,felles_url=pub['url'],pakker_native=3713)
+  save(f,q)
+ for f in t.glob('rutekart*.json'):
+  q=read(f)
+  for group in q.values():
+   for e in group['ruter']:e.update(i_fellespakke=True,felles_url=pub['url'])
+  save(f,q)
+ (t/'PAKKER.md').write_text('# Kontrollert fellespakke3713\n\n'+body+'\n')
+for f in [S/'NESTE.md',S/'RAPPORT.md']:
+ first,rest=f.read_text().split('\n',1);f.write_text(first+'\n\n'+block+'\n\nTidligere opplysninger nedenfor er historikk.\n\n'+rest)
+f=A/'jobber/fig178_03/notat.md';f.write_text('## Fellespakke3713 kontrollert\n\n'+pub['url']+' inneholder alle tolv ruter. Begge faktiske pakker,alle grafikkhash og ny Linux-motor er kontrollert. Taggbygg er grønt og nativefrys er opphevet. Ingen ny Tom-/Claude-godkjenning. Se rapporter/felles-release-20261023-helikopter.\n\n'+f.read_text())
+f=P/'log.md';f.write_text(f.read_text()+'\n## '+datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')+' (Codex)\n\n'+body+'\n')
+(R/'RAPPORT.md').write_text('# Pakkesamlepunkt3713 kontrollert\n\n'+body+'\n')
+(R/'NESTE.md').write_text('# Fortsett grafikkproduksjonen\n\n'+body+'\n\nIkke gjenta dispatch,nedlasting,publisering eller ferdige engangshjelpere. Fortsett neste manglende grafikk fra den siste kildesjekken.\n')
+shutil.copy2(__file__,R/'etter-publisering.py.txt');print('3713 i begge faktiske pakker,fellesrelease og taggbygg kontrollert,frys opphevet i statuskildene.',flush=True)

@@ -1,0 +1,29 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from ci_jobber import linux_jobber
+import json,subprocess,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;S=A/'rapporter/helikopter178-siste2010-20261023'
+read=lambda f:json.loads(f.read_text());save=lambda f,v:f.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest();api=lambda x:json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/'+x],cwd=P,text=True))
+s=read(O/'bygg-startet.json');r=read(O/'publisert.json');tag=s['release_tag'];runs=api('actions/workflows/windows.yml/runs?per_page=30')['workflow_runs'];matched=[v for v in runs if v['head_branch']==tag and v['head_sha']==s['kode']and v['event']=='push']
+if not matched:print('Forventet taggbygg ennå ikke registrert;behold nativefrys,ingen ny dispatch.');raise SystemExit(0)
+assert len(matched)==1;run=matched[0];save(R/'taggbygg.json',run)
+if run['status']!='completed':print('Taggbygg',run['id'],run['status'],'behold nativefrys.');raise SystemExit(0)
+assert run['conclusion']=='success'
+assert api('git/ref/heads/hd-mod')['object']['sha']==s['hd_mod']and all(sha(P/'mods/gpt'/f)==h for f,h in read(R/'moddfiler-3713.json').items())
+source=read(S/'start.json');assert all(sha(A/f)==h for f,h in source['beskyttede'].items());assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==source['stash']
+latest=api('releases/latest');assert latest['id']==r['release_id']
+for e in read(O/'assetkontroll.json'):
+ asset=next(v for v in latest['assets']if v['name']==e['fil']);assert asset['digest']=='sha256:'+e['sha256']and asset['size']==e['bytes']
+active=[];metadata=[];raw=[]
+for wf in ['linux.yml','windows.yml']:
+ for other in api('actions/workflows/'+wf+'/runs?per_page=30')['workflow_runs']:
+  if other['status']=='completed':continue
+  raw.append(dict(id=other['id'],status=other['status'],gren=other['head_branch']))
+  if wf=='linux.yml'and other['id']==s['plattform']['linux']['run_id']:
+   proof=linux_jobber(s);metadata.append(dict(run=other['id'],status=other['status'],alle_faktiske_jobber_success=True));save(R/'ci-jobber-ved-frysslutt.json',proof)
+  else:active.append(other['id'])
+if active:print('Andre pakkearbeidere aktive',active,'behold nativefrys.');raise SystemExit(0)
+r.update(taggbygg_id=run['id'],taggbygg_success=True,taggbygg_forventes=False,native_frosset=False,aktive_ekstra_bygg=[],aktive_ekstra_bygg_raw=raw,CI_metadata_pending=metadata,linux_ci_metadata_pending=bool(metadata),sluttkontroll_utc=datetime.now(timezone.utc).isoformat())
+s.update(taggbygg_forventes=False,native_frosset=False,status='begge_pakker_og_fellesrelease_hentet_kontrollert_taggbygg_success')
+for d in [O,R]:save(d/'publisert.json',r);save(d/'bygg-startet.json',s)
+shutil.copy2(__file__,R/'taggkontroll.py.txt');print('Taggbygg',run['id'],'success,Latest og alle publiserte vedlegg fortsatt korrekte;nativefrys opphevet.',flush=True)
