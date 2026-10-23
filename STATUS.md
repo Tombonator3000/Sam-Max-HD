@@ -1,5 +1,21 @@
 # Status
 
+<!-- helikopter178-fase2003-status:start -->
+Publisert hd-mod 2228e137de73ca178318a7d3657dd7b4aeddc805 har 3719 native. Grafikkilde er gpt-arbeid 9e40966b4a9b4c3eee552ddce902cf6625acf0fd. Alle 21963 publiserte filhash er hentet tilbake og kontrollert. Alle 21962 tidligere stier og 21956 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3718-grunnlaget er bevart under out. Bare én ny native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
+
+Ti faktiske innebygde image_gen-kall H093..H102 har gitt én valgt ny helikopterfase, 2003/H100. Den er laget, egenkontrollert, native mottatt i kandidat, visuelt sett og motorobservert. Ingen ny Tom-/Claude-godkjenning. Fig178_02 er 6/24, familien 178 er 18/102. Hele figurjobber er fortsatt 508/1758, 1250 uten resultat, pluss returer og sluttkontroll. Ti bildekall er ikke ti leverte jobber.
+
+H100 bruker én ny venstremodul og egen H098-høyre/skjøt. Modulplasseringen bruker bare egne mål og alfakolonner. Hele tidligere 2005..2009 og alle publiserte PNG bevares. Ingen originalmasker, kildefragmenter, kildekoordinater til delplassering, lokal fargepåmaling eller flytting av enkeltrekk. Alle sterke alfa-/åpnings-/farge-/kodefester består uendret 3 HD med null ekstra kodepiksler over 3 HD. IoU/dekning 0,970/0,983. Kildeløs replay gjenlager egen RGBA og native PNG byteeksakt. Original egenkontroll 6 OK + 18 tomme mål, forventet exit 2. Automatisk mottak 1 OK / 0 SJEKK. Ingen motor-/pipelinekodeendring.
+
+To ferske kontrollerte avspillinger med faktisk nedlastet Linux-binær 4e32ae90 sammenligner 3718/3719 i rom 35, aktør 29, kostyme 178, animasjon 1, posisjon 160,60, zclip0. Begge 160 kontroller/148 null, 120/120 null etter frame 40. Tolv kjente inngangsavvik er identiske i koordinater og begge RGB. Originalrektangel med 8 HD naboområde er identisk. 7276 synlige HD-piksler endres. Ingen uforklarte HD-endringer, atomisk lagring består. Hele motorbildet, før/etter-paret, native, delark, gråtavle og 24 sekvensfaser 1998..2021 er visuelt sett. 53 kilder logget, ikke alle 102 eller naturlig full gjennomspilling. Ingen ny interaktiv Windows-/webtest.
+
+Gjenoppta rapporter/helikopter178-forfaser2000til2004-20261023/NESTE.md og RETUR.md. 2004/H101 har fortsatt én for trang åpning, maks 3,606 HD; prøvde helflytt/helaffine varianter er ikke anvendt. H094-venstre kan gjenbrukes. 2002/H102 trenger mørke/grønne felt og åpning rettet. 2001/H077 og 2000/H078 fra returforfaserapporten er ikke nytegnet her. 1990 trenger ny hel originalkilde. 2003, 2005..2009 og komplett fig178_03 skal ikke gjentas. Neste 178-kall H103 er ikke utført eller reservert. 137/V013 og 296/S037 er uendret.
+
+Felles Linux/Windows helikopter-utgave har fortsatt 3713 og mangler seks etter publisering. Begge faktiske pakker oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning med nedlasting, sjekksummer og grafikkinnhold kontrollert. Ingen nødvendig Tom-designavklaring. Automatikken er ACTIVE, all grafikk er ikke ferdig. Ingen grafikk til main eller gammel nattprosess.
+<!-- helikopter178-fase2003-status:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-forfaser2005-2006-status:start -->
 Publisert hd-mod c2ef7ebebedd515ae3a60a5e2591ab7ff34c10a5 har 3718 native. Grafikkilde er gpt-arbeid ae6c8fe9340db326f28a8d900779b27908364115. Alle 21962 publiserte filhash er hentet tilbake og kontrollert. Alle 21960 tidligere stier og 21954 tidligere PNG er bevart. 1472 beskyttede input og tre opprinnelige stasher er uendret. Lokal mods/gpt er atomisk mottatt fra verifisert arkiv, og 3716-grunnlaget er bevart under out. Bare to nye native er lagt til. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 
