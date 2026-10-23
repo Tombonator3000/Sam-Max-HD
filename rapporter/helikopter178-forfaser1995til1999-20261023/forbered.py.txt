@@ -1,0 +1,22 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,subprocess
+import numpy as np
+from PIL import Image
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+remote=dict(line.split()[::-1]for line in subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod','refs/heads/gpt-arbeid','refs/heads/main'],cwd=P,text=True).splitlines())
+if not(R/'start.json').exists():
+ save(R/'start.json',dict(tid_utc=datetime.now(timezone.utc).isoformat(),remote=remote,grundlag_native=3723,figurer_med_resultat=508,figurer_totalt=1758,ruter=[1999,1998,1997,1996,1995],stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines(),bibliotek=['figurark-fast-storrelse.md','publisert-mod-er-fasit.md'],ingen_originalfiler_endret=True))
+base=json.loads((A/'rapporter/helikopter178-delgrupper-20261023/kall/H085/kodepalett.json').read_text())
+mapping={tuple(e['ekte']):e['kode']for e in base['tabell']};mapping.update({(19,59,31):[128,128,255],(239,135,39):[255,128,255],(43,79,35):[0,255,128],(195,103,7):[192,0,255],(43,91,43):[192,255,0],(255,179,67):[255,192,0],(123,175,207):[0,128,255],(123,115,203):[128,64,255]})
+for n in [1999,1998,1997,1996,1995]:
+ S=R/'kilder'/str(n);src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));h,w=src.shape[:2]
+ table=[dict(ekte=t.tolist(),kode=mapping[tuple(t)])for t in np.unique(src[src[:,:,3]>0,:3],axis=0)]
+ code=src.copy()
+ for e in table:code[np.all(src[:,:,:3]==e['ekte'],2)&(src[:,:,3]>0),:3]=e['kode']
+ scale=min(24,936//w);pos=((1024-w*scale)//2,(1024-h*scale)//2)
+ guide=Image.new('RGBA',(1024,1024),'#808080');guide.alpha_composite(Image.fromarray(code).resize((w*scale,h*scale),Image.Resampling.NEAREST),pos);guide.convert('RGB').save(S/'kodefarge-referanse.png')
+ save(S/'kodepalett.json',dict(tabell=table,kilde_sha256=sha(S/'original-1x.png'),guide_sha256=sha(S/'kodefarge-referanse.png'),skalering=scale,plass=pos))
+print('Five source-confirmed code references prepared.')

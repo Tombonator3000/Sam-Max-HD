@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+from smhd.myk import place
+from own_parts import decode
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+cid=sys.argv[1];K=R/'kall'/cid;plan=json.loads((K/'plan.json').read_text());n=plan['rute'];S=R/'kilder'/str(n);palette=json.loads((S/'kodepalett.json').read_text());src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));h,w=src.shape[:2]
+a,clean=(np.array(Image.open(K/'egen-sammensatt.png').convert('RGBA')),{'egne_moduler':True})if(K/'egen-sammensatt.png').exists()else decode(K/('egen-global-kodekalibrert.png'if(K/'egen-global-kodekalibrert.png').exists()else'raa.png'),palette['tabell']);
+if not(K/'egen-sammensatt.png').exists():Image.fromarray(a).save(K/'egen-renset.png')
+yy,xx=np.nonzero(a[:,:,3]>=128);x0,y0,x1,y1=map(int,(xx.min(),yy.min(),xx.max()+1,yy.max()+1));sx,sy=4*w/(x1-x0),4*h/(y1-y0);placed=place(a,src,sx,sy);b=placed['bilde'];Image.fromarray(b).save(K/'prototype-under-kontroll.png')
+ref=np.zeros_like(b);px,py=placed['margx']*4,placed['margy']*4;ref[py:py+h*4,px:px+w*4]=np.repeat(np.repeat(src,4,0),4,1);Image.fromarray(ref).save(K/'original-native-kontroll.png')
+core=b[:,:,3]>=128;dist=nd.distance_transform_edt(~core);bgdist=nd.distance_transform_edt(core);oy,ox=np.nonzero(src[:,:,3]>0);pos=dist[py+oy*4+2,px+ox*4+2];by,bx=np.nonzero(src[:,:,3]==0);neg=bgdist[py+by*4+2,px+bx*4+2]
+# Ren egen kodefarge projiseres nearest bare til maaling, aldri originalmaske.
+scaled=np.array(Image.fromarray(a).resize((round(a.shape[1]*sx),round(a.shape[0]*sy)),Image.Resampling.NEAREST));can=np.zeros_like(b);x,y=px+placed['flytt'][0],py+placed['flytt'][1];hh,ww=scaled.shape[:2];cx0,cy0=max(0,x),max(0,y);cx1,cy1=min(x+ww,can.shape[1]),min(y+hh,can.shape[0]);can[cy0:cy1,cx0:cx1]=scaled[cy0-y:cy1-y,cx0-x:cx1-x]
+rows=[];coords=np.argwhere(core);rgb=b[core,:3];colors=np.array([e['ekte']for e in palette['tabell']]);_,ids=cKDTree(colors).query(rgb)
+for col in colors:
+ have=np.all(can[:,:,:3]==col,2)&(can[:,:,3]>=128);target=np.all(ref[:,:,:3]==col,2)&(ref[:,:,3]>=128);qy,qx=np.nonzero(np.all(src[:,:,:3]==col,2)&(src[:,:,3]>0));qy,qx=py+qy*4+2,px+qx*4+2
+ d=nd.distance_transform_edt(~have)[qy,qx]if have.any()else np.full(len(qy),999.);extra=nd.distance_transform_edt(~target)[have]if have.any()else np.array([]);nativecoords=coords[np.all(colors[ids]==col,1)];dn=cKDTree(nativecoords).query(np.stack([qy,qx],1))[0]if len(nativecoords)else np.full(len(qy),999.)
+ rows.append(dict(RGB=col.tolist(),kildepunkter=len(qy),kode_fester_over3HD=int((d>3).sum()),kode_maks_HD=float(d.max()),egne_kodepiksler_over3HD_fra_kilde=int((extra>3).sum()),native_fester_over3HD=int((dn>3).sum()),native_maks_HD=float(dn.max())))
+q={k:v for k,v in placed.items()if k!='bilde'};q.update(kall=cid,rute=n,hel_skala=[sx,sy],hel_affin_port=.88<=sx/sy<=1.12,rens=clean,alfa_fester_over3HD=int((pos>3).sum()),alfa_maks_HD=float(pos.max()),apninger_over3HD=int((neg>3).sum()),apninger_maks_HD=float(neg.max()),farger=rows,egen_alfa=True,originalmaske=False,originalfragmenter=False,lokal_flytting_av_trekk=False,visuelt_sett=False,native_mottatt=False,motorobservert=False,publisert=False)
+q['teknisk_ok']=q['hel_affin_port']and q['snitt_union']>=.6 and q['dekning']>=.8 and not q['kuttet']and q['alfa_fester_over3HD']==0 and q['apninger_over3HD']==0 and all(e['kode_fester_over3HD']==0 and e['egne_kodepiksler_over3HD_fra_kilde']==0 and e['native_fester_over3HD']==0 for e in rows)
+q['native_sha256']=hashlib.sha256((K/'prototype-under-kontroll.png').read_bytes()).hexdigest();(K/'kontroll.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+board=Image.new('RGB',(b.shape[1]*8+60,b.shape[0]*4+60),'#304050');d=ImageDraw.Draw(board)
+for i,(arr,label)in enumerate([(ref,'Original, bare kontroll'),(b,cid+' egen tegning')]):
+ im=Image.fromarray(arr);bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);board.paste(bg.resize((im.width*4,im.height*4)).convert('RGB'),(10+i*(im.width*4+30),40));d.text((10+i*(im.width*4+30),12),label,fill='white')
+board.save(K/'sammenligning4x.png')
+print(cid,'OK',q['teknisk_ok'],'IoU',q['snitt_union'],'dekn',q['dekning'],'alfa',q['alfa_fester_over3HD'],'hull',q['apninger_over3HD']);print('fargeavvik',[(e['RGB'],e['kode_fester_over3HD'],e['egne_kodepiksler_over3HD_fra_kilde'],e['native_fester_over3HD'])for e in rows if e['kode_fester_over3HD']or e['egne_kodepiksler_over3HD_fra_kilde']or e['native_fester_over3HD']])

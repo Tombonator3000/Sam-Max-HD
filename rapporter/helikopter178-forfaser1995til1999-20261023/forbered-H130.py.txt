@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/helikopter178-forfaser1995til1999-20261023';B=R/'kall/H128';K=R/'kall/H130';K.mkdir();a=np.array(Image.open(B/'egen-renset.png'));m=np.all(a[:,:,:3]==[83,43,0],2)&(a[:,:,3]>=128);lab,n=nd.label(m);choices=[]
+for i in range(1,n+1):
+ yy,xx=np.where(lab==i)
+ if len(xx)>=30 and xx.max()<500 and yy.min()>740:choices.append((float(yy.mean()),[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]))
+_,box=max(choices);x0,y0,x1,y1=box;crop=[x0-4,y0-25,x1+25,y1+4];own=Image.open(B/'egen-global-kodekalibrert.png').convert('RGBA').crop(crop);own=own.resize((own.width*10,own.height*10),Image.Resampling.NEAREST);canvas=Image.new('RGBA',(1024,1024));pos=((1024-own.width)//2,(1024-own.height)//2);canvas.alpha_composite(own,pos);canvas.save(K/'egen-redigeringsmodul.png')
+source=Image.open(R/'kilder/1999/kodefarge-referanse.png');pal=json.loads((R/'kilder/1999/kodepalett.json').read_text());sc=pal['skalering'];px,py=pal['plass'];source.crop((px+18*sc,py+19*sc,px+23*sc,py+23*sc)).resize((1000,800),Image.Resampling.NEAREST).save(K/'kilde-detaljguide.png')
+prompt='''Image 1 is my OWN isolated edit module. Preserve every existing field and shape at its exact size and position. Image 2 is the exact source color layout for the same runner endpoint, gray is transparent padding. Image 3 is clean edge style only, not subject or colors.
+There is a single BRIGHT YELLOW square at the LOWER LEFT of the opaque group in image1. Repaint ONLY that entire yellow square to LIGHT YELLOW-GREEN, exact RGB(192,255,0), matching image2. The DARK GREEN square immediately ABOVE it, the OLIVE square at upper right, the NAVY field beside the olive and the MAROON field on its lower right must remain unchanged. Other separate red/navy/yellow shapes towards the upper right must remain unchanged. Do not make the light-green field taller, wider, rounded or split. It replaces precisely the old yellow field, no other area.
+This is only a small abstract module, do NOT draw the whole helicopter. No new parts, lines, symbols, shading or background. No gray pixels in the output; keep actual transparent alpha and every gap. Return the COMPLETE own module on the same square canvas.'''
+args=dict(prompt=prompt,referenced_image_paths=[str(K/'egen-redigeringsmodul.png'),str(K/'kilde-detaljguide.png'),str(A/'hovedark/sam.png')],transparent_background=True)
+(K/'argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n');(K/'prompt-brukt.txt').write_text(prompt+'\n');(K/'plan.json').write_text(json.dumps(dict(kall='H130',rute=1999,utfort=False,modul=True,egen_basis='H128',egen_basis_vindu=crop,egen_gul_komponent=box,egen_plass_i_redigeringslerret=list(pos),egen_visningsskala=10,kildeutsnitt_kun_guide=[18,19,23,23],kildekoordinater_til_plassering=False,originalmaske=False,original_kontekst_og_stil_sett=True),ensure_ascii=False,indent=2)+'\n');print('Own module crop',crop)

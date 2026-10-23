@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/helikopter178-forfaser1995til1999-20261023';K=R/'kall/H129';K.mkdir();B=R/'kall/H128';q=json.loads((B/'kontroll.json').read_text());im=Image.open(B/'egen-global-kodekalibrert.png').convert('RGBA');d=ImageDraw.Draw(im);points={}
+for label,(sx,sy)in {'A':(19,21),'B':(7,10),'C':(2,16)}.items():
+ x=round((sx*4+2-q['flytt'][0])/q['hel_skala'][0]);y=round((sy*4+2-q['flytt'][1])/q['hel_skala'][1]);points[label]=[x,y];d.ellipse((x-25,y-25,x+25,y+25),outline='white',width=4);d.text((x+28,y-12),label,fill='white',stroke_width=1)
+im.save(K/'egen-lokaliseringsguide.png')
+# Kildeutsnittet brukes bare som visuell forklaring, aldri som utdata eller klippemaske.
+ref=Image.open(R/'kilder/1999/kodefarge-referanse.png');ref.save(K/'hel-kodeguide.png');src=Image.open(R/'kilder/1999/original-1x.png');pal=json.loads((R/'kilder/1999/kodepalett.json').read_text())
+small=ref.crop((60,390,460,700)).resize((1000,775),Image.Resampling.NEAREST);small.save(K/'venstre-kodeguide.png')
+prompt='''Image 1 is my OWN code-colored sprite to EDIT. Image 2 marks three precise corrections with white circles and letters. Image 3 is the authoritative whole color-field reference. Image 4 enlarges the left area of that source. Image 5 is only the approved antialiased edge style; do not draw Sam.
+Fix just the three marked source-field errors while preserving every other field, proportion, thin part and position:
+A: The small YELLOW square at the very left endpoint of the LOWER middle diagonal runner must be LIGHT YELLOW-GREEN (RGB 192,255,0), matching the original reference. Keep its size. The neighboring olive and navy squares remain unchanged.
+B: The TEAL patch just below the upper left little dark-blue/cyan arch must be TRANSPARENT. Open this small one-cell hole, matching the gray opening in the source. Keep the white, dark-blue, cyan and purple surrounding fields.
+C: The tiny yellow-green patch beside the leftmost fork must be the same LIGHT YELLOW-GREEN (192,255,0) over its WHOLE shown field, with no bright-yellow bottom half.
+Keep all other flat exact code colors and genuine transparent holes. Do not redraw the design or simplify small patches. Remove all white circles and letters. Do not add outlines, shading, highlights, texture or scenery. Return the COMPLETE isolated sprite on the SAME transparent square canvas, with genuine alpha.'''
+args=dict(prompt=prompt,referenced_image_paths=[str(B/'egen-global-kodekalibrert.png'),str(K/'egen-lokaliseringsguide.png'),str(K/'hel-kodeguide.png'),str(K/'venstre-kodeguide.png'),str(A/'hovedark/sam.png')],transparent_background=True)
+(K/'prompt-brukt.txt').write_text(prompt+'\n');(K/'argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n');(K/'plan.json').write_text(json.dumps(dict(kall='H129',rute=1999,utfort=False,original_kontekst_og_stil_sett=True,retur='H128',diagnosepunkter_bare_til_forklaringsguide=points,originalmaske_til_utdata=False,kildekoordinater_til_endring_av_utdata=False),ensure_ascii=False,indent=2)+'\n')
+print('Correction A,B,C guides prepared',points)

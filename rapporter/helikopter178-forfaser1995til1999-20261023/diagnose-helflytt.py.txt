@@ -1,0 +1,15 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,sys
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1995til1999-20261023';K=R/'kall'/sys.argv[1];q=json.loads((K/'kontroll.json').read_text());n=q['rute'];src=np.array(Image.open(R/f'kilder/{n}/original-1x.png'));r=np.array(Image.open(K/'original-native-kontroll.png'));b=np.array(Image.open(K/'prototype-under-kontroll.png'));a=np.array(Image.open(K/('egen-sammensatt.png'if(K/'egen-sammensatt.png').exists()else'egen-renset.png')));sx,sy=q['hel_skala'];bb=np.array(Image.fromarray(a).resize((round(a.shape[1]*sx),round(a.shape[0]*sy)),Image.Resampling.NEAREST));px,py=q['margx']*4,q['margy']*4;xx,yy=px+q['flytt'][0],py+q['flytt'][1];can=np.zeros_like(b);hh,ww=bb.shape[:2];x0,y0=max(0,xx),max(0,yy);x1,y1=min(xx+ww,can.shape[1]),min(yy+hh,can.shape[0]);can[y0:y1,x0:x1]=bb[y0-yy:y1-yy,x0-xx:x1-xx]
+def shift(a,dx,dy):
+ o=np.zeros_like(a);h,w=a.shape[:2];x0,y0=max(0,dx),max(0,dy);x1,y1=min(w,w+dx),min(h,h+dy);o[y0:y1,x0:x1]=a[y0-dy:y1-dy,x0-dx:x1-dx];return o
+rows=[]
+for dy in range(-2,3):
+ for dx in range(-2,3):
+  v=shift(can,dx,dy);nv=shift(b,dx,dy);core=nv[:,:,3]>=128;pos=nd.distance_transform_edt(~core);neg=nd.distance_transform_edt(core);oy,ox=np.where(src[:,:,3]>0);by,bx=np.where(src[:,:,3]==0);bad=int((pos[py+oy*4+2,px+ox*4+2]>3).sum());holes=int((neg[py+by*4+2,px+bx*4+2]>3).sum());extra=0
+  for col in np.unique(src[src[:,:,3]>0,:3],axis=0):
+   have=np.all(v[:,:,:3]==col,2)&(v[:,:,3]>=128);tar=np.all(r[:,:,:3]==col,2)&(r[:,:,3]>=128);syy,sxx=np.nonzero(np.all(src[:,:,:3]==col,2)&(src[:,:,3]>0));dist=nd.distance_transform_edt(~have)[py+syy*4+2,px+sxx*4+2]if have.any()else np.full(len(syy),999.);bad+=int((dist>3).sum());extra+=int((nd.distance_transform_edt(~tar)[have]>3).sum())
+  rows.append(dict(dx=dx,dy=dy,bad=bad,extra=extra,holes=holes))
+rows.sort(key=lambda e:(e['bad']+e['extra']+e['holes'],e['bad'],abs(e['dx'])+abs(e['dy'])));(K/'helflytt-diagnose.json').write_text(json.dumps(rows,indent=2)+'\n');print(rows[:5]);print('all zero',any(e['bad']==e['extra']==e['holes']==0 for e in rows))

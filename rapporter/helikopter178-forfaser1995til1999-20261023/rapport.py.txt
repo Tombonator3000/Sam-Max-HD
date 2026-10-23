@@ -1,0 +1,60 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import hashlib,json,shutil,gzip,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+rows=[];maps=[]
+for K in sorted((R/'kall').iterdir()):
+ if not(K/'plan.json').exists():continue
+ q=json.loads((K/'plan.json').read_text());control=json.loads((K/'kontroll.json').read_text())if(K/'kontroll.json').exists()else{}
+ rows.append(dict(kall=K.name,rute=q['rute'],utfort=q['utfort'],raa=str((K/'raa.png').relative_to(A)),raa_sha256=sha(K/'raa.png'),prompt_sha256=sha(K/'prompt-brukt.txt'),argumenter_sha256=sha(K/'argumenter.json'),modul=q.get('modul',False),verktøy='innebygd image_gen',teknisk_ok=control.get('teknisk_ok',False),valgt=False,egenkontrollert=True,visuelt_sett_raa=True,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+ if(K/'prototype-under-kontroll.png').exists():
+  maps.append(dict(kall=K.name,rute=q['rute'],jobb='fig178_02',prototype=str((K/'prototype-under-kontroll.png').relative_to(A)),sha256=sha(K/'prototype-under-kontroll.png'),maal=list(__import__('PIL.Image',fromlist=['Image']).open(K/'prototype-under-kontroll.png').size),egen_alfa=True,originalmaske=False,originalfragmenter=False,status='RETUR',levert=False,native_mottatt=False,motorobservert=False,publisert=False))
+assert len(rows)==5 and all(r['utfort']for r in rows)and not any(r['teknisk_ok']for r in rows)
+save(R/'alle-kall.json',rows);save(R/'rutekart-returer.json',dict(leveranser=[],returer=maps));save(R/'fremdrift.json',dict(leveranser=[],delvise_leveranser=[],bildekall=rows,innebygde_bildekall=5,nye_native=0,native=3723,figurjobber=508,total=1758,fig178_02_native=10,fig178_02_totalt=24,familie178_native=22,familie178_totalt=102,hd_mod='15835538ca4b4e70e95a0f227e7d41bea830400e',pakker_native=3723,status='PAABEGYNT_RETUR',laget_raa=5,egenkontrollert_raa=5,lagede_valgte_sluttruter=0,native_mottatt=0,visuelt_sett_valgte_sluttruter=0,motorobservert_valgte_sluttruter=0,publisert_nye_native=0,Tom_godkjent=0,Claude_godkjent=0))
+pr=json.loads((R/'grunnlag3723-start1-y60.json').read_text());source=[]
+for n in range(1995,2000):
+ S=R/'kilder'/str(n);e=pr['tegninger'][f'costume178_{n}'];f=Path(e['fil']);flat=f.with_name(f.stem+'_flat.png');shutil.copy2(flat,S/'hel-originalmotor-flat.png');q=json.loads((S/'kilde.json').read_text());q.update(flatmotor_sha256=sha(S/'hel-originalmotor-flat.png'),ny_motor='651aa78c84411784671f600085147bbbdce5dc6281e77bd113eb7db7f1c0ed27',visuelt_sett_original_og_stil=n in [1998,1999]);save(S/'kilde.json',q);source.append(q)
+save(R/'kildekontroll-fem-eldre.json',dict(ruter=source,alle_fem_hele_synlige=True,alle_RGB565_bekreftet=True,ingen_originalfragmenter_til_utdata=True,kontrollert_ikke_naturlig_spillsekvens=True,visuelt_sett_foer_nytegning=[1999,1998],ikke_nytegnet_eller_visuelt_sett_ennå=[1997,1996,1995]))
+for f in O.glob('*.py'):shutil.copy2(f,R/(f.name+'.txt'))
+checks=pr['kontroller'];save(R/'motor-kildestatus.json',dict(exit=pr['exit'],motor_sha256=pr['binar_sha256'],kontroller=len(checks),null=pr['nullkontroller'],null_etter_frame40=sum(q['frame']>40 and q['avvik']==0 for q in checks),kildefaser_logget=len(pr['tegninger']),nye_valgte_native=0,ny_kandidat_avspilling=False,visuelt_sett_hele_motorbilder_for_ruter=[1999,1998],kontrollert_aktor29=True,naturlig_full_gjennomspilling=False))
+(R/'NESTE.md').write_text('''# Gjenoppta denne bunken
+
+H126..H130 er fem faktiske innebygde image_gen-kall, med råbilder, faktiske prompter og argumenter. Ingen ny native er importert. Gjenoppta her, ikke fra forrige rapport om 2000/2001.
+
+Fem kilder 1995..1999 er ferskt motorbekreftet med installert WebP-motor; alle er hele og RGB565-identiske. Bare 1999 og 1998 er visuelt sett i kontekst og ved Sam-ankeret før nytegning; se de tre andre før de tegnes. Det finnes én uendret grunnlagsavspilling under out/helikopter178-forfaser1995til1999-20261023/grunnlag3723-start1-y60. Den er ikke en full modkopi og skal beholdes til bunken er sammenlignet med kandidat.
+
+1999: H126 har penere HD-kontur, men mange feil fargefester. H128 har presis geometri, men synlige pikseltrapper og små kodefeltreturer. H129 retter hullet og runnerenden, men introduserer andre feltfeil. Rene og sammensatte kontroller er bevart hver for seg. H130 er en isolert redigeringsmodul som retter den lysegrønne runnerenden. Den sammensatte varianten med H128-RGB og H129-alfa har alle positive alfa-/åpnings-/fargefester innen 3 HD, men fortsatt ekstra kodepiksler, særlig uønsket mørk kant fra H130-modulen. Ingen av dem består alle porter. Gjennomgå selve kildeformen og faktisk utdata; målinger alene godkjenner ikke stilen. H127 er retur for 1998. 1997..1995 er ikke tegnet.
+
+Neste bilde H131 er ikke utført eller reservert. Før neste retur: inspiser H128/H129/H130, kontroll.json og egne monteringsvinduer. H130s svarte støy kommer fra egen råkode utenfor de tilsiktede marineblå feltene. Eventuell koderens må være global klassifisering av egne RGB, uten originalmasker eller lokale fargepåmalinger. Alfa skal beholdes ekte, små kildedeler må bestå. Ikke bruk pikseltrappet H128 som nytt stilanker. Bevar stilnivået fra godkjent Sam og de tidligere publiserte delrutene.
+
+H126..H130 skal ikke telles som fem ferdige jobber. 508/1758 figurjobber, 3723 native, fig178_02 10/24 og familie178 22/102 er uendret. Ikke tegn 2000..2009 eller komplett 2010..2021 på nytt. 1990 trenger fortsatt ny hel originalkilde. 137/V013 og 296/S037 er uendret.
+
+Gjeldende native er WebP 15835538ca4b4e70e95a0f227e7d41bea830400e, og fellespakker sam-max-hd-2026-10-23-webp har samme 3723 native. Bruk denne komplette modden, ikke historiske dedupliserte out-modmapper. Ingen kandidat eller ny modkopi er opprettet i denne bunken. Originale jobber og tre stasher bevares. Automatikken er ACTIVE; ingen nødvendig Tom-designavklaring eller gammel nattprosess.
+''')
+(R/'RETUR.md').write_text('''# Aktive returer
+
+H126 / 1999: finere kurver, men mange fargefelt skifter størrelse og små felt mangler. Ingen import.
+H127 / 1998: to alfafester og mange fargefelt avviker. Ingen import.
+H128 / 1999: presis geometri (IoU 0,988), men stilretur for pikseltrapper. Etter global kodekalibrering gjenstår et for tett hull, runnerens lysegrønne felt og ekstra gult/teal.
+H129 / 1999: ren tegning har IoU 0,997 og åpner hullet, men har andre feltfeil. Sammensetning med H128 har fortsatt ett mørkegrønt festeavvik og små ekstra kodefelt. Heleflyttdiagnosen gir ingen godkjent løsning og er ikke anvendt. Ren kontroll er kontroll-for-sammensetning.json.
+H130 / 1999: isolert egen redigeringsmodul for runnerenden. Sammenstilling med H128-RGB og hel H129-alfa har alle positive alfa-/åpnings-/farge-/kodefester innen uendret 3 HD, men ekstra rene kodepiksler består fortsatt. 30 ekstra svarte kodepiksler og 1..2 i enkelte andre felt. Egen modul har en mørk støy-/omrisskant som ikke skal inn i sluttbildet. Ingen import eller stilgodkjenning.
+
+Ingen port er svekket, ingen originalmaske er brukt til klipp, ingen originalfragmenter er lagt inn, ingen kildestyrt lokal trekkflytting er brukt. Egne hele redigeringsvinduer og globale RGB-kalibreringer er dokumentert. Alle fem faktiske råbilder og prompter er beholdt. Sammenstillingene teller ikke som nye bildekall eller leveranser.
+''')
+(R/'notat.md').write_text('''# Produksjonsnotat
+
+Dato: 23. oktober 2026. Verktøy: innebygd image_gen, modellnavn ikke oppgitt. Fem faktiske bildekall H126..H130. Fire hele tegninger og én egen redigeringsmodul. Råbilder og de eksakte verktøyargumentene er i kall-mappene. Ingen CLI-/API-bildefallback.
+
+Motivet er deler av helikopterkostyme178 i World of Fish, med rotor-/karosseri-/understellsfaser. Kildepalett og hele synlighet er kontrollert mot faktisk motoravspilling; approved Sam brukes bare for strek og kantbehandling. Uklare pikselklynger er ikke fullført til en oppdiktet hel figur. Prompten for hele figurarket er bevart; de faktiske korrigerte enkeltrutepromptene er separate.
+
+Ingen resultat.png er levert: alle forsøk er returer under arbeid. Alfa, åpninger, eksakte fargefester og rene kodefelt må alle bestå uendret 3 HD, og pikseltrapper må løses visuelt før mottak. Tekniske nesten-treff er ikke ferdige HD-bilder. Ingen ny Tom-/Claude-godkjenning.
+
+Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt for fast 4x-mål og vern av publisert mod. Kandidat og ny publisering er ikke startet. WebP-mod og verifiserte Linux-/Windows-pakker er uendret. Fem råbilder er ikke fem nye figurjobber. Automatikken fortsetter fra NESTE.md uten nytt spørsmål til Tom.
+''')
+assert subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines()==['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c']
+subprocess.run(['git','diff','--exit-code','5d23128962f65fbd2ffd7596c162bb5859e7acff','--','jobber','hovedark','stil'],cwd=A,check=True,stdout=subprocess.DEVNULL)
+save(R/'sluttkontroll.json',dict(raa_sha_kontrollert=5,ekte_innebygde_bildekall=5,nye_godkjente_native=0,nye_mottatte_native=0,publisert_native_uaendret=3723,hele_figurjobber_508_av_1758=True,jobber_hovedark_stil_uendret=True,stashes_uendret_3=True,kildepixler_bare_referanse_og_maaling=True,ny_kandidat=False,ny_pakkebygging=False,grunnlag_avspilling_beholdt_for_paabegynt_bunke=True,Tom_avklaring_noedvendig=False,automation='ACTIVE',dato_oslo=datetime.now(ZoneInfo('Europe/Oslo')).isoformat()))
+files=sorted(p for p in R.rglob('*')if p.is_file()and p.name!='SHA256SUMS');(R/'SHA256SUMS').write_text(''.join(sha(f)+'  '+f.relative_to(R).as_posix()+'\n'for f in files));print('Report',len(files),'files',sum(p.stat().st_size for p in files),'bytes')

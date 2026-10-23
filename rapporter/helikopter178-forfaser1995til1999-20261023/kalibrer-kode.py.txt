@@ -1,0 +1,12 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/helikopter178-forfaser1995til1999-20261023';K=R/'kall'/sys.argv[1]
+a=np.array(Image.open(K/'raa.png').convert('RGBA'));alpha=a[:,:,3].copy();v=a[:,:,:3].astype(int)
+# Bare globale RGB-klasser fra eget rabilde; ingen kildemasker eller XY-regler.
+mint=(v[:,:,0]<24)&(v[:,:,1]>230)&(v[:,:,2]>170)&(v[:,:,2]<230)&(alpha>0)
+lime=(v[:,:,0]>210)&(v[:,:,0]<247)&(v[:,:,1]>235)&(v[:,:,1]-v[:,:,0]>=8)&(v[:,:,2]<30)&(alpha>0)
+a[mint,:3]=[0,255,128];a[lime,:3]=[192,255,0]
+assert np.array_equal(alpha,a[:,:,3]);Image.fromarray(a).save(K/'egen-global-kodekalibrert.png')
+(K/'egen-kodekalibrering.json').write_text(json.dumps(dict(raa_sha256=hashlib.sha256((K/'raa.png').read_bytes()).hexdigest(),global_RGB_regler={'mint':'R<24,G>230,170<B<230 -> 0,255,128','lime':'210<R<247,G>235,G-R>=8,B<30 -> 192,255,0'},mint_egne_piksler=int(mint.sum()),lime_egne_piksler=int(lime.sum()),egen_alfa_byteidentisk=True,ingen_kildefiler_aapnet=True,ingen_XY_regler=True,originalmaske=False,kildekoordinater_til_endring=False),ensure_ascii=False,indent=2)+'\n')
+print('Global own-code calibration',int(mint.sum()),int(lime.sum()))

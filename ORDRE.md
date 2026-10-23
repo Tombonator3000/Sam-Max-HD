@@ -1,5 +1,17 @@
 # Ordre fra Claude
 
+<!-- helikopter178-forfaser1995-1999:start -->
+Fem faktiske innebygde bildekall H126..H130 er bevart i rapporter/helikopter178-forfaser1995til1999-20261023. Ingen ny native består alle porter ennå, og ingen resultat.png leveres. 1999 og 1998 er visuelt sett med original og stilanker før nytegning. Alle fem kilder 1995..1999 er ferskt bekreftet hele og RGB565-identiske i installert WebP-motor. Ny grunnlagsavspilling gir 160 kontroller/148 null, 120/120 null etter frame40 og logger 53 kildefaser. Dette er kontrollert aktør29, ikke naturlig full gjennomspilling.
+
+H126 har finere kontur men fargeavvik. H127 er retur for 1998. H128 har mer presise felt, men synlige pikseltrapper og små returer. H129 retter hull og runnerende, men gir andre fargefeltavvik. H130 retter runnerenden som egen redigeringsmodul. Sammensatt H130 har alle positive alfa-/åpnings-/farge-/kodefester innen uendret 3 HD, men fortsatt ekstra kodepiksler, særlig mørk støy fra egen modul. Ingen port er svekket. Returer og monteringer skal ikke brukes som stilankere. Alle fem råbilder og eksakte prompter er bevart. Ingen originalmaske eller originalfragmenter i utdata.
+
+Gjenoppta NESTE.md og RETUR.md i den nye rapporten. Neste H131 er ikke utført eller reservert. 1997..1995 er ikke tegnet eller visuelt sett ennå. Ikke gjenta H126..H130 eller tidligere native 2000..2009/2010..2021. 1990 trenger fortsatt ny hel kilde. Ingen nødvendig Tom-designavklaring.
+
+Gjeldende hd-mod er WebP 15835538ca4b4e70e95a0f227e7d41bea830400e, fortsatt 3723 native. Figurjobber 508/1758, fig178_02 10/24 og familie178 22/102 er uendret. Felles Linux-/Windows-utgave sam-max-hd-2026-10-23-webp inneholder samme 3723 og er tidligere faktisk lastet ned og filkontrollert. Ingen ny kandidat, modkopi, publisering eller pakkebygging. Originale jobber og tre stasher er uendret. Følg docs/WEBP.md og webp-migrering-20261023 før senere mottak. Automatikken er ACTIVE, ingen gammel nattprosess.
+<!-- helikopter178-forfaser1995-1999:slutt -->
+
+Tidligere status nedenfor er historikk.
+
 <!-- helikopter178-retur2001-2000-status:start -->
 Publisert hd-mod 2ba07d9cb94c99053fd0e97b0dfab903f3b01aff har 3723 native. Grafikkilde er gpt-arbeid 2f92cd2c06ca1d7b50441cfc3e62f817ad299ae7. Hele fjernarkivet er faktisk lastet ned som strøm, og alle 21967 filhash er kontrollert. Alle 21965 tidligere stier og 21959 tidligere PNG er bevart; bare mod.json og SHA256SUMS oppdateres som metadata. 1472 beskyttede input og tre opprinnelige stasher er uendret. Kandidaten er lokalt mottatt ved katalognavnbytte etter kontroll. 3721-grunnlaget er bevart under out. Ingen ekstra klon, lagret TAR eller kontrollkopi er opprettet. Alle 47 eksisterende releaser og fire fellesvedlegg er bevart. Ingen aktive pakkebygg eller nativefrys ved publiseringen.
 
