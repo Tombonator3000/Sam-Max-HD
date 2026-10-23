@@ -1,0 +1,129 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json, hashlib, subprocess, shutil
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+
+def put(p, data):
+    p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+r = read(R / 'mottak-publisert1998.json')
+pub, artifact = r['hd_mod'], r['grafikkilde']
+cid = 'H165/alfamin-egne-materialplan-r1/heltilpasning01'
+assert r['alle_filhash_bekreftet'] and r['lokalt_mottatt']
+assert r['native'] == 3727 and r['filantall'] == 21972
+assert subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/hd-mod'], cwd=P, text=True).split()[0] == pub
+download = read(O / 'grafikkilde3727-hentet.json')
+assert download['commit'] == artifact and download['SHA256_og_Gitblob_SHA1_bekreftet']
+assert download['faktisk_hentet_filer'] == download['forventede_filer'] == 500
+motor = read(R / 'motor-sammenligning1998.json')
+assert motor['sammenlignede_eksakte_originaltilstander'] == 160 and motor['utelatte_tilstander'] == []
+assert motor['ingen_uforklarte_HD_avvik_utenfor_ny_native'] and motor['visuelt_sett']
+assert motor['fase1998'][0]['endrede_HD_piksler'] == 10832
+dedup = read(R / 'motor3727-identiske-kopier.json')
+assert dedup['alle_kontrollstier_og_filhash_bevart']
+assert not (R / 'LEVERANSE-1998.md').exists(), 'Engangsskript: sluttrapport finnes allerede'
+shutil.copyfile(O / 'grafikkilde3727-hentet.json', R / 'grafikkilde3727-hentet.json')
+
+status = f'''Publisert hd-mod {pub} har 3727 native ruter og er vanlig Git-barn av {r['forelder']}, uten force-push. Fase 1998 er laget, egenkontrollert, native mottatt, visuelt sett, motorobservert og publisert som tapsfri WebP. Hele fjernarkivet er faktisk hentet som strøm. Alle 21972 filhash er bekreftet før aktivering i mods/gpt. 4876 WebP og 17089 tekniske PNG. Alle tidligere grafikkfiler og indeks-/maskebilder er bytebevart; bare mod.json og SHA256SUMS endres som metadata. Grafikkilde er gpt-arbeid {artifact}. Alle 500 endrede kildefiler er faktisk hentet med SHA256 og Gitblob SHA1 bekreftet. Ingen lagret TAR eller nedlastet modkopi.
+
+Ti nye faktiske innebygde image_gen-kall H156..H165 er bevart med råbilder, faktiske prompter, argumenter og planer. Bunken har 40 faktiske kall. Valgt {cid} bruker eldre H138/H149 og åtte nye H158..H165. H156/H157 er returer uten valgte sluttpiksler. Hele egne materialplan registreres mot tidligere egne RGB-/alfaplan. Robust start bruker prosentiler av egne kjerner; alle plan transformeres hele uten klipp eller sletting av deler. Egen H149-alfa møter union av faktisk malte egne materialplan med ensartet maksfilter på én råpiksel. RGB-fringe kommer bare fra egne malte kjerner. Én siste helaffin transformasjon 0,995 x 1,005, HD-flytt 0,0. Ingen originalmaske, kildefragmenter, lokal kildepåmaling eller flytting av enkeltrekk. Kilden brukes til guide og kontroll, ikke lokal produksjonsplassering. Alle uendrede sterke 3HD-porter består med null feil, også samtlige ekstra kodepiksler og nativefarger. IoU 0,923, dekning 0,937. Kildeløs replay er PNG-/RGBA-byteeksakt. WebP er RGBA-byteidentisk, også under alfa 0. Se notat1998.md og SHA-festede kallplaner.
+
+Delark fig178_02 er 14/24 og familie178 er 26/102. Hele figurjobber er fortsatt 508/1758; ingen hel resultat.png leveres. Alle 13 gamle delruter bevares. Standard kontroll gir 14 OK/10 tomme mål, ingen produsert FEIL; automatisk mottak gir 1 OK. Native, delark, hele motorbildet, før/etter og 27 sekvensfaser er visuelt sett. Ingen ny Tom-/Claude-godkjenning.
+
+To nye kontrollerte motoravspillinger i rom 35/aktør 29 bruker faktisk WebP-binær 651aa78c. Alle 160 hele original-RGBA-tilstander og komplette originale celtegnekall-lister er identiske, ingen uparede tilstander. Bare fase 1998/bilde-frame 119 endres: 10832 HD-piksler, alle innen berørt originalrektangel med 8HD naboområde, null utenfor. Begge sider har 160 bufferkontroller/148 null og 120/120 null etter frame 40. Tolv gamle tidlige avvik har identiske koordinater og begge RGBA. 53 kildefaser er observert, ikke alle 102. Kontrollert aktøravspilling er ikke full naturlig gjennomspilling. Ingen ny interaktiv Windows-/webtest eller motor-/pipelinekode.
+
+Fortsett den eksisterende returen 1995/H145, den siste påbegynte i bunken 1995..1999. H166 er ikke utført, forberedt eller reservert. Ikke tegn 1996, 1997, 1998, 1999 eller 2000..2021 på nytt. 1990 trenger hel kilde; 137/V013 og 296/S037 er uendret. Se hele originalen i spillkontekst og godkjent Sam før neste motiv. Bruk kallokal kodepalett. Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokale kontroller.
+
+Den gamle aktive modkopien er fjernet først etter full verifisering mot Git-barnet; metadata beholdes i Git-forelderen. {dedup['identiske_kopier_erstattet_av_harde_lenker']} eksakte motorbildekopier i de to nye kjøringene deler innhold via harde lenker. Alle kontrollstier og hash er bevart. {dedup['logiske_duplikatbytes']} logiske duplikatbyte er ikke et mål på fysisk frigitt plass. Råbilder, unike kilder, stilankere, beskyttede jobbfiler og alle tre stasher beholdes. Den ene komplette kandidaten er nå aktiv mods/gpt; ingen ekstra fullmod- eller arkivkopi. Behold kandidat3727-start1-y60 og nødvendige kontrollgrunnlag til bunken er ferdig.
+
+Felles Linux-/Windows-pakker har fortsatt 3723 og mangler fire publiserte faser. De oppdateres ved neste komplette ark-/familiesamlepunkt eller avslutning, med faktisk nedlasting, sjekksummer og inkludert grafikk kontrollert. Ingen ny pakke eller gammel nattprosess. Ingen nødvendig Tom-avklaring. Automatikken er ACTIVE og hele oppgaven er ikke ferdig.
+'''
+start = '<!-- helikopter178-forfaser1995-1999:start -->'
+end = '<!-- helikopter178-forfaser1995-1999:slutt -->'
+for name in ['ORDRE.md', 'GRAFIKKLISTE.md']:
+    p = A / name
+    t = p.read_text()
+    i, j = t.index(start), t.index(end) + len(end)
+    p.write_text(t[:i] + start + '\n' + status + end + t[j:])
+(R / 'NESTE.md').write_text('# Gjenoppta eksisterende bunke\n\n' + status)
+(R / 'LEVERANSE-1998.md').write_text('# Helikopterfase 1998 publisert\n\n' + status)
+with (R / 'RETUR.md').open('a') as out:
+    out.write('\n\n## Gjeldende etter publisert fase 1998\n\n' + status)
+
+controlsha = sha(R / 'kall' / cid / 'kontroll.json')
+f = read(R / 'fremdrift.json')
+assert f['native'] == 3727 and f['innebygde_bildekall'] == 40
+assert f['grafikkilder_per_rute'] == {'1999': '02b43dbcf8b644b67caff2587d304e18df198977', '1997': '5ebc4de7891506f99550c3f90841288ac9a873ae', '1996': 'fa66de6f62c7d2243537810f8af8c4d637c5db69', '1998': artifact}
+assert len(f['valgte_varianter']) == 4
+f.update(oppdatert_oslo=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(), grafikkrapport_kilde=artifact,
+         grafikkrapport_endrede_filer_faktisk_hentet=download['faktisk_hentet_filer'],
+         grafikkrapport_SHA256_og_Gitblob_SHA1_bekreftet=True, grafikkrapport_payload_lagret=False,
+         grafikkrapport_hentekvittering='grafikkilde3727-hentet.json', siste_retur1998=None,
+         status='DELVIS_PUBLISERT_1999_1997_1996_1998', siste_okt='videre-1998-H156-H165.json', bunke_ferdig=False)
+for e in f['egne_avledede_varianter']:
+    if e.get('variant') == cid:
+        e.update(kontroll_sha256=controlsha, publisert=True, hd_mod=pub, grafikkilde=artifact,
+                 status='PUBLISERT_EGENKONTROLLERT_MOTOROBSERVERT')
+put(R / 'fremdrift.json', f)
+for name, key in [('rutekart-returer.json', 'egne_varianter'), ('rutekart-videreH156-H165-1998.json', 'egenkontrollerte_varianter')]:
+    d = read(R / name)
+    for e in d[key]:
+        if e.get('variant') == cid:
+            e.update(kontroll_sha256=controlsha, publisert=True, hd_mod=pub, grafikkilde=artifact,
+                     status='PUBLISERT_EGENKONTROLLERT_MOTOROBSERVERT')
+    if name == 'rutekart-returer.json':
+        d['nye_ruter_i_modden_i_okten'] = 1
+        for e in d['valgte_avledede_varianter']:
+            if e['rute'] == 1998:
+                e.update(publisert=True, hd_mod=pub, grafikkilde=artifact,
+                         status='PUBLISERT_EGENKONTROLLERT_MOTOROBSERVERT')
+    else:
+        d['nye_publiserte_ruter'] = 1
+    put(R / name, d)
+for name in ['rutekart-fig178_02.json', 'rutekart-samlet.json']:
+    d = read(R / name)
+    for e in d['fig178_02']['ruter']:
+        if e['rute'] == 1998:
+            e['forst_publisert_hd_mod'] = pub
+    put(R / name, d)
+q = read(R / 'egen-native1998.json')
+q['ruter'][0]['forst_publisert_hd_mod'] = pub
+put(R / 'egen-native1998.json', q)
+v = read(R / 'videre-1998-H156-H165.json')
+v.update(publisert_native_naa=3727, nye_publiserte_native_i_okten=1, hd_mod=pub, grafikkilde=artifact,
+         alle21972_filhash_faktisk_hentet_bekreftet=True, gammel_aktiv_modkopi_verifisert_slettet=True)
+put(R / 'videre-1998-H156-H165.json', v)
+st = read(R / 'kandidatstatus1998.json')
+st.update(publisert=True, lokalt_mottatt=True, hd_mod=pub, aktiv_mod=str(P / 'mods/gpt'), tidligere_kandidat_na_aktiv_mod=True)
+put(R / 'kandidatstatus1998.json', st)
+s = dict(dato_oslo=datetime.now(ZoneInfo('Europe/Oslo')).isoformat(), raa_sha_kontrollert=40,
+         ekte_innebygde_bildekall=40, nye_i_okten=10, lagede_valgte_sluttruter=4, egenkontrollerte_native=4,
+         native_mottatt=4, visuelt_sett=4, motorobservert_native=4, publisert=4, Tom_godkjent=False,
+         Claude_godkjent=False, publisert_native_naa=3727, hd_mod=pub, grafikkilde=artifact,
+         forelder=r['forelder'], force_push=False, vanlig_git_barn_av_gjeldende_SHA=True,
+         alle_publiserte_filhash_hentet_bekreftet=21972, gammel_arbeidskopi_verifisert_slettet=True,
+         figurjobber=dict(med_resultat=508, total=1758), delark=dict(native=14, total=24),
+         familie178=dict(native=26, total=102), jobber_hovedark_stil_uendret=True,
+         stashes_uendret_3=True, stashes=r['stasher'], kildepiksler_bare_referanse_og_maaling=True,
+         ny_kandidat=True, ny_fullmodkopi_utenom_en_kandidat=False, ny_motoravspilling=True,
+         antall_nye_motoravspillinger=2, hele_originaltilstander_strengt_paret=160,
+         hele_originaltilstander_uparet=0, motor_HD_uforklarte=0,
+         motor_HD_endringer_innen_ny_rute=10832, motor_HD_endringer_utenfor_ny_rute=0,
+         motor_identiske_kopier_hardlenket=dedup['identiske_kopier_erstattet_av_harde_lenker'],
+         nye_native_i_okten=1, nye_native_motorobservert_i_okten=1, nye_native_publisert_i_okten=1,
+         ny_pakkebygging=False, fellespakker_native=3723, fellespakker_mangler=4,
+         neste_kall='H166', neste_kall_utfort=False, neste_kall_reservert=False,
+         Tom_avklaring_noedvendig=False, automation='ACTIVE', bunke_ferdig=False,
+         samlet_sluttkontroll_av_hele_prosjektet=False, siste_okt='videre-1998-H156-H165.json')
+put(R / 'sluttkontroll.json', s)
+with (R / 'notat1998.md').open('a') as out:
+    out.write(f'\nPublisert og lokalt aktivert som hd-mod {pub}, grafikkilde {artifact}. Alle 21972 modfiler og alle 500 endrede kildefiler er faktisk hentet og hashkontrollert. Alle tidligere grafikkfiler er bytebevart. Fellespakker 3723 er ikke oppdatert og mangler fire publiserte faser. Se mottak-publisert1998.json og LEVERANSE-1998.md.\n')
+(R / 'sluttstatus-1998.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps(dict(hd_mod=pub, grafikkilde=artifact, native=3727, delark=[14, 24], familie=[26, 102], neste='H166'), ensure_ascii=False))
