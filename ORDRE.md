@@ -1,5 +1,11 @@
 # Ordre fra Claude
 
+<!-- helikopter178-graaplan1987-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+93 faktiske kall etter fem nye H264..H268 for fase 1987. H264s runde kodeøyer og H265s trappede gråoverlay er avvist. H266 nytegner hele eget motiv; H267 retter halehette/-bøy og H268 små vindusfelt. Bare H268s vindusrektangel beholdes, ikke det endrede understellet. H268/hel-affin-kontroll har null form-/åpningsfeil ved uendrede porter, men 24 positive materialavvik og ekstra klassepiksler gjenstår. Tre egne råbilder gir byteeksakt replay av egen heltegning og nativeprøve. Ingen nye hele jobber, native mottak, motor eller publiserte mod-/pakkebyte. Fortsatt 3733 native og 508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md, graaplan1987-status.md og graaplan1987-avvik-kildepunkter.json. H269 er ikke startet. Sam er eneste stilanker; automatikken ACTIVE.
+<!-- helikopter178-graaplan1987-20261024:slutt -->
+
 <!-- helikopter178-retur1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

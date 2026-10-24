@@ -1,0 +1,34 @@
+from pathlib import Path
+from io import BytesIO
+import json,hashlib,sys
+import numpy as np
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+from PIL import Image
+from smhd.myk import _premul_resize
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';cid=sys.argv[1];C=R/'kall'/cid;K=C/'overlay-graa';K.mkdir(exist_ok=False)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=json.loads((C/'plan.json').read_text());q=plan['foer_helplassering'];source=Path(plan['kilde_mappe'])
+basepath=R/'kall/H263/samlet-hoeyreblad/egen-heltegning.png';rawpath=C/'raa.png'
+# Target bounds are frozen reference metadata. They are NOT opened or used as a mask.
+target=(134,361,1090,788)
+opened=[];realopen=Image.open
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in [basepath.resolve(),rawpath.resolve()],str(p);opened.append(str(p));return realopen(fp,*a,**kw)
+Image.open=guard
+try:
+ base=np.array(Image.open(basepath).convert('RGBA'));raw=np.array(Image.open(rawpath).convert('RGBA'))
+ code=np.array([c for g,c in plan['kodefarger']]);gray=np.array([g for g,c in plan['kodefarger']]);d,idx=cKDTree(code.astype(float)).query(raw[:,:,:3].reshape(-1,3).astype(float));idx=idx.reshape(raw.shape[:2]);d=d.reshape(raw.shape[:2])
+ own=np.zeros_like(raw);own[:,:,:3]=gray[idx];own[:,:,3]=np.where(d<130,raw[:,:,3],0);own[own[:,:,3]<8]=0
+ yy,xx=np.nonzero(own[:,:,3]>=128);bbox=(int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1));x,y,X,Y=bbox
+ tx,ty,tX,tY=target;scales=((tX-tx)/(X-x),(tY-ty)/(Y-y));assert all(.7<s<1.3 for s in scales)
+ placed=np.zeros_like(base);scaled=_premul_resize(own[y:Y,x:X],(tX-tx,tY-ty));placed[ty:tY,tx:tX]=scaled
+ # Uniform own-colour cleanup. No original pixels, original alpha, locations or labels.
+ rgb=base[:,:,:3].astype(float);neutral=(base[:,:,3]>8)&(rgb.min(2)>32)&(np.ptp(rgb,axis=2)<24)
+ eligible=(base[:,:,3]>=128)&~neutral
+ assert eligible.any();_,near=nd.distance_transform_edt(~eligible,return_indices=True);clean=base.copy();clean[neutral,:3]=base[near[0][neutral],near[1][neutral],:3]
+ cleanim=Image.fromarray(clean);cleanim.alpha_composite(Image.fromarray(placed));out=np.array(cleanim);out[out[:,:,3]==0,:3]=0
+ Image.fromarray(own).save(K/'egne-dekodede-plan.png');Image.fromarray(placed).save(K/'egne-helplasserte-plan.png');Image.fromarray(clean).save(K/'egen-base-uten-noytrale-farger.png');Image.fromarray(out).save(K/'egen-heltegning.png')
+finally:Image.open=realopen
+proof=dict(egne_bilder_aapnet=opened,originalbilder_aapnet=0,egne_SHA256={str(f):sha(f)for f in [basepath,rawpath]},kodefarger_til_kanonisk_RGB=plan['kodefarger'],egen_kodeavstand_maks=130,hel_egen_bbox=bbox,hel_referanse_bbox_metadata=target,egen_hel_skala=scales,kildeklipp=False,originalmaske=False,originalfragmenter=False,egen_noytralregel='egen alpha>8, minRGB>32 og maxRGB-minRGB<24',egne_noytrale_piksler=int(neutral.sum()),fyll='nærmeste egen ikke-nøytrale piksel innen egen alpha>=128',egen_base_alfa_byteidentisk=bool(np.array_equal(clean[:,:,3],base[:,:,3])),egen_overlay_alpha_komponert_uten_kildemaske=True,ferdig_SHA256=sha(K/'egen-heltegning.png'),visuelt_sett=False,native_mottatt=False,publisert=False)
+(K/'rens.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(K/'plan.json').write_text(json.dumps(dict(rute=1987,jobb='fig178_02',kilde_mappe=str(source),egen_variant=cid+'/overlay-graa',nytt_bildekall=False,faktisk_opphav_kall=cid,kodeplan_metode_anvendt=True),ensure_ascii=False,indent=2)+'\n');(R/'sett-egne-graaplan.py.txt').write_bytes(Path(__file__).read_bytes());print(cid,proof['egne_noytrale_piksler'],bbox,scales)

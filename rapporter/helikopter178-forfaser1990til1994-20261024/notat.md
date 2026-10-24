@@ -1,3 +1,11 @@
+# Nyeste status: gråfelt1987
+
+93 faktiske kall etter fem nye H264..H268 for fase 1987. H264s runde kodeøyer og H265s trappede gråoverlay er avvist. H266 nytegner hele eget motiv; H267 retter halehette/-bøy og H268 små vindusfelt. Bare H268s vindusrektangel beholdes, ikke det endrede understellet. H268/hel-affin-kontroll har null form-/åpningsfeil ved uendrede porter, men 24 positive materialavvik og ekstra klassepiksler gjenstår. Tre egne råbilder gir byteeksakt replay av egen heltegning og nativeprøve. Ingen nye hele jobber, native mottak, motor eller publiserte mod-/pakkebyte. Fortsatt 3733 native og 508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md, graaplan1987-status.md og graaplan1987-avvik-kildepunkter.json. H269 er ikke startet. Sam er eneste stilanker; automatikken ACTIVE.
+
+Se graaplan1987-status.md og rutekart-graaplan1987.json.
+
+## Historisk status før H264..H268
+
 # Nyeste status: konkrete1987-returer
 
 88 faktiske kall etter fem konkrete rettinger H259..H263 for fase 1987. Navring fjernet, sideknapper flatet ut og rotor-/vindusfelt forsøkt rettet. H263/samlet-hoeyreblad er holdt arbeidsfil, fortsatt ett formpunkt og flere materialreturer. H260s utsnittsstripe og seks Python-polygonrenser er avvist. Ingen nye hele jobber, native mottak, motor eller publiserte mod-/pakkebyte. Fortsatt 3733 native og 508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md, retur1987-status.md og avvik-kildepunktene. H264 er ikke startet. Sam er eneste stilanker, automatikken ACTIVE.

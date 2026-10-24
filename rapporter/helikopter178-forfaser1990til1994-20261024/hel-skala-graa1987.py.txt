@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+from smhd.myk import _premul_resize
+import numpy as np,json,hashlib,os
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';B=R/'kall/H268/bare-vindu';K=R/'kall/H268/hel-affin-kontroll';K.mkdir(exist_ok=False)
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();q=read(B/'kontroll.json');plan=read(B/'plan.json');S=Path(plan['kilde_mappe']);src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));own=np.array(Image.open(B/'egen-heltegning.png').convert('RGBA'));own[own[:,:,3]<8]=0
+H,W=(src.shape[0]+q['margy']*2)*4,(src.shape[1]+q['margx']*2)*4;mx,my=q['margx']*4,q['margy']*4;ref=np.zeros((H,W),bool);ref[my:my+src.shape[0]*4,mx:mx+src.shape[1]*4]=np.repeat(np.repeat(src[:,:,3]>0,4,0),4,1);oy,ox=np.nonzero(src[:,:,3]>0);by,bx=np.nonzero(src[:,:,3]==0);base_scales=q['hel_skala'];base_xy=q['flytt'];best=None;trials=0
+for sy_mult in [0.98,0.985,0.99,0.995,1.,1.005,1.01,1.015,1.02]:
+ for sx_mult in [0.98,0.985,0.99,0.995,1.,1.005,1.01,1.015,1.02]:
+  sx,sy=base_scales[0]*sx_mult,base_scales[1]*sy_mult;a=_premul_resize(own,(round(own.shape[1]*sx),round(own.shape[0]*sy)))
+  # Scale about the centre of the own canvas; translations below are whole-image only.
+  fx=base_xy[0]+round(own.shape[1]*(base_scales[0]-sx)/2);fy=base_xy[1]+round(own.shape[0]*(base_scales[1]-sy)/2)
+  for dy in range(-2,3):
+   for dx in range(-2,3):
+    px,py=mx+fx+dx,my+fy+dy;z=np.zeros((H,W,4),np.uint8);x0,y0=max(px,0),max(py,0);x1,y1=min(px+a.shape[1],W),min(py+a.shape[0],H);z[y0:y1,x0:x1]=a[y0-py:y1-py,x0-px:x1-px];core=z[:,:,3]>=128;pos=nd.distance_transform_edt(~core)[my+oy*4+2,mx+ox*4+2];neg=nd.distance_transform_edt(core)[my+by*4+2,mx+bx*4+2];bad=int((pos>3).sum()+(neg>3).sum());iou=float((core&ref).sum()/(core|ref).sum());trials+=1;key=(bad,-iou,abs(sx_mult-1)+abs(sy_mult-1),abs(dx)+abs(dy))
+    if best is None or key<best[0]:best=(key,z,[sx,sy],[fx+dx,fy+dy],pos,neg,[sx_mult,sy_mult])
+key,z,scales,shift,pos,neg,mults=best;os.link(B/'egen-heltegning.png',K/'egen-heltegning.png');Image.fromarray(z).save(K/'prototype-under-kontroll.png');core=z[:,:,3]>=128
+colors=np.unique(src[src[:,:,3]>0,:3],axis=0);_,ids=cKDTree(colors.astype(float)).query(z[core,:3].astype(float));labels=np.full(core.shape,-1,int);labels[core]=ids;ref_rgba=np.zeros_like(z);ref_rgba[my:my+src.shape[0]*4,mx:mx+src.shape[1]*4]=np.repeat(np.repeat(src,4,0),4,1);rows=[]
+for i,col in enumerate(colors):
+ have=labels==i;target=(ref_rgba[:,:,3]>0)&np.all(ref_rgba[:,:,:3]==col,2);yy,xx=np.nonzero((src[:,:,3]>0)&np.all(src[:,:,:3]==col,2));dist=nd.distance_transform_edt(~have)[my+yy*4+2,mx+xx*4+2]if have.any()else np.full(len(yy),999.);extra=nd.distance_transform_edt(~target)[have]if have.any()else np.array([]);rows.append(dict(RGB=col.tolist(),kildepunkter=len(yy),native_fester_over3HD=int((dist>3).sum()),native_maks_HD=float(dist.max()),ekstra_paletteklassifiserte_nativepiksler_over3HD=int((extra>3).sum()),ekstra_maks_HD=float(extra.max())if len(extra)else None))
+out={**q,'kall':'H268/hel-affin-kontroll','farger':rows,'hel_skala':scales,'flytt':shift,'snitt_union':round(-key[1],3),'dekning':round(float((core&ref).sum()/ref.sum()),3),'alfa_fester_over3HD':int((pos>3).sum()),'alfa_maks_HD':float(pos.max()),'apninger_over3HD':int((neg>3).sum()),'apninger_maks_HD':float(neg.max()),'hel_affin_port':bool(.88<=scales[0]/scales[1]<=1.12),'alfa_og_form_bestatt':key[0]==0,'strenge_fargeporter_bestatt':all(v['native_fester_over3HD']==v['ekstra_paletteklassifiserte_nativepiksler_over3HD']==0 for v in rows),'teknisk_ok':False,'visuelt_sett':False,'status':'AVVENTER_VISUELL_MATERIALKONTROLL','native_sha256':sha(K/'prototype-under-kontroll.png')};(K/'kontroll.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');(K/'plan.json').write_text(json.dumps({**plan,'egen_variant':'H268/hel-affin-kontroll','nytt_bildekall':False},ensure_ascii=False,indent=2)+'\n');proof=dict(hele_egne_skalaer_mult=mults,hele_egne_skalaer=scales,hele_egne_flytt=shift,proever=trials,alfa_fester_over3HD=out['alfa_fester_over3HD'],apninger_over3HD=out['apninger_over3HD'],ingen_originalmaskering_eller_kildefarger_i_produksjon=True,opprinnelig_egen_RGBA_heltegning_beholdt=True,original_leses_bare_til_maal_og_QA=True,terskler_endret=False,native_mottatt=False,publisert=False);(K/'hel-skala.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'hel-skala-graa1987.py.txt').write_bytes(Path(__file__).read_bytes());print(proof)
