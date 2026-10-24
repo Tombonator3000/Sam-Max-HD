@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage
+import numpy as np,json,hashlib,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam291-foerste-20261024';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plans=json.loads((R/'ruteplan-unik.json').read_text());crops={};records=[]
+# Hele egne komponenter. Ingen originalmaske brukes til uttaket.
+a=np.array(Image.open(R/'fig291_01-egen-renset01.png'));core=a[:,:,3]>=128;lab,n=ndimage.label(core,structure=np.ones((3,3)))
+comps=[]
+for k,sl in enumerate(ndimage.find_objects(lab),1):
+ if sl is not None and (lab[sl]==k).sum()>1000:
+  y,x=sl;comps.append((0 if y.start<560 else 1,x.start,k))
+for idx,(_,_,k) in enumerate(sorted(comps)):
+ ar=a.copy();dist=ndimage.distance_transform_edt(lab!=k);ar[dist>3]=0;yy,xx=np.nonzero(lab==k);b=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];crops[1920+idx]=('fig291_01',ar,b,'egen komponent '+str(k))
+# De sammensatte rutene beholder alle egne deler, innbyrdes mål og luft.
+boxes2=[(40,25,410,380),(415,80,880,380),(880,70,1330,380),(20,385,565,660),(565,385,1255,660),(35,665,772,990),(774,650,1450,990)]
+boxes3=[(5,50,750,490),(770,50,1536,490),(5,540,750,1000),(770,540,1536,1000)]
+for job,nums,boxes in [('fig291_02',list(range(1929,1936)),boxes2),('fig291_03',list(range(1936,1940)),boxes3),('fig291_04',[1941],[(780,110,1535,510)])]:
+ ar=np.array(Image.open(R/(f'{job}-egen-renset02.png' if job=='fig291_03' else f'{job}-egen-renset01.png')))
+ for num,rect in zip(nums,boxes):
+  x0,y0,x1,y1=rect;own=ar[y0:y1,x0:x1].copy();yy,xx=np.nonzero(own[:,:,3]>=128);b=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)];crops[num]=(job,own,b,'eget rektangel '+str(rect))
+for plan in plans:
+ num=int(plan['bilde'].split('_')[-1]);job,own,b,method=crops[num];x0,y0,x1,y1=b;tw,th=[v*4 for v in plan['maal']];sx=tw/(x1-x0);sy=th/(y1-y0)
+ # En samlet transform for hele motivet, myk egen alfa. Tre egne kantrader beholdes.
+ padded=Image.fromarray(own).crop((x0-3,y0-3,x1+3,y1+3));size=(round(padded.width*sx),round(padded.height*sy));paint=padded.resize(size,Image.Resampling.LANCZOS);pa=np.array(paint);yy,xx=np.nonzero(pa[:,:,3]>=128);cx,cy=int(xx.min()),int(yy.min());cw,ch=int(xx.max()-cx+1),int(yy.max()-cy+1)
+ assert abs(cw-tw)<=1 and abs(ch-th)<=1,(num,cw,ch,tw,th)
+ proto=Image.new('RGBA',(tw+16,th+16));proto.alpha_composite(paint,(8-cx,8-cy));dest=R/f'costume291_{num}-prototype03.png';proto.save(dest)
+ records.append(dict(bilde=plan['bilde'],raa=f'{job}-raa02.png' if job=='fig291_03' else f'{job}-raa01.png',raa_sha256=sha(R/(f'{job}-raa02.png' if job=='fig291_03' else f'{job}-raa01.png')),renset=f'{job}-egen-renset02.png' if job=='fig291_03' else f'{job}-egen-renset01.png',eget_uttak=method,egen_coreboks=b,sx=sx,sy=sy,anisotropi=sx/sy,prototype=dest.name,prototype_sha256=sha(dest),kilde_rgba_sha256=plan['kildergba_sha256']))
+byname={v['bilde']:v for v in records}
+for i in range(1,6):
+ job=f'fig291_{i:02}';j=json.loads((A/'jobber'/job/'jobb.json').read_text());out=Image.new('RGBA',(1536,1024));rows=[]
+ for r in j['ruter']:
+  plan=next(v for v in plans if any(t['bilde']==r['bilde'] for t in v['maaljobber']));pr=byname[plan['bilde']];im=Image.open(R/pr['prototype']);x,y,x1,y1=r['synlig'];out.alpha_composite(im,(64+x*4-8,32+y*4-8));rows.append(dict(bilde=r['bilde'],kostyme=291,rute=r['rute'],rect=[64+x*4,32+y*4,(x1-x)*4,(y1-y)*4],representant=plan['bilde'],prototype='rapporter/'+R.name+'/'+pr['prototype'],prototype_sha256=pr['prototype_sha256'],kilde_rgba_sha256=plan['kildergba_sha256']))
+ dest=R/f'{job}-utkast03.png';out.save(dest);(R/f'rutekart-{job}.json').write_text(json.dumps({job:dict(sha256_resultat=sha(dest),ruter=rows)},indent=2)+'\n')
+(R/'prototype-kvitteringer03.json').write_text(json.dumps(records,indent=2)+'\n');shutil.copy2(__file__,R/'plasser.py.txt');print('19 unike prototyper,28 maal,5 utkast. Maks anisotropi:',max(abs(v['anisotropi']-1) for v in records))

@@ -1,3 +1,8 @@
+<!-- sam291-foerste-20261024:start -->
+Nyeste produksjon: fig291_01..05, Sam tar av bigfootforkledningen i kjøkkenet,28 nye native fra19 motiver. Fem innebygde kall.26 egenkontroll OK/to SJEKK,28 native OK. Alle28 motorlogget,90/90 null på hver side,90 originale flatepar byteidentiske, null HD-endringer utenfor nye aktørflater.19 motivsammenligninger og fem hele bilder sett. Kandidat3761/22006filer,513/1758 hele resultatark. Publisering og faktisk pakkehent føres i rapporter/sam291-foerste-20261024. Ingen ny Tom-/Claude-godkjenning.
+Neste gyldige uavhengige produksjon:291_06..08,18 ruter. Les NESTE.md. Tidligere heli-returer er bevart, H336 ikke startet. Verktøyavviste110/246/304/223 og ugyldige344/346 gjentas ikke. Ingen nødvendig ny Tom-avklaring, automatikken ACTIVE.
+<!-- sam291-foerste-20261024:slutt -->
+
 # Ordre fra Claude
 
 <!-- helikopter178-helreturer-20261024:start -->

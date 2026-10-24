@@ -1,0 +1,66 @@
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,shutil,re,gzip
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam291-foerste-20261024';O=Path(__file__).resolve().parent;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+# Bevis fra den faktiske visningen av19 sammenligninger og fem hele motorbilder.
+d=json.loads((R/'motor-sammenligning.json').read_text());d['oppsummering']['visuelt_sett']=True;d['oppsummering']['visuell_vurdering']='19 hele original/native/motormotiver og fem hele kandidatbilder sett. Forkledning, maskens bakside på gulvet, farger, Sam-design og alfa vurdert. Max i forgrunnen følger uendret spill. Ingen ny Tom-/Claude-godkjenning.';save(R/'motor-sammenligning.json',d)
+f=json.loads((R/'fremdrift.json').read_text());native=json.loads((R/'webp-nye.json').read_text());nr={e['bilde']:e for e in native['filer']}
+for e in f['leveranser']:
+ j=e['jobb'];e.update(native_mottatt=True,native_mottak_ok=True,motorobservert=True,visuelt_sett=True,konstruert_chore6=True,Tom_godkjent=False,Claude_godkjent=False);e['native']=[dict(bilde=r['bilde'],fil=nr[r['bilde']]['fil'],sha256=nr[r['bilde']]['sha256']) for r in json.loads((A/'jobber'/j/'jobb.json').read_text())['ruter']]
+ p=A/'jobber'/j/'notat.md';s=p.read_text();s=s.replace('Ingen originalsilhuettmaske, originalfragmenter eller palettindekser er brukt som nye produksjonspiksler.','Ingen originalsilhuettmaske klipper nye motiver. Uendret native mottak v6 bevarer i tillegg én kildebekreftet brun originalpiksel mykt i hver av1935..1940, seks runtime-ruter. Det er en liten løs stoffprikk, ikke en hel originalrute eller hard klipping av tegningen. Se kildebekreftede-smaadeler.json.');s=re.sub(r'Resultat SHA256: [0-9a-f]+',f'Resultat SHA256: {sha(A/e["resultat"])}',s);s=s.replace('Native mottak, motor og publisering kontrolleres separat og er foreløpig ikke bekreftet.','Native mottak:28/28 OK i bunken, null sjekk/mangler. Ni hele kilde-RGBA-identiske aliaser er gjort native-byteidentiske etter mottaket, for å fjerne små gruppeavhengige reskaleringer. Minste native snitt/union0,778 og dekning0,944. Alle28 er logget i kontrollert360-bilders chore6 på aktør8, pos250,157 og clip1. Samme binær mot grunnlag:90/90 nullkontroller på hver side,90 originale hele flatepar byteidentiske og null HD-endringer utenfor de loggede nye aktørflatene.19 ulike motiver og fem hele spillbilder er visuelt sett. Publisering kvitteres separat etter push/tilbakehenting.');p.write_text(s)
+f.update(hele_figurjobber=513,totalt_figurjobber=1758,mangler_resultat=1245,native_i_kandidat=3761,nye_native=28,hele_ark_denne_bunken=5,nye_native_publisert=False,egenkontroll_ruter_ok=26,egenkontroll_ruter_sjekk=2,egenkontroll_ruter_feil=0,automatisk_native_ok=28,visuelt_sett_motiver=19,motorobservert_ruter=28,publisert=False,automatikk='ACTIVE',fullfort=False,ny_nodvendig_Tom_avklaring=False,neste='fig291_06 til08,18 ruter. Ikke startet ny maling. Bevar heli-returene.')
+save(R/'fremdrift.json',f)
+entries=json.loads((R/'bildekall.json').read_text())
+for e in entries:
+ args=json.loads((R/e['argumenter']).read_text());e.update(prompt_sha256=sha(R/e['prompt']),argumenter_sha256=sha(R/e['argumenter']),referanser=[dict(fil=str(Path(p).relative_to(A)),sha256=sha(Path(p)))for p in args['referenced_image_paths']],status='bevart og kontrollert',brukt_i_sluttleveranse=e['raa']!='fig291_03-raa01.png')
+save(R/'bildekall.json',entries)
+for p,dig in json.loads((R/'beskyttede-kilder.json').read_text()).items():assert sha(A/p)==dig,p
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==json.loads((R/'grunnlag.json').read_text())['stashes']
+# Kontroller også alle tidligere sporede beskyttede referanser, inkludert rapportkilder.
+tracked=subprocess.check_output(['git','ls-files','-z'],cwd=A).split(b'\0');count=0
+for b in tracked:
+ if b and Path(b.decode()).name in ['referanse.png','original_1x.png','prompt.txt','jobb.json']:
+  p=A/b.decode();expected=subprocess.check_output(['git','rev-parse','HEAD:'+b.decode()],cwd=A,text=True).strip();data=p.read_bytes();assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==expected;count+=1
+save(R/'bevaringskontroll.json',dict(beskyttede_jobber_hovedark=9064,alle_sporede_beskyttede=count,alle_byteidentiske=True,stasher=stash,ny_grafikk_i_main=False,gamle_grafikkfiler_bytebevart_i_kandidat=21976,kun_tidligere_modjson_og_SHA256SUMS_endret=True))
+report='''# Sam tar av bigfootforkledningen, fem ark
+
+Fig291_01 til05 er laget, egenkontrollert, native mottatt og visuelt sett i kontrollert motoravspilling.28 nye native fra19 ulike hele kilder, ni eksakte aliaser. Kandidat3761 har22006 filer og371208919 byte. Publisering og pakker kvitteres i egne filer etter faktisk hent. Hele prosjektet er ikke ferdig:513/1758 resultatark,1245 mangler pluss returer, kildefeil og samlet sluttkontroll.
+
+Fem innebygde image_gen-kall, fire rågrunnlag valgt. Første03 hadde en oppdiktet lys ansiktsflate på gulvmasken; nytt02-forsøk viser baksiden som kilden. Kilde er globalt113 i rom56. Sam tar av en lodden forkledning, ikke en annen person som skal tegnes. Sam-/Max-mastere brukes for identitet og strek. Originalene,46 kilder i faktisk motorforløp,19 enkeltmotiver og fem hele sluttbilder er sett. Beskyttede jobbfiler er uendret. Se premissretting.md, råbilder, faktiske prompter og input-SHA-er i bildekall.json.
+
+Python renser egen alfadis og plasserer hele egne tegninger i fast4x, med inntil6,6prosent forskjell mellom bredde-/høydefaktor. Ingen originalsilhuettmaske. Ni eksakte hele kilde-RGBA-aliaser gir byteidentisk native etter dokumentert samordning. Uendret mottak v6 legger til en kildebekreftet brun stoffprikk fra originalen i hver av1935..1940, seks små originalpiksler totalt, mykt oppskalert. Dette er eksplisitt dokumentert og aldri en hard maske over nytegningen.
+
+Egenkontroll:26 ruter OK, to SJEKK i03 ved snitt/union0,74/0,75,100prosent mål og0,2/0,1px forskyvning, ingen FEIL. Automatisk native:28 OK, null sjekk/mangler. Endelig minste native snitt/union0,778 og dekning0,944, uendrede terskler. Et eksisterende listformat i sam296-detaljretur-20261022/rutekart-returer.json stanser global route_maps før jobbfilteret. Mottaket er derfor kjørt med en liten symlenket projeksjon av bare disse fem jobbene og rapporten. Samme uendrede CLI, ingen gammel rapport eller pipelinekode endret. Se mottak-automatisk.json og mottak-slutt.json.
+
+To faktiske360-bilders Linux-kjøringer med samme651aa78c-motor. Chore6, aktør8, pos250,157, clip1, samme tilfeldighetsfrø, rom56.90 kontroller på hver side, alle null. Alle28 nye er logget.90 hele originalflatepar er byteidentiske. Ingen HD-avvik utenfor nye aktørflater kontrollert med sist12frames faktiske loggrektangler.19 hele original/native/motormotiver og fem hele kandidatbilder er sett. Dette er kontrollert avspilling, ikke naturlig gjennomspilling, ny Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Fersk publisert hd-mod c80099158b30fb08fa0cb670acb112bf14fd58f4 er verifisert mot hele Git-treet før kandidaten. Alle21978 tidligere filer er bevart; kun mod.json og SHA256SUMS endres blant dem. Tekniske indeks-/maske-PNG er byteidentiske. Nye fargebilder konverteres med eksisterende webp.convert_image, lossless/exact, og alle RGBA-byte inkludert skjult RGB bekreftes. Én hardlenket kandidat, delt Git og kanoniske spilldata. Se webp-nye.json, kandidat.json og SHA-festede fullmanifest.
+
+Prosjektbibliotekets figurark-fast-storrelse.md brukes for fast4x og uendrede12prosentgrenser. PASS i opphavet gir ikke stilgodkjenning her. Motor-/pipelinekode er uendret. Gamle nattprosesser er ikke startet. Alle9174 tidligere beskyttede input og tre stasher er uendret. Heli-returer H327/H289/H252 er bevart; H336 er ikke startet. Etter fem avsluttede returkall i forrige økt er denne uavhengige familien produsert uten å gjenta verktøyavviste110/246/304/223 eller ugyldige344/346.
+
+Neste er fig291_06 til08,18 ruter i samme46-ruters familie. Ingen ny maling er startet for dem. Native pakker har fortsatt3733 inntil bygge- og nedlastingsbevis foreligger. Automatikken fortsetter, ingen nødvendig Tom-avklaring.
+'''
+(R/'RAPPORT.md').write_text(report)
+(R/'NESTE.md').write_text('''# Gjenoppta kostyme291
+
+Fem hele ark01..05 er kontrollert og klar for additiv publisering. Les mottak-publisert.json hvis den finnes.28 nye, kandidat3761,513 hele figurjobber. Fortsett06..08 med18 ruter fra samme gyldige chore6 i rom56. Søk eksakt hel-RGBA-gjenbruk mot denne bunken først. Ikke gjenoppta en ny rågenerering av allerede leverte01..05. Avklar gul maskes bakside, bevar alle små stoffprikker.
+
+Fem bildekall er ferdige.06..08 er ikke kalt eller reservert. Kildeskript113, baseline360bilder med46loggede kilder og19motorkontroller ligger her. Bevar uavklarte helikopterreturer; ikke gjenta verktøyavviste eller ugyldige jobber. Før neste mottak: docs/WEBP.md og PLASSBRUK.md. Pakker må oppdateres/kontrolleres ved dette samlepunktet og kvitteres separat. Ingen ny Tom-/Claude-godkjenning. Automatikken ACTIVE, all grafikk gjenstår.
+''')
+q=A/'GRAFIKKLISTE.md';s=q.read_text()
+for i in range(1,6):old=f'- [ ] `fig291_{i:02}`';assert old in s;s=s.replace(old,f'- [x] `fig291_{i:02}`',1)
+q.write_text(s)
+q=A/'ORDRE.md';s=q.read_text();header='''<!-- sam291-foerste-20261024:start -->
+Nyeste produksjon: fig291_01..05, Sam tar av bigfootforkledningen i kjøkkenet,28 nye native fra19 motiver. Fem innebygde kall.26 egenkontroll OK/to SJEKK,28 native OK. Alle28 motorlogget,90/90 null på hver side,90 originale flatepar byteidentiske, null HD-endringer utenfor nye aktørflater.19 motivsammenligninger og fem hele bilder sett. Kandidat3761/22006filer,513/1758 hele resultatark. Publisering og faktisk pakkehent føres i rapporter/sam291-foerste-20261024. Ingen ny Tom-/Claude-godkjenning.
+Neste gyldige uavhengige produksjon:291_06..08,18 ruter. Les NESTE.md. Tidligere heli-returer er bevart, H336 ikke startet. Verktøyavviste110/246/304/223 og ugyldige344/346 gjentas ikke. Ingen nødvendig ny Tom-avklaring, automatikken ACTIVE.
+<!-- sam291-foerste-20261024:slutt -->
+
+''';q.write_text(header+s)
+# Vår Python-cache er en regenererbar arbeidsfil, aldri en kildedel.
+cache=A/'verktoy/__pycache__'
+if cache.exists():
+ for p in cache.glob('sjekk_leveranse.cpython-*.pyc'):p.unlink()
+ if not list(cache.iterdir()):cache.rmdir()
+shutil.copy2(__file__,R/'fest-leveranse.py.txt');print('Klar for kildepush',count,'beskyttede,513 ark,28 nye native,ingen FEIL',flush=True)

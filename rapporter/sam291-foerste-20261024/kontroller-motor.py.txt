@@ -1,0 +1,35 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,hashlib,re,shutil,gzip
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam291-foerste-20261024';O=Path(__file__).resolve().parent;B=O/'grunnlag6';C=O/'kandidat6';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+rep=json.loads((R/'mottak-slutt.json').read_text());byname={n:r for v in rep['ark'].values() for n,r in v['ruter'].items()};targets={int(n.split('_')[-1]) for n in byname}
+def events(folder):
+ s=(folder/'scummvm.log').read_text();return [dict(frame=int(f),cel=int(n),x=int(x),y=int(y),w=int(w),h=int(h)) for f,n,x,y,w,h in re.findall(r'frame (\d+) soft cel\s+(\d+) costume\s*291\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',s)]
+b,c=events(B),events(C);assert b==c and targets<={r['cel'] for r in c};checks=[]
+for folder in [B,C]:
+ log=(folder/'scummvm.log').read_text();qs=[(int(f),int(n)) for f,n in re.findall(r'verify frame (\d+): (\d+) screen pixels differ from the whole screen built again',log)];assert len(qs)==90 and all(n==0 for f,n in qs);checks.append(qs)
+assert checks[0]==checks[1]
+pairs=[]
+for p in sorted(C.glob('frame_*_room[0-9][0-9][0-9].png')):
+ base=B/p.name;f=int(p.name.split('_')[1]);fa=p.with_name(p.stem+'_flat.png');fb=base.with_name(base.stem+'_flat.png');assert base.exists() and fa.exists() and fb.exists()
+ old=np.array(Image.open(base));new=np.array(Image.open(p));assert np.array_equal(np.array(Image.open(fa)),np.array(Image.open(fb))),p.name
+ diff=np.any(old!=new,axis=2);mask=np.zeros(diff.shape,bool)
+ # Kun kontrollrektangler fra faktisk tegnelogg, ikke produksjonsmasker.
+ for e in c:
+  if e['cel'] in targets and e['frame']<=f and e['frame']>=f-12:
+   x0=max(0,(e['x']-8)*4);x1=min(1280,(e['x']+e['w']+8)*4);y0=max(0,(e['y']-8)*4);y1=min(800,(e['y']+e['h']+8)*4);mask[y0:y1,x0:x1]=True
+ pairs.append(dict(frame=f,rom=int(p.stem[-3:]),original_byteidentisk=True,HD_avvik=int(diff.sum()),HD_avvik_utenfor_siste12frames_loggede_nye_flate=int((diff&~mask).sum()),grunnlag_sha256=sha(base),kandidat_sha256=sha(p),original_sha256=sha(fa)))
+# Bevar original/native/motor for hvert av de19 nye hele motivene.
+plans=json.loads((R/'ruteplan-unik.json').read_text());tiles=[];vis=[]
+for t in plans:
+ n=int(t['bilde'].split('_')[-1]);e=next(e for e in c if e['cel']==n);f=((e['frame']//4)+1)*4;p=C/f'frame_{f:06}_room056.png';ori=B/f'frame_{f:06}_room056_flat.png';r=byname[t['bilde']];mx,my=r['marg'];native=Image.open(O/'mottak'/r['fil']).convert('RGBA');original=Image.open(P/'work/extract/costumes'/f'{t["bilde"]}.png').convert('RGBA').resize((e['w']*4,e['h']*4),Image.Resampling.NEAREST)
+ rect=((e['x']-mx)*4,(e['y']-my)*4,(e['x']+e['w']+mx)*4,(e['y']+e['h']+my)*4);motor=Image.open(p).crop(rect).convert('RGBA');w,h=native.size;tile=Image.new('RGB',(w*3+16,h+25),(70,70,70));bg=Image.new('RGBA',(w,h),(70,70,70,255));bg.alpha_composite(original,(mx*4,my*4));tile.paste(bg.convert('RGB'),(0,25));bg=Image.new('RGBA',(w,h),(70,70,70,255));bg.alpha_composite(native);tile.paste(bg.convert('RGB'),(w+8,25));tile.paste(motor.convert('RGB'),(w*2+16,25));ImageDraw.Draw(tile).text((5,5),f'{t["bilde"]}: original | native | faktisk motor frame{f}',fill=(255,255,255));tile.save(R/f'{t["bilde"]}-original-native-motor.png');tiles.append(tile);vis.append(dict(bilde=t['bilde'],logg_frame=e['frame'],bildeframe=f,pos=[e['x'],e['y']],maal=[e['w'],e['h']],native_sha256=sha(O/'mottak'/r['fil']),motor_sha256=sha(p),kontrollbilde=f'{t["bilde"]}-original-native-motor.png'))
+for i in range(0,len(tiles),4):
+ group=tiles[i:i+4];w=1900;thumbs=[im.resize((min(w,im.width),round(im.height*min(1,w/im.width)))) for im in group];h=sum(t.height for t in thumbs)+8*(len(thumbs)-1);out=Image.new('RGB',(w,h),(40,40,40));y=0
+ for t in thumbs:out.paste(t,(0,y));y+=t.height+8
+ out.save(R/f'motor-varianter-{i//4+1}.png')
+for f in [64,80,100,120,148]:
+ for folder,label in [(B,'grunnlag'),(C,'kandidat')]:shutil.copy2(folder/f'frame_{f:06}_room056.png',R/f'helscene-{label}-{f}.png')
+summary=dict(binar_sha256=sha(P/'engine/scummvm/scummvm'),to_faktiske_kjoringer=True,antall_bilder_per_kjoring=360,dumpfrekvens=4,kontroller_per_kjoring=[90,90],null_per_kjoring=[90,90],nye_native_observert=len(targets),ulike_motiver=len(plans),originale_flatepar_byteidentiske=len(pairs),par=len(pairs),maks_avvik_utenfor_loggede_nye_flate=max(v['HD_avvik_utenfor_siste12frames_loggede_nye_flate']for v in pairs),maks_HD_avvik=max(v['HD_avvik'] for v in pairs),samme_celkall_og_posisjoner=True,konstruert_chore6=True,aktor8=True,pos='250,157',clip=1,ingen_naturlig_gjennomspilling=True,ny_Windows_eller_web=False,visuelt_sett=False)
+save(R/'motor-sammenligning.json',dict(oppsummering=summary,par=pairs,visuelle_varianter=vis));shutil.copy2(__file__,R/'kontroller-motor.py.txt');print(summary,flush=True)

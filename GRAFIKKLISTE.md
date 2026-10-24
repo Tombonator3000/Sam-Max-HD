@@ -1679,16 +1679,16 @@ Figurark for Sam og Max, Max, Sam.
 - [x] `fig124_06` (figurark 6 for Max (kostyme 124), 16 ruter: animasjon 7 mot høyre (4 ruter); animasjon 8 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_07` (figurark 7 for Max (kostyme 124), 12 ruter: animasjon 9 mot høyre (12 ruter), bilde to `hovedark/max.png`)
 - [ ] `fig124_08` (figurark 8 for Max (kostyme 124), 3 ruter: animasjon 10 mot høyre (1 rute); animasjon 11 mot høyre (2 ruter), bilde to `hovedark/max.png`)
-- [ ] `fig291_01` (figurark 1 for Sam (kostyme 291), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig291_01` (figurark 1 for Sam (kostyme 291), 9 ruter: start mot høyre (9 ruter), bilde to `hovedark/sam.png`)
 
 ## Bestilling 44
 
 Figurark for Sam, Sam og Max.
 
-- [ ] `fig291_02` (figurark 2 for Sam (kostyme 291), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig291_03` (figurark 3 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig291_04` (figurark 4 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
-- [ ] `fig291_05` (figurark 5 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig291_02` (figurark 2 for Sam (kostyme 291), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig291_03` (figurark 3 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig291_04` (figurark 4 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
+- [x] `fig291_05` (figurark 5 for Sam (kostyme 291), 4 ruter: start mot høyre (4 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig291_06` (figurark 6 for Sam (kostyme 291), 6 ruter: start mot høyre (6 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig291_07` (figurark 7 for Sam (kostyme 291), 7 ruter: start mot høyre (7 ruter), bilde to `hovedark/sam.png`)
 - [ ] `fig291_08` (figurark 8 for Sam (kostyme 291), 5 ruter: start mot høyre (5 ruter), bilde to `hovedark/sam.png`)

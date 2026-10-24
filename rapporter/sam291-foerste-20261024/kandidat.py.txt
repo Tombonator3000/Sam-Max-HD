@@ -1,0 +1,46 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from PIL import Image
+from smhd.webp import convert_image
+import gzip,hashlib,json,os,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam291-foerste-20261024';O=Path(__file__).resolve().parent;M=P/'mods/gpt';K=O/'mod-kandidat';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+rep=json.loads((O/'mottak/myke.json').read_text());assert rep['ruter_ok']==28 and rep['ruter_sjekk']==rep['ruter_mangler']==rep['ruter_teknisk']==0
+save(R/'mottak-automatisk.json',rep);byname={n:r for job in rep['ark'].values() for n,r in job['ruter'].items()};norm=[]
+for plan in json.loads((R/'ruteplan-unik.json').read_text()):
+ name=plan['bilde'];src=O/'mottak'/byname[name]['fil'];original=Image.open(P/'work/extract/costumes'/f'{name}.png').convert('RGBA');proven=hashlib.sha256(original.tobytes()).hexdigest()
+ for e in plan['maaljobber']:
+  n=e['bilde'];other=Image.open(P/'work/extract/costumes'/f'{n}.png').convert('RGBA');assert other.size==original.size and other.tobytes()==original.tobytes(),n
+  old=byname[n];dest=O/'mottak'/old['fil']
+  if n!=name:
+   oldhash=sha(dest)
+   if oldhash!=sha(src):shutil.copy2(src,dest)
+   chosen=dict(byname[name]);chosen.update(fil=old['fil'],rute=old['rute'],kostyme=old['kostyme'],animasjon=old['animasjon'],retning=old['retning'],lag=old['lag'],eksakt_native_fra=name,original_rgba_sha256=proven);old.update(chosen)
+   norm.append(dict(bilde=n,kanonisk=name,original_rgba_sha256=proven,for_native_sha256=oldhash,etter_native_sha256=sha(dest),endret=oldhash!=sha(dest)))
+for r in byname.values():assert r['status']=='ok' and r['kilde'].startswith('arket') and r['i_modden'] and sha(O/'mottak'/r['fil'])==r['sha256']
+save(O/'mottak/myke.json',rep);save(R/'mottak-slutt.json',rep);save(R/'native-eksakt-gjenbruk.json',norm)
+assert not K.exists();parent=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0];assert parent==json.loads((R/'grunnlag.json').read_text())['hd_mod']
+tree={}
+for line in subprocess.check_output(['git','ls-tree','-r','-z',parent],cwd=P).split(b'\0'):
+ if line:meta,n=line.split(b'\t');tree[n.decode()]=meta.split()[2].decode()
+files=sorted(p for p in M.rglob('*') if p.is_file());assert len(files)==len(tree)==21978
+old={}
+for p in files:
+ b=p.read_bytes();rel=str(p.relative_to(M));assert hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()==tree[rel],rel;old[rel]=hashlib.sha256(b).hexdigest()
+with gzip.open(R/'grunnlag-filhash.json.gz','wt') as f:json.dump(old,f,sort_keys=True)
+shutil.copytree(M,K,copy_function=os.link)
+rows=[]
+for name,r in byname.items():
+ src=O/'mottak'/r['fil'];out=K/r['fil'];assert not out.exists() and not out.with_suffix('.webp').exists(),name
+ info=convert_image(src,out.with_suffix('.webp'));target=out.with_suffix(info['extension']);rows.append(dict(bilde=name,png_sha256=sha(src),fil=str(target.relative_to(K)),sha256=sha(target),native_fra=r.get('eksakt_native_fra'),**info))
+meta=json.loads((M/'mod.json').read_text());assert meta['costume_cels']==3733;meta['costume_cels']+=28;assert 'costume291' not in meta['costumes'];meta['costumes'].append('costume291');meta['costumes'].sort();meta['created']='2026-10-24';(K/'mod.json').unlink();save(K/'mod.json',meta)
+(K/'SHA256SUMS').unlink();checks={str(p.relative_to(K)):sha(p) for p in sorted(K.rglob('*')) if p.is_file()};(K/'SHA256SUMS').write_text(''.join(f'{v}  {k}\n' for k,v in sorted(checks.items())));checks['SHA256SUMS']=sha(K/'SHA256SUMS')
+for rel,dig in old.items():
+ if rel not in ['mod.json','SHA256SUMS']:assert checks[rel]==dig,rel
+for rel in old:
+ if rel.endswith(('_idx.png','_mask.png')):assert checks[rel]==old[rel]
+assert len(checks)==22006 and json.loads((K/'mod.json').read_text())['costume_cels']==3761
+save(R/'webp-nye.json',dict(parent=parent,complete=True,RGBA_eksakt=True,indeks_og_masker_byteidentiske=True,filer=rows))
+with gzip.open(R/'kandidat-filhash.json.gz','wt') as f:json.dump(checks,f,sort_keys=True)
+save(R/'kandidat.json',dict(parent=parent,filer=len(checks),native=3761,tillegg=28,enkelt_kandidat=str(K),full_gitkopi=False,spillkopi=False,bytes=sum(p.stat().st_size for p in K.rglob('*') if p.is_file()),endret_tidligere=['mod.json','SHA256SUMS'],aliaser=len(norm)))
+shutil.copy2(__file__,R/'kandidat.py.txt');print('Kandidat3761',len(checks),'filer;28native;9byteeksakte aliaser;allesynligeogskjulteRGBAverifisert',flush=True)
