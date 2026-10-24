@@ -22,7 +22,7 @@ for f in sorted(p for p in B.glob('frame_*_room*.png')if not p.stem.endswith('_f
    im=Image.open(root/f.name).crop(box).convert('RGB').resize((box[2]*2-box[0]*2,box[3]*2-box[1]*2),Image.Resampling.NEAREST);im.thumbnail((670,330),Image.Resampling.LANCZOS);xx,yy=10+j*690,45+i*375;board.paste(im,(xx,yy));d.text((xx,yy-23),str(e['cel'])+' '+label,fill='white')
   shutil.copyfile(g,R/f'stilprototype1990til1994-rute{e["cel"]}-motor.png')
  if np.array_equal(orig1,orig2)and bc[frame]==cc[frame]:
-  outside=int((diff&~allowed).sum());assert outside==0,(frame,outside);strict.append(dict(frame=frame,original_flat_SHA256=sha(ff),originale_tegnekall_identiske=True,endrede_HD=int(diff.sum()),utenfor_proevde_ruter=0))
+  outside=int((diff&~allowed).sum());assert outside==0,(frame,outside);strict.append(dict(frame=frame,fil=f.name,original_flat_SHA256=sha(ff),originale_tegnekall_identiske=True,endrede_HD=int(diff.sum()),utenfor_proevde_ruter=0))
  else:other.append(dict(frame=frame,ulik_original_flat=int(np.any(orig1!=orig2,2).sum()),originale_tegnekall_identiske=bc[frame]==cc[frame],ikke_brukt_som_strengt_HD_par=True))
 assert {e['rute']for e in rows}==set(range(1990,1995));board.save(R/'stilprototype-motor-femfasepar.png')
 buf=[]
