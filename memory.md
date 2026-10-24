@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-kantfarger-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Grå bladkant og grønn halefinne forbedret, materialretur består, 2026-10-24 12:35
+
+Fem nye faktiske innebygde image_gen-kall H326..H330 er utført, totalt 154 mottatte råbilder. Seks egne komposisjoner omfatter én Python-brunprøve fra samme H327-råbilde. H327/egen-del-RGB er holdt arbeidskontrollpunkt for 1987: grå bladkant og grønn nedre halefinne er forbedret. Form/åpning 0/0. Tre positive materialfester består: grått [15,4], grønt [0,5]/[26,25]. Ekstra materialpiksler består, og rå RGB 263/6315 er svakere enn H323s 239/6260 selv om grupperte positive går fra fem til tre. Ingen samlet material-/stilgodkjenning. H328s bredere bomstripe løser ikke halefestet. H329/H330s naturlige RGBA taper form og er retur.
+
+Kilde 348aa26c6e4967469a3d1941e1fc3b07b2afa451 og rapport 708e2e247a61500e0a5e13dedcc8b8470cf217b0 er pushet til gpt-arbeid og faktisk strømmet tilbake: 132 kildefiler/17535151 byte og 17 rapportfiler/1177121 byte. Alle lengder/SHA256/Git-blob SHA1 er bekreftet uten ekstra payload. [Status og kontrollbevis](https://github.com/Tombonator3000/Sam-Max-HD/tree/708e2e247a61500e0a5e13dedcc8b8470cf217b0/rapporter/helikopter178-forfaser1990til1994-20261024/kantfarger-status.md).
+
+Fortsatt 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 publiserte native, fig178_02 20/24 og familie 178 32/102. Alle 9174 beskyttede input, derav 9064 jobb/hovedark, og tre stasher er uendret. Ingen ny hel resultat.png, formelt native mottak, publisert mod/pakke eller Tom-/Claude-godkjenning. Fire releasevedleggs metadata er uendret; tidligere faktisk nedlastede og innholdskontrollerte Linux 392411640 byte og Windows 544532414 byte beholdes enkeltvis. H331 er ikke startet, forberedt eller reservert. Ingen nødvendig ny Tom-avklaring. Automatikken ACTIVE, all grafikk og samlet sluttkontroll er ikke ferdig. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-kantfarger-20261024:slutt -->
+
 <!-- helikopter178-bladdeler-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 
