@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-bladfarger-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Grønt stagfeste tilbake, fortsatt materialretur, 2026-10-24 11:17
+
+Fem nye faktiske innebygde image_gen-kall H311..H315 retter deler av fase 1987 i fig178_02, ikke fem hele figurjobber. Totalt 139 mottatte råbilder. H315/egen-redigert-felt holdes som nytt arbeidskontrollpunkt: det lille grønne fremre stagfestet er tilbake, form/åpning 0/0, men ni positive materialfester består: sort 1/grått 5/grønt 3. Blått/gull/brunt/lavendel har 0 positive, men ekstra klassepiksler består og gyllenaksent er 101 mot H310s 95. H312/H313s store gråbånd og H314s grønne halebase som spiser tre brune fester er returer. Kilden har også innvendige grå bladfelt med RGB 55/71/115, ikke bare grå nedre kant. Fem egne komposisjoner/native-PNG/RGBA har byteeksakt replay fra 20 egne råbilder; valgt H315 har ti direkte råopphav. Ingen originalbilder/masker brukes som produksjonsbilder; egen alfa og 3 HD/12 prosent-porter beholdes.
+
+Kilde 9aac6cc58819ca3d68b227e2fad2a2afe30a8ef9 og rapport 5ac4f3e74ac062c48102f10af1569ce80584f85c er pushet på gpt-arbeid og faktisk strømmet tilbake: 123 kildefiler/14415648 byte og 11 rapportfiler/1135072 byte, alle lengde-/SHA256-/Git-blob SHA1-bekreftet uten ekstra lagret payload. [Status og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/5ac4f3e74ac062c48102f10af1569ce80584f85c/rapporter/helikopter178-forfaser1990til1994-20261024/bladfarger-status.md).
+
+Fortsatt 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 publiserte native, fig178_02 20/24 og familie 178 32/102. Alle 9174 beskyttede input, derav 9064 jobb/hovedark, og tre opprinnelige stasher er uendret. Ingen ny hel resultat.png, formelt native mottak, publisert modgrafikk/pakke eller Tom-/Claude-godkjenning. Fire releasevedleggs metadata er uendret; tidligere faktisk nedlastede og innholdskontrollerte Linux 392411640 byte og Windows 544532414 byte beholdes enkeltvis. H289/1988 og H252/1990 er uendret. H316 er ikke startet, forberedt eller reservert. Sam er eneste godkjente stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE. All grafikk og samlet sluttkontroll gjenstår. Følg docs/PLASSBRUK.md og docs/WEBP.md.
+<!-- helikopter178-bladfarger-20261024:slutt -->
+
 <!-- helikopter178-materialfarger-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 
