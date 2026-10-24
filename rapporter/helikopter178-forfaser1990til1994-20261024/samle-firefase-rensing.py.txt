@@ -1,0 +1,136 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image, ImageDraw
+import hashlib
+import json
+import subprocess
+import numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+
+def put(p, value):
+    p.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+variants = {
+    'H279': 'bare-vindu',
+    'H280': 'global-brunt',
+    'H281': 'global-brunt',
+    'H282': 'global-brunt',
+    'H283': 'bare-hale',
+}
+effects = {
+    'H279': 'Ny helredigering forsøker dypere bakre vindushjørne og grå eksponering ved masten. Bare eget vindusrektangel beholdes over H270. Ovalt glass består, små blå/lavendel felt mistes, og 21 positive materialavvik består. H270 med 19 avvik beholdes som rent 1987-grunnlag.',
+    'H280': 'Fase 1989 får delte grå sidefelt og mindre svart halerotornav. Hele tegningen har fortsatt fasettpreg, manglende grå rotorfelt, feil småfelter og form/åpning. Ikke en godkjent erstatning for H255.',
+    'H281': 'Fase 1988 får adskilte sidefelt, men venstre felt blir en trappet figur, det runde halerotornavet består og hele proporsjoner endres. Formkontrollen blir vesentlig svakere. Ikke beholdt foran H256 eller H283s smale halevariant.',
+    'H282': 'Fase 1986 får grå diagonal halerotor og et grønt avbrudd i midtre sidefelt. Rød bladspiss er bevart som rød, men for stor/lys og feilregistrert. Små vindusfelt, grå rotorfelt, sideformer og silhuett er fortsatt returer. Ingen import.',
+    'H283': 'Kun halerotoren for 1988 rettes fra H256. Den ned-venstre diagonalen er nå grå med smalt møtepunkt, uten den tidligere store runde grå hetten. Eget helt halerektangel blandes over egen kalibrert H256, med bytebevarte piksler utenfor ROI. Denne smale varianten holdes for videre 1988-retting, men fem formfester og 69 positive materialavvik består. Sidebeltet og små rotorfelt er fortsatt feil.',
+}
+calls = read(R / 'faktiske-bildekall.json')
+assert [v['kall'] for v in calls] == [f'H{n}' for n in range(176, 284)]
+assert not (R / 'kall/H284').exists()
+entries = []
+board = Image.new('RGB', (704, 1160), '#87959e')
+draw = ImageDraw.Draw(board)
+for row, (cid, variant) in enumerate(variants.items()):
+    K = R / 'kall' / cid
+    V = K / variant
+    plan = read(K / 'plan.json')
+    args = read(K / 'argumenter.json')
+    ledger = next(v for v in calls if v['kall'] == cid)
+    assert plan['utfort'] and plan['innebygd_image_gen']
+    assert sha(K / 'raa.png') == plan['raa_sha256'] == ledger['raa_sha256']
+    assert sha(K / 'prompt-brukt.txt') == ledger['prompt_sha256']
+    assert sha(K / 'argumenter.json') == ledger['argumenter_sha256']
+    assert (K / 'prompt-brukt.txt').read_text() == args['prompt'] + '\n'
+    for f, h in plan['referanser_SHA256'].items():
+        assert sha(Path(f)) == h, f
+    raw = np.array(Image.open(K / 'raa.png').convert('RGBA'))
+    alpha = raw[:, :, 3]
+    assert np.any(alpha == 0) and np.any(alpha == 255) and np.any((alpha > 0) & (alpha < 255))
+    q = read(V / 'kontroll.json')
+    m = read(V / 'hele-materialer-kontroll.json')
+    assert not q['teknisk_ok'] and not m['materialporter_bestatt']
+    for f, data in [('kontroll.json', q), ('hele-materialer-kontroll.json', m)]:
+        data.update(visuelt_sett=True, native_mottatt=False, motorobservert=False, publisert=False)
+        if f == 'kontroll.json':
+            data.update(status='RETUR_FORM_MATERIAL_ELLER_MOTIV', egen_stilvurdering_bestatt=False)
+        put(V / f, data)
+    ledger['gruppe'] = 'firefase-rensing-1986til1989'
+    entry = dict(
+        kall=cid, rute=plan['rute'], variant=cid + '/' + variant,
+        raa_SHA256=sha(K / 'raa.png'), prompt_SHA256=ledger['prompt_sha256'],
+        argumenter_SHA256=ledger['argumenter_sha256'],
+        maal=list(raw.shape[1::-1]), alfa0=int((alpha == 0).sum()),
+        alfa255=int((alpha == 255).sum()), myk_alfa=int(((alpha > 0) & (alpha < 255)).sum()),
+        laget=True, raa_visuelt_sett=True, egenkontroll_utfort=True,
+        egenkontroll_bestatt=False, retur=effects[cid],
+        native_proeve_visuelt_sett=True, native_mottatt=False,
+        motorobservert=False, publisert=False, Tom_godkjent=False, Claude_godkjent=False,
+        egen_heltegning_SHA256=sha(V / 'egen-heltegning.png'),
+        native_SHA256=sha(V / 'prototype-under-kontroll.png'),
+        hel_skala=q['hel_skala'], hel_flytt=q['flytt'],
+        marg_originalpiksler=[q['margx'], q['margy']],
+        snitt_union=q['snitt_union'], dekning=q['dekning'],
+        alfa_fester_over3HD=q['alfa_fester_over3HD'], apninger_over3HD=q['apninger_over3HD'],
+        samlet_materialkontroll=dict(
+            hel_flytt_HD=m['hel_flytt_HD'], snitt_union=m['snitt_union'],
+            alfa_fester_over3HD=m['alfa_fester_over3HD'], apninger_over3HD=m['apninger_over3HD']),
+        positive_materialavvik=sum(v['fester_over3HD'] for v in m['materialer']),
+        materialeavvik=m['materialer'],
+        alle_fargediagnoser=len(q['farger']),
+        fargefester_over3HD=sum(v['native_fester_over3HD'] for v in q['farger']),
+        ekstra_fargeklassepiksler_over3HD=sum(v['ekstra_paletteklassifiserte_nativepiksler_over3HD'] for v in q['farger']),
+    )
+    entries.append(entry)
+    put(K / 'raa-kontroll.json', entry)
+    (K / 'notat.md').write_text(
+        f'# {cid}: retting av fase {plan["rute"]}\n\n'
+        'Faktisk innebygd image_gen-kall, modellnavn ikke oppgitt. Råbilde, faktisk prompt, argumenter og referansehash er bevart. Riktig original i spillkontekst og godkjent Sam er sett før motivet. Egne tidligere prøver er redigeringsgrunnlag, aldri godkjente stilankere.\n\n'
+        + effects[cid] + '\n\n'
+        f'Kontroll: snitt/union {q["snitt_union"]}, dekning {q["dekning"]}, form/åpning {q["alfa_fester_over3HD"]}/{q["apninger_over3HD"]} ved direkte helplassering. Samlet materialkontroll bruker helflytt {m["hel_flytt_HD"]}, form/åpning {m["alfa_fester_over3HD"]}/{m["apninger_over3HD"]}, og har {entry["positive_materialavvik"]} positive materialavvik. Alle {len(q["farger"])} fargediagnoser beholdes, med {entry["fargefester_over3HD"]} positive og {entry["ekstra_fargeklassepiksler_over3HD"]} ekstra klasseavvik. Ingen 3 HD-grenser er endret.\n\n'
+        'Rensing bruker bare eget RGB/alpha og kanonisk brunfarge. Hele motivet flyttes/skaleres samlet. Egne rektangulære delbilder bruker premultiplisert blanding uten originalmasker eller originalpiksler. Laget og egenkontrollert som forsøk, fortsatt retur. Ingen ny hel resultat.png, native mottak, motoravspilling, publisering eller Tom-/Claude-godkjenning. Se firefase-rensing-status.md.\n'
+    )
+    source = Image.open(Path(plan['kilde_mappe']) / 'original-1x.png').convert('RGBA')
+    original = Image.new('RGBA', (352, 200))
+    original.alpha_composite(source.resize((source.width * 4, source.height * 4), Image.Resampling.NEAREST), (24, 24))
+    native = Image.open(V / 'prototype-under-kontroll.png').convert('RGBA')
+    drawing = Image.new('RGBA', (352, 200))
+    drawing.alpha_composite(native, (24 - q['margx'] * 4, 24 - q['margy'] * 4))
+    for col, (im, title) in enumerate([(original, str(plan['rute']) + ' original'), (drawing, cid + '/' + variant)]):
+        x, y = col * 352, row * 232
+        board.paste(im, (x, y + 24), im)
+        draw.text((x + 8, y + 6), title, fill='black')
+
+put(R / 'faktiske-bildekall.json', calls)
+board.save(R / 'firefase-rensing-native-forloep.png')
+put(R / 'rutekart-firefase-rensing.json', dict(
+    utc=datetime.now(timezone.utc).isoformat(), jobb='fig178_02',
+    nye_bildekall=5, faktiske_bildekall_totalt=108, leveranser=[], raa=entries,
+    rent_1987_arbeidskontrollpunkt='H270/utsnitt-egenbbox',
+    holdt_1988_haleretting='H283/bare-hale',
+    H280_H281_H282_ikke_valgt_som_bedre_hel_erstatning=True,
+    egenkontroll_bestatt=False, native_mottatt=False, nye_motoravspillinger=0,
+    publisert=False, Tom_godkjent=False, Claude_godkjent=False))
+
+expected = read(O / 'kandidat3733-filhash.json')
+actual = {str(p.relative_to(P / 'mods/gpt')): sha(p) for p in (P / 'mods/gpt').rglob('*') if p.is_file()}
+assert actual == expected and len(actual) == 21978
+remote = subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/hd-mod'], cwd=P, text=True).split()[0]
+assert remote == 'c80099158b30fb08fa0cb670acb112bf14fd58f4'
+old, new = read(O / 'vindusramme1987-release-metadata.json'), read(O / 'firefase-rensing-release-metadata.json')
+assets = lambda d: sorted([{k: a[k] for k in ['id', 'name', 'size', 'digest']} for a in d['assets']], key=lambda a: a['id'])
+assert old['id'] == new['id'] and assets(old) == assets(new)
+put(R / 'firefase-rensing-mod-pakker-uendret.json', dict(
+    utc=datetime.now(timezone.utc).isoformat(), hd_mod=remote,
+    aktive_modfilhash_bekreftet=21978, tidligere_faktisk_hentet_fullmanifest_bekreftet=True,
+    fjern_SHA_bekreftet=True, nye_kandidater=0, nye_motoravspillinger=0,
+    nye_pakker=0, nye_arkivnedlastinger=0, nye_slettinger=0,
+    release_id=new['id'], release_url=new['html_url'], releasevedlegg_uendret=assets(new),
+    tidligere_faktiske_pakkekontroller_gjelder=True, ny_faktisk_pakkenedlasting=False))
+(R / 'samle-firefase-rensing.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps([dict(kall=v['kall'], rute=v['rute'], form=v['alfa_fester_over3HD'], apning=v['apninger_over3HD'], materialer=v['positive_materialavvik']) for v in entries]))

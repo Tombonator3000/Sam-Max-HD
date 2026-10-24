@@ -1,0 +1,94 @@
+from pathlib import Path
+from PIL import Image
+from io import BytesIO
+from smhd.myk import _premul_resize
+import ast
+import hashlib
+import json
+import numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+O = Path(__file__).resolve().parent
+R = P / 'work/.gpt-gren/rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+# Reuse the exact previously verified own-RGBA arithmetic, not source pixels.
+tree = ast.parse((O / 'replay-vindusramme1987.py').read_text())
+defs = [v for v in tree.body if isinstance(v, ast.FunctionDef) and v.name in ['brown', 'blend', 'pngsha']]
+assert len(defs) == 3
+exec(compile(ast.Module(body=defs, type_ignores=[]), '<own-rgba-functions>', 'exec'))
+files = {c: R / 'kall' / c / 'raa.png' for c in ['H256', 'H279', 'H280', 'H281', 'H282', 'H283']}
+base = R / 'kall/H270/utsnitt-egenbbox/egen-heltegning.png'
+prior = read(R / 'replay-vindusramme1987.json')
+assert prior['kun_egne_fire_raabilder'] and prior['egen_heltegning_PNG_og_RGBA_byteeksakt']
+assert sha(base) == prior['egen_heltegning_PNG_SHA256']
+allowed = {p.resolve() for p in files.values()} | {base.resolve()}
+realopen = Image.open
+opened = []
+
+def guard(fp, *args, **kwargs):
+    p = Path(fp).resolve()
+    assert p in allowed, str(p)
+    opened.append(str(p))
+    return realopen(fp, *args, **kwargs)
+
+spec = {
+    'H279/bare-vindu': (72, 36),
+    'H280/global-brunt': (70, 39),
+    'H281/global-brunt': (67, 36),
+    'H282/global-brunt': (64, 35),
+    'H283/bare-hale': (67, 36),
+}
+Image.open = guard
+try:
+    raw = {c: np.array(Image.open(p).convert('RGBA')) for c, p in files.items()}
+    old = np.array(Image.open(base).convert('RGBA'))
+    variants = {
+        'H279/bare-vindu': blend(old, brown(raw['H279']), [525, 545, 840, 698], 12, True),
+        'H280/global-brunt': brown(raw['H280']),
+        'H281/global-brunt': brown(raw['H281']),
+        'H282/global-brunt': brown(raw['H282']),
+        'H283/bare-hale': blend(brown(raw['H256']), brown(raw['H283']), [385, 605, 570, 835], 12, True),
+    }
+    natives = {}
+    for name, own in variants.items():
+        K = R / 'kall' / name
+        assert pngsha(own) == sha(K / 'egen-heltegning.png'), name
+        q = read(K / 'kontroll.json')
+        sx, sy = q['hel_skala']
+        clean = own.copy()
+        clean[clean[:, :, 3] < 8] = 0
+        scaled = _premul_resize(clean, (round(clean.shape[1] * sx), round(clean.shape[0] * sy)))
+        w, h = spec[name]
+        W, H = (w + 2 * q['margx']) * 4, (h + 2 * q['margy']) * 4
+        native = np.zeros((H, W, 4), np.uint8)
+        px, py = q['margx'] * 4 + q['flytt'][0], q['margy'] * 4 + q['flytt'][1]
+        x0, y0 = max(px, 0), max(py, 0)
+        x1, y1 = min(px + scaled.shape[1], W), min(py + scaled.shape[0], H)
+        native[y0:y1, x0:x1] = scaled[y0 - py:y1 - py, x0 - px:x1 - px]
+        assert pngsha(native) == sha(K / 'prototype-under-kontroll.png'), name
+        natives[name] = native
+finally:
+    Image.open = realopen
+
+rows = []
+for name, own in variants.items():
+    K = R / 'kall' / name
+    native = natives[name]
+    assert np.array_equal(own, np.array(Image.open(K / 'egen-heltegning.png').convert('RGBA')))
+    assert np.array_equal(native, np.array(Image.open(K / 'prototype-under-kontroll.png').convert('RGBA')))
+    rows.append(dict(
+        variant=name, egen_PNG_SHA256=pngsha(own), egen_RGBA_SHA256=hashlib.sha256(own.tobytes()).hexdigest(),
+        native_PNG_SHA256=pngsha(native), native_RGBA_SHA256=hashlib.sha256(native.tobytes()).hexdigest(),
+        egen_og_native_PNG_og_RGBA_byteeksakt=True))
+proof = dict(
+    produksjonsbilder_aapnet=opened, produksjon_kun_egne_genererte_bilder=True,
+    originalbilder_eller_originalmasker_aapnet_under_produksjon=0,
+    direkte_raw_SHA256={c: sha(p) for c, p in files.items()},
+    H279_egen_base=dict(bilde=str(base), SHA256=sha(base), tidligere_fire_raw_replay='replay-vindusramme1987.json'),
+    H283_direkte_raa_med_sluttpiksler=['H256', 'H283'],
+    kanonisk_RGB_egne_ROI_og_helregistrering_er_scalar_metadata=True,
+    varianter=rows, laget_ekstra_fullkopi=False, native_mottatt=False, motorobservert=False, publisert=False)
+(R / 'replay-firefase-rensing.json').write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
+(R / 'replay-firefase-rensing.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Fem egne heltegninger og native-PNG/RGBA byteeksakt gjenskapt uten originalbilder under produksjon.')

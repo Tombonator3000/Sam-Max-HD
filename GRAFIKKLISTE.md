@@ -1,5 +1,12 @@
 # Grafikkliste
 
+<!-- helikopter178-firefase-rensing-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+Fem faktiske innebygde image_gen-kall H279..H283 retter åpne faser 1986..1989. Totalt 108 kall i bunken, ingen nye hele jobber eller native mottak. Rent H270/1987 beholdes med null form/åpning og 19 positive materialavvik. H283/bare-hale holdes som smal 1988-haleretting fra H256 med grå ned-venstre diagonal og smalere navmøte, men fem formfester og 69 positive materialavvik består. H280/H281/H282 er ikke godkjente hele erstatninger. Alle fem egne heltegninger og native-PNG/RGBA er gjenskapt byteeksakt uten originalbilder under produksjonsreplay. Råbilder, faktiske prompter, rutekart, kontroll og notater er bevart. Ingen ny motor, modkandidat, publisert grafikk eller pakke. Fortsatt 508/1758 hele figurjobber, 3733 native og fig178_02 20/24. H284 er ikke startet. Sam er eneste godkjente stilanker. Ingen nødvendig ny Tom-designavklaring; automatikken ACTIVE.
+Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md.
+<!-- helikopter178-firefase-rensing-20261024:slutt -->
+
 <!-- helikopter178-vindusramme1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
