@@ -1,5 +1,17 @@
 # todo.md
 
+<!-- helikopter178-vindusramme1987-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 07:01
+
+- [x] Ti faktiske kall H269..H278 med råbilder, prompter og egenkontroll er bevart. Alle 224 kildefiler og fire rapportfiler er pushet og faktisk lengde-/SHA256-/Git-blob-bekreftet. Totalt 103 kall; ingen nye leverte jobber.
+- [ ] Gjenoppta rent H270/utsnitt-egenbbox fra [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/0bd76d22138bffeb724a6a9a6d0ac08bebea2fef/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md). Null form-/åpningsavvik, men 19 positive materialavvik og ekstra klassepiksler består. Rett grå venstreblad-/vindusfelt og rammeutstrekning; bevar små refleksfarger. H279 er ikke startet. Ingen import før teknisk og visuell kontroll består.
+- [ ] Bruk komplett vindusguide med rad 14 og grått kildepunkt 39,14. Behold H277/H278 og to reflekslag som returer på krage, utstrekning eller synlige skjøter. Sam er eneste godkjente stilanker.
+- [ ] Fortsett også åpne 1989/1988/1986 og returer 1990..1994 ved uavhengig arbeid. Behold H252/1990; ikke dupliser 1995..2021 uten retur.
+- [ ] Ved bestått retting: én fersk komplett WebP-kandidat, relevant motoravspilling, vanlig hd-mod-barn av fersk fjern-SHA og faktisk tilbakehenting. Pakker oppdateres ved publisert samlepunkt/avslutning. Mod/pakker er uendret med 3733 native og 508/1758 hele jobber. Automatikken ACTIVE; sluttkontroll gjenstår.
+<!-- helikopter178-vindusramme1987-20261024:slutt -->
+
 <!-- helikopter178-graaplan1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

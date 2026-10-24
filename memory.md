@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-vindusramme1987-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Blad og vindusrammer i retur, 2026-10-24 07:01
+
+Fase 1987 videreføres fra rent H270/utsnitt-egenbbox etter ti faktiske kall H269..H278, totalt 103 i bunken. Form-/åpningskontroll har null avvik, men 19 positive materialavvik og ekstra klassepiksler gjenstår. Ingen ny resultat.png, native mottak, motoravspilling eller godkjenning. H279 er ikke startet. Sam er eneste godkjente stilanker. [Rapport og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/0bd76d22138bffeb724a6a9a6d0ac08bebea2fef/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+Valgt heltegning og native-PNG/RGBA er byteeksakt gjenskapt fra bare egne H266/H267/H268/H270-råbilder uten å åpne originalbilder/masker. Bruk komplett vindusguide fra rad 14 med kildebekreftet grått ved 39,14. H272..H274s eldre guide manglet dette feltet; H277s grå mastkrage og H278s synlige reflekslag er returer. Bevar de tre små grønne/blå/lavendel refleksklassene.
+
+Grafikkilde e69f7939acd7ba75a3d7d56d5b5891e7275e7497 og rapport 0bd76d22138bffeb724a6a9a6d0ac08bebea2fef er faktisk hentet og SHA256-/Git-blob-bekreftet, 224 + 4 filer. Mod/pakker er uendret c8009915, med alle 21978 modhash bekreftet. Alle 9174 beskyttede input og tre stasher er uendret. Opptelling: 508/1758 hele figurjobber, 3733 native, fig178_02 20/24, familie178 32/102. Ingen ny modkandidat, arkivnedlasting, pakke eller sletting. Automatikken ACTIVE; ingen nødvendig ny Tom-designavklaring.
+<!-- helikopter178-vindusramme1987-20261024:slutt -->
+
 <!-- helikopter178-graaplan1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

@@ -1,5 +1,21 @@
 # Status
 
+<!-- helikopter178-vindusramme1987-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Fase 1987 har fortsatt materialretur, 2026-10-24 07:01
+
+Ti nye faktiske innebygde image_gen-kall H269..H278 retter den påbegynte fase 1987. Bunken har 103 faktiske kall, ikke 103 leverte jobber. Rent H270/utsnitt-egenbbox er holdt arbeidsgrunnlag. Ingen ny hel resultat.png, native mottak, motoravspilling, publisert modgrafikk eller Tom-/Claude-godkjenning. [Rapport og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/0bd76d22138bffeb724a6a9a6d0ac08bebea2fef/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+H270 har null form-/åpningsfester ved uendrede 3 HD-grenser, snitt/union 0,864 og dekning 0,919. Materialretur består: 1 sort, 11 grå, 2 brune og 5 grønne positive avvik. Fem grå fester er forbedret mot H268. Alle 22 fargediagnoser beholdes, med 260 positive og 6128 ekstra klasseavvik. De tre små grønne/blå/lavendel refleksklassene har null positive og ekstra avvik. Tallene er diagnostikk; små grå felt og rammeutstrekning må fortsatt rettes. Aktiv bildevakt gjenskaper egen heltegning og native-PNG/RGBA byteeksakt fra bare egne H266/H267/H268/H270-råbilder. Ingen originalbilder eller originalmasker åpnes under produksjonsreplay.
+
+H271s formendring, H272..H275s panel-/trappepreg, H277s oppdiktede grå mastkrage og H278s feil vindusutstrekning er returer. To egne reflekslag får synlige grå skjøter selv når småfargeportene består. De erstatter ikke rent H270. H272..H274s guide utelot kildepunkt 39,14. Før H275-kallet ble komplett guide rettet til rad 14 med kildebekreftet RGB 115,115,115; tidligere faktiske prompter og guider er bevart. Ingen slik del er importert.
+
+Grafikkilde e69f7939acd7ba75a3d7d56d5b5891e7275e7497 og rapport 0bd76d22138bffeb724a6a9a6d0ac08bebea2fef er pushet og faktisk hentet tilbake. Alle 224 kildefiler (21866779 byte) og fire rapportfiler (66875 byte) er lengde-, SHA256- og Git-blob SHA1-bekreftet uten ekstra lagret nedlastingspayload. Alle 21978 aktive modhash, 9174 beskyttede input og tre opprinnelige stasher er uendret. Faktisk opptelling: 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 native, fig178_02 20/24 og familie178 32/102. Fersk hd-mod er fortsatt c80099158b30fb08fa0cb670acb112bf14fd58f4. Fire releasevedleggs ID, navn, størrelse og digest er uendret; tidligere faktiske Linux-/Windows-pakke- og innholdskontroller gjelder. Ingen ny modkandidat, pakke, arkivnedlasting eller sletting.
+
+Gjenoppta H270 med materialpunktene og komplett vindusguide i rapporten. H279 er ikke forberedt, utført eller reservert. H255/1989, H256/1988 og H258/1986 kan rettes uavhengig; H252/1990 og stilretur 1991..1994 står uendret. Ingen duplisering av 1995..2021 uten retur. Sam er eneste godkjente stilanker. 137/V013 og 296/S037 er uendret. Ingen nødvendig ny Tom-designavklaring. Automatikken er ACTIVE; all grafikk og sluttkontroll er ikke ferdig. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokale kontroller. Ingen motor-/pipelinekodeendring, force-push, CLI/API-bildefallback eller gammel nattprosess.
+<!-- helikopter178-vindusramme1987-20261024:slutt -->
+
 <!-- helikopter178-graaplan1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
