@@ -98,4 +98,5 @@ EOF
 
 echo "Lager zip ..."
 (cd "$OUT" && rm -f "$NAVN.zip" && zip -qr -9 "$NAVN.zip" "$NAVN" && sha256sum "$NAVN.zip" > "$NAVN.zip.sha256")
+python3 "$ROOT/tools/kontroller_pakkestorrelse.py" "$OUT/$NAVN.zip" --rapport "$OUT/storrelse.json"
 echo "Ferdig: $OUT/$NAVN.zip ($(du -h "$OUT/$NAVN.zip" | cut -f1))"

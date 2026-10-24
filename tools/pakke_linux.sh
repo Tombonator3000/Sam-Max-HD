@@ -121,6 +121,7 @@ cp "$SRC/icons/scummvm.svg" "$OUT/sam-max-hd.svg"
 
 if [ -z "${LINUXDEPLOY:-}" ] || [ -z "${APPIMAGETOOL:-}" ]; then
 	cp "$OUT/AppRun" "$OUT/sam-max-hd.desktop" "$OUT/sam-max-hd.svg" "$APPDIR/"
+	python3 "$ROOT/tools/kontroller_pakkestorrelse.py" "$APPDIR" --rapport "$OUT/storrelse.json"
 	echo "Ferdig: $APPDIR (uten LINUXDEPLOY og APPIMAGETOOL blir det ingen AppImage). Start med $APPDIR/AppRun"
 	exit 0
 fi
@@ -137,4 +138,5 @@ rm -f "$OUT/$NAVN"
 ARCH=x86_64 "$APPIMAGETOOL" --no-appstream "$APPDIR" "$OUT/$NAVN" > "$OUT/appimagetool.log" 2>&1 \
 	|| { tail -20 "$OUT/appimagetool.log"; exit 1; }
 (cd "$OUT" && sha256sum "$NAVN" > "$NAVN.sha256")
+python3 "$ROOT/tools/kontroller_pakkestorrelse.py" "$APPDIR" --arkiv "$OUT/$NAVN" --rapport "$OUT/storrelse.json"
 echo "Ferdig: $OUT/$NAVN ($(du -h "$OUT/$NAVN" | cut -f1))"
