@@ -1,0 +1,107 @@
+from pathlib import Path
+from PIL import Image
+from io import BytesIO
+from smhd.myk import _premul_resize
+from scipy import ndimage as nd
+import ast
+import json
+import hashlib
+import numpy as np
+
+O = Path(__file__).resolve().parent
+R = Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter') / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+tree = ast.parse((O / 'replay-vindusramme1987.py').read_text())
+defs = [v for v in tree.body if isinstance(v, ast.FunctionDef) and v.name in ['brown', 'blend', 'pngsha']]
+exec(compile(ast.Module(body=defs, type_ignores=[]), '<own-rgba-functions>', 'exec'))
+files = {c: R / 'kall' / c / 'raa.png' for c in ['H256', 'H283', 'H288', 'H289']}
+opened = []
+realopen = Image.open
+
+def guard(fp, *args, **kwargs):
+    p = Path(fp).resolve()
+    assert p in [f.resolve() for f in files.values()], str(p)
+    opened.append(str(p))
+    return realopen(fp, *args, **kwargs)
+
+def part_overlay(base, raw, data):
+    x, y, X, Y = data['egen_ROI']
+    H, W = Y - y, X - x
+    sx, sy = data['egen_hel_skala']
+    px, py = data['egen_hel_flytt']
+    scaled = _premul_resize(raw, (round(raw.shape[1] * sx), round(raw.shape[0] * sy)))
+    tile = np.zeros((H, W, 4), np.uint8)
+    x0, y0 = max(px, 0), max(py, 0)
+    x1, y1 = min(px + scaled.shape[1], W), min(py + scaled.shape[0], H)
+    tile[y0:y1, x0:x1] = scaled[y0 - py:y1 - py, x0 - px:x1 - px]
+    placed = base.copy()
+    placed[y:Y, x:X] = tile
+    return blend(base, placed, data['egen_ROI'], 16, True)
+
+def native(own, q):
+    clean = own.copy()
+    clean[clean[:, :, 3] < 8] = 0
+    sx, sy = q['hel_skala']
+    scaled = _premul_resize(clean, (round(clean.shape[1] * sx), round(clean.shape[0] * sy)))
+    W, H = (67 + 2 * q['margx']) * 4, (36 + 2 * q['margy']) * 4
+    result = np.zeros((H, W, 4), np.uint8)
+    px, py = q['margx'] * 4 + q['flytt'][0], q['margy'] * 4 + q['flytt'][1]
+    x0, y0 = max(px, 0), max(py, 0)
+    x1, y1 = min(px + scaled.shape[1], W), min(py + scaled.shape[0], H)
+    result[y0:y1, x0:x1] = scaled[y0 - py:y1 - py, x0 - px:x1 - px]
+    return result
+
+Image.open = guard
+try:
+    raw = {c: np.array(Image.open(f).convert('RGBA')) for c, f in files.items()}
+    base = blend(brown(raw['H256']), brown(raw['H283']), [385, 605, 570, 835], 12, True)
+    assert pngsha(base) == sha(R / 'kall/H283/bare-hale/egen-heltegning.png')
+    selected = part_overlay(base, raw['H289'], read(R / 'kall/H289/utsnitt-egenbbox/rens.json'))
+    painted = part_overlay(base, raw['H288'], read(R / 'kall/H288/utsnitt-egenbbox-y4/rens.json'))
+    x, y, X, Y = [100, 405, 670, 555]
+    old, new = base[y:Y, x:X], painted[y:Y, x:X]
+    H, W = old.shape[:2]
+    yy, xx = np.indices((H, W))
+    edge = np.minimum.reduce([xx, yy, W - 1 - xx, H - 1 - yy])
+    t = np.minimum(np.clip(edge / 8, 0, 1), np.clip(nd.distance_transform_edt(new[:, :, 3] >= 128) / 4, 0, 1))
+    weight = t * t * (3 - 2 * t)
+    weight[old[:, :, 3] < 8] = 0
+    alpha_trial = base.copy()
+    alpha_trial[y:Y, x:X, :3] = np.uint8(np.clip(np.rint(old[:, :, :3] * (1 - weight[:, :, None]) + new[:, :, :3] * weight[:, :, None]), 0, 255))
+    assert np.array_equal(alpha_trial[:, :, 3], base[:, :, 3])
+    own_variants = {'H289/utsnitt-egenbbox': selected, 'H288/egen-alfa-bevart': alpha_trial}
+    native_variants = {}
+    for name, own in own_variants.items():
+        K = R / 'kall' / name
+        assert pngsha(own) == sha(K / 'egen-heltegning.png'), name
+        out = native(own, read(K / 'kontroll.json'))
+        assert pngsha(out) == sha(K / 'prototype-under-kontroll.png'), name
+        native_variants[name] = out
+    base_native = native(base, read(R / 'kall/H283/bare-hale/kontroll.json'))
+    assert np.array_equal(base_native[:, :, 3], native_variants['H288/egen-alfa-bevart'][:, :, 3])
+finally:
+    Image.open = realopen
+
+rows = []
+for name, own in own_variants.items():
+    K = R / 'kall' / name
+    out = native_variants[name]
+    assert np.array_equal(own, np.array(Image.open(K / 'egen-heltegning.png').convert('RGBA')))
+    assert np.array_equal(out, np.array(Image.open(K / 'prototype-under-kontroll.png').convert('RGBA')))
+    rows.append(dict(variant=name, egen_PNG_SHA256=pngsha(own), egen_RGBA_SHA256=hashlib.sha256(own.tobytes()).hexdigest(),
+                     native_PNG_SHA256=pngsha(out), native_RGBA_SHA256=hashlib.sha256(out.tobytes()).hexdigest(),
+                     egen_og_native_PNG_og_RGBA_byteeksakt=True))
+proof = dict(produksjonsbilder_aapnet=opened, kun_egne_fire_raabilder=True,
+             originalbilder_eller_masker_aapnet_under_produksjon=0,
+             raa_SHA256={c: sha(f) for c, f in files.items()},
+             valgt_1988='H289/utsnitt-egenbbox', valgt_direkte_raa=['H256','H283','H289'],
+             H288_alfaproevens_direkte_raa=['H256','H283','H288'],
+             H288_egen_og_native_alpha_byteidentisk_med_egen_H283=True,
+             H288_alfaproeven_visuelt_returnert_paa_dobbeltkontur=True,
+             kanonisk_RGB_egne_ROI_og_helregistrering_er_metadata=True,
+             varianter=rows, laget_ekstra_fullkopi=False,
+             native_mottatt=False, motorobservert=False, publisert=False)
+(R / 'replay-rotorfelt1988.json').write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
+(R / 'replay-rotorfelt1988.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Valgt H289 og returnert H288-alfaprøve er PNG/RGBA-byteeksakte fra egne råbilder. Ingen originalbilder åpnet.')

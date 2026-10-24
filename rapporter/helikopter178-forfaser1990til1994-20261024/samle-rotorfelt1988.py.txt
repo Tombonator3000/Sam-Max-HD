@@ -1,0 +1,105 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+import hashlib
+import json
+import subprocess
+import numpy as np
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+read = lambda p: json.loads(p.read_text())
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p, value): p.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+variants = ['H284/global-brunt','H285/eget-sidefelt','H286/bare-sidefelt','H287/utsnitt-egenbbox',
+            'H288/utsnitt-egenbbox','H288/utsnitt-egenbbox-y4','H288/utsnitt-egenbbox-y8',
+            'H288/egen-alfa-bevart','H289/utsnitt-egenbbox','H289/utsnitt-egenbbox-xm4-y4']
+main = dict(H284=variants[0], H285=variants[1], H286=variants[2], H287=variants[3], H288=variants[7], H289=variants[8])
+effects = {
+ 'H284':'Direkte ny kildeprøve uten tidligere helform som bildeinput får nytt rundt sidepunkt, sammenhengende grått belte og feil form. Ikke valgt foran H283.',
+ 'H285':'Eget isolert mørkt sidefelt har riktigere mørkegrå toner og grønne avbrudd, men blokkmønster og rektangulær innsettingsskjøt. Bare genereringsreferanse, ikke en forbedring som kan importeres.',
+ 'H286':'H285 brukes som konstruksjonsreferanse til naturlige sidefelt. Formen blir glattere, men avbrudd og brunfarge er feil. RGB-rensingen beskytter gylne toner og etterlater for mye oransje/gyllent på kroppen. Ikke valgt.',
+ 'H287':'Isolert venstre blad retter noen egne felt, men generatoren forenkler de åtte kildegruppene til få større grå felt. Ikke valgt.',
+ 'H288':'Åtte kildebekreftede grå grupper forsøkes bevart. Tre alfaplasseringer får nye formavvik. RGB-prøve med bytebevart gammel EGEN alpha gir fem formfester og 60 positive materialavvik, men synlig indre dobbeltkontur og streker langs bladet. Tallet overstyrer ikke den visuelle returen.',
+ 'H289':'Øvre/høyre blad får fyldigere rot og grå rotstripe. Samlet plassering etter egne alfa-bokser gir tre formfester mot tidligere fem. Holdt videre 1988-kontrollpunkt med material- og motivretur. En ekstra hel delflytt 4 egne piksler venstre/ned gir flere formavvik og velges ikke.',
+}
+calls = read(R / 'faktiske-bildekall.json')
+assert [c['kall'] for c in calls] == [f'H{n}' for n in range(176, 290)]
+assert not (R / 'kall/H290').exists()
+entries = []
+for cid, variant in main.items():
+ K = R / 'kall' / cid
+ plan, args = read(K / 'plan.json'), read(K / 'argumenter.json')
+ ledger = next(c for c in calls if c['kall'] == cid)
+ assert plan['utfort'] and plan['innebygd_image_gen']
+ assert sha(K / 'raa.png') == plan['raa_sha256'] == ledger['raa_sha256']
+ assert sha(K / 'prompt-brukt.txt') == ledger['prompt_sha256'] and sha(K / 'argumenter.json') == ledger['argumenter_sha256']
+ assert (K / 'prompt-brukt.txt').read_text() == args['prompt'] + '\n'
+ for p, h in plan['referanser_SHA256'].items(): assert sha(Path(p)) == h, p
+ a = np.array(Image.open(K / 'raa.png').convert('RGBA')); alpha = a[:,:,3]
+ assert np.any(alpha == 0) and np.any(alpha == 255) and np.any((alpha > 0) & (alpha < 255))
+ ledger['gruppe'] = 'rotorfelt-og-morke-sidefelt1988'
+ q, m = read(R / 'kall' / variant / 'kontroll.json'), read(R / 'kall' / variant / 'hele-materialer-kontroll.json')
+ entry = dict(kall=cid, rute=1988, variant=variant, raa_SHA256=sha(K/'raa.png'),
+              prompt_SHA256=ledger['prompt_sha256'], argumenter_SHA256=ledger['argumenter_sha256'],
+              maal=list(a.shape[1::-1]), alfa0=int((alpha==0).sum()), alfa255=int((alpha==255).sum()),
+              myk_alfa=int(((alpha>0)&(alpha<255)).sum()), laget=True, raa_visuelt_sett=True,
+              egenkontroll_utfort=True, egenkontroll_bestatt=False, retur=effects[cid],
+              native_proeve_visuelt_sett=False, native_mottatt=False, motorobservert=False,
+              publisert=False, Tom_godkjent=False, Claude_godkjent=False,
+              egen_heltegning_SHA256=sha(R/'kall'/variant/'egen-heltegning.png'),
+              native_SHA256=sha(R/'kall'/variant/'prototype-under-kontroll.png'),
+              hel_skala=q['hel_skala'], hel_flytt=q['flytt'], marg_originalpiksler=[q['margx'],q['margy']],
+              snitt_union=q['snitt_union'], dekning=q['dekning'],
+              alfa_fester_over3HD=q['alfa_fester_over3HD'], apninger_over3HD=q['apninger_over3HD'],
+              positive_materialavvik=sum(v['fester_over3HD'] for v in m['materialer']),
+              materialeavvik=m['materialer'], samlet_materialkontroll={k:m[k] for k in ['hel_flytt_HD','snitt_union','alfa_fester_over3HD','apninger_over3HD']},
+              alle_fargediagnoser=len(q['farger']), fargefester_over3HD=sum(v['native_fester_over3HD'] for v in q['farger']),
+              ekstra_fargeklassepiksler_over3HD=sum(v['ekstra_paletteklassifiserte_nativepiksler_over3HD'] for v in q['farger']))
+ entries.append(entry); put(K/'raa-kontroll.json',entry)
+ (K/'notat.md').write_text(f'# {cid}: gråfelt og rotorfelt for fase 1988\n\nFaktisk innebygd image_gen-kall, modellnavn ikke oppgitt. Råbilde, faktisk prompt, argumenter og referansehash er bevart. Riktig original i spillkontekst og godkjent Sam er sett før motivet. Tidligere egne prøver er redigerings-/konstruksjonsgrunnlag, aldri godkjente stilankere.\n\n'+effects[cid]+f'\n\nDirekte helkontroll: form/åpning {q["alfa_fester_over3HD"]}/{q["apninger_over3HD"]}, snitt/union {q["snitt_union"]}, dekning {q["dekning"]}. Materialkontrollen prøver bare samlet helflytt {m["hel_flytt_HD"]}, har form/åpning {m["alfa_fester_over3HD"]}/{m["apninger_over3HD"]} og {entry["positive_materialavvik"]} positive materialavvik. Alle 22 råfargediagnoser og uendrede 3 HD-grenser beholdes: {entry["fargefester_over3HD"]} positive og {entry["ekstra_fargeklassepiksler_over3HD"]} ekstra fargeklasseavvik.\n\nIngen originalpiksler eller originalmasker brukes til tegnet produksjon. Egen alpha og egne delbilder styrer rensing/plassering. Ingen ny hel resultat.png, native mottak, motor, publisering eller Tom-/Claude-godkjenning. Se rotorfelt1988-status.md og rutekart-rotorfelt1988.json.\n')
+put(R/'faktiske-bildekall.json',calls)
+
+S = A/'rapporter/helikopter178-forfaser1995til1999-20261023/kilder-neste/1988'
+source = np.array(Image.open(S/'original-1x.png').convert('RGBA'))
+crop=source[3:14,:36]; grey=(crop[:,:,3]>0)&(crop[:,:,0]==crop[:,:,1])&(crop[:,:,1]==crop[:,:,2])&(crop[:,:,0]>0)
+labels,n=nd.label(grey, structure=np.ones((3,3)))
+groups=[dict(antal=int((labels==i).sum()),bbox_original_1x=[int(x.min()),int(y.min()+3),int(x.max()+1),int(y.max()+4)]) for i in range(1,n+1) for y,x in [np.nonzero(labels==i)]]
+assert n==8
+body=source[22:26,31:50]; grays=sorted({tuple(map(int,c[:3])) for c in body.reshape(-1,4) if c[3] and c[0]==c[1]==c[2]})
+assert grays==[(55,55,55),(71,71,71)]
+K=R/'kall/H289/utsnitt-egenbbox';q=read(K/'kontroll.json');own=np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA'));yy,xx=np.nonzero(source[:,:,3]>0);dist=nd.distance_transform_edt(own[:,:,3]<128)[q['margy']*4+yy*4+2,q['margx']*4+xx*4+2]
+put(R/'rotorfelt1988-kildeanalyse.json',dict(kilde_RGBA_SHA256=sha(S/'original-1x.png'),
+    venstreblad_kildeutsnitt=[0,3,36,14],graa_8sammenhengende_fargegrupper=groups,
+    sidefelt_kildeutsnitt=[31,22,50,26],sidefelt_graa_RGB=grays,
+    valgt_variant='H289/utsnitt-egenbbox',formfeil_original_1x=[[int(x),int(y),float(d)]for x,y,d in zip(xx,yy,dist)if d>3],
+    metode='Kun lesekontroll og genereringsbrief. Fargegrupper er ikke nye objekter. Ingen originalmasker/piksler overføres til grafikken.'))
+
+board=Image.new('RGB',(1056,928),'#87959e');draw=ImageDraw.Draw(board);items=[('1988 original',None)]+[(v,v)for v in variants]
+for i,(title,v) in enumerate(items):
+ im=Image.new('RGBA',(352,200))
+ if v:
+  K=R/'kall'/v;d=read(K/'kontroll.json');im.alpha_composite(Image.open(K/'prototype-under-kontroll.png').convert('RGBA'),(24-d['margx']*4,24-d['margy']*4))
+ else: im.alpha_composite(Image.fromarray(source).resize((268,144),Image.Resampling.NEAREST),(24,24))
+ x,y=(i%3)*352,(i//3)*232;board.paste(im,(x,y+24),im);draw.text((x+6,y+6),title,fill='black')
+board.save(R/'rotorfelt1988-native-forloep.png')
+for v in variants:
+ K=R/'kall'/v
+ for f in ['kontroll.json','hele-materialer-kontroll.json']:
+  d=read(K/f);d.update(visuelt_sett=False,native_mottatt=False,motorobservert=False,publisert=False)
+  if f=='kontroll.json':d.update(status='RETUR_FORM_MATERIAL_ELLER_MOTIV',egen_stilvurdering_bestatt=False)
+  put(K/f,d)
+put(R/'rutekart-rotorfelt1988.json',dict(utc=datetime.now(timezone.utc).isoformat(),jobb='fig178_02',
+    nye_bildekall=6,faktiske_bildekall_totalt=114,leveranser=[],raa=entries,varianter=variants,
+    holdt_1988_arbeidskontrollpunkt='H289/utsnitt-egenbbox',uendret_1987='H270/utsnitt-egenbbox',
+    H288_egen_alpha_bevart_er_visuell_retur=True,egenkontroll_bestatt=False,native_mottatt=False,
+    nye_motoravspillinger=0,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+expected=read(O/'kandidat3733-filhash.json');actual={str(p.relative_to(P/'mods/gpt')):sha(p) for p in (P/'mods/gpt').rglob('*')if p.is_file()};assert actual==expected and len(actual)==21978
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0];assert remote=='c80099158b30fb08fa0cb670acb112bf14fd58f4'
+old,new=read(O/'firefase-rensing-release-metadata.json'),read(O/'rotorfelt1988-release-metadata.json');assets=lambda d:sorted([{k:a[k]for k in ['id','name','size','digest']}for a in d['assets']],key=lambda a:a['id']);assert old['id']==new['id'] and assets(old)==assets(new)
+put(R/'rotorfelt1988-mod-pakker-uendret.json',dict(utc=datetime.now(timezone.utc).isoformat(),hd_mod=remote,aktive_modfilhash_bekreftet=21978,tidligere_faktisk_hentet_fullmanifest_bekreftet=True,fjern_SHA_bekreftet=True,nye_kandidater=0,nye_motoravspillinger=0,nye_pakker=0,nye_arkivnedlastinger=0,nye_slettinger=0,release_id=new['id'],release_url=new['html_url'],releasevedlegg_uendret=assets(new),tidligere_faktiske_pakkekontroller_gjelder=True,ny_faktisk_pakkenedlasting=False))
+(R/'samle-rotorfelt1988.py.txt').write_bytes(Path(__file__).read_bytes())
+print('114 faktiske kall. H289 har tre direkte formfester. Alle nye prøver er fortsatt returer.')

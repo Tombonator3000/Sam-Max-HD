@@ -1,0 +1,65 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import _premul_resize
+import ast
+import hashlib
+import json
+import sys
+import numpy as np
+
+O = Path(__file__).resolve().parent
+R = Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter') / O.name
+K = R / 'kall' / sys.argv[1]
+V = K / sys.argv[2]
+V.mkdir()
+plan = json.loads((K / 'plan.json').read_text())
+base = Path(plan['egen_base'])
+raw = K / 'raa.png'
+tree = ast.parse((O / 'replay-vindusramme1987.py').read_text())
+defs = [v for v in tree.body if isinstance(v, ast.FunctionDef) and v.name in ['brown', 'blend']]
+exec(compile(ast.Module(body=defs, type_ignores=[]), '<own-rgba>', 'exec'))
+realopen = Image.open
+opened = []
+
+def guard(fp, *args, **kwargs):
+    p = Path(fp).resolve()
+    assert p in [base.resolve(), raw.resolve()], str(p)
+    opened.append(str(p))
+    return realopen(fp, *args, **kwargs)
+
+Image.open = guard
+try:
+    a = np.array(Image.open(base).convert('RGBA'))
+    part = brown(np.array(Image.open(raw).convert('RGBA')))
+    ys, xs = np.nonzero(part[:, :, 3] >= 8)
+    bbox = [max(0, int(xs.min()) - 2), max(0, int(ys.min()) - 2), min(part.shape[1], int(xs.max()) + 3), min(part.shape[0], int(ys.max()) + 3)]
+    bx, by, bX, bY = bbox
+    part = part[by:bY, bx:bX]
+    x, y, X, Y = plan['egen_ROI']
+    W, H = X - x, Y - y
+    scale = min(W / part.shape[1], H / part.shape[0])
+    scaled = _premul_resize(part, (round(part.shape[1] * scale), round(part.shape[0] * scale)))
+    dx, dy = (W - scaled.shape[1]) // 2, (H - scaled.shape[0]) // 2
+    layer = Image.new('RGBA', (W, H))
+    layer.alpha_composite(Image.fromarray(scaled), (dx, dy))
+    target = Image.fromarray(a[y:Y, x:X]).copy()
+    target.alpha_composite(layer)
+    placed = a.copy()
+    placed[y:Y, x:X] = np.array(target)
+    own = blend(a, placed, plan['egen_ROI'], 8, True)
+finally:
+    Image.open = realopen
+
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+Image.fromarray(own).save(V / 'egen-heltegning.png')
+plan.update(kall=sys.argv[1] + '/' + sys.argv[2], nytt_bildekall=False)
+(V / 'plan.json').write_text(json.dumps(plan, ensure_ascii=False, indent=2) + '\n')
+data = dict(produksjonsbilder_aapnet=opened, originalbilder_eller_masker_aapnet=0,
+            egen_base=str(base), egen_base_SHA256=sha(base), egen_del=str(raw), egen_del_SHA256=sha(raw),
+            egen_ROI=plan['egen_ROI'], egen_bbox=bbox, uniform_skala=scale,
+            egen_hel_flytt_i_ROI=[dx,dy], alpha_over_foer_premultiplisert_blanding=True,
+            feather=8, alle_egenpiksler_utenfor_ROI_byteidentiske=True,
+            ingen_originalpiksler_eller_originalmaske=True, egen_heltegning_SHA256=sha(V / 'egen-heltegning.png'))
+(V / 'rens.json').write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+(R / 'place-own-flatfield.py.txt').write_bytes(Path(__file__).read_bytes())
+print(dict(egen_bbox=bbox, uniform_skala=scale, egen_flytt=[dx,dy]))

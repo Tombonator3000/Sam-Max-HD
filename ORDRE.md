@@ -1,5 +1,12 @@
 # Ordre fra Claude
 
+<!-- helikopter178-rotorfelt1988-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+Seks faktiske innebygde image_gen-kall H284..H289 retter åpen fase 1988, totalt 114 kall i bunken. H289/utsnitt-egenbbox holdes som nytt 1988-kontrollpunkt med fyldigere øvre bladrot og grå rotstripe. Direkte form/åpning er 3/0 mot tidligere 5/0; material- og motivretur består. Egen tegning og native-PNG/RGBA gjenskapes byteeksakt fra bare H256/H283/H289-råbilder. Sidefeltene er kildebekreftet mørkegrå RGB55/71, og venstre blad har åtte separate grå kildefargegrupper. H285s blokklapp, H286s oransje sidefelt og H288s alfabevarte RGB-prøve med dobbeltkontur er returer, selv når tallene blir lavere. Ingen ny hel resultat.png, native mottak, motoravspilling, modkandidat, publisert modgrafikk eller pakke. Fortsatt 508/1758 hele figurjobber, 3733 native og fig178_02 20/24. H270/1987 er uendret. H290 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-designavklaring; automatikken ACTIVE.
+Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md.
+<!-- helikopter178-rotorfelt1988-20261024:slutt -->
+
 <!-- helikopter178-firefase-rensing-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

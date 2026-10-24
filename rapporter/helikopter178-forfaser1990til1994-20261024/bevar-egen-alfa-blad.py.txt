@@ -1,0 +1,56 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np
+import hashlib
+import json
+
+R = Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024')
+K = R / 'kall/H288'
+V = K / 'egen-alfa-bevart'
+V.mkdir()
+base = R / 'kall/H283/bare-hale/egen-heltegning.png'
+paint = K / 'utsnitt-egenbbox-y4/egen-heltegning.png'
+realopen = Image.open
+opened = []
+
+def guard(fp, *args, **kwargs):
+    p = Path(fp).resolve()
+    assert p in [base.resolve(), paint.resolve()], str(p)
+    opened.append(str(p))
+    return realopen(fp, *args, **kwargs)
+
+Image.open = guard
+try:
+    a = np.array(Image.open(base).convert('RGBA'))
+    b = np.array(Image.open(paint).convert('RGBA'))
+    x, y, X, Y = box = [100, 405, 670, 555]
+    old, new = a[y:Y, x:X], b[y:Y, x:X]
+    H, W = old.shape[:2]
+    yy, xx = np.indices((H, W))
+    edge = np.minimum.reduce([xx, yy, W - 1 - xx, H - 1 - yy])
+    t = np.minimum(np.clip(edge / 8, 0, 1), np.clip(nd.distance_transform_edt(new[:, :, 3] >= 128) / 4, 0, 1))
+    weight = t * t * (3 - 2 * t)
+    weight[old[:, :, 3] < 8] = 0
+    out = a.copy()
+    out[y:Y, x:X, :3] = np.uint8(np.clip(np.rint(old[:, :, :3] * (1 - weight[:, :, None]) + new[:, :, :3] * weight[:, :, None]), 0, 255))
+    assert np.array_equal(out[:, :, 3], a[:, :, 3])
+    outside = np.ones(a.shape[:2], bool)
+    outside[y:Y, x:X] = False
+    assert np.array_equal(out[outside], a[outside])
+finally:
+    Image.open = realopen
+
+Image.fromarray(out).save(V / 'egen-heltegning.png')
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+plan = json.loads((K / 'plan.json').read_text())
+plan.update(kall='H288/egen-alfa-bevart', nytt_bildekall=False)
+(V / 'plan.json').write_text(json.dumps(plan, ensure_ascii=False, indent=2) + '\n')
+proof = dict(metode='Bare RGB fra egne genererte fargefelt overføres med myk vekt fra egen ny alpha. Hele gamle egne alpha bevares byteidentisk. Ingen originalmaske eller originalpiksler leses.',
+             produksjonsbilder_aapnet=opened, originalbilder_eller_masker_aapnet=0,
+             egen_base=str(base), egen_base_SHA256=sha(base), egen_ny=str(paint), egen_ny_SHA256=sha(paint),
+             egen_ROI=box, gammel_egen_alfa_byteidentisk=True,
+             alle_egenpiksler_utenfor_ROI_byteidentiske=True, egen_heltegning_SHA256=sha(V / 'egen-heltegning.png'))
+(V / 'rens.json').write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
+(R / 'bevar-egen-alfa-blad.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Hele egen alpha og alle egne piksler utenfor bladrektangelet er byteidentiske.')
