@@ -1,0 +1,26 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image,ImageDraw
+from smhd.myk import place
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np,json,hashlib,sys,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;K=R/'kall'/sys.argv[1];read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+plan=read(K/'plan.json');n=plan['rute'];S=R/'kilder'/str(n);src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));a=np.array(Image.open((K/'egen-heltegning.png')if(K/'egen-heltegning.png').exists()else(K/'raa.png')).convert('RGBA'));a[a[:,:,3]<8]=0;Image.fromarray(a).save(K/'egen-renset.png')
+yy,xx=np.nonzero(a[:,:,3]>=128);sx=4*src.shape[1]/(xx.max()-xx.min()+1);sy=4*src.shape[0]/(yy.max()-yy.min()+1);p=place(a,src,sx,sy);b=p['bilde'];Image.fromarray(b).save(K/'prototype-under-kontroll.png');mx,my=p['margx']*4,p['margy']*4
+ref=np.zeros_like(b);ref[my:my+src.shape[0]*4,mx:mx+src.shape[1]*4]=np.repeat(np.repeat(src,4,0),4,1)
+core=b[:,:,3]>=128;dpos=nd.distance_transform_edt(~core);dneg=nd.distance_transform_edt(core);oy,ox=np.nonzero(src[:,:,3]>0);by,bx=np.nonzero(src[:,:,3]==0);pos=dpos[my+oy*4+2,mx+ox*4+2];neg=dneg[my+by*4+2,mx+bx*4+2]
+colors=np.unique(src[src[:,:,3]>0,:3],axis=0);coords=np.argwhere(core);_,ids=cKDTree(colors.astype(float)).query(b[core,:3].astype(float));labels=np.full(core.shape,-1,int);labels[core]=ids
+rows=[]
+for i,col in enumerate(colors):
+ have=labels==i;target=(ref[:,:,3]>=128)&np.all(ref[:,:,:3]==col,2);qy,qx=np.nonzero((src[:,:,3]>0)&np.all(src[:,:,:3]==col,2));qy,qx=my+qy*4+2,mx+qx*4+2
+ dist=nd.distance_transform_edt(~have)[qy,qx]if have.any()else np.full(len(qy),999.);extra=nd.distance_transform_edt(~target)[have]if have.any()else np.array([])
+ rows.append(dict(RGB=col.tolist(),kildepunkter=len(qy),native_fester_over3HD=int((dist>3).sum()),native_maks_HD=float(dist.max()),ekstra_paletteklassifiserte_nativepiksler_over3HD=int((extra>3).sum()),ekstra_maks_HD=float(extra.max())if len(extra)else None))
+q={k:v for k,v in p.items()if k!='bilde'};q.update(kall=sys.argv[1],rute=n,hel_skala=[float(sx),float(sy)],hel_affin_port=bool(.88<=sx/sy<=1.12),alfa_fester_over3HD=int((pos>3).sum()),alfa_maks_HD=float(pos.max()),apninger_over3HD=int((neg>3).sum()),apninger_maks_HD=float(neg.max()),farger=rows,fargeklassifisering='Nærmeste kanoniske RGB brukes bare til måling av naturlig helfarget tegning. RGB/alpha i resultat er ikke palettsnappet.',kodeplan_metode_anvendt=False,egen_alfa=True,originalmaske=False,originalfragmenter=False,lokal_kildeplassering_eller_pamaling=False,visuelt_sett=False,egen_stilvurdering_bestatt=False,native_mottatt=False,motorobservert=False,publisert=False,native_sha256=sha(K/'prototype-under-kontroll.png'))
+q['alfa_og_form_bestatt']=bool(q['hel_affin_port']and q['snitt_union']>=.6 and q['dekning']>=.8 and not q['kuttet']and q['alfa_fester_over3HD']==0 and q['apninger_over3HD']==0)
+q['strenge_fargeporter_bestatt']=all(e['native_fester_over3HD']==0 and e['ekstra_paletteklassifiserte_nativepiksler_over3HD']==0 for e in rows);q['teknisk_ok']=q['alfa_og_form_bestatt']and q['strenge_fargeporter_bestatt'];q['status']='AVVENTER_VISUELL_OG_TEKNISK_KONTROLL'
+(K/'kontroll.json').write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+board=Image.new('RGB',(b.shape[1]*8+60,b.shape[0]*4+60),'#304050');dr=ImageDraw.Draw(board)
+for i,(arr,label)in enumerate([(ref,'Original, bare kontroll'),(b,sys.argv[1]+' hel nytegning')]):
+ im=Image.fromarray(arr);bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);board.paste(bg.resize((im.width*4,im.height*4)).convert('RGB'),(10+i*(im.width*4+30),40));dr.text((10+i*(im.width*4+30),12),label,fill='white')
+board.save(K/'sammenligning4x.png');(R/'kontroller-hel-stilretur.py.txt').write_bytes(Path(__file__).read_bytes());print({k:q[k]for k in ['kall','snitt_union','dekning','alfa_fester_over3HD','apninger_over3HD','alfa_maks_HD','apninger_maks_HD','hel_affin_port','teknisk_ok']});print('Fargefester over3HD',sum(e['native_fester_over3HD']for e in rows),'ekstra klassepiksler',sum(e['ekstra_paletteklassifiserte_nativepiksler_over3HD']for e in rows),flush=True)

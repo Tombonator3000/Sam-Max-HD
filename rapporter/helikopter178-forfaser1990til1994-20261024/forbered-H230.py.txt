@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image,ImageFilter
+from datetime import datetime,timezone
+import json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;K=R/'kall/H230';K.mkdir()
+src=Image.open(R/'kilder/1990/original-1x.png').convert('RGBA')
+for soft,name in [(False,'original-kontrast.png'),(True,'myk-kildereferanse-kontrast.png')]:
+ im=src.resize((836,418),Image.Resampling.BICUBIC if soft else Image.Resampling.NEAREST)
+ if soft:im=im.filter(ImageFilter.GaussianBlur(2))
+ canvas=Image.new('RGBA',(1024,1024),(230,30,190,255));canvas.alpha_composite(im,(94,303));canvas.convert('RGB').save(K/name)
+prompt='''Use case: style-transfer. Create ONE faithful whole helicopter sprite by smoothly inking image1. Image1 is the original on HOT PINK, softened only to explain continuous shapes. Image2 is the EXACT unfiltered source, also on hot pink. Image3 is the approved Sam & Max clean cartoon ink style ONLY. Never draw pink, Sam, reference panels, a grid or source pixels.
+Trace the original at 4x: same silhouette, pose, projection, proportions, position, rotor phase and colour for every physical surface. Keep the compact angular mechanical dark-brown fuselage, exact grey windshield, tail fin and green tail assembly, both irregular green skids with brown struts, and both long asymmetric silver/grey rotor blades. The hot-pink background and every hot-pink interior gap must become genuine transparent alpha.
+Read the exact image2 carefully: the thin grey lower rim is BELOW the green underside of the upper-left rotor; its grey blade face has tiny flat dark-olive flecks. The grey areas on the brown body SIDE are separate small angular areas in the original, not a new broad connected decorative grey stripe. Keep the small grey tail-fin edge, rear diagonal tail blade, skid joints and hub/body junction. Keep each tiny original blue and gold accent. No added bolt circles, new windows or accessories. Do not join distinct colour regions, thicken struts, round the body or straighten the original uneven parts.
+Turn raster clusters into the coherent parts they depict using smooth continuous thin dark cartoon contours, flat paint, one source shadow step and only the original highlights. No pixel staircases, blur, texture, dither, gradients, added reflections or extra details. Dark brown base RGB115,59,11; shadow83,43,0; light139,75,15. Preserve original dark forest-green and olive surfaces, silver/grey/white blades and grey window. No orange body recolouring.
+Preserve the exact square1024 canvas and image1 placement: whole helicopter inside the same836x418 box at94,303. No crop, zoom, rotation, rearrangement or recentering. Return one complete smooth helicopter with true transparent alpha, including enclosed holes. No floor shadow, text, labels, watermark, comparison or background.'''
+refs=[K/'myk-kildereferanse-kontrast.png',K/'original-kontrast.png',A/'hovedark/sam.png']
+args=dict(prompt=prompt,referenced_image_paths=list(map(str,refs)),transparent_background=True)
+(K/'prompt-brukt.txt').write_text(prompt+'\n');(K/'argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n')
+plan=dict(kall='H230',rute=1990,jobb='fig178_02',utfort=False,formaal='Ny heltegning med originalens grå deler skilt fra bakgrunnen med rosa referansebakgrunn',original_kontekst_og_stil_sett=True,kildeguide_kun_referanse_aldri_produksjonspiksler=True,referanser_SHA256={str(p):hashlib.sha256(p.read_bytes()).hexdigest()for p in refs},planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n');(R/'forbered-H230.py.txt').write_bytes(Path(__file__).read_bytes())
+print(K)

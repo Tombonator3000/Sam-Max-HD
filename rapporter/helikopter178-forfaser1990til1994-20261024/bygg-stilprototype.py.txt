@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from datetime import datetime,timezone
+import os,json,gzip,hashlib,numpy as np,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'stilprototype3733';assert not C.exists()
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base='c80099158b30fb08fa0cb670acb112bf14fd58f4';remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0];assert remote==base
+expected=json.loads(gzip.decompress((R/'kandidat3733-filhash.json.gz').read_bytes()));actual={str(p.relative_to(M)):sha(p)for p in sorted(M.rglob('*'))if p.is_file()};assert actual==expected and len(actual)==21978
+C.mkdir()
+for p in sorted(M.rglob('*')):
+ target=C/p.relative_to(M)
+ if p.is_dir():target.mkdir(exist_ok=True)
+ else:os.link(p,target)
+variants={1990:'H229',1991:'H232',1992:'H233',1993:'H234',1994:'H235'};rows=[];newhash=dict(actual);board=Image.new('RGB',(1640,1100),'#304050');dr=ImageDraw.Draw(board)
+for row,(n,cid)in enumerate(variants.items()):
+ K=R/'kall'/cid/'global-brunkalibrering-v2';q=read(K/'hele-materialer-kontroll.json');assert q['rute']==n and not q['materialporter_bestatt'];src=K/'prototype-helplassering.png';rel=f'costumes/costume178_{n}_hd.webp';dest=C/rel;before=sha(dest);dest.unlink()
+ im=Image.open(src).convert('RGBA');im.save(dest,format='WEBP',lossless=True,exact=True,quality=100,method=6);decoded=Image.open(dest).convert('RGBA');assert np.array_equal(np.array(im),np.array(decoded));assert not dest.with_suffix('.png').exists();newhash[rel]=sha(dest)
+ original=Image.open(R/'kilder'/str(n)/'original-1x.png').convert('RGBA');canvas=Image.new('RGBA',im.size);canvas.alpha_composite(original.resize((original.width*4,original.height*4),Image.Resampling.NEAREST),(8,8))
+ for col,arr in enumerate([canvas,Image.open(M/rel).convert('RGBA'),decoded]):
+  bg=Image.new('RGBA',arr.size,'#87959e');bg.alpha_composite(arr);bg.thumbnail((525,180),Image.Resampling.LANCZOS);x,y=10+col*545,40+row*215;board.paste(bg.convert('RGB'),(x,y));dr.text((x,y-22),f'{n} '+['Original, bare kontroll','Publisert, stilretur',cid+' ny helproeve'][col],fill='white')
+ rows.append(dict(rute=n,kall=cid,kildeplan=str((K.parent/'plan.json').relative_to(A)),rute_original_SHA256=sha(R/'kilder'/str(n)/'original-1x.png'),raa_SHA256=sha(K.parent/'raa.png'),egen_fargekalibrert_SHA256=sha(K/'egen-heltegning.png'),plassering_PNG=str(src.relative_to(A)),plassering_PNG_SHA256=sha(src),opprinnelig_publisert_WebP_SHA256=before,midlertidig_WebP_SHA256=sha(dest),WebP_RGBA_byteidentisk_inkludert_transparent_RGB=True,hel_flytt_HD=q['hel_flytt_HD'],alfa_fester_over3HD=q['alfa_fester_over3HD'],apninger_over3HD=q['apninger_over3HD'],formporter_bestatt=q['formporter_bestatt'],materialporter_bestatt=False,laget=True,egenkontroll_utfort=True,egenkontroll_bestatt=False,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+meta=read(C/'mod.json');meta['stilprototype_ikke_godkjent']=dict(ruter=list(variants),grunnlag_hd_mod=base,mottatt=False,publisering_tillatt=False)
+(C/'mod.json').unlink();put(C/'mod.json',meta);newhash['mod.json']=sha(C/'mod.json');(C/'SHA256SUMS').unlink();(C/'SHA256SUMS').write_text(''.join(f'{digest}  {rel}\n'for rel,digest in sorted(newhash.items())if rel!='SHA256SUMS'));newhash['SHA256SUMS']=sha(C/'SHA256SUMS')
+after={str(p.relative_to(M)):sha(p)for p in sorted(M.rglob('*'))if p.is_file()};assert after==actual
+changes={p for p in actual if actual[p]!=newhash[p]};assert changes=={f'costumes/costume178_{n}_hd.webp'for n in variants}|{'mod.json','SHA256SUMS'}
+for p in C.rglob('*.png'):assert sha(p)==expected[str(p.relative_to(C))]
+board.save(R/'stilproever-femfaser.png');put(R/'rutekart-stilproever.json',dict(type='KUN_STILPROEVER_IKKE_MOTTAK',jobb='fig178_02',ruter=rows,originale_jobbfiler_endret=False,rutekart_publisert20_oppforinger_endret=False))
+put(R/'stilprototype3733.json',dict(utc=datetime.now(timezone.utc).isoformat(),grunnlag_hd_mod=base,fasit_fjern_sha_kontrollert=True,grunnlag_alle_filhash_kontrollert=len(actual),grunnlag_bytebevart_etter_kandidatbygg=True,prototype=str(C),native_antall=3733,prototype_ruter=list(variants),nye_godkjente_native=0,hele_jobber_nye=0,alle_idx_mask_PNG_byteidentiske=True,endret_stier=sorted(changes),egne_WebP_RGBA_byteidentiske=True,metode='En komplett midlertidig hardlenket kandidat. De fem erstattede WebP og to metadatafiler ble koblet fra før skriving. Ingen aktiv modfil er skrevet.',publisert=False,midlertidig_kandidat_maal='Kun visuell animasjonskontroll av fem feilede stilproever. Ikke teknisk mottak eller godkjenning.',ruter=rows))
+(R/'bygg-stilprototype.py.txt').write_bytes(Path(__file__).read_bytes());print('prototype',len(actual),'filer, fem feilede proever, aktiv mod bytebevart')

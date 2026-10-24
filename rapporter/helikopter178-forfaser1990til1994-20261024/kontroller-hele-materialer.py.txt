@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;K=R/'kall'/sys.argv[1];read=lambda p:json.loads(p.read_text());q=read(K/'kontroll.json');src=np.array(Image.open(R/'kilder'/str(q['rute'])/'original-1x.png').convert('RGBA'));b=np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA'));mx,my=q['margx']*4,q['margy']*4;ref=np.zeros_like(b);ref[my:my+src.shape[0]*4,mx:mx+src.shape[1]*4]=np.repeat(np.repeat(src,4,0),4,1)
+# Hele tegningen flyttes samlet. Ingen lokale felt, kildeklipp eller RGB-endring.
+oy,ox=np.nonzero(src[:,:,3]>0);by,bx=np.nonzero(src[:,:,3]==0);refcore=ref[:,:,3]>=128;candidates=[]
+for dy in range(-2,3):
+ for dx in range(-2,3):
+  z=np.zeros_like(b);sx0,sy0=max(0,-dx),max(0,-dy);sx1,sy1=min(b.shape[1],b.shape[1]-dx),min(b.shape[0],b.shape[0]-dy);z[sy0+dy:sy1+dy,sx0+dx:sx1+dx]=b[sy0:sy1,sx0:sx1];core=z[:,:,3]>=128;pos=nd.distance_transform_edt(~core)[my+oy*4+2,mx+ox*4+2];neg=nd.distance_transform_edt(core)[my+by*4+2,mx+bx*4+2];bad=int((pos>3).sum()+(neg>3).sum());iou=float((core&refcore).sum()/(core|refcore).sum());candidates.append((bad,-iou,abs(dx)+abs(dy),dx,dy,z,pos,neg))
+bad,niou,_,dx,dy,z,pos,neg=min(candidates,key=lambda v:v[:3]);Image.fromarray(z).save(K/'prototype-helplassering.png');core=z[:,:,3]>=128
+colors=np.unique(src[src[:,:,3]>0,:3],axis=0);_,nativeids=cKDTree(colors.astype(float)).query(z[core,:3].astype(float));labels=np.full(core.shape,-1,int);labels[core]=nativeids
+material=lambda c:'sort'if c==(0,0,0)else'blaa'if c==(123,175,207)else'gyllenaksent'if c in[(195,103,7),(239,135,39),(255,179,67)]else'graatt_solv_vindu'if c[0]==c[1]==c[2]else'brunt'if c[0]>c[1]else'groent_oliven'
+groups={name:[i for i,c in enumerate(colors)if material(tuple(map(int,c)))==name]for name in ['sort','blaa','gyllenaksent','graatt_solv_vindu','brunt','groent_oliven']};rows=[]
+# Ny mørk tegnet strek kan ligge langs kildens allerede definerte omriss/materialgrenser.
+source_labels=np.full(refcore.shape,-1,int)
+for i,c in enumerate(colors):source_labels[(ref[:,:,3]>0)&np.all(ref[:,:,:3]==c,2)]=i
+edges=np.zeros(refcore.shape,bool);edges[:-1]|=source_labels[:-1]!=source_labels[1:];edges[:,:-1]|=source_labels[:,:-1]!=source_labels[:,1:];edgedist=nd.distance_transform_edt(~edges)
+for name,ids in groups.items():
+ have=np.isin(labels,ids)&core;target=np.zeros_like(refcore)
+ for i in ids:target|=(ref[:,:,3]>0)&np.all(ref[:,:,:3]==colors[i],2)
+ sy,sx=np.nonzero((src[:,:,3]>0)&np.isin(np.ravel_multi_index(np.moveaxis(src[:,:,:3],2,0),(256,256,256)),np.ravel_multi_index(colors[ids].T,(256,256,256))));yy,xx=my+sy*4+2,mx+sx*4+2;dist=nd.distance_transform_edt(~have)[yy,xx]if have.any()else np.full(len(yy),999.);extra=(edgedist[have]if name=='sort'else nd.distance_transform_edt(~target)[have])if have.any()else np.array([])
+ rows.append(dict(materiale=name,RGB_kilde=[colors[i].tolist()for i in ids],kildepunkter=len(yy),feil_kildepunkter_1x=np.column_stack((sx[dist>3],sy[dist>3])).tolist(),fester_over3HD=int((dist>3).sum()),maks_feste_HD=float(dist.max()),ekstra_piksler_over3HD=int((extra>3).sum()),maks_ekstra_HD=float(extra.max())if len(extra)else None,ekstra_sort_maales_mot_kildens_konturer=name=='sort'))
+proof=dict(kall=sys.argv[1],rute=q['rute'],metode='Hele fysisk sammenhengende materialer i naturlig heltegning. Originalens skygge-/dithertoner grupperes innen samme materiale, aldri mellom materialer. Alle RGB-data og alpha beholdes. Ny mørk inkstrek kontrolleres mot eksisterende kildekanter. Dette er en annen måling enn ren kodefarge i tekniske materialplan.',kildefarger_alle=len(colors),materialer=rows,terskel_HD=3,hel_flytt_HD=[dx,dy],snitt_union=round(-niou,3),alfa_fester_over3HD=int((pos>3).sum()),apninger_over3HD=int((neg>3).sum()),originalmaske=False,lokale_farge_eller_kildeendringer=False,RGB_endret=False,rå_palettklassifisering_fortsatt_rapportert_i='kontroll.json',raadatadiagnostikk_tauset_eller_terskler_endret=False,materialporter_bestatt=all(v['fester_over3HD']==v['ekstra_piksler_over3HD']==0 for v in rows),formporter_bestatt=bad==0,visuelt_sett=False,native_mottatt=False,motorobservert=False,publisert=False)
+(K/'hele-materialer-kontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'kontroller-hele-materialer.py.txt').write_bytes(Path(__file__).read_bytes());print({k:proof[k]for k in ['kall','hel_flytt_HD','snitt_union','alfa_fester_over3HD','apninger_over3HD','materialporter_bestatt','formporter_bestatt']});print([(e['materiale'],e['fester_over3HD'],e['ekstra_piksler_over3HD'])for e in rows])

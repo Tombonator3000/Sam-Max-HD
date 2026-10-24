@@ -1,0 +1,38 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,gzip,hashlib,os,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;C=O/'stilprototype3733';M=P/'mods/gpt';assert C.is_dir();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+baseline=json.loads(gzip.decompress((R/'kandidat3733-filhash.json.gz').read_bytes()));assert {str(p.relative_to(M)):sha(p)for p in M.rglob('*')if p.is_file()}==baseline
+actual={str(p.relative_to(C)):sha(p)for p in sorted(C.rglob('*'))if p.is_file()};assert set(actual)==set(baseline);changed={r for r in actual if actual[r]!=baseline[r]};assert changed=={f'costumes/costume178_{n}_hd.webp'for n in range(1990,1995)}|{'mod.json','SHA256SUMS'}
+keep=R/'stilprototype-beholdt';keep.mkdir();files=[]
+for rel in sorted(changed):
+ dest=keep/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(C/rel,dest);assert sha(dest)==actual[rel];files.append(dict(fil=rel,sha256=actual[rel],beholdt=str(dest.relative_to(A))))
+with gzip.open(R/'stilprototype-filhash.json.gz','wb')as f:f.write(json.dumps(actual,sort_keys=True,separators=(',',':')).encode())
+for name in ['stilprototype3733.json','rutekart-stilproever.json']:
+ q=read(R/name);q['midlertidig_modkopi_fjernet_etter_hashkontroll']=True;q['grunnlag_gjenopprettes_fra_hd_mod']='c80099158b30fb08fa0cb670acb112bf14fd58f4';q['alle_sju_avvikende_filer_beholdt']=files
+ for e in q['ruter']:
+  e['WebP_beholdt_fil']=str((keep/f'costumes/costume178_{e["rute"]}_hd.webp').relative_to(A));assert sha(A/e['WebP_beholdt_fil'])==e['midlertidig_WebP_SHA256']
+ put(R/name,q)
+free1=shutil.disk_usage(P).free;shutil.rmtree(C)
+# Ferdige motorprøver deles bare når SHA256 og faktiske bytes er identiske.
+canonical={};cache={}
+def digest(p):
+ st=p.stat();key=(st.st_dev,st.st_ino,st.st_size,st.st_mtime_ns)
+ if key not in cache:cache[key]=sha(p)
+ return cache[key]
+prior=['grunnlag3728-start1-pos220','kandidat3733-start1-pos220','pakke3733-start1-pos220']
+for name in prior:
+ for p in sorted((O/name).glob('*.png')):canonical.setdefault(digest(p),p)
+records=[];total=0
+targets=[]
+for name in ['stilgrunnlag-start1-3733','stilproever-start1-3733']:targets.extend(sorted((O/name).glob('*.png')))
+targets.extend(sorted(R.glob('stilprototype1990til1994-rute*-motor.png')))
+for p in targets:
+ total+=1;h=digest(p);old=canonical.get(h)
+ if old is None:canonical[h]=p;continue
+ if os.path.samefile(p,old):continue
+ assert p.read_bytes()==old.read_bytes();size=p.stat().st_size;t=p.with_name(p.name+'.dedup-link');assert not t.exists();os.link(old,t);os.replace(t,p);assert sha(p)==h;records.append(dict(fil=str(p),beholdt=str(old),sha256=h,byte=size))
+assert {str(p.relative_to(M)):sha(p)for p in M.rglob('*')if p.is_file()}==baseline
+put(R/'stilproever-dedup-rydding.json',dict(utc=datetime.now(timezone.utc).isoformat(),aktiv_mod_alle21978_filhash_bytebevart=True,kandidat_fjernet=str(C),kandidat_alle21978_hash_beholdt_i='stilprototype-filhash.json.gz',gjenoppretting='Hent komplett hd-mod c80099158b30fb08fa0cb670acb112bf14fd58f4 og erstatt bare de sju SHA-verifiserte filene i stilprototype-beholdt. Kontroller fullmanifestet. Dette gir kun feilet stilprototype, ikke godkjent mod.',unike_avvikende_kandidatfiler_beholdt=files,kun_egen_nodvendig_fullkandidat_fjernet=True,kontrollerte_nye_motorbilder=total,hardlenket=len(records),logiske_duplikatbyte=sum(e['byte']for e in records),alle_motorstier_og_hash_bevart=True,raa_kilder_stilanker_og_stasher_bevart=True,ingen_nye_arkivnedlastinger=True,filsystem_fri_for=free1,filsystem_fri_etter=shutil.disk_usage(P).free,logiske_byte_eller_fri_endring_ikke_tatt_som_bevist_fysisk_gevinstrapport=True,filer=records))
+(R/'rydd-stilproever.py.txt').write_bytes(Path(__file__).read_bytes());print('Kandidat fjernet,7 avvikende filer bevart,',len(records),'verifiserte motorbilder hardlenket,',len(targets),'stier bevart')
