@@ -1,0 +1,60 @@
+from pathlib import Path
+import json
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';q=json.loads((R/'rutekart-kantfarger.json').read_text());m=json.loads((R/'kantfarger-H327-motor-kontroll.json').read_text());put=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+text='''# Bladkanter og grønne haleflater
+
+H326..H330 er fem nye faktiske innebygde image_gen-kall, totalt154 mottatte råbilder. Seks egne komposisjoner omfatter også én Python-brunprøve fra samme H327-råbilde. Dette er retting av fase1987 i den påbegynte fig178_02, ingen nye hele figurjobber. H331 er ikke startet, forberedt eller reservert. Originalen er sett som hel fase, i rom35 og i nabofaser ved halerotoren. Sam er eneste godkjente stilanker. Tidligere egne bilder er redigeringsmål, ikke godkjente stilreferanser.
+
+| Variant | Positive materialfester | Rå RGB positiv/ekstra | Direkte form/åpning | Vurdering |
+| --- | ---: | ---: | --- | --- |
+'''
+for v in q['komposisjoner']:
+ text+='| '+v['variant']+' | '+str(v['positive_materialfester'])+' | '+str(v['RGB_positiv_ekstra'][0])+'/'+str(v['RGB_positiv_ekstra'][1])+' | '+str(v['direkte_form_apning'][0])+'/'+str(v['direkte_form_apning'][1])+' | '+v['grunn']+' |\n'
+text+='''
+H327/egen-del-RGB er holdt arbeidskontrollpunkt for1987. H326 forbedrer øvre venstre grå bladfelt, H327 får tilbake grønn nedre del av halefinnen. Positive materialfester går fra H323s fem til tre: grått[15,4], grønt[0,5]/[26,25]. Ekstra materialpiksler består: sort10, blått25, gyllenaksent57, grått186, brunt14, grønt188, lavendel1. Mot H323 går gull101 til57 og grått194 til186, men grønt175 til188. Rå RGB263/6315 er svakere enn H323s239/6260. Dette er ingen samlet material- eller stilgodkjenning; begge sider av alle porter gjelder fortsatt.
+
+H328s bredere grønne bomstripe løser ikke gjenværende halefeste. Originalens grønne felt må sees sammen med rotorens rot og nabofaser, ikke reduseres til en bomstripe. H330 prøver en bredere hel grønn rotorskulder og naturlig RGBA, men får tre formfeil og seks positive materialfester. H329s naturlige bladalfa taper14 direkte formfester og får12/1 etter materialkontrollens samlede helplassering. Begge er retur. Ingen ny generering eller kodefarge fra enkelte kildepunkter er brukt. Den globale brunkalibreringen av eget H327-råbilde gir ingen praktisk portforbedring og er ikke valgt.
+
+Seks egne heltegninger/native-PNG/RGBA er gjenskapt byteeksakt fra34 egne råbilder gjennom tidligere/nye kjeder, med sperrer mot originalbilder under produksjon. Valgt H327 har13 direkte råopphav: H266/H267/H268/H270/H299/H300/H309/H310/H311/H315/H323/H326/H327. Hele egne deler registreres samlet etter egen alfaramme. Alle piksler utenfor egne rektangler er bytebevart med myk16px overgang. H326/H327/H328 og brunprøven beholder egen alfa; H329/H330 bruker naturlig ny RGBA uten kildeklipp. De siste prøvene endrer henholdsvis26292/12810 egne alfapiksler, og er avvist av formkontrollen. Frosne heltransformer,3HD og12prosent er uendret. Ingen originalmaske eller lokal kildepunktmaling. Se replay-kantfarger.json og rutekart-kantfarger.json.
+
+H327 er lokalt motorobservert i én ny faktisk kontrollert160bilders kjøring mot bevart faktisk baseline fra03ff8106b2fd95a490d5df91ae2e62618abbc30a, samme binær/oppsett. Ny kjøring har148 nullkontroller og120/120 null etter frame40. Unik cel178/1987 ved39,67,72x36 i frame108 er valgt bare fra originale celkall. Lokal original-ROI[144,260,456,420] er byteidentisk;13259 HD-piksler endres der. Hele originaltilstander gir52 par og108 uparede per kjøring. HD-avvik utenfor ROI17330 og hel originalskjerm16096 består. Dette er lokal observasjon av konstruert aktør29, ingen helskjermregresjon, naturlig gjennomspilling eller ny Windows-/webtest. Strace dekker rename/unlink, ikke open/read. Motorpar og helt motorbilde er sett.
+
+Én nødvendig komplett hardlenket kandidat er laget fra fersk publisert hd-mod c80099158b30fb08fa0cb670acb112bf14fd58f4. Den har3734 native bare som midlertidig prøve. Ny WebP er tapsfri exact-RGBA, også skjult RGB, og alle tekniske PNG er bytebevart. Alle21978 aktive modhash er uendret før/etter byggingen. Tre kandidatspesifikke filer og fullmanifest for21979 filer er bevart. Fullkandidaten fjernes først etter faktisk kilde-tilbakehenting og full hashkontroll; journal blir kantfarger-rydding.json. Ingen ny full Git-/spilldatakopi eller arkivnedlasting. Fire uendrede releasevedleggs ID/størrelse/sjekksum er kontrollert på nytt; tidligere faktisk nedlastede og innholdskontrollerte Linux392411640byte og Windows544532414byte beholdes enkeltvis.
+
+Fortsatt508/1758 hele figurjobber,1250 uten resultat pluss returer/sluttkontroll,3733 publiserte native, fig178_02 20/24 og familie178 32/102. Alle9174 beskyttede input, derav9064 jobb/hovedark, og tre opprinnelige stasher er uendret. Ingen ny hel resultat.png, formelt native mottak, publisert mod/pakke eller Tom-/Claude-godkjenning. Ingen nødvendig ny Tom-avklaring. Automatikken ACTIVE, all grafikk og samlet sluttkontroll er ikke ferdig. Følg docs/WEBP.md og docs/PLASSBRUK.md. Prosjektbibliotekets figurark-fast-storrelse.md er brukt med lokale kontroller, PASS i opphavet er ikke stilgodkjenning her.
+'''
+# Keep numbers readable without altering IDs, hashes, or protected inputs.
+replacements={'totalt154':'totalt 154','fase1987':'fase 1987','for1987':'for 1987','rom35':'rom 35','fra34':'fra 34','har13':'har 13','myk16px':'myk 16 px','henholdsvis26292/12810':'henholdsvis 26292/12810','kontrollert160bilders':'kontrollert 160 bilders','fra03ff':'fra 03ff','har148':'har 148','og120/120':'og 120/120','frame40':'frame 40','cel178/1987':'cel 178/1987','ved39,67,72x36':'ved 39,67,72x36','frame108':'frame 108','ROI[144':'ROI [144',';13259':'; 13259','gir52':'gir 52','og108':'og 108','ROI17330':'ROI 17330','originalskjerm16096':'originalskjerm 16096','aktør29':'aktør 29','har3734':'har 3734','Alle21978':'Alle 21978','for21979':'for 21979','Linux392411640byte':'Linux 392411640 byte','Windows544532414byte':'Windows 544532414 byte','Fortsatt508/1758':'Fortsatt 508/1758',',1250':', 1250',',3733':', 3733','familie178':'familie 178','Alle9174':'Alle 9174','derav9064':'derav 9064',',3HD':', 3 HD','og12prosent':'og 12 prosent','grått[15':'grått [15','grønt[0':'grønt [0'}
+for a,b in replacements.items():text=text.replace(a,b)
+(R/'kantfarger-status.md').write_text(text)
+nexttext='''# Gjenoppta H327/1987 og øvrige åpne returer
+
+H326..H330 er utført, fem nye faktiske bildeverktøykall og totalt 154 råbilder. H331 er ikke startet, forberedt eller reservert. Les kantfarger-status.md, rutekart-kantfarger.json og replay-kantfarger.json.
+
+H327/egen-del-RGB er holdt arbeidskontrollpunkt. Grå bladkant og grønn nedre halefinne er forbedret, direkte form/åpning 0/0. Tre positive består: grått [15,4], grønt [0,5]/[26,25], og ekstra materialpiksler er fortsatt retur. Ikke skjul rå RGB263/6315 eller ekstra grønt188. H328s bredere bomstripe løste ikke halefestet, H329/H330s naturlige RGBA taper form og er retur. Ikke viderefør antakelsen om at hele det grønne halefestet kan løses som en bomstripe; se rotoren og nabofasene samlet før nytt motiv. Ingen kildepunktsmaling, originalmasker eller avslappede porter. Bevar liten svart bladskygge, vindusrefleksenes små blå/lavendel/grønne deler, gull [39,15]/[47,21], grønt fremre stagfeste og grå dash.
+
+Seks komposisjoner/native-PNG/RGBA er byteeksakt reprodusert fra 34 egne råbilder, 13 direkte i valgt H327. Nye deler registreres samlet etter egen alfaramme med myk 16 px overgang, uten å forme dem med originalen. Fast heltransform,3HD og12prosent gjelder. Sam er eneste godkjente stilanker. Hele berørte faser og animasjon må fortsatt gjennom samlet kontroll.
+
+H327 alene er lokalt motorobservert i én ny faktisk160bilders kontrollert kjøring mot bevart faktisk baseline. Lokal original-ROI er identisk, hele skjermtilstander utenfor ROI divergerer. Ingen bestått helskjermregresjon, naturlig/Windows-/webgjennomspilling eller formelt native mottak. Én nødvendig hardlenket kandidat fra fersk publisert mod, tre avvikende filer og fullmanifest beholdes til verifisert opprydding. Ingen full Git-/spilldatakopi eller dobbel arkivnedlasting. Historiske out-modmapper er ikke komplette grunnlag.
+
+Behold H289/utsnitt-egenbbox for1988, med kildegrønne/oliven stripeavbrudd som riktig premiss, og H252/eget-rent-kontrollpunkt for1990. 1986/1989 og1991..1994 har fortsatt returer. Ikke dupliser1995..2021 uten dokumentert retur.
+
+Fortsatt508/1758 hele jobber,3733 native, fig178_02 20/24 og familie178 32/102. Ingen ny hel jobb, publisert mod/pakke eller Tom-/Claude-godkjenning. Ingen nødvendig ny Tom-avklaring. Automatikken ACTIVE, all grafikk og sluttkontroll er ikke ferdig. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+'''
+for a,b in replacements.items():nexttext=nexttext.replace(a,b)
+nexttext=nexttext.replace('for1988','for 1988').replace('for1990','for 1990').replace('og1991','og 1991').replace('dupliser1995','dupliser 1995').replace('faktisk160bilders','faktisk 160 bilders')
+(R/'NESTE.md').write_text(nexttext)
+block='''<!-- helikopter178-kantfarger-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+H326..H330 er fem faktiske nye innebygde image_gen-kall, totalt 154 råbilder. Seks egne komposisjoner/native-PNG/RGBA er gjenskapt byteeksakt fra 34 egne råbilder. H327/1987 er holdt arbeidskontrollpunkt: grå bladkant og grønn nedre halefinne forbedret. Tre positive materialfester og ekstra piksler består, rå RGB263/6315. Form/åpning 0/0. H328 bomstripe løser ikke halefestet; H329/H330 naturlig RGBA taper form og er retur. Ingen kildepunktmaling eller originalmasker. Bare H327 er ny lokalt motorobservert i én faktisk160bilders kjøring mot bevart faktisk baseline, lokal original-ROI identisk. Hele skjermtilstander utenfor ROI divergerer; ingen helskjermregresjon eller naturlig gjennomspilling.
+
+Én nødvendig midlertidig WebP-kandidat er bare prøve. Ingen hel jobb, formelt native mottak, publisert mod/pakke eller Tom-/Claude-godkjenning. Fortsatt508/1758 hele jobber og3733 native. Alle aktive modhash, beskyttede input og tre stasher er uendret. H331 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og kantfarger-status.md. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-kantfarger-20261024:slutt -->
+
+'''
+for a,b in replacements.items():block=block.replace(a,b)
+block=block.replace('og3733','og 3733').replace('faktisk160bilders','faktisk 160 bilders')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;s=p.read_text();first,rest=s.split('\n',1);assert 'helikopter178-kantfarger-20261024:start'not in s;p.write_text(first+'\n\n'+block+rest.lstrip('\n'))
+(R/'skriv-kantstatus.py.txt').write_bytes(Path(__file__).read_bytes());print('Status, NESTE og gjeldende ordre oppdatert.')

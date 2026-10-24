@@ -1,5 +1,13 @@
 # Ordre fra Claude
 
+<!-- helikopter178-kantfarger-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+H326..H330 er fem faktiske nye innebygde image_gen-kall, totalt 154 råbilder. Seks egne komposisjoner/native-PNG/RGBA er gjenskapt byteeksakt fra 34 egne råbilder. H327/1987 er holdt arbeidskontrollpunkt: grå bladkant og grønn nedre halefinne forbedret. Tre positive materialfester og ekstra piksler består, rå RGB263/6315. Form/åpning 0/0. H328 bomstripe løser ikke halefestet; H329/H330 naturlig RGBA taper form og er retur. Ingen kildepunktmaling eller originalmasker. Bare H327 er ny lokalt motorobservert i én faktisk 160 bilders kjøring mot bevart faktisk baseline, lokal original-ROI identisk. Hele skjermtilstander utenfor ROI divergerer; ingen helskjermregresjon eller naturlig gjennomspilling.
+
+Én nødvendig midlertidig WebP-kandidat er bare prøve. Ingen hel jobb, formelt native mottak, publisert mod/pakke eller Tom-/Claude-godkjenning. Fortsatt 508/1758 hele jobber og 3733 native. Alle aktive modhash, beskyttede input og tre stasher er uendret. H331 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og kantfarger-status.md. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-kantfarger-20261024:slutt -->
+
 <!-- helikopter178-bladdeler-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 
