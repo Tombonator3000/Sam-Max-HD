@@ -180,3 +180,7 @@ Grafikkilde e69f7939acd7ba75a3d7d56d5b5891e7275e7497 er vanlig Git-barn av d225a
 ## Faktisk tilbakehenting av de fem rettingskallene
 
 Grafikkilde 4874e190b83aa39582dc6d65f8a9a1f84b7d6b5d er vanlig Git-barn av 0bd76d22138bffeb724a6a9a6d0ac08bebea2fef. Alle 112 endrede filer er faktisk hentet som strømmer, totalt 10660296 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle filer. Ingen ekstra nedlastet payloadkopi beholdes. Se firefase-rensing-kilder-faktisk-hentet.json.gz. H270/1987 og H283/bare-hale for 1988 er fortsatt arbeidskontrollpunkter med returer, ikke native mottatt. H284 er ikke startet; automatikken ACTIVE.
+
+## Faktisk tilbakehenting av de seks rotorfelt- og sidefeltkallene
+
+Grafikkilde d4c9bf3be90deba697723988491eedf1481787ac er vanlig Git-barn av fdd7a094ecae200350178c1f9eb51ce2ea4ed0f8. Alle 174 endrede filer er faktisk hentet som strømmer, totalt 16364327 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for samtlige filer. Ingen ekstra nedlastet payloadkopi beholdes. Se rotorfelt1988-kilder-faktisk-hentet.json.gz. H289/utsnitt-egenbbox holdes som nytt arbeidskontrollpunkt med tre direkte formfester og material-/motivretur, ikke godkjent native. H270/1987 er uendret. H290 er ikke startet; automatikken ACTIVE.

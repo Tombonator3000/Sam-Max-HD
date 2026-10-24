@@ -9,3 +9,7 @@ Seks faktiske innebygde image_gen-kall H284..H289 retter åpen fase 1988, totalt
 - Ingen av de nye variantene skal importeres nå. Ved bestått retting: én fersk komplett WebP-mod, relevant motorprøve, vanlig hd-mod-barn av gjeldende fjern-SHA, faktisk tilbakehenting og pakker ved publisert samlepunkt/avslutning.
 
 Se rotorfelt1988-status.md, rutekart-rotorfelt1988.json og replay-rotorfelt1988.json. H290 er ikke startet/reservert. Ingen nødvendig ny Tom-avklaring; automatikken ACTIVE; all grafikk er ikke ferdig.
+
+## Faktisk tilbakehenting av de seks rotorfelt- og sidefeltkallene
+
+Grafikkilde d4c9bf3be90deba697723988491eedf1481787ac er vanlig Git-barn av fdd7a094ecae200350178c1f9eb51ce2ea4ed0f8. Alle 174 endrede filer er faktisk hentet som strømmer, totalt 16364327 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for samtlige filer. Ingen ekstra nedlastet payloadkopi beholdes. Se rotorfelt1988-kilder-faktisk-hentet.json.gz. H289/utsnitt-egenbbox holdes som nytt arbeidskontrollpunkt med tre direkte formfester og material-/motivretur, ikke godkjent native. H270/1987 er uendret. H290 er ikke startet; automatikken ACTIVE.
