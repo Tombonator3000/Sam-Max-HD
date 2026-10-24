@@ -193,3 +193,7 @@ Grafikkilde 4874e190b83aa39582dc6d65f8a9a1f84b7d6b5d er vanlig Git-barn av 0bd76
 ## Faktisk tilbakehenting av de seks rotorfelt- og sidefeltkallene
 
 Grafikkilde d4c9bf3be90deba697723988491eedf1481787ac er vanlig Git-barn av fdd7a094ecae200350178c1f9eb51ce2ea4ed0f8. Alle 174 endrede filer er faktisk hentet som strømmer, totalt 16364327 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for samtlige filer. Ingen ekstra nedlastet payloadkopi beholdes. Se rotorfelt1988-kilder-faktisk-hentet.json.gz. H289/utsnitt-egenbbox holdes som nytt arbeidskontrollpunkt med tre direkte formfester og material-/motivretur, ikke godkjent native. H270/1987 er uendret. H290 er ikke startet; automatikken ACTIVE.
+
+## Faktisk tilbakehenting av delprøver og verktøyavvisning
+
+Grafikkilde b03b92ef11b452a2cf0aad45710a770d99d21062 er vanlig Git-barn av 9e2beea6ca6b9e675ebf7a28d75f190aec86971e. Alle 169 endrede filer er faktisk hentet som strømmer, totalt 16273421 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for samtlige filer. Ingen ekstra nedlastet payloadkopi beholdes. Se delfelt1988-kilder-faktisk-hentet.json.gz. Fem råbilder og H291s feilbevis er bevart; H291 har ingen råbildefil. Alle nye grafikkprøver er fortsatt returer. H289/1988 og H270/1987 beholdes uendret. H296 er ikke startet; automatikken ACTIVE.
