@@ -1,0 +1,25 @@
+from pathlib import Path
+import json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+rec=read(O/'kantfarger-kilder-faktisk-hentet.json');source=rec['commit'];assert source=='348aa26c6e4967469a3d1941e1fc3b07b2afa451'and rec['faktisk_hentet_filer']==132 and rec['SHA256_og_Gitblob_SHA1_bekreftet'];(R/'kantfarger-kilder-faktisk-hentet.json').write_bytes((O/'kantfarger-kilder-faktisk-hentet.json').read_bytes());cleanup=read(R/'kantfarger-rydding.json');assert cleanup['midlertidig_fullkandidat_kontrollert_og_fjernet']and not(O/'delproeve3734').exists()
+q=read(R/'rutekart-kantfarger.json');q.update(kilde_SHA_avventer_commit=False,grafikkilde_kantfarger=source,kildefiler_faktisk_hentet=rec['faktisk_hentet_filer'],kildefiler_bytes=rec['bytes'],kildefiler_SHA256_og_Gitblob_SHA1_bekreftet=True,kildekvittering_SHA256=sha(R/'kantfarger-kilder-faktisk-hentet.json'),midlertidig_fullkandidat_ryddet=True,rydding='kantfarger-rydding.json',motor_kontroll_SHA256=sha(R/'kantfarger-H327-motor-kontroll.json'))
+for e in q['komposisjoner']:e['grafikkilde']=source
+put(R/'rutekart-kantfarger.json',q);f=read(R/'fremdrift.json');f.update(grafikkilde_nye_kantfarger=source,kantfarger_kilde_sha_avventer_egen_commit=False,kantfarger_kilde_filer_faktisk_hentet=rec['faktisk_hentet_filer'],kantfarger_kilde_bytes=rec['bytes'],kantfarger_kilde_SHA256_og_Gitblob_SHA1_bekreftet=True,kantfarger_nedlastet_payload_dobbeltlagret=False,kantfarger_rydding='kantfarger-rydding.json',midlertidig_kandidat_ryddet=True,hardlenkede_eksakte_motorbildekopier=cleanup['nye_eksakte_kopier_hardlenket'],nye_motorPNG_stier_beholdt=cleanup['nye_motorPNG_stier']);put(R/'fremdrift.json',f)
+text='Kilde '+source+' er pushet og faktisk strømmet tilbake: '+str(rec['faktisk_hentet_filer'])+' filer/'+str(rec['bytes'])+' byte. Alle lengder/SHA256/Git-blob SHA1 er bekreftet uten ekstra nedlastet payload. Deretter er hele kandidaten med 21979 filer kontrollert og fjernet. Tre kandidatspesifikke filer og fullmanifest er bevart for gjenoppretting fra hd-mod-forelderen. Alle 21978 aktive modhash er uendret før/etter. '+str(cleanup['nye_eksakte_kopier_hardlenket'])+' eksakte nye motorbildekopier er hardlenket; alle '+str(cleanup['nye_motorPNG_stier'])+' stier/hash beholdes. Se kantfarger-rydding.json. Ingen råbilder, unike kilder, stilankre eller stasher er slettet.'
+p=R/'kantfarger-status.md';s=p.read_text().replace('Fullkandidaten fjernes først etter faktisk kilde-tilbakehenting og full hashkontroll; journal blir kantfarger-rydding.json.','Fullkandidaten er fjernet etter faktisk kilde-tilbakehenting og full hashkontroll, se kantfarger-rydding.json.');p.write_text(s+'\n'+text+'\n')
+p=R/'NESTE.md';s=p.read_text().replace('beholdes til verifisert opprydding','er sikret, og fullkandidaten er verifisert og ryddet');p.write_text(s+'\n'+text+'\n')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;s=p.read_text();end='<!-- helikopter178-kantfarger-20261024:slutt -->';assert s.count(end)==1;p.write_text(s.replace(end,text+'\n'+end))
+# Readability corrections only in new prose; actual prompts, raw images and job inputs stay intact.
+files=[R/'kantfarger-status.md',R/'NESTE.md']+[R/'kall'/('H'+str(i))/'notat.md'for i in range(326,331)]
+subs={'i26292piksler':'i 26292 piksler','i12810piksler':'i 12810 piksler','fra34':'fra 34','myk16px':'myk 16 px','kontrollert160bilders':'kontrollert 160 bilders','RGB263':'RGB 263','grønt188':'grønt 188','sort10':'sort 10','blått25':'blått 25','gyllenaksent57':'gyllenaksent 57','grått186':'grått 186','brunt14':'brunt 14','lavendel1':'lavendel 1','gull101':'gull 101','til57':'til 57','grått194':'grått 194','til186':'til 186','grønt175':'grønt 175','til188':'til 188','får12/1':'får 12/1',',3HD':', 3 HD','og12prosent':'og 12 prosent','rom35':'rom 35','H327s186 til254':'H327s 186 til 254','til195':'til 195','H323s239/6260':'H323s 239/6260','160bilders':'160 bilders','fase1987':'fase 1987','RGB263/6314':'RGB 263/6314','formfester og får12/1':'formfester og får 12/1'}
+for p in files:
+ s=p.read_text()
+ for a,b in subs.items():s=s.replace(a,b)
+ p.write_text(s)
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;s=p.read_text();left,rest=s.split('<!-- helikopter178-kantfarger-20261024:slutt -->',1)
+ for a,b in subs.items():left=left.replace(a,b)
+ p.write_text(left+'<!-- helikopter178-kantfarger-20261024:slutt -->'+rest)
+(R/'fest-kantfarger.py.txt').write_bytes(Path(__file__).read_bytes());print('132 kildefiler SHA-festet, kandidat verifisert og ryddet.')
