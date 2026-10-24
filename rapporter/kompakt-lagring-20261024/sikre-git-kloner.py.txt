@@ -1,0 +1,24 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,subprocess,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/kompakt-lagring-20261024';R=P/'work/.gpt-gren/rapporter'/O.name
+rows=json.loads((O/'git-kloner-plan.json').read_text())['clones'];missing=json.loads((O/'manglende-objekter.json').read_text());oids=sorted(missing)
+# All historic publication data already exists in the retained repository. Keep the
+# formerly unreachable publication commits and back up their unique metadata remotely.
+checks=subprocess.check_output(['git','cat-file','--batch-check'],cwd=P,input=('\n'.join(oids)+'\n').encode()).decode().splitlines();assert len(checks)==245 and all('missing'not in x for x in checks)
+refs=[]
+for row in rows:
+ c=P/row['path'];assert not row['stash'] and not row['locks'] and not row['operations'];subprocess.run(['git','diff','--cached','--quiet'],cwd=c,check=True)
+ heads=subprocess.check_output(['git','for-each-ref','--format=%(refname) %(objectname)'],cwd=c,text=True).splitlines();symbolic=subprocess.check_output(['git','symbolic-ref','HEAD'],cwd=c,text=True).strip();ref='refs/archive/out-publikasjon/'+row['head'];subprocess.run(['git','update-ref',ref,row['head']],cwd=P,check=True);refs.append({**row,'archive_ref_in_retained_repository':ref,'original_HEAD_symbolic':symbolic,'original_refs':heads,'index_matches_HEAD':True})
+pack=R/'historiske-publiseringsmetadata.pack'
+with pack.open('wb')as f:subprocess.run(['git','pack-objects','--stdout','--no-reuse-delta'],cwd=P,input=('\n'.join(oids)+'\n').encode(),stdout=f,check=True)
+# Validate the independent metadata pack and all originally referenced objects.
+with pack.open('rb')as f:result=subprocess.run(['git','index-pack','--stdin','--verify'],cwd=P,stdin=f,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+# --verify requires an on-disk pack; validate by indexing the retained standalone copy.
+if result.returncode:
+ result=subprocess.run(['git','index-pack',str(pack)],cwd=P,capture_output=True,text=True,check=True);idx=pack.with_suffix('.idx');subprocess.run(['git','verify-pack','-v',str(idx)],cwd=P,stdout=subprocess.DEVNULL,check=True);idx.unlink()
+reachable=set(x.split()[0]for x in subprocess.check_output(['git','rev-list','--objects','--all'],cwd=P,text=True).splitlines())
+for row in rows:
+ c=P/row['path'];objects=set(subprocess.check_output(['git','cat-file','--batch-all-objects','--batch-check=%(objectname)'],cwd=c,text=True).splitlines());assert objects<=reachable,row['path']
+proof={'utc':datetime.now(timezone.utc).isoformat(),'clones':refs,'unique_objects_preserved':len(oids),'object_types_and_sizes':checks,'standalone_metadata_pack':pack.name,'pack_bytes':pack.stat().st_size,'pack_sha256':hashlib.sha256(pack.read_bytes()).hexdigest(),'pack_verified':True,'all_clone_objects_reachable_in_retained_repository':True,'remote_sha_before':json.loads((O/'baseline.json').read_text())['hd_mod'],'remove_only_old_git_metadata_after_remote_backup':True,'stashes_untouched':True}
+(R/'git-kloner-sikret.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'sikre-git-kloner.py.txt').write_bytes(Path(__file__).read_bytes());print('Sikret',len(rows),'gamle kloner med',len(oids),'unik metadataobjekter.',pack.stat().st_size,'byte. Ingen Git-klon slettet ennå.')

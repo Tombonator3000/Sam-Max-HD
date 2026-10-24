@@ -1,0 +1,38 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import os,subprocess,json,hashlib,gzip
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/kompakt-lagring-20261024';R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def git(cwd,*args):return subprocess.check_output(['git',*args],cwd=cwd).decode().strip()
+def put(n,x):(O/n).write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+def free():s=os.statvfs(P);return s.f_bavail*s.f_frsize
+assert git(P,'branch','--show-current')=='main' and not git(P,'status','--porcelain')
+base={'utc':datetime.now(timezone.utc).isoformat(),'free_before':free(),'main':git(P,'rev-parse','HEAD'),'gpt':git(A,'rev-parse','HEAD'),'hd_mod':git(P,'ls-remote','origin','refs/heads/hd-mod').split()[0],'stashes':git(P,'stash','list','--format=%H').splitlines(),'du_project_before':int(subprocess.check_output(['du','-sx','-B1',str(P)]).split()[0])}
+put('baseline.json',base)
+reachable=set(x.split()[0]for x in git(P,'rev-list','--objects','--all').splitlines());assert len(reachable)>20000
+# Only standalone, old publication clones under out; never registered worktrees.
+clones=[]
+for root,ds,fs in os.walk(P/'out'):
+ path=Path(root)
+ if '.git' in ds:
+  ds.remove('.git');clones.append(path)
+rows=[]
+for c in sorted(clones):
+ d=c/'.git';objects=set(git(c,'cat-file','--batch-all-objects','--batch-check=%(objectname)').splitlines());heads=git(c,'for-each-ref','--format=%(objectname)').splitlines();head=git(c,'rev-parse','HEAD');locks=list(d.rglob('*.lock'));nbytes=sum(p.stat().st_size for p in d.rglob('*')if p.is_file());idx=git(c,'ls-files','--stage').splitlines();index_oids={x.split()[1]for x in idx};missing=(objects|index_oids|set(heads)|{head})-reachable;stashes=git(c,'stash','list','--format=%H').splitlines();operations=[n for n in ['MERGE_HEAD','rebase-apply','rebase-merge','sequencer']if(d/n).exists()]
+ row={'path':str(c.relative_to(P)), 'head':head,'objects':len(objects),'objects_missing_from_retained_reachable_root':len(missing),'all_objects_reachable_in_root':not missing,'git_bytes':nbytes,'stash':stashes,'locks':len(locks),'operations':operations,'remove_only_git_metadata':not missing and not locks and not operations and not stashes}
+ rows.append(row)
+ print(len(rows),'/',len(clones),c.name,row['remove_only_git_metadata'],flush=True)
+put('git-kloner-plan.json',{'root_reachable_objects':len(reachable),'clones':rows,'removable':sum(x['remove_only_git_metadata']for x in rows),'metadata_bytes':sum(x['git_bytes']for x in rows if x['remove_only_git_metadata'])})
+# Canonical game copies remain untouched. Only byte-identical old out copies qualify.
+source={p.name:{'source':str(p),'size':p.stat().st_size,'sha256':sha(p)}for p in(P/'game').iterdir()if p.is_file() and p.name!='SHA256SUMS'}
+keepers={'kompakt-lagring-20261024','helikopter178-forfaser1990til1994-20261024','helikopter178-forfaser1995til1999-20261023'};dups=[]
+for root,ds,fs in os.walk(P/'out'):
+ p=Path(root);ds[:]=[n for n in ds if n!='.git' and not(p==P/'out'and n in keepers)]
+ for n in fs:
+  if n not in source:continue
+  f=p/n;s=source[n]
+  if f.is_symlink()or f.stat().st_size!=s['size']:continue
+  if sha(f)==s['sha256']:dups.append({'path':str(f.relative_to(P)),**s})
+put('spillduplikater-plan.json',{'sources':source,'duplicates':dups,'files':len(dups),'logical_bytes':sum(x['size']for x in dups)})
+print('CLONES',sum(x['remove_only_git_metadata']for x in rows),'BYTES',sum(x['git_bytes']for x in rows if x['remove_only_git_metadata']), 'GAME',len(dups),sum(x['size']for x in dups),flush=True)
+(R/'audit.py.txt').write_bytes(Path(__file__).read_bytes())
