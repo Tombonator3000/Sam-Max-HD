@@ -1,5 +1,19 @@
 # memory.md
 
+<!-- helikopter178-detaljer-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Detaljrettinger, fortsatt retur, 2026-10-24 03:28
+
+Seks nye faktiske innebygde image_gen-kall H236..H241 har rettet detaljer i helikopterfase1990. Totalt 66 kall er bevart i bunken. Tre grå sidegrupper er skilt, fremre skjøt er mørknet, to små olivenfelt er gjenopprettet og en oppdiktet lys krage under hovedrotornavet er fjernet. H239 har glattere strek i spillet, men små materialfelt og to åpninger avviker fortsatt. Alle seks er holdte prøver, ingen nye native mottak, hele figurjobber eller publiserte grafikkbytes. Ingen ny Tom-/Claude-godkjenning. [Rapport, råbilder og rutekart](https://github.com/Tombonator3000/Sam-Max-HD/tree/14a440c5c30e8af0378cc33f149941d30f175205/rapporter/helikopter178-forfaser1990til1994-20261024).
+
+To ferske kontrollerte avspillinger av H239 og aktiv mod gir 160 identiske hele original-RGBA-filpar med 159 unike framenumre og identiske originale celtegnekall. Bare fase1990 endrer HD. Hele helikopteret og original ROI med 8 HD nabo er kontrollert, og motorparet er visuelt sett. Hver kjøring har 160 kontroller/148 null, 120/120 null etter frame40, og 12 like tidlige avvik i koordinater og begge RGBA. En eldre baseline ble først avvist på ulik originaltilstand. Ikke full naturlig gjennomspilling eller ny Windows-/webtest. Ingen originalmasker, kildefragmenter eller lokal kildebasert påmaling/flytting. Bare hele egen tegning tilpasses; egne brune/grønne RGB kalibreres globalt med uendret alfa. Grensene på 3 HD-piksler er beholdt.
+
+Grafikkilde a96a59f9b306f677ed56982ef953816841245cf1 og rapport 14a440c5c30e8af0378cc33f149941d30f175205 er pushet og faktisk hentet tilbake. Alle 176 kildefiler og fire rapportfiler er lengde-, SHA256- og Git-blob SHA1-bekreftet uten ekstra lagrede nedlastingskopier. Den midlertidige fullmodkopien er ryddet; alle tre avvikende filer og fullmanifest er beholdt. 913 eksakte motorbildekopier er hardlenket, med alle 1124 nye bildestier/hash bevart. Alle 21978 aktive modfiler, 9174 beskyttede input og tre opprinnelige stasher er uendret.
+
+Faktisk opptelling er fortsatt 508/1758 hele figurjobber, 1250 uten resultat, pluss returer/sluttkontroll. Fig178_02 er 20/24 tekniske ruter uten hel resultat.png, familie178 32/102. Aktiv hd-mod og begge kontrollerte fellespakker er uendret c80099158b30fb08fa0cb670acb112bf14fd58f4, 3733 native. Ingen ny pakke bygges av feilede prøver. Neste er konkrete småfelt- og åpningsrettinger fra H239, ikke H240/H241 som forbedring. H242 er ikke forberedt, utført eller reservert. Fortsett deretter1991..1994;1989..1986 er uproduserte.137/V013 og296/S037 er uendret. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes fortsatt med lokal kontroll og docs/WEBP.md. Ingen motor-/pipelinekodeendring eller ny nødvendig designavklaring. Automatikken er ACTIVE, grafikken er ikke ferdig.
+<!-- helikopter178-detaljer-20261024:slutt -->
+
 <!-- helikopter178-helstil-20261024:start -->
 Nyeste status gjelder foran eldre publiseringsblokker nedenfor.
 

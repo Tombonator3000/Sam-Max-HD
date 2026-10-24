@@ -1,5 +1,17 @@
 # todo.md
 
+<!-- helikopter178-detaljer-20261024:start -->
+## Neste i grafikkproduksjonen, 2026-10-24 03:28
+
+- [x] Seks faktiske detaljprøver H236..H241 er laget, kontrollert, pushet og faktisk hentet med verifiserte rå-/prompt-/referansehash. Fortsatt retur, ingen nye godkjente native.
+- [x] H239 er sett i to ferske kontrollerte motoravspillinger, med 160 identiske hele originalfilpar og HD-endring bare i1990. Midlertidig mod er ryddet med tre endrede filer og fullmanifest beholdt. 913 nye duplikater er hardlenket, alle 1124 bildestier/hash beholdt.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/14a440c5c30e8af0378cc33f149941d30f175205/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra H239 med grå småfelt og to åpninger. Sam er godkjent stilanker. H242 er ikke forberedt, utført eller reservert. Ikke bruk H240/H241 som forbedring.
+- [ ] Fortsett stilretur1991..1994 og uproduserte1989..1986. Først når alle24 ruter og returer er klare, lever hel fig178_02/resultat.png. Fortsatt20/24, familie17832/102,508/1758 hele figurjobber og1250 uten resultat pluss returer/sluttkontroll.
+- [ ] Fortsett all produserbar grafikk automatisk. Publiser bare kontrollert retur som vanlig barn av fersk hd-mod-SHA, med faktisk tilbakehenting av alle hash. Én kandidat per bunke, tapsfri exact WebP og bevarte tekniske PNG. Begge faktiske pakker oppdateres ved neste publiserte samlepunkt/avslutning; samme antall beviser ikke samme bytes.
+
+Grafikkilde a96a59f9b306f677ed56982ef953816841245cf1 og rapport14a440c5c30e8af0378cc33f149941d30f175205 er faktisk hentet med SHA256 og Git-blob SHA1 bekreftet. hd-mod og begge eksisterende pakker er uendret c80099158b30fb08fa0cb670acb112bf14fd58f4,3733 native. Automatikken er ACTIVE; ingen ny nødvendig Tom-avklaring eller godkjenning.
+<!-- helikopter178-detaljer-20261024:slutt -->
+
 <!-- helikopter178-helstil-20261024:start -->
 ## Neste i grafikkproduksjonen
 
