@@ -1,0 +1,13 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';K=R/'kall/H299';V=K/'egen-brune-stag';V.mkdir(exist_ok=False);src=K/'bare-vindu-egen-alfa/egen-heltegning.png';real=Image.open;opened=[]
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p==src.resolve();opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ a=np.array(Image.open(src).convert('RGBA'));f=a[:,:,:3].astype(float);r,g,b=np.moveaxis(f,2,0);yy,xx=np.indices(a.shape[:2]);x,y,X,Y=520,749,855,887;edge=np.minimum.reduce([xx-x,yy-y,X-1-xx,Y-1-yy]);t=np.clip(edge/12,0,1);feather=t*t*(3-2*t);warm=np.clip((r-g-15)/25,0,1)*np.clip((g-b-10)/20,0,1);light=np.clip((r-139)/55,0,1);weight=feather*warm*light*(a[:,:,3]/255)
+ # Only own warm high RGB in a soft own rectangle is cleaned to the canonical light brown.
+ target=np.zeros_like(f);target[:]=[139,75,15];out=a.copy();out[:,:,:3]=np.rint(f*(1-weight[:,:,None])+target*weight[:,:,None]).clip(0,255).astype(np.uint8);out[a[:,:,3]==0]=a[a[:,:,3]==0];outside=(xx<x)|(xx>=X)|(yy<y)|(yy>=Y);assert np.array_equal(out[outside],a[outside])and np.array_equal(out[:,:,3],a[:,:,3]);Image.fromarray(out).save(V/'egen-heltegning.png')
+finally:Image.open=real
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((K/'plan.json').read_text());plan.update(kall='H299/egen-brune-stag',nytt_bildekall=False,egen_variant='H299/egen-brune-stag',egen_ROI=[x,y,X,Y]);(V/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n');d=dict(metode='Egen myk RGB-rens av varme hoylys paa egne stag/nedre kropp. Eget rektangel, ikke originalmaske. Bare egne RGB/alpha leses, kanonisk lys brun er en fargekonstant.',produksjonsbilder_aapnet=opened,egen_base_SHA256=sha(src),egen_resultat_SHA256=sha(V/'egen-heltegning.png'),egen_ROI=[x,y,X,Y],egen_feather_px=12,egen_lysbun_RGB=[139,75,15],egen_alpha_byteidentisk=True,utenfor_egen_ROI_byteidentisk=True,originalbilder_eller_masker_i_produksjon=0,nytt_bildekall=False);(V/'rens.json').write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');(R/'rens-egen-strutfarge.py.txt').write_bytes(Path(__file__).read_bytes());print(V)

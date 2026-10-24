@@ -1,0 +1,57 @@
+from pathlib import Path
+from PIL import Image
+from io import BytesIO
+from smhd.myk import _premul_resize
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np,json,hashlib,ast
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;OLD=P/'out/helikopter178-forfaser1990til1994-20261024';R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+ids=['H266','H267','H268','H270','H276','H296','H297','H298','H299','H300','H306','H307','H308','H309','H310'];files={c:R/'kall'/c/'raa.png'for c in ids};allowed={p.resolve()for p in files.values()};opened=[];real=Image.open
+
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in allowed,str(p);opened.append(str(p));return real(fp,*a,**kw)
+
+def pngsha(a):
+ b=BytesIO();Image.fromarray(a).save(b,format='PNG');return hashlib.sha256(b.getvalue()).hexdigest()
+
+def rect(old,new,box,feather):
+ x,y,X,Y=box;H,W=Y-y,X-x;yy,xx=np.indices((H,W));t=np.clip(np.minimum.reduce([xx,yy,W-1-xx,H-1-yy])/feather,0,1);w=t*t*(3-2*t)*new[y:Y,x:X,3]/255;out=old.copy();out[y:Y,x:X,:3]=np.rint(old[y:Y,x:X,:3]*(1-w[:,:,None])+new[y:Y,x:X,:3]*w[:,:,None]).clip(0,255).astype(np.uint8);out[old[:,:,3]==0]=old[old[:,:,3]==0];return out
+
+def part(old,new,data):
+ x,y,X,Y=data['egen_ROI'];H,W=Y-y,X-x;sx,sy=data['egen_hel_skala'];px,py=data['egen_hel_flytt'];scaled=_premul_resize(new,(round(new.shape[1]*sx),round(new.shape[0]*sy)));tile=np.zeros((H,W,4),np.uint8);xx,yy=max(0,px),max(0,py);XX,YY=min(W,px+scaled.shape[1]),min(H,py+scaled.shape[0]);tile[yy:YY,xx:XX]=scaled[yy-py:YY-py,xx-px:XX-px];layer=np.zeros_like(old);layer[y:Y,x:X]=tile;return rect(old,layer,data['egen_ROI'],16)
+
+def whole_raw(old,new,plan):
+ out=rect(old,new,plan['egen_ROI'],12);x,y,X,Y=plan['egen_ROI'];zero=old[y:Y,x:X,3]==0;out[y:Y,x:X,:3][zero]=0;return out
+
+def own_cleanup(name,old,new):
+ f=O/name;t=ast.parse(f.read_text());body=next(v for v in t.body if isinstance(v,ast.Try)).body;clean=[]
+ for v in body:
+  if any(isinstance(n,ast.Call)and isinstance(n.func,ast.Attribute)and n.func.attr=='open'and isinstance(n.func.value,ast.Name)and n.func.value.id=='Image'for n in ast.walk(v)):continue
+  if isinstance(v,ast.Expr)and isinstance(v.value,ast.Call)and isinstance(v.value.func,ast.Attribute)and v.value.func.attr=='save':continue
+  clean.append(v)
+ ns=dict(np=np,Image=Image,cKDTree=cKDTree,nd=nd,a=old,old=old,new=new);exec(compile(ast.Module(body=clean,type_ignores=[]),str(f),'exec'),ns);return ns['out']
+
+Image.open=guard
+try:
+ f=OLD/'replay-vinduhel1987.py';s=f.read_text().split('\nfor row in rows:')[0];v={'__file__':str(f),'__name__':'parent_replay'};saved=Image.open
+ try:exec(compile(s,str(f),'exec'),v)
+ finally:Image.open=saved
+ old=v['builds']['H299/bare-vindu-egen-alfa'];h300=v['builds']['H300/bare-vindu-egen-alfa'];assert pngsha(old)==sha(R/'kall/H299/bare-vindu-egen-alfa/egen-heltegning.png')and pngsha(h300)==sha(R/'kall/H300/bare-vindu-egen-alfa/egen-heltegning.png')
+ raw={c:np.array(Image.open(files[c]).convert('RGBA'))for c in ['H306','H307','H308','H309','H310']};builds={}
+ builds['H299/egen-brune-stag']=own_cleanup('rens-egen-strutfarge.py',old,h300)
+ builds['H299/egen-gullnese-H300']=own_cleanup('bevar-egen-gullnese.py',old,h300)
+ builds['H299/egen-nedre-gullnese-H300']=own_cleanup('bevar-egen-nedre-gullnese.py',old,h300)
+ nese=rect(old,h300,[760,660,844,715],6);builds['H299/egen-nedre-nese-RGB']=nese
+ for c in ['H306','H307']:builds[c+'/egen-blad-RGB']=part(old,raw[c],read(R/'kall'/c/'egen-blad-RGB/rens.json'))
+ builds['H308/egen-redigert-felt']=whole_raw(old,raw['H308'],read(R/'kall/H308/plan.json'))
+ h309=whole_raw(nese,raw['H309'],read(R/'kall/H309/plan.json'));builds['H309/egen-redigert-felt']=h309
+ partial=rect(nese,h309,[775,610,832,670],12);builds['H309/bare-fremre-refleks']=partial
+ builds['H310/egen-redigert-felt']=whole_raw(partial,raw['H310'],read(R/'kall/H310/plan.json'))
+ rows=[];natives={}
+ for name,a in builds.items():
+  K=R/'kall'/name;q=read(K/'kontroll.json');n=v['native'](a,q);ash,nsh=pngsha(a),pngsha(n);assert ash==sha(K/'egen-heltegning.png')and nsh==sha(K/'prototype-under-kontroll.png'),name;assert np.array_equal(a[:,:,3],old[:,:,3]);natives[name]=n;rows.append(dict(variant=name,egen_PNG_SHA256=ash,native_PNG_SHA256=nsh,egen_RGBA_SHA256=hashlib.sha256(a.tobytes()).hexdigest(),native_RGBA_SHA256=hashlib.sha256(n.tobytes()).hexdigest(),PNG_byteeksakt=True,hele_egen_alfa_byteidentisk_med_H299=True))
+finally:Image.open=real
+for row in rows:
+ K=R/'kall'/row['variant'];assert np.array_equal(builds[row['variant']],np.array(Image.open(K/'egen-heltegning.png').convert('RGBA')));assert np.array_equal(natives[row['variant']],np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA')));row['RGBA_byteeksakt']=True
+proof=dict(metode='Ti egne komposisjoner og native-PNG/RGBA rekonstrueres fra egne urorte raakjeder. Hele egne blad, myke egne rektangler og egen RGB-rensing. Ingen originalbilder, originale masker eller originale kildepunkter leses som produksjonsbilder.',produksjonsbilder_aapnet=opened,raa_SHA256={c:sha(p)for c,p in files.items()},unike_egne_raabilder=len(set(opened)),originalbilder_eller_masker_aapnet_under_produksjon=0,varianter=rows,alle_ti_egen_og_native_PNG_RGBA_byteeksakt=True,valgt_arbeidskontrollpunkt='H310/egen-redigert-felt',valgt_direkte_raa=['H266','H267','H268','H270','H299','H300','H309','H310'],genereringsreferanser_er_ikke_automatisk_direkte_sluttpiksler=True,native_mottatt=False,publisert=False)
+(R/'replay-materialfarger.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'replay-materialfarger.py.txt').write_bytes(Path(__file__).read_bytes());print('Ti egne komposisjoner og native-PNG/RGBA er byteeksakt gjenskapt fra',proof['unike_egne_raabilder'],'egne råbilder. Valgt H310 har åtte direkte råopphav.')

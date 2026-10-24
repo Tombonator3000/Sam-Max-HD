@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from collections import defaultdict
+from datetime import datetime,timezone
+import numpy as np,json,re,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';B=O/'materialfarger-grunnlag-start1-3733';C=O/'materialfarger-proeve-start1-3734';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def calls(root):
+ d=defaultdict(list)
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',(root/'scummvm.log').read_text()):
+  f,n,k,x,y,w,h=map(int,m.groups());d[f+1].append((k,n,x,y,w,h))
+ return d
+b=read(R/(B.name+'.json'));c=read(R/(C.name+'.json'));assert b['exit']==c['exit']==0;assert len(b['kontroller'])==len(c['kontroller'])==160;assert b['binar_sha256']==c['binar_sha256']=='651aa78c84411784671f600085147bbbdce5dc6281e77bd113eb7db7f1c0ed27'
+bc,cc=calls(B),calls(C)
+def inv(root,draw):
+ rows=[]
+ for p in sorted(root.glob('frame_*_room*.png')):
+  if p.stem.endswith('_flat'):continue
+  f=int(p.name.split('_')[1]);flat=p.with_name(p.stem+'_flat.png');a=np.array(Image.open(flat).convert('RGBA'));h=hashlib.sha256(a.tobytes()).hexdigest();room=re.search(r'room(\d+)',p.name).group(1);rows.append(dict(frame=f,fil=p.name,flat_fil=flat.name,original_RGBA_SHA256=h,HD_SHA256=sha(p),tegnekall=draw[f],key=(room,h,tuple(draw[f]))))
+ return rows
+br,cr=inv(B,bc),inv(C,cc);assert len(br)==len(cr)==160;groups=defaultdict(list)
+for z in cr:groups[z['key']].append(z)
+used=set();pairs=[];unmatched=[]
+for e in br:
+ opts=[z for z in groups[e['key']]if z['fil']not in used]
+ if not opts:unmatched.append(e['fil']);continue
+ g=min(opts,key=lambda z:(abs(z['frame']-e['frame']),z['frame']));used.add(g['fil']);v=np.array(Image.open(B/e['fil']).convert('RGBA'));w=np.array(Image.open(C/g['fil']).convert('RGBA'));diff=np.any(v!=w,2);pairs.append(dict(grunnlag=e['fil'],proeve=g['fil'],original_RGBA_SHA256=e['original_RGBA_SHA256'],originale_celkall_like=True,HD_avvik=int(diff.sum())))
+# Select the unique target by ORIGINAL cel identity/position/size, never HD appearance.
+BT=[e for e in br if (178,1987,39,67,72,36)in e['tegnekall']];CT=[e for e in cr if (178,1987,39,67,72,36)in e['tegnekall']];assert len(BT)==len(CT)==1;e,g=BT[0],CT[0];assert e['frame']==g['frame']==108;assert [t for t in e['tegnekall']if t[0]==178]==[t for t in g['tegnekall']if t[0]==178]
+box=[144,260,456,420];x,y,r,t=box;a=np.array(Image.open(B/e['flat_fil']).convert('RGBA'));z=np.array(Image.open(C/g['flat_fil']).convert('RGBA'));v=np.array(Image.open(B/e['fil']).convert('RGBA'));w=np.array(Image.open(C/g['fil']).convert('RGBA'));flatdiff=np.any(a!=z,2);diff=np.any(v!=w,2);roi=np.zeros(diff.shape,bool);roi[y:t,x:r]=True;assert not (flatdiff&roi).any() and (diff&roi).any();assert int(flatdiff.sum())==16096
+board=Image.new('RGB',(1300,395),'#304050');dr=ImageDraw.Draw(board)
+for i,(root,row,label)in enumerate([(B,e,'Publisert: originalrute 1987'),(C,g,'H310: lokalt motorobservert, fortsatt materialretur')]):
+ im=Image.open(root/row['fil']).crop(box).convert('RGB').resize(((r-x)*2,(t-y)*2),Image.Resampling.NEAREST);board.paste(im,(10+650*i,40));dr.text((10+650*i,12),label,fill='white')
+board.save(R/'materialfarger-H310-motorpar.png')
+for dest,src in [('materialfarger-H310-motor.png',C/g['fil']),('materialfarger-H310-grunnlagmotor.png',B/e['fil']),('materialfarger-H310-originalmotor.png',C/g['flat_fil']),('materialfarger-H310-grunnlagoriginal.png',B/e['flat_fil'])]:(R/dest).write_bytes(src.read_bytes())
+proof=dict(utc=datetime.now(timezone.utc).isoformat(),ferske_kontrollerte_avspillinger=2,gjenbrukt_baseline=False,binar_SHA256=c['binar_sha256'],kontroller_per_kjoring=[len(b['kontroller']),len(c['kontroller'])],null_per_kjoring=[b['nullkontroller'],c['nullkontroller']],etter40_kontroller_per_kjoring=[sum(v['frame']>40 for v in d['kontroller'])for d in[b,c]],etter40_null_per_kjoring=[sum(v['avvik']==0 and v['frame']>40 for v in d['kontroller'])for d in[b,c]],par_utvalg='Unik opprinnelig cel178/1987 ved39,67,72x36 i begge logger, frame108. Lokal original-RGBA maa vaere byteidentisk. Ingen HD-likhet brukes til parvalg.',rute=1987,grunnlag_frame=108,proeve_frame=108,originale_kostyme178_celkall_like=True,alle_celkall_grunnlag=e['tegnekall'],alle_celkall_proeve=g['tegnekall'],alle_aktorenes_celkall_like=e['tegnekall']==g['tegnekall'],ROI=box,ROI_inkluderer_hel_originalrute_og_native_marger=True,original_ROI_RGBA_SHA256=hashlib.sha256(a[y:t,x:r].tobytes()).hexdigest(),original_ROI_avvik=int((flatdiff&roi).sum()),HD_ROI_avvik=int((diff&roi).sum()),HD_utenfor_ROI_avvik=int((diff&~roi).sum()),hele_originalskjermen_avvik=int(flatdiff.sum()),hele_originalskjermen_identisk=False,hele160_HD_forlop_bevist_identisk_utenfor1987=False,hele_originaltilstander_kunne_pares=len(pairs),uparede_originaltilstander_per_kjoring=[len(unmatched),len(cr)-len(used)],hele_originalpar=pairs,uparede_grunnlagsfiler=unmatched,uparede_proevefiler=[z['fil']for z in cr if z['fil']not in used],begrensning='Det forste helskjermparet feilet allerede ved frame2. Matching paa rom+hele flat-RGBA+alle celkall ga52par og108uparede tilstander i hver kjoring; 1987 var ikke blant de hele parene. Frame108 har forskjellige andre aktorer/romdetaljer, blant annet Max/fisker. Tidsavhengig forskjell er en tolkning, ikke en isolert motorfeil. Denne kontrollen beviser bare den byteidentiske lokale originaltilstanden med samme kostyme178-celkall og viser den faktiske H310-prototypen i motoren. Utenfor ROI er ikke isolert.',logg_modbane_bekreftet=str(O/'materialproeve3734')in(C/'scummvm.log').read_text(),native_WebP_SHA256=read(R/'materialproeve3734.json')['WebP_SHA256'],WebP_aapning_i_strace_ikke_registrert=True,strace_omfang='rename/unlink bare, ingen open/read-kontroll',bevisbilder={f:sha(R/f)for f in['materialfarger-H310-motorpar.png','materialfarger-H310-motor.png','materialfarger-H310-grunnlagmotor.png','materialfarger-H310-originalmotor.png','materialfarger-H310-grunnlagoriginal.png']},motorobservert=True,visuelt_sett=False,native_mottatt=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False,full_naturlig_gjennomspilling=False,interaktiv_Windows_web_ikke_testet=True)
+put(R/'materialfarger-H310-motor-kontroll.json',proof);q=read(R/'materialproeve3734.json');q.update(motorobservert=True,motor_scope='To faktiske 160-bilders kjoringer; lokal original-ROI identisk ved cel1987. Helskjermtilstander divergerer utenfor ROI. Ikke isolert hele-skjermer-regresjon.');put(R/'materialproeve3734.json',q);(R/'kontroller-materialmotor-lokalt.py.txt').write_bytes(Path(__file__).read_bytes());(R/'kontroller-materialmotor-helskjerm-feilet.py.txt').write_bytes((O/'kontroller-materialmotor.py').read_bytes());print({k:proof[k]for k in['null_per_kjoring','etter40_null_per_kjoring','original_ROI_avvik','HD_ROI_avvik','hele_originaltilstander_kunne_pares','uparede_originaltilstander_per_kjoring']})

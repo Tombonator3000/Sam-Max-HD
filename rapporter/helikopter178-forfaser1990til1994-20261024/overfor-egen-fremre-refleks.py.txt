@@ -1,0 +1,11 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';K=R/'kall/H309';V=K/'bare-fremre-refleks';V.mkdir(exist_ok=False);base=R/'kall/H299/egen-nedre-nese-RGB/egen-heltegning.png';donor=K/'egen-redigert-felt/egen-heltegning.png';real=Image.open;opened=[]
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in[base.resolve(),donor.resolve()];opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ old=np.array(Image.open(base).convert('RGBA'));new=np.array(Image.open(donor).convert('RGBA'));x,y,X,Y=775,610,832,670;H,W=Y-y,X-x;yy,xx=np.indices((H,W));edge=np.minimum.reduce([xx,yy,W-1-xx,H-1-yy]);t=np.clip(edge/12,0,1);w=t*t*(3-2*t)*new[y:Y,x:X,3]/255;out=old.copy();out[y:Y,x:X,:3]=np.rint(old[y:Y,x:X,:3]*(1-w[:,:,None])+new[y:Y,x:X,:3]*w[:,:,None]).clip(0,255).astype(np.uint8);out[old[:,:,3]==0]=old[old[:,:,3]==0];mask=np.ones(old.shape[:2],bool);mask[y:Y,x:X]=False;assert np.array_equal(out[:,:,3],old[:,:,3])and np.array_equal(out[mask],old[mask]);Image.fromarray(out).save(V/'egen-heltegning.png')
+finally:Image.open=real
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=json.loads((K/'plan.json').read_text());plan.update(nytt_bildekall=False,egen_variant='H309/bare-fremre-refleks',egen_ROI=[x,y,X,Y]);(V/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n');(V/'rens.json').write_text(json.dumps(dict(metode='Bare eget fremre refleksrektangel fra egen H309 over egen H299/nese med myk 12 px overgang. Hele egen alfa og utsiden er byteidentiske. Ingen egne fargeutvalg, originalbilder, kildepunkter eller originale masker i produksjonen.',produksjonsbilder_aapnet=opened,egen_base_SHA256=sha(base),egen_donor_SHA256=sha(donor),egen_ROI=[x,y,X,Y],feather_px=12,egen_alpha_byteidentisk=True,utenfor_egen_ROI_byteidentisk=True,originalbilder_eller_masker_i_produksjon=0,nytt_bildekall=False,egen_resultat_SHA256=sha(V/'egen-heltegning.png')),ensure_ascii=False,indent=2)+'\n');(R/'overfor-egen-fremre-refleks.py.txt').write_bytes(Path(__file__).read_bytes());print(V)
