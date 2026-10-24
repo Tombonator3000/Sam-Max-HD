@@ -1,0 +1,36 @@
+from pathlib import Path
+from PIL import Image
+from io import BytesIO
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def prefix(path,marker):
+ text=path.read_text();assert text.count(marker)==1;s={'__file__':str(path),'__name__':'own_parent_replay'};saved=Image.open
+ try:exec(compile(text.split(marker)[0],str(path),'exec'),s)
+ finally:Image.open=saved
+ return s
+def pngsha(a):
+ b=BytesIO();Image.fromarray(a).save(b,format='PNG');return hashlib.sha256(b.getvalue()).hexdigest()
+b=prefix(P/'out/helikopter178-bladfarger-20261024/replay-bladfarger.py','\nfor row in rows:');v=prefix(P/'out/helikopter178-forfaser1990til1994-20261024/replay-rotorfelt1988.py','\nrows = []');files={c:R/'kall'/c/'raa.png'for c in ['H321','H322','H323','H324','H325']};opened=[];real=Image.open
+
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in {f.resolve()for f in files.values()},str(p);opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ raw={c:np.array(Image.open(p).convert('RGBA'))for c,p in files.items()};builds={};natives={};rows=[];old=b['builds']['H315/egen-redigert-felt']
+ for c in files:
+  variant=c+('/egen-blad-RGB'if c in ['H321','H322','H323']else'/egen-del-RGB');K=R/'kall'/variant;base=builds['H323/egen-blad-RGB']if c=='H324'else v['selected']if c=='H325'else old;own=b['ns']['part'](base,raw[c],read(K/'rens.json'));out=v['native'](own,read(K/'kontroll.json'))if c=='H325'else b['ns']['v']['native'](own,read(K/'kontroll.json'));assert pngsha(own)==sha(K/'egen-heltegning.png')and pngsha(out)==sha(K/'prototype-under-kontroll.png'),variant;assert np.array_equal(own[:,:,3],base[:,:,3]);builds[variant]=own;natives[variant]=out;rows.append(dict(variant=variant,rute=1988 if c=='H325'else 1987,egen_PNG_SHA256=pngsha(own),native_PNG_SHA256=pngsha(out),egen_RGBA_SHA256=hashlib.sha256(own.tobytes()).hexdigest(),native_RGBA_SHA256=hashlib.sha256(out.tobytes()).hexdigest(),PNG_byteeksakt=True,hele_egen_alfa_byteidentisk_med_egen_forelder=True))
+finally:Image.open=real
+for e in rows:
+ K=R/'kall'/e['variant'];assert np.array_equal(builds[e['variant']],np.array(Image.open(K/'egen-heltegning.png').convert('RGBA')));assert np.array_equal(natives[e['variant']],np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA')));e['RGBA_byteeksakt']=True
+allopened=set(opened);seen=set();guards=[]
+def collect(s):
+ if id(s)in seen:return
+ seen.add(id(s))
+ if isinstance(s,dict):
+  if isinstance(s.get('opened'),list):
+   paths=[p for p in s['opened']if isinstance(p,str)];allopened.update(paths);guards.append(dict(script=s.get('__file__'),bare_egne_raa=all(Path(p).name=='raa.png'and'/kall/H'in p for p in paths),antall=len(set(paths))))
+  for z in s.values():
+   if isinstance(z,dict):collect(z)
+collect(b);collect(v);assert all(Path(p).name=='raa.png'and'/kall/H'in p for p in allopened)and len(allopened)==29
+proof=dict(metode='Fem egne komposisjoner/native gjenskapt byteeksakt fra egne urorte raa gjennom verifiserte eldre raakjeder. Hele egne deler registrert mot egen alfaramme, myk 16px RGB-overfoering, egen alfa bevart. Ingen originalbilder, originalmasker eller lokale kildepunkter som produksjonspiksler.',produksjonsbilder_aapnet=sorted(allopened),raa_SHA256={Path(p).parent.name:sha(Path(p))for p in sorted(allopened)},unike_egne_raabilder=29,delreplay_sperrer=guards,originalbilder_eller_masker_under_produksjon=0,varianter=rows,alle_fem_egen_native_PNG_RGBA_byteeksakt=True,valgt_1987='H323/egen-blad-RGB',valgt_direkte_raa=['H266','H267','H268','H270','H299','H300','H309','H310','H311','H315','H323'],genereringsreferanser_er_ikke_direkte_sluttpiksler=True,native_mottatt=False,publisert=False)
+(R/'replay-bladdeler.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'replay-bladdeler.py.txt').write_bytes(Path(__file__).read_bytes());print('Fem egne heltegninger/native-PNG/RGBA byteeksakte fra 29 egne råbilder; valgt H323 har 11 direkte.')

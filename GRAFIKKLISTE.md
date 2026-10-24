@@ -1,5 +1,13 @@
 # Grafikkliste
 
+<!-- helikopter178-bladdeler-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+H321..H325 er fem faktiske nye innebygde image_gen-kall, totalt 149 råbilder. Fem egne komposisjoner/native-PNG/RGBA har byteeksakt replay fra 29 egne råbilder. H323/1987 er holdt nytt arbeidskontrollpunkt: svart bladskygge tilbake, grå innvendige felt bedre, mindre neon. Form/åpning 0/0, men fem positive og ekstra materialpiksler består. H324s grønne halefelt er retur. Før H325 ble kildepremisset rettet til grønne/oliven avbrudd i 1988-stripen; plassering/materialer er fortsatt retur og H289 beholdes.
+
+H323 er lokalt motorobservert i én ny faktisk kontrollert kjøring mot bevart faktisk baseline. Lokal original-ROI identisk, hele skjermtilstander utenfor ROI divergerer; ingen helskjermregresjon eller naturlig gjennomspilling. Én nødvendig WebP-kandidat er bare prøve, ingen ny hel jobb, formelt native mottak eller publisert mod/pakke. Alle 21978 aktive modhash, beskyttede input og tre stasher er uendret. Fortsatt 508/1758 hele jobber og 3733 native. H326 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og bladdeler-status.md. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-bladdeler-20261024:slutt -->
+
 <!-- helikopter178-fem-returer-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 

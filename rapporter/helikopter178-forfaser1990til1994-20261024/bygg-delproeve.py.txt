@@ -1,0 +1,23 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import os,json,gzip,hashlib,numpy as np,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';M=P/'mods/gpt';C=O/'delproeve3734';assert not C.exists();sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base='c80099158b30fb08fa0cb670acb112bf14fd58f4';assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==base
+expected=json.loads(gzip.decompress((R/'kandidat3733-filhash.json.gz').read_bytes()));actual={str(p.relative_to(M)):sha(p)for p in M.rglob('*')if p.is_file()};assert actual==expected and len(actual)==21978
+K=R/'kall/H323/egen-blad-RGB';q=json.loads((K/'kontroll.json').read_text());mq=json.loads((K/'hele-materialer-kontroll.json').read_text());assert q['rute']==1987 and q['alfa_og_form_bestatt']and not mq['materialporter_bestatt'];src=K/'prototype-under-kontroll.png';im=Image.open(src).convert('RGBA');assert im.size==(312,160)
+C.mkdir()
+for p in M.rglob('*'):
+ t=C/p.relative_to(M)
+ if p.is_dir():t.mkdir(exist_ok=True)
+ else:os.link(p,t)
+rel='costumes/costume178_1987_hd.webp';dest=C/rel;assert not dest.exists()and not dest.with_suffix('.png').exists();im.save(dest,format='WEBP',lossless=True,exact=True,quality=100,method=6);assert np.array_equal(np.array(im),np.array(Image.open(dest).convert('RGBA')));assert dest.read_bytes()[12:16]==b'VP8L'
+meta=json.loads((C/'mod.json').read_text());assert meta['costume_cels']==3733;meta['costume_cels']=3734;meta['stilprototype_ikke_godkjent']=dict(ruter=[1987],kall='H323/egen-blad-RGB',grunnlag_hd_mod=base,mottatt=False,publisering_tillatt=False);(C/'mod.json').unlink();put(C/'mod.json',meta)
+new={**actual,rel:sha(dest),'mod.json':sha(C/'mod.json')};(C/'SHA256SUMS').unlink();(C/'SHA256SUMS').write_text(''.join(f'{h}  {p}\n'for p,h in sorted(new.items())if p!='SHA256SUMS'));new['SHA256SUMS']=sha(C/'SHA256SUMS');assert {p for p in new if new[p]!=actual.get(p)}=={rel,'mod.json','SHA256SUMS'}
+assert {str(p.relative_to(M)):sha(p)for p in M.rglob('*')if p.is_file()}==actual
+for p in C.rglob('*.png'):assert sha(p)==actual[str(p.relative_to(C))]
+with gzip.open(R/'delproeve-filhash.json.gz','wb')as f:f.write(json.dumps(new,separators=(',',':')).encode())
+put(R/'delproeve3734.json',dict(utc=datetime.now(timezone.utc).isoformat(),grunnlag_hd_mod=base,aktive_filhash_bekreftet_for_og_etter=len(actual),bare_en_midlertidig_fullkandidat=True,prototype=str(C),rute=1987,kall='H323/egen-blad-RGB',PNG_SHA256=sha(src),WebP_SHA256=sha(dest),WebP_RGBA_byteidentisk_inkludert_transparent_RGB=True,alle_idx_mask_PNG_bytebevart=True,marg_originalpiksler=[3,2],formporter_bestatt=True,materialporter_bestatt=False,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False,endret_stier=[rel,'mod.json','SHA256SUMS'],native_i_kandidat=3734,native_publisert=3733,merknad='Holdt teknisk motorproeve av visuell materialretur. Ingen godkjenning, aktivering eller publisering.'))
+(R/'bygg-delproeve.py.txt').write_bytes(Path(__file__).read_bytes());print('En full hardlenket kandidat 3734, 21978 aktive filer og tekniske PNG bytebevart. Ny WebP exact-RGBA.')
+s=(P/'out/helikopter178-forfaser1990til1994-20261024/motor-smaafelt.py').read_text().replace("R=A/'rapporter'/O.name","R=A/'rapporter/helikopter178-forfaser1990til1994-20261024'");(O/'motor-delproeve.py').write_text(s)
