@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np, hashlib, json
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024'
+K=R/'kall/H248'; V=K/'eget-graafelt-og-bladende'; V.mkdir()
+base=K/'eget-lite-graafelt/egen-heltegning.png'
+tile=R/'kall/H247/eget-blad-alfa/egen-heltegning.png'
+a=np.array(Image.open(base).convert('RGBA'));b=np.array(Image.open(tile).convert('RGBA'))
+box=[512,575,618,635];x,y,X,Y=box;H,W=Y-y,X-x
+yy,xx=np.indices((H,W));e=np.minimum.reduce([xx,yy,W-1-xx,H-1-yy]);t=np.clip(e/6,0,1);w=t*t*(3-2*t)
+aa=a[y:Y,x:X].astype(float)/255;bb=b[y:Y,x:X].astype(float)/255
+al=aa[:,:,3]*(1-w)+bb[:,:,3]*w;pre=aa[:,:,:3]*aa[:,:,3,None]*(1-w[:,:,None])+bb[:,:,:3]*bb[:,:,3,None]*w[:,:,None]
+rgb=np.divide(pre,al[:,:,None],out=np.zeros_like(pre),where=al[:,:,None]>0)
+out=a.copy();out[y:Y,x:X]=np.uint8(np.clip(np.rint(np.dstack((rgb,al))*255),0,255))
+outside=np.ones(a.shape[:2],bool);outside[y:Y,x:X]=False;assert np.array_equal(out[outside],a[outside])
+Image.fromarray(out).save(V/'egen-heltegning.png');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+(V/'rens.json').write_text(json.dumps(dict(metode='En hel egen rektangulaer bladendedetalj fra H247 legges med 6 egne RAW-piksler smoothstep inn i egen H248. H247 som hel variant er fortsatt avvist. Ingen enkeltkildepiksel eller originalmaske styrer produksjon.',egen_base=str(base),egen_base_SHA256=sha(base),egen_del=str(tile),egen_del_SHA256=sha(tile),egen_ROI=box,egen_feather_bredde=6,alle_egenpiksler_utenfor_ROI_byteidentiske=True,ingen_originalpiksler_eller_originalmaske=True,egen_heltegning_SHA256=sha(V/'egen-heltegning.png')),ensure_ascii=False,indent=2)+'\n')
+(R/'egne-detaljdeler.py.txt').write_bytes(Path(__file__).read_bytes())
+print(V)

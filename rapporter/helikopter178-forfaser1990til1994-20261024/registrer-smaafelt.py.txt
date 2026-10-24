@@ -1,0 +1,51 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import copy,hashlib,json,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+put=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+selected='H252/eget-rent-kontrollpunkt/frossen-parent246'
+specs=[
+ ('H248','utsnitt-sammensatt/frossen-parent246','Sideknappen blir flatere. Hele kroppsideutsnittet flytter naboer og feiler form/materialer. Bare eget lite graafelt brukes i rent kontrollpunkt.'),
+ ('H249','utsnitt-sammensatt/frossen-parent246','Smal boeyd haleforbindelse, men endret geometri. Hele og senere avgrensede halevarianter er holdt ute av valgt rent kontrollpunkt.'),
+ ('H250','utsnitt-sammensatt/frossen-parent246','Skaftbaand endres, men hele utsnittet mister andre felt og gir en ny uverifisert olivenfirkant. Delkomposisjoner ga synlige soemmer og er avvist.'),
+ ('H251','utsnitt-sammensatt/frossen-parent246','Det nye graa hjoernet ligger feil og blir et separat innfelt felt. Flere graa/brune feil, ikke valgt.'),
+ ('H252','utsnitt-sammensatt/frossen-parent246','Hele underkanten endrer aapninger og flytter fargefelt. Bare eget smale nesefelt brukes sammen med H248 i rent kontrollpunkt.'),
+ ('H253','eget-blad-alfa/frossen-parent246','Hele venstre blad tegnes sammenhengende og de synlige bladsoemmene fjernes i raa. Etter innplassering er nye hvite/graa kildefester borte; og basen arver andre holdte delkomposisjoner. Ikke valgt.')]
+calls=json.loads((R/'faktiske-bildekall.json').read_text());assert len(calls)==78 and [x['kall'] for x in calls]==[f'H{i}' for i in range(176,254)]
+rows=[]
+for cid,variant,reason in specs:
+ K=R/'kall'/cid;plan=json.loads((K/'plan.json').read_text());args=json.loads((K/'argumenter.json').read_text());assert plan['utfort']
+ assert args['prompt']+'\n'==(K/'prompt-brukt.txt').read_text()
+ assert all(sha(Path(p))==h for p,h in plan['referanser_SHA256'].items())
+ a=np.array(Image.open(K/'raa.png'));assert a.shape[2]==4 and int(a[:,:,3].min())==0 and int(a[:,:,3].max())==255
+ raw=dict(kall=cid,sha256=sha(K/'raa.png'),maal=[a.shape[1],a.shape[0]],alfa0=int((a[:,:,3]==0).sum()),alfa255=int((a[:,:,3]==255).sum()),myk_alfa=int(((a[:,:,3]>0)&(a[:,:,3]<255)).sum()))
+ q=json.loads((K/variant/'kontroll.json').read_text());q.update(visuelt_sett=True,native_mottatt=False,publisert=False,motorobservert=False,egen_stilvurdering_bestatt=False,returgrunn=reason);put(K/variant/'kontroll.json',q)
+ row=dict(**raw,variant=variant,prompt_sha256=sha(K/'prompt-brukt.txt'),argumenter_sha256=sha(K/'argumenter.json'),referanser_SHA256_bekreftet=True,egenkontroll_utfort=True,egenkontroll_bestatt=False,visuelt_sett=True,motorobservert=False,native_mottatt=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False,alfa_fester_over3HD=q['alfa_fester_over3HD'],apninger_over3HD=q['apninger_over3HD'],materialfester_over3HD=sum(x['fester_over3HD'] for x in q['materialer']),returgrunn=reason)
+ rows.append(row)
+ (K/'notat.md').write_text(f'''# {cid}, fase1990, fortsatt grafikkretur
+
+Faktisk innebygd image_gen-kall, generert {plan['utfort_utc']}. Modell-ID ble ikke oppgitt av verktøyet. Uendret råbilde er raa.png, SHA256 {raw['sha256']}. Faktisk prompt og argumenter er lagret i prompt-brukt.txt og argumenter.json; alle referansehash er bekreftet. Originalen i rom35 og Sam-ankeret er sett før motivet. Egne naturlige utsnitt er redigeringsmål, kildeutsnitt brukes bare som referanse. Ingen originalhardmaske eller kildefragmenter brukes til produksjon. Egen RGBA er bevart ved identitetsbehandling før sammensetting.
+
+{reason}
+
+Råbilde og den oppgitte nativevarianten er visuelt sett. Alfa, åpninger og både21-farge- og seksmaterialdiagnose er kontrollert med samme3HD-grenser. Dette er ingen ny hel resultat.png, native mottak, publisering eller Tom-/Claude-godkjenning. Den valgte motorprøven gjelder kun {selected}, som bruker hele egne råbidrag H239,H245,H246,H248,H252. Andre prøvevarianter er ikke motorobservert. Se smaafelt-status.md og smaafelt-valg.json.
+''')
+ for c in calls:
+  if c['kall']==cid:c.update(gruppe='smaafelt-stilretur',raa_visuelt_sett=True)
+put(R/'faktiske-bildekall.json',calls)
+q=json.loads((R/'kall'/selected/'kontroll.json').read_text());assert q['formporter_bestatt'] and not q['materialporter_bestatt'];assert [r['fester_over3HD'] for r in q['materialer']]==[0,0,0,10,1,4]
+proof=json.loads((R/'smaafelt-replay.json').read_text());assert proof['egenRGBA_ogPNG_byteeksakt_med_valgt_prototype'] and len(proof['produksjonsbilder_aapnet'])==5
+motor=json.loads((R/'smaafelt-H252-motor-kontroll.json').read_text());assert motor['hele_originaltilstandpar']==160 and motor['ruter_observert'][0]['endrede_HD']==17739
+q.update(visuelt_sett=True,motorobservert=True,native_mottatt=False,publisert=False,egen_stilvurdering_bestatt=False,returgrunn='Rent kontrollpunkt med flatere grå sidefelt og grønn eksponering under nesen. 15 materialfester og ekstradiagnoser gjenstår. Varianten med seks feil er avvist på synlige skjøter.');put(R/'kall'/selected/'kontroll.json',q)
+put(R/'smaafelt-kontroll.json',dict(utc=datetime.now(timezone.utc).isoformat(),faktiske_nye_kall=6,faktiske_bildekall_i_bunken=78,rader=rows,raw_alfa_og_prompt_referanse_hash_bekreftet=True,egenkontroll_utfort=True,egenkontroll_bestatt=False,nye_native=0,nye_hele_figurjobber=0,publisert=False))
+put(R/'smaafelt-valg.json',dict(valgt=selected,PNG_SHA256=q['prototype_SHA256'],direkte_egne_raw=['H239','H245','H246','H248','H252'],direkte_egne_raw_sha256={c:sha(R/'kall'/c/'raa.png') for c in ['H239','H245','H246','H248','H252']},formporter_bestatt=True,materialfester_over3HD=15,materialer=q['materialer'],visuelt_sett=True,motorobservert=True,native_mottatt=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False,avvist_seksfeilsvariant='H252/eget-venstre-bladmidtfelt-plassert/frossen-parent246',avvisningsgrunn='Synlige soemmer og dobbeltkonturer i venstre blad og hale. Bedre maaletall alene er ikke visuell godkjenning.',H253_ikke_valgt_som_automatisk_forbedring=True))
+put(R/'rutekart-smaafelt.json',dict(type='Holdt prototype, publisert 20-rutekart uendret',grunnlag_hd_mod='c80099158b30fb08fa0cb670acb112bf14fd58f4',rute=1990,jobb='fig178_02',variant=selected,PNG_SHA256=q['prototype_SHA256'],maal=[368,216],padding_originalpiksler=8,native_mottatt=False,publisert=False,visuelt_sett=True,motorobservert=True))
+f=json.loads((R/'fremdrift.json').read_text());assert f['faktiske_bildekall']==72
+f['historisk_rotorutsnitt72']={k:copy.deepcopy(f[k]) for k in ['status','faktiske_bildekall','aktuelle_stilproever','direkte_raabilder_i_nye_prototypepiksler','siste_produksjon_utc','neste_kall','grafikkilde_nye_rotorutsnitt']}
+f.update(status='RENT_SMAAFELT_KONTROLLPUNKT_FORTSATT_MATERIALRETUR',faktiske_bildekall=len(calls),kall=[c['kall'] for c in calls],nye_bildekall_denne_kjoring=6,nye_godkjente_native_denne_kjoring=0,endrede_publiserte_grafikkfiler_denne_kjoring=0,neste_kall='H254',neste_kall_utfort_eller_reservert=False,naeste_prioritet='Gjenoppta fra H252/eget-rent-kontrollpunkt. 10 graa, 1 brunt, 4 groenne materialfester avviker. Ikke bruk seksfeilsvarianten eller H253 som automatisk forbedring; egne delsoemmer er visuelle returer. Se hele egen komponent etter foerste innplassering. Deretter1991..1994 og1989..1986.',raabilder_i_nye_prototypepiksler=5,direkte_raabilder_i_nye_prototypepiksler=['H239','H245','H246','H248','H252'],valgt_formporter_bestatt=True,valgt_materialporter_bestatt=False,valgt_raw_replay_byteeksakt=True,siste_produksjon_utc=datetime.now(timezone.utc).isoformat(),smaafelt_kilde_sha_avventer_egen_commit=True,midlertidig_kandidat_ryddet=False,opptelling='opptelling-smaafelt.json')
+f['aktuelle_stilproever']['1990']=selected
+put(R/'fremdrift.json',f)
+(R/'registrer-smaafelt.py.txt').write_bytes(Path(__file__).read_bytes())
+print('6 faktiske kall kontrollert, 78 totalt, rent checkpoint 15 materialfester fortsatt retur')

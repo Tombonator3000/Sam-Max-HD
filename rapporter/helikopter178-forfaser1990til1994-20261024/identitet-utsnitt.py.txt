@@ -1,0 +1,7 @@
+from pathlib import Path
+import json,os,sys,hashlib
+R=Path('/home/tom/Sam-Max-HD/work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024');K=R/'kall'/sys.argv[1];V=K/'global-brun-og-gront';V.mkdir()
+os.link(K/'raa.png',V/'egen-heltegning.png')
+(V/'rens.json').write_text(json.dumps(dict(metode='Identitet, egen RGBA beholdt, ingen farge- eller alfakalibrering',kilde='../raa.png',raa_SHA256=hashlib.sha256((K/'raa.png').read_bytes()).hexdigest(),originalpiksler_i_produksjon=0,hard_originalmaske=False),ensure_ascii=False,indent=2)+'\n')
+(R/'identitet-utsnitt.py.txt').write_bytes(Path(__file__).read_bytes())
+print(sys.argv[1], 'egen RGBA identisk')

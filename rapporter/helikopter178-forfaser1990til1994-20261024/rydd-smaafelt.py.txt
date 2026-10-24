@@ -1,0 +1,33 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,gzip,hashlib,os,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'smaafelt-proeve3733'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+read=lambda p:json.loads(p.read_text())
+put=lambda p,q:p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+expected=json.loads(gzip.decompress((R/'smaafelt-proeve-filhash.json.gz').read_bytes()));base=json.loads(gzip.decompress((R/'kandidat3733-filhash.json.gz').read_bytes()));actual={str(p.relative_to(C)):sha(p)for p in sorted(C.rglob('*'))if p.is_file()};assert actual==expected
+changed=[p for p in actual if actual[p]!=base[p]];assert set(changed)=={'mod.json','SHA256SUMS','costumes/costume178_1990_hd.webp'}
+D=R/'smaafelt-H252-beholdt';D.mkdir()
+for rel in changed:
+ t=D/rel;t.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(C/rel,t);assert sha(t)==expected[rel]
+index={}
+for name in ['stilgrunnlag-start1-3733','stilproever-start1-3733','rettet-grunnlag-start1-3733','rettet-helproeve-start1-3733','rotorutsnitt-grunnlag-start1-3733','rotorutsnitt-proeve-start1-3733']:
+ for p in sorted((O/name).glob('*.png')):index.setdefault(sha(p),p)
+newfiles=[]
+for name in ['smaafelt-grunnlag-start1-3733','smaafelt-proeve-start1-3733']:newfiles.extend(sorted((O/name).glob('*.png')))
+rows=[];n=0
+for p in newfiles:
+ h=sha(p);sz=p.stat().st_size;key=index.get(h)
+ if key and p.stat().st_ino!=key.stat().st_ino:
+  assert p.read_bytes()==key.read_bytes();p.unlink();os.link(key,p);assert sha(p)==h;n+=1
+ else:index.setdefault(h,p)
+ rows.append(dict(fil=str(p),SHA256=h,bytes=sz,beholdt=str(index[h]),samme_inode=p.stat().st_ino==index[h].stat().st_ino))
+assert len(rows)==1124 and all(sha(Path(e['fil']))==e['SHA256']for e in rows)
+assert {str(p.relative_to(M)):sha(p)for p in sorted(M.rglob('*'))if p.is_file()}==base
+shutil.rmtree(C);assert not C.exists()
+assert {str(p.relative_to(M)):sha(p)for p in sorted(M.rglob('*'))if p.is_file()}==base
+for name in ['smaafelt-proeve3733.json','smaafelt-H252-motor-kontroll.json']:
+ q=read(R/name);q.update(visuelt_sett=True,prototype_ryddet=True);put(R/name,q)
+q=read(R/'fremdrift.json');q.update(midlertidig_kandidat_ryddet=True,hardlenkede_eksakte_motorbildekopier=n,nye_motorPNG_stier_beholdt=len(rows));put(R/'fremdrift.json',q)
+put(R/'smaafelt-rydding.json',dict(utc=datetime.now(timezone.utc).isoformat(),grunnlag_hd_mod='c80099158b30fb08fa0cb670acb112bf14fd58f4',midlertidig_fullkandidat_kontrollert_og_fjernet=True,kandidat_filhash_bekreftet=len(actual),beholdte_avvikende_stier=changed,beholdt_mappe=str(D.relative_to(A)),alle_aktive_modhash_byteidentiske_foer_og_etter=len(base),nye_motorPNG_stier=len(rows),nye_eksakte_kopier_hardlenket=n,alle_motorstier_og_hash_beholdt=True,bevis_fysisk_frigjorte_bytes_ikke_utledet_fra_logisk_sum=True,raa_unike_kilder_stilankre_og_stasher_ikke_slettet=True,nye_pakke_eller_arkivnedlastinger=0,motorbilder=rows))
+(R/'rydd-smaafelt.py.txt').write_bytes(Path(__file__).read_bytes());print(dict(aktive_byteidentiske=len(base),kandidat_ryddet=True,beholdte_endringer=len(changed),motorstier=len(rows),nye_hardlenker=n))

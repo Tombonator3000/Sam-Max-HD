@@ -1,3 +1,11 @@
+# Nyeste status: rent småfeltkontrollpunkt
+
+78 faktiske kall etter seks nye H248..H253. Rent H252/eget-rent-kontrollpunkt har flatere grå sidefelt og gjenopprettet grønt nesefelt, men 15 materialfester gjenstår. Varianten med seks avvik er avvist på synlige delskjøter; H253 er ikke valgt. Alle nye prøver er fortsatt returer. Ingen nye native mottak, hele figurjobber eller publiserte mod-/pakkebyte. Fortsatt 3733 native og 508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og smaafelt-status.md. H254 er ikke startet. Sam er stilanker. Automatikken ACTIVE.
+
+Se smaafelt-status.md for full kontroll, avviste mellomvarianter og gjenopptaking.
+
+## Historisk status før H248..H253
+
 # Nyeste status: rotorutsnitt, fortsatt materialretur
 
 Seks faktiske innebygde image_gen-kall H242..H247 er bevart, totalt 72 i den påbegynte bunken. H245 retter halerotorens oppdiktede runde grå hette til en bøyd, smal forbindelse. H246 retter undersiden av høyre hovedblad. Valgt H246 har null alfa- og åpningsfeil med uendret 3 HD-grense og snitt/union 0.878. Fortsatt 10 grå, ett brunt og fem grønne materialfester feiler; ekstra klassepiksler og de 21 fargediagnosene er beholdt. Dette er fortsatt grafikkretur, ikke native mottak eller ferdig stilgodkjenning. H247 forlenger venstre grå stripe, men endrer flere materialgrenser og velges ikke fremfor H246. H244s direkte nytegning fra kildeutsnittet ble for mosaikkpreget og er avvist før komposisjon. Se rotorutsnitt-kontroll.json, rutekart-rotorutsnitt.json og rotorutsnitt-seks-proever.png.

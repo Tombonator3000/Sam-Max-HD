@@ -1,0 +1,22 @@
+from pathlib import Path
+from PIL import Image
+from datetime import datetime,timezone
+import os,json,gzip,hashlib,numpy as np,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'smaafelt-proeve3733';assert not C.exists()
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+base='c80099158b30fb08fa0cb670acb112bf14fd58f4';assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]==base
+expected=json.loads(gzip.decompress((R/'kandidat3733-filhash.json.gz').read_bytes()));actual={str(p.relative_to(M)):sha(p)for p in sorted(M.rglob('*'))if p.is_file()};assert actual==expected and len(actual)==21978
+K=R/'kall/H252/eget-rent-kontrollpunkt/frossen-parent246';q=json.loads((K/'kontroll.json').read_text());assert q['rute']==1990 and q['formporter_bestatt'] and not q['materialporter_bestatt'];src=K/'prototype-helplassering.png';im=Image.open(src).convert('RGBA');assert im.size==(368,216)
+C.mkdir()
+for p in sorted(M.rglob('*')):
+ t=C/p.relative_to(M)
+ if p.is_dir():t.mkdir(exist_ok=True)
+ else:os.link(p,t)
+rel='costumes/costume178_1990_hd.webp';dest=C/rel;dest.unlink();im.save(dest,format='WEBP',lossless=True,exact=True,quality=100,method=6);assert np.array_equal(np.array(im),np.array(Image.open(dest).convert('RGBA')));assert not dest.with_suffix('.png').exists()
+meta=json.loads((C/'mod.json').read_text());meta['stilprototype_ikke_godkjent']=dict(ruter=[1990],kall='H252-rent-kontrollpunkt',grunnlag_hd_mod=base,mottatt=False,publisering_tillatt=False);(C/'mod.json').unlink();put(C/'mod.json',meta);new=dict(actual);new[rel]=sha(dest);new['mod.json']=sha(C/'mod.json');(C/'SHA256SUMS').unlink();(C/'SHA256SUMS').write_text(''.join(f'{h}  {p}\n'for p,h in sorted(new.items())if p!='SHA256SUMS'));new['SHA256SUMS']=sha(C/'SHA256SUMS');assert {p for p in new if new[p]!=actual[p]}=={rel,'mod.json','SHA256SUMS'}
+assert {str(p.relative_to(M)):sha(p)for p in sorted(M.rglob('*'))if p.is_file()}==actual
+for p in C.rglob('*.png'):assert sha(p)==actual[str(p.relative_to(C))]
+with gzip.open(R/'smaafelt-proeve-filhash.json.gz','wb')as f:f.write(json.dumps(new,separators=(',',':')).encode())
+put(R/'smaafelt-proeve3733.json',dict(utc=datetime.now(timezone.utc).isoformat(),grunnlag_hd_mod=base,aktive_filhash_bekreftet_for_og_etter=len(actual),bare_en_midlertidig_fullkandidat=True,prototype=str(C),rute=1990,kall='H252-rent-kontrollpunkt',PNG_SHA256=sha(src),WebP_SHA256=sha(dest),WebP_RGBA_byteidentisk_inkludert_transparent_RGB=True,alle_idx_mask_PNG_bytebevart=True,padding_originalpiksler=8,padding_lest_fra_filstorrelse_av_motor=True,formporter_bestatt=True,materialporter_bestatt=False,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False,endret_stier=[rel,'mod.json','SHA256SUMS'],merknad='Holdt visuell prototype. Ingen godkjenning eller aktivering. To ferske kontrollerte avspillinger skal kjoeres. Ingen aktivering eller publisering.'))
+(R/'bygg-smaafelt-proeve.py.txt').write_bytes(Path(__file__).read_bytes());print('21978 aktivfiler og alle tekniske PNG bytebevart. En holdt prototype WebP exactRGBA.')
