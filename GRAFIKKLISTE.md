@@ -6,6 +6,7 @@ Nyeste status gjelder foran historiske blokker nedenfor.
 H306..H310 er fem nye faktiske innebygde image_gen-kall, totalt 134 mottatte råbilder. Ti egne komposisjoner/native har byteeksakt replay. H310/1987 er nytt holdt arbeidskontrollpunkt: form/åpning 0/0, blått/gull 0 positive, men 11 positive materialfester og ekstra klassepiksler gjenstår. H306/H307s blad og H308s store gullnese er returer. Egen alfa og alle porter er bevart. H310 er lokalt motorobservert i to ferske avspillinger med byteidentisk original-ROI; andre aktører/romtilstander divergerer utenfor ROI. Dette er ikke bestått helskjermregresjon eller naturlig gjennomspilling. Ingen ny hel jobb, formelt native mottak, publisert modgrafikk/pakke eller Tom-/Claude-godkjenning. Fortsatt 508/1758 hele figurjobber og 3733 native. H311 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE.
 
 Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og materialfarger-status.md. H289/1988 og H252/1990 beholdes. Følg docs/PLASSBRUK.md og docs/WEBP.md; behold tre kandidatspesifikke filer og fullmanifest, ingen varige fulle modkopier.
+Kilde 03ff8106b2fd95a490d5df91ae2e62618abbc30a er faktisk hentet tilbake og kontrollert: 195 filer/19808314 byte. Én midlertidig kandidat er fjernet etter hashkontroll, tre endrede filer og fullmanifest er bevart; aktive modhash er uendret.
 <!-- helikopter178-materialfarger-20261024:slutt -->
 
 <!-- helikopter178-vinduhel1987-20261024:start -->

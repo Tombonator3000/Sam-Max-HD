@@ -8,6 +8,8 @@ Neste praktiske arbeid er få hele, naturlige grå bladfargeflater med riktige t
 
 H310 er lokalt motorobservert i rom35/aktør29 med to faktiske avspillinger. Original-ROI rundt 1987 er byteidentisk, men andre aktører/romtilstander divergerer utenfor ROI. Ikke gjenbruk dette som påstand om hele skjermtilstander eller full naturlig gjennomspilling. Se materialfarger-H310-motor-kontroll.json. Ingen formelt nytt native mottak, hel jobb, publisert mod/pakke eller Tom-/Claude-godkjenning.
 
-Les docs/PLASSBRUK.md og docs/WEBP.md. Én nødvendig komplett kandidat per bunke, ingen varige fullkopier per forsøk, ingen nye Git-/spilldata- eller dobbeltlagrede arkivkopier. Kandidaten for H310 er bevart gjennom gjeldende hd-mod, tre avvikende filer og fullmanifest; følg materialfarger-rydding.json når den er sikret. Native fargebilder er WebP. Tekniske indeks-/maske-PNG og originalt jobbgrunnlag/rå/resultat beholdes. Bruk aldri dedupliserte historiske out-modkopier som komplett grunnlag.
+Les docs/PLASSBRUK.md og docs/WEBP.md. Én nødvendig komplett kandidat per bunke, ingen varige fullkopier per forsøk, ingen nye Git-/spilldata- eller dobbeltlagrede arkivkopier. Kandidaten for H310 er bevart gjennom gjeldende hd-mod, tre avvikende filer og fullmanifest; fullkandidaten er fjernet etter faktisk tilbakehenting. Følg materialfarger-rydding.json for gjenoppretting. Native fargebilder er WebP. Tekniske indeks-/maske-PNG og originalt jobbgrunnlag/rå/resultat beholdes. Bruk aldri dedupliserte historiske out-modkopier som komplett grunnlag.
 
 Fortsatt 508/1758 hele figurjobber, 3733 native, fig178_02 20/24. Sam er eneste stilanker. Ingen nødvendig ny Tom-avklaring. Automatikken ACTIVE; all grafikk og samlet sluttkontroll gjenstår.
+
+Kilder er sikret i 03ff8106b2fd95a490d5df91ae2e62618abbc30a og faktisk hentet tilbake, 195 filer/19808314 byte med SHA256 og Git-blob SHA1. Se materialfarger-kilder-faktisk-hentet.json. Gjenoppta herfra.
