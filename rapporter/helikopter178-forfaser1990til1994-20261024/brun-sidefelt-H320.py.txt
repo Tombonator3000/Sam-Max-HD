@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image
+import json,hashlib,ast,numpy as np
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';K=R/'kall/H320';V=K/'egen-brun-sidefelt';V.mkdir(exist_ok=False);read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();plan=read(K/'plan.json');base=Path(plan['egen_base']);raw=K/'raa.png';plan.update(nytt_bildekall=False,egen_variant='H320/egen-brun-sidefelt',egen_ROI=[492,650,820,750],egen_RGB_kalibrering='Samme tidligere dokumenterte globale brunkalibrering, fra eget raabilde til fast baseRGB115/59/11. Ingen originalpunkt- eller maskeinngang.',eget_rektangel_utvidet='Dekker hele egen nye bakre graastrek og myk overgang, valgt i eget lerret; ingen lokale kildepunkter.')
+for f,names in [(P/'out/helikopter178-forfaser1990til1994-20261024/replay-vindusramme1987.py',['brown']),(P/'out/helikopter178-refleks-og-blad-20261024/replay-fasefelt.py',['compose'])]:
+ tree=ast.parse(f.read_text())
+ for node in tree.body:
+  if isinstance(node,ast.FunctionDef)and node.name in names:exec(compile(ast.Module(body=[node],type_ignores=[]),str(f),'exec'))
+allowed={base.resolve(),raw.resolve()};opened=[];real=Image.open
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in allowed,str(p);opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ old=np.array(Image.open(base).convert('RGBA'));new=np.array(Image.open(raw).convert('RGBA'));out=compose(old,brown(new),plan);assert np.array_equal(out[:,:,3],old[:,:,3]);Image.fromarray(out).save(V/'egen-heltegning.png')
+finally:Image.open=real
+(V/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n');(V/'rens.json').write_text(json.dumps(dict(metode=plan['egen_RGB_kalibrering'],produksjonsbilder_aapnet=opened,egen_ROI=plan['egen_ROI'],egen_feather_bredde=12,egen_alfa_byteidentisk=True,egen_RGBA_bare_utenfor_rektangel_bevart=True,originalbilder_eller_masker_i_produksjon=0,egen_base_SHA256=sha(base),raa_SHA256=sha(raw),egen_heltegning_SHA256=sha(V/'egen-heltegning.png')),ensure_ascii=False,indent=2)+'\n');(R/'brun-sidefelt-H320.py.txt').write_bytes(Path(__file__).read_bytes());print(V)

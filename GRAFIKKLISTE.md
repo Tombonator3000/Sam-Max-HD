@@ -1,5 +1,13 @@
 # Grafikkliste
 
+<!-- helikopter178-fem-returer-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+H316..H320 er fem nye faktiske innebygde image_gen-kall i fire åpne faser, totalt 144 råbilder. Seks egne komposisjoner/native-PNG/RGBA har byteeksakt replay, inkludert én Python-brunvariant. Ingen ny prøve består form/material/motiv samlet. H315/1987 og H289/1988 beholdes. H316/H317s lavere telling gir ikke godkjenning; H318s stripe består; H319s halerotor/nav er feil; H320s brune to-sidefeltvariant er bare partiell retur med bevart liten rød bladtipp. Alle stoppes før formelt native mottak; ingen ny fullkandidat eller motorobservasjon. H315s historiske motorbevis overføres ikke.
+
+Alle 21978 aktive modhash er uendret. Ingen ny hel jobb eller mod/pakke. Fortsatt 508/1758 hele jobber og 3733 native. Beskyttede input og tre stasher er uendret. H321 er ikke startet. Sam er eneste stilanker, ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og fem-returer-status.md. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-fem-returer-20261024:slutt -->
+
 <!-- helikopter178-bladfarger-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 
