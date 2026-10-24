@@ -127,3 +127,7 @@ Grafikkilde 760e2c4ee2ed4ee064d942fe10a9141f4656daab er vanlig Git-barn av 24c75
 ## Faktisk tilbakehenting av konturvask og fire førsteprøver
 
 Grafikkilde 40d4ffe9a14199e4160b5688ce6577679a7e694d er vanlig Git-barn av c0613a3893f10535cbaa2508ee6b4a5fc2e934f8. Alle 92 endrede filer er faktisk hentet som strømmer, totalt 6443599 byte, med lengde, SHA256 og Git-blob SHA1 bekreftet. Ingen nedlastet payloadkopi beholdes. Se konturvask-fire-kilder-faktisk-hentet.json.gz. Dette bekrefter lagrede råbilder og kontrollbevis, ikke ferdige native ruter. Filkontrollen er gjentatt med NUL-avgrensede filnavn etter at git-sitering av det norske filnavnet ga et kontrollavbrudd; alle 92 filer ligger innenfor autorisert grafikk-/rapportarbeid, uten slettinger eller beskyttede inputendringer. Den faktiske H258-promptens ekstra sluttlinje er bevart. Se konturvask-fire-kilde-audit.json. H259 er ikke startet, automatikken er ACTIVE.
+
+## Faktisk tilbakehenting av rettingene
+
+Grafikkilde 283834f2d6e3bb5117ce9781fff82a0662d55f0a er vanlig Git-barn av e9f3587fc2878286fb79165bd25c546ebcfc512d. Alle 143 endrede filer er faktisk hentet som strømmer, totalt 12856847 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle filer; ingen nedlastet payloadkopi beholdes. Se retur1987-kilder-faktisk-hentet.json.gz. Dette sikrer råbilder og kontrollbevis, ikke ferdig native godkjenning. H264 er ikke startet; automatikken er ACTIVE.
