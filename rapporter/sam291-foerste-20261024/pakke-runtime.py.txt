@@ -1,0 +1,16 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+import numpy as np,json,re,hashlib,shutil,os
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name;C=O/'kandidat6';D=O/'pakke3761';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+meta=json.loads((R/'pakke3761.json').read_text());assert meta['exit']==0 and meta['native_antall']==3761 and len(meta['kontroller'])==90 and meta['nullkontroller']==90
+r=json.loads((R/'webp-nye.json').read_text());wanted={e['bilde']for e in r['filer']};assert wanted<=set(meta['tegninger']);pairs=[]
+for p in sorted(D.glob('frame_*_room[0-9][0-9][0-9].png')):
+ q=C/p.name;ori=p.with_name(p.stem+'_flat.png');qo=q.with_name(q.stem+'_flat.png');n=np.array(Image.open(p));old=np.array(Image.open(q));o=np.array(Image.open(ori));oo=np.array(Image.open(qo));pairs.append(dict(frame=int(p.stem.split('_')[1]),rom=int(p.stem[-3:]),original_RGBA_lik=bool(np.array_equal(o,oo)),HD_RGBA_lik=bool(np.array_equal(n,old)),original_avvik=int(np.any(o!=oo,axis=2).sum()),HD_avvik=int(np.any(n!=old,axis=2).sum()),pakke_png_sha256=sha(p),produksjon_png_sha256=sha(q),original_pakke_sha256=sha(ori)))
+assert len(pairs)==90
+proof=dict(pakkebinar_sha256=meta['binar_sha256'],produksjonsbinar_sha256='651aa78c84411784671f600085147bbbdce5dc6281e77bd113eb7db7f1c0ed27',hd_mod=json.load(open(R/'mottak-publisert.json'))['hd_mod'],native=3761,nye_native_observert=len(wanted),pakkekontroller=90,pakkenullkontroller=90,alle_90_original_og_HD_RGBA_identiske=all(e['original_RGBA_lik']and e['HD_RGBA_lik']for e in pairs),begge_faktiske_kjoringer=True,visuelt_sett=False,full_naturlig_gjennomspilling=False,interaktiv_Windows=False,par=pairs)
+(R/'pakke-runtime-sammenligning.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');assert proof['alle_90_original_og_HD_RGBA_identiske'],[e for e in pairs if not e['original_RGBA_lik']or not e['HD_RGBA_lik']]
+for f in [64,120,148]:
+ src=D/f'frame_{f:06}_room056.png';dest=R/f'helscene-pakke3761-{f}.png';same=R/f'helscene-kandidat-{f}.png'
+ if sha(src)==sha(same):os.link(same,dest)
+ else:shutil.copy2(src,dest)
+shutil.copy2(__file__,R/'pakke-runtime.py.txt');print({k:v for k,v in proof.items()if k!='par'},flush=True)

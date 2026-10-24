@@ -9,3 +9,5 @@ Toms Python-tillatelse er brukt til å rense egen alfadis inntil tre HD-piksler 
 Resultat SHA256: 7dd082a4233ac60f37604df8320f0b9f62866f6f8bf5a30e1c3cc4c0473bfa0c. Rutekart og neste handling står i rapporten.
 
 Publisert og faktisk hentet tilbake: hd-mod a4b2c9965deae32047d805b955ad204df7312a88, kilde 6c686bf713a66a8bab014942c664f8f4d1a05cf7. Alle22006 modfiler og alle tidligere grafikkbytes er kontrollert.28 nye native,3761 totalt. Pakker3733 mangler28 inntil pågående Linux-/Windows-bygg er lastet ned og innholdskontrollert.
+
+Med i faktisk nedlastet og innholdskontrollert fellesutgave3761: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-forkledning. Alle28 nye native og22006 modhash er bekreftet i begge plattformer. Pakkemotorens90 original-/HD-RGBA-par er like produksjonen,90/90 nullkontroller. Ingen ny Tom-/Claude-godkjenning.

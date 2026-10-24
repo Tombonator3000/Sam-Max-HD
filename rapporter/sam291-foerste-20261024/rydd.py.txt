@@ -1,0 +1,40 @@
+from pathlib import Path
+from PIL import Image
+from io import BytesIO
+import json,hashlib,subprocess,shutil,os,gzip
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();journal=[]
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+release=json.loads((R/'fellespakker3761.json').read_text());assert release['published']and release['alle_fire_fellesvedlegg_faktisk_hentet_bekreftet'];before=shutil.disk_usage(P).free
+# Bare verifiserte utpakkingsduplikater, ikke råbilder eller spillgrunnlag.
+for d in [O/'pakker3761/linux/squashfs-root/usr/share/sam-max-hd/mods/gpt',O/'pakker3761/linux/squashfs-root/usr/share/sam-max-hd/game']:
+ assert d.is_dir()and not d.is_symlink()and O in d.parents
+ source=M if d.name=='gpt'else P/'game';rows=[]
+ for p in sorted(d.rglob('*')):
+  if p.is_file():
+   rel=p.relative_to(d);assert (source/rel).is_file() and sha(p)==sha(source/rel),rel;rows.append(dict(fil=str(rel),sha256=sha(p),bytes=p.stat().st_size))
+ journal.append(dict(mappe=str(d),metode='alle bytes kontrollert mot aktiv publisert mod eller kanoniske game, faktisk pakke beholdt',filer=len(rows),logiske_bytes=sum(e['bytes']for e in rows),beholdt=str(source),mod_sha=release['hd_mod']if d.name=='gpt'else None,filhash=rows,slettet=True));shutil.rmtree(d)
+# Gamle3733-pakker er bevart som kontrollerte immutable releasevedlegg.
+oldR=A/'rapporter/helikopter178-forfaser1990til1994-20261024';old=json.loads((oldR/'fellespakker3733.json').read_text());oldO=P/'out/helikopter178-forfaser1990til1994-20261024/pakker3733'
+for a in old['assets']:
+ platform='linux'if 'AppImage'in a['name']else'windows';p=oldO/platform/a['name']
+ if not p.exists():continue
+ assert not p.is_symlink()and p.stat().st_size==a['bytes']and sha(p)==a['sha256'];remote=json.loads(subprocess.check_output(['gh','api',f'repos/Tombonator3000/Sam-Max-HD/releases/assets/{a["id"]}'],cwd=P,text=True));assert remote['id']==a['id']and remote['size']==a['bytes']and remote['digest']=='sha256:'+a['sha256']
+ journal.append(dict(fil=str(p),sha256=a['sha256'],bytes=a['bytes'],beholdt_release=old['url'],beholdt_asset_id=a['id'],historisk_kontroll=oldR.relative_to(A).as_posix()+'/fellespakker3733.json',ny_pakke3761_faktisk_verifisert=True,slettet=True));p.unlink()
+# Native-PNG kan gjenskapes byteeksakt fra publisert tapsfri WebP.
+webp=json.loads((R/'webp-nye.json').read_text());retained=[]
+for e in webp['filer']:
+ src=O/'mottak/costumes'/(e['bilde']+'_hd.png');dest=M/e['fil'];assert sha(src)==e['png_sha256'] and sha(dest)==e['sha256'];b=BytesIO();Image.open(dest).convert('RGBA').save(b,format='PNG');reproduced=hashlib.sha256(b.getvalue()).hexdigest()==sha(src)
+ if reproduced:journal.append(dict(fil=str(src),sha256=sha(src),bytes=src.stat().st_size,beholdt=str(dest),beholdt_sha256=sha(dest),hd_mod=release['hd_mod'],PNG_gjenskapt_byteeksakt_i_minne=True,slettet=True));src.unlink()
+ else:retained.append(str(src))
+# Behold motorbevis, men hardlenk bare eksakte PNG-duplikater. Råbilder berøres aldri.
+seen={};dedup=[]
+files=sorted(O.glob('*/frame_*.png'))+sorted(R.glob('helscene-*.png'))
+for p in files:
+ if not p.is_file()or p.is_symlink():continue
+ dig=sha(p)
+ if dig not in seen:seen[dig]=p;continue
+ keeper=seen[dig]
+ if p.stat().st_ino==keeper.stat().st_ino:continue
+ assert p.read_bytes()==keeper.read_bytes();n=p.stat().st_size;p.unlink();os.link(keeper,p);dedup.append(dict(fil=str(p),beholdt=str(keeper),sha256=dig,bytes=n))
+proof=dict(fullført=True,bare_verifiserte_kopier_slettet=True,råbilder_og_resultat_beholdt=True,stasher_urørt=True,ingen_Git_pruning=True,ingen_ny_full_modkopi_beholdt=True,ett_nedlastet_arkiv_per_nåværende_plattform=True,logiske_bytes_slettet=sum(e.get('logiske_bytes',e.get('bytes',0))for e in journal),observert_ledig_disk_for=before,observert_ledig_disk_etter=shutil.disk_usage(P).free,PNG_native_beholdt_fordi_ikke_byteeksakt_replay=retained,slettinger=journal,motor_eksakte_duplikater_hardlenket=len(dedup),motor_hardlenker=dedup)
+save(R/'plassjournal.json',proof);save(O/'plassjournal.json',proof);shutil.copy2(__file__,R/'rydd.py.txt');print({k:v for k,v in proof.items()if k not in ['slettinger','motor_hardlenker']},flush=True)

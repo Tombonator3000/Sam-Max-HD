@@ -1,6 +1,6 @@
 # Sam tar av bigfootforkledningen, fem ark
 
-Publisert og faktisk hentet tilbake: hd-mod a4b2c9965deae32047d805b955ad204df7312a88, kilde 6c686bf713a66a8bab014942c664f8f4d1a05cf7. Alle22006 modfiler og alle tidligere grafikkbytes er kontrollert.28 nye native,3761 totalt. Pakker3733 mangler28 inntil pågående Linux-/Windows-bygg er lastet ned og innholdskontrollert.
+Publisert og faktisk hentet tilbake: hd-mod a4b2c9965deae32047d805b955ad204df7312a88, kilde 6c686bf713a66a8bab014942c664f8f4d1a05cf7. Alle22006 modfiler og alle tidligere grafikkbytes er kontrollert.28 nye native,3761 totalt. Fellespakker3761 er faktisk lastet ned og innholdskontrollert, Linux394,2MB og Windows547,1MB.
 
 Fig291_01 til05 er laget, egenkontrollert, native mottatt og visuelt sett i kontrollert motoravspilling.28 nye native fra19 ulike hele kilder, ni eksakte aliaser. Kandidat3761 har22006 filer og371208919 byte. Publisering og pakker kvitteres i egne filer etter faktisk hent. Hele prosjektet er ikke ferdig:513/1758 resultatark,1245 mangler pluss returer, kildefeil og samlet sluttkontroll.
 
@@ -16,4 +16,14 @@ Fersk publisert hd-mod c80099158b30fb08fa0cb670acb112bf14fd58f4 er verifisert mo
 
 Prosjektbibliotekets figurark-fast-storrelse.md brukes for fast4x og uendrede12prosentgrenser. PASS i opphavet gir ikke stilgodkjenning her. Motor-/pipelinekode er uendret. Gamle nattprosesser er ikke startet. Alle9174 tidligere beskyttede input og tre stasher er uendret. Heli-returer H327/H289/H252 er bevart; H336 er ikke startet. Etter fem avsluttede returkall i forrige økt er denne uavhengige familien produsert uten å gjenta verktøyavviste110/246/304/223 eller ugyldige344/346.
 
-Neste er fig291_06 til08,18 ruter i samme46-ruters familie. Ingen ny maling er startet for dem. Native pakker har fortsatt3733 inntil bygge- og nedlastingsbevis foreligger. Automatikken fortsetter, ingen nødvendig Tom-avklaring.
+Neste er fig291_06 til08,18 ruter i samme46-ruters familie. Ingen ny maling er startet for dem. Fellespakker3761 er nå kontrollert, se pakke-linux3761.json, pakke-windows3761.json og fellespakker3761.json. Automatikken fortsetter, ingen nødvendig Tom-avklaring.
+
+## Pakker og avsluttet bunke
+
+Fellesutgaven er nå oppdatert og Latest-bekreftet: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-forkledning. Linux394185208 byte, Windows547139597 byte, Windows utpakket661781484 byte. Begge faktiske nedlastinger og alle22006 modhash er bekreftet, og alle fire fellesvedlegg er strømmet tilbake med SHA-er uten dobbeltlagret payload. Begge lokale størrelseskontroller består:1000MB nedlasting/2000MB utpakket og ingen arbeidsmapper i pakken. Ny Linux-pakkemotor23fd8c4e er kjørt360bilder med28 nye loggede native og90/90 nullkontroller. Alle90 original- og HD-RGBA-par er identiske mot produksjonsprøven; tre hele pakkebilder er sett. Windows hovedbygg40090843624 består faktisk oppstart. Dette er fortsatt ingen naturlig gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Et eksisterende Windows-taggfilter startet automatisk ekstra bygg40091907302 da den nye fellesutgaven fikk tagg. Det er ikke hovedbygget eller en ny dispatch/omstart fra Codex. Tidligere kjent filterfeil er ikke endret her.
+
+Plassjournalen bevarer råbilder, alle resultater, stilankere og relevante motorbevis.1505738707 byte verifiserte gamle pakke-/utpakkingskopier er slettet logisk, pluss3726402 byte nativePNG som er byteeksakt gjenskapt i minnet fra publisert WebP med samme optimize=True-innstilling som myk.py.627 eksakte motorbildekopier er hardlenket med stier og hasher bevart. Det finnes én beholdt nedlasting per nåværende plattform. Logisk sletting er ikke en påstand om tilsvarende fysisk frigjort plass; faktisk ledig disk er journalført separat. Ingen Git-pruning, stasher eller unike kilder er slettet. Pakkeutpakkingens midlertidige mod-/spillkopier er kontrollert mot beholdt grunnlag og fjernet.
+
+513 av1758 hele figurjobber har resultat,1245 mangler pluss returer/kildefeil/sluttkontroll. Neste er fig291_06..08 med18 ulike hele kilder og ingen nye kall/resultater. Automatikken fortsetter uten nødvendig Tom-avklaring. Heli-returer og alle tidligere publiserte grafikkbytes er bevart.

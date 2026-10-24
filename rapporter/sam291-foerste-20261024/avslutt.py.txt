@@ -1,0 +1,32 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,gzip,subprocess,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam291-foerste-20261024';O=Path(__file__).resolve().parent;M=P/'mods/gpt';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+f=json.loads((R/'fremdrift.json').read_text());pk=json.load(open(R/'fellespakker3761.json'));pub=json.load(open(R/'mottak-publisert.json'));assert pk['published']and pk['native']==3761
+expected=json.loads(gzip.decompress((R/'kandidat-filhash.json.gz').read_bytes()));actual={str(p.relative_to(M)):sha(p)for p in M.rglob('*')if p.is_file()};assert actual==expected and len(actual)==22006
+for p,h in json.load(open(R/'beskyttede-kilder.json')).items():assert sha(A/p)==h
+stash=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();assert stash==pub['stasher'];assert len(list((A/'jobber').glob('fig*/resultat.png')))==513
+for q in ['pakkestorrelse-linux.json','pakkestorrelse-windows.json']:assert json.load(open(R/q))['ok']
+for platform in ['linux','windows']:
+ q=json.load(open(R/f'pakke-{platform}3761.json'))
+ for e in q['nedlastet']:
+  p=O/'pakker3761'/platform/e['fil'];assert sha(p)==e['sha256']and p.stat().st_size==e['bytes']
+latest=json.loads(subprocess.check_output(['gh','api','repos/Tombonator3000/Sam-Max-HD/releases/latest'],cwd=P,text=True));assert latest['id']==pk['release_id']==422701925
+f.update(pakker_native=3761,pakker_mangler=0,pakker_oppdatert=True,pakker_faktisk_lastet_ned=True,felles_release=pk['url'],Linux_bytes=394185208,Windows_bytes=547139597,alle22006_modhash_i_begge_pakker_bekreftet=True,fullfort=False,automatikk='ACTIVE');save(R/'fremdrift.json',f)
+p=R/'mottak-publisert.json';pub.update(pakker_native=3761,pakker_mangler=0,pakker_felles=pk['url'],pakker_faktisk_hentet=True);save(p,pub)
+msg=f'''Fellesutgaven er nå oppdatert og Latest-bekreftet: {pk['url']}. Linux394185208 byte, Windows547139597 byte, Windows utpakket661781484 byte. Begge faktiske nedlastinger og alle22006 modhash er bekreftet, og alle fire fellesvedlegg er strømmet tilbake med SHA-er uten dobbeltlagret payload. Begge lokale størrelseskontroller består:1000MB nedlasting/2000MB utpakket og ingen arbeidsmapper i pakken. Ny Linux-pakkemotor23fd8c4e er kjørt360bilder med28 nye loggede native og90/90 nullkontroller. Alle90 original- og HD-RGBA-par er identiske mot produksjonsprøven; tre hele pakkebilder er sett. Windows hovedbygg40090843624 består faktisk oppstart. Dette er fortsatt ingen naturlig gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Et eksisterende Windows-taggfilter startet automatisk ekstra bygg40091907302 da den nye fellesutgaven fikk tagg. Det er ikke hovedbygget eller en ny dispatch/omstart fra Codex. Tidligere kjent filterfeil er ikke endret her.
+
+Plassjournalen bevarer råbilder, alle resultater, stilankere og relevante motorbevis.1505738707 byte verifiserte gamle pakke-/utpakkingskopier er slettet logisk, pluss3726402 byte nativePNG som er byteeksakt gjenskapt i minnet fra publisert WebP med samme optimize=True-innstilling som myk.py.627 eksakte motorbildekopier er hardlenket med stier og hasher bevart. Det finnes én beholdt nedlasting per nåværende plattform. Logisk sletting er ikke en påstand om tilsvarende fysisk frigjort plass; faktisk ledig disk er journalført separat. Ingen Git-pruning, stasher eller unike kilder er slettet. Pakkeutpakkingens midlertidige mod-/spillkopier er kontrollert mot beholdt grunnlag og fjernet.
+
+513 av1758 hele figurjobber har resultat,1245 mangler pluss returer/kildefeil/sluttkontroll. Neste er fig291_06..08 med18 ulike hele kilder og ingen nye kall/resultater. Automatikken fortsetter uten nødvendig Tom-avklaring. Heli-returer og alle tidligere publiserte grafikkbytes er bevart.'''
+p=R/'RAPPORT.md';p.write_text(p.read_text()+'\n## Pakker og avsluttet bunke\n\n'+msg+'\n')
+p=R/'NESTE.md';p.write_text('Første bunke01..05 er avsluttet, publisert, hentet og inkludert i faktisk kontrollerte fellespakker3761. '+pk['url']+'\n\n'+p.read_text()+'\nHistorisk utpakkingsmappe og mottaks-PNG i out er ryddet etter SHA-kontroll. Bruk aktiv hd-mod eller tapsfri replay med optimize=True, ikke anta at gamle out-modmapper er komplette. Pakker3761 er oppdatert og verifisert; ikke bygg dem på nytt før ny godkjent grafikk eller relevant kode gir grunn.\n')
+for i in range(1,6):
+ p=A/f'jobber/fig291_{i:02}/notat.md';p.write_text(p.read_text()+'\nMed i faktisk nedlastet og innholdskontrollert fellesutgave3761: '+pk['url']+'. Alle28 nye native og22006 modhash er bekreftet i begge plattformer. Pakkemotorens90 original-/HD-RGBA-par er like produksjonen,90/90 nullkontroller. Ingen ny Tom-/Claude-godkjenning.\n')
+p=A/'ORDRE.md';s=p.read_text();s=s.replace('Pakker3733 mangler28 inntil pågående Linux-/Windows-bygg er lastet ned og innholdskontrollert.','Fellespakker3761 er nå faktisk lastet ned og alle22006 modhash bekreftet, Linux394,2MB/Windows547,1MB: '+pk['url']+'.');p.write_text(s)
+shutil.copy2(O/'rapport-faktisk-hentet.json',R/'rapport-faktisk-hentet.json');shutil.copy2(O/'hent-grafikkilde.py',R/'hent-grafikkilde.py.txt');shutil.copy2(__file__,R/'avslutt.py.txt')
+save(R/'sluttkontroll.json',dict(utc=datetime.now(timezone.utc).isoformat(),kilde='6c686bf713a66a8bab014942c664f8f4d1a05cf7',rapport='148e2550cc9b69db7d6b13542c72b55c8ad4eb72',hd_mod=pub['hd_mod'],native=3761,alle22006_aktive_filhash_stemmer=True,hele_figurjobber=513,uten_resultat=1245,stasher=stash,alle9064_jobbhovedark_kilder_bytebevart=True,tidligere9174_sporede_kilder_kontrollert_i_kildecommit=True,plassjournal='plassjournal.json',nativePNG_replay='nativePNG-replay-og-rydding.json',felles_release=pk['url'],felles_som_latest_bekreftet=True,neste='fig291_06 til08,18 kilder,ikke nye bildekall',automatikk='ACTIVE',alt_ferdig=False,ny_Tom_eller_Claude_godkjenning=False))
+print('Avsluttet fem ark,28 nye og begge pakker verifisert,513/1758. Ingen nødvendig Tom-avklaring.',flush=True)
