@@ -1,5 +1,15 @@
 # memory.md
 
+<!-- helikopter178-fasefelt-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Aktuelle grafikkreturer etter plassarbeidet, 2026-10-24 10:01
+
+Fem faktiske innebygde image_gen-kall H301..H305 retter deler av fem åpne faser i fig178_02, ikke fem hele figurjobber. Totalt 129 mottatte råbilder. Alle nye hele prøver er returer; H299/1987, H289/1988 og H252/1990 beholdes. H304s røde tipp går fra 2/89 til 1/57 positive/ekstra rå rødfargeavvik, men er bare delforarbeid. H301 mister grå bladfester; H302 har oransje drift og skjøt; H303 har for høy hale og gjenværende gamle grønne deler; H305 har færre brune fasetter, men fortsatt skjøt og flere grå avvik. En egen Python-refleksprøve på H299 er også returnert, ikke et nytt bildekall.
+
+Alle seks egne komposisjoner/native-PNG/RGBA er byteeksakt gjenskapt fra 26 egne råbilder uten originalbilder/masker under produksjonsreplay. Kilde cf42741a390419e67b0e6dfb4dff2accc95229a2 og rapport 3efbed2f43d47c13a2feab293328f61bb4aab8d6 er faktisk strømmet tilbake og lengde-/SHA256-/Git-blob-bekreftet, 124 + 5 filer. [Gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/3efbed2f43d47c13a2feab293328f61bb4aab8d6/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md). Fortsatt 508/1758 hele jobber og 3733 native. Alle 21978 modhash, 9174 beskyttede input og tre stasher er uendret. Ingen ny motor, modkandidat, pakke eller full arbeidskopi. H306 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE.
+<!-- helikopter178-fasefelt-20261024:slutt -->
+
 <!-- kompakt-lagring-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

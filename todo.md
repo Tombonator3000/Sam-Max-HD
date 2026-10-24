@@ -1,5 +1,15 @@
 # todo.md
 
+<!-- helikopter178-fasefelt-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Fem nye rettingskall kontrollert, 2026-10-24 10:01
+
+- [x] H301..H305 er bevart med råbilder, faktiske prompter og kontroll. Totalt 129 mottatte råbilder. Seks egne komposisjoner og native-PNG/RGBA er gjenskapt byteeksakt fra 26 egne råbilder uten originalbilder/masker under produksjonsreplay. Alle nye prøver er fortsatt returer. [Bevis og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/3efbed2f43d47c13a2feab293328f61bb4aab8d6/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+- [ ] Gjenoppta H299/1987 med 0/0 form/åpning og 13 positive materialfester. H289/1988 og H252/1990 beholdes. H304s mindre mørkrøde tipp er bare delforarbeid; hele 1986 har fortsatt form-/materialretur. H302s oransje drift, H303s høye hale og H305s skjøt/gråfelt skal ikke overta rene tidligere kontrollpunkt. H306 er ikke startet eller reservert.
+- [ ] Fortsett åpne faser/returer før én kontrollert WebP-kandidat og relevant motoravspilling. Nå er ingen ny hel jobb, native, motor eller mod-/pakkeendring levert. Fortsatt 508/1758 hele jobber, 3733 native, fig178_02 20/24. Følg docs/PLASSBRUK.md. Automatikken ACTIVE; grafikk og sluttkontroll gjenstår.
+<!-- helikopter178-fasefelt-20261024:slutt -->
+
 <!-- kompakt-lagring-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

@@ -1,5 +1,21 @@
 # Status
 
+<!-- helikopter178-fasefelt-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Fem åpne faser rettet og kontrollert, fortsatt retur, 2026-10-24 10:01
+
+H301..H305 er fem faktiske innebygde image_gen-kall, totalt 129 mottatte råbilder i bunken. Fem rettingskall på deler av én figurjobb er ingen nye hele leveranser. Råbilder, faktiske prompter/argumenter, SHA-festet fremdrift/rutekart og kontroll er bevart. [Status og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/3efbed2f43d47c13a2feab293328f61bb4aab8d6/rapporter/helikopter178-forfaser1990til1994-20261024/fasefelt-status.md).
+
+H299/1987 holdes med 0/0 form/åpning og 13 positive materialfester. H301 endrer grå bladfelt, men øker de grå feilfestene fra fem til 23. En egen Python-refleksprøve gir blått 0/0, men ny lavendelfeil og synlig vindusskjøt. H302 deler sidebeltet i 1988, men store polygoner, oransje kroppsfelt og overgang består; H289 beholdes. H303/1989 fjerner den runde svarte hetten og får grå halediagonal, men halen er for høy og gamle grønne deler ligger igjen under. H304/1986 får litt mindre mørkere rødt og 1/57 rå rødfargeavvik mot tidligere 2/89, fortsatt bare delforarbeid. H305/1990 har færre brune fasetter, men skjøt og 16 positive materialfester mot parentens 15. H252 beholdes.
+
+Alle fem råbilder, seks egne komposisjoner og native-kontrollpar er visuelt sett. De seks egne tegningene og native-PNG/RGBA er byteeksakt gjenskapt fra 26 egne råbilder med aktiv bildevakt uten originalbilder/masker under produksjonsreplay. Direkte native og separat samlet materialhelflytt holdes fra hverandre. Rå fargediagnoser, ekstra klassepiksler og 3 HD-/12 prosent-grenser beholdes. Ingen ny hel resultat.png, native mottak, motor, publisert modgrafikk eller Tom-/Claude-godkjenning. Historisk motorbevis overføres ikke til nye prøver.
+
+Kilde cf42741a390419e67b0e6dfb4dff2accc95229a2 og rapport 3efbed2f43d47c13a2feab293328f61bb4aab8d6 er pushet og faktisk hentet tilbake som strøm, alle 124 kildefiler/10537871 byte og fem rapportfiler/75843 byte med lengde-, SHA256- og Git-blob-bekreftelse. Ingen dobbeltlagret payload. Fersk telling er 508/1758 hele jobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 native, fig178_02 20/24 og familie178 32/102. Alle 21978 modhash, 9174 beskyttede input, tre stasher og fire releasevedleggs metadata er uendret. hd-mod er fortsatt c80099158b30fb08fa0cb670acb112bf14fd58f4. Ingen ny modkandidat, tale-/Git-kopi, pakke, arkivnedlasting eller sletting. Eksisterende kontrollerte 392/545 MB spillerpakker er uendret.
+
+H306 er ikke startet eller reservert. Sam er eneste stilanker. Ingen nødvendig ny Tom-designavklaring; automatikken ACTIVE. All grafikk og samlet sluttkontroll gjenstår. Bibliotekets figurark-fast-storrelse.md brukes med lokale kontroller. Ingen motor-/pipelinekodeendring, bildefallback, force-push eller gammel nattprosess.
+<!-- helikopter178-fasefelt-20261024:slutt -->
+
 <!-- kompakt-lagring-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
