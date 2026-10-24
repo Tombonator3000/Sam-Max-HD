@@ -1,0 +1,28 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,hashlib,subprocess,os,shutil,time
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/kompakt-lagring-20261024';R=A/'rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def git(cwd,*args):return subprocess.check_output(['git',*args],cwd=cwd,text=True).strip()
+def free():s=os.statvfs(P);return s.f_bavail*s.f_frsize
+backup=json.loads((O/'metadata-faktisk-hentet.json').read_text());assert backup['SHA256_og_Gitblob_SHA1_bekreftet'] and backup['faktisk_hentet_filer']==9;proof=json.loads((R/'git-kloner-sikret.json').read_text());assert sha(R/proof['standalone_metadata_pack'])==proof['pack_sha256'];base=json.loads((O/'baseline.json').read_text());assert git(P,'stash','list','--format=%H').splitlines()==base['stashes']
+reachable=set(x.split()[0]for x in git(P,'rev-list','--objects','--all').splitlines());active=[]
+for proc in Path('/proc').iterdir():
+ if not proc.name.isdigit():continue
+ try:active.append((proc/'cwd').resolve(strict=True))
+ except(OSError,RuntimeError):pass
+summary={'start_utc':datetime.now(timezone.utc).isoformat(),'free_before':free(),'git_metadata_removed':0,'git_metadata_bytes':0,'game_copies_removed':0,'game_duplicate_bytes':0,'skipped_active':[],'sources_unchanged':True,'root_history_not_pruned':True,'metadata_backup_commit':backup['commit']}
+log=O/'sletting-git-og-spill.jsonl'
+assert not log.exists()
+with log.open('w')as journal:
+ for row in proof['clones']:
+  c=P/row['path'];d=c/'.git';assert c.is_relative_to(P/'out') and d.is_dir() and not d.is_symlink()
+  if any(p==c or p.is_relative_to(c)for p in active):summary['skipped_active'].append(str(c));continue
+  assert git(c,'rev-parse','HEAD')==row['head'] and git(P,'rev-parse',row['archive_ref_in_retained_repository'])==row['head'];assert not list(d.rglob('*.lock'))and not git(c,'stash','list','--format=%H');subprocess.run(['git','diff','--cached','--quiet'],cwd=c,check=True)
+  objects=set(git(c,'cat-file','--batch-all-objects','--batch-check=%(objectname)').splitlines());assert objects<=reachable;intent={'kind':'git_metadata','path':str(d.relative_to(P)),'head':row['head'],'bytes':row['git_bytes'],'objects':len(objects),'state':'verified_before_delete'};journal.write(json.dumps(intent)+'\n');journal.flush();shutil.rmtree(d);assert not d.exists();summary['git_metadata_removed']+=1;summary['git_metadata_bytes']+=row['git_bytes']
+ plan=json.loads((O/'spillduplikater-plan.json').read_text());verified={}
+ for row in plan['duplicates']:
+  p=P/row['path'];source=Path(row['source']);assert p.is_relative_to(P/'out') and not p.is_symlink() and source.is_relative_to(P/'game')
+  if source not in verified:assert sha(source)==row['sha256'];verified[source]=source.stat()
+  assert source.stat()==verified[source] and p.stat().st_size==row['size'] and sha(p)==row['sha256'];journal.write(json.dumps({'kind':'game_duplicate',**row,'state':'verified_before_delete'})+'\n');journal.flush();p.unlink();summary['game_copies_removed']+=1;summary['game_duplicate_bytes']+=row['size']
+summary.update(end_utc=datetime.now(timezone.utc).isoformat(),free_after=free(),journal_sha256=sha(log),stashes_after=git(P,'stash','list','--format=%H').splitlines());assert summary['stashes_after']==base['stashes'];(O/'git-og-spill-ryddet.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(R/'rydd-verifiserte-data.py.txt').write_bytes(Path(__file__).read_bytes());print(json.dumps(summary,ensure_ascii=False),flush=True)

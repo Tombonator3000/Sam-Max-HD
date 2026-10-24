@@ -1,0 +1,33 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,gzip,hashlib,os,time
+P=Path('/home/tom/Sam-Max-HD');O=P/'out/kompakt-lagring-20261024';R=P/'work/.gpt-gren/rapporter'/O.name
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def stamp(p):
+ s=p.stat();return [s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns]
+def free():s=os.statvfs(P);return s.f_bavail*s.f_frsize
+plan=json.loads(gzip.decompress((O/'png-duplikater-plan.json.gz').read_bytes()));rows=plan['rows'];delete={r[0]for r in rows};sources={r[3]for r in rows};assert not delete & sources;assert not(R/'slettede-png-duplikater.jsonl.gz').exists()
+summary={'start_utc':datetime.now(timezone.utc).isoformat(),'free_before':free(),'planned':len(rows),'removed':0,'logical_bytes':0,'skipped_changed':[],'unique_images_removed':False,'protected_job_inputs_touched':False,'sources_verified':0};verified={};active=[]
+for proc in Path('/proc').iterdir():
+ if not proc.name.isdigit():continue
+ try:
+  cwd=(proc/'cwd').resolve(strict=True)
+  if cwd.is_relative_to(P/'out') and cwd not in [P/'out',O]:active.append(cwd)
+ except(OSError,RuntimeError):pass
+journal=O/'slettede-png-duplikater.jsonl.gz'
+with gzip.open(journal,'wt',compresslevel=6)as log:
+ for i,(relative,h,size,source,expected)in enumerate(rows,1):
+  p=P/relative;keep=P/source
+  if any(p==a or p.is_relative_to(a)for a in active):summary['skipped_changed'].append([relative,'active_cwd']);continue
+  if not p.is_relative_to(P/'out') or p.is_symlink()or keep.is_symlink()or p.name in plan['protected_names']:raise AssertionError(relative)
+  current=stamp(p)
+  if [current[0],current[1],current[3]]!=expected or current[2]!=size:summary['skipped_changed'].append([relative,'changed_stamp']);continue
+  if source not in verified:
+   if not keep.is_file()or keep.stat().st_size!=size or sha(keep)!=h:summary['skipped_changed'].append([relative,'source_changed']);continue
+   verified[source]=stamp(keep)
+  if stamp(keep)!=verified[source]or sha(p)!=h or stamp(p)!=current:summary['skipped_changed'].append([relative,'changed_bytes']);continue
+  # The retained source is never part of this deletion set.
+  log.write(json.dumps([relative,h,size,source],ensure_ascii=False,separators=(',',':'))+'\n');p.unlink();summary['removed']+=1;summary['logical_bytes']+=size
+  if i%10000==0:
+   log.flush();summary.update(processed=i,free_now=free());(O/'png-rydding-status.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');print(i,'/',len(rows),'fjernet',summary['removed'],'MB',summary['logical_bytes']//1000000,flush=True)
+summary.update(end_utc=datetime.now(timezone.utc).isoformat(),free_after=free(),sources_verified=len(verified),journal_sha256=sha(journal));(O/'png-rydding-status.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n');(R/'rydd-png-duplikater.py.txt').write_bytes(Path(__file__).read_bytes());print(json.dumps({k:v for k,v in summary.items()if k!='skipped_changed'},ensure_ascii=False), 'skipped',len(summary['skipped_changed']),flush=True)

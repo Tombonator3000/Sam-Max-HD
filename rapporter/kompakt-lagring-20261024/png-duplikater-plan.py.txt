@@ -1,0 +1,32 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime,timezone
+import os,json,hashlib,subprocess,time,gzip
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=P/'out/kompakt-lagring-20261024';R=A/'rapporter'/O.name;start=time.time_ns()
+KEEP={'kompakt-lagring-20261024','helikopter178-forfaser1990til1994-20261024','helikopter178-forfaser1995til1999-20261023'}
+PROTECT={'referanse.png','original_1x.png','prompt.txt','jobb.json'}
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+tracked=[A/p for p in subprocess.check_output(['git','ls-files','-z','--','*.png'],cwd=A).decode().split('\0')if p]
+refs={};inodes={}
+def hashed(p):
+ st=p.stat();return p,st,sha(p)
+with ThreadPoolExecutor(max_workers=6)as pool:
+ for p,st,h in pool.map(hashed,[p for p in tracked if p.is_file()and not p.is_symlink()]):refs.setdefault(h,str(p.relative_to(P)))
+print('Beholdte sporede PNG-hasher',len(refs),flush=True)
+files=[]
+for root,ds,fs in os.walk(P/'out'):
+ d=Path(root);ds[:]=[n for n in ds if n!='.git'and not(d==P/'out'and n in KEEP)]
+ for n in fs:
+  if n.lower().endswith('.png')and n not in PROTECT:
+   p=d/n
+   if not p.is_symlink()and p.stat().st_mtime_ns<start:files.append(p)
+rows=[];logical=0;unique=0
+with ThreadPoolExecutor(max_workers=6)as pool:
+ for i,(p,st,h)in enumerate(pool.map(hashed,sorted(files)),1):
+  rel=str(p.relative_to(P));source=refs.get(h)
+  if source is None:refs[h]=rel;unique+=1
+  else:
+   rows.append([rel,h,st.st_size,source,[st.st_dev,st.st_ino,st.st_mtime_ns]]);logical+=st.st_size
+  if i%20000==0:print(i,'/',len(files),'duplikater',len(rows),'MB',logical//1000000,flush=True)
+proof={'utc':datetime.now(timezone.utc).isoformat(),'method':'SHA256-identiske PNG-kopier utenfor aktive bunker. En beholdt identisk fil må finnes og verifiseres igjen før sletting. Ingen unike bilder eller beskyttede jobbgrunnlag slettes.','excluded_active_out_roots':sorted(KEEP),'protected_names':sorted(PROTECT),'candidate_files':len(files),'duplicates':len(rows),'logical_duplicate_bytes':logical,'unique_out_PNG_retained':unique,'rows_columns':['path','sha256','size','retained_source','dev_inode_mtime_ns'],'rows':rows}
+p=O/'png-duplikater-plan.json.gz';p.write_bytes(gzip.compress(json.dumps(proof,ensure_ascii=False,separators=(',',':')).encode(),mtime=0));(R/'png-duplikater-plan.py.txt').write_bytes(Path(__file__).read_bytes());print('PLAN',len(rows),'duplikater',logical,'byte, unike beholdt',unique,'manifest',p.stat().st_size,flush=True)
