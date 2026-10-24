@@ -1,5 +1,21 @@
 # memory.md
 
+<!-- helikopter178-rotorutsnitt-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## To åpninger rettet, fortsatt materialretur, 2026-10-24 04:13
+
+Seks nye faktiske innebygde image_gen-kall H242..H247 gir totalt 72 kall i bunken. H245 retter halerotorens forbindelse og H246 undersiden av høyre hovedrotorblad. Valgt H246 har null alfa- og åpningsfeil ved uendret 3 HD-grense. Ti grå, ett brunt og fem grønne materialfester avviker fortsatt. Prøven er visuelt sett og motorobservert, men fortsatt holdt for retting. Ingen nye native mottak, hele resultat.png, publiserte grafikkendringer eller Tom-/Claude-godkjenninger. [Rapport, råbilder og rutekart](https://github.com/Tombonator3000/Sam-Max-HD/tree/24c75f8f755faac8a908b8ac2dbbadcbc8e56acf/rapporter/helikopter178-forfaser1990til1994-20261024).
+
+Egne naturlige detaljutsnitt og egne alfakomponenter plasseres samlet i egen heltegning. Ingen originalhardmaske eller kildefragmenter brukes til produksjon. Aktiv filvakt gjenskaper valgt PNG/RGBA byteeksakt fra kun egne råbilder H239, H245 og H246; kanoniske farger og fastlagte plasseringsparametre er kildeavledet metadata. Dette presiserer arbeidsmåten for nye forsøk foran eldre beskrivelser om bare heltegning.
+
+Grafikkilde 9ffa2d503cf07b2687ed432193f80f3cdbe6315d og rapport 24c75f8f755faac8a908b8ac2dbbadcbc8e56acf er pushet og faktisk hentet tilbake. Alle 217 kildefiler og fire rapportfiler er lengde-, SHA256- og Git-blob SHA1-bekreftet uten ekstra nedlastingskopier. Den ene fullkandidaten er fjernet etter kontroll; tre avvikende filer og fullmanifest er beholdt. 1123 eksakte nye motorbildekopier er hardlenket med alle 1124 nye bildestier/hash bevart. Alle 21978 aktive modfiler, 9174 beskyttede input og tre opprinnelige stasher er uendret.
+
+Faktisk opptelling er fortsatt 508/1758 hele figurjobber, 1250 uten resultat, pluss returer/sluttkontroll. Fig178_02 er 20/24 tekniske ruter uten hel resultat.png, familie178 32/102. hd-mod og begge kontrollerte fellespakker er uendret c80099158b30fb08fa0cb670acb112bf14fd58f4, 3733 native. Gjeldende releasevedleggs ID, størrelse og digest er kontrollert uendret; tidligere faktiske nedlastingskontroller gjelder. Ingen pakke bygges av holdte prøver.
+
+Neste er små materialfelt fra H246 med begge rettede åpninger bevart. H247 velges ikke som forbedring. H248 er ikke forberedt, utført eller reservert. Fortsett deretter 1991..1994 og uproduserte 1989..1986. Sam er godkjent stilanker; 137/V013 og 296/S037 er uendret. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes med lokal kontroll og docs/WEBP.md. Ingen motor-/pipelinekodeendring eller nødvendig ny designavklaring. Automatikken er ACTIVE; grafikken er ikke ferdig.
+<!-- helikopter178-rotorutsnitt-20261024:slutt -->
+
 <!-- helikopter178-detaljer-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

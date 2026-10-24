@@ -1,5 +1,17 @@
 # todo.md
 
+<!-- helikopter178-rotorutsnitt-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 04:13
+
+- [x] Seks faktiske bildeprøver H242..H247 er laget og kontrollert. Alle 217 kildefiler og fire rapportfiler er pushet og faktisk hashbekreftet ved tilbakehenting. Totalt 72 kall, ingen nye native mottak eller hele jobber.
+- [x] H246 har null alfa- og åpningsfeil og byteeksakt produksjonsreplay fra tre egne råbilder. To ferske motoravspillinger har 160 identiske hele originalfilpar. Prøvemod er ryddet; tre avvikende filer og fullmanifest er beholdt.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/24c75f8f755faac8a908b8ac2dbbadcbc8e56acf/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra H246 med ti grå, ett brunt og fem grønne materialfester som fortsatt avviker. Bevar begge rettede åpninger og godkjent Sam-stil. H247 velges ikke som forbedring. H248 er ikke forberedt, utført eller reservert.
+- [ ] Fortsett stilretur 1991..1994 og uproduserte 1989..1986; ikke dupliser 1995..2021 uten dokumentert retur. 137/V013 og 296/S037 er uendret.
+- [ ] Etter godkjent retting: native mottak fra fersk komplett publisert WebP-mod, kontroll og vanlig hd-mod-barn av fersk fjern-SHA, faktisk tilbakehenting og relevante pakker. Nåværende mod og begge fellespakker er uendret c8009915 med 3733 native. Ingen pakker av holdte prøver. Automatikken er ACTIVE, og sluttkontroll gjenstår.
+<!-- helikopter178-rotorutsnitt-20261024:slutt -->
+
 <!-- helikopter178-detaljer-20261024:start -->
 ## Neste i grafikkproduksjonen, 2026-10-24 03:28
 
