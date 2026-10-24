@@ -29,3 +29,5 @@ Fersk telling er 508/1758 hele figurjobber, 1250 uten resultat pluss returer/slu
 Gjenoppta H299/1987 eller uavhengige åpne faser. H304 kan brukes som dokumentert rødt delforarbeid, ikke som godkjent heltegning. H289/1988 og H252/1990 beholdes som rene tidligere kontrollpunkt. Ikke dupliser publiserte 1995..2021 uten retur. H306 er ikke startet eller reservert. All grafikk og sluttkontroll gjenstår. Ingen nødvendig ny Tom-designavklaring; automatikken ACTIVE.
 
 Bibliotekets figurark-fast-storrelse.md er brukt med uendrede lokale skalarporter. Søket figurark/alfa/refleks/fargefelt ga ikke en ny direkte løsning; utvidet figurark-søk fant eksisterende PASS-kort. Ingen motor-/pipelinekodeendring, bildefallback, omgåelse av grenser, force-push eller gammel nattprosess. H291s historiske verktøyavvisning er fortsatt bevart uten råfil.
+
+Grafikkilden cf42741a390419e67b0e6dfb4dff2accc95229a2 er pushet og faktisk hentet tilbake som strøm: alle 124 endrede filer, 10537871 byte, er lengde-, SHA256- og Git-blob SHA1-bekreftet. Ingen ekstra nedlastet payload er lagret. Dette verifiserer publiserte arbeidskilder og rapporter, ikke et nytt native mottak.

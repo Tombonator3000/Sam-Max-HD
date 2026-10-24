@@ -9,3 +9,5 @@ H289/1988 beholdes. H302s delte sidefelt har oransje kroppsfelt og overgang; ikk
 Les docs/PLASSBRUK.md og docs/WEBP.md. Ingen nye fulle Git- eller spilldatakopier i out. Bruk én nødvendig komplett kandidat fra fersk hd-mod når et motiv består, og ingen kandidat for uvalgte returer. Native fargebilder er WebP; tekniske indeks-/maske-PNG og originale jobbfiler/rå/resultat beholdes. Ikke bruk dedupliserte historiske out-modkopier som komplett grunnlag. 3 HD- og 12 prosent-porter senkes ikke.
 
 Fortsatt 508/1758 hele figurjobber, 3733 native, fig178_02 20/24. Sam er eneste stilanker. Ingen nødvendig ny Tom-avklaring. Ikke dupliser 1995..2021 uten retur. Automatikken ACTIVE; all grafikk og samlet sluttkontroll gjenstår.
+
+Kilder er sikret i cf42741a390419e67b0e6dfb4dff2accc95229a2 og faktisk hentet tilbake, 124 filer/10537871 byte med SHA256 og Git-blob SHA1. Se fasefelt-kilder-faktisk-hentet.json. Gjenoppta herfra.
