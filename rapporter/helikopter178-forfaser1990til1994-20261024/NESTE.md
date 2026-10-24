@@ -9,3 +9,8 @@ Fem faktiske innebygde image_gen-kall H279..H283 retter åpne faser 1986..1989. 
 5. Ingen av de fem nye variantene skal importeres nå. Etter bestått retting: én fersk komplett WebP-mod, relevant motorprøve, vanlig hd-mod-barn av fersk fjern-SHA, faktisk tilbakehenting og pakker ved publisert samlepunkt/avslutning.
 
 Se firefase-rensing-status.md, rutekart-firefase-rensing.json, replay-firefase-rensing.json og opptelling-firefase-rensing.json. H284 er ikke startet eller reservert. Ingen ny motorstatus kan overføres fra H252. Automatikken ACTIVE; all grafikk er ikke ferdig.
+
+
+## Faktisk tilbakehenting av de fem rettingskallene
+
+Grafikkilde 4874e190b83aa39582dc6d65f8a9a1f84b7d6b5d er vanlig Git-barn av 0bd76d22138bffeb724a6a9a6d0ac08bebea2fef. Alle 112 endrede filer er faktisk hentet som strømmer, totalt 10660296 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle filer. Ingen ekstra nedlastet payloadkopi beholdes. Se firefase-rensing-kilder-faktisk-hentet.json.gz. H270/1987 og H283/bare-hale for 1988 er fortsatt arbeidskontrollpunkter med returer, ikke native mottatt. H284 er ikke startet; automatikken ACTIVE.
