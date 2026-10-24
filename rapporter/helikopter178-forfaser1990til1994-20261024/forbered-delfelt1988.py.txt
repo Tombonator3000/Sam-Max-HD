@@ -1,0 +1,31 @@
+from pathlib import Path
+from PIL import Image
+import hashlib,json,sys
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent
+R=A/'rapporter'/O.name; S=A/'rapporter/helikopter178-forfaser1995til1999-20261023/kilder-neste/1988'
+cid,part,base_variant=sys.argv[1:4]; K=R/'kall'/cid; K.mkdir(exist_ok=False)
+base=R/'kall'/base_variant/'egen-heltegning.png'
+parts={
+ 'overblad':([36,0,67,13],[700,345,1160,530]),
+ 'venstreblad':([0,3,36,14],[100,405,690,555]),
+ 'bakblad':([40,13,65,23],[715,530,1095,695]),
+ 'vindu':([29,14,52,22],[535,550,905,700]),
+ 'sidefelt':([20,19,53,28],[425,638,930,775]),
+ 'understell':([24,26,56,36],[480,742,985,910]),
+}
+crop,roi=parts[part]
+def padded(im,margin):
+ out=Image.new('RGBA',(im.width+2*margin,im.height+2*margin));out.alpha_composite(im,(margin,margin));return out
+source=Image.open(S/'original-1x.png').convert('RGBA').crop(crop)
+padded(source,3).resize(((source.width+6)*24,(source.height+6)*24),Image.Resampling.NEAREST).save(K/'original-delfelt-kun-referanse.png')
+padded(Image.open(base).convert('RGBA').crop(roi),12).save(K/'egen-delfelt-kun-referanse.png')
+prompt=sys.stdin.read().strip(); assert prompt
+refs=[K/'original-delfelt-kun-referanse.png',K/'egen-delfelt-kun-referanse.png',A/'hovedark/sam.png',S/'referanse24x.png']
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+args=dict(prompt=prompt,referenced_image_paths=list(map(str,refs)),transparent_background=True)
+(K/'prompt-brukt.txt').write_text(prompt+'\n')
+(K/'argumenter.json').write_text(json.dumps(args,ensure_ascii=False,indent=2)+'\n')
+(K/'plan.json').write_text(json.dumps(dict(kall=cid,rute=1988,jobb='fig178_02',kilde_mappe=str(S),utfort=False,nytt_bildekall=True,type=part+'-kildetro-nytegning',egen_heltegning=str(base),egen_base=str(base),egen_base_SHA256=sha(base),utsnitt_i_egen_tegning=roi,egen_ROI=roi,kildeutsnitt_kun_referanse=crop,kilde_RGBA_SHA256=sha(S/'original-1x.png'),original_kontekst_og_stil_sett=True,referanser_SHA256={str(p):sha(p) for p in refs},originalmaske=False,stilanker='hovedark/sam.png'),ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-delfelt1988.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps(args,ensure_ascii=False))

@@ -1,0 +1,41 @@
+from pathlib import Path
+from datetime import datetime,timezone
+from PIL import Image
+import numpy as np,json,hashlib
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,q):p.write_text(json.dumps(q,ensure_ascii=False,indent=2)+'\n')
+effects={
+ 'H290':'Små øvre kantutstikk og nedre hvit tapp er tegnet inn, men direkte form/åpning er 4/0. Erstatter ikke H289 med 3/0. Material- og motivretur består.',
+ 'H292':'Grå vindusrammer er tegnet inn, men vanlig utsnittsblanding skjærer av det grønne bakbladet. RGB-prøven bevarer egen alfa og helt grønne egenpiksler, men blå refleks er for stor og plassering/overganger er fortsatt feil. Ingen av variantene velges.',
+ 'H293':'Det sammenhengende sidebeltet deles, men grå former blir store omrissede polygoner og utsnittet gir avskårne vinduer, kroppsgrenser og synlige skjøter. Varianten med bevart egen alfa/grønt har fortsatt feil feltplassering og skjøter. Ikke valgt.',
+ 'H294':'Kildepremisset er rettet før faktisk bildekall: landingsutsnittet har ingen opake nøytrale grå piksler. Den grå diagonalen til venstre er en haledel, ikke bakre landingsledd. Nytt understell beholder mørke skjøter, men utsnittsblandingen gir avskåret bakre kroppsgrense og nye form-/åpningsfeil. Ikke valgt.',
+ 'H295':'Generatoren fjerner svarte omriss fra de grå sidefeltene. Egen brunfarge kalibreres globalt fra egen RGB med bytebevart alfa. Feltplassering og vindus-/kroppsskjøter er fortsatt feil, også med bevart egen alfa og helt grønne egenpiksler. Ingen variant velges.',
+}
+main=dict(H290='H290/utsnitt-egenbbox',H292='H292/egen-alfa-og-groent-bevart',H293='H293/egen-alfa-og-groent-bevart',H294='H294/utsnitt-egenbbox',H295='H295/kalibrert-egen-alfa-og-groent-bevart')
+ledger=read(R/'faktiske-bildekall.json');assert len(ledger)==119 and [c['kall'] for c in ledger]==[f'H{n}' for n in range(176,296) if n!=291]
+assert not (R/'kall/H291/raa.png').exists() and read(R/'kall/H291/verktøyfeil.json')['code']=='moderation_blocked'
+assert not (R/'kall/H296').exists()
+entries=[]
+for cid,variant in main.items():
+ K=R/'kall'/cid;plan,args=read(K/'plan.json'),read(K/'argumenter.json');item=next(c for c in ledger if c['kall']==cid)
+ assert plan['utfort'] and plan['innebygd_image_gen'] and sha(K/'raa.png')==plan['raa_sha256']==item['raa_sha256']
+ assert sha(K/'prompt-brukt.txt')==item['prompt_sha256'] and sha(K/'argumenter.json')==item['argumenter_sha256']
+ assert (K/'prompt-brukt.txt').read_text()==args['prompt']+'\n'
+ for p,h in plan['referanser_SHA256'].items():assert sha(Path(p))==h,p
+ arr=np.array(Image.open(K/'raa.png').convert('RGBA'));alpha=arr[:,:,3];assert np.any(alpha==0) and np.any(alpha==255) and np.any((alpha>0)&(alpha<255))
+ item['gruppe']='delfelt1988';item['raa_visuelt_sett']=True
+ q,m=read(R/'kall'/variant/'kontroll.json'),read(R/'kall'/variant/'hele-materialer-kontroll.json')
+ row=dict(kall=cid,rute=1988,variant=variant,raa_SHA256=sha(K/'raa.png'),prompt_SHA256=item['prompt_sha256'],argumenter_SHA256=item['argumenter_sha256'],maal=list(arr.shape[1::-1]),alfa0=int((alpha==0).sum()),alfa255=int((alpha==255).sum()),myk_alfa=int(((alpha>0)&(alpha<255)).sum()),laget=True,raa_visuelt_sett=True,egen_heltegning_visuelt_sett=True,native_proeve_visuelt_sett=True,egenkontroll_utfort=True,egenkontroll_bestatt=False,retur=effects[cid],direkte_form_apning=[q['alfa_fester_over3HD'],q['apninger_over3HD']],samlet_materialkontroll={k:m[k] for k in ['hel_flytt_HD','alfa_fester_over3HD','apninger_over3HD']},positive_materialavvik=sum(v['fester_over3HD'] for v in m['materialer']),alle_fargediagnoser=len(q['farger']),RGB_fester_over3HD=sum(v['native_fester_over3HD'] for v in q['farger']),ekstra_RGB_klassepiksler_over3HD=sum(v['ekstra_paletteklassifiserte_nativepiksler_over3HD'] for v in q['farger']),native_SHA256=sha(R/'kall'/variant/'prototype-under-kontroll.png'),native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False)
+ entries.append(row);put(K/'raa-kontroll.json',row)
+ (K/'notat.md').write_text(f'# {cid}, delretting av helikopterfase 1988\n\nInnebygd image_gen er faktisk kjørt og råbilde mottatt. Modellnavn er ikke oppgitt av verktøyet. Riktig original i motorrom35/World of Fish og Sam-stilanker er sett før motivet. Råbilde, faktisk prompt, argumenter og referansehash er bevart.\n\n'+effects[cid]+f'\n\nHovedprøve {variant} har direkte form/åpning {row["direkte_form_apning"]}. Materialkontrollens separate helflytt {m["hel_flytt_HD"]} gir form/åpning {m["alfa_fester_over3HD"]}/{m["apninger_over3HD"]} og {row["positive_materialavvik"]} positive materialavvik. Alle 22 RGB-diagnoser og uendrede 3 HD-grenser beholdes: {row["RGB_fester_over3HD"]} positive og {row["ekstra_RGB_klassepiksler_over3HD"]} ekstra klasseavvik. Ingen originalmasker eller originale produksjonspiksler. Ni nye egne sammensettinger og native-PNG/RGBA er byteeksakt gjenskapt fra egne råbilder.\n\nIngen ny hel resultat.png, native mottak, motor, modkandidat, publisert modgrafikk eller godkjenning. H289 beholdes uendret som arbeidskontrollpunkt. Se delfelt1988-status.md og rutekart-delfelt1988.json.\n')
+put(R/'faktiske-bildekall.json',ledger)
+variants=[]
+for v in read(R/'replay-delfelt1988.json')['varianter']:
+ K=R/'kall'/v['variant'];q,m=read(K/'kontroll.json'),read(K/'hele-materialer-kontroll.json')
+ q.update(visuelt_sett=True,egen_stilvurdering_bestatt=False,status='VISUELL_OG_TEKNISK_RETUR');m['visuelt_sett']=True;put(K/'kontroll.json',q);put(K/'hele-materialer-kontroll.json',m)
+ variants.append({**v,'direkte_form_apning':[q['alfa_fester_over3HD'],q['apninger_over3HD']],'material_helflytt':m['hel_flytt_HD'],'material_helflytt_form_apning':[m['alfa_fester_over3HD'],m['apninger_over3HD']],'positive_materialavvik':sum(x['fester_over3HD'] for x in m['materialer']),'egen_heltegning_visuelt_sett':True,'native_proeve_visuelt_sett':True,'egenkontroll_bestatt':False})
+put(R/'rutekart-delfelt1988.json',dict(utc=datetime.now(timezone.utc).isoformat(),jobb='fig178_02',forsokte_innebygde_kall=6,nye_mottatte_raabilder=5,mottatte_raabilder_i_bunken=119,verktøyfeil=[dict(kall='H291',raa_mottatt=False,feilfil='kall/H291/verktøyfeil.json')],leveranser=[],raa=entries,varianter=variants,holdt_1988_uendret='H289/utsnitt-egenbbox',uendret_1987='H270/utsnitt-egenbbox',egenkontroll_bestatt=False,native_mottatt=False,nye_motoravspillinger=0,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+(R/'samle-delfelt1988.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps(dict(forsok=6,nye_raa=5,totale_raa=119,nye_heltegninger_og_native=len(variants),form_og_materiale=[dict(kall=e['kall'],direkte=e['direkte_form_apning'],materiale=e['positive_materialavvik']) for e in entries],nye_leveranser=0),ensure_ascii=False))

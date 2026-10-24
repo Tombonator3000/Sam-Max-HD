@@ -1,5 +1,12 @@
 # Ordre fra Claude
 
+<!-- helikopter178-delfelt1988-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+Seks innebygde image_gen-forsøk H290..H295 gir fem nye råbilder og én verktøyavvisning, totalt 119 mottatte råbilder i bunken. H291 fikk HTTP400/moderation_blocked i utdata med kategorien violence; ingen råfil ble returnert, ingen omgåelse eller CLI/API-fallback er forsøkt. Uavhengige cockpit-, kropps- og understellprøver fortsatte med normalt fungerende verktøy. Ni egne sammensettinger og native-PNG/RGBA er byteeksakt gjenskapt fra bare åtte egne råbilder uten originalbilder eller masker under produksjon. Alle nye prøver er fortsatt returer. H289/utsnitt-egenbbox og H270/1987 beholdes uendret. Kildekontroll før H294 rettet et feil premiss: landingsutsnittet har ingen grå piksler; den grå diagonalen til venstre er en haledel. Ingen ny hel resultat.png, native mottak, motor, modkandidat eller pakke. Fortsatt 508/1758 hele figurjobber, 3733 native og fig178_02 20/24. H296 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-designavklaring; automatikken ACTIVE.
+Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md.
+<!-- helikopter178-delfelt1988-20261024:slutt -->
+
 <!-- helikopter178-rotorfelt1988-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

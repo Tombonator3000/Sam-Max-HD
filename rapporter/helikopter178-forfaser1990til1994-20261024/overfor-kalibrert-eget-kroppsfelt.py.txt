@@ -1,0 +1,21 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+K=R/'kall'/sys.argv[1];plan=json.loads((K/'plan.json').read_text());base=Path(plan['egen_heltegning']);made=K/'kalibrert-utsnitt-egenbbox/egen-heltegning.png';V=K/'kalibrert-egen-alfa-og-groent-bevart';V.mkdir(exist_ok=False)
+opened=[];real=Image.open
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in [base.resolve(),made.resolve()];opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ old=np.array(Image.open(base).convert('RGBA'));new=np.array(Image.open(made).convert('RGBA'));f=old[:,:,:3].astype(float);r,g,b=np.moveaxis(f,2,0)
+ green=np.clip((g-r)/6,0,1)*np.clip((g-b)/12,0,1)
+ x,y,X,Y=plan['egen_ROI'];yy,xx=np.indices((Y-y,X-x));edge=np.minimum.reduce([xx,yy,X-x-1-xx,Y-y-1-yy]);w=np.zeros(old.shape[:2]);t=np.clip(edge/12,0,1);w[y:Y,x:X]=t*t*(3-2*t)
+ w*=(1-green)*(new[:,:,3]/255);out=old.copy();out[:,:,:3]=np.rint(f*(1-w[:,:,None])+new[:,:,:3]*w[:,:,None]).clip(0,255).astype(np.uint8);out[old[:,:,3]==0,:3]=old[old[:,:,3]==0,:3]
+ assert np.array_equal(out[:,:,3],old[:,:,3]);outside=np.ones(w.shape,bool);outside[y:Y,x:X]=False;assert np.array_equal(out[outside],old[outside]);assert np.array_equal(out[green==1],old[green==1]);Image.fromarray(out).save(V/'egen-heltegning.png')
+finally:Image.open=real
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+(V/'plan.json').write_text(json.dumps({**plan,'egen_variant':str(V.relative_to(R/'kall')),'nytt_bildekall':False},ensure_ascii=False,indent=2)+'\n')
+(V/'rens.json').write_text(json.dumps(dict(metode='RGB fra egen plassert delfeltprøve blandes inn i egen kropp. Kontinuerlig RGB-vern av egne grønne områder og egen alfa, ikke originalomriss. Eget rektangel med myk overgang.',produksjonsbilder_aapnet=opened,originalbilder_eller_masker_aapnet=0,egen_ROI=plan['egen_ROI'],hele_egen_alpha_byteidentisk=True,helt_groenne_egenpiksler_byteidentiske=True,utenfor_egen_ROI_byteidentisk=True,egen_base_SHA256=sha(base),egen_delfelt_SHA256=sha(made),egen_resultat_SHA256=sha(V/'egen-heltegning.png')),ensure_ascii=False,indent=2)+'\n')
+(R/'overfor-kalibrert-eget-kroppsfelt.py.txt').write_bytes(Path(__file__).read_bytes())
+print(str(V))
