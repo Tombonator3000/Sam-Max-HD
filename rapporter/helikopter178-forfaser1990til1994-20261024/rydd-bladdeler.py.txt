@@ -1,0 +1,38 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,gzip,hashlib,os,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';M=P/'mods/gpt';C=O/'delproeve3734';D=R/'delproeve-H323-beholdt';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+receipt=read(O/'bladdeler-kilder-faktisk-hentet.json');source=receipt['commit'];assert receipt['SHA256_og_Gitblob_SHA1_bekreftet']and not receipt['lagret_nedlastet_payload'];assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=A,text=True).strip()==source;assert subprocess.check_output(['git','ls-remote','origin','refs/heads/gpt-arbeid'],cwd=A,text=True).split()[0]==source
+baseid='c80099158b30fb08fa0cb670acb112bf14fd58f4';assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=A,text=True).split()[0]==baseid
+base=json.loads(gzip.decompress((R/'kandidat3733-filhash.json.gz').read_bytes()));expected=json.loads(gzip.decompress((R/'delproeve-filhash.json.gz').read_bytes()));assert C.resolve()==P/'out/helikopter178-bladdeler-20261024/delproeve3734';assert not C.is_symlink()and all(not p.is_symlink()for p in C.rglob('*'));actual={str(p.relative_to(C)):sha(p)for p in C.rglob('*')if p.is_file()};assert actual==expected and len(actual)==21979
+changed=[n for n,h in actual.items()if h!=base.get(n)];assert set(changed)=={'costumes/costume178_1987_hd.webp','mod.json','SHA256SUMS'};fetched={v['fil']:v for v in receipt['filer']}
+for n in changed:
+ assert sha(D/n)==expected[n];key=str((D/n).relative_to(A));assert fetched[key]['sha256']==expected[n]
+assert {str(p.relative_to(M)):sha(p)for p in M.rglob('*')if p.is_file()}==base
+# Bound deduplication to known prior/current motor outputs. Keep every new path and hash.
+oldO=P/'out/helikopter178-forfaser1990til1994-20261024';old=[]
+olderO=P/'out/helikopter178-materialfarger-20261024'
+for name in ['materialfarger-grunnlag-start1-3733','materialfarger-proeve-start1-3734']:old.extend(sorted((olderO/name).glob('*.png')))
+for name in ['rettet-grunnlag-start1-3733','rettet-helproeve-start1-3733','rotorutsnitt-grunnlag-start1-3733','rotorutsnitt-proeve-start1-3733']:
+ old.extend(sorted((oldO/name).glob('*.png')))
+previousO=P/'out/helikopter178-bladfarger-20261024'
+for name in ['bladfarger-proeve-start1-3734']:old.extend(sorted((previousO/name).glob('*.png')))
+index={}
+for p in old:index.setdefault(sha(p),p)
+rows=[];n=0
+for name in ['bladdeler-grunnlag-start1-3733','bladdeler-proeve-start1-3734']:
+ for p in sorted((O/name).glob('*.png')):
+  h=sha(p);sz=p.stat().st_size;key=index.get(h)
+  if key and p.stat().st_ino!=key.stat().st_ino:
+   assert p.read_bytes()==key.read_bytes();tmp=p.with_name(p.name+'.dedup-tmp');assert not tmp.exists();os.link(key,tmp);os.replace(tmp,p);assert sha(p)==h;n+=1
+  else:index.setdefault(h,p)
+  rows.append(dict(fil=str(p),SHA256=h,bytes=sz,beholdt=str(index[h]),samme_inode=p.stat().st_ino==index[h].stat().st_ino))
+assert len(rows)==562 and all(sha(Path(e['fil']))==e['SHA256']for e in rows)
+shutil.rmtree(C);assert not C.exists();assert {str(p.relative_to(M)):sha(p)for p in M.rglob('*')if p.is_file()}==base
+put(R/'bladdeler-rydding.json',dict(utc=datetime.now(timezone.utc).isoformat(),kildefiler_pushet_og_faktisk_hentet=source,kildekvittering_SHA256=sha(O/'bladdeler-kilder-faktisk-hentet.json'),grunnlag_hd_mod=baseid,midlertidig_fullkandidat_kontrollert_og_fjernet=True,kandidat_filhash_bekreftet=len(actual),beholdte_avvikende_stier=changed,beholdt_mappe=str(D.relative_to(A)),gjenoppretting='Hent eksakt hd-mod-forelder og erstatt/legg til bare tre beholdte kandidatfiler. Bekreft hele21979filers manifest. Ingen deduplisert historisk out-mod brukes som komplett grunnlag.',fullmanifest_SHA256=sha(R/'delproeve-filhash.json.gz'),alle_aktive_modhash_byteidentiske_foer_og_etter=len(base),nye_motorPNG_stier=len(rows),nye_eksakte_kopier_hardlenket=n,alle_motorstier_og_hash_beholdt=True,fysisk_frigjort_plass_ikke_beregnet_fra_logisk_sum=True,raa_unike_kilder_stilankre_og_stasher_ikke_slettet=True,nye_pakke_eller_arkivnedlastinger=0,motorbilder=rows))
+f=read(R/'fremdrift.json');f.update(midlertidig_kandidat_ryddet=True,hardlenkede_eksakte_motorbildekopier=n,nye_motorPNG_stier_beholdt=len(rows));put(R/'fremdrift.json',f)
+for name in ['delproeve3734.json','bladdeler-H323-motor-kontroll.json']:
+ q=read(R/name);q['prototype_ryddet']=True;put(R/name,q)
+q=read(R/'rutekart-bladdeler.json');q['motor_kontroll_SHA256']=sha(R/'bladdeler-H323-motor-kontroll.json');put(R/'rutekart-bladdeler.json',q)
+(R/'rydd-bladdeler.py.txt').write_bytes(Path(__file__).read_bytes());print(dict(aktive_byteidentiske=len(base),kandidat_ryddet=True,beholdte_endringer=len(changed),motorstier=len(rows),nye_hardlenker=n))
