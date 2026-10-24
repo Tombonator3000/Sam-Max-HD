@@ -1,0 +1,8 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,sys
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';cid=sys.argv[1];spec=json.loads(Path(sys.argv[2]).read_text());K=R/'kall'/cid;K.mkdir(exist_ok=False)
+refs=[Path(p) for p in spec['referanser']];prompt=spec['prompt'];args=dict(prompt=prompt,referenced_image_paths=list(map(str,refs)),transparent_background=True)
+plan=dict(kall=cid,rute=spec['rute'],jobb='fig178_02',kilde_mappe=spec['kilde_mappe'],nytt_bildekall=True,utfort=False,type=spec['type'],egen_base=spec['egen_base'],egen_genereringsreferanse=str(refs[0]),egen_ROI=spec['egen_ROI'],egen_variant='egen-redigert-felt',original_kontekst_og_stil_sett=True,referanser_SHA256={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in refs},originalmaske=False,stilanker='hovedark/sam.png',forberedt_utc=datetime.now(timezone.utc).isoformat())
+for name,data in [('argumenter.json',args),('plan.json',plan)]: (K/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+(K/'prompt-brukt.txt').write_text(prompt+'\n');(R/'forbered-fasefelt.py.txt').write_bytes(Path(__file__).read_bytes());print(K)

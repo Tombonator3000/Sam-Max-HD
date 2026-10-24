@@ -1,0 +1,12 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json
+A=Path('/home/tom/Sam-Max-HD/work/.gpt-gren');R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';K=R/'kall/H301';K.mkdir(exist_ok=False)
+refs=[R/'kall/H299/bare-vindu-egen-alfa/egen-heltegning.png',A/'rapporter/helikopter178-forfaser1995til1999-20261023/kilder-neste/1987/referanse24x.png',A/'hovedark/sam.png']
+prompt='''Use case: precise-object-edit. Edit image 1, my full helicopter drawing, changing ONLY the exposed grey paint areas on the long main rotor blade extending toward the upper left. Image 2 is the original animation phase 1987: follow its grey exposures along the blade, especially the broad upper patch close to the outer tip, the shorter upper-middle patch and the two grey patches near the inner root. These are flat irregular worn paint areas on a green blade, not fittings, clamps or extra objects. Keep their positions and extent faithful to the source. Image 3, Sam, is the sole approved line-and-flat-colour style reference. Retain the smooth existing outer blade contour and its dark olive interior; keep its exact angle, length, thickness and position. Preserve the entire rest of image 1 including the other two main blades, black hub meeting gold directly, tail rotor, brown cabin, all small blue/lavender/green window reflections, side markings and landing skids. Clean thin dark outlines, flat grey patches with one shade, no gradients, texture, bevels or new hardware. Preserve the full square canvas and the existing drawing placement and scale. Real transparent alpha.'''
+args=dict(prompt=prompt,referenced_image_paths=list(map(str,refs)),transparent_background=True)
+plan=dict(kall='H301',rute=1987,jobb='fig178_02',kilde_mappe=str(refs[1].parent),nytt_bildekall=True,utfort=False,type='venstre-hovedblad-graa-malingsfelt',egen_base=str(refs[0]),egen_genereringsreferanse=str(refs[0]),egen_ROI=[90,345,630,544],original_kontekst_og_stil_sett=True,referanser_SHA256={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in refs},originalmaske=False,stilanker='hovedark/sam.png',forberedt_utc=datetime.now(timezone.utc).isoformat())
+for name,data in [('argumenter.json',args),('plan.json',plan)]: (K/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+(K/'prompt-brukt.txt').write_text(prompt+'\n')
+(R/'forbered-blad-H301.py.txt').write_bytes(Path(__file__).read_bytes())
+print(K)

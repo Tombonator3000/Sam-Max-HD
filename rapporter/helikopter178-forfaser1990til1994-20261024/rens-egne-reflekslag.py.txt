@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';K=R/'kall/H299';V=K/'egen-reflekslag';V.mkdir(exist_ok=False);sources={'base':K/'bare-vindu-egen-alfa/egen-heltegning.png','blue':R/'kall/H270/utsnitt-egenbbox/egen-heltegning.png','gold':R/'kall/H300/bare-vindu-egen-alfa/egen-heltegning.png'}
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();opened=[];real=Image.open
+
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in[f.resolve()for f in sources.values()];opened.append(str(p));return real(fp,*a,**kw)
+def blue(a):
+ r,g,b=np.moveaxis(a[:,:,:3].astype(float),2,0);return np.clip((g-r-5)/12,0,1)*np.clip((b-r-10)/15,0,1)*np.clip((b-g-4)/12,0,1)
+Image.open=guard
+try:
+ a={k:np.array(Image.open(f).convert('RGBA'))for k,f in sources.items()};base=a['base'];assert all(x.shape==base.shape for x in a.values());yy,xx=np.indices(base.shape[:2]);roi=(xx>=528)&(xx<845)&(yy>=555)&(yy<702);x,y,X,Y=528,555,845,702;edge=np.minimum.reduce([xx-x,yy-y,X-1-xx,Y-1-yy]);t=np.clip(edge/12,0,1);feather=t*t*(3-2*t)*roi
+ r,g,b=np.moveaxis(base[:,:,:3].astype(float),2,0);neutral=roi&(base[:,:,3]>=128)&((np.maximum.reduce([r,g,b])-np.minimum.reduce([r,g,b]))<12)&(r>40);_,near=nd.distance_transform_edt(~neutral,return_indices=True);remove=blue(base)*feather;out=base.copy();donor=base[near[0],near[1],:3];out[:,:,:3]=np.rint(out[:,:,:3]*(1-remove[:,:,None])+donor*remove[:,:,None]).clip(0,255).astype(np.uint8)
+ restore=blue(a['blue'])*feather*a['blue'][:,:,3]/255;out[:,:,:3]=np.rint(out[:,:,:3]*(1-restore[:,:,None])+a['blue'][:,:,:3]*restore[:,:,None]).clip(0,255).astype(np.uint8)
+ r,g,b=np.moveaxis(a['gold'][:,:,:3].astype(float),2,0);gold=np.clip((r-170)/20,0,1)*np.clip((g-70)/25,0,1)*np.clip((110-b)/30,0,1)*np.clip((r-1.2*g)/20,0,1);gold*=roi& (xx>=710);gold*=feather*a['gold'][:,:,3]/255;out[:,:,:3]=np.rint(out[:,:,:3]*(1-gold[:,:,None])+a['gold'][:,:,:3]*gold[:,:,None]).clip(0,255).astype(np.uint8);out[base[:,:,3]==0,:3]=base[base[:,:,3]==0,:3];assert np.array_equal(base[:,:,3],out[:,:,3])and np.array_equal(out[~roi],base[~roi]);Image.fromarray(out).save(V/'egen-heltegning.png')
+finally:Image.open=real
+plan=json.loads((K/'plan.json').read_text());plan.update(nytt_bildekall=False,egen_variant='H299/egen-reflekslag');(V/'plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n');(V/'rens.json').write_text(json.dumps(dict(metode='Bare egne myke RGB-masker og egne eksisterende genererte reflekslag på samme lerret. H299s blå egenfarge renses med nærmeste egen nøytrale farge, H270s egne blå felt og H300s egne gylne felt legges over med myk RGB-vekt. Ingen originalbilde, originalmaske eller kildekoordinat brukes under produksjon.',produksjonsbilder_aapnet=opened,produksjon_originalbilder_aapnet=0,egen_alfa_byteidentisk=True,egen_ROI=[x,y,X,Y],egen_kilder_SHA256={k:sha(p)for k,p in sources.items()},egen_resultat_SHA256=sha(V/'egen-heltegning.png'),nytt_bildekall=False),ensure_ascii=False,indent=2)+'\n');(R/'rens-egne-reflekslag.py.txt').write_bytes(Path(__file__).read_bytes());print(V)

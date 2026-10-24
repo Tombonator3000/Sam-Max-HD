@@ -1,5 +1,5 @@
 {
-  "status": "VINDUHEL1987_H299_ARBEIDSKONTROLLPUNKT_MATERIALRETUR",
+  "status": "FASEFELT_H301_H305_RETUR_TIDLIGERE_KONTROLLPUNKT_BEHOLDT",
   "bunke_ferdig": false,
   "native": 3733,
   "native_kandidat": 3733,
@@ -15,7 +15,7 @@
   "familie178_native": 32,
   "familie178_kandidat": 32,
   "familie178_totalt": 102,
-  "faktiske_bildekall": 124,
+  "faktiske_bildekall": 129,
   "kall": [
     "H176",
     "H177",
@@ -140,7 +140,12 @@
     "H297",
     "H298",
     "H299",
-    "H300"
+    "H300",
+    "H301",
+    "H302",
+    "H303",
+    "H304",
+    "H305"
   ],
   "raa_med_sluttpiksler": 42,
   "valgte_ruter": {
@@ -168,7 +173,7 @@
     1989,
     1986
   ],
-  "neste_kall": "H301",
+  "neste_kall": "H306",
   "neste_kall_utfort_eller_reservert": false,
   "fullt_ferdig": false,
   "grafikkilde": "7a26e3506903f5081e95ec94a9bada3d6d63253d",
@@ -190,7 +195,7 @@
   "visuell_stil_godkjent": false,
   "stilretur_grunn": "For mye trappepreg i interne fargegrenser og flere konturer, og svak stiloverensstemmelse med det godkjente Sam-ankeret. Teknisk form/farge/alfa og motor er kontrollert, men grafikken må nytegnes før endelig stilgodkjenning.",
   "teknisk_bunke_publisert": true,
-  "naeste_prioritet": "Plassarbeidet er ferdig. Følg docs/PLASSBRUK.md; gjenoppta H299/1987 med materialretur.",
+  "naeste_prioritet": "Gjenoppta H299/1987 og uavhengige aapne faser. H304 er kun rodt delforarbeid. H289/1988 og H252/1990 beholdes. Ingen ny import. Folg docs/PLASSBRUK.md.",
   "fellespakker_url": "https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-helikopter-forfaser",
   "kode_main_pakker": "1d89dbcb7c8ed2cb1edab3d614f4fbd44699931d",
   "alle_publiserte_modhash_faktisk_hentet": true,
@@ -251,8 +256,8 @@
   },
   "nye_motorPNG_stier_beholdt": 1124,
   "detaljproever_raa_og_prompt_hash_bekreftet": true,
-  "opptelling": "opptelling-vinduhel1987.json",
-  "siste_produksjon_utc": "2026-10-24T06:56:42.487994+00:00",
+  "opptelling": "opptelling-fasefelt.json",
+  "siste_produksjon_utc": "2026-10-24T07:59:03.530798+00:00",
   "grafikkilde_nye_detaljproever": "a96a59f9b306f677ed56982ef953816841245cf1",
   "detaljproever_kilde_filer_faktisk_hentet": 176,
   "detaljproever_kilde_SHA256_og_Gitblob_SHA1_bekreftet": true,
@@ -326,8 +331,8 @@
     "siste_produksjon_utc": "2026-10-24T02:42:35.770781+00:00",
     "grafikkilde_nye_smaafelt": "760e2c4ee2ed4ee064d942fe10a9141f4656daab"
   },
-  "egne_Python_renseproever_denne_kjoring": 5,
-  "nye_helfaseproever_denne_kjoring": 5,
+  "egne_Python_renseproever_denne_kjoring": 1,
+  "nye_helfaseproever_denne_kjoring": 0,
   "nye_motoravspillinger_denne_kjoring": 0,
   "nye_faseproever": {
     "1989": "H255",
@@ -391,8 +396,8 @@
       "H268"
     ]
   },
-  "nye_helfigur_redigeringskall_denne_kjoring": 3,
-  "nye_isolerte_detaljkall_denne_kjoring": 2,
+  "nye_helfigur_redigeringskall_denne_kjoring": 5,
+  "nye_isolerte_detaljkall_denne_kjoring": 0,
   "grafikkilde_nye_vindusramme1987_sha_avventer_egen_commit": false,
   "grafikkilde_nye_vindusramme1987": "e69f7939acd7ba75a3d7d56d5b5891e7275e7497",
   "vindusramme1987_kilde_filer_faktisk_hentet": 224,
@@ -472,7 +477,7 @@
       "H289"
     ]
   },
-  "bildekall_med_mottatt_raa": 124,
+  "bildekall_med_mottatt_raa": 129,
   "forsokte_bildekall_denne_kjoring": 5,
   "nye_mottatte_raabilder_denne_kjoring": 5,
   "feilede_bildekall_denne_kjoring": 0,
@@ -536,5 +541,24 @@
   "vinduhel1987_nedlastet_payload_dobbeltlagret": false,
   "kompakt_lagring_PR": 37,
   "kompakt_lagring_main": "2e5f0ebd0c56556248798d4a7a675fd0b69cca36",
-  "kompakt_lagring_rapport": "../kompakt-lagring-20261024/SLUTTSTATUS.json"
+  "kompakt_lagring_rapport": "../kompakt-lagring-20261024/SLUTTSTATUS.json",
+  "historisk_vinduhel1987_124raa": {
+    "commit": "ebdf3365f8ded06d45d46253e12afdefe07892f4",
+    "rapport": "vinduhel1987-status.md",
+    "raa": 124,
+    "valgt": "H299/bare-vindu-egen-alfa"
+  },
+  "fasefelt_rutekart": "rutekart-fasefelt.json",
+  "fasefelt_replay": "replay-fasefelt.json",
+  "fasefelt_status": "fasefelt-status.md",
+  "fasefelt_proever": {
+    "1987": "H301",
+    "1988": "H302",
+    "1989": "H303",
+    "1986": "H304",
+    "1990": "H305"
+  },
+  "fasefelt_alle_proever_returnert": true,
+  "fasefelt_seks_egen_native_PNG_RGBA_byteeksakt": true,
+  "fasefelt_grafikkilde_avventer_egen_commit": true
 }

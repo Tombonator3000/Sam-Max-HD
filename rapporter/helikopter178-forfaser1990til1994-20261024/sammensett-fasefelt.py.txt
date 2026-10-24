@@ -1,0 +1,27 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';K=R/'kall'/sys.argv[1];plan=json.loads((K/'plan.json').read_text());base=Path(plan['egen_base']);part=Path(plan['egen_nytt_bilde']);V=K/'egen-redigert-felt';V.mkdir(exist_ok=False)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();opened=[];real=Image.open
+
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in [base.resolve(),part.resolve()];opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ old=np.array(Image.open(base).convert('RGBA'));new=np.array(Image.open(part).convert('RGBA'));assert old.shape==new.shape
+ x,y,X,Y=plan['egen_ROI'];h,w=Y-y,X-x;yy,xx=np.indices((h,w));edge=np.minimum.reduce([xx,yy,w-1-xx,h-1-yy]);t=np.clip(edge/12,0,1);feather=t*t*(3-2*t);out=old.copy()
+ if plan['bevar_egen_alfa']:
+  weight=feather*new[y:Y,x:X,3]/255
+  out[y:Y,x:X,:3]=np.rint(old[y:Y,x:X,:3]*(1-weight[:,:,None])+new[y:Y,x:X,:3]*weight[:,:,None]).clip(0,255).astype(np.uint8)
+ else:
+  a=old[y:Y,x:X,3]/255;b=new[y:Y,x:X,3]/255;c=a*(1-feather)+b*feather
+  rgb=old[y:Y,x:X,:3]*a[:,:,None]*(1-feather[:,:,None])+new[y:Y,x:X,:3]*b[:,:,None]*feather[:,:,None]
+  out[y:Y,x:X,:3]=np.rint(rgb/np.maximum(c[:,:,None],1e-9)).clip(0,255).astype(np.uint8);out[y:Y,x:X,3]=np.rint(c*255).clip(0,255).astype(np.uint8)
+ out[out[:,:,3]==0,:3]=0;outside=np.ones(old.shape[:2],bool);outside[y:Y,x:X]=False
+ # Fully transparent RGB is preserved too outside the own rectangle.
+ out[outside]=old[outside];assert np.array_equal(out[outside],old[outside])
+ if plan['bevar_egen_alfa']:assert np.array_equal(out[:,:,3],old[:,:,3])
+ Image.fromarray(out).save(V/'egen-heltegning.png')
+finally:Image.open=real
+(V/'plan.json').write_text(json.dumps({**plan,'nytt_bildekall':False,'egen_variant':str(V.relative_to(R/'kall'))},ensure_ascii=False,indent=2)+'\n')
+(V/'rens.json').write_text(json.dumps(dict(metode='To egne hele lerret og et eget rektangel med myk 12 px overgang. RGB-overfoering med gammel egen alfa eller premultiplisert egen RGBA etter plan. Ingen originalbilder eller originale masker.',produksjonsbilder_aapnet=opened,egen_ROI=plan['egen_ROI'],egen_feather_bredde=12,egen_base_SHA256=sha(base),egen_helredigering_SHA256=sha(part),egen_heltegning_SHA256=sha(V/'egen-heltegning.png'),egen_alpha_byteidentisk=bool(np.array_equal(out[:,:,3],old[:,:,3])),egen_ny_alpha_brukt=not plan['bevar_egen_alfa'],utenfor_egen_ROI_byteidentisk=True,originalbilder_eller_masker_i_produksjon=0),ensure_ascii=False,indent=2)+'\n');(R/'sammensett-fasefelt.py.txt').write_bytes(Path(__file__).read_bytes());print(V)
