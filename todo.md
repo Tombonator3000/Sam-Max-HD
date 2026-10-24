@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-rotorfelt1988-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 08:01
+
+- [x] Seks faktiske rotorfelt-/sidefeltkall H284..H289, totalt 114, er bevart med råbilder, faktiske prompter og kontroll. Alle 174 kildefiler og fire rapportfiler er pushet og faktisk lengde-/SHA256-/Git-blob-bekreftet. Valgt H289 og returnert H288-alfaprøve har byteeksakt replay uten originalbilder under produksjon.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/9e2beea6ca6b9e675ebf7a28d75f190aec86971e/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra H289/utsnitt-egenbbox. Rett de tre direkte formpunktene og materialreturene. Behold H283 som tidligere ren sammenligning og H270/1987 uendret. H290 er ikke startet; ingen import nå.
+- [ ] Behold kildebekreftede mørkegrå sidefelt RGB55/71 og små grå rotorfargegrupper uten nye objekter. H285s blokklapp, H286s oransje sidefelt og H288s dobbeltkontur er konkrete returer. Fortsett åpne 1989/1986 og 1990..1994; ikke dupliser 1995..2021 uten retur. Sam er eneste godkjente stilanker.
+- [ ] Etter bestått teknisk og visuell retting: én fersk komplett WebP-kandidat, relevant motoravspilling, vanlig hd-mod-barn av fersk fjern-SHA og faktisk tilbakehenting. Pakker oppdateres ved publisert samlepunkt/avslutning. Nå er mod/pakker uendret med 3733 native og 508/1758 hele jobber. Automatikken ACTIVE; sluttkontroll gjenstår.
+<!-- helikopter178-rotorfelt1988-20261024:slutt -->
+
 <!-- helikopter178-firefase-rensing-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

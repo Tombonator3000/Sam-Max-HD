@@ -1,5 +1,21 @@
 # Status
 
+<!-- helikopter178-rotorfelt1988-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Seks rotorfeltprøver, tre formpunkter gjenstår, 2026-10-24 08:01
+
+Seks faktiske innebygde image_gen-kall H284..H289 retter åpen helikopterfase 1988, totalt 114 kall i bunken. H289/utsnitt-egenbbox holdes som nytt arbeidskontrollpunkt med fyldigere øvre bladrot og grå rotstripe. Lagret direkte nativeprøve har tre formfester og null åpningsfeil mot tidligere fem/null. Materialkontrollens separate helflytt [2,0] har to/null og 69 positive materialavvik. Ingen av prøvene er godkjent. [Rapport og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/9e2beea6ca6b9e675ebf7a28d75f190aec86971e/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+Kildekontrollen viser mørkegrå sidefelt med RGB55/71 og åtte små grå fargegrupper i venstre hovedblad. H284 lager nytt sidepunkt og belte. H285s blokklapp, H286s oransje sidefelt og H288s alfabevarte RGB-prøve med synlig dobbeltkontur er returer. H288 har lavere materialtall, men velges ikke. H289s direkte sluttpiksler kommer bare fra egne H256/H283/H289-råbilder. Egen tegning og native-PNG/RGBA er gjenskapt byteeksakt med aktiv bildevakt uten originalbilder eller originalmasker under produksjon. Den avviste H288-prøven har også eget replay og byteidentisk gammel egen alfa og nativealfa. Alle råbilder, egne sammensettinger og ti nativevarianter er visuelt sett. Alle 22 fargediagnoser og uendrede 3 HD-grenser er beholdt.
+
+Grafikkilde d4c9bf3be90deba697723988491eedf1481787ac og rapport 9e2beea6ca6b9e675ebf7a28d75f190aec86971e er pushet og faktisk hentet tilbake. Alle 174 kildefiler (16364327 byte) og fire rapportfiler (64880 byte) er lengde-, SHA256- og Git-blob SHA1-bekreftet uten ekstra lagret payload. Ingen ny hel resultat.png, native mottak, motoravspilling, modkandidat, publisert modgrafikk eller Tom-/Claude-godkjenning. Historisk motorbevis for H252/1990 gjelder ikke de nye prøvene.
+
+Fortsatt 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 native, fig178_02 20/24 og familie178 32/102. Alle 21978 aktive modhash, 9174 beskyttede input og tre opprinnelige stasher er uendret. Fersk hd-mod er c80099158b30fb08fa0cb670acb112bf14fd58f4. Fire releasevedleggs ID/navn/størrelse/digest er uendret; tidligere faktiske Linux-/Windows-pakke- og innholdskontroller gjelder. Ingen ny pakke, arkivnedlasting eller sletting.
+
+Gjenoppta H289s tre direkte formpunkter og materialreturer. H283/bare-hale beholdes som forrige rene sammenligningsgrunnlag; H270/1987 er uendret med null form/åpning og 19 positive materialavvik. 1989/1986 og 1990..1994 har åpne returer. Ikke dupliser 1995..2021 uten retur. H290 er ikke forberedt, utført eller reservert. Sam er eneste godkjente stilanker. 137/V013 og 296/S037 er uendret. Ingen nødvendig ny Tom-designavklaring. Automatikken ACTIVE; all grafikk og sluttkontroll er ikke ferdig. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokale kontroller. Ingen motor-/pipelinekodeendring, force-push, ekstern bildefallback eller gammel nattprosess.
+<!-- helikopter178-rotorfelt1988-20261024:slutt -->
+
 <!-- helikopter178-firefase-rensing-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

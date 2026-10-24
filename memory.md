@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-rotorfelt1988-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Mørke sidefelt og rotorfelt, fortsatt retur, 2026-10-24 08:01
+
+Seks rotorfelt-/sidefeltkall H284..H289 for fase 1988 gir 114 faktiske kall i bunken. H289/utsnitt-egenbbox holdes med tre direkte formfester og null åpningsfeil, men material-/motivretur består. Separat materialhelflytt [2,0] gir to/null og 69 positive materialavvik. H283 er tidligere rent sammenligningsgrunnlag; H270/1987 er uendret. Ingen ny hel resultat.png, native mottak, motor eller godkjenning. [Gjenopptaking og bevis](https://github.com/Tombonator3000/Sam-Max-HD/tree/9e2beea6ca6b9e675ebf7a28d75f190aec86971e/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+Sidefeltene er kildebekreftet mørkegrå RGB55/71, og venstre blad har åtte små grå fargegrupper. H285s blokklapp, H286s oransje sidefelt og H288s alfabevarte prøve med dobbeltkontur er returer. Lavere materialtall eller bevart egen alfa gir ikke visuell godkjenning. H289s egen tegning og native-PNG/RGBA er gjenskapt byteeksakt fra bare H256/H283/H289-råbilder, uten originalbilder/masker under produksjon.
+
+Grafikkilde d4c9bf3be90deba697723988491eedf1481787ac og rapport 9e2beea6ca6b9e675ebf7a28d75f190aec86971e er faktisk hentet og SHA256-/Git-blob-bekreftet, 174 + 4 filer. Mod/pakker c8009915 er uendret; alle 21978 modhash, 9174 beskyttede input og tre stasher er bekreftet. Fortsatt 508/1758 hele figurjobber og 3733 native, fig178_02 20/24. H290 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE.
+<!-- helikopter178-rotorfelt1988-20261024:slutt -->
+
 <!-- helikopter178-firefase-rensing-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
