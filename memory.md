@@ -1,5 +1,19 @@
 # memory.md
 
+<!-- helikopter178-graaplan1987-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Gråfelt og detaljretur 1987, ingen ny import, 2026-10-24 06:13
+
+Fem nye faktiske innebygde image_gen-kall H264..H268 viderefører den påbegynte fase 1987, totalt 93 kall i bunken. H264s oppblåste kodeøyer og H265s trappede gråoverlay er avvist. H266 tegner hele eget motiv på nytt med Sam som eneste stilanker, H267 retter grå halehette/-bøy og H268 små grønne/blå/lavendel vindusfelt. H268s hele utsnitt endrer understell og gir en synlig skjøt i fremre løper og er avvist; bare eget vindusrektangel beholdes over H267. Hele understell og kropp utenfor dette rektangelet er bytebevart. Råbilder og alle egne nativevarianter er visuelt sett. Ingen nye hele resultat.png, native mottak, motoravspillinger, publiserte grafikkbytes eller Tom-/Claude-godkjenninger. [Rapport og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/d225add1db511a3d4a47866b047bd0ac4c96d01e/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+Sist arbeidet H268/hel-affin-kontroll har null form-/åpningsfeil ved uendrede 3 HD-porter etter samlet helregistrering, med snitt/union 0,867. Materialretur består: 1 sort, 16 grå, 2 brune og 5 grønne positive avvik. Blått, gylne aksenter og lavendel har null positive avvik. Alle 22 fargediagnoser beholdes med 267 positive og 5928 ekstra nærmeste-klasseavvik, samt ekstra materialklassepiksler. Tallene er diagnostikk, ikke objektantall eller visuell godkjenning. Små grå eksponeringer og feil feltutstrekning gjenstår. Aktiv bildevakt gjenskaper egen heltegning og native-PNG/RGBA byteeksakt fra bare tre egne råbilder H266/H267/H268. H264/H265 er genereringsreferanseopphav uten direkte sluttpiksler. Ingen originalbilde eller originalmaske åpnes under produksjonsreplay. Kanonisk brun RGB, egne ROI og fast helplassering er metadata, ikke lokal originalpåmaling.
+
+Grafikkilde 1f4cfe47386c272dd3f64bab31d66891753f7e9d og rapport d225add1db511a3d4a47866b047bd0ac4c96d01e er pushet og faktisk hentet tilbake. Alle 128 kildefiler og fire rapportfiler er lengde-, SHA256- og Git-blob SHA1-bekreftet uten ekstra lagret nedlastingspayload. Alle 21978 aktive modhash, 9174 beskyttede input og tre opprinnelige stasher er uendret. Ingen ny modkandidat, arkivnedlasting, motoravspilling, pakke eller sletting denne kjøringen. Faktisk opptelling er 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 native, fig178_02 20/24 og familie178 32/102. Fersk hd-mod er fortsatt c80099158b30fb08fa0cb670acb112bf14fd58f4. Fire releasevedleggs ID, navn, størrelse og digest er uendret; tidligere faktiske Linux-/Windows-pakke- og innholdskontroller gjelder. Ingen motorstatus fra H252/1990 overføres til nye prøver.
+
+Gjenoppta H268/hel-affin-kontroll med materialpunktene i graaplan1987-avvik-kildepunkter.json, særlig grå eksponeringer på venstre hovedrotorblad og nedre venstre vindusramme. H269 er ikke forberedt, utført eller reservert. Ikke importer kontrollpunktet nå. Ikke gjenbruk H265s pikselsteg eller H268s endrede understell. H255/1989, H256/1988 og H258/1986 kan rettes uavhengig; H252/1990 og stilretur 1991..1994 står uendret. Ingen duplisering av 1995..2021 uten retur. Sam er eneste stilanker; 137/V013 og 296/S037 er uendret. Ingen nødvendig ny Tom-designavklaring. Automatikken forblir ACTIVE; bunken og all grafikk er ikke ferdig. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes med lokale kontroller etter søk og én utvidelse. Ingen motor-/pipelinekodeendring, force-push, CLI/API-bildefallback eller gammel nattprosess.
+<!-- helikopter178-graaplan1987-20261024:slutt -->
+
 <!-- helikopter178-retur1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

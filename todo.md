@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-graaplan1987-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 06:13
+
+- [x] Fem faktiske image_gen-kall H264..H268, totalt 93, med råbilder, faktiske prompter, kildehash og egenkontroll. Alle 128 kildefiler og fire rapportfiler er pushet og faktisk SHA256-/Git-blob-bekreftet uten ekstra lagret payload. H264/H265 og H268s hele utsnitt er dokumenterte returer.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/d225add1db511a3d4a47866b047bd0ac4c96d01e/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra holdt H268/hel-affin-kontroll. Null form-/åpningsfeil, men 24 positive materialavvik og ekstra klassepiksler gjenstår. Alle 22 fargediagnoser beholdes. Rett særlig små grå eksponeringer, behold de rettede hale-/vindusfeltene. H269 er ikke startet; ingen import nå.
+- [ ] Fortsett også åpne 1989/1988/1986 og returer 1990..1994 ved uavhengig arbeid. Behold H252/1990 som holdt arbeidsfil. Sam er eneste godkjente stilanker; ingen avviste kodeplan, understell eller egenprøver som stilanker.
+- [ ] Etter bestått teknisk og visuell retting: én fersk komplett WebP-kandidat, motorprøve, vanlig hd-mod-barn av fersk fjern-SHA og faktisk tilbakehenting. Pakker oppdateres ved nytt publisert samlepunkt/avslutning. Mod/pakker er uendret c8009915 med 3733 native, 508/1758 hele jobber og fig178_02 20/24. Automatikken ACTIVE; sluttkontroll gjenstår.
+<!-- helikopter178-graaplan1987-20261024:slutt -->
+
 <!-- helikopter178-retur1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
