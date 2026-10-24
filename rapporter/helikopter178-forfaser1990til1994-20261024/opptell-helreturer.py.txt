@@ -1,0 +1,16 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import subprocess,hashlib,json
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';M=P/'mods/gpt';git=lambda *args:subprocess.check_output(['git',*args],cwd=A)
+tree={}
+for line in git('ls-tree','-r','-z','HEAD').split(b'\0'):
+ if line:
+  meta,p=line.split(b'\t',1);tree[p.decode()]=meta.split()[2].decode()
+protect=[n for n in tree if Path(n).name in['referanse.png','original_1x.png','prompt.txt','jobb.json']]
+for n in protect:
+ data=(A/n).read_bytes();assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==tree[n],n
+jobs=sorted((A/'jobber').glob('fig*/jobb.json'));nresult=sum(p.with_name('resultat.png').is_file()for p in jobs)
+idx=sorted((M/'costumes').glob('*_idx.png'));has=lambda stem:(M/'costumes'/f'{stem}_hd.webp').is_file()or(M/'costumes'/f'{stem}_hd.png').is_file();native=[p for p in idx if has(p.name.removesuffix('_idx.png'))];family=[p for p in native if p.name.startswith('costume178_')];j=json.loads((A/'jobber/fig178_02/jobb.json').read_text());ark=[z for z in j['ruter']if has(z['bilde'])]
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).splitlines();expected=['3bcac2e1c5fc70f077c5845bd1c497503e2242ca','1672c8981a434e17bed5c142599680f16a238a74','729db1fccdc5c2edf5dc6367f9778b9f68ea428c'];assert stashes==expected;assert (nresult,len(jobs),len(native),len(family),len(ark),len(j['ruter']))==(508,1758,3733,32,20,24)
+out=dict(utc=datetime.now(timezone.utc).isoformat(),figurjobber=nresult,figurjobber_totalt=len(jobs),uten_resultat=len(jobs)-nresult,native_faktisk_med_idx_og_hd=len(native),familie178_native=len(family),familie178_totalt=sum(len(json.loads(p.read_text())['ruter'])for p in jobs if json.loads(p.read_text()).get('kostyme')==178),fig178_02_native=len(ark),fig178_02_totalt=len(j['ruter']),beskyttede_jobbfiler_sha1_mot_HEAD=sum(n.startswith(('jobber/','hovedark/'))for n in protect),beskyttede_jobbfiler_byteidentiske=True,alle_sporede_beskyttede_filenavn_sha1_mot_HEAD=len(protect),alle_sporede_beskyttede_filenavn_byteidentiske=True,tre_opprinnelige_stasher_uendret=stashes,ny_hel_resultat_png=False)
+(R/'opptelling-helreturer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');(R/'opptell-helreturer.py.txt').write_bytes(Path(__file__).read_bytes());print(out)

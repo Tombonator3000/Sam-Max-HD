@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from io import BytesIO
+from smhd.myk import _premul_resize
+import ast,json,hashlib,numpy as np
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';O=Path(__file__).resolve().parent;read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();dims={1988:[67,36],1989:[70,39],1986:[64,35],1990:[76,38]}
+for f,names in [(P/'out/helikopter178-forfaser1990til1994-20261024/replay-vindusramme1987.py',['brown']),(P/'out/helikopter178-materialfarger-20261024/replay-materialfarger.py',['rect','part'])]:
+ for node in ast.parse(f.read_text()).body:
+  if isinstance(node,ast.FunctionDef)and node.name in names:exec(compile(ast.Module(body=[node],type_ignores=[]),str(f),'exec'))
+def pngsha(a):
+ b=BytesIO();Image.fromarray(a).save(b,format='PNG');return hashlib.sha256(b.getvalue()).hexdigest()
+def native(a,q):
+ sw,sh=dims[q['rute']];a=a.copy();a[a[:,:,3]<8]=0;sx,sy=q['hel_skala'];scaled=_premul_resize(a,(round(a.shape[1]*sx),round(a.shape[0]*sy)));W,H=(sw+q['margx']*2)*4,(sh+q['margy']*2)*4;out=np.zeros((H,W,4),np.uint8);px,py=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];x,y=max(px,0),max(py,0);X,Y=min(px+scaled.shape[1],W),min(py+scaled.shape[0],H);out[y:Y,x:X]=scaled[y-py:Y-py,x-px:X-px];return out
+files={c:R/'kall'/c/'raa.png'for c in ['H331','H332','H333','H334','H335']};real=Image.open;opened=[]
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in {v.resolve()for v in files.values()},str(p);opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ raw={c:np.array(Image.open(p).convert('RGBA'))for c,p in files.items()};builds={};natives={};rows=[]
+ for c in ['H331','H332','H333','H334']:
+  builds[c+'/hel-raaprove']=raw[c];builds[c+'/hel-brunprove']=brown(raw[c])
+ builds['H335/egen-del-RGB']=part(builds['H331/hel-brunprove'],raw['H335'],read(R/'kall/H335/egen-del-RGB/rens.json'))
+ for v,own in builds.items():
+  K=R/'kall'/v;q=read(K/'kontroll.json');out=native(own,q);natives[v]=out;assert pngsha(own)==sha(K/'egen-heltegning.png')and pngsha(out)==sha(K/'prototype-under-kontroll.png'),v;rows.append(dict(variant=v,rute=q['rute'],egen_PNG_SHA256=pngsha(own),native_PNG_SHA256=pngsha(out),egen_RGBA_SHA256=hashlib.sha256(own.tobytes()).hexdigest(),native_RGBA_SHA256=hashlib.sha256(out.tobytes()).hexdigest(),PNG_byteeksakt=True,direkte_raa=['H331','H335']if v.startswith('H335/')else[v.split('/')[0]]))
+finally:Image.open=real
+for e in rows:
+ K=R/'kall'/e['variant'];assert np.array_equal(builds[e['variant']],np.array(Image.open(K/'egen-heltegning.png').convert('RGBA')));assert np.array_equal(natives[e['variant']],np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA')));e['RGBA_byteeksakt']=True
+assert len(set(opened))==5
+proof=dict(metode='Ni egne komposisjoner/native byteeksakt fra bare fem nye urørte egne råbilder. Fire hele faser med rå/brunkalibrert variant, ett helt eget venstreblad med myk16px RGB-overføring og bevart egen H331-alfa. Fast helregistrering fra lagrede numeriske metadata, ingen originalbilder under replay. Kildealfabilder ble bare brukt til å velge samlet transform i den opprinnelige kontrollen, aldri til å klippe nye piksler.',produksjonsbilder_aapnet=opened,raa_SHA256={c:sha(p)for c,p in files.items()},unike_egne_raabilder=5,originalbilder_eller_masker_under_produksjon=0,varianter=rows,alle_ni_egen_native_PNG_RGBA_byteeksakt=True,native_mottatt=False,publisert=False)
+(R/'replay-helreturer.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'replay-helreturer.py.txt').write_bytes(Path(__file__).read_bytes());print('Ni egne/native PNG og RGBA byteeksakte fra fem egne råbilder.')
+# Read-only source comparison after guarded production and byte verification.
+board=Image.new('RGB',(1200,1050),'#304050');dr=ImageDraw.Draw(board)
+for i,c in enumerate(files):
+ plan=read(R/'kall'/c/'plan.json');src=Image.open(Path(plan['kilde_mappe'])/'original-1x.png').convert('RGBA');src=src.resize((src.width*4,src.height*4),Image.Resampling.NEAREST);names=[c+'/hel-raaprove',c+'/hel-brunprove']if c!='H335'else['H335/egen-del-RGB'];ims=[(src,'Original '+str(plan['rute']))]+[(Image.fromarray(natives[n]),n)for n in names]
+ for j,(im,label)in enumerate(ims):
+  bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);board.paste(bg.convert('RGB'),(12+j*400,32+i*210));dr.text((12+j*400,10+i*210),label,fill='white')
+board.save(R/'helreturer-ni-native-og-original.png')

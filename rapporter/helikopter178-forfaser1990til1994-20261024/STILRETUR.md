@@ -1,3 +1,11 @@
+# Nyeste stilretur: H331..H335
+
+Fem nye faktiske innebygde image_gen-kall H331..H335 er utført i samme påbegynte fig178_02, totalt 159 mottatte råbilder. Fire hele fasetegninger og ett isolert blad gir ni egne komposisjoner med fire globale brunvarianter. Dette er rettingsforsøk, ingen nye hele figurjobber. H336 er ikke startet, forberedt eller reservert. Originalene er sett som hele faser og i rom 35 før motivene. Sam er eneste godkjente stilanker.
+
+Alle ni nye varianter er fortsatt returer. Se helreturer-status.md og NESTE.md. H331/H335s sterkere form gjør dem ikke til ferdige material-/stilvalg. H327, H289 og H252 beholdes. Ingen ny motorobservasjon eller native mottak.
+
+## Historisk stilretur før H331
+
 # Nyeste status: vinduhel1987
 
 <!-- helikopter178-vinduhel1987-20261024 -->
