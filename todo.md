@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-retur1987-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 05:45
+
+- [x] Fem konkrete rettingskall H259..H263 er laget, kontrollert, pushet og faktisk hentet tilbake. Totalt 88 kall. Alle 143 kildefiler og fire rapportfiler er SHA256-/Git-blob-bekreftet. Seks Python-polygonrenser er dokumenterte returer, ikke nye bildekall eller leveranser.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/5c850ad62933b16a1f1cfc254004d0badbaab8b2/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra holdt H263/samlet-hoeyreblad, med formpunkt 25,28 og materialpunktene i retur1987-avvik-kildepunkter.json. Ett formpunkt og 52 positive materialfester gjenstår, alle 22 fargediagnoser beholdes. Ikke importer prøven nå. H264 er ikke startet.
+- [ ] Behold rent H252/1990 som holdt arbeidsgrunnlag. Ikke bruk H260s brune utsnittsstripe eller polygonrensene som forbedringer. Fortsett også åpne 1989/1988/1986 og returer 1990..1994; Sam er eneste stilanker.
+- [ ] Etter bestått teknisk og visuell retting: én fersk komplett WebP-kandidat, motorprøve, vanlig hd-mod-barn av fersk fjern-SHA og faktisk tilbakehenting. Pakker oppdateres ved nytt publisert samlepunkt/avslutning. Nå er mod/pakker uendret c8009915 med 3733 native, 508/1758 hele jobber og fig178_02 20/24. Automatikken ACTIVE, sluttkontroll gjenstår.
+<!-- helikopter178-retur1987-20261024:slutt -->
+
 <!-- helikopter178-konturvask-fire-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
