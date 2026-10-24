@@ -90,3 +90,7 @@ Den ene midlertidige fullmodkopien er fjernet etter kontroll av alle 21978 filha
 ## Faktisk tilbakehenting av denne leveransen
 
 Grafikkilde a96a59f9b306f677ed56982ef953816841245cf1 er pushet som vanlig barn av 2b8d91c6639b440209a879f8c208d1468306ce9f. Alle 176 endrede filer er faktisk hentet tilbake som strømmer. Både SHA256, Git-blob SHA1 og lengde er bekreftet, totalt 20488354 byte, uten ekstra lagret nedlastingskopi. Se detaljproever-kilder-faktisk-hentet.json.gz. Dette verifiserer kildeleveransen, ikke stilgodkjenning eller nativepublisering. hd-mod c80099158b30fb08fa0cb670acb112bf14fd58f4 og begge pakker er uendret. H242 er ikke startet, og automatikken er ACTIVE.
+
+## Faktisk tilbakehenting av rotorutsnittene
+
+Grafikkilde 9ffa2d503cf07b2687ed432193f80f3cdbe6315d er vanlig Git-barn av 14a440c5c30e8af0378cc33f149941d30f175205. Alle 217 endrede filer er faktisk hentet som strømmer, totalt 26070491 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle; ingen nedlastet payloadkopi beholdes. Se rotorutsnitt-kilder-faktisk-hentet.json.gz. Dette verifiserer råbilder og kontrollbevis, ikke ferdig stilgodkjenning eller native mottak. Neste H248 er ikke startet; automatikken er ACTIVE.

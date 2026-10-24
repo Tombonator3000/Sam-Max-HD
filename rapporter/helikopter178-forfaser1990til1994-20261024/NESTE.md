@@ -13,3 +13,7 @@ Faktisk ny opptelling: 508/1758 hele figurjobber, 1250 uten resultat, 3733 nativ
 Neste H248 er ikke forberedt, utført eller reservert. Gjenoppta fra H246 med de konkrete små grå/grønne områdene og bevar begge rettede åpninger. Ikke bruk H247 som automatisk forbedring eller et avvist bilde som stilanker. Sam er fortsatt godkjent stilanker. Fortsett deretter1991..1994;1989..1986 er uproduserte. 137/V013 og296/S037 er uendret. Ingen ny nødvendig Tom-designavklaring. Automatikken forblir ACTIVE, bunken og hele grafikken er ikke ferdige. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes fortsatt med lokal kontroll. Ingen motor-/pipelinekodeendring, CLI/API-bildefallback, force-push eller gamle nattprosesser.
 
 Fersk komplett publisert WebP-mod skal være grunnlag for neste kontrollerte kandidat. Bevar _idx.png/_mask.png og alle beskyttede jobbfiler. Publisering krever vanlig barn av fersk fjern-SHA og faktisk tilbakehenting av alle hash. Samme nativeantall beviser ikke samme pakkeinnhold hvis returbytes senere endres.
+
+## Faktisk tilbakehenting av rotorutsnittene
+
+Grafikkilde 9ffa2d503cf07b2687ed432193f80f3cdbe6315d er vanlig Git-barn av 14a440c5c30e8af0378cc33f149941d30f175205. Alle 217 endrede filer er faktisk hentet som strømmer, totalt 26070491 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle; ingen nedlastet payloadkopi beholdes. Se rotorutsnitt-kilder-faktisk-hentet.json.gz. Dette verifiserer råbilder og kontrollbevis, ikke ferdig stilgodkjenning eller native mottak. Neste H248 er ikke startet; automatikken er ACTIVE.
