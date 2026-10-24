@@ -152,3 +152,8 @@ Grafikkilde 283834f2d6e3bb5117ce9781fff82a0662d55f0a er vanlig Git-barn av e9f35
 ## Faktisk tilbakehenting av gråfelt-/detaljreturene
 
 Grafikkilde 1f4cfe47386c272dd3f64bab31d66891753f7e9d er vanlig Git-barn av 5c850ad62933b16a1f1cfc254004d0badbaab8b2. Alle 128 endrede filer er faktisk hentet som strømmer, totalt 12342574 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle filer; ingen ekstra nedlastet payloadkopi beholdes. Se graaplan1987-kilder-faktisk-hentet.json.gz. Dette bevarer forsøk og kontrollbevis, ikke ferdig native godkjenning. H269 er ikke startet; automatikken er ACTIVE.
+
+
+## Faktisk tilbakehenting av blad-/vindusrammereturene
+
+Grafikkilde e69f7939acd7ba75a3d7d56d5b5891e7275e7497 er vanlig Git-barn av d225add1db511a3d4a47866b047bd0ac4c96d01e. Alle 224 endrede filer er faktisk hentet som strømmer, totalt 21866779 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle filer. Ingen ekstra nedlastet payloadkopi beholdes. Se vindusramme1987-kilder-faktisk-hentet.json.gz. Rent H270 er fortsatt et kontrollpunkt med materialretur, ikke native mottatt. H279 er ikke startet; automatikken er ACTIVE.
