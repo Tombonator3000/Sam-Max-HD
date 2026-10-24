@@ -8,6 +8,8 @@ Grått ligger også inne i venstre blad, ikke bare langs kanten. De ni grå kild
 
 H315 er lokalt motorobservert i én ny faktisk avspilling mot bevart faktisk baseline. Lokal original-ROI ved1987 er byteidentisk, men hele skjermtilstander utenfor ROI divergerer. Ingen helskjermregresjon, naturlig gjennomspilling eller ny Windows-/webtest. Ingen hel jobb, formelt native mottak, publisert modgrafikk/pakke eller Tom-/Claude-godkjenning.
 
-Følg docs/PLASSBRUK.md og docs/WEBP.md. Én komplett hardlenket kandidat fra fersk publisert mod, tre kandidatspesifikke filer/fullmanifest og SHA-festet gjenoppretting. Fullkandidaten fjernes etter verifisert kilde-tilbakehenting, se bladfarger-rydding.json. Ingen fulle Git-/spilldatakopier eller dobbeltlagrede arkiver. Native farger WebP, tekniske indeks-/maske-PNG og originale jobbgrunnlag/rå/resultat beholdes. Historiske dedupliserte out-modmapper er ufullstendige og brukes ikke som komplett grunnlag.
+Følg docs/PLASSBRUK.md og docs/WEBP.md. Én komplett hardlenket kandidat fra fersk publisert mod, tre kandidatspesifikke filer/fullmanifest og SHA-festet gjenoppretting. Fullkandidaten er fjernet etter verifisert kilde-tilbakehenting, se bladfarger-rydding.json. Ingen fulle Git-/spilldatakopier eller dobbeltlagrede arkiver. Native farger WebP, tekniske indeks-/maske-PNG og originale jobbgrunnlag/rå/resultat beholdes. Historiske dedupliserte out-modmapper er ufullstendige og brukes ikke som komplett grunnlag.
 
 Fortsatt 508/1758 hele jobber, 3733 native, fig178_02 20/24. Sam er eneste godkjente stilanker. Ingen nødvendig ny Tom-avklaring. Automatikken ACTIVE; all grafikk og sluttkontroll gjenstår.
+
+Kilder er sikret i 9aac6cc58819ca3d68b227e2fad2a2afe30a8ef9 og faktisk strømmet tilbake, alle 123 filer/14415648 byte med SHA256 og Git-blob SHA1. Se bladfarger-kilder-faktisk-hentet.json. Gjenoppta herfra.
