@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-firefase-rensing-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 07:21
+
+- [x] Fem faktiske rettingskall H279..H283 for fire åpne faser, totalt 108, er bevart med råbilder, faktiske prompter og egenkontroll. Alle 112 kildefiler og fire rapportfiler er pushet og faktisk lengde-/SHA256-/Git-blob-bekreftet. Fem egne tegninger og native-PNG/RGBA har byteeksakt replay uten originalbilder under produksjon.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/fdd7a094ecae200350178c1f9eb51ce2ea4ed0f8/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra rent H270/1987 eller smal H283/bare-hale for 1988. H270 har 19 materialavvik og null form/åpning. H283 har fem formfester og 69 materialavvik, men rettet grå halediagonal. Rett sidefelt og små rotoreksponeringer. H284 er ikke startet; ingen import nå.
+- [ ] Hold H279/H280/H281/H282 som konkrete returer. 1986 beholder kildebekreftet rødt; sidefeltene varierer mellom fasene. Fortsett åpne 1989/1986 og returer 1990..1994. Ikke dupliser 1995..2021 uten retur. Sam er eneste godkjente stilanker.
+- [ ] Etter bestått teknisk og visuell retting: én fersk komplett WebP-kandidat, relevant motoravspilling, vanlig hd-mod-barn av fersk fjern-SHA og faktisk tilbakehenting. Pakker oppdateres ved publisert samlepunkt/avslutning. Nå er mod/pakker uendret med 3733 native og 508/1758 hele jobber. Automatikken ACTIVE; sluttkontroll gjenstår.
+<!-- helikopter178-firefase-rensing-20261024:slutt -->
+
 <!-- helikopter178-vindusramme1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

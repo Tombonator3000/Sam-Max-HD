@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-firefase-rensing-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Fire faser i retur, smal halerotorretting holdes, 2026-10-24 07:21
+
+Fem rettingskall H279..H283 for fire åpne faser gir 108 faktiske kall i bunken. Rent H270/1987 beholdes med 19 positive materialavvik og null form/åpning. H283/bare-hale holdes for 1988 med rettet grå halediagonal, men fem formfester og 69 positive materialavvik. H280/H281/H282 er returer. Ingen ny hel resultat.png, native mottak, motor eller godkjenning. [Gjenopptaking og bevis](https://github.com/Tombonator3000/Sam-Max-HD/tree/fdd7a094ecae200350178c1f9eb51ce2ea4ed0f8/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+Alle fem egne tegninger og native-PNG/RGBA er gjenskapt byteeksakt uten originalbilder under produksjon. H283 bruker bare egne H256/H283; resten er bytebevart utenfor eget halerektangel. Grå sidefelt varierer mellom fasene; ikke bruk generiske merker. Kildebekreftet rødt i 1986 og små refleksfelt beholdes.
+
+Grafikkilde 4874e190b83aa39582dc6d65f8a9a1f84b7d6b5d og rapport fdd7a094ecae200350178c1f9eb51ce2ea4ed0f8 er faktisk hentet og SHA256-/Git-blob-bekreftet, 112 + 4 filer. Mod/pakker c8009915 er uendret, alle 21978 modhash, 9174 beskyttede input og tre stasher er bekreftet. Fortsatt 508/1758 hele figurjobber, 3733 native, fig178_02 20/24. H284 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE.
+<!-- helikopter178-firefase-rensing-20261024:slutt -->
+
 <!-- helikopter178-vindusramme1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

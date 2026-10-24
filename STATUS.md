@@ -1,5 +1,19 @@
 # Status
 
+<!-- helikopter178-firefase-rensing-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Fem rettingskall, fortsatt ingen nye mottak, 2026-10-24 07:21
+
+Fem faktiske innebygde image_gen-kall H279..H283 retter fire åpne helikopterfaser 1986..1989, totalt 108 kall i bunken. H279s vindusretting mister små blå/lavendel felt og erstatter ikke rent H270/1987 med null form-/åpningsfeil og 19 positive materialavvik. H280/H281s delte sidefelt gir fortsatt motiv- og formreturer. H282 gjenoppretter grå halediagonal og beholder kildebekreftet rødt, men grå felt, refleksdetaljer, rød utstrekning og form er feil. H283/bare-hale holdes som smal 1988-retting fra H256: grå ned-venstre diagonal og smalere møtepunkt, men fem formfester og 69 positive materialavvik består. Det gamle sidebeltet og manglende rotorfelt gjenstår. [Rapport og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/fdd7a094ecae200350178c1f9eb51ce2ea4ed0f8/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+Alle fem råbilder og nativeprøver er visuelt sett. Alle fem egne heltegninger og native-PNG/RGBA er byteeksakt gjenskapt med aktiv bildevakt uten originalbilder/masker under produksjon. H283s direkte sluttpiksler kommer bare fra egne H256/H283, med bytebevart egen tegning utenfor halerektangelet. Hele skaleringer og flyttinger bruker skalar metadata. Alle opprinnelige fargediagnoser og 3 HD-grenser beholdes. Ingen ny hel resultat.png, native mottak, motoravspilling, publisert modgrafikk eller Tom-/Claude-godkjenning. Eldre H252/1990-motorbevis gjelder ikke disse prøvene.
+
+Grafikkilde 4874e190b83aa39582dc6d65f8a9a1f84b7d6b5d og rapport fdd7a094ecae200350178c1f9eb51ce2ea4ed0f8 er pushet og faktisk hentet tilbake. Alle 112 kildefiler (10660296 byte) og fire rapportfiler (57605 byte) er lengde-, SHA256- og Git-blob SHA1-bekreftet uten ekstra lagret payload. Alle 21978 aktive modhash, 9174 beskyttede input og tre opprinnelige stasher er uendret. Opptelling: 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 native, fig178_02 20/24 og familie178 32/102. Fersk hd-mod er uendret c80099158b30fb08fa0cb670acb112bf14fd58f4. Fire releasevedleggs ID/navn/størrelse/digest er uendret; tidligere faktiske Linux-/Windows-pakke- og innholdskontroller gjelder. Ingen ny modkandidat, pakke, arkivnedlasting eller sletting.
+
+Gjenoppta rent H270/1987 eller H283/bare-hale for videre 1988-retting. H280/H281/H282 er ikke valgt som bedre hele erstatninger. H284 er ikke forberedt, utført eller reservert. 1989/1986 og 1990..1994 har åpne returer; ikke dupliser 1995..2021 uten retur. Sam er eneste godkjente stilanker. Sidefeltene varierer mellom fasene og skal ikke erstattes av generiske merker. 137/V013 og 296/S037 er uendret. Ingen nødvendig ny Tom-designavklaring. Automatikken ACTIVE; all grafikk og sluttkontroll er ikke ferdig. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokal kontroll. Ingen motor-/pipelinekodeendring, force-push, ekstern bildefallback eller gammel nattprosess.
+<!-- helikopter178-firefase-rensing-20261024:slutt -->
+
 <!-- helikopter178-vindusramme1987-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
