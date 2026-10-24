@@ -16,20 +16,34 @@ Repoet er offentlig etter Toms valg. Spillfilene og alt som lages fra dem ligger
 | HD-motor | På for Sam & Max: rom, objekter, blast-objekter og figurer får HD fra modden. Testet med nearest-mod (0 avvik) og romtest i alle rom. Teksten har HD, og HD Graphics står i originalmenyen (F5); Ctrl+H bytter ([docs/HD-MOTOR.md](docs/HD-MOTOR.md)) |
 | Uttrekk | `smhd extract` tar ut alt: 83 rombakgrunner, 959 objektbilder og 16 052 kostymeruter fra 348 kostymer, som PNG med metadata. Egne dekodere oversatt fra ScummVM |
 | Skript | Alle 1181 skript dekompilert med descumm (`tools/dekompiler_skript.py`), 1179 uten feil |
-| HD-grafikk | Første runde fra ChatGPT er i `hd-mod` (14. oktober): 76 rom, 841 objektbilder og 931 figurruter. Resten vises som originalen til det kommer ([docs/BESTILLING-CHATGPT.md](docs/BESTILLING-CHATGPT.md)) |
-| Spille | `./spill.sh` starter spillet med HD-modden. Windows: last ned `SamMaxHD-Windows.zip` fra releasen «Sam & Max HD for Windows», pakk ut og start «Sam og Max HD.bat». Linux: releasen «Sam & Max HD for Linux». Nettsiden trenger eget repo |
+| HD-grafikk | Under produksjon. Publisert mod bruker tapsfri WebP med ekte alfa; palettindekser og masker er PNG. Originalgrafikken brukes der HD mangler. Se [STATUS.md](STATUS.md) |
+| Spille | Last ned ferdig Linux- eller Windows-pakke nedenfor. Begge inneholder spillet, tale, motor og dagens HD-mod |
 
 Detaljer: [STATUS.md](STATUS.md). Hva som gjenstår: [todo.md](todo.md).
 
 ## Spille
 
+Last ned den [felles kontrollerte utgaven](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-helikopter-forfaser). Du trenger ingen Git-klon eller grafikkarbeidsmappe.
+
+| Plattform | Nedlasting | Plass etter utpakking | Start |
+| --- | --- | --- | --- |
+| [Linux AppImage](https://github.com/Tombonator3000/Sam-Max-HD/releases/download/sam-max-hd-2026-10-24-helikopter-forfaser/SamMaxHD-x86_64.AppImage) | 392 MB | Kjøres som én fil | Gjør filen kjørbar og start den |
+| [Windows ZIP](https://github.com/Tombonator3000/Sam-Max-HD/releases/download/sam-max-hd-2026-10-24-helikopter-forfaser/SamMaxHD-Windows.zip) | 545 MB | 659 MB | Pakk ut og start «Sam og Max HD.bat» |
+
+Størrelsene gjelder utgaven 24. oktober 2026, målt i desimale MB. Spillet, tale, motor og dagens HD-grafikk er inkludert. Grafikken lages fortsatt; dette er ikke en påstand om at all HD-grafikk er ferdig. Ctrl+H bytter HD og original; F5 åpner spillmenyen. Se [spilltest](docs/SPILLTEST.md) og [plassbruk og størrelsesgrenser](docs/PLASSBRUK.md).
+
+## Bygge selv
+
+Dette er utvikleroppsettet. Hent bare kodegrenen ved første kloning:
+
 ```sh
-sudo apt install build-essential git pkg-config libsdl2-dev libpng-dev zlib1g-dev   # én gang (Ubuntu/Debian)
-git clone https://github.com/Tombonator3000/Sam-Max-HD.git && cd Sam-Max-HD
+sudo apt install build-essential git pkg-config libsdl2-dev libpng-dev libwebp-dev zlib1g-dev
+git clone --depth 1 --single-branch --branch main https://github.com/Tombonator3000/Sam-Max-HD.git
+cd Sam-Max-HD
 ./spill.sh
 ```
 
-`spill.sh` henter spillfilene og siste HD-mod, bygger motoren første gang og starter spillet. Talen (`MONSTER.SOU`) ligger i deler på 90 MB i `spilldata` fordi GitHub ikke tar filer over 100 MB, og settes sammen av `tools/hent_spilldata.sh`. Til det finnes en HD-mod, starter spillet med originalgrafikken; `./spill.sh --auto` gir automatisk oppskalering. Ctrl+H bytter mellom HD og original. Alle valg og hva du skal se etter: [docs/SPILLTEST.md](docs/SPILLTEST.md).
+`spill.sh` henter spillet og gjeldende HD-mod og bygger motoren første gang. Grafikerens råbilder, jobbmapper og historiske testkopier skal ikke hentes for å spille. Talen settes sammen fra grenen `spilldata`; `gpt-arbeid` er bare for grafikkproduksjon.
 
 ## Grener
 
@@ -37,5 +51,5 @@ git clone https://github.com/Tombonator3000/Sam-Max-HD.git && cd Sam-Max-HD
 | --- | --- |
 | `main` | Kode og dokumentasjon |
 | `spilldata` | Spillfilene med sjekksummer |
-| `gpt-arbeid` | Arbeidsbordet med grafikerne: alle jobbene, bare stilpiloten er bestilt |
-| `hd-mod` | Siste HD-pakke, én commit som erstattes. Tom til den første modden finnes |
+| `gpt-arbeid` | Grafikerens råbilder, jobbgrunnlag og kontrollrapporter. Inngår ikke i spillerpakken |
+| `hd-mod` | Gjeldende HD-mod med bevarte Git-foreldre. Publiseres uten force-push |

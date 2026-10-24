@@ -14,6 +14,7 @@ on:
     paths:
       - '.github/workflows/windows.yml'
       - 'tools/pakke_windows.sh'
+      - 'tools/kontroller_pakkestorrelse.py'
       - 'tools/windows/**'
 
 permissions:
@@ -63,7 +64,7 @@ jobs:
           msystem: MINGW64
           update: true
           install: >-
-            git make zip
+            git make zip python
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-pkgconf
             mingw-w64-x86_64-SDL2
