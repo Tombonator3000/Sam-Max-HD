@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-konturvask-fire-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 05:13
+
+- [x] Fem faktiske kall H254..H258, fire førsteprøver for 1989..1986 og tre egne rensevarianter er kontrollert og bevart. Alle 92 kildefiler og fem rapportfiler er pushet og faktisk hashbekreftet. Totalt 83 bildekall, ingen nye native eller hele jobber.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/e9f3587fc2878286fb79165bd25c546ebcfc512d/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra egne H255..H258, særlig H257/1987 med nærmest form. Rett faktiske sidefelt, halerotor, små farger og form mot riktig original. Ikke tegn de fire fasene som urørte nye jobber. H259 er ikke startet.
+- [ ] Rent H252/1990 har fortsatt 15 positive materialavvik. Ikke erstatt det med H254s feilaktige streklag eller avviste Python-varianter. Behold begge åpninger og se hele komponenten etter hver innplassering. 1991..1994 har stilreturer. Sam er eneste stilanker.
+- [ ] Etter ferdig retting: native mottak fra fersk komplett WebP-mod, motorprøve, vanlig hd-mod-barn av fersk fjern-SHA og faktisk tilbakehenting. Oppdater begge pakker ved neste publiserte samlepunkt/avslutning. Nå er mod/pakker uendret c8009915, 3733 native; 508/1758 hele jobber, fig178_02 20/24. Ingen ny kandidat/motor denne kjøringen. Automatikken ACTIVE, sluttkontroll gjenstår.
+<!-- helikopter178-konturvask-fire-20261024:slutt -->
+
 <!-- helikopter178-smaafelt-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

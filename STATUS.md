@@ -1,5 +1,21 @@
 # Status
 
+<!-- helikopter178-konturvask-fire-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Konturvask og fire faseprøver, ingen ny import, 2026-10-24 05:13
+
+Fem nye faktiske innebygde image_gen-kall H254..H258 er bevart, totalt 83 i den åpne bunken. H254s streklag for 1990 er avvist på nye nav/krager og feil halefinne. H255..H258 er første hele prøver for 1989..1986. De har jevnere strek, men alle har form-/material-/motivreturer. Små grå sidegrupper slås sammen eller blir runde knapper; halerotoren får et nytt rundt nav. Den røde bladspissen i 1986 er kildebekreftet i originalens indeks 124/125 og bevart i prøven. Tre Python-varianter renser egne genererte fargeflater/strek, men er fortsatt stilreturer og teller ikke som bildekall eller leverte jobber. Ingen nye hele resultat.png, native mottak, motoravspillinger, publiserte grafikkbytes eller Tom-/Claude-godkjenninger denne kjøringen. [Nyeste rapport og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/e9f3587fc2878286fb79165bd25c546ebcfc512d/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+Hele egen RGBA er tilpasset samlet; originalens alfa brukes bare til helregistrering og separat kontroll, aldri som hard klippemaske eller produksjonspiksler. Egen alfa under 8 er satt til null. Alle 21/22/22/24 fargediagnoser og uendrede 3 HD-grenser er beholdt. Form-/åpningsfester som avviker er henholdsvis 20/5, 5/0, 2/0, 29/0 for 1989..1986. Råbildene og nativeprøvene er visuelt sett mot riktige originaler og Sam. H252s rene tidligere kontrollpunkt for 1990 står uendret med 15 positive materialavvik. Dets eldre motorbevis gjelder ikke nye prøver. Ingen ny kandidat eller motor er startet på de påviste returene.
+
+Grafikkilde 40d4ffe9a14199e4160b5688ce6577679a7e694d og rapport e9f3587fc2878286fb79165bd25c546ebcfc512d er pushet og faktisk hentet tilbake. Alle 92 kildefiler og fem rapportfiler er lengde-, SHA256- og Git-blob SHA1-bekreftet, uten ekstra lagret nedlastingspayload. Filkontrollen er gjentatt med NUL-avgrensede filnavn etter et kontrollavbrudd på git-sitert norsk filnavn; alle 92 filer består, og faktisk prompt med ekstra sluttlinje er bevart. Se rapportens kilde-audit. Alle 21978 aktive modhash, 9174 beskyttede input og tre opprinnelige stasher er uendret. Ingen fullmodkopi eller nytt pakke-/arkiv er opprettet, ingen data slettet.
+
+Faktisk opptelling er fortsatt 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 native, fig178_02 20/24 tekniske ruter uten hel resultat.png og familie178 32/102. Fersk hd-mod-SHA er uendret c80099158b30fb08fa0cb670acb112bf14fd58f4. Fire releasevedleggs ID, navn, størrelse og digest er uendret; tidligere faktiske Linux-/Windows-pakke- og innholdskontroller gjelder, uten ny nedlasting. Ingen pakke bygges av returene.
+
+Gjenoppta egne H255..H258, særlig H257/1987 som har nærmest form, og rent H252/1990 ved småfeltretting. Se hele komponenten etter hver innplassering. H259 er ikke forberedt, utført eller reservert. 1991..1994 har fortsatt stilreturer; 1995..2021 skal ikke dupliseres uten retur. Sam er eneste stilanker. 137/V013 og 296/S037 er uendret. Ingen nødvendig ny Tom-avklaring. Automatikken er ACTIVE, bunken og all grafikk er ikke ferdig. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokal kontroll; søket etter egen konturrensing ga ingen relevant løsning etter én utvidelse. Ingen motor-/pipelinekodeendring, force-push, CLI/API-bildefallback eller gammel nattprosess.
+<!-- helikopter178-konturvask-fire-20261024:slutt -->
+
 <!-- helikopter178-smaafelt-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
