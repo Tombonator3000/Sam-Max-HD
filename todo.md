@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-delfelt1988-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 08:26
+
+- [x] Seks faktiske verktøyforsøk H290..H295 ga fem nye råbilder og én bevart utdataavvisning, totalt 119 mottatte råbilder i bunken. Alle 169 kildefiler og fire rapportfiler er pushet og faktisk lengde-/SHA256-/Git-blob-bekreftet. Ni egne tegninger og native-PNG/RGBA har byteeksakt replay uten originalbilder under produksjon.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/0a479ddb1e558ca12fa4dea476615b6bf738ac17/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra rent H289/1988 eller uavhengig H270/1987. Alle nye delprøver er returer. H291 har ingen råfil; feilen er bevart uten omgåelse. H296 er ikke startet; ingen import nå.
+- [ ] Behold begge landingsledd mørke. Den grå diagonalen til venstre hører til halen. Rett felter og registrering uten at et bredt delfelt skjærer bort bakblad, vinduer eller kropp. Fortsett åpne 1989/1986 og 1990..1994; ikke dupliser 1995..2021 uten retur. Sam er eneste godkjente stilanker.
+- [ ] Etter bestått teknisk og visuell retting: én fersk komplett WebP-kandidat, relevant motoravspilling, vanlig hd-mod-barn av fersk fjern-SHA og faktisk tilbakehenting. Pakker oppdateres ved publisert samlepunkt/avslutning. Nå er mod/pakker uendret med 3733 native og 508/1758 hele jobber. Automatikken ACTIVE; sluttkontroll gjenstår.
+<!-- helikopter178-delfelt1988-20261024:slutt -->
+
 <!-- helikopter178-rotorfelt1988-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

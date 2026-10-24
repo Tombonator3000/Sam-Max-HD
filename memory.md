@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-delfelt1988-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Grå haledel avklart, fem delprøver i retur, 2026-10-24 08:26
+
+Seks delbildeforsøk H290..H295 gir fem nye råbilder, én bevart verktøyavvisning og totalt 119 mottatte råbilder i bunken. H291 fikk ingen råfil etter HTTP400/moderation_blocked i utdata; ingen omgåelse eller bildefallback er forsøkt. Uavhengige deler fungerte deretter. Alle nye prøver er returer på form, feltplassering eller skjøter. H289/1988 og H270/1987 beholdes uendret. [Gjenopptaking og bevis](https://github.com/Tombonator3000/Sam-Max-HD/tree/0a479ddb1e558ca12fa4dea476615b6bf738ac17/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md).
+
+Kildekontroll før H294 retter premisset om bakre grått landingsledd: utsnittet [24,26,56,36] har ingen opake nøytrale grå piksler. Den grå diagonalen til venstre er en haledel. Begge landingsledd er mørke. Foreløpig prompt ble rettet før bildekall; historiske faktiske prompter beholdes. H295s fjerning av omriss reparerer ikke forskjøvne felter eller kroppsskjøter.
+
+Ni egne heltegninger og native-PNG/RGBA er gjenskapt byteeksakt fra åtte egne råbilder uten originalbilder/masker under produksjon. Grafikkilde b03b92ef11b452a2cf0aad45710a770d99d21062 og rapport 0a479ddb1e558ca12fa4dea476615b6bf738ac17 er faktisk lengde-/SHA256-/Git-blob-bekreftet, 169 + 4 filer. Ingen ny hel resultat.png, native mottak, motor eller godkjenning. Mod/pakker c8009915 er uendret; alle 21978 modhash, 9174 beskyttede input og tre stasher er bekreftet. Fortsatt 508/1758 hele figurjobber og 3733 native, fig178_02 20/24. H296 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE.
+<!-- helikopter178-delfelt1988-20261024:slutt -->
+
 <!-- helikopter178-rotorfelt1988-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
