@@ -102,3 +102,8 @@ Grafikkilde a96a59f9b306f677ed56982ef953816841245cf1 er pushet som vanlig barn a
 ## Faktisk tilbakehenting av rotorutsnittene
 
 Grafikkilde 9ffa2d503cf07b2687ed432193f80f3cdbe6315d er vanlig Git-barn av 14a440c5c30e8af0378cc33f149941d30f175205. Alle 217 endrede filer er faktisk hentet som strømmer, totalt 26070491 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle; ingen nedlastet payloadkopi beholdes. Se rotorutsnitt-kilder-faktisk-hentet.json.gz. Dette verifiserer råbilder og kontrollbevis, ikke ferdig stilgodkjenning eller native mottak. Neste H248 er ikke startet; automatikken er ACTIVE.
+
+
+## Faktisk tilbakehenting av småfeltprøvene
+
+Grafikkilde 760e2c4ee2ed4ee064d942fe10a9141f4656daab er vanlig Git-barn av 24c75f8f755faac8a908b8ac2dbbadcbc8e56acf. Alle 210 endrede filer er faktisk hentet som strømmer, totalt 24931229 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle; ingen nedlastet payloadkopi beholdes. Se smaafelt-kilder-faktisk-hentet.json.gz. Dette bekrefter råbilder og kontrollbevis, ikke ferdig stil eller native mottak. H254 er ikke startet, automatikken er ACTIVE.

@@ -15,3 +15,8 @@ Fersk faktisk opptelling er 508/1758 hele figurjobber, 1250 uten resultat, 3733 
 Neste H254 er ikke forberedt, utført eller reservert. Gjenoppta fra H252/eget-rent-kontrollpunkt og de konkrete punktene i avvik-kildepunkter.json. Bevar begge rettede åpninger, kroppens form og de to beholdte smårettingene. Se hele egen komponent visuelt etter første innplassering før flere delplasseringer bygges videre på den. Bruk bare godkjent Sam som stilanker. Fortsett deretter 1991..1994 og uproduserte 1989..1986; øvrige 1995..2021 skal ikke dupliseres uten dokumentert retur. 137/V013 og 296/S037 er uendret. Ingen nødvendig ny Tom-avklaring. Automatikken er ACTIVE, bunken og hele grafikken er ikke ferdige. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes med lokale kontroller og docs/WEBP.md. Ingen motor-/pipelinekodeendring, CLI/API-bildefallback, force-push eller gammel nattprosess.
 
 Bruk fersk komplett publisert WebP-mod for neste kandidat. Publisering krever et vanlig barn av fersk fjern-SHA og faktisk tilbakehenting av alle filhash. Historiske out-mapper kan være ufullstendige.
+
+
+## Faktisk tilbakehenting av småfeltprøvene
+
+Grafikkilde 760e2c4ee2ed4ee064d942fe10a9141f4656daab er vanlig Git-barn av 24c75f8f755faac8a908b8ac2dbbadcbc8e56acf. Alle 210 endrede filer er faktisk hentet som strømmer, totalt 24931229 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle; ingen nedlastet payloadkopi beholdes. Se smaafelt-kilder-faktisk-hentet.json.gz. Dette bekrefter råbilder og kontrollbevis, ikke ferdig stil eller native mottak. H254 er ikke startet, automatikken er ACTIVE.
