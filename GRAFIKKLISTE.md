@@ -1,5 +1,11 @@
 # Grafikkliste
 
+<!-- helikopter178-vinduhel1987-20261024:start -->
+Fem nye innebygde image_gen-kall H296..H300 er bevart med råbilder og faktiske prompter. Bunken har 124 mottatte råbilder; historisk H291 har ingen råfil. H299/bare-vindu-egen-alfa holdes som arbeidskontrollpunkt for 1987 med null form/åpning og 13 positive materialfester mot H270s 19. Materialretur og ekstra klassepiksler består. Ingen ny hel resultat.png, native mottak, motor, modkandidat eller pakke. Fortsatt 508/1758 hele figurjobber og 3733 native. H301 er ikke startet.
+
+Tom prioriterte kompakt lagring og spillerpakker. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md før neste jobb.
+<!-- helikopter178-vinduhel1987-20261024:slutt -->
+
 <!-- helikopter178-delfelt1988-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+K=R/'kall'/sys.argv[1];plan=json.loads((K/'plan.json').read_text());base=Path(plan['egen_base']);part=K/'global-brunt/egen-heltegning.png';V=K/'bare-vindu-egen-alfa';V.mkdir(exist_ok=False)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();opened=[];real=Image.open
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in [base.resolve(),part.resolve()];opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ old=np.array(Image.open(base).convert('RGBA'));new=np.array(Image.open(part).convert('RGBA'));assert old.shape==new.shape
+ x,y,X,Y=plan['egen_ROI'];h,w=Y-y,X-x;yy,xx=np.indices((h,w));edge=np.minimum.reduce([xx,yy,w-1-xx,h-1-yy]);t=np.clip(edge/12,0,1);weight=t*t*(3-2*t)*new[y:Y,x:X,3]/255
+ # Only own high-resolution RGB and a feathered own rectangle. Keep own old alpha.
+ out=old.copy();out[y:Y,x:X,:3]=np.rint(old[y:Y,x:X,:3]*(1-weight[:,:,None])+new[y:Y,x:X,:3]*weight[:,:,None]).clip(0,255).astype(np.uint8);out[old[:,:,3]==0,:3]=old[old[:,:,3]==0,:3]
+ outside=np.ones(old.shape[:2],bool);outside[y:Y,x:X]=False;assert np.array_equal(out[outside],old[outside]) and np.array_equal(out[:,:,3],old[:,:,3]);Image.fromarray(out).save(V/'egen-heltegning.png')
+finally:Image.open=real
+(V/'plan.json').write_text(json.dumps({**plan,'nytt_bildekall':False,'egen_variant':str(V.relative_to(R/'kall'))},ensure_ascii=False,indent=2)+'\n')
+(V/'rens.json').write_text(json.dumps(dict(metode='Samme egne hele lerret, kun eget rektangel overføres med myk kant. Ingen delfeltstrekk, originalbilder eller originalmaske. Hele gamle EGEN alfa er byteidentisk.',produksjonsbilder_aapnet=opened,egen_ROI=plan['egen_ROI'],egen_feather_bredde=12,egen_base_SHA256=sha(base),egen_helredigering_SHA256=sha(part),egen_heltegning_SHA256=sha(V/'egen-heltegning.png'),egen_alpha_byteidentisk=True,utenfor_egen_ROI_byteidentisk=True,originalbilder_eller_masker_i_produksjon=0,hele_egne_lerret_samme_maal=True),ensure_ascii=False,indent=2)+'\n')
+(R/'overfor-egen-helredigering.py.txt').write_bytes(Path(__file__).read_bytes());print(V)

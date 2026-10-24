@@ -1,0 +1,24 @@
+from pathlib import Path
+from PIL import Image
+from smhd.myk import _premul_resize
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+K=R/'kall'/sys.argv[1];plan=json.loads((K/'plan.json').read_text());base=Path(plan['egen_base']);plate=R/'kall/H276/egen-vindusreferanse/egen-ren-brunplate.png';raw=K/'raa.png';V=K/'helt-vindu-egen-plate';V.mkdir(exist_ok=False)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();opened=[];real=Image.open
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in [base.resolve(),plate.resolve(),raw.resolve()];opened.append(str(p));return real(fp,*a,**kw)
+Image.open=guard
+try:
+ old=np.array(Image.open(base).convert('RGBA'));clear=np.array(Image.open(plate).convert('RGBA'));part=np.array(Image.open(raw).convert('RGBA'));assert old.shape==clear.shape
+ target=plan['hele_vindusdel_bbox_RAW_metadata'];yy,xx=np.nonzero(part[:,:,3]>=128);bbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+ sx=(target[2]-target[0])/(bbox[2]-bbox[0]);sy=(target[3]-target[1])/(bbox[3]-bbox[1]);requested=[sx,sy];sy=float(np.clip(sy,sx/1.12,sx/.88));assert .88-1e-12<=sx/sy<=1.12+1e-12
+ scaled=_premul_resize(part,(round(part.shape[1]*sx),round(part.shape[0]*sy)));px=round((target[0]+target[2])/2-(bbox[0]+bbox[2])*sx/2);py=round((target[1]+target[3])/2-(bbox[1]+bbox[3])*sy/2);layer=np.zeros_like(old);h,w=scaled.shape[:2];layer[py:py+h,px:px+w]=scaled
+ x,y,X,Y=[528,560,842,695];H,W=Y-y,X-x;yy,xx=np.indices((H,W));edge=np.minimum.reduce([xx,yy,W-1-xx,H-1-yy]);t=np.clip(edge/12,0,1);weight=t*t*(3-2*t)
+ # Only old own RGB/alpha, a cleaned own underpainting and one whole generated part.
+ out=old.copy();out[y:Y,x:X,:3]=np.rint(old[y:Y,x:X,:3]*(1-weight[:,:,None])+clear[y:Y,x:X,:3]*weight[:,:,None]).clip(0,255).astype(np.uint8)
+ al=(layer[:,:,3]/255)[:,:,None];out[:,:,:3]=np.rint(out[:,:,:3]*(1-al)+layer[:,:,:3]*al).clip(0,255).astype(np.uint8);out[:,:,3]=old[:,:,3];out[old[:,:,3]==0,:3]=old[old[:,:,3]==0,:3]
+ outside=np.ones(old.shape[:2],bool);outside[y:Y,x:X]=False;assert np.array_equal(out[outside],old[outside]) and np.array_equal(out[:,:,3],old[:,:,3]);Image.fromarray(out).save(V/'egen-heltegning.png');Image.fromarray(layer).save(V/'eget-helt-vinduslag.png')
+finally:Image.open=real
+(V/'plan.json').write_text(json.dumps({**plan,'nytt_bildekall':False,'egen_variant':str(V.relative_to(R/'kall'))},ensure_ascii=False,indent=2)+'\n')
+(V/'rens.json').write_text(json.dumps(dict(metode='Hele eget vinduslag registreres samlet etter scalar bboxmetadata. Egen renset brun underplate legges i eget mykt rektangel. Hele gamle EGEN alfa beholdes, ingen originalmaske.',produksjonsbilder_aapnet=opened,egen_base_SHA256=sha(base),egen_bruneplate_SHA256=sha(plate),egen_del_SHA256=sha(raw),egen_del_bbox=bbox,hel_del_target_bbox_metadata=target,onsket_hel_skala=requested,egen_hel_del_skala=[sx,sy],egen_hel_del_flytt=[px,py],akseforhold_innen_uendret_12prosent=True,egen_ROI=[x,y,X,Y],egen_feather_bredde=12,egen_alpha_byteidentisk=True,utenfor_egen_ROI_byteidentisk=True,originalbilder_eller_masker_i_produksjon=0,egen_resultat_SHA256=sha(V/'egen-heltegning.png')),ensure_ascii=False,indent=2)+'\n')
+(R/'plasser-helt-vindu1987.py.txt').write_bytes(Path(__file__).read_bytes());print(sys.argv[1],bbox,[sx,sy],[px,py])
