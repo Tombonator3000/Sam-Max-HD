@@ -1,0 +1,45 @@
+from pathlib import Path
+from collections import Counter
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json,hashlib,subprocess,tomllib,os,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';R=A/'rapporter/sam291-siste-20261024';O=P/'out/sam291-siste-20261024'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+aut=tomllib.loads(Path('/home/tom/.codex/automations/fullf-r-sam-max-grafikken/automation.toml').read_text());assert aut['status']=='PAUSED'
+base=json.loads((R/'grunnlag.json').read_text());protected=json.loads((R/'beskyttede-kilder.json').read_text())
+assert all(sha(A/n)==h for n,h in protected.items())
+stashes=subprocess.check_output(['git','stash','list','--format=%H'],cwd=P,text=True).split();assert stashes==base['stashes']
+refs={n:subprocess.check_output(['git','ls-remote','origin','refs/heads/'+n],cwd=P,text=True).split()[0]for n in ['main','gpt-arbeid','hd-mod']};assert refs==base['refs']
+parent=refs['hd-mod'];tree={}
+for row in subprocess.check_output(['git','ls-tree','-r','-z',parent],cwd=P).split(b'\0'):
+ if row:
+  m,n=row.split(b'\t');tree[n.decode()]=m.split()[2].decode()
+files={str(p.relative_to(P/'mods/gpt')):p for p in (P/'mods/gpt').rglob('*')if p.is_file()};assert files.keys()==tree.keys()
+for n,p in files.items():
+ b=p.read_bytes();assert hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()==tree[n],n
+alljobs={};counts=Counter();delivered=Counter()
+for q in sorted((A/'jobber').glob('*/jobb.json')):
+ j=json.loads(q.read_text());t=j['type'];ok=(q.parent/'resultat.png').exists();counts[t]+=1;delivered[t]+=ok;alljobs[q.parent.name]=dict(type=t,resultat_finnes=ok,resultat_sha256=sha(q.parent/'resultat.png')if ok else None)
+assert counts['figur']==1758 and delivered['figur']==513
+assert all(not(A/f'jobber/fig291_{n:02}/resultat.png').exists()for n in range(6,9))
+# Samme faktiske motorbilder som sist beholdes gjennom identiske hardlenker.
+reused=[];old=P/'out/sam291-foerste-20261024/kandidat6';now=O/'grunnlag6'
+for p in now.glob('*.png'):
+ q=old/p.name
+ if q.exists() and p.read_bytes()==q.read_bytes() and p.stat().st_ino!=q.stat().st_ino:
+  h=sha(q);size=p.stat().st_size;p.unlink();os.link(q,p);assert sha(p)==h;reused.append(dict(fil=str(p.relative_to(P)),beholdt=str(q.relative_to(P)),sha256=h,bytes=size))
+save(R/'baseline-duplikater.json',dict(stier_bevart=True,alle_bytes_kontrollert=True,filer=reused))
+proof=json.loads((R/'grunnlag6.json').read_text());assert proof['exit']==0 and len(proof['kontroller'])==90 and proof['nullkontroller']==90 and len(proof['tegninger'])==46
+stamp=datetime.now(ZoneInfo('Europe/Oslo')).strftime('%Y-%m-%d %H:%M')
+summary=dict(tid_norsk=stamp,brukerba_om_pause=True,automasjon_id=aut['id'],automasjon_status='PAUSED',oppstart_krever_ny_beskjed_fra_Tom=True,refs_ved_pause=refs,jobber=dict(counts),med_resultat=dict(delivered),total_jobber=sum(counts.values()),med_resultat_total=sum(delivered.values()),uten_resultat_total=sum(counts.values())-sum(delivered.values()),andel_uten_resultat_prosent=100*(1-sum(delivered.values())/sum(counts.values())),figur_uten_resultat=1245,figur_uten_resultat_prosent=100*1245/1758,native=json.loads((P/'mods/gpt/mod.json').read_text())['costume_cels'],aktive_modfiler_kontrollert=len(files),beskyttede_input_uendret=len(protected),stashes_uendret=stashes,nye_bildekall=0,nye_leverte_ark=0,ny_native_publisering=False,pakker_endret=False,klargjort=['fig291_06','fig291_07','fig291_08'],baseline=dict(exit=0,kontroller=90,null=90,kilder_logget=46),all_grafikk_ferdig=False,prosent_gjelder_forste_resultat_ikke_timer_eller_stilgodkjenning=True)
+save(R/'pause.json',summary);save(R/'jobbtelling.json',alljobs)
+text=f'''# Arbeidet er pauset av Tom\n\nTom ba {stamp} om pause til han selv ber om oppstart. Automatiseringen fullf-r-sam-max-grafikken er PAUSED, bekreftet av appverktøy og lagret konfigurasjon. Ingen videre bildegenerering, native import eller pakkeoppdatering skal starte av seg selv.\n\nFerdige fig291_01 til05 er allerede committet, pushet, hentet tilbake og motor-/pakkekontrollert. Kilde6c686bf713a66a8bab014942c664f8f4d1a05cf7, rapport9868d6ecd17900292ac8fcf127d9748733d3110b, hd-mod{parent}. Fellesutgave: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-forkledning. Linux394185208 byte, Windows547139597 byte. Ingen ny grafikk eller pakke siden den leveransen.\n\nFør pause kom er kun fig291_06 til08 klargjort videre. Originaler og Sam-/Max-mastere er sett, primærskript113 bevart og en faktisk360-bilders baseline kjørt med90/90 nullkontroller og46 kildefaser logget. Ingen image_gen-kall, resultat.png, native mottak eller ny modkandidat fra denne klargjøringen. Sam vises bare i første fase på06; øvrige06-faser er forkledningsdeler.07/08 viser Max som kommer fram. Gul maske ligger med baksiden opp, uten lys ansiktsflate. Små kildepiksler må undersøkes/bevares gjennom uendret mottaksmetode. Ved senere oppstart: gjenoppta denne bunken, ikke01..05.\n\nNy filbasert telling:1015 av2264 bestilte jobber har resultat.png,1249 mangler,55,17 prosent. Dette er antall førsteleveranser, ikke arbeidstid eller godkjent sluttstatus. Figurark513/1758,1245 uten resultat,70,82 prosent; rom115/115, objekter86/86, ikonark9/9 og lag292/296. Returer, ugyldige kildejobber og samlet visuell/motorisk sluttkontroll står i tillegg. GRAFIKKLISTE.md har historiske ufullstendige avkrysninger; tellingen er gjort fra alle jobb.json/resultat.png og full mapping er bevart i jobbtelling.json.\n\nAlle22006 aktive modfiler er kontrollert mot publisert Git-tre. Alle9174 beskyttede input og de tre opprinnelige stashene er uendret. Nye baselinebilder som er byteidentiske med forrige faktiske kandidatkjøring er hardlenket etter hashkontroll, med alle stier bevart. Ingen motor-/pipelinekodeendring eller gammel nattprosess. Bibliotekskilden figurark-fast-storrelse og remake-/WebP-/plassreglene er brukt.\n'''
+(R/'PAUSET.md').write_text(text);(R/'NESTE.md').write_text(text)
+shutil.copy2(__file__,R/'pause.py.txt')
+pauseblock=f'''<!-- Tom-pause-20261024:start -->\n## Pauset etter Toms beskjed {stamp}\n\nAutomatiseringen Fullfør Sam & Max-grafikken er PAUSED. Stopp all videre produksjon til Tom uttrykkelig ber om oppstart.513/1758 figurark og1015/2264 grafikkjobber har resultat.1245 figurark,70,82 prosent, og1249 jobber totalt,55,17 prosent, mangler første resultat. Returer og sluttkontroll kommer i tillegg. Kun klargjøring/baseline for291_06..08, ingen nye bildekall/resultater/native etter siste publiserte3761. Se rapporter/sam291-siste-20261024/PAUSET.md.\n<!-- Tom-pause-20261024:slutt -->\n\n'''
+q=A/'ORDRE.md';q.write_text(pauseblock+q.read_text())
+for n in ['memory.md','todo.md','STATUS.md']:
+ q=P/n;s=q.read_text();nl=s.find('\n');q.write_text(s[:nl+1]+'\n'+pauseblock+s[nl+1:])
+q=P/'log.md';q.write_text(q.read_text()+f'\n\n## {stamp} (Codex)\n\n'+text.split('\n\n',1)[1])
+print(json.dumps(summary,ensure_ascii=False,indent=2))

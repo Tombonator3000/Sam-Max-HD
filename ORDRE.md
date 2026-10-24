@@ -1,3 +1,9 @@
+<!-- Tom-pause-20261024:start -->
+## Pauset etter Toms beskjed 2026-10-24 14:17
+
+Automatiseringen Fullfør Sam & Max-grafikken er PAUSED. Stopp all videre produksjon til Tom uttrykkelig ber om oppstart.513/1758 figurark og1015/2264 grafikkjobber har resultat.1245 figurark,70,82 prosent, og1249 jobber totalt,55,17 prosent, mangler første resultat. Returer og sluttkontroll kommer i tillegg. Kun klargjøring/baseline for291_06..08, ingen nye bildekall/resultater/native etter siste publiserte3761. Se rapporter/sam291-siste-20261024/PAUSET.md.
+<!-- Tom-pause-20261024:slutt -->
+
 <!-- sam291-foerste-20261024:start -->
 Nyeste produksjon: fig291_01..05, Sam tar av bigfootforkledningen i kjøkkenet,28 nye native fra19 motiver. Fem innebygde kall.26 egenkontroll OK/to SJEKK,28 native OK. Alle28 motorlogget,90/90 null på hver side,90 originale flatepar byteidentiske, null HD-endringer utenfor nye aktørflater.19 motivsammenligninger og fem hele bilder sett. Kandidat3761/22006filer,513/1758 hele resultatark. Publisert og faktisk hentet tilbake: hd-mod a4b2c9965deae32047d805b955ad204df7312a88, kilde 6c686bf713a66a8bab014942c664f8f4d1a05cf7. Alle22006 modfiler og alle tidligere grafikkbytes er kontrollert.28 nye native,3761 totalt. Fellespakker3761 er nå faktisk lastet ned og alle22006 modhash bekreftet, Linux394,2MB/Windows547,1MB: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-forkledning. Se rapporter/sam291-foerste-20261024. Ingen ny Tom-/Claude-godkjenning.
 Neste gyldige uavhengige produksjon:291_06..08,18 ruter. Les NESTE.md. Tidligere heli-returer er bevart, H336 ikke startet. Verktøyavviste110/246/304/223 og ugyldige344/346 gjentas ikke. Ingen nødvendig ny Tom-avklaring, automatikken ACTIVE.

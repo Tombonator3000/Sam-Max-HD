@@ -1,0 +1,11 @@
+# Arbeidet er pauset av Tom
+
+Tom ba 2026-10-24 14:17 om pause til han selv ber om oppstart. Automatiseringen fullf-r-sam-max-grafikken er PAUSED, bekreftet av appverktøy og lagret konfigurasjon. Ingen videre bildegenerering, native import eller pakkeoppdatering skal starte av seg selv.
+
+Ferdige fig291_01 til05 er allerede committet, pushet, hentet tilbake og motor-/pakkekontrollert. Kilde6c686bf713a66a8bab014942c664f8f4d1a05cf7, rapport9868d6ecd17900292ac8fcf127d9748733d3110b, hd-moda4b2c9965deae32047d805b955ad204df7312a88. Fellesutgave: https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-forkledning. Linux394185208 byte, Windows547139597 byte. Ingen ny grafikk eller pakke siden den leveransen.
+
+Før pause kom er kun fig291_06 til08 klargjort videre. Originaler og Sam-/Max-mastere er sett, primærskript113 bevart og en faktisk360-bilders baseline kjørt med90/90 nullkontroller og46 kildefaser logget. Ingen image_gen-kall, resultat.png, native mottak eller ny modkandidat fra denne klargjøringen. Sam vises bare i første fase på06; øvrige06-faser er forkledningsdeler.07/08 viser Max som kommer fram. Gul maske ligger med baksiden opp, uten lys ansiktsflate. Små kildepiksler må undersøkes/bevares gjennom uendret mottaksmetode. Ved senere oppstart: gjenoppta denne bunken, ikke01..05.
+
+Ny filbasert telling:1015 av2264 bestilte jobber har resultat.png,1249 mangler,55,17 prosent. Dette er antall førsteleveranser, ikke arbeidstid eller godkjent sluttstatus. Figurark513/1758,1245 uten resultat,70,82 prosent; rom115/115, objekter86/86, ikonark9/9 og lag292/296. Returer, ugyldige kildejobber og samlet visuell/motorisk sluttkontroll står i tillegg. GRAFIKKLISTE.md har historiske ufullstendige avkrysninger; tellingen er gjort fra alle jobb.json/resultat.png og full mapping er bevart i jobbtelling.json.
+
+Alle22006 aktive modfiler er kontrollert mot publisert Git-tre. Alle9174 beskyttede input og de tre opprinnelige stashene er uendret. Nye baselinebilder som er byteidentiske med forrige faktiske kandidatkjøring er hardlenket etter hashkontroll, med alle stier bevart. Ingen motor-/pipelinekodeendring eller gammel nattprosess. Bibliotekskilden figurark-fast-storrelse og remake-/WebP-/plassreglene er brukt.
