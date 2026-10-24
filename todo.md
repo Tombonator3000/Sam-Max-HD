@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-helreturer-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Neste, 2026-10-24 13:01
+
+- [x] Sikre H331..H335 med fem nye råbilder/faktiske prompter og ni byteeksakte komposisjoner/native. Totalt 159 råbilder; verifiser faktisk kilde-/rapportnedlasting. Alle nye prøver er fortsatt returer.
+- [x] Bekreft alle aktive modhash, beskyttede input, fire releasevedlegg og tre stasher uendret. Ingen ny fullkandidat, motor, arkivnedlasting eller sletting.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/25b989a6bf0b681f26a102cc24dacb2e03c2714b/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra H327/1987 og H289/1988. H331/H335 er bare alternative formforarbeider; materialene er fortsatt feil. Bruk konkrete hele egne deler og bevar fungerende geometri; H332/H333/H334 skal ikke overta eldre kontrollpunkter. H336 er ikke startet.
+- [ ] Fortsett øvrige åpne faser/returer og samlet sluttkontroll. Nå 508/1758 hele jobber og 3733 native. Ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-helreturer-20261024:slutt -->
+
 <!-- helikopter178-kantfarger-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 

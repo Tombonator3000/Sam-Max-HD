@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-helreturer-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Hele faser og blad kontrollert, returer består, 2026-10-24 13:01
+
+Fem nye faktiske innebygde image_gen-kall H331..H335 i samme påbegynte fig178_02 er bevart, totalt 159 mottatte råbilder. Fire hele fasetegninger og ett isolert blad gir ni egne komposisjoner med fire globale brunvarianter. Alle ni er fortsatt returer. H331/H335 har sterkere form for 1988, 0/0 mot H289s 3/0, men 78/80/77 positive materialfester mot H289s 69. H335 får nedre grå bladfelt tilbake, men ekstra grått og grønt forverres. H332/H333 taper poseforhold, og H334 taper H252-formen selv om brunfargen blir roligere. H327/1987, H289/1988 og H252/1990 beholdes.
+
+Kilde 4706b1300c0a502a2d3c203da201a39a0cc5b05f og rapport 25b989a6bf0b681f26a102cc24dacb2e03c2714b er pushet på gpt-arbeid og faktisk strømmet tilbake: 136 kildefiler/17576608 byte og 8 rapportfiler/965390 byte. Alle lengder/SHA256/Git-blob SHA1 er bekreftet uten ekstra payload. [Returer og bevis](https://github.com/Tombonator3000/Sam-Max-HD/tree/25b989a6bf0b681f26a102cc24dacb2e03c2714b/rapporter/helikopter178-forfaser1990til1994-20261024/helreturer-status.md).
+
+Fortsatt 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 publiserte native, fig178_02 20/24 og familie 178 32/102. Alle 9174 beskyttede input, derav 9064 jobb/hovedark, og tre opprinnelige stasher er uendret. H336 er ikke startet, forberedt eller reservert. Ingen nødvendig ny Tom-avklaring. Automatikken ACTIVE; all grafikk og samlet sluttkontroll er ikke ferdig. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-helreturer-20261024:slutt -->
+
 <!-- helikopter178-kantfarger-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 
