@@ -1,0 +1,93 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image, ImageDraw
+import hashlib, json, subprocess
+import numpy as np
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'
+O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d): p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+
+calls=read(R/'faktiske-bildekall.json')
+assert len(calls)==83 and [c['kall'] for c in calls]==[f'H{n}' for n in range(176,259)]
+rows=[]; drawings=[]
+failures={
+ 'H255':'Grå sidefelt er slått sammen til en sammenhengende stripe; nytt rundt halerotornav, endret hale/understell og forenklede små materialfelt.',
+ 'H256':'Grå sidefelt er slått sammen til en sammenhengende stripe; nytt rundt halerotornav og tap/endring av små felt. Fem positive formfester avviker.',
+ 'H257':'Tre sidefelt er nå skilt, men to er avrundet som knapper. Halerotoren har ny rund navring; små grønne/grå felt og to formfester avviker.',
+ 'H258':'Den kildebekreftede røde bladspissen er med, men øvre blad har feil bredde/form, nye store grå felt, grå sidefelt/halerotornav er omtegnet og små felt endret.'
+}
+for cid in ['H254','H255','H256','H257','H258']:
+ K=R/'kall'/cid; plan=read(K/'plan.json'); args=read(K/'argumenter.json')
+ assert plan['utfort'] and plan['raa_sha256']==sha(K/'raa.png')
+ assert (K/'prompt-brukt.txt').read_text().rstrip()==args['prompt'].rstrip()
+ for f,h in plan['referanser_SHA256'].items(): assert sha(Path(f))==h,f
+ c=next(c for c in calls if c['kall']==cid)
+ assert c['raa_sha256']==sha(K/'raa.png')
+ assert c['prompt_sha256']==sha(K/'prompt-brukt.txt')
+ assert c['argumenter_sha256']==sha(K/'argumenter.json')
+ c['gruppe']='streklag-retur' if cid=='H254' else 'hel-uprodusert-fase'
+ arr=np.array(Image.open(K/'raa.png').convert('RGBA')); alpha=arr[:,:,3]
+ raw=dict(maal=[arr.shape[1],arr.shape[0]],mode='RGBA',alfa0=int((alpha==0).sum()),alfa255=int((alpha==255).sum()),myk_alfa=int(((alpha>0)&(alpha<255)).sum()))
+ assert all(raw[k]>0 for k in ['alfa0','alfa255','myk_alfa'])
+ if cid=='H254':
+  reason='Sort streklag har ekte alfa, men nytegner et annet motiv: rund navring, nye krager og det tredje hovedrotorbladet som fast halefinne. Avvist før overlagring, tilpasning og motor.'
+  q=None
+ else:
+  reason=failures[cid]; q=read(K/'kontroll.json')
+  assert not q['teknisk_ok']
+  src=np.array(Image.open(Path(plan['kilde_mappe'])/'original-1x.png').convert('RGBA'))
+  own=np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA'))
+  ref=np.zeros_like(own); x,y=q['margx']*4,q['margy']*4
+  ref[y:y+src.shape[0]*4,x:x+src.shape[1]*4]=np.repeat(np.repeat(src,4,0),4,1)
+  drawings.append((cid,plan['rute'],ref,own,q))
+  q.update(status='RETUR_FORM_MATERIAL_OG_MOTIV',egen_stilvurdering_bestatt=False,visuell_retur=reason)
+  put(K/'kontroll.json',q)
+ entry=dict(kall=cid,rute=plan['rute'],raa_SHA256=sha(K/'raa.png'),prompt_SHA256=sha(K/'prompt-brukt.txt'),argumenter_SHA256=sha(K/'argumenter.json'),**raw,
+            laget=True,egenkontroll_utfort=True,egenkontroll_bestatt=False,raa_visuelt_sett=True,native_proeve_visuelt_sett=False,
+            native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False,retur=reason)
+ if q:
+  entry.update(native_proeve=str((K/'prototype-under-kontroll.png').relative_to(A)),native_proeve_SHA256=sha(K/'prototype-under-kontroll.png'),
+               original_mappe=plan['kilde_mappe'],original_SHA256=plan['kilde_RGBA_SHA256'],padding_originalpiksler=[q['margx'],q['margy']],
+               flytt=q['flytt'],hel_skala=q['hel_skala'],snitt_union=q['snitt_union'],dekning=q['dekning'],
+               alfa_fester_over3HD=q['alfa_fester_over3HD'],apninger_over3HD=q['apninger_over3HD'],
+               fargefester_over3HD=sum(r['native_fester_over3HD']for r in q['farger']),
+               ekstra_paletteklassifiserte_piksler_over3HD=sum(r['ekstra_paletteklassifiserte_nativepiksler_over3HD']for r in q['farger']),
+               alle_fargeklasser=len(q['farger']),kuttet=q['kuttet'])
+ text=f'# {cid}: fase {plan["rute"]}, retur\n\nFaktisk innebygd image_gen-kall, råbilde, faktisk prompt, argumenter og referansehash bevart. Bare godkjent Sam er stilanker. Originalen er sett i spillkontekst før motivet. Ingen kildepiksler eller hard originalmaske er brukt til produksjon.\n\n{reason}\n\n'
+ if q:
+  text+=f'Hele egen tegning er tilpasset samlet med skala {q["hel_skala"]} og forskyvning {q["flytt"]}. Dette bruker originalens alfa til helregistrering og kontroll, aldri til å klippe eller male egne piksler. Bare egen alfa under 8 er satt til null. Snitt/union {q["snitt_union"]}, dekning {q["dekning"]}; {q["alfa_fester_over3HD"]} positive formfester og {q["apninger_over3HD"]} åpningsfester over uendret 3 HD-grense. Alle {len(q["farger"])} fargediagnoser beholdes. Disse tallene gir ingen visuell godkjenning.\n\n'
+ text+='Laget og egenkontrollert som forsøk, men ikke godkjent, native mottatt, motorobservert eller publisert. Ingen hel resultat.png eller ny Tom-/Claude-godkjenning.\n'
+ (K/'notat.md').write_text(text);put(K/'raa-kontroll.json',entry);rows.append(entry)
+put(R/'faktiske-bildekall.json',calls)
+
+# Compare completed own native probes against source only in this QA board.
+board=Image.new('RGB',(1280,4*390),'#87959e'); draw=ImageDraw.Draw(board)
+for i,(cid,n,ref,own,q) in enumerate(drawings):
+ y=390*i
+ draw.text((16,y+12),f'{cid} / {n}: original | egen holdt prove',fill='black')
+ draw.text((16,y+30),f'IoU {q["snitt_union"]}; form {q["alfa_fester_over3HD"]}; hull {q["apninger_over3HD"]}',fill='black')
+ for j,arr in enumerate([ref,own]):
+  im=Image.fromarray(arr);bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im)
+  scale=min(600/im.width,320/im.height);bg=bg.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.NEAREST)
+  board.paste(bg.convert('RGB'),(16+j*640,y+55))
+board.save(R/'siste-fire-native-kontroll.png')
+put(R/'rutekart-konturvask-fire.json',dict(utc=datetime.now(timezone.utc).isoformat(),jobb='fig178_02',status='ALLE_NYE_PROEVER_RETUR',nye_bildekall=5,faktiske_bildekall_totalt=83,leveranser=[],ruter=rows,ingen_hele_resultat_png=True,terskel_HD=3,originalmasker_i_produksjon=False))
+
+# Compare the active complete mod with the previously downloaded published manifest.
+expected=read(O/'kandidat3733-filhash.json')
+actual={str(p.relative_to(P/'mods/gpt')):sha(p)for p in (P/'mods/gpt').rglob('*')if p.is_file()}
+assert actual==expected and len(actual)==21978
+assert subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0]=='c80099158b30fb08fa0cb670acb112bf14fd58f4'
+old=read(O/'smaafelt-release-metadata.json');new=read(O/'konturvask-fire-release-metadata.json')
+assets=lambda d:sorted([{k:a[k]for k in ['id','name','size','digest']}for a in d['assets']],key=lambda a:a['id'])
+assert old['id']==new['id'] and assets(old)==assets(new)
+put(R/'konturvask-fire-mod-pakker-uendret.json',dict(utc=datetime.now(timezone.utc).isoformat(),hd_mod='c80099158b30fb08fa0cb670acb112bf14fd58f4',
+ aktive_modfiler_SHA256_byteidentiske=len(actual),sammenlignet_med='Tidligere faktisk hentet og verifisert fullmanifest kandidat3733-filhash.json',
+ fjern_SHA_bekreftet=True,nye_modkandidater=0,nye_motoravspillinger=0,nye_pakke_eller_arkivnedlastinger=0,nye_slettinger=0,
+ release_id=new['id'],release_url=new['html_url'],release_vedlegg_ID_storrelse_digest_uendret=assets(new),
+ tidligere_faktiske_pakkekontroller_gjelder=True,ny_faktisk_pakkenedlasting=False,ingen_ny_pakke_av_returer=True))
+(R/'samle-konturvask-fire.py.txt').write_bytes(Path(__file__).read_bytes())
+print('83 faktiske kall, fem nye råkall bevart; 21978 modhash og fire releasevedlegg uendret. Ingen kandidat eller motor denne kjøringen.')

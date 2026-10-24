@@ -1,0 +1,26 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np,json,hashlib,sys
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';V=R/sys.argv[1]
+# Read-only QA: the original is used only to measure the completed own picture.
+source=np.array(Image.open(R/'kilder/1990/original-1x.png').convert('RGBA'));out=np.array(Image.open(V/'prototype-helplassering.png').convert('RGBA'));assert out.shape==(216,368,4);W,H=368,216
+core=out[:,:,3]>=128;ad=nd.distance_transform_edt(~core);hd=nd.distance_transform_edt(core);oy,ox=np.nonzero(source[:,:,3]>0);by,bx=np.nonzero(source[:,:,3]==0);apos=int((ad[32+oy*4+2,32+ox*4+2]>3).sum());aneg=int((hd[32+by*4+2,32+bx*4+2]>3).sum());ref=np.zeros_like(out);ref[32:184,32:336]=np.repeat(np.repeat(source,4,0),4,1);rco=ref[:,:,3]>0;colors=np.unique(source[source[:,:,3]>0,:3],axis=0);_,ids=cKDTree(colors.astype(float)).query(out[core,:3]);lab=np.full(core.shape,-1,int);lab[core]=ids
+rows=[]
+for i,col in enumerate(colors):
+ sm=(source[:,:,3]>0)&np.all(source[:,:,:3]==col,2);yy,xx=np.nonzero(sm);have=lab==i;target=rco&np.all(ref[:,:,:3]==col,2);d=nd.distance_transform_edt(~have);e=nd.distance_transform_edt(~target);rows.append(dict(RGB=col.tolist(),native_fester_over3HD=int((d[32+yy*4+2,32+xx*4+2]>3).sum()),ekstra_paletteklassifiserte_nativepiksler_over3HD=int((e[have]>3).sum())))
+def group(c):
+ t=tuple(map(int,c));return 0 if t==(0,0,0)else 1 if t==(123,175,207)else 2 if t in[(195,103,7),(239,135,39),(255,179,67)]else 3 if t[0]==t[1]==t[2]else 4 if t[0]>t[1]else 5
+cg=np.array([group(c)for c in colors]);glab=np.full(core.shape,-1,int);glab[core]=cg[lab[core]];slab=np.full(core.shape,-1,int)
+for i,c in enumerate(colors):slab[rco&np.all(ref[:,:,:3]==c,2)]=i
+edges=np.zeros(core.shape,bool);edges[:-1]|=slab[:-1]!=slab[1:];edges[:,:-1]|=slab[:,:-1]!=slab[:,1:];ed=nd.distance_transform_edt(~edges);names=['sort','blaa','gyllenaksent','graatt_solv_vindu','brunt','groent_oliven'];mrows=[]
+for g in range(6):
+ target=np.zeros(core.shape,bool);sourcemask=np.zeros(source.shape[:2],bool)
+ for i,c in enumerate(colors):
+  if cg[i]==g:target|=rco&np.all(ref[:,:,:3]==c,2);sourcemask|=(source[:,:,3]>0)&np.all(source[:,:,:3]==c,2)
+ yy,xx=np.nonzero(sourcemask);d=nd.distance_transform_edt(glab!=g);e=ed if g==0 else nd.distance_transform_edt(~target);mrows.append(dict(materiale=names[g],fester_over3HD=int((d[32+yy*4+2,32+xx*4+2]>3).sum()),ekstra_piksler_over3HD=int((e[glab==g]>3).sum())))
+
+proof=dict(rute=1990,padding_originalpiksler=8,terskel_HD=3,alfa_fester_over3HD=apos,apninger_over3HD=aneg,snitt_union=float((core&rco).sum()/(core|rco).sum()),farger=rows,materialer=mrows,formporter_bestatt=apos==aneg==0,materialporter_bestatt=all(e['fester_over3HD']==e['ekstra_piksler_over3HD']==0 for e in mrows),prototype_SHA256=hashlib.sha256((V/'prototype-helplassering.png').read_bytes()).hexdigest(),produksjonen_bruker_ikke_originalmasker=True,native_mottatt=False,publisert=False,visuelt_sett=False)
+(V/'kontroll.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:proof[k]for k in ['alfa_fester_over3HD','apninger_over3HD','snitt_union','materialporter_bestatt']},ensure_ascii=False));print(mrows)
+(R/'kontroller-ferdig-native.py.txt').write_bytes(Path(__file__).read_bytes())

@@ -1,5 +1,11 @@
 
 
+<!-- helikopter178-konturvask-fire-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+83 faktiske kall etter fem nye H254..H258. H254s streklag er avvist på feil motiv. H255..H258 er første hele prøver for 1989..1986, alle med konkrete form-/material-/motivreturer. Tre Python-rensevarianter er også stilreturer og er ikke nye bildekall. H252/1990 forblir uendret rent kontrollpunkt med 15 positive materialavvik. Ingen nye hele resultat.png, native mottak, motoravspillinger eller publiserte mod-/pakkebyte. Fortsatt 3733 native og 508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og konturvask-fire-status.md. H259 er ikke startet. Gjenoppta egne prøver; Sam er eneste stilanker. Automatikken ACTIVE.
+<!-- helikopter178-konturvask-fire-20261024:slutt -->
+
 <!-- helikopter178-smaafelt-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

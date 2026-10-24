@@ -1,0 +1,30 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;V=R/'egen-konturvask';V.mkdir()
+src=R/'native/costume178_1990_hd.png';recipe=json.loads((R/'oppskrift1990.json').read_text());colors=np.unique(np.array([c for p in recipe['materialplan'] for c in p['sluttfarger']],np.uint8),axis=0);assert len(colors)==21
+# Production reads only our previously generated native picture, not the original.
+allowed={str(src.resolve())};opened=[];real_open=Image.open
+def guarded(fp,*args,**kwargs):
+ name=str(Path(fp).resolve());assert name in allowed,name;opened.append(name);return real_open(fp,*args,**kwargs)
+Image.open=guarded;a=np.array(Image.open(src).convert('RGBA'));assert a.shape==(168,320,4)
+alpha=a[:,:,3].copy();core=alpha>0;_,ids=cKDTree(colors.astype(float)).query(a[core,:3]);labels=np.full(core.shape,-1,int);labels[core]=ids
+results=[];S=4
+for sigma in [1.2,1.8]:
+ best=np.full((a.shape[0]*S,a.shape[1]*S),-1.,np.float32);winner=np.zeros(best.shape,np.uint8)
+ for i,col in enumerate(colors):
+  own_weight=(labels==i).astype(np.float32)*(alpha.astype(np.float32)/255)
+  large=np.repeat(np.repeat(own_weight,S,0),S,1);smooth=nd.gaussian_filter(large,sigma*S,mode='constant')
+  better=smooth>best;best[better]=smooth[better];winner[better]=i
+ rgb=colors[winner].reshape(a.shape[0],S,a.shape[1],S,3).mean(axis=(1,3));out=a.copy();out[:,:,:3]=np.rint(rgb).astype(np.uint8);out[alpha==0,:3]=0;assert np.array_equal(out[:,:,3],alpha)
+ pad=np.zeros((216,368,4),np.uint8);pad[24:192,24:344]=out;name='sigma-'+str(sigma).replace('.','-');d=V/name;d.mkdir();Image.fromarray(pad).save(d/'prototype-helplassering.png');results.append(dict(variant=name,sigma_native_HD=sigma,egen_palette=colors.tolist(),egen_alfa_byteidentisk=True,originalbilder_i_produksjon=0,hard_originalmaske=False,global_ensartet_egen_grensevask=True,PNG_SHA256=hashlib.sha256((d/'prototype-helplassering.png').read_bytes()).hexdigest()))
+Image.open=real_open;assert opened==[str(src.resolve())]
+proof=dict(utc=datetime.now(timezone.utc).isoformat(),metode='Bare egne RGB-klasseflater fra tidligere genererte fargeplan leses. Alle 21 egne klasser behandles ensartet med Gauss og vinnerfelt i 4x delopploesning. Fargeflatene blir flate med subpikselantialias. Hele egen naturlige alfa beholdes byteidentisk. Ingen originalbilde eller originalmaske leses under produksjon.',egen_input_SHA256=hashlib.sha256(src.read_bytes()).hexdigest(),raw_opphav=[p['kall']for p in recipe['materialplan']],produksjonsbilder_aapnet=opened,palette_fra_egen_oppskrift=True,palette_og_gammel_helplassering_er_kildeavledet_metadata=True,proever=results,native_mottatt=False,publisert=False)
+(V/'rens.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'vask-egne-fargegrenser.py.txt').write_bytes(Path(__file__).read_bytes())
+board=Image.new('RGB',(1152,360),(126,144,154));draw=ImageDraw.Draw(board);pad=np.zeros((216,368,4),np.uint8);pad[24:192,24:344]=a
+for i,(name,image)in enumerate([('Egne H222, stilretur',Image.fromarray(pad))]+[(e['variant'],Image.open(V/e['variant']/'prototype-helplassering.png'))for e in results]):
+ board.paste(image,(i*384+8,30),image);draw.text((i*384+8,8),name,fill='black')
+board.save(V/'egen-grensevask-sammenligning.png');print('To globale egne konturproever laget, alfa byteidentisk; ingen originalbilder lest i produksjonen')

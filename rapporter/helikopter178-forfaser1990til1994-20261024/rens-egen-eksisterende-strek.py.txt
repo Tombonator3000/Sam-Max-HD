@@ -1,0 +1,19 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';V=R/'egen-konturvask/egen-eksisterende-strek';V.mkdir()
+color=R/'egen-konturvask/sigma-1-2/prototype-helplassering.png';ink=R/'kall/H252/eget-rent-kontrollpunkt/frossen-parent246/prototype-helplassering.png'
+allowed={str(color.resolve()),str(ink.resolve())};opened=[];real_open=Image.open
+def guarded(fp,*a,**kw):
+ p=str(Path(fp).resolve());assert p in allowed,p;opened.append(p);return real_open(fp,*a,**kw)
+Image.open=guarded;a=np.array(Image.open(color).convert('RGBA'));b=np.array(Image.open(ink).convert('RGBA'));assert a.shape==b.shape==(216,368,4)
+strength=np.clip((35-b[:,:,:3].max(axis=2).astype(float))/20,0,1);strength=strength*strength*(3-2*strength);layer=b.copy();layer[:,:,:3]=0;layer[:,:,3]=np.rint(b[:,:,3].astype(float)*strength).astype(np.uint8)
+# Extract existing own ink only, then composite it as one whole layer.
+layer[:,:,3]=np.minimum(layer[:,:,3],a[:,:,3]);out=np.array(Image.alpha_composite(Image.fromarray(a),Image.fromarray(layer)));out[:,:,3]=a[:,:,3];out[out[:,:,3]==0,:3]=0
+assert np.array_equal(out[:,:,3],a[:,:,3]);Image.fromarray(out).save(V/'prototype-helplassering.png');Image.fromarray(layer).save(V/'egen-renset-strek.png');Image.open=real_open
+proof=dict(utc=datetime.now(timezone.utc).isoformat(),metode='Eksisterende moerk strek renses fra kun egen H252-native, med ensartet myk RGB-svarthetsvekt. Hele streklaget legges over egne behandlede fargeplan. Egen fargeplanalfa beholdes. Ingen originalbilder, originalmasker eller kildefragmenter leses.',produksjonsbilder_aapnet=opened,input_SHA256={Path(p).name+'_'+Path(p).parent.name:hashlib.sha256(Path(p).read_bytes()).hexdigest()for p in opened},egen_alfa_byteidentisk=True,ny_tegning_eller_nytt_motiv_fra_Python=False,prototype_SHA256=hashlib.sha256((V/'prototype-helplassering.png').read_bytes()).hexdigest(),native_mottatt=False,publisert=False)
+(V/'rens.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'rens-egen-eksisterende-strek.py.txt').write_bytes(Path(__file__).read_bytes())
+board=Image.new('RGB',(768,300),(133,149,158));d=ImageDraw.Draw(board)
+for i,(name,im)in enumerate([('Egne behandlede fargeplan',Image.fromarray(a)),('Med egen renset strek',Image.fromarray(out))]):board.paste(im,(8+i*384,30),im);d.text((8+i*384,8),name,fill='black')
+board.save(V/'egen-strek-sammenligning.png');print('Eget RGB-svarthetslag renset, ingen originalbilder lest')

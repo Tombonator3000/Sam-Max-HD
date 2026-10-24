@@ -1,0 +1,42 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image
+import hashlib, json, sys
+
+P = Path('/home/tom/Sam-Max-HD')
+A = P / 'work/.gpt-gren'
+O = Path(__file__).resolve().parent
+R = A / 'rapporter' / O.name
+cid, phase_text = sys.argv[1:]
+phase = int(phase_text)
+assert (cid, phase) in [('H255',1989), ('H256',1988), ('H257',1987), ('H258',1986)]
+S = A / 'rapporter/helikopter178-forfaser1995til1999-20261023/kilder-neste' / phase_text
+K = R / 'kall' / cid
+K.mkdir()
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+src = Image.open(S / 'original-1x.png').convert('RGBA')
+scale = 12
+w, h = src.width * scale, src.height * scale
+x, y = (1024-w)//2, (1024-h)//2
+guide = Image.new('RGBA', (1024,1024), '#87959e')
+guide.alpha_composite(src.resize((w,h), Image.Resampling.NEAREST), (x,y))
+guide.convert('RGB').save(K / 'original-posisjonsguide.png')
+prompt = f'''Use case: faithful game sprite remaster. Redraw the single helicopter in image1 in the clean ink-and-flat-colour cartoon finish of approved Sam in image2. Image3 shows this exact original helicopter in its game scene, for meaning only. Return one complete helicopter, rotor phase {phase}, on genuine transparent alpha, with the full 1024x1024 canvas of image1.
+
+Image1 fixes all geometry, colour regions and placement. The sprite spans {w}x{h} at ({x},{y}); retain these proportions and large transparent margins. This is an asymmetric compact dark-brown angular helicopter pointing right. Trace its peculiar original silhouette and every opening, with long thin irregular green skids, short brown legs, a small uneven tail rotor, dark grey windscreen with tiny pale blue and lavender accents, and tiny original gold highlights. Its THREE main rotor blades rotate as shown: their green undersides and silver/grey/white upper surface must follow this exact phase, not become a fixed tail fin. Every rotor arm keeps its exact angle, width and visible colour regions from image1. Do not assume a silver blade is present where this phase shows green or a concealed surface. Main hub black, directly touching the tiny brown/gold roof, with no added white collar. The three grey body-side patch groups stay separate, interrupted by original brown and green areas. They are flat irregular short shapes, never one continuous stripe. The tiny tail rotor has no newly added solid circular hub. Match the original tail, leg joints, individual small marks and dark olive inserts. Preserve tiny lavender and light-blue source accents.
+
+Smooth the pixel staircases into confident continuous hand-inked contours. Use flat dark browns (base RGB115,59,11; shadow83,43,0; light139,75,15), forest green and dark olive, neutral greys and white. One shadow step per surface, clean antialiased edges, like image2. Keep small green, grey and gold areas on the same parts. Do not redesign into a rounded conventional aircraft. No new hardware, rivets, root collars, wheels, lamps, markings, reflections, gradients, texture, pixelation or extra parts. Do not draw Sam, the game background, panels or labels. All blue-grey background, including enclosed gaps, becomes transparent. No crop, zoom, ground shadow or opaque backdrop. One faithful smooth cartoon sprite with real alpha.'''
+refs = [K/'original-posisjonsguide.png', A/'hovedark/sam.png', S/'hel-originalmotor.png']
+args = dict(prompt=prompt, referenced_image_paths=list(map(str,refs)), transparent_background=True)
+plan = dict(kall=cid, rute=phase, jobb='fig178_02', utfort=False,
+            modul='hel-uprodusert-fase', kilde_mappe=str(S),
+            original_kontekst_og_stil_sett=True,
+            originalmaske=False, kildeguide_kun_referanse=True,
+            kilde_RGBA_SHA256=sha(S/'original-1x.png'),
+            referanser_SHA256={str(p):sha(p) for p in refs},
+            planlagt_utc=datetime.now(timezone.utc).isoformat())
+(K/'prompt-brukt.txt').write_text(prompt+'\n')
+for name, data in [('argumenter.json',args), ('plan.json',plan)]:
+    (K/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+(R/'forbered-siste-fire.py.txt').write_bytes(Path(__file__).read_bytes())
+print(K)

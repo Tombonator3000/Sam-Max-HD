@@ -1,0 +1,66 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import json
+
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text())
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+assert not(R/'kall/H259').exists()
+route=read(R/'rutekart-konturvask-fire.json')
+for e in route['ruter']:
+ K=R/'kall'/e['kall']
+ if e['kall']!='H254':
+  e['native_proeve_visuelt_sett']=True
+  q=read(K/'kontroll.json');q['visuelt_sett']=True;put(K/'kontroll.json',q)
+  p=K/'notat.md';p.write_text(p.read_text()+'\nDen ferdig tilpassede nativeprøven er visuelt sett mot riktig original i siste-fire-native-kontroll.png. Returgrunnene består. Ingen motorstatus overføres fra eldre faser eller varianter.\n')
+ put(K/'raa-kontroll.json',e)
+put(R/'rutekart-konturvask-fire.json',route)
+
+for name in ['sigma-1-2','sigma-1-8','egen-eksisterende-strek']:
+ V=R/'egen-konturvask'/name;q=read(V/'kontroll.json')
+ q.update(visuelt_sett=True,egen_stilvurdering_bestatt=False,status='RETUR_STIL_OG_EGNE_FARGE_STREK_GRENSER',
+          retur='Fortsatt synlige pikseltrapper i egne fargeflater; den ekstraherte egne streken følger heller ikke flatene nøyaktig.' if name=='egen-eksisterende-strek' else 'Fortsatt synlige pikseltrapper i egne fargegrenser og omriss sammenlignet med godkjent Sam.')
+ put(V/'kontroll.json',q)
+
+status='''Fem nye faktiske innebygde image_gen-kall H254..H258 er bevart med råbilder, faktiske prompter, argumenter, kildehenvisninger og SHA256. Totalt 83 faktiske kall i den åpne bunken. H254 er et sort streklag til 1990, avvist fordi det legger til runde nav/krager og gjør det tredje hovedrotorbladet til en fast halefinne. Det er ikke montert eller importert. H255..H258 er første hele stilprøver for de fire tidligere uproduserte fasene 1989..1986. De er laget og egenkontrollert som forsøk, men alle har form-/material-/motivreturer. Fire råbilder er ikke fire ferdige figurjobber. Ingen nye hele resultat.png, native mottak, motoravspillinger, publiserte grafikkbytes eller Tom-/Claude-godkjenninger denne kjøringen.
+
+Alle fem nye råbilder har ekte RGBA med alfa 0, alfa 255 og mellomverdier. Original og riktig spillkontekst for hver fase samt godkjent Sam er sett før motivet. Bare Sam er stilanker. H255/1989 har 20 positive formfester og fem åpningsfester over uendret 3 HD-grense, IoU 0,811. H256/1988 har fem formfester, null åpningsfester, IoU 0,856. H257/1987 har to formfester, null åpningsfester, IoU 0,861. H258/1986 har 29 formfester, null åpningsfester, IoU 0,795. Alle 21/22/22/24 fargediagnoser beholdes, med både manglende og ekstra klassepiksler. Ingen grense er svekket. De målte fargene gir ikke i seg selv antall nye objekter: naturlig strek og skygge kan klassifiseres som andre nærmeste palettfarger. De synlige motivavvikene er likevel konkrete returer.
+
+H255 og H256 slår de tre grå sidegruppene sammen til én stripe. H257 skiller gruppene, men avrunder dem til knapper, og har ny rund ring i halerotoren. H258 beholder den lille røde bladspissen, men endrer bladformen og grå områder. Alle fire forenkler små kildefelt og deler av hale/understell. Råbildene og de ferdig tilpassede nativeprøvene er visuelt sett mot riktige originaler. Se siste-fire-native-kontroll.png, hver kallmappes kontroll.json/notat.md og rutekart-konturvask-fire.json. De ferdige nativeprøvene bruker bare egen RGBA, samlet helskalering og forskyvning. Originalens alfa brukes til helregistrering og separat måling, aldri som klippemaske eller produksjonspiksler. Bare egen alfa under 8 er satt til null. Ingen source-fragmenter eller lokal kildebasert påmaling/flytting er brukt.
+
+Fase1986s røde bladspiss er ikke gjettet: fem originalpiksler bruker kostymets indeks124/125, RGB115,19,11 og143,27,19. Den lille klare grønne fargen RGB7,95,51 finnes også i1986/1987, og lavendelRGB123,115,203 må holdes atskilt fra lyseblått. H257s premiss om en stor lys bladflate ble rettet før første faktiske kall; H258s faseavhengige ekstra farger ble også kontrollert og føyd til før kall. Faktisk prompt og argumenter i hver kallmappe er fasiten, ikke senere felles hjelpeskript.
+
+Tre Python-varianter i egen-konturvask er egen rensing/plassering, ikke nye image_gen-kall eller leverte jobber. De behandler tidligere egne genererte fargeplan ensartet med Gauss og egen palettklassifisering; egen alfa beholdes. En aktiv bildevakt hindrer originalbilder under produksjonen. Palett og gammel helplassering er kildeavledet metadata. Råopphav er de åtte egne kallene H213,H215,H216,H218,H219,H220,H221,H222. Sigma1,2 beholder alle positive materialfester, men har ekstra sort/brunt og fortsatt trappepreg. Sigma1,8 får også nye grønn-/brunavvik. Ekstrahert egen strek fra det rene H252-kontrollpunktet har alle positive materialfester, men ekstra klassepiksler og dårlig samsvar mellom egne farge- og strekgrenser. Alle tre er visuelt sett og avvist som ferdig stil. Ingen originalhardmaske, nye kildemalte piksler eller fallback er brukt.
+
+Det tidligere rene H252/eget-rent-kontrollpunkt for1990 står uendret som beste holdte detaljgrunnlag: null alfa-/åpningsfeil, men15 positive materialavvik. De nye rensevariantene eller H254 skal ikke erstatte det som en påstått forbedring. Tidligere motorbevis gjelder bare de navngitte eldre prøvene, særlig H252; de gir ingen motorstatus for H254..H258. Denne kjøringen bygde ingen modkandidat og startet ingen motor, fordi alle nye bilder allerede har påviste returgrunner.
+
+Ny faktisk opptelling gir fortsatt508/1758 hele figurjobber,1250 uten resultat pluss returer/sluttkontroll,3733 native, fig178_02 20/24 tekniske ruter uten hel resultat.png og familie178 32/102. Alle9174 sporede beskyttede filnavn, hvorav9064 i jobber/hovedark, og de tre opprinnelige stashene er bytebekreftet uendret. Alle21978 aktive modfilhash er bekreftet mot det tidligere faktisk hentede publiserte fullmanifestet. Fersk fjern-SHA er fortsatt c80099158b30fb08fa0cb670acb112bf14fd58f4. Fire releasevedleggs ID, navn, størrelse og digest er uendret. Tidligere faktiske Linux-/Windows-pakke- og innholdskontroller gjelder; ingen ny pakke eller nedlastet arkiv er laget av disse returene. Ingen fullmodkopi er opprettet, og ingen data eller stasher er slettet denne kjøringen.
+
+Gjenoppta de fire egne førsteprøvene, særlig H257/1987 med nærmest form, og det rene H252/1990 når småfeltene rettes. Ikke generer de fire fasene som om de var urørte nye jobber. Rett konkrete kildedeler gjennom bildeverktøyet og se hele egen komponent etter hver innplassering, før nye skjøter legges til. Ikke gjenta H254s generiske streklag eller bruk de avviste prøvene som stilankere. H259 er ikke forberedt, utført eller reservert.1991..1994 har fortsatt dokumenterte stilreturer;1995..2021 skal ikke dupliseres uten retur.137/V013 og296/S037 er uendret. Ingen nødvendig ny Tom-designavklaring. Automatikken er ACTIVE; den åpne bunken og all grafikk er ikke ferdig. Bibliotekets figurark-fast-storrelse.md og publisert-mod-er-fasit.md brukes fortsatt med lokale kontroller. Søket etter egen konturrensing ga ingen relevante kort, også etter én utvidelse; renseforsøkene er lokale, ikke en gjenbrukt PASS-løsning. Ingen motor-/pipelinekodeendring, CLI/API-bildefallback, force-push eller gammel nattprosess.
+'''
+for a,b in [('Fase1986','Fase 1986'),('indeks124/125','indeks 124/125'),('RGB115','RGB 115'),('og143','og 143'),('i1986','i 1986'),('lavendelRGB','lavendel RGB'),('Sigma1,2','Sigma 1,2'),('Sigma1,8','Sigma 1,8'),('for1990','for 1990'),('men15','men 15'),('fortsatt508','fortsatt 508'),(',1250',', 1250'),(',3733',', 3733'),('Alle9174','Alle 9174'),('hvorav9064','hvorav 9064'),('Alle21978','Alle 21978'),('.1991','. 1991'),(';1995','; 1995'),('.137','. 137'),('og296','og 296')]:status=status.replace(a,b)
+(R/'konturvask-fire-status.md').write_text('# Egen konturvask og fire nye faseprøver, alle returer\n\n'+status)
+(R/'NESTE.md').write_text('# Gjenoppta H255..H258 og rent H252, H259 ikke startet\n\n'+status+'\nBruk fersk komplett publisert WebP-mod for eventuell kandidat. Publisering krever vanlig barn av gjeldende fjern-SHA og faktisk tilbakehenting av alle filhash. Behold råbilder, originale jobbfiler, unike kilder og godkjente stilankre.\n')
+brief='83 faktiske kall etter fem nye H254..H258. H254s streklag er avvist på feil motiv. H255..H258 er første hele prøver for1989..1986, alle med konkrete form-/material-/motivreturer. Tre Python-rensevarianter er også stilreturer og er ikke nye bildekall. H252/1990 forblir uendret rent kontrollpunkt med15 positive materialavvik. Ingen nye hele resultat.png, native mottak, motoravspillinger eller publiserte mod-/pakkebyte. Fortsatt3733 native og508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og konturvask-fire-status.md. H259 er ikke startet. Gjenoppta egne prøver; Sam er eneste stilanker. Automatikken ACTIVE.'
+for a,b in [('for1989','for 1989'),('med15','med 15'),('Fortsatt3733','Fortsatt 3733'),('og508','og 508')]:brief=brief.replace(a,b)
+for f in [R/'RETUR.md',R/'STILRETUR.md',R/'notat.md',R/'sluttstatus.md']:
+ old=f.read_text();assert '# Nyeste status: konturvask og fire faseprøver' not in old
+ f.write_text('# Nyeste status: konturvask og fire faseprøver\n\n'+brief+'\n\nSe konturvask-fire-status.md og rutekart-konturvask-fire.json.\n\n## Historisk status før H254..H258\n\n'+old)
+marker='helikopter178-konturvask-fire-20261024'
+for f in [A/'ORDRE.md',A/'GRAFIKKLISTE.md',A/'jobber/fig178_02/notat.md']:
+ old=f.read_text();assert marker not in old;title,rest=old.split('\n',1)
+ f.write_text(title+'\n\n<!-- '+marker+':start -->\nNyeste status gjelder foran eldre blokker nedenfor.\n\n'+brief+'\n<!-- '+marker+':slutt -->\n\n'+rest.lstrip('\n'))
+f=read(R/'fremdrift.json')
+f['historisk_smaafelt78']={k:f[k]for k in ['status','faktiske_bildekall','neste_kall','siste_produksjon_utc','grafikkilde_nye_smaafelt']}
+f.update(status='KONTURVASK_OG_FIRE_FASEPROEVER_ALLE_RETUR',faktiske_bildekall=83,kall=[c['kall']for c in read(R/'faktiske-bildekall.json')],nye_bildekall_denne_kjoring=5,
+ egne_Python_renseproever_denne_kjoring=3,nye_helfaseproever_denne_kjoring=4,hele_jobber_nye=0,nye_godkjente_native_denne_kjoring=0,
+ endrede_publiserte_grafikkfiler_denne_kjoring=0,nye_motoravspillinger_denne_kjoring=0,
+ motor_gjelder='Historisk holdt H252-prototype i to tidligere kontrollerte avspillinger. Ingen av de fem nye kallene eller tre rensevariantene er motorobservert denne kjøringen.',
+ neste_faser=[1987,1988,1989,1986],neste_kall='H259',neste_kall_utfort_eller_reservert=False,
+ nye_faseproever={str(e['rute']):e['kall']for e in route['ruter']if e['kall']!='H254'},
+ naeste_prioritet='Gjenoppta egne H255..H258, særlig H257/1987, og rent H252/1990 ved småfeltretting. Ingen avviste bilder som stilanker. Ingen ny generisk streklagsrunde.',
+ opptelling='opptelling-konturvask-fire.json',siste_produksjon_utc=datetime.now(timezone.utc).isoformat(),
+ grafikkilde_nye_konturvask_fire_sha_avventer_egen_commit=True)
+put(R/'fremdrift.json',f)
+(R/'status-konturvask-fire.py.txt').write_bytes(Path(__file__).read_bytes())
+print('Nyeste status, retur, ordre, rutekart og fremdrift oppdatert. H259 ikke startet.')
