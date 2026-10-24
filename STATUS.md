@@ -1,5 +1,24 @@
 # Status
 
+<!-- sam291-foerste3761-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Fem nye forkledningsark i kontrollerte kompakte pakker, 2026-10-24 14:07
+
+Fem hele figurark fig291_01 til05 er produsert, egenkontrollert, native mottatt, visuelt sett og motorobservert.28 nye native fra19 ulike hele RGBA-kilder, ni eksakte aliaser. Fem innebygde bildekall, fire rågrunnlag valgt. En gulvmaske med oppdiktet lys ansiktsflate er rettet. Sam og Max tar av bigfootforkledningen i rom56, etter primærskript113. Originaler, spillkontekst og godkjente Sam-/Max-mastere er sett. Egen generert alfa og samlet plassering, ingen hard originalsilhuettmaske. Standardmottaket bevarer seks kildebekreftede brune originalpiksler som små myke stoffprikker i1935..1940, separat dokumentert.
+
+Egenkontroll26 OK/to SJEKK, ingen FEIL. Native28 OK med uendrede grenser, minste snitt/union0,778 og dekning0,944. Samme produksjonsmotor i to360-bilders chore6-forløp:90/90 null på hver side,90 hele originalflatepar byteidentiske og null HD-endringer utenfor loggede nye aktørflater. Alle28 nye observert,19 motivsammenligninger og fem hele bilder sett. Ny faktisk nedlastet Linux-pakkemotor er også kjørt360bilder:90/90 null, alle28 observert, alle90 original- og HD-RGBA-par identiske mot produksjonsprøven. Tre hele pakkebilder sett. Windows-pakken har bestått faktisk oppstart i Actions. Ingen naturlig gjennomspilling, ny interaktiv Windows-/webtest eller ny Tom-/Claude-godkjenning.
+
+Grafikkilde 6c686bf713a66a8bab014942c664f8f4d1a05cf7, rapport 9868d6ecd17900292ac8fcf127d9748733d3110b, hd-mod a4b2c9965deae32047d805b955ad204df7312a88 med fersk fjernforelder c80099158b30fb08fa0cb670acb112bf14fd58f4. Vanlig commit uten force-push. Hele fjernmodden er faktisk strømmet tilbake:22006 filhash, alle tidligere grafikkbytes og17089 indeks-/maskebilder bekreftet. Aktiv mod har3761 native,4910 WebP og371208919 byte. Tapsfri exact WebP bevarer også skjult RGB. Én nødvendig hardlenket kandidat ble flyttet til aktiv mod etter verifisering. Tre stasher og alle9174 beskyttede input,9064 i jobber/hovedark, er uendret.
+
+[Felles Linux-/Windows-utgave](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-forkledning) er publisert og faktisk lastet ned. Linux394185208 byte, Windows547139597 byte, Windows utpakket661781484 byte. Begge pakker har alle22006 modhash og28 nye ruter. Alle fire fellesvedlegg er strømmet tilbake med SHA-er uten dobbeltlagret nedlasting. Størrelsesgrenser og faktisk innhold er kontrollert. Verifiserte gamle3733-arkiver og nye utpakkingskopier er ryddet med SHA-festet journal; råbilder, resultater, stilankere og relevante motorbevis beholdes. Ingen nye varige fulle Git- eller talekopier er beholdt.
+
+Ny telling:513/1758 hele figurjobber,1245 mangler resultat pluss returer, kildefeil og samlet sluttkontroll. Neste er fig291_06 til08 med18 ulike hele kilder, ingen eksakte hele treff og ingen nye bildekall/resultater ennå. Originalarkene er sett:06 viser Sam/forkledningen,07/08 Max som kommer fram. Bevar heli-returene H327/H289/H252; H336 er ikke startet. Verktøyavviste og kildefeilmerkede jobber gjentas ikke. Ingen nødvendig ny Tom-avklaring. Automatikken ACTIVE, gammel nattkontroll er ikke gjenstartet. [Rapport og neste handling](https://github.com/Tombonator3000/Sam-Max-HD/tree/9868d6ecd17900292ac8fcf127d9748733d3110b/rapporter/sam291-foerste-20261024/NESTE.md).
+
+Prosjektbibliotekets figurark-fast-storrelse.md og prosjektets remake-/WebP-/plassmetode er brukt. Global route_maps stanser på et eksisterende listformat i en sam296-retur; disse fem er mottatt gjennom en liten symlenket projeksjon med samme uendrede CLI og terskler. Ingen motor-/pipelinekodeendring. All ny grafikk ligger bare i gpt-arbeid og hd-mod.
+<!-- sam291-foerste3761-20261024:slutt -->
+
+
 <!-- helikopter178-helreturer-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 

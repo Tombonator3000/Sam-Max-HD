@@ -1,5 +1,19 @@
 # todo.md
 
+<!-- sam291-foerste3761-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Neste, 2026-10-24 14:07
+
+- [x] Levert fig291_01 til05,28 nye native, alle28 motorobservert og19 motivsammenligninger sett.
+- [x] Publisert additivt hd-mod a4b2c9965deae32047d805b955ad204df7312a88,22006 faktiske fjernfilhash og alle tidligere grafikkbytes bekreftet.
+- [x] [Felles kompakte pakker3761](https://github.com/Tombonator3000/Sam-Max-HD/releases/tag/sam-max-hd-2026-10-24-forkledning) faktisk lastet ned og alle modfiler bekreftet. Linux394,2MB og Windows547,1MB. Pakkemotor90/90 null, alle90 RGBA-par like, Windows-oppstart i Actions bestått. SHA-journalført opprydding etter kontroll.
+- [ ] Fortsett [fig291_06 til08](https://github.com/Tombonator3000/Sam-Max-HD/tree/9868d6ecd17900292ac8fcf127d9748733d3110b/rapporter/sam291-foerste-20261024/NESTE.md),18 ulike hele kilder, ingen nye bildekall/resultater for disse ennå. Se originaler i spillkontekst og godkjente ankere før ny maling.
+- [ ] Bevar og følg opp eksisterende heli-returer. Ikke gjenta verktøyavviste eller kildefeilmerkede motiver.513/1758 hele figurjobber,1245 uten resultat pluss returer/sluttkontroll. Ikke ferdig, automatikken ACTIVE, ingen nødvendig Tom-avklaring.
+
+<!-- sam291-foerste3761-20261024:slutt -->
+
+
 <!-- helikopter178-helreturer-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 
