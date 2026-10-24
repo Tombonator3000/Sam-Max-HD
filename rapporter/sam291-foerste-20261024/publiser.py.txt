@@ -1,0 +1,48 @@
+from pathlib import Path,PurePosixPath
+from datetime import datetime,timezone
+import gzip,json,hashlib,os,subprocess,tarfile,shutil
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'mod-kandidat';B=O/'verifisert-gammelmod3733';INDEX=O/'publisering.index';source='6c686bf713a66a8bab014942c664f8f4d1a05cf7';parent='c80099158b30fb08fa0cb670acb112bf14fd58f4'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+def git(*args,env=None):return subprocess.check_output(['git',*args],cwd=P,text=True,env=env).strip()
+def remote(b):return git('ls-remote','origin','refs/heads/'+b).split()[0]
+def inv(d):return {str(p.relative_to(d)):sha(p)for p in sorted(d.rglob('*'))if p.is_file()}
+expected=json.loads(gzip.decompress((R/'kandidat-filhash.json.gz').read_bytes()));base=json.loads(gzip.decompress((R/'grunnlag-filhash.json.gz').read_bytes()));download=json.loads((O/'kilde-faktisk-hentet.json').read_text());assert download['commit']==source and download['SHA256_og_Gitblob_SHA1_bekreftet']
+assert remote('gpt-arbeid')==source and remote('hd-mod')==parent and not subprocess.check_output(['git','status','--porcelain'],cwd=A) and not git('status','--porcelain')
+assert inv(M)==base and inv(C)==expected and len(base)==21978 and len(expected)==22006
+added=set(expected)-set(base);changed={n for n in base if base[n]!=expected[n]};assert len(added)==28 and all(n.startswith('costumes/costume291_')and n.endswith('_hd.webp')for n in added) and changed=={'mod.json','SHA256SUMS'}
+assert json.loads((R/'motor-sammenligning.json').read_text())['oppsummering']['visuelt_sett'];assert not B.exists()and not INDEX.exists()
+stash=json.loads((R/'grunnlag.json').read_text())['stashes'];assert git('stash','list','--format=%H').splitlines()==stash
+main=git('rev-parse','HEAD');ix=P/'.git/index';ixhash=sha(ix);env=dict(os.environ,GIT_INDEX_FILE=str(INDEX));git('read-tree',parent,env=env)
+for rel in sorted(added|changed):
+ oid=git('hash-object','-w',str(C/rel));git('update-index','--add','--cacheinfo','100644,'+oid+','+rel,env=env)
+tree=git('write-tree',env=env);diff=git('diff-tree','--no-commit-id','--name-status','-r',parent,tree).splitlines();assert set(diff)=={'A\t'+n for n in added}|{'M\t'+n for n in changed}
+commit=git('-c','user.name=Codex','-c','user.email=noreply@openai.com','commit-tree',tree,'-p',parent,'-m','HD-mod3761: Sam tar av bigfootforkledningen, 28 nye ruter','-m','Grafikkilde gpt-arbeid '+source+'. Tapsfri exact WebP, alle tidligere grafikkbytes bevart. Egenkontrollert og motorobservert, ingen ny Tom-/Claude-godkjenning.')
+assert git('rev-parse',commit+'^')==parent and remote('hd-mod')==parent and sha(ix)==ixhash
+put(O/'publisering-forsokt.json',dict(source=source,forelder=parent,hd_mod=commit,force_push=False,fasit_fjern_SHA=True,fase='push'))
+subprocess.run(['git','push','-q','origin',commit+':refs/heads/hd-mod'],cwd=P,check=True);assert remote('hd-mod')==commit;subprocess.run(['git','fetch','-q','--no-tags','origin','refs/heads/hd-mod:refs/remotes/origin/hd-mod'],cwd=P,check=True);print('Additiv3761 publisert. Strommer hele fjernmodden for filhashkontroll.',flush=True)
+class Reader:
+ def __init__(self,s):self.s=s;self.n=0;self.h=hashlib.sha256()
+ def read(self,n=-1):
+  b=self.s.read(n);self.n+=len(b);self.h.update(b);return b
+actual={}
+with(O/'fjernmod-nedlasting.log').open('wb')as err:
+ proc=subprocess.Popen(['gh','api','repos/Tombonator3000/Sam-Max-HD/tarball/'+commit],cwd=P,stdout=subprocess.PIPE,stderr=err);reader=Reader(proc.stdout)
+ with tarfile.open(fileobj=reader,mode='r|*')as tar:
+  for member in tar:
+   if not member.isfile():continue
+   parts=PurePosixPath(member.name).parts;assert len(parts)>1 and '..'not in parts;name='/'.join(parts[1:]);assert name not in actual;stream=tar.extractfile(member);h=hashlib.sha256()
+   while chunk:=stream.read(1024*1024):h.update(chunk)
+   actual[name]=h.hexdigest()
+ while reader.read(1024*1024):pass
+ assert proc.wait(timeout=30)==0
+assert actual==expected and len(actual)==22006 and inv(M)==base and inv(C)==actual and remote('hd-mod')==commit
+assert sha(ix)==ixhash and git('rev-parse','HEAD')==main and git('stash','list','--format=%H').splitlines()==stash
+M.rename(B);C.rename(M);assert inv(M)==actual and inv(B)==base
+for rel in ['mod.json','SHA256SUMS']:assert hashlib.sha256(subprocess.check_output(['git','show',parent+':'+rel],cwd=P)).hexdigest()==base[rel]
+shutil.rmtree(B);INDEX.unlink()
+receipt=dict(utc=datetime.now(timezone.utc).isoformat(),grafikkilde=source,hd_mod=commit,forelder=parent,force_push=False,native=3761,nye_native=28,hele_figurjobber=513,filantall=len(actual),WebP=sum(n.endswith('.webp')for n in actual),PNG=sum(n.endswith('.png')for n in actual),alle_filhash_bekreftet=True,alle_tidligere_grafikkfiler_SHA_bevart=True,indeks_mask_PNG_bytebevart=True,endret_tidligere=sorted(changed),hele_fjernmod_faktisk_hentet=True,nedlastede_bytes=reader.n,fjernarkiv_sha256=reader.h.hexdigest(),TAR_eller_full_nedlastet_modkopi_lagret=False,lokalt_mottatt=True,motorobservert=True,visuelt_sett=True,ny_Tom_godkjenning=False,ny_Claude_godkjenning=False,stasher=stash,tidligere_full_arbeidskopi_verifisert_og_slettet=True,pakker_native=3733,pakker_mangler=28)
+put(R/'mottak-publisert.json',receipt);put(O/'publisering-forsokt.json',receipt);shutil.copy2(__file__,R/'publiser.py.txt');shutil.copy2(O/'kilde-faktisk-hentet.json',R/'kilde-faktisk-hentet.json')
+f=json.loads((R/'fremdrift.json').read_text());f.update(publisert=True,nye_native_publisert=True,native_publisert=3761,grafikkilde=source,hd_mod=commit)
+for e in f['leveranser']:e.update(publisert=True,hd_mod=commit,grafikkilde=source,importert=True)
+put(R/'fremdrift.json',f);print(json.dumps(receipt,ensure_ascii=False),flush=True)

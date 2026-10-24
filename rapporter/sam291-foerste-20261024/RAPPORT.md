@@ -1,5 +1,7 @@
 # Sam tar av bigfootforkledningen, fem ark
 
+Publisert og faktisk hentet tilbake: hd-mod a4b2c9965deae32047d805b955ad204df7312a88, kilde 6c686bf713a66a8bab014942c664f8f4d1a05cf7. Alle22006 modfiler og alle tidligere grafikkbytes er kontrollert.28 nye native,3761 totalt. Pakker3733 mangler28 inntil pågående Linux-/Windows-bygg er lastet ned og innholdskontrollert.
+
 Fig291_01 til05 er laget, egenkontrollert, native mottatt og visuelt sett i kontrollert motoravspilling.28 nye native fra19 ulike hele kilder, ni eksakte aliaser. Kandidat3761 har22006 filer og371208919 byte. Publisering og pakker kvitteres i egne filer etter faktisk hent. Hele prosjektet er ikke ferdig:513/1758 resultatark,1245 mangler pluss returer, kildefeil og samlet sluttkontroll.
 
 Fem innebygde image_gen-kall, fire rågrunnlag valgt. Første03 hadde en oppdiktet lys ansiktsflate på gulvmasken; nytt02-forsøk viser baksiden som kilden. Kilde er globalt113 i rom56. Sam tar av en lodden forkledning, ikke en annen person som skal tegnes. Sam-/Max-mastere brukes for identitet og strek. Originalarkene og spillkonteksten er sett. Motorforløpet logger46 kilder.19 enkeltmotiver og fem hele sluttbilder er visuelt sett. Beskyttede jobbfiler er uendret. Se premissretting.md, råbilder, faktiske prompter og input-SHA-er i bildekall.json.
