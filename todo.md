@@ -1,5 +1,19 @@
 # todo.md
 
+<!-- helikopter178-helstil-20261024:start -->
+## Neste i grafikkproduksjonen
+
+- [x] Laget og kontrollert 13 nye hele stilprøver H223..H235 for fem helikopterfaser 1990..1994. Alle holdes utenfor publisert mod på grunn av form-/materialfeil. Råbilder, prompter, hasher og rutekart er pushet og faktisk hentet tilbake.
+- [x] Motorprøvd fem holdte varianter i én midlertidig WebP-mod. 160 eksakte originale romfilpar, samme 12 gamle bufferavvik og null nye HD-endringer utenfor de fem prøvde rutene. Ikke ferdig native mottak eller stilgodkjenning.
+- [x] Ryddet den verifiserte fullmodkopien, beholdt alle sju avvikende filer og fullmanifest. Hardlenket 1124 eksakte motorbildekopier med alle stier/hash bevart. Aktiv mod, beskyttede input og tre stasher er uendret.
+- [ ] Gjenoppta [rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/2b8d91c6639b440209a879f8c208d1468306ce9f/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md). Korriger 1990 fra H229s hele egen tegning med de konkrete returgrunnene. Godkjent Sam er eneste stilanker. Bevar små materialflater og riktig tredje hovedrotorblad. H236 er ikke forberedt, utført eller reservert.
+- [ ] Korriger deretter 1991..1994; produser uavhengige 1989..1986. Se originalene i spillkontekst før hvert motiv. Ikke dupliser 1995..2021 uten dokumentert retur.
+- [ ] Lever faktisk komplett fig178_02/resultat.png når alle 24 ruter og returer er klare. Fortsatt 20/24 tekniske ruter, familie178 32/102, hele figurjobber 508/1758 med 1250 uten resultat pluss returer/sluttkontroll. Ingen ny Tom-/Claude-godkjenning.
+- [ ] Fortsett all produserbar grafikk. Publiser bare kontrollert retur som vanlig barn av fersk hd-mod-SHA, og hent alle hash tilbake. Bruk én kandidat per bunke og tapsfri exact WebP. Oppdater begge faktiske pakker ved neste samlepunkt eller avslutning; samme nativeantall beviser ikke samme innhold etter en senere retur.
+
+hd-mod og begge eksisterende fellespakker er fortsatt c80099158b30fb08fa0cb670acb112bf14fd58f4, 3733 native. Ingen godkjent grafikk er lagt til denne kjøringen. Kilde 55024e0fe064870ba7526814f342ea86bcac178c, rapport 2b8d91c6639b440209a879f8c208d1468306ce9f, begge faktisk hentet og hashkontrollert. Automatikken forblir ACTIVE. Ingen nødvendig Tom-avklaring, motor-/pipelinekodeendring eller gammel nattprosess.
+<!-- helikopter178-helstil-20261024:slutt -->
+
 <!-- helikopter178-forfaser1990-1994:start -->
 ## Neste i grafikkproduksjonen
 

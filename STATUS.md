@@ -1,5 +1,23 @@
 # Status
 
+<!-- helikopter178-helstil-20261024:start -->
+Nyeste status gjelder foran eldre publiseringsblokker nedenfor.
+
+## Hele helikopterprøver under retting, 2026-10-24 02:55
+
+13 nye faktiske innebygde image_gen-kall H223..H235 har gitt hele stilprøver for fem faser, 1990..1994. Bunken har nå 60 faktiske kall med råbilder og faktiske prompter. Konturene er jevnere, men små grå/grønne flater og enkelte former er endret. Ingen av de nye prøvene er ferdig godkjent, native mottatt eller publisert. De er visuelt sett og fem er motorobservert som holdte prototyper. Det er ikke gitt ny Tom-/Claude-godkjenning. [Nyeste rapport og rutekart](https://github.com/Tombonator3000/Sam-Max-HD/tree/2b8d91c6639b440209a879f8c208d1468306ce9f/rapporter/helikopter178-forfaser1990til1994-20261024).
+
+Aktiv hd-mod er uendret c80099158b30fb08fa0cb670acb112bf14fd58f4, med 3733 native, 4882 WebP og 17089 tekniske PNG. Alle 21978 aktive filhash er kontrollert byteidentiske før og etter prøvebygg og rydding. Fig178_02 er fortsatt 20/24 tekniske ruter, familie178 32/102. Ny opptelling gir 508/1758 hele figurjobber, 1250 uten resultat, pluss returer og samlet sluttkontroll. Ingen hel resultat.png er lagt til. Begge eksisterende fellespakker har samme uendrede publiserte mod. Ingen nye pakker er bygd av feilede stilprøver.
+
+To nye kontrollerte motoravspillinger med binær 651aa78c har hver 160 bufferkontroller, 148 null og 120/120 null etter frame 40. De 12 gamle inngangsavvikene har identiske koordinater og begge RGBA. Alle 160 dumpede romfilpar har identiske hele original-RGBA-tilstander og originale celtegnekall. Dette er 159 ulike framenumre: ingen romdump ved 10, to ved 23. Alle fem originale ROI med 8 HD naboområde er identiske, og endret HD ligger bare i de fem prøvde rutene. Motorpar og hele 1990-bildet er sett. Dette er en stilprøve av feilede varianter, ikke full naturlig gjennomspilling eller ny Windows-/webtest.
+
+De naturlige heltegningene er kontrollert både mot beholdte 21-fargediagnoser og en separat materialdiagnose som grupperer skyggetoner innen samme materiale. Begge viser fortsatt avvik; 3 HD-terskler er beholdt. Ingen originale hardmasker, kildefragmenter eller lokal kildebasert påmaling/flytting brukes. Egen brunfarge kalibreres globalt fra eget RGB, med uendret alfa. Første målerunde for 1991..1994 arvet feil 1990 i variantmetadata; feilen er dokumentert og alle fire er kjørt mot riktig kilde. Ingen slike målinger ga mottak. Faserekken klargjør at den store bevegelige grønne delen er tredje hovedrotorblad, atskilt fra halerotoren. Det korrigerte premisset skal brukes videre.
+
+[Grafikkilde](https://github.com/Tombonator3000/Sam-Max-HD/tree/55024e0fe064870ba7526814f342ea86bcac178c/rapporter/helikopter178-forfaser1990til1994-20261024) er 55024e0fe064870ba7526814f342ea86bcac178c, og alle 257 endrede kildefiler er faktisk hentet med SHA256 og Git-blob SHA1 bekreftet. Rapport 2b8d91c6639b440209a879f8c208d1468306ce9f er deretter faktisk hentet med samme kontroll for alle 8 endrede rapportfiler. Ingen ekstra nedlastede payloadkopier beholdes. Den ene midlertidige fullmodkopien er fjernet etter fullhashkontroll. Alle sju avvikende filer og fullmanifest er beholdt med gjenoppretting fra c8009915. 1124 eksakte motorbildekopier er hardlenket, alle 1129 motorbildestier og hash er bevart. Logiske byte regnes ikke som fysisk plassgevinst. Alle 9174 sporede beskyttede filnavn, hvorav 9064 i jobber/hovedark, er bytekontrollert mot HEAD. De tre opprinnelige stashene er urørt.
+
+Neste er en presis retting av 1990 fra H229/global-brunkalibrering-v2 som redigeringsmål, med fasens egen original og godkjent Sam som eneste stilanker. Rett små materialflater og bevar riktig tredje rotorblad. Fortsett deretter 1991..1994; 1989..1986 er fortsatt uproduserte uavhengige faser. H236 er ikke forberedt, utført eller reservert. Ikke tegn 1995..2021 igjen uten dokumentert retur. 137/V013 og 296/S037 er uendret. Bibliotekskildene figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt med lokale kontroller og docs/WEBP.md. Ingen motor-/pipelinekodeendring, force-push, CLI/API-bildefallback eller gammel nattprosess. Ingen nødvendig ny designavklaring fra Tom. Automatikken er ACTIVE, og all grafikk er ikke ferdig.
+<!-- helikopter178-helstil-20261024:slutt -->
+
 <!-- helikopter178-forfaser1990-1994:start -->
 ## Helikopterfaser og verifiserte pakker 3733, 2026-10-24 01:57
 
