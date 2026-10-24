@@ -1,0 +1,115 @@
+from pathlib import Path
+from collections import defaultdict
+from datetime import datetime, timezone
+from PIL import Image, ImageDraw
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+import numpy as np, json, hashlib
+
+P=Path('/home/tom/Sam-Max-HD'); A=P/'work/.gpt-gren'; O=Path(__file__).resolve().parent; R=A/'rapporter'/O.name
+V=R/'egen-kurverens';V.mkdir(exist_ok=False)
+F=R/'native/costume178_1990_hd.png';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert sha(F)=='14b33cc93dcc56f643b72bcd5688b7fec4bf8a36b4d2e73a05bbc05461c5962c'
+opened=[];original_open=Image.open
+def own_open(fp,*a,**kw):
+ p=Path(fp).resolve();assert p==F.resolve(),str(p);opened.append(str(p));return original_open(fp,*a,**kw)
+Image.open=own_open
+try:
+ own=np.array(Image.open(F).convert('RGBA'))
+ palette=np.array(json.loads((R/'egen-konturvask/rens.json').read_text())['proever'][0]['egen_palette'],np.uint8)
+ core=own[:,:,3]>=128;labels=np.full(core.shape,-1,int)
+ _,labels[core]=cKDTree(palette.astype(float)).query(own[core,:3].astype(float))
+ _,nearest=nd.distance_transform_edt(~core,return_indices=True)
+ filled=labels[tuple(nearest)]
+
+ def loops(mask):
+  # Boundaries of OUR generated colour regions; no original mask is available.
+  h,w=mask.shape;pad=np.pad(mask,1);edges=defaultdict(list)
+  for y,x in zip(*np.nonzero(mask)):
+   if not pad[y,x+1]:edges[(x,y)].append((x+1,y))
+   if not pad[y+1,x+2]:edges[(x+1,y)].append((x+1,y+1))
+   if not pad[y+2,x+1]:edges[(x+1,y+1)].append((x,y+1))
+   if not pad[y+1,x]:edges[(x,y+1)].append((x,y))
+  dirs={(1,0):0,(0,1):1,(-1,0):2,(0,-1):3};result=[]
+  while edges:
+   start=next(iter(edges));cur=start;previous=None;points=[]
+   while True:
+    points.append(cur);candidates=edges[cur]
+    if previous is None:nxt=candidates[0]
+    else:
+     old=dirs[(cur[0]-previous[0],cur[1]-previous[1])]
+     def priority(p):
+      new=dirs[(p[0]-cur[0],p[1]-cur[1])];return {1:0,0:1,3:2,2:3}[(new-old)%4]
+     nxt=min(candidates,key=priority)
+    candidates.remove(nxt)
+    if not candidates:del edges[cur]
+    previous,cur=cur,nxt
+    if cur==start:break
+   result.append(np.array(points,float))
+  return result
+
+ def area(p):return .5*np.sum(p[:,0]*np.roll(p[:,1],-1)-p[:,1]*np.roll(p[:,0],-1))
+ def rdp(p,eps):
+  if len(p)<3:return p
+  v=p[-1]-p[0];den=v@v
+  if den==0:dist=np.linalg.norm(p-p[0],axis=1)
+  else:
+   t=np.clip(((p-p[0])@v)/den,0,1);dist=np.linalg.norm(p-(p[0]+t[:,None]*v),axis=1)
+  i=int(np.argmax(dist))
+  if dist[i]<=eps:return p[[0,-1]]
+  return np.vstack([rdp(p[:i+1],eps)[:-1],rdp(p[i:],eps)])
+ def simplify(p,eps):
+  prev=np.roll(p,1,axis=0);nxt=np.roll(p,-1,axis=0)
+  cross=(p[:,0]-prev[:,0])*(nxt[:,1]-p[:,1])-(p[:,1]-prev[:,1])*(nxt[:,0]-p[:,0])
+  p=p[cross!=0]
+  if len(p)<4:return p
+  j=int(np.argmax(np.linalg.norm(p-p[0],axis=1)))
+  q=np.vstack([rdp(p[:j+1],eps)[:-1],rdp(np.vstack([p[j:],p[0]]),eps)[:-1]])
+  if len(q)<3 or area(q)*area(p)<=0 or abs(area(q))<abs(area(p))*.4:return p
+  return q
+ def rounded(p,radius):
+  out=[]
+  for i,a in enumerate(p):
+   before=p[i-1]-a;after=p[(i+1)%len(p)]-a
+   b,c=np.linalg.norm(before),np.linalg.norm(after)
+   r=min(radius,b*.25,c*.25)
+   x,y=a+before*r/b,a+after*r/c
+   for t in np.linspace(0,1,7):out.append((1-t)**2*x+2*(1-t)*t*a+t*t*y)
+  return np.array(out)
+ def render(paths,eps,radius,scale):
+  im=Image.new('L',(own.shape[1]*scale,own.shape[0]*scale));draw=ImageDraw.Draw(im)
+  for p in sorted(paths,key=lambda p:abs(area(p)),reverse=True):
+   q=rounded(simplify(p,eps),radius);pts=[tuple(v*scale-.5)for v in q]
+   draw.polygon(pts,fill=255 if area(p)>0 else 0)
+  return np.array(im).astype(float)/255
+
+ paths=[loops(labels==i)for i in range(len(palette))];alpha_paths=loops(core)
+ metadata=[];scale=4
+ for name,eps,radius,ink in [('e16-r07',1.6,.7,False),('e16-r07-strek',1.6,.7,True),('e22-r09-strek',2.2,.9,True)]:
+  D=V/name;D.mkdir();total=np.zeros((own.shape[0]*scale,own.shape[1]*scale));rgb=np.zeros(total.shape+(3,))
+  for i,pp in enumerate(paths):
+   cov=render(pp,eps,radius,scale);total+=cov;rgb+=cov[:,:,None]*palette[i]
+  fallback=np.repeat(np.repeat(palette[filled],scale,0),scale,1)
+  out=np.divide(rgb,total[:,:,None],out=fallback.astype(float),where=total[:,:,None]>0)
+  alpha=render(alpha_paths,eps,radius,scale)
+  if ink:
+   dist=nd.distance_transform_edt(alpha>=.5)/scale
+   amount=np.clip((.8-dist)*scale+.5,0,1);out*=1-amount[:,:,None]
+  arr=np.dstack([out,alpha*255]).clip(0,255).astype(np.uint8)
+  hi=Image.fromarray(arr);im=hi.resize((own.shape[1],own.shape[0]),Image.Resampling.LANCZOS)
+  pad=Image.new('RGBA',(368,216));pad.alpha_composite(im,(24,24));pad.save(D/'prototype-helplassering.png')
+  metadata.append(dict(variant=name,epsilon_native_HD=eps,egen_hjorneradius_native_HD=radius,egen_ytre_kontur_renset=ink,
+                       originaler_i_produksjonen=0,egen_alpha_omtegnet_fra_egne_konturer=True,PNG_SHA256=sha(D/'prototype-helplassering.png')))
+ proof=dict(utc=datetime.now(timezone.utc).isoformat(),egen_input=str(F),egen_input_SHA256=sha(F),produksjonsbilder_aapnet=opened,
+            metode='Samme polygonforenkling og hjørnerunding på alle egne farge- og alfakonturer. Kun egne tidligere genererte RGBA, egen oppskriftspalett og kildeavledet gammel helplassering. Hull følges fra egne løkker. Ingen originalbilde eller originalmaske er tilgjengelig under produksjonen.',
+            egne_raabilder_opphav=['H213','H215','H216','H218','H219','H220','H221','H222'],nye_bildekall=0,nytt_resultat_png=False,
+            maalet_368x216_padding8_er_kildeavledet_metadata=True,egen_ekstra_kontur_avledet_fra_egen_alfa=True,prøver=metadata,
+            native_mottatt=False,motorobservert=False,publisert=False,egen_stilvurdering_bestatt=False)
+ (V/'rens.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n')
+finally:Image.open=original_open
+(R/'rens-egne-polygonkonturer.py.txt').write_bytes(Path(__file__).read_bytes())
+board=Image.new('RGB',(368*3,246),'#87959e');draw=ImageDraw.Draw(board)
+for i,e in enumerate(metadata):
+ im=Image.open(V/e['variant']/'prototype-helplassering.png').convert('RGBA');board.paste(im,(i*368,30),im);draw.text((i*368+8,8),e['variant'],fill='black')
+board.save(V/'konturproever-native.png')
+print(metadata)

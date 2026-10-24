@@ -1,0 +1,37 @@
+from pathlib import Path
+from PIL import Image
+from io import BytesIO
+from smhd.myk import _premul_resize
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name
+files={c:R/'kall'/c/'raa.png'for c in ['H260','H261','H262','H263']}
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+opened=[];real_open=Image.open
+def guarded(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in [v.resolve()for v in files.values()],str(p);opened.append(str(p));return real_open(fp,*a,**kw)
+Image.open=guarded
+try:
+ raw={c:np.array(Image.open(f).convert('RGBA'))for c,f in files.items()};a=raw['H260'];rgb=a[:,:,:3].astype(float);r,g,b=np.moveaxis(rgb,2,0)
+ sample=(a[:,:,3]>=128)&(r>1.3*g)&(g>1.4*b)&(r>40);median=np.median(rgb[sample],axis=0);gain=np.array([115.,59.,11.])/median;gain[2]=np.clip(gain[2],.8,1.2)
+ weight=np.clip((r-g)/30,0,1)*np.clip((g-b)/25,0,1)*np.clip((r-35)/25,0,1)
+ gold=np.clip((r-195)/35,0,1);gold=gold*gold*(3-2*gold);warm=np.clip((g/(r+1)-.49)/.06,0,1);warm=warm*warm*(3-2*warm);weight*=1-gold*warm
+ out=a.copy();out[:,:,:3]=np.clip(np.rint(rgb+(rgb*gain-rgb)*weight[:,:,None]),0,255).astype(np.uint8);out[out[:,:,3]==0,:3]=0
+ stages=[]
+ for cid,box in [('H261',[85,342,635,545]),('H262',[535,551,828,663]),('H263',[665,455,1195,590])]:
+  x,y,X,Y=box;H,W=Y-y,X-x;yy,xx=np.indices((H,W));e=np.minimum.reduce([xx,yy,W-1-xx,H-1-yy]);t=np.clip(e/8,0,1);w=t*t*(3-2*t)
+  aa=out[y:Y,x:X].astype(float)/255;bb=raw[cid][y:Y,x:X].astype(float)/255;al=aa[:,:,3]*(1-w)+bb[:,:,3]*w
+  pre=aa[:,:,:3]*aa[:,:,3,None]*(1-w[:,:,None])+bb[:,:,:3]*bb[:,:,3,None]*w[:,:,None];col=np.divide(pre,al[:,:,None],out=np.zeros_like(pre),where=al[:,:,None]>0)
+  old=out.copy();out[y:Y,x:X]=np.uint8(np.clip(np.rint(np.dstack((col,al))*255),0,255));outside=np.ones(out.shape[:2],bool);outside[y:Y,x:X]=False;assert np.array_equal(old[outside],out[outside]);stages.append(dict(kall=cid,egen_ROI=box,egen_feather=8,utenfor_egen_ROI_byteidentisk=True))
+ buf=BytesIO();Image.fromarray(out).save(buf,format='PNG');pngsha=hashlib.sha256(buf.getvalue()).hexdigest();rgbasha=hashlib.sha256(out.tobytes()).hexdigest()
+ q=json.loads((R/'kall/H263/samlet-hoeyreblad/kontroll.json').read_text());clean=out.copy();clean[clean[:,:,3]<8]=0
+ sx,sy=q['hel_skala'];scaled=_premul_resize(clean,(round(clean.shape[1]*sx),round(clean.shape[0]*sy)))
+ # Original dimensions and the fixed whole fitting are metadata, not original pixels.
+ W,H=(72+2*q['margx'])*4,(36+2*q['margy'])*4;native=np.zeros((H,W,4),np.uint8)
+ px,py=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];nh,nw=scaled.shape[:2]
+ x0,y0=max(px,0),max(py,0);x1,y1=min(px+nw,W),min(py+nh,H);native[y0:y1,x0:x1]=scaled[y0-py:y1-py,x0-px:x1-px]
+ nb=BytesIO();Image.fromarray(native).save(nb,format='PNG');nsha=hashlib.sha256(nb.getvalue()).hexdigest()
+finally:Image.open=real_open
+expected=R/'kall/H263/samlet-hoeyreblad/egen-heltegning.png';assert pngsha==sha(expected) and np.array_equal(out,np.array(Image.open(expected).convert('RGBA')))
+nf=expected.with_name('prototype-under-kontroll.png');assert nsha==sha(nf) and np.array_equal(native,np.array(Image.open(nf).convert('RGBA')))
+proof=dict(produksjonsbilder_aapnet=opened,kun_egne_fire_raabilder=True,opprinnelige_bilder_eller_masker_aapnet=0,raa_SHA256={c:sha(f)for c,f in files.items()},kanonisk_brun_RGB_og_faste_ROI_er_metadata=True,steg=stages,PNG_SHA256=pngsha,RGBA_SHA256=rgbasha,PNG_og_RGBA_byteeksakt=True,native_PNG_SHA256=nsha,native_RGBA_SHA256=hashlib.sha256(native.tobytes()).hexdigest(),native_PNG_og_RGBA_byteeksakt=True,native_helplassering_fra_fast_metadata_uten_originalbilde=True,laget_ekstra_fullkopi=False,native_mottatt=False,publisert=False)
+(R/'replay-retur1987.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'replay-retur1987.py.txt').write_bytes(Path(__file__).read_bytes());print('Byteeksakt replay fra fire egne råbilder, ingen originaler eller originalmasker åpnet.')

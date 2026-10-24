@@ -1,0 +1,50 @@
+from pathlib import Path
+from datetime import datetime, timezone
+from PIL import Image,ImageDraw
+from scipy import ndimage as nd
+import numpy as np,json,hashlib,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+calls=read(R/'faktiske-bildekall.json');assert len(calls)==88 and [e['kall']for e in calls]==[f'H{n}'for n in range(176,264)]
+entries=[]
+for cid in [f'H{n}'for n in range(259,264)]:
+ K=R/'kall'/cid;p=read(K/'plan.json');args=read(K/'argumenter.json');e=next(v for v in calls if v['kall']==cid)
+ assert p['utfort'] and sha(K/'raa.png')==p['raa_sha256']==e['raa_sha256']
+ assert sha(K/'prompt-brukt.txt')==e['prompt_sha256'] and sha(K/'argumenter.json')==e['argumenter_sha256']
+ assert (K/'prompt-brukt.txt').read_text()==args['prompt']+'\n'
+ for f,h in p['referanser_SHA256'].items():assert sha(Path(f))==h,f
+ a=np.array(Image.open(K/'raa.png').convert('RGBA'));al=a[:,:,3];e['gruppe']='konkret-faseretur1987'
+ entry=dict(kall=cid,rute=1987,raa_SHA256=sha(K/'raa.png'),prompt_SHA256=e['prompt_sha256'],argumenter_SHA256=e['argumenter_sha256'],maal=list(a.shape[1::-1]),alfa0=int((al==0).sum()),alfa255=int((al==255).sum()),myk_alfa=int(((al>0)&(al<255)).sum()),laget=True,raa_visuelt_sett=True,egenkontroll_bestatt=False,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False)
+ assert min(entry[k]for k in ['alfa0','alfa255','myk_alfa'])>0
+ entries.append(entry);put(K/'raa-kontroll.json',entry)
+put(R/'faktiske-bildekall.json',calls)
+variants=['H259/samlet-halefelt','H260/samlet-sidefelt','H260/global-brunt','H261/samlet-venstreblad','H262/samlet-vindusfelt','H263/samlet-hoeyreblad']
+for v in variants:
+ K=R/'kall'/v;p=read(K/'plan.json');p={k:p[k]for k in ['rute','jobb','kilde_mappe','kilde_RGBA_SHA256']if k in p};p.update(egen_variant=v,nytt_bildekall=False,faktisk_opphav_kall=v.split('/')[0]);put(K/'plan.json',p)
+ q=read(K/'kontroll.json');q.update(status='RETUR_FORM_OG_MATERIALER',egen_stilvurdering_bestatt=False,native_mottatt=False,publisert=False);put(K/'kontroll.json',q)
+
+curves=[]
+for folder in ['egen-kurverens','egen-kurverens-storre']:
+ for qf in sorted((R/folder).glob('*/kontroll.json')):
+  q=read(qf);q.update(visuelt_sett=True,egen_stilvurdering_bestatt=False,status='RETUR_KNEKK_OG_UNDERSTELL',retur='Rensingen gir fortsatt trappepreg eller spisse knekk/forenklet understell. Sterkeste variant mister også ett brunt og to grønne materialfester. Ingen valgt stilforbedring.');put(qf,q);curves.append(dict(variant=str(qf.parent.relative_to(R)),PNG_SHA256=q['prototype_SHA256'],formfeil=q['alfa_fester_over3HD'],apningsfeil=q['apninger_over3HD'],materialer=q['materialer'],visuelt_sett=True,egen_stilvurdering_bestatt=False))
+assert len(curves)==6
+
+S=A/'rapporter/helikopter178-forfaser1995til1999-20261023/kilder-neste/1987';src=np.array(Image.open(S/'original-1x.png').convert('RGBA'));W,H=352,208
+ref=np.zeros((H,W,4),np.uint8);ref[32:176,32:320]=np.repeat(np.repeat(src,4,0),4,1)
+items=[('Original, bare kontroll',ref)]
+for v in ['H257','H259/samlet-halefelt','H260/samlet-sidefelt','H260/global-brunt','H261/samlet-venstreblad','H262/samlet-vindusfelt','H263/samlet-hoeyreblad']:
+ K=R/'kall'/v;q=read(K/'kontroll.json');im=Image.open(K/'prototype-under-kontroll.png').convert('RGBA');can=Image.new('RGBA',(W,H));can.alpha_composite(im,(32-q['margx']*4,32-q['margy']*4));items.append((v,np.array(can)))
+board=Image.new('RGB',(W*3,(H+32)*3),'#87959e');draw=ImageDraw.Draw(board)
+for i,(title,arr)in enumerate(items):
+ x=(i%3)*W;y=(i//3)*(H+32);im=Image.fromarray(arr);board.paste(im,(x,y+32),im);draw.text((x+8,y+8),title,fill='black')
+board.save(R/'retur1987-native-forloep.png')
+K=R/'kall/H263/samlet-hoeyreblad';q=read(K/'kontroll.json');mat=read(K/'hele-materialer-kontroll.json');z=np.array(Image.open(K/'prototype-helplassering.png').convert('RGBA'));core=z[:,:,3]>=128;mx,my=q['margx']*4,q['margy']*4;oy,ox=np.nonzero(src[:,:,3]>0);dist=nd.distance_transform_edt(~core)[my+oy*4+2,mx+ox*4+2]
+diag=dict(egen_variant='H263/samlet-hoeyreblad',rute=1987,alfa_feil_kildepunkter_1x=np.column_stack([ox[dist>3],oy[dist>3]]).tolist(),materialer=mat['materialer'],metode='Bare lesekontroll, ikke produksjon eller tillatelse til å male kildepiksler.',alle_22_fargediagnoser='kall/H263/samlet-hoeyreblad/kontroll.json')
+put(R/'retur1987-avvik-kildepunkter.json',diag)
+put(R/'rutekart-retur1987.json',dict(utc=datetime.now(timezone.utc).isoformat(),jobb='fig178_02',nye_bildekall=5,faktiske_bildekall_totalt=88,leveranser=[],raa=entries,egen_variant_sist_arbeidet='H263/samlet-hoeyreblad',egen_variant_sha256=sha(K/'egen-heltegning.png'),native_proeve_sha256=sha(K/'prototype-under-kontroll.png'),native_marg_originalpiksler=[q['margx'],q['margy']],hel_skala=q['hel_skala'],hel_flytt=q['flytt'],snitt_union=q['snitt_union'],dekning=q['dekning'],alfa_fester_over3HD=q['alfa_fester_over3HD'],apninger_over3HD=q['apninger_over3HD'],fargefester_over3HD=sum(e['native_fester_over3HD']for e in q['farger']),ekstra_fargeklassepiksler_over3HD=sum(e['ekstra_paletteklassifiserte_nativepiksler_over3HD']for e in q['farger']),materialer=mat['materialer'],egen_kurverens_seks_returer=curves,native_mottatt=False,motorobservert=False,publisert=False,Tom_godkjent=False,Claude_godkjent=False))
+expected=read(O/'kandidat3733-filhash.json');actual={str(f.relative_to(P/'mods/gpt')):sha(f)for f in(P/'mods/gpt').rglob('*')if f.is_file()};assert actual==expected and len(actual)==21978
+remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/hd-mod'],cwd=P,text=True).split()[0];assert remote=='c80099158b30fb08fa0cb670acb112bf14fd58f4'
+old=read(O/'konturvask-fire-release-metadata.json');new=read(O/'retur1987-release-metadata.json');assets=lambda d:sorted([{k:a[k]for k in ['id','name','size','digest']}for a in d['assets']],key=lambda e:e['id']);assert old['id']==new['id'] and assets(old)==assets(new)
+put(R/'retur1987-mod-pakker-uendret.json',dict(utc=datetime.now(timezone.utc).isoformat(),hd_mod=remote,aktive_modfilhash_bekreftet=21978,tidligere_faktisk_hentet_fullmanifest_bekreftet=True,fjern_SHA_bekreftet=True,nye_kandidater=0,nye_motoravspillinger=0,nye_pakker=0,nye_arkivnedlastinger=0,nye_slettinger=0,release_id=new['id'],release_url=new['html_url'],releasevedlegg_uendret=assets(new),tidligere_faktiske_pakkekontroller_gjelder=True,ny_faktisk_pakkenedlasting=False))
+(R/'samle-retur1987.py.txt').write_bytes(Path(__file__).read_bytes());print('88 faktiske kall; fem nye råkall og seks rene renseforsøk. Ingen nye native, kandidat eller motor. Alle21978 modhash og fire releasevedlegg uendret.')
