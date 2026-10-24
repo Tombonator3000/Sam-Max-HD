@@ -1,0 +1,34 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from datetime import datetime,timezone
+import hashlib,json,gzip,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+notes={
+'H236':'De tre kildebekreftede graa kroppsidegruppene er atskilt, men den minste blir en omrisset rund knott. Fortsatt feil lys krage paa fremre landingsstoette og under hovednavet. To smaa olivenfelt paa venstre blad forsvinner.',
+'H237':'Fremre/hoyre stoetteskjot er morknet. Bakre/venstre lille graa felt er bevart. Hel affin plassering kan gi null alfa-/aapningsfeil, men oppdiktet graa hovednavkrage og manglende olivenfelt staar igjen.',
+'H238':'To smaa olivenfelt paa venstre hovedblad er gjenopprettet som flate felt. Hovednavet har fortsatt en oppdiktet lys graa krage. Kildekontrollen finner ogsaa smaafelt- og aapningsavvik.',
+'H239':'Oppdiktet lys graa krage under svart hovedrotornav er fjernet. Brun/gyllen topp moetes direkte med navet, og kildebekreftet graa diagonal bak/venstre er bevart. Fortsatt to aapningsfeil og feil/manglende smaa grå/grønne materialfelt. Videre redigeringsutgangspunkt, ikke godkjent stilanker.',
+'H240':'Forsøk paa smalere graa halerotor og underside av hoyre hovedblad gir fortsatt to aapningsfeil etter hel affine plassering og flere materialavvik enn H239. Hele figuren er bevart. Ikke valgt fremfor H239.',
+'H241':'Tettere heltegning og original i lik maalestokk forlenger den graa stripen under venstre hovedblad, men den minste kroppsideflekken er fortsatt omrisset og rund. Fem aapningsfeil etter hel affine plassering. Ikke valgt fremfor H239.'}
+variants={'H236':'global-brunkalibrering-v2','H237':'global-brun-og-gront/samlet-affin','H238':'global-brun-og-gront/samlet-affin','H239':'global-brun-og-gront/samlet-affin','H240':'global-brun-og-gront/samlet-affin-utvidet','H241':'global-brun-og-gront/samlet-affin-utvidet'}
+ledger=read(R/'faktiske-bildekall.json');assert len(ledger)==66 and len({e['kall']for e in ledger})==66
+rows=[];board=Image.new('RGB',(1400,840),'#304050');d=ImageDraw.Draw(board)
+for i,(cid,reason)in enumerate(notes.items()):
+ K=R/'kall'/cid;plan=read(K/'plan.json');e=next(z for z in ledger if z['kall']==cid);args=read(K/'argumenter.json');assert args['prompt']+'\n'==(K/'prompt-brukt.txt').read_text();assert sha(K/'raa.png')==plan['raa_sha256']==e['raa_sha256'];assert sha(K/'argumenter.json')==e['argumenter_sha256'];assert sha(K/'prompt-brukt.txt')==e['prompt_sha256'];assert plan['utfort'] and plan['rute']==1990
+ for p,h in plan['referanser_SHA256'].items():assert sha(Path(p))==h,p
+ V=K/variants[cid];aff='samlet-affin' in str(V);q=read(V/('kontroll.json'if aff else'hele-materialer-kontroll.json'));native=V/'prototype-helplassering.png';assert not q['materialporter_bestatt'];im=Image.open(native).convert('RGBA');bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);bg=bg.resize((bg.width*2,bg.height*2),Image.Resampling.NEAREST);bg.thumbnail((680,230),Image.Resampling.LANCZOS);x,y=10+(i%2)*700,36+(i//2)*280;board.paste(bg.convert('RGB'),(x,y));d.text((x,y-24),f'{cid} 1990 RETUR alfa{q["alfa_fester_over3HD"]} hull{q["apninger_over3HD"]}',fill='white')
+ row=dict(kall=cid,rute=1990,raa_SHA256=e['raa_sha256'],prompt_SHA256=e['prompt_sha256'],argumenter_SHA256=e['argumenter_sha256'],variant=str(V.relative_to(R)),prototype_fil=str(native.relative_to(R)),prototype_SHA256=sha(native),alfa_fester_over3HD=q['alfa_fester_over3HD'],apninger_over3HD=q['apninger_over3HD'],snitt_union=q['snitt_union'],materialfester_over3HD=sum(z['fester_over3HD']for z in q['materialer']),ekstra_materialklassepiksler_over3HD=sum(z['ekstra_piksler_over3HD']for z in q['materialer']),laget=True,egenkontroll_utfort=True,egenkontroll_bestatt=False,visuelt_sett=False,native_mottatt=False,motorobservert=cid=='H239',publisert=False,Tom_godkjent=False,Claude_godkjent=False,returgrunn=reason);rows.append(row)
+ (K/'notat.md').write_text(f'''# {cid}: detaljretting av helikopterfase1990
+
+Laget med innebygd image_gen 24. oktober 2026. Verktøyet oppga ikke separat modellnavn. Faktisk prompt, argumenter og urørt råbilde er bevart. Rå SHA256 {e['raa_sha256']}. Originalen i spillkontekst og godkjent hovedark/sam.png ble sett før motivet. Dette er et forsøk innen samme stilretur, ikke en ny hel figurjobb.
+
+{reason}
+
+Kontrollert variant: {row['variant']}. Prototype SHA256 {row['prototype_SHA256']}. Alle tre grenseverdier forblir 3 HD-piksler; de 21 opprinnelige fargeklassene er fortsatt egne diagnoser. Tilleggsdiagnosen grupperer bare skyggetoner innen samme materiale. Nærmeste RGB-klasse kan tolke mørk ny konturstrek som oliven; slike ekstratall alene er ikke bevis på nye objekter. Alle tall beholdes, og prøven er ikke godkjent.
+
+Bare hele egen tegning er skalert/flyttet samlet. H237..H241 har i tillegg global kalibrering av egne grønne RGB-farger. Kalibreringen bruker ikke kildekoordinater og endrer ikke alfa. Se rens.json. Ingen harde originalmasker, originale produksjonspiksler, lokal kildebasert fargepåmaling eller delvis trekkflytting. Kontrastguider og kildeutsnitt er bare referanser. H240s planlagte grønne forklaring ble rettet FØR bildekallet, etter RGB-probe av den grå halerotoren. Den faktisk brukte prompten er den korrigerte.
+
+Laget, egenkontroll utført og ikke bestått. Visuell tavlekontroll føres i detaljproever-kontroll.json. Native mottak: nei. Motorprøve av denne varianten: {'H239 som holdt WebP-prototype, se rettet-H239-motor-kontroll.json'if cid=='H239'else'nei'}. Publisert: nei. Ingen Tom-/Claude-godkjenning. Råbilde og tidligere publiserte modfiler beholdes.
+''')
+board.save(R/'detaljproever-seks-native.png');put(R/'detaljproever-kontroll.json',dict(utc=datetime.now(timezone.utc).isoformat(),nye_faktiske_bildekall=6,bunke_faktiske_bildekall=66,unike_nye_faser=0,fase_som_rettes=1990,innebygd_image_gen=True,CLI_API_fallback=False,alle_raa_prompt_argumenter_og_referansehash_kontrollert=True,modellkvote_eller_bildeverktoyfeil=False,alle_holdt_utenfor_publisert_mod=True,visuelt_sett=False,rader=rows));put(R/'rutekart-detaljproever.json',dict(type='PROTOTYPER_IKKE_NATIVEMOTTAK',jobb='fig178_02',rute=1990,proever=rows,ingen_nye_native=True,publisert_rutekart_endret=False));(R/'samle-detaljproever.py.txt').write_bytes(Path(__file__).read_bytes());print([(z['kall'],z['alfa_fester_over3HD'],z['apninger_over3HD'],z['materialfester_over3HD'])for z in rows])
