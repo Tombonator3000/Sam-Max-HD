@@ -1,3 +1,11 @@
+# Nyeste status: blad-vindusramme1987
+
+103 faktiske kall etter ti nye H269..H278 for fase 1987. H270/utsnitt-egenbbox er rent arbeidskontrollpunkt med fem forbedrede grå fester, null form-/åpningsfeil og fortsatt 19 positive materialavvik. Fire egne råbilder gir byteeksakt replay av egen heltegning og nativeprøve. Vindusreturene, ufullstendig rad 15-guide rettet til rad 14 og to egne refleksrenseprøver er dokumentert. H278s lavere materialtall og gjenopprettede refleksporter overstyrer ikke synlige delskjøter eller tapte/for store små felt. Ingen nye hele jobber, native mottak, motor eller publiserte mod-/pakkebyte. Fortsatt 3733 native og 508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md, vindusramme1987-status.md og vindusramme1987-avvik-kildepunkter.json. H279 er ikke startet; Sam er eneste stilanker; automatikken ACTIVE.
+
+Se vindusramme1987-status.md og rutekart-vindusramme1987.json.
+
+## Historisk status før H269..H278
+
 # Nyeste status: gråfelt1987
 
 93 faktiske kall etter fem nye H264..H268 for fase 1987. H264s runde kodeøyer og H265s trappede gråoverlay er avvist. H266 nytegner hele eget motiv; H267 retter halehette/-bøy og H268 små vindusfelt. Bare H268s vindusrektangel beholdes, ikke det endrede understellet. H268/hel-affin-kontroll har null form-/åpningsfeil ved uendrede porter, men 24 positive materialavvik og ekstra klassepiksler gjenstår. Tre egne råbilder gir byteeksakt replay av egen heltegning og nativeprøve. Ingen nye hele jobber, native mottak, motor eller publiserte mod-/pakkebyte. Fortsatt 3733 native og 508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md, graaplan1987-status.md og graaplan1987-avvik-kildepunkter.json. H269 er ikke startet. Sam er eneste stilanker; automatikken ACTIVE.

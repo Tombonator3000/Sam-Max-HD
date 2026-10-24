@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image
+from io import BytesIO
+from smhd.myk import _premul_resize
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name;files={c:R/'kall'/c/'raa.png'for c in ['H266','H267','H268','H270']};K=R/'kall/H270/utsnitt-egenbbox';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+opened=[];realopen=Image.open
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in [f.resolve()for f in files.values()],str(p);opened.append(str(p));return realopen(fp,*a,**kw)
+def pngsha(a):
+ b=BytesIO();Image.fromarray(a).save(b,format='PNG');return hashlib.sha256(b.getvalue()).hexdigest()
+def brown(a):
+ rgb=a[:,:,:3].astype(float);r,g,b=np.moveaxis(rgb,2,0);sample=(a[:,:,3]>=128)&(r>1.3*g)&(g>1.4*b)&(r>40);med=np.median(rgb[sample],axis=0);gain=np.array([115.,59.,11.])/med;gain[2]=np.clip(gain[2],.8,1.2);w=np.clip((r-g)/30,0,1)*np.clip((g-b)/25,0,1)*np.clip((r-35)/25,0,1);gold=np.clip((r-195)/35,0,1);gold=gold*gold*(3-2*gold);warm=np.clip((g/(r+1)-.49)/.06,0,1);warm=warm*warm*(3-2*warm);w*=1-gold*warm;out=a.copy();out[:,:,:3]=np.uint8(np.clip(np.rint(rgb+(rgb*gain-rgb)*w[:,:,None]),0,255));out[out[:,:,3]==0,:3]=0;assert np.array_equal(out[:,:,3],a[:,:,3]);return out
+def blend(base,new,box,feather,full=False):
+ x,y,X,Y=box;H,W=Y-y,X-x;yy,xx=np.indices((H,W));edge=np.minimum.reduce([xx,yy,W-1-xx,H-1-yy]);t=np.clip(edge/feather,0,1);w=t*t*(3-2*t);aa=base[y:Y,x:X].astype(float)/255;bb=(new[y:Y,x:X]if full else np.array(Image.fromarray(new).resize((W,H),Image.Resampling.LANCZOS))).astype(float)/255;al=aa[:,:,3]*(1-w)+bb[:,:,3]*w;pre=aa[:,:,:3]*aa[:,:,3,None]*(1-w[:,:,None])+bb[:,:,:3]*bb[:,:,3,None]*w[:,:,None];rgb=np.divide(pre,al[:,:,None],out=np.zeros_like(pre),where=al[:,:,None]>0);out=base.copy();out[y:Y,x:X]=np.uint8(np.clip(np.rint(np.dstack((rgb,al))*255),0,255));outside=np.ones(base.shape[:2],bool);outside[y:Y,x:X]=False;assert np.array_equal(out[outside],base[outside]);return out
+Image.open=guard
+try:
+ raw={c:np.array(Image.open(f).convert('RGBA'))for c,f in files.items()};b266=brown(raw['H266']);b267=blend(b266,brown(raw['H267']),[330,590,560,820],16);b268=blend(b267,brown(raw['H268']),[525,545,845,865],16);own=blend(b267,b268,[525,570,845,710],16,True)
+ stages=[dict(variant=v,PNG_SHA256=pngsha(a),byteeksakt=pngsha(a)==sha(R/'kall'/v/'egen-heltegning.png'))for v,a in [('H266/global-brunt',b266),('H267/utsnitt-sammensatt',b267),('H268/utsnitt-sammensatt',b268),('H268/bare-vindu',own)]];assert all(e['byteeksakt']for e in stages),stages
+ d=read(K/'rens.json');part=raw['H270'];ssx,ssy=d['egen_hel_skala'];ppx,ppy=d['egen_hel_flytt'];xx,yy,XX,YY=d['egen_ROI'];HH,WW=YY-yy,XX-xx;scaledpart=_premul_resize(part,(round(part.shape[1]*ssx),round(part.shape[0]*ssy)));tile=np.zeros((HH,WW,4),np.uint8);tx0,ty0=max(ppx,0),max(ppy,0);tx1,ty1=min(ppx+scaledpart.shape[1],WW),min(ppy+scaledpart.shape[0],HH);tile[ty0:ty1,tx0:tx1]=scaledpart[ty0-ppy:ty1-ppy,tx0-ppx:tx1-ppx];placed=own.copy();placed[yy:YY,xx:XX]=tile;own=blend(own,placed,d['egen_ROI'],16,True);stages.append(dict(variant='H270/utsnitt-egenbbox',PNG_SHA256=pngsha(own),byteeksakt=pngsha(own)==sha(K/'egen-heltegning.png')));assert stages[-1]['byteeksakt']
+ q=read(K/'kontroll.json');sx,sy=q['hel_skala'];clean=own.copy();clean[clean[:,:,3]<8]=0;scaled=_premul_resize(clean,(round(clean.shape[1]*sx),round(clean.shape[0]*sy)));W,H=(72+q['margx']*2)*4,(36+q['margy']*2)*4;native=np.zeros((H,W,4),np.uint8);px,py=q['margx']*4+q['flytt'][0],q['margy']*4+q['flytt'][1];x0,y0=max(px,0),max(py,0);x1,y1=min(px+scaled.shape[1],W),min(py+scaled.shape[0],H);native[y0:y1,x0:x1]=scaled[y0-py:y1-py,x0-px:x1-px];assert pngsha(native)==sha(K/'prototype-under-kontroll.png')
+finally:Image.open=realopen
+assert np.array_equal(own,np.array(Image.open(K/'egen-heltegning.png').convert('RGBA')));assert np.array_equal(native,np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA')))
+proof=dict(produksjonsbilder_aapnet=opened,kun_egne_fire_raabilder=True,opprinnelige_bilder_eller_masker_aapnet=0,raa_SHA256={c:sha(f)for c,f in files.items()},kanonisk_brun_RGB_egne_ROI_og_fast_helplassering_er_metadata=True,steg=stages,egen_heltegning_PNG_SHA256=pngsha(own),egen_heltegning_RGBA_SHA256=hashlib.sha256(own.tobytes()).hexdigest(),egen_heltegning_PNG_og_RGBA_byteeksakt=True,native_PNG_SHA256=pngsha(native),native_RGBA_SHA256=hashlib.sha256(native.tobytes()).hexdigest(),native_PNG_og_RGBA_byteeksakt=True,H264_H265_og_nye_vindusproever_ingen_direkte_sluttpiksler=True,laget_ekstra_fullkopi=False,native_mottatt=False,motorobservert=False,publisert=False)
+(R/'replay-vindusramme1987.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'replay-vindusramme1987.py.txt').write_bytes(Path(__file__).read_bytes());print('Byteeksakt egen heltegning og native fra bare egne H266, H267, H268, H270. Ingen originaler åpnet under produksjonsreplay.')
