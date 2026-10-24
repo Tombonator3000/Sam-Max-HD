@@ -1,0 +1,11 @@
+# H246: helikopterfase1990, rotorretur
+
+Laget med innebygd image_gen 24. oktober 2026. Verktøyet oppga ikke separat modellnavn. Dette er et generert detaljutsnitt innen samme stilretur i fig178_02, ikke en ny hel figurjobb. Faktisk prompt, argumenter, referansehash og urørt råbilde er bevart. Originalen i spillkontekst og godkjent Sam-anker ble sett før motivet. Rå SHA256 d0f0c90f84f93617a6d49288d20d03bed9e7f412dfe618e26d47a1f2d2a769c1.
+
+Hoyre hovedblad er redigert separat, og dets EGEN alfakomponent er skilt fra den egne kroppsnaboen. Kropp/gulltopp og alle andre egne piksler utenfor bladunionen er bytebevart. Valgt H246 har null alfa-/aapningsfeil og snitt/union0.878. Fortsatt10graa,1brunt og5groenne materialfester over3HD, med ekstra klassepiksler. Holdt motorproeve, ikke teknisk eller visuell ferdiggodkjenning.
+
+Kontrollert variant: eget-blad-alfa/samlet-affin-utvidet. Nativeprototype SHA256: 4741534de3a21c1a9e27b26a3208949348e3610866798d06b0dc6f9e603685ce. Alle gamle og nye3HD-terskler er beholdt. 21-fargediagnoser er beholdt, og H246/frossen-parent246 maaler baade21klasser og seks materialgrupper paa byteidentisk valgt sluttgeometri. Ingen godkjenning paa telling eller form/alfa alene.
+
+Metoden for utsnitt er ny her: image_gen redigerer egne detaljer; hele egne naturlige utsnitt/alfakomponenter plasseres samlet tilbake i den egne heltegningen. Ingen originalpiksel, originalfragment eller hard originalmaske brukes som produksjonsgrafikk. Dette er ikke endring av enkeltpikslers kildefarger eller flytting av enkeltrekk. Se egne rens.json med eksakte ROI, helforskyvning, egen alfaseparasjon og sammenligning av nabopiksler. Brun-/grønnkalibrering bruker bare egne RGB med uendret alfa. Brunkalibrering er uttrykkelig hoppet over for H246/H247 fordi bladutsnittene ikke har en brun hovedflate. Eldre beskrivelser om at bare hele helikopteret flyttes gjelder de eldre prøvene.
+
+Laget og egenkontroll utført, fortsatt retur. Visuell tavlekontroll føres i rotorutsnitt-kontroll.json. Native mottak: nei. Motorprøve av valgt variant: ja, som holdt prototype, se rotorutsnitt-H246-motor-kontroll.json. Publisert: nei. Ingen Tom-/Claude-godkjenning. De seks nye prompter/raa er egne forsøk, ikke seks leverte figurjobber.

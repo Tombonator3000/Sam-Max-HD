@@ -1,0 +1,39 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import json,gzip,hashlib,os,shutil,subprocess
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;M=P/'mods/gpt';C=O/'rotorutsnitt-proeve3733';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+expected=json.loads(gzip.decompress((R/'rotorutsnitt-proeve-filhash.json.gz').read_bytes()));base=json.loads(gzip.decompress((R/'kandidat3733-filhash.json.gz').read_bytes()));actual={str(p.relative_to(C)):sha(p)for p in sorted(C.rglob('*'))if p.is_file()};assert actual==expected
+changed=[p for p in actual if actual[p]!=base[p]];assert len(changed)==3
+D=R/'rotorutsnitt-H246-beholdt';assert not D.exists();D.mkdir()
+for rel in changed:
+ t=D/rel;t.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(C/rel,t);assert sha(t)==expected[rel]
+old=[]
+for name in ['stilgrunnlag-start1-3733','stilproever-start1-3733','rettet-grunnlag-start1-3733','rettet-helproeve-start1-3733']:
+ old.extend(sorted((O/name).glob('*.png')))
+index={}
+for p in old:index.setdefault(sha(p),p)
+newfiles=[]
+for name in ['rotorutsnitt-grunnlag-start1-3733','rotorutsnitt-proeve-start1-3733']:newfiles.extend(sorted((O/name).glob('*.png')))
+rows=[];n=0
+for p in newfiles:
+ h=sha(p);sz=p.stat().st_size;key=index.get(h)
+ if key and p.stat().st_ino!=key.stat().st_ino:
+  assert p.read_bytes()==key.read_bytes();p.unlink();os.link(key,p);assert sha(p)==h;n+=1
+ else:index.setdefault(h,p)
+ rows.append(dict(fil=str(p),SHA256=h,bytes=sz,beholdt=str(index[h]),samme_inode=p.stat().st_ino==index[h].stat().st_ino))
+assert all(sha(Path(e['fil']))==e['SHA256']for e in rows)
+assert {str(p.relative_to(M)):sha(p)for p in sorted(M.rglob('*'))if p.is_file()}==base
+shutil.rmtree(C);assert not C.exists()
+assert {str(p.relative_to(M)):sha(p)for p in sorted(M.rglob('*'))if p.is_file()}==base
+for name in ['rotorutsnitt-kontroll.json','rutekart-rotorutsnitt.json']:
+ q=read(R/name);q['visuelt_sett']=True
+ for e in q.get('rader',q.get('proever',[])):e['visuelt_sett']=True
+ put(R/name,q)
+for cid in range(242,248):
+ K=R/'kall'/f'H{cid}'
+ for p in list(K.rglob('kontroll.json'))+list(K.rglob('hele-materialer-kontroll.json')):
+  q=read(p);q.update(visuelt_sett=True,motiv_og_smaaflater_godkjent=False,egen_stilvurdering_bestatt=False,native_mottatt=False,publisert=False,motorobservert=cid==246 and str(p.relative_to(K)) in ['eget-blad-alfa/samlet-affin-utvidet/kontroll.json','eget-blad-alfa/frossen-parent246/kontroll.json'],returgrunn=next(e['returgrunn']for e in read(R/'rotorutsnitt-kontroll.json')['rader']if e['kall']==f'H{cid}'));put(p,q)
+for name in ['rotorutsnitt-proeve3733.json','rotorutsnitt-H246-motor-kontroll.json']:
+ q=read(R/name);q['visuelt_sett']=True;q['prototype_ryddet']=True;put(R/name,q)
+put(R/'rotorutsnitt-rydding.json',dict(utc=datetime.now(timezone.utc).isoformat(),grunnlag_hd_mod='c80099158b30fb08fa0cb670acb112bf14fd58f4',midlertidig_fullkandidat_kontrollert_og_fjernet=True,kandidat_filhash_bekreftet=len(actual),beholdte_avvikende_stier=changed,beholdt_mappe=str(D.relative_to(A)),alle_aktive_modhash_byteidentiske_foer_og_etter=len(base),nye_motorPNG_stier=len(rows),nye_eksakte_kopier_hardlenket=n,alle_motorstier_og_hash_beholdt=True,bevis_fysisk_frigjorte_bytes_ikke_utledet_fra_logisk_sum=True,raa_unike_kilder_stilankre_og_stasher_ikke_slettet=True,nye_pakke_eller_arkivnedlastinger=0,motorbilder=rows));(R/'rydd-rotorutsnitt.py.txt').write_bytes(Path(__file__).read_bytes());print(dict(aktive_byteidentiske=len(base),kandidat_ryddet=True,beholdte_endringer=len(changed),motorstier=len(rows),nye_hardlenker=n))

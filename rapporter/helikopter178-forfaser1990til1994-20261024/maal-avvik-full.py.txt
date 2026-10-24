@@ -1,0 +1,14 @@
+from pathlib import Path
+import numpy as np,json,sys
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.spatial import cKDTree
+P=Path('/home/tom/Sam-Max-HD');R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';K=R/'kall'/sys.argv[1];q=json.loads((K/'kontroll.json').read_text());s=np.array(Image.open(R/'kilder/1990/original-1x.png').convert('RGBA'));z=np.array(Image.open(K/'prototype-helplassering.png').convert('RGBA'));m=32
+colors=np.unique(s[s[:,:,3]>0,:3],axis=0)
+def g(c):
+ t=tuple(map(int,c));return 0 if t==(0,0,0)else 1 if t==(123,175,207)else 2 if t in[(195,103,7),(239,135,39),(255,179,67)]else 3 if t[0]==t[1]==t[2]else 4 if t[0]>t[1]else 5
+cg=np.array([g(c)for c in colors]);lab=np.full(z.shape[:2],-1,int);co=z[:,:,3]>=128;_,ids=cKDTree(colors).query(z[co,:3]);lab[co]=cg[ids];ad=nd.distance_transform_edt(~co);hd=nd.distance_transform_edt(co);out={}
+for mat in range(6):
+ y,x=np.nonzero((s[:,:,3]>0)&np.vectorize(g,signature='(n)->()')(s[:,:,:3]) .__eq__(mat));d=nd.distance_transform_edt(lab!=mat);bad=d[m+y*4+2,m+x*4+2]>3;out[str(mat)]=[dict(x=int(a),y=int(b),rgb=s[b,a,:3].tolist())for a,b in zip(x[bad],y[bad])]
+y,x=np.nonzero(s[:,:,3]==0);bad=hd[m+y*4+2,m+x*4+2]>3;out['holes']=[dict(x=int(a),y=int(b),distance=float(hd[m+b*4+2,m+a*4+2]))for a,b in zip(x[bad],y[bad])]
+(K/'avvik-kildepunkter.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out))

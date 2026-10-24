@@ -1,0 +1,38 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from datetime import datetime,timezone
+import json,hashlib,numpy as np
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+notes={
+'H242':'Et nytt helbilde beholdt den for brede graa halerotoren. Etter helplassering feiler ett alfa- og to aapningsfester. Ikke forbedring av H239.',
+'H243':'Redigert eget haleutsnitt. Detaljen er glattere, men den runde graa hetten og den for vide stripen staar igjen. Sammensatt heleproeve har fortsatt to aapningsfeil. Ikke valgt.',
+'H244':'Nytegning direkte fra kildeutsnittet lager en mosaikk av omrissede fargeblokker. Stilavvist foer komposisjon eller nativeproeve. Ingen av disse rawpikslene er brukt i valgt variant.',
+'H245':'Den oppdiktede runde graa halehetten er fjernet og erstattet av en smal boeyd forbindelse. Et helt eget utsnitt er plassert samlet4,4egne RAW-piksler fra opprinnelig ROI, med egen myk soem. Haleaapningen er da innen3HD. Bare hoyre blads aapning feiler. Direkte pikselbidrag til valgt H246.',
+'H246':'Hoyre hovedblad er redigert separat, og dets EGEN alfakomponent er skilt fra den egne kroppsnaboen. Kropp/gulltopp og alle andre egne piksler utenfor bladunionen er bytebevart. Valgt H246 har null alfa-/aapningsfeil og snitt/union0.878. Fortsatt10graa,1brunt og5groenne materialfester over3HD, med ekstra klassepiksler. Holdt motorproeve, ikke teknisk eller visuell ferdiggodkjenning.',
+'H247':'Den graa stripen under venstre hovedblad er forlenget naturlig. Direkte helomplassering endrer imidlertid andre maaleforhold. Med frossen parent246 er andre nativepiksler identiske utenfor venstrebladets endringsboks. Et samlet eget blad8RAW-piksler ned gir null formfeil, men flere materialfeil enn H246. Ikke valgt som forbedring; bruk som lokal returgrunn, ikke stilanker.'}
+variants={'H242':'global-brun-og-gront/samlet-affin-utvidet','H243':'utsnitt-sammensatt/samlet-affin-utvidet','H245':'utsnitt-plassering/samlet-affin-utvidet','H246':'eget-blad-alfa/samlet-affin-utvidet','H247':'eget-blad-alfa-ned8/frossen-parent246'}
+ledger=read(R/'faktiske-bildekall.json');assert len(ledger)==72 and len({e['kall']for e in ledger})==72;rows=[];board=Image.new('RGB',(1400,1000),'#304050');dr=ImageDraw.Draw(board)
+for i,(cid,reason)in enumerate(notes.items()):
+ K=R/'kall'/cid;e=next(z for z in ledger if z['kall']==cid);q=read(K/'plan.json');args=read(K/'argumenter.json');assert q['utfort']and q['rute']==1990;assert sha(K/'raa.png')==q['raa_sha256']==e['raa_sha256'];assert sha(K/'prompt-brukt.txt')==e['prompt_sha256']and sha(K/'argumenter.json')==e['argumenter_sha256'];assert args['prompt']+'\n'==(K/'prompt-brukt.txt').read_text()
+ for p,h in q['referanser_SHA256'].items():assert sha(Path(p))==h,p
+ e['utdata_type']='heltegning'if cid=='H242'else'generert_detaljutsnitt';e['ikke_ny_hel_figurjobb']=True
+ if cid in variants:
+  V=K/variants[cid];c=read(V/'kontroll.json');p=V/'prototype-helplassering.png';im=Image.open(p).convert('RGBA');motor=cid=='H246';ap=c['alfa_fester_over3HD'];hp=c['apninger_over3HD'];mat=sum(v['fester_over3HD']for v in c['materialer']);extras=sum(v['ekstra_piksler_over3HD']for v in c['materialer']);prototype=str(p.relative_to(R));digest=sha(p);form=c['formporter_bestatt'];iou=c['snitt_union']
+ else:
+  p=K/'raa.png';im=Image.open(p).convert('RGBA');motor=False;ap=hp=mat=extras=iou=form=None;prototype=digest=None;put(K/'kontroll.json',dict(kall=cid,rute=1990,raw_stoerrelse=list(im.size),ekte_alfa=True,visuelt_sett=True,egenkontroll_utfort=True,teknisk_helrute_ikke_maalet=True,komponert_eller_nativeproevd=False,status='STILAVVIST_FOER_KOMPOSISJON',returgrunn=reason,native_mottatt=False,motorobservert=False,publisert=False))
+ row=dict(kall=cid,rute=1990,type=e['utdata_type'],raa_SHA256=e['raa_sha256'],prompt_SHA256=e['prompt_sha256'],argumenter_SHA256=e['argumenter_sha256'],variant=variants.get(cid),prototype_fil=prototype,prototype_SHA256=digest,snitt_union=iou,alfa_fester_over3HD=ap,apninger_over3HD=hp,formporter_bestatt=form,materialfester_over3HD=mat,ekstra_materialklassepiksler_over3HD=extras,laget=True,egenkontroll_utfort=True,egenkontroll_bestatt=False,visuelt_sett=False,native_mottatt=False,motorobservert=motor,publisert=False,Tom_godkjent=False,Claude_godkjent=False,returgrunn=reason);rows.append(row)
+ bg=Image.new('RGBA',im.size,'#87959e');bg.alpha_composite(im);bg.thumbnail((660,275),Image.Resampling.LANCZOS);xx,yy=10+(i%2)*700,45+(i//2)*330;board.paste(bg.convert('RGB'),(xx,yy));dr.text((xx,yy-25),cid+' 1990 RETUR '+('raw, stilavvist'if cid=='H244'else f'alfa{ap} hull{hp}'),fill='white')
+ (K/'notat.md').write_text(f'''# {cid}: helikopterfase1990, rotorretur
+
+Laget med innebygd image_gen 24. oktober 2026. Verktøyet oppga ikke separat modellnavn. Dette er {'en heltegning'if cid=='H242'else'et generert detaljutsnitt'} innen samme stilretur i fig178_02, ikke en ny hel figurjobb. Faktisk prompt, argumenter, referansehash og urørt råbilde er bevart. Originalen i spillkontekst og godkjent Sam-anker ble sett før motivet. Rå SHA256 {e['raa_sha256']}.
+
+{reason}
+
+Kontrollert variant: {row['variant']}. Nativeprototype SHA256: {digest}. Alle gamle og nye3HD-terskler er beholdt. 21-fargediagnoser er beholdt, og H246/frossen-parent246 maaler baade21klasser og seks materialgrupper paa byteidentisk valgt sluttgeometri. Ingen godkjenning paa telling eller form/alfa alene.
+
+Metoden for utsnitt er ny her: image_gen redigerer egne detaljer; hele egne naturlige utsnitt/alfakomponenter plasseres samlet tilbake i den egne heltegningen. Ingen originalpiksel, originalfragment eller hard originalmaske brukes som produksjonsgrafikk. Dette er ikke endring av enkeltpikslers kildefarger eller flytting av enkeltrekk. Se egne rens.json med eksakte ROI, helforskyvning, egen alfaseparasjon og sammenligning av nabopiksler. Brun-/grønnkalibrering bruker bare egne RGB med uendret alfa. Brunkalibrering er uttrykkelig hoppet over for H246/H247 fordi bladutsnittene ikke har en brun hovedflate. Eldre beskrivelser om at bare hele helikopteret flyttes gjelder de eldre prøvene.
+
+Laget og egenkontroll utført, fortsatt retur. Visuell tavlekontroll føres i rotorutsnitt-kontroll.json. Native mottak: nei. Motorprøve av valgt variant: {'ja, som holdt prototype, se rotorutsnitt-H246-motor-kontroll.json'if motor else'nei'}. Publisert: nei. Ingen Tom-/Claude-godkjenning. De seks nye prompter/raa er egne forsøk, ikke seks leverte figurjobber.
+''')
+board.save(R/'rotorutsnitt-seks-proever.png');put(R/'faktiske-bildekall.json',ledger);put(R/'rotorutsnitt-kontroll.json',dict(utc=datetime.now(timezone.utc).isoformat(),nye_faktiske_bildekall=6,bunke_faktiske_bildekall=72,nye_hele_figurjobber=0,nye_godkjente_native=0,aktuell_rute=1990,utfoert_via_innebygd_image_gen=True,CLI_API_fallback=False,ingen_kvote_eller_image_gen_feil=True,alle_raw_prompt_argument_og_referansehash_bekreftet=True,valg='H246/eget-blad-alfa/samlet-affin-utvidet',direkte_egne_raw_i_valgte_piksler=['H239','H245','H246'],visuelt_sett=False,rader=rows));put(R/'rutekart-rotorutsnitt.json',dict(type='HOLDTE_PROTOTYPER_IKKE_NATIVEMOTTAK',jobb='fig178_02',rute=1990,rader=rows,publisert_rutekart_uendret=True));(R/'samle-rotorutsnitt.py.txt').write_bytes(Path(__file__).read_bytes());print('72 faktiske kall,6 nye,0 nye godkjente native; alle raw/prompter og referansehash bekreftet.')

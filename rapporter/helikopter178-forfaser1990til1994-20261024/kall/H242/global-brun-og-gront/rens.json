@@ -1,0 +1,20 @@
+{
+  "kall": "H242",
+  "metode": "Global myk egen RGB-kalibrering av tydelig groenn egenfarge, uten kildeposisjoner eller masker. Kanonisk lysgroenn43,91,43. Morke oliventoner med liten G-R endres svakere eller ikke. Brown/grey/blue/gold faller utenfor gronn-vekten.",
+  "input_sha256": "d5db3e949b5bbd3720f680ff5f2e66bd59f57c22c3f5f949026c48a97879bcc7",
+  "egen_median_RGB": [
+    37.0,
+    99.0,
+    44.0
+  ],
+  "maal_RGB": [
+    43.0,
+    91.0,
+    43.0
+  ],
+  "vekt": "clip((G-R)/30,0,1)*clip((G-B)/25,0,1)",
+  "matrise": "R+=((43-medianR)/medianG)*G; G*=91/medianG; B+=((43-medianB)/medianG)*G_original",
+  "egen_alpha_byteidentisk": true,
+  "ingen_kildekoordinater_eller_lokal_paamaling": true,
+  "resultat_sha256": "207f78599d6cd7457b459363e494d237f1e9db6b0cefba7f2b6d89da9e7ba7cb"
+}

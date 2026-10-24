@@ -1,5 +1,11 @@
 # Grafikkliste
 
+<!-- helikopter178-rotorutsnitt-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+72 faktiske kall i bunken etter seks nye H242..H247. H246 har rettede rotoråpninger og null formfeil, men små grå/grønne materialfelt avviker fortsatt. Holdt motorprøve, ikke nytt native mottak eller godkjent hel jobb. Ingen publiserte mod-/pakkebyte endret; fortsatt3733 native og508/1758 hele figurjobber, fig178_02 20/24. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md, rotorutsnitt-kontroll.json og rotorutsnitt-replay.json. Neste H248 er ikke startet. Sam er stilanker; avviste bilder er det ikke. Gjenoppta småfelt fra H246, ikke H247 som ubekreftet forbedring. Automatikken ACTIVE.
+<!-- helikopter178-rotorutsnitt-20261024:slutt -->
+
 <!-- helikopter178-detaljer-20261024:start -->
 Nyeste status gjelder foran eldre tekniske og visuelle blokker nedenfor.
 

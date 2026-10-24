@@ -1,0 +1,29 @@
+from pathlib import Path
+from PIL import Image
+from scipy import ndimage as nd
+from smhd.myk import _premul_resize
+from datetime import datetime,timezone
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter'/O.name;K=R/'kall';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();bq=json.loads((K/'H246/eget-blad-alfa/kontroll.json').read_text());aq=json.loads((K/'H246/eget-blad-alfa/samlet-affin-utvidet/kontroll.json').read_text());expected=aq['prototype_SHA256'];allowed={str((K/c/'raa.png').resolve())for c in ['H239','H245','H246']};opened=[];original_open=Image.open
+# Vakt: produksjonsløypa får bare lese de tre egne image_gen-råbildene.
+def guarded_open(fp,*args,**kwargs):
+ p=str(Path(fp).resolve());assert p in allowed,p;opened.append(p);return original_open(fp,*args,**kwargs)
+Image.open=guarded_open
+
+def read(c):return np.array(Image.open(K/c/'raa.png').convert('RGBA'))
+def brown(a):
+ f=a[:,:,:3].astype(float);r,g,b=np.moveaxis(f,2,0);sample=(a[:,:,3]>=128)&(r>1.3*g)&(g>1.4*b)&(r>40);med=np.median(f[sample],axis=0);gain=np.array([115.,59.,11.])/med;gain[2]=np.clip(gain[2],.8,1.2);w=np.clip((r-g)/30,0,1)*np.clip((g-b)/25,0,1)*np.clip((r-35)/25,0,1);gold=np.clip((r-195)/35,0,1);gold=gold*gold*(3-2*gold);warm=np.clip((g/(r+1)-.49)/.06,0,1);warm=warm*warm*(3-2*warm);w*=1-gold*warm;out=a.copy();out[:,:,:3]=np.clip(np.rint(f+(f*gain-f)*w[:,:,None]),0,255).astype(np.uint8);out[out[:,:,3]==0,:3]=0;assert np.array_equal(a[:,:,3],out[:,:,3]);return out
+
+def green(a):
+ f=a[:,:,:3].astype(float);r,g,b=np.moveaxis(f,2,0);sample=(a[:,:,3]>=128)&(g>r*1.35)&(g>b*1.35)&(g>65);med=np.median(f[sample],axis=0);w=np.clip((g-r)/30,0,1)*np.clip((g-b)/25,0,1);new=f.copy();new[:,:,0]=r+(43-med[0])*g/med[1];new[:,:,1]=g*91/med[1];new[:,:,2]=b+(43-med[2])*g/med[1];out=a.copy();out[:,:,:3]=np.clip(np.rint(f+(new-f)*w[:,:,None]),0,255).astype(np.uint8);out[out[:,:,3]==0,:3]=0;assert np.array_equal(a[:,:,3],out[:,:,3]);return out
+
+def blend(a,b,w):
+ a=a.astype(float)/255;b=b.astype(float)/255;al=a[:,:,3]*(1-w)+b[:,:,3]*w;pre=a[:,:,:3]*a[:,:,3,None]*(1-w[:,:,None])+b[:,:,:3]*b[:,:,3,None]*w[:,:,None];rgb=np.divide(pre,al[:,:,None],out=np.zeros_like(pre),where=al[:,:,None]>0);return np.uint8(np.clip(np.rint(np.dstack((rgb,al))*255),0,255))
+
+def part(a):
+ lab,n=nd.label(a[:,:,3]>=8,np.ones((3,3),bool));sizes=np.bincount(lab.ravel());chosen=int(np.argmax(sizes[1:])+1);comp=lab==chosen;mask=nd.binary_dilation(comp,iterations=4);near=np.unique(lab[mask&((lab>0)&(lab!=chosen))]);assert all(sizes[k]<=16 for k in near);comp|=np.isin(lab,near);mask=nd.binary_dilation(comp,iterations=4);assert not np.any(mask&((lab>0)&~np.isin(lab,np.r_[chosen,near])));p=a.copy();p[~mask]=0;return mask,p
+base=green(brown(read('H239')));tail=green(brown(read('H245')));tile=np.array(Image.fromarray(tail).resize((240,265),Image.Resampling.LANCZOS));moved=np.zeros_like(tile);moved[4:,4:]=tile[:-4,:-4];yy,xx=np.indices((265,240));t=np.clip(np.minimum.reduce([xx,yy,239-xx,264-yy]).astype(float)/16,0,1);weight=t*t*(3-2*t);base[690:955,300:540]=blend(base[690:955,300:540],moved,weight)
+right=green(read('H246'));new=np.array(Image.fromarray(right).resize((555,190),Image.Resampling.LANCZOS))[:,40:];before=base[510:700,715:1230].copy();om,_=part(before);nm,npiece=part(new);remaining=before.copy();remaining[om]=0;placed=np.array(Image.alpha_composite(Image.fromarray(remaining),Image.fromarray(npiece)));union=om|nm;placed[~union]=before[~union];t=np.clip(np.arange(515,dtype=float)/16,0,1);weight=np.repeat((t*t*(3-2*t))[None,:],190,axis=0);out=blend(before,placed,weight);out[~union]=before[~union];base[510:700,715:1230]=out
+# Fastlagt helplassering, ingen originalbilder eller originalmasker leses.
+a=base.copy();a[a[:,:,3]<8]=0;sx,sy=bq['hel_skala'];scaled=_premul_resize(a,(round(a.shape[1]*sx),round(a.shape[0]*sy)));W,H=368,216;pad=np.zeros((H,W,4),np.uint8);px,py=32+bq['flytt'][0],32+bq['flytt'][1];x0,y0=max(0,px),max(0,py);x1,y1=min(W,px+scaled.shape[1]),min(H,py+scaled.shape[0]);pad[y0:y1,x0:x1]=scaled[y0-py:y1-py,x0-px:x1-px];sx,sy=aq['skalafaktor_pa_hel_egen_native'];cx,cy=aq['skalasenter_HD'];native=np.array(Image.fromarray(pad).transform((W,H),Image.Transform.AFFINE,(1/sx,0,cx-cx/sx,0,1/sy,cy-cy/sy),resample=Image.Resampling.BICUBIC));assert aq['hel_flytt_HD']==[0,0];outfile=O/'replay-rotorutsnitt.png';Image.fromarray(native).save(outfile);result=sha(outfile);assert result==expected,(result,expected);assert set(opened)==allowed and len(opened)==3;Image.open=original_open;assert np.array_equal(native,np.array(Image.open(K/'H246/eget-blad-alfa/samlet-affin-utvidet/prototype-helplassering.png').convert('RGBA')));outfile.unlink()
+proof=dict(utc=datetime.now(timezone.utc).isoformat(),metode='Kun H239,H245,H246 sine urorte image_gen-raa leses som bilder under aktiv aapnevakt. Global egenRGB-kalibrering, egne utsnitt/egenalfa og fastlagt heltransform gir byteeksakt valgt prototype. Kontrollbilder leses foerst etter produksjonen.',aapnevakt_bare_tre_egne_raw=True,produksjonsbilder_aapnet=opened,raw_SHA256={Path(p).parent.name:sha(Path(p))for p in opened},ingen_originalbilder_eller_originalmasker_eller_originalfragmenter_i_produksjon=True,ingen_palette_skriving_fra_originalpixel=True,egenRGBA_ogPNG_byteeksakt_med_valgt_prototype=True,prototype_SHA256=result,maaI=[W,H],replay_duplikat_fjernet_etter_verifikasjon=True,underlag_for_helplassering_og_kanoniske_farger_er_fortsatt_kildeavledet_metadatagrunnlag=True,native_mottatt=False,publisert=False);(R/'rotorutsnitt-replay.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'replay-rotorutsnitt.py.txt').write_bytes(Path(__file__).read_bytes());print('Vakt bekreftet: bare tre egne raw. PNG og RGBA byteeksakt; ingen duplikat beholdt.')

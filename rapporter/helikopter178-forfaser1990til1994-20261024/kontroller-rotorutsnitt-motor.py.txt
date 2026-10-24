@@ -1,0 +1,39 @@
+from pathlib import Path
+from PIL import Image,ImageDraw
+from collections import defaultdict
+from datetime import datetime,timezone
+import numpy as np,json,re,hashlib,gzip
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter'/O.name;B=O/'rotorutsnitt-grunnlag-start1-3733';C=O/'rotorutsnitt-proeve-start1-3733';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+b=read(R/(B.name+'.json'));c=read(R/(C.name+'.json'));assert b['exit']==c['exit']==0 and b['kontroller']==c['kontroller'] and b['nullkontroller']==c['nullkontroller']==148
+assert c['binar_sha256']==b['binar_sha256']=='651aa78c84411784671f600085147bbbdce5dc6281e77bd113eb7db7f1c0ed27'
+def calls(root):
+ d=defaultdict(list)
+ for m in re.finditer(r'frame (\d+) soft cel\s+(\d+) costume\s*(\d+)\b.*? at (-?\d+),(-?\d+) (\d+)x(\d+)',(root/'scummvm.log').read_text()):
+  f,n,k,x,y,w,h=map(int,m.groups());d[f+1].append((k,n,x,y,w,h))
+ return d
+bc,cc=calls(B),calls(C);pairs=[];rows=[];board=Image.new('RGB',(1340,400),'#304050');dr=ImageDraw.Draw(board)
+for f in sorted(p for p in B.glob('frame_*_room*.png')if not p.stem.endswith('_flat')):
+ frame=int(f.name.split('_')[1]);g=C/f.name;ff=f.with_name(f.stem+'_flat.png');gg=g.with_name(g.stem+'_flat.png');v=np.array(Image.open(f).convert('RGBA'));w=np.array(Image.open(g).convert('RGBA'));a=np.array(Image.open(ff).convert('RGBA'));z=np.array(Image.open(gg).convert('RGBA'));assert np.array_equal(a,z) and bc[frame]==cc[frame],f.name;diff=np.any(v!=w,2);allowed=np.zeros(diff.shape,bool)
+ es=[e for e in c['hendelser']if e['cel']==1990 and e['bildeframe']==frame and 'room035' in f.name]
+ for e in es:
+  old=[s for s in b['hendelser']if s['cel']==1990 and s['bildeframe']==frame];assert old and old[0]['pos']==e['pos']and old[0]['maal']==e['maal'];x,y=e['pos'];ww,hh=e['maal'];box=[x*4-8,y*4-8,(x+ww)*4+8,(y+hh)*4+8];assert min(box)>=0 and box[2]<=1280 and box[3]<=800;allowed[box[1]:box[3],box[0]:box[2]]=True;assert diff.sum()>0
+  rows.append(dict(rute=1990,frame=frame,fil=f.name,pos=e['pos'],maal=e['maal'],ROI=box,hele_i_viewport=True,original_ROI_8HD_byteidentisk=True,endrede_HD=int(diff.sum()),motorfil_SHA256=sha(g),originalmotorfil_SHA256=sha(gg)))
+  for j,(root,label)in enumerate([(B,'Publisert, stilretur'),(C,'H246: aapninger rettet, materialfelt fortsatt retur')]):
+   im=Image.open(root/f.name).crop(box).convert('RGB');im=im.resize((im.width*2,im.height*2),Image.Resampling.NEAREST);im.thumbnail((650,345),Image.Resampling.LANCZOS);board.paste(im,(10+j*670,40));dr.text((10+j*670,12),label,fill='white')
+  (R/'rotorutsnitt-H246-motor.png').write_bytes(g.read_bytes());(R/'rotorutsnitt-H246-originalmotor.png').write_bytes(gg.read_bytes())
+ assert int((diff&~allowed).sum())==0,(f.name,int((diff&~allowed).sum()));pairs.append(dict(fil=f.name,frame=frame,original_flat_SHA256=sha(ff),originale_tegnekall_identiske=True,endrede_HD=int(diff.sum()),utenfor1990=0))
+assert len(rows)==1 and len(pairs)==160;board.save(R/'rotorutsnitt-H246-motorpar.png');buffer=[]
+for e in b['kontroller']:
+ if e['avvik']==0:continue
+ arrays=[]
+ for root in [B,C]:
+  fs=sorted(p for p in root.glob(f'frame_{e["frame"]:06}_room*.png')if not p.stem.endswith('_flat'));v=np.array(Image.open(root/f'frame_{e["frame"]:06}_screen.png').convert('RGBA'));matched=[]
+  for p in fs:
+   w=np.array(Image.open(p).convert('RGBA'));mask=np.any(v!=w,2);yy,xx=np.nonzero(mask)
+   if len(xx)==e['avvik']:matched.append((p.name,np.column_stack((yy,xx,v[mask],w[mask]))))
+  assert len(matched)==1;arrays.append(matched[0])
+ assert arrays[0][0]==arrays[1][0]and np.array_equal(arrays[0][1],arrays[1][1]);buffer.append(dict(frame=e['frame'],fil=arrays[0][0],avvik=e['avvik'],koordinater_og_begge_RGBA=arrays[0][1].tolist()))
+with gzip.open(R/'rotorutsnitt-H246-bufferavvik.json.gz','wb')as f:f.write(json.dumps(buffer,separators=(',',':')).encode())
+put(R/'rotorutsnitt-H246-motor-kontroll.json',dict(utc=datetime.now(timezone.utc).isoformat(),ferske_kontrollerte_avspillinger=2,gjenbrukt_baseline=False,ny_baseline='rotorutsnitt-grunnlag-start1-3733',baseline_sha256=sha(R/(B.name+'.json')),baseline_mod_og_binaer_uforandret_bekreftet=True,gammel_baseline_avvist=False,binar_SHA256=c['binar_sha256'],kontroller=160,null=148,null_etter_frame40=120,buffer12_beggeRGBA_og_posisjoner_identiske=True,hele_originaltilstandpar=len(pairs),unike_framenummer=len({p['frame']for p in pairs}),par=pairs,ruter_observert=rows,endrede_HD_bare_1990=True,full_naturlig_gjennomspilling=False,interaktiv_Windows_web_ikke_testet=True,visuelt_sett=False,native_mottatt=False,publisert=False))
+q=read(R/'rotorutsnitt-proeve3733.json');q['motorobservert']=True;put(R/'rotorutsnitt-proeve3733.json',q);(R/'kontroller-rotorutsnitt-motor.py.txt').write_bytes(Path(__file__).read_bytes());print('160 hele originalpar /159 framenummer like, bare1990 endrerHD,12buffer beggeRGBA like',rows)
