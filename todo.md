@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- kompakt-lagring-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Plassarbeidet ferdig, grafikk fortsetter, 2026-10-24 09:26
+
+- [x] Skill spillerpakken fra arbeidsområdet: verifisert 392 MB Linux, 545 MB Windows og 659 MB utpakket Windows-innhold. README peker til ferdigpakkene. PR37s størrelsessperre er flettet etter grønne tester og faktisk Windows-bygg/oppstart.
+- [x] Rydd verifiserte gamle arbeidskopier med bevart historikk: 49 Git-kopier, 230 spilldatafiler og 293895 identiske PNG-kopier. Ingen unike bilder, jobbgrunnlag eller stasher er slettet. [Rapport og journal](https://github.com/Tombonator3000/Sam-Max-HD/tree/d4780bc7d54179c0e3436587a10a6aeed3c66545/rapporter/kompakt-lagring-20261024/README.md).
+- [ ] Følg docs/PLASSBRUK.md ved videre produksjon: ett Git-objektlager, én spilldatakilde, én nødvendig modkandidat per bunke og én kopi av hvert gjeldende pakkearkiv. Behold 4x oppløsning, tapsfri WebP, tekniske indeks-/maske-PNG og originale jobbgrunnlag. Pakkebyggingen stopper over 1000 MB nedlasting eller 2000 MB utpakket.
+- [ ] Gjenoppta rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md fra H299/1987 med materialretur. H289/1988 er uendret. Totalt 124 råbilder; H301 ikke startet. Ingen ny import før teknisk og visuell kontroll består. Fortsett åpne faser og returer; all grafikk og sluttkontroll gjenstår. Automatikken ACTIVE.
+<!-- kompakt-lagring-20261024:slutt -->
+
 <!-- helikopter178-delfelt1988-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

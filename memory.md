@@ -1,5 +1,19 @@
 # memory.md
 
+<!-- kompakt-lagring-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Kompakte spillerpakker og fast plassrutine, 2026-10-24 09:26
+
+Spillerens nedlasting er 392 MB Linux eller 545 MB Windows, med spillet, tale, motor og dagens HD-mod. Windows-innholdet er 659 MB utpakket. Produksjonsmappen på rundt 90 GB var arbeidsdata. [Kontrollrapport](https://github.com/Tombonator3000/Sam-Max-HD/tree/d4780bc7d54179c0e3436587a10a6aeed3c66545/rapporter/kompakt-lagring-20261024/README.md).
+
+PR 37 er flettet etter grønne tester og faktisk Windows-bygg/oppstart. Pakkeskriptene stopper over 1000 MB nedlasting eller 2000 MB utpakket og avviser arbeidsmapper. Behold 4 ganger originalens oppløsning og tapsfri WebP med ekte alfa. Les docs/PLASSBRUK.md før arbeid med out eller pakker: ett delt Git-objektlager, én spilldatakilde, én nødvendig kandidat per bunke og én kopi av hvert gjeldende pakkearkiv. Fjern verifiserte mellomkopier etter bunken; behold råbilder, unike kilder, stilankere og relevante bevis.
+
+49 Git-kopier, 230 spilldatakopier og 293895 identiske PNG-kopier er fjernet etter kontroll. Særskilt Git-metadata er sikret og faktisk hentet tilbake. Prosjekt-du er redusert fra 90.03 til 50.84 GB; observert ledig disk økte 31.58 GB. Ingen unike bilder, 9174 beskyttede input eller tre opprinnelige stasher er endret. Alle 21978 modhash og eksisterende pakkers hasher er uendret. Historiske out-modmapper er fortsatt ufullstendige og skal ikke brukes som ny komplett mod.
+
+Grafikkbunken er sikret med 124 mottatte råbilder. Gjenoppta H299/bare-vindu-egen-alfa for 1987 med 0/0 form/åpning og 13 positive materialfester. H289/1988 er uendret; H301 er ikke startet. Fortsatt 508/1758 hele figurjobber og 3733 native. Ingen ny hel resultat.png, native mottak, motor eller godkjenning. Grafikken er ikke ferdig; automatikken ACTIVE.
+<!-- kompakt-lagring-20261024:slutt -->
+
 <!-- helikopter178-delfelt1988-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

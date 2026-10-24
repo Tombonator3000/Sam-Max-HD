@@ -50,3 +50,5 @@ nettsidetestene dekker også alfa, dupliserte palettfarger og blandede modmapper
 Plassbruk i `out/` omfatter mange gamle fullkopier, nedlastinger og motorbilder.
 Tapsfri WebP i selve modden løser bare en liten del av dette. Gamle kopier fjernes
 først etter dokumentert kontroll mot en beholdt kilde eller utgivelse.
+
+Størrelsesgrenser for spillerpakker og fast plassrutine for arbeidskopier er dokumentert i [PLASSBRUK.md](PLASSBRUK.md). Tapsfri komprimering og original oppløsning beholdes.

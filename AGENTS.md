@@ -65,6 +65,8 @@ python3 tools/indeks_info.py game/SAMNMAX.000
 
 ## Arbeid med motoren
 
+- Før arbeid med pakkebygg eller `out/`: les `docs/PLASSBRUK.md`. Gjenbruk hovedrepoets Git-objektlager og kanoniske spilldata. Ikke lag full Git-klon eller ny talekopi for hver bunke. Bruk én nødvendig modkandidat og fjern verifiserte mellomkopier etter kontroll. Pakkebyggingen har grenser på 1000 MB nedlasting og 2000 MB utpakket; råbilder og arbeidsmapper inngår ikke i spillerpakken.
+
 - Fargebilder i den publiserte modden er tapsfri WebP fra 23. oktober 2026. Les `docs/WEBP.md` før motor-, mod- eller pakkeendringer. Originale grafikkjobber og råbilder beholder formatet sitt. Indeks- og maskebilder beholdes som PNG.
 - Bruk gjeldende `hd-mod` som grunnlag. Gamle `out/`-modkopier er ryddet for verifiserte duplikater og kan være ufullstendige. Ikke bruk `tools/mod_gren.sh send`, som force-pusher; bevar tidligere publiserte filer i Git-historikken og verifiser ny faktisk nedlasting.
 
