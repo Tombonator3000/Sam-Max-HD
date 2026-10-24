@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-fem-returer-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Fem helikopterreturer kontrollert og sikret, 2026-10-24 11:46
+
+Fem nye faktiske innebygde image_gen-kall H316..H320 fortsetter fire åpne faser i fig178_02, totalt 144 mottatte råbilder. Dette er seks kontrollerte komposisjoner, inkludert én Python-brunvariant, ikke fem hele leverte figurjobber. H315/1987 og H289/1988 beholdes. H316/H317 har åtte positive materialfester mot H315s ni, men dårligere grønt og mer ekstra grått; lavere telling gir ingen godkjenning. H318 beholder feil sammenhengende gråstripe. H319s hale kommer lavere, men rundt nav og feil plassering/form består. H320s todelte grå sidefelt kommer nærmere kilden; brunvarianten reduserer ekstra gyllenaksent 279 til 61, men 105 positive materialfester og direkte form/åpning 29/0 består. Liten rød venstre bladtipp bevares. Ingen ny prøve består samlet egenkontroll.
+
+Kilde 4439ae967d8ef0689764d83e98ac11a26044b667 og rapport 2d707126b5a8ec05b97eaed675f379590f3fb009 er pushet på gpt-arbeid og faktisk strømmet tilbake: 116 kildefiler/9795165 byte og 8 rapportfiler/908047 byte. Alle lengder/SHA256/Git-blob SHA1 er bekreftet uten ekstra nedlastet payload. [Status og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/2d707126b5a8ec05b97eaed675f379590f3fb009/rapporter/helikopter178-forfaser1990til1994-20261024/fem-returer-status.md).
+
+Fortsatt 508/1758 hele figurjobber, 1250 uten resultat pluss returer og sluttkontroll, 3733 publiserte native, fig178_02 20/24 og familie 178 32/102. Alle 9174 beskyttede input, derav 9064 jobb/hovedark, og tre opprinnelige stasher er uendret. Ingen ny hel resultat.png, formelt native mottak, publisert modgrafikk/pakke eller Tom-/Claude-godkjenning. Fortsett samme påbegynte fig178_02 og åpne returer. H321 er ikke startet, forberedt eller reservert. Ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. All grafikk og samlet sluttkontroll er ikke ferdig. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-fem-returer-20261024:slutt -->
+
 <!-- helikopter178-bladfarger-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 

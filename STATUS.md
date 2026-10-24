@@ -1,5 +1,21 @@
 # Status
 
+<!-- helikopter178-fem-returer-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## H316 til H320: ingen ny godkjent hel fase, 2026-10-24 11:46
+
+Fem nye faktiske innebygde image_gen-kall H316..H320 fortsetter fire åpne faser i fig178_02, totalt 144 mottatte råbilder. Dette er seks kontrollerte komposisjoner, inkludert én Python-brunvariant, ikke fem hele leverte figurjobber. H315/1987 og H289/1988 beholdes. H316/H317 har åtte positive materialfester mot H315s ni, men dårligere grønt og mer ekstra grått; lavere telling gir ingen godkjenning. H318 beholder feil sammenhengende gråstripe. H319s hale kommer lavere, men rundt nav og feil plassering/form består. H320s todelte grå sidefelt kommer nærmere kilden; brunvarianten reduserer ekstra gyllenaksent 279 til 61, men 105 positive materialfester og direkte form/åpning 29/0 består. Liten rød venstre bladtipp bevares. Ingen ny prøve består samlet egenkontroll.
+
+Seks egne heltegninger/native-PNG/RGBA har byteeksakt replay fra 41 egne råbilder i tidligere og nye kjeder; 21 unike direkte råopphav over de seks nye komposisjonene. Tallet 41 inkluderer gjennomgåtte eldre prøvegrener. Egne myke rektangler, egen alfa og tidligere dokumentert global egenRGB-kalibrering brukes, uten originale bilder/masker eller lokal kildepunktpåmaling. H319 bruker ny egen alfa, øvrige bevarer den byteidentisk. Frosset hel skalering/flytt og 3 HD/12 prosent er uendret. Originalene er sett i spillkontekst og som hele faser før hvert motiv; Sam er eneste godkjente stilanker.
+
+Alle nye prøver stoppes før formelt native mottak. Ingen ny full modkandidat eller motoravspilling er laget. Historisk faktisk lokal motorobservasjon av H315 gjelder bare uendret H315, og overføres ikke til de nye returene. Ingen ny Windows-/webtest, naturlig gjennomspilling eller helskjermregresjon påstås. Alle 21978 aktive modhash er kontrollert uendret mot publisert hd-mod c80099158b30fb08fa0cb670acb112bf14fd58f4. Ingen ny full Git-/spilldatakopi eller arkivnedlasting; out inneholder bare nødvendige små arbeidsfiler. Fire releasevedleggs ID/størrelse/sjekksum er uendret, tidligere faktisk nedlastede og innholdskontrollerte Linux 392411640 byte og Windows 544532414 byte beholdes enkeltvis.
+
+Kilde 4439ae967d8ef0689764d83e98ac11a26044b667 og rapport 2d707126b5a8ec05b97eaed675f379590f3fb009 er pushet på gpt-arbeid og faktisk strømmet tilbake: 116 kildefiler/9795165 byte og 8 rapportfiler/908047 byte. Alle lengder/SHA256/Git-blob SHA1 er bekreftet uten ekstra nedlastet payload. [Status og gjenopptaking](https://github.com/Tombonator3000/Sam-Max-HD/tree/2d707126b5a8ec05b97eaed675f379590f3fb009/rapporter/helikopter178-forfaser1990til1994-20261024/fem-returer-status.md).
+
+Fortsatt 508/1758 hele figurjobber, 1250 uten resultat pluss returer og sluttkontroll, 3733 publiserte native, fig178_02 20/24 og familie 178 32/102. Alle 9174 beskyttede input, derav 9064 jobb/hovedark, og tre opprinnelige stasher er uendret. Ingen ny hel resultat.png, formelt native mottak, publisert modgrafikk/pakke eller Tom-/Claude-godkjenning. Fortsett samme påbegynte fig178_02 og åpne returer. H321 er ikke startet, forberedt eller reservert. Ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. All grafikk og samlet sluttkontroll er ikke ferdig. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-fem-returer-20261024:slutt -->
+
 <!-- helikopter178-bladfarger-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 

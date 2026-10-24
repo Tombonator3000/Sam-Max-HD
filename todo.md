@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-fem-returer-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Neste, 2026-10-24 11:46
+
+- [x] Bevar H316..H320: fem nye råbilder, faktiske prompter og seks byteeksakte komposisjoner/native med én Python-brunvariant, totalt 144 råbilder. Kilde og rapport er faktisk hentet og hashkontrollert.
+- [x] Bekreft alle 21978 aktive modhash, beskyttede input og tre stasher uendret. Ingen ny fullkandidat, motoravspilling eller pakke for returer som ikke består egenkontroll.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/2d707126b5a8ec05b97eaed675f379590f3fb009/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) i fig178_02. H315/1987 og H289/1988 beholdes; H320s brune sidefelt er en partiell retur. Rett hele naturlige flater/egne deler uten originalmasker eller kildepunktmaling. H319s nye runde halerotornav og plassering skal ikke overtas. H321 er ikke startet.
+- [ ] Fullfør alle åpne jobber/returer, relevant native kontroll og faktisk motoravspilling før publisering. Nå 508/1758 hele jobber og 3733 native; ingen ny hel jobb, mod/pakke eller Tom-/Claude-godkjenning. Ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+<!-- helikopter178-fem-returer-20261024:slutt -->
+
 <!-- helikopter178-bladfarger-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 
