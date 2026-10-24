@@ -70,3 +70,7 @@ Bibliotek: figurark-fast-storrelse.md og publisert-mod-er-fasit.md, kontrollert 
 ## Rydding etter motorprøven
 
 Den ene midlertidige fullmodkopien er fjernet etter kontroll av alle 21978 filhash. Alle sju avvikende filer er beholdt med SHA, sammen med fullmanifest og gjenopprettingsgrunnlag c80099158b30fb08fa0cb670acb112bf14fd58f4. 1124 eksakte nye motorbildekopier er hardlenket etter SHA- og bytekontroll; alle 1129 motorbildestier og hash er bevart. Aktiv mod er kontrollert byteidentisk igjen. Ingen råbilder, unike kilder, stilankre eller stasher er slettet. Ingen nye pakke-/arkivnedlastinger. Se stilproever-dedup-rydding.json. Logiske duplikatbyte regnes ikke som bevist fysisk plassgevinst.
+
+## Faktisk tilbakehenting av denne leveransen
+
+Grafikkilde a96a59f9b306f677ed56982ef953816841245cf1 er pushet som vanlig barn av 2b8d91c6639b440209a879f8c208d1468306ce9f. Alle 176 endrede filer er faktisk hentet tilbake som strømmer. Både SHA256, Git-blob SHA1 og lengde er bekreftet, totalt 20488354 byte, uten ekstra lagret nedlastingskopi. Se detaljproever-kilder-faktisk-hentet.json.gz. Dette verifiserer kildeleveransen, ikke stilgodkjenning eller nativepublisering. hd-mod c80099158b30fb08fa0cb670acb112bf14fd58f4 og begge pakker er uendret. H242 er ikke startet, og automatikken er ACTIVE.
