@@ -4,6 +4,7 @@
 Nyeste status gjelder foran historiske blokker nedenfor.
 
 H331..H335 er fem nye faktiske innebygde image_gen-kall, totalt 159 råbilder. Fire hele fasetegninger og ett blad gir ni byteeksakte egne komposisjoner/native-PNG/RGBA fra fem egne råbilder. Alle nye prøver er fortsatt returer. H331/H335 har 0/0 form for 1988, men 78/80/77 positive materialfester mot H289s 69. H332/H333 taper poseforhold; H334 taper H252-formen. H327/1987, H289/1988 og H252/1990 beholdes. Ingen ny motor, fullkandidat, hel jobb, native mottak eller publisert mod/pakke. Eldre motorbevis overføres ikke. Alle aktive modhash, beskyttede input og tre stasher er uendret. Fortsatt 508/1758 hele jobber og 3733 native. H336 er ikke startet. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring, automatikken ACTIVE. Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og helreturer-status.md. Følg docs/WEBP.md og docs/PLASSBRUK.md.
+Kilde 4706b1300c0a502a2d3c203da201a39a0cc5b05f er pushet og faktisk strømmet tilbake: 136 filer/17576608 byte, alle lengder/SHA256/Git-blob SHA1 bekreftet. Ingen nedlastet payload er dobbeltlagret. Ingen fullkandidat eller ny motor er laget av disse returene. Se helreturer-kilder-faktisk-hentet.json.
 <!-- helikopter178-helreturer-20261024:slutt -->
 
 <!-- helikopter178-kantfarger-20261024:start -->
