@@ -1,5 +1,13 @@
 # Ordre fra Claude
 
+<!-- helikopter178-bladfarger-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+H311..H315 er fem nye faktiske innebygde image_gen-kall, totalt 139 råbilder. Fem egne komposisjoner/native har byteeksakt replay. H315/1987 er nytt holdt arbeidskontrollpunkt med lite grønt fremre stagfeste tilbake: form/åpning 0/0, ni positive materialfester og ekstra klassepiksler består. H312/H313s brede gråbånd og H314s grønne halebase som spiser brunt er returer. Grått finnes også inne i bladet, ikke bare langs kanten. H315 er lokalt motorobservert i én ny faktisk avspilling mot bevart faktisk baseline; hele skjermtilstander utenfor ROI divergerer. Dette er ikke helskjermregresjon eller naturlig gjennomspilling. Ingen ny hel jobb, formelt native mottak, publisert mod/pakke eller Tom-/Claude-godkjenning. Fortsatt 508/1758 hele jobber og 3733 native. H316 er ikke startet; Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE.
+
+Se rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md og bladfarger-status.md. H289/1988 og H252/1990 er uendret. Følg docs/PLASSBRUK.md og docs/WEBP.md. Tre kandidatspesifikke filer/fullmanifest beholdes, ingen varig fullkandidat.
+<!-- helikopter178-bladfarger-20261024:slutt -->
+
 <!-- helikopter178-materialfarger-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 

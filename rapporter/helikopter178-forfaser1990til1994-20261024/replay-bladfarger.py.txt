@@ -1,0 +1,25 @@
+from pathlib import Path
+from PIL import Image
+from io import BytesIO
+import numpy as np,json,hashlib
+P=Path('/home/tom/Sam-Max-HD');O=Path(__file__).resolve().parent;R=P/'work/.gpt-gren/rapporter/helikopter178-forfaser1990til1994-20261024';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();ids=['H266','H267','H268','H270','H276','H296','H297','H298','H299','H300','H306','H307','H308','H309','H310','H311','H312','H313','H314','H315'];files={c:R/'kall'/c/'raa.png'for c in ids};allowed={p.resolve()for p in files.values()};opened=[];real=Image.open
+def guard(fp,*a,**kw):
+ p=Path(fp).resolve();assert p in allowed,str(p);opened.append(str(p));return real(fp,*a,**kw)
+def pngsha(a):
+ b=BytesIO();Image.fromarray(a).save(b,format='PNG');return hashlib.sha256(b.getvalue()).hexdigest()
+Image.open=guard
+try:
+ f=P/'out/helikopter178-materialfarger-20261024/replay-materialfarger.py';s=f.read_text().split('\nfor row in rows:')[0];ns={'__file__':str(f),'__name__':'parent_replay'};saved=Image.open
+ try:exec(compile(s,str(f),'exec'),ns)
+ finally:Image.open=saved
+ base=ns['builds']['H310/egen-redigert-felt'];raw={c:np.array(Image.open(files[c]).convert('RGBA'))for c in['H311','H312','H313','H314','H315']};builds={};h311=ns['whole_raw'](base,raw['H311'],read(R/'kall/H311/plan.json'));builds['H311/egen-redigert-felt']=h311
+ for c in ['H312','H313']:builds[c+'/egen-blad-RGB']=ns['part'](h311,raw[c],read(R/'kall'/c/'egen-blad-RGB/rens.json'))
+ for c in ['H314','H315']:builds[c+'/egen-redigert-felt']=ns['whole_raw'](h311,raw[c],read(R/'kall'/c/'plan.json'))
+ rows=[];natives={}
+ for name,a in builds.items():
+  K=R/'kall'/name;n=ns['v']['native'](a,read(K/'kontroll.json'));assert pngsha(a)==sha(K/'egen-heltegning.png')and pngsha(n)==sha(K/'prototype-under-kontroll.png'),name;assert np.array_equal(a[:,:,3],base[:,:,3]);natives[name]=n;rows.append(dict(variant=name,egen_PNG_SHA256=pngsha(a),native_PNG_SHA256=pngsha(n),egen_RGBA_SHA256=hashlib.sha256(a.tobytes()).hexdigest(),native_RGBA_SHA256=hashlib.sha256(n.tobytes()).hexdigest(),PNG_byteeksakt=True,hele_egen_alfa_byteidentisk_med_H310=True))
+finally:Image.open=real
+for row in rows:
+ K=R/'kall'/row['variant'];assert np.array_equal(builds[row['variant']],np.array(Image.open(K/'egen-heltegning.png').convert('RGBA')));assert np.array_equal(natives[row['variant']],np.array(Image.open(K/'prototype-under-kontroll.png').convert('RGBA')));row['RGBA_byteeksakt']=True
+proof=dict(metode='Fem egne komposisjoner/native gjenskapt fra egne raa gjennom tidligere frosne raakjeder. Bare egne myke rektangler, hele egne blad og egen alfa. Ingen originalbilder/masker/kildepunkter som produksjonsbilder.',produksjonsbilder_aapnet=opened,raa_SHA256={c:sha(p)for c,p in files.items()},unike_egne_raabilder=len(set(opened)),originalbilder_eller_masker_aapnet_under_produksjon=0,varianter=rows,alle_fem_egen_og_native_PNG_RGBA_byteeksakt=True,valgt_arbeidskontrollpunkt='H315/egen-redigert-felt',valgt_direkte_raa=['H266','H267','H268','H270','H299','H300','H309','H310','H311','H315'],genereringsreferanser_er_ikke_automatisk_direkte_sluttpiksler=True,native_mottatt=False,publisert=False)
+(R/'replay-bladfarger.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');(R/'replay-bladfarger.py.txt').write_bytes(Path(__file__).read_bytes());print('Fem egne komposisjoner/native-PNG/RGBA byteeksakt; egne raakilder',proof['unike_egne_raabilder'],'direkte H315',len(proof['valgt_direkte_raa']))
