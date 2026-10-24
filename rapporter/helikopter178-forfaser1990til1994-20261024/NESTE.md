@@ -9,3 +9,5 @@ Fortsett samme påbegynte fig178_02, med åpne 1986..1994-faser og dokumenterte 
 Alle seks nye prøver er returer før formell import. Ingen ny motorobservasjon eller full modkandidat er laget; historisk H315-observasjon overføres ikke til dem. Når en retting består, gjør relevant native kontroll og faktisk motoravspilling fra fersk publisert mod. Bare én komplett nødvendig kandidat per bunke. Følg docs/WEBP.md og docs/PLASSBRUK.md; historiske dedupliserte out-modmapper er ufullstendige. Ingen fulle Git-/spilldatakopier eller doble arkivnedlastinger.
 
 Fortsatt 508/1758 hele jobber, 3733 native, fig178_02 20/24 og familie 178 32/102. Ingen ny hel jobb, formelt native mottak, publisert mod/pakke eller Tom-/Claude-godkjenning. Sam er eneste godkjente stilanker, ingen nødvendig ny Tom-avklaring. Automatikken ACTIVE; all grafikk og sluttkontroll gjenstår.
+
+Kildene er pushet på gpt-arbeid som 4439ae967d8ef0689764d83e98ac11a26044b667 og faktisk strømmet tilbake: alle 116 filer/9795165 byte er lengde-/SHA256-/Git-blob SHA1-bekreftet. Ingen nedlastet payload er dobbeltlagret. Se fem-returer-kilder-faktisk-hentet.json.

@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,hashlib
+P=Path('/home/tom/Sam-Max-HD');A=P/'work/.gpt-gren';O=Path(__file__).resolve().parent;R=A/'rapporter/helikopter178-forfaser1990til1994-20261024';OLD=P/'out/helikopter178-forfaser1990til1994-20261024';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();read=lambda p:json.loads(p.read_text())
+def put(p,d):p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+receipt=OLD/'fem-returer-kilder-faktisk-hentet.json';d=read(receipt);source=d['commit'];assert source=='4439ae967d8ef0689764d83e98ac11a26044b667'and d['forelder']=='5ac4f3e74ac062c48102f10af1569ce80584f85c'and d['faktisk_hentet_filer']==116 and d['SHA256_og_Gitblob_SHA1_bekreftet']and not d['lagret_nedlastet_payload'];(R/receipt.name).write_bytes(receipt.read_bytes());(O/receipt.name).write_bytes(receipt.read_bytes())
+q=read(R/'rutekart-fem-returer.json');q.update(kilde_SHA_avventer_commit=False,grafikkilde_fem_returer=source,kildefiler_faktisk_hentet=d['faktisk_hentet_filer'],kildefiler_bytes=d['bytes'],kildefiler_SHA256_og_Gitblob_SHA1_bekreftet=True,kildekvittering_SHA256=sha(R/receipt.name))
+for row in q['komposisjoner']:row['grafikkilde']=source
+put(R/'rutekart-fem-returer.json',q);f=read(R/'fremdrift.json');f.update(fem_returer_kilde_sha_avventer_commit=False,grafikkilde_nye_fem_returer=source,fem_returer_kilde_filer_faktisk_hentet=d['faktisk_hentet_filer'],fem_returer_kilde_bytes=d['bytes'],fem_returer_kilde_SHA256_og_Gitblob_SHA1_bekreftet=True,fem_returer_nedlastet_payload_dobbeltlagret=False,fem_returer_rutekart='rutekart-fem-returer.json',fem_returer_replay='replay-fem-returer.json');put(R/'fremdrift.json',f)
+text='Kildene er pushet på gpt-arbeid som '+source+' og faktisk strømmet tilbake: alle '+str(d['faktisk_hentet_filer'])+' filer/'+str(d['bytes'])+' byte er lengde-/SHA256-/Git-blob SHA1-bekreftet. Ingen nedlastet payload er dobbeltlagret. Se '+receipt.name+'.'
+for name in ['fem-returer-status.md','NESTE.md']:
+ p=R/name;s=p.read_text();assert text not in s;p.write_text(s+'\n'+text+'\n')
+for name in ['ORDRE.md','GRAFIKKLISTE.md']:
+ p=A/name;s=p.read_text();end='<!-- helikopter178-fem-returer-20261024:slutt -->';assert s.count(end)==1;p.write_text(s.replace(end,text+'\n'+end))
+(R/'fest-fem-returer.py.txt').write_bytes(Path(__file__).read_bytes());print(text)
