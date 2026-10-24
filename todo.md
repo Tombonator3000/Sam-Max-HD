@@ -1,5 +1,17 @@
 # todo.md
 
+<!-- helikopter178-smaafelt-20261024:start -->
+Nyeste status gjelder foran eldre blokker nedenfor.
+
+## Neste i grafikkproduksjonen, 2026-10-24 04:46
+
+- [x] Seks faktiske kall H248..H253 er laget, kontrollert, pushet og faktisk hentet tilbake med SHA256/Gitblob SHA1. Totalt 78 kall. Ingen nye native mottak eller hele figurjobber.
+- [x] Rent H252-kontrollpunkt er byteeksakt gjenskapt fra fem egne råbilder og sett i to ferske motoravspillinger med 160 identiske hele originalfilpar. Den ene prøvemodden er ryddet, tre endrede filer og fullmanifest er beholdt.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/c0613a3893f10535cbaa2508ee6b4a5fc2e934f8/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra H252/eget-rent-kontrollpunkt, med 10 grå, ett brunt og fire grønne materialavvik. Bevar begge åpninger og de to smårettingene. Seksfeilsvarianten er avvist på skjøter; H253 er ikke valgt. H254 er ikke forberedt, utført eller reservert.
+- [ ] Se hele egen komponent etter første innplassering før nye delkomposisjoner. Fortsett stilretur 1991..1994 og uproduserte 1989..1986. Sam er stilanker; 137/V013 og 296/S037 er uendret.
+- [ ] Etter godkjent retting: native mottak fra fersk komplett WebP-mod, vanlig hd-mod-barn av fersk fjern-SHA, faktisk tilbakehenting og relevante pakker. Mod/pakker er uendret c8009915 med 3733 native. Samlet sluttkontroll gjenstår, automatikken er ACTIVE.
+<!-- helikopter178-smaafelt-20261024:slutt -->
+
 <!-- helikopter178-rotorutsnitt-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
