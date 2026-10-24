@@ -1,5 +1,12 @@
 # memory.md
 
+<!-- Tom-pause-20261024:start -->
+## Pauset etter Toms beskjed 2026-10-24 14:17
+
+Automatiseringen Fullfør Sam & Max-grafikken er PAUSED. Stopp all videre produksjon til Tom uttrykkelig ber om oppstart.513/1758 figurark og1015/2264 grafikkjobber har resultat.1245 figurark,70,82 prosent, og1249 jobber totalt,55,17 prosent, mangler første resultat. Returer og sluttkontroll kommer i tillegg. Kun klargjøring/baseline for291_06..08, ingen nye bildekall/resultater/native etter siste publiserte3761. Se rapporter/sam291-siste-20261024/PAUSET.md.
+<!-- Tom-pause-20261024:slutt -->
+
+
 <!-- sam291-foerste3761-20261024:start -->
 Nyeste status gjelder foran historiske blokker nedenfor.
 
