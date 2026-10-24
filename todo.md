@@ -1,5 +1,16 @@
 # todo.md
 
+<!-- helikopter178-materialfarger-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Neste, 2026-10-24 10:50
+
+- [x] Bevar H306..H310 med fem råbilder/faktiske prompter, ti byteeksakte komposisjoner og faktisk tilbakehentet kilde/rapport. Totalt 134 råbilder. H310 er lokalt motorobservert; helskjermtilstander divergerer utenfor ROI og gir ingen helskjermgodkjenning.
+- [x] Fjern én 21979 filers midlertidig kandidat etter verifisering; bevar tre avvikende filer/fullmanifest og alle 1124 motorstier. Alle aktive modhash, beskyttede input og tre stasher er uendret.
+- [ ] Gjenoppta [NESTE.md](https://github.com/Tombonator3000/Sam-Max-HD/tree/5a7f2a13ec418dc472c237e3a959beb374f5d0d5/rapporter/helikopter178-forfaser1990til1994-20261024/NESTE.md) fra H310/1987: 0/0 form/åpning og blått/gull festet, men svart 1/grått 5/grønt 5 positive materialfester og ekstra klassepiksler består. Bevar små refleksfarger og frosne 3 HD/12 prosent-porter. H289/1988 og H252/1990 beholdes. H311 er ikke startet.
+- [ ] Fortsett øvrige åpne faser/returer før formelt native mottak/publisering og samlepakker. Nå 508/1758 hele jobber og 3733 native. Ingen ny hel jobb, mod-/pakkeendring eller Tom-/Claude-godkjenning. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE. Følg docs/PLASSBRUK.md og docs/WEBP.md.
+<!-- helikopter178-materialfarger-20261024:slutt -->
+
 <!-- helikopter178-fasefelt-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 

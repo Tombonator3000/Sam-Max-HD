@@ -1,5 +1,17 @@
 # memory.md
 
+<!-- helikopter178-materialfarger-20261024:start -->
+Nyeste status gjelder foran historiske blokker nedenfor.
+
+## Små refleksfarger festet, materialretur gjenstår, 2026-10-24 10:50
+
+Fem faktiske innebygde image_gen-kall H306..H310 retter fase 1987 i fig178_02. Totalt 134 mottatte råbilder. Ti egne komposisjoner og native-PNG/RGBA har byteeksakt replay fra 15 egne råbilder, uten originalbilder/masker under produksjon. H310/egen-redigert-felt holdes som nytt arbeidskontrollpunkt: form/åpning 0/0, blått og gull 0 positive, men 11 positive materialfester og ekstra klassepiksler gjenstår. H306/H307s venstreblad og H308s store gullnese er returer. Før H308 ble premisset rettet: gyllenaksent ved 39,15 og 47,21 er kildebekreftet, bare nagle-/ovaltolkningen er feil. H289/1988 og H252/1990 er uendret.
+
+Kilde 03ff8106b2fd95a490d5df91ae2e62618abbc30a og rapport 5a7f2a13ec418dc472c237e3a959beb374f5d0d5 er pushet på gpt-arbeid og faktisk strømmet tilbake: 195 kildefiler/19808314 byte og 11 rapportfiler/1411798 byte med lengde-, SHA256- og Git-blob SHA1-kontroll. Ingen ekstra lagret nedlastingspayload. [Arbeidsstatus og motorbegrensning](https://github.com/Tombonator3000/Sam-Max-HD/tree/5a7f2a13ec418dc472c237e3a959beb374f5d0d5/rapporter/helikopter178-forfaser1990til1994-20261024/materialfarger-status.md).
+
+Fortsatt 508/1758 hele figurjobber, 1250 uten resultat pluss returer/sluttkontroll, 3733 publiserte native, fig178_02 20/24 og familie178 32/102. Alle 9174 beskyttede input og tre opprinnelige stasher er uendret. Ingen ny hel resultat.png, publisert modgrafikk eller pakke. Fire release-assets er uendret: Linux 392411640 byte og Windows 544532414 byte er tidligere faktisk nedlastet og innholdskontrollert. Følg docs/PLASSBRUK.md og docs/WEBP.md. H311 er ikke startet, forberedt eller reservert. Sam er eneste stilanker; ingen nødvendig ny Tom-avklaring; automatikken ACTIVE. All grafikk og samlet sluttkontroll gjenstår.
+<!-- helikopter178-materialfarger-20261024:slutt -->
+
 <!-- helikopter178-fasefelt-20261024:start -->
 Nyeste status gjelder foran eldre blokker nedenfor.
 
