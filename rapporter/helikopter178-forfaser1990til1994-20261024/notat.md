@@ -139,3 +139,8 @@ Grafikkilde 40d4ffe9a14199e4160b5688ce6577679a7e694d er vanlig Git-barn av c0613
 ## Faktisk tilbakehenting av rettingene
 
 Grafikkilde 283834f2d6e3bb5117ce9781fff82a0662d55f0a er vanlig Git-barn av e9f3587fc2878286fb79165bd25c546ebcfc512d. Alle 143 endrede filer er faktisk hentet som strømmer, totalt 12856847 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle filer; ingen nedlastet payloadkopi beholdes. Se retur1987-kilder-faktisk-hentet.json.gz. Dette sikrer råbilder og kontrollbevis, ikke ferdig native godkjenning. H264 er ikke startet; automatikken er ACTIVE.
+
+
+## Faktisk tilbakehenting av gråfelt-/detaljreturene
+
+Grafikkilde 1f4cfe47386c272dd3f64bab31d66891753f7e9d er vanlig Git-barn av 5c850ad62933b16a1f1cfc254004d0badbaab8b2. Alle 128 endrede filer er faktisk hentet som strømmer, totalt 12342574 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for alle filer; ingen ekstra nedlastet payloadkopi beholdes. Se graaplan1987-kilder-faktisk-hentet.json.gz. Dette bevarer forsøk og kontrollbevis, ikke ferdig native godkjenning. H269 er ikke startet; automatikken er ACTIVE.
