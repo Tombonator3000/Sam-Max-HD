@@ -206,3 +206,7 @@ Grafikkilde d4c9bf3be90deba697723988491eedf1481787ac er vanlig Git-barn av fdd7a
 ## Faktisk tilbakehenting av delprøver og verktøyavvisning
 
 Grafikkilde b03b92ef11b452a2cf0aad45710a770d99d21062 er vanlig Git-barn av 9e2beea6ca6b9e675ebf7a28d75f190aec86971e. Alle 169 endrede filer er faktisk hentet som strømmer, totalt 16273421 byte. Lengde, SHA256 og Git-blob SHA1 stemmer for samtlige filer. Ingen ekstra nedlastet payloadkopi beholdes. Se delfelt1988-kilder-faktisk-hentet.json.gz. Fem råbilder og H291s feilbevis er bevart; H291 har ingen råbildefil. Alle nye grafikkprøver er fortsatt returer. H289/1988 og H270/1987 beholdes uendret. H296 er ikke startet; automatikken ACTIVE.
+
+## Faktisk tilbakehenting
+
+Kildecommit ebdf3365f8ded06d45d46253e12afdefe07892f4 er faktisk hentet som strømmer: 123 filer, 10672187 byte, alle lengde-/SHA256-/Git-blob-bekreftet. Ingen ekstra payloadkopi beholdes. Se vinduhel1987-kilder-faktisk-hentet.json.gz.

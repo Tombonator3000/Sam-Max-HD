@@ -9,3 +9,7 @@ Alle fem egne sammensettinger og native-PNG/RGBA er visuelt sett og byteeksakt g
 Se replay-vinduhel1987.json, rutekart-vinduhel1987.json og vinduhel1987-avvik-kildepunkter.json. Alle 21978 aktive modhash, fire releasevedleggs ID/navn/størrelse/digest, 9174 beskyttede input og tre opprinnelige stasher er bekreftet uendret. Sam er eneste stilanker. Ingen nødvendig ny Tom-designavklaring. Grafikken og sluttkontrollen er ikke ferdig.
 
 Tom prioriterte 24. oktober et kompakt system for prosjekt og nedlasting. Sikre denne påbegynte bunken før videre produksjon. Undersøk og rydd verifiserte gamle out-kopier og Git-kloner, og skill arbeidsområde fra den faktiske spillerpakken. Ingen nye bildekall trengs mens denne konkrete plassfeilen undersøkes. Bibliotekkortene figurark-fast-storrelse.md og publisert-mod-er-fasit.md er brukt i grafikkarbeidet; søk etter diskplass ga ingen relevante treff. Ingen motor-/pipelinekodeendring i denne grafikkbunken.
+
+## Faktisk tilbakehenting
+
+Kildecommit ebdf3365f8ded06d45d46253e12afdefe07892f4 er faktisk hentet som strømmer: 123 filer, 10672187 byte, alle lengde-/SHA256-/Git-blob-bekreftet. Ingen ekstra payloadkopi beholdes. Se vinduhel1987-kilder-faktisk-hentet.json.gz.
